@@ -30,7 +30,7 @@ const fetchNotifications = createAsyncThunk(
   },
 );
 
-const markNotificationSeen = createAsyncThunk(
+const markNotificationsSeen = createAsyncThunk(
   'app/Notification/MARK_NOTIFICATION_SEEN',
   async (notificationIds: string[]) => {
     await updateNotificationsApi({
@@ -40,7 +40,7 @@ const markNotificationSeen = createAsyncThunk(
   },
 );
 
-const markOldNotification = createAsyncThunk(
+const markAllNotificationsAreOld = createAsyncThunk(
   'app/Notification/MARK_OLD_NOTIFICATION',
   async (notificationIds: string[]) => {
     await updateNotificationsApi({
@@ -52,8 +52,8 @@ const markOldNotification = createAsyncThunk(
 
 export const NotificationThunks = {
   fetchNotifications,
-  markNotificationSeen,
-  markOldNotification,
+  markNotificationsSeen,
+  markAllNotificationsAreOld,
 };
 
 // ================ Slice ================ //
@@ -61,7 +61,7 @@ const NotificationSlice = createSlice({
   name: 'Notification',
   initialState,
   reducers: {
-    markNotificationSeen: (state, action) => {
+    markNotificationsSeen: (state, action) => {
       const notificationIds = action.payload;
       const { notifications = [] } = current(state);
 
@@ -70,6 +70,21 @@ const NotificationSlice = createSlice({
           return {
             ...notification,
             seen: true,
+          };
+        }
+
+        return notification;
+      });
+    },
+    markAllNotificationsAreOld: (state, { payload }) => {
+      const notificationIds = payload;
+      const { notifications = [] } = current(state);
+
+      state.notifications = notifications.map((notification) => {
+        if (notificationIds.includes(notification.id)) {
+          return {
+            ...notification,
+            isNew: false,
           };
         }
 

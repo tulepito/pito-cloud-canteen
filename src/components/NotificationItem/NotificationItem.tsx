@@ -27,8 +27,8 @@ const NotificationItem: React.FC<NotificationItemProps> = (props) => {
   });
 
   const handleClick = () => {
-    dispatch(NotificationThunks.markNotificationSeen([id]));
-    dispatch(NotificationActions.markNotificationSeen([id]));
+    dispatch(NotificationThunks.markNotificationsSeen([id]));
+    dispatch(NotificationActions.markNotificationsSeen([id]));
 
     if (relatedLink) {
       router.push(relatedLink);

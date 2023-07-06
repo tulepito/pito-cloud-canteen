@@ -1,5 +1,5 @@
 // eslint-disable-next-line import/no-named-as-default
-import React from 'react';
+import React, { useEffect } from 'react';
 import classNames from 'classnames';
 import { useRouter } from 'next/router';
 
@@ -16,9 +16,13 @@ import ProfileMenuItem from '@components/ProfileMenuItem/ProfileMenuItem';
 import ProfileMenuLabel from '@components/ProfileMenuLabel/ProfileMenuLabel';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import Tooltip from '@components/Tooltip/Tooltip';
-import { useAppSelector } from '@hooks/reduxHooks';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { useLogout } from '@hooks/useLogout';
+import {
+  NotificationActions,
+  NotificationThunks,
+} from '@redux/slices/notification.slice';
 import { currentUserSelector } from '@redux/slices/user.slice';
 import { CurrentUser } from '@src/utils/data';
 
@@ -31,6 +35,7 @@ type TPartnerHeaderProps = {
 };
 
 const PartnerHeader: React.FC<TPartnerHeaderProps> = () => {
+  const dispatch = useAppDispatch();
   const currentUser = useAppSelector(currentUserSelector);
   const notifications = useAppSelector(
     (state) => state.Notification.notifications,
@@ -43,7 +48,11 @@ const PartnerHeader: React.FC<TPartnerHeaderProps> = () => {
   const { lastName = '', firstName = '' } = currentUserGetter.getProfile();
   const currentUserFullName = `${lastName} ${firstName}`;
 
-  const newNotifications = notifications.filter((noti) => noti?.isNew === true);
+  const newNotificationIds = notifications.reduce(
+    (ids, noti) => (noti?.isNew === true ? ids.concat(noti?.id) : ids),
+    [],
+  );
+  const newNotificationIdsCount = newNotificationIds.length;
 
   const onLogout = async () => {
     await handleLogoutFn();
@@ -54,6 +63,18 @@ const PartnerHeader: React.FC<TPartnerHeaderProps> = () => {
   const handleCloseTooltip = () => {
     tooltipController.setFalse();
   };
+
+  useEffect(() => {
+    if (tooltipController.value && newNotificationIds.length > 0) {
+      dispatch(
+        NotificationThunks.markAllNotificationsAreOld(newNotificationIds),
+      );
+      dispatch(
+        NotificationActions.markAllNotificationsAreOld(newNotificationIds),
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tooltipController.value]);
 
   return (
     <div className={css.root}>
@@ -85,8 +106,8 @@ const PartnerHeader: React.FC<TPartnerHeaderProps> = () => {
               className={css.notiIcon}
               onClick={() => tooltipController.setTrue()}>
               <IconBell className={css.iconBell} />
-              <RenderWhen condition={newNotifications.length > 0}>
-                <div className={css.notiDot}>{newNotifications.length}</div>
+              <RenderWhen condition={newNotificationIdsCount > 0}>
+                <div className={css.notiDot}>{newNotificationIdsCount}</div>
               </RenderWhen>
             </InlineTextButton>
           </Tooltip>
