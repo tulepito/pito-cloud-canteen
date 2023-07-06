@@ -14,6 +14,7 @@ import {
   orderManagementThunks,
 } from '@redux/slices/OrderManagement.slice';
 import { Listing } from '@src/utils/data';
+import { EOrderStates } from '@src/utils/enums';
 import { formatTimestamp } from '@utils/dates';
 import type { TDefaultProps, TListing } from '@utils/types';
 
@@ -52,9 +53,13 @@ const OrderLinkSection: React.FC<TOrderLinkSectionProps> = (props) => {
 
   const plan = Listing(planData as TListing);
   const order = Listing(orderData as TListing);
+  const { orderState } = order.getMetadata();
+
   const { viewed } = plan.getMetadata();
   const orderId = order.getId();
   const planId = plan.getId();
+
+  const isPicking = orderState === EOrderStates.picking;
   const isFirstTimeAccess =
     !isAminLayout && !(inProgress || viewed || planViewed);
 
@@ -142,7 +147,9 @@ const OrderLinkSection: React.FC<TOrderLinkSectionProps> = (props) => {
         data={{ orderLink, orderDeadline, companyName }}
         isFirstTimeShow={isFirstTimeAccess}
         isOpen={
-          !inProgress && (isFirstTimeAccess || isSendNotificationModalOpen)
+          !inProgress &&
+          (isFirstTimeAccess || isSendNotificationModalOpen) &&
+          isPicking
         }
         onClose={handleCloseSendNotificationModal}
       />
