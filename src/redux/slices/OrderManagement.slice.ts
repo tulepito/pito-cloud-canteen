@@ -12,6 +12,7 @@ import {
   participantSubOrderUpdateDocumentApi,
   queryOrderChangesHistoryDocumentApi,
 } from '@apis/firebaseApi';
+import { createNotificationApi } from '@apis/notificationApi';
 import {
   addParticipantToOrderApi,
   addUpdateMemberOrder,
@@ -30,9 +31,11 @@ import { checkUserExistedApi } from '@apis/userApi';
 import { EOrderDetailsTableTab } from '@components/OrderDetails/EditView/ManageOrderDetailSection/OrderDetailsTable/OrderDetailsTable.utils';
 import { createAsyncThunk } from '@redux/redux.helper';
 import type { RootState } from '@redux/store';
+import type { NotificationInvitationParams } from '@services/notifications';
 import type { TPlan } from '@src/utils/orderTypes';
 import { Listing, User } from '@utils/data';
 import {
+  ENotificationType,
   EOrderHistoryTypes,
   EOrderType,
   EParticipantOrderStatus,
@@ -302,7 +305,7 @@ type TOrderManagementState = {
   transactionDataMap: {
     [date: number]: TTransaction;
   };
-
+  restaurantData: TObject[];
   subOrderChangesHistory: TSubOrderChangeHistoryItem[];
   querySubOrderChangesHistoryInProgress: boolean;
   loadMoreSubOrderChangesHistory: boolean;
@@ -341,6 +344,7 @@ const initialState: TOrderManagementState = {
   participantData: [],
   anonymousParticipantData: [],
   transactionDataMap: {},
+  restaurantData: [],
   subOrderChangesHistory: [],
   querySubOrderChangesHistoryInProgress: false,
   querySubOrderChangesHistoryError: null,
@@ -876,15 +880,17 @@ const updateOrderFromDraftEdit = createAsyncThunk(
     const {
       id: { uuid: orderId },
     } = getState().OrderManagement.orderData!;
-    const {
-      id: { uuid: planId },
-    } = getState().OrderManagement.planData!;
+    const { planData, restaurantData = [] } = getState().OrderManagement;
+
+    const planId = Listing(planData as TListing).getId();
+    const { orderDetail } = Listing(planData as TListing).getMetadata();
     const { draftSubOrderChangesHistory } = getState().OrderManagement;
     const { draftOrderDetail } = getState().OrderManagement;
     const updateParams = {
       planId,
       orderDetail: draftOrderDetail,
     };
+
     await addUpdateMemberOrder(orderId, updateParams);
     await Promise.all(
       Object.keys(draftSubOrderChangesHistory).map(async (date) => {
@@ -892,7 +898,7 @@ const updateOrderFromDraftEdit = createAsyncThunk(
           date as keyof typeof draftSubOrderChangesHistory
         ] as TSubOrderChangeHistoryItem[];
         if (draftSubOrderChangesHistoryByDate.length > 0) {
-          const { restaurant } = draftOrderDetail[date] || {};
+          const { restaurant = {} } = draftOrderDetail[date] || {};
 
           await sendOrderDetailUpdatedEmailApi({
             orderId,
@@ -911,6 +917,7 @@ const updateOrderFromDraftEdit = createAsyncThunk(
                   newValue,
                   createdAt,
                 } = item;
+
                 const subOrderChangesHistoryParams = {
                   planId,
                   memberId,
@@ -930,6 +937,54 @@ const updateOrderFromDraftEdit = createAsyncThunk(
         }
       }),
     );
+
+    const updatedDateList = Object.keys(draftSubOrderChangesHistory).filter(
+      (d, index, array) => array.indexOf(d) === index,
+    );
+
+    const createNotificationParams = updatedDateList.reduce(
+      (
+        rest: {
+          type: ENotificationType;
+          params: NotificationInvitationParams;
+        }[],
+        date: string,
+      ) => {
+        const { restaurant: restaurantFromOrder } =
+          draftOrderDetail[date] || {};
+        const restaurantId = restaurantFromOrder.id;
+        const restaurant = restaurantData.find(
+          (r) => r?.id?.uuid === restaurantId,
+        );
+
+        if (restaurant) {
+          const author = restaurant.author || {};
+          const userId = User(author).getId();
+          const newParams = {
+            type: ENotificationType.SUB_ORDER_UPDATED,
+            params: {
+              userId,
+              orderId,
+              planId,
+              date,
+              newOrderDetail: draftOrderDetail[date],
+              oldOrderDetail: orderDetail[date],
+            } as NotificationInvitationParams,
+          };
+
+          return rest.concat(newParams);
+        }
+
+        return rest;
+      },
+      [],
+    );
+
+    if (!isEmpty(createNotificationParams))
+      createNotificationApi({
+        notifications: createNotificationParams,
+      });
+
     await dispatch(loadData(orderId));
   },
 );
