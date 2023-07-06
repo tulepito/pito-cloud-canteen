@@ -40,6 +40,7 @@ const Tooltip: React.FC<TTooltipProps> = (props) => {
     children,
     showArrow = true,
     overlayInnerStyle,
+    ...rest
   } = props;
   const overlayClasses = classNames(css.overlay, overlayClassName);
 
@@ -51,6 +52,7 @@ const Tooltip: React.FC<TTooltipProps> = (props) => {
     overlayInnerStyle,
     destroyTooltipOnHide: true,
     showArrow,
+    ...rest,
   };
 
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
