@@ -1,0 +1,40 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.itemWrapper {
+  @include flexAlign(center, space-between);
+  gap: 16px;
+  padding: 16px 24px;
+  border-bottom: 1px solid $neutralGray3;
+  cursor: pointer;
+  &:hover {
+    background-color: $neutralGray3;
+  }
+
+  &.isNew {
+    background-color: $neutralGray3;
+  }
+}
+
+.notificationContent {
+  @include flexAlign(center, flex-start);
+  gap: 16px;
+}
+
+.contentWrapper {
+  .content {
+    color: $neutralGray6;
+    @include textTemplate(14px, $fontWeightRegular, 20px);
+  }
+
+  .pastTime {
+    @include textTemplate(12px, $fontWeightRegular, 16px);
+    color: $neutralGray5;
+    margin-top: 2px;
+  }
+}
+
+.boldText {
+  font-weight: $fontWeightBold;
+}

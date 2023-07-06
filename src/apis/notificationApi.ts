@@ -7,12 +7,12 @@ import { getApi, postApi, putApi } from './configs';
 export const fetchNotificationsApi = async () => getApi('/notifications');
 
 export const updateNotificationsApi = async ({
-  notificationId,
+  notificationIds,
   updateData,
 }: {
-  notificationId: string | string[];
+  notificationIds: string[];
   updateData: TObject;
-}) => putApi(`/notifications`, { notificationId, updateData });
+}) => putApi(`/notifications`, { notificationIds, updateData });
 
 export const createNotificationApi = async ({
   notificationType,
