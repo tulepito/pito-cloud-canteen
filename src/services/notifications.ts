@@ -154,7 +154,20 @@ export const createFirebaseDocNotification = async (
         break;
       }
 
-      case ENotificationType.SUB_ORDER_INPROGRESS:
+      case ENotificationType.SUB_ORDER_INPROGRESS: {
+        const { planId, transition, date, orderId, subOrderName } =
+          notificationParams;
+        data = {
+          ...data,
+          transition,
+          date,
+          orderId,
+          planId,
+          subOrderName,
+        };
+
+        break;
+      }
       case ENotificationType.SUB_ORDER_CANCELED:
       case ENotificationType.SUB_ORDER_DELIVERED:
       case ENotificationType.SUB_ORDER_DELIVERING: {
