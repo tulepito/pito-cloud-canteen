@@ -4,6 +4,7 @@ import { DateTime } from 'luxon';
 
 import { transitPlanApi } from '@apis/admin';
 import { participantSubOrderUpdateDocumentApi } from '@apis/firebaseApi';
+import { createNotificationApi } from '@apis/notificationApi';
 import {
   adminUpdateOrderStateApi,
   getBookerOrderDataApi,
@@ -18,8 +19,13 @@ import {
   denormalisedResponseEntities,
   Listing,
   Transaction,
+  User,
 } from '@src/utils/data';
-import { ESubOrderTxStatus, ETransactionRoles } from '@src/utils/enums';
+import {
+  ENotificationType,
+  ESubOrderTxStatus,
+  ETransactionRoles,
+} from '@src/utils/enums';
 import { ETransition } from '@src/utils/transaction';
 import type {
   TListing,
@@ -43,6 +49,18 @@ const mapTxTransitionToFirebaseSubOrderStatus = (lastTransition: string) => {
       return ESubOrderTxStatus.CANCELED;
     default:
       return ESubOrderTxStatus.PENDING;
+  }
+};
+const mapTxTransitionToNotificationType = (lastTransition: string) => {
+  switch (lastTransition) {
+    case ETransition.START_DELIVERY:
+      return ENotificationType.SUB_ORDER_DELIVERING;
+    case ETransition.COMPLETE_DELIVERY:
+      return ENotificationType.SUB_ORDER_DELIVERED;
+    case ETransition.OPERATOR_CANCEL_PLAN:
+      return ENotificationType.SUB_ORDER_CANCELED;
+    default:
+      return ENotificationType.SUB_ORDER_INPROGRESS;
   }
 };
 
@@ -168,7 +186,9 @@ const updateOrderState = createAsyncThunk(
 
 const transit = createAsyncThunk(
   'app/OrderDetail/TRANSIT',
-  async ({ transactionId, transition }: TObject) => {
+  async ({ transactionId, transition }: TObject, { getState }) => {
+    const { company } = getState().OrderDetail;
+    const { companyName } = User(company!).getPublicData();
     const { data: response } = await transitPlanApi({
       transactionId,
       transition,
@@ -176,10 +196,10 @@ const transit = createAsyncThunk(
 
     const { tx } = response;
     const txGetter = Transaction(tx as TTransaction);
-    const { booking } = txGetter.getFullData();
-    const { displayStart } = booking.attributes;
+    const { booking, provider } = txGetter.getFullData();
+    const { displayStart, start } = booking.attributes;
     const { lastTransition } = txGetter.getAttributes();
-    const { planId, participantIds = [] } = txGetter.getMetadata();
+    const { planId, participantIds = [], orderId } = txGetter.getMetadata();
     const timestamp = new Date(displayStart).getTime();
     const subOrderTimestamp = DateTime.fromMillis(timestamp)
       .setZone('Asia/Ho_Chi_Minh')
@@ -201,6 +221,22 @@ const transit = createAsyncThunk(
         }),
       );
     }
+
+    createNotificationApi({
+      notifications: [
+        {
+          type: mapTxTransitionToNotificationType(transition),
+          params: {
+            userId: User(provider).getId(),
+            orderId,
+            planId,
+            date: new Date(start).getTime(),
+            companyName,
+            transition,
+          } as NotificationInvitationParams,
+        },
+      ],
+    });
 
     return { transactionId, transition, createdAt: new Date().toISOString() };
   },
