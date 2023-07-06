@@ -348,7 +348,7 @@ const recommendRestaurants = createAsyncThunk(
                 const restaurantResponse = denormalisedResponseEntities(
                   await sdk.listings.show({
                     id: restaurantId,
-                    include: ['images'],
+                    include: ['images', 'author'],
                     'fields.image': [
                       'variants.landscape-crop',
                       'variants.landscape-crop2x',
@@ -368,7 +368,6 @@ const recommendRestaurants = createAsyncThunk(
               }),
             ),
           );
-
           if (restaurants.length > 0) {
             const randomRestaurant =
               restaurants[Math.floor(Math.random() * (restaurants.length - 1))];
@@ -385,6 +384,8 @@ const recommendRestaurants = createAsyncThunk(
                 menuId: randomRestaurant?.menu.id.uuid,
                 minQuantity,
                 maxQuantity,
+                restaurantOwnerId:
+                  randomRestaurant?.restaurantInfo?.author?.id?.uuid,
                 phoneNumber: Listing(
                   randomRestaurant?.restaurantInfo,
                 ).getPublicData()?.phoneNumber,
@@ -421,7 +422,7 @@ const recommendRestaurantForSpecificDay = createAsyncThunk(
           const restaurantResponse = denormalisedResponseEntities(
             await sdk.listings.show({
               id: restaurantId,
-              include: ['images'],
+              include: ['images', 'author'],
               'fields.image': [
                 'variants.landscape-crop',
                 'variants.landscape-crop2x',
@@ -441,43 +442,32 @@ const recommendRestaurantForSpecificDay = createAsyncThunk(
         }),
       ),
     );
-
     if (restaurants.length > 0) {
       const randomNumber = Math.floor(Math.random() * (restaurants.length - 1));
-      const shouldUpdateRestaurantId = Listing(
-        restaurants[randomNumber]?.restaurantInfo,
-      ).getId();
+      const otherRandomNumber = Math.abs(randomNumber - restaurants.length + 1);
 
-      const newRestaurantData =
-        shouldUpdateRestaurantId !== orderDetail[dateTime]?.restaurant?.id
-          ? {
-              id: Listing(restaurants[randomNumber]?.restaurantInfo).getId(),
-              restaurantName: Listing(
-                restaurants[randomNumber]?.restaurantInfo,
-              ).getAttributes().title,
-              foodList: [],
-              phoneNumber: Listing(
-                restaurants[randomNumber]?.restaurantInfo,
-              ).getPublicData()?.phoneNumber,
-              menuId: restaurants[randomNumber]?.menu.id.uuid,
-            }
-          : {
-              id: Listing(
-                restaurants[Math.abs(randomNumber - restaurants.length + 1)]
-                  ?.restaurantInfo,
-              ).getId(),
-              restaurantName: Listing(
-                restaurants[Math.abs(randomNumber - restaurants.length + 1)]
-                  ?.restaurantInfo,
-              ).getAttributes().title,
-              foodList: [],
-              phoneNumber: Listing(
-                restaurants[randomNumber]?.restaurantInfo,
-              ).getPublicData()?.phoneNumber,
-              menuId:
-                restaurants[Math.abs(randomNumber - restaurants.length + 1)]
-                  ?.menu.id.uuid,
-            };
+      const randomRestaurant =
+        restaurants[randomNumber]?.restaurantInfo?.id?.uuid !==
+        orderDetail[dateTime]?.restaurant?.id
+          ? restaurants[randomNumber]?.restaurantInfo
+          : restaurants[otherRandomNumber]?.restaurantInfo;
+
+      const randomRestaurantGetter = Listing(randomRestaurant);
+      const randomRestaurantId = randomRestaurantGetter.getId();
+      const { minQuantity = 0, maxQuantity = Number.MAX_VALUE } =
+        randomRestaurantGetter.getMetadata();
+
+      const newRestaurantData = {
+        id: randomRestaurantId,
+        restaurantName: randomRestaurantGetter.getAttributes().title,
+        restaurantOwnerId: randomRestaurant?.author?.id?.uuid,
+        foodList: [],
+        phoneNumber: randomRestaurantGetter.getPublicData().phoneNumber,
+        menuId: restaurants[randomNumber]?.menu.id.uuid,
+        minQuantity,
+        maxQuantity,
+      };
+
       const newOrderDetail = {
         ...orderDetail,
         [dateTime]: {
