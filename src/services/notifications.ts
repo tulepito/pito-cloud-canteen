@@ -1,16 +1,16 @@
-import { randomUUID } from 'crypto';
-
 import { ENotificationType } from '@src/utils/enums';
 import type { TObject } from '@src/utils/types';
 
 import {
+  addCollectionDoc,
   queryCollectionData,
-  setCollectionDocWithCustomId,
   updateCollectionDoc,
 } from './firebase';
 
-const { FIREBASE_NOTIFICATION_COLLECTION_NAME } = process.env;
-
+const {
+  FIREBASE_NOTIFICATION_COLLECTION_NAME,
+  NEXT_PUBLIC_FIREBASE_NOTIFICATION_COLLECTION_NAME,
+} = process.env;
 type RequiredNotificationParams = {
   userId: string;
 };
@@ -27,7 +27,7 @@ type NotificationParams = {
   seen: boolean;
 };
 
-type NotificationInvitationParams = TObject &
+export type NotificationInvitationParams = TObject &
   RequiredNotificationParams &
   Partial<NotificationParams>;
 
@@ -36,7 +36,6 @@ export const createFirebaseDocNotification = async (
   notificationParams: NotificationInvitationParams,
 ) => {
   const notificationTime = new Date();
-  const notificationId = randomUUID();
   const defaultAttributes = {
     isNew: true,
     notificationType,
@@ -134,11 +133,12 @@ export const createFirebaseDocNotification = async (
         break;
       }
       case ENotificationType.SUB_ORDER_UPDATED: {
-        const { planId, subOrderDate, oldOrderDetail, newOrderDetail } =
+        const { planId, date, orderId, oldOrderDetail, newOrderDetail } =
           notificationParams;
         data = {
           ...data,
-          subOrderDate,
+          date,
+          orderId,
           planId,
           oldOrderDetail,
           newOrderDetail,
@@ -151,10 +151,10 @@ export const createFirebaseDocNotification = async (
         break;
     }
 
-    await setCollectionDocWithCustomId(
-      notificationId,
+    await addCollectionDoc(
       data,
-      FIREBASE_NOTIFICATION_COLLECTION_NAME!,
+      NEXT_PUBLIC_FIREBASE_NOTIFICATION_COLLECTION_NAME! ||
+        FIREBASE_NOTIFICATION_COLLECTION_NAME!,
     );
   } catch (error) {
     console.error('Error notification type: ', notificationType);
@@ -174,6 +174,10 @@ export const fetchFirebaseDocNotifications = async (userId: string) => {
       },
       limitRecords: 30,
     });
+    console.debug(
+      '💫 > file: notifications.ts:177 > fetchFirebaseDocNotifications > notifications: ',
+      notifications,
+    );
 
     return notifications;
   } catch (error) {
