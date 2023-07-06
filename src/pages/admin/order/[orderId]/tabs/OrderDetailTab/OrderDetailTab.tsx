@@ -65,6 +65,8 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
   const dispatch = useAppDispatch();
   const orderId = Listing(order).getId();
 
+  const { handler: onDownloadReviewOrderResults } = useExportOrderDetails();
+
   const {
     notes,
     orderStateHistory = [],
@@ -88,8 +90,6 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
     orderTitle,
     priceQuotationData,
   );
-
-  const { handler: onDownloadReviewOrderResults } = useExportOrderDetails();
 
   const tabItems = useMemo(
     () => {
