@@ -55,23 +55,25 @@ const CollapsibleRows: React.FC<TCollapsibleRowsProps> = (props) => {
           const isChecked = rowCheckbox.includes(row.key);
 
           return (
-            <>
-              <td
-                className={classNames(tableBodyCellClassName, css.bodyCell, {
-                  [css.isParent]: row.data.isParent && showRowsController.value,
-                })}
-                data-label={col.label}
-                key={row.key}>
-                {col.render(row.data, isChecked, showRowsController)}
-              </td>
-            </>
+            <td
+              className={classNames(tableBodyCellClassName, css.bodyCell, {
+                [css.isParent]: row.data.isParent && showRowsController.value,
+              })}
+              data-label={col.label}
+              key={col.key}>
+              {col.render(row.data, isChecked, showRowsController)}
+            </td>
           );
         })}
       </tr>
       <RenderWhen condition={row.data.isParent && showRowsController.value}>
         {row.data?.children.map((child: TRowData) => (
           <tr
-            className={classNames(tableBodyRowClassName, css.bodyRow)}
+            className={classNames(
+              tableBodyRowClassName,
+              css.bodyRow,
+              css.bodyRowChild,
+            )}
             key={child.key}>
             {columns.map((col: TColumn) => {
               const rowCheckbox = values?.rowCheckbox || [];

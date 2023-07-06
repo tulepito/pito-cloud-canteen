@@ -18,8 +18,7 @@
 }
 
 .labelDate {
-  font-size: 14px;
-  line-height: 24px;
+  @include textTemplate(14px, $fontWeightSemiBold, 24px);
   color: $neutralGray6;
   margin-bottom: 8px;
   display: inline-block;
@@ -44,4 +43,8 @@
   width: 160px;
   height: 48px;
   margin: 20px auto 0;
+}
+
+.label {
+  font-weight: $fontWeightSemiBold;
 }
