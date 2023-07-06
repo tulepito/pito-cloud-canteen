@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, current } from '@reduxjs/toolkit';
 
 import {
   fetchNotificationsApi,
@@ -32,9 +32,9 @@ const fetchNotifications = createAsyncThunk(
 
 const markNotificationSeen = createAsyncThunk(
   'app/Notification/MARK_NOTIFICATION_SEEN',
-  async (notificationId: string | string[]) => {
+  async (notificationIds: string[]) => {
     await updateNotificationsApi({
-      notificationId,
+      notificationIds,
       updateData: { seen: true },
     });
   },
@@ -42,9 +42,9 @@ const markNotificationSeen = createAsyncThunk(
 
 const markOldNotification = createAsyncThunk(
   'app/Notification/MARK_OLD_NOTIFICATION',
-  async (notificationId: string | string[]) => {
+  async (notificationIds: string[]) => {
     await updateNotificationsApi({
-      notificationId,
+      notificationIds,
       updateData: { isNew: false },
     });
   },
@@ -60,7 +60,23 @@ export const NotificationThunks = {
 const NotificationSlice = createSlice({
   name: 'Notification',
   initialState,
-  reducers: {},
+  reducers: {
+    markNotificationSeen: (state, action) => {
+      const notificationIds = action.payload;
+      const { notifications = [] } = current(state);
+
+      state.notifications = notifications.map((notification) => {
+        if (notificationIds.includes(notification.id)) {
+          return {
+            ...notification,
+            seen: true,
+          };
+        }
+
+        return notification;
+      });
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchNotifications.pending, (state) => {
