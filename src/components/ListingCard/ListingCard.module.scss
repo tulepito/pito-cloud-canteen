@@ -73,6 +73,7 @@
 
     @include viewportMedium {
       display: block;
+      white-space: nowrap;
     }
   }
 }
