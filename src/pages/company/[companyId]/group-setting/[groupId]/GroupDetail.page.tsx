@@ -18,6 +18,7 @@ import useBoolean from '@hooks/useBoolean';
 import useFetchCompanyInfo from '@hooks/useFetchCompanyInfo';
 import { companyPaths } from '@src/paths';
 import { companyThunks } from '@src/redux/slices/company.slice';
+import { ALLERGIES_OPTIONS, getLabelByKey } from '@src/utils/enums';
 import { User } from '@utils/data';
 import type { TObject } from '@utils/types';
 
@@ -71,6 +72,10 @@ const GroupDetailPage = () => {
     (state) => state.company.companyMembers,
     shallowEqual,
   );
+  const nutritions = useAppSelector(
+    (state) => state.company.nutritions,
+    shallowEqual,
+  );
 
   const {
     fetchGroupDetailInProgress,
@@ -99,8 +104,18 @@ const GroupDetailPage = () => {
               }`,
               email: User(member).getAttributes()?.email,
               group: getGroupNames(User(member).getMetadata()?.groupList),
-              allergy: User(member).getPublicData()?.allergies?.join(', '),
-              nutrition: User(member).getPublicData()?.nutritions?.join(', '),
+              allergy: User(member)
+                .getPublicData()
+                ?.allergies?.map((allergy: string) =>
+                  getLabelByKey(ALLERGIES_OPTIONS, allergy),
+                )
+                .join(', '),
+              nutrition: User(member)
+                .getPublicData()
+                ?.nutritions?.map((nutrition: string) =>
+                  getLabelByKey(nutritions, nutrition),
+                )
+                ?.join(', '),
             },
           },
         ],
@@ -189,6 +204,7 @@ const GroupDetailPage = () => {
         groupId: groupId as string,
       }),
     );
+    dispatch(companyThunks.fetchAttributes());
   }, [groupId]);
 
   const groupInfoFormInitialValues = useMemo(
