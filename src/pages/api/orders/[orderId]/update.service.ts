@@ -78,7 +78,7 @@ const updateOrder = async ({
           ...(shouldUpdateOrderName
             ? {
                 publicData: {
-                  orderName: `${companyName}_PCC_${formatTimestamp(
+                  orderName: `${companyName}_${formatTimestamp(
                     generalInfo.startDate,
                   )} - ${formatTimestamp(generalInfo.endDate)}`,
                 },
