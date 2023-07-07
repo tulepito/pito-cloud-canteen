@@ -149,6 +149,7 @@ const OrderListPage = () => {
       deliveryHour,
       deadlineDate,
       orderStateHistory = [],
+      orderState,
     } = orderListing.getMetadata();
     const { title: orderTitle } = orderListing.getAttributes();
 
@@ -210,6 +211,7 @@ const OrderListPage = () => {
           transactionId:
             currentPlanListing.getMetadata().orderDetail[planItemKey]
               ?.transactionId,
+          orderState,
         },
         title: orderTitle,
         start: DateTime.fromMillis(+planItemKey).toJSDate(),
