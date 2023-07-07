@@ -16,7 +16,7 @@ import useSelectDay from '@components/CalendarDashboard/hooks/useSelectDay';
 import LoadingModal from '@components/LoadingModal/LoadingModal';
 import ParticipantLayout from '@components/ParticipantLayout/ParticipantLayout';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
-import { getItem } from '@helpers/localStorageHelpers';
+import { getItem, setItem } from '@helpers/localStorageHelpers';
 import { isOver } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
@@ -47,7 +47,14 @@ const OrderListPage = () => {
   const router = useRouter();
   const { planId: planIdFromQuery, timestamp: timestampFromQuery } =
     router.query;
+  const localStorageView = getItem('participant_calendarView');
+  const isValidLocalStorageView = ['month', 'week'].includes(
+    localStorageView as View,
+  );
 
+  const [defaultCalendarView, setDefaultCalendarView] = useState<View>(
+    isValidLocalStorageView ? localStorageView : Views.WEEK,
+  );
   const updateProfileModalControl = useBoolean();
   const onBoardingModal = useBoolean();
   const tourControl = useBoolean();
@@ -220,9 +227,15 @@ const OrderListPage = () => {
     isSameDate(_event.start, selectedDay),
   );
 
-  const defaultView = isMobileLayout
-    ? Views.MONTH
-    : (getItem('participant_calendarView') as View) || Views.WEEK;
+  useEffect(() => {
+    if (isMobileLayout) {
+      setItem('participant_calendarView', Views.MONTH);
+      setDefaultCalendarView(Views.MONTH);
+    } else {
+      setItem('participant_calendarView', Views.WEEK);
+      setDefaultCalendarView(Views.WEEK);
+    }
+  }, [isMobileLayout]);
 
   const subOrdersFromSelectedDayTxIds = compact(
     subOrdersFromSelectedDay.map(
@@ -341,7 +354,7 @@ const OrderListPage = () => {
           events={walkthroughEnable ? EVENTS_MOCKUP : flattenEvents}
           renderEvent={OrderEventCard}
           inProgress={showLoadingModal}
-          defautlView={defaultView}
+          defautlView={defaultCalendarView}
           // exposeAnchorDate={handleAnchorDateChange}
           components={{
             toolbar: (toolBarProps: any) => (

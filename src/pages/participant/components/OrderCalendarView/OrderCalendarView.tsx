@@ -143,8 +143,11 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
     isSameDate(_event.start, selectedDay),
   );
 
-  const defaultView =
-    (getItem('participant_calendarView') as View) || Views.WEEK;
+  const localStorageView = getItem('participant_calendarView');
+  const isValidLocalStorageView = ['month', 'week'].includes(
+    localStorageView as View,
+  );
+  const defaultView = isValidLocalStorageView ? localStorageView : Views.WEEK;
 
   const sectionCompanyBranding = loadDataInProgress ? (
     <div className={css.sectionCompanyBranding}>

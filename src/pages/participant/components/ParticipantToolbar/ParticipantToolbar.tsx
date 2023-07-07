@@ -10,6 +10,7 @@ import {
 } from '@components/CalendarDashboard/helpers/constant';
 import useSelectDay from '@components/CalendarDashboard/hooks/useSelectDay';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
+import { setItem } from '@helpers/localStorageHelpers';
 import type { TObject } from '@utils/types';
 
 import css from './ParticipantToolbar.module.scss';
@@ -77,7 +78,7 @@ const ParticipantToolbar: React.FC<TToolbarProps> = (props) => {
 
   const viewFunc = (viewName: string) => () => {
     onView(viewName);
-    localStorage.setItem('participant_calendarView', viewName);
+    setItem('participant_calendarView', viewName);
   };
 
   const viewNamesGroupFunc = () => {
