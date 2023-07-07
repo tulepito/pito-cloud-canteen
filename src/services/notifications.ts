@@ -139,6 +139,7 @@ export const createFirebaseDocNotification = async (
           orderId,
           oldOrderDetail,
           newOrderDetail,
+          companyName,
           orderTitle,
         } = notificationParams;
         data = {
@@ -148,6 +149,7 @@ export const createFirebaseDocNotification = async (
           planId,
           oldOrderDetail,
           newOrderDetail,
+          companyName,
           orderTitle,
           relatedLink: `/partner/orders/${orderId}_${subOrderDate}`,
         };
@@ -181,6 +183,36 @@ export const createFirebaseDocNotification = async (
           subOrderDate,
           orderId,
           planId,
+          companyName,
+          relatedLink: `/partner/orders/${orderId}_${subOrderDate}`,
+        };
+
+        break;
+      }
+
+      case ENotificationType.SUB_ORDER_REVIEWED_BY_BOOKER: {
+        const { reviewerId, subOrderDate, orderId, companyName } =
+          notificationParams;
+        data = {
+          ...data,
+          reviewerId,
+          subOrderDate,
+          orderId,
+          companyName,
+          relatedLink: `/partner/orders/${orderId}_${subOrderDate}`,
+        };
+
+        break;
+      }
+
+      case ENotificationType.SUB_ORDER_REVIEWED_BY_PARTICIPANT: {
+        const { reviewerId, subOrderDate, orderId, companyName } =
+          notificationParams;
+        data = {
+          ...data,
+          reviewerId,
+          subOrderDate,
+          orderId,
           companyName,
           relatedLink: `/partner/orders/${orderId}_${subOrderDate}`,
         };

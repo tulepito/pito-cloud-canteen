@@ -24,8 +24,13 @@ const RatingSubOrderModal: React.FC<TRatingSubOrderModalProps> = (props) => {
     openSuccessRatingModal,
   } = props;
   const dispatch = useAppDispatch();
-  const { orderId, restaurant, timestamp, planId } =
-    selectedEvent?.resource || {};
+  const {
+    companyName = 'PCC',
+    orderId,
+    restaurant,
+    timestamp,
+    planId,
+  } = selectedEvent?.resource || {};
   const restaurantId = restaurant?.id;
 
   const handleClose = () => {
@@ -61,6 +66,7 @@ const RatingSubOrderModal: React.FC<TRatingSubOrderModalProps> = (props) => {
 
     const { meta } = await dispatch(
       OrderListThunks.postParticipantRating({
+        companyName,
         rating,
         detailTextRating,
         planId,
