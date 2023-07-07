@@ -100,7 +100,7 @@
 }
 
 .tooltipOverlay {
-  opacity: 1;
+  opacity: 1 !important;
 }
 
 .tooltipOverlay :global(.rc-tooltip-inner) {
