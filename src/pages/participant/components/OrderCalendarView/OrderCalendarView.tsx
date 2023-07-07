@@ -55,6 +55,7 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
   const ensureCompanyUser = User(company).getFullData();
   const orderObj = Listing(order);
   const orderId = orderObj.getId();
+  const { companyName = 'PCC' } = orderObj.getMetadata();
   const orderTitle = orderObj.getAttributes()?.title;
   const orderColor = markColorForOrder(convertStringToNumber(orderTitle || ''));
   const currentUserId = CurrentUser(currentUser).getId();

@@ -163,6 +163,7 @@ const OrderListPage = () => {
       deadlineDate,
       orderStateHistory = [],
       orderState,
+      companyName = 'PCC',
     } = orderListing.getMetadata();
     const { title: orderTitle } = orderListing.getAttributes();
 
@@ -218,6 +219,7 @@ const OrderListPage = () => {
             dishes,
           },
           deadlineDate,
+          companyName,
           isOrderStarted:
             orderStateHistory.findIndex(
               (history: TObject) => history.state === EOrderStates.inProgress,

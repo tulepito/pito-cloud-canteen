@@ -3,17 +3,28 @@ import uniq from 'lodash/uniq';
 
 import { denormalisedResponseEntities } from '@services/data';
 import { fetchListing } from '@services/integrationHelper';
+import { createFirebaseDocNotification } from '@services/notifications';
 import { getIntegrationSdk } from '@services/sdk';
 import { UserPermission } from '@src/types/UserPermission';
 import { Listing, User } from '@src/utils/data';
-import { EListingType, EOrderStates } from '@src/utils/enums';
+import {
+  EListingType,
+  ENotificationType,
+  EOrderStates,
+} from '@src/utils/enums';
 
-export const postRatingFn = async (ratings: any) => {
+export const postRatingFn = async ({
+  companyName,
+  ratings,
+}: {
+  companyName: string;
+  ratings: any;
+}) => {
   const integrationSdk = getIntegrationSdk();
   await Promise.all(
     ratings.map(async (rating: any) => {
       const { restaurantId, ...rest } = rating;
-      const { orderId, timestamp } = rest;
+      const { orderId, timestamp, reviewerId } = rest;
       const restaurantListing = await fetchListing(restaurantId, ['author']);
       const listingAuthorUser = User(restaurantListing.author);
       const authorId = listingAuthorUser.getId();
@@ -28,23 +39,36 @@ export const postRatingFn = async (ratings: any) => {
         },
       });
 
+      createFirebaseDocNotification(
+        ENotificationType.SUB_ORDER_REVIEWED_BY_BOOKER,
+        {
+          userId: authorId,
+          orderId,
+          subOrderDate: timestamp,
+          companyName,
+          reviewerId,
+        },
+      );
+
       return denormalisedResponseEntities(response)[0];
     }),
   );
 };
 
 export const postParticipantRatingFn = async ({
+  companyName,
   rating,
   detailTextRating,
   imageIdList,
 }: {
+  companyName: string;
   rating: any;
   detailTextRating: string;
   imageIdList: string[];
 }) => {
   const integrationSdk = getIntegrationSdk();
   const { restaurantId, ...rest } = rating;
-  const { orderId, timestamp } = rest;
+  const { orderId, timestamp, reviewerId } = rest;
   const restaurantListing = await fetchListing(restaurantId, ['author']);
   const listingAuthorUser = User(restaurantListing.author);
   const authorId = listingAuthorUser.getId();
@@ -60,6 +84,17 @@ export const postParticipantRatingFn = async ({
       reviewRole: UserPermission.PARTICIPANT,
     },
   });
+
+  createFirebaseDocNotification(
+    ENotificationType.SUB_ORDER_REVIEWED_BY_PARTICIPANT,
+    {
+      userId: authorId,
+      orderId,
+      subOrderDate: timestamp,
+      companyName,
+      reviewerId,
+    },
+  );
 
   return denormalisedResponseEntities(response)[0];
 };

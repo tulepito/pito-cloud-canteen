@@ -215,6 +215,7 @@ export type TBookerPostRatingApiBody = {
   detailTextRating?: string;
   staff: TScenarioRating;
   service: TScenarioRating;
+  companyName: string;
 };
 export const bookerPostRatingApi = (body: TBookerPostRatingApiBody) =>
   postApi('/company/ratings', body);

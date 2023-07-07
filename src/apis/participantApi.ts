@@ -13,6 +13,7 @@ export const participantReviewPlanTx = (body: TParticipantReviewPlanTxBody) => {
 };
 
 type TParticipantPostRatingApiBody = {
+  companyName: string;
   rating: TRestaurantRating;
   imageIdList?: string[];
   detailTextRating?: string;
