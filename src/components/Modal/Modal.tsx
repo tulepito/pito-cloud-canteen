@@ -44,7 +44,6 @@ const Modal: React.FC<TModalProps> = (props) => {
     openClassName,
     handleClose,
     scrollLayerClassName,
-    modalHeaderClassName,
     customHeader,
     closeButton,
     closeClassName,
