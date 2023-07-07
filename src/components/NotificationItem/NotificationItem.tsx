@@ -6,6 +6,7 @@ import {
   NotificationActions,
   NotificationThunks,
 } from '@redux/slices/notification.slice';
+import { ENotificationType } from '@src/utils/enums';
 
 import NotificationItemIcon from './NotificationItemIcon';
 import NotificationItemInfo from './NotificationItemInfo';
@@ -27,8 +28,10 @@ const NotificationItem: React.FC<NotificationItemProps> = (props) => {
   });
 
   const handleClick = () => {
-    dispatch(NotificationThunks.markNotificationsSeen([id]));
-    dispatch(NotificationActions.markNotificationsSeen([id]));
+    if (notificationType !== ENotificationType.SUB_ORDER_UPDATED) {
+      dispatch(NotificationThunks.markNotificationsSeen([id]));
+      dispatch(NotificationActions.markNotificationsSeen([id]));
+    }
 
     if (relatedLink) {
       router.push(relatedLink);
