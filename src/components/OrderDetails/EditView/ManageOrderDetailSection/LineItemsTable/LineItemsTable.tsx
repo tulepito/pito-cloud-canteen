@@ -46,8 +46,9 @@ const LineItemsTable: React.FC<TLineItemsTableProps> = (props) => {
 
   const dispatch = useAppDispatch();
   const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
-  const { planData, draftOrderDetail } = useAppSelector(
-    (state) => state.OrderManagement,
+  const planData = useAppSelector((state) => state.OrderManagement.planData);
+  const draftOrderDetail = useAppSelector(
+    (state) => state.OrderManagement.draftOrderDetail,
   );
 
   const planDataGetter = Listing(planData as TListing);
