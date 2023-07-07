@@ -221,7 +221,6 @@ const transit = createAsyncThunk(
         }),
       );
     }
-
     createNotificationApi({
       notifications: [
         {
@@ -230,7 +229,7 @@ const transit = createAsyncThunk(
             userId: User(provider).getId(),
             orderId,
             planId,
-            subOrderDate: new Date(start).getTime(),
+            subOrderDate: DateTime.fromISO(start).startOf('day').toMillis(),
             companyName,
             transition,
           } as NotificationInvitationParams,
