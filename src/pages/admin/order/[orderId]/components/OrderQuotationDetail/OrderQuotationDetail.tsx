@@ -1,5 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useMemo, useState } from 'react';
+import compact from 'lodash/compact';
+import isEmpty from 'lodash/isEmpty';
 
 import ReviewCartSection from '@components/OrderDetails/ReviewView/ReviewCartSection/ReviewCartSection';
 import ReviewOrderDetailsSection from '@components/OrderDetails/ReviewView/ReviewOrderDetailsSection/ReviewOrderDetailsSection';
@@ -66,20 +68,28 @@ const OrderQuotationDetail: React.FC<OrderQuotationDetailProps> = (props) => {
   const tabItems = useMemo(
     () =>
       isPartner
-        ? Object.keys(quotationDetail).map((restaurantId: string) => ({
-            key: restaurantId,
-            label: quotationDetail[restaurantId].name,
-            childrenFn: (childProps: any) => (
-              <ReviewOrderDetailsSection {...childProps} />
-            ),
-            childrenProps: {
-              foodOrderGroupedByDate: formatQuotationToFoodTableData(
-                quotationDetail,
-                restaurantId,
-              ),
-              outsideCollapsible: true,
-            },
-          }))
+        ? compact(
+            Object.keys(quotationDetail).map((restaurantId: string) => {
+              if (isEmpty(quotationDetail[restaurantId].quotation)) {
+                return null;
+              }
+
+              return {
+                key: restaurantId,
+                label: quotationDetail[restaurantId].name,
+                childrenFn: (childProps: any) => (
+                  <ReviewOrderDetailsSection {...childProps} />
+                ),
+                childrenProps: {
+                  foodOrderGroupedByDate: formatQuotationToFoodTableData(
+                    quotationDetail,
+                    restaurantId,
+                  ),
+                  outsideCollapsible: true,
+                },
+              };
+            }),
+          )
         : [],
     [isPartner, quotationDetail],
   );
