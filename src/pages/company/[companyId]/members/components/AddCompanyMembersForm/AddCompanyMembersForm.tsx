@@ -5,6 +5,7 @@ import { useIntl } from 'react-intl';
 import difference from 'lodash/difference';
 import fill from 'lodash/fill';
 
+import Avatar from '@components/Avatar/Avatar';
 import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
@@ -157,9 +158,19 @@ const AddCompanyMembersForm: React.FC<AddCompanyMembersFormProps> = (props) => {
                 return (
                   <div key={index} className={css.memberItem}>
                     <div className={css.memberWrapper}>
-                      <div className={css.grayCircle} />
                       {hasNoAccount ? (
-                        <div className={css.fullRowEmail}>{record.email}</div>
+                        <div className={css.grayCircle} />
+                      ) : (
+                        <Avatar
+                          className={css.avatar}
+                          user={record.response.user}
+                          disableProfileLink
+                        />
+                      )}
+                      {hasNoAccount ? (
+                        <>
+                          <div className={css.fullRowEmail}>{record.email}</div>
+                        </>
                       ) : (
                         <div>
                           <div className={css.name}>

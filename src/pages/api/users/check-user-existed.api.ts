@@ -3,6 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 import cookies from '@services/cookie';
 import { getIntegrationSdk } from '@services/integrationSdk';
+import { EImageVariants } from '@src/utils/enums';
 import { denormalisedResponseEntities } from '@utils/data';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
@@ -21,6 +22,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       await integrationSdk.users.show({
         ...(hasId ? { id } : {}),
         ...(hasEmail ? { email } : {}),
+        include: ['profileImage'],
+        'fields.image': [
+          `variants.${EImageVariants.squareSmall}`,
+          `variants.${EImageVariants.squareSmall2x}`,
+        ],
       }),
     );
 
