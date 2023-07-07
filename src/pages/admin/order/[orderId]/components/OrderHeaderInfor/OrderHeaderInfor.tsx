@@ -6,6 +6,7 @@ import Button from '@components/Button/Button';
 import { FieldTextInputComponent } from '@components/FormFields/FieldTextInput/FieldTextInput';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { Listing, User } from '@src/utils/data';
+import { EOrderStates } from '@src/utils/enums';
 import type { TListing, TUser } from '@src/utils/types';
 
 import css from './OrderHeaderInfor.module.scss';
@@ -41,6 +42,7 @@ const OrderHeaderInfor: React.FC<OrderHeaderInforProps> = (props) => {
     deliveryAddress,
     deliveryHour,
     staffName = '',
+    orderState,
   } = orderListing.getMetadata();
 
   const { companyName } = companyUser.getPublicData();
@@ -50,6 +52,11 @@ const OrderHeaderInfor: React.FC<OrderHeaderInforProps> = (props) => {
   const { phoneNumber: publicPhoneNumber } = bookerUser.getPublicData();
   const phoneNumber = protetedphoneNumber || publicPhoneNumber;
   const { email: bookerEmail } = bookerUser.getAttributes();
+
+  const isCanceledOrder = [
+    EOrderStates.canceled,
+    EOrderStates.canceledByBooker,
+  ].includes(orderState);
 
   const formInitialValues = useMemo(
     () => ({
@@ -130,12 +137,13 @@ const OrderHeaderInfor: React.FC<OrderHeaderInforProps> = (props) => {
                       input={pitoStaffInput.input}
                       meta={pitoStaffInput.meta}
                       className={css.pitoStaffInput}
+                      disabled={isCanceledOrder}
                     />
                     <Button
                       onClick={onSaveStaffName}
                       variant="cta"
                       inProgress={updateOrderStaffNameInProgress}
-                      disabled={pristine}>
+                      disabled={pristine || isCanceledOrder}>
                       Lưu
                     </Button>
                   </>
