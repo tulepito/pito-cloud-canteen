@@ -1,6 +1,9 @@
-import React from 'react';
+import React, { forwardRef, useState } from 'react';
+import { OnChange } from 'react-final-form-listeners';
 import { useIntl } from 'react-intl';
 import classNames from 'classnames';
+import format from 'date-fns/format';
+import viLocale from 'date-fns/locale/vi';
 import type { FormApi } from 'final-form';
 
 import FieldDatePicker from '@components/FormFields/FieldDatePicker/FieldDatePicker';
@@ -25,23 +28,66 @@ type TFieldMenuApplyTimeGroup = {
   inputFieldsClassName?: string;
 };
 
+// eslint-disable-next-line react/display-name
+const CustomStartDateFieldInput = forwardRef((props, ref) => {
+  return (
+    <FieldTextInput
+      {...props}
+      id="startDate"
+      name="startDate"
+      className={css.customInput}
+      format={(value) => {
+        return value
+          ? format(new Date(value), 'EEE, dd MMMM, yyyy', {
+              locale: viLocale,
+            })
+          : format(new Date(), 'EEE, dd MMMM, yyyy', {
+              locale: viLocale,
+            });
+      }}
+      inputRef={ref}
+    />
+  );
+});
+
+// eslint-disable-next-line react/display-name
+const CustomEndDateFieldInput = forwardRef((props, ref) => {
+  return (
+    <FieldTextInput
+      {...props}
+      id="endDate"
+      name="endDate"
+      className={css.customInput}
+      format={(value) => {
+        return value
+          ? format(new Date(value), 'EEE, dd MMMM, yyyy', {
+              locale: viLocale,
+            })
+          : format(new Date(), 'EEE, dd MMMM, yyyy', {
+              locale: viLocale,
+            });
+      }}
+      inputRef={ref}
+    />
+  );
+});
+
 const FieldMenuApplyTimeGroup: React.FC<TFieldMenuApplyTimeGroup> = (props) => {
   const { values, form, dateInputClassName, className, inputFieldsClassName } =
     props;
   const intl = useIntl();
+  const { startDate: startDateInitialValue, endDate: endDateInitialValue } =
+    values;
+  const initialStartDate = startDateInitialValue
+    ? new Date(startDateInitialValue)
+    : null;
+  const initialEndDate = endDateInitialValue
+    ? new Date(endDateInitialValue)
+    : null;
+  const [startDate, setStartDate] = useState<Date>(initialStartDate!);
+  const [endDate, setEndDate] = useState<Date>(initialEndDate!);
 
   const isCycleMenu = values.menuType === EMenuTypes.cycleMenu;
-
-  const setStartDate = (date: Date) => {
-    form.change('startDate', date);
-    if (values.endDate <= date) {
-      form.change('endDate', undefined);
-    }
-  };
-
-  const setEndDate = (date: Date) => {
-    form.change('endDate', date);
-  };
 
   const today = new Date();
   const startDateAsDate = new Date(values.startDate);
@@ -56,19 +102,45 @@ const FieldMenuApplyTimeGroup: React.FC<TFieldMenuApplyTimeGroup> = (props) => {
     ? false
     : !values.startDate || !values.endDate;
 
+  const startDateClasses = classNames(
+    css.inputDate,
+    dateInputClassName,
+    !startDate && css.placeholder,
+  );
+
+  const endDateClasses = classNames(
+    css.inputDate,
+    dateInputClassName,
+    !endDate && css.placeholder,
+  );
+
+  const handleStartDateChange = (value: any, prevValue: any) => {
+    if (endDateInitialValue && value !== prevValue) {
+      form.batch(() => {
+        form.change('endDate', undefined);
+        setEndDate(undefined!);
+      });
+    }
+  };
+
   return (
     <div className={classNames(css.root, className)}>
       <div className={classNames(css.fields, inputFieldsClassName)}>
+        <OnChange name="startDate">{handleStartDateChange}</OnChange>
         <FieldDatePicker
           id="startDate"
           name="startDate"
-          selected={values.startDate}
-          onChange={setStartDate}
+          selected={startDate}
+          onChange={(date: Date) => setStartDate(date)}
           minDate={today}
-          className={classNames(css.inputDate, dateInputClassName)}
-          dateFormat={'dd MMMM, yyyy'}
-          placeholderText={'Nhập ngày bắt đầu'}
+          className={startDateClasses}
+          dateFormat={'EEE, dd MMMM, yyyy'}
+          placeholderText={format(new Date(), 'EEE, dd MMMM, yyyy', {
+            locale: viLocale,
+          })}
+          position="bottom"
           autoComplete="off"
+          withPortal
           label={intl.formatMessage({
             id: 'EditMenuInformationForm.startDateLabel',
           })}
@@ -77,19 +149,21 @@ const FieldMenuApplyTimeGroup: React.FC<TFieldMenuApplyTimeGroup> = (props) => {
               id: 'EditMenuInformationForm.startDateRequired',
             }),
           )}
+          customInput={<CustomStartDateFieldInput />}
         />
         {values.menuType === EMenuTypes.fixedMenu && (
           <FieldDatePicker
             id="endDate"
             name="endDate"
             selected={values.endDate}
-            onChange={setEndDate}
+            onChange={(date: Date) => setEndDate(date)}
             disabled={!values.startDate}
             minDate={minEndDate || today}
-            className={classNames(css.inputDate, dateInputClassName)}
+            className={endDateClasses}
             dateFormat={'dd MMMM, yyyy'}
             placeholderText={'Nhập ngày kết thúc'}
             autoComplete="off"
+            withPortal
             label={intl.formatMessage({
               id: 'EditMenuInformationForm.endDateLabel',
             })}
@@ -98,6 +172,7 @@ const FieldMenuApplyTimeGroup: React.FC<TFieldMenuApplyTimeGroup> = (props) => {
                 id: 'EditMenuInformationForm.endDateRequired',
               }),
             )}
+            customInput={<CustomEndDateFieldInput />}
           />
         )}
         {isCycleMenu && (
