@@ -20,9 +20,16 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   switch (apiMethod) {
     case HttpMethod.POST:
       try {
-        const { rating, detailTextRating, imageIdList, planId } = req.body;
+        const {
+          companyName = 'PCC',
+          rating,
+          detailTextRating,
+          imageIdList,
+          planId,
+        } = req.body;
         const { reviewerId, timestamp } = rating;
         const review = await postParticipantRatingFn({
+          companyName,
           rating,
           detailTextRating,
           imageIdList,
@@ -41,6 +48,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         const food = await fetchListing(foodId);
         const foodListing = Listing(food);
         const { title: foodName } = foodListing.getAttributes();
+
         createFirebaseDocNotification(ENotificationType.ORDER_RATING, {
           userId: reviewerId,
           planId,

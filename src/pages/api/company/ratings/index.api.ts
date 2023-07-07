@@ -14,9 +14,15 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   switch (apiMethod) {
     case HttpMethod.POST:
       try {
-        const { ratings, detailTextRating, imageIdList, staff, service } =
-          req.body;
-        await postRatingFn(ratings);
+        const {
+          companyName,
+          ratings,
+          detailTextRating,
+          imageIdList,
+          staff,
+          service,
+        } = req.body;
+        await postRatingFn({ companyName, ratings });
         await updateRatingForRestaurantFn(ratings);
         await updateRatingForOrderFn({
           ratings,
