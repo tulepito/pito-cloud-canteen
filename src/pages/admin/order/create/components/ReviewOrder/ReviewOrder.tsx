@@ -164,6 +164,13 @@ export const ReviewContent: React.FC<any> = (props) => {
   } = Listing(order as TListing).getMetadata();
   const { restaurantName, phoneNumber, foodList = {}, id } = restaurant || {};
   const isInProgressOrder = orderState === EOrderStates.inProgress;
+  const isCancelOrder = [
+    EOrderStates.canceled,
+    EOrderStates.canceledByBooker,
+  ].includes(orderState);
+
+  const fieldDeliveryManDisabled =
+    isCancelOrder || deliveryManOptions?.length === 0;
 
   const parsedFoodList = Object.keys(foodList).map((key, index) => {
     return {
@@ -226,6 +233,7 @@ export const ReviewContent: React.FC<any> = (props) => {
                 className={css.selectBoxContent}
                 meta={deliveryMan.meta}
                 input={deliveryMan.input}
+                disabled={fieldDeliveryManDisabled}
                 onChange={handleFieldDeliveryManChange}>
                 <option disabled value={''}>
                   Chọn nhân viên
