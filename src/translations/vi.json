@@ -1388,7 +1388,7 @@
   "ReviewOrdersResultModal.tableHead.foodName": "MÓN ĂN",
   "ReviewOrdersResultModal.tableHead.name": "TÊN",
   "ReviewOrdersResultModal.tableHead.price": "ĐƠN GIÁ",
-  "ReviewOrdersResultModal.tableHead.requirement": "Ghi chú",
+  "ReviewOrdersResultModal.tableHead.requirement": "GHI CHÚ",
   "ReviewOrdersResultModal.title": "Kết quả chọn món",
   "ReviewOrdersResultSection.subtitle": "{count, plural, =0 {} other {(# người đã chọn)}}",
   "ReviewOrdersResultSection.title": "TỔNG SỐ LƯỢNG THAM GIA",

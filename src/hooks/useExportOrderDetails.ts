@@ -33,7 +33,7 @@ const prepareData = ({
             Tên: participantData[memberId]?.name,
             'Món ăn': foodListOfDate[foodId]?.foodName,
             'Đơn giá': foodListOfDate[foodId]?.foodPrice,
-            'GHI CHÚ': requirement,
+            'Ghi chú': requirement,
           };
 
           return isJoinedPlan(foodId, status)
