@@ -480,8 +480,7 @@ const recommendRestaurantForSpecificDay = createAsyncThunk(
               ).getAttributes().title,
               foodList: [],
               phoneNumber: Listing(
-                restaurants[Math.abs(randomNumber - restaurants.length + 1)]
-                  ?.restaurantInfo,
+                restaurants[randomNumber]?.restaurantInfo,
               ).getPublicData()?.phoneNumber,
               menuId:
                 restaurants[Math.abs(randomNumber - restaurants.length + 1)]
