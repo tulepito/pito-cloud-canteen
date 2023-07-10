@@ -60,7 +60,7 @@ const FilterFormComponent: React.FC<TFilterFormComponentProps> = (props) => {
             name="meta_startDate"
             selected={values.meta_startDate}
             onChange={setStartDate}
-            label="Ngày triển khai"
+            label="Từ ngày triển khai"
             className={css.dateInput}
             dateFormat={'dd MMMM, yyyy'}
             placeholderText={'Từ'}
@@ -70,7 +70,7 @@ const FilterFormComponent: React.FC<TFilterFormComponentProps> = (props) => {
             id="meta_endDate"
             name="meta_endDate"
             onChange={setEndDate}
-            label="Ngày kết thúc"
+            label="Đến ngày triển khai"
             className={css.dateInput}
             selected={values.meta_endDate}
             dateFormat={'dd MMMM, yyyy'}

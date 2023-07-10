@@ -189,11 +189,6 @@
     overflow-x: scroll;
     position: relative;
   }
-  .table {
-    @include viewportMedium {
-      min-width: 1440px;
-    }
-  }
 }
 
 .stateItem {
