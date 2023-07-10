@@ -365,14 +365,10 @@ const OrderDetailPage = () => {
                 : css.lineItemsTable
             }>
             <ManageLineItemsSection
-              data={editViewData.manageOrdersData}
               isDraftEditing={isDraftEditing}
               ableToUpdateOrder={ableToUpdateOrder}
-              shouldShowOverflowError={shouldShowOverflowError}
-              shouldShowUnderError={shouldShowUnderError}
               setCurrentViewDate={handleSetCurrentViewDate}
               currentViewDate={currentViewDate}
-              minQuantity={minQuantity}
             />
             {isDraftEditing && (
               <SubOrderChangesHistorySection

@@ -480,9 +480,12 @@ export const emailSendingFactory = async (
         const { partnerUser } = emailDataSource;
         const { email: partnerEmail } = partnerUser?.getAttributes() || {};
         const subOrderDate = formatTimestamp(timestamp);
+        const { systemVATPercentage } = await getSystemAttributes();
+
         const emailTemplate = partnerOrderDetailsUpdated({
           ...emailDataSource,
           subOrderDate,
+          currentOrderVATPercentage: systemVATPercentage,
         });
         const emailDataParams = {
           receiver: [partnerEmail],

@@ -17,17 +17,13 @@ import LineItemsTable from './LineItemsTable/LineItemsTable';
 import css from './ManageLineItemsSection.module.scss';
 
 type TManageLineItemsSectionProps = {
-  data: {
-    startDate: number;
-    endDate: number;
-  };
-  isDraftEditing: boolean;
-  shouldShowOverflowError: boolean;
-  shouldShowUnderError: boolean;
+  isDraftEditing?: boolean;
+  shouldShowOverflowError?: boolean;
+  shouldShowUnderError?: boolean;
   setCurrentViewDate: (date: number) => void;
   currentViewDate: number;
-  ableToUpdateOrder: boolean;
-  minQuantity: number;
+  ableToUpdateOrder?: boolean;
+  minQuantity?: number;
   isAdminLayout?: boolean;
 };
 

@@ -158,6 +158,10 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
     updateOrderState(state);
   };
 
+  const handleSetCurrentViewDate = (date: number) => {
+    setCurrentViewDate(date);
+  };
+
   useEffect(() => {
     dispatch(AdminAttributesThunks.fetchAttributes());
   }, []);
@@ -225,7 +229,8 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
                 <div className={css.lineItemsTable}>
                   <ManageLineItemsSection
                     isAdminLayout
-                    data={editViewData.manageOrdersData}
+                    setCurrentViewDate={handleSetCurrentViewDate}
+                    currentViewDate={currentViewDate}
                   />
                 </div>
               </RenderWhen.False>
