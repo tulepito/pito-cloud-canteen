@@ -185,118 +185,121 @@ const sendRemindEmailToMember = createAsyncThunk(
 const addOrUpdateMemberOrder = createAsyncThunk(
   'app/OrderManagement/ADD_OR_UPDATE_MEMBER_ORDER',
   async (params: TObject, { getState, dispatch, rejectWithValue }) => {
-    const { currentViewDate, foodId, memberId, requirement, memberEmail } =
-      params;
-    const orderGetter = Listing(
-      getState().OrderManagement.orderData! as TListing,
-    );
-    const orderId = orderGetter.getId();
-    const { participants = [], anonymous = [] } = orderGetter.getMetadata();
-    const {
-      id: { uuid: planId },
-      attributes: { metadata = {} },
-    } = getState().OrderManagement.planData!;
+    try {
+      const { currentViewDate, foodId, memberId, requirement, memberEmail } =
+        params;
+      const orderGetter = Listing(
+        getState().OrderManagement.orderData! as TListing,
+      );
+      const orderId = orderGetter.getId();
+      const { participants = [], anonymous = [] } = orderGetter.getMetadata();
+      const {
+        id: { uuid: planId },
+        attributes: { metadata = {} },
+      } = getState().OrderManagement.planData!;
 
-    let shouldUpdateAnonymousList = false;
-    let updateAnonymous = anonymous;
+      let shouldUpdateAnonymousList = false;
+      let updateAnonymous = anonymous;
 
-    const checkUserResult = await checkUserExistedApi({
-      ...(memberId ? { id: memberId } : {}),
-      ...(memberEmail ? { email: memberEmail } : {}),
-    });
+      const checkUserResult = await checkUserExistedApi({
+        ...(memberId ? { id: memberId } : {}),
+        ...(memberEmail ? { email: memberEmail } : {}),
+      });
 
-    let participantId = memberId;
+      let participantId = memberId;
 
-    const { status: apiStatus = EHttpStatusCode.NotFound, user } =
-      checkUserResult?.data || {};
+      const { status: apiStatus = EHttpStatusCode.NotFound, user } =
+        checkUserResult?.data || {};
 
-    if (apiStatus === EHttpStatusCode.NotFound) {
-      return rejectWithValue('user_not_found');
-    }
+      if (apiStatus === EHttpStatusCode.NotFound) {
+        return rejectWithValue('user_not_found');
+      }
 
-    if (!isEmpty(user)) {
-      participantId = User(user).getId();
-    }
-    // Update list anonymous
-    if (
-      !participants.includes(participantId) &&
-      !anonymous.includes(participantId) &&
-      participantId
-    ) {
-      shouldUpdateAnonymousList = true;
-      updateAnonymous = anonymous.concat(participantId);
-    }
+      if (!isEmpty(user)) {
+        participantId = User(user).getId();
+      }
+      // Update list anonymous
+      if (
+        !participants.includes(participantId) &&
+        !anonymous.includes(participantId) &&
+        participantId
+      ) {
+        shouldUpdateAnonymousList = true;
+        updateAnonymous = anonymous.concat(participantId);
+      }
 
-    const memberOrderDetailOnUpdateDate =
-      metadata?.orderDetail[currentViewDate.toString()].memberOrders[memberId];
-    const { foodId: oldFoodId, status = EParticipantOrderStatus.empty } =
-      memberOrderDetailOnUpdateDate || {};
+      const memberOrderDetailOnUpdateDate =
+        metadata?.orderDetail[currentViewDate.toString()].memberOrders[
+          memberId
+        ];
+      const { status = EParticipantOrderStatus.empty } =
+        memberOrderDetailOnUpdateDate || {};
 
-    if (foodId === '' || oldFoodId === foodId) {
-      return;
-    }
-    let newMemberOrderValues = memberOrderDetailOnUpdateDate;
+      let newMemberOrderValues = memberOrderDetailOnUpdateDate;
 
-    switch (status) {
-      case EParticipantOrderStatus.joined:
-      case EParticipantOrderStatus.notAllowed:
-        newMemberOrderValues = {
-          ...newMemberOrderValues,
-          foodId,
-        };
-        break;
-      case EParticipantOrderStatus.empty:
-      case EParticipantOrderStatus.notJoined:
-        newMemberOrderValues = {
-          ...newMemberOrderValues,
-          foodId,
-          status: EParticipantOrderStatus.joined,
-        };
-        break;
-      case EParticipantOrderStatus.expired:
-        break;
-      default:
-        break;
-    }
-    newMemberOrderValues = { ...newMemberOrderValues, requirement };
+      switch (status) {
+        case EParticipantOrderStatus.joined:
+        case EParticipantOrderStatus.notAllowed:
+          newMemberOrderValues = {
+            ...newMemberOrderValues,
+            foodId,
+          };
+          break;
+        case EParticipantOrderStatus.empty:
+        case EParticipantOrderStatus.notJoined:
+          newMemberOrderValues = {
+            ...newMemberOrderValues,
+            foodId,
+            status: EParticipantOrderStatus.joined,
+          };
+          break;
+        case EParticipantOrderStatus.expired:
+          break;
+        default:
+          break;
+      }
+      newMemberOrderValues = { ...newMemberOrderValues, requirement };
 
-    const updateParams = {
-      planId,
-      orderDetail: {
-        ...metadata.orderDetail,
-        [currentViewDate]: {
-          ...metadata.orderDetail[currentViewDate],
-          memberOrders: {
-            ...metadata.orderDetail[currentViewDate].memberOrders,
-            [participantId]: newMemberOrderValues,
+      const updateParams = {
+        planId,
+        orderDetail: {
+          ...metadata.orderDetail,
+          [currentViewDate]: {
+            ...metadata.orderDetail[currentViewDate],
+            memberOrders: {
+              ...metadata.orderDetail[currentViewDate].memberOrders,
+              [participantId]: newMemberOrderValues,
+            },
           },
         },
-      },
-      ...(shouldUpdateAnonymousList
-        ? { orderId, anonymous: updateAnonymous }
-        : {}),
-    };
+        ...(shouldUpdateAnonymousList
+          ? { orderId, anonymous: updateAnonymous }
+          : {}),
+      };
 
-    await addUpdateMemberOrder(orderId, updateParams);
-    const subOrderId = `${participantId} - ${planId} - ${currentViewDate}`;
-    const { data: firebaseSubOrderDocument } =
-      await participantSubOrderGetByIdApi(subOrderId);
+      await addUpdateMemberOrder(orderId, updateParams);
+      const subOrderId = `${participantId} - ${planId} - ${currentViewDate}`;
+      const { data: firebaseSubOrderDocument } =
+        await participantSubOrderGetByIdApi(subOrderId);
 
-    if (!firebaseSubOrderDocument) {
-      await participantSubOrderAddDocumentApi({
-        participantId,
-        planId,
-        timestamp: currentViewDate,
-      });
-    } else {
-      await participantSubOrderUpdateDocumentApi({
-        subOrderId,
-        params: {
-          foodId,
-        },
-      });
+      if (!firebaseSubOrderDocument) {
+        await participantSubOrderAddDocumentApi({
+          participantId,
+          planId,
+          timestamp: currentViewDate,
+        });
+      } else {
+        await participantSubOrderUpdateDocumentApi({
+          subOrderId,
+          params: {
+            foodId,
+          },
+        });
+      }
+      await dispatch(loadData(orderId));
+    } catch (error) {
+      console.log(error);
     }
-    await dispatch(loadData(orderId));
   },
 );
 
