@@ -162,6 +162,7 @@ const OrderDetailPage = () => {
   } = Listing(orderData as TListing).getMetadata();
 
   const isNormalOrder = orderType === EOrderType.normal;
+  console.log('isNormalOrder', isNormalOrder);
   const isPicking = orderState === EOrderStates.picking;
   const isDraftEditing = orderState === EOrderStates.inProgress;
 
@@ -348,46 +349,48 @@ const OrderDetailPage = () => {
               />
             )}
           </div>
-        </RenderWhen>
-        <RenderWhen.False>
-          <div
-            className={
-              isDraftEditing
-                ? css.lineItemsTableWithSubOrderSection
-                : css.lineItemsTable
-            }>
-            <ManageLineItemsSection
-              isDraftEditing={isDraftEditing}
-              ableToUpdateOrder={ableToUpdateOrder}
-              setCurrentViewDate={handleSetCurrentViewDate}
-              currentViewDate={currentViewDate}
-            />
-            {isDraftEditing && (
-              <SubOrderChangesHistorySection
-                className={classNames(
-                  css.container,
-                  css.normalOrderSubOrderSection,
-                )}
-                querySubOrderChangesHistoryInProgress={
-                  querySubOrderChangesHistoryInProgress
-                }
-                subOrderChangesHistory={subOrderChangesHistory}
-                draftSubOrderChangesHistory={
-                  draftSubOrderChangesHistory[
-                    currentViewDate as unknown as keyof typeof draftSubOrderChangesHistory
-                  ]
-                }
-                onQueryMoreSubOrderChangesHistory={
-                  onQueryMoreSubOrderChangesHistory
-                }
-                subOrderChangesHistoryTotalItems={
-                  subOrderChangesHistoryTotalItems
-                }
-                loadMoreSubOrderChangesHistory={loadMoreSubOrderChangesHistory}
+          <RenderWhen.False>
+            <div
+              className={
+                isDraftEditing
+                  ? css.lineItemsTableWithSubOrderSection
+                  : css.lineItemsTable
+              }>
+              <ManageLineItemsSection
+                isDraftEditing={isDraftEditing}
+                ableToUpdateOrder={ableToUpdateOrder}
+                setCurrentViewDate={handleSetCurrentViewDate}
+                currentViewDate={currentViewDate}
               />
-            )}
-          </div>
-        </RenderWhen.False>
+              {isDraftEditing && (
+                <SubOrderChangesHistorySection
+                  className={classNames(
+                    css.container,
+                    css.normalOrderSubOrderSection,
+                  )}
+                  querySubOrderChangesHistoryInProgress={
+                    querySubOrderChangesHistoryInProgress
+                  }
+                  subOrderChangesHistory={subOrderChangesHistory}
+                  draftSubOrderChangesHistory={
+                    draftSubOrderChangesHistory[
+                      currentViewDate as unknown as keyof typeof draftSubOrderChangesHistory
+                    ]
+                  }
+                  onQueryMoreSubOrderChangesHistory={
+                    onQueryMoreSubOrderChangesHistory
+                  }
+                  subOrderChangesHistoryTotalItems={
+                    subOrderChangesHistoryTotalItems
+                  }
+                  loadMoreSubOrderChangesHistory={
+                    loadMoreSubOrderChangesHistory
+                  }
+                />
+              )}
+            </div>
+          </RenderWhen.False>
+        </RenderWhen>
       </RenderWhen>
 
       <AlertModal
