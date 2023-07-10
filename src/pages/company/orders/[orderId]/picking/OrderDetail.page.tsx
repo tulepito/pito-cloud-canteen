@@ -2,6 +2,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useCallback, useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
+import Skeleton from 'react-loading-skeleton';
 import classNames from 'classnames';
 import isEmpty from 'lodash/isEmpty';
 import { useRouter } from 'next/router';
@@ -185,6 +186,9 @@ const OrderDetailPage = () => {
     (state) => state.OrderManagement.cancelPickingOrderInProgress,
   );
   const orderData = useAppSelector((state) => state.OrderManagement.orderData);
+  const systemVATPercentage = useAppSelector(
+    (state) => state.SystemAttributes.systemVATPercentage,
+  );
   const isFetchingOrderDetails = useAppSelector(
     (state) => state.OrderManagement.isFetchingOrderDetails,
   );
@@ -202,16 +206,23 @@ const OrderDetailPage = () => {
     shouldShowOverflowError,
     shouldShowUnderError,
   } = useAppSelector((state) => state.OrderManagement);
-
+  const {
+    orderState,
+    bookerId,
+    orderType = EOrderType.group,
+    orderVATPercentage,
+  } = Listing(orderData as TListing).getMetadata();
   const { orderDetail = {} } = Listing(planData as TListing).getMetadata();
+  const isPickingOrder = orderState === EOrderStates.picking;
   const {
     orderTitle,
     editViewData,
     reviewViewData,
     priceQuotationData,
     setReviewInfoValues,
-  } = usePrepareOrderDetailPageData({});
-
+  } = usePrepareOrderDetailPageData({
+    VATPercentage: isPickingOrder ? systemVATPercentage : orderVATPercentage,
+  });
   const handleCloseReachMaxAllowedChangesModal = () =>
     setShowReachMaxAllowedChangesModal(null);
 
@@ -255,11 +266,6 @@ const OrderDetailPage = () => {
   });
 
   const userId = CurrentUser(currentUser!).getId();
-  const {
-    orderState,
-    bookerId,
-    orderType = EOrderType.group,
-  } = Listing(orderData as TListing).getMetadata();
 
   const isNormalOrder = orderType === EOrderType.normal;
   const isPicking = orderState === EOrderStates.picking;
@@ -479,42 +485,8 @@ const OrderDetailPage = () => {
           </RenderWhen.False>
         </RenderWhen>
         <RenderWhen.False>
-          <div
-            className={
-              isDraftEditing
-                ? css.lineItemsTableWithSubOrderSection
-                : css.lineItemsTable
-            }>
-            <ManageLineItemsSection
-              isDraftEditing={isDraftEditing}
-              ableToUpdateOrder={ableToUpdateOrder}
-              setCurrentViewDate={handleSetCurrentViewDate}
-              currentViewDate={currentViewDate}
-            />
-            {isDraftEditing && (
-              <SubOrderChangesHistorySection
-                className={classNames(
-                  css.container,
-                  css.normalOrderSubOrderSection,
-                )}
-                querySubOrderChangesHistoryInProgress={
-                  querySubOrderChangesHistoryInProgress
-                }
-                subOrderChangesHistory={subOrderChangesHistory}
-                draftSubOrderChangesHistory={
-                  draftSubOrderChangesHistory[
-                    currentViewDate as unknown as keyof typeof draftSubOrderChangesHistory
-                  ]
-                }
-                onQueryMoreSubOrderChangesHistory={
-                  onQueryMoreSubOrderChangesHistory
-                }
-                subOrderChangesHistoryTotalItems={
-                  subOrderChangesHistoryTotalItems
-                }
-                loadMoreSubOrderChangesHistory={loadMoreSubOrderChangesHistory}
-              />
-            )}
+          <div className={css.loadingContainer}>
+            <Skeleton className={css.loadingContent} />
           </div>
         </RenderWhen.False>
       </RenderWhen>
@@ -559,6 +531,17 @@ const OrderDetailPage = () => {
       orderData={orderData as TListing}
     />
   );
+
+  useEffect(() => {
+    if (draftOrderDetail) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      () => {
+        dispatch(OrderManagementsAction.resetDraftSubOrderChangeHistory());
+
+        return dispatch(OrderManagementsAction.resetDraftOrderDetails());
+      };
+    }
+  }, []);
 
   useEffect(() => {
     if (shouldShowOverflowError || shouldShowUnderError) {
@@ -635,6 +618,30 @@ const OrderDetailPage = () => {
       }
     }
   }, [isRouterReady, orderState]);
+  useEffect(() => {
+    if (shouldShowOverflowError || shouldShowUnderError) {
+      const i = setTimeout(() => {
+        dispatch(OrderManagementsAction.resetOrderDetailValidation());
+        clearTimeout(i);
+      }, 4000);
+    }
+  }, [shouldShowOverflowError, shouldShowUnderError]);
+
+  useEffect(() => {
+    onQuerySubOrderHistoryChanges();
+  }, [onQuerySubOrderHistoryChanges]);
+
+  useEffect(() => {
+    if (draftOrderDetail) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      () => {
+        dispatch(OrderManagementsAction.resetDraftSubOrderChangeHistory());
+
+        return dispatch(OrderManagementsAction.resetDraftOrderDetails());
+      };
+    }
+  }, []);
+
   useEffect(() => {
     if (shouldShowOverflowError || shouldShowUnderError) {
       const i = setTimeout(() => {
