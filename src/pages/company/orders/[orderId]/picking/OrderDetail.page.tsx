@@ -162,6 +162,7 @@ const OrderDetailPage = () => {
   } = Listing(orderData as TListing).getMetadata();
 
   const isNormalOrder = orderType === EOrderType.normal;
+  console.log('isNormalOrder', isNormalOrder);
   const isPicking = orderState === EOrderStates.picking;
   const isDraftEditing = orderState === EOrderStates.inProgress;
 
@@ -319,7 +320,6 @@ const OrderDetailPage = () => {
                   : css.lineItemsTable
               }>
               <ManageLineItemsSection
-                data={editViewData.manageOrdersData}
                 isDraftEditing={isDraftEditing}
                 ableToUpdateOrder={ableToUpdateOrder}
                 shouldShowOverflowError={shouldShowOverflowError}
@@ -358,42 +358,8 @@ const OrderDetailPage = () => {
           </RenderWhen.False>
         </RenderWhen>
         <RenderWhen.False>
-          <div
-            className={
-              isDraftEditing
-                ? css.lineItemsTableWithSubOrderSection
-                : css.lineItemsTable
-            }>
-            <ManageLineItemsSection
-              isDraftEditing={isDraftEditing}
-              ableToUpdateOrder={ableToUpdateOrder}
-              setCurrentViewDate={handleSetCurrentViewDate}
-              currentViewDate={currentViewDate}
-            />
-            {isDraftEditing && (
-              <SubOrderChangesHistorySection
-                className={classNames(
-                  css.container,
-                  css.normalOrderSubOrderSection,
-                )}
-                querySubOrderChangesHistoryInProgress={
-                  querySubOrderChangesHistoryInProgress
-                }
-                subOrderChangesHistory={subOrderChangesHistory}
-                draftSubOrderChangesHistory={
-                  draftSubOrderChangesHistory[
-                    currentViewDate as unknown as keyof typeof draftSubOrderChangesHistory
-                  ]
-                }
-                onQueryMoreSubOrderChangesHistory={
-                  onQueryMoreSubOrderChangesHistory
-                }
-                subOrderChangesHistoryTotalItems={
-                  subOrderChangesHistoryTotalItems
-                }
-                loadMoreSubOrderChangesHistory={loadMoreSubOrderChangesHistory}
-              />
-            )}
+          <div className={css.loadingContainer}>
+            <Skeleton className={css.loadingContent} />
           </div>
         </RenderWhen.False>
       </RenderWhen>
@@ -436,8 +402,6 @@ const OrderDetailPage = () => {
       onSaveOrderNote={onSaveOrderNote}
       onDownloadReviewOrderResults={onDownloadReviewOrderResults}
       orderData={orderData as TListing}
-      onSaveOrderNote={onSaveOrderNote}
-      onDownloadReviewOrderResults={onDownloadReviewOrderResults}
     />
   );
 
