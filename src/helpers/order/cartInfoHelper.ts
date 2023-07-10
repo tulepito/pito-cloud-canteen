@@ -254,9 +254,11 @@ export const calculatePriceQuotationPartner = ({
 export const calculatePriceQuotationInfoFromQuotation = ({
   quotation,
   packagePerMember,
+  currentOrderVATPercentage,
 }: {
   quotation: TListing;
   packagePerMember: number;
+  currentOrderVATPercentage: number;
 }) => {
   const quotationListingGetter = Listing(quotation);
   const { client, partner } = quotationListingGetter.getMetadata();
@@ -309,7 +311,7 @@ export const calculatePriceQuotationInfoFromQuotation = ({
   const promotion = 0;
   const totalWithoutVAT =
     totalPrice + serviceFee + transportFee + PITOFee - promotion;
-  const VATFee = Math.round(totalWithoutVAT * config.VATPercentage);
+  const VATFee = Math.round(totalWithoutVAT * currentOrderVATPercentage);
   const totalWithVAT = VATFee + totalWithoutVAT;
   const overflow = isOverflowPackage
     ? totalWithVAT - totalDishes * packagePerMember

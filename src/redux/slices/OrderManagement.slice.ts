@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 import { createSlice } from '@reduxjs/toolkit';
+import { isEmpty } from 'lodash';
 import groupBy from 'lodash/groupBy';
 import omit from 'lodash/omit';
 
@@ -24,6 +25,7 @@ import {
   updateOrderApi,
   updatePlanDetailsApi,
 } from '@apis/orderApi';
+import { checkUserExistedApi } from '@apis/userApi';
 import { EOrderDetailsTableTab } from '@components/OrderDetails/EditView/ManageOrderDetailSection/OrderDetailsTable/OrderDetailsTable.utils';
 import {
   calculateClientQuotation,
@@ -32,13 +34,13 @@ import {
 import { createAsyncThunk } from '@redux/redux.helper';
 import type { RootState } from '@redux/store';
 import type { TPlan } from '@src/utils/orderTypes';
-import { denormalisedResponseEntities, Listing } from '@utils/data';
+import { denormalisedResponseEntities, Listing, User } from '@utils/data';
 import {
   EOrderHistoryTypes,
   EOrderType,
   EParticipantOrderStatus,
 } from '@utils/enums';
-import { storableError } from '@utils/errors';
+import { EHttpStatusCode, storableError } from '@utils/errors';
 import type {
   TCompany,
   TListing,
@@ -177,18 +179,18 @@ export const prepareOrderDetail = ({
   foodId,
   memberId,
   requirement,
+  memberOrderValues,
 }: {
   orderDetail: TPlan['orderDetail'];
   currentViewDate: number;
   foodId: string;
   memberId: string;
   requirement: string;
+  memberOrderValues: TObject;
 }) => {
-  const memberOrderDetailOnUpdateDate =
-    orderDetail[currentViewDate.toString()].memberOrders[memberId];
-  const { status = EParticipantOrderStatus.empty } =
-    memberOrderDetailOnUpdateDate || {};
-  let newMemberOrderValues = memberOrderDetailOnUpdateDate;
+  let newMemberOrderValues = memberOrderValues;
+
+  const { status = EParticipantOrderStatus.empty } = memberOrderValues || {};
 
   switch (status) {
     case EParticipantOrderStatus.joined:
@@ -221,6 +223,54 @@ export const prepareOrderDetail = ({
   );
 
   return newOrderDetail as TPlan['orderDetail'];
+};
+const prepareAnonymousList = async ({
+  orderData,
+  memberId,
+  memberEmail,
+}: {
+  orderData: TListing;
+  memberId: string;
+  memberEmail: string;
+}) => {
+  const orderGetter = Listing(orderData);
+  const { participants = [], anonymous = [] } = orderGetter.getMetadata();
+
+  let shouldUpdateAnonymousList = false;
+  let updateAnonymous = anonymous;
+
+  const checkUserResult = await checkUserExistedApi({
+    ...(memberId ? { id: memberId } : {}),
+    ...(memberEmail ? { email: memberEmail } : {}),
+  });
+
+  let participantId = memberId;
+
+  const { status: apiStatus = EHttpStatusCode.NotFound, user } =
+    checkUserResult?.data || {};
+
+  if (apiStatus === EHttpStatusCode.NotFound) {
+    return { errorMessage: 'user_not_found' };
+  }
+
+  if (!isEmpty(user)) {
+    participantId = User(user).getId();
+  }
+  // Update list anonymous
+  if (
+    !participants.includes(participantId) &&
+    !anonymous.includes(participantId) &&
+    participantId
+  ) {
+    shouldUpdateAnonymousList = true;
+    updateAnonymous = anonymous.concat(participantId);
+  }
+
+  return {
+    shouldUpdateAnonymousList,
+    updateAnonymous,
+    participantId,
+  };
 };
 
 // ================ Initial states ================ //
@@ -437,13 +487,17 @@ const addOrUpdateMemberOrder = createAsyncThunk(
       orderDetail: draftOrderDetail,
       currentViewDate,
       foodId,
-      memberId,
+      memberId: participantId as string,
       requirement,
+      memberOrderValues: memberOrderDetailOnUpdateDate,
     });
 
     const updateParams = {
       planId,
       orderDetail: newOrderDetail,
+      ...(shouldUpdateAnonymousList
+        ? { orderId, anonymous: updateAnonymous }
+        : {}),
     };
 
     await addUpdateMemberOrder(orderId, updateParams);
@@ -454,7 +508,7 @@ const addOrUpdateMemberOrder = createAsyncThunk(
 
     if (!firebaseSubOrderDocument) {
       await participantSubOrderAddDocumentApi({
-        participantId,
+        participantId: participantId as string,
         planId,
         timestamp: currentViewDate,
       });
@@ -1515,22 +1569,6 @@ const OrderManagementSlice = createSlice({
       })
       .addCase(bookerMarkInprogressPlanViewed.rejected, (state) => {
         return state;
-      })
-      /* =============== updatePlanOrderDetail =============== */
-      .addCase(updatePlanOrderDetail.pending, (state) => {
-        state.isUpdatingOrderDetails = true;
-      })
-      .addCase(updatePlanOrderDetail.fulfilled, (state, { payload }) => {
-        state.isUpdatingOrderDetails = false;
-        state.planData.attributes.metadata = {
-          ...state.planData.attributes.metadata,
-          orderDetail: {
-            ...payload,
-          },
-        };
-      })
-      .addCase(updatePlanOrderDetail.rejected, (state) => {
-        state.isUpdatingOrderDetails = false;
       })
       .addCase(
         querySubOrderChangesHistory.pending,

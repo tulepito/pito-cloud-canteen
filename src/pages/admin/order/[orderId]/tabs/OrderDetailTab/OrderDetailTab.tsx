@@ -60,10 +60,13 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
     updateOrderStateInProgress,
     transactionDataMap,
   } = props;
-
-  const [viewMode, setViewMode] = useState<EPageViewMode>(EPageViewMode.edit);
   const router = useRouter();
   const { timestamp } = router.query;
+  const [currentViewDate, setCurrentViewDate] = useState<number>(
+    Number(timestamp),
+  );
+
+  const [viewMode, setViewMode] = useState<EPageViewMode>(EPageViewMode.edit);
   const dispatch = useAppDispatch();
   const orderId = Listing(order).getId();
 
@@ -153,6 +156,10 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
     updateOrderState(state);
   };
 
+  const handleSetCurrentViewDate = (date: number) => {
+    setCurrentViewDate(date);
+  };
+
   useEffect(() => {
     dispatch(AdminAttributesThunks.fetchAttributes());
   }, []);
@@ -189,21 +196,29 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
             <RenderWhen condition={isGroupOrder}>
               <div className={css.editViewRoot}>
                 <div className={css.leftPart}>
-                  <ManageOrdersSection data={editViewData.manageOrdersData} />
+                  <ManageOrdersSection
+                    setCurrentViewDate={(date) => setCurrentViewDate(date)}
+                    currentViewDate={currentViewDate}
+                    isDraftEditing={false}
+                    ableToUpdateOrder
+                  />
                 </div>
                 <div className={css.rightPart}>
                   <OrderDeadlineCountdownSection
                     className={css.container}
                     data={editViewData.countdownSectionData}
+                    ableToUpdateOrder
                   />
                   <OrderLinkSection
                     className={css.container}
                     data={editViewData.linkSectionData}
                     isAminLayout
+                    ableToUpdateOrder
                   />
                   <ManageParticipantsSection
                     className={css.container}
                     data={editViewData.manageParticipantData}
+                    ableToUpdateOrder
                   />
                 </div>
               </div>
@@ -212,7 +227,8 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
                 <div className={css.lineItemsTable}>
                   <ManageLineItemsSection
                     isAdminLayout
-                    data={editViewData.manageOrdersData}
+                    setCurrentViewDate={handleSetCurrentViewDate}
+                    currentViewDate={currentViewDate}
                   />
                 </div>
               </RenderWhen.False>

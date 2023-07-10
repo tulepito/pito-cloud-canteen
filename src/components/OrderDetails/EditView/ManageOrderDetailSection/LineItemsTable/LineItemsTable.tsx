@@ -24,11 +24,11 @@ import css from './LineItemsTable.module.scss';
 
 type TLineItemsTableProps = {
   currentViewDate: number;
-  isDraftEditing: boolean;
-  ableToUpdateOrder: boolean;
-  shouldShowOverflowError: boolean;
-  shouldShowUnderError: boolean;
-  minQuantity: number;
+  isDraftEditing?: boolean;
+  ableToUpdateOrder?: boolean;
+  shouldShowOverflowError?: boolean;
+  shouldShowUnderError?: boolean;
+  minQuantity?: number;
   isAdminLayout?: boolean;
 };
 

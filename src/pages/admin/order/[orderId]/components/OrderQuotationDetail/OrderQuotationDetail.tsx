@@ -10,11 +10,10 @@ import {
   calculatePriceQuotationInfoFromQuotation,
   calculatePriceQuotationPartner,
 } from '@helpers/order/cartInfoHelper';
+import { groupFoodOrderByDateFromQuotation } from '@helpers/order/orderDetailHelper';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { useDownloadPriceQuotation } from '@hooks/useDownloadPriceQuotation';
-import { groupFoodOrderByDateFromQuotation } from '@pages/company/orders/[orderId]/picking/helpers/orderDetailHelper';
 import { Listing } from '@src/utils/data';
-import { EOrderType } from '@src/utils/enums';
 import type { TListing, TObject, TUser } from '@src/utils/types';
 
 import {
@@ -51,8 +50,7 @@ const OrderQuotationDetail: React.FC<OrderQuotationDetailProps> = (props) => {
   );
   const partnerServiceFee =
     Listing(order).getMetadata()?.serviceFees?.[currentPartnerId!];
-  const { orderType = EOrderType.group, packagePerMember = 0 } =
-    Listing(order).getMetadata();
+  const { packagePerMember = 0 } = Listing(order).getMetadata();
 
   const priceQuotation = isPartner
     ? calculatePriceQuotationPartner({
@@ -65,6 +63,7 @@ const OrderQuotationDetail: React.FC<OrderQuotationDetailProps> = (props) => {
     : calculatePriceQuotationInfoFromQuotation({
         quotation: quotation!,
         packagePerMember,
+        currentOrderVATPercentage,
       });
 
   const handlePartnerChange = (tab: any) => {

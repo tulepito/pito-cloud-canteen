@@ -1,4 +1,4 @@
-import { calculatePriceQuotationInfo } from '@pages/company/orders/[orderId]/picking/helpers/cartInfoHelper';
+import { calculatePriceQuotationInfo } from '@helpers/order/cartInfoHelper';
 
 import { formatTimestamp } from '../dates';
 
@@ -10,6 +10,7 @@ type PartnerNewOrderAppearParams = {
   planListing: any;
   restaurantListing: any;
   subOrderDate: string;
+  currentOrderVATPercentage: number;
 };
 
 export const partnerOrderDetailsUpdatedSubject = (subOrderDate: string) =>
@@ -21,6 +22,7 @@ const partnerOrderDetailsUpdated = ({
   restaurantListing,
   planListing,
   subOrderDate,
+  currentOrderVATPercentage,
 }: PartnerNewOrderAppearParams) => {
   const orderId = orderListing.getId();
   const { title: orderTitle } = orderListing.getAttributes();
@@ -37,6 +39,7 @@ const partnerOrderDetailsUpdated = ({
     calculatePriceQuotationInfo({
       planOrderDetail,
       order: orderListing.getFullData(),
+      currentOrderVATPercentage,
     });
 
   const orderUrl = `${BASE_URL}/partner/orders/${orderId}`;

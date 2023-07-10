@@ -184,6 +184,7 @@ export const usePrepareOrderDetailPageData = ({
       calculatePriceQuotationInfoFromQuotation({
         quotation: quotation as TListing,
         packagePerMember,
+        currentOrderVATPercentage,
       }),
     [packagePerMember, quotation],
   );

@@ -28,7 +28,7 @@ type TReviewViewProps = TDefaultProps & {
   reviewViewData: ReturnType<
     typeof usePrepareOrderDetailPageData
   >['reviewViewData'];
-  orderData: TListing;
+  orderData?: TListing;
   onGoBackToEditOrderPage?: () => void;
   onSubmitEdit?: (values: TReviewInfoFormValues) => void;
   onDownloadPriceQuotation: () => Promise<void>;
@@ -55,7 +55,7 @@ const ReviewView: React.FC<TReviewViewProps> = (props) => {
   } = props;
   const { leftClassName, rightClassName } = classes;
   const dispatch = useAppDispatch();
-  const orderListingGetter = Listing(orderData);
+  const orderListingGetter = Listing(orderData!);
   const { quotationId } = orderListingGetter.getMetadata();
   useEffect(() => {
     if (quotationId) {
