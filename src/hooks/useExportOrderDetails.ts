@@ -43,7 +43,18 @@ const prepareData = ({
         [],
       );
 
-      return [...result, ...orderData];
+      const sortedOrderData = orderData.sort((a, b) => {
+        if (a['Món ăn'] < b['Món ăn']) {
+          return -1;
+        }
+        if (a['Món ăn'] > b['Món ăn']) {
+          return 1;
+        }
+
+        return 0;
+      });
+
+      return [...result, ...sortedOrderData];
     },
     [],
   );
