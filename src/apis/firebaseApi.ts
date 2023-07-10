@@ -46,6 +46,7 @@ export const participantGetNotificationsApi = async () =>
 export const participantUpdateSeenNotificationApi = async (
   notificationId: string,
 ) => postApi('/participants/notifications', { notificationId });
+
 export const createOrderChangesHistoryDocumentApi = async (
   orderId: string,
   { planId, ...rest }: TSubOrderChangeHistoryItem,
