@@ -487,27 +487,6 @@ export const markColorForOrder = (orderNumber: number) => {
   return colorList[orderNumber % colorList.length];
 };
 
-export const mealTypeAdapter = (mealType: string) => {
-  switch (mealType) {
-    case 'vegetarian':
-      return EFoodTypes.vegetarianDish;
-    case 'unVegetarian':
-      return EFoodTypes.savoryDish;
-    default:
-      return '';
-  }
-};
-
-export const mealTypeReverseAdapter = (mealType: string) => {
-  switch (mealType) {
-    case EFoodTypes.vegetarianDish:
-      return 'vegetarian';
-    case EFoodTypes.savoryDish:
-      return 'unVegetarian';
-    default:
-      return '';
-  }
-};
 export const getSelectedRestaurantAndFoodList = ({
   foodList = [],
   foodIds = [],
@@ -550,6 +529,28 @@ export const getSelectedRestaurantAndFoodList = ({
     submitRestaurantData,
     submitFoodListData,
   };
+};
+
+export const mealTypeAdapter = (mealType: string) => {
+  switch (mealType) {
+    case 'vegetarian':
+      return EFoodTypes.vegetarianDish;
+    case 'unVegetarian':
+      return EFoodTypes.savoryDish;
+    default:
+      return '';
+  }
+};
+
+export const mealTypeReverseAdapter = (mealType: string) => {
+  switch (mealType) {
+    case EFoodTypes.vegetarianDish:
+      return 'vegetarian';
+    case EFoodTypes.savoryDish:
+      return 'unVegetarian';
+    default:
+      return '';
+  }
 };
 
 export const calculateClientQuotation = (foodOrderGroupedByDate: any[]) => {

@@ -21,17 +21,19 @@ const EventCardContent: React.FC<TEventCardContentProps> = ({
 }) => {
   const {
     deliveryAddress,
-    expiredTime,
-    isOrderStarted = false,
     restaurant: restaurantObj,
-  } = event.resource || {};
+    expiredTime,
 
-  const shouldShowCountDown = isOver(expiredTime) || isOrderStarted;
+    isOrderStarted = false,
+  } = event?.resource || {};
+
+  const isExpired = isOver(expiredTime);
   const remainTime = calculateRemainTime(new Date(expiredTime).getTime());
+  const shouldShowCountdown = !isExpired && !isOrderStarted;
 
   return (
     <>
-      <RenderWhen condition={shouldShowCountDown}>
+      <RenderWhen condition={shouldShowCountdown}>
         <OrderEventCardContentItem
           icon={<IconClockWithExclamation />}
           isHighlight={isFirstHighlight}>

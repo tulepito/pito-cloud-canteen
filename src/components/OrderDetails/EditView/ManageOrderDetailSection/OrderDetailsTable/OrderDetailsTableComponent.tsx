@@ -151,24 +151,26 @@ export const OrderDetailsTableComponent: React.FC<
                             </RenderWhen>
                           </td>
                           <td>
-                            <div className={css.actionCell}>
-                              <IconEdit
-                                className={css.icon}
-                                onClick={
-                                  actionDisabled
-                                    ? doNothing
-                                    : onClickEditOrderItem(tab, memberId)
-                                }
-                              />
-                              <IconDelete
-                                className={css.icon}
-                                onClick={
-                                  actionDisabled
-                                    ? doNothing
-                                    : onClickDeleteOrderItem(memberId)
-                                }
-                              />
-                            </div>
+                            {ableToUpdateOrder && (
+                              <div className={css.actionCell}>
+                                <IconEdit
+                                  className={css.icon}
+                                  onClick={
+                                    actionDisabled
+                                      ? doNothing
+                                      : onClickEditOrderItem(tab, memberId)
+                                  }
+                                />
+                                <IconDelete
+                                  className={css.icon}
+                                  onClick={
+                                    actionDisabled
+                                      ? doNothing
+                                      : onClickDeleteOrderItem(memberId)
+                                  }
+                                />
+                              </div>
+                            )}
                           </td>
                         </tr>
                       );

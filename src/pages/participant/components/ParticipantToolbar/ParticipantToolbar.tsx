@@ -29,9 +29,9 @@ export type TToolbarProps = {
   anchorDate: Date;
   onPickForMe?: () => void;
   onPickForMeLoading?: boolean;
+  isAllowChangePeriod?: boolean;
   onChangeDate?: (date: Date) => void;
   date?: Date;
-  isAllowChangePeriod?: boolean;
 };
 
 const ParticipantToolbar: React.FC<TToolbarProps> = (props) => {
@@ -46,8 +46,8 @@ const ParticipantToolbar: React.FC<TToolbarProps> = (props) => {
     onView,
     views,
     view,
-    date,
     isAllowChangePeriod = false,
+    date,
   } = props;
   const intl = useIntl();
   const mountedRef = useRef(false);

@@ -117,20 +117,6 @@ const OrderListPage = () => {
       participantPostRatingInProgress) &&
     !walkthroughEnable;
 
-  useEffect(() => {
-    (async () => {
-      await dispatch(OrderListThunks.fetchOrders(currentUserId));
-      dispatch(OrderListActions.markColorToOrder());
-    })();
-  }, [currentUserId]);
-
-  useEffect(() => {
-    dispatch(OrderListThunks.fetchAttributes());
-  }, []);
-  useEffect(() => {
-    dispatch(OrderListThunks.fetchParticipantFirebaseNotifications());
-  }, []);
-
   const unseenNotifications = notifications.filter(
     (notification) => !notification.seen,
   );
@@ -362,11 +348,8 @@ const OrderListPage = () => {
             toolbar: (toolBarProps: any) => (
               <ParticipantToolbar
                 {...toolBarProps}
-                onChangeDate={handleSelectDay}
                 isAllowChangePeriod
-                // startDate={new Date(startDate)}
-                // endDate={new Date(endDate)}
-                // anchorDate={anchorDate}
+                onChangeDate={handleSelectDay}
               />
             ),
           }}

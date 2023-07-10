@@ -224,6 +224,7 @@ export const prepareOrderDetail = ({
 
   return newOrderDetail as TPlan['orderDetail'];
 };
+
 const prepareAnonymousList = async ({
   orderData,
   memberId,
@@ -991,10 +992,10 @@ export const orderManagementThunks = {
   bookerStartOrder,
   cancelPickingOrder,
   bookerMarkInprogressPlanViewed,
-  updatePlanOrderDetail,
   querySubOrderChangesHistory,
-  updateOrderFromDraftEdit,
+  updatePlanOrderDetail,
   fetchQuotation,
+  updateOrderFromDraftEdit,
 };
 
 // ================ Slice ================ //
