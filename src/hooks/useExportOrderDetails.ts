@@ -43,7 +43,7 @@ const prepareData = ({
         [],
       );
 
-      const sortedData = orderData.sort((a, b) => {
+      const sortedOrderData = orderData.sort((a, b) => {
         if (a['Món ăn'] < b['Món ăn']) {
           return -1;
         }
@@ -54,7 +54,7 @@ const prepareData = ({
         return 0;
       });
 
-      return [...result, ...sortedData];
+      return [...result, ...sortedOrderData];
     },
     [],
   );
