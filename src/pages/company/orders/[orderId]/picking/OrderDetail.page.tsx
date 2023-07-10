@@ -490,11 +490,8 @@ const OrderDetailPage = () => {
             <ManageLineItemsSection
               isDraftEditing={isDraftEditing}
               ableToUpdateOrder={ableToUpdateOrder}
-              shouldShowOverflowError={shouldShowOverflowError}
-              shouldShowUnderError={shouldShowUnderError}
               setCurrentViewDate={handleSetCurrentViewDate}
               currentViewDate={currentViewDate}
-              minQuantity={minQuantity}
             />
             {isDraftEditing && (
               <SubOrderChangesHistorySection
