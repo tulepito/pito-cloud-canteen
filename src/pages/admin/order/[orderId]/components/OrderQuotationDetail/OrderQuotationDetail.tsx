@@ -94,10 +94,10 @@ const OrderQuotationDetail: React.FC<OrderQuotationDetailProps> = (props) => {
         })
       : formatPriceQuotationData({
           order,
-          orderDetail: orderDetail!,
           company,
           booker,
           priceQuotation,
+          quotation,
         });
   }, [
     currentPartnerId,
