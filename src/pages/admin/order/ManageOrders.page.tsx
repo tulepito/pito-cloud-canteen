@@ -455,7 +455,9 @@ const parseEntitiesToTableData = (orders: TIntegrationOrderListing[]) => {
           orderId: entity?.id?.uuid,
           restaurants: [orderDetail[key]?.restaurant?.restaurantName],
           subOrders: newSubOrders,
-          orderName: entity.attributes.publicData.orderName,
+          orderName: `${
+            company?.attributes?.profile?.publicData?.companyName
+          }_${formatTimestamp(+key, 'dd/MM/yyyy')}`,
           deliveryHour,
           parentKey: entity.id.uuid,
           tx: orderDetail[key]?.transaction,
