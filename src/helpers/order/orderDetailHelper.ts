@@ -176,53 +176,6 @@ export const groupFoodOrderByDate = ({
     : groupFoodForNormal(orderDetail, date);
 };
 
-export const groupFoodOrderByDateFromQuotation = ({
-  quotation,
-}: {
-  quotation: TListing;
-}) => {
-  const quotationListingGetter = Listing(quotation);
-  const { client, partner } = quotationListingGetter.getMetadata();
-  if (isEmpty(client) || isEmpty(partner)) {
-    return [];
-  }
-
-  const result = Object.keys(client.quotation).map(
-    (subOrderDate: string, index: number) => {
-      const restaurant = Object.keys(partner).find((restaurantId: string) => {
-        return Object.keys(partner[restaurantId].quotation).some(
-          (date: string) => date === subOrderDate,
-        );
-      });
-
-      return {
-        date: subOrderDate,
-        restaurantId: Object.keys(partner[restaurant!])[0],
-        restaurantName: partner[restaurant!].name,
-        index,
-        totalDishes: client.quotation[subOrderDate].reduce(
-          (previousResult: number, current: TObject) => {
-            const { frequency } = current;
-
-            return previousResult + frequency;
-          },
-          0,
-        ),
-        foodDataList: client.quotation[subOrderDate],
-        totalPrice: client.quotation[subOrderDate].reduce(
-          (previousResult: number, current: TObject) => {
-            const { foodPrice, frequency } = current;
-
-            return previousResult + foodPrice * frequency;
-          },
-          0,
-        ),
-      };
-    },
-  );
-
-  return result;
-};
 export const groupPickingOrderByFood = ({
   orderDetail,
   date,
@@ -324,4 +277,51 @@ export const groupPickingOrderByFood = ({
     },
     [] as TObject[],
   );
+};
+export const groupFoodOrderByDateFromQuotation = ({
+  quotation,
+}: {
+  quotation: TListing;
+}) => {
+  const quotationListingGetter = Listing(quotation);
+  const { client, partner } = quotationListingGetter.getMetadata();
+  if (isEmpty(client) || isEmpty(partner)) {
+    return [];
+  }
+
+  const result = Object.keys(client.quotation).map(
+    (subOrderDate: string, index: number) => {
+      const restaurant = Object.keys(partner).find((restaurantId: string) => {
+        return Object.keys(partner[restaurantId].quotation).some(
+          (date: string) => date === subOrderDate,
+        );
+      });
+
+      return {
+        date: subOrderDate,
+        restaurantId: Object.keys(partner[restaurant!])[0],
+        restaurantName: partner[restaurant!].name,
+        index,
+        totalDishes: client.quotation[subOrderDate].reduce(
+          (previousResult: number, current: TObject) => {
+            const { frequency } = current;
+
+            return previousResult + frequency;
+          },
+          0,
+        ),
+        foodDataList: client.quotation[subOrderDate],
+        totalPrice: client.quotation[subOrderDate].reduce(
+          (previousResult: number, current: TObject) => {
+            const { foodPrice, frequency } = current;
+
+            return previousResult + foodPrice * frequency;
+          },
+          0,
+        ),
+      };
+    },
+  );
+
+  return result;
 };

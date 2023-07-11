@@ -834,28 +834,6 @@ const bookerMarkInprogressPlanViewed = createAsyncThunk(
   },
 );
 
-const updatePlanOrderDetail = createAsyncThunk(
-  'app/OrderManagement/UPDATE_PLAN_ORDER_DETAIL',
-  async (
-    {
-      orderId,
-      planId,
-      orderDetail,
-    }: { orderId: string; planId: string; orderDetail: TObject },
-    { fulfillWithValue, rejectWithValue },
-  ) => {
-    try {
-      updatePlanDetailsApi(orderId, {
-        orderDetail,
-        planId,
-      });
-
-      return fulfillWithValue(orderDetail);
-    } catch (error) {
-      return rejectWithValue(error);
-    }
-  },
-);
 const querySubOrderChangesHistory = createAsyncThunk(
   'app/OrderManagement/QUERY_SUB_ORDER_CHANGES_HISTORY',
   async ({
@@ -879,6 +857,28 @@ const querySubOrderChangesHistory = createAsyncThunk(
     );
 
     return data;
+  },
+);
+const updatePlanOrderDetail = createAsyncThunk(
+  'app/OrderManagement/UPDATE_PLAN_ORDER_DETAIL',
+  async (
+    {
+      orderId,
+      planId,
+      orderDetail,
+    }: { orderId: string; planId: string; orderDetail: TObject },
+    { fulfillWithValue, rejectWithValue },
+  ) => {
+    try {
+      updatePlanDetailsApi(orderId, {
+        orderDetail,
+        planId,
+      });
+
+      return fulfillWithValue(orderDetail);
+    } catch (error) {
+      return rejectWithValue(error);
+    }
   },
 );
 

@@ -87,7 +87,6 @@ const LineItemsTable: React.FC<TLineItemsTableProps> = (props) => {
         ...draftOrderDetail,
         [currentViewDate]: currentViewData,
       };
-
       if (isDraftEditing) {
         dispatch(
           OrderManagementsAction.setDraftOrderDetails(updateOrderDetail),

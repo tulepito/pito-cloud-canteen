@@ -87,7 +87,7 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
 
     Object.keys(planItem).forEach((planItemKey: string) => {
       const meal = planItem[planItemKey];
-      const { restaurant = {}, foodList = [] } = meal;
+      const { restaurant = {}, foodList = [], transactionId } = meal;
 
       const dishes = foodList.map((food: TListing) => ({
         key: Listing(food).getId(),
@@ -99,7 +99,6 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
 
       const foodSelection =
         orderDetail[planItemKey].memberOrders[currentUserId] || {};
-      const transactionId = orderDetail[planItemKey]?.transactionId;
 
       const pickFoodStatus = foodSelection?.status;
 

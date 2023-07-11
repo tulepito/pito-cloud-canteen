@@ -53,8 +53,8 @@ const ReviewView: React.FC<TReviewViewProps> = (props) => {
     onSaveOrderNote,
     onDownloadReviewOrderResults,
   } = props;
-  const { leftClassName, rightClassName } = classes;
   const dispatch = useAppDispatch();
+  const { leftClassName, rightClassName } = classes;
   const orderListingGetter = Listing(orderData!);
   const { quotationId } = orderListingGetter.getMetadata();
   useEffect(() => {

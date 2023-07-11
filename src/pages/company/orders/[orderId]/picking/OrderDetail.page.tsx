@@ -2,7 +2,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useCallback, useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
-import Skeleton from 'react-loading-skeleton';
 import classNames from 'classnames';
 import { isEqual } from 'lodash';
 import isEmpty from 'lodash/isEmpty';
@@ -353,8 +352,45 @@ const OrderDetailPage = () => {
           </RenderWhen.False>
         </RenderWhen>
         <RenderWhen.False>
-          <div className={css.loadingContainer}>
-            <Skeleton className={css.loadingContent} />
+          <div
+            className={
+              isDraftEditing
+                ? css.lineItemsTableWithSubOrderSection
+                : css.lineItemsTable
+            }>
+            <ManageLineItemsSection
+              isDraftEditing={isDraftEditing}
+              ableToUpdateOrder={ableToUpdateOrder}
+              shouldShowOverflowError={shouldShowOverflowError}
+              shouldShowUnderError={shouldShowUnderError}
+              setCurrentViewDate={handleSetCurrentViewDate}
+              currentViewDate={currentViewDate}
+              minQuantity={minQuantity}
+            />
+            {isDraftEditing && (
+              <SubOrderChangesHistorySection
+                className={classNames(
+                  css.container,
+                  css.normalOrderSubOrderSection,
+                )}
+                querySubOrderChangesHistoryInProgress={
+                  querySubOrderChangesHistoryInProgress
+                }
+                subOrderChangesHistory={subOrderChangesHistory}
+                draftSubOrderChangesHistory={
+                  draftSubOrderChangesHistory[
+                    currentViewDate as unknown as keyof typeof draftSubOrderChangesHistory
+                  ]
+                }
+                onQueryMoreSubOrderChangesHistory={
+                  onQueryMoreSubOrderChangesHistory
+                }
+                subOrderChangesHistoryTotalItems={
+                  subOrderChangesHistoryTotalItems
+                }
+                loadMoreSubOrderChangesHistory={loadMoreSubOrderChangesHistory}
+              />
+            )}
           </div>
         </RenderWhen.False>
       </RenderWhen>
