@@ -85,8 +85,9 @@ const reloadData = createAsyncThunk(
     dispatch(shoppingCartThunks.removeAllFromPlanCart({ planId }));
 
     orderDays.forEach((day) => {
-      const userOder = plan?.[day]?.memberOrder?.[currentUserId];
-      const status = userOder?.status;
+      const { status, requirement, foodId } =
+        plan?.[day]?.memberOrder?.[currentUserId] || {};
+
       if (status !== EParticipantOrderStatus.empty) {
         dispatch(
           shoppingCartActions.addToCart({
@@ -94,9 +95,8 @@ const reloadData = createAsyncThunk(
             planId,
             dayId: day,
             mealId:
-              status === EParticipantOrderStatus.notJoined
-                ? status
-                : userOder?.foodId,
+              status === EParticipantOrderStatus.notJoined ? status : foodId,
+            requirement,
           }),
         );
       }
