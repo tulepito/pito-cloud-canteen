@@ -10,7 +10,7 @@ import { parseThousandNumber } from '@helpers/format';
 import { isEnableToStartOrder } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { orderManagementThunks } from '@redux/slices/OrderManagement.slice';
-import { adminPaths, companyPaths } from '@src/paths';
+import { companyPaths } from '@src/paths';
 import { EOrderStates, EOrderType } from '@src/utils/enums';
 import { Listing } from '@utils/data';
 import type { TListing, TObject } from '@utils/types';
@@ -113,17 +113,14 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
     }
 
     if (response.meta.requestStatus !== 'rejected') {
-      router.push(
-        isAdminLayout
-          ? {
-              pathname: adminPaths.OrderDetail,
-              query: { orderId },
-            }
-          : {
-              pathname: companyPaths.ManageOrderDetail,
-              query: { orderId },
-            },
-      );
+      if (isAdminLayout) {
+        router.reload();
+      } else {
+        router.push({
+          pathname: companyPaths.ManageOrderDetail,
+          query: { orderId },
+        });
+      }
     }
   };
 
