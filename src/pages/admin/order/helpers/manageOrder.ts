@@ -85,11 +85,11 @@ export const parseEntitiesToExportCsv = (
           }),
           ...(hasCompanyAddressCol && { 'Địa chỉ công ty': companyLocation }),
           ...(hasDeliveryDate && {
-            'Ngày giao hàng': child.data.subOrderDate,
+            'Ngày giao hàng': `${deliveryHour}\n${child.data.subOrderDate}`,
           }),
           ...(hasTotalDishes && { 'Số phần ăn': child.data.totalDishes }),
           ...(hasOrderNotes && {
-            'Ghi chú đơn hàng': orderNotes[child.key],
+            'Ghi chú đơn hàng': orderNotes[child.data.restaurantId],
           }),
           ...(hasPartners && {
             'Đối tác': child.data.restaurants.join('\n'),
