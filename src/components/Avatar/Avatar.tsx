@@ -51,7 +51,6 @@ const Avatar: React.FC<TAvatarProps> = (props) => {
     disableProfileLink,
   } = props;
   const intl = useIntl();
-  const classes = classNames(rootClassName || css.root, className);
 
   const userIsCurrentUser = user && user.type === 'currentUser';
   const avatarUser = userIsCurrentUser
@@ -88,12 +87,19 @@ const Avatar: React.FC<TAvatarProps> = (props) => {
     avatarUser,
     defaultUserAbbreviatedName,
   );
+
+  const hasProfileImage = avatarUser.profileImage && avatarUser.profileImage.id;
+  const profileLinkEnabled = !disableProfileLink;
+  const classes = classNames(
+    rootClassName || css.root,
+    { [css.hasProfileImage]: hasProfileImage !== null },
+    className,
+  );
+
   const rootProps = { className: classes, title: displayName };
   const linkProps = avatarUser.id
     ? { href: 'ProfilePage', params: { id: avatarUser.id.uuid } }
     : { href: 'ProfileBasePage' };
-  const hasProfileImage = avatarUser.profileImage && avatarUser.profileImage.id;
-  const profileLinkEnabled = !disableProfileLink;
 
   const classForInitials = initialsClassName || css.initials;
 
