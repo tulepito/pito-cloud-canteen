@@ -2,6 +2,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useCallback, useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
+import Skeleton from 'react-loading-skeleton';
 import classNames from 'classnames';
 import { isEqual } from 'lodash';
 import isEmpty from 'lodash/isEmpty';
@@ -309,7 +310,6 @@ const OrderDetailPage = () => {
               />
             )}
           </div>
-
           <RenderWhen.False>
             <div
               className={
