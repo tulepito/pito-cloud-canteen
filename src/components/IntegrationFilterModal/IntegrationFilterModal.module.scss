@@ -16,34 +16,6 @@
   top: 10vh !important;
 }
 
-.filterIcon {
-  margin-right: 10px;
-  fill: $neutralGray6;
-}
-
-.filterBtn {
-  width: 160px;
-  height: 48px;
-  margin: 20px auto 0;
-}
-
-.filterButton {
-  padding: 10px 20px 10px 20px;
-  font-size: 14px;
-
-  .filterIcon {
-    width: 16px;
-    height: 14px;
-  }
-
-  &:hover,
-  &:focus {
-    .filterIcon * {
-      fill: $neutralGray1;
-    }
-  }
-}
-
 .formButtons {
   margin-top: 40px;
   display: flex;

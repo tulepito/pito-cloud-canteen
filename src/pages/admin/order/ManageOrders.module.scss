@@ -44,6 +44,8 @@
 .companyName {
   font-weight: $fontWeightBold;
   margin-bottom: 5px;
+  @include lineClamp(1);
+  overflow-wrap: break-word;
 }
 
 .bodyCell:nth-child(3) {
@@ -87,6 +89,7 @@
 
 .orderName {
   font-weight: bold;
+  overflow-wrap: break-word;
 }
 
 .locationRow {
@@ -217,5 +220,33 @@
     content: '_';
     color: white;
     display: block;
+  }
+}
+
+.filterIcon {
+  margin-right: 10px;
+  fill: $neutralGray6;
+}
+
+.filterBtn {
+  width: 160px;
+  height: 48px;
+  margin: 20px auto 0;
+}
+
+.filterButton {
+  padding: 10px 20px 10px 20px;
+  font-size: 14px;
+
+  .filterIcon {
+    width: 16px;
+    height: 14px;
+  }
+
+  &:hover,
+  &:focus {
+    .filterIcon * {
+      fill: $neutralGray1;
+    }
   }
 }

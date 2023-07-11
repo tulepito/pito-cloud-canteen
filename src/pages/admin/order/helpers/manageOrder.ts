@@ -19,6 +19,7 @@ export const parseEntitiesToExportCsv = (
   const hasOrderNotes = exportColumns.includes('orderNotes');
   const hasPartners = exportColumns.includes('restaurants');
   const hasSubOrders = exportColumns.includes('normal');
+  const hasParentOrder = exportColumns.includes('group');
   const hasPartnersPhoneNumbers = exportColumns.includes('partnerPhoneNumber');
   const hasPartnersAddress = exportColumns.includes('partnerAddress');
 
@@ -28,14 +29,16 @@ export const parseEntitiesToExportCsv = (
       orderCreatedAt,
       companyName,
       bookerPhoneNumber,
-      location,
+      companyLocation,
       totalDishes,
       startDate,
+      endDate,
       children = [],
       restaurants = [],
       fullRestaurantsData,
       orderNotes = {},
       partnerLocation,
+      deliveryHour,
     } = order.data || {};
 
     const parentOrderData = {
@@ -47,9 +50,9 @@ export const parseEntitiesToExportCsv = (
       ...(hasBookerPhoneNumberCol && {
         'SĐT người đại diện': bookerPhoneNumber,
       }),
-      ...(hasCompanyAddressCol && { 'Địa chỉ công ty': location }),
+      ...(hasCompanyAddressCol && { 'Địa chỉ công ty': companyLocation }),
       ...(hasDeliveryDate && {
-        'Ngày giao hàng': startDate,
+        'Ngày giao hàng': `${deliveryHour}\n${startDate}-${endDate}`,
       }),
       ...(hasTotalDishes && { 'Số phần ăn': totalDishes }),
       ...(hasOrderNotes && {
@@ -78,7 +81,7 @@ export const parseEntitiesToExportCsv = (
           ...(hasBookerPhoneNumberCol && {
             'SĐT người đại diện': bookerPhoneNumber,
           }),
-          ...(hasCompanyAddressCol && { 'Địa chỉ công ty': location }),
+          ...(hasCompanyAddressCol && { 'Địa chỉ công ty': companyLocation }),
           ...(hasDeliveryDate && {
             'Ngày giao hàng': child.data.subOrderDate,
           }),
@@ -98,7 +101,19 @@ export const parseEntitiesToExportCsv = (
         }))
       : [];
 
-    return [parentOrderData, ...subOrdersData];
+    if (!hasTitleCol || (hasTitleCol && !hasSubOrders && !hasParentOrder)) {
+      return parentOrderData;
+    }
+
+    let exportedFinalItems: any = [];
+    if (hasParentOrder) {
+      exportedFinalItems = [parentOrderData];
+    }
+    if (hasSubOrders) {
+      exportedFinalItems = [...exportedFinalItems, ...subOrdersData];
+    }
+
+    return exportedFinalItems;
   });
 
   return flatten(orderToExport);
