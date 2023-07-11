@@ -376,7 +376,7 @@ const OrderListPage = () => {
           />
           <UpdateProfileModal
             isOpen={updateProfileModalControl.value}
-            onClose={() => {}}
+            onClose={handleCloseWalkThrough}
             currentUser={currentUser!}
             handleOnBoardingModalOpen={handleOnBoardingModalOpen}
           />
