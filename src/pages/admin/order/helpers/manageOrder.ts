@@ -1,4 +1,5 @@
 import flatten from 'lodash/flatten';
+import uniq from 'lodash/uniq';
 import * as XLSX from 'xlsx';
 
 import { formatTimestamp } from '@src/utils/dates';
@@ -37,6 +38,7 @@ export const parseEntitiesToExportCsv = (
       restaurants = [],
       fullRestaurantsData,
       orderNotes = {},
+      orderNote,
       partnerLocation,
       deliveryHour,
     } = order.data || {};
@@ -56,15 +58,15 @@ export const parseEntitiesToExportCsv = (
       }),
       ...(hasTotalDishes && { 'Số phần ăn': totalDishes }),
       ...(hasOrderNotes && {
-        'Ghi chú đơn hàng': Object.values(orderNotes).join('\n'),
+        'Ghi chú đơn hàng': orderNote,
       }),
       ...(hasPartners && {
         'Đối tác': restaurants.join('\n'),
       }),
       ...(hasPartnersPhoneNumbers && {
-        'SĐT đối tác': fullRestaurantsData
-          .map((item: any) => item.phoneNumber || '')
-          .join('\n'),
+        'SĐT đối tác': uniq(
+          fullRestaurantsData.map((item: any) => item.phoneNumber || ''),
+        ).join('\n'),
       }),
       ...(hasPartnersAddress && {
         'Địa chỉ đối tác': partnerLocation.join('\n'),
@@ -123,7 +125,7 @@ export const makeExcelFile = (data: any, exportColumns: string[]) => {
   const foodsToExport = parseEntitiesToExportCsv(data, exportColumns);
   const ws = XLSX.utils.json_to_sheet(foodsToExport);
   const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, 'SheetJS');
+  XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
   XLSX.writeFile(
     wb,
     `${formatTimestamp(new Date().getTime())}_Danh_sách_đơn_hàng.xlsx`,
