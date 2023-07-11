@@ -71,7 +71,7 @@ const BADGE_TYPE_BASE_ON_ORDER_STATE = {
   [EOrderStates.canceledByBooker]: EBadgeType.default,
   [EOrderStates.completed]: EBadgeType.warning,
   [EOrderStates.inProgress]: EBadgeType.info,
-  [EOrderStates.pendingPayment]: EBadgeType.info,
+  [EOrderStates.pendingPayment]: EBadgeType.warning,
   [EOrderStates.picking]: EBadgeType.warning,
   [EOrderStates.reviewed]: EBadgeType.warning,
 
@@ -95,7 +95,22 @@ const BADGE_CLASS_NAME_BASE_ON_ORDER_STATE = {
   [ETransition.COMPLETE_DELIVERY]: css.badgeSuccess,
 };
 
-const renderBadgeForSubOrder = (tx: TTransaction) => {
+const renderBadgeForSubOrder = (
+  tx: TTransaction,
+  state: EOrderStates | EOrderDraftStates,
+) => {
+  if (!tx)
+    return (
+      <Badge
+        containerClassName={classNames(
+          css.badge,
+          BADGE_CLASS_NAME_BASE_ON_ORDER_STATE[state],
+        )}
+        labelClassName={css.badgeLabel}
+        type={BADGE_TYPE_BASE_ON_ORDER_STATE[state] || EBadgeType.default}
+        label={getLabelByKey(ORDER_STATES_OPTIONS, state)}
+      />
+    );
   if (txIsDelivering(tx)) {
     return (
       <Badge
@@ -126,9 +141,9 @@ const renderBadgeForSubOrder = (tx: TTransaction) => {
 
   return (
     <Badge
-      labelClassName={css.badgeLabelLight}
-      type={EBadgeType.darkBlue}
-      label="Đang giao hàng"
+      labelClassName={css.badgeLabel}
+      type={EBadgeType.info}
+      label="Đang triển khai"
     />
   );
 };
@@ -311,7 +326,7 @@ const TABLE_COLUMN: TColumn[] = [
     }) => {
       return (
         <RenderWhen condition={!!parentKey}>
-          {renderBadgeForSubOrder(tx)}
+          {renderBadgeForSubOrder(tx, state)}
           <RenderWhen.False>
             <Badge
               containerClassName={classNames(
@@ -440,7 +455,9 @@ const parseEntitiesToTableData = (orders: TIntegrationOrderListing[]) => {
           orderId: entity?.id?.uuid,
           restaurants: [orderDetail[key]?.restaurant?.restaurantName],
           subOrders: newSubOrders,
-          orderName: entity.attributes.publicData.orderName,
+          orderName: `${
+            company?.attributes?.profile?.publicData?.companyName
+          }_${formatTimestamp(+key, 'dd/MM/yyyy')}`,
           deliveryHour,
           parentKey: entity.id.uuid,
           tx: orderDetail[key]?.transaction,
@@ -461,6 +478,8 @@ const parseEntitiesToTableData = (orders: TIntegrationOrderListing[]) => {
         id: entity.id.uuid,
         title: entity.attributes.title,
         location: deliveryAddress?.address,
+        companyLocation:
+          company?.attributes?.profile?.publicData?.companyLocation?.address,
         companyName: company?.attributes?.profile?.publicData?.companyName,
         displayName: `${company?.attributes.profile?.lastName} ${company?.attributes.profile?.firstName}`,
         startDate: startDate && formatTimestamp(startDate),
@@ -620,21 +639,16 @@ const ManageOrdersPage = () => {
 
   useEffect(() => {
     const endDateWithOneMoreDay = addDays(new Date(meta_endDate as string), 1);
+    const hasDateFilter = meta_startDate || meta_endDate;
+    const metaStartDateQuery = `${
+      meta_startDate ? new Date(meta_startDate as string).getTime() : ''
+    },${meta_endDate ? new Date(endDateWithOneMoreDay).getTime() : ''}`;
     dispatch(
       orderAsyncActions.queryOrders({
         page,
         keywords,
-        meta_orderState,
-        ...(meta_endDate
-          ? { meta_endDate: `,${new Date(endDateWithOneMoreDay).getTime()}` }
-          : {}),
-        ...(meta_startDate
-          ? {
-              meta_startDate: `${new Date(
-                meta_startDate as string,
-              ).getTime()},`,
-            }
-          : {}),
+        ...(meta_orderState ? { meta_orderState } : {}),
+        ...(hasDateFilter ? { meta_startDate: metaStartDateQuery } : {}),
       }),
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps

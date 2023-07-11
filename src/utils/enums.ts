@@ -1024,14 +1024,6 @@ export const ORDER_ADMIN_FILTER_OPTIONS = [
     label: 'Đang triển khai',
   },
   {
-    key: 'delivering',
-    label: 'Đang giao hàng',
-  },
-  {
-    key: 'delivered',
-    label: 'Đã giao hàng',
-  },
-  {
     key: 'pendingPayment',
     label: 'Chưa thanh toán',
   },
