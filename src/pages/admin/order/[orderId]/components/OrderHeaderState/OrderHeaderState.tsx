@@ -48,7 +48,9 @@ const OrderHeaderState: React.FC<OrderHeaderStateProps> = (props) => {
     orderState === EOrderDraftStates.pendingApproval ||
     orderState === EOrderDraftStates.draft;
 
-  const shouldShowStartOrderBtn = orderState === EOrderStates.picking;
+  const shouldShowStartOrderBtn =
+    typeof onConfirmOrder !== 'undefined' &&
+    orderState === EOrderStates.picking;
 
   const canCancelOrder = orderFlow?.[
     orderState as TTransitionOrderState
