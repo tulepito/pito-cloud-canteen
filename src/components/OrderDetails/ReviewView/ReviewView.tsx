@@ -106,6 +106,11 @@ const ReviewView: React.FC<TReviewViewProps> = (props) => {
           className={css.detailRoot}
           foodOrderGroupedByDate={reviewViewData.foodOrderGroupedByDate}
         />
+
+        <ReviewNoteSection
+          onSaveOrderNote={onSaveOrderNote}
+          data={reviewViewData.orderNoteData}
+        />
       </div>
       <div className={rightPartClasses}>
         <RenderWhen condition={!canGoBackEditMode}>
