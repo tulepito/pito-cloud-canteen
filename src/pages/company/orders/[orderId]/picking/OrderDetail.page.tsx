@@ -2,6 +2,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useCallback, useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
+import Skeleton from 'react-loading-skeleton';
 import classNames from 'classnames';
 import { isEqual } from 'lodash';
 import isEmpty from 'lodash/isEmpty';
@@ -309,44 +310,6 @@ const OrderDetailPage = () => {
               />
             )}
           </div>
-          <div className={css.rightPart}>
-            <OrderDeadlineCountdownSection
-              className={css.container}
-              data={editViewData.countdownSectionData}
-              ableToUpdateOrder={ableToUpdateOrder}
-            />
-            <OrderLinkSection
-              className={css.container}
-              data={editViewData.linkSectionData}
-              ableToUpdateOrder={ableToUpdateOrder}
-            />
-            <ManageParticipantsSection
-              className={css.container}
-              data={editViewData.manageParticipantData}
-              ableToUpdateOrder={ableToUpdateOrder}
-            />
-            {isDraftEditing && (
-              <SubOrderChangesHistorySection
-                className={css.container}
-                querySubOrderChangesHistoryInProgress={
-                  querySubOrderChangesHistoryInProgress
-                }
-                subOrderChangesHistory={subOrderChangesHistory}
-                draftSubOrderChangesHistory={
-                  draftSubOrderChangesHistory[
-                    currentViewDate as unknown as keyof typeof draftSubOrderChangesHistory
-                  ]
-                }
-                onQueryMoreSubOrderChangesHistory={
-                  onQueryMoreSubOrderChangesHistory
-                }
-                subOrderChangesHistoryTotalItems={
-                  subOrderChangesHistoryTotalItems
-                }
-                loadMoreSubOrderChangesHistory={loadMoreSubOrderChangesHistory}
-              />
-            )}
-          </div>
           <RenderWhen.False>
             <div
               className={
@@ -389,6 +352,11 @@ const OrderDetailPage = () => {
             </div>
           </RenderWhen.False>
         </RenderWhen>
+        <RenderWhen.False>
+          <div className={css.loadingContainer}>
+            <Skeleton className={css.loadingContent} />
+          </div>
+        </RenderWhen.False>
       </RenderWhen>
 
       <AlertModal

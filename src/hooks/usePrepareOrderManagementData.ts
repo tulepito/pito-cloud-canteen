@@ -221,7 +221,7 @@ export const usePrepareOrderDetailPageData = ({
     participantData,
     anonymous,
     anonymousParticipantData,
-    orderDetail,
+    orderDetail: isOrderEditing ? draftOrderDetail : orderDetail,
   };
   const reviewCartData = {
     overflow,
