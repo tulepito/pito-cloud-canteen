@@ -71,12 +71,11 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
   const { restaurant: preselectedRestaurant } = useGetRestaurant();
 
   const { orderId, planId, planDetail, orderType } = useGetPlanDetails();
+  const { orderDetail } = Listing(planDetail).getMetadata();
   const restaurantReviewModalControl = useBoolean();
   const initFoodList = useMemo(() => {
     const detail =
-      Listing(planDetail).getMetadata().orderDetail?.[
-        `${openFromCalendar ? propTimestamp : timestamp}`
-      ];
+      orderDetail?.[`${openFromCalendar ? propTimestamp : timestamp}`];
     const savedRestaurantId = detail?.restaurant?.id;
 
     if (selectedRestaurantId === savedRestaurantId) {
@@ -123,6 +122,7 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
     coverImageId,
     minQuantity = 0,
     maxQuantity = Number.MAX_VALUE,
+    phoneNumber,
   } = Listing(currentRestaurant!).getPublicData();
   const restaurantAvatar = getListingImageById(
     avatarImageId,
@@ -222,12 +222,15 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
     const updatedValues = {
       [`${openFromCalendar ? propTimestamp : timestamp}`]: {
         restaurant: {
+          ...orderDetail?.[`${openFromCalendar ? propTimestamp : timestamp}`]
+            ?.restaurant,
           foodList: updateFoodList,
           id: selectedRestaurantId,
           restaurantName,
           menuId: currentMenuId,
           minQuantity,
           maxQuantity,
+          phoneNumber,
         },
         lineItems: updateLineItems,
       },
