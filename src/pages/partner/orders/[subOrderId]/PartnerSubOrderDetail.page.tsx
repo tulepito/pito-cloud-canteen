@@ -32,7 +32,7 @@ import { PartnerSubOrderDetailThunks } from './PartnerSubOrderDetail.slice';
 import css from './PartnerSubOrderDetailPage.module.scss';
 
 type TPartnerSubOrderDetailPageProps = {};
-export enum EPartnerSubOrderDetailPage {
+export enum EPartnerSubOrderDetailPageViewMode {
   summary = 'summary',
   detail = 'detail',
 }
@@ -51,7 +51,9 @@ const PartnerSubOrderDetailPage: React.FC<
   );
   const updateOrderModalContainer = useBoolean();
   const dispatch = useAppDispatch();
-  const [viewMode, setViewMode] = useState(EPartnerSubOrderDetailPage.summary);
+  const [viewMode, setViewMode] = useState(
+    EPartnerSubOrderDetailPageViewMode.summary,
+  );
 
   const {
     isReady,
@@ -66,7 +68,8 @@ const PartnerSubOrderDetailPage: React.FC<
   const { orderDetail = {} } = planGetter.getMetadata();
   const isGroupOrder = orderType === EOrderType.group;
 
-  const isSummaryViewMode = viewMode === EPartnerSubOrderDetailPage.summary;
+  const isSummaryViewMode =
+    viewMode === EPartnerSubOrderDetailPageViewMode.summary;
   const newUpdatedOrderNotificationIds = notifications.reduce(
     (
       ids,
@@ -119,7 +122,7 @@ const PartnerSubOrderDetailPage: React.FC<
   );
 
   const handleChangeViewMode =
-    (_viewMode: EPartnerSubOrderDetailPage) => () => {
+    (_viewMode: EPartnerSubOrderDetailPageViewMode) => () => {
       setViewMode(_viewMode);
     };
 
@@ -131,6 +134,11 @@ const PartnerSubOrderDetailPage: React.FC<
       NotificationActions.markNotificationsSeen(newUpdatedOrderNotificationIds),
     );
     updateOrderModalContainer.setFalse();
+  };
+
+  const handleClickViewDetails = () => {
+    handleChangeViewMode(EPartnerSubOrderDetailPageViewMode.detail);
+    handleCloseModal();
   };
 
   useEffect(() => {
@@ -178,7 +186,7 @@ const PartnerSubOrderDetailPage: React.FC<
 
         <RenderWhen condition={!isEmpty(newUpdatedOrderNotification)}>
           <Modal
-            isOpen={updateOrderModalContainer.value}
+            isOpen={!fetchOrderInProgress && updateOrderModalContainer.value}
             handleClose={handleCloseModal}
             className={css.updatedOrderModal}
             modalHeaderClassName={css.updatedOrderModalHeader}
@@ -237,15 +245,20 @@ const PartnerSubOrderDetailPage: React.FC<
                   })}{' '}
                 </>
               </div>
-              <div>
-                <Button>
-                  <div>
-                    {intl.formatMessage({
-                      id: 'PartnerSubOrderDetailPage.updateOrderModal.viewDetails',
-                    })}
-                  </div>
-                </Button>
-              </div>
+
+              <RenderWhen condition={isGroupOrder}>
+                <div className={css.action}>
+                  <Button
+                    onClick={handleClickViewDetails}
+                    className={css.viewDetailsBtn}>
+                    <div>
+                      {intl.formatMessage({
+                        id: 'PartnerSubOrderDetailPage.updateOrderModal.viewDetails',
+                      })}
+                    </div>
+                  </Button>
+                </div>
+              </RenderWhen>
             </div>
           </Modal>
         </RenderWhen>
