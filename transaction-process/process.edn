@@ -12,9 +12,7 @@
                 }
                {
                 :name    :transition/expired-start-delivery,
-                :at      {:fn/plus [
-                                    {:fn/timepoint [:time/booking-display-start]}
-                                    {:fn/period ["PT1M"]}]}
+                :actor   :actor.role/operator,
                 :actions [],
                 :from    :state/initiated
                 :to      :state/failed-delivery
@@ -28,9 +26,7 @@
                 }
                {
                 :name    :transition/expired-delivery,
-                :at      {:fn/plus [
-                                    {:fn/timepoint [:time/booking-display-start]}
-                                    {:fn/period ["PT1M"]}]}
+                :actor   :actor.role/operator,
                 :actions [{:name :action/decline-booking}],
                 :from    :state/delivering
                 :to      :state/failed-delivery
