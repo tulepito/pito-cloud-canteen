@@ -52,6 +52,10 @@ const DishSelectionForm: React.FC<TDishSelectionFormProps> = ({
     (state) => state.ParticipantOrderManagementPage,
   );
 
+  const updateSubOrderInProgress = useAppSelector(
+    (state) => state.ParticipantOrderList.updateSubOrderInProgress,
+  );
+
   const {
     form,
     handleSubmit,
@@ -79,8 +83,12 @@ const DishSelectionForm: React.FC<TDishSelectionFormProps> = ({
     updateOrderError ||
     subOrderStatus === EParticipantOrderStatus.notJoined;
 
-  const rejectSubmitting = clickedType === 'reject' && updateOrderInProgress;
-  const confirmSubmitting = clickedType === 'submit' && updateOrderInProgress;
+  const rejectSubmitting =
+    clickedType === 'reject' &&
+    (updateOrderInProgress || updateSubOrderInProgress);
+  const confirmSubmitting =
+    clickedType === 'submit' &&
+    (updateOrderInProgress || updateSubOrderInProgress);
 
   return (
     <form className={css.root} onSubmit={handleSubmit}>

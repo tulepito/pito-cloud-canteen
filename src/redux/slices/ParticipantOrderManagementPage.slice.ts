@@ -1,13 +1,13 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-import { loadOrderDataApi, updateParticipantOrderApi } from '@apis/index';
+import { updateParticipantOrderApi } from '@apis/index';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { userThunks } from '@redux/slices/user.slice';
+import { denormalisedResponseEntities, Listing } from '@src/utils/data';
 import { storableError } from '@utils/errors';
 import type { TListing, TObject, TUser } from '@utils/types';
 
 const LOAD_DATA = 'app/OrderManagementPage/LOAD_DATA';
-const RELOAD_DATA = 'app/OrderManagementPage/RELOAD_DATA';
 const UPDATE_ORDER = 'app/OrderManagementPage/UPDATE_ORDER';
 
 type TParticipantOrderManagementState = {
@@ -20,6 +20,7 @@ type TParticipantOrderManagementState = {
   // Update order
   updateOrderInProgress: boolean;
   updateOrderError: any;
+  restaurants: TListing[];
 };
 
 const initialState: TParticipantOrderManagementState = {
@@ -33,28 +34,48 @@ const initialState: TParticipantOrderManagementState = {
   // Update order
   updateOrderInProgress: false,
   updateOrderError: null,
+
+  restaurants: [],
 };
 
 const loadData = createAsyncThunk(
   LOAD_DATA,
-  async (orderId: string, { dispatch }) => {
-    const response = await loadOrderDataApi(orderId);
+  async (orderId: string, { dispatch, extra: sdk }) => {
+    const order = denormalisedResponseEntities(
+      await sdk.listings.show(
+        {
+          id: orderId,
+        },
+        { expand: true },
+      ),
+    )[0];
+    const orderListing = Listing(order);
+    const { plans = [] } = orderListing.getMetadata();
+    const plan = denormalisedResponseEntities(
+      await sdk.listings.show(
+        {
+          id: plans[0],
+        },
+        { expand: true },
+      ),
+    )[0];
+    const planListing = Listing(plan);
+    const { orderDetail = {} } = planListing.getMetadata();
+    const allRelatedRestaurantsIdList = Object.values(orderDetail).map(
+      (subOrder: any) => subOrder?.restaurant?.id,
+    );
+    const allRelatedRestaurants = denormalisedResponseEntities(
+      await sdk.listings.query({
+        ids: allRelatedRestaurantsIdList,
+      }),
+    );
     await dispatch(userThunks.fetchCurrentUser({}));
 
-    return response?.data.data;
-  },
-  {
-    serializeError: storableError,
-  },
-);
-
-const reloadData = createAsyncThunk(
-  RELOAD_DATA,
-  async (orderId: string, { dispatch }) => {
-    const response = await loadOrderDataApi(orderId);
-    await dispatch(userThunks.fetchCurrentUser({}));
-
-    return response?.data.data;
+    return {
+      order,
+      plans: [plan],
+      restaurants: allRelatedRestaurants,
+    };
   },
   {
     serializeError: storableError,
@@ -103,23 +124,6 @@ const participantOrderSlice = createSlice({
         ...state,
         loadDataError: error.message,
         loadDataInProgress: false,
-      }))
-      .addCase(reloadData.pending, (state) => ({
-        ...state,
-        reloadDataInProgress: true,
-        reloadDataError: null,
-      }))
-      .addCase(reloadData.fulfilled, (state, { payload }) => {
-        return {
-          ...state,
-          ...payload,
-          reloadDataInProgress: false,
-        };
-      })
-      .addCase(reloadData.rejected, (state, { error }) => ({
-        ...state,
-        reloadDataError: error.message,
-        reloadDataInProgress: false,
       }))
       .addCase(updateOrder.pending, (state) => ({
         ...state,

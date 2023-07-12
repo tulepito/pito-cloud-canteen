@@ -79,8 +79,12 @@ const OrderEventCardPopup: React.FC<TOrderEventCardPopupProps> = ({
       orderId,
     };
 
-    await dispatch(participantOrderManagementThunks.updateOrder(payload));
-    await dispatch(
+    if (from === 'orderList') {
+      await dispatch(OrderListThunks.updateSubOrder(payload));
+    } else {
+      await dispatch(participantOrderManagementThunks.updateOrder(payload));
+    }
+    dispatch(
       OrderListThunks.addSubOrderDocumentToFirebase({
         participantId: currentUserId,
         planId,
