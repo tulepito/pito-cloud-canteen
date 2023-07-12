@@ -10,6 +10,7 @@ import type { TIntegrationOrderListing, TListing, TObject } from '@utils/types';
 export const parseEntitiesToTableData = (
   orders: TIntegrationOrderListing[],
   page: number,
+  currentOrderVATPercentage: number,
 ) => {
   return orders.map((entity, index) => {
     const { plan = {} } = entity;
@@ -35,6 +36,7 @@ export const parseEntitiesToTableData = (
     const { totalWithVAT } = calculatePriceQuotationInfo({
       order: entity,
       planOrderDetail,
+      currentOrderVATPercentage,
     });
 
     const isCreatedByPitoAdmin = orderStateHistory.some(

@@ -11,6 +11,7 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 // eslint-disable-next-line import/no-cycle
 import ServiceFeesAndNotes from '@pages/admin/order/StepScreen/ServiceFeesAndNotes/ServiceFeesAndNotes';
 import { orderAsyncActions, resetOrder } from '@redux/slices/Order.slice';
+import { SystemAttributesThunks } from '@redux/slices/systemAttributes.slice';
 import { Listing } from '@utils/data';
 import type { TListing } from '@utils/types';
 
@@ -139,6 +140,10 @@ const CreateOrderWizard = () => {
     if (!orderId) {
       dispatch(resetOrder());
     }
+  }, []);
+
+  useEffect(() => {
+    dispatch(SystemAttributesThunks.fetchAttributes());
   }, []);
 
   const saveStep = (tab: string) => {

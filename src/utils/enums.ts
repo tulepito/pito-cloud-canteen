@@ -990,3 +990,9 @@ export enum ENotificationType {
   ORDER_PICKING = 'ORDER_PICKING',
   ORDER_RATING = 'ORDER_RATING',
 }
+
+export enum ENotificationPopupTypes {
+  success = 'success',
+  warning = 'warning',
+  error = 'error',
+}

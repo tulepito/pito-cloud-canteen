@@ -13,6 +13,7 @@ type BookerSubOrderIsCanceledParams = {
   orderListing: any;
   planListing: any;
   timestamp: number;
+  systemVATPercentage: number;
 };
 
 export const bookerSubOrderIsCanceledSubject = (subOrderDate: string) =>
@@ -23,6 +24,7 @@ const bookerSubOrderIsCanceled = ({
   orderListing,
   planListing,
   timestamp,
+  systemVATPercentage,
 }: BookerSubOrderIsCanceledParams) => {
   const { displayName: bookerName } = bookerUser.getProfile();
   const orderId = orderListing.getId();
@@ -48,6 +50,7 @@ const bookerSubOrderIsCanceled = ({
     calculatePriceQuotationInfo({
       planOrderDetail,
       order: orderListing.getFullData(),
+      currentOrderVATPercentage: systemVATPercentage,
     });
   const numberOfSubOrders = Object.keys(currentOrderDetail).length || 0;
   const formatSubOrderDate = formatTimestamp(timestamp);

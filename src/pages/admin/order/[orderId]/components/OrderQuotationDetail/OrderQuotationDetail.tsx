@@ -9,6 +9,7 @@ import {
   calculatePriceQuotationPartner,
 } from '@helpers/order/cartInfoHelper';
 import { groupFoodOrderByDate } from '@helpers/order/orderDetailHelper';
+import { useAppSelector } from '@hooks/reduxHooks';
 import { useDownloadPriceQuotation } from '@hooks/useDownloadPriceQuotation';
 import { Listing } from '@src/utils/data';
 import { EOrderType } from '@src/utils/enums';
@@ -39,6 +40,10 @@ const OrderQuotationDetail: React.FC<OrderQuotationDetailProps> = (props) => {
     () => quotationListing.getMetadata()[target] || {},
     [quotationListing, target],
   );
+  const currentOrderVATPercentage = useAppSelector(
+    (state) => state.SystemAttributes.currentOrderVATPercentage,
+  );
+
   const [currentPartnerId, setCurrentPartnerId] = useState<string>(
     Object.keys(quotationListing.getMetadata()?.partner || {})[0],
   );
@@ -53,10 +58,12 @@ const OrderQuotationDetail: React.FC<OrderQuotationDetailProps> = (props) => {
           quotationListing.getMetadata()?.[target]?.[currentPartnerId!]
             ?.quotation,
         serviceFee: partnerServiceFee,
+        currentOrderVATPercentage,
       })
     : calculatePriceQuotationInfo({
         planOrderDetail: orderDetail!,
         order,
+        currentOrderVATPercentage,
       });
 
   const handlePartnerChange = (tab: any) => {
@@ -93,6 +100,7 @@ const OrderQuotationDetail: React.FC<OrderQuotationDetailProps> = (props) => {
           priceQuotation,
           restaurantId: currentPartnerId,
           quotationDetail,
+          currentOrderVATPercentage,
         })
       : formatPriceQuotationData({
           order,
@@ -100,6 +108,7 @@ const OrderQuotationDetail: React.FC<OrderQuotationDetailProps> = (props) => {
           company,
           booker,
           priceQuotation,
+          currentOrderVATPercentage,
         });
   }, [
     currentPartnerId,

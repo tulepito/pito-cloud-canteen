@@ -52,6 +52,8 @@ import type {
   TPagination,
 } from '@utils/types';
 
+import { SystemAttributesThunks } from './systemAttributes.slice';
+
 export const MANAGE_ORDER_PAGE_SIZE = 10;
 
 type TOrderInitialState = {
@@ -629,7 +631,7 @@ const fetchRestaurantCoverImages = createAsyncThunk(
 
 const fetchOrder = createAsyncThunk(
   FETCH_ORDER,
-  async (orderId: string, { extra: sdk }) => {
+  async (orderId: string, { extra: sdk, dispatch }) => {
     const response = denormalisedResponseEntities(
       await sdk.listings.show({
         id: orderId,
@@ -637,13 +639,19 @@ const fetchOrder = createAsyncThunk(
     )[0];
 
     const { bookerId } = Listing(response).getMetadata();
+
     const selectedBooker = denormalisedResponseEntities(
       await sdk.users.show({
         id: bookerId,
       }),
     )[0];
 
-    return { order: response, selectedBooker };
+    dispatch(SystemAttributesThunks.fetchVATPercentageByOrderId(orderId));
+
+    return {
+      order: response,
+      selectedBooker,
+    };
   },
 );
 

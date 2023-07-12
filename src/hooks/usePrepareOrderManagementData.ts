@@ -27,6 +27,11 @@ export const usePrepareOrderDetailPageData = () => {
     bookerData,
     transactionDataMap,
   } = useAppSelector((state) => state.OrderManagement);
+
+  const currentOrderVATPercentage = useAppSelector(
+    (state) => state.SystemAttributes.currentOrderVATPercentage,
+  );
+
   const currentUser = useAppSelector(currentUserSelector);
 
   const { title: orderTitle = '' } = Listing(
@@ -120,6 +125,7 @@ export const usePrepareOrderDetailPageData = () => {
   } = calculatePriceQuotationInfo({
     planOrderDetail: orderDetail,
     order: orderData as TObject,
+    currentOrderVATPercentage,
   });
 
   const reviewInfoData = {
@@ -183,6 +189,7 @@ export const usePrepareOrderDetailPageData = () => {
       transportFee: `${parseThousandNumber(transportFee)}đ`,
       VATFee: `${parseThousandNumber(VATFee)}đ`,
       PITOFee: `${parseThousandNumber(PITOFee)}đ`,
+      currentOrderVATPercentage,
     },
     orderDetailData: {
       foodOrderGroupedByDate,
