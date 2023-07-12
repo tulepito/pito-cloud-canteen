@@ -67,18 +67,16 @@ const OrderDetailPage = () => {
   const confirmCancelOrderActions = useBoolean(false);
   const dispatch = useAppDispatch();
   const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
-  const { timestamp } = router.query;
+  const {
+    query: { orderId, timestamp },
+    isReady: isRouterReady,
+  } = router;
   const [currentViewDate, setCurrentViewDate] = useState<number>(
     Number(timestamp),
   );
 
   const [showReachMaxAllowedChangesModal, setShowReachMaxAllowedChangesModal] =
     useState<'reach_max' | 'reach_min' | null>(null);
-
-  const {
-    query: { orderId },
-    isReady: isRouterReady,
-  } = router;
 
   const currentUser = useAppSelector((state) => state.user.currentUser);
   const cancelPickingOrderInProgress = useAppSelector(
@@ -235,6 +233,7 @@ const OrderDetailPage = () => {
     currentViewDate,
     isNormalOrder,
   );
+
   const EditViewComponent = (
     <div className={editViewClasses}>
       <OrderTitle
@@ -261,7 +260,7 @@ const OrderDetailPage = () => {
           <div className={css.leftPart}>
             <ManageOrdersSection
               ableToUpdateOrder={ableToUpdateOrder}
-              setCurrentViewDate={(date) => setCurrentViewDate(date)}
+              setCurrentViewDate={handleSetCurrentViewDate}
               currentViewDate={currentViewDate}
               isDraftEditing={isDraftEditing}
               handleOpenReachMaxAllowedChangesModal={
@@ -319,8 +318,11 @@ const OrderDetailPage = () => {
               <ManageLineItemsSection
                 isDraftEditing={isDraftEditing}
                 ableToUpdateOrder={ableToUpdateOrder}
+                shouldShowOverflowError={shouldShowOverflowError}
+                shouldShowUnderError={shouldShowUnderError}
                 setCurrentViewDate={handleSetCurrentViewDate}
                 currentViewDate={currentViewDate}
+                minQuantity={minQuantity}
               />
               {isDraftEditing && (
                 <SubOrderChangesHistorySection
@@ -435,6 +437,30 @@ const OrderDetailPage = () => {
       onDownloadReviewOrderResults={onDownloadReviewOrderResults}
     />
   );
+
+  useEffect(() => {
+    if (shouldShowOverflowError || shouldShowUnderError) {
+      const i = setTimeout(() => {
+        dispatch(OrderManagementsAction.resetOrderDetailValidation());
+        clearTimeout(i);
+      }, 4000);
+    }
+  }, [shouldShowOverflowError, shouldShowUnderError]);
+
+  useEffect(() => {
+    onQuerySubOrderHistoryChanges();
+  }, [onQuerySubOrderHistoryChanges]);
+
+  useEffect(() => {
+    if (draftOrderDetail) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      () => {
+        dispatch(OrderManagementsAction.resetDraftSubOrderChangeHistory());
+
+        return dispatch(OrderManagementsAction.resetDraftOrderDetails());
+      };
+    }
+  }, []);
 
   useEffect(() => {
     if (

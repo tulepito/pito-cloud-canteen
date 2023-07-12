@@ -156,7 +156,10 @@ const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
         <div className={css.divider} />
         <OrderEventCardContentItems event={event} isFirstHighlight />
         <RenderWhen condition={shouldShowPickFoodSection}>
-          <RenderWhen condition={fetchSubOrderTxInProgress}>
+          <RenderWhen
+            condition={
+              fetchSubOrderTxInProgress || fetchSubOrderDocumentInProgress
+            }>
             <div className={css.loading}>Đang tải</div>
             <RenderWhen.False>
               <div className={css.divider} />

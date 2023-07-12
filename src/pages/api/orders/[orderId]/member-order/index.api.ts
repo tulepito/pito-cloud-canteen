@@ -116,6 +116,26 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           }),
         );
 
+        await Promise.all(
+          normalizedOrderDetail.map(async (order, index) => {
+            const { params } = order;
+            const {
+              transactionId,
+              extendedData: { metadata },
+            } = params;
+
+            if (transactionId) {
+              await integrationSdk.transactions.updateMetadata({
+                id: transactionId,
+                metadata: {
+                  ...metadata,
+                  isLastTxOfPlan: index === normalizedOrderDetail.length - 1,
+                },
+              });
+            }
+          }),
+        );
+
         res.json({
           statusCode: 200,
           message: `Successfully update plan info, planId: ${planId}`,

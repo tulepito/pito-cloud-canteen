@@ -107,9 +107,9 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
       deliveryAddress?.address !== null ? deliveryAddress : {},
     ),
   };
+  const isGroupOrder = orderType === EOrderType.group;
   const isStartDateInValid = startDate < findMinStartDate().getTime();
   const isDeadlineDateInValid = deadlineDate < findMinDeadlineDate().getTime();
-  const isGroupOrder = orderType === EOrderType.group;
 
   const nextStartWeek = DateTime.fromJSDate(new Date())
     .startOf('week')

@@ -666,6 +666,15 @@ export type TTransitionOrderState =
   | EOrderStates.pendingPayment
   | EOrderStates.completed;
 
+export type TNotification = {
+  id: string;
+  message: string | ReactElement;
+  messageValues: TObject;
+  linkProps: any;
+  hidden: boolean;
+  type: ENotificationPopupTypes;
+};
+
 export type TSubOrderChangeHistoryItem = {
   id?: string | number;
   authorId?: string;
@@ -679,12 +688,4 @@ export type TSubOrderChangeHistoryItem = {
   planId?: string;
   planOrderDate?: Date;
   type?: EOrderHistoryTypes;
-};
-export type TNotification = {
-  id: string;
-  message: string | ReactElement;
-  messageValues: TObject;
-  linkProps: any;
-  hidden: boolean;
-  type: ENotificationPopupTypes;
 };

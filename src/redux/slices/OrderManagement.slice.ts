@@ -11,6 +11,7 @@ import {
   participantSubOrderUpdateDocumentApi,
   queryOrderChangesHistoryDocumentApi,
 } from '@apis/firebaseApi';
+import { createNotificationApi } from '@apis/notificationApi';
 import {
   addParticipantToOrderApi,
   addUpdateMemberOrder,
@@ -33,9 +34,11 @@ import {
 } from '@helpers/orderHelper';
 import { createAsyncThunk } from '@redux/redux.helper';
 import type { RootState } from '@redux/store';
+import type { NotificationInvitationParams } from '@services/notifications';
 import type { TPlan } from '@src/utils/orderTypes';
 import { denormalisedResponseEntities, Listing, User } from '@utils/data';
 import {
+  ENotificationType,
   EOrderHistoryTypes,
   EOrderType,
   EParticipantOrderStatus,
@@ -136,8 +139,8 @@ export const checkMinMaxQuantity = (
     ).length;
     const totalQuantityCanAdd = (totalQuantity * 10) / 100;
     const totalAdded = totalQuantity - oldTotalQuantity;
-    const shouldShowOverflowError = totalAdded > totalQuantityCanAdd;
 
+    const shouldShowOverflowError = totalAdded > totalQuantityCanAdd;
     const shouldShowUnderError = totalQuantity < minQuantity;
 
     return shouldShowOverflowError || shouldShowUnderError;
@@ -306,7 +309,7 @@ type TOrderManagementState = {
   transactionDataMap: {
     [date: number]: TTransaction;
   };
-
+  restaurantData: TObject[];
   subOrderChangesHistory: TSubOrderChangeHistoryItem[];
   querySubOrderChangesHistoryInProgress: boolean;
   loadMoreSubOrderChangesHistory: boolean;
@@ -348,6 +351,7 @@ const initialState: TOrderManagementState = {
   participantData: [],
   anonymousParticipantData: [],
   transactionDataMap: {},
+  restaurantData: [],
   subOrderChangesHistory: [],
   querySubOrderChangesHistoryInProgress: false,
   querySubOrderChangesHistoryError: null,
@@ -886,18 +890,28 @@ const updateOrderFromDraftEdit = createAsyncThunk(
   'app/OrderManagement/UPDATE_ORDER_FROM_DRAFT_EDIT',
   async (foodOrderGroupedByDate: TObject[], { getState, dispatch }) => {
     const {
-      id: { uuid: orderId },
-    } = getState().OrderManagement.orderData!;
-    const {
-      id: { uuid: planId },
-    } = getState().OrderManagement.planData!;
-    const { companyId } = getState().OrderManagement;
-    const { draftSubOrderChangesHistory } = getState().OrderManagement;
-    const { draftOrderDetail } = getState().OrderManagement;
+      companyId,
+      orderData,
+      planData,
+      restaurantData = [],
+      draftSubOrderChangesHistory,
+      draftOrderDetail,
+    } = getState().OrderManagement;
+
+    const orderId = Listing(orderData as TListing).getId();
+    const { title: orderTitle } = Listing(
+      orderData as TListing,
+    ).getAttributes();
+    const { companyName = 'PCC' } = Listing(
+      orderData as TListing,
+    ).getMetadata();
+    const planId = Listing(planData as TListing).getId();
+    const { orderDetail } = Listing(planData as TListing).getMetadata();
     const updateParams = {
       planId,
       orderDetail: draftOrderDetail,
     };
+
     await addUpdateMemberOrder(orderId, updateParams);
     await Promise.all(
       Object.keys(draftSubOrderChangesHistory).map(async (date) => {
@@ -905,7 +919,7 @@ const updateOrderFromDraftEdit = createAsyncThunk(
           date as keyof typeof draftSubOrderChangesHistory
         ] as TSubOrderChangeHistoryItem[];
         if (draftSubOrderChangesHistoryByDate.length > 0) {
-          const { restaurant } = draftOrderDetail[date] || {};
+          const { restaurant = {} } = draftOrderDetail[date] || {};
 
           await sendOrderDetailUpdatedEmailApi({
             orderId,
@@ -924,6 +938,7 @@ const updateOrderFromDraftEdit = createAsyncThunk(
                   newValue,
                   createdAt,
                 } = item;
+
                 const subOrderChangesHistoryParams = {
                   planId,
                   memberId,
@@ -962,6 +977,56 @@ const updateOrderFromDraftEdit = createAsyncThunk(
       client: clientQuotation,
     };
     createQuotationApi(orderId, apiBody);
+
+    const updatedDateList = Object.keys(draftSubOrderChangesHistory).filter(
+      (d, index, array) => array.indexOf(d) === index,
+    );
+
+    const createNotificationParams = updatedDateList.reduce(
+      (
+        rest: {
+          type: ENotificationType;
+          params: NotificationInvitationParams;
+        }[],
+        date: string,
+      ) => {
+        const { restaurant: restaurantFromOrder } =
+          draftOrderDetail[date] || {};
+        const restaurantId = restaurantFromOrder.id;
+        const restaurant = restaurantData.find(
+          (r) => r?.id?.uuid === restaurantId,
+        );
+
+        if (restaurant) {
+          const author = restaurant.author || {};
+          const userId = User(author).getId();
+          const newParams = {
+            type: ENotificationType.SUB_ORDER_UPDATED,
+            params: {
+              userId,
+              orderId,
+              planId,
+              subOrderDate: Number(date),
+              orderTitle,
+              companyName,
+              newOrderDetail: draftOrderDetail[date],
+              oldOrderDetail: orderDetail[date],
+            } as NotificationInvitationParams,
+          };
+
+          return rest.concat(newParams);
+        }
+
+        return rest;
+      },
+      [],
+    );
+
+    if (!isEmpty(createNotificationParams))
+      createNotificationApi({
+        notifications: createNotificationParams,
+      });
+
     await dispatch(loadData(orderId));
   },
 );

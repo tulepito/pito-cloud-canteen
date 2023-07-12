@@ -8,6 +8,8 @@ import IconTruck from '@components/Icons/IconTruck/IconTruck';
 import IconUser from '@components/Icons/IconUser/IconUser';
 import { ENotificationType } from '@src/utils/enums';
 
+import css from './NotificationItemIcon.module.scss';
+
 type NotificationItemIconProps = {
   type: string;
 };
@@ -46,14 +48,14 @@ const NotificationItemIcon: React.FC<NotificationItemIconProps> = (props) => {
       break;
     case ENotificationType.PARTNER_PROFILE_UPDATED_BY_ADMIN:
     case ENotificationType.SUB_ORDER_UPDATED:
-      icon = <IconEdit />;
+      icon = <IconEdit className={css.editIcon} />;
       break;
 
     default:
-      icon = <IconUser />;
+      icon = null;
       break;
   }
 
-  return icon;
+  return <div className={css.iconContainer}>{icon}</div>;
 };
 export default NotificationItemIcon;

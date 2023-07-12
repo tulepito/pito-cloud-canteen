@@ -1,6 +1,7 @@
 import { calculatePriceQuotationInfo } from '@helpers/order/cartInfoHelper';
 
 import { formatTimestamp } from '../dates';
+import type { TObject } from '../types';
 
 const BASE_URL = process.env.NEXT_PUBLIC_CANONICAL_URL;
 
@@ -10,7 +11,6 @@ type PartnerNewOrderAppearParams = {
   planListing: any;
   restaurantListing: any;
   subOrderDate: string;
-  currentOrderVATPercentage: number;
 };
 
 export const partnerOrderDetailsUpdatedSubject = (subOrderDate: string) =>
@@ -22,7 +22,6 @@ const partnerOrderDetailsUpdated = ({
   restaurantListing,
   planListing,
   subOrderDate,
-  currentOrderVATPercentage,
 }: PartnerNewOrderAppearParams) => {
   const orderId = orderListing.getId();
   const { title: orderTitle } = orderListing.getAttributes();
@@ -30,19 +29,24 @@ const partnerOrderDetailsUpdated = ({
 
   const { orderDetail: planOrderDetail } = planListing.getMetadata();
 
-  const { startDate, endDate, staffName } = orderListing.getMetadata();
+  const {
+    startDate,
+    endDate,
+    staffName,
+    orderVATPercentage = 0,
+  } = orderListing.getMetadata();
   const { companyName } = companyUser.getPublicData();
   const formattedStartDate = formatTimestamp(startDate);
-  const formattedEnddate = formatTimestamp(endDate);
+  const formattedEndDate = formatTimestamp(endDate);
 
   const { totalPrice, totalDishes, VATFee, PITOFee, totalWithVAT } =
     calculatePriceQuotationInfo({
-      planOrderDetail,
-      order: orderListing.getFullData(),
-      currentOrderVATPercentage,
+      planOrderDetail: planOrderDetail as TObject,
+      order: orderListing.getFullData() as TObject,
+      currentOrderVATPercentage: orderVATPercentage,
     });
 
-  const orderUrl = `${BASE_URL}/partner/orders/${orderId}`;
+  const orderUrl = `${BASE_URL}/partner/orders/${orderId}_${subOrderDate}`;
 
   return `
   <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -1026,7 +1030,7 @@ const partnerOrderDetailsUpdated = ({
                                         color: #333333;
                                         font-size: 14px;
                                       ">
-                                      <strong>${formattedStartDate} - ${formattedEnddate}</strong>
+                                      <strong>${formattedStartDate} - ${formattedEndDate}</strong>
                                     </p>
                                   </td>
                                 </tr>

@@ -22,12 +22,12 @@ export type TModalProps = PropsWithChildren<{
   shouldHideIconClose?: boolean;
   closeButton?: ReactNode;
   handleClose: () => void;
+  headerClassName?: string;
   scrollLayerClassName?: string;
   customHeader?: ReactNode;
   closeClassName?: string;
   shouldFullScreenInMobile?: boolean;
   shouldHideGreyBackground?: boolean;
-  headerClassName?: string;
 }>;
 
 const Modal: React.FC<TModalProps> = (props) => {
@@ -77,7 +77,7 @@ const Modal: React.FC<TModalProps> = (props) => {
     scrollLayerClassName,
   );
 
-  const headerClasses = classNames(headerClassName, css.modalHeader);
+  const headerClasses = classNames(css.modalHeader, headerClassName);
 
   const hasTitle = !!title;
   const closeModalMessage = intl.formatMessage({ id: 'Modal.closeModal' });
