@@ -454,6 +454,7 @@ const parseEntitiesToTableData = (orders: TIntegrationOrderListing[]) => {
           state: orderState || EOrderDraftStates.pendingApproval,
           orderId: entity?.id?.uuid,
           restaurants: [orderDetail[key]?.restaurant?.restaurantName],
+          restaurantId: orderDetail[key]?.restaurant?.id,
           subOrders: newSubOrders,
           orderName: `${
             company?.attributes?.profile?.publicData?.companyName
@@ -501,7 +502,7 @@ const parseEntitiesToTableData = (orders: TIntegrationOrderListing[]) => {
         bookerPhoneNumber:
           company?.attributes?.profile?.publicData?.phoneNumber,
         totalDishes,
-        orderNotes: entity.attributes.metadata.notes,
+        orderNotes: entity.attributes.metadata?.notes,
         orderNote: entity.attributes.metadata?.orderNote,
         fullRestaurantsData,
         partnerLocation: allRestaurants.map(

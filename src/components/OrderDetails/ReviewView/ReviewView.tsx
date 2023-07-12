@@ -94,10 +94,6 @@ const ReviewView: React.FC<TReviewViewProps> = (props) => {
           data={reviewViewData?.reviewInfoData || {}}
           onSubmit={onSubmitEdit}
         />
-        <ReviewNoteSection
-          onSaveOrderNote={onSaveOrderNote}
-          data={reviewViewData.orderNoteData}
-        />
         <RenderWhen condition={isGroupOrder}>
           <ReviewOrdersResultSection
             className={css.resultRoot}
@@ -109,6 +105,11 @@ const ReviewView: React.FC<TReviewViewProps> = (props) => {
         <ReviewOrderDetailsSection
           className={css.detailRoot}
           foodOrderGroupedByDate={reviewViewData.foodOrderGroupedByDate}
+        />
+
+        <ReviewNoteSection
+          onSaveOrderNote={onSaveOrderNote}
+          data={reviewViewData.orderNoteData}
         />
       </div>
       <div className={rightPartClasses}>

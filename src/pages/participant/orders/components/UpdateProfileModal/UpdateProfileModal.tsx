@@ -20,10 +20,17 @@ type UpdateProfileModalProps = {
   onClose: () => void;
   currentUser?: TCurrentUser | TUser;
   handleOnBoardingModalOpen: () => void;
+  handleCloseWalkThrough?: () => void;
 };
 
 const UpdateProfileModal: React.FC<UpdateProfileModalProps> = (props) => {
-  const { isOpen, onClose, currentUser, handleOnBoardingModalOpen } = props;
+  const {
+    isOpen,
+    onClose,
+    currentUser,
+    handleOnBoardingModalOpen,
+    handleCloseWalkThrough,
+  } = props;
   const dispatch = useAppDispatch();
   const nutritionOptions = useAppSelector(
     (state) => state.ParticipantOrderList.nutritions,
@@ -78,12 +85,15 @@ const UpdateProfileModal: React.FC<UpdateProfileModalProps> = (props) => {
     <PopupModal
       id="UpdateProfileModal"
       isOpen={isOpen}
-      handleClose={onClose}
+      handleClose={() => {}}
       shouldHideIconClose
       customHeader={
         <div className={css.modalHeader}>
           <div className={css.title}>Hoàn thiện hồ sơ cá nhân</div>
-          <IconClose className={css.closeIcon} onClick={onClose} />
+          <IconClose
+            className={css.closeIcon}
+            onClick={handleCloseWalkThrough}
+          />
         </div>
       }
       containerClassName={css.modalContainer}>
