@@ -1,39 +1,11 @@
-import { useEffect } from 'react';
-import { shallowEqual } from 'react-redux';
-import { useRouter } from 'next/router';
-
 import MetaWrapper from '@components/MetaWrapper/MetaWrapper';
-import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { participantPaths } from '@src/paths';
 
-import { AccountThunks } from '../Account.slice';
-import SpecialDemandModal from '../components/SpecialDemandModal/SpecialDemandModal';
+import SpecialDemandPage from './SpecialDemand.page';
 
 const AccountPageRoute = () => {
-  const router = useRouter();
-  const dispatch = useAppDispatch();
-  const currentUser = useAppSelector((state) => state.user.currentUser);
-  const nutritionOptions = useAppSelector(
-    (state) => state.ParticipantAccount.nutritions,
-    shallowEqual,
-  );
-  const goBack = () => {
-    router.push(participantPaths.Account);
-  };
-
-  useEffect(() => {
-    dispatch(AccountThunks.fetchAttributes());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   return (
     <MetaWrapper>
-      <SpecialDemandModal
-        isOpen={true}
-        onClose={goBack}
-        nutritionOptions={nutritionOptions}
-        currentUser={currentUser!}
-      />
+      <SpecialDemandPage />
     </MetaWrapper>
   );
 };

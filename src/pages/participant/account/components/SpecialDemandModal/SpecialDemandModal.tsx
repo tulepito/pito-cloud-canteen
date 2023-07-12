@@ -1,16 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useMemo } from 'react';
 
-import ConfirmationModal from '@components/ConfirmationModal/ConfirmationModal';
 import IconArrowHead from '@components/Icons/IconArrowHead/IconArrowHead';
 import Modal from '@components/Modal/Modal';
-import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import useBoolean from '@hooks/useBoolean';
-import { userThunks } from '@redux/slices/user.slice';
-import { User } from '@src/utils/data';
 import type { TCurrentUser, TUser } from '@src/utils/types';
 
-import { AccountThunks } from '../../Account.slice';
 import type { TSpecialDemandFormValues } from '../SpecialDemandForm/SpecialDemandForm';
 import SpecialDemandForm from '../SpecialDemandForm/SpecialDemandForm';
 
@@ -21,26 +14,19 @@ type TSpecialDemandModalProps = {
   onClose: () => void;
   nutritionOptions: { key: string; label: string }[];
   currentUser: TUser | TCurrentUser;
+  handleSubmit: (values: TSpecialDemandFormValues) => void;
+  initialValues: TSpecialDemandFormValues;
+  inProgress: boolean;
 };
 const SpecialDemandModal: React.FC<TSpecialDemandModalProps> = (props) => {
-  const { isOpen, onClose, nutritionOptions, currentUser } = props;
-  const dispatch = useAppDispatch();
-  const updateSpecialDemandSuccessModalControl = useBoolean();
-  const currentUserGetter = User(currentUser as TUser);
-  const { allergies = [], nutritions = [] } = currentUserGetter.getPublicData();
-  const updateSpecialDemandInProgress = useAppSelector(
-    (state) => state.ParticipantAccount.updateSpecialDemandInProgress,
-  );
-
-  const initialValues = useMemo(
-    () => ({ allergies, nutritions }),
-    [JSON.stringify(allergies), JSON.stringify(nutritions)],
-  );
-  const handleSubmit = async (values: TSpecialDemandFormValues) => {
-    await dispatch(AccountThunks.updateSpecialDemand(values));
-    await dispatch(userThunks.fetchCurrentUser());
-    updateSpecialDemandSuccessModalControl.setTrue();
-  };
+  const {
+    isOpen,
+    onClose,
+    nutritionOptions,
+    handleSubmit,
+    initialValues,
+    inProgress,
+  } = props;
 
   return (
     <Modal
@@ -64,18 +50,10 @@ const SpecialDemandModal: React.FC<TSpecialDemandModalProps> = (props) => {
           onSubmit={handleSubmit}
           initialValues={initialValues}
           nutritionOptions={nutritionOptions}
-          inProgress={updateSpecialDemandInProgress}
+          inProgress={inProgress}
+          view="mobile"
         />
       </div>
-      <ConfirmationModal
-        isPopup
-        id="UpdateSpecialDemandSuccessModal"
-        isOpen={updateSpecialDemandSuccessModalControl.value}
-        onClose={updateSpecialDemandSuccessModalControl.setFalse}
-        title="Thông báo"
-        description="Cập nhật yêu cầu đặc biệt thành công!"
-        secondForAutoClose={3}
-      />
     </Modal>
   );
 };

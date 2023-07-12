@@ -55,6 +55,7 @@ export const FieldTextInputComponent: React.FC<InputComponentProps> = (
     rightIconContainerClassName,
     inputClassName,
     customOnBlur,
+    onChange: onCustomChange,
     ...rest
   } = props;
 
@@ -103,7 +104,9 @@ export const FieldTextInputComponent: React.FC<InputComponentProps> = (
     });
 
   const onInputChange = (event: any) => {
-    if (type === 'number') {
+    if (typeof onCustomChange === 'function') {
+      onCustomChange(event);
+    } else if (type === 'number') {
       const newValue = event.target.value
         .replace(/\+/g, '-')
         .replace(/[^0-9]/g, '');

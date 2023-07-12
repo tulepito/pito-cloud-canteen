@@ -22,6 +22,16 @@
   left: 50%;
   transform: translateX(-50%);
   z-index: -1;
+
+  @include viewportLarge {
+    display: none;
+  }
+}
+
+.avatarSection {
+  @include viewportLarge {
+    display: none;
+  }
 }
 
 .navigationWrapper {
@@ -29,6 +39,10 @@
   @include flexAlign(unset, center);
   flex-direction: column;
   gap: 24px;
+
+  @include viewportLarge {
+    display: none;
+  }
 
   .navigationItem {
     @include flexAlign(center, space-between);
@@ -49,5 +63,14 @@
     span {
       @include textTemplate(16px, $fontWeightSemiBold, 24px);
     }
+  }
+}
+
+.desktopView {
+  display: none;
+  @include viewportLarge {
+    display: block;
+    margin-left: 292px;
+    width: calc(100% - 292px);
   }
 }
