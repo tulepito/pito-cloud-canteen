@@ -30,7 +30,7 @@ const SubOrderCard: React.FC<TSubOrderCardProps> = (props) => {
   const {
     daySession,
     deliveryHour,
-    deliveryAddress,
+    restaurantAddress,
     restaurant,
     status,
     deadlineDate,
@@ -41,7 +41,6 @@ const SubOrderCard: React.FC<TSubOrderCardProps> = (props) => {
     isOrderStarted = false,
   } = event?.resource || {};
 
-  const { address } = deliveryAddress;
   const { name: restaurantName } = restaurant;
   const orderTitle = event?.title || '';
   const isFoodPicked = !!event.resource?.dishSelection?.dishSelection;
@@ -116,7 +115,7 @@ const SubOrderCard: React.FC<TSubOrderCardProps> = (props) => {
           <div className={css.row}>
             <div className={css.deliveryAddress}>
               <IconLocation />
-              <span>{address}</span>
+              <span>{restaurantAddress}</span>
             </div>
           </div>
           <div className={css.row}>

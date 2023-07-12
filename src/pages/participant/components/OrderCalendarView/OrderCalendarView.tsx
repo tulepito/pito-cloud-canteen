@@ -23,7 +23,7 @@ import SuccessRatingModal from '@pages/participant/orders/components/SuccessRati
 import { getDaySessionFromDeliveryTime, isSameDate } from '@src/utils/dates';
 import { convertStringToNumber } from '@src/utils/number';
 import { CurrentUser, Listing, User } from '@utils/data';
-import type { TCurrentUser, TListing, TObject, TUser } from '@utils/types';
+import type { TCurrentUser, TListing, TUser } from '@utils/types';
 
 import ParticipantToolbar from '../ParticipantToolbar/ParticipantToolbar';
 
@@ -33,16 +33,20 @@ type TOrderCalendarViewProps = {
   company: TUser;
   order: TListing;
   plans?: TListing[];
-  subOrders?: any;
   currentUser: TCurrentUser;
   loadDataInProgress?: boolean;
+  restaurants: TListing[];
 };
 
-type TPlanItem = TObject;
-
 const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
-  const { company, order, subOrders, currentUser, plans, loadDataInProgress } =
-    props;
+  const {
+    company,
+    order,
+    restaurants,
+    currentUser,
+    plans,
+    loadDataInProgress,
+  } = props;
 
   const companyTitle = User(company).getPublicData().displayName;
   const ensureCompanyUser = User(company).getFullData();
@@ -65,35 +69,38 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
     updateOrderInProgress,
   } = useSubOrderPicking();
 
-  const { deadlineDate, deliveryHour, startDate, endDate } =
+  const { deadlineDate, deliveryHour, startDate, endDate, orderState } =
     orderObj.getMetadata();
   const [anchorTime, setAnchorTime] = useState<number | undefined>();
 
   const anchorDate =
     anchorTime || startDate ? new Date(anchorTime || startDate) : new Date();
 
-  const events = subOrders.map((subOrder: any) => {
-    const planKey = Object.keys(subOrder)[0];
-    const planItem: TPlanItem = subOrder[planKey];
+  const allPlansIdList = plans?.map((plan) => Listing(plan).getId()) || [];
+  const events = allPlansIdList.map((planId: string) => {
     const currentPlan = plans?.find(
-      (plan) => Listing(plan).getId() === planKey,
+      (plan) => Listing(plan).getId() === planId,
     ) as TListing;
+    const currentPlanListing = Listing(currentPlan);
 
+    const { orderDetail = {} } = currentPlanListing.getMetadata();
     const listEvent: Event[] = [];
     let isAnchorTimeChanged: any = false;
 
-    Object.keys(planItem).forEach((planItemKey: string) => {
-      const meal = planItem[planItemKey];
-      const { restaurant = {}, foodList = [] } = meal;
-
-      const dishes = foodList.map((food: TListing) => ({
-        key: Listing(food).getId(),
-        value: Listing(food).getAttributes().title,
+    Object.keys(orderDetail).forEach((planItemKey: string) => {
+      const planItem = orderDetail[planItemKey];
+      const { foodList = {}, restaurantName, id } = planItem.restaurant;
+      const restaurant = restaurants?.find(
+        (_restaurant) => Listing(_restaurant).getId() === id,
+      );
+      const restaurantListing = Listing(restaurant!);
+      const dishes = Object.keys(foodList).map((foodId: string) => ({
+        key: foodId,
+        value: foodList[foodId].foodName,
       }));
 
       const foodSelection =
-        Listing(currentPlan).getMetadata().orderDetail[planItemKey]
-          .memberOrders[currentUserId] || {};
+        orderDetail[planItemKey].memberOrders[currentUserId] || {};
 
       const pickFoodStatus = foodSelection?.status;
 
@@ -108,15 +115,16 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
       const event = {
         resource: {
           id: `${planItemKey}`,
-          subOrderId: planKey,
+          subOrderId: planId,
           orderId,
           daySession: getDaySessionFromDeliveryTime(deliveryHour),
           status: pickFoodStatus,
           type: 'dailyMeal',
-          deliveryAddress: Listing(restaurant).getPublicData().location,
+          restaurantAddress:
+            restaurantListing.getPublicData().location?.address,
           restaurant: {
-            name: Listing(restaurant).getAttributes().title,
-            id: Listing(restaurant).getId(),
+            name: restaurantName,
+            id,
           },
           meal: {
             dishes,
@@ -126,6 +134,7 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
           deliveryHour,
           dishSelection: { dishSelection: foodSelection?.foodId },
           orderColor,
+          orderState,
         },
         title: orderTitle,
         start: DateTime.fromMillis(+planItemKey).toJSDate(),

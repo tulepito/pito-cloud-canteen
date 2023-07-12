@@ -73,12 +73,12 @@ const OrderListPage = () => {
   const fetchOrdersInProgress = useAppSelector(
     (state) => state.ParticipantOrderList.fetchOrdersInProgress,
   );
-  const subOrders = useAppSelector(
-    (state) => state.ParticipantOrderList.allSubOrders,
-    shallowEqual,
-  );
   const plans = useAppSelector(
     (state) => state.ParticipantOrderList.allPlans,
+    shallowEqual,
+  );
+  const restaurants = useAppSelector(
+    (state) => state.ParticipantOrderList.restaurants,
     shallowEqual,
   );
   const mappingSubOrderToOrder = useAppSelector(
@@ -136,13 +136,12 @@ const OrderListPage = () => {
   );
   const numberOfUnseenNotifications = unseenNotifications.length;
 
-  const events = subOrders.map((subOrder: any) => {
-    const planKey = Object.keys(subOrder)[0];
-    const planItem: TObject = subOrder[planKey];
+  const allPlansIdList = plans?.map((plan) => Listing(plan).getId()) || [];
+  const events = allPlansIdList.map((planId: string) => {
     const currentPlan = plans?.find(
-      (plan) => Listing(plan).getId() === planKey,
+      (plan) => Listing(plan).getId() === planId,
     ) as TListing;
-    const orderId = mappingSubOrderToOrder[planKey];
+    const orderId = mappingSubOrderToOrder[planId];
     const order = orders?.find((_order) => Listing(_order).getId() === orderId);
     const orderListing = Listing(order);
     const {
@@ -153,18 +152,22 @@ const OrderListPage = () => {
     } = orderListing.getMetadata();
     const { title: orderTitle } = orderListing.getAttributes();
 
+    const currentPlanListing = Listing(currentPlan);
+
+    const { orderDetail = {} } = currentPlanListing.getMetadata();
     const listEvent: Event[] = [];
 
-    Object.keys(planItem).forEach((planItemKey: string) => {
-      const meal = planItem[planItemKey];
-      const { restaurant = {}, foodList = [] } = meal;
-
-      const dishes = foodList.map((food: TListing) => ({
-        key: Listing(food).getId(),
-        value: Listing(food).getAttributes().title,
+    Object.keys(orderDetail).forEach((planItemKey: string) => {
+      const planItem = orderDetail[planItemKey];
+      const { foodList = {}, restaurantName, id } = planItem.restaurant;
+      const restaurant = restaurants?.find(
+        (_restaurant) => Listing(_restaurant).getId() === id,
+      );
+      const restaurantListing = Listing(restaurant!);
+      const dishes = Object.keys(foodList).map((foodId: string) => ({
+        key: foodId,
+        value: foodList[foodId].foodName,
       }));
-
-      const currentPlanListing = Listing(currentPlan);
 
       const foodSelection =
         currentPlanListing.getMetadata().orderDetail[planItemKey].memberOrders[
@@ -183,18 +186,19 @@ const OrderListPage = () => {
 
       const event = {
         resource: {
-          id: `${planKey} - ${planItemKey}`,
+          id: `${planId} - ${planItemKey}`,
           timestamp: planItemKey,
-          subOrderId: planKey,
+          subOrderId: planId,
           orderId,
-          planId: planKey,
+          planId,
           daySession: getDaySessionFromDeliveryTime(deliveryHour),
           status: pickFoodStatus,
           type: 'dailyMeal',
-          deliveryAddress: Listing(restaurant).getPublicData().location,
+          restaurantAddress:
+            restaurantListing.getPublicData().location?.address,
           restaurant: {
-            name: Listing(restaurant).getAttributes().title,
-            id: Listing(restaurant).getId(),
+            name: restaurantName,
+            id,
           },
           meal: {
             dishes,
@@ -355,7 +359,7 @@ const OrderListPage = () => {
           anchorDate={selectedDay}
           events={walkthroughEnable ? EVENTS_MOCKUP : flattenEvents}
           renderEvent={OrderEventCard}
-          inProgress={showLoadingModal}
+          inProgress={fetchOrdersInProgress}
           defautlView={defaultCalendarView}
           // exposeAnchorDate={handleAnchorDateChange}
           components={{
