@@ -669,7 +669,6 @@ const ManageOrdersPage = () => {
 
   const onFilterSubmit = ({
     keywords,
-    meta_state,
     meta_startDate,
     meta_endDate,
     meta_orderState,
@@ -678,14 +677,13 @@ const ManageOrdersPage = () => {
       pathname: adminRoutes.ManageOrders.path,
       query: {
         keywords,
-        meta_state: meta_state.join(','),
         ...(meta_startDate
           ? { meta_startDate: new Date(meta_startDate).toISOString() }
           : {}),
         ...(meta_endDate
           ? { meta_endDate: new Date(meta_endDate).toISOString() }
           : {}),
-        meta_orderState,
+        ...(meta_orderState ? { meta_orderState } : {}),
       },
     });
   };
