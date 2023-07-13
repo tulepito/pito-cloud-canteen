@@ -3,20 +3,27 @@ import isEmpty from 'lodash/isEmpty';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HttpMethod } from '@apis/configs';
-import { queryAllListings } from '@helpers/apiHelpers';
+import { queryAllListings, queryAllTransactions } from '@helpers/apiHelpers';
 import { denormalisedResponseEntities } from '@services/data';
 import { getIntegrationSdk, handleError } from '@services/sdk';
-import { Listing } from '@src/utils/data';
+import { Listing, Transaction } from '@src/utils/data';
 import { EListingType, EOrderStates } from '@src/utils/enums';
 import type { TPlan } from '@src/utils/orderTypes';
-import type { TListing, TObject } from '@src/utils/types';
+import type { TListing, TObject, TTransaction } from '@src/utils/types';
+
+const SHOULD_HAVE_TRANSACTION_STATES = [
+  EOrderStates.inProgress,
+  EOrderStates.pendingPayment,
+  EOrderStates.completed,
+  EOrderStates.reviewed,
+];
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
-    const { partnerId /* JSONParams */ } = req.query;
-    // const {} = JSON.parse(JSONParams as string);
-
-    const apiMethod = req.method;
+    const {
+      method: apiMethod,
+      query: { partnerId },
+    } = req;
     const integrationSdk = getIntegrationSdk();
 
     switch (apiMethod) {
@@ -27,6 +34,19 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             meta_listingType: EListingType.order,
           },
         });
+        const transactions = await queryAllTransactions({
+          query: {
+            listingId: partnerId,
+          },
+        });
+
+        const transactionMap = transactions.reduce(
+          (map: TObject<string, TTransaction>, tx: TTransaction) => ({
+            ...map,
+            [Transaction(tx).getId()]: tx,
+          }),
+          {},
+        );
 
         const orderWithPlanDataMaybe = async (order: TListing) => {
           const { plans = [], orderState } = Listing(order).getMetadata();
@@ -43,37 +63,17 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
               resultValue = { ...resultValue, plan: planListing };
               const { orderDetail } = Listing(planListing).getMetadata();
 
-              if (
-                [
-                  EOrderStates.inProgress,
-                  EOrderStates.pendingPayment,
-                  EOrderStates.completed,
-                  EOrderStates.reviewed,
-                ].includes(orderState)
-              ) {
-                const transactionIdMap = Object.entries<
-                  TPlan['orderDetail'][keyof TPlan['orderDetail']]
-                >(orderDetail).reduce<
-                  { timestamp: string; transactionId: string }[]
-                >((prev, [timestamp, { transactionId }]) => {
-                  if (transactionId)
-                    return prev.concat([{ timestamp, transactionId }]);
-
-                  return prev;
-                }, []);
-
+              if (SHOULD_HAVE_TRANSACTION_STATES.includes(orderState)) {
                 const transactionDataMap: TObject = {};
-                await Promise.all(
-                  transactionIdMap.map(async ({ timestamp, transactionId }) => {
-                    const [tx] = denormalisedResponseEntities(
-                      await integrationSdk.transactions.show({
-                        id: transactionId,
-                      }),
-                    );
+                Object.entries<
+                  TPlan['orderDetail'][keyof TPlan['orderDetail']]
+                >(orderDetail).forEach(([timestamp, { transactionId }]) => {
+                  if (transactionId) {
+                    transactionDataMap[timestamp] =
+                      transactionMap[transactionId];
+                  }
+                });
 
-                    transactionDataMap[timestamp] = tx;
-                  }),
-                );
                 resultValue = { ...resultValue, transactionDataMap };
               }
 
