@@ -123,9 +123,10 @@ const ListingDetailModal: React.FC<TListingDetailModalProps> = (props) => {
       id={`ListingDetailModal.${title}`}
       isOpen={isOpen}
       handleClose={onClose}
-      containerClassName={css.modalContainer}
-      headerClassName={css.headerModal}>
-      <div>
+      headerClassName={css.headerModal}
+      contentClassName={css.modalContentWrapper}
+      containerClassName={css.modalContainer}>
+      <div className={css.modalContent}>
         <div className={css.listingImage}>
           <RenderWhen condition={listingImages.length > 0}>
             <Slider {...sliderSettings}>

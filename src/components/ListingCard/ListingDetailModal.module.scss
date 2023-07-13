@@ -4,10 +4,8 @@
 
 .modalContainer {
   padding: 0 16px !important;
-
   @include viewportMedium {
     padding: 0 24px !important;
-    max-height: min(700px, 70vh);
     max-width: min(600px, 60vw);
   }
 }
@@ -112,6 +110,8 @@
 
 .requirementSection {
   padding: 12px 0 24px;
+  margin-bottom: 90px;
+
   display: flex;
   flex-direction: column;
   row-gap: 8px;
@@ -122,25 +122,39 @@
   }
 }
 
+.modalContent {
+  overflow: scroll;
+  @include viewportMedium {
+    max-height: min(700px, 70vh);
+
+    padding: 0 7px !important;
+  }
+}
+
+.modalContentWrapper {
+  position: relative;
+}
+
 .selectFoodSection {
   position: fixed;
   bottom: 0;
   z-index: 2;
   left: 0;
   width: 100vw;
-  margin: 0 0 40px 0;
   background-color: $neutralGray1;
   display: flex;
   justify-content: flex-end;
+  padding: 16px;
 
   .selectFoodBtn {
     width: 150px;
+    float: right;
   }
 
   @include viewportMedium {
-    position: relative;
-    left: 0;
     width: 100%;
+    position: absolute;
+    padding: 16px 0;
   }
 }
 
