@@ -81,7 +81,7 @@ const loadData = createAsyncThunk(
 
         const { orders = [] } = response?.data || {};
 
-        return orders;
+        return { orders, restaurantId: restaurantListingId };
       }
 
       return [];
@@ -147,7 +147,7 @@ const PartnerManageOrdersSlice = createSlice({
         0 + (page - 1) * perPage,
         page * perPage >= validSubOrders.length
           ? validSubOrders.length
-          : perPage,
+          : perPage * page,
       );
     },
   },
@@ -158,10 +158,10 @@ const PartnerManageOrdersSlice = createSlice({
         state.fetchOrderInProgress = true;
         state.fetchOrderError = null;
       })
-      .addCase(loadData.fulfilled, (state, { payload }) => {
+      .addCase(loadData.fulfilled, (state, { payload }: any) => {
         const { pagination } = current(state);
         const { perPage } = pagination;
-        const orderList = payload;
+        const { orders: orderList, restaurantId } = payload;
 
         const subOrderList = (orderList as TObject[]).reduce<TObject[]>(
           (result, curr) => {
@@ -177,8 +177,10 @@ const PartnerManageOrdersSlice = createSlice({
               .reduce<TObject[]>((subOrderRes, currSubOrderEntry) => {
                 const [date, data] = currSubOrderEntry;
 
-                return data?.transactionId
-                  ? subOrderRes.concat({
+                return restaurantId !== data?.restaurant?.id ||
+                  isEmpty(data?.transactionId)
+                  ? subOrderRes
+                  : subOrderRes.concat({
                       ...data,
                       date,
                       orderTitle: title,
@@ -186,8 +188,7 @@ const PartnerManageOrdersSlice = createSlice({
                       ...orderMetadata,
                       orderId,
                       transaction: transactionDataMap[date],
-                    })
-                  : subOrderRes;
+                    });
               }, []);
 
             return result.concat(subOrders);
