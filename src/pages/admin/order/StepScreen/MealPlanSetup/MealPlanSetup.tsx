@@ -10,7 +10,7 @@ import {
   changeStep2SubmitStatus,
   orderAsyncActions,
 } from '@redux/slices/Order.slice';
-import { Listing } from '@utils/data';
+import { Listing, User } from '@utils/data';
 import { getSelectedDaysOfWeek } from '@utils/dates';
 import type { TListing } from '@utils/types';
 
@@ -67,9 +67,12 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
   );
 
   const {
-    location: { address: defaultAddress = '', origin: defaultOrigin = {} } = {},
-    location,
-  } = currentClient?.attributes.profile.publicData || {};
+    companyLocation: {
+      address: defaultAddress = '',
+      origin: defaultOrigin = {},
+    } = {},
+    companyLocation: location,
+  } = User(currentClient).getPublicData();
 
   const onSubmit = useCallback(
     async (values: any) => {
