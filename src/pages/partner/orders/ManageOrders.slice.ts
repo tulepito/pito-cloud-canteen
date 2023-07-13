@@ -5,6 +5,7 @@ import { queryPartnerOrdersApi } from '@apis/partnerApi';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { CurrentUser, Listing } from '@src/utils/data';
 import { formatTimestamp } from '@src/utils/dates';
+import { toNonAccentVietnamese } from '@src/utils/string';
 import {
   txIsCanceled,
   txIsCompleted,
@@ -123,8 +124,14 @@ const PartnerManageOrdersSlice = createSlice({
             }`;
             const isValid =
               (isEmpty(name) ||
-                `${companyName}_${formatTimestamp(date)}`.includes(name)) &&
-              (isEmpty(subOrderId) || subOrderTitle.includes(subOrderId)) &&
+                toNonAccentVietnamese(
+                  `${companyName}_${formatTimestamp(date)}`,
+                  true,
+                ).includes(toNonAccentVietnamese(name, true))) &&
+              (isEmpty(subOrderId) ||
+                toNonAccentVietnamese(subOrderTitle, true).includes(
+                  toNonAccentVietnamese(subOrderId, true),
+                )) &&
               (isEmpty(status) || isValidStatus(transaction, status)) &&
               (isEmpty(startTime) ||
                 (Number(startTime) >= Number(startDate || 0) &&
