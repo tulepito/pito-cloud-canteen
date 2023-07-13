@@ -60,7 +60,7 @@ const SubOrderCart: React.FC<TSubOrderCartProps> = (props) => {
     planOrderDetail,
     order,
     currentOrderVATPercentage: orderVATPercentage,
-    currentOrderServiceFeePercentage: serviceFeePercentage,
+    currentOrderServiceFeePercentage: serviceFeePercentage / 100,
     date,
     shouldIncludePITOFee: false,
   });

@@ -5,6 +5,7 @@ import { queryPartnerOrdersApi } from '@apis/partnerApi';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { CurrentUser, Listing } from '@src/utils/data';
 import { formatTimestamp } from '@src/utils/dates';
+import { toNonAccentVietnamese } from '@src/utils/string';
 import {
   txIsCanceled,
   txIsCompleted,
@@ -81,7 +82,7 @@ const loadData = createAsyncThunk(
 
         const { orders = [] } = response?.data || {};
 
-        return orders;
+        return { orders, restaurantId: restaurantListingId };
       }
 
       return [];
@@ -123,8 +124,14 @@ const PartnerManageOrdersSlice = createSlice({
             }`;
             const isValid =
               (isEmpty(name) ||
-                `${companyName}_${formatTimestamp(date)}`.includes(name)) &&
-              (isEmpty(subOrderId) || subOrderTitle.includes(subOrderId)) &&
+                toNonAccentVietnamese(
+                  `${companyName}_${formatTimestamp(date)}`,
+                  true,
+                ).includes(toNonAccentVietnamese(name, true))) &&
+              (isEmpty(subOrderId) ||
+                toNonAccentVietnamese(subOrderTitle, true).includes(
+                  toNonAccentVietnamese(subOrderId, true),
+                )) &&
               (isEmpty(status) || isValidStatus(transaction, status)) &&
               (isEmpty(startTime) ||
                 (Number(startTime) >= Number(startDate || 0) &&
@@ -158,10 +165,10 @@ const PartnerManageOrdersSlice = createSlice({
         state.fetchOrderInProgress = true;
         state.fetchOrderError = null;
       })
-      .addCase(loadData.fulfilled, (state, { payload }) => {
+      .addCase(loadData.fulfilled, (state, { payload }: any) => {
         const { pagination } = current(state);
         const { perPage } = pagination;
-        const orderList = payload;
+        const { orders: orderList, restaurantId } = payload;
 
         const subOrderList = (orderList as TObject[]).reduce<TObject[]>(
           (result, curr) => {
@@ -177,8 +184,10 @@ const PartnerManageOrdersSlice = createSlice({
               .reduce<TObject[]>((subOrderRes, currSubOrderEntry) => {
                 const [date, data] = currSubOrderEntry;
 
-                return data?.transactionId
-                  ? subOrderRes.concat({
+                return restaurantId !== data?.restaurant?.id ||
+                  isEmpty(data?.transactionId)
+                  ? subOrderRes
+                  : subOrderRes.concat({
                       ...data,
                       date,
                       orderTitle: title,
@@ -186,8 +195,7 @@ const PartnerManageOrdersSlice = createSlice({
                       ...orderMetadata,
                       orderId,
                       transaction: transactionDataMap[date],
-                    })
-                  : subOrderRes;
+                    });
               }, []);
 
             return result.concat(subOrders);

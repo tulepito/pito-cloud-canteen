@@ -174,7 +174,9 @@ export const usePrepareOrderDetailPageData = ({
       calculatePriceQuotationInfo({
         planOrderDetail: draftOrderDetail,
         order: orderData as TObject,
-        currentOrderVATPercentage,
+        currentOrderVATPercentage: !isEmpty(VATPercentage)
+          ? VATPercentage!
+          : currentOrderVATPercentage,
       }),
     [orderData, draftOrderDetail, currentOrderVATPercentage],
   );
@@ -184,7 +186,9 @@ export const usePrepareOrderDetailPageData = ({
       calculatePriceQuotationInfoFromQuotation({
         quotation: quotation as TListing,
         packagePerMember,
-        currentOrderVATPercentage,
+        currentOrderVATPercentage: !isEmpty(VATPercentage)
+          ? VATPercentage!
+          : currentOrderVATPercentage,
       }),
     [packagePerMember, quotation],
   );

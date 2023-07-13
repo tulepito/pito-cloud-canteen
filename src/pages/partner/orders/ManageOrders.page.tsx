@@ -45,7 +45,7 @@ const TABLE_COLUMN: TColumn[] = [
         <NamedLink
           path={partnerPaths.SubOrderDetail}
           params={{
-            subOrderId: `${id}_${date.toString()}`,
+            subOrderId: `${id}_${date}`,
           }}>
           {titleComponent}
         </NamedLink>
@@ -167,9 +167,9 @@ const parseEntitiesToTableData = (subOrders: TObject[]) => {
         companyName,
         orderName: `${companyName}_${formatTimestamp(date)}`,
         staffName,
-        startDate: startDate && formatTimestamp(startDate),
+        startDate: startDate ? formatTimestamp(startDate) : '',
         time: Number(startDate),
-        endDate: endDate && formatTimestamp(endDate),
+        endDate: endDate ? formatTimestamp(endDate) : '',
         state: EOrderDraftStates.pendingApproval,
         deliveryHour: formattedDeliveryHour,
         transaction,
