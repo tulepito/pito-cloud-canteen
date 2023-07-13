@@ -729,7 +729,11 @@ const ManageOrdersPage = () => {
               }
               placement="bottomLeft"
               trigger="click"
-              overlayInnerStyle={{ backgroundColor: '#fff', padding: 0 }}>
+              overlayClassName={css.orderDetailTooltip}
+              overlayInnerStyle={{
+                backgroundColor: '#fff',
+                padding: 0,
+              }}>
               <Button
                 type="button"
                 variant="secondary"
@@ -754,6 +758,7 @@ const ManageOrdersPage = () => {
                 }
                 placement="bottomRight"
                 trigger="click"
+                overlayClassName={css.orderDetailTooltip}
                 overlayInnerStyle={{ backgroundColor: '#fff', padding: 0 }}>
                 <Button variant="secondary">Cột</Button>
               </Tooltip>
@@ -767,6 +772,7 @@ const ManageOrdersPage = () => {
                 }
                 placement="bottomRight"
                 trigger="click"
+                overlayClassName={css.orderDetailTooltip}
                 overlayInnerStyle={{ backgroundColor: '#fff', padding: 0 }}>
                 <Button variant="secondary">Tải danh sách</Button>
               </Tooltip>
