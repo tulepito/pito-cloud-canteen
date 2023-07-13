@@ -1,16 +1,19 @@
 import isEmpty from 'lodash/isEmpty';
+import uniq from 'lodash/uniq';
 
 import { denormalisedResponseEntities } from '@services/data';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { createFirebaseDocNotification } from '@services/notifications';
 import type { TPlan } from '@src/utils/orderTypes';
-import { Listing } from '@utils/data';
+import { Listing, User } from '@utils/data';
 import {
   EBookerOrderDraftStates,
   ENotificationType,
   EOrderDraftStates,
   EOrderStates,
 } from '@utils/enums';
+
+const ADMIN_FLEX_ID = process.env.PITO_ADMIN_ID;
 
 const enableToPublishOrderStates = [
   EOrderDraftStates.pendingApproval,
@@ -50,6 +53,7 @@ export const publishOrder = async (orderId: string) => {
     orderState,
     orderStateHistory = [],
     participants = [],
+    serviceFees = {},
   } = orderListing.getMetadata();
   const { title: orderTitle } = orderListing.getAttributes();
 
@@ -74,6 +78,33 @@ export const publishOrder = async (orderId: string) => {
     },
   });
 
+  const response = denormalisedResponseEntities(
+    await integrationSdk.users.show(
+      {
+        id: ADMIN_FLEX_ID,
+      },
+      { expand: true },
+    ),
+  )[0];
+  const { systemServiceFeePercentage = 0 } = User(response).getPrivateData();
+
+  let newServiceFees = serviceFees;
+  if (isEmpty(serviceFees)) {
+    const allRestaurantIdList = uniq(
+      Object.values(planOrderDetails).map(
+        (subOrder: any) => subOrder?.restaurant?.id,
+      ),
+    );
+
+    newServiceFees = allRestaurantIdList.reduce(
+      (prev, restaurantId) => ({
+        ...prev,
+        [restaurantId]: systemServiceFeePercentage * 100,
+      }),
+      {},
+    );
+  }
+
   await integrationSdk.listings.update({
     id: orderId,
     metadata: {
@@ -82,6 +113,7 @@ export const publishOrder = async (orderId: string) => {
         state: EOrderStates.picking,
         updatedAt: new Date().getTime(),
       }),
+      serviceFees: newServiceFees,
     },
   });
 
