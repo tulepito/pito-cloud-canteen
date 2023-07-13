@@ -2,7 +2,7 @@
 @use '/src/styles/mixins.scss' as *;
 
 .note {
-  white-space: pre;
+  white-space: pre-line;
   padding: 16px;
   border-radius: 4px;
   background-color: $neutralGray2;
