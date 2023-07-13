@@ -59,6 +59,17 @@ export const queryAllListings = async ({ query, include = [] }: any = {}) => {
   });
 };
 
+export const queryAllTransactions = async ({
+  query,
+  include = [],
+}: any = {}) => {
+  return queryAllPages({
+    sdkModel: getIntegrationSdk().transactions,
+    include,
+    query,
+  });
+};
+
 export type TCheckUnConflictedParams = {
   mealType: EMenuMealType;
   daysOfWeek: string[];
