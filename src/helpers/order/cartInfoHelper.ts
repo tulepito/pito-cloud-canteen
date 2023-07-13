@@ -62,13 +62,11 @@ export const calculateTotalPriceAndDishes = ({
           const { lineItems = [], status } = rawOrderDetailOfDate;
 
           if (
-            dateKey &&
-            (date?.toString() !== dateKey || status) ===
-              ESubOrderStatus.CANCELED
+            (dateKey && date?.toString() !== dateKey) ||
+            status === ESubOrderStatus.CANCELED
           ) {
             return result;
           }
-
           const totalInfo = lineItems.reduce(
             (
               res: {
