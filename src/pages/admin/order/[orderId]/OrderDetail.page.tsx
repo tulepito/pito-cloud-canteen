@@ -92,6 +92,14 @@ const OrderDetailPage = () => {
     );
   };
 
+  const onSaveOrderNote = (orderNote: string) => {
+    return dispatch(
+      orderManagementThunks.updateOrderGeneralInfo({
+        orderNote,
+      }),
+    );
+  };
+
   const tabItems = [
     {
       key: EOrderDetailTabs.ORDER_DETAIL,
@@ -112,6 +120,7 @@ const OrderDetailPage = () => {
         updateOrderStaffNameInProgress,
         updateOrderState,
         updateOrderStateInProgress,
+        onSaveOrderNote,
       },
     },
     {

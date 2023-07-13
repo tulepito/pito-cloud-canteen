@@ -46,6 +46,7 @@ type OrderDetailTabProps = {
   updateOrderStaffNameInProgress: boolean;
   updateOrderState: (newOrderState: string) => void;
   updateOrderStateInProgress: boolean;
+  onSaveOrderNote: (orderNote: string) => void;
 };
 
 const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
@@ -59,6 +60,7 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
     updateOrderState,
     updateOrderStateInProgress,
     transactionDataMap,
+    onSaveOrderNote,
   } = props;
   const router = useRouter();
   const { timestamp } = router.query;
@@ -260,6 +262,7 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
             onDownloadReviewOrderResults={onDownloadReviewOrderResults}
             showStartPickingOrderButton
             isAdminLayout
+            onSaveOrderNote={onSaveOrderNote}
           />
         </RenderWhen.False>
       </RenderWhen>
