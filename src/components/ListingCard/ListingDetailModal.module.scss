@@ -4,10 +4,8 @@
 
 .modalContainer {
   padding: 0 16px !important;
-
   @include viewportMedium {
     padding: 0 24px !important;
-    max-height: min(700px, 70vh);
     max-width: min(600px, 60vw);
   }
 }
@@ -118,6 +116,20 @@
   }
 }
 
+.modalContent {
+  overflow: scroll;
+
+  @include viewportMedium {
+    max-height: min(700px, 70vh);
+
+    padding: 0 7px !important;
+  }
+}
+
+.modalContentWrapper {
+  position: relative;
+}
+
 .selectFoodSection {
   position: fixed;
   bottom: 0;
@@ -128,13 +140,13 @@
   background-color: $neutralGray1;
 
   .selectFoodBtn {
-    width: 100%;
+    float: right;
   }
 
   @include viewportMedium {
-    position: relative;
-    left: 0;
     width: 100%;
+    position: absolute;
+
     padding: 16px 0;
   }
 }
