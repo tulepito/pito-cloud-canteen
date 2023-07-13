@@ -77,7 +77,7 @@ const SubOrderDetail: React.FC<TSubOrderDetailProps> = ({
     const ws = XLSXUtils.aoa_to_sheet(downloadData as any[][]);
     const wb = XLSXUtils.book_new();
     XLSXUtils.book_append_sheet(wb, ws, 'Sheet1');
-    writeFile(wb, `Chi tiết đặt món`);
+    writeFile(wb, `Chi tiết đặt món.xlsx`);
   };
 
   useEffect(() => {
