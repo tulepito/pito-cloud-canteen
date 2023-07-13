@@ -104,7 +104,7 @@ const QuizMealDate = () => {
             orderType: isGroupOrder ? EOrderType.group : EOrderType.normal,
             ...deadlineInfoMaybe,
             deliveryAddress:
-              User(selectedCompany).getPublicData().location || {},
+              User(selectedCompany).getPublicData().companyLocation || {},
             dayInWeek: selectedDays,
           },
         }),
