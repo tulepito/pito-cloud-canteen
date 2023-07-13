@@ -122,7 +122,7 @@ const groupFoodForNormal = (orderDetail: TObject, date?: number | string) => {
           id: foodId,
           name: foodName,
           quantity = 1,
-          price: foodPrice,
+          unitPrice: foodPrice = 0,
         } = lineItem;
         const { foodUnit = '' } = foodListOfDate[foodId] || {};
 
