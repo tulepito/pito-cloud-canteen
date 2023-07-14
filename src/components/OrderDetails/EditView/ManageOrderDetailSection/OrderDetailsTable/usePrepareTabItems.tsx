@@ -18,9 +18,13 @@ type TUsePrepareTabItemsParams = {
     tab: EOrderDetailsTableTab,
     memberId: string,
   ) => () => void;
-  handleClickDeleteOrderItem: (memberId: string) => () => void;
+  handleClickDeleteOrderItem: (
+    tab: EOrderDetailsTableTab,
+    memberId: string,
+  ) => () => void;
   handleRestoreMembers: (memberIds: string[]) => void;
   handleDeletePermanentlyMembers: (memberIds: string[]) => void;
+  ableToUpdateOrder: boolean;
 };
 
 export const usePrepareTabItems = ({
@@ -32,6 +36,7 @@ export const usePrepareTabItems = ({
   handleClickDeleteOrderItem,
   handleRestoreMembers,
   handleDeletePermanentlyMembers,
+  ableToUpdateOrder,
 }: TUsePrepareTabItemsParams) => {
   const intl = useIntl();
 
@@ -57,12 +62,14 @@ export const usePrepareTabItems = ({
         EOrderDetailsTableTab.deleted
       >,
       tableHeads,
-      onClickDeleteOrderItem: handleClickDeleteOrderItem,
+      onClickDeleteOrderItem: (memberId: string) =>
+        handleClickDeleteOrderItem(tabValue, memberId),
       onClickEditOrderItem: handleClickEditOrderItem,
       data: tabData,
       deletedTabData,
       onRestoreMembers: handleRestoreMembers,
       onDeletePermanentlyMembers: handleDeletePermanentlyMembers,
+      ableToUpdateOrder,
     };
 
     switch (tabValue) {

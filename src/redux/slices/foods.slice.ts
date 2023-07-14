@@ -357,7 +357,7 @@ const createPartnerFoodFromCsv = createAsyncThunk(
                 );
                 resolve(response as any);
               } catch (error) {
-                console.log('error', error);
+                console.error('error', error);
                 reject(error);
               }
             }

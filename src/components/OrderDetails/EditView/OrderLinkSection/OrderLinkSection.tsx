@@ -14,6 +14,7 @@ import {
   orderManagementThunks,
 } from '@redux/slices/OrderManagement.slice';
 import { Listing } from '@src/utils/data';
+import { EOrderStates } from '@src/utils/enums';
 import { formatTimestamp } from '@utils/dates';
 import type { TDefaultProps, TListing } from '@utils/types';
 
@@ -28,6 +29,7 @@ type TOrderLinkSectionProps = TDefaultProps & {
     companyName: string;
   };
   isAminLayout?: boolean;
+  ableToUpdateOrder: boolean;
 };
 
 const OrderLinkSection: React.FC<TOrderLinkSectionProps> = (props) => {
@@ -36,6 +38,7 @@ const OrderLinkSection: React.FC<TOrderLinkSectionProps> = (props) => {
     className,
     data: { orderDeadline, companyName },
     isAminLayout = false,
+    ableToUpdateOrder,
   } = props;
   const intl = useIntl();
   const dispatch = useAppDispatch();
@@ -50,9 +53,13 @@ const OrderLinkSection: React.FC<TOrderLinkSectionProps> = (props) => {
 
   const plan = Listing(planData as TListing);
   const order = Listing(orderData as TListing);
+  const { orderState } = order.getMetadata();
+
   const { viewed } = plan.getMetadata();
   const orderId = order.getId();
   const planId = plan.getId();
+
+  const isPicking = orderState === EOrderStates.picking;
   const isFirstTimeAccess =
     !isAminLayout && !(inProgress || viewed || planViewed);
 
@@ -116,6 +123,7 @@ const OrderLinkSection: React.FC<TOrderLinkSectionProps> = (props) => {
         <div className={css.title}>{sectionTitle}</div>
         <Button
           variant="inline"
+          disabled={!ableToUpdateOrder}
           className={css.shareLinkButton}
           onClick={handleShareButtonClick}>
           <IconShare className={css.editIcon} />
@@ -128,7 +136,7 @@ const OrderLinkSection: React.FC<TOrderLinkSectionProps> = (props) => {
           overlayClassName={css.toolTipOverlay}
           tooltipContent={copyToClipboardTooltip}
           placement="bottom">
-          <ButtonIcon onClick={handleCopyLink}>
+          <ButtonIcon disabled={!ableToUpdateOrder} onClick={handleCopyLink}>
             <IconCopy />
           </ButtonIcon>
         </Tooltip>
@@ -139,7 +147,9 @@ const OrderLinkSection: React.FC<TOrderLinkSectionProps> = (props) => {
         data={{ orderLink, orderDeadline, companyName }}
         isFirstTimeShow={isFirstTimeAccess}
         isOpen={
-          !inProgress && (isFirstTimeAccess || isSendNotificationModalOpen)
+          !inProgress &&
+          (isFirstTimeAccess || isSendNotificationModalOpen) &&
+          isPicking
         }
         onClose={handleCloseSendNotificationModal}
       />

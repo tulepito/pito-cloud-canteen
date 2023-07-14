@@ -4,6 +4,7 @@ import { useIntl } from 'react-intl';
 import Skeleton from 'react-loading-skeleton';
 import isEmpty from 'lodash/isEmpty';
 import { DateTime } from 'luxon';
+import Link from 'next/link';
 
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import ActivityItem from '@components/TimeLine/ActivityItem';
@@ -90,7 +91,12 @@ const ReviewOrderProcessSection: React.FC<
     (state) => state.OrderManagement.transactionDataMap,
   );
   const transactionDataList = Object.values(transactionDataMap);
-  const { orderStateHistory } = Listing(orderData as TListing).getMetadata();
+  const { orderStateHistory, orderState } = Listing(
+    orderData as TListing,
+  ).getMetadata();
+  const orderIsInProgress = orderState === EOrderStates.inProgress;
+  const orderId = Listing(orderData as TListing).getId();
+
   const totalDays = transactionDataList.length;
   const activeIndex = findCurrentActiveIndex(orderStateHistory);
 
@@ -139,6 +145,14 @@ const ReviewOrderProcessSection: React.FC<
           </RenderWhen.False>
         </RenderWhen>
       </div>
+      <RenderWhen condition={orderIsInProgress}>
+        <div className={css.separator}></div>
+        <Link
+          className={css.pickingLink}
+          href={`/company/orders/${orderId}/picking`}>
+          Quản lý chọn món
+        </Link>
+      </RenderWhen>
     </div>
   );
 };

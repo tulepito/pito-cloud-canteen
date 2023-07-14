@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import type { View } from 'react-big-calendar';
-import { type Event, Views } from 'react-big-calendar';
+import { type Event, type View, Views } from 'react-big-calendar';
 import Skeleton from 'react-loading-skeleton';
 import flatten from 'lodash/flatten';
 import { DateTime } from 'luxon';
@@ -110,6 +109,7 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
           id: `${planItemKey}`,
           subOrderId: planKey,
           orderId,
+          timestamp: +planItemKey,
           daySession: getDaySessionFromDeliveryTime(deliveryHour),
           status: pickFoodStatus,
           type: 'dailyMeal',

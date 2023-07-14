@@ -296,7 +296,7 @@ const OrderListPage = () => {
   };
 
   useEffect(() => {
-    if (subOrdersFromSelectedDayTxIds.length > 0) {
+    if (subOrdersFromSelectedDayTxIds.length > 0 && !walkthroughEnable) {
       dispatch(
         OrderListThunks.fetchTransactionBySubOrder(
           subOrdersFromSelectedDayTxIds,
@@ -315,10 +315,12 @@ const OrderListPage = () => {
 
   useEffect(() => {
     (async () => {
-      await dispatch(OrderListThunks.fetchOrders(currentUserId));
-      dispatch(OrderListActions.markColorToOrder());
+      if (!walkthroughEnable) {
+        await dispatch(OrderListThunks.fetchOrders(currentUserId));
+        dispatch(OrderListActions.markColorToOrder());
+      }
     })();
-  }, [currentUserId]);
+  }, [currentUserId, walkthroughEnable]);
 
   useEffect(() => {
     dispatch(OrderListThunks.fetchAttributes());
@@ -362,11 +364,8 @@ const OrderListPage = () => {
             toolbar: (toolBarProps: any) => (
               <ParticipantToolbar
                 {...toolBarProps}
-                onChangeDate={handleSelectDay}
                 isAllowChangePeriod
-                // startDate={new Date(startDate)}
-                // endDate={new Date(endDate)}
-                // anchorDate={anchorDate}
+                onChangeDate={handleSelectDay}
               />
             ),
           }}

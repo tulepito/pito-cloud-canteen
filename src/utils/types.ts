@@ -19,6 +19,7 @@ import type {
   ENotificationPopupTypes,
   ENotificationTypes,
   EOrderDraftStates,
+  EOrderHistoryTypes,
   EOrderStates,
   EReviewRatings,
   EReviewTypes,
@@ -669,4 +670,19 @@ export type TNotification = {
   linkProps: any;
   hidden: boolean;
   type: ENotificationPopupTypes;
+};
+
+export type TSubOrderChangeHistoryItem = {
+  id?: string | number;
+  authorId?: string;
+  createdAt?: any;
+  memberId?: string;
+  member?: {
+    email?: string;
+  };
+  newValue?: any;
+  oldValue?: any;
+  planId?: string;
+  planOrderDate?: Date;
+  type?: EOrderHistoryTypes;
 };

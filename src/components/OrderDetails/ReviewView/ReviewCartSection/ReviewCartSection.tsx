@@ -10,8 +10,8 @@ import { parseThousandNumber } from '@helpers/format';
 import { isEnableToStartOrder } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { orderManagementThunks } from '@redux/slices/OrderManagement.slice';
-import { adminPaths, companyPaths } from '@src/paths';
-import { EOrderType } from '@src/utils/enums';
+import { companyPaths } from '@src/paths';
+import { EOrderStates, EOrderType } from '@src/utils/enums';
 import { Listing } from '@utils/data';
 import type { TListing, TObject } from '@utils/types';
 
@@ -61,6 +61,11 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
   const isStartOrderInProgress = useAppSelector(
     (state) => state.OrderManagement.isStartOrderInProgress,
   );
+
+  const updateOrderFromDraftEditInProgress = useAppSelector(
+    (state) => state.OrderManagement.updateOrderFromDraftEditInProgress,
+  );
+
   const planData = useAppSelector((state) => state.OrderManagement.planData);
   const orderData = useAppSelector((state) => state.OrderManagement.orderData);
 
@@ -80,35 +85,42 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
   });
 
   const { orderDetail } = Listing(planData as TListing).getMetadata();
-  const { orderType = EOrderType.group } = Listing(
+  const { orderType = EOrderType.group, orderState } = Listing(
     orderData as TListing,
   ).getMetadata();
   const isStartOrderDisabled = !isEnableToStartOrder(
     orderDetail,
     orderType === EOrderType.group,
   );
+
+  const isDraftEditing = orderState === EOrderStates.inProgress;
+
   const isPartner = target === 'partner';
 
   const handleStartPickingOrder = async () => {
-    const { meta } = await dispatch(
-      orderManagementThunks.bookerStartOrder({
-        orderId: orderId as string,
-        foodOrderGroupedByDate,
-      }),
-    );
-
-    if (meta.requestStatus !== 'rejected') {
-      router.push(
-        isAdminLayout
-          ? {
-              pathname: adminPaths.OrderDetail,
-              query: { orderId },
-            }
-          : {
-              pathname: companyPaths.ManageOrderDetail,
-              query: { orderId },
-            },
+    let response;
+    if (isDraftEditing) {
+      response = await dispatch(
+        orderManagementThunks.updateOrderFromDraftEdit(),
       );
+    } else {
+      response = await dispatch(
+        orderManagementThunks.bookerStartOrder({
+          orderId: orderId as string,
+          foodOrderGroupedByDate,
+        }),
+      );
+    }
+
+    if (response.meta.requestStatus !== 'rejected') {
+      if (isAdminLayout) {
+        router.reload();
+      } else {
+        router.push({
+          pathname: companyPaths.ManageOrderDetail,
+          query: { orderId },
+        });
+      }
     }
   };
 
@@ -227,8 +239,10 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
         <Button
           variant="cta"
           className={css.makePaymentButton}
-          inProgress={isStartOrderInProgress}
-          disabled={isStartOrderDisabled}
+          inProgress={
+            isStartOrderInProgress || updateOrderFromDraftEditInProgress
+          }
+          disabled={isStartOrderDisabled || updateOrderFromDraftEditInProgress}
           onClick={handleStartPickingOrder}>
           <div>
             {intl.formatMessage({

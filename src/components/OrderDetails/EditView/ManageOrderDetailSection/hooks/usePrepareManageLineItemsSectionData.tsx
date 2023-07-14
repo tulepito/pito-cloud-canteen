@@ -1,5 +1,4 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import type { Dispatch, SetStateAction } from 'react';
 import { useEffect, useMemo } from 'react';
 import { isEmpty } from 'lodash';
 
@@ -9,7 +8,7 @@ import type { TListing, TObject } from '@utils/types';
 
 export const usePrepareManageLineItemsSectionData = (
   currentViewDate: number | string,
-  setCurrentViewDate: Dispatch<SetStateAction<number>>,
+  setCurrentViewDate: (date: number) => void,
 ) => {
   const { planData } = useAppSelector((state) => state.OrderManagement);
 
@@ -28,7 +27,7 @@ export const usePrepareManageLineItemsSectionData = (
     [currentViewDate, JSON.stringify(dateList)],
   );
 
-  const { restaurant = {} } = orderDetail[currentViewDate.toString()] || {};
+  const { restaurant = {} } = orderDetail[currentViewDate?.toString()] || {};
   const { foodList = {} } = restaurant;
   const foodOptions = Object.entries<TObject>(foodList).map(
     ([foodId, foodData]) => {

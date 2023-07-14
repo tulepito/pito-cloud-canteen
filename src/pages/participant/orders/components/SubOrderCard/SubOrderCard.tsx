@@ -4,6 +4,7 @@ import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 
 import OrderEventCardStatus from '@components/CalendarDashboard/components/OrderEventCard/OrderEventCardStatus';
+import { EVENT_STATUS } from '@components/CalendarDashboard/helpers/constant';
 import IconBanned from '@components/Icons/IconBanned/IconBanned';
 import IconDeadline from '@components/Icons/IconDeadline/IconDeadline';
 import IconFood from '@components/Icons/IconFood/IconFood';
@@ -13,7 +14,6 @@ import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { isOver } from '@helpers/orderHelper';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { calculateRemainTime } from '@src/utils/dates';
-import { EParticipantOrderStatus } from '@src/utils/enums';
 
 import css from './SubOrderCard.module.scss';
 
@@ -55,7 +55,14 @@ const SubOrderCard: React.FC<TSubOrderCardProps> = (props) => {
     (item: any) => item.key === dishSelection?.dishSelection,
   )?.value;
 
-  const shouldShowRejectStatus = status === EParticipantOrderStatus.notJoined;
+  const shouldShowRejectButton =
+    !isOrderStarted &&
+    ![EVENT_STATUS.EXPIRED_STATUS, EVENT_STATUS.NOT_JOINED_STATUS].includes(
+      status,
+    ) &&
+    !isExpired &&
+    !transactionId;
+  const shouldShowCountdown = !isOrderStarted && !isExpired;
 
   const subOrderTxs = useAppSelector(
     (state) => state.ParticipantOrderList.subOrderTxs,
@@ -96,7 +103,7 @@ const SubOrderCard: React.FC<TSubOrderCardProps> = (props) => {
             </div>
           </div>
         </RenderWhen>
-        <RenderWhen condition={shouldShowRejectStatus}>
+        <RenderWhen condition={shouldShowRejectButton}>
           <div className={css.row}>
             <div className={css.noPickThisDay}>
               <IconBanned />
@@ -105,7 +112,7 @@ const SubOrderCard: React.FC<TSubOrderCardProps> = (props) => {
           </div>
         </RenderWhen>
         <div className={css.orderInfo}>
-          <RenderWhen condition={!isExpired && !isOrderStarted}>
+          <RenderWhen condition={shouldShowCountdown}>
             <div className={css.row}>
               <div className={css.orderDeadline}>
                 <IconDeadline />

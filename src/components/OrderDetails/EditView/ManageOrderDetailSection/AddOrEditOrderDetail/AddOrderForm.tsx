@@ -7,6 +7,7 @@ import { useIntl } from 'react-intl';
 import isEmpty from 'lodash/isEmpty';
 
 import Button from '@components/Button/Button';
+import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import Form from '@components/Form/Form';
 import FieldCustomSelectComponent from '@components/FormFields/FieldCustomSelect/FieldCustomSelect';
 import FieldSelect from '@components/FormFields/FieldSelect/FieldSelect';
@@ -40,6 +41,13 @@ type TExtraProps = {
     memberId: string;
     memberName: string;
   }[];
+  ableToUpdateOrder: boolean;
+  isDraftEditing: boolean;
+  shouldShowOverflowError?: boolean;
+  shouldShowUnderError?: boolean;
+  maxQuantity?: number;
+  minQuantity?: number;
+  currentViewDate: number;
 };
 type TAddOrderFormComponentProps = FormRenderProps<TAddOrderFormValues> &
   Partial<TExtraProps>;
@@ -66,9 +74,18 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
     submitErrors,
     values,
     invalid,
+    ableToUpdateOrder,
+    isDraftEditing,
+    shouldShowOverflowError,
+    shouldShowUnderError,
+    minQuantity,
+    currentViewDate,
   } = props;
-  const fieldSelectMemberDisable = inProgress;
-  const fieldSelectFoodDisable = foodOptions?.length === 0;
+
+  const fieldSelectMemberDisable = inProgress || !ableToUpdateOrder;
+  const fieldSelectFoodDisable =
+    foodOptions?.length === 0 || !ableToUpdateOrder;
+
   const submitDisabled =
     invalid ||
     addOrUpdateMemberOrderInProgress ||
@@ -96,6 +113,12 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
   const handleToggleShowHideRequirementField = () => {
     setIsRequirementInputShow(!isRequirementInputShow);
   };
+
+  useEffect(() => {
+    if (currentViewDate && form) {
+      form.reset();
+    }
+  }, [currentViewDate]);
 
   useEffect(() => {
     if (isRequirementInputShow) {
@@ -194,6 +217,7 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
             formError={submitErrors?.participantId}
             validate={validateMemberField}
             validateErrorClassName={css.fieldParticipantIdError}
+            newOptionValidator={isDraftEditing ? () => false : undefined}
           />
           {addOrUpdateMemberOrderError !== null && (
             <div className={css.formError}>
@@ -219,6 +243,18 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
           })}
         </Button>
       </div>
+      {isDraftEditing && shouldShowOverflowError && (
+        <ErrorMessage
+          className={css.error}
+          message={`Bạn đã thay đổi vượt mức quy định (tối đa 10% số lượng người tham gia)`}
+        />
+      )}
+      {isDraftEditing && shouldShowUnderError && (
+        <ErrorMessage
+          className={css.error}
+          message={`Cần đặt tối thiểu ${minQuantity} phần`}
+        />
+      )}
 
       <div className={css.addRequirementContainer}>
         <Button
@@ -247,6 +283,7 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
               placeholder={intl.formatMessage({
                 id: 'AddOrderForm.requirementField.placeholder',
               })}
+              disabled={!ableToUpdateOrder}
             />
           </div>
         )}

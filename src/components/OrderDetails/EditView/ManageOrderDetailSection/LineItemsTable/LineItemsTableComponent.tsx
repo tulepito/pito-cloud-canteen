@@ -26,11 +26,12 @@ const TABLE_HEAD_IDS = [
 type TLineItemsTableComponentProps = {
   data: TObject;
   onModifyQuantity: (id: string, quantity: number) => () => void;
+  ableToUpdateOrder: boolean;
 };
 
 export const LineItemsTableComponent: React.FC<
   TLineItemsTableComponentProps
-> = ({ data = {}, onModifyQuantity }) => {
+> = ({ data = {}, onModifyQuantity, ableToUpdateOrder }) => {
   const intl = useIntl();
   const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
 
@@ -70,7 +71,7 @@ export const LineItemsTableComponent: React.FC<
 
   const doNothing = () => {};
 
-  const actionDisabled = inProgress;
+  const actionDisabled = inProgress || !ableToUpdateOrder;
   const formattedTotalPrice = `${parseThousandNumber(totalPrice)}đ`;
 
   const bodyComponent = (

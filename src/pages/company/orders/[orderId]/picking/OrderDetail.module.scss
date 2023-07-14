@@ -3,6 +3,8 @@
 @use '/src/styles/customMediaQueries.scss' as *;
 
 .editViewRoot {
+  $maxWidthWithPadding: calc(100vw - 320px - 40px);
+
   padding: 16px 8px;
   display: flex;
   flex-direction: column;
@@ -22,7 +24,6 @@
 
   .leftPart {
     order: 3;
-    $maxWidthWithPadding: calc(100vw - 320px - 40px);
 
     margin-top: 24px;
 
@@ -72,19 +73,6 @@
         height: fit-content;
       }
     }
-
-    .container {
-      padding: 16px;
-      border-radius: 16px;
-
-      background-color: $neutralGray1;
-      outline: 1px solid $neutralGray4;
-      outline-offset: -1px;
-
-      & > div:first-of-type {
-        @include textTemplate(18px, 700, 4/3);
-      }
-    }
   }
 
   @include viewportSmall {
@@ -132,12 +120,33 @@
       margin: 40px auto;
     }
 
+    &.editNormalOrderViewWithHistorySection {
+      display: flex;
+    }
+
+    .normalOrderSubOrderSection {
+      min-width: 320px;
+      max-width: 320px;
+    }
+
     .titlePart {
       grid-column: 1 / span 3;
       max-width: 1180px;
     }
   }
 
+  .lineItemsTableWithSubOrderSection {
+    display: flex;
+    width: 100%;
+    order: 2;
+    gap: 56px;
+    flex-direction: column;
+    align-items: flex-start;
+
+    @include viewportMedium {
+      flex-direction: row;
+    }
+  }
   .lineItemsTable {
     order: 2;
     grid-column: 2;
@@ -188,5 +197,18 @@
     @include viewportSLarge {
       max-width: calc(1180px + 130px * 2);
     }
+  }
+}
+
+.container {
+  padding: 16px;
+  border-radius: 16px;
+
+  background-color: $neutralGray1;
+  outline: 1px solid $neutralGray4;
+  outline-offset: -1px;
+
+  & > div:first-of-type {
+    @include textTemplate(18px, 700, 4/3);
   }
 }
