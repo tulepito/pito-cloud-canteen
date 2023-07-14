@@ -8,7 +8,7 @@ import { FieldTextInputComponent } from '@components/FormFields/FieldTextInput/F
 import { parseThousandNumber } from '@helpers/format';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { QuizActions } from '@redux/slices/Quiz.slice';
-import { quizPaths } from '@src/paths';
+import { companyPaths, quizPaths } from '@src/paths';
 import {
   greaterThanOneThousand,
   greaterThanZero,
@@ -143,12 +143,15 @@ const QuizPerPackMemberAmountPage = () => {
   const goBack = () => {
     router.back();
   };
+  const handleCancel = () => {
+    router.push(companyPaths.Home);
+  };
 
   return (
     <QuizModal
       id="QuizPerPackMemberAmountModal"
       isOpen
-      handleClose={() => {}}
+      handleClose={handleCancel}
       modalTitle={intl.formatMessage({
         id: 'QuizPerPackMemberAmountPage.title',
       })}
