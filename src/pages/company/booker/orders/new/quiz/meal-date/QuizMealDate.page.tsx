@@ -138,12 +138,15 @@ const QuizMealDate = () => {
   const goBack = () => {
     router.back();
   };
+  const handleCancel = () => {
+    router.push(companyPaths.Home);
+  };
 
   return !creatingOrderModalControl.value ? (
     <QuizModal
       id="QuizMealDateModal"
       isOpen={!creatingOrderModalControl.value}
-      handleClose={() => {}}
+      handleClose={handleCancel}
       modalTitle={intl.formatMessage({ id: 'QuizMealDate.title' })}
       submitText="Tạo đơn"
       onSubmit={onFormSubmitClick}

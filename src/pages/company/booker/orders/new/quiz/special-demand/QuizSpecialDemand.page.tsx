@@ -6,7 +6,7 @@ import { useRouter } from 'next/router';
 
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { QuizActions, QuizThunks } from '@redux/slices/Quiz.slice';
-import { quizPaths } from '@src/paths';
+import { companyPaths, quizPaths } from '@src/paths';
 import { User } from '@src/utils/data';
 
 import useRedirectAfterReloadPage from '../../hooks/useRedirectAfterReloadPage';
@@ -76,11 +76,15 @@ const QuizSpecialDemand = () => {
     ],
   );
 
+  const handleCancel = () => {
+    router.push(companyPaths.Home);
+  };
+
   return (
     <QuizModal
       id="QuizSpecialDemand"
       isOpen
-      handleClose={() => {}}
+      handleClose={handleCancel}
       modalTitle={intl.formatMessage({
         id: 'QuizSpecialDemand.title',
       })}
