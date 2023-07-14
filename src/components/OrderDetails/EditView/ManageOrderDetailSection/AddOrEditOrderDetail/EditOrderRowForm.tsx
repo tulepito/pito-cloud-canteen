@@ -31,9 +31,15 @@ type TEditOrderRowFormProps = FormProps<TEditOrderRowFormValues> & TExtraProps;
 const EditOrderRowFormComponent: React.FC<TEditOrderRowFormComponentProps> = (
   props,
 ) => {
-  const { handleSubmit, foodOptions, submitting, pristine } = props;
+  const {
+    handleSubmit,
+    foodOptions,
+    submitting,
+    pristine,
+    initialValues = {},
+  } = props;
   const intl = useIntl();
-
+  const { requirement } = initialValues;
   const submitDisabled = pristine || submitting;
   const submitInprogress = submitting;
   const showRequirementText = intl.formatMessage({
@@ -69,6 +75,12 @@ const EditOrderRowFormComponent: React.FC<TEditOrderRowFormComponentProps> = (
   const handleToggleShowHideRequirementField = () => {
     setIsRequirementInputShow(!isRequirementInputShow);
   };
+
+  useEffect(() => {
+    if (requirement) {
+      setIsRequirementInputShow(true);
+    }
+  }, [requirement]);
 
   useEffect(() => {
     if (isRequirementInputShow) {

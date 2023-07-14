@@ -1,5 +1,6 @@
 import ReviewView from '@components/OrderDetails/ReviewView/ReviewView';
 import { useDownloadPriceQuotation } from '@hooks/useDownloadPriceQuotation';
+import useExportOrderDetails from '@hooks/useExportOrderDetails';
 import { usePrepareOrderDetailPageData } from '@hooks/usePrepareOrderManagementData';
 
 import TitleSection from './TitleSection';
@@ -22,6 +23,8 @@ const CompanyOrderDetailPage: React.FC<TCompanyOrderDetailPageProps> = () => {
     priceQuotationData,
   );
 
+  const { handler: onDownloadReviewOrderResults } = useExportOrderDetails();
+
   return (
     <div className={css.root}>
       <TitleSection
@@ -35,6 +38,7 @@ const CompanyOrderDetailPage: React.FC<TCompanyOrderDetailPageProps> = () => {
         onDownloadPriceQuotation={handleDownloadPriceQuotation}
         canEditInfo={false}
         reviewViewData={reviewViewData}
+        onDownloadReviewOrderResults={onDownloadReviewOrderResults}
       />
     </div>
   );

@@ -127,8 +127,9 @@ const ListingDetailModal: React.FC<TListingDetailModalProps> = (props) => {
       isOpen={isOpen}
       handleClose={onClose}
       closeButton={closeButton}
+      contentClassName={css.modalContentWrapper}
       containerClassName={css.modalContainer}>
-      <div>
+      <div className={css.modalContent}>
         <div className={css.listingImage}>
           <RenderWhen condition={listingImages.length > 0}>
             <Slider {...sliderSettings}>
@@ -214,12 +215,11 @@ const ListingDetailModal: React.FC<TListingDetailModalProps> = (props) => {
             onChange={handleChangeRequirement}
           />
         </div>
-
-        <div className={css.selectFoodSection}>
-          <Button className={css.selectFoodBtn} onClick={onSelectFood}>
-            Chọn món
-          </Button>
-        </div>
+      </div>
+      <div className={css.selectFoodSection}>
+        <Button className={css.selectFoodBtn} onClick={onSelectFood}>
+          Chọn món
+        </Button>
       </div>
     </Modal>
   );

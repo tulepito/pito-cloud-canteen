@@ -222,55 +222,6 @@ export const prepareOrderDetail = ({
   return newOrderDetail as TPlan['orderDetail'];
 };
 
-const prepareAnonymousList = async ({
-  orderData,
-  memberId,
-  memberEmail,
-}: {
-  orderData: TListing;
-  memberId: string;
-  memberEmail: string;
-}) => {
-  const orderGetter = Listing(orderData);
-  const { participants = [], anonymous = [] } = orderGetter.getMetadata();
-
-  let shouldUpdateAnonymousList = false;
-  let updateAnonymous = anonymous;
-
-  const checkUserResult = await checkUserExistedApi({
-    ...(memberId ? { id: memberId } : {}),
-    ...(memberEmail ? { email: memberEmail } : {}),
-  });
-
-  let participantId = memberId;
-
-  const { status: apiStatus = EHttpStatusCode.NotFound, user } =
-    checkUserResult?.data || {};
-
-  if (apiStatus === EHttpStatusCode.NotFound) {
-    return { errorMessage: 'user_not_found' };
-  }
-
-  if (!isEmpty(user)) {
-    participantId = User(user).getId();
-  }
-  // Update list anonymous
-  if (
-    !participants.includes(participantId) &&
-    !anonymous.includes(participantId) &&
-    participantId
-  ) {
-    shouldUpdateAnonymousList = true;
-    updateAnonymous = anonymous.concat(participantId);
-  }
-
-  return {
-    shouldUpdateAnonymousList,
-    updateAnonymous,
-    participantId,
-  };
-};
-
 // ================ Initial states ================ //
 type TOrderManagementState = {
   // Fetch data state
@@ -313,12 +264,12 @@ type TOrderManagementState = {
   subOrderChangesHistoryTotalItems: number;
   draftSubOrderChangesHistory: Record<string, TSubOrderChangeHistoryItem[]>;
 
-  draftOrderDetail: TPlan['orderDetail'];
   updateOrderFromDraftEditInProgress: boolean;
   updateOrderfromDraftEditError: any;
 
   shouldShowUnderError: boolean;
   shouldShowOverflowError: boolean;
+  draftOrderDetail: TPlan['orderDetail'];
 };
 
 const initialState: TOrderManagementState = {
@@ -445,73 +396,121 @@ const sendRemindEmailToMember = createAsyncThunk(
 const addOrUpdateMemberOrder = createAsyncThunk(
   'app/OrderManagement/ADD_OR_UPDATE_MEMBER_ORDER',
   async (params: TObject, { getState, dispatch, rejectWithValue }) => {
-    const { currentViewDate, foodId, memberId, requirement, memberEmail } =
-      params;
+    try {
+      const { currentViewDate, foodId, memberId, requirement, memberEmail } =
+        params;
+      const orderGetter = Listing(
+        getState().OrderManagement.orderData! as TListing,
+      );
+      const orderId = orderGetter.getId();
+      const { participants = [], anonymous = [] } = orderGetter.getMetadata();
+      const {
+        id: { uuid: planId },
+        attributes: { metadata = {} },
+      } = getState().OrderManagement.planData!;
 
-    const { draftOrderDetail, orderData, planData } =
-      getState().OrderManagement;
-    const planId = Listing(planData as TListing).getId();
-    const orderId = Listing(orderData as TListing).getId();
+      let shouldUpdateAnonymousList = false;
+      let updateAnonymous = anonymous;
 
-    const {
-      shouldUpdateAnonymousList,
-      updateAnonymous,
-      errorMessage,
-      participantId,
-    } = await prepareAnonymousList({
-      orderData: orderData as TListing,
-      memberEmail,
-      memberId,
-    });
+      const checkUserResult = await checkUserExistedApi({
+        ...(memberId ? { id: memberId } : {}),
+        ...(memberEmail ? { email: memberEmail } : {}),
+      });
 
-    if (errorMessage) return rejectWithValue(errorMessage);
+      let participantId = memberId;
 
-    const memberOrderDetailOnUpdateDate =
-      draftOrderDetail[currentViewDate.toString()].memberOrders[memberId];
-    const { foodId: oldFoodId } = memberOrderDetailOnUpdateDate || {};
+      const { status: apiStatus = EHttpStatusCode.NotFound, user } =
+        checkUserResult?.data || {};
 
-    if (foodId === '' || oldFoodId === foodId) {
-      return;
-    }
+      if (apiStatus === EHttpStatusCode.NotFound) {
+        return rejectWithValue('user_not_found');
+      }
 
-    const newOrderDetail = prepareOrderDetail({
-      orderDetail: draftOrderDetail,
-      currentViewDate,
-      foodId,
-      memberId: participantId as string,
-      requirement,
-      memberOrderValues: memberOrderDetailOnUpdateDate,
-    });
+      if (!isEmpty(user)) {
+        participantId = User(user).getId();
+      }
+      // Update list anonymous
+      if (
+        !participants.includes(participantId) &&
+        !anonymous.includes(participantId) &&
+        participantId
+      ) {
+        shouldUpdateAnonymousList = true;
+        updateAnonymous = anonymous.concat(participantId);
+      }
 
-    const updateParams = {
-      planId,
-      orderDetail: newOrderDetail,
-      ...(shouldUpdateAnonymousList
-        ? { orderId, anonymous: updateAnonymous }
-        : {}),
-    };
+      const memberOrderDetailOnUpdateDate =
+        metadata?.orderDetail[currentViewDate.toString()].memberOrders[
+          memberId
+        ];
+      const { status = EParticipantOrderStatus.empty } =
+        memberOrderDetailOnUpdateDate || {};
 
-    await addUpdateMemberOrder(orderId, updateParams);
+      let newMemberOrderValues = memberOrderDetailOnUpdateDate;
 
-    const subOrderId = `${memberId} - ${planId} - ${currentViewDate}`;
-    const { data: firebaseSubOrderDocument } =
-      await participantSubOrderGetByIdApi(subOrderId);
+      switch (status) {
+        case EParticipantOrderStatus.joined:
+        case EParticipantOrderStatus.notAllowed:
+          newMemberOrderValues = {
+            ...newMemberOrderValues,
+            foodId,
+          };
+          break;
+        case EParticipantOrderStatus.empty:
+        case EParticipantOrderStatus.notJoined:
+          newMemberOrderValues = {
+            ...newMemberOrderValues,
+            foodId,
+            status: EParticipantOrderStatus.joined,
+          };
+          break;
+        case EParticipantOrderStatus.expired:
+          break;
+        default:
+          break;
+      }
+      newMemberOrderValues = { ...newMemberOrderValues, requirement };
 
-    if (!firebaseSubOrderDocument) {
-      await participantSubOrderAddDocumentApi({
-        participantId: participantId as string,
+      const updateParams = {
         planId,
-        timestamp: currentViewDate,
-      });
-    } else {
-      await participantSubOrderUpdateDocumentApi({
-        subOrderId,
-        params: {
-          foodId,
+        orderDetail: {
+          ...metadata.orderDetail,
+          [currentViewDate]: {
+            ...metadata.orderDetail[currentViewDate],
+            memberOrders: {
+              ...metadata.orderDetail[currentViewDate].memberOrders,
+              [participantId]: newMemberOrderValues,
+            },
+          },
         },
-      });
+        ...(shouldUpdateAnonymousList
+          ? { orderId, anonymous: updateAnonymous }
+          : {}),
+      };
+
+      await addUpdateMemberOrder(orderId, updateParams);
+      const subOrderId = `${participantId} - ${planId} - ${currentViewDate}`;
+      const { data: firebaseSubOrderDocument } =
+        await participantSubOrderGetByIdApi(subOrderId);
+
+      if (!firebaseSubOrderDocument) {
+        participantSubOrderAddDocumentApi({
+          participantId,
+          planId,
+          timestamp: currentViewDate,
+        });
+      } else {
+        participantSubOrderUpdateDocumentApi({
+          subOrderId,
+          params: {
+            foodId,
+          },
+        });
+      }
+      await dispatch(loadData(orderId));
+    } catch (error) {
+      console.log(error);
     }
-    await dispatch(loadData(orderId));
   },
 );
 

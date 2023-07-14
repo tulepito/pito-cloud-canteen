@@ -7,6 +7,7 @@ import type { TDefaultProps } from '@utils/types';
 import ReviewCartSection from './ReviewCartSection/ReviewCartSection';
 import type { TReviewInfoFormValues } from './ReviewInfoSection/ReviewInfoForm';
 import ReviewInfoSection from './ReviewInfoSection/ReviewInfoSection';
+import ReviewNoteSection from './ReviewNoteSection/ReviewNoteSection';
 import ReviewOrderDetailsSection from './ReviewOrderDetailsSection/ReviewOrderDetailsSection';
 import ReviewOrderProcessSection from './ReviewOrderProcessSection/ReviewOrderProcessSection';
 import ReviewOrdersResultSection from './ReviewOrdersResultSection/ReviewOrdersResultSection';
@@ -26,6 +27,8 @@ type TReviewViewProps = TDefaultProps & {
   onGoBackToEditOrderPage?: () => void;
   onSubmitEdit?: (values: TReviewInfoFormValues) => void;
   onDownloadPriceQuotation: () => Promise<void>;
+  onSaveOrderNote?: (value: string) => void;
+  onDownloadReviewOrderResults: () => void;
 };
 
 const ReviewView: React.FC<TReviewViewProps> = (props) => {
@@ -41,6 +44,8 @@ const ReviewView: React.FC<TReviewViewProps> = (props) => {
     onSubmitEdit,
     onDownloadPriceQuotation,
     classes = {},
+    onSaveOrderNote,
+    onDownloadReviewOrderResults,
   } = props;
   const { leftClassName, rightClassName } = classes;
 
@@ -80,7 +85,7 @@ const ReviewView: React.FC<TReviewViewProps> = (props) => {
           <ReviewOrdersResultSection
             className={css.resultRoot}
             data={reviewViewData.reviewResultData}
-            goBackToEditMode={onGoBackToEditOrderPage}
+            onDownloadReviewOrderResults={onDownloadReviewOrderResults}
           />
         </RenderWhen>
 
@@ -88,6 +93,12 @@ const ReviewView: React.FC<TReviewViewProps> = (props) => {
           className={css.detailRoot}
           foodOrderGroupedByDate={reviewViewData.foodOrderGroupedByDate}
         />
+        {isGroupOrder && (
+          <ReviewNoteSection
+            onSaveOrderNote={onSaveOrderNote}
+            data={reviewViewData.orderNoteData}
+          />
+        )}
       </div>
       <div className={rightPartClasses}>
         <RenderWhen condition={!canGoBackEditMode}>

@@ -12,6 +12,7 @@ import Tabs from '@components/Tabs/Tabs';
 import { groupFoodOrderByDate } from '@helpers/order/orderDetailHelper';
 import { useAppDispatch } from '@hooks/reduxHooks';
 import { useDownloadPriceQuotation } from '@hooks/useDownloadPriceQuotation';
+import useExportOrderDetails from '@hooks/useExportOrderDetails';
 import { usePrepareOrderDetailPageData } from '@hooks/usePrepareOrderManagementData';
 import { AdminAttributesThunks } from '@pages/admin/Attributes.slice';
 import { ReviewContent } from '@pages/admin/order/create/components/ReviewOrder/ReviewOrder';
@@ -44,6 +45,7 @@ type OrderDetailTabProps = {
   updateOrderStaffNameInProgress: boolean;
   updateOrderState: (newOrderState: string) => void;
   updateOrderStateInProgress: boolean;
+  onSaveOrderNote: (orderNote: string) => void;
 };
 
 const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
@@ -57,6 +59,7 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
     updateOrderState,
     updateOrderStateInProgress,
     transactionDataMap,
+    onSaveOrderNote,
   } = props;
   const router = useRouter();
   const { timestamp } = router.query;
@@ -68,6 +71,8 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
 
   const dispatch = useAppDispatch();
   const orderId = Listing(order).getId();
+
+  const { handler: onDownloadReviewOrderResults } = useExportOrderDetails();
 
   const {
     notes,
@@ -130,6 +135,7 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
             updatePlanDetail,
             timeStamp: key,
             foodOrder,
+            onDownloadReviewOrderResults,
           },
         };
       });
@@ -230,8 +236,10 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
             onSubmitEdit={() => {}}
             onDownloadPriceQuotation={handleDownloadPriceQuotation}
             onGoBackToEditOrderPage={handleGoBackFromReviewMode}
+            onDownloadReviewOrderResults={onDownloadReviewOrderResults}
             showStartPickingOrderButton
             isAdminLayout
+            onSaveOrderNote={onSaveOrderNote}
           />
         </RenderWhen.False>
       </RenderWhen>
