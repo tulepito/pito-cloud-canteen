@@ -117,7 +117,7 @@ const getTransitions = (states: TStateDescription['states']) => {
   return stateNames.reduce(transitionsReducer, []);
 };
 
-const txLastTransition = (tx: TTransaction) =>
+export const txLastTransition = (tx: TTransaction) =>
   ensureTransaction(tx).attributes.lastTransition;
 
 // This is a list of all the transitions that this app should be able to handle.

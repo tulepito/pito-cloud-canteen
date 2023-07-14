@@ -11,11 +11,10 @@ import * as XLSX from 'xlsx';
 
 import Button, { InlineTextButton } from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
-import FieldMultipleSelect from '@components/FormFields/FieldMultipleSelect/FieldMultipleSelect';
-import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import IconDelete from '@components/Icons/IconDelete/IconDelete';
 import IconDuplicate from '@components/Icons/IconDuplicate/IconDuplicate';
 import IconEdit from '@components/Icons/IconEdit/IconEdit';
+import IconFilter from '@components/Icons/IconFilter/IconFilter';
 import IconPrint from '@components/Icons/IconPrint/IconPrint';
 import IconUploadFile from '@components/Icons/IconUploadFile/IconUploadFile';
 import IntegrationFilterModal from '@components/IntegrationFilterModal/IntegrationFilterModal';
@@ -24,6 +23,7 @@ import AlertModal from '@components/Modal/AlertModal';
 import NamedLink from '@components/NamedLink/NamedLink';
 import type { TColumn } from '@components/Table/Table';
 import { TableForm } from '@components/Table/Table';
+import Tooltip from '@components/Tooltip/Tooltip';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { foodSliceThunks } from '@redux/slices/foods.slice';
@@ -37,6 +37,8 @@ import {
   SPECIAL_DIET_OPTIONS,
 } from '@utils/enums';
 import type { TIntegrationListing } from '@utils/types';
+
+import FilterForm from './FilterForm/FilterForm';
 
 import css from './ManagePartnerFoods.module.scss';
 
@@ -402,33 +404,33 @@ const ManagePartnerFoods = () => {
       </h1>
       <div className={css.tableActions}>
         <IntegrationFilterModal
-          onSubmit={handleSubmitFilter}
           onClear={handleClearFilter}
-          title={<FormattedMessage id="ManagePartnerFoods.filterModal.title" />}
-          initialValues={{
-            keywords,
-            pub_category: groupPubCategory,
-          }}>
-          {() => (
-            <>
-              <FieldTextInput
-                name="keywords"
-                id="keywords"
-                label="Tên món"
-                placeholder="Nhập tên món"
-                className={css.input}
-              />
-              <FieldMultipleSelect
-                className={css.input}
-                name="pub_category"
-                id="pub_category"
-                label="Phong cách ẩm thực"
-                placeholder="Phong cách ẩm thực"
-                options={categoryOptions}
-              />
-            </>
-          )}
-        </IntegrationFilterModal>
+          className={css.filterTooltip}
+          leftFilters={
+            <Tooltip
+              tooltipContent={
+                <FilterForm
+                  onSubmit={handleSubmitFilter}
+                  categoryOptions={categoryOptions}
+                  initialValues={{
+                    keywords,
+                    pub_category: groupPubCategory,
+                  }}
+                />
+              }
+              placement="bottomLeft"
+              trigger="click"
+              overlayInnerStyle={{ backgroundColor: '#fff', padding: 20 }}>
+              <Button
+                type="button"
+                variant="secondary"
+                className={css.filterButton}>
+                <IconFilter className={css.filterIcon} />
+                <FormattedMessage id="IntegrationFilterModal.filterMessage" />
+              </Button>
+            </Tooltip>
+          }
+        />
         <div className={css.ctaButtons}>
           <InlineTextButton
             inProgress={removeFoodInProgress}

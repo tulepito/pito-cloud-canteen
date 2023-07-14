@@ -465,6 +465,7 @@ export type TAdminListingAttributes = {
   publicData?: any;
   metadata?: any;
   privateData?: any;
+  createdAt?: Date;
 };
 
 export type TOrderListing = {
@@ -498,6 +499,7 @@ export type TIntegrationOrderListing = {
   booker?: TBooker;
   plan?: TListing;
   subOrders?: TIntegrationListing[];
+  allRestaurants?: TListing[];
 };
 
 export type TCompanyMemberWithDetails = {

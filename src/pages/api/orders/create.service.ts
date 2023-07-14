@@ -53,6 +53,7 @@ const createOrder = async ({
   const companyAccount = await fetchUser(companyId);
 
   const { subAccountId } = companyAccount.attributes.profile.privateData;
+  const { companyName } = companyAccount.attributes.profile.publicData;
 
   const orderId = generateUncountableIdForOrder(currentOrderNumber);
   const generatedOrderId = `PT${orderId}`;
@@ -119,11 +120,12 @@ const createOrder = async ({
         startDate,
         endDate,
         mealType,
+        companyName,
       },
       ...(shouldUpdateOrderName
         ? {
             publicData: {
-              orderName: `PCC_${formatTimestamp(
+              orderName: `${companyName}_${formatTimestamp(
                 generalInfo.startDate,
               )} - ${formatTimestamp(generalInfo.endDate)}`,
             },

@@ -1,0 +1,33 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/defaults.scss' as *;
+
+.formContainer {
+  max-width: 350px;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 20px;
+  gap: 16px;
+}
+
+.formTitle {
+  @include textTemplate(20px, $fontWeightBold, 32px);
+  color: $neutralGray6;
+}
+
+.formDesc {
+  @include textTemplate(14px, $fontWeightRegular, 20px);
+  color: $neutralGray5;
+}
+
+.fieldInput {
+  @include textTemplate(14px, $fontWeightRegular, 24px);
+  width: 200px;
+}
+
+.childFieldInput {
+  padding-left: 32px;
+}

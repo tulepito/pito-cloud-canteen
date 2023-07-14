@@ -94,6 +94,7 @@
         border-bottom: 1px solid $neutralGray3;
         position: relative;
         font-size: 14px;
+        vertical-align: top;
 
         &:before {
           content: attr(data-label);
@@ -111,6 +112,9 @@
           text-align: left;
         }
       }
+    }
+    .bodyRowChild {
+      background-color: $neutralGray2;
     }
   }
 }

@@ -1,30 +1,19 @@
 @use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.root {
+  @include flexAlign(center, space-between);
+  width: 100%;
+}
+
+.rightButtons {
+  display: flex;
+  gap: 16px;
+}
 
 .modalContainer {
   max-width: 500px;
   top: 10vh !important;
-}
-
-.filterIcon {
-  margin-right: 10px;
-  fill: $neutralGray6;
-}
-
-.filterButton {
-  padding: 10px 20px 10px 20px;
-  font-size: 14px;
-
-  .filterIcon {
-    width: 16px;
-    height: 14px;
-  }
-
-  &:hover,
-  &:focus {
-    .filterIcon * {
-      fill: $neutralGray1;
-    }
-  }
 }
 
 .formButtons {
@@ -44,6 +33,7 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
+  padding: 20px;
 }
 
 .clearButton {
@@ -60,4 +50,8 @@
 
 .container {
   overflow: visible !important;
+}
+
+.tooltipOverlay {
+  padding: 20px 0;
 }

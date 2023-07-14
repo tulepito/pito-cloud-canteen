@@ -961,7 +961,7 @@
   "ManageDeletedListForm.restore": "Thêm lại",
   "ManageDeletedListModal.title": "Danh sách đã xoá {count, plural, =0 {} other {(#)}}",
   "ManageLineItemsSection.containerTitle": "DANH SÁCH MÓN ĂN",
-  "ManageOrderPage.createDateLabel": "Ngày triển khai",
+  "ManageOrderPage.createDateLabel": "Thời gian",
   "ManageOrders.noResults": "Không có kết quả nào hiển thị",
   "ManageOrders.title": "Danh sách đơn hàng",
   "ManageOrdersPage.draftOrderDate": "Chưa nhập thời gian",

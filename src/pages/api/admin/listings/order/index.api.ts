@@ -1,12 +1,17 @@
+import uniq from 'lodash/uniq';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HttpMethod } from '@apis/configs';
+import { queryAllPages } from '@helpers/apiHelpers';
 import { LISTING_TYPE } from '@pages/api/helpers/constants';
 import cookies from '@services/cookie';
 import { getIntegrationSdk, handleError } from '@services/sdk';
 import { denormalisedResponseEntities, Listing } from '@utils/data';
 import { EOrderStates } from '@utils/enums';
 import type { TIntegrationOrderListing, TListing } from '@utils/types';
+
+const { NEXT_PUBLIC_ENV } = process.env;
+const isProduction = NEXT_PUBLIC_ENV === 'production';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
@@ -17,17 +22,32 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       case HttpMethod.GET:
         {
           const { JSONParams } = req.query;
-          const { dataParams = {}, queryParams = {} } =
-            JSON.parse(JSONParams as string) || {};
+          const {
+            dataParams = {},
+            queryParams = {},
+            isQueryAllPages = false,
+          } = JSON.parse(JSONParams as string) || {};
 
-          const response = await integrationSdk.listings.query(
-            {
-              ...dataParams,
-              meta_listingType: LISTING_TYPE.ORDER,
-            },
-            queryParams,
-          );
-          const orders = denormalisedResponseEntities(response);
+          const response = isQueryAllPages
+            ? await queryAllPages({
+                sdkModel: integrationSdk.listings,
+                query: {
+                  ...dataParams,
+                  meta_listingType: LISTING_TYPE.ORDER,
+                },
+              })
+            : await integrationSdk.listings.query(
+                {
+                  ...dataParams,
+                  meta_listingType: LISTING_TYPE.ORDER,
+                },
+                queryParams,
+              );
+          const orders = isQueryAllPages
+            ? isProduction
+              ? response
+              : response.slice(0, 20)
+            : denormalisedResponseEntities(response);
           const orderWithOthersData = await Promise.all(
             orders.map(async (order: TIntegrationOrderListing) => {
               const {
@@ -50,6 +70,24 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
                 const { orderDetail: planOrderDetail } = Listing(
                   plan as TListing,
                 ).getMetadata();
+
+                const allRestaurantsIds = uniq(
+                  Object.values(planOrderDetail).map(
+                    (orderDetail: any) => orderDetail.restaurant.id,
+                  ),
+                );
+
+                const allRestaurants = await Promise.all(
+                  allRestaurantsIds.map(async (restaurantId) => {
+                    const [restaurant] = denormalisedResponseEntities(
+                      await integrationSdk.listings.show({
+                        id: restaurantId,
+                      }),
+                    );
+
+                    return restaurant;
+                  }),
+                );
 
                 const orderDetailsWithTransaction = planOrderDetail;
 
@@ -88,6 +126,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
                   ...order,
                   company,
                   subOrders: [plan],
+                  allRestaurants,
                 };
               }
 
@@ -101,7 +140,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
           res.json({
             orders: orderWithOthersData,
-            pagination: response.data.meta,
+            ...(!isQueryAllPages && {
+              pagination: response.data.meta,
+            }),
           });
         }
         break;

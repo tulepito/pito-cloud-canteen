@@ -67,9 +67,9 @@ const updateOrder = async ({
       }
     }
 
-    const companyDisplayName = companyAccount.attributes.profile.displayName;
+    const { companyName } = companyAccount.attributes.profile.publicData;
 
-    const shouldUpdateOrderName = companyDisplayName && startDate && endDate;
+    const shouldUpdateOrderName = companyName && startDate && endDate;
     // eslint-disable-next-line prefer-destructuring
     updatedOrderListing = denormalisedResponseEntities(
       await integrationSdk.listings.update(
@@ -78,7 +78,7 @@ const updateOrder = async ({
           ...(shouldUpdateOrderName
             ? {
                 publicData: {
-                  orderName: `PCC_${formatTimestamp(
+                  orderName: `${companyName}_${formatTimestamp(
                     generalInfo.startDate,
                   )} - ${formatTimestamp(generalInfo.endDate)}`,
                 },

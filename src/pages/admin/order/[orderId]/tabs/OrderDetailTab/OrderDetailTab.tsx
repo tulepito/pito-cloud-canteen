@@ -61,15 +61,15 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
     transactionDataMap,
     onSaveOrderNote,
   } = props;
+
+  const dispatch = useAppDispatch();
   const router = useRouter();
   const { timestamp } = router.query;
   const [currentViewDate, setCurrentViewDate] = useState<number>(
     Number(timestamp),
   );
-
   const [viewMode, setViewMode] = useState<EPageViewMode>(EPageViewMode.edit);
 
-  const dispatch = useAppDispatch();
   const orderId = Listing(order).getId();
 
   const { handler: onDownloadReviewOrderResults } = useExportOrderDetails();
@@ -126,6 +126,7 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
         };
 
         return {
+          id: key,
           key,
           label: formatTimestamp(Number(key)),
           childrenFn: (childProps: any) => <ReviewContent {...childProps} />,
@@ -159,6 +160,8 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
   useEffect(() => {
     dispatch(AdminAttributesThunks.fetchAttributes());
   }, []);
+
+  const defaultActiveKey = tabItems.findIndex(({ id }) => id === timestamp);
 
   return (
     <div className={css.container}>
@@ -219,7 +222,12 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
             </RenderWhen>
 
             <RenderWhen.False>
-              <Tabs items={tabItems as any} />
+              <Tabs
+                items={tabItems as any}
+                defaultActiveKey={`${
+                  (defaultActiveKey < 0 ? 0 : defaultActiveKey) + 1
+                }`}
+              />
             </RenderWhen.False>
           </RenderWhen>
         </div>

@@ -19,9 +19,7 @@ const findValidEvents = (events) => {
       !isEmpty(orderId) &&
       isLastTxOfPlan &&
       [
-        Transitions.expiredDelivery,
         Transitions.cancelDelivery,
-        Transitions.expireStartDelivery,
         Transitions.operatorCancelPlan,
         Transitions.completeDelivery,
       ].includes(lastTransition)
