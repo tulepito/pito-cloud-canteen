@@ -26,7 +26,7 @@ const EventCardContent: React.FC<TEventCardContentProps> = ({
     restaurant: restaurantObj,
   } = event.resource || {};
 
-  const shouldShowCountDown = isOver(expiredTime) || isOrderStarted;
+  const shouldShowCountDown = !(isOver(expiredTime) || isOrderStarted);
   const remainTime = calculateRemainTime(new Date(expiredTime).getTime());
 
   return (

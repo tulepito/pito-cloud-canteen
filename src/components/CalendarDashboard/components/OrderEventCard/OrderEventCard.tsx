@@ -1,8 +1,11 @@
+import { useMemo } from 'react';
 import type { Event } from 'react-big-calendar';
+import { shallowEqual } from 'react-redux';
 import classNames from 'classnames';
 
 import Tooltip from '@components/Tooltip/Tooltip';
 import { isOver } from '@helpers/orderHelper';
+import { useAppSelector } from '@hooks/reduxHooks';
 import { useViewport } from '@hooks/useViewport';
 
 import { EVENT_STATUS } from '../../helpers/constant';
@@ -21,7 +24,12 @@ export type TOrderEventCardProps = {
 
 const OrderEventCard: React.FC<TOrderEventCardProps> = ({ event }) => {
   const { isMobileLayout } = useViewport();
-  const { status, expiredTime, isOrderStarted = false } = event.resource || {};
+  const {
+    status,
+    expiredTime,
+    isOrderStarted = false,
+    transactionId,
+  } = event.resource || {};
 
   const isFoodPicked = !!event.resource?.dishSelection?.dishSelection;
   const isExpired = isOver(expiredTime);
@@ -38,6 +46,16 @@ const OrderEventCard: React.FC<TOrderEventCardProps> = ({ event }) => {
   const cardStyles = {
     borderColor: isExpiredAndNotPickedFood ? '#8C8C8C' : orderColor,
   };
+
+  const subOrderTxs = useAppSelector(
+    (state) => state.ParticipantOrderList.subOrderTxs,
+    shallowEqual,
+  );
+
+  const subOrderTx = useMemo(
+    () => subOrderTxs.find((tx) => tx.id.uuid === transactionId),
+    [subOrderTxs, transactionId],
+  );
 
   return (
     <Tooltip
@@ -63,6 +81,7 @@ const OrderEventCard: React.FC<TOrderEventCardProps> = ({ event }) => {
             <OrderEventCardStatus
               className={css.cardStatus}
               status={eventStatus}
+              subOrderTx={subOrderTx}
             />
             <OrderEventCardContentItems event={event} />
           </div>
