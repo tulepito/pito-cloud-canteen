@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { type Event, type View, Views } from 'react-big-calendar';
+import type { Event, View } from 'react-big-calendar';
+import { Views } from 'react-big-calendar';
 import Skeleton from 'react-loading-skeleton';
 import flatten from 'lodash/flatten';
 import { DateTime } from 'luxon';
@@ -83,13 +84,13 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
 
     Object.keys(planItem).forEach((planItemKey: string) => {
       const meal = planItem[planItemKey];
-      const { restaurant = {}, foodList = [] } = meal;
+      const { restaurant = {}, foodList = [], transactionId } = meal;
 
       const dishes = foodList.map((food: TListing) => ({
         key: Listing(food).getId(),
         value: Listing(food).getAttributes().title,
       }));
-
+      const currentPlanListing = Listing(currentPlan);
       const foodSelection =
         Listing(currentPlan).getMetadata().orderDetail[planItemKey]
           .memberOrders[currentUserId] || {};
@@ -126,6 +127,8 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
           deliveryHour,
           dishSelection: { dishSelection: foodSelection?.foodId },
           orderColor,
+          transactionId,
+          planId: currentPlanListing.getId(),
         },
         title: orderTitle,
         start: DateTime.fromMillis(+planItemKey).toJSDate(),

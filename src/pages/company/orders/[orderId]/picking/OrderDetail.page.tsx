@@ -426,6 +426,7 @@ const OrderDetailPage = () => {
       showStartPickingOrderButton
       onSaveOrderNote={onSaveOrderNote}
       onDownloadReviewOrderResults={onDownloadReviewOrderResults}
+      orderData={orderData as TListing}
     />
   );
 

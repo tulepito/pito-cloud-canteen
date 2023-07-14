@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 
+import Badge, { EBadgeType } from '@components/Badge/Badge';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import type { TColumn } from '@components/Table/Table';
@@ -8,7 +9,7 @@ import Tabs from '@components/Tabs/Tabs';
 import { useAppDispatch } from '@hooks/reduxHooks';
 import { Listing, User } from '@src/utils/data';
 import { formatTimestamp } from '@src/utils/dates';
-import type { EOrderStates } from '@src/utils/enums';
+import { type EOrderStates, EQuotationStatus } from '@src/utils/enums';
 import type { TListing, TPagination, TUser } from '@src/utils/types';
 
 import OrderHeaderInfor from '../../components/OrderHeaderInfor/OrderHeaderInfor';
@@ -51,7 +52,7 @@ const TABLE_COLUMNS: TColumn[] = [
   },
   {
     key: 'address',
-    label: 'Địa điểm giao hàng',
+    label: 'Địa điểm',
     render: (data: any) => {
       return (
         <div className={css.locationRow}>
@@ -86,34 +87,29 @@ const TABLE_COLUMNS: TColumn[] = [
     sortable: true,
   },
   {
-    key: 'restaurantName',
-    label: 'Đối tác',
-    render: ({ restaurants = [] }: any) => {
-      const { length } = restaurants;
-      const moreThanTwo = restaurants.length > 2;
-      const remainLength = length - 2;
-
-      return length > 0 ? (
-        <div className={css.rowText}>
-          {restaurants.slice(0, 2).map((restaurantName: string) => (
-            <div key={restaurantName} className={css.restaurantName}>
-              {restaurantName}
-            </div>
-          ))}
-          {moreThanTwo && (
-            <div className={css.remainText}>+ {remainLength} đối tác </div>
-          )}
-        </div>
-      ) : (
-        <></>
-      );
-    },
-  },
-  {
     key: 'staffName',
     label: 'Nhân viên phụ trách',
     render: ({ staffName }: any) => {
       return staffName ? <div>{staffName}</div> : <></>;
+    },
+    sortable: true,
+  },
+  {
+    key: 'status',
+    label: 'Trạng thái',
+    render: ({ status }: any) => {
+      return (
+        <Badge
+          label={
+            status === EQuotationStatus.ACTIVE ? 'Mới tạo' : 'Hết hiệu lực'
+          }
+          type={
+            status === EQuotationStatus.ACTIVE
+              ? EBadgeType.warning
+              : EBadgeType.default
+          }
+        />
+      );
     },
     sortable: true,
   },
@@ -156,6 +152,7 @@ const parseEntitiesToTableData = ({
     const quotationListing = Listing(quotation);
     const { title: quotationTitle } = quotationListing.getAttributes();
     const quotationId = quotationListing.getId();
+    const { status } = quotationListing.getMetadata();
 
     return {
       key: quotationId,
@@ -171,6 +168,7 @@ const parseEntitiesToTableData = ({
         startDate: startDate && formatTimestamp(startDate),
         endDate: endDate && formatTimestamp(endDate),
         deliveryHour,
+        status,
         onQuotationDetail: () => setSelectedQuotation(quotationListing.getId()),
       },
     };
@@ -292,6 +290,10 @@ const OrderQuotationTab: React.FC<OrderQuotationTabProps> = (props) => {
             columns={TABLE_COLUMNS}
             data={dataTable}
             pagination={quotationsPagination}
+            tableWrapperClassName={css.tableWrapper}
+            tableClassName={css.table}
+            tableHeadCellClassName={css.tableHeadCell}
+            tableBodyCellClassName={css.tableBodyCell}
           />
         </div>
         <RenderWhen.False>

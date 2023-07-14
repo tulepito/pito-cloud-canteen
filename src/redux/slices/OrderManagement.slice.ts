@@ -28,10 +28,14 @@ import {
 } from '@apis/orderApi';
 import { checkUserExistedApi } from '@apis/userApi';
 import { EOrderDetailsTableTab } from '@components/OrderDetails/EditView/ManageOrderDetailSection/OrderDetailsTable/OrderDetailsTable.utils';
+import {
+  calculateClientQuotation,
+  calculatePartnerQuotation,
+} from '@helpers/orderHelper';
 import { createAsyncThunk } from '@redux/redux.helper';
 import type { RootState } from '@redux/store';
 import type { TPlan } from '@src/utils/orderTypes';
-import { Listing, User } from '@utils/data';
+import { denormalisedResponseEntities, Listing, User } from '@utils/data';
 import {
   EOrderHistoryTypes,
   EOrderType,
@@ -270,6 +274,9 @@ type TOrderManagementState = {
   shouldShowUnderError: boolean;
   shouldShowOverflowError: boolean;
   draftOrderDetail: TPlan['orderDetail'];
+  quotation: TObject;
+  fetchQuotationInProgress: boolean;
+  fetchQuotationError: any;
 };
 
 const initialState: TOrderManagementState = {
@@ -305,9 +312,13 @@ const initialState: TOrderManagementState = {
   draftSubOrderChangesHistory: {},
   shouldShowUnderError: false,
   shouldShowOverflowError: false,
+  quotation: {},
+  fetchQuotationInProgress: false,
+  fetchQuotationError: null,
 };
 
 // ================ Thunk types ================ //
+const FETCH_QUOTATION = 'app/OrderManagement/FETCH_QUOTATION';
 
 // ================ Async thunks ================ //
 const loadData = createAsyncThunk(
@@ -874,13 +885,14 @@ const updatePlanOrderDetail = createAsyncThunk(
 
 const updateOrderFromDraftEdit = createAsyncThunk(
   'app/OrderManagement/UPDATE_ORDER_FROM_DRAFT_EDIT',
-  async (_, { getState, dispatch }) => {
+  async (foodOrderGroupedByDate: TObject[], { getState, dispatch }) => {
     const {
       id: { uuid: orderId },
     } = getState().OrderManagement.orderData!;
     const {
       id: { uuid: planId },
     } = getState().OrderManagement.planData!;
+    const { companyId } = getState().OrderManagement;
     const { draftSubOrderChangesHistory } = getState().OrderManagement;
     const { draftOrderDetail } = getState().OrderManagement;
     const updateParams = {
@@ -932,7 +944,38 @@ const updateOrderFromDraftEdit = createAsyncThunk(
         }
       }),
     );
+
+    const clientQuotation = calculateClientQuotation(foodOrderGroupedByDate);
+
+    const groupByRestaurantQuotationData = groupBy(
+      foodOrderGroupedByDate,
+      'restaurantId',
+    );
+
+    const partnerQuotation = calculatePartnerQuotation(
+      groupByRestaurantQuotationData,
+    );
+
+    const apiBody = {
+      orderId,
+      companyId: companyId!,
+      partner: partnerQuotation,
+      client: clientQuotation,
+    };
+    createQuotationApi(orderId, apiBody);
     await dispatch(loadData(orderId));
+  },
+);
+const fetchQuotation = createAsyncThunk(
+  FETCH_QUOTATION,
+  async (quotationId: string, { extra: sdk }) => {
+    const quotation = denormalisedResponseEntities(
+      await sdk.listings.show({
+        id: quotationId,
+      }),
+    )[0];
+
+    return quotation;
   },
 );
 
@@ -952,6 +995,7 @@ export const orderManagementThunks = {
   querySubOrderChangesHistory,
   updatePlanOrderDetail,
   updateOrderFromDraftEdit,
+  fetchQuotation,
 };
 
 // ================ Slice ================ //
@@ -1596,6 +1640,19 @@ const OrderManagementSlice = createSlice({
       })
       .addCase(updatePlanOrderDetail.rejected, (state) => {
         state.isUpdatingOrderDetails = false;
+      })
+
+      .addCase(fetchQuotation.pending, (state) => {
+        state.fetchQuotationInProgress = true;
+        state.fetchQuotationError = null;
+      })
+      .addCase(fetchQuotation.fulfilled, (state, { payload }) => {
+        state.fetchQuotationInProgress = false;
+        state.quotation = payload;
+      })
+      .addCase(fetchQuotation.rejected, (state, { error }) => {
+        state.fetchQuotationInProgress = false;
+        state.fetchQuotationError = error.message;
       });
   },
 });

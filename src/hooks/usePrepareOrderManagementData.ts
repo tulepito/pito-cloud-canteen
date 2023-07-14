@@ -1,10 +1,18 @@
-import { useState } from 'react';
+/* eslint-disable react-hooks/exhaustive-deps */
+import { useMemo, useState } from 'react';
+import isEmpty from 'lodash/isEmpty';
 import { useRouter } from 'next/router';
 
 import type { TReviewInfoFormValues } from '@components/OrderDetails/ReviewView/ReviewInfoSection/ReviewInfoForm';
 import { parseThousandNumber } from '@helpers/format';
-import { calculatePriceQuotationInfo } from '@helpers/order/cartInfoHelper';
-import { groupFoodOrderByDate } from '@helpers/order/orderDetailHelper';
+import {
+  calculatePriceQuotationInfo,
+  calculatePriceQuotationInfoFromQuotation,
+} from '@helpers/order/cartInfoHelper';
+import {
+  groupFoodOrderByDate,
+  groupFoodOrderByDateFromQuotation,
+} from '@helpers/order/orderDetailHelper';
 import { isEnableToStartOrder } from '@helpers/orderHelper';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { currentUserSelector } from '@redux/slices/user.slice';
@@ -26,6 +34,9 @@ export const usePrepareOrderDetailPageData = () => {
     companyData,
     bookerData,
     transactionDataMap,
+    quotation,
+    draftOrderDetail,
+    draftSubOrderChangesHistory,
   } = useAppSelector((state) => state.OrderManagement);
 
   const currentOrderVATPercentage = useAppSelector(
@@ -62,7 +73,7 @@ export const usePrepareOrderDetailPageData = () => {
     deliveryAddress,
     deadlineDate = 0,
     deadlineHour,
-    // packagePerMember = 0,
+    packagePerMember = 0,
     participants = [],
     anonymous = [],
     staffName = '',
@@ -76,6 +87,7 @@ export const usePrepareOrderDetailPageData = () => {
     EOrderStates.canceled || EOrderStates.canceledByBooker,
   ].includes(orderState);
   const canStartOrder = isEnableToStartOrder(orderDetail, isGroupOrder);
+  const isOrderIsPicking = orderState === EOrderStates.picking;
   const canReview =
     orderState === EOrderStates.completed ||
     (orderState === EOrderStates.pendingPayment && !ratings);
@@ -109,27 +121,81 @@ export const usePrepareOrderDetailPageData = () => {
     manageOrdersData,
   };
   /* =============== Review data =============== */
-  const foodOrderGroupedByDate = groupFoodOrderByDate({
-    orderDetail,
-    isGroupOrder,
-  });
-  const {
-    totalPrice,
-    PITOPoints,
-    VATFee,
-    totalWithVAT,
-    serviceFee,
-    transportFee,
-    promotion,
-    overflow,
-    PITOFee,
-    totalWithoutVAT,
-  } = calculatePriceQuotationInfo({
-    planOrderDetail: orderDetail,
-    order: orderData as TObject,
-    currentOrderVATPercentage,
-  });
+  const isOrderEditing = !isEmpty(draftSubOrderChangesHistory);
+  const foodOrderGroupedByDateFromOrderDetail = useMemo(
+    () =>
+      groupFoodOrderByDate({
+        orderDetail,
+        isGroupOrder,
+      }),
+    [orderDetail, isGroupOrder],
+  );
+  const foodOrderGroupedByDateFromQuotation = useMemo(
+    () =>
+      groupFoodOrderByDateFromQuotation({
+        quotation: quotation as TListing,
+      }),
+    [JSON.stringify(quotation)],
+  );
+  const foodOrderGroupedByDateFromDraftOrderDetail = useMemo(
+    () =>
+      groupFoodOrderByDate({
+        orderDetail: draftOrderDetail,
+        isGroupOrder,
+      }),
+    [JSON.stringify(draftOrderDetail), isGroupOrder],
+  );
 
+  const foodOrderGroupedByDate = isOrderIsPicking
+    ? foodOrderGroupedByDateFromOrderDetail
+    : isOrderEditing
+    ? foodOrderGroupedByDateFromDraftOrderDetail
+    : foodOrderGroupedByDateFromQuotation;
+  const quotationInfo = useMemo(
+    () =>
+      calculatePriceQuotationInfo({
+        planOrderDetail: orderDetail,
+        order: orderData as TObject,
+        currentOrderVATPercentage,
+      }),
+    [orderData, orderDetail],
+  );
+  const quotationDraftInfor = useMemo(
+    () =>
+      calculatePriceQuotationInfo({
+        planOrderDetail: draftOrderDetail,
+        order: orderData as TObject,
+        currentOrderVATPercentage,
+      }),
+    [orderData, draftOrderDetail],
+  );
+
+  const quotationInfor = useMemo(
+    () =>
+      calculatePriceQuotationInfoFromQuotation({
+        quotation: quotation as TListing,
+        packagePerMember,
+        currentOrderVATPercentage,
+      }),
+    [packagePerMember, quotation],
+  );
+
+  const {
+    totalPrice = 0,
+    PITOPoints = 0,
+    VATFee = 0,
+    totalWithVAT = 0,
+    serviceFee = 0,
+    transportFee = 0,
+    promotion = 0,
+    overflow,
+    PITOFee = 0,
+    totalWithoutVAT = 0,
+  } = isOrderIsPicking
+    ? quotationInfo
+    : isOrderEditing
+    ? quotationDraftInfor
+    : quotationInfor;
   const reviewInfoData = {
     reviewInfoValues,
     deliveryHour,
@@ -217,5 +283,6 @@ export const usePrepareOrderDetailPageData = () => {
     reviewViewData,
     priceQuotationData,
     setReviewInfoValues,
+    orderData,
   };
 };

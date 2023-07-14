@@ -168,6 +168,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           const newPartner = {
             ...partner,
             [restaurantId]: {
+              ...partner[restaurantId],
               quotation: omit(partner[restaurantId].quotation, [
                 startTimestamp,
               ]),

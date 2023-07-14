@@ -117,20 +117,6 @@ const OrderListPage = () => {
       participantPostRatingInProgress) &&
     !walkthroughEnable;
 
-  useEffect(() => {
-    (async () => {
-      await dispatch(OrderListThunks.fetchOrders(currentUserId));
-      dispatch(OrderListActions.markColorToOrder());
-    })();
-  }, [currentUserId]);
-
-  useEffect(() => {
-    dispatch(OrderListThunks.fetchAttributes());
-  }, []);
-  useEffect(() => {
-    dispatch(OrderListThunks.fetchParticipantFirebaseNotifications());
-  }, []);
-
   const unseenNotifications = notifications.filter(
     (notification) => !notification.seen,
   );
@@ -296,6 +282,11 @@ const OrderListPage = () => {
   };
 
   useEffect(() => {
+    dispatch(OrderListThunks.fetchAttributes());
+    dispatch(OrderListThunks.fetchParticipantFirebaseNotifications());
+  }, []);
+
+  useEffect(() => {
     if (subOrdersFromSelectedDayTxIds.length > 0 && !walkthroughEnable) {
       dispatch(
         OrderListThunks.fetchTransactionBySubOrder(
@@ -321,10 +312,6 @@ const OrderListPage = () => {
       }
     })();
   }, [currentUserId, walkthroughEnable]);
-
-  useEffect(() => {
-    dispatch(OrderListThunks.fetchAttributes());
-  }, []);
 
   useEffect(() => {
     if (planIdFromQuery && timestampFromQuery) {

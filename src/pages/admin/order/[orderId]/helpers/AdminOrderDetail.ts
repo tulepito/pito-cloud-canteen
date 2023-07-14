@@ -1,5 +1,5 @@
 import { parseThousandNumber } from '@helpers/format';
-import { groupFoodOrderByDate } from '@helpers/order/orderDetailHelper';
+import { groupFoodOrderByDateFromQuotation } from '@helpers/order/orderDetailHelper';
 import { Listing, User } from '@src/utils/data';
 import { EOrderType } from '@src/utils/enums';
 import type { TListing, TObject, TUser } from '@src/utils/types';
@@ -87,15 +87,15 @@ export const formatPriceQuotationData = ({
   booker,
   order,
   priceQuotation,
-  orderDetail,
   currentOrderVATPercentage,
+  quotation,
 }: {
   company: TUser;
   booker: TUser;
   order: TListing;
   priceQuotation: TObject;
-  orderDetail: TObject;
   currentOrderVATPercentage: number;
+  quotation?: TListing;
 }) => {
   const {
     orderTitle,
@@ -107,7 +107,6 @@ export const formatPriceQuotationData = ({
     bookerPhoneNumber,
     staffName,
     deliveryAddress,
-    isGroupOrder,
   } = relatedOrderDataSource({
     company,
     booker,
@@ -152,9 +151,8 @@ export const formatPriceQuotationData = ({
       currentOrderVATPercentage,
     },
     orderDetailData: {
-      foodOrderGroupedByDate: groupFoodOrderByDate({
-        orderDetail: orderDetail!,
-        isGroupOrder,
+      foodOrderGroupedByDate: groupFoodOrderByDateFromQuotation({
+        quotation: quotation!,
       }),
     },
   };
