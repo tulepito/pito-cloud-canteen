@@ -7,7 +7,7 @@ import { useRouter } from 'next/router';
 
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { QuizActions } from '@redux/slices/Quiz.slice';
-import { quizPaths } from '@src/paths';
+import { companyPaths, quizPaths } from '@src/paths';
 
 import useRedirectAfterReloadPage from '../../hooks/useRedirectAfterReloadPage';
 import QuizModal from '../components/QuizModal/QuizModal';
@@ -88,11 +88,15 @@ const QuizMealStyles = () => {
     router.back();
   };
 
+  const handleCancel = () => {
+    router.push(companyPaths.Home);
+  };
+
   return (
     <QuizModal
       id="QuizMealStyles"
       isOpen
-      handleClose={() => {}}
+      handleClose={handleCancel}
       modalTitle={intl.formatMessage({ id: 'QuizMealStyles.title' })}
       submitText="Tiếp tục"
       cancelText="Bỏ qua"
