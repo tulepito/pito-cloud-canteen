@@ -61,8 +61,12 @@
   flex-direction: column;
   row-gap: 8px;
 
-  .foodTitle {
-    @include textTemplate(18px, 700, 24px);
+  .foodTitleWrapper {
+    display: flex;
+    justify-content: space-between;
+    .foodTitle {
+      @include textTemplate(18px, 700, 24px);
+    }
   }
 
   .badgeContainer {
@@ -105,7 +109,7 @@
 }
 
 .requirementSection {
-  padding: 12px 0 130px;
+  padding: 12px 0 24px;
   display: flex;
   flex-direction: column;
   row-gap: 8px;
@@ -136,18 +140,19 @@
   z-index: 2;
   left: 0;
   width: 100vw;
-  padding: 16px;
+  margin: 0 0 40px 0;
   background-color: $neutralGray1;
+  display: flex;
+  justify-content: flex-end;
 
   .selectFoodBtn {
-    float: right;
+    width: 150px;
   }
 
   @include viewportMedium {
+    position: relative;
+    left: 0;
     width: 100%;
-    position: absolute;
-
-    padding: 16px 0;
   }
 }
 
@@ -167,4 +172,8 @@
       opacity: 0.6;
     }
   }
+}
+
+.headerModal {
+  justify-content: flex-end;
 }

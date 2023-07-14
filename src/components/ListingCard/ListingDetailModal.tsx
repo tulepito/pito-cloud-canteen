@@ -7,7 +7,6 @@ import isEmpty from 'lodash/isEmpty';
 import Badge from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
 import { FieldTextAreaComponent } from '@components/FormFields/FieldTextArea/FieldTextArea';
-import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import IconBox from '@components/Icons/IconBox/IconBox';
 import Modal from '@components/Modal/Modal';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
@@ -20,6 +19,7 @@ import {
   SPECIAL_DIET_OPTIONS,
 } from '@src/utils/enums';
 import { toNonAccentVietnamese } from '@src/utils/string';
+import { maxLength } from '@src/utils/validators';
 
 import css from './ListingDetailModal.module.scss';
 
@@ -45,13 +45,17 @@ const ListingDetailModal: React.FC<TListingDetailModalProps> = (props) => {
   } = props;
 
   const intl = useIntl();
-  const { form: foodSelectionForm } = useForm({
+  const { form: foodSelectionForm, invalid } = useForm({
     onSubmit: () => {},
     initialValues: {
       requirement,
     },
   });
-  const requirementField = useField('requirement', foodSelectionForm);
+  const requirementField = useField(
+    'requirement',
+    foodSelectionForm,
+    maxLength('Ghi chú không được vượt quá 500 kí tự', 500),
+  );
   const packagingOptions = useAppSelector(
     (state) => state.SystemAttributes.packaging,
   );
@@ -101,13 +105,6 @@ const ListingDetailModal: React.FC<TListingDetailModalProps> = (props) => {
     arrows: false,
   };
 
-  const closeButton = (
-    <Button variant="inline" className={css.closeModalBtn} onClick={onClose}>
-      <IconArrow direction="left" />
-      <div>Quay lại</div>
-    </Button>
-  );
-
   const handleChangeRequirement = (value: string) => {
     onChangeRequirement(value);
   };
@@ -126,9 +123,9 @@ const ListingDetailModal: React.FC<TListingDetailModalProps> = (props) => {
       id={`ListingDetailModal.${title}`}
       isOpen={isOpen}
       handleClose={onClose}
-      closeButton={closeButton}
       contentClassName={css.modalContentWrapper}
-      containerClassName={css.modalContainer}>
+      containerClassName={css.modalContainer}
+      headerClassName={css.headerModal}>
       <div className={css.modalContent}>
         <div className={css.listingImage}>
           <RenderWhen condition={listingImages.length > 0}>
@@ -155,7 +152,15 @@ const ListingDetailModal: React.FC<TListingDetailModalProps> = (props) => {
         </div>
 
         <div className={css.section}>
-          <div className={css.foodTitle}>{title}</div>
+          <div className={css.foodTitleWrapper}>
+            <div className={css.foodTitle}>{title}</div>
+            <RenderWhen condition={!isEmpty(packagingLabel)}>
+              <div className={css.packagingSection}>
+                <IconBox className={css.iconBox} />
+                <div>{packagingLabel}</div>
+              </div>
+            </RenderWhen>
+          </div>
 
           <RenderWhen condition={badges?.length > 0}>
             <div className={css.badgeContainer}>
@@ -166,13 +171,6 @@ const ListingDetailModal: React.FC<TListingDetailModalProps> = (props) => {
                   type={badge?.badgeType}
                 />
               ))}
-            </div>
-          </RenderWhen>
-
-          <RenderWhen condition={!isEmpty(packagingLabel)}>
-            <div className={css.packagingSection}>
-              <IconBox className={css.iconBox} />
-              <div>{packagingLabel}</div>
             </div>
           </RenderWhen>
         </div>
@@ -215,11 +213,15 @@ const ListingDetailModal: React.FC<TListingDetailModalProps> = (props) => {
             onChange={handleChangeRequirement}
           />
         </div>
-      </div>
-      <div className={css.selectFoodSection}>
-        <Button className={css.selectFoodBtn} onClick={onSelectFood}>
-          Chọn món
-        </Button>
+
+        <div className={css.selectFoodSection}>
+          <Button
+            disabled={invalid}
+            className={css.selectFoodBtn}
+            onClick={onSelectFood}>
+            Chọn món này
+          </Button>
+        </div>
       </div>
     </Modal>
   );
