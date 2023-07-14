@@ -120,6 +120,7 @@ const createOrder = async ({
         startDate,
         endDate,
         mealType,
+        companyName,
       },
       ...(shouldUpdateOrderName
         ? {
