@@ -12,13 +12,18 @@ import {
 } from '@apis/firebaseApi';
 import { updateParticipantOrderApi } from '@apis/index';
 import { participantPostRatingApi } from '@apis/participantApi';
-import { fetchTxApi } from '@apis/txApi';
+import { fetchTxApi, queryTransactionApi } from '@apis/txApi';
 import { disableWalkthroughApi, fetchSearchFilterApi } from '@apis/userApi';
 import { getParticipantOrdersQuery } from '@helpers/listingSearchQuery';
 import { markColorForOrder } from '@helpers/orderHelper';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { userThunks } from '@redux/slices/user.slice';
-import { denormalisedResponseEntities, Listing } from '@src/utils/data';
+import {
+  CurrentUser,
+  denormalisedResponseEntities,
+  Listing,
+} from '@src/utils/data';
+import { getEndOfMonth } from '@src/utils/dates';
 import { convertStringToNumber } from '@src/utils/number';
 import type {
   TKeyValue,
@@ -159,10 +164,16 @@ const disableWalkthrough = createAsyncThunk(
 
 const fetchOrders = createAsyncThunk(
   FETCH_ORDERS,
-  async (userId: string, { extra: sdk }) => {
-    const query = getParticipantOrdersQuery({ userId });
+  async ({ userId, selectedMonth }: TObject, { extra: sdk, getState }) => {
+    const { currentUser } = getState().user;
+    const query = getParticipantOrdersQuery({
+      userId,
+      startDate: selectedMonth.getTime(),
+      endDate: getEndOfMonth(selectedMonth).getTime(),
+    });
     const response = await sdk.listings.query(query);
     const orders = denormalisedResponseEntities(response);
+
     const allPlansIdList = orders.map((order: TListing) => {
       const orderListing = Listing(order);
       const { plans = [] } = orderListing.getMetadata();
@@ -211,12 +222,22 @@ const fetchOrders = createAsyncThunk(
       },
       {},
     );
+    const currentUserGetter = CurrentUser(currentUser!);
+    const { companyList } = currentUserGetter.getMetadata();
+    const { data: transactions } = await queryTransactionApi({
+      dataParams: {
+        createdAtStart: selectedMonth,
+        createdAtEnd: getEndOfMonth(selectedMonth),
+        companyId: companyList[0],
+      },
+    });
 
     return {
       orders,
       allPlans: flatten(allPlans),
       restaurants: allRelatedRestaurants,
       mappingSubOrderToOrder,
+      subOrderTxs: transactions,
     };
   },
 );
@@ -429,11 +450,20 @@ const OrderListSlice = createSlice({
       })
       .addCase(fetchOrders.fulfilled, (state, { payload }) => {
         state.fetchOrdersInProgress = false;
-        state.orders = payload.orders;
-        // state.allSubOrders = payload.allSubOrders;
+        state.orders = uniqBy([...state.orders, ...payload.orders], 'id.uuid');
+        state.subOrderTxs = uniqBy(
+          [...state.subOrderTxs, ...payload.subOrderTxs],
+          'id.uuid',
+        );
         state.restaurants = payload.restaurants;
-        state.allPlans = payload.allPlans;
-        state.mappingSubOrderToOrder = payload.mappingSubOrderToOrder;
+        state.allPlans = uniqBy(
+          [...state.allPlans, ...payload.allPlans],
+          'id.uuid',
+        );
+        state.mappingSubOrderToOrder = {
+          ...state.mappingSubOrderToOrder,
+          ...payload.mappingSubOrderToOrder,
+        };
       })
       .addCase(fetchOrders.rejected, (state, { error }) => {
         state.fetchOrdersInProgress = false;

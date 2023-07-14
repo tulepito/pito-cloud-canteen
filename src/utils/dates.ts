@@ -323,8 +323,11 @@ export const diffDays = (
   date2 = new Date().getTime(),
   units: DurationUnits = ['days'],
 ) => {
-  return DateTime.fromMillis(date1).diff(DateTime.fromMillis(date2), units)
-    .days;
+  const diffObject = DateTime.fromMillis(date1)
+    .diff(DateTime.fromMillis(date2), units)
+    .toObject();
+
+  return diffObject;
 };
 
 export const printHoursToString = (hours: number, minutes: number) => {
@@ -496,4 +499,26 @@ export const calcPastTime = (timestamp: number) => {
 };
 export const getDayOfWeek = (timestamp: number) => {
   return DateTime.fromMillis(timestamp).weekday;
+};
+
+export const getNextMonth = (date: Date) => {
+  return DateTime.fromJSDate(date)
+    .plus({ months: 1 })
+    .startOf('month')
+    .toJSDate();
+};
+
+export const getPrevMonth = (date: Date) => {
+  return DateTime.fromJSDate(date)
+    .minus({ months: 1 })
+    .startOf('month')
+    .toJSDate();
+};
+
+export const getStartOfMonth = (date: Date) => {
+  return DateTime.fromJSDate(date).startOf('month').toJSDate();
+};
+
+export const getEndOfMonth = (date: Date) => {
+  return DateTime.fromJSDate(date).endOf('month').toJSDate();
 };

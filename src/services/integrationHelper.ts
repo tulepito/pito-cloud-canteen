@@ -97,3 +97,19 @@ export const updateTransactionMetadata = async (
 
   return denormalisedResponseEntities(response)?.[0];
 };
+
+export const queryTransactions = async (query: any, include: string[] = []) => {
+  const integrationSdk = getIntegrationSdk();
+
+  const response = await integrationSdk.transactions.query(
+    {
+      ...query,
+      include,
+    },
+    {
+      expand: true,
+    },
+  );
+
+  return denormalisedResponseEntities(response);
+};

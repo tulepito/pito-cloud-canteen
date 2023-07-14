@@ -20,7 +20,7 @@ type TOrderEventCardStatusProps = {
 const StatusToBadgeTypeMap = {
   [EVENT_STATUS.EMPTY_STATUS]: EBadgeType.warning,
   [EVENT_STATUS.JOINED_STATUS]: EBadgeType.info,
-  [EVENT_STATUS.NOT_JOINED_STATUS]: EBadgeType.default,
+  [EVENT_STATUS.NOT_JOINED_STATUS]: EBadgeType.info,
   [EVENT_STATUS.EXPIRED_STATUS]: EBadgeType.default,
 
   [ETransition.START_DELIVERY]: EBadgeType.info,

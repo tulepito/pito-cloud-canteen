@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 import type { Event, View } from 'react-big-calendar';
 import { Views } from 'react-big-calendar';
 import { shallowEqual } from 'react-redux';
-import compact from 'lodash/compact';
 import flatten from 'lodash/flatten';
 import { DateTime } from 'luxon';
 import { useRouter } from 'next/router';
@@ -22,7 +21,14 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { useViewport } from '@hooks/useViewport';
 import { CurrentUser, Listing } from '@src/utils/data';
-import { getDaySessionFromDeliveryTime, isSameDate } from '@src/utils/dates';
+import {
+  diffDays,
+  getDaySessionFromDeliveryTime,
+  getNextMonth,
+  getPrevMonth,
+  getStartOfMonth,
+  isSameDate,
+} from '@src/utils/dates';
 import { EOrderStates, EParticipantOrderStatus } from '@src/utils/enums';
 import type { TListing, TObject } from '@src/utils/types';
 
@@ -61,6 +67,14 @@ const OrderListPage = () => {
   const ratingSubOrderModalControl = useBoolean();
   const { selectedDay, handleSelectDay } = useSelectDay();
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const [selectedMonth, setSelectedMonth] = useState<Date | null>(
+    getStartOfMonth(new Date()),
+  );
+  const [maxSelectedMonth, setMaxSelectedMonth] = useState<Date | null>(
+    getStartOfMonth(new Date()),
+  );
+  const isPrevMonthController = useBoolean();
+
   const subOrderDetailModalControl = useBoolean();
   const { isMobileLayout } = useViewport();
   const successRatingModalControl = useBoolean();
@@ -245,12 +259,6 @@ const OrderListPage = () => {
     }
   }, [isMobileLayout]);
 
-  const subOrdersFromSelectedDayTxIds = compact(
-    subOrdersFromSelectedDay.map(
-      (_event: any) => _event.resource.transactionId,
-    ),
-  );
-
   const openUpdateProfileModal = () => {
     updateProfileModalControl.setTrue();
   };
@@ -301,15 +309,23 @@ const OrderListPage = () => {
     successRatingModalControl.setFalse();
   };
 
-  useEffect(() => {
-    if (subOrdersFromSelectedDayTxIds.length > 0 && !walkthroughEnable) {
-      dispatch(
-        OrderListThunks.fetchTransactionBySubOrder(
-          subOrdersFromSelectedDayTxIds,
-        ),
-      );
+  const handleChangeTimePeriod = (action: string) => {
+    if (action === 'NEXT') {
+      isPrevMonthController.setFalse();
+      const nextMonth = getNextMonth(selectedMonth!);
+      setSelectedMonth(nextMonth);
+      if (
+        diffDays(nextMonth?.getTime(), maxSelectedMonth?.getTime(), ['months'])
+          .months! > 0
+      ) {
+        setMaxSelectedMonth(nextMonth);
+      }
+    } else {
+      isPrevMonthController.setTrue();
+      const prevMonth = getPrevMonth(selectedMonth!);
+      setSelectedMonth(prevMonth);
     }
-  }, [JSON.stringify(subOrdersFromSelectedDayTxIds)]);
+  };
 
   useEffect(() => {
     if (selectedEvent) {
@@ -321,12 +337,24 @@ const OrderListPage = () => {
 
   useEffect(() => {
     (async () => {
-      if (!walkthroughEnable) {
-        await dispatch(OrderListThunks.fetchOrders(currentUserId));
+      if (
+        !isPrevMonthController.value &&
+        diffDays(selectedMonth?.getTime(), maxSelectedMonth?.getTime(), [
+          'months',
+        ]).months! >= 0
+      ) {
+        await dispatch(
+          OrderListThunks.fetchOrders({ userId: currentUserId, selectedMonth }),
+        );
         dispatch(OrderListActions.markColorToOrder());
       }
     })();
-  }, [currentUserId, walkthroughEnable]);
+  }, [
+    currentUserId,
+    selectedMonth,
+    isPrevMonthController.value,
+    maxSelectedMonth,
+  ]);
 
   useEffect(() => {
     if (planIdFromQuery && timestampFromQuery) {
@@ -369,6 +397,7 @@ const OrderListPage = () => {
                 {...toolBarProps}
                 isAllowChangePeriod
                 onChangeDate={handleSelectDay}
+                onCustomPeriodClick={handleChangeTimePeriod}
               />
             ),
           }}

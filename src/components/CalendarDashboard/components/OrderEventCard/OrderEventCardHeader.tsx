@@ -15,11 +15,13 @@ const OrderEventCardHeader: React.FC<TOrderEventCardHeaderProps> = ({
 }) => {
   const intl = useIntl();
   const startTime = event.resource.deliveryHour;
-  const { daySession = MORNING_SESSION } = event.resource;
+  const { daySession = MORNING_SESSION, dishSelection } = event.resource;
   const { orderColor } = event?.resource || {};
+  const isFoodPicked = !!dishSelection?.dishSelection;
   const isExpired = isOver(event.resource?.expiredTime);
+  const isExpiredToPickFood = isExpired && !isFoodPicked;
   const headerStyles = {
-    backgroundColor: isExpired ? '#8C8C8C' : orderColor,
+    backgroundColor: isExpiredToPickFood ? '#8C8C8C' : orderColor,
   };
 
   return (
