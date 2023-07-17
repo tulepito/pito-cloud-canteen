@@ -161,6 +161,7 @@ export const ReviewContent: React.FC<any> = (props) => {
     participants = [],
     anonymous = [],
     orderState,
+    orderNote,
   } = Listing(order as TListing).getMetadata();
   const { restaurantName, phoneNumber, foodList = {}, id } = restaurant || {};
   const isInProgressOrder = orderState === EOrderStates.inProgress;
@@ -376,14 +377,16 @@ export const ReviewContent: React.FC<any> = (props) => {
           </RenderWhen.False>
         </RenderWhen>
       </Collapsible>
-      <Collapsible
-        label={intl.formatMessage({
-          id: 'ReviewOrder.note',
-        })}>
-        <div className={classNames(css.contentBox, css.spaceStart)}>
-          {notes?.[id]}
-        </div>
-      </Collapsible>
+      {(orderNote || notes?.[id]) && (
+        <Collapsible
+          label={intl.formatMessage({
+            id: 'ReviewOrder.note',
+          })}>
+          <div className={classNames(css.contentBox, css.spaceStart)}>
+            {orderNote || notes?.[id]}
+          </div>
+        </Collapsible>
+      )}
     </div>
   );
 };
