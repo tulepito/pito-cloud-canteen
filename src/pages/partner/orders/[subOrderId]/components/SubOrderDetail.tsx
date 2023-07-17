@@ -165,10 +165,10 @@ const SubOrderDetail: React.FC<TSubOrderDetailProps> = ({
                     <div>{foodIndex + 1}</div>
                     <div>{foodName}</div>
                     <div>{frequency}</div>
+                    <div>{parseThousandNumber(foodPrice || 0)}đ</div>
                     <div>
                       {parseThousandNumber((foodPrice || 0) * frequency)}đ
                     </div>
-                    <div>{parseThousandNumber(foodPrice || 0)}đ</div>
                     <div
                       className={css.actionCell}
                       onClick={handleClickGroupTitle(foodIndex)}>
