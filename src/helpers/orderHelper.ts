@@ -159,7 +159,6 @@ export const orderDataCheckers = (order: TListing) => {
     isPackagePerMemberValid: Number.isInteger(packagePerMember),
     haveAnyPlans: !isEmpty(plans),
   };
-
   const isAllValid = Object.values(checkers).every((value) => value);
 
   return { ...checkers, isAllValid };

@@ -211,10 +211,6 @@ export const usePrepareOrderDetailPageData = ({
       foodOrderGroupedByDate,
     },
   };
-  console.debug(
-    '💫 > file: usePrepareOrderManagementData.ts:211 > priceQuotationData: ',
-    priceQuotationData,
-  );
 
   const goToReviewPage = () => {
     router.push({
