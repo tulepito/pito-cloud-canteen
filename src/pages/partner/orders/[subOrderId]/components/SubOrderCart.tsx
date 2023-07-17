@@ -68,12 +68,14 @@ const SubOrderCart: React.FC<TSubOrderCartProps> = (props) => {
   const { orderTitle, priceQuotationData } = usePrepareOrderDetailPageData({
     date,
     VATPercentage: orderVATPercentage,
+    serviceFeePercentage: serviceFeePercentage / 100,
   });
 
-  const handleDownloadPriceQuotation = useDownloadPriceQuotation(
+  const handleDownloadPriceQuotation = useDownloadPriceQuotation({
     orderTitle,
     priceQuotationData,
-  );
+    isPartnerQuotation: true,
+  });
   const rootClasses = classNames(css.root, className);
   const titleClasses = classNames(css.title, {});
   const downloadPriceQuotationClasses = classNames(css.downloadPriceQuotation, {

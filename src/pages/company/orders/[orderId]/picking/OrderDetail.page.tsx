@@ -148,10 +148,10 @@ const OrderDetailPage = () => {
     setCurrentViewDate(date);
   };
 
-  const handleDownloadPriceQuotation = useDownloadPriceQuotation(
+  const handleDownloadPriceQuotation = useDownloadPriceQuotation({
     orderTitle,
     priceQuotationData,
-  );
+  });
 
   const userId = CurrentUser(currentUser!).getId();
   const {

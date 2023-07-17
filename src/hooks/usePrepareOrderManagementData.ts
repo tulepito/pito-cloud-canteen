@@ -24,9 +24,11 @@ import type { TCurrentUser, TListing, TObject, TUser } from '@utils/types';
 export const usePrepareOrderDetailPageData = ({
   date,
   VATPercentage,
+  serviceFeePercentage,
 }: {
   date?: string | number;
   VATPercentage?: number;
+  serviceFeePercentage?: number;
 }) => {
   const router = useRouter();
   const [reviewInfoValues, setReviewInfoValues] =
@@ -270,12 +272,18 @@ export const usePrepareOrderDetailPageData = ({
       transportFee: `${parseThousandNumber(transportFee)}đ`,
       VATFee: `${parseThousandNumber(VATFee)}đ`,
       PITOFee: `${parseThousandNumber(PITOFee)}đ`,
-      currentOrderVATPercentage,
+      currentOrderVATPercentage: !isEmpty(VATPercentage)
+        ? VATPercentage!
+        : currentOrderVATPercentage,
     },
     orderDetailData: {
       foodOrderGroupedByDate,
     },
   };
+  console.debug(
+    '💫 > file: usePrepareOrderManagementData.ts:211 > priceQuotationData: ',
+    priceQuotationData,
+  );
 
   const goToReviewPage = () => {
     router.push({
