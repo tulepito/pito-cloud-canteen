@@ -33,13 +33,13 @@ const usePrepareDownloadData = (foodDataList: TObject[] = []) => {
       foodName,
       frequency.toString(),
       `${parseThousandNumber(foodPrice || 0)}đ`,
-      `${parseThousandNumber(foodPrice || 0 * frequency)}đ`,
+      `${parseThousandNumber((foodPrice || 0) * frequency)}đ`,
     ];
 
     data.push(titleRow);
 
     notes.forEach(({ note = '-', name }: TObject, noteIndex: number) => {
-      data.push([`${foodIndex + 1}.${noteIndex}`, name, note]);
+      data.push([`${foodIndex + 1}.${noteIndex + 1}`, name, note]);
     });
     data.push([]);
   });
