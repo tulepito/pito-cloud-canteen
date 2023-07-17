@@ -85,14 +85,14 @@ const SubOrderCart: React.FC<TSubOrderCartProps> = (props) => {
   return (
     <div className={rootClasses}>
       <div className={titleClasses}>
-        {title || intl.formatMessage({ id: 'ReviewCardSection.title' })}
+        {title || intl.formatMessage({ id: 'SubOrderCart.title' })}
       </div>
 
       <div className={css.feeContainer}>
         <div className={css.feeItem}>
           <div className={css.feeItemContainer}>
             <div className={css.label}>
-              {intl.formatMessage({ id: 'ReviewCardSection.totalPrice' })}
+              {intl.formatMessage({ id: 'SubOrderCart.totalPrice' })}
             </div>
             <div className={css.fee}>
               {parseThousandNumber(totalPrice.toString())}đ
@@ -103,7 +103,7 @@ const SubOrderCart: React.FC<TSubOrderCartProps> = (props) => {
         <div className={css.feeItem}>
           <div className={css.feeItemContainer}>
             <div className={css.label}>
-              {intl.formatMessage({ id: 'ReviewCardSection.serviceFee' })}
+              {intl.formatMessage({ id: 'SubOrderCart.serviceFee' })}
               <Badge
                 label={`${serviceFeePercentage}%`}
                 className={css.VATBadge}
@@ -119,7 +119,7 @@ const SubOrderCart: React.FC<TSubOrderCartProps> = (props) => {
           <div className={css.feeItemContainer}>
             <div className={css.label}>
               {intl.formatMessage({
-                id: 'ReviewCardSection.promotion',
+                id: 'SubOrderCart.promotion',
               })}
             </div>
             <div className={css.fee}>
@@ -130,7 +130,7 @@ const SubOrderCart: React.FC<TSubOrderCartProps> = (props) => {
         <div className={css.feeItem}>
           <div className={css.feeItemContainer}>
             <div className={css.totalWithoutVATLabel}>
-              {intl.formatMessage({ id: 'ReviewCardSection.totalWithoutVAT' })}
+              {intl.formatMessage({ id: 'SubOrderCart.totalWithoutVAT' })}
             </div>
 
             <div className={css.fee}>
@@ -142,7 +142,7 @@ const SubOrderCart: React.FC<TSubOrderCartProps> = (props) => {
           <div
             className={classNames(css.feeItemContainer, css.VATItemContainer)}>
             <div className={css.label}>
-              {intl.formatMessage({ id: 'ReviewCardSection.VAT' })}
+              {intl.formatMessage({ id: 'SubOrderCart.VAT' })}
               <Badge
                 label={`${Math.round(orderVATPercentage * 100)}%`}
                 className={css.VATBadge}
@@ -155,14 +155,14 @@ const SubOrderCart: React.FC<TSubOrderCartProps> = (props) => {
         </div>
         <div className={css.feeItem}>
           <div className={css.totalWithVATLabel}>
-            {intl.formatMessage({ id: 'ReviewCardSection.totalWithVAT' })}
+            {intl.formatMessage({ id: 'SubOrderCart.totalWithVAT' })}
           </div>
           <div className={css.totalWithVAT}>
             {parseThousandNumber(totalWithVAT.toString())}đ
           </div>
 
           <div className={css.totalDescription}>
-            {intl.formatMessage({ id: 'ReviewCardSection.totalDescription' })}
+            {intl.formatMessage({ id: 'SubOrderCart.totalDescription' })}
           </div>
         </div>
       </div>
@@ -173,7 +173,7 @@ const SubOrderCart: React.FC<TSubOrderCartProps> = (props) => {
         disabled={isDownloadingPriceQuotation}
         onClick={handleDownloadPriceQuotation}>
         {intl.formatMessage({
-          id: 'ReviewCardSection.downloadPriceQuotation',
+          id: 'SubOrderCart.downloadPriceQuotation',
         })}
       </Button>
     </div>
