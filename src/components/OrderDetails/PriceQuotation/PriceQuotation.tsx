@@ -45,7 +45,6 @@ const PriceQuotation: React.FC<TPriceQuotationProps> = ({
   isPartnerQuotation = false,
   data,
 }) => {
-  console.debug('💫 > file: PriceQuotation.tsx:48 > data: ', data);
   const {
     customerData,
     cartData,
