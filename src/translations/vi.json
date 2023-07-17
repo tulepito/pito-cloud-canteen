@@ -1602,6 +1602,7 @@
   "SubOrderSummary.tableHead.no": "STT",
   "SubOrderSummary.tableHead.quantity": "SL",
   "SubOrderSummary.tableHead.totalPice": "THÀNH TIỀN",
+  "SubOrderSummary.hasNote": "Có ghi chú",
   "SubOrderSummary.tableHead.type": "HẠNG MỤC",
   "SubOrderSummary.tableHead.unitPrice": "ĐƠN GIÁ",
   "SubOrderSummary.title": "CHI TIẾT ĐƠN HÀNG",
