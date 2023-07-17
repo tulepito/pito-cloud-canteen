@@ -69,10 +69,10 @@ const OrderDetailPage = () => {
     priceQuotationData,
     setReviewInfoValues,
   } = usePrepareOrderDetailPageData({});
-  const handleDownloadPriceQuotation = useDownloadPriceQuotation(
+  const handleDownloadPriceQuotation = useDownloadPriceQuotation({
     orderTitle,
     priceQuotationData,
-  );
+  });
 
   const userId = CurrentUser(currentUser!).getId();
   const {
