@@ -29,15 +29,12 @@ const partnerOrderDetailsUpdated = ({
   const { title: restaurantName } = restaurantListing.getAttributes();
 
   const { orderDetail: planOrderDetail } = planListing.getMetadata();
-  const {
-    startDate,
-    endDate,
-    staffName,
-    orderVATPercentage = 0,
-  } = orderListing.getMetadata();
+  const { staffName, orderVATPercentage = 0 } = orderListing.getMetadata();
   const { companyName } = companyUser.getPublicData();
-  const formattedStartDate = formatTimestamp(startDate);
-  const formattedEndDate = formatTimestamp(endDate);
+  const formattedDate = formatTimestamp(Number(subOrderDate || 0));
+
+  const dayIndex = new Date(Number(subOrderDate)).getDay();
+  const subOrderTitle = `${orderTitle}-${dayIndex > 0 ? dayIndex : 7}`;
 
   const { totalPrice, totalDishes, VATFee, PITOFee, totalWithVAT } =
     calculatePriceQuotationInfo({
@@ -1030,7 +1027,7 @@ const partnerOrderDetailsUpdated = ({
                                         color: #333333;
                                         font-size: 14px;
                                       ">
-                                      <strong>${formattedStartDate} - ${formattedEndDate}</strong>
+                                      <strong>${formattedDate}</strong>
                                     </p>
                                   </td>
                                 </tr>
@@ -1142,7 +1139,7 @@ const partnerOrderDetailsUpdated = ({
                                         color: #333333;
                                         font-size: 14px;
                                       ">
-                                      <strong>${orderTitle}</strong>
+                                      <strong>${subOrderTitle}</strong>
                                     </p>
                                   </td>
                                 </tr>
