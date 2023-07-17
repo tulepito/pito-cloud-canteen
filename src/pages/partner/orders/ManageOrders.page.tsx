@@ -19,7 +19,7 @@ import { parseThousandNumber } from '@helpers/format';
 import { calculateSubOrderPrice } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { partnerPaths } from '@src/paths';
-import { findEndDeliveryTime, formatTimestamp } from '@src/utils/dates';
+import { formatTimestamp } from '@src/utils/dates';
 import { EOrderDraftStates, EOrderType } from '@utils/enums';
 import type { TObject, TTableSortValue } from '@utils/types';
 
@@ -151,9 +151,7 @@ const parseEntitiesToTableData = (subOrders: TObject[]) => {
     });
 
     const subOrderTitle = `${orderTitle}-${dayIndex > 0 ? dayIndex : 7}`;
-    const formattedDeliveryHour = `${deliveryHour}-${findEndDeliveryTime(
-      deliveryHour,
-    )}`;
+    const formattedDeliveryHour = `${deliveryHour}`;
 
     return {
       key: subOrderTitle,
