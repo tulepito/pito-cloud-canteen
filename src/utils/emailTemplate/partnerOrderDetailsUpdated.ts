@@ -1,3 +1,4 @@
+import { parseThousandNumber } from '@helpers/format';
 import { calculatePriceQuotationInfo } from '@helpers/order/cartInfoHelper';
 
 import { formatTimestamp } from '../dates';
@@ -660,7 +661,7 @@ const partnerOrderDetailsUpdated = ({
                                         margin: 0;
                                         line-height: 24px;
                                         mso-line-height-rule: exactly;
-                                        font-family: manrope;
+                                        font-family: arial, 'helvetica neue', helvetica, sans-serif;
                                         font-size: 24px;
                                         font-style: normal;
                                         font-weight: bold;
@@ -681,7 +682,7 @@ const partnerOrderDetailsUpdated = ({
                                         -webkit-text-size-adjust: none;
                                         -ms-text-size-adjust: none;
                                         mso-line-height-rule: exactly;
-                                        font-family: manrope;
+                                        font-family: arial, 'helvetica neue', helvetica, sans-serif;
                                         line-height: 21px;
                                         color: #333333;
                                         font-size: 14px;
@@ -705,7 +706,7 @@ const partnerOrderDetailsUpdated = ({
                                         -webkit-text-size-adjust: none;
                                         -ms-text-size-adjust: none;
                                         mso-line-height-rule: exactly;
-                                        font-family: manrope;
+                                        font-family: arial, 'helvetica neue', helvetica, sans-serif;
                                         line-height: 21px;
                                         color: #333333;
                                         font-size: 14px;
@@ -820,7 +821,7 @@ const partnerOrderDetailsUpdated = ({
                                           <center
                                             style="
                                               color: #ffffff;
-                                              font-family: Manrope;
+                                              font-family: arial, 'helvetica neue', helvetica, sans-serif;
                                               font-size: 15px;
                                               font-weight: 400;
                                               line-height: 15px;
@@ -858,7 +859,7 @@ const partnerOrderDetailsUpdated = ({
                                           display: inline-block;
                                           background: #ef3d2a;
                                           border-radius: 8px;
-                                          font-family: Manrope;
+                                          font-family: arial, 'helvetica neue', helvetica, sans-serif;
                                           font-weight: normal;
                                           font-style: normal;
                                           line-height: 19px;
@@ -963,7 +964,7 @@ const partnerOrderDetailsUpdated = ({
                                         -webkit-text-size-adjust: none;
                                         -ms-text-size-adjust: none;
                                         mso-line-height-rule: exactly;
-                                        font-family: manrope;
+                                        font-family: arial, 'helvetica neue', helvetica, sans-serif;
                                         line-height: 21px;
                                         color: #8c8c8c;
                                         font-size: 14px;
@@ -982,7 +983,7 @@ const partnerOrderDetailsUpdated = ({
                                         -webkit-text-size-adjust: none;
                                         -ms-text-size-adjust: none;
                                         mso-line-height-rule: exactly;
-                                        font-family: manrope;
+                                        font-family: arial, 'helvetica neue', helvetica, sans-serif;
                                         line-height: 21px;
                                         color: #333333;
                                         font-size: 14px;
@@ -1005,7 +1006,7 @@ const partnerOrderDetailsUpdated = ({
                                         -webkit-text-size-adjust: none;
                                         -ms-text-size-adjust: none;
                                         mso-line-height-rule: exactly;
-                                        font-family: manrope;
+                                        font-family: arial, 'helvetica neue', helvetica, sans-serif;
                                         line-height: 21px;
                                         color: #8c8c8c;
                                         font-size: 14px;
@@ -1024,7 +1025,7 @@ const partnerOrderDetailsUpdated = ({
                                         -webkit-text-size-adjust: none;
                                         -ms-text-size-adjust: none;
                                         mso-line-height-rule: exactly;
-                                        font-family: manrope;
+                                        font-family: arial, 'helvetica neue', helvetica, sans-serif;
                                         line-height: 21px;
                                         color: #333333;
                                         font-size: 14px;
@@ -1075,12 +1076,12 @@ const partnerOrderDetailsUpdated = ({
                                         -webkit-text-size-adjust: none;
                                         -ms-text-size-adjust: none;
                                         mso-line-height-rule: exactly;
-                                        font-family: manrope;
+                                        font-family: arial, 'helvetica neue', helvetica, sans-serif;
                                         line-height: 21px;
                                         color: #8c8c8c;
                                         font-size: 14px;
                                       ">
-                                      Người viện&nbsp;&#x8;phụ trách
+                                      Nhân viên&nbsp;&#x8;phụ trách
                                     </p>
                                   </td>
                                 </tr>
@@ -1094,7 +1095,7 @@ const partnerOrderDetailsUpdated = ({
                                         -webkit-text-size-adjust: none;
                                         -ms-text-size-adjust: none;
                                         mso-line-height-rule: exactly;
-                                        font-family: manrope;
+                                        font-family: arial, 'helvetica neue', helvetica, sans-serif;
                                         line-height: 21px;
                                         color: #333333;
                                         font-size: 14px;
@@ -1117,7 +1118,7 @@ const partnerOrderDetailsUpdated = ({
                                         -webkit-text-size-adjust: none;
                                         -ms-text-size-adjust: none;
                                         mso-line-height-rule: exactly;
-                                        font-family: manrope;
+                                        font-family: arial, 'helvetica neue', helvetica, sans-serif;
                                         line-height: 21px;
                                         color: #8c8c8c;
                                         font-size: 14px;
@@ -1136,7 +1137,7 @@ const partnerOrderDetailsUpdated = ({
                                         -webkit-text-size-adjust: none;
                                         -ms-text-size-adjust: none;
                                         mso-line-height-rule: exactly;
-                                        font-family: manrope;
+                                        font-family: arial, 'helvetica neue', helvetica, sans-serif;
                                         line-height: 21px;
                                         color: #333333;
                                         font-size: 14px;
@@ -1418,7 +1419,9 @@ const partnerOrderDetailsUpdated = ({
                                               font-size: 14px;
                                               font-weight: bold;
                                             "
-                                            >${totalPrice}</a
+                                            >${parseThousandNumber(
+                                              totalPrice || 0,
+                                            )}đ</a
                                           >
                                         </td>
                                       </tr>
@@ -1550,7 +1553,9 @@ const partnerOrderDetailsUpdated = ({
                                               font-size: 14px;
                                               font-weight: bold;
                                             "
-                                            >${PITOFee}</a
+                                            >${parseThousandNumber(
+                                              PITOFee || 0,
+                                            )}đ</a
                                           >
                                         </td>
                                         <td
@@ -1582,7 +1587,9 @@ const partnerOrderDetailsUpdated = ({
                                               font-size: 14px;
                                               font-weight: bold;
                                             "
-                                            >${VATFee}</a
+                                            >${parseThousandNumber(
+                                              VATFee || 0,
+                                            )}đ</a
                                           >
                                         </td>
                                       </tr>
@@ -1712,7 +1719,9 @@ const partnerOrderDetailsUpdated = ({
                                               font-size: 14px;
                                               font-weight: bold;
                                             "
-                                            >${totalWithVAT}</a
+                                            >${parseThousandNumber(
+                                              totalWithVAT || 0,
+                                            )}đ</a
                                           >
                                         </td>
                                         <td
@@ -1836,7 +1845,7 @@ const partnerOrderDetailsUpdated = ({
                                         -webkit-text-size-adjust: none;
                                         -ms-text-size-adjust: none;
                                         mso-line-height-rule: exactly;
-                                        font-family: manrope;
+                                        font-family: arial, 'helvetica neue', helvetica, sans-serif;
                                         line-height: 21px;
                                         color: #333333;
                                         font-size: 14px;
@@ -1881,7 +1890,7 @@ const partnerOrderDetailsUpdated = ({
                                         -webkit-text-size-adjust: none;
                                         -ms-text-size-adjust: none;
                                         mso-line-height-rule: exactly;
-                                        font-family: manrope;
+                                        font-family: arial, 'helvetica neue', helvetica, sans-serif;
                                         line-height: 21px;
                                         color: #333333;
                                         font-size: 14px;
@@ -1923,7 +1932,7 @@ const partnerOrderDetailsUpdated = ({
                                         -webkit-text-size-adjust: none;
                                         -ms-text-size-adjust: none;
                                         mso-line-height-rule: exactly;
-                                        font-family: manrope;
+                                        font-family: arial, 'helvetica neue', helvetica, sans-serif;
                                         line-height: 21px;
                                         color: #333333;
                                         font-size: 14px;
@@ -2175,7 +2184,7 @@ const partnerOrderDetailsUpdated = ({
                                         -webkit-text-size-adjust: none;
                                         -ms-text-size-adjust: none;
                                         mso-line-height-rule: exactly;
-                                        font-family: manrope;
+                                        font-family: arial, 'helvetica neue', helvetica, sans-serif;
                                         line-height: 18px;
                                         color: #8c8c8c;
                                         font-size: 12px;
