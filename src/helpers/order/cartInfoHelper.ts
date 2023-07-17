@@ -187,7 +187,7 @@ export const calculatePriceQuotationInfo = ({
   const PITOFee = actualPCCFee;
 
   const totalWithoutVAT =
-    totalPrice + serviceFee + transportFee + PITOFee - promotion;
+    totalPrice - serviceFee + transportFee + PITOFee - promotion;
   const VATFee = Math.round(totalWithoutVAT * currentOrderVATPercentage);
   const totalWithVAT = VATFee + totalWithoutVAT;
   const overflow = isOverflowPackage
