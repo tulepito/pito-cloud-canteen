@@ -75,6 +75,7 @@ const SubOrderCart: React.FC<TSubOrderCartProps> = (props) => {
     VATPercentage: orderVATPercentage,
     serviceFeePercentage: serviceFeePercentage / 100,
   });
+
   const handleDownloadPriceQuotation = useDownloadPriceQuotation({
     orderTitle,
     priceQuotationData,
