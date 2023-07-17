@@ -147,10 +147,10 @@ const OrderDetailPage = () => {
     setCurrentViewDate(date);
   };
 
-  const handleDownloadPriceQuotation = useDownloadPriceQuotation(
+  const handleDownloadPriceQuotation = useDownloadPriceQuotation({
     orderTitle,
     priceQuotationData,
-  );
+  });
 
   const userId = CurrentUser(currentUser!).getId();
   const {
@@ -221,7 +221,7 @@ const OrderDetailPage = () => {
     isRouterReady &&
     ((currentTxIsInitiated &&
       isDraftEditing &&
-      diffDays(currentViewDate, NOW, 'day') > ONE_DAY) ||
+      Number(diffDays(currentViewDate, NOW, 'day')) > ONE_DAY) ||
       isPicking);
 
   const orderDetailsNotChanged =
@@ -439,30 +439,6 @@ const OrderDetailPage = () => {
   );
 
   useEffect(() => {
-    if (shouldShowOverflowError || shouldShowUnderError) {
-      const i = setTimeout(() => {
-        dispatch(OrderManagementsAction.resetOrderDetailValidation());
-        clearTimeout(i);
-      }, 4000);
-    }
-  }, [shouldShowOverflowError, shouldShowUnderError]);
-
-  useEffect(() => {
-    onQuerySubOrderHistoryChanges();
-  }, [onQuerySubOrderHistoryChanges]);
-
-  useEffect(() => {
-    if (draftOrderDetail) {
-      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-      () => {
-        dispatch(OrderManagementsAction.resetDraftSubOrderChangeHistory());
-
-        return dispatch(OrderManagementsAction.resetDraftOrderDetails());
-      };
-    }
-  }, []);
-
-  useEffect(() => {
     if (
       isRouterReady &&
       !isFetchingOrderDetails &&
@@ -512,6 +488,7 @@ const OrderDetailPage = () => {
       }
     }
   }, [isRouterReady, orderState]);
+
   useEffect(() => {
     if (shouldShowOverflowError || shouldShowUnderError) {
       const i = setTimeout(() => {

@@ -11,16 +11,24 @@ const PADDING_TOP = 42; // padding top in pixels
 const PADDING_BOTTOM = 42; // padding bottom in pixels
 
 export const downloadPriceQuotation =
-  (
-    orderTitle: string,
+  ({
+    orderTitle,
+    priceQuotationData,
+    isPartnerQuotation = false,
+  }: {
+    orderTitle: string;
+    isPartnerQuotation?: boolean;
     priceQuotationData: ReturnType<
       typeof usePrepareOrderDetailPageData
-    >['priceQuotationData'],
-  ) =>
+    >['priceQuotationData'];
+  }) =>
   async () => {
     const ele = (
       <TranslationProvider>
-        <PriceQuotation data={priceQuotationData} />
+        <PriceQuotation
+          data={priceQuotationData}
+          isPartnerQuotation={isPartnerQuotation}
+        />
       </TranslationProvider>
     );
     const div = document.createElement('div');

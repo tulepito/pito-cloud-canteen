@@ -101,9 +101,9 @@ const SubOrderSummary: React.FC<TSubOrderSummaryProps> = ({
 
                 const noteComponentMaybe = (
                   <div className={css.foodNoteContainer}>
-                    {notes.map((note: string, noteIdx: number) => (
-                      <div key={noteIdx}>{note}</div>
-                    ))}
+                    {intl.formatMessage({
+                      id: 'SubOrderSummary.hasNote',
+                    })}
                   </div>
                 );
 

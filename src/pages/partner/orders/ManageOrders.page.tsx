@@ -3,6 +3,7 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 import React, { useEffect, useMemo, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
+import { DateTime } from 'luxon';
 import { useRouter } from 'next/router';
 
 import Badge, { EBadgeType } from '@components/Badge/Badge';
@@ -15,11 +16,12 @@ import SubOrderBadge from '@components/SubOrderBadge/SubOrderBadge';
 import type { TColumn } from '@components/Table/Table';
 import { TableForm } from '@components/Table/Table';
 import Tooltip from '@components/Tooltip/Tooltip';
+import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
 import { parseThousandNumber } from '@helpers/format';
 import { calculateSubOrderPrice } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { partnerPaths } from '@src/paths';
-import { findEndDeliveryTime, formatTimestamp } from '@src/utils/dates';
+import { formatTimestamp } from '@src/utils/dates';
 import { EOrderDraftStates, EOrderType } from '@utils/enums';
 import type { TObject, TTableSortValue } from '@utils/types';
 
@@ -105,7 +107,6 @@ const TABLE_COLUMN: TColumn[] = [
     render: ({ transaction = {} }: TObject) => {
       return <SubOrderBadge transaction={transaction} />;
     },
-    sortable: true,
   },
   {
     key: 'isPaid',
@@ -152,10 +153,7 @@ const parseEntitiesToTableData = (subOrders: TObject[]) => {
     });
 
     const subOrderTitle = `${orderTitle}-${dayIndex > 0 ? dayIndex : 7}`;
-
-    const formattedDeliveryHour = `${deliveryHour}-${findEndDeliveryTime(
-      deliveryHour,
-    )}`;
+    const formattedDeliveryHour = `${deliveryHour}`;
 
     return {
       key: subOrderTitle,
@@ -168,7 +166,10 @@ const parseEntitiesToTableData = (subOrders: TObject[]) => {
         orderName: `${companyName}_${formatTimestamp(date)}`,
         staffName,
         startDate: startDate ? formatTimestamp(startDate) : '',
-        time: Number(startDate),
+        time: DateTime.fromMillis(Number(date || 0))
+          .startOf('day')
+          .plus({ ...convertHHmmStringToTimeParts(deliveryHour) })
+          .toMillis(),
         endDate: endDate ? formatTimestamp(endDate) : '',
         state: EOrderDraftStates.pendingApproval,
         deliveryHour: formattedDeliveryHour,
@@ -184,6 +185,9 @@ const sortOrders = ({ columnName, type }: TTableSortValue, data: any) => {
 
   // eslint-disable-next-line array-callback-return
   return data.sort((a: any, b: any) => {
+    if (columnName === 'time') {
+      return isAsc ? a.data.time - b.data.time : b.data.time - a.data.time;
+    }
     if (typeof a.data[columnName] === 'number') {
       return isAsc
         ? a.data[columnName] - b.data[columnName]

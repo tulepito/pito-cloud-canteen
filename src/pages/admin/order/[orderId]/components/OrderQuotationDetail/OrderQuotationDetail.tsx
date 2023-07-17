@@ -129,10 +129,10 @@ const OrderQuotationDetail: React.FC<OrderQuotationDetailProps> = (props) => {
     JSON.stringify(orderDetail),
   ]);
 
-  const handleDownloadPriceQuotation = useDownloadPriceQuotation(
-    Listing(order).getAttributes().title,
-    priceQuotationData as any,
-  );
+  const handleDownloadPriceQuotation = useDownloadPriceQuotation({
+    orderTitle: Listing(order).getAttributes().title,
+    priceQuotationData: priceQuotationData as any,
+  });
 
   return (
     <div className={css.container}>
