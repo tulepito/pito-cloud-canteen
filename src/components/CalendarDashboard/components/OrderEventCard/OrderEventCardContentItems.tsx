@@ -20,8 +20,8 @@ const EventCardContent: React.FC<TEventCardContentProps> = ({
   isFirstHighlight,
 }) => {
   const {
-    deliveryAddress,
     restaurant: restaurantObj,
+    restaurantAddress,
     expiredTime,
     isOrderStarted = false,
   } = event?.resource || {};
@@ -43,7 +43,7 @@ const EventCardContent: React.FC<TEventCardContentProps> = ({
         <FormattedMessage
           id="EventCard.deliveryAddress"
           values={{
-            address: deliveryAddress?.address,
+            address: restaurantAddress,
           }}
         />
       </OrderEventCardContentItem>

@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import type { Event } from 'react-big-calendar';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
@@ -88,11 +88,7 @@ const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
   );
 
   const { reviewId } = subOrderDocument;
-  useEffect(() => {
-    if (isOpen) {
-      dispatch(OrderListThunks.fetchTransactionBySubOrder([transactionId]));
-    }
-  }, [dispatch, isOpen, transactionId]);
+
   const onNavigateToOrderDetail = () => {
     router.push({
       pathname: participantPaths.PlanDetail,
@@ -121,9 +117,12 @@ const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
       },
       orderId,
     };
-    await dispatch(participantOrderManagementThunks.updateOrder(payload));
-    await dispatch(OrderListThunks.updateSubOrder(payload));
-    await dispatch(
+    if (from === 'orderList') {
+      await dispatch(OrderListThunks.updateSubOrder(payload));
+    } else {
+      await dispatch(participantOrderManagementThunks.updateOrder(payload));
+    }
+    dispatch(
       OrderListThunks.addSubOrderDocumentToFirebase({
         participantId: currentUserId,
         planId,

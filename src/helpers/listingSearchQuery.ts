@@ -218,11 +218,21 @@ export const getOrderQuotationsQuery = ({
   return query;
 };
 
-export const getParticipantOrdersQuery = ({ userId }: { userId: string }) => {
+export const getParticipantOrdersQuery = ({
+  userId,
+  startDate,
+  endDate,
+}: {
+  userId: string;
+  startDate: number;
+  endDate: number;
+}) => {
   const query = {
     meta_listingType: ListingTypes.ORDER,
     meta_participants: `has_any:${userId}`,
     meta_orderState: Object.values(EOrderStates).join(','),
+    meta_startDate: `${startDate},`,
+    meta_endDate: `,${endDate}`,
   };
 
   return query;

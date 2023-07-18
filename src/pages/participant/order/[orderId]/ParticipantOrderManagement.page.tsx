@@ -55,8 +55,8 @@ const ParticipantOrderManagement = () => {
     (state) => state.ParticipantOrderManagementPage.plans,
     shallowEqual,
   );
-  const subOrders = useAppSelector(
-    (state) => state.ParticipantOrderManagementPage.subOrders,
+  const restaurants = useAppSelector(
+    (state) => state.ParticipantOrderManagementPage.restaurants,
     shallowEqual,
   );
   const loadDataInProgress = useAppSelector(
@@ -154,7 +154,7 @@ const ParticipantOrderManagement = () => {
         company,
         order,
         plans,
-        subOrders,
+        restaurants,
         currentUser,
         loadDataInProgress,
       },

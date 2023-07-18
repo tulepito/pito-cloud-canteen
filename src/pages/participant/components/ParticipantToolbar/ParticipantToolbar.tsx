@@ -32,6 +32,7 @@ export type TToolbarProps = {
   isAllowChangePeriod?: boolean;
   onChangeDate?: (date: Date) => void;
   date?: Date;
+  onCustomPeriodClick?: (action: string) => void;
 };
 
 const ParticipantToolbar: React.FC<TToolbarProps> = (props) => {
@@ -48,6 +49,7 @@ const ParticipantToolbar: React.FC<TToolbarProps> = (props) => {
     view,
     isAllowChangePeriod = false,
     date,
+    onCustomPeriodClick,
   } = props;
   const intl = useIntl();
   const mountedRef = useRef(false);
@@ -61,6 +63,9 @@ const ParticipantToolbar: React.FC<TToolbarProps> = (props) => {
   const navigateFunc = (action: string) => () => {
     onNavigate(action);
     shouldSetDateRef.current = true;
+    if (typeof onCustomPeriodClick === 'function') {
+      onCustomPeriodClick(action);
+    }
   };
 
   const showPrevBtn =

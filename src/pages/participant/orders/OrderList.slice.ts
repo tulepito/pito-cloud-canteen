@@ -1,6 +1,6 @@
-import type { Event } from 'react-big-calendar';
 import { createSlice } from '@reduxjs/toolkit';
 import flatten from 'lodash/flatten';
+import uniq from 'lodash/uniq';
 import uniqBy from 'lodash/uniqBy';
 
 import type { ParticipantSubOrderAddDocumentApiBody } from '@apis/firebaseApi';
@@ -10,15 +10,20 @@ import {
   participantSubOrderGetByIdApi,
   participantUpdateSeenNotificationApi,
 } from '@apis/firebaseApi';
-import { loadOrderDataApi, updateParticipantOrderApi } from '@apis/index';
+import { updateParticipantOrderApi } from '@apis/index';
 import { participantPostRatingApi } from '@apis/participantApi';
-import { fetchTxApi } from '@apis/txApi';
+import { fetchTxApi, queryTransactionApi } from '@apis/txApi';
 import { disableWalkthroughApi, fetchSearchFilterApi } from '@apis/userApi';
 import { getParticipantOrdersQuery } from '@helpers/listingSearchQuery';
 import { markColorForOrder } from '@helpers/orderHelper';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { userThunks } from '@redux/slices/user.slice';
-import { denormalisedResponseEntities, Listing } from '@src/utils/data';
+import {
+  CurrentUser,
+  denormalisedResponseEntities,
+  Listing,
+} from '@src/utils/data';
+import { getEndOfMonth } from '@src/utils/dates';
 import { convertStringToNumber } from '@src/utils/number';
 import type {
   TKeyValue,
@@ -69,6 +74,7 @@ type TOrderListState = {
   participantFirebaseNotifications: any[];
   fetchParticipantFirebaseNotificationsInProgress: boolean;
   fetchParticipantFirebaseNotificationsError: any;
+  restaurants: TListing[];
 };
 const initialState: TOrderListState = {
   nutritions: [],
@@ -111,6 +117,8 @@ const initialState: TOrderListState = {
   participantFirebaseNotifications: [],
   fetchParticipantFirebaseNotificationsInProgress: false,
   fetchParticipantFirebaseNotificationsError: null,
+
+  restaurants: [],
 };
 
 // ================ Thunk types ================ //
@@ -156,10 +164,42 @@ const disableWalkthrough = createAsyncThunk(
 
 const fetchOrders = createAsyncThunk(
   FETCH_ORDERS,
-  async (userId: string, { extra: sdk }) => {
-    const query = getParticipantOrdersQuery({ userId });
+  async ({ userId, selectedMonth }: TObject, { extra: sdk, getState }) => {
+    const { currentUser } = getState().user;
+    const query = getParticipantOrdersQuery({
+      userId,
+      startDate: selectedMonth.getTime(),
+      endDate: getEndOfMonth(selectedMonth).getTime(),
+    });
     const response = await sdk.listings.query(query);
     const orders = denormalisedResponseEntities(response);
+
+    const allPlansIdList = orders.map((order: TListing) => {
+      const orderListing = Listing(order);
+      const { plans = [] } = orderListing.getMetadata();
+
+      return plans[0];
+    });
+    const allPlans = denormalisedResponseEntities(
+      await sdk.listings.query({
+        ids: allPlansIdList,
+      }),
+    );
+    const allRelatedRestaurantsIdList = uniq(
+      allPlans.map((plan: TListing) => {
+        const planListing = Listing(plan);
+        const { orderDetail = {} } = planListing.getMetadata();
+
+        return Object.values(orderDetail).map(
+          (subOrder: any) => subOrder?.restaurant?.id,
+        );
+      }),
+    );
+    const allRelatedRestaurants = denormalisedResponseEntities(
+      await sdk.listings.query({
+        ids: allRelatedRestaurantsIdList,
+      }),
+    );
     const mappingSubOrderToOrder = orders.reduce(
       (result: any, order: TListing) => {
         const orderListing = Listing(order);
@@ -182,26 +222,22 @@ const fetchOrders = createAsyncThunk(
       },
       {},
     );
-    const allPlansData: Event[] = await Promise.all(
-      orders.map(async (order: TListing) => {
-        const orderListing = Listing(order);
-        const orderId = orderListing.getId();
-        const allOrderData = await loadOrderDataApi(orderId);
-        const { subOrders, plans } = allOrderData.data.data;
-
-        return { subOrders: flatten(subOrders), plans: flatten(plans) };
-      }),
-    );
-    const allSubOrders = allPlansData.map(
-      (planData: any) => planData.subOrders,
-    );
-    const allPlans = allPlansData.map((planData: any) => planData.plans);
+    const currentUserGetter = CurrentUser(currentUser!);
+    const { companyList } = currentUserGetter.getMetadata();
+    const { data: transactions } = await queryTransactionApi({
+      dataParams: {
+        createdAtStart: selectedMonth,
+        createdAtEnd: getEndOfMonth(selectedMonth),
+        companyId: companyList[0],
+      },
+    });
 
     return {
       orders,
-      allSubOrders: flatten(allSubOrders),
       allPlans: flatten(allPlans),
+      restaurants: allRelatedRestaurants,
       mappingSubOrderToOrder,
+      subOrderTxs: transactions,
     };
   },
 );
@@ -414,10 +450,20 @@ const OrderListSlice = createSlice({
       })
       .addCase(fetchOrders.fulfilled, (state, { payload }) => {
         state.fetchOrdersInProgress = false;
-        state.orders = payload.orders;
-        state.allSubOrders = payload.allSubOrders;
-        state.allPlans = payload.allPlans;
-        state.mappingSubOrderToOrder = payload.mappingSubOrderToOrder;
+        state.orders = uniqBy([...state.orders, ...payload.orders], 'id.uuid');
+        state.subOrderTxs = uniqBy(
+          [...state.subOrderTxs, ...payload.subOrderTxs],
+          'id.uuid',
+        );
+        state.restaurants = payload.restaurants;
+        state.allPlans = uniqBy(
+          [...state.allPlans, ...payload.allPlans],
+          'id.uuid',
+        );
+        state.mappingSubOrderToOrder = {
+          ...state.mappingSubOrderToOrder,
+          ...payload.mappingSubOrderToOrder,
+        };
       })
       .addCase(fetchOrders.rejected, (state, { error }) => {
         state.fetchOrdersInProgress = false;

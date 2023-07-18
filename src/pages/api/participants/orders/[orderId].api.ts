@@ -4,6 +4,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HttpMethod } from '@apis/configs';
 import cookies from '@services/cookie';
+import { fetchListing, fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk, getSdk, handleError } from '@services/sdk';
 import {
   CurrentUser,
@@ -66,29 +67,11 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
       try {
         // Get order data
-        const order = denormalisedResponseEntities(
-          await integrationSdk.listings.show({
-            id: orderId,
-          }),
-        )[0];
+        const order = await fetchListing(orderId as string);
 
         // Get company data (user)
         const companyId = order?.attributes.metadata?.companyId || '';
-        const company = denormalisedResponseEntities(
-          await integrationSdk.users.show(
-            {
-              id: companyId,
-              include: ['profileImage'],
-              'fields.image': [
-                'variants.square-small',
-                'variants.square-small2x',
-              ],
-            },
-            {
-              expand: true,
-            },
-          ),
-        )[0];
+        const company = await fetchUser(companyId);
 
         // Get list sub-order (plan)
         const planIds = order?.attributes.metadata?.plans || [];
@@ -136,12 +119,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           await sdk.currentUser.show(),
         )[0];
         const currentUserId = CurrentUser(currentUser).getId();
-        const [orderListing] = denormalisedResponseEntities(
-          await integrationSdk.listings.show({ id: orderId }),
-        );
-        const updatingPlan = denormalisedResponseEntities(
-          await integrationSdk.listings.show({ id: planId }),
-        )[0];
+
+        const orderListing = await fetchListing(orderId as string);
+        const updatingPlan = await fetchListing(planId as string);
 
         const { participants = [], anonymous = [] } =
           Listing(orderListing).getMetadata();
