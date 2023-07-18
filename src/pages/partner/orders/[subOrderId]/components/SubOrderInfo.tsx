@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 
 import { useAppSelector } from '@hooks/reduxHooks';
 import { Listing, User } from '@src/utils/data';
-import { findEndDeliveryTime, formatTimestamp } from '@src/utils/dates';
+import { formatTimestamp } from '@src/utils/dates';
 import type { TListing } from '@src/utils/types';
 
 import css from './SubOrderInfo.module.scss';
@@ -32,9 +32,9 @@ const SubOrderInfo: React.FC<TSubOrderInfoProps> = () => {
     staffName = '',
   } = orderGetter.getMetadata();
   const { companyName } = companyGetter.getPublicData();
-  const formattedDeliveryHour = `${deliveryHour}-${findEndDeliveryTime(
-    deliveryHour,
-  )}, ${formatTimestamp(Number(date))}`;
+  const formattedDeliveryHour = `${deliveryHour}, ${formatTimestamp(
+    Number(date),
+  )}`;
 
   return (
     <div className={css.root}>
