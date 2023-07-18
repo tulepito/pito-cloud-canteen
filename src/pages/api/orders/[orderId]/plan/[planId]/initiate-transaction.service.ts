@@ -116,7 +116,7 @@ export const initiateTransaction = async ({
         planId,
         orderId,
         transition: ETransition.INITIATE_TRANSACTION,
-        date: bookingStart.getTime(),
+        subOrderDate: bookingStart.getTime(),
         subOrderName: `${companyName}_${formatTimestamp(
           bookingStart.getTime(),
         )}`,
