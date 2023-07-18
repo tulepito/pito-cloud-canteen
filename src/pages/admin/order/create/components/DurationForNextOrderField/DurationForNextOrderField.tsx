@@ -31,6 +31,10 @@ const DurationForNextOrderField: React.FC<DurationForNextOrderFieldProps> = (
     }
   };
 
+  const handleParseNumber = (value: string) => {
+    return parseThousandNumber(value);
+  };
+
   return (
     <div className={containerClasses}>
       {title && <div className={css.fieldLabel}>{title}</div>}
@@ -41,7 +45,7 @@ const DurationForNextOrderField: React.FC<DurationForNextOrderFieldProps> = (
           type="text"
           className={css.durationTimeInput}
           placeholder="1"
-          parse={parseThousandNumber}
+          parse={handleParseNumber}
         />
         <div className={css.timeModeBtnWrapper}>
           <Button
