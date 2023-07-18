@@ -40,8 +40,8 @@ const CompanyOrderDetailPage: React.FC<TCompanyOrderDetailPageProps> = () => {
         onDownloadPriceQuotation={handleDownloadPriceQuotation}
         canEditInfo={false}
         reviewViewData={reviewViewData}
-        orderData={orderData as TListing}
         onDownloadReviewOrderResults={onDownloadReviewOrderResults}
+        orderData={orderData as TListing}
       />
     </div>
   );

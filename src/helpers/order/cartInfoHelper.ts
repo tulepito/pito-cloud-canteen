@@ -309,7 +309,7 @@ export const calculatePriceQuotationInfoFromQuotation = ({
   const promotion = 0;
   const totalWithoutVAT =
     totalPrice + serviceFee + transportFee + PITOFee - promotion;
-  const VATFee = Math.round(totalWithoutVAT * currentOrderVATPercentage);
+  const VATFee = Math.round(totalWithoutVAT * currentOrderVATPercentage || 0);
   const totalWithVAT = VATFee + totalWithoutVAT;
   const overflow = isOverflowPackage
     ? totalWithVAT - totalDishes * packagePerMember

@@ -152,6 +152,7 @@
   }
 
   @include viewportMedium {
+    left: 0;
     width: 100%;
     position: absolute;
     padding: 16px 0;

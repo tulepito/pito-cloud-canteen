@@ -49,9 +49,9 @@ const ReviewView: React.FC<TReviewViewProps> = (props) => {
     onSubmitEdit,
     onDownloadPriceQuotation,
     classes = {},
-    orderData,
     onSaveOrderNote,
     onDownloadReviewOrderResults,
+    orderData,
   } = props;
   const dispatch = useAppDispatch();
   const { leftClassName, rightClassName } = classes;
