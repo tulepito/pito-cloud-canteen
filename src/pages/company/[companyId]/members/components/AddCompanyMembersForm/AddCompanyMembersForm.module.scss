@@ -37,6 +37,12 @@
       margin-right: 12px;
     }
 
+    .avatar {
+      width: 28px;
+      height: 28px;
+      margin-right: 12px;
+    }
+
     .fullRowEmail {
       @include text(14px);
       color: $neutralGray6;
