@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 import isEmpty from 'lodash/isEmpty';
+import uniqBy from 'lodash/uniqBy';
 import { useRouter } from 'next/router';
 
 import Button from '@components/Button/Button';
@@ -117,8 +118,9 @@ const PartnerSubOrderDetailPage: React.FC<
       })
     : [{}];
   const { foodDataList: oldFoodList = [] } = oldOrderDataMaybe || {};
-  const foodList: TObject[] = Array.from(
-    new Set(currentFoodList.concat(oldFoodList)),
+  const foodList: TObject[] = uniqBy(
+    currentFoodList.concat(oldFoodList),
+    'foodId',
   );
 
   const handleChangeViewMode =
