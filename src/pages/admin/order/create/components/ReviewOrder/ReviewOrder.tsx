@@ -94,7 +94,6 @@ export const ReviewContent: React.FC<any> = (props) => {
   const {
     timeStamp,
     restaurant,
-    notes = {},
     deliveryManInfo = {},
     updatePlanDetail,
     foodOrder = {},
@@ -132,6 +131,8 @@ export const ReviewContent: React.FC<any> = (props) => {
     setCurrDeliveryManPhoneNumber(deliveryManPhoneNumber);
   }, [deliveryManPhoneNumber]);
 
+  const { note } = orderDetail?.[timeStamp] || {};
+
   const participantData = useAppSelector(
     (state) => state.OrderDetail.participantData,
   );
@@ -168,7 +169,7 @@ export const ReviewContent: React.FC<any> = (props) => {
     orderState,
     orderNote,
   } = Listing(order as TListing).getMetadata();
-  const { restaurantName, phoneNumber, foodList = {}, id } = restaurant || {};
+  const { restaurantName, phoneNumber, foodList = {} } = restaurant || {};
   const isInProgressOrder = orderState === EOrderStates.inProgress;
   const isCancelOrder = [
     EOrderStates.canceled,
@@ -383,13 +384,13 @@ export const ReviewContent: React.FC<any> = (props) => {
           </RenderWhen.False>
         </RenderWhen>
       </Collapsible>
-      {(orderNote || notes?.[id]) && (
+      {(orderNote || note) && (
         <Collapsible
           label={intl.formatMessage({
             id: 'ReviewOrder.note',
           })}>
           <div className={classNames(css.contentBox, css.spaceStart)}>
-            {orderNote || notes?.[id]}
+            {orderNote || note}
           </div>
         </Collapsible>
       )}
