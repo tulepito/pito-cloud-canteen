@@ -66,12 +66,12 @@ const TABLE_COLUMN: TColumn[] = [
     key: 'time',
     label: 'Thời gian',
     render: (data: any) => {
-      const { startDate, endDate, deliveryHour } = data;
+      const { date, deliveryHour } = data;
 
-      return startDate && endDate ? (
+      return date ? (
         <div className={css.rowText}>
           <div className={css.deliveryHour}>{deliveryHour}</div>
-          {data.startDate} - {data.endDate}
+          {formatTimestamp(Number(date))}
         </div>
       ) : (
         <></>
