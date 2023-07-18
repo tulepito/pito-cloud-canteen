@@ -94,8 +94,8 @@ export const formatPriceQuotationData = ({
   booker: TUser;
   order: TListing;
   priceQuotation: TObject;
-  quotation?: TListing;
   currentOrderVATPercentage: number;
+  quotation?: TListing;
 }) => {
   const {
     orderTitle,

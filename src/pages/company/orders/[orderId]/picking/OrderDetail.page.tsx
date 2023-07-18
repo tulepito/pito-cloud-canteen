@@ -2,6 +2,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useCallback, useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
+import Skeleton from 'react-loading-skeleton';
 import classNames from 'classnames';
 import { isEqual } from 'lodash';
 import isEmpty from 'lodash/isEmpty';
@@ -221,7 +222,7 @@ const OrderDetailPage = () => {
     isRouterReady &&
     ((currentTxIsInitiated &&
       isDraftEditing &&
-      Number(diffDays(currentViewDate, NOW, 'day')) > ONE_DAY) ||
+      Number(diffDays(currentViewDate, NOW, 'day').days) >= ONE_DAY) ||
       isPicking);
 
   const orderDetailsNotChanged =
@@ -308,6 +309,7 @@ const OrderDetailPage = () => {
               />
             )}
           </div>
+
           <RenderWhen.False>
             <div
               className={
@@ -354,45 +356,8 @@ const OrderDetailPage = () => {
           </RenderWhen.False>
         </RenderWhen>
         <RenderWhen.False>
-          <div
-            className={
-              isDraftEditing
-                ? css.lineItemsTableWithSubOrderSection
-                : css.lineItemsTable
-            }>
-            <ManageLineItemsSection
-              isDraftEditing={isDraftEditing}
-              ableToUpdateOrder={ableToUpdateOrder}
-              shouldShowOverflowError={shouldShowOverflowError}
-              shouldShowUnderError={shouldShowUnderError}
-              setCurrentViewDate={handleSetCurrentViewDate}
-              currentViewDate={currentViewDate}
-              minQuantity={minQuantity}
-            />
-            {isDraftEditing && (
-              <SubOrderChangesHistorySection
-                className={classNames(
-                  css.container,
-                  css.normalOrderSubOrderSection,
-                )}
-                querySubOrderChangesHistoryInProgress={
-                  querySubOrderChangesHistoryInProgress
-                }
-                subOrderChangesHistory={subOrderChangesHistory}
-                draftSubOrderChangesHistory={
-                  draftSubOrderChangesHistory[
-                    currentViewDate as unknown as keyof typeof draftSubOrderChangesHistory
-                  ]
-                }
-                onQueryMoreSubOrderChangesHistory={
-                  onQueryMoreSubOrderChangesHistory
-                }
-                subOrderChangesHistoryTotalItems={
-                  subOrderChangesHistoryTotalItems
-                }
-                loadMoreSubOrderChangesHistory={loadMoreSubOrderChangesHistory}
-              />
-            )}
+          <div className={css.loadingContainer}>
+            <Skeleton className={css.loadingContent} />
           </div>
         </RenderWhen.False>
       </RenderWhen>
@@ -432,9 +397,9 @@ const OrderDetailPage = () => {
       onDownloadPriceQuotation={handleDownloadPriceQuotation}
       onGoBackToEditOrderPage={handleGoBackFromReviewMode}
       showStartPickingOrderButton
-      orderData={orderData as TListing}
       onSaveOrderNote={onSaveOrderNote}
       onDownloadReviewOrderResults={onDownloadReviewOrderResults}
+      orderData={orderData as TListing}
     />
   );
 
