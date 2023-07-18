@@ -222,7 +222,7 @@ const OrderDetailPage = () => {
     isRouterReady &&
     ((currentTxIsInitiated &&
       isDraftEditing &&
-      diffDays(currentViewDate, NOW, 'day') > ONE_DAY) ||
+      Number(diffDays(currentViewDate, NOW, 'day').days) >= ONE_DAY) ||
       isPicking);
 
   const orderDetailsNotChanged =
