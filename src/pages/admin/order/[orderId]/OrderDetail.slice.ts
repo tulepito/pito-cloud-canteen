@@ -198,7 +198,7 @@ const transit = createAsyncThunk(
     const { tx } = response;
     const txGetter = Transaction(tx as TTransaction);
     const { booking, provider } = txGetter.getFullData();
-    const { displayStart, start } = booking.attributes;
+    const { displayStart } = booking.attributes;
     const { lastTransition } = txGetter.getAttributes();
     const { planId, participantIds = [], orderId } = txGetter.getMetadata();
     const timestamp = new Date(displayStart).getTime();
@@ -222,6 +222,15 @@ const transit = createAsyncThunk(
         }),
       );
     }
+    console.debug('💫 > file: OrderDetail.slice.ts:231 > ', {
+      userId: User(provider).getId(),
+      orderId,
+      planId,
+      subOrderDate: DateTime.fromISO(displayStart).startOf('day').toMillis(),
+      companyName,
+      transition,
+    });
+
     createNotificationApi({
       notifications: [
         {
@@ -230,7 +239,9 @@ const transit = createAsyncThunk(
             userId: User(provider).getId(),
             orderId,
             planId,
-            subOrderDate: DateTime.fromISO(start).startOf('day').toMillis(),
+            subOrderDate: DateTime.fromISO(displayStart)
+              .startOf('day')
+              .toMillis(),
             companyName,
             transition,
           } as NotificationInvitationParams,
