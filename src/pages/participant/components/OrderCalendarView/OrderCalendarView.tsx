@@ -107,6 +107,7 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
         key: foodId,
         value: foodList[foodId].foodName,
       }));
+
       const foodSelection =
         orderDetail[planItemKey].memberOrders[currentUserId] || {};
 
@@ -146,6 +147,7 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
           transactionId,
           planId: currentPlanListing.getId(),
           orderState,
+          companyName,
         },
         title: orderTitle,
         start: DateTime.fromMillis(+planItemKey).toJSDate(),

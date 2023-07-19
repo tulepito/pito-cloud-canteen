@@ -8,5 +8,8 @@ export const parseThousandNumber = (
   value: string | number,
   separator = ',',
 ) => {
-  return addCommas(removeNonNumeric(value.toString()), separator);
+  return addCommas(
+    removeNonNumeric(value !== null ? value.toString() : '0'),
+    separator,
+  );
 };

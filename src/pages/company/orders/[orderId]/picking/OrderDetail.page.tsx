@@ -500,6 +500,30 @@ const OrderDetailPage = () => {
     }
   }, []);
 
+  useEffect(() => {
+    if (shouldShowOverflowError || shouldShowUnderError) {
+      const i = setTimeout(() => {
+        dispatch(OrderManagementsAction.resetOrderDetailValidation());
+        clearTimeout(i);
+      }, 4000);
+    }
+  }, [shouldShowOverflowError, shouldShowUnderError]);
+
+  useEffect(() => {
+    onQuerySubOrderHistoryChanges();
+  }, [onQuerySubOrderHistoryChanges]);
+
+  useEffect(() => {
+    if (draftOrderDetail) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      () => {
+        dispatch(OrderManagementsAction.resetDraftSubOrderChangeHistory());
+
+        return dispatch(OrderManagementsAction.resetDraftOrderDetails());
+      };
+    }
+  }, []);
+
   switch (viewMode) {
     case EPageViewMode.priceQuotation:
       return <PriceQuotation data={priceQuotationData} />;

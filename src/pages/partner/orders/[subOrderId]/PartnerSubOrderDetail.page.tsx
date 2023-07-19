@@ -1,5 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable import/no-cycle */
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 import isEmpty from 'lodash/isEmpty';
@@ -191,7 +191,7 @@ const PartnerSubOrderDetailPage: React.FC<
             isOpen={!fetchOrderInProgress && updateOrderModalContainer.value}
             handleClose={handleCloseModal}
             className={css.updatedOrderModal}
-            modalHeaderClassName={css.updatedOrderModalHeader}
+            headerClassName={css.updatedOrderModalHeader}
             containerClassName={css.updatedOrderModalContainer}>
             <div>
               <div className={css.title}>

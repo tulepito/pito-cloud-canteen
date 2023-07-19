@@ -131,6 +131,8 @@ export const ReviewContent: React.FC<any> = (props) => {
     setCurrDeliveryManPhoneNumber(deliveryManPhoneNumber);
   }, [deliveryManPhoneNumber]);
 
+  const { note } = orderDetail?.[timeStamp] || {};
+
   const participantData = useAppSelector(
     (state) => state.OrderDetail.participantData,
   );

@@ -221,29 +221,3 @@
     @include textTemplate(18px, 700, 4/3);
   }
 }
-
-.container {
-  padding: 16px;
-  border-radius: 16px;
-
-  background-color: $neutralGray1;
-  outline: 1px solid $neutralGray4;
-  outline-offset: -1px;
-
-  & > div:first-of-type {
-    @include textTemplate(18px, 700, 4/3);
-  }
-}
-
-.container {
-  padding: 16px;
-  border-radius: 16px;
-
-  background-color: $neutralGray1;
-  outline: 1px solid $neutralGray4;
-  outline-offset: -1px;
-
-  & > div:first-of-type {
-    @include textTemplate(18px, 700, 4/3);
-  }
-}

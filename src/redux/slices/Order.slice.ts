@@ -148,6 +148,7 @@ type TOrderInitialState = {
   allOrders: TListing[];
   queryAllOrdersInProgress: boolean;
   queryAllOrdersError: any;
+  currentOrderVATPercentage: number;
 };
 
 const initialState: TOrderInitialState = {
@@ -245,6 +246,7 @@ const initialState: TOrderInitialState = {
   allOrders: [],
   queryAllOrdersInProgress: false,
   queryAllOrdersError: null,
+  currentOrderVATPercentage: config.VATPercentage,
 };
 
 const CREATE_ORDER = 'app/Order/CREATE_ORDER';

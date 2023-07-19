@@ -50,7 +50,7 @@ const OrderQuotationDetail: React.FC<OrderQuotationDetailProps> = (props) => {
   );
   const partnerServiceFee =
     Listing(order).getMetadata()?.serviceFees?.[currentPartnerId!];
-  const { packagePerMember = 0 } = Listing(order).getMetadata() || {};
+  const { packagePerMember = 0 } = Listing(order).getMetadata();
 
   const priceQuotation = isPartner
     ? calculatePriceQuotationPartner({

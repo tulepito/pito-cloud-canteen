@@ -15,6 +15,7 @@ import { getOrderQuotationsQuery } from '@helpers/listingSearchQuery';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { OrderManagementsAction } from '@redux/slices/OrderManagement.slice';
 import { SystemAttributesThunks } from '@redux/slices/systemAttributes.slice';
+import type { NotificationInvitationParams } from '@services/notifications';
 import {
   denormalisedResponseEntities,
   Listing,

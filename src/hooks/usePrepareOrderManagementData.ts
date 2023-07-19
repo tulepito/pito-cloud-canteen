@@ -25,10 +25,12 @@ export const usePrepareOrderDetailPageData = ({
   date,
   VATPercentage,
   serviceFeePercentage,
+  partnerId,
 }: {
   date?: string | number;
   VATPercentage?: number;
   serviceFeePercentage?: number;
+  partnerId?: string;
 }) => {
   const router = useRouter();
   const [reviewInfoValues, setReviewInfoValues] =
@@ -141,6 +143,7 @@ export const usePrepareOrderDetailPageData = ({
     () =>
       groupFoodOrderByDateFromQuotation({
         quotation: quotation as TListing,
+        date,
       }),
     [JSON.stringify(quotation)],
   );
@@ -163,9 +166,10 @@ export const usePrepareOrderDetailPageData = ({
       calculatePriceQuotationInfo({
         planOrderDetail: orderDetail,
         order: orderData as TObject,
-        currentOrderVATPercentage: !isEmpty(VATPercentage)
+        currentOrderVATPercentage: VATPercentage!
           ? VATPercentage!
           : currentOrderVATPercentage,
+        currentOrderServiceFeePercentage: serviceFeePercentage,
         date,
         shouldIncludePITOFee: isEmpty(date),
       }),
@@ -176,7 +180,11 @@ export const usePrepareOrderDetailPageData = ({
       calculatePriceQuotationInfo({
         planOrderDetail: draftOrderDetail,
         order: orderData as TObject,
-        currentOrderVATPercentage,
+        date,
+        currentOrderVATPercentage: VATPercentage!
+          ? VATPercentage!
+          : currentOrderVATPercentage,
+        currentOrderServiceFeePercentage: serviceFeePercentage,
       }),
     [orderData, draftOrderDetail, currentOrderVATPercentage],
   );
@@ -186,9 +194,14 @@ export const usePrepareOrderDetailPageData = ({
       calculatePriceQuotationInfoFromQuotation({
         quotation: quotation as TListing,
         packagePerMember,
-        currentOrderVATPercentage,
+        currentOrderVATPercentage: VATPercentage!
+          ? VATPercentage!
+          : currentOrderVATPercentage,
+        currentOrderServiceFeePercentage: serviceFeePercentage,
+        date,
+        partnerId,
       }),
-    [packagePerMember, quotation],
+    [packagePerMember, JSON.stringify(quotation)],
   );
 
   const {

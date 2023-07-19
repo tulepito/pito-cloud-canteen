@@ -1,4 +1,5 @@
-import React from 'react';
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, { useEffect } from 'react';
 import { useIntl } from 'react-intl';
 import classNames from 'classnames';
 import { useRouter } from 'next/router';
@@ -7,9 +8,10 @@ import Badge from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
 import { parseThousandNumber } from '@helpers/format';
 import { calculatePriceQuotationInfo } from '@helpers/order/cartInfoHelper';
-import { useAppSelector } from '@hooks/reduxHooks';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { useDownloadPriceQuotation } from '@hooks/useDownloadPriceQuotation';
 import { usePrepareOrderDetailPageData } from '@hooks/usePrepareOrderManagementData';
+import { orderManagementThunks } from '@redux/slices/OrderManagement.slice';
 import { CurrentUser, Listing } from '@src/utils/data';
 import type { TListing } from '@utils/types';
 
@@ -23,7 +25,7 @@ type TSubOrderCartProps = {
 
 const SubOrderCart: React.FC<TSubOrderCartProps> = (props) => {
   const { className, title } = props;
-
+  const dispatch = useAppDispatch();
   const intl = useIntl();
   const router = useRouter();
   const order = useAppSelector((state) => state.PartnerSubOrderDetail.order);
@@ -43,8 +45,11 @@ const SubOrderCart: React.FC<TSubOrderCartProps> = (props) => {
 
   const orderGetter = Listing(order as TListing);
   const planGetter = Listing(plan as TListing);
-  const { orderVATPercentage = 0, serviceFees: serviceFeePercentageMap = {} } =
-    orderGetter.getMetadata();
+  const {
+    orderVATPercentage = 0,
+    serviceFees: serviceFeePercentageMap = {},
+    quotationId,
+  } = orderGetter.getMetadata();
   const { orderDetail: planOrderDetail = {} } = planGetter.getMetadata();
   const serviceFeePercentage =
     serviceFeePercentageMap[restaurantListingId] || 0;
@@ -67,10 +72,10 @@ const SubOrderCart: React.FC<TSubOrderCartProps> = (props) => {
 
   const { orderTitle, priceQuotationData } = usePrepareOrderDetailPageData({
     date,
+    partnerId: restaurantListingId,
     VATPercentage: orderVATPercentage,
     serviceFeePercentage: serviceFeePercentage / 100,
   });
-
   const handleDownloadPriceQuotation = useDownloadPriceQuotation({
     orderTitle,
     priceQuotationData,
@@ -81,6 +86,12 @@ const SubOrderCart: React.FC<TSubOrderCartProps> = (props) => {
   const downloadPriceQuotationClasses = classNames(css.downloadPriceQuotation, {
     [css.downloadingPriceQuotation]: isDownloadingPriceQuotation,
   });
+
+  useEffect(() => {
+    if (quotationId) {
+      dispatch(orderManagementThunks.fetchQuotation(quotationId));
+    }
+  }, [quotationId]);
 
   return (
     <div className={rootClasses}>

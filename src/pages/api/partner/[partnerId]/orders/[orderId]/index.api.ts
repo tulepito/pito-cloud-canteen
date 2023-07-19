@@ -13,6 +13,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     const { orderId, JSONParams } = req.query;
     const { date } = JSON.parse(JSONParams as string);
     const apiMethod = req.method;
+
     const integrationSdk = getIntegrationSdk();
 
     if (isEmpty(date) || isEmpty(orderId)) {

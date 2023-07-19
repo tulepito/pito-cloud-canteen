@@ -110,6 +110,8 @@
 
 .requirementSection {
   padding: 12px 0 24px;
+  margin-bottom: 90px;
+
   display: flex;
   flex-direction: column;
   row-gap: 8px;
@@ -122,7 +124,6 @@
 
 .modalContent {
   overflow: scroll;
-
   @include viewportMedium {
     max-height: min(700px, 70vh);
 
@@ -140,19 +141,21 @@
   z-index: 2;
   left: 0;
   width: 100vw;
-  margin: 0 0 40px 0;
   background-color: $neutralGray1;
   display: flex;
   justify-content: flex-end;
+  padding: 16px;
 
   .selectFoodBtn {
     width: 150px;
+    float: right;
   }
 
   @include viewportMedium {
-    position: relative;
     left: 0;
     width: 100%;
+    position: absolute;
+    padding: 16px 0;
   }
 }
 
