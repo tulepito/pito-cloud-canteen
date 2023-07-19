@@ -24,12 +24,9 @@
 .coverWrapper {
   .cover {
     width: 100%;
-    height: auto;
+    height: 266px;
     border-radius: 8px;
-
-    @include viewportMedium {
-      height: 266px;
-    }
+    object-fit: cover;
   }
 }
 

@@ -231,8 +231,7 @@ export const getParticipantOrdersQuery = ({
     meta_listingType: ListingTypes.ORDER,
     meta_participants: `has_any:${userId}`,
     meta_orderState: Object.values(EOrderStates).join(','),
-    meta_startDate: `${startDate},`,
-    meta_endDate: `,${endDate}`,
+    meta_startDate: `${startDate},${endDate + 1}`,
   };
 
   return query;
