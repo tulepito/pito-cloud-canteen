@@ -1,11 +1,19 @@
+@use '/src/styles/customMediaQueries.scss' as *;
+
 .notifications {
   margin-top: 12px;
 
-  max-height: 60vh;
-  max-height: 80dvh;
-  overflow-y: auto;
+  @include viewportLarge {
+    max-height: 60vh;
+    max-height: 80dvh;
+    overflow-y: auto;
 
-  &::-webkit-scrollbar {
-    display: none;
+    &::-webkit-scrollbar {
+      display: none;
+    }
   }
+}
+
+.modalContainer.modalContainer {
+  z-index: 201;
 }
