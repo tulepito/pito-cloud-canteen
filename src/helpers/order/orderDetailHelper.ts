@@ -283,8 +283,10 @@ export const groupPickingOrderByFood = ({
 
 export const groupFoodOrderByDateFromQuotation = ({
   quotation,
+  date: dateFromParams,
 }: {
   quotation: TListing;
+  date?: string | number;
 }) => {
   const quotationListingGetter = Listing(quotation);
   const { client, partner } = quotationListingGetter.getMetadata();
@@ -292,38 +294,44 @@ export const groupFoodOrderByDateFromQuotation = ({
     return [];
   }
 
-  const result = Object.keys(client.quotation).map(
-    (subOrderDate: string, index: number) => {
+  const result = Object.keys(client.quotation).reduce(
+    (res: TObject[], subOrderDate: string, index: number) => {
+      if (dateFromParams && dateFromParams !== subOrderDate) {
+        return res;
+      }
       const restaurant = Object.keys(partner).find((restaurantId: string) => {
         return Object.keys(partner[restaurantId].quotation).some(
           (date: string) => date === subOrderDate,
         );
       });
 
-      return {
-        date: subOrderDate,
-        restaurantId: Object.keys(partner[restaurant!])[0],
-        restaurantName: partner[restaurant!].name,
-        index,
-        totalDishes: client.quotation[subOrderDate].reduce(
-          (previousResult: number, current: TObject) => {
-            const { frequency } = current;
+      return res.concat([
+        {
+          date: subOrderDate,
+          restaurantId: Object.keys(partner[restaurant!])[0],
+          restaurantName: partner[restaurant!].name,
+          index: dateFromParams ? 1 : index,
+          totalDishes: client.quotation[subOrderDate].reduce(
+            (previousResult: number, current: TObject) => {
+              const { frequency } = current;
 
-            return previousResult + frequency;
-          },
-          0,
-        ),
-        foodDataList: client.quotation[subOrderDate],
-        totalPrice: client.quotation[subOrderDate].reduce(
-          (previousResult: number, current: TObject) => {
-            const { foodPrice, frequency } = current;
+              return previousResult + frequency;
+            },
+            0,
+          ),
+          foodDataList: client.quotation[subOrderDate],
+          totalPrice: client.quotation[subOrderDate].reduce(
+            (previousResult: number, current: TObject) => {
+              const { foodPrice, frequency } = current;
 
-            return previousResult + foodPrice * frequency;
-          },
-          0,
-        ),
-      };
+              return previousResult + foodPrice * frequency;
+            },
+            0,
+          ),
+        },
+      ]);
     },
+    [],
   );
 
   return result;

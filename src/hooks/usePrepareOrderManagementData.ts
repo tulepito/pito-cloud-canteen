@@ -25,10 +25,12 @@ export const usePrepareOrderDetailPageData = ({
   date,
   VATPercentage,
   serviceFeePercentage,
+  partnerId,
 }: {
   date?: string | number;
   VATPercentage?: number;
   serviceFeePercentage?: number;
+  partnerId?: string;
 }) => {
   const router = useRouter();
   const [reviewInfoValues, setReviewInfoValues] =
@@ -141,6 +143,7 @@ export const usePrepareOrderDetailPageData = ({
     () =>
       groupFoodOrderByDateFromQuotation({
         quotation: quotation as TListing,
+        date,
       }),
     [JSON.stringify(quotation)],
   );
@@ -177,6 +180,7 @@ export const usePrepareOrderDetailPageData = ({
       calculatePriceQuotationInfo({
         planOrderDetail: draftOrderDetail,
         order: orderData as TObject,
+        date,
         currentOrderVATPercentage: VATPercentage!
           ? VATPercentage!
           : currentOrderVATPercentage,
@@ -193,8 +197,11 @@ export const usePrepareOrderDetailPageData = ({
         currentOrderVATPercentage: VATPercentage!
           ? VATPercentage!
           : currentOrderVATPercentage,
+        currentOrderServiceFeePercentage: serviceFeePercentage,
+        date,
+        partnerId,
       }),
-    [packagePerMember, quotation],
+    [packagePerMember, JSON.stringify(quotation)],
   );
 
   const {
