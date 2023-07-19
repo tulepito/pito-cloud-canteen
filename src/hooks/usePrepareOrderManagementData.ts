@@ -22,6 +22,7 @@ export const usePrepareOrderDetailPageData = ({
   date?: string | number;
   VATPercentage?: number;
   serviceFeePercentage?: number;
+  partnerId?: string;
 }) => {
   const router = useRouter();
   const [reviewInfoValues, setReviewInfoValues] =

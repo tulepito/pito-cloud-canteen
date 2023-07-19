@@ -1,3 +1,6 @@
+import isEmpty from 'lodash/isEmpty';
+import pick from 'lodash/pick';
+
 import {
   getFoodDataMap,
   getPCCFeeByMemberAmount,
@@ -244,5 +247,105 @@ export const calculatePriceQuotationPartner = ({
     totalWithoutVAT,
     totalWithVAT,
     promotion,
+  };
+};
+
+export const calculatePriceQuotationInfoFromQuotation = ({
+  quotation,
+  packagePerMember,
+  currentOrderVATPercentage,
+  currentOrderServiceFeePercentage = 0,
+  date,
+  partnerId,
+}: {
+  quotation: TListing;
+  packagePerMember: number;
+  currentOrderVATPercentage: number;
+  currentOrderServiceFeePercentage?: number;
+  date?: number | string;
+  partnerId?: string;
+}) => {
+  const quotationListingGetter = Listing(quotation);
+  const { client, partner } = quotationListingGetter.getMetadata();
+  if (isEmpty(client) || isEmpty(partner)) {
+    return {};
+  }
+
+  const isPartnerFlow = date && partnerId;
+
+  const clientQuotation = client.quotation;
+  const partnerQuotation = isPartnerFlow
+    ? pick(partner[partnerId].quotation, date)
+    : {};
+
+  const {
+    totalPrice = 0,
+    totalDishes = 0,
+    PITOFee = 0,
+  }: any = Object.values(
+    isPartnerFlow ? partnerQuotation : clientQuotation,
+  ).reduce(
+    (result: any, subOrder: any) => {
+      const { subOrderTotalPrice, subOrderTotalDished } = subOrder.reduce(
+        (subOrderResult: any, item: any) => {
+          const { foodPrice, frequency } = item;
+
+          return {
+            subOrderTotalPrice:
+              subOrderResult.subOrderTotalPrice + foodPrice * frequency,
+            subOrderTotalDished: subOrderResult.subOrderTotalDished + frequency,
+          };
+        },
+        {
+          subOrderTotalPrice: 0,
+          subOrderTotalDished: 0,
+        },
+      );
+
+      const subOrderPITOFee = isPartnerFlow
+        ? 0
+        : getPCCFeeByMemberAmount(subOrderTotalDished);
+
+      return {
+        totalPrice: result.totalPrice + subOrderTotalPrice,
+        totalDishes: result.totalDishes + subOrderTotalDished,
+        PITOFee: result.PITOFee + subOrderPITOFee,
+      };
+    },
+    {
+      totalPrice: 0,
+      totalDishes: 0,
+      PITOFee: 0,
+    },
+  );
+
+  const PITOPoints = Math.floor(totalPrice / 100000);
+  const isOverflowPackage = totalDishes * packagePerMember < totalPrice;
+  const serviceFee = isPartnerFlow
+    ? currentOrderServiceFeePercentage * totalPrice
+    : 0;
+  const transportFee = 0;
+  const promotion = 0;
+  const totalWithoutVAT =
+    totalPrice - serviceFee + transportFee + PITOFee - promotion;
+  const VATFee = Math.round(totalWithoutVAT * currentOrderVATPercentage || 0);
+  const totalWithVAT = VATFee + totalWithoutVAT;
+  const overflow = isOverflowPackage
+    ? totalWithVAT - totalDishes * packagePerMember
+    : 0;
+
+  return {
+    totalPrice,
+    totalDishes,
+    PITOPoints,
+    VATFee,
+    totalWithVAT,
+    serviceFee,
+    transportFee,
+    promotion,
+    overflow,
+    isOverflowPackage,
+    totalWithoutVAT,
+    PITOFee,
   };
 };
