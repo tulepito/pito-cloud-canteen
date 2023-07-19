@@ -1,7 +1,6 @@
 import { parseThousandNumber } from '@helpers/format';
 import { calculatePriceQuotationInfo } from '@helpers/order/cartInfoHelper';
 
-import { formatTimestamp } from '../dates';
 import type { TObject } from '../types';
 
 const BASE_URL = process.env.NEXT_PUBLIC_CANONICAL_URL;
@@ -11,7 +10,8 @@ type PartnerNewOrderAppearParams = {
   orderListing: any;
   planListing: any;
   restaurantListing: any;
-  subOrderDate: string;
+  subOrderDate: number | string;
+  formattedSubOrderDate: string;
 };
 
 export const partnerOrderDetailsUpdatedSubject = (subOrderDate: string) =>
@@ -23,6 +23,7 @@ const partnerOrderDetailsUpdated = ({
   restaurantListing,
   planListing,
   subOrderDate,
+  formattedSubOrderDate,
 }: PartnerNewOrderAppearParams) => {
   const orderId = orderListing.getId();
   const { title: orderTitle } = orderListing.getAttributes();
@@ -31,7 +32,7 @@ const partnerOrderDetailsUpdated = ({
   const { orderDetail: planOrderDetail } = planListing.getMetadata();
   const { staffName, orderVATPercentage = 0 } = orderListing.getMetadata();
   const { companyName } = companyUser.getPublicData();
-  const formattedDate = formatTimestamp(Number(subOrderDate || 0));
+  const formattedDate = formattedSubOrderDate;
 
   const dayIndex = new Date(Number(subOrderDate)).getDay();
   const subOrderTitle = `${orderTitle}-${dayIndex > 0 ? dayIndex : 7}`;
