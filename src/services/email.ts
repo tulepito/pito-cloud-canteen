@@ -484,15 +484,16 @@ export const emailSendingFactory = async (
         });
         const { partnerUser } = emailDataSource;
         const { email: partnerEmail } = partnerUser?.getAttributes() || {};
-
+        const formattedSubOrderDate = formatTimestamp(Number(subOrderDate));
         const emailTemplate = partnerOrderDetailsUpdated({
           ...emailDataSource,
           subOrderDate,
-          formattedSubOrderDate: formatTimestamp(subOrderDate),
+          formattedSubOrderDate,
         });
+
         const emailDataParams = {
           receiver: [partnerEmail],
-          subject: partnerOrderDetailsUpdatedSubject(subOrderDate),
+          subject: partnerOrderDetailsUpdatedSubject(formattedSubOrderDate),
           content: emailTemplate as string,
           sender: systemSenderEmail as string,
         };

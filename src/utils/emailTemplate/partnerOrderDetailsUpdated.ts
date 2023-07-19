@@ -32,7 +32,6 @@ const partnerOrderDetailsUpdated = ({
   const { orderDetail: planOrderDetail } = planListing.getMetadata();
   const { staffName, orderVATPercentage = 0 } = orderListing.getMetadata();
   const { companyName } = companyUser.getPublicData();
-  const formattedDate = formattedSubOrderDate;
 
   const dayIndex = new Date(Number(subOrderDate)).getDay();
   const subOrderTitle = `${orderTitle}-${dayIndex > 0 ? dayIndex : 7}`;
@@ -43,7 +42,6 @@ const partnerOrderDetailsUpdated = ({
       order: orderListing.getFullData() as TObject,
       currentOrderVATPercentage: orderVATPercentage,
     });
-
   const orderUrl = `${BASE_URL}/partner/orders/${orderId}_${subOrderDate}`;
 
   return `
@@ -665,7 +663,7 @@ const partnerOrderDetailsUpdated = ({
                                         font-weight: bold;
                                         color: #333333;
                                       ">
-                                      Ngày ăn ${subOrderDate}&nbsp;có sự thay
+                                      Ngày ăn ${formattedSubOrderDate}&nbsp;có sự thay
                                       đổi
                                     </h1>
                                   </td>
@@ -710,7 +708,7 @@ const partnerOrderDetailsUpdated = ({
                                         font-size: 14px;
                                       ">
                                       Ngày ăn
-                                      <strong>${subOrderDate}</strong> đã có sự
+                                      <strong>${formattedSubOrderDate}</strong> đã có sự
                                       thay đổi về số lượng món. Đối tác vui lòng
                                       cập nhật lại thông tin để chuẩn bị đơn
                                       hàng tốt hơn.
@@ -1028,7 +1026,7 @@ const partnerOrderDetailsUpdated = ({
                                         color: #333333;
                                         font-size: 14px;
                                       ">
-                                      <strong>${formattedDate}</strong>
+                                      <strong>${formattedSubOrderDate}</strong>
                                     </p>
                                   </td>
                                 </tr>
@@ -1419,6 +1417,7 @@ const partnerOrderDetailsUpdated = ({
                                             "
                                             >${parseThousandNumber(
                                               totalPrice || 0,
+                                              '.',
                                             )}đ</a
                                           >
                                         </td>
@@ -1553,6 +1552,7 @@ const partnerOrderDetailsUpdated = ({
                                             "
                                             >${parseThousandNumber(
                                               PITOFee || 0,
+                                              '.',
                                             )}đ</a
                                           >
                                         </td>
@@ -1587,6 +1587,7 @@ const partnerOrderDetailsUpdated = ({
                                             "
                                             >${parseThousandNumber(
                                               VATFee || 0,
+                                              '.',
                                             )}đ</a
                                           >
                                         </td>
@@ -1719,6 +1720,7 @@ const partnerOrderDetailsUpdated = ({
                                             "
                                             >${parseThousandNumber(
                                               totalWithVAT || 0,
+                                              '.',
                                             )}đ</a
                                           >
                                         </td>
