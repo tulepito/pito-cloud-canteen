@@ -49,16 +49,21 @@ const OrderHeaderState: React.FC<OrderHeaderStateProps> = (props) => {
     orderState === EOrderDraftStates.draft;
 
   const shouldShowStartOrderBtn = orderState === EOrderStates.picking;
-
+  const shouldManagePickingBtn = orderState === EOrderStates.inProgress;
   const canCancelOrder = orderFlow?.[
     orderState as TTransitionOrderState
   ]?.includes(EOrderStates.canceled);
+
+  const hasAnyActionsCanDo =
+    canCancelOrder || shouldShowUpdateOrderStateBtn || shouldManagePickingBtn;
 
   const onCancelOrder = () => {
     if (canCancelOrder) {
       handleUpdateOrderState?.(EOrderStates.canceled)();
     }
   };
+
+  const turnOnEditPickingAfterStartOrderMode = () => {};
 
   return (
     <div className={css.header}>
@@ -68,13 +73,18 @@ const OrderHeaderState: React.FC<OrderHeaderStateProps> = (props) => {
         <div className={statusClasses}>{orderStateLabel}</div>
         <div className={css.action}>
           <IconLightOutline onClick={orderStateActionDropdownControl.setTrue} />
-          {orderStateActionDropdownControl.value && canCancelOrder && (
+          <RenderWhen
+            condition={
+              orderStateActionDropdownControl.value && hasAnyActionsCanDo
+            }>
             <OutsideClickHandler
               className={css.actionList}
               onOutsideClick={orderStateActionDropdownControl.setFalse}>
-              <div className={css.actionItem} onClick={onCancelOrder}>
-                Huỷ đơn
-              </div>
+              <RenderWhen condition={canCancelOrder}>
+                <div className={css.actionItem} onClick={onCancelOrder}>
+                  Huỷ đơn
+                </div>
+              </RenderWhen>
               <RenderWhen condition={shouldShowUpdateOrderStateBtn}>
                 <div
                   className={css.actionItem}
@@ -82,8 +92,15 @@ const OrderHeaderState: React.FC<OrderHeaderStateProps> = (props) => {
                   Hoàn tất
                 </div>
               </RenderWhen>
-            </OutsideClickHandler>
-          )}
+              <RenderWhen condition={shouldManagePickingBtn}>
+                <div
+                  className={css.actionItem}
+                  onClick={turnOnEditPickingAfterStartOrderMode}>
+                  Quản lý chọn món
+                </div>
+              </RenderWhen>
+            </OutsideClickHandler>{' '}
+          </RenderWhen>
         </div>
       </div>
       <RenderWhen condition={shouldShowUpdateOrderStateBtn}>
