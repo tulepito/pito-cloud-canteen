@@ -36,7 +36,7 @@ const Modal: React.FC<TModalProps> = (props) => {
     children,
     isOpen,
     title,
-    shouldHideIconClose,
+    shouldHideIconClose = false,
     className,
     containerClassName,
     contentClassName,
