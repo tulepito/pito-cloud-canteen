@@ -23,6 +23,7 @@ type OrderHeaderStateProps = {
   handleUpdateOrderState: (state: EOrderStates) => () => void;
   onConfirmOrder?: () => void;
   updateOrderStateInProgress: boolean;
+  isDraftEditing: boolean;
   turnOnDraftEditMode: () => void;
 };
 
@@ -33,6 +34,7 @@ const OrderHeaderState: React.FC<OrderHeaderStateProps> = (props) => {
     updateOrderStateInProgress,
     onConfirmOrder,
     turnOnDraftEditMode,
+    isDraftEditing,
   } = props;
   const orderStateActionDropdownControl = useBoolean();
   const orderListing = Listing(order);
@@ -117,6 +119,11 @@ const OrderHeaderState: React.FC<OrderHeaderStateProps> = (props) => {
           onClick={onConfirmOrder}
           inProgress={updateOrderStateInProgress}>
           Xác nhận
+        </Button>
+      </RenderWhen>
+      <RenderWhen condition={isDraftEditing}>
+        <Button variant="cta" className={css.stateBtn} onClick={onConfirmOrder}>
+          Cập nhật
         </Button>
       </RenderWhen>
     </div>
