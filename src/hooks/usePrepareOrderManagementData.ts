@@ -266,7 +266,6 @@ export const usePrepareOrderDetailPageData = ({
       disabled: orderState !== EOrderStates.picking,
     },
   };
-
   /* =============== Price quotation data =============== */
   const priceQuotationData = {
     customerData: {
