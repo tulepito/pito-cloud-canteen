@@ -133,7 +133,7 @@ export const usePrepareOrderDetailPageData = ({
   } = calculatePriceQuotationInfo({
     planOrderDetail: orderDetail,
     order: orderData as TObject,
-    currentOrderVATPercentage: !isEmpty(VATPercentage)
+    currentOrderVATPercentage: VATPercentage!
       ? VATPercentage!
       : currentOrderVATPercentage,
     date,
@@ -180,7 +180,6 @@ export const usePrepareOrderDetailPageData = ({
     isCanceledOrder,
     transactionDataMap,
   };
-
   /* =============== Price quotation data =============== */
   const priceQuotationData = {
     customerData: {
