@@ -138,11 +138,6 @@ const PartnerSubOrderDetailPage: React.FC<
     updateOrderModalContainer.setFalse();
   };
 
-  const handleClickViewDetails = () => {
-    handleChangeViewMode(EPartnerSubOrderDetailPageViewMode.detail);
-    handleCloseModal();
-  };
-
   useEffect(() => {
     if (subOrderId && isReady) {
       dispatch(PartnerSubOrderDetailThunks.loadData({ orderId, date }));
@@ -190,6 +185,7 @@ const PartnerSubOrderDetailPage: React.FC<
           <Modal
             isOpen={!fetchOrderInProgress && updateOrderModalContainer.value}
             handleClose={handleCloseModal}
+            shouldHideIconClose
             className={css.updatedOrderModal}
             headerClassName={css.updatedOrderModalHeader}
             containerClassName={css.updatedOrderModalContainer}>
@@ -244,23 +240,21 @@ const PartnerSubOrderDetailPage: React.FC<
                         <div>{crrFrequency}</div>
                       </div>
                     );
-                  })}{' '}
+                  })}
                 </>
               </div>
 
-              <RenderWhen condition={isGroupOrder}>
-                <div className={css.action}>
-                  <Button
-                    onClick={handleClickViewDetails}
-                    className={css.viewDetailsBtn}>
-                    <div>
-                      {intl.formatMessage({
-                        id: 'PartnerSubOrderDetailPage.updateOrderModal.viewDetails',
-                      })}
-                    </div>
-                  </Button>
-                </div>
-              </RenderWhen>
+              <div className={css.action}>
+                <Button
+                  onClick={handleCloseModal}
+                  className={css.viewDetailsBtn}>
+                  <div>
+                    {intl.formatMessage({
+                      id: 'PartnerSubOrderDetailPage.updateOrderModal.viewDetails',
+                    })}
+                  </div>
+                </Button>
+              </div>
             </div>
           </Modal>
         </RenderWhen>

@@ -264,7 +264,6 @@ export const usePrepareOrderDetailPageData = ({
       disabled: orderState !== EOrderStates.picking,
     },
   };
-
   /* =============== Price quotation data =============== */
   const priceQuotationData = {
     customerData: {
@@ -285,7 +284,7 @@ export const usePrepareOrderDetailPageData = ({
       transportFee: `${parseThousandNumber(transportFee)}đ`,
       VATFee: `${parseThousandNumber(VATFee)}đ`,
       PITOFee: `${parseThousandNumber(PITOFee)}đ`,
-      currentOrderVATPercentage: !isEmpty(VATPercentage)
+      currentOrderVATPercentage: VATPercentage!
         ? VATPercentage!
         : currentOrderVATPercentage,
     },

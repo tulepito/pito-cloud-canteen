@@ -207,7 +207,7 @@ export const groupFoodOrderByDateFromQuotation = ({
           date: subOrderDate,
           restaurantId: Object.keys(partner[restaurant!])[0],
           restaurantName: partner[restaurant!].name,
-          index: dateFromParams ? 1 : index,
+          index: dateFromParams ? 0 : index,
           totalDishes: client.quotation[subOrderDate].reduce(
             (previousResult: number, current: TObject) => {
               const { frequency } = current;
