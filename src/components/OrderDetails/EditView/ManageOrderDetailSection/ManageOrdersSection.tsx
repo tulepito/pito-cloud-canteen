@@ -34,6 +34,8 @@ type TManageOrdersSectionProps = {
   handleOpenReachMaxAllowedChangesModal?: (type: string) => void;
   shouldShowOverflowError?: boolean;
   shouldShowUnderError?: boolean;
+  planReachMaxRestaurantQuantityInPickingState?: boolean;
+  planReachMinRestaurantQuantityInPickingState?: boolean;
 };
 
 const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
@@ -45,6 +47,8 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
     handleOpenReachMaxAllowedChangesModal,
     shouldShowOverflowError,
     shouldShowUnderError,
+    planReachMaxRestaurantQuantityInPickingState,
+    planReachMinRestaurantQuantityInPickingState,
   } = props;
 
   const dispatch = useAppDispatch();
@@ -116,6 +120,7 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
               }
               shouldShowOverflowError={shouldShowOverflowError}
               minQuantity={minQuantity}
+              maxQuantity={maxQuantity}
             />
           </div>
           <div className={css.addOrder}>
@@ -134,6 +139,12 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
                 maxQuantity={maxQuantity}
                 minQuantity={minQuantity}
                 currentViewDate={currentViewDate}
+                planReachMaxRestaurantQuantityInPickingState={
+                  planReachMaxRestaurantQuantityInPickingState
+                }
+                planReachMinRestaurantQuantityInPickingState={
+                  planReachMinRestaurantQuantityInPickingState
+                }
               />
             </div>
           </div>

@@ -48,6 +48,8 @@ type TExtraProps = {
   maxQuantity?: number;
   minQuantity?: number;
   currentViewDate: number;
+  planReachMaxRestaurantQuantityInPickingState?: boolean;
+  planReachMinRestaurantQuantityInPickingState?: boolean;
 };
 type TAddOrderFormComponentProps = FormRenderProps<TAddOrderFormValues> &
   Partial<TExtraProps>;
@@ -78,7 +80,10 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
     isDraftEditing,
     shouldShowOverflowError,
     shouldShowUnderError,
+    planReachMaxRestaurantQuantityInPickingState,
+    planReachMinRestaurantQuantityInPickingState,
     minQuantity,
+    maxQuantity,
     currentViewDate,
   } = props;
 
@@ -243,18 +248,25 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
           })}
         </Button>
       </div>
-      {isDraftEditing && shouldShowOverflowError && (
+      {shouldShowOverflowError && (
         <ErrorMessage
           className={css.error}
           message={`Bạn đã thay đổi vượt mức quy định (tối đa 10% số lượng người tham gia)`}
         />
       )}
-      {isDraftEditing && shouldShowUnderError && (
+      {planReachMaxRestaurantQuantityInPickingState && (
         <ErrorMessage
           className={css.error}
-          message={`Cần đặt tối thiểu ${minQuantity} phần`}
+          message={`Bạn đã đặt vượt mức tối đa (${maxQuantity} phần)`}
         />
       )}
+      {shouldShowUnderError ||
+        (planReachMinRestaurantQuantityInPickingState && (
+          <ErrorMessage
+            className={css.error}
+            message={`Cần đặt tối thiểu ${minQuantity} phần`}
+          />
+        ))}
 
       <div className={css.addRequirementContainer}>
         <Button
