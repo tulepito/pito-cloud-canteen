@@ -64,7 +64,7 @@ export const calculateTotalPriceAndDishes = ({
           const { lineItems = [], status } = rawOrderDetailOfDate;
 
           if (
-            (dateKey && date?.toString() !== dateKey) ||
+            (date && date?.toString() !== dateKey) ||
             status === ESubOrderStatus.CANCELED
           ) {
             return result;
@@ -118,7 +118,7 @@ export const calculatePriceQuotationInfo = ({
   const {
     packagePerMember = 0,
     orderState,
-    orderType,
+    orderType = EOrderType.group,
   } = Listing(order as TListing).getMetadata();
   const isOrderInProgress = orderState === EOrderStates.inProgress;
   const isGroupOrder = orderType === EOrderType.group;
