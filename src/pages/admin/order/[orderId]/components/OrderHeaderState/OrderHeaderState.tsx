@@ -23,6 +23,7 @@ type OrderHeaderStateProps = {
   handleUpdateOrderState: (state: EOrderStates) => () => void;
   onConfirmOrder?: () => void;
   updateOrderStateInProgress: boolean;
+  turnOnDraftEditMode: () => void;
 };
 
 const OrderHeaderState: React.FC<OrderHeaderStateProps> = (props) => {
@@ -31,6 +32,7 @@ const OrderHeaderState: React.FC<OrderHeaderStateProps> = (props) => {
     handleUpdateOrderState,
     updateOrderStateInProgress,
     onConfirmOrder,
+    turnOnDraftEditMode,
   } = props;
   const orderStateActionDropdownControl = useBoolean();
   const orderListing = Listing(order);
@@ -63,8 +65,6 @@ const OrderHeaderState: React.FC<OrderHeaderStateProps> = (props) => {
     }
   };
 
-  const turnOnEditPickingAfterStartOrderMode = () => {};
-
   return (
     <div className={css.header}>
       <div className={css.orderTitle}>
@@ -93,9 +93,7 @@ const OrderHeaderState: React.FC<OrderHeaderStateProps> = (props) => {
                 </div>
               </RenderWhen>
               <RenderWhen condition={shouldManagePickingBtn}>
-                <div
-                  className={css.actionItem}
-                  onClick={turnOnEditPickingAfterStartOrderMode}>
+                <div className={css.actionItem} onClick={turnOnDraftEditMode}>
                   Quản lý chọn món
                 </div>
               </RenderWhen>

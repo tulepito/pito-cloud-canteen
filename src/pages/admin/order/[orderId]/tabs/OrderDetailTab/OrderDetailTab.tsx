@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 
@@ -144,6 +145,7 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [JSON.stringify(order), JSON.stringify(orderDetail)],
   );
+  const defaultActiveKey = tabItems.findIndex(({ id }) => id === timestamp);
 
   const handleConfirmOrder = () => {
     setViewMode(EPageViewMode.review);
@@ -157,11 +159,13 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
     updateOrderState(state);
   };
 
+  const turnOnDraftEditMode = () => {
+    setViewMode(EPageViewMode.edit);
+  };
+
   useEffect(() => {
     dispatch(AdminAttributesThunks.fetchAttributes());
   }, []);
-
-  const defaultActiveKey = tabItems.findIndex(({ id }) => id === timestamp);
 
   return (
     <div className={css.container}>
@@ -171,6 +175,7 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
           handleUpdateOrderState={handleUpdateOrderState}
           updateOrderStateInProgress={updateOrderStateInProgress}
           onConfirmOrder={handleConfirmOrder}
+          turnOnDraftEditMode={turnOnDraftEditMode}
         />
         <RenderWhen condition={showStateSectionCondition}>
           <ReviewOrderStatesSection
