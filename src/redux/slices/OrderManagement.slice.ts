@@ -55,22 +55,25 @@ import { SystemAttributesThunks } from './systemAttributes.slice';
 
 export const QUERY_SUB_ORDER_CHANGES_HISTORY_PER_PAGE = 3;
 
-export const checkMinMaxQuantity = (
+export const checkMinMaxQuantityInProgressState = (
   orderDetails: TPlan['orderDetail'],
   oldOrderDetail: TPlan['orderDetail'],
   currentViewDate: number,
   isNormalOrder: boolean,
 ) => {
-  let totalQuantity = 0;
   const data = orderDetails?.[currentViewDate] || {};
   const { lineItems = [], restaurant = {} } = data;
   const { maxQuantity = 100, minQuantity = 1 } = restaurant;
-  if (isNormalOrder) {
-    totalQuantity = lineItems.reduce((result: number, lineItem: TObject) => {
-      result += lineItem?.quantity || 1;
 
-      return result;
-    }, 0);
+  if (isNormalOrder) {
+    const totalQuantity = lineItems.reduce(
+      (result: number, lineItem: TObject) => {
+        result += lineItem?.quantity || 1;
+
+        return result;
+      },
+      0,
+    );
 
     const disabledSubmit = Object.keys(orderDetails).some((key) => {
       const detail = orderDetails[key];
@@ -109,14 +112,21 @@ export const checkMinMaxQuantity = (
       !!oldMemberOrders[f].foodId &&
       oldMemberOrders[f].status === EParticipantOrderStatus.joined,
   ).length;
-  totalQuantity = Object.keys(memberOrders).filter(
+  const totalQuantity = Object.keys(memberOrders).filter(
     (f) =>
       !!memberOrders[f].foodId &&
       memberOrders[f].status === EParticipantOrderStatus.joined,
   ).length;
-  const totalQuantityCanAdd = (totalQuantity * 10) / 100;
+  const totalChanges = Object.keys(memberOrders).filter(
+    (f) =>
+      memberOrders[f]?.foodId !== oldMemberOrders[f]?.foodId ||
+      memberOrders[f]?.status !== oldMemberOrders[f]?.status,
+  ).length;
+
+  const totalTimeCanChange = (totalQuantity * 10) / 100;
   const totalAdded = totalQuantity - oldTotalQuantity;
-  const shouldShowOverflowError = totalAdded > totalQuantityCanAdd;
+  const shouldShowOverflowError =
+    totalAdded > totalTimeCanChange || totalChanges > totalTimeCanChange;
 
   const shouldShowUnderError = totalQuantity < minQuantity;
 
@@ -1065,7 +1075,7 @@ const OrderManagementSlice = createSlice({
         }) || {};
 
       const { shouldShowOverflowError, shouldShowUnderError } =
-        checkMinMaxQuantity(
+        checkMinMaxQuantityInProgressState(
           newOrderDetail,
           defaultOrderDetail,
           currentViewDate,
@@ -1190,7 +1200,7 @@ const OrderManagementSlice = createSlice({
       );
 
       const { shouldShowOverflowError, shouldShowUnderError } =
-        checkMinMaxQuantity(
+        checkMinMaxQuantityInProgressState(
           newOrderDetail,
           defaultOrderDetail,
           currentViewDate,
@@ -1283,7 +1293,7 @@ const OrderManagementSlice = createSlice({
       const { orderDetail = {} } = planDataGetter.getMetadata();
 
       const { shouldShowOverflowError, shouldShowUnderError } =
-        checkMinMaxQuantity(
+        checkMinMaxQuantityInProgressState(
           newOrderDetail,
           orderDetail,
           currentViewDate,

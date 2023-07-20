@@ -51,6 +51,8 @@ type TOrderDetailsTableProps = {
   handleOpenReachMaxAllowedChangesModal?: (type: string) => void;
   shouldShowOverflowError?: boolean;
   minQuantity?: number;
+  maxQuantity?: number;
+  shouldShowUnderError?: boolean;
 };
 
 const OrderDetailsTable: React.FC<TOrderDetailsTableProps> = (props) => {
