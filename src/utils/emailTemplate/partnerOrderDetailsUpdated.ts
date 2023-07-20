@@ -27,20 +27,29 @@ const partnerOrderDetailsUpdated = ({
 }: PartnerNewOrderAppearParams) => {
   const orderId = orderListing.getId();
   const { title: orderTitle } = orderListing.getAttributes();
+  const restaurantId = restaurantListing.getId();
   const { title: restaurantName } = restaurantListing.getAttributes();
 
   const { orderDetail: planOrderDetail } = planListing.getMetadata();
-  const { staffName, orderVATPercentage = 0 } = orderListing.getMetadata();
+
+  const {
+    staffName,
+    orderVATPercentage = 0,
+    serviceFees = {},
+  } = orderListing.getMetadata();
   const { companyName } = companyUser.getPublicData();
 
   const dayIndex = new Date(Number(subOrderDate)).getDay();
   const subOrderTitle = `${orderTitle}-${dayIndex > 0 ? dayIndex : 7}`;
 
-  const { totalPrice, totalDishes, VATFee, PITOFee, totalWithVAT } =
+  const { totalPrice, totalDishes, VATFee, serviceFee, totalWithVAT } =
     calculatePriceQuotationInfo({
       planOrderDetail: planOrderDetail as TObject,
       order: orderListing.getFullData() as TObject,
       currentOrderVATPercentage: orderVATPercentage,
+      currentOrderServiceFeePercentage: (serviceFees[restaurantId] || 0) / 100,
+      date: subOrderDate,
+      shouldIncludePITOFee: false,
     });
   const orderUrl = `${BASE_URL}/partner/orders/${orderId}_${subOrderDate}`;
 
@@ -1551,7 +1560,7 @@ const partnerOrderDetailsUpdated = ({
                                               font-weight: bold;
                                             "
                                             >${parseThousandNumber(
-                                              PITOFee || 0,
+                                              serviceFee || 0,
                                               '.',
                                             )}đ</a
                                           >
