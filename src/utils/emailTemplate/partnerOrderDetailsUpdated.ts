@@ -1,6 +1,9 @@
+import { DateTime } from 'luxon';
+
 import { parseThousandNumber } from '@helpers/format';
 import { calculatePriceQuotationInfo } from '@helpers/order/cartInfoHelper';
 
+import { VNTimezone } from '../dates';
 import type { TObject } from '../types';
 
 const BASE_URL = process.env.NEXT_PUBLIC_CANONICAL_URL;
@@ -39,8 +42,10 @@ const partnerOrderDetailsUpdated = ({
   } = orderListing.getMetadata();
   const { companyName } = companyUser.getPublicData();
 
-  const dayIndex = new Date(Number(subOrderDate)).getDay();
-  const subOrderTitle = `${orderTitle}-${dayIndex > 0 ? dayIndex : 7}`;
+  const weekDay = DateTime.fromMillis(Number(subOrderDate))
+    .setZone(VNTimezone)
+    .startOf('day').weekday;
+  const subOrderTitle = `${orderTitle}-${weekDay}`;
 
   const { totalPrice, totalDishes, VATFee, serviceFee, totalWithVAT } =
     calculatePriceQuotationInfo({
