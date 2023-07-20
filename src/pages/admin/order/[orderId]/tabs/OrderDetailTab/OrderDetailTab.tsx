@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 
 import ManageLineItemsSection from '@components/OrderDetails/EditView/ManageOrderDetailSection/ManageLineItemsSection';
@@ -7,6 +7,7 @@ import ManageOrdersSection from '@components/OrderDetails/EditView/ManageOrderDe
 import ManageParticipantsSection from '@components/OrderDetails/EditView/ManageParticipantsSection/ManageParticipantsSection';
 import OrderDeadlineCountdownSection from '@components/OrderDetails/EditView/OrderDeadlineCountdownSection/OrderDeadlineCountdownSection';
 import OrderLinkSection from '@components/OrderDetails/EditView/OrderLinkSection/OrderLinkSection';
+import SubOrderChangesHistorySection from '@components/OrderDetails/EditView/SubOrderChangesHistorySection/SubOrderChangesHistorySection';
 import ReviewOrderStatesSection from '@components/OrderDetails/ReviewView/ReviewOrderStatesSection/ReviewOrderStatesSection';
 import ReviewView from '@components/OrderDetails/ReviewView/ReviewView';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
@@ -18,6 +19,10 @@ import useExportOrderDetails from '@hooks/useExportOrderDetails';
 import { usePrepareOrderDetailPageData } from '@hooks/usePrepareOrderManagementData';
 import { AdminAttributesThunks } from '@pages/admin/Attributes.slice';
 import { ReviewContent } from '@pages/admin/order/create/components/ReviewOrder/ReviewOrder';
+import {
+  OrderManagementsAction,
+  orderManagementThunks,
+} from '@redux/slices/OrderManagement.slice';
 import { Listing } from '@src/utils/data';
 import { formatTimestamp } from '@src/utils/dates';
 import { EOrderStates, EOrderType } from '@src/utils/enums';
@@ -73,7 +78,7 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
 
   const [viewMode, setViewMode] = useState<EPageViewMode>(EPageViewMode.edit);
   const orderId = Listing(order).getId();
-
+  const isEditMode = viewMode === EPageViewMode.edit;
   const { handler: onDownloadReviewOrderResults } = useExportOrderDetails();
 
   const {
@@ -99,6 +104,22 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
     orderTitle,
     priceQuotationData,
   });
+
+  const onQuerySubOrderHistoryChanges = useCallback(
+    (lastRecordCreatedAt?: number) => {
+      if (!planId || !orderId || !currentViewDate) return;
+
+      return dispatch(
+        orderManagementThunks.querySubOrderChangesHistory({
+          orderId: orderId as string,
+          planId,
+          planOrderDate: currentViewDate,
+          lastRecordCreatedAt,
+        }),
+      );
+    },
+    [planId, orderId, currentViewDate],
+  );
 
   const tabItems = useMemo(
     () => {
@@ -162,21 +183,42 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
   };
 
   const turnOnDraftEditMode = () => {
-    setViewMode(EPageViewMode.edit);
+    setIsDraftEditing(true);
+  };
+
+  const onQueryMoreSubOrderChangesHistory = () => {
+    if (lastRecordSubOrderChangesHistoryCreatedAt)
+      return onQuerySubOrderHistoryChanges(
+        lastRecordSubOrderChangesHistoryCreatedAt,
+      );
   };
 
   useEffect(() => {
+    onQuerySubOrderHistoryChanges();
+  }, [onQuerySubOrderHistoryChanges]);
+
+  useEffect(() => {
+    if (draftOrderDetail) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      () => {
+        dispatch(OrderManagementsAction.resetDraftSubOrderChangeHistory());
+
+        return dispatch(OrderManagementsAction.resetDraftOrderDetails());
+      };
+    }
+
     dispatch(AdminAttributesThunks.fetchAttributes());
   }, []);
 
   return (
     <div className={css.container}>
-      <RenderWhen condition={viewMode === EPageViewMode.edit}>
+      <RenderWhen condition={isEditMode}>
         <OrderHeaderState
           order={order}
           handleUpdateOrderState={handleUpdateOrderState}
           updateOrderStateInProgress={updateOrderStateInProgress}
           onConfirmOrder={handleConfirmOrder}
+          isDraftEditing={isDraftEditing}
           turnOnDraftEditMode={turnOnDraftEditMode}
         />
         <RenderWhen condition={showStateSectionCondition}>
@@ -203,7 +245,7 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
                   <ManageOrdersSection
                     setCurrentViewDate={(date) => setCurrentViewDate(date)}
                     currentViewDate={currentViewDate}
-                    isDraftEditing={false}
+                    isDraftEditing={isDraftEditing}
                     ableToUpdateOrder
                   />
                 </div>
@@ -224,6 +266,29 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
                     data={editViewData.manageParticipantData}
                     ableToUpdateOrder
                   />
+                  <RenderWhen condition={isPickingState || isDraftEditing}>
+                    <SubOrderChangesHistorySection
+                      className={css.container}
+                      querySubOrderChangesHistoryInProgress={
+                        querySubOrderChangesHistoryInProgress
+                      }
+                      subOrderChangesHistory={subOrderChangesHistory}
+                      draftSubOrderChangesHistory={
+                        draftSubOrderChangesHistory[
+                          currentViewDate as unknown as keyof typeof draftSubOrderChangesHistory
+                        ]
+                      }
+                      onQueryMoreSubOrderChangesHistory={
+                        onQueryMoreSubOrderChangesHistory
+                      }
+                      subOrderChangesHistoryTotalItems={
+                        subOrderChangesHistoryTotalItems
+                      }
+                      loadMoreSubOrderChangesHistory={
+                        loadMoreSubOrderChangesHistory
+                      }
+                    />
+                  </RenderWhen>
                 </div>
               </div>
 
