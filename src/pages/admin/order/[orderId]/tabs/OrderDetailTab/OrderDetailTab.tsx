@@ -1,5 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import isEqual from 'lodash/isEqual';
 import { useRouter } from 'next/router';
 
 import ManageLineItemsSection from '@components/OrderDetails/EditView/ManageOrderDetailSection/ManageLineItemsSection';
@@ -20,12 +21,14 @@ import { usePrepareOrderDetailPageData } from '@hooks/usePrepareOrderManagementD
 import { AdminAttributesThunks } from '@pages/admin/Attributes.slice';
 import { ReviewContent } from '@pages/admin/order/create/components/ReviewOrder/ReviewOrder';
 import {
+  checkMinMaxQuantity,
   OrderManagementsAction,
   orderManagementThunks,
 } from '@redux/slices/OrderManagement.slice';
 import { Listing } from '@src/utils/data';
 import { formatTimestamp } from '@src/utils/dates';
 import { EOrderStates, EOrderType } from '@src/utils/enums';
+import { txIsInitiated } from '@src/utils/transaction';
 import type { TListing, TObject, TTransaction, TUser } from '@src/utils/types';
 
 import OrderHeaderInfor from '../../components/OrderHeaderInfor/OrderHeaderInfor';
@@ -69,7 +72,10 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
     onSaveOrderNote,
   } = props;
   const router = useRouter();
-  const { timestamp } = router.query;
+  const {
+    query: { timestamp },
+    isReady: isRouterReady,
+  } = router;
   const [currentViewDate, setCurrentViewDate] = useState<number>(
     Number(timestamp),
   );
@@ -95,6 +101,24 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
     orderStateHistory.findIndex(({ state }: { state: EOrderStates }) => {
       return state === EOrderStates.inProgress;
     }) > 0;
+  const orderDetailsNotChanged =
+    isDraftEditing && isEqual(orderDetail, draftOrderDetail);
+
+  const { minQuantity, disabledSubmit } = checkMinMaxQuantity(
+    draftOrderDetail,
+    orderDetail,
+    currentViewDate,
+    !isGroupOrder,
+  );
+
+  const currentTxIsInitiated = txIsInitiated(
+    transactionDataMap[currentViewDate],
+  );
+
+  const ableToUpdateOrder =
+    !isFetchingOrderDetails &&
+    isRouterReady &&
+    ((currentTxIsInitiated && isDraftEditing) || isPickingState);
 
   const { orderTitle, priceQuotationData, editViewData, reviewViewData } =
     // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -125,7 +149,7 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
     () => {
       const foodOrderGroupedByDate = groupFoodOrderByDate({
         orderDetail,
-        isGroupOrder: orderType === EOrderType.group,
+        isGroupOrder,
       });
 
       return Object.keys(orderDetail).map((key: string) => {
@@ -186,6 +210,10 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
     setIsDraftEditing(true);
   };
 
+  const handleSetCurrentViewDate = (date: number) => {
+    setCurrentViewDate(date);
+  };
+
   const onQueryMoreSubOrderChangesHistory = () => {
     if (lastRecordSubOrderChangesHistoryCreatedAt)
       return onQuerySubOrderHistoryChanges(
@@ -220,6 +248,9 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
           onConfirmOrder={handleConfirmOrder}
           isDraftEditing={isDraftEditing}
           turnOnDraftEditMode={turnOnDraftEditMode}
+          confirmUpdateDisabled={
+            !isPickingState && (disabledSubmit || orderDetailsNotChanged)
+          }
         />
         <RenderWhen condition={showStateSectionCondition}>
           <ReviewOrderStatesSection
