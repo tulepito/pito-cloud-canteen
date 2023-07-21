@@ -119,16 +119,10 @@ export const checkMinMaxQuantityInProgressState = (
       !!memberOrders[f].foodId &&
       memberOrders[f].status === EParticipantOrderStatus.joined,
   ).length;
-  const totalChanges = Object.keys(memberOrders).filter(
-    (f) =>
-      memberOrders[f]?.foodId !== oldMemberOrders[f]?.foodId ||
-      memberOrders[f]?.status !== oldMemberOrders[f]?.status,
-  ).length;
 
   const totalTimeCanChange = (totalQuantity * 10) / 100;
   const totalAdded = totalQuantity - oldTotalQuantity;
-  const shouldShowOverflowError =
-    totalAdded > totalTimeCanChange || totalChanges > totalTimeCanChange;
+  const shouldShowOverflowError = totalAdded > totalTimeCanChange;
 
   const shouldShowUnderError = totalQuantity < minQuantity;
 
