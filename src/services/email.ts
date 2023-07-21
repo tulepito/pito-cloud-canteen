@@ -6,6 +6,9 @@ import bookerAccountCreated, {
 import bookerAccountSuspended, {
   bookerAccountSuspendedSubject,
 } from '@src/utils/emailTemplate/bookerAccountSuspended';
+import bookerOrderCancelled, {
+  bookerOrderCancelledSubject,
+} from '@src/utils/emailTemplate/bookerOrderCancelled';
 import bookerOrderCreated, {
   bookerOrderCreatedSubject,
 } from '@src/utils/emailTemplate/bookerOrderCreated';
@@ -51,6 +54,7 @@ export enum EmailTemplateForBookerTypes {
   BOOKER_ORDER_SUCCESS = 'BOOKER_ORDER_SUCCESS',
   BOOKER_SUB_ORDER_CANCELED = 'BOOKER_SUB_ORDER_CANCELED',
   BOOKER_REVENUE_ANALYTICS = 'BOOKER_REVENUE_ANALYTICS',
+  BOOKER_ORDER_CANCELLED = 'BOOKER_ORDER_CANCELLED',
 }
 
 export enum EmailTemplateForParticipantTypes {
@@ -343,6 +347,26 @@ export const emailSendingFactory = async (
         const emailDataParams = {
           receiver: [companyEmail],
           subject: bookerAccountSuspendedSubject,
+          content: emailTemplate as string,
+          sender: systemSenderEmail as string,
+        };
+        sendIndividualEmail(emailDataParams);
+        break;
+      }
+      case EmailTemplateTypes.BOOKER.BOOKER_ORDER_CANCELLED: {
+        const { orderId } = emailParams;
+        const emailDataSource = await fetchEmailDataSourceWithOrder({
+          receiver: 'booker',
+          orderId,
+        });
+
+        const { bookerUser, orderListing } = emailDataSource;
+        const { orderName } = orderListing.getPublicData();
+        const { email: bookerEmail } = bookerUser?.getAttributes() || {};
+        const emailTemplate = bookerOrderCancelled(emailDataSource);
+        const emailDataParams = {
+          receiver: ['minh.tran@journeyh.io'],
+          subject: bookerOrderCancelledSubject(orderName),
           content: emailTemplate as string,
           sender: systemSenderEmail as string,
         };
