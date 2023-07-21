@@ -75,6 +75,7 @@ const BADGE_TYPE_BASE_ON_ORDER_STATE = {
   [EOrderStates.pendingPayment]: EBadgeType.warning,
   [EOrderStates.picking]: EBadgeType.warning,
   [EOrderStates.reviewed]: EBadgeType.warning,
+  [EOrderStates.expiredStart]: EBadgeType.default,
 
   [ETransition.START_DELIVERY]: EBadgeType.darkBlue,
   [ETransition.COMPLETE_DELIVERY]: EBadgeType.strongSuccess,
@@ -91,6 +92,7 @@ const BADGE_CLASS_NAME_BASE_ON_ORDER_STATE = {
   [EOrderStates.pendingPayment]: css.badgeProcessing,
   [EOrderStates.picking]: css.badgeWarning,
   [EOrderStates.reviewed]: css.badgeWarning,
+  [EOrderStates.expiredStart]: css.badgeDefault,
 
   [ETransition.START_DELIVERY]: css.badgeInProgress,
   [ETransition.COMPLETE_DELIVERY]: css.badgeSuccess,

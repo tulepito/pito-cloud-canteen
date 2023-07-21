@@ -4,7 +4,7 @@ const Listing = (listing) => {
   const ensuredListing = ensureListing(listing);
   const id = ensuredListing?.id?.uuid;
   const { privateData, publicData, protectedData, metadata } =
-    ensuredListing?.attributes;
+    ensuredListing.attributes;
 
   return {
     getId: () => {

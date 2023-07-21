@@ -4,6 +4,7 @@ const { getIntegrationSdk } = require('./sdk');
 const calculateRemainPages = (meta) => {
   const { totalPages = 1 } = meta;
   if (totalPages <= 1) return [];
+
   return new Array(totalPages - 1).fill(0).map((_v, i) => i + 2);
 };
 
@@ -25,6 +26,7 @@ const queryAllPages = async ({
     });
 
     result = [...result, ...denormalisedResponseEntities(response)];
+
     return response;
   };
 
@@ -35,6 +37,7 @@ const queryAllPages = async ({
 
   if (remainPages.length) {
     await Promise.all(remainPages.map((page) => queryPage({ page })));
+
     return result;
   }
 
