@@ -23,6 +23,11 @@ import type { TListing, TObject } from '@utils/types';
 
 export const getParticipantPickingLink = (orderId: string) =>
   `${process.env.NEXT_PUBLIC_CANONICAL_URL}/participant/order/${orderId}`;
+export const getDeliveryTrackingLink = (
+  orderId: string,
+  timestamp: string | number,
+) =>
+  `${process.env.NEXT_PUBLIC_CANONICAL_URL}/delivery-tracking/${orderId}_${timestamp}`;
 
 export const isJoinedPlan = (
   foodId: string,

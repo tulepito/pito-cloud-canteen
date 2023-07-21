@@ -23,6 +23,7 @@ import Table from '@components/Table/Table';
 import Tabs from '@components/Tabs/Tabs';
 import Tooltip from '@components/Tooltip/Tooltip';
 import { addCommas, parseThousandNumber } from '@helpers/format';
+import { getDeliveryTrackingLink } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import {
@@ -177,6 +178,7 @@ export const ReviewContent: React.FC<any> = (props) => {
     orderState,
     orderNote,
   } = Listing(order as TListing).getMetadata();
+  const orderId = Listing(order as TListing).getId();
   const { restaurantName, phoneNumber, foodList = {} } = restaurant || {};
   const isInProgressOrder = orderState === EOrderStates.inProgress;
   const isCancelOrder = [
@@ -200,7 +202,7 @@ export const ReviewContent: React.FC<any> = (props) => {
   }) as any;
 
   const handleCopyLink = () => {
-    navigator.clipboard.writeText('');
+    navigator.clipboard.writeText(getDeliveryTrackingLink(orderId, timeStamp));
     setCopyToClipboardTooltip(copiedCopyText);
   };
 
