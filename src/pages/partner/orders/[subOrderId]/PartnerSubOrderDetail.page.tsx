@@ -123,6 +123,15 @@ const PartnerSubOrderDetailPage: React.FC<
     'foodId',
   );
 
+  const hasAnyChanges = foodList.some(({ foodId }: TObject) => {
+    const { frequency: oldFrequency = 0 } =
+      oldFoodList.find((item: TObject) => item.foodId === foodId) || {};
+    const { frequency: crrFrequency = 0 } =
+      currentFoodList.find((item: TObject) => item.foodId === foodId) || {};
+
+    return oldFrequency !== crrFrequency;
+  });
+
   const handleChangeViewMode =
     (_viewMode: EPartnerSubOrderDetailPageViewMode) => () => {
       setViewMode(_viewMode);
@@ -138,11 +147,6 @@ const PartnerSubOrderDetailPage: React.FC<
     updateOrderModalContainer.setFalse();
   };
 
-  const handleClickViewDetails = () => {
-    handleChangeViewMode(EPartnerSubOrderDetailPageViewMode.detail);
-    handleCloseModal();
-  };
-
   useEffect(() => {
     if (subOrderId && isReady) {
       dispatch(PartnerSubOrderDetailThunks.loadData({ orderId, date }));
@@ -151,10 +155,27 @@ const PartnerSubOrderDetailPage: React.FC<
   }, [isReady, subOrderId]);
 
   useEffect(() => {
-    if (!fetchOrderInProgress && newUpdatedOrderNotification) {
+    if (!fetchOrderInProgress && newUpdatedOrderNotification && hasAnyChanges) {
       updateOrderModalContainer.setTrue();
     }
-  }, [fetchOrderInProgress, JSON.stringify(newUpdatedOrderNotification)]);
+
+    if (!hasAnyChanges) {
+      dispatch(
+        NotificationThunks.markNotificationsSeen(
+          newUpdatedOrderNotificationIds,
+        ),
+      );
+      dispatch(
+        NotificationActions.markNotificationsSeen(
+          newUpdatedOrderNotificationIds,
+        ),
+      );
+    }
+  }, [
+    fetchOrderInProgress,
+    hasAnyChanges,
+    JSON.stringify(newUpdatedOrderNotification),
+  ]);
 
   useEffect(() => {
     return () => {
@@ -190,6 +211,7 @@ const PartnerSubOrderDetailPage: React.FC<
           <Modal
             isOpen={!fetchOrderInProgress && updateOrderModalContainer.value}
             handleClose={handleCloseModal}
+            shouldHideIconClose
             className={css.updatedOrderModal}
             headerClassName={css.updatedOrderModalHeader}
             containerClassName={css.updatedOrderModalContainer}>
@@ -237,30 +259,28 @@ const PartnerSubOrderDetailPage: React.FC<
                         (item: TObject) => item.foodId === foodId,
                       ) || {};
 
-                    return (
+                    return oldFrequency === crrFrequency ? null : (
                       <div key={foodId} className={css.row}>
                         <div title={foodName}>{foodName}</div>
                         <div>{oldFrequency}</div>
                         <div>{crrFrequency}</div>
                       </div>
                     );
-                  })}{' '}
+                  })}
                 </>
               </div>
 
-              <RenderWhen condition={isGroupOrder}>
-                <div className={css.action}>
-                  <Button
-                    onClick={handleClickViewDetails}
-                    className={css.viewDetailsBtn}>
-                    <div>
-                      {intl.formatMessage({
-                        id: 'PartnerSubOrderDetailPage.updateOrderModal.viewDetails',
-                      })}
-                    </div>
-                  </Button>
-                </div>
-              </RenderWhen>
+              <div className={css.action}>
+                <Button
+                  onClick={handleCloseModal}
+                  className={css.viewDetailsBtn}>
+                  <div>
+                    {intl.formatMessage({
+                      id: 'PartnerSubOrderDetailPage.updateOrderModal.viewDetails',
+                    })}
+                  </div>
+                </Button>
+              </div>
             </div>
           </Modal>
         </RenderWhen>

@@ -4,7 +4,6 @@ import { useCallback, useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 import Skeleton from 'react-loading-skeleton';
 import classNames from 'classnames';
-import { isEqual } from 'lodash';
 import isEmpty from 'lodash/isEmpty';
 import { useRouter } from 'next/router';
 
@@ -26,21 +25,124 @@ import { useDownloadPriceQuotation } from '@hooks/useDownloadPriceQuotation';
 import useExportOrderDetails from '@hooks/useExportOrderDetails';
 import { usePrepareOrderDetailPageData } from '@hooks/usePrepareOrderManagementData';
 import {
-  checkMinMaxQuantity,
+  checkMinMaxQuantityInProgressState,
   orderDetailsAnyActionsInProgress,
   OrderManagementsAction,
   orderManagementThunks,
 } from '@redux/slices/OrderManagement.slice';
 import { companyPaths } from '@src/paths';
 import { diffDays } from '@src/utils/dates';
+import type { TPlan } from '@src/utils/orderTypes';
 import { txIsInitiated } from '@src/utils/transaction';
 import { CurrentUser, Listing } from '@utils/data';
-import { EOrderDraftStates, EOrderStates, EOrderType } from '@utils/enums';
-import type { TListing } from '@utils/types';
+import {
+  EOrderDraftStates,
+  EOrderStates,
+  EOrderType,
+  EParticipantOrderStatus,
+} from '@utils/enums';
+import type {
+  TListing,
+  TObject,
+  TSubOrderChangeHistoryItem,
+} from '@utils/types';
 
 import ModalReachMaxAllowedChanges from '../components/ModalReachMaxAllowedChanges/ModalReachMaxAllowedChanges';
 
 import css from './OrderDetail.module.scss';
+
+const checkOrderDetailHasChanged = (
+  draftSubOrderChangesHistory: Record<string, TSubOrderChangeHistoryItem[]>,
+) => {
+  return Object.keys(draftSubOrderChangesHistory).some((dateAsTimeStamp) => {
+    return draftSubOrderChangesHistory[dateAsTimeStamp].length > 0;
+  });
+};
+
+const checkMinMaxQuantityInPickingState = (
+  isNormalOrder: boolean,
+  isPicking: boolean,
+  orderDetail: TPlan['orderDetail'] = {},
+) => {
+  if (!isPicking) {
+    return {
+      planValidations: {},
+      orderReachMaxRestaurantQuantity: false,
+      orderReachMinRestaurantQuantity: false,
+    };
+  }
+  let planValidations = {};
+  if (isNormalOrder) {
+    planValidations = Object.keys(orderDetail).reduce(
+      (prev: any, dateAsTimeStamp) => {
+        const currentOrderDetails = orderDetail[dateAsTimeStamp];
+        const { lineItems = [], restaurant = {} } = currentOrderDetails || {};
+        const { maxQuantity = 100, minQuantity = 1 } = restaurant || {};
+        const totalAdded = lineItems.reduce(
+          (result: number, lineItem: TObject) => {
+            result += lineItem?.quantity || 1;
+
+            return result;
+          },
+          0,
+        );
+
+        return {
+          ...prev,
+          [dateAsTimeStamp]: {
+            planReachMinRestaurantQuantity: totalAdded < minQuantity,
+            planReachMaxRestaurantQuantity: totalAdded > maxQuantity,
+          },
+        };
+      },
+      {},
+    );
+  } else {
+    planValidations = Object.keys(orderDetail).reduce(
+      (prev: any, dateAsTimeStamp) => {
+        const currentOrderDetails = orderDetail[dateAsTimeStamp] || {};
+        const { memberOrders = {}, restaurant } = currentOrderDetails;
+        const { minQuantity = 0, maxQuantity = 100 } = restaurant;
+        const totalAdded = Object.keys(memberOrders).filter(
+          (f) =>
+            !!memberOrders[f].foodId &&
+            memberOrders[f].status === EParticipantOrderStatus.joined,
+        ).length;
+
+        return {
+          ...prev,
+          [dateAsTimeStamp]: {
+            planReachMinRestaurantQuantity: totalAdded < minQuantity,
+            planReachMaxRestaurantQuantity: totalAdded > maxQuantity,
+          },
+        };
+      },
+      {},
+    );
+  }
+  const orderReachMinRestaurantQuantity = Object.keys(planValidations).some(
+    (dateAsTimeStamp) => {
+      const { planReachMinRestaurantQuantity } =
+        planValidations[dateAsTimeStamp as keyof typeof planValidations] || {};
+
+      return planReachMinRestaurantQuantity;
+    },
+  );
+  const orderReachMaxRestaurantQuantity = Object.keys(planValidations).some(
+    (dateAsTimeStamp) => {
+      const { planReachMaxRestaurantQuantity } =
+        planValidations[dateAsTimeStamp as keyof typeof planValidations];
+
+      return planReachMaxRestaurantQuantity;
+    },
+  );
+
+  return {
+    planValidations,
+    orderReachMaxRestaurantQuantity,
+    orderReachMinRestaurantQuantity,
+  };
+};
 
 enum EPageViewMode {
   edit = 'edit',
@@ -84,6 +186,9 @@ const OrderDetailPage = () => {
     (state) => state.OrderManagement.cancelPickingOrderInProgress,
   );
   const orderData = useAppSelector((state) => state.OrderManagement.orderData);
+  const systemVATPercentage = useAppSelector(
+    (state) => state.SystemAttributes.systemVATPercentage,
+  );
   const isFetchingOrderDetails = useAppSelector(
     (state) => state.OrderManagement.isFetchingOrderDetails,
   );
@@ -101,16 +206,23 @@ const OrderDetailPage = () => {
     shouldShowOverflowError,
     shouldShowUnderError,
   } = useAppSelector((state) => state.OrderManagement);
-
+  const {
+    orderState,
+    bookerId,
+    orderType = EOrderType.group,
+    orderVATPercentage,
+  } = Listing(orderData as TListing).getMetadata();
   const { orderDetail = {} } = Listing(planData as TListing).getMetadata();
+  const isPickingOrder = orderState === EOrderStates.picking;
   const {
     orderTitle,
     editViewData,
     reviewViewData,
     priceQuotationData,
     setReviewInfoValues,
-  } = usePrepareOrderDetailPageData({});
-
+  } = usePrepareOrderDetailPageData({
+    VATPercentage: isPickingOrder ? systemVATPercentage : orderVATPercentage,
+  });
   const handleCloseReachMaxAllowedChangesModal = () =>
     setShowReachMaxAllowedChangesModal(null);
 
@@ -154,11 +266,6 @@ const OrderDetailPage = () => {
   });
 
   const userId = CurrentUser(currentUser!).getId();
-  const {
-    orderState,
-    bookerId,
-    orderType = EOrderType.group,
-  } = Listing(orderData as TListing).getMetadata();
 
   const isNormalOrder = orderType === EOrderType.normal;
   const isPicking = orderState === EOrderStates.picking;
@@ -225,15 +332,29 @@ const OrderDetailPage = () => {
       Number(diffDays(currentViewDate, NOW, 'day').days) >= ONE_DAY) ||
       isPicking);
 
-  const orderDetailsNotChanged =
-    isDraftEditing && isEqual(orderDetail, draftOrderDetail);
+  const orderDetailsNotChanged = !checkOrderDetailHasChanged(
+    draftSubOrderChangesHistory,
+  );
 
-  const { minQuantity, disabledSubmit } = checkMinMaxQuantity(
+  const { minQuantity, disabledSubmit } = checkMinMaxQuantityInProgressState(
     draftOrderDetail,
     orderDetail,
     currentViewDate,
     isNormalOrder,
   );
+
+  const {
+    planValidations,
+    orderReachMaxRestaurantQuantity,
+    orderReachMinRestaurantQuantity,
+  } = checkMinMaxQuantityInPickingState(isNormalOrder, isPicking, orderDetail);
+
+  const {
+    planReachMaxRestaurantQuantity:
+      planReachMaxRestaurantQuantityInPickingState,
+    planReachMinRestaurantQuantity:
+      planReachMinRestaurantQuantityInPickingState,
+  } = planValidations[currentViewDate as keyof typeof planValidations] || {};
 
   const EditViewComponent = (
     <div className={editViewClasses}>
@@ -251,7 +372,10 @@ const OrderDetailPage = () => {
             : ''
         }
         confirmDisabled={
-          !isPicking && (orderDetailsNotChanged || disabledSubmit)
+          (!isPicking && (orderDetailsNotChanged || disabledSubmit)) ||
+          (isPicking &&
+            (orderReachMaxRestaurantQuantity ||
+              orderReachMinRestaurantQuantity))
         }
         isDraftEditing={isDraftEditing}
       />
@@ -269,6 +393,12 @@ const OrderDetailPage = () => {
               }
               shouldShowOverflowError={shouldShowOverflowError}
               shouldShowUnderError={shouldShowUnderError}
+              planReachMaxRestaurantQuantityInPickingState={
+                planReachMaxRestaurantQuantityInPickingState
+              }
+              planReachMinRestaurantQuantityInPickingState={
+                planReachMinRestaurantQuantityInPickingState
+              }
             />
           </div>
           <div className={css.rightPart}>
