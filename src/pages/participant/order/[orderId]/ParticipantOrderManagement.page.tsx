@@ -9,13 +9,14 @@ import { useRouter } from 'next/router';
 import Avatar from '@components/Avatar/Avatar';
 import Button from '@components/Button/Button';
 import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
-import CoverModal from '@components/CoverModal/CoverModal';
 import LoadingModal from '@components/LoadingModal/LoadingModal';
 import ParticipantLayout from '@components/ParticipantLayout/ParticipantLayout';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
 import Tabs from '@components/Tabs/Tabs';
 import { isOrderOverDeadline } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
+import CoverBox from '@pages/participant/components/CoverBox/CoverBox';
 import { participantOrderManagementThunks } from '@redux/slices/ParticipantOrderManagementPage.slice';
 import { currentUserSelector } from '@redux/slices/user.slice';
 import missingPickingOrderCover from '@src/assets/missingPickingCover.png';
@@ -167,68 +168,77 @@ const ParticipantOrderManagement = () => {
 
   return (
     <ParticipantLayout>
-      <CoverModal
-        id="PickingOrderModal"
-        isOpen={pickingOrderModalControl.value}
-        onClose={pickingOrderModalControl.setFalse}
-        coverSrc={pickingOrderCover}
-        contentInProgress={loadDataInProgress}
-        modalTitle={intl.formatMessage({ id: 'PickingOrderModal.title' })}
-        modalDescription={intl.formatMessage(
-          { id: 'PickingOrderModal.description' },
-          {
-            span: (msg: ReactNode) => (
-              <span className={css.boldText}>{msg}</span>
-            ),
-            orderName,
-          },
-        )}
-        rowInformation={rowInformation}
-        buttonWrapper={
-          <Button
-            className={css.btn}
-            disabled={loadDataInProgress}
-            onClick={pickingOrderModalControl.setFalse}>
-            Bắt đầu
-          </Button>
-        }
-      />
-      <CoverModal
-        id="MissingOrderModal"
-        isOpen={missingPickingOrderModalControl.value}
-        onClose={missingPickingOrderModalControl.setFalse}
-        coverSrc={missingPickingOrderCover}
-        contentInProgress={loadDataInProgress}
-        modalTitle={intl.formatMessage({ id: 'MissingOrderModal.title' })}
-        modalDescription={intl.formatMessage({
-          id: 'MissingOrderModal.description',
-        })}
-        rowInformation={rowInformation}
-        buttonWrapper={
-          <Button
-            className={css.btn}
-            onClick={goToHomePage}
-            disabled={loadDataInProgress}>
-            Về trang chủ
-          </Button>
-        }
-      />
-      <SectionOrderHeader
-        currentView={currentView}
-        setViewFunction={setCurrentView}
-        showToggle={isOwnerControl.value}
-      />
-      {loadDataInProgress ? (
-        <>
-          <CalendarDashboard
-            inProgress={loadDataInProgress}
-            components={{ toolbar: () => <></> }}
+      <RenderWhen
+        condition={
+          pickingOrderModalControl.value ||
+          missingPickingOrderModalControl.value
+        }>
+        <RenderWhen condition={pickingOrderModalControl.value}>
+          <CoverBox
+            coverSrc={pickingOrderCover}
+            contentInProgress={loadDataInProgress}
+            modalTitle={intl.formatMessage({ id: 'PickingOrderModal.title' })}
+            modalDescription={intl.formatMessage(
+              { id: 'PickingOrderModal.description' },
+              {
+                span: (msg: ReactNode) => (
+                  <span className={css.boldText}>{msg}</span>
+                ),
+                orderName,
+              },
+            )}
+            rowInformation={rowInformation}
+            buttonWrapper={
+              <Button
+                className={css.btn}
+                disabled={loadDataInProgress}
+                onClick={pickingOrderModalControl.setFalse}>
+                Bắt đầu
+              </Button>
+            }
           />
-        </>
-      ) : (
-        <Tabs items={tabOptions as any} headerClassName={css.tabHeader} />
-      )}
-      <LoadingModal isOpen={loadingInProgress} />
+        </RenderWhen>
+        <RenderWhen condition={missingPickingOrderModalControl.value}>
+          <CoverBox
+            coverSrc={missingPickingOrderCover}
+            contentInProgress={loadDataInProgress}
+            modalTitle={intl.formatMessage({ id: 'MissingOrderModal.title' })}
+            modalDescription={intl.formatMessage({
+              id: 'MissingOrderModal.description',
+            })}
+            rowInformation={rowInformation}
+            buttonWrapper={
+              <Button
+                className={css.btn}
+                onClick={goToHomePage}
+                disabled={loadDataInProgress}>
+                Về trang chủ
+              </Button>
+            }
+          />
+        </RenderWhen>
+
+        <RenderWhen.False>
+          <>
+            <SectionOrderHeader
+              currentView={currentView}
+              setViewFunction={setCurrentView}
+              showToggle={isOwnerControl.value}
+            />
+            {loadDataInProgress ? (
+              <>
+                <CalendarDashboard
+                  inProgress={loadDataInProgress}
+                  components={{ toolbar: () => <></> }}
+                />
+              </>
+            ) : (
+              <Tabs items={tabOptions as any} headerClassName={css.tabHeader} />
+            )}
+            <LoadingModal isOpen={loadingInProgress} />
+          </>
+        </RenderWhen.False>
+      </RenderWhen>
     </ParticipantLayout>
   );
 };
