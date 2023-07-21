@@ -84,3 +84,7 @@ export const updateParticipantOrderApi = (orderId: string, body: TObject) =>
 
 export const fetchUserApi = (userId: string) =>
   getApi(`/users/fetch-user/${userId}`);
+
+export const queryDeliveryInfoApi = ({ orderId, date }: TObject) => {
+  return getApi(`/delivery-tracking`, { orderId, date });
+};
