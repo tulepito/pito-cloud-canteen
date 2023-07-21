@@ -159,6 +159,20 @@
   }
 }
 
+.billOfLading {
+  margin-top: 24px;
+  display: flex;
+  align-items: center;
+  column-gap: 16px;
+  cursor: pointer;
+
+  .copyIcon {
+    path {
+      fill: $labelBlue2;
+    }
+  }
+}
+
 .contentBox {
   display: flex;
   justify-content: space-between;
@@ -318,4 +332,14 @@
       }
     }
   }
+}
+
+.tooltipOverlay {
+  opacity: 1;
+}
+
+.toolTipOverlay :global(.rc-tooltip-arrow) {
+  border-color: $neutralGray6;
+  border-right-color: $neutralGray1;
+  border-left-color: $neutralGray1;
 }
