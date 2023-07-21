@@ -673,6 +673,7 @@ export enum EOrderStates {
   pendingPayment = 'pendingPayment',
   completed = 'completed',
   reviewed = 'reviewed',
+  expiredStart = 'expiredStart',
 }
 
 export enum EBookerOrderDraftStates {
@@ -819,6 +820,10 @@ export const ORDER_STATES_OPTIONS = [
     key: EOrderStates.reviewed,
     label: 'Đã đánh giá',
   },
+  {
+    key: EOrderStates.expiredStart,
+    label: 'Hết hiệu lực',
+  },
 ];
 
 export const getLabelByKey = (
@@ -901,6 +906,7 @@ export const MANAGE_COMPANY_ORDERS_TAB_MAP = {
     EOrderStates.completed,
     EOrderStates.reviewed,
     EOrderStates.canceled,
+    EOrderStates.expiredStart,
   ],
   [EManageCompanyOrdersTab.SCHEDULED]: [
     EOrderStates.picking,
@@ -915,7 +921,10 @@ export const MANAGE_COMPANY_ORDERS_TAB_MAP = {
     EOrderDraftStates.pendingApproval,
     EBookerOrderDraftStates.bookerDraft,
   ],
-  [EManageCompanyOrdersTab.CANCELED]: [EOrderStates.canceled],
+  [EManageCompanyOrdersTab.CANCELED]: [
+    EOrderStates.canceled,
+    EOrderStates.expiredStart,
+  ],
 };
 
 export enum EAttributeSetting {

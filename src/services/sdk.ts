@@ -161,5 +161,8 @@ export const getCurrentUser = async (
   const response = await sdk.currentUser.show(params);
   const [currentUser] = denormalisedResponseEntities(response);
 
-  return currentUser;
+  return {
+    currentUser,
+    response,
+  };
 };
