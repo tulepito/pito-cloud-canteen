@@ -335,6 +335,8 @@
   "DeliveryAddressField.detailAddress.label": "Chi tiết địa chỉ",
   "DeliveryAddressField.detailAddress.placeholder": "Toà nhà/tầng",
   "DeliveryAddressField.title": "Chọn địa điểm giao hàng",
+  "DeliveryTrackingPage.subTitle": "Mã đơn hàng: {orderTitle}",
+  "DeliveryTrackingPage.title": "PHIẾU VẬN ĐƠN",
   "DishSelectionForm.accept": "Xác nhận chọn món",
   "DishSelectionForm.pickForMe": "Chọn giúp tôi",
   "DishSelectionForm.reject": "Không tham gia",

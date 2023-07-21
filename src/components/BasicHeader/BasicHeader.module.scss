@@ -1,0 +1,30 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.root {
+  flex: 1;
+  height: fit-content;
+  position: fixed;
+  top: 0;
+  height: $adminTopbarHeight;
+  padding: 0 28px;
+  width: 100%;
+  left: 0;
+  background-color: $neutralGray1;
+  border-bottom: 1px solid $neutralGray3;
+  z-index: 49;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  @include viewportMedium {
+    padding: 17px 80px;
+  }
+
+  .headerRight {
+    .logo {
+      width: unset;
+      height: 36px;
+    }
+  }
+}
