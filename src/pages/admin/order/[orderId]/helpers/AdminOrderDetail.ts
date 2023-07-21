@@ -2,7 +2,12 @@ import { parseThousandNumber } from '@helpers/format';
 import { groupFoodOrderByDateFromQuotation } from '@helpers/order/orderDetailHelper';
 import { Listing, User } from '@src/utils/data';
 import { EOrderType } from '@src/utils/enums';
-import type { TListing, TObject, TUser } from '@src/utils/types';
+import type {
+  TListing,
+  TObject,
+  TPaymentRecord,
+  TUser,
+} from '@src/utils/types';
 
 export const formatQuotationToFoodTableData = (
   quotationDetail: any,
@@ -264,4 +269,20 @@ export const formatPriceQuotationDataPartner = ({
       ),
     },
   };
+};
+
+export const calculatePaidAmountBySubOrderDate = (
+  paymentRecords: TPaymentRecord[],
+) => {
+  return paymentRecords.reduce((previousResult, current) => {
+    const { amount } = current;
+
+    return previousResult + amount;
+  }, 0);
+};
+
+export const generateSKU = (role: string, orderTitle: string) => {
+  const random4DigitsNumber = Math.floor(1000 + Math.random() * 9000);
+
+  return `${random4DigitsNumber}-${role}-${orderTitle}`;
 };
