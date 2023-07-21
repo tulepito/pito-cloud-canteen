@@ -1,11 +1,11 @@
 import { denormalisedResponseEntities } from '@services/data';
+import { emailSendingFactory, EmailTemplateTypes } from '@services/email';
 import { getIntegrationSdk } from '@services/sdk';
 import { Listing } from '@utils/data';
 import { EOrderStates } from '@utils/enums';
 
 export const cancelPickingOrder = async (orderId: string) => {
   const integrationSdk = await getIntegrationSdk();
-
   const [orderListing] = denormalisedResponseEntities(
     await integrationSdk.listings.show({ id: orderId }),
   );
@@ -13,9 +13,9 @@ export const cancelPickingOrder = async (orderId: string) => {
   const { orderState, orderStateHistory = [] } =
     Listing(orderListing).getMetadata();
 
-  if (orderState !== EOrderStates.picking) {
-    throw new Error(`Order is not in picking state, orderState: ${orderState}`);
-  }
+  // if (orderState !== EOrderStates.picking) {
+  //   throw new Error(`Order is not in picking state, orderState: ${orderState}`);
+  // }
 
   await integrationSdk.listings.update({
     id: orderId,
@@ -26,5 +26,8 @@ export const cancelPickingOrder = async (orderId: string) => {
         updatedAt: new Date().getTime(),
       }),
     },
+  });
+  emailSendingFactory(EmailTemplateTypes.BOOKER.BOOKER_ORDER_CANCELLED, {
+    orderId,
   });
 };
