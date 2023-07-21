@@ -1,0 +1,9 @@
+.tableHeadCell {
+  &:first-child {
+    width: 240px;
+  }
+}
+
+.deleteIcon {
+  cursor: pointer;
+}

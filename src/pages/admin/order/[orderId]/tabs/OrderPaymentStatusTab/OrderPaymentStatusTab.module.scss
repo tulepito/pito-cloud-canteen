@@ -1,0 +1,35 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.tabContainer {
+  margin-top: 40px;
+}
+
+.label {
+  max-width: 240px;
+  @include flexAlign(center);
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  gap: 8px;
+}
+
+.tooltipOverlay {
+  background-color: $neutralGray1;
+
+  &:global.rc-tooltip {
+    opacity: 1 !important;
+  }
+}
+
+.tooltipName {
+  color: $neutralGray6;
+  @include textTemplate(14px, $fontWeightBold, 20px);
+  padding: 12px;
+}
+
+.checkIcon {
+  width: 16px;
+  height: 16px;
+}
