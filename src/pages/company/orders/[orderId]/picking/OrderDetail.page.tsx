@@ -67,6 +67,8 @@ const checkMinMaxQuantityInPickingState = (
   if (!isPicking) {
     return {
       planValidations: {},
+      orderReachMaxRestaurantQuantity: false,
+      orderReachMinRestaurantQuantity: false,
     };
   }
   let planValidations = {};
