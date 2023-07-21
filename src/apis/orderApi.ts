@@ -37,6 +37,9 @@ export type TUpdateOrderApiBody = {
 export const createBookerOrderApi = (body: TCreateBookerOrderApiBody) =>
   postApi('/orders', body);
 
+export const reorderApi = (orderId: string) =>
+  postApi(`/orders/${orderId}/reorder`);
+
 export const getBookerOrderDataApi = (orderId: string) =>
   getApi(`/orders/${orderId}`);
 
