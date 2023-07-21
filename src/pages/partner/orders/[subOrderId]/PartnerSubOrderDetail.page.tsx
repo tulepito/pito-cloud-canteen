@@ -123,6 +123,15 @@ const PartnerSubOrderDetailPage: React.FC<
     'foodId',
   );
 
+  const hasAnyChanges = foodList.some(({ foodId }: TObject) => {
+    const { frequency: oldFrequency = 0 } =
+      oldFoodList.find((item: TObject) => item.foodId === foodId) || {};
+    const { frequency: crrFrequency = 0 } =
+      currentFoodList.find((item: TObject) => item.foodId === foodId) || {};
+
+    return oldFrequency !== crrFrequency;
+  });
+
   const handleChangeViewMode =
     (_viewMode: EPartnerSubOrderDetailPageViewMode) => () => {
       setViewMode(_viewMode);
@@ -146,10 +155,27 @@ const PartnerSubOrderDetailPage: React.FC<
   }, [isReady, subOrderId]);
 
   useEffect(() => {
-    if (!fetchOrderInProgress && newUpdatedOrderNotification) {
+    if (!fetchOrderInProgress && newUpdatedOrderNotification && hasAnyChanges) {
       updateOrderModalContainer.setTrue();
     }
-  }, [fetchOrderInProgress, JSON.stringify(newUpdatedOrderNotification)]);
+
+    if (!hasAnyChanges) {
+      dispatch(
+        NotificationThunks.markNotificationsSeen(
+          newUpdatedOrderNotificationIds,
+        ),
+      );
+      dispatch(
+        NotificationActions.markNotificationsSeen(
+          newUpdatedOrderNotificationIds,
+        ),
+      );
+    }
+  }, [
+    fetchOrderInProgress,
+    hasAnyChanges,
+    JSON.stringify(newUpdatedOrderNotification),
+  ]);
 
   useEffect(() => {
     return () => {
@@ -233,7 +259,7 @@ const PartnerSubOrderDetailPage: React.FC<
                         (item: TObject) => item.foodId === foodId,
                       ) || {};
 
-                    return (
+                    return oldFrequency === crrFrequency ? null : (
                       <div key={foodId} className={css.row}>
                         <div title={foodName}>{foodName}</div>
                         <div>{oldFrequency}</div>
