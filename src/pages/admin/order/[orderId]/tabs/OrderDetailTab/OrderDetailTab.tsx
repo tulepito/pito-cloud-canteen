@@ -1,7 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import classNames from 'classnames';
+import isEqual from 'lodash/isEqual';
 import { useRouter } from 'next/router';
 
+import ManageLineItemsSection from '@components/OrderDetails/EditView/ManageOrderDetailSection/ManageLineItemsSection';
 import ManageOrdersSection from '@components/OrderDetails/EditView/ManageOrderDetailSection/ManageOrdersSection';
 import ManageParticipantsSection from '@components/OrderDetails/EditView/ManageParticipantsSection/ManageParticipantsSection';
 import OrderDeadlineCountdownSection from '@components/OrderDetails/EditView/OrderDeadlineCountdownSection/OrderDeadlineCountdownSection';
@@ -19,12 +22,14 @@ import { usePrepareOrderDetailPageData } from '@hooks/usePrepareOrderManagementD
 import { AdminAttributesThunks } from '@pages/admin/Attributes.slice';
 import { ReviewContent } from '@pages/admin/order/create/components/ReviewOrder/ReviewOrder';
 import {
+  checkMinMaxQuantity,
   OrderManagementsAction,
   orderManagementThunks,
 } from '@redux/slices/OrderManagement.slice';
 import { Listing } from '@src/utils/data';
 import { formatTimestamp } from '@src/utils/dates';
 import { EOrderStates, EOrderType } from '@src/utils/enums';
+import { txIsInitiated } from '@src/utils/transaction';
 import type { TListing, TObject, TTransaction, TUser } from '@src/utils/types';
 
 import OrderHeaderInfor from '../../components/OrderHeaderInfor/OrderHeaderInfor';
@@ -76,12 +81,16 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
     loadMoreSubOrderChangesHistory,
     draftOrderDetail,
     draftSubOrderChangesHistory,
-    // shouldShowOverflowError,
-    // shouldShowUnderError,
+    shouldShowOverflowError,
+    shouldShowUnderError,
+    isFetchingOrderDetails,
   } = useAppSelector((state) => state.OrderManagement);
   const dispatch = useAppDispatch();
   const router = useRouter();
-  const { timestamp } = router.query;
+  const {
+    query: { timestamp },
+    isReady: isRouterReady,
+  } = router;
   const [currentViewDate, setCurrentViewDate] = useState<number>(
     Number(timestamp),
   );
@@ -99,11 +108,30 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
     orderType = EOrderType.group,
   } = Listing(order).getMetadata();
   const isPickingState = orderState === EOrderStates.picking;
+  const isGroupOrder = orderType === EOrderType.group;
   const planId = plans.length > 0 ? plans[0] : undefined;
   const showStateSectionCondition =
     orderStateHistory.findIndex(({ state }: { state: EOrderStates }) => {
       return state === EOrderStates.inProgress;
     }) > 0;
+  const orderDetailsNotChanged =
+    isDraftEditing && isEqual(orderDetail, draftOrderDetail);
+
+  const { minQuantity, disabledSubmit } = checkMinMaxQuantity(
+    draftOrderDetail,
+    orderDetail,
+    currentViewDate,
+    !isGroupOrder,
+  );
+
+  const currentTxIsInitiated = txIsInitiated(
+    transactionDataMap[currentViewDate],
+  );
+
+  const ableToUpdateOrder =
+    !isFetchingOrderDetails &&
+    isRouterReady &&
+    ((currentTxIsInitiated && isDraftEditing) || isPickingState);
 
   const { orderTitle, priceQuotationData, editViewData, reviewViewData } =
     // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -134,7 +162,7 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
     () => {
       const foodOrderGroupedByDate = groupFoodOrderByDate({
         orderDetail,
-        isGroupOrder: orderType === EOrderType.group,
+        isGroupOrder,
       });
 
       return Object.keys(orderDetail).map((key: string) => {
@@ -195,6 +223,10 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
     setIsDraftEditing(true);
   };
 
+  const handleSetCurrentViewDate = (date: number) => {
+    setCurrentViewDate(date);
+  };
+
   const onQueryMoreSubOrderChangesHistory = () => {
     if (lastRecordSubOrderChangesHistoryCreatedAt)
       return onQuerySubOrderHistoryChanges(
@@ -229,6 +261,9 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
           onConfirmOrder={handleConfirmOrder}
           isDraftEditing={isDraftEditing}
           turnOnDraftEditMode={turnOnDraftEditMode}
+          confirmUpdateDisabled={
+            !isPickingState && (disabledSubmit || orderDetailsNotChanged)
+          }
         />
         <RenderWhen condition={showStateSectionCondition}>
           <ReviewOrderStatesSection
@@ -248,7 +283,7 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
 
         <div className={css.orderDetailWrapper}>
           <RenderWhen condition={isPickingState || isDraftEditing}>
-            <RenderWhen condition={orderType === 'group'}>
+            <RenderWhen condition={isGroupOrder}>
               <div className={css.editViewRoot}>
                 <div className={css.leftPart}>
                   <ManageOrdersSection
@@ -300,6 +335,54 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
                   </RenderWhen>
                 </div>
               </div>
+
+              <RenderWhen.False>
+                <RenderWhen condition={isDraftEditing}>
+                  <div
+                    className={
+                      isDraftEditing
+                        ? css.lineItemsTableWithSubOrderSection
+                        : css.lineItemsTable
+                    }>
+                    <ManageLineItemsSection
+                      data={editViewData.manageOrdersData}
+                      isDraftEditing={isDraftEditing}
+                      ableToUpdateOrder={ableToUpdateOrder}
+                      shouldShowOverflowError={shouldShowOverflowError}
+                      shouldShowUnderError={shouldShowUnderError}
+                      setCurrentViewDate={handleSetCurrentViewDate}
+                      currentViewDate={currentViewDate}
+                      minQuantity={minQuantity}
+                    />
+                    {isDraftEditing && (
+                      <SubOrderChangesHistorySection
+                        className={classNames(
+                          css.historyContainer,
+                          css.normalOrderSubOrderSection,
+                        )}
+                        querySubOrderChangesHistoryInProgress={
+                          querySubOrderChangesHistoryInProgress
+                        }
+                        subOrderChangesHistory={subOrderChangesHistory}
+                        draftSubOrderChangesHistory={
+                          draftSubOrderChangesHistory[
+                            currentViewDate as unknown as keyof typeof draftSubOrderChangesHistory
+                          ]
+                        }
+                        onQueryMoreSubOrderChangesHistory={
+                          onQueryMoreSubOrderChangesHistory
+                        }
+                        subOrderChangesHistoryTotalItems={
+                          subOrderChangesHistoryTotalItems
+                        }
+                        loadMoreSubOrderChangesHistory={
+                          loadMoreSubOrderChangesHistory
+                        }
+                      />
+                    )}
+                  </div>
+                </RenderWhen>
+              </RenderWhen.False>
             </RenderWhen>
 
             <RenderWhen.False>
