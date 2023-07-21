@@ -365,7 +365,7 @@ export const emailSendingFactory = async (
         const { email: bookerEmail } = bookerUser?.getAttributes() || {};
         const emailTemplate = bookerOrderCancelled(emailDataSource);
         const emailDataParams = {
-          receiver: ['minh.tran@journeyh.io'],
+          receiver: [bookerEmail],
           subject: bookerOrderCancelledSubject(orderName),
           content: emailTemplate as string,
           sender: systemSenderEmail as string,

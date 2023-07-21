@@ -18,6 +18,7 @@ import {
   bookerPublishOrderApi,
   createBookerOrderApi,
   queryOrdersApi,
+  reorderApi,
   requestApprovalOrderApi,
   updateOrderApi,
   updatePlanDetailsApi,
@@ -147,6 +148,9 @@ type TOrderInitialState = {
   allOrders: TListing[];
   queryAllOrdersInProgress: boolean;
   queryAllOrdersError: any;
+
+  reorderInProgress: boolean;
+  reorderError: any;
 };
 
 const initialState: TOrderInitialState = {
@@ -244,6 +248,9 @@ const initialState: TOrderInitialState = {
   allOrders: [],
   queryAllOrdersInProgress: false,
   queryAllOrdersError: null,
+
+  reorderInProgress: false,
+  reorderError: null,
 };
 
 const CREATE_ORDER = 'app/Order/CREATE_ORDER';
@@ -268,6 +275,8 @@ const GET_COMPANY_ORDER_NOTIFICATIONS =
 
 const GET_COMPANY_ORDER_SUMMARY = 'app/Order/GET_COMPANY_ORDER_SUMMARY';
 const QUERY_ALL_ORDERS = 'app/Order/QUERY_ALL_ORDERS';
+
+const BOOKER_REORDER = 'app/Order/BOOKER_REORDER';
 
 const createOrder = createAsyncThunk(CREATE_ORDER, async (params: any) => {
   const { clientId, bookerId, isCreatedByAdmin = false, generalInfo } = params;
@@ -881,6 +890,18 @@ const getCompanyOrderSummary = createAsyncThunk(
   },
 );
 
+const bookerReorder = createAsyncThunk(
+  BOOKER_REORDER,
+  async (orderId: string) => {
+    const { data } = await reorderApi(orderId);
+
+    return data;
+  },
+  {
+    serializeError: storableAxiosError,
+  },
+);
+
 export const orderAsyncActions = {
   createOrder,
   updateOrder,
@@ -904,6 +925,7 @@ export const orderAsyncActions = {
   getCompanyOrderNotification,
   getCompanyOrderSummary,
   queryAllOrders,
+  bookerReorder,
 };
 
 const orderSlice = createSlice({
@@ -1367,6 +1389,20 @@ const orderSlice = createSlice({
         ...state,
         queryAllOrdersInProgress: false,
         queryAllOrdersError: error.message,
+      }))
+      .addCase(bookerReorder.pending, (state) => ({
+        ...state,
+        reorderInProgress: true,
+        reorderError: null,
+      }))
+      .addCase(bookerReorder.fulfilled, (state) => ({
+        ...state,
+        reorderInProgress: false,
+      }))
+      .addCase(bookerReorder.rejected, (state, { error }) => ({
+        ...state,
+        reorderInProgress: false,
+        reorderError: error,
       }));
   },
 });

@@ -24,7 +24,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         try {
           const { planId } = req.query;
           const createData = req.body;
-          const currentUser = await getCurrentUser(req, res);
+          const { currentUser } = await getCurrentUser(req, res);
           const createdAt = createData?.createdAt
             ? new Date(createData.createdAt)
             : new Date();

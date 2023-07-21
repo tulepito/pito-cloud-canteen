@@ -1,5 +1,4 @@
 const { mapLimit } = require('async');
-const { denormalisedResponseEntities } = require('./utils/data');
 const { diffDays } = require('./utils/dates');
 const { Listing } = require('./utils/normalizeEntity');
 const { getIntegrationSdk } = require('./utils/sdk');
@@ -32,6 +31,7 @@ module.exports.run = async (_, context) => {
       const reachMaxPickingDate =
         diffDays(TODAY_AS_TIMESTAMP, updatedAt).milliseconds >
         EXPIRED_PICKING_ORDER_DAYS_NUMBER;
+
       return reachMaxPickingDate;
     });
 
@@ -55,6 +55,7 @@ module.exports.run = async (_, context) => {
             ],
           },
         });
+
         return response;
       } catch (error) {
         console.error(`update order failed listingId : ${listingId} `, {
