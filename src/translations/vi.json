@@ -1518,6 +1518,8 @@
   "SubOrderChangesHistoryItem.memberFoodRemoved": "Xóa thành viên",
   "SubOrderChangesHistoryItem.memberFoodRemovedContent": "Xóa {email} từ {from}",
   "SubOrderChangesHistorySection.title": "Hoạt động chỉnh sửa",
+  "SubOrderDetailRoute.description": "Phiếu Vận Đơn",
+  "SubOrderDetailRoute.title": "Phiếu Vận Đơn",
   "Table.noResults": "Không có dữ liệu",
   "Toolbar.action.pickForMe": "Chọn giúp tôi",
   "Toolbar.action.today": "Hôm nay",
