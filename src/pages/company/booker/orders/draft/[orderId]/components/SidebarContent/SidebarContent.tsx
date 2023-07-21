@@ -130,7 +130,7 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
   const deliveryInitValues = {
     startDate: startDate || nextStartWeek,
     endDate: endDate || nextEndWeek,
-    deliveryHour: deliveryHour || '07:00',
+    deliveryHour,
   };
   const deadlineInitValues = {
     deadlineDate: new Date(deadlineDate).getTime() || defaultDeadlineDate,

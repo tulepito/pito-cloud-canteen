@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import classNames from 'classnames';
 import { useRouter } from 'next/router';
@@ -17,12 +17,14 @@ import { companyPaths } from '@src/paths';
 import { historyPushState } from '@src/utils/history';
 import {
   EManageCompanyOrdersTab,
+  EOrderStates,
   MANAGE_COMPANY_ORDERS_TAB_MAP,
 } from '@utils/enums';
 import type { TObject } from '@utils/types';
 
 import { parseEntitiesToTableData } from '../helpers/parseEntitiesToTableData';
 
+import OrderStateWarningModal from './OrderStateWarningModal/OrderStateWarningModal';
 import { CompanyOrdersTableColumns } from './CompanyOrdersTableColumns';
 import type { TSearchOrderFormValues } from './SearchOrderForm';
 import SearchOrderForm from './SearchOrderForm';
@@ -153,6 +155,10 @@ const CompanyOrdersTable: React.FC<TCompanyOrdersTableProps> = () => {
   );
 
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+
+  const [orderWarningState, setOrderWarningState] =
+    useState<EOrderStates | null>();
+
   let currDebounceRef = debounceRef.current;
 
   const {
@@ -161,11 +167,31 @@ const CompanyOrdersTable: React.FC<TCompanyOrdersTableProps> = () => {
     companyId = '',
     currentTab = EManageCompanyOrdersTab.ALL,
   } = query;
+
+  const openOrderStateWarningModal = (value: EOrderStates) => {
+    setOrderWarningState(value);
+  };
+
+  const closeOrderStateWarningModal = () => {
+    setOrderWarningState(null);
+  };
+
+  const onConfirmOrderStateWarningModal = () => {
+    return router.push(companyPaths.CreateNewOrder);
+  };
+
+  const orderStateWarningContent =
+    orderWarningState === EOrderStates.expiredStart
+      ? 'Đơn hàng đã hết hiệu lực đặt.'
+      : 'Đơn hàng của bạn đã huỷ. Bạn có muốn đặt đơn mới không?';
+
   const tableData = parseEntitiesToTableData(
     orders,
     Number(page),
     currentOrderVATPercentage,
+    openOrderStateWarningModal,
   );
+
   const tabItems = prepareTabItems({
     intl,
     currentTab,
@@ -255,6 +281,14 @@ const CompanyOrdersTable: React.FC<TCompanyOrdersTableProps> = () => {
             initialValues={{ keywords: keywords as string }}
           />
         }
+      />
+      <OrderStateWarningModal
+        id="CompanyOrdersTable.OrderStateWarningModal"
+        isOpen={!!orderWarningState}
+        handleClose={closeOrderStateWarningModal}
+        onCancel={closeOrderStateWarningModal}
+        onConfirm={onConfirmOrderStateWarningModal}
+        content={orderStateWarningContent}
       />
     </div>
   );

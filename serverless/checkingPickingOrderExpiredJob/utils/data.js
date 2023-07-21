@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-extraneous-dependencies
 const reduce = require('lodash/reduce');
 const { sanitizeEntity } = require('./sanitize');
 
@@ -120,6 +121,7 @@ const ensureListing = (listing) => {
     attributes: { publicData: {} },
     images: [],
   };
+
   return { ...empty, ...listing };
 };
 

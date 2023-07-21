@@ -1,5 +1,4 @@
 const flexIntegrationSdk = require('sharetribe-flex-integration-sdk');
-const { denormalisedResponseEntities } = require('./data');
 
 const getIntegrationSdk = () =>
   flexIntegrationSdk.createInstance({
