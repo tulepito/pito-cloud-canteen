@@ -8,6 +8,7 @@ import { InlineTextButton } from '@components/Button/Button';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import IconBell from '@components/Icons/IconBell/IconBell';
 import IconMail from '@components/Icons/IconMail/IconMail';
+import NamedLink from '@components/NamedLink/NamedLink';
 import OutsideClickHandler from '@components/OutsideClickHandler/OutsideClickHandler';
 import PitoLogo from '@components/PitoLogo/PitoLogo';
 import ProfileMenu from '@components/ProfileMenu/ProfileMenu';
@@ -24,6 +25,7 @@ import {
   NotificationThunks,
 } from '@redux/slices/notification.slice';
 import { currentUserSelector } from '@redux/slices/user.slice';
+import { partnerPaths } from '@src/paths';
 import { CurrentUser } from '@src/utils/data';
 
 import PartnerNotificationModal from './PartnerNotificationModal';
@@ -78,9 +80,11 @@ const PartnerHeader: React.FC<TPartnerHeaderProps> = () => {
 
   return (
     <div className={css.root}>
-      <div className={css.headerRight}>
-        <PitoLogo className={css.logo} />
-      </div>
+      <NamedLink path={partnerPaths.Home}>
+        <div className={css.headerRight}>
+          <PitoLogo className={css.logo} />
+        </div>
+      </NamedLink>
       <div className={css.headerLeft}>
         <div className={css.actionContainer}>
           <InlineTextButton type="button">
