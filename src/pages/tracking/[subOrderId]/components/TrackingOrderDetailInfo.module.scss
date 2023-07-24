@@ -31,6 +31,10 @@
   }
   & > div:nth-of-type(3) {
     flex-basis: 50px;
+
+    @include viewportLarge {
+      flex-basis: 260px;
+    }
   }
   & > div:nth-of-type(4) {
     flex-basis: 30px;
