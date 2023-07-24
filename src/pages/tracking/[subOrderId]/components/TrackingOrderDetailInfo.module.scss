@@ -75,6 +75,10 @@
         & > div:nth-of-type(3) {
           flex-basis: 65%;
           @include lineClamp(2);
+
+          @include viewportMedium {
+            max-width: 45%;
+          }
         }
       }
 
@@ -120,4 +124,7 @@
       }
     }
   }
+}
+
+.root {
 }

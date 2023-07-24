@@ -72,6 +72,7 @@ const TrackingOrderDetailInfo: React.FC<TTrackingOrderDetailInfoProps> = ({
 
   return (
     <Collapsible
+      className={css.root}
       label={intl.formatMessage({
         id: 'Tracking.OrderDetailInfo.title',
       })}>
