@@ -43,12 +43,12 @@ const PartnerPaymentDetail: React.FC<PartnerPaymentDetailProps> = (props) => {
   );
   const addPaymentDisabled = totalWithVAT === paidAmount;
 
-  const handleAddPartnerPaymentRecord = (
+  const handleAddPartnerPaymentRecord = async (
     values: TAddingPaymentRecordFormValues,
   ) => {
     const { paymentAmount, paymentNote } = values;
 
-    dispatch(
+    const { meta } = await dispatch(
       OrderDetailThunks.createPartnerPaymentRecord({
         paymentType: 'partner',
         orderId,
@@ -59,6 +59,10 @@ const PartnerPaymentDetail: React.FC<PartnerPaymentDetailProps> = (props) => {
         SKU: generateSKU('CUSTOMER', orderId),
       }),
     );
+
+    if (meta.requestStatus === 'fulfilled') {
+      addPaymentModalController.setFalse();
+    }
   };
 
   const handleDeletePartnerPaymentRecord = async (paymentRecordId: string) => {

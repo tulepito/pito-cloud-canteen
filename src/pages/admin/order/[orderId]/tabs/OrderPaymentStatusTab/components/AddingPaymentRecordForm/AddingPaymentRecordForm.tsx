@@ -127,8 +127,14 @@ const AddingPaymentRecordFormComponent: React.FC<
     }
   }, [percentage]);
 
+  const handleFormSubmit = async (_values: any) => {
+    await handleSubmit(_values);
+    form.restart();
+    setPercentage(0);
+  };
+
   return (
-    <Form onSubmit={handleSubmit}>
+    <Form onSubmit={handleFormSubmit}>
       <FieldTextInput
         id="paymentAmount"
         name="paymentAmount"
