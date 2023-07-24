@@ -30,6 +30,10 @@ const TrackingOrderDetailInfo: React.FC<TTrackingOrderDetailInfoProps> = ({
   const orderGetter = Listing(order as TListing);
   const { orderType = EOrderType.group } = orderGetter.getMetadata();
   const { lineItems = [] } = orderDetailOfDate;
+  console.debug(
+    '💫 > file: TrackingOrderDetailInfo.tsx:33 > lineItems: ',
+    lineItems,
+  );
   const isGroupOrder = orderType === EOrderType.group;
 
   // Prepare data for order with type 'group'
@@ -144,14 +148,15 @@ const TrackingOrderDetailInfo: React.FC<TTrackingOrderDetailInfoProps> = ({
 
             <RenderWhen.False>
               {lineItems?.map((lineItem: TObject, foodIndex: number) => {
-                const { foodName, frequency } = lineItem;
+                const { name: foodName, quantity: frequency } = lineItem;
 
                 return (
                   <div className={css.tableRowGroup} key={foodIndex}>
-                    <div className={css.row}>
+                    <div className={css.lineItemRow}>
                       <div>{foodIndex + 1}</div>
                       <div>{foodName}</div>
                       <div>{frequency}</div>
+                      <div></div>
                     </div>
                   </div>
                 );

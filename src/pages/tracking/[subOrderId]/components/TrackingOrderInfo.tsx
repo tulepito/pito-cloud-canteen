@@ -42,7 +42,8 @@ const TrackingOrderInfo: React.FC<TTrackingOrderInfoProps> = () => {
         value: location?.address || '',
       },
     ];
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [restaurantName, phoneNumber, contactorName, JSON.stringify(location)]);
 
   return (
     <Collapsible
