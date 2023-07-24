@@ -149,7 +149,7 @@ type TOrderInitialState = {
   queryAllOrdersInProgress: boolean;
   queryAllOrdersError: any;
 
-  reorderInProgress: boolean;
+  reorderInProgressId: string | null;
   reorderError: any;
 };
 
@@ -249,7 +249,7 @@ const initialState: TOrderInitialState = {
   queryAllOrdersInProgress: false,
   queryAllOrdersError: null,
 
-  reorderInProgress: false,
+  reorderInProgressId: null,
   reorderError: null,
 };
 
@@ -1390,18 +1390,18 @@ const orderSlice = createSlice({
         queryAllOrdersInProgress: false,
         queryAllOrdersError: error.message,
       }))
-      .addCase(bookerReorder.pending, (state) => ({
+      .addCase(bookerReorder.pending, (state, { meta: { arg: orderId } }) => ({
         ...state,
-        reorderInProgress: true,
+        reorderInProgressId: orderId,
         reorderError: null,
       }))
       .addCase(bookerReorder.fulfilled, (state) => ({
         ...state,
-        reorderInProgress: false,
+        reorderInProgressId: null,
       }))
       .addCase(bookerReorder.rejected, (state, { error }) => ({
         ...state,
-        reorderInProgress: false,
+        reorderInProgressId: null,
         reorderError: error,
       }));
   },
