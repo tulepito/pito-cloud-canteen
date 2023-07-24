@@ -9,7 +9,9 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { Listing } from '@src/utils/data';
 import type { TListing } from '@src/utils/types';
 
+import TrackingContactInfo from './components/TrackingContactInfo';
 import TrackingDeliveryInfo from './components/TrackingDeliveryInfo';
+import TrackingNoteInfo from './components/TrackingNoteInfo';
 import TrackingOrderDetailInfo from './components/TrackingOrderDetailInfo';
 import TrackingOrderInfo from './components/TrackingOrderInfo';
 import { TrackingPageThunks } from './TrackingPage.slice';
@@ -34,7 +36,7 @@ const TrackingPage: React.FC<TTrackingPageProps> = () => {
   // eslint-disable-next-line no-unsafe-optional-chaining
   const [orderId, date] = (subOrderId as string)?.split('_');
 
-  const { orderTitle = '' } = Listing(order as TListing).getMetadata();
+  const { title: orderTitle = '' } = Listing(order as TListing).getAttributes();
 
   useEffect(() => {
     if (orderId && date) {
@@ -60,7 +62,7 @@ const TrackingPage: React.FC<TTrackingPageProps> = () => {
           <Skeleton className={css.subTitleLoading} />
 
           <RenderWhen.False>
-            <div>
+            <div className={css.subTitle}>
               {intl.formatMessage(
                 { id: 'TrackingPage.subTitle' },
                 { orderTitle },
@@ -69,12 +71,11 @@ const TrackingPage: React.FC<TTrackingPageProps> = () => {
           </RenderWhen.False>
         </RenderWhen>
       </div>
-
       <TrackingOrderInfo />
       <TrackingDeliveryInfo subOrderDate={date} />
       <TrackingOrderDetailInfo subOrderDate={date} />
-
-      <div></div>
+      <TrackingNoteInfo />
+      <TrackingContactInfo />
     </div>
   );
 };

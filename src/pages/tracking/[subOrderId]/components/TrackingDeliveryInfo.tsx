@@ -64,7 +64,7 @@ const TrackingDeliveryInfo: React.FC<TTrackingDeliveryInfoProps> = ({
       label={intl.formatMessage({
         id: 'Tracking.DeliveryInfo.title',
       })}>
-      <div>
+      <div className={css.rows}>
         {rowData.map(({ label, value }, index) => {
           return (
             <div key={index} className={css.rowInfo}>
