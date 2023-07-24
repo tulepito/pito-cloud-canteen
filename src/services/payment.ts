@@ -21,6 +21,7 @@ export type PaymentBaseParams = {
   companyName?: string;
   orderTitle?: string;
   totalPrice?: number;
+  deliveryHour?: string;
 };
 
 export const createPaymentRecordOnFirebase = async (
