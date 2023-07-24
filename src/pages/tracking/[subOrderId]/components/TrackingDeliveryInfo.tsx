@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
 
@@ -21,13 +22,13 @@ const TrackingDeliveryInfo: React.FC<TTrackingDeliveryInfoProps> = ({
   // Booker data
   const bookerGetter = User(booker as TUser);
   const { firstName, lastName } = bookerGetter.getProfile();
-  const { phoneNumber } = bookerGetter.getPublicData();
+  const { phoneNumber = '-' } = bookerGetter.getPublicData();
   // Order data
   const orderGetter = Listing(order as TListing);
   const {
     deliveryAddress = {},
-    companyName = '',
-    deadlineHour,
+    companyName = '-',
+    deliveryHour,
   } = orderGetter.getMetadata();
 
   const rowData = useMemo(() => {
@@ -50,14 +51,24 @@ const TrackingDeliveryInfo: React.FC<TTrackingDeliveryInfoProps> = ({
         label: intl.formatMessage({
           id: 'Tracking.DeliveryInfo.deliveryAddress',
         }),
-        value: deliveryAddress?.address || '',
+        value: deliveryAddress?.address || '-',
       },
       {
         label: intl.formatMessage({ id: 'Tracking.DeliveryInfo.deliveryTime' }),
-        value: `${deadlineHour}, ${formatTimestamp(Number(subOrderDate))}`,
+        value: `${deliveryHour || '-'}, ${formatTimestamp(
+          Number(subOrderDate),
+        )}`,
       },
     ];
-  }, []);
+  }, [
+    companyName,
+    lastName,
+    firstName,
+    phoneNumber,
+    deliveryHour,
+    subOrderDate,
+    JSON.stringify(deliveryAddress),
+  ]);
 
   return (
     <Collapsible
