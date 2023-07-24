@@ -67,6 +67,7 @@ const PartnerPaymentDetail: React.FC<PartnerPaymentDetailProps> = (props) => {
         partnerName,
         companyName,
         orderTitle,
+        totalPrice: totalWithVAT,
         SKU: generateSKU('CUSTOMER', orderId),
       }),
     );
