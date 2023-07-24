@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type { NextRequest } from 'next/server';
 
-import type { TObject } from '@src/utils/types';
+import type { TCurrentUser, TObject } from '@src/utils/types';
 
 import { denormalisedResponseEntities } from './data';
 
@@ -161,5 +161,8 @@ export const getCurrentUser = async (
   const response = await sdk.currentUser.show(params);
   const [currentUser] = denormalisedResponseEntities(response);
 
-  return currentUser;
+  return {
+    currentUser: currentUser as TCurrentUser,
+    response,
+  };
 };

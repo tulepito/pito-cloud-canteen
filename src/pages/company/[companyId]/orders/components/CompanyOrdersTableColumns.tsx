@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable react-hooks/rules-of-hooks */
-import type { ReactNode } from 'react';
+import { type ReactNode } from 'react';
 import { useIntl } from 'react-intl';
 import classNames from 'classnames';
 import { useRouter } from 'next/router';
 
 import Badge, { EBadgeType } from '@components/Badge/Badge';
 import type { TButtonVariant } from '@components/Button/Button';
-import Button from '@components/Button/Button';
+import Button, { InlineTextButton } from '@components/Button/Button';
 import AlertModal from '@components/Modal/AlertModal';
 import NamedLink from '@components/NamedLink/NamedLink';
 import OrderDetailTooltip from '@components/OrderDetailTooltip/OrderDetailTooltip';
@@ -19,6 +19,7 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
 import { companyPaths } from '@src/paths';
+import { Listing } from '@src/utils/data';
 import {
   EBookerOrderDraftStates,
   EOrderDraftStates,
@@ -40,6 +41,7 @@ const BADGE_TYPE_BASE_ON_ORDER_STATE = {
   [EOrderStates.pendingPayment]: EBadgeType.danger,
   [EOrderStates.completed]: EBadgeType.success,
   [EOrderStates.reviewed]: EBadgeType.success,
+  [EOrderStates.expiredStart]: EBadgeType.default,
 };
 
 const BADGE_CLASS_NAME_BASE_ON_ORDER_STATE = {
@@ -51,6 +53,7 @@ const BADGE_CLASS_NAME_BASE_ON_ORDER_STATE = {
   [EOrderStates.pendingPayment]: css.badgeDefault,
   [EOrderStates.picking]: css.badgeDefault,
   [EOrderStates.reviewed]: css.badgeDefault,
+  [EOrderStates.expiredStart]: css.badgeDefault,
 };
 
 const CompanyOrdersActionColumn = ({
@@ -78,6 +81,10 @@ const CompanyOrdersActionColumn = ({
   );
   const deleteDraftOrderInProgress = useAppSelector(
     (state) => state.Order.deleteDraftOrderInProgress,
+  );
+
+  const reorderInProgressId = useAppSelector(
+    (state) => state.Order.reorderInProgressId,
   );
 
   const orderLink = getParticipantPickingLink(orderId);
@@ -133,6 +140,22 @@ const CompanyOrdersActionColumn = ({
       pathname: companyPaths.OrderRating,
       query: { orderId },
     });
+  };
+
+  const handleReorder = async () => {
+    const { payload } = await dispatch(
+      orderAsyncActions.bookerReorder(orderId),
+    );
+
+    const newOrderId = Listing(payload).getId();
+    if (payload) {
+      router.push({
+        pathname: companyPaths.EditDraftOrder,
+        query: {
+          orderId: newOrderId,
+        },
+      });
+    }
   };
 
   const secondaryButtonProps = {
@@ -223,8 +246,15 @@ const CompanyOrdersActionColumn = ({
     </Button>
   ) : null;
 
+  const reorderInProgress = reorderInProgressId === orderId;
+
   const reorderButton = (
-    <Button key={`${orderId}-reorderButton`} {...secondaryButtonProps} disabled>
+    <Button
+      key={`${orderId}-reorderButton`}
+      {...secondaryButtonProps}
+      onClick={handleReorder}
+      inProgress={reorderInProgress}
+      disabled={reorderInProgress}>
       {intl.formatMessage({
         id: 'ManageCompanyOrdersPage.actionBtn.reorder',
       })}
@@ -300,7 +330,14 @@ export const CompanyOrdersTableColumns: TColumn[] = [
     key: 'title',
     label: 'Đơn hàng',
     render: (data: TObject) => {
-      const { id, isCreatedByPitoAdmin, title, state, plan } = data;
+      const {
+        id,
+        isCreatedByPitoAdmin,
+        title,
+        state,
+        plan,
+        openOrderStateWarningModal,
+      } = data;
       const titleContent = (
         <div className={css.title}>
           #{title}
@@ -313,6 +350,20 @@ export const CompanyOrdersTableColumns: TColumn[] = [
 
       if ([EOrderDraftStates.draft].includes(state)) {
         return titleContent;
+      }
+
+      const isPitoOrderCancelled =
+        state === EOrderStates.canceled && isCreatedByPitoAdmin;
+
+      const openOrderStateWarningModalFn = () =>
+        openOrderStateWarningModal(state);
+
+      if (isPitoOrderCancelled || state === EOrderStates.expiredStart) {
+        return (
+          <InlineTextButton onClick={openOrderStateWarningModalFn}>
+            {titleContent}
+          </InlineTextButton>
+        );
       }
 
       if (
