@@ -83,8 +83,8 @@ const CompanyOrdersActionColumn = ({
     (state) => state.Order.deleteDraftOrderInProgress,
   );
 
-  const reorderInProgress = useAppSelector(
-    (state) => state.Order.reorderInProgress,
+  const reorderInProgressId = useAppSelector(
+    (state) => state.Order.reorderInProgressId,
   );
 
   const orderLink = getParticipantPickingLink(orderId);
@@ -245,6 +245,8 @@ const CompanyOrdersActionColumn = ({
       })}
     </Button>
   ) : null;
+
+  const reorderInProgress = reorderInProgressId === orderId;
 
   const reorderButton = (
     <Button
