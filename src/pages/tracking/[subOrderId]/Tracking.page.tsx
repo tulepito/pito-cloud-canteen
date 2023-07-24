@@ -7,18 +7,18 @@ import BasicHeader from '@components/BasicHeader/BasicHeader';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 
-import { DeliveryTrackingPageThunks } from './DeliveryTrackingPage.slice';
+import { TrackingPageThunks } from './TrackingPage.slice';
 
-import css from './DeliveryTrackingPage.module.scss';
+import css from './TrackingPage.module.scss';
 
-type TDeliveryTrackingPageProps = {};
+type TTrackingPageProps = {};
 
-const DeliveryTrackingPage: React.FC<TDeliveryTrackingPageProps> = () => {
+const TrackingPage: React.FC<TTrackingPageProps> = () => {
   const intl = useIntl();
   const router = useRouter();
   const dispatch = useAppDispatch();
   const loadDataInProgress = useAppSelector(
-    (state) => state.DeliveryTrackingPage.loadDataInProgress,
+    (state) => state.TrackingPage.loadDataInProgress,
   );
 
   const {
@@ -30,7 +30,7 @@ const DeliveryTrackingPage: React.FC<TDeliveryTrackingPageProps> = () => {
 
   useEffect(() => {
     dispatch(
-      DeliveryTrackingPageThunks.loadData({
+      TrackingPageThunks.loadData({
         orderId,
         date,
       }),
@@ -43,7 +43,7 @@ const DeliveryTrackingPage: React.FC<TDeliveryTrackingPageProps> = () => {
 
       <div className={css.titleContainer}>
         <div className={css.title}>
-          {intl.formatMessage({ id: 'DeliveryTrackingPage.title' })}
+          {intl.formatMessage({ id: 'TrackingPage.title' })}
         </div>
         <RenderWhen condition={loadDataInProgress}>
           <Skeleton className={css.subTitleLoading} />
@@ -51,7 +51,7 @@ const DeliveryTrackingPage: React.FC<TDeliveryTrackingPageProps> = () => {
           <RenderWhen.False>
             <div>
               {intl.formatMessage(
-                { id: 'DeliveryTrackingPage.subTitle' },
+                { id: 'TrackingPage.subTitle' },
                 { orderTitle: '' },
               )}
             </div>
@@ -64,4 +64,4 @@ const DeliveryTrackingPage: React.FC<TDeliveryTrackingPageProps> = () => {
   );
 };
 
-export default DeliveryTrackingPage;
+export default TrackingPage;

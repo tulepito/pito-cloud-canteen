@@ -86,5 +86,5 @@ export const fetchUserApi = (userId: string) =>
   getApi(`/users/fetch-user/${userId}`);
 
 export const queryDeliveryInfoApi = ({ orderId, date }: TObject) => {
-  return getApi(`/delivery-tracking`, { orderId, date });
+  return getApi(`/tracking`, { orderId, date });
 };

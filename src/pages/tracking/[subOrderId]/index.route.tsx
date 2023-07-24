@@ -1,13 +1,13 @@
 import MetaWrapper from '@components/MetaWrapper/MetaWrapper';
 
-import DeliveryTrackingPage from './DeliveryTracking.page';
+import TrackingPage from './Tracking.page';
 
 type TSubOrderDetailRouteProps = {};
 
 const SubOrderDetailRoute: React.FC<TSubOrderDetailRouteProps> = () => {
   return (
     <MetaWrapper routeName="SubOrderDetailRoute">
-      <DeliveryTrackingPage />
+      <TrackingPage />
     </MetaWrapper>
   );
 };

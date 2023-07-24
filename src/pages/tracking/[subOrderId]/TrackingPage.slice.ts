@@ -6,11 +6,11 @@ import type { TObject } from '@src/utils/types';
 import { queryDeliveryInfoApi } from '../../../apis/index';
 
 // ================ Initial states ================ //
-type TDeliveryTrackingPageState = {
+type TTrackingPageState = {
   loadDataInProgress: boolean;
   order: TObject;
 };
-const initialState: TDeliveryTrackingPageState = {
+const initialState: TTrackingPageState = {
   loadDataInProgress: false,
   order: {},
 };
@@ -19,7 +19,7 @@ const initialState: TDeliveryTrackingPageState = {
 
 // ================ Async thunks ================ //
 const loadData = createAsyncThunk(
-  'app/DeliveryTrackingPage/LOAD_DATA',
+  'app/TrackingPage/LOAD_DATA',
   async ({ orderId, date }: TObject) => {
     const response = await queryDeliveryInfoApi({ orderId, date });
 
@@ -27,13 +27,13 @@ const loadData = createAsyncThunk(
   },
 );
 
-export const DeliveryTrackingPageThunks = {
+export const TrackingPageThunks = {
   loadData,
 };
 
 // ================ Slice ================ //
-const DeliveryTrackingPageSlice = createSlice({
-  name: 'DeliveryTrackingPage',
+const TrackingPageSlice = createSlice({
+  name: 'TrackingPage',
   initialState,
   reducers: {},
   extraReducers: (builder) => {
@@ -52,7 +52,7 @@ const DeliveryTrackingPageSlice = createSlice({
 });
 
 // ================ Actions ================ //
-export const DeliveryTrackingPageActions = DeliveryTrackingPageSlice.actions;
-export default DeliveryTrackingPageSlice.reducer;
+export const TrackingPageActions = TrackingPageSlice.actions;
+export default TrackingPageSlice.reducer;
 
 // ================ Selectors ================ //
