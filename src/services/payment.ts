@@ -20,6 +20,7 @@ export type PaymentBaseParams = {
   subOrderDate?: number;
   companyName?: string;
   orderTitle?: string;
+  totalPrice?: number;
 };
 
 export const createPaymentRecordOnFirebase = async (
