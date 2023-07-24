@@ -54,6 +54,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             subOrderDate,
             companyName,
             orderTitle,
+            totalPrice,
+            deliveryHour,
           } = paymentRecordParams;
           const allowedPaymentRecordParams: Partial<PaymentBaseParams> = {
             SKU,
@@ -65,6 +67,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             ...(subOrderDate ? { subOrderDate } : {}),
             ...(companyName ? { companyName } : {}),
             ...(orderTitle ? { orderTitle } : {}),
+            ...(totalPrice ? { totalPrice } : {}),
+            ...(deliveryHour ? { deliveryHour } : {}),
           };
           const newPaymentRecord = await createPaymentRecordOnFirebase(
             paymentRecordType,

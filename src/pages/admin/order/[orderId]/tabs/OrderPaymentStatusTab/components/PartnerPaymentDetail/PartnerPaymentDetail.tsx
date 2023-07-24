@@ -24,6 +24,7 @@ type PartnerPaymentDetailProps = {
   paidAmount: number;
   company: TUser;
   orderTitle: string;
+  deliveryHour: string;
 };
 
 const PartnerPaymentDetail: React.FC<PartnerPaymentDetailProps> = (props) => {
@@ -37,6 +38,7 @@ const PartnerPaymentDetail: React.FC<PartnerPaymentDetailProps> = (props) => {
     paidAmount,
     company,
     orderTitle,
+    deliveryHour,
   } = props;
   const addPaymentModalController = useBoolean();
   const dispatch = useAppDispatch();
@@ -68,6 +70,7 @@ const PartnerPaymentDetail: React.FC<PartnerPaymentDetailProps> = (props) => {
         companyName,
         orderTitle,
         totalPrice: totalWithVAT,
+        deliveryHour,
         SKU: generateSKU('CUSTOMER', orderId),
       }),
     );
