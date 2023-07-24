@@ -33,6 +33,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           participants = [],
           anonymous = [],
           orderType = EOrderType.group,
+          bookerId,
         } = Listing(order).getMetadata();
         const planId = plans[0];
         const isGroupOrder = EOrderType.group === orderType;
@@ -73,6 +74,15 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
               anonymous: anonymousParticipantData,
             };
           }
+        }
+
+        // TODO: query booker info
+        const bookerResponse = await integrationSdk.users.show({
+          id: bookerId,
+        });
+        const [booker] = denormalisedResponseEntities(bookerResponse);
+        if (!isEmpty(booker)) {
+          orderWithPlanDataMaybe = { ...orderWithPlanDataMaybe, booker };
         }
 
         // TODO: query company info

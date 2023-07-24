@@ -6,7 +6,11 @@ import { useRouter } from 'next/router';
 import BasicHeader from '@components/BasicHeader/BasicHeader';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { Listing } from '@src/utils/data';
+import type { TListing } from '@src/utils/types';
 
+import TrackingDeliveryInfo from './components/TrackingDeliveryInfo';
+import TrackingOrderInfo from './components/TrackingOrderInfo';
 import { TrackingPageThunks } from './TrackingPage.slice';
 
 import css from './TrackingPage.module.scss';
@@ -20,6 +24,7 @@ const TrackingPage: React.FC<TTrackingPageProps> = () => {
   const loadDataInProgress = useAppSelector(
     (state) => state.TrackingPage.loadDataInProgress,
   );
+  const order = useAppSelector((state) => state.TrackingPage.order);
 
   const {
     query: { subOrderId = '' },
@@ -28,14 +33,19 @@ const TrackingPage: React.FC<TTrackingPageProps> = () => {
   // eslint-disable-next-line no-unsafe-optional-chaining
   const [orderId, date] = (subOrderId as string)?.split('_');
 
+  const { orderTitle = '' } = Listing(order as TListing).getMetadata();
+
   useEffect(() => {
-    dispatch(
-      TrackingPageThunks.loadData({
-        orderId,
-        date,
-      }),
-    );
-  }, []);
+    if (orderId && date) {
+      dispatch(
+        TrackingPageThunks.loadData({
+          orderId,
+          date,
+        }),
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [orderId, date]);
 
   return (
     <div className={css.root}>
@@ -52,12 +62,15 @@ const TrackingPage: React.FC<TTrackingPageProps> = () => {
             <div>
               {intl.formatMessage(
                 { id: 'TrackingPage.subTitle' },
-                { orderTitle: '' },
+                { orderTitle },
               )}
             </div>
           </RenderWhen.False>
         </RenderWhen>
       </div>
+
+      <TrackingOrderInfo />
+      <TrackingDeliveryInfo subOrderDate={date} />
 
       <div></div>
     </div>
