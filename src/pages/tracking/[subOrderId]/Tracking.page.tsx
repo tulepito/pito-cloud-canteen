@@ -10,6 +10,7 @@ import { Listing } from '@src/utils/data';
 import type { TListing } from '@src/utils/types';
 
 import TrackingDeliveryInfo from './components/TrackingDeliveryInfo';
+import TrackingOrderDetailInfo from './components/TrackingOrderDetailInfo';
 import TrackingOrderInfo from './components/TrackingOrderInfo';
 import { TrackingPageThunks } from './TrackingPage.slice';
 
@@ -71,6 +72,7 @@ const TrackingPage: React.FC<TTrackingPageProps> = () => {
 
       <TrackingOrderInfo />
       <TrackingDeliveryInfo subOrderDate={date} />
+      <TrackingOrderDetailInfo subOrderDate={date} />
 
       <div></div>
     </div>
