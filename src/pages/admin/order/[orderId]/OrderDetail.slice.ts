@@ -355,7 +355,7 @@ const createPartnerPaymentRecord = createAsyncThunk(
       partnerPaymentRecords[subOrderDate] || {};
     const newPartnerPaymentRecords = {
       ...partnerPaymentRecords,
-      [subOrderDate]: [...currentPaymentRecordsBySubOrder, newPaymentRecord],
+      [subOrderDate]: [newPaymentRecord, ...currentPaymentRecordsBySubOrder],
     };
 
     return newPartnerPaymentRecords;
@@ -552,6 +552,19 @@ const OrderDetailSlice = createSlice({
       .addCase(createPartnerPaymentRecord.rejected, (state, { error }) => {
         state.createPartnerPaymentRecordInProgress = false;
         state.createPartnerPaymentRecordError = error.message;
+      })
+
+      .addCase(deletePartnerPaymentRecord.pending, (state) => {
+        state.deletePartnerPaymentRecordInProgress = true;
+        state.deletePartnerPaymentRecordError = null;
+      })
+      .addCase(deletePartnerPaymentRecord.fulfilled, (state, { payload }) => {
+        state.deletePartnerPaymentRecordInProgress = false;
+        state.partnerPaymentRecords = payload;
+      })
+      .addCase(deletePartnerPaymentRecord.rejected, (state, { error }) => {
+        state.deletePartnerPaymentRecordInProgress = false;
+        state.deletePartnerPaymentRecordError = error.message;
       });
   },
 });

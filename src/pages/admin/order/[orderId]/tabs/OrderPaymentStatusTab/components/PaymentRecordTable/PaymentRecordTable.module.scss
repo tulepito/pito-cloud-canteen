@@ -2,6 +2,9 @@
   &:first-child {
     width: 240px;
   }
+  &:nth-child(3) {
+    width: 280px;
+  }
 }
 
 .deleteIcon {
