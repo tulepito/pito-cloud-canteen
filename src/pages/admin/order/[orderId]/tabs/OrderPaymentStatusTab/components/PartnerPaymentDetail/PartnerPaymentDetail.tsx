@@ -4,6 +4,8 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { generateSKU } from '@pages/admin/order/[orderId]/helpers/AdminOrderDetail';
 import { OrderDetailThunks } from '@pages/admin/order/[orderId]/OrderDetail.slice';
+import { User } from '@src/utils/data';
+import type { TUser } from '@src/utils/types';
 
 import type { TAddingPaymentRecordFormValues } from '../AddingPaymentRecordForm/AddingPaymentRecordForm';
 import AddingPaymentRecordModal from '../AddingPaymentRecordModal/AddingPaymentRecordModal';
@@ -20,6 +22,8 @@ type PartnerPaymentDetailProps = {
   subOrderDate: string;
   partnerPaymentRecordsByDate: any[];
   paidAmount: number;
+  company: TUser;
+  orderTitle: string;
 };
 
 const PartnerPaymentDetail: React.FC<PartnerPaymentDetailProps> = (props) => {
@@ -31,9 +35,13 @@ const PartnerPaymentDetail: React.FC<PartnerPaymentDetailProps> = (props) => {
     subOrderDate,
     partnerPaymentRecordsByDate = [],
     paidAmount,
+    company,
+    orderTitle,
   } = props;
   const addPaymentModalController = useBoolean();
   const dispatch = useAppDispatch();
+  const companyUser = User(company);
+  const { companyName } = companyUser.getPublicData();
 
   const createPartnerPaymentRecordInProgress = useAppSelector(
     (state) => state.OrderDetail.createPartnerPaymentRecordInProgress,
@@ -56,6 +64,9 @@ const PartnerPaymentDetail: React.FC<PartnerPaymentDetailProps> = (props) => {
         subOrderDate,
         amount: parseThousandNumberToInteger(paymentAmount),
         paymentNote,
+        partnerName,
+        companyName,
+        orderTitle,
         SKU: generateSKU('CUSTOMER', orderId),
       }),
     );

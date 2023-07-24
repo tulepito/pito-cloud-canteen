@@ -38,6 +38,7 @@ const OrderPaymentStatusTab: React.FC<OrderPaymentStatusTabProps> = (props) => {
     updateOrderState,
     updateOrderStateInProgress,
     quotations,
+    company,
   } = props;
   const dispatch = useAppDispatch();
   const [selectedSubOrderDate, setSelectedSubOrderDate] = useState<string>('');
@@ -114,6 +115,8 @@ const OrderPaymentStatusTab: React.FC<OrderPaymentStatusTabProps> = (props) => {
           partnerPaymentRecordsByDate,
           totalWithVAT,
           paidAmount,
+          company,
+          orderTitle,
         },
       };
     });
