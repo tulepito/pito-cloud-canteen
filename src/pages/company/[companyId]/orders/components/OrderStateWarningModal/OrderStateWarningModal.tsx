@@ -11,15 +11,16 @@ type TOrderStateWarningModal = {
   onCancel: () => void;
   onConfirm: () => void;
   content: string;
+  title: string;
 };
 
 const OrderStateWarningModal: React.FC<TOrderStateWarningModal> = (props) => {
-  const { content, ...rest } = props;
+  const { content, title, ...rest } = props;
 
   return (
     <AlertModal
       {...rest}
-      title="Đơn Hàng Đã Hủy"
+      title={title}
       cancelLabel="Thoát"
       confirmLabel="Đặt đơn mới">
       <div className={css.content}>{content}</div>

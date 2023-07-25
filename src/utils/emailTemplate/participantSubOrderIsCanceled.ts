@@ -16,11 +16,11 @@ const participantSubOrderIsCanceled = ({
   orderListing,
   timestamp,
 }: ParticipantCompanyInvitationParams) => {
-  const { displayName: participantName } = participantUser.getProfile();
+  const { firstName, lastName } = participantUser.getProfile();
   const { orderName } = orderListing.getPublicData();
   const orderId = orderListing.getId();
   const viewOrderUrl = `${BASE_URL}/participant/order/${orderId}`;
-
+  const participantName = `${lastName} ${firstName}`;
   const formattedSubOrderDate = formatTimestamp(timestamp);
 
   return `
