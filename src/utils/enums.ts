@@ -1037,3 +1037,9 @@ export const ORDER_ADMIN_FILTER_OPTIONS = [
     label: 'Hủy đơn',
   },
 ];
+
+export enum EPartnerVATSetting {
+  vat = 'vat',
+  noExportVat = 'noExportVat',
+  direct = 'direct',
+}
