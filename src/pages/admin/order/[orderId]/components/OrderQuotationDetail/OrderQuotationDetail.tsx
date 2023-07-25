@@ -9,11 +9,13 @@ import Tabs from '@components/Tabs/Tabs';
 import {
   calculatePriceQuotationInfoFromQuotation,
   calculatePriceQuotationPartner,
+  vatPercentageBaseOnVatSetting,
 } from '@helpers/order/cartInfoHelper';
 import { groupFoodOrderByDateFromQuotation } from '@helpers/order/orderDetailHelper';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { useDownloadPriceQuotation } from '@hooks/useDownloadPriceQuotation';
 import { Listing } from '@src/utils/data';
+import { EPartnerVATSetting } from '@src/utils/enums';
 import type { TListing, TObject, TUser } from '@src/utils/types';
 
 import {
@@ -48,9 +50,17 @@ const OrderQuotationDetail: React.FC<OrderQuotationDetailProps> = (props) => {
   const [currentPartnerId, setCurrentPartnerId] = useState<string>(
     Object.keys(quotationListing.getMetadata()?.partner || {})[0],
   );
-  const partnerServiceFee =
-    Listing(order).getMetadata()?.serviceFees?.[currentPartnerId!];
-  const { packagePerMember = 0 } = Listing(order).getMetadata() || {};
+
+  const orderGetter = Listing(order);
+  const {
+    serviceFees = {},
+    vatSettings = {},
+    packagePerMember = 0,
+  } = orderGetter.getMetadata();
+
+  const partnerServiceFee = serviceFees[currentPartnerId!] || 0;
+  const partnerVATSetting =
+    vatSettings?.[currentPartnerId!] || EPartnerVATSetting.vat;
 
   const priceQuotation = isPartner
     ? calculatePriceQuotationPartner({
@@ -58,7 +68,11 @@ const OrderQuotationDetail: React.FC<OrderQuotationDetailProps> = (props) => {
           quotationListing.getMetadata()?.[target]?.[currentPartnerId!]
             ?.quotation,
         serviceFee: partnerServiceFee,
-        currentOrderVATPercentage,
+        currentOrderVATPercentage: vatPercentageBaseOnVatSetting({
+          vatSetting: partnerVATSetting,
+          vatPercentage: currentOrderVATPercentage,
+        }),
+        shouldSkipVAT: partnerVATSetting === EPartnerVATSetting.direct,
       })
     : calculatePriceQuotationInfoFromQuotation({
         quotation: quotation!,
@@ -159,6 +173,7 @@ const OrderQuotationDetail: React.FC<OrderQuotationDetailProps> = (props) => {
           title="Thực đơn phục vụ"
           target={target}
           isAdminLayout
+          vatSetting={partnerVATSetting}
         />
       </div>
     </div>

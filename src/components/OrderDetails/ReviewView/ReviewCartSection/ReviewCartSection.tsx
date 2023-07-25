@@ -11,7 +11,7 @@ import { isEnableToStartOrder } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { orderManagementThunks } from '@redux/slices/OrderManagement.slice';
 import { companyPaths } from '@src/paths';
-import { EOrderStates, EOrderType } from '@src/utils/enums';
+import { EOrderStates, EOrderType, EPartnerVATSetting } from '@src/utils/enums';
 import { Listing } from '@utils/data';
 import type { TListing, TObject } from '@utils/types';
 
@@ -26,6 +26,7 @@ type TReviewCartSectionProps = {
   title?: string;
   target: 'client' | 'partner';
   isAdminLayout?: boolean;
+  vatSetting: EPartnerVATSetting;
 };
 
 const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
@@ -43,6 +44,7 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
       // transportFee = 0,
       VATFee = 0,
       PITOFee = 0,
+      VATPercentage = 0,
     } = {},
     showStartPickingOrderButton,
     onClickDownloadPriceQuotation,
@@ -50,6 +52,7 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
     title,
     target,
     isAdminLayout = false,
+    vatSetting = EPartnerVATSetting.vat,
   } = props;
 
   const intl = useIntl();
@@ -69,10 +72,6 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
   const planData = useAppSelector((state) => state.OrderManagement.planData);
   const orderData = useAppSelector((state) => state.OrderManagement.orderData);
 
-  const currentOrderVATPercentage = useAppSelector(
-    (state) => state.SystemAttributes.currentOrderVATPercentage,
-  );
-  console.log({ currentOrderVATPercentage });
   const {
     query: { orderId },
   } = router;
@@ -83,7 +82,9 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
   const downloadPriceQuotationClasses = classNames(css.downloadPriceQuotation, {
     [css.downloadingPriceQuotation]: isDownloadingPriceQuotation,
   });
-
+  const shouldShowVATCondition =
+    (vatSetting !== EPartnerVATSetting.direct && target === 'partner') ||
+    target === 'client';
   const { orderDetail } = Listing(planData as TListing).getMetadata();
   const { orderType = EOrderType.group, orderState } = Listing(
     orderData as TListing,
@@ -191,21 +192,33 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
             </div>
           </div>
         </div>
-        <div className={css.feeItem}>
-          <div
-            className={classNames(css.feeItemContainer, css.VATItemContainer)}>
-            <div className={css.label}>
-              {intl.formatMessage({ id: 'ReviewCardSection.VAT' })}
-              <Badge
-                label={`${currentOrderVATPercentage * 100}%`}
-                className={css.VATBadge}
-              />
-            </div>
-            <div className={css.fee}>
-              {parseThousandNumber(VATFee.toString())}đ
+        <RenderWhen condition={shouldShowVATCondition}>
+          <div className={css.feeItem}>
+            <div
+              className={classNames(
+                css.feeItemContainer,
+                css.VATItemContainer,
+              )}>
+              <div className={css.label}>
+                <RenderWhen condition={vatSetting === EPartnerVATSetting.vat}>
+                  {intl.formatMessage({ id: 'ReviewCardSection.VAT' })}
+                  <RenderWhen.False>
+                    {intl.formatMessage({
+                      id: 'ReviewCardSection.noExportVAT',
+                    })}
+                  </RenderWhen.False>
+                </RenderWhen>
+                <Badge
+                  label={`${VATPercentage * 100}%`}
+                  className={css.VATBadge}
+                />
+              </div>
+              <div className={css.fee}>
+                {parseThousandNumber(VATFee.toString())}đ
+              </div>
             </div>
           </div>
-        </div>
+        </RenderWhen>
         <div className={css.feeItem}>
           <div className={css.totalWithVATLabel}>
             {intl.formatMessage({ id: 'ReviewCardSection.totalWithVAT' })}
