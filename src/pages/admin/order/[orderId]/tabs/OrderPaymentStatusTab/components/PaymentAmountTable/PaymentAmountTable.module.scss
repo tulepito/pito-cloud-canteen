@@ -1,0 +1,40 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.container {
+  width: 300px;
+  margin: 24px auto 0;
+}
+
+.tableTitle {
+  @include textTemplate(18px, $fontWeightBold, 28px);
+  text-align: center;
+}
+
+.tableContainer {
+  margin-top: 12px;
+  border: 1px solid $neutralGray3;
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  .row {
+    @include flexAlign(center, space-between);
+    padding-bottom: 8px;
+    border-bottom: 1px solid $neutralGray3;
+
+    &:last-child {
+      border: none;
+    }
+
+    span {
+      font-weight: $fontWeightSemiBold;
+      &:last-child {
+        font-weight: $fontWeightBold;
+      }
+    }
+  }
+}

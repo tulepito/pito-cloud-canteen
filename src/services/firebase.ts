@@ -2,6 +2,7 @@ import { initializeApp } from 'firebase/app';
 import {
   addDoc,
   collection,
+  deleteDoc,
   doc,
   getCountFromServer,
   getDoc,
@@ -90,7 +91,10 @@ const queryCollectionData = async ({
 
 const addCollectionDoc = async (data: any, collectionName: string) => {
   const ref = collection(firestore, collectionName);
-  await addDoc(ref, data);
+
+  const addedDoc = await addDoc(ref, data);
+
+  return addedDoc.id;
 };
 
 const setCollectionDocWithCustomId = async (
@@ -100,6 +104,10 @@ const setCollectionDocWithCustomId = async (
   pathSegments = [],
 ) => {
   await setDoc(doc(firestore, path, ...pathSegments, customId), data);
+};
+
+const setCollectionDoc = async (data: any, path: string, pathSegments = []) => {
+  await setDoc(doc(firestore, path, ...pathSegments), data);
 };
 
 const updateCollectionDoc = async (
@@ -140,12 +148,22 @@ const getCollectionCount = async ({
   return count.data().count;
 };
 
+const deleteDocument = async (
+  documentId: string,
+  path: string,
+  pathSegments = [],
+) => {
+  await deleteDoc(doc(firestore, path, ...pathSegments, documentId));
+};
+
 export {
   addCollectionDoc,
+  deleteDocument,
   getCollectionCount,
   getCollectionData,
   getDocumentById,
   queryCollectionData,
+  setCollectionDoc,
   setCollectionDocWithCustomId,
   updateCollectionDoc,
 };

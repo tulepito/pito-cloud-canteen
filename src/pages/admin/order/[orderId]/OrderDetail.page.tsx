@@ -9,6 +9,7 @@ import { orderManagementThunks } from '@redux/slices/OrderManagement.slice';
 import { EOrderDetailTabs } from '@src/utils/enums';
 
 import OrderDetailTab from './tabs/OrderDetailTab/OrderDetailTab';
+import OrderPaymentStatusTab from './tabs/OrderPaymentStatusTab/OrderPaymentStatusTab';
 import OrderQuotationTab from './tabs/OrderQuotationTab/OrderQuotationTab';
 import { OrderDetailThunks } from './OrderDetail.slice';
 
@@ -131,6 +132,28 @@ const OrderDetailPage = () => {
           <div className={css.loading}>Đang tải dữ liệu...</div>
         ) : (
           <OrderQuotationTab {...childProps} />
+        ),
+      childrenProps: {
+        orderDetail,
+        order,
+        company,
+        booker,
+        updateStaffName,
+        updateOrderStaffNameInProgress,
+        updateOrderState,
+        updateOrderStateInProgress,
+        quotations,
+        quotationsPagination,
+      },
+    },
+    {
+      key: EOrderDetailTabs.PAYMENT_STATUS,
+      label: 'Tình trạng thanh toán',
+      childrenFn: (childProps: any) =>
+        fetchOrderInProgress ? (
+          <div className={css.loading}>Đang tải dữ liệu...</div>
+        ) : (
+          <OrderPaymentStatusTab {...childProps} />
         ),
       childrenProps: {
         orderDetail,

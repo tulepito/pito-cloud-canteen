@@ -13,3 +13,7 @@ export const parseThousandNumber = (
     separator,
   );
 };
+
+export const parseThousandNumberToInteger = (value: string) => {
+  return parseInt(removeNonNumeric(value), 10);
+};
