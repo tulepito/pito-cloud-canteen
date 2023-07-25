@@ -1,0 +1,13 @@
+@use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/defaults.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.select {
+  @include inputStyles;
+}
+
+.searchContainer {
+  @include flexAlign(center);
+  gap: 8px;
+}

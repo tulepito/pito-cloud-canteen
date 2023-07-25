@@ -56,6 +56,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             orderTitle,
             totalPrice,
             deliveryHour,
+            isHideFromHistory,
           } = paymentRecordParams;
           const allowedPaymentRecordParams: Partial<PaymentBaseParams> = {
             SKU,
@@ -69,6 +70,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             ...(orderTitle ? { orderTitle } : {}),
             ...(totalPrice ? { totalPrice } : {}),
             ...(deliveryHour ? { deliveryHour } : {}),
+            ...(isHideFromHistory ? { isHideFromHistory } : {}),
           };
           const newPaymentRecord = await createPaymentRecordOnFirebase(
             paymentRecordType,

@@ -16,6 +16,7 @@ import {
   updateDoc,
   where,
 } from 'firebase/firestore';
+import pick from 'lodash/pick';
 
 import type { TObject } from '@src/utils/types';
 
@@ -84,6 +85,37 @@ const queryCollectionData = async ({
   const list: any[] = [];
   snapshot.forEach((_doc: any) => {
     list.push({ ..._doc.data(), id: _doc.id });
+  });
+
+  return list;
+};
+
+const queryAllCollectionData = async ({
+  collectionName,
+  queryParams,
+  neededDataAttributes,
+}: {
+  collectionName: string;
+  queryParams: TObject;
+  neededDataAttributes?: string[];
+}) => {
+  const hasNeededDataAttributes =
+    neededDataAttributes && neededDataAttributes.length > 0;
+  const ref = collection(firestore, collectionName);
+  const queryFuncs = Object.keys(queryParams).map((key) =>
+    where(key, queryParams[key].operator, queryParams[key].value),
+  );
+  const q = query(ref, ...queryFuncs, orderBy('createdAt', 'desc'));
+
+  const snapshot = await (await getDocs(q)).docs;
+
+  const list: any[] = [];
+
+  snapshot.forEach((_doc) => {
+    const neededData = !hasNeededDataAttributes
+      ? _doc.data()
+      : pick(_doc.data(), neededDataAttributes);
+    list.push({ ...neededData, id: _doc.id });
   });
 
   return list;
@@ -162,6 +194,7 @@ export {
   getCollectionCount,
   getCollectionData,
   getDocumentById,
+  queryAllCollectionData,
   queryCollectionData,
   setCollectionDoc,
   setCollectionDocWithCustomId,
