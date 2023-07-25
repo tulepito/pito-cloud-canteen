@@ -187,6 +187,7 @@ const OrderQuotationDetail: React.FC<OrderQuotationDetailProps> = (props) => {
           title="Thực đơn phục vụ"
           target={target}
           isAdminLayout
+          vatSetting={partnerVATSetting}
         />
       </div>
     </div>

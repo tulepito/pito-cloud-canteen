@@ -11,10 +11,29 @@ import {
   EOrderStates,
   EOrderType,
   EParticipantOrderStatus,
+  EPartnerVATSetting,
   ESubOrderStatus,
 } from '@src/utils/enums';
 import { Listing } from '@utils/data';
 import type { TListing, TObject, TQuotation } from '@utils/types';
+
+export const vatPercentageBaseOnVatSetting = ({
+  vatSetting,
+  vatPercentage,
+}: {
+  vatSetting: EPartnerVATSetting;
+  vatPercentage: number;
+}) => {
+  switch (vatSetting) {
+    case EPartnerVATSetting.direct:
+      return 0;
+    case EPartnerVATSetting.noExportVat:
+      return 0.04;
+    case EPartnerVATSetting.vat:
+    default:
+      return vatPercentage;
+  }
+};
 
 export const calculateTotalPriceAndDishes = ({
   orderDetail = {},
@@ -250,6 +269,7 @@ export const calculatePriceQuotationPartner = ({
     totalWithoutVAT,
     totalWithVAT,
     promotion,
+    VATPercentage: currentOrderVATPercentage,
   };
 };
 
@@ -351,5 +371,6 @@ export const calculatePriceQuotationInfoFromQuotation = ({
     isOverflowPackage,
     totalWithoutVAT,
     PITOFee,
+    VATPercentage: currentOrderVATPercentage,
   };
 };
