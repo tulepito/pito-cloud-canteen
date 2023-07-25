@@ -24,10 +24,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           }
 
           await startOrder(orderId as string);
+          console.info('>> Started order: ', orderId);
           await initiateTransaction({
             orderId: orderId as string,
             planId: planId as string,
           });
+          console.info('>> Initiated transactions');
 
           res.status(200).json({
             message: `Successfully finish picking order`,
