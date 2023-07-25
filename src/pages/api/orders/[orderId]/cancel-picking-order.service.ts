@@ -11,8 +11,11 @@ export const cancelPickingOrder = async (orderId: string) => {
     await integrationSdk.listings.show({ id: orderId }),
   );
 
-  const { orderStateHistory = [], plans = [] } =
-    Listing(orderListing).getMetadata();
+  const {
+    orderState,
+    orderStateHistory = [],
+    plans = [],
+  } = Listing(orderListing).getMetadata();
 
   if (orderState !== EOrderStates.picking) {
     throw new Error(`Order is not in picking state, orderState: ${orderState}`);
