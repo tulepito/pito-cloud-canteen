@@ -352,8 +352,7 @@ export const CompanyOrdersTableColumns: TColumn[] = [
         return titleContent;
       }
 
-      const isPitoOrderCancelled =
-        state === EOrderStates.canceled && isCreatedByPitoAdmin;
+      const isPitoOrderCancelled = state === EOrderStates.canceled;
 
       const openOrderStateWarningModalFn = () =>
         openOrderStateWarningModal(state);

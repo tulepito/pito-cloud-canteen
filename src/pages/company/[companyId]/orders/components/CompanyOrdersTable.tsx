@@ -185,6 +185,11 @@ const CompanyOrdersTable: React.FC<TCompanyOrdersTableProps> = () => {
       ? 'Đơn hàng đã hết hiệu lực đặt.'
       : 'Đơn hàng của bạn đã huỷ. Bạn có muốn đặt đơn mới không?';
 
+  const orderStateWarningModalTitle =
+    orderWarningState === EOrderStates.expiredStart
+      ? 'Đơn Hàng Đã Hết Hiệu Lực'
+      : 'Đơn Hàng Đã Hủy';
+
   const tableData = parseEntitiesToTableData(
     orders,
     Number(page),
@@ -284,6 +289,7 @@ const CompanyOrdersTable: React.FC<TCompanyOrdersTableProps> = () => {
       />
       <OrderStateWarningModal
         id="CompanyOrdersTable.OrderStateWarningModal"
+        title={orderStateWarningModalTitle}
         isOpen={!!orderWarningState}
         handleClose={closeOrderStateWarningModal}
         onCancel={closeOrderStateWarningModal}
