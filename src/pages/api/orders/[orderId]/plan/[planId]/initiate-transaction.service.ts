@@ -1,3 +1,5 @@
+import uniq from 'lodash/uniq';
+
 import {
   normalizeOrderDetail,
   prepareNewPlanOrderDetail,
@@ -7,10 +9,10 @@ import { fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/sdk';
 import { getSubAccountTrustedSdk } from '@services/subAccountSdk';
 import config from '@src/configs';
-import { EOrderType } from '@src/utils/enums';
+import { EOrderType, EPartnerVATSetting } from '@src/utils/enums';
 import { Listing, Transaction } from '@utils/data';
 import { ETransition } from '@utils/transaction';
-import type { TObject } from '@utils/types';
+import type { TListing, TObject } from '@utils/types';
 
 export const initiateTransaction = async ({
   orderId,
@@ -61,6 +63,7 @@ export const initiateTransaction = async ({
   });
 
   const transactionMap: TObject = {};
+  const partnerIds: string[] = [];
   // Initiate transaction for each date
   await Promise.all(
     normalizedOrderDetail.map(async (item, index) => {
@@ -75,6 +78,7 @@ export const initiateTransaction = async ({
         },
         date,
       } = item;
+      partnerIds.push(listingId);
 
       const createTxResponse = await subAccountTrustedSdk.transactions.initiate(
         {
@@ -108,6 +112,34 @@ export const initiateTransaction = async ({
     id: planId,
     metadata: {
       orderDetail: prepareNewPlanOrderDetail(planOrderDetail, transactionMap),
+    },
+  });
+
+  // update VAT setting for partners
+  const partnerListings = denormalisedResponseEntities(
+    await integrationSdk.listings.query({
+      ids: uniq(partnerIds),
+    }),
+  );
+  const vatSettings = partnerListings.reduce(
+    (res: TObject, partner: TListing) => {
+      const partnerGetter = Listing(partner);
+      const partnerId = partnerGetter.getId();
+
+      const { vat = EPartnerVATSetting.vat } = partnerGetter.getPublicData();
+
+      return {
+        ...res,
+        [partnerId]: vat,
+      };
+    },
+    {},
+  );
+
+  await integrationSdk.listings.update({
+    id: orderId,
+    metadata: {
+      vatSettings,
     },
   });
 };
