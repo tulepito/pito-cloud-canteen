@@ -1,8 +1,9 @@
 import { denormalisedResponseEntities } from '@services/data';
 import { emailSendingFactory, EmailTemplateTypes } from '@services/email';
+import { fetchListing } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/sdk';
 import { Listing } from '@utils/data';
-import { EOrderStates } from '@utils/enums';
+import { EOrderStates, EParticipantOrderStatus } from '@utils/enums';
 
 export const cancelPickingOrder = async (orderId: string) => {
   const integrationSdk = await getIntegrationSdk();
@@ -10,8 +11,11 @@ export const cancelPickingOrder = async (orderId: string) => {
     await integrationSdk.listings.show({ id: orderId }),
   );
 
-  const { orderState, orderStateHistory = [] } =
-    Listing(orderListing).getMetadata();
+  const {
+    orderState,
+    orderStateHistory = [],
+    plans = [],
+  } = Listing(orderListing).getMetadata();
 
   if (orderState !== EOrderStates.picking) {
     throw new Error(`Order is not in picking state, orderState: ${orderState}`);
@@ -27,7 +31,43 @@ export const cancelPickingOrder = async (orderId: string) => {
       }),
     },
   });
+
+  // Email for booker about order cancel
   emailSendingFactory(EmailTemplateTypes.BOOKER.BOOKER_ORDER_CANCELLED, {
     orderId,
   });
+
+  // Email for participants about plan cancel
+  Promise.all(
+    plans.map(async (planId: string) => {
+      const plan = await fetchListing(planId);
+      const { orderDetail = {} } = Listing(plan).getMetadata();
+
+      Promise.all(
+        Object.keys(orderDetail).map((dateAsTimeStamp) => {
+          const { memberOrders = {} } = orderDetail[dateAsTimeStamp];
+
+          const participantIds: string[] = [];
+
+          Object.keys(memberOrders).forEach((partId) => {
+            const { status, foodId } = memberOrders[partId];
+            if (status === EParticipantOrderStatus.joined && !!foodId) {
+              participantIds.push(partId);
+            }
+          });
+
+          return participantIds.map((participantId: string) =>
+            emailSendingFactory(
+              EmailTemplateTypes.PARTICIPANT.PARTICIPANT_SUB_ORDER_CANCELED,
+              {
+                orderId,
+                timestamp: dateAsTimeStamp,
+                participantId,
+              },
+            ),
+          );
+        }),
+      );
+    }),
+  );
 };
