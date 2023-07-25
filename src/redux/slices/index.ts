@@ -29,6 +29,7 @@ export { default as user } from './user.slice';
 export { default as walkthrough } from './walkthrough.slice';
 export { default as AdminAttributes } from '@pages/admin/Attributes.slice';
 export { default as OrderDetail } from '@pages/admin/order/[orderId]/OrderDetail.slice';
+export { default as PaymentPartner } from '@pages/admin/payment-partner/PaymentPartner.slice';
 export { default as Nutrition } from '@pages/company/[companyId]/nutrition/Nutrition.slice';
 export { default as BookerDraftOrderPage } from '@pages/company/booker/orders/draft/[orderId]/BookerDraftOrderPage.slice';
 export { default as BookerSelectRestaurant } from '@pages/company/booker/orders/draft/[orderId]/restaurants/BookerSelectRestaurant.slice';

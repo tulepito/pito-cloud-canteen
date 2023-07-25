@@ -202,6 +202,18 @@ export const adminRoutes = {
     path: '/admin/account/password',
     label: 'Mật khẩu',
   },
+  AdminPayment: {
+    path: '/admin/payment',
+    label: 'Thanh toán',
+  },
+  PartnerPayment: {
+    path: '/admin/payment-partner',
+    label: 'Thanh toán đối tác',
+  },
+  ClientPayment: {
+    path: '/admin/payment-client',
+    label: 'Thanh toán khách hàng',
+  },
 } as const;
 
 export const companyPaths = {

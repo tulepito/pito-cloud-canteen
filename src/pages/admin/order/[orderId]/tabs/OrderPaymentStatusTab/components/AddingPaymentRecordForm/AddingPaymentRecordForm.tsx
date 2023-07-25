@@ -32,7 +32,7 @@ type TAddingPaymentRecordFormComponentProps =
 type TAddingPaymentRecordFormProps = FormProps<TAddingPaymentRecordFormValues> &
   TExtraProps;
 
-const PaymentPercentageDropdown = ({
+export const PaymentPercentageDropdown = ({
   totalPrice,
   paidAmount,
   percentage,

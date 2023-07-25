@@ -3,7 +3,9 @@ import { EPaymentStatus } from '@src/utils/enums';
 import {
   addCollectionDoc,
   deleteDocument,
+  getCollectionCount,
   getDocumentById,
+  queryAllCollectionData,
   queryCollectionData,
 } from './firebase';
 
@@ -17,11 +19,12 @@ export type PaymentBaseParams = {
   orderId: string;
   partnerId?: string;
   partnerName?: string;
-  subOrderDate?: number;
+  subOrderDate?: string;
   companyName?: string;
   orderTitle?: string;
   totalPrice?: number;
   deliveryHour?: string;
+  isHideFromHistory?: boolean;
 };
 
 export const createPaymentRecordOnFirebase = async (
@@ -96,6 +99,37 @@ export const queryPaymentRecordOnFirebase = async (query: any) => {
     });
 
     return paymentRecords;
+  } catch (error) {
+    console.error('Error query payment record: ', error);
+  }
+};
+
+export const queryAllPartnerPaymentRecordsOnFirebase = async () => {
+  try {
+    const paymentRecords = await queryAllCollectionData({
+      collectionName: FIREBASE_PAYMENT_RECORD_COLLECTION_NAME!,
+      queryParams: {
+        paymentType: {
+          operator: '==',
+          value: 'partner',
+        },
+      },
+    });
+
+    return paymentRecords;
+  } catch (error) {
+    console.error('Error query payment record: ', error);
+  }
+};
+
+export const getTotalRecordsOnFirebase = async (query: any) => {
+  try {
+    const totalRecords = await getCollectionCount({
+      collectionName: FIREBASE_PAYMENT_RECORD_COLLECTION_NAME!,
+      queryParams: query,
+    });
+
+    return totalRecords as number;
   } catch (error) {
     console.error('Error query payment record: ', error);
   }

@@ -186,3 +186,6 @@ export const sendOrderDetailUpdatedEmailApi = ({
     restaurantId,
     timestamp,
   });
+
+export const initializePaymentApi = (orderId: string, planId: string) =>
+  postApi(`/orders/${orderId}/plan/${planId}/initialize-payment`);
