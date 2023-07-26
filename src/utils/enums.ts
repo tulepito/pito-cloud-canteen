@@ -1037,3 +1037,7 @@ export const ORDER_ADMIN_FILTER_OPTIONS = [
     label: 'Hủy đơn',
   },
 ];
+
+export enum EPaymentStatus {
+  SUCCESS = 'success',
+}
