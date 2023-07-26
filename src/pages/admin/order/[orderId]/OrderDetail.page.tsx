@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { shallowEqual } from 'react-redux';
 import { useRouter } from 'next/router';
 
@@ -18,7 +18,8 @@ import css from './OrderDetail.module.scss';
 const OrderDetailPage = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
-  const { orderId } = router.query;
+  const { orderId, tab } = router.query;
+  const [defaultActiveKey, setDefaultActiveKey] = useState<number>(1);
 
   const order = useAppSelector(
     (state) => state.OrderDetail.order,
@@ -170,9 +171,16 @@ const OrderDetailPage = () => {
     },
   ];
 
+  useEffect(() => {
+    if (tab) {
+      setDefaultActiveKey(tabItems.findIndex((item) => item.key === tab) + 1);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tab]);
+
   return (
     <div>
-      <Tabs items={tabItems as any} />
+      <Tabs items={tabItems as any} defaultActiveKey={`${defaultActiveKey}`} />
     </div>
   );
 };

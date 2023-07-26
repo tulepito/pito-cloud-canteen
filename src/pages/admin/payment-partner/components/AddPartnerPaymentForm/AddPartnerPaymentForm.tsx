@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import addDays from 'date-fns/addDays';
@@ -23,12 +23,14 @@ export type TAddPartnerPaymentFormValues = {
   startDate?: number;
   endDate?: number;
   partnerName?: any;
+  [key: string]: any;
 };
 
 type TExtraProps = {
   partnerNameList: string[];
   unPaidPaymentList: any[];
   inProgress?: boolean;
+  selectInputRef: any;
 };
 type TAddPartnerPaymentFormComponentProps =
   FormRenderProps<TAddPartnerPaymentFormValues> & Partial<TExtraProps>;
@@ -45,11 +47,26 @@ const AddPartnerPaymentFormComponent: React.FC<
     partnerNameList = [],
     unPaidPaymentList = [],
     inProgress,
+    selectInputRef,
   } = props;
+
+  const selectFieldRef = useRef<any>(null);
+
+  const paymentRecordData = Object.keys(values).filter((key) =>
+    key.includes('paymentAmount'),
+  );
+  const hasPaymentRecordValue = paymentRecordData.some(
+    (key) => !!values?.[key],
+  );
+
+  const paymentDisabled =
+    paymentRecordData.length === 0 ||
+    (paymentRecordData.length !== 0 && !hasPaymentRecordValue);
 
   const [unPaidPaymentListFiltered, setUnPaidPaymentListFiltered] =
     useState<any[]>(unPaidPaymentList);
 
+  useImperativeHandle(selectInputRef, () => selectFieldRef?.current);
   useEffect(() => {
     setUnPaidPaymentListFiltered(unPaidPaymentList);
   }, [unPaidPaymentList]);
@@ -70,7 +87,9 @@ const AddPartnerPaymentFormComponent: React.FC<
       key: 'id',
       label: 'ID',
       render: ({ orderTitle, subOrderDate }: any) => (
-        <div>{`#${orderTitle}_${getDayOfWeek(+subOrderDate)}`}</div>
+        <div className={css.orderTitle}>{`#${orderTitle}_${getDayOfWeek(
+          +subOrderDate,
+        )}`}</div>
       ),
     },
     {
@@ -84,14 +103,18 @@ const AddPartnerPaymentFormComponent: React.FC<
       key: 'totalAmount',
       label: 'Tổng giá trị',
       render: ({ totalAmount }: any) => (
-        <div>{parseThousandNumber(totalAmount)}đ</div>
+        <div className={css.semiBoldText}>
+          {parseThousandNumber(totalAmount)}đ
+        </div>
       ),
     },
     {
       key: 'remainAmount',
       label: 'Chưa thanh toán',
       render: ({ remainAmount }: any) => (
-        <div>{parseThousandNumber(remainAmount)}đ</div>
+        <div className={css.semiBoldText}>
+          {parseThousandNumber(remainAmount)}đ
+        </div>
       ),
     },
     {
@@ -114,7 +137,7 @@ const AddPartnerPaymentFormComponent: React.FC<
     },
   ];
 
-  const submitDisabled = inProgress;
+  const submitDisabled = inProgress || paymentDisabled;
 
   const setStartDate = (date: number) => {
     form.change('startDate', date);
@@ -176,15 +199,25 @@ const AddPartnerPaymentFormComponent: React.FC<
           name="partnerName"
           placeholder="Nhập tên đối tác"
           options={partnerNameOptions}
+          inputRef={selectFieldRef}
         />
       </div>
       <div className={css.filterBtn}>
-        <Button className={css.btn} onClick={filterUnPaidPaymentList}>
+        <Button
+          className={css.btn}
+          type="button"
+          onClick={filterUnPaidPaymentList}>
           Tìm kiếm
         </Button>
       </div>
       <div className={css.horizontalDevider}></div>
-      <Table columns={TABLE_COLUMNS} data={unPaidPaymentListFiltered} />
+      <div className={css.tableWrapper}>
+        <Table
+          columns={TABLE_COLUMNS}
+          data={unPaidPaymentListFiltered}
+          tableBodyCellClassName={css.tableBodyCell}
+        />
+      </div>
       <div className={css.paymentBtn}>
         <Button
           type="submit"

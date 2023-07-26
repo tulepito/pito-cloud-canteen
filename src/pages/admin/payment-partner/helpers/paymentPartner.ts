@@ -11,9 +11,19 @@ export const filterPaymentPartner = (
   const { partnerName, orderTitle, startDate, endDate, status } = filterList;
 
   const filterFn = (item: any) => {
-    if (partnerName && !`${item.data.partnerName}`.includes(partnerName))
+    if (
+      partnerName &&
+      !`${item.data.partnerName}`
+        .toLocaleLowerCase()
+        .includes(partnerName.toLocaleLowerCase())
+    )
       return false;
-    if (orderTitle && !`${item.data.orderTitle}`.includes(orderTitle))
+    if (
+      orderTitle &&
+      !`${item.data.orderTitle}`
+        .toLocaleLowerCase()
+        .includes(orderTitle.toLocaleLowerCase())
+    )
       return false;
     if (startDate && +item.data.subOrderDate < startDate) return false;
     if (endDate && +item.data.subOrderDate > endDate) return false;

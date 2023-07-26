@@ -16,7 +16,7 @@ type FieldRecommendSelectProps = FieldRenderProps<string, any> & {
 export const FieldRecommendSelectComponent = (
   props: FieldRecommendSelectProps,
 ) => {
-  const { options, input, placeholder } = props;
+  const { options, input, placeholder, inputRef } = props;
   const focusController = useBoolean();
   const { id, name, onChange } = input;
 
@@ -89,6 +89,7 @@ export const FieldRecommendSelectComponent = (
       placeholder={placeholder}
       components={{ ValueContainer: SearchIcon }}
       onChange={onCustomChange}
+      ref={inputRef}
     />
   );
 };
