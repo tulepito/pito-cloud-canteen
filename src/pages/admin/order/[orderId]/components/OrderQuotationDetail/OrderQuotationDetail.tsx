@@ -55,7 +55,6 @@ const OrderQuotationDetail: React.FC<OrderQuotationDetailProps> = (props) => {
   const [currentSubOrderDate, setCrrSubOrderDate] = useState<string>(
     Object.keys(clientQuotation)[0],
   );
-
   const orderMetadata = Listing(order).getMetadata();
   const { title: orderTitle = '' } = Listing(order).getAttributes();
 
@@ -74,9 +73,10 @@ const OrderQuotationDetail: React.FC<OrderQuotationDetailProps> = (props) => {
     currentOrderServiceFeePercentage: partnerServiceFee / 100,
   });
 
-  const handlePartnerChange = (tab: any) => {
+  const handleTabChange = (tab: any) => {
     setCrrSubOrderDate(tab.key);
   };
+
   const tabItems = useMemo(() => {
     if (isPartner) {
       const partnerQuotationEntries = Object.entries(quotationDetail);
@@ -149,10 +149,12 @@ const OrderQuotationDetail: React.FC<OrderQuotationDetailProps> = (props) => {
     JSON.stringify(orderDetail),
   ]);
 
-  const handleDownloadPriceQuotation = useDownloadPriceQuotation(
-    Listing(order).getAttributes().title,
-    priceQuotationData as any,
-  );
+  const handleDownloadPriceQuotation = useDownloadPriceQuotation({
+    orderTitle: Listing(order).getAttributes().title,
+    priceQuotationData: priceQuotationData as any,
+    isPartnerQuotation: true,
+    subOrderDate: currentSubOrderDate,
+  });
 
   return (
     <div className={css.container}>
@@ -160,7 +162,7 @@ const OrderQuotationDetail: React.FC<OrderQuotationDetailProps> = (props) => {
         {isPartner ? (
           <Tabs
             items={tabItems as any}
-            onChange={handlePartnerChange}
+            onChange={handleTabChange}
             defaultActiveKey="1"
             tabItemClassName={css.tabItem}
             tabActiveItemClassName={css.tabActiveItem}

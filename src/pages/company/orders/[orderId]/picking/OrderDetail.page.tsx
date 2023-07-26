@@ -276,10 +276,10 @@ const OrderDetailPage = () => {
     }
   }, []);
 
-  const handleDownloadPriceQuotation = useDownloadPriceQuotation(
+  const handleDownloadPriceQuotation = useDownloadPriceQuotation({
     orderTitle,
     priceQuotationData,
-  );
+  });
 
   const userId = CurrentUser(currentUser!).getId();
   const {

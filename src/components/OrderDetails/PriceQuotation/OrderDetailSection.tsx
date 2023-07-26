@@ -10,11 +10,13 @@ import css from './OrderDetailSection.module.scss';
 type TOrderDetailSectionProps = {
   foodOrderGroupedByDate: TObject[];
   itemId: string;
+  subOrderDate?: number | string;
 };
 
 const OrderDetailSection: React.FC<TOrderDetailSectionProps> = ({
   foodOrderGroupedByDate,
   itemId,
+  subOrderDate,
 }) => {
   const intl = useIntl();
 
@@ -58,6 +60,10 @@ const OrderDetailSection: React.FC<TOrderDetailSectionProps> = ({
             restaurantName,
             index,
           } = dateData;
+          if (subOrderDate && subOrderDate?.toString() !== date.toString()) {
+            return null;
+          }
+
           const formattedDate = formatTimestamp(date, 'EEE, dd/MM/yyyy');
 
           return (
@@ -68,7 +74,7 @@ const OrderDetailSection: React.FC<TOrderDetailSectionProps> = ({
               <div
                 className={classNames(css.groupTitle, 'item-title')}
                 id={`${itemId}-${parentIndex}`}>
-                <div>{index + 1}</div>
+                <div>{subOrderDate ? 1 : index + 1}</div>
                 <div>
                   {formattedDate}
                   <div className={css.restaurantName} title={restaurantName}>
