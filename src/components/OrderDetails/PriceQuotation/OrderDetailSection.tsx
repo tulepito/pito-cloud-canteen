@@ -24,29 +24,29 @@ const OrderDetailSection: React.FC<TOrderDetailSectionProps> = ({
     <div className={css.orderDetailSection}>
       <div className={css.sectionTitle}>
         {intl.formatMessage({
-          id: 'BookerOrderDetailsPriceQuotation.orderDetailSection.title',
+          id: 'OrderDetails.PriceQuotation.orderDetailSection.title',
         })}
       </div>
       <div className={css.sectionContentContainer}>
         <div className={css.tableHead}>
           <div>
             {intl.formatMessage({
-              id: 'BookerOrderDetailsPriceQuotation.orderDetailSection.head.no',
+              id: 'OrderDetails.PriceQuotation.orderDetailSection.head.no',
             })}
           </div>
           <div>
             {intl.formatMessage({
-              id: 'BookerOrderDetailsPriceQuotation.orderDetailSection.head.type',
+              id: 'OrderDetails.PriceQuotation.orderDetailSection.head.type',
             })}
           </div>
           <div>
             {intl.formatMessage({
-              id: 'BookerOrderDetailsPriceQuotation.orderDetailSection.head.quantity',
+              id: 'OrderDetails.PriceQuotation.orderDetailSection.head.quantity',
             })}
           </div>
           <div>
             {intl.formatMessage({
-              id: 'BookerOrderDetailsPriceQuotation.orderDetailSection.head.cost',
+              id: 'OrderDetails.PriceQuotation.orderDetailSection.head.cost',
             })}
           </div>
         </div>

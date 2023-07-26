@@ -54,7 +54,6 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
     isAdminLayout = false,
     vatSetting = EPartnerVATSetting.vat,
   } = props;
-
   const intl = useIntl();
   const dispatch = useAppDispatch();
   const router = useRouter();

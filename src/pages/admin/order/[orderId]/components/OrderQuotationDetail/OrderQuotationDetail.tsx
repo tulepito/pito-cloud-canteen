@@ -6,7 +6,10 @@ import isEmpty from 'lodash/isEmpty';
 import ReviewCartSection from '@components/OrderDetails/ReviewView/ReviewCartSection/ReviewCartSection';
 import ReviewOrderDetailsSection from '@components/OrderDetails/ReviewView/ReviewOrderDetailsSection/ReviewOrderDetailsSection';
 import Tabs from '@components/Tabs/Tabs';
-import { calculatePriceQuotationInfoFromQuotation } from '@helpers/order/cartInfoHelper';
+import {
+  calculatePriceQuotationInfoFromQuotation,
+  vatPercentageBaseOnVatSetting,
+} from '@helpers/order/cartInfoHelper';
 import { groupFoodOrderByDateFromQuotation } from '@helpers/order/orderDetailHelper';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { useDownloadPriceQuotation } from '@hooks/useDownloadPriceQuotation';
@@ -69,11 +72,15 @@ const OrderQuotationDetail: React.FC<OrderQuotationDetailProps> = (props) => {
   const partnerVATSetting =
     vatSettings?.[currentPartnerId!] || EPartnerVATSetting.vat;
   const partnerServiceFee = serviceFees[currentPartnerId!];
+  const vatPercentage = vatPercentageBaseOnVatSetting({
+    vatSetting: partnerVATSetting,
+    vatPercentage: currentOrderVATPercentage,
+  });
 
   const priceQuotation = calculatePriceQuotationInfoFromQuotation({
     quotation: quotation!,
     packagePerMember,
-    currentOrderVATPercentage,
+    currentOrderVATPercentage: vatPercentage,
     date: isPartner ? currentSubOrderDate : undefined,
     partnerId: currentPartnerId,
     currentOrderServiceFeePercentage: partnerServiceFee / 100,
@@ -135,7 +142,7 @@ const OrderQuotationDetail: React.FC<OrderQuotationDetailProps> = (props) => {
           priceQuotation,
           restaurantId: currentPartnerId!,
           quotationDetail,
-          currentOrderVATPercentage,
+          vatPercentage,
         })
       : formatPriceQuotationData({
           order,
@@ -161,6 +168,7 @@ const OrderQuotationDetail: React.FC<OrderQuotationDetailProps> = (props) => {
     priceQuotationData: priceQuotationData as any,
     isPartnerQuotation: true,
     subOrderDate: currentSubOrderDate,
+    vatSetting: partnerVATSetting,
   });
 
   return (
