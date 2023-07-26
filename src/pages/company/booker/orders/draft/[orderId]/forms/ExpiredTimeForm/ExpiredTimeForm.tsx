@@ -1,10 +1,11 @@
+import { useMemo } from 'react';
 import { useField, useForm } from 'react-final-form-hooks';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { DateTime } from 'luxon';
 
 import Button from '@components/Button/Button';
 import { FieldDatePickerComponent } from '@components/FormFields/FieldDatePicker/FieldDatePicker';
-import { FieldSelectComponent } from '@components/FormFields/FieldSelect/FieldSelect';
+import { FieldDropdownSelectComponent } from '@components/FormFields/FieldDropdownSelect/FieldDropdownSelect';
 import IconClock from '@components/Icons/IconClock/IconClock';
 import { TimeOptions } from '@utils/dates';
 
@@ -67,6 +68,15 @@ const ExpiredTimeForm: React.FC<TExpiredTimeFormProps> = ({
     .minus({ days: 2 })
     .toJSDate();
 
+  const parsedDeliveryHourOptions = useMemo(
+    () =>
+      TimeOptions.map((option) => ({
+        label: option.label,
+        key: option.key,
+      })),
+    [],
+  );
+
   return (
     <form className={css.root} onSubmit={handleSubmit}>
       <FieldDatePickerComponent
@@ -87,7 +97,7 @@ const ExpiredTimeForm: React.FC<TExpiredTimeFormProps> = ({
         className={css.dateInput}
         autoComplete="off"
       />
-      <FieldSelectComponent
+      <FieldDropdownSelectComponent
         id="deadlineHour"
         name="deadlineHour"
         className={css.fieldSelect}
@@ -96,13 +106,10 @@ const ExpiredTimeForm: React.FC<TExpiredTimeFormProps> = ({
         })}
         leftIcon={<IconClock />}
         meta={deadlineHour.meta}
-        input={deadlineHour.input}>
-        {TimeOptions.map((option) => (
-          <option key={option} value={option}>
-            {option}
-          </option>
-        ))}
-      </FieldSelectComponent>
+        input={deadlineHour.input}
+        options={parsedDeliveryHourOptions}
+      />
+
       <Button
         className={css.submitBtn}
         inProgress={submitInprogress}

@@ -3,7 +3,7 @@ import { Form as FinalForm } from 'react-final-form';
 import arrayMutators from 'final-form-arrays';
 
 import Form from '@components/Form/Form';
-import FieldSelect from '@components/FormFields/FieldSelect/FieldSelect';
+import FieldDropdownSelect from '@components/FormFields/FieldDropdownSelect/FieldDropdownSelect';
 import FieldTextArea from '@components/FormFields/FieldTextArea/FieldTextArea';
 
 import css from './ServiceFeeAndNoteForm.module.scss';
@@ -30,12 +30,13 @@ const ServiceFeeAndNoteFormComponent: React.FC<
   return (
     <Form onSubmit={handleSubmit}>
       <h3>Dặn dò</h3>
-      <FieldSelect
+      <FieldDropdownSelect
         className={css.restaurantSelectField}
         id="restaurant"
-        name="restaurant">
-        {restaurantOptions}
-      </FieldSelect>
+        options={restaurantOptions}
+        placeholder="Chọn nhà nhàng"
+        name="restaurant"
+      />
       {values.restaurant && (
         <FieldTextArea
           id={`note-${values.restaurant}`}

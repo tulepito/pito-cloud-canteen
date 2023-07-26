@@ -7,7 +7,7 @@ import isEmpty from 'lodash/isEmpty';
 
 import Button from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
-import { FieldSelectComponent } from '@components/FormFields/FieldSelect/FieldSelect';
+import { FieldDropdownSelectComponent } from '@components/FormFields/FieldDropdownSelect/FieldDropdownSelect';
 import { FieldTextAreaComponent } from '@components/FormFields/FieldTextArea/FieldTextArea';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import {
@@ -16,6 +16,7 @@ import {
   orderManagementThunks,
 } from '@redux/slices/OrderManagement.slice';
 import { Listing } from '@src/utils/data';
+import { shortenString } from '@src/utils/string';
 import type { TListing, TObject } from '@src/utils/types';
 
 import { LineItemsTableComponent } from './LineItemsTableComponent';
@@ -208,6 +209,11 @@ const LineItemsTable: React.FC<TLineItemsTableProps> = (props) => {
     form.reset();
   }, [currentViewDate]);
 
+  const parsedFoodOptions = foodOptions?.map((f) => ({
+    label: shortenString(f.name, 18),
+    key: f.id,
+  }));
+
   return (
     <div className={css.root}>
       <LineItemsTableComponent
@@ -222,26 +228,18 @@ const LineItemsTable: React.FC<TLineItemsTableProps> = (props) => {
           </label>
 
           <div className={css.fieldRow}>
-            <FieldSelectComponent
+            <FieldDropdownSelectComponent
               id={`food`}
               name={`food`}
               className={css.fieldSelect}
+              options={parsedFoodOptions}
               disabled={disabledSelectFood}
-              meta={foodField.meta}
-              input={foodField.input}>
-              <option disabled value="">
-                {intl.formatMessage({
-                  id: 'LineItemsTable.addFoodField.placeholder',
-                })}
-              </option>
-              {foodOptions.map(({ id, name }) => {
-                return (
-                  <option key={id} value={id}>
-                    {name}
-                  </option>
-                );
+              placeholder={intl.formatMessage({
+                id: 'LineItemsTable.addFoodField.placeholder',
               })}
-            </FieldSelectComponent>
+              meta={foodField.meta}
+              input={foodField.input}
+            />
 
             <Button
               onClick={handleAddNewLineItem}

@@ -2,9 +2,9 @@
 import { useEffect, useMemo } from 'react';
 import { shallowEqual } from 'react-redux';
 
+import FieldDropdownSelect from '@components/FormFields/FieldDropdownSelect/FieldDropdownSelect';
 import FieldLabelCheckbox from '@components/FormFields/FieldLabelCheckbox/FieldLabelCheckbox';
 import FieldRating from '@components/FormFields/FieldRating/FieldRating';
-import FieldSelect from '@components/FormFields/FieldSelect/FieldSelect';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 
 import { OrderRatingThunks } from '../../rating/OrderRating.slice';
@@ -92,24 +92,28 @@ const FoodRating: React.FC<TFoodRatingProps> = (props) => {
     values[OPTIONAL_FOOD_RESTAURANT_UNSATISFACTED],
   ]);
 
+  const parsedRestaurantByDayOptions = useMemo(
+    () =>
+      restaurantsByDay.map(
+        ({ restaurantId, restaurantName, timestamp }: any) => ({
+          key: `${restaurantId} - ${timestamp}`,
+          label: restaurantName,
+        }),
+      ),
+    [JSON.stringify(restaurantsByDay)],
+  );
+
   const optionalFoodRating = isFoodSatifactedSelected ? (
     <>
       <div className={css.optionalFieldTitle}>Món nào khiến bạn ấn tượng?</div>
-      <FieldSelect
+      <FieldDropdownSelect
         name={OPTIONAL_FOOD_RESTAURANT_SATISFACTED}
         id="optionalFood-restaurant"
-        className={css.optionalSelectField}>
-        <option value="">Chọn nhà hàng bạn muốn đánh giá</option>
-        {restaurantsByDay.map(
-          ({ restaurantId, restaurantName, timestamp }: any) => (
-            <option
-              key={`${restaurantId}-${timestamp}`}
-              value={`${restaurantId} - ${timestamp}`}>
-              {restaurantName}
-            </option>
-          ),
-        )}
-      </FieldSelect>
+        className={css.optionalSelectField}
+        placeholder="Chọn nhà hàng bạn muốn đánh giá"
+        options={parsedRestaurantByDayOptions}
+      />
+
       {fetchFoodListByRestaurant ? (
         <div>Đang tải dữ liệu...</div>
       ) : (
@@ -127,21 +131,14 @@ const FoodRating: React.FC<TFoodRatingProps> = (props) => {
       <div className={css.optionalFieldTitle}>
         Món nào khiến không bạn ấn tượng?
       </div>
-      <FieldSelect
+      <FieldDropdownSelect
         name={OPTIONAL_FOOD_RESTAURANT_UNSATISFACTED}
         id="optionalFood-restaurant"
-        className={css.optionalSelectField}>
-        <option value="">Chọn nhà hàng bạn muốn đánh giá</option>
-        {restaurantsByDay.map(
-          ({ restaurantId, restaurantName, timestamp }: any) => (
-            <option
-              key={`${restaurantId}-${timestamp}`}
-              value={`${restaurantId} - ${timestamp}`}>
-              {restaurantName}
-            </option>
-          ),
-        )}
-      </FieldSelect>
+        className={css.optionalSelectField}
+        options={parsedRestaurantByDayOptions}
+        placeholder="Chọn nhà hàng bạn muốn đánh giá"
+      />
+
       {fetchFoodListByRestaurant ? (
         <div>Đang tải dữ liệu...</div>
       ) : (
