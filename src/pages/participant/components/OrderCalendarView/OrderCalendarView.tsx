@@ -13,7 +13,7 @@ import OrderEventCard from '@components/CalendarDashboard/components/OrderEventC
 import LoadingModal from '@components/LoadingModal/LoadingModal';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { getItem } from '@helpers/localStorageHelpers';
-import { markColorForOrder } from '@helpers/orderHelper';
+import { isOver, markColorForOrder } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import useSubOrderPicking from '@pages/participant/hooks/useSubOrderPicking';
@@ -23,6 +23,7 @@ import SubOrderDetailModal from '@pages/participant/orders/components/SubOrderDe
 import SuccessRatingModal from '@pages/participant/orders/components/SuccessRatingModal/SuccessRatingModal';
 import { OrderListThunks } from '@pages/participant/orders/OrderList.slice';
 import { getDaySessionFromDeliveryTime, isSameDate } from '@src/utils/dates';
+import { EOrderStates, EParticipantOrderStatus } from '@src/utils/enums';
 import { convertStringToNumber } from '@src/utils/number';
 import { CurrentUser, Listing, User } from '@utils/data';
 import type { TCurrentUser, TListing, TUser } from '@utils/types';
@@ -75,6 +76,9 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
 
   const { deadlineDate, deliveryHour, startDate, endDate, orderState } =
     orderObj.getMetadata();
+  const isOrderCanceled =
+    orderState === EOrderStates.canceled ||
+    orderState === EOrderStates.canceledByBooker;
   const [anchorTime, setAnchorTime] = useState<number | undefined>();
 
   const anchorDate =
@@ -93,12 +97,8 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
 
     Object.keys(orderDetail).forEach((planItemKey: string) => {
       const planItem = orderDetail[planItemKey];
-      const {
-        foodList = {},
-        restaurantName,
-        id,
-        transactionId,
-      } = planItem.restaurant;
+      const { transactionId } = planItem;
+      const { foodList = {}, restaurantName, id } = planItem.restaurant;
       const restaurant = restaurants?.find(
         (_restaurant) => Listing(_restaurant).getId() === id,
       );
@@ -111,16 +111,24 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
       const foodSelection =
         orderDetail[planItemKey].memberOrders[currentUserId] || {};
 
-      const pickFoodStatus = foodSelection?.status;
+      const alreadyPickFood = !!foodSelection?.foodId;
+
+      const expiredTime = deadlineDate
+        ? DateTime.fromMillis(+deadlineDate)
+        : DateTime.fromMillis(+planItemKey).minus({ day: 2 });
+
+      const pickFoodStatus = isOrderCanceled
+        ? orderState
+        : alreadyPickFood
+        ? EParticipantOrderStatus.joined
+        : isOver(expiredTime.toMillis())
+        ? EParticipantOrderStatus.expired
+        : foodSelection?.status;
 
       if (!pickFoodStatus && !anchorTime && !isAnchorTimeChanged) {
         isAnchorTimeChanged = true;
         setAnchorTime(+planItemKey);
       }
-      const expiredTime = deadlineDate
-        ? DateTime.fromMillis(+deadlineDate)
-        : DateTime.fromMillis(+planItemKey).minus({ day: 2 });
-
       const event = {
         resource: {
           id: `${planItemKey}`,

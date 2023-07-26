@@ -8,8 +8,6 @@ import { isOver } from '@helpers/orderHelper';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { useViewport } from '@hooks/useViewport';
 
-import { EVENT_STATUS } from '../../helpers/constant';
-
 import OrderEventCardContentItems from './OrderEventCardContentItems';
 import OrderEventCardHeader from './OrderEventCardHeader';
 import OrderEventCardPopup from './OrderEventCardPopup';
@@ -36,9 +34,6 @@ const OrderEventCard: React.FC<TOrderEventCardProps> = ({ event }) => {
   const isExpiredAndNotPickedFood =
     !isFoodPicked && (isExpired || isOrderStarted);
 
-  const eventStatus = isExpiredAndNotPickedFood
-    ? EVENT_STATUS.EXPIRED_STATUS
-    : status;
   const { orderColor } = event?.resource || {};
   const dotStyles = {
     backgroundColor: isExpiredAndNotPickedFood ? '#8C8C8C' : orderColor,
@@ -63,7 +58,7 @@ const OrderEventCard: React.FC<TOrderEventCardProps> = ({ event }) => {
       tooltipContent={
         <OrderEventCardPopup
           event={event}
-          status={eventStatus}
+          status={status}
           isExpired={isExpired}
         />
       }
@@ -80,7 +75,7 @@ const OrderEventCard: React.FC<TOrderEventCardProps> = ({ event }) => {
           <div className={css.eventCardContentWrapper}>
             <OrderEventCardStatus
               className={css.cardStatus}
-              status={eventStatus}
+              status={status}
               subOrderTx={subOrderTx}
             />
             <OrderEventCardContentItems event={event} />
