@@ -31,7 +31,6 @@ export const FieldDropdownSelectComponent: React.FC<TFieldDropdownSelect> = (
     meta,
     placeholder,
     options = [],
-    initialFieldValue,
     labelClassName,
     className,
     fieldWrapperClassName,

@@ -139,6 +139,19 @@ export const formatTimestamp = (
     });
 };
 
+export const formatDate = (
+  date = new Date(),
+  format?: string,
+  locale: LocaleOptions['locale'] = 'vi',
+  timeZone: string = VNTimezone,
+) => {
+  return DateTime.fromJSDate(date)
+    .setZone(timeZone)
+    .toFormat(format || 'dd/MM/yyyy', {
+      locale,
+    });
+};
+
 export const addWeeksToDate = (dateObj: Date, numberOfWeeks: number) => {
   const weekToAdd = numberOfWeeks * 7 - 1;
   dateObj.setDate(dateObj.getDate() + weekToAdd);
@@ -184,8 +197,6 @@ export const generateTimeOptions = () => {
 
   return options;
 };
-
-export const TimeOptions = generateTimeOptions();
 
 export const getDayInWeekFromPeriod = (start: number, end: number) => {
   if (!start || !end) return [];
@@ -516,3 +527,34 @@ export const getStartOfMonth = (date: Date) => {
 export const getEndOfMonth = (date: Date) => {
   return DateTime.fromJSDate(date).endOf('month').toJSDate();
 };
+
+export const renderListTimeOptions = (
+  startTime: string = '06:00',
+  endTime: string = '23:00',
+  interval: number = 15,
+) => {
+  const [startHour, startMinute] = startTime?.split(':') || [];
+  const [endHour, endMinute] = endTime?.split(':') || [];
+  const startInterval = Number(startHour) * 60 + Number(startMinute);
+  const endInterval = Number(endHour) * 60 + Number(endMinute);
+  const result = [];
+  for (let i = startInterval; i <= endInterval; i += interval) {
+    const hours = Math.floor(i / 60);
+    const minutes = i % 60;
+
+    const timeIn24HourClock = `${hours}:${minutes}`.replace(/\b\d\b/g, '0$&');
+
+    const timeIn12HourClock = `${hours % 12 || 12}:${minutes} ${
+      'AP'[+(hours > 11)]
+    }M`.replace(/\b\d\b/g, '0$&');
+
+    result.push({
+      label: timeIn12HourClock,
+      key: timeIn24HourClock,
+    });
+  }
+
+  return result;
+};
+
+export const TimeOptions = renderListTimeOptions();
