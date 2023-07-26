@@ -1,9 +1,10 @@
+import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { parseThousandNumber } from '@helpers/format';
 
 import css from './PaymentAmountTable.module.scss';
 
 type PaymentAmountTableProps = {
-  tableTitle: string;
+  tableTitle?: string;
   totalPrice: number;
   paidAmount: number;
 };
@@ -13,7 +14,10 @@ const PaymentAmountTable: React.FC<PaymentAmountTableProps> = (props) => {
 
   return (
     <div className={css.container}>
-      <div className={css.tableTitle}>{tableTitle}</div>
+      <RenderWhen condition={!!tableTitle}>
+        <div className={css.tableTitle}>{tableTitle}</div>
+      </RenderWhen>
+
       <div className={css.tableContainer}>
         <div className={css.row}>
           <span>Tổng giá tiền</span>
