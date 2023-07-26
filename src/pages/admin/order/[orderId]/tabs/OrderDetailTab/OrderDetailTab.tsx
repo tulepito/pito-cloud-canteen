@@ -69,7 +69,7 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
     updateOrderStaffNameInProgress,
     updateOrderState,
     updateOrderStateInProgress,
-    transactionDataMap,
+    transactionDataMap = {},
     onSaveOrderNote,
   } = props;
 
