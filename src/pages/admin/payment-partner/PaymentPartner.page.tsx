@@ -2,10 +2,12 @@ import { useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import flatMapDeep from 'lodash/flatMapDeep';
+import isEmpty from 'lodash/isEmpty';
 import uniq from 'lodash/uniq';
 
 import Badge, { EBadgeType } from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
+import IconClose from '@components/Icons/IconClose/IconClose';
 import IconFilter from '@components/Icons/IconFilter/IconFilter';
 import IntegrationFilterModal from '@components/IntegrationFilterModal/IntegrationFilterModal';
 import type { TColumn } from '@components/Table/Table';
@@ -23,15 +25,41 @@ import KeywordSearchForm from '../partner/components/KeywordSearchForm/KeywordSe
 
 import AddPartnerPaymentModal from './components/AddPartnerPaymentModal/AddPartnerPaymentModal';
 import PaymentFilterModal from './components/PaymentFilterModal/PaymentFilterModal';
-import { filterPaymentPartner } from './helpers/paymentPartner';
+import { filterPaymentPartner, makeExcelFile } from './helpers/paymentPartner';
 import { PaymentPartnerThunks } from './PaymentPartner.slice';
 
 import css from './PaymentPartner.module.scss';
+
+const getFilterLabelText = (key: string, value: string | string[]) => {
+  switch (key) {
+    case 'partnerName':
+      return value;
+    case 'startDate':
+    case 'endDate':
+      return formatTimestamp(+value);
+    case 'status':
+      return Array.isArray(value)
+        ? value
+            .map((item: string) =>
+              item === 'isPaid' ? 'Đã thanh toán' : 'Chưa thanh toán',
+            )
+            .join(', ')
+        : value === 'isPaid'
+        ? 'Đã thanh toán'
+        : 'Chưa thanh toán';
+    default:
+      return value;
+  }
+};
 
 const PaymentPartnerPage = () => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
   const [filters, setFilters] = useState({} as any);
+  const [selectedPaymentRecords, setSelectedPaymentRecords] = useState(
+    {} as any,
+  );
+
   const filterPaymentModalController = useBoolean();
   const addPartnerPaymentModalController = useBoolean();
   const title = intl.formatMessage({
@@ -159,6 +187,7 @@ const PaymentPartnerPage = () => {
   );
 
   const filteredTableData = filterPaymentPartner(formattedTableData, filters);
+
   useEffect(() => {
     dispatch(PaymentPartnerThunks.fetchPartnerPaymentRecords());
   }, [dispatch]);
@@ -167,6 +196,12 @@ const PaymentPartnerPage = () => {
     setFilters({});
   };
 
+  const onRemoveFilter = (key: string) => () => {
+    const currentFilters = { ...filters };
+    delete currentFilters[key];
+
+    setFilters(currentFilters);
+  };
   const onPartnerPaymentRecordsSubmit = async (values: any) => {
     const newPaymentRecords = Object.keys(values).filter((key) =>
       key.includes('paymentAmount'),
@@ -174,7 +209,6 @@ const PaymentPartnerPage = () => {
 
     const newPaymentRecordsData = newPaymentRecords.map((key) => {
       const [, orderTitle, subOrderDate, id] = key.split(' - ');
-      console.log('orderTitle, subOrderDate, id', key.split(' - '));
       const currentPaymentRecord = formattedTableData.find(
         (_data) => _data.key === id,
       );
@@ -204,6 +238,40 @@ const PaymentPartnerPage = () => {
     }
   };
 
+  const getExposeValues = ({ values }: any) => {
+    // need set timeout here to wait FormSpy render first to avoid React warning
+    setTimeout(() => {
+      setSelectedPaymentRecords(values);
+    }, 0);
+  };
+
+  const onDownloadPaymentList = () => {
+    const hasSelectedPaymentRecords = !isEmpty(selectedPaymentRecords);
+    if (hasSelectedPaymentRecords) {
+      const selectedPaymentRecordsData = filteredTableData.filter((item) =>
+        selectedPaymentRecords.rowCheckbox.includes(item.key),
+      );
+      makeExcelFile(selectedPaymentRecordsData);
+    } else {
+      makeExcelFile(filteredTableData);
+    }
+  };
+
+  const filterLabels = Object.keys(filters).map((key) => {
+    return (
+      <div key={`${key}-${filters[key]}`} className={css.filterLabel}>
+        <span>
+          {intl.formatMessage({
+            id: `PaymentPartnerPage.filterLabels.${key}`,
+          })}
+          {' :'}
+        </span>{' '}
+        <span>{getFilterLabelText(key, filters[key])}</span>
+        <IconClose className={css.iconClose} onClick={onRemoveFilter(key)} />
+      </div>
+    );
+  });
+
   return (
     <div className={css.root}>
       <div className={css.header}>
@@ -225,7 +293,10 @@ const PaymentPartnerPage = () => {
           }
           rightFilters={
             <>
-              <Button type="button" variant="secondary">
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={onDownloadPaymentList}>
                 <FormattedMessage id="PaymentPartnerPage.actionButton.downloadPayment" />
               </Button>
               <Button
@@ -237,13 +308,14 @@ const PaymentPartnerPage = () => {
           }
         />
       </div>
+      <div className={css.filterLabels}>{filterLabels}</div>
       <div className={css.tableWrapper}>
         <TableForm
           columns={TABLE_COLUMNS}
           hasCheckbox
           data={filteredTableData}
           tableBodyCellClassName={css.tableBodyCell}
-          // exposeValues={getExposeValues}
+          exposeValues={getExposeValues}
           isLoading={fetchPaymentPartnerRecordsInProgress}
         />
       </div>
