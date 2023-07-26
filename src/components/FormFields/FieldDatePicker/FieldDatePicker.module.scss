@@ -60,7 +60,7 @@
   }
 
   & :global(.react-datepicker__day-name) {
-    color: #626262;
+    color: $neutralGray6;
     width: 30px;
     @include viewportMedium {
       width: 37px;
@@ -92,7 +92,7 @@
     cursor: pointer;
     height: auto;
     path {
-      stroke: #bbbbbb;
+      stroke: $neutralGray5;
     }
   }
 }
