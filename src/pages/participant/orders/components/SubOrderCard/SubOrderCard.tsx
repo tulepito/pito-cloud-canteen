@@ -54,13 +54,9 @@ const SubOrderCard: React.FC<TSubOrderCardProps> = (props) => {
     (item: any) => item.key === dishSelection?.dishSelection,
   )?.value;
 
-  const shouldShowRejectButton =
-    !isOrderStarted &&
-    ![EVENT_STATUS.EXPIRED_STATUS, EVENT_STATUS.NOT_JOINED_STATUS].includes(
-      status,
-    ) &&
-    !isExpired &&
-    !transactionId;
+  const shouldShowRejectButton = [EVENT_STATUS.NOT_JOINED_STATUS].includes(
+    status,
+  );
   const shouldShowCountdown = !isOrderStarted && !isExpired;
 
   const subOrderTxs = useAppSelector(
