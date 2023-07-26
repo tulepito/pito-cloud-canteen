@@ -31,3 +31,33 @@
 .tableWrapper {
   margin-top: 24px;
 }
+
+.filterLabels {
+  @include flexAlign(center);
+  gap: 10px;
+  margin-top: 24px;
+
+  .filterLabel {
+    padding: 8px 12px;
+    border: 1px solid $neutralGray3;
+    border-radius: 30px;
+    span {
+      @include textTemplate(14px, $fontWeightRegular, 20px);
+
+      &:first-child {
+        color: $neutralGray5;
+      }
+    }
+  }
+
+  .iconClose {
+    width: 10px;
+    height: 10px;
+    margin-left: 12px;
+    cursor: pointer;
+
+    path {
+      fill: $neutralGray5;
+    }
+  }
+}
