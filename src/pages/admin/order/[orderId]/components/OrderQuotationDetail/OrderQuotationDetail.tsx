@@ -38,15 +38,15 @@ const OrderQuotationDetail: React.FC<OrderQuotationDetailProps> = (props) => {
 
   const clientQuotation = useMemo(
     () => quotationMetadata.client || {},
-    [quotationGetter, target],
+    [JSON.stringify(quotationMetadata.client)],
   );
   const partnerQuotation = useMemo(
     () => quotationMetadata.partner || {},
-    [quotationGetter, target],
+    [JSON.stringify(quotationMetadata.partner)],
   );
   const quotationDetail = useMemo(
     () => quotationMetadata[target] || {},
-    [quotationGetter, target],
+    [JSON.stringify(quotationMetadata), target],
   );
   const currentOrderVATPercentage = useAppSelector(
     (state) => state.SystemAttributes.currentOrderVATPercentage,
