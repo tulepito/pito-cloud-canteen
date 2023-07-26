@@ -5,7 +5,7 @@ import { useIntl } from 'react-intl';
 
 import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
-import FieldSelect from '@components/FormFields/FieldSelect/FieldSelect';
+import FieldDropdownSelect from '@components/FormFields/FieldDropdownSelect/FieldDropdownSelect';
 import FieldTextArea from '@components/FormFields/FieldTextArea/FieldTextArea';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import IconMinus from '@components/Icons/IconMinus/IconMinus';
@@ -14,7 +14,6 @@ import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { shortenString } from '@utils/string';
 
 import css from './EditOrderRowForm.module.scss';
-import FieldDropdownSelect from '@components/FormFields/FieldDropdownSelect/FieldDropdownSelect';
 
 export type TEditOrderRowFormValues = {
   memberName: string;
