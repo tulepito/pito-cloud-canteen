@@ -8,9 +8,12 @@
 
 .noImageContainer {
   display: flex;
+  background-color: $neutralGray3;
   flex-direction: column;
+  position: relative;
   justify-content: center;
-  background-color: $neutralGray1;
+  align-items: center;
+  height: 100%;
 }
 
 .noImageWrapper {
@@ -21,7 +24,6 @@
 }
 
 .noImageIcon {
-  padding-top: 24px;
   box-sizing: content-box;
   stroke: $neutralGray5;
 }

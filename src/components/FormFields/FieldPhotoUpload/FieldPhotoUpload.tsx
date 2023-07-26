@@ -1,14 +1,13 @@
 import type { ChangeEvent } from 'react';
 import React, { useState } from 'react';
 import { Field } from 'react-final-form';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { useIntl } from 'react-intl';
 import classNames from 'classnames';
 
 import { InlineTextButton } from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import IconClose from '@components/Icons/IconClose/IconClose';
 import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
-import IconUpload from '@components/Icons/IconUpload/IconUpload';
 import ImageFromFile from '@components/ImageFromFile/ImageFromFile';
 import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
 import { isUploadImageOverLimitError } from '@utils/errors';
@@ -204,10 +203,10 @@ const FieldPhotoUpload: React.FC<TFieldPhotoUpload> = (props) => {
                       [css.error]: hasError,
                     })}>
                     <div className={css.iconUpload}>
-                      <IconUpload />
-                      <span className={css.uploadImageLabel}>
-                        <FormattedMessage id="FieldPhotoUpload.uploadLabel" />
-                      </span>
+                      <ResponsiveImage
+                        image={null}
+                        alt={`${input.name} asset`}
+                      />
                     </div>
                   </label>
                 )}

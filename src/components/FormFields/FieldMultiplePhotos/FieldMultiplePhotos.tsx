@@ -1,13 +1,12 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import { Field } from 'react-final-form';
 import { FieldArray } from 'react-final-form-arrays';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { useIntl } from 'react-intl';
 import classNames from 'classnames';
 
 import { InlineTextButton } from '@components/Button/Button';
 import IconClose from '@components/Icons/IconClose/IconClose';
 import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
-import IconUpload from '@components/Icons/IconUpload/IconUpload';
 import ImageFromFile from '@components/ImageFromFile/ImageFromFile';
 import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
 import ValidationError from '@components/ValidationError/ValidationError';
@@ -203,14 +202,10 @@ const FieldMutiplePhotos = (props: any) => {
                             ) : (
                               <label htmlFor={inputName} className={css.label}>
                                 <div className={css.addPhotoWrapper}>
-                                  {index === 0 && (
-                                    <div className={css.addIcon}>
-                                      <IconUpload />
-                                      <div className={css.addLabel}>
-                                        <FormattedMessage id="FieldMultiplePhotos.addLabel" />
-                                      </div>
-                                    </div>
-                                  )}
+                                  <ResponsiveImage
+                                    image={null}
+                                    alt={`${fields.name}[${index}] asset`}
+                                  />
                                 </div>
                               </label>
                             )}

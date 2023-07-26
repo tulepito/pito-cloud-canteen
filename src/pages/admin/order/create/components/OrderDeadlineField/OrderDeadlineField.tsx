@@ -1,4 +1,4 @@
-import { forwardRef, useState } from 'react';
+import { forwardRef, useMemo, useState } from 'react';
 import { OnChange } from 'react-final-form-listeners';
 import { useIntl } from 'react-intl';
 import classNames from 'classnames';
@@ -6,7 +6,7 @@ import format from 'date-fns/format';
 import viLocale from 'date-fns/locale/vi';
 
 import FieldDatePicker from '@components/FormFields/FieldDatePicker/FieldDatePicker';
-import FieldSelect from '@components/FormFields/FieldSelect/FieldSelect';
+import FieldDropdownSelect from '@components/FormFields/FieldDropdownSelect/FieldDropdownSelect';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import IconCalendar from '@components/Icons/IconCalender/IconCalender';
 import IconClock from '@components/Icons/IconClock/IconClock';
@@ -117,6 +117,15 @@ const OrderDeadlineField: React.FC<TOrderDeadlineFieldProps> = (props) => {
     !deadlineDate && css.placeholder,
   );
 
+  const parsedDeliveryHourOptions = useMemo(
+    () =>
+      TimeOptions.map((option) => ({
+        label: option.label,
+        key: option.key,
+      })),
+    [],
+  );
+
   return (
     <div className={containerClasses}>
       {title && <div className={css.fieldTitle}>{title}</div>}
@@ -141,7 +150,7 @@ const OrderDeadlineField: React.FC<TOrderDeadlineFieldProps> = (props) => {
           validate={required(deadlineDateRequired)}
           customInput={<CustomDeadlineFieldInput />}
         />
-        <FieldSelect
+        <FieldDropdownSelect
           id="deadlineHour"
           name="deadlineHour"
           label={
@@ -152,18 +161,12 @@ const OrderDeadlineField: React.FC<TOrderDeadlineFieldProps> = (props) => {
           }
           className={css.fieldSelect}
           leftIcon={<IconClock />}
-          validate={required(deadlineHourRequired)}>
-          <option value="" disabled>
-            {intl.formatMessage({
-              id: 'OrderDeadlineField.deadlineHour.placeholder',
-            })}
-          </option>
-          {TimeOptions.map((option) => (
-            <option key={option} value={option}>
-              {option}
-            </option>
-          ))}
-        </FieldSelect>
+          validate={required(deadlineHourRequired)}
+          options={parsedDeliveryHourOptions}
+          placeholder={intl.formatMessage({
+            id: 'OrderDeadlineField.deadlineHour.placeholder',
+          })}
+        />
       </div>
     </div>
   );

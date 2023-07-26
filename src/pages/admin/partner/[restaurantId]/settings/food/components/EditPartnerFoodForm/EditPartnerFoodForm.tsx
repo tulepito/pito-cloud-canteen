@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
@@ -13,9 +13,9 @@ import Button from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import Form from '@components/Form/Form';
 import FieldCheckboxGroup from '@components/FormFields/FieldCheckboxGroup/FieldCheckboxGroup';
+import FieldDropdownSelect from '@components/FormFields/FieldDropdownSelect/FieldDropdownSelect';
 import FieldMutiplePhotos from '@components/FormFields/FieldMultiplePhotos/FieldMultiplePhotos';
 import FieldRadioButton from '@components/FormFields/FieldRadioButton/FieldRadioButton';
-import FieldSelect from '@components/FormFields/FieldSelect/FieldSelect';
 import FieldTextArea from '@components/FormFields/FieldTextArea/FieldTextArea';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import FieldTextInputWithBottomBox from '@components/FormFields/FieldTextInputWithBottomBox/FieldTextInputWithBottomBox';
@@ -114,6 +114,25 @@ const EditPartnerFoodFormComponent: React.FC<
 
     return handleSubmitOnClick && handleSubmitOnClick(values);
   };
+
+  const parsedPackagingOptions = useMemo(
+    () =>
+      packagingOptions
+        .filter((cate: TKeyValue) => cate.key !== OTHER_OPTION)
+        .map((cat: TKeyValue) => ({
+          label: cat.label,
+          key: cat.key,
+        })),
+    [JSON.stringify(packagingOptions)],
+  );
+
+  const parsedCategoryOptions = useMemo(
+    () =>
+      categoriesOptions
+        .filter((cate: TKeyValue) => cate.key !== OTHER_OPTION)
+        .map((cat: TKeyValue) => ({ key: cat.key, label: cat.label })),
+    [JSON.stringify(categoriesOptions)],
+  );
 
   return (
     <Form className={css.root}>
@@ -304,10 +323,11 @@ const EditPartnerFoodFormComponent: React.FC<
             )}
             parse={parsePrice}
           />
-          <FieldSelect
+          <FieldDropdownSelect
             className={css.field}
             name="packaging"
             id="packaging"
+            options={parsedPackagingOptions}
             label={intl.formatMessage({
               id: 'EditPartnerFoodForm.packagingLabel',
             })}
@@ -315,20 +335,11 @@ const EditPartnerFoodFormComponent: React.FC<
               intl.formatMessage({
                 id: 'EditPartnerFoodForm.packagingRequired',
               }),
-            )}>
-            <option value="" disabled>
-              {intl.formatMessage({
-                id: 'EditPartnerFoodForm.packagingPlaceholder',
-              })}
-            </option>
-            {packagingOptions
-              .filter((cate: TKeyValue) => cate.key !== OTHER_OPTION)
-              .map((cat: TKeyValue) => (
-                <option key={cat.key} value={cat.key}>
-                  {cat.label}
-                </option>
-              ))}
-          </FieldSelect>
+            )}
+            placeholder={intl.formatMessage({
+              id: 'EditPartnerFoodForm.packagingPlaceholder',
+            })}
+          />
         </div>
       </div>
       <div className={css.flexField}>
@@ -360,13 +371,11 @@ const EditPartnerFoodFormComponent: React.FC<
               />
             ))}
           </div>
-          <FieldSelect
+          <FieldDropdownSelect
             className={css.field}
             name="category"
+            options={parsedCategoryOptions}
             id="category"
-            placeholder={intl.formatMessage({
-              id: 'EditPartnerFoodForm.foodCategoryPlaceholder',
-            })}
             label={intl.formatMessage({
               id: 'EditPartnerFoodForm.foodCategoryLabel',
             })}
@@ -374,20 +383,11 @@ const EditPartnerFoodFormComponent: React.FC<
               intl.formatMessage({
                 id: 'EditPartnerFoodForm.categoryRequired',
               }),
-            )}>
-            <option value="" disabled>
-              {intl.formatMessage({
-                id: 'EditPartnerFoodForm.categoryPlaceholder',
-              })}
-            </option>
-            {categoriesOptions
-              .filter((cate: TKeyValue) => cate.key !== OTHER_OPTION)
-              .map((cat: TKeyValue) => (
-                <option key={cat.key} value={cat.key}>
-                  {cat.label}
-                </option>
-              ))}
-          </FieldSelect>
+            )}
+            placeholder={intl.formatMessage({
+              id: 'EditPartnerFoodForm.categoryPlaceholder',
+            })}
+          />
         </div>
       </div>
       <div className={css.flexField}>
