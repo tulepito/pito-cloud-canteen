@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useCallback } from 'react';
 
 import { downloadPriceQuotation as downloadPriceQuotationFn } from '@helpers/order/downloadPriceQuotationHelper';
@@ -11,12 +12,14 @@ export const useDownloadPriceQuotation = ({
   orderTitle,
   priceQuotationData,
   isPartnerQuotation = false,
+  subOrderDate,
 }: {
   orderTitle: string;
   priceQuotationData: ReturnType<
     typeof usePrepareOrderDetailPageData
   >['priceQuotationData'];
   isPartnerQuotation?: boolean;
+  subOrderDate?: number | string;
 }) => {
   const dispatch = useAppDispatch();
 
@@ -27,11 +30,16 @@ export const useDownloadPriceQuotation = ({
       orderTitle,
       priceQuotationData,
       isPartnerQuotation,
+      subOrderDate,
     })();
     dispatch(priceQuotationActions.endDownloading());
     dispatch(UIActions.disableScrollRemove('priceQuotation'));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [orderTitle, JSON.stringify(priceQuotationData)]);
+  }, [
+    orderTitle,
+    JSON.stringify(priceQuotationData),
+    subOrderDate,
+    isPartnerQuotation,
+  ]);
 
   return downloadPriceQuotation;
 };

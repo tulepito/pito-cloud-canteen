@@ -15,17 +15,20 @@ export const downloadPriceQuotation =
     orderTitle,
     priceQuotationData,
     isPartnerQuotation = false,
+    subOrderDate,
   }: {
     orderTitle: string;
     isPartnerQuotation?: boolean;
     priceQuotationData: ReturnType<
       typeof usePrepareOrderDetailPageData
     >['priceQuotationData'];
+    subOrderDate?: number | string;
   }) =>
   async () => {
     const ele = (
       <TranslationProvider>
         <PriceQuotation
+          subOrderDate={subOrderDate}
           data={priceQuotationData}
           isPartnerQuotation={isPartnerQuotation}
         />

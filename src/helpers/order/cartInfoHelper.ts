@@ -1,5 +1,5 @@
-import { pick } from 'lodash';
 import isEmpty from 'lodash/isEmpty';
+import pick from 'lodash/pick';
 
 import {
   getFoodDataMap,
@@ -212,7 +212,7 @@ export const calculatePriceQuotationInfo = ({
 };
 
 export const calculatePriceQuotationPartner = ({
-  quotation,
+  quotation = {},
   serviceFee = 0,
   currentOrderVATPercentage,
   subOrderDate,
@@ -343,7 +343,8 @@ export const calculatePriceQuotationInfoFromQuotation = ({
     PITOPoints,
     VATFee,
     totalWithVAT,
-    serviceFee,
+    serviceFee: currentOrderServiceFeePercentage * 100,
+    serviceFeePrice: serviceFee,
     transportFee,
     promotion,
     overflow,
