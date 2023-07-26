@@ -68,7 +68,7 @@ const PriceQuotation: React.FC<TPriceQuotationProps> = ({ data }) => {
             { orderName: orderTitle },
           )}
         </div>
-        <PitoLogo className={css.PITOlogo} />
+        <PitoLogo className={css.PITOlogo} variant="secondary" />
       </div>
       <div className={css.contentContainer}>
         <InfoSection id={'infoSection'} {...infoSectionData} />
