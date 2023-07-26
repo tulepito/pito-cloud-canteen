@@ -1,10 +1,13 @@
+import type { ReactDatePickerCustomHeaderProps } from 'react-datepicker';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import type { FieldProps, FieldRenderProps } from 'react-final-form';
 import { Field } from 'react-final-form';
 import classNames from 'classnames';
 import viLocale from 'date-fns/locale/vi';
 
+import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import ValidationError from '@components/ValidationError/ValidationError';
+import { formatDate } from '@src/utils/dates';
 
 import 'react-datepicker/dist/react-datepicker.css';
 import css from './FieldDatePicker.module.scss';
@@ -14,6 +17,36 @@ type FieldDatePickerProps = FieldRenderProps<string, any> & {
   label?: string;
   name?: string;
 };
+
+const renderCustomHeader = (props: ReactDatePickerCustomHeaderProps) => {
+  const { date, increaseMonth, decreaseMonth } = props;
+
+  return (
+    <div className={css.calendarHear}>
+      <IconArrow
+        onClick={decreaseMonth}
+        direction="left"
+        className={css.arrow}
+      />
+      <div className={css.date}>{formatDate(new Date(date), 'MMMM, yyyy')}</div>
+      <IconArrow
+        onClick={increaseMonth}
+        direction="right"
+        className={css.arrow}
+      />
+    </div>
+  );
+};
+
+enum EDaysOfWeekInEn {
+  'Thứ Hai' = 'M',
+  'Thứ Ba' = 'T',
+  'Thứ Tư' = 'W',
+  'Thứ Năm' = 'T',
+  'Thứ Sáu' = 'F',
+  'Thứ Bảy' = 'S',
+  'Chủ Nhật' = 'S',
+}
 
 export const FieldDatePickerComponent: React.FC<FieldDatePickerProps> = (
   props,
@@ -58,6 +91,10 @@ export const FieldDatePickerComponent: React.FC<FieldDatePickerProps> = (
       [css.inputError]: !!customErrorText || !!(invalid && error),
     });
 
+  const formatWeekDay = (dayOfWeek: string) => {
+    return EDaysOfWeekInEn[dayOfWeek as keyof typeof EDaysOfWeekInEn];
+  };
+
   return (
     <div className={classNames(css.root, className)}>
       {label && (
@@ -73,7 +110,10 @@ export const FieldDatePickerComponent: React.FC<FieldDatePickerProps> = (
         onChange={onInputChange}
         className={inputClasses}
         customInput={customInput}
+        renderCustomHeader={renderCustomHeader}
         selected={value || selected}
+        formatWeekDay={formatWeekDay}
+        calendarStartDay={0}
         {...rest}
       />
       {!customInput && <ValidationError fieldMeta={fieldMeta} />}
