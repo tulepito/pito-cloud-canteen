@@ -39,3 +39,20 @@
 .paymentBtn {
   @include flexAlign(center, flex-end);
 }
+
+.orderTitle {
+  color: $labelBlue2;
+  font-weight: $fontWeightBold;
+}
+
+.semiBoldText {
+  font-weight: $fontWeightSemiBold;
+}
+
+.tableWrapper {
+  overflow-y: auto;
+  max-height: 300px;
+  .tableBodyCell {
+    vertical-align: middle !important;
+  }
+}

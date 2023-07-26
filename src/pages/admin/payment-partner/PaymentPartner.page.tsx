@@ -1,6 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { shallowEqual } from 'react-redux';
 import flatMapDeep from 'lodash/flatMapDeep';
 import isEmpty from 'lodash/isEmpty';
 import uniq from 'lodash/uniq';
@@ -10,6 +9,7 @@ import Button from '@components/Button/Button';
 import IconClose from '@components/Icons/IconClose/IconClose';
 import IconFilter from '@components/Icons/IconFilter/IconFilter';
 import IntegrationFilterModal from '@components/IntegrationFilterModal/IntegrationFilterModal';
+import NamedLink from '@components/NamedLink/NamedLink';
 import type { TColumn } from '@components/Table/Table';
 import { TableForm } from '@components/Table/Table';
 import {
@@ -18,7 +18,10 @@ import {
 } from '@helpers/format';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
+import { adminPaths } from '@src/paths';
 import { formatTimestamp } from '@src/utils/dates';
+import { EOrderDetailTabs } from '@src/utils/enums';
+import type { TPagination } from '@src/utils/types';
 
 import { generateSKU } from '../order/[orderId]/helpers/AdminOrderDetail';
 import KeywordSearchForm from '../partner/components/KeywordSearchForm/KeywordSearchForm';
@@ -59,6 +62,7 @@ const PaymentPartnerPage = () => {
   const [selectedPaymentRecords, setSelectedPaymentRecords] = useState(
     {} as any,
   );
+  const [page, setPage] = useState(1);
 
   const filterPaymentModalController = useBoolean();
   const addPartnerPaymentModalController = useBoolean();
@@ -72,7 +76,6 @@ const PaymentPartnerPage = () => {
 
   const paymentPartnerRecords = useAppSelector(
     (state) => state.PaymentPartner.paymentPartnerRecords,
-    shallowEqual,
   );
 
   const createPaymentPartnerRecordsInProgress = useAppSelector(
@@ -83,46 +86,68 @@ const PaymentPartnerPage = () => {
     {
       key: 'id',
       label: 'ID',
-      render: ({ orderTitle }: any) => <div>#{orderTitle}</div>,
+      render: ({ orderTitle, orderId }: any) => (
+        <div>
+          <NamedLink
+            className={css.orderTitle}
+            path={adminPaths.OrderDetail}
+            params={{ orderId, tab: EOrderDetailTabs.PAYMENT_STATUS }}>
+            #{orderTitle}
+          </NamedLink>
+        </div>
+      ),
     },
     {
       key: 'partnerName',
       label: 'Đối tác',
-      render: ({ partnerName }: any) => <div>{partnerName}</div>,
+      render: ({ partnerName }: any) => (
+        <div className={css.boldText}>{partnerName}</div>
+      ),
     },
     {
       key: 'subOrderName',
       label: 'Tên đơn hàng',
       render: ({ companyName, subOrderDate }: any) => (
-        <div>{`${companyName}_${formatTimestamp(subOrderDate)}`}</div>
+        <div className={css.boldText}>{`${companyName}_${formatTimestamp(
+          subOrderDate,
+        )}`}</div>
       ),
     },
     {
       key: 'subOrderDate',
       label: 'Thời gian',
       render: ({ subOrderDate, deliveryHour }: any) => (
-        <div>{`${deliveryHour} ${formatTimestamp(subOrderDate)}`}</div>
+        <div>
+          <div className={css.semiBoldText}>{deliveryHour}</div>
+          {`${formatTimestamp(subOrderDate)}`}
+        </div>
       ),
     },
     {
       key: 'totalAmount',
       label: 'Tổng giá trị',
       render: ({ totalAmount }: any) => (
-        <div>{parseThousandNumber(totalAmount)}đ</div>
+        <div className={css.semiBoldText}>
+          {parseThousandNumber(totalAmount)}đ
+        </div>
       ),
     },
     {
       key: 'paidAmount',
       label: 'Đã thanh toán',
       render: ({ paidAmount }: any) => (
-        <div>{parseThousandNumber(paidAmount)}đ</div>
+        <div className={css.semiBoldText}>
+          {parseThousandNumber(paidAmount)}đ
+        </div>
       ),
     },
     {
       key: 'remainAmount',
       label: 'Còn lại',
       render: ({ remainAmount }: any) => (
-        <div>{parseThousandNumber(remainAmount)}đ</div>
+        <div className={css.semiBoldText}>
+          {parseThousandNumber(remainAmount)}đ
+        </div>
       ),
     },
     {
@@ -139,11 +164,15 @@ const PaymentPartnerPage = () => {
     },
   ];
 
-  const tableData = flatMapDeep(paymentPartnerRecords, (subOrders, orderId) =>
-    flatMapDeep(subOrders, (subOrderData, subOrderDate) => ({
-      id: `${orderId}_${subOrderDate}`,
-      paymentRecords: [...subOrderData],
-    })),
+  const tableData = useMemo(
+    () =>
+      flatMapDeep(paymentPartnerRecords, (subOrders, orderId) =>
+        flatMapDeep(subOrders, (subOrderData, subOrderDate) => ({
+          id: `${orderId}_${subOrderDate}`,
+          paymentRecords: [...subOrderData],
+        })),
+      ),
+    [paymentPartnerRecords],
   );
 
   const formattedTableData = tableData.map((item) => {
@@ -187,6 +216,18 @@ const PaymentPartnerPage = () => {
   );
 
   const filteredTableData = filterPaymentPartner(formattedTableData, filters);
+
+  const filteredTableDataWithPagination = useMemo(
+    () => filteredTableData.slice((page - 1) * 10, page * 10),
+    [filteredTableData, page],
+  );
+
+  const pagination: TPagination = {
+    page,
+    perPage: 10,
+    totalItems: filteredTableData.length,
+    totalPages: Math.ceil(filteredTableData.length / 10),
+  };
 
   useEffect(() => {
     dispatch(PaymentPartnerThunks.fetchPartnerPaymentRecords());
@@ -313,10 +354,12 @@ const PaymentPartnerPage = () => {
         <TableForm
           columns={TABLE_COLUMNS}
           hasCheckbox
-          data={filteredTableData}
+          data={filteredTableDataWithPagination}
           tableBodyCellClassName={css.tableBodyCell}
           exposeValues={getExposeValues}
           isLoading={fetchPaymentPartnerRecordsInProgress}
+          pagination={pagination}
+          onCustomPageChange={setPage}
         />
       </div>
 
