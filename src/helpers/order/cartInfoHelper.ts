@@ -188,7 +188,7 @@ export const calculatePriceQuotationInfo = ({
 };
 
 export const calculatePriceQuotationPartner = ({
-  quotation,
+  quotation = {},
   serviceFee = 0,
   currentOrderVATPercentage,
 }: {
@@ -298,7 +298,8 @@ export const calculatePriceQuotationInfoFromQuotation = ({
     PITOPoints,
     VATFee,
     totalWithVAT,
-    serviceFee,
+    serviceFee: currentOrderServiceFeePercentage * 100,
+    serviceFeePrice: serviceFee,
     transportFee,
     promotion,
     overflow,
