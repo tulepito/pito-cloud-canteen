@@ -24,21 +24,24 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             paymentType,
             orderId,
           });
+          if (paymentType === 'partner') {
+            const groupPaymentRecordsBySubOrderDate = paymentRecords?.reduce(
+              (acc: any, cur: any) => {
+                const { subOrderDate } = cur;
+                if (!acc[subOrderDate]) {
+                  acc[subOrderDate] = [];
+                }
+                acc[subOrderDate].push(cur);
 
-          const groupPaymentRecordsBySubOrderDate = paymentRecords?.reduce(
-            (acc: any, cur: any) => {
-              const { subOrderDate } = cur;
-              if (!acc[subOrderDate]) {
-                acc[subOrderDate] = [];
-              }
-              acc[subOrderDate].push(cur);
+                return acc;
+              },
+              {},
+            );
 
-              return acc;
-            },
-            {},
-          );
-
-          res.json(groupPaymentRecordsBySubOrderDate);
+            res.json(groupPaymentRecordsBySubOrderDate);
+          } else {
+            res.json(paymentRecords);
+          }
         }
         break;
       case HttpMethod.POST:

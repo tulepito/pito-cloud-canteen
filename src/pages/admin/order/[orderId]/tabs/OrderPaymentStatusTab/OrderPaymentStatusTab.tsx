@@ -6,7 +6,10 @@ import IconCheckmarkWithCircle from '@components/Icons/IconCheckmark/IconCheckma
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import Tabs from '@components/Tabs/Tabs';
 import Tooltip from '@components/Tooltip/Tooltip';
-import { calculatePriceQuotationPartner } from '@helpers/order/cartInfoHelper';
+import {
+  calculatePriceQuotationInfo,
+  calculatePriceQuotationPartner,
+} from '@helpers/order/cartInfoHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { Listing } from '@src/utils/data';
 import { getDayOfWeek } from '@src/utils/dates';
@@ -17,6 +20,7 @@ import OrderHeaderState from '../../components/OrderHeaderState/OrderHeaderState
 import { calculatePaidAmountBySubOrderDate } from '../../helpers/AdminOrderDetail';
 import { OrderDetailThunks } from '../../OrderDetail.slice';
 
+import ClientPaymentDetail from './components/ClientPaymentDetail/ClientPaymentDetail';
 import PartnerPaymentDetail from './components/PartnerPaymentDetail/PartnerPaymentDetail';
 
 import css from './OrderPaymentStatusTab.module.scss';
@@ -51,6 +55,11 @@ const OrderPaymentStatusTab: React.FC<OrderPaymentStatusTabProps> = (props) => {
     shallowEqual,
   );
 
+  const clientPaymentRecords = useAppSelector(
+    (state) => state.OrderDetail.clientPaymentRecords,
+    shallowEqual,
+  );
+
   const orderListing = Listing(order);
   const orderId = orderListing.getId();
   const { title: orderTitle } = orderListing.getAttributes();
@@ -73,7 +82,9 @@ const OrderPaymentStatusTab: React.FC<OrderPaymentStatusTabProps> = (props) => {
 
       const { totalWithVAT } = partnerQuotationBySubOrderDate;
       const partnerPaymentRecordsByDate =
-        partnerPaymentRecords[subOrderDate] || [];
+        partnerPaymentRecords[subOrderDate].filter(
+          (_record) => !_record.isHideFromHistory,
+        ) || [];
       const paidAmount = calculatePaidAmountBySubOrderDate(
         partnerPaymentRecordsByDate,
       );
@@ -94,10 +105,12 @@ const OrderPaymentStatusTab: React.FC<OrderPaymentStatusTabProps> = (props) => {
                 orderDetail[subOrderDate].restaurant.restaurantName
               } #${orderTitle}-${getDayOfWeek(+subOrderDate)}`}</div>
             }>
-            <div className={css.label}>
-              {`${
-                orderDetail[subOrderDate].restaurant.restaurantName
-              } #${orderTitle}-${getDayOfWeek(+subOrderDate)}`}
+            <div className={css.labelWrapper}>
+              <div className={css.label}>
+                {`${
+                  orderDetail[subOrderDate].restaurant.restaurantName
+                } #${orderTitle}-${getDayOfWeek(+subOrderDate)}`}
+              </div>
               <RenderWhen condition={showCheckmark}>
                 <IconCheckmarkWithCircle className={css.checkIcon} />
               </RenderWhen>
@@ -122,6 +135,32 @@ const OrderPaymentStatusTab: React.FC<OrderPaymentStatusTabProps> = (props) => {
       };
     });
 
+  const { totalWithVAT: clientTotalPrice } = calculatePriceQuotationInfo({
+    planOrderDetail: orderDetail,
+    order,
+    currentOrderVATPercentage,
+  });
+
+  const clientPaidAmount =
+    calculatePaidAmountBySubOrderDate(clientPaymentRecords);
+  const clientTabItem = {
+    key: 'client',
+    label: 'Khách hàng',
+    childrenFn: (childProps: any) => <ClientPaymentDetail {...childProps} />,
+    childrenProps: {
+      totalWithVAT: clientTotalPrice,
+      orderId,
+      paymentType: 'client',
+      company,
+      orderTitle,
+      paidAmount: clientPaidAmount,
+      deliveryHour,
+      clientPaymentRecords,
+    },
+  };
+
+  const totalTabItems = [clientTabItem].concat(partnerTabItems as any[]);
+
   useEffect(() => {
     if (orderId) {
       dispatch(OrderDetailThunks.fetchQuotations(orderId));
@@ -129,12 +168,8 @@ const OrderPaymentStatusTab: React.FC<OrderPaymentStatusTabProps> = (props) => {
   }, [dispatch, orderId]);
 
   useEffect(() => {
-    dispatch(
-      OrderDetailThunks.fetchPartnerPaymentRecords({
-        paymentType: 'partner',
-        orderId,
-      }),
-    );
+    dispatch(OrderDetailThunks.fetchPartnerPaymentRecords(orderId));
+    dispatch(OrderDetailThunks.fetchClientPaymentRecords(orderId));
   }, [dispatch, orderId]);
 
   const handleUpdateOrderState = (state: EOrderStates) => () => {
@@ -154,7 +189,7 @@ const OrderPaymentStatusTab: React.FC<OrderPaymentStatusTabProps> = (props) => {
       />
       <RenderWhen condition={!isEmpty(quotations)}>
         <div className={css.tabContainer}>
-          <Tabs items={partnerTabItems as any} onChange={onTabChange} />
+          <Tabs items={totalTabItems as any} onChange={onTabChange} />
         </div>
       </RenderWhen>
     </div>

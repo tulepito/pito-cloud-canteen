@@ -109,6 +109,14 @@ type TOrderDetailState = {
 
   deletePartnerPaymentRecordInProgress: boolean;
   deletePartnerPaymentRecordError: any;
+
+  clientPaymentRecords: any[];
+
+  createClientPaymentRecordInProgress: boolean;
+  createClientPaymentRecordError: any;
+
+  deleteClientPaymentRecordInProgress: boolean;
+  deleteClientPaymentRecordError: any;
 };
 const initialState: TOrderDetailState = {
   order: null!,
@@ -144,6 +152,13 @@ const initialState: TOrderDetailState = {
 
   deletePartnerPaymentRecordInProgress: false,
   deletePartnerPaymentRecordError: null,
+
+  clientPaymentRecords: [],
+  createClientPaymentRecordInProgress: false,
+  createClientPaymentRecordError: null,
+
+  deleteClientPaymentRecordInProgress: false,
+  deleteClientPaymentRecordError: null,
 };
 
 // ================ Thunk types ================ //
@@ -157,6 +172,12 @@ const FETCH_PARTNER_PAYMENT_RECORD =
   'app/OrderDetail/FETCH_PARTNER_PAYMENT_RECORD';
 const DELETE_PARTNER_PAYMENT_RECORD =
   'app/OrderDetail/DELETE_PARTNER_PAYMENT_RECORD';
+const FETCH_CLIENT_PAYMENT_RECORD =
+  'app/OrderDetail/FETCH_CLIENT_PAYMENT_RECORD';
+const CREATE_CLIENT_PAYMENT_RECORD =
+  'app/OrderDetail/CREATE_CLIENT_PAYMENT_RECORD';
+const DELETE_CLIENT_PAYMENT_RECORD =
+  'app/OrderDetail/DELETE_CLIENT_PAYMENT_RECORD';
 // ================ Async thunks ================ //
 const fetchOrder = createAsyncThunk(
   FETCH_ORDER,
@@ -330,9 +351,9 @@ const updatePlanDetail = createAsyncThunk(
 
 const fetchPartnerPaymentRecords = createAsyncThunk(
   FETCH_PARTNER_PAYMENT_RECORD,
-  async (query: any) => {
+  async (orderId: string) => {
     const { data: partnerPaymentRecords } = await getPaymentRecordsApi({
-      dataParams: query,
+      dataParams: { orderId, paymentType: 'partner' },
     });
 
     return partnerPaymentRecords;
@@ -383,6 +404,48 @@ const deletePartnerPaymentRecord = createAsyncThunk(
   },
 );
 
+const fetchClientPaymentRecords = createAsyncThunk(
+  FETCH_CLIENT_PAYMENT_RECORD,
+  async (orderId: string) => {
+    const { data: clientPaymentRecords } = await getPaymentRecordsApi({
+      dataParams: { orderId, paymentType: 'client' },
+    });
+
+    return clientPaymentRecords;
+  },
+);
+
+const createClientPaymentRecord = createAsyncThunk(
+  CREATE_CLIENT_PAYMENT_RECORD,
+  async (payload: TObject, { getState }) => {
+    const { clientPaymentRecords = [] } = getState().OrderDetail;
+    const { paymentType } = payload;
+    const apiBody = {
+      paymentRecordType: paymentType,
+      paymentRecordParams: {
+        ...payload,
+      },
+    };
+    const { data: newPaymentRecord } = await createPaymentRecordApi(apiBody);
+
+    return [newPaymentRecord, ...clientPaymentRecords];
+  },
+);
+
+const deleteClientPaymentRecord = createAsyncThunk(
+  DELETE_CLIENT_PAYMENT_RECORD,
+  async (paymentRecordId: string, { getState }) => {
+    const { clientPaymentRecords = [] } = getState().OrderDetail;
+    await deletePaymentRecordApi({ paymentRecordId });
+
+    const newClientPaymentRecords = clientPaymentRecords.filter(
+      (paymentRecord: any) => paymentRecord.id !== paymentRecordId,
+    );
+
+    return newClientPaymentRecords;
+  },
+);
+
 export const OrderDetailThunks = {
   fetchOrder,
   updateStaffName,
@@ -393,6 +456,10 @@ export const OrderDetailThunks = {
   fetchPartnerPaymentRecords,
   createPartnerPaymentRecord,
   deletePartnerPaymentRecord,
+
+  fetchClientPaymentRecords,
+  createClientPaymentRecord,
+  deleteClientPaymentRecord,
 };
 
 // ================ Slice ================ //
@@ -565,6 +632,45 @@ const OrderDetailSlice = createSlice({
       .addCase(deletePartnerPaymentRecord.rejected, (state, { error }) => {
         state.deletePartnerPaymentRecordInProgress = false;
         state.deletePartnerPaymentRecordError = error.message;
+      })
+
+      .addCase(fetchClientPaymentRecords.pending, (state) => {
+        state.fetchPartnerPaymentRecordsInProgress = true;
+        state.fetchPartnerPaymentRecordsError = null;
+      })
+      .addCase(fetchClientPaymentRecords.fulfilled, (state, { payload }) => {
+        state.fetchPartnerPaymentRecordsInProgress = false;
+        state.clientPaymentRecords = payload;
+      })
+      .addCase(fetchClientPaymentRecords.rejected, (state, { error }) => {
+        state.fetchPartnerPaymentRecordsInProgress = false;
+        state.fetchPartnerPaymentRecordsError = error.message;
+      })
+
+      .addCase(createClientPaymentRecord.pending, (state) => {
+        state.createClientPaymentRecordInProgress = true;
+        state.createClientPaymentRecordError = null;
+      })
+      .addCase(createClientPaymentRecord.fulfilled, (state, { payload }) => {
+        state.createClientPaymentRecordInProgress = false;
+        state.clientPaymentRecords = payload;
+      })
+      .addCase(createClientPaymentRecord.rejected, (state, { error }) => {
+        state.createClientPaymentRecordInProgress = false;
+        state.createClientPaymentRecordError = error.message;
+      })
+
+      .addCase(deleteClientPaymentRecord.pending, (state) => {
+        state.deleteClientPaymentRecordInProgress = true;
+        state.deleteClientPaymentRecordError = null;
+      })
+      .addCase(deleteClientPaymentRecord.fulfilled, (state, { payload }) => {
+        state.deleteClientPaymentRecordInProgress = false;
+        state.clientPaymentRecords = payload;
+      })
+      .addCase(deleteClientPaymentRecord.rejected, (state, { error }) => {
+        state.deleteClientPaymentRecordInProgress = false;
+        state.deleteClientPaymentRecordError = error.message;
       });
   },
 });

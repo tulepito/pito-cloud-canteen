@@ -40,7 +40,7 @@ export const initializePayment = async (
         });
 
         return {
-          SKU: generateSKU('CUSTOMER', orderId),
+          SKU: generateSKU('PARTNER', orderId),
           amount: 0,
           paymentNote: '',
           orderId,

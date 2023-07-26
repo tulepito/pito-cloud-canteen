@@ -11,6 +11,7 @@ type AddingPaymentRecordModalProps = {
   totalPrice: number;
   paidAmount: number;
   inProgress?: boolean;
+  paymentType?: 'client' | 'partner';
 };
 
 const AddingPaymentRecordModal: React.FC<AddingPaymentRecordModalProps> = (
@@ -23,6 +24,7 @@ const AddingPaymentRecordModal: React.FC<AddingPaymentRecordModalProps> = (
     totalPrice,
     paidAmount,
     inProgress,
+    paymentType = 'partner',
   } = props;
 
   return (
@@ -37,6 +39,7 @@ const AddingPaymentRecordModal: React.FC<AddingPaymentRecordModalProps> = (
         totalPrice={totalPrice}
         paidAmount={paidAmount}
         inProgress={inProgress}
+        paymentType={paymentType}
       />
     </Modal>
   );
