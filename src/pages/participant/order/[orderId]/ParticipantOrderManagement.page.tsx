@@ -17,6 +17,7 @@ import { isOrderOverDeadline } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import CoverBox from '@pages/participant/components/CoverBox/CoverBox';
+import OrderCalendarView from '@pages/participant/components/OrderCalendarView/OrderCalendarView';
 import { participantOrderManagementThunks } from '@redux/slices/ParticipantOrderManagementPage.slice';
 import { currentUserSelector } from '@redux/slices/user.slice';
 import missingPickingOrderCover from '@src/assets/missingPickingCover.png';
@@ -24,9 +25,9 @@ import pickingOrderCover from '@src/assets/pickingOrderCover.png';
 import { participantPaths } from '@src/paths';
 import { Listing, User } from '@src/utils/data';
 import { formatTimestamp } from '@src/utils/dates';
+import { EOrderStates } from '@src/utils/enums';
 import type { TListing, TUser } from '@utils/types';
 
-import OrderCalendarView from '../../components/OrderCalendarView/OrderCalendarView';
 import SectionOrderHeader from '../../components/SectionOrderHeader/SectionOrderHeader';
 import { VIEWS } from '../../helpers/constants';
 
@@ -67,11 +68,15 @@ const ParticipantOrderManagement = () => {
   const companyUser = User(company as TUser);
   const orderListing = Listing(order as TListing);
   const { orderName } = orderListing.getPublicData();
-  const { selectedGroups = [], deadlineDate } = orderListing.getMetadata();
+  const {
+    selectedGroups = [],
+    deadlineDate,
+    orderState,
+  } = orderListing.getMetadata();
   const { displayName: bookerName } = companyUser.getProfile();
   const { companyName } = companyUser.getPublicData();
   const { groups = [] } = companyUser.getMetadata();
-
+  const isOrderCanceled = orderState === EOrderStates.canceled;
   const selectedGroupNames =
     selectedGroups.includes('allMembers') || !selectedGroups.length
       ? ['Tất cả thành viên']
@@ -99,7 +104,9 @@ const ParticipantOrderManagement = () => {
   ];
 
   const shouldShowMissingPickingOrderModal =
-    !isEmpty(order) && isOrderOverDeadline(order as TListing);
+    !isEmpty(order) &&
+    isOrderOverDeadline(order as TListing) &&
+    !isOrderCanceled;
 
   const pickingOrderModalControl = useBoolean(
     !shouldShowMissingPickingOrderModal,
@@ -170,8 +177,10 @@ const ParticipantOrderManagement = () => {
     <ParticipantLayout>
       <RenderWhen
         condition={
-          pickingOrderModalControl.value ||
-          missingPickingOrderModalControl.value
+          (pickingOrderModalControl.value ||
+            missingPickingOrderModalControl.value) &&
+          !loadDataInProgress &&
+          !isOrderCanceled
         }>
         <RenderWhen condition={pickingOrderModalControl.value}>
           <CoverBox

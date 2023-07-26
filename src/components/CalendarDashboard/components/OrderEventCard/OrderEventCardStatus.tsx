@@ -22,6 +22,7 @@ const StatusToBadgeTypeMap = {
   [EVENT_STATUS.JOINED_STATUS]: EBadgeType.info,
   [EVENT_STATUS.NOT_JOINED_STATUS]: EBadgeType.info,
   [EVENT_STATUS.EXPIRED_STATUS]: EBadgeType.default,
+  [EVENT_STATUS.CANCELED_STATUS]: EBadgeType.danger,
 
   [ETransition.START_DELIVERY]: EBadgeType.info,
   [ETransition.COMPLETE_DELIVERY]: EBadgeType.success,

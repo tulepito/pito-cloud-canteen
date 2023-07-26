@@ -11,6 +11,7 @@ import { OrderListThunks } from '@pages/participant/orders/OrderList.slice';
 import { participantOrderManagementThunks } from '@redux/slices/ParticipantOrderManagementPage.slice';
 import { currentUserSelector } from '@redux/slices/user.slice';
 import { participantPaths } from '@src/paths';
+import { EOrderStates } from '@src/utils/enums';
 import { CurrentUser } from '@utils/data';
 
 import type { TEventStatus } from '../../helpers/types';
@@ -48,10 +49,15 @@ const OrderEventCardPopup: React.FC<TOrderEventCardPopupProps> = ({
     daySession,
     deliveryHour: startTime,
     isOrderStarted = false,
+    orderState,
   } = event.resource;
+  const isOrderCancelled = orderState === EOrderStates.canceled;
 
   const shouldShowPickFoodSection =
-    !isOrderStarted && !isExpired && isEmpty(transactionId);
+    !isOrderStarted &&
+    !isExpired &&
+    isEmpty(transactionId) &&
+    !isOrderCancelled;
   const timestamp =
     orderDay.split(' - ').length > 1 ? orderDay.split(' - ')[1] : orderDay;
   const from =
