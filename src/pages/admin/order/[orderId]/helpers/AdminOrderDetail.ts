@@ -10,7 +10,7 @@ export const formatQuotationToFoodTableData = (
 ) => {
   const restaurantQuotation = quotationDetail[restaurantId];
 
-  const foodTableData = Object.keys(restaurantQuotation?.quotation).map(
+  return Object.keys(restaurantQuotation?.quotation || {}).map(
     (date: string, index: number) => {
       const foodDataList = restaurantQuotation?.quotation[date];
       const summary = foodDataList.reduce(
@@ -38,8 +38,39 @@ export const formatQuotationToFoodTableData = (
       };
     },
   );
+};
 
-  return foodTableData;
+export const prepareSingleDateFoodTableDataFromQuotation = (
+  clientQuotation: TObject,
+  subOrderDate: string,
+) => {
+  const foodDataList = clientQuotation[subOrderDate];
+
+  const summary = foodDataList.reduce(
+    (previousResult: TObject, current: TObject) => {
+      const { totalPrice, totalDishes } = previousResult;
+      const { frequency, foodPrice } = current;
+
+      return {
+        ...previousResult,
+        totalDishes: totalDishes + frequency,
+        totalPrice: totalPrice + foodPrice * frequency,
+      };
+    },
+    {
+      totalDishes: 0,
+      totalPrice: 0,
+    } as TObject,
+  );
+
+  return [
+    {
+      date: Number(subOrderDate),
+      index: 0,
+      foodDataList,
+      ...summary,
+    },
+  ];
 };
 
 export const relatedOrderDataSource = ({

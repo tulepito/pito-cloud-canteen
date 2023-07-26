@@ -6,10 +6,7 @@ import isEmpty from 'lodash/isEmpty';
 import ReviewCartSection from '@components/OrderDetails/ReviewView/ReviewCartSection/ReviewCartSection';
 import ReviewOrderDetailsSection from '@components/OrderDetails/ReviewView/ReviewOrderDetailsSection/ReviewOrderDetailsSection';
 import Tabs from '@components/Tabs/Tabs';
-import {
-  calculatePriceQuotationInfoFromQuotation,
-  calculatePriceQuotationPartner,
-} from '@helpers/order/cartInfoHelper';
+import { calculatePriceQuotationInfoFromQuotation } from '@helpers/order/cartInfoHelper';
 import { groupFoodOrderByDateFromQuotation } from '@helpers/order/orderDetailHelper';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { useDownloadPriceQuotation } from '@hooks/useDownloadPriceQuotation';
@@ -19,7 +16,7 @@ import type { TListing, TObject, TUser } from '@src/utils/types';
 import {
   formatPriceQuotationData,
   formatPriceQuotationDataPartner,
-  formatQuotationToFoodTableData,
+  prepareSingleDateFoodTableDataFromQuotation,
 } from '../../helpers/AdminOrderDetail';
 
 import css from './OrderQuotationDetail.module.scss';
@@ -36,68 +33,91 @@ const OrderQuotationDetail: React.FC<OrderQuotationDetailProps> = (props) => {
   const { quotation, target, orderDetail, order, company, booker } = props;
 
   const isPartner = target === 'partner';
-  const quotationListing = Listing(quotation!);
+  const quotationGetter = Listing(quotation!);
+  const quotationMetadata = quotationGetter.getMetadata();
+
+  const clientQuotation = useMemo(
+    () => quotationMetadata.client || {},
+    [quotationGetter, target],
+  );
+  const partnerQuotation = useMemo(
+    () => quotationMetadata.partner || {},
+    [quotationGetter, target],
+  );
   const quotationDetail = useMemo(
-    () => quotationListing.getMetadata()[target] || {},
-    [quotationListing, target],
+    () => quotationMetadata[target] || {},
+    [quotationGetter, target],
   );
   const currentOrderVATPercentage = useAppSelector(
     (state) => state.SystemAttributes.currentOrderVATPercentage,
   );
 
-  const [currentPartnerId, setCurrentPartnerId] = useState<string>(
-    Object.keys(quotationListing.getMetadata()?.partner || {})[0],
+  const [currentSubOrderDate, setCrrSubOrderDate] = useState<string>(
+    Object.keys(clientQuotation)[0],
   );
-  const partnerServiceFee =
-    Listing(order).getMetadata()?.serviceFees?.[currentPartnerId!];
-  const { packagePerMember = 0 } = Listing(order).getMetadata() || {};
 
-  const priceQuotation = isPartner
-    ? calculatePriceQuotationPartner({
-        quotation:
-          quotationListing.getMetadata()?.[target]?.[currentPartnerId!]
-            ?.quotation,
-        serviceFee: partnerServiceFee,
-        currentOrderVATPercentage,
-      })
-    : calculatePriceQuotationInfoFromQuotation({
-        quotation: quotation!,
-        packagePerMember,
-        currentOrderVATPercentage,
-      });
+  const orderMetadata = Listing(order).getMetadata();
+  const { title: orderTitle = '' } = Listing(order).getAttributes();
+
+  const currentPartnerId = (Object.entries(partnerQuotation).find(
+    ([, value]) => (value as TObject)?.quotation[currentSubOrderDate],
+  ) || [])[0];
+  const partnerServiceFee = orderMetadata.serviceFees?.[currentPartnerId!];
+  const { packagePerMember = 0 } = orderMetadata;
+
+  const priceQuotation = calculatePriceQuotationInfoFromQuotation({
+    quotation: quotation!,
+    packagePerMember,
+    currentOrderVATPercentage,
+    date: isPartner ? currentSubOrderDate : undefined,
+    partnerId: currentPartnerId,
+    currentOrderServiceFeePercentage: partnerServiceFee / 100,
+  });
 
   const handlePartnerChange = (tab: any) => {
-    setCurrentPartnerId(tab.key);
+    setCrrSubOrderDate(tab.key);
   };
+  const tabItems = useMemo(() => {
+    if (isPartner) {
+      const partnerQuotationEntries = Object.entries(quotationDetail);
 
-  const tabItems = useMemo(
-    () =>
-      isPartner
-        ? compact(
-            Object.keys(quotationDetail).map((restaurantId: string) => {
-              if (isEmpty(quotationDetail[restaurantId].quotation)) {
-                return null;
-              }
+      return compact(
+        Object.keys(clientQuotation.quotation).reduce(
+          (res: any[], subOrderDate: string) => {
+            const partnerEntry = partnerQuotationEntries.find(
+              ([_, value]) =>
+                !isEmpty((value as TObject)?.quotation[subOrderDate]),
+            );
+            if (isEmpty(partnerEntry)) {
+              return res;
+            }
 
-              return {
-                key: restaurantId,
-                label: quotationDetail[restaurantId].name,
-                childrenFn: (childProps: any) => (
-                  <ReviewOrderDetailsSection {...childProps} />
-                ),
-                childrenProps: {
-                  foodOrderGroupedByDate: formatQuotationToFoodTableData(
-                    quotationDetail,
-                    restaurantId,
+            const [partnerId] = partnerEntry!;
+            const dayIndex = new Date(Number(subOrderDate)).getDay();
+
+            return res.concat({
+              key: subOrderDate,
+              label: `${quotationDetail[partnerId].name} #${orderTitle}-${dayIndex}`,
+              childrenFn: (childProps: any) => (
+                <ReviewOrderDetailsSection {...childProps} />
+              ),
+              childrenProps: {
+                foodOrderGroupedByDate:
+                  prepareSingleDateFoodTableDataFromQuotation(
+                    clientQuotation.quotation,
+                    subOrderDate,
                   ),
-                  outsideCollapsible: true,
-                },
-              };
-            }),
-          )
-        : [],
-    [isPartner, quotationDetail],
-  );
+                outsideCollapsible: true,
+              },
+            });
+          },
+          [],
+        ),
+      );
+    }
+
+    return [];
+  }, [isPartner, quotationDetail]);
 
   const priceQuotationData = useMemo(() => {
     return isPartner
@@ -106,7 +126,7 @@ const OrderQuotationDetail: React.FC<OrderQuotationDetailProps> = (props) => {
           booker,
           company,
           priceQuotation,
-          restaurantId: currentPartnerId,
+          restaurantId: currentPartnerId!,
           quotationDetail,
           currentOrderVATPercentage,
         })
@@ -138,7 +158,13 @@ const OrderQuotationDetail: React.FC<OrderQuotationDetailProps> = (props) => {
     <div className={css.container}>
       <div className={css.leftCol}>
         {isPartner ? (
-          <Tabs items={tabItems as any} onChange={handlePartnerChange} />
+          <Tabs
+            items={tabItems as any}
+            onChange={handlePartnerChange}
+            defaultActiveKey="1"
+            tabItemClassName={css.tabItem}
+            tabActiveItemClassName={css.tabActiveItem}
+          />
         ) : (
           <>
             <div className={css.clientTitle}>Báo giá khách hàng</div>
