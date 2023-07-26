@@ -1,19 +1,19 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
 
 import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
-import FieldSelect from '@components/FormFields/FieldSelect/FieldSelect';
+import FieldDropdownSelect from '@components/FormFields/FieldDropdownSelect/FieldDropdownSelect';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
-import { generateTimeOptions } from '@src/utils/dates';
+import { renderListTimeOptions } from '@src/utils/dates';
 import { EAttributeSetting } from '@src/utils/enums';
 import { required } from '@src/utils/validators';
 
 import css from './AddAttributeForm.module.scss';
 
-const TIME_OPTIONS = generateTimeOptions();
+const TIME_OPTIONS = renderListTimeOptions();
 
 export type TAddAttributeFormValues = {
   attribute: EAttributeSetting;
@@ -77,22 +77,41 @@ const AddAttributeFormComponent: React.FC<TAddAttributeFormComponentProps> = (
   });
 
   const submitDisabled = invalid || inProgress;
-  const startTimeValueIndex = TIME_OPTIONS.findIndex(
-    (option) => option === values?.start,
+
+  const parsedTimeOptions = useMemo(
+    () =>
+      TIME_OPTIONS.map((o) => ({
+        key: o.key,
+        label: o.label,
+      })),
+    [],
   );
-  const endTimeOptions = TIME_OPTIONS.slice(startTimeValueIndex + 1);
+
+  const startTimeValueIndex = parsedTimeOptions.findIndex(
+    (option) => option.key === values?.start,
+  );
+  const endTimeOptions = parsedTimeOptions.slice(startTimeValueIndex + 1);
+
+  const attributeOptions = useMemo(
+    () =>
+      ATTRIBUTE_LIST.map((attribute) => ({
+        key: attribute.key,
+        label: intl.formatMessage({
+          id: attribute.label,
+        }),
+      })),
+    [intl],
+  );
 
   return (
     <Form onSubmit={handleSubmit} className={css.formContainer}>
-      <FieldSelect id="attribute" name="attribute" label={'Chọn mục'}>
-        {ATTRIBUTE_LIST.map((attribute) => (
-          <option key={attribute.key} value={attribute.key}>
-            {intl.formatMessage({
-              id: attribute.label,
-            })}
-          </option>
-        ))}
-      </FieldSelect>
+      <FieldDropdownSelect
+        options={attributeOptions}
+        id="attribute"
+        name="attribute"
+        label={'Chọn mục'}
+      />
+
       <FieldTextInput
         id={`${values?.attribute}`}
         name={`${values?.attribute}`}
@@ -104,7 +123,7 @@ const AddAttributeFormComponent: React.FC<TAddAttributeFormComponentProps> = (
 
       {values.attribute === EAttributeSetting.DAY_SESSIONS && (
         <div className={css.timeFieldsWrapper}>
-          <FieldSelect
+          <FieldDropdownSelect
             id="start"
             name="start"
             label={intl.formatMessage({
@@ -115,19 +134,14 @@ const AddAttributeFormComponent: React.FC<TAddAttributeFormComponentProps> = (
               intl.formatMessage({
                 id: 'AddAttributeForm.start.required',
               }),
-            )}>
-            <option value="" disabled>
-              {intl.formatMessage({
-                id: 'AddAttributeForm.start.placeholder',
-              })}
-            </option>
-            {TIME_OPTIONS.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </FieldSelect>
-          <FieldSelect
+            )}
+            placeholder={intl.formatMessage({
+              id: 'AddAttributeForm.start.placeholder',
+            })}
+            options={parsedTimeOptions}
+          />
+
+          <FieldDropdownSelect
             id="end"
             name="end"
             label={intl.formatMessage({
@@ -138,18 +152,12 @@ const AddAttributeFormComponent: React.FC<TAddAttributeFormComponentProps> = (
               intl.formatMessage({
                 id: 'AddAttributeForm.end.required',
               }),
-            )}>
-            <option value="" disabled>
-              {intl.formatMessage({
-                id: 'AddAttributeForm.end.placeholder',
-              })}
-            </option>
-            {endTimeOptions.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </FieldSelect>
+            )}
+            placeholder={intl.formatMessage({
+              id: 'AddAttributeForm.end.placeholder',
+            })}
+            options={endTimeOptions}
+          />
         </div>
       )}
 

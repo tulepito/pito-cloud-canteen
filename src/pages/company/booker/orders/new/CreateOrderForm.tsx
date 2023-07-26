@@ -1,8 +1,10 @@
+import { useMemo } from 'react';
 import { useField, useForm } from 'react-final-form-hooks';
 import { FormattedMessage, useIntl } from 'react-intl';
 import isEmpty from 'lodash/isEmpty';
 
 import Button, { InlineTextButton } from '@components/Button/Button';
+import { FieldDropdownSelectComponent } from '@components/FormFields/FieldDropdownSelect/FieldDropdownSelect';
 import { FieldSelectComponent } from '@components/FormFields/FieldSelect/FieldSelect';
 
 import css from './BookerNewOrder.module.scss';
@@ -95,27 +97,33 @@ const CreateOrderForm: React.FC<TCreateOrderFormProps> = ({
   //   }
   // };
 
+  const parsedCompanyOptions = useMemo(
+    () =>
+      companies.map((companyItem) => ({
+        key: companyItem.id,
+        label: companyItem.name,
+      })),
+    [JSON.stringify(companies)],
+  );
+
   return (
     <form className={css.root} onSubmit={handleSubmit}>
-      <FieldSelectComponent
+      <FieldDropdownSelectComponent
         className={css.input}
         label={companyLabel}
         input={company.input}
         meta={company.meta}
         id={`company`}
         name="company"
-        disabled={isCompanyListEmpty}>
-        <option key={'empty'} disabled value={''}>
-          {queryInprogress
+        disabled={isCompanyListEmpty}
+        options={parsedCompanyOptions}
+        placeholder={
+          queryInprogress
             ? intl.formatMessage({ id: 'CreateOrderForm.company.loading' })
-            : intl.formatMessage({ id: 'CreateOrderForm.company.placeholder' })}
-        </option>
-        {companies.map((companyItem) => (
-          <option key={companyItem.id} value={companyItem.id}>
-            {companyItem.name}
-          </option>
-        ))}
-      </FieldSelectComponent>
+            : intl.formatMessage({ id: 'CreateOrderForm.company.placeholder' })
+        }
+      />
+
       {/* <Toggle
         className={classNames(css.toggle, css.input)}
         onClick={handleUsePreviousData}

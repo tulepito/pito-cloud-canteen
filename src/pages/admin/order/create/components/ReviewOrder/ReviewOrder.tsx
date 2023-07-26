@@ -12,7 +12,7 @@ import { useRouter } from 'next/router';
 import Collapsible from '@components/Collapsible/Collapsible';
 import ConfirmationModal from '@components/ConfirmationModal/ConfirmationModal';
 import Form from '@components/Form/Form';
-import { FieldSelectComponent } from '@components/FormFields/FieldSelect/FieldSelect';
+import { FieldDropdownSelectComponent } from '@components/FormFields/FieldDropdownSelect/FieldDropdownSelect';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import ReviewOrdersResultSection from '@components/OrderDetails/ReviewView/ReviewOrdersResultSection/ReviewOrdersResultSection';
@@ -206,6 +206,15 @@ export const ReviewContent: React.FC<any> = (props) => {
     setCurrDeliveryManPhoneNumber(currDeliveryInfoOption?.phoneNumber);
   };
 
+  const parsedDeliveryManOptions = useMemo(
+    () =>
+      deliveryManOptions.map((d) => ({
+        key: d.key,
+        label: d.name,
+      })),
+    [JSON.stringify(deliveryManOptions)],
+  );
+
   useEffect(() => {
     setCurrDeliveryManPhoneNumber(deliveryManPhoneNumber);
   }, [deliveryManPhoneNumber]);
@@ -235,11 +244,13 @@ export const ReviewContent: React.FC<any> = (props) => {
               <span className={css.boxTitle}>
                 {intl.formatMessage({ id: 'ReviewOrder.deliveryManName' })}
               </span>
-              <FieldSelectComponent
+              <FieldDropdownSelectComponent
                 id={`${timeStamp}_deliveryMan`}
                 name="deliveryMan"
                 className={css.selectBoxContent}
                 meta={deliveryMan.meta}
+                options={parsedDeliveryManOptions}
+                placeholder="Chọn nhân viên"
                 input={deliveryMan.input}
                 disabled={fieldDeliveryManDisabled}
                 onChange={handleFieldDeliveryManChange}>
@@ -251,7 +262,7 @@ export const ReviewContent: React.FC<any> = (props) => {
                     {name}
                   </option>
                 ))}
-              </FieldSelectComponent>
+              </FieldDropdownSelectComponent>
             </div>
             <div className={css.flexChild}>
               <span className={css.boxTitle}>

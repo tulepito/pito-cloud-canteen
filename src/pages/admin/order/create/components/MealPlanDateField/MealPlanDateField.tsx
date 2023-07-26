@@ -1,4 +1,4 @@
-import { forwardRef, useState } from 'react';
+import { forwardRef, useMemo, useState } from 'react';
 import { OnChange } from 'react-final-form-listeners';
 import { useIntl } from 'react-intl';
 import classNames from 'classnames';
@@ -7,18 +7,18 @@ import format from 'date-fns/format';
 import viLocale from 'date-fns/locale/vi';
 
 import FieldDatePicker from '@components/FormFields/FieldDatePicker/FieldDatePicker';
-import FieldSelect from '@components/FormFields/FieldSelect/FieldSelect';
+import FieldDropdownSelect from '@components/FormFields/FieldDropdownSelect/FieldDropdownSelect';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import IconCalendar from '@components/Icons/IconCalender/IconCalender';
 import IconClock from '@components/Icons/IconClock/IconClock';
 import { findMinStartDate } from '@helpers/orderHelper';
-import { generateTimeOptions } from '@utils/dates';
+import { renderListTimeOptions } from '@utils/dates';
 import type { TObject } from '@utils/types';
 import { composeValidators, nonSatOrSunDay, required } from '@utils/validators';
 
 import css from './MealPlanDateField.module.scss';
 
-const TIME_OPTIONS = generateTimeOptions();
+const TIME_OPTIONS = renderListTimeOptions();
 
 type MealPlanDateFieldProps = {
   form: any;
@@ -144,6 +144,15 @@ const MealPlanDateField: React.FC<MealPlanDateFieldProps> = (props) => {
 
   const containerClasses = classNames(css.container, containerClassName);
 
+  const parsedDeliveryHourOptions = useMemo(
+    () =>
+      TIME_OPTIONS.map((option) => ({
+        label: option.label,
+        key: option.key,
+      })),
+    [],
+  );
+
   return (
     <div className={containerClasses}>
       {title && <div className={css.fieldTitle}>{title}</div>}
@@ -188,7 +197,7 @@ const MealPlanDateField: React.FC<MealPlanDateFieldProps> = (props) => {
           })}
           customInput={<CustomEndDateFieldInput />}
         />
-        <FieldSelect
+        <FieldDropdownSelect
           id="deliveryHour"
           name="deliveryHour"
           label={intl.formatMessage({
@@ -196,18 +205,12 @@ const MealPlanDateField: React.FC<MealPlanDateFieldProps> = (props) => {
           })}
           className={css.fieldSelect}
           leftIcon={<IconClock />}
-          validate={required(deliveryHourRequiredMessage)}>
-          <option value="" disabled>
-            {intl.formatMessage({
-              id: 'OrderDeadlineField.deliveryHour.placeholder',
-            })}
-          </option>
-          {TIME_OPTIONS.map((option) => (
-            <option key={option} value={option}>
-              {option}
-            </option>
-          ))}
-        </FieldSelect>
+          validate={required(deliveryHourRequiredMessage)}
+          placeholder={intl.formatMessage({
+            id: 'OrderDeadlineField.deliveryHour.placeholder',
+          })}
+          options={parsedDeliveryHourOptions}
+        />
       </div>
     </div>
   );

@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
@@ -7,7 +8,7 @@ import { DateTime } from 'luxon';
 import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
 import FieldDatePicker from '@components/FormFields/FieldDatePicker/FieldDatePicker';
-import FieldSelect from '@components/FormFields/FieldSelect/FieldSelect';
+import FieldDropdownSelect from '@components/FormFields/FieldDropdownSelect/FieldDropdownSelect';
 import IconCalendar from '@components/Icons/IconCalender/IconCalender';
 import IconClock from '@components/Icons/IconClock/IconClock';
 import { TimeOptions } from '@utils/dates';
@@ -43,6 +44,15 @@ const EditOrderDeadlineFormComponent: React.FC<
     form.change('deadlineDate', date);
   };
 
+  const parsedDeliveryHourOptions = useMemo(
+    () =>
+      TimeOptions.map((option) => ({
+        label: option.label,
+        key: option.key,
+      })),
+    [],
+  );
+
   return (
     <Form onSubmit={handleSubmit} className={css.root}>
       <div className={css.fieldDatePickerContainer}>
@@ -62,18 +72,17 @@ const EditOrderDeadlineFormComponent: React.FC<
         />
         <IconCalendar className={css.calendarIcon} />
       </div>
-      <FieldSelect
+      <FieldDropdownSelect
         id="deadlineHour"
         name="deadlineHour"
         label={intl.formatMessage({
           id: 'EditOrderDeadlineForm.deadlineHour.label',
         })}
         className={css.fieldSelect}
-        leftIcon={<IconClock className={css.clockIcon} />}>
-        {TimeOptions.map((option) => (
-          <option key={option}>{option}</option>
-        ))}
-      </FieldSelect>
+        leftIcon={<IconClock className={css.clockIcon} />}
+        options={parsedDeliveryHourOptions}
+      />
+
       <div className={css.actions}>
         <Button disabled={buttonDisabled}>
           {intl.formatMessage({ id: 'EditOrderDeadlineForm.submitButtonText' })}

@@ -5,7 +5,7 @@ import classNames from 'classnames';
 
 import { InlineTextButton } from '@components/Button/Button';
 import FieldCheckbox from '@components/FormFields/FieldCheckbox/FieldCheckbox';
-import FieldSelect from '@components/FormFields/FieldSelect/FieldSelect';
+import FieldDropdownSelect from '@components/FormFields/FieldDropdownSelect/FieldDropdownSelect';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import IconAdd from '@components/Icons/IconAdd/IconAdd';
 import IconDelete from '@components/Icons/IconDelete/IconDelete';
@@ -67,7 +67,7 @@ const FieldBankAccounts: React.FC<TFieldBankAccounts> = (props) => {
               return (
                 <Fragment key={fieldName}>
                   <div className={css.bankItem} key={fieldName}>
-                    <FieldSelect
+                    <FieldDropdownSelect
                       key={fieldName}
                       className={css.field}
                       label={intl.formatMessage({
@@ -76,22 +76,17 @@ const FieldBankAccounts: React.FC<TFieldBankAccounts> = (props) => {
                       id={`${fieldName}.bankId`}
                       name={`${fieldName}.bankId`}
                       required
+                      options={LIST_BANKS}
                       validate={required(
                         intl.formatMessage({
                           id: 'FieldBankAccounts.bankIdRequired',
                         }),
-                      )}>
-                      <option disabled value="">
-                        {intl.formatMessage({
-                          id: 'FieldBankAccounts.bankIdlaceholder',
-                        })}
-                      </option>
-                      {LIST_BANKS.map((option: any) => (
-                        <option key={option.key} value={option.key}>
-                          {option.label}
-                        </option>
-                      ))}
-                    </FieldSelect>
+                      )}
+                      placeholder={intl.formatMessage({
+                        id: 'FieldBankAccounts.bankIdlaceholder',
+                      })}
+                    />
+
                     <FieldTextInput
                       className={css.field}
                       label={intl.formatMessage({

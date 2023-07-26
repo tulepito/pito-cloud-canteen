@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
@@ -14,6 +14,7 @@ import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { shortenString } from '@utils/string';
 
 import css from './EditOrderRowForm.module.scss';
+import FieldDropdownSelect from '@components/FormFields/FieldDropdownSelect/FieldDropdownSelect';
 
 export type TEditOrderRowFormValues = {
   memberName: string;
@@ -40,6 +41,7 @@ const EditOrderRowFormComponent: React.FC<TEditOrderRowFormComponentProps> = (
   } = props;
   const intl = useIntl();
   const { requirement } = initialValues;
+
   const submitDisabled = pristine || submitting;
   const submitInprogress = submitting;
   const showRequirementText = intl.formatMessage({
@@ -56,20 +58,13 @@ const EditOrderRowFormComponent: React.FC<TEditOrderRowFormComponentProps> = (
     setCurrentRequirementFieldActionText,
   ] = useState(showRequirementText);
 
-  const selectFoodOptions = (
-    <>
-      <option disabled value="">
-        {intl.formatMessage({
-          id: 'EditOrderRowForm.foodSelectField.placeholder',
-        })}
-      </option>
-
-      {foodOptions?.map(({ foodId, foodName }) => (
-        <option title={foodName} key={foodId} value={foodId}>
-          {shortenString(foodName, 16)}
-        </option>
-      ))}
-    </>
+  const parsedFoodOptions = useMemo(
+    () =>
+      foodOptions?.map((f) => ({
+        key: f.foodId,
+        label: shortenString(f.foodName, 16),
+      })),
+    [JSON.stringify(foodOptions)],
   );
 
   const handleToggleShowHideRequirementField = () => {
@@ -95,9 +90,15 @@ const EditOrderRowFormComponent: React.FC<TEditOrderRowFormComponentProps> = (
     <Form onSubmit={handleSubmit} className={css.root}>
       <div className={css.fieldOnRow}>
         <FieldTextInput name="memberName" disabled className={css.input} />
-        <FieldSelect id="foodId" name="foodId" className={css.input}>
-          {selectFoodOptions}
-        </FieldSelect>
+        <FieldDropdownSelect
+          id="foodId"
+          name="foodId"
+          className={css.input}
+          placeholder={intl.formatMessage({
+            id: 'EditOrderRowForm.foodSelectField.placeholder',
+          })}
+          options={parsedFoodOptions}
+        />
       </div>
 
       <Button
