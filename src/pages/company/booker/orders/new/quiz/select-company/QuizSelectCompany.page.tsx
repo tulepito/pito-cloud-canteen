@@ -5,7 +5,7 @@ import { shallowEqual } from 'react-redux';
 import filter from 'lodash/filter';
 import { useRouter } from 'next/router';
 
-import { FieldSelectComponent } from '@components/FormFields/FieldSelect/FieldSelect';
+import { FieldDropdownSelectComponent } from '@components/FormFields/FieldDropdownSelect/FieldDropdownSelect';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { QuizThunks } from '@redux/slices/Quiz.slice';
 import { quizPaths } from '@src/paths';
@@ -91,6 +91,15 @@ const QuizSelectCompany = () => {
     handleSubmit();
   };
 
+  const bookerOptions = useMemo(
+    () =>
+      bookerCompanyList.map((companyItem: any) => ({
+        label: companyItem.name,
+        key: companyItem.id,
+      })),
+    [JSON.stringify(bookerCompanyIdList)],
+  );
+
   return (
     <QuizModal
       id="QuizSelectCompanyModal"
@@ -106,24 +115,18 @@ const QuizSelectCompany = () => {
       submitDisabled={hasValidationErrors}>
       <div className={css.container}>
         <form>
-          <FieldSelectComponent
+          <FieldDropdownSelectComponent
             className={css.input}
             label={companyLabel}
             input={company.input}
             meta={company.meta}
             id={`company`}
-            name="company">
-            <option key={'empty'} disabled value={''}>
-              {intl.formatMessage({
-                id: 'CreateOrderForm.company.placeholder',
-              })}
-            </option>
-            {bookerCompanyList.map((companyItem: any) => (
-              <option key={companyItem.id} value={companyItem.id}>
-                {companyItem.name}
-              </option>
-            ))}
-          </FieldSelectComponent>
+            name="company"
+            placeholder={intl.formatMessage({
+              id: 'CreateOrderForm.company.placeholder',
+            })}
+            options={bookerOptions}
+          />
         </form>
       </div>
     </QuizModal>

@@ -2,7 +2,6 @@
 @use '/src/styles/customMediaQueries.scss' as *;
 
 .root {
-  overflow: hidden;
   flex-basis: 60px;
   padding: 0;
   position: absolute;
@@ -103,7 +102,6 @@
 
 .content {
   position: relative;
-  overflow: hidden;
   left: 0px;
   transition: linear 0.2s;
   width: 100%;

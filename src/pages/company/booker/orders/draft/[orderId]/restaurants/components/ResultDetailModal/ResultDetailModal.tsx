@@ -295,6 +295,7 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
           <div className={css.content}>
             <div className={css.coverImage}>
               <ResponsiveImage
+                className={css.restaurantCover}
                 alt={restaurantName}
                 image={restaurantCover}
                 variants={[

@@ -1,11 +1,11 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useField, useForm } from 'react-final-form-hooks';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { DateTime } from 'luxon';
 
 import Button from '@components/Button/Button';
 import { FieldDatePickerComponent } from '@components/FormFields/FieldDatePicker/FieldDatePicker';
-import { FieldSelectComponent } from '@components/FormFields/FieldSelect/FieldSelect';
+import { FieldDropdownSelectComponent } from '@components/FormFields/FieldDropdownSelect/FieldDropdownSelect';
 import IconClock from '@components/Icons/IconClock/IconClock';
 import { findMinStartDate } from '@helpers/orderHelper';
 import { TimeOptions } from '@utils/dates';
@@ -96,6 +96,15 @@ const DeliveryTimeForm: React.FC<TDeliveryTimeFormProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form.getFieldState('startDate')?.pristine, startDate.input.value]);
 
+  const parsedDeliveryHourOptions = useMemo(
+    () =>
+      TimeOptions.map((option) => ({
+        label: option.label,
+        key: option.key,
+      })),
+    [],
+  );
+
   return (
     <form className={css.root} onSubmit={handleSubmit}>
       <FieldDatePickerComponent
@@ -132,7 +141,7 @@ const DeliveryTimeForm: React.FC<TDeliveryTimeFormProps> = ({
         className={css.dateInput}
         autoComplete="off"
       />
-      <FieldSelectComponent
+      <FieldDropdownSelectComponent
         id="deliveryHour"
         name="deliveryHour"
         className={css.fieldSelect}
@@ -141,13 +150,9 @@ const DeliveryTimeForm: React.FC<TDeliveryTimeFormProps> = ({
         })}
         leftIcon={<IconClock />}
         meta={deliveryHour.meta}
-        input={deliveryHour.input}>
-        {TimeOptions.map((option) => (
-          <option key={option} value={option}>
-            {option}
-          </option>
-        ))}
-      </FieldSelectComponent>
+        input={deliveryHour.input}
+        options={parsedDeliveryHourOptions}
+      />
       <Button
         className={css.submitBtn}
         inProgress={submitInprogress}

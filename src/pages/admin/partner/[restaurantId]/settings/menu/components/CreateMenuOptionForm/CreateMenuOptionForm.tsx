@@ -6,8 +6,8 @@ import { shallowEqual } from 'react-redux';
 import { useRouter } from 'next/router';
 
 import Form from '@components/Form/Form';
+import FieldDropdownSelect from '@components/FormFields/FieldDropdownSelect/FieldDropdownSelect';
 import FieldRadioButton from '@components/FormFields/FieldRadioButton/FieldRadioButton';
-import FieldSelect from '@components/FormFields/FieldSelect/FieldSelect';
 import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { menusSliceThunks } from '@redux/slices/menus.slice';
@@ -89,22 +89,16 @@ const CreateMenuOptionFormComponent: React.FC<
           (queryMenuOptionsInProgress ? (
             <IconSpinner className={css.iconSpinner} />
           ) : (
-            <FieldSelect
+            <FieldDropdownSelect
               label={intl.formatMessage({
                 id: 'CreateMenuOptionForm.duplicateIdLabel',
               })}
               className={css.fieldSelect}
               name="duplicateId"
-              id="duplicateId">
-              <option value="" disabled>
-                Chọn Menu
-              </option>
-              {options.map((opt) => (
-                <option value={opt.key} key={opt.key}>
-                  {opt.label}
-                </option>
-              ))}
-            </FieldSelect>
+              id="duplicateId"
+              options={options}
+              placeholder="Chọn Menu"
+            />
           ))}
       </>
     </Form>

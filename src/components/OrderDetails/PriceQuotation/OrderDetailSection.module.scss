@@ -46,9 +46,10 @@
 
     .tableHead {
       @include orderDetailColumnsLayout;
-      background-color: $neutralGray2;
+      background-color: $neutralGray5;
       @include textTemplate(10px, 700, 16px);
       border-bottom: 1px solid $neutralGray4;
+      color: $neutralGray1;
     }
 
     .tableRowGroup {
@@ -66,7 +67,7 @@
       }
 
       .groupTitle {
-        border-bottom: 1.5px solid $neutralGray4;
+        background-color: $neutralGray3;
         @include textTemplate(12px, 700, 16px);
 
         .restaurantName {
