@@ -26,7 +26,7 @@ type TReviewCartSectionProps = {
   title?: string;
   target: 'client' | 'partner';
   isAdminLayout?: boolean;
-  vatSetting: EPartnerVATSetting;
+  vatSetting?: EPartnerVATSetting;
 };
 
 const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
