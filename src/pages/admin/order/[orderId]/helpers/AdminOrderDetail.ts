@@ -201,7 +201,7 @@ export const formatPriceQuotationDataPartner = ({
   priceQuotation,
   restaurantId,
   quotationDetail,
-  currentOrderVATPercentage,
+  vatPercentage,
 }: {
   company: TUser;
   booker: TUser;
@@ -209,7 +209,7 @@ export const formatPriceQuotationDataPartner = ({
   priceQuotation: TObject;
   restaurantId: string;
   quotationDetail: TObject;
-  currentOrderVATPercentage: number;
+  vatPercentage: number;
 }) => {
   const {
     orderTitle,
@@ -258,7 +258,7 @@ export const formatPriceQuotationDataPartner = ({
       promotion: `${parseThousandNumber(promotion)}đ`,
       totalWithVAT: `${parseThousandNumber(totalWithVAT)}đ`,
       VATFee: `${parseThousandNumber(VATFee)}đ`,
-      currentOrderVATPercentage,
+      vatPercentage,
     },
     orderDetailData: {
       foodOrderGroupedByDate: formatQuotationToFoodTableData(

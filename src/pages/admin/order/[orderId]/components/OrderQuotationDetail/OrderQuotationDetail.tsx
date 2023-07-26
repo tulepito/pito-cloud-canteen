@@ -67,7 +67,7 @@ const OrderQuotationDetail: React.FC<OrderQuotationDetailProps> = (props) => {
   const priceQuotation = calculatePriceQuotationInfoFromQuotation({
     quotation: quotation!,
     packagePerMember,
-    currentOrderVATPercentage,
+    currentOrderVATPercentage: vatPercentage,
     date: isPartner ? currentSubOrderDate : undefined,
     partnerId: currentPartnerId,
     currentOrderServiceFeePercentage: partnerServiceFee / 100,
@@ -128,7 +128,7 @@ const OrderQuotationDetail: React.FC<OrderQuotationDetailProps> = (props) => {
           priceQuotation,
           restaurantId: currentPartnerId!,
           quotationDetail,
-          currentOrderVATPercentage,
+          vatPercentage,
         })
       : formatPriceQuotationData({
           order,
