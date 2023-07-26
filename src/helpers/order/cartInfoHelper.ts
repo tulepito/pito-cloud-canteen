@@ -230,10 +230,12 @@ export const calculatePriceQuotationInfoFromQuotation = ({
   quotation,
   packagePerMember,
   currentOrderVATPercentage,
+  currentOrderServiceFeePercentage = 0,
 }: {
   quotation: TListing;
   packagePerMember: number;
   currentOrderVATPercentage: number;
+  currentOrderServiceFeePercentage?: number;
 }) => {
   const quotationListingGetter = Listing(quotation);
   const { client, partner } = quotationListingGetter.getMetadata();
