@@ -24,6 +24,7 @@ const NotificationModal: React.FC<NotificationModalProps> = (props) => {
       id="NotificationModal"
       isOpen={isOpen}
       handleClose={onClose}
+      className={css.modalContainer}
       title="Thông báo">
       <div className={css.notifications}>
         {notifications.map((notificationItem: any) => (
