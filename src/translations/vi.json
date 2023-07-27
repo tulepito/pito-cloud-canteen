@@ -319,7 +319,7 @@
   "DayColumn.Session.MORNING_SESSION": "Bữa sáng",
   "DayColumn.Status.empty": "Chưa chọn món",
   "DayColumn.Status.expired": "Hết hạn",
-  "DayColumn.Status.joined": "Đã hoàn thành",
+  "DayColumn.Status.joined": "Đã chọn món",
   "DayColumn.Status.notJoined": "Đã hoàn thành",
   "DayColumn.Status.canceled": "Đã hủy",
   "DayInWeekField.fri": "Thứ 6",

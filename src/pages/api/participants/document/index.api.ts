@@ -28,8 +28,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
               value: participantId,
             },
             txStatus: {
-              operator: '==',
-              value: txStatus,
+              operator: 'in',
+              value: Array.isArray(txStatus) ? txStatus : [txStatus],
             },
           },
           limitRecords: Number(limitRecords),
