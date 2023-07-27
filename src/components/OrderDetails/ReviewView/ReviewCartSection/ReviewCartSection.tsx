@@ -72,7 +72,7 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
   const currentOrderVATPercentage = useAppSelector(
     (state) => state.SystemAttributes.currentOrderVATPercentage,
   );
-  console.log({ currentOrderVATPercentage });
+
   const {
     query: { orderId },
   } = router;
