@@ -253,13 +253,13 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
           message={`Bạn đã đặt vượt mức tối đa (${maxQuantity} phần)`}
         />
       )}
-      {shouldShowUnderError ||
-        (planReachMinRestaurantQuantityInPickingState && (
-          <ErrorMessage
-            className={css.error}
-            message={`Cần đặt tối thiểu ${minQuantity} phần`}
-          />
-        ))}
+      {(shouldShowUnderError ||
+        planReachMinRestaurantQuantityInPickingState) && (
+        <ErrorMessage
+          className={css.error}
+          message={`Cần đặt tối thiểu ${minQuantity} phần`}
+        />
+      )}
 
       <div className={css.addRequirementContainer}>
         <Button
