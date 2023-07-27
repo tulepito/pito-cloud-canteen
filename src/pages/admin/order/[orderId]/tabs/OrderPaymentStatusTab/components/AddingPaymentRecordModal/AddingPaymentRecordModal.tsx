@@ -1,4 +1,5 @@
 import Modal from '@components/Modal/Modal';
+import { EPaymentType } from '@src/utils/enums';
 
 import AddingPaymentRecordForm from '../AddingPaymentRecordForm/AddingPaymentRecordForm';
 
@@ -11,6 +12,7 @@ type AddingPaymentRecordModalProps = {
   totalPrice: number;
   paidAmount: number;
   inProgress?: boolean;
+  paymentType?: EPaymentType;
 };
 
 const AddingPaymentRecordModal: React.FC<AddingPaymentRecordModalProps> = (
@@ -23,6 +25,7 @@ const AddingPaymentRecordModal: React.FC<AddingPaymentRecordModalProps> = (
     totalPrice,
     paidAmount,
     inProgress,
+    paymentType = EPaymentType.PARTNER,
   } = props;
 
   return (
@@ -37,6 +40,7 @@ const AddingPaymentRecordModal: React.FC<AddingPaymentRecordModalProps> = (
         totalPrice={totalPrice}
         paidAmount={paidAmount}
         inProgress={inProgress}
+        paymentType={paymentType}
       />
     </Modal>
   );

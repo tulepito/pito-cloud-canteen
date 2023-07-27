@@ -9,6 +9,7 @@ import {
   queryPaymentRecordOnFirebase,
 } from '@services/payment';
 import { handleError } from '@services/sdk';
+import { EPaymentType } from '@src/utils/enums';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   const apiMethod = req.method;
@@ -24,21 +25,24 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             paymentType,
             orderId,
           });
+          if (paymentType === EPaymentType.PARTNER) {
+            const groupPaymentRecordsBySubOrderDate = paymentRecords?.reduce(
+              (acc: any, cur: any) => {
+                const { subOrderDate } = cur;
+                if (!acc[subOrderDate]) {
+                  acc[subOrderDate] = [];
+                }
+                acc[subOrderDate].push(cur);
 
-          const groupPaymentRecordsBySubOrderDate = paymentRecords?.reduce(
-            (acc: any, cur: any) => {
-              const { subOrderDate } = cur;
-              if (!acc[subOrderDate]) {
-                acc[subOrderDate] = [];
-              }
-              acc[subOrderDate].push(cur);
+                return acc;
+              },
+              {},
+            );
 
-              return acc;
-            },
-            {},
-          );
-
-          res.json(groupPaymentRecordsBySubOrderDate);
+            res.json(groupPaymentRecordsBySubOrderDate);
+          } else {
+            res.json(paymentRecords);
+          }
         }
         break;
       case HttpMethod.POST:

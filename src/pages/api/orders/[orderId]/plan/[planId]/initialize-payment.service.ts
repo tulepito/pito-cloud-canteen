@@ -4,6 +4,7 @@ import { fetchListing } from '@services/integrationHelper';
 import type { PaymentBaseParams } from '@services/payment';
 import { createPaymentRecordOnFirebase } from '@services/payment';
 import { Listing } from '@src/utils/data';
+import { EPaymentType } from '@src/utils/enums';
 import type { TListing } from '@src/utils/types';
 
 export const initializePayment = async (
@@ -40,7 +41,7 @@ export const initializePayment = async (
         });
 
         return {
-          SKU: generateSKU('CUSTOMER', orderId),
+          SKU: generateSKU('PARTNER', orderId),
           amount: 0,
           paymentNote: '',
           orderId,
@@ -57,6 +58,6 @@ export const initializePayment = async (
     );
 
   partnerPaymentRecordsData.forEach((paymentRecordData) => {
-    createPaymentRecordOnFirebase('partner', paymentRecordData);
+    createPaymentRecordOnFirebase(EPaymentType.PARTNER, paymentRecordData);
   });
 };

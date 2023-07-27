@@ -6,13 +6,16 @@
   margin-top: 40px;
 }
 
-.label {
-  max-width: 240px;
+.labelWrapper {
   @include flexAlign(center);
-
-  overflow: hidden;
-  text-overflow: ellipsis;
   gap: 8px;
+}
+
+.label {
+  width: 200px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .tooltipOverlay {
