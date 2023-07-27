@@ -2,7 +2,7 @@ const { DateTime } = require('luxon');
 
 const VNTimezone = 'Asia/Ho_Chi_Minh';
 
-const calculateRemainTime = (futureTimestamp) => {
+const calculateRemainTime = (futureTimestamp = new Date().getTime()) => {
   const futureTime = DateTime.fromMillis(futureTimestamp);
 
   // Get the current time as a DateTime object
