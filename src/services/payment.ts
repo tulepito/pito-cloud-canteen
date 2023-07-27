@@ -1,4 +1,4 @@
-import { EPaymentStatus } from '@src/utils/enums';
+import { EPaymentStatus, EPaymentType } from '@src/utils/enums';
 
 import {
   addCollectionDoc,
@@ -28,7 +28,7 @@ export type PaymentBaseParams = {
 };
 
 export const createPaymentRecordOnFirebase = async (
-  type: 'client' | 'partner',
+  type: EPaymentType,
   params: Partial<PaymentBaseParams>,
 ) => {
   const paymentCreatedAt = new Date();
@@ -61,7 +61,7 @@ export const createPaymentRecordOnFirebase = async (
 export const queryPaymentRecordOnFirebase = async (query: any) => {
   try {
     const { paymentType, partnerId, orderId, subOrderDate } = query;
-    const isPartnerPaymentRecordQuery = paymentType === 'partner';
+    const isPartnerPaymentRecordQuery = paymentType === EPaymentType.PARTNER;
     const partnerQuery = isPartnerPaymentRecordQuery && {
       ...(partnerId && {
         partnerId: {
@@ -104,7 +104,7 @@ export const queryAllPartnerPaymentRecordsOnFirebase = async () => {
       queryParams: {
         paymentType: {
           operator: '==',
-          value: 'partner',
+          value: EPaymentType.PARTNER,
         },
       },
     });

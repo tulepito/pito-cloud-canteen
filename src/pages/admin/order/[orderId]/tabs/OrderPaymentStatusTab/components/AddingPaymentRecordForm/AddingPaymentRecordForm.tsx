@@ -13,6 +13,7 @@ import {
   parseThousandNumberToInteger,
 } from '@helpers/format';
 import useBoolean from '@hooks/useBoolean';
+import { EPaymentType } from '@src/utils/enums';
 import { maxLength, required } from '@src/utils/validators';
 
 import css from './AddingPaymentRecordForm.module.scss';
@@ -26,7 +27,7 @@ type TExtraProps = {
   totalPrice: number;
   paidAmount: number;
   inProgress?: boolean;
-  paymentType?: 'client' | 'partner';
+  paymentType?: EPaymentType;
 };
 type TAddingPaymentRecordFormComponentProps =
   FormRenderProps<TAddingPaymentRecordFormValues> & Partial<TExtraProps>;
@@ -109,7 +110,7 @@ const AddingPaymentRecordFormComponent: React.FC<
     values,
     invalid,
     inProgress,
-    paymentType = 'partner',
+    paymentType = EPaymentType.PARTNER,
   } = props;
   const [percentage, setPercentage] = useState<number>(0);
 
@@ -168,7 +169,7 @@ const AddingPaymentRecordFormComponent: React.FC<
             paidAmount={paidAmount}
             percentage={percentage}
             setPercentage={setPercentage}
-            hasOnlyMaxOption={paymentType === 'client'}
+            hasOnlyMaxOption={paymentType === EPaymentType.CLIENT}
           />
         }
         rightIconContainerClassName={css.rightIcon}

@@ -9,6 +9,7 @@ import {
   queryPaymentRecordOnFirebase,
 } from '@services/payment';
 import { handleError } from '@services/sdk';
+import { EPaymentType } from '@src/utils/enums';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   const apiMethod = req.method;
@@ -24,7 +25,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             paymentType,
             orderId,
           });
-          if (paymentType === 'partner') {
+          if (paymentType === EPaymentType.PARTNER) {
             const groupPaymentRecordsBySubOrderDate = paymentRecords?.reduce(
               (acc: any, cur: any) => {
                 const { subOrderDate } = cur;

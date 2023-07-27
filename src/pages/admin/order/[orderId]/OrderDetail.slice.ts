@@ -23,12 +23,17 @@ import {
   Listing,
   Transaction,
 } from '@src/utils/data';
-import { ESubOrderTxStatus, ETransactionRoles } from '@src/utils/enums';
+import {
+  EPaymentType,
+  ESubOrderTxStatus,
+  ETransactionRoles,
+} from '@src/utils/enums';
 import { ETransition } from '@src/utils/transaction';
 import type {
   TListing,
   TObject,
   TPagination,
+  TPaymentRecord,
   TTransaction,
   TUser,
 } from '@src/utils/types';
@@ -79,7 +84,7 @@ type TOrderDetailState = {
   fetchQuotationsError: any;
 
   partnerPaymentRecords: {
-    [subOrderDate: string]: any[];
+    [subOrderDate: string]: TPaymentRecord[];
   };
   fetchPartnerPaymentRecordsInProgress: boolean;
   fetchPartnerPaymentRecordsError: any;
@@ -90,7 +95,7 @@ type TOrderDetailState = {
   deletePartnerPaymentRecordInProgress: boolean;
   deletePartnerPaymentRecordError: any;
 
-  clientPaymentRecords: any[];
+  clientPaymentRecords: TPaymentRecord[];
 
   createClientPaymentRecordInProgress: boolean;
   createClientPaymentRecordError: any;
@@ -298,7 +303,7 @@ const fetchPartnerPaymentRecords = createAsyncThunk(
   FETCH_PARTNER_PAYMENT_RECORD,
   async (orderId: string) => {
     const { data: partnerPaymentRecords } = await getPaymentRecordsApi({
-      dataParams: { orderId, paymentType: 'partner' },
+      dataParams: { orderId, paymentType: EPaymentType.PARTNER },
     });
 
     return partnerPaymentRecords;
@@ -353,7 +358,7 @@ const fetchClientPaymentRecords = createAsyncThunk(
   FETCH_CLIENT_PAYMENT_RECORD,
   async (orderId: string) => {
     const { data: clientPaymentRecords } = await getPaymentRecordsApi({
-      dataParams: { orderId, paymentType: 'client' },
+      dataParams: { orderId, paymentType: EPaymentType.CLIENT },
     });
 
     return clientPaymentRecords;
