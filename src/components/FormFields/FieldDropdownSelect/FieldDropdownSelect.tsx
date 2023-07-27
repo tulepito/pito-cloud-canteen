@@ -5,6 +5,7 @@ import classNames from 'classnames';
 import find from 'lodash/find';
 
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
+import OutsideClickHandler from '@components/OutsideClickHandler/OutsideClickHandler';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import ValidationError from '@components/ValidationError/ValidationError';
 import useBoolean from '@hooks/useBoolean';
@@ -85,7 +86,9 @@ export const FieldDropdownSelectComponent: React.FC<TFieldDropdownSelect> = (
   });
 
   return (
-    <div className={classes}>
+    <OutsideClickHandler
+      onOutsideClick={dropdownController.setFalse}
+      className={classes}>
       {label ? (
         <div className={labelWrapperClasses}>
           <label htmlFor={id} className={labelClasses}>
@@ -133,7 +136,7 @@ export const FieldDropdownSelectComponent: React.FC<TFieldDropdownSelect> = (
       <input type="hidden" {...inputProps} />
 
       <ValidationError fieldMeta={meta} />
-    </div>
+    </OutsideClickHandler>
   );
 };
 
