@@ -57,6 +57,8 @@ type OrderDetailTabProps = {
   updateOrderState: (newOrderState: string) => void;
   updateOrderStateInProgress: boolean;
   onSaveOrderNote: (orderNote: string) => void;
+  planReachMaxRestaurantQuantityInPickingState?: boolean;
+  planReachMinRestaurantQuantityInPickingState?: boolean;
 };
 
 const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
@@ -71,6 +73,8 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
     updateOrderStateInProgress,
     transactionDataMap = {},
     onSaveOrderNote,
+    planReachMaxRestaurantQuantityInPickingState = false,
+    planReachMinRestaurantQuantityInPickingState = false,
   } = props;
 
   const {
@@ -123,8 +127,8 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
     orderDetail,
     currentViewDate,
     !isGroupOrder,
+    true,
   );
-
   const currentTxIsInitiated = txIsInitiated(
     transactionDataMap[currentViewDate],
   );
@@ -292,6 +296,15 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
                     currentViewDate={currentViewDate}
                     isDraftEditing={isDraftEditing}
                     ableToUpdateOrder
+                    shouldShowUnderError={shouldShowUnderError}
+                    shouldShowOverflowError={shouldShowOverflowError}
+                    planReachMaxRestaurantQuantityInPickingState={
+                      planReachMaxRestaurantQuantityInPickingState
+                    }
+                    planReachMinRestaurantQuantityInPickingState={
+                      planReachMinRestaurantQuantityInPickingState
+                    }
+                    isAdminFlow
                   />
                 </div>
                 <div className={css.rightPart}>
@@ -338,50 +351,49 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
               </div>
 
               <RenderWhen.False>
-                <RenderWhen condition={isDraftEditing}>
-                  <div
-                    className={
-                      isDraftEditing
-                        ? css.lineItemsTableWithSubOrderSection
-                        : css.lineItemsTable
-                    }>
-                    <ManageLineItemsSection
-                      isDraftEditing={isDraftEditing}
-                      ableToUpdateOrder={ableToUpdateOrder}
-                      shouldShowOverflowError={shouldShowOverflowError}
-                      shouldShowUnderError={shouldShowUnderError}
-                      setCurrentViewDate={handleSetCurrentViewDate}
-                      currentViewDate={currentViewDate}
-                      minQuantity={minQuantity}
+                <div
+                  className={
+                    isDraftEditing
+                      ? css.lineItemsTableWithSubOrderSection
+                      : css.lineItemsTable
+                  }>
+                  <ManageLineItemsSection
+                    isDraftEditing={isDraftEditing}
+                    ableToUpdateOrder={ableToUpdateOrder}
+                    shouldShowOverflowError={shouldShowOverflowError}
+                    shouldShowUnderError={shouldShowUnderError}
+                    setCurrentViewDate={handleSetCurrentViewDate}
+                    currentViewDate={currentViewDate}
+                    minQuantity={minQuantity}
+                    isAdminFlow
+                  />
+                  {isDraftEditing && (
+                    <SubOrderChangesHistorySection
+                      className={classNames(
+                        css.historyContainer,
+                        css.normalOrderSubOrderSection,
+                      )}
+                      querySubOrderChangesHistoryInProgress={
+                        querySubOrderChangesHistoryInProgress
+                      }
+                      subOrderChangesHistory={subOrderChangesHistory}
+                      draftSubOrderChangesHistory={
+                        draftSubOrderChangesHistory[
+                          currentViewDate as unknown as keyof typeof draftSubOrderChangesHistory
+                        ]
+                      }
+                      onQueryMoreSubOrderChangesHistory={
+                        onQueryMoreSubOrderChangesHistory
+                      }
+                      subOrderChangesHistoryTotalItems={
+                        subOrderChangesHistoryTotalItems
+                      }
+                      loadMoreSubOrderChangesHistory={
+                        loadMoreSubOrderChangesHistory
+                      }
                     />
-                    {isDraftEditing && (
-                      <SubOrderChangesHistorySection
-                        className={classNames(
-                          css.historyContainer,
-                          css.normalOrderSubOrderSection,
-                        )}
-                        querySubOrderChangesHistoryInProgress={
-                          querySubOrderChangesHistoryInProgress
-                        }
-                        subOrderChangesHistory={subOrderChangesHistory}
-                        draftSubOrderChangesHistory={
-                          draftSubOrderChangesHistory[
-                            currentViewDate as unknown as keyof typeof draftSubOrderChangesHistory
-                          ]
-                        }
-                        onQueryMoreSubOrderChangesHistory={
-                          onQueryMoreSubOrderChangesHistory
-                        }
-                        subOrderChangesHistoryTotalItems={
-                          subOrderChangesHistoryTotalItems
-                        }
-                        loadMoreSubOrderChangesHistory={
-                          loadMoreSubOrderChangesHistory
-                        }
-                      />
-                    )}
-                  </div>
-                </RenderWhen>
+                  )}
+                </div>
               </RenderWhen.False>
             </RenderWhen>
 

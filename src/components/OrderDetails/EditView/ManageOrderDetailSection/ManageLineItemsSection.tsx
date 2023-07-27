@@ -22,9 +22,9 @@ type TManageLineItemsSectionProps = {
   shouldShowUnderError?: boolean;
   setCurrentViewDate: (date: number) => void;
   currentViewDate: number;
-  ableToUpdateOrder?: boolean;
-  minQuantity?: number;
-  isAdminLayout?: boolean;
+  ableToUpdateOrder: boolean;
+  minQuantity: number;
+  isAdminFlow?: boolean;
 };
 
 const ManageLineItemsSection: React.FC<TManageLineItemsSectionProps> = (
@@ -38,7 +38,7 @@ const ManageLineItemsSection: React.FC<TManageLineItemsSectionProps> = (
     shouldShowUnderError,
     shouldShowOverflowError,
     minQuantity,
-    isAdminLayout = false,
+    isAdminFlow = false,
   } = props;
 
   const intl = useIntl();
@@ -68,7 +68,7 @@ const ManageLineItemsSection: React.FC<TManageLineItemsSectionProps> = (
               shouldShowOverflowError={shouldShowOverflowError}
               shouldShowUnderError={shouldShowUnderError}
               minQuantity={minQuantity}
-              isAdminLayout={isAdminLayout}
+              isAdminFlow={isAdminFlow}
             />
           </div>
         </div>

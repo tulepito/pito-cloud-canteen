@@ -30,7 +30,7 @@ type TLineItemsTableComponentProps = {
   data: TObject;
   onModifyQuantity: (id: string, quantity: number) => () => void;
   ableToUpdateOrder: boolean;
-  isAdminLayout?: boolean;
+  isAdminFlow?: boolean;
 };
 
 export const LineItemsTableComponent: React.FC<
@@ -39,7 +39,7 @@ export const LineItemsTableComponent: React.FC<
   data = {},
   onModifyQuantity,
   ableToUpdateOrder,
-  isAdminLayout = false,
+  isAdminFlow = false,
 }) => {
   const intl = useIntl();
   const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
@@ -198,7 +198,7 @@ export const LineItemsTableComponent: React.FC<
     <>
       <Alert
         className={classNames(css.overFlowAlert, {
-          [css.isAdminLayout]: isAdminLayout,
+          [css.isAdminLayout]: isAdminFlow,
         })}
         openClassName={css.isOpen}
         message={overFlowMemberAmountMessage}
