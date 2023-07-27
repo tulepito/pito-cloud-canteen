@@ -53,6 +53,7 @@ type TOrderDetailsTableProps = {
   minQuantity?: number;
   maxQuantity?: number;
   shouldShowUnderError?: boolean;
+  isAdminFlow?: boolean;
 };
 
 const OrderDetailsTable: React.FC<TOrderDetailsTableProps> = (props) => {
@@ -64,6 +65,7 @@ const OrderDetailsTable: React.FC<TOrderDetailsTableProps> = (props) => {
     handleOpenReachMaxAllowedChangesModal,
     shouldShowOverflowError,
     minQuantity,
+    isAdminFlow = false,
   } = props;
   const {
     query: { tab: tabId },
@@ -147,6 +149,7 @@ const OrderDetailsTable: React.FC<TOrderDetailsTableProps> = (props) => {
       memberEmail: wannaDeleteMember?.email,
       currentViewDate,
       tab: wannaDeleteMember.tab,
+      isAdminFlow,
     };
 
     if (isDraftEditing) {
@@ -170,6 +173,7 @@ const OrderDetailsTable: React.FC<TOrderDetailsTableProps> = (props) => {
       requirement: requirement || '',
       currentViewDate,
       memberEmail: memberData?.email,
+      isAdminFlow,
     };
 
     if (isDraftEditing) {
@@ -242,8 +246,6 @@ const OrderDetailsTable: React.FC<TOrderDetailsTableProps> = (props) => {
           defaultActiveKey={defaultActiveKey.toString()}
         />
         <AlertConfirmDeleteParticipant
-          // cancelDisabled={disableButton}
-          // confirmDisabled={disableButton}
           isOpen={isDeleteParticipantModalOpen}
           onClose={turnOffDeleteParticipantModalOpen}
           onCancel={handleCancelDeleteOrderItem}

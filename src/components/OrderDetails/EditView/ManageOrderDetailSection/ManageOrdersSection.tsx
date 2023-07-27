@@ -34,6 +34,7 @@ type TManageOrdersSectionProps = {
   shouldShowUnderError?: boolean;
   planReachMaxRestaurantQuantityInPickingState?: boolean;
   planReachMinRestaurantQuantityInPickingState?: boolean;
+  isAdminFlow?: boolean;
 };
 
 const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
@@ -47,6 +48,7 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
     shouldShowUnderError,
     planReachMaxRestaurantQuantityInPickingState,
     planReachMinRestaurantQuantityInPickingState,
+    isAdminFlow = false,
   } = props;
 
   const dispatch = useAppDispatch();
@@ -82,6 +84,7 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
             memberId: selectParticipantValue,
             memberEmail: member?.memberEmail,
           }),
+      isAdminFlow,
     };
 
     if (isDraftEditing) {
@@ -116,6 +119,7 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
               shouldShowOverflowError={shouldShowOverflowError}
               minQuantity={minQuantity}
               maxQuantity={maxQuantity}
+              isAdminFlow={isAdminFlow}
             />
           </div>
           <div className={css.addOrder}>
