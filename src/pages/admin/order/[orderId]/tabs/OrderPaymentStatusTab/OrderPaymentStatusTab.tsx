@@ -82,7 +82,7 @@ const OrderPaymentStatusTab: React.FC<OrderPaymentStatusTabProps> = (props) => {
 
       const { totalWithVAT } = partnerQuotationBySubOrderDate;
       const partnerPaymentRecordsByDate =
-        partnerPaymentRecords[subOrderDate].filter(
+        partnerPaymentRecords?.[subOrderDate]?.filter(
           (_record) => !_record.isHideFromHistory,
         ) || [];
       const paidAmount = calculatePaidAmountBySubOrderDate(
