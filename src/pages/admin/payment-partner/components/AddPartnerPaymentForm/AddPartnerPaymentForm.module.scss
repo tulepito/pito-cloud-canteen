@@ -1,0 +1,58 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.datesInput {
+  @include flexAlign(center, space-between);
+  gap: 10px;
+  margin-top: 8px;
+
+  .dateInput {
+    width: 402px;
+  }
+}
+
+.fieldInput {
+  margin-top: 24px;
+
+  .label {
+    @include textTemplate(14px, $fontWeightRegular, 20px);
+    margin-bottom: 8px;
+  }
+}
+
+.filterBtn {
+  margin-top: 24px;
+}
+
+.horizontalDevider {
+  border-bottom: 1px solid $neutralGray3;
+  margin-bottom: 12px;
+  margin-top: 20px;
+}
+
+.rightIcon {
+  right: 36px !important;
+  z-index: 100;
+}
+
+.paymentBtn {
+  @include flexAlign(center, flex-end);
+}
+
+.orderTitle {
+  color: $labelBlue2;
+  font-weight: $fontWeightBold;
+}
+
+.semiBoldText {
+  font-weight: $fontWeightSemiBold;
+}
+
+.tableWrapper {
+  overflow-y: auto;
+  max-height: 300px;
+  .tableBodyCell {
+    vertical-align: middle !important;
+  }
+}

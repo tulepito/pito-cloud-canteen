@@ -64,6 +64,7 @@ type TTableProps = TDefaultProps & {
   extraRows?: ReactNode;
   tableWrapperClassName?: string;
   shouldReplacePathWhenChangePage?: boolean;
+  onCustomPageChange?: (page: number) => void;
 };
 
 const getUniqueString = (list: string[]) => {
@@ -96,24 +97,29 @@ const Table = (props: TTableProps) => {
     afterCheckboxChangeHandler,
     extraRows,
     tableWrapperClassName,
+    onCustomPageChange,
   } = props;
 
   const tableClasses = classNames(css.table, tableClassName);
   const router = useRouter();
 
   const onPageChange = (page: number) => {
-    const params = {
-      pathname: paginationPath,
-      query: {
-        ...router.query,
-        page,
-      },
-    };
-
-    if (shouldReplacePathWhenChangePage) {
-      router.replace(params);
+    if (typeof onCustomPageChange === 'function') {
+      onCustomPageChange(page);
     } else {
-      router.push(params);
+      const params = {
+        pathname: paginationPath,
+        query: {
+          ...router.query,
+          page,
+        },
+      };
+
+      if (shouldReplacePathWhenChangePage) {
+        router.replace(params);
+      } else {
+        router.push(params);
+      }
     }
   };
 

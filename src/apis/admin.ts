@@ -30,3 +30,6 @@ export const createPaymentRecordApi = (body: TObject) =>
 
 export const deletePaymentRecordApi = (body: TObject) =>
   deleteApi('/admin/payment', body);
+
+export const getPartnerPaymentRecordsApi = () =>
+  getApi('/admin/payment/payment-partner');
