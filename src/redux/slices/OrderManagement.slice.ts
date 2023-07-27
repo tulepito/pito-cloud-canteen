@@ -60,6 +60,7 @@ export const checkMinMaxQuantityInProgressState = (
   oldOrderDetail: TPlan['orderDetail'],
   currentViewDate: number,
   isNormalOrder: boolean,
+  isAdminFlow = false,
 ) => {
   const data = orderDetails?.[currentViewDate] || {};
   const { lineItems = [], restaurant = {} } = data;
@@ -145,11 +146,11 @@ export const checkMinMaxQuantityInProgressState = (
 
     const shouldShowUnderError = totalQuantity < minQuantity;
 
-    return shouldShowOverflowError || shouldShowUnderError;
+    return (!isAdminFlow && shouldShowOverflowError) || shouldShowUnderError;
   });
 
   return {
-    shouldShowOverflowError,
+    shouldShowOverflowError: shouldShowOverflowError && !isAdminFlow,
     shouldShowUnderError,
     minQuantity,
     maxQuantity,
@@ -1036,8 +1037,14 @@ const OrderManagementSlice = createSlice({
       };
     },
     updateDraftOrderDetail: (state, { payload }) => {
-      const { currentViewDate, foodId, memberId, memberEmail, requirement } =
-        payload;
+      const {
+        currentViewDate,
+        foodId,
+        memberId,
+        memberEmail,
+        requirement,
+        isAdminFlow = false,
+      } = payload;
 
       const {
         draftOrderDetail,
@@ -1075,6 +1082,7 @@ const OrderManagementSlice = createSlice({
           defaultOrderDetail,
           currentViewDate,
           orderType === EOrderType.normal,
+          isAdminFlow,
         );
 
       if (shouldShowOverflowError || shouldShowUnderError) {
@@ -1186,7 +1194,13 @@ const OrderManagementSlice = createSlice({
       };
     },
     draftDisallowMember: (state, { payload }) => {
-      const { currentViewDate, memberId, memberEmail, tab } = payload;
+      const {
+        currentViewDate,
+        memberId,
+        memberEmail,
+        tab,
+        isAdminFlow = false,
+      } = payload;
       const { draftOrderDetail, planData, orderData } = state;
       const { orderDetail: defaultOrderDetail } = Listing(
         planData as TListing,
@@ -1230,6 +1244,7 @@ const OrderManagementSlice = createSlice({
           defaultOrderDetail,
           currentViewDate,
           orderType === EOrderType.normal,
+          isAdminFlow,
         );
 
       if (shouldShowOverflowError || shouldShowUnderError) {
@@ -1306,7 +1321,11 @@ const OrderManagementSlice = createSlice({
       };
     },
     setDraftOrderDetailsAndSubOrderChangeHistory: (state, { payload }) => {
-      const { updateValues = {}, newOrderDetail } = payload;
+      const {
+        updateValues = {},
+        newOrderDetail,
+        isAdminFlow = false,
+      } = payload;
 
       const {
         currentViewDate,
@@ -1327,6 +1346,7 @@ const OrderManagementSlice = createSlice({
           orderDetail,
           currentViewDate,
           orderType === EOrderType.normal,
+          isAdminFlow,
         );
 
       if (shouldShowOverflowError || shouldShowUnderError) {

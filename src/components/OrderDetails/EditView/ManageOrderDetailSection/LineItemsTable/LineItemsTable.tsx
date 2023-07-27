@@ -25,23 +25,23 @@ import css from './LineItemsTable.module.scss';
 
 type TLineItemsTableProps = {
   currentViewDate: number;
-  isDraftEditing?: boolean;
-  ableToUpdateOrder?: boolean;
-  shouldShowOverflowError?: boolean;
-  shouldShowUnderError?: boolean;
-  minQuantity?: number;
-  isAdminLayout?: boolean;
+  isDraftEditing: boolean;
+  ableToUpdateOrder: boolean;
+  shouldShowOverflowError: boolean;
+  shouldShowUnderError: boolean;
+  minQuantity: number;
+  isAdminFlow?: boolean;
 };
 
 const LineItemsTable: React.FC<TLineItemsTableProps> = (props) => {
   const {
     currentViewDate,
-    isDraftEditing = false,
-    ableToUpdateOrder = true,
-    shouldShowOverflowError = false,
-    shouldShowUnderError = false,
-    minQuantity = 1,
-    isAdminLayout = false,
+    isDraftEditing,
+    ableToUpdateOrder,
+    shouldShowOverflowError,
+    shouldShowUnderError,
+    minQuantity,
+    isAdminFlow = false,
   } = props;
   const intl = useIntl();
 
@@ -183,6 +183,7 @@ const LineItemsTable: React.FC<TLineItemsTableProps> = (props) => {
               quantity,
               foodId,
             },
+            isAdminFlow,
           }),
         );
       } else {
@@ -223,7 +224,7 @@ const LineItemsTable: React.FC<TLineItemsTableProps> = (props) => {
         data={data}
         onModifyQuantity={handleModifyQuantity}
         ableToUpdateOrder={ableToUpdateOrder}
-        isAdminLayout={isAdminLayout}
+        isAdminFlow={isAdminFlow}
       />
       <form onSubmit={handleSubmit}>
         <div className={css.fieldContainer}>
