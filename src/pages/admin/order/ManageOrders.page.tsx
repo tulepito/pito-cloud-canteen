@@ -31,6 +31,7 @@ import {
   txIsCanceled,
   txIsDelivered,
   txIsDelivering,
+  txIsInitiated,
 } from '@src/utils/transaction';
 import { formatTimestamp, getDayOfWeek } from '@utils/dates';
 import {
@@ -111,6 +112,15 @@ const renderBadgeForSubOrder = (
         label={getLabelByKey(ORDER_STATES_OPTIONS, state)}
       />
     );
+  if (txIsInitiated(tx)) {
+    return (
+      <Badge
+        labelClassName={css.badgeLabel}
+        type={EBadgeType.info}
+        label="Đang triển khai"
+      />
+    );
+  }
   if (txIsDelivering(tx)) {
     return (
       <Badge
@@ -141,9 +151,9 @@ const renderBadgeForSubOrder = (
 
   return (
     <Badge
-      labelClassName={css.badgeLabel}
-      type={EBadgeType.info}
-      label="Đang triển khai"
+      labelClassName={css.badgeLabelLight}
+      type={EBadgeType.strongDanger}
+      label="Huỷ đơn"
     />
   );
 };
