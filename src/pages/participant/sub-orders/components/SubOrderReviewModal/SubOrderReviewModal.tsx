@@ -10,6 +10,7 @@ import Modal from '@components/Modal/Modal';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { useViewport } from '@hooks/useViewport';
 import { Listing } from '@src/utils/data';
 import { formatTimestamp } from '@src/utils/dates';
 import { EImageVariants } from '@src/utils/enums';
@@ -29,6 +30,7 @@ const SubOrderReviewModal: React.FC<SubOrderReviewModalProps> = (props) => {
   const { isOpen, onClose, subOrder } = props;
   const intl = useIntl();
   const dispatch = useAppDispatch();
+  const { isMobileLayout } = useViewport();
   const subOrderReview = useAppSelector(
     (state) => state.ParticipantSubOrderList.subOrderReview,
   );
@@ -65,7 +67,8 @@ const SubOrderReviewModal: React.FC<SubOrderReviewModalProps> = (props) => {
       className={css.modal}
       closeClassName={css.closedModal}
       containerClassName={css.modalContainer}
-      shouldHideIconClose>
+      title={isMobileLayout ? undefined : 'Đánh giá Chi tiết'}
+      shouldHideIconClose={isMobileLayout}>
       <RenderWhen condition={fetchReviewInProgress || isEmpty(subOrderReview)}>
         <div className={css.loading}>
           <IconSpinner />

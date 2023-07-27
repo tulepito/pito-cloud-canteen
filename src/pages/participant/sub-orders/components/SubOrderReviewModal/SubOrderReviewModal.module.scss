@@ -4,10 +4,19 @@
 
 .modalContainer.modalContainer {
   padding: 0;
+
+  @include viewportLarge {
+    padding: 0 24px 24px;
+  }
 }
 
 .modal {
   background-color: $neutralGray1;
+
+  @include viewportLarge {
+    background-color: transparent;
+    transition: none;
+  }
 }
 
 .closedModal {
@@ -23,6 +32,10 @@
   opacity: 1;
   background-color: $neutralGray1;
   transition: all 0.5s ease-in-out;
+
+  @include viewportLarge {
+    transition: none;
+  }
 }
 
 .modalHeader {
@@ -51,6 +64,10 @@
   @include flexAlign(center);
   gap: 8px;
   padding: 0 16px;
+
+  @include viewportLarge {
+    display: none;
+  }
 }
 
 .restaurantInfor {
@@ -59,11 +76,21 @@
   padding: 0 16px;
   margin-top: 20px;
 
+  @include viewportLarge {
+    padding: 0 0 20px;
+    border-bottom: 1px solid $neutralGray4;
+  }
+
   .leftSide {
     .imageWrapper {
       width: 120px;
       height: 120px;
       position: relative;
+
+      @include viewportLarge {
+        width: 80px;
+        height: 80px;
+      }
 
       .image {
         border-radius: 8px;

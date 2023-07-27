@@ -3,8 +3,10 @@ import { useIntl } from 'react-intl';
 import last from 'lodash/last';
 import { useRouter } from 'next/router';
 
+import Badge, { EBadgeType } from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
 import IconRatingFace from '@components/Icons/IconRatingFace/IconRatingFace';
+import IconShop from '@components/Icons/IconShop/IconShop';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
@@ -22,6 +24,28 @@ type SubOrderCardProps = {
   subOrder: any;
   setSelectedSubOrder: (subOrder: any) => void;
   openSubOrderReviewModal: () => void;
+};
+
+const getTxStatusLabel = (txStatus: string) => {
+  switch (txStatus) {
+    case 'delivering':
+      return 'Đang giao hàng';
+    case 'delivered':
+      return 'Đã giao hàng';
+    default:
+      return 'Đã chọn món';
+  }
+};
+
+const getTxStatusBadgeType = (txStatus: string) => {
+  switch (txStatus) {
+    case 'delivering':
+      return EBadgeType.info;
+    case 'delivered':
+      return EBadgeType.success;
+    default:
+      return EBadgeType.warning;
+  }
 };
 
 const SubOrderCard: React.FC<SubOrderCardProps> = (props) => {
@@ -53,7 +77,7 @@ const SubOrderCard: React.FC<SubOrderCardProps> = (props) => {
     timestamp,
     "EEEE, 'ngày' dd/MM/yyyy",
   )}`;
-  const hasBottomSection = txStatus === 'delivered';
+  const isSubOrderDelivered = txStatus === 'delivered';
   useEffect(() => {
     if (reviewId) {
       dispatch(SubOrdersThunks.fetchReviewFromSubOrder(reviewId));
@@ -94,13 +118,27 @@ const SubOrderCard: React.FC<SubOrderCardProps> = (props) => {
           <div className={css.dishName}>{foodName}</div>
           <div className={css.time}>{subOrderTime}</div>
         </div>
-        <RenderWhen condition={hasBottomSection}>
-          <div className={css.bottomSection}>
+        <div className={css.inforSectionDesktop}>
+          <div className={css.dishName} title={foodName}>
+            {foodName}
+          </div>
+          <div className={css.time}>{subOrderTime}</div>
+          <div className={css.restaurantName}>
+            <IconShop className={css.iconShop} />
+            <span title={restaurantName}>{restaurantName}</span>
+          </div>
+        </div>
+        <div className={css.bottomSection}>
+          <Badge
+            className={css.badge}
+            type={getTxStatusBadgeType(txStatus)}
+            label={getTxStatusLabel(txStatus)}
+          />
+          <RenderWhen condition={isSubOrderDelivered}>
             <RenderWhen condition={!reviewId}>
               <Button className={css.ratingBtn} onClick={goToRatingPage}>
                 Đánh giá
               </Button>
-
               <RenderWhen.False>
                 <div className={css.rating}>
                   <IconRatingFace
@@ -115,8 +153,8 @@ const SubOrderCard: React.FC<SubOrderCardProps> = (props) => {
                 </div>
               </RenderWhen.False>
             </RenderWhen>
-          </div>
-        </RenderWhen>
+          </RenderWhen>
+        </div>
       </div>
     </div>
   );

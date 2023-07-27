@@ -4,6 +4,10 @@
 
 .container {
   padding: 64px 16px 104px;
+
+  @include viewportLarge {
+    padding: 64px 60px 104px;
+  }
 }
 
 .title {
