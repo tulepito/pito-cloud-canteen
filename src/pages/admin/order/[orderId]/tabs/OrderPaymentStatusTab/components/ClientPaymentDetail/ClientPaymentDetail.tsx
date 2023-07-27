@@ -5,6 +5,7 @@ import useBoolean from '@hooks/useBoolean';
 import { generateSKU } from '@pages/admin/order/[orderId]/helpers/AdminOrderDetail';
 import { OrderDetailThunks } from '@pages/admin/order/[orderId]/OrderDetail.slice';
 import { User } from '@src/utils/data';
+import { EPaymentType } from '@src/utils/enums';
 import type { TUser } from '@src/utils/types';
 
 import type { TAddingPaymentRecordFormValues } from '../AddingPaymentRecordForm/AddingPaymentRecordForm';
@@ -56,7 +57,7 @@ const ClientPaymentDetail: React.FC<ClientPaymentDetailProps> = (props) => {
 
     const { meta } = await dispatch(
       OrderDetailThunks.createClientPaymentRecord({
-        paymentType: 'client',
+        paymentType: EPaymentType.CLIENT,
         orderId,
         amount: parseThousandNumberToInteger(paymentAmount),
         paymentNote,
@@ -104,7 +105,7 @@ const ClientPaymentDetail: React.FC<ClientPaymentDetailProps> = (props) => {
         totalPrice={totalWithVAT}
         paidAmount={paidAmount}
         inProgress={createClientPaymentRecordInProgress}
-        paymentType="client"
+        paymentType={EPaymentType.CLIENT}
       />
     </div>
   );

@@ -702,4 +702,5 @@ export type TPaymentRecord = {
   companyName?: string;
   orderTitle?: string;
   createdAt?: Date;
+  isHideFromHistory?: boolean;
 };

@@ -13,7 +13,7 @@ import {
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { Listing } from '@src/utils/data';
 import { getDayOfWeek } from '@src/utils/dates';
-import type { EOrderStates } from '@src/utils/enums';
+import { type EOrderStates, EPaymentType } from '@src/utils/enums';
 import type { TListing, TUser } from '@src/utils/types';
 
 import OrderHeaderState from '../../components/OrderHeaderState/OrderHeaderState';
@@ -150,7 +150,7 @@ const OrderPaymentStatusTab: React.FC<OrderPaymentStatusTabProps> = (props) => {
     childrenProps: {
       totalWithVAT: clientTotalPrice,
       orderId,
-      paymentType: 'client',
+      paymentType: EPaymentType.CLIENT,
       company,
       orderTitle,
       paidAmount: clientPaidAmount,
