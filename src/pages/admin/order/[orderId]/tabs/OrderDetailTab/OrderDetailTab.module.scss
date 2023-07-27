@@ -229,7 +229,7 @@
 
   .leftPart {
     order: 2;
-    $maxWidthWithPadding: calc(100vw - 320px - 280px - 40px);
+    $maxWidthWithPadding: calc(100vw - 320px - 40px - 40px * 2);
 
     margin-top: 24px;
 
@@ -240,7 +240,7 @@
     }
 
     @include viewportLarge {
-      width: min(750px, calc($maxWidthWithPadding - 72px));
+      width: min(750px, calc($maxWidthWithPadding - 280px - 72px));
     }
 
     @include viewportSLarge {

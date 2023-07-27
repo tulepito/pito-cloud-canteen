@@ -1098,6 +1098,8 @@ const OrderManagementSlice = createSlice({
 
         return {
           ...state,
+          shouldShowOverflowError: false,
+          shouldShowUnderError: false,
           draftOrderDetail: newOrderDetail,
           draftSubOrderChangesHistory: {
             ...state.draftSubOrderChangesHistory,
@@ -1177,6 +1179,8 @@ const OrderManagementSlice = createSlice({
 
       return {
         ...state,
+        shouldShowOverflowError: false,
+        shouldShowUnderError: false,
         draftOrderDetail: newOrderDetail,
         draftSubOrderChangesHistory: newDraftSubOrderChangesHistory,
       };
@@ -1245,6 +1249,8 @@ const OrderManagementSlice = createSlice({
 
         return {
           ...state,
+          shouldShowOverflowError: false,
+          shouldShowUnderError: false,
           draftOrderDetail: newOrderDetail,
           draftSubOrderChangesHistory: newDraftSubOrderChangesHistory,
         };
@@ -1294,6 +1300,8 @@ const OrderManagementSlice = createSlice({
     setDraftOrderDetails: (state, { payload }) => {
       return {
         ...state,
+        shouldShowOverflowError: false,
+        shouldShowUnderError: false,
         draftOrderDetail: payload,
       };
     },
@@ -1346,6 +1354,8 @@ const OrderManagementSlice = createSlice({
 
           return {
             ...state,
+            shouldShowOverflowError: false,
+            shouldShowUnderError: false,
             draftOrderDetail: newOrderDetail,
             draftSubOrderChangesHistory: {
               ...state.draftSubOrderChangesHistory,
@@ -1382,6 +1392,8 @@ const OrderManagementSlice = createSlice({
 
           return {
             ...state,
+            shouldShowOverflowError: false,
+            shouldShowUnderError: false,
             draftSubOrderChangesHistory: newDraftSubOrderChangesHistory,
             draftOrderDetail: newOrderDetail,
           };
@@ -1422,6 +1434,8 @@ const OrderManagementSlice = createSlice({
 
         return {
           ...state,
+          shouldShowOverflowError: false,
+          shouldShowUnderError: false,
           draftSubOrderChangesHistory: newDraftSubOrderChangesHistory,
           draftOrderDetail: newOrderDetail,
         };
@@ -1463,6 +1477,8 @@ const OrderManagementSlice = createSlice({
 
       return {
         ...state,
+        shouldShowOverflowError: false,
+        shouldShowUnderError: false,
         draftSubOrderChangesHistory: newDraftSubOrderChangesHistory,
         draftOrderDetail: newOrderDetail,
       };
@@ -1473,12 +1489,16 @@ const OrderManagementSlice = createSlice({
 
       return {
         ...state,
+        shouldShowOverflowError: false,
+        shouldShowUnderError: false,
         draftOrderDetail: orderDetail,
       };
     },
     resetDraftSubOrderChangeHistory: (state) => {
       return {
         ...state,
+        shouldShowOverflowError: false,
+        shouldShowUnderError: false,
         draftSubOrderChangesHistory: {},
       };
     },
