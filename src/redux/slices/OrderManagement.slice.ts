@@ -427,6 +427,7 @@ const addOrUpdateMemberOrder = createAsyncThunk(
       let shouldUpdateAnonymousList = false;
       let updateAnonymous = anonymous;
 
+      // TODO: check existed user or not
       const checkUserResult = await checkUserExistedApi({
         ...(memberId ? { id: memberId } : {}),
         ...(memberEmail ? { email: memberEmail } : {}),
@@ -444,7 +445,7 @@ const addOrUpdateMemberOrder = createAsyncThunk(
       if (!isEmpty(user)) {
         participantId = User(user).getId();
       }
-      // Update list anonymous
+      // TODO: Update list anonymous
       if (
         !participants.includes(participantId) &&
         !anonymous.includes(participantId) &&
@@ -498,9 +499,7 @@ const addOrUpdateMemberOrder = createAsyncThunk(
             },
           },
         },
-        ...(shouldUpdateAnonymousList
-          ? { orderId, anonymous: updateAnonymous }
-          : {}),
+        ...(shouldUpdateAnonymousList ? { anonymous: updateAnonymous } : {}),
       };
 
       await addUpdateMemberOrder(orderId, updateParams);
