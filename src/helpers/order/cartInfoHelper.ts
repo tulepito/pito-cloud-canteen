@@ -214,12 +214,12 @@ export const calculatePriceQuotationInfo = ({
 
 export const calculatePriceQuotationPartner = ({
   quotation = {},
-  serviceFee = 0,
+  serviceFeePercentage = 0,
   currentOrderVATPercentage,
   subOrderDate,
 }: {
   quotation: TQuotation;
-  serviceFee: number;
+  serviceFeePercentage: number;
   currentOrderVATPercentage: number;
   subOrderDate?: string;
 }) => {
@@ -238,8 +238,8 @@ export const calculatePriceQuotationPartner = ({
 
         return result + totalPriceInDate;
       }, 0);
-  const serviceFeePrice = Math.round((totalPrice * serviceFee) / 100);
-  const totalWithoutVAT = totalPrice - promotion - serviceFeePrice;
+  const serviceFee = Math.round((totalPrice * serviceFeePercentage) / 100);
+  const totalWithoutVAT = totalPrice - promotion - serviceFee;
   const VATFee = Math.round(totalWithoutVAT * currentOrderVATPercentage);
   const totalWithVAT = VATFee + totalWithoutVAT;
 
@@ -247,7 +247,6 @@ export const calculatePriceQuotationPartner = ({
     totalPrice,
     VATFee,
     serviceFee,
-    serviceFeePrice,
     totalWithoutVAT,
     totalWithVAT,
     promotion,
@@ -344,8 +343,8 @@ export const calculatePriceQuotationInfoFromQuotation = ({
     PITOPoints,
     VATFee,
     totalWithVAT,
-    serviceFee: currentOrderServiceFeePercentage * 100,
-    serviceFeePrice: serviceFee,
+    serviceFeePercentage: currentOrderServiceFeePercentage * 100,
+    serviceFee,
     transportFee,
     promotion,
     overflow,

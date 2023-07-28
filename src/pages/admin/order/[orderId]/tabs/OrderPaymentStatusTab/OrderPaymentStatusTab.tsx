@@ -91,7 +91,8 @@ const OrderPaymentStatusTab: React.FC<OrderPaymentStatusTabProps> = (props) => {
         const partnerQuotationBySubOrderDate = calculatePriceQuotationPartner({
           quotation:
             partner[orderDetail[subOrderDate].restaurant.id]?.quotation,
-          serviceFee: serviceFees[orderDetail[subOrderDate].restaurant.id],
+          serviceFeePercentage:
+            serviceFees[orderDetail[subOrderDate].restaurant.id],
           currentOrderVATPercentage,
           subOrderDate,
         });
