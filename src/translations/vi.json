@@ -1039,6 +1039,8 @@
   "ManagePartnersPage.newStatus": "Mới",
   "ManagePartnersPage.pendingRestaurantApprovalState": "Nhà hàng đang chờ phê duyệt",
   "ManagePartnersPage.unsatisfactoryStatus": "Không đạt yêu cầu",
+  "ManagePaymentsPage.actionButton.downloadPayment": "Tải danh sách",
+  "ManagePaymentsPage.title": "Thanh toán",
   "MealDateForm.dayInWeekField.title": "Chọn ngày ăn trong tuần",
   "MealDateForm.durationForNextOrderField.label": "Kế hoạch bữa ăn của bạn kéo dài trong bao lâu?",
   "MealDateForm.OrderDeadlineField.label.date": "Chọn ngày kết thúc chọn món",
