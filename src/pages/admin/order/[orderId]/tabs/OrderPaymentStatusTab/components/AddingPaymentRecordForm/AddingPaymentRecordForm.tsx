@@ -28,6 +28,7 @@ type TExtraProps = {
   paidAmount: number;
   inProgress?: boolean;
   paymentType?: EPaymentType;
+  createPaymentError?: any;
 };
 type TAddingPaymentRecordFormComponentProps =
   FormRenderProps<TAddingPaymentRecordFormValues> & Partial<TExtraProps>;
@@ -111,6 +112,7 @@ const AddingPaymentRecordFormComponent: React.FC<
     invalid,
     inProgress,
     paymentType = EPaymentType.PARTNER,
+    createPaymentError,
   } = props;
   const [percentage, setPercentage] = useState<number>(0);
 
@@ -185,6 +187,10 @@ const AddingPaymentRecordFormComponent: React.FC<
         labelClassName={css.label}
         validate={maxLength('Ghi chú không được vượt quá 200 ký tự', 200)}
       />
+
+      {createPaymentError && (
+        <div className={css.error}>Có lỗi xảy ra, vui lòng thử lại</div>
+      )}
       <Button
         type="submit"
         className={css.submitBtn}

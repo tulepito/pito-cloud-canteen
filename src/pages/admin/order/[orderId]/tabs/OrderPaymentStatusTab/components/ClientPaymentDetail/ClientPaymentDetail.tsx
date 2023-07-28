@@ -42,6 +42,9 @@ const ClientPaymentDetail: React.FC<ClientPaymentDetailProps> = (props) => {
   const createClientPaymentRecordInProgress = useAppSelector(
     (state) => state.OrderDetail.createClientPaymentRecordInProgress,
   );
+  const createClientPaymentRecordError = useAppSelector(
+    (state) => state.OrderDetail.createClientPaymentRecordError,
+  );
   const deleteClientPaymentRecordInProgress = useAppSelector(
     (state) => state.OrderDetail.deleteClientPaymentRecordInProgress,
   );
@@ -71,6 +74,8 @@ const ClientPaymentDetail: React.FC<ClientPaymentDetailProps> = (props) => {
 
     if (meta.requestStatus === 'fulfilled') {
       addPaymentModalController.setFalse();
+    } else {
+      dispatch(OrderDetailThunks.fetchClientPaymentRecords(orderId));
     }
   };
 
@@ -106,6 +111,7 @@ const ClientPaymentDetail: React.FC<ClientPaymentDetailProps> = (props) => {
         paidAmount={paidAmount}
         inProgress={createClientPaymentRecordInProgress}
         paymentType={EPaymentType.CLIENT}
+        error={createClientPaymentRecordError}
       />
     </div>
   );

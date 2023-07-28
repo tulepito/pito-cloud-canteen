@@ -61,8 +61,7 @@ export const createPaymentRecordOnFirebase = async (
 export const queryPaymentRecordOnFirebase = async (query: any) => {
   try {
     const { paymentType, partnerId, orderId, subOrderDate } = query;
-    const isPartnerPaymentRecordQuery = paymentType === EPaymentType.PARTNER;
-    const partnerQuery = isPartnerPaymentRecordQuery && {
+    const paymentQuery = {
       ...(partnerId && {
         partnerId: {
           operator: '==',
@@ -87,7 +86,7 @@ export const queryPaymentRecordOnFirebase = async (query: any) => {
           operator: '==',
           value: paymentType,
         },
-        ...(isPartnerPaymentRecordQuery ? partnerQuery : {}),
+        ...paymentQuery,
       },
     });
 
