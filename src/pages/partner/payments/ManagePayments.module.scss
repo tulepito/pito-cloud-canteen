@@ -23,20 +23,33 @@
   margin-top: 24px;
 }
 
-.filterButton {
-  padding: 10px 20px 10px 20px;
-  font-size: 14px;
+.actionSection {
+  display: flex;
+  justify-content: space-between;
 
-  .filterIcon {
-    width: 16px;
-    height: 14px;
-    margin-right: 8px;
-  }
+  .filterButton,
+  .downloadButton {
+    padding: 10px 20px 10px 20px;
+    font-size: 14px;
+    display: flex;
+    column-gap: 8px;
 
-  &:hover,
-  &:focus {
-    .filterIcon * {
-      fill: $neutralGray1;
+    .iconContainer {
+      width: 20px;
+      height: 20px;
+
+      .icon {
+        margin: 2.5px auto;
+        width: auto;
+        height: 15px;
+      }
+    }
+
+    &:hover,
+    &:focus {
+      .icon * {
+        fill: $neutralGray1;
+      }
     }
   }
 }
