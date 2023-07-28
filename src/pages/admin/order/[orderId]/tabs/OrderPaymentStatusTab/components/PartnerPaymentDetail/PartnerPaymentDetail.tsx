@@ -49,6 +49,9 @@ const PartnerPaymentDetail: React.FC<PartnerPaymentDetailProps> = (props) => {
   const createPartnerPaymentRecordInProgress = useAppSelector(
     (state) => state.OrderDetail.createPartnerPaymentRecordInProgress,
   );
+  const createPartnerPaymentRecordError = useAppSelector(
+    (state) => state.OrderDetail.createPartnerPaymentRecordError,
+  );
   const deletePartnerPaymentRecordInProgress = useAppSelector(
     (state) => state.OrderDetail.deletePartnerPaymentRecordInProgress,
   );
@@ -78,6 +81,8 @@ const PartnerPaymentDetail: React.FC<PartnerPaymentDetailProps> = (props) => {
 
     if (meta.requestStatus === 'fulfilled') {
       addPaymentModalController.setFalse();
+    } else {
+      dispatch(OrderDetailThunks.fetchPartnerPaymentRecords(orderId));
     }
   };
 
@@ -116,6 +121,7 @@ const PartnerPaymentDetail: React.FC<PartnerPaymentDetailProps> = (props) => {
         totalPrice={totalWithVAT}
         paidAmount={paidAmount}
         inProgress={createPartnerPaymentRecordInProgress}
+        error={createPartnerPaymentRecordError}
       />
     </div>
   );

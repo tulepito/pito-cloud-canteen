@@ -11,6 +11,8 @@ import {
 import { handleError } from '@services/sdk';
 import { EPaymentType } from '@src/utils/enums';
 
+import { checkPaymentRecordValid } from './check-valid-payment.service';
+
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   const apiMethod = req.method;
   try {
@@ -62,6 +64,17 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             deliveryHour,
             isHideFromHistory,
           } = paymentRecordParams;
+
+          const canCreatePaymentRecord = await checkPaymentRecordValid(
+            paymentRecordParams,
+            paymentRecordType,
+          );
+          if (!canCreatePaymentRecord) {
+            return res.status(400).json({
+              message: 'Payment record is invalid',
+            });
+          }
+
           const allowedPaymentRecordParams: Partial<PaymentBaseParams> = {
             SKU,
             amount,
