@@ -194,12 +194,14 @@ const ListingDetailModal: React.FC<TListingDetailModalProps> = (props) => {
           </div>
         </RenderWhen>
 
-        <div className={css.section}>
-          <div className={css.sideDishesLabel}>
-            <FormattedMessage id="ListingDetailModal.sideDishesLabel" />
+        <RenderWhen condition={!isEmpty(sideDishesText)}>
+          <div className={css.section}>
+            <div className={css.sideDishesLabel}>
+              <FormattedMessage id="ListingDetailModal.sideDishesLabel" />
+            </div>
+            <div className={css.sideDishesContent}>{sideDishesText}</div>
           </div>
-          <div className={css.sideDishesContent}>{sideDishesText}</div>
-        </div>
+        </RenderWhen>
 
         <div className={css.requirementSection}>
           <div className={css.requirementLabel}>{fieldRequirement.label}</div>
