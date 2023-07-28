@@ -14,7 +14,11 @@ import {
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { Listing } from '@src/utils/data';
 import { getDayOfWeek } from '@src/utils/dates';
-import { type EOrderStates, EPaymentType } from '@src/utils/enums';
+import {
+  type EOrderStates,
+  EPaymentType,
+  ESubOrderStatus,
+} from '@src/utils/enums';
 import type { TListing, TUser } from '@src/utils/types';
 
 import OrderHeaderState from '../../components/OrderHeaderState/OrderHeaderState';
@@ -76,7 +80,10 @@ const OrderPaymentStatusTab: React.FC<OrderPaymentStatusTabProps> = (props) => {
     compact(
       Object.keys(orderDetail).map((subOrderDate: string) => {
         if (
-          isEmpty(partner[orderDetail[subOrderDate].restaurant.id]?.quotation)
+          isEmpty(
+            partner[orderDetail[subOrderDate].restaurant.id]?.quotation,
+          ) ||
+          orderDetail[subOrderDate].status === ESubOrderStatus.CANCELED
         ) {
           return null;
         }
