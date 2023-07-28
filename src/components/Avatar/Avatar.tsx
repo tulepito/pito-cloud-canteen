@@ -90,18 +90,17 @@ const Avatar: React.FC<TAvatarProps> = (props) => {
 
   const hasProfileImage = avatarUser.profileImage && avatarUser.profileImage.id;
   const profileLinkEnabled = !disableProfileLink;
+
+  const classForInitials = initialsClassName || css.initials;
   const classes = classNames(
     rootClassName || css.root,
     { [css.hasProfileImage]: hasProfileImage !== null },
     className,
   );
-
   const rootProps = { className: classes, title: displayName };
   const linkProps = avatarUser.id
     ? { href: 'ProfilePage', params: { id: avatarUser.id.uuid } }
     : { href: 'ProfileBasePage' };
-
-  const classForInitials = initialsClassName || css.initials;
 
   if (isBannedUser || isDeletedUser) {
     return (

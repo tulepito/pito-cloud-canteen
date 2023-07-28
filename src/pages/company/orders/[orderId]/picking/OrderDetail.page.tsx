@@ -582,6 +582,7 @@ const OrderDetailPage = () => {
     if (
       !isEmpty(orderState) &&
       isRouterReady &&
+      orderId &&
       !BookerAccessibleOrderStates.includes(orderState)
     ) {
       router.push({

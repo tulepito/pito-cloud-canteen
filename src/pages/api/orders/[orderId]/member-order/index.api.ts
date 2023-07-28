@@ -48,7 +48,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           deliveryHour,
         });
 
-        if (orderId) {
+        if (typeof anonymous !== 'undefined') {
           await integrationSdk.listings.update({
             id: orderId,
             metadata: {
