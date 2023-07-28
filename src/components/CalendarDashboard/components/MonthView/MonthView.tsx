@@ -44,7 +44,8 @@ function MonthView({
     () => MonthView.range(date, { localizer }),
     [date, localizer],
   );
-  const { walkthroughEnable = false } = resources || ({} as any);
+  const { walkthroughEnable = false, hideEmptySubOrderSection = false } =
+    resources || ({} as any);
   const firstDay = currRange[0];
   const totalEmptyDays = (firstDay.getDay() || 7) - 1;
   const emptyDayEls = Array.from(Array(totalEmptyDays).keys());
@@ -76,7 +77,10 @@ function MonthView({
           />
         ))}
       </div>
-      <RenderWhen condition={!walkthroughEnable && events.length === 0}>
+      <RenderWhen
+        condition={
+          !walkthroughEnable && events.length === 0 && !hideEmptySubOrderSection
+        }>
         <div className={css.noEventsWrapper}>
           <EmptySubOrder className={css.noEventIcon} />
         </div>

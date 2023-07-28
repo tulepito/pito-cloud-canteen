@@ -6,4 +6,15 @@
   @include flexAlign(flex-start, center);
   flex-direction: column;
   gap: 16px;
+
+  @include viewportLarge {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 32px;
+  }
+}
+
+.emptySubOrders {
+  margin: 124px auto 0;
 }

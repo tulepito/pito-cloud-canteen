@@ -65,7 +65,7 @@ const SubOrders = () => {
     dispatch(
       SubOrdersThunks.fetchSubOrdersFromFirebase({
         participantId: currentUserId,
-        txStatus: DELIVERING_TAB,
+        txStatus: [ESubOrderTxStatus.PENDING, DELIVERING_TAB],
       }),
     );
     dispatch(

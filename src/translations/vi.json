@@ -320,7 +320,7 @@
   "DayColumn.Status.canceled": "Đã hủy",
   "DayColumn.Status.empty": "Chưa chọn món",
   "DayColumn.Status.expired": "Hết hạn",
-  "DayColumn.Status.joined": "Đã hoàn thành",
+  "DayColumn.Status.joined": "Đã chọn món",
   "DayColumn.Status.notJoined": "Đã hoàn thành",
   "DayInWeekField.fri": "Thứ 6",
   "DayInWeekField.label": "Chọn ngày ăn trong tuần",

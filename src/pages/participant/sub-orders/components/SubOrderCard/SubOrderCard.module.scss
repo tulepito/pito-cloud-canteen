@@ -6,11 +6,21 @@
   @include flexAlign(center);
   gap: 12px;
 
+  @include viewportLarge {
+    align-items: normal;
+    width: 418px;
+  }
+
   .leftSide {
     .imageWrapper {
       width: 108px;
       height: 108px;
       position: relative;
+
+      @include viewportLarge {
+        width: 160px;
+        height: 160px;
+      }
 
       .image {
         border-radius: 8px;
@@ -24,6 +34,9 @@
     gap: 8px;
 
     .inforSection {
+      @include viewportLarge {
+        display: none;
+      }
       .restaurantName {
         @include textTemplate(12px, $fontWeightRegular, 16px);
       }
@@ -40,10 +53,67 @@
       }
     }
 
+    .inforSectionDesktop {
+      display: none;
+
+      @include viewportLarge {
+        display: block;
+      }
+
+      .restaurantName {
+        @include textTemplate(16px, $fontWeightRegular, 24px);
+        @include flexAlign(center);
+        gap: 8px;
+
+        span {
+          @include lineClamp(1);
+        }
+
+        .iconShop {
+          width: 20px;
+          height: 20px;
+          flex-shrink: 0;
+        }
+      }
+
+      .dishName {
+        @include textTemplate(16px, $fontWeightBold, 24px);
+        margin-top: 4px;
+        @include lineClamp(1);
+      }
+
+      .time {
+        @include textTemplate(16px, $fontWeightRegular, 24px);
+        color: $neutralGray5;
+        margin-top: 4px;
+        @include lineClamp(1);
+      }
+    }
+
     .bottomSection {
+      @include viewportLarge {
+        margin-bottom: 8px;
+        padding-top: 16px;
+        border-top: 1px solid $neutralGray3;
+        @include flexAlign(center, space-between);
+        width: 100%;
+      }
+
+      .badge {
+        display: none;
+
+        @include viewportLarge {
+          display: block;
+        }
+      }
+
       .rating {
         @include flexAlign(center);
         gap: 8px;
+
+        @include viewportLarge {
+          cursor: pointer;
+        }
 
         .iconFace {
           width: 20px;
