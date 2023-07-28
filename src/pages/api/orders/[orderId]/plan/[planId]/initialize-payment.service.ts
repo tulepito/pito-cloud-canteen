@@ -35,7 +35,7 @@ export const initializePayment = async (
         const { id, restaurantName } = restaurant;
         const { totalWithVAT: totalPrice } = calculatePriceQuotationPartner({
           quotation: partner[id].quotation,
-          serviceFee: serviceFees[id],
+          serviceFeePercentage: serviceFees[id],
           currentOrderVATPercentage: orderVATPercentage,
           subOrderDate,
         });

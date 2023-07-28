@@ -35,7 +35,6 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
       overflow = 0,
       promotion = 0,
       serviceFee = 0,
-      serviceFeePrice = 0,
       totalPrice = 0,
       totalWithoutVAT = 0,
       totalWithVAT = 0,
@@ -152,7 +151,7 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
                 <Badge label={`${serviceFee}%`} className={css.VATBadge} />
               </div>
               <div className={css.fee}>
-                {parseThousandNumber(serviceFeePrice.toString())}đ
+                {parseThousandNumber(serviceFee.toString())}đ
               </div>
             </div>
           </div>

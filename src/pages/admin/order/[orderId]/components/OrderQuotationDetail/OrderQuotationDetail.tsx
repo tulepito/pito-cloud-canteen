@@ -152,8 +152,8 @@ const OrderQuotationDetail: React.FC<OrderQuotationDetailProps> = (props) => {
   const handleDownloadPriceQuotation = useDownloadPriceQuotation({
     orderTitle: Listing(order).getAttributes().title,
     priceQuotationData: priceQuotationData as any,
-    isPartnerQuotation: true,
-    subOrderDate: currentSubOrderDate,
+    isPartnerQuotation: isPartner,
+    subOrderDate: isPartner ? currentSubOrderDate : undefined,
   });
 
   return (

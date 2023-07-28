@@ -233,7 +233,6 @@ export const formatPriceQuotationDataPartner = ({
     promotion,
     totalWithVAT,
     VATFee,
-    serviceFeePrice,
   } = priceQuotation;
 
   const customerData = {
@@ -255,7 +254,6 @@ export const formatPriceQuotationDataPartner = ({
     },
     cartData: {
       serviceFee: `${parseThousandNumber(serviceFee)}đ`,
-      serviceFeePrice: `${parseThousandNumber(serviceFeePrice)}đ`,
       totalPrice: `${parseThousandNumber(totalPrice)}đ`,
       promotion: `${parseThousandNumber(promotion)}đ`,
       totalWithVAT: `${parseThousandNumber(totalWithVAT)}đ`,
