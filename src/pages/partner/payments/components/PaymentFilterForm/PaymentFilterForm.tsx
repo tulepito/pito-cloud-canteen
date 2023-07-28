@@ -9,6 +9,7 @@ import Form from '@components/Form/Form';
 import FieldCheckboxGroup from '@components/FormFields/FieldCheckboxGroup/FieldCheckboxGroup';
 import FieldDatePicker from '@components/FormFields/FieldDatePicker/FieldDatePicker';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
+import IconClose from '@components/Icons/IconClose/IconClose';
 import IconSearch from '@components/Icons/IconSearch/IconSearch';
 
 import css from './PaymentFilterForm.module.scss';
@@ -49,6 +50,7 @@ const PaymentFilterFormComponent: React.FC<TPaymentFilterFormComponentProps> = (
 
   const setStartDate = (date: number) => {
     form.change('startDate', date);
+
     if (values.endDate) {
       form.change('endDate', undefined);
     }
@@ -59,75 +61,78 @@ const PaymentFilterFormComponent: React.FC<TPaymentFilterFormComponentProps> = (
 
   return (
     <Form onSubmit={handleSubmit}>
-      <div className={css.fieldInput}>
-        <FieldTextInput
-          id="partnerName"
-          name="partnerName"
-          label="Tên đối tác"
-          labelClassName={css.label}
-          placeholder="Tìm kiếm đối tác"
-          leftIcon={<IconSearch />}
-        />
+      <div>
+        <IconClose />
       </div>
-      <div className={css.fieldInput}>
-        <FieldTextInput
-          id="orderTitle"
-          name="orderTitle"
-          label="Mã đơn hàng"
-          labelClassName={css.label}
-          placeholder="Tìm kiếm đơn hàng"
-          leftIcon={<IconSearch />}
-        />
-      </div>
-      <div className={css.fieldInput}>
-        <label className={css.label}>
-          <FormattedMessage id="ManageOrderPage.createDateLabel" />
-        </label>
-        <div className={css.dateInputs}>
-          <FieldDatePicker
-            id="startDate"
-            name="startDate"
-            selected={values.startDate}
-            onChange={setStartDate}
-            className={css.dateInput}
-            dateFormat={'dd MMMM, yyyy'}
-            placeholderText={'Từ'}
-            autoComplete="off"
-          />
-          <FieldDatePicker
-            id="endDate"
-            name="endDate"
-            onChange={setEndDate}
-            className={css.dateInput}
-            selected={values.endDate}
-            dateFormat={'dd MMMM, yyyy'}
-            placeholderText={'Đến'}
-            autoComplete="off"
-            minDate={minEndDate}
-            disabled={!values.startDate}
+      <div>
+        <div className={css.fieldInput}>
+          <FieldTextInput
+            id="orderName"
+            name="orderName"
+            label="Tên đơn hàng"
+            labelClassName={css.label}
+            placeholder="Tìm kiếm đơn hàng"
+            leftIcon={<IconSearch />}
           />
         </div>
-      </div>
-
-      <div className={css.fieldInput}>
-        <label className={css.label}>Trạng thái</label>
-        <FieldCheckboxGroup
-          istClassName={css.checkboxGroup}
-          id="EditCompanySettingsInformationForm.mealSetting"
-          options={PAYMENT_STATUS_OPTIONS}
-          name="status"
-        />
-      </div>
-
-      <div className={css.btnsWrapper}>
-        <Button
-          variant="secondary"
-          type="button"
-          className={css.btn}
-          onClick={handleClearFilters}>
-          Xoá bộ lọc
-        </Button>
-        <Button className={css.btn}>Áp dụng</Button>
+        <div className={css.fieldInput}>
+          <FieldTextInput
+            id="orderTitle"
+            name="orderTitle"
+            label="Mã đơn hàng"
+            labelClassName={css.label}
+            placeholder="Tìm kiếm đơn hàng"
+            leftIcon={<IconSearch />}
+          />
+        </div>
+        <div className={css.fieldInput}>
+          <label className={css.label}>
+            <FormattedMessage id="ManagePaymentsPage.createDateLabel" />
+          </label>
+          <div className={css.dateInputs}>
+            <FieldDatePicker
+              id="startDate"
+              name="startDate"
+              selected={values.startDate}
+              onChange={setStartDate}
+              className={css.dateInput}
+              dateFormat={'dd MMMM, yyyy'}
+              placeholderText={'Từ'}
+              autoComplete="off"
+            />
+            <FieldDatePicker
+              id="endDate"
+              name="endDate"
+              onChange={setEndDate}
+              className={css.dateInput}
+              selected={values.endDate}
+              dateFormat={'dd MMMM, yyyy'}
+              placeholderText={'Đến'}
+              autoComplete="off"
+              minDate={minEndDate}
+              disabled={!values.startDate}
+            />
+          </div>
+        </div>
+        <div className={css.fieldInput}>
+          <label className={css.label}>Trạng thái</label>
+          <FieldCheckboxGroup
+            istClassName={css.checkboxGroup}
+            id="PaymentFilterForm.status"
+            options={PAYMENT_STATUS_OPTIONS}
+            name="status"
+          />
+        </div>
+        <div className={css.btnsWrapper}>
+          <Button
+            variant="secondary"
+            type="button"
+            className={css.btn}
+            onClick={handleClearFilters}>
+            Xoá bộ lọc
+          </Button>
+          <Button className={css.btn}>Áp dụng</Button>
+        </div>{' '}
       </div>
     </Form>
   );

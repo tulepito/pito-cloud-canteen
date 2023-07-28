@@ -6,12 +6,12 @@ import isEmpty from 'lodash/isEmpty';
 
 import Badge, { EBadgeType } from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
-import IconClose from '@components/Icons/IconClose/IconClose';
+import IconDownload from '@components/Icons/IconDownload/IconDownload';
 import IconFilter from '@components/Icons/IconFilter/IconFilter';
-import IntegrationFilterModal from '@components/IntegrationFilterModal/IntegrationFilterModal';
 import NamedLink from '@components/NamedLink/NamedLink';
 import type { TColumn } from '@components/Table/Table';
 import { TableForm } from '@components/Table/Table';
+import Tooltip from '@components/Tooltip/Tooltip';
 import { parseThousandNumber } from '@helpers/format';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
@@ -25,28 +25,6 @@ import { filterPayments, makeExcelFile } from './helpers/paymentPartner';
 import { PartnerManagePaymentsThunks } from './PartnerManagePayments.slice';
 
 import css from './ManagePayments.module.scss';
-
-const getFilterLabelText = (key: string, value: string | string[]) => {
-  switch (key) {
-    case 'partnerName':
-      return value;
-    case 'startDate':
-    case 'endDate':
-      return formatTimestamp(+value);
-    case 'status':
-      return Array.isArray(value)
-        ? value
-            .map((item: string) =>
-              item === 'isPaid' ? 'Đã thanh toán' : 'Chưa thanh toán',
-            )
-            .join(', ')
-        : value === 'isPaid'
-        ? 'Đã thanh toán'
-        : 'Chưa thanh toán';
-    default:
-      return value;
-  }
-};
 
 const ManagePaymentsPage = () => {
   const intl = useIntl();
@@ -209,16 +187,12 @@ const ManagePaymentsPage = () => {
     dispatch(PartnerManagePaymentsThunks.loadData());
   }, [dispatch]);
 
-  const onClearFilters = () => {
-    setFilters({});
-  };
+  // const onRemoveFilter = (key: string) => () => {
+  //   const currentFilters = { ...filters };
+  //   delete currentFilters[key];
 
-  const onRemoveFilter = (key: string) => () => {
-    const currentFilters = { ...filters };
-    delete currentFilters[key];
-
-    setFilters(currentFilters);
-  };
+  //   setFilters(currentFilters);
+  // };
 
   const getExposeValues = ({ values }: any) => {
     // need set timeout here to wait FormSpy render first to avoid React warning
@@ -239,52 +213,42 @@ const ManagePaymentsPage = () => {
     }
   };
 
-  const filterLabels = Object.keys(filters).map((key) => {
-    return (
-      <div key={`${key}-${filters[key]}`} className={css.filterLabel}>
-        <span>
-          {intl.formatMessage({
-            id: `ManagePaymentsPage.filterLabels.${key}`,
-          })}
-          {' :'}
-        </span>{' '}
-        <span>{getFilterLabelText(key, filters[key])}</span>
-        <IconClose className={css.iconClose} onClick={onRemoveFilter(key)} />
-      </div>
-    );
-  });
-
   return (
     <div className={css.root}>
       <div className={css.header}>
         <h1 className={css.title}>{title}</h1>
       </div>
-      <div className={css.filterForm}>
-        <IntegrationFilterModal
-          onClear={onClearFilters}
-          leftFilters={
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={filterPaymentModalController.setTrue}
-              className={css.filterButton}>
-              <IconFilter className={css.filterIcon} />
-              <FormattedMessage id="IntegrationFilterModal.filterMessage" />
-            </Button>
+      <div className={css.actionSection}>
+        <Tooltip
+          overlayClassName={css.filterBtnTooltipOverlay}
+          tooltipContent={
+            <PaymentFilterModal
+              isOpen={filterPaymentModalController.value}
+              onClose={filterPaymentModalController.setFalse}
+              setFilters={setFilters}
+            />
           }
-          rightFilters={
-            <>
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={onDownloadPaymentList}>
-                <FormattedMessage id="ManagePaymentsPage.actionButton.downloadPayment" />
-              </Button>
-            </>
-          }
-        />
+          trigger="click"
+          placement="bottom">
+          <Button variant="secondary" className={css.filterButton}>
+            <div className={css.iconContainer}>
+              <IconFilter className={css.icon} />
+            </div>
+            <FormattedMessage id="ManagePaymentsPage.filterButtonText" />
+          </Button>
+        </Tooltip>
+
+        <Button
+          variant="secondary"
+          className={css.downloadButton}
+          onClick={onDownloadPaymentList}>
+          <div className={css.iconContainer}>
+            <IconDownload variant="normal" className={css.icon} />
+          </div>
+          <FormattedMessage id="ManagePaymentsPage.downloadButtonText" />
+        </Button>
       </div>
-      <div className={css.filterLabels}>{filterLabels}</div>
+
       <div className={css.tableWrapper}>
         <TableForm
           columns={TABLE_COLUMNS}
@@ -297,12 +261,6 @@ const ManagePaymentsPage = () => {
           onCustomPageChange={setPage}
         />
       </div>
-
-      <PaymentFilterModal
-        isOpen={filterPaymentModalController.value}
-        onClose={filterPaymentModalController.setFalse}
-        setFilters={setFilters}
-      />
     </div>
   );
 };
