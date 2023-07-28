@@ -375,7 +375,7 @@ const createPartnerPaymentRecord = createAsyncThunk(
     };
     const { data: newPaymentRecord } = await createPaymentRecordApi(apiBody);
     const currentPaymentRecordsBySubOrder =
-      partnerPaymentRecords[subOrderDate] || {};
+      partnerPaymentRecords[subOrderDate] || [];
     const newPartnerPaymentRecords = {
       ...partnerPaymentRecords,
       [subOrderDate]: [newPaymentRecord, ...currentPaymentRecordsBySubOrder],
