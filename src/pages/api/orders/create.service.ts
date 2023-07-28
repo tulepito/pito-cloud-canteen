@@ -125,6 +125,7 @@ const createOrder = async ({
       ...(shouldUpdateOrderName
         ? {
             publicData: {
+              companyName,
               orderName: `${companyName}_${formatTimestamp(
                 generalInfo.startDate,
               )} - ${formatTimestamp(generalInfo.endDate)}`,
