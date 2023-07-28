@@ -262,6 +262,7 @@ export const participantPaths = {
 export const partnerPaths = {
   Home: '/partner',
   ManageOrders: '/partner/orders',
+  ManagePayments: '/partner/payments',
   SubOrderDetail: '/partner/orders/[subOrderId]',
 };
 
@@ -278,5 +279,9 @@ export const partnerRoutes = {
   SubOrderDetail: {
     path: partnerPaths.SubOrderDetail,
     label: 'Chi tiết đơn hàng',
+  },
+  ManagePayments: {
+    path: partnerPaths.ManagePayments,
+    label: 'Thanh toán',
   },
 };

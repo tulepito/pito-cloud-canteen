@@ -1253,6 +1253,7 @@
   "PartnerSidebar.dashboardLabel": "Trang chủ",
   "PartnerSidebar.manageOrdersLabel": "Danh sách đơn hàng",
   "PartnerSidebar.orderPageLabel": "Danh sách đơn hàng",
+  "PartnerSidebar.paymentLabel": "Thanh toán",
   "PasswordRecoveryForm.description": "Vui lòng nhập email khách hàng dùng để đăng kí tài khoản PITO",
   "PasswordRecoveryForm.email.invalid": "Vui lòng nhập đúng địa chỉ Email",
   "PasswordRecoveryForm.email.label": "Email",
