@@ -324,7 +324,7 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
                     data={editViewData.manageParticipantData}
                     ableToUpdateOrder
                   />
-                  <RenderWhen condition={isPickingState || isDraftEditing}>
+                  <RenderWhen condition={isDraftEditing}>
                     <SubOrderChangesHistorySection
                       className={css.container}
                       querySubOrderChangesHistoryInProgress={
@@ -367,7 +367,7 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
                     minQuantity={minQuantity}
                     isAdminFlow
                   />
-                  {isDraftEditing && (
+                  <RenderWhen condition={isDraftEditing}>
                     <SubOrderChangesHistorySection
                       className={classNames(
                         css.historyContainer,
@@ -392,7 +392,7 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
                         loadMoreSubOrderChangesHistory
                       }
                     />
-                  )}
+                  </RenderWhen>
                 </div>
               </RenderWhen.False>
             </RenderWhen>
