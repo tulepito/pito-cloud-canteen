@@ -4,6 +4,7 @@ import { updateParticipantOrderApi } from '@apis/index';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { userThunks } from '@redux/slices/user.slice';
 import { denormalisedResponseEntities, Listing } from '@src/utils/data';
+import { EImageVariants } from '@src/utils/enums';
 import { storableError } from '@utils/errors';
 import type { TListing, TObject, TUser } from '@utils/types';
 
@@ -41,6 +42,7 @@ const initialState: TParticipantOrderManagementState = {
 const loadData = createAsyncThunk(
   LOAD_DATA,
   async (orderId: string, { dispatch, extra: sdk }) => {
+    let returnValues = {};
     const order = denormalisedResponseEntities(
       await sdk.listings.show(
         {
@@ -50,7 +52,7 @@ const loadData = createAsyncThunk(
       ),
     )[0];
     const orderListing = Listing(order);
-    const { plans = [] } = orderListing.getMetadata();
+    const { plans = [], companyId } = orderListing.getMetadata();
     const plan = denormalisedResponseEntities(
       await sdk.listings.show(
         {
@@ -69,13 +71,31 @@ const loadData = createAsyncThunk(
         ids: allRelatedRestaurantsIdList,
       }),
     );
-    await dispatch(userThunks.fetchCurrentUser({}));
-
-    return {
+    returnValues = {
       order,
       plans: [plan],
       restaurants: allRelatedRestaurants,
     };
+
+    if (companyId) {
+      const company =
+        (denormalisedResponseEntities(
+          await sdk.users.show(
+            {
+              id: companyId,
+              include: ['profileImage'],
+              'fields.image': [`variants.${EImageVariants.squareSmall}`],
+            },
+            { expand: true },
+          ),
+        ) || [])[0] || {};
+
+      returnValues = { ...returnValues, company };
+    }
+
+    await dispatch(userThunks.fetchCurrentUser({}));
+
+    return returnValues;
   },
   {
     serializeError: storableError,
