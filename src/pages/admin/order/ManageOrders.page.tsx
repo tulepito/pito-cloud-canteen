@@ -152,8 +152,8 @@ const renderBadgeForSubOrder = (
   return (
     <Badge
       labelClassName={css.badgeLabelLight}
-      type={EBadgeType.strongDanger}
-      label="Huỷ đơn"
+      type={EBadgeType.strongSuccess}
+      label="Đã giao hàng"
     />
   );
 };

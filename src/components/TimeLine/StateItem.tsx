@@ -39,7 +39,7 @@ const StateItem: React.FC<TStateItemProps> = ({
   } else if (txIsDelivering(tx)) {
     stateComponent = <IconDelivering className={css.icon} />;
   } else if (txIsDeliveryFailed(tx)) {
-    stateComponent = <IconCancel className={css.icon} />;
+    stateComponent = <IconTickWithBackground className={css.icon} />;
   } else if (txIsCanceled(tx)) {
     stateComponent = <IconCancel className={css.icon} />;
   }
