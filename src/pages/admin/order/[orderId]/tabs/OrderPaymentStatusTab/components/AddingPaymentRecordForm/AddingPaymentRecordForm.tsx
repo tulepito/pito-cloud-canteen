@@ -143,7 +143,7 @@ const AddingPaymentRecordFormComponent: React.FC<
       } else {
         form.change(
           'paymentAmount',
-          parseThousandNumber((totalPrice * percentage) / 100),
+          parseThousandNumber(Math.floor((totalPrice * percentage) / 100)),
         );
       }
     }
