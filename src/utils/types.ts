@@ -688,3 +688,17 @@ export type TSubOrderChangeHistoryItem = {
   planOrderDate?: Date;
   type?: EOrderHistoryTypes;
 };
+
+export type TPaymentRecord = {
+  id: string;
+  SKU: string;
+  amount: number;
+  paymentNote: string;
+  orderId: string;
+  partnerId?: string;
+  partnerName?: string;
+  subOrderDate?: number;
+  companyName?: string;
+  orderTitle?: string;
+  createdAt?: Date;
+};

@@ -63,6 +63,7 @@ type TTableProps = TDefaultProps & {
   afterCheckboxChangeHandler?: (e: any, rowCheckboxValues: any) => void;
   extraRows?: ReactNode;
   tableWrapperClassName?: string;
+  onCustomPageChange?: (page: number) => void;
 };
 
 const getUniqueString = (list: string[]) => {
@@ -94,19 +95,24 @@ const Table = (props: TTableProps) => {
     afterCheckboxChangeHandler,
     extraRows,
     tableWrapperClassName,
+    onCustomPageChange,
   } = props;
 
   const tableClasses = classNames(css.table, tableClassName);
   const router = useRouter();
 
   const onPageChange = (page: number) => {
-    router.push({
-      pathname: paginationPath,
-      query: {
-        ...router.query,
-        page,
-      },
-    });
+    if (typeof onCustomPageChange === 'function') {
+      onCustomPageChange(page);
+    } else {
+      router.push({
+        pathname: paginationPath,
+        query: {
+          ...router.query,
+          page,
+        },
+      });
+    }
   };
 
   const customOnChangeCheckAllCheckbox = (e: any) => {
