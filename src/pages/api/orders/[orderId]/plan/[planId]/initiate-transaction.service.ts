@@ -1,3 +1,5 @@
+import uniq from 'lodash/uniq';
+
 import {
   normalizeOrderDetail,
   prepareNewPlanOrderDetail,
@@ -61,6 +63,7 @@ export const initiateTransaction = async ({
   });
 
   const transactionMap: TObject = {};
+  const partnerIds: string[] = [];
   // Initiate transaction for each date
   await Promise.all(
     normalizedOrderDetail.map(async (item, index) => {
@@ -75,6 +78,7 @@ export const initiateTransaction = async ({
         },
         date,
       } = item;
+      partnerIds.push(listingId);
 
       const createTxResponse = await subAccountTrustedSdk.transactions.initiate(
         {
@@ -108,6 +112,14 @@ export const initiateTransaction = async ({
     id: planId,
     metadata: {
       orderDetail: prepareNewPlanOrderDetail(planOrderDetail, transactionMap),
+    },
+  });
+
+  // Update list of partnerIDs
+  integrationSdk.listings.update({
+    id: orderId,
+    metadata: {
+      partnerIds: uniq(partnerIds),
     },
   });
 };

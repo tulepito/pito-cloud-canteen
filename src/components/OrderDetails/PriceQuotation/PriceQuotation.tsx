@@ -13,6 +13,7 @@ import OrderDetailSection from './OrderDetailSection';
 import css from './PriceQuotation.module.scss';
 
 type TPriceQuotationProps = {
+  isPartnerQuotation?: boolean;
   data: {
     customerData: Partial<TReviewInfoFormValues> & {
       email: string;
@@ -40,7 +41,10 @@ type TPriceQuotationProps = {
   };
 };
 
-const PriceQuotation: React.FC<TPriceQuotationProps> = ({ data }) => {
+const PriceQuotation: React.FC<TPriceQuotationProps> = ({
+  isPartnerQuotation = false,
+  data,
+}) => {
   const {
     customerData,
     cartData,
@@ -72,7 +76,10 @@ const PriceQuotation: React.FC<TPriceQuotationProps> = ({ data }) => {
       </div>
       <div className={css.contentContainer}>
         <InfoSection id={'infoSection'} {...infoSectionData} />
-        <CartSection id={'summaryPrice'} {...cartData} />
+        <CartSection
+          id={'summaryPrice'}
+          {...{ ...cartData, isPartnerQuotation }}
+        />
         <OrderDetailSection itemId="quoteItem" {...orderDetailData} />
       </div>
     </div>

@@ -40,7 +40,7 @@ export const startOrder = async (orderId: string) => {
     { expand: true },
   );
 
-  await emailSendingFactory(EmailTemplateTypes.BOOKER.BOOKER_ORDER_SUCCESS, {
+  emailSendingFactory(EmailTemplateTypes.BOOKER.BOOKER_ORDER_SUCCESS, {
     orderId,
   });
 };

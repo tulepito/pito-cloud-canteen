@@ -1,4 +1,5 @@
 import isEmpty from 'lodash/isEmpty';
+import pick from 'lodash/pick';
 
 import {
   getFoodDataMap,
@@ -17,14 +18,20 @@ import type { TListing, TObject, TQuotation } from '@utils/types';
 export const calculateTotalPriceAndDishes = ({
   orderDetail = {},
   isGroupOrder,
+  date,
 }: {
   orderDetail: TObject;
   isGroupOrder: boolean;
+  date?: number | string;
 }) => {
   return isGroupOrder
     ? Object.entries<TObject>(orderDetail).reduce<TObject>(
         (result, currentOrderDetailEntry) => {
-          const [, rawOrderDetailOfDate] = currentOrderDetailEntry;
+          const [dateKey, rawOrderDetailOfDate] = currentOrderDetailEntry;
+          if (date && date?.toString() !== dateKey) {
+            return result;
+          }
+
           const {
             memberOrders,
             restaurant = {},
@@ -52,13 +59,15 @@ export const calculateTotalPriceAndDishes = ({
       )
     : Object.entries<TObject>(orderDetail).reduce<TObject>(
         (result, currentOrderDetailEntry) => {
-          const [, rawOrderDetailOfDate] = currentOrderDetailEntry;
+          const [dateKey, rawOrderDetailOfDate] = currentOrderDetailEntry;
           const { lineItems = [], status } = rawOrderDetailOfDate;
 
-          if (status === ESubOrderStatus.CANCELED) {
+          if (
+            (dateKey && date?.toString() !== dateKey) ||
+            status === ESubOrderStatus.CANCELED
+          ) {
             return result;
           }
-
           const totalInfo = lineItems.reduce(
             (
               res: {
@@ -94,10 +103,16 @@ export const calculatePriceQuotationInfo = ({
   planOrderDetail = {},
   order,
   currentOrderVATPercentage,
+  currentOrderServiceFeePercentage = 0,
+  date,
+  shouldIncludePITOFee = true,
 }: {
   planOrderDetail: TObject;
   order: TObject;
   currentOrderVATPercentage: number;
+  date?: number | string;
+  shouldIncludePITOFee?: boolean;
+  currentOrderServiceFeePercentage?: number;
 }) => {
   const {
     packagePerMember = 0,
@@ -112,6 +127,7 @@ export const calculatePriceQuotationInfo = ({
   ).reduce<TObject>((result, currentOrderDetailEntry) => {
     const [subOrderDate, rawOrderDetailOfDate] = currentOrderDetailEntry;
     const { status, transactionId } = rawOrderDetailOfDate;
+
     if (
       status === ESubOrderStatus.CANCELED ||
       (!transactionId && isOrderInProgress)
@@ -126,45 +142,53 @@ export const calculatePriceQuotationInfo = ({
       },
     };
   }, {});
-  const actualPCCFee = Object.values(currentOrderDetail).reduce(
-    (result, currentOrderDetailOfDate) => {
-      const { memberOrders, lineItems = [] } = currentOrderDetailOfDate;
-      const memberAmountOfDate = isGroupOrder
-        ? Object.values(memberOrders).reduce(
-            (resultOfDate: number, currentMemberOrder: any) => {
-              const { foodId, status: memberStatus } = currentMemberOrder;
-              if (foodId && memberStatus === EParticipantOrderStatus.joined) {
-                return resultOfDate + 1;
-              }
+  const actualPCCFee = shouldIncludePITOFee
+    ? Object.values(currentOrderDetail).reduce(
+        (result, currentOrderDetailOfDate) => {
+          const { memberOrders, lineItems = [] } = currentOrderDetailOfDate;
+          const memberAmountOfDate = isGroupOrder
+            ? Object.values(memberOrders).reduce(
+                (resultOfDate: number, currentMemberOrder: any) => {
+                  const { foodId, status: memberStatus } = currentMemberOrder;
+                  if (
+                    foodId &&
+                    memberStatus === EParticipantOrderStatus.joined
+                  ) {
+                    return resultOfDate + 1;
+                  }
 
-              return resultOfDate;
-            },
-            0,
-          )
-        : lineItems.reduce((res: number, item: TObject) => {
-            return res + (item?.quantity || 1);
-          }, 0);
+                  return resultOfDate;
+                },
+                0,
+              )
+            : lineItems.reduce((res: number, item: TObject) => {
+                return res + (item?.quantity || 1);
+              }, 0);
 
-      return result + getPCCFeeByMemberAmount(memberAmountOfDate);
-    },
-    0,
-  );
+          return result + getPCCFeeByMemberAmount(memberAmountOfDate);
+        },
+        0,
+      )
+    : 0;
 
   const { totalPrice = 0, totalDishes = 0 } = calculateTotalPriceAndDishes({
     orderDetail: planOrderDetail,
     isGroupOrder,
+    date,
   });
 
   const PITOPoints = Math.floor(totalPrice / 100000);
   const isOverflowPackage = totalDishes * packagePerMember < totalPrice;
-  const serviceFee = 0;
+  const serviceFee = date
+    ? Math.round(totalPrice * currentOrderServiceFeePercentage)
+    : 0;
   const transportFee = 0;
   const promotion = 0;
 
   const PITOFee = actualPCCFee;
 
   const totalWithoutVAT =
-    totalPrice + serviceFee + transportFee + PITOFee - promotion;
+    totalPrice - serviceFee + transportFee + PITOFee - promotion;
   const VATFee = Math.round(totalWithoutVAT * currentOrderVATPercentage);
   const totalWithVAT = VATFee + totalWithoutVAT;
   const overflow = isOverflowPackage
@@ -233,10 +257,16 @@ export const calculatePriceQuotationInfoFromQuotation = ({
   quotation,
   packagePerMember,
   currentOrderVATPercentage,
+  currentOrderServiceFeePercentage = 0,
+  date,
+  partnerId,
 }: {
   quotation: TListing;
   packagePerMember: number;
   currentOrderVATPercentage: number;
+  currentOrderServiceFeePercentage?: number;
+  date?: number | string;
+  partnerId?: string;
 }) => {
   const quotationListingGetter = Listing(quotation);
   const { client, partner } = quotationListingGetter.getMetadata();
@@ -244,12 +274,20 @@ export const calculatePriceQuotationInfoFromQuotation = ({
     return {};
   }
 
-  const { quotation: clientQuotation } = client;
+  const isPartnerFlow = date && partnerId;
+
+  const clientQuotation = client.quotation;
+  const partnerQuotation = isPartnerFlow
+    ? pick(partner[partnerId].quotation, date)
+    : {};
+
   const {
     totalPrice = 0,
     totalDishes = 0,
-    PITOFee,
-  }: any = Object.values(clientQuotation).reduce(
+    PITOFee = 0,
+  }: any = Object.values(
+    isPartnerFlow ? partnerQuotation : clientQuotation,
+  ).reduce(
     (result: any, subOrder: any) => {
       const { subOrderTotalPrice, subOrderTotalDished } = subOrder.reduce(
         (subOrderResult: any, item: any) => {
@@ -267,7 +305,9 @@ export const calculatePriceQuotationInfoFromQuotation = ({
         },
       );
 
-      const subOrderPITOFee = getPCCFeeByMemberAmount(subOrderTotalDished);
+      const subOrderPITOFee = isPartnerFlow
+        ? 0
+        : getPCCFeeByMemberAmount(subOrderTotalDished);
 
       return {
         totalPrice: result.totalPrice + subOrderTotalPrice,
@@ -284,11 +324,13 @@ export const calculatePriceQuotationInfoFromQuotation = ({
 
   const PITOPoints = Math.floor(totalPrice / 100000);
   const isOverflowPackage = totalDishes * packagePerMember < totalPrice;
-  const serviceFee = 0;
+  const serviceFee = isPartnerFlow
+    ? currentOrderServiceFeePercentage * totalPrice
+    : 0;
   const transportFee = 0;
   const promotion = 0;
   const totalWithoutVAT =
-    totalPrice + serviceFee + transportFee + PITOFee - promotion;
+    totalPrice - serviceFee + transportFee + PITOFee - promotion;
   const VATFee = Math.round(totalWithoutVAT * currentOrderVATPercentage || 0);
   const totalWithVAT = VATFee + totalWithoutVAT;
   const overflow = isOverflowPackage

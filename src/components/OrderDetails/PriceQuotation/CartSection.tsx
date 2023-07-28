@@ -13,11 +13,13 @@ type TCartSectionProps = {
   PITOFee?: string;
   VATFee: string;
   currentOrderVATPercentage: number;
+  isPartnerQuotation?: boolean;
 };
 
 const CartSection: React.FC<TCartSectionProps> = (props) => {
   const {
     id,
+    serviceFee,
     serviceFeePrice,
     totalPrice,
     promotion,
@@ -26,6 +28,7 @@ const CartSection: React.FC<TCartSectionProps> = (props) => {
     // transportFee,
     VATFee,
     currentOrderVATPercentage,
+    isPartnerQuotation = false,
   } = props;
   const intl = useIntl();
 
@@ -68,11 +71,13 @@ const CartSection: React.FC<TCartSectionProps> = (props) => {
           <div>
             {intl.formatMessage({
               id: `BookerOrderDetailsPriceQuotation.cartSection.rowLabel.${
-                PITOFee ? 'PITOFee' : 'serviceCost'
+                !isPartnerQuotation ? 'PITOFee' : 'serviceCost'
               }`,
             })}
           </div>
-          <div>{PITOFee || serviceFeePrice}</div>
+          <div>
+            {isPartnerQuotation ? serviceFeePrice || serviceFee : PITOFee}
+          </div>
         </div>
         {/* <div className={css.tableRow}>
           <div>3</div>

@@ -162,7 +162,7 @@ const deadlineTimeOptions = [
   '18:00',
 ];
 
-const VATPercentage = 0.1;
+const VATPercentage = 0;
 
 const marketplacePhoneNumber = '1900 252 530';
 

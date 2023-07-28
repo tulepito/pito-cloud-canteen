@@ -90,12 +90,12 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
 
   const { orderTitle, priceQuotationData, editViewData, reviewViewData } =
     // eslint-disable-next-line react-hooks/rules-of-hooks
-    usePrepareOrderDetailPageData();
+    usePrepareOrderDetailPageData({});
 
-  const handleDownloadPriceQuotation = useDownloadPriceQuotation(
+  const handleDownloadPriceQuotation = useDownloadPriceQuotation({
     orderTitle,
     priceQuotationData,
-  );
+  });
 
   const tabItems = useMemo(
     () => {
