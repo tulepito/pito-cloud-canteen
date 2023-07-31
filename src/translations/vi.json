@@ -1609,6 +1609,7 @@
   "SubOrderTitle.mainTitle": "Đơn hàng {orderTitle}",
   "SubOrderTitle.note": "Nếu có bất cứ thay đổi hoặc yêu cầu liên quan đến đơn hàng, vui lòng liên hệ hotline {phoneNumber}.",
   "SubOrderTitle.phoneNumber": "1900252530",
+  "Table.noResults": "Không có kết quả",
   "Toolbar.action.pickForMe": "Chọn giúp tôi",
   "Toolbar.action.today": "Hôm nay",
   "Toolbar.viewMode.month": "Tháng",
