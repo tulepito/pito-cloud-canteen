@@ -15,7 +15,7 @@ export const participantSubOrderGetDocumentApi = async (
   participantId: string,
   txStatus: string,
   limitRecords?: number,
-  lastRecord?: number,
+  lastRecord?: number | null,
 ) =>
   getApi(`/participants/document`, {
     participantId,
