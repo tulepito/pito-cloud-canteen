@@ -18,6 +18,11 @@
   text-overflow: ellipsis;
 }
 
+.clientLabel {
+  @include flexAlign(center);
+  gap: 8px;
+}
+
 .tooltipOverlay {
   background-color: $neutralGray1;
 

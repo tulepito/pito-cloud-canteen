@@ -161,9 +161,17 @@ const OrderPaymentStatusTab: React.FC<OrderPaymentStatusTabProps> = (props) => {
 
   const clientPaidAmount =
     calculatePaidAmountBySubOrderDate(clientPaymentRecords);
+  const showClientCheckmark = clientTotalPrice === clientPaidAmount;
   const clientTabItem = {
     key: 'client',
-    label: 'Khách hàng',
+    label: (
+      <div className={css.clientLabel}>
+        <span>Khách hàng</span>
+        <RenderWhen condition={showClientCheckmark}>
+          <IconCheckmarkWithCircle className={css.checkIcon} />
+        </RenderWhen>
+      </div>
+    ),
     childrenFn: (childProps: any) => <ClientPaymentDetail {...childProps} />,
     childrenProps: {
       totalWithVAT: clientTotalPrice,
