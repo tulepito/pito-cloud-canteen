@@ -15,11 +15,11 @@ import IconSearch from '@components/Icons/IconSearch/IconSearch';
 import css from './PaymentFilterForm.module.scss';
 
 export type TPaymentFilterFormValues = {
-  partnerName?: string;
-  orderTitle?: string;
-  startDate?: number;
-  endDate?: number;
-  status?: string[];
+  subOrderName: string;
+  orderTitle: string;
+  startDate: number;
+  endDate: number;
+  status: string[];
 };
 
 const PAYMENT_STATUS_OPTIONS = [
@@ -34,7 +34,8 @@ const PAYMENT_STATUS_OPTIONS = [
 ];
 
 type TExtraProps = {
-  handleClearFilters: () => void;
+  onClearFilters: () => void;
+  onClose: () => void;
 };
 type TPaymentFilterFormComponentProps =
   FormRenderProps<TPaymentFilterFormValues> & Partial<TExtraProps>;
@@ -44,7 +45,13 @@ type TPaymentFilterFormProps = FormProps<TPaymentFilterFormValues> &
 const PaymentFilterFormComponent: React.FC<TPaymentFilterFormComponentProps> = (
   props,
 ) => {
-  const { handleSubmit, form, values, handleClearFilters } = props;
+  const {
+    handleSubmit,
+    form,
+    values,
+    onClearFilters: handleClearFiltersFromProps,
+    onClose,
+  } = props;
 
   const minEndDate = addDays(values.startDate!, 1);
 
@@ -59,17 +66,25 @@ const PaymentFilterFormComponent: React.FC<TPaymentFilterFormComponentProps> = (
     form.change('endDate', date);
   };
 
+  const handleClearFilters = () => {
+    form.reset();
+
+    if (handleClearFiltersFromProps) {
+      handleClearFiltersFromProps();
+    }
+  };
+
   return (
     <Form onSubmit={handleSubmit}>
       <div className={css.closeContainer}>
         <div>Lọc</div>
-        <IconClose className={css.iconClose} />
+        <IconClose className={css.iconClose} onClick={onClose} />
       </div>
       <div>
         <div className={css.fieldInput}>
           <FieldTextInput
-            id="orderName"
-            name="orderName"
+            id="subOrderName"
+            name="subOrderName"
             label="Tên đơn hàng"
             labelClassName={css.label}
             placeholder="Tìm kiếm đơn hàng"
