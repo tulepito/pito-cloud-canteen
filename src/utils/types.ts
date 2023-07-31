@@ -3,7 +3,7 @@ import type Decimal from 'decimal.js';
 import type { NextPage } from 'next';
 
 import { types as sdkLoader } from '@sharetribe/sdk';
-import type { adminRoutes } from '@src/paths';
+import type { adminRoutes, partnerRoutes } from '@src/paths';
 
 import type {
   EAvailabilityPlans,
@@ -432,6 +432,7 @@ export type TFormLabel =
   | string;
 
 export type AdminRouteKey = keyof typeof adminRoutes;
+export type PartnerRouteKey = keyof typeof partnerRoutes;
 
 export type TAddress = {
   predictions: any[];
@@ -687,4 +688,18 @@ export type TSubOrderChangeHistoryItem = {
   planId?: string;
   planOrderDate?: Date;
   type?: EOrderHistoryTypes;
+};
+
+export type TPaymentRecord = {
+  id: string;
+  SKU: string;
+  amount: number;
+  paymentNote: string;
+  orderId: string;
+  partnerId?: string;
+  partnerName?: string;
+  subOrderDate?: number;
+  companyName?: string;
+  orderTitle?: string;
+  createdAt?: Date;
 };

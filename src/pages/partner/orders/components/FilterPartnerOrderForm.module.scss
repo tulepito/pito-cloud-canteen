@@ -1,0 +1,39 @@
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/vars.scss' as *;
+
+.form {
+  display: flex;
+  row-gap: 20px;
+  flex-direction: column;
+}
+
+.fieldContainer {
+  &:nth-of-type(3) {
+    display: flex;
+    row-gap: 8px;
+    flex-direction: column;
+
+    .fieldContainerRow {
+      display: flex;
+      row-gap: 8px;
+      flex-direction: row;
+      max-width: 300px;
+      justify-content: space-between;
+
+      & * {
+        flex-basis: 132px;
+      }
+    }
+  }
+}
+
+.fieldLabel {
+  color: $neutralGray6;
+  @include textTemplate(14px, 600, 20px);
+}
+
+.submitBtn {
+  width: 160px;
+  margin: 0 auto;
+}

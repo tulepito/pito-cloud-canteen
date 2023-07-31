@@ -30,6 +30,10 @@ const PerPackageField: React.FC<PerPackageFieldProps> = (props) => {
     id: 'PerPackageField.perPackGreaterThanOneThousand',
   });
 
+  const handleParseNumber = (value: string) => {
+    return parseThousandNumber(value);
+  };
+
   return (
     <div className={css.container}>
       {title && <div className={css.fieldTitle}>{title}</div>}
@@ -40,7 +44,7 @@ const PerPackageField: React.FC<PerPackageFieldProps> = (props) => {
           label={intl.formatMessage({
             id: 'PerPackageField.label',
           })}
-          parse={parseThousandNumber}
+          parse={handleParseNumber}
           placeholder={intl.formatMessage({
             id: 'PerPackageField.placeholder',
           })}

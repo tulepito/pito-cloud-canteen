@@ -37,8 +37,12 @@ const mergeCurrentUser = (
 };
 
 const detectUserPermission = (currentUser: TCurrentUser) => {
-  const { isCompany, isAdmin, company } =
-    CurrentUser(currentUser).getMetadata();
+  const {
+    isAdmin = false,
+    isPartner = false,
+    isCompany = false,
+    company,
+  } = CurrentUser(currentUser).getMetadata();
 
   let isBooker;
 
@@ -51,6 +55,7 @@ const detectUserPermission = (currentUser: TCurrentUser) => {
   }
 
   if (isAdmin) return EUserPermission.admin;
+  if (isPartner) return EUserPermission.partner;
   if (isCompany || isBooker) return EUserPermission.company;
 
   return EUserPermission.normal;

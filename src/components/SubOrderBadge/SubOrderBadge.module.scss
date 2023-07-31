@@ -1,0 +1,19 @@
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/vars.scss' as *;
+
+.root {
+  height: fit-content;
+  display: flex;
+  .delivering {
+    color: $neutralGray1;
+    background-color: $labelDarkBlue;
+  }
+  .delivered {
+    color: $neutralGray1;
+    background-color: $sematicGreen2;
+  }
+  .canceled {
+    color: $neutralGray1;
+    background-color: $sematicRed2;
+  }
+}

@@ -213,7 +213,7 @@ const OrderDetailPage = () => {
     reviewViewData,
     priceQuotationData,
     setReviewInfoValues,
-  } = usePrepareOrderDetailPageData();
+  } = usePrepareOrderDetailPageData({});
 
   const handleCloseReachMaxAllowedChangesModal = () =>
     setShowReachMaxAllowedChangesModal(null);
@@ -276,10 +276,10 @@ const OrderDetailPage = () => {
     }
   }, []);
 
-  const handleDownloadPriceQuotation = useDownloadPriceQuotation(
+  const handleDownloadPriceQuotation = useDownloadPriceQuotation({
     orderTitle,
     priceQuotationData,
-  );
+  });
 
   const userId = CurrentUser(currentUser!).getId();
   const {

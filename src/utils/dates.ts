@@ -185,6 +185,13 @@ export const generateTimeOptions = () => {
   return options;
 };
 
+export const findEndDeliveryTime = (time = '6:30') => {
+  const [hour, min] = time.split(':');
+  const numHour = Number(hour) + 1;
+
+  return `${numHour > 24 ? 0 : numHour}:${min}`;
+};
+
 export const TimeOptions = generateTimeOptions();
 
 export const getDayInWeekFromPeriod = (start: number, end: number) => {

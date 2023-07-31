@@ -202,6 +202,18 @@ export const adminRoutes = {
     path: '/admin/account/password',
     label: 'Mật khẩu',
   },
+  AdminPayment: {
+    path: '/admin/payment',
+    label: 'Thanh toán',
+  },
+  PartnerPayment: {
+    path: '/admin/payment-partner',
+    label: 'Thanh toán đối tác',
+  },
+  ClientPayment: {
+    path: '/admin/payment-client',
+    label: 'Thanh toán khách hàng',
+  },
 } as const;
 
 export const companyPaths = {
@@ -245,4 +257,31 @@ export const participantPaths = {
   AccountChangePassword: '/participant/account/change-password',
   AccountSpecialDemand: '/participant/account/special-demand',
   PlanDetail: '/participant/plans/[planId]',
+};
+
+export const partnerPaths = {
+  Home: '/partner',
+  ManageOrders: '/partner/orders',
+  ManagePayments: '/partner/payments',
+  SubOrderDetail: '/partner/orders/[subOrderId]',
+};
+
+export const partnerRoutes = {
+  ManageOrders: {
+    path: partnerPaths.ManageOrders,
+    label: 'Danh sách đơn hàng',
+  },
+
+  Home: {
+    path: partnerPaths.Home,
+    label: 'Trang chủ',
+  },
+  SubOrderDetail: {
+    path: partnerPaths.SubOrderDetail,
+    label: 'Chi tiết đơn hàng',
+  },
+  ManagePayments: {
+    path: partnerPaths.ManagePayments,
+    label: 'Thanh toán',
+  },
 };

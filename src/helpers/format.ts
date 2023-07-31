@@ -7,3 +7,7 @@ export const removeNonNumeric = (num: string) =>
 export const parseThousandNumber = (value: string | number) => {
   return addCommas(removeNonNumeric(value.toString()));
 };
+
+export const parseThousandNumberToInteger = (value: string) => {
+  return parseInt(removeNonNumeric(value), 10);
+};

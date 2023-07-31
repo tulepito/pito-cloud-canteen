@@ -1,13 +1,16 @@
 import isEmpty from 'lodash/isEmpty';
 
-import { Listing } from '@src/utils/data';
+import { Listing, User } from '@src/utils/data';
 import { EParticipantOrderStatus, ESubOrderStatus } from '@utils/enums';
-import type { TListing, TObject } from '@utils/types';
+import type { TListing, TObject, TUser } from '@utils/types';
 
-const groupFoodForGroupOrder = (orderDetail: TObject) => {
+const groupFoodForGroupOrder = (
+  orderDetail: TObject,
+  date?: number | string,
+) => {
   return Object.entries(orderDetail).reduce(
     (result, currentOrderDetailEntry, index) => {
-      const [date, rawOrderDetailOfDate] = currentOrderDetailEntry;
+      const [d, rawOrderDetailOfDate] = currentOrderDetailEntry;
 
       const {
         memberOrders,
@@ -15,14 +18,21 @@ const groupFoodForGroupOrder = (orderDetail: TObject) => {
         status: subOrderStatus,
       } = rawOrderDetailOfDate as TObject;
       const { id, restaurantName, foodList: foodListOfDate = {} } = restaurant;
-      if (subOrderStatus === ESubOrderStatus.CANCELED) {
+      if (
+        subOrderStatus === ESubOrderStatus.CANCELED ||
+        (date && d !== date.toString())
+      ) {
         return result;
       }
 
       const foodDataMap = Object.entries(memberOrders).reduce(
         (foodFrequencyResult, currentMemberOrderEntry) => {
           const [, memberOrderData] = currentMemberOrderEntry;
-          const { foodId, status } = memberOrderData as TObject;
+          const {
+            foodId,
+            status,
+            requirement = '',
+          } = memberOrderData as TObject;
           const {
             foodName,
             foodPrice,
@@ -31,13 +41,24 @@ const groupFoodForGroupOrder = (orderDetail: TObject) => {
 
           if (status === EParticipantOrderStatus.joined && foodId !== '') {
             const data = foodFrequencyResult[foodId] as TObject;
-            const { frequency } = data || {};
+            const { frequency, notes = [] } = data || {};
+
+            if (!isEmpty(requirement)) {
+              notes.push(requirement);
+            }
 
             return {
               ...foodFrequencyResult,
               [foodId]: data
-                ? { ...data, frequency: frequency + 1 }
-                : { foodId, foodName, foodUnit, foodPrice, frequency: 1 },
+                ? { ...data, frequency: frequency + 1, notes }
+                : {
+                    foodId,
+                    foodName,
+                    foodUnit,
+                    foodPrice,
+                    notes,
+                    frequency: 1,
+                  },
             };
           }
 
@@ -67,7 +88,7 @@ const groupFoodForGroupOrder = (orderDetail: TObject) => {
       return [
         ...result,
         {
-          date,
+          date: d,
           index,
           ...summary,
           foodDataList,
@@ -79,17 +100,20 @@ const groupFoodForGroupOrder = (orderDetail: TObject) => {
   );
 };
 
-const groupFoodForNormal = (orderDetail: TObject) => {
+const groupFoodForNormal = (orderDetail: TObject, date?: number | string) => {
   return Object.entries(orderDetail).reduce(
     (result, currentOrderDetailEntry, index) => {
-      const [date, rawOrderDetailOfDate] = currentOrderDetailEntry;
+      const [d, rawOrderDetailOfDate] = currentOrderDetailEntry;
 
       const {
         lineItems = [],
         restaurant: { id, restaurantName, foodList: foodListOfDate = {} },
         status: subOrderStatus,
       } = rawOrderDetailOfDate as TObject;
-      if (subOrderStatus === ESubOrderStatus.CANCELED) {
+      if (
+        subOrderStatus === ESubOrderStatus.CANCELED ||
+        (date && d !== date.toString())
+      ) {
         return result;
       }
 
@@ -98,7 +122,7 @@ const groupFoodForNormal = (orderDetail: TObject) => {
           id: foodId,
           name: foodName,
           quantity = 1,
-          price: foodPrice,
+          unitPrice: foodPrice = 0,
         } = lineItem;
         const { foodUnit = '' } = foodListOfDate[foodId] || {};
 
@@ -126,7 +150,7 @@ const groupFoodForNormal = (orderDetail: TObject) => {
       return [
         ...result,
         {
-          date,
+          date: d,
           index,
           ...summary,
           foodDataList,
@@ -141,18 +165,126 @@ const groupFoodForNormal = (orderDetail: TObject) => {
 export const groupFoodOrderByDate = ({
   orderDetail = {},
   isGroupOrder = true,
+  date,
 }: {
   orderDetail: TObject;
   isGroupOrder: boolean;
+  date?: number | string;
 }) => {
   return isGroupOrder
-    ? groupFoodForGroupOrder(orderDetail)
-    : groupFoodForNormal(orderDetail);
+    ? groupFoodForGroupOrder(orderDetail, date)
+    : groupFoodForNormal(orderDetail, date);
 };
+
+export const groupPickingOrderByFood = ({
+  orderDetail,
+  date,
+  participants = [],
+  anonymous = [],
+}: {
+  orderDetail: TObject;
+  date?: number | string;
+  participants: TObject[];
+  anonymous: TObject[];
+}) => {
+  return Object.entries(orderDetail).reduce(
+    (result, currentOrderDetailEntry, index) => {
+      const [d, rawOrderDetailOfDate] = currentOrderDetailEntry;
+
+      const {
+        memberOrders,
+        restaurant = {},
+        status: subOrderStatus,
+      } = rawOrderDetailOfDate as TObject;
+      const { id, foodList: foodListOfDate = {} } = restaurant;
+      if (
+        subOrderStatus === ESubOrderStatus.CANCELED ||
+        (date && d !== date.toString())
+      ) {
+        return result;
+      }
+
+      const foodDataMap = Object.entries(memberOrders).reduce(
+        (foodFrequencyResult, currentMemberOrderEntry) => {
+          const [memberId, memberOrderData] = currentMemberOrderEntry;
+
+          const {
+            foodId,
+            status,
+            requirement = '',
+          } = memberOrderData as TObject;
+          const {
+            foodName,
+            foodPrice,
+            foodUnit = '',
+          } = foodListOfDate[foodId] || {};
+
+          const participantMaybe = participants.find(
+            (p) => p?.id?.uuid === memberId,
+          );
+          const anonymousUserMaybe = anonymous.find(
+            (p) => p?.id?.uuid === memberId,
+          );
+
+          const { firstName, lastName } = User(
+            (participantMaybe || anonymousUserMaybe) as TUser,
+          ).getProfile();
+
+          if (status === EParticipantOrderStatus.joined && foodId !== '') {
+            const data = foodFrequencyResult[foodId] as TObject;
+            const { frequency, notes = [] } = data || {};
+            const newNote = {
+              note: requirement,
+              name: `${lastName} ${firstName}`,
+            };
+
+            if (!isEmpty(requirement)) {
+              notes.splice(0, 0, newNote);
+            } else {
+              notes.push(newNote);
+            }
+
+            return {
+              ...foodFrequencyResult,
+              [foodId]: data
+                ? { ...data, frequency: frequency + 1, notes }
+                : {
+                    foodId,
+                    foodName,
+                    foodUnit,
+                    foodPrice,
+                    notes,
+                    frequency: 1,
+                  },
+            };
+          }
+
+          return foodFrequencyResult;
+        },
+        {} as TObject,
+      );
+      const foodDataList = Object.values(foodDataMap);
+
+      return [
+        ...result,
+        {
+          date: d,
+          index,
+          foodDataList,
+          restaurantId: id,
+        },
+      ];
+    },
+    [] as TObject[],
+  );
+};
+
 export const groupFoodOrderByDateFromQuotation = ({
   quotation,
+  date: dateFromParams,
 }: {
   quotation: TListing;
+  date?: string | number;
 }) => {
   const quotationListingGetter = Listing(quotation);
   const { client, partner } = quotationListingGetter.getMetadata();
@@ -160,38 +292,44 @@ export const groupFoodOrderByDateFromQuotation = ({
     return [];
   }
 
-  const result = Object.keys(client.quotation).map(
-    (subOrderDate: string, index: number) => {
+  const result = Object.keys(client.quotation).reduce(
+    (res: TObject[], subOrderDate: string, index: number) => {
+      if (dateFromParams && dateFromParams !== subOrderDate) {
+        return res;
+      }
       const restaurant = Object.keys(partner).find((restaurantId: string) => {
         return Object.keys(partner[restaurantId].quotation).some(
           (date: string) => date === subOrderDate,
         );
       });
 
-      return {
-        date: subOrderDate,
-        restaurantId: Object.keys(partner[restaurant!])[0],
-        restaurantName: partner[restaurant!].name,
-        index,
-        totalDishes: client.quotation[subOrderDate].reduce(
-          (previousResult: number, current: TObject) => {
-            const { frequency } = current;
+      return res.concat([
+        {
+          date: subOrderDate,
+          restaurantId: Object.keys(partner[restaurant!])[0],
+          restaurantName: partner[restaurant!].name,
+          index: dateFromParams ? 1 : index,
+          totalDishes: client.quotation[subOrderDate].reduce(
+            (previousResult: number, current: TObject) => {
+              const { frequency } = current;
 
-            return previousResult + frequency;
-          },
-          0,
-        ),
-        foodDataList: client.quotation[subOrderDate],
-        totalPrice: client.quotation[subOrderDate].reduce(
-          (previousResult: number, current: TObject) => {
-            const { foodPrice, frequency } = current;
+              return previousResult + frequency;
+            },
+            0,
+          ),
+          foodDataList: client.quotation[subOrderDate],
+          totalPrice: client.quotation[subOrderDate].reduce(
+            (previousResult: number, current: TObject) => {
+              const { foodPrice, frequency } = current;
 
-            return previousResult + foodPrice * frequency;
-          },
-          0,
-        ),
-      };
+              return previousResult + foodPrice * frequency;
+            },
+            0,
+          ),
+        },
+      ]);
     },
+    [],
   );
 
   return result;

@@ -1,7 +1,12 @@
 import { createSlice, current } from '@reduxjs/toolkit';
 import isEmpty from 'lodash/isEmpty';
 
-import { transitPlanApi } from '@apis/admin';
+import {
+  createPaymentRecordApi,
+  deletePaymentRecordApi,
+  getPaymentRecordsApi,
+  transitPlanApi,
+} from '@apis/admin';
 import { participantSubOrderUpdateDocumentApi } from '@apis/firebaseApi';
 import {
   adminUpdateOrderStateApi,
@@ -72,6 +77,18 @@ type TOrderDetailState = {
   quotationsPagination: TPagination;
   fetchQuotationsInProgress: boolean;
   fetchQuotationsError: any;
+
+  partnerPaymentRecords: {
+    [subOrderDate: string]: any[];
+  };
+  fetchPartnerPaymentRecordsInProgress: boolean;
+  fetchPartnerPaymentRecordsError: any;
+
+  createPartnerPaymentRecordInProgress: boolean;
+  createPartnerPaymentRecordError: any;
+
+  deletePartnerPaymentRecordInProgress: boolean;
+  deletePartnerPaymentRecordError: any;
 };
 const initialState: TOrderDetailState = {
   order: null!,
@@ -97,6 +114,16 @@ const initialState: TOrderDetailState = {
   quotationsPagination: null!,
   fetchQuotationsInProgress: false,
   fetchQuotationsError: null,
+  partnerPaymentRecords: {},
+
+  fetchPartnerPaymentRecordsInProgress: false,
+  fetchPartnerPaymentRecordsError: null,
+
+  createPartnerPaymentRecordInProgress: false,
+  createPartnerPaymentRecordError: null,
+
+  deletePartnerPaymentRecordInProgress: false,
+  deletePartnerPaymentRecordError: null,
 };
 
 // ================ Thunk types ================ //
@@ -104,7 +131,12 @@ const FETCH_ORDER = 'app/OrderDetail/FETCH_ORDER';
 const UPDATE_STAFF_NAME = 'app/OrderDetail/UPDATE_STAFF_NAME';
 const UPDATE_ORDER_STATE = 'app/OrderDetail/UPDATE_ORDER_STATE';
 const FETCH_QUOTATIONS = 'app/OrderDetail/FETCH_QUOTATIONS';
-
+const CREATE_PARTNER_PAYMENT_RECORD =
+  'app/OrderDetail/CREATE_PARTNER_PAYMENT_RECORD';
+const FETCH_PARTNER_PAYMENT_RECORD =
+  'app/OrderDetail/FETCH_PARTNER_PAYMENT_RECORD';
+const DELETE_PARTNER_PAYMENT_RECORD =
+  'app/OrderDetail/DELETE_PARTNER_PAYMENT_RECORD';
 // ================ Async thunks ================ //
 const fetchOrder = createAsyncThunk(
   FETCH_ORDER,
@@ -241,6 +273,61 @@ const updatePlanDetail = createAsyncThunk(
   },
 );
 
+const fetchPartnerPaymentRecords = createAsyncThunk(
+  FETCH_PARTNER_PAYMENT_RECORD,
+  async (query: any) => {
+    const { data: partnerPaymentRecords } = await getPaymentRecordsApi({
+      dataParams: query,
+    });
+
+    return partnerPaymentRecords;
+  },
+);
+
+const createPartnerPaymentRecord = createAsyncThunk(
+  CREATE_PARTNER_PAYMENT_RECORD,
+  async (payload: TObject, { getState }) => {
+    const { partnerPaymentRecords = {} } = getState().OrderDetail;
+    const { paymentType, subOrderDate } = payload;
+    const apiBody = {
+      paymentRecordType: paymentType,
+      paymentRecordParams: {
+        ...payload,
+      },
+    };
+    const { data: newPaymentRecord } = await createPaymentRecordApi(apiBody);
+    const currentPaymentRecordsBySubOrder =
+      partnerPaymentRecords[subOrderDate] || {};
+    const newPartnerPaymentRecords = {
+      ...partnerPaymentRecords,
+      [subOrderDate]: [newPaymentRecord, ...currentPaymentRecordsBySubOrder],
+    };
+
+    return newPartnerPaymentRecords;
+  },
+);
+
+const deletePartnerPaymentRecord = createAsyncThunk(
+  DELETE_PARTNER_PAYMENT_RECORD,
+  async (paymentRecordId: string, { getState }) => {
+    const { partnerPaymentRecords = {} } = getState().OrderDetail;
+    await deletePaymentRecordApi({ paymentRecordId });
+
+    const newPartnerPaymentRecords = Object.entries(
+      partnerPaymentRecords,
+    ).reduce((acc: any, [subOrderDate, paymentRecords]) => {
+      const newPaymentRecords = paymentRecords.filter(
+        (paymentRecord: any) => paymentRecord.id !== paymentRecordId,
+      );
+      acc[subOrderDate] = newPaymentRecords;
+
+      return acc;
+    }, {});
+
+    return newPartnerPaymentRecords;
+  },
+);
+
 export const OrderDetailThunks = {
   fetchOrder,
   updateStaffName,
@@ -248,6 +335,9 @@ export const OrderDetailThunks = {
   fetchQuotations,
   transit,
   updatePlanDetail,
+  fetchPartnerPaymentRecords,
+  createPartnerPaymentRecord,
+  deletePartnerPaymentRecord,
 };
 
 // ================ Slice ================ //
@@ -381,6 +471,45 @@ const OrderDetailSlice = createSlice({
       })
       .addCase(updatePlanDetail.rejected, (state) => {
         return state;
+      })
+
+      .addCase(fetchPartnerPaymentRecords.pending, (state) => {
+        state.fetchPartnerPaymentRecordsInProgress = true;
+        state.fetchPartnerPaymentRecordsError = null;
+      })
+      .addCase(fetchPartnerPaymentRecords.fulfilled, (state, { payload }) => {
+        state.fetchPartnerPaymentRecordsInProgress = false;
+        state.partnerPaymentRecords = payload;
+      })
+      .addCase(fetchPartnerPaymentRecords.rejected, (state, { error }) => {
+        state.fetchPartnerPaymentRecordsInProgress = false;
+        state.fetchPartnerPaymentRecordsError = error.message;
+      })
+
+      .addCase(createPartnerPaymentRecord.pending, (state) => {
+        state.createPartnerPaymentRecordInProgress = true;
+        state.createPartnerPaymentRecordError = null;
+      })
+      .addCase(createPartnerPaymentRecord.fulfilled, (state, { payload }) => {
+        state.createPartnerPaymentRecordInProgress = false;
+        state.partnerPaymentRecords = payload;
+      })
+      .addCase(createPartnerPaymentRecord.rejected, (state, { error }) => {
+        state.createPartnerPaymentRecordInProgress = false;
+        state.createPartnerPaymentRecordError = error.message;
+      })
+
+      .addCase(deletePartnerPaymentRecord.pending, (state) => {
+        state.deletePartnerPaymentRecordInProgress = true;
+        state.deletePartnerPaymentRecordError = null;
+      })
+      .addCase(deletePartnerPaymentRecord.fulfilled, (state, { payload }) => {
+        state.deletePartnerPaymentRecordInProgress = false;
+        state.partnerPaymentRecords = payload;
+      })
+      .addCase(deletePartnerPaymentRecord.rejected, (state, { error }) => {
+        state.deletePartnerPaymentRecordInProgress = false;
+        state.deletePartnerPaymentRecordError = error.message;
       });
   },
 });

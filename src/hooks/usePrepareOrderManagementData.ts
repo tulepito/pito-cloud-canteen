@@ -21,7 +21,16 @@ import { Listing, User } from '@utils/data';
 import { EOrderStates, EOrderType } from '@utils/enums';
 import type { TCurrentUser, TListing, TObject, TUser } from '@utils/types';
 
-export const usePrepareOrderDetailPageData = () => {
+export const usePrepareOrderDetailPageData = ({
+  date,
+  VATPercentage,
+  serviceFeePercentage,
+}: {
+  date?: string | number;
+  VATPercentage?: number;
+  serviceFeePercentage?: number;
+  partnerId?: string;
+}) => {
   const router = useRouter();
   const [reviewInfoValues, setReviewInfoValues] =
     useState<TReviewInfoFormValues>();
@@ -42,7 +51,6 @@ export const usePrepareOrderDetailPageData = () => {
   const currentOrderVATPercentage = useAppSelector(
     (state) => state.SystemAttributes.currentOrderVATPercentage,
   );
-
   const currentUser = useAppSelector(currentUserSelector);
 
   const { title: orderTitle = '' } = Listing(
@@ -156,7 +164,12 @@ export const usePrepareOrderDetailPageData = () => {
       calculatePriceQuotationInfo({
         planOrderDetail: orderDetail,
         order: orderData as TObject,
-        currentOrderVATPercentage,
+        currentOrderVATPercentage: VATPercentage!
+          ? VATPercentage!
+          : currentOrderVATPercentage,
+        currentOrderServiceFeePercentage: serviceFeePercentage,
+        date,
+        shouldIncludePITOFee: isEmpty(date),
       }),
     [orderData, orderDetail],
   );
@@ -165,7 +178,12 @@ export const usePrepareOrderDetailPageData = () => {
       calculatePriceQuotationInfo({
         planOrderDetail: draftOrderDetail,
         order: orderData as TObject,
-        currentOrderVATPercentage,
+        currentOrderVATPercentage: VATPercentage!
+          ? VATPercentage!
+          : currentOrderVATPercentage,
+        currentOrderServiceFeePercentage: serviceFeePercentage,
+        date,
+        shouldIncludePITOFee: isEmpty(date),
       }),
     [orderData, draftOrderDetail],
   );
@@ -175,7 +193,11 @@ export const usePrepareOrderDetailPageData = () => {
       calculatePriceQuotationInfoFromQuotation({
         quotation: quotation as TListing,
         packagePerMember,
-        currentOrderVATPercentage,
+        currentOrderVATPercentage: VATPercentage!
+          ? VATPercentage!
+          : currentOrderVATPercentage,
+        currentOrderServiceFeePercentage: serviceFeePercentage,
+        date,
       }),
     [packagePerMember, quotation],
   );
@@ -261,7 +283,9 @@ export const usePrepareOrderDetailPageData = () => {
       transportFee: `${parseThousandNumber(transportFee)}đ`,
       VATFee: `${parseThousandNumber(VATFee)}đ`,
       PITOFee: `${parseThousandNumber(PITOFee)}đ`,
-      currentOrderVATPercentage,
+      currentOrderVATPercentage: !isEmpty(VATPercentage)
+        ? VATPercentage!
+        : currentOrderVATPercentage,
     },
     orderDetailData: {
       foodOrderGroupedByDate,

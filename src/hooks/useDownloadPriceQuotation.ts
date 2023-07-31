@@ -7,18 +7,27 @@ import { UIActions } from '@redux/slices/UI.slice';
 import { useAppDispatch } from './reduxHooks';
 import type { usePrepareOrderDetailPageData } from './usePrepareOrderManagementData';
 
-export const useDownloadPriceQuotation = (
-  orderTitle: string,
+export const useDownloadPriceQuotation = ({
+  orderTitle,
+  priceQuotationData,
+  isPartnerQuotation = false,
+}: {
+  orderTitle: string;
   priceQuotationData: ReturnType<
     typeof usePrepareOrderDetailPageData
-  >['priceQuotationData'],
-) => {
+  >['priceQuotationData'];
+  isPartnerQuotation?: boolean;
+}) => {
   const dispatch = useAppDispatch();
 
   const downloadPriceQuotation = useCallback(async () => {
     dispatch(priceQuotationActions.startDownloading());
     dispatch(UIActions.disableScrollRequest('priceQuotation'));
-    await downloadPriceQuotationFn(orderTitle, priceQuotationData)();
+    await downloadPriceQuotationFn({
+      orderTitle,
+      priceQuotationData,
+      isPartnerQuotation,
+    })();
     dispatch(priceQuotationActions.endDownloading());
     dispatch(UIActions.disableScrollRemove('priceQuotation'));
     // eslint-disable-next-line react-hooks/exhaustive-deps
