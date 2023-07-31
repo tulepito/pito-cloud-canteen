@@ -391,7 +391,7 @@ const recommendRestaurants = createAsyncThunk(
             const randomRestaurant =
               restaurants[Math.floor(Math.random() * (restaurants.length - 1))];
             const restaurantGetter = Listing(randomRestaurant?.restaurantInfo);
-            const { minQuantity = 0, maxQuantity = Number.MAX_VALUE } =
+            const { minQuantity = 0, maxQuantity = 100 } =
               restaurantGetter.getPublicData();
             const lineItemsMaybe = isNormalOrder ? { lineItems: [] } : {};
 
