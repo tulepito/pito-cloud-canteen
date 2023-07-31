@@ -1,3 +1,4 @@
+import isEmpty from 'lodash/isEmpty';
 import * as XLSX from 'xlsx';
 
 import { parseThousandNumber } from '@helpers/format';
@@ -5,21 +6,29 @@ import { formatTimestamp } from '@src/utils/dates';
 import type { TObject } from '@src/utils/types';
 
 export const filterPayments = (paymentRecords: any[], filterList: TObject) => {
-  const { orderTitle, startDate, endDate, status } = filterList;
+  const { subOrderName, orderTitle, startDate, endDate, status } = filterList;
+  const isStartDateEmpty = typeof startDate === 'undefined';
+  const isEndDateEmpty = typeof endDate === 'undefined';
 
   const filterFn = (item: any) => {
-    if (
-      orderTitle &&
-      !`${item.data.orderTitle}`
-        .toLocaleLowerCase()
-        .includes(orderTitle.toLocaleLowerCase())
-    )
-      return false;
-    if (startDate && +item.data.subOrderDate < startDate) return false;
-    if (endDate && +item.data.subOrderDate > endDate) return false;
-    if (status && !status.includes(item.data.status)) return false;
+    const isValidWithStartDateMaybe =
+      isStartDateEmpty || Number(item.data.subOrderDate) >= Number(startDate);
+    const isValidWithEndDateMaybe =
+      isEndDateEmpty || Number(item.data.subOrderDate) <= Number(endDate);
 
-    return true;
+    return (
+      (isEmpty(subOrderName) ||
+        `${item.data.subOrderName}`
+          .toLocaleLowerCase()
+          .includes(subOrderName.toLocaleLowerCase())) &&
+      (isEmpty(orderTitle) ||
+        `${item.data.orderTitle}`
+          .toLocaleLowerCase()
+          .includes(orderTitle.toLocaleLowerCase())) &&
+      isValidWithStartDateMaybe &&
+      isValidWithEndDateMaybe &&
+      (typeof status === 'undefined' || status.includes(item.data.status))
+    );
   };
 
   return paymentRecords.filter(filterFn);

@@ -9,6 +9,7 @@ import Button from '@components/Button/Button';
 import IconDownload from '@components/Icons/IconDownload/IconDownload';
 import IconFilter from '@components/Icons/IconFilter/IconFilter';
 import NamedLink from '@components/NamedLink/NamedLink';
+import OutsideClickHandler from '@components/OutsideClickHandler/OutsideClickHandler';
 import type { TColumn } from '@components/Table/Table';
 import { TableForm } from '@components/Table/Table';
 import Tooltip from '@components/Tooltip/Tooltip';
@@ -20,6 +21,7 @@ import { formatTimestamp } from '@src/utils/dates';
 import { EOrderDetailTabs } from '@src/utils/enums';
 import type { TPagination } from '@src/utils/types';
 
+import type { TPaymentFilterFormValues } from './components/PaymentFilterForm/PaymentFilterForm';
 import PaymentFilterForm from './components/PaymentFilterForm/PaymentFilterForm';
 import { filterPayments, makeExcelFile } from './helpers/paymentPartner';
 import { PartnerManagePaymentsThunks } from './PartnerManagePayments.slice';
@@ -67,10 +69,8 @@ const ManagePaymentsPage = () => {
     {
       key: 'subOrderName',
       label: 'Tên đơn hàng',
-      render: ({ companyName, subOrderDate }: any) => (
-        <div className={css.boldText}>{`${companyName}_${formatTimestamp(
-          subOrderDate,
-        )}`}</div>
+      render: ({ subOrderName }: any) => (
+        <div className={css.boldText}>{subOrderName}</div>
       ),
     },
     {
@@ -148,6 +148,7 @@ const ManagePaymentsPage = () => {
       (acc, cur) => acc + (cur.amount || 0),
       0,
     );
+    const subOrderName = `${companyName}_${formatTimestamp(subOrderDate)}`;
     const remainAmount = totalAmount - paidAmount;
     const status = remainAmount === 0 ? 'isPaid' : 'isNotPaid';
 
@@ -155,7 +156,6 @@ const ManagePaymentsPage = () => {
       key: id,
       data: {
         id,
-        companyName,
         subOrderDate,
         orderTitle,
         totalAmount,
@@ -165,12 +165,15 @@ const ManagePaymentsPage = () => {
         deliveryHour,
         orderId,
         partnerId,
+        subOrderName,
       },
     };
   });
 
-  const filteredTableData = filterPayments(formattedTableData, filters);
-
+  const filteredTableData = useMemo(
+    () => filterPayments(formattedTableData, filters),
+    [JSON.stringify(filters), JSON.stringify(formattedTableData)],
+  );
   const filteredTableDataWithPagination = useMemo(
     () => filteredTableData.slice((page - 1) * 10, page * 10),
     [filteredTableData, page],
@@ -183,12 +186,9 @@ const ManagePaymentsPage = () => {
     totalPages: Math.ceil(filteredTableData.length / 10),
   };
 
-  // const onRemoveFilter = (key: string) => () => {
-  //   const currentFilters = { ...filters };
-  //   delete currentFilters[key];
-
-  //   setFilters(currentFilters);
-  // };
+  const handleClearFilters = () => {
+    setFilters({});
+  };
 
   const getExposeValues = ({ values }: any) => {
     // need set timeout here to wait FormSpy render first to avoid React warning
@@ -197,9 +197,23 @@ const ManagePaymentsPage = () => {
     }, 0);
   };
 
-  // const handleCloseTooltip = () => {
-  //   tooltipController.setFalse();
-  // };
+  const handleCloseTooltip = () => {
+    tooltipController.setFalse();
+  };
+
+  const handleFilterSubmit = (values: TPaymentFilterFormValues) => {
+    const { subOrderName, orderTitle, startDate, endDate, status } = values;
+
+    setFilters({
+      ...(subOrderName && { subOrderName }),
+      ...(orderTitle && { orderTitle }),
+      ...(startDate && { startDate }),
+      ...(endDate && { endDate }),
+      ...(status && { status }),
+    });
+
+    handleCloseTooltip();
+  };
 
   const onDownloadPaymentList = () => {
     const hasSelectedPaymentRecords = !isEmpty(selectedPaymentRecords);
@@ -224,17 +238,18 @@ const ManagePaymentsPage = () => {
       </div>
       <div className={css.actionSection}>
         <Tooltip
-          // visible={tooltipController.value}
-          // popupVisible={tooltipController.value}
+          visible={tooltipController.value}
+          popupVisible={tooltipController.value}
           overlayClassName={css.filterBtnTooltipOverlay}
           tooltipContent={
-            <div>
+            <OutsideClickHandler onOutsideClick={handleCloseTooltip}>
               <PaymentFilterForm
-                setFilters={setFilters}
-                onSubmit={() => {}}
-                handleClearFilters={() => {}}
+                initialValues={filters}
+                onSubmit={handleFilterSubmit}
+                onClearFilters={handleClearFilters}
+                onClose={handleCloseTooltip}
               />
-            </div>
+            </OutsideClickHandler>
           }
           trigger="click"
           placement="bottomLeft">
