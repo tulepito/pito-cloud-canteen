@@ -151,7 +151,7 @@ const AddPartnerPaymentFormComponent: React.FC<
 
   const filterUnPaidPaymentList = () => {
     setUnPaidPaymentListFiltered(
-      filterPaymentPartner(unPaidPaymentListFiltered, {
+      filterPaymentPartner(unPaidPaymentList, {
         startDate: values?.startDate,
         endDate: values?.endDate,
         partnerName: values?.partnerName?.value,
