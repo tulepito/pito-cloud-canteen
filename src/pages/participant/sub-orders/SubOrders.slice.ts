@@ -19,6 +19,8 @@ type TSubOrdersState = {
   subOrderReview: any;
   fetchReviewInProgress: boolean;
   fetchReviewError: any;
+  deliveringLastRecord: number | null;
+  deliveredLastRecord: number | null;
 };
 const initialState: TSubOrdersState = {
   subOrders: [],
@@ -29,6 +31,8 @@ const initialState: TSubOrdersState = {
   subOrderReview: [],
   fetchReviewInProgress: false,
   fetchReviewError: null,
+  deliveringLastRecord: null,
+  deliveredLastRecord: null,
 };
 
 // ================ Thunk types ================ //
@@ -40,14 +44,16 @@ const FETCH_REVIEW_FROM_SUB_ORDER = 'app/SubOrders/FETCH_REVIEW_FROM_SUB_ORDER';
 
 const fetchSubOrdersFromFirebase = createAsyncThunk(
   FETCH_SUB_ORDERS_FROM_FIREBASE,
-  async (payload: any) => {
-    const { participantId, txStatus, lastRecord } = payload;
+  async (payload: any, { getState }) => {
+    const { deliveringLastRecord, deliveredLastRecord } =
+      getState().ParticipantSubOrderList;
+    const { participantId, txStatus } = payload;
 
     const { data: response } = await participantSubOrderGetDocumentApi(
       participantId,
       txStatus,
       FIREBASE_LIMIT_RECORDS,
-      lastRecord,
+      Array.isArray(txStatus) ? deliveringLastRecord : deliveredLastRecord,
     );
 
     return Array.isArray(txStatus)
@@ -100,10 +106,30 @@ const SubOrdersSlice = createSlice({
           fetchSubOrdersInProgress: false,
           fetchSubOrdersError: null,
           ...(action.payload.deliveredSubOrders && {
-            deliveredSubOrders: action.payload.deliveredSubOrders,
+            deliveredSubOrders: uniqBy(
+              [
+                ...state.deliveredSubOrders,
+                ...action.payload.deliveredSubOrders,
+              ],
+              'id',
+            ),
+            deliveredLastRecord:
+              action.payload.deliveredSubOrders[
+                action.payload.deliveredSubOrders.length - 1
+              ]?.createdAt?.seconds,
           }),
           ...(action.payload.deliveringSubOrders && {
-            deliveringSubOrders: action.payload.deliveringSubOrders,
+            deliveringSubOrders: uniqBy(
+              [
+                ...state.deliveringSubOrders,
+                ...action.payload.deliveringSubOrders,
+              ],
+              'id',
+            ),
+            deliveringLastRecord:
+              action.payload.deliveringSubOrders[
+                action.payload.deliveringSubOrders.length - 1
+              ]?.createdAt?.seconds,
           }),
         };
       })
