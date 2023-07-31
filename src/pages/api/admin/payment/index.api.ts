@@ -78,8 +78,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           const allowedPaymentRecordParams: Partial<PaymentBaseParams> = {
             SKU,
             amount,
-            paymentNote,
             orderId,
+            ...(paymentNote ? { paymentNote } : {}),
             ...(partnerId ? { partnerId } : {}),
             ...(partnerName ? { partnerName } : {}),
             ...(subOrderDate ? { subOrderDate } : {}),
