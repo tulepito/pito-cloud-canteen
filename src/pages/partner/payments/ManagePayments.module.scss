@@ -87,3 +87,22 @@
     }
   }
 }
+
+.filterBtnTooltipOverlay {
+  opacity: 1;
+  padding: 0;
+
+  :global(.rc-tooltip-inner) {
+    border-radius: 8px;
+    padding: 20px;
+    background: $neutralGray1;
+
+    /* Shadown/XL */
+    box-shadow: 0px 20px 24px 4px rgba(16, 24, 40, 0.1),
+      0px 8px 8px -4px rgba(16, 24, 40, 0.04);
+  }
+
+  :global(.rc-tooltip-arrow) {
+    display: none;
+  }
+}

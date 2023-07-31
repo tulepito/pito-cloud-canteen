@@ -20,7 +20,7 @@ import { formatTimestamp } from '@src/utils/dates';
 import { EOrderDetailTabs } from '@src/utils/enums';
 import type { TPagination } from '@src/utils/types';
 
-import PaymentFilterModal from './components/PaymentFilterModal/PaymentFilterModal';
+import PaymentFilterForm from './components/PaymentFilterForm/PaymentFilterForm';
 import { filterPayments, makeExcelFile } from './helpers/paymentPartner';
 import { PartnerManagePaymentsThunks } from './PartnerManagePayments.slice';
 
@@ -34,8 +34,8 @@ const ManagePaymentsPage = () => {
     {} as any,
   );
   const [page, setPage] = useState(1);
+  const tooltipController = useBoolean();
 
-  const filterPaymentModalController = useBoolean();
   const title = intl.formatMessage({
     id: 'ManagePaymentsPage.title',
   });
@@ -183,10 +183,6 @@ const ManagePaymentsPage = () => {
     totalPages: Math.ceil(filteredTableData.length / 10),
   };
 
-  useEffect(() => {
-    dispatch(PartnerManagePaymentsThunks.loadData());
-  }, [dispatch]);
-
   // const onRemoveFilter = (key: string) => () => {
   //   const currentFilters = { ...filters };
   //   delete currentFilters[key];
@@ -201,6 +197,10 @@ const ManagePaymentsPage = () => {
     }, 0);
   };
 
+  // const handleCloseTooltip = () => {
+  //   tooltipController.setFalse();
+  // };
+
   const onDownloadPaymentList = () => {
     const hasSelectedPaymentRecords = !isEmpty(selectedPaymentRecords);
     if (hasSelectedPaymentRecords) {
@@ -213,6 +213,10 @@ const ManagePaymentsPage = () => {
     }
   };
 
+  useEffect(() => {
+    dispatch(PartnerManagePaymentsThunks.loadData());
+  }, []);
+
   return (
     <div className={css.root}>
       <div className={css.header}>
@@ -220,17 +224,24 @@ const ManagePaymentsPage = () => {
       </div>
       <div className={css.actionSection}>
         <Tooltip
+          // visible={tooltipController.value}
+          // popupVisible={tooltipController.value}
           overlayClassName={css.filterBtnTooltipOverlay}
           tooltipContent={
-            <PaymentFilterModal
-              isOpen={filterPaymentModalController.value}
-              onClose={filterPaymentModalController.setFalse}
-              setFilters={setFilters}
-            />
+            <div>
+              <PaymentFilterForm
+                setFilters={setFilters}
+                onSubmit={() => {}}
+                handleClearFilters={() => {}}
+              />
+            </div>
           }
           trigger="click"
-          placement="bottom">
-          <Button variant="secondary" className={css.filterButton}>
+          placement="bottomLeft">
+          <Button
+            variant="secondary"
+            className={css.filterButton}
+            onClick={() => tooltipController.setTrue()}>
             <div className={css.iconContainer}>
               <IconFilter className={css.icon} />
             </div>
