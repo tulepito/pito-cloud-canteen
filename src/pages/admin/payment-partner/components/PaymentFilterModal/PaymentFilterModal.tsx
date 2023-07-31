@@ -1,3 +1,5 @@
+import { useRef } from 'react';
+
 import Modal from '@components/Modal/Modal';
 
 import type { TPaymentFilterFormValues } from '../PaymentFilterForm/PaymentFilterForm';
@@ -13,6 +15,7 @@ type PaymentFilterModalProps = {
 
 const PaymentFilterModal: React.FC<PaymentFilterModalProps> = (props) => {
   const { isOpen, onClose, setFilters } = props;
+  const formRef = useRef<any>();
 
   const handleFilterSubmit = (values: TPaymentFilterFormValues) => {
     const { partnerName, orderTitle, startDate, endDate, status } = values;
@@ -30,6 +33,7 @@ const PaymentFilterModal: React.FC<PaymentFilterModalProps> = (props) => {
 
   const handleClearFilters = () => {
     setFilters({});
+    formRef?.current?.reset();
     onClose();
   };
 
@@ -43,6 +47,7 @@ const PaymentFilterModal: React.FC<PaymentFilterModalProps> = (props) => {
       <PaymentFilterForm
         onSubmit={handleFilterSubmit}
         handleClearFilters={handleClearFilters}
+        formRef={formRef}
       />
     </Modal>
   );
