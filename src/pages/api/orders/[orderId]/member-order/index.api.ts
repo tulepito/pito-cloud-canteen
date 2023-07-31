@@ -80,6 +80,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         res.json({
           statusCode: 200,
           message: `Successfully update plan info, planId: ${planId}`,
+          planListing,
         });
       } catch (error) {
         handleError(res, error);

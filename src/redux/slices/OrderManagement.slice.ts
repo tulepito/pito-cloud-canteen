@@ -410,7 +410,7 @@ const sendRemindEmailToMember = createAsyncThunk(
 
 const addOrUpdateMemberOrder = createAsyncThunk(
   'app/OrderManagement/ADD_OR_UPDATE_MEMBER_ORDER',
-  async (params: TObject, { getState, dispatch, rejectWithValue }) => {
+  async (params: TObject, { getState, rejectWithValue }) => {
     try {
       const { currentViewDate, foodId, memberId, requirement, memberEmail } =
         params;
@@ -502,7 +502,10 @@ const addOrUpdateMemberOrder = createAsyncThunk(
         ...(shouldUpdateAnonymousList ? { anonymous: updateAnonymous } : {}),
       };
 
-      await addUpdateMemberOrder(orderId, updateParams);
+      const { data: updatePlanListing } = await addUpdateMemberOrder(
+        orderId,
+        updateParams,
+      );
       const subOrderId = `${participantId} - ${planId} - ${currentViewDate}`;
       const { data: firebaseSubOrderDocument } =
         await participantSubOrderGetByIdApi(subOrderId);
@@ -521,7 +524,10 @@ const addOrUpdateMemberOrder = createAsyncThunk(
           },
         });
       }
-      await dispatch(loadData(orderId));
+      const planListing = Listing(updatePlanListing.planListing);
+      const { orderDetail } = planListing.getMetadata();
+
+      return { planData: updatePlanListing.planListing, orderDetail };
     } catch (error) {
       console.log(error);
     }
@@ -1557,8 +1563,10 @@ const OrderManagementSlice = createSlice({
         state.addOrUpdateMemberOrderError = null;
         state.addOrUpdateMemberOrderInProgress = true;
       })
-      .addCase(addOrUpdateMemberOrder.fulfilled, (state) => {
+      .addCase(addOrUpdateMemberOrder.fulfilled, (state, { payload }) => {
         state.addOrUpdateMemberOrderInProgress = false;
+        state.draftOrderDetail = payload?.orderDetail;
+        state.planData = payload?.planData;
       })
       .addCase(addOrUpdateMemberOrder.rejected, (state, { payload }) => {
         state.addOrUpdateMemberOrderInProgress = false;
