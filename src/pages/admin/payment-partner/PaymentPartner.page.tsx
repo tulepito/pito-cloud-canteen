@@ -374,6 +374,7 @@ const PaymentPartnerPage = () => {
         isOpen={filterPaymentModalController.value}
         onClose={filterPaymentModalController.setFalse}
         setFilters={setFilters}
+        setPage={setPage}
       />
       <AddPartnerPaymentModal
         isOpen={addPartnerPaymentModalController.value}
