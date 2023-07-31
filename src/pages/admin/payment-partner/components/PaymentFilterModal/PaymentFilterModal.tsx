@@ -11,10 +11,11 @@ type PaymentFilterModalProps = {
   isOpen: boolean;
   onClose: () => void;
   setFilters: (filter: TPaymentFilterFormValues) => void;
+  setPage: (page: number) => void;
 };
 
 const PaymentFilterModal: React.FC<PaymentFilterModalProps> = (props) => {
-  const { isOpen, onClose, setFilters } = props;
+  const { isOpen, onClose, setFilters, setPage } = props;
   const formRef = useRef<any>();
 
   const handleFilterSubmit = (values: TPaymentFilterFormValues) => {
@@ -27,6 +28,7 @@ const PaymentFilterModal: React.FC<PaymentFilterModalProps> = (props) => {
       ...(endDate && { endDate }),
       ...(status && { status }),
     });
+    setPage(1);
 
     onClose();
   };
