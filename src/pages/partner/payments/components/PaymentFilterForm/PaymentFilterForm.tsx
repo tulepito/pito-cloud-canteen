@@ -61,8 +61,9 @@ const PaymentFilterFormComponent: React.FC<TPaymentFilterFormComponentProps> = (
 
   return (
     <Form onSubmit={handleSubmit}>
-      <div>
-        <IconClose />
+      <div className={css.closeContainer}>
+        <div>Lọc</div>
+        <IconClose className={css.iconClose} />
       </div>
       <div>
         <div className={css.fieldInput}>
@@ -117,7 +118,7 @@ const PaymentFilterFormComponent: React.FC<TPaymentFilterFormComponentProps> = (
         <div className={css.fieldInput}>
           <label className={css.label}>Trạng thái</label>
           <FieldCheckboxGroup
-            istClassName={css.checkboxGroup}
+            listClassName={css.checkboxGroup}
             id="PaymentFilterForm.status"
             options={PAYMENT_STATUS_OPTIONS}
             name="status"
@@ -132,7 +133,7 @@ const PaymentFilterFormComponent: React.FC<TPaymentFilterFormComponentProps> = (
             Xoá bộ lọc
           </Button>
           <Button className={css.btn}>Áp dụng</Button>
-        </div>{' '}
+        </div>
       </div>
     </Form>
   );
