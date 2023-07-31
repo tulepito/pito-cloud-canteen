@@ -1,8 +1,9 @@
 import { createSlice } from '@reduxjs/toolkit';
 import groupBy from 'lodash/groupBy';
 
-import { getPartnerPaymentRecordsApi } from '@apis/admin';
+import { queryAllPartnerPaymentRecordsApi } from '@apis/partnerApi';
 import { createAsyncThunk } from '@redux/redux.helper';
+import { CurrentUser } from '@src/utils/data';
 import type { TObject } from '@src/utils/types';
 
 // ================ Initial states ================ //
@@ -22,29 +23,40 @@ const FETCH_PARTNER_PAYMENT_RECORDS = 'app/PartnerManagePayments/LOAD_DATA';
 
 // ================ Async thunks ================ //
 
-const loadData = createAsyncThunk(FETCH_PARTNER_PAYMENT_RECORDS, async () => {
-  const { data: allPaymentRecords } = await getPartnerPaymentRecordsApi();
+const loadData = createAsyncThunk(
+  FETCH_PARTNER_PAYMENT_RECORDS,
+  async (_, { getState }) => {
+    const { currentUser } = getState().user;
+    const { restaurantListingId } = CurrentUser(currentUser!).getMetadata();
 
-  const paymentRecordsGroupedByOrderId = groupBy(allPaymentRecords, 'orderId');
+    const { data: allPaymentRecords } = await queryAllPartnerPaymentRecordsApi({
+      partnerId: restaurantListingId,
+    });
 
-  const paymentRecordBySubOrder = Object.keys(
-    paymentRecordsGroupedByOrderId,
-  ).reduce((result: any, orderId: string) => {
-    const paymentRecordsGroupedBySubOrderDate = groupBy(
-      paymentRecordsGroupedByOrderId[orderId],
-      'subOrderDate',
+    const paymentRecordsGroupedByOrderId = groupBy(
+      allPaymentRecords,
+      'orderId',
     );
 
-    return {
-      ...result,
-      [orderId]: {
-        ...paymentRecordsGroupedBySubOrderDate,
-      },
-    };
-  }, {});
+    const paymentRecordBySubOrder = Object.keys(
+      paymentRecordsGroupedByOrderId,
+    ).reduce((result: any, orderId: string) => {
+      const paymentRecordsGroupedBySubOrderDate = groupBy(
+        paymentRecordsGroupedByOrderId[orderId],
+        'subOrderDate',
+      );
 
-  return paymentRecordBySubOrder;
-});
+      return {
+        ...result,
+        [orderId]: {
+          ...paymentRecordsGroupedBySubOrderDate,
+        },
+      };
+    }, {});
+
+    return paymentRecordBySubOrder;
+  },
+);
 
 export const PartnerManagePaymentsThunks = {
   loadData,
