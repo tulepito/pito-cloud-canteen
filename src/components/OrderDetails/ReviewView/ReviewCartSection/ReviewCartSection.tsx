@@ -34,7 +34,9 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
     data: {
       overflow = 0,
       promotion = 0,
+      // eslint-disable-next-line unused-imports/no-unused-vars
       serviceFee = 0,
+      serviceFeePercentage = 0,
       totalPrice = 0,
       totalWithoutVAT = 0,
       totalWithVAT = 0,
@@ -148,7 +150,10 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
             <div className={css.feeItemContainer}>
               <div className={css.label}>
                 {intl.formatMessage({ id: 'ReviewCardSection.serviceFee' })}
-                <Badge label={`${serviceFee}%`} className={css.VATBadge} />
+                <Badge
+                  label={`${serviceFeePercentage}%`}
+                  className={css.VATBadge}
+                />
               </div>
               <div className={css.fee}>
                 {parseThousandNumber(serviceFee.toString())}đ
