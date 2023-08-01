@@ -43,6 +43,7 @@ export const FieldRecommendSelectComponent = (
         backgroundColor: '#fafafa',
       },
       boxShadow: 'none',
+      minHeight: 44,
     }),
     option: (base: any) => ({
       ...base,

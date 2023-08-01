@@ -111,6 +111,7 @@
   "AdminManagePartnersRoute.title": "Admin | Quản lý đối tác",
   "AdminPartnerPaymentRoute.description": "Thanh toán đối tác",
   "AdminPartnerPaymentRoute.title": "Admin | Thanh toán đối tác",
+  "AdminClientPaymentRoute.title": "Admin | Thanh toán khách hàng",
   "AdminSidebar.accountSettingLabel": "Cài đặt tài khoản",
   "AdminSidebar.adminAccountInformationSetting": "Thông tin tài khoản",
   "AdminSidebar.adminAccountPasswordSetting": "Mật khẩu",
@@ -1627,5 +1628,6 @@
   "UserPermission.accountant": "Kế toán viên",
   "UserPermission.booker": "Booker",
   "UserPermission.owner": "Quản trị viên",
-  "UserPermission.participant": "Thành viên"
+  "UserPermission.participant": "Thành viên",
+  "AdminManageClientPaymentsPage.title": "Quản Lí Thanh Toán Khách Hàng"
 }
