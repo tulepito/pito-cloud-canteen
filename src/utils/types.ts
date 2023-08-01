@@ -702,4 +702,5 @@ export type TPaymentRecord = {
   orderTitle?: string;
   createdAt?: Date;
   isHideFromHistory?: boolean;
+  totalPrice?: number;
 };
