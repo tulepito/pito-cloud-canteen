@@ -306,7 +306,7 @@ const fetchPartnerPaymentRecords = createAsyncThunk(
       dataParams: { orderId, paymentType: EPaymentType.PARTNER },
     });
 
-    return partnerPaymentRecords;
+    return partnerPaymentRecords || {};
   },
 );
 
@@ -361,7 +361,7 @@ const fetchClientPaymentRecords = createAsyncThunk(
       dataParams: { orderId, paymentType: EPaymentType.CLIENT },
     });
 
-    return clientPaymentRecords;
+    return clientPaymentRecords || [];
   },
 );
 

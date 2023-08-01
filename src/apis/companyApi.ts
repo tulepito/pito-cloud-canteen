@@ -218,3 +218,8 @@ export type TBookerPostRatingApiBody = {
 };
 export const bookerPostRatingApi = (body: TBookerPostRatingApiBody) =>
   postApi('/company/ratings', body);
+
+export const queryAllClientPaymentRecordsApi = (
+  companyId: string,
+  params: any,
+) => getApi(`/company/${companyId}/payment/payment-client`, params);
