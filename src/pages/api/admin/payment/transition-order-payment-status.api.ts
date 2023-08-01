@@ -7,7 +7,7 @@ import { getIntegrationSdk } from '@services/integrationSdk';
 import { queryPaymentRecordOnFirebase } from '@services/payment';
 import { handleError } from '@services/sdk';
 import { Listing } from '@src/utils/data';
-import { EPaymentType } from '@src/utils/enums';
+import { EOrderStates, EPaymentType } from '@src/utils/enums';
 
 import { calculateClientTotalPriceAndPaidAmount } from './check-valid-payment.service';
 
@@ -15,6 +15,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   const integrationSdk = getIntegrationSdk();
   try {
     const { orderId, planId } = req.body;
+
+    const order = await fetchListing(orderId);
+    const orderListing = Listing(order);
+    const { orderStateHistory } = orderListing.getMetadata();
 
     const plan = await fetchListing(planId);
     const planListing = Listing(plan);
@@ -94,6 +98,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         id: orderId,
         metadata: {
           isPaid: true,
+          orderState: EOrderStates.completed,
+          orderStateHistory: orderStateHistory.concat({
+            state: EOrderStates.completed,
+            updatedAt: new Date().getTime(),
+          }),
         },
       });
 
