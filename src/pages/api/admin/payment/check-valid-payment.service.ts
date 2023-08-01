@@ -5,6 +5,30 @@ import type { PaymentBaseParams } from '@services/payment';
 import { queryPaymentRecordOnFirebase } from '@services/payment';
 import { Listing } from '@src/utils/data';
 import { EPaymentType } from '@src/utils/enums';
+import type { TPaymentRecord } from '@src/utils/types';
+
+export const calculateClientTotalPriceAndPaidAmount = async (
+  orderId: string,
+  paymentRecords: TPaymentRecord[],
+) => {
+  const order = await fetchListing(orderId);
+  const orderListing = Listing(order);
+  const { plans = [], orderVATPercentage } = orderListing.getMetadata();
+  const plan = await fetchListing(plans[0]);
+  const planListing = Listing(plan);
+  const { orderDetail = {} } = planListing.getMetadata();
+  const { totalWithVAT: clientTotalPrice } = calculatePriceQuotationInfo({
+    planOrderDetail: orderDetail,
+    order,
+    currentOrderVATPercentage: orderVATPercentage,
+  });
+  const clientPaidAmount = calculatePaidAmountBySubOrderDate(paymentRecords!);
+
+  return {
+    clientTotalPrice,
+    clientPaidAmount,
+  };
+};
 
 export const checkPaymentRecordValid = async (
   paymentRecord: PaymentBaseParams,
@@ -44,18 +68,8 @@ export const checkPaymentRecordValid = async (
 
     return totalPrice - paidAmount >= amount;
   }
-  const order = await fetchListing(orderId);
-  const orderListing = Listing(order);
-  const { plans = [], orderVATPercentage } = orderListing.getMetadata();
-  const plan = await fetchListing(plans[0]);
-  const planListing = Listing(plan);
-  const { orderDetail = {} } = planListing.getMetadata();
-  const { totalWithVAT: clientTotalPrice } = calculatePriceQuotationInfo({
-    planOrderDetail: orderDetail,
-    order,
-    currentOrderVATPercentage: orderVATPercentage,
-  });
-  const paidAmount = calculatePaidAmountBySubOrderDate(paymentRecords!);
+  const { clientTotalPrice, clientPaidAmount } =
+    await calculateClientTotalPriceAndPaidAmount(orderId, paymentRecords!);
 
-  return clientTotalPrice - paidAmount >= amount;
+  return clientTotalPrice - clientPaidAmount >= amount;
 };
