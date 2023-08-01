@@ -1,4 +1,4 @@
-import { EPaymentStatus } from '@src/utils/enums';
+import { EPaymentStatus, EPaymentType } from '@src/utils/enums';
 import type { TObject } from '@src/utils/types';
 
 import {
@@ -29,37 +29,30 @@ export type PaymentBaseParams = {
 };
 
 export const createPaymentRecordOnFirebase = async (
-  type: 'client' | 'partner',
+  type: EPaymentType,
   params: Partial<PaymentBaseParams>,
 ) => {
   const paymentCreatedAt = new Date();
   try {
-    switch (type) {
-      case 'partner': {
-        const data = {
-          ...params,
-          paymentType: type,
-          paymentStatus: EPaymentStatus.SUCCESS,
-          createdAt: paymentCreatedAt,
-        };
-        const paymentRecordId = await addCollectionDoc(
-          data,
-          FIREBASE_PAYMENT_RECORD_COLLECTION_NAME!,
-        );
-        const paymentRecordData = await getDocumentById(
-          paymentRecordId,
-          FIREBASE_PAYMENT_RECORD_COLLECTION_NAME!,
-        );
+    const data = {
+      ...params,
+      paymentType: type,
+      paymentStatus: EPaymentStatus.SUCCESS,
+      createdAt: paymentCreatedAt,
+    };
+    const paymentRecordId = await addCollectionDoc(
+      data,
+      FIREBASE_PAYMENT_RECORD_COLLECTION_NAME!,
+    );
+    const paymentRecordData = await getDocumentById(
+      paymentRecordId,
+      FIREBASE_PAYMENT_RECORD_COLLECTION_NAME!,
+    );
 
-        return {
-          id: paymentRecordId,
-          ...paymentRecordData,
-        };
-      }
-
-      default:
-        break;
-    }
+    return {
+      id: paymentRecordId,
+      ...paymentRecordData,
+    };
   } catch (error) {
     console.error('Error payment record type: ', type);
     console.error('Error creating payment record: ', error);
@@ -69,8 +62,7 @@ export const createPaymentRecordOnFirebase = async (
 export const queryPaymentRecordOnFirebase = async (query: any) => {
   try {
     const { paymentType, partnerId, orderId, subOrderDate } = query;
-    const isPartnerPaymentRecordQuery = paymentType === 'partner';
-    const partnerQuery = isPartnerPaymentRecordQuery && {
+    const paymentQuery = {
       ...(partnerId && {
         partnerId: {
           operator: '==',
@@ -95,7 +87,7 @@ export const queryPaymentRecordOnFirebase = async (query: any) => {
           operator: '==',
           value: paymentType,
         },
-        ...(isPartnerPaymentRecordQuery ? partnerQuery : {}),
+        ...paymentQuery,
       },
     });
 
@@ -113,7 +105,7 @@ export const queryAllPartnerPaymentRecordsOnFirebase = async (query = {}) => {
       queryParams: {
         paymentType: {
           operator: '==',
-          value: 'partner',
+          value: EPaymentType.PARTNER,
         },
         ...(partnerId && {
           partnerId: {

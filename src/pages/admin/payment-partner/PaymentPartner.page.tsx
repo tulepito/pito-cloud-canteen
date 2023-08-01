@@ -20,7 +20,7 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { adminPaths } from '@src/paths';
 import { formatTimestamp } from '@src/utils/dates';
-import { EOrderDetailTabs } from '@src/utils/enums';
+import { EOrderDetailTabs, EPaymentType } from '@src/utils/enums';
 import type { TPagination } from '@src/utils/types';
 
 import { generateSKU } from '../order/[orderId]/helpers/AdminOrderDetail';
@@ -255,7 +255,7 @@ const PaymentPartnerPage = () => {
       );
 
       return {
-        paymentType: 'partner',
+        paymentType: EPaymentType.PARTNER,
         orderTitle,
         subOrderDate,
         paymentNote: '',
