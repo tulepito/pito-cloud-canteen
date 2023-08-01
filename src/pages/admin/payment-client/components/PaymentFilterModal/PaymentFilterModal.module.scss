@@ -1,0 +1,10 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.modalContainer.modalContainer {
+  @include viewportLarge {
+    width: 480px;
+    flex-basis: 480px;
+  }
+}

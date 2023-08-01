@@ -122,6 +122,26 @@ export const queryAllPartnerPaymentRecordsOnFirebase = async (query = {}) => {
   }
 };
 
+export const queryAllCompanyPaymentRecordsOnFirebase = async (query = {}) => {
+  const { companyId } = query as TObject;
+
+  return queryAllCollectionData({
+    collectionName: FIREBASE_PAYMENT_RECORD_COLLECTION_NAME!,
+    queryParams: {
+      paymentType: {
+        operator: '==',
+        value: 'client',
+      },
+      ...(companyId && {
+        partnerId: {
+          operator: '==',
+          value: companyId,
+        },
+      }),
+    },
+  });
+};
+
 export const getTotalRecordsOnFirebase = async (query: any) => {
   try {
     const totalRecords = await getCollectionCount({
