@@ -3,12 +3,14 @@ import compact from 'lodash/compact';
 import isNumber from 'lodash/isNumber';
 import isString from 'lodash/isString';
 import uniq from 'lodash/uniq';
+import uniqBy from 'lodash/uniqBy';
 import { DateTime } from 'luxon';
 
 import {
   companyApi,
   getCompanyNotificationsApi,
   getCompanyOrderSummaryApi,
+  queryAllClientPaymentRecordsApi,
 } from '@apis/companyApi';
 import { fetchUserApi } from '@apis/index';
 import type { TUpdateOrderApiBody } from '@apis/orderApi';
@@ -52,6 +54,7 @@ import type {
   TObject,
   TOrderStateCountMap,
   TPagination,
+  TPaymentRecord,
 } from '@utils/types';
 
 import { SystemAttributesThunks } from './systemAttributes.slice';
@@ -153,6 +156,9 @@ type TOrderInitialState = {
 
   reorderInProgressId: string | null;
   reorderError: any;
+  allClientPaymentRecords: TPaymentRecord[];
+  queryAllClientPaymentRecordsInProgress: boolean;
+  queryAllClientPaymentRecordsError: any;
 };
 
 const initialState: TOrderInitialState = {
@@ -254,6 +260,9 @@ const initialState: TOrderInitialState = {
 
   reorderInProgressId: null,
   reorderError: null,
+  allClientPaymentRecords: [],
+  queryAllClientPaymentRecordsInProgress: false,
+  queryAllClientPaymentRecordsError: null,
 };
 
 const CREATE_ORDER = 'app/Order/CREATE_ORDER';
@@ -278,6 +287,8 @@ const GET_COMPANY_ORDER_NOTIFICATIONS =
 
 const GET_COMPANY_ORDER_SUMMARY = 'app/Order/GET_COMPANY_ORDER_SUMMARY';
 const QUERY_ALL_ORDERS = 'app/Order/QUERY_ALL_ORDERS';
+const QUERY_ALL_CLIENT_PAYMENT_RECORDS =
+  'app/Order/QUERY_ALL_CLIENT_PAYMENT_RECORDS';
 
 const BOOKER_REORDER = 'app/Order/BOOKER_REORDER';
 
@@ -894,6 +905,26 @@ const bookerReorder = createAsyncThunk(
   },
 );
 
+const queryAllClientPaymentRecords = createAsyncThunk(
+  QUERY_ALL_CLIENT_PAYMENT_RECORDS,
+  async ({ companyId, page = 1 }: TObject, { getState }) => {
+    const { orders } = getState().Order;
+    const orderIds: string[] = orders
+      .slice((page - 1) * 10, page * 10)
+      .map((order) => {
+        return order.id.uuid;
+      });
+
+    const { data } = await queryAllClientPaymentRecordsApi(companyId, {
+      dataParams: {
+        orderIds,
+      },
+    });
+
+    return data;
+  },
+);
+
 export const orderAsyncActions = {
   createOrder,
   updateOrder,
@@ -918,6 +949,7 @@ export const orderAsyncActions = {
   getCompanyOrderSummary,
   queryAllOrders,
   bookerReorder,
+  queryAllClientPaymentRecords,
 };
 
 const orderSlice = createSlice({
@@ -1396,6 +1428,28 @@ const orderSlice = createSlice({
         ...state,
         reorderInProgressId: null,
         reorderError: error,
+      }))
+
+      .addCase(queryAllClientPaymentRecords.pending, (state) => ({
+        ...state,
+        queryAllClientPaymentRecordsInProgress: true,
+        queryAllClientPaymentRecordsError: null,
+      }))
+      .addCase(
+        queryAllClientPaymentRecords.fulfilled,
+        (state, { payload }) => ({
+          ...state,
+          queryAllClientPaymentRecordsInProgress: false,
+          allClientPaymentRecords: uniqBy(
+            [...state.allClientPaymentRecords, ...payload],
+            'id',
+          ),
+        }),
+      )
+      .addCase(queryAllClientPaymentRecords.rejected, (state, { error }) => ({
+        ...state,
+        queryAllClientPaymentRecordsInProgress: false,
+        queryAllClientPaymentRecordsError: error.message,
       }));
   },
 });

@@ -139,3 +139,29 @@ export const deletePaymentRecordByIdOnFirebase = async (
     console.error('Error delete payment record: ', error);
   }
 };
+
+export const queryClientPaymentRecordsOnFirebase = async (query: any) => {
+  try {
+    const { orderIds } = query;
+    const paymentQuery = {
+      orderId: {
+        operator: 'in',
+        value: orderIds,
+      },
+      paymentType: {
+        operator: '==',
+        value: EPaymentType.CLIENT,
+      },
+    };
+    const paymentRecords = await queryCollectionData({
+      collectionName: FIREBASE_PAYMENT_RECORD_COLLECTION_NAME!,
+      queryParams: {
+        ...paymentQuery,
+      },
+    });
+
+    return paymentRecords;
+  } catch (error) {
+    console.error('Error query payment record: ', error);
+  }
+};

@@ -153,6 +153,9 @@ const CompanyOrdersTable: React.FC<TCompanyOrdersTableProps> = () => {
   const currentOrderVATPercentage = useAppSelector(
     (state) => state.SystemAttributes.currentOrderVATPercentage,
   );
+  const allClientPaymentRecords = useAppSelector(
+    (state) => state.Order.allClientPaymentRecords,
+  );
 
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
 
@@ -194,6 +197,7 @@ const CompanyOrdersTable: React.FC<TCompanyOrdersTableProps> = () => {
     orders,
     Number(page),
     currentOrderVATPercentage,
+    allClientPaymentRecords,
     openOrderStateWarningModal,
   );
 
@@ -243,26 +247,31 @@ const CompanyOrdersTable: React.FC<TCompanyOrdersTableProps> = () => {
   }, [page, totalPages]);
 
   useEffect(() => {
-    if (!currentTab || !isReady || !companyId || companyId === '[companyId]')
-      return;
+    (async () => {
+      if (!currentTab || !isReady || !companyId || companyId === '[companyId]')
+        return;
 
-    let params: TObject = {
-      page,
-      keywords,
-      companyId,
-    };
+      let params: TObject = {
+        page,
+        keywords,
+        companyId,
+      };
 
-    const parsedOrderState =
-      MANAGE_COMPANY_ORDERS_TAB_MAP[
-        currentTab as keyof typeof MANAGE_COMPANY_ORDERS_TAB_MAP
-      ].join(',');
+      const parsedOrderState =
+        MANAGE_COMPANY_ORDERS_TAB_MAP[
+          currentTab as keyof typeof MANAGE_COMPANY_ORDERS_TAB_MAP
+        ].join(',');
 
-    params = {
-      ...params,
-      meta_orderState: parsedOrderState,
-      currentTab,
-    };
-    dispatch(orderAsyncActions.queryCompanyOrders(params));
+      params = {
+        ...params,
+        meta_orderState: parsedOrderState,
+        currentTab,
+      };
+      await dispatch(orderAsyncActions.queryCompanyOrders(params));
+      await dispatch(
+        orderAsyncActions.queryAllClientPaymentRecords({ companyId, page }),
+      );
+    })();
   }, [companyId, currentTab, dispatch, isReady, keywords, page]);
 
   const currentTabIndex = findTabIndexById(
