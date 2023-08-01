@@ -33,3 +33,12 @@ export const deletePaymentRecordApi = (body: TObject) =>
 
 export const getPartnerPaymentRecordsApi = () =>
   getApi('/admin/payment/payment-partner');
+
+export const transitionOrderPaymentStatusApi = (
+  orderId: string,
+  planId: string,
+) =>
+  postApi('/admin/payment/transition-order-payment-status', {
+    orderId,
+    planId,
+  });

@@ -436,6 +436,7 @@ const parseEntitiesToTableData = (orders: TIntegrationOrderListing[]) => {
       staffName,
       deliveryAddress,
       deliveryHour,
+      isPaid = false,
     } = entity?.attributes?.metadata || {};
 
     const orderDetail = subOrders[0]?.attributes?.metadata?.orderDetail || {};
@@ -481,6 +482,7 @@ const parseEntitiesToTableData = (orders: TIntegrationOrderListing[]) => {
             (_restaurant) =>
               _restaurant.id.uuid === orderDetail[key]?.restaurant?.id,
           )?.attributes?.publicData?.location?.address,
+          isPaid: orderDetail[key]?.isPaid,
         },
       };
     });
@@ -506,8 +508,7 @@ const parseEntitiesToTableData = (orders: TIntegrationOrderListing[]) => {
         deliveryHour,
         isParent: true,
         children: subOrderDates,
-        isPaid:
-          entity.attributes.metadata.orderState === EOrderStates.completed,
+        isPaid,
         orderCreatedAt: formatTimestamp(
           new Date(entity.attributes.createdAt!).getTime(),
         ),
