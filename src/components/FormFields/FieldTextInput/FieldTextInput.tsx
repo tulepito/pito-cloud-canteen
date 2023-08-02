@@ -28,6 +28,7 @@ type InputComponentProps = FieldRenderProps<string, any> &
     showText?: boolean;
     placeholder?: string;
     inputClassName?: string;
+    inputContainerClassName?: string;
   };
 
 export const FieldTextInputComponent: React.FC<InputComponentProps> = (
@@ -39,6 +40,7 @@ export const FieldTextInputComponent: React.FC<InputComponentProps> = (
     rootClassName,
     className,
     inputRootClass,
+    inputContainerClassName,
     disabled,
     labelClassName,
     customErrorText,
@@ -146,7 +148,10 @@ export const FieldTextInputComponent: React.FC<InputComponentProps> = (
       };
 
   const classes = classNames(rootClassName || css.root, className);
-  const inputContainerClasses = classNames(css.inputContainer);
+  const inputContainerClasses = classNames(
+    css.inputContainer,
+    inputContainerClassName,
+  );
   const labelClasses = classNames(css.labelRoot, labelClassName);
   const labelRequiredRedStar = required ? css.labelRequiredRedStar : '';
 
