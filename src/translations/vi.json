@@ -99,6 +99,7 @@
   "AdminHomePageRoute.description": "Trang chủ",
   "AdminHomePageRoute.title": "Admin | Trang chủ",
   "AdminManageClientPaymentsPage.title": "Quản Lí Thanh Toán Khách Hàng",
+  "AdminManageClientPaymentsRoute.title": "Admin | Thanh Toán Khách Hàng",
   "AdminManageCompaniesRoute.description": "Quản lý khách hàng",
   "AdminManageCompaniesRoute.title": "Admin | Quản lý khách hàng",
   "AdminManageFoodRoute.description": "Đối tác - Món ăn",
