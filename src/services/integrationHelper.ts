@@ -21,6 +21,24 @@ export const fetchListing = async (
   return denormalisedResponseEntities(response)[0];
 };
 
+export const adminQueryListings = async (
+  params: TObject = {},
+  include: string[] = [],
+  imageVariants?: string[],
+) => {
+  const integrationSdk = getIntegrationSdk();
+  const response = await integrationSdk.listings.query(
+    {
+      ...params,
+      include,
+      ...(imageVariants && { 'fields.image': imageVariants }),
+    },
+    { expand: true },
+  );
+
+  return denormalisedResponseEntities(response);
+};
+
 export const fetchUser = async (userId: string) => {
   const integrationSdk = getIntegrationSdk();
   const response = await integrationSdk.users.show(

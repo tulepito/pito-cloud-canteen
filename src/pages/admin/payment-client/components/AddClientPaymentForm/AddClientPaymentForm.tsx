@@ -63,7 +63,6 @@ const AddClientPaymentFormComponent: React.FC<
     onQueryCompanyBookers,
     companyBookers,
     queryBookersInProgress,
-    invalid,
   } = props;
 
   const selectFieldRef = useRef<any>(null);
@@ -175,6 +174,7 @@ const AddClientPaymentFormComponent: React.FC<
 
       return;
     }
+
     setUnPaidPaymentListFiltered(
       filterClientPayment(unPaidPaymentList, {
         bookerIds: values.bookerIds,
