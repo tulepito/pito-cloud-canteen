@@ -1,6 +1,7 @@
 import { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
+import { OnChange } from 'react-final-form-listeners';
 import addDays from 'date-fns/addDays';
 import arrayMutators from 'final-form-arrays';
 
@@ -8,29 +9,39 @@ import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
 import FieldDatePicker from '@components/FormFields/FieldDatePicker/FieldDatePicker';
 import FieldRecommendSelect from '@components/FormFields/FieldRecommendSelect/FieldRecommendSelect';
+import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
 import type { TColumn } from '@components/Table/Table';
 import Table from '@components/Table/Table';
 import { parseThousandNumber } from '@helpers/format';
-import { formatTimestamp, getDayOfWeek } from '@src/utils/dates';
+import { formatTimestamp } from '@src/utils/dates';
+import type { TCompanyMemberWithDetails, TObject } from '@src/utils/types';
+import { nonEmptyArray } from '@src/utils/validators';
 
 import { filterClientPayment } from '../../helpers';
 
 import AddingClientTableField from './AddingClientTableField';
+import FieldMultipleSelectBooker from './FieldMultipleSelectBooker';
 
 import css from './AddClientPaymentForm.module.scss';
 
 export type TAddClientPaymentFormValues = {
   startDate?: number;
   endDate?: number;
-  partnerName?: any;
+  partnerId?: any;
+  company?: TObject;
+  bookerIds: string[];
   [key: string]: any;
 };
 
 type TExtraProps = {
-  companyNameList: string[];
+  companyList: TObject[];
+  partnerList: TObject[];
   unPaidPaymentList: any[];
   inProgress?: boolean;
   selectInputRef: any;
+  onQueryCompanyBookers: (id: string) => void;
+  companyBookers: TCompanyMemberWithDetails[];
+  queryBookersInProgress: boolean;
 };
 type AddClientPaymentFormComponentProps =
   FormRenderProps<TAddClientPaymentFormValues> & Partial<TExtraProps>;
@@ -44,10 +55,15 @@ const AddClientPaymentFormComponent: React.FC<
     handleSubmit,
     values,
     form,
-    companyNameList = [],
+    companyList = [],
+    partnerList = [],
     unPaidPaymentList = [],
     inProgress,
     selectInputRef,
+    onQueryCompanyBookers,
+    companyBookers,
+    queryBookersInProgress,
+    invalid,
   } = props;
 
   const selectFieldRef = useRef<any>(null);
@@ -73,9 +89,14 @@ const AddClientPaymentFormComponent: React.FC<
 
   const minEndDate = addDays(values.startDate!, 1);
 
-  const companyNameOptions = companyNameList.map((companyName) => ({
-    value: companyName,
-    label: companyName,
+  const companyNameOptions = companyList.map((company) => ({
+    value: company.companyId,
+    label: company.companyName,
+  }));
+
+  const partnerNameOptions = partnerList.map((partnerName) => ({
+    value: partnerName.restaurantId,
+    label: partnerName.restaurantName,
   }));
 
   const handleParseInputValue = (value: string) => {
@@ -86,17 +107,17 @@ const AddClientPaymentFormComponent: React.FC<
     {
       key: 'id',
       label: 'ID',
-      render: ({ orderTitle, subOrderDate }: any) => (
-        <div className={css.orderTitle}>{`#${orderTitle}_${getDayOfWeek(
-          +subOrderDate,
-        )}`}</div>
+      render: ({ orderTitle }: any) => (
+        <div className={css.orderTitle}>{`#${orderTitle}`}</div>
       ),
     },
     {
       key: 'subOrderDate',
       label: 'Ngày triển khai',
-      render: ({ subOrderDate }: any) => (
-        <div>{formatTimestamp(subOrderDate)}</div>
+      render: ({ startDate, endDate }: any) => (
+        <div>{`${formatTimestamp(startDate)} - ${formatTimestamp(
+          endDate,
+        )}`}</div>
       ),
     },
     {
@@ -120,13 +141,12 @@ const AddClientPaymentFormComponent: React.FC<
     {
       key: 'paymentAction',
       label: 'Thanh toán',
-      render: ({ totalAmount, paidAmount, orderTitle, subOrderDate, id }) => {
+      render: ({ totalAmount, paidAmount, orderTitle, id }) => {
         return (
           <AddingClientTableField
             totalAmount={totalAmount}
             paidAmount={paidAmount}
             orderTitle={orderTitle}
-            subOrderDate={subOrderDate}
             handleParseInputValue={handleParseInputValue}
             id={id}
             form={form}
@@ -150,11 +170,17 @@ const AddClientPaymentFormComponent: React.FC<
   };
 
   const filterUnPaidPaymentList = () => {
+    if (!values?.bookerIds || values?.bookerIds?.length <= 0) {
+      form.change('bookerIds', undefined);
+
+      return;
+    }
     setUnPaidPaymentListFiltered(
       filterClientPayment(unPaidPaymentList, {
+        bookerIds: values.bookerIds,
         startDate: values?.startDate,
         endDate: values?.endDate,
-        companyName: values?.companyName?.value,
+        partnerId: values?.partnerId?.value,
       }),
     );
   };
@@ -164,8 +190,22 @@ const AddClientPaymentFormComponent: React.FC<
     form.restart();
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-shadow
+  const handleCompanyChange = (company: TObject) => {
+    const { value } = company;
+
+    if (values?.company?.value !== value) {
+      form.change('bookerIds', []);
+    }
+
+    if (value && onQueryCompanyBookers) {
+      onQueryCompanyBookers(value);
+    }
+  };
+
   return (
     <Form onSubmit={handleSubmitForm}>
+      <OnChange name="company">{handleCompanyChange}</OnChange>
       <div className={css.datesInput}>
         <FieldDatePicker
           id="startDate"
@@ -196,17 +236,42 @@ const AddClientPaymentFormComponent: React.FC<
         <div className={css.fieldInput}>
           <div className={css.label}>Công ty</div>
           <FieldRecommendSelect
-            id="companyName"
-            name="companyName"
+            id="company"
+            name="company"
             placeholder="Nhập tên khách hàng"
             options={companyNameOptions}
             inputRef={selectFieldRef}
           />
         </div>
+        <div className={css.fieldInput}>
+          <div className={css.label}>Công ty</div>
+          <FieldRecommendSelect
+            id="partnerId"
+            name="partnerId"
+            placeholder="Nhập tên đối tác"
+            options={partnerNameOptions}
+            inputRef={selectFieldRef}
+          />
+        </div>
+      </div>
+      <div className={css.fieldSelectBooker}>
+        {values?.company?.value &&
+          (queryBookersInProgress ? (
+            <IconSpinner className={css.loading} />
+          ) : (
+            <FieldMultipleSelectBooker
+              name="bookerIds"
+              id="bookerIds"
+              options={companyBookers}
+              values={values}
+              validate={nonEmptyArray('Vui lòng chọn booker')}
+            />
+          ))}
       </div>
       <div className={css.filterBtn}>
         <Button
           className={css.btn}
+          disabled={queryBookersInProgress}
           type="button"
           onClick={filterUnPaidPaymentList}>
           Tìm kiếm

@@ -1,15 +1,22 @@
 import { createSlice } from '@reduxjs/toolkit';
+import { groupBy } from 'lodash';
 
+import { createPaymentRecordApi } from '@apis/admin';
 import { adminQueryAllClientPaymentsApi } from '@apis/companyApi';
 import { createAsyncThunk } from '@redux/redux.helper';
+import { EPaymentType } from '@src/utils/enums';
+import type { TObject } from '@src/utils/types';
 
 // ================ Initial states ================ //
 
 const ADMIN_FETCH_CLIENT_PAYMENT =
   'app/AdminManageClientPayments/ADMIN_FETCH_CLIENT_PAYMENT';
 
+const ADMIN_CREATE_CLIENT_PAYMENT =
+  'app/AdminManageClientPayments/ADMIN_CREATE_CLIENT_PAYMENT';
+
 type TAdminManageClientPaymentsState = {
-  clientPayments: any[];
+  clientPaymentsMap: TObject;
   fetchClientPaymentsInProgress: boolean;
   fetchClientPaymentsError: any;
 
@@ -17,7 +24,7 @@ type TAdminManageClientPaymentsState = {
   createClientPaymentsRecordsError: any;
 };
 const initialState: TAdminManageClientPaymentsState = {
-  clientPayments: [],
+  clientPaymentsMap: {},
   fetchClientPaymentsInProgress: false,
   fetchClientPaymentsError: null,
 
@@ -33,11 +40,63 @@ const fetchPartnerPaymentRecords = createAsyncThunk(
   async () => {
     const { data: allPaymentRecords } = await adminQueryAllClientPaymentsApi();
 
-    return allPaymentRecords;
+    const paymentRecordsGrouppedByOrderId = groupBy(
+      allPaymentRecords,
+      'orderId',
+    );
+
+    return paymentRecordsGrouppedByOrderId;
   },
 );
+
+const adminCreateClientPayment = createAsyncThunk(
+  ADMIN_CREATE_CLIENT_PAYMENT,
+  async (payload: any[], { getState }) => {
+    const oldClientPaymentMap = {
+      ...getState().AdminManageClientPayments.clientPaymentsMap,
+    };
+    const newClientPaymentRecords = await Promise.all(
+      payload.map(async (paymentRecord) => {
+        const apiBody = {
+          paymentRecordType: EPaymentType.CLIENT,
+          paymentRecordParams: {
+            ...paymentRecord,
+          },
+        };
+        const { data: newPartnerPaymentRecord } = await createPaymentRecordApi(
+          apiBody,
+        );
+
+        return newPartnerPaymentRecord;
+      }),
+    );
+
+    const mergedClientPaymentRecords = newClientPaymentRecords.reduce(
+      (acc: any, newRecord: any) => {
+        const { orderId } = newRecord;
+        if (acc?.[orderId]) {
+          return {
+            ...acc,
+            [orderId]: [newRecord, ...acc[orderId]],
+          };
+        }
+        const newAcc = {
+          ...acc,
+          [orderId]: [newRecord],
+        };
+
+        return newAcc;
+      },
+      oldClientPaymentMap,
+    );
+
+    return mergedClientPaymentRecords;
+  },
+);
+
 export const AdminManageClientPaymentsThunks = {
   fetchPartnerPaymentRecords,
+  adminCreateClientPayment,
 };
 
 // ================ Slice ================ //
@@ -46,21 +105,31 @@ const AdminManageClientPaymentsSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    builder.addCase(fetchPartnerPaymentRecords.pending, (state) => {
-      state.fetchClientPaymentsInProgress = true;
-      state.fetchClientPaymentsError = null;
-    });
-    builder.addCase(
-      fetchPartnerPaymentRecords.fulfilled,
-      (state, { payload }) => {
+    builder
+      .addCase(fetchPartnerPaymentRecords.pending, (state) => {
+        state.fetchClientPaymentsInProgress = true;
+        state.fetchClientPaymentsError = null;
+      })
+      .addCase(fetchPartnerPaymentRecords.fulfilled, (state, { payload }) => {
         state.fetchClientPaymentsInProgress = false;
-        state.clientPayments = payload;
-      },
-    );
-    builder.addCase(fetchPartnerPaymentRecords.rejected, (state, action) => {
-      state.fetchClientPaymentsInProgress = false;
-      state.fetchClientPaymentsError = action.payload;
-    });
+        state.clientPaymentsMap = payload;
+      })
+      .addCase(fetchPartnerPaymentRecords.rejected, (state, { error }) => {
+        state.fetchClientPaymentsInProgress = false;
+        state.fetchClientPaymentsError = error;
+      })
+      .addCase(adminCreateClientPayment.pending, (state) => {
+        state.createClientPaymentsInProgress = true;
+        state.createClientPaymentsRecordsError = null;
+      })
+      .addCase(adminCreateClientPayment.fulfilled, (state, { payload }) => {
+        state.createClientPaymentsInProgress = false;
+        state.clientPaymentsMap = payload;
+      })
+      .addCase(adminCreateClientPayment.rejected, (state, { error }) => {
+        state.createClientPaymentsInProgress = false;
+        state.createClientPaymentsRecordsError = error;
+      });
   },
 });
 

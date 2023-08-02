@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { isEmpty, uniq } from 'lodash';
+import classNames from 'classnames';
+import { flatMapDeep, isEmpty, uniq } from 'lodash';
 
 import Badge, { EBadgeType } from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
@@ -15,23 +16,21 @@ import {
 } from '@helpers/format';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
+import { companyMemberThunks } from '@redux/slices/companyMember.slice';
 import { adminPaths } from '@src/paths';
+import { UserPermission } from '@src/types/UserPermission';
 import { formatTimestamp } from '@src/utils/dates';
 import { EOrderDetailTabs } from '@src/utils/enums';
-import type { TPagination } from '@src/utils/types';
+import type { TObject, TPagination } from '@src/utils/types';
 
 import { generateSKU } from '../order/[orderId]/helpers/AdminOrderDetail';
 import KeywordSearchForm from '../partner/components/KeywordSearchForm/KeywordSearchForm';
-import PaymentFilterModal from '../payment-partner/components/PaymentFilterModal/PaymentFilterModal';
-import {
-  filterPaymentPartner,
-  makeExcelFile,
-} from '../payment-partner/helpers/paymentPartner';
-import { PaymentPartnerThunks } from '../payment-partner/PaymentPartner.slice';
+import { filterPaymentPartner } from '../payment-partner/helpers/paymentPartner';
 
 import AddClientPaymentModal from './components/AddClientPaymentModal/AddClientPaymentModal';
+import PaymentFilterModal from './components/PaymentFilterModal/PaymentFilterModal';
 import { AdminManageClientPaymentsThunks } from './AdminManageClientPayments.slice';
-import { filterClientPayment } from './helpers';
+import { filterClientPayment, makeClientPaymentExcelFile } from './helpers';
 
 import css from './AdminManageClientPayments.module.scss';
 
@@ -80,21 +79,41 @@ const TABLE_COLUMNS: TColumn[] = [
     ),
   },
   {
-    key: 'subOrderName',
+    key: 'orderName',
     label: 'Tên đơn hàng',
-    render: ({ companyName, subOrderDate }: any) => (
-      <div className={css.boldText}>{`${companyName}_${formatTimestamp(
-        subOrderDate,
+    render: ({ companyName, startDate, endDate }: any) => (
+      <div
+        className={classNames(
+          css.boldText,
+          css.orderName,
+        )}>{`${companyName}_${formatTimestamp(startDate)} - ${formatTimestamp(
+        endDate,
       )}`}</div>
     ),
   },
   {
-    key: 'subOrderDate',
+    key: 'representatives',
+    label: 'Người đại diện',
+    render: ({ booker = {} }: any) => {
+      const { bookerDisplayName, bookerPhoneNumber } = booker;
+
+      return (
+        <div>
+          <div>
+            <div className={css.memberName}>{bookerDisplayName}</div>
+            <div className={css.memberPhoneNumber}>{bookerPhoneNumber}</div>
+          </div>
+        </div>
+      );
+    },
+  },
+  {
+    key: 'orderDate',
     label: 'Thời gian',
-    render: ({ subOrderDate, deliveryHour }: any) => (
+    render: ({ startDate, endDate, deliveryHour }: any) => (
       <div>
         <div className={css.semiBoldText}>{deliveryHour}</div>
-        {`${formatTimestamp(subOrderDate)}`}
+        {`${formatTimestamp(startDate)} - ${formatTimestamp(endDate)}`}
       </div>
     ),
   },
@@ -137,6 +156,21 @@ const TABLE_COLUMNS: TColumn[] = [
   },
 ];
 
+export const getUniqueRestaurants = (restaurants: TObject[]) => {
+  const resArr = [] as any[];
+  restaurants.forEach((item) => {
+    if (!item?.restaurantId) {
+      return;
+    }
+    const i = resArr.findIndex((x) => x.restaurantId === item.restaurantId);
+    if (i <= -1) {
+      resArr.push(item);
+    }
+  });
+
+  return resArr;
+};
+
 const AdminManageClientPaymentsPage = () => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
@@ -156,24 +190,63 @@ const AdminManageClientPaymentsPage = () => {
     (state) => state.AdminManageClientPayments.fetchClientPaymentsInProgress,
   );
 
-  const clientPayments = useAppSelector(
-    (state) => state.AdminManageClientPayments.clientPayments,
+  const clientPaymentsMap = useAppSelector(
+    (state) => state.AdminManageClientPayments.clientPaymentsMap,
   );
 
   const createClientPaymentsInProgress = useAppSelector(
     (state) => state.AdminManageClientPayments.createClientPaymentsInProgress,
   );
 
-  const formattedTableData = clientPayments.map((item) => {
-    const { id } = item;
-    const companyName = item.companyName || '';
-    const deliveryHour = item.deliveryHour || '';
-    const orderTitle = item.orderTitle || '';
-    const totalAmount = item.totalPrice || 0;
-    const orderId = item.orderId || '';
-    const partnerId = item.partnerId || '';
-    const paidAmount = item.amount || 0;
-    const remainAmount = totalAmount - paidAmount;
+  const companyMembers = useAppSelector(
+    (state) => state.companyMember.companyMembers,
+  );
+
+  const companyBookers = companyMembers.filter(
+    (member) =>
+      member.permission === UserPermission.OWNER ||
+      member.permission === UserPermission.BOOKER,
+  );
+
+  const queryMembersInProgress = useAppSelector(
+    (state) => state.companyMember.queryMembersInProgress,
+  );
+
+  const onQueryCompanyBookers = (id: string) =>
+    dispatch(companyMemberThunks.queryCompanyMembers(id));
+
+  const tableData = useMemo(
+    () =>
+      flatMapDeep(clientPaymentsMap, (subOrders, orderId) => ({
+        id: orderId,
+        paymentRecords: [...subOrders],
+      })),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [JSON.stringify(clientPaymentsMap)],
+  );
+
+  const formattedTableData = tableData.map((item: any) => {
+    const { id, paymentRecords } = item;
+    const totalPrice = paymentRecords[0]?.totalPrice || 0;
+    const companyName = paymentRecords[0].companyName || '';
+    const startDate = paymentRecords[0].startDate || '';
+    const endDate = paymentRecords[0].endDate || '';
+
+    const deliveryHour = paymentRecords[0].deliveryHour || '';
+    const orderTitle = paymentRecords[0].orderTitle || '';
+
+    const orderId = paymentRecords[0].orderId || '';
+    const partnerId = paymentRecords[0].partnerId || '';
+    const booker = paymentRecords[0].booker || '';
+    const company = paymentRecords[0].company || {};
+
+    const restaurants = paymentRecords[0].restaurants || [];
+
+    const paidAmount = paymentRecords.reduce(
+      (acc: number, cur: TObject) => acc + (cur.amount || 0),
+      0,
+    );
+    const remainAmount = totalPrice - paidAmount;
 
     const status = remainAmount === 0 ? 'isPaid' : 'isNotPaid';
 
@@ -183,19 +256,31 @@ const AdminManageClientPaymentsPage = () => {
         id,
         companyName,
         orderTitle,
-        totalAmount,
+        totalAmount: totalPrice,
         remainAmount,
         paidAmount,
         status,
         deliveryHour,
         orderId,
         partnerId,
+        startDate,
+        endDate,
+        booker,
+        restaurants,
+        company,
       },
     };
   });
+  const companyList = uniq(
+    formattedTableData
+      .filter((item) => !!item.data.company?.companyName)
+      .map((item) => item.data.company),
+  );
 
-  const companyNameList = uniq(
-    formattedTableData.map((item) => item.data.companyName),
+  const partnerList = getUniqueRestaurants(
+    formattedTableData.reduce((prev, item) => {
+      return [...prev, ...item.data.restaurants];
+    }, [] as TObject[]),
   );
 
   const filteredTableData = filterClientPayment(formattedTableData, filters);
@@ -232,7 +317,7 @@ const AdminManageClientPaymentsPage = () => {
     );
 
     const newPaymentRecordsData = newPaymentRecords.map((key) => {
-      const [, orderTitle, subOrderDate, id] = key.split(' - ');
+      const [, orderTitle, id] = key.split(' - ');
       const currentPaymentRecord = formattedTableData.find(
         (_data) => _data.key === id,
       );
@@ -240,20 +325,23 @@ const AdminManageClientPaymentsPage = () => {
       return {
         paymentType: 'client',
         orderTitle,
-        subOrderDate,
+        startDate: currentPaymentRecord?.data?.startDate,
+        endDate: currentPaymentRecord?.data?.endDate,
         paymentNote: '',
-        companyName: currentPaymentRecord?.data.companyName,
-        deliveryHour: currentPaymentRecord?.data.deliveryHour,
+        companyName: currentPaymentRecord?.data?.companyName,
+        deliveryHour: currentPaymentRecord?.data?.deliveryHour,
         amount: parseThousandNumberToInteger(values[key]),
-        totalPrice: currentPaymentRecord?.data.totalAmount,
-        orderId: currentPaymentRecord?.data.orderId,
-        partnerId: currentPaymentRecord?.data.partnerId,
-        SKU: generateSKU('CUSTOMER', currentPaymentRecord?.data.orderId),
+        totalPrice: currentPaymentRecord?.data?.totalAmount,
+        orderId: currentPaymentRecord?.data?.orderId,
+        partnerId: currentPaymentRecord?.data?.partnerId,
+        SKU: generateSKU('CUSTOMER', currentPaymentRecord?.data?.orderId),
       };
     });
 
     const { meta } = await dispatch(
-      PaymentPartnerThunks.createPartnerPaymentRecords(newPaymentRecordsData),
+      AdminManageClientPaymentsThunks.adminCreateClientPayment(
+        newPaymentRecordsData,
+      ),
     );
 
     if (meta.requestStatus === 'fulfilled') {
@@ -274,9 +362,9 @@ const AdminManageClientPaymentsPage = () => {
       const selectedPaymentRecordsData = filteredTableData.filter((item) =>
         selectedPaymentRecords.rowCheckbox.includes(item.key),
       );
-      makeExcelFile(selectedPaymentRecordsData);
+      makeClientPaymentExcelFile(selectedPaymentRecordsData);
     } else {
-      makeExcelFile(filteredTableData);
+      makeClientPaymentExcelFile(filteredTableData);
     }
   };
 
@@ -344,22 +432,28 @@ const AdminManageClientPaymentsPage = () => {
           onCustomPageChange={setPage}
         />
       </div>
-
       <PaymentFilterModal
         isOpen={filterPaymentModalController.value}
         onClose={filterPaymentModalController.setFalse}
         setFilters={setFilters}
+        initialValues={filters}
       />
-      <AddClientPaymentModal
-        isOpen={addClientPaymentModalController.value}
-        onClose={addClientPaymentModalController.setFalse}
-        companyNameList={companyNameList}
-        paymentList={filterPaymentPartner(formattedTableData, {
-          status: ['isNotPaid'],
-        })}
-        onClientPaymentRecordsSubmit={onClientPaymentRecordsSubmit}
-        inProgress={createClientPaymentsInProgress}
-      />
+      {addClientPaymentModalController.value && (
+        <AddClientPaymentModal
+          isOpen={addClientPaymentModalController.value}
+          onClose={addClientPaymentModalController.setFalse}
+          companyList={companyList}
+          partnerList={partnerList}
+          paymentList={filterPaymentPartner(formattedTableData, {
+            status: ['isNotPaid'],
+          })}
+          onQueryCompanyBookers={onQueryCompanyBookers}
+          companyBookers={companyBookers}
+          queryBookersInProgress={queryMembersInProgress}
+          onClientPaymentRecordsSubmit={onClientPaymentRecordsSubmit}
+          inProgress={createClientPaymentsInProgress}
+        />
+      )}
     </div>
   );
 };
