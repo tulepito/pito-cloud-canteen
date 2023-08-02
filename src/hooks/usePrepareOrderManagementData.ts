@@ -180,11 +180,12 @@ export const usePrepareOrderDetailPageData = ({
       calculatePriceQuotationInfo({
         planOrderDetail: draftOrderDetail,
         order: orderData as TObject,
-        date,
         currentOrderVATPercentage: VATPercentage!
           ? VATPercentage!
           : currentOrderVATPercentage,
         currentOrderServiceFeePercentage: serviceFeePercentage,
+        date,
+        shouldIncludePITOFee: isEmpty(date),
       }),
     [orderData, draftOrderDetail, currentOrderVATPercentage],
   );

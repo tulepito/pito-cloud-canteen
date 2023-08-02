@@ -5,11 +5,60 @@ import type { TIconProps } from '@utils/types';
 
 import css from './IconDownload.module.scss';
 
-const IconDownload: React.FC<TIconProps> = (props) => {
-  const { className } = props;
+type TIconDownloadProps = TIconProps & {
+  variant?: 'file' | 'normal';
+};
+
+const IconDownload: React.FC<TIconDownloadProps> = (props) => {
+  const { className, variant = 'file' } = props;
   const classes = classNames(className, css.root);
 
-  return (
+  const isNormalVariant = variant === 'normal';
+
+  return isNormalVariant ? (
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 20 20"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg">
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M10.0007 13.7842C9.65573 13.7842 9.37573 13.5042 9.37573 13.1592V3.125C9.37573 2.78 9.65573 2.5 10.0007 2.5C10.3457 2.5 10.6257 2.78 10.6257 3.125V13.1592C10.6257 13.5042 10.3457 13.7842 10.0007 13.7842Z"
+        fill="#BFBFBF"
+      />
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M10.0008 13.7845C9.83494 13.7845 9.67494 13.7187 9.55827 13.6004L7.12827 11.1612C6.88494 10.9162 6.88577 10.5204 7.12994 10.277C7.37494 10.0337 7.76994 10.0337 8.01327 10.2787L10.0008 12.2745L11.9883 10.2787C12.2316 10.0337 12.6266 10.0337 12.8716 10.277C13.1158 10.5204 13.1166 10.9162 12.8733 11.1612L10.4433 13.6004C10.3266 13.7187 10.1666 13.7845 10.0008 13.7845Z"
+        fill="#BFBFBF"
+      />
+      <mask
+        id="mask0_15014_60241"
+        style={{ maskType: 'luminance' }}
+        maskUnits="userSpaceOnUse"
+        x="1"
+        y="6"
+        width="18"
+        height="12">
+        <path
+          fillRule="evenodd"
+          clipRule="evenodd"
+          d="M1.66675 6.44531H18.3332V17.8986H1.66675V6.44531Z"
+          fill="white"
+        />
+      </mask>
+      <g mask="url(#mask0_15014_60241)">
+        <path
+          fillRule="evenodd"
+          clipRule="evenodd"
+          d="M14.6459 17.8986H5.36258C3.32508 17.8986 1.66675 16.2411 1.66675 14.2028V10.132C1.66675 8.09865 3.32091 6.44531 5.35508 6.44531H6.13925C6.48425 6.44531 6.76425 6.72531 6.76425 7.07031C6.76425 7.41531 6.48425 7.69531 6.13925 7.69531H5.35508C4.01008 7.69531 2.91675 8.78781 2.91675 10.132V14.2028C2.91675 15.552 4.01341 16.6486 5.36258 16.6486H14.6459C15.9892 16.6486 17.0834 15.5545 17.0834 14.2111V10.1411C17.0834 8.79198 15.9859 7.69531 14.6384 7.69531H13.8617C13.5167 7.69531 13.2367 7.41531 13.2367 7.07031C13.2367 6.72531 13.5167 6.44531 13.8617 6.44531H14.6384C16.6759 6.44531 18.3334 8.10365 18.3334 10.1411V14.2111C18.3334 16.2445 16.6784 17.8986 14.6459 17.8986Z"
+          fill="#BFBFBF"
+        />
+      </g>
+    </svg>
+  ) : (
     <svg
       width="20"
       height="20"

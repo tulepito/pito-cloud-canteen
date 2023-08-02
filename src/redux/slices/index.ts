@@ -29,6 +29,7 @@ export { default as user } from './user.slice';
 export { default as walkthrough } from './walkthrough.slice';
 export { default as AdminAttributes } from '@pages/admin/Attributes.slice';
 export { default as OrderDetail } from '@pages/admin/order/[orderId]/OrderDetail.slice';
+export { default as AdminManageClientPayments } from '@pages/admin/payment-client/AdminManageClientPayments.slice';
 export { default as PaymentPartner } from '@pages/admin/payment-partner/PaymentPartner.slice';
 export { default as Nutrition } from '@pages/company/[companyId]/nutrition/Nutrition.slice';
 export { default as BookerDraftOrderPage } from '@pages/company/booker/orders/draft/[orderId]/BookerDraftOrderPage.slice';
@@ -41,3 +42,4 @@ export { default as ParticipantPlanPage } from '@pages/participant/plans/[planId
 export { default as ParticipantSubOrderList } from '@pages/participant/sub-orders/SubOrders.slice';
 export { default as PartnerSubOrderDetail } from '@pages/partner/orders/[subOrderId]/PartnerSubOrderDetail.slice';
 export { default as PartnerManageOrders } from '@pages/partner/orders/ManageOrders.slice';
+export { default as PartnerManagePayments } from '@pages/partner/payments/PartnerManagePayments.slice';
