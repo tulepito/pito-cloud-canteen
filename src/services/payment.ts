@@ -26,6 +26,8 @@ export type PaymentBaseParams = {
   totalPrice?: number;
   deliveryHour?: string;
   isHideFromHistory?: boolean;
+  company?: TObject;
+  restaurants?: TObject[];
 };
 
 export const createPaymentRecordOnFirebase = async (
