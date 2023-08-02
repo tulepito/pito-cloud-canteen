@@ -1295,6 +1295,7 @@
   "PaymentPartnerPage.actionButton.addPayment": "Thêm thanh toán",
   "PaymentPartnerPage.actionButton.downloadPayment": "In danh sách",
   "PaymentPartnerPage.actionButton.paymentConfirm": "Xác nhận thanh toán",
+  "PaymentPartnerPage.filterLabels.bookerName": "Tên người đại diện",
   "PaymentPartnerPage.filterLabels.companyName": "Tên khách hàng",
   "PaymentPartnerPage.filterLabels.endDate": "Đến ngày",
   "PaymentPartnerPage.filterLabels.orderTitle": "Mã đơn hàng",

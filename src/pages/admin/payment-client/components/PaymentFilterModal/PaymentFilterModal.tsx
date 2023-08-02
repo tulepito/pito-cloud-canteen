@@ -22,6 +22,7 @@ const PaymentFilterModal: React.FC<PaymentFilterModalProps> = (props) => {
       endDate,
       status,
       restaurantName,
+      bookerName,
     } = values;
     setFilters({
       ...(companyName && { companyName }),
@@ -30,6 +31,7 @@ const PaymentFilterModal: React.FC<PaymentFilterModalProps> = (props) => {
       ...(endDate && { endDate }),
       ...(status && { status }),
       ...(restaurantName && { restaurantName }),
+      ...(bookerName && { bookerName }),
     });
 
     onClose();
