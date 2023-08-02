@@ -49,7 +49,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
             res.json(groupPaymentRecordsBySubOrderDate);
           } else {
-            res.json(paymentRecords);
+            const newPaymentRecords = paymentRecords?.filter(
+              (p) => !p.isHideFromHistory,
+            );
+            res.json(newPaymentRecords);
           }
         }
         break;

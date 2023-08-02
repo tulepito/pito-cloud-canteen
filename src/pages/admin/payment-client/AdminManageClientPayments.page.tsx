@@ -374,6 +374,9 @@ const AdminManageClientPaymentsPage = () => {
   };
 
   const filterLabels = Object.keys(filters).map((key) => {
+    const isArray = Array.isArray(filters[key]);
+    if (isArray && filters[key].length <= 0) return <></>;
+
     return (
       <div key={`${key}-${filters[key]}`} className={css.filterLabel}>
         <span>
