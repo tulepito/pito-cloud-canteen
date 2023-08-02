@@ -22,7 +22,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             return;
           }
 
-          const orderListing = await fetchListing(orderId as string);
+          const orderListing = await fetchListing(orderId as string, [
+            'author',
+          ]);
           const planListing = await fetchListing(planId as string);
           await initializePayment(orderListing, planListing);
 

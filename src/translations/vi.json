@@ -1299,6 +1299,7 @@
   "PaymentPartnerPage.filterLabels.endDate": "Đến ngày",
   "PaymentPartnerPage.filterLabels.orderTitle": "Mã đơn hàng",
   "PaymentPartnerPage.filterLabels.partnerName": "Đối tác",
+  "PaymentPartnerPage.filterLabels.restaurantName": "Tên đối tác",
   "PaymentPartnerPage.filterLabels.startDate": "Từ ngày",
   "PaymentPartnerPage.filterLabels.status": "Trạng thái",
   "PaymentPartnerPage.title": "Quản lí thanh toán đối tác",
