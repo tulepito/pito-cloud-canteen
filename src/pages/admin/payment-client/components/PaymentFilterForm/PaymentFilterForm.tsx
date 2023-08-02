@@ -20,6 +20,7 @@ export type TPaymentFilterFormValues = {
   endDate?: number;
   status?: string[];
   restaurantName?: string;
+  bookerName?: string;
 };
 
 const PAYMENT_STATUS_OPTIONS = [
@@ -77,6 +78,16 @@ const PaymentFilterFormComponent: React.FC<TPaymentFilterFormComponentProps> = (
           label="Tên đối tác"
           labelClassName={css.label}
           placeholder="Tìm kiếm đối tác"
+          leftIcon={<IconSearch />}
+        />
+      </div>
+      <div className={css.fieldInput}>
+        <FieldTextInput
+          id="bookerName"
+          name="bookerName"
+          label="Người đại diện"
+          labelClassName={css.label}
+          placeholder="Tìm kiếm người đại diện"
           leftIcon={<IconSearch />}
         />
       </div>

@@ -20,6 +20,7 @@ export const filterClientPayment = (
     partnerId: filterPartnerId,
     bookerIds: filterBookerIds,
     restaurantName: filterRestaurantName,
+    bookerName: filterBookerName,
   } = filterList;
 
   const filterFn = (item: any) => {
@@ -33,6 +34,14 @@ export const filterClientPayment = (
       company = {},
       booker = {},
     } = item.data;
+
+    if (
+      filterBookerName &&
+      !removeAccents(booker?.bookerDisplayName)
+        .toLocaleLowerCase()
+        .includes(removeAccents(filterBookerName).toLocaleLowerCase())
+    )
+      return false;
 
     if (
       filterCompanyName &&
