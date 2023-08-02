@@ -13,7 +13,6 @@ type TAddClientPaymentFormValues = {
   totalAmount: number;
   paidAmount: number;
   orderTitle: string;
-  subOrderDate: string;
   handleParseInputValue: (value: string) => string;
   form: any;
   values: any;
@@ -28,7 +27,6 @@ const AddingClientTableField: React.FC<TAddClientPaymentFormValues> = (
     paidAmount = 0,
     handleParseInputValue,
     orderTitle,
-    subOrderDate,
     form,
     values,
     id,
@@ -36,7 +34,7 @@ const AddingClientTableField: React.FC<TAddClientPaymentFormValues> = (
   const [percentage, setPercentage] = useState(0);
 
   const paymentAmountValue =
-    values?.[`paymentAmount - ${orderTitle} - ${subOrderDate} - ${id}`] || 0;
+    values?.[`paymentAmount - ${orderTitle} - ${id}`] || 0;
 
   useEffect(() => {
     if (
@@ -44,24 +42,16 @@ const AddingClientTableField: React.FC<TAddClientPaymentFormValues> = (
       totalAmount - paidAmount
     ) {
       form.change(
-        `paymentAmount - ${orderTitle} - ${subOrderDate} - ${id}`,
+        `paymentAmount - ${orderTitle} - ${id}`,
         parseThousandNumber(`${totalAmount - paidAmount}`),
       );
     }
-  }, [
-    form,
-    orderTitle,
-    paidAmount,
-    paymentAmountValue,
-    subOrderDate,
-    totalAmount,
-    id,
-  ]);
+  }, [form, orderTitle, paidAmount, paymentAmountValue, totalAmount, id]);
 
   useEffect(() => {
     if (percentage !== 0) {
       form.change(
-        `paymentAmount - ${orderTitle} - ${subOrderDate} - ${id}`,
+        `paymentAmount - ${orderTitle} - ${id}`,
         parseThousandNumber((totalAmount * percentage) / 100),
       );
     }
@@ -70,8 +60,8 @@ const AddingClientTableField: React.FC<TAddClientPaymentFormValues> = (
 
   return (
     <FieldTextInput
-      id={`paymentAmount - ${orderTitle} - ${subOrderDate} - ${id}`}
-      name={`paymentAmount - ${orderTitle} - ${subOrderDate} - ${id}`}
+      id={`paymentAmount - ${orderTitle} - ${id}`}
+      name={`paymentAmount - ${orderTitle} - ${id}`}
       placeholder="Nhập số"
       rightIcon={
         <PaymentPercentageDropdown
@@ -79,6 +69,7 @@ const AddingClientTableField: React.FC<TAddClientPaymentFormValues> = (
           paidAmount={paidAmount}
           percentage={percentage}
           setPercentage={setPercentage}
+          hasOnlyMaxOption
         />
       }
       rightIconContainerClassName={css.rightIcon}

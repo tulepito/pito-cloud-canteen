@@ -89,6 +89,7 @@ const GET_COMPANY_MEMBERS_BY_COMPANY_IDS =
 const queryCompanyMembers = createAsyncThunk(
   QUERY_COMPANY_MEMBERS,
   async (id: string) => {
+    console.log({ id });
     const { data } = await queryCompanyMembersApi(id);
 
     return data;

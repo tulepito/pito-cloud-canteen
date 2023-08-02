@@ -1,16 +1,21 @@
 import { useRef } from 'react';
 
 import Modal from '@components/Modal/Modal';
+import type { TCompanyMemberWithDetails, TObject } from '@src/utils/types';
 
 import AddClientPaymentForm from '../AddClientPaymentForm/AddClientPaymentForm';
 
 type TAddClientPaymentModalProps = {
   isOpen: boolean;
   onClose: () => void;
-  companyNameList: string[];
+  companyList: TObject[];
+  partnerList: TObject[];
   paymentList: any[];
   onClientPaymentRecordsSubmit: (values: any) => void;
   inProgress?: boolean;
+  onQueryCompanyBookers: (id: string) => void;
+  companyBookers: TCompanyMemberWithDetails[];
+  queryBookersInProgress: boolean;
 };
 
 const AddClientPaymentModal: React.FC<TAddClientPaymentModalProps> = (
@@ -19,10 +24,14 @@ const AddClientPaymentModal: React.FC<TAddClientPaymentModalProps> = (
   const {
     isOpen,
     onClose,
-    companyNameList,
+    companyList,
+    partnerList,
     paymentList,
     onClientPaymentRecordsSubmit,
     inProgress,
+    onQueryCompanyBookers,
+    companyBookers,
+    queryBookersInProgress,
   } = props;
 
   const selectInputRef = useRef<any>(null);
@@ -40,10 +49,14 @@ const AddClientPaymentModal: React.FC<TAddClientPaymentModalProps> = (
       handleClose={handleModalClose}>
       <AddClientPaymentForm
         onSubmit={onClientPaymentRecordsSubmit}
-        companyNameList={companyNameList}
+        companyList={companyList}
+        partnerList={partnerList}
         unPaidPaymentList={paymentList}
         inProgress={inProgress}
         selectInputRef={selectInputRef}
+        onQueryCompanyBookers={onQueryCompanyBookers}
+        companyBookers={companyBookers}
+        queryBookersInProgress={queryBookersInProgress}
       />
     </Modal>
   );

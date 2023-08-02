@@ -74,3 +74,16 @@
     }
   }
 }
+
+.memberName {
+  font-weight: $fontWeightBold;
+  margin-bottom: 2px;
+}
+
+.memberPhoneNumber {
+  color: $neutralGray5;
+}
+
+.orderName {
+  max-width: 200px;
+}
