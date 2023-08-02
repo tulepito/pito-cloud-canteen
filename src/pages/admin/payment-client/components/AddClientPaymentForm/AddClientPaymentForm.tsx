@@ -15,7 +15,6 @@ import Table from '@components/Table/Table';
 import { parseThousandNumber } from '@helpers/format';
 import { formatTimestamp } from '@src/utils/dates';
 import type { TCompanyMemberWithDetails, TObject } from '@src/utils/types';
-import { nonEmptyArray } from '@src/utils/validators';
 
 import { filterClientPayment } from '../../helpers';
 
@@ -169,15 +168,10 @@ const AddClientPaymentFormComponent: React.FC<
   };
 
   const filterUnPaidPaymentList = () => {
-    if (!values?.bookerIds || values?.bookerIds?.length <= 0) {
-      form.change('bookerIds', undefined);
-
-      return;
-    }
-
     setUnPaidPaymentListFiltered(
       filterClientPayment(unPaidPaymentList, {
-        bookerIds: values.bookerIds,
+        companyId: values?.company?.value,
+        bookerIds: values?.bookerIds,
         startDate: values?.startDate,
         endDate: values?.endDate,
         partnerId: values?.partnerId?.value,
@@ -244,7 +238,7 @@ const AddClientPaymentFormComponent: React.FC<
           />
         </div>
         <div className={css.fieldInput}>
-          <div className={css.label}>Công ty</div>
+          <div className={css.label}>Đối tác</div>
           <FieldRecommendSelect
             id="partnerId"
             name="partnerId"
@@ -264,7 +258,6 @@ const AddClientPaymentFormComponent: React.FC<
               id="bookerIds"
               options={companyBookers}
               values={values}
-              validate={nonEmptyArray('Vui lòng chọn booker')}
             />
           ))}
       </div>
