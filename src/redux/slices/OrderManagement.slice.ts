@@ -1454,6 +1454,12 @@ const OrderManagementSlice = createSlice({
         draftSubOrderChangesHistory: {},
       };
     },
+    updateOrderData: (state, { payload }) => {
+      return {
+        ...state,
+        orderData: payload,
+      };
+    },
   },
   extraReducers: (builder) => {
     builder
