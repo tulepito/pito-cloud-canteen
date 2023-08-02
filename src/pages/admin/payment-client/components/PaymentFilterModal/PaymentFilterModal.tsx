@@ -15,13 +15,21 @@ type PaymentFilterModalProps = {
 const PaymentFilterModal: React.FC<PaymentFilterModalProps> = (props) => {
   const { isOpen, onClose, setFilters, initialValues } = props;
   const handleFilterSubmit = (values: TPaymentFilterFormValues) => {
-    const { companyName, orderTitle, startDate, endDate, status } = values;
+    const {
+      companyName,
+      orderTitle,
+      startDate,
+      endDate,
+      status,
+      restaurantName,
+    } = values;
     setFilters({
       ...(companyName && { companyName }),
       ...(orderTitle && { orderTitle }),
       ...(startDate && { startDate }),
       ...(endDate && { endDate }),
       ...(status && { status }),
+      ...(restaurantName && { restaurantName }),
     });
 
     onClose();

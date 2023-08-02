@@ -1,7 +1,9 @@
+/* eslint-disable @typescript-eslint/no-shadow */
 import * as XLSX from 'xlsx';
 
 import { parseThousandNumber } from '@helpers/format';
 import { formatTimestamp } from '@src/utils/dates';
+import { removeAccents } from '@src/utils/string';
 import type { TObject } from '@src/utils/types';
 
 export const filterClientPayment = (
@@ -17,6 +19,7 @@ export const filterClientPayment = (
     status: filterStatus,
     partnerId: filterPartnerId,
     bookerIds: filterBookerIds,
+    restaurantName: filterRestaurantName,
   } = filterList;
 
   const filterFn = (item: any) => {
@@ -60,12 +63,26 @@ export const filterClientPayment = (
 
     if (filterEndDate && endDate > filterEndDate) return false;
 
-    if (filterStatus && !filterStatus.includes(status)) return false;
+    if (
+      filterStatus &&
+      filterStatus.length > 0 &&
+      !filterStatus.includes(status)
+    )
+      return false;
 
     if (
       filterPartnerId &&
-      // eslint-disable-next-line @typescript-eslint/no-shadow
       !restaurants.some((item: any) => item.restaurantId === filterPartnerId)
+    )
+      return false;
+
+    if (
+      filterRestaurantName &&
+      !restaurants.some((item: any) =>
+        removeAccents(item.restaurantName)
+          .toLocaleLowerCase()
+          .includes(removeAccents(filterRestaurantName).toLocaleLowerCase()),
+      )
     )
       return false;
 
