@@ -3,6 +3,10 @@
 
 .root {
   @include inputContainerStyles;
+  & :global(.react-datepicker-popper) {
+    z-index: $zIndexModal + 2;
+  }
+
   .input {
     width: 100%;
 
