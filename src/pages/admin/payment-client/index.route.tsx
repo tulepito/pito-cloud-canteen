@@ -4,7 +4,7 @@ import AdminManageClientPaymentsPage from './AdminManageClientPayments.page';
 
 export default function AdminClientPaymentRoute() {
   return (
-    <MetaWrapper routeName="AdminManageClientPayments">
+    <MetaWrapper routeName="AdminManageClientPaymentsRoute">
       <AdminManageClientPaymentsPage />
     </MetaWrapper>
   );
