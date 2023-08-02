@@ -130,7 +130,7 @@ export const initializePayment = async (
         }
       : {}),
   };
-  console.log({ clientPaymentData });
+
   partnerPaymentRecordsData.forEach((paymentRecordData) => {
     createPaymentRecordOnFirebase(EPaymentType.PARTNER, paymentRecordData);
   });
