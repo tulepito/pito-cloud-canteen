@@ -83,7 +83,8 @@ const OrderPaymentStatusTab: React.FC<OrderPaymentStatusTabProps> = (props) => {
           isEmpty(
             partner[orderDetail[subOrderDate].restaurant.id]?.quotation,
           ) ||
-          orderDetail[subOrderDate].status === ESubOrderStatus.CANCELED
+          orderDetail[subOrderDate].status === ESubOrderStatus.CANCELED ||
+          !orderDetail[subOrderDate].transactionId
         ) {
           return null;
         }
@@ -180,7 +181,9 @@ const OrderPaymentStatusTab: React.FC<OrderPaymentStatusTabProps> = (props) => {
       orderTitle,
       paidAmount: clientPaidAmount,
       deliveryHour,
-      clientPaymentRecords,
+      clientPaymentRecords: clientPaymentRecords?.filter(
+        (_record) => !_record.isHideFromHistory,
+      ),
     },
   };
 
