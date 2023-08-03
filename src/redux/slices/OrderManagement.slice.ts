@@ -22,6 +22,7 @@ import {
   deleteParticipantFromOrderApi,
   getBookerOrderDataApi,
   sendOrderDetailUpdatedEmailApi,
+  sendPartnerNewOrderAppearEmailApi,
   sendRemindEmailToMemberApi,
   updateOrderApi,
   updatePlanDetailsApi,
@@ -814,10 +815,10 @@ const bookerStartOrder = createAsyncThunk(
 
     // Function is not ready on production
 
-    // await sendPartnerNewOrderAppearEmailApi(orderId, {
-    //   orderId,
-    //   partner: partnerQuotation,
-    // });
+    await sendPartnerNewOrderAppearEmailApi(orderId, {
+      orderId,
+      partner: partnerQuotation,
+    });
   },
 );
 
