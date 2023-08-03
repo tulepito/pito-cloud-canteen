@@ -17,30 +17,28 @@ import LineItemsTable from './LineItemsTable/LineItemsTable';
 import css from './ManageLineItemsSection.module.scss';
 
 type TManageLineItemsSectionProps = {
-  data: {
-    startDate: number;
-    endDate: number;
-  };
-  isDraftEditing: boolean;
-  shouldShowOverflowError: boolean;
-  shouldShowUnderError: boolean;
-  setCurrentViewDate: (date: number) => void;
   currentViewDate: number;
-  ableToUpdateOrder: boolean;
-  minQuantity: number;
+  isDraftEditing?: boolean;
+  shouldShowOverflowError?: boolean;
+  shouldShowUnderError?: boolean;
+  setCurrentViewDate: (date: number) => void;
+  ableToUpdateOrder?: boolean;
+  minQuantity?: number;
+  isAdminLayout?: boolean;
 };
 
 const ManageLineItemsSection: React.FC<TManageLineItemsSectionProps> = (
   props,
 ) => {
   const {
-    isDraftEditing,
+    isDraftEditing = false,
     currentViewDate,
     setCurrentViewDate,
-    ableToUpdateOrder,
-    shouldShowUnderError,
-    shouldShowOverflowError,
-    minQuantity,
+    ableToUpdateOrder = true,
+    shouldShowUnderError = false,
+    shouldShowOverflowError = false,
+    minQuantity = 0,
+    isAdminLayout = false,
   } = props;
 
   const intl = useIntl();
@@ -70,6 +68,7 @@ const ManageLineItemsSection: React.FC<TManageLineItemsSectionProps> = (
               shouldShowOverflowError={shouldShowOverflowError}
               shouldShowUnderError={shouldShowUnderError}
               minQuantity={minQuantity}
+              isAdminLayout={isAdminLayout}
             />
           </div>
         </div>

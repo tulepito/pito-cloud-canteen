@@ -94,7 +94,6 @@ export const ReviewContent: React.FC<any> = (props) => {
   const {
     timeStamp,
     restaurant,
-    notes = {},
     deliveryManInfo = {},
     updatePlanDetail,
     foodOrder = {},
@@ -128,9 +127,7 @@ export const ReviewContent: React.FC<any> = (props) => {
     ? orderDetailInDraftState
     : orderDetailInPickingState;
 
-  useEffect(() => {
-    setCurrDeliveryManPhoneNumber(deliveryManPhoneNumber);
-  }, [deliveryManPhoneNumber]);
+  const { note } = orderDetail?.[timeStamp] || {};
 
   const participantData = useAppSelector(
     (state) => state.OrderDetail.participantData,
@@ -166,9 +163,17 @@ export const ReviewContent: React.FC<any> = (props) => {
     participants = [],
     anonymous = [],
     orderState,
+    orderNote,
   } = Listing(order as TListing).getMetadata();
-  const { restaurantName, phoneNumber, foodList = {}, id } = restaurant || {};
+  const { restaurantName, phoneNumber, foodList = {} } = restaurant || {};
   const isInProgressOrder = orderState === EOrderStates.inProgress;
+  const isCancelOrder = [
+    EOrderStates.canceled,
+    EOrderStates.canceledByBooker,
+  ].includes(orderState);
+
+  const fieldDeliveryManDisabled =
+    isCancelOrder || deliveryManOptions?.length === 0;
 
   const parsedFoodList = Object.keys(foodList).map((key, index) => {
     return {
@@ -201,6 +206,10 @@ export const ReviewContent: React.FC<any> = (props) => {
     setCurrDeliveryManPhoneNumber(currDeliveryInfoOption?.phoneNumber);
   };
 
+  useEffect(() => {
+    setCurrDeliveryManPhoneNumber(deliveryManPhoneNumber);
+  }, [deliveryManPhoneNumber]);
+
   return (
     <div>
       <RenderWhen condition={isInProgressOrder}>
@@ -232,6 +241,7 @@ export const ReviewContent: React.FC<any> = (props) => {
                 className={css.selectBoxContent}
                 meta={deliveryMan.meta}
                 input={deliveryMan.input}
+                disabled={fieldDeliveryManDisabled}
                 onChange={handleFieldDeliveryManChange}>
                 <option disabled value={''}>
                   Chọn nhân viên
@@ -374,14 +384,16 @@ export const ReviewContent: React.FC<any> = (props) => {
           </RenderWhen.False>
         </RenderWhen>
       </Collapsible>
-      <Collapsible
-        label={intl.formatMessage({
-          id: 'ReviewOrder.note',
-        })}>
-        <div className={classNames(css.contentBox, css.spaceStart)}>
-          {notes?.[id]}
-        </div>
-      </Collapsible>
+      {(orderNote || note) && (
+        <Collapsible
+          label={intl.formatMessage({
+            id: 'ReviewOrder.note',
+          })}>
+          <div className={classNames(css.contentBox, css.spaceStart)}>
+            {orderNote || note}
+          </div>
+        </Collapsible>
+      )}
     </div>
   );
 };
@@ -446,16 +458,6 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
   const planId = plans.length > 0 ? plans[0] : undefined;
   const { address } = deliveryAddress || {};
 
-  useEffect(() => {
-    if (isEmpty(orderDetail) && !isEmpty(plans)) {
-      dispatch(orderAsyncActions.fetchOrderDetail(plans));
-    }
-  }, [
-    JSON.stringify(order),
-    JSON.stringify(orderDetail),
-    JSON.stringify(plans),
-  ]);
-
   const { renderedOrderDetail } =
     useMemo(() => {
       return {
@@ -510,6 +512,16 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
       shipperName,
     };
   }, [staffName, shipperName]);
+
+  useEffect(() => {
+    if (isEmpty(orderDetail) && !isEmpty(plans)) {
+      dispatch(orderAsyncActions.fetchOrderDetail(plans));
+    }
+  }, [
+    JSON.stringify(order),
+    JSON.stringify(orderDetail),
+    JSON.stringify(plans),
+  ]);
 
   return (
     <div className={css.root}>

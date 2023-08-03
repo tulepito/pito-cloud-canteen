@@ -468,7 +468,6 @@ const OrderDetailPage = () => {
                   : css.lineItemsTable
               }>
               <ManageLineItemsSection
-                data={editViewData.manageOrdersData}
                 isDraftEditing={isDraftEditing}
                 ableToUpdateOrder={ableToUpdateOrder}
                 shouldShowOverflowError={shouldShowOverflowError}
