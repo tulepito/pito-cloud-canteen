@@ -226,7 +226,6 @@ const fetchOrders = createAsyncThunk(
     const { companyList } = currentUserGetter.getMetadata();
     const { data: transactions } = await queryTransactionApi({
       dataParams: {
-        createdAtStart: selectedMonth,
         createdAtEnd: getEndOfMonth(selectedMonth),
         companyId: companyList[0],
       },
