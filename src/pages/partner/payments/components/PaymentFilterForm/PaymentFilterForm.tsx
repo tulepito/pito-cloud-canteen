@@ -11,6 +11,7 @@ import FieldDatePicker from '@components/FormFields/FieldDatePicker/FieldDatePic
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import IconClose from '@components/Icons/IconClose/IconClose';
 import IconSearch from '@components/Icons/IconSearch/IconSearch';
+import { EOrderPaymentState } from '@src/utils/enums';
 
 import css from './PaymentFilterForm.module.scss';
 
@@ -24,11 +25,11 @@ export type TPaymentFilterFormValues = {
 
 const PAYMENT_STATUS_OPTIONS = [
   {
-    key: 'isNotPaid',
+    key: EOrderPaymentState.isNotPaid,
     label: 'Chưa thanh toán',
   },
   {
-    key: 'isPaid',
+    key: EOrderPaymentState.isPaid,
     label: 'Đã thanh toán',
   },
 ];

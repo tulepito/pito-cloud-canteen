@@ -1067,3 +1067,7 @@ export enum EPaymentType {
   PARTNER = 'partner',
   CLIENT = 'client',
 }
+export enum EOrderPaymentState {
+  isPaid = 'isPaid',
+  isNotPaid = 'isNotPaid',
+}
