@@ -4,6 +4,10 @@
 
 .header {
   @include flexAlign(center, space-between);
+
+  .title {
+    @include textTemplate(24px, $fontWeightBold, 32px);
+  }
 }
 
 .orderTitle {
