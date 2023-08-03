@@ -153,9 +153,6 @@ const CompanyOrdersTable: React.FC<TCompanyOrdersTableProps> = () => {
   const currentOrderVATPercentage = useAppSelector(
     (state) => state.SystemAttributes.currentOrderVATPercentage,
   );
-  const allClientPaymentRecords = useAppSelector(
-    (state) => state.Order.allClientPaymentRecords,
-  );
 
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
 
@@ -197,7 +194,6 @@ const CompanyOrdersTable: React.FC<TCompanyOrdersTableProps> = () => {
     orders,
     Number(page),
     currentOrderVATPercentage,
-    allClientPaymentRecords,
     openOrderStateWarningModal,
   );
 
@@ -268,9 +264,6 @@ const CompanyOrdersTable: React.FC<TCompanyOrdersTableProps> = () => {
         currentTab,
       };
       await dispatch(orderAsyncActions.queryCompanyOrders(params));
-      await dispatch(
-        orderAsyncActions.queryAllClientPaymentRecords({ companyId, page }),
-      );
     })();
   }, [companyId, currentTab, dispatch, isReady, keywords, page]);
 

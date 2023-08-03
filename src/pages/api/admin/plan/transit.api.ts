@@ -22,6 +22,8 @@ import { isTransactionsTransitionInvalidTransition } from '@src/utils/errors';
 import { ETransition } from '@src/utils/transaction';
 import type { TError } from '@src/utils/types';
 
+import { transitionOrderStatus } from './transition-order-status.service';
+
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
     const apiMethod = req.method;
@@ -85,6 +87,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           planId: plans[0],
           subOrderDate: startTimestamp,
         };
+        const plan = await fetchListing(plans[0]);
 
         if (transition === ETransition.START_DELIVERY) {
           participantIds.map(async (participantId: string) => {
@@ -101,9 +104,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
               userId: participantId,
             });
           });
+          await transitionOrderStatus(order, plan, integrationSdk);
         }
         if (transition === ETransition.OPERATOR_CANCEL_PLAN) {
-          const plan = await fetchListing(plans[0]);
           const planListing = Listing(plan);
           const { orderDetail } = planListing.getMetadata();
           const newOrderDetail = {
@@ -186,6 +189,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             client: newClient,
             partner: newPartner,
           });
+          await transitionOrderStatus(order, plan, integrationSdk);
         }
 
         return res.status(200).json({

@@ -6,18 +6,12 @@ import { Listing } from '@utils/data';
 import { formatTimestamp } from '@utils/dates';
 import type { EOrderStates } from '@utils/enums';
 import { EOrderDraftStates, EOrderType } from '@utils/enums';
-import type {
-  TIntegrationOrderListing,
-  TListing,
-  TObject,
-  TPaymentRecord,
-} from '@utils/types';
+import type { TIntegrationOrderListing, TListing, TObject } from '@utils/types';
 
 export const parseEntitiesToTableData = (
   orders: TIntegrationOrderListing[],
   page: number,
   currentOrderVATPercentage: number,
-  allClientPaymentRecords: TPaymentRecord[],
   openOrderStateWarningModal?: (e: EOrderStates) => void,
 ) => {
   return orders.map((entity, index) => {
@@ -87,10 +81,7 @@ export const parseEntitiesToTableData = (
         deliveryHour,
         totalWithVAT,
         openOrderStateWarningModal,
-        paymentStatus:
-          allClientPaymentRecords.findIndex(
-            (paymentRecord) => paymentRecord.orderId === orderId,
-          ) !== -1,
+        paymentStatus: entity.attributes.metadata?.isClientSufficientPaid,
       },
     };
   });

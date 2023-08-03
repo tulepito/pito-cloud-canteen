@@ -496,7 +496,7 @@ export const CompanyOrdersTableColumns: TColumn[] = [
     }) => {
       return (
         <div className={css.state}>
-          <RenderWhen condition={paymentStatus}>
+          <RenderWhen condition={Boolean(paymentStatus)}>
             <Badge type={EBadgeType.success} label="Đã hoàn thành" />
             <RenderWhen.False>
               <Badge
