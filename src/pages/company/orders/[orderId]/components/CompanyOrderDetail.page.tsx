@@ -18,7 +18,7 @@ const CompanyOrderDetailPage: React.FC<TCompanyOrderDetailPageProps> = () => {
     canReview,
     goToReviewPage,
     orderData,
-  } = usePrepareOrderDetailPageData();
+  } = usePrepareOrderDetailPageData({});
 
   const handleDownloadPriceQuotation = useDownloadPriceQuotation({
     orderTitle,

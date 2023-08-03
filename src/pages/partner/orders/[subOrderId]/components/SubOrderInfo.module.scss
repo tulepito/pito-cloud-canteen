@@ -1,0 +1,30 @@
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/vars.scss' as *;
+
+.root {
+  padding: 16px 0 24px;
+  @include textTemplate(16px, 400, 24px);
+  border-bottom: 1px solid $neutralGray5;
+
+  .title {
+    font-weight: 700;
+    margin-bottom: 20px;
+  }
+
+  .row {
+    display: flex;
+    column-gap: 36px;
+
+    &:not(&:first-child) {
+      margin-top: 16px;
+    }
+
+    .label {
+      flex-basis: 170px;
+      min-width: 170px;
+    }
+    .value {
+      font-weight: 600;
+    }
+  }
+}

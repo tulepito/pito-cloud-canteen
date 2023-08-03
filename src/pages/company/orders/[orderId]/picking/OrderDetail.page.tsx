@@ -213,7 +213,7 @@ const OrderDetailPage = () => {
     reviewViewData,
     priceQuotationData,
     setReviewInfoValues,
-  } = usePrepareOrderDetailPageData();
+  } = usePrepareOrderDetailPageData({});
 
   const handleCloseReachMaxAllowedChangesModal = () =>
     setShowReachMaxAllowedChangesModal(null);
@@ -251,30 +251,6 @@ const OrderDetailPage = () => {
   const handleSetCurrentViewDate = (date: number) => {
     setCurrentViewDate(date);
   };
-
-  useEffect(() => {
-    if (shouldShowOverflowError || shouldShowUnderError) {
-      const i = setTimeout(() => {
-        dispatch(OrderManagementsAction.resetOrderDetailValidation());
-        clearTimeout(i);
-      }, 4000);
-    }
-  }, [shouldShowOverflowError, shouldShowUnderError]);
-
-  useEffect(() => {
-    onQuerySubOrderHistoryChanges();
-  }, [onQuerySubOrderHistoryChanges]);
-
-  useEffect(() => {
-    if (draftOrderDetail) {
-      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-      () => {
-        dispatch(OrderManagementsAction.resetDraftSubOrderChangeHistory());
-
-        return dispatch(OrderManagementsAction.resetDraftOrderDetails());
-      };
-    }
-  }, []);
 
   const handleDownloadPriceQuotation = useDownloadPriceQuotation({
     orderTitle,
@@ -552,6 +528,30 @@ const OrderDetailPage = () => {
       orderData={orderData as TListing}
     />
   );
+
+  useEffect(() => {
+    if (shouldShowOverflowError || shouldShowUnderError) {
+      const i = setTimeout(() => {
+        dispatch(OrderManagementsAction.resetOrderDetailValidation());
+        clearTimeout(i);
+      }, 4000);
+    }
+  }, [shouldShowOverflowError, shouldShowUnderError]);
+
+  useEffect(() => {
+    onQuerySubOrderHistoryChanges();
+  }, [onQuerySubOrderHistoryChanges]);
+
+  useEffect(() => {
+    if (draftOrderDetail) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      () => {
+        dispatch(OrderManagementsAction.resetDraftSubOrderChangeHistory());
+
+        return dispatch(OrderManagementsAction.resetDraftOrderDetails());
+      };
+    }
+  }, []);
 
   useEffect(() => {
     if (

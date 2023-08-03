@@ -1,0 +1,26 @@
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/vars.scss' as *;
+
+.root {
+  display: flex;
+  padding: 8px;
+}
+
+.crumb {
+  @include flexCenter;
+}
+
+.label {
+  font-size: 12px;
+  line-height: 14px;
+  color: $neutralGray6;
+  &.active {
+    color: $neutralGray6;
+  }
+}
+
+.arrowIcon {
+  margin: 0 5px;
+  width: 10px;
+  height: 10px;
+}
