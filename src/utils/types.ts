@@ -21,6 +21,7 @@ import type {
   EOrderDraftStates,
   EOrderHistoryTypes,
   EOrderStates,
+  EPaymentType,
   EReviewRatings,
   EReviewTypes,
   ETimeSlots,
@@ -704,4 +705,5 @@ export type TPaymentRecord = {
   createdAt?: Date;
   isHideFromHistory?: boolean;
   totalPrice?: number;
+  paymentType?: EPaymentType;
 };

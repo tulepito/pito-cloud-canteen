@@ -18,12 +18,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
     const order = await fetchListing(orderId);
     const orderListing = Listing(order);
-    const { orderStateHistory } = orderListing.getMetadata();
+    const { orderStateHistory, orderState } = orderListing.getMetadata();
 
     const plan = await fetchListing(planId);
     const planListing = Listing(plan);
     const { orderDetail } = planListing.getMetadata();
 
+    // get all client payment records
     const clientPaymentRecords = await queryPaymentRecordOnFirebase({
       paymentType: EPaymentType.CLIENT,
       orderId,
@@ -37,6 +38,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
     const isClientPaidAmountEnough = clientTotalPrice - clientPaidAmount === 0;
 
+    // get all partner payment records
     const partnerPaymentRecords = await queryPaymentRecordOnFirebase({
       paymentType: EPaymentType.PARTNER,
       orderId,
@@ -97,37 +99,35 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       subOrderDatePaymentStatus,
     ).every((status: any) => Boolean(status));
 
-    if (
-      isClientPaidAmountEnough &&
-      isPartnerPaidAmountEnough &&
-      isPaymentNumberEqualToSubOrderDateNumber
-    ) {
-      await integrationSdk.listings.update({
-        id: orderId,
-        metadata: {
-          isPaid: true,
-          orderState: EOrderStates.completed,
-          orderStateHistory: orderStateHistory.concat({
-            state: EOrderStates.completed,
-            updatedAt: new Date().getTime(),
-          }),
-        },
-      });
+    const isOrderPendingPayment = orderState === EOrderStates.pendingPayment;
 
-      res.json({
-        message: 'Transition order payment status successfully',
-      });
-    } else {
-      await integrationSdk.listings.update({
-        id: orderId,
-        metadata: {
-          isPaid: false,
-        },
-      });
-      res.status(200).json({
-        message: 'Transition order payment status failed',
-      });
-    }
+    await integrationSdk.listings.update({
+      id: orderId,
+      metadata: {
+        isClientSufficientPaid: isClientPaidAmountEnough,
+        isPartnerSufficientPaid:
+          isPartnerPaidAmountEnough && isPaymentNumberEqualToSubOrderDateNumber,
+        ...(isOrderPendingPayment &&
+        isClientPaidAmountEnough &&
+        isPartnerPaidAmountEnough &&
+        isPaymentNumberEqualToSubOrderDateNumber
+          ? {
+              orderState: EOrderStates.completed,
+              orderStateHistory: [
+                ...orderStateHistory,
+                {
+                  state: EOrderStates.completed,
+                  updatedAt: new Date().getTime(),
+                },
+              ],
+            }
+          : {}),
+      },
+    });
+
+    res.json({
+      message: 'Transition order payment status successfully',
+    });
   } catch (error) {
     handleError(res, error);
   }
