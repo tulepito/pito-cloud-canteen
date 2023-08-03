@@ -122,7 +122,7 @@ const PaymentFilterFormComponent: React.FC<TPaymentFilterFormComponentProps> = (
       <div className={css.fieldInput}>
         <label className={css.label}>Trạng thái</label>
         <FieldCheckboxGroup
-          istClassName={css.checkboxGroup}
+          itemClassName={css.checkboxGroup}
           id="EditCompanySettingsInformationForm.mealSetting"
           options={PAYMENT_STATUS_OPTIONS}
           name="status"
