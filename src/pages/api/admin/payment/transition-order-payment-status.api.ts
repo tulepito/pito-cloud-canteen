@@ -74,7 +74,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           ...result,
           [subOrderDate]: {
             ...orderDetail[subOrderDate],
-            isPaid: subOrderDatePaymentStatus[subOrderDate],
+            isPaid: Boolean(subOrderDatePaymentStatus[subOrderDate]),
           },
         };
       },
@@ -89,11 +89,19 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       },
     });
 
+    const isPaymentNumberEqualToSubOrderDateNumber =
+      Object.keys(orderDetail).length ===
+      Object.keys(subOrderDatePaymentStatus).length;
+
     const isPartnerPaidAmountEnough = Object.values(
       subOrderDatePaymentStatus,
     ).every((status: any) => Boolean(status));
 
-    if (isClientPaidAmountEnough && isPartnerPaidAmountEnough) {
+    if (
+      isClientPaidAmountEnough &&
+      isPartnerPaidAmountEnough &&
+      isPaymentNumberEqualToSubOrderDateNumber
+    ) {
       await integrationSdk.listings.update({
         id: orderId,
         metadata: {
