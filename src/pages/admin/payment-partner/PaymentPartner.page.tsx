@@ -10,8 +10,10 @@ import IconClose from '@components/Icons/IconClose/IconClose';
 import IconFilter from '@components/Icons/IconFilter/IconFilter';
 import IntegrationFilterModal from '@components/IntegrationFilterModal/IntegrationFilterModal';
 import NamedLink from '@components/NamedLink/NamedLink';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
 import type { TColumn } from '@components/Table/Table';
 import { TableForm } from '@components/Table/Table';
+import Tooltip from '@components/Tooltip/Tooltip';
 import {
   parseThousandNumber,
   parseThousandNumberToInteger,
@@ -19,7 +21,7 @@ import {
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { adminPaths } from '@src/paths';
-import { formatTimestamp } from '@src/utils/dates';
+import { formatTimestamp, getDayOfWeek } from '@src/utils/dates';
 import {
   EOrderDetailTabs,
   EOrderPaymentState,
@@ -90,13 +92,13 @@ const PaymentPartnerPage = () => {
     {
       key: 'id',
       label: 'ID',
-      render: ({ orderTitle, orderId }: any) => (
+      render: ({ orderTitle, orderId, subOrderDate }: any) => (
         <div>
           <NamedLink
             className={css.orderTitle}
             path={adminPaths.OrderDetail}
             params={{ orderId, tab: EOrderDetailTabs.PAYMENT_STATUS }}>
-            #{orderTitle}
+            {`#${orderTitle}-${getDayOfWeek(+subOrderDate)}`}
           </NamedLink>
         </div>
       ),
@@ -293,16 +295,17 @@ const PaymentPartnerPage = () => {
     }, 0);
   };
 
-  const onDownloadPaymentList = () => {
-    const hasSelectedPaymentRecords = !isEmpty(selectedPaymentRecords);
-    if (hasSelectedPaymentRecords) {
-      const selectedPaymentRecordsData = filteredTableData.filter((item) =>
+  const hasSelectedPaymentRecords = !isEmpty(
+    selectedPaymentRecords.rowCheckbox,
+  );
+  const selectedPaymentRecordsData = hasSelectedPaymentRecords
+    ? filteredTableData.filter((item) =>
         selectedPaymentRecords.rowCheckbox.includes(item.key),
-      );
-      makeExcelFile(selectedPaymentRecordsData);
-    } else {
-      makeExcelFile(filteredTableData);
-    }
+      )
+    : filteredTableData;
+
+  const onDownloadPaymentList = () => {
+    makeExcelFile(selectedPaymentRecordsData);
   };
 
   const filterLabels = Object.keys(filters).map((key) => {
@@ -330,14 +333,31 @@ const PaymentPartnerPage = () => {
         <IntegrationFilterModal
           onClear={onClearFilters}
           leftFilters={
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={filterPaymentModalController.setTrue}
-              className={css.filterButton}>
-              <IconFilter className={css.filterIcon} />
-              <FormattedMessage id="IntegrationFilterModal.filterMessage" />
-            </Button>
+            <Tooltip
+              tooltipContent={
+                <PaymentFilterModal
+                  // isOpen={filterPaymentModalController.value}
+                  // onClose={filterPaymentModalController.setFalse}
+                  setFilters={setFilters}
+                  setPage={setPage}
+                />
+              }
+              placement="bottomLeft"
+              trigger="click"
+              overlayClassName={css.orderDetailTooltip}
+              overlayInnerStyle={{
+                backgroundColor: '#fff',
+                padding: 0,
+              }}>
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={filterPaymentModalController.setTrue}
+                className={css.filterButton}>
+                <IconFilter className={css.filterIcon} />
+                <FormattedMessage id="IntegrationFilterModal.filterMessage" />
+              </Button>
+            </Tooltip>
           }
           rightFilters={
             <>
@@ -369,23 +389,19 @@ const PaymentPartnerPage = () => {
           onCustomPageChange={setPage}
         />
       </div>
-
-      <PaymentFilterModal
-        isOpen={filterPaymentModalController.value}
-        onClose={filterPaymentModalController.setFalse}
-        setFilters={setFilters}
-        setPage={setPage}
-      />
-      <AddPartnerPaymentModal
-        isOpen={addPartnerPaymentModalController.value}
-        onClose={addPartnerPaymentModalController.setFalse}
-        partnerNameList={partnerNameList}
-        paymentList={filterPaymentPartner(formattedTableData, {
-          status: [EOrderPaymentState.isNotPaid],
-        })}
-        onPartnerPaymentRecordsSubmit={onPartnerPaymentRecordsSubmit}
-        inProgress={createPaymentPartnerRecordsInProgress}
-      />
+      <RenderWhen condition={addPartnerPaymentModalController.value}>
+        <AddPartnerPaymentModal
+          isOpen={addPartnerPaymentModalController.value}
+          onClose={addPartnerPaymentModalController.setFalse}
+          partnerNameList={partnerNameList}
+          paymentList={filterPaymentPartner(selectedPaymentRecordsData, {
+            status: ['isNotPaid'],
+          })}
+          hasSelectedPaymentRecords={hasSelectedPaymentRecords}
+          onPartnerPaymentRecordsSubmit={onPartnerPaymentRecordsSubmit}
+          inProgress={createPaymentPartnerRecordsInProgress}
+        />
+      </RenderWhen>
     </div>
   );
 };

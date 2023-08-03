@@ -3,6 +3,7 @@ import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import addDays from 'date-fns/addDays';
 import arrayMutators from 'final-form-arrays';
+import isEmpty from 'lodash/isEmpty';
 
 import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
@@ -11,6 +12,7 @@ import FieldRecommendSelect from '@components/FormFields/FieldRecommendSelect/Fi
 import type { TColumn } from '@components/Table/Table';
 import Table from '@components/Table/Table';
 import { parseThousandNumber } from '@helpers/format';
+import useBoolean from '@hooks/useBoolean';
 import { formatTimestamp, getDayOfWeek } from '@src/utils/dates';
 
 import { filterPaymentPartner } from '../../helpers/paymentPartner';
@@ -31,6 +33,8 @@ type TExtraProps = {
   unPaidPaymentList: any[];
   inProgress?: boolean;
   selectInputRef: any;
+  formRef: any;
+  hasSelectedPaymentRecords?: boolean;
 };
 type TAddPartnerPaymentFormComponentProps =
   FormRenderProps<TAddPartnerPaymentFormValues> & Partial<TExtraProps>;
@@ -48,6 +52,8 @@ const AddPartnerPaymentFormComponent: React.FC<
     unPaidPaymentList = [],
     inProgress,
     selectInputRef,
+    hasSelectedPaymentRecords,
+    formRef,
   } = props;
 
   const selectFieldRef = useRef<any>(null);
@@ -65,8 +71,11 @@ const AddPartnerPaymentFormComponent: React.FC<
 
   const [unPaidPaymentListFiltered, setUnPaidPaymentListFiltered] =
     useState<any[]>(unPaidPaymentList);
+  const isFilterClicked = useBoolean();
 
   useImperativeHandle(selectInputRef, () => selectFieldRef?.current);
+
+  useImperativeHandle(formRef, () => formRef?.current);
   useEffect(() => {
     setUnPaidPaymentListFiltered(unPaidPaymentList);
   }, [unPaidPaymentList]);
@@ -77,6 +86,13 @@ const AddPartnerPaymentFormComponent: React.FC<
     value: partnerName,
     label: partnerName,
   }));
+
+  const hasFilters =
+    !!values.startDate || !!values.endDate || !isEmpty(values.partnerName);
+
+  const showTableData =
+    hasSelectedPaymentRecords ||
+    (!hasSelectedPaymentRecords && hasFilters && isFilterClicked.value);
 
   const handleParseInputValue = (value: string) => {
     return parseThousandNumber(value);
@@ -157,11 +173,13 @@ const AddPartnerPaymentFormComponent: React.FC<
         partnerName: values?.partnerName?.value,
       }),
     );
+    isFilterClicked.setTrue();
   };
 
   const handleSubmitForm = (_values: any) => {
     handleSubmit(_values);
     form.restart();
+    isFilterClicked.setFalse();
   };
 
   return (
@@ -214,7 +232,7 @@ const AddPartnerPaymentFormComponent: React.FC<
       <div className={css.tableWrapper}>
         <Table
           columns={TABLE_COLUMNS}
-          data={unPaidPaymentListFiltered}
+          data={showTableData ? unPaidPaymentListFiltered : []}
           tableBodyCellClassName={css.tableBodyCell}
         />
       </div>
