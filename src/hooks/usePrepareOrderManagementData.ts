@@ -284,7 +284,7 @@ export const usePrepareOrderDetailPageData = ({
       transportFee: `${parseThousandNumber(transportFee)}đ`,
       VATFee: `${parseThousandNumber(VATFee)}đ`,
       PITOFee: `${parseThousandNumber(PITOFee)}đ`,
-      currentOrderVATPercentage: VATPercentage!
+      vatPercentage: VATPercentage!
         ? VATPercentage!
         : currentOrderVATPercentage,
     },

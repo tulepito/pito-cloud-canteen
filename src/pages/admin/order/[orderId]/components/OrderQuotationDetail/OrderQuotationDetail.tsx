@@ -6,11 +6,15 @@ import isEmpty from 'lodash/isEmpty';
 import ReviewCartSection from '@components/OrderDetails/ReviewView/ReviewCartSection/ReviewCartSection';
 import ReviewOrderDetailsSection from '@components/OrderDetails/ReviewView/ReviewOrderDetailsSection/ReviewOrderDetailsSection';
 import Tabs from '@components/Tabs/Tabs';
-import { calculatePriceQuotationInfoFromQuotation } from '@helpers/order/cartInfoHelper';
+import {
+  calculatePriceQuotationInfoFromQuotation,
+  vatPercentageBaseOnVatSetting,
+} from '@helpers/order/cartInfoHelper';
 import { groupFoodOrderByDateFromQuotation } from '@helpers/order/orderDetailHelper';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { useDownloadPriceQuotation } from '@hooks/useDownloadPriceQuotation';
 import { Listing } from '@src/utils/data';
+import { EPartnerVATSetting } from '@src/utils/enums';
 import type { TListing, TObject, TUser } from '@src/utils/types';
 
 import {
@@ -54,23 +58,32 @@ const OrderQuotationDetail: React.FC<OrderQuotationDetailProps> = (props) => {
   const [currentSubOrderDate, setCrrSubOrderDate] = useState<string>(
     Object.keys(clientQuotation)[0],
   );
-
-  const orderMetadata = Listing(order).getMetadata();
+  const {
+    serviceFees = {},
+    vatSettings = {},
+    packagePerMember = 0,
+  } = Listing(order).getMetadata();
   const { title: orderTitle = '' } = Listing(order).getAttributes();
 
   const currentPartnerId = (Object.entries(partnerQuotation).find(
     ([, value]) => (value as TObject)?.quotation[currentSubOrderDate],
   ) || [])[0];
-  const partnerServiceFee = orderMetadata.serviceFees?.[currentPartnerId!];
-  const { packagePerMember = 0 } = orderMetadata;
+  const partnerVATSetting =
+    vatSettings?.[currentPartnerId!] || EPartnerVATSetting.vat;
+  const partnerServiceFee = serviceFees[currentPartnerId!];
+  const vatPercentage = vatPercentageBaseOnVatSetting({
+    vatSetting: partnerVATSetting,
+    vatPercentage: currentOrderVATPercentage,
+  });
 
   const priceQuotation = calculatePriceQuotationInfoFromQuotation({
     quotation: quotation!,
     packagePerMember,
-    currentOrderVATPercentage,
+    currentOrderVATPercentage: vatPercentage,
     date: isPartner ? currentSubOrderDate : undefined,
     partnerId: currentPartnerId,
     currentOrderServiceFeePercentage: partnerServiceFee / 100,
+    shouldSkipVAT: partnerVATSetting === EPartnerVATSetting.direct,
   });
 
   const handleTabChange = (tab: any) => {
@@ -128,7 +141,7 @@ const OrderQuotationDetail: React.FC<OrderQuotationDetailProps> = (props) => {
           priceQuotation,
           restaurantId: currentPartnerId!,
           quotationDetail,
-          currentOrderVATPercentage,
+          vatPercentage,
         })
       : formatPriceQuotationData({
           order,
@@ -154,6 +167,7 @@ const OrderQuotationDetail: React.FC<OrderQuotationDetailProps> = (props) => {
     priceQuotationData: priceQuotationData as any,
     isPartnerQuotation: isPartner,
     subOrderDate: isPartner ? currentSubOrderDate : undefined,
+    vatSetting: partnerVATSetting,
   });
 
   return (
@@ -187,6 +201,7 @@ const OrderQuotationDetail: React.FC<OrderQuotationDetailProps> = (props) => {
           title="Thực đơn phục vụ"
           target={target}
           isAdminLayout
+          vatSetting={partnerVATSetting}
         />
       </div>
     </div>
