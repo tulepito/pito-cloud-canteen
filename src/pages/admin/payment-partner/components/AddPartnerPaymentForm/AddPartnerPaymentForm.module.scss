@@ -49,9 +49,18 @@
   font-weight: $fontWeightSemiBold;
 }
 
+.table {
+  overflow: auto;
+}
+
 .tableWrapper {
   overflow-y: auto;
   max-height: 300px;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
   .tableBodyCell {
     vertical-align: middle !important;
   }
