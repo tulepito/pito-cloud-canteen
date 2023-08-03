@@ -1,4 +1,5 @@
 import isEmpty from 'lodash/isEmpty';
+import pick from 'lodash/pick';
 
 import {
   getFoodDataMap,
@@ -188,7 +189,7 @@ export const calculatePriceQuotationInfo = ({
 };
 
 export const calculatePriceQuotationPartner = ({
-  quotation,
+  quotation = {},
   serviceFee = 0,
   currentOrderVATPercentage,
 }: {
@@ -230,10 +231,16 @@ export const calculatePriceQuotationInfoFromQuotation = ({
   quotation,
   packagePerMember,
   currentOrderVATPercentage,
+  currentOrderServiceFeePercentage = 0,
+  date,
+  partnerId,
 }: {
   quotation: TListing;
   packagePerMember: number;
   currentOrderVATPercentage: number;
+  currentOrderServiceFeePercentage?: number;
+  date?: number | string;
+  partnerId?: string;
 }) => {
   const quotationListingGetter = Listing(quotation);
   const { client, partner } = quotationListingGetter.getMetadata();
@@ -241,12 +248,20 @@ export const calculatePriceQuotationInfoFromQuotation = ({
     return {};
   }
 
-  const { quotation: clientQuotation } = client;
+  const isPartnerFlow = date && partnerId;
+
+  const clientQuotation = client.quotation;
+  const partnerQuotation = isPartnerFlow
+    ? pick(partner[partnerId].quotation, date)
+    : {};
+
   const {
     totalPrice = 0,
     totalDishes = 0,
-    PITOFee,
-  }: any = Object.values(clientQuotation).reduce(
+    PITOFee = 0,
+  }: any = Object.values(
+    isPartnerFlow ? partnerQuotation : clientQuotation,
+  ).reduce(
     (result: any, subOrder: any) => {
       const { subOrderTotalPrice, subOrderTotalDished } = subOrder.reduce(
         (subOrderResult: any, item: any) => {
@@ -264,7 +279,9 @@ export const calculatePriceQuotationInfoFromQuotation = ({
         },
       );
 
-      const subOrderPITOFee = getPCCFeeByMemberAmount(subOrderTotalDished);
+      const subOrderPITOFee = isPartnerFlow
+        ? 0
+        : getPCCFeeByMemberAmount(subOrderTotalDished);
 
       return {
         totalPrice: result.totalPrice + subOrderTotalPrice,
@@ -281,11 +298,13 @@ export const calculatePriceQuotationInfoFromQuotation = ({
 
   const PITOPoints = Math.floor(totalPrice / 100000);
   const isOverflowPackage = totalDishes * packagePerMember < totalPrice;
-  const serviceFee = 0;
+  const serviceFee = isPartnerFlow
+    ? currentOrderServiceFeePercentage * totalPrice
+    : 0;
   const transportFee = 0;
   const promotion = 0;
   const totalWithoutVAT =
-    totalPrice + serviceFee + transportFee + PITOFee - promotion;
+    totalPrice - serviceFee + transportFee + PITOFee - promotion;
   const VATFee = Math.round(totalWithoutVAT * currentOrderVATPercentage || 0);
   const totalWithVAT = VATFee + totalWithoutVAT;
   const overflow = isOverflowPackage
@@ -298,7 +317,8 @@ export const calculatePriceQuotationInfoFromQuotation = ({
     PITOPoints,
     VATFee,
     totalWithVAT,
-    serviceFee,
+    serviceFee: currentOrderServiceFeePercentage * 100,
+    serviceFeePrice: serviceFee,
     transportFee,
     promotion,
     overflow,

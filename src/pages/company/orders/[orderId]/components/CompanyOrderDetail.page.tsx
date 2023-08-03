@@ -20,10 +20,10 @@ const CompanyOrderDetailPage: React.FC<TCompanyOrderDetailPageProps> = () => {
     orderData,
   } = usePrepareOrderDetailPageData();
 
-  const handleDownloadPriceQuotation = useDownloadPriceQuotation(
+  const handleDownloadPriceQuotation = useDownloadPriceQuotation({
     orderTitle,
     priceQuotationData,
-  );
+  });
 
   const { handler: onDownloadReviewOrderResults } = useExportOrderDetails();
 

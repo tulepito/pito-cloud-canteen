@@ -7,11 +7,25 @@
   gap: 20px;
 
   .leftCol {
-    width: 100%;
+    width: calc(100% - 300px);
+    flex-basis: calc(100% - 300px);
 
     .clientTitle {
       @include textTemplate(18px, $fontWeightBold, 24px);
       height: 40px;
+    }
+
+    .tabItem {
+      max-width: 100px;
+      overflow: hidden;
+      & div {
+        width: 100%;
+        @include lineClamp(1);
+      }
+    }
+
+    .tabActiveItem {
+      max-width: unset;
     }
   }
 
