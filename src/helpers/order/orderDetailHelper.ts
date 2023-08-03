@@ -233,6 +233,7 @@ export const groupFoodOrderByDateFromQuotation = ({
 
   return result;
 };
+
 export const groupPickingOrderByFood = ({
   orderDetail,
   date,
@@ -249,7 +250,7 @@ export const groupPickingOrderByFood = ({
       const [d, rawOrderDetailOfDate] = currentOrderDetailEntry;
 
       const {
-        memberOrders,
+        memberOrders = {},
         restaurant = {},
         status: subOrderStatus,
       } = rawOrderDetailOfDate as TObject;
@@ -264,7 +265,6 @@ export const groupPickingOrderByFood = ({
       const foodDataMap = Object.entries(memberOrders).reduce(
         (foodFrequencyResult, currentMemberOrderEntry) => {
           const [memberId, memberOrderData] = currentMemberOrderEntry;
-
           const {
             foodId,
             status,
@@ -282,7 +282,6 @@ export const groupPickingOrderByFood = ({
           const anonymousUserMaybe = anonymous.find(
             (p) => p?.id?.uuid === memberId,
           );
-
           const { firstName, lastName } = User(
             (participantMaybe || anonymousUserMaybe) as TUser,
           ).getProfile();

@@ -1,0 +1,48 @@
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.root {
+  padding: 80px 16px 0;
+  display: flex;
+  flex-direction: column;
+  row-gap: 8px;
+
+  @include viewportMedium {
+    row-gap: 16px;
+  }
+
+  @include viewportLarge {
+    padding: 80px 0 0;
+    justify-content: center;
+    max-width: 820px;
+    margin: 0 auto;
+  }
+
+  .titleContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    row-gap: 8px;
+    padding-bottom: 20px;
+    @include textTemplate(16px, 400, 24px);
+
+    @include viewportMedium {
+      padding-bottom: 32px;
+    }
+
+    .title {
+      @include textTemplate(24px, 700, 32px);
+    }
+
+    .subTitle {
+      @include textTemplate(16px, 400, 24px);
+    }
+
+    .subTitleLoading {
+      width: 156px;
+      height: 24px;
+    }
+  }
+}

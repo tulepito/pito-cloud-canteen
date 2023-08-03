@@ -16,6 +16,7 @@ export const enGeneralPaths = {
   StyleGuide: '/style-guide',
   EmailVerification: '/verify-email',
   Home: '/',
+  Tracking: '/tracking/[subOrderId]',
 };
 
 export const personalPaths = {
@@ -42,6 +43,7 @@ export const IgnoredAuthCheckRoutes = [
   enGeneralPaths.RecoveryPassword,
   generalPaths.ResetPassword,
   enGeneralPaths.ResetPassword,
+  enGeneralPaths.Tracking,
 ];
 export const IgnoredPermissionCheckRoutes = [
   generalPaths.SignIn,
@@ -55,6 +57,7 @@ export const IgnoredPermissionCheckRoutes = [
   enGeneralPaths.ResetPassword,
   generalPaths.EmailVerification,
   enGeneralPaths.EmailVerification,
+  enGeneralPaths.Tracking,
 ];
 
 export const adminPaths = {

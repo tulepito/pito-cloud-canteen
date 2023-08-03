@@ -15,12 +15,15 @@ import Form from '@components/Form/Form';
 import { FieldDropdownSelectComponent } from '@components/FormFields/FieldDropdownSelect/FieldDropdownSelect';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
+import IconCopy from '@components/Icons/IconCopy/IconCopy';
 import ReviewOrdersResultSection from '@components/OrderDetails/ReviewView/ReviewOrdersResultSection/ReviewOrdersResultSection';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import type { TColumn } from '@components/Table/Table';
 import Table from '@components/Table/Table';
 import Tabs from '@components/Tabs/Tabs';
+import Tooltip from '@components/Tooltip/Tooltip';
 import { addCommas, parseThousandNumber } from '@helpers/format';
+import { getTrackingLink } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import {
@@ -119,20 +122,6 @@ export const ReviewContent: React.FC<any> = (props) => {
     (state) => state.OrderDetail.orderDetail,
   );
 
-  const order = !isEmpty(orderInDraftState)
-    ? orderInDraftState
-    : orderInPickingState;
-
-  const orderDetail = !isEmpty(orderDetailInDraftState)
-    ? orderDetailInDraftState
-    : orderDetailInPickingState;
-
-  useEffect(() => {
-    setCurrDeliveryManPhoneNumber(deliveryManPhoneNumber);
-  }, [deliveryManPhoneNumber]);
-
-  const { note } = orderDetail?.[timeStamp] || {};
-
   const participantData = useAppSelector(
     (state) => state.OrderDetail.participantData,
   );
@@ -142,6 +131,26 @@ export const ReviewContent: React.FC<any> = (props) => {
   const deliveryManOptions = useAppSelector(
     (state) => state.AdminAttributes.deliveryPeople,
   );
+
+  const defaultCopyText = intl.formatMessage({
+    id: 'ReviewContent.copyToClipboardTooltip.default',
+  });
+  const copiedCopyText = intl.formatMessage({
+    id: 'ReviewContent.copyToClipboardTooltip.copied',
+  });
+
+  const [copyToClipboardTooltip, setCopyToClipboardTooltip] =
+    useState(defaultCopyText);
+
+  const order = !isEmpty(orderInDraftState)
+    ? orderInDraftState
+    : orderInPickingState;
+
+  const orderDetail = !isEmpty(orderDetailInDraftState)
+    ? orderDetailInDraftState
+    : orderDetailInPickingState;
+
+  const { note } = orderDetail?.[timeStamp] || {};
 
   const { form } = useForm<TFormDeliveryInfoValues>({
     onSubmit: () => {},
@@ -169,6 +178,7 @@ export const ReviewContent: React.FC<any> = (props) => {
     orderState,
     orderNote,
   } = Listing(order as TListing).getMetadata();
+  const orderId = Listing(order as TListing).getId();
   const { restaurantName, phoneNumber, foodList = {} } = restaurant || {};
   const isInProgressOrder = orderState === EOrderStates.inProgress;
   const isCancelOrder = [
@@ -190,6 +200,11 @@ export const ReviewContent: React.FC<any> = (props) => {
       },
     };
   }) as any;
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(getTrackingLink(orderId, timeStamp));
+    setCopyToClipboardTooltip(copiedCopyText);
+  };
 
   const handleToggleMenuCollapse = () => {
     menuCollapseController.toggle();
@@ -218,6 +233,10 @@ export const ReviewContent: React.FC<any> = (props) => {
       })),
     [JSON.stringify(deliveryManOptions)],
   );
+
+  useEffect(() => {
+    setCurrDeliveryManPhoneNumber(deliveryManPhoneNumber);
+  }, [deliveryManPhoneNumber]);
 
   return (
     <div>
@@ -266,6 +285,19 @@ export const ReviewContent: React.FC<any> = (props) => {
                   {currDeliveryPhoneNumber}
                 </span>
               </RenderWhen>
+
+              <div className={css.billOfLading} onClick={handleCopyLink}>
+                {intl.formatMessage({ id: 'ReviewOrder.billOfLading' })}
+                <Tooltip
+                  overlayClassName={css.toolTipOverlay}
+                  trigger="hover"
+                  tooltipContent={copyToClipboardTooltip}
+                  placement="bottom">
+                  <div>
+                    <IconCopy className={css.copyIcon} />
+                  </div>
+                </Tooltip>
+              </div>
             </div>
           </div>
         </Collapsible>
