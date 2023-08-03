@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/no-shadow */
 import React, { useEffect, useMemo, useState } from 'react';
@@ -645,6 +646,7 @@ const ManageOrdersPage = () => {
     const metaStartDateQuery = `${
       meta_startDate ? new Date(meta_startDate as string).getTime() : ''
     },${meta_endDate ? new Date(endDateWithOneMoreDay).getTime() : ''}`;
+
     dispatch(
       orderAsyncActions.queryOrders({
         page,
@@ -653,12 +655,8 @@ const ManageOrdersPage = () => {
         ...(hasDateFilter ? { meta_startDate: metaStartDateQuery } : {}),
       }),
     );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch]);
-
-  useEffect(() => {
     dispatch(resetOrder());
-  }, [dispatch]);
+  }, []);
 
   const onClearFilter = () => {
     router.push({

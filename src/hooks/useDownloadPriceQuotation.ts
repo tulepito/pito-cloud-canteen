@@ -21,15 +21,23 @@ export const useDownloadPriceQuotation = ({
   const dispatch = useAppDispatch();
 
   const downloadPriceQuotation = useCallback(async () => {
-    dispatch(priceQuotationActions.startDownloading());
-    dispatch(UIActions.disableScrollRequest('priceQuotation'));
-    await downloadPriceQuotationFn({
-      orderTitle,
-      priceQuotationData,
-      isPartnerQuotation,
-    })();
-    dispatch(priceQuotationActions.endDownloading());
-    dispatch(UIActions.disableScrollRemove('priceQuotation'));
+    try {
+      dispatch(priceQuotationActions.startDownloading());
+      dispatch(UIActions.disableScrollRequest('priceQuotation'));
+      await downloadPriceQuotationFn({
+        orderTitle,
+        priceQuotationData,
+        isPartnerQuotation,
+      })();
+      dispatch(priceQuotationActions.endDownloading());
+      dispatch(UIActions.disableScrollRemove('priceQuotation'));
+    } catch (error) {
+      console.error(
+        '💫 > file: useDownloadPriceQuotation.ts:27 > downloadPriceQuotation > error: ',
+        error,
+      );
+    }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [orderTitle, JSON.stringify(priceQuotationData)]);
 

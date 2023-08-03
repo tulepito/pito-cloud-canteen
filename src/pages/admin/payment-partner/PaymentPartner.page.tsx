@@ -20,7 +20,7 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { adminPaths } from '@src/paths';
 import { formatTimestamp } from '@src/utils/dates';
-import { EOrderDetailTabs } from '@src/utils/enums';
+import { EOrderDetailTabs, EOrderPaymentState } from '@src/utils/enums';
 import type { TPagination } from '@src/utils/types';
 
 import { generateSKU } from '../order/[orderId]/helpers/AdminOrderDetail';
@@ -190,7 +190,10 @@ const PaymentPartnerPage = () => {
       0,
     );
     const remainAmount = totalAmount - paidAmount;
-    const status = remainAmount === 0 ? 'isPaid' : 'isNotPaid';
+    const status =
+      remainAmount === 0
+        ? EOrderPaymentState.isPaid
+        : EOrderPaymentState.isNotPaid;
 
     return {
       key: id,
@@ -373,7 +376,7 @@ const PaymentPartnerPage = () => {
         onClose={addPartnerPaymentModalController.setFalse}
         partnerNameList={partnerNameList}
         paymentList={filterPaymentPartner(formattedTableData, {
-          status: ['isNotPaid'],
+          status: [EOrderPaymentState.isNotPaid],
         })}
         onPartnerPaymentRecordsSubmit={onPartnerPaymentRecordsSubmit}
         inProgress={createPaymentPartnerRecordsInProgress}

@@ -1043,3 +1043,8 @@ export const ORDER_ADMIN_FILTER_OPTIONS = [
 export enum EPaymentStatus {
   SUCCESS = 'success',
 }
+
+export enum EOrderPaymentState {
+  isPaid = 'isPaid',
+  isNotPaid = 'isNotPaid',
+}
