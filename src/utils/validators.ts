@@ -89,7 +89,7 @@ export const maxLength =
     return hasLength && value.length <= maximumLength ? VALID : message;
   };
 
-export const nonEmptyArray = (message: string) => (value: string) => {
+export const nonEmptyArray = (message: string) => (value: string[]) => {
   return value && Array.isArray(value) && value.length > 0 ? VALID : message;
 };
 

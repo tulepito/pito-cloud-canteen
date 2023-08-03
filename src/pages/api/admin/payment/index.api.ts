@@ -2,6 +2,11 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HttpMethod } from '@apis/configs';
 import cookies from '@services/cookie';
+import {
+  adminQueryListings,
+  fetchListing,
+  fetchUser,
+} from '@services/integrationHelper';
 import type { PaymentBaseParams } from '@services/payment';
 import {
   createPaymentRecordOnFirebase,
@@ -9,6 +14,7 @@ import {
   queryPaymentRecordOnFirebase,
 } from '@services/payment';
 import { handleError } from '@services/sdk';
+import { Listing, User } from '@src/utils/data';
 import { EPaymentType } from '@src/utils/enums';
 
 import { checkPaymentRecordValid } from './check-valid-payment.service';
@@ -43,7 +49,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
             res.json(groupPaymentRecordsBySubOrderDate);
           } else {
-            res.json(paymentRecords);
+            const newPaymentRecords = paymentRecords?.filter(
+              (p) => !p.isHideFromHistory,
+            );
+            res.json(newPaymentRecords);
           }
         }
         break;
@@ -75,20 +84,77 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             });
           }
 
+          const order = await fetchListing(orderId, ['author']);
+
+          const {
+            startDate,
+            endDate,
+            bookerId,
+            partnerIds = [],
+            companyId,
+          } = Listing(order).getMetadata();
+
+          const company = companyId ? await fetchUser(companyId) : null;
+
+          const listings = await adminQueryListings({ ids: partnerIds });
+          const restaurants = listings.reduce((prev: any, listing: any) => {
+            const { title } = Listing(listing as any).getAttributes();
+            const restaurantId = Listing(listing as any).getId();
+
+            return [
+              ...prev,
+              {
+                restaurantName: title,
+                restaurantId,
+              },
+            ];
+          }, [] as any);
+
+          const bookerUser = await fetchUser(bookerId);
+
+          const bookerDisplayName = User(bookerUser).getProfile().displayName;
+          const bookerPhoneNumber =
+            User(bookerUser).getProtectedData().phoneNumber;
+
           const allowedPaymentRecordParams: Partial<PaymentBaseParams> = {
             SKU,
             amount,
-            paymentNote,
             orderId,
+            ...(paymentNote ? { paymentNote } : {}),
             ...(partnerId ? { partnerId } : {}),
             ...(partnerName ? { partnerName } : {}),
-            ...(subOrderDate ? { subOrderDate } : {}),
             ...(companyName ? { companyName } : {}),
             ...(orderTitle ? { orderTitle } : {}),
             ...(totalPrice ? { totalPrice } : {}),
             ...(deliveryHour ? { deliveryHour } : {}),
             ...(isHideFromHistory ? { isHideFromHistory } : {}),
+            ...(paymentRecordType === EPaymentType.CLIENT
+              ? startDate && endDate
+                ? { startDate, endDate }
+                : {}
+              : subOrderDate
+              ? { subOrderDate }
+              : {}),
+            ...(restaurants ? { restaurants } : {}),
+            ...(company
+              ? {
+                  company: {
+                    companyName: User(company).getPublicData().companyName,
+                    companyId,
+                  },
+                }
+              : {}),
+            ...(bookerUser
+              ? {
+                  booker: {
+                    bookerDisplayName: bookerDisplayName || '',
+                    bookerPhoneNumber: bookerPhoneNumber || '',
+                    bookerId,
+                  },
+                }
+              : {}),
           };
+
           const newPaymentRecord = await createPaymentRecordOnFirebase(
             paymentRecordType,
             allowedPaymentRecordParams,

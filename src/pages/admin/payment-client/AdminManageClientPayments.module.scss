@@ -1,0 +1,89 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.header {
+  @include flexAlign(center, space-between);
+}
+
+.orderTitle {
+  color: $labelBlue2;
+  font-weight: $fontWeightBold;
+}
+
+.boldText {
+  font-weight: $fontWeightBold;
+}
+
+.semiBoldText {
+  font-weight: $fontWeightSemiBold;
+}
+
+.filterForm {
+  margin-top: 24px;
+}
+
+.filterButton {
+  padding: 10px 20px 10px 20px;
+  font-size: 14px;
+
+  .filterIcon {
+    width: 16px;
+    height: 14px;
+    margin-right: 8px;
+  }
+
+  &:hover,
+  &:focus {
+    .filterIcon * {
+      fill: $neutralGray1;
+    }
+  }
+}
+
+.tableWrapper {
+  margin-top: 24px;
+}
+
+.filterLabels {
+  @include flexAlign(center);
+  gap: 10px;
+  margin-top: 24px;
+
+  .filterLabel {
+    padding: 8px 12px;
+    border: 1px solid $neutralGray3;
+    border-radius: 30px;
+    span {
+      @include textTemplate(14px, $fontWeightRegular, 20px);
+
+      &:first-child {
+        color: $neutralGray5;
+      }
+    }
+  }
+
+  .iconClose {
+    width: 10px;
+    height: 10px;
+    margin-left: 12px;
+    cursor: pointer;
+
+    path {
+      fill: $neutralGray5;
+    }
+  }
+}
+
+.memberName {
+  font-weight: $fontWeightBold;
+  margin-bottom: 2px;
+}
+
+.memberPhoneNumber {
+  color: $neutralGray5;
+}
+
+.orderName {
+  max-width: 200px;
+}

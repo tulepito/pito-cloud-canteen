@@ -121,7 +121,7 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
     avatarImageId,
     coverImageId,
     minQuantity = 0,
-    maxQuantity = Number.MAX_VALUE,
+    maxQuantity = 100,
     phoneNumber,
   } = Listing(currentRestaurant!).getPublicData();
   const restaurantAvatar = getListingImageById(

@@ -1,3 +1,4 @@
+import { useEffect, useImperativeHandle } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import { FormattedMessage } from 'react-intl';
@@ -35,6 +36,7 @@ const PAYMENT_STATUS_OPTIONS = [
 
 type TExtraProps = {
   handleClearFilters: () => void;
+  formRef: any;
 };
 type TPaymentFilterFormComponentProps =
   FormRenderProps<TPaymentFilterFormValues> & Partial<TExtraProps>;
@@ -44,7 +46,9 @@ type TPaymentFilterFormProps = FormProps<TPaymentFilterFormValues> &
 const PaymentFilterFormComponent: React.FC<TPaymentFilterFormComponentProps> = (
   props,
 ) => {
-  const { handleSubmit, form, values, handleClearFilters } = props;
+  const { handleSubmit, form, values, handleClearFilters, formRef } = props;
+
+  useImperativeHandle(formRef, () => form);
 
   const minEndDate = addDays(values.startDate!, 1);
 
@@ -57,6 +61,12 @@ const PaymentFilterFormComponent: React.FC<TPaymentFilterFormComponentProps> = (
   const setEndDate = (date: number) => {
     form.change('endDate', date);
   };
+
+  useEffect(() => {
+    if (values.status?.length === 0) {
+      form.change('status', undefined);
+    }
+  }, [form, values]);
 
   return (
     <Form onSubmit={handleSubmit}>
@@ -113,7 +123,7 @@ const PaymentFilterFormComponent: React.FC<TPaymentFilterFormComponentProps> = (
       <div className={css.fieldInput}>
         <label className={css.label}>Trạng thái</label>
         <FieldCheckboxGroup
-          istClassName={css.checkboxGroup}
+          itemClassName={css.checkboxGroup}
           id="EditCompanySettingsInformationForm.mealSetting"
           options={PAYMENT_STATUS_OPTIONS}
           name="status"

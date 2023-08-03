@@ -4,6 +4,10 @@
 
 .header {
   @include flexAlign(center, space-between);
+
+  .title {
+    @include textTemplate(24px, $fontWeightBold, 32px);
+  }
 }
 
 .orderTitle {
@@ -72,5 +76,12 @@
     path {
       fill: $neutralGray5;
     }
+  }
+}
+
+.orderDetailTooltip {
+  background-color: $neutralGray1;
+  &:global.rc-tooltip {
+    opacity: 1 !important;
   }
 }

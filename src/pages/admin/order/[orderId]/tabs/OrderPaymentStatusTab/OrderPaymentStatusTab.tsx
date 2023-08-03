@@ -83,7 +83,8 @@ const OrderPaymentStatusTab: React.FC<OrderPaymentStatusTabProps> = (props) => {
           isEmpty(
             partner[orderDetail[subOrderDate].restaurant.id]?.quotation,
           ) ||
-          orderDetail[subOrderDate].status === ESubOrderStatus.CANCELED
+          orderDetail[subOrderDate].status === ESubOrderStatus.CANCELED ||
+          !orderDetail[subOrderDate].transactionId
         ) {
           return null;
         }
@@ -161,9 +162,17 @@ const OrderPaymentStatusTab: React.FC<OrderPaymentStatusTabProps> = (props) => {
 
   const clientPaidAmount =
     calculatePaidAmountBySubOrderDate(clientPaymentRecords);
+  const showClientCheckmark = clientTotalPrice === clientPaidAmount;
   const clientTabItem = {
     key: 'client',
-    label: 'Khách hàng',
+    label: (
+      <div className={css.clientLabel}>
+        <span>Khách hàng</span>
+        <RenderWhen condition={showClientCheckmark}>
+          <IconCheckmarkWithCircle className={css.checkIcon} />
+        </RenderWhen>
+      </div>
+    ),
     childrenFn: (childProps: any) => <ClientPaymentDetail {...childProps} />,
     childrenProps: {
       totalWithVAT: clientTotalPrice,
@@ -173,7 +182,9 @@ const OrderPaymentStatusTab: React.FC<OrderPaymentStatusTabProps> = (props) => {
       orderTitle,
       paidAmount: clientPaidAmount,
       deliveryHour,
-      clientPaymentRecords,
+      clientPaymentRecords: clientPaymentRecords?.filter(
+        (_record) => !_record.isHideFromHistory,
+      ),
     },
   };
 

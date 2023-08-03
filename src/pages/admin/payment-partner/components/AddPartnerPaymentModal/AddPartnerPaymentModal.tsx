@@ -11,6 +11,7 @@ type TAddPartnerPaymentModalProps = {
   paymentList: any[];
   onPartnerPaymentRecordsSubmit: (values: any) => void;
   inProgress?: boolean;
+  hasSelectedPaymentRecords?: boolean;
 };
 
 const AddPartnerPaymentModal: React.FC<TAddPartnerPaymentModalProps> = (
@@ -23,13 +24,16 @@ const AddPartnerPaymentModal: React.FC<TAddPartnerPaymentModalProps> = (
     paymentList,
     onPartnerPaymentRecordsSubmit,
     inProgress,
+    hasSelectedPaymentRecords,
   } = props;
 
   const selectInputRef = useRef<any>(null);
+  const formRef = useRef<any>(null);
 
   const handleModalClose = () => {
     onClose();
     selectInputRef?.current?.clearValue();
+    formRef.current?.reset();
   };
 
   return (
@@ -44,6 +48,8 @@ const AddPartnerPaymentModal: React.FC<TAddPartnerPaymentModalProps> = (
         unPaidPaymentList={paymentList}
         inProgress={inProgress}
         selectInputRef={selectInputRef}
+        hasSelectedPaymentRecords={hasSelectedPaymentRecords}
+        formRef={formRef}
       />
     </Modal>
   );

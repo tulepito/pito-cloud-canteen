@@ -8,6 +8,7 @@ import RenderWhen from '@components/RenderWhen/RenderWhen';
 import Tabs from '@components/Tabs/Tabs';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
+import { useBottomScroll } from '@hooks/useBottomScroll';
 import { currentUserSelector } from '@redux/slices/user.slice';
 import { CurrentUser } from '@src/utils/data';
 import { ESubOrderTxStatus } from '@src/utils/enums';
@@ -75,6 +76,19 @@ const SubOrders = () => {
       }),
     );
   }, [currentUserId, dispatch]);
+
+  useBottomScroll(() =>
+    dispatch(
+      SubOrdersThunks.fetchSubOrdersFromFirebase({
+        participantId: currentUserId,
+        txStatus:
+          activeTab === DELIVERING_TAB
+            ? [ESubOrderTxStatus.PENDING, DELIVERING_TAB]
+            : DELIVERED_TAB,
+      }),
+    ),
+  );
+
   const tabItems = [
     {
       key: DELIVERING_TAB,

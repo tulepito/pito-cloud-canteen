@@ -1,4 +1,4 @@
-import Modal from '@components/Modal/Modal';
+import { useRef } from 'react';
 
 import type { TPaymentFilterFormValues } from '../PaymentFilterForm/PaymentFilterForm';
 import PaymentFilterForm from '../PaymentFilterForm/PaymentFilterForm';
@@ -6,13 +6,13 @@ import PaymentFilterForm from '../PaymentFilterForm/PaymentFilterForm';
 import css from './PaymentFilterModal.module.scss';
 
 type PaymentFilterModalProps = {
-  isOpen: boolean;
-  onClose: () => void;
   setFilters: (filter: TPaymentFilterFormValues) => void;
+  setPage: (page: number) => void;
 };
 
 const PaymentFilterModal: React.FC<PaymentFilterModalProps> = (props) => {
-  const { isOpen, onClose, setFilters } = props;
+  const { setFilters, setPage } = props;
+  const formRef = useRef<any>();
 
   const handleFilterSubmit = (values: TPaymentFilterFormValues) => {
     const { partnerName, orderTitle, startDate, endDate, status } = values;
@@ -24,27 +24,25 @@ const PaymentFilterModal: React.FC<PaymentFilterModalProps> = (props) => {
       ...(endDate && { endDate }),
       ...(status && { status }),
     });
+    setPage(1);
 
-    onClose();
+    // onClose();
   };
 
   const handleClearFilters = () => {
     setFilters({});
-    onClose();
+    formRef?.current?.reset();
+    // onClose();
   };
 
   return (
-    <Modal
-      id="PaymentFilterModal"
-      isOpen={isOpen}
-      handleClose={onClose}
-      containerClassName={css.modalContainer}
-      title="Lọc">
+    <div className={css.container}>
       <PaymentFilterForm
         onSubmit={handleFilterSubmit}
         handleClearFilters={handleClearFilters}
+        formRef={formRef}
       />
-    </Modal>
+    </div>
   );
 };
 

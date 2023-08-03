@@ -57,7 +57,7 @@ function WeekView({
     () => WeekView.range(date, { localizer }),
     [date, localizer],
   );
-  const { hideEmptySubOrderSection = false } = resources as any;
+  const { hideEmptySubOrderSection = false } = resources || ({} as any);
 
   useEffect(() => {
     if (width < 768) {

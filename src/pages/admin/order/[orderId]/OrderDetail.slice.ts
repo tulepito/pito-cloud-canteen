@@ -6,6 +6,7 @@ import {
   createPaymentRecordApi,
   deletePaymentRecordApi,
   getPaymentRecordsApi,
+  transitionOrderPaymentStatusApi,
   transitPlanApi,
 } from '@apis/admin';
 import { participantSubOrderUpdateDocumentApi } from '@apis/firebaseApi';
@@ -358,14 +359,17 @@ const fetchPartnerPaymentRecords = createAsyncThunk(
       dataParams: { orderId, paymentType: EPaymentType.PARTNER },
     });
 
-    return partnerPaymentRecords;
+    return partnerPaymentRecords || {};
   },
 );
 
 const createPartnerPaymentRecord = createAsyncThunk(
   CREATE_PARTNER_PAYMENT_RECORD,
   async (payload: TObject, { getState }) => {
-    const { partnerPaymentRecords = {} } = getState().OrderDetail;
+    const { partnerPaymentRecords = {}, order } = getState().OrderDetail;
+    const orderListing = Listing(order);
+    const orderId = orderListing.getId();
+    const { plans = [] } = orderListing.getMetadata();
     const { paymentType, subOrderDate } = payload;
     const apiBody = {
       paymentRecordType: paymentType,
@@ -380,6 +384,7 @@ const createPartnerPaymentRecord = createAsyncThunk(
       ...partnerPaymentRecords,
       [subOrderDate]: [newPaymentRecord, ...currentPaymentRecordsBySubOrder],
     };
+    transitionOrderPaymentStatusApi(orderId, plans[0]);
 
     return newPartnerPaymentRecords;
   },
@@ -388,7 +393,10 @@ const createPartnerPaymentRecord = createAsyncThunk(
 const deletePartnerPaymentRecord = createAsyncThunk(
   DELETE_PARTNER_PAYMENT_RECORD,
   async (paymentRecordId: string, { getState }) => {
-    const { partnerPaymentRecords = {} } = getState().OrderDetail;
+    const { partnerPaymentRecords = {}, order } = getState().OrderDetail;
+    const orderListing = Listing(order);
+    const orderId = orderListing.getId();
+    const { plans = [] } = orderListing.getMetadata();
     await deletePaymentRecordApi({ paymentRecordId });
 
     const newPartnerPaymentRecords = Object.entries(
@@ -401,6 +409,7 @@ const deletePartnerPaymentRecord = createAsyncThunk(
 
       return acc;
     }, {});
+    transitionOrderPaymentStatusApi(orderId, plans[0]);
 
     return newPartnerPaymentRecords;
   },
@@ -413,14 +422,17 @@ const fetchClientPaymentRecords = createAsyncThunk(
       dataParams: { orderId, paymentType: EPaymentType.CLIENT },
     });
 
-    return clientPaymentRecords;
+    return clientPaymentRecords || [];
   },
 );
 
 const createClientPaymentRecord = createAsyncThunk(
   CREATE_CLIENT_PAYMENT_RECORD,
   async (payload: TObject, { getState }) => {
-    const { clientPaymentRecords = [] } = getState().OrderDetail;
+    const { clientPaymentRecords = [], order } = getState().OrderDetail;
+    const orderListing = Listing(order);
+    const orderId = orderListing.getId();
+    const { plans = [] } = orderListing.getMetadata();
     const { paymentType } = payload;
     const apiBody = {
       paymentRecordType: paymentType,
@@ -429,6 +441,7 @@ const createClientPaymentRecord = createAsyncThunk(
       },
     };
     const { data: newPaymentRecord } = await createPaymentRecordApi(apiBody);
+    transitionOrderPaymentStatusApi(orderId, plans[0]);
 
     return [newPaymentRecord, ...clientPaymentRecords];
   },
@@ -437,12 +450,16 @@ const createClientPaymentRecord = createAsyncThunk(
 const deleteClientPaymentRecord = createAsyncThunk(
   DELETE_CLIENT_PAYMENT_RECORD,
   async (paymentRecordId: string, { getState }) => {
-    const { clientPaymentRecords = [] } = getState().OrderDetail;
+    const { clientPaymentRecords = [], order } = getState().OrderDetail;
+    const orderListing = Listing(order);
+    const orderId = orderListing.getId();
+    const { plans = [] } = orderListing.getMetadata();
     await deletePaymentRecordApi({ paymentRecordId });
 
     const newClientPaymentRecords = clientPaymentRecords.filter(
       (paymentRecord: any) => paymentRecord.id !== paymentRecordId,
     );
+    transitionOrderPaymentStatusApi(orderId, plans[0]);
 
     return newClientPaymentRecords;
   },
