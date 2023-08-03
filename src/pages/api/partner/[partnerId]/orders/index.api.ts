@@ -4,8 +4,8 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HttpMethod } from '@apis/configs';
 import { queryAllListings, queryAllTransactions } from '@helpers/apiHelpers';
-import { denormalisedResponseEntities } from '@services/data';
-import { getIntegrationSdk, handleError } from '@services/sdk';
+import { fetchListing } from '@services/integrationHelper';
+import { handleError } from '@services/sdk';
 import { Listing, Transaction } from '@src/utils/data';
 import { EListingType, EOrderStates } from '@src/utils/enums';
 import type { TPlan } from '@src/utils/orderTypes';
@@ -24,7 +24,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       method: apiMethod,
       query: { partnerId },
     } = req;
-    const integrationSdk = getIntegrationSdk();
 
     switch (apiMethod) {
       case HttpMethod.GET: {
@@ -55,9 +54,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           let resultValue = order as TObject;
 
           if (planId) {
-            const [planListing] = denormalisedResponseEntities(
-              (await integrationSdk.listings.show({ id: planId })) || [{}],
-            );
+            const planListing = await fetchListing(planId);
 
             if (!isEmpty(planListing)) {
               resultValue = { ...resultValue, plan: planListing };

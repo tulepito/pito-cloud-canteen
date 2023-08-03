@@ -1074,3 +1074,8 @@ export enum EPartnerVATSetting {
   noExportVat = 'noExportVat',
   direct = 'direct',
 }
+
+export enum EOrderPaymentState {
+  isPaid = 'isPaid',
+  isNotPaid = 'isNotPaid',
+}

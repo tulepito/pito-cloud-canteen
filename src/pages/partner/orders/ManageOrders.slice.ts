@@ -5,6 +5,7 @@ import { queryPartnerOrdersApi } from '@apis/partnerApi';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { CurrentUser, Listing } from '@src/utils/data';
 import { formatTimestamp } from '@src/utils/dates';
+import { EOrderPaymentState } from '@src/utils/enums';
 import { toNonAccentVietnamese } from '@src/utils/string';
 import {
   txIsCanceled,
@@ -44,7 +45,7 @@ const initialState: TPartnerManageOrdersState = {
 };
 
 const isValidStatus = (transaction: TTransaction, status: string) => {
-  if (status === 'isNotPaid') {
+  if (status === EOrderPaymentState.isNotPaid) {
     return true;
   }
 

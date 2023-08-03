@@ -1,4 +1,5 @@
 import { EPaymentStatus, EPaymentType } from '@src/utils/enums';
+import type { TObject } from '@src/utils/types';
 
 import {
   addCollectionDoc,
@@ -96,8 +97,9 @@ export const queryPaymentRecordOnFirebase = async (query: any) => {
   }
 };
 
-export const queryAllPartnerPaymentRecordsOnFirebase = async () => {
+export const queryAllPartnerPaymentRecordsOnFirebase = async (query = {}) => {
   try {
+    const { partnerId } = query as TObject;
     const paymentRecords = await queryAllCollectionData({
       collectionName: FIREBASE_PAYMENT_RECORD_COLLECTION_NAME!,
       queryParams: {
@@ -105,6 +107,12 @@ export const queryAllPartnerPaymentRecordsOnFirebase = async () => {
           operator: '==',
           value: EPaymentType.PARTNER,
         },
+        ...(partnerId && {
+          partnerId: {
+            operator: '==',
+            value: partnerId,
+          },
+        }),
       },
     });
 

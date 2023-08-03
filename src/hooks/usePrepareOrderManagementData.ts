@@ -185,6 +185,7 @@ export const usePrepareOrderDetailPageData = ({
           ? VATPercentage!
           : currentOrderVATPercentage,
         currentOrderServiceFeePercentage: serviceFeePercentage,
+        shouldIncludePITOFee: isEmpty(date),
       }),
     [orderData, draftOrderDetail, currentOrderVATPercentage],
   );
