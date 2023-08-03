@@ -356,6 +356,18 @@ const OrderListPage = () => {
       if (event) {
         setSelectedEvent(event);
         subOrderDetailModalControl.setTrue();
+      } else {
+        const monthInQuery = getStartOfMonth(
+          DateTime.fromMillis(+timestamp).toJSDate(),
+        );
+        setSelectedMonth(getStartOfMonth(monthInQuery));
+        if (
+          diffDays(monthInQuery?.getTime(), maxSelectedMonth?.getTime(), [
+            'months',
+          ]).months! > 0
+        ) {
+          setMaxSelectedMonth(monthInQuery);
+        }
       }
     }
   }, [planIdFromQuery, timestampFromQuery, JSON.stringify(flattenEvents)]);
