@@ -63,6 +63,7 @@ const AddingClientTableField: React.FC<TAddClientPaymentFormValues> = (
       id={`paymentAmount - ${orderTitle} - ${id}`}
       name={`paymentAmount - ${orderTitle} - ${id}`}
       placeholder="Nhập số"
+      inputContainerClassName={css.paymentFieldContainer}
       rightIcon={
         <PaymentPercentageDropdown
           totalPrice={totalAmount}

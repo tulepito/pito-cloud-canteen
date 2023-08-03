@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import classNames from 'classnames';
-import { flatMapDeep, isEmpty, uniq } from 'lodash';
+import { flatMapDeep, isEmpty } from 'lodash';
 
 import Badge, { EBadgeType } from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
@@ -156,13 +156,16 @@ const TABLE_COLUMNS: TColumn[] = [
   },
 ];
 
-export const getUniqueRestaurants = (restaurants: TObject[]) => {
+export const getUniquePaymentRelationship = (
+  list: TObject[],
+  uniqueBy: string,
+) => {
   const resArr = [] as any[];
-  restaurants.forEach((item) => {
-    if (!item?.restaurantId) {
+  list.forEach((item) => {
+    if (!item?.[uniqueBy]) {
       return;
     }
-    const i = resArr.findIndex((x) => x.restaurantId === item.restaurantId);
+    const i = resArr.findIndex((x) => x[uniqueBy] === item[uniqueBy]);
     if (i <= -1) {
       resArr.push(item);
     }
@@ -271,16 +274,18 @@ const AdminManageClientPaymentsPage = () => {
       },
     };
   });
-  const companyList = uniq(
+  const companyList = getUniquePaymentRelationship(
     formattedTableData
       .filter((item) => !!item.data.company?.companyName)
       .map((item) => item.data.company),
+    'companyId',
   );
 
-  const partnerList = getUniqueRestaurants(
+  const partnerList = getUniquePaymentRelationship(
     formattedTableData.reduce((prev, item) => {
       return [...prev, ...item.data.restaurants];
     }, [] as TObject[]),
+    'restaurantId',
   );
 
   const filteredTableData = filterClientPayment(formattedTableData, filters);
@@ -369,6 +374,9 @@ const AdminManageClientPaymentsPage = () => {
   };
 
   const filterLabels = Object.keys(filters).map((key) => {
+    const isArray = Array.isArray(filters[key]);
+    if (isArray && filters[key].length <= 0) return <></>;
+
     return (
       <div key={`${key}-${filters[key]}`} className={css.filterLabel}>
         <span>

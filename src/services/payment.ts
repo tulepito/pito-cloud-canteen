@@ -21,6 +21,8 @@ export type PaymentBaseParams = {
   partnerId?: string;
   partnerName?: string;
   subOrderDate?: string;
+  startDate?: number;
+  endDate?: number;
   companyName?: string;
   orderTitle?: string;
   totalPrice?: number;
