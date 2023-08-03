@@ -234,6 +234,7 @@ const AddPartnerPaymentFormComponent: React.FC<
           columns={TABLE_COLUMNS}
           data={showTableData ? unPaidPaymentListFiltered : []}
           tableBodyCellClassName={css.tableBodyCell}
+          tableClassName={css.table}
         />
       </div>
       <div className={css.paymentBtn}>
