@@ -7,10 +7,15 @@
   flex-direction: column;
   gap: 16px;
 
-  @include viewportLarge {
+  @include viewportMedium {
     flex-direction: row;
     flex-wrap: wrap;
-    justify-content: flex-start;
+    justify-content: space-between;
+  }
+
+  @include viewportSLarge {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
     gap: 32px;
   }
 }
