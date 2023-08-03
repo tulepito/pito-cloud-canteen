@@ -5,18 +5,12 @@ import { combineOrderDetailWithPriceInfo } from '@helpers/orderHelper';
 import { Listing } from '@utils/data';
 import { formatTimestamp } from '@utils/dates';
 import { EOrderDraftStates, EOrderType } from '@utils/enums';
-import type {
-  TIntegrationOrderListing,
-  TListing,
-  TObject,
-  TPaymentRecord,
-} from '@utils/types';
+import type { TIntegrationOrderListing, TListing, TObject } from '@utils/types';
 
 export const parseEntitiesToTableData = (
   orders: TIntegrationOrderListing[],
   page: number,
   currentOrderVATPercentage: number,
-  allClientPaymentRecords: TPaymentRecord[],
 ) => {
   return orders.map((entity, index) => {
     const { plan = {} } = entity;
@@ -84,10 +78,7 @@ export const parseEntitiesToTableData = (
         orderName: entity.attributes.publicData.orderName,
         deliveryHour,
         totalWithVAT,
-        paymentStatus:
-          allClientPaymentRecords.findIndex(
-            (paymentRecord) => paymentRecord.orderId === orderId,
-          ) !== -1,
+        paymentStatus: entity.attributes.metadata?.isClientSufficientPaid,
       },
     };
   });

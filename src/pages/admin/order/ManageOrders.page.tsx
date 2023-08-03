@@ -424,7 +424,8 @@ const parseEntitiesToTableData = (orders: TIntegrationOrderListing[]) => {
       staffName,
       deliveryAddress,
       deliveryHour,
-      isPaid = false,
+      isClientSufficientPaid = false,
+      isPartnerSufficientPaid = false,
     } = entity?.attributes?.metadata || {};
 
     const orderDetail = subOrders[0]?.attributes?.metadata?.orderDetail || {};
@@ -496,7 +497,7 @@ const parseEntitiesToTableData = (orders: TIntegrationOrderListing[]) => {
         deliveryHour,
         isParent: true,
         children: subOrderDates,
-        isPaid,
+        isPaid: isClientSufficientPaid && isPartnerSufficientPaid,
         orderCreatedAt: formatTimestamp(
           new Date(entity.attributes.createdAt!).getTime(),
         ),

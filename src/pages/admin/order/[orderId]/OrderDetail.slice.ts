@@ -1,5 +1,6 @@
 import { createSlice, current } from '@reduxjs/toolkit';
 import isEmpty from 'lodash/isEmpty';
+import { DateTime } from 'luxon';
 
 import {
   createPaymentRecordApi,
@@ -238,8 +239,13 @@ const transit = createAsyncThunk(
     const { displayStart } = booking.attributes;
     const { lastTransition } = txGetter.getAttributes();
     const { planId, participantIds = [] } = txGetter.getMetadata();
+    const timestamp = new Date(displayStart).getTime();
+    const subOrderTimestamp = DateTime.fromMillis(timestamp)
+      .setZone('Asia/Ho_Chi_Minh')
+      .startOf('day')
+      .toMillis();
     const firebaseSubOrderIdList = participantIds.map(
-      (id: string) => `${id} - ${planId} - ${new Date(displayStart).getTime()}`,
+      (id: string) => `${id} - ${planId} - ${subOrderTimestamp}`,
     );
 
     if (transitionShouldChangeFirebaseSubOrderStatus.includes(lastTransition)) {
