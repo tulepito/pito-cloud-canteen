@@ -536,7 +536,7 @@ export const getEndOfMonth = (date: Date) => {
 };
 
 export const renderListTimeOptions = (
-  startTime: string = '06:00',
+  startTime: string = '06:30',
   endTime: string = '23:00',
   interval: number = 15,
 ) => {
