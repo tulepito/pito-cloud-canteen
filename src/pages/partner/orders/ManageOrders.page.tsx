@@ -140,6 +140,7 @@ const parseEntitiesToTableData = (subOrders: TObject[]) => {
       restaurant,
       lineItems = [],
       transaction,
+      isPaid,
     } = entity;
     const dayIndex = new Date(Number(date)).getDay();
 
@@ -174,7 +175,7 @@ const parseEntitiesToTableData = (subOrders: TObject[]) => {
         state: EOrderDraftStates.pendingApproval,
         deliveryHour: formattedDeliveryHour,
         transaction,
-        isPaid: false,
+        isPaid,
       },
     };
   });
