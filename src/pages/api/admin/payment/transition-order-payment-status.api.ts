@@ -100,6 +100,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     ).every((status: any) => Boolean(status));
 
     const isOrderPendingPayment = orderState === EOrderStates.pendingPayment;
+    const isOrderStateIncludePendingPayment = orderStateHistory.some(
+      (state: any) => state.state === EOrderStates.pendingPayment,
+    );
 
     await integrationSdk.listings.update({
       id: orderId,
@@ -117,6 +120,17 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
                 ...orderStateHistory,
                 {
                   state: EOrderStates.completed,
+                  updatedAt: new Date().getTime(),
+                },
+              ],
+            }
+          : !isOrderPendingPayment && isOrderStateIncludePendingPayment
+          ? {
+              orderState: EOrderStates.pendingPayment,
+              orderStateHistory: [
+                ...orderStateHistory,
+                {
+                  state: EOrderStates.pendingPayment,
                   updatedAt: new Date().getTime(),
                 },
               ],
