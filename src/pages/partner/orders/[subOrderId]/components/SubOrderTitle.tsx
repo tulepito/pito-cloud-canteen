@@ -1,5 +1,6 @@
 import { useIntl } from 'react-intl';
 import Skeleton from 'react-loading-skeleton';
+import { useRouter } from 'next/router';
 
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import SubOrderBadge from '@components/SubOrderBadge/SubOrderBadge';
@@ -13,14 +14,21 @@ type TSubOrderTitleProps = {};
 
 const SubOrderTitle: React.FC<TSubOrderTitleProps> = () => {
   const intl = useIntl();
+  const router = useRouter();
   const order = useAppSelector((state) => state.PartnerSubOrderDetail.order);
   const fetchOrderInProgress = useAppSelector(
     (state) => state.PartnerSubOrderDetail.fetchOrderInProgress,
   );
 
+  const {
+    query: { subOrderId = '' },
+  } = router;
+
+  // eslint-disable-next-line no-unsafe-optional-chaining
+  const [, date] = (subOrderId as string)?.split('_');
+  const dayIndex = new Date(Number(date)).getDay();
   const { transaction } = order || {};
   const orderGetter = Listing(order as TListing);
-
   const { title: orderTitle = '' } = orderGetter.getAttributes();
 
   return (
@@ -30,7 +38,11 @@ const SubOrderTitle: React.FC<TSubOrderTitleProps> = () => {
           {intl.formatMessage(
             { id: 'SubOrderTitle.mainTitle' },
             {
-              orderTitle: <span className={css.orderTitle}>#{orderTitle}</span>,
+              orderTitle: (
+                <span className={css.orderTitle}>
+                  #{orderTitle}_{dayIndex === 0 ? 7 : dayIndex}
+                </span>
+              ),
             },
           )}
 
