@@ -186,3 +186,6 @@ export const sendOrderDetailUpdatedEmailApi = ({
     restaurantId,
     timestamp,
   });
+
+export const updateOrderStateToDraftApi = (orderId: string) =>
+  putApi(`/orders/${orderId}/update-order-state-to-draft`);

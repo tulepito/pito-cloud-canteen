@@ -20,6 +20,7 @@ import useBoolean from '@hooks/useBoolean';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
 import { companyPaths } from '@src/paths';
 import { Listing } from '@src/utils/data';
+import { diffDays } from '@src/utils/dates';
 import {
   EBookerOrderDraftStates,
   EOrderDraftStates,
@@ -62,16 +63,10 @@ const CompanyOrdersActionColumn = ({
   companyId,
   hasRating,
   isGroupOrder,
-}: {
-  state:
-    | EOrderStates
-    | EBookerOrderDraftStates
-    | EOrderDraftStates.pendingApproval;
-  id: string;
-  companyId: string;
-  hasRating?: boolean;
-  isGroupOrder?: boolean;
-}) => {
+  startDateTimestamp,
+  openOrderStateWarningModal,
+  setSelectedOrderId,
+}: TObject) => {
   const intl = useIntl();
   const router = useRouter();
   const dispatch = useAppDispatch();
@@ -108,10 +103,19 @@ const CompanyOrdersActionColumn = ({
   };
 
   const navigateToBookerManageOrderDetailPage = () => {
-    router.push({
-      pathname: companyPaths.ManageOrderPicking,
-      query: { orderId },
-    });
+    const today = new Date().getTime();
+    const isTodayAfterStartDate =
+      Number(diffDays(startDateTimestamp, today, 'day').days) < 0;
+
+    if (state === EOrderStates.picking && isTodayAfterStartDate) {
+      openOrderStateWarningModal('expireStartOrder');
+      setSelectedOrderId(orderId);
+    } else {
+      router.push({
+        pathname: companyPaths.ManageOrderPicking,
+        query: { orderId },
+      });
+    }
   };
 
   const handleDeleteDraftOrder = () => {
