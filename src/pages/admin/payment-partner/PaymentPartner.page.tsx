@@ -327,12 +327,13 @@ const PaymentPartnerPage = () => {
           onClear={onClearFilters}
           leftFilters={
             <Tooltip
+              visible={filterPaymentModalController.value}
               tooltipContent={
                 <PaymentFilterModal
-                  // isOpen={filterPaymentModalController.value}
-                  // onClose={filterPaymentModalController.setFalse}
+                  onClose={filterPaymentModalController.setFalse}
                   setFilters={setFilters}
                   setPage={setPage}
+                  filters={filters}
                 />
               }
               placement="bottomLeft"
@@ -345,7 +346,7 @@ const PaymentPartnerPage = () => {
               <Button
                 type="button"
                 variant="secondary"
-                onClick={filterPaymentModalController.setTrue}
+                onClick={filterPaymentModalController.toggle}
                 className={css.filterButton}>
                 <IconFilter className={css.filterIcon} />
                 <FormattedMessage id="IntegrationFilterModal.filterMessage" />
