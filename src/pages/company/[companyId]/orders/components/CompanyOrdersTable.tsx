@@ -153,11 +153,17 @@ const CompanyOrdersTable: React.FC<TCompanyOrdersTableProps> = () => {
   const currentOrderVATPercentage = useAppSelector(
     (state) => state.SystemAttributes.currentOrderVATPercentage,
   );
+  const updateOrderStateToDraftInProgress = useAppSelector(
+    (state) => state.Order.updateOrderStateToDraftInProgress,
+  );
 
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
 
-  const [orderWarningState, setOrderWarningState] =
-    useState<EOrderStates | null>();
+  const [orderWarningState, setOrderWarningState] = useState<
+    EOrderStates | 'expireStartOrder' | null
+  >();
+
+  const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
 
   let currDebounceRef = debounceRef.current;
 
@@ -176,25 +182,43 @@ const CompanyOrdersTable: React.FC<TCompanyOrdersTableProps> = () => {
     setOrderWarningState(null);
   };
 
-  const onConfirmOrderStateWarningModal = () => {
+  const onConfirmOrderStateWarningModal = async () => {
+    if (orderWarningState === 'expireStartOrder') {
+      await dispatch(
+        orderAsyncActions.updateOrderStateToDraft(selectedOrderId!),
+      );
+
+      return router.push({
+        pathname: companyPaths.EditDraftOrder,
+        query: { orderId: selectedOrderId },
+      });
+    }
+
     return router.push(companyPaths.CreateNewOrder);
   };
 
   const orderStateWarningContent =
     orderWarningState === EOrderStates.expiredStart
       ? 'Đơn hàng đã hết hiệu lực đặt.'
+      : orderWarningState === 'expireStartOrder'
+      ? 'Đơn hàng đã quá hạn đặt. Chọn lại ngày giao hàng nhé.'
       : 'Đơn hàng của bạn đã huỷ. Bạn có muốn đặt đơn mới không?';
 
   const orderStateWarningModalTitle =
     orderWarningState === EOrderStates.expiredStart
       ? 'Đơn Hàng Đã Hết Hiệu Lực'
+      : orderWarningState === 'expireStartOrder'
+      ? 'Đơn Hàng Đã Quá Hạn đặt'
       : 'Đơn Hàng Đã Hủy';
 
+  const orderStateWarningModalConfirmText =
+    orderWarningState === 'expireStartOrder' ? 'Tiếp tục' : 'Đặt Đơn Mới';
   const tableData = parseEntitiesToTableData(
     orders,
     Number(page),
     currentOrderVATPercentage,
     openOrderStateWarningModal,
+    setSelectedOrderId,
   );
 
   const tabItems = prepareTabItems({
@@ -297,6 +321,8 @@ const CompanyOrdersTable: React.FC<TCompanyOrdersTableProps> = () => {
         onCancel={closeOrderStateWarningModal}
         onConfirm={onConfirmOrderStateWarningModal}
         content={orderStateWarningContent}
+        confirmText={orderStateWarningModalConfirmText}
+        confirmInProgress={updateOrderStateToDraftInProgress}
       />
     </div>
   );

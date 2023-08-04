@@ -21,6 +21,7 @@ import {
   reorderApi,
   requestApprovalOrderApi,
   updateOrderApi,
+  updateOrderStateToDraftApi,
   updatePlanDetailsApi,
 } from '@apis/orderApi';
 import { fetchSearchFilterApi } from '@apis/userApi';
@@ -152,6 +153,9 @@ type TOrderInitialState = {
 
   reorderInProgressId: string | null;
   reorderError: any;
+
+  updateOrderStateToDraftInProgress: boolean;
+  updateOrderStateToDraftError: any;
 };
 
 const initialState: TOrderInitialState = {
@@ -252,6 +256,9 @@ const initialState: TOrderInitialState = {
 
   reorderInProgressId: null,
   reorderError: null,
+
+  updateOrderStateToDraftInProgress: false,
+  updateOrderStateToDraftError: null,
 };
 
 const CREATE_ORDER = 'app/Order/CREATE_ORDER';
@@ -278,6 +285,7 @@ const GET_COMPANY_ORDER_SUMMARY = 'app/Order/GET_COMPANY_ORDER_SUMMARY';
 const QUERY_ALL_ORDERS = 'app/Order/QUERY_ALL_ORDERS';
 
 const BOOKER_REORDER = 'app/Order/BOOKER_REORDER';
+const UPDATE_ORDER_STATE_TO_DRAFT = 'app/Order/UPDATE_ORDER_STATE_TO_DRAFT';
 
 const createOrder = createAsyncThunk(CREATE_ORDER, async (params: any) => {
   const { clientId, bookerId, isCreatedByAdmin = false, generalInfo } = params;
@@ -892,6 +900,16 @@ const bookerReorder = createAsyncThunk(
   },
 );
 
+const updateOrderStateToDraft = createAsyncThunk(
+  UPDATE_ORDER_STATE_TO_DRAFT,
+  async (orderId: string) => {
+    await updateOrderStateToDraftApi(orderId);
+  },
+  {
+    serializeError: storableAxiosError,
+  },
+);
+
 export const orderAsyncActions = {
   createOrder,
   updateOrder,
@@ -916,6 +934,7 @@ export const orderAsyncActions = {
   getCompanyOrderSummary,
   queryAllOrders,
   bookerReorder,
+  updateOrderStateToDraft,
 };
 
 const orderSlice = createSlice({
@@ -1394,6 +1413,21 @@ const orderSlice = createSlice({
         ...state,
         reorderInProgressId: null,
         reorderError: error,
+      }))
+
+      .addCase(updateOrderStateToDraft.pending, (state) => ({
+        ...state,
+        updateOrderStateToDraftInProgress: true,
+        updateOrderStateToDraftError: null,
+      }))
+      .addCase(updateOrderStateToDraft.fulfilled, (state) => ({
+        ...state,
+        updateOrderStateToDraftInProgress: false,
+      }))
+      .addCase(updateOrderStateToDraft.rejected, (state, { error }) => ({
+        ...state,
+        updateOrderStateToDraftInProgress: false,
+        updateOrderStateToDraftError: error.message,
       }));
   },
 });
