@@ -334,36 +334,36 @@ const PaymentPartnerPage = () => {
         <IntegrationFilterModal
           onClear={onClearFilters}
           leftFilters={
-            <OutsideClickHandler
-              className={css.tooltipWrapper}
-              onOutsideClick={filterPaymentModalController.setFalse}>
-              <Tooltip
-                visible={filterPaymentModalController.value}
-                tooltipContent={
+            <Tooltip
+              visible={filterPaymentModalController.value}
+              tooltipContent={
+                <OutsideClickHandler
+                  className={css.tooltipWrapper}
+                  onOutsideClick={filterPaymentModalController.setFalse}>
                   <PaymentFilterModal
                     onClose={filterPaymentModalController.setFalse}
                     setFilters={setFilters}
                     setPage={setPage}
                     filters={filters}
                   />
-                }
-                placement="bottomLeft"
-                trigger="click"
-                overlayClassName={css.orderDetailTooltip}
-                overlayInnerStyle={{
-                  backgroundColor: '#fff',
-                  padding: 0,
-                }}>
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={filterPaymentModalController.toggle}
-                  className={css.filterButton}>
-                  <IconFilter className={css.filterIcon} />
-                  <FormattedMessage id="IntegrationFilterModal.filterMessage" />
-                </Button>
-              </Tooltip>
-            </OutsideClickHandler>
+                </OutsideClickHandler>
+              }
+              placement="bottomLeft"
+              trigger="click"
+              overlayClassName={css.orderDetailTooltip}
+              overlayInnerStyle={{
+                backgroundColor: '#fff',
+                padding: 0,
+              }}>
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={filterPaymentModalController.toggle}
+                className={css.filterButton}>
+                <IconFilter className={css.filterIcon} />
+                <FormattedMessage id="IntegrationFilterModal.filterMessage" />
+              </Button>
+            </Tooltip>
           }
           rightFilters={
             <>
