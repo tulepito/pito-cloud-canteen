@@ -13,6 +13,7 @@ export const parseEntitiesToTableData = (
   page: number,
   currentOrderVATPercentage: number,
   openOrderStateWarningModal?: (e: EOrderStates) => void,
+  setSelectedOrderId?: (orderId: string) => void,
 ) => {
   return orders.map((entity, index) => {
     const { plan = {} } = entity;
@@ -53,6 +54,7 @@ export const parseEntitiesToTableData = (
         orderNumber: (page - 1) * 10 + index + 1,
         location: deliveryAddress?.address,
         startDate: startDate ? formatTimestamp(startDate) : '',
+        startDateTimestamp: startDate,
         endDate: endDate ? formatTimestamp(endDate) : '',
         state: orderState,
         isCreatedByPitoAdmin,
@@ -82,6 +84,7 @@ export const parseEntitiesToTableData = (
         totalWithVAT,
         openOrderStateWarningModal,
         paymentStatus: entity.attributes.metadata?.isClientSufficientPaid,
+        setSelectedOrderId,
       },
     };
   });

@@ -12,17 +12,20 @@ type TOrderStateWarningModal = {
   onConfirm: () => void;
   content: string;
   title: string;
+  confirmText?: string;
+  confirmInProgress?: boolean;
 };
 
 const OrderStateWarningModal: React.FC<TOrderStateWarningModal> = (props) => {
-  const { content, title, ...rest } = props;
+  const { content, title, confirmText, confirmInProgress, ...rest } = props;
 
   return (
     <AlertModal
       {...rest}
       title={title}
       cancelLabel="Thoát"
-      confirmLabel="Đặt đơn mới">
+      confirmInProgress={confirmInProgress}
+      confirmLabel={confirmText}>
       <div className={css.content}>{content}</div>
     </AlertModal>
   );
