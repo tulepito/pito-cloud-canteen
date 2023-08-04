@@ -23,6 +23,7 @@ import {
   getBookerOrderDataApi,
   initializePaymentApi,
   sendOrderDetailUpdatedEmailApi,
+  sendPartnerNewOrderAppearEmailApi,
   sendRemindEmailToMemberApi,
   updateOrderApi,
   updatePlanDetailsApi,
@@ -822,11 +823,10 @@ const bookerStartOrder = createAsyncThunk(
     const { data: response } = await createQuotationApi(orderId, apiBody);
     // Function is not ready on production
 
-    // await sendPartnerNewOrderAppearEmailApi(orderId, {
-    //   orderId,
-    //   partner: partnerQuotation,
-    // });
-
+    await sendPartnerNewOrderAppearEmailApi(orderId, {
+      orderId,
+      partner: partnerQuotation,
+    });
     initializePaymentApi(orderId, plans[0]);
 
     return response;
