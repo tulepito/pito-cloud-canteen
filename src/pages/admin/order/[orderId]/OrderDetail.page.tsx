@@ -173,7 +173,9 @@ const OrderDetailPage = () => {
 
   useEffect(() => {
     if (tab) {
-      setDefaultActiveKey(tabItems.findIndex((item) => item.key === tab) + 1);
+      const tabIndexMaybe = tabItems.findIndex((item) => item.key === tab) + 1;
+
+      setDefaultActiveKey(tabIndexMaybe === 0 ? 1 : tabIndexMaybe);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tab]);
