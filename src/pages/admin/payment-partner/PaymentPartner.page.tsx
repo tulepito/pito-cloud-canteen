@@ -10,6 +10,7 @@ import IconClose from '@components/Icons/IconClose/IconClose';
 import IconFilter from '@components/Icons/IconFilter/IconFilter';
 import IntegrationFilterModal from '@components/IntegrationFilterModal/IntegrationFilterModal';
 import NamedLink from '@components/NamedLink/NamedLink';
+import OutsideClickHandler from '@components/OutsideClickHandler/OutsideClickHandler';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import type { TColumn } from '@components/Table/Table';
 import { TableForm } from '@components/Table/Table';
@@ -326,32 +327,36 @@ const PaymentPartnerPage = () => {
         <IntegrationFilterModal
           onClear={onClearFilters}
           leftFilters={
-            <Tooltip
-              visible={filterPaymentModalController.value}
-              tooltipContent={
-                <PaymentFilterModal
-                  onClose={filterPaymentModalController.setFalse}
-                  setFilters={setFilters}
-                  setPage={setPage}
-                  filters={filters}
-                />
-              }
-              placement="bottomLeft"
-              trigger="click"
-              overlayClassName={css.orderDetailTooltip}
-              overlayInnerStyle={{
-                backgroundColor: '#fff',
-                padding: 0,
-              }}>
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={filterPaymentModalController.toggle}
-                className={css.filterButton}>
-                <IconFilter className={css.filterIcon} />
-                <FormattedMessage id="IntegrationFilterModal.filterMessage" />
-              </Button>
-            </Tooltip>
+            <OutsideClickHandler
+              className={css.tooltipWrapper}
+              onOutsideClick={filterPaymentModalController.setFalse}>
+              <Tooltip
+                visible={filterPaymentModalController.value}
+                tooltipContent={
+                  <PaymentFilterModal
+                    onClose={filterPaymentModalController.setFalse}
+                    setFilters={setFilters}
+                    setPage={setPage}
+                    filters={filters}
+                  />
+                }
+                placement="bottomLeft"
+                trigger="click"
+                overlayClassName={css.orderDetailTooltip}
+                overlayInnerStyle={{
+                  backgroundColor: '#fff',
+                  padding: 0,
+                }}>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={filterPaymentModalController.toggle}
+                  className={css.filterButton}>
+                  <IconFilter className={css.filterIcon} />
+                  <FormattedMessage id="IntegrationFilterModal.filterMessage" />
+                </Button>
+              </Tooltip>
+            </OutsideClickHandler>
           }
           rightFilters={
             <>
