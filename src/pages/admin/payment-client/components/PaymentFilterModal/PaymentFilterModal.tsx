@@ -48,6 +48,8 @@ const PaymentFilterModal: React.FC<PaymentFilterModalProps> = (props) => {
       isOpen={isOpen}
       handleClose={onClose}
       containerClassName={css.modalContainer}
+      scrollLayerClassName={css.scrollLayer}
+      className={css.modal}
       title="Lọc">
       <PaymentFilterForm
         onSubmit={handleFilterSubmit}
