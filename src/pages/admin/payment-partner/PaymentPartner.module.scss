@@ -79,6 +79,10 @@
   }
 }
 
+.tooltipWrapper {
+  width: auto;
+}
+
 .orderDetailTooltip {
   background-color: $neutralGray1;
   &:global.rc-tooltip {
