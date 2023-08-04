@@ -161,7 +161,7 @@ export const initiateTransaction = async ({
     {},
   );
 
-  integrationSdk.listings.update({
+  await integrationSdk.listings.update({
     id: orderId,
     metadata: {
       partnerIds: uniq(partnerIds),
