@@ -54,12 +54,12 @@ export const relatedOrderDataSource = ({
   const orderListing = Listing(order);
   const companyUser = User(company);
   const bookerUser = User(booker);
-
   const orderTitle = orderListing.getAttributes().title;
   const { companyName } = companyUser.getPublicData();
   const { displayName } = bookerUser.getProfile();
   const { email: bookerEmail } = bookerUser.getAttributes();
   const { phoneNumber: bookerPhoneNumber } = bookerUser.getProtectedData();
+  const { phoneNumber: companyPhoneNumber } = bookerUser.getPublicData();
   const {
     deliveryAddress,
     staffName,
@@ -75,7 +75,7 @@ export const relatedOrderDataSource = ({
     endDate,
     bookerName: displayName,
     bookerEmail,
-    bookerPhoneNumber,
+    bookerPhoneNumber: bookerPhoneNumber || companyPhoneNumber,
     staffName,
     deliveryAddress: deliveryAddress?.address,
     isGroupOrder: orderType === EOrderType.group,
@@ -112,7 +112,6 @@ export const formatPriceQuotationData = ({
     booker,
     order,
   });
-
   const {
     serviceFee,
     totalPrice,
