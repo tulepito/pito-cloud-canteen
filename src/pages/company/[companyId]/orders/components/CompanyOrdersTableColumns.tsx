@@ -294,7 +294,7 @@ const CompanyOrdersActionColumn = ({
       buttonList = [reviewOrderButton, reorderButton];
       break;
     case EOrderStates.completed:
-      buttonList = [reorderButton];
+      buttonList = [reviewOrderButton, reorderButton];
       break;
     case EOrderStates.reviewed:
       buttonList = [reorderButton];
@@ -500,7 +500,10 @@ export const CompanyOrdersTableColumns: TColumn[] = [
     }) => {
       return (
         <div className={css.state}>
-          <RenderWhen condition={Boolean(paymentStatus)}>
+          <RenderWhen
+            condition={
+              Boolean(paymentStatus) && state === EOrderStates.completed
+            }>
             <Badge type={EBadgeType.success} label="Đã hoàn thành" />
             <RenderWhen.False>
               <Badge
