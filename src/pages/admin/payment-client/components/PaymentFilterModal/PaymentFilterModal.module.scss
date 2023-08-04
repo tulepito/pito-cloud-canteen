@@ -8,3 +8,11 @@
     flex-basis: 480px;
   }
 }
+
+.modal {
+  overflow: scroll;
+}
+
+.scrollLayer {
+  min-height: 120vh !important;
+}
