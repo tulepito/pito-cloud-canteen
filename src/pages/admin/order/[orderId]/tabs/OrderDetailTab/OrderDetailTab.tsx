@@ -21,8 +21,8 @@ import useExportOrderDetails from '@hooks/useExportOrderDetails';
 import { usePrepareOrderDetailPageData } from '@hooks/usePrepareOrderManagementData';
 import { AdminAttributesThunks } from '@pages/admin/Attributes.slice';
 import { ReviewContent } from '@pages/admin/order/create/components/ReviewOrder/ReviewOrder';
+import { checkMinMaxQuantityInPickingState } from '@pages/company/orders/[orderId]/picking/OrderDetail.page';
 import {
-  checkMinMaxQuantityInProgressState,
   OrderManagementsAction,
   orderManagementThunks,
 } from '@redux/slices/OrderManagement.slice';
@@ -57,8 +57,6 @@ type OrderDetailTabProps = {
   updateOrderState: (newOrderState: string) => void;
   updateOrderStateInProgress: boolean;
   onSaveOrderNote: (orderNote: string) => void;
-  planReachMaxRestaurantQuantityInPickingState?: boolean;
-  planReachMinRestaurantQuantityInPickingState?: boolean;
 };
 
 const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
@@ -73,8 +71,6 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
     updateOrderStateInProgress,
     transactionDataMap = {},
     onSaveOrderNote,
-    planReachMaxRestaurantQuantityInPickingState = false,
-    planReachMinRestaurantQuantityInPickingState = false,
   } = props;
 
   const {
@@ -85,10 +81,10 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
     loadMoreSubOrderChangesHistory,
     draftOrderDetail,
     draftSubOrderChangesHistory,
-    shouldShowOverflowError,
-    shouldShowUnderError,
+    orderValidationsInProgressState,
     isFetchingOrderDetails,
   } = useAppSelector((state) => state.OrderManagement);
+
   const dispatch = useAppDispatch();
   const router = useRouter();
   const {
@@ -103,6 +99,24 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
   const orderId = Listing(order).getId();
   const isEditMode = viewMode === EPageViewMode.edit;
   const { handler: onDownloadReviewOrderResults } = useExportOrderDetails();
+
+  const {
+    planValidationsInProgressState,
+    orderReachMaxCanModify,
+    orderReachMaxRestaurantQuantity,
+    orderReachMinRestaurantQuantity,
+  } = orderValidationsInProgressState || {};
+
+  const planReachMaxRestaurantQuantityInProgressState =
+    planValidationsInProgressState?.[currentViewDate]
+      ?.planReachMaxRestaurantQuantity;
+
+  const planReachMinRestaurantQuantityInProgressState =
+    planValidationsInProgressState?.[currentViewDate]
+      ?.planReachMinRestaurantQuantity;
+
+  const planReachMaxCanModifyInProgressState =
+    planValidationsInProgressState?.[currentViewDate]?.planReachMaxCanModify;
 
   const {
     notes,
@@ -121,13 +135,6 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
   const orderDetailsNotChanged =
     isDraftEditing && isEqual(orderDetail, draftOrderDetail);
 
-  const { minQuantity, disabledSubmit } = checkMinMaxQuantityInProgressState(
-    draftOrderDetail,
-    orderDetail,
-    currentViewDate,
-    !isGroupOrder,
-    true,
-  );
   const currentTxIsInitiated = txIsInitiated(
     transactionDataMap[currentViewDate],
   );
@@ -255,6 +262,51 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
     dispatch(AdminAttributesThunks.fetchAttributes());
   }, []);
 
+  useEffect(() => {
+    if (
+      planReachMaxRestaurantQuantityInProgressState ||
+      planReachMinRestaurantQuantityInProgressState ||
+      planReachMaxCanModifyInProgressState
+    ) {
+      const i = setTimeout(() => {
+        dispatch(OrderManagementsAction.resetOrderDetailValidation());
+        clearTimeout(i);
+      }, 4000);
+    }
+  }, [
+    planReachMaxRestaurantQuantityInProgressState,
+    planReachMinRestaurantQuantityInProgressState,
+    planReachMaxCanModifyInProgressState,
+  ]);
+
+  const isNormalOrder = orderType === EOrderType.normal;
+  const isPicking = orderState === EOrderStates.picking;
+
+  const {
+    planValidations,
+    orderReachMaxRestaurantQuantity:
+      orderReachMaxRestaurantQuantityInPickingState,
+    orderReachMinRestaurantQuantity:
+      orderReachMinRestaurantQuantityInPickingState,
+  } = checkMinMaxQuantityInPickingState(isNormalOrder, isPicking, orderDetail);
+
+  const {
+    planReachMaxRestaurantQuantity:
+      planReachMaxRestaurantQuantityInPickingState,
+    planReachMinRestaurantQuantity:
+      planReachMinRestaurantQuantityInPickingState,
+  } = planValidations[currentViewDate as keyof typeof planValidations] || {};
+
+  const disabledSubmit =
+    orderReachMinRestaurantQuantity ||
+    orderReachMaxRestaurantQuantity ||
+    orderReachMaxCanModify ||
+    orderReachMaxRestaurantQuantityInPickingState ||
+    orderReachMinRestaurantQuantityInPickingState;
+
+  const { minQuantity = 1 } =
+    draftOrderDetail?.[currentViewDate]?.restaurant || {};
+
   return (
     <div className={css.container}>
       <RenderWhen condition={isEditMode}>
@@ -265,9 +317,7 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
           onConfirmOrder={handleConfirmOrder}
           isDraftEditing={isDraftEditing}
           turnOnDraftEditMode={turnOnDraftEditMode}
-          confirmUpdateDisabled={
-            !isPickingState && (disabledSubmit || orderDetailsNotChanged)
-          }
+          confirmUpdateDisabled={disabledSubmit || orderDetailsNotChanged}
         />
         <RenderWhen condition={showStateSectionCondition}>
           <ReviewOrderStatesSection
@@ -295,13 +345,14 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
                     currentViewDate={currentViewDate}
                     isDraftEditing={isDraftEditing}
                     ableToUpdateOrder
-                    shouldShowUnderError={shouldShowUnderError}
-                    shouldShowOverflowError={shouldShowOverflowError}
-                    planReachMaxRestaurantQuantityInPickingState={
-                      planReachMaxRestaurantQuantityInPickingState
+                    planReachMaxCanModify={planReachMaxCanModifyInProgressState}
+                    planReachMaxRestaurantQuantity={
+                      planReachMaxRestaurantQuantityInPickingState ||
+                      planReachMaxRestaurantQuantityInProgressState
                     }
-                    planReachMinRestaurantQuantityInPickingState={
-                      planReachMinRestaurantQuantityInPickingState
+                    planReachMinRestaurantQuantity={
+                      planReachMinRestaurantQuantityInPickingState ||
+                      planReachMinRestaurantQuantityInProgressState
                     }
                     isAdminFlow
                   />
@@ -360,8 +411,14 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
                     data={editViewData.manageOrdersData}
                     isDraftEditing={isDraftEditing}
                     ableToUpdateOrder={ableToUpdateOrder}
-                    shouldShowOverflowError={shouldShowOverflowError}
-                    shouldShowUnderError={shouldShowUnderError}
+                    shouldShowOverflowError={
+                      planReachMaxRestaurantQuantityInProgressState ||
+                      planReachMaxRestaurantQuantityInPickingState
+                    }
+                    shouldShowUnderError={
+                      planReachMinRestaurantQuantityInProgressState ||
+                      planReachMinRestaurantQuantityInPickingState
+                    }
                     setCurrentViewDate={handleSetCurrentViewDate}
                     currentViewDate={currentViewDate}
                     minQuantity={minQuantity}

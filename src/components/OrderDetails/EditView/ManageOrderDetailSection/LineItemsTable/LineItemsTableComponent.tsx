@@ -35,8 +35,7 @@ export const LineItemsTableComponent: React.FC<
   const intl = useIntl();
   const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
 
-  const { lineItems = [], restaurant = {} } = data;
-  const { maxQuantity = 100, minQuantity = 1 } = restaurant;
+  const { lineItems = [] } = data;
 
   const { totalPrice, totalQuantity, formInitialValues } = useMemo(
     () =>
@@ -64,10 +63,6 @@ export const LineItemsTableComponent: React.FC<
   //   initialValues: formInitialValues,
   //   onSubmit: () => {},
   // });
-
-  const shouldShowOverflowError = totalQuantity > maxQuantity;
-  const shouldShowUnderError = totalQuantity < minQuantity;
-  const hasError = shouldShowOverflowError || shouldShowUnderError;
 
   const doNothing = () => {};
 
@@ -216,27 +211,6 @@ export const LineItemsTableComponent: React.FC<
                   <td>{formattedTotalPrice}</td>
                   <td></td>
                 </tr>
-                <RenderWhen condition={hasError}>
-                  <tr>
-                    <td colSpan={5}>
-                      <div className={css.errorText}>
-                        <RenderWhen condition={shouldShowOverflowError}>
-                          {intl.formatMessage({
-                            id: 'LineItemsTableComponent.overflowMaxQuantity',
-                          })}
-                        </RenderWhen>
-                        <RenderWhen condition={shouldShowUnderError}>
-                          {intl.formatMessage(
-                            {
-                              id: 'LineItemsTableComponent.underMinQuantity',
-                            },
-                            { minQuantity },
-                          )}
-                        </RenderWhen>
-                      </div>
-                    </td>
-                  </tr>
-                </RenderWhen>
               </tbody>
             </table>
           </td>

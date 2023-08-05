@@ -56,106 +56,114 @@ import { SystemAttributesThunks } from './systemAttributes.slice';
 export const QUERY_SUB_ORDER_CHANGES_HISTORY_PER_PAGE = 3;
 
 export const checkMinMaxQuantityInProgressState = (
-  orderDetails: TPlan['orderDetail'],
-  oldOrderDetail: TPlan['orderDetail'],
-  currentViewDate: number,
   isNormalOrder: boolean,
+  orderDetail: TPlan['orderDetail'] = {},
+  oldOrderDetail: TPlan['orderDetail'] = {},
   isAdminFlow = false,
 ) => {
-  const data = orderDetails?.[currentViewDate] || {};
-  const { lineItems = [], restaurant = {} } = data;
-  const { maxQuantity = 100, minQuantity = 1 } = restaurant;
-
+  let planValidationsInProgressState = {};
   if (isNormalOrder) {
-    const totalQuantity = lineItems.reduce(
-      (result: number, lineItem: TObject) => {
-        result += lineItem?.quantity || 1;
+    planValidationsInProgressState = Object.keys(orderDetail).reduce(
+      (prev: any, dateAsTimeStamp) => {
+        const currentOrderDetails = orderDetail[dateAsTimeStamp];
+        const { lineItems = [], restaurant = {} } = currentOrderDetails || {};
+        const { maxQuantity = 100, minQuantity = 1 } = restaurant || {};
 
-        return result;
+        const totalAdded = lineItems.reduce(
+          (result: number, lineItem: TObject) => {
+            result += lineItem?.quantity || 1;
+
+            return result;
+          },
+          0,
+        );
+
+        return {
+          ...prev,
+          [dateAsTimeStamp]: {
+            planReachMinRestaurantQuantity: totalAdded < minQuantity,
+            planReachMaxRestaurantQuantity: totalAdded > maxQuantity,
+            planReachMaxCanModify: false,
+          },
+        };
       },
-      0,
+      {},
     );
+  } else {
+    planValidationsInProgressState = Object.keys(orderDetail).reduce(
+      (prev: any, dateAsTimeStamp) => {
+        const currentOrderDetails = orderDetail[dateAsTimeStamp] || {};
+        const { memberOrders = {}, restaurant } = currentOrderDetails;
+        const { maxQuantity = 100, minQuantity = 1 } = restaurant || {};
 
-    const disabledSubmit = Object.keys(orderDetails).some((key) => {
-      const detail = orderDetails[key];
-      const { lineItems = [], restaurant = {} } = detail || {};
-      const { maxQuantity = 100, minQuantity = 1 } = restaurant || {};
-      const totalQuantity = lineItems.reduce(
-        (result: number, lineItem: TObject) => {
-          result += lineItem?.quantity || 1;
+        const { memberOrders: oldMemberOrders = {} } =
+          oldOrderDetail?.[dateAsTimeStamp] || {};
+        const oldTotalQuantity = Object.keys(oldMemberOrders).filter(
+          (f) =>
+            !!oldMemberOrders[f].foodId &&
+            oldMemberOrders[f].status === EParticipantOrderStatus.joined,
+        ).length;
+        const totalQuantity = Object.keys(memberOrders).filter(
+          (f) =>
+            !!memberOrders[f].foodId &&
+            memberOrders[f].status === EParticipantOrderStatus.joined,
+        ).length;
 
-          return result;
-        },
-        0,
-      );
-      const shouldShowOverflowError = totalQuantity > maxQuantity;
-      const shouldShowUnderError = totalQuantity < minQuantity;
+        const totalTimeCanChange = (totalQuantity * 10) / 100;
+        const totalAdded = totalQuantity - oldTotalQuantity;
+        const planReachMaxCanModify = totalAdded > totalTimeCanChange;
 
-      return shouldShowOverflowError || shouldShowUnderError;
-    });
-
-    const shouldShowOverflowError = totalQuantity > maxQuantity;
-    const shouldShowUnderError = totalQuantity < minQuantity;
-
-    return {
-      shouldShowOverflowError,
-      shouldShowUnderError,
-      minQuantity,
-      maxQuantity,
-      disabledSubmit,
-    };
+        return {
+          ...prev,
+          [dateAsTimeStamp]: {
+            planReachMinRestaurantQuantity: totalQuantity < minQuantity,
+            planReachMaxRestaurantQuantity:
+              isAdminFlow && totalQuantity > maxQuantity,
+            planReachMaxCanModify: !isAdminFlow && planReachMaxCanModify,
+          },
+        };
+      },
+      {},
+    );
   }
-  const { memberOrders = {} } = data;
-  const { memberOrders: oldMemberOrders = {} } =
-    oldOrderDetail?.[currentViewDate] || {};
-  const oldTotalQuantity = Object.keys(oldMemberOrders).filter(
-    (f) =>
-      !!oldMemberOrders[f].foodId &&
-      oldMemberOrders[f].status === EParticipantOrderStatus.joined,
-  ).length;
-  const totalQuantity = Object.keys(memberOrders).filter(
-    (f) =>
-      !!memberOrders[f].foodId &&
-      memberOrders[f].status === EParticipantOrderStatus.joined,
-  ).length;
+  const orderReachMinRestaurantQuantity = Object.keys(
+    planValidationsInProgressState,
+  ).some((dateAsTimeStamp) => {
+    const { planReachMinRestaurantQuantity } =
+      planValidationsInProgressState[
+        dateAsTimeStamp as keyof typeof planValidationsInProgressState
+      ] || {};
 
-  const totalTimeCanChange = (totalQuantity * 10) / 100;
-  const totalAdded = totalQuantity - oldTotalQuantity;
-  const shouldShowOverflowError = totalAdded > totalTimeCanChange;
+    return planReachMinRestaurantQuantity;
+  });
 
-  const shouldShowUnderError = totalQuantity < minQuantity;
+  const orderReachMaxRestaurantQuantity = Object.keys(
+    planValidationsInProgressState,
+  ).some((dateAsTimeStamp) => {
+    const { planReachMaxRestaurantQuantity } =
+      planValidationsInProgressState[
+        dateAsTimeStamp as keyof typeof planValidationsInProgressState
+      ];
 
-  const disabledSubmit = Object.keys(orderDetails).some((key) => {
-    const data = orderDetails[key] || {};
-    const { memberOrders = {}, restaurant } = data;
-    const { minQuantity = 1 } = restaurant;
-    const { memberOrders: oldMemberOrders = {} } = oldOrderDetail?.[key] || {};
-    const oldTotalQuantity = Object.keys(oldMemberOrders).filter(
-      (f) =>
-        !!oldMemberOrders[f].foodId &&
-        oldMemberOrders[f].status === EParticipantOrderStatus.joined,
-    ).length;
-    const totalQuantity = Object.keys(memberOrders).filter(
-      (f) =>
-        !!memberOrders[f].foodId &&
-        memberOrders[f].status === EParticipantOrderStatus.joined,
-    ).length;
-    const totalQuantityCanAdd = (totalQuantity * 10) / 100;
-    const totalAdded = totalQuantity - oldTotalQuantity;
+    return planReachMaxRestaurantQuantity;
+  });
 
-    const shouldShowOverflowError = totalAdded > totalQuantityCanAdd;
+  const orderReachMaxCanModify = Object.keys(
+    planValidationsInProgressState,
+  ).some((dateAsTimeStamp) => {
+    const { planReachMaxCanModify } =
+      planValidationsInProgressState[
+        dateAsTimeStamp as keyof typeof planValidationsInProgressState
+      ];
 
-    const shouldShowUnderError = totalQuantity < minQuantity;
-
-    return (!isAdminFlow && shouldShowOverflowError) || shouldShowUnderError;
+    return planReachMaxCanModify;
   });
 
   return {
-    shouldShowOverflowError: shouldShowOverflowError && !isAdminFlow,
-    shouldShowUnderError,
-    minQuantity,
-    maxQuantity,
-    disabledSubmit,
+    planValidationsInProgressState,
+    orderReachMaxRestaurantQuantity,
+    orderReachMinRestaurantQuantity,
+    orderReachMaxCanModify,
   };
 };
 
@@ -276,12 +284,24 @@ type TOrderManagementState = {
   updateOrderFromDraftEditInProgress: boolean;
   updateOrderfromDraftEditError: any;
 
-  shouldShowUnderError: boolean;
-  shouldShowOverflowError: boolean;
   draftOrderDetail: TPlan['orderDetail'];
   quotation: TObject;
   fetchQuotationInProgress: boolean;
   fetchQuotationError: any;
+
+  orderValidationsInProgressState: {
+    planValidationsInProgressState: Record<
+      number,
+      {
+        planReachMinRestaurantQuantity: boolean;
+        planReachMaxRestaurantQuantity: boolean;
+        planReachMaxCanModify: boolean;
+      }
+    >;
+    orderReachMaxRestaurantQuantity: boolean;
+    orderReachMinRestaurantQuantity: boolean;
+    orderReachMaxCanModify: boolean;
+  } | null;
 };
 
 const initialState: TOrderManagementState = {
@@ -315,8 +335,7 @@ const initialState: TOrderManagementState = {
   updateOrderFromDraftEditInProgress: false,
   updateOrderfromDraftEditError: null,
   draftSubOrderChangesHistory: {},
-  shouldShowUnderError: false,
-  shouldShowOverflowError: false,
+  orderValidationsInProgressState: null,
   quotation: {},
   fetchQuotationInProgress: false,
   fetchQuotationError: null,
@@ -1031,8 +1050,7 @@ const OrderManagementSlice = createSlice({
     resetOrderDetailValidation: (state) => {
       return {
         ...state,
-        shouldShowOverflowError: false,
-        shouldShowUnderError: false,
+        orderValidationsInProgressState: null,
       };
     },
     updateDraftOrderDetail: (state, { payload }) => {
@@ -1075,20 +1093,27 @@ const OrderManagementSlice = createSlice({
           memberOrderValues: memberOrderBeforeUpdate,
         }) || {};
 
-      const { shouldShowOverflowError, shouldShowUnderError } =
+      const orderValidationsInProgressState =
         checkMinMaxQuantityInProgressState(
+          orderType === EOrderType.normal,
           newOrderDetail,
           defaultOrderDetail,
-          currentViewDate,
-          orderType === EOrderType.normal,
           isAdminFlow,
         );
+      const {
+        orderReachMaxRestaurantQuantity,
+        orderReachMinRestaurantQuantity,
+        orderReachMaxCanModify,
+      } = orderValidationsInProgressState;
 
-      if (shouldShowOverflowError || shouldShowUnderError) {
+      if (
+        orderReachMaxRestaurantQuantity ||
+        orderReachMinRestaurantQuantity ||
+        orderReachMaxCanModify
+      ) {
         return {
           ...state,
-          shouldShowOverflowError,
-          shouldShowUnderError,
+          orderValidationsInProgressState,
         };
       }
 
@@ -1105,8 +1130,7 @@ const OrderManagementSlice = createSlice({
 
         return {
           ...state,
-          shouldShowOverflowError: false,
-          shouldShowUnderError: false,
+          orderValidationsInProgressState,
           draftOrderDetail: newOrderDetail,
           draftSubOrderChangesHistory: {
             ...state.draftSubOrderChangesHistory,
@@ -1160,8 +1184,7 @@ const OrderManagementSlice = createSlice({
 
       return {
         ...state,
-        shouldShowOverflowError: false,
-        shouldShowUnderError: false,
+        orderValidationsInProgressState,
         draftOrderDetail: newOrderDetail,
         draftSubOrderChangesHistory: newDraftSubOrderChangesHistory,
       };
@@ -1211,20 +1234,27 @@ const OrderManagementSlice = createSlice({
         newMemberOrderValues,
       );
 
-      const { shouldShowOverflowError, shouldShowUnderError } =
+      const orderValidationsInProgressState =
         checkMinMaxQuantityInProgressState(
+          orderType === EOrderType.normal,
           newOrderDetail,
           defaultOrderDetail,
-          currentViewDate,
-          orderType === EOrderType.normal,
           isAdminFlow,
         );
+      const {
+        orderReachMaxRestaurantQuantity,
+        orderReachMinRestaurantQuantity,
+        orderReachMaxCanModify,
+      } = orderValidationsInProgressState;
 
-      if (shouldShowOverflowError || shouldShowUnderError) {
+      if (
+        orderReachMaxRestaurantQuantity ||
+        orderReachMinRestaurantQuantity ||
+        orderReachMaxCanModify
+      ) {
         return {
           ...state,
-          shouldShowOverflowError,
-          shouldShowUnderError,
+          orderValidationsInProgressState,
         };
       }
 
@@ -1237,8 +1267,7 @@ const OrderManagementSlice = createSlice({
 
         return {
           ...state,
-          shouldShowOverflowError: false,
-          shouldShowUnderError: false,
+          orderValidationsInProgressState,
           draftOrderDetail: newOrderDetail,
           draftSubOrderChangesHistory: newDraftSubOrderChangesHistory,
         };
@@ -1281,6 +1310,7 @@ const OrderManagementSlice = createSlice({
 
       return {
         ...state,
+        orderValidationsInProgressState,
         draftOrderDetail: newOrderDetail,
         draftSubOrderChangesHistory: newDraftSubOrderChangesHistory,
       };
@@ -1288,8 +1318,7 @@ const OrderManagementSlice = createSlice({
     setDraftOrderDetails: (state, { payload }) => {
       return {
         ...state,
-        shouldShowOverflowError: false,
-        shouldShowUnderError: false,
+        orderValidationsInProgressState: null,
         draftOrderDetail: payload,
       };
     },
@@ -1313,20 +1342,27 @@ const OrderManagementSlice = createSlice({
 
       const { orderDetail = {} } = planDataGetter.getMetadata();
 
-      const { shouldShowOverflowError, shouldShowUnderError } =
+      const orderValidationsInProgressState =
         checkMinMaxQuantityInProgressState(
+          orderType === EOrderType.normal,
           newOrderDetail,
           orderDetail,
-          currentViewDate,
-          orderType === EOrderType.normal,
           isAdminFlow,
         );
+      const {
+        orderReachMaxRestaurantQuantity,
+        orderReachMinRestaurantQuantity,
+        orderReachMaxCanModify,
+      } = orderValidationsInProgressState;
 
-      if (shouldShowOverflowError || shouldShowUnderError) {
+      if (
+        orderReachMaxRestaurantQuantity ||
+        orderReachMinRestaurantQuantity ||
+        orderReachMaxCanModify
+      ) {
         return {
           ...state,
-          shouldShowOverflowError,
-          shouldShowUnderError,
+          orderValidationsInProgressState,
         };
       }
       const { lineItems } = orderDetail[currentViewDate] || {};
@@ -1347,8 +1383,7 @@ const OrderManagementSlice = createSlice({
 
           return {
             ...state,
-            shouldShowOverflowError: false,
-            shouldShowUnderError: false,
+            orderValidationsInProgressState,
             draftOrderDetail: newOrderDetail,
             draftSubOrderChangesHistory: {
               ...state.draftSubOrderChangesHistory,
@@ -1385,8 +1420,7 @@ const OrderManagementSlice = createSlice({
 
           return {
             ...state,
-            shouldShowOverflowError: false,
-            shouldShowUnderError: false,
+            orderValidationsInProgressState,
             draftSubOrderChangesHistory: newDraftSubOrderChangesHistory,
             draftOrderDetail: newOrderDetail,
           };
@@ -1427,8 +1461,7 @@ const OrderManagementSlice = createSlice({
 
         return {
           ...state,
-          shouldShowOverflowError: false,
-          shouldShowUnderError: false,
+          orderValidationsInProgressState,
           draftSubOrderChangesHistory: newDraftSubOrderChangesHistory,
           draftOrderDetail: newOrderDetail,
         };
@@ -1470,8 +1503,7 @@ const OrderManagementSlice = createSlice({
 
       return {
         ...state,
-        shouldShowOverflowError: false,
-        shouldShowUnderError: false,
+        orderValidationsInProgressState,
         draftSubOrderChangesHistory: newDraftSubOrderChangesHistory,
         draftOrderDetail: newOrderDetail,
       };
@@ -1482,16 +1514,14 @@ const OrderManagementSlice = createSlice({
 
       return {
         ...state,
-        shouldShowOverflowError: false,
-        shouldShowUnderError: false,
+        orderValidationsInProgressState: null,
         draftOrderDetail: orderDetail,
       };
     },
     resetDraftSubOrderChangeHistory: (state) => {
       return {
         ...state,
-        shouldShowOverflowError: false,
-        shouldShowUnderError: false,
+        orderValidationsInProgressState: null,
         draftSubOrderChangesHistory: {},
       };
     },
