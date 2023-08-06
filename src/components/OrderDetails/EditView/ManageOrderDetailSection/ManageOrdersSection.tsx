@@ -32,10 +32,9 @@ type TManageOrdersSectionProps = {
   setCurrentViewDate: (date: number) => void;
   isDraftEditing: boolean;
   handleOpenReachMaxAllowedChangesModal?: (type: string) => void;
-  shouldShowOverflowError?: boolean;
-  shouldShowUnderError?: boolean;
-  planReachMaxRestaurantQuantityInPickingState?: boolean;
-  planReachMinRestaurantQuantityInPickingState?: boolean;
+  planReachMaxCanModify?: boolean;
+  planReachMaxRestaurantQuantity?: boolean;
+  planReachMinRestaurantQuantity?: boolean;
   isAdminFlow?: boolean;
 };
 
@@ -46,10 +45,9 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
     setCurrentViewDate,
     isDraftEditing,
     handleOpenReachMaxAllowedChangesModal,
-    shouldShowOverflowError,
-    shouldShowUnderError,
-    planReachMaxRestaurantQuantityInPickingState,
-    planReachMinRestaurantQuantityInPickingState,
+    planReachMaxCanModify,
+    planReachMaxRestaurantQuantity,
+    planReachMinRestaurantQuantity,
     isAdminFlow = false,
   } = props;
 
@@ -121,7 +119,9 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
               handleOpenReachMaxAllowedChangesModal={
                 handleOpenReachMaxAllowedChangesModal
               }
-              shouldShowOverflowError={shouldShowOverflowError}
+              shouldShowOverflowError={
+                planReachMaxRestaurantQuantity || planReachMaxCanModify
+              }
               minQuantity={minQuantity}
               maxQuantity={maxQuantity}
               isAdminFlow={isAdminFlow}
@@ -138,17 +138,12 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
                 memberOptions={memberOptions}
                 ableToUpdateOrder={ableToUpdateOrder}
                 isDraftEditing={isDraftEditing}
-                shouldShowUnderError={shouldShowUnderError}
-                shouldShowOverflowError={shouldShowOverflowError}
+                planReachMaxRestaurantQuantity={planReachMaxRestaurantQuantity}
+                planReachMinRestaurantQuantity={planReachMinRestaurantQuantity}
+                planReachMaxCanModify={planReachMaxCanModify}
                 maxQuantity={maxQuantity}
                 minQuantity={minQuantity}
                 currentViewDate={currentViewDate}
-                planReachMaxRestaurantQuantityInPickingState={
-                  planReachMaxRestaurantQuantityInPickingState
-                }
-                planReachMinRestaurantQuantityInPickingState={
-                  planReachMinRestaurantQuantityInPickingState
-                }
               />
             </div>
           </div>
