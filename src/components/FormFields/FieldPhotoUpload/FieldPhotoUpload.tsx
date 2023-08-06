@@ -182,10 +182,14 @@ const FieldPhotoUpload: React.FC<TFieldPhotoUpload> = (props) => {
           // field has been touched and the validation has failed.
 
           const hasError = !!(touched && invalid && error);
+          console.log({ hasError });
 
           return !fieldDisabled ? (
             <>
-              <div className={classNames(css.root, className)}>
+              <div
+                className={classNames(css.root, className, {
+                  [css.error]: hasError,
+                })}>
                 <input {...inputProps} className={css.addImageInput} />
                 {image && !uploadImageFailed ? (
                   <PhotoWithOverlay
@@ -197,11 +201,7 @@ const FieldPhotoUpload: React.FC<TFieldPhotoUpload> = (props) => {
                     onRemoveImage={removeFn}
                   />
                 ) : (
-                  <label
-                    htmlFor={input.name}
-                    className={classNames(css.label, {
-                      [css.error]: hasError,
-                    })}>
+                  <label htmlFor={input.name} className={classNames(css.label)}>
                     <div className={css.iconUpload}>
                       <ResponsiveImage
                         image={null}
