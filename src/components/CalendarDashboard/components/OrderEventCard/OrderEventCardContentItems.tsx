@@ -20,9 +20,10 @@ const EventCardContent: React.FC<TEventCardContentProps> = ({
   isFirstHighlight,
 }) => {
   const {
-    restaurant: restaurantObj,
     restaurantAddress,
+    restaurant: restaurantObj,
     expiredTime,
+
     isOrderStarted = false,
   } = event?.resource || {};
 

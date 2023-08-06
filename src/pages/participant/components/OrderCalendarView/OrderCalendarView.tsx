@@ -56,6 +56,7 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
   const ensureCompanyUser = User(company).getFullData();
   const orderObj = Listing(order);
   const orderId = orderObj.getId();
+  const { companyName = 'PCC' } = orderObj.getMetadata();
   const orderTitle = orderObj.getAttributes()?.title;
   const orderColor = markColorForOrder(convertStringToNumber(orderTitle || ''));
   const currentUserId = CurrentUser(currentUser).getId();
@@ -106,6 +107,7 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
         key: foodId,
         value: foodList[foodId].foodName,
       }));
+
       const foodSelection =
         orderDetail[planItemKey].memberOrders[currentUserId] || {};
 
@@ -153,6 +155,7 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
           transactionId,
           planId: currentPlanListing.getId(),
           orderState,
+          companyName,
         },
         title: orderTitle,
         start: DateTime.fromMillis(+planItemKey).toJSDate(),

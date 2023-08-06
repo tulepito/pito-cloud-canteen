@@ -11,6 +11,7 @@ import {
   participantSubOrderUpdateDocumentApi,
   queryOrderChangesHistoryDocumentApi,
 } from '@apis/firebaseApi';
+import { createNotificationApi } from '@apis/notificationApi';
 import {
   addParticipantToOrderApi,
   addUpdateMemberOrder,
@@ -20,6 +21,7 @@ import {
   createQuotationApi,
   deleteParticipantFromOrderApi,
   getBookerOrderDataApi,
+  initializePaymentApi,
   sendOrderDetailUpdatedEmailApi,
   sendPartnerNewOrderAppearEmailApi,
   sendRemindEmailToMemberApi,
@@ -34,9 +36,11 @@ import {
 } from '@helpers/orderHelper';
 import { createAsyncThunk } from '@redux/redux.helper';
 import type { RootState } from '@redux/store';
+import type { NotificationInvitationParams } from '@services/notifications';
 import type { TPlan } from '@src/utils/orderTypes';
 import { denormalisedResponseEntities, Listing, User } from '@utils/data';
 import {
+  ENotificationType,
   EOrderHistoryTypes,
   EOrderType,
   EParticipantOrderStatus,
@@ -143,7 +147,6 @@ export const checkMinMaxQuantityInProgressState = (
     const totalQuantityCanAdd = (totalQuantity * 10) / 100;
     const totalAdded = totalQuantity - oldTotalQuantity;
     const shouldShowOverflowError = totalAdded > totalQuantityCanAdd;
-
     const shouldShowUnderError = totalQuantity < minQuantity;
 
     return (!isAdminFlow && shouldShowOverflowError) || shouldShowUnderError;
@@ -315,11 +318,11 @@ const initialState: TOrderManagementState = {
   updateOrderFromDraftEditInProgress: false,
   updateOrderfromDraftEditError: null,
   draftSubOrderChangesHistory: {},
-  shouldShowUnderError: false,
-  shouldShowOverflowError: false,
   quotation: {},
   fetchQuotationInProgress: false,
   fetchQuotationError: null,
+  shouldShowUnderError: false,
+  shouldShowOverflowError: false,
 };
 
 // ================ Thunk types ================ //
@@ -823,6 +826,7 @@ const bookerStartOrder = createAsyncThunk(
       orderId,
       partner: partnerQuotation,
     });
+    initializePaymentApi(orderId, plans[0]);
 
     return response;
   },
@@ -897,14 +901,23 @@ const updateOrderFromDraftEdit = createAsyncThunk(
   'app/OrderManagement/UPDATE_ORDER_FROM_DRAFT_EDIT',
   async (foodOrderGroupedByDate: TObject[], { getState, dispatch }) => {
     const {
-      id: { uuid: orderId },
-    } = getState().OrderManagement.orderData!;
-    const {
-      id: { uuid: planId },
-    } = getState().OrderManagement.planData!;
-    const { companyId } = getState().OrderManagement;
-    const { draftSubOrderChangesHistory } = getState().OrderManagement;
-    const { draftOrderDetail } = getState().OrderManagement;
+      companyId,
+      orderData,
+      planData,
+      restaurantData = [],
+      draftSubOrderChangesHistory,
+      draftOrderDetail,
+    } = getState().OrderManagement;
+
+    const orderId = Listing(orderData as TListing).getId();
+    const { title: orderTitle } = Listing(
+      orderData as TListing,
+    ).getAttributes();
+    const { companyName = 'PCC' } = Listing(
+      orderData as TListing,
+    ).getMetadata();
+    const planId = Listing(planData as TListing).getId();
+    const { orderDetail } = Listing(planData as TListing).getMetadata();
     const updateParams = {
       planId,
       orderDetail: draftOrderDetail,
@@ -975,6 +988,56 @@ const updateOrderFromDraftEdit = createAsyncThunk(
       client: clientQuotation,
     };
     createQuotationApi(orderId, apiBody);
+
+    const updatedDateList = Object.keys(draftSubOrderChangesHistory).filter(
+      (d, index, array) => array.indexOf(d) === index,
+    );
+
+    const createNotificationParams = updatedDateList.reduce(
+      (
+        rest: {
+          type: ENotificationType;
+          params: NotificationInvitationParams;
+        }[],
+        date: string,
+      ) => {
+        const { restaurant: restaurantFromOrder } =
+          draftOrderDetail[date] || {};
+        const restaurantId = restaurantFromOrder.id;
+        const restaurant = restaurantData.find(
+          (r) => r?.id?.uuid === restaurantId,
+        );
+
+        if (restaurant) {
+          const author = restaurant.author || {};
+          const userId = User(author).getId();
+          const newParams = {
+            type: ENotificationType.SUB_ORDER_UPDATED,
+            params: {
+              userId,
+              orderId,
+              planId,
+              subOrderDate: Number(date),
+              orderTitle,
+              companyName,
+              newOrderDetail: draftOrderDetail[date],
+              oldOrderDetail: orderDetail[date],
+            } as NotificationInvitationParams,
+          };
+
+          return rest.concat(newParams);
+        }
+
+        return rest;
+      },
+      [],
+    );
+
+    if (!isEmpty(createNotificationParams))
+      createNotificationApi({
+        notifications: createNotificationParams,
+      });
+
     await dispatch(loadData(orderId));
   },
 );
@@ -1006,8 +1069,8 @@ export const orderManagementThunks = {
   bookerMarkInprogressPlanViewed,
   querySubOrderChangesHistory,
   updatePlanOrderDetail,
-  updateOrderFromDraftEdit,
   fetchQuotation,
+  updateOrderFromDraftEdit,
 };
 
 // ================ Slice ================ //
@@ -1115,19 +1178,6 @@ const OrderManagementSlice = createSlice({
           shouldShowOverflowError: false,
           shouldShowUnderError: false,
           draftOrderDetail: newOrderDetail,
-          draftSubOrderChangesHistory: {
-            ...state.draftSubOrderChangesHistory,
-            [currentViewDate]: currentDraftSubOrderChanges,
-          },
-        };
-      }
-
-      if (defaultFoodId === foodId && orderHistoryByMemberIndex > -1) {
-        currentDraftSubOrderChanges.splice(orderHistoryByMemberIndex, 0);
-
-        return {
-          ...state,
-          orderDetail: newOrderDetail,
           draftSubOrderChangesHistory: {
             ...state.draftSubOrderChangesHistory,
             [currentViewDate]: currentDraftSubOrderChanges,

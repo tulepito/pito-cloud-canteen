@@ -357,10 +357,6 @@ const OrderListPage = () => {
   ]);
 
   useEffect(() => {
-    dispatch(OrderListThunks.fetchAttributes());
-  }, []);
-
-  useEffect(() => {
     if (planIdFromQuery && timestampFromQuery) {
       const planId = planIdFromQuery as string;
       const timestamp = timestampFromQuery as string;

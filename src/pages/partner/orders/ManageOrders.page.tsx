@@ -143,6 +143,7 @@ const parseEntitiesToTableData = (subOrders: TObject[]) => {
       isPaid,
     } = entity;
     const dayIndex = new Date(Number(date)).getDay();
+
     const { totalPrice } = calculateSubOrderPrice({
       orderType,
       data: {

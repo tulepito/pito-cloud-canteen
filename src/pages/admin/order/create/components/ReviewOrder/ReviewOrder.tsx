@@ -272,16 +272,9 @@ export const ReviewContent: React.FC<any> = (props) => {
                 placeholder="Chọn nhân viên"
                 input={deliveryMan.input}
                 disabled={fieldDeliveryManDisabled}
-                onChange={handleFieldDeliveryManChange}>
-                <option disabled value={''}>
-                  Chọn nhân viên
-                </option>
-                {deliveryManOptions.map(({ key, name }) => (
-                  <option key={key} value={key}>
-                    {name}
-                  </option>
-                ))}
-              </FieldDropdownSelectComponent>
+                onChange={handleFieldDeliveryManChange}
+                customOnChange={handleFieldDeliveryManChange}
+              />
             </div>
             <div className={css.flexChild}>
               <span className={css.boxTitle}>

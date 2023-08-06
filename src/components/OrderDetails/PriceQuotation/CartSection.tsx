@@ -14,7 +14,6 @@ type TCartSectionProps = {
   transportFee: string;
   PITOFee?: string;
   VATFee: string;
-  currentOrderVATPercentage: number;
   isPartnerQuotation?: boolean;
   vatPercentage: number;
   vatSetting: EPartnerVATSetting;
@@ -77,7 +76,7 @@ const CartSection: React.FC<TCartSectionProps> = (props) => {
           <div>2</div>
           <div>
             {intl.formatMessage({
-              id: `BookerOrderDetailsPriceQuotation.cartSection.rowLabel.${
+              id: `OrderDetails.PriceQuotation.cartSection.rowLabel.${
                 isPartnerQuotation ? 'serviceCost' : 'PITOFee'
               }`,
             })}

@@ -4,6 +4,7 @@ import { parseThousandNumber } from '@helpers/format';
 import { calculatePriceQuotationInfo } from '@helpers/order/cartInfoHelper';
 
 import { VNTimezone } from '../dates';
+import type { TObject } from '../types';
 
 const BASE_URL = process.env.NEXT_PUBLIC_CANONICAL_URL;
 
@@ -12,8 +13,7 @@ type PartnerNewOrderAppearParams = {
   orderListing: any;
   planListing: any;
   restaurantListing: any;
-  subOrderDate: string;
-  currentOrderVATPercentage: number;
+  subOrderDate: number | string;
   formattedSubOrderDate: string;
 };
 
@@ -49,8 +49,8 @@ const partnerOrderDetailsUpdated = ({
 
   const { totalPrice, totalDishes, VATFee, serviceFee, totalWithVAT } =
     calculatePriceQuotationInfo({
-      planOrderDetail,
-      order: orderListing.getFullData(),
+      planOrderDetail: planOrderDetail as TObject,
+      order: orderListing.getFullData() as TObject,
       currentOrderVATPercentage: orderVATPercentage,
       currentOrderServiceFeePercentage: (serviceFees[restaurantId] || 0) / 100,
       date: subOrderDate,

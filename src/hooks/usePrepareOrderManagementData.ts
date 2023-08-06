@@ -25,6 +25,7 @@ export const usePrepareOrderDetailPageData = ({
   date,
   VATPercentage,
   serviceFeePercentage,
+  partnerId,
 }: {
   date?: string | number;
   VATPercentage?: number;
@@ -170,9 +171,8 @@ export const usePrepareOrderDetailPageData = ({
         currentOrderVATPercentage: VATPercentage!
           ? VATPercentage!
           : currentOrderVATPercentage,
-        date,
         currentOrderServiceFeePercentage: serviceFeePercentage,
-
+        date,
         shouldIncludePITOFee: isEmpty(date),
       }),
     [orderData, orderDetail, currentOrderVATPercentage],
@@ -202,6 +202,7 @@ export const usePrepareOrderDetailPageData = ({
           : currentOrderVATPercentage,
         currentOrderServiceFeePercentage: serviceFeePercentage,
         date,
+        partnerId,
       }),
     [packagePerMember, JSON.stringify(quotation)],
   );
@@ -286,7 +287,7 @@ export const usePrepareOrderDetailPageData = ({
       transportFee: `${parseThousandNumber(transportFee)}đ`,
       VATFee: `${parseThousandNumber(VATFee)}đ`,
       PITOFee: `${parseThousandNumber(PITOFee)}đ`,
-      currentOrderVATPercentage: !isEmpty(VATPercentage)
+      vatPercentage: VATPercentage!
         ? VATPercentage!
         : currentOrderVATPercentage,
     },

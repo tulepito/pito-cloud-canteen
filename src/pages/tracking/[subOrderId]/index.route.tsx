@@ -2,14 +2,16 @@ import MetaWrapper from '@components/MetaWrapper/MetaWrapper';
 
 import TrackingPage from './Tracking.page';
 
-type TSubOrderDetailRouteProps = {};
+type TTrackingSubOrderDetailRouteProps = {};
 
-const SubOrderDetailRoute: React.FC<TSubOrderDetailRouteProps> = () => {
+const TrackingSubOrderDetailRoute: React.FC<
+  TTrackingSubOrderDetailRouteProps
+> = () => {
   return (
-    <MetaWrapper routeName="SubOrderDetailRoute">
+    <MetaWrapper routeName="TrackingSubOrderDetailRoute">
       <TrackingPage />
     </MetaWrapper>
   );
 };
 
-export default SubOrderDetailRoute;
+export default TrackingSubOrderDetailRoute;

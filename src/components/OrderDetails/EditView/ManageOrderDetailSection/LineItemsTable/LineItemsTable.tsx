@@ -25,22 +25,22 @@ import css from './LineItemsTable.module.scss';
 
 type TLineItemsTableProps = {
   currentViewDate: number;
-  isDraftEditing: boolean;
-  ableToUpdateOrder: boolean;
-  shouldShowOverflowError: boolean;
-  shouldShowUnderError: boolean;
-  minQuantity: number;
+  isDraftEditing?: boolean;
+  ableToUpdateOrder?: boolean;
+  shouldShowOverflowError?: boolean;
+  shouldShowUnderError?: boolean;
+  minQuantity?: number;
   isAdminFlow?: boolean;
 };
 
 const LineItemsTable: React.FC<TLineItemsTableProps> = (props) => {
   const {
     currentViewDate,
-    isDraftEditing,
-    ableToUpdateOrder,
-    shouldShowOverflowError,
-    shouldShowUnderError,
-    minQuantity,
+    isDraftEditing = false,
+    ableToUpdateOrder = true,
+    shouldShowOverflowError = false,
+    shouldShowUnderError = false,
+    minQuantity = 1,
     isAdminFlow = false,
   } = props;
   const intl = useIntl();

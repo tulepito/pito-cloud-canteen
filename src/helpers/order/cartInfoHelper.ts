@@ -1,4 +1,3 @@
-import { pick } from 'lodash';
 import isEmpty from 'lodash/isEmpty';
 import pick from 'lodash/pick';
 
@@ -236,11 +235,13 @@ export const calculatePriceQuotationPartner = ({
   serviceFeePercentage = 0,
   currentOrderVATPercentage,
   subOrderDate,
+  shouldSkipVAT = false,
 }: {
   quotation: TQuotation;
   serviceFeePercentage: number;
   currentOrderVATPercentage: number;
   subOrderDate?: string;
+  shouldSkipVAT?: boolean;
 }) => {
   const promotion = 0;
   const totalPrice = subOrderDate
@@ -259,7 +260,9 @@ export const calculatePriceQuotationPartner = ({
       }, 0);
   const serviceFee = Math.round((totalPrice * serviceFeePercentage) / 100);
   const totalWithoutVAT = totalPrice - promotion - serviceFee;
-  const VATFee = Math.round(totalWithoutVAT * currentOrderVATPercentage);
+  const VATFee = shouldSkipVAT
+    ? 0
+    : Math.round(totalWithoutVAT * currentOrderVATPercentage);
   const totalWithVAT = VATFee + totalWithoutVAT;
 
   return {
@@ -280,6 +283,7 @@ export const calculatePriceQuotationInfoFromQuotation = ({
   currentOrderServiceFeePercentage = 0,
   date,
   partnerId,
+  shouldSkipVAT = false,
 }: {
   quotation: TListing;
   packagePerMember: number;
@@ -287,6 +291,7 @@ export const calculatePriceQuotationInfoFromQuotation = ({
   currentOrderServiceFeePercentage?: number;
   date?: number | string;
   partnerId?: string;
+  shouldSkipVAT?: boolean;
 }) => {
   const quotationListingGetter = Listing(quotation);
   const { client, partner } = quotationListingGetter.getMetadata();
@@ -351,7 +356,9 @@ export const calculatePriceQuotationInfoFromQuotation = ({
   const promotion = 0;
   const totalWithoutVAT =
     totalPrice - serviceFee + transportFee + PITOFee - promotion;
-  const VATFee = Math.round(totalWithoutVAT * currentOrderVATPercentage || 0);
+  const VATFee = shouldSkipVAT
+    ? 0
+    : Math.round(totalWithoutVAT * currentOrderVATPercentage || 0);
   const totalWithVAT = VATFee + totalWithoutVAT;
   const overflow = isOverflowPackage
     ? totalWithVAT - totalDishes * packagePerMember

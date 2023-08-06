@@ -150,6 +150,7 @@ type TOrderInitialState = {
   allOrders: TListing[];
   queryAllOrdersInProgress: boolean;
   queryAllOrdersError: any;
+  currentOrderVATPercentage: number;
 
   reorderInProgressId: string | null;
   reorderError: any;
@@ -253,6 +254,7 @@ const initialState: TOrderInitialState = {
   allOrders: [],
   queryAllOrdersInProgress: false,
   queryAllOrdersError: null,
+  currentOrderVATPercentage: config.VATPercentage,
 
   reorderInProgressId: null,
   reorderError: null,
