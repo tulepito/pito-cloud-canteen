@@ -1100,16 +1100,22 @@ const OrderManagementSlice = createSlice({
           defaultOrderDetail,
           isAdminFlow,
         );
+      const { planValidationsInProgressState } =
+        orderValidationsInProgressState;
+
       const {
-        orderReachMaxRestaurantQuantity,
-        orderReachMinRestaurantQuantity,
-        orderReachMaxCanModify,
-      } = orderValidationsInProgressState;
+        planReachMaxRestaurantQuantity,
+        planReachMinRestaurantQuantity,
+        planReachMaxCanModify,
+      } =
+        planValidationsInProgressState[
+          currentViewDate as keyof typeof planValidationsInProgressState
+        ] || {};
 
       if (
-        orderReachMaxRestaurantQuantity ||
-        orderReachMinRestaurantQuantity ||
-        orderReachMaxCanModify
+        planReachMaxRestaurantQuantity ||
+        planReachMinRestaurantQuantity ||
+        planReachMaxCanModify
       ) {
         return {
           ...state,
@@ -1241,16 +1247,22 @@ const OrderManagementSlice = createSlice({
           defaultOrderDetail,
           isAdminFlow,
         );
+      const { planValidationsInProgressState } =
+        orderValidationsInProgressState;
+
       const {
-        orderReachMaxRestaurantQuantity,
-        orderReachMinRestaurantQuantity,
-        orderReachMaxCanModify,
-      } = orderValidationsInProgressState;
+        planReachMaxRestaurantQuantity,
+        planReachMinRestaurantQuantity,
+        planReachMaxCanModify,
+      } =
+        planValidationsInProgressState[
+          currentViewDate as keyof typeof planValidationsInProgressState
+        ] || {};
 
       if (
-        orderReachMaxRestaurantQuantity ||
-        orderReachMinRestaurantQuantity ||
-        orderReachMaxCanModify
+        planReachMaxRestaurantQuantity ||
+        planReachMinRestaurantQuantity ||
+        planReachMaxCanModify
       ) {
         return {
           ...state,
@@ -1349,16 +1361,22 @@ const OrderManagementSlice = createSlice({
           orderDetail,
           isAdminFlow,
         );
+      const { planValidationsInProgressState } =
+        orderValidationsInProgressState;
+
       const {
-        orderReachMaxRestaurantQuantity,
-        orderReachMinRestaurantQuantity,
-        orderReachMaxCanModify,
-      } = orderValidationsInProgressState;
+        planReachMaxRestaurantQuantity,
+        planReachMinRestaurantQuantity,
+        planReachMaxCanModify,
+      } =
+        planValidationsInProgressState[
+          currentViewDate as keyof typeof planValidationsInProgressState
+        ] || {};
 
       if (
-        orderReachMaxRestaurantQuantity ||
-        orderReachMinRestaurantQuantity ||
-        orderReachMaxCanModify
+        planReachMaxRestaurantQuantity ||
+        planReachMinRestaurantQuantity ||
+        planReachMaxCanModify
       ) {
         return {
           ...state,
