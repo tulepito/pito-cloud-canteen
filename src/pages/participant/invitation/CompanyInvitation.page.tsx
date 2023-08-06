@@ -5,7 +5,6 @@ import { shallowEqual } from 'react-redux';
 import { useRouter } from 'next/router';
 
 import Button from '@components/Button/Button';
-import CoverModal from '@components/CoverModal/CoverModal';
 import LoadingModal from '@components/LoadingModal/LoadingModal';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { companyInvitationThunks } from '@redux/slices/companyInvitation.slice';
@@ -14,6 +13,8 @@ import invitationCover from '@src/assets/invitationCover.png';
 import { participantPaths } from '@src/paths';
 import { User } from '@utils/data';
 import type { TUser } from '@utils/types';
+
+import CoverBox from '../components/CoverBox/CoverBox';
 
 import css from './CompanyInvitation.module.scss';
 
@@ -41,7 +42,6 @@ const CompanyInvitationPage = () => {
     useAppSelector((state) => state.companyInvitation);
 
   const invalidInvitation = responseToInvitationResult === 'invalidInvitaion';
-  const validInvitation = responseToInvitationResult === 'userAccept';
 
   const isLoading =
     responseToInvitationInProgress ||
@@ -90,10 +90,7 @@ const CompanyInvitationPage = () => {
 
   return (
     <div className={css.foodBackground}>
-      <CoverModal
-        id="InvitationModal"
-        isOpen={validInvitation}
-        onClose={() => {}}
+      <CoverBox
         coverSrc={invitationCover}
         modalTitle={intl.formatMessage({ id: 'InvitationModal.title' })}
         modalDescription={intl.formatMessage(

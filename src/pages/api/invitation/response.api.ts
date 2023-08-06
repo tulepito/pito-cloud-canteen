@@ -26,6 +26,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       currentUserGetter.getMetadata();
     const userId = User(currentUser).getId();
 
+    if (
+      userCompany[userId] &&
+      userCompany[userId].permission === UserPermission.PARTICIPANT
+    ) {
+      return res.json({
+        message: 'userAccept',
+      });
+    }
     const companyAccount = await fetchUser(companyId);
     const companyUser = User(companyAccount);
     const { companyName } = companyUser.getPublicData();
