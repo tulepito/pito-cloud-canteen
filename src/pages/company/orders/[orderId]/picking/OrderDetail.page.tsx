@@ -224,7 +224,6 @@ const OrderDetailPage = () => {
   const planReachMaxCanModifyInProgressState =
     planValidationsInProgressState?.[currentViewDate]?.planReachMaxCanModify;
 
-  const { orderDetail = {} } = Listing(planData as TListing).getMetadata();
   const {
     orderTitle,
     editViewData,
@@ -387,7 +386,11 @@ const OrderDetailPage = () => {
     planValidations,
     orderReachMaxRestaurantQuantity,
     orderReachMinRestaurantQuantity,
-  } = checkMinMaxQuantityInPickingState(isNormalOrder, isPicking, orderDetail);
+  } = checkMinMaxQuantityInPickingState(
+    isNormalOrder,
+    isPicking,
+    draftOrderDetail,
+  );
 
   const {
     planReachMaxRestaurantQuantity:

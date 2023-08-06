@@ -113,7 +113,7 @@ const OrderDetailsTable: React.FC<TOrderDetailsTableProps> = (props) => {
       const memberOrderData =
         allTabData[tab].find((item: TObject) => item.memberData.id === memberId)
           ?.memberData || {};
-      console.log({ memberOrderData });
+
       const { condition, type } = checkShouldShowEditOrderWarningModal(
         planData as TListing,
         currentViewDate,

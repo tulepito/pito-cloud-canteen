@@ -288,7 +288,11 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
       orderReachMaxRestaurantQuantityInPickingState,
     orderReachMinRestaurantQuantity:
       orderReachMinRestaurantQuantityInPickingState,
-  } = checkMinMaxQuantityInPickingState(isNormalOrder, isPicking, orderDetail);
+  } = checkMinMaxQuantityInPickingState(
+    isNormalOrder,
+    isPicking,
+    draftOrderDetail,
+  );
 
   const {
     planReachMaxRestaurantQuantity:
