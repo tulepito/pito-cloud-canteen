@@ -8,6 +8,8 @@
   height: 100%;
   border-radius: 16px;
   overflow: hidden;
+  background-color: $neutralGray1;
+  box-shadow: $boxShadowPopup;
 }
 
 .previewImage {
@@ -27,8 +29,7 @@
 }
 
 .error {
-  border-color: $sematicRed2;
-  border-width: 2px;
+  border: 1px solid $sematicRed2;
 }
 
 .sessionPhoto {
