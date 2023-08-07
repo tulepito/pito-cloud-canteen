@@ -63,3 +63,7 @@ export const queryOrderChangesHistoryDocumentApi = async (
   getApi(
     `/orders/${orderId}/plan/${planId}/history/?planOrderDate=${planOrderDate}&lastRecordCreatedAt=${lastRecordCreatedAt}`,
   );
+
+export const fetchParticipantFirebaseSubOrderApi = async (
+  subOrderDocumentId: string,
+) => getApi(`/participants/document/${subOrderDocumentId}`);
