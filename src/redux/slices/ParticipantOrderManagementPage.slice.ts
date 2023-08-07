@@ -1,12 +1,14 @@
 import { createSlice } from '@reduxjs/toolkit';
+import compact from 'lodash/compact';
 
 import { updateParticipantOrderApi } from '@apis/index';
+import { fetchTxApi } from '@apis/txApi';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { userThunks } from '@redux/slices/user.slice';
 import { denormalisedResponseEntities, Listing } from '@src/utils/data';
 import { EImageVariants } from '@src/utils/enums';
 import { storableError } from '@utils/errors';
-import type { TListing, TObject, TUser } from '@utils/types';
+import type { TListing, TObject, TTransaction, TUser } from '@utils/types';
 
 const LOAD_DATA = 'app/OrderManagementPage/LOAD_DATA';
 const UPDATE_ORDER = 'app/OrderManagementPage/UPDATE_ORDER';
@@ -22,6 +24,7 @@ type TParticipantOrderManagementState = {
   updateOrderInProgress: boolean;
   updateOrderError: any;
   restaurants: TListing[];
+  subOrderTxs: TTransaction[];
 };
 
 const initialState: TParticipantOrderManagementState = {
@@ -37,6 +40,7 @@ const initialState: TParticipantOrderManagementState = {
   updateOrderError: null,
 
   restaurants: [],
+  subOrderTxs: [],
 };
 
 const loadData = createAsyncThunk(
@@ -71,10 +75,25 @@ const loadData = createAsyncThunk(
         ids: allRelatedRestaurantsIdList,
       }),
     );
+    const txIds = compact(
+      Object.values(orderDetail).map(
+        (subOrder: any) => subOrder?.transactionId,
+      ),
+    );
+
+    const subOrderTxs = await Promise.all(
+      txIds.map(async (txId: string) => {
+        const { data: tx } = await fetchTxApi(txId);
+
+        return tx;
+      }),
+    );
+
     returnValues = {
       order,
       plans: [plan],
       restaurants: allRelatedRestaurants,
+      subOrderTxs,
     };
 
     if (companyId) {

@@ -413,7 +413,11 @@ const OrderListPage = () => {
               />
             ),
           }}
-          resources={walkthroughEnable}
+          resources={{
+            walkthroughEnable,
+            openRatingSubOrderModal,
+            setSelectedEvent,
+          }}
         />
       </div>
       <div className={css.subOrderContainer}>

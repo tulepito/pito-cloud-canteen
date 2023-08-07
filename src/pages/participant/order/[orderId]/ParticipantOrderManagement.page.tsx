@@ -61,6 +61,10 @@ const ParticipantOrderManagement = () => {
     (state) => state.ParticipantOrderManagementPage.restaurants,
     shallowEqual,
   );
+  const subOrderTxs = useAppSelector(
+    (state) => state.ParticipantOrderManagementPage.subOrderTxs,
+    shallowEqual,
+  );
   const loadDataInProgress = useAppSelector(
     (state) => state.ParticipantOrderManagementPage.loadDataInProgress,
   );
@@ -165,6 +169,7 @@ const ParticipantOrderManagement = () => {
         restaurants,
         currentUser,
         loadDataInProgress,
+        subOrderTxs,
       },
     },
   ];
