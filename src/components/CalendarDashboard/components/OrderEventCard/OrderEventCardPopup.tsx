@@ -4,13 +4,15 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import isEmpty from 'lodash/isEmpty';
 import { useRouter } from 'next/router';
 
-import { InlineTextButton } from '@components/Button/Button';
+import Button, { InlineTextButton } from '@components/Button/Button';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { OrderListThunks } from '@pages/participant/orders/OrderList.slice';
 import { participantOrderManagementThunks } from '@redux/slices/ParticipantOrderManagementPage.slice';
 import { currentUserSelector } from '@redux/slices/user.slice';
 import { participantPaths } from '@src/paths';
+import { txIsDelivered } from '@src/utils/transaction';
+import type { TTransaction } from '@src/utils/types';
 import { CurrentUser } from '@utils/data';
 
 import type { TEventStatus } from '../../helpers/types';
@@ -26,12 +28,22 @@ type TOrderEventCardPopupProps = {
   event: Event;
   status?: TEventStatus;
   isExpired: boolean;
+  subOrderDocument: any;
+  subOrderTx?: TTransaction;
+  fetchSubOrderTxInProgress: boolean;
+  fetchSubOrderDocumentInProgress: boolean;
+  openRatingSubOrderModal: () => void;
 };
 
 const OrderEventCardPopup: React.FC<TOrderEventCardPopupProps> = ({
   event,
   status,
   isExpired = false,
+  subOrderDocument,
+  subOrderTx,
+  fetchSubOrderTxInProgress,
+  fetchSubOrderDocumentInProgress,
+  openRatingSubOrderModal,
 }) => {
   const router = useRouter();
   const intl = useIntl();
@@ -58,6 +70,8 @@ const OrderEventCardPopup: React.FC<TOrderEventCardPopupProps> = ({
     router.pathname === participantPaths.OrderList
       ? 'orderList'
       : 'orderDetail';
+
+  const { reviewId } = subOrderDocument;
 
   const onSelectDish = async (
     values: TDishSelectionFormValues,
@@ -136,6 +150,19 @@ const OrderEventCardPopup: React.FC<TOrderEventCardPopupProps> = ({
               initialValues={dishSelection}
             />
           </div>
+        </div>
+      </RenderWhen>
+      <RenderWhen
+        condition={!reviewId && txIsDelivered(subOrderTx as TTransaction)}>
+        <div className={css.ratingWrapper}>
+          <Button
+            disabled={
+              fetchSubOrderTxInProgress || fetchSubOrderDocumentInProgress
+            }
+            className={css.ratingBtn}
+            onClick={openRatingSubOrderModal}>
+            Đánh giá
+          </Button>
         </div>
       </RenderWhen>
     </div>

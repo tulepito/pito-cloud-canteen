@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import type { Event, View } from 'react-big-calendar';
 import { Views } from 'react-big-calendar';
 import Skeleton from 'react-loading-skeleton';
@@ -13,17 +13,18 @@ import LoadingModal from '@components/LoadingModal/LoadingModal';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { getItem } from '@helpers/localStorageHelpers';
 import { markColorForOrder } from '@helpers/orderHelper';
-import { useAppSelector } from '@hooks/reduxHooks';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import useSubOrderPicking from '@pages/participant/hooks/useSubOrderPicking';
 import RatingSubOrderModal from '@pages/participant/orders/components/RatingSubOrderModal/RatingSubOrderModal';
 import SubOrderCard from '@pages/participant/orders/components/SubOrderCard/SubOrderCard';
 import SubOrderDetailModal from '@pages/participant/orders/components/SubOrderDetailModal/SubOrderDetailModal';
 import SuccessRatingModal from '@pages/participant/orders/components/SuccessRatingModal/SuccessRatingModal';
+import { OrderListThunks } from '@pages/participant/orders/OrderList.slice';
 import { getDaySessionFromDeliveryTime, isSameDate } from '@src/utils/dates';
 import { convertStringToNumber } from '@src/utils/number';
 import { CurrentUser, Listing, User } from '@utils/data';
-import type { TCurrentUser, TListing, TUser } from '@utils/types';
+import type { TCurrentUser, TListing, TTransaction, TUser } from '@utils/types';
 
 import ParticipantToolbar from '../ParticipantToolbar/ParticipantToolbar';
 
@@ -36,6 +37,7 @@ type TOrderCalendarViewProps = {
   currentUser: TCurrentUser;
   loadDataInProgress?: boolean;
   restaurants: TListing[];
+  subOrderTxs: TTransaction[];
 };
 
 const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
@@ -46,7 +48,10 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
     currentUser,
     plans,
     loadDataInProgress,
+    subOrderTxs,
   } = props;
+
+  const dispatch = useAppDispatch();
 
   const companyTitle = User(company).getPublicData().displayName;
   const ensureCompanyUser = User(company).getFullData();
@@ -89,12 +94,8 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
 
     Object.keys(orderDetail).forEach((planItemKey: string) => {
       const planItem = orderDetail[planItemKey];
-      const {
-        foodList = {},
-        restaurantName,
-        id,
-        transactionId,
-      } = planItem.restaurant;
+      const { transactionId } = planItem;
+      const { foodList = {}, restaurantName, id } = planItem.restaurant;
       const restaurant = restaurants?.find(
         (_restaurant) => Listing(_restaurant).getId() === id,
       );
@@ -115,6 +116,7 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
       const expiredTime = deadlineDate
         ? DateTime.fromMillis(+deadlineDate)
         : DateTime.fromMillis(+planItemKey).minus({ day: 2 });
+      const subOrderTx = subOrderTxs.find((tx) => tx.id.uuid === transactionId);
 
       const event = {
         resource: {
@@ -142,6 +144,7 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
           transactionId,
           planId: currentPlanListing.getId(),
           orderState,
+          subOrderTx,
         },
         title: orderTitle,
         start: DateTime.fromMillis(+planItemKey).toJSDate(),
@@ -192,6 +195,14 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
     successRatingModalControl.setFalse();
   };
 
+  useEffect(() => {
+    if (selectedEvent) {
+      const { timestamp, planId } = selectedEvent.resource;
+      const subOrderId = `${currentUserId} - ${planId} - ${timestamp}`;
+      dispatch(OrderListThunks.fetchSubOrdersFromFirebase(subOrderId));
+    }
+  }, [selectedEvent]);
+
   return (
     <div className={css.container}>
       <div>
@@ -213,6 +224,7 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
               />
             ),
           }}
+          resources={{ setSelectedEvent }}
         />
       </div>
       <div className={css.subOrderContainer}>
