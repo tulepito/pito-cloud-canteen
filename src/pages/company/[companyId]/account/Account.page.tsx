@@ -53,12 +53,11 @@ const AccountPage = () => {
   const fetchCompanyInfoInProgress = useAppSelector(
     (state) => state.company.fetchCompanyInfoInProgress,
   );
-
-  const { companyName = '', location = {} } = User(
+  const { companyName = '', companyLocation = {} } = User(
     company as TUser,
   ).getPublicData();
   const { email = '' } = User(company as TUser).getAttributes();
-  const { address = '' } = location;
+  const { address = '' } = companyLocation;
   const { tax } = User(company as TUser).getPrivateData();
 
   const { email: bookerEmail = '' } = User(currentUser!).getAttributes();
@@ -67,7 +66,7 @@ const AccountPage = () => {
   ).getProfile();
   const { phoneNumber: bookerPhoneNumber = '' } = User(
     currentUser!,
-  ).getProtectedData();
+  ).getPublicData();
   const initialFormValues = useMemo<TContactPointProfileFormValues>(
     () => ({
       displayName: bookerDisplayName,
