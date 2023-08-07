@@ -323,29 +323,50 @@ type TFoodDataValue = {
 
 type TFoodDataMap = TObject<string, TFoodDataValue>;
 
-export const getFoodDataMap = ({ foodListOfDate = {}, memberOrders }: any) => {
-  return Object.entries(memberOrders).reduce<TFoodDataMap>(
-    (foodFrequencyResult, currentMemberOrderEntry) => {
-      const [, memberOrderData] = currentMemberOrderEntry;
-      const { foodId, status } = memberOrderData as TObject;
-      const { foodName, foodPrice } = foodListOfDate[foodId] || {};
+export const getFoodDataMap = ({
+  foodListOfDate = {},
+  memberOrders,
+  orderType,
+  lineItems = [],
+}: any) => {
+  if (orderType === EOrderType.group) {
+    return Object.entries(memberOrders).reduce<TFoodDataMap>(
+      (foodFrequencyResult, currentMemberOrderEntry) => {
+        const [, memberOrderData] = currentMemberOrderEntry;
+        const { foodId, status } = memberOrderData as TObject;
+        const { foodName, foodPrice } = foodListOfDate[foodId] || {};
 
-      if (isJoinedPlan(foodId, status)) {
-        const data = foodFrequencyResult[foodId] as TObject;
-        const { frequency } = data || {};
+        if (isJoinedPlan(foodId, status)) {
+          const data = foodFrequencyResult[foodId] as TObject;
+          const { frequency } = data || {};
 
-        return {
-          ...foodFrequencyResult,
-          [foodId]: data
-            ? { ...data, frequency: frequency + 1 }
-            : { foodId, foodName, foodPrice, frequency: 1 },
-        };
-      }
+          return {
+            ...foodFrequencyResult,
+            [foodId]: data
+              ? { ...data, frequency: frequency + 1 }
+              : { foodId, foodName, foodPrice, frequency: 1 },
+          };
+        }
 
-      return foodFrequencyResult;
-    },
-    {},
-  );
+        return foodFrequencyResult;
+      },
+      {},
+    );
+  }
+
+  return lineItems.reduce((result: any, item: any) => {
+    const { id, name, quantity, unitPrice } = item;
+
+    return {
+      ...result,
+      [id]: {
+        foodId: id,
+        foodName: name,
+        foodPrice: unitPrice,
+        frequency: quantity,
+      },
+    };
+  }, {} as TFoodDataMap) as TFoodDataMap;
 };
 
 export const getTotalInfo = (foodDataList: TFoodDataValue[]) => {
@@ -372,16 +393,26 @@ export const getTotalInfo = (foodDataList: TFoodDataValue[]) => {
 
 export const combineOrderDetailWithPriceInfo = ({
   orderDetail = {},
+  orderType = EOrderType.group,
 }: {
   orderDetail: TObject;
+  orderType?: EOrderType;
 }) => {
   return Object.entries<TObject>(orderDetail).reduce<TObject>(
     (result, currentOrderDetailEntry) => {
       const [date, rawOrderDetailOfDate] = currentOrderDetailEntry;
-      const { memberOrders, restaurant = {} } = rawOrderDetailOfDate;
+      const {
+        memberOrders,
+        restaurant = {},
+        lineItems = [],
+      } = rawOrderDetailOfDate;
       const { foodList: foodListOfDate } = restaurant;
-
-      const foodDataMap = getFoodDataMap({ foodListOfDate, memberOrders });
+      const foodDataMap = getFoodDataMap({
+        foodListOfDate,
+        memberOrders,
+        orderType,
+        lineItems,
+      });
       const foodDataList = Object.values(foodDataMap);
       const totalInfo = getTotalInfo(foodDataList);
 
