@@ -25,7 +25,6 @@ import { useDownloadPriceQuotation } from '@hooks/useDownloadPriceQuotation';
 import useExportOrderDetails from '@hooks/useExportOrderDetails';
 import { usePrepareOrderDetailPageData } from '@hooks/usePrepareOrderManagementData';
 import {
-  checkMinMaxQuantityInProgressState,
   orderDetailsAnyActionsInProgress,
   OrderManagementsAction,
   orderManagementThunks,
@@ -59,7 +58,7 @@ const checkOrderDetailHasChanged = (
   });
 };
 
-const checkMinMaxQuantityInPickingState = (
+export const checkMinMaxQuantityInPickingState = (
   isNormalOrder: boolean,
   isPicking: boolean,
   orderDetail: TPlan['orderDetail'] = {},
@@ -203,8 +202,7 @@ const OrderDetailPage = () => {
     planData,
     draftSubOrderChangesHistory,
     transactionDataMap,
-    shouldShowOverflowError,
-    shouldShowUnderError,
+    orderValidationsInProgressState,
   } = useAppSelector((state) => state.OrderManagement);
   const {
     orderState,
@@ -212,8 +210,29 @@ const OrderDetailPage = () => {
     orderType = EOrderType.group,
     orderVATPercentage,
   } = Listing(orderData as TListing).getMetadata();
-  const { orderDetail = {} } = Listing(planData as TListing).getMetadata();
+
   const isPickingOrder = orderState === EOrderStates.picking;
+
+  const {
+    planValidationsInProgressState,
+    orderReachMaxCanModify: orderReachMaxCanModifyInProgressState,
+    orderReachMaxRestaurantQuantity:
+      orderReachMaxRestaurantQuantityInProgressState,
+    orderReachMinRestaurantQuantity:
+      orderReachMinRestaurantQuantityInProgressState,
+  } = orderValidationsInProgressState || {};
+
+  const planReachMaxRestaurantQuantityInProgressState =
+    planValidationsInProgressState?.[currentViewDate]
+      ?.planReachMaxRestaurantQuantity;
+
+  const planReachMinRestaurantQuantityInProgressState =
+    planValidationsInProgressState?.[currentViewDate]
+      ?.planReachMinRestaurantQuantity;
+
+  const planReachMaxCanModifyInProgressState =
+    planValidationsInProgressState?.[currentViewDate]?.planReachMaxCanModify;
+
   const {
     orderTitle,
     editViewData,
@@ -259,6 +278,38 @@ const OrderDetailPage = () => {
   const handleSetCurrentViewDate = (date: number) => {
     setCurrentViewDate(date);
   };
+
+  useEffect(() => {
+    if (
+      planReachMaxRestaurantQuantityInProgressState ||
+      planReachMinRestaurantQuantityInProgressState ||
+      planReachMaxCanModifyInProgressState
+    ) {
+      const i = setTimeout(() => {
+        dispatch(OrderManagementsAction.resetOrderDetailValidation());
+        clearTimeout(i);
+      }, 4000);
+    }
+  }, [
+    planReachMaxRestaurantQuantityInProgressState,
+    planReachMinRestaurantQuantityInProgressState,
+    planReachMaxCanModifyInProgressState,
+  ]);
+
+  useEffect(() => {
+    onQuerySubOrderHistoryChanges();
+  }, [onQuerySubOrderHistoryChanges]);
+
+  useEffect(() => {
+    if (draftOrderDetail) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      () => {
+        dispatch(OrderManagementsAction.resetDraftSubOrderChangeHistory());
+
+        return dispatch(OrderManagementsAction.resetDraftOrderDetails());
+      };
+    }
+  }, []);
 
   const handleDownloadPriceQuotation = useDownloadPriceQuotation({
     orderTitle,
@@ -336,18 +387,15 @@ const OrderDetailPage = () => {
     draftSubOrderChangesHistory,
   );
 
-  const { minQuantity, disabledSubmit } = checkMinMaxQuantityInProgressState(
-    draftOrderDetail,
-    orderDetail,
-    currentViewDate,
-    isNormalOrder,
-  );
-
   const {
     planValidations,
     orderReachMaxRestaurantQuantity,
     orderReachMinRestaurantQuantity,
-  } = checkMinMaxQuantityInPickingState(isNormalOrder, isPicking, orderDetail);
+  } = checkMinMaxQuantityInPickingState(
+    isNormalOrder,
+    isPicking,
+    draftOrderDetail,
+  );
 
   const {
     planReachMaxRestaurantQuantity:
@@ -355,6 +403,16 @@ const OrderDetailPage = () => {
     planReachMinRestaurantQuantity:
       planReachMinRestaurantQuantityInPickingState,
   } = planValidations[currentViewDate as keyof typeof planValidations] || {};
+
+  const disabledSubmit =
+    orderReachMaxCanModifyInProgressState ||
+    orderReachMaxRestaurantQuantity ||
+    orderReachMinRestaurantQuantity ||
+    orderReachMaxRestaurantQuantityInProgressState ||
+    orderReachMinRestaurantQuantityInProgressState;
+
+  const { minQuantity = 1 } =
+    draftOrderDetail?.[currentViewDate]?.restaurant || {};
 
   const EditViewComponent = (
     <div className={editViewClasses}>
@@ -372,10 +430,7 @@ const OrderDetailPage = () => {
             : ''
         }
         confirmDisabled={
-          (!isPicking && (orderDetailsNotChanged || disabledSubmit)) ||
-          (isPicking &&
-            (orderReachMaxRestaurantQuantity ||
-              orderReachMinRestaurantQuantity))
+          disabledSubmit || (!isPicking && orderDetailsNotChanged)
         }
         isDraftEditing={isDraftEditing}
       />
@@ -391,13 +446,14 @@ const OrderDetailPage = () => {
               handleOpenReachMaxAllowedChangesModal={
                 handleOpenReachMaxAllowedChangesModal
               }
-              shouldShowOverflowError={shouldShowOverflowError}
-              shouldShowUnderError={shouldShowUnderError}
-              planReachMaxRestaurantQuantityInPickingState={
-                planReachMaxRestaurantQuantityInPickingState
+              planReachMaxCanModify={planReachMaxCanModifyInProgressState}
+              planReachMaxRestaurantQuantity={
+                planReachMaxRestaurantQuantityInPickingState ||
+                planReachMaxRestaurantQuantityInProgressState
               }
-              planReachMinRestaurantQuantityInPickingState={
-                planReachMinRestaurantQuantityInPickingState
+              planReachMinRestaurantQuantity={
+                planReachMinRestaurantQuantityInPickingState ||
+                planReachMinRestaurantQuantityInProgressState
               }
             />
           </div>
@@ -449,8 +505,14 @@ const OrderDetailPage = () => {
               <ManageLineItemsSection
                 isDraftEditing={isDraftEditing}
                 ableToUpdateOrder={ableToUpdateOrder}
-                shouldShowOverflowError={shouldShowOverflowError}
-                shouldShowUnderError={shouldShowUnderError}
+                shouldShowOverflowError={
+                  planReachMaxRestaurantQuantityInProgressState ||
+                  planReachMaxRestaurantQuantityInPickingState
+                }
+                shouldShowUnderError={
+                  planReachMinRestaurantQuantityInProgressState ||
+                  planReachMinRestaurantQuantityInPickingState
+                }
                 setCurrentViewDate={handleSetCurrentViewDate}
                 currentViewDate={currentViewDate}
                 minQuantity={minQuantity}
@@ -533,41 +595,6 @@ const OrderDetailPage = () => {
   );
 
   useEffect(() => {
-    if (draftOrderDetail) {
-      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-      () => {
-        dispatch(OrderManagementsAction.resetDraftSubOrderChangeHistory());
-
-        return dispatch(OrderManagementsAction.resetDraftOrderDetails());
-      };
-    }
-  }, []);
-
-  useEffect(() => {
-    if (shouldShowOverflowError || shouldShowUnderError) {
-      const i = setTimeout(() => {
-        dispatch(OrderManagementsAction.resetOrderDetailValidation());
-        clearTimeout(i);
-      }, 4000);
-    }
-  }, [shouldShowOverflowError, shouldShowUnderError]);
-
-  useEffect(() => {
-    onQuerySubOrderHistoryChanges();
-  }, [onQuerySubOrderHistoryChanges]);
-
-  useEffect(() => {
-    if (draftOrderDetail) {
-      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-      () => {
-        dispatch(OrderManagementsAction.resetDraftSubOrderChangeHistory());
-
-        return dispatch(OrderManagementsAction.resetDraftOrderDetails());
-      };
-    }
-  }, []);
-
-  useEffect(() => {
     if (
       isRouterReady &&
       !isFetchingOrderDetails &&
@@ -618,53 +645,6 @@ const OrderDetailPage = () => {
       }
     }
   }, [isRouterReady, orderState]);
-  useEffect(() => {
-    if (shouldShowOverflowError || shouldShowUnderError) {
-      const i = setTimeout(() => {
-        dispatch(OrderManagementsAction.resetOrderDetailValidation());
-        clearTimeout(i);
-      }, 4000);
-    }
-  }, [shouldShowOverflowError, shouldShowUnderError]);
-
-  useEffect(() => {
-    onQuerySubOrderHistoryChanges();
-  }, [onQuerySubOrderHistoryChanges]);
-
-  useEffect(() => {
-    if (draftOrderDetail) {
-      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-      () => {
-        dispatch(OrderManagementsAction.resetDraftSubOrderChangeHistory());
-
-        return dispatch(OrderManagementsAction.resetDraftOrderDetails());
-      };
-    }
-  }, []);
-
-  useEffect(() => {
-    if (shouldShowOverflowError || shouldShowUnderError) {
-      const i = setTimeout(() => {
-        dispatch(OrderManagementsAction.resetOrderDetailValidation());
-        clearTimeout(i);
-      }, 4000);
-    }
-  }, [shouldShowOverflowError, shouldShowUnderError]);
-
-  useEffect(() => {
-    onQuerySubOrderHistoryChanges();
-  }, [onQuerySubOrderHistoryChanges]);
-
-  useEffect(() => {
-    if (draftOrderDetail) {
-      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-      () => {
-        dispatch(OrderManagementsAction.resetDraftSubOrderChangeHistory());
-
-        return dispatch(OrderManagementsAction.resetDraftOrderDetails());
-      };
-    }
-  }, []);
 
   switch (viewMode) {
     case EPageViewMode.priceQuotation:

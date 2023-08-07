@@ -40,8 +40,10 @@ const OrderTitle: React.FC<TOrderTitleProps> = (props) => {
   } = props;
 
   const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
+
   const submitDisabled =
     (!isDraftEditing && !canStartOrder) || inProgress || confirmDisabled;
+
   const cancelOrderDisabled = inProgress;
 
   const rootClasses = classNames(rootClassName || css.root, className);
