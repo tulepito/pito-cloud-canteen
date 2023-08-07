@@ -28,19 +28,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           planId,
         } = req.body;
         const { reviewerId, timestamp } = rating;
-        const review = await postParticipantRatingFn({
-          companyName,
-          rating,
-          detailTextRating,
-          imageIdList,
-        });
-
-        await updateRatingForRestaurantFn([rating]);
-        const subOrderId = `${reviewerId} - ${planId} - ${timestamp}`;
-        await updateFirebaseDocument(subOrderId, {
-          reviewId: review.id.uuid,
-        });
-
         const plan = await fetchListing(planId);
         const planListing = Listing(plan);
         const { orderDetail } = planListing.getMetadata();
@@ -48,6 +35,21 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         const food = await fetchListing(foodId);
         const foodListing = Listing(food);
         const { title: foodName } = foodListing.getAttributes();
+
+        const review = await postParticipantRatingFn({
+          companyName,
+          rating,
+          detailTextRating,
+          imageIdList,
+          foodName,
+          foodId,
+        });
+
+        await updateRatingForRestaurantFn([rating]);
+        const subOrderId = `${reviewerId} - ${planId} - ${timestamp}`;
+        await updateFirebaseDocument(subOrderId, {
+          reviewId: review.id.uuid,
+        });
 
         createFirebaseDocNotification(ENotificationType.ORDER_RATING, {
           userId: reviewerId,

@@ -60,11 +60,15 @@ export const postParticipantRatingFn = async ({
   rating,
   detailTextRating,
   imageIdList,
+  foodName,
+  foodId,
 }: {
   companyName: string;
   rating: any;
   detailTextRating: string;
   imageIdList: string[];
+  foodName: string;
+  foodId: string;
 }) => {
   const integrationSdk = getIntegrationSdk();
   const { restaurantId, ...rest } = rating;
@@ -82,6 +86,8 @@ export const postParticipantRatingFn = async ({
       detailTextRating,
       listingType: EListingType.rating,
       reviewRole: UserPermission.PARTICIPANT,
+      foodName,
+      foodId,
     },
   });
 

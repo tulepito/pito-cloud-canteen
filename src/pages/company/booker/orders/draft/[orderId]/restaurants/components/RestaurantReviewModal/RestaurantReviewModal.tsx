@@ -38,8 +38,14 @@ const ReviewItemList = ({
       )}
       {reviewList.map((review: any) => {
         const reviewListing = Listing(review);
-        const { generalRating, detailRating, timestamp } =
-          reviewListing.getMetadata();
+        const {
+          generalRating,
+          detailRating,
+          timestamp,
+          foodName,
+          detailTextRating,
+        } = reviewListing.getMetadata();
+        const { createdAt: reviewAt } = reviewListing.getAttributes();
 
         return (
           <div className={css.reviewItem} key={reviewListing.getId()}>
@@ -48,6 +54,9 @@ const ReviewItemList = ({
               detailRating={detailRating}
               user={reviewerList?.[reviewListing.getId()]}
               timestamp={timestamp}
+              foodName={foodName}
+              detailTextRating={detailTextRating}
+              reviewAt={reviewAt}
             />
           </div>
         );

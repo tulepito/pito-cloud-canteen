@@ -1,3 +1,5 @@
+import classNames from 'classnames';
+
 import Avatar from '@components/Avatar/Avatar';
 import IconRatingFace from '@components/Icons/IconRatingFace/IconRatingFace';
 import { User } from '@src/utils/data';
@@ -21,10 +23,20 @@ type ReviewItemProps = {
   };
   timestamp: number;
   user: TUser;
+  foodName?: string;
+  detailTextRating?: string;
+  reviewAt?: Date;
 };
 
 const ReviewItem: React.FC<ReviewItemProps> = (props) => {
-  const { generalRating, detailRating, user, timestamp } = props;
+  const {
+    generalRating,
+    detailRating,
+    user,
+    timestamp,
+    foodName,
+    detailTextRating,
+  } = props;
 
   const { food, packaging } = detailRating;
   const reviewerUser = User(user);
@@ -56,9 +68,17 @@ const ReviewItem: React.FC<ReviewItemProps> = (props) => {
         {packaging?.optionalOtherReview && (
           <div className={css.textReview}>{packaging?.optionalOtherReview}</div>
         )}
-        <div className={css.reviewAt}>
-          {formatTimestamp(timestamp, 'dd/MM/yyyy')}
-        </div>
+        {detailTextRating && (
+          <div className={classNames(css.textReview, css.detailTextRating)}>
+            {detailTextRating}
+          </div>
+        )}
+        {foodName && (
+          <div className={classNames(css.textReview, css.foodName)}>
+            Đã đặt món: <span>{foodName} •</span>{' '}
+            {formatTimestamp(timestamp, 'dd/MM/yyyy')}
+          </div>
+        )}
       </div>
     </div>
   );
