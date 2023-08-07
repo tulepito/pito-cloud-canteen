@@ -421,6 +421,7 @@ const parseEntitiesToTableData = (orders: TIntegrationOrderListing[]) => {
             ...(plan as TListing).attributes.metadata,
             orderDetail: combineOrderDetailWithPriceInfo({
               orderDetail: planOrderDetail,
+              orderType: entity?.attributes?.metadata?.orderType,
             }),
           },
         },
