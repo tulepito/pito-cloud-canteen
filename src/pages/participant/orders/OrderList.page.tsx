@@ -467,6 +467,7 @@ const OrderListPage = () => {
             selectedEvent={selectedEvent}
             currentUserId={currentUserId}
             openSuccessRatingModal={openSuccessRatingModal}
+            participantPostRatingInProgress={participantPostRatingInProgress}
           />
         </div>
       </RenderWhen>

@@ -24,6 +24,7 @@ import {
   Listing,
 } from '@src/utils/data';
 import { getEndOfMonth } from '@src/utils/dates';
+import { ESubOrderTxStatus } from '@src/utils/enums';
 import { convertStringToNumber } from '@src/utils/number';
 import type {
   TKeyValue,
@@ -31,6 +32,8 @@ import type {
   TObject,
   TTransaction,
 } from '@src/utils/types';
+
+import { SubOrdersThunks } from '../sub-orders/SubOrders.slice';
 
 // ================ Initial states ================ //
 type TOrderListState = {
@@ -296,14 +299,23 @@ const fetchTransactionBySubOrder = createAsyncThunk(
 
 const postParticipantRating = createAsyncThunk(
   POST_PARTICIPANT_RATING,
-  async (payload: any, { getState }) => {
+  async (payload: any, { getState, dispatch }) => {
     const { images } = getState().uploadImage;
+    const { currentUser } = getState().user;
+    const { planId, rating } = payload;
+    const { timestamp } = rating;
     const bodyApi = {
       ...payload,
       imageIdList: Object.values(images).map((image: any) => image.imageId),
     };
 
     const { data: response } = await participantPostRatingApi(bodyApi);
+    dispatch(
+      SubOrdersThunks.fetchSubOrderFromFirebase({
+        subOrderDocumentId: `${currentUser?.id.uuid} - ${planId} - ${timestamp}`,
+        subOrderType: ESubOrderTxStatus.DELIVERED,
+      }),
+    );
 
     return response;
   },

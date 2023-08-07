@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import type { Event } from 'react-big-calendar';
 
 import SlideModal from '@components/SlideModal/SlideModal';
@@ -14,6 +15,7 @@ type TRatingSubOrderModalProps = {
   currentUserId: string;
   selectedEvent: Event | null;
   openSuccessRatingModal: () => void;
+  participantPostRatingInProgress?: boolean;
 };
 const RatingSubOrderModal: React.FC<TRatingSubOrderModalProps> = (props) => {
   const {
@@ -22,6 +24,7 @@ const RatingSubOrderModal: React.FC<TRatingSubOrderModalProps> = (props) => {
     currentUserId,
     selectedEvent,
     openSuccessRatingModal,
+    participantPostRatingInProgress,
   } = props;
   const dispatch = useAppDispatch();
   const {
@@ -38,13 +41,16 @@ const RatingSubOrderModal: React.FC<TRatingSubOrderModalProps> = (props) => {
     onClose();
   };
 
-  const initialValues: TRatingSubOrderFormValues = {
-    general: '',
-    food: '',
-    packaging: '',
-    detailTextRating: '',
-    images: [],
-  };
+  const initialValues: TRatingSubOrderFormValues = useMemo(
+    () => ({
+      general: '',
+      food: '',
+      packaging: '',
+      detailTextRating: '',
+      images: [],
+    }),
+    [],
+  );
 
   const handleSubmit = async (values: TRatingSubOrderFormValues) => {
     const { general, food, packaging, detailTextRating } = values;
@@ -85,6 +91,7 @@ const RatingSubOrderModal: React.FC<TRatingSubOrderModalProps> = (props) => {
       <RatingSubOrderForm
         onSubmit={handleSubmit}
         initialValues={initialValues}
+        inProgress={participantPostRatingInProgress}
       />
     </SlideModal>
   );
