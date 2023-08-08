@@ -1,3 +1,4 @@
+import { useImperativeHandle } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
@@ -24,6 +25,7 @@ export type TRatingSubOrderFormValues = {
 type TExtraProps = {
   images?: any;
   inProgress?: boolean;
+  formRef?: any;
 };
 type TRatingSubOrderFormComponentProps =
   FormRenderProps<TRatingSubOrderFormValues> & Partial<TExtraProps>;
@@ -33,11 +35,12 @@ type TRatingSubOrderFormProps = FormProps<TRatingSubOrderFormValues> &
 const RatingSubOrderFormComponent: React.FC<
   TRatingSubOrderFormComponentProps
 > = (props) => {
-  const { handleSubmit, values, inProgress } = props;
+  const { handleSubmit, values, inProgress, form, formRef } = props;
   const intl = useIntl();
   const hasGeneralRating = !!values?.general;
   const hadFoodRating = !!values?.food;
   const hadPackagingRating = !!values?.packaging;
+  useImperativeHandle(formRef, () => form);
   const images = useAppSelector(
     (state) => state.uploadImage.images,
     shallowEqual,

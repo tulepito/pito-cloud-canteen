@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import type { Event } from 'react-big-calendar';
 import { shallowEqual } from 'react-redux';
 import { useRouter } from 'next/router';
 
@@ -12,6 +13,9 @@ import { useBottomScroll } from '@hooks/useBottomScroll';
 import { currentUserSelector } from '@redux/slices/user.slice';
 import { CurrentUser } from '@src/utils/data';
 import { ESubOrderTxStatus } from '@src/utils/enums';
+
+import RatingSubOrderModal from '../orders/components/RatingSubOrderModal/RatingSubOrderModal';
+import SuccessRatingModal from '../orders/components/SuccessRatingModal/SuccessRatingModal';
 
 import SubOrderList from './components/SubOrderList/SubOrderList';
 import SubOrderReviewModal from './components/SubOrderReviewModal/SubOrderReviewModal';
@@ -34,6 +38,9 @@ const SubOrders = () => {
   const currentUser = useAppSelector(currentUserSelector);
   const currentUserGetter = CurrentUser(currentUser);
   const currentUserId = currentUserGetter.getId();
+  const ratingSubOrderModalControl = useBoolean();
+  const successRatingModalControl = useBoolean();
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
 
   const deliveredSubOrders = useAppSelector(
     (state) => state.ParticipantSubOrderList.deliveredSubOrders,
@@ -47,6 +54,15 @@ const SubOrders = () => {
   const fetchSubOrdersInProgress = useAppSelector(
     (state) => state.ParticipantSubOrderList.fetchSubOrdersInProgress,
   );
+
+  const participantPostRatingInProgress = useAppSelector(
+    (state) => state.ParticipantOrderList.participantPostRatingInProgress,
+  );
+
+  const openSuccessRatingModal = () => {
+    ratingSubOrderModalControl.setFalse();
+    successRatingModalControl.setTrue();
+  };
 
   useEffect(() => {
     if (planIdFromQuery && timestampFromQuery) {
@@ -128,6 +144,8 @@ const SubOrders = () => {
         subOrders: deliveredSubOrders,
         setSelectedSubOrder,
         openSubOrderReviewModal: subOrderReviewModalControl.setTrue,
+        setSelectedEvent,
+        openRatingSubOrderModal: ratingSubOrderModalControl.setTrue,
       },
     },
   ];
@@ -148,6 +166,20 @@ const SubOrders = () => {
           subOrder={selectedSubOrder}
         />
       </RenderWhen>
+      <RenderWhen condition={!!selectedEvent}>
+        <RatingSubOrderModal
+          isOpen={ratingSubOrderModalControl.value}
+          onClose={ratingSubOrderModalControl.setFalse}
+          selectedEvent={selectedEvent}
+          currentUserId={currentUserId}
+          openSuccessRatingModal={openSuccessRatingModal}
+          participantPostRatingInProgress={participantPostRatingInProgress}
+        />
+      </RenderWhen>
+      <SuccessRatingModal
+        isOpen={successRatingModalControl.value}
+        onClose={successRatingModalControl.setFalse}
+      />
       <BottomNavigationBar />
     </div>
   );
