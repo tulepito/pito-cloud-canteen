@@ -162,6 +162,7 @@ const AddClientPaymentFormComponent: React.FC<
   const setEndDate = (date: number) => {
     form.change('endDate', date);
   };
+
   const filters = {
     companyId: values?.company?.value,
     bookerIds: values?.bookerIds,
@@ -190,8 +191,12 @@ const AddClientPaymentFormComponent: React.FC<
     }
   };
 
-  const hasFilters =
-    Object.values(submittedFilters).filter((i) => !!i).length >= 5;
+  const hasFilters = !!(
+    submittedFilters?.companyId ||
+    (submittedFilters?.bookerIds && submittedFilters?.bookerIds.length > 0) ||
+    (submittedFilters?.startDate && submittedFilters?.endDate) ||
+    submittedFilters?.partnerId
+  );
 
   const filteredPayments = filterClientPayment(
     unPaidPaymentList,

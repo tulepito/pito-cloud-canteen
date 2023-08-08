@@ -56,7 +56,7 @@ export const filterClientPayment = (
       !filterBookerIds.includes(booker.bookerId)
     )
       return false;
-
+    console.log({ filterCompanyId, company: company.companyId });
     if (filterCompanyId && company.companyId !== filterCompanyId) return false;
 
     if (
