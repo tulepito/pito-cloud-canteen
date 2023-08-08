@@ -341,6 +341,9 @@ export const CompanyOrdersTableColumns: TColumn[] = [
         state,
         plan,
         openOrderStateWarningModal,
+        startDateTimestamp,
+        orderId,
+        setSelectedOrderId,
       } = data;
       const titleContent = (
         <div className={css.title}>
@@ -385,6 +388,20 @@ export const CompanyOrdersTableColumns: TColumn[] = [
       }
 
       if ([EOrderStates.picking].includes(state)) {
+        const today = new Date().getTime();
+        const isTodayAfterStartDate =
+          Number(diffDays(startDateTimestamp, today, 'day').days) < 0;
+        if (isTodayAfterStartDate) {
+          return (
+            <InlineTextButton
+              onClick={() => {
+                openOrderStateWarningModal('expireStartOrder');
+                setSelectedOrderId(orderId);
+              }}>
+              {titleContent}
+            </InlineTextButton>
+          );
+        }
         returnComponent = (
           <NamedLink
             path={companyPaths.ManageOrderPicking}
