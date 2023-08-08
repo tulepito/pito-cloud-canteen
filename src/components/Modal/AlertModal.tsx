@@ -22,6 +22,7 @@ type TAlertModal = {
   confirmDisabled?: boolean;
   confirmInProgress?: boolean;
   cancelDisabled?: boolean;
+  cancelInProgress?: boolean;
   containerClassName?: string;
   actionsClassName?: string;
   cancelClassName?: string;
@@ -49,6 +50,7 @@ const AlertModal: React.FC<PropsWithChildren<TAlertModal>> = ({
   confirmClassName,
   childrenClassName,
   shouldFullScreenInMobile = true,
+  cancelInProgress = false,
 }) => {
   const shouldShowCancelButton =
     !isEmpty(cancelLabel) && typeof onCancel !== 'undefined';
@@ -80,6 +82,7 @@ const AlertModal: React.FC<PropsWithChildren<TAlertModal>> = ({
             className={classNames(css.reject, cancelClassName)}
             variant="secondary"
             size="medium"
+            inProgress={cancelInProgress}
             onClick={onCancel}>
             {cancelLabel}
           </Button>
