@@ -139,10 +139,13 @@ const ManagePaymentsPage = () => {
     const { id, paymentRecords } = item;
     const companyName = paymentRecords[0].companyName || '';
     const subOrderDate = paymentRecords[0].subOrderDate || '';
+    const dayIndex = new Date(Number(subOrderDate)).getDay();
     const deliveryHour = paymentRecords[0].deliveryHour || '';
-    const orderTitle = paymentRecords[0].orderTitle || '';
+    const orderTitle =
+      `${paymentRecords[0].orderTitle || ''}_` +
+      `${dayIndex === 0 ? 7 : dayIndex}`;
     const totalAmount = paymentRecords[0].totalPrice || 0;
-    const orderId = paymentRecords[0].orderId || '';
+    const orderId = `${paymentRecords[0].orderId || ''}`;
     const partnerId = paymentRecords[0].partnerId || '';
     const paidAmount = paymentRecords.reduce(
       (acc, cur) => acc + (cur.amount || 0),
@@ -219,7 +222,10 @@ const ManagePaymentsPage = () => {
   };
 
   const onDownloadPaymentList = () => {
-    const hasSelectedPaymentRecords = !isEmpty(selectedPaymentRecords);
+    const hasSelectedPaymentRecords = !isEmpty(
+      selectedPaymentRecords.rowCheckbox,
+    );
+
     if (hasSelectedPaymentRecords) {
       const selectedPaymentRecordsData = filteredTableData.filter((item) =>
         selectedPaymentRecords.rowCheckbox.includes(item.key),
