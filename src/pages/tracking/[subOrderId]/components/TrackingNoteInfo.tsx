@@ -9,7 +9,7 @@ import { Listing } from '@src/utils/data';
 import { EOrderType } from '@src/utils/enums';
 import type { TListing } from '@src/utils/types';
 
-import css from './TrackingOrderInfo.module.scss';
+import css from './TrackingNoteInfo.module.scss';
 
 type TTrackingOrderInfoProps = {};
 
