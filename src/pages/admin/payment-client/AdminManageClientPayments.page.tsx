@@ -288,10 +288,7 @@ const AdminManageClientPaymentsPage = () => {
     'restaurantId',
   );
 
-  const filteredTableData = filterClientPayment(
-    formattedTableData.slice(0, 1),
-    filters,
-  );
+  const filteredTableData = filterClientPayment(formattedTableData, filters);
   const filteredTableDataWithPagination = useMemo(
     () => filteredTableData.slice((page - 1) * 10, page * 10),
     [filteredTableData, page],
