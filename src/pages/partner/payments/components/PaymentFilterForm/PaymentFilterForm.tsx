@@ -98,7 +98,7 @@ const PaymentFilterFormComponent: React.FC<TPaymentFilterFormComponentProps> = (
             name="subOrderName"
             label="Tên đơn hàng"
             labelClassName={css.label}
-            placeholder="Tìm kiếm tên đơn hàng"
+            placeholder="Tìm kiếm mã đơn hàng"
             leftIcon={<IconSearch />}
           />
         </div>
