@@ -195,7 +195,7 @@ const OrderDetailPage = () => {
       setDefaultActiveKey(tabIndexMaybe === 0 ? 1 : tabIndexMaybe);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tab]);
+  }, [tab, tabItems]);
 
   return (
     <div>
