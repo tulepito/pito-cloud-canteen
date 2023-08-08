@@ -84,21 +84,21 @@ const PaymentFilterFormComponent: React.FC<TPaymentFilterFormComponentProps> = (
       <div>
         <div className={css.fieldInput}>
           <FieldTextInput
-            id="subOrderName"
-            name="subOrderName"
-            label="Tên đơn hàng"
+            id="orderTitle"
+            name="orderTitle"
+            label="Mã đơn hàng"
             labelClassName={css.label}
-            placeholder="Tìm kiếm đơn hàng"
+            placeholder="Tìm kiếm tên đơn hàng"
             leftIcon={<IconSearch />}
           />
         </div>
         <div className={css.fieldInput}>
           <FieldTextInput
-            id="orderTitle"
-            name="orderTitle"
-            label="Mã đơn hàng"
+            id="subOrderName"
+            name="subOrderName"
+            label="Tên đơn hàng"
             labelClassName={css.label}
-            placeholder="Tìm kiếm đơn hàng"
+            placeholder="Tìm kiếm tên đơn hàng"
             leftIcon={<IconSearch />}
           />
         </div>
