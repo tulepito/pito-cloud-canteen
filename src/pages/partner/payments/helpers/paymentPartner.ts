@@ -27,7 +27,7 @@ export const filterPayments = (paymentRecords: any[], filterList: TObject) => {
           .includes(orderTitle.toLocaleLowerCase())) &&
       isValidWithStartDateMaybe &&
       isValidWithEndDateMaybe &&
-      (typeof status === 'undefined' || status.includes(item.data.status))
+      (isEmpty(status) || status.includes(item.data.status))
     );
   };
 
