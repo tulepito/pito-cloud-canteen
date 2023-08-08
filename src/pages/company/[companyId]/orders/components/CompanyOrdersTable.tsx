@@ -156,6 +156,9 @@ const CompanyOrdersTable: React.FC<TCompanyOrdersTableProps> = () => {
   const updateOrderStateToDraftInProgress = useAppSelector(
     (state) => state.Order.updateOrderStateToDraftInProgress,
   );
+  const bookerDeleteOrderInProgress = useAppSelector(
+    (state) => state.Order.bookerDeleteOrderInProgress,
+  );
 
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
 
@@ -178,7 +181,22 @@ const CompanyOrdersTable: React.FC<TCompanyOrdersTableProps> = () => {
     setOrderWarningState(value);
   };
 
-  const closeOrderStateWarningModal = () => {
+  const onCancelOrderStateWarningModal = async () => {
+    if (orderWarningState === EOrderStates.expiredStart) {
+      console.log('aleleh: ', selectedOrderId, companyId);
+
+      await dispatch(
+        orderAsyncActions.bookerDeleteOrder({
+          orderId: selectedOrderId,
+          companyId,
+        }),
+      );
+
+      setOrderWarningState(null);
+    }
+  };
+
+  const closeOrderStateWarningModal = async () => {
     setOrderWarningState(null);
   };
 
@@ -318,11 +336,15 @@ const CompanyOrdersTable: React.FC<TCompanyOrdersTableProps> = () => {
         title={orderStateWarningModalTitle}
         isOpen={!!orderWarningState}
         handleClose={closeOrderStateWarningModal}
-        onCancel={closeOrderStateWarningModal}
+        onCancel={onCancelOrderStateWarningModal}
         onConfirm={onConfirmOrderStateWarningModal}
         content={orderStateWarningContent}
         confirmText={orderStateWarningModalConfirmText}
         confirmInProgress={updateOrderStateToDraftInProgress}
+        cancelText={
+          orderWarningState === EOrderStates.expiredStart ? 'Xóa đơn' : 'Thoát'
+        }
+        cancelInProgress={bookerDeleteOrderInProgress}
       />
     </div>
   );

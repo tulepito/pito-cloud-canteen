@@ -157,6 +157,9 @@ type TOrderInitialState = {
 
   updateOrderStateToDraftInProgress: boolean;
   updateOrderStateToDraftError: any;
+
+  bookerDeleteOrderInProgress: boolean;
+  bookerDeleteOrderError: any;
 };
 
 const initialState: TOrderInitialState = {
@@ -261,6 +264,9 @@ const initialState: TOrderInitialState = {
 
   updateOrderStateToDraftInProgress: false,
   updateOrderStateToDraftError: null,
+
+  bookerDeleteOrderInProgress: false,
+  bookerDeleteOrderError: null,
 };
 
 const CREATE_ORDER = 'app/Order/CREATE_ORDER';
@@ -288,6 +294,7 @@ const QUERY_ALL_ORDERS = 'app/Order/QUERY_ALL_ORDERS';
 
 const BOOKER_REORDER = 'app/Order/BOOKER_REORDER';
 const UPDATE_ORDER_STATE_TO_DRAFT = 'app/Order/UPDATE_ORDER_STATE_TO_DRAFT';
+const BOOKER_DELETE_ORDER = 'app/Order/BOOKER_DELETE_ORDER';
 
 const createOrder = createAsyncThunk(CREATE_ORDER, async (params: any) => {
   const { clientId, bookerId, isCreatedByAdmin = false, generalInfo } = params;
@@ -912,6 +919,24 @@ const updateOrderStateToDraft = createAsyncThunk(
   },
 );
 
+const bookerDeleteOrder = createAsyncThunk(
+  BOOKER_DELETE_ORDER,
+  async ({ orderId, companyId }: TObject, { getState }) => {
+    const { orders } = getState().Order;
+    await bookerDeleteDraftOrderApi({
+      orderId,
+      companyId,
+    });
+
+    const newOrders = orders.filter((order) => order.id.uuid !== orderId);
+
+    return newOrders;
+  },
+  {
+    serializeError: storableAxiosError,
+  },
+);
+
 export const orderAsyncActions = {
   createOrder,
   updateOrder,
@@ -937,6 +962,7 @@ export const orderAsyncActions = {
   queryAllOrders,
   bookerReorder,
   updateOrderStateToDraft,
+  bookerDeleteOrder,
 };
 
 const orderSlice = createSlice({
@@ -1430,7 +1456,20 @@ const orderSlice = createSlice({
         ...state,
         updateOrderStateToDraftInProgress: false,
         updateOrderStateToDraftError: error.message,
-      }));
+      }))
+
+      .addCase(bookerDeleteOrder.pending, (state) => {
+        state.bookerDeleteOrderInProgress = true;
+        state.bookerDeleteOrderError = null;
+      })
+      .addCase(bookerDeleteOrder.fulfilled, (state, { payload }) => {
+        state.bookerDeleteOrderInProgress = false;
+        state.orders = payload;
+      })
+      .addCase(bookerDeleteOrder.rejected, (state, { error }) => {
+        state.bookerDeleteOrderInProgress = false;
+        state.bookerDeleteOrderError = error.message;
+      });
   },
 });
 

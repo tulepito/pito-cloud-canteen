@@ -362,8 +362,10 @@ export const CompanyOrdersTableColumns: TColumn[] = [
 
       const isPitoOrderCancelled = state === EOrderStates.canceled;
 
-      const openOrderStateWarningModalFn = () =>
+      const openOrderStateWarningModalFn = () => {
         openOrderStateWarningModal(state);
+        setSelectedOrderId(orderId);
+      };
 
       if (isPitoOrderCancelled || state === EOrderStates.expiredStart) {
         return (

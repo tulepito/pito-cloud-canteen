@@ -24,7 +24,7 @@ import missingPickingOrderCover from '@src/assets/missingPickingCover.png';
 import pickingOrderCover from '@src/assets/pickingOrderCover.png';
 import { participantPaths } from '@src/paths';
 import { Listing, User } from '@src/utils/data';
-import { formatTimestamp } from '@src/utils/dates';
+import { diffDays, formatTimestamp } from '@src/utils/dates';
 import { EOrderStates } from '@src/utils/enums';
 import type { TListing, TUser } from '@utils/types';
 
@@ -76,12 +76,16 @@ const ParticipantOrderManagement = () => {
     selectedGroups = [],
     deadlineDate,
     orderState,
+    startDate,
   } = orderListing.getMetadata();
   const { displayName: bookerName } = companyUser.getProfile();
   const { companyName } = companyUser.getPublicData();
   const { groups = [] } = companyUser.getMetadata();
   const isOrderCanceled = orderState === EOrderStates.canceled;
   const isOrderExpiredStart = orderState === EOrderStates.expiredStart;
+  const today = new Date().getTime();
+  const isTodayAfterStartDate =
+    Number(diffDays(startDate, today, 'day').days) < 0;
   const selectedGroupNames =
     selectedGroups.includes('allMembers') || !selectedGroups.length
       ? ['Tất cả thành viên']
@@ -187,7 +191,8 @@ const ParticipantOrderManagement = () => {
             missingPickingOrderModalControl.value) &&
           !loadDataInProgress &&
           !isOrderCanceled &&
-          !isOrderExpiredStart
+          !isOrderExpiredStart &&
+          !isTodayAfterStartDate
         }>
         <RenderWhen condition={pickingOrderModalControl.value}>
           <CoverBox
