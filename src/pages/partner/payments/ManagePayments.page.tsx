@@ -222,7 +222,10 @@ const ManagePaymentsPage = () => {
   };
 
   const onDownloadPaymentList = () => {
-    const hasSelectedPaymentRecords = !isEmpty(selectedPaymentRecords);
+    const hasSelectedPaymentRecords = !isEmpty(
+      selectedPaymentRecords.rowCheckbox,
+    );
+
     if (hasSelectedPaymentRecords) {
       const selectedPaymentRecordsData = filteredTableData.filter((item) =>
         selectedPaymentRecords.rowCheckbox.includes(item.key),

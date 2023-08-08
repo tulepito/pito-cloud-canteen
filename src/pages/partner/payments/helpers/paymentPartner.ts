@@ -39,7 +39,7 @@ export const parseEntitiesToExportCsv = (paymentRecords: any[]) => {
     const {
       orderTitle,
       subOrderDate,
-      companyName,
+      subOrderName,
       deliveryHour,
       totalAmount,
       paidAmount,
@@ -49,7 +49,7 @@ export const parseEntitiesToExportCsv = (paymentRecords: any[]) => {
 
     return {
       ID: orderTitle,
-      'Tên đơn hàng': `${companyName}_${formatTimestamp(subOrderDate)}`,
+      'Tên đơn hàng': subOrderName,
       'Thời gian': `${deliveryHour} ${formatTimestamp(subOrderDate)}`,
       'Tổng giá trị': parseThousandNumber(totalAmount),
       'Đã thanh toán': parseThousandNumber(paidAmount),
