@@ -15,7 +15,7 @@ const TrackingContactInfo: React.FC<TTrackingContactInfoProps> = () => {
   const order = useAppSelector((state) => state.TrackingPage.order);
 
   const orderGetter = Listing(order as TListing);
-  const { staffName = '-' } = orderGetter.getMetadata();
+  const { staffName } = orderGetter.getMetadata();
 
   const rowData = useMemo(() => {
     return [
@@ -23,7 +23,7 @@ const TrackingContactInfo: React.FC<TTrackingContactInfoProps> = () => {
         label: intl.formatMessage({
           id: 'Tracking.ContactInfo.deliveryManName',
         }),
-        value: staffName,
+        value: staffName || '-',
       },
       {
         label: intl.formatMessage({
@@ -32,7 +32,8 @@ const TrackingContactInfo: React.FC<TTrackingContactInfoProps> = () => {
         value: '-',
       },
     ];
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [staffName]);
 
   return (
     <Collapsible
