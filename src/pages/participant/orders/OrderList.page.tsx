@@ -216,6 +216,8 @@ const OrderListPage = () => {
             currentPlanListing.getMetadata().orderDetail[planItemKey]
               ?.transactionId,
           orderState,
+          foodName: dishes.find((_dish) => _dish.key === foodSelection?.foodId)
+            ?.value,
         },
         title: orderTitle,
         start: DateTime.fromMillis(+planItemKey).toJSDate(),

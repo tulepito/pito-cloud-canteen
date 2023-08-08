@@ -23,12 +23,12 @@ const SubOrderList: React.FC<SubOrderListProps> = (props) => {
   } = props;
 
   return (
-    <div className={css.subOrdersWrapper}>
-      <RenderWhen condition={subOrders.length === 0}>
-        <div className={css.emptySubOrders}>
-          <EmptySubOrder title="Hiện chưa có món ăn đang triển khai" />
-        </div>
-        <RenderWhen.False>
+    <RenderWhen condition={subOrders.length === 0}>
+      <div className={css.emptySubOrders}>
+        <EmptySubOrder title="Hiện chưa có món ăn đang triển khai" />
+      </div>
+      <RenderWhen.False>
+        <div className={css.subOrdersWrapper}>
           {subOrders.map((subOrder: any) => (
             <SubOrderCard
               key={subOrder.id}
@@ -39,9 +39,9 @@ const SubOrderList: React.FC<SubOrderListProps> = (props) => {
               openRatingSubOrderModal={openRatingSubOrderModal}
             />
           ))}
-        </RenderWhen.False>
-      </RenderWhen>
-    </div>
+        </div>
+      </RenderWhen.False>
+    </RenderWhen>
   );
 };
 
