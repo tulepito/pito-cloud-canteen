@@ -326,7 +326,7 @@ type TFoodDataMap = TObject<string, TFoodDataValue>;
 export const getFoodDataMap = ({
   foodListOfDate = {},
   memberOrders,
-  orderType,
+  orderType = EOrderType.group,
   lineItems = [],
 }: any) => {
   if (orderType === EOrderType.group) {

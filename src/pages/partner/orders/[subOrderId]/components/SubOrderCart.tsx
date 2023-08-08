@@ -7,7 +7,10 @@ import { useRouter } from 'next/router';
 import Badge from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
 import { parseThousandNumber } from '@helpers/format';
-import { calculatePriceQuotationInfo } from '@helpers/order/cartInfoHelper';
+import {
+  calculatePriceQuotationInfo,
+  vatPercentageBaseOnVatSetting,
+} from '@helpers/order/cartInfoHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { useDownloadPriceQuotation } from '@hooks/useDownloadPriceQuotation';
 import { usePrepareOrderDetailPageData } from '@hooks/usePrepareOrderManagementData';
@@ -49,10 +52,16 @@ const SubOrderCart: React.FC<TSubOrderCartProps> = (props) => {
     orderVATPercentage = 0,
     serviceFees: serviceFeePercentageMap = {},
     quotationId,
+    vatSettings = {},
   } = orderGetter.getMetadata();
   const { orderDetail: planOrderDetail = {} } = planGetter.getMetadata();
   const serviceFeePercentage =
     serviceFeePercentageMap[restaurantListingId] || 0;
+  const vatSetting = vatSettings[restaurantListingId];
+  const vatPercentage = vatPercentageBaseOnVatSetting({
+    vatSetting,
+    vatPercentage: orderVATPercentage,
+  });
 
   const {
     promotion = 0,
@@ -64,7 +73,7 @@ const SubOrderCart: React.FC<TSubOrderCartProps> = (props) => {
   } = calculatePriceQuotationInfo({
     planOrderDetail,
     order,
-    currentOrderVATPercentage: orderVATPercentage,
+    currentOrderVATPercentage: vatPercentage,
     currentOrderServiceFeePercentage: serviceFeePercentage / 100,
     date,
     shouldIncludePITOFee: false,
@@ -73,13 +82,14 @@ const SubOrderCart: React.FC<TSubOrderCartProps> = (props) => {
   const { orderTitle, priceQuotationData } = usePrepareOrderDetailPageData({
     date,
     partnerId: restaurantListingId,
-    VATPercentage: orderVATPercentage,
+    VATPercentage: vatPercentage,
     serviceFeePercentage: serviceFeePercentage / 100,
   });
   const handleDownloadPriceQuotation = useDownloadPriceQuotation({
     orderTitle,
     priceQuotationData,
     isPartnerQuotation: true,
+    vatSetting,
   });
   const rootClasses = classNames(css.root, className);
   const titleClasses = classNames(css.title, {});
@@ -155,7 +165,7 @@ const SubOrderCart: React.FC<TSubOrderCartProps> = (props) => {
             <div className={css.label}>
               {intl.formatMessage({ id: 'SubOrderCart.VAT' })}
               <Badge
-                label={`${Math.round(orderVATPercentage * 100)}%`}
+                label={`${Math.round(vatPercentage * 100)}%`}
                 className={css.VATBadge}
               />
             </div>
