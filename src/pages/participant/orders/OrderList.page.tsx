@@ -479,6 +479,7 @@ const OrderListPage = () => {
         isOpen={successRatingModalControl.value}
         onClose={successRatingModalControl.setFalse}
         closeAllModals={closeAllModals}
+        fromOrderList
       />
       <NotificationModal
         isOpen={notificationModalControl.value}

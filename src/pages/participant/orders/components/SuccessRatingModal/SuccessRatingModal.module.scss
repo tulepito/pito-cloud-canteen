@@ -5,6 +5,10 @@
 .modalContainer.modalContainer {
   flex-basis: calc(100% - 32px);
   padding: 20px;
+
+  @include viewportLarge {
+    flex-basis: 500px;
+  }
 }
 
 .modalHeader {

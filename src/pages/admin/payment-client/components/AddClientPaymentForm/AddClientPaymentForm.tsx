@@ -1,4 +1,4 @@
-import { useEffect, useImperativeHandle, useRef, useState } from 'react';
+import { useImperativeHandle, useRef, useState } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import { OnChange } from 'react-final-form-listeners';
@@ -77,13 +77,9 @@ const AddClientPaymentFormComponent: React.FC<
     paymentRecordData.length === 0 ||
     (paymentRecordData.length !== 0 && !hasPaymentRecordValue);
 
-  const [unPaidPaymentListFiltered, setUnPaidPaymentListFiltered] =
-    useState<any[]>(unPaidPaymentList);
+  const [submittedFilters, setSubmittedFilters] = useState<TObject>({});
 
   useImperativeHandle(selectInputRef, () => selectFieldRef?.current);
-  useEffect(() => {
-    setUnPaidPaymentListFiltered(unPaidPaymentList);
-  }, [unPaidPaymentList]);
 
   const minEndDate = addDays(values.startDate!, 1);
 
@@ -166,17 +162,16 @@ const AddClientPaymentFormComponent: React.FC<
   const setEndDate = (date: number) => {
     form.change('endDate', date);
   };
+  const filters = {
+    companyId: values?.company?.value,
+    bookerIds: values?.bookerIds,
+    startDate: values?.startDate,
+    endDate: values?.endDate,
+    partnerId: values?.partnerId?.value,
+  };
 
   const filterUnPaidPaymentList = () => {
-    setUnPaidPaymentListFiltered(
-      filterClientPayment(unPaidPaymentList, {
-        companyId: values?.company?.value,
-        bookerIds: values?.bookerIds,
-        startDate: values?.startDate,
-        endDate: values?.endDate,
-        partnerId: values?.partnerId?.value,
-      }),
-    );
+    setSubmittedFilters(filters);
   };
 
   const handleSubmitForm = (_values: any) => {
@@ -188,14 +183,20 @@ const AddClientPaymentFormComponent: React.FC<
   const handleCompanyChange = (company: TObject) => {
     const { value } = company;
 
-    if (values?.company?.value !== value) {
-      form.change('bookerIds', []);
-    }
+    form.change('bookerIds', []);
 
     if (value && onQueryCompanyBookers) {
       onQueryCompanyBookers(value);
     }
   };
+
+  const hasFilters =
+    Object.values(submittedFilters).filter((i) => !!i).length >= 5;
+
+  const filteredPayments = filterClientPayment(
+    unPaidPaymentList,
+    submittedFilters,
+  );
 
   return (
     <Form onSubmit={handleSubmitForm}>
@@ -274,7 +275,7 @@ const AddClientPaymentFormComponent: React.FC<
       <div className={css.tableWrapper}>
         <Table
           columns={TABLE_COLUMNS}
-          data={unPaidPaymentListFiltered}
+          data={hasFilters ? filteredPayments : []}
           tableBodyCellClassName={css.tableBodyCell}
         />
       </div>

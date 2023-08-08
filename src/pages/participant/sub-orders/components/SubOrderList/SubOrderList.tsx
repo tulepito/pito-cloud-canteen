@@ -9,6 +9,8 @@ type SubOrderListProps = {
   subOrders: any;
   setSelectedSubOrder: (subOrder: any) => void;
   openSubOrderReviewModal: () => void;
+  setSelectedEvent?: (event: any) => void;
+  openRatingSubOrderModal?: () => void;
 };
 
 const SubOrderList: React.FC<SubOrderListProps> = (props) => {
@@ -16,6 +18,8 @@ const SubOrderList: React.FC<SubOrderListProps> = (props) => {
     subOrders = [],
     setSelectedSubOrder,
     openSubOrderReviewModal,
+    setSelectedEvent,
+    openRatingSubOrderModal,
   } = props;
 
   return (
@@ -31,6 +35,8 @@ const SubOrderList: React.FC<SubOrderListProps> = (props) => {
               subOrder={subOrder}
               setSelectedSubOrder={setSelectedSubOrder}
               openSubOrderReviewModal={openSubOrderReviewModal}
+              setSelectedEvent={setSelectedEvent}
+              openRatingSubOrderModal={openRatingSubOrderModal}
             />
           ))}
         </RenderWhen.False>
