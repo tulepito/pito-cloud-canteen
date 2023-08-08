@@ -272,18 +272,20 @@ export const ReviewContent: React.FC<any> = (props) => {
                 </span>
               </RenderWhen>
 
-              <div className={css.billOfLading} onClick={handleCopyLink}>
-                {intl.formatMessage({ id: 'ReviewOrder.billOfLading' })}
-                <Tooltip
-                  overlayClassName={css.toolTipOverlay}
-                  trigger="hover"
-                  tooltipContent={copyToClipboardTooltip}
-                  placement="bottom">
-                  <div>
-                    <IconCopy className={css.copyIcon} />
-                  </div>
-                </Tooltip>
-              </div>
+              <RenderWhen condition={isInProgressOrder}>
+                <div className={css.billOfLading} onClick={handleCopyLink}>
+                  {intl.formatMessage({ id: 'ReviewOrder.billOfLading' })}
+                  <Tooltip
+                    overlayClassName={css.toolTipOverlay}
+                    trigger="hover"
+                    tooltipContent={copyToClipboardTooltip}
+                    placement="bottom">
+                    <div>
+                      <IconCopy className={css.copyIcon} />
+                    </div>
+                  </Tooltip>
+                </div>
+              </RenderWhen>
             </div>
           </div>
         </Collapsible>
