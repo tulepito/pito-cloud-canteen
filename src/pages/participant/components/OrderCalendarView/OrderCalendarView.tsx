@@ -26,7 +26,7 @@ import { getDaySessionFromDeliveryTime, isSameDate } from '@src/utils/dates';
 import { EOrderStates, EParticipantOrderStatus } from '@src/utils/enums';
 import { convertStringToNumber } from '@src/utils/number';
 import { CurrentUser, Listing, User } from '@utils/data';
-import type { TCurrentUser, TListing, TUser } from '@utils/types';
+import type { TCurrentUser, TListing, TTransaction, TUser } from '@utils/types';
 
 import ParticipantToolbar from '../ParticipantToolbar/ParticipantToolbar';
 
@@ -39,6 +39,7 @@ type TOrderCalendarViewProps = {
   currentUser: TCurrentUser;
   loadDataInProgress?: boolean;
   restaurants: TListing[];
+  subOrderTxs: TTransaction[];
 };
 
 const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
@@ -49,6 +50,7 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
     currentUser,
     plans,
     loadDataInProgress,
+    subOrderTxs,
   } = props;
   const dispatch = useAppDispatch();
 
@@ -129,6 +131,9 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
         isAnchorTimeChanged = true;
         setAnchorTime(+planItemKey);
       }
+
+      const subOrderTx = subOrderTxs.find((tx) => tx.id.uuid === transactionId);
+
       const event = {
         resource: {
           id: `${planItemKey}`,
@@ -156,6 +161,7 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
           planId: currentPlanListing.getId(),
           orderState,
           companyName,
+          subOrderTx,
         },
         title: orderTitle,
         start: DateTime.fromMillis(+planItemKey).toJSDate(),
@@ -171,7 +177,6 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
   const subOrdersTxIds = compact(
     flattenEvents.map((_event: any) => _event.resource.transactionId),
   );
-
   useEffect(() => {
     if (subOrdersTxIds) {
       dispatch(OrderListThunks.fetchTransactionBySubOrder(subOrdersTxIds));
@@ -215,6 +220,14 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
     successRatingModalControl.setFalse();
   };
 
+  useEffect(() => {
+    if (selectedEvent) {
+      const { timestamp, planId } = selectedEvent.resource;
+      const subOrderId = `${currentUserId} - ${planId} - ${timestamp}`;
+      dispatch(OrderListThunks.fetchSubOrdersFromFirebase(subOrderId));
+    }
+  }, [selectedEvent]);
+
   return (
     <div className={css.container}>
       <div>
@@ -236,6 +249,7 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
               />
             ),
           }}
+          resources={{ setSelectedEvent }}
         />
       </div>
       <div className={css.subOrderContainer}>

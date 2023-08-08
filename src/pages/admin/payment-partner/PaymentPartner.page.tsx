@@ -10,6 +10,7 @@ import IconClose from '@components/Icons/IconClose/IconClose';
 import IconFilter from '@components/Icons/IconFilter/IconFilter';
 import IntegrationFilterModal from '@components/IntegrationFilterModal/IntegrationFilterModal';
 import NamedLink from '@components/NamedLink/NamedLink';
+import OutsideClickHandler from '@components/OutsideClickHandler/OutsideClickHandler';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import type { TColumn } from '@components/Table/Table';
 import { TableForm } from '@components/Table/Table';
@@ -336,12 +337,16 @@ const PaymentPartnerPage = () => {
             <Tooltip
               visible={filterPaymentModalController.value}
               tooltipContent={
-                <PaymentFilterModal
-                  onClose={filterPaymentModalController.setFalse}
-                  setFilters={setFilters}
-                  setPage={setPage}
-                  filters={filters}
-                />
+                <OutsideClickHandler
+                  className={css.tooltipWrapper}
+                  onOutsideClick={filterPaymentModalController.setFalse}>
+                  <PaymentFilterModal
+                    onClose={filterPaymentModalController.setFalse}
+                    setFilters={setFilters}
+                    setPage={setPage}
+                    filters={filters}
+                  />
+                </OutsideClickHandler>
               }
               placement="bottomLeft"
               trigger="click"

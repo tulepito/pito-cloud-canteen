@@ -157,7 +157,7 @@ const getDocumentById = async (documentId: string, collectionName: string) => {
   const docRef = doc(firestore, collectionName, documentId);
   const docSnap = await getDoc(docRef);
   if (docSnap.exists()) {
-    return docSnap.data();
+    return { ...docSnap.data(), id: docSnap.id };
   }
 
   return null;

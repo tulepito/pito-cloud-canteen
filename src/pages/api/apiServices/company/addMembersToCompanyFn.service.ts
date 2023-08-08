@@ -134,7 +134,7 @@ const addMembersToCompanyFn = async (params: TAddMembersToCompanyParams) => {
     );
 
     participantMemberIds.map(async (participantId: string) => {
-      createFirebaseDocNotification(ENotificationType.ORDER_DELIVERING, {
+      createFirebaseDocNotification(ENotificationType.INVITATION, {
         userId: participantId,
         companyName,
         companyId,

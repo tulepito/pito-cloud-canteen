@@ -48,8 +48,22 @@
   }
 
   .textReview {
-    margin-top: 20px;
+    margin-top: 8px;
     @include textTemplate(14px, $fontWeightRegular, 20px);
+    color: $neutralGray5;
+
+    span {
+      font-weight: $fontWeightSemiBold;
+    }
+  }
+
+  .detailTextRating {
+    color: $neutralGray6;
+    margin-top: 16px;
+  }
+
+  .foodName {
+    font-size: 12px;
   }
 
   .reviewAt {

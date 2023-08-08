@@ -136,6 +136,7 @@ export const usePrepareOrderDetailPageData = ({
       groupFoodOrderByDate({
         orderDetail,
         isGroupOrder,
+        date,
       }),
     [orderDetail, isGroupOrder],
   );
@@ -152,6 +153,7 @@ export const usePrepareOrderDetailPageData = ({
       groupFoodOrderByDate({
         orderDetail: draftOrderDetail,
         isGroupOrder,
+        date,
       }),
     [JSON.stringify(draftOrderDetail), isGroupOrder],
   );

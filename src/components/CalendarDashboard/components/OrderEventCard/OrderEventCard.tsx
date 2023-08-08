@@ -18,15 +18,21 @@ import css from './OrderEventCard.module.scss';
 export type TOrderEventCardProps = {
   event: Event;
   index: number;
+  resources?: any;
 };
 
-const OrderEventCard: React.FC<TOrderEventCardProps> = ({ event }) => {
+const OrderEventCard: React.FC<TOrderEventCardProps> = ({
+  event,
+  resources,
+}) => {
   const { isMobileLayout } = useViewport();
+  const { openRatingSubOrderModal, setSelectedEvent } = resources || {};
   const {
     status,
     expiredTime,
     isOrderStarted = false,
     transactionId,
+    subOrderTx: subOrderTxFromEvent,
   } = event.resource || {};
 
   const isFoodPicked = !!event.resource?.dishSelection?.dishSelection;
@@ -46,10 +52,22 @@ const OrderEventCard: React.FC<TOrderEventCardProps> = ({ event }) => {
     (state) => state.ParticipantOrderList.subOrderTxs,
     shallowEqual,
   );
+  const subOrderDocument = useAppSelector(
+    (state) => state.ParticipantOrderList.subOrderDocument,
+    shallowEqual,
+  );
+  const fetchSubOrderTxInProgress = useAppSelector(
+    (state) => state.ParticipantOrderList.fetchSubOrderTxInProgress,
+  );
+  const fetchSubOrderDocumentInProgress = useAppSelector(
+    (state) => state.ParticipantOrderList.fetchSubOrderDocumentInProgress,
+  );
 
   const subOrderTx = useMemo(
-    () => subOrderTxs.find((tx) => tx.id.uuid === transactionId),
-    [subOrderTxs, transactionId],
+    () =>
+      subOrderTxs.find((tx) => tx.id.uuid === transactionId) ||
+      subOrderTxFromEvent,
+    [subOrderTxFromEvent, subOrderTxs, transactionId],
   );
 
   return (
@@ -60,8 +78,18 @@ const OrderEventCard: React.FC<TOrderEventCardProps> = ({ event }) => {
           event={event}
           status={status}
           isExpired={isExpired}
+          subOrderDocument={subOrderDocument}
+          subOrderTx={subOrderTx}
+          fetchSubOrderTxInProgress={fetchSubOrderTxInProgress}
+          fetchSubOrderDocumentInProgress={fetchSubOrderDocumentInProgress}
+          openRatingSubOrderModal={openRatingSubOrderModal}
         />
       }
+      onVisibleChange={(visible) => {
+        if (visible) {
+          if (typeof setSelectedEvent === 'function') setSelectedEvent(event);
+        }
+      }}
       placement="rightTop"
       trigger={isMobileLayout ? '' : 'click'}
       overlayInnerStyle={{ backgroundColor: '#fff' }}>

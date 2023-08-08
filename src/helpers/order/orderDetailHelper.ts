@@ -1,8 +1,8 @@
 import isEmpty from 'lodash/isEmpty';
 
 import { Listing, User } from '@src/utils/data';
+import type { TListing, TObject, TUser } from '@src/utils/types';
 import { EParticipantOrderStatus, ESubOrderStatus } from '@utils/enums';
-import type { TListing, TObject, TUser } from '@utils/types';
 
 const groupFoodForGroupOrder = (
   orderDetail: TObject,

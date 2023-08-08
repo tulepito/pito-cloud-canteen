@@ -254,13 +254,13 @@ const LineItemsTable: React.FC<TLineItemsTableProps> = (props) => {
               })}
             </Button>
           </div>
-          {isDraftEditing && shouldShowOverflowError && (
+          {shouldShowOverflowError && (
             <ErrorMessage
               className={css.error}
               message={`Bạn đã vượt quá phần ăn tối đa của đối tác`}
             />
           )}
-          {isDraftEditing && shouldShowUnderError && (
+          {shouldShowUnderError && (
             <ErrorMessage
               className={css.error}
               message={`Cần đặt tối thiểu ${minQuantity} phần`}

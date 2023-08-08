@@ -496,16 +496,6 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
   const planId = plans.length > 0 ? plans[0] : undefined;
   const { address } = deliveryAddress || {};
 
-  useEffect(() => {
-    if (isEmpty(orderDetail) && !isEmpty(plans)) {
-      dispatch(orderAsyncActions.fetchOrderDetail(plans));
-    }
-  }, [
-    JSON.stringify(order),
-    JSON.stringify(orderDetail),
-    JSON.stringify(plans),
-  ]);
-
   const { renderedOrderDetail } =
     useMemo(() => {
       return {
@@ -560,6 +550,16 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
       shipperName,
     };
   }, [staffName, shipperName]);
+
+  useEffect(() => {
+    if (isEmpty(orderDetail) && !isEmpty(plans)) {
+      dispatch(orderAsyncActions.fetchOrderDetail(plans));
+    }
+  }, [
+    JSON.stringify(order),
+    JSON.stringify(orderDetail),
+    JSON.stringify(plans),
+  ]);
 
   return (
     <div className={css.root}>

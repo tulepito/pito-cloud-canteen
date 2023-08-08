@@ -26,7 +26,8 @@
   width: 100%;
   max-width: 1440px;
   height: 250px;
-
+  background-color: $neutralGray1;
+  box-shadow: $boxShadowPopup;
   @include viewportLarge {
     height: 300px;
   }

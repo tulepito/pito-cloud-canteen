@@ -61,6 +61,10 @@ const ParticipantOrderManagement = () => {
     (state) => state.ParticipantOrderManagementPage.restaurants,
     shallowEqual,
   );
+  const subOrderTxs = useAppSelector(
+    (state) => state.ParticipantOrderManagementPage.subOrderTxs,
+    shallowEqual,
+  );
   const loadDataInProgress = useAppSelector(
     (state) => state.ParticipantOrderManagementPage.loadDataInProgress,
   );
@@ -77,6 +81,7 @@ const ParticipantOrderManagement = () => {
   const { companyName } = companyUser.getPublicData();
   const { groups = [] } = companyUser.getMetadata();
   const isOrderCanceled = orderState === EOrderStates.canceled;
+  const isOrderExpiredStart = orderState === EOrderStates.expiredStart;
   const selectedGroupNames =
     selectedGroups.includes('allMembers') || !selectedGroups.length
       ? ['Tất cả thành viên']
@@ -165,6 +170,7 @@ const ParticipantOrderManagement = () => {
         restaurants,
         currentUser,
         loadDataInProgress,
+        subOrderTxs,
       },
     },
   ];
@@ -180,7 +186,8 @@ const ParticipantOrderManagement = () => {
           (pickingOrderModalControl.value ||
             missingPickingOrderModalControl.value) &&
           !loadDataInProgress &&
-          !isOrderCanceled
+          !isOrderCanceled &&
+          !isOrderExpiredStart
         }>
         <RenderWhen condition={pickingOrderModalControl.value}>
           <CoverBox

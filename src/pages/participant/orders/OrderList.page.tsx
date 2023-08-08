@@ -413,7 +413,11 @@ const OrderListPage = () => {
               />
             ),
           }}
-          resources={walkthroughEnable}
+          resources={{
+            walkthroughEnable,
+            openRatingSubOrderModal,
+            setSelectedEvent,
+          }}
         />
       </div>
       <div className={css.subOrderContainer}>
@@ -467,6 +471,7 @@ const OrderListPage = () => {
             selectedEvent={selectedEvent}
             currentUserId={currentUserId}
             openSuccessRatingModal={openSuccessRatingModal}
+            participantPostRatingInProgress={participantPostRatingInProgress}
           />
         </div>
       </RenderWhen>

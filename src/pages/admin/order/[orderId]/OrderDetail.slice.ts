@@ -590,7 +590,9 @@ const OrderDetailSlice = createSlice({
             ...currOrderDetail,
             [date]: {
               ...currOrderDetail[date],
-              status: 'canceled',
+              ...(transition === ETransition.OPERATOR_CANCEL_PLAN && {
+                status: 'canceled',
+              }),
             },
           };
         }
