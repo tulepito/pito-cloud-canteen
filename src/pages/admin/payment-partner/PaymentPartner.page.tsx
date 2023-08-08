@@ -94,7 +94,11 @@ const PaymentPartnerPage = () => {
           <NamedLink
             className={css.orderTitle}
             path={adminPaths.OrderDetail}
-            params={{ orderId, tab: EOrderDetailTabs.PAYMENT_STATUS }}>
+            params={{
+              orderId,
+              tab: EOrderDetailTabs.PAYMENT_STATUS,
+              subOrderDate,
+            }}>
             {`#${orderTitle}-${getDayOfWeek(+subOrderDate)}`}
           </NamedLink>
         </div>
