@@ -64,6 +64,20 @@
   }
 }
 
+.vatContainer {
+  display: flex;
+  flex-direction: column;
+  row-gap: 8px;
+  padding-bottom: 16px;
+  margin-top: -4px;
+
+  .vatField {
+    label {
+      padding: 0;
+    }
+  }
+}
+
 .configField {
   display: flex;
   gap: 20px;

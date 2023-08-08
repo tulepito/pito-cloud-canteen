@@ -1,6 +1,6 @@
 /* eslint-disable import/no-cycle */
 import React from 'react';
-import { Field, Form as FinalForm } from 'react-final-form';
+import { Form as FinalForm } from 'react-final-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import classNames from 'classnames';
 import arrayMutators from 'final-form-arrays';
@@ -9,15 +9,16 @@ import Button from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import Form from '@components/Form/Form';
 import FieldCheckboxGroup from '@components/FormFields/FieldCheckboxGroup/FieldCheckboxGroup';
+import FieldRadioButton from '@components/FormFields/FieldRadioButton/FieldRadioButton';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import IconEdit from '@components/Icons/IconEdit/IconEdit';
 import NamedLink from '@components/NamedLink/NamedLink';
 import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
-import ToggleButton from '@components/ToggleButton/ToggleButton';
 import { useAppSelector } from '@hooks/reduxHooks';
 import {
   BUSINESS_TYPE_OPTIONS,
   EImageVariants,
+  EPartnerVATSetting,
   ERestaurantListingStatus,
   EXTRA_SERVICE_OPTIONS,
   LIST_BANKS,
@@ -57,7 +58,6 @@ const EditPartnerPreviewForm: React.FC<any> = (props) => {
         const {
           handleSubmit,
           values,
-          form,
           formError,
           inProgress,
           onDiscard,
@@ -318,25 +318,38 @@ const EditPartnerPreviewForm: React.FC<any> = (props) => {
                         id: 'EditPartnerForm.retaurantConfigLabel',
                       })}
                     </div>
-                    <Field name="vat" id="vat">
-                      {(vatFieldProps: any) => {
-                        const { input } = vatFieldProps;
-
-                        return (
-                          <ToggleButton
-                            disabled
-                            className={css.vatButton}
-                            id={input.name}
-                            name={input.name}
-                            label={intl.formatMessage({
-                              id: 'EditPartnerForm.exportVat',
-                            })}
-                            onClick={(e: any) => form.change('vat', e)}
-                            defaultValue={input.value}
-                          />
-                        );
-                      }}
-                    </Field>
+                    <div className={css.vatContainer}>
+                      <FieldRadioButton
+                        name="vat"
+                        id="vat.exportVat"
+                        value={EPartnerVATSetting.vat}
+                        label={intl.formatMessage({
+                          id: 'EditPartnerForm.exportVat',
+                        })}
+                        className={css.vatField}
+                        disabled
+                      />
+                      <FieldRadioButton
+                        name="vat"
+                        id="vat.noExportVat"
+                        value={EPartnerVATSetting.noExportVat}
+                        label={intl.formatMessage({
+                          id: 'EditPartnerForm.noExportVat',
+                        })}
+                        className={css.vatField}
+                        disabled
+                      />
+                      <FieldRadioButton
+                        name="vat"
+                        id="vat.direct"
+                        value={EPartnerVATSetting.direct}
+                        label={intl.formatMessage({
+                          id: 'EditPartnerForm.direct',
+                        })}
+                        className={css.vatField}
+                        disabled
+                      />
+                    </div>
                     <FieldTextInput
                       name="minPrice"
                       className={css.minPrice}
