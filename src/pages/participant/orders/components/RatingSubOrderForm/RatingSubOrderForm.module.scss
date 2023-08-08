@@ -10,6 +10,12 @@
   padding-bottom: 20px;
   border-bottom: 1px solid $neutralGray4;
 
+  @include viewportLarge {
+    width: 360px;
+    border: none;
+    margin: 0 auto;
+  }
+
   .generalRatingTitle {
     @include textTemplate(16px, $fontWeightBold, 24px);
     text-align: center;

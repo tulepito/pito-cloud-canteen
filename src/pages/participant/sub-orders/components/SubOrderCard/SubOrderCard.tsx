@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 import { useIntl } from 'react-intl';
 import last from 'lodash/last';
-import { useRouter } from 'next/router';
 
 import Badge, { EBadgeType } from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
@@ -10,7 +9,6 @@ import IconShop from '@components/Icons/IconShop/IconShop';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { participantPaths } from '@src/paths';
 import { Listing } from '@src/utils/data';
 import { formatTimestamp } from '@src/utils/dates';
 import { EImageVariants } from '@src/utils/enums';
@@ -24,6 +22,8 @@ type SubOrderCardProps = {
   subOrder: any;
   setSelectedSubOrder: (subOrder: any) => void;
   openSubOrderReviewModal: () => void;
+  setSelectedEvent?: (event: any) => void;
+  openRatingSubOrderModal?: () => void;
 };
 
 const getTxStatusLabel = (txStatus: string) => {
@@ -49,7 +49,13 @@ const getTxStatusBadgeType = (txStatus: string) => {
 };
 
 const SubOrderCard: React.FC<SubOrderCardProps> = (props) => {
-  const { subOrder, setSelectedSubOrder, openSubOrderReviewModal } = props;
+  const {
+    subOrder,
+    setSelectedSubOrder,
+    openSubOrderReviewModal,
+    setSelectedEvent,
+    openRatingSubOrderModal,
+  } = props;
   const dispatch = useAppDispatch();
   const intl = useIntl();
   const {
@@ -59,11 +65,10 @@ const SubOrderCard: React.FC<SubOrderCardProps> = (props) => {
     txStatus,
     id,
     reviewId,
-    planId,
     deliveryHour,
+    restaurantId,
   } = subOrder;
-
-  const router = useRouter();
+  const timestamp = parseInt(`${last(id.split(' - '))}`, 10);
   const subOrderReview = useAppSelector(
     (state) => state.ParticipantSubOrderList.subOrderReview,
   );
@@ -72,7 +77,6 @@ const SubOrderCard: React.FC<SubOrderCardProps> = (props) => {
   );
   const reviewListing = Listing(review as TListing);
   const { generalRating } = reviewListing.getMetadata();
-  const timestamp = parseInt(`${last(id.split(' - '))}`, 10);
   const subOrderTime = `${deliveryHour} ${formatTimestamp(
     timestamp,
     "EEEE, 'ngày' dd/MM/yyyy",
@@ -83,14 +87,17 @@ const SubOrderCard: React.FC<SubOrderCardProps> = (props) => {
       dispatch(SubOrdersThunks.fetchReviewFromSubOrder(reviewId));
     }
   }, [dispatch, reviewId]);
-  const goToRatingPage = () => {
-    router.push({
-      pathname: participantPaths.OrderList,
-      query: {
-        planId,
+  const openReviewRatingModal = () => {
+    setSelectedEvent?.({
+      resource: {
+        ...subOrder,
         timestamp,
+        restaurant: {
+          id: restaurantId,
+        },
       },
     });
+    openRatingSubOrderModal?.();
   };
 
   const openReviewModal = () => {
@@ -136,7 +143,7 @@ const SubOrderCard: React.FC<SubOrderCardProps> = (props) => {
           />
           <RenderWhen condition={isSubOrderDelivered}>
             <RenderWhen condition={!reviewId}>
-              <Button className={css.ratingBtn} onClick={goToRatingPage}>
+              <Button className={css.ratingBtn} onClick={openReviewRatingModal}>
                 Đánh giá
               </Button>
               <RenderWhen.False>
