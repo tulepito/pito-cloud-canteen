@@ -92,6 +92,18 @@ const OrderHeaderState: React.FC<OrderHeaderStateProps> = (props) => {
     confirmCancelOrderActions.setFalse();
   };
 
+  const handleCloseDropdownAfterClickedAction = (func: () => void) => () => {
+    func();
+    orderStateActionDropdownControl.setFalse();
+  };
+
+  const handleClickCancelOrder = handleCloseDropdownAfterClickedAction(
+    confirmCancelOrderActions.setTrue,
+  );
+  const handleClickTurnOnDraftEditMode = handleCloseDropdownAfterClickedAction(
+    turnOnDraftEditMode!,
+  );
+
   return (
     <div className={css.header}>
       <div className={css.orderTitle}>
@@ -110,7 +122,7 @@ const OrderHeaderState: React.FC<OrderHeaderStateProps> = (props) => {
               <RenderWhen condition={canCancelOrder}>
                 <div
                   className={css.actionItem}
-                  onClick={confirmCancelOrderActions.setTrue}>
+                  onClick={handleClickCancelOrder}>
                   Huỷ đơn
                 </div>
               </RenderWhen>
@@ -123,7 +135,9 @@ const OrderHeaderState: React.FC<OrderHeaderStateProps> = (props) => {
               </RenderWhen>
 
               <RenderWhen condition={shouldManagePickingBtn}>
-                <div className={css.actionItem} onClick={turnOnDraftEditMode}>
+                <div
+                  className={css.actionItem}
+                  onClick={handleClickTurnOnDraftEditMode}>
                   Quản lý chọn món
                 </div>
               </RenderWhen>
