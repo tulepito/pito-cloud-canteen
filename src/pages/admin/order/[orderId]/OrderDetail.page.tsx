@@ -23,7 +23,7 @@ import css from './OrderDetail.module.scss';
 const OrderDetailPage = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
-  const { orderId, tab } = router.query;
+  const { orderId, tab, subOrderDate } = router.query;
   const [defaultActiveKey, setDefaultActiveKey] = useState<number>(1);
 
   const order = useAppSelector(
@@ -183,6 +183,7 @@ const OrderDetailPage = () => {
         updateOrderStateInProgress,
         quotations,
         quotationsPagination,
+        subOrderDate,
       },
     },
   ]);

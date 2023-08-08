@@ -38,6 +38,7 @@ type OrderPaymentStatusTabProps = {
   quotations: TListing[];
   updateOrderState: (newOrderState: string) => void;
   updateOrderStateInProgress: boolean;
+  subOrderDate?: string;
 };
 
 const OrderPaymentStatusTab: React.FC<OrderPaymentStatusTabProps> = (props) => {
@@ -48,9 +49,12 @@ const OrderPaymentStatusTab: React.FC<OrderPaymentStatusTabProps> = (props) => {
     updateOrderStateInProgress,
     quotations,
     company,
+    subOrderDate: subOrderDateFromQuery,
   } = props;
+
   const dispatch = useAppDispatch();
   const [selectedSubOrderDate, setSelectedSubOrderDate] = useState<string>('');
+  const [defaultActiveKey, setDefaultActiveKey] = useState<number>(1);
 
   const currentOrderVATPercentage = useAppSelector(
     (state) => state.SystemAttributes.currentOrderVATPercentage,
@@ -75,84 +79,86 @@ const OrderPaymentStatusTab: React.FC<OrderPaymentStatusTabProps> = (props) => {
   const partnerCurrentQuotationListing = Listing(partnerCurrentQuotation!);
   const { partner = {} } = partnerCurrentQuotationListing.getMetadata();
 
-  const partnerTabItems =
-    !isEmpty(quotations) &&
-    compact(
-      Object.keys(orderDetail).map((subOrderDate: string) => {
-        if (
-          isEmpty(
-            partner[orderDetail[subOrderDate].restaurant.id]?.quotation,
-          ) ||
-          orderDetail[subOrderDate].status === ESubOrderStatus.CANCELED ||
-          !orderDetail[subOrderDate].transactionId
-        ) {
-          return null;
-        }
+  const partnerTabItems = !isEmpty(quotations)
+    ? compact(
+        Object.keys(orderDetail).map((subOrderDate: string) => {
+          if (
+            isEmpty(
+              partner[orderDetail[subOrderDate].restaurant.id]?.quotation,
+            ) ||
+            orderDetail[subOrderDate].status === ESubOrderStatus.CANCELED ||
+            !orderDetail[subOrderDate].transactionId
+          ) {
+            return null;
+          }
 
-        const partnerQuotationBySubOrderDate = calculatePriceQuotationPartner({
-          quotation:
-            partner[orderDetail[subOrderDate].restaurant.id]?.quotation,
-          serviceFeePercentage:
-            serviceFees[orderDetail[subOrderDate].restaurant.id],
-          currentOrderVATPercentage,
-          subOrderDate,
-        });
+          const partnerQuotationBySubOrderDate = calculatePriceQuotationPartner(
+            {
+              quotation:
+                partner[orderDetail[subOrderDate].restaurant.id]?.quotation,
+              serviceFeePercentage:
+                serviceFees[orderDetail[subOrderDate].restaurant.id],
+              currentOrderVATPercentage,
+              subOrderDate,
+            },
+          );
 
-        const { totalWithVAT } = partnerQuotationBySubOrderDate;
-        const partnerPaymentRecordsByDate =
-          partnerPaymentRecords?.[subOrderDate]?.filter(
-            (_record) => !_record.isHideFromHistory,
-          ) || [];
-        const paidAmount = calculatePaidAmountBySubOrderDate(
-          partnerPaymentRecordsByDate,
-        );
-        const showCheckmark = totalWithVAT === paidAmount;
-
-        return {
-          key: subOrderDate,
-          label: (
-            <Tooltip
-              placement="bottomLeft"
-              overlayClassName={css.tooltipOverlay}
-              overlayInnerStyle={{
-                backgroundColor: '#fff',
-                padding: 0,
-              }}
-              tooltipContent={
-                <div className={css.tooltipName}>{`${
-                  orderDetail[subOrderDate].restaurant.restaurantName
-                } #${orderTitle}-${getDayOfWeek(+subOrderDate)}`}</div>
-              }>
-              <div className={css.labelWrapper}>
-                <div className={css.label}>
-                  {`${
-                    orderDetail[subOrderDate].restaurant.restaurantName
-                  } #${orderTitle}-${getDayOfWeek(+subOrderDate)}`}
-                </div>
-                <RenderWhen condition={showCheckmark}>
-                  <IconCheckmarkWithCircle className={css.checkIcon} />
-                </RenderWhen>
-              </div>
-            </Tooltip>
-          ),
-          childrenFn: (childProps: any) => (
-            <PartnerPaymentDetail {...childProps} />
-          ),
-          childrenProps: {
-            partnerName: orderDetail[subOrderDate].restaurant.restaurantName,
-            subOrderDate: selectedSubOrderDate,
-            orderId,
-            partnerId: orderDetail[subOrderDate].restaurant.id,
+          const { totalWithVAT } = partnerQuotationBySubOrderDate;
+          const partnerPaymentRecordsByDate =
+            partnerPaymentRecords?.[subOrderDate]?.filter(
+              (_record) => !_record.isHideFromHistory,
+            ) || [];
+          const paidAmount = calculatePaidAmountBySubOrderDate(
             partnerPaymentRecordsByDate,
-            totalWithVAT,
-            paidAmount,
-            company,
-            orderTitle,
-            deliveryHour,
-          },
-        };
-      }),
-    );
+          );
+          const showCheckmark = totalWithVAT === paidAmount;
+
+          return {
+            key: subOrderDate,
+            label: (
+              <Tooltip
+                placement="bottomLeft"
+                overlayClassName={css.tooltipOverlay}
+                overlayInnerStyle={{
+                  backgroundColor: '#fff',
+                  padding: 0,
+                }}
+                tooltipContent={
+                  <div className={css.tooltipName}>{`${
+                    orderDetail[subOrderDate].restaurant.restaurantName
+                  } #${orderTitle}-${getDayOfWeek(+subOrderDate)}`}</div>
+                }>
+                <div className={css.labelWrapper}>
+                  <div className={css.label}>
+                    {`${
+                      orderDetail[subOrderDate].restaurant.restaurantName
+                    } #${orderTitle}-${getDayOfWeek(+subOrderDate)}`}
+                  </div>
+                  <RenderWhen condition={showCheckmark}>
+                    <IconCheckmarkWithCircle className={css.checkIcon} />
+                  </RenderWhen>
+                </div>
+              </Tooltip>
+            ),
+            childrenFn: (childProps: any) => (
+              <PartnerPaymentDetail {...childProps} />
+            ),
+            childrenProps: {
+              partnerName: orderDetail[subOrderDate].restaurant.restaurantName,
+              subOrderDate: selectedSubOrderDate,
+              orderId,
+              partnerId: orderDetail[subOrderDate].restaurant.id,
+              partnerPaymentRecordsByDate,
+              totalWithVAT,
+              paidAmount,
+              company,
+              orderTitle,
+              deliveryHour,
+            },
+          };
+        }),
+      )
+    : null;
 
   const { totalWithVAT: clientTotalPrice } = calculatePriceQuotationInfo({
     planOrderDetail: orderDetail,
@@ -201,6 +207,17 @@ const OrderPaymentStatusTab: React.FC<OrderPaymentStatusTabProps> = (props) => {
     dispatch(OrderDetailThunks.fetchClientPaymentRecords(orderId));
   }, [dispatch, orderId]);
 
+  useEffect(() => {
+    if (subOrderDateFromQuery) {
+      const tabIndexMaybe =
+        (partnerTabItems || []).findIndex(
+          (item) => item.key === subOrderDateFromQuery,
+        ) + 1;
+      setDefaultActiveKey(tabIndexMaybe === 0 ? 1 : tabIndexMaybe);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [subOrderDateFromQuery, partnerTabItems]);
+
   const handleUpdateOrderState = (state: EOrderStates) => () => {
     updateOrderState(state);
   };
@@ -218,7 +235,11 @@ const OrderPaymentStatusTab: React.FC<OrderPaymentStatusTabProps> = (props) => {
       />
       <RenderWhen condition={!isEmpty(quotations)}>
         <div className={css.tabContainer}>
-          <Tabs items={totalTabItems as any} onChange={onTabChange} />
+          <Tabs
+            items={totalTabItems as any}
+            onChange={onTabChange}
+            defaultActiveKey={`${defaultActiveKey}`}
+          />
         </div>
       </RenderWhen>
     </div>
