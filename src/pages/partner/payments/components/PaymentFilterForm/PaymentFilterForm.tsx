@@ -76,7 +76,7 @@ const PaymentFilterFormComponent: React.FC<TPaymentFilterFormComponentProps> = (
   };
 
   return (
-    <Form onSubmit={handleSubmit}>
+    <Form onSubmit={handleSubmit} className={css.root}>
       <div className={css.closeContainer}>
         <div>Lọc</div>
         <IconClose className={css.iconClose} onClick={onClose} />
