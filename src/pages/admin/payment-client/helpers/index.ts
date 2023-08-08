@@ -29,7 +29,6 @@ export const filterClientPayment = (
       orderTitle,
       status,
       startDate,
-      endDate,
       restaurants = [],
       company = {},
       booker = {},
@@ -68,9 +67,12 @@ export const filterClientPayment = (
     )
       return false;
 
-    if (filterStartDate && startDate < filterStartDate) return false;
-
-    if (filterEndDate && endDate > filterEndDate) return false;
+    if (
+      filterStartDate &&
+      filterEndDate &&
+      (startDate < filterStartDate || startDate > filterEndDate)
+    )
+      return false;
 
     if (
       filterStatus &&
