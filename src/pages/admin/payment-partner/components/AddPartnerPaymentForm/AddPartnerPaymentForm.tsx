@@ -103,7 +103,7 @@ const AddPartnerPaymentFormComponent: React.FC<
       key: 'id',
       label: 'ID',
       render: ({ orderTitle, subOrderDate }: any) => (
-        <div className={css.orderTitle}>{`#${orderTitle}_${getDayOfWeek(
+        <div className={css.orderTitle}>{`#${orderTitle}-${getDayOfWeek(
           +subOrderDate,
         )}`}</div>
       ),
