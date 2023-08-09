@@ -7,7 +7,7 @@ import { getIntegrationSdk } from '@services/integrationSdk';
 import { queryPaymentRecordOnFirebase } from '@services/payment';
 import { handleError } from '@services/sdk';
 import { Listing } from '@src/utils/data';
-import { EOrderStates, EPaymentType } from '@src/utils/enums';
+import { EOrderStates, EPaymentType, ESubOrderStatus } from '@src/utils/enums';
 
 import { calculateClientTotalPriceAndPaidAmount } from './check-valid-payment.service';
 
@@ -60,6 +60,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     const subOrderDatePaymentStatus = Object.keys(
       groupPaymentRecordsBySubOrderDate,
     ).reduce((result: any, subOrderDate: string) => {
+      if (
+        !orderDetail[subOrderDate]?.transactionId ||
+        (orderDetail[subOrderDate]?.transactionId &&
+          orderDetail[subOrderDate]?.status === ESubOrderStatus.CANCELED)
+      ) {
+        return result;
+      }
       const paymentRecords = groupPaymentRecordsBySubOrderDate[subOrderDate];
       const totalPrice = paymentRecords?.[0]?.totalPrice || 0;
       const paidAmount = calculatePaidAmountBySubOrderDate(paymentRecords);
@@ -91,8 +98,26 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       },
     });
 
+    const activeOrderDetail = Object.keys(orderDetail).reduce(
+      (result: any, subOrderDate: string) => {
+        if (
+          !orderDetail[subOrderDate]?.transactionId ||
+          (orderDetail[subOrderDate]?.transactionId &&
+            orderDetail[subOrderDate]?.status === ESubOrderStatus.CANCELED)
+        ) {
+          return result;
+        }
+
+        return {
+          ...result,
+          [subOrderDate]: orderDetail[subOrderDate],
+        };
+      },
+      {},
+    );
+
     const isPaymentNumberEqualToSubOrderDateNumber =
-      Object.keys(orderDetail).length ===
+      Object.keys(activeOrderDetail).length ===
       Object.keys(subOrderDatePaymentStatus).length;
 
     const isPartnerPaidAmountEnough = Object.values(
