@@ -12,7 +12,7 @@ import { useRouter } from 'next/router';
 import Collapsible from '@components/Collapsible/Collapsible';
 import ConfirmationModal from '@components/ConfirmationModal/ConfirmationModal';
 import Form from '@components/Form/Form';
-import { FieldSelectComponent } from '@components/FormFields/FieldSelect/FieldSelect';
+import { FieldDropdownSelectComponent } from '@components/FormFields/FieldDropdownSelect/FieldDropdownSelect';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import ReviewOrdersResultSection from '@components/OrderDetails/ReviewView/ReviewOrdersResultSection/ReviewOrdersResultSection';
@@ -167,13 +167,6 @@ export const ReviewContent: React.FC<any> = (props) => {
   } = Listing(order as TListing).getMetadata();
   const { restaurantName, phoneNumber, foodList = {} } = restaurant || {};
   const isInProgressOrder = orderState === EOrderStates.inProgress;
-  const isCancelOrder = [
-    EOrderStates.canceled,
-    EOrderStates.canceledByBooker,
-  ].includes(orderState);
-
-  const fieldDeliveryManDisabled =
-    isCancelOrder || deliveryManOptions?.length === 0;
 
   const parsedFoodList = Object.keys(foodList).map((key, index) => {
     return {
@@ -210,6 +203,15 @@ export const ReviewContent: React.FC<any> = (props) => {
     setCurrDeliveryManPhoneNumber(deliveryManPhoneNumber);
   }, [deliveryManPhoneNumber]);
 
+  const parsedDeliveryManOptions = useMemo(
+    () =>
+      deliveryManOptions.map((d) => ({
+        key: d.key,
+        label: d.name,
+      })),
+    [JSON.stringify(deliveryManOptions)],
+  );
+
   return (
     <div>
       <RenderWhen condition={isInProgressOrder}>
@@ -235,23 +237,16 @@ export const ReviewContent: React.FC<any> = (props) => {
               <span className={css.boxTitle}>
                 {intl.formatMessage({ id: 'ReviewOrder.deliveryManName' })}
               </span>
-              <FieldSelectComponent
+              <FieldDropdownSelectComponent
                 id={`${timeStamp}_deliveryMan`}
                 name="deliveryMan"
                 className={css.selectBoxContent}
                 meta={deliveryMan.meta}
+                options={parsedDeliveryManOptions}
+                placeholder="Chọn nhân viên"
                 input={deliveryMan.input}
-                disabled={fieldDeliveryManDisabled}
-                onChange={handleFieldDeliveryManChange}>
-                <option disabled value={''}>
-                  Chọn nhân viên
-                </option>
-                {deliveryManOptions.map(({ key, name }) => (
-                  <option key={key} value={key}>
-                    {name}
-                  </option>
-                ))}
-              </FieldSelectComponent>
+                customOnChange={handleFieldDeliveryManChange}
+              />
             </div>
             <div className={css.flexChild}>
               <span className={css.boxTitle}>

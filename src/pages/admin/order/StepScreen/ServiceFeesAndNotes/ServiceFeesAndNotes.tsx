@@ -61,13 +61,10 @@ const ServiceFeesAndNotes: React.FC<ServiceFeesAndNotesProps> = (props) => {
   const { notes, serviceFees, memberAmount = 0 } = orderListing.getMetadata();
   const numberOfOrderDays = Object.keys(orderDetail).length;
   const PITOFee = getPCCFeeByMemberAmount(memberAmount) * numberOfOrderDays;
-  const restaurantOptions = restaurantList.map((restaurant: TListing) => (
-    <option
-      key={Listing(restaurant).getId()}
-      value={Listing(restaurant).getId()}>
-      {`${Listing(restaurant).getAttributes().title}`}
-    </option>
-  ));
+  const restaurantOptions = restaurantList.map((restaurant: TListing) => ({
+    label: Listing(restaurant).getAttributes().title,
+    key: Listing(restaurant).getId(),
+  }));
 
   const partnerFormInitialValues = useMemo(() => {
     return restaurantList.reduce((result: any, restaurant: TListing | null) => {

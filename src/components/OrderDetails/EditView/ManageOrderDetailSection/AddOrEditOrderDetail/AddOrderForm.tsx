@@ -10,7 +10,7 @@ import Button from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import Form from '@components/Form/Form';
 import FieldCustomSelectComponent from '@components/FormFields/FieldCustomSelect/FieldCustomSelect';
-import FieldSelect from '@components/FormFields/FieldSelect/FieldSelect';
+import FieldDropdownSelect from '@components/FormFields/FieldDropdownSelect/FieldDropdownSelect';
 import FieldTextArea from '@components/FormFields/FieldTextArea/FieldTextArea';
 import IconMinus from '@components/Icons/IconMinus/IconMinus';
 import IconPlusWithoutBorder from '@components/Icons/IconPlusWithoutBorder/IconPlusWithoutBorder';
@@ -142,21 +142,10 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
     [JSON.stringify(memberOptions)],
   );
 
-  const selectFoodOptions = (
-    <>
-      <option disabled value="">
-        {intl.formatMessage({
-          id: 'AddOrderForm.foodIdField.placeholder',
-        })}
-      </option>
-
-      {foodOptions?.map(({ foodId, foodName }) => (
-        <option title={foodName} key={foodId} value={foodId}>
-          {shortenString(foodName, 18)}
-        </option>
-      ))}
-    </>
-  );
+  const parsedFoodOptions = foodOptions?.map((f) => ({
+    label: shortenString(f.foodName, 18),
+    key: f.foodId,
+  }));
 
   const customHandleSubmit = (event: any) => {
     return handleSubmit(event)?.then((submitResult) => {
@@ -231,13 +220,17 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
           )}
         </div>
         <div className={css.fieldContainer}>
-          <FieldSelect
+          <FieldDropdownSelect
+            className={css.fieldSelect}
+            options={parsedFoodOptions}
             disabled={fieldSelectFoodDisable}
             id={'addOrder.foodId'}
             name="foodId"
-            selectClassName={css.fieldSelect}>
-            {selectFoodOptions}
-          </FieldSelect>
+            placeholder={intl.formatMessage({
+              id: 'AddOrderForm.foodIdField.placeholder',
+            })}
+            fieldWrapperClassName={css.fieldSelectWrapper}
+          />
         </div>
         <Button
           disabled={submitDisabled}

@@ -76,7 +76,6 @@
   left: -280px;
   width: 100%;
   opacity: 0;
-  background-color: $neutralGray1;
   transition: 0.3s linear;
   padding: 0 28px 28px;
 }
@@ -85,7 +84,6 @@
   position: relative;
   left: 0px;
   opacity: 1;
-  overflow: scroll;
   max-height: 80vh;
 }
 

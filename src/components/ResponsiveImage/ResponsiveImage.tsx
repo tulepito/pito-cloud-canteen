@@ -33,9 +33,8 @@
  * sizes, see the API documentation.
  */
 
-import type { CSSProperties } from 'react';
-import React from 'react';
-import { FormattedMessage } from 'react-intl';
+import type { CSSProperties, MutableRefObject } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import classNames from 'classnames';
 import Image from 'next/image';
 
@@ -44,6 +43,10 @@ import type { TDefaultProps, TImage, TImageVariant } from '@utils/types';
 import NoImageIcon from './NoImageIcon';
 
 import css from './ResponsiveImage.module.scss';
+
+const PARENT_MAX_WIDTH_TO_MAKE_NO_IMAGE_ICON_SMALL = 300;
+const SMALL_NO_IMAGE_ICON_WIDTH = 30;
+const BIG_NO_IMAGE_ICON_WIDTH = 60;
 
 type TResponsiveImageProps = TDefaultProps & {
   alt: string;
@@ -58,11 +61,29 @@ const ResponsiveImage: React.FC<TResponsiveImageProps> = (props) => {
     className,
     rootClassName,
     alt,
-    noImageMessage,
     image,
     variants = [],
     ...rest
   } = props;
+
+  const [noImageIconWidth, setNoImageIconWidth] = useState<number>(
+    BIG_NO_IMAGE_ICON_WIDTH,
+  );
+
+  const noImageContainerRef = useRef() as MutableRefObject<HTMLDivElement>;
+
+  useEffect(() => {
+    // This useEffect to make no image icon width to fit with its parent width
+    if (image) return;
+    if (
+      noImageContainerRef.current &&
+      noImageContainerRef.current.clientWidth <=
+        PARENT_MAX_WIDTH_TO_MAKE_NO_IMAGE_ICON_SMALL
+    ) {
+      setNoImageIconWidth(SMALL_NO_IMAGE_ICON_WIDTH);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [JSON.stringify(image), noImageContainerRef]);
 
   const classes = classNames(rootClassName || css.root, className);
   if (image === null || variants.length === 0) {
@@ -72,15 +93,10 @@ const ResponsiveImage: React.FC<TResponsiveImageProps> = (props) => {
       className,
     );
 
-    const noImageMessageText = noImageMessage || (
-      <FormattedMessage id="ResponsiveImage.noImage" />
-    );
-
     return (
-      <div className={noImageClasses}>
+      <div className={noImageClasses} ref={noImageContainerRef}>
         <div className={css.noImageWrapper}>
-          <NoImageIcon className={css.noImageIcon} />
-          <div className={css.noImageText}>{noImageMessageText}</div>
+          <NoImageIcon className={css.noImageIcon} width={noImageIconWidth} />
         </div>
       </div>
     );

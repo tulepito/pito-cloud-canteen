@@ -1,8 +1,8 @@
 import { useMemo } from 'react';
 
+import FieldDropdownSelect from '@components/FormFields/FieldDropdownSelect/FieldDropdownSelect';
 import FieldLabelCheckbox from '@components/FormFields/FieldLabelCheckbox/FieldLabelCheckbox';
 import FieldRating from '@components/FormFields/FieldRating/FieldRating';
-import FieldSelect from '@components/FormFields/FieldSelect/FieldSelect';
 import FieldTextArea from '@components/FormFields/FieldTextArea/FieldTextArea';
 
 import css from './OrderRatingForm.module.scss';
@@ -101,26 +101,29 @@ const PackagingRating: React.FC<TPackagingRatingProps> = (props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isPackagingSatifactedSelected, values]);
 
+  const parsedRestaurantByDayOptions = useMemo(
+    () =>
+      restaurantsByDay.map(
+        ({ restaurantId, restaurantName, timestamp }: any) => ({
+          key: `${restaurantId} - ${timestamp}`,
+          label: restaurantName,
+        }),
+      ),
+    [JSON.stringify(restaurantsByDay)],
+  );
+
   const optionalPackagingRating = isPackagingSatifactedSelected ? (
     <>
       <div className={css.optionalFieldTitle}>
         Yếu tố nào khiến bạn hài lòng?
       </div>
-      <FieldSelect
+      <FieldDropdownSelect
         name="optionalPackaging-restaurant-satifacted"
         id="optionalPackaging-restaurant"
-        className={css.optionalSelectField}>
-        <option value="">Chọn nhà hàng bạn muốn đánh giá</option>
-        {restaurantsByDay.map(
-          ({ restaurantId, restaurantName, timestamp }: any) => (
-            <option
-              key={`${restaurantId}-${timestamp}`}
-              value={`${restaurantId} - ${timestamp}`}>
-              {restaurantName}
-            </option>
-          ),
-        )}
-      </FieldSelect>
+        className={css.optionalSelectField}
+        placeholder="Chọn nhà hàng bạn muốn đánh giá"
+        options={parsedRestaurantByDayOptions}
+      />
       {isPackagingRestaurantSelected && (
         <FieldLabelCheckbox
           name="optionalPackaging-satifacted"
@@ -134,21 +137,14 @@ const PackagingRating: React.FC<TPackagingRatingProps> = (props) => {
       <div className={css.optionalFieldTitle}>
         Yếu tố nào khiến bạn không hài lòng?
       </div>
-      <FieldSelect
+      <FieldDropdownSelect
         name="optionalPackaging-restaurant-unsatifacted"
         id="optionalPackaging-restaurant"
-        className={css.optionalSelectField}>
-        <option value="">Chọn nhà hàng bạn muốn đánh giá</option>
-        {restaurantsByDay.map(
-          ({ restaurantId, restaurantName, timestamp }: any) => (
-            <option
-              key={`${restaurantId}-${timestamp}`}
-              value={`${restaurantId} - ${timestamp}`}>
-              {restaurantName}
-            </option>
-          ),
-        )}
-      </FieldSelect>
+        className={css.optionalSelectField}
+        placeholder="Chọn nhà hàng bạn muốn đánh giá"
+        options={parsedRestaurantByDayOptions}
+      />
+
       {isPackagingRestaurantSelected && (
         <FieldLabelCheckbox
           name="optionalPackaging-unsatifacted"

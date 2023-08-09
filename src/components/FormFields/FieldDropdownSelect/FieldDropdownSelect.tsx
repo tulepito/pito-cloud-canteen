@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react';
+import { cloneElement } from 'react';
 import type { FieldRenderProps } from 'react-final-form';
 import { Field } from 'react-final-form';
 import classNames from 'classnames';
 import find from 'lodash/find';
 
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
+import OutsideClickHandler from '@components/OutsideClickHandler/OutsideClickHandler';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import ValidationError from '@components/ValidationError/ValidationError';
 import useBoolean from '@hooks/useBoolean';
@@ -31,38 +32,74 @@ export const FieldDropdownSelectComponent: React.FC<TFieldDropdownSelect> = (
     meta,
     placeholder,
     options = [],
-    initialFieldValue,
     labelClassName,
+    className,
+    fieldWrapperClassName,
+    disabled,
+    labelWrapperClassName,
+    customOnChange,
+    leftIcon,
     ...rest
   } = props;
-  const [selected, setSelected] = useState<string>(initialFieldValue!);
-  const { onChange } = input;
+  const { onChange, value } = input;
 
-  useEffect(() => {
-    onChange(selected);
-  }, [onChange, selected]);
-  const classes = classNames(css.root);
+  const classes = classNames(css.root, className);
   const labelClasses = classNames(css.label, labelClassName);
+  const labelWrapperClasses = classNames(
+    css.labelWrapper,
+    labelWrapperClassName,
+  );
 
+  const fieldWrapperClasses = classNames(
+    css.fieldWrapper,
+    fieldWrapperClassName,
+    { [css.fieldDisabled]: disabled },
+  );
   const inputProps = {
     ...input,
     ...rest,
   };
 
   const onSelectOption = (optionKey: string) => () => {
-    setSelected(optionKey);
+    if (onChange) {
+      onChange(optionKey);
+    }
+
+    if (customOnChange) {
+      customOnChange(optionKey);
+    }
     dropdownController.setFalse();
   };
 
+  const leftIconElement = leftIcon
+    ? cloneElement(leftIcon, {
+        rootClassName: css.leftIcon,
+      })
+    : undefined;
+
+  const valueClasses = classNames(css.value, {
+    [css.paddingWithLeftIcon]: !!leftIcon,
+  });
+
+  const placholderClasses = classNames(css.placeholder, {
+    [css.paddingWithLeftIcon]: !!leftIcon,
+  });
+
   return (
-    <div className={classes}>
+    <OutsideClickHandler
+      onOutsideClick={dropdownController.setFalse}
+      className={classes}>
       {label ? (
-        <label htmlFor={id} className={labelClasses}>
-          {label}
-          {required && <span>*</span>}
-        </label>
+        <div className={labelWrapperClasses}>
+          <label htmlFor={id} className={labelClasses}>
+            {label}
+            {required && <span>*</span>}
+          </label>
+        </div>
       ) : null}
-      <div className={css.fieldWrapper} onClick={dropdownController.toggle}>
+      <div className={fieldWrapperClasses} onClick={dropdownController.toggle}>
+        {leftIconElement}
+
         <IconArrow
           direction="right"
           className={classNames(
@@ -70,13 +107,13 @@ export const FieldDropdownSelectComponent: React.FC<TFieldDropdownSelect> = (
             dropdownController.value && css.rotate,
           )}
         />
-        <RenderWhen condition={!selected}>
+        <RenderWhen condition={!value}>
           {placeholder && (
-            <span className={css.placeholder}>{placeholder}</span>
+            <span className={placholderClasses}>{placeholder}</span>
           )}
           <RenderWhen.False>
-            <span className={css.value}>
-              {find(options, (_option: any) => _option.key === selected)?.label}
+            <span className={valueClasses}>
+              {find(options, (_option: any) => _option.key === value)?.label}
             </span>
           </RenderWhen.False>
         </RenderWhen>
@@ -89,7 +126,7 @@ export const FieldDropdownSelectComponent: React.FC<TFieldDropdownSelect> = (
               onClick={onSelectOption(option.key)}
               className={classNames(
                 css.dropdownItem,
-                selected === option.key && css.selected,
+                value === option.key && css.selected,
               )}>
               {option.label}
             </div>
@@ -99,7 +136,7 @@ export const FieldDropdownSelectComponent: React.FC<TFieldDropdownSelect> = (
       <input type="hidden" {...inputProps} />
 
       <ValidationError fieldMeta={meta} />
-    </div>
+    </OutsideClickHandler>
   );
 };
 
