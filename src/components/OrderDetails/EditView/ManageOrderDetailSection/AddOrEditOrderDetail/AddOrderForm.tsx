@@ -86,7 +86,6 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
     maxQuantity,
     currentViewDate,
   } = props;
-
   const fieldSelectMemberDisable = inProgress || !ableToUpdateOrder;
   const fieldSelectFoodDisable =
     foodOptions?.length === 0 || !ableToUpdateOrder;

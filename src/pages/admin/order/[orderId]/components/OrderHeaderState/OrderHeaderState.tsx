@@ -27,6 +27,9 @@ type OrderHeaderStateProps = {
   handleUpdateOrderState: (state: EOrderStates) => () => void;
   onConfirmOrder?: () => void;
   updateOrderStateInProgress: boolean;
+  isDraftEditing?: boolean;
+  confirmUpdateDisabled?: boolean;
+  turnOnDraftEditMode?: () => void;
 };
 
 const OrderHeaderState: React.FC<OrderHeaderStateProps> = (props) => {
@@ -35,6 +38,9 @@ const OrderHeaderState: React.FC<OrderHeaderStateProps> = (props) => {
     handleUpdateOrderState,
     updateOrderStateInProgress,
     onConfirmOrder,
+    turnOnDraftEditMode,
+    isDraftEditing = false,
+    confirmUpdateDisabled = true,
   } = props;
 
   const intl = useIntl();
@@ -69,9 +75,13 @@ const OrderHeaderState: React.FC<OrderHeaderStateProps> = (props) => {
     typeof onConfirmOrder !== 'undefined' &&
     orderState === EOrderStates.picking;
 
+  const shouldManagePickingBtn = orderState === EOrderStates.inProgress;
   const canCancelOrder = orderFlow?.[
     orderState as TTransitionOrderState
   ]?.includes(EOrderStates.canceled);
+
+  const hasAnyActionsCanDo =
+    canCancelOrder || shouldShowUpdateOrderStateBtn || shouldManagePickingBtn;
 
   const handleAgreeCancelOrder = () => {
     if (canCancelOrder) {
@@ -91,15 +101,20 @@ const OrderHeaderState: React.FC<OrderHeaderStateProps> = (props) => {
         <div className={statusClasses}>{orderStateLabel}</div>
         <div className={css.action}>
           <IconLightOutline onClick={orderStateActionDropdownControl.setTrue} />
-          {orderStateActionDropdownControl.value && canCancelOrder && (
+          <RenderWhen
+            condition={
+              orderStateActionDropdownControl.value && hasAnyActionsCanDo
+            }>
             <OutsideClickHandler
               className={css.actionList}
               onOutsideClick={orderStateActionDropdownControl.setFalse}>
-              <div
-                className={css.actionItem}
-                onClick={confirmCancelOrderActions.setTrue}>
-                Huỷ đơn
-              </div>
+              <RenderWhen condition={canCancelOrder}>
+                <div
+                  className={css.actionItem}
+                  onClick={confirmCancelOrderActions.setTrue}>
+                  Huỷ đơn
+                </div>
+              </RenderWhen>
               <RenderWhen condition={shouldShowUpdateOrderStateBtn}>
                 <div
                   className={css.actionItem}
@@ -107,26 +122,30 @@ const OrderHeaderState: React.FC<OrderHeaderStateProps> = (props) => {
                   Hoàn tất
                 </div>
               </RenderWhen>
-            </OutsideClickHandler>
-          )}
-
-          <AlertModal
-            isOpen={confirmCancelOrderActions.value}
-            handleClose={confirmCancelOrderActions.setFalse}
-            title={intl.formatMessage({
-              id: 'BookerOrderDetailsPage.confirmCancelOrderModal.title',
-            })}
-            confirmLabel={intl.formatMessage({
-              id: 'BookerOrderDetailsPage.confirmCancelOrderModal.confirmText',
-            })}
-            cancelLabel={intl.formatMessage({
-              id: 'BookerOrderDetailsPage.confirmCancelOrderModal.cancelText',
-            })}
-            onConfirm={handleAgreeCancelOrder}
-            onCancel={handleDisagreeCancelOrder}
-            confirmInProgress={updateOrderStateInProgress}
-            cancelDisabled={updateOrderStateInProgress}
-          />
+              <RenderWhen condition={shouldManagePickingBtn}>
+                <div className={css.actionItem} onClick={turnOnDraftEditMode}>
+                  Quản lý chọn món
+                </div>
+              </RenderWhen>
+            </OutsideClickHandler>{' '}
+            <AlertModal
+              isOpen={confirmCancelOrderActions.value}
+              handleClose={confirmCancelOrderActions.setFalse}
+              title={intl.formatMessage({
+                id: 'BookerOrderDetailsPage.confirmCancelOrderModal.title',
+              })}
+              confirmLabel={intl.formatMessage({
+                id: 'BookerOrderDetailsPage.confirmCancelOrderModal.confirmText',
+              })}
+              cancelLabel={intl.formatMessage({
+                id: 'BookerOrderDetailsPage.confirmCancelOrderModal.cancelText',
+              })}
+              onConfirm={handleAgreeCancelOrder}
+              onCancel={handleDisagreeCancelOrder}
+              confirmInProgress={updateOrderStateInProgress}
+              cancelDisabled={updateOrderStateInProgress}
+            />
+          </RenderWhen>
         </div>
       </div>
       <RenderWhen condition={shouldShowUpdateOrderStateBtn}>
@@ -146,6 +165,15 @@ const OrderHeaderState: React.FC<OrderHeaderStateProps> = (props) => {
           inProgress={updateOrderStateInProgress}
           disabled={disableConfirmButton}>
           Xác nhận
+        </Button>
+      </RenderWhen>
+      <RenderWhen condition={isDraftEditing}>
+        <Button
+          variant="cta"
+          className={css.stateBtn}
+          disabled={confirmUpdateDisabled}
+          onClick={onConfirmOrder}>
+          Cập nhật
         </Button>
       </RenderWhen>
     </div>

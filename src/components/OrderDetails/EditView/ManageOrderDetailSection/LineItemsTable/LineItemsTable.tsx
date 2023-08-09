@@ -30,7 +30,7 @@ type TLineItemsTableProps = {
   shouldShowOverflowError: boolean;
   shouldShowUnderError: boolean;
   minQuantity: number;
-  isAdminLayout?: boolean;
+  isAdminFlow?: boolean;
 };
 
 const LineItemsTable: React.FC<TLineItemsTableProps> = (props) => {
@@ -41,7 +41,7 @@ const LineItemsTable: React.FC<TLineItemsTableProps> = (props) => {
     shouldShowOverflowError,
     shouldShowUnderError,
     minQuantity,
-    isAdminLayout = false,
+    isAdminFlow = false,
   } = props;
   const intl = useIntl();
 
@@ -183,6 +183,7 @@ const LineItemsTable: React.FC<TLineItemsTableProps> = (props) => {
               quantity,
               foodId,
             },
+            isAdminFlow,
           }),
         );
       } else {
@@ -223,7 +224,7 @@ const LineItemsTable: React.FC<TLineItemsTableProps> = (props) => {
         data={data}
         onModifyQuantity={handleModifyQuantity}
         ableToUpdateOrder={ableToUpdateOrder}
-        isAdminLayout={isAdminLayout}
+        isAdminLayout={isAdminFlow}
       />
       <form onSubmit={handleSubmit}>
         <div className={css.fieldContainer}>
