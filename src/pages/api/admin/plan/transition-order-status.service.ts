@@ -22,6 +22,7 @@ export const transitionOrderStatus = async (
   } = orderListing.getMetadata();
   const { orderDetail } = planListing.getMetadata();
 
+  const isOrderInProgress = orderState === EOrderStates.inProgress;
   const isOrderPendingPayment = orderState === EOrderStates.pendingPayment;
   const isOrderSuficientPaid =
     isClientSufficientPaid && isPartnerSufficientPaid;
@@ -47,7 +48,9 @@ export const transitionOrderStatus = async (
   );
 
   const shouldTransitToOrderCompleted =
-    isOrderSuficientPaid && isOrderPendingPayment && isAllTransactionCompleted;
+    isOrderSuficientPaid &&
+    (isOrderPendingPayment || isOrderInProgress) &&
+    isAllTransactionCompleted;
 
   const shouldTransitToOrderPendingPayment =
     isAllTransactionCompleted && !isOrderPendingPayment;
