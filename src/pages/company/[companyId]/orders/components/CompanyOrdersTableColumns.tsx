@@ -448,7 +448,9 @@ export const CompanyOrdersTableColumns: TColumn[] = [
         <div className={css.state}>
           <RenderWhen
             condition={
-              Boolean(paymentStatus) && state === EOrderStates.completed
+              Boolean(paymentStatus) &&
+              (state === EOrderStates.completed ||
+                state === EOrderStates.pendingPayment)
             }>
             <Badge type={EBadgeType.success} label="Đã hoàn thành" />
             <RenderWhen.False>

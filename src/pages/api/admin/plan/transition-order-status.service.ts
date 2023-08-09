@@ -1,3 +1,5 @@
+import compact from 'lodash/compact';
+
 import { fetchTransaction } from '@services/integrationHelper';
 import { Listing, Transaction } from '@src/utils/data';
 import { EOrderStates } from '@src/utils/enums';
@@ -24,8 +26,8 @@ export const transitionOrderStatus = async (
   const isOrderSuficientPaid =
     isClientSufficientPaid && isPartnerSufficientPaid;
 
-  const txIdList = Object.values(orderDetail).map(
-    (item: any) => item.transactionId,
+  const txIdList = compact(
+    Object.values(orderDetail).map((item: any) => item.transactionId),
   );
 
   const txsLastTransitions = await Promise.all(
