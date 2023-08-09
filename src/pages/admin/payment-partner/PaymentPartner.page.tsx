@@ -31,7 +31,6 @@ import {
 import type { TPagination } from '@src/utils/types';
 
 import { generateSKU } from '../order/[orderId]/helpers/AdminOrderDetail';
-import KeywordSearchForm from '../partner/components/KeywordSearchForm/KeywordSearchForm';
 
 import AddPartnerPaymentModal from './components/AddPartnerPaymentModal/AddPartnerPaymentModal';
 import PaymentFilterModal from './components/PaymentFilterModal/PaymentFilterModal';
@@ -332,7 +331,6 @@ const PaymentPartnerPage = () => {
     <div className={css.root}>
       <div className={css.header}>
         <h1 className={css.title}>{title}</h1>
-        <KeywordSearchForm onSubmit={() => {}} />
       </div>
       <div className={css.filterForm}>
         <IntegrationFilterModal

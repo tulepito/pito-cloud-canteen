@@ -180,6 +180,10 @@
   overflow-x: auto;
   padding: 0 16px;
   height: 133px;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 .imageWrapper {
