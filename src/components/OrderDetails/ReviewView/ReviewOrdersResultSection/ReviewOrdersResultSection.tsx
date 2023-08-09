@@ -54,7 +54,7 @@ const ReviewOrdersResultSection: React.FC<TReviewOrdersResultSectionProps> = (
         <div className={css.subtitle}>
           {intl.formatMessage(
             { id: 'ReviewOrdersResultSection.subtitle' },
-            { count: completedPickFoodParticipants.length },
+            { count: completedPickFoodParticipants.length || 1 },
           )}
         </div>
       </div>
