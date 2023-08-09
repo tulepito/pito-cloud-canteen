@@ -17,12 +17,12 @@ import { EOrderType } from '@src/utils/enums';
 import type { TListing, TObject } from '@src/utils/types';
 
 // eslint-disable-next-line import/no-cycle
-import { EPartnerSubOrderDetailPage } from '../PartnerSubOrderDetail.page';
+import { EPartnerSubOrderDetailPageViewMode } from '../PartnerSubOrderDetail.page';
 
 import css from './SubOrderSummary.module.scss';
 
 type TSubOrderSummaryProps = {
-  onChangeViewMode: (v: EPartnerSubOrderDetailPage) => () => void;
+  onChangeViewMode: (v: EPartnerSubOrderDetailPageViewMode) => () => void;
 };
 
 const SubOrderSummary: React.FC<TSubOrderSummaryProps> = ({
@@ -140,7 +140,9 @@ const SubOrderSummary: React.FC<TSubOrderSummaryProps> = ({
           <Button
             variant="inline"
             className={css.viewOrderDetail}
-            onClick={onChangeViewMode(EPartnerSubOrderDetailPage.detail)}>
+            onClick={onChangeViewMode(
+              EPartnerSubOrderDetailPageViewMode.detail,
+            )}>
             {intl.formatMessage({ id: 'SubOrderSummary.viewDetail' })}
             <IconArrow direction="right" className={css.arrowIcon} />
           </Button>

@@ -22,6 +22,7 @@ export type TModalProps = PropsWithChildren<{
   shouldHideIconClose?: boolean;
   closeButton?: ReactNode;
   handleClose: () => void;
+  modalHeaderClassName?: string;
   scrollLayerClassName?: string;
   customHeader?: ReactNode;
   closeClassName?: string;
@@ -36,7 +37,7 @@ const Modal: React.FC<TModalProps> = (props) => {
     children,
     isOpen,
     title,
-    shouldHideIconClose,
+    shouldHideIconClose = false,
     className,
     containerClassName,
     contentClassName,

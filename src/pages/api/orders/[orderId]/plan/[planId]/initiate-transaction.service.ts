@@ -6,13 +6,15 @@ import {
 } from '@pages/api/orders/utils';
 import { denormalisedResponseEntities } from '@services/data';
 import { fetchUser } from '@services/integrationHelper';
+import { createFirebaseDocNotification } from '@services/notifications';
 import { getIntegrationSdk } from '@services/sdk';
 import { getSubAccountTrustedSdk } from '@services/subAccountSdk';
 import config from '@src/configs';
-import { EOrderType } from '@src/utils/enums';
-import { Listing, Transaction } from '@utils/data';
+import { Listing, Transaction, User } from '@src/utils/data';
+import { formatTimestamp } from '@src/utils/dates';
+import { ENotificationType, EOrderType } from '@src/utils/enums';
 import { ETransition } from '@utils/transaction';
-import type { TObject } from '@utils/types';
+import type { TObject, TTransaction } from '@utils/types';
 
 export const initiateTransaction = async ({
   orderId,
@@ -40,6 +42,7 @@ export const initiateTransaction = async ({
     deliveryHour,
     plans = [],
     orderType,
+    companyName = 'PCC',
   } = orderData.getMetadata();
   const isGroupOrder = orderType === EOrderType.group;
 
@@ -96,10 +99,28 @@ export const initiateTransaction = async ({
             },
           },
         },
+        {
+          include: ['provider'],
+          expand: true,
+        },
       );
 
       const [tx] = denormalisedResponseEntities(createTxResponse);
+      const txGetter = Transaction(tx as TTransaction);
+
       const txId = Transaction(tx).getId() as string;
+      const { provider } = txGetter.getFullData();
+
+      createFirebaseDocNotification(ENotificationType.SUB_ORDER_INPROGRESS, {
+        userId: User(provider).getId(),
+        planId,
+        orderId,
+        transition: ETransition.INITIATE_TRANSACTION,
+        subOrderDate: bookingStart.getTime(),
+        subOrderName: `${companyName}_${formatTimestamp(
+          bookingStart.getTime(),
+        )}`,
+      });
 
       transactionMap[date] = txId;
 

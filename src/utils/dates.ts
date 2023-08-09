@@ -327,11 +327,7 @@ export const diffDays = (
   date2 = new Date().getTime(),
   units: DurationUnits = ['days'],
 ) => {
-  const diffObject = DateTime.fromMillis(date1)
-    .diff(DateTime.fromMillis(date2), units)
-    .toObject();
-
-  return diffObject;
+  return DateTime.fromMillis(date1).diff(DateTime.fromMillis(date2), units);
 };
 
 export const printHoursToString = (hours: number, minutes: number) => {

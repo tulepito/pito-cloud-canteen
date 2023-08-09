@@ -12,8 +12,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
     const { orderId, JSONParams } = req.query;
     const { date } = JSON.parse(JSONParams as string);
-
     const apiMethod = req.method;
+
     const integrationSdk = getIntegrationSdk();
 
     if (isEmpty(date) || isEmpty(orderId)) {
@@ -105,7 +105,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           if (isEmpty(txId)) {
             return res
               .status(EHttpStatusCode.BadRequest)
-              .json({ error: 'Missing invalid order date' });
+              .json({ error: 'Invalid order date' });
           }
 
           const [transaction] = denormalisedResponseEntities(
@@ -121,7 +121,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           };
         }
 
-        return res.status(200).json(orderWithPlanDataMaybe);
+        return res.status(200).json({ order: orderWithPlanDataMaybe });
       }
 
       default:

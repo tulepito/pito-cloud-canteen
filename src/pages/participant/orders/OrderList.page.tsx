@@ -109,13 +109,21 @@ const OrderListPage = () => {
     (state) =>
       state.ParticipantOrderList.addSubOrderDocumentToFirebaseInProgress,
   );
-
   const participantPostRatingInProgress = useAppSelector(
     (state) => state.ParticipantOrderList.participantPostRatingInProgress,
   );
-
   const notifications = useAppSelector(
     (state) => state.ParticipantOrderList.participantFirebaseNotifications,
+    shallowEqual,
+  );
+  const fetchParticipantFirebaseNotificationsInProgress = useAppSelector(
+    (state) =>
+      state.ParticipantOrderList
+        .fetchParticipantFirebaseNotificationsInProgress,
+    shallowEqual,
+  );
+  const fetchSubOrderTxInProgress = useAppSelector(
+    (state) => state.ParticipantOrderList.fetchSubOrderTxInProgress,
     shallowEqual,
   );
 
@@ -128,7 +136,13 @@ const OrderListPage = () => {
     (fetchOrdersInProgress ||
       updateSubOrderInProgress ||
       addSubOrderDocumentToFirebaseInProgress ||
-      participantPostRatingInProgress) &&
+      participantPostRatingInProgress ||
+      fetchOrdersInProgress ||
+      updateSubOrderInProgress ||
+      addSubOrderDocumentToFirebaseInProgress ||
+      participantPostRatingInProgress ||
+      fetchParticipantFirebaseNotificationsInProgress ||
+      fetchSubOrderTxInProgress) &&
     !walkthroughEnable;
 
   const unseenNotifications = notifications.filter(
@@ -149,6 +163,7 @@ const OrderListPage = () => {
       deadlineDate,
       orderStateHistory = [],
       orderState,
+      companyName = 'PCC',
     } = orderListing.getMetadata();
     const { title: orderTitle } = orderListing.getAttributes();
 
@@ -204,6 +219,7 @@ const OrderListPage = () => {
             dishes,
           },
           deadlineDate,
+          companyName,
           isOrderStarted:
             orderStateHistory.findIndex(
               (history: TObject) => history.state === EOrderStates.inProgress,
@@ -361,6 +377,7 @@ const OrderListPage = () => {
   }, [planIdFromQuery, timestampFromQuery, JSON.stringify(flattenEvents)]);
 
   useEffect(() => {
+    dispatch(OrderListThunks.fetchAttributes());
     dispatch(OrderListThunks.fetchParticipantFirebaseNotifications());
   }, []);
 

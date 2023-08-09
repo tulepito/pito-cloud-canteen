@@ -16,12 +16,12 @@ import type { TListing, TObject } from '@src/utils/types';
 
 import usePrepareDownloadData from '../hooks/usePrepareDownloadData';
 // eslint-disable-next-line import/no-cycle
-import { EPartnerSubOrderDetailPage } from '../PartnerSubOrderDetail.page';
+import { EPartnerSubOrderDetailPageViewMode } from '../PartnerSubOrderDetail.page';
 
 import css from './SubOrderDetail.module.scss';
 
 type TSubOrderDetailProps = {
-  onChangeViewMode: (v: EPartnerSubOrderDetailPage) => () => void;
+  onChangeViewMode: (v: EPartnerSubOrderDetailPageViewMode) => () => void;
 };
 
 const SubOrderDetail: React.FC<TSubOrderDetailProps> = ({
@@ -95,7 +95,9 @@ const SubOrderDetail: React.FC<TSubOrderDetailProps> = ({
         <Button
           variant="inline"
           className={css.goBackBtn}
-          onClick={onChangeViewMode(EPartnerSubOrderDetailPage.summary)}>
+          onClick={onChangeViewMode(
+            EPartnerSubOrderDetailPageViewMode.summary,
+          )}>
           <IconArrow direction="left" className={css.arrowIcon} />
           {intl.formatMessage({ id: 'SubOrderDetail.goBackToSummary' })}
         </Button>

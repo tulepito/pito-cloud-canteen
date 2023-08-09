@@ -470,7 +470,12 @@ export const emailSendingFactory = async (
         break;
       }
       case EmailTemplateTypes.PARTNER.PARTNER_ORDER_DETAILS_UPDATED: {
-        const { orderId, partnerId, restaurantId, timestamp } = emailParams;
+        const {
+          orderId,
+          partnerId,
+          restaurantId,
+          timestamp: subOrderDate,
+        } = emailParams;
         const emailDataSource: any = await fetchEmailDataSourceWithOrder({
           receiver: 'partner',
           partnerId,
@@ -479,14 +484,16 @@ export const emailSendingFactory = async (
         });
         const { partnerUser } = emailDataSource;
         const { email: partnerEmail } = partnerUser?.getAttributes() || {};
-        const subOrderDate = formatTimestamp(timestamp);
+        const formattedSubOrderDate = formatTimestamp(Number(subOrderDate));
         const emailTemplate = partnerOrderDetailsUpdated({
           ...emailDataSource,
           subOrderDate,
+          formattedSubOrderDate,
         });
+
         const emailDataParams = {
           receiver: [partnerEmail],
-          subject: partnerOrderDetailsUpdatedSubject(subOrderDate),
+          subject: partnerOrderDetailsUpdatedSubject(formattedSubOrderDate),
           content: emailTemplate as string,
           sender: systemSenderEmail as string,
         };

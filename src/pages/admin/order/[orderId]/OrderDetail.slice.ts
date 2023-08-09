@@ -1,8 +1,10 @@
 import { createSlice, current } from '@reduxjs/toolkit';
 import isEmpty from 'lodash/isEmpty';
+import { DateTime } from 'luxon';
 
 import { transitPlanApi } from '@apis/admin';
 import { participantSubOrderUpdateDocumentApi } from '@apis/firebaseApi';
+import { createNotificationApi } from '@apis/notificationApi';
 import {
   adminUpdateOrderStateApi,
   getBookerOrderDataApi,
@@ -13,12 +15,18 @@ import { getOrderQuotationsQuery } from '@helpers/listingSearchQuery';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { OrderManagementsAction } from '@redux/slices/OrderManagement.slice';
 import { SystemAttributesThunks } from '@redux/slices/systemAttributes.slice';
+import type { NotificationInvitationParams } from '@services/notifications';
 import {
   denormalisedResponseEntities,
   Listing,
   Transaction,
+  User,
 } from '@src/utils/data';
-import { ESubOrderTxStatus, ETransactionRoles } from '@src/utils/enums';
+import {
+  ENotificationType,
+  ESubOrderTxStatus,
+  ETransactionRoles,
+} from '@src/utils/enums';
 import { ETransition } from '@src/utils/transaction';
 import type {
   TListing,
@@ -42,6 +50,18 @@ const mapTxTransitionToFirebaseSubOrderStatus = (lastTransition: string) => {
       return ESubOrderTxStatus.CANCELED;
     default:
       return ESubOrderTxStatus.PENDING;
+  }
+};
+const mapTxTransitionToNotificationType = (lastTransition: string) => {
+  switch (lastTransition) {
+    case ETransition.START_DELIVERY:
+      return ENotificationType.SUB_ORDER_DELIVERING;
+    case ETransition.COMPLETE_DELIVERY:
+      return ENotificationType.SUB_ORDER_DELIVERED;
+    case ETransition.OPERATOR_CANCEL_PLAN:
+      return ENotificationType.SUB_ORDER_CANCELED;
+    default:
+      return ENotificationType.SUB_ORDER_INPROGRESS;
   }
 };
 
@@ -167,7 +187,9 @@ const updateOrderState = createAsyncThunk(
 
 const transit = createAsyncThunk(
   'app/OrderDetail/TRANSIT',
-  async ({ transactionId, transition }: TObject) => {
+  async ({ transactionId, transition }: TObject, { getState }) => {
+    const { company } = getState().OrderDetail;
+    const { companyName } = User(company!).getPublicData();
     const { data: response } = await transitPlanApi({
       transactionId,
       transition,
@@ -175,12 +197,17 @@ const transit = createAsyncThunk(
 
     const { tx } = response;
     const txGetter = Transaction(tx as TTransaction);
-    const { booking } = txGetter.getFullData();
+    const { booking, provider } = txGetter.getFullData();
     const { displayStart } = booking.attributes;
     const { lastTransition } = txGetter.getAttributes();
-    const { planId, participantIds = [] } = txGetter.getMetadata();
+    const { planId, participantIds = [], orderId } = txGetter.getMetadata();
+    const timestamp = new Date(displayStart).getTime();
+    const subOrderTimestamp = DateTime.fromMillis(timestamp)
+      .setZone('Asia/Ho_Chi_Minh')
+      .startOf('day')
+      .toMillis();
     const firebaseSubOrderIdList = participantIds.map(
-      (id: string) => `${id} - ${planId} - ${new Date(displayStart).getTime()}`,
+      (id: string) => `${id} - ${planId} - ${subOrderTimestamp}`,
     );
 
     if (transitionShouldChangeFirebaseSubOrderStatus.includes(lastTransition)) {
@@ -193,6 +220,32 @@ const transit = createAsyncThunk(
         });
       });
     }
+    console.debug('💫 > file: OrderDetail.slice.ts:231 > ', {
+      userId: User(provider).getId(),
+      orderId,
+      planId,
+      subOrderDate: DateTime.fromISO(displayStart).startOf('day').toMillis(),
+      companyName,
+      transition,
+    });
+
+    createNotificationApi({
+      notifications: [
+        {
+          type: mapTxTransitionToNotificationType(transition),
+          params: {
+            userId: User(provider).getId(),
+            orderId,
+            planId,
+            subOrderDate: DateTime.fromISO(displayStart)
+              .startOf('day')
+              .toMillis(),
+            companyName,
+            transition,
+          } as NotificationInvitationParams,
+        },
+      ],
+    });
 
     return { transactionId, transition, createdAt: new Date().toISOString() };
   },

@@ -170,7 +170,10 @@ const OrderDetailPage = () => {
   const confirmCancelOrderActions = useBoolean(false);
   const dispatch = useAppDispatch();
   const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
-  const { timestamp } = router.query;
+  const {
+    query: { orderId, timestamp },
+    isReady: isRouterReady,
+  } = router;
   const [currentViewDate, setCurrentViewDate] = useState<number>(
     Number(timestamp),
   );
@@ -178,16 +181,14 @@ const OrderDetailPage = () => {
   const [showReachMaxAllowedChangesModal, setShowReachMaxAllowedChangesModal] =
     useState<'reach_max' | 'reach_min' | null>(null);
 
-  const {
-    query: { orderId },
-    isReady: isRouterReady,
-  } = router;
-
   const currentUser = useAppSelector((state) => state.user.currentUser);
   const cancelPickingOrderInProgress = useAppSelector(
     (state) => state.OrderManagement.cancelPickingOrderInProgress,
   );
   const orderData = useAppSelector((state) => state.OrderManagement.orderData);
+  const systemVATPercentage = useAppSelector(
+    (state) => state.SystemAttributes.systemVATPercentage,
+  );
   const isFetchingOrderDetails = useAppSelector(
     (state) => state.OrderManagement.isFetchingOrderDetails,
   );
@@ -205,16 +206,23 @@ const OrderDetailPage = () => {
     shouldShowOverflowError,
     shouldShowUnderError,
   } = useAppSelector((state) => state.OrderManagement);
-
+  const {
+    orderState,
+    bookerId,
+    orderType = EOrderType.group,
+    orderVATPercentage,
+  } = Listing(orderData as TListing).getMetadata();
   const { orderDetail = {} } = Listing(planData as TListing).getMetadata();
+  const isPickingOrder = orderState === EOrderStates.picking;
   const {
     orderTitle,
     editViewData,
     reviewViewData,
     priceQuotationData,
     setReviewInfoValues,
-  } = usePrepareOrderDetailPageData({});
-
+  } = usePrepareOrderDetailPageData({
+    VATPercentage: isPickingOrder ? systemVATPercentage : orderVATPercentage,
+  });
   const handleCloseReachMaxAllowedChangesModal = () =>
     setShowReachMaxAllowedChangesModal(null);
 
@@ -258,11 +266,6 @@ const OrderDetailPage = () => {
   });
 
   const userId = CurrentUser(currentUser!).getId();
-  const {
-    orderState,
-    bookerId,
-    orderType = EOrderType.group,
-  } = Listing(orderData as TListing).getMetadata();
 
   const isNormalOrder = orderType === EOrderType.normal;
   const isPicking = orderState === EOrderStates.picking;

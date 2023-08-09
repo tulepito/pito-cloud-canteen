@@ -50,7 +50,11 @@ const OrderRatingPage = () => {
 
   const orderListing = Listing(order);
 
-  const { orderStatus, ratings: orderRatings } = orderListing.getMetadata();
+  const {
+    orderStatus,
+    ratings: orderRatings,
+    companyName = 'PCC',
+  } = orderListing.getMetadata();
   const isOrderRated = !!orderRatings || orderStatus === EOrderStates.reviewed;
   const pageTitle = intl.formatMessage(
     {
@@ -194,6 +198,7 @@ const OrderRatingPage = () => {
           detailTextRating,
           staff: staffRating,
           service: serviceRating,
+          companyName,
         }),
       );
       if (meta.requestStatus === 'fulfilled') {

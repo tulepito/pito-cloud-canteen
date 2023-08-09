@@ -10,7 +10,7 @@ import { parseThousandNumber } from '@helpers/format';
 import { isEnableToStartOrder } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { orderManagementThunks } from '@redux/slices/OrderManagement.slice';
-import { companyPaths } from '@src/paths';
+import { adminPaths, companyPaths } from '@src/paths';
 import { EOrderStates, EOrderType } from '@src/utils/enums';
 import { Listing } from '@utils/data';
 import type { TListing, TObject } from '@utils/types';
@@ -68,9 +68,8 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
 
   const planData = useAppSelector((state) => state.OrderManagement.planData);
   const orderData = useAppSelector((state) => state.OrderManagement.orderData);
-
-  const currentOrderVATPercentage = useAppSelector(
-    (state) => state.SystemAttributes.currentOrderVATPercentage,
+  const systemVATPercentage = useAppSelector(
+    (state) => state.SystemAttributes.systemVATPercentage,
   );
 
   const {
@@ -85,23 +84,49 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
   });
 
   const { orderDetail } = Listing(planData as TListing).getMetadata();
-  const { orderType = EOrderType.group, orderState } = Listing(
-    orderData as TListing,
-  ).getMetadata();
+  const {
+    orderType = EOrderType.group,
+    orderState,
+    orderVATPercentage,
+  } = Listing(orderData as TListing).getMetadata();
   const isStartOrderDisabled = !isEnableToStartOrder(
     orderDetail,
     orderType === EOrderType.group,
   );
 
   const isDraftEditing = orderState === EOrderStates.inProgress;
-
+  const isPickingState = orderState === EOrderStates.picking;
   const isPartner = target === 'partner';
+  const VATPercentage = isPickingState
+    ? systemVATPercentage
+    : orderVATPercentage;
 
   const handleStartPickingOrder = async () => {
     let response;
     if (isDraftEditing) {
       response = await dispatch(
         orderManagementThunks.updateOrderFromDraftEdit(foodOrderGroupedByDate!),
+      );
+    } else {
+      response = await dispatch(
+        orderManagementThunks.bookerStartOrder({
+          orderId: orderId as string,
+          foodOrderGroupedByDate,
+        }),
+      );
+    }
+
+    if (response.meta.requestStatus !== 'rejected') {
+      router.push(
+        isAdminLayout
+          ? {
+              pathname: adminPaths.OrderDetail,
+              query: { orderId },
+            }
+          : {
+              pathname: companyPaths.ManageOrderDetail,
+              query: { orderId },
+            },
       );
     } else {
       response = await dispatch(
@@ -197,7 +222,7 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
             <div className={css.label}>
               {intl.formatMessage({ id: 'ReviewCardSection.VAT' })}
               <Badge
-                label={`${currentOrderVATPercentage * 100}%`}
+                label={`${VATPercentage * 100}%`}
                 className={css.VATBadge}
               />
             </div>

@@ -30,7 +30,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
       case HttpMethod.POST: {
         const { notificationId } = req.body;
-        await updateSeenFirebaseDocNotification(notificationId);
+        await updateSeenFirebaseDocNotification(notificationId, {
+          seen: true,
+        });
         res.status(200).end();
         break;
       }
