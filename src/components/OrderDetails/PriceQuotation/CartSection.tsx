@@ -1,5 +1,8 @@
 import { useIntl } from 'react-intl';
 
+import RenderWhen from '@components/RenderWhen/RenderWhen';
+import { EPartnerVATSetting } from '@src/utils/enums';
+
 import css from './CartSection.module.scss';
 
 type TCartSectionProps = {
@@ -12,8 +15,9 @@ type TCartSectionProps = {
   transportFee: string;
   PITOFee?: string;
   VATFee: string;
-  currentOrderVATPercentage: number;
   isPartnerQuotation?: boolean;
+  vatPercentage: number;
+  vatSetting: EPartnerVATSetting;
 };
 
 const CartSection: React.FC<TCartSectionProps> = (props) => {
@@ -27,33 +31,36 @@ const CartSection: React.FC<TCartSectionProps> = (props) => {
     PITOFee,
     // transportFee,
     VATFee,
-    currentOrderVATPercentage,
     isPartnerQuotation = false,
+    vatPercentage,
+    vatSetting = EPartnerVATSetting.vat,
   } = props;
   const intl = useIntl();
+
+  const shouldSkipVAT = vatSetting === EPartnerVATSetting.direct;
 
   return (
     <div className={css.cartSection} id={id}>
       <div className={css.sectionTitle}>
         {intl.formatMessage({
-          id: 'BookerOrderDetailsPriceQuotation.cartSection.title',
+          id: 'OrderDetails.PriceQuotation.cartSection.title',
         })}
       </div>
       <div className={css.sectionContentContainer}>
         <div className={css.tableHead}>
           <div>
             {intl.formatMessage({
-              id: 'BookerOrderDetailsPriceQuotation.cartSection.head.no',
+              id: 'OrderDetails.PriceQuotation.cartSection.head.no',
             })}
           </div>
           <div>
             {intl.formatMessage({
-              id: 'BookerOrderDetailsPriceQuotation.cartSection.head.type',
+              id: 'OrderDetails.PriceQuotation.cartSection.head.type',
             })}
           </div>
           <div>
             {intl.formatMessage({
-              id: 'BookerOrderDetailsPriceQuotation.cartSection.head.cost',
+              id: 'OrderDetails.PriceQuotation.cartSection.head.cost',
             })}
           </div>
         </div>
@@ -61,7 +68,7 @@ const CartSection: React.FC<TCartSectionProps> = (props) => {
           <div>1</div>
           <div>
             {intl.formatMessage({
-              id: 'BookerOrderDetailsPriceQuotation.cartSection.rowLabel.menuCost',
+              id: 'OrderDetails.PriceQuotation.cartSection.rowLabel.menuCost',
             })}
           </div>
           <div>{totalPrice}</div>
@@ -83,7 +90,7 @@ const CartSection: React.FC<TCartSectionProps> = (props) => {
           <div>3</div>
           <div>
             {intl.formatMessage({
-              id: 'BookerOrderDetailsPriceQuotation.cartSection.rowLabel.transportCost',
+              id: 'OrderDetails.PriceQuotation.cartSection.rowLabel.transportCost',
             })}
           </div>
           <div>{transportFee}</div>
@@ -92,28 +99,42 @@ const CartSection: React.FC<TCartSectionProps> = (props) => {
           <div>3</div>
           <div>
             {intl.formatMessage({
-              id: 'BookerOrderDetailsPriceQuotation.cartSection.rowLabel.promotion',
+              id: 'OrderDetails.PriceQuotation.cartSection.rowLabel.promotion',
             })}
           </div>
           <div>{promotion}</div>
         </div>
-        <div className={css.tableRow}>
-          <div>4</div>
-          <div>
-            {intl.formatMessage(
-              {
-                id: 'BookerOrderDetailsPriceQuotation.cartSection.rowLabel.VAT',
-              },
-              { percent: currentOrderVATPercentage * 100 },
-            )}
+
+        <RenderWhen condition={!shouldSkipVAT}>
+          <div className={css.tableRow}>
+            <div>4</div>
+            <div>
+              <RenderWhen
+                condition={vatSetting === EPartnerVATSetting.noExportVat}>
+                {intl.formatMessage(
+                  {
+                    id: 'OrderDetails.PriceQuotation.cartSection.rowLabel.noExportVAT',
+                  },
+                  { percent: vatPercentage * 100 },
+                )}
+                <RenderWhen.False>
+                  {intl.formatMessage(
+                    {
+                      id: 'OrderDetails.PriceQuotation.cartSection.rowLabel.VAT',
+                    },
+                    { percent: vatPercentage * 100 },
+                  )}
+                </RenderWhen.False>
+              </RenderWhen>
+            </div>
+            <div>{VATFee}</div>
           </div>
-          <div>{VATFee}</div>
-        </div>
+        </RenderWhen>
         <div className={css.tableRow}>
           <div> </div>
           <div>
             {intl.formatMessage({
-              id: 'BookerOrderDetailsPriceQuotation.cartSection.rowLabel.totalCost',
+              id: 'OrderDetails.PriceQuotation.cartSection.rowLabel.totalCost',
             })}
           </div>
           <div>{totalWithVAT}</div>

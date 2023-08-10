@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import PriceQuotation from '@components/OrderDetails/PriceQuotation/PriceQuotation';
 import type { usePrepareOrderDetailPageData } from '@hooks/usePrepareOrderManagementData';
 import { createNewPrint } from '@services/pdf';
+import { EPartnerVATSetting } from '@src/utils/enums';
 import TranslationProvider from '@translations/TranslationProvider';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -16,6 +17,7 @@ export const downloadPriceQuotation =
     priceQuotationData,
     isPartnerQuotation = false,
     subOrderDate,
+    vatSetting = EPartnerVATSetting.vat,
   }: {
     orderTitle: string;
     isPartnerQuotation?: boolean;
@@ -23,12 +25,14 @@ export const downloadPriceQuotation =
       typeof usePrepareOrderDetailPageData
     >['priceQuotationData'];
     subOrderDate?: number | string;
+    vatSetting: EPartnerVATSetting;
   }) =>
   async () => {
     const ele = (
       <TranslationProvider>
         <PriceQuotation
           subOrderDate={subOrderDate}
+          vatSetting={vatSetting}
           data={priceQuotationData}
           isPartnerQuotation={isPartnerQuotation}
         />

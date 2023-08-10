@@ -31,14 +31,14 @@ const InfoSection: React.FC<TInfoSectionProps> = (props) => {
       <div className={css.customerSection}>
         <div className={css.sectionTitle}>
           {intl.formatMessage({
-            id: 'BookerOrderDetailsPriceQuotation.customerSection.label',
+            id: 'OrderDetails.PriceQuotation.customerSection.label',
           })}
         </div>
         <div className={css.sectionContent}>
           <div>
             <span>
               {intl.formatMessage({
-                id: 'BookerOrderDetailsPriceQuotation.customerSection.fullName',
+                id: 'OrderDetails.PriceQuotation.customerSection.fullName',
               })}
             </span>
             <span> {contactPeopleName}</span>
@@ -46,7 +46,7 @@ const InfoSection: React.FC<TInfoSectionProps> = (props) => {
           <div>
             <span>
               {intl.formatMessage({
-                id: 'BookerOrderDetailsPriceQuotation.customerSection.phoneNumber',
+                id: 'OrderDetails.PriceQuotation.customerSection.phoneNumber',
               })}
             </span>
             <span>{contactPhoneNumber}</span>
@@ -54,7 +54,7 @@ const InfoSection: React.FC<TInfoSectionProps> = (props) => {
           <div>
             <span>
               {intl.formatMessage({
-                id: 'BookerOrderDetailsPriceQuotation.customerSection.email',
+                id: 'OrderDetails.PriceQuotation.customerSection.email',
               })}
             </span>
             <span>{email}</span>
@@ -64,14 +64,14 @@ const InfoSection: React.FC<TInfoSectionProps> = (props) => {
       <div className={css.orderSection}>
         <div className={css.sectionTitle}>
           {intl.formatMessage({
-            id: 'BookerOrderDetailsPriceQuotation.orderSection.label',
+            id: 'OrderDetails.PriceQuotation.orderSection.label',
           })}
         </div>
         <div className={css.sectionContent}>
           <div>
             <span>
               {intl.formatMessage({
-                id: 'BookerOrderDetailsPriceQuotation.orderSection.companyName',
+                id: 'OrderDetails.PriceQuotation.orderSection.companyName',
               })}
             </span>
             <span>{companyName}</span>
@@ -80,13 +80,13 @@ const InfoSection: React.FC<TInfoSectionProps> = (props) => {
           <div>
             <span>
               {intl.formatMessage({
-                id: 'BookerOrderDetailsPriceQuotation.orderSection.duration.label',
+                id: 'OrderDetails.PriceQuotation.orderSection.duration.label',
               })}
             </span>
             <span>
               {intl.formatMessage(
                 {
-                  id: 'BookerOrderDetailsPriceQuotation.orderSection.duration.text',
+                  id: 'OrderDetails.PriceQuotation.orderSection.duration.text',
                 },
                 { start: startDate, end: endDate },
               )}
@@ -96,7 +96,7 @@ const InfoSection: React.FC<TInfoSectionProps> = (props) => {
           <div>
             <span>
               {intl.formatMessage({
-                id: 'BookerOrderDetailsPriceQuotation.orderSection.deliveryAddress',
+                id: 'OrderDetails.PriceQuotation.orderSection.deliveryAddress',
               })}
             </span>
             <span>{deliveryAddress}</span>

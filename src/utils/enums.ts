@@ -1058,3 +1058,9 @@ export enum EPaymentType {
   PARTNER = 'partner',
   CLIENT = 'client',
 }
+
+export enum EPartnerVATSetting {
+  vat = 'vat',
+  noExportVat = 'noExportVat',
+  direct = 'direct',
+}

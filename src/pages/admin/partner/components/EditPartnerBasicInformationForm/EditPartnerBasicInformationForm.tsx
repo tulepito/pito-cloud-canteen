@@ -1,5 +1,5 @@
 import React, { useMemo, useRef, useState } from 'react';
-import { Field, Form as FinalForm } from 'react-final-form';
+import { Form as FinalForm } from 'react-final-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import arrayMutators from 'final-form-arrays';
 import isEqual from 'lodash/isEqual';
@@ -13,12 +13,12 @@ import FieldAvailability, {
 import FieldCheckboxGroup from '@components/FormFields/FieldCheckboxGroup/FieldCheckboxGroup';
 import FieldPasswordInput from '@components/FormFields/FieldPasswordInput/FieldPasswordInput';
 import FieldPhotoUpload from '@components/FormFields/FieldPhotoUpload/FieldPhotoUpload';
+import FieldRadioButton from '@components/FormFields/FieldRadioButton/FieldRadioButton';
 import FieldTextArea from '@components/FormFields/FieldTextArea/FieldTextArea';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import { LocationAutocompleteInputField } from '@components/LocationAutocompleteInput/LocationAutocompleteInput';
-import ToggleButton from '@components/ToggleButton/ToggleButton';
 import { useViewport } from '@hooks/useViewport';
-import { EImageVariants, OTHER_OPTION } from '@utils/enums';
+import { EImageVariants, EPartnerVATSetting, OTHER_OPTION } from '@utils/enums';
 import { isUploadImageOverLimitError } from '@utils/errors';
 import type { TImage } from '@utils/types';
 import {
@@ -514,24 +514,37 @@ const EditPartnerBasicInformationForm: React.FC<
                       id: 'EditPartnerForm.retaurantConfigLabel',
                     })}
                   </p>
-                  <Field name="vat" id="vat">
-                    {(vatFieldProps: any) => {
-                      const { input } = vatFieldProps;
 
-                      return (
-                        <ToggleButton
-                          className={css.vatButton}
-                          id={input.name}
-                          name={input.name}
-                          label={intl.formatMessage({
-                            id: 'EditPartnerForm.exportVat',
-                          })}
-                          onClick={(e: any) => form.change('vat', e)}
-                          defaultValue={input.value}
-                        />
-                      );
-                    }}
-                  </Field>
+                  <div className={css.vatContainer}>
+                    <FieldRadioButton
+                      name="vat"
+                      id="vat.exportVat"
+                      value={EPartnerVATSetting.vat}
+                      label={intl.formatMessage({
+                        id: 'EditPartnerForm.exportVat',
+                      })}
+                      className={css.vatField}
+                    />
+                    <FieldRadioButton
+                      name="vat"
+                      id="vat.noExportVat"
+                      value={EPartnerVATSetting.noExportVat}
+                      label={intl.formatMessage({
+                        id: 'EditPartnerForm.noExportVat',
+                      })}
+                      className={css.vatField}
+                    />
+                    <FieldRadioButton
+                      name="vat"
+                      id="vat.direct"
+                      value={EPartnerVATSetting.direct}
+                      label={intl.formatMessage({
+                        id: 'EditPartnerForm.direct',
+                      })}
+                      className={css.vatField}
+                    />
+                  </div>
+
                   <FieldTextInput
                     name="minPrice"
                     className={css.minPrice}

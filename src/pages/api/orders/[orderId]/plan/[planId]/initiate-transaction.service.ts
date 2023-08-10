@@ -12,9 +12,13 @@ import { getSubAccountTrustedSdk } from '@services/subAccountSdk';
 import config from '@src/configs';
 import { Listing, Transaction, User } from '@src/utils/data';
 import { formatTimestamp } from '@src/utils/dates';
-import { ENotificationType, EOrderType } from '@src/utils/enums';
+import {
+  ENotificationType,
+  EOrderType,
+  EPartnerVATSetting,
+} from '@src/utils/enums';
 import { ETransition } from '@utils/transaction';
-import type { TObject, TTransaction } from '@utils/types';
+import type { TListing, TObject, TTransaction } from '@utils/types';
 
 export const initiateTransaction = async ({
   orderId,
@@ -136,11 +140,32 @@ export const initiateTransaction = async ({
     },
   });
 
-  // Update list of partnerIDs
-  integrationSdk.listings.update({
+  // update VAT setting for partners
+  const partnerListings = denormalisedResponseEntities(
+    await integrationSdk.listings.query({
+      ids: uniq(partnerIds),
+    }),
+  );
+  const vatSettings = partnerListings.reduce(
+    (res: TObject, partner: TListing) => {
+      const partnerGetter = Listing(partner);
+      const partnerId = partnerGetter.getId();
+
+      const { vat = EPartnerVATSetting.vat } = partnerGetter.getPublicData();
+
+      return {
+        ...res,
+        [partnerId]: vat,
+      };
+    },
+    {},
+  );
+
+  await integrationSdk.listings.update({
     id: orderId,
     metadata: {
       partnerIds: uniq(partnerIds),
+      vatSettings,
     },
   });
 };

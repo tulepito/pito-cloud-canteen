@@ -1,6 +1,7 @@
 import { useIntl } from 'react-intl';
 
 import PitoLogo from '@components/PitoLogo/PitoLogo';
+import { EPartnerVATSetting } from '@src/utils/enums';
 import { formatTimestamp } from '@utils/dates';
 import type { TObject } from '@utils/types';
 
@@ -15,6 +16,8 @@ import css from './PriceQuotation.module.scss';
 type TPriceQuotationProps = {
   subOrderDate?: number | string;
   isPartnerQuotation?: boolean;
+  vatSetting?: EPartnerVATSetting;
+  shouldSkipVAT?: boolean;
   data: {
     customerData: Partial<TReviewInfoFormValues> & {
       email: string;
@@ -34,7 +37,7 @@ type TPriceQuotationProps = {
       totalWithVAT: string;
       transportFee: string;
       VATFee: string;
-      currentOrderVATPercentage: number;
+      vatPercentage: number;
     };
     orderDetailData: {
       foodOrderGroupedByDate: TObject[];
@@ -46,6 +49,7 @@ const PriceQuotation: React.FC<TPriceQuotationProps> = ({
   subOrderDate,
   isPartnerQuotation = false,
   data,
+  vatSetting = EPartnerVATSetting.vat,
 }) => {
   const {
     customerData,
@@ -65,12 +69,18 @@ const PriceQuotation: React.FC<TPriceQuotationProps> = ({
     endDate: formattedEndDate,
   };
 
+  const cartProps = {
+    ...cartData,
+    isPartnerQuotation,
+    vatSetting,
+  };
+
   return (
     <div className={css.root} id="priceQuotation">
       <div className={css.titleContainer} id="header">
         <div>
           {intl.formatMessage(
-            { id: 'BookerOrderDetailsPriceQuotation.title' },
+            { id: 'OrderDetails.PriceQuotation.title' },
             { orderName: orderTitle },
           )}
         </div>
@@ -78,10 +88,7 @@ const PriceQuotation: React.FC<TPriceQuotationProps> = ({
       </div>
       <div className={css.contentContainer}>
         <InfoSection id={'infoSection'} {...infoSectionData} />
-        <CartSection
-          id={'summaryPrice'}
-          {...{ ...cartData, isPartnerQuotation }}
-        />
+        <CartSection id={'summaryPrice'} {...cartProps} />
         <OrderDetailSection
           itemId="quoteItem"
           subOrderDate={subOrderDate}

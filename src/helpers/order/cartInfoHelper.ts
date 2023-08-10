@@ -10,10 +10,29 @@ import {
   EOrderStates,
   EOrderType,
   EParticipantOrderStatus,
+  EPartnerVATSetting,
   ESubOrderStatus,
 } from '@src/utils/enums';
 import { Listing } from '@utils/data';
 import type { TListing, TObject, TQuotation } from '@utils/types';
+
+export const vatPercentageBaseOnVatSetting = ({
+  vatSetting,
+  vatPercentage,
+}: {
+  vatSetting: EPartnerVATSetting;
+  vatPercentage: number;
+}) => {
+  switch (vatSetting) {
+    case EPartnerVATSetting.direct:
+      return 0;
+    case EPartnerVATSetting.noExportVat:
+      return 0.04;
+    case EPartnerVATSetting.vat:
+    default:
+      return vatPercentage;
+  }
+};
 
 export const calculateTotalPriceAndDishes = ({
   orderDetail = {},
@@ -216,11 +235,13 @@ export const calculatePriceQuotationPartner = ({
   serviceFee = 0,
   currentOrderVATPercentage,
   subOrderDate,
+  shouldSkipVAT = false,
 }: {
   quotation: TQuotation;
   serviceFee: number;
   currentOrderVATPercentage: number;
   subOrderDate?: string;
+  shouldSkipVAT?: boolean;
 }) => {
   const promotion = 0;
   const totalPrice = subOrderDate
@@ -239,7 +260,9 @@ export const calculatePriceQuotationPartner = ({
       }, 0);
   const serviceFeePrice = Math.round((totalPrice * serviceFee) / 100);
   const totalWithoutVAT = totalPrice - promotion - serviceFeePrice;
-  const VATFee = Math.round(totalWithoutVAT * currentOrderVATPercentage);
+  const VATFee = shouldSkipVAT
+    ? 0
+    : Math.round(totalWithoutVAT * currentOrderVATPercentage);
   const totalWithVAT = VATFee + totalWithoutVAT;
 
   return {
@@ -250,6 +273,7 @@ export const calculatePriceQuotationPartner = ({
     totalWithoutVAT,
     totalWithVAT,
     promotion,
+    VATPercentage: currentOrderVATPercentage,
   };
 };
 
@@ -260,6 +284,7 @@ export const calculatePriceQuotationInfoFromQuotation = ({
   currentOrderServiceFeePercentage = 0,
   date,
   partnerId,
+  shouldSkipVAT = false,
 }: {
   quotation: TListing;
   packagePerMember: number;
@@ -267,6 +292,7 @@ export const calculatePriceQuotationInfoFromQuotation = ({
   currentOrderServiceFeePercentage?: number;
   date?: number | string;
   partnerId?: string;
+  shouldSkipVAT?: boolean;
 }) => {
   const quotationListingGetter = Listing(quotation);
   const { client, partner } = quotationListingGetter.getMetadata();
@@ -331,7 +357,9 @@ export const calculatePriceQuotationInfoFromQuotation = ({
   const promotion = 0;
   const totalWithoutVAT =
     totalPrice - serviceFee + transportFee + PITOFee - promotion;
-  const VATFee = Math.round(totalWithoutVAT * currentOrderVATPercentage || 0);
+  const VATFee = shouldSkipVAT
+    ? 0
+    : Math.round(totalWithoutVAT * currentOrderVATPercentage || 0);
   const totalWithVAT = VATFee + totalWithoutVAT;
   const overflow = isOverflowPackage
     ? totalWithVAT - totalDishes * packagePerMember
@@ -351,5 +379,6 @@ export const calculatePriceQuotationInfoFromQuotation = ({
     isOverflowPackage,
     totalWithoutVAT,
     PITOFee,
+    VATPercentage: currentOrderVATPercentage,
   };
 };
