@@ -1,7 +1,7 @@
 import * as XLSX from 'xlsx';
 
 import { parseThousandNumber } from '@helpers/format';
-import { formatTimestamp } from '@src/utils/dates';
+import { formatTimestamp, getDayOfWeek } from '@src/utils/dates';
 import type { TObject } from '@src/utils/types';
 
 export const filterPaymentPartner = (
@@ -19,10 +19,16 @@ export const filterPaymentPartner = (
     )
       return false;
     if (
-      orderTitle &&
-      !`${item.data.orderTitle}`
-        .toLocaleLowerCase()
-        .includes(orderTitle.toLocaleLowerCase())
+      (orderTitle &&
+        /-/.test(orderTitle) &&
+        !`${item.data.subOrderTitle}`
+          .toLocaleLowerCase()
+          .includes(orderTitle.toLocaleLowerCase())) ||
+      (orderTitle &&
+        !/-/.test(orderTitle) &&
+        !`${item.data.orderTitle}`
+          .toLocaleLowerCase()
+          .includes(orderTitle.toLocaleLowerCase()))
     )
       return false;
     if (startDate && +item.data.subOrderDate < startDate) return false;
@@ -50,7 +56,7 @@ export const parseEntitiesToExportCsv = (paymentRecords: any[]) => {
     } = paymentRecord.data || {};
 
     return {
-      ID: orderTitle,
+      ID: `#${orderTitle}-${getDayOfWeek(+subOrderDate)}`,
       'Đối tác': partnerName,
       'Tên đơn hàng': `${companyName}_${formatTimestamp(subOrderDate)}`,
       'Thời gian': `${deliveryHour} ${formatTimestamp(subOrderDate)}`,

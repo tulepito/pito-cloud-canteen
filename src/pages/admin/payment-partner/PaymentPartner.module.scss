@@ -79,13 +79,24 @@
   }
 }
 
-.tooltipWrapper {
-  width: auto;
-}
-
 .orderDetailTooltip {
   background-color: $neutralGray1;
   &:global.rc-tooltip {
     opacity: 1 !important;
+  }
+}
+
+.filterButtonWrapper {
+  position: relative;
+  z-index: 1;
+
+  .tooltipWrapper {
+    position: absolute;
+    top: 50px;
+    left: 0;
+    width: 480px;
+    background-color: $neutralGray1;
+    box-shadow: 0px 20px 24px 4px rgba(16, 24, 40, 0.1),
+      0px 8px 8px -4px rgba(16, 24, 40, 0.04);
   }
 }
