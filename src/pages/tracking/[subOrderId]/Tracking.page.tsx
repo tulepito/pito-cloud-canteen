@@ -35,7 +35,7 @@ const TrackingPage: React.FC<TTrackingPageProps> = () => {
 
   // eslint-disable-next-line no-unsafe-optional-chaining
   const [orderId, date] = (subOrderId as string)?.split('_');
-
+  const dateIndex = new Date(Number(date)).getDay();
   const { title: orderTitle = '' } = Listing(order as TListing).getAttributes();
 
   useEffect(() => {
@@ -65,7 +65,7 @@ const TrackingPage: React.FC<TTrackingPageProps> = () => {
             <div className={css.subTitle}>
               {intl.formatMessage(
                 { id: 'TrackingPage.subTitle' },
-                { orderTitle },
+                { orderTitle: `${orderTitle}_${dateIndex || 7}` },
               )}
             </div>
           </RenderWhen.False>

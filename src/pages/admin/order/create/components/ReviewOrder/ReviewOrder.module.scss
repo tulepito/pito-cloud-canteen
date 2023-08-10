@@ -165,6 +165,7 @@
   align-items: center;
   column-gap: 16px;
   cursor: pointer;
+  word-break: break-word;
 
   .copyIcon {
     path {
@@ -188,10 +189,12 @@
 
   &.spaceStart {
     justify-content: flex-start;
-    word-break: break-all;
+    word-break: keep-all;
 
     .flexChild {
-      margin-right: 100px;
+      @include viewportMedium {
+        margin-right: 100px;
+      }
     }
   }
 
