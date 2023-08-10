@@ -13,92 +13,81 @@ import AddingPaymentRecordModal from '../AddingPaymentRecordModal/AddingPaymentR
 import PaymentAmountTable from '../PaymentAmountTable/PaymentAmountTable';
 import PaymentRecordTable from '../PaymentRecordTable/PaymentRecordTable';
 
-import css from './PartnerPaymentDetail.module.scss';
+import css from './ClientPaymentDetail.module.scss';
 
-type PartnerPaymentDetailProps = {
-  partnerName: string;
+type ClientPaymentDetailProps = {
   totalWithVAT: number;
   orderId: string;
-  partnerId: string;
-  subOrderDate: string;
-  partnerPaymentRecordsByDate: any[];
+  clientPaymentRecords: any[];
   paidAmount: number;
   company: TUser;
   orderTitle: string;
   deliveryHour: string;
 };
 
-const PartnerPaymentDetail: React.FC<PartnerPaymentDetailProps> = (props) => {
+const ClientPaymentDetail: React.FC<ClientPaymentDetailProps> = (props) => {
   const {
-    partnerName,
     totalWithVAT,
     orderId,
-    partnerId,
-    subOrderDate,
-    partnerPaymentRecordsByDate = [],
+    clientPaymentRecords = [],
     paidAmount,
     company,
     orderTitle,
     deliveryHour,
   } = props;
-  const addPaymentModalController = useBoolean();
+
   const dispatch = useAppDispatch();
+  const addPaymentModalController = useBoolean();
+
+  const createClientPaymentRecordInProgress = useAppSelector(
+    (state) => state.OrderDetail.createClientPaymentRecordInProgress,
+  );
+  const createClientPaymentRecordError = useAppSelector(
+    (state) => state.OrderDetail.createClientPaymentRecordError,
+  );
+  const deleteClientPaymentRecordInProgress = useAppSelector(
+    (state) => state.OrderDetail.deleteClientPaymentRecordInProgress,
+  );
+
   const companyUser = User(company);
   const { companyName } = companyUser.getPublicData();
-
-  const createPartnerPaymentRecordInProgress = useAppSelector(
-    (state) => state.OrderDetail.createPartnerPaymentRecordInProgress,
-  );
-  const createPartnerPaymentRecordError = useAppSelector(
-    (state) => state.OrderDetail.createPartnerPaymentRecordError,
-  );
-  const deletePartnerPaymentRecordInProgress = useAppSelector(
-    (state) => state.OrderDetail.deletePartnerPaymentRecordInProgress,
-  );
   const addPaymentDisabled = totalWithVAT === paidAmount;
 
-  const handleAddPartnerPaymentRecord = async (
+  const onAddClientPaymentRecord = async (
     values: TAddingPaymentRecordFormValues,
   ) => {
     const { paymentAmount, paymentNote } = values;
 
     const { meta } = await dispatch(
-      OrderDetailThunks.createPartnerPaymentRecord({
-        paymentType: EPaymentType.PARTNER,
+      OrderDetailThunks.createClientPaymentRecord({
+        paymentType: EPaymentType.CLIENT,
         orderId,
-        partnerId,
-        subOrderDate,
         amount: parseThousandNumberToInteger(paymentAmount),
         paymentNote,
-        partnerName,
         companyName,
         orderTitle,
         totalPrice: totalWithVAT,
         deliveryHour,
-        SKU: generateSKU('PARTNER', orderId),
+        SKU: generateSKU('CUSTOMER', orderId),
       }),
     );
 
     if (meta.requestStatus === 'fulfilled') {
       addPaymentModalController.setFalse();
     } else {
-      dispatch(OrderDetailThunks.fetchPartnerPaymentRecords(orderId));
+      dispatch(OrderDetailThunks.fetchClientPaymentRecords(orderId));
     }
   };
 
-  const handleDeletePartnerPaymentRecord = async (paymentRecordId: string) => {
+  const handleDeleteClientPaymentRecord = async (paymentRecordId: string) => {
     return dispatch(
-      OrderDetailThunks.deletePartnerPaymentRecord(paymentRecordId),
+      OrderDetailThunks.deleteClientPaymentRecord(paymentRecordId),
     );
   };
 
   return (
     <div>
-      <PaymentAmountTable
-        tableTitle={partnerName}
-        totalPrice={totalWithVAT}
-        paidAmount={paidAmount}
-      />
+      <PaymentAmountTable totalPrice={totalWithVAT} paidAmount={paidAmount} />
       <div className={css.buttonsWrapper}>
         <Button
           variant="secondary"
@@ -109,22 +98,23 @@ const PartnerPaymentDetail: React.FC<PartnerPaymentDetailProps> = (props) => {
       </div>
       <div className={css.tableWrapper}>
         <PaymentRecordTable
-          tableData={partnerPaymentRecordsByDate}
-          onDeletePaymentRecord={handleDeletePartnerPaymentRecord}
-          deleteInProgress={deletePartnerPaymentRecordInProgress}
+          tableData={clientPaymentRecords}
+          onDeletePaymentRecord={handleDeleteClientPaymentRecord}
+          deleteInProgress={deleteClientPaymentRecordInProgress}
         />
       </div>
       <AddingPaymentRecordModal
         isOpen={addPaymentModalController.value}
         handleClose={addPaymentModalController.setFalse}
-        onPaymentSubmit={handleAddPartnerPaymentRecord}
+        onPaymentSubmit={onAddClientPaymentRecord}
         totalPrice={totalWithVAT}
         paidAmount={paidAmount}
-        inProgress={createPartnerPaymentRecordInProgress}
-        error={createPartnerPaymentRecordError}
+        inProgress={createClientPaymentRecordInProgress}
+        paymentType={EPaymentType.CLIENT}
+        error={createClientPaymentRecordError}
       />
     </div>
   );
 };
 
-export default PartnerPaymentDetail;
+export default ClientPaymentDetail;

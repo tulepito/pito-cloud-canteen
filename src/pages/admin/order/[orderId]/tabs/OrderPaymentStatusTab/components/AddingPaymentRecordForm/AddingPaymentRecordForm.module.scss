@@ -17,6 +17,11 @@
     color: $neutralGray5;
   }
 
+  .maxOption {
+    color: $labelBlue2;
+    text-decoration: underline;
+  }
+
   .percentageRow {
     padding: 8px 16px;
 
@@ -52,4 +57,9 @@
 .submitBtn {
   margin-top: 28px;
   width: 100%;
+}
+
+.error {
+  margin-top: 12px;
+  color: $primaryPri2;
 }

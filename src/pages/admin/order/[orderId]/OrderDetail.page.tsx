@@ -1,12 +1,14 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { shallowEqual } from 'react-redux';
+import compact from 'lodash/compact';
 import { useRouter } from 'next/router';
 
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import Tabs from '@components/Tabs/Tabs';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { orderManagementThunks } from '@redux/slices/OrderManagement.slice';
-import { EOrderDetailTabs } from '@src/utils/enums';
+import { Listing } from '@src/utils/data';
+import { EOrderDetailTabs, EOrderStates } from '@src/utils/enums';
 
 import OrderDetailTab from './tabs/OrderDetailTab/OrderDetailTab';
 import OrderPaymentStatusTab from './tabs/OrderPaymentStatusTab/OrderPaymentStatusTab';
@@ -66,6 +68,15 @@ const OrderDetailPage = () => {
     shallowEqual,
   );
 
+  const orderListing = Listing(order);
+  const { orderState } = orderListing.getMetadata();
+  const isShowOrderPaymentStatusTab = [
+    EOrderStates.inProgress,
+    EOrderStates.completed,
+    EOrderStates.pendingPayment,
+    EOrderStates.reviewed,
+  ].includes(orderState);
+
   useEffect(() => {
     if (orderId) {
       dispatch(orderManagementThunks.loadData(orderId as string));
@@ -102,7 +113,7 @@ const OrderDetailPage = () => {
     );
   };
 
-  const tabItems = [
+  const tabItems = compact([
     {
       key: EOrderDetailTabs.ORDER_DETAIL,
       label: 'Chi tiết đơn hàng',
@@ -147,7 +158,7 @@ const OrderDetailPage = () => {
         quotationsPagination,
       },
     },
-    {
+    isShowOrderPaymentStatusTab && {
       key: EOrderDetailTabs.PAYMENT_STATUS,
       label: 'Tình trạng thanh toán',
       childrenFn: (childProps: any) =>
@@ -170,7 +181,7 @@ const OrderDetailPage = () => {
         subOrderDate,
       },
     },
-  ];
+  ]);
 
   useEffect(() => {
     if (tab) {
@@ -179,7 +190,7 @@ const OrderDetailPage = () => {
       setDefaultActiveKey(tabIndexMaybe === 0 ? 1 : tabIndexMaybe);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tab]);
+  }, [tab, tabItems]);
 
   return (
     <div>

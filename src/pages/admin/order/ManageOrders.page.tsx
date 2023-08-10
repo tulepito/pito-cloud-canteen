@@ -5,6 +5,7 @@ import { FormattedMessage } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import classNames from 'classnames';
 import addDays from 'date-fns/addDays';
+import compact from 'lodash/compact';
 import { useRouter } from 'next/router';
 
 import Badge, { EBadgeType } from '@components/Badge/Badge';
@@ -435,6 +436,8 @@ const parseEntitiesToTableData = (orders: TIntegrationOrderListing[]) => {
       staffName,
       deliveryAddress,
       deliveryHour,
+      isClientSufficientPaid = false,
+      isPartnerSufficientPaid = false,
     } = entity?.attributes?.metadata || {};
 
     const orderDetail = subOrders[0]?.attributes?.metadata?.orderDetail || {};
@@ -448,41 +451,46 @@ const parseEntitiesToTableData = (orders: TIntegrationOrderListing[]) => {
       isGroupOrder,
     });
 
-    const subOrderDates = Object.keys(orderDetail).map((key) => {
-      const { totalDishes: childTotalDishes } = calculateTotalPriceAndDishes({
-        orderDetail: { key: orderDetail[key] },
-        isGroupOrder,
-      });
+    const subOrderDates = compact(
+      Object.keys(orderDetail).map((key) => {
+        const { totalDishes: childTotalDishes } = calculateTotalPriceAndDishes({
+          orderDetail: { key: orderDetail[key] },
+          isGroupOrder,
+        });
 
-      return {
-        key: `${entity.id.uuid}-${key}`,
-        data: {
-          id: `${entity.id.uuid}-${key}`,
-          title: `${entity.attributes.title}-${getDayOfWeek(+key)}`,
-          startDate: startDate && formatTimestamp(startDate),
-          endDate: endDate && formatTimestamp(endDate),
-          subOrderDate: formatTimestamp(+key, 'dd/MM/yyyy'),
-          state: orderState || EOrderDraftStates.pendingApproval,
-          orderId: entity?.id?.uuid,
-          restaurants: [orderDetail[key]?.restaurant?.restaurantName],
-          restaurantId: orderDetail[key]?.restaurant?.id,
-          subOrders: newSubOrders,
-          orderName: `${
-            company?.attributes?.profile?.publicData?.companyName
-          }_${formatTimestamp(+key, 'dd/MM/yyyy')}`,
-          deliveryHour,
-          parentKey: entity.id.uuid,
-          tx: orderDetail[key]?.transaction,
-          partnerPhoneNumber: orderDetail[key]?.restaurant?.phoneNumber,
-          totalDishes: childTotalDishes,
-          timestamp: +key,
-          partnerLocation: allRestaurants.find(
-            (_restaurant) =>
-              _restaurant.id.uuid === orderDetail[key]?.restaurant?.id,
-          )?.attributes?.publicData?.location?.address,
-        },
-      };
-    });
+        if (!orderDetail[key]?.transactionId) return null;
+
+        return {
+          key: `${entity.id.uuid}-${key}`,
+          data: {
+            id: `${entity.id.uuid}-${key}`,
+            title: `${entity.attributes.title}-${getDayOfWeek(+key)}`,
+            startDate: startDate && formatTimestamp(startDate),
+            endDate: endDate && formatTimestamp(endDate),
+            subOrderDate: formatTimestamp(+key, 'dd/MM/yyyy'),
+            state: orderState || EOrderDraftStates.pendingApproval,
+            orderId: entity?.id?.uuid,
+            restaurants: [orderDetail[key]?.restaurant?.restaurantName],
+            restaurantId: orderDetail[key]?.restaurant?.id,
+            subOrders: newSubOrders,
+            orderName: `${
+              company?.attributes?.profile?.publicData?.companyName
+            }_${formatTimestamp(+key, 'dd/MM/yyyy')}`,
+            deliveryHour,
+            parentKey: entity.id.uuid,
+            tx: orderDetail[key]?.transaction,
+            partnerPhoneNumber: orderDetail[key]?.restaurant?.phoneNumber,
+            totalDishes: childTotalDishes,
+            timestamp: +key,
+            partnerLocation: allRestaurants.find(
+              (_restaurant) =>
+                _restaurant.id.uuid === orderDetail[key]?.restaurant?.id,
+            )?.attributes?.publicData?.location?.address,
+            isPaid: orderDetail[key]?.isPaid,
+          },
+        };
+      }),
+    );
 
     return {
       key: entity.id.uuid,
@@ -505,8 +513,7 @@ const parseEntitiesToTableData = (orders: TIntegrationOrderListing[]) => {
         deliveryHour,
         isParent: true,
         children: subOrderDates,
-        isPaid:
-          entity.attributes.metadata.orderState === EOrderStates.completed,
+        isPaid: isClientSufficientPaid && isPartnerSufficientPaid,
         orderCreatedAt: formatTimestamp(
           new Date(entity.attributes.createdAt!).getTime(),
         ),

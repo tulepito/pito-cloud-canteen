@@ -11,6 +11,7 @@ import Button from '@components/Button/Button';
 import AlertModal from '@components/Modal/AlertModal';
 import NamedLink from '@components/NamedLink/NamedLink';
 import OrderDetailTooltip from '@components/OrderDetailTooltip/OrderDetailTooltip';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
 import type { TColumn } from '@components/Table/Table';
 import Tooltip from '@components/Tooltip/Tooltip';
 import { parseThousandNumber } from '@helpers/format';
@@ -259,7 +260,7 @@ const CompanyOrdersActionColumn = ({
       buttonList = [reviewOrderButton, reorderButton];
       break;
     case EOrderStates.completed:
-      buttonList = [reorderButton];
+      buttonList = [reviewOrderButton, reorderButton];
       break;
     case EOrderStates.reviewed:
       buttonList = [reorderButton];
@@ -436,18 +437,36 @@ export const CompanyOrdersTableColumns: TColumn[] = [
   {
     key: 'state',
     label: 'Trạng thái',
-    render: ({ state }: { state: EOrderStates }) => {
+    render: ({
+      state,
+      paymentStatus,
+    }: {
+      state: EOrderStates;
+      paymentStatus: boolean;
+    }) => {
       return (
         <div className={css.state}>
-          <Badge
-            containerClassName={classNames(
-              css.badge,
-              BADGE_CLASS_NAME_BASE_ON_ORDER_STATE[state],
-            )}
-            labelClassName={css.badgeLabel}
-            type={BADGE_TYPE_BASE_ON_ORDER_STATE[state] || EBadgeType.default}
-            label={getLabelByKey(ORDER_STATES_OPTIONS, state)}
-          />
+          <RenderWhen
+            condition={
+              Boolean(paymentStatus) &&
+              (state === EOrderStates.completed ||
+                state === EOrderStates.pendingPayment)
+            }>
+            <Badge type={EBadgeType.success} label="Đã hoàn thành" />
+            <RenderWhen.False>
+              <Badge
+                containerClassName={classNames(
+                  css.badge,
+                  BADGE_CLASS_NAME_BASE_ON_ORDER_STATE[state],
+                )}
+                labelClassName={css.badgeLabel}
+                type={
+                  BADGE_TYPE_BASE_ON_ORDER_STATE[state] || EBadgeType.default
+                }
+                label={getLabelByKey(ORDER_STATES_OPTIONS, state)}
+              />
+            </RenderWhen.False>
+          </RenderWhen>
         </div>
       );
     },

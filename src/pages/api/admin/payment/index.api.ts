@@ -9,6 +9,9 @@ import {
   queryPaymentRecordOnFirebase,
 } from '@services/payment';
 import { handleError } from '@services/sdk';
+import { EPaymentType } from '@src/utils/enums';
+
+import { checkPaymentRecordValid } from './check-valid-payment.service';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   const apiMethod = req.method;
@@ -24,21 +27,24 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             paymentType,
             orderId,
           });
+          if (paymentType === EPaymentType.PARTNER) {
+            const groupPaymentRecordsBySubOrderDate = paymentRecords?.reduce(
+              (acc: any, cur: any) => {
+                const { subOrderDate } = cur;
+                if (!acc[subOrderDate]) {
+                  acc[subOrderDate] = [];
+                }
+                acc[subOrderDate].push(cur);
 
-          const groupPaymentRecordsBySubOrderDate = paymentRecords?.reduce(
-            (acc: any, cur: any) => {
-              const { subOrderDate } = cur;
-              if (!acc[subOrderDate]) {
-                acc[subOrderDate] = [];
-              }
-              acc[subOrderDate].push(cur);
+                return acc;
+              },
+              {},
+            );
 
-              return acc;
-            },
-            {},
-          );
-
-          res.json(groupPaymentRecordsBySubOrderDate);
+            res.json(groupPaymentRecordsBySubOrderDate);
+          } else {
+            res.json(paymentRecords);
+          }
         }
         break;
       case HttpMethod.POST:
@@ -58,11 +64,22 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             deliveryHour,
             isHideFromHistory,
           } = paymentRecordParams;
+
+          const canCreatePaymentRecord = await checkPaymentRecordValid(
+            paymentRecordParams,
+            paymentRecordType,
+          );
+          if (!canCreatePaymentRecord) {
+            return res.status(400).json({
+              message: 'Payment record is invalid',
+            });
+          }
+
           const allowedPaymentRecordParams: Partial<PaymentBaseParams> = {
             SKU,
             amount,
-            paymentNote,
             orderId,
+            ...(paymentNote ? { paymentNote } : {}),
             ...(partnerId ? { partnerId } : {}),
             ...(partnerName ? { partnerName } : {}),
             ...(subOrderDate ? { subOrderDate } : {}),

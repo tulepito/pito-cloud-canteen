@@ -13,6 +13,7 @@ import {
   parseThousandNumberToInteger,
 } from '@helpers/format';
 import useBoolean from '@hooks/useBoolean';
+import { EPaymentType } from '@src/utils/enums';
 import { maxLength, required } from '@src/utils/validators';
 
 import css from './AddingPaymentRecordForm.module.scss';
@@ -26,6 +27,8 @@ type TExtraProps = {
   totalPrice: number;
   paidAmount: number;
   inProgress?: boolean;
+  paymentType?: EPaymentType;
+  createPaymentError?: any;
 };
 type TAddingPaymentRecordFormComponentProps =
   FormRenderProps<TAddingPaymentRecordFormValues> & Partial<TExtraProps>;
@@ -37,10 +40,12 @@ export const PaymentPercentageDropdown = ({
   paidAmount,
   percentage,
   setPercentage,
+  hasOnlyMaxOption = false,
 }: {
   totalPrice: number;
   paidAmount: number;
   percentage: number;
+  hasOnlyMaxOption?: boolean;
   setPercentage: (percentage: number) => void;
 }) => {
   const showPercentageController = useBoolean();
@@ -58,11 +63,21 @@ export const PaymentPercentageDropdown = ({
 
   return (
     <div className={css.dropdownContainer}>
-      <div className={css.percentage}>{percentage}%</div>
-      <IconArrow
-        onClick={showPercentageController.toggle}
-        direction={showPercentageController.value ? 'down' : 'right'}
-      />
+      <RenderWhen condition={hasOnlyMaxOption}>
+        <div className={css.maxOption} onClick={handleClickPercentage(100)}>
+          max
+        </div>
+        <RenderWhen.False>
+          <>
+            <div className={css.percentage}>{percentage}%</div>
+            <IconArrow
+              onClick={showPercentageController.toggle}
+              direction={showPercentageController.value ? 'down' : 'right'}
+            />
+          </>
+        </RenderWhen.False>
+      </RenderWhen>
+
       <RenderWhen condition={showPercentageController.value}>
         <div className={css.dropdownWrapper}>
           <RenderWhen condition={isRemainingAmountGreaterOrEqualThan30Percent}>
@@ -96,6 +111,8 @@ const AddingPaymentRecordFormComponent: React.FC<
     values,
     invalid,
     inProgress,
+    paymentType = EPaymentType.PARTNER,
+    createPaymentError,
   } = props;
   const [percentage, setPercentage] = useState<number>(0);
 
@@ -120,10 +137,17 @@ const AddingPaymentRecordFormComponent: React.FC<
 
   useEffect(() => {
     if (percentage !== 0) {
-      form.change(
-        'paymentAmount',
-        parseThousandNumber((totalPrice * percentage) / 100),
-      );
+      if (percentage === 100) {
+        form.change(
+          'paymentAmount',
+          parseThousandNumber(totalPrice - paidAmount),
+        );
+      } else {
+        form.change(
+          'paymentAmount',
+          parseThousandNumber(Math.floor((totalPrice * percentage) / 100)),
+        );
+      }
     }
   }, [percentage]);
 
@@ -147,6 +171,7 @@ const AddingPaymentRecordFormComponent: React.FC<
             paidAmount={paidAmount}
             percentage={percentage}
             setPercentage={setPercentage}
+            hasOnlyMaxOption={paymentType === EPaymentType.CLIENT}
           />
         }
         rightIconContainerClassName={css.rightIcon}
@@ -162,6 +187,10 @@ const AddingPaymentRecordFormComponent: React.FC<
         labelClassName={css.label}
         validate={maxLength('Ghi chú không được vượt quá 200 ký tự', 200)}
       />
+
+      {createPaymentError && (
+        <div className={css.error}>Có lỗi xảy ra, vui lòng thử lại</div>
+      )}
       <Button
         type="submit"
         className={css.submitBtn}

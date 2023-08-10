@@ -21,6 +21,7 @@ import type {
   EOrderDraftStates,
   EOrderHistoryTypes,
   EOrderStates,
+  EPaymentType,
   EReviewRatings,
   EReviewTypes,
   ETimeSlots,
@@ -702,4 +703,7 @@ export type TPaymentRecord = {
   companyName?: string;
   orderTitle?: string;
   createdAt?: Date;
+  isHideFromHistory?: boolean;
+  totalPrice?: number;
+  paymentType?: EPaymentType;
 };

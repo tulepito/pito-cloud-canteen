@@ -78,6 +78,7 @@ export const parseEntitiesToTableData = (
         orderName: entity.attributes.publicData.orderName,
         deliveryHour,
         totalWithVAT,
+        paymentStatus: entity.attributes.metadata?.isClientSufficientPaid,
       },
     };
   });
