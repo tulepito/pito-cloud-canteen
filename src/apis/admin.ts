@@ -21,3 +21,15 @@ export const transitPlanApi = ({
     txId: transactionId,
     transition,
   });
+
+export const getPaymentRecordsApi = (params: TObject) =>
+  getApi('/admin/payment', params);
+
+export const createPaymentRecordApi = (body: TObject) =>
+  postApi('/admin/payment', body);
+
+export const deletePaymentRecordApi = (body: TObject) =>
+  deleteApi('/admin/payment', body);
+
+export const getPartnerPaymentRecordsApi = () =>
+  getApi('/admin/payment/payment-partner');

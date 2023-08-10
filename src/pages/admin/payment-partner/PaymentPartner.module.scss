@@ -1,0 +1,102 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.header {
+  @include flexAlign(center, space-between);
+
+  .title {
+    @include textTemplate(24px, $fontWeightBold, 32px);
+  }
+}
+
+.orderTitle {
+  color: $labelBlue2;
+  font-weight: $fontWeightBold;
+}
+
+.boldText {
+  font-weight: $fontWeightBold;
+}
+
+.semiBoldText {
+  font-weight: $fontWeightSemiBold;
+}
+
+.filterForm {
+  margin-top: 24px;
+}
+
+.filterButton {
+  padding: 10px 20px 10px 20px;
+  font-size: 14px;
+
+  .filterIcon {
+    width: 16px;
+    height: 14px;
+    margin-right: 8px;
+  }
+
+  &:hover,
+  &:focus {
+    .filterIcon * {
+      fill: $neutralGray1;
+    }
+  }
+}
+
+.tableWrapper {
+  margin-top: 24px;
+}
+
+.filterLabels {
+  @include flexAlign(center);
+  gap: 10px;
+  margin-top: 24px;
+
+  .filterLabel {
+    padding: 8px 12px;
+    border: 1px solid $neutralGray3;
+    border-radius: 30px;
+    span {
+      @include textTemplate(14px, $fontWeightRegular, 20px);
+
+      &:first-child {
+        color: $neutralGray5;
+      }
+    }
+  }
+
+  .iconClose {
+    width: 10px;
+    height: 10px;
+    margin-left: 12px;
+    cursor: pointer;
+
+    path {
+      fill: $neutralGray5;
+    }
+  }
+}
+
+.orderDetailTooltip {
+  background-color: $neutralGray1;
+  &:global.rc-tooltip {
+    opacity: 1 !important;
+  }
+}
+
+.filterButtonWrapper {
+  position: relative;
+  z-index: 1;
+
+  .tooltipWrapper {
+    position: absolute;
+    top: 50px;
+    left: 0;
+    width: 480px;
+    background-color: $neutralGray1;
+    box-shadow: 0px 20px 24px 4px rgba(16, 24, 40, 0.1),
+      0px 8px 8px -4px rgba(16, 24, 40, 0.04);
+  }
+}

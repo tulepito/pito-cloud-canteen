@@ -8,6 +8,7 @@ import IconOrderManagement from '@components/Icons/IconOrderManagement/IconOrder
 import IconSetting from '@components/Icons/IconSetting/IconSetting';
 import IconTool from '@components/Icons/IconTool/IconTool';
 import IconUserManagement from '@components/Icons/IconUserManagement/IconUserManagement';
+import IconWallet from '@components/Icons/IconWallet/IconWallet';
 import type { TSidebarMenu } from '@components/MultiLevelSidebar/MultiLevelSidebar';
 import MultiLevelSidebar from '@components/MultiLevelSidebar/MultiLevelSidebar';
 import NamedLink from '@components/NamedLink/NamedLink';
@@ -115,6 +116,27 @@ const LIST_SIDEBAR_MENU: TSidebarMenu[] = [
             ],
           },
         ],
+      },
+    ],
+  },
+  {
+    id: 'payment',
+    Icon: IconWallet,
+    nameLink: adminRoutes.PartnerPayment.path,
+    label: 'AdminSidebar.paymentLabel',
+    isFirstLevel: true,
+    childrenMenus: [
+      {
+        id: 'clientPayment',
+        label: 'AdminSidebar.clientPaymentLabel',
+        nameLink: adminRoutes.ClientPayment.path,
+        highlightRefLinks: [adminRoutes.ClientPayment.path],
+      },
+      {
+        id: 'partnerPayment',
+        label: 'AdminSidebar.partnerPaymentLabel',
+        nameLink: adminRoutes.PartnerPayment.path,
+        highlightRefLinks: [adminRoutes.PartnerPayment.path],
       },
     ],
   },

@@ -2,6 +2,7 @@ import { initializeApp } from 'firebase/app';
 import {
   addDoc,
   collection,
+  deleteDoc,
   doc,
   getCountFromServer,
   getDoc,
@@ -15,6 +16,7 @@ import {
   updateDoc,
   where,
 } from 'firebase/firestore';
+import pick from 'lodash/pick';
 
 import type { TObject } from '@src/utils/types';
 
@@ -88,9 +90,43 @@ const queryCollectionData = async ({
   return list;
 };
 
+const queryAllCollectionData = async ({
+  collectionName,
+  queryParams,
+  neededDataAttributes,
+}: {
+  collectionName: string;
+  queryParams: TObject;
+  neededDataAttributes?: string[];
+}) => {
+  const hasNeededDataAttributes =
+    neededDataAttributes && neededDataAttributes.length > 0;
+  const ref = collection(firestore, collectionName);
+  const queryFuncs = Object.keys(queryParams).map((key) =>
+    where(key, queryParams[key].operator, queryParams[key].value),
+  );
+  const q = query(ref, ...queryFuncs, orderBy('createdAt', 'desc'));
+
+  const snapshot = await (await getDocs(q)).docs;
+
+  const list: any[] = [];
+
+  snapshot.forEach((_doc) => {
+    const neededData = !hasNeededDataAttributes
+      ? _doc.data()
+      : pick(_doc.data(), neededDataAttributes);
+    list.push({ ...neededData, id: _doc.id });
+  });
+
+  return list;
+};
+
 const addCollectionDoc = async (data: any, collectionName: string) => {
   const ref = collection(firestore, collectionName);
-  await addDoc(ref, data);
+
+  const addedDoc = await addDoc(ref, data);
+
+  return addedDoc.id;
 };
 
 const setCollectionDocWithCustomId = async (
@@ -100,6 +136,10 @@ const setCollectionDocWithCustomId = async (
   pathSegments = [],
 ) => {
   await setDoc(doc(firestore, path, ...pathSegments, customId), data);
+};
+
+const setCollectionDoc = async (data: any, path: string, pathSegments = []) => {
+  await setDoc(doc(firestore, path, ...pathSegments), data);
 };
 
 const updateCollectionDoc = async (
@@ -140,12 +180,23 @@ const getCollectionCount = async ({
   return count.data().count;
 };
 
+const deleteDocument = async (
+  documentId: string,
+  path: string,
+  pathSegments = [],
+) => {
+  await deleteDoc(doc(firestore, path, ...pathSegments, documentId));
+};
+
 export {
   addCollectionDoc,
+  deleteDocument,
   getCollectionCount,
   getCollectionData,
   getDocumentById,
+  queryAllCollectionData,
   queryCollectionData,
+  setCollectionDoc,
   setCollectionDocWithCustomId,
   updateCollectionDoc,
 };

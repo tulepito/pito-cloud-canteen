@@ -215,25 +215,28 @@ export const calculatePriceQuotationPartner = ({
   quotation = {},
   serviceFee = 0,
   currentOrderVATPercentage,
+  subOrderDate,
 }: {
   quotation: TQuotation;
   serviceFee: number;
   currentOrderVATPercentage: number;
+  subOrderDate?: string;
 }) => {
   const promotion = 0;
-  const totalPrice = Object.keys(quotation).reduce(
-    (result: number, orderDate: string) => {
-      const totalPriceInDate = quotation[orderDate].reduce(
-        (singleDateSum: number, item: any) => {
-          return singleDateSum + item.foodPrice * item.frequency;
-        },
-        0,
-      );
+  const totalPrice = subOrderDate
+    ? quotation[subOrderDate].reduce((singleDateSum: number, item: any) => {
+        return singleDateSum + item.foodPrice * item.frequency;
+      }, 0)
+    : Object.keys(quotation).reduce((result: number, orderDate: string) => {
+        const totalPriceInDate = quotation[orderDate].reduce(
+          (singleDateSum: number, item: any) => {
+            return singleDateSum + item.foodPrice * item.frequency;
+          },
+          0,
+        );
 
-      return result + totalPriceInDate;
-    },
-    0,
-  );
+        return result + totalPriceInDate;
+      }, 0);
   const serviceFeePrice = Math.round((totalPrice * serviceFee) / 100);
   const totalWithoutVAT = totalPrice - promotion - serviceFeePrice;
   const VATFee = Math.round(totalWithoutVAT * currentOrderVATPercentage);

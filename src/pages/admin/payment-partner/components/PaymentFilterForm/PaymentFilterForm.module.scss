@@ -1,0 +1,32 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.fieldInput {
+  margin-top: 28px;
+}
+
+.label {
+  @include textTemplate(18px, $fontWeightBold, 24px);
+  color: $neutralGray6;
+}
+
+.dateInputs {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.btnsWrapper {
+  @include flexAlign(center, space-between);
+  gap: 16px;
+  margin-top: 28px;
+}
+
+.btn {
+  width: 100%;
+}
+
+.checkboxGroup {
+  @include textTemplate(16px, $fontWeightRegular, 24px);
+}
