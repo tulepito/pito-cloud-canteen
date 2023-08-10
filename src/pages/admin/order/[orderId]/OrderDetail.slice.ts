@@ -104,6 +104,8 @@ type TOrderDetailState = {
 
   deleteClientPaymentRecordInProgress: boolean;
   deleteClientPaymentRecordError: any;
+
+  fetchOnlyOrderInProgress: boolean;
 };
 const initialState: TOrderDetailState = {
   order: null!,
@@ -146,6 +148,8 @@ const initialState: TOrderDetailState = {
 
   deleteClientPaymentRecordInProgress: false,
   deleteClientPaymentRecordError: null,
+
+  fetchOnlyOrderInProgress: false,
 };
 
 // ================ Thunk types ================ //
@@ -165,6 +169,7 @@ const CREATE_CLIENT_PAYMENT_RECORD =
   'app/OrderDetail/CREATE_CLIENT_PAYMENT_RECORD';
 const DELETE_CLIENT_PAYMENT_RECORD =
   'app/OrderDetail/DELETE_CLIENT_PAYMENT_RECORD';
+const FETCH_ONLY_ORDER = 'app/OrderDetail/FETCH_ONLY_ORDER';
 // ================ Async thunks ================ //
 const fetchOrder = createAsyncThunk(
   FETCH_ORDER,
@@ -193,6 +198,14 @@ const fetchOrder = createAsyncThunk(
       participantData,
       anonymousParticipantData,
     };
+  },
+);
+const fetchOnlyOrder = createAsyncThunk(
+  FETCH_ONLY_ORDER,
+  async (orderId: string, { extra: sdk }) => {
+    const order = await sdk.listings.show({ id: orderId });
+
+    return denormalisedResponseEntities(order)[0];
   },
 );
 
@@ -319,7 +332,7 @@ const fetchPartnerPaymentRecords = createAsyncThunk(
 
 const createPartnerPaymentRecord = createAsyncThunk(
   CREATE_PARTNER_PAYMENT_RECORD,
-  async (payload: TObject, { getState }) => {
+  async (payload: TObject, { getState, dispatch }) => {
     const { partnerPaymentRecords = {}, order } = getState().OrderDetail;
     const orderListing = Listing(order);
     const orderId = orderListing.getId();
@@ -338,7 +351,8 @@ const createPartnerPaymentRecord = createAsyncThunk(
       ...partnerPaymentRecords,
       [subOrderDate]: [newPaymentRecord, ...currentPaymentRecordsBySubOrder],
     };
-    transitionOrderPaymentStatusApi(orderId, plans[0]);
+    await transitionOrderPaymentStatusApi(orderId, plans[0]);
+    await dispatch(fetchOnlyOrder(orderId));
 
     return newPartnerPaymentRecords;
   },
@@ -346,7 +360,7 @@ const createPartnerPaymentRecord = createAsyncThunk(
 
 const deletePartnerPaymentRecord = createAsyncThunk(
   DELETE_PARTNER_PAYMENT_RECORD,
-  async (paymentRecordId: string, { getState }) => {
+  async (paymentRecordId: string, { getState, dispatch }) => {
     const { partnerPaymentRecords = {}, order } = getState().OrderDetail;
     const orderListing = Listing(order);
     const orderId = orderListing.getId();
@@ -363,7 +377,8 @@ const deletePartnerPaymentRecord = createAsyncThunk(
 
       return acc;
     }, {});
-    transitionOrderPaymentStatusApi(orderId, plans[0]);
+    await transitionOrderPaymentStatusApi(orderId, plans[0]);
+    await dispatch(fetchOnlyOrder(orderId));
 
     return newPartnerPaymentRecords;
   },
@@ -382,7 +397,7 @@ const fetchClientPaymentRecords = createAsyncThunk(
 
 const createClientPaymentRecord = createAsyncThunk(
   CREATE_CLIENT_PAYMENT_RECORD,
-  async (payload: TObject, { getState }) => {
+  async (payload: TObject, { getState, dispatch }) => {
     const { clientPaymentRecords = [], order } = getState().OrderDetail;
     const orderListing = Listing(order);
     const orderId = orderListing.getId();
@@ -395,7 +410,8 @@ const createClientPaymentRecord = createAsyncThunk(
       },
     };
     const { data: newPaymentRecord } = await createPaymentRecordApi(apiBody);
-    transitionOrderPaymentStatusApi(orderId, plans[0]);
+    await transitionOrderPaymentStatusApi(orderId, plans[0]);
+    await dispatch(fetchOnlyOrder(orderId));
 
     return [newPaymentRecord, ...clientPaymentRecords];
   },
@@ -403,7 +419,7 @@ const createClientPaymentRecord = createAsyncThunk(
 
 const deleteClientPaymentRecord = createAsyncThunk(
   DELETE_CLIENT_PAYMENT_RECORD,
-  async (paymentRecordId: string, { getState }) => {
+  async (paymentRecordId: string, { getState, dispatch }) => {
     const { clientPaymentRecords = [], order } = getState().OrderDetail;
     const orderListing = Listing(order);
     const orderId = orderListing.getId();
@@ -413,7 +429,8 @@ const deleteClientPaymentRecord = createAsyncThunk(
     const newClientPaymentRecords = clientPaymentRecords.filter(
       (paymentRecord: any) => paymentRecord.id !== paymentRecordId,
     );
-    transitionOrderPaymentStatusApi(orderId, plans[0]);
+    await transitionOrderPaymentStatusApi(orderId, plans[0]);
+    await dispatch(fetchOnlyOrder(orderId));
 
     return newClientPaymentRecords;
   },
@@ -644,6 +661,17 @@ const OrderDetailSlice = createSlice({
       .addCase(deleteClientPaymentRecord.rejected, (state, { error }) => {
         state.deleteClientPaymentRecordInProgress = false;
         state.deleteClientPaymentRecordError = error.message;
+      })
+
+      .addCase(fetchOnlyOrder.pending, (state) => {
+        state.fetchOnlyOrderInProgress = true;
+      })
+      .addCase(fetchOnlyOrder.fulfilled, (state, { payload }) => {
+        state.fetchOnlyOrderInProgress = false;
+        state.order = payload;
+      })
+      .addCase(fetchOnlyOrder.rejected, (state) => {
+        state.fetchOnlyOrderInProgress = false;
       });
   },
 });
