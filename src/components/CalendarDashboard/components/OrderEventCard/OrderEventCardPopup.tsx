@@ -11,7 +11,7 @@ import { OrderListThunks } from '@pages/participant/orders/OrderList.slice';
 import { participantOrderManagementThunks } from '@redux/slices/ParticipantOrderManagementPage.slice';
 import { currentUserSelector } from '@redux/slices/user.slice';
 import { participantPaths } from '@src/paths';
-import { EOrderStates } from '@src/utils/enums';
+import { EOrderStates, EParticipantOrderStatus } from '@src/utils/enums';
 import { txIsDelivered } from '@src/utils/transaction';
 import type { TTransaction } from '@src/utils/types';
 import { CurrentUser } from '@utils/data';
@@ -159,7 +159,11 @@ const OrderEventCardPopup: React.FC<TOrderEventCardPopupProps> = ({
         </div>
       </RenderWhen>
       <RenderWhen
-        condition={!reviewId && txIsDelivered(subOrderTx as TTransaction)}>
+        condition={
+          !reviewId &&
+          txIsDelivered(subOrderTx as TTransaction) &&
+          status === EParticipantOrderStatus.joined
+        }>
         <div className={css.ratingWrapper}>
           <Button
             disabled={
