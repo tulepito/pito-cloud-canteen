@@ -15,7 +15,7 @@ export const participantSubOrderGetDocumentApi = async (
   participantId: string,
   txStatus: string,
   limitRecords?: number,
-  lastRecord?: number,
+  lastRecord?: number | null,
 ) =>
   getApi(`/participants/document`, {
     participantId,
@@ -63,3 +63,7 @@ export const queryOrderChangesHistoryDocumentApi = async (
   getApi(
     `/orders/${orderId}/plan/${planId}/history/?planOrderDate=${planOrderDate}&lastRecordCreatedAt=${lastRecordCreatedAt}`,
   );
+
+export const fetchParticipantFirebaseSubOrderApi = async (
+  subOrderDocumentId: string,
+) => getApi(`/participants/document/${subOrderDocumentId}`);

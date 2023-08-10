@@ -232,6 +232,8 @@ const OrderListPage = () => {
             currentPlanListing.getMetadata().orderDetail[planItemKey]
               ?.transactionId,
           orderState,
+          foodName: dishes.find((_dish) => _dish.key === foodSelection?.foodId)
+            ?.value,
         },
         title: orderTitle,
         start: DateTime.fromMillis(+planItemKey).toJSDate(),
@@ -372,6 +374,18 @@ const OrderListPage = () => {
       if (event) {
         setSelectedEvent(event);
         subOrderDetailModalControl.setTrue();
+      } else {
+        const monthInQuery = getStartOfMonth(
+          DateTime.fromMillis(+timestamp).toJSDate(),
+        );
+        setSelectedMonth(getStartOfMonth(monthInQuery));
+        if (
+          diffDays(monthInQuery?.getTime(), maxSelectedMonth?.getTime(), [
+            'months',
+          ]).months! > 0
+        ) {
+          setMaxSelectedMonth(monthInQuery);
+        }
       }
     }
   }, [planIdFromQuery, timestampFromQuery, JSON.stringify(flattenEvents)]);
@@ -446,19 +460,22 @@ const OrderListPage = () => {
       </RenderWhen>
       <RenderWhen condition={!!selectedEvent}>
         <div className={css.subOrderDetailModal}>
-          <SubOrderDetailModal
-            isOpen={subOrderDetailModalControl.value}
-            onClose={subOrderDetailModalControl.setFalse}
-            event={selectedEvent!}
-            openRatingSubOrderModal={openRatingSubOrderModal}
-            from="orderList"
-          />
+          <RenderWhen condition={isMobileLayout}>
+            <SubOrderDetailModal
+              isOpen={subOrderDetailModalControl.value}
+              onClose={subOrderDetailModalControl.setFalse}
+              event={selectedEvent!}
+              openRatingSubOrderModal={openRatingSubOrderModal}
+              from="orderList"
+            />
+          </RenderWhen>
           <RatingSubOrderModal
             isOpen={ratingSubOrderModalControl.value}
             onClose={ratingSubOrderModalControl.setFalse}
             selectedEvent={selectedEvent}
             currentUserId={currentUserId}
             openSuccessRatingModal={openSuccessRatingModal}
+            participantPostRatingInProgress={participantPostRatingInProgress}
           />
         </div>
       </RenderWhen>
@@ -466,6 +483,7 @@ const OrderListPage = () => {
         isOpen={successRatingModalControl.value}
         onClose={successRatingModalControl.setFalse}
         closeAllModals={closeAllModals}
+        fromOrderList
       />
       <NotificationModal
         isOpen={notificationModalControl.value}

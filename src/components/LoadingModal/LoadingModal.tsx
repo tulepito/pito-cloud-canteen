@@ -1,9 +1,14 @@
 import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
 import Modal from '@components/Modal/Modal';
+import { useViewport } from '@hooks/useViewport';
 
 import css from './LoadingModal.module.scss';
 
 const LoadingModal = ({ isOpen }: { isOpen: boolean }) => {
+  const { isMobileLayout } = useViewport();
+
+  if (!isMobileLayout) return null;
+
   return (
     <Modal
       id="LoadingModal"

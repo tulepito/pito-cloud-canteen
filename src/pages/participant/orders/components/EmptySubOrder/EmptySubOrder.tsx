@@ -2,7 +2,13 @@ import classNames from 'classnames';
 
 import css from './EmptySubOrder.module.scss';
 
-const EmptySubOrder = ({ className }: { className?: string }) => {
+const EmptySubOrder = ({
+  className,
+  title = 'Hiện chưa có ngày ăn được tạo',
+}: {
+  className?: string;
+  title?: string;
+}) => {
   return (
     <div className={classNames(css.container, className)}>
       <svg
@@ -59,7 +65,7 @@ const EmptySubOrder = ({ className }: { className?: string }) => {
           fill="#B0B0B0"
         />
       </svg>
-      <div className={css.text}>Hiện chưa có ngày ăn được tạo</div>
+      <div className={css.text}>{title}</div>
     </div>
   );
 };

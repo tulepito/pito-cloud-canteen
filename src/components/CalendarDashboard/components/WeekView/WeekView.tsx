@@ -57,6 +57,7 @@ function WeekView({
     () => WeekView.range(date, { localizer }),
     [date, localizer],
   );
+  const { hideEmptySubOrderSection = false } = resources || ({} as any);
 
   useEffect(() => {
     if (width < 768) {
@@ -86,7 +87,7 @@ function WeekView({
           />
         ))}
       </div>
-      <RenderWhen condition={events.length === 0}>
+      <RenderWhen condition={events.length === 0 && !hideEmptySubOrderSection}>
         <EmptySubOrder />
       </RenderWhen>
     </div>

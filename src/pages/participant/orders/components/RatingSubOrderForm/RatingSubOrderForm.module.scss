@@ -5,10 +5,20 @@
 .container {
   max-height: 80vh;
   overflow-y: auto;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 .generalRatingWrapper {
   padding-bottom: 20px;
   border-bottom: 1px solid $neutralGray4;
+
+  @include viewportLarge {
+    width: 400px;
+    border: none;
+    margin: 0 auto;
+  }
 
   .generalRatingTitle {
     @include textTemplate(16px, $fontWeightBold, 24px);
@@ -17,6 +27,10 @@
 
   .generalRatingField {
     margin: 20px auto 0;
+
+    > div {
+      flex-basis: calc(490px / 7);
+    }
 
     svg {
       width: 28px;

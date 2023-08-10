@@ -1,7 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit';
 import uniqBy from 'lodash/uniqBy';
 
-import { participantSubOrderGetDocumentApi } from '@apis/firebaseApi';
+import {
+  fetchParticipantFirebaseSubOrderApi,
+  participantSubOrderGetDocumentApi,
+} from '@apis/firebaseApi';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { denormalisedResponseEntities } from '@src/utils/data';
 import { EImageVariants, ESubOrderTxStatus } from '@src/utils/enums';
@@ -19,6 +22,11 @@ type TSubOrdersState = {
   subOrderReview: any;
   fetchReviewInProgress: boolean;
   fetchReviewError: any;
+  deliveringLastRecord: number | null;
+  deliveredLastRecord: number | null;
+
+  fetchSubOrderInProgress: boolean;
+  fetchSubOrderError: any;
 };
 const initialState: TSubOrdersState = {
   subOrders: [],
@@ -29,6 +37,10 @@ const initialState: TSubOrdersState = {
   subOrderReview: [],
   fetchReviewInProgress: false,
   fetchReviewError: null,
+  deliveringLastRecord: null,
+  deliveredLastRecord: null,
+  fetchSubOrderInProgress: false,
+  fetchSubOrderError: null,
 };
 
 // ================ Thunk types ================ //
@@ -36,21 +48,25 @@ const FETCH_SUB_ORDERS_FROM_FIREBASE =
   'app/SubOrders/FETCH_SUB_ORDERS_FROM_FIREBASE';
 
 const FETCH_REVIEW_FROM_SUB_ORDER = 'app/SubOrders/FETCH_REVIEW_FROM_SUB_ORDER';
+const FETCH_SUB_ORDER_FROM_FIREBASE =
+  'app/SubOrders/FETCH_SUB_ORDER_FROM_FIREBASE';
 // ================ Async thunks ================ //
 
 const fetchSubOrdersFromFirebase = createAsyncThunk(
   FETCH_SUB_ORDERS_FROM_FIREBASE,
-  async (payload: any) => {
-    const { participantId, txStatus, lastRecord } = payload;
+  async (payload: any, { getState }) => {
+    const { deliveringLastRecord, deliveredLastRecord } =
+      getState().ParticipantSubOrderList;
+    const { participantId, txStatus } = payload;
 
     const { data: response } = await participantSubOrderGetDocumentApi(
       participantId,
       txStatus,
       FIREBASE_LIMIT_RECORDS,
-      lastRecord,
+      Array.isArray(txStatus) ? deliveringLastRecord : deliveredLastRecord,
     );
 
-    return txStatus === ESubOrderTxStatus.DELIVERING
+    return Array.isArray(txStatus)
       ? {
           deliveringSubOrders: response,
         }
@@ -78,9 +94,29 @@ const fetchReviewFromSubOrder = createAsyncThunk(
   },
 );
 
+const fetchSubOrderFromFirebase = createAsyncThunk(
+  FETCH_SUB_ORDER_FROM_FIREBASE,
+  async (payload: any) => {
+    const { subOrderDocumentId, subOrderType } = payload;
+
+    const { data: response } = await fetchParticipantFirebaseSubOrderApi(
+      subOrderDocumentId,
+    );
+
+    return subOrderType === ESubOrderTxStatus.DELIVERING
+      ? {
+          deliveringSubOrder: response,
+        }
+      : {
+          deliveredSubOrder: response,
+        };
+  },
+);
+
 export const SubOrdersThunks = {
   fetchSubOrdersFromFirebase,
   fetchReviewFromSubOrder,
+  fetchSubOrderFromFirebase,
 };
 
 // ================ Slice ================ //
@@ -100,10 +136,30 @@ const SubOrdersSlice = createSlice({
           fetchSubOrdersInProgress: false,
           fetchSubOrdersError: null,
           ...(action.payload.deliveredSubOrders && {
-            deliveredSubOrders: action.payload.deliveredSubOrders,
+            deliveredSubOrders: uniqBy(
+              [
+                ...state.deliveredSubOrders,
+                ...action.payload.deliveredSubOrders,
+              ],
+              'id',
+            ),
+            deliveredLastRecord:
+              action.payload.deliveredSubOrders[
+                action.payload.deliveredSubOrders.length - 1
+              ]?.createdAt?.seconds,
           }),
           ...(action.payload.deliveringSubOrders && {
-            deliveringSubOrders: action.payload.deliveringSubOrders,
+            deliveringSubOrders: uniqBy(
+              [
+                ...state.deliveringSubOrders,
+                ...action.payload.deliveringSubOrders,
+              ],
+              'id',
+            ),
+            deliveringLastRecord:
+              action.payload.deliveringSubOrders[
+                action.payload.deliveringSubOrders.length - 1
+              ]?.createdAt?.seconds,
           }),
         };
       })
@@ -127,6 +183,36 @@ const SubOrdersSlice = createSlice({
       .addCase(fetchReviewFromSubOrder.rejected, (state, action) => {
         state.fetchReviewInProgress = false;
         state.fetchReviewError = action.error.message;
+      })
+
+      .addCase(fetchSubOrderFromFirebase.pending, (state) => {
+        state.fetchSubOrderInProgress = true;
+        state.fetchSubOrderError = null;
+      })
+      .addCase(fetchSubOrderFromFirebase.fulfilled, (state, { payload }) => {
+        return {
+          ...state,
+          fetchSubOrderInProgress: false,
+          ...(payload.deliveredSubOrder && {
+            deliveredSubOrders: state.deliveredSubOrders.map((subOrder: any) =>
+              subOrder.id === payload.deliveredSubOrder.id
+                ? payload.deliveredSubOrder
+                : subOrder,
+            ),
+          }),
+          ...(payload.deliveringSubOrder && {
+            deliveringSubOrders: state.deliveringSubOrders.map(
+              (subOrder: any) =>
+                subOrder.id === payload.deliveringSubOrder.id
+                  ? payload.deliveringSubOrder
+                  : subOrder,
+            ),
+          }),
+        };
+      })
+      .addCase(fetchSubOrderFromFirebase.rejected, (state, action) => {
+        state.fetchSubOrderInProgress = false;
+        state.fetchSubOrderError = action.error.message;
       });
   },
 });

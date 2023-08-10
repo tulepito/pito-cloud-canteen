@@ -4,6 +4,7 @@ import { HttpMethod } from '@apis/configs';
 import cookies from '@services/cookie';
 import { queryCollectionData } from '@services/firebase';
 import { handleError } from '@services/sdk';
+import { EParticipantOrderStatus } from '@src/utils/enums';
 
 import {
   addFirebaseDocument,
@@ -28,8 +29,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
               value: participantId,
             },
             txStatus: {
+              operator: 'in',
+              value: Array.isArray(txStatus) ? txStatus : [txStatus],
+            },
+            status: {
               operator: '==',
-              value: txStatus,
+              value: EParticipantOrderStatus.joined,
             },
           },
           limitRecords: Number(limitRecords),

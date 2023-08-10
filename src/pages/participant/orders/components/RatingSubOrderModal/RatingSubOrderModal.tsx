@@ -1,12 +1,17 @@
+import { useMemo, useRef } from 'react';
 import type { Event } from 'react-big-calendar';
 
+import Modal from '@components/Modal/Modal';
 import SlideModal from '@components/SlideModal/SlideModal';
 import { useAppDispatch } from '@hooks/reduxHooks';
+import { useViewport } from '@hooks/useViewport';
 import { resetImage } from '@redux/slices/uploadImage.slice';
 
 import { OrderListThunks } from '../../OrderList.slice';
 import type { TRatingSubOrderFormValues } from '../RatingSubOrderForm/RatingSubOrderForm';
 import RatingSubOrderForm from '../RatingSubOrderForm/RatingSubOrderForm';
+
+import css from './RatingSubOrderModal.module.scss';
 
 type TRatingSubOrderModalProps = {
   isOpen: boolean;
@@ -14,6 +19,7 @@ type TRatingSubOrderModalProps = {
   currentUserId: string;
   selectedEvent: Event | null;
   openSuccessRatingModal: () => void;
+  participantPostRatingInProgress?: boolean;
 };
 const RatingSubOrderModal: React.FC<TRatingSubOrderModalProps> = (props) => {
   const {
@@ -22,29 +28,37 @@ const RatingSubOrderModal: React.FC<TRatingSubOrderModalProps> = (props) => {
     currentUserId,
     selectedEvent,
     openSuccessRatingModal,
+    participantPostRatingInProgress,
   } = props;
   const dispatch = useAppDispatch();
+  const { isMobileLayout } = useViewport();
   const {
     companyName = 'PCC',
     orderId,
     restaurant,
     timestamp,
     planId,
+    foodName,
   } = selectedEvent?.resource || {};
   const restaurantId = restaurant?.id;
+  const formRef = useRef<any>(null);
 
   const handleClose = () => {
     dispatch(resetImage());
+    formRef.current?.restart();
     onClose();
   };
 
-  const initialValues: TRatingSubOrderFormValues = {
-    general: '',
-    food: '',
-    packaging: '',
-    detailTextRating: '',
-    images: [],
-  };
+  const initialValues: TRatingSubOrderFormValues = useMemo(
+    () => ({
+      general: '',
+      food: '',
+      packaging: '',
+      detailTextRating: '',
+      images: [],
+    }),
+    [],
+  );
 
   const handleSubmit = async (values: TRatingSubOrderFormValues) => {
     const { general, food, packaging, detailTextRating } = values;
@@ -77,16 +91,39 @@ const RatingSubOrderModal: React.FC<TRatingSubOrderModalProps> = (props) => {
       handleClose();
       openSuccessRatingModal();
       dispatch(resetImage());
+      formRef.current?.reset();
     }
   };
 
+  if (isMobileLayout)
+    return (
+      <SlideModal
+        id="RatingSubOrderModal"
+        isOpen={isOpen}
+        onClose={handleClose}>
+        <RatingSubOrderForm
+          onSubmit={handleSubmit}
+          initialValues={initialValues}
+          inProgress={participantPostRatingInProgress}
+          formRef={formRef}
+        />
+      </SlideModal>
+    );
+
   return (
-    <SlideModal id="RatingSubOrderModal" isOpen={isOpen} onClose={handleClose}>
+    <Modal
+      id="RatingSubOrderModal"
+      isOpen={isOpen}
+      handleClose={handleClose}
+      containerClassName={css.modalContainer}
+      title={`Đánh giá món ${foodName}`}>
       <RatingSubOrderForm
         onSubmit={handleSubmit}
         initialValues={initialValues}
+        inProgress={participantPostRatingInProgress}
+        formRef={formRef}
       />
-    </SlideModal>
+    </Modal>
   );
 };
 

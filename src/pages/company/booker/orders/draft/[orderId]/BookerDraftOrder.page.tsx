@@ -284,6 +284,7 @@ function BookerDraftOrderPage() {
                 onEditFood: onOpenPickFoodModal,
                 editFoodInprogress: onEditFoodInProgress,
                 availableOrderDetailCheckList,
+                hideEmptySubOrderSection: true,
               }}
               components={componentsProps}
             />
