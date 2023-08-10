@@ -10,9 +10,9 @@ import IconDownload from '@components/Icons/IconDownload/IconDownload';
 import IconFilter from '@components/Icons/IconFilter/IconFilter';
 import NamedLink from '@components/NamedLink/NamedLink';
 import OutsideClickHandler from '@components/OutsideClickHandler/OutsideClickHandler';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
 import type { TColumn } from '@components/Table/Table';
 import { TableForm } from '@components/Table/Table';
-import Tooltip from '@components/Tooltip/Tooltip';
 import { parseThousandNumber } from '@helpers/format';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
@@ -246,22 +246,7 @@ const ManagePaymentsPage = () => {
         <h1 className={css.title}>{title}</h1>
       </div>
       <div className={css.actionSection}>
-        <Tooltip
-          visible={tooltipController.value}
-          popupVisible={tooltipController.value}
-          overlayClassName={css.filterBtnTooltipOverlay}
-          tooltipContent={
-            <OutsideClickHandler onOutsideClick={handleCloseTooltip}>
-              <PaymentFilterForm
-                initialValues={filters}
-                onSubmit={handleFilterSubmit}
-                onClearFilters={handleClearFilters}
-                onClose={handleCloseTooltip}
-              />
-            </OutsideClickHandler>
-          }
-          trigger="click"
-          placement="bottomLeft">
+        <div className={css.filterButtonWrapper}>
           <Button
             variant="secondary"
             className={css.filterButton}
@@ -271,7 +256,20 @@ const ManagePaymentsPage = () => {
             </div>
             <FormattedMessage id="ManagePaymentsPage.filterButtonText" />
           </Button>
-        </Tooltip>
+
+          <RenderWhen condition={tooltipController.value}>
+            <div className={css.filterTooltip}>
+              <OutsideClickHandler onOutsideClick={handleCloseTooltip}>
+                <PaymentFilterForm
+                  initialValues={filters}
+                  onSubmit={handleFilterSubmit}
+                  onClearFilters={handleClearFilters}
+                  onClose={handleCloseTooltip}
+                />
+              </OutsideClickHandler>
+            </div>
+          </RenderWhen>
+        </div>
 
         <Button
           variant="secondary"
