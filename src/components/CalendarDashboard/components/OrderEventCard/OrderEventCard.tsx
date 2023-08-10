@@ -6,6 +6,7 @@ import classNames from 'classnames';
 import Tooltip from '@components/Tooltip/Tooltip';
 import { isOver } from '@helpers/orderHelper';
 import { useAppSelector } from '@hooks/reduxHooks';
+import useBoolean from '@hooks/useBoolean';
 import { useViewport } from '@hooks/useViewport';
 
 import { EVENT_STATUS } from '../../helpers/constant';
@@ -36,6 +37,8 @@ const OrderEventCard: React.FC<TOrderEventCardProps> = ({
     transactionId,
     subOrderTx: subOrderTxFromEvent,
   } = event.resource || {};
+
+  const tooltipVisibleController = useBoolean();
 
   const isFoodPicked = !!event.resource?.dishSelection?.dishSelection;
   const isExpired = isOver(expiredTime);
@@ -75,9 +78,17 @@ const OrderEventCard: React.FC<TOrderEventCardProps> = ({
     [subOrderTxFromEvent, subOrderTxs, transactionId],
   );
 
+  const handleOpenRatingModal = () => {
+    if (typeof openRatingSubOrderModal === 'function') {
+      tooltipVisibleController.setFalse();
+      openRatingSubOrderModal(subOrderTx);
+    }
+  };
+
   return (
     <Tooltip
       overlayClassName={css.tooltipOverlay}
+      visible={tooltipVisibleController.value}
       tooltipContent={
         <OrderEventCardPopup
           event={event}
@@ -87,13 +98,14 @@ const OrderEventCard: React.FC<TOrderEventCardProps> = ({
           subOrderTx={subOrderTx}
           fetchSubOrderTxInProgress={fetchSubOrderTxInProgress}
           fetchSubOrderDocumentInProgress={fetchSubOrderDocumentInProgress}
-          openRatingSubOrderModal={openRatingSubOrderModal}
+          openRatingSubOrderModal={handleOpenRatingModal}
         />
       }
       onVisibleChange={(visible) => {
         if (visible) {
           if (typeof setSelectedEvent === 'function') setSelectedEvent(event);
         }
+        tooltipVisibleController.setValue(visible);
       }}
       placement="rightTop"
       trigger={isMobileLayout ? '' : 'click'}
