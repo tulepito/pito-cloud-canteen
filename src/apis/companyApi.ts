@@ -224,3 +224,6 @@ export const queryAllClientPaymentRecordsApi = (
   companyId: string,
   params: any,
 ) => getApi(`/company/${companyId}/payment/payment-client`, params);
+export const adminQueryAllClientPaymentsApi = () => {
+  return getApi(`/admin/payment/client`);
+};

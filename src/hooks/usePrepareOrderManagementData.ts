@@ -172,7 +172,6 @@ export const usePrepareOrderDetailPageData = ({
           : currentOrderVATPercentage,
         date,
         currentOrderServiceFeePercentage: serviceFeePercentage,
-
         shouldIncludePITOFee: isEmpty(date),
       }),
     [orderData, orderDetail],

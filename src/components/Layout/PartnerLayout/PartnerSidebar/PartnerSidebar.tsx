@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 
 import IconHome from '@components/Icons/IconHome/IconHome';
 import IconOrderManagement from '@components/Icons/IconOrderManagement/IconOrderManagement';
+import IconWallet from '@components/Icons/IconWallet/IconWallet';
 import type { TSidebarMenu } from '@components/MultiLevelSidebar/MultiLevelSidebar';
 import MultiLevelSidebar from '@components/MultiLevelSidebar/MultiLevelSidebar';
 import NamedLink from '@components/NamedLink/NamedLink';
@@ -35,6 +36,13 @@ const LIST_SIDEBAR_MENU: TSidebarMenu[] = [
         highlightRefLinks: [partnerPaths.SubOrderDetail],
       },
     ],
+  },
+  {
+    id: 'payment',
+    Icon: IconWallet,
+    nameLink: partnerPaths.ManagePayments,
+    label: 'PartnerSidebar.paymentLabel',
+    isFirstLevel: true,
   },
 ];
 

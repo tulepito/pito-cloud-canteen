@@ -15,3 +15,7 @@ export const queryPartnerOrderDetailApi = ({
 }: TObject) => {
   return getApi(`${BASE_URL}/${partnerId}/orders/${orderId}`, { date });
 };
+
+export const queryAllPartnerPaymentRecordsApi = ({ partnerId }: TObject) => {
+  return getApi(`${BASE_URL}/${partnerId}/payments`);
+};
