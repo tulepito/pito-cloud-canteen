@@ -250,6 +250,10 @@ export const usePrepareOrderDetailPageData = ({
     transportFee,
     VATFee,
     PITOFee,
+    vatPercentage: !isEmpty(VATPercentage)
+      ? VATPercentage!
+      : currentOrderVATPercentage,
+    serviceFeePercentage,
   };
   const reviewViewData = {
     isGroupOrder,

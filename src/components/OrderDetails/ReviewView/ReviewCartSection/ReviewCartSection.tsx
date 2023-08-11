@@ -35,10 +35,8 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
     data: {
       overflow = 0,
       promotion = 0,
-      // eslint-disable-next-line unused-imports/no-unused-vars
       serviceFee = 0,
       serviceFeePercentage = 0,
-      serviceFeePrice = 0,
       totalPrice = 0,
       totalWithoutVAT = 0,
       totalWithVAT = 0,
@@ -46,7 +44,7 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
       // transportFee = 0,
       VATFee = 0,
       PITOFee = 0,
-      VATPercentage = 0,
+      vatPercentage = 0,
     } = {},
     showStartPickingOrderButton,
     onClickDownloadPriceQuotation,
@@ -174,7 +172,7 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
                 />
               </div>
               <div className={css.fee}>
-                {parseThousandNumber(serviceFeePrice.toString())}đ
+                {parseThousandNumber(serviceFee.toString())}đ
               </div>
             </div>
           </div>
@@ -233,7 +231,7 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
                   </RenderWhen.False>
                 </RenderWhen>
                 <Badge
-                  label={`${VATPercentage * 100}%`}
+                  label={`${vatPercentage * 100}%`}
                   className={css.VATBadge}
                 />
               </div>
