@@ -171,8 +171,8 @@ export const usePrepareOrderDetailPageData = ({
         currentOrderVATPercentage: VATPercentage!
           ? VATPercentage!
           : currentOrderVATPercentage,
-        currentOrderServiceFeePercentage: serviceFeePercentage,
         date,
+        currentOrderServiceFeePercentage: serviceFeePercentage,
         shouldIncludePITOFee: isEmpty(date),
       }),
     [orderData, orderDetail, currentOrderVATPercentage],
@@ -252,6 +252,10 @@ export const usePrepareOrderDetailPageData = ({
     transportFee,
     VATFee,
     PITOFee,
+    vatPercentage: !isEmpty(VATPercentage)
+      ? VATPercentage!
+      : currentOrderVATPercentage,
+    serviceFeePercentage,
   };
   const reviewViewData = {
     isGroupOrder,

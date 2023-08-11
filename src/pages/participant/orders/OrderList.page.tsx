@@ -460,13 +460,15 @@ const OrderListPage = () => {
       </RenderWhen>
       <RenderWhen condition={!!selectedEvent}>
         <div className={css.subOrderDetailModal}>
-          <SubOrderDetailModal
-            isOpen={subOrderDetailModalControl.value}
-            onClose={subOrderDetailModalControl.setFalse}
-            event={selectedEvent!}
-            openRatingSubOrderModal={openRatingSubOrderModal}
-            from="orderList"
-          />
+          <RenderWhen condition={isMobileLayout}>
+            <SubOrderDetailModal
+              isOpen={subOrderDetailModalControl.value}
+              onClose={subOrderDetailModalControl.setFalse}
+              event={selectedEvent!}
+              openRatingSubOrderModal={openRatingSubOrderModal}
+              from="orderList"
+            />
+          </RenderWhen>
           <RatingSubOrderModal
             isOpen={ratingSubOrderModalControl.value}
             onClose={ratingSubOrderModalControl.setFalse}

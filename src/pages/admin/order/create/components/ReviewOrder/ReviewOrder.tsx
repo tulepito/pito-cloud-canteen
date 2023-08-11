@@ -181,13 +181,6 @@ export const ReviewContent: React.FC<any> = (props) => {
   const orderId = Listing(order as TListing).getId();
   const { restaurantName, phoneNumber, foodList = {} } = restaurant || {};
   const isInProgressOrder = orderState === EOrderStates.inProgress;
-  const isCancelOrder = [
-    EOrderStates.canceled,
-    EOrderStates.canceledByBooker,
-  ].includes(orderState);
-
-  const fieldDeliveryManDisabled =
-    isCancelOrder || deliveryManOptions?.length === 0;
 
   const parsedFoodList = Object.keys(foodList).map((key, index) => {
     return {
@@ -271,8 +264,6 @@ export const ReviewContent: React.FC<any> = (props) => {
                 options={parsedDeliveryManOptions}
                 placeholder="Chọn nhân viên"
                 input={deliveryMan.input}
-                disabled={fieldDeliveryManDisabled}
-                onChange={handleFieldDeliveryManChange}
                 customOnChange={handleFieldDeliveryManChange}
               />
             </div>

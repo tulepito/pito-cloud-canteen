@@ -74,6 +74,7 @@ const OrderHeaderState: React.FC<OrderHeaderStateProps> = (props) => {
   const shouldShowStartOrderBtn =
     typeof onConfirmOrder !== 'undefined' &&
     orderState === EOrderStates.picking;
+
   const shouldManagePickingBtn = orderState === EOrderStates.inProgress;
   const canCancelOrder = orderFlow?.[
     orderState as TTransitionOrderState
@@ -133,7 +134,6 @@ const OrderHeaderState: React.FC<OrderHeaderStateProps> = (props) => {
                   Hoàn tất
                 </div>
               </RenderWhen>
-
               <RenderWhen condition={shouldManagePickingBtn}>
                 <div
                   className={css.actionItem}

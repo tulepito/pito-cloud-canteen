@@ -202,13 +202,6 @@
   }
 }
 
-.lineItemsTable {
-  @include viewportXLarge {
-    max-width: 1090px;
-    margin: 0 auto;
-  }
-}
-
 .lineItemsTableWithSubOrderSection {
   display: flex;
   width: 100%;
@@ -255,6 +248,11 @@
 
   @include viewportSLarge {
     max-width: 820px;
+  }
+
+  @include viewportXLarge {
+    max-width: 1090px;
+    margin: 0 auto;
   }
 }
 

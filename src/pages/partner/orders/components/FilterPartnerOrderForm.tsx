@@ -103,7 +103,7 @@ const FilterPartnerOrderFormComponent: React.FC<
       id: 'FilterPartnerOrderForm.subOrderStartTime.label',
     }),
     dateFormat: 'dd/MM/yyyy',
-    placeholderText: intl.formatMessage({
+    placeholder: intl.formatMessage({
       id: 'FilterPartnerOrderForm.subOrderStartTime.placeholder',
     }),
   };
@@ -115,7 +115,7 @@ const FilterPartnerOrderFormComponent: React.FC<
     }),
     minDate: subOrderStartTime,
     dateFormat: 'dd/MM/yyyy',
-    placeholderText: intl.formatMessage({
+    placeholder: intl.formatMessage({
       id: 'FilterPartnerOrderForm.subOrderEndTime.placeholder',
     }),
   };

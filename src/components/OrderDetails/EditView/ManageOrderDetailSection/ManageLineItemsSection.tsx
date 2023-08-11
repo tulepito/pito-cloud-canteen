@@ -17,13 +17,13 @@ import LineItemsTable from './LineItemsTable/LineItemsTable';
 import css from './ManageLineItemsSection.module.scss';
 
 type TManageLineItemsSectionProps = {
+  currentViewDate: number;
   isDraftEditing?: boolean;
   shouldShowOverflowError?: boolean;
   shouldShowUnderError?: boolean;
   setCurrentViewDate: (date: number) => void;
-  currentViewDate: number;
-  ableToUpdateOrder: boolean;
-  minQuantity: number;
+  ableToUpdateOrder?: boolean;
+  minQuantity?: number;
   isAdminFlow?: boolean;
 };
 
@@ -34,10 +34,10 @@ const ManageLineItemsSection: React.FC<TManageLineItemsSectionProps> = (
     isDraftEditing,
     currentViewDate,
     setCurrentViewDate,
-    ableToUpdateOrder,
-    shouldShowUnderError,
-    shouldShowOverflowError,
-    minQuantity,
+    ableToUpdateOrder = true,
+    shouldShowUnderError = false,
+    shouldShowOverflowError = false,
+    minQuantity = 0,
     isAdminFlow = false,
   } = props;
 

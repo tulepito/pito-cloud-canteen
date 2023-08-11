@@ -25,7 +25,6 @@ const EventCardContent: React.FC<TEventCardContentProps> = ({
     restaurantAddress,
     restaurant: restaurantObj,
     expiredTime,
-
     isOrderStarted = false,
     foodName,
     status,

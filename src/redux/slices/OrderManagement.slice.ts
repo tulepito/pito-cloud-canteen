@@ -293,6 +293,8 @@ type TOrderManagementState = {
   fetchQuotationInProgress: boolean;
   fetchQuotationError: any;
 
+  shouldShowUnderError: boolean;
+  shouldShowOverflowError: boolean;
   orderValidationsInProgressState: {
     planValidationsInProgressState: Record<
       number,
@@ -341,6 +343,8 @@ const initialState: TOrderManagementState = {
   updateOrderfromDraftEditError: null,
   draftSubOrderChangesHistory: {},
   orderValidationsInProgressState: null,
+  shouldShowUnderError: false,
+  shouldShowOverflowError: false,
   quotation: {},
   fetchQuotationInProgress: false,
   fetchQuotationError: null,
@@ -929,7 +933,6 @@ const updateOrderFromDraftEdit = createAsyncThunk(
       draftSubOrderChangesHistory,
       draftOrderDetail,
     } = getState().OrderManagement;
-
     const orderId = Listing(orderData as TListing).getId();
     const { title: orderTitle } = Listing(
       orderData as TListing,
@@ -1062,6 +1065,7 @@ const updateOrderFromDraftEdit = createAsyncThunk(
     await dispatch(loadData(orderId));
   },
 );
+
 const fetchQuotation = createAsyncThunk(
   FETCH_QUOTATION,
   async (quotationId: string, { extra: sdk }) => {
