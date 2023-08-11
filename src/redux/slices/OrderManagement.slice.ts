@@ -1079,18 +1079,9 @@ const OrderManagementSlice = createSlice({
   name: 'OrderManagement',
   initialState,
   reducers: {
-    clearOrderData: (state) => {
+    clearOrderData: () => {
       return {
-        ...state,
-        companyId: null,
-        companyData: null,
-        orderData: {},
-        planData: {},
-        bookerData: null,
-        participantData: [],
-        anonymousParticipantData: [],
-        transactionDataMap: {},
-        isFetchingOrderDetails: false,
+        ...initialState,
       };
     },
     clearAddUpdateParticipantError: (state) => {
