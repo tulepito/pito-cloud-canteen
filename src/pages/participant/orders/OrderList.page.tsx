@@ -10,6 +10,7 @@ import { useRouter } from 'next/router';
 import BottomNavigationBar from '@components/BottomNavigationBar/BottomNavigationBar';
 import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
 import OrderEventCard from '@components/CalendarDashboard/components/OrderEventCard/OrderEventCard';
+import { EVENT_STATUS } from '@components/CalendarDashboard/helpers/constant';
 import { EVENTS_MOCKUP } from '@components/CalendarDashboard/helpers/mockupData';
 import useSelectDay from '@components/CalendarDashboard/hooks/useSelectDay';
 import LoadingModal from '@components/LoadingModal/LoadingModal';
@@ -151,7 +152,9 @@ const OrderListPage = () => {
       orderState,
     } = orderListing.getMetadata();
     const { title: orderTitle } = orderListing.getAttributes();
-
+    const isOrderCanceled =
+      orderState === EOrderStates.canceled ||
+      orderState === EOrderStates.canceledByBooker;
     const currentPlanListing = Listing(currentPlan);
 
     const { orderDetail = {} } = currentPlanListing.getMetadata();
@@ -178,7 +181,9 @@ const OrderListPage = () => {
         : DateTime.fromMillis(+planItemKey).minus({ day: 2 });
 
       const alreadyPickFood = !!foodSelection?.foodId;
-      const pickFoodStatus = alreadyPickFood
+      const pickFoodStatus = isOrderCanceled
+        ? EVENT_STATUS.CANCELED_STATUS
+        : alreadyPickFood
         ? EParticipantOrderStatus.joined
         : isOver(expiredTime.toMillis())
         ? EParticipantOrderStatus.expired

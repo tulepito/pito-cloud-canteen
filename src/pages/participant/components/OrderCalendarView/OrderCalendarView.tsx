@@ -10,6 +10,7 @@ import Avatar from '@components/Avatar/Avatar';
 import BottomNavigationBar from '@components/BottomNavigationBar/BottomNavigationBar';
 import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
 import OrderEventCard from '@components/CalendarDashboard/components/OrderEventCard/OrderEventCard';
+import { EVENT_STATUS } from '@components/CalendarDashboard/helpers/constant';
 import LoadingModal from '@components/LoadingModal/LoadingModal';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { getItem } from '@helpers/localStorageHelpers';
@@ -116,7 +117,7 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
         : DateTime.fromMillis(+planItemKey).minus({ day: 2 });
 
       const pickFoodStatus = isOrderCanceled
-        ? orderState
+        ? EVENT_STATUS.CANCELED_STATUS
         : alreadyPickFood
         ? EParticipantOrderStatus.joined
         : isOver(expiredTime.toMillis())
