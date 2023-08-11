@@ -6,7 +6,10 @@ import { useRouter } from 'next/router';
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import Tabs from '@components/Tabs/Tabs';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { orderManagementThunks } from '@redux/slices/OrderManagement.slice';
+import {
+  OrderManagementsAction,
+  orderManagementThunks,
+} from '@redux/slices/OrderManagement.slice';
 import { Listing } from '@src/utils/data';
 import { EOrderDetailTabs, EOrderStates } from '@src/utils/enums';
 
@@ -96,13 +99,15 @@ const OrderDetailPage = () => {
     [dispatch, orderId],
   );
 
-  const updateOrderState = (newOrderState: string) => {
-    dispatch(
+  const updateOrderState = async (newOrderState: string) => {
+    const { payload } = await dispatch(
       OrderDetailThunks.updateOrderState({
         orderId: orderId as string,
         orderState: newOrderState,
       }),
     );
+
+    dispatch(OrderManagementsAction.updateOrderData(payload));
   };
 
   const onSaveOrderNote = (orderNote: string) => {
