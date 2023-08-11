@@ -192,8 +192,10 @@
     word-break: keep-all;
 
     .flexChild {
-      @include viewportMedium {
-        margin-right: 100px;
+      &:nth-child(1) {
+        @include viewportMedium {
+          margin-right: 100px;
+        }
       }
     }
   }

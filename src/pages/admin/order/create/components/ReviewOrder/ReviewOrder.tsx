@@ -177,10 +177,15 @@ export const ReviewContent: React.FC<any> = (props) => {
     anonymous = [],
     orderState,
     orderNote,
+    orderStateHistory = [],
   } = Listing(order as TListing).getMetadata();
   const orderId = Listing(order as TListing).getId();
   const { restaurantName, phoneNumber, foodList = {} } = restaurant || {};
   const isInProgressOrder = orderState === EOrderStates.inProgress;
+  const shouldShowTrackingLink =
+    orderStateHistory.findIndex(
+      (h: TObject) => h.state === EOrderStates.inProgress,
+    ) >= 0;
 
   const parsedFoodList = Object.keys(foodList).map((key, index) => {
     return {
@@ -277,7 +282,7 @@ export const ReviewContent: React.FC<any> = (props) => {
                 </span>
               </RenderWhen>
 
-              <RenderWhen condition={isInProgressOrder}>
+              <RenderWhen condition={shouldShowTrackingLink}>
                 <div className={css.billOfLading} onClick={handleCopyLink}>
                   {intl.formatMessage({ id: 'ReviewOrder.billOfLading' })}
                   <Tooltip
