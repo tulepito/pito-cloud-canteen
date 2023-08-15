@@ -70,7 +70,6 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
     subOrderDetailModalControl,
     selectedEvent,
     setSelectedEvent,
-    onRejectSelectDish,
     addSubOrderDocumentToFirebaseInProgress,
     participantPostRatingInProgress,
     updateSubOrderInProgress,
@@ -260,7 +259,6 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
           <SubOrderCard
             key={_event.resource?.id}
             event={_event}
-            onRejectSelectDish={onRejectSelectDish}
             setSelectedEvent={setSelectedEvent}
             openSubOrderDetailModal={subOrderDetailModalControl.setTrue}
           />
