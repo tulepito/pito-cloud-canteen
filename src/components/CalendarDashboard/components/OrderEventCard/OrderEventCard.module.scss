@@ -181,6 +181,12 @@
 .highlightText {
   color: $primaryPri2;
 }
+
+.icon {
+  & path {
+    fill: $neutralGray4;
+  }
+}
 .highLightIcon {
   & path {
     fill: $primaryPri2;

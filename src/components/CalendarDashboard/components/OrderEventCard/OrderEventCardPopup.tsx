@@ -62,6 +62,7 @@ const OrderEventCardPopup: React.FC<TOrderEventCardPopupProps> = ({
     deliveryHour: startTime,
     isOrderStarted = false,
     orderState,
+    subOrderTx: subOrderTxFromEvent,
   } = event.resource;
   const isOrderCancelled = orderState === EOrderStates.canceled;
 
@@ -126,7 +127,12 @@ const OrderEventCardPopup: React.FC<TOrderEventCardPopupProps> = ({
         <div className={css.title}>
           {intl.formatMessage({ id: `DayColumn.Session.${daySession}` })}
         </div>
-        {status && <OrderEventCardStatus status={status} />}
+        {status && (
+          <OrderEventCardStatus
+            status={status}
+            subOrderTx={subOrderTxFromEvent}
+          />
+        )}
       </div>
       <div className={css.mealType}>
         <span className={css.regularText}>#{event.title}</span> |{' '}
