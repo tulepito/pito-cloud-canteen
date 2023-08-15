@@ -52,6 +52,9 @@ export const usePrepareOrderDetailPageData = ({
   const currentOrderVATPercentage = useAppSelector(
     (state) => state.SystemAttributes.currentOrderVATPercentage,
   );
+  const systemVATPercentage = useAppSelector(
+    (state) => state.SystemAttributes.systemVATPercentage,
+  );
   const currentUser = useAppSelector(currentUserSelector);
 
   const { title: orderTitle = '' } = Listing(
@@ -97,6 +100,12 @@ export const usePrepareOrderDetailPageData = ({
   ].includes(orderState);
   const canStartOrder = isEnableToStartOrder(orderDetail, isGroupOrder);
   const isOrderIsPicking = orderState === EOrderStates.picking;
+  const isOrderIsinProgress = orderState === EOrderStates.inProgress;
+  const vatPercentage = isOrderIsinProgress
+    ? VATPercentage!
+      ? VATPercentage!
+      : currentOrderVATPercentage
+    : systemVATPercentage;
   const canReview =
     orderState === EOrderStates.completed ||
     (orderState === EOrderStates.pendingPayment && !ratings);
@@ -138,7 +147,7 @@ export const usePrepareOrderDetailPageData = ({
         isGroupOrder,
         date,
       }),
-    [orderDetail, isGroupOrder],
+    [JSON.stringify(orderDetail), isGroupOrder],
   );
   const foodOrderGroupedByDateFromQuotation = useMemo(
     () =>
@@ -168,14 +177,16 @@ export const usePrepareOrderDetailPageData = ({
       calculatePriceQuotationInfo({
         planOrderDetail: orderDetail,
         order: orderData as TObject,
-        currentOrderVATPercentage: VATPercentage!
-          ? VATPercentage!
-          : currentOrderVATPercentage,
+        currentOrderVATPercentage: vatPercentage,
         date,
         currentOrderServiceFeePercentage: serviceFeePercentage,
         shouldIncludePITOFee: isEmpty(date),
       }),
-    [orderData, orderDetail, currentOrderVATPercentage],
+    [
+      JSON.stringify(orderData),
+      JSON.stringify(orderDetail),
+      currentOrderVATPercentage,
+    ],
   );
   const quotationDraftInfor = useMemo(
     () =>
@@ -183,13 +194,15 @@ export const usePrepareOrderDetailPageData = ({
         planOrderDetail: draftOrderDetail,
         order: orderData as TObject,
         date,
-        currentOrderVATPercentage: VATPercentage!
-          ? VATPercentage!
-          : currentOrderVATPercentage,
+        currentOrderVATPercentage: vatPercentage,
         currentOrderServiceFeePercentage: serviceFeePercentage,
         shouldIncludePITOFee: isEmpty(date),
       }),
-    [orderData, draftOrderDetail, currentOrderVATPercentage],
+    [
+      JSON.stringify(orderData),
+      JSON.stringify(draftOrderDetail),
+      currentOrderVATPercentage,
+    ],
   );
 
   const quotationInfor = useMemo(
@@ -197,9 +210,7 @@ export const usePrepareOrderDetailPageData = ({
       calculatePriceQuotationInfoFromQuotation({
         quotation: quotation as TListing,
         packagePerMember,
-        currentOrderVATPercentage: VATPercentage!
-          ? VATPercentage!
-          : currentOrderVATPercentage,
+        currentOrderVATPercentage: vatPercentage,
         currentOrderServiceFeePercentage: serviceFeePercentage,
         date,
         partnerId,
@@ -252,9 +263,7 @@ export const usePrepareOrderDetailPageData = ({
     transportFee,
     VATFee,
     PITOFee,
-    vatPercentage: !isEmpty(VATPercentage)
-      ? VATPercentage!
-      : currentOrderVATPercentage,
+    vatPercentage,
     serviceFeePercentage,
   };
   const reviewViewData = {
