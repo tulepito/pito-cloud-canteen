@@ -132,6 +132,7 @@ const DishSelectionForm: React.FC<TDishSelectionFormProps> = ({
           <Button
             className={classNames(css.btn, css.lastBtn)}
             variant="inline"
+            type="button"
             onClick={handleReject}
             disabled={disabledRejectButton}
             inProgress={rejectSubmitting}>

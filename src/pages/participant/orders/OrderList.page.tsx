@@ -275,26 +275,6 @@ const OrderListPage = () => {
     dispatch(OrderListThunks.disableWalkthrough(currentUserId));
   };
 
-  const onRejectSelectDish = (params: any) => {
-    const { orderId, orderDay, planId } = params;
-    const payload = {
-      updateValues: {
-        orderId,
-        orderDay,
-        planId,
-        memberOrders: {
-          [currentUserId]: {
-            status: 'notJoined',
-            foodId: '',
-          },
-        },
-      },
-      orderId,
-    };
-
-    dispatch(OrderListThunks.updateSubOrder(payload));
-  };
-
   const handleOnBoardingModalOpen = () => {
     onBoardingModal.setTrue();
     setTimeout(() => {
@@ -432,7 +412,6 @@ const OrderListPage = () => {
           <SubOrderCard
             key={_event.resource?.id}
             event={_event}
-            onRejectSelectDish={onRejectSelectDish}
             setSelectedEvent={setSelectedEvent}
             openSubOrderDetailModal={subOrderDetailModalControl.setTrue}
           />
