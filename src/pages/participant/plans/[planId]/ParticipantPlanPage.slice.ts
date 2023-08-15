@@ -2,6 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 
 import { participantSubOrderAddDocumentApi } from '@apis/firebaseApi';
 import { loadPlanDataApi, updateParticipantOrderApi } from '@apis/index';
+import { OrderListActions } from '@pages/participant/orders/OrderList.slice';
 import { createAsyncThunk } from '@redux/redux.helper';
 import {
   shoppingCartActions,
@@ -152,7 +153,11 @@ const updateOrder = createAsyncThunk(
       planData: updatedPlan,
     };
 
-    await updateParticipantOrderApi(orderId, updateValues);
+    const { data: newPlan } = await updateParticipantOrderApi(
+      orderId,
+      updateValues,
+    );
+    dispatch(OrderListActions.updatePlanDetail(newPlan));
     orderDays.forEach((timestamp: string) => {
       participantSubOrderAddDocumentApi({
         participantId: currentUserId,
