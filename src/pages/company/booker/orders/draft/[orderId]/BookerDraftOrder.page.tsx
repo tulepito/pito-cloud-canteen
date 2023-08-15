@@ -215,12 +215,15 @@ function BookerDraftOrderPage() {
     dispatch(
       BookerSelectRestaurantActions.setSelectedRestaurantId(restaurantId),
     );
-    await dispatch(
-      BookerSelectRestaurantThunks.searchRestaurants({
-        timestamp: +dateTime,
-        orderId: orderId as string,
-      }),
-    );
+    const isRestaurantFetched =
+      restaurants.findIndex((restaurant) => restaurant.id === restaurantId) !==
+      -1;
+
+    if (!isRestaurantFetched) {
+      await dispatch(
+        BookerSelectRestaurantThunks.fetchRestaurant(restaurantId),
+      );
+    }
     await dispatch(
       BookerSelectRestaurantThunks.fetchFoodListFromRestaurant({
         restaurantId,

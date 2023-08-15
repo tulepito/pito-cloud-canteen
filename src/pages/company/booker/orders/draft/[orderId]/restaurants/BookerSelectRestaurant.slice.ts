@@ -1,6 +1,9 @@
 import { createSlice } from '@reduxjs/toolkit';
+import chunk from 'lodash/chunk';
+import flatten from 'lodash/flatten';
 import keyBy from 'lodash/keyBy';
 import mapValue from 'lodash/mapValues';
+import uniq from 'lodash/uniq';
 import uniqBy from 'lodash/uniqBy';
 import { DateTime } from 'luxon';
 
@@ -147,8 +150,25 @@ const FETCH_RESTAURANT_REVIEWS =
 // ================ Async thunks ================ //
 const fetchRestaurant = createAsyncThunk(
   FETCH_RESTAURANT,
-  async (restaurantId: string, { extra: sdk }) => {
+  async (restaurantId: string, { extra: sdk, getState }) => {
+    const {
+      restaurantIdList = [],
+      searchResult = [],
+      totalItems,
+    } = getState().BookerSelectRestaurant;
     if (restaurantId) {
+      const isRestaurantExisted = restaurantIdList.includes(restaurantId);
+
+      if (isRestaurantExisted)
+        return {
+          restaurant: searchResult.find(
+            (restaurant) => restaurant.id.uuid === restaurantId,
+          ),
+          restaurantIdList,
+          searchResult,
+          totalItems,
+        };
+
       const response = denormalisedResponseEntities(
         await sdk.listings.show({
           id: restaurantId,
@@ -162,10 +182,20 @@ const fetchRestaurant = createAsyncThunk(
         }),
       )[0];
 
-      return response;
+      return {
+        restaurant: response,
+        restaurantIdList: restaurantIdList.concat(restaurantId),
+        searchResult: uniqBy(searchResult.concat(response), 'id.uuid'),
+        totalItems: totalItems + 1,
+      };
     }
 
-    return null;
+    return {
+      restaurant: null,
+      restaurantIdList,
+      searchResult,
+      totalItems,
+    };
   },
 );
 
@@ -194,27 +224,55 @@ const searchRestaurants = createAsyncThunk(
       menuId: menu.id.uuid,
     }));
 
-    const { query: restaurantQuery, restaurantIds: newRestaurantIds } =
+    const newRestaurantIds = uniqBy<{ restaurantId: string; menuId: string }>(
+      combinedRestaurantMenuData,
+      'restaurantId',
+    ).map((item) => item.restaurantId);
+    const totalRestaurantIds = uniq([...restaurantIdList, ...newRestaurantIds]);
+    const slicedRestaurantIdsBy100 = chunk(totalRestaurantIds, 100);
+
+    const restaurantQueries = slicedRestaurantIdsBy100.map((restaurantIds) =>
       getRestaurantQuery({
-        menuList: combinedRestaurantMenuData,
-        restaurantIds: restaurantIdList,
+        restaurantIds,
         companyAccount,
         params,
-      });
+      }),
+    );
 
-    const restaurantsResponse = await sdk.listings.query(restaurantQuery);
+    const restaurantsResponse = await Promise.all(
+      restaurantQueries.map(async (restaurantQuery) => {
+        const response = await sdk.listings.query(restaurantQuery);
+        const { meta: chunkRestaurantResponseMeta } = response.data;
 
-    const { meta } = restaurantsResponse.data;
+        return {
+          chunkRestaurantsResponse: denormalisedResponseEntities(response),
+          chunkRestaurantResponseMeta,
+        };
+      }),
+    );
 
-    const restaurants = denormalisedResponseEntities(restaurantsResponse);
+    const totalItems = restaurantsResponse.reduce(
+      (acc, { chunkRestaurantResponseMeta }) => {
+        const { totalItems: chunkTotalItems } = chunkRestaurantResponseMeta;
+
+        return acc + chunkTotalItems;
+      },
+      0,
+    );
+
+    const searchResult = flatten(
+      restaurantsResponse.map(
+        ({ chunkRestaurantsResponse }) => chunkRestaurantsResponse,
+      ),
+    );
 
     return {
       ...(newRestaurantIds.length > 0 && {
         restaurantIdList: newRestaurantIds,
       }),
-      searchResult: restaurants,
+      searchResult,
       combinedRestaurantMenuData,
-      totalItems: meta.totalItems,
+      totalItems,
     };
   },
 );
@@ -521,7 +579,10 @@ const BookerSelectRestaurantSlice = createSlice({
       .addCase(fetchRestaurant.fulfilled, (state, { payload }) => ({
         ...state,
         fetchRestaurantInProgress: false,
-        restaurant: payload,
+        restaurant: payload?.restaurant,
+        restaurantIdList: payload?.restaurantIdList,
+        searchResult: payload?.searchResult,
+        totalItems: payload?.totalItems,
       }))
       .addCase(fetchRestaurant.rejected, (state, { error }) => ({
         ...state,

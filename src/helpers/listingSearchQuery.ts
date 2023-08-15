@@ -1,4 +1,3 @@
-import uniqBy from 'lodash/uniqBy';
 import { DateTime } from 'luxon';
 
 import { calculateBounds } from '@helpers/mapHelpers';
@@ -99,12 +98,10 @@ export const getMenuQuery = ({
 };
 
 export const getRestaurantQuery = ({
-  menuList,
   restaurantIds,
   companyAccount,
   params,
 }: {
-  menuList: any;
   restaurantIds: string[];
   companyAccount: TUser | null;
   params: any;
@@ -118,18 +115,11 @@ export const getRestaurantQuery = ({
     packaging = [],
   } = params;
 
-  let newRestaurantIds = [...restaurantIds];
-
-  newRestaurantIds = uniqBy<{ restaurantId: string; menuId: string }>(
-    menuList,
-    'restaurantId',
-  ).map((item) => item.restaurantId);
-
   const origin = User(companyAccount as TUser).getPublicData()?.location
     ?.origin;
   const bounds = distance ? calculateBounds(origin, distance) : '';
   const query = {
-    ids: newRestaurantIds.slice(0, 50),
+    ids: restaurantIds,
     keywords,
     page,
     ...(rating && { meta_rating: `${rating},` }),
@@ -150,10 +140,7 @@ export const getRestaurantQuery = ({
     ],
   };
 
-  return {
-    query,
-    restaurantIds: newRestaurantIds,
-  };
+  return query;
 };
 
 export const getMenuQueryInSpecificDay = ({
