@@ -16,13 +16,16 @@
 
     .fieldContainerRow {
       display: flex;
-      row-gap: 8px;
+      gap: 8px;
       flex-direction: row;
-      max-width: 300px;
       justify-content: space-between;
 
-      & * {
-        flex-basis: 132px;
+      @include viewportLarge {
+        max-width: 300px;
+
+        & * {
+          flex-basis: 132px;
+        }
       }
     }
   }

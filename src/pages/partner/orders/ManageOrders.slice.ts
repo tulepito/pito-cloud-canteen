@@ -105,7 +105,8 @@ const PartnerManageOrdersSlice = createSlice({
     filterData: (state, { payload }) => {
       const { allSubOrders, pagination } = current(state);
       const { perPage } = pagination;
-      const { page, name, subOrderId, startTime, endTime, status } = payload;
+      const { page, name, subOrderId, startTime, endTime, status, isMobile } =
+        payload;
       const isPaidStatus = status === 'isPaid';
 
       const validSubOrders = isPaidStatus
@@ -151,12 +152,14 @@ const PartnerManageOrdersSlice = createSlice({
         totalPages: Math.round(validSubOrders.length / perPage + 0.5),
         page,
       };
-      state.currentSubOrders = validSubOrders.slice(
-        0 + (page - 1) * perPage,
-        page * perPage >= validSubOrders.length
-          ? validSubOrders.length
-          : page * perPage,
-      );
+      state.currentSubOrders = isMobile
+        ? validSubOrders
+        : validSubOrders.slice(
+            0 + (page - 1) * perPage,
+            page * perPage >= validSubOrders.length
+              ? validSubOrders.length
+              : page * perPage,
+          );
     },
   },
   extraReducers: (builder) => {
