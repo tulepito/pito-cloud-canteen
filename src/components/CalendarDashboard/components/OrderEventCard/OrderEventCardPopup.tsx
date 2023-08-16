@@ -159,6 +159,7 @@ const OrderEventCardPopup: React.FC<TOrderEventCardPopupProps> = ({
               actionsDisabled={isExpired}
               dishes={dishes}
               onSubmit={onSelectDish}
+              subOrderStatus={status}
               initialValues={dishSelection}
             />
           </div>
