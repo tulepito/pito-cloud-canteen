@@ -1,8 +1,10 @@
+import flatten from 'lodash/flatten';
 import isEmpty from 'lodash/isEmpty';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HttpMethod } from '@apis/configs';
 import { EHttpStatusCode } from '@apis/errors';
+import { convertListIdToQueries } from '@helpers/apiHelpers';
 import { denormalisedResponseEntities } from '@services/data';
 import { getIntegrationSdk, handleError } from '@services/sdk';
 import { Listing } from '@src/utils/data';
@@ -41,33 +43,40 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
         if (isGroupOrder) {
           if (!isEmpty(participants)) {
-            const participantData = await Promise.all(
-              participants.map(async (id: string) => {
-                const [memberAccount] = denormalisedResponseEntities(
-                  await integrationSdk.users.show({
-                    id,
-                  }),
-                );
-
-                return memberAccount;
-              }),
+            const participantQueries = convertListIdToQueries({
+              idList: participants,
+            });
+            const participantData = flatten(
+              await Promise.all(
+                participantQueries.map(async ({ ids }) => {
+                  return denormalisedResponseEntities(
+                    await integrationSdk.users.query({
+                      meta_id: `${ids}`,
+                    }),
+                  );
+                }),
+              ),
             );
+
             orderWithPlanDataMaybe = {
               ...orderWithPlanDataMaybe,
               participants: participantData,
             };
           }
           if (!isEmpty(anonymous)) {
-            const anonymousParticipantData = await Promise.all(
-              anonymous.map(async (id: string) => {
-                const [memberAccount] = denormalisedResponseEntities(
-                  await integrationSdk.users.show({
-                    id,
-                  }),
-                );
-
-                return memberAccount;
-              }),
+            const anonymousParticipantQueries = convertListIdToQueries({
+              idList: anonymous,
+            });
+            const anonymousParticipantData = flatten(
+              await Promise.all(
+                anonymousParticipantQueries.map(async ({ ids }) => {
+                  return denormalisedResponseEntities(
+                    await integrationSdk.users.query({
+                      meta_id: `${ids}`,
+                    }),
+                  );
+                }),
+              ),
             );
             orderWithPlanDataMaybe = {
               ...orderWithPlanDataMaybe,

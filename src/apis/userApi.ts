@@ -1,4 +1,4 @@
-import { getApi } from './configs';
+import { getApi, putApi } from './configs';
 
 export const checkUserExistedApi = ({
   email,
@@ -14,3 +14,5 @@ export const fetchSearchFilterApi = () => getApi('/search-filters');
 
 export const disableWalkthroughApi = (userId: string) =>
   getApi(`/users/disable-walkthrough/${userId}`);
+
+export const postSignUpApi = () => putApi(`/users/post-sign-up/`);

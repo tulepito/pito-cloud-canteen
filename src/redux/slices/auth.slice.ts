@@ -1,6 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 import isEmpty from 'lodash/isEmpty';
 
+import { postSignUpApi } from '@apis/userApi';
 import { createAsyncThunk } from '@redux/redux.helper';
 import type { RootState } from '@redux/store';
 import { storableError } from '@utils/errors';
@@ -103,6 +104,8 @@ const signUp = createAsyncThunk(
     // do that automatically.
     await sdk.currentUser.create(createUserParams);
     await dispatch(login({ email, password }));
+
+    postSignUpApi();
   },
   {
     serializeError: storableError,
