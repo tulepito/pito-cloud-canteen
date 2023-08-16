@@ -46,6 +46,7 @@ import type { TAddCompanyGroupsFormValues } from '../AddCompanyGroupsForm/AddCom
 import type { TEditCompanyBankAccountsFormValues } from '../EditCompanyBankAccountsForm/EditCompanyBankAccountsForm';
 import type { TEditCompanyInformationFormValues } from '../EditCompanyInformationForm/EditCompanyInformationForm';
 import EditInformationCompanyForm from '../EditCompanyInformationForm/EditCompanyInformationForm';
+import type { TEditCompanyOtherSettingsFormValues } from '../EditCompanyOtherSettingsForm/EditCompanyOtherSettingsForm';
 import type { TEditCompanySettingsInformationFormValues } from '../EditCompanySettingsInformationForm/EditCompanySettingsInformationForm';
 import EditCompanySettingsTabs from '../EditCompanySettingsTabs/EditCompanySettingsTabs';
 import type { TUpdateCompanyGroupFormValues } from '../UpdateCompanyGroupForm/UpdateCompanyGroupForm';
@@ -249,10 +250,13 @@ const EditCompanyWizardTab: React.FC<TEditCompanyWizardTab> = (props) => {
                   User(company).getPrivateData().bankAccounts) ||
                 defaultBankAccounts,
               paymentDueDays: User(company).getPrivateData().paymentDueDays,
+              specificPCCFee: User(company).getMetadata().specificPCCFee,
             } as TEditCompanySettingsInformationFormValues &
-              TEditCompanyBankAccountsFormValues)
+              TEditCompanyBankAccountsFormValues &
+              TEditCompanyOtherSettingsFormValues)
           : {};
       }
+
       default:
         return {};
     }
@@ -277,7 +281,8 @@ const EditCompanyWizardTab: React.FC<TEditCompanyWizardTab> = (props) => {
         <EditCompanySettingsTabs
           initialValues={
             initialValues as TEditCompanySettingsInformationFormValues &
-              TEditCompanyBankAccountsFormValues
+              TEditCompanyBankAccountsFormValues &
+              TEditCompanyOtherSettingsFormValues
           }
           onCompanyLogoUpload={onCompanyLogoUpload}
           uploadedCompanyLogo={uploadedCompanyLogo}

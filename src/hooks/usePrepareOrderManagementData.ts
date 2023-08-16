@@ -65,6 +65,9 @@ export const usePrepareOrderDetailPageData = ({
   ).getAttributes();
   const { orderDetail = {} } = Listing(planData as TListing).getMetadata();
   const { companyName = '' } = User(companyData as TUser).getPublicData();
+  const { hasSpecificPCCFee = false, specificPCCFee } = User(
+    companyData as TUser,
+  ).getMetadata();
 
   const {
     email: bookerEmail,
@@ -93,6 +96,8 @@ export const usePrepareOrderDetailPageData = ({
     ratings,
     orderType = EOrderType.group,
     orderNote = '',
+    hasSpecificPCCFee: orderHasSpecificPCCFee = false,
+    specificPCCFee: orderPCCFee = 0,
   } = Listing(orderData as TListing).getMetadata();
   const isGroupOrder = orderType === EOrderType.group;
   const isCanceledOrder = [
@@ -181,11 +186,15 @@ export const usePrepareOrderDetailPageData = ({
         date,
         currentOrderServiceFeePercentage: serviceFeePercentage,
         shouldIncludePITOFee: isEmpty(date),
+        hasSpecificPCCFee,
+        specificPCCFee,
       }),
     [
       JSON.stringify(orderData),
       JSON.stringify(orderDetail),
       currentOrderVATPercentage,
+      hasSpecificPCCFee,
+      specificPCCFee,
     ],
   );
   const quotationDraftInfor = useMemo(
@@ -197,11 +206,15 @@ export const usePrepareOrderDetailPageData = ({
         currentOrderVATPercentage: vatPercentage,
         currentOrderServiceFeePercentage: serviceFeePercentage,
         shouldIncludePITOFee: isEmpty(date),
+        hasSpecificPCCFee: orderHasSpecificPCCFee,
+        specificPCCFee: orderPCCFee,
       }),
     [
       JSON.stringify(orderData),
       JSON.stringify(draftOrderDetail),
       currentOrderVATPercentage,
+      orderHasSpecificPCCFee,
+      orderPCCFee,
     ],
   );
 
@@ -214,8 +227,15 @@ export const usePrepareOrderDetailPageData = ({
         currentOrderServiceFeePercentage: serviceFeePercentage,
         date,
         partnerId,
+        hasSpecificPCCFee: orderHasSpecificPCCFee,
+        specificPCCFee: orderPCCFee,
       }),
-    [packagePerMember, JSON.stringify(quotation)],
+    [
+      packagePerMember,
+      JSON.stringify(quotation),
+      orderHasSpecificPCCFee,
+      orderPCCFee,
+    ],
   );
 
   const {

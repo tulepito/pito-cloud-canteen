@@ -1,3 +1,4 @@
+import { removeNonNumeric } from '@helpers/format';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import type { TObject, TUpdateCompanyApiParams } from '@src/utils/types';
 
@@ -21,6 +22,7 @@ const updateCompany = async (
     nutritions,
     bankAccounts,
     paymentDueDays,
+    specificPCCFee,
   } = dataParams;
 
   const { selectedPlace } = location || {};
@@ -73,6 +75,15 @@ const updateCompany = async (
       ...(tax ? { tax } : {}),
       ...(bankAccounts ? { bankAccounts } : {}),
       ...(paymentDueDays ? { paymentDueDays } : {}),
+    },
+
+    metadata: {
+      ...(specificPCCFee
+        ? {
+            specificPCCFee: Number(removeNonNumeric(specificPCCFee)),
+            hasSpecificPCCFee: true,
+          }
+        : { hasSpecificPCCFee: false }),
     },
   };
 

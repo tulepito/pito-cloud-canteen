@@ -605,6 +605,7 @@ export type TUpdateCompanyApiParams = {
   location: TObject;
   note: string;
   tax: string;
+  specificPCCFee: string;
   profileImageId: string;
   nutritions: string[];
   bankAccounts: TObject[];

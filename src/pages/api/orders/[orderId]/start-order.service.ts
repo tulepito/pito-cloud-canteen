@@ -1,8 +1,9 @@
 import { denormalisedResponseEntities } from '@services/data';
 import { emailSendingFactory, EmailTemplateTypes } from '@services/email';
 import getSystemAttributes from '@services/getSystemAttributes';
+import { fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
-import { Listing } from '@utils/data';
+import { Listing, User } from '@utils/data';
 import { EOrderStates } from '@utils/enums';
 
 export const startOrder = async (orderId: string) => {
@@ -13,11 +14,16 @@ export const startOrder = async (orderId: string) => {
       id: orderId,
     }),
   );
-  const { orderState, orderStateHistory = [] } =
-    Listing(orderListing).getMetadata();
+  const {
+    companyId,
+    orderState,
+    orderStateHistory = [],
+  } = Listing(orderListing).getMetadata();
 
   if (orderState !== EOrderStates.picking) {
-    throw new Error('You can start order (with orderState is "picking") only');
+    throw new Error(
+      'You can start picking order (with orderState is "picking") only',
+    );
   }
 
   const updateOrderStateHistory = orderStateHistory.concat([
@@ -27,18 +33,20 @@ export const startOrder = async (orderId: string) => {
     },
   ]);
   const { systemVATPercentage = 0 } = await getSystemAttributes();
+  const companyUser = await fetchUser(companyId);
+  const { hasSpecificPCCFee = false, specificPCCFee = 0 } =
+    User(companyUser).getMetadata();
 
-  await integrationSdk.listings.update(
-    {
-      id: orderId,
-      metadata: {
-        orderState: EOrderStates.inProgress,
-        orderStateHistory: updateOrderStateHistory,
-        orderVATPercentage: systemVATPercentage,
-      },
+  await integrationSdk.listings.update({
+    id: orderId,
+    metadata: {
+      orderState: EOrderStates.inProgress,
+      orderStateHistory: updateOrderStateHistory,
+      orderVATPercentage: systemVATPercentage,
+      hasSpecificPCCFee,
+      specificPCCFee,
     },
-    { expand: true },
-  );
+  });
 
   emailSendingFactory(EmailTemplateTypes.BOOKER.BOOKER_ORDER_SUCCESS, {
     orderId,
