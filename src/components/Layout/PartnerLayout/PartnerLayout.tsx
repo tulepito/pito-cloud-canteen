@@ -1,12 +1,14 @@
 import type { PropsWithChildren } from 'react';
 
 import useBoolean from '@hooks/useBoolean';
+import { useViewport } from '@hooks/useViewport';
 
 import PartnerHeader from './PartnerHeader/PartnerHeader';
 import PartnerLayoutContent from './PartnerLayoutContent/PartnerLayoutContent';
 import PartnerLayoutSidebar from './PartnerLayoutSidebar/PartnerLayoutSidebar';
 import PartnerLayoutTopbar from './PartnerLayoutTopbar/PartnerLayoutTopbar';
 import PartnerLayoutWrapper from './PartnerLayoutWrapper/PartnerLayoutWrapper';
+import PartnerMobileLayout from './PartnerMobileLayout/PartnerMobileLayout';
 import AdminSidebar from './PartnerSidebar/PartnerSidebar';
 
 const PartnerLayout: React.FC<PropsWithChildren> = (props) => {
@@ -16,6 +18,11 @@ const PartnerLayout: React.FC<PropsWithChildren> = (props) => {
     setFalse: onCloseMenu,
     toggle: toggleMenuOpen,
   } = useBoolean(false);
+
+  const { isMobileLayout } = useViewport();
+
+  if (isMobileLayout)
+    return <PartnerMobileLayout>{children}</PartnerMobileLayout>;
 
   return (
     <PartnerLayoutWrapper>
