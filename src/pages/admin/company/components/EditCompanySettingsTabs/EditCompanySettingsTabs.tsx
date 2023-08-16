@@ -13,10 +13,12 @@ import type {
 
 import type { TAddCompanyGroupsFormValues } from '../AddCompanyGroupsForm/AddCompanyGroupsForm';
 import EditCompanyBankAccountsForm from '../EditCompanyBankAccountsForm/EditCompanyBankAccountsForm';
+import EditCompanyOtherSettingsForm from '../EditCompanyOtherSettingsForm/EditCompanyOtherSettingsForm';
 import type { TEditCompanySettingsInformationFormValues } from '../EditCompanySettingsInformationForm/EditCompanySettingsInformationForm';
 import EditCompanySettingsInformationForm from '../EditCompanySettingsInformationForm/EditCompanySettingsInformationForm';
 import {
   COMPANY_SETTING_INFORMATION_TAB_ID,
+  COMPANY_SETTING_OTHER_TAB_ID,
   COMPANY_SETTING_PAYMENT_TAB_ID,
   COMPANY_SETTING_SUBSCRIPTION_TAB_ID,
 } from '../EditCompanyWizard/utils';
@@ -89,6 +91,11 @@ const EditCompanySettingsTabs: React.FC<TEditCompanySettingsTabsProps> = (
         <FormattedMessage id="EditCompanySettingsTabs.subscriptionSetting" />
       ),
       children: <></>,
+    },
+    {
+      id: COMPANY_SETTING_OTHER_TAB_ID,
+      label: <FormattedMessage id="EditCompanySettingsTabs.otherSettings" />,
+      children: <EditCompanyOtherSettingsForm {...props} />,
     },
   ];
 

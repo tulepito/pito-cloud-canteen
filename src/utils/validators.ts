@@ -1,6 +1,9 @@
 /* eslint-disable no-useless-escape */
 import compact from 'lodash/compact';
+import isEmpty from 'lodash/isEmpty';
 import toPairs from 'lodash/toPairs';
+
+import { removeNonNumeric } from '@helpers/format';
 
 import { printHoursToString } from './dates';
 import { EDayOfWeek } from './enums';
@@ -189,8 +192,13 @@ export const numberMaxLength =
   };
 
 export const numberMinLength =
-  (message: string, minimumLength: number) => (value: number) => {
-    const parsedValue = Number(value);
+  (message: string, minimumLength: number, shouldPassIfEmpty = false) =>
+  (value: number) => {
+    if (shouldPassIfEmpty && isEmpty(value)) {
+      return VALID;
+    }
+
+    const parsedValue = Number(removeNonNumeric(value.toString()));
     const isNumber = typeof parsedValue === 'number';
 
     return isNumber && parsedValue >= minimumLength ? VALID : message;

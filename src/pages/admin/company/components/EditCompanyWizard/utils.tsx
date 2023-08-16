@@ -2,6 +2,7 @@ import type { TObject } from '@utils/types';
 
 import type { TEditCompanyBankAccountsFormValues } from '../EditCompanyBankAccountsForm/EditCompanyBankAccountsForm';
 import type { TEditCompanyInformationFormValues } from '../EditCompanyInformationForm/EditCompanyInformationForm';
+import type { TEditCompanyOtherSettingsFormValues } from '../EditCompanyOtherSettingsForm/EditCompanyOtherSettingsForm';
 import type { TEditCompanySettingsInformationFormValues } from '../EditCompanySettingsInformationForm/EditCompanySettingsInformationForm';
 
 export const COMPANY_INFORMATION_TAB = 'information';
@@ -16,6 +17,7 @@ export const COMPANY_SETTING_INFORMATION_TAB_ID = 'companySettingsInformation';
 export const COMPANY_SETTING_PAYMENT_TAB_ID = 'companySettingsPayment';
 export const COMPANY_SETTING_SUBSCRIPTION_TAB_ID =
   'companySettingsSubscription';
+export const COMPANY_SETTING_OTHER_TAB_ID = 'companySettingsOther';
 
 export const createSubmitCreateCompanyValues = (
   values: TEditCompanyInformationFormValues &
@@ -53,7 +55,8 @@ export const createSubmitCreateCompanyValues = (
 export const createSubmitUpdateCompanyValues = (
   values: TEditCompanyInformationFormValues &
     TEditCompanySettingsInformationFormValues &
-    TEditCompanyBankAccountsFormValues,
+    TEditCompanyBankAccountsFormValues &
+    TEditCompanyOtherSettingsFormValues,
   tab: string,
 ) => {
   switch (tab) {
@@ -89,7 +92,9 @@ export const createSubmitUpdateCompanyValues = (
         tabValue,
         bankAccounts = [],
         paymentDueDays,
+        specificPCCFee,
       } = values;
+
       switch (tabValue) {
         case COMPANY_SETTING_INFORMATION_TAB_ID: {
           const { imageId } = companyLogo || {};
@@ -108,6 +113,9 @@ export const createSubmitUpdateCompanyValues = (
         }
         case COMPANY_SETTING_SUBSCRIPTION_TAB_ID: {
           return {};
+        }
+        case COMPANY_SETTING_OTHER_TAB_ID: {
+          return { specificPCCFee };
         }
         default:
           return {};
