@@ -5,11 +5,11 @@ import {
   getFoodDataMap,
   getPCCFeeByMemberAmount,
   getTotalInfo,
+  isJoinedPlan,
 } from '@helpers/orderHelper';
 import {
   EOrderStates,
   EOrderType,
-  EParticipantOrderStatus,
   EPartnerVATSetting,
   ESubOrderStatus,
 } from '@src/utils/enums';
@@ -125,6 +125,8 @@ export const calculatePriceQuotationInfo = ({
   currentOrderServiceFeePercentage = 0,
   date,
   shouldIncludePITOFee = true,
+  hasSpecificPCCFee,
+  specificPCCFee = 0,
 }: {
   planOrderDetail: TObject;
   order: TObject;
@@ -132,6 +134,8 @@ export const calculatePriceQuotationInfo = ({
   date?: number | string;
   shouldIncludePITOFee?: boolean;
   currentOrderServiceFeePercentage?: number;
+  hasSpecificPCCFee: boolean;
+  specificPCCFee?: number;
 }) => {
   const {
     packagePerMember = 0,
@@ -161,33 +165,33 @@ export const calculatePriceQuotationInfo = ({
       },
     };
   }, {});
+
+  const normalPCCFee = Object.values(currentOrderDetail).reduce(
+    (result, currentOrderDetailOfDate) => {
+      const { memberOrders, lineItems = [] } = currentOrderDetailOfDate;
+      const memberAmountOfDate = isGroupOrder
+        ? Object.values(memberOrders).reduce(
+            (resultOfDate: number, currentMemberOrder: any) => {
+              const { foodId, status } = currentMemberOrder;
+
+              return isJoinedPlan(foodId, status)
+                ? resultOfDate + 1
+                : resultOfDate;
+            },
+            0,
+          )
+        : lineItems.reduce((res: number, item: TObject) => {
+            return res + (item?.quantity || 1);
+          }, 0);
+
+      return result + getPCCFeeByMemberAmount(memberAmountOfDate);
+    },
+    0,
+  );
   const actualPCCFee = shouldIncludePITOFee
-    ? Object.values(currentOrderDetail).reduce(
-        (result, currentOrderDetailOfDate) => {
-          const { memberOrders, lineItems = [] } = currentOrderDetailOfDate;
-          const memberAmountOfDate = isGroupOrder
-            ? Object.values(memberOrders).reduce(
-                (resultOfDate: number, currentMemberOrder: any) => {
-                  const { foodId, status: memberStatus } = currentMemberOrder;
-                  if (
-                    foodId &&
-                    memberStatus === EParticipantOrderStatus.joined
-                  ) {
-                    return resultOfDate + 1;
-                  }
-
-                  return resultOfDate;
-                },
-                0,
-              )
-            : lineItems.reduce((res: number, item: TObject) => {
-                return res + (item?.quantity || 1);
-              }, 0);
-
-          return result + getPCCFeeByMemberAmount(memberAmountOfDate);
-        },
-        0,
-      )
+    ? hasSpecificPCCFee
+      ? specificPCCFee
+      : normalPCCFee
     : 0;
 
   const { totalPrice = 0, totalDishes = 0 } = calculateTotalPriceAndDishes({
@@ -284,6 +288,8 @@ export const calculatePriceQuotationInfoFromQuotation = ({
   date,
   partnerId,
   shouldSkipVAT = false,
+  hasSpecificPCCFee,
+  specificPCCFee = 0,
 }: {
   quotation: TListing;
   packagePerMember: number;
@@ -292,6 +298,8 @@ export const calculatePriceQuotationInfoFromQuotation = ({
   date?: number | string;
   partnerId?: string;
   shouldSkipVAT?: boolean;
+  hasSpecificPCCFee: boolean;
+  specificPCCFee?: number;
 }) => {
   const quotationListingGetter = Listing(quotation);
   const { client, partner } = quotationListingGetter.getMetadata();
@@ -330,14 +338,14 @@ export const calculatePriceQuotationInfoFromQuotation = ({
         },
       );
 
-      const subOrderPITOFee = isPartnerFlow
-        ? 0
-        : getPCCFeeByMemberAmount(subOrderTotalDished);
-
       return {
         totalPrice: result.totalPrice + subOrderTotalPrice,
         totalDishes: result.totalDishes + subOrderTotalDished,
-        PITOFee: result.PITOFee + subOrderPITOFee,
+        PITOFee: isPartnerFlow
+          ? 0
+          : hasSpecificPCCFee
+          ? specificPCCFee
+          : result.PITOFee + getPCCFeeByMemberAmount(subOrderTotalDished),
       };
     },
     {
