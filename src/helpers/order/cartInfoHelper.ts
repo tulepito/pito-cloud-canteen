@@ -125,7 +125,7 @@ export const calculatePriceQuotationInfo = ({
   currentOrderServiceFeePercentage = 0,
   date,
   shouldIncludePITOFee = true,
-  hasSpecificPCCFee,
+  hasSpecificPCCFee = false,
   specificPCCFee = 0,
 }: {
   planOrderDetail: TObject;
@@ -134,7 +134,7 @@ export const calculatePriceQuotationInfo = ({
   date?: number | string;
   shouldIncludePITOFee?: boolean;
   currentOrderServiceFeePercentage?: number;
-  hasSpecificPCCFee: boolean;
+  hasSpecificPCCFee?: boolean;
   specificPCCFee?: number;
 }) => {
   const {

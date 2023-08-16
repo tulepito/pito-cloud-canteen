@@ -70,6 +70,8 @@ export const initializePayment = async (
     bookerId,
     partnerIds = [],
     companyId,
+    hasSpecificPCCFee = false,
+    specificPCCFee = 0,
   } = orderListingGetter.getMetadata();
 
   const company = companyId ? await fetchUser(companyId) : null;
@@ -97,6 +99,8 @@ export const initializePayment = async (
     planOrderDetail: orderDetail,
     order: orderListing,
     currentOrderVATPercentage: orderVATPercentage,
+    hasSpecificPCCFee,
+    specificPCCFee,
   });
 
   const clientPaymentData: Partial<PaymentBaseParams> = {

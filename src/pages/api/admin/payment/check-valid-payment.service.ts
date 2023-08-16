@@ -13,7 +13,12 @@ export const calculateClientTotalPriceAndPaidAmount = async (
 ) => {
   const order = await fetchListing(orderId);
   const orderListing = Listing(order);
-  const { plans = [], orderVATPercentage } = orderListing.getMetadata();
+  const {
+    plans = [],
+    orderVATPercentage,
+    hasSpecificPCCFee = false,
+    specificPCCFee = 0,
+  } = orderListing.getMetadata();
   const plan = await fetchListing(plans[0]);
   const planListing = Listing(plan);
   const { orderDetail = {} } = planListing.getMetadata();
@@ -21,6 +26,8 @@ export const calculateClientTotalPriceAndPaidAmount = async (
     planOrderDetail: orderDetail,
     order,
     currentOrderVATPercentage: orderVATPercentage,
+    hasSpecificPCCFee,
+    specificPCCFee,
   });
   const clientPaidAmount = calculatePaidAmountBySubOrderDate(paymentRecords!);
 

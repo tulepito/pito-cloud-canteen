@@ -18,9 +18,11 @@ export const parseEntitiesToTableData = (
   return orders.map((entity, index) => {
     const { plan = {} } = entity;
     const orderId = entity?.id?.uuid;
-    const { orderType = EOrderType.group } = Listing(
-      entity as TListing,
-    ).getMetadata();
+    const {
+      orderType = EOrderType.group,
+      hasSpecificPCCFee = false,
+      specificPCCFee = 0,
+    } = Listing(entity as TListing).getMetadata();
     const { orderDetail: planOrderDetail = {} } = Listing(
       plan as TListing,
     ).getMetadata();
@@ -40,6 +42,8 @@ export const parseEntitiesToTableData = (
       order: entity,
       planOrderDetail,
       currentOrderVATPercentage,
+      hasSpecificPCCFee,
+      specificPCCFee,
     });
 
     const isCreatedByPitoAdmin = orderStateHistory.some(
