@@ -100,8 +100,8 @@ export const usePrepareOrderDetailPageData = ({
   ].includes(orderState);
   const canStartOrder = isEnableToStartOrder(orderDetail, isGroupOrder);
   const isOrderIsPicking = orderState === EOrderStates.picking;
-  const isOrderIsinProgress = orderState === EOrderStates.inProgress;
-  const vatPercentage = isOrderIsinProgress
+  const isOrderIsInProgress = orderState === EOrderStates.inProgress;
+  const vatPercentage = isOrderIsInProgress
     ? VATPercentage!
       ? VATPercentage!
       : currentOrderVATPercentage
