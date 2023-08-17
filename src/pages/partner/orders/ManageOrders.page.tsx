@@ -250,7 +250,7 @@ const ManageOrdersPage = () => {
       subOrderId: subOrderId as string,
       subOrderStartTime: Number(startTime || 0),
       subOrderEndTime: Number(endTime || 0),
-      subOrderStatus: status as string,
+      subOrderStatus: ((status as string) || '').split(','),
     }),
     [name, subOrderId, startTime, endTime, status],
   );
@@ -313,7 +313,7 @@ const ManageOrdersPage = () => {
         ...(name ? { name } : {}),
         ...(startTime ? { startTime } : {}),
         ...(endTime ? { endTime } : {}),
-        ...(status ? { status } : {}),
+        ...(status ? { status: status.join(',') } : {}),
         ...(subOrderId ? { subOrderId } : {}),
       },
     });

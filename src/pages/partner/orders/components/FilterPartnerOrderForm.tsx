@@ -2,11 +2,12 @@ import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import { OnChange } from 'react-final-form-listeners';
 import { useIntl } from 'react-intl';
+import arrayMutators from 'final-form-arrays';
 
 import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
+import FieldCheckboxGroup from '@components/FormFields/FieldCheckboxGroup/FieldCheckboxGroup';
 import FieldDatePicker from '@components/FormFields/FieldDatePicker/FieldDatePicker';
-import FieldSelect from '@components/FormFields/FieldSelect/FieldSelect';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import { EOrderPaymentState } from '@src/utils/enums';
 
@@ -17,7 +18,7 @@ export type TFilterPartnerOrderFormValues = {
   subOrderId: string;
   subOrderStartTime: number;
   subOrderEndTime: number;
-  subOrderStatus: string;
+  subOrderStatus: string[];
 };
 
 type TExtraProps = {};
@@ -120,29 +121,13 @@ const FilterPartnerOrderFormComponent: React.FC<
     }),
   };
 
-  const fieldSubOrderStatusProps = {
-    name: 'subOrderStatus',
-    id: 'FilterPartnerOrderForm.subOrderStatus',
-    label: intl.formatMessage({
-      id: 'FilterPartnerOrderForm.subOrderStatus.label',
-    }),
-    labelClassName: css.fieldLabel,
-    children: (
-      <>
-        <option disabled value="">
-          {intl.formatMessage({
-            id: 'FilterPartnerOrderForm.subOrderStatus.placeholder',
-          })}
-        </option>
-        {SUB_ORDER_STATUS_OPTIONS?.map(({ key, labelId }) => (
-          <option key={key} value={key}>
-            {intl.formatMessage({
-              id: labelId,
-            })}
-          </option>
-        ))}
-      </>
-    ),
+  const generateStatusOptions = () => {
+    return SUB_ORDER_STATUS_OPTIONS.map((option) => {
+      return {
+        key: option.key,
+        label: intl.formatMessage({ id: option.labelId }),
+      };
+    });
   };
 
   return (
@@ -165,8 +150,14 @@ const FilterPartnerOrderFormComponent: React.FC<
           <FieldDatePicker {...fieldSubOrderEndTimeProps} />
         </div>
       </div>
-      <div className={css.fieldContainer}>
-        <FieldSelect {...fieldSubOrderStatusProps} />
+      <div className={css.fieldCheckboxContainer}>
+        <label className={css.label}>Trạng thái đơn hàng</label>
+        <FieldCheckboxGroup
+          itemClassName={css.checkboxGroup}
+          id="subOrderStatus"
+          options={generateStatusOptions()}
+          name="subOrderStatus"
+        />
       </div>
 
       <Button className={css.submitBtn} disabled={submitDisabled}>
@@ -181,7 +172,13 @@ const FilterPartnerOrderFormComponent: React.FC<
 const FilterPartnerOrderForm: React.FC<TFilterPartnerOrderFormProps> = (
   props,
 ) => {
-  return <FinalForm {...props} component={FilterPartnerOrderFormComponent} />;
+  return (
+    <FinalForm
+      mutators={{ ...arrayMutators }}
+      {...props}
+      component={FilterPartnerOrderFormComponent}
+    />
+  );
 };
 
 export default FilterPartnerOrderForm;

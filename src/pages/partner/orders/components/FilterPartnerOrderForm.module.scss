@@ -31,6 +31,16 @@
   }
 }
 
+.fieldCheckboxContainer {
+  .label {
+    @include textTemplate(14px, $fontWeightSemiBold, 20px);
+  }
+
+  .checkboxGroup {
+    @include textTemplate(14px, $fontWeightRegular, 24px);
+  }
+}
+
 .fieldLabel {
   color: $neutralGray6;
   @include textTemplate(14px, 600, 20px);
