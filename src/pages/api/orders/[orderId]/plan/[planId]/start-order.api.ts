@@ -23,7 +23,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             return;
           }
 
-          await startOrder(orderId as string);
+          await startOrder(orderId as string, planId as string);
           console.info('>> Started order: ', orderId);
           await initiateTransaction({
             orderId: orderId as string,

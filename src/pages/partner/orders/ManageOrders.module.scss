@@ -3,6 +3,14 @@
 @use '/src/styles/mixins.scss' as *;
 @use '/src/styles/defaults.scss' as *;
 
+.root {
+  margin-top: 44px;
+
+  @include viewportLarge {
+    margin-top: 0;
+  }
+}
+
 .filterForm {
   display: flex;
   align-items: center;

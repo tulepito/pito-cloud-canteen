@@ -88,6 +88,26 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           subOrderDate: startTimestamp,
         };
         const plan = await fetchListing(plans[0]);
+        const planId = plan.getId();
+        const planListing = Listing(plan);
+        const { orderDetail } = planListing.getMetadata();
+
+        const updatePlanListing = async (lastTransition: string) => {
+          const newOrderDetail = {
+            ...orderDetail,
+            [startTimestamp]: {
+              ...orderDetail[startTimestamp],
+              lastTransition,
+            },
+          };
+
+          await integrationSdk.listings.update({
+            id: planId,
+            metadata: {
+              orderDetail: newOrderDetail,
+            },
+          });
+        };
 
         if (transition === ETransition.START_DELIVERY) {
           participantIds.map(async (participantId: string) => {
@@ -96,6 +116,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
               userId: participantId,
             });
           });
+
+          await updatePlanListing(ETransition.START_DELIVERY);
         }
         if (transition === ETransition.COMPLETE_DELIVERY) {
           participantIds.map(async (participantId: string) => {
@@ -105,24 +127,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             });
           });
           await transitionOrderStatus(order, plan, integrationSdk);
+          await updatePlanListing(ETransition.COMPLETE_DELIVERY);
         }
         if (transition === ETransition.OPERATOR_CANCEL_PLAN) {
-          const planListing = Listing(plan);
-          const { orderDetail } = planListing.getMetadata();
-          const newOrderDetail = {
-            ...orderDetail,
-            [startTimestamp]: {
-              ...orderDetail[startTimestamp],
-              status: 'canceled',
-            },
-          };
-
-          integrationSdk.listings.update({
-            id: plans[0],
-            metadata: {
-              orderDetail: newOrderDetail,
-            },
-          });
+          await updatePlanListing(ETransition.OPERATOR_CANCEL_PLAN);
           emailSendingFactory(
             EmailTemplateTypes.BOOKER.BOOKER_SUB_ORDER_CANCELED,
             {

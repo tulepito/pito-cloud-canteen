@@ -42,16 +42,29 @@ const SubOrderNote: React.FC<TSubOrderNoteProps> = () => {
 
   return (
     <RenderWhen condition={!fetchOrderInProgress}>
-      <RenderWhen condition={isGroupOrder && !isEmpty(bookerOrderNote)}>
-        <Collapsible label={intl.formatMessage({ id: 'SubOrderNote.title' })}>
+      <div className={css.mobileNotesWrapper}>
+        <div className={css.title}>
+          {intl.formatMessage({ id: 'SubOrderNote.title' })}
+        </div>
+        <RenderWhen condition={isGroupOrder && !isEmpty(bookerOrderNote)}>
           <div className={css.note}>{bookerOrderNote}</div>
-        </Collapsible>
-      </RenderWhen>
-      <RenderWhen condition={!isGroupOrder && !isEmpty(bookerSubOrderNote)}>
-        <Collapsible label={intl.formatMessage({ id: 'SubOrderNote.title' })}>
+        </RenderWhen>
+        <RenderWhen condition={!isGroupOrder && !isEmpty(bookerSubOrderNote)}>
           <div className={css.note}>{bookerSubOrderNote}</div>
-        </Collapsible>
-      </RenderWhen>
+        </RenderWhen>
+      </div>
+      <div className={css.desktopNotesWrapper}>
+        <RenderWhen condition={isGroupOrder && !isEmpty(bookerOrderNote)}>
+          <Collapsible label={intl.formatMessage({ id: 'SubOrderNote.title' })}>
+            <div className={css.note}>{bookerOrderNote}</div>
+          </Collapsible>
+        </RenderWhen>
+        <RenderWhen condition={!isGroupOrder && !isEmpty(bookerSubOrderNote)}>
+          <Collapsible label={intl.formatMessage({ id: 'SubOrderNote.title' })}>
+            <div className={css.note}>{bookerSubOrderNote}</div>
+          </Collapsible>
+        </RenderWhen>
+      </div>
       <RenderWhen.False>
         <Skeleton className={css.loading} />
       </RenderWhen.False>

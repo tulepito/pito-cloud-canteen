@@ -176,7 +176,7 @@ const PartnerManageOrdersSlice = createSlice({
 
         const subOrderList = (orderList as TObject[]).reduce<TObject[]>(
           (result, curr) => {
-            const { plan, transactionDataMap = {} } = curr || {};
+            const { plan } = curr || {};
             const orderGetter = Listing(curr as TListing);
             const orderMetadata = orderGetter.getMetadata();
             const { title } = orderGetter.getAttributes();
@@ -198,7 +198,6 @@ const PartnerManageOrdersSlice = createSlice({
                       companyName,
                       ...orderMetadata,
                       orderId,
-                      transaction: transactionDataMap[date],
                     });
               }, []);
 
