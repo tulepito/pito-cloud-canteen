@@ -267,6 +267,10 @@ export const partnerPaths = {
   ManageOrders: '/partner/orders',
   ManagePayments: '/partner/payments',
   SubOrderDetail: '/partner/orders/[subOrderId]',
+  ManageProduct: '/partner/product',
+  ManageFood: '/partner/product/food',
+  ManageMenus: '/partner/product/menus',
+  Settings: '/partner/settings',
 };
 
 export const partnerRoutes = {
