@@ -110,8 +110,8 @@ const TABLE_COLUMN: TColumn[] = [
   {
     key: 'state',
     label: 'Trạng thái',
-    render: ({ transaction = {} }: TObject) => {
-      return <SubOrderBadge transaction={transaction} />;
+    render: ({ lastTransition }: TObject) => {
+      return <SubOrderBadge lastTransition={lastTransition} />;
     },
   },
   {
@@ -145,7 +145,7 @@ const parseEntitiesToTableData = (subOrders: TObject[]) => {
       memberOrders = {},
       restaurant,
       lineItems = [],
-      transaction,
+      lastTransition,
       isPaid,
     } = entity;
     const dayIndex = new Date(Number(date)).getDay();
@@ -180,7 +180,7 @@ const parseEntitiesToTableData = (subOrders: TObject[]) => {
         endDate: endDate ? formatTimestamp(endDate) : '',
         state: EOrderDraftStates.pendingApproval,
         deliveryHour: formattedDeliveryHour,
-        transaction,
+        lastTransition,
         isPaid,
       },
     };

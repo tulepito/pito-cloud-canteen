@@ -15,7 +15,8 @@ type PartnerSubOrderCardProps = {
 
 const PartnerSubOrderCard: React.FC<PartnerSubOrderCardProps> = (props) => {
   const { data } = props;
-  const { orderName, totalPrice, transaction, deliveryHour, date, id } = data;
+  const { orderName, totalPrice, lastTransition, deliveryHour, date, id } =
+    data;
 
   return (
     <NamedLink
@@ -33,7 +34,7 @@ const PartnerSubOrderCard: React.FC<PartnerSubOrderCardProps> = (props) => {
             <IconReceipt className={css.iconReceipt} />
             <span>{totalPrice}</span>
           </div>
-          <SubOrderBadge transaction={transaction} />
+          <SubOrderBadge lastTransition={lastTransition} />
         </div>
         <div className={css.cardFooter}>
           <IconClock className={css.iconClock} />

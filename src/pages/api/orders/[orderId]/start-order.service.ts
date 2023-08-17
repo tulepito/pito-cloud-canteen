@@ -5,7 +5,7 @@ import { getIntegrationSdk } from '@services/integrationSdk';
 import { Listing } from '@utils/data';
 import { EOrderStates } from '@utils/enums';
 
-export const startOrder = async (orderId: string) => {
+export const startOrder = async (orderId: string, planId: string) => {
   const integrationSdk = getIntegrationSdk();
 
   const [orderListing] = denormalisedResponseEntities(
@@ -13,8 +13,11 @@ export const startOrder = async (orderId: string) => {
       id: orderId,
     }),
   );
-  const { orderState, orderStateHistory = [] } =
-    Listing(orderListing).getMetadata();
+  const {
+    orderState,
+    orderStateHistory = [],
+    partnerIds = [],
+  } = Listing(orderListing).getMetadata();
 
   if (orderState !== EOrderStates.picking) {
     throw new Error('You can start order (with orderState is "picking") only');
@@ -39,6 +42,13 @@ export const startOrder = async (orderId: string) => {
     },
     { expand: true },
   );
+
+  await integrationSdk.listings.update({
+    id: planId,
+    metadata: {
+      partnerIds,
+    },
+  });
 
   emailSendingFactory(EmailTemplateTypes.BOOKER.BOOKER_ORDER_SUCCESS, {
     orderId,

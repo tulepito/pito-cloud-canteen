@@ -2,6 +2,22 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/mixins.scss' as *;
 .root {
+  padding: 44px 0 100px;
+  @include viewportLarge {
+    padding: 0;
+  }
+
+  .goBackContainer {
+    @include flexAlign(center);
+    height: 48px;
+    padding-left: 16px;
+    border-bottom: 1px solid $neutralGray3;
+
+    @include viewportLarge {
+      display: none;
+    }
+  }
+
   .container {
     margin-top: 28px;
     @include viewportLargeWithPaddings {
@@ -11,8 +27,33 @@
     }
 
     .leftPart {
+      .mobileSubOrderCartWrapper {
+        display: block;
+        @include viewportLarge {
+          display: none;
+        }
+      }
+
+      .mobileSubOrderSummaryWrapper {
+        display: block;
+        @include viewportLarge {
+          display: none;
+        }
+      }
+
+      .subOrderSummaryWrapper {
+        display: none;
+
+        @include viewportLarge {
+          display: block;
+        }
+      }
     }
     .rightPart {
+      display: none;
+      @include viewportLarge {
+        display: block;
+      }
     }
   }
 

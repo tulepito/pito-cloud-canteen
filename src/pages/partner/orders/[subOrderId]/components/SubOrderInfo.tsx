@@ -41,29 +41,31 @@ const SubOrderInfo: React.FC<TSubOrderInfoProps> = () => {
       <div className={css.title}>
         {intl.formatMessage({ id: 'SubOrderInfo.title' })}
       </div>
-      <div className={css.row}>
-        <div className={css.label}>
-          {intl.formatMessage({ id: 'SubOrderInfo.companyLabel' })}
+      <div className={css.inforWrapper}>
+        <div className={css.row}>
+          <div className={css.label}>
+            {intl.formatMessage({ id: 'SubOrderInfo.companyLabel' })}
+          </div>
+          <div className={css.value}>{companyName}</div>
         </div>
-        <div className={css.value}>{companyName}</div>
-      </div>
-      <div className={css.row}>
-        <div className={css.label}>
-          {intl.formatMessage({ id: 'SubOrderInfo.deliveryAddressLabel' })}
+        <div className={css.row}>
+          <div className={css.label}>
+            {intl.formatMessage({ id: 'SubOrderInfo.deliveryAddressLabel' })}
+          </div>
+          <div className={css.value}>{deliveryAddress?.address || ''}</div>
         </div>
-        <div className={css.value}>{deliveryAddress?.address || ''}</div>
-      </div>
-      <div className={css.row}>
-        <div className={css.label}>
-          {intl.formatMessage({ id: 'SubOrderInfo.deliveryTimeLabel' })}
+        <div className={css.row}>
+          <div className={css.label}>
+            {intl.formatMessage({ id: 'SubOrderInfo.deliveryTimeLabel' })}
+          </div>
+          <div className={css.value}>{formattedDeliveryHour}</div>
         </div>
-        <div className={css.value}>{formattedDeliveryHour}</div>
-      </div>
-      <div className={css.row}>
-        <div className={css.label}>
-          {intl.formatMessage({ id: 'SubOrderInfo.staffNameLabel' })}
+        <div className={css.row}>
+          <div className={css.label}>
+            {intl.formatMessage({ id: 'SubOrderInfo.staffNameLabel' })}
+          </div>
+          <div className={css.value}>{staffName}</div>
         </div>
-        <div className={css.value}>{staffName}</div>
       </div>
     </div>
   );
