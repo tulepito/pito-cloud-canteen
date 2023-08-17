@@ -113,6 +113,7 @@ export const getRestaurantQuery = ({
     distance,
     categories = [],
     packaging = [],
+    memberAmount,
   } = params;
 
   const origin = User(companyAccount as TUser).getPublicData()?.location
@@ -129,6 +130,12 @@ export const getRestaurantQuery = ({
       : {}),
     ...(packaging.length > 0 && {
       pub_packaging: `has_any:${packaging.join(',')}`,
+    }),
+    ...(memberAmount && {
+      pub_minQuantity: `,${memberAmount}`,
+    }),
+    ...(memberAmount && {
+      pub_maxQuantity: `${memberAmount},`,
     }),
     meta_status: ERestaurantListingStatus.authorized,
     include: ['images'],

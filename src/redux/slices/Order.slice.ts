@@ -1,5 +1,4 @@
 import { createSlice } from '@reduxjs/toolkit';
-import compact from 'lodash/compact';
 import isNumber from 'lodash/isNumber';
 import isString from 'lodash/isString';
 import uniq from 'lodash/uniq';
@@ -30,6 +29,7 @@ import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
 import {
   getMenuQuery,
   getMenuQueryInSpecificDay,
+  getRestaurantQuery,
 } from '@helpers/listingSearchQuery';
 import { LISTING_TYPE } from '@pages/api/helpers/constants';
 import { createAsyncThunk } from '@redux/redux.helper';
@@ -356,6 +356,7 @@ const recommendRestaurants = createAsyncThunk(
       startDate,
       endDate,
       orderType = EOrderType.group,
+      memberAmount = 0,
     } = Listing(order as TListing).getMetadata();
     const isNormalOrder = orderType === EOrderType.normal;
     const totalDates = renderDateRange(startDate, endDate);
@@ -375,33 +376,40 @@ const recommendRestaurants = createAsyncThunk(
             sdkModel: sdk.listings,
             query: menuQuery,
           });
-          const restaurants = compact(
-            await Promise.all(
-              allMenus.map(async (menu: TListing) => {
-                const { restaurantId } = Listing(menu).getMetadata();
-                const restaurantResponse = denormalisedResponseEntities(
-                  await sdk.listings.show({
-                    id: restaurantId,
-                    include: ['images', 'author'],
-                    'fields.image': [
-                      'variants.landscape-crop',
-                      'variants.landscape-crop2x',
-                    ],
-                  }),
-                )[0];
-                const { status: restaurantStatus } =
-                  Listing(restaurantResponse).getMetadata();
+          const restaurantIdList = uniq<any>(
+            allMenus.map((menu: TListing) => {
+              const { restaurantId } = Listing(menu).getMetadata();
 
-                if (restaurantStatus !== ERestaurantListingStatus.authorized)
-                  return null;
+              return restaurantId;
+            }),
+          ).slice(0, 100);
 
-                return {
-                  restaurantInfo: restaurantResponse,
-                  menu,
-                };
-              }),
-            ),
+          const restaurantsQuery = getRestaurantQuery({
+            restaurantIds: restaurantIdList,
+            companyAccount: null,
+            params: {
+              memberAmount,
+            },
+          });
+
+          const restaurantsResponse = denormalisedResponseEntities(
+            await sdk.listings.query(restaurantsQuery),
           );
+
+          const restaurants = allMenus.reduce((result: any, menu: TListing) => {
+            const { restaurantId } = Listing(menu).getMetadata();
+            const restaurantInfo = restaurantsResponse.find(
+              (restaurant: TListing) =>
+                Listing(restaurant).getId() === restaurantId,
+            );
+            if (!restaurantInfo) return result;
+
+            return result.concat({
+              menu,
+              restaurantInfo,
+            });
+          }, []);
+
           if (restaurants.length > 0) {
             const randomRestaurant =
               restaurants[Math.floor(Math.random() * (restaurants.length - 1))];
@@ -440,7 +448,9 @@ const recommendRestaurantForSpecificDay = createAsyncThunk(
   async (dateTime: number, { getState, extra: sdk }) => {
     const { order, orderDetail } = getState().Order;
     const orderId = Listing(order as TListing).getId();
-    const { plans = [] } = Listing(order as TListing).getMetadata();
+    const { plans = [], memberAmount = 0 } = Listing(
+      order as TListing,
+    ).getMetadata();
     const menuQueryParams = {
       timestamp: dateTime,
     };
@@ -449,33 +459,40 @@ const recommendRestaurantForSpecificDay = createAsyncThunk(
       sdkModel: sdk.listings,
       query: menuQuery,
     });
-    const restaurants = compact(
-      await Promise.all(
-        allMenus.map(async (menu: TListing) => {
-          const { restaurantId } = Listing(menu).getMetadata();
-          const restaurantResponse = denormalisedResponseEntities(
-            await sdk.listings.show({
-              id: restaurantId,
-              include: ['images', 'author'],
-              'fields.image': [
-                'variants.landscape-crop',
-                'variants.landscape-crop2x',
-              ],
-            }),
-          )[0];
-          const { status: restaurantStatus } =
-            Listing(restaurantResponse).getMetadata();
 
-          if (restaurantStatus !== ERestaurantListingStatus.authorized)
-            return null;
+    const restaurantIdList = uniq<any>(
+      allMenus.map((menu: TListing) => {
+        const { restaurantId } = Listing(menu).getMetadata();
 
-          return {
-            restaurantInfo: restaurantResponse,
-            menu,
-          };
-        }),
-      ),
+        return restaurantId;
+      }),
+    ).slice(0, 100);
+
+    const restaurantsQuery = getRestaurantQuery({
+      restaurantIds: restaurantIdList,
+      companyAccount: null,
+      params: {
+        memberAmount,
+      },
+    });
+
+    const restaurantsResponse = denormalisedResponseEntities(
+      await sdk.listings.query(restaurantsQuery),
     );
+
+    const restaurants = allMenus.reduce((result: any, menu: TListing) => {
+      const { restaurantId } = Listing(menu).getMetadata();
+      const restaurantInfo = restaurantsResponse.find(
+        (restaurant: TListing) => Listing(restaurant).getId() === restaurantId,
+      );
+      if (!restaurantInfo) return result;
+
+      return result.concat({
+        menu,
+        restaurantInfo,
+      });
+    }, []);
+
     if (restaurants.length > 0) {
       const randomNumber = Math.floor(Math.random() * (restaurants.length - 1));
       const otherRandomNumber = Math.abs(randomNumber - restaurants.length + 1);
