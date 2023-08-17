@@ -19,7 +19,6 @@ const ModalReachMaxAllowedChanges: React.FC<TModalReachMaxAllowedChanges> = (
   props,
 ) => {
   const { id, isOpen, handleClose, type = 'reach_max', minQuantity } = props;
-  console.log({ type });
 
   return (
     <Modal
