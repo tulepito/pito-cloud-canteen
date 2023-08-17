@@ -8,6 +8,7 @@ import PartnerHeader from './PartnerHeader/PartnerHeader';
 import PartnerLayoutContent from './PartnerLayoutContent/PartnerLayoutContent';
 import PartnerLayoutSidebar from './PartnerLayoutSidebar/PartnerLayoutSidebar';
 import PartnerLayoutTopbar from './PartnerLayoutTopbar/PartnerLayoutTopbar';
+import PartnerNavBar from './PartnerNavBar/PartnerNavBar';
 import PartnerSidebar from './PartnerSidebar/PartnerSidebar';
 
 import css from './PartnerLayout.module.scss';
@@ -23,23 +24,24 @@ const PartnerLayout: React.FC<PropsWithChildren> = (props) => {
 
   return (
     <div className={css.root}>
-      <RenderWhen condition={isMobileLayout}>
-        <RenderWhen.False>
-          <PartnerLayoutSidebar isMenuOpen={isMenuOpen}>
-            <PartnerSidebar
-              onCloseMenu={onCloseMenu}
-              onMenuClick={toggleMenuOpen}
-            />
-          </PartnerLayoutSidebar>
-          <div className={css.main}>
-            <PartnerLayoutTopbar>
-              <PartnerHeader onMenuClick={toggleMenuOpen} />
-            </PartnerLayoutTopbar>
-            <PartnerLayoutContent isMenuOpen={isMenuOpen}>
-              {children}
-            </PartnerLayoutContent>
-          </div>
-        </RenderWhen.False>
+      <div className={css.main}>
+        <PartnerLayoutTopbar>
+          <PartnerHeader onMenuClick={toggleMenuOpen} />
+        </PartnerLayoutTopbar>
+        <PartnerLayoutContent isMenuOpen={isMenuOpen}>
+          {children}
+        </PartnerLayoutContent>
+      </div>
+
+      <PartnerNavBar />
+
+      <RenderWhen condition={!isMobileLayout}>
+        <PartnerLayoutSidebar isMenuOpen={isMenuOpen}>
+          <PartnerSidebar
+            onCloseMenu={onCloseMenu}
+            onMenuClick={toggleMenuOpen}
+          />
+        </PartnerLayoutSidebar>
       </RenderWhen>
     </div>
   );
