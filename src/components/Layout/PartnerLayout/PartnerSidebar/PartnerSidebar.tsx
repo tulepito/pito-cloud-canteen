@@ -46,7 +46,7 @@ const LIST_SIDEBAR_MENU: TSidebarMenu[] = [
   },
 ];
 
-type TAdminSidebarProps = {
+type TPartnerSidebarProps = {
   onMenuClick: () => void;
   onCloseMenu: () => void;
 };
@@ -70,7 +70,7 @@ const checkNestedPathActive = (arr: TSidebarMenu[], pathName: string) => {
   }
 };
 
-const AdminSidebar: React.FC<TAdminSidebarProps> = (props) => {
+const PartnerSidebar: React.FC<TPartnerSidebarProps> = (props) => {
   const { onCloseMenu } = props;
   const intl = useIntl();
 
@@ -122,4 +122,4 @@ const AdminSidebar: React.FC<TAdminSidebarProps> = (props) => {
   );
 };
 
-export default AdminSidebar;
+export default PartnerSidebar;
