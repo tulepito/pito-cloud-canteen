@@ -73,22 +73,34 @@ const OrderQuotationDetail: React.FC<OrderQuotationDetailProps> = (props) => {
   const partnerVATSetting =
     vatSettings?.[currentPartnerId!] || EPartnerVATSetting.vat;
   const partnerServiceFee = serviceFees[currentPartnerId!];
-  const vatPercentage = vatPercentageBaseOnVatSetting({
-    vatSetting: partnerVATSetting,
-    vatPercentage: currentOrderVATPercentage,
-  });
+  const vatPercentage = isPartner
+    ? vatPercentageBaseOnVatSetting({
+        vatSetting: partnerVATSetting,
+        vatPercentage: currentOrderVATPercentage,
+      })
+    : currentOrderVATPercentage;
 
-  const priceQuotation = calculatePriceQuotationInfoFromQuotation({
-    quotation: quotation!,
-    packagePerMember,
-    currentOrderVATPercentage: vatPercentage,
-    date: isPartner ? currentSubOrderDate : undefined,
-    partnerId: currentPartnerId,
-    currentOrderServiceFeePercentage: partnerServiceFee / 100,
-    shouldSkipVAT: partnerVATSetting === EPartnerVATSetting.direct,
-    hasSpecificPCCFee,
-    specificPCCFee,
-  });
+  const priceQuotation = useMemo(
+    () =>
+      calculatePriceQuotationInfoFromQuotation({
+        quotation: quotation!,
+        packagePerMember,
+        currentOrderVATPercentage: vatPercentage,
+        date: isPartner ? currentSubOrderDate : undefined,
+        partnerId: currentPartnerId,
+        currentOrderServiceFeePercentage: partnerServiceFee / 100,
+        shouldSkipVAT: partnerVATSetting === EPartnerVATSetting.direct,
+        hasSpecificPCCFee,
+        specificPCCFee,
+      }),
+    [
+      isPartner,
+      hasSpecificPCCFee,
+      specificPCCFee,
+      partnerVATSetting,
+      JSON.stringify(quotation),
+    ],
+  );
 
   const handleTabChange = (tab: any) => {
     setCrrSubOrderDate(tab.key);
@@ -205,7 +217,7 @@ const OrderQuotationDetail: React.FC<OrderQuotationDetailProps> = (props) => {
           title="Thực đơn phục vụ"
           target={target}
           isAdminLayout
-          vatSetting={partnerVATSetting}
+          vatSetting={isPartner ? partnerVATSetting : undefined}
         />
       </div>
     </div>
