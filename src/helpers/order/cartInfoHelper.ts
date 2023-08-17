@@ -378,6 +378,6 @@ export const calculatePriceQuotationInfoFromQuotation = ({
     isOverflowPackage,
     totalWithoutVAT,
     PITOFee,
-    VATPercentage: currentOrderVATPercentage,
+    vatPercentage: currentOrderVATPercentage,
   };
 };
