@@ -556,7 +556,11 @@ const addOrUpdateMemberOrder = createAsyncThunk(
       const planListing = Listing(updatePlanListing.planListing);
       const { orderDetail } = planListing.getMetadata();
 
-      return { planData: updatePlanListing.planListing, orderDetail };
+      return {
+        planData: updatePlanListing.planListing,
+        orderDetail,
+        newUser: user,
+      };
     } catch (error) {
       console.log(error);
     }
@@ -1736,6 +1740,9 @@ const OrderManagementSlice = createSlice({
         state.addOrUpdateMemberOrderInProgress = false;
         state.draftOrderDetail = payload?.orderDetail;
         state.planData = payload?.planData;
+        state.anonymousParticipantData = state.anonymousParticipantData.concat(
+          payload?.newUser,
+        );
       })
       .addCase(addOrUpdateMemberOrder.rejected, (state, { payload }) => {
         state.addOrUpdateMemberOrderInProgress = false;
