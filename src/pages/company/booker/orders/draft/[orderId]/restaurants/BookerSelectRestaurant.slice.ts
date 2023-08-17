@@ -216,6 +216,8 @@ const searchRestaurants = createAsyncThunk(
       getState().BookerSelectRestaurant;
 
     const query = getMenuQuery({ order, params });
+    const orderListing = Listing(order);
+    const { memberAmount = 0 } = orderListing.getMetadata();
 
     const allMenus = await queryAllPages({ sdkModel: sdk.listings, query });
 
@@ -235,7 +237,10 @@ const searchRestaurants = createAsyncThunk(
       getRestaurantQuery({
         restaurantIds,
         companyAccount,
-        params,
+        params: {
+          ...params,
+          memberAmount,
+        },
       }),
     );
 
