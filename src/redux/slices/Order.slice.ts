@@ -1,5 +1,4 @@
 import { createSlice } from '@reduxjs/toolkit';
-import compact from 'lodash/compact';
 import isNumber from 'lodash/isNumber';
 import isString from 'lodash/isString';
 import uniq from 'lodash/uniq';
@@ -397,24 +396,19 @@ const recommendRestaurants = createAsyncThunk(
             await sdk.listings.query(restaurantsQuery),
           );
 
-          const restaurants = compact<{
-            menu: TListing;
-            restaurantInfo: TListing;
-          }>(
-            allMenus.map((menu: TListing) => {
-              const { restaurantId } = Listing(menu).getMetadata();
-              const restaurantInfo = restaurantsResponse.find(
-                (restaurant: TListing) =>
-                  Listing(restaurant).getId() === restaurantId,
-              );
-              if (!restaurantInfo) return null;
+          const restaurants = allMenus.reduce((result: any, menu: TListing) => {
+            const { restaurantId } = Listing(menu).getMetadata();
+            const restaurantInfo = restaurantsResponse.find(
+              (restaurant: TListing) =>
+                Listing(restaurant).getId() === restaurantId,
+            );
+            if (!restaurantInfo) return result;
 
-              return {
-                menu,
-                restaurantInfo,
-              };
-            }),
-          );
+            return result.concat({
+              menu,
+              restaurantInfo,
+            });
+          }, []);
 
           if (restaurants.length > 0) {
             const randomRestaurant =
@@ -486,24 +480,18 @@ const recommendRestaurantForSpecificDay = createAsyncThunk(
       await sdk.listings.query(restaurantsQuery),
     );
 
-    const restaurants = compact<{
-      menu: TListing;
-      restaurantInfo: TListing;
-    }>(
-      allMenus.map((menu: TListing) => {
-        const { restaurantId } = Listing(menu).getMetadata();
-        const restaurantInfo = restaurantsResponse.find(
-          (restaurant: TListing) =>
-            Listing(restaurant).getId() === restaurantId,
-        );
-        if (!restaurantInfo) return null;
+    const restaurants = allMenus.reduce((result: any, menu: TListing) => {
+      const { restaurantId } = Listing(menu).getMetadata();
+      const restaurantInfo = restaurantsResponse.find(
+        (restaurant: TListing) => Listing(restaurant).getId() === restaurantId,
+      );
+      if (!restaurantInfo) return result;
 
-        return {
-          menu,
-          restaurantInfo,
-        };
-      }),
-    );
+      return result.concat({
+        menu,
+        restaurantInfo,
+      });
+    }, []);
 
     if (restaurants.length > 0) {
       const randomNumber = Math.floor(Math.random() * (restaurants.length - 1));
