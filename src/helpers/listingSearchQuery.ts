@@ -132,7 +132,7 @@ export const getRestaurantQuery = ({
       pub_packaging: `has_any:${packaging.join(',')}`,
     }),
     ...(memberAmount && {
-      pub_minQuantity: `,${memberAmount}`,
+      pub_minQuantity: `,${memberAmount + 1}`,
     }),
     ...(memberAmount && {
       pub_maxQuantity: `${memberAmount},`,
