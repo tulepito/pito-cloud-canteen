@@ -20,6 +20,7 @@ import Tooltip from '@components/Tooltip/Tooltip';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { useLogout } from '@hooks/useLogout';
+import { useViewport } from '@hooks/useViewport';
 import {
   NotificationActions,
   NotificationThunks,
@@ -45,6 +46,7 @@ const PartnerHeader: React.FC<TPartnerHeaderProps> = () => {
   const router = useRouter();
   const handleLogoutFn = useLogout();
   const tooltipController = useBoolean();
+  const { isMobileLayout } = useViewport();
 
   const currentUserGetter = CurrentUser(currentUser);
   const { lastName = '', firstName = '' } = currentUserGetter.getProfile();
@@ -80,7 +82,14 @@ const PartnerHeader: React.FC<TPartnerHeaderProps> = () => {
 
   return (
     <div className={css.root}>
-      <NamedLink path={partnerPaths.Home}>
+      <ProfileMenuLabel className={css.headerLeftMobile}>
+        <div className={css.avatar}>
+          <Avatar disableProfileLink user={currentUser} />
+        </div>
+        <p className={css.displayName}>{currentUserFullName}</p>
+      </ProfileMenuLabel>
+
+      <NamedLink path={partnerPaths.Home} className={css.headerRightWrapper}>
         <div className={css.headerRight}>
           <PitoLogo className={css.logo} />
         </div>
@@ -117,22 +126,25 @@ const PartnerHeader: React.FC<TPartnerHeaderProps> = () => {
           </Tooltip>
         </div>
         <div className={css.line}></div>
-        <ProfileMenu>
-          <ProfileMenuLabel className={css.profileMenuWrapper}>
-            <div className={css.avatar}>
-              <Avatar disableProfileLink user={currentUser} />
-            </div>
-            <p className={css.displayName}>{currentUserFullName}</p>
-            <IconArrow direction="down" />
-          </ProfileMenuLabel>
-          <ProfileMenuContent className={css.profileMenuContent}>
-            <ProfileMenuItem key="AccountSettingsPage">
-              <InlineTextButton type="button" onClick={onLogout}>
-                <p>Đăng xuất</p>
-              </InlineTextButton>
-            </ProfileMenuItem>
-          </ProfileMenuContent>
-        </ProfileMenu>
+
+        <RenderWhen condition={!isMobileLayout}>
+          <ProfileMenu>
+            <ProfileMenuLabel className={css.profileMenuWrapper}>
+              <div className={css.avatar}>
+                <Avatar disableProfileLink user={currentUser} />
+              </div>
+              <p className={css.displayName}>{currentUserFullName}</p>
+              <IconArrow direction="down" />
+            </ProfileMenuLabel>
+            <ProfileMenuContent className={css.profileMenuContent}>
+              <ProfileMenuItem key="AccountSettingsPage">
+                <InlineTextButton type="button" onClick={onLogout}>
+                  <p>Đăng xuất</p>
+                </InlineTextButton>
+              </ProfileMenuItem>
+            </ProfileMenuContent>
+          </ProfileMenu>
+        </RenderWhen>
       </div>
     </div>
   );
