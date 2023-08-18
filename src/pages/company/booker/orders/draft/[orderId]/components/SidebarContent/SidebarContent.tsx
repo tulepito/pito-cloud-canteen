@@ -83,7 +83,13 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
     (state) => state.Order.orderDetail,
     shallowEqual,
   );
+  const updateOrderDetailInProgress = useAppSelector(
+    (state) => state.Order.updateOrderDetailInProgress,
+  );
 
+  const recommendRestaurantInProgress = useAppSelector(
+    (state) => state.Order.recommendRestaurantInProgress,
+  );
   const orderData = Listing(order);
   const companyData = User(companyAccount!);
   const { title: orderCode } = orderData.getAttributes();
@@ -110,6 +116,10 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
   const isGroupOrder = orderType === EOrderType.group;
   const isStartDateInValid = startDate < findMinStartDate().getTime();
   const isDeadlineDateInValid = deadlineDate < findMinDeadlineDate().getTime();
+  const sidebarFormSubmitInProgress =
+    updateOrderInProgress ||
+    updateOrderDetailInProgress ||
+    recommendRestaurantInProgress;
 
   const nextStartWeek = DateTime.fromJSDate(new Date())
     .startOf('week')
@@ -170,6 +180,7 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
       deliveryHour: deliveryHourValue,
       nutritions: nutritionsValue,
       mealType: mealTypeValue,
+      memberAmount: memberAmountValue,
     } = values;
     const finalStartDate = startDateValue || startDate;
     const finalEndDate = endDateValue || endDate;
@@ -201,7 +212,8 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
       difference(nutritions, finalNutritions).length > 0 ||
       getDaySessionFromDeliveryTime(deliveryHour) !==
         getDaySessionFromDeliveryTime(finalDeliveryHour) ||
-      packagePerMember !== +finalPackagePerMember;
+      packagePerMember !== +finalPackagePerMember ||
+      memberAmount !== +memberAmountValue;
 
     const { payload: newOrderDetail } = await dispatch(
       orderAsyncActions.recommendRestaurants(),
@@ -226,7 +238,7 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
           <LocationForm
             initialValues={locationInitValues}
             onSubmit={handleSubmit}
-            loading={updateOrderInProgress}
+            loading={sidebarFormSubmitInProgress}
           />
         );
       case 'deliveryTime':
@@ -234,7 +246,7 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
           <DeliveryTimeForm
             initialValues={deliveryInitValues}
             onSubmit={handleSubmit}
-            loading={updateOrderInProgress}
+            loading={sidebarFormSubmitInProgress}
           />
         );
       case 'expiredTime':
@@ -243,7 +255,7 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
             deliveryTime={new Date(startDate || nextStartWeek)}
             initialValues={deadlineInitValues}
             onSubmit={handleSubmit}
-            loading={updateOrderInProgress}
+            loading={sidebarFormSubmitInProgress}
           />
         );
       case 'numberEmployees':
@@ -251,7 +263,7 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
           <NumberEmployeesForm
             initialValues={numberEmployeesInitValues}
             onSubmit={handleSubmit}
-            loading={updateOrderInProgress}
+            loading={sidebarFormSubmitInProgress}
           />
         );
       case 'nutrition':
@@ -259,7 +271,7 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
           <NutritionForm
             initialValues={nutritionsInitValues}
             onSubmit={handleSubmit}
-            loading={updateOrderInProgress}
+            loading={sidebarFormSubmitInProgress}
           />
         );
       case 'access':
@@ -267,7 +279,7 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
           <AccessForm
             initialValues={selectedGroupsInitValues}
             onSubmit={handleSubmit}
-            loading={updateOrderInProgress}
+            loading={sidebarFormSubmitInProgress}
             groupList={groupList}
             companyId={companyData.getId()}
           />
@@ -277,7 +289,7 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
           <UnitBudgetForm
             initialValues={packagePerMemberInitValues}
             onSubmit={handleSubmit}
-            loading={updateOrderInProgress}
+            loading={sidebarFormSubmitInProgress}
           />
         );
       default:
