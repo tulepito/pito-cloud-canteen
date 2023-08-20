@@ -1,3 +1,5 @@
+import isEmpty from 'lodash/isEmpty';
+
 import { removeNonNumeric } from '@helpers/format';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import type { TObject, TUpdateCompanyApiParams } from '@src/utils/types';
@@ -78,12 +80,12 @@ const updateCompany = async (
     },
 
     metadata: {
-      ...(specificPCCFee
-        ? {
+      ...(isEmpty(specificPCCFee)
+        ? { hasSpecificPCCFee: false, specificPCCFee: undefined }
+        : {
             specificPCCFee: Number(removeNonNumeric(specificPCCFee)),
             hasSpecificPCCFee: true,
-          }
-        : { hasSpecificPCCFee: false }),
+          }),
     },
   };
 
