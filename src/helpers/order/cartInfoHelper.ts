@@ -134,7 +134,7 @@ export const calculatePriceQuotationInfo = ({
   date?: number | string;
   shouldIncludePITOFee?: boolean;
   currentOrderServiceFeePercentage?: number;
-  hasSpecificPCCFee: boolean;
+  hasSpecificPCCFee?: boolean;
   specificPCCFee?: number;
 }) => {
   const {

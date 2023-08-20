@@ -72,7 +72,13 @@ const OrderPaymentStatusTab: React.FC<OrderPaymentStatusTabProps> = (props) => {
   const orderListing = Listing(order);
   const orderId = orderListing.getId();
   const { title: orderTitle } = orderListing.getAttributes();
-  const { quotationId, serviceFees, deliveryHour } = orderListing.getMetadata();
+  const {
+    quotationId,
+    serviceFees,
+    deliveryHour,
+    hasSpecificPCCFee = false,
+    specificPCCFee = 0,
+  } = orderListing.getMetadata();
   const partnerCurrentQuotation = quotations.find(
     (_quotation) => _quotation.id.uuid === quotationId,
   );
@@ -164,6 +170,8 @@ const OrderPaymentStatusTab: React.FC<OrderPaymentStatusTabProps> = (props) => {
     planOrderDetail: orderDetail,
     order,
     currentOrderVATPercentage,
+    hasSpecificPCCFee,
+    specificPCCFee,
   });
 
   const clientPaidAmount =
