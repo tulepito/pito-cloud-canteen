@@ -65,7 +65,7 @@ export const usePrepareOrderDetailPageData = ({
   ).getAttributes();
   const { orderDetail = {} } = Listing(planData as TListing).getMetadata();
   const { companyName = '' } = User(companyData as TUser).getPublicData();
-  const { hasSpecificPCCFee = false, specificPCCFee } = User(
+  const { hasSpecificPCCFee = false, specificPCCFee = 0 } = User(
     companyData as TUser,
   ).getMetadata();
 
