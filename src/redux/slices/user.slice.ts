@@ -69,6 +69,9 @@ type TUserState = {
   sendVerificationEmailError: any;
   favoriteRestaurants: any[];
   favoriteFood: any[];
+
+  updateProfileInProgress: boolean;
+  updateProfileError: any;
 };
 
 const initialState: TUserState = {
@@ -79,6 +82,9 @@ const initialState: TUserState = {
   sendVerificationEmailError: null,
   favoriteRestaurants: [],
   favoriteFood: [],
+
+  updateProfileInProgress: false,
+  updateProfileError: null,
 };
 
 // ================ Thunks ================ //
@@ -144,9 +150,19 @@ const sendVerificationEmail = createAsyncThunk(
   },
 );
 
+const updateProfile = createAsyncThunk(
+  'app/user/UPDATE_PROFILE',
+  async (payload: TObject, { extra: sdk, dispatch }) => {
+    await sdk.currentUser.updateProfile(payload);
+
+    await dispatch(fetchCurrentUser());
+  },
+);
+
 export const userThunks = {
   fetchCurrentUser,
   sendVerificationEmail,
+  updateProfile,
 };
 
 const userSlice = createSlice({
@@ -194,6 +210,18 @@ const userSlice = createSlice({
           sendVerificationEmailInProgress: false,
           sendVerificationEmailError: action,
         };
+      })
+      /* =============== updateProfile =============== */
+      .addCase(updateProfile.pending, (state) => {
+        state.updateProfileInProgress = true;
+        state.updateProfileError = false;
+      })
+      .addCase(updateProfile.fulfilled, (state) => {
+        state.updateProfileInProgress = false;
+      })
+      .addCase(updateProfile.rejected, (state) => {
+        state.updateProfileInProgress = false;
+        state.updateProfileError = true;
       });
   },
 });
