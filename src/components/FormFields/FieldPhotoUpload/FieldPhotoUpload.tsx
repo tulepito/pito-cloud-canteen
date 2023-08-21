@@ -103,6 +103,7 @@ export type TFieldPhotoUpload = {
   className?: string;
   variants: string[];
   uploadImageError?: any;
+  iconUploadClassName?: string;
   name: string;
   id: string;
   validate?: any;
@@ -127,6 +128,7 @@ const FieldPhotoUpload: React.FC<TFieldPhotoUpload> = (props) => {
             onRemoveImage,
             variants,
             uploadImageError,
+            iconUploadClassName,
             meta,
           } = fieldRenderProps;
           const onChange = async (e: ChangeEvent<HTMLInputElement>) => {
@@ -202,7 +204,11 @@ const FieldPhotoUpload: React.FC<TFieldPhotoUpload> = (props) => {
                   />
                 ) : (
                   <label htmlFor={input.name} className={classNames(css.label)}>
-                    <div className={css.iconUpload}>
+                    <div
+                      className={classNames(
+                        css.iconUpload,
+                        iconUploadClassName,
+                      )}>
                       <ResponsiveImage
                         image={null}
                         alt={`${input.name} asset`}
