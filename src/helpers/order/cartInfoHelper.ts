@@ -166,7 +166,7 @@ export const calculatePriceQuotationInfo = ({
     };
   }, {});
 
-  const normalPCCFee = Object.values(currentOrderDetail).reduce(
+  const PCCFee = Object.values(currentOrderDetail).reduce(
     (result, currentOrderDetailOfDate) => {
       const { memberOrders, lineItems = [] } = currentOrderDetailOfDate;
       const memberAmountOfDate = isGroupOrder
@@ -184,15 +184,13 @@ export const calculatePriceQuotationInfo = ({
             return res + (item?.quantity || 1);
           }, 0);
 
-      return result + getPCCFeeByMemberAmount(memberAmountOfDate);
+      return result + hasSpecificPCCFee
+        ? specificPCCFee
+        : getPCCFeeByMemberAmount(memberAmountOfDate);
     },
     0,
   );
-  const actualPCCFee = shouldIncludePITOFee
-    ? hasSpecificPCCFee
-      ? specificPCCFee
-      : normalPCCFee
-    : 0;
+  const actualPCCFee = shouldIncludePITOFee ? PCCFee : 0;
 
   const { totalPrice = 0, totalDishes = 0 } = calculateTotalPriceAndDishes({
     orderDetail: planOrderDetail,
@@ -343,9 +341,9 @@ export const calculatePriceQuotationInfoFromQuotation = ({
         totalDishes: result.totalDishes + subOrderTotalDished,
         PITOFee: isPartnerFlow
           ? 0
-          : hasSpecificPCCFee
+          : result.PITOFee + hasSpecificPCCFee
           ? specificPCCFee
-          : result.PITOFee + getPCCFeeByMemberAmount(subOrderTotalDished),
+          : getPCCFeeByMemberAmount(subOrderTotalDished),
       };
     },
     {

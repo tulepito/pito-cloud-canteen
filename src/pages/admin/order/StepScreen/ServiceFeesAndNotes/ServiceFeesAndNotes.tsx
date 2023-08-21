@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
@@ -7,7 +8,7 @@ import { addCommas } from '@helpers/format';
 import { getPCCFeeByMemberAmount } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
-import { Listing } from '@src/utils/data';
+import { Listing, User } from '@src/utils/data';
 import type { TListing } from '@src/utils/types';
 
 // eslint-disable-next-line import/no-cycle
@@ -59,8 +60,24 @@ const ServiceFeesAndNotes: React.FC<ServiceFeesAndNotesProps> = (props) => {
     (state) => state.Order.updateOrderInProgress,
   );
   const { notes, serviceFees, memberAmount = 0 } = orderListing.getMetadata();
+  const { companyId: clientId } = Listing(order as TListing).getMetadata();
+
+  const companies = useAppSelector(
+    (state) => state.company.companyRefs,
+    shallowEqual,
+  );
+  const currentClient = companies.find(
+    (company) => company.id.uuid === clientId,
+  );
+
+  const { hasSpecificPCCFee = false, specificPCCFee = 0 } =
+    User(currentClient).getMetadata();
+
   const numberOfOrderDays = Object.keys(orderDetail).length;
-  const PITOFee = getPCCFeeByMemberAmount(memberAmount) * numberOfOrderDays;
+  const PITOFee =
+    (hasSpecificPCCFee
+      ? specificPCCFee
+      : getPCCFeeByMemberAmount(memberAmount)) * numberOfOrderDays;
   const restaurantOptions = restaurantList.map((restaurant: TListing) => ({
     label: Listing(restaurant).getAttributes().title,
     key: Listing(restaurant).getId(),
@@ -78,7 +95,6 @@ const ServiceFeesAndNotes: React.FC<ServiceFeesAndNotesProps> = (props) => {
           0,
       };
     }, {});
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     JSON.stringify(restaurantList),
     JSON.stringify(serviceFees),
@@ -87,7 +103,7 @@ const ServiceFeesAndNotes: React.FC<ServiceFeesAndNotesProps> = (props) => {
 
   useEffect(() => {
     dispatch(orderAsyncActions.fetchOrderRestaurants());
-  }, [dispatch]);
+  }, []);
 
   const handleFormSubmit = async (values: any) => {
     const newNotes = Object.keys(values).reduce((result, note) => {
