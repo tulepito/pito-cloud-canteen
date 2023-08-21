@@ -1,28 +1,35 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect } from 'react';
+import { Form as FinalForm } from 'react-final-form';
 import { useRouter } from 'next/router';
 
+import Form from '@components/Form/Form';
+import FieldPhotoUpload from '@components/FormFields/FieldPhotoUpload/FieldPhotoUpload';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import IconFood from '@components/Icons/IconFood/IconFood';
 import IconLock from '@components/Icons/IconLock/IconLock';
 import IconUser from '@components/Icons/IconUser2/IconUser2';
-import { useViewport } from '@hooks/useViewport';
+import { useAppDispatch } from '@hooks/reduxHooks';
+import { partnerThunks, removeCover } from '@redux/slices/partners.slice';
 import { participantPaths } from '@src/paths';
+import { EImageVariants } from '@src/utils/enums';
+import type { TObject } from '@src/utils/types';
 
 import css from './PartnerSettingsPage.module.scss';
 
-// const ACCEPT_IMAGES = 'image/*';
+const ACCEPT_IMAGES = 'image/png, image/gif, image/jpeg';
+const COVER_VARIANTS = [EImageVariants.scaledXLarge];
 
 const PartnerSettingsPage = () => {
   const router = useRouter();
 
-  const { isMobileLayout } = useViewport();
+  const dispatch = useAppDispatch();
 
-  useEffect(() => {
-    if (!isMobileLayout) {
-      router.push(participantPaths.AccountProfile);
-    }
-  }, [isMobileLayout]);
+  const handleCoverUpload = (params: TObject) => {
+    return dispatch(partnerThunks.requestCoverUpload(params));
+  };
+  const handleRemoveCover = (id: any) => {
+    return dispatch(removeCover(id));
+  };
 
   const openProfileModal = () => {
     router.push(participantPaths.AccountProfile);
@@ -38,44 +45,34 @@ const PartnerSettingsPage = () => {
 
   return (
     <div className={css.container}>
-      <div className={css.greyCircle}></div>
-      <div className={css.avatarSection}>
-        <div className={css.mediaFields}>
-          <div className={css.mediaFieldGroup}>
-            {/* <FieldPhotoUpload
-              name="cover"
-              accept={ACCEPT_IMAGES}
-              id="cover"
-              className={css.fieldCover}
-              image={uploadedCovers?.[0]}
-              variants={COVER_VARIANTS}
-              onImageUpload={onCoverUpload}
-              onRemoveImage={onRemoveCover}
-              validate={nonEmptyImage(
-                intl.formatMessage({
-                  id: 'EditPartnerBasicInformationForm.coverRequired',
-                }),
-              )}
-            />
-            <FieldPhotoUpload
-              name="avatar"
-              image={uploadedAvatars?.[0]}
-              accept={ACCEPT_IMAGES}
-              id="avatar"
-              className={css.fieldAvatar}
-              onImageUpload={onAvatarUpload}
-              onRemoveImage={onRemoveAvatar}
-              variants={AVATAR_VARIANTS}
-              validate={nonEmptyImage(
-                intl.formatMessage({
-                  id: 'EditPartnerBasicInformationForm.avatarRequired',
-                }),
-              )}
-            />
-            {uploadImageFailed && <ErrorMessage message={uploadImageFailed} />} */}
-          </div>
-        </div>
-      </div>
+      <FinalForm
+        onSubmit={() => {}}
+        render={() => {
+          return (
+            <Form>
+              <div className={css.avatarSection}>
+                <div className={css.mediaFields}>
+                  <div className={css.mediaFieldGroup}>
+                    <FieldPhotoUpload
+                      name="cover"
+                      accept={ACCEPT_IMAGES}
+                      id="cover"
+                      className={css.fieldCover}
+                      image={undefined}
+                      variants={COVER_VARIANTS}
+                      onImageUpload={handleCoverUpload as any}
+                      onRemoveImage={handleRemoveCover}
+                      iconUploadClassName={css.coverIconUpload}
+                    />
+
+                    {/* {uploadImageFailed && <ErrorMessage message={uploadImageFailed} />} */}
+                  </div>
+                </div>
+              </div>
+            </Form>
+          );
+        }}
+      />
       <div className={css.navigationWrapper}>
         <div className={css.navigationItem} onClick={openProfileModal}>
           <div className={css.iconGroup}>

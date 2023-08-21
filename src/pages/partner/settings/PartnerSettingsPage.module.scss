@@ -3,7 +3,7 @@
 @use '/src/styles/customMediaQueries.scss' as *;
 
 .container {
-  padding: 80px 16px;
+  padding: 16px 16px 80px;
   position: relative;
   overflow: hidden;
 
@@ -12,38 +12,47 @@
   }
 }
 
-.greyCircle {
-  position: absolute;
-  width: 613px;
-  height: 613px;
-  background-color: $neutralGray2;
-  border-radius: 100%;
-  top: -480px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: -1;
-
-  @include viewportLarge {
-    display: none;
-  }
+.mediaFieldGroup {
+  position: relative;
+  width: 100%;
 }
 
-.avatarSection {
-  @include viewportLarge {
-    display: none;
-  }
+.fieldAvatar {
+  width: 118px;
+  height: 118px;
+  position: relative;
+  left: 50%;
+  bottom: 40px;
+  transform: translateX(-50%);
+  z-index: 1;
+  background-color: $neutralGray1;
+  box-shadow: $boxShadowPopup;
+}
+
+.coverIconUpload {
+  padding: 0;
 }
 
 .mediaFields {
   display: flex;
   flex-direction: column;
-  padding: 0 40px;
   align-items: center;
   margin-bottom: 40px;
 }
 
 .mediaTitle {
   margin-bottom: 40px;
+}
+
+.fieldCover {
+  width: 100%;
+  max-width: 1440px;
+  height: 250px;
+  background-color: $neutralGray1;
+  box-shadow: $boxShadowPopup;
+  @include viewportLarge {
+    height: 300px;
+  }
 }
 
 .navigationWrapper {
