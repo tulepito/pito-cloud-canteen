@@ -7,6 +7,8 @@ import type { TObject } from '@utils/types';
 type TPasswordSliceInitialState = {
   initialEmail: string | null;
   submittedEmail: string | null;
+  changePasswordInProgress: boolean;
+  changePasswordError: any;
   recoveryError: any;
   recoveryInProgress: boolean;
   passwordRequested: boolean;
@@ -17,6 +19,8 @@ type TPasswordSliceInitialState = {
 const initialState: TPasswordSliceInitialState = {
   initialEmail: null,
   submittedEmail: null,
+  changePasswordInProgress: false,
+  changePasswordError: null,
   recoveryError: null,
   recoveryInProgress: false,
   passwordRequested: false,
@@ -27,6 +31,23 @@ const initialState: TPasswordSliceInitialState = {
 // ================ Thunk ================ //
 const PASSWORD_RECOVERY = 'app/Password/Recovery';
 const PASSWORD_RESET = 'app/Password/Reset';
+const CHANGE_PASSWORD = 'app/Password/Change_Password';
+
+const changePassword = createAsyncThunk(
+  CHANGE_PASSWORD,
+  async (
+    payload: { currentPassword: string; newPassword: string },
+    { extra: sdk, rejectWithValue, fulfillWithValue },
+  ) => {
+    try {
+      await sdk.currentUser.changePassword(payload);
+
+      return fulfillWithValue(null);
+    } catch (error) {
+      return rejectWithValue(storableError(error));
+    }
+  },
+);
 
 const recoverPassword = createAsyncThunk(
   PASSWORD_RECOVERY,
@@ -62,6 +83,7 @@ const resetPassword = createAsyncThunk(
 export const passwordThunks = {
   recoverPassword,
   resetPassword,
+  changePassword,
 };
 
 const passwordSlice = createSlice({
@@ -82,6 +104,18 @@ const passwordSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      .addCase(changePassword.pending, (state) => {
+        state.changePasswordInProgress = true;
+        state.changePasswordError = null;
+      })
+      .addCase(changePassword.fulfilled, (state) => {
+        state.changePasswordInProgress = false;
+      })
+      .addCase(changePassword.rejected, (state, { error }) => {
+        state.changePasswordInProgress = false;
+        state.changePasswordError = error;
+      })
+
       .addCase(recoverPassword.pending, (state) => {
         return {
           ...state,
