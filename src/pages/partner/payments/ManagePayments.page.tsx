@@ -11,11 +11,13 @@ import IconFilter from '@components/Icons/IconFilter/IconFilter';
 import NamedLink from '@components/NamedLink/NamedLink';
 import OutsideClickHandler from '@components/OutsideClickHandler/OutsideClickHandler';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
+import SlideModal from '@components/SlideModal/SlideModal';
 import type { TColumn } from '@components/Table/Table';
 import { TableForm } from '@components/Table/Table';
 import { parseThousandNumber } from '@helpers/format';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
+import { useViewport } from '@hooks/useViewport';
 import { adminPaths } from '@src/paths';
 import { formatTimestamp } from '@src/utils/dates';
 import { EOrderDetailTabs, EOrderPaymentState } from '@src/utils/enums';
@@ -31,12 +33,17 @@ import css from './ManagePayments.module.scss';
 const ManagePaymentsPage = () => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
+  const { isMobileLayout } = useViewport();
+  const mobileFilterModalControl = useBoolean();
   const [filters, setFilters] = useState({} as any);
   const [selectedPaymentRecords, setSelectedPaymentRecords] = useState(
     {} as any,
   );
   const [page, setPage] = useState(1);
   const tooltipController = useBoolean();
+
+  const shouldShowMobileFilterModal =
+    mobileFilterModalControl.value && isMobileLayout;
 
   const title = intl.formatMessage({
     id: 'ManagePaymentsPage.title',
@@ -192,6 +199,13 @@ const ManagePaymentsPage = () => {
     totalPages: Math.ceil(filteredTableData.length / 10),
   };
 
+  const handleShowMobileFilterModal = () => {
+    mobileFilterModalControl.setTrue();
+  };
+  const handleCloseMobileFilterModal = () => {
+    mobileFilterModalControl.setFalse();
+  };
+
   const handleClearFilters = () => {
     setFilters({});
   };
@@ -218,7 +232,11 @@ const ManagePaymentsPage = () => {
       ...(status && { status }),
     });
 
-    handleCloseTooltip();
+    if (isMobileLayout) {
+      handleCloseMobileFilterModal();
+    } else {
+      handleCloseTooltip();
+    }
   };
 
   const onDownloadPaymentList = () => {
@@ -244,6 +262,12 @@ const ManagePaymentsPage = () => {
     <div className={css.root}>
       <div className={css.header}>
         <h1 className={css.title}>{title}</h1>
+        <Button
+          variant="secondary"
+          className={css.filterBtn}
+          onClick={handleShowMobileFilterModal}>
+          <IconFilter className={css.icon} />
+        </Button>
       </div>
       <div className={css.actionSection}>
         <div className={css.filterButtonWrapper}>
@@ -294,6 +318,20 @@ const ManagePaymentsPage = () => {
           onCustomPageChange={setPage}
         />
       </div>
+
+      <SlideModal
+        containerClassName={css.mobileFilterModalContainer}
+        id="ManagePaymentsPage.MobilePaymentFilterForm"
+        modalTitle="Bộ lọc"
+        isOpen={shouldShowMobileFilterModal}
+        onClose={handleCloseMobileFilterModal}>
+        <PaymentFilterForm
+          initialValues={filters}
+          onSubmit={handleFilterSubmit}
+          onClearFilters={handleClearFilters}
+          onClose={handleCloseMobileFilterModal}
+        />
+      </SlideModal>
     </div>
   );
 };
