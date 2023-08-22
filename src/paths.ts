@@ -271,6 +271,7 @@ export const partnerPaths = {
   ManageFood: '/partner/product/food',
   ManageMenus: '/partner/product/menus',
   Settings: '/partner/settings',
+  ChangePassword: '/partner/settings/change-password',
   AccountSettings: '/partner/settings/account',
   AccountSettingsDetail: '/partner/settings/account/info',
   MenuSettings: '/partner/settings/account/menu',

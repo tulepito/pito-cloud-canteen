@@ -53,7 +53,7 @@ const PartnerSettingsPage = () => {
   };
 
   const openChangePasswordModal = () => {
-    router.push(participantPaths.AccountChangePassword);
+    router.push(partnerPaths.ChangePassword);
   };
 
   const openSpecialDemandModal = () => {

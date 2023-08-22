@@ -1272,6 +1272,8 @@
   "ParticipantSidebar.profile": "Tài khoản cá nhân",
   "PartnerAccountSettingsRoute.description": "Đối tác | Cài đặt tài khoản",
   "PartnerAccountSettingsRoute.title": "Đối tác | Cài đặt tài khoản",
+  "PartnerChangePasswordRoute.description": "Đối tác | Đổi mật khẩu",
+  "PartnerChangePasswordRoute.title": "Đối tác | Đổi mật khẩu",
   "PartnerHomePageRoute.description": "Trang chủ",
   "PartnerHomePageRoute.title": "Đối tác | Trang chủ",
   "PartnerManagePaymentsRoute.description": "Thanh toán",

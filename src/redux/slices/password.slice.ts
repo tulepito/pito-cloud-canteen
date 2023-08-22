@@ -101,6 +101,9 @@ const passwordSlice = createSlice({
     clearPasswordRecoveryError: (state) => {
       state.recoveryError = null;
     },
+    clearChangePasswordError: (state) => {
+      state.changePasswordError = null;
+    },
   },
   extraReducers: (builder) => {
     builder
