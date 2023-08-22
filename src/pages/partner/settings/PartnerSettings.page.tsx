@@ -11,7 +11,7 @@ import IconLock from '@components/Icons/IconLock/IconLock';
 import IconUser from '@components/Icons/IconUser2/IconUser2';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { partnerThunks, removeCover } from '@redux/slices/partners.slice';
-import { participantPaths } from '@src/paths';
+import { participantPaths, partnerPaths } from '@src/paths';
 import { EImageVariants } from '@src/utils/enums';
 import { pickRenderableImages } from '@src/utils/images';
 import type { TObject } from '@src/utils/types';
@@ -48,8 +48,8 @@ const PartnerSettingsPage = () => {
     return dispatch(removeCover(id));
   };
 
-  const openProfileModal = () => {
-    router.push(participantPaths.AccountProfile);
+  const handleNavigateToAccountSettingsPage = () => {
+    router.push(partnerPaths.AccountSettings);
   };
 
   const openChangePasswordModal = () => {
@@ -98,7 +98,9 @@ const PartnerSettingsPage = () => {
         }}
       />
       <div className={css.navigationWrapper}>
-        <div className={css.navigationItem} onClick={openProfileModal}>
+        <div
+          className={css.navigationItem}
+          onClick={handleNavigateToAccountSettingsPage}>
           <div className={css.iconGroup}>
             <IconUser />
             <span>Cài đặt tài khoản</span>
