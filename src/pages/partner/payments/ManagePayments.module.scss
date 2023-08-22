@@ -151,3 +151,10 @@
   @include textTemplate(14px, 400, 20px);
   color: $neutralGray5;
 }
+
+.mobilePaymentsContainer {
+  display: flex;
+  flex-direction: column;
+  padding: 24px 16px;
+  row-gap: 12px;
+}

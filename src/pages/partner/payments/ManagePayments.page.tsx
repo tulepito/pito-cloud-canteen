@@ -24,6 +24,7 @@ import { formatTimestamp } from '@src/utils/dates';
 import { EOrderDetailTabs, EOrderPaymentState } from '@src/utils/enums';
 import type { TPagination } from '@src/utils/types';
 
+import MobilePaymentCard from './components/MobilePaymentCard/MobilePaymentCard';
 import type { TPaymentFilterFormValues } from './components/PaymentFilterForm/PaymentFilterForm';
 import PaymentFilterForm from './components/PaymentFilterForm/PaymentFilterForm';
 import { filterPayments, makeExcelFile } from './helpers/paymentPartner';
@@ -326,7 +327,13 @@ const ManagePaymentsPage = () => {
             <div>Bạn chưa có hoá đơn cần thanh toán</div>
           </div>
           <RenderWhen.False>
-            <div className={css.mobilePaymentsContainer}></div>
+            <div className={css.mobilePaymentsContainer}>
+              {filteredTableDataWithPagination.map(
+                ({ data: paymentData, key }) => (
+                  <MobilePaymentCard key={key} paymentData={paymentData} />
+                ),
+              )}
+            </div>
           </RenderWhen.False>
         </RenderWhen>
       </RenderWhen>
