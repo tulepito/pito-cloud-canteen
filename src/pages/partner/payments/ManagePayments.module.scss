@@ -139,3 +139,15 @@
 .mobileFilterModalContainer.mobileFilterModalContainer {
   padding: 20px 16px;
 }
+
+.mobilePaymentsEmpty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  row-gap: 12px;
+  margin-top: calc(50vh - 62px - 60px);
+  margin-top: calc(50dvh - 62px - 60px);
+
+  @include textTemplate(14px, 400, 20px);
+  color: $neutralGray5;
+}

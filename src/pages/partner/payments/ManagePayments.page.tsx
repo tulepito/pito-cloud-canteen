@@ -7,6 +7,7 @@ import isEmpty from 'lodash/isEmpty';
 import Badge, { EBadgeType } from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
 import IconDownload from '@components/Icons/IconDownload/IconDownload';
+import IconEmpty from '@components/Icons/IconEmpty/IconEmpty';
 import IconFilter from '@components/Icons/IconFilter/IconFilter';
 import NamedLink from '@components/NamedLink/NamedLink';
 import OutsideClickHandler from '@components/OutsideClickHandler/OutsideClickHandler';
@@ -191,7 +192,6 @@ const ManagePaymentsPage = () => {
     () => filteredTableData.slice((page - 1) * 10, page * 10),
     [filteredTableData, page],
   );
-
   const pagination: TPagination = {
     page,
     perPage: 10,
@@ -318,6 +318,18 @@ const ManagePaymentsPage = () => {
           onCustomPageChange={setPage}
         />
       </div>
+
+      <RenderWhen condition={isMobileLayout}>
+        <RenderWhen condition={isEmpty(filteredTableDataWithPagination)}>
+          <div className={css.mobilePaymentsEmpty}>
+            <IconEmpty />
+            <div>Bạn chưa có hoá đơn cần thanh toán</div>
+          </div>
+          <RenderWhen.False>
+            <div className={css.mobilePaymentsContainer}></div>
+          </RenderWhen.False>
+        </RenderWhen>
+      </RenderWhen>
 
       <SlideModal
         containerClassName={css.mobileFilterModalContainer}
