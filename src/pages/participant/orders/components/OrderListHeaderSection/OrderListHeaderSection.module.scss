@@ -16,6 +16,7 @@
     background-color: $neutralGray3;
     border-radius: 100%;
     position: relative;
+    cursor: pointer;
 
     .notiNumber {
       position: absolute;
@@ -30,5 +31,21 @@
       @include flexCenter;
       @include textTemplate(10px, $fontWeightRegular, 12px);
     }
+  }
+}
+
+.notificationWrapper {
+  position: relative;
+
+  .notificationTooltip {
+    position: absolute;
+    top: 100%;
+    right: calc(50% + 16px);
+    transform: translateX(50%);
+    width: 500px;
+    padding: 16px;
+    background-color: $neutralGray1;
+    box-shadow: 0px 8px 8px -4px rgba(16, 24, 40, 0.04),
+      0px 20px 24px -4px rgba(16, 24, 40, 0.1);
   }
 }

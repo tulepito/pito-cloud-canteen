@@ -497,10 +497,12 @@ const OrderListPage = () => {
         closeAllModals={closeAllModals}
         fromOrderList
       />
-      <NotificationModal
-        isOpen={notificationModalControl.value}
-        onClose={notificationModalControl.setFalse}
-      />
+      <RenderWhen condition={isMobileLayout}>
+        <NotificationModal
+          isOpen={notificationModalControl.value}
+          onClose={notificationModalControl.setFalse}
+        />
+      </RenderWhen>
 
       <BottomNavigationBar />
       <LoadingModal isOpen={showLoadingModal} />

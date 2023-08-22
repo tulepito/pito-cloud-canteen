@@ -11,6 +11,24 @@ type NotificationModalProps = {
   isOpen: boolean;
   onClose: () => void;
 };
+
+export const NotificationList = () => {
+  const notifications = useAppSelector(
+    (state) => state.ParticipantOrderList.participantFirebaseNotifications,
+    shallowEqual,
+  );
+
+  return (
+    <div className={css.notifications}>
+      {notifications.map((notificationItem: any) => (
+        <NotificationItem
+          key={notificationItem.id}
+          notificationItem={notificationItem}
+        />
+      ))}
+    </div>
+  );
+};
 const NotificationModal: React.FC<NotificationModalProps> = (props) => {
   const { isOpen, onClose } = props;
 
