@@ -375,7 +375,7 @@
   "EditCompanyForm.updateSuccess": "Cập nhật thành công",
   "EditCompanyForm.validLocation": "Địa chỉ không hợp lệ",
   "EditCompanyOtherSettingsForm.PCCFeeField.label": "Phí PITO Cloud Canteen",
-  "EditCompanyOtherSettingsForm.PCCFeeField.min": "Nhập tối thiểu 1,000 đồng",
+  "EditCompanyOtherSettingsForm.PCCFeeField.min": "Nhập tối thiểu 0 đồng",
   "EditCompanyOtherSettingsForm.PCCFeeField.placeholder": "Nhập số",
   "EditCompanyOtherSettingsForm.PCCFeeField.unit": "đồng",
   "EditCompanyPage.updateCompanyFailed": "Cập nhật tài khoản lỗi. Xin vui lòng thử lại.",
