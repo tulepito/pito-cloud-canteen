@@ -64,7 +64,7 @@ const EditCompanyOtherSettingsFormComponent: React.FC<
               intl.formatMessage({
                 id: 'EditCompanyOtherSettingsForm.PCCFeeField.min',
               }),
-              1000,
+              -1,
               true,
             ),
           )}
