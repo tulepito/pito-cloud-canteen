@@ -34,6 +34,7 @@ type TOrderEventCardPopupProps = {
   fetchSubOrderTxInProgress: boolean;
   fetchSubOrderDocumentInProgress: boolean;
   openRatingSubOrderModal: () => void;
+  onCloseEventCardPopup: () => void;
 };
 
 const OrderEventCardPopup: React.FC<TOrderEventCardPopupProps> = ({
@@ -45,6 +46,7 @@ const OrderEventCardPopup: React.FC<TOrderEventCardPopupProps> = ({
   fetchSubOrderTxInProgress,
   fetchSubOrderDocumentInProgress,
   openRatingSubOrderModal,
+  onCloseEventCardPopup,
 }) => {
   const router = useRouter();
   const intl = useIntl();
@@ -112,6 +114,7 @@ const OrderEventCardPopup: React.FC<TOrderEventCardPopupProps> = ({
         timestamp: parseInt(`${timestamp}`, 10),
       }),
     );
+    onCloseEventCardPopup();
   };
 
   const onNavigateToOrderDetail = () => {

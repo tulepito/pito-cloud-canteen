@@ -94,6 +94,7 @@ const OrderEventCard: React.FC<TOrderEventCardProps> = ({
           fetchSubOrderTxInProgress={fetchSubOrderTxInProgress}
           fetchSubOrderDocumentInProgress={fetchSubOrderDocumentInProgress}
           openRatingSubOrderModal={handleOpenRatingModal}
+          onCloseEventCardPopup={tooltipVisibleController.setFalse}
         />
       }
       onVisibleChange={(visible) => {

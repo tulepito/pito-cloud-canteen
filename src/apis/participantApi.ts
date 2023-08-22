@@ -1,6 +1,6 @@
 import type { TRestaurantRating } from '@src/utils/types';
 
-import { postApi } from './configs';
+import { postApi, putApi } from './configs';
 
 type TParticipantReviewPlanTxBody = {
   txId: string;
@@ -21,3 +21,6 @@ type TParticipantPostRatingApiBody = {
 };
 export const participantPostRatingApi = (body: TParticipantPostRatingApiBody) =>
   postApi('/participants/ratings', body);
+
+export const updateFirstTimeViewOrderApi = (orderId: string) =>
+  putApi(`/participants/orders/${orderId}/update-first-time-view-order`);
