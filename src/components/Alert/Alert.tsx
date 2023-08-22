@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import classNames from 'classnames';
 
 import IconClose from '@components/Icons/IconClose/IconClose';
+import IconTickWithBackground from '@components/Icons/IconTickWithBackground/IconTickWithBackground';
 import IconWarningWithTriangle from '@components/Icons/IconWarningWithTriangle/IconWarningWithTriangle';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import type { TDefaultProps } from '@src/utils/types';
@@ -11,6 +12,7 @@ import css from './Alert.module.scss';
 const DEFAULT_CLOSE_TIME = 2000;
 
 export enum EAlertPosition {
+  bottom = 'bottom',
   topRight = 'topRight',
   topLeft = 'topLeft',
   bottomRight = 'bottomRight',
@@ -19,6 +21,7 @@ export enum EAlertPosition {
 
 export enum EAlertType {
   warning = 'warning',
+  success = 'success',
 }
 
 type TAlertProps = TDefaultProps & {
@@ -65,7 +68,9 @@ const Alert: React.FC<TAlertProps> = (props) => {
       [css.bottomSide]:
         position === EAlertPosition.bottomLeft ||
         position === EAlertPosition.bottomRight,
+      [css.centerSide]: position === EAlertPosition.bottom,
       [css.warning]: type === EAlertType.warning,
+      [css.success]: type === EAlertType.success,
     },
     openClassName ? { [openClassName]: isOpen } : {},
     className,
@@ -87,6 +92,9 @@ const Alert: React.FC<TAlertProps> = (props) => {
       <div className={css.container}>
         <RenderWhen condition={type === EAlertType.warning}>
           <IconWarningWithTriangle />
+        </RenderWhen>
+        <RenderWhen condition={type === EAlertType.success}>
+          <IconTickWithBackground className={css.icon} />
         </RenderWhen>
         <div className={messageClasses}>{message}</div>
       </div>
