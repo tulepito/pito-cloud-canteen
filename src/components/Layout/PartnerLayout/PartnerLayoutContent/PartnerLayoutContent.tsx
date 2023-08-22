@@ -5,6 +5,8 @@ import type { PropsWithChildren } from 'react';
 import React from 'react';
 import classNames from 'classnames';
 
+import RenderWhen from '@components/RenderWhen/RenderWhen';
+import { useViewport } from '@hooks/useViewport';
 import type { TDefaultProps } from '@utils/types';
 
 import { PartnerBreadCrumbs } from '../PartnerBreadCrumbs/PartnerBreadCrumbs';
@@ -19,13 +21,17 @@ type TPartnerLayoutContentProps = PropsWithChildren<
 
 const PartnerLayoutContent: React.FC<TPartnerLayoutContentProps> = (props) => {
   const { className, rootClassName, children, isMenuOpen } = props;
+  const { isMobileLayout } = useViewport();
+
   const classes = classNames(rootClassName || css.root, className, {
     [css.menuOpen]: isMenuOpen,
   });
 
   return (
     <div className={classes} role="main">
-      <PartnerBreadCrumbs />
+      <RenderWhen condition={!isMobileLayout}>
+        <PartnerBreadCrumbs />
+      </RenderWhen>
       <div className={css.container}>{children}</div>
     </div>
   );
