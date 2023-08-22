@@ -8,7 +8,7 @@ import { useRouter } from 'next/router';
 import RestaurantCard from '@components/RestaurantCard/RestaurantCard';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
-import { User } from '@utils/data';
+import { Listing, User } from '@utils/data';
 import type { TListing, TUser } from '@utils/types';
 
 import {
@@ -39,6 +39,9 @@ const ResultList: React.FC<TResultListProps> = ({
   const router = useRouter();
   const { timestamp: queryTs, restaurantId, orderId, menuId } = router.query;
   const timestamp = +`${queryTs}`;
+
+  const orderListing = Listing(order!);
+  const { packagePerMember = 0 } = orderListing.getMetadata();
 
   const [selectedRestaurantId, setSelectedRestaurantId] = useState<
     string | undefined
@@ -141,6 +144,7 @@ const ResultList: React.FC<TResultListProps> = ({
         companyGeoOrigin={companyGeoOrigin}
         onSearchSubmit={onSearchSubmit}
         fetchFoodInProgress={fetchRestaurantFoodInProgress}
+        packagePerMember={packagePerMember}
       />
     </>
   );

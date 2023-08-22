@@ -2,6 +2,7 @@ import React from 'react';
 
 import FoodCard from '@components/FoodCard/FoodCard';
 import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
+import { Listing } from '@src/utils/data';
 import type { TListing } from '@utils/types';
 
 import css from './ResultDetailModal.module.scss';
@@ -14,6 +15,7 @@ type TFoodsListSectionProps = {
   foodList?: TListing[];
   hideSelection?: boolean;
   fetchFoodInProgress?: boolean;
+  packagePerMember?: number;
 };
 
 const FoodListSection: React.FC<TFoodsListSectionProps> = ({
@@ -24,7 +26,55 @@ const FoodListSection: React.FC<TFoodsListSectionProps> = ({
   foodList = [],
   hideSelection = false,
   fetchFoodInProgress = false,
+  packagePerMember = 0,
 }) => {
+  const groupedFoodList = foodList.reduce<{
+    equalPriceList: TListing[];
+    lessPriceList: TListing[];
+    greaterPriceList: TListing[];
+  }>(
+    (result: any, foodItem: TListing) => {
+      const foodListing = Listing(foodItem);
+      const { price } = foodListing.getAttributes();
+      const { equalPriceList, lessPriceList, greaterPriceList } = result;
+
+      if (price.amount === packagePerMember) {
+        equalPriceList.push(foodItem);
+      } else if (price.amount < packagePerMember) {
+        lessPriceList.push(foodItem);
+      } else {
+        greaterPriceList.push(foodItem);
+      }
+
+      return {
+        equalPriceList,
+        lessPriceList,
+        greaterPriceList,
+      };
+    },
+    {
+      equalPriceList: [],
+      lessPriceList: [],
+      greaterPriceList: [],
+    },
+  );
+
+  const sortesFoodList = [
+    ...groupedFoodList.equalPriceList,
+    ...groupedFoodList.lessPriceList.sort((a, b) => {
+      const aPrice = Listing(a).getAttributes().price.amount;
+      const bPrice = Listing(b).getAttributes().price.amount;
+
+      return aPrice - bPrice;
+    }),
+    ...groupedFoodList.greaterPriceList.sort((a, b) => {
+      const aPrice = Listing(a).getAttributes().price.amount;
+      const bPrice = Listing(b).getAttributes().price.amount;
+
+      return aPrice - bPrice;
+    }),
+  ];
+
   return (
     <section className={css.foodSection}>
       <div className={css.categories}>
@@ -36,7 +86,7 @@ const FoodListSection: React.FC<TFoodsListSectionProps> = ({
             </div>
           ) : (
             <div className={css.foodList}>
-              {foodList.map((item) => (
+              {sortesFoodList.map((item) => (
                 <FoodCard
                   key={`${item?.id.uuid}`}
                   food={item}

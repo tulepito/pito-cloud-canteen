@@ -104,6 +104,7 @@ function BookerDraftOrderPage() {
     plans = [],
     startDate: startDateTimestamp,
     endDate: endDateTimestamp,
+    packagePerMember = 0,
   } = Listing(order as TListing).getMetadata();
   const planId = plans.length > 0 ? plans[0] : undefined;
 
@@ -309,6 +310,7 @@ function BookerDraftOrderPage() {
             fetchFoodInProgress={fetchRestaurantFoodInProgress}
             openFromCalendar
             timestamp={selectedTimestamp}
+            packagePerMember={packagePerMember}
           />
         </LayoutMain>
       </Layout>
