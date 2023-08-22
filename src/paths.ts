@@ -271,6 +271,10 @@ export const partnerPaths = {
   ManageFood: '/partner/product/food',
   ManageMenus: '/partner/product/menus',
   Settings: '/partner/settings',
+  AccountSettings: '/partner/settings/account',
+  AccountSettingsDetail: '/partner/settings/account/info',
+  MenuSettings: '/partner/settings/account/menu',
+  BankSettings: '/partner/settings/account/bank',
 };
 
 export const partnerRoutes = {

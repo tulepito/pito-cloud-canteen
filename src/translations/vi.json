@@ -1270,6 +1270,8 @@
   "ParticipantSidebar.changePassword": "Đổi mật khẩu",
   "ParticipantSidebar.nutrition": "Yêu cầu đặc biệt",
   "ParticipantSidebar.profile": "Tài khoản cá nhân",
+  "PartnerAccountSettingsRoute.description": "Đối tác | Cài đặt tài khoản",
+  "PartnerAccountSettingsRoute.title": "Đối tác | Cài đặt tài khoản",
   "PartnerHomePageRoute.description": "Trang chủ",
   "PartnerHomePageRoute.title": "Đối tác | Trang chủ",
   "PartnerManagePaymentsRoute.description": "Thanh toán",
