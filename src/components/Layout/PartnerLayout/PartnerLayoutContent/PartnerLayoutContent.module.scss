@@ -3,10 +3,17 @@
 
 .root {
   margin-top: $adminTopbarHeight;
-  min-height: calc(100vh - $adminTopbarHeight);
-  width: calc(100vw - $adminSidebarLeftPartWidth);
+  min-height: calc(100vh - $adminTopbarHeight - 96px);
+  min-height: calc(100dvh - $adminTopbarHeight - 96px);
   transition: all 0.5s;
-  margin-left: $adminSidebarLeftPartWidth;
+  margin-bottom: 96px;
+
+  @include viewportMedium {
+    width: calc(100vw - $adminSidebarLeftPartWidth);
+    margin-left: $adminSidebarLeftPartWidth;
+    min-height: calc(100vh - $adminTopbarHeight);
+    margin-bottom: 0px;
+  }
 
   @include viewportLarge {
     margin-left: $adminSidebarWidth;
@@ -18,8 +25,12 @@
   background-color: $neutralGray1;
   border-radius: 6px;
   padding: 19px 40px 40px 40px;
-  width: calc(100vw - $adminSidebarLeftPartWidth);
-  max-width: calc(100vw - $adminSidebarLeftPartWidth);
+  max-width: 100vw;
+
+  @include viewportMedium {
+    width: calc(100vw - $adminSidebarLeftPartWidth);
+    max-width: calc(100vw - $adminSidebarLeftPartWidth);
+  }
 
   @include viewportLarge {
     width: calc(100vw - $adminSidebarWidth);

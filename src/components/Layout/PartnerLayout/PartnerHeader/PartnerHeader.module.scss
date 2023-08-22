@@ -1,5 +1,6 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
 
 .root {
   flex: 1;
@@ -7,7 +8,6 @@
   position: fixed;
   top: 0;
   height: $adminTopbarHeight;
-  padding: 0 28px;
   width: 100%;
   left: 0;
   background-color: $neutralGray1;
@@ -16,13 +16,37 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding: 8px 16px;
 
-  .headerRight {
-    .logo {
-      width: unset;
-      height: 36px;
+  @include viewportMedium {
+    padding: 0 28px;
+  }
+
+  .headerRightWrapper {
+    display: none;
+    @include viewportMedium {
+      display: block;
+    }
+
+    .headerRight {
+      .logo {
+        width: unset;
+        height: 36px;
+      }
     }
   }
+
+  .headerLeftMobile {
+    display: flex;
+    flex-direction: row;
+    column-gap: 8px;
+    align-items: center;
+
+    @include viewportMedium {
+      display: none;
+    }
+  }
+
   .headerLeft {
     display: flex;
     align-items: center;
@@ -35,10 +59,15 @@
     }
 
     .line {
+      display: none;
       height: 30px;
       width: 1px;
       margin: 0 26px;
       background-color: $neutralGray4;
+
+      @include viewportMedium {
+        display: block;
+      }
     }
 
     .profileMenuContent {
