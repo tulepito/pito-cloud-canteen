@@ -1,4 +1,5 @@
 import type { PropsWithChildren } from 'react';
+import { useRouter } from 'next/router';
 
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import useBoolean from '@hooks/useBoolean';
@@ -10,11 +11,13 @@ import PartnerLayoutSidebar from './PartnerLayoutSidebar/PartnerLayoutSidebar';
 import PartnerLayoutTopbar from './PartnerLayoutTopbar/PartnerLayoutTopbar';
 import PartnerNavBar from './PartnerNavBar/PartnerNavBar';
 import PartnerSidebar from './PartnerSidebar/PartnerSidebar';
+import { shouldShowPartnerHeader } from './partnerLayout.helpers';
 
 import css from './PartnerLayout.module.scss';
 
 const PartnerLayout: React.FC<PropsWithChildren> = (props) => {
   const { children } = props;
+  const { pathname } = useRouter();
   const {
     value: isMenuOpen,
     setFalse: onCloseMenu,
@@ -22,13 +25,19 @@ const PartnerLayout: React.FC<PropsWithChildren> = (props) => {
   } = useBoolean(false);
   const { isMobileLayout } = useViewport();
 
+  const hideHeaderMaybe = shouldShowPartnerHeader(pathname);
+
   return (
     <div className={css.root}>
       <div className={css.main}>
-        <PartnerLayoutTopbar>
-          <PartnerHeader onMenuClick={toggleMenuOpen} />
-        </PartnerLayoutTopbar>
-        <PartnerLayoutContent isMenuOpen={isMenuOpen}>
+        <RenderWhen condition={hideHeaderMaybe}>
+          <PartnerLayoutTopbar>
+            <PartnerHeader onMenuClick={toggleMenuOpen} />
+          </PartnerLayoutTopbar>
+        </RenderWhen>
+        <PartnerLayoutContent
+          hideHeader={!hideHeaderMaybe}
+          isMenuOpen={isMenuOpen}>
           {children}
         </PartnerLayoutContent>
       </div>

@@ -8,6 +8,12 @@
   transition: all 0.5s;
   margin-bottom: 96px;
 
+  &.hideHeader {
+    margin-top: 0;
+    min-height: calc(100vh - 96px);
+    min-height: calc(100dvh - 96px);
+  }
+
   @include viewportMedium {
     width: calc(100vw - $adminSidebarLeftPartWidth);
     margin-left: $adminSidebarLeftPartWidth;
@@ -24,10 +30,10 @@
 .container {
   background-color: $neutralGray1;
   border-radius: 6px;
-  padding: 19px 40px 40px 40px;
-  max-width: 100vw;
 
   @include viewportMedium {
+    padding: 19px 40px 40px 40px;
+    max-width: 100vw;
     width: calc(100vw - $adminSidebarLeftPartWidth);
     max-width: calc(100vw - $adminSidebarLeftPartWidth);
   }
