@@ -40,10 +40,12 @@
   .notificationTooltip {
     position: absolute;
     top: 100%;
-    right: calc(50% + 16px);
-    transform: translateX(50%);
+    right: 0;
     width: 500px;
+    max-height: 570px;
+    overflow: auto;
     padding: 16px;
+    border-radius: 16px;
     background-color: $neutralGray1;
     box-shadow: 0px 8px 8px -4px rgba(16, 24, 40, 0.04),
       0px 20px 24px -4px rgba(16, 24, 40, 0.1);

@@ -123,11 +123,9 @@
   background-color: $neutralGray1;
   @include textTemplate(14px, 700, 36px, '');
   color: $neutralGray6;
-  border-radius: 8px;
+  border-radius: 40px;
   @include flexCenter;
-  @include viewportMedium {
-    display: none;
-  }
+  cursor: pointer;
 }
 
 .pickForMeBtn {
