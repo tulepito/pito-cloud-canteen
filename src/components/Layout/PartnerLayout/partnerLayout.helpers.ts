@@ -1,11 +1,7 @@
 import { partnerPaths } from '@src/paths';
 
+const HIDING_PARTNER_HEADER_PATHNAMES = [partnerPaths.ManagePayments];
+
 export const shouldShowPartnerHeader = (pathName: string) => {
-  const hideList = [partnerPaths.ManagePayments];
-
-  if (hideList.includes(pathName)) {
-    return false;
-  }
-
-  return true;
+  return !HIDING_PARTNER_HEADER_PATHNAMES.includes(pathName);
 };
