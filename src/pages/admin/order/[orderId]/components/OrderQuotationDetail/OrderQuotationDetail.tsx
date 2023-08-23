@@ -72,7 +72,7 @@ const OrderQuotationDetail: React.FC<OrderQuotationDetailProps> = (props) => {
   ) || [])[0];
   const partnerVATSetting =
     vatSettings?.[currentPartnerId!] || EPartnerVATSetting.vat;
-  const partnerServiceFee = serviceFees[currentPartnerId!];
+  const partnerServiceFee = serviceFees[currentPartnerId!] || 0;
   const vatPercentage = isPartner
     ? vatPercentageBaseOnVatSetting({
         vatSetting: partnerVATSetting,
@@ -97,7 +97,9 @@ const OrderQuotationDetail: React.FC<OrderQuotationDetailProps> = (props) => {
       isPartner,
       hasSpecificPCCFee,
       specificPCCFee,
+      partnerServiceFee,
       partnerVATSetting,
+      vatPercentage,
       JSON.stringify(quotation),
     ],
   );
