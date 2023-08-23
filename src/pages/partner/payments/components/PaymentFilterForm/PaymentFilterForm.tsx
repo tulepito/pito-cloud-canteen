@@ -26,11 +26,11 @@ export type TPaymentFilterFormValues = {
 
 const PAYMENT_STATUS_OPTIONS = [
   {
-    key: EOrderPaymentState.isNotPaid,
+    key: EOrderPaymentState.isPaid,
     label: 'Đã thanh toán',
   },
   {
-    key: EOrderPaymentState.isPaid,
+    key: EOrderPaymentState.isNotPaid,
     label: 'Chờ thanh toán',
   },
 ];
