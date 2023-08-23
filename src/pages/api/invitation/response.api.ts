@@ -1,6 +1,5 @@
 import { mapLimit } from 'async';
 import isEmpty from 'lodash/isEmpty';
-import remove from 'lodash/remove';
 import uniq from 'lodash/uniq';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
@@ -152,7 +151,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         id: orderId,
         metadata: {
           participants: uniq(participants.concat(userId)),
-          anonymous: remove(anonymous, (id) => id === userId),
+          anonymous: anonymous.filter((id: string) => id !== userId),
         },
       });
 
