@@ -42,6 +42,8 @@
     column-gap: 8px;
     align-items: center;
 
+    @include textTemplate(14px, 600, 20px);
+
     @include viewportMedium {
       display: none;
     }
