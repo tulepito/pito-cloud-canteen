@@ -291,15 +291,6 @@ const transit = createAsyncThunk(
         }),
       );
     }
-    console.debug('💫 > file: OrderDetail.slice.ts:231 > ', {
-      userId: User(provider).getId(),
-      orderId,
-      planId,
-      subOrderDate: DateTime.fromISO(displayStart).startOf('day').toMillis(),
-      companyName,
-      transition,
-    });
-
     createNotificationApi({
       notifications: [
         {
