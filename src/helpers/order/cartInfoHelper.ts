@@ -184,12 +184,13 @@ export const calculatePriceQuotationInfo = ({
             return res + (item?.quantity || 1);
           }, 0);
 
-      return (
-        result +
-        (hasSpecificPCCFee
+      const PCCFeeOfDate = hasSpecificPCCFee
+        ? memberAmountOfDate > 0
           ? specificPCCFee
-          : getPCCFeeByMemberAmount(memberAmountOfDate))
-      );
+          : 0
+        : getPCCFeeByMemberAmount(memberAmountOfDate);
+
+      return result + PCCFeeOfDate;
     },
     0,
   );
@@ -338,15 +339,16 @@ export const calculatePriceQuotationInfoFromQuotation = ({
         },
       );
 
+      const PCCFeeOfDate = hasSpecificPCCFee
+        ? subOrderTotalDished > 0
+          ? specificPCCFee
+          : 0
+        : getPCCFeeByMemberAmount(subOrderTotalDished);
+
       return {
         totalPrice: result.totalPrice + subOrderTotalPrice,
         totalDishes: result.totalDishes + subOrderTotalDished,
-        PITOFee: isPartnerFlow
-          ? 0
-          : result.PITOFee +
-            (hasSpecificPCCFee
-              ? specificPCCFee
-              : getPCCFeeByMemberAmount(subOrderTotalDished)),
+        PITOFee: isPartnerFlow ? 0 : result.PITOFee + PCCFeeOfDate,
       };
     },
     {
