@@ -18,6 +18,7 @@ import { TableForm } from '@components/Table/Table';
 import { parseThousandNumber } from '@helpers/format';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
+import { useBottomScroll } from '@hooks/useBottomScroll';
 import { useViewport } from '@hooks/useViewport';
 import { adminPaths } from '@src/paths';
 import { formatTimestamp } from '@src/utils/dates';
@@ -190,8 +191,11 @@ const ManagePaymentsPage = () => {
     [JSON.stringify(filters), JSON.stringify(formattedTableData)],
   );
   const filteredTableDataWithPagination = useMemo(
-    () => filteredTableData.slice((page - 1) * 10, page * 10),
-    [filteredTableData, page],
+    () =>
+      isMobileLayout
+        ? filteredTableData.slice(0, page * 10)
+        : filteredTableData.slice((page - 1) * 10, page * 10),
+    [filteredTableData, page, isMobileLayout],
   );
   const pagination: TPagination = {
     page,
@@ -254,6 +258,16 @@ const ManagePaymentsPage = () => {
       makeExcelFile(filteredTableData);
     }
   };
+
+  useBottomScroll(() =>
+    setPage((p) =>
+      isMobileLayout
+        ? p + 1 > filteredTableData.length
+          ? filteredTableData.length
+          : p + 1
+        : p,
+    ),
+  );
 
   useEffect(() => {
     dispatch(PartnerManagePaymentsThunks.loadData());
