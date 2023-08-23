@@ -70,7 +70,7 @@ const OrderQuotationDetail: React.FC<OrderQuotationDetailProps> = (props) => {
   ) || [])[0];
   const partnerVATSetting =
     vatSettings?.[currentPartnerId!] || EPartnerVATSetting.vat;
-  const partnerServiceFee = serviceFees[currentPartnerId!];
+  const partnerServiceFee = serviceFees[currentPartnerId!] || 0;
   const vatPercentage = isPartner
     ? vatPercentageBaseOnVatSetting({
         vatSetting: partnerVATSetting,
@@ -89,7 +89,13 @@ const OrderQuotationDetail: React.FC<OrderQuotationDetailProps> = (props) => {
         currentOrderServiceFeePercentage: partnerServiceFee / 100,
         shouldSkipVAT: partnerVATSetting === EPartnerVATSetting.direct,
       }),
-    [isPartner, partnerVATSetting, JSON.stringify(quotation)],
+    [
+      isPartner,
+      partnerServiceFee,
+      partnerVATSetting,
+      vatPercentage,
+      JSON.stringify(quotation),
+    ],
   );
 
   const handleTabChange = (tab: any) => {
