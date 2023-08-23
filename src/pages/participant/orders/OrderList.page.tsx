@@ -133,6 +133,14 @@ const OrderListPage = () => {
     shallowEqual,
   );
 
+  const pickFoodForSubOrdersInProgress = useAppSelector(
+    (state) => state.ParticipantOrderList.pickFoodForSubOrdersInProgress,
+  );
+
+  const pickFoodForSpecificSubOrderInProgress = useAppSelector(
+    (state) => state.ParticipantOrderList.pickFoodForSpecificSubOrderInProgress,
+  );
+
   const currentUserGetter = CurrentUser(currentUser!);
   const currentUserId = currentUserGetter.getId();
   const { walkthroughEnable = true } = currentUserGetter.getMetadata();
@@ -341,6 +349,49 @@ const OrderListPage = () => {
     }
   };
 
+  const recommendFoodForSubOrder = () => {
+    const neededRecommendSubOrders = flattenEvents.reduce(
+      (result: any, _event: Event) => {
+        const { resource } = _event;
+        const { status, dishSelection, orderState } = resource;
+        if (
+          status === EParticipantOrderStatus.empty &&
+          !dishSelection.dishSelection &&
+          orderState === EOrderStates.picking
+        ) {
+          result.push({
+            planId: resource.planId,
+            orderId: resource.orderId,
+            subOrderDate: resource.timestamp,
+          });
+        }
+
+        return result;
+      },
+      [],
+    );
+
+    dispatch(
+      OrderListThunks.pickFoodForSubOrders({
+        recommendSubOrders: neededRecommendSubOrders,
+        recommendFrom: 'orderList',
+      }),
+    );
+  };
+
+  const recommendFoodForSpecificSubOrder = (params: {
+    planId: string;
+    orderId: string;
+    subOrderDate: string;
+  }) => {
+    dispatch(
+      OrderListThunks.pickFoodForSpecificSubOrder({
+        recommendSubOrder: params,
+        recommendFrom: 'orderList',
+      }),
+    );
+  };
+
   useEffect(() => {
     if (selectedEvent) {
       const { timestamp, planId } = selectedEvent.resource;
@@ -424,6 +475,8 @@ const OrderListPage = () => {
                 isAllowChangePeriod
                 onChangeDate={handleSelectDay}
                 onCustomPeriodClick={handleChangeTimePeriod}
+                onPickForMe={recommendFoodForSubOrder}
+                onPickForMeLoading={pickFoodForSubOrdersInProgress}
               />
             ),
           }}
@@ -431,6 +484,8 @@ const OrderListPage = () => {
             walkthroughEnable,
             openRatingSubOrderModal,
             setSelectedEvent,
+            recommendFoodForSpecificSubOrder,
+            pickFoodForSpecificSubOrderInProgress,
           }}
         />
       </div>
@@ -479,6 +534,12 @@ const OrderListPage = () => {
               event={selectedEvent!}
               openRatingSubOrderModal={openRatingSubOrderModal}
               from="orderList"
+              recommendFoodForSpecificSubOrder={
+                recommendFoodForSpecificSubOrder
+              }
+              pickFoodForSpecificSubOrderInProgress={
+                pickFoodForSpecificSubOrderInProgress
+              }
             />
           </RenderWhen>
           <RatingSubOrderModal

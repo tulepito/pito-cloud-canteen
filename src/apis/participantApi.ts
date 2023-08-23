@@ -24,3 +24,7 @@ export const participantPostRatingApi = (body: TParticipantPostRatingApiBody) =>
 
 export const updateFirstTimeViewOrderApi = (orderId: string) =>
   putApi(`/participants/orders/${orderId}/update-first-time-view-order`);
+
+export const recommendFoodForSubOrdersApi = (body: {
+  mappedRecommendFoodToOrderDetail: any;
+}) => putApi('/participants/plans/recommend-food-for-sub-orders', body);

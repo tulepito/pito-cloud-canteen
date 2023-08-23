@@ -75,6 +75,8 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
     participantPostRatingInProgress,
     updateSubOrderInProgress,
     updateOrderInProgress,
+    pickFoodForSubOrdersInProgress,
+    pickFoodForSpecificSubOrderInProgress,
   } = useSubOrderPicking();
 
   const { deadlineDate, deliveryHour, startDate, endDate, orderState } =
@@ -180,6 +182,50 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
   const subOrdersTxIds = compact(
     flattenEvents.map((_event: any) => _event.resource.transactionId),
   );
+
+  const recommendFoodForSubOrder = () => {
+    const neededRecommendSubOrders = flattenEvents.reduce(
+      (result: any, _event: Event) => {
+        const { resource } = _event;
+        const { status, dishSelection } = resource;
+        if (
+          status === EParticipantOrderStatus.empty &&
+          !dishSelection.dishSelection &&
+          orderState === EOrderStates.picking
+        ) {
+          result.push({
+            planId: resource.planId,
+            orderId: resource.orderId,
+            subOrderDate: resource.timestamp,
+          });
+        }
+
+        return result;
+      },
+      [],
+    );
+
+    dispatch(
+      OrderListThunks.pickFoodForSubOrders({
+        recommendSubOrders: neededRecommendSubOrders,
+        recommendFrom: 'orderDetail',
+      }),
+    );
+  };
+
+  const recommendFoodForSpecificSubOrder = (params: {
+    planId: string;
+    orderId: string;
+    subOrderDate: string;
+  }) => {
+    dispatch(
+      OrderListThunks.pickFoodForSpecificSubOrder({
+        recommendSubOrder: params,
+        recommendFrom: 'orderDetail',
+      }),
+    );
+  };
+
   useEffect(() => {
     if (subOrdersTxIds) {
       dispatch(OrderListThunks.fetchTransactionBySubOrder(subOrdersTxIds));
@@ -249,10 +295,16 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
                 startDate={new Date(startDate)}
                 endDate={new Date(endDate)}
                 anchorDate={anchorDate}
+                onPickForMe={recommendFoodForSubOrder}
+                onPickForMeLoading={pickFoodForSubOrdersInProgress}
               />
             ),
           }}
-          resources={{ setSelectedEvent }}
+          resources={{
+            setSelectedEvent,
+            recommendFoodForSpecificSubOrder,
+            pickFoodForSpecificSubOrderInProgress,
+          }}
         />
       </div>
       <div className={css.subOrderContainer}>
@@ -273,6 +325,10 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
           event={selectedEvent!}
           openRatingSubOrderModal={ratingSubOrderModalControl.setTrue}
           from="orderDetail"
+          recommendFoodForSpecificSubOrder={recommendFoodForSpecificSubOrder}
+          pickFoodForSpecificSubOrderInProgress={
+            pickFoodForSpecificSubOrderInProgress
+          }
         />
         <RatingSubOrderModal
           isOpen={ratingSubOrderModalControl.value}

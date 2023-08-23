@@ -230,3 +230,21 @@ export const getParticipantOrdersQuery = ({
 
   return query;
 };
+
+type TGetOrderQuery = {
+  foodIds: string[];
+  params: {
+    allergicIngredients?: string[];
+    specialDiets?: string[];
+  };
+};
+export const getFoodQuery = ({ foodIds, params }: TGetOrderQuery) => {
+  const { specialDiets } = params;
+  const query = {
+    ids: foodIds,
+    meta_listingType: ListingTypes.FOOD,
+    ...(specialDiets ? { pub_specialDiets: `has_any:${specialDiets}` } : {}),
+  };
+
+  return query;
+};

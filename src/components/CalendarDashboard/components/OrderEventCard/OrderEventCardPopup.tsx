@@ -1,4 +1,5 @@
-import React from 'react';
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, { useMemo } from 'react';
 import type { Event } from 'react-big-calendar';
 import { FormattedMessage, useIntl } from 'react-intl';
 import isEmpty from 'lodash/isEmpty';
@@ -35,6 +36,8 @@ type TOrderEventCardPopupProps = {
   fetchSubOrderDocumentInProgress: boolean;
   openRatingSubOrderModal: () => void;
   onCloseEventCardPopup: () => void;
+  onPickForMe: () => void;
+  pickFoodForSpecificSubOrderInProgress?: boolean;
 };
 
 const OrderEventCardPopup: React.FC<TOrderEventCardPopupProps> = ({
@@ -47,6 +50,8 @@ const OrderEventCardPopup: React.FC<TOrderEventCardPopupProps> = ({
   fetchSubOrderDocumentInProgress,
   openRatingSubOrderModal,
   onCloseEventCardPopup,
+  onPickForMe,
+  pickFoodForSpecificSubOrderInProgress,
 }) => {
   const router = useRouter();
   const intl = useIntl();
@@ -81,6 +86,11 @@ const OrderEventCardPopup: React.FC<TOrderEventCardPopupProps> = ({
       : 'orderDetail';
 
   const { reviewId } = subOrderDocument;
+
+  const dishSelectionFormInitialValues = useMemo(
+    () => dishSelection,
+    [JSON.stringify(dishSelection)],
+  );
 
   const onSelectDish = async (
     values: TDishSelectionFormValues,
@@ -124,6 +134,12 @@ const OrderEventCardPopup: React.FC<TOrderEventCardPopupProps> = ({
     });
   };
 
+  const handlePickForMe = () => {
+    if (status !== EParticipantOrderStatus.empty) return;
+
+    onPickForMe();
+  };
+
   return (
     <div className={css.root}>
       <div className={css.header}>
@@ -162,7 +178,9 @@ const OrderEventCardPopup: React.FC<TOrderEventCardPopupProps> = ({
               actionsDisabled={isExpired}
               dishes={dishes}
               onSubmit={onSelectDish}
-              initialValues={dishSelection}
+              initialValues={dishSelectionFormInitialValues}
+              onPickForMe={handlePickForMe}
+              pickForMeInProgress={pickFoodForSpecificSubOrderInProgress}
             />
           </div>
         </div>

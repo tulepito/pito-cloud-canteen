@@ -186,6 +186,9 @@ const participantOrderSlice = createSlice({
     setFirstTimeViewOrder(state, { payload }) {
       state.shouldShowFirstTimeOrderModal = payload;
     },
+    updatePlans: (state, { payload }) => {
+      state.plans = payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -240,5 +243,7 @@ const participantOrderSlice = createSlice({
       }));
   },
 });
+
+export const ParticipantOrderManagementActions = participantOrderSlice.actions;
 
 export default participantOrderSlice.reducer;

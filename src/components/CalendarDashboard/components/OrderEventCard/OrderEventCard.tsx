@@ -27,13 +27,21 @@ const OrderEventCard: React.FC<TOrderEventCardProps> = ({
   resources,
 }) => {
   const { isMobileLayout } = useViewport();
-  const { openRatingSubOrderModal, setSelectedEvent } = resources || {};
+  const {
+    openRatingSubOrderModal,
+    setSelectedEvent,
+    recommendFoodForSpecificSubOrder,
+    pickFoodForSpecificSubOrderInProgress,
+  } = resources || {};
   const {
     status,
     expiredTime,
     isOrderStarted = false,
     transactionId,
     subOrderTx: subOrderTxFromEvent,
+    planId,
+    orderId,
+    timestamp,
   } = event.resource || {};
 
   const tooltipVisibleController = useBoolean();
@@ -80,6 +88,14 @@ const OrderEventCard: React.FC<TOrderEventCardProps> = ({
     }
   };
 
+  const onPickForMe = () => {
+    recommendFoodForSpecificSubOrder({
+      planId,
+      orderId,
+      subOrderDate: timestamp,
+    });
+  };
+
   return (
     <Tooltip
       overlayClassName={css.tooltipOverlay}
@@ -95,6 +111,10 @@ const OrderEventCard: React.FC<TOrderEventCardProps> = ({
           fetchSubOrderDocumentInProgress={fetchSubOrderDocumentInProgress}
           openRatingSubOrderModal={handleOpenRatingModal}
           onCloseEventCardPopup={tooltipVisibleController.setFalse}
+          onPickForMe={onPickForMe}
+          pickFoodForSpecificSubOrderInProgress={
+            pickFoodForSpecificSubOrderInProgress
+          }
         />
       }
       onVisibleChange={(visible) => {
