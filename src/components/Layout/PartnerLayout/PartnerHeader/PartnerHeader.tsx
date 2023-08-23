@@ -7,7 +7,6 @@ import Avatar from '@components/Avatar/Avatar';
 import { InlineTextButton } from '@components/Button/Button';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import IconBell from '@components/Icons/IconBell/IconBell';
-import IconMail from '@components/Icons/IconMail/IconMail';
 import NamedLink from '@components/NamedLink/NamedLink';
 import OutsideClickHandler from '@components/OutsideClickHandler/OutsideClickHandler';
 import PitoLogo from '@components/PitoLogo/PitoLogo';
@@ -96,10 +95,6 @@ const PartnerHeader: React.FC<TPartnerHeaderProps> = () => {
       </NamedLink>
       <div className={css.headerLeft}>
         <div className={css.actionContainer}>
-          <InlineTextButton type="button">
-            <IconMail className={css.iconMail} />
-          </InlineTextButton>
-
           <Tooltip
             overlayClassName={classNames(css.tooltipOverlay)}
             placement="bottom"
