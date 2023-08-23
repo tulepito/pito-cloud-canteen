@@ -20,6 +20,11 @@ const PartnerNavBar = () => {
   const router = useRouter();
   const moreItemsController = useBoolean();
 
+  const isMoreItemActive = [
+    partnerPaths.Settings,
+    partnerPaths.ManagePayments,
+  ].includes(router.pathname);
+
   const handleCloseMoreItemsModal = () => moreItemsController.setFalse();
   const handleOpenMoreItemsModal = () => moreItemsController.setTrue();
 
@@ -58,7 +63,7 @@ const PartnerNavBar = () => {
       <div className={css.itemWrapper} onClick={handleOpenMoreItemsModal}>
         <div
           className={classNames(css.item, {
-            [css.active]: router.pathname === partnerPaths.Settings,
+            [css.active]: isMoreItemActive,
           })}>
           <IconMoreSquare className={css.icon} />
           <div className={css.label}>Thêm</div>
