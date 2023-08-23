@@ -23,6 +23,8 @@ type TListCardProps = {
   isSelected?: boolean;
   selectDisabled?: boolean;
   isOrderAlreadyStarted: boolean;
+  getNextSubOrderDay: (dayId: string) => string;
+  onSelectTab: (item: any) => void;
 };
 
 const ListingCard: React.FC<TListCardProps> = ({
@@ -33,6 +35,8 @@ const ListingCard: React.FC<TListCardProps> = ({
   isSelected,
   selectDisabled,
   isOrderAlreadyStarted,
+  getNextSubOrderDay,
+  onSelectTab,
 }) => {
   const detailModalController = useBoolean();
   const requirementRef = useRef<string | undefined>();
@@ -56,6 +60,8 @@ const ListingCard: React.FC<TListCardProps> = ({
       dispatch(
         shoppingCartThunks.addToCart({ planId, dayId, mealId, requirement }),
       );
+      const nextDate = getNextSubOrderDay(dayId);
+      onSelectTab({ id: nextDate });
     }
   };
   const handleRemoveFromCard = () => {

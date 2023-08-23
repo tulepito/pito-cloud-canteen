@@ -145,7 +145,7 @@ const initialState: TOrderListState = {
   pickFoodForSpecificSubOrderError: null,
 };
 
-const getFoodIdListWithSuitablePrice = ({
+export const getFoodIdListWithSuitablePrice = ({
   payload,
   orders,
   allPlans,
@@ -183,7 +183,7 @@ const getFoodIdListWithSuitablePrice = ({
   return suitablePriceFoodList;
 };
 
-const recommendFood = ({
+export const recommendFood = ({
   foodList,
   subOrderFoodIds,
   allergies,

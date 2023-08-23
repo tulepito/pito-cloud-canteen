@@ -86,7 +86,7 @@ const ResponsiveImage: React.FC<TResponsiveImageProps> = (props) => {
   }, [JSON.stringify(image), noImageContainerRef]);
 
   const classes = classNames(rootClassName || css.root, className);
-  if (image === null || variants.length === 0) {
+  if (!image || variants.length === 0) {
     const noImageClasses = classNames(
       rootClassName || css.root,
       css.noImageContainer,
