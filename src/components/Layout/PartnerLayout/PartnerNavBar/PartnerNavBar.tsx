@@ -75,22 +75,32 @@ const PartnerNavBar = () => {
         isOpen={moreItemsController.value}
         onClose={handleCloseMoreItemsModal}>
         <div className={css.menuContainer}>
-          <NamedLink path={partnerPaths.ManagePayments} className={css.itemRow}>
-            <IconWallet className={css.itemIcon} />
-            <div>Thanh toán</div>
-          </NamedLink>
-          <div className={css.itemRow}>
-            <IconGraph className={css.itemIcon} />
-            <div>Phân tích bán hàng</div>
-          </div>
-          <div className={css.itemRow}>
-            <IconBorderStar className={css.itemIcon} />
-            <div>Đánh giá</div>
-          </div>
-          <div className={css.itemRow}>
-            <IconSetting className={css.itemIcon} />
-            <div>Cài đặt</div>
-          </div>
+          <span onClick={handleCloseMoreItemsModal}>
+            <NamedLink
+              path={partnerPaths.ManagePayments}
+              className={css.itemRow}>
+              <IconWallet className={css.itemIcon} />
+              <div>Thanh toán</div>
+            </NamedLink>
+          </span>
+          <span onClick={handleCloseMoreItemsModal}>
+            <div className={css.itemRow}>
+              <IconGraph className={css.itemIcon} />
+              <div>Phân tích bán hàng</div>
+            </div>
+          </span>
+          <span onClick={handleCloseMoreItemsModal}>
+            <div className={css.itemRow}>
+              <IconBorderStar className={css.itemIcon} />
+              <div>Đánh giá</div>
+            </div>
+          </span>
+          <span onClick={handleCloseMoreItemsModal}>
+            <div className={css.itemRow}>
+              <IconSetting className={css.itemIcon} />
+              <div>Cài đặt</div>
+            </div>
+          </span>
         </div>
       </SlideModal>
     </div>
