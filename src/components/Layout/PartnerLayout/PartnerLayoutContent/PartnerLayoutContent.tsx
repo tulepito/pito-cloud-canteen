@@ -16,16 +16,28 @@ import css from './PartnerLayoutContent.module.scss';
 type TPartnerLayoutContentProps = PropsWithChildren<
   TDefaultProps & {
     isMenuOpen?: boolean;
+    hideHeader?: boolean;
   }
 >;
 
 const PartnerLayoutContent: React.FC<TPartnerLayoutContentProps> = (props) => {
-  const { className, rootClassName, children, isMenuOpen } = props;
+  const {
+    className,
+    rootClassName,
+    children,
+    isMenuOpen,
+    hideHeader = false,
+  } = props;
   const { isMobileLayout } = useViewport();
 
-  const classes = classNames(rootClassName || css.root, className, {
-    [css.menuOpen]: isMenuOpen,
-  });
+  const classes = classNames(
+    rootClassName || css.root,
+    {
+      [css.hideHeader]: hideHeader,
+      [css.menuOpen]: isMenuOpen,
+    },
+    className,
+  );
 
   return (
     <div className={classes} role="main">

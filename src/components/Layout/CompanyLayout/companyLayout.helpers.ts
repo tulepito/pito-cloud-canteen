@@ -1,38 +1,30 @@
 import { companyPaths, quizPaths } from '@src/paths';
 
+const HIDING_COMPANY_FEATURE_HEADER_PATHNAMES = [
+  companyPaths.CreateNewOrder,
+  companyPaths.EditDraftOrder,
+  companyPaths.OrderSelectRestaurant,
+  companyPaths.ManageOrderDetail,
+  companyPaths.ManageOrderPicking,
+  ...Object.values(quizPaths),
+];
+
 export const shouldShowFeatureHeader = (pathName: string) => {
-  const hideList = [
-    companyPaths.CreateNewOrder,
-    companyPaths.EditDraftOrder,
-    companyPaths.OrderSelectRestaurant,
-    companyPaths.ManageOrderDetail,
-    companyPaths.ManageOrderPicking,
-    ...Object.values(quizPaths),
-  ];
-
-  if (hideList.includes(pathName)) {
-    return false;
-  }
-
-  return true;
+  return !HIDING_COMPANY_FEATURE_HEADER_PATHNAMES.includes(pathName);
 };
 
+const HIDING_COMPANY_SIDE_BAR_PATHNAMES = [
+  companyPaths.Home,
+  companyPaths.CreateNewOrder,
+  companyPaths.EditDraftOrder,
+  companyPaths.OrderSelectRestaurant,
+  companyPaths.ManageOrders,
+  companyPaths.ManageOrderDetail,
+  companyPaths.ManageOrderPicking,
+  companyPaths.OrderRating,
+  ...Object.values(quizPaths),
+];
+
 export const shouldShowSidebar = (pathName: string) => {
-  const hideList = [
-    companyPaths.Home,
-    companyPaths.CreateNewOrder,
-    companyPaths.EditDraftOrder,
-    companyPaths.OrderSelectRestaurant,
-    companyPaths.ManageOrders,
-    companyPaths.ManageOrderDetail,
-    companyPaths.ManageOrderPicking,
-    companyPaths.OrderRating,
-    ...Object.values(quizPaths),
-  ];
-
-  if (hideList.includes(pathName)) {
-    return false;
-  }
-
-  return true;
+  return !HIDING_COMPANY_SIDE_BAR_PATHNAMES.includes(pathName);
 };

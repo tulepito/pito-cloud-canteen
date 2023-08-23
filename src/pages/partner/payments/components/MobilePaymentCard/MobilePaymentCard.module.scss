@@ -1,0 +1,40 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.root {
+  padding: 4px 16px;
+
+  border-radius: 8px;
+  border: 1px solid $neutralGray3;
+  background: $neutralGray1;
+}
+
+.titleContainer {
+  display: flex;
+  flex-direction: column;
+  row-gap: 8px;
+  padding: 8px 0;
+  @include textTemplate(14px, 600, 20px);
+
+  .orderTitle {
+    color: $labelBlue2;
+  }
+}
+
+.twoColumn {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  @include textTemplate(14px, 400, 20px);
+
+  .grayLabel {
+    color: $neutralGray5;
+  }
+}
+
+.totalAmount {
+  display: flex;
+  column-gap: 8px;
+  align-items: center;
+}

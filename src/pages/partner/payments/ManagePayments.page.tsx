@@ -7,20 +7,25 @@ import isEmpty from 'lodash/isEmpty';
 import Badge, { EBadgeType } from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
 import IconDownload from '@components/Icons/IconDownload/IconDownload';
+import IconEmpty from '@components/Icons/IconEmpty/IconEmpty';
 import IconFilter from '@components/Icons/IconFilter/IconFilter';
 import NamedLink from '@components/NamedLink/NamedLink';
 import OutsideClickHandler from '@components/OutsideClickHandler/OutsideClickHandler';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
+import SlideModal from '@components/SlideModal/SlideModal';
 import type { TColumn } from '@components/Table/Table';
 import { TableForm } from '@components/Table/Table';
 import { parseThousandNumber } from '@helpers/format';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
+import { useBottomScroll } from '@hooks/useBottomScroll';
+import { useViewport } from '@hooks/useViewport';
 import { adminPaths } from '@src/paths';
 import { formatTimestamp } from '@src/utils/dates';
 import { EOrderDetailTabs, EOrderPaymentState } from '@src/utils/enums';
 import type { TPagination } from '@src/utils/types';
 
+import MobilePaymentCard from './components/MobilePaymentCard/MobilePaymentCard';
 import type { TPaymentFilterFormValues } from './components/PaymentFilterForm/PaymentFilterForm';
 import PaymentFilterForm from './components/PaymentFilterForm/PaymentFilterForm';
 import { filterPayments, makeExcelFile } from './helpers/paymentPartner';
@@ -31,12 +36,17 @@ import css from './ManagePayments.module.scss';
 const ManagePaymentsPage = () => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
+  const { isMobileLayout } = useViewport();
+  const mobileFilterModalControl = useBoolean();
   const [filters, setFilters] = useState({} as any);
   const [selectedPaymentRecords, setSelectedPaymentRecords] = useState(
     {} as any,
   );
   const [page, setPage] = useState(1);
   const tooltipController = useBoolean();
+
+  const shouldShowMobileFilterModal =
+    mobileFilterModalControl.value && isMobileLayout;
 
   const title = intl.formatMessage({
     id: 'ManagePaymentsPage.title',
@@ -181,15 +191,24 @@ const ManagePaymentsPage = () => {
     [JSON.stringify(filters), JSON.stringify(formattedTableData)],
   );
   const filteredTableDataWithPagination = useMemo(
-    () => filteredTableData.slice((page - 1) * 10, page * 10),
-    [filteredTableData, page],
+    () =>
+      isMobileLayout
+        ? filteredTableData.slice(0, page * 10)
+        : filteredTableData.slice((page - 1) * 10, page * 10),
+    [filteredTableData, page, isMobileLayout],
   );
-
   const pagination: TPagination = {
     page,
     perPage: 10,
     totalItems: filteredTableData.length,
     totalPages: Math.ceil(filteredTableData.length / 10),
+  };
+
+  const handleShowMobileFilterModal = () => {
+    mobileFilterModalControl.setTrue();
+  };
+  const handleCloseMobileFilterModal = () => {
+    mobileFilterModalControl.setFalse();
   };
 
   const handleClearFilters = () => {
@@ -218,7 +237,11 @@ const ManagePaymentsPage = () => {
       ...(status && { status }),
     });
 
-    handleCloseTooltip();
+    if (isMobileLayout) {
+      handleCloseMobileFilterModal();
+    } else {
+      handleCloseTooltip();
+    }
   };
 
   const onDownloadPaymentList = () => {
@@ -236,6 +259,16 @@ const ManagePaymentsPage = () => {
     }
   };
 
+  useBottomScroll(() =>
+    setPage((p) =>
+      isMobileLayout
+        ? p + 1 > filteredTableData.length
+          ? filteredTableData.length
+          : p + 1
+        : p,
+    ),
+  );
+
   useEffect(() => {
     dispatch(PartnerManagePaymentsThunks.loadData());
   }, []);
@@ -244,6 +277,12 @@ const ManagePaymentsPage = () => {
     <div className={css.root}>
       <div className={css.header}>
         <h1 className={css.title}>{title}</h1>
+        <Button
+          variant="secondary"
+          className={css.filterBtn}
+          onClick={handleShowMobileFilterModal}>
+          <IconFilter className={css.icon} />
+        </Button>
       </div>
       <div className={css.actionSection}>
         <div className={css.filterButtonWrapper}>
@@ -294,6 +333,38 @@ const ManagePaymentsPage = () => {
           onCustomPageChange={setPage}
         />
       </div>
+
+      <RenderWhen condition={isMobileLayout}>
+        <RenderWhen condition={isEmpty(filteredTableDataWithPagination)}>
+          <div className={css.mobilePaymentsEmpty}>
+            <IconEmpty />
+            <div>Bạn chưa có hoá đơn cần thanh toán</div>
+          </div>
+          <RenderWhen.False>
+            <div className={css.mobilePaymentsContainer}>
+              {filteredTableDataWithPagination.map(
+                ({ data: paymentData, key }) => (
+                  <MobilePaymentCard key={key} paymentData={paymentData} />
+                ),
+              )}
+            </div>
+          </RenderWhen.False>
+        </RenderWhen>
+      </RenderWhen>
+
+      <SlideModal
+        containerClassName={css.mobileFilterModalContainer}
+        id="ManagePaymentsPage.MobilePaymentFilterForm"
+        modalTitle="Bộ lọc"
+        isOpen={shouldShowMobileFilterModal}
+        onClose={handleCloseMobileFilterModal}>
+        <PaymentFilterForm
+          initialValues={filters}
+          onSubmit={handleFilterSubmit}
+          onClearFilters={handleClearFilters}
+          onClose={handleCloseMobileFilterModal}
+        />
+      </SlideModal>
     </div>
   );
 };

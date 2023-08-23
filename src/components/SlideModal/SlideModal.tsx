@@ -1,4 +1,5 @@
 import type { PropsWithChildren } from 'react';
+import classNames from 'classnames';
 
 import IconClose from '@components/Icons/IconClose/IconClose';
 import PopupModal from '@components/PopupModal/PopupModal';
@@ -10,10 +11,17 @@ type TSlideModalProps = PropsWithChildren & {
   isOpen: boolean;
   modalTitle?: string;
   onClose: () => void;
+  containerClassName?: string;
 };
 
 const SlideModal: React.FC<TSlideModalProps> = (props) => {
-  const { isOpen, onClose, id, children, modalTitle } = props;
+  const { isOpen, onClose, id, children, modalTitle, containerClassName } =
+    props;
+
+  const containerClasses = classNames(
+    css.slideModalContainer,
+    containerClassName,
+  );
 
   return (
     <PopupModal
@@ -29,7 +37,7 @@ const SlideModal: React.FC<TSlideModalProps> = (props) => {
           {modalTitle && <div className={css.title}>{modalTitle}</div>}
         </div>
       }
-      containerClassName={css.slideModalContainer}>
+      containerClassName={containerClasses}>
       {children}
     </PopupModal>
   );

@@ -30,10 +30,6 @@ const TrackingOrderDetailInfo: React.FC<TTrackingOrderDetailInfoProps> = ({
   const orderGetter = Listing(order as TListing);
   const { orderType = EOrderType.group } = orderGetter.getMetadata();
   const { lineItems = [] } = orderDetailOfDate;
-  console.debug(
-    '💫 > file: TrackingOrderDetailInfo.tsx:33 > lineItems: ',
-    lineItems,
-  );
   const isGroupOrder = orderType === EOrderType.group;
 
   // Prepare data for order with type 'group'
