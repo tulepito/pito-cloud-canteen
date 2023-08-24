@@ -13,7 +13,7 @@ import ImageFromFile from '@components/ImageFromFile/ImageFromFile';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import type { TImageActionPayload } from '@redux/slices/uploadImage.slice';
 import { uploadImageThunks } from '@redux/slices/uploadImage.slice';
-import { userThunks } from '@redux/slices/user.slice';
+import { currentUserSelector, userThunks } from '@redux/slices/user.slice';
 import { User } from '@src/utils/data';
 import { isUploadImageOverLimitError } from '@src/utils/errors';
 import type { TCurrentUser, TUser } from '@src/utils/types';
@@ -23,16 +23,15 @@ import css from './AvatarForm.module.scss';
 export type TAvatarFormValues = {};
 
 const ACCEPT_IMAGES = 'image/*';
-type TExtraProps = {
-  currentUser: TCurrentUser | TUser;
-};
+type TExtraProps = {};
 type TAvatarFormComponentProps = FormRenderProps<TAvatarFormValues> &
   Partial<TExtraProps>;
 type TAvatarFormProps = FormProps<TAvatarFormValues> & TExtraProps;
 
 const AvatarFormComponent: React.FC<TAvatarFormComponentProps> = (props) => {
-  const { handleSubmit, currentUser } = props;
+  const { handleSubmit } = props;
   const dispatch = useAppDispatch();
+  const currentUser = useAppSelector(currentUserSelector);
   const intl = useIntl();
   const [uploadDelay, setUploadDelay] = useState(false);
   const uploadTimeoutRef = useRef<any>(null);
