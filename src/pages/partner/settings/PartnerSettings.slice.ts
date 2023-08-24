@@ -38,6 +38,10 @@ type TPartnerSettingsState = {
   uploadingCovers: boolean;
 
   removedImageIds: any[];
+
+  // update
+  updateRestaurantInprogress: boolean;
+  updateRestaurantError: any;
 };
 const initialState: TPartnerSettingsState = {
   nutritions: [],
@@ -62,6 +66,9 @@ const initialState: TPartnerSettingsState = {
   uploadingCovers: false,
 
   removedImageIds: [],
+  // update
+  updateRestaurantInprogress: false,
+  updateRestaurantError: null,
 };
 
 // ================ Thunk types ================ //
@@ -425,6 +432,16 @@ const PartnerSettingsSlice = createSlice({
           uploadCoverError: error,
           uploadingCovers: false,
         };
+      })
+      /* =============== updatePartnerRestaurantListing =============== */
+      .addCase(updatePartnerRestaurantListing.pending, (state) => {
+        state.updateRestaurantInprogress = true;
+      })
+      .addCase(updatePartnerRestaurantListing.fulfilled, (state) => {
+        state.updateRestaurantInprogress = false;
+      })
+      .addCase(updatePartnerRestaurantListing.rejected, (state) => {
+        state.updateRestaurantInprogress = false;
       });
   },
 });

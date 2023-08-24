@@ -12,6 +12,7 @@ import IconFood from '@components/Icons/IconFood/IconFood';
 import IconLock from '@components/Icons/IconLock/IconLock';
 import IconUser from '@components/Icons/IconUser2/IconUser2';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { currentUserSelector } from '@redux/slices/user.slice';
 import { participantPaths, partnerPaths } from '@src/paths';
 import { OwnListing } from '@src/utils/data';
 import { EImageVariants } from '@src/utils/enums';
@@ -46,7 +47,7 @@ const PartnerSettingsPage = () => {
     removedAvatarIds,
     restaurantListing,
   } = useAppSelector((state) => state.PartnerSettingsPage);
-  const currentUser = useAppSelector((state) => state.user.currentUser);
+  const currentUser = useAppSelector(currentUserSelector);
 
   const uploadedCoverImages = pickRenderableImagesByProperty(
     restaurantListing,

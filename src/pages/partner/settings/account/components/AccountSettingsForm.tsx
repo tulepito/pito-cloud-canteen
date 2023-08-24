@@ -1,11 +1,19 @@
+import { useEffect } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
+import { useIntl } from 'react-intl';
 
 import Alert, { EAlertPosition, EAlertType } from '@components/Alert/Alert';
 import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import { LocationAutocompleteInputField } from '@components/LocationAutocompleteInput/LocationAutocompleteInput';
+import useBoolean from '@hooks/useBoolean';
+import {
+  composeValidators,
+  phoneNumberFormatValid,
+  required,
+} from '@src/utils/validators';
 
 import css from './AccountSettingsForm.module.scss';
 
@@ -20,7 +28,7 @@ export type TAccountSettingsFormValues = {
   facebookLink: string;
 };
 
-type TExtraProps = {};
+type TExtraProps = { isSubmitted: boolean };
 type TAccountSettingsFormComponentProps =
   FormRenderProps<TAccountSettingsFormValues> & Partial<TExtraProps>;
 type TAccountSettingsFormProps = FormProps<TAccountSettingsFormValues> &
@@ -29,12 +37,16 @@ type TAccountSettingsFormProps = FormProps<TAccountSettingsFormValues> &
 const AccountSettingsFormComponent: React.FC<
   TAccountSettingsFormComponentProps
 > = (props) => {
-  const { handleSubmit } = props;
+  const { handleSubmit, pristine, isSubmitted = false, submitting } = props;
+  const intl = useIntl();
+  const successAlertControl = useBoolean();
+
+  const submitDisabled = pristine;
 
   const fieldBrandName = {
     label: 'Tên thương hiệu',
     id: 'AccountSettingsForm.fieldBrandName',
-    name: 'brandName',
+    name: 'title',
     disabled: true,
   };
   const fieldCompanyName = {
@@ -47,6 +59,11 @@ const AccountSettingsFormComponent: React.FC<
     label: 'Người đại diện',
     id: 'AccountSettingsForm.fieldContactorName',
     name: 'contactorName',
+    validate: required(
+      intl.formatMessage({
+        id: 'AccountSettingsForm.contactorNameRequired',
+      }),
+    ),
   };
   const fieldEmail = {
     label: 'Email',
@@ -58,12 +75,23 @@ const AccountSettingsFormComponent: React.FC<
     label: 'Điện thoại',
     id: 'AccountSettingsForm.fieldPhoneNumber',
     name: 'phoneNumber',
-    disabled: true,
+    validate: composeValidators(
+      required(
+        intl.formatMessage({
+          id: 'AccountSettingsForm.phoneNumberRequired',
+        }),
+      ),
+      phoneNumberFormatValid(
+        intl.formatMessage({
+          id: 'AccountSettingsForm.phoneNumberValid',
+        }),
+      ),
+    ),
   };
   const fieldAddress = {
     label: 'Địa chỉ',
     id: 'AccountSettingsForm.fieldAddress',
-    name: 'address',
+    name: 'location',
     className: css.fieldLocation,
   };
   const fieldWebsite = {
@@ -79,6 +107,11 @@ const AccountSettingsFormComponent: React.FC<
     placeholder: '-',
   };
 
+  useEffect(() => {
+    if (isSubmitted) successAlertControl.setTrue();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSubmitted]);
+
   return (
     <Form onSubmit={handleSubmit} className={css.formRoot}>
       <>
@@ -90,12 +123,14 @@ const AccountSettingsFormComponent: React.FC<
         <LocationAutocompleteInputField {...fieldAddress} />
         <FieldTextInput {...fieldWebsite} />
         <FieldTextInput {...fieldFacebookLink} />
-        <Button>Lưu thay đổi</Button>
+        <Button disabled={submitDisabled} inProgress={submitting}>
+          Lưu thay đổi
+        </Button>
         <Alert
           message="Cập nhật thông tin thành công"
-          isOpen
+          isOpen={successAlertControl.value}
           autoClose
-          onClose={() => {}}
+          onClose={successAlertControl.setFalse}
           type={EAlertType.success}
           hasCloseButton={false}
           position={EAlertPosition.bottomLeft}

@@ -1,6 +1,18 @@
+import { useMemo, useState } from 'react';
+
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import Modal from '@components/Modal/Modal';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { currentUserSelector } from '@redux/slices/user.slice';
+import {
+  CurrentUser,
+  getLocationInitialValues,
+  OwnListing,
+} from '@src/utils/data';
 
+import { PartnerSettingsThunks } from '../../PartnerSettings.slice';
+
+import type { TAccountSettingsFormValues } from './AccountSettingsForm';
 import AccountSettingsForm from './AccountSettingsForm';
 
 import css from './AccountSettingsModal.module.scss';
@@ -12,6 +24,47 @@ type TNavigationModalProps = {
 
 const AccountSettingsModal: React.FC<TNavigationModalProps> = (props) => {
   const { isOpen, onClose } = props;
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const dispatch = useAppDispatch();
+  const restaurantListing = useAppSelector(
+    (state) => state.PartnerSettingsPage.restaurantListing,
+  );
+  const currentUser = useAppSelector(currentUserSelector);
+
+  const restaurantGetter = OwnListing(restaurantListing);
+  const { email } = CurrentUser(currentUser).getAttributes();
+  const { title } = restaurantGetter.getAttributes();
+  const { companyName, contactorName, website, facebookLink, phoneNumber } =
+    restaurantGetter.getPublicData();
+
+  const initialValues = useMemo(
+    () => ({
+      title,
+      email,
+      companyName,
+      location: restaurantListing
+        ? getLocationInitialValues(restaurantListing)
+        : {},
+      contactorName,
+      phoneNumber,
+      website,
+      facebookLink,
+    }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [JSON.stringify(restaurantListing)],
+  );
+
+  const handleSubmitAccountSettingForm = async (
+    values: TAccountSettingsFormValues,
+  ) => {
+    const response = await dispatch(
+      PartnerSettingsThunks.updatePartnerRestaurantListing(values),
+    );
+
+    if (response.meta.requestStatus !== 'rejected') {
+      setIsSubmitted(true);
+    }
+  };
 
   return (
     <Modal
@@ -27,7 +80,11 @@ const AccountSettingsModal: React.FC<TNavigationModalProps> = (props) => {
           <div>Thông tin tài khoản</div>
         </div>
 
-        <AccountSettingsForm onSubmit={() => {}} />
+        <AccountSettingsForm
+          initialValues={initialValues}
+          onSubmit={handleSubmitAccountSettingForm}
+          isSubmitted={isSubmitted}
+        />
       </div>
     </Modal>
   );

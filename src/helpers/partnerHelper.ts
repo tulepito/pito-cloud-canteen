@@ -10,26 +10,38 @@ export const createSubmitUpdatePartnerValues = (
     uploadedCovers = [],
     uploadedAvatars = [],
     oldImages = [],
-    removedImageIds,
+    location,
+    contactorName = '',
+    removedImageIds = [],
+    website = '',
+    facebookLink = '',
   } = values;
+
+  const { selectedPlace = {} } = location || {};
+  const { address, origin } = selectedPlace;
 
   const avatarImageIdMaybe = getSubmitImageId(uploadedAvatars)?.[0]?.uuid;
   const coverImageIdMaybe = getSubmitImageId(uploadedCovers)?.[0]?.uuid;
 
   const submittedValues = {
     id,
+    ...(origin ? { geolocation: origin } : {}),
     images: getUniqueImages([
       ...getSubmitImageId(uploadedCovers),
       ...getSubmitImageId(uploadedAvatars),
       ...getSubmitImageId(oldImages),
     ]).filter((image) => !removedImageIds.includes(image.uuid)),
     publicData: {
+      location: { address },
       ...(avatarImageIdMaybe !== null && avatarImageIdMaybe
         ? { avatarImageId: avatarImageIdMaybe }
         : {}),
       ...(coverImageIdMaybe !== null && coverImageIdMaybe
         ? { coverImageId: coverImageIdMaybe }
         : {}),
+      website,
+      facebookLink,
+      contactorName,
     },
   };
 
