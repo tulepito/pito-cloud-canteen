@@ -25,18 +25,18 @@ const PartnerLayout: React.FC<PropsWithChildren> = (props) => {
   } = useBoolean(false);
   const { isMobileLayout } = useViewport();
 
-  const hideHeaderMaybe = shouldShowPartnerHeader(pathname);
+  const hideHeaderMaybe = isMobileLayout && !shouldShowPartnerHeader(pathname);
 
   return (
     <div className={css.root}>
       <div className={css.main}>
-        <RenderWhen condition={hideHeaderMaybe}>
+        <RenderWhen condition={!hideHeaderMaybe}>
           <PartnerLayoutTopbar>
             <PartnerHeader onMenuClick={toggleMenuOpen} />
           </PartnerLayoutTopbar>
         </RenderWhen>
         <PartnerLayoutContent
-          hideHeader={!hideHeaderMaybe}
+          hideHeader={hideHeaderMaybe}
           isMenuOpen={isMenuOpen}>
           {children}
         </PartnerLayoutContent>
