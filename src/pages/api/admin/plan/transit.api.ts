@@ -144,14 +144,16 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
           // Function is not ready on production
 
-          emailSendingFactory(
-            EmailTemplateTypes.PARTNER.PARTNER_SUB_ORDER_CANCELED,
-            {
-              orderId,
-              timestamp,
-              restaurantId,
-            },
-          );
+          if (process.env.NEXT_APP_ALLOW_PARTNER_EMAIL_SEND === 'true') {
+            emailSendingFactory(
+              EmailTemplateTypes.PARTNER.PARTNER_SUB_ORDER_CANCELED,
+              {
+                orderId,
+                timestamp,
+                restaurantId,
+              },
+            );
+          }
 
           participantIds.map(async (participantId: string) => {
             createFirebaseDocNotification(ENotificationType.ORDER_CANCEL, {
