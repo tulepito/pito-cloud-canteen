@@ -102,6 +102,7 @@
   display: none;
 
   @include viewportMedium {
+    display: initial;
     margin-top: 24px;
   }
 }
