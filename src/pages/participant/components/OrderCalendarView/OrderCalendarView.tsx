@@ -126,6 +126,8 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
         ? EVENT_STATUS.CANCELED_STATUS
         : alreadyPickFood
         ? EParticipantOrderStatus.joined
+        : foodSelection?.status === EParticipantOrderStatus.notJoined
+        ? EParticipantOrderStatus.notJoined
         : isOver(expiredTime.toMillis())
         ? EParticipantOrderStatus.expired
         : foodSelection?.status;

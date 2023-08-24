@@ -8,6 +8,7 @@ import { isOver } from '@helpers/orderHelper';
 import { useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { useViewport } from '@hooks/useViewport';
+import { EParticipantOrderStatus } from '@src/utils/enums';
 
 import OrderEventCardContentItems from './OrderEventCardContentItems';
 import OrderEventCardHeader from './OrderEventCardHeader';
@@ -47,9 +48,10 @@ const OrderEventCard: React.FC<TOrderEventCardProps> = ({
   const tooltipVisibleController = useBoolean();
 
   const isFoodPicked = !!event.resource?.dishSelection?.dishSelection;
+  const isNotJoined = status === EParticipantOrderStatus.notJoined;
   const isExpired = isOver(expiredTime);
   const isExpiredAndNotPickedFood =
-    !isFoodPicked && (isExpired || isOrderStarted);
+    !isFoodPicked && (isExpired || isOrderStarted) && !isNotJoined;
 
   const { orderColor } = event?.resource || {};
   const dotStyles = {
@@ -129,7 +131,7 @@ const OrderEventCard: React.FC<TOrderEventCardProps> = ({
       <div>
         <div
           className={classNames(css.root, {
-            [css.rootExpired]: isExpired,
+            [css.rootExpired]: isExpiredAndNotPickedFood,
           })}
           style={cardStyles}>
           <OrderEventCardHeader event={event} />
