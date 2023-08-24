@@ -13,6 +13,7 @@ import IconLock from '@components/Icons/IconLock/IconLock';
 import IconUser from '@components/Icons/IconUser2/IconUser2';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { participantPaths, partnerPaths } from '@src/paths';
+import { OwnListing } from '@src/utils/data';
 import { EImageVariants } from '@src/utils/enums';
 import { isUploadImageOverLimitError } from '@src/utils/errors';
 import { pickRenderableImagesByProperty } from '@src/utils/images';
@@ -62,6 +63,7 @@ const PartnerSettingsPage = () => {
     'avatarImageId',
   );
 
+  const { title } = OwnListing(restaurantListing).getAttributes();
   const uploadImageError = uploadCoverError || uploadAvatarError;
   const uploadOverLimit = isUploadImageOverLimitError(uploadImageError);
 
@@ -162,6 +164,8 @@ const PartnerSettingsPage = () => {
           );
         }}
       />
+
+      <div className={css.title}>{title}</div>
 
       <div className={css.navigationWrapper}>
         <div

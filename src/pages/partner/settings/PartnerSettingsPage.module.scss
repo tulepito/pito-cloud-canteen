@@ -12,6 +12,14 @@
   }
 }
 
+.title {
+  @include textTemplate(20px, 700, 22px);
+  width: 100%;
+  text-align: center;
+  position: relative;
+  bottom: 60px;
+}
+
 .mediaFieldGroup {
   position: relative;
   width: 100%;
@@ -22,7 +30,7 @@
   height: 120px;
   position: relative;
   left: 50%;
-  bottom: 80px;
+  bottom: 72px;
   transform: translateX(-50%);
   z-index: 1;
   background-color: $neutralGray1;
@@ -62,7 +70,6 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 40px;
 }
 
 .mediaTitle {
@@ -81,7 +88,6 @@
 }
 
 .navigationWrapper {
-  margin-top: 28px;
   @include flexAlign(unset, center);
   flex-direction: column;
   gap: 24px;
