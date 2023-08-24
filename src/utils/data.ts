@@ -746,3 +746,44 @@ export const getUniqueUsers = (users: TUser[]) => {
 
   return Object.values(userMap) as TUser[];
 };
+
+export const getDataWithRemovedOtherField = (arr: string[]) =>
+  arr.filter((item: string) => item !== 'other');
+
+export const getListWithNewOtherValues = (
+  newOtherValue: string,
+  oldOtherValue: string,
+  list: string[],
+  hasOtherValueInList: boolean,
+) => {
+  const newList = [...list];
+
+  const oldOtherItemIndex = newList.indexOf(oldOtherValue);
+  if (!hasOtherValueInList && oldOtherItemIndex >= 0) {
+    newList.splice(oldOtherItemIndex, 1);
+
+    return newList;
+  }
+
+  const otherValueIndex = newList.findIndex(
+    (str: string) => str === newOtherValue,
+  );
+
+  const notChange = newOtherValue === oldOtherValue;
+  // otherValueIndex >= 0 is value not change => don't need to update
+  //! otherValue is other is null => don't need to add
+
+  if (otherValueIndex >= 0 || !newOtherValue || notChange) {
+    return newList;
+  }
+
+  // replace old other value to new other value
+
+  if (oldOtherItemIndex >= 0) {
+    newList[oldOtherItemIndex] = newOtherValue;
+  } else {
+    newList.push(newOtherValue);
+  }
+
+  return newList;
+};

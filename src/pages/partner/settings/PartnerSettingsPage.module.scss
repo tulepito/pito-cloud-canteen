@@ -18,19 +18,44 @@
 }
 
 .fieldAvatar {
-  width: 118px;
-  height: 118px;
+  width: 120px;
+  height: 120px;
   position: relative;
   left: 50%;
-  bottom: 40px;
+  bottom: 80px;
   transform: translateX(-50%);
   z-index: 1;
   background-color: $neutralGray1;
   box-shadow: $boxShadowPopup;
+  border-radius: 50%;
+  overflow: visible;
+
+  & div {
+    border-radius: 50%;
+    width: 120px;
+    height: 120px;
+  }
+
+  & label > div {
+    width: unset;
+    height: unset;
+  }
+
+  & img {
+    border-radius: 50%;
+    width: 120px;
+    height: 120px;
+  }
 }
 
 .coverIconUpload {
   padding: 0;
+  background-color: $neutralGray3;
+}
+
+.avatarIconUpload {
+  bottom: 0;
+  right: 0;
 }
 
 .mediaFields {
@@ -47,7 +72,7 @@
 .fieldCover {
   width: 100%;
   max-width: 1440px;
-  height: 250px;
+  height: 160px;
   background-color: $neutralGray1;
   box-shadow: $boxShadowPopup;
   @include viewportLarge {

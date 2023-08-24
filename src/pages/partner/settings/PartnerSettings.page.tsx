@@ -1,8 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect } from 'react';
 import { Form as FinalForm } from 'react-final-form';
+import { useIntl } from 'react-intl';
 import { useRouter } from 'next/router';
 
+import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import Form from '@components/Form/Form';
 import FieldPhotoUpload from '@components/FormFields/FieldPhotoUpload/FieldPhotoUpload';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
@@ -10,42 +12,83 @@ import IconFood from '@components/Icons/IconFood/IconFood';
 import IconLock from '@components/Icons/IconLock/IconLock';
 import IconUser from '@components/Icons/IconUser2/IconUser2';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { partnerThunks, removeCover } from '@redux/slices/partners.slice';
 import { participantPaths, partnerPaths } from '@src/paths';
 import { EImageVariants } from '@src/utils/enums';
-import { pickRenderableImages } from '@src/utils/images';
+import { isUploadImageOverLimitError } from '@src/utils/errors';
+import { pickRenderableImagesByProperty } from '@src/utils/images';
 import type { TObject } from '@src/utils/types';
+import { nonEmptyImage } from '@src/utils/validators';
 
-import { PartnerSettingsThunks } from './PartnerSettings.slice';
+import {
+  PartnerSettingsActions,
+  PartnerSettingsThunks,
+} from './PartnerSettings.slice';
 
 import css from './PartnerSettingsPage.module.scss';
 
 const ACCEPT_IMAGES = 'image/png, image/gif, image/jpeg';
 const COVER_VARIANTS = [EImageVariants.scaledXLarge];
+const AVATAR_VARIANTS = [EImageVariants.squareSmall2x];
 
 const PartnerSettingsPage = () => {
+  const intl = useIntl();
   const router = useRouter();
   const dispatch = useAppDispatch();
   const {
     uploadedCovers,
-    // uploadCoverError,
+    uploadCoverError,
     uploadedCoversOrder,
     removedCoverIds,
-  } = useAppSelector((state) => state.partners);
+    uploadedAvatars,
+    uploadAvatarError,
+    uploadedAvatarsOrder,
+    removedAvatarIds,
+    restaurantListing,
+  } = useAppSelector((state) => state.PartnerSettingsPage);
   const currentUser = useAppSelector((state) => state.user.currentUser);
 
-  const uploadedCoverImages = pickRenderableImages(
-    {},
+  const uploadedCoverImages = pickRenderableImagesByProperty(
+    restaurantListing,
     uploadedCovers,
     uploadedCoversOrder,
     removedCoverIds,
+    'coverImageId',
+  );
+  const uploadedAvatarImages = pickRenderableImagesByProperty(
+    restaurantListing,
+    uploadedAvatars,
+    uploadedAvatarsOrder,
+    removedAvatarIds,
+    'avatarImageId',
   );
 
+  const uploadImageError = uploadCoverError || uploadAvatarError;
+  const uploadOverLimit = isUploadImageOverLimitError(uploadImageError);
+
+  let uploadImageFailed: string | undefined;
+
+  if (uploadOverLimit) {
+    uploadImageFailed = intl.formatMessage({
+      id: 'FieldPhotoUpload.imageUploadFailed.uploadOverLimit',
+    });
+  } else if (uploadImageError) {
+    uploadImageFailed = intl.formatMessage({
+      id: 'FieldPhotoUpload.imageUploadFailed.uploadFailed',
+    });
+  }
+
   const handleCoverUpload = (params: TObject) => {
-    return dispatch(partnerThunks.requestCoverUpload(params));
+    return dispatch(PartnerSettingsThunks.requestCoverUpload(params));
   };
   const handleRemoveCover = (id: any) => {
-    return dispatch(removeCover(id));
+    return dispatch(PartnerSettingsActions.removeCover(id));
+  };
+
+  const handleUploadAvatar = (params: TObject) => {
+    return dispatch(PartnerSettingsThunks.requestAvatarUpload(params));
+  };
+  const handleRemoveAvatar = (id: any) => {
+    return dispatch(PartnerSettingsActions.removeAvatar(id));
   };
 
   const handleNavigateToAccountSettingsPage = () => {
@@ -87,9 +130,31 @@ const PartnerSettingsPage = () => {
                       onImageUpload={handleCoverUpload as any}
                       onRemoveImage={handleRemoveCover}
                       iconUploadClassName={css.coverIconUpload}
+                      shouldHideIconWhenEmpty
+                      shouldShowClearBtn={false}
+                    />
+                    <FieldPhotoUpload
+                      name="avatar"
+                      image={uploadedAvatarImages?.[0]}
+                      accept={ACCEPT_IMAGES}
+                      id="avatar"
+                      className={css.fieldAvatar}
+                      onImageUpload={handleUploadAvatar as any}
+                      onRemoveImage={handleRemoveAvatar}
+                      variants={AVATAR_VARIANTS}
+                      validate={nonEmptyImage(
+                        intl.formatMessage({
+                          id: 'EditPartnerBasicInformationForm.avatarRequired',
+                        }),
+                      )}
+                      iconCameraClassName={css.avatarIconUpload}
+                      shouldHideIconWhenEmpty
+                      shouldShowClearBtn={false}
                     />
 
-                    {/* {uploadImageFailed && <ErrorMessage message={uploadImageFailed} />} */}
+                    {uploadImageFailed && (
+                      <ErrorMessage message={uploadImageFailed} />
+                    )}
                   </div>
                 </div>
               </div>
@@ -97,6 +162,7 @@ const PartnerSettingsPage = () => {
           );
         }}
       />
+
       <div className={css.navigationWrapper}>
         <div
           className={css.navigationItem}
