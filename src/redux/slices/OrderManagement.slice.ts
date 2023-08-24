@@ -517,17 +517,10 @@ const addOrUpdateMemberOrder = createAsyncThunk(
       newMemberOrderValues = { ...newMemberOrderValues, requirement };
 
       const updateParams = {
+        currentViewDate,
+        participantId,
         planId,
-        orderDetail: {
-          ...metadata.orderDetail,
-          [currentViewDate]: {
-            ...metadata.orderDetail[currentViewDate],
-            memberOrders: {
-              ...metadata.orderDetail[currentViewDate].memberOrders,
-              [participantId]: newMemberOrderValues,
-            },
-          },
-        },
+        newMemberOrderValues,
         ...(shouldUpdateAnonymousList ? { anonymous: updateAnonymous } : {}),
       };
 
