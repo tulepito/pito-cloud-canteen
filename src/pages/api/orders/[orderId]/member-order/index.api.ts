@@ -4,6 +4,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HttpMethod } from '@apis/configs';
 import { denormalisedResponseEntities } from '@services/data';
+import { fetchListing } from '@services/integrationHelper';
 import { getIntegrationSdk, handleError } from '@services/sdk';
 import { Listing } from '@src/utils/data';
 import type { TObject } from '@src/utils/types';
@@ -17,12 +18,40 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   switch (apiMethod) {
     case HttpMethod.PUT:
       try {
-        const { planId, orderDetail, anonymous = [] } = req.body;
+        const {
+          planId,
+          currentViewDate,
+          participantId,
+          newMemberOrderValues,
+          newMembersOrderValues,
+          anonymous = [],
+        } = req.body;
+
+        const currentPlan = await fetchListing(planId);
+        const currentPlanListing = Listing(currentPlan);
+        const { orderDetail } = currentPlanListing.getMetadata();
+
+        const newOrderDetail = {
+          ...orderDetail,
+          [currentViewDate]: {
+            ...orderDetail[currentViewDate],
+            memberOrders: {
+              ...orderDetail[currentViewDate].memberOrders,
+              ...(newMembersOrderValues && {
+                ...newMembersOrderValues,
+              }),
+              ...(participantId && {
+                [participantId]: newMemberOrderValues,
+              }),
+            },
+          },
+        };
+
         const response = await integrationSdk.listings.update(
           {
             id: planId,
             metadata: {
-              orderDetail,
+              orderDetail: newOrderDetail,
             },
           },
           { expand: true },
@@ -46,7 +75,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         const normalizedOrderDetail = normalizeOrderDetail({
           orderId,
           planId,
-          planOrderDetail: orderDetail,
+          planOrderDetail: newOrderDetail,
           deliveryHour,
         });
 
