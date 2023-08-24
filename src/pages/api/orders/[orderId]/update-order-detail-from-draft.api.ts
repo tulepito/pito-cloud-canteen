@@ -2,11 +2,10 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HttpMethod } from '@apis/configs';
 import { denormalisedResponseEntities } from '@services/data';
-import { fetchListing } from '@services/integrationHelper';
 import { getIntegrationSdk, handleError } from '@services/sdk';
 import { Listing } from '@src/utils/data';
 
-import { normalizeOrderDetail } from '../../utils';
+import { normalizeOrderDetail } from '../utils';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const apiMethod = req.method;
@@ -15,48 +14,20 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   switch (apiMethod) {
     case HttpMethod.PUT:
       try {
-        const {
-          planId,
-          currentViewDate,
-          participantId,
-          newMemberOrderValues,
-          newMembersOrderValues,
-          anonymous,
-        } = req.body;
-
-        const currentPlan = await fetchListing(planId);
-        const currentPlanListing = Listing(currentPlan);
-        const { orderDetail } = currentPlanListing.getMetadata();
-
-        const newOrderDetail = {
-          ...orderDetail,
-          [currentViewDate]: {
-            ...orderDetail[currentViewDate],
-            memberOrders: {
-              ...orderDetail[currentViewDate].memberOrders,
-              ...(newMembersOrderValues && {
-                ...newMembersOrderValues,
-              }),
-              ...(participantId && {
-                [participantId]: newMemberOrderValues,
-              }),
-            },
-          },
-        };
+        const { planId, orderDetail } = req.body;
+        const { orderId } = req.query;
 
         const response = await integrationSdk.listings.update(
           {
             id: planId,
             metadata: {
-              orderDetail: newOrderDetail,
+              orderDetail,
             },
           },
           { expand: true },
         );
 
         const [planListing] = denormalisedResponseEntities(response);
-
-        const { orderId } = Listing(planListing).getMetadata();
 
         const orderResponse = await integrationSdk.listings.show(
           {
@@ -70,20 +41,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         const { deliveryHour } = Listing(orderListing).getMetadata();
 
         const normalizedOrderDetail = normalizeOrderDetail({
-          orderId,
+          orderId: orderId as string,
           planId,
-          planOrderDetail: newOrderDetail,
+          planOrderDetail: orderDetail,
           deliveryHour,
         });
 
-        if (typeof anonymous !== 'undefined') {
-          await integrationSdk.listings.update({
-            id: orderId,
-            metadata: {
-              anonymous,
-            },
-          });
-        }
         await Promise.all(
           normalizedOrderDetail.map(async (order, index) => {
             const { params } = order;
@@ -106,7 +69,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
         res.json({
           statusCode: 200,
-          message: `Successfully update plan info, planId: ${planId}`,
+          message: `Successfully update plan from draft plan, planId: ${planId}`,
           planListing,
         });
       } catch (error) {
