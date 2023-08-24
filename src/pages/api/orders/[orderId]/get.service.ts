@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-shadow */
+import flatten from 'lodash/flatten';
 import isEmpty from 'lodash/isEmpty';
 
+import { convertListIdToQueries } from '@helpers/apiHelpers';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { denormalisedResponseEntities, Listing } from '@utils/data';
 import { EImageVariants, EOrderStates } from '@utils/enums';
@@ -29,32 +31,40 @@ const getOrder = async ({ orderId }: { orderId: string }) => {
   const [companyUser] = denormalisedResponseEntities(companyResponse);
 
   let data: TObject = { companyId, companyData: companyUser, orderListing };
-  const participantData = await Promise.all(
-    participants.map(async (id: string) => {
-      const [memberAccount] = denormalisedResponseEntities(
-        await integrationSdk.users.show({
-          id,
-          include: ['profileImage'],
-          'fields.image': [
-            `variants.${EImageVariants.squareSmall}`,
-            `variants.${EImageVariants.squareSmall2x}`,
-          ],
-        }),
-      );
 
-      return memberAccount;
-    }),
+  const participantQueries = convertListIdToQueries({
+    idList: participants,
+  });
+  const participantData = flatten(
+    await Promise.all(
+      participantQueries.map(async ({ ids }) => {
+        return denormalisedResponseEntities(
+          await integrationSdk.users.query({
+            meta_id: `${ids}`,
+            include: ['profileImage'],
+            'fields.image': [
+              `variants.${EImageVariants.squareSmall}`,
+              `variants.${EImageVariants.squareSmall2x}`,
+            ],
+          }),
+        );
+      }),
+    ),
   );
-  const anonymousParticipantData = await Promise.all(
-    anonymous.map(async (id: string) => {
-      const [memberAccount] = denormalisedResponseEntities(
-        await integrationSdk.users.show({
-          id,
-        }),
-      );
 
-      return memberAccount;
-    }),
+  const anonymousParticipantQueries = convertListIdToQueries({
+    idList: anonymous,
+  });
+  const anonymousParticipantData = flatten(
+    await Promise.all(
+      anonymousParticipantQueries.map(async ({ ids }) => {
+        return denormalisedResponseEntities(
+          await integrationSdk.users.query({
+            meta_id: `${ids}`,
+          }),
+        );
+      }),
+    ),
   );
 
   data = { ...data, participantData, anonymousParticipantData };

@@ -14,7 +14,7 @@ import { updateParticipantOrderApi } from '@apis/index';
 import { participantPostRatingApi } from '@apis/participantApi';
 import { fetchTxApi, queryTransactionApi } from '@apis/txApi';
 import { disableWalkthroughApi, fetchSearchFilterApi } from '@apis/userApi';
-import { getParticipantOrdersQuery } from '@helpers/listingSearchQuery';
+import { getParticipantOrdersQueries } from '@helpers/listingSearchQuery';
 import { markColorForOrder } from '@helpers/orderHelper';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { userThunks } from '@redux/slices/user.slice';
@@ -169,13 +169,17 @@ const fetchOrders = createAsyncThunk(
   FETCH_ORDERS,
   async ({ userId, selectedMonth }: TObject, { extra: sdk, getState }) => {
     const { currentUser } = getState().user;
-    const query = getParticipantOrdersQuery({
+    const queries = getParticipantOrdersQueries({
       userId,
       startDate: selectedMonth.getTime(),
       endDate: getEndOfMonth(selectedMonth).getTime(),
     });
-    const response = await sdk.listings.query(query);
-    const orders = denormalisedResponseEntities(response);
+    const responses = await Promise.all(
+      queries.map(async (query) =>
+        denormalisedResponseEntities(await sdk.listings.query(query)),
+      ),
+    );
+    const orders = flatten(responses);
 
     const allPlansIdList = orders.map((order: TListing) => {
       const orderListing = Listing(order);
@@ -226,13 +230,19 @@ const fetchOrders = createAsyncThunk(
       {},
     );
     const currentUserGetter = CurrentUser(currentUser!);
-    const { companyList } = currentUserGetter.getMetadata();
-    const { data: transactions } = await queryTransactionApi({
-      dataParams: {
-        createdAtEnd: getEndOfMonth(selectedMonth),
-        companyId: companyList[0],
-      },
-    });
+    const { companyList = [] } = currentUserGetter.getMetadata();
+    let transactions = [];
+
+    if (companyList[0]) {
+      const { data } = await queryTransactionApi({
+        dataParams: {
+          createdAtEnd: getEndOfMonth(selectedMonth),
+          companyId: companyList[0],
+        },
+      });
+
+      transactions = data;
+    }
 
     return {
       orders,

@@ -1,4 +1,5 @@
 import { getIntegrationSdk } from '@services/sdk';
+import type { TObject } from '@src/utils/types';
 import { denormalisedResponseEntities } from '@utils/data';
 import type { EMenuMealType } from '@utils/enums';
 
@@ -68,6 +69,29 @@ export const queryAllTransactions = async ({
     include,
     query,
   });
+};
+
+export const convertListIdToQueries = ({
+  idList = [],
+  query = {},
+  include = [],
+}: any = {}) => {
+  let queries: TObject[] = [];
+  const queryCount = Math.round(idList.length / 100 + 0.5);
+
+  for (let index = 0; index < queryCount; index++) {
+    const subList = idList.slice(index * 100, (index + 1) * 100);
+
+    queries = queries.concat({
+      ids: subList.join(','),
+      query: {
+        ...query,
+      },
+      include,
+    });
+  }
+
+  return queries;
 };
 
 export type TCheckUnConflictedParams = {

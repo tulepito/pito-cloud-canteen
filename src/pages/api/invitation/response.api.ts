@@ -1,14 +1,56 @@
+import { mapLimit } from 'async';
 import isEmpty from 'lodash/isEmpty';
+import uniq from 'lodash/uniq';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
+import { queryAllListings } from '@helpers/apiHelpers';
 import cookies from '@services/cookie';
-import { fetchUser } from '@services/integrationHelper';
+import { fetchListing, fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { createFirebaseDocNotification } from '@services/notifications';
 import { getSdk, handleError } from '@services/sdk';
 import { UserPermission } from '@src/types/UserPermission';
-import { ENotificationType } from '@src/utils/enums';
-import { denormalisedResponseEntities, User } from '@utils/data';
+import {
+  EListingType,
+  ENotificationType,
+  EOrderStates,
+  EOrderType,
+  EParticipantOrderStatus,
+} from '@src/utils/enums';
+import type { TListing, TObject } from '@src/utils/types';
+import { denormalisedResponseEntities, Listing, User } from '@utils/data';
+
+const prepareNewOrderDetailPlan = ({
+  newMemberId,
+  planListing,
+}: {
+  newMemberId: string;
+  planListing: TListing;
+}) => {
+  const { orderDetail = {} } = Listing(planListing).getMetadata();
+  const newOrderDetail = Object.entries(orderDetail).reduce<TObject>(
+    (result, [date, orderDetailByDate]) => {
+      const { memberOrders = {} } = (orderDetailByDate as TObject) || {};
+
+      return {
+        ...result,
+        [date]: {
+          ...(orderDetailByDate as TObject),
+          memberOrders: {
+            ...memberOrders,
+            [newMemberId]: {
+              foodId: '',
+              status: EParticipantOrderStatus.empty,
+            },
+          },
+        },
+      };
+    },
+    {},
+  );
+
+  return newOrderDetail;
+};
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   const sdk = getSdk(req, res);
@@ -79,6 +121,64 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       userId,
       companyName,
     });
+
+    // TODO: update picking for new member
+    // Step 1: query picking order
+    const allPickingOrders = await queryAllListings({
+      query: {
+        meta_listingType: EListingType.order,
+        meta_orderType: EOrderType.group,
+        meta_orderState: EOrderStates.picking,
+        meta_companyId: companyId,
+        meta_selectedGroups: 'allMembers',
+      },
+    });
+    // Step 2. Create update function
+    const updateFn = async (order: TListing) => {
+      const orderId = Listing(order).getId();
+      const {
+        participants = [],
+        anonymous = [],
+        plans = [],
+      } = Listing(order).getMetadata();
+
+      // todo: if user already in participant list, stop update process
+      if (participants.includes(userId)) {
+        return;
+      }
+
+      await integrationSdk.listings.update({
+        id: orderId,
+        metadata: {
+          participants: uniq(participants.concat(userId)),
+          anonymous: anonymous.filter((id: string) => id !== userId),
+        },
+      });
+
+      // todo: if user already in anonymous list, stop update process
+      if (anonymous.includes(userId)) {
+        return;
+      }
+
+      const planId = plans[0];
+      if (!isEmpty(planId)) {
+        const planListing = await fetchListing(planId);
+
+        const newOrderDetail = prepareNewOrderDetailPlan({
+          planListing,
+          newMemberId: userId,
+        });
+        await integrationSdk.listings.update({
+          id: planId,
+          metadata: {
+            orderDetail: newOrderDetail,
+            orderDetailTemp: undefined,
+          },
+        });
+      }
+    };
+    // Step 3. Call function update data
+    mapLimit(allPickingOrders, 10, updateFn);
 
     return res.json({
       message: 'userAccept',
