@@ -6,9 +6,11 @@ import classNames from 'classnames';
 
 import { InlineTextButton } from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
+import IconCamera from '@components/Icons/IconCamera/IconCamera';
 import IconClose from '@components/Icons/IconClose/IconClose';
 import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
 import ImageFromFile from '@components/ImageFromFile/ImageFromFile';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
 import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
 import { isUploadImageOverLimitError } from '@utils/errors';
 import type {
@@ -27,6 +29,7 @@ type TPhotoWithOverlay = TDefaultProps & {
   onRemoveImage: (id: any) => void;
   onClick?: () => void;
   variants: TImageVariant[];
+  shouldShowClearBtn?: boolean;
 };
 
 const PhotoWithOverlay = (props: TPhotoWithOverlay) => {
@@ -37,6 +40,7 @@ const PhotoWithOverlay = (props: TPhotoWithOverlay) => {
     onRemoveImage,
     onClick,
     variants,
+    shouldShowClearBtn = true,
   } = props;
   const handleRemoveClick = (e: any) => {
     e.stopPropagation();
@@ -63,8 +67,16 @@ const PhotoWithOverlay = (props: TPhotoWithOverlay) => {
   }
   const classes = classNames(css.thumbnail, className);
 
+  const handleClick = (e: any) => {
+    if (!shouldShowClearBtn) {
+      handleRemoveClick(e);
+    }
+
+    if (onClick) onClick();
+  };
+
   return (
-    <div onClick={onClick} className={css.previewImage}>
+    <div onClick={handleClick} className={css.previewImage}>
       <div className={classes}>
         <div className={css.threeToTwoWrapper}>
           <div className={css.aspectWrapper}>
@@ -77,12 +89,15 @@ const PhotoWithOverlay = (props: TPhotoWithOverlay) => {
           </div>
         </div>
       </div>
-      <InlineTextButton
-        type="button"
-        className={css.removeButton}
-        onClick={handleRemoveClick}>
-        <IconClose />
-      </InlineTextButton>
+
+      <RenderWhen condition={shouldShowClearBtn}>
+        <InlineTextButton
+          type="button"
+          className={css.removeButton}
+          onClick={handleRemoveClick}>
+          <IconClose />
+        </InlineTextButton>
+      </RenderWhen>
     </div>
   );
 };
@@ -104,6 +119,10 @@ export type TFieldPhotoUpload = {
   variants: string[];
   uploadImageError?: any;
   iconUploadClassName?: string;
+  shouldHideIconWhenEmpty?: boolean;
+  shouldShowIconCameraWhenEmpty?: boolean;
+  iconCameraClassName?: string;
+  shouldShowClearBtn?: boolean;
   name: string;
   id: string;
   validate?: any;
@@ -130,6 +149,10 @@ const FieldPhotoUpload: React.FC<TFieldPhotoUpload> = (props) => {
             uploadImageError,
             iconUploadClassName,
             meta,
+            shouldHideIconWhenEmpty = false,
+            shouldShowClearBtn = true,
+            iconCameraClassName,
+            shouldShowIconCameraWhenEmpty = false,
           } = fieldRenderProps;
           const onChange = async (e: ChangeEvent<HTMLInputElement>) => {
             const { files } = e.target;
@@ -184,7 +207,6 @@ const FieldPhotoUpload: React.FC<TFieldPhotoUpload> = (props) => {
           // field has been touched and the validation has failed.
 
           const hasError = !!(touched && invalid && error);
-          console.log({ hasError });
 
           return !fieldDisabled ? (
             <>
@@ -201,6 +223,7 @@ const FieldPhotoUpload: React.FC<TFieldPhotoUpload> = (props) => {
                     savedImageAltText={`${input.name} asset`}
                     variants={variants}
                     onRemoveImage={removeFn}
+                    shouldShowClearBtn={shouldShowClearBtn}
                   />
                 ) : (
                   <label htmlFor={input.name} className={classNames(css.label)}>
@@ -209,10 +232,23 @@ const FieldPhotoUpload: React.FC<TFieldPhotoUpload> = (props) => {
                         css.iconUpload,
                         iconUploadClassName,
                       )}>
-                      <ResponsiveImage
-                        image={null}
-                        alt={`${input.name} asset`}
-                      />
+                      <RenderWhen condition={!shouldHideIconWhenEmpty}>
+                        <ResponsiveImage
+                          image={null}
+                          alt={`${input.name} asset`}
+                        />
+                      </RenderWhen>
+                    </div>
+
+                    <div
+                      className={classNames(
+                        css.iconCameraContainer,
+                        {
+                          [css.hideIconCamera]: !shouldShowIconCameraWhenEmpty,
+                        },
+                        iconCameraClassName,
+                      )}>
+                      <IconCamera />
                     </div>
                   </label>
                 )}
