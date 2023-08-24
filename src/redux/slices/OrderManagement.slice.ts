@@ -833,12 +833,13 @@ const bookerStartOrder = createAsyncThunk(
       client: clientQuotation,
     };
     const { data: response } = await createQuotationApi(orderId, apiBody);
-    // Function is not ready on production
 
-    await sendPartnerNewOrderAppearEmailApi(orderId, {
-      orderId,
-      partner: partnerQuotation,
-    });
+    if (process.env.NEXT_APP_ALLOW_PARTNER_EMAIL_SEND === 'true') {
+      await sendPartnerNewOrderAppearEmailApi(orderId, {
+        orderId,
+        partner: partnerQuotation,
+      });
+    }
     initializePaymentApi(orderId, plans[0]);
 
     return response;
@@ -944,11 +945,13 @@ const updateOrderFromDraftEdit = createAsyncThunk(
         if (draftSubOrderChangesHistoryByDate.length > 0) {
           const { restaurant = {} } = draftOrderDetail[date] || {};
 
-          await sendOrderDetailUpdatedEmailApi({
-            orderId,
-            timestamp: date,
-            restaurantId: restaurant.id!,
-          });
+          if (process.env.NEXT_APP_ALLOW_PARTNER_EMAIL_SEND === 'true') {
+            await sendOrderDetailUpdatedEmailApi({
+              orderId,
+              timestamp: date,
+              restaurantId: restaurant.id!,
+            });
+          }
 
           await Promise.all(
             draftSubOrderChangesHistoryByDate.map(
