@@ -42,6 +42,9 @@ const uploadImage = createAsyncThunk(
         `variants.${EImageVariants.squareSmall}`,
         `variants.${EImageVariants.squareSmall2x}`,
         `variants.${EImageVariants.scaledLarge}`,
+        `variants.${EImageVariants.landscapeCrop2x}`,
+        `variants.${EImageVariants.scaledMedium}`,
+        `variants.${EImageVariants.scaledXLarge}`,
       ],
     };
     const uploadImageResponse = await sdk.images.upload(

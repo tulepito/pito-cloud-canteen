@@ -1,0 +1,21 @@
+@use '/src/styles/mixins.scss' as *;
+
+.alertMessage {
+  @include textTemplate(14px, 700, 20px);
+}
+
+.formRoot {
+  padding: 16px 16px 48px;
+  display: flex;
+  flex-direction: column;
+  row-gap: 12px;
+
+  button {
+    width: 100%;
+  }
+}
+
+.label {
+  @include textTemplate(14px, 600, 20px);
+  margin-bottom: 8px;
+}
