@@ -1,0 +1,40 @@
+@use '/src/styles/mixins.scss' as *;
+
+.root {
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  row-gap: 16px;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  row-gap: 8px;
+
+  .label {
+    @include textTemplate(14px, 600, 20px);
+  }
+}
+
+.mealContainer {
+  display: flex;
+  flex-direction: row;
+  gap: 8px 12px;
+  flex-wrap: wrap;
+
+  .mealBadge {
+    padding: 8px 16px;
+  }
+}
+
+.categoryContainer {
+  display: flex;
+  flex-direction: row;
+  gap: 8px 12px;
+  flex-wrap: wrap;
+
+  .categoryBadge {
+    padding: 8px 16px;
+  }
+}

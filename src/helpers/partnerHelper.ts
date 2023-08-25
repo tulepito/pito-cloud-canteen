@@ -11,12 +11,13 @@ export const createSubmitUpdatePartnerValues = (
     uploadedAvatars = [],
     oldImages = [],
     location,
-    contactorName = '',
+    contactorName,
     removedImageIds = [],
     website = '',
     facebookLink = '',
+    meals,
+    categories,
   } = values;
-
   const { selectedPlace = {} } = location || {};
   const { address, origin } = selectedPlace;
 
@@ -32,16 +33,18 @@ export const createSubmitUpdatePartnerValues = (
       ...getSubmitImageId(oldImages),
     ]).filter((image) => !removedImageIds.includes(image.uuid)),
     publicData: {
-      location: { address },
+      ...(address ? { location: { address } } : {}),
       ...(avatarImageIdMaybe !== null && avatarImageIdMaybe
         ? { avatarImageId: avatarImageIdMaybe }
         : {}),
       ...(coverImageIdMaybe !== null && coverImageIdMaybe
         ? { coverImageId: coverImageIdMaybe }
         : {}),
-      website,
-      facebookLink,
-      contactorName,
+      ...(website ? { website } : {}),
+      ...(facebookLink ? { facebookLink } : {}),
+      ...(contactorName ? { contactorName } : {}),
+      ...(meals ? { meals } : {}),
+      ...(categories ? { categories } : {}),
     },
   };
 

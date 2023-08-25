@@ -437,6 +437,29 @@ export const MEAL_OPTIONS = [
   },
 ];
 
+export const MEAL_OPTIONS_WITH_TIME = [
+  {
+    key: 'breakfast',
+    label: 'Ăn sáng (6h30 - 10h30)',
+  },
+  {
+    key: 'lunch',
+    label: 'Ăn trưa (10h30 - 14h)',
+  },
+  {
+    key: 'dinner',
+    label: 'Ăn tối (16h30 - 22h)',
+  },
+  {
+    key: 'brunch',
+    label: 'Ăn xế',
+  },
+  {
+    key: 'snack',
+    label: 'Ăn vặt',
+  },
+];
+
 export const CATEGORY_OPTIONS = [
   {
     key: 'categories-Thuần Việt',
