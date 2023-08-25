@@ -62,6 +62,8 @@ const OrderQuotationDetail: React.FC<OrderQuotationDetailProps> = (props) => {
     serviceFees = {},
     vatSettings = {},
     packagePerMember = 0,
+    hasSpecificPCCFee = false,
+    specificPCCFee = 0,
   } = Listing(order).getMetadata();
   const { title: orderTitle = '' } = Listing(order).getAttributes();
 
@@ -88,9 +90,13 @@ const OrderQuotationDetail: React.FC<OrderQuotationDetailProps> = (props) => {
         partnerId: currentPartnerId,
         currentOrderServiceFeePercentage: partnerServiceFee / 100,
         shouldSkipVAT: partnerVATSetting === EPartnerVATSetting.direct,
+        hasSpecificPCCFee,
+        specificPCCFee,
       }),
     [
       isPartner,
+      hasSpecificPCCFee,
+      specificPCCFee,
       partnerServiceFee,
       partnerVATSetting,
       vatPercentage,
