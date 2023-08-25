@@ -276,6 +276,7 @@ export const partnerPaths = {
   AccountSettingsDetail: '/partner/settings/account/info',
   MenuSettings: '/partner/settings/account/menu',
   BankSettings: '/partner/settings/account/bank',
+  RestaurantSettings: '/partner/settings/restaurant',
 };
 
 export const partnerRoutes = {

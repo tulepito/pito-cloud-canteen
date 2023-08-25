@@ -13,7 +13,7 @@ import IconLock from '@components/Icons/IconLock/IconLock';
 import IconUser from '@components/Icons/IconUser2/IconUser2';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { currentUserSelector } from '@redux/slices/user.slice';
-import { participantPaths, partnerPaths } from '@src/paths';
+import { partnerPaths } from '@src/paths';
 import { OwnListing } from '@src/utils/data';
 import { EImageVariants } from '@src/utils/enums';
 import { isUploadImageOverLimitError } from '@src/utils/errors';
@@ -102,8 +102,8 @@ const PartnerSettingsPage = () => {
     router.push(partnerPaths.ChangePassword);
   };
 
-  const openSpecialDemandModal = () => {
-    router.push(participantPaths.AccountSpecialDemand);
+  const handleNavigateToRestaurantSettingsPage = () => {
+    router.push(partnerPaths.RestaurantSettings);
   };
 
   useEffect(() => {
@@ -178,7 +178,9 @@ const PartnerSettingsPage = () => {
           </div>
           <IconArrow direction="right" />
         </div>
-        <div className={css.navigationItem} onClick={openSpecialDemandModal}>
+        <div
+          className={css.navigationItem}
+          onClick={handleNavigateToRestaurantSettingsPage}>
           <div className={css.iconGroup}>
             <IconFood />
             <span>Cài đặt nhà hàng</span>
