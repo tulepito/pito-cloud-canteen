@@ -685,16 +685,17 @@ const deleteDisAllowedMember = createAsyncThunk(
       },
       oldMemberOrders,
     );
+    const updateOrderDetail = {
+      ...metadata.orderDetail,
+      [currentViewDate]: {
+        ...metadata.orderDetail[currentViewDate],
+        memberOrders: newMemberOrders,
+      },
+    };
 
     const updateParams = {
       planId,
-      orderDetail: {
-        ...metadata.orderDetail,
-        [currentViewDate]: {
-          ...metadata.orderDetail[currentViewDate],
-          memberOrders: newMemberOrders,
-        },
-      },
+      orderDetail: updateOrderDetail,
     };
 
     await addUpdateMemberOrder(orderId, updateParams);

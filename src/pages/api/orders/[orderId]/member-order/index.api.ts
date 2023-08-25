@@ -1,9 +1,12 @@
+import isEmpty from 'lodash/isEmpty';
+import uniq from 'lodash/uniq';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HttpMethod } from '@apis/configs';
 import { denormalisedResponseEntities } from '@services/data';
 import { getIntegrationSdk, handleError } from '@services/sdk';
 import { Listing } from '@src/utils/data';
+import type { TObject } from '@src/utils/types';
 
 import { normalizeOrderDetail } from '../../utils';
 
@@ -14,8 +17,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   switch (apiMethod) {
     case HttpMethod.PUT:
       try {
-        const { planId, orderDetail, anonymous } = req.body;
-
+        const { planId, orderDetail, anonymous = [] } = req.body;
         const response = await integrationSdk.listings.update(
           {
             id: planId,
@@ -39,8 +41,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
         const [orderListing] = denormalisedResponseEntities(orderResponse);
 
-        const { deliveryHour } = Listing(orderListing).getMetadata();
-
+        const { deliveryHour, anonymous: currAnonymous = [] } =
+          Listing(orderListing).getMetadata();
         const normalizedOrderDetail = normalizeOrderDetail({
           orderId,
           planId,
@@ -48,14 +50,30 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           deliveryHour,
         });
 
-        if (typeof anonymous !== 'undefined') {
-          await integrationSdk.listings.update({
-            id: orderId,
-            metadata: {
-              anonymous,
+        const memberIds = uniq(
+          Object.entries(orderDetail).reduce<string[]>(
+            (idList, [_key, currentOrderOfDate]) => {
+              const { memberOrders = {} } =
+                (currentOrderOfDate as TObject) || {};
+
+              return idList.concat(Object.keys(memberOrders as TObject));
             },
-          });
-        }
+            [],
+          ),
+        );
+        const shouldNormalizeAnonymousList = isEmpty(anonymous)
+          ? currAnonymous
+          : anonymous;
+        const updateAnonymousList = shouldNormalizeAnonymousList.filter(
+          (id: string) => memberIds.includes(id),
+        );
+        await integrationSdk.listings.update({
+          id: orderId,
+          metadata: {
+            anonymous: updateAnonymousList,
+          },
+        });
+
         await Promise.all(
           normalizedOrderDetail.map(async (order, index) => {
             const { params } = order;
