@@ -554,6 +554,7 @@ const addOrUpdateMemberOrder = createAsyncThunk(
         planData: updatePlanListing.planListing,
         orderDetail,
         newUser: user,
+        anonymous: updateAnonymous,
       };
     } catch (error) {
       console.log(error);
@@ -1755,6 +1756,7 @@ const OrderManagementSlice = createSlice({
         state.addOrUpdateMemberOrderInProgress = false;
         state.draftOrderDetail = payload?.orderDetail;
         state.planData = payload?.planData;
+        state.orderData.attributes.metadata.anonymous = payload?.anonymous;
         state.anonymousParticipantData = state.anonymousParticipantData.concat(
           payload?.newUser,
         );
