@@ -14,6 +14,7 @@ import { updateParticipantOrderApi } from '@apis/index';
 import { participantPostRatingApi } from '@apis/participantApi';
 import { fetchTxApi, queryTransactionApi } from '@apis/txApi';
 import { disableWalkthroughApi, fetchSearchFilterApi } from '@apis/userApi';
+import { convertListIdToQueries } from '@helpers/apiHelpers';
 import { getParticipantOrdersQueries } from '@helpers/listingSearchQuery';
 import { markColorForOrder } from '@helpers/orderHelper';
 import { createAsyncThunk } from '@redux/redux.helper';
@@ -187,25 +188,43 @@ const fetchOrders = createAsyncThunk(
 
       return plans[0];
     });
-    const allPlans = denormalisedResponseEntities(
-      await sdk.listings.query({
-        ids: allPlansIdList,
-      }),
+
+    const planQueries = convertListIdToQueries({ idList: allPlansIdList });
+    const allPlans = flatten(
+      await Promise.all(
+        planQueries.map(async ({ ids }) => {
+          return denormalisedResponseEntities(
+            await sdk.listings.query({
+              ids,
+            }),
+          );
+        }),
+      ),
     );
     const allRelatedRestaurantsIdList = uniq(
-      allPlans.map((plan: TListing) => {
-        const planListing = Listing(plan);
-        const { orderDetail = {} } = planListing.getMetadata();
+      flatten(
+        allPlans.map((plan: TListing) => {
+          const planListing = Listing(plan);
+          const { orderDetail = {} } = planListing.getMetadata();
 
-        return Object.values(orderDetail).map(
-          (subOrder: any) => subOrder?.restaurant?.id,
-        );
-      }),
+          return Object.values(orderDetail).map(
+            (subOrder: any) => subOrder?.restaurant?.id,
+          );
+        }),
+      ),
     );
-    const allRelatedRestaurants = denormalisedResponseEntities(
-      await sdk.listings.query({
-        ids: allRelatedRestaurantsIdList,
-      }),
+    const allRelatedRestaurants = flatten(
+      await Promise.all(
+        convertListIdToQueries({ idList: allRelatedRestaurantsIdList }).map(
+          async ({ ids }) => {
+            return denormalisedResponseEntities(
+              await sdk.listings.query({
+                ids,
+              }),
+            );
+          },
+        ),
+      ),
     );
     const mappingSubOrderToOrder = orders.reduce(
       (result: any, order: TListing) => {
@@ -246,7 +265,7 @@ const fetchOrders = createAsyncThunk(
 
     return {
       orders,
-      allPlans: flatten(allPlans),
+      allPlans,
       restaurants: allRelatedRestaurants,
       mappingSubOrderToOrder,
       subOrderTxs: transactions,
