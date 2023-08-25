@@ -1,0 +1,119 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.container {
+  padding: 16px 16px 80px;
+  position: relative;
+  overflow: hidden;
+
+  @include viewportMedium {
+    padding: 0 24px;
+  }
+}
+
+.title {
+  @include textTemplate(20px, 700, 22px);
+  width: 100%;
+  text-align: center;
+  position: relative;
+  bottom: 60px;
+}
+
+.mediaFieldGroup {
+  position: relative;
+  width: 100%;
+}
+
+.fieldAvatar {
+  width: 120px;
+  height: 120px;
+  position: relative;
+  left: 50%;
+  bottom: 72px;
+  transform: translateX(-50%);
+  z-index: 1;
+  background-color: $neutralGray1;
+  box-shadow: $boxShadowPopup;
+  border-radius: 50%;
+  overflow: visible;
+
+  & div {
+    border-radius: 50%;
+    width: 120px;
+    height: 120px;
+  }
+
+  & label > div {
+    width: unset;
+    height: unset;
+  }
+
+  & img {
+    border-radius: 50%;
+    width: 120px;
+    height: 120px;
+  }
+}
+
+.coverIconUpload {
+  padding: 0;
+  background-color: $neutralGray3;
+}
+
+.avatarIconUpload {
+  bottom: 0;
+  right: 0;
+}
+
+.mediaFields {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.mediaTitle {
+  margin-bottom: 40px;
+}
+
+.fieldCover {
+  width: 100%;
+  max-width: 1440px;
+  height: 160px;
+  background-color: $neutralGray1;
+  box-shadow: $boxShadowPopup;
+  @include viewportLarge {
+    height: 300px;
+  }
+}
+
+.navigationWrapper {
+  @include flexAlign(unset, center);
+  flex-direction: column;
+  gap: 24px;
+
+  @include viewportLarge {
+    display: none;
+  }
+
+  .navigationItem {
+    @include flexAlign(center, space-between);
+    padding-bottom: 16px;
+    border-bottom: 1px solid $neutralGray3;
+    cursor: pointer;
+  }
+
+  .iconGroup {
+    @include flexAlign(center);
+    gap: 16px;
+
+    svg {
+      path {
+        fill: $neutralGray5;
+      }
+    }
+    span {
+      @include textTemplate(16px, $fontWeightSemiBold, 24px);
+    }
+  }
+}

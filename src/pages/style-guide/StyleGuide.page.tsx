@@ -8,6 +8,7 @@ import Badge, { EBadgeType } from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
 import FieldCheckbox from '@components/FormFields/FieldCheckbox/FieldCheckbox';
+import FieldDateRangePicker from '@components/FormFields/FieldDateRangePicker/FieldDateRangePicker';
 import FieldPasswordInput from '@components/FormFields/FieldPasswordInput/FieldPasswordInput';
 import FieldSelect from '@components/FormFields/FieldSelect/FieldSelect';
 import FieldTextArea from '@components/FormFields/FieldTextArea/FieldTextArea';
@@ -109,6 +110,10 @@ const StyleGuidePage = (props: any) => {
   const modalControl = useBoolean(false);
   const [pageCurrent, setPageCurrent] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [dateRange, setDateRange] = useState<any>({
+    startDate: null,
+    endDate: null,
+  });
   const onShowSizeChange = (current: number, _pageSize: number) => {
     setPageSize(_pageSize);
   };
@@ -220,6 +225,20 @@ const StyleGuidePage = (props: any) => {
                   id="content"
                   label="Field text area"
                   placeholder="Input Content"
+                />
+                <FieldDateRangePicker
+                  id="dateRangeField"
+                  name="dateRangeField"
+                  selected={dateRange.startDate}
+                  onChange={(values: [Date | null, Date | null]) => {
+                    console.log('values: ', values);
+                    setDateRange({
+                      startDate: values[0],
+                      endDate: values[1],
+                    });
+                  }}
+                  startDate={dateRange.startDate}
+                  endDate={dateRange.endDate}
                 />
 
                 <Button type="submit" fullWidth style={{ margin: '16px 0' }}>
