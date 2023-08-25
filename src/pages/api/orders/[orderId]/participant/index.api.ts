@@ -69,11 +69,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
               [date]: {
                 ...(orderDetailOnDate as TObject),
                 memberOrders: {
-                  ...memberOrders,
                   [userId]: {
                     foodId: '',
                     status: EParticipantOrderStatus.empty,
                   },
+                  ...memberOrders,
                 },
               },
             };
@@ -81,12 +81,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           {},
         );
 
-        const updateAnonymousList = anonymous?.includes(userId)
-          ? anonymous?.splice(
-              anonymous.findIndex((id: string) => userId === id),
-              1,
-            )
-          : anonymous;
+        const updateAnonymousList = anonymous.filter(
+          (id: string) => id !== userId,
+        );
 
         await integrationSdk.listings.update({
           id: orderId,
