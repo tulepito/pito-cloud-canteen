@@ -2,12 +2,14 @@ import { createSlice } from '@reduxjs/toolkit';
 import omit from 'lodash/omit';
 
 import { fetchSearchFilterApi } from '@apis/userApi';
+import { queryAllPages } from '@helpers/apiHelpers';
 import { createSubmitUpdatePartnerValues } from '@helpers/partnerHelper';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { CurrentUser, denormalisedResponseEntities } from '@src/utils/data';
 import { EImageVariants } from '@src/utils/enums';
 import { storableError } from '@src/utils/errors';
 import { pickRenderableImagesByProperty } from '@src/utils/images';
+import { ETransition } from '@src/utils/transaction';
 import type {
   TCurrentUser,
   TKeyValue,
@@ -42,6 +44,9 @@ type TPartnerSettingsState = {
   // update
   updateRestaurantInprogress: boolean;
   updateRestaurantError: any;
+
+  // inprogress transactions
+  inProgressTransactions: any[];
 };
 const initialState: TPartnerSettingsState = {
   nutritions: [],
@@ -69,6 +74,8 @@ const initialState: TPartnerSettingsState = {
   // update
   updateRestaurantInprogress: false,
   updateRestaurantError: null,
+
+  inProgressTransactions: [],
 };
 
 // ================ Thunk types ================ //
@@ -105,7 +112,19 @@ const loadData = createAsyncThunk(
       ],
     });
 
-    return denormalisedResponseEntities(restaurantResponse)[0];
+    const inProgressTransactions = await queryAllPages({
+      sdkModel: sdk.transactions,
+      query: {
+        listingId: restaurantListingId,
+        lastTransitions: ETransition.INITIATE_TRANSACTION,
+      },
+      include: ['booking'],
+    });
+
+    return {
+      restaurantListing: denormalisedResponseEntities(restaurantResponse)[0],
+      inProgressTransactions,
+    };
   },
 );
 
@@ -332,7 +351,8 @@ const PartnerSettingsSlice = createSlice({
       })
       .addCase(loadData.fulfilled, (state, { payload }) => {
         state.fetchDataInProgress = false;
-        state.restaurantListing = payload;
+        state.restaurantListing = payload?.restaurantListing;
+        state.inProgressTransactions = payload?.inProgressTransactions;
       })
       .addCase(loadData.rejected, (state, { payload }) => {
         state.fetchDataInProgress = false;
