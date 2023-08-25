@@ -128,7 +128,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       query: {
         meta_listingType: EListingType.order,
         meta_orderType: EOrderType.group,
-        meta_orderState: EOrderStates.picking,
+        meta_orderState: `has_any:${EOrderStates.picking}`,
         meta_companyId: companyId,
         meta_selectedGroups: 'allMembers',
       },
