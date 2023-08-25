@@ -46,6 +46,7 @@ type TResultDetailModalProps = {
   openFromCalendar?: boolean;
   timestamp?: number;
   onSearchSubmit?: (value: string, restaurantId: string) => void;
+  packagePerMember?: number;
 };
 
 const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
@@ -59,6 +60,7 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
   fetchFoodInProgress,
   openFromCalendar,
   timestamp: propTimestamp,
+  packagePerMember = 0,
 }) => {
   const intl = useIntl();
   const router = useRouter();
@@ -325,6 +327,7 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
               onClickFood={handleOpenFoodDetail}
               selectedFoodIds={selectedFoods}
               fetchFoodInProgress={fetchFoodInProgress}
+              packagePerMember={packagePerMember}
             />
           </div>
         </div>
