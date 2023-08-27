@@ -43,8 +43,9 @@ const SubOrderCard: React.FC<TSubOrderCardProps> = (props) => {
   const { name: restaurantName } = restaurant;
   const orderTitle = event?.title || '';
   const isFoodPicked = !!event.resource?.dishSelection?.dishSelection;
+  const isNotJoined = status === EVENT_STATUS.NOT_JOINED_STATUS;
   const isExpired = isOver(event.resource?.expiredTime);
-  const isExpiredToPickFood = isExpired && !isFoodPicked;
+  const isExpiredToPickFood = isExpired && !isFoodPicked && !isNotJoined;
   const headerStyles = {
     backgroundColor: isExpiredToPickFood ? '#8C8C8C' : orderColor,
   };

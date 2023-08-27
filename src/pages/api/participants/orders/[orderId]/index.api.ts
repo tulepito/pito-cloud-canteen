@@ -3,17 +3,16 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HttpMethod } from '@apis/configs';
+import { LISTING_TYPE } from '@pages/api/helpers/constants';
 import cookies from '@services/cookie';
 import { fetchListing, fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk, getSdk, handleError } from '@services/sdk';
+import type { TListing } from '@src/utils/types';
 import {
   CurrentUser,
   denormalisedResponseEntities,
   Listing,
 } from '@utils/data';
-
-import type { TListing } from '../../../../utils/types';
-import { LISTING_TYPE } from '../../helpers/constants';
 
 const fetchSubOrder = async (orderDetail: any) => {
   let orderDetailResult = {};

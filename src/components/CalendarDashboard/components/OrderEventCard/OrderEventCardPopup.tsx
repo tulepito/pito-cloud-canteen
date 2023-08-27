@@ -1,4 +1,5 @@
-import React from 'react';
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, { useMemo } from 'react';
 import type { Event } from 'react-big-calendar';
 import { FormattedMessage, useIntl } from 'react-intl';
 import isEmpty from 'lodash/isEmpty';
@@ -34,6 +35,9 @@ type TOrderEventCardPopupProps = {
   fetchSubOrderTxInProgress: boolean;
   fetchSubOrderDocumentInProgress: boolean;
   openRatingSubOrderModal: () => void;
+  onCloseEventCardPopup: () => void;
+  onPickForMe: () => void;
+  pickFoodForSpecificSubOrderInProgress?: boolean;
 };
 
 const OrderEventCardPopup: React.FC<TOrderEventCardPopupProps> = ({
@@ -45,6 +49,9 @@ const OrderEventCardPopup: React.FC<TOrderEventCardPopupProps> = ({
   fetchSubOrderTxInProgress,
   fetchSubOrderDocumentInProgress,
   openRatingSubOrderModal,
+  onCloseEventCardPopup,
+  onPickForMe,
+  pickFoodForSpecificSubOrderInProgress,
 }) => {
   const router = useRouter();
   const intl = useIntl();
@@ -80,6 +87,11 @@ const OrderEventCardPopup: React.FC<TOrderEventCardPopupProps> = ({
 
   const { reviewId } = subOrderDocument;
 
+  const dishSelectionFormInitialValues = useMemo(
+    () => dishSelection,
+    [JSON.stringify(dishSelection)],
+  );
+
   const onSelectDish = async (
     values: TDishSelectionFormValues,
     reject?: boolean,
@@ -112,6 +124,7 @@ const OrderEventCardPopup: React.FC<TOrderEventCardPopupProps> = ({
         timestamp: parseInt(`${timestamp}`, 10),
       }),
     );
+    onCloseEventCardPopup();
   };
 
   const onNavigateToOrderDetail = () => {
@@ -119,6 +132,12 @@ const OrderEventCardPopup: React.FC<TOrderEventCardPopupProps> = ({
       pathname: participantPaths.PlanDetail,
       query: { orderDay: timestamp, planId, from },
     });
+  };
+
+  const handlePickForMe = () => {
+    if (status !== EParticipantOrderStatus.empty) return;
+
+    onPickForMe();
   };
 
   return (
@@ -160,7 +179,9 @@ const OrderEventCardPopup: React.FC<TOrderEventCardPopupProps> = ({
               dishes={dishes}
               onSubmit={onSelectDish}
               subOrderStatus={status}
-              initialValues={dishSelection}
+              initialValues={dishSelectionFormInitialValues}
+              onPickForMe={handlePickForMe}
+              pickForMeInProgress={pickFoodForSpecificSubOrderInProgress}
             />
           </div>
         </div>

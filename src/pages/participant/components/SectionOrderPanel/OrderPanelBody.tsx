@@ -34,7 +34,6 @@ const OrderPanelBody: React.FC<TOrderPanelBody> = ({
       })}>
       <Button
         variant="inline"
-        disabled
         onClick={onAutoSelect}
         className={css.autoSelect}>
         <IconRefreshing className={css.iconRefresh} />
