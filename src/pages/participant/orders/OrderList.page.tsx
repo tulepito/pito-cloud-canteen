@@ -7,6 +7,7 @@ import flatten from 'lodash/flatten';
 import { DateTime } from 'luxon';
 import { useRouter } from 'next/router';
 
+import Avatar from '@components/Avatar/Avatar';
 import BottomNavigationBar from '@components/BottomNavigationBar/BottomNavigationBar';
 import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
 import OrderEventCard from '@components/CalendarDashboard/components/OrderEventCard/OrderEventCard';
@@ -16,12 +17,13 @@ import useSelectDay from '@components/CalendarDashboard/hooks/useSelectDay';
 import LoadingModal from '@components/LoadingModal/LoadingModal';
 import ParticipantLayout from '@components/ParticipantLayout/ParticipantLayout';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
+import Tabs from '@components/Tabs/Tabs';
 import { getItem, setItem } from '@helpers/localStorageHelpers';
 import { isOver } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { useViewport } from '@hooks/useViewport';
-import { CurrentUser, Listing } from '@src/utils/data';
+import { CurrentUser, Listing, User } from '@src/utils/data';
 import {
   diffDays,
   getDaySessionFromDeliveryTime,
@@ -31,7 +33,7 @@ import {
   isSameDate,
 } from '@src/utils/dates';
 import { EOrderStates, EParticipantOrderStatus } from '@src/utils/enums';
-import type { TListing, TObject } from '@src/utils/types';
+import type { TListing, TObject, TUser } from '@src/utils/types';
 
 import ParticipantToolbar from '../components/ParticipantToolbar/ParticipantToolbar';
 
@@ -139,6 +141,11 @@ const OrderListPage = () => {
 
   const pickFoodForSpecificSubOrderInProgress = useAppSelector(
     (state) => state.ParticipantOrderList.pickFoodForSpecificSubOrderInProgress,
+  );
+
+  const company = useAppSelector(
+    (state) => state.ParticipantOrderList.company,
+    shallowEqual,
   );
 
   const currentUserGetter = CurrentUser(currentUser!);
@@ -454,12 +461,8 @@ const OrderListPage = () => {
     dispatch(OrderListThunks.fetchParticipantFirebaseNotifications());
   }, []);
 
-  return (
-    <ParticipantLayout>
-      <OrderListHeaderSection
-        openNotificationModal={notificationModalControl.setTrue}
-        numberOfUnseenNotifications={numberOfUnseenNotifications}
-      />
+  const orderListPageContent = (
+    <>
       <div className={css.calendarContainer}>
         <CalendarDashboard
           anchorDate={selectedDay}
@@ -564,6 +567,34 @@ const OrderListPage = () => {
           onClose={notificationModalControl.setFalse}
         />
       </RenderWhen>
+    </>
+  );
+
+  const tabOptions = [
+    {
+      id: 'company',
+      label: (
+        <div className={css.companyTab}>
+          <Avatar
+            className={css.companyAvatar}
+            user={company as TUser}
+            disableProfileLink
+          />
+          <span>{User(company as TUser).getPublicData()?.companyName}</span>
+        </div>
+      ),
+      childrenFn: () => orderListPageContent,
+      childrenProps: {},
+    },
+  ];
+
+  return (
+    <ParticipantLayout>
+      <OrderListHeaderSection
+        openNotificationModal={notificationModalControl.setTrue}
+        numberOfUnseenNotifications={numberOfUnseenNotifications}
+      />
+      <Tabs items={tabOptions as any} headerClassName={css.tabHeader} />
 
       <BottomNavigationBar />
       <LoadingModal isOpen={showLoadingModal} />

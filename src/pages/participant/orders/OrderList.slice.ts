@@ -40,6 +40,7 @@ import type {
   TListing,
   TObject,
   TTransaction,
+  TUser,
 } from '@src/utils/types';
 
 import { SubOrdersThunks } from '../sub-orders/SubOrders.slice';
@@ -93,6 +94,8 @@ type TOrderListState = {
 
   pickFoodForSpecificSubOrderInProgress: boolean;
   pickFoodForSpecificSubOrderError: any;
+
+  company: TUser | null;
 };
 const initialState: TOrderListState = {
   nutritions: [],
@@ -143,6 +146,8 @@ const initialState: TOrderListState = {
 
   pickFoodForSpecificSubOrderInProgress: false,
   pickFoodForSpecificSubOrderError: null,
+
+  company: null,
 };
 
 export const getFoodIdListWithSuitablePrice = ({
@@ -376,13 +381,25 @@ const fetchOrders = createAsyncThunk(
       {},
     );
     const currentUserGetter = CurrentUser(currentUser!);
-    const { companyList } = currentUserGetter.getMetadata();
-    const { data: transactions } = await queryTransactionApi({
-      dataParams: {
-        createdAtEnd: getEndOfMonth(selectedMonth),
-        companyId: companyList[0],
-      },
-    });
+    const { companyList = [] } = currentUserGetter.getMetadata();
+    const companyId = companyList[0] || null;
+    let transactions = [];
+    let company = null;
+    if (companyId) {
+      const { data } = await queryTransactionApi({
+        dataParams: {
+          createdAtEnd: getEndOfMonth(selectedMonth),
+          companyId: companyList[0],
+        },
+      });
+      transactions = data;
+      const companyResponse = denormalisedResponseEntities(
+        await sdk.users.show({
+          id: companyList[0],
+        }),
+      )[0];
+      company = companyResponse;
+    }
 
     return {
       orders,
@@ -390,6 +407,7 @@ const fetchOrders = createAsyncThunk(
       restaurants: allRelatedRestaurants,
       mappingSubOrderToOrder,
       subOrderTxs: transactions,
+      company,
     };
   },
 );
@@ -875,6 +893,7 @@ const OrderListSlice = createSlice({
           ...state.mappingSubOrderToOrder,
           ...payload.mappingSubOrderToOrder,
         };
+        state.company = payload.company;
       })
       .addCase(fetchOrders.rejected, (state, { error }) => {
         state.fetchOrdersInProgress = false;
