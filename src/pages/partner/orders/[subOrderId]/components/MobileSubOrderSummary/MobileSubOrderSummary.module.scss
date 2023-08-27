@@ -1,0 +1,73 @@
+@use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.container {
+  padding: 20px 16px 0;
+}
+
+.title {
+  @include textTemplate(16px, $fontWeightSemiBold, 24px);
+}
+
+.dishTable {
+  margin-top: 12px;
+
+  .tableHeader {
+    border-radius: 8px;
+    background-color: $neutralGray3;
+    @include flexAlign(center);
+    gap: 8px;
+    padding: 10px 12px;
+    @include textTemplate(14px, $fontWeightBold, 20px);
+
+    .orderNumber {
+      flex-basis: 40px;
+    }
+
+    .foodNameContainer {
+      flex-basis: 40%;
+    }
+
+    .price {
+      flex-basis: 40%;
+    }
+  }
+
+  .tableBody {
+    padding: 10px 12px;
+
+    .itemWrapper {
+      border-bottom: 1px solid $neutralGray3;
+      padding: 12px 0;
+      gap: 8px;
+      @include flexAlign(center);
+
+      .orderNumber {
+        flex-basis: 40px;
+        @include textTemplate(14px, $fontWeightRegular, 20px);
+      }
+
+      .foodNameContainer {
+        flex-basis: 40%;
+        @include flexAlign(center);
+        gap: 8px;
+        @include textTemplate(14px, $fontWeightSemiBold, 20px);
+
+        .noteIconContainer {
+          display: inline-flex;
+        }
+      }
+
+      .priceWrapper {
+        flex-basis: 40%;
+        text-align: right;
+        @include textTemplate(14px, $fontWeightSemiBold, 20px);
+      }
+    }
+  }
+}
+
+.viewOrderDetail {
+  @include textTemplate(14px, $fontWeightBold, 24px);
+}

@@ -4,6 +4,7 @@ import { DateTime } from 'luxon';
 import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
 import { isJoinedPlan } from '@helpers/orderHelper';
 import type { TPlan } from '@src/utils/orderTypes';
+import { ETransition } from '@src/utils/transaction';
 import type { TObject } from '@src/utils/types';
 
 type TPlanOrderDetail = TPlan['orderDetail'];
@@ -159,7 +160,11 @@ export const prepareNewPlanOrderDetail = (
     (prev, [date, orderOfDate]: [string, TOrderOfDate]) => {
       return {
         ...prev,
-        [date]: { ...orderOfDate, transactionId: transactionIdMap[date] },
+        [date]: {
+          ...orderOfDate,
+          transactionId: transactionIdMap[date],
+          lastTransition: ETransition.INITIATE_TRANSACTION,
+        },
       };
     },
     {},

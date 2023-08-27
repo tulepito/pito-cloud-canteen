@@ -6,7 +6,7 @@ import { getIntegrationSdk } from '@services/integrationSdk';
 import { Listing, User } from '@utils/data';
 import { EOrderStates } from '@utils/enums';
 
-export const startOrder = async (orderId: string) => {
+export const startOrder = async (orderId: string, planId: string) => {
   const integrationSdk = getIntegrationSdk();
 
   const [orderListing] = denormalisedResponseEntities(
@@ -18,6 +18,7 @@ export const startOrder = async (orderId: string) => {
     companyId,
     orderState,
     orderStateHistory = [],
+    partnerIds = [],
   } = Listing(orderListing).getMetadata();
 
   if (orderState !== EOrderStates.picking) {
@@ -45,6 +46,13 @@ export const startOrder = async (orderId: string) => {
       orderVATPercentage: systemVATPercentage,
       hasSpecificPCCFee,
       specificPCCFee,
+    },
+  });
+
+  await integrationSdk.listings.update({
+    id: planId,
+    metadata: {
+      partnerIds,
     },
   });
 

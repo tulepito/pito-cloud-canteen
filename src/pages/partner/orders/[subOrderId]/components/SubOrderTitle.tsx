@@ -27,7 +27,7 @@ const SubOrderTitle: React.FC<TSubOrderTitleProps> = () => {
   // eslint-disable-next-line no-unsafe-optional-chaining
   const [, date] = (subOrderId as string)?.split('_');
   const dayIndex = new Date(Number(date)).getDay();
-  const { transaction } = order || {};
+  const { lastTransition } = order || {};
   const orderGetter = Listing(order as TListing);
   const { title: orderTitle = '' } = orderGetter.getAttributes();
 
@@ -35,18 +35,20 @@ const SubOrderTitle: React.FC<TSubOrderTitleProps> = () => {
     <RenderWhen condition={!fetchOrderInProgress}>
       <div className={css.root}>
         <div className={css.mainTitle}>
-          {intl.formatMessage(
-            { id: 'SubOrderTitle.mainTitle' },
-            {
-              orderTitle: (
-                <span className={css.orderTitle}>
-                  #{orderTitle}_{dayIndex === 0 ? 7 : dayIndex}
-                </span>
-              ),
-            },
-          )}
+          <div>
+            {intl.formatMessage(
+              { id: 'SubOrderTitle.mainTitle' },
+              {
+                orderTitle: (
+                  <span className={css.orderTitle}>
+                    #{orderTitle}_{dayIndex === 0 ? 7 : dayIndex}
+                  </span>
+                ),
+              },
+            )}
+          </div>
 
-          <SubOrderBadge transaction={transaction} />
+          <SubOrderBadge lastTransition={lastTransition} />
         </div>
         <div className={css.note}>
           {intl.formatMessage(

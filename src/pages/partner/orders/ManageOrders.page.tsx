@@ -12,6 +12,8 @@ import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import IconFilter from '@components/Icons/IconFilter/IconFilter';
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import NamedLink from '@components/NamedLink/NamedLink';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
+import SlideModal from '@components/SlideModal/SlideModal';
 import SubOrderBadge from '@components/SubOrderBadge/SubOrderBadge';
 import type { TColumn } from '@components/Table/Table';
 import { TableForm } from '@components/Table/Table';
@@ -20,6 +22,9 @@ import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
 import { parseThousandNumber } from '@helpers/format';
 import { calculateSubOrderPrice } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import useBoolean from '@hooks/useBoolean';
+import { useViewport } from '@hooks/useViewport';
+import EmptySubOrder from '@pages/participant/orders/components/EmptySubOrder/EmptySubOrder';
 import { partnerPaths } from '@src/paths';
 import { formatTimestamp } from '@src/utils/dates';
 import { EOrderDraftStates, EOrderType } from '@utils/enums';
@@ -27,6 +32,7 @@ import type { TObject, TTableSortValue } from '@utils/types';
 
 import type { TFilterPartnerOrderFormValues } from './components/FilterPartnerOrderForm';
 import FilterPartnerOrderForm from './components/FilterPartnerOrderForm';
+import PartnerSubOrderCard from './components/PartnerSubOrderCard/PartnerSubOrderCard';
 import {
   PartnerManageOrdersActions,
   PartnerManageOrdersThunks,
@@ -104,8 +110,8 @@ const TABLE_COLUMN: TColumn[] = [
   {
     key: 'state',
     label: 'Trạng thái',
-    render: ({ transaction = {} }: TObject) => {
-      return <SubOrderBadge transaction={transaction} />;
+    render: ({ lastTransition }: TObject) => {
+      return <SubOrderBadge lastTransition={lastTransition} />;
     },
   },
   {
@@ -139,7 +145,7 @@ const parseEntitiesToTableData = (subOrders: TObject[]) => {
       memberOrders = {},
       restaurant,
       lineItems = [],
-      transaction,
+      lastTransition,
       isPaid,
     } = entity;
     const dayIndex = new Date(Number(date)).getDay();
@@ -174,7 +180,7 @@ const parseEntitiesToTableData = (subOrders: TObject[]) => {
         endDate: endDate ? formatTimestamp(endDate) : '',
         state: EOrderDraftStates.pendingApproval,
         deliveryHour: formattedDeliveryHour,
-        transaction,
+        lastTransition,
         isPaid,
       },
     };
@@ -210,6 +216,8 @@ const sortOrders = ({ columnName, type }: TTableSortValue, data: any) => {
 const ManageOrdersPage = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
+  const { isMobileLayout } = useViewport();
+  const filterPartnerSubOrderModalController = useBoolean();
   // eslint-disable-next-line @typescript-eslint/naming-convention
   const {
     query: { page = 1, name, subOrderId, startTime, endTime, status },
@@ -242,7 +250,7 @@ const ManageOrdersPage = () => {
       subOrderId: subOrderId as string,
       subOrderStartTime: Number(startTime || 0),
       subOrderEndTime: Number(endTime || 0),
-      subOrderStatus: status as string,
+      subOrderStatus: ((status as string) || '').split(','),
     }),
     [name, subOrderId, startTime, endTime, status],
   );
@@ -262,26 +270,33 @@ const ManageOrdersPage = () => {
   } else if (currentSubOrders?.length > 0) {
     content = (
       <>
-        <TableForm
-          columns={TABLE_COLUMN}
-          data={sortedData}
-          pagination={pagination}
-          paginationPath={partnerPaths.ManageOrders}
-          shouldReplacePathWhenChangePage
-          tableBodyCellClassName={css.bodyCell}
-          tableHeadCellClassName={css.headCell}
-          handleSort={handleSort}
-          sortValue={sortValue}
-          tableWrapperClassName={css.tableWrapper}
-          tableClassName={css.table}
-        />
+        <div className={css.mobileContentWrapper}>
+          {sortedData.map((item: TObject) => (
+            <PartnerSubOrderCard key={item.key} data={item.data} />
+          ))}
+        </div>
+        <div className={css.desktopContentWrapper}>
+          <TableForm
+            columns={TABLE_COLUMN}
+            data={sortedData}
+            pagination={pagination}
+            paginationPath={partnerPaths.ManageOrders}
+            shouldReplacePathWhenChangePage
+            tableBodyCellClassName={css.bodyCell}
+            tableHeadCellClassName={css.headCell}
+            handleSort={handleSort}
+            sortValue={sortValue}
+            tableWrapperClassName={css.tableWrapper}
+            tableClassName={css.table}
+          />
+        </div>
       </>
     );
   } else {
     content = (
-      <p>
-        <FormattedMessage id="ManageOrders.noResults" />
-      </p>
+      <div className={css.emptyWrapper}>
+        <EmptySubOrder />
+      </div>
     );
   }
 
@@ -298,7 +313,7 @@ const ManageOrdersPage = () => {
         ...(name ? { name } : {}),
         ...(startTime ? { startTime } : {}),
         ...(endTime ? { endTime } : {}),
-        ...(status ? { status } : {}),
+        ...(status ? { status: status.join(',') } : {}),
         ...(subOrderId ? { subOrderId } : {}),
       },
     });
@@ -314,6 +329,7 @@ const ManageOrdersPage = () => {
           ...(endTime ? { endTime } : {}),
           ...(status ? { status } : {}),
           ...(subOrderId ? { subOrderId } : {}),
+          isMobile: isMobileLayout,
         }),
       );
     }
@@ -330,6 +346,7 @@ const ManageOrdersPage = () => {
             ...(endTime ? { endTime } : {}),
             ...(status ? { status } : {}),
             ...(subOrderId ? { subOrderId } : {}),
+            isMobile: isMobileLayout,
           }),
         );
       });
@@ -342,6 +359,14 @@ const ManageOrdersPage = () => {
         <h1 className={css.title}>
           <FormattedMessage id="ManageOrders.title" />
         </h1>
+        <Button
+          variant="secondary"
+          className={css.mobileFilterBtn}
+          onClick={filterPartnerSubOrderModalController.setTrue}>
+          <div className={css.filterIconContainer}>
+            <IconFilter className={css.filterIcon} />
+          </div>
+        </Button>
       </div>
 
       <Tooltip
@@ -362,6 +387,18 @@ const ManageOrdersPage = () => {
         </Button>
       </Tooltip>
       {content}
+
+      <RenderWhen condition={isMobileLayout}>
+        <SlideModal
+          id="FilterPartnerSubOrderModal"
+          isOpen={filterPartnerSubOrderModalController.value}
+          onClose={filterPartnerSubOrderModalController.setFalse}>
+          <FilterPartnerOrderForm
+            initialValues={initialFilterFormValues}
+            onSubmit={handleFilterChange}
+          />
+        </SlideModal>
+      </RenderWhen>
     </div>
   );
 };
