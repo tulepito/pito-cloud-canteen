@@ -4,6 +4,7 @@ import Modal from '@components/Modal/Modal';
 import { useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { Listing } from '@src/utils/data';
+import { formatTimestamp } from '@src/utils/dates';
 
 import type { TRestaurantSettingFormValues } from './RestaurantSettingForm';
 import RestaurantSettingForm from './RestaurantSettingForm';
@@ -30,6 +31,9 @@ const RestaurantSettingModal: React.FC<TNavigationModalProps> = (props) => {
     changePasswordSuccessModalControl.setFalse();
   };
 
+  const stopReceiveOrderInfo = `${formatTimestamp()} -  ${formatTimestamp()}`;
+  const dayOffInfo = `${formatTimestamp()} -  ${formatTimestamp()}`;
+
   return (
     <Modal
       isOpen={isOpen}
@@ -48,6 +52,8 @@ const RestaurantSettingModal: React.FC<TNavigationModalProps> = (props) => {
           onSubmit={handleSubmit}
           initialValues={{
             isActive,
+            dayOffInfo,
+            stopReceiveOrderInfo,
           }}
         />
 

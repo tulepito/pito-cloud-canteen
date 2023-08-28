@@ -54,3 +54,13 @@
     justify-content: center;
   }
 }
+
+.slideModalActions {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  column-gap: 16px;
+  > * {
+    flex-basis: calc(50% - 8px);
+  }
+}
