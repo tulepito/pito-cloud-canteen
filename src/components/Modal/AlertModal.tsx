@@ -29,6 +29,7 @@ type TAlertModal = {
   confirmClassName?: string;
   childrenClassName?: string;
   shouldFullScreenInMobile?: boolean;
+  shouldHideIconClose?: boolean;
 };
 
 const AlertModal: React.FC<PropsWithChildren<TAlertModal>> = ({
@@ -50,6 +51,7 @@ const AlertModal: React.FC<PropsWithChildren<TAlertModal>> = ({
   confirmClassName,
   childrenClassName,
   shouldFullScreenInMobile = true,
+  shouldHideIconClose = false,
   cancelInProgress = false,
 }) => {
   const shouldShowCancelButton =
@@ -59,9 +61,13 @@ const AlertModal: React.FC<PropsWithChildren<TAlertModal>> = ({
   const shouldShowActionSection =
     shouldShowCancelButton || shouldShowConfirmButton;
 
-  const childrenClasses = classNames(css.children, childrenClassName, {
-    [css.hasActionSection]: shouldShowActionSection,
-  });
+  const childrenClasses = classNames(
+    css.children,
+    {
+      [css.hasActionSection]: shouldShowActionSection,
+    },
+    childrenClassName,
+  );
 
   return (
     <Modal
@@ -71,6 +77,7 @@ const AlertModal: React.FC<PropsWithChildren<TAlertModal>> = ({
       title={title}
       isOpen={isOpen}
       handleClose={handleClose}
+      shouldHideIconClose={shouldHideIconClose}
       containerClassName={classNames(css.container, containerClassName)}
       shouldFullScreenInMobile={shouldFullScreenInMobile}>
       <div className={childrenClasses}>{children}</div>

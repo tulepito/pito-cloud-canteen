@@ -3,13 +3,22 @@ import { useState } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Field, Form as FinalForm } from 'react-final-form';
 
+import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
 import FieldDateRangePicker from '@components/FormFields/FieldDateRangePicker/FieldDateRangePicker';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import IconCalendar from '@components/Icons/IconCalender/IconCalender';
+import IconDanger from '@components/Icons/IconDanger/IconDanger';
+import LoadingModal from '@components/LoadingModal/LoadingModal';
+import AlertModal from '@components/Modal/AlertModal';
 import SlideModal from '@components/SlideModal/SlideModal';
 import Toggle from '@components/Toggle/Toggle';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
+import { Listing } from '@src/utils/data';
+import { formatTimestamp } from '@src/utils/dates';
+
+import { PartnerSettingsThunks } from '../../PartnerSettings.slice';
 
 import css from './RestaurantSettingForm.module.scss';
 
@@ -25,18 +34,109 @@ const RestaurantSettingFormComponent: React.FC<
   TRestaurantSettingFormComponentProps
 > = (props) => {
   const { handleSubmit } = props;
+  const dispatch = useAppDispatch();
   const dayOffControl = useBoolean();
   const stopReceiveOrderControl = useBoolean();
+  const cannotTurnOffAppStatusControl = useBoolean();
+  const cannotUpdateDayOffRangeControl = useBoolean();
+  const toggleAppStatusInProgress = useAppSelector(
+    (state) => state.PartnerSettingsPage.toggleAppStatusInProgress,
+  );
+  const inProgressTransactions = useAppSelector(
+    (state) => state.PartnerSettingsPage.inProgressTransactions,
+  );
+  const restaurantListing = useAppSelector(
+    (state) => state.PartnerSettingsPage.restaurantListing,
+  );
+  const today = new Date();
 
   const [dayOffRange, setDayOffRange] = useState<any>({
-    startDate: null,
-    endDate: null,
+    startDate: today,
+    endDate: today,
+  });
+  const [stopReceiveOrderRange, setStopReceiveOrderRange] = useState<any>({
+    startDate: today,
+    endDate: today,
   });
 
-  const [stopReceiveOrderRange, setStopReceiveOrderRange] = useState<any>({
-    startDate: null,
-    endDate: null,
-  });
+  const { isActive = true } = Listing(restaurantListing).getPublicData();
+
+  // Toggle App status
+  const inProgressTransactionsAfterToDay = inProgressTransactions
+    .reduce((txList: Date[], { booking }: any) => {
+      return booking?.attributes?.displayEnd > today
+        ? txList.concat(booking?.attributes?.displayStart)
+        : txList;
+    }, [])
+    .sort((a: Date, b: Date) => a.getTime() - b.getTime()) as Date[];
+
+  const inProgressTransactionsAfterToDayCount =
+    inProgressTransactionsAfterToDay.length;
+  const nearestNextDateHaveInProgressOrder =
+    inProgressTransactionsAfterToDayCount > 0
+      ? inProgressTransactionsAfterToDay[0]
+      : new Date();
+  const theBestFarNextDateHaveInProgressOrder =
+    inProgressTransactionsAfterToDayCount > 1
+      ? inProgressTransactionsAfterToDay[
+          inProgressTransactionsAfterToDayCount - 1
+        ]
+      : nearestNextDateHaveInProgressOrder;
+
+  const isEnableTurnOffAppStatus =
+    !isActive || (isActive && inProgressTransactionsAfterToDayCount === 0);
+  const isToggleAppStatusDisabled = toggleAppStatusInProgress;
+
+  const handleToggleStatusClick = () => {
+    if (isEnableTurnOffAppStatus) {
+      dispatch(PartnerSettingsThunks.toggleRestaurantActiveStatus());
+    } else {
+      cannotTurnOffAppStatusControl.setTrue();
+    }
+  };
+
+  // Day off
+  const inProgressTransactionsInDayOffRange = inProgressTransactions
+    .reduce((txList: Date[], { booking }: any) => {
+      const { startDate, endDate } = dayOffRange;
+
+      const bookingEndTime = booking?.attributes?.displayEnd;
+      const bookingStartTime = booking?.attributes?.displayStart;
+
+      const validBooking =
+        (startDate instanceof Date ? startDate : today) <= bookingStartTime &&
+        bookingEndTime <= (endDate instanceof Date ? endDate : today);
+
+      return validBooking
+        ? txList.concat(booking?.attributes?.displayStart)
+        : txList;
+    }, [])
+    .sort((a: Date, b: Date) => a.getTime() - b.getTime());
+
+  const inProgressTransactionsInDayOffRangeCount =
+    inProgressTransactionsInDayOffRange.length;
+  const nearestNextDateHaveInProgressOrderForDayOff =
+    inProgressTransactionsInDayOffRangeCount > 0
+      ? inProgressTransactionsInDayOffRange[0]
+      : new Date();
+  const theBestFarNextDateHaveInProgressOrderForDayOff =
+    inProgressTransactionsInDayOffRangeCount > 1
+      ? inProgressTransactionsInDayOffRange[
+          inProgressTransactionsInDayOffRangeCount - 1
+        ]
+      : nearestNextDateHaveInProgressOrderForDayOff;
+
+  const isEnableUpdateDateOffRangeAppStatus =
+    !isActive || (isActive && inProgressTransactionsInDayOffRangeCount === 0);
+
+  const handleUpdateDayOffRangeClick = () => {
+    if (isEnableUpdateDateOffRangeAppStatus) {
+      dayOffControl.setFalse();
+    } else {
+      dayOffControl.setFalse();
+      cannotUpdateDayOffRangeControl.setTrue();
+    }
+  };
 
   return (
     <Form onSubmit={handleSubmit} className={css.formRoot}>
@@ -73,7 +173,39 @@ const RestaurantSettingFormComponent: React.FC<
         name="dayOffInfo"
         label="Cập nhật lịch nghỉ"
         leftIcon={<IconCalendar />}
+        onClick={dayOffControl.setTrue}
       />
+      <AlertModal
+        id="RestaurantSettingForm.alertWarningCannotUpdateDayOffRange"
+        shouldHideIconClose
+        shouldFullScreenInMobile={false}
+        containerClassName={css.cannotTurnOffAppStatus}
+        childrenClassName={css.cannotTurnOffAppStatusChildren}
+        actionsClassName={css.cannotTurnOffAppStatusAction}
+        cancelLabel="Huỷ"
+        onCancel={cannotUpdateDayOffRangeControl.setFalse}
+        isOpen={cannotUpdateDayOffRangeControl.value}
+        handleClose={cannotUpdateDayOffRangeControl.setFalse}>
+        <div className={css.cannotTurnOffAppStatusContent}>
+          <IconDanger className={css.iconDanger} />
+          <div className={css.title}>Không thể cập nhật lịch nghỉ</div>
+          <div>
+            Hiện có{' '}
+            <b>
+              <u>{inProgressTransactionsInDayOffRange.length} đơn</u>
+            </b>{' '}
+            đang được triển khai từ ngày{' '}
+            {formatTimestamp(
+              nearestNextDateHaveInProgressOrderForDayOff.getTime(),
+            )}{' '}
+            tới{' '}
+            {formatTimestamp(
+              theBestFarNextDateHaveInProgressOrderForDayOff.getTime(),
+            )}
+            .
+          </div>
+        </div>
+      </AlertModal>
 
       <Field id="RestaurantSettingForm.isActive" name="isActive">
         {(props) => {
@@ -84,34 +216,41 @@ const RestaurantSettingFormComponent: React.FC<
               label={'Tắt app'}
               id={id}
               name={input.name}
+              disabled={isToggleAppStatusDisabled}
               status={input.value ? 'on' : 'off'}
               onClick={(value) => {
-                input.onChange(value);
+                if (isEnableTurnOffAppStatus) input.onChange(value);
+                handleToggleStatusClick();
               }}
               className={css.activeAppToggle}
             />
           );
         }}
       </Field>
-
-      <SlideModal
-        id="RestaurantSettingForm.dayOffRangeSlideModal"
-        isOpen={dayOffControl.value}
-        onClose={dayOffControl.setFalse}>
-        <FieldDateRangePicker
-          id="RestaurantSettingForm.dayOff"
-          name="dayOffRange"
-          selected={dayOffRange.startDate}
-          onChange={(values: [Date | null, Date | null]) => {
-            setDayOffRange({
-              startDate: values[0],
-              endDate: values[1],
-            });
-          }}
-          startDate={dayOffRange.startDate}
-          endDate={dayOffRange.endDate}
-        />
-      </SlideModal>
+      <AlertModal
+        shouldHideIconClose
+        shouldFullScreenInMobile={false}
+        containerClassName={css.cannotTurnOffAppStatus}
+        childrenClassName={css.cannotTurnOffAppStatusChildren}
+        actionsClassName={css.cannotTurnOffAppStatusAction}
+        cancelLabel="Huỷ"
+        onCancel={cannotTurnOffAppStatusControl.setFalse}
+        isOpen={cannotTurnOffAppStatusControl.value}
+        handleClose={cannotTurnOffAppStatusControl.setFalse}>
+        <div className={css.cannotTurnOffAppStatusContent}>
+          <IconDanger className={css.iconDanger} />
+          <div className={css.title}>Không thể tắt app</div>
+          <div>
+            Hiện có{' '}
+            <b>
+              <u>{inProgressTransactionsAfterToDay.length} đơn</u>
+            </b>{' '}
+            đang được triển khai từ ngày{' '}
+            {formatTimestamp(nearestNextDateHaveInProgressOrder.getTime())} tới{' '}
+            {formatTimestamp(theBestFarNextDateHaveInProgressOrder.getTime())}.
+          </div>
+        </div>
+      </AlertModal>
 
       <SlideModal
         id="RestaurantSettingForm.stopReceiveOrderRangeSlideModal"
@@ -131,6 +270,33 @@ const RestaurantSettingFormComponent: React.FC<
           endDate={stopReceiveOrderRange.endDate}
         />
       </SlideModal>
+
+      <SlideModal
+        id="RestaurantSettingForm.dayOffRangeSlideModal"
+        isOpen={dayOffControl.value}
+        onClose={dayOffControl.setFalse}>
+        <FieldDateRangePicker
+          id="RestaurantSettingForm.dayOff"
+          name="dayOffRange"
+          selected={dayOffRange.startDate}
+          onChange={(values: [Date | null, Date | null]) => {
+            setDayOffRange({
+              startDate: values[0],
+              endDate: values[1],
+            });
+          }}
+          startDate={dayOffRange.startDate}
+          endDate={dayOffRange.endDate}
+        />
+        <div className={css.slideModalActions}>
+          <Button variant="inline" onClick={dayOffControl.setFalse}>
+            Hủy
+          </Button>
+          <Button onClick={handleUpdateDayOffRangeClick}>Áp dụng</Button>
+        </div>
+      </SlideModal>
+
+      <LoadingModal isOpen={toggleAppStatusInProgress} />
     </Form>
   );
 };
