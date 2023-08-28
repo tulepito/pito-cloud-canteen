@@ -69,12 +69,6 @@
     color: $neutralGray5;
     margin: 0;
     @include lineClamp(2);
-    display: none;
-
-    @include viewportMedium {
-      display: block;
-      white-space: nowrap;
-    }
   }
 }
 
@@ -105,6 +99,7 @@
     border-radius: 50%;
     border: 1px solid $primaryPri2;
     @include flexCenter;
+    flex-shrink: 0;
   }
 
   .selectDisabled {

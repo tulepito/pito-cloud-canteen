@@ -18,6 +18,8 @@ type TDishSelectionFormProps = {
   initialValues: TDishSelectionFormValues;
   actionsDisabled: boolean;
   subOrderStatus?: string;
+  onPickForMe: () => void;
+  pickForMeInProgress?: boolean;
 };
 
 export type TDishSelectionFormValues = {
@@ -39,6 +41,8 @@ const DishSelectionForm: React.FC<TDishSelectionFormProps> = ({
   initialValues,
   actionsDisabled = false,
   subOrderStatus = EVENT_STATUS.EMPTY_STATUS,
+  onPickForMe,
+  pickForMeInProgress,
 }) => {
   const [clickedType, setClickedType] = useState<
     'reject' | 'submit' | undefined
@@ -74,6 +78,10 @@ const DishSelectionForm: React.FC<TDishSelectionFormProps> = ({
     onSubmit(values, true);
   };
 
+  const handlePickForMe = () => {
+    onPickForMe();
+  };
+
   const dishSelection = useField('dishSelection', form);
   const disabledSubmit =
     actionsDisabled || submitting || hasValidationErrors || pristine;
@@ -95,7 +103,7 @@ const DishSelectionForm: React.FC<TDishSelectionFormProps> = ({
       <div className={css.fieldGroup}>
         {dishes.map((dish, index) => (
           <label
-            key={index}
+            key={`${index}_${initialValues.dishSelection}`}
             className={css.radioLabel}
             title={dish.value}
             htmlFor={`dishSelection-${index}`}>
@@ -115,9 +123,14 @@ const DishSelectionForm: React.FC<TDishSelectionFormProps> = ({
       </div>
       <div className={css.sectionWrapper}>
         <div className={css.row}>
-          {/* <Button className={css.btn} variant="secondary">
+          <Button
+            className={css.btn}
+            variant="secondary"
+            type="button"
+            onClick={handlePickForMe}
+            inProgress={pickForMeInProgress}>
             Chọn giúp tôi
-          </Button> */}
+          </Button>
           <Button
             className={css.btn}
             type="submit"

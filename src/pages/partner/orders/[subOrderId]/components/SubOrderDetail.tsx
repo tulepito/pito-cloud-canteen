@@ -11,6 +11,7 @@ import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { parseThousandNumber } from '@helpers/format';
 import { groupPickingOrderByFood } from '@helpers/order/orderDetailHelper';
 import { useAppSelector } from '@hooks/reduxHooks';
+import { useViewport } from '@hooks/useViewport';
 import { Listing } from '@src/utils/data';
 import type { TListing, TObject } from '@src/utils/types';
 
@@ -29,6 +30,7 @@ const SubOrderDetail: React.FC<TSubOrderDetailProps> = ({
 }) => {
   const intl = useIntl();
   const router = useRouter();
+  const { isMobileLayout } = useViewport();
   const fetchOrderInProgress = useAppSelector(
     (state) => state.PartnerSubOrderDetail.fetchOrderInProgress,
   );
@@ -92,15 +94,19 @@ const SubOrderDetail: React.FC<TSubOrderDetailProps> = ({
   return (
     <RenderWhen condition={!fetchOrderInProgress}>
       <div className={css.root}>
-        <Button
-          variant="inline"
-          className={css.goBackBtn}
-          onClick={onChangeViewMode(
-            EPartnerSubOrderDetailPageViewMode.summary,
-          )}>
-          <IconArrow direction="left" className={css.arrowIcon} />
-          {intl.formatMessage({ id: 'SubOrderDetail.goBackToSummary' })}
-        </Button>
+        <div className={css.goBackBtnWrapper}>
+          <Button
+            variant="inline"
+            className={css.goBackBtn}
+            onClick={onChangeViewMode(
+              EPartnerSubOrderDetailPageViewMode.summary,
+            )}>
+            <IconArrow direction="left" className={css.arrowIcon} />
+            <span className={css.goBackText}>
+              {intl.formatMessage({ id: 'SubOrderDetail.goBackToSummary' })}
+            </span>
+          </Button>
+        </div>
 
         <div className={css.actionContainer}>
           <div className={css.title}>
@@ -144,6 +150,24 @@ const SubOrderDetail: React.FC<TSubOrderDetailProps> = ({
             </div>
             <div></div>
           </div>
+          <div className={css.tableHeadMobile}>
+            <div>
+              {intl.formatMessage({
+                id: 'SubOrderDetail.tableHead.no',
+              })}
+            </div>
+            <div>
+              {intl.formatMessage({
+                id: 'SubOrderDetail.tableHead.foodType',
+              })}
+            </div>
+            <div>
+              {intl.formatMessage({
+                id: 'SubOrderDetail.tableHead.note',
+              })}
+            </div>
+            <div></div>
+          </div>
 
           <div className={css.tableBody}>
             {foodDataList?.map((foodData: TObject, foodIndex: number) => {
@@ -164,11 +188,19 @@ const SubOrderDetail: React.FC<TSubOrderDetailProps> = ({
                   <div className={groupTitleClasses}>
                     <div>{foodIndex + 1}</div>
                     <div>{foodName}</div>
-                    <div>{frequency}</div>
-                    <div>{parseThousandNumber(foodPrice || 0)}đ</div>
-                    <div>
-                      {parseThousandNumber((foodPrice || 0) * frequency)}đ
-                    </div>
+                    <RenderWhen condition={!isMobileLayout}>
+                      <div>{frequency}</div>
+                      <div>{parseThousandNumber(foodPrice || 0)}đ</div>
+                      <div>
+                        {parseThousandNumber((foodPrice || 0) * frequency)}đ
+                      </div>
+
+                      <RenderWhen.False>
+                        <div>{`${frequency} x ${parseThousandNumber(
+                          foodPrice || 0,
+                        )}đ`}</div>
+                      </RenderWhen.False>
+                    </RenderWhen>
                     <div
                       className={css.actionCell}
                       onClick={handleClickGroupTitle(foodIndex)}>
@@ -184,6 +216,7 @@ const SubOrderDetail: React.FC<TSubOrderDetailProps> = ({
                           </div>
                           <div>{name}</div>
                           <div title={note}>{note || '-'}</div>
+                          <div></div>
                         </div>
                       );
                     })}

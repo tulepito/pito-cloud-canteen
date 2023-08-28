@@ -23,6 +23,13 @@ const useSubOrderPicking = () => {
   const participantPostRatingInProgress = useAppSelector(
     (state) => state.ParticipantOrderList.participantPostRatingInProgress,
   );
+  const pickFoodForSubOrdersInProgress = useAppSelector(
+    (state) => state.ParticipantOrderList.pickFoodForSubOrdersInProgress,
+  );
+
+  const pickFoodForSpecificSubOrderInProgress = useAppSelector(
+    (state) => state.ParticipantOrderList.pickFoodForSpecificSubOrderInProgress,
+  );
 
   return {
     subOrderDetailModalControl,
@@ -32,6 +39,8 @@ const useSubOrderPicking = () => {
     participantPostRatingInProgress,
     updateSubOrderInProgress,
     updateOrderInProgress,
+    pickFoodForSubOrdersInProgress,
+    pickFoodForSpecificSubOrderInProgress,
   };
 };
 

@@ -69,6 +69,11 @@ const ParticipantOrderManagement = () => {
     (state) => state.ParticipantOrderManagementPage.loadDataInProgress,
   );
 
+  const shouldShowFirstTimeOrderModal = useAppSelector(
+    (state) =>
+      state.ParticipantOrderManagementPage.shouldShowFirstTimeOrderModal,
+  );
+
   const companyUser = User(company as TUser);
   const orderListing = Listing(order as TListing);
   const { orderName } = orderListing.getPublicData();
@@ -183,6 +188,18 @@ const ParticipantOrderManagement = () => {
     router.push(participantPaths.OrderList);
   };
 
+  const updateHideFirstTimeOrderModal = async () => {
+    const { meta } = await dispatch(
+      participantOrderManagementThunks.updateFirstTimeViewOrder(
+        orderId as string,
+      ),
+    );
+
+    if (meta.requestStatus === 'fulfilled') {
+      pickingOrderModalControl.setFalse();
+    }
+  };
+
   return (
     <ParticipantLayout>
       <RenderWhen
@@ -192,7 +209,8 @@ const ParticipantOrderManagement = () => {
           !loadDataInProgress &&
           !isOrderCanceled &&
           !isOrderExpiredStart &&
-          !isTodayAfterStartDate
+          !isTodayAfterStartDate &&
+          shouldShowFirstTimeOrderModal
         }>
         <RenderWhen condition={pickingOrderModalControl.value}>
           <CoverBox
@@ -213,7 +231,7 @@ const ParticipantOrderManagement = () => {
               <Button
                 className={css.btn}
                 disabled={loadDataInProgress}
-                onClick={pickingOrderModalControl.setFalse}>
+                onClick={updateHideFirstTimeOrderModal}>
                 Bắt đầu
               </Button>
             }

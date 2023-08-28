@@ -1,4 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
+import { maxBy } from 'lodash';
+import chunk from 'lodash/chunk';
 import flatten from 'lodash/flatten';
 import uniq from 'lodash/uniq';
 import uniqBy from 'lodash/uniqBy';
@@ -11,13 +13,20 @@ import {
   participantUpdateSeenNotificationApi,
 } from '@apis/firebaseApi';
 import { updateParticipantOrderApi } from '@apis/index';
-import { participantPostRatingApi } from '@apis/participantApi';
+import {
+  participantPostRatingApi,
+  recommendFoodForSubOrdersApi,
+} from '@apis/participantApi';
 import { fetchTxApi, queryTransactionApi } from '@apis/txApi';
 import { disableWalkthroughApi, fetchSearchFilterApi } from '@apis/userApi';
 import { convertListIdToQueries } from '@helpers/apiHelpers';
-import { getParticipantOrdersQueries } from '@helpers/listingSearchQuery';
+import {
+  getFoodQuery,
+  getParticipantOrdersQueries,
+} from '@helpers/listingSearchQuery';
 import { markColorForOrder } from '@helpers/orderHelper';
 import { createAsyncThunk } from '@redux/redux.helper';
+import { ParticipantOrderManagementActions } from '@redux/slices/ParticipantOrderManagementPage.slice';
 import { userThunks } from '@redux/slices/user.slice';
 import {
   CurrentUser,
@@ -25,13 +34,14 @@ import {
   Listing,
 } from '@src/utils/data';
 import { getEndOfMonth } from '@src/utils/dates';
-import { ESubOrderTxStatus } from '@src/utils/enums';
+import { EParticipantOrderStatus, ESubOrderTxStatus } from '@src/utils/enums';
 import { convertStringToNumber } from '@src/utils/number';
 import type {
   TKeyValue,
   TListing,
   TObject,
   TTransaction,
+  TUser,
 } from '@src/utils/types';
 
 import { SubOrdersThunks } from '../sub-orders/SubOrders.slice';
@@ -79,6 +89,14 @@ type TOrderListState = {
   fetchParticipantFirebaseNotificationsInProgress: boolean;
   fetchParticipantFirebaseNotificationsError: any;
   restaurants: TListing[];
+
+  pickFoodForSubOrdersInProgress: boolean;
+  pickFoodForSubOrdersError: any;
+
+  pickFoodForSpecificSubOrderInProgress: boolean;
+  pickFoodForSpecificSubOrderError: any;
+
+  company: TUser | null;
 };
 const initialState: TOrderListState = {
   nutritions: [],
@@ -123,8 +141,140 @@ const initialState: TOrderListState = {
   fetchParticipantFirebaseNotificationsError: null,
 
   restaurants: [],
+
+  pickFoodForSubOrdersInProgress: false,
+  pickFoodForSubOrdersError: null,
+
+  pickFoodForSpecificSubOrderInProgress: false,
+  pickFoodForSpecificSubOrderError: null,
+
+  company: null,
 };
 
+export const getFoodIdListWithSuitablePrice = ({
+  payload,
+  orders,
+  allPlans,
+}: {
+  payload: {
+    planId: string;
+    orderId: string;
+    subOrderDate: string;
+  };
+  orders: TListing[];
+  allPlans: TListing[];
+}) => {
+  const { planId, subOrderDate, orderId } = payload;
+  const order = orders.find((_order) => _order.id.uuid === orderId);
+  const plan = allPlans.find((_plan) => _plan.id.uuid === planId);
+  const orderListing = Listing(order!);
+  const planListing = Listing(plan!);
+  const { packagePerMember = 0 } = orderListing.getMetadata();
+  const { orderDetail = {} } = planListing.getMetadata();
+  const subOrder = orderDetail[subOrderDate];
+  const { foodList } = subOrder.restaurant;
+  const suitablePriceFoodList = Object.keys(foodList).reduce(
+    (result: any, foodId: string) => {
+      const food = foodList[foodId];
+      const { foodPrice } = food;
+      if (foodPrice <= packagePerMember) {
+        result.push(foodId);
+      }
+
+      return result;
+    },
+    [],
+  );
+
+  return suitablePriceFoodList;
+};
+
+export const recommendFood = ({
+  foodList,
+  subOrderFoodIds,
+  allergies,
+}: {
+  foodList: TListing[];
+  subOrderFoodIds: string[];
+  allergies: string[];
+}) => {
+  const subOrderFoodList = foodList.filter((food) =>
+    subOrderFoodIds.includes(food.id.uuid),
+  );
+
+  const filteredFoodListByAllergies = subOrderFoodList.filter(
+    (food) =>
+      !allergies.some((allergy: string) =>
+        Listing(food).getPublicData().allergies.includes(allergy),
+      ),
+  );
+
+  const isAllFoodHaveAllergies = filteredFoodListByAllergies.length === 0;
+
+  const foodListToFilter = isAllFoodHaveAllergies
+    ? subOrderFoodList
+    : filteredFoodListByAllergies;
+
+  const isAllFoodHaveNoRating = foodListToFilter.every(
+    (food) => !Listing(food).getMetadata().rating,
+  );
+
+  const mostSuitableFood = !isAllFoodHaveNoRating
+    ? maxBy(
+        foodListToFilter,
+        (food) => Listing(food).getMetadata()?.rating || 0,
+      )
+    : maxBy(
+        foodListToFilter,
+        (food) => Listing(food).getMetadata()?.pickingTime || 0,
+      );
+
+  return mostSuitableFood;
+};
+
+const updateRecommendFoodToOrderDetail = ({
+  allPlans,
+  planId,
+  currentUserGetter,
+  groupedFood,
+}: {
+  allPlans: TListing[];
+  planId: string;
+  currentUserGetter: any;
+  groupedFood: any;
+}) => {
+  const plan = allPlans.find((_plan) => _plan.id.uuid === planId);
+  const planListing = Listing(plan!);
+  const { orderDetail = {} } = planListing.getMetadata();
+  const newOrderDetail = Object.keys(orderDetail).reduce(
+    (newOrderDetailResult: any, subOrderDate: string) => {
+      if (!groupedFood[planId][subOrderDate]?.id?.uuid)
+        return {
+          ...newOrderDetailResult,
+          [subOrderDate]: {
+            ...orderDetail[subOrderDate],
+          },
+        };
+
+      return {
+        ...newOrderDetailResult,
+        [subOrderDate]: {
+          ...orderDetail[subOrderDate],
+          memberOrders: {
+            ...orderDetail[subOrderDate]?.memberOrders,
+            [currentUserGetter.getId()]: {
+              foodId: groupedFood[planId][subOrderDate].id.uuid,
+              status: EParticipantOrderStatus.joined,
+            },
+          },
+        },
+      };
+    },
+    {},
+  );
+
+  return newOrderDetail;
+};
 // ================ Thunk types ================ //
 const FETCH_ATTRIBUTES = 'app/ParticipantOrderList/FETCH_ATTRIBUTES';
 const UPDATE_PROFILE = 'app/ParticipantOrderList/UPDATE_PROFILE';
@@ -140,9 +290,14 @@ const ADD_SUB_ORDER_DOCUMENT_TO_FIREBASE =
 const FETCH_SUB_ORDERS_FROM_FIREBASE =
   'app/ParticipantOrderList/FETCH_SUB_ORDERS_FROM_FIREBASE';
 const FETCH_PARTICIPANT_FIREBASE_NOTIFICATIONS =
-  'app/FETCH_PARTICIPANT_FIREBASE_NOTIFICATIONS';
+  'app/ParticipantOrderList/FETCH_PARTICIPANT_FIREBASE_NOTIFICATIONS';
 const UPDATE_SEEN_NOTIFICATION_STATUS_TO_FIREBASE =
-  'app/UPDATE_SEEN_NOTIFICATION_STATUS_TO_FIREBASE';
+  'app/ParticipantOrderList/UPDATE_SEEN_NOTIFICATION_STATUS_TO_FIREBASE';
+const PICK_FOOD_FOR_SUB_ORDERS =
+  'app/ParticipantOrderList/PICK_FOOD_FOR_SUB_ORDERS';
+const PICK_FOOD_FOR_SPECIFIC_SUB_ORDER =
+  'app/ParticipantOrderList/PICK_FOOD_FOR_SPECIFIC_SUB_ORDER';
+
 // ================ Async thunks ================ //
 const fetchAttributes = createAsyncThunk(FETCH_ATTRIBUTES, async () => {
   const { data: response } = await fetchSearchFilterApi();
@@ -250,17 +405,23 @@ const fetchOrders = createAsyncThunk(
     );
     const currentUserGetter = CurrentUser(currentUser!);
     const { companyList = [] } = currentUserGetter.getMetadata();
+    const companyId = companyList[0] || null;
     let transactions = [];
-
-    if (companyList[0]) {
+    let company = null;
+    if (companyId) {
       const { data } = await queryTransactionApi({
         dataParams: {
           createdAtEnd: getEndOfMonth(selectedMonth),
           companyId: companyList[0],
         },
       });
-
       transactions = data;
+      const companyResponse = denormalisedResponseEntities(
+        await sdk.users.show({
+          id: companyList[0],
+        }),
+      )[0];
+      company = companyResponse;
     }
 
     return {
@@ -269,6 +430,7 @@ const fetchOrders = createAsyncThunk(
       restaurants: allRelatedRestaurants,
       mappingSubOrderToOrder,
       subOrderTxs: transactions,
+      company,
     };
   },
 );
@@ -381,6 +543,254 @@ const updateSeenNotificationStatusToFirebase = createAsyncThunk(
   },
 );
 
+const pickFoodForSubOrders = createAsyncThunk(
+  PICK_FOOD_FOR_SUB_ORDERS,
+  async (
+    payload: {
+      recommendSubOrders: {
+        planId: string;
+        orderId: string;
+        subOrderDate: string;
+      }[];
+      recommendFrom: 'orderList' | 'orderDetail';
+    },
+    { getState, extra: sdk, dispatch },
+  ) => {
+    const { recommendFrom, recommendSubOrders } = payload;
+    const { orders: orderListOrders, allPlans: orderListAllPlans } =
+      getState().ParticipantOrderList;
+    const { order: detailOrderOrder, plans: detailOrderPlans } =
+      getState().ParticipantOrderManagementPage;
+    const orders =
+      recommendFrom === 'orderList' ? orderListOrders : [detailOrderOrder];
+    const allPlans =
+      recommendFrom === 'orderList' ? orderListAllPlans : detailOrderPlans;
+    const { currentUser } = getState().user;
+    const currentUserGetter = CurrentUser(currentUser!);
+    const { allergies = [] } = currentUserGetter.getPublicData();
+
+    const foodIdChunkList = recommendSubOrders.map(
+      (item) =>
+        getFoodIdListWithSuitablePrice({
+          payload: item,
+          orders,
+          allPlans,
+        }) || [],
+    );
+
+    const flattenFoodIdList = uniq(flatten(foodIdChunkList));
+    const slicedFoodIdsBy100 = chunk(flattenFoodIdList, 100);
+    const foodQueries = slicedFoodIdsBy100.map((foodIds) =>
+      getFoodQuery({
+        foodIds,
+        params: {},
+      }),
+    );
+
+    const foodsResponse: TListing[] = flatten(
+      await Promise.all(
+        foodQueries.map(async (foodQuery) => {
+          const response = denormalisedResponseEntities(
+            await sdk.listings.query(foodQuery),
+          );
+
+          return response;
+        }),
+      ),
+    );
+
+    const groupedFoodBySubOrderDate = recommendSubOrders.reduce(
+      (result: any, item, index: number) => {
+        const subOrderFoodIds = foodIdChunkList[index];
+        const mostSuitableFood = recommendFood({
+          foodList: foodsResponse,
+          subOrderFoodIds,
+          allergies,
+        });
+
+        return {
+          ...result,
+          [item.planId]: {
+            ...result[item.planId],
+            [item.subOrderDate]: mostSuitableFood,
+          },
+        };
+      },
+      {},
+    );
+
+    const mappedRecommendFoodToOrderDetail = Object.keys(
+      groupedFoodBySubOrderDate,
+    ).reduce((result: any, planId) => {
+      const newOrderDetail = updateRecommendFoodToOrderDetail({
+        allPlans,
+        planId,
+        currentUserGetter,
+        groupedFood: groupedFoodBySubOrderDate,
+      });
+
+      return {
+        ...result,
+        [planId]: {
+          orderDetail: newOrderDetail,
+        },
+      };
+    }, {});
+
+    await recommendFoodForSubOrdersApi({ mappedRecommendFoodToOrderDetail });
+    recommendSubOrders.forEach((item) => {
+      const { planId, subOrderDate } = item;
+      participantSubOrderAddDocumentApi({
+        participantId: currentUserGetter.getId(),
+        planId,
+        timestamp: +subOrderDate,
+      });
+    });
+
+    const newAllPlans = allPlans.map((plan: TListing) => {
+      if (
+        Object.keys(mappedRecommendFoodToOrderDetail).includes(plan.id.uuid)
+      ) {
+        return {
+          ...plan,
+          attributes: {
+            ...plan.attributes,
+            metadata: {
+              ...plan.attributes.metadata,
+              orderDetail:
+                mappedRecommendFoodToOrderDetail[plan.id.uuid].orderDetail,
+            },
+          },
+        };
+      }
+
+      return plan;
+    });
+
+    if (recommendFrom === 'orderList') {
+      return newAllPlans;
+    }
+
+    dispatch(ParticipantOrderManagementActions.updatePlans(newAllPlans));
+
+    return orderListAllPlans;
+  },
+);
+
+const pickFoodForSpecificSubOrder = createAsyncThunk(
+  PICK_FOOD_FOR_SPECIFIC_SUB_ORDER,
+  async (
+    payload: {
+      recommendSubOrder: {
+        planId: string;
+        orderId: string;
+        subOrderDate: string;
+      };
+      recommendFrom: 'orderList' | 'orderDetail';
+    },
+    { getState, extra: sdk, dispatch },
+  ) => {
+    const { recommendFrom, recommendSubOrder } = payload;
+    const { planId, subOrderDate } = recommendSubOrder;
+    const { orders: orderListOrders, allPlans: orderListAllPlans } =
+      getState().ParticipantOrderList;
+    const { order: detailOrderOrder, plans: detailOrderPlans } =
+      getState().ParticipantOrderManagementPage;
+    const orders =
+      recommendFrom === 'orderList' ? orderListOrders : [detailOrderOrder];
+    const allPlans =
+      recommendFrom === 'orderList' ? orderListAllPlans : detailOrderPlans;
+    const { currentUser } = getState().user;
+    const currentUserGetter = CurrentUser(currentUser!);
+    const { allergies = [] } = currentUserGetter.getPublicData();
+
+    const foodIdList = getFoodIdListWithSuitablePrice({
+      payload: recommendSubOrder,
+      orders,
+      allPlans,
+    });
+
+    const flattenFoodIdList = uniq<string>(foodIdList);
+    const slicedFoodIdsBy100 = chunk(flattenFoodIdList, 100);
+    const foodQueries = slicedFoodIdsBy100.map((foodIds) =>
+      getFoodQuery({
+        foodIds,
+        params: {},
+      }),
+    );
+
+    const foodsResponse: TListing[] = flatten(
+      await Promise.all(
+        foodQueries.map(async (foodQuery) => {
+          const response = denormalisedResponseEntities(
+            await sdk.listings.query(foodQuery),
+          );
+
+          return response;
+        }),
+      ),
+    );
+
+    const mostSuitableFood = recommendFood({
+      foodList: foodsResponse,
+      subOrderFoodIds: foodIdList,
+      allergies,
+    });
+
+    const groupedFood = {
+      [planId]: {
+        [subOrderDate]: mostSuitableFood,
+      },
+    };
+
+    const newOrderDetail = updateRecommendFoodToOrderDetail({
+      allPlans,
+      planId,
+      currentUserGetter,
+      groupedFood,
+    });
+
+    await recommendFoodForSubOrdersApi({
+      mappedRecommendFoodToOrderDetail: {
+        [planId]: {
+          orderDetail: newOrderDetail,
+        },
+      },
+    });
+
+    participantSubOrderAddDocumentApi({
+      participantId: currentUserGetter.getId(),
+      planId,
+      timestamp: +subOrderDate,
+    });
+
+    const newAllPlans = allPlans.map((plan: TListing) => {
+      if (plan.id.uuid === planId) {
+        return {
+          ...plan,
+          attributes: {
+            ...plan.attributes,
+            metadata: {
+              ...plan.attributes.metadata,
+              orderDetail: newOrderDetail,
+            },
+          },
+        };
+      }
+
+      return plan;
+    });
+
+    if (recommendFrom === 'orderList') {
+      return newAllPlans;
+    }
+
+    dispatch(ParticipantOrderManagementActions.updatePlans(newAllPlans));
+
+    return orderListAllPlans;
+  },
+);
+
 export const OrderListThunks = {
   fetchAttributes,
   updateProfile,
@@ -393,6 +803,8 @@ export const OrderListThunks = {
   fetchSubOrdersFromFirebase,
   fetchParticipantFirebaseNotifications,
   updateSeenNotificationStatusToFirebase,
+  pickFoodForSubOrders,
+  pickFoodForSpecificSubOrder,
 };
 
 // ================ Slice ================ //
@@ -519,6 +931,7 @@ const OrderListSlice = createSlice({
           ...state.mappingSubOrderToOrder,
           ...payload.mappingSubOrderToOrder,
         };
+        state.company = payload.company;
       })
       .addCase(fetchOrders.rejected, (state, { error }) => {
         state.fetchOrdersInProgress = false;
@@ -605,7 +1018,33 @@ const OrderListSlice = createSlice({
           state.fetchParticipantFirebaseNotificationsInProgress = false;
           state.fetchParticipantFirebaseNotificationsError = error.message;
         },
-      );
+      )
+
+      .addCase(pickFoodForSubOrders.pending, (state) => {
+        state.pickFoodForSubOrdersInProgress = true;
+        state.pickFoodForSubOrdersError = false;
+      })
+      .addCase(pickFoodForSubOrders.fulfilled, (state, { payload }) => {
+        state.pickFoodForSubOrdersInProgress = false;
+        state.allPlans = payload;
+      })
+      .addCase(pickFoodForSubOrders.rejected, (state, { error }) => {
+        state.pickFoodForSubOrdersInProgress = false;
+        state.pickFoodForSubOrdersError = error.message;
+      })
+
+      .addCase(pickFoodForSpecificSubOrder.pending, (state) => {
+        state.pickFoodForSpecificSubOrderInProgress = true;
+        state.pickFoodForSpecificSubOrderError = false;
+      })
+      .addCase(pickFoodForSpecificSubOrder.fulfilled, (state, { payload }) => {
+        state.pickFoodForSpecificSubOrderInProgress = false;
+        state.allPlans = payload;
+      })
+      .addCase(pickFoodForSpecificSubOrder.rejected, (state, { error }) => {
+        state.pickFoodForSpecificSubOrderInProgress = false;
+        state.pickFoodForSpecificSubOrderError = error.message;
+      });
   },
 });
 

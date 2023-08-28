@@ -55,6 +55,16 @@ const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({
   const isOrderDeadlineOver = isOverDeadline(order);
   const isOrderAlreadyStarted = orderState !== EOrderStates.picking;
 
+  const getNextSubOrderDay = (dayId: string) => {
+    const subOrderDates = Object.keys(plan);
+
+    const dayIndex = subOrderDates.findIndex((item) => item === dayId);
+    const nextDayIndex =
+      Object.keys(plan).length - 1 === dayIndex ? dayIndex : dayIndex + 1;
+
+    return subOrderDates[nextDayIndex];
+  };
+
   const convertDataToTabItem = () => {
     if (loadDataInProgress) {
       return listingLoading();
@@ -92,7 +102,6 @@ const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({
 
       const selectDisabled =
         isOrderDeadlineOver ||
-        !!hasDishInCart ||
         reloadDataInProgress ||
         submitDataInprogress ||
         isOrderAlreadyStarted;
@@ -107,6 +116,8 @@ const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({
           isSelected={hasDishInCart === dish?.id?.uuid}
           selectDisabled={selectDisabled}
           isOrderAlreadyStarted={isOrderAlreadyStarted}
+          getNextSubOrderDay={getNextSubOrderDay}
+          onSelectTab={onSelectTab}
         />
       ));
 

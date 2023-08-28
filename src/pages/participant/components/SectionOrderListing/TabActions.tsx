@@ -5,6 +5,7 @@ import Button from '@components/Button/Button';
 import IconBanned from '@components/Icons/IconBanned/IconBanned';
 import IconRefreshing from '@components/Icons/IconRefreshing/IconRefreshing';
 import { useAppDispatch } from '@hooks/reduxHooks';
+import { ParticipantPlanThunks } from '@pages/participant/plans/[planId]/ParticipantPlanPage.slice';
 import { shoppingCartThunks } from '@redux/slices/shoppingCart.slice';
 
 import css from './SectionOrderListing.module.scss';
@@ -24,7 +25,10 @@ const TabActions: React.FC<TTabActionsProps> = ({
 }) => {
   const dispatch = useAppDispatch();
 
-  const handleAutoSelect = () => {};
+  const handleAutoSelect = () => {
+    dispatch(ParticipantPlanThunks.recommendFoodSubOrder(orderDay));
+  };
+
   const handleNotJoinDay = () => {
     dispatch(
       shoppingCartThunks.addToCart({

@@ -3,6 +3,14 @@
 @use '/src/styles/mixins.scss' as *;
 @use '/src/styles/defaults.scss' as *;
 
+.root {
+  margin-top: 44px;
+
+  @include viewportLarge {
+    margin-top: 0;
+  }
+}
+
 .filterForm {
   display: flex;
   align-items: center;
@@ -14,10 +22,39 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding: 6px 16px;
+  border-bottom: 1px solid $neutralGray3;
+
+  @include viewportLarge {
+    border: none;
+  }
 }
 
 .title {
-  @include pageTitle;
+  @include textTemplate(16px, $fontWeightBold, 24px);
+
+  @include viewportLarge {
+    @include pageTitle;
+  }
+}
+
+.desktopContentWrapper {
+  display: none;
+
+  @include viewportLarge {
+    display: block;
+  }
+}
+
+.mobileContentWrapper {
+  @include flexAlign(normal);
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px 16px 100px;
+
+  @include viewportLarge {
+    display: none;
+  }
 }
 
 .rowState {
@@ -184,8 +221,12 @@
   margin-bottom: 20px;
   padding: 10px 20px;
   min-height: unset;
-  display: flex;
   column-gap: 8px;
+  display: none;
+
+  @include viewportLarge {
+    display: flex;
+  }
 
   .filterIconContainer {
     width: 20px;
@@ -201,4 +242,30 @@
 
 .deliveryHour {
   @include textTemplate(14px, 600, 20px);
+}
+
+.mobileFilterBtn {
+  width: 36px;
+  min-height: 36px;
+  display: flex;
+
+  @include viewportLarge {
+    display: none;
+  }
+
+  .filterIconContainer {
+    width: 20px;
+    height: 20px;
+
+    .filterIcon {
+      margin: 2.5px auto;
+      width: auto;
+      height: 15px;
+    }
+  }
+}
+
+.emptyWrapper {
+  @include flexCenter;
+  margin-top: 10em;
 }

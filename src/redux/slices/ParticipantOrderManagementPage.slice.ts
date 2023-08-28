@@ -2,6 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import compact from 'lodash/compact';
 
 import { updateParticipantOrderApi } from '@apis/index';
+import { updateFirstTimeViewOrderApi } from '@apis/participantApi';
 import { fetchTxApi } from '@apis/txApi';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { userThunks } from '@redux/slices/user.slice';
@@ -12,6 +13,8 @@ import type { TListing, TObject, TTransaction, TUser } from '@utils/types';
 
 const LOAD_DATA = 'app/OrderManagementPage/LOAD_DATA';
 const UPDATE_ORDER = 'app/OrderManagementPage/UPDATE_ORDER';
+const UPDATE_FIRST_TIME_VIEW_ORDER =
+  'app/OrderManagementPage/UPDATE_FIRST_TIME_VIEW_ORDER';
 
 type TParticipantOrderManagementState = {
   company: TUser | {};
@@ -25,6 +28,9 @@ type TParticipantOrderManagementState = {
   updateOrderError: any;
   restaurants: TListing[];
   subOrderTxs: TTransaction[];
+
+  shouldShowFirstTimeOrderModal: boolean;
+  updateFirstTimeViewOrderInProgress: boolean;
 };
 
 const initialState: TParticipantOrderManagementState = {
@@ -41,11 +47,15 @@ const initialState: TParticipantOrderManagementState = {
 
   restaurants: [],
   subOrderTxs: [],
+  shouldShowFirstTimeOrderModal: false,
+  updateFirstTimeViewOrderInProgress: false,
 };
 
 const loadData = createAsyncThunk(
   LOAD_DATA,
-  async (orderId: string, { dispatch, extra: sdk }) => {
+  async (orderId: string, { dispatch, extra: sdk, getState }) => {
+    const { currentUser } = getState().user;
+    const currentUserId = currentUser?.id?.uuid;
     let returnValues = {};
     const order = denormalisedResponseEntities(
       await sdk.listings.show(
@@ -94,6 +104,10 @@ const loadData = createAsyncThunk(
       plans: [plan],
       restaurants: allRelatedRestaurants,
       subOrderTxs,
+      shouldShowFirstTimeOrderModal:
+        !orderListing.getMetadata()?.[
+          `hideFirstTimeOrderModal_${currentUserId}`
+        ],
     };
 
     if (companyId) {
@@ -149,12 +163,33 @@ const updateOrder = createAsyncThunk(
   },
 );
 
-export const participantOrderManagementThunks = { loadData, updateOrder };
+const updateFirstTimeViewOrder = createAsyncThunk(
+  UPDATE_FIRST_TIME_VIEW_ORDER,
+  async (orderId: string) => {
+    await updateFirstTimeViewOrderApi(orderId);
+  },
+  {
+    serializeError: storableError,
+  },
+);
+
+export const participantOrderManagementThunks = {
+  loadData,
+  updateOrder,
+  updateFirstTimeViewOrder,
+};
 
 const participantOrderSlice = createSlice({
   name: 'ParticipantOrderManagement',
   initialState,
-  reducers: {},
+  reducers: {
+    setFirstTimeViewOrder(state, { payload }) {
+      state.shouldShowFirstTimeOrderModal = payload;
+    },
+    updatePlans: (state, { payload }) => {
+      state.plans = payload;
+    },
+  },
   extraReducers: (builder) => {
     builder
       /* =============== loadData =============== */
@@ -189,8 +224,26 @@ const participantOrderSlice = createSlice({
         ...state,
         updateOrderInProgress: false,
         updateOrderError: error.message,
+      }))
+
+      .addCase(updateFirstTimeViewOrder.pending, (state) => ({
+        ...state,
+        firstTimeViewOrderInProgress: true,
+      }))
+
+      .addCase(updateFirstTimeViewOrder.fulfilled, (state) => ({
+        ...state,
+        firstTimeViewOrderInProgress: false,
+        shouldShowFirstTimeOrderModal: false,
+      }))
+
+      .addCase(updateFirstTimeViewOrder.rejected, (state) => ({
+        ...state,
+        firstTimeViewOrderInProgress: false,
       }));
   },
 });
+
+export const ParticipantOrderManagementActions = participantOrderSlice.actions;
 
 export default participantOrderSlice.reducer;

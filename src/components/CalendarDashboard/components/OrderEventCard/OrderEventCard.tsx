@@ -8,6 +8,7 @@ import { isOver } from '@helpers/orderHelper';
 import { useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { useViewport } from '@hooks/useViewport';
+import { EParticipantOrderStatus } from '@src/utils/enums';
 
 import OrderEventCardContentItems from './OrderEventCardContentItems';
 import OrderEventCardHeader from './OrderEventCardHeader';
@@ -27,21 +28,30 @@ const OrderEventCard: React.FC<TOrderEventCardProps> = ({
   resources,
 }) => {
   const { isMobileLayout } = useViewport();
-  const { openRatingSubOrderModal, setSelectedEvent } = resources || {};
+  const {
+    openRatingSubOrderModal,
+    setSelectedEvent,
+    recommendFoodForSpecificSubOrder,
+    pickFoodForSpecificSubOrderInProgress,
+  } = resources || {};
   const {
     status,
     expiredTime,
     isOrderStarted = false,
     transactionId,
     subOrderTx: subOrderTxFromEvent,
+    planId,
+    orderId,
+    timestamp,
   } = event.resource || {};
 
   const tooltipVisibleController = useBoolean();
 
   const isFoodPicked = !!event.resource?.dishSelection?.dishSelection;
+  const isNotJoined = status === EParticipantOrderStatus.notJoined;
   const isExpired = isOver(expiredTime);
   const isExpiredAndNotPickedFood =
-    !isFoodPicked && (isExpired || isOrderStarted);
+    !isFoodPicked && (isExpired || isOrderStarted) && !isNotJoined;
 
   const { orderColor } = event?.resource || {};
   const dotStyles = {
@@ -80,6 +90,14 @@ const OrderEventCard: React.FC<TOrderEventCardProps> = ({
     }
   };
 
+  const onPickForMe = () => {
+    recommendFoodForSpecificSubOrder({
+      planId,
+      orderId,
+      subOrderDate: timestamp,
+    });
+  };
+
   return (
     <Tooltip
       overlayClassName={css.tooltipOverlay}
@@ -94,6 +112,11 @@ const OrderEventCard: React.FC<TOrderEventCardProps> = ({
           fetchSubOrderTxInProgress={fetchSubOrderTxInProgress}
           fetchSubOrderDocumentInProgress={fetchSubOrderDocumentInProgress}
           openRatingSubOrderModal={handleOpenRatingModal}
+          onCloseEventCardPopup={tooltipVisibleController.setFalse}
+          onPickForMe={onPickForMe}
+          pickFoodForSpecificSubOrderInProgress={
+            pickFoodForSpecificSubOrderInProgress
+          }
         />
       }
       onVisibleChange={(visible) => {
@@ -108,7 +131,7 @@ const OrderEventCard: React.FC<TOrderEventCardProps> = ({
       <div>
         <div
           className={classNames(css.root, {
-            [css.rootExpired]: isExpired,
+            [css.rootExpired]: isExpiredAndNotPickedFood,
           })}
           style={cardStyles}>
           <OrderEventCardHeader event={event} />
