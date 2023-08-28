@@ -7,6 +7,7 @@ import Form from '@components/Form/Form';
 import { FieldPasswordInputComponent } from '@components/FormFields/FieldPasswordInput/FieldPasswordInput';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { useViewport } from '@hooks/useViewport';
 import { passwordActions } from '@redux/slices/password.slice';
 import { generalPaths } from '@src/paths';
 import { passwordFormatValid } from '@src/utils/validators';
@@ -21,7 +22,7 @@ export type TChangePasswordFormValues = {
 
 type TChangePasswordFormProps = {
   onSubmit: (values: TChangePasswordFormValues) => void;
-  inProgress: boolean;
+  inProgress?: boolean;
 };
 
 const validate = (values: TChangePasswordFormValues) => {
@@ -55,9 +56,10 @@ const validate = (values: TChangePasswordFormValues) => {
 
 const ChangePasswordForm: React.FC<TChangePasswordFormProps> = ({
   onSubmit,
-  inProgress,
+  inProgress = false,
 }) => {
   const router = useRouter();
+  const { isMobileLayout } = useViewport();
   const dispatch = useAppDispatch();
   const changePasswordError = useAppSelector(
     (state) => state.ParticipantAccount.changePasswordError,
@@ -107,7 +109,12 @@ const ChangePasswordForm: React.FC<TChangePasswordFormProps> = ({
 
   return (
     <Form onSubmit={handleSubmit} className={css.root}>
-      <div className={css.header}>Đổi mật khẩu</div>
+      <div className={css.header}>
+        {isMobileLayout ? 'Đổi mật khẩu' : 'Cài đặt'}
+      </div>
+
+      <div className={css.subHeader}>Cài đặt mật khẩu</div>
+
       <div className={css.formContainer}>
         <div className={css.fieldsContainer}>
           <div className={css.fieldWrapper}>
@@ -153,6 +160,8 @@ const ChangePasswordForm: React.FC<TChangePasswordFormProps> = ({
             <ErrorMessage message="Mật khẩu hiện tại chưa đúng" />
           </RenderWhen>
         </div>
+
+        <div className={css.divider} />
 
         <Button
           type="submit"
