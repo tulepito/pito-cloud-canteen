@@ -50,10 +50,13 @@ const BankInfoFormComponent: React.FC<TBankInfoFormComponentProps> = (
 
   return (
     <Form onSubmit={handleSubmit} className={css.formRoot}>
-      <FieldTextInput {...fieldBankOwnerName} />
-      <FieldTextInput {...fieldBankId} />
-      <FieldTextInput {...fieldBankAgency} />
-      <FieldTextInput {...fieldBankAccountNumber} />
+      <div className={css.header}>Thông tin ngân hàng</div>
+      <div className={css.fieldContainer}>
+        <FieldTextInput {...fieldBankOwnerName} />
+        <FieldTextInput {...fieldBankId} />
+        <FieldTextInput {...fieldBankAgency} />
+        <FieldTextInput {...fieldBankAccountNumber} />
+      </div>
     </Form>
   );
 };

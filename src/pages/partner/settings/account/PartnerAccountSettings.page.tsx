@@ -1,10 +1,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
+import isEqual from 'lodash/isEqual';
 import { useRouter } from 'next/router';
 
+import Button from '@components/Button/Button';
 import IconEdit from '@components/Icons/IconEdit/IconEdit';
+import Modal from '@components/Modal/Modal';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
-import { useAppSelector } from '@hooks/reduxHooks';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { useViewport } from '@hooks/useViewport';
 import { currentUserSelector } from '@redux/slices/user.slice';
@@ -15,9 +18,12 @@ import {
   OwnListing,
 } from '@src/utils/data';
 
+import { PartnerSettingsThunks } from '../PartnerSettings.slice';
+
 import AccountSettingsForm from './components/AccountSettingsForm';
 import BankInfoForm from './components/BankInfoForm';
 import MenuInfo from './components/MenuInfo';
+import type { TMenuSettingsFormValues } from './components/MenuSettingsForm';
 import MenuSettingsForm from './components/MenuSettingsForm';
 import NavigationModal from './components/NavigationModal';
 
@@ -29,8 +35,12 @@ const PartnerAccountSettingsPage: React.FC<
   TPartnerAccountSettingsPageProps
 > = () => {
   const router = useRouter();
+  const dispatch = useAppDispatch();
   const { isMobileLayout } = useViewport();
   const menuViewModeController = useBoolean(true);
+  const updateRestaurantInprogress = useAppSelector(
+    (state) => state.PartnerSettingsPage.updateRestaurantInprogress,
+  );
   const restaurantListing = useAppSelector(
     (state) => state.PartnerSettingsPage.restaurantListing,
   );
@@ -90,11 +100,33 @@ const PartnerAccountSettingsPage: React.FC<
     [JSON.stringify(restaurantListing)],
   );
 
+  const [pageFormValues, setPageFormValues] = useState<any>({
+    ...accountFormInitialValues,
+  });
+  const isAccountFormChanged = !isEqual(
+    pageFormValues,
+    accountFormInitialValues,
+  );
+
   const handleChangeMenuViewMode = () => {
     menuViewModeController.toggle();
   };
   const handleCloseNavigationModal = () => {
     router.push(partnerPaths.Settings);
+  };
+
+  const handleSubmitMenuSettingsForm = async (
+    values: TMenuSettingsFormValues,
+  ) => {
+    return dispatch(
+      PartnerSettingsThunks.updatePartnerRestaurantListing(values),
+    );
+  };
+
+  const handleSubmitPageForm = () => {
+    return dispatch(
+      PartnerSettingsThunks.updatePartnerRestaurantListing(pageFormValues),
+    );
   };
 
   return (
@@ -106,30 +138,44 @@ const PartnerAccountSettingsPage: React.FC<
           <AccountSettingsForm
             initialValues={accountFormInitialValues}
             onSubmit={() => {}}
+            onFormChange={setPageFormValues}
           />
 
-          <div>
-            <div>Thực đơn</div>
-            <div
-              className={css.editIconContainer}
-              onClick={handleChangeMenuViewMode}>
-              <IconEdit />
+          <div className={css.menuSettingsContainer}>
+            <div className={css.menuSettingsTitle}>
+              <div>Thực đơn</div>
+              <div
+                className={css.editIconContainer}
+                onClick={handleChangeMenuViewMode}>
+                <IconEdit />
+              </div>
             </div>
-            <RenderWhen condition={isInMenuViewMode}>
-              <MenuInfo meals={meals} categories={categories} />
 
-              <RenderWhen.False>
-                <MenuSettingsForm
-                  initialValues={menuEditFormInitialValues}
-                  onSubmit={() => {}}
-                />
-              </RenderWhen.False>
-            </RenderWhen>
+            <MenuInfo meals={meals} categories={categories} />
+            <Modal
+              title="Chỉnh Sửa thực đơn"
+              isOpen={!isInMenuViewMode}
+              handleClose={menuViewModeController.setTrue}>
+              <MenuSettingsForm
+                initialValues={menuEditFormInitialValues}
+                onSubmit={handleSubmitMenuSettingsForm}
+              />
+            </Modal>
           </div>
           <BankInfoForm
             initialValues={bankInfoInitialValues}
             onSubmit={() => {}}
           />
+
+          <div className={css.divider} />
+          <Button
+            type="button"
+            className={css.submitBtn}
+            disabled={!isAccountFormChanged}
+            inProgress={updateRestaurantInprogress}
+            onClick={handleSubmitPageForm}>
+            Lưu thay đổi
+          </Button>
         </RenderWhen.False>
       </RenderWhen>
     </div>

@@ -1,6 +1,49 @@
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/vars.scss' as *;
+
 .formRoot {
+  display: flex;
+  flex-direction: column;
+  row-gap: 24px;
+
+  .header {
+    display: none;
+    @include textTemplate(18px, 700, 24px);
+
+    @include viewportMedium {
+      display: block;
+    }
+  }
+
+  @include viewportMedium {
+    padding: 40px 0;
+    border-top: 1px solid $neutralGray3;
+  }
+}
+
+.fieldContainer {
   display: flex;
   flex-direction: column;
   row-gap: 16px;
   padding: 16px;
+
+  @include viewportMedium {
+    padding: 0;
+    flex-direction: row;
+    flex-wrap: wrap;
+    column-gap: 32px;
+
+    & > * {
+      flex-basis: calc(50% - 16px);
+    }
+  }
+
+  @include viewportSLarge {
+    column-gap: 60px;
+
+    & > * {
+      flex-basis: calc(50% - 30px);
+    }
+  }
 }
