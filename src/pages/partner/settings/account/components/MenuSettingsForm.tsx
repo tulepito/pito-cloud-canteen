@@ -15,7 +15,7 @@ import css from './MenuSettingsForm.module.scss';
 
 export type TMenuSettingsFormValues = {};
 
-type TExtraProps = { isSubmitted: boolean };
+type TExtraProps = { isSubmitted?: boolean };
 type TMenuSettingsFormComponentProps =
   FormRenderProps<TMenuSettingsFormValues> & Partial<TExtraProps>;
 type TMenuSettingsFormProps = FormProps<TMenuSettingsFormValues> & TExtraProps;

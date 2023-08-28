@@ -28,7 +28,7 @@ export type TAccountSettingsFormValues = {
   facebookLink: string;
 };
 
-type TExtraProps = { isSubmitted: boolean };
+type TExtraProps = { isSubmitted?: boolean };
 type TAccountSettingsFormComponentProps =
   FormRenderProps<TAccountSettingsFormValues> & Partial<TExtraProps>;
 type TAccountSettingsFormProps = FormProps<TAccountSettingsFormValues> &
