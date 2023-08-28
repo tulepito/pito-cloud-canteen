@@ -46,8 +46,10 @@ const transferCompanyOwner = async ({
 
   await isBookerInOrderProgress({ members, memberEmail: newOwnerEmail });
 
-  const { companyList: companyListOfNewCompany } =
-    User(newCompanyAccount).getMetadata();
+  const {
+    companyList: companyListOfNewCompany,
+    company: prevCompanyObjOfNewCompany,
+  } = User(newCompanyAccount).getMetadata();
 
   if (!newCompanyAccount) {
     throw new Error('User not found');
@@ -72,10 +74,28 @@ const transferCompanyOwner = async ({
 
     return memberList;
   }, members);
-
   const newOwnerCompanyList = companyListOfNewCompany.map((id: string) =>
     id === companyId ? User(newCompanyAccount).getId() : id,
   );
+
+  const newCompanyObjOfNewCompany = Object.keys(
+    prevCompanyObjOfNewCompany,
+  ).reduce((acc, cur) => {
+    let newCompanyData = { ...acc } as any;
+    if (cur === companyId) {
+      // replace old company id with new company id
+      newCompanyData = {
+        ...newCompanyData,
+        [User(newCompanyAccount).getId()]: {
+          ...(newCompanyData[cur] || {}),
+          permission: UserPermission.OWNER,
+        },
+      };
+      delete newCompanyData[cur];
+    }
+
+    return newCompanyData;
+  }, prevCompanyObjOfNewCompany);
 
   // Update new member data to new company ( owner )
   const newCompanyResponse = await integrationSdk.users.updateProfile(
@@ -108,6 +128,7 @@ const transferCompanyOwner = async ({
         status,
         userState,
         companyList: newOwnerCompanyList,
+        company: newCompanyObjOfNewCompany,
       },
     },
     {
@@ -138,13 +159,14 @@ const transferCompanyOwner = async ({
             ...newCompanyData,
             [User(newCompanyAccount).getId()]: {
               ...(newCompanyData[cur] || {}),
+              permission: permissionForOldOwner || UserPermission.PARTICIPANT,
             },
           };
           delete newCompanyData[cur];
         }
 
         return newCompanyData;
-      }, {});
+      }, company);
 
       const newMemberCompanyList = memberCompanyList.map(
         (memberCompanyId: string) =>
