@@ -9,7 +9,6 @@ import PartnerHeader from './PartnerHeader/PartnerHeader';
 import PartnerLayoutContent from './PartnerLayoutContent/PartnerLayoutContent';
 import PartnerLayoutSidebar from './PartnerLayoutSidebar/PartnerLayoutSidebar';
 import PartnerLayoutTopbar from './PartnerLayoutTopbar/PartnerLayoutTopbar';
-import PartnerMobileLayout from './PartnerMobileLayout/PartnerMobileLayout';
 import PartnerNavBar from './PartnerNavBar/PartnerNavBar';
 import PartnerSidebar from './PartnerSidebar/PartnerSidebar';
 import { shouldShowPartnerHeader } from './partnerLayout.helpers';
@@ -26,21 +25,18 @@ const PartnerLayout: React.FC<PropsWithChildren> = (props) => {
   } = useBoolean(false);
   const { isMobileLayout } = useViewport();
 
-  const hideHeaderMaybe = isMobileLayout && !shouldShowPartnerHeader(pathname);
-
-  if (isMobileLayout)
-    return <PartnerMobileLayout>{children}</PartnerMobileLayout>;
+  const showHeaderMaybe = shouldShowPartnerHeader(pathname);
 
   return (
     <div className={css.root}>
       <div className={css.main}>
-        <RenderWhen condition={!hideHeaderMaybe}>
+        <RenderWhen condition={showHeaderMaybe}>
           <PartnerLayoutTopbar>
             <PartnerHeader onMenuClick={toggleMenuOpen} />
           </PartnerLayoutTopbar>
         </RenderWhen>
         <PartnerLayoutContent
-          hideHeader={hideHeaderMaybe}
+          hideHeader={!showHeaderMaybe}
           isMenuOpen={isMenuOpen}>
           {children}
         </PartnerLayoutContent>
