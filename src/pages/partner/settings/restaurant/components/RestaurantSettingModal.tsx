@@ -3,6 +3,7 @@ import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import Modal from '@components/Modal/Modal';
 import { useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
+import { Listing } from '@src/utils/data';
 
 import type { TRestaurantSettingFormValues } from './RestaurantSettingForm';
 import RestaurantSettingForm from './RestaurantSettingForm';
@@ -17,10 +18,11 @@ type TNavigationModalProps = {
 const RestaurantSettingModal: React.FC<TNavigationModalProps> = (props) => {
   const { isOpen, onClose } = props;
   const changePasswordSuccessModalControl = useBoolean();
-  // const dispatch = useAppDispatch();
-  const changePasswordInProgress = useAppSelector(
-    (state) => state.password.changePasswordInProgress,
+  const restaurantListing = useAppSelector(
+    (state) => state.PartnerSettingsPage.restaurantListing,
   );
+
+  const { isActive = true } = Listing(restaurantListing).getPublicData();
 
   const handleSubmit = async (_values: TRestaurantSettingFormValues) => {};
 
@@ -44,7 +46,9 @@ const RestaurantSettingModal: React.FC<TNavigationModalProps> = (props) => {
 
         <RestaurantSettingForm
           onSubmit={handleSubmit}
-          inProgress={changePasswordInProgress}
+          initialValues={{
+            isActive,
+          }}
         />
 
         <Alert

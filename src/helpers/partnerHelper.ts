@@ -17,6 +17,7 @@ export const createSubmitUpdatePartnerValues = (
     facebookLink = '',
     meals,
     categories,
+    isActive,
   } = values;
   const { selectedPlace = {} } = location || {};
   const { address, origin } = selectedPlace;
@@ -45,6 +46,7 @@ export const createSubmitUpdatePartnerValues = (
       ...(contactorName ? { contactorName } : {}),
       ...(meals ? { meals } : {}),
       ...(categories ? { categories } : {}),
+      ...(typeof isActive !== 'undefined' ? { isActive } : {}),
     },
   };
 
