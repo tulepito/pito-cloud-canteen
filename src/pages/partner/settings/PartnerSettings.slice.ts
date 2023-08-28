@@ -1,11 +1,16 @@
 import { createSlice } from '@reduxjs/toolkit';
 import omit from 'lodash/omit';
 
+import { toggleAppStatusApi } from '@apis/partnerApi';
 import { fetchSearchFilterApi } from '@apis/userApi';
 import { queryAllPages } from '@helpers/apiHelpers';
 import { createSubmitUpdatePartnerValues } from '@helpers/partnerHelper';
 import { createAsyncThunk } from '@redux/redux.helper';
-import { CurrentUser, denormalisedResponseEntities } from '@src/utils/data';
+import {
+  CurrentUser,
+  denormalisedResponseEntities,
+  Listing,
+} from '@src/utils/data';
 import { EImageVariants } from '@src/utils/enums';
 import { storableError } from '@src/utils/errors';
 import { pickRenderableImagesByProperty } from '@src/utils/images';
@@ -47,6 +52,10 @@ type TPartnerSettingsState = {
 
   // inprogress transactions
   inProgressTransactions: any[];
+
+  // toggle app
+  toggleAppStatusInProgress: boolean;
+  toggleAppStatusError: any;
 };
 const initialState: TPartnerSettingsState = {
   nutritions: [],
@@ -76,6 +85,10 @@ const initialState: TPartnerSettingsState = {
   updateRestaurantError: null,
 
   inProgressTransactions: [],
+
+  // toggle app
+  toggleAppStatusInProgress: false,
+  toggleAppStatusError: null,
 };
 
 // ================ Thunk types ================ //
@@ -281,12 +294,40 @@ const uploadCover = createAsyncThunk(
   },
 );
 
+const toggleRestaurantActiveStatus = createAsyncThunk(
+  'app/PartnerSettings/TOGGLE_RESTAURANT_ACTIVE_STATUS',
+  async (_: TObject | undefined, { rejectWithValue, getState, dispatch }) => {
+    try {
+      const { restaurantListing } = getState().PartnerSettingsPage;
+      const restaurantGetter = Listing(restaurantListing);
+      const restaurantId = restaurantGetter.getId();
+      const { isActive = true } = Listing(restaurantListing).getPublicData();
+
+      await dispatch(updatePartnerRestaurantListing({ isActive: !isActive }));
+
+      await toggleAppStatusApi(
+        {
+          partnerId: restaurantId,
+        },
+        { isActive },
+      );
+
+      return true;
+    } catch (error) {
+      console.error(error);
+
+      return rejectWithValue(storableError(error));
+    }
+  },
+);
+
 export const PartnerSettingsThunks = {
   loadData,
   fetchAttributes,
   requestCoverUpload: uploadCover,
   requestAvatarUpload: uploadAvatar,
   updatePartnerRestaurantListing,
+  toggleRestaurantActiveStatus,
 };
 
 // ================ Slice ================ //
@@ -462,6 +503,18 @@ const PartnerSettingsSlice = createSlice({
       })
       .addCase(updatePartnerRestaurantListing.rejected, (state) => {
         state.updateRestaurantInprogress = false;
+      })
+      /* =============== toggleRestaurantActiveStatus =============== */
+      .addCase(toggleRestaurantActiveStatus.pending, (state) => {
+        state.toggleAppStatusInProgress = true;
+        state.toggleAppStatusError = null;
+      })
+      .addCase(toggleRestaurantActiveStatus.fulfilled, (state) => {
+        state.toggleAppStatusInProgress = false;
+      })
+      .addCase(toggleRestaurantActiveStatus.rejected, (state, { payload }) => {
+        state.toggleAppStatusInProgress = false;
+        state.toggleAppStatusError = payload;
       });
   },
 });

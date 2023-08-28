@@ -1,6 +1,6 @@
 import type { TObject } from '@src/utils/types';
 
-import { getApi } from './configs';
+import { getApi, putApi } from './configs';
 
 const BASE_URL = '/partner';
 
@@ -18,4 +18,8 @@ export const queryPartnerOrderDetailApi = ({
 
 export const queryAllPartnerPaymentRecordsApi = ({ partnerId }: TObject) => {
   return getApi(`${BASE_URL}/${partnerId}/payments`);
+};
+
+export const toggleAppStatusApi = ({ partnerId }: TObject, body: TObject) => {
+  return putApi(`${BASE_URL}/${partnerId}/toggle-app-status`, body);
 };
