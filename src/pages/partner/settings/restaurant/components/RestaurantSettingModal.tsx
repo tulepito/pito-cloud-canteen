@@ -58,7 +58,7 @@ const RestaurantSettingModal: React.FC<TNavigationModalProps> = (props) => {
         />
 
         <Alert
-          message="Cập nhật mật khẩu thành công"
+          message="Cập nhật thông tin thành công"
           isOpen={changePasswordSuccessModalControl.value}
           autoClose
           onClose={handleCloseSuccessModal}
