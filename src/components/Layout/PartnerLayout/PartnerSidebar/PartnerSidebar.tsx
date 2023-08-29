@@ -3,6 +3,7 @@ import { useIntl } from 'react-intl';
 import classNames from 'classnames';
 import { useRouter } from 'next/router';
 
+import IconCategory from '@components/Icons/IconCategory/IconCategory';
 import IconHome from '@components/Icons/IconHome/IconHome';
 import IconOrderManagement from '@components/Icons/IconOrderManagement/IconOrderManagement';
 import IconWallet from '@components/Icons/IconWallet/IconWallet';
@@ -34,6 +35,21 @@ const LIST_SIDEBAR_MENU: TSidebarMenu[] = [
         label: 'PartnerSidebar.manageOrdersLabel',
         nameLink: partnerPaths.ManageOrders,
         highlightRefLinks: [partnerPaths.SubOrderDetail],
+      },
+    ],
+  },
+  {
+    id: 'products',
+    Icon: IconCategory,
+    nameLink: partnerPaths.ManageFood,
+    label: 'PartnerSidebar.productPageLabel',
+    isFirstLevel: true,
+    childrenMenus: [
+      {
+        id: 'manageFood',
+        label: 'PartnerSidebar.productPage.manageFood',
+        nameLink: partnerPaths.ManageFood,
+        highlightRefLinks: [partnerPaths.EditFood, partnerPaths.CreateFood],
       },
     ],
   },

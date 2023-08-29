@@ -19,3 +19,16 @@ export const queryPartnerOrderDetailApi = ({
 export const queryAllPartnerPaymentRecordsApi = ({ partnerId }: TObject) => {
   return getApi(`${BASE_URL}/${partnerId}/payments`);
 };
+
+export type TQueryPartnerFoodApiParams = {
+  restaurantId: string;
+  keywords?: string;
+  foodType?: string;
+  createAtStart?: string;
+  createAtEnd?: string;
+};
+export const queryPartnerFoodsApi = (params: TObject) =>
+  getApi(`${BASE_URL}/food`, params);
+
+export const fetchPartnerFoodApi = (foodId: string) =>
+  getApi(`${BASE_URL}/food/${foodId}`);

@@ -1,0 +1,26 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.formContainer {
+  @include flexAlign(normal);
+  flex-direction: column;
+  gap: 20px;
+}
+
+.filterBtn {
+  width: 160px;
+  height: 48px;
+  margin: 20px auto 0;
+}
+
+.label {
+  color: $neutralGray6;
+  @include textTemplate(14px, $fontWeightSemiBold, 20px);
+}
+
+.dateInputGroup {
+  @include flexAlign(center, space-between);
+  gap: 16px;
+  margin-top: 8px;
+}
