@@ -149,14 +149,15 @@ const tabCompleted = (tab: string, company: TCompany | null): boolean => {
     privateData = {},
     metadata = {},
   } = profile || {};
-  const { location, phoneNumber } = publicData;
+  const { companyLocation, phoneNumber, companyName } = publicData;
   const { bankAccounts = [] } = privateData;
   const { members = {}, groups = [] } = metadata;
 
   const isCompanyInformationTabCompleted = !!(
     displayName &&
-    location &&
-    phoneNumber
+    companyLocation &&
+    phoneNumber &&
+    companyName
   );
 
   const isCompanySettingsTabCompleted = !!(
