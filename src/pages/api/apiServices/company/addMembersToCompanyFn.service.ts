@@ -1,17 +1,29 @@
+import { mapLimit } from 'async';
+import { isEmpty, uniq } from 'lodash';
 import compact from 'lodash/compact';
 import difference from 'lodash/difference';
 
+import {
+  prepareNewOrderDetailPlan,
+  queryAllListings,
+} from '@helpers/apiHelpers';
 import { sendIndividualEmail } from '@services/awsSES';
 import { emailSendingFactory, EmailTemplateTypes } from '@services/email';
-import { fetchUser } from '@services/integrationHelper';
+import { fetchListing, fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { createFirebaseDocNotification } from '@services/notifications';
 import { UserInviteStatus, UserPermission } from '@src/types/UserPermission';
 import participantCompanyInvitation, {
   participantCompanyInvitationSubject,
 } from '@src/utils/emailTemplate/participantCompanyInvitation';
-import { ENotificationType } from '@src/utils/enums';
-import { denormalisedResponseEntities, User } from '@utils/data';
+import {
+  EListingType,
+  ENotificationType,
+  EOrderStates,
+  EOrderType,
+} from '@src/utils/enums';
+import type { TListing } from '@src/utils/types';
+import { denormalisedResponseEntities, Listing, User } from '@utils/data';
 
 const systemSenderEmail = process.env.AWS_SES_SENDER_EMAIL;
 
@@ -36,6 +48,18 @@ const addMembersToCompanyFn = async (params: TAddMembersToCompanyParams) => {
   );
   const membersEmailList = Object.keys(members);
 
+  // TODO: update picking for new member
+  // Step 1: query picking order
+  const allPickingOrders = await queryAllListings({
+    query: {
+      meta_listingType: EListingType.order,
+      meta_orderType: EOrderType.group,
+      meta_orderState: EOrderStates.picking,
+      meta_companyId: companyId,
+      meta_selectedGroups: 'has_any:allMembers',
+    },
+  });
+
   // Step update data for existed user
   const newParticipantMembers = await Promise.all(
     difference(userIdList, membersIdList).map(async (userId: string) => {
@@ -54,6 +78,52 @@ const addMembersToCompanyFn = async (params: TAddMembersToCompanyParams) => {
         },
       });
       const { email: userEmail } = User(userAccount).getAttributes();
+
+      // Step 2. Create update function
+      const updateFn = async (order: TListing) => {
+        const orderId = Listing(order).getId();
+        const {
+          participants = [],
+          anonymous = [],
+          plans = [],
+        } = Listing(order).getMetadata();
+
+        // todo: if user already in participant list, stop update process
+        if (participants.includes(userId)) {
+          return;
+        }
+
+        await integrationSdk.listings.update({
+          id: orderId,
+          metadata: {
+            participants: uniq(participants.concat(userId)),
+            anonymous: anonymous.filter((id: string) => id !== userId),
+          },
+        });
+
+        // todo: if user already in anonymous list, stop update process
+        if (anonymous.includes(userId)) {
+          return;
+        }
+
+        const planId = plans[0];
+        if (!isEmpty(planId)) {
+          const planListing = await fetchListing(planId);
+
+          const newOrderDetail = prepareNewOrderDetailPlan({
+            planListing,
+            newMemberId: userId,
+          });
+          await integrationSdk.listings.update({
+            id: planId,
+            metadata: {
+              orderDetail: newOrderDetail,
+            },
+          });
+        }
+      };
+      // Step 3. Call function update data
+      mapLimit(allPickingOrders, 10, updateFn);
 
       return {
         [userEmail]: {

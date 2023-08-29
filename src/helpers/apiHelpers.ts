@@ -1,7 +1,7 @@
 import { getIntegrationSdk } from '@services/sdk';
-import type { TObject } from '@src/utils/types';
-import { denormalisedResponseEntities } from '@utils/data';
-import type { EMenuMealType } from '@utils/enums';
+import type { TListing, TObject } from '@src/utils/types';
+import { denormalisedResponseEntities, Listing } from '@utils/data';
+import { type EMenuMealType, EParticipantOrderStatus } from '@utils/enums';
 
 // query all page
 const calculateRemainPages = (meta: any) => {
@@ -101,4 +101,36 @@ export type TCheckUnConflictedParams = {
   id?: string;
   startDate: number;
   endDate: number;
+};
+
+export const prepareNewOrderDetailPlan = ({
+  newMemberId,
+  planListing,
+}: {
+  newMemberId: string;
+  planListing: TListing;
+}) => {
+  const { orderDetail = {} } = Listing(planListing).getMetadata();
+  const newOrderDetail = Object.entries(orderDetail).reduce<TObject>(
+    (result, [date, orderDetailByDate]) => {
+      const { memberOrders = {} } = (orderDetailByDate as TObject) || {};
+
+      return {
+        ...result,
+        [date]: {
+          ...(orderDetailByDate as TObject),
+          memberOrders: {
+            [newMemberId]: {
+              foodId: '',
+              status: EParticipantOrderStatus.empty,
+            },
+            ...memberOrders,
+          },
+        },
+      };
+    },
+    {},
+  );
+
+  return newOrderDetail;
 };

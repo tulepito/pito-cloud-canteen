@@ -3,7 +3,10 @@ import isEmpty from 'lodash/isEmpty';
 import uniq from 'lodash/uniq';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import { queryAllListings } from '@helpers/apiHelpers';
+import {
+  prepareNewOrderDetailPlan,
+  queryAllListings,
+} from '@helpers/apiHelpers';
 import cookies from '@services/cookie';
 import { fetchListing, fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
@@ -15,42 +18,9 @@ import {
   ENotificationType,
   EOrderStates,
   EOrderType,
-  EParticipantOrderStatus,
 } from '@src/utils/enums';
-import type { TListing, TObject } from '@src/utils/types';
+import type { TListing } from '@src/utils/types';
 import { denormalisedResponseEntities, Listing, User } from '@utils/data';
-
-const prepareNewOrderDetailPlan = ({
-  newMemberId,
-  planListing,
-}: {
-  newMemberId: string;
-  planListing: TListing;
-}) => {
-  const { orderDetail = {} } = Listing(planListing).getMetadata();
-  const newOrderDetail = Object.entries(orderDetail).reduce<TObject>(
-    (result, [date, orderDetailByDate]) => {
-      const { memberOrders = {} } = (orderDetailByDate as TObject) || {};
-
-      return {
-        ...result,
-        [date]: {
-          ...(orderDetailByDate as TObject),
-          memberOrders: {
-            ...memberOrders,
-            [newMemberId]: {
-              foodId: '',
-              status: EParticipantOrderStatus.empty,
-            },
-          },
-        },
-      };
-    },
-    {},
-  );
-
-  return newOrderDetail;
-};
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   const sdk = getSdk(req, res);
@@ -172,7 +142,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           id: planId,
           metadata: {
             orderDetail: newOrderDetail,
-            orderDetailTemp: undefined,
           },
         });
       }
