@@ -1,0 +1,74 @@
+@use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/vars.scss' as *;
+
+.container {
+  max-height: 540px;
+}
+
+.contentContainer {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  row-gap: 28px;
+}
+
+.closeBtn {
+  margin: 0 auto;
+  width: 50%;
+  max-width: 320px;
+}
+
+.headCell {
+  padding: 12px !important;
+}
+
+.headCell:first-child {
+  @include viewportLarge {
+    width: 130px;
+  }
+}
+.headCell:nth-child(2) {
+  @include viewportLarge {
+    max-width: 320px;
+  }
+}
+.headCell:nth-child(3) {
+  @include viewportLarge {
+    min-width: 124px;
+    max-width: 180px;
+  }
+}
+
+.headCell:nth-child(4) {
+  @include viewportLarge {
+    max-width: 120px;
+  }
+}
+
+.bodyCell {
+  vertical-align: top;
+  padding: 12px !important;
+}
+
+.bodyCell:first-child {
+  @include viewportLarge {
+    width: 130px;
+    padding: 12px !important;
+  }
+}
+.bodyCell:nth-child(2) {
+  @include viewportLarge {
+    max-width: 320px;
+  }
+}
+.bodyCell:nth-child(3) {
+  @include viewportLarge {
+    min-width: 124px;
+    max-width: 180px;
+  }
+}
+.bodyCell:nth-child(4) {
+  @include viewportLarge {
+    max-width: 120px;
+  }
+}

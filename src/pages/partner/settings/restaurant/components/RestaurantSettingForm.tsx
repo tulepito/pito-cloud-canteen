@@ -20,6 +20,8 @@ import { formatTimestamp } from '@src/utils/dates';
 
 import { PartnerSettingsThunks } from '../../PartnerSettings.slice';
 
+import InProgressOrdersModal from './InProgressOrderModal';
+
 import css from './RestaurantSettingForm.module.scss';
 
 export type TRestaurantSettingFormValues = {};
@@ -39,6 +41,7 @@ const RestaurantSettingFormComponent: React.FC<
   const stopReceiveOrderControl = useBoolean();
   const cannotTurnOffAppStatusControl = useBoolean();
   const cannotUpdateDayOffRangeControl = useBoolean();
+  const inProgressOrdersModalControl = useBoolean();
   const toggleAppStatusInProgress = useAppSelector(
     (state) => state.PartnerSettingsPage.toggleAppStatusInProgress,
   );
@@ -50,6 +53,7 @@ const RestaurantSettingFormComponent: React.FC<
   );
   const today = new Date();
 
+  const [currentOrders, setCurrentOrders] = useState<any>([]);
   const [dayOffRange, setDayOffRange] = useState<any>({
     startDate: today,
     endDate: today,
@@ -138,6 +142,15 @@ const RestaurantSettingFormComponent: React.FC<
     }
   };
 
+  const handleViewOrdersForDayOff = () => {
+    setCurrentOrders(inProgressTransactionsInDayOffRange);
+    inProgressOrdersModalControl.setTrue();
+  };
+  const handleViewOrdersForTurnOffApp = () => {
+    setCurrentOrders(inProgressTransactionsAfterToDay);
+    inProgressOrdersModalControl.setTrue();
+  };
+
   return (
     <Form onSubmit={handleSubmit} className={css.formRoot}>
       <div className={css.header}>Cài đặt</div>
@@ -198,7 +211,7 @@ const RestaurantSettingFormComponent: React.FC<
           <div className={css.title}>Không thể cập nhật lịch nghỉ</div>
           <div>
             Hiện có{' '}
-            <b>
+            <b onClick={handleViewOrdersForDayOff}>
               <u>{inProgressTransactionsInDayOffRange.length} đơn</u>
             </b>{' '}
             đang được triển khai từ ngày{' '}
@@ -250,7 +263,7 @@ const RestaurantSettingFormComponent: React.FC<
           <div className={css.title}>Không thể tắt app</div>
           <div>
             Hiện có{' '}
-            <b>
+            <b onClick={handleViewOrdersForTurnOffApp}>
               <u>{inProgressTransactionsAfterToDay.length} đơn</u>
             </b>{' '}
             đang được triển khai từ ngày{' '}
@@ -303,6 +316,12 @@ const RestaurantSettingFormComponent: React.FC<
           <Button onClick={handleUpdateDayOffRangeClick}>Áp dụng</Button>
         </div>
       </SlideModal>
+
+      <InProgressOrdersModal
+        isOpen={inProgressOrdersModalControl.value}
+        onClose={inProgressOrdersModalControl.setFalse}
+        orders={currentOrders}
+      />
 
       <LoadingModal isOpen={toggleAppStatusInProgress} />
 
