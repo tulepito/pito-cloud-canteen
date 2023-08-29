@@ -1,4 +1,5 @@
 import { Field } from 'react-final-form';
+import { FormattedMessage } from 'react-intl';
 import classNames from 'classnames';
 
 import IconClose from '@components/Icons/IconClose/IconClose';
@@ -11,16 +12,38 @@ import {
   removeImage,
   uploadImageThunks,
 } from '@redux/slices/uploadImage.slice';
+import { isUploadImageOverLimitError } from '@src/utils/errors';
 
 import css from './RatingImagesUploadField.module.scss';
 
 const ACCEPT_IMAGES = 'image/*';
 const MAX_FILES = 5;
 
+const UploadImageError = (image: any) => {
+  const { uploadError } = image;
+  let error = null;
+  if (isUploadImageOverLimitError(uploadError)) {
+    error = (
+      <div className={css.error}>
+        <FormattedMessage id="FieldAvatar.imageUploadFailedFileTooLarge" />
+      </div>
+    );
+  } else if (uploadError) {
+    error = (
+      <div className={css.error}>
+        <FormattedMessage id="FieldAvatar.imageUploadFailed" />
+      </div>
+    );
+  }
+
+  return error;
+};
+
 type TRatingImagesUploadFieldProps = {
   images: {};
   containerClassName?: string;
 };
+
 const RatingImagesUploadField: React.FC<TRatingImagesUploadFieldProps> = ({
   images,
   containerClassName,
@@ -143,6 +166,7 @@ const RatingImagesUploadField: React.FC<TRatingImagesUploadFieldProps> = ({
                 id={image.id}
                 file={image.file}
                 className={css.image}></ImageFromFile>
+              <UploadImageError {...image} />
             </div>
           );
         })}
