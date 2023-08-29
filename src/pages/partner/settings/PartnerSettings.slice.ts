@@ -159,7 +159,7 @@ const updatePartnerRestaurantListing = createAsyncThunk(
         restaurantListing,
       );
 
-      const { data } = await sdk.ownListings.update(submitValues, {
+      const data = await sdk.ownListings.update(submitValues, {
         include: ['images'],
         'fields.image': [
           // Listing page
@@ -498,9 +498,13 @@ const PartnerSettingsSlice = createSlice({
       .addCase(updatePartnerRestaurantListing.pending, (state) => {
         state.updateRestaurantInprogress = true;
       })
-      .addCase(updatePartnerRestaurantListing.fulfilled, (state) => {
-        state.updateRestaurantInprogress = false;
-      })
+      .addCase(
+        updatePartnerRestaurantListing.fulfilled,
+        (state, { payload }) => {
+          state.updateRestaurantInprogress = false;
+          state.restaurantListing = payload;
+        },
+      )
       .addCase(updatePartnerRestaurantListing.rejected, (state) => {
         state.updateRestaurantInprogress = false;
       })
