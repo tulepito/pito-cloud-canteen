@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
@@ -28,7 +29,10 @@ export type TAccountSettingsFormValues = {
   facebookLink: string;
 };
 
-type TExtraProps = { isSubmitted: boolean };
+type TExtraProps = {
+  isSubmitted?: boolean;
+  onFormChange?: (values: TAccountSettingsFormValues) => void;
+};
 type TAccountSettingsFormComponentProps =
   FormRenderProps<TAccountSettingsFormValues> & Partial<TExtraProps>;
 type TAccountSettingsFormProps = FormProps<TAccountSettingsFormValues> &
@@ -37,9 +41,17 @@ type TAccountSettingsFormProps = FormProps<TAccountSettingsFormValues> &
 const AccountSettingsFormComponent: React.FC<
   TAccountSettingsFormComponentProps
 > = (props) => {
-  const { handleSubmit, pristine, isSubmitted = false, submitting } = props;
+  const {
+    handleSubmit,
+    pristine,
+    isSubmitted = false,
+    submitting,
+    values,
+    onFormChange,
+  } = props;
   const intl = useIntl();
   const successAlertControl = useBoolean();
+  const mountedControl = useBoolean();
 
   const submitDisabled = pristine;
 
@@ -108,8 +120,17 @@ const AccountSettingsFormComponent: React.FC<
   };
 
   useEffect(() => {
+    mountedControl.setTrue();
+  }, []);
+
+  useEffect(() => {
+    if (mountedControl.value && typeof onFormChange !== 'undefined') {
+      onFormChange(values);
+    }
+  }, [JSON.stringify(values)]);
+
+  useEffect(() => {
     if (isSubmitted) successAlertControl.setTrue();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSubmitted]);
 
   return (

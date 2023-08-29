@@ -20,11 +20,13 @@ import { formatTimestamp } from '@src/utils/dates';
 
 import { PartnerSettingsThunks } from '../../PartnerSettings.slice';
 
+import InProgressOrdersModal from './InProgressOrderModal';
+
 import css from './RestaurantSettingForm.module.scss';
 
 export type TRestaurantSettingFormValues = {};
 
-type TExtraProps = {};
+type TExtraProps = { inProgress?: boolean };
 type TRestaurantSettingFormComponentProps =
   FormRenderProps<TRestaurantSettingFormValues> & Partial<TExtraProps>;
 type TRestaurantSettingFormProps = FormProps<TRestaurantSettingFormValues> &
@@ -33,12 +35,13 @@ type TRestaurantSettingFormProps = FormProps<TRestaurantSettingFormValues> &
 const RestaurantSettingFormComponent: React.FC<
   TRestaurantSettingFormComponentProps
 > = (props) => {
-  const { handleSubmit } = props;
+  const { handleSubmit, inProgress = false } = props;
   const dispatch = useAppDispatch();
   const dayOffControl = useBoolean();
   const stopReceiveOrderControl = useBoolean();
   const cannotTurnOffAppStatusControl = useBoolean();
   const cannotUpdateDayOffRangeControl = useBoolean();
+  const inProgressOrdersModalControl = useBoolean();
   const toggleAppStatusInProgress = useAppSelector(
     (state) => state.PartnerSettingsPage.toggleAppStatusInProgress,
   );
@@ -50,6 +53,7 @@ const RestaurantSettingFormComponent: React.FC<
   );
   const today = new Date();
 
+  const [currentOrders, setCurrentOrders] = useState<any>([]);
   const [dayOffRange, setDayOffRange] = useState<any>({
     startDate: today,
     endDate: today,
@@ -138,9 +142,22 @@ const RestaurantSettingFormComponent: React.FC<
     }
   };
 
+  const handleViewOrdersForDayOff = () => {
+    setCurrentOrders(inProgressTransactionsInDayOffRange);
+    inProgressOrdersModalControl.setTrue();
+  };
+  const handleViewOrdersForTurnOffApp = () => {
+    setCurrentOrders(inProgressTransactionsAfterToDay);
+    inProgressOrdersModalControl.setTrue();
+  };
+
   return (
     <Form onSubmit={handleSubmit} className={css.formRoot}>
-      <div>
+      <div className={css.header}>Cài đặt</div>
+
+      <div className={css.subHeader}>Cài đặt nhà hàng</div>
+
+      <div className={css.fieldContainer}>
         <Field
           id="RestaurantSettingForm.stopReceiveOrder"
           name="stopReceiveOrder">
@@ -168,13 +185,16 @@ const RestaurantSettingFormComponent: React.FC<
           leftIcon={<IconCalendar />}
         />
       </div>
-      <FieldTextInput
-        id="RestaurantSettingForm.dayOffInfo"
-        name="dayOffInfo"
-        label="Cập nhật lịch nghỉ"
-        leftIcon={<IconCalendar />}
-        onClick={dayOffControl.setTrue}
-      />
+      <div className={css.fieldContainer}>
+        <FieldTextInput
+          id="RestaurantSettingForm.dayOffInfo"
+          name="dayOffInfo"
+          label="Cập nhật lịch nghỉ"
+          leftIcon={<IconCalendar />}
+          onClick={dayOffControl.setTrue}
+        />
+      </div>
+
       <AlertModal
         id="RestaurantSettingForm.alertWarningCannotUpdateDayOffRange"
         shouldHideIconClose
@@ -191,7 +211,7 @@ const RestaurantSettingFormComponent: React.FC<
           <div className={css.title}>Không thể cập nhật lịch nghỉ</div>
           <div>
             Hiện có{' '}
-            <b>
+            <b onClick={handleViewOrdersForDayOff}>
               <u>{inProgressTransactionsInDayOffRange.length} đơn</u>
             </b>{' '}
             đang được triển khai từ ngày{' '}
@@ -206,27 +226,28 @@ const RestaurantSettingFormComponent: React.FC<
           </div>
         </div>
       </AlertModal>
+      <div className={css.fieldContainer}>
+        <Field id="RestaurantSettingForm.isActive" name="isActive">
+          {(props) => {
+            const { id, input } = props;
 
-      <Field id="RestaurantSettingForm.isActive" name="isActive">
-        {(props) => {
-          const { id, input } = props;
-
-          return (
-            <Toggle
-              label={'Tắt app'}
-              id={id}
-              name={input.name}
-              disabled={isToggleAppStatusDisabled}
-              status={input.value ? 'on' : 'off'}
-              onClick={(value) => {
-                if (isEnableTurnOffAppStatus) input.onChange(value);
-                handleToggleStatusClick();
-              }}
-              className={css.activeAppToggle}
-            />
-          );
-        }}
-      </Field>
+            return (
+              <Toggle
+                label={'Tắt app'}
+                id={id}
+                name={input.name}
+                disabled={isToggleAppStatusDisabled}
+                status={input.value ? 'on' : 'off'}
+                onClick={(value) => {
+                  if (isEnableTurnOffAppStatus) input.onChange(value);
+                  handleToggleStatusClick();
+                }}
+                className={css.activeAppToggle}
+              />
+            );
+          }}
+        </Field>
+      </div>
       <AlertModal
         shouldHideIconClose
         shouldFullScreenInMobile={false}
@@ -242,7 +263,7 @@ const RestaurantSettingFormComponent: React.FC<
           <div className={css.title}>Không thể tắt app</div>
           <div>
             Hiện có{' '}
-            <b>
+            <b onClick={handleViewOrdersForTurnOffApp}>
               <u>{inProgressTransactionsAfterToDay.length} đơn</u>
             </b>{' '}
             đang được triển khai từ ngày{' '}
@@ -296,7 +317,18 @@ const RestaurantSettingFormComponent: React.FC<
         </div>
       </SlideModal>
 
+      <InProgressOrdersModal
+        isOpen={inProgressOrdersModalControl.value}
+        onClose={inProgressOrdersModalControl.setFalse}
+        orders={currentOrders}
+      />
+
       <LoadingModal isOpen={toggleAppStatusInProgress} />
+
+      <div className={css.divider} />
+      <Button type="submit" inProgress={inProgress} className={css.submitBtn}>
+        Lưu thay đổi
+      </Button>
     </Form>
   );
 };

@@ -1,15 +1,12 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 
-import MetaWrapper from '@components/MetaWrapper/MetaWrapper';
 import { useViewport } from '@hooks/useViewport';
 import { partnerPaths } from '@src/paths';
 
-import PartnerSettingsPage from './PartnerSettings.page';
-
-const PartnerSettingsRoute = () => {
-  const router = useRouter();
+export const useNavigateToAccountSettingsPage = () => {
   const { isMobileLayout } = useViewport();
+  const router = useRouter();
 
   useEffect(() => {
     if (!isMobileLayout) {
@@ -17,12 +14,4 @@ const PartnerSettingsRoute = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isMobileLayout]);
-
-  return (
-    <MetaWrapper routeName="PartnerSettingsRoute">
-      <PartnerSettingsPage />
-    </MetaWrapper>
-  );
 };
-
-export default PartnerSettingsRoute;

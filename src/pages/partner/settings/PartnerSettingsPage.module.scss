@@ -20,71 +20,8 @@
   bottom: 60px;
 }
 
-.mediaFieldGroup {
-  position: relative;
-  width: 100%;
-}
-
-.fieldAvatar {
-  width: 120px;
-  height: 120px;
-  position: relative;
-  left: 50%;
-  bottom: 72px;
-  transform: translateX(-50%);
-  z-index: 1;
-  background-color: $neutralGray1;
-  box-shadow: $boxShadowPopup;
-  border-radius: 50%;
-  overflow: visible;
-
-  & div {
-    border-radius: 50%;
-    width: 120px;
-    height: 120px;
-  }
-
-  & label > div {
-    width: unset;
-    height: unset;
-  }
-
-  & img {
-    border-radius: 50%;
-    width: 120px;
-    height: 120px;
-  }
-}
-
-.coverIconUpload {
-  padding: 0;
-  background-color: $neutralGray3;
-}
-
-.avatarIconUpload {
-  bottom: 0;
-  right: 0;
-}
-
-.mediaFields {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
 .mediaTitle {
   margin-bottom: 40px;
-}
-
-.fieldCover {
-  width: 100%;
-  max-width: 1440px;
-  height: 160px;
-  background-color: $neutralGray1;
-  box-shadow: $boxShadowPopup;
-  @include viewportLarge {
-    height: 300px;
-  }
 }
 
 .navigationWrapper {

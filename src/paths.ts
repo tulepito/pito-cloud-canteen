@@ -284,7 +284,6 @@ export const partnerRoutes = {
     path: partnerPaths.ManageOrders,
     label: 'Danh sách đơn hàng',
   },
-
   Home: {
     path: partnerPaths.Home,
     label: 'Trang chủ',
@@ -296,5 +295,21 @@ export const partnerRoutes = {
   ManagePayments: {
     path: partnerPaths.ManagePayments,
     label: 'Thanh toán',
+  },
+  Settings: {
+    path: partnerPaths.Settings,
+    label: 'Cài đặt',
+  },
+  AccountSettings: {
+    path: partnerPaths.AccountSettings,
+    label: 'Cài đặt tài khoản',
+  },
+  PasswordSettings: {
+    path: partnerPaths.ChangePassword,
+    label: 'Cài đặt mật khẩu',
+  },
+  RestaurantSettings: {
+    path: partnerPaths.RestaurantSettings,
+    label: 'Cài đặt nhà hàng',
   },
 };
