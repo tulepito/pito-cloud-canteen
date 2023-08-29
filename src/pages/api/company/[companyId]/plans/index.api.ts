@@ -8,9 +8,9 @@ import {
   showCurrentUser,
   showUserById,
 } from '@services/sdkHelper';
-import { ListingTypes } from '@src/types/listingTypes';
 import { UserPermission } from '@src/types/UserPermission';
 import { CurrentUser, User } from '@src/utils/data';
+import { EListingType } from '@src/utils/enums';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
@@ -51,7 +51,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           res,
           {
             ...dataParams,
-            meta_listingType: ListingTypes.PLAN,
+            meta_listingType: EListingType.subOrder,
           },
           queryParams,
         );

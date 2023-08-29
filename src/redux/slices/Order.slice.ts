@@ -40,6 +40,7 @@ import { convertWeekDay, renderDateRange } from '@utils/dates';
 import {
   EInvalidRestaurantCase,
   EListingStates,
+  EListingType,
   EManageCompanyOrdersTab,
   ENotificationTypes,
   EOrderType,
@@ -660,7 +661,7 @@ const queryTotalOrderCountByTab = createAsyncThunk(
             states: EListingStates.published,
             meta_bookerId: bookerId,
             meta_companyId: companyId,
-            meta_listingType: LISTING_TYPE.ORDER,
+            meta_listingType: EListingType.order,
             sort: 'createdAt',
             meta_orderState: parsedStates,
             tab: key,
