@@ -2,6 +2,7 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import { type ReactNode } from 'react';
 import { useIntl } from 'react-intl';
+import Skeleton from 'react-loading-skeleton';
 import classNames from 'classnames';
 import { useRouter } from 'next/router';
 
@@ -345,6 +346,7 @@ export const CompanyOrdersTableColumns: TColumn[] = [
         startDateTimestamp,
         orderId,
         setSelectedOrderId,
+        queryCompanyPlansByOrderIdsInProgress,
       } = data;
       const titleContent = (
         <div className={css.title}>
@@ -429,7 +431,13 @@ export const CompanyOrdersTableColumns: TColumn[] = [
           overlayClassName={css.orderDetailTooltip}
           overlayInnerStyle={{ backgroundColor: '#ffffff' }}
           showArrow={false}
-          tooltipContent={<OrderDetailTooltip subOrders={subOrders} />}
+          tooltipContent={
+            queryCompanyPlansByOrderIdsInProgress ? (
+              <Skeleton />
+            ) : (
+              <OrderDetailTooltip subOrders={subOrders} />
+            )
+          }
           placement="bottomLeft">
           <div>{returnComponent}</div>
         </Tooltip>
@@ -463,21 +471,28 @@ export const CompanyOrdersTableColumns: TColumn[] = [
   {
     key: 'restaurantName',
     label: 'Đơn vị phục vụ',
-    render: ({ restaurants = [] }: TObject) => {
+    render: ({
+      restaurants = [],
+      queryCompanyPlansByOrderIdsInProgress,
+    }: TObject) => {
       const { length } = restaurants;
       const moreThanTwo = restaurants.length > 2;
       const remainLength = length - 2;
 
       return (
         <div className={css.restaurantName}>
-          {restaurants.slice(0, 2).map((restaurantName: string) => (
-            <div
-              key={restaurantName}
-              className={css.name}
-              title={restaurantName}>
-              {restaurantName}
-            </div>
-          ))}
+          {queryCompanyPlansByOrderIdsInProgress ? (
+            <Skeleton />
+          ) : (
+            restaurants.slice(0, 2).map((restaurantName: string) => (
+              <div
+                key={restaurantName}
+                className={css.name}
+                title={restaurantName}>
+                {restaurantName}
+              </div>
+            ))
+          )}
           {moreThanTwo && (
             <div className={css.remainText}>+ {remainLength} đối tác </div>
           )}
@@ -499,10 +514,17 @@ export const CompanyOrdersTableColumns: TColumn[] = [
   {
     key: 'totalWithVAT',
     label: 'Giá trị đơn hàng',
-    render: ({ totalWithVAT }: TObject) => {
+    render: ({
+      totalWithVAT,
+      queryCompanyPlansByOrderIdsInProgress,
+    }: TObject) => {
       return (
         <div className={css.totalWithVAT}>
-          {parseThousandNumber(totalWithVAT)}đ
+          {queryCompanyPlansByOrderIdsInProgress ? (
+            <Skeleton />
+          ) : (
+            `${parseThousandNumber(totalWithVAT)}đ`
+          )}
         </div>
       );
     },

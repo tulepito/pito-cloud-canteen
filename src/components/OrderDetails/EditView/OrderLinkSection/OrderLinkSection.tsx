@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 import classNames from 'classnames';
 
@@ -105,6 +105,15 @@ const OrderLinkSection: React.FC<TOrderLinkSectionProps> = (props) => {
     }
   };
 
+  useEffect(() => {
+    if (isFirstTimeAccess) {
+      const i = setTimeout(() => {
+        setIsSendNotificationModalOpen(true);
+        clearTimeout(i);
+      }, 1000);
+    }
+  }, [isFirstTimeAccess]);
+
   const handleSubmitSendNotification = async (
     values: TSendNotificationFormValues,
   ) => {
@@ -116,6 +125,9 @@ const OrderLinkSection: React.FC<TOrderLinkSectionProps> = (props) => {
 
     dispatch(orderManagementThunks.sendRemindEmailToMember(emailParams));
   };
+
+  const shouldShowSendNotificationModal =
+    !inProgress && isSendNotificationModalOpen && isPicking;
 
   return (
     <div className={rootClasses}>
@@ -146,11 +158,7 @@ const OrderLinkSection: React.FC<TOrderLinkSectionProps> = (props) => {
         onSubmit={handleSubmitSendNotification}
         data={{ orderLink, orderDeadline, companyName }}
         isFirstTimeShow={isFirstTimeAccess}
-        isOpen={
-          !inProgress &&
-          (isFirstTimeAccess || isSendNotificationModalOpen) &&
-          isPicking
-        }
+        isOpen={shouldShowSendNotificationModal}
         onClose={handleCloseSendNotificationModal}
       />
     </div>

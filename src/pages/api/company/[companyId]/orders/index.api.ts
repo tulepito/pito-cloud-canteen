@@ -2,6 +2,8 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 import cookies from '@services/cookie';
 import { handleError } from '@services/sdk';
+import { showCurrentUser } from '@services/sdkHelper';
+import { CurrentUser } from '@src/utils/data';
 
 import { queryCompanyOrders } from './query.service';
 
@@ -16,18 +18,17 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           JSONParams as string,
         );
 
-        const { orderWithCompany, totalItemMap, queryOrdersPagination } =
-          await queryCompanyOrders({
-            companyId: companyId as string,
-            dataParams,
-            queryParams,
-          });
+        const { currentUser } = await showCurrentUser(req, res);
 
-        res.json({
-          orders: orderWithCompany,
-          pagination: queryOrdersPagination,
-          totalItemMap,
+        const bookerId = CurrentUser(currentUser).getId();
+
+        const { response } = await queryCompanyOrders({
+          companyId: companyId as string,
+          dataParams: { ...dataParams, meta_bookerId: bookerId },
+          queryParams,
         });
+
+        return res.json(response);
       } catch (error) {
         handleError(res, error);
       }

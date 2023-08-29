@@ -10,19 +10,25 @@ import type { TIntegrationOrderListing, TListing, TObject } from '@utils/types';
 
 export const parseEntitiesToTableData = (
   orders: TIntegrationOrderListing[],
+  plans: TListing[],
+  queryCompanyPlansByOrderIdsInProgress: boolean,
   page: number,
   currentOrderVATPercentage: number,
   openOrderStateWarningModal?: (e: EOrderStates) => void,
   setSelectedOrderId?: (orderId: string) => void,
 ) => {
   return orders.map((entity, index) => {
-    const { plan = {} } = entity;
     const orderId = entity?.id?.uuid;
     const {
       orderType = EOrderType.group,
       hasSpecificPCCFee = false,
       specificPCCFee = 0,
     } = Listing(entity as TListing).getMetadata();
+
+    const plan =
+      plans.find((p) => Listing(p).getMetadata().orderId === orderId) ||
+      ({} as any);
+
     const { orderDetail: planOrderDetail = {} } = Listing(
       plan as TListing,
     ).getMetadata();
@@ -66,6 +72,7 @@ export const parseEntitiesToTableData = (
         companyId,
         hasRating: !!ratings,
         isGroupOrder: orderType === EOrderType.group,
+        queryCompanyPlansByOrderIdsInProgress,
         plan: {
           ...plan,
           attributes: {
