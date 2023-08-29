@@ -48,7 +48,11 @@ const RatingSubOrderFormComponent: React.FC<
   const postRatingInProgress = useAppSelector(
     (state) => state.ParticipantOrderList.participantPostRatingInProgress,
   );
-  const submitDisabled = postRatingInProgress || !hasGeneralRating;
+
+  const hasErrorImages = Object.values(images).some((i: any) => i.uploadError);
+
+  const submitDisabled =
+    postRatingInProgress || !hasGeneralRating || hasErrorImages;
 
   return (
     <Form className={css.container} onSubmit={handleSubmit}>
