@@ -18,6 +18,7 @@ import {
   OwnListing,
 } from '@src/utils/data';
 
+import MediaForm from '../components/MediaForm';
 import { PartnerSettingsThunks } from '../PartnerSettings.slice';
 
 import AccountSettingsForm from './components/AccountSettingsForm';
@@ -135,11 +136,18 @@ const PartnerAccountSettingsPage: React.FC<
         <NavigationModal isOpen onClose={handleCloseNavigationModal} />
 
         <RenderWhen.False>
-          <AccountSettingsForm
-            initialValues={accountFormInitialValues}
-            onSubmit={() => {}}
-            onFormChange={setPageFormValues}
-          />
+          <div className={css.pageTitle}>Cài đặt</div>
+
+          <div className={css.accountSettingsContainer}>
+            <div className={css.menuSettingsTitle}>Thông tin tài khoản</div>
+            <MediaForm />
+
+            <AccountSettingsForm
+              initialValues={accountFormInitialValues}
+              onSubmit={() => {}}
+              onFormChange={setPageFormValues}
+            />
+          </div>
 
           <div className={css.menuSettingsContainer}>
             <div className={css.menuSettingsTitle}>

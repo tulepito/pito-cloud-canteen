@@ -1,10 +1,24 @@
 @use '/src/styles/mixins.scss' as *;
 @use '/src/styles/vars.scss' as *;
 
+.pageTitle {
+  @include textTemplate(24px, 700, 32px);
+  margin: 0 0 28px;
+}
 .editIconContainer {
   width: 24px;
   height: 24px;
   cursor: pointer;
+}
+
+.accountSettingsContainer {
+  .menuSettingsTitle {
+    @include textTemplate(18px, 700, 24px);
+    display: flex;
+    column-gap: 12px;
+    flex-direction: row;
+    margin-bottom: 32px;
+  }
 }
 
 .menuSettingsContainer {
