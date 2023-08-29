@@ -25,7 +25,7 @@ const PartnerLayout: React.FC<PropsWithChildren> = (props) => {
   } = useBoolean(false);
   const { isMobileLayout } = useViewport();
 
-  const showHeaderMaybe = shouldShowPartnerHeader(pathname);
+  const showHeaderMaybe = !isMobileLayout || shouldShowPartnerHeader(pathname);
 
   return (
     <div className={css.root}>
