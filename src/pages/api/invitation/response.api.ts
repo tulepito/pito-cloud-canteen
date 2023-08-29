@@ -84,7 +84,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
     if (isEmpty(userMember)) {
       return res.json({
-        message: 'invalidInvitaion',
+        message: 'invalidInvitation',
       });
     }
 
@@ -130,7 +130,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         meta_orderType: EOrderType.group,
         meta_orderState: `has_any:${EOrderStates.picking}`,
         meta_companyId: companyId,
-        meta_selectedGroups: 'allMembers',
+        meta_selectedGroups: 'has_any:allMembers',
       },
     });
     // Step 2. Create update function
