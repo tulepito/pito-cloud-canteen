@@ -1,6 +1,6 @@
 import type { TRestaurantRating } from '@src/utils/types';
 
-import { postApi, putApi } from './configs';
+import { getApi, postApi, putApi } from './configs';
 
 type TParticipantReviewPlanTxBody = {
   txId: string;
@@ -28,3 +28,9 @@ export const updateFirstTimeViewOrderApi = (orderId: string) =>
 export const recommendFoodForSubOrdersApi = (body: {
   mappedRecommendFoodToOrderDetail: any;
 }) => putApi('/participants/plans/recommend-food-for-sub-orders', body);
+export type TFetchOrdersApiParams = {
+  selectedMonth: Date;
+};
+
+export const fetchOrdersApi = (params: TFetchOrdersApiParams) =>
+  getApi('/participants/orders/fetch-order-list', params);

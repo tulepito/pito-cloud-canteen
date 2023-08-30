@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 import type { Event, View } from 'react-big-calendar';
 import { Views } from 'react-big-calendar';
 import Skeleton from 'react-loading-skeleton';
-import compact from 'lodash/compact';
 import flatten from 'lodash/flatten';
 import { DateTime } from 'luxon';
 
@@ -53,7 +52,6 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
     currentUser,
     plans,
     loadDataInProgress,
-    subOrderTxs,
   } = props;
   const dispatch = useAppDispatch();
 
@@ -103,7 +101,7 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
 
     Object.keys(orderDetail).forEach((planItemKey: string) => {
       const planItem = orderDetail[planItemKey];
-      const { transactionId } = planItem;
+      const { lastTransition } = planItem;
       const { foodList = {}, restaurantName, id } = planItem.restaurant;
       const restaurant = restaurants?.find(
         (_restaurant) => Listing(_restaurant).getId() === id,
@@ -138,8 +136,6 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
         setAnchorTime(+planItemKey);
       }
 
-      const subOrderTx = subOrderTxs.find((tx) => tx.id.uuid === transactionId);
-
       const event = {
         resource: {
           id: `${planItemKey}`,
@@ -163,11 +159,10 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
           deliveryHour,
           dishSelection: { dishSelection: foodSelection?.foodId },
           orderColor,
-          transactionId,
           planId: currentPlanListing.getId(),
           orderState,
           companyName,
-          subOrderTx,
+          lastTransition,
           foodName: dishes.find((_dish) => _dish.key === foodSelection?.foodId)
             ?.value,
         },
@@ -182,10 +177,6 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
     return listEvent;
   });
   const flattenEvents = flatten<Event>(events);
-  const subOrdersTxIds = compact(
-    flattenEvents.map((_event: any) => _event.resource.transactionId),
-  );
-
   const recommendFoodForSubOrder = () => {
     const neededRecommendSubOrders = flattenEvents.reduce(
       (result: any, _event: Event) => {
@@ -228,12 +219,6 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
       }),
     );
   };
-
-  useEffect(() => {
-    if (subOrdersTxIds) {
-      dispatch(OrderListThunks.fetchTransactionBySubOrder(subOrdersTxIds));
-    }
-  }, [subOrdersTxIds]);
 
   const subOrdersFromSelectedDay = flattenEvents.filter((_event: any) =>
     isSameDate(_event.start, selectedDay),

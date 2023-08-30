@@ -21,8 +21,7 @@ import { currentUserSelector } from '@redux/slices/user.slice';
 import { participantPaths } from '@src/paths';
 import { CurrentUser } from '@src/utils/data';
 import { EOrderStates, EParticipantOrderStatus } from '@src/utils/enums';
-import { txIsDelivered } from '@src/utils/transaction';
-import type { TTransaction } from '@src/utils/types';
+import { ETransition } from '@src/utils/transaction';
 
 import { OrderListThunks } from '../../OrderList.slice';
 
@@ -65,15 +64,11 @@ const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
     expiredTime,
     daySession,
     deliveryHour: startTime,
-    transactionId,
     orderState,
+    lastTransition,
   } = event.resource;
   const dishes: any[] = event.resource?.meal?.dishes || [];
   const user = useAppSelector(currentUserSelector);
-  const subOrderTxs = useAppSelector(
-    (state) => state.ParticipantOrderList.subOrderTxs,
-    shallowEqual,
-  );
 
   const fetchSubOrderTxInProgress = useAppSelector(
     (state) => state.ParticipantOrderList.fetchSubOrderTxInProgress,
@@ -87,10 +82,6 @@ const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
     shallowEqual,
   );
   const timestamp = last<string>(orderDay.split(' - '));
-  const subOrderTx = useMemo(
-    () => subOrderTxs.find((tx) => tx.id.uuid === transactionId),
-    [JSON.stringify(subOrderTxs), transactionId],
-  );
 
   const isExpired = isOver(expiredTime);
   const shouldShowPickFoodSection =
@@ -167,7 +158,10 @@ const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
             {intl.formatMessage({ id: `DayColumn.Session.${daySession}` })}
           </div>
           {status && (
-            <OrderEventCardStatus status={status} subOrderTx={subOrderTx} />
+            <OrderEventCardStatus
+              status={status}
+              lastTransition={lastTransition}
+            />
           )}
         </div>
         <div className={css.mealType}>
@@ -212,7 +206,9 @@ const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
           </RenderWhen>
         </RenderWhen>
         <RenderWhen
-          condition={!reviewId && txIsDelivered(subOrderTx as TTransaction)}>
+          condition={
+            !reviewId && lastTransition === ETransition.COMPLETE_DELIVERY
+          }>
           <Button
             disabled={
               fetchSubOrderTxInProgress || fetchSubOrderDocumentInProgress
