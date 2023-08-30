@@ -41,8 +41,8 @@ export const createSubmitUpdatePartnerValues = (
       ...(coverImageIdMaybe !== null && coverImageIdMaybe
         ? { coverImageId: coverImageIdMaybe }
         : {}),
-      ...(website ? { website } : {}),
-      ...(facebookLink ? { facebookLink } : {}),
+      ...(typeof website !== 'undefined' ? { website } : {}),
+      ...(typeof facebookLink !== 'undefined' ? { facebookLink } : {}),
       ...(contactorName ? { contactorName } : {}),
       ...(meals ? { meals } : {}),
       ...(categories ? { categories } : {}),
