@@ -14,6 +14,20 @@ import {
 } from '@src/utils/enums';
 import type { TIntegrationListing } from '@src/utils/types';
 
+const fetchListingsByChunkedIds = async (ids: string[], sdk: any) => {
+  const listingsResponse = await Promise.all(
+    chunk<string>(ids, 100).map(async (_ids) => {
+      const response = await sdk.listings.query({
+        ids: _ids,
+      });
+
+      return denormalisedResponseEntities(response);
+    }),
+  );
+
+  return flatten(listingsResponse);
+};
+
 const queryMenuByIdList = async (menuIdList: string[]) => {
   const integrationSdk = getIntegrationSdk();
 
@@ -228,20 +242,9 @@ export const updateMenuAfterFoodDeleted = async (deletedFoodId: string) => {
             let newFoodNutritions;
 
             if (foodIdList.includes(deletedFoodId)) {
-              const listFoodResponse = await Promise.all(
-                chunk<string>(newFoodIdList, 100).map(async (ids) => {
-                  const response = await integrationSdk.listings.query({
-                    ids,
-                  });
-
-                  return response;
-                }),
-              );
-
-              const foods = flatten(
-                listFoodResponse.map((_response) =>
-                  denormalisedResponseEntities(_response),
-                ),
+              const foods = await fetchListingsByChunkedIds(
+                newFoodIdList,
+                integrationSdk,
               );
 
               newFoodTypeList = getUniqueString(
@@ -333,9 +336,7 @@ export const updateMenuAfterFoodDeleted = async (deletedFoodId: string) => {
 export const updateMenuAfterFoodUpdated = async (updatedFoodId: string) => {
   try {
     const integrationSdk = getIntegrationSdk();
-    console.log('SERVER before fetch updatedFood');
     const updatedFood = await fetchListing(updatedFoodId);
-    console.log('SERVER after fetch updatedFood success');
     const updatedFoodListing = IntegrationListing(updatedFood);
 
     const { menuIdList = [], unit: newFoodUnit } =
@@ -358,24 +359,9 @@ export const updateMenuAfterFoodUpdated = async (updatedFoodId: string) => {
               IntegrationListing(menu).getMetadata()[`${day}FoodIdList`] || [];
 
             if (foodIdList.includes(updatedFoodId)) {
-              const listFoodResponse = await Promise.all(
-                chunk<string>(foodIdList, 100).map(async (ids) => {
-                  const response = await integrationSdk.listings.query({
-                    ids,
-                  });
-
-                  return response;
-                }),
-              );
-              console.log(
-                'SERVER after fetch listFoodResponse success',
-                listFoodResponse,
-              );
-
-              const foods = flatten(
-                listFoodResponse.map((_response) =>
-                  denormalisedResponseEntities(_response),
-                ),
+              const foods = await fetchListingsByChunkedIds(
+                foodIdList,
+                integrationSdk,
               );
 
               const newMinFoodPrice = foods.reduce(
@@ -460,21 +446,7 @@ export const updateMenuAfterFoodUpdated = async (updatedFoodId: string) => {
       [],
     );
 
-    const listOrderResponse = await Promise.all(
-      chunk<string>(orderIdList, 100).map(async (ids) => {
-        const response = await integrationSdk.listings.query({
-          ids,
-        });
-
-        return response;
-      }),
-    );
-
-    const orders = flatten(
-      listOrderResponse.map((_response) =>
-        denormalisedResponseEntities(_response),
-      ),
-    );
+    const orders = await fetchListingsByChunkedIds(orderIdList, integrationSdk);
 
     await Promise.all(
       orders.map(async (order: TIntegrationListing) => {

@@ -4,12 +4,12 @@ import MetaWrapper from '@components/MetaWrapper/MetaWrapper';
 
 import EditPartnerFoodPage from './EditPartnerFood.page';
 
-const AdminEditPartnerFoodRoute = () => {
+const PartnerEditPartnerFoodRoute = () => {
   return (
-    <MetaWrapper routeName="AdminEditPartnerFoodRoute">
+    <MetaWrapper routeName="PartnerEditPartnerFoodRoute">
       <EditPartnerFoodPage />
     </MetaWrapper>
   );
 };
 
-export default AdminEditPartnerFoodRoute;
+export default PartnerEditPartnerFoodRoute;

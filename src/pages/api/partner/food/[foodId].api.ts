@@ -17,9 +17,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
     const apiMethod = req.method;
     const integrationSdk = getIntegrationSdk();
+    const { foodId } = req.query;
     switch (apiMethod) {
       case HttpMethod.GET: {
-        const { foodId } = req.query;
         const food = await fetchListing(
           foodId as string,
           ['images'],
@@ -29,7 +29,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         return res.status(200).json(food);
       }
       case HttpMethod.PUT: {
-        const { foodId } = req.query;
         const { dataParams = {}, queryParams = {} } = req.body;
         const response = await integrationSdk.listings.update(
           dataParams,
@@ -41,8 +40,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         return res.status(200).json(denormalisedResponseEntities(response)[0]);
       }
       case HttpMethod.DELETE: {
-        const { foodId } = req.query;
-
         const response = await integrationSdk.listings.update({
           id: foodId,
           metadata: {

@@ -6,7 +6,7 @@ import cookies from '@services/cookie';
 import partnerChecker from '@services/permissionChecker/partner';
 import { getIntegrationSdk, getSdk, handleError } from '@services/sdk';
 import { CurrentUser, denormalisedResponseEntities } from '@src/utils/data';
-import { EImageVariants, EListingType } from '@src/utils/enums';
+import { EImageVariants, EListingStates, EListingType } from '@src/utils/enums';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
@@ -67,7 +67,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         const response = await integrationSdk.listings.create(
           {
             ...dataParams,
-            state: 'published',
+            state: EListingStates.published,
             authorId: restaurant.author.id.uuid,
           },
           queryParams,

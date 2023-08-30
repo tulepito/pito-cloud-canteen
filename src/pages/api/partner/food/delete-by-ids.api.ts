@@ -10,6 +10,7 @@ import { handleError } from '@services/sdk';
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
     const apiMethod = req.method;
+    const integrationSdk = getIntegrationSdk();
 
     if (apiMethod !== HttpMethod.DELETE)
       return res.status(400).json({ message: 'Bad request' });
@@ -19,7 +20,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
     const responses = await Promise.all(
       ids.map(async (id: string) =>
-        getIntegrationSdk().listings.update(
+        integrationSdk.listings.update(
           {
             id,
             metadata: {
