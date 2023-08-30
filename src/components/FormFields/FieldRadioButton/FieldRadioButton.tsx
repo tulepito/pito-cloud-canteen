@@ -16,32 +16,30 @@ export const IconRadioButton: React.FC<TIconRadioButton> = (props) => {
   return (
     <div>
       <svg
-        preserveAspectRatio="none"
-        width="14"
-        height="14"
+        width={20}
+        height={20}
         className={className}
+        viewBox="0 0 20 20"
+        fill="none"
         xmlns="http://www.w3.org/2000/svg">
-        <circle
-          className={props.showAsRequired ? css.required : css.notChecked}
-          cx="5"
-          cy="19"
-          r="6"
-          transform="translate(2 -12)"
-          strokeWidth="1"
-          fill="none"
-          fillRule="evenodd"
+        <rect
+          x="0.5"
+          y="0.5"
+          width={19}
+          height={19}
+          rx="9.5"
+          fill="white"
+          stroke="#BFBFBF"
         />
-
         <g
           className={classNames(
             css.checked,
             checkedClassName || css.checkedStyle,
           )}
-          transform="translate(2 -12)"
+          transform="translate(0 -10)"
           fill="none"
           fillRule="evenodd">
-          <circle strokeWidth="1" cx="5" cy="19" r="6" />
-          <circle fillRule="nonzero" cx="5" cy="19" r="3" />
+          <circle fillRule="nonzero" cx="10" cy="20" r="6" />
         </g>
       </svg>
     </div>

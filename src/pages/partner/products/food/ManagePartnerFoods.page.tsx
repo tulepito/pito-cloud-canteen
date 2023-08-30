@@ -161,11 +161,8 @@ const TABLE_COLUMN: TColumn[] = [
 const parseEntitiesToTableData = (
   foods: TIntegrationListing[],
   extraData: any,
+  categoryOptions: any,
 ) => {
-  const categoryOptions = useAppSelector(
-    (state) => state.AdminAttributes.categories,
-  );
-
   return foods.map((food) => {
     return {
       key: food.id.uuid,
@@ -198,58 +195,59 @@ const parseEntitiesToExportCsv = (
   packagingOptions: any,
   categoryOptions: any,
 ) => {
-  const foodsToExport = foods
-    .filter((food) => ids.includes(food.id.uuid))
-    .map((food) => {
-      const {
-        publicData = {},
-        description,
-        title,
-        price,
-      } = food.attributes || {};
-      const {
-        sideDishes = [],
-        specialDiets = [],
-        category,
-        foodType,
-        menuType,
-        allergicIngredients = [],
-        maxQuantity,
-        minOrderHourInAdvance,
-        minQuantity,
-        notes,
-        unit,
-        numberOfMainDishes,
-        packaging,
-      } = publicData;
+  const filteredFoods =
+    ids.length > 0 ? foods.filter((food) => ids.includes(food.id.uuid)) : foods;
 
-      return {
-        'Mã món': food.id.uuid,
-        'Tên món ăn': title,
-        'Mô tả': description,
-        'Đơn giá': `${price?.amount} VND`,
-        'Thành phần dị ứng': allergicIngredients.join(','),
-        'Chất liệu bao bì': getLabelByKey(packagingOptions, packaging),
-        'Phong cách ẩm thực': getLabelByKey(categoryOptions, category),
-        'Loại món ăn': getLabelByKey(FOOD_TYPE_OPTIONS, foodType),
-        'Loại menu': getLabelByKey(MENU_OPTIONS, menuType),
-        'Món ăn kèm': sideDishes
-          .map((key: string) => getLabelByKey(SIDE_DISH_OPTIONS, key))
-          .join(','),
-        'Chế độ dinh dưỡng đặc biệt': specialDiets
-          .map((key: string) => getLabelByKey(SPECIAL_DIET_OPTIONS, key))
-          .join(','),
-        'Số nguời tối đa': maxQuantity,
-        'Giờ đặt trước tối thiểu': minOrderHourInAdvance,
-        'Số lượng tối thiểu': minQuantity,
-        'Ghi chú': notes,
-        'Đơn vị tính': unit,
-        'Số món chính': numberOfMainDishes,
-        'Hình ảnh': food.images?.map(
-          (image) => image.attributes.variants['square-small2x'].url,
-        ),
-      };
-    });
+  const foodsToExport = filteredFoods.map((food) => {
+    const {
+      publicData = {},
+      description,
+      title,
+      price,
+    } = food.attributes || {};
+    const {
+      sideDishes = [],
+      specialDiets = [],
+      category,
+      foodType,
+      menuType,
+      allergicIngredients = [],
+      maxQuantity,
+      minOrderHourInAdvance,
+      minQuantity,
+      notes,
+      unit,
+      numberOfMainDishes,
+      packaging,
+    } = publicData;
+
+    return {
+      'Mã món': food.id.uuid,
+      'Tên món ăn': title,
+      'Mô tả': description,
+      'Đơn giá': `${price?.amount} VND`,
+      'Thành phần dị ứng': allergicIngredients.join(','),
+      'Chất liệu bao bì': getLabelByKey(packagingOptions, packaging),
+      'Phong cách ẩm thực': getLabelByKey(categoryOptions, category),
+      'Loại món ăn': getLabelByKey(FOOD_TYPE_OPTIONS, foodType),
+      'Loại menu': getLabelByKey(MENU_OPTIONS, menuType),
+      'Món ăn kèm': sideDishes
+        .map((key: string) => getLabelByKey(SIDE_DISH_OPTIONS, key))
+        .join(','),
+      'Chế độ dinh dưỡng đặc biệt': specialDiets
+        .map((key: string) => getLabelByKey(SPECIAL_DIET_OPTIONS, key))
+        .join(','),
+      'Số nguời tối đa': maxQuantity,
+      'Giờ đặt trước tối thiểu': minOrderHourInAdvance,
+      'Số lượng tối thiểu': minQuantity,
+      'Ghi chú': notes,
+      'Đơn vị tính': unit,
+      'Số món chính': numberOfMainDishes,
+      'Hình ảnh': food.images?.map(
+        (image) => image.attributes.variants['square-small2x'].url,
+      ),
+    };
+  });
 
   return foodsToExport;
 };
@@ -262,11 +260,11 @@ const ManagePartnerFoods = () => {
   const router = useRouter();
 
   const categoryOptions = useAppSelector(
-    (state) => state.AdminAttributes.categories,
+    (state) => state.SystemAttributes.categories,
   );
 
   const packagingOptions = useAppSelector(
-    (state) => state.AdminAttributes.packaging,
+    (state) => state.SystemAttributes.packaging,
   );
 
   const [idsToAction, setIdsToAction] = useState<string[]>([]);
@@ -295,6 +293,13 @@ const ManagePartnerFoods = () => {
     createAtStart = '',
     createAtEnd = '',
   } = router.query;
+
+  const hasFilterApplied = !!(
+    keywords ||
+    foodType ||
+    createAtStart ||
+    createAtEnd
+  );
 
   const {
     foods,
@@ -367,9 +372,13 @@ const ManagePartnerFoods = () => {
     }
   };
 
-  const parsedFoods = parseEntitiesToTableData(foods, {
-    onSetFoodToRemove,
-  });
+  const parsedFoods = parseEntitiesToTableData(
+    foods,
+    {
+      onSetFoodToRemove,
+    },
+    categoryOptions,
+  );
 
   const handleClearFilter = () => {
     router.push({
@@ -451,22 +460,28 @@ const ManagePartnerFoods = () => {
     });
   };
 
+  const noDataContent = !hasFilterApplied ? (
+    <div className={css.emptyList}>
+      <IconFoodListEmpty />
+      <span>Tạo món ăn đầu tiên ngay bạn nhé!</span>
+      <NamedLink className={css.link} path={partnerPaths.CreateFood}>
+        <Button className={classNames(css.addButton, css.empty)}>
+          Thêm món ăn
+        </Button>
+      </NamedLink>
+      <Button
+        onClick={openImportModal}
+        className={classNames(css.lightButton, css.empty)}>
+        Thêm món ăn hàng loạt
+      </Button>
+    </div>
+  ) : (
+    <div>Không có món ăn nào</div>
+  );
+
   const viewModeContentRendered =
     foods.length === 0 ? (
-      <div className={css.emptyList}>
-        <IconFoodListEmpty />
-        <span>Tạo món ăn đầu tiên ngay bạn nhé!</span>
-        <NamedLink className={css.link} path={partnerPaths.CreateFood}>
-          <Button className={classNames(css.addButton, css.empty)}>
-            Thêm món ăn
-          </Button>
-        </NamedLink>
-        <Button
-          onClick={openImportModal}
-          className={classNames(css.lightButton, css.empty)}>
-          Thêm món ăn hàng loạt
-        </Button>
-      </div>
+      noDataContent
     ) : viewListMode === 'grid' ? (
       <GridFoodListForm
         onSubmit={() => {}}
@@ -552,11 +567,16 @@ const ManagePartnerFoods = () => {
                   <FilterForm
                     onSubmit={handleSubmitFilter}
                     categoryOptions={categoryOptions}
+                    onClearForm={handleClearFilter}
                     initialValues={{
                       keywords,
                       foodType: foodType as string,
-                      createAtStart: createAtStart as string,
-                      createAtEnd: createAtEnd as string,
+                      createAtStart: createAtStart
+                        ? new Date(+createAtStart).getTime()
+                        : undefined,
+                      createAtEnd: createAtEnd
+                        ? new Date(+createAtEnd).getTime()
+                        : undefined,
                     }}
                   />
                 }
@@ -595,16 +615,16 @@ const ManagePartnerFoods = () => {
 
           <InlineTextButton
             onClick={makeExcelFile}
-            disabled={idsToAction.length === 0}
+            disabled={hasFilterApplied && foods.length === 0}
             className={css.removeButton}>
             <IconPrint
               className={classNames(css.buttonIcon, {
-                [css.disabled]: idsToAction.length === 0,
+                [css.disabled]: foods.length === 0,
               })}
             />
             <div
               className={classNames(css.buttonIcon, {
-                [css.disabled]: idsToAction.length === 0,
+                [css.disabled]: hasFilterApplied && foods.length === 0,
               })}>
               In danh sách món ăn
             </div>

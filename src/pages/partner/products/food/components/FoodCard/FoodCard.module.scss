@@ -62,6 +62,7 @@
 .contentWrapper {
   @include flexAlign(center, space-between);
   gap: 12px;
+  color: $neutralGray6;
 
   .image {
     width: 84px;
@@ -88,6 +89,7 @@
       .menuType {
         @include textTemplate(14px, $fontWeightRegular, 20px);
         color: $neutralGray5;
+        margin-top: 4px;
       }
     }
 

@@ -2,14 +2,12 @@ import { useState } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
-import addDays from 'date-fns/addDays';
 
 import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
 import FieldDatePicker from '@components/FormFields/FieldDatePicker/FieldDatePicker';
 import FieldRadioButton from '@components/FormFields/FieldRadioButton/FieldRadioButton';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
-import { findMinStartDate } from '@helpers/orderHelper';
 import { EFoodTypes, FOOD_TYPE_OPTIONS, getLabelByKey } from '@src/utils/enums';
 
 import css from './FilterForm.module.scss';
@@ -17,26 +15,37 @@ import css from './FilterForm.module.scss';
 export type TFilterFormValues = {
   keywords?: string | string[];
   foodType?: string;
-  createAtStart?: string;
-  createAtEnd?: string;
+  createAtStart?: number;
+  createAtEnd?: number;
 };
 
 type TExtraProps = {
   categoryOptions: any;
+  onClearForm: () => void;
 };
 type TFilterFormComponentProps = FormRenderProps<TFilterFormValues> &
   Partial<TExtraProps>;
 type TFilterFormProps = FormProps<TFilterFormValues> & TExtraProps;
 
 const FilterFormComponent: React.FC<TFilterFormComponentProps> = (props) => {
-  const { handleSubmit } = props;
+  const { handleSubmit, onClearForm, values } = props;
+  const {
+    createAtStart: createAtStartInitialValue,
+    createAtEnd: createAtEndInitialValue,
+  } = values;
+  const initialCreateAtStart = createAtStartInitialValue
+    ? new Date(createAtStartInitialValue)
+    : null;
+
+  const initialCreateAtEnd = createAtEndInitialValue
+    ? new Date(createAtEndInitialValue)
+    : null;
   const intl = useIntl();
   const submitDisabled = false;
-  const [startDate, setStartDate] = useState<Date>(null!);
-  const [endDate, setEndDate] = useState<Date>(null!);
+  const [startDate, setStartDate] = useState<Date>(initialCreateAtStart!);
+  const [endDate, setEndDate] = useState<Date>(initialCreateAtEnd!);
 
-  const minStartDate = findMinStartDate();
-  const maxEndDate = startDate ? addDays(startDate, 6) : undefined;
+  const maxEndDate = new Date();
 
   return (
     <Form onSubmit={handleSubmit} className={css.formContainer}>
@@ -66,7 +75,7 @@ const FilterFormComponent: React.FC<TFilterFormComponentProps> = (props) => {
           label={getLabelByKey(FOOD_TYPE_OPTIONS, EFoodTypes.vegetarianDish)}
         />
         <FieldRadioButton
-          name="pub_foodType"
+          name="foodType"
           id={`foodType-${EFoodTypes.savoryDish}`}
           value={EFoodTypes.savoryDish}
           label={getLabelByKey(FOOD_TYPE_OPTIONS, EFoodTypes.savoryDish)}
@@ -81,40 +90,43 @@ const FilterFormComponent: React.FC<TFilterFormComponentProps> = (props) => {
             name="createAtStart"
             selected={startDate}
             onChange={(date: Date) => setStartDate(date)}
-            minDate={minStartDate}
             autoComplete="off"
             dateFormat={'EEE, dd MMMM, yyyy'}
-            // className={startDateClasses}
             placeholderText="Từ"
-            // validate={composeValidators(
-            //   required(startDateRequiredMessage),
-            //   nonSatOrSunDay(startDateNonSatOrSunDayMessage),
-            // )}
           />
           <FieldDatePicker
             id="createAtEnd"
             name="createAtEnd"
             onChange={(date: Date) => setEndDate(date)}
             selected={endDate}
-            // className={endDateClasses}
             minDate={startDate}
             maxDate={maxEndDate}
             dateFormat={'EEE, dd MMMM, yyyy'}
             autoComplete="off"
-            // validate={required(endDateRequiredMessage)}
             disabled={!startDate}
             placeholderText="Đến"
           />
         </div>
       </div>
+      <div className={css.btns}>
+        <Button
+          type="button"
+          className={css.filterBtn}
+          size="medium"
+          variant="secondary"
+          disabled={submitDisabled}
+          onClick={onClearForm}>
+          {intl.formatMessage({ id: 'IntegrationFilterModal.clearBtn' })}
+        </Button>
 
-      <Button
-        type="submit"
-        className={css.filterBtn}
-        size="medium"
-        disabled={submitDisabled}>
-        {intl.formatMessage({ id: 'ManagePartnerFoods.filterModal.title' })}
-      </Button>
+        <Button
+          type="submit"
+          className={css.filterBtn}
+          size="medium"
+          disabled={submitDisabled}>
+          {intl.formatMessage({ id: 'ManagePartnerFoods.filterModal.title' })}
+        </Button>
+      </div>
     </Form>
   );
 };

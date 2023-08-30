@@ -37,10 +37,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           ...(keywords && { keywords }),
           ...(foodType && { pub_foodType: foodType }),
           ...(createAtStart && {
-            createAtStart: new Date(createAtStart).toISOString(),
+            createdAtStart: new Date(+createAtStart).toISOString(),
           }),
           ...(createAtEnd && {
-            createAtEnd: new Date(createAtEnd).toISOString(),
+            createdAtEnd: new Date(+createAtEnd).toISOString(),
           }),
           meta_listingType: EListingType.food,
           meta_restaurantId: restaurantId || restaurantListingId,
