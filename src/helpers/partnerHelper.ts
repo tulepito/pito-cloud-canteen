@@ -18,6 +18,10 @@ export const createSubmitUpdatePartnerValues = (
     meals,
     categories,
     isActive,
+    phoneNumber,
+    startStopReceiveOrderDate,
+    endStopReceiveOrderDate,
+    stopReceiveOrder,
   } = values;
   const { selectedPlace = {} } = location || {};
   const { address, origin } = selectedPlace;
@@ -41,9 +45,19 @@ export const createSubmitUpdatePartnerValues = (
       ...(coverImageIdMaybe !== null && coverImageIdMaybe
         ? { coverImageId: coverImageIdMaybe }
         : {}),
-      ...(website ? { website } : {}),
-      ...(facebookLink ? { facebookLink } : {}),
+      ...(typeof website !== 'undefined' ? { website } : {}),
+      ...(typeof facebookLink !== 'undefined' ? { facebookLink } : {}),
+      // #region Stop receive order fields
+      ...(typeof startStopReceiveOrderDate === 'number'
+        ? { startStopReceiveOrderDate }
+        : {}),
+      ...(typeof endStopReceiveOrderDate === 'number'
+        ? { endStopReceiveOrderDate }
+        : {}),
+      ...(typeof stopReceiveOrder !== 'undefined' ? { stopReceiveOrder } : {}),
+      // #endregion
       ...(contactorName ? { contactorName } : {}),
+      ...(phoneNumber ? { phoneNumber } : {}),
       ...(meals ? { meals } : {}),
       ...(categories ? { categories } : {}),
       ...(typeof isActive !== 'undefined' ? { isActive } : {}),

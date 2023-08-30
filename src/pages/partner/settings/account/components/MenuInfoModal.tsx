@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import IconEdit from '@components/Icons/IconEdit/IconEdit';
@@ -24,7 +24,7 @@ type TNavigationModalProps = {
 const MenuInfoModal: React.FC<TNavigationModalProps> = (props) => {
   const { isOpen, onClose } = props;
 
-  const [isSubmitted, setIsSubmitted] = useState(false);
+  const submittedControl = useBoolean();
   const dispatch = useAppDispatch();
   const viewModeController = useBoolean(true);
   const restaurantListing = useAppSelector(
@@ -55,7 +55,7 @@ const MenuInfoModal: React.FC<TNavigationModalProps> = (props) => {
     );
 
     if (response.meta.requestStatus !== 'rejected') {
-      setIsSubmitted(true);
+      submittedControl.setTrue();
     }
   };
 
@@ -91,7 +91,8 @@ const MenuInfoModal: React.FC<TNavigationModalProps> = (props) => {
             <MenuSettingsForm
               initialValues={initialValues}
               onSubmit={handleSubmitForm}
-              isSubmitted={isSubmitted}
+              isSubmitted={submittedControl.value}
+              setSubmitted={submittedControl.setValue}
             />
           </RenderWhen.False>
         </RenderWhen>

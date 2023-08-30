@@ -14,6 +14,7 @@ import {
   composeValidators,
   phoneNumberFormatValid,
   required,
+  validURL,
 } from '@src/utils/validators';
 
 import css from './AccountSettingsForm.module.scss';
@@ -31,6 +32,7 @@ export type TAccountSettingsFormValues = {
 
 type TExtraProps = {
   isSubmitted?: boolean;
+  setSubmitted?: (value: boolean) => void;
   onFormChange?: (values: TAccountSettingsFormValues) => void;
 };
 type TAccountSettingsFormComponentProps =
@@ -45,6 +47,7 @@ const AccountSettingsFormComponent: React.FC<
     handleSubmit,
     pristine,
     isSubmitted = false,
+    setSubmitted,
     submitting,
     values,
     onFormChange,
@@ -105,18 +108,30 @@ const AccountSettingsFormComponent: React.FC<
     id: 'AccountSettingsForm.fieldAddress',
     name: 'location',
     className: css.fieldLocation,
+    inputClassName: css.fieldLocationInput,
+    isMultipleLines: true,
   };
   const fieldWebsite = {
     label: 'Website',
     id: 'AccountSettingsForm.fieldWebsite',
     name: 'website',
     placeholder: '-',
+    validate: validURL(
+      intl.formatMessage({
+        id: 'AccountSettingsForm.websiteInvalid',
+      }),
+    ),
   };
   const fieldFacebookLink = {
     label: 'Trang Facebook',
     id: 'AccountSettingsForm.fieldFacebookLink',
     name: 'facebookLink',
     placeholder: '-',
+    validate: validURL(
+      intl.formatMessage({
+        id: 'AccountSettingsForm.facebookUrlValid',
+      }),
+    ),
   };
 
   useEffect(() => {
@@ -130,7 +145,12 @@ const AccountSettingsFormComponent: React.FC<
   }, [JSON.stringify(values)]);
 
   useEffect(() => {
-    if (isSubmitted) successAlertControl.setTrue();
+    if (isSubmitted) {
+      successAlertControl.setTrue();
+      if (setSubmitted) {
+        setSubmitted(false);
+      }
+    }
   }, [isSubmitted]);
 
   return (

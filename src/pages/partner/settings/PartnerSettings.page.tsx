@@ -47,8 +47,8 @@ const PartnerSettingsPage = () => {
 
   return (
     <div className={css.container}>
-      <div className={css.title}>{title}</div>
       <MediaForm />
+      <div className={css.title}>{title}</div>
       <div className={css.navigationWrapper}>
         <div
           className={css.navigationItem}

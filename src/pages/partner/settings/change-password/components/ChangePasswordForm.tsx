@@ -62,7 +62,7 @@ const ChangePasswordForm: React.FC<TChangePasswordFormProps> = ({
   const { isMobileLayout } = useViewport();
   const dispatch = useAppDispatch();
   const changePasswordError = useAppSelector(
-    (state) => state.ParticipantAccount.changePasswordError,
+    (state) => state.password.changePasswordError,
   );
 
   const { form, handleSubmit, submitting, hasValidationErrors } =

@@ -5,7 +5,7 @@ import classNames from 'classnames';
 import ValidationError from '@components/ValidationError/ValidationError';
 
 // eslint-disable-next-line import/extensions
-import LocationAutocompleteInputImpl from './LocationAutocompleteInputImpl.tsx';
+import LocationAutocompleteInputImpl from './LocationAutocompleteInputImpl';
 
 import css from './LocationAutocompleteInput.module.scss';
 

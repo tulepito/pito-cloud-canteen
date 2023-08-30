@@ -41,6 +41,13 @@
       padding-right: 24px;
     }
   }
+
+  &.rowDisabled {
+    cursor: not-allowed;
+    &:hover {
+      background-color: transparent;
+    }
+  }
 }
 
 .item {

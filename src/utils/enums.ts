@@ -158,6 +158,7 @@ export enum ERestaurantListingStatus {
 export enum EInvalidRestaurantCase {
   closed = 'closed',
   noMenusValid = 'noMenusValid',
+  stopReceiveOrder = 'stopReceiveOrder',
 }
 
 export enum EParticipantOrderStatus {

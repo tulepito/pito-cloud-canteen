@@ -1,8 +1,9 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import Modal from '@components/Modal/Modal';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import useBoolean from '@hooks/useBoolean';
 import { currentUserSelector } from '@redux/slices/user.slice';
 import {
   CurrentUser,
@@ -24,7 +25,7 @@ type TNavigationModalProps = {
 
 const AccountSettingsModal: React.FC<TNavigationModalProps> = (props) => {
   const { isOpen, onClose } = props;
-  const [isSubmitted, setIsSubmitted] = useState(false);
+  const submittedControl = useBoolean();
   const dispatch = useAppDispatch();
   const restaurantListing = useAppSelector(
     (state) => state.PartnerSettingsPage.restaurantListing,
@@ -62,7 +63,7 @@ const AccountSettingsModal: React.FC<TNavigationModalProps> = (props) => {
     );
 
     if (response.meta.requestStatus !== 'rejected') {
-      setIsSubmitted(true);
+      submittedControl.setTrue();
     }
   };
 
@@ -83,7 +84,8 @@ const AccountSettingsModal: React.FC<TNavigationModalProps> = (props) => {
         <AccountSettingsForm
           initialValues={initialValues}
           onSubmit={handleSubmitAccountSettingForm}
-          isSubmitted={isSubmitted}
+          isSubmitted={submittedControl.value}
+          setSubmitted={submittedControl.setValue}
         />
       </div>
     </Modal>

@@ -153,6 +153,9 @@ const LocationAutocompleteInputImpl = (props: any) => {
     meta,
     ref,
     disabled = false,
+    isMultipleLines = false,
+    lines = 2,
+    enableResize = false,
   } = props;
   const {
     onChange: onChangeInput,
@@ -441,8 +444,12 @@ const LocationAutocompleteInputImpl = (props: any) => {
   const iconClass = classNames(iconClassName || css.icon);
   const inputClass = classNames(inputClassName || css.input, {
     [validClassName]: isValid,
+    [css.textareaNoResize]: !enableResize,
   });
-  const predictionsClass = classNames(predictionsClassName);
+  const predictionsClasses = classNames(
+    { [css.predictionWithMultipleLines]: isMultipleLines },
+    predictionsClassName,
+  );
 
   // Only render predictions when the input has focus. For
   // development and easier workflow with the browser devtools, you
@@ -450,34 +457,41 @@ const LocationAutocompleteInputImpl = (props: any) => {
   // list will disappear.
   const renderPredictions = inputHasFocus;
 
+  const inputProps = {
+    className: inputClass,
+    autoComplete: 'off',
+    autoFocus,
+    placeholder,
+    name,
+    value: search,
+    disabled: fetchingPlaceDetails || disabled,
+    onFocus: handleOnFocus,
+    onBlur: handleOnBlur,
+    onChange,
+    onKeyDown,
+    ref: (node: any) => {
+      inputRef.current = node;
+      if (ref) {
+        ref(node);
+      }
+    },
+
+    ...(isMultipleLines ? { rows: lines } : { type: 'search' }),
+  };
+
   return (
     <div className={rootClass}>
       <div className={iconClass}>
         {fetchingPlaceDetails && <IconSpinner className={css.iconSpinner} />}
       </div>
-      <input
-        className={inputClass}
-        type="search"
-        autoComplete="off"
-        autoFocus={autoFocus}
-        placeholder={placeholder}
-        name={name}
-        value={search}
-        disabled={fetchingPlaceDetails || disabled}
-        onFocus={handleOnFocus}
-        onBlur={handleOnBlur}
-        onChange={onChange}
-        onKeyDown={onKeyDown}
-        ref={(node) => {
-          inputRef.current = node;
-          if (ref) {
-            ref(node);
-          }
-        }}
-      />
+      {isMultipleLines ? (
+        <textarea {...inputProps} />
+      ) : (
+        <input {...inputProps} />
+      )}
       {renderPredictions ? (
         <LocationPredictionsList
-          rootClassName={predictionsClass}
+          className={predictionsClasses}
           attributionClassName={predictionsAttributionClassName}
           predictions={predictions}
           geocoder={getGeocoder()}
