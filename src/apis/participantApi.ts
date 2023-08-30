@@ -1,6 +1,6 @@
 import type { TRestaurantRating } from '@src/utils/types';
 
-import { postApi } from './configs';
+import { getApi, postApi } from './configs';
 
 type TParticipantReviewPlanTxBody = {
   txId: string;
@@ -21,3 +21,10 @@ type TParticipantPostRatingApiBody = {
 };
 export const participantPostRatingApi = (body: TParticipantPostRatingApiBody) =>
   postApi('/participants/ratings', body);
+
+export type TFetchOrdersApiParams = {
+  selectedMonth: Date;
+};
+
+export const fetchOrdersApi = (params: TFetchOrdersApiParams) =>
+  getApi('/participants/orders/fetch-order-list', params);
