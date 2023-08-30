@@ -6,7 +6,6 @@ import { useRouter } from 'next/router';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { foodSliceThunks } from '@redux/slices/foods.slice';
 import { IntegrationListing } from '@src/utils/data';
 import type { TObject } from '@src/utils/types';
 import { parsePrice } from '@src/utils/validators';
@@ -24,7 +23,8 @@ import { getUpdateFoodData } from '../utils';
 import css from './EditPartnerFood.module.scss';
 
 const EditPartnerFoodPage = () => {
-  const { foodId = '' } = useRouter().query;
+  const router = useRouter();
+  const { foodId = '' } = router.query;
   const dispatch = useAppDispatch();
 
   const {
@@ -44,7 +44,7 @@ const EditPartnerFoodPage = () => {
 
   const handleSubmit = (values: TEditPartnerFoodFormValues) =>
     dispatch(
-      foodSliceThunks.updatePartnerFoodListing(
+      partnerFoodSliceThunks.updatePartnerFoodListing(
         getUpdateFoodData({ ...values, id: foodId as string }),
       ),
     );

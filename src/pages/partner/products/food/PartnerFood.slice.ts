@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-shadow */
+import { toast } from 'react-toastify';
 import { createSlice } from '@reduxjs/toolkit';
 import omit from 'lodash/omit';
 import Papa from 'papaparse';
@@ -6,9 +7,17 @@ import * as XLSX from 'xlsx';
 
 import { getAttributesApi } from '@apis/admin';
 import { partnerFoodApi } from '@apis/foodApi';
-import { fetchPartnerFoodApi, queryPartnerFoodsApi } from '@apis/partnerApi';
+import {
+  createPartnerFoodApi,
+  fetchPartnerFoodApi,
+  queryPartnerFoodsApi,
+  removePartnerFoodApi,
+  removePartnerMultipleFoodApi,
+  updatePartnerFoodApi,
+} from '@apis/partnerApi';
 import { getImportDataFromCsv } from '@pages/admin/partner/[restaurantId]/settings/food/utils';
 import { createAsyncThunk } from '@redux/redux.helper';
+import { bottomRightToastOptions } from '@src/utils/toastify';
 import { CurrentUser, denormalisedResponseEntities } from '@utils/data';
 import { EImageVariants, EListingType } from '@utils/enums';
 import { storableAxiosError, storableError } from '@utils/errors';
@@ -196,12 +205,12 @@ const createPartnerFoodListing = createAsyncThunk(
   CREATE_PARTNER_FOOD_LISTING,
   async (payload: any, { rejectWithValue }) => {
     try {
-      const { data } = await partnerFoodApi.createFood({
+      const { data: food } = await createPartnerFoodApi({
         dataParams: payload,
         queryParams: {},
       });
 
-      return denormalisedResponseEntities(data)[0];
+      return food;
     } catch (error) {
       console.error(`${CREATE_PARTNER_FOOD_LISTING} error: `, error);
 
@@ -278,15 +287,17 @@ const updatePartnerFoodListing = createAsyncThunk(
         'fields.image': [`variants.${EImageVariants.squareSmall2x}`],
         expand: true,
       };
-      const { data } = await partnerFoodApi.updateFood(dataParams.id, {
+      const { data: food } = await updatePartnerFoodApi(dataParams.id, {
         dataParams,
         queryParams,
       });
-      const [food] = denormalisedResponseEntities(data);
+
+      toast.success('Cập nhật món ăn thành công', bottomRightToastOptions);
 
       return food;
     } catch (error) {
       console.error(`${UPDATE_PARTNER_FOOD_LISTING} error: `, error);
+      toast.error('Cập nhật món ăn thất bại', bottomRightToastOptions);
 
       return rejectWithValue(storableError(error));
     }
@@ -431,22 +442,19 @@ const removePartnerFood = createAsyncThunk(
       const { id = '', ids = [] } = payload;
       const isDeletingListIds = ids.length > 0;
       const { data } = isDeletingListIds
-        ? await partnerFoodApi.deleteFoodByIds({
+        ? await removePartnerMultipleFoodApi({
             dataParams: {
               ids,
             },
             queryParams: {},
           })
-        : await partnerFoodApi.deleteFood(id, {
-            dataParams: {
-              ...payload,
-            },
-            queryParams: {},
-          });
+        : await removePartnerFoodApi(id);
+      toast.success('Xóa món ăn thành công', bottomRightToastOptions);
 
       return data;
     } catch (error) {
       console.error(`${REMOVE_PARTNER_FOOD_LISTING} error: `, error);
+      toast.error('Xóa món ăn thất bại', bottomRightToastOptions);
 
       return rejectWithValue(storableAxiosError(error));
     }

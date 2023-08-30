@@ -747,7 +747,7 @@ const ManagePartnerFoods = () => {
             id="ManagePartnerFoods.removeContent"
             values={{
               foodName: (
-                <div className={css.foodTitle}>
+                <span className={css.foodTitle}>
                   {removeCheckedModalOpen ? (
                     <FormattedMessage
                       id="ManagePartnerFoods.foodLength"
@@ -756,7 +756,7 @@ const ManagePartnerFoods = () => {
                   ) : (
                     foodToRemove?.title
                   )}
-                </div>
+                </span>
               ),
             }}
           />

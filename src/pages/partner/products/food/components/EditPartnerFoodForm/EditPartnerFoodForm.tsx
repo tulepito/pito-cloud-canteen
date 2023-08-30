@@ -8,6 +8,7 @@ import classNames from 'classnames';
 import type { FormApi } from 'final-form';
 import arrayMutators from 'final-form-arrays';
 import isEqual from 'lodash/isEqual';
+import { useRouter } from 'next/router';
 
 import Button from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
@@ -21,6 +22,7 @@ import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput
 import FieldTextInputWithBottomBox from '@components/FormFields/FieldTextInputWithBottomBox/FieldTextInputWithBottomBox';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { foodSliceAction, foodSliceThunks } from '@redux/slices/foods.slice';
+import { partnerPaths } from '@src/paths';
 import type { TKeyValue } from '@src/utils/types';
 import {
   EImageVariants,
@@ -518,12 +520,14 @@ const EditPartnerFoodFormComponent: React.FC<
 };
 
 const EditPartnerFoodForm: React.FC<TEditPartnerFoodFormProps> = (props) => {
+  const router = useRouter();
   const [submittedValues, setSubmittedValues] =
     useState<TEditPartnerFoodFormValues>();
   const handleSubmit = async (values: TEditPartnerFoodFormValues) => {
     const { error } = (await props.onSubmit(values, {} as any)) as any;
     if (!error) {
       setSubmittedValues(values);
+      router.push(partnerPaths.ManageFood);
     }
   };
 

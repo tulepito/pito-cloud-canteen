@@ -1,9 +1,17 @@
 /* eslint-disable @typescript-eslint/no-loop-func */
 /* eslint-disable no-await-in-loop */
+import { chunk, flatten, uniq } from 'lodash';
+
 import { denormalisedResponseEntities } from '@services/data';
+import { fetchListing } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { getUniqueString, IntegrationListing } from '@src/utils/data';
-import { EDayOfWeek } from '@src/utils/enums';
+import {
+  EBookerOrderDraftStates,
+  EDayOfWeek,
+  EListingStates,
+  EListingType,
+} from '@src/utils/enums';
 import type { TIntegrationListing } from '@src/utils/types';
 
 const queryMenuByIdList = async (menuIdList: string[]) => {
@@ -11,7 +19,7 @@ const queryMenuByIdList = async (menuIdList: string[]) => {
 
   const menuResponse = await integrationSdk.listings.query(
     {
-      ids: menuIdList.slice(0, 50),
+      ids: menuIdList,
     },
     {
       expand: true,
@@ -33,11 +41,7 @@ export const updateMenuAfterFoodDeletedByListId = async (foodIds: string[]) => {
 
     // eslint-disable-next-line no-restricted-syntax
     for (const deletedFoodId of foodIds) {
-      const foodResponse = await integrationSdk.listings.show({
-        id: deletedFoodId,
-      });
-
-      const [deletedFood] = denormalisedResponseEntities(foodResponse);
+      const deletedFood = await fetchListing(deletedFoodId);
 
       const { menuIdList = [] } =
         IntegrationListing(deletedFood).getPublicData();
@@ -89,6 +93,7 @@ export const updateMenuAfterFoodDeletedByListId = async (foodIds: string[]) => {
 
             let newMinFoodPrice;
             let newFoodTypeList;
+            let newFoodNutritions;
             const deletedFoodIsInDay = foodIdList.some((id: string) =>
               deletedFoodIds.includes(id),
             );
@@ -121,6 +126,15 @@ export const updateMenuAfterFoodDeletedByListId = async (foodIds: string[]) => {
                   return [...prev, foodType];
                 }, [] as string[]),
               );
+
+              newFoodNutritions = uniq(
+                foods.reduce((result: any, food: TIntegrationListing) => {
+                  const { specialDiets = [] } =
+                    IntegrationListing(food).getPublicData();
+
+                  return [...result, ...specialDiets];
+                }, []),
+              );
             }
             const minPriceChanged = newMinFoodPrice !== currentMinFoodPrice;
             const menuId = IntegrationListing(details).getId();
@@ -145,6 +159,7 @@ export const updateMenuAfterFoodDeletedByListId = async (foodIds: string[]) => {
                     {}),
                   [`${day}FoodIdList`]: newFoodIdList,
                   [`${day}FoodType`]: newFoodTypeList,
+                  [`${day}FoodNutritions`]: newFoodNutritions,
                 },
               },
             };
@@ -176,13 +191,11 @@ export const updateMenuAfterFoodDeleted = async (deletedFoodId: string) => {
   try {
     const integrationSdk = getIntegrationSdk();
 
-    const foodResponse = await integrationSdk.listings.show({
-      id: deletedFoodId,
-    });
+    const deletedFood = await fetchListing(deletedFoodId);
 
-    const [deletedFood] = denormalisedResponseEntities(foodResponse);
+    const deletedFoodListing = IntegrationListing(deletedFood);
 
-    const { menuIdList = [] } = IntegrationListing(deletedFood).getPublicData();
+    const { menuIdList = [] } = deletedFoodListing.getPublicData();
 
     const menus = await queryMenuByIdList(menuIdList);
 
@@ -193,15 +206,14 @@ export const updateMenuAfterFoodDeleted = async (deletedFoodId: string) => {
         return Promise.all(
           Object.keys(EDayOfWeek).map(async (key) => {
             const day = EDayOfWeek[key as keyof typeof EDayOfWeek];
+            const menuListing = IntegrationListing(menu);
             const foodIdList =
-              IntegrationListing(menu).getMetadata()[`${day}FoodIdList`] || [];
+              menuListing.getMetadata()[`${day}FoodIdList`] || [];
 
             const currentMinFoodPrice =
-              IntegrationListing(menu).getPublicData()[`${day}MinFoodPrice`] ||
-              0;
+              menuListing.getPublicData()[`${day}MinFoodPrice`] || 0;
 
-            const foodsByDate =
-              IntegrationListing(menu).getPublicData()?.foodsByDate;
+            const foodsByDate = menuListing.getPublicData()?.foodsByDate;
 
             const foodsByDay = foodsByDate?.[day];
 
@@ -213,23 +225,32 @@ export const updateMenuAfterFoodDeleted = async (deletedFoodId: string) => {
 
             let newMinFoodPrice;
             let newFoodTypeList;
+            let newFoodNutritions;
 
             if (foodIdList.includes(deletedFoodId)) {
-              const listFoodResponse = await integrationSdk.listings.query({
-                ids: newFoodIdList.slice(0, 50),
-              });
+              const listFoodResponse = await Promise.all(
+                chunk<string>(newFoodIdList, 100).map(async (ids) => {
+                  const response = await integrationSdk.listings.query({
+                    ids,
+                  });
 
-              const foods = denormalisedResponseEntities(listFoodResponse);
+                  return response;
+                }),
+              );
+
+              const foods = flatten(
+                listFoodResponse.map((_response) =>
+                  denormalisedResponseEntities(_response),
+                ),
+              );
 
               newFoodTypeList = getUniqueString(
                 foods.reduce((prev: string[], food: TIntegrationListing) => {
                   const { foodType } = IntegrationListing(food).getPublicData();
                   // If menu still has any food has the same food type with the deleted food => Won't do any thing => Else remove that food type from menu
-                  if (deletedFoodId !== food.id.uuid) {
+                  if (deletedFoodId !== food.id.uuid || !foodType) {
                     return prev;
                   }
-
-                  if (!foodType) return prev;
 
                   return [...prev, foodType];
                 }, []),
@@ -247,6 +268,14 @@ export const updateMenuAfterFoodDeleted = async (deletedFoodId: string) => {
                   return amount < min ? amount : min;
                 },
                 0,
+              );
+              newFoodNutritions = uniq(
+                foods.reduce((result: any, food: TIntegrationListing) => {
+                  const { specialDiets = [] } =
+                    IntegrationListing(food).getPublicData();
+
+                  return [...result, ...specialDiets];
+                }, []),
               );
             }
             const minPriceChanged = newMinFoodPrice !== currentMinFoodPrice;
@@ -272,6 +301,7 @@ export const updateMenuAfterFoodDeleted = async (deletedFoodId: string) => {
                     {}),
                   [`${day}FoodIdList`]: newFoodIdList,
                   [`${day}FoodType`]: newFoodTypeList,
+                  [`${day}FoodNutritions`]: newFoodNutritions,
                 },
               },
             };
@@ -303,14 +333,17 @@ export const updateMenuAfterFoodDeleted = async (deletedFoodId: string) => {
 export const updateMenuAfterFoodUpdated = async (updatedFoodId: string) => {
   try {
     const integrationSdk = getIntegrationSdk();
+    console.log('SERVER before fetch updatedFood');
+    const updatedFood = await fetchListing(updatedFoodId);
+    console.log('SERVER after fetch updatedFood success');
+    const updatedFoodListing = IntegrationListing(updatedFood);
 
-    const foodResponse = await integrationSdk.listings.show({
-      id: updatedFoodId,
-    });
-
-    const [updatedFood] = denormalisedResponseEntities(foodResponse);
-
-    const { menuIdList = [] } = IntegrationListing(updatedFood).getPublicData();
+    const { menuIdList = [], unit: newFoodUnit } =
+      updatedFoodListing.getPublicData();
+    const {
+      price: { amount: newPriceAmount = 0 },
+      title: newFoodName,
+    } = updatedFoodListing.getAttributes();
 
     const menus = await queryMenuByIdList(menuIdList);
 
@@ -325,11 +358,25 @@ export const updateMenuAfterFoodUpdated = async (updatedFoodId: string) => {
               IntegrationListing(menu).getMetadata()[`${day}FoodIdList`] || [];
 
             if (foodIdList.includes(updatedFoodId)) {
-              const listFoodResponse = await integrationSdk.listings.query({
-                ids: foodIdList.slice(0, 50),
-              });
+              const listFoodResponse = await Promise.all(
+                chunk<string>(foodIdList, 100).map(async (ids) => {
+                  const response = await integrationSdk.listings.query({
+                    ids,
+                  });
 
-              const foods = denormalisedResponseEntities(listFoodResponse);
+                  return response;
+                }),
+              );
+              console.log(
+                'SERVER after fetch listFoodResponse success',
+                listFoodResponse,
+              );
+
+              const foods = flatten(
+                listFoodResponse.map((_response) =>
+                  denormalisedResponseEntities(_response),
+                ),
+              );
 
               const newMinFoodPrice = foods.reduce(
                 (min: number, food: TIntegrationListing, index: number) => {
@@ -354,6 +401,15 @@ export const updateMenuAfterFoodUpdated = async (updatedFoodId: string) => {
                 }, [] as string[]),
               );
 
+              const newFoodNutritions = uniq(
+                foods.reduce((result: any, food: TIntegrationListing) => {
+                  const { specialDiets = [] } =
+                    IntegrationListing(food).getPublicData();
+
+                  return [...result, ...specialDiets];
+                }, []),
+              );
+
               const menuId = menu.id.uuid;
 
               updateMap = {
@@ -365,12 +421,128 @@ export const updateMenuAfterFoodUpdated = async (updatedFoodId: string) => {
                   metadata: {
                     ...(updateMap?.[menuId]?.metadata || {}),
                     [`${day}FoodType`]: newFoodTypeList,
+                    [`${day}FoodNutritions`]: newFoodNutritions,
                   },
                 },
               };
             }
           }),
         );
+      }),
+    );
+
+    const plans = denormalisedResponseEntities(
+      await integrationSdk.listings.query({
+        meta_menuIds: `has_any:${menuIdList.join(',')}`,
+        meta_listingType: EListingType.subOrder,
+      }),
+    );
+
+    const orderIdList = plans.reduce(
+      (result: any, plan: TIntegrationListing) => {
+        const { orderDetail, orderId } = IntegrationListing(plan).getMetadata();
+        const totalFoodIdList = Object.values(orderDetail).reduce<string[]>(
+          (totalFoodIdListResult: any, subOrder: any) => {
+            return [
+              ...totalFoodIdListResult,
+              ...Object.keys(subOrder.restaurant.foodList),
+            ];
+          },
+          [],
+        );
+
+        if (totalFoodIdList.includes(updatedFoodId)) {
+          return [...result, orderId];
+        }
+
+        return result;
+      },
+      [],
+    );
+
+    const listOrderResponse = await Promise.all(
+      chunk<string>(orderIdList, 100).map(async (ids) => {
+        const response = await integrationSdk.listings.query({
+          ids,
+        });
+
+        return response;
+      }),
+    );
+
+    const orders = flatten(
+      listOrderResponse.map((_response) =>
+        denormalisedResponseEntities(_response),
+      ),
+    );
+
+    await Promise.all(
+      orders.map(async (order: TIntegrationListing) => {
+        const orderListing = IntegrationListing(order);
+        const { orderState, plans: orderPlans = [] } =
+          orderListing.getMetadata();
+
+        if (
+          [
+            EListingStates.draft,
+            EListingStates.pendingApproval,
+            EBookerOrderDraftStates.bookerDraft,
+          ].includes(orderState)
+        ) {
+          const plan = plans.find(
+            (p: TIntegrationListing) => p.id.uuid === orderPlans[0],
+          );
+          const planListing = IntegrationListing(plan);
+          const { orderDetail } = planListing.getMetadata();
+          const newOrderDetail = Object.keys(orderDetail).reduce(
+            (result, subOrderDate: string) => {
+              const { restaurant } = orderDetail[subOrderDate];
+              const { foodList } = restaurant;
+
+              const newFoodList = Object.keys(foodList).reduce(
+                (foodListResult: any, foodId: string) => {
+                  const food = foodList[foodId];
+                  if (foodId === updatedFoodId) {
+                    return {
+                      ...foodListResult,
+                      [foodId]: {
+                        ...food,
+                        foodName: newFoodName,
+                        foodPrice: newPriceAmount,
+                        foodUnit: newFoodUnit,
+                      },
+                    };
+                  }
+
+                  return {
+                    ...foodListResult,
+                    [foodId]: food,
+                  };
+                },
+                {},
+              );
+
+              return {
+                ...result,
+                [subOrderDate]: {
+                  ...orderDetail[subOrderDate],
+                  restaurant: {
+                    ...restaurant,
+                    foodList: newFoodList,
+                  },
+                },
+              };
+            },
+            orderDetail,
+          );
+
+          await integrationSdk.listings.update({
+            id: orderPlans[0],
+            metadata: {
+              orderDetail: newOrderDetail,
+            },
+          });
+        }
       }),
     );
 

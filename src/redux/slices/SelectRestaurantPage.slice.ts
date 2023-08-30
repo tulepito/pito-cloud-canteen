@@ -1,10 +1,9 @@
 import { createSlice } from '@reduxjs/toolkit';
 
+import { fetchFoodListFromMenuApi } from '@apis/admin';
 import { getMenuQuery } from '@helpers/listingSearchQuery';
 import { createAsyncThunk } from '@redux/redux.helper';
-import { ListingTypes } from '@src/types/listingTypes';
 import { denormalisedResponseEntities, Listing } from '@utils/data';
-import { convertWeekDay } from '@utils/dates';
 import type { TListing, TObject, TPagination } from '@utils/types';
 
 type TSelectRestaurantPageSliceInitialState = {
@@ -96,29 +95,14 @@ const getRestaurants = createAsyncThunk(
 
 const getRestaurantFood = createAsyncThunk(
   QUERY_RESTAURANT_FOOD,
-  async (
-    { menuId, dateTime, favoriteFoodIdList = [] }: any,
-    { extra: sdk, getState },
-  ) => {
-    const { order } = getState().Order;
-    const { nutritions = [] } = Listing(order as TListing).getMetadata();
-    const dayOfWeek = convertWeekDay(dateTime.weekday).key;
-    const response = await sdk.listings.query({
-      pub_menuIdList: `has_any:${menuId}`,
-      meta_listingType: ListingTypes.FOOD,
-      pub_menuWeekDay: `has_any:${dayOfWeek}`,
-      ...(nutritions.length > 0
-        ? { pub_specialDiets: `has_any:${nutritions.join(',')}` }
-        : {}),
-      ...(favoriteFoodIdList.length > 0
-        ? {
-            ids: favoriteFoodIdList.slice(0, 50),
-          }
-        : {}),
+  async ({ menuId, subOrderDate, favoriteFoodIdList = [] }: any) => {
+    const { data: foodList } = await fetchFoodListFromMenuApi({
+      menuId,
+      subOrderDate,
+      favoriteFoodIdList,
     });
-    const result = denormalisedResponseEntities(response);
 
-    return { foodList: result };
+    return { foodList };
   },
 );
 

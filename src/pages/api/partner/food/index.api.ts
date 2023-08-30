@@ -55,6 +55,27 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           managePartnerFoodPagination: response.data.meta,
         });
       }
+      case HttpMethod.POST: {
+        const { dataParams, queryParams = {} } = req.body;
+        const { restaurantListingId } = currentUserGetter.getMetadata();
+
+        const restaurantRes = await integrationSdk.listings.show({
+          id: restaurantListingId,
+          include: ['author'],
+        });
+        const [restaurant] = denormalisedResponseEntities(restaurantRes);
+        const response = await integrationSdk.listings.create(
+          {
+            ...dataParams,
+            state: 'published',
+            authorId: restaurant.author.id.uuid,
+          },
+          queryParams,
+        );
+
+        return res.status(200).json(denormalisedResponseEntities(response)[0]);
+      }
+
       default:
         return res.status(400).json({ message: 'Bad request' });
     }

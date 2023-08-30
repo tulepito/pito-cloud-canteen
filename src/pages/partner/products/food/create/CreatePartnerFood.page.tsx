@@ -6,11 +6,10 @@ import { useRouter } from 'next/router';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { partnerPaths } from '@src/paths';
-import { IntegrationListing } from '@utils/data';
+import { CurrentUser, IntegrationListing } from '@utils/data';
 import { EFoodTypes, EMenuTypes } from '@utils/enums';
 import { getInitialAddImages } from '@utils/images';
-import type { TIntegrationListing, TObject } from '@utils/types';
+import type { TObject } from '@utils/types';
 
 import EditPartnerFoodForm from '../components/EditPartnerFoodForm/EditPartnerFoodForm';
 import {
@@ -25,7 +24,7 @@ import css from './CreatePartnerFood.module.scss';
 const CreatePartnerFoodPage = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
-  const { restaurantId = '', duplicateId } = router.query;
+  const { duplicateId } = router.query;
   const {
     createFoodInProgress,
     createFoodError,
@@ -34,6 +33,9 @@ const CreatePartnerFoodPage = () => {
     showFoodError,
     uploadingImages,
   } = useAppSelector((state) => state.PartnerFood, shallowEqual);
+  const currentUser = useAppSelector((state) => state.user.currentUser);
+  const currentUserGetter = CurrentUser(currentUser!);
+  const { restaurantListingId } = currentUserGetter.getMetadata();
 
   const {
     partnerListingRef,
@@ -41,29 +43,16 @@ const CreatePartnerFoodPage = () => {
     showPartnerListingError,
   } = useAppSelector((state) => state.partners, shallowEqual);
 
-  const redirectToEditPage = (listing: TIntegrationListing) => {
-    const foodId = listing?.id?.uuid;
-    setTimeout(() => {
-      if (foodId)
-        return router.push({
-          pathname: partnerPaths.EditFood,
-          query: {
-            foodId,
-          },
-        });
-    }, 1000);
-  };
   const handleSubmit = async (values: TEditPartnerFoodFormValues) => {
     if (duplicateId) {
       const response = await dispatch(
         partnerFoodSliceThunks.duplicateFood(
           getDuplicateData({
             ...values,
-            restaurantId: restaurantId as string,
+            restaurantId: restaurantListingId,
           }),
         ),
       );
-      redirectToEditPage(response.payload);
 
       return response;
     }
@@ -71,11 +60,10 @@ const CreatePartnerFoodPage = () => {
       partnerFoodSliceThunks.createPartnerFoodListing(
         getSubmitFoodData({
           ...values,
-          restaurantId: restaurantId as string,
+          restaurantId: restaurantListingId,
         }),
       ),
     );
-    redirectToEditPage(response.payload);
 
     return response;
   };

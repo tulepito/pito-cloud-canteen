@@ -362,7 +362,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     await dispatch(
       selectRestaurantPageThunks.getRestaurantFood({
         menuId,
-        dateTime: DateTime.fromMillis(+dateTime),
+        subOrderDate: dateTime,
       }),
     );
     openPickFoodModal();
