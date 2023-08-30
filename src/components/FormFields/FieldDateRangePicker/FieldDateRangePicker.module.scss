@@ -21,7 +21,11 @@
   & :global(.react-datepicker__month) {
     text-align: center;
     margin: 0;
-    padding: 0 15px;
+    padding: 0 8px;
+
+    @include viewportMedium {
+      padding: 0 15px;
+    }
   }
 
   & :global(.react-datepicker__triangle) {
@@ -36,36 +40,32 @@
   & :global(.react-datepicker__header) {
     background-color: $neutralGray1 !important;
     border-bottom: none;
+    padding-bottom: 16px;
   }
 
   & :global(.react-datepicker__day) {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
     font-family: $fontFamily;
     margin: 0;
+    width: min(calc(calc(100vw - 48px) / 7), 72px);
+    height: 40px;
+
     @include viewportMedium {
       width: 40px;
-      height: 40px;
-    }
-    &:hover {
-      border: 1px solid $neutralGray5;
-      background-color: transparent;
+
+      &:hover {
+        border: 1px solid $neutralGray5;
+        background-color: transparent;
+      }
     }
   }
 
   & :global(.react-datepicker__day--selected),
   & :global(.react-datepicker__day--keyboard-selected) {
     background-color: $labelDarkBlue;
-    border-radius: 50%;
-    width: 30px;
-    height: 30px;
-    @include viewportMedium {
-      width: 40px;
-      height: 40px;
-    }
+    border-radius: 16px;
   }
 
   & :global(.react-datepicker__day--today) {
@@ -74,10 +74,11 @@
   }
 
   & :global(.react-datepicker__day-name) {
-    color: $neutralGray6;
-    width: 30px;
+    color: $neutralGray5;
+    width: min(calc(calc(100vw - 32px - 1.7rem * 2) / 7), 72px);
+
     @include viewportMedium {
-      width: 37px;
+      width: 40px;
     }
   }
   & :global(.react-datepicker-popper) {
