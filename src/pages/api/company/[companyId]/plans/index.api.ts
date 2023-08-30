@@ -11,6 +11,23 @@ import {
 import { UserPermission } from '@src/types/UserPermission';
 import { CurrentUser, User } from '@src/utils/data';
 import { EListingType } from '@src/utils/enums';
+import type { TCurrentUser, TUser } from '@src/utils/types';
+
+const isBookerOrOwner = (currentUser: TCurrentUser, companyUser: TUser) => {
+  const currentUserId = CurrentUser(currentUser).getId();
+
+  const { members = {} } = User(companyUser).getMetadata();
+
+  return Object.keys(members).find((member) => {
+    const { permission, id } = members[member];
+
+    if (id === currentUserId) {
+      return permission === UserPermission.BOOKER || UserPermission.OWNER;
+    }
+
+    return false;
+  });
+};
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
@@ -30,21 +47,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           showUserById(req, res, companyId as string),
         ]);
 
-        const currentUserId = CurrentUser(currentUser).getId();
-
-        const { members = {} } = User(companyUser).getMetadata();
-
-        const isBookerOrOwner = Object.keys(members).find((member) => {
-          const { permission, id } = members[member];
-
-          if (id === currentUserId) {
-            return permission === UserPermission.BOOKER || UserPermission.OWNER;
-          }
-
-          return false;
-        });
-
-        if (!isBookerOrOwner) throw new Error('You are not booker or owner');
+        if (!isBookerOrOwner(currentUser, companyUser))
+          throw new Error('You are not booker or owner');
 
         const { listings } = await queryListings(
           req,

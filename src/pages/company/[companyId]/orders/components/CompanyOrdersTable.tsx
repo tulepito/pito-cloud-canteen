@@ -98,7 +98,9 @@ const prepareTabItems = ({ intl, currentTab, tableData }: any) => {
     const label = (
       <div className={css.tabLabel}>
         {intl.formatMessage({ id })}
-        <span className={countClasses}>{(totalItemMap as TObject)[key]}</span>
+        <span className={countClasses}>
+          {(totalItemMap as TObject)?.[key] || 0}
+        </span>
       </div>
     );
 
@@ -147,7 +149,7 @@ const CompanyOrdersTable: React.FC<TCompanyOrdersTableProps> = () => {
   const { query, isReady, replace } = useRouter();
   const dispatch = useAppDispatch();
   const orders = useAppSelector((state) => state.Order.orders) || [];
-
+  const currentUser = useAppSelector((state) => state.user.currentUser);
   const plansByOrderIds = useAppSelector(
     (state) => state.Order.plansByOrderIds,
   );
@@ -159,6 +161,7 @@ const CompanyOrdersTable: React.FC<TCompanyOrdersTableProps> = () => {
   const queryOrderInProgress = useAppSelector(
     (state) => state.Order.queryOrderInProgress,
   );
+
   const { totalPages = 1 } = useAppSelector(
     (state) => state.Order.manageOrdersPagination,
   );
@@ -298,15 +301,24 @@ const CompanyOrdersTable: React.FC<TCompanyOrdersTableProps> = () => {
     }
   }, [page, totalPages]);
 
+  const currentUserId = currentUser?.id?.uuid;
+
   useEffect(() => {
     (async () => {
-      if (!currentTab || !isReady || !companyId || companyId === '[companyId]')
+      if (
+        !currentTab ||
+        !isReady ||
+        !companyId ||
+        companyId === '[companyId]' ||
+        !currentUserId
+      )
         return;
 
       let params: TObject = {
         page,
         keywords,
         companyId,
+        bookerId: currentUserId,
       };
 
       const parsedOrderState =
@@ -321,7 +333,7 @@ const CompanyOrdersTable: React.FC<TCompanyOrdersTableProps> = () => {
       };
       await dispatch(orderAsyncActions.queryCompanyOrders(params));
     })();
-  }, [companyId, currentTab, dispatch, isReady, keywords, page]);
+  }, [companyId, currentTab, dispatch, isReady, keywords, page, currentUserId]);
 
   const currentTabIndex = findTabIndexById(
     currentTab as EManageCompanyOrdersTab,
