@@ -73,8 +73,12 @@ const RestaurantSettingFormComponent: React.FC<
       : today,
   });
   const [dayOffRange, setDayOffRange] = useState<any>({
-    startDate: today,
-    endDate: today,
+    startDate: initialValues.startDayOff
+      ? new Date(initialValues.startDayOff)
+      : today,
+    endDate: initialValues.endDayOff
+      ? new Date(initialValues.endDayOff)
+      : today,
   });
 
   const { isActive = true } = Listing(restaurantListing).getPublicData();
@@ -172,11 +176,22 @@ const RestaurantSettingFormComponent: React.FC<
       : nearestNextDateHaveInProgressOrderForDayOff;
 
   const isEnableUpdateDateOffRangeAppStatus =
-    !isActive || (isActive && inProgressTransactionsInDayOffRangeCount === 0);
+    inProgressTransactionsInDayOffRangeCount === 0;
+
+  const isUpdateDayOffRangeDisabled =
+    dayOffRange.startDate === null ||
+    dayOffRange.endDate === null ||
+    dayOffRange.startDate > dayOffRange.endDate;
 
   const handleUpdateDayOffRangeClick = () => {
     if (isEnableUpdateDateOffRangeAppStatus) {
       dayOffControl.setFalse();
+      dispatch(
+        PartnerSettingsThunks.updatePartnerRestaurantListing({
+          startDayOff: dayOffRange.startDate.getTime(),
+          endDayOff: dayOffRange.endDate.getTime(),
+        }),
+      );
     } else {
       dayOffControl.setFalse();
       cannotUpdateDayOffRangeControl.setTrue();
@@ -374,7 +389,11 @@ const RestaurantSettingFormComponent: React.FC<
           <Button variant="inline" onClick={dayOffControl.setFalse}>
             Hủy
           </Button>
-          <Button onClick={handleUpdateDayOffRangeClick}>Áp dụng</Button>
+          <Button
+            disabled={isUpdateDayOffRangeDisabled}
+            onClick={handleUpdateDayOffRangeClick}>
+            Áp dụng
+          </Button>
         </div>
       </SlideModal>
 

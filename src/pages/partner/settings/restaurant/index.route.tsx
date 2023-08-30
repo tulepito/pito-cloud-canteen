@@ -30,6 +30,8 @@ const PartnerRestaurantSettingRoute = () => {
     stopReceiveOrder = false,
     startStopReceiveOrderDate,
     endStopReceiveOrderDate,
+    startDayOff,
+    endDayOff,
   } = Listing(restaurantListing).getPublicData();
 
   const stopReceiveOrderInfo = fetchDataInProgress
@@ -37,13 +39,17 @@ const PartnerRestaurantSettingRoute = () => {
     : `${formatTimestamp(startStopReceiveOrderDate)} -  ${formatTimestamp(
         endStopReceiveOrderDate,
       )}`;
-  const dayOffInfo = `${formatTimestamp()} -  ${formatTimestamp()}`;
+  const dayOffInfo = `${formatTimestamp(startDayOff)} -  ${formatTimestamp(
+    endDayOff,
+  )}`;
 
   const formInitialValues = {
     isActive,
     dayOffInfo,
     stopReceiveOrder,
     stopReceiveOrderInfo,
+    startDayOff,
+    endDayOff,
   };
 
   const handleClose = () => {
