@@ -698,7 +698,7 @@ const queryCompanyOrders = createAsyncThunk(
   'app/Orders/COMPANY_QUERY_ORDERS',
   async (payload: TObject, { rejectWithValue, dispatch, getState }) => {
     const { companyId = '', bookerId, ...restPayload } = payload;
-    console.log('query Order');
+
     if (companyId === '') {
       return rejectWithValue('Company ID is empty');
     }
