@@ -23,7 +23,7 @@ type TFoodCardProps = {
   id: string;
   name: string;
   food: TListing;
-  setFoodToRemove: (params: { id: string }) => void;
+  setFoodToRemove: (params: any) => void;
 };
 
 const FoodCard: React.FC<TFoodCardProps> = (props) => {
@@ -39,44 +39,46 @@ const FoodCard: React.FC<TFoodCardProps> = (props) => {
   const { menuType, foodType, specialDiets = [] } = foodListing.getPublicData();
 
   const checkBoxContent = (
-    <div className={css.contentWrapper}>
-      <div className={css.image}>
-        <ResponsiveImage
-          image={foodImage}
-          alt={foodName}
-          variants={[EImageVariants.squareSmall2x]}
-        />
-      </div>
-      <div className={css.content}>
-        <div className={css.infoWrapper}>
-          <div className={css.foodName} title={foodName}>
-            {foodName}
-          </div>
-          <div className={css.menuType}>
-            {getLabelByKey(MENU_OPTIONS, menuType)}
-          </div>
+    <NamedLink path={partnerPaths.EditFood.replace('[foodId]', foodId)}>
+      <div className={css.contentWrapper}>
+        <div className={css.image}>
+          <ResponsiveImage
+            image={foodImage}
+            alt={foodName}
+            variants={[EImageVariants.squareSmall2x]}
+          />
         </div>
-        <div className={css.bottomWrapper}>
-          <div className={css.foodType}>
-            <RenderWhen condition={!!specialDiets[0]}>
+        <div className={css.content}>
+          <div className={css.infoWrapper}>
+            <div className={css.foodName} title={foodName}>
+              {foodName}
+            </div>
+            <div className={css.menuType}>
+              {getLabelByKey(MENU_OPTIONS, menuType)}
+            </div>
+          </div>
+          <div className={css.bottomWrapper}>
+            <div className={css.foodType}>
+              <RenderWhen condition={!!specialDiets[0]}>
+                <Badge
+                  type={EBadgeType.info}
+                  label={getLabelByKey(SPECIAL_DIET_OPTIONS, specialDiets[0])}
+                />
+              </RenderWhen>
               <Badge
-                type={EBadgeType.info}
-                label={getLabelByKey(SPECIAL_DIET_OPTIONS, specialDiets[0])}
+                type={EBadgeType.success}
+                label={getLabelByKey(FOOD_TYPE_OPTIONS, foodType)}
               />
-            </RenderWhen>
-            <Badge
-              type={EBadgeType.success}
-              label={getLabelByKey(FOOD_TYPE_OPTIONS, foodType)}
-            />
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </NamedLink>
   );
 
   const handleRemoveFood = () => {
     actionController.setFalse();
-    setFoodToRemove({ id: foodId });
+    setFoodToRemove({ id: foodId, title: foodName });
   };
 
   return (

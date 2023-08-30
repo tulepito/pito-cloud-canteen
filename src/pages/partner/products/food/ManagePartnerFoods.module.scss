@@ -40,7 +40,8 @@
 
 .filterIcon {
   fill: $neutralGray6;
-  width: 20px;
+  width: 14px;
+  height: 14px;
   margin-right: 10px;
 }
 
@@ -165,12 +166,6 @@
   font-size: 14px;
   gap: 8px;
 
-  // svg {
-  //   path {
-  //     fill: $neutralGray1;
-  //   }
-  // }
-
   &.empty {
     width: 240px;
   }
@@ -212,13 +207,15 @@
   font-weight: $fontWeightBold;
   font-size: 14px;
 
-  &:hover {
-    background-color: $neutralGray6;
-    color: $neutralGray1;
+  &:not(:disabled) {
+    &:hover {
+      background-color: $neutralGray6;
+      color: $neutralGray1;
 
-    svg {
-      path {
-        fill: $neutralGray1;
+      svg {
+        path {
+          fill: $neutralGray1;
+        }
       }
     }
   }
@@ -290,12 +287,6 @@
     max-width: calc(100vw - 350px);
     overflow-x: scroll;
     position: relative;
-  }
-}
-
-.table {
-  @include viewportMedium {
-    min-width: 1440px;
   }
 }
 
