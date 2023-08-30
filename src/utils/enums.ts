@@ -103,6 +103,7 @@ export enum EErrorCode {
   notFound = 'not-found',
   forbidden = 'forbidden',
   missingStripeAccount = 'transaction-missing-stripe-account',
+  newOwnerAlreadyACompanyUser = 'new-owner-already-a-company-user',
 }
 
 export enum ECompanyStatus {
