@@ -824,7 +824,23 @@ const checkRestaurantStillAvailable = createAsyncThunk(
 
         const { status = ERestaurantListingStatus.authorized } =
           Listing(restaurantListing).getMetadata();
-
+        const {
+          stopReceiveOrder = false,
+          startStopReceiveOrderDate = 0,
+          endStopReceiveOrderDate = 0,
+        } = Listing(restaurantListing).getPublicData();
+        const isInStopReceiveOrderTime =
+          stopReceiveOrder &&
+          Number(timestamp) >= startStopReceiveOrderDate &&
+          Number(timestamp) <= endStopReceiveOrderDate;
+        if (isInStopReceiveOrderTime) {
+          return {
+            [timestamp]: {
+              isAvailable: false,
+              status: EInvalidRestaurantCase.stopReceiveOrder,
+            },
+          };
+        }
         if (status !== ERestaurantListingStatus.authorized) {
           return {
             [timestamp]: {

@@ -80,7 +80,7 @@ const RestaurantSettingFormComponent: React.FC<
   const { isActive = true } = Listing(restaurantListing).getPublicData();
 
   const handleChangeStopReceiveOrder = (value: boolean) => {
-    if (isMobileLayout) {
+    if (isMobileLayout && !value) {
       dispatch(
         PartnerSettingsThunks.updatePartnerRestaurantListing({
           stopReceiveOrder: value,
