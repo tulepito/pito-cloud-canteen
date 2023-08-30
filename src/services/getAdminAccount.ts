@@ -18,13 +18,16 @@ export const getOrderNumber = async () => {
   return currentOrderNumber;
 };
 
-export const updateOrderNumber = async () => {
+export const updateOrderNumber = async (newOrderNumber?: number) => {
   const integrationSdk = getIntegrationSdk();
-  const currentOrderNumber = await getOrderNumber();
+  const orderNumber =
+    typeof newOrderNumber === 'number'
+      ? newOrderNumber
+      : (await getOrderNumber()) + 1;
   await integrationSdk.users.updateProfile({
     id: ADMIN_ID,
     metadata: {
-      currentOrderNumber: currentOrderNumber + 1,
+      currentOrderNumber: orderNumber,
     },
   });
 };
