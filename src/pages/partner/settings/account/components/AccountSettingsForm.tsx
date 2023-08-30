@@ -31,6 +31,7 @@ export type TAccountSettingsFormValues = {
 
 type TExtraProps = {
   isSubmitted?: boolean;
+  setSubmitted?: (value: boolean) => void;
   onFormChange?: (values: TAccountSettingsFormValues) => void;
 };
 type TAccountSettingsFormComponentProps =
@@ -45,6 +46,7 @@ const AccountSettingsFormComponent: React.FC<
     handleSubmit,
     pristine,
     isSubmitted = false,
+    setSubmitted,
     submitting,
     values,
     onFormChange,
@@ -132,7 +134,12 @@ const AccountSettingsFormComponent: React.FC<
   }, [JSON.stringify(values)]);
 
   useEffect(() => {
-    if (isSubmitted) successAlertControl.setTrue();
+    if (isSubmitted) {
+      successAlertControl.setTrue();
+      if (setSubmitted) {
+        setSubmitted(false);
+      }
+    }
   }, [isSubmitted]);
 
   return (

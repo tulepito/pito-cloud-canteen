@@ -15,7 +15,10 @@ import css from './MenuSettingsForm.module.scss';
 
 export type TMenuSettingsFormValues = {};
 
-type TExtraProps = { isSubmitted?: boolean };
+type TExtraProps = {
+  isSubmitted?: boolean;
+  setSubmitted?: (value: boolean) => void;
+};
 type TMenuSettingsFormComponentProps =
   FormRenderProps<TMenuSettingsFormValues> & Partial<TExtraProps>;
 type TMenuSettingsFormProps = FormProps<TMenuSettingsFormValues> & TExtraProps;
@@ -23,7 +26,13 @@ type TMenuSettingsFormProps = FormProps<TMenuSettingsFormValues> & TExtraProps;
 const MenuSettingsFormComponent: React.FC<TMenuSettingsFormComponentProps> = (
   props,
 ) => {
-  const { handleSubmit, pristine, isSubmitted = false, submitting } = props;
+  const {
+    handleSubmit,
+    pristine,
+    isSubmitted = false,
+    submitting,
+    setSubmitted,
+  } = props;
 
   const successAlertControl = useBoolean();
 
@@ -33,7 +42,12 @@ const MenuSettingsFormComponent: React.FC<TMenuSettingsFormComponentProps> = (
   const submitDisabled = pristine;
 
   useEffect(() => {
-    if (isSubmitted) successAlertControl.setTrue();
+    if (isSubmitted) {
+      successAlertControl.setTrue();
+      if (setSubmitted) {
+        setSubmitted(false);
+      }
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSubmitted]);
 
