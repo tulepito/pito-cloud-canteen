@@ -65,10 +65,11 @@
     }
   }
   .description {
-    @include textTemplate(14px, 400, 24px, '');
+    @include textTemplate(14px, 400, 24px);
     color: $neutralGray5;
     margin: 0;
-    @include lineClamp(2);
+    @include lineClamp(2, 24px);
+    letter-spacing: 0.028px;
   }
 }
 
