@@ -14,6 +14,7 @@ import {
   composeValidators,
   phoneNumberFormatValid,
   required,
+  validURL,
 } from '@src/utils/validators';
 
 import css from './AccountSettingsForm.module.scss';
@@ -115,12 +116,22 @@ const AccountSettingsFormComponent: React.FC<
     id: 'AccountSettingsForm.fieldWebsite',
     name: 'website',
     placeholder: '-',
+    validate: validURL(
+      intl.formatMessage({
+        id: 'AccountSettingsForm.websiteInvalid',
+      }),
+    ),
   };
   const fieldFacebookLink = {
     label: 'Trang Facebook',
     id: 'AccountSettingsForm.fieldFacebookLink',
     name: 'facebookLink',
     placeholder: '-',
+    validate: validURL(
+      intl.formatMessage({
+        id: 'AccountSettingsForm.facebookUrlValid',
+      }),
+    ),
   };
 
   useEffect(() => {
