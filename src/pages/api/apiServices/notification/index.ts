@@ -29,6 +29,7 @@ export const sendNotificationToParticipantOnUpdateOrder = async (
       }
 
       default:
+        return;
     }
   } catch (error) {
     console.error(
