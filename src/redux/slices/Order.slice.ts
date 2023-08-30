@@ -108,7 +108,7 @@ type TOrderInitialState = {
 
   queryTotalOrdersCountByTabInProgress: boolean;
   queryTotalOrdersCountByTabError: any;
-  totalItemMap: TOrderStateCountMap;
+  totalItemMap: TOrderStateCountMap | null;
 
   companyOrderNotificationMap: TCompanyOrderNoticationMap;
   getOrderNotificationInProgress: boolean;
@@ -219,13 +219,14 @@ const initialState: TOrderInitialState = {
     page: 1,
     perPage: 10,
   },
-  totalItemMap: {
-    [EManageCompanyOrdersTab.SCHEDULED]: 0,
-    [EManageCompanyOrdersTab.CANCELED]: 0,
-    [EManageCompanyOrdersTab.DRAFT]: 0,
-    [EManageCompanyOrdersTab.COMPLETED]: 0,
-    [EManageCompanyOrdersTab.ALL]: 0,
-  },
+  // totalItemMap: {
+  //   [EManageCompanyOrdersTab.SCHEDULED]: 0,
+  //   [EManageCompanyOrdersTab.CANCELED]: 0,
+  //   [EManageCompanyOrdersTab.DRAFT]: 0,
+  //   [EManageCompanyOrdersTab.COMPLETED]: 0,
+  //   [EManageCompanyOrdersTab.ALL]: 0,
+  // },
+  totalItemMap: null,
 
   queryTotalOrdersCountByTabInProgress: false,
   queryTotalOrdersCountByTabError: null,
@@ -695,11 +696,15 @@ const queryTotalOrderCountByTab = createAsyncThunk(
 
 const queryCompanyOrders = createAsyncThunk(
   'app/Orders/COMPANY_QUERY_ORDERS',
-  async (payload: TObject, { rejectWithValue, dispatch }) => {
-    const { companyId = '', ...restPayload } = payload;
-
+  async (payload: TObject, { rejectWithValue, dispatch, getState }) => {
+    const { companyId = '', bookerId, ...restPayload } = payload;
+    console.log('query Order');
     if (companyId === '') {
       return rejectWithValue('Company ID is empty');
+    }
+
+    if (!bookerId) {
+      return rejectWithValue('Booker ID is empty');
     }
 
     const params = {
@@ -708,6 +713,7 @@ const queryCompanyOrders = createAsyncThunk(
         perPage: MANAGE_ORDER_PAGE_SIZE,
         states: EListingStates.published,
         meta_companyId: companyId,
+        meta_bookerId: bookerId,
         meta_listingType: LISTING_TYPE.ORDER,
         sort: 'createdAt',
       },
@@ -721,6 +727,7 @@ const queryCompanyOrders = createAsyncThunk(
     );
     const orders = denormalisedResponseEntities(response);
     const orderIds = orders.map((order: TListing) => Listing(order).getId());
+    const pagination = response.data.meta;
 
     dispatch(
       queryCompanyPlansByOrderIds({
@@ -729,19 +736,19 @@ const queryCompanyOrders = createAsyncThunk(
       }),
     );
 
-    const pagination = response.data.meta;
+    const alreadyFetchOrderCount = !!getState().Order.totalItemMap;
 
-    const { bookerId } = Listing(orders[0]).getMetadata();
-
-    dispatch(
-      queryTotalOrderCountByTab({
-        bookerId,
-        companyId,
-        currentTab: restPayload.currentTab,
-        page: restPayload.page,
-        pagination,
-      }),
-    );
+    if (!alreadyFetchOrderCount) {
+      dispatch(
+        queryTotalOrderCountByTab({
+          bookerId,
+          companyId,
+          currentTab: restPayload.currentTab,
+          page: restPayload.page,
+          pagination,
+        }),
+      );
+    }
 
     return { orders, pagination, queryParams: payload };
   },
@@ -1222,13 +1229,6 @@ const orderSlice = createSlice({
         totalPages: 1,
         page: 1,
         perPage: 10,
-      },
-      totalItemMap: {
-        [EManageCompanyOrdersTab.SCHEDULED]: 0,
-        [EManageCompanyOrdersTab.CANCELED]: 0,
-        [EManageCompanyOrdersTab.DRAFT]: 0,
-        [EManageCompanyOrdersTab.COMPLETED]: 0,
-        [EManageCompanyOrdersTab.ALL]: 0,
       },
     }),
     changeStep4SubmitStatus: (state, { payload }) => ({

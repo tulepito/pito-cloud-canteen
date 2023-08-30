@@ -57,15 +57,15 @@ const ORDER_ANALYSIS_DATA = [
 ];
 
 type TOrdersAnalysisSection = {
-  totalItemMap: TOrderStateCountMap;
+  totalItemMap: TOrderStateCountMap | null;
   inProgress: boolean;
 };
 
 const mapTotalItemMapToOrderAnalysisData = (
-  totalItemMap: TOrderStateCountMap,
+  totalItemMap: TOrderStateCountMap | null,
 ) => {
   const orderAnalysisData = ORDER_ANALYSIS_DATA.map((orderData) => {
-    const orderCount = totalItemMap[orderData.key];
+    const orderCount = totalItemMap?.[orderData.key] || 0;
 
     return {
       ...orderData,

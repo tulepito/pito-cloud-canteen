@@ -63,12 +63,15 @@ const CompanyDashboardPage = () => {
   ]);
 
   useEffect(() => {
-    if (!companyId) return;
+    if (!companyId || !currentUserId) return;
 
     const isPersonal = companyId === 'personal';
     const companyIdToQuery = isPersonal ? currentUserId : companyId;
     dispatch(
-      orderAsyncActions.queryCompanyOrders({ companyId: companyIdToQuery }),
+      orderAsyncActions.queryCompanyOrders({
+        companyId: companyIdToQuery,
+        bookerId: currentUserId,
+      }),
     );
     dispatch(
       orderAsyncActions.getCompanyOrderNotification(companyIdToQuery as string),
