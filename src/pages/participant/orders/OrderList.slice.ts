@@ -1,6 +1,4 @@
 import { createSlice } from '@reduxjs/toolkit';
-import flatten from 'lodash/flatten';
-import uniq from 'lodash/uniq';
 import uniqBy from 'lodash/uniqBy';
 
 import type { ParticipantSubOrderAddDocumentApiBody } from '@apis/firebaseApi';
@@ -11,19 +9,12 @@ import {
   participantUpdateSeenNotificationApi,
 } from '@apis/firebaseApi';
 import { updateParticipantOrderApi } from '@apis/index';
-import { participantPostRatingApi } from '@apis/participantApi';
-import { fetchTxApi, queryTransactionApi } from '@apis/txApi';
+import { fetchOrdersApi, participantPostRatingApi } from '@apis/participantApi';
 import { disableWalkthroughApi, fetchSearchFilterApi } from '@apis/userApi';
-import { getParticipantOrdersQuery } from '@helpers/listingSearchQuery';
 import { markColorForOrder } from '@helpers/orderHelper';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { userThunks } from '@redux/slices/user.slice';
-import {
-  CurrentUser,
-  denormalisedResponseEntities,
-  Listing,
-} from '@src/utils/data';
-import { getEndOfMonth } from '@src/utils/dates';
+import { Listing } from '@src/utils/data';
 import { ESubOrderTxStatus } from '@src/utils/enums';
 import { convertStringToNumber } from '@src/utils/number';
 import type {
@@ -130,8 +121,7 @@ const UPDATE_PROFILE = 'app/ParticipantOrderList/UPDATE_PROFILE';
 const DISABLE_WALKTHROUGH = 'app/ParticipantOrderList/DISABLE_WALKTHROUGH';
 const FETCH_ORDERS = 'app/ParticipantOrderList/FETCH_ORDERS';
 const UPDATE_SUB_ORDER = 'app/ParticipantOrderList/UPDATE_SUB_ORDER';
-const FETCH_TRANSACTION_BY_SUB_ORDER =
-  'app/ParticipantOrderList/FETCH_TRANSACTION_BY_SUB_ORDER';
+
 const POST_PARTICIPANT_RATING =
   'app/ParticipantOrderList/POST_PARTICIPANT_RATING';
 const ADD_SUB_ORDER_DOCUMENT_TO_FIREBASE =
@@ -167,79 +157,18 @@ const disableWalkthrough = createAsyncThunk(
 
 const fetchOrders = createAsyncThunk(
   FETCH_ORDERS,
-  async ({ userId, selectedMonth }: TObject, { extra: sdk, getState }) => {
-    const { currentUser } = getState().user;
-    const query = getParticipantOrdersQuery({
-      userId,
-      startDate: selectedMonth.getTime(),
-      endDate: getEndOfMonth(selectedMonth).getTime(),
+  async ({ selectedMonth }: TObject) => {
+    const { data } = await fetchOrdersApi({
+      selectedMonth,
     });
-    const response = await sdk.listings.query(query);
-    const orders = denormalisedResponseEntities(response);
 
-    const allPlansIdList = orders.map((order: TListing) => {
-      const orderListing = Listing(order);
-      const { plans = [] } = orderListing.getMetadata();
-
-      return plans[0];
-    });
-    const allPlans = denormalisedResponseEntities(
-      await sdk.listings.query({
-        ids: allPlansIdList,
-      }),
-    );
-    const allRelatedRestaurantsIdList = uniq(
-      allPlans.map((plan: TListing) => {
-        const planListing = Listing(plan);
-        const { orderDetail = {} } = planListing.getMetadata();
-
-        return Object.values(orderDetail).map(
-          (subOrder: any) => subOrder?.restaurant?.id,
-        );
-      }),
-    );
-    const allRelatedRestaurants = denormalisedResponseEntities(
-      await sdk.listings.query({
-        ids: allRelatedRestaurantsIdList,
-      }),
-    );
-    const mappingSubOrderToOrder = orders.reduce(
-      (result: any, order: TListing) => {
-        const orderListing = Listing(order);
-        const orderId = orderListing.getId();
-        const { plans = [] } = orderListing.getMetadata();
-        const planIdWithOrderId = plans.reduce(
-          (mapping: any[], planId: string) => {
-            return {
-              ...mapping,
-              [planId]: orderId,
-            };
-          },
-          {},
-        );
-
-        return {
-          ...result,
-          ...planIdWithOrderId,
-        };
-      },
-      {},
-    );
-    const currentUserGetter = CurrentUser(currentUser!);
-    const { companyList } = currentUserGetter.getMetadata();
-    const { data: transactions } = await queryTransactionApi({
-      dataParams: {
-        createdAtEnd: getEndOfMonth(selectedMonth),
-        companyId: companyList[0],
-      },
-    });
+    const { orders, allPlans, restaurants, mappingSubOrderToOrder } = data;
 
     return {
       orders,
-      allPlans: flatten(allPlans),
-      restaurants: allRelatedRestaurants,
+      allPlans,
+      restaurants,
       mappingSubOrderToOrder,
-      subOrderTxs: transactions,
     };
   },
 );
@@ -267,33 +196,6 @@ const updateSubOrder = createAsyncThunk(
     return {
       allPlans: newAllPlans,
     };
-  },
-);
-
-const fetchTransactionBySubOrder = createAsyncThunk(
-  FETCH_TRANSACTION_BY_SUB_ORDER,
-  async (txIds: string[], { getState }) => {
-    const { subOrderTxs = [] } = getState().ParticipantOrderList;
-    const subOrderTxsIds = subOrderTxs.map((tx: TTransaction) => tx.id.uuid);
-    if (txIds.length === 0) return subOrderTxs;
-    const shouldFetchSubOrderTxs = txIds.filter(
-      (txId: string) => !subOrderTxsIds.includes(txId),
-    );
-
-    const txsResponse = await Promise.all(
-      shouldFetchSubOrderTxs.map(async (txId: string) => {
-        const { data: txResponse } = await fetchTxApi(txId);
-
-        return txResponse;
-      }),
-    );
-
-    const newSubOrderTxs: TTransaction[] = uniqBy(
-      subOrderTxs.concat(txsResponse),
-      'id.uuid',
-    );
-
-    return newSubOrderTxs;
   },
 );
 
@@ -357,7 +259,6 @@ export const OrderListThunks = {
   updateProfile,
   disableWalkthrough,
   fetchOrders,
-  fetchTransactionBySubOrder,
   postParticipantRating,
   addSubOrderDocumentToFirebase,
   updateSubOrder,
@@ -462,10 +363,7 @@ const OrderListSlice = createSlice({
       .addCase(fetchOrders.fulfilled, (state, { payload }) => {
         state.fetchOrdersInProgress = false;
         state.orders = uniqBy([...state.orders, ...payload.orders], 'id.uuid');
-        state.subOrderTxs = uniqBy(
-          [...state.subOrderTxs, ...payload.subOrderTxs],
-          'id.uuid',
-        );
+
         state.restaurants = payload.restaurants;
         state.allPlans = uniqBy(
           [...state.allPlans, ...payload.allPlans],
@@ -479,19 +377,6 @@ const OrderListSlice = createSlice({
       .addCase(fetchOrders.rejected, (state, { error }) => {
         state.fetchOrdersInProgress = false;
         state.fetchOrdersError = error.message;
-      })
-
-      .addCase(fetchTransactionBySubOrder.pending, (state) => {
-        state.fetchSubOrderTxInProgress = true;
-        state.fetchSubOrderTxError = false;
-      })
-      .addCase(fetchTransactionBySubOrder.fulfilled, (state, { payload }) => {
-        state.fetchSubOrderTxInProgress = false;
-        state.subOrderTxs = payload;
-      })
-      .addCase(fetchTransactionBySubOrder.rejected, (state, { error }) => {
-        state.fetchSubOrderTxInProgress = false;
-        state.fetchSubOrderTxError = error.message;
       })
 
       .addCase(postParticipantRating.pending, (state) => {

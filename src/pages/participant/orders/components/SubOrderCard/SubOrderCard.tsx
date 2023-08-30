@@ -1,7 +1,5 @@
-import { useMemo } from 'react';
 import type { Event } from 'react-big-calendar';
 import { useIntl } from 'react-intl';
-import { shallowEqual } from 'react-redux';
 
 import OrderEventCardStatus from '@components/CalendarDashboard/components/OrderEventCard/OrderEventCardStatus';
 import { EVENT_STATUS } from '@components/CalendarDashboard/helpers/constant';
@@ -12,7 +10,6 @@ import IconLocation from '@components/Icons/IconLocation/IconLocation';
 import IconShop from '@components/Icons/IconShop/IconShop';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { isOver } from '@helpers/orderHelper';
-import { useAppSelector } from '@hooks/reduxHooks';
 import { calculateRemainTime } from '@src/utils/dates';
 
 import css from './SubOrderCard.module.scss';
@@ -37,7 +34,7 @@ const SubOrderCard: React.FC<TSubOrderCardProps> = (props) => {
     meal,
     dishSelection,
     orderColor,
-    transactionId,
+    lastTransition,
     isOrderStarted = false,
   } = event?.resource || {};
 
@@ -59,16 +56,6 @@ const SubOrderCard: React.FC<TSubOrderCardProps> = (props) => {
   );
   const shouldShowCountdown = !isOrderStarted && !isExpired;
 
-  const subOrderTxs = useAppSelector(
-    (state) => state.ParticipantOrderList.subOrderTxs,
-    shallowEqual,
-  );
-
-  const subOrderTx = useMemo(
-    () => subOrderTxs.find((tx) => tx.id.uuid === transactionId),
-    [subOrderTxs, transactionId],
-  );
-
   const onCardClick = () => {
     setSelectedEvent(event);
     openSubOrderDetailModal();
@@ -88,7 +75,10 @@ const SubOrderCard: React.FC<TSubOrderCardProps> = (props) => {
       </div>
       <div className={css.body}>
         <div className={css.row}>
-          <OrderEventCardStatus status={status} subOrderTx={subOrderTx} />
+          <OrderEventCardStatus
+            status={status}
+            lastTransition={lastTransition}
+          />
         </div>
         <RenderWhen condition={!!selectionFoodName}>
           <div className={css.row}>

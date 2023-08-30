@@ -2,9 +2,7 @@ import React from 'react';
 import { useIntl } from 'react-intl';
 
 import Badge, { EBadgeType } from '@components/Badge/Badge';
-import { Transaction } from '@src/utils/data';
-import { ETransition, txIsInitiated } from '@src/utils/transaction';
-import type { TTransaction } from '@src/utils/types';
+import { ETransition } from '@src/utils/transaction';
 
 import { EVENT_STATUS } from '../../helpers/constant';
 import type { TEventStatus } from '../../helpers/types';
@@ -14,25 +12,29 @@ import css from './OrderEventCard.module.scss';
 type TOrderEventCardStatusProps = {
   status: TEventStatus;
   className?: string;
-  subOrderTx?: TTransaction;
+  lastTransition: string;
 };
 
 const StatusToBadgeTypeMap = {
   [EVENT_STATUS.EMPTY_STATUS]: EBadgeType.warning,
   [EVENT_STATUS.JOINED_STATUS]: EBadgeType.info,
   [EVENT_STATUS.NOT_JOINED_STATUS]: EBadgeType.info,
-  [EVENT_STATUS.EXPIRED_STATUS]: EBadgeType.default,
+  [EVENT_STATUS.EXPIRED_STATUS]: EBadgeType.info,
   [EVENT_STATUS.CANCELED_STATUS]: EBadgeType.danger,
 
+  [ETransition.INITIATE_TRANSACTION]: EBadgeType.info,
   [ETransition.START_DELIVERY]: EBadgeType.info,
   [ETransition.COMPLETE_DELIVERY]: EBadgeType.success,
-  [ETransition.EXPIRED_START_DELIVERY]: EBadgeType.default,
+  [ETransition.EXPIRED_START_DELIVERY]: EBadgeType.info,
   [ETransition.CANCEL_DELIVERY]: EBadgeType.danger,
   [ETransition.OPERATOR_CANCEL_PLAN]: EBadgeType.danger,
+  [ETransition.EXPIRED_REVIEW_TIME]: EBadgeType.success,
 };
 
 const txStateToLabelMapper = (lastTransition: string) => {
   switch (lastTransition) {
+    case ETransition.INITIATE_TRANSACTION:
+      return 'StateItemToolTip.initialTx';
     case ETransition.START_DELIVERY:
       return 'StateItemToolTip.stateDelivering';
     case ETransition.COMPLETE_DELIVERY:
@@ -45,21 +47,18 @@ const txStateToLabelMapper = (lastTransition: string) => {
       return 'StateItemToolTip.stateSubOrderCanceled';
 
     default:
-      return 'StateItemToolTip.stateDelivering';
+      return 'StateItemToolTip.stateDelivered';
   }
 };
 const OrderEventCardStatus: React.FC<TOrderEventCardStatusProps> = ({
   status,
-  subOrderTx,
+  lastTransition,
 }) => {
   const intl = useIntl();
-  const isSubOrderTxInitial = txIsInitiated(subOrderTx!);
-  const subOrderTxGetter = Transaction(subOrderTx!);
-  const { lastTransition } = subOrderTxGetter.getAttributes();
 
   return (
     <>
-      {subOrderTx && !isSubOrderTxInitial ? (
+      {lastTransition ? (
         <Badge
           className={css.badge}
           type={StatusToBadgeTypeMap[lastTransition]}

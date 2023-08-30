@@ -1578,6 +1578,7 @@
   "SignUpRoute.desciption": "Đăng ký",
   "SignUpRoute.title": "Đăng ký",
   "StateItemToolTip.expire": "Quá hạn",
+  "StateItemToolTip.initialTx": "Đang triển khai",
   "StateItemToolTip.stateCanceled": "Huỷ đơn",
   "StateItemToolTip.stateDelivered": "Đã giao hàng",
   "StateItemToolTip.stateDelivering": "Đang giao hàng",

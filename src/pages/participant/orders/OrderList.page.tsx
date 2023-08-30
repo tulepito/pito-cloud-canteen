@@ -128,11 +128,6 @@ const OrderListPage = () => {
     shallowEqual,
   );
 
-  const subOrderTxs = useAppSelector(
-    (state) => state.ParticipantOrderList.subOrderTxs,
-    shallowEqual,
-  );
-
   const currentUserGetter = CurrentUser(currentUser!);
   const currentUserId = currentUserGetter.getId();
   const { walkthroughEnable = true } = currentUserGetter.getMetadata();
@@ -182,7 +177,7 @@ const OrderListPage = () => {
 
     Object.keys(orderDetail).forEach((planItemKey: string) => {
       const planItem = orderDetail[planItemKey];
-      const { transactionId } = planItem;
+      const { lastTransition } = planItem;
       const { foodList = {}, restaurantName, id } = planItem.restaurant;
       const restaurant = restaurants?.find(
         (_restaurant) => Listing(_restaurant).getId() === id,
@@ -209,8 +204,6 @@ const OrderListPage = () => {
         : isOver(expiredTime.toMillis())
         ? EParticipantOrderStatus.expired
         : foodSelection?.status;
-
-      const subOrderTx = subOrderTxs.find((tx) => tx.id.uuid === transactionId);
 
       const event = {
         resource: {
@@ -241,9 +234,8 @@ const OrderListPage = () => {
           expiredTime: expiredTime.toMillis(),
           deliveryHour,
           dishSelection: { dishSelection: foodSelection?.foodId },
-          transactionId,
-          subOrderTx,
           orderState,
+          lastTransition,
           foodName: dishes.find((_dish) => _dish.key === foodSelection?.foodId)
             ?.value,
         },
