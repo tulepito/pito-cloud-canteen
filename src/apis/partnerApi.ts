@@ -1,6 +1,7 @@
 import type { TObject } from '@src/utils/types';
 
-import { getApi, putApi } from './configs';
+import type { TBodyParams } from './configs';
+import { deleteApi, getApi, postApi, putApi } from './configs';
 
 const BASE_URL = '/partner';
 
@@ -23,3 +24,26 @@ export const queryAllPartnerPaymentRecordsApi = ({ partnerId }: TObject) => {
 export const toggleAppStatusApi = ({ partnerId }: TObject, body: TObject) => {
   return putApi(`${BASE_URL}/${partnerId}/toggle-app-status`, body);
 };
+export type TQueryPartnerFoodApiParams = {
+  restaurantId: string;
+  keywords?: string;
+  foodType?: string;
+  createAtStart?: string;
+  createAtEnd?: string;
+};
+export const queryPartnerFoodsApi = (params: TObject) =>
+  getApi(`${BASE_URL}/food`, params);
+
+export const fetchPartnerFoodApi = (foodId: string) =>
+  getApi(`${BASE_URL}/food/${foodId}`);
+
+export const createPartnerFoodApi = (data: TObject) =>
+  postApi(`${BASE_URL}/food`, data);
+
+export const updatePartnerFoodApi = (foodId: string, data: TObject) =>
+  putApi(`${BASE_URL}/food/${foodId}`, data);
+
+export const removePartnerFoodApi = (foodId: string) =>
+  deleteApi(`${BASE_URL}/food/${foodId}`);
+export const removePartnerMultipleFoodApi = (body: TBodyParams) =>
+  deleteApi(`${BASE_URL}/food/delete-by-ids`, body);

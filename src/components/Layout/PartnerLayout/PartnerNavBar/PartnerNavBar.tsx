@@ -50,10 +50,10 @@ const PartnerNavBar = () => {
         </div>
       </NamedLink>
 
-      <NamedLink path={partnerPaths.ManageProduct} className={css.itemWrapper}>
+      <NamedLink path={partnerPaths.Products} className={css.itemWrapper}>
         <div
           className={classNames(css.item, {
-            [css.active]: pathname === partnerPaths.ManageProduct,
+            [css.active]: pathname === partnerPaths.Products,
           })}>
           <IconCategory className={css.icon} />
           <div className={css.label}>Sản phẩm</div>

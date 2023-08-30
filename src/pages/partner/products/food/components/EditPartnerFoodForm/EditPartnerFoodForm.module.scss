@@ -1,0 +1,169 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/defaults.scss' as *;
+
+.root {
+  max-width: 1440px;
+  margin: auto;
+}
+
+.fieldPhotos {
+  max-width: 600px;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  margin-bottom: 40px;
+}
+
+.smallPhotos {
+  display: flex;
+  gap: 10px;
+}
+
+.bigPhotoField {
+  max-width: 70%;
+  margin: auto;
+  width: 300px;
+  height: 200px;
+}
+
+.smallPhotoField {
+  width: 100%;
+  height: 100px;
+}
+
+.flexField {
+  display: flex;
+  width: 100%;
+  margin-bottom: 40px;
+  flex-direction: column;
+  gap: 30px;
+
+  &.innerFlexfield {
+    margin-bottom: 0;
+  }
+
+  &.flexColumn {
+    flex-direction: column;
+  }
+
+  .field {
+    width: 100%;
+  }
+  @include viewportLarge {
+    flex-direction: row;
+  }
+}
+
+.label {
+  @include inputLabelStyles;
+}
+
+.radioFields {
+  margin-bottom: 20px;
+}
+
+.inputSuffixed {
+  color: $neutralGray5;
+  padding: 0 10px;
+  width: unset !important;
+  flex-direction: row !important;
+  justify-content: flex-end !important;
+  border-left: 1px solid $neutralGray3;
+}
+
+.specialDietsList {
+  display: grid;
+  gap: 15px;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.specialDietsCheckbox {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+
+.specialDietsLabel {
+  font-size: 14px;
+  line-height: 24px;
+  color: $neutralGray6;
+  font-weight: $fontWeightMedium;
+  margin: 0 0 8px 0;
+}
+
+.specialDietsItem {
+  padding: 0;
+
+  &:last-child {
+    grid-column-start: span 3;
+  }
+}
+
+.submitButtons {
+  display: flex;
+  justify-content: space-between;
+}
+
+.imageInputWrapper {
+  display: grid !important;
+  .imageInput:nth-child(1) {
+    @include viewportLarge {
+      grid-column-start: 1;
+      height: 250px;
+      width: 50%;
+      margin: auto;
+      grid-column-end: 5;
+    }
+  }
+}
+
+.titleFields {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  @include viewportMedium {
+    flex-direction: row;
+  }
+}
+
+.titleField {
+  flex: 1;
+}
+
+.unitField {
+  @include viewportMedium {
+    width: 110px;
+  }
+}
+
+.notePriceDescription {
+  font-style: italic;
+  font-size: 14px;
+}
+
+.minOrderFields {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+
+  @include viewportMedium {
+    flex-direction: row;
+    gap: 20px;
+
+    justify-content: space-between;
+    .minOrderField {
+      flex: 1;
+    }
+  }
+}
+
+.sideDishesList {
+  display: flex;
+  gap: 24px;
+}
+
+.inputWithSuffix {
+  padding-right: 70px;
+}

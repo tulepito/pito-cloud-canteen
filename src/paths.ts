@@ -267,9 +267,6 @@ export const partnerPaths = {
   ManageOrders: '/partner/orders',
   ManagePayments: '/partner/payments',
   SubOrderDetail: '/partner/orders/[subOrderId]',
-  ManageProduct: '/partner/product',
-  ManageFood: '/partner/product/food',
-  ManageMenus: '/partner/product/menus',
   Settings: '/partner/settings',
   ChangePassword: '/partner/settings/change-password',
   AccountSettings: '/partner/settings/account',
@@ -277,6 +274,10 @@ export const partnerPaths = {
   MenuSettings: '/partner/settings/account/menu',
   BankSettings: '/partner/settings/account/bank',
   RestaurantSettings: '/partner/settings/restaurant',
+  Products: '/partner/products',
+  ManageFood: '/partner/products/food',
+  CreateFood: '/partner/products/food/create',
+  EditFood: '/partner/products/food/[foodId]',
 };
 
 export const partnerRoutes = {
@@ -311,5 +312,21 @@ export const partnerRoutes = {
   RestaurantSettings: {
     path: partnerPaths.RestaurantSettings,
     label: 'Cài đặt nhà hàng',
+  },
+  Products: {
+    path: partnerPaths.Products,
+    label: 'Sản phẩm',
+  },
+  ManageFood: {
+    path: partnerPaths.ManageFood,
+    label: 'Danh sách món ăn',
+  },
+  CreateFood: {
+    path: partnerPaths.CreateFood,
+    label: 'Tạo món ăn',
+  },
+  EditFood: {
+    path: partnerPaths.EditFood,
+    label: 'Chỉnh sửa món ăn',
   },
 };
