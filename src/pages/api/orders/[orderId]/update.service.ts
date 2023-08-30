@@ -2,6 +2,7 @@ import isEmpty from 'lodash/isEmpty';
 import { DateTime } from 'luxon';
 
 import { calculateGroupMembers, getAllCompanyMembers } from '@helpers/company';
+import { sendNotificationToParticipantOnUpdateOrder } from '@pages/api/apiServices/notification';
 import {
   createScheduler,
   getScheduler,
@@ -70,6 +71,7 @@ const updateOrder = async ({
     const { companyName } = companyAccount.attributes.profile.publicData;
 
     const shouldUpdateOrderName = companyName && startDate && endDate;
+
     // eslint-disable-next-line prefer-destructuring
     updatedOrderListing = denormalisedResponseEntities(
       await integrationSdk.listings.update(
@@ -94,6 +96,8 @@ const updateOrder = async ({
       ),
     )[0];
   }
+
+  sendNotificationToParticipantOnUpdateOrder(orderId);
 
   return updatedOrderListing;
 };
