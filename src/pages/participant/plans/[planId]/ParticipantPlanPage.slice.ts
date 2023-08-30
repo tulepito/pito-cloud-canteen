@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
+import difference from 'lodash/difference';
 
 import { participantSubOrderAddDocumentApi } from '@apis/firebaseApi';
 import { loadPlanDataApi, updateParticipantOrderApi } from '@apis/index';
@@ -252,12 +253,27 @@ const recommendFoodSubOrders = createAsyncThunk(
     const { currentUser } = getState().user;
     const { plan, order } = getState().ParticipantPlanPage;
     const currentUserGetter = CurrentUser(currentUser!);
+    const currentUserId = currentUserGetter.getId();
     const { allergies = [] } = currentUserGetter.getPublicData();
     const orderListing = Listing(order!);
     const { packagePerMember = 0, plans = [] } = orderListing.getMetadata();
     const subOrderDates = Object.keys(plan);
+    const notJoinedDay = Object.keys(plan).reduce(
+      (acc: any, subOrderDate: string) => {
+        const { memberOrder } = plan[subOrderDate];
+        const { status } = memberOrder[currentUserId] || {};
+        if (status === EParticipantOrderStatus.notJoined) {
+          return [...acc, subOrderDate];
+        }
 
-    subOrderDates.forEach((subOrderDate: string) => {
+        return acc;
+      },
+      [],
+    );
+
+    const recommendSubOrderDays = difference(subOrderDates, notJoinedDay);
+
+    recommendSubOrderDays.forEach((subOrderDate: string) => {
       recommendFoodForShoppingCart({
         plan,
         subOrderDate,
