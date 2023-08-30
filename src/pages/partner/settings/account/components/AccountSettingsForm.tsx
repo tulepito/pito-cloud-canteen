@@ -105,6 +105,8 @@ const AccountSettingsFormComponent: React.FC<
     id: 'AccountSettingsForm.fieldAddress',
     name: 'location',
     className: css.fieldLocation,
+    inputClassName: css.fieldLocationInput,
+    isMultipleLines: true,
   };
   const fieldWebsite = {
     label: 'Website',

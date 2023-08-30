@@ -35,10 +35,6 @@
   }
 }
 
-.fieldLocation input {
-  // height: 72px;
-}
-
 .alertMessage {
   @include textTemplate(14px, 700, 20px);
 }
