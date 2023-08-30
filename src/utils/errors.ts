@@ -195,6 +195,16 @@ export const isChangeEmailWrongPassword = (error: TError) =>
   error && error.status === 403;
 
 /**
+ * Check if the given API error (from `transfer-owner`) is due to the new owner already being a company user.
+ */
+
+export const isNewOwnerAlreadyACompanyUser = (error: TError) => {
+  return (
+    error && hasErrorWithCode(error, EErrorCode.newOwnerAlreadyACompanyUser)
+  );
+};
+
+/**
  * Check if the given API error (from `sdk.currentUser.changePassword(params)`)
  * is due to giving wrong password.
  */
