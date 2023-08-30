@@ -23,6 +23,7 @@ import { isOver } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { useViewport } from '@hooks/useViewport';
+import { CalendarActions } from '@redux/slices/Calendar.slice';
 import { CurrentUser, Listing, User } from '@src/utils/data';
 import {
   diffDays,
@@ -439,6 +440,7 @@ const OrderListPage = () => {
   useEffect(() => {
     dispatch(OrderListThunks.fetchAttributes());
     dispatch(OrderListThunks.fetchParticipantFirebaseNotifications());
+    dispatch(CalendarActions.setSelectedDay(null));
   }, []);
 
   const orderListPageContent = (

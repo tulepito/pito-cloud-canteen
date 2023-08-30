@@ -103,8 +103,9 @@
   height: 320px;
 
   @include viewportMedium {
-    width: 300px;
+    width: calc(851px / 3 - 20px);
     height: 300px;
+    margin-bottom: 20px;
   }
 }
 

@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { maxBy } from 'lodash';
+import { intersection, maxBy } from 'lodash';
 import chunk from 'lodash/chunk';
 import flatten from 'lodash/flatten';
 import uniq from 'lodash/uniq';
@@ -34,8 +34,14 @@ import {
   Listing,
 } from '@src/utils/data';
 import { getEndOfMonth } from '@src/utils/dates';
-import { EParticipantOrderStatus, ESubOrderTxStatus } from '@src/utils/enums';
+import {
+  ALLERGIES_OPTIONS,
+  EParticipantOrderStatus,
+  ESubOrderTxStatus,
+  getLabelByKey,
+} from '@src/utils/enums';
 import { convertStringToNumber } from '@src/utils/number';
+import { toNonAccentVietnamese } from '@src/utils/string';
 import type {
   TKeyValue,
   TListing,
@@ -204,9 +210,16 @@ export const recommendFood = ({
 
   const filteredFoodListByAllergies = subOrderFoodList.filter(
     (food) =>
-      !allergies.some((allergy: string) =>
-        Listing(food).getPublicData().allergies.includes(allergy),
-      ),
+      intersection(
+        Listing(food)
+          .getPublicData()
+          .allergicIngredients.map((_foodAllergy: string) =>
+            toNonAccentVietnamese(_foodAllergy),
+          ),
+        allergies.map((allergy: string) =>
+          toNonAccentVietnamese(getLabelByKey(ALLERGIES_OPTIONS, allergy)),
+        ),
+      ).length === 0,
   );
 
   const isAllFoodHaveAllergies = filteredFoodListByAllergies.length === 0;

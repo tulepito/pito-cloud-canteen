@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
 import type { Event, View } from 'react-big-calendar';
 import { Views } from 'react-big-calendar';
@@ -23,6 +24,7 @@ import SubOrderCard from '@pages/participant/orders/components/SubOrderCard/SubO
 import SubOrderDetailModal from '@pages/participant/orders/components/SubOrderDetailModal/SubOrderDetailModal';
 import SuccessRatingModal from '@pages/participant/orders/components/SuccessRatingModal/SuccessRatingModal';
 import { OrderListThunks } from '@pages/participant/orders/OrderList.slice';
+import { CalendarActions } from '@redux/slices/Calendar.slice';
 import { getDaySessionFromDeliveryTime, isSameDate } from '@src/utils/dates';
 import { EOrderStates, EParticipantOrderStatus } from '@src/utils/enums';
 import { convertStringToNumber } from '@src/utils/number';
@@ -277,6 +279,10 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
       dispatch(OrderListThunks.fetchSubOrdersFromFirebase(subOrderId));
     }
   }, [selectedEvent]);
+
+  useEffect(() => {
+    dispatch(CalendarActions.setSelectedDay(null));
+  }, []);
 
   return (
     <div className={css.container}>
