@@ -18,6 +18,7 @@ export const createSubmitUpdatePartnerValues = (
     meals,
     categories,
     isActive,
+    phoneNumber,
   } = values;
   const { selectedPlace = {} } = location || {};
   const { address, origin } = selectedPlace;
@@ -44,6 +45,7 @@ export const createSubmitUpdatePartnerValues = (
       ...(typeof website !== 'undefined' ? { website } : {}),
       ...(typeof facebookLink !== 'undefined' ? { facebookLink } : {}),
       ...(contactorName ? { contactorName } : {}),
+      ...(phoneNumber ? { phoneNumber } : {}),
       ...(meals ? { meals } : {}),
       ...(categories ? { categories } : {}),
       ...(typeof isActive !== 'undefined' ? { isActive } : {}),
