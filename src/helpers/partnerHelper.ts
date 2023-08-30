@@ -19,6 +19,9 @@ export const createSubmitUpdatePartnerValues = (
     categories,
     isActive,
     phoneNumber,
+    startStopReceiveOrderDate,
+    endStopReceiveOrderDate,
+    stopReceiveOrder,
   } = values;
   const { selectedPlace = {} } = location || {};
   const { address, origin } = selectedPlace;
@@ -44,6 +47,15 @@ export const createSubmitUpdatePartnerValues = (
         : {}),
       ...(typeof website !== 'undefined' ? { website } : {}),
       ...(typeof facebookLink !== 'undefined' ? { facebookLink } : {}),
+      // #region Stop receive order fields
+      ...(typeof startStopReceiveOrderDate === 'number'
+        ? { startStopReceiveOrderDate }
+        : {}),
+      ...(typeof endStopReceiveOrderDate === 'number'
+        ? { endStopReceiveOrderDate }
+        : {}),
+      ...(typeof stopReceiveOrder !== 'undefined' ? { stopReceiveOrder } : {}),
+      // #endregion
       ...(contactorName ? { contactorName } : {}),
       ...(phoneNumber ? { phoneNumber } : {}),
       ...(meals ? { meals } : {}),

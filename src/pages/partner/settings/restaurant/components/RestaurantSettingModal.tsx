@@ -1,38 +1,27 @@
 import Alert, { EAlertPosition, EAlertType } from '@components/Alert/Alert';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import Modal from '@components/Modal/Modal';
-import { useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
-import { Listing } from '@src/utils/data';
-import { formatTimestamp } from '@src/utils/dates';
 
-import type { TRestaurantSettingFormValues } from './RestaurantSettingForm';
 import RestaurantSettingForm from './RestaurantSettingForm';
 
 import css from './RestaurantSettingModal.module.scss';
 
-type TNavigationModalProps = {
+type TRestaurantSettingModalProps = {
   isOpen: boolean;
   onClose: () => void;
+  initialValues: any;
 };
 
-const RestaurantSettingModal: React.FC<TNavigationModalProps> = (props) => {
-  const { isOpen, onClose } = props;
+const RestaurantSettingModal: React.FC<TRestaurantSettingModalProps> = (
+  props,
+) => {
+  const { isOpen, onClose, initialValues } = props;
   const changePasswordSuccessModalControl = useBoolean();
-  const restaurantListing = useAppSelector(
-    (state) => state.PartnerSettingsPage.restaurantListing,
-  );
-
-  const { isActive = true } = Listing(restaurantListing).getPublicData();
-
-  const handleSubmit = async (_values: TRestaurantSettingFormValues) => {};
 
   const handleCloseSuccessModal = () => {
     changePasswordSuccessModalControl.setFalse();
   };
-
-  const stopReceiveOrderInfo = `${formatTimestamp()} -  ${formatTimestamp()}`;
-  const dayOffInfo = `${formatTimestamp()} -  ${formatTimestamp()}`;
 
   return (
     <Modal
@@ -49,12 +38,8 @@ const RestaurantSettingModal: React.FC<TNavigationModalProps> = (props) => {
         </div>
 
         <RestaurantSettingForm
-          onSubmit={handleSubmit}
-          initialValues={{
-            isActive,
-            dayOffInfo,
-            stopReceiveOrderInfo,
-          }}
+          onSubmit={() => {}}
+          initialValues={initialValues}
         />
 
         <Alert

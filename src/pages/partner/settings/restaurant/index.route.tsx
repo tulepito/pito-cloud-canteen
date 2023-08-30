@@ -21,11 +21,30 @@ const PartnerRestaurantSettingRoute = () => {
   const restaurantListing = useAppSelector(
     (state) => state.PartnerSettingsPage.restaurantListing,
   );
+  const fetchDataInProgress = useAppSelector(
+    (state) => state.PartnerSettingsPage.fetchDataInProgress,
+  );
 
-  const { isActive = true } = Listing(restaurantListing).getPublicData();
+  const {
+    isActive = true,
+    stopReceiveOrder = false,
+    startStopReceiveOrderDate,
+    endStopReceiveOrderDate,
+  } = Listing(restaurantListing).getPublicData();
 
-  const stopReceiveOrderInfo = `${formatTimestamp()} -  ${formatTimestamp()}`;
+  const stopReceiveOrderInfo = fetchDataInProgress
+    ? ''
+    : `${formatTimestamp(startStopReceiveOrderDate)} -  ${formatTimestamp(
+        endStopReceiveOrderDate,
+      )}`;
   const dayOffInfo = `${formatTimestamp()} -  ${formatTimestamp()}`;
+
+  const formInitialValues = {
+    isActive,
+    dayOffInfo,
+    stopReceiveOrder,
+    stopReceiveOrderInfo,
+  };
 
   const handleClose = () => {
     router.push(partnerPaths.Settings);
@@ -36,15 +55,15 @@ const PartnerRestaurantSettingRoute = () => {
   return (
     <MetaWrapper routeName="PartnerRestaurantSettingRoute">
       <RenderWhen condition={isMobileLayout}>
-        <RestaurantSettingModal isOpen onClose={handleClose} />
+        <RestaurantSettingModal
+          initialValues={formInitialValues}
+          isOpen
+          onClose={handleClose}
+        />
         <RenderWhen.False>
           <RestaurantSettingForm
             onSubmit={handleSubmit}
-            initialValues={{
-              isActive,
-              dayOffInfo,
-              stopReceiveOrderInfo,
-            }}
+            initialValues={formInitialValues}
           />
         </RenderWhen.False>
       </RenderWhen>
