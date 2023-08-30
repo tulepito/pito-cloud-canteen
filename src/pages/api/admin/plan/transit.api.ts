@@ -88,8 +88,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           subOrderDate: startTimestamp,
         };
         const plan = await fetchListing(plans[0]);
-        const planId = plan.getId();
         const planListing = Listing(plan);
+        const planId = planListing.getId();
+
         const { orderDetail } = planListing.getMetadata();
 
         const updatePlanListing = async (lastTransition: string) => {
