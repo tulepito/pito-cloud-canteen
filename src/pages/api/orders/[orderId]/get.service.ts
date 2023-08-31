@@ -30,12 +30,12 @@ const getOrder = async ({ orderId }: { orderId: string }) => {
   let data: TObject = { companyId, companyData: companyUser, orderListing };
   const participantData = denormalisedResponseEntities(
     await integrationSdk.users.query({
-      ids: participants,
+      meta_id: participants,
     }),
   );
   const anonymousParticipantData = denormalisedResponseEntities(
     await integrationSdk.users.query({
-      ids: anonymous,
+      meta_id: anonymous,
     }),
   );
 
