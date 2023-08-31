@@ -160,6 +160,8 @@ const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({
               orderDay={orderDay}
               planId={`${planId}`}
               isOrderDeadlineOver={isOrderDeadlineOver}
+              getNextSubOrderDay={getNextSubOrderDay}
+              onSelectTab={onSelectTab}
             />
           }
           enableTabScroll

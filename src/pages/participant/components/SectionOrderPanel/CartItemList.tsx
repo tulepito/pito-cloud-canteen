@@ -63,6 +63,7 @@ const CartItemList: React.FC<TCartItemList> = ({
         key={key}
         label={itemLabel}
         value={dishTitle}
+        subOrderDate={key}
         removeDisabled={isOrderDeadlineOver}
         onRemove={onRemoveItem(key)}
       />
