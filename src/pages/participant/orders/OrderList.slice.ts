@@ -490,14 +490,14 @@ const OrderListSlice = createSlice({
       })
       .addCase(fetchOrders.fulfilled, (state, { payload }) => {
         state.fetchOrdersInProgress = false;
-        state.orders = uniqBy([...state.orders, ...payload.orders], 'id.uuid');
+        state.orders = uniqBy([...payload.orders, ...state.orders], 'id.uuid');
         state.subOrderTxs = uniqBy(
-          [...state.subOrderTxs, ...payload.subOrderTxs],
+          [...payload.subOrderTxs, ...state.subOrderTxs],
           'id.uuid',
         );
         state.restaurants = payload.restaurants;
         state.allPlans = uniqBy(
-          [...state.allPlans, ...payload.allPlans],
+          [...payload.allPlans, ...state.allPlans],
           'id.uuid',
         );
         state.mappingSubOrderToOrder = {
