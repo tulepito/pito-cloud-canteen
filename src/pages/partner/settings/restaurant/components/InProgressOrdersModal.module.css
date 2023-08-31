@@ -1,5 +1,6 @@
 @use '/src/styles/customMediaQueries.scss' as *;
 @use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
 
 .container {
   max-height: 540px;
@@ -71,4 +72,17 @@
   @include viewportLarge {
     max-width: 120px;
   }
+}
+
+.totalPrice,
+.deliveryHour,
+.orderName,
+.orderTitle {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 24px;
+}
+
+.orderTitle {
+  color: #2f54eb;
 }

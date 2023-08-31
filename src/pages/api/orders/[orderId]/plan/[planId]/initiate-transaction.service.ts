@@ -45,8 +45,12 @@ export const initiateTransaction = async ({
     companyId,
     deliveryHour,
     plans = [],
-    orderType,
+    orderType = EOrderType.group,
     companyName = 'PCC',
+    orderVATPercentage,
+    serviceFees = {},
+    hasSpecificPCCFee = false,
+    specificPCCFee = 0,
   } = orderData.getMetadata();
   const isGroupOrder = orderType === EOrderType.group;
 
@@ -99,6 +103,14 @@ export const initiateTransaction = async ({
             bookingDisplayEnd,
             metadata: {
               ...metadata,
+              timestamp: date,
+              orderVATPercentage,
+              serviceFees,
+              hasSpecificPCCFee,
+              specificPCCFee,
+              subOrderName: `${companyName}_${formatTimestamp(
+                bookingDisplayStart.getTime(),
+              )}`,
               isLastTxOfPlan: index === normalizedOrderDetail.length - 1,
             },
           },

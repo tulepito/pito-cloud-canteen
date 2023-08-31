@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Field, Form as FinalForm } from 'react-final-form';
 import { OnChange } from 'react-final-form-listeners';
+import { DateTime } from 'luxon';
 
 import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
@@ -19,7 +20,7 @@ import Tooltip from '@components/Tooltip/Tooltip';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { useViewport } from '@hooks/useViewport';
-import { Listing } from '@src/utils/data';
+import { Listing, Transaction } from '@src/utils/data';
 import { formatTimestamp } from '@src/utils/dates';
 
 import { PartnerSettingsThunks } from '../../PartnerSettings.slice';
@@ -65,6 +66,9 @@ const RestaurantSettingFormComponent: React.FC<
   const cannotTurnOffAppStatusControl = useBoolean();
   const cannotUpdateDayOffRangeControl = useBoolean();
   const inProgressOrdersModalControl = useBoolean();
+  const paymentPartnerRecords = useAppSelector(
+    (state) => state.PartnerManagePayments.paymentPartnerRecords,
+  );
   const toggleAppStatusInProgress = useAppSelector(
     (state) => state.PartnerSettingsPage.toggleAppStatusInProgress,
   );
@@ -186,24 +190,35 @@ const RestaurantSettingFormComponent: React.FC<
 
   // #region Toggle App status
   const inProgressTransactionsAfterToDay = inProgressTransactions
-    .reduce((txList: Date[], { booking }: any) => {
-      return booking?.attributes?.displayEnd > today
-        ? txList.concat(booking?.attributes?.displayStart)
+    .reduce((txList: any[], tx: any) => {
+      const endTime = tx?.booking?.attributes?.displayEnd;
+      const startTime = tx?.booking?.attributes?.displayStart;
+      const { orderId } = Transaction(tx).getMetadata();
+      const timestamp = DateTime.fromJSDate(startTime)
+        .startOf('day')
+        .toMillis();
+      const validPaymentRecord =
+        paymentPartnerRecords[orderId] &&
+        paymentPartnerRecords[orderId][timestamp] &&
+        paymentPartnerRecords[orderId][timestamp][0];
+
+      return validPaymentRecord && endTime > today
+        ? txList.concat({ time: startTime, paymentRecord: validPaymentRecord })
         : txList;
     }, [])
-    .sort((a: Date, b: Date) => a.getTime() - b.getTime()) as Date[];
+    .sort((a: any, b: any) => a.time.getTime() - b.time.getTime()) as any[];
 
   const inProgressTransactionsAfterToDayCount =
     inProgressTransactionsAfterToDay.length;
   const nearestNextDateHaveInProgressOrder =
     inProgressTransactionsAfterToDayCount > 0
-      ? inProgressTransactionsAfterToDay[0]
+      ? inProgressTransactionsAfterToDay[0].time
       : new Date();
   const theBestFarNextDateHaveInProgressOrder =
     inProgressTransactionsAfterToDayCount > 1
       ? inProgressTransactionsAfterToDay[
           inProgressTransactionsAfterToDayCount - 1
-        ]
+        ].time
       : nearestNextDateHaveInProgressOrder;
 
   const isEnableTurnOffAppStatus =
@@ -225,33 +240,41 @@ const RestaurantSettingFormComponent: React.FC<
 
   // #region Day off
   const inProgressTransactionsInDayOffRange = inProgressTransactions
-    .reduce((txList: Date[], { booking }: any) => {
+    .reduce((txList: any[], tx: any) => {
       const { startDate, endDate } = dayOffRange;
-
+      const booking = tx?.booking || {};
+      const { orderId } = Transaction(tx).getMetadata();
       const bookingEndTime = booking?.attributes?.displayEnd;
       const bookingStartTime = booking?.attributes?.displayStart;
+      const timestamp = DateTime.fromJSDate(bookingStartTime)
+        .startOf('day')
+        .toMillis();
 
       const validBooking =
         (startDate instanceof Date ? startDate : today) <= bookingStartTime &&
         bookingEndTime <= (endDate instanceof Date ? endDate : today);
+      const validPaymentRecord =
+        paymentPartnerRecords[orderId] &&
+        paymentPartnerRecords[orderId][timestamp] &&
+        paymentPartnerRecords[orderId][timestamp][0];
 
-      return validBooking
-        ? txList.concat(booking?.attributes?.displayStart)
+      return validPaymentRecord && validBooking
+        ? txList.concat({ time: timestamp, paymentRecord: validPaymentRecord })
         : txList;
     }, [])
-    .sort((a: Date, b: Date) => a.getTime() - b.getTime());
+    .sort((a: any, b: any) => a.time.getTime() - b.time.getTime());
 
   const inProgressTransactionsInDayOffRangeCount =
     inProgressTransactionsInDayOffRange.length;
   const nearestNextDateHaveInProgressOrderForDayOff =
     inProgressTransactionsInDayOffRangeCount > 0
-      ? inProgressTransactionsInDayOffRange[0]
+      ? inProgressTransactionsInDayOffRange[0].time
       : new Date();
   const theBestFarNextDateHaveInProgressOrderForDayOff =
     inProgressTransactionsInDayOffRangeCount > 1
       ? inProgressTransactionsInDayOffRange[
           inProgressTransactionsInDayOffRangeCount - 1
-        ]
+        ].time
       : nearestNextDateHaveInProgressOrderForDayOff;
 
   const isEnableUpdateDateOffRangeAppStatus =
@@ -320,9 +343,11 @@ const RestaurantSettingFormComponent: React.FC<
   const handleViewOrdersForDayOff = () => {
     setCurrentOrders(inProgressTransactionsInDayOffRange);
     inProgressOrdersModalControl.setTrue();
+    cannotUpdateDayOffRangeControl.setFalse();
   };
   const handleViewOrdersForTurnOffApp = () => {
     setCurrentOrders(inProgressTransactionsAfterToDay);
+    cannotTurnOffAppStatusControl.setFalse();
     inProgressOrdersModalControl.setTrue();
   };
   // #endregion Day off
