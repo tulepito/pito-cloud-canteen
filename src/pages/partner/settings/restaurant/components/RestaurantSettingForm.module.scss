@@ -96,6 +96,17 @@
   > * {
     flex-basis: calc(50% - 8px);
   }
+
+  @include viewportMedium {
+    justify-content: flex-end;
+    column-gap: 12px;
+    margin-top: 8px;
+
+    > * {
+      flex-basis: unset;
+      padding: 10px 20px;
+    }
+  }
 }
 
 .submitBtn {
@@ -117,5 +128,12 @@
   @include viewportMedium {
     display: block;
     margin: 40px 0;
+  }
+}
+
+.datePickerTooltip {
+  background-color: $neutralGray1;
+  &:global.rc-tooltip {
+    opacity: 1 !important;
   }
 }

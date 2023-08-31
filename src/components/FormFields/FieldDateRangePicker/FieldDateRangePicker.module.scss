@@ -58,6 +58,7 @@
       &:hover {
         border: 1px solid $neutralGray5;
         background-color: transparent;
+        color: $neutralGray6;
       }
     }
   }
@@ -78,7 +79,7 @@
     width: min(calc(calc(100vw - 32px - 1.7rem * 2) / 7), 72px);
 
     @include viewportMedium {
-      width: 40px;
+      width: calc(40px - 0.2rem * 2);
     }
   }
   & :global(.react-datepicker-popper) {
