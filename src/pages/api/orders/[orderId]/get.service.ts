@@ -1,11 +1,9 @@
 /* eslint-disable @typescript-eslint/no-shadow */
-import flatten from 'lodash/flatten';
 import isEmpty from 'lodash/isEmpty';
 
-import { convertListIdToQueries } from '@helpers/apiHelpers';
+import { fetchListing, fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { denormalisedResponseEntities, Listing } from '@utils/data';
-import { EImageVariants, EOrderStates } from '@utils/enums';
 import type { TPlan } from '@utils/orderTypes';
 import type { TObject } from '@utils/types';
 
@@ -22,7 +20,6 @@ const getOrder = async ({ orderId }: { orderId: string }) => {
     participants = [],
     anonymous = [],
     bookerId = '',
-    orderState,
   } = Listing(orderListing).getMetadata();
 
   const companyResponse = await integrationSdk.users.show({
@@ -31,51 +28,22 @@ const getOrder = async ({ orderId }: { orderId: string }) => {
   const [companyUser] = denormalisedResponseEntities(companyResponse);
 
   let data: TObject = { companyId, companyData: companyUser, orderListing };
-
-  const participantQueries = convertListIdToQueries({
-    idList: participants,
-  });
-  const participantData = flatten(
-    await Promise.all(
-      participantQueries.map(async ({ ids }) => {
-        return denormalisedResponseEntities(
-          await integrationSdk.users.query({
-            meta_id: `${ids}`,
-            include: ['profileImage'],
-            'fields.image': [
-              `variants.${EImageVariants.squareSmall}`,
-              `variants.${EImageVariants.squareSmall2x}`,
-            ],
-          }),
-        );
-      }),
-    ),
+  const participantData = denormalisedResponseEntities(
+    await integrationSdk.users.query({
+      ids: participants,
+    }),
   );
-
-  const anonymousParticipantQueries = convertListIdToQueries({
-    idList: anonymous,
-  });
-  const anonymousParticipantData = flatten(
-    await Promise.all(
-      anonymousParticipantQueries.map(async ({ ids }) => {
-        return denormalisedResponseEntities(
-          await integrationSdk.users.query({
-            meta_id: `${ids}`,
-          }),
-        );
-      }),
-    ),
+  const anonymousParticipantData = denormalisedResponseEntities(
+    await integrationSdk.users.query({
+      ids: anonymous,
+    }),
   );
 
   data = { ...data, participantData, anonymousParticipantData };
 
   if (plans?.length > 0) {
     const planId = plans[0];
-    const [planListing] = denormalisedResponseEntities(
-      await integrationSdk.listings.show({
-        id: planId,
-      }),
-    );
+    const planListing = await fetchListing(planId);
 
     data = { ...data, planListing };
 
@@ -101,46 +69,10 @@ const getOrder = async ({ orderId }: { orderId: string }) => {
     );
 
     data = { ...data, restaurantData };
-
-    if (
-      [
-        EOrderStates.inProgress,
-        EOrderStates.pendingPayment,
-        EOrderStates.completed,
-        EOrderStates.reviewed,
-      ].includes(orderState)
-    ) {
-      const transactionIdMap = orderDetailEntries.reduce<
-        { timestamp: string; transactionId: string }[]
-      >((prev, [timestamp, { transactionId }]) => {
-        if (transactionId) return prev.concat([{ timestamp, transactionId }]);
-
-        return prev;
-      }, []);
-
-      const transactionDataMap: TObject = {};
-      await Promise.all(
-        transactionIdMap.map(async ({ timestamp, transactionId }) => {
-          const [tx] = denormalisedResponseEntities(
-            await integrationSdk.transactions.show({
-              id: transactionId,
-            }),
-          );
-
-          transactionDataMap[timestamp] = tx;
-        }),
-      );
-
-      data = { ...data, transactionDataMap };
-    }
   }
 
   if (!isEmpty(bookerId)) {
-    const [bookerData] = denormalisedResponseEntities(
-      await integrationSdk.users.show({
-        id: bookerId,
-      }),
-    );
+    const bookerData = await fetchUser(bookerId);
 
     data = { ...data, bookerData };
   }

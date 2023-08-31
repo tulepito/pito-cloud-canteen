@@ -1,11 +1,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect } from 'react';
 import { useIntl } from 'react-intl';
+import Skeleton from 'react-loading-skeleton';
 import classNames from 'classnames';
 import { useRouter } from 'next/router';
 
 import Badge from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { parseThousandNumber } from '@helpers/format';
 import {
   calculatePriceQuotationInfo,
@@ -24,10 +26,11 @@ type TSubOrderCartProps = {
   className?: string;
   onClickDownloadPriceQuotation?: () => void;
   title?: string;
+  inProgress: boolean;
 };
 
 const SubOrderCart: React.FC<TSubOrderCartProps> = (props) => {
-  const { className, title } = props;
+  const { className, title, inProgress } = props;
   const dispatch = useAppDispatch();
   const intl = useIntl();
   const router = useRouter();
@@ -109,101 +112,106 @@ const SubOrderCart: React.FC<TSubOrderCartProps> = (props) => {
         {title || intl.formatMessage({ id: 'SubOrderCart.title' })}
       </div>
 
-      <div className={css.inforWrapper}>
-        <div className={css.feeContainer}>
-          <div className={css.feeItem}>
-            <div className={css.feeItemContainer}>
-              <div className={css.label}>
-                {intl.formatMessage({ id: 'SubOrderCart.totalPrice' })}
+      <RenderWhen condition={!inProgress}>
+        <div className={css.inforWrapper}>
+          <div className={css.feeContainer}>
+            <div className={css.feeItem}>
+              <div className={css.feeItemContainer}>
+                <div className={css.label}>
+                  {intl.formatMessage({ id: 'SubOrderCart.totalPrice' })}
+                </div>
+                <div className={css.fee}>
+                  {parseThousandNumber(totalPrice.toString())}đ
+                </div>
               </div>
-              <div className={css.fee}>
-                {parseThousandNumber(totalPrice.toString())}đ
+            </div>
+
+            <div className={css.feeItem}>
+              <div className={css.feeItemContainer}>
+                <div className={css.label}>
+                  {intl.formatMessage({ id: 'SubOrderCart.serviceFee' })}
+                  <Badge
+                    label={`${serviceFeePercentage}%`}
+                    className={css.VATBadge}
+                  />
+                </div>
+                <div className={css.fee}>
+                  {parseThousandNumber(serviceFee.toString())}đ
+                </div>
+              </div>
+            </div>
+
+            <div className={css.feeItem}>
+              <div className={css.feeItemContainer}>
+                <div className={css.label}>
+                  {intl.formatMessage({
+                    id: 'SubOrderCart.promotion',
+                  })}
+                </div>
+                <div className={css.fee}>
+                  {parseThousandNumber(promotion.toString())}đ
+                </div>
+              </div>
+            </div>
+            <div className={css.feeItem}>
+              <div className={css.feeItemContainer}>
+                <div className={css.totalWithoutVATLabel}>
+                  {intl.formatMessage({ id: 'SubOrderCart.totalWithoutVAT' })}
+                </div>
+
+                <div className={css.fee}>
+                  {parseThousandNumber(totalWithoutVAT.toString())}đ
+                </div>
+              </div>
+            </div>
+            <div className={css.feeItem}>
+              <div
+                className={classNames(
+                  css.feeItemContainer,
+                  css.VATItemContainer,
+                )}>
+                <div className={css.label}>
+                  {intl.formatMessage({ id: 'SubOrderCart.VAT' })}
+                  <Badge
+                    label={`${Math.round(vatPercentage * 100)}%`}
+                    className={css.VATBadge}
+                  />
+                </div>
+                <div className={css.fee}>
+                  {parseThousandNumber(VATFee.toString())}đ
+                </div>
+              </div>
+            </div>
+            <div className={css.totalPrice}>
+              <div className={css.totalWithVATLabel}>
+                {intl.formatMessage({ id: 'SubOrderCart.totalWithVAT' })}
+              </div>
+              <div className={css.priceWrapper}>
+                <div className={css.totalWithVAT}>
+                  {parseThousandNumber(totalWithVAT.toString())}đ
+                </div>
+
+                <div className={css.totalDescription}>
+                  {intl.formatMessage({ id: 'SubOrderCart.totalDescription' })}
+                </div>
               </div>
             </div>
           </div>
 
-          <div className={css.feeItem}>
-            <div className={css.feeItemContainer}>
-              <div className={css.label}>
-                {intl.formatMessage({ id: 'SubOrderCart.serviceFee' })}
-                <Badge
-                  label={`${serviceFeePercentage}%`}
-                  className={css.VATBadge}
-                />
-              </div>
-              <div className={css.fee}>
-                {parseThousandNumber(serviceFee.toString())}đ
-              </div>
-            </div>
-          </div>
-
-          <div className={css.feeItem}>
-            <div className={css.feeItemContainer}>
-              <div className={css.label}>
-                {intl.formatMessage({
-                  id: 'SubOrderCart.promotion',
-                })}
-              </div>
-              <div className={css.fee}>
-                {parseThousandNumber(promotion.toString())}đ
-              </div>
-            </div>
-          </div>
-          <div className={css.feeItem}>
-            <div className={css.feeItemContainer}>
-              <div className={css.totalWithoutVATLabel}>
-                {intl.formatMessage({ id: 'SubOrderCart.totalWithoutVAT' })}
-              </div>
-
-              <div className={css.fee}>
-                {parseThousandNumber(totalWithoutVAT.toString())}đ
-              </div>
-            </div>
-          </div>
-          <div className={css.feeItem}>
-            <div
-              className={classNames(
-                css.feeItemContainer,
-                css.VATItemContainer,
-              )}>
-              <div className={css.label}>
-                {intl.formatMessage({ id: 'SubOrderCart.VAT' })}
-                <Badge
-                  label={`${Math.round(vatPercentage * 100)}%`}
-                  className={css.VATBadge}
-                />
-              </div>
-              <div className={css.fee}>
-                {parseThousandNumber(VATFee.toString())}đ
-              </div>
-            </div>
-          </div>
-          <div className={css.totalPrice}>
-            <div className={css.totalWithVATLabel}>
-              {intl.formatMessage({ id: 'SubOrderCart.totalWithVAT' })}
-            </div>
-            <div className={css.priceWrapper}>
-              <div className={css.totalWithVAT}>
-                {parseThousandNumber(totalWithVAT.toString())}đ
-              </div>
-
-              <div className={css.totalDescription}>
-                {intl.formatMessage({ id: 'SubOrderCart.totalDescription' })}
-              </div>
-            </div>
-          </div>
+          <Button
+            variant="inline"
+            className={downloadPriceQuotationClasses}
+            disabled={isDownloadingPriceQuotation}
+            onClick={handleDownloadPriceQuotation}>
+            {intl.formatMessage({
+              id: 'SubOrderCart.downloadPriceQuotation',
+            })}
+          </Button>
         </div>
-
-        <Button
-          variant="inline"
-          className={downloadPriceQuotationClasses}
-          disabled={isDownloadingPriceQuotation}
-          onClick={handleDownloadPriceQuotation}>
-          {intl.formatMessage({
-            id: 'SubOrderCart.downloadPriceQuotation',
-          })}
-        </Button>
-      </div>
+        <RenderWhen.False>
+          <Skeleton className={css.loading} />
+        </RenderWhen.False>
+      </RenderWhen>
     </div>
   );
 };

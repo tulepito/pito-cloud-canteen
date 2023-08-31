@@ -19,7 +19,7 @@ import {
   NotificationActions,
   NotificationThunks,
 } from '@redux/slices/notification.slice';
-import { orderManagementThunks } from '@redux/slices/OrderManagement.slice';
+import { partnerPaths } from '@src/paths';
 import { Listing } from '@src/utils/data';
 import { formatTimestamp } from '@src/utils/dates';
 import { ENotificationType, EOrderType } from '@src/utils/enums';
@@ -152,10 +152,13 @@ const PartnerSubOrderDetailPage: React.FC<
     updateOrderModalContainer.setFalse();
   };
 
+  const onGoBack = () => {
+    router.push(partnerPaths.ManageOrders);
+  };
+
   useEffect(() => {
     if (subOrderId && isReady) {
       dispatch(PartnerSubOrderDetailThunks.loadData({ orderId, date }));
-      dispatch(orderManagementThunks.loadData(orderId));
     }
   }, [isReady, subOrderId]);
 
@@ -201,7 +204,7 @@ const PartnerSubOrderDetailPage: React.FC<
     <div className={css.root}>
       <RenderWhen condition={!isMobileLayout || isSummaryViewMode}>
         <>
-          <div className={css.goBackContainer}>
+          <div className={css.goBackContainer} onClick={onGoBack}>
             <IconArrow direction="left" />
           </div>
           <SubOrderTitle />
@@ -210,9 +213,12 @@ const PartnerSubOrderDetailPage: React.FC<
       <RenderWhen condition={isSummaryViewMode}>
         <div className={css.container}>
           <div className={css.leftPart}>
-            <SubOrderInfo />
+            <SubOrderInfo inProgress={fetchOrderInProgress} />
             <div className={css.mobileSubOrderCartWrapper}>
-              <SubOrderCart title="Thực đơn phục vụ" />
+              <SubOrderCart
+                title="Thực đơn phục vụ"
+                inProgress={fetchOrderInProgress}
+              />
             </div>
             <div className={css.mobileSubOrderSummaryWrapper}>
               <MobileSubOrderSummary onChangeViewMode={handleChangeViewMode} />
@@ -223,7 +229,7 @@ const PartnerSubOrderDetailPage: React.FC<
             <SubOrderNote />
           </div>
           <div className={css.rightPart}>
-            <SubOrderCart />
+            <SubOrderCart inProgress={fetchOrderInProgress} />
           </div>
         </div>
 
@@ -231,7 +237,6 @@ const PartnerSubOrderDetailPage: React.FC<
           <PopupModal
             isOpen={!fetchOrderInProgress && updateOrderModalContainer.value}
             handleClose={handleCloseModal}
-            shouldHideIconClose
             className={css.updatedOrderModal}
             headerClassName={css.updatedOrderModalHeader}
             containerClassName={css.updatedOrderModalContainer}>

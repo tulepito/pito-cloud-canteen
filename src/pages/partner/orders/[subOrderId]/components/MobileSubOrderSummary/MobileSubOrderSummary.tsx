@@ -101,10 +101,9 @@ const MobileSubOrderSummary: React.FC<TMobileSubOrderSummaryProps> = ({
   };
 
   return (
-    <RenderWhen condition={!fetchOrderInProgress}>
-      {' '}
-      <div className={css.container}>
-        <div className={css.title}>Chi tiết đơn hàng</div>
+    <div className={css.container}>
+      <div className={css.title}>Chi tiết đơn hàng</div>
+      <RenderWhen condition={!fetchOrderInProgress}>
         <div className={css.dishTable}>
           <div className={css.tableHeader}>
             <div className={css.orderNumber}>STT</div>
@@ -126,11 +125,11 @@ const MobileSubOrderSummary: React.FC<TMobileSubOrderSummaryProps> = ({
             <IconArrow direction="right" className={css.arrowIcon} />
           </Button>
         </RenderWhen>
-      </div>
-      <RenderWhen.False>
-        <Skeleton className={css.loading} />
-      </RenderWhen.False>
-    </RenderWhen>
+        <RenderWhen.False>
+          <Skeleton className={css.loading} />
+        </RenderWhen.False>
+      </RenderWhen>
+    </div>
   );
 };
 
