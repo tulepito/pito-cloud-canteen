@@ -6,9 +6,14 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { HttpMethod } from '@apis/configs';
 import { getParticipantOrdersQueries } from '@helpers/listingSearchQuery';
 import cookies from '@services/cookie';
+import { fetchUser } from '@services/integrationHelper';
 import participantChecker from '@services/permissionChecker/participant';
 import { getSdk, handleError } from '@services/sdk';
-import { denormalisedResponseEntities, Listing } from '@src/utils/data';
+import {
+  CurrentUser,
+  denormalisedResponseEntities,
+  Listing,
+} from '@src/utils/data';
 import { getEndOfMonth } from '@src/utils/dates';
 import type { TListing } from '@src/utils/types';
 
@@ -39,14 +44,20 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           await sdk.currentUser.show(),
         )[0];
 
-        const ordersQuery = getParticipantOrdersQueries({
+        const ordersQueries = getParticipantOrdersQueries({
           userId: currentUser.id.uuid,
           startDate: new Date(selectedMonth).getTime(),
           endDate: getEndOfMonth(new Date(selectedMonth)).getTime(),
-        })[0];
+        });
 
-        const response = await sdk.listings.query(ordersQuery);
-        const orders = denormalisedResponseEntities(response);
+        const responses = await Promise.all(
+          ordersQueries.map(async (query) => {
+            const response = await sdk.listings.query(query);
+
+            return denormalisedResponseEntities(response);
+          }),
+        );
+        const orders = flatten(responses);
 
         const allPlansIdList = orders.map((order: TListing) => {
           const orderListing = Listing(order);
@@ -95,11 +106,21 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           {},
         );
 
+        const currentUserGetter = CurrentUser(currentUser);
+        const { companyList = [] } = currentUserGetter.getMetadata();
+        const companyId = companyList[0];
+        let company;
+
+        if (companyId) {
+          company = await fetchUser(companyId);
+        }
+
         return res.status(200).json({
           orders,
           allPlans: flatten(allPlans),
           restaurants: allRelatedRestaurants,
           mappingSubOrderToOrder,
+          company,
         });
       }
       default:

@@ -9,6 +9,7 @@ import PartnerHeader from './PartnerHeader/PartnerHeader';
 import PartnerLayoutContent from './PartnerLayoutContent/PartnerLayoutContent';
 import PartnerLayoutSidebar from './PartnerLayoutSidebar/PartnerLayoutSidebar';
 import PartnerLayoutTopbar from './PartnerLayoutTopbar/PartnerLayoutTopbar';
+import PartnerMobileLayout from './PartnerMobileLayout/PartnerMobileLayout';
 import PartnerNavBar from './PartnerNavBar/PartnerNavBar';
 import PartnerSidebar from './PartnerSidebar/PartnerSidebar';
 import { shouldShowPartnerHeader } from './partnerLayout.helpers';
@@ -26,6 +27,9 @@ const PartnerLayout: React.FC<PropsWithChildren> = (props) => {
   const { isMobileLayout } = useViewport();
 
   const showHeaderMaybe = !isMobileLayout || shouldShowPartnerHeader(pathname);
+
+  if (isMobileLayout)
+    return <PartnerMobileLayout>{children}</PartnerMobileLayout>;
 
   return (
     <div className={css.root}>
