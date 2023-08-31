@@ -29,6 +29,7 @@ const recommendFoodForShoppingCart = ({
   allergies,
   plans,
   dispatch,
+  currentMealId,
 }: {
   plan: any;
   subOrderDate: string;
@@ -36,6 +37,7 @@ const recommendFoodForShoppingCart = ({
   allergies: string[];
   plans: string[];
   dispatch: any;
+  currentMealId?: string;
 }) => {
   const subOrder = plan[subOrderDate];
   const { foodList } = subOrder;
@@ -45,13 +47,26 @@ const recommendFoodForShoppingCart = ({
       Listing(food).getAttributes().price.amount <= packagePerMember,
   );
 
-  const mostSuitableFood = recommendFood({
+  let mostSuitableFood = recommendFood({
     foodList: suitablePriceFoodList,
     subOrderFoodIds: suitablePriceFoodList.map((food: TListing) =>
       Listing(food).getId(),
     ),
     allergies,
   });
+
+  while (
+    currentMealId &&
+    Listing(mostSuitableFood!).getId() === currentMealId
+  ) {
+    mostSuitableFood = recommendFood({
+      foodList: suitablePriceFoodList,
+      subOrderFoodIds: suitablePriceFoodList.map((food: TListing) =>
+        Listing(food).getId(),
+      ),
+      allergies,
+    });
+  }
 
   dispatch(
     shoppingCartThunks.addToCart({
@@ -229,10 +244,13 @@ export const recommendFoodSubOrder = createAsyncThunk(
   async (subOrderDate: string, { getState, dispatch }) => {
     const { currentUser } = getState().user;
     const { plan, order } = getState().ParticipantPlanPage;
+    const { orders } = getState().shoppingCart;
     const currentUserGetter = CurrentUser(currentUser!);
     const { allergies = [] } = currentUserGetter.getPublicData();
     const orderListing = Listing(order!);
     const { packagePerMember = 0, plans = [] } = orderListing.getMetadata();
+    const currentMealId =
+      orders[currentUserGetter.getId()]?.[plans[0]]?.[+subOrderDate]?.foodId;
     recommendFoodForShoppingCart({
       plan,
       subOrderDate,
@@ -240,6 +258,7 @@ export const recommendFoodSubOrder = createAsyncThunk(
       allergies,
       plans,
       dispatch,
+      currentMealId,
     });
   },
   {
@@ -252,6 +271,7 @@ const recommendFoodSubOrders = createAsyncThunk(
   async (_, { getState, dispatch }) => {
     const { currentUser } = getState().user;
     const { plan, order } = getState().ParticipantPlanPage;
+    const { orders } = getState().shoppingCart;
     const currentUserGetter = CurrentUser(currentUser!);
     const currentUserId = currentUserGetter.getId();
     const { allergies = [] } = currentUserGetter.getPublicData();
@@ -274,6 +294,8 @@ const recommendFoodSubOrders = createAsyncThunk(
     const recommendSubOrderDays = difference(subOrderDates, notJoinedDay);
 
     recommendSubOrderDays.forEach((subOrderDate: string) => {
+      const currentMealId =
+        orders[currentUserGetter.getId()]?.[plans[0]]?.[+subOrderDate]?.foodId;
       recommendFoodForShoppingCart({
         plan,
         subOrderDate,
@@ -281,6 +303,7 @@ const recommendFoodSubOrders = createAsyncThunk(
         allergies,
         plans,
         dispatch,
+        currentMealId,
       });
     });
   },
