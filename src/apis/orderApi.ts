@@ -205,3 +205,6 @@ export const updateOrderStateToDraftApi = (orderId: string) =>
 
 export const updateOrderDetailFromDraftApi = (orderId: string, body: TObject) =>
   putApi(`/orders/${orderId}/update-order-detail-from-draft`, body);
+
+export const updatePaymentApi = (orderId: string, planId: string) =>
+  putApi(`/orders/${orderId}/plan/${planId}/update-payment`);
