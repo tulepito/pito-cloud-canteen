@@ -1,5 +1,5 @@
 import type { ChangeEvent } from 'react';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Field } from 'react-final-form';
 import { useIntl } from 'react-intl';
 import classNames from 'classnames';
@@ -12,6 +12,7 @@ import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
 import ImageFromFile from '@components/ImageFromFile/ImageFromFile';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
+import useBoolean from '@hooks/useBoolean';
 import { isUploadImageOverLimitError } from '@utils/errors';
 import type {
   TDefaultProps,
@@ -27,9 +28,12 @@ type TPhotoWithOverlay = TDefaultProps & {
   image: TImage & { file: File; imageId: string };
   savedImageAltText: string;
   onRemoveImage: (id: any) => void;
+  onUploadImage: () => void;
   onClick?: () => void;
   variants: TImageVariant[];
   shouldShowClearBtn?: boolean;
+  shouldShowUploadBtn?: boolean;
+  uploadBtnWithImgClassName?: string;
 };
 
 const PhotoWithOverlay = (props: TPhotoWithOverlay) => {
@@ -41,6 +45,9 @@ const PhotoWithOverlay = (props: TPhotoWithOverlay) => {
     onClick,
     variants,
     shouldShowClearBtn = true,
+    shouldShowUploadBtn = false,
+    uploadBtnWithImgClassName,
+    onUploadImage,
   } = props;
   const handleRemoveClick = (e: any) => {
     e.stopPropagation();
@@ -67,11 +74,7 @@ const PhotoWithOverlay = (props: TPhotoWithOverlay) => {
   }
   const classes = classNames(css.thumbnail, className);
 
-  const handleClick = (e: any) => {
-    if (!shouldShowClearBtn) {
-      handleRemoveClick(e);
-    }
-
+  const handleClick = (_e: any) => {
     if (onClick) onClick();
   };
 
@@ -96,6 +99,17 @@ const PhotoWithOverlay = (props: TPhotoWithOverlay) => {
           className={css.removeButton}
           onClick={handleRemoveClick}>
           <IconClose />
+        </InlineTextButton>
+      </RenderWhen>
+      <RenderWhen condition={shouldShowUploadBtn}>
+        <InlineTextButton
+          type="button"
+          className={classNames(
+            css.iconCameraContainerWithImg,
+            uploadBtnWithImgClassName,
+          )}
+          onClick={onUploadImage}>
+          <IconCamera />
         </InlineTextButton>
       </RenderWhen>
     </div>
@@ -123,6 +137,8 @@ export type TFieldPhotoUpload = {
   shouldShowIconCameraWhenEmpty?: boolean;
   iconCameraClassName?: string;
   shouldShowClearBtn?: boolean;
+  shouldShowUploadBtnWithImg?: boolean;
+  uploadBtnWithImgClassName?: string;
   name: string;
   id: string;
   validate?: any;
@@ -132,6 +148,9 @@ export type TFieldPhotoUpload = {
 const FieldPhotoUpload: React.FC<TFieldPhotoUpload> = (props) => {
   const intl = useIntl();
   const [triggerFlag, setTriggerFlag] = useState<string>('');
+  const [shouldRemoveImgId, setShouldRemoveImgId] = useState<string>('');
+  const shouldRemoveImgControl = useBoolean(false);
+  const inputRef = useRef(null);
 
   return (
     <>
@@ -153,12 +172,19 @@ const FieldPhotoUpload: React.FC<TFieldPhotoUpload> = (props) => {
             shouldShowClearBtn = true,
             iconCameraClassName,
             shouldShowIconCameraWhenEmpty = false,
+            shouldShowUploadBtnWithImg = false,
+            uploadBtnWithImgClassName,
           } = fieldRenderProps;
           const onChange = async (e: ChangeEvent<HTMLInputElement>) => {
             const { files } = e.target;
-
             const file = files && files[0];
             if (file) {
+              if (shouldRemoveImgControl.value && shouldRemoveImgId) {
+                onRemoveImage(shouldRemoveImgId);
+                setShouldRemoveImgId('');
+                shouldRemoveImgControl.setFalse();
+              }
+
               const params = {
                 file,
                 id: `${file.name}_${new Date().getTime()}`,
@@ -174,6 +200,14 @@ const FieldPhotoUpload: React.FC<TFieldPhotoUpload> = (props) => {
             }
           };
 
+          const handleClickUploadImage = (oldImgId: string) => () => {
+            if (inputRef.current !== null && (inputRef.current as any)?.click) {
+              (inputRef.current as any).click();
+              setShouldRemoveImgId(oldImgId);
+              shouldRemoveImgControl.setTrue();
+            }
+          };
+
           const removeFn = (id: any) => {
             input.onChange('');
             onRemoveImage(id);
@@ -186,6 +220,7 @@ const FieldPhotoUpload: React.FC<TFieldPhotoUpload> = (props) => {
             name: input.name,
             onChange,
             type: 'file',
+            ref: inputRef,
           };
 
           const uploadOverLimit = isUploadImageOverLimitError(uploadImageError);
@@ -217,13 +252,16 @@ const FieldPhotoUpload: React.FC<TFieldPhotoUpload> = (props) => {
                 <input {...inputProps} className={css.addImageInput} />
                 {image && !uploadImageFailed ? (
                   <PhotoWithOverlay
-                    id={image.imageId}
+                    id={image.id}
                     rootClassName={css.rootForImage}
                     image={image}
                     savedImageAltText={`${input.name} asset`}
                     variants={variants}
                     onRemoveImage={removeFn}
                     shouldShowClearBtn={shouldShowClearBtn}
+                    shouldShowUploadBtn={shouldShowUploadBtnWithImg}
+                    onUploadImage={handleClickUploadImage(image.id)}
+                    uploadBtnWithImgClassName={uploadBtnWithImgClassName}
                   />
                 ) : (
                   <label htmlFor={input.name} className={classNames(css.label)}>
