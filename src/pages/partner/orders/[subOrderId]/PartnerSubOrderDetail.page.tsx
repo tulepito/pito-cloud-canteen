@@ -20,6 +20,7 @@ import {
   NotificationThunks,
 } from '@redux/slices/notification.slice';
 import { orderManagementThunks } from '@redux/slices/OrderManagement.slice';
+import { partnerPaths } from '@src/paths';
 import { Listing } from '@src/utils/data';
 import { formatTimestamp } from '@src/utils/dates';
 import { ENotificationType, EOrderType } from '@src/utils/enums';
@@ -152,6 +153,10 @@ const PartnerSubOrderDetailPage: React.FC<
     updateOrderModalContainer.setFalse();
   };
 
+  const onGoBack = () => {
+    router.push(partnerPaths.ManageOrders);
+  };
+
   useEffect(() => {
     if (subOrderId && isReady) {
       dispatch(PartnerSubOrderDetailThunks.loadData({ orderId, date }));
@@ -201,7 +206,7 @@ const PartnerSubOrderDetailPage: React.FC<
     <div className={css.root}>
       <RenderWhen condition={!isMobileLayout || isSummaryViewMode}>
         <>
-          <div className={css.goBackContainer}>
+          <div className={css.goBackContainer} onClick={onGoBack}>
             <IconArrow direction="left" />
           </div>
           <SubOrderTitle />
