@@ -3,9 +3,9 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HttpMethod } from '@apis/configs';
 import { EHttpStatusCode } from '@apis/errors';
-import { denormalisedResponseEntities } from '@services/data';
+import { fetchListing, fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk, handleError } from '@services/sdk';
-import { Listing } from '@src/utils/data';
+import { denormalisedResponseEntities, Listing } from '@src/utils/data';
 import { EOrderType } from '@src/utils/enums';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
@@ -24,9 +24,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
     switch (apiMethod) {
       case HttpMethod.GET: {
-        const [order] = denormalisedResponseEntities(
-          (await integrationSdk.listings.show({ id: orderId })) || [{}],
-        );
+        const order = await fetchListing(orderId as string);
         const {
           plans = [],
           companyId,
@@ -40,34 +38,24 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
         if (isGroupOrder) {
           if (!isEmpty(participants)) {
-            const participantData = await Promise.all(
-              participants.map(async (id: string) => {
-                const [memberAccount] = denormalisedResponseEntities(
-                  await integrationSdk.users.show({
-                    id,
-                  }),
-                );
-
-                return memberAccount;
+            const participantData = denormalisedResponseEntities(
+              await integrationSdk.users.query({
+                ids: participants,
               }),
             );
+
             orderWithPlanDataMaybe = {
               ...orderWithPlanDataMaybe,
               participants: participantData,
             };
           }
           if (!isEmpty(anonymous)) {
-            const anonymousParticipantData = await Promise.all(
-              anonymous.map(async (id: string) => {
-                const [memberAccount] = denormalisedResponseEntities(
-                  await integrationSdk.users.show({
-                    id,
-                  }),
-                );
-
-                return memberAccount;
+            const anonymousParticipantData = denormalisedResponseEntities(
+              await integrationSdk.users.query({
+                ids: anonymous,
               }),
             );
+
             orderWithPlanDataMaybe = {
               ...orderWithPlanDataMaybe,
               anonymous: anonymousParticipantData,
@@ -76,10 +64,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         }
 
         // TODO: query company info
-        const companyResponse = await integrationSdk.users.show({
-          id: companyId,
-        });
-        const [company] = denormalisedResponseEntities(companyResponse);
+        const company = await fetchUser(companyId);
 
         if (!isEmpty(company)) {
           orderWithPlanDataMaybe = { ...orderWithPlanDataMaybe, company };
@@ -87,9 +72,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
         if (planId) {
           // TODO: query plan info
-          const [planListing] = denormalisedResponseEntities(
-            (await integrationSdk.listings.show({ id: planId })) || [{}],
-          );
+          const planListing = await fetchListing(planId);
 
           if (isEmpty(planListing)) {
             return res
@@ -97,27 +80,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
               .json({ error: 'Order detail was not found' });
           }
 
-          const { orderDetail = {} } = Listing(planListing).getMetadata();
-          const orderDetailOfDate = orderDetail[date];
-
-          // TODO: query tx info
-          const txId = orderDetailOfDate?.transactionId;
-          if (isEmpty(txId)) {
-            return res
-              .status(EHttpStatusCode.BadRequest)
-              .json({ error: 'Invalid order date' });
-          }
-
-          const [transaction] = denormalisedResponseEntities(
-            (await integrationSdk.transactions.show({
-              id: txId,
-            })) || [{}],
-          );
-
           orderWithPlanDataMaybe = {
             ...orderWithPlanDataMaybe,
             plan: planListing,
-            transaction,
           };
         }
 

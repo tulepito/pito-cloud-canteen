@@ -27,6 +27,7 @@ const PopupModal: React.FC<PopupModalProps> = (props) => {
     scrollLayerClassName,
     customHeader,
     closeClassName,
+    headerClassName,
   } = props;
   const intl = useIntl();
   const dispatch = useAppDispatch();
@@ -51,6 +52,8 @@ const PopupModal: React.FC<PopupModalProps> = (props) => {
       </Button>
     ) : null;
 
+  const headerClasses = classNames(css.modalHeader, headerClassName);
+
   useEffect(() => {
     if (isOpen) {
       dispatch(UIActions.disableScrollRequest(id));
@@ -66,7 +69,7 @@ const PopupModal: React.FC<PopupModalProps> = (props) => {
       <div className={scrollLayerClasses}>
         <div className={containerClasses}>
           {!hasCustomHeader && (
-            <div className={css.modalHeader}>
+            <div className={headerClasses}>
               {hasTitle && <div className={css.title}>{title}</div>}
               {closeBtn}
             </div>

@@ -71,3 +71,10 @@
 .viewOrderDetail {
   @include textTemplate(14px, $fontWeightBold, 24px);
 }
+
+.loading {
+  width: 100%;
+  border-radius: 8px;
+  height: 300px;
+  margin-top: 12px;
+}
