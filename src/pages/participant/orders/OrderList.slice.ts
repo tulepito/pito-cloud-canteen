@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { intersection, maxBy } from 'lodash';
+import { intersection, maxBy, random } from 'lodash';
 import chunk from 'lodash/chunk';
 import flatten from 'lodash/flatten';
 import uniq from 'lodash/uniq';
@@ -227,6 +227,9 @@ export const recommendFood = ({
     (food) => !Listing(food).getMetadata().rating,
   );
 
+  const randomFood =
+    foodListToFilter[Math.floor(Math.random() * foodListToFilter.length)];
+
   const mostSuitableFood = !isAllFoodHaveNoRating
     ? maxBy(
         foodListToFilter,
@@ -237,7 +240,7 @@ export const recommendFood = ({
         (food) => Listing(food).getMetadata()?.pickingTime || 0,
       );
 
-  return mostSuitableFood;
+  return random() === 1 ? randomFood : mostSuitableFood;
 };
 
 const updateRecommendFoodToOrderDetail = ({
