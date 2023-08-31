@@ -122,7 +122,7 @@ const updatePayment = async (orderId: string, planId: string) => {
   const { partner = {} } = Listing(quotationListing).getMetadata();
 
   const { orderDetail = {} } = planListingGetter.getMetadata();
-  console.log({ partner });
+
   await updatePartnerPaymentRecord(
     orderId,
     partner,
