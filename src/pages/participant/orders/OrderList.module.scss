@@ -80,3 +80,20 @@
     margin-bottom: 0;
   }
 }
+
+.companyTab {
+  @include flexAlign(center, space-between);
+
+  .companyAvatar {
+    width: 20px;
+    height: 20px;
+    min-width: 20px;
+    margin-right: 8px;
+    font-size: 8px;
+  }
+
+  .fakeAvatar {
+    width: 0px;
+    height: 20px;
+  }
+}
