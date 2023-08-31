@@ -39,6 +39,8 @@ export const downloadPriceQuotation =
       </TranslationProvider>
     );
     const div = document.createElement('div');
+    div.style.position = 'absolute';
+    div.style.top = '-9999px';
     document.body.appendChild(div);
     ReactDOM.render(ele, div);
 
