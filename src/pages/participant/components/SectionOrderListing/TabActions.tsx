@@ -15,6 +15,8 @@ type TTabActionsProps = {
   planId: string;
   orderDay: string;
   isOrderDeadlineOver: boolean;
+  getNextSubOrderDay: (dayId: string) => string;
+  onSelectTab: (item: any) => void;
 };
 
 const TabActions: React.FC<TTabActionsProps> = ({
@@ -22,11 +24,15 @@ const TabActions: React.FC<TTabActionsProps> = ({
   planId,
   orderDay,
   isOrderDeadlineOver,
+  getNextSubOrderDay,
+  onSelectTab,
 }) => {
   const dispatch = useAppDispatch();
 
   const handleAutoSelect = () => {
     dispatch(ParticipantPlanThunks.recommendFoodSubOrder(orderDay));
+    const nextDate = getNextSubOrderDay(orderDay);
+    onSelectTab({ id: nextDate });
   };
 
   const handleNotJoinDay = () => {
