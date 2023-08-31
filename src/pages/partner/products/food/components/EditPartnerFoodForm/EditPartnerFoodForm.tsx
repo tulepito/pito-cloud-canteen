@@ -34,14 +34,12 @@ import {
 import { pickRenderableImages } from '@utils/images';
 import {
   composeValidators,
-  composeValidatorsWithAllValues,
   maxLength,
   minPriceLength,
   numberMinLength,
   parsePrice,
   required,
   upperCaseFirstLetter,
-  validateNonEnterInputField,
   validFoodTitle,
 } from '@utils/validators';
 
@@ -297,11 +295,6 @@ const EditPartnerFoodFormComponent: React.FC<
             label={intl.formatMessage({
               id: 'EditPartnerFoodForm.unitLabel',
             })}
-            validate={composeValidators(
-              required(
-                intl.formatMessage({ id: 'EditPartnerFoodForm.unitRequired' }),
-              ),
-            )}
           />
         </div>
         <div className={classNames(css.flexField, css.innerFlexfield)}>
@@ -407,13 +400,6 @@ const EditPartnerFoodFormComponent: React.FC<
             id: 'EditPartnerFoodForm.allergicIngredientLabel',
           })}
           form={form as unknown as FormApi}
-          validate={composeValidatorsWithAllValues(
-            validateNonEnterInputField(
-              intl.formatMessage({
-                id: 'EditPartnerFoodForm.allergicIngredientValid',
-              }),
-            ),
-          )}
         />
         <FieldTextInput
           className={css.field}
@@ -429,19 +415,6 @@ const EditPartnerFoodFormComponent: React.FC<
           inputClassName={css.inputWithSuffix}
           rightIconContainerClassName={css.inputSuffixed}
           rightIcon={<div>món</div>}
-          validate={composeValidators(
-            required(
-              intl.formatMessage({
-                id: 'EditPartnerFoodForm.numberOfMainDishesRequired',
-              }),
-            ),
-            numberMinLength(
-              intl.formatMessage({
-                id: 'EditPartnerFoodForm.numberOfMainDishesInvalid',
-              }),
-              1,
-            ),
-          )}
         />
       </div>
       <div className={css.flexField}>
