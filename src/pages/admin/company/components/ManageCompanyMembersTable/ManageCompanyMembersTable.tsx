@@ -16,6 +16,7 @@ import Pagination from '@components/Pagination/Pagination';
 import type { TColumn } from '@components/Table/Table';
 import Table from '@components/Table/Table';
 import { UserInviteStatus, UserPermission } from '@src/types/UserPermission';
+import { isNewOwnerAlreadyACompanyUser } from '@src/utils/errors';
 import type { TCompanyGroup, TCompanyMemberWithDetails } from '@utils/types';
 
 import css from './ManageCompanyMembersTable.module.scss';
@@ -432,6 +433,23 @@ const ManageCompanyMembersTable: React.FC<TManageCompanyMembersTable> = (
   const onPageChange = (page: number) => {
     setPage(page);
   };
+  console.log({ transferCompanyOwnerError });
+  const transferErrorMessage =
+    !transferCompanyOwnerError ? null : isNewOwnerAlreadyACompanyUser(
+        transferCompanyOwnerError,
+      ) ? (
+      <ErrorMessage
+        message={intl.formatMessage({
+          id: 'ManageCompanyMembersTable.newOwnerAlreadyCompanyUser',
+        })}
+      />
+    ) : (
+      <ErrorMessage
+        message={intl.formatMessage({
+          id: 'ManageCompanyMembersTable.updateMemberPermissionError',
+        })}
+      />
+    );
 
   return (
     <div className={css.root}>
@@ -579,13 +597,7 @@ const ManageCompanyMembersTable: React.FC<TManageCompanyMembersTable> = (
               ),
             },
           )}
-          {transferCompanyOwnerError && (
-            <ErrorMessage
-              message={intl.formatMessage({
-                id: 'ManageCompanyMembersTable.updateMemberPermissionError',
-              })}
-            />
-          )}
+          {transferErrorMessage}
         </div>
       </AlertModal>
     </div>

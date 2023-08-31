@@ -162,6 +162,7 @@ const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({
               isOrderDeadlineOver={isOrderDeadlineOver}
             />
           }
+          enableTabScroll
         />
       </div>
     </div>

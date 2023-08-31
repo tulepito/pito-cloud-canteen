@@ -949,6 +949,7 @@
   "ManageCompanyMembersTable.memberRemoveConfirm": "Xóa",
   "ManageCompanyMembersTable.memberRemoveContent": "Bạn có muốn xóa thành viên {email} khỏi công ty?",
   "ManageCompanyMembersTable.memberRemoveTitle": "Xóa thành viên",
+  "ManageCompanyMembersTable.newOwnerAlreadyCompanyUser": "Không thể chuyền quyền cho thành viên này, vui lòng chọn thành viên khác.",
   "ManageCompanyMembersTable.tranferOwner": "Chuyển quyền",
   "ManageCompanyMembersTable.updateMemberPermissionError": "Không thể cập nhật quyền thành viên",
   "ManageCompanyMembersTable.updateOwnerContent": "Vui lòng chọn quản trị viên mới",

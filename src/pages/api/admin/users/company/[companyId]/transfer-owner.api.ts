@@ -16,6 +16,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       req.body;
 
     const newCompany = await transferCompanyOwner({
+      res,
       companyId: companyId as string,
       newOwnerEmail: newOwnerEmail as string,
       permissionForOldOwner: permissionForOldOwner as UserPermission,
@@ -24,6 +25,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
     return res.status(200).json(newCompany);
   } catch (error) {
+    console.error('transfer owner error', error);
+
     return handleError(res, error);
   }
 };

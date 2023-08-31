@@ -66,6 +66,10 @@ const ListingCard: React.FC<TListCardProps> = ({
       );
       const nextDate = getNextSubOrderDay(dayId);
       onSelectTab({ id: nextDate });
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth',
+      });
     }
   };
   const handleRemoveFromCard = () => {
