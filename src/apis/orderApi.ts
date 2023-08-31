@@ -191,3 +191,6 @@ export const initializePaymentApi = (orderId: string, planId: string) =>
   postApi(`/orders/${orderId}/plan/${planId}/initialize-payment`);
 export const updateOrderStateToDraftApi = (orderId: string) =>
   putApi(`/orders/${orderId}/update-order-state-to-draft`);
+
+export const updatePaymentApi = (orderId: string, planId: string) =>
+  putApi(`/orders/${orderId}/plan/${planId}/update-payment`);
