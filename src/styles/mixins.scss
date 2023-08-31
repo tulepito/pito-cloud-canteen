@@ -247,7 +247,6 @@ $buttonBorderRadius: 8px;
   overflow: hidden;
   text-overflow: ellipsis;
   line-height: $lineHeight;
-  max-height: $lineHeight * $numberOfLines;
 }
 
 @mixin verticalDivider($color, $width, $height) {
