@@ -267,6 +267,10 @@ export const partnerPaths = {
   ManageOrders: '/partner/orders',
   ManagePayments: '/partner/payments',
   SubOrderDetail: '/partner/orders/[subOrderId]',
+  Products: '/partner/products',
+  ManageFood: '/partner/products/food',
+  CreateFood: '/partner/products/food/create',
+  EditFood: '/partner/products/food/[foodId]',
 };
 
 export const partnerRoutes = {
@@ -286,5 +290,21 @@ export const partnerRoutes = {
   ManagePayments: {
     path: partnerPaths.ManagePayments,
     label: 'Thanh toán',
+  },
+  Products: {
+    path: partnerPaths.Products,
+    label: 'Sản phẩm',
+  },
+  ManageFood: {
+    path: partnerPaths.ManageFood,
+    label: 'Danh sách món ăn',
+  },
+  CreateFood: {
+    path: partnerPaths.CreateFood,
+    label: 'Tạo món ăn',
+  },
+  EditFood: {
+    path: partnerPaths.EditFood,
+    label: 'Chỉnh sửa món ăn',
   },
 };

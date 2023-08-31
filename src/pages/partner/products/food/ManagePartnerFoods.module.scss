@@ -1,0 +1,374 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/defaults.scss' as *;
+
+.titleWrapper {
+  @include flexAlign(center, space-between);
+
+  .titleCtaBtnWrapper {
+    @include flexAlign(center);
+    gap: 12px;
+  }
+}
+
+.title {
+  @include pageTitle;
+}
+
+.descriptionRow {
+  max-width: 250px;
+}
+
+.tableBodyCell:nth-child(2) {
+  width: 100px !important;
+}
+
+.tableBodyCell:nth-child(5) {
+  width: 250px !important;
+}
+
+.idRow {
+  font-weight: $fontWeightBold;
+  color: $labelBlue2;
+  @include lineClamp(3);
+}
+
+.actionBtn {
+  margin: 0 10px;
+}
+
+.filterIcon {
+  fill: $neutralGray6;
+  width: 14px;
+  height: 14px;
+  margin-right: 10px;
+}
+
+.tableActions {
+  display: flex;
+  margin: 20px 0 40px 0;
+  flex-direction: column;
+  row-gap: 40px;
+  @include viewportLarge {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+}
+
+.ctaButtons {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  @include viewportLarge {
+    flex-direction: row;
+  }
+}
+
+.titleRow {
+  min-width: 200px;
+  display: block;
+  color: $neutralGray6;
+}
+
+.secondaryButton {
+  @include buttonColorSecondary;
+  background-color: $neutralGray2;
+  outline: 1px solid $neutralGray4;
+
+  &:focus,
+  &:hover {
+    background-color: $neutralGray3;
+    color: unset;
+    border-color: unset;
+  }
+}
+
+.filterButton {
+  border-width: 1px;
+}
+
+.addButton {
+  background-color: #000000;
+  color: $neutralGray1;
+
+  &.empty {
+    width: 240px;
+  }
+}
+
+.hidden {
+  display: none;
+}
+
+.filterForm {
+  max-width: 400px;
+  padding: 50px 0 150px 0;
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  justify-content: center;
+  margin: auto;
+}
+
+.modal {
+  top: 100px;
+}
+
+.input {
+  margin-bottom: 30px;
+  width: 100%;
+}
+
+.discardButton {
+  composes: secondaryButton;
+}
+
+.rightButtons {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.leftButton {
+  composes: secondaryButton;
+}
+
+.formButtons {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.filteButtonActive {
+  background-color: #ff4c38;
+  color: $neutralGray1;
+  border-color: #ff4c38;
+  svg {
+    fill: $neutralGray1;
+  }
+  &:focus,
+  &:hover {
+    background-color: #c0392b;
+    color: #c0392b;
+  }
+}
+
+.iconSpinner {
+  stroke: $neutralGray5;
+}
+
+.buttonIcon {
+  margin-right: 12px;
+}
+
+.lightButton {
+  font-size: 14px;
+  gap: 8px;
+
+  &.empty {
+    width: 240px;
+  }
+}
+
+.deletedFood {
+  text-transform: uppercase;
+  font-weight: $fontWeightBold;
+}
+
+.foodTitle {
+  display: inline-flex;
+  font-weight: $fontWeightBold;
+  color: #000000;
+}
+
+.removeTitle {
+  font-weight: $fontWeightBold;
+  font-size: 20px;
+  color: $neutralGray6;
+  margin-bottom: 28px;
+}
+
+.removeContent {
+  font-size: 14px;
+  font-weight: $fontWeightRegular;
+  color: $neutralGray5;
+  margin: 0;
+}
+
+.removeButton {
+  border: 1px solid $neutralGray4;
+  padding: 10px 20px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $neutralGray6;
+  font-weight: $fontWeightBold;
+  font-size: 14px;
+
+  &:not(:disabled) {
+    &:hover {
+      background-color: $neutralGray6;
+      color: $neutralGray1;
+
+      svg {
+        path {
+          fill: $neutralGray1;
+        }
+      }
+    }
+  }
+}
+
+.disabled {
+  color: $neutralGray5;
+  path {
+    fill: $neutralGray5;
+  }
+}
+
+.link {
+  button {
+    font-size: 14px;
+    width: 100%;
+    outline: none;
+    @include viewportLarge {
+      width: unset;
+    }
+  }
+}
+
+.inputWrapper {
+  position: relative;
+}
+
+.inputFile {
+  opacity: 0;
+  position: absolute;
+  height: 100%;
+  width: 100%;
+}
+
+.fileLabel {
+  width: 100%;
+  min-height: 200px;
+  border: 1px dashed $neutralGray5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $neutralGray5;
+}
+
+.importTitle {
+  color: $neutralGray6;
+  margin: 0 0 30px 0;
+}
+
+.importLabel {
+  color: $neutralGray6;
+  margin-bottom: 30px;
+}
+
+.downloadFileHere {
+  color: $neutralGray5;
+  a {
+    color: $neutralGray6;
+    font-weight: $fontWeightBold;
+  }
+}
+
+.removeModalContent {
+  padding: 5px 0 25px 0;
+}
+
+.tableWrapper {
+  @include viewportMedium {
+    max-width: calc(100vw - 350px);
+    overflow-x: scroll;
+    position: relative;
+  }
+}
+
+.googleSheetInput {
+  @include inputStyles;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.radioButton {
+  margin-bottom: 20px;
+  .inputWrapper {
+    margin-bottom: 10px;
+    display: flex;
+    overflow: hidden;
+    align-items: center;
+  }
+}
+
+.deletedFood {
+  text-transform: uppercase;
+  font-weight: $fontWeightBold;
+}
+
+.filterTooltip {
+  width: auto;
+}
+
+.viewTypeWrapper {
+  @include flexAlign(center);
+  gap: 4px;
+  background-color: $neutralGray2;
+  border-radius: 12px;
+  padding: 4px;
+
+  .viewIcon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    @include flexCenter;
+    cursor: pointer;
+
+    & svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    &.active {
+      background-color: $neutralGray1;
+
+      & svg {
+        path {
+          fill: $neutralGray6;
+        }
+      }
+    }
+  }
+}
+
+.emptyList {
+  @include flexAlign(center, center);
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 80px;
+}
+
+.menuTypeTableHeaderLabel {
+  @include flexAlign(center);
+  gap: 4px;
+}
+
+.iconInfoWrapper {
+  @include flexAlign(center);
+}
+
+.menuTypeDescription {
+  background-color: $neutralGray6;
+  color: $neutralGray1;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.overlay {
+  opacity: 1 !important;
+}

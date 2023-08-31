@@ -43,4 +43,5 @@ export { default as ParticipantSubOrderList } from '@pages/participant/sub-order
 export { default as PartnerSubOrderDetail } from '@pages/partner/orders/[subOrderId]/PartnerSubOrderDetail.slice';
 export { default as PartnerManageOrders } from '@pages/partner/orders/ManageOrders.slice';
 export { default as PartnerManagePayments } from '@pages/partner/payments/PartnerManagePayments.slice';
+export { default as PartnerFood } from '@pages/partner/products/food/PartnerFood.slice';
 export { default as TrackingPage } from '@pages/tracking/[subOrderId]/TrackingPage.slice';

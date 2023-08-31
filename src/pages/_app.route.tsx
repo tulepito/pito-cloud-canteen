@@ -6,6 +6,7 @@ import nProgress from 'nprogress';
 
 import AuthGuard from '@components/Guards/AuthGuard';
 import PermissionGuard from '@components/Guards/PermissionGuard';
+import ToastifyProvider from '@components/ToastifyProvider/ToastifyProvider';
 import UIProvider from '@components/UIProvider/UIProvider';
 import store from '@redux/store';
 import TranslationProvider from '@translations/TranslationProvider';
@@ -41,7 +42,9 @@ const MyApp = ({
         <UIProvider>
           <AuthGuard>
             <PermissionGuard>
-              <Component {...restProps.pageProps} key={router.asPath} />
+              <ToastifyProvider>
+                <Component {...restProps.pageProps} key={router.asPath} />
+              </ToastifyProvider>
             </PermissionGuard>
           </AuthGuard>
         </UIProvider>

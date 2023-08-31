@@ -170,7 +170,7 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
 
     dispatch(
       selectRestaurantPageThunks.getRestaurantFood({
-        dateTime,
+        subOrderDate: dateTime.toMillis(),
         menuId: Listing(menu).getId(),
       }),
     );

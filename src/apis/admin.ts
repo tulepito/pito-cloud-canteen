@@ -42,3 +42,6 @@ export const transitionOrderPaymentStatusApi = (
     orderId,
     planId,
   });
+
+export const fetchFoodListFromMenuApi = (params: TObject) =>
+  getApi('/admin/listings/order/fetch-food-from-menu', params);

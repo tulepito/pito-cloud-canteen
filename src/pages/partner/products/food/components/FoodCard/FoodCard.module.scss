@@ -1,0 +1,106 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.cardWrapper {
+  border-radius: 12px;
+  border: 1px solid $neutralGray3;
+  background: $neutralGray1;
+  padding: 12px;
+  width: 100%;
+  position: relative;
+
+  .checkboxLabel {
+    width: 100%;
+
+    .checkboxWrapper {
+      align-self: center;
+    }
+  }
+
+  .actionsWrapper {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+
+    svg {
+      cursor: pointer;
+    }
+
+    .actionsBtnWrapper {
+      @include flexAlign(center);
+      flex-direction: column;
+      position: absolute;
+      top: 0;
+      left: 32px;
+      border-radius: 8px;
+      background-color: $neutralGray1;
+      width: 150px;
+      overflow: hidden;
+      z-index: 1;
+      box-shadow: 0px 8px 8px -4px rgba(16, 24, 40, 0.04),
+        0px 20px 24px -4px rgba(16, 24, 40, 0.1);
+
+      .item {
+        width: 150px;
+        padding: 12px;
+        cursor: pointer;
+        color: $neutralGray6;
+
+        &:hover {
+          background-color: $neutralGray2;
+        }
+      }
+    }
+  }
+}
+
+.checkboxText {
+  width: 100%;
+}
+
+.contentWrapper {
+  @include flexAlign(center, space-between);
+  gap: 12px;
+  color: $neutralGray6;
+
+  .image {
+    width: 84px;
+    height: 84px;
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+
+    svg {
+      width: 24px;
+      height: 24px;
+    }
+  }
+
+  .content {
+    flex-basis: calc(100% - 112px);
+
+    .infoWrapper {
+      .foodName {
+        @include textTemplate(16px, $fontWeightBold, 24px);
+        @include lineClamp(1);
+      }
+
+      .menuType {
+        @include textTemplate(14px, $fontWeightRegular, 20px);
+        color: $neutralGray5;
+        margin-top: 4px;
+      }
+    }
+
+    .bottomWrapper {
+      @include flexAlign(center, space-between);
+      margin-top: 12px;
+
+      .foodType {
+        @include flexAlign(center);
+        gap: 4px;
+      }
+    }
+  }
+}
