@@ -250,11 +250,11 @@ export const calculatePriceQuotationPartner = ({
 }) => {
   const promotion = 0;
   const totalPrice = subOrderDate
-    ? quotation[subOrderDate].reduce((singleDateSum: number, item: any) => {
+    ? quotation[subOrderDate]?.reduce((singleDateSum: number, item: any) => {
         return singleDateSum + item.foodPrice * item.frequency;
       }, 0)
     : Object.keys(quotation).reduce((result: number, orderDate: string) => {
-        const totalPriceInDate = quotation[orderDate].reduce(
+        const totalPriceInDate = quotation[orderDate]?.reduce(
           (singleDateSum: number, item: any) => {
             return singleDateSum + item.foodPrice * item.frequency;
           },
