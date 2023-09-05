@@ -11,8 +11,8 @@ import type { TObject, TTransaction } from '@utils/types';
 
 import css from './ReviewOrderStatesSection.module.scss';
 
-const prepareItemFromData = (transactionMap: TObject<number, TTransaction>) => {
-  const items = Object.entries(transactionMap)
+const prepareItemFromData = (orderDetail: TObject<number, TTransaction>) => {
+  const items = Object.entries(orderDetail)
     .map(([date, tx]) => {
       return { date: Number(date), tx };
     })
@@ -26,9 +26,7 @@ const prepareItemFromData = (transactionMap: TObject<number, TTransaction>) => {
 
 type TReviewOrderStatesSectionProps = {
   data: {
-    transactionDataMap: {
-      [date: number]: TTransaction;
-    };
+    orderDetail: TObject;
     isCanceledOrder: boolean;
   };
   isAdminLayout?: boolean;
@@ -36,14 +34,14 @@ type TReviewOrderStatesSectionProps = {
 };
 
 const ReviewOrderStatesSection: React.FC<TReviewOrderStatesSectionProps> = ({
-  data: { transactionDataMap, isCanceledOrder },
+  data: { orderDetail = {}, isCanceledOrder },
   isAdminLayout = false,
   className,
 }) => {
   const items = useMemo(
-    () => prepareItemFromData(transactionDataMap),
+    () => prepareItemFromData(orderDetail),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [JSON.stringify(transactionDataMap)],
+    [JSON.stringify(orderDetail)],
   );
 
   const classes = classNames(css.root, className);
