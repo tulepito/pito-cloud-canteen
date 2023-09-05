@@ -32,7 +32,6 @@ import {
   ENotificationType,
   EPaymentType,
   ESubOrderTxStatus,
-  ETransactionRoles,
 } from '@src/utils/enums';
 import { ETransition } from '@src/utils/transaction';
 import type {
@@ -575,38 +574,21 @@ const OrderDetailSlice = createSlice({
         state.transitError = null;
       })
       .addCase(transit.fulfilled, (state, { payload }) => {
-        const { transactionId, transition, createdAt } = payload;
+        const { transactionId, transition } = payload;
         const currentState = current(state);
         const currOrderDetail = currentState.orderDetail;
-        const currTxMap = currentState.transactionDataMap || {};
-        const updateEnTry = Object.entries(currTxMap).find(
-          ([_, txData]) => Transaction(txData).getId() === transactionId,
+        const updateEnTry = Object.entries<any>(currOrderDetail).find(
+          ([_, { transactionId: _transactionId }]) =>
+            _transactionId === transactionId,
         );
 
         if (updateEnTry) {
-          const [date, txData] = updateEnTry;
-
-          const updateTxData = {
-            ...txData,
-            attributes: {
-              ...txData?.attributes,
-              transitions: (
-                (txData?.attributes?.transitions || []) as any[]
-              ).concat({
-                createdAt,
-                transition,
-                by: ETransactionRoles.operator,
-              }),
-              lastTransition: transition,
-              lastTransitionedAt: createdAt,
-            },
-          };
-
-          state.transactionDataMap = { ...currTxMap, [date]: updateTxData };
+          const [date] = updateEnTry;
           state.orderDetail = {
             ...currOrderDetail,
             [date]: {
               ...currOrderDetail[date],
+              lastTransition: transition,
               ...(transition === ETransition.OPERATOR_CANCEL_PLAN && {
                 status: 'canceled',
               }),
