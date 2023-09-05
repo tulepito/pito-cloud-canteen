@@ -5,8 +5,10 @@ import { useRouter } from 'next/router';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import IconFood from '@components/Icons/IconFood/IconFood';
 import IconLock from '@components/Icons/IconLock/IconLock';
+import IconLogout from '@components/Icons/IconLogout/IconLogout';
 import IconUser from '@components/Icons/IconUser2/IconUser2';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { useLogout } from '@hooks/useLogout';
 import { currentUserSelector } from '@redux/slices/user.slice';
 import { partnerPaths } from '@src/paths';
 import { OwnListing } from '@src/utils/data';
@@ -19,6 +21,7 @@ import css from './PartnerSettingsPage.module.scss';
 const PartnerSettingsPage = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
+  const handleLogoutFn = useLogout();
   const currentUser = useAppSelector(currentUserSelector);
   const restaurantListing = useAppSelector(
     (state) => state.PartnerSettingsPage.restaurantListing,
@@ -72,6 +75,13 @@ const PartnerSettingsPage = () => {
           <div className={css.iconGroup}>
             <IconLock />
             <span>Đổi mật khẩu</span>
+          </div>
+          <IconArrow direction="right" />
+        </div>
+        <div className={css.navigationItem} onClick={handleLogoutFn}>
+          <div className={css.iconGroup}>
+            <IconLogout />
+            <span>Đăng xuất</span>
           </div>
           <IconArrow direction="right" />
         </div>
