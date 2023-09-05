@@ -7,6 +7,7 @@ import { HttpMethod } from '@apis/configs';
 import { getParticipantOrdersQueries } from '@helpers/listingSearchQuery';
 import cookies from '@services/cookie';
 import { fetchUser } from '@services/integrationHelper';
+import { getIntegrationSdk } from '@services/integrationSdk';
 import participantChecker from '@services/permissionChecker/participant';
 import { getSdk, handleError } from '@services/sdk';
 import {
@@ -35,6 +36,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
     const apiMethod = req.method;
     const sdk = getSdk(req, res);
+    const integrationSdk = getIntegrationSdk();
 
     switch (apiMethod) {
       case HttpMethod.GET: {
@@ -52,7 +54,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
         const responses = await Promise.all(
           ordersQueries.map(async (query) => {
-            const response = await sdk.listings.query(query);
+            const response = await integrationSdk.listings.query(query);
 
             return denormalisedResponseEntities(response);
           }),
@@ -65,7 +67,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
           return plans[0];
         });
-        const allPlans = await fetchListingsByChunkedIds(allPlansIdList, sdk);
+        const allPlans = await fetchListingsByChunkedIds(
+          allPlansIdList,
+          integrationSdk,
+        );
 
         const allRelatedRestaurantsIdList = uniq(
           allPlans.map((plan: TListing) => {
@@ -80,7 +85,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
         const allRelatedRestaurants = await fetchListingsByChunkedIds(
           flatten(allRelatedRestaurantsIdList),
-          sdk,
+          integrationSdk,
         );
 
         const mappingSubOrderToOrder = orders.reduce(
