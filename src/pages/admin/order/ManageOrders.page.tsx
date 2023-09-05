@@ -171,13 +171,20 @@ const OrderDetailTooltip = ({
     (prev: any, subOrder: TIntegrationListing) => {
       const { orderDetail = {} } = subOrder.attributes.metadata || {};
       const subOrderDetails = Object.keys(orderDetail).map((key) => {
-        const { transaction, totalPrice = 0 } = orderDetail[key];
+        const {
+          lastTransition,
+          transactionId,
+          totalPrice = 0,
+        } = orderDetail[key];
 
         return (
           <div key={key} className={css.orderDetailTooltipItem}>
             <StateItem
               className={css.stateItem}
-              data={{ tx: transaction, date: formatTimestamp(Number(key)) }}
+              data={{
+                tx: { lastTransition, transactionId },
+                date: formatTimestamp(Number(key)),
+              }}
             />
             <span>{parsePrice(String(totalPrice))}đ</span>
           </div>

@@ -23,7 +23,7 @@ const StateItem: React.FC<TStateItemProps> = ({
   isAdminLayout = false,
 }) => {
   const rootClasses = classNames(rootClassName || css.root, className);
-  const { lastTransition, transactionId } = tx;
+  const { lastTransition, transactionId } = tx || {};
 
   let stateComponent = <div className={classNames(css.icon, css.iconEmpty)} />;
 

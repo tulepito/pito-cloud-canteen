@@ -523,11 +523,17 @@ export const getPrevMonth = (date: Date) => {
 };
 
 export const getStartOfMonth = (date: Date) => {
-  return DateTime.fromJSDate(date).startOf('month').toJSDate();
+  return DateTime.fromJSDate(date)
+    .setZone(VNTimezone)
+    .startOf('month')
+    .toJSDate();
 };
 
 export const getEndOfMonth = (date: Date) => {
-  return DateTime.fromJSDate(date).endOf('month').toJSDate();
+  return DateTime.fromJSDate(date)
+    .setZone(VNTimezone)
+    .endOf('month')
+    .toJSDate();
 };
 
 export const renderListTimeOptions = (
