@@ -39,8 +39,6 @@ const PartnerRestaurantSettingRoute = () => {
     stopReceiveOrder = false,
     startStopReceiveOrderDate,
     endStopReceiveOrderDate,
-    startDayOff,
-    endDayOff,
   } = Listing(restaurantListing).getPublicData();
 
   const stopReceiveOrderInfo = useMemo(
@@ -59,15 +57,6 @@ const PartnerRestaurantSettingRoute = () => {
       endStopReceiveOrderDate,
     ],
   );
-  const dayOffInfo = useMemo(
-    () =>
-      fetchDataInProgress
-        ? ''
-        : `${formatTimestamp(
-            formValues?.startDayOff || startDayOff,
-          )} -  ${formatTimestamp(formValues?.endDayOff || endDayOff)}`,
-    [fetchDataInProgress, JSON.stringify(formValues), startDayOff, endDayOff],
-  );
 
   const formInitialValues = useMemo(
     () => ({
@@ -75,7 +64,6 @@ const PartnerRestaurantSettingRoute = () => {
         typeof formValues?.isActive !== 'undefined'
           ? formValues?.isActive
           : isActive,
-      dayOffInfo,
       stopReceiveOrder:
         typeof formValues?.stopReceiveOrder !== 'undefined'
           ? formValues?.stopReceiveOrder
@@ -85,18 +73,13 @@ const PartnerRestaurantSettingRoute = () => {
         formValues?.startStopReceiveOrderDate || startStopReceiveOrderDate,
       endStopReceiveOrderDate:
         formValues?.endStopReceiveOrderDate || endStopReceiveOrderDate,
-      startDayOff: formValues?.startDayOff || startDayOff,
-      endDayOff: formValues?.endDayOff || endDayOff,
     }),
     [
       isActive,
-      dayOffInfo,
       stopReceiveOrder,
       stopReceiveOrderInfo,
       startStopReceiveOrderDate,
       endStopReceiveOrderDate,
-      startDayOff,
-      endDayOff,
       JSON.stringify(formValues),
     ],
   );
@@ -106,9 +89,7 @@ const PartnerRestaurantSettingRoute = () => {
     (formValues.isActive === isActive &&
       formValues.stopReceiveOrder === stopReceiveOrder &&
       formValues.startStopReceiveOrderDate === startStopReceiveOrderDate &&
-      formValues.endStopReceiveOrderDate === endStopReceiveOrderDate &&
-      formValues.startDayOff === startDayOff &&
-      formValues.endDayOff === endDayOff);
+      formValues.endStopReceiveOrderDate === endStopReceiveOrderDate);
   const handleClose = () => {
     router.push(partnerPaths.Settings);
   };

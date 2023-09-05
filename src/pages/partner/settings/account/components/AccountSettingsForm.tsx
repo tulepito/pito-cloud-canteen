@@ -164,9 +164,11 @@ const AccountSettingsFormComponent: React.FC<
         <LocationAutocompleteInputField {...fieldAddress} />
         <FieldTextInput {...fieldWebsite} />
         <FieldTextInput {...fieldFacebookLink} />
-        <Button disabled={submitDisabled} inProgress={submitting}>
-          Lưu thay đổi
-        </Button>
+        <div className={css.actionContainer}>
+          <Button disabled={submitDisabled} inProgress={submitting}>
+            Lưu thay đổi
+          </Button>
+        </div>
         <Alert
           message="Cập nhật thông tin thành công"
           isOpen={successAlertControl.value}

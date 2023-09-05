@@ -74,9 +74,11 @@ const MenuSettingsFormComponent: React.FC<TMenuSettingsFormComponentProps> = (
           />
         </div>
 
-        <Button disabled={submitDisabled} inProgress={submitting}>
-          Lưu thay đổi
-        </Button>
+        <div className={css.actionContainer}>
+          <Button disabled={submitDisabled} inProgress={submitting}>
+            Lưu thay đổi
+          </Button>
+        </div>
 
         <Alert
           message="Cập nhật thông tin thành công"

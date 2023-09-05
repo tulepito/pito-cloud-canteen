@@ -22,8 +22,6 @@ export const createSubmitUpdatePartnerValues = (
     startStopReceiveOrderDate,
     endStopReceiveOrderDate,
     stopReceiveOrder,
-    startDayOff,
-    endDayOff,
   } = values;
   const { selectedPlace = {} } = location || {};
   const { address, origin } = selectedPlace;
@@ -57,11 +55,6 @@ export const createSubmitUpdatePartnerValues = (
         ? { endStopReceiveOrderDate }
         : {}),
       ...(typeof stopReceiveOrder !== 'undefined' ? { stopReceiveOrder } : {}),
-      // #endregion
-      // #region Day off fields
-      ...(typeof startDayOff === 'number' ? { startDayOff } : {}),
-      ...(typeof endDayOff === 'number' ? { endDayOff } : {}),
-      // #endregion
       ...(contactorName ? { contactorName } : {}),
       ...(phoneNumber ? { phoneNumber } : {}),
       ...(meals ? { meals } : {}),
