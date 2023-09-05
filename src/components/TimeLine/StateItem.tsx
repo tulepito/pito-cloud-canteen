@@ -7,13 +7,7 @@ import IconDelivering from '@components/Icons/IconDelivering/IconDelivering';
 import IconTickWithBackground from '@components/Icons/IconTickWithBackground/IconTickWithBackground';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import Tooltip from '@components/Tooltip/Tooltip';
-import {
-  txIsCanceled,
-  txIsCompleted,
-  txIsDelivering,
-  txIsDeliveryFailed,
-  txIsInitiated,
-} from '@utils/transaction';
+import { ETransition } from '@utils/transaction';
 
 import StateItemTooltip from './StateItemTooltip';
 import type { TTimeLineItemProps } from './types';
@@ -29,23 +23,40 @@ const StateItem: React.FC<TStateItemProps> = ({
   isAdminLayout = false,
 }) => {
   const rootClasses = classNames(rootClassName || css.root, className);
+  const { lastTransition, transactionId } = tx;
 
   let stateComponent = <div className={classNames(css.icon, css.iconEmpty)} />;
 
-  if (txIsInitiated(tx)) {
-    //
-  } else if (txIsCompleted(tx)) {
-    stateComponent = <IconTickWithBackground className={css.icon} />;
-  } else if (txIsDelivering(tx)) {
-    stateComponent = <IconDelivering className={css.icon} />;
-  } else if (txIsDeliveryFailed(tx)) {
-    stateComponent = <IconTickWithBackground className={css.icon} />;
-  } else if (txIsCanceled(tx)) {
-    stateComponent = <IconCancel className={css.icon} />;
+  switch (lastTransition) {
+    case ETransition.INITIATE_TRANSACTION:
+      break;
+    case ETransition.START_DELIVERY:
+      stateComponent = <IconDelivering className={css.icon} />;
+      break;
+    case ETransition.COMPLETE_DELIVERY:
+      stateComponent = <IconTickWithBackground className={css.icon} />;
+      break;
+    case ETransition.EXPIRED_START_DELIVERY:
+      stateComponent = <IconCancel className={css.icon} />;
+      break;
+    case ETransition.CANCEL_DELIVERY:
+      stateComponent = <IconCancel className={css.icon} />;
+      break;
+    case ETransition.OPERATOR_CANCEL_PLAN:
+      stateComponent = <IconTickWithBackground className={css.icon} />;
+      break;
+
+    default:
+      break;
   }
 
   const tooltipContent = useMemo(() => {
-    return <StateItemTooltip tx={tx} />;
+    return (
+      <StateItemTooltip
+        lastTransition={lastTransition}
+        transactionId={transactionId}
+      />
+    );
   }, [JSON.stringify(tx)]);
 
   const stateItemComponent = useMemo(

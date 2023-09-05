@@ -81,7 +81,7 @@ const ReviewView: React.FC<TReviewViewProps> = (props) => {
         <RenderWhen condition={!canGoBackEditMode}>
           <ReviewOrderStatesSection
             data={{
-              transactionDataMap: reviewViewData?.transactionDataMap || {},
+              orderDetail: reviewViewData?.reviewResultData?.orderDetail,
               isCanceledOrder: reviewViewData?.isCanceledOrder || false,
             }}
           />
