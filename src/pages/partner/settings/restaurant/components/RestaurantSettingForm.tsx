@@ -33,8 +33,6 @@ export type TRestaurantSettingFormValues = {
   stopReceiveOrder: boolean;
   startStopReceiveOrderDate: number;
   endStopReceiveOrderDate: number;
-  startDayOff: number;
-  endDayOff: number;
   isActive: boolean;
 };
 
@@ -62,9 +60,7 @@ const RestaurantSettingFormComponent: React.FC<
   const { isMobileLayout } = useViewport();
   const dispatch = useAppDispatch();
   const stopReceiveOrderControl = useBoolean();
-  const dayOffControl = useBoolean();
   const cannotTurnOffAppStatusControl = useBoolean();
-  const cannotUpdateDayOffRangeControl = useBoolean();
   const inProgressOrdersModalControl = useBoolean();
   const paymentPartnerRecords = useAppSelector(
     (state) => state.PartnerManagePayments.paymentPartnerRecords,
@@ -89,34 +85,17 @@ const RestaurantSettingFormComponent: React.FC<
       ? new Date(initialValues.endStopReceiveOrderDate)
       : today,
   });
-  const [dayOffRange, setDayOffRange] = useState<any>({
-    startDate: initialValues.startDayOff
-      ? new Date(initialValues.startDayOff)
-      : today,
-    endDate: initialValues.endDayOff
-      ? new Date(initialValues.endDayOff)
-      : today,
-  });
 
   useEffect(
     () =>
       setStopReceiveOrderRange({
-        startDate: initialValues.startStopReceiveOrderDate,
-        endDate: initialValues.endStopReceiveOrderDate,
+        startDate: new Date(initialValues.startStopReceiveOrderDate || 0),
+        endDate: new Date(initialValues.endStopReceiveOrderDate || 0),
       }),
     [
       initialValues.startStopReceiveOrderDate,
       initialValues.endStopReceiveOrderDate,
     ],
-  );
-
-  useEffect(
-    () =>
-      setDayOffRange({
-        startDate: initialValues.startDayOff,
-        endDate: initialValues.endDayOff,
-      }),
-    [initialValues.startDayOff, initialValues.endDayOff],
   );
 
   const { isActive = true } = Listing(restaurantListing).getPublicData();
@@ -140,8 +119,8 @@ const RestaurantSettingFormComponent: React.FC<
   const handleUpdateStopReceiveOrderRangeClick = () => {
     stopReceiveOrderControl.setFalse();
     const newValues = {
-      startStopReceiveOrderDate: stopReceiveOrderRange.startDate.getTime(),
-      endStopReceiveOrderDate: stopReceiveOrderRange.endDate.getTime(),
+      startStopReceiveOrderDate: stopReceiveOrderRange.startDate?.getTime(),
+      endStopReceiveOrderDate: stopReceiveOrderRange.endDate?.getTime(),
       stopReceiveOrder: true,
     };
 
@@ -238,119 +217,11 @@ const RestaurantSettingFormComponent: React.FC<
   };
   // #endregion
 
-  // #region Day off
-  const inProgressTransactionsInDayOffRange = inProgressTransactions
-    .reduce((txList: any[], tx: any) => {
-      const { startDate, endDate } = dayOffRange;
-      const booking = tx?.booking || {};
-      const { orderId } = Transaction(tx).getMetadata();
-      const bookingEndTime = booking?.attributes?.displayEnd;
-      const bookingStartTime = booking?.attributes?.displayStart;
-      const timestamp = DateTime.fromJSDate(bookingStartTime)
-        .startOf('day')
-        .toMillis();
-
-      const validBooking =
-        (startDate instanceof Date ? startDate : today) <= bookingStartTime &&
-        bookingEndTime <= (endDate instanceof Date ? endDate : today);
-      const validPaymentRecord =
-        paymentPartnerRecords[orderId] &&
-        paymentPartnerRecords[orderId][timestamp] &&
-        paymentPartnerRecords[orderId][timestamp][0];
-
-      return validPaymentRecord && validBooking
-        ? txList.concat({ time: timestamp, paymentRecord: validPaymentRecord })
-        : txList;
-    }, [])
-    .sort((a: any, b: any) => a.time.getTime() - b.time.getTime());
-
-  const inProgressTransactionsInDayOffRangeCount =
-    inProgressTransactionsInDayOffRange.length;
-  const nearestNextDateHaveInProgressOrderForDayOff =
-    inProgressTransactionsInDayOffRangeCount > 0
-      ? inProgressTransactionsInDayOffRange[0].time
-      : new Date();
-  const theBestFarNextDateHaveInProgressOrderForDayOff =
-    inProgressTransactionsInDayOffRangeCount > 1
-      ? inProgressTransactionsInDayOffRange[
-          inProgressTransactionsInDayOffRangeCount - 1
-        ].time
-      : nearestNextDateHaveInProgressOrderForDayOff;
-
-  const isEnableUpdateDateOffRangeAppStatus =
-    inProgressTransactionsInDayOffRangeCount === 0;
-
-  const isUpdateDayOffRangeDisabled =
-    dayOffRange.startDate === null ||
-    dayOffRange.endDate === null ||
-    dayOffRange.startDate > dayOffRange.endDate;
-
-  const handleUpdateDayOffRangeClick = () => {
-    const newValues = {
-      startDayOff: dayOffRange.startDate.getTime(),
-      endDayOff: dayOffRange.endDate.getTime(),
-    };
-
-    if (isEnableUpdateDateOffRangeAppStatus) {
-      dayOffControl.setFalse();
-      if (isMobileLayout) {
-        dispatch(
-          PartnerSettingsThunks.updatePartnerRestaurantListing({
-            ...newValues,
-          }),
-        );
-      } else if (setFormValues) {
-        setFormValues({
-          ...values,
-          ...newValues,
-        });
-      }
-    } else {
-      dayOffControl.setFalse();
-      cannotUpdateDayOffRangeControl.setTrue();
-    }
-  };
-
-  const dayOffDatePicker = (
-    <>
-      <FieldDateRangePicker
-        id="RestaurantSettingForm.dayOff"
-        name="dayOffRange"
-        selected={dayOffRange.startDate}
-        minDate={today}
-        onChange={(values: [Date | null, Date | null]) => {
-          setDayOffRange({
-            startDate: values[0],
-            endDate: values[1],
-          });
-        }}
-        startDate={dayOffRange.startDate}
-        endDate={dayOffRange.endDate}
-      />
-      <div className={css.slideModalActions}>
-        <Button variant="inline" onClick={dayOffControl.setFalse}>
-          Hủy
-        </Button>
-        <Button
-          disabled={isUpdateDayOffRangeDisabled}
-          onClick={handleUpdateDayOffRangeClick}>
-          Áp dụng
-        </Button>
-      </div>
-    </>
-  );
-
-  const handleViewOrdersForDayOff = () => {
-    setCurrentOrders(inProgressTransactionsInDayOffRange);
-    inProgressOrdersModalControl.setTrue();
-    cannotUpdateDayOffRangeControl.setFalse();
-  };
   const handleViewOrdersForTurnOffApp = () => {
     setCurrentOrders(inProgressTransactionsAfterToDay);
     cannotTurnOffAppStatusControl.setFalse();
     inProgressOrdersModalControl.setTrue();
   };
-  // #endregion Day off
 
   return (
     <Form onSubmit={handleSubmit} className={css.formRoot}>
@@ -422,78 +293,6 @@ const RestaurantSettingFormComponent: React.FC<
       </SlideModal>
 
       <div className={css.fieldContainer}>
-        <RenderWhen condition={isMobileLayout}>
-          <FieldTextInput
-            id="RestaurantSettingForm.dayOffInfo"
-            name="dayOffInfo"
-            label="Cập nhật lịch nghỉ"
-            leftIcon={<IconCalendar />}
-            disabled={inProgress}
-            onClick={dayOffControl.setTrue}
-            onChange={() => {}}
-          />
-          <RenderWhen.False>
-            <Tooltip
-              overlayClassName={css.datePickerTooltip}
-              overlayInnerStyle={{ backgroundColor: '#ffffff' }}
-              showArrow={false}
-              tooltipContent={dayOffDatePicker}
-              visible={!isMobileLayout && dayOffControl.value}
-              trigger="click"
-              placement="bottomLeft">
-              <FieldTextInput
-                id="RestaurantSettingForm.dayOffInfo"
-                name="dayOffInfo"
-                label="Cập nhật lịch nghỉ"
-                disabled={inProgress}
-                leftIcon={<IconCalendar />}
-                onClick={dayOffControl.setTrue}
-                onChange={() => {}}
-              />
-            </Tooltip>
-          </RenderWhen.False>
-        </RenderWhen>
-      </div>
-      <SlideModal
-        id="RestaurantSettingForm.dayOffRangeSlideModal"
-        isOpen={isMobileLayout && dayOffControl.value}
-        onClose={dayOffControl.setFalse}
-        modalTitle="Chọn ngày">
-        {dayOffDatePicker}
-      </SlideModal>
-      <AlertModal
-        id="RestaurantSettingForm.alertWarningCannotUpdateDayOffRange"
-        shouldHideIconClose
-        shouldFullScreenInMobile={false}
-        containerClassName={css.cannotTurnOffAppStatus}
-        childrenClassName={css.cannotTurnOffAppStatusChildren}
-        actionsClassName={css.cannotTurnOffAppStatusAction}
-        cancelLabel="Huỷ"
-        onCancel={cannotUpdateDayOffRangeControl.setFalse}
-        isOpen={cannotUpdateDayOffRangeControl.value}
-        handleClose={cannotUpdateDayOffRangeControl.setFalse}>
-        <div className={css.cannotTurnOffAppStatusContent}>
-          <IconDanger className={css.iconDanger} />
-          <div className={css.title}>Không thể cập nhật lịch nghỉ</div>
-          <div>
-            Hiện có{' '}
-            <b onClick={handleViewOrdersForDayOff}>
-              <u>{inProgressTransactionsInDayOffRange.length} đơn</u>
-            </b>{' '}
-            đang được triển khai từ ngày{' '}
-            {formatTimestamp(
-              nearestNextDateHaveInProgressOrderForDayOff.getTime(),
-            )}{' '}
-            tới{' '}
-            {formatTimestamp(
-              theBestFarNextDateHaveInProgressOrderForDayOff.getTime(),
-            )}
-            .
-          </div>
-        </div>
-      </AlertModal>
-
-      <div className={css.fieldContainer}>
         <Field id="RestaurantSettingForm.isActive" name="isActive">
           {(props) => {
             const { id, input } = props;
@@ -504,7 +303,7 @@ const RestaurantSettingFormComponent: React.FC<
                 id={id}
                 name={input.name}
                 disabled={isToggleAppStatusDisabled || inProgress}
-                status={input.value ? 'on' : 'off'}
+                status={input.value ? 'off' : 'on'}
                 onClick={(value) => {
                   if (isEnableTurnOffAppStatus) input.onChange(value);
                   handleToggleStatusClick();
