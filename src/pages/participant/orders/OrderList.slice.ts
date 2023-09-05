@@ -208,7 +208,7 @@ export const recommendFood = ({
       intersection(
         Listing(food)
           .getPublicData()
-          .allergicIngredients.map((_foodAllergy: string) =>
+          .allergicIngredients?.map((_foodAllergy: string) =>
             toNonAccentVietnamese(_foodAllergy),
           ),
         allergies.map((allergy: string) =>
@@ -216,7 +216,6 @@ export const recommendFood = ({
         ),
       ).length === 0,
   );
-
   const isAllFoodHaveAllergies = filteredFoodListByAllergies.length === 0;
 
   const foodListToFilter = isAllFoodHaveAllergies
