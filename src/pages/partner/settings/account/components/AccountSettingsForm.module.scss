@@ -1,8 +1,9 @@
 @use '/src/styles/mixins.scss' as *;
 @use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/vars.scss' as *;
 
 .formRoot {
-  padding: 16px 16px 54px;
+  padding: 16px 16px 88px;
 
   display: flex;
   row-gap: 16px;
@@ -28,9 +29,25 @@
     }
   }
 
-  @include viewportMedium {
+  .actionContainer {
+    position: fixed;
+    bottom: 0;
+    width: 100vw;
+    padding: 16px;
+    left: 0;
+    background-color: $neutralGray1;
+
     button {
-      display: none;
+      width: 100%;
+    }
+
+    @include viewportMedium {
+      position: static;
+      width: 100%;
+
+      button {
+        display: none;
+      }
     }
   }
 }
