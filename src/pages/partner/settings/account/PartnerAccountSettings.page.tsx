@@ -119,9 +119,11 @@ const PartnerAccountSettingsPage: React.FC<
   const handleSubmitMenuSettingsForm = async (
     values: TMenuSettingsFormValues,
   ) => {
-    return dispatch(
+    await dispatch(
       PartnerSettingsThunks.updatePartnerRestaurantListing(values),
     );
+
+    menuViewModeController.setTrue();
   };
 
   const handleSubmitPageForm = () => {
