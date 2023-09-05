@@ -1,12 +1,15 @@
-import { chunk, flatten, map } from 'lodash';
+import { map } from 'lodash';
 import isEmpty from 'lodash/isEmpty';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HttpMethod } from '@apis/configs';
-import { queryAllListings } from '@helpers/apiHelpers';
+import {
+  fetchListingsByChunkedIds,
+  queryAllListings,
+} from '@helpers/apiHelpers';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { handleError } from '@services/sdk';
-import { denormalisedResponseEntities, Listing } from '@src/utils/data';
+import { Listing } from '@src/utils/data';
 import { EListingType } from '@src/utils/enums';
 import type { TListing, TObject } from '@src/utils/types';
 
@@ -27,27 +30,32 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           },
         });
 
-        const planIds = orders.map(
-          (order: TListing) => Listing(order).getMetadata().plans[0],
+        const { planIds, quotationIds } = orders.reduce(
+          (acc: any, order: TListing) => {
+            const { planIds: accPlanIds, quotationIds: accQuotationIds } = acc;
+            const { plans = [], quotationId } = Listing(order).getMetadata();
+
+            return {
+              planIds: [...accPlanIds, plans[0]],
+              quotationIds: [...accQuotationIds, quotationId],
+            };
+          },
+          {
+            planIds: [],
+            quotationIds: [],
+          },
         );
-        const chunkedPlanIds = chunk(planIds, 100);
-
-        const allPlans = flatten(
-          await Promise.all(
-            chunkedPlanIds.map(async (ids) => {
-              const plans = denormalisedResponseEntities(
-                await integrationSdk.listings.query({
-                  ids: ids.join(','),
-                }),
-              );
-
-              return plans;
-            }),
-          ),
+        const allPlans = await fetchListingsByChunkedIds(
+          planIds,
+          integrationSdk,
+        );
+        const allQuotations = await fetchListingsByChunkedIds(
+          quotationIds,
+          integrationSdk,
         );
 
         const orderWithPlanDataMaybe = map(orders, (order: TListing) => {
-          const { plans = [] } = Listing(order).getMetadata();
+          const { plans = [], quotationId } = Listing(order).getMetadata();
 
           const planId = plans[0];
           let resultValue = order as TObject;
@@ -59,12 +67,22 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
             if (!isEmpty(planListing)) {
               resultValue = { ...resultValue, plan: planListing };
-
-              return resultValue;
             }
           }
 
-          return order;
+          if (quotationId) {
+            const quotationListing = allQuotations.find(
+              (quotation: TListing) =>
+                Listing(quotation).getId() === quotationId,
+            );
+
+            if (!isEmpty(quotationListing)) {
+              const { partner = {} } = Listing(quotationListing).getMetadata();
+              resultValue = { ...resultValue, quotation: partner };
+            }
+          }
+
+          return resultValue;
         });
 
         return res.status(200).json({ orders: orderWithPlanDataMaybe });
