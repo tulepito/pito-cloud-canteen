@@ -15,7 +15,7 @@
     color: $neutralGray6;
     padding: 32px 24px 0;
 
-    @include lineClamp(2);
+    @include lineClamp(2, 32px);
   }
 }
 
