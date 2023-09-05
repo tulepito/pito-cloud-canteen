@@ -62,7 +62,7 @@
 
   @include viewportMedium {
     margin-bottom: 0;
-    @include lineClamp(2);
+    @include lineClamp(2, 32px);
     max-width: 80%;
   }
 }
