@@ -264,7 +264,7 @@ export const calculatePriceQuotationPartner = ({
         return result + totalPriceInDate;
       }, 0);
   const serviceFee = Math.round((totalPrice * serviceFeePercentage) / 100);
-  const totalWithoutVAT = totalPrice - promotion - serviceFee;
+  const totalWithoutVAT = totalPrice - promotion + serviceFee;
   const VATFee = shouldSkipVAT
     ? 0
     : Math.round(totalWithoutVAT * currentOrderVATPercentage);

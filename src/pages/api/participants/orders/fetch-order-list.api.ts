@@ -1,9 +1,9 @@
-import chunk from 'lodash/chunk';
 import flatten from 'lodash/flatten';
 import uniq from 'lodash/uniq';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HttpMethod } from '@apis/configs';
+import { fetchListingsByChunkedIds } from '@helpers/apiHelpers';
 import { getParticipantOrdersQueries } from '@helpers/listingSearchQuery';
 import cookies from '@services/cookie';
 import { fetchUser } from '@services/integrationHelper';
@@ -17,20 +17,6 @@ import {
 } from '@src/utils/data';
 import { getEndOfMonth } from '@src/utils/dates';
 import type { TListing } from '@src/utils/types';
-
-const fetchListingsByChunkedIds = async (ids: string[], sdk: any) => {
-  const listingsResponse = await Promise.all(
-    chunk<string>(ids, 100).map(async (_ids) => {
-      const response = await sdk.listings.query({
-        ids: _ids,
-      });
-
-      return denormalisedResponseEntities(response);
-    }),
-  );
-
-  return flatten(listingsResponse);
-};
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {

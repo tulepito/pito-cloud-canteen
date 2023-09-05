@@ -3,6 +3,7 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 import React, { useEffect, useMemo, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
+import { isEmpty } from 'lodash';
 import { DateTime } from 'luxon';
 import { useRouter } from 'next/router';
 
@@ -20,14 +21,14 @@ import { TableForm } from '@components/Table/Table';
 import Tooltip from '@components/Tooltip/Tooltip';
 import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
 import { parseThousandNumber } from '@helpers/format';
-import { calculateSubOrderPrice } from '@helpers/orderHelper';
+import { calculatePriceQuotationPartner } from '@helpers/order/cartInfoHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { useViewport } from '@hooks/useViewport';
 import EmptySubOrder from '@pages/participant/orders/components/EmptySubOrder/EmptySubOrder';
 import { partnerPaths } from '@src/paths';
 import { formatTimestamp } from '@src/utils/dates';
-import { EOrderDraftStates, EOrderType } from '@utils/enums';
+import { EOrderDraftStates } from '@utils/enums';
 import type { TObject, TTableSortValue } from '@utils/types';
 
 import type { TFilterPartnerOrderFormValues } from './components/FilterPartnerOrderForm';
@@ -137,27 +138,33 @@ const parseEntitiesToTableData = (subOrders: TObject[]) => {
       date,
       companyName,
       orderTitle,
-      orderType = EOrderType.group,
       staffName,
       startDate,
       endDate,
       deliveryHour,
-      memberOrders = {},
       restaurant,
-      lineItems = [],
       lastTransition,
       isPaid,
+      quotation,
+      serviceFees,
+      orderVATPercentage,
     } = entity;
     const dayIndex = new Date(Number(date)).getDay();
 
-    const { totalPrice } = calculateSubOrderPrice({
-      orderType,
-      data: {
-        memberOrders,
-        restaurant,
-        lineItems,
-      },
-    });
+    let totalPrice = 0;
+    if (!isEmpty(quotation)) {
+      if (!isEmpty(quotation[restaurant.id]?.quotation)) {
+        const partnerQuotationBySubOrderDate = calculatePriceQuotationPartner({
+          quotation: quotation[restaurant.id].quotation,
+          serviceFeePercentage: serviceFees[restaurant.id],
+          currentOrderVATPercentage: orderVATPercentage,
+          subOrderDate: date,
+        });
+
+        const { totalWithVAT } = partnerQuotationBySubOrderDate;
+        totalPrice = totalWithVAT;
+      }
+    }
 
     const subOrderTitle = `${orderTitle}-${dayIndex > 0 ? dayIndex : 7}`;
     const formattedDeliveryHour = `${deliveryHour}`;

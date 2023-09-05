@@ -175,11 +175,15 @@ const PartnerManageOrdersSlice = createSlice({
 
         const subOrderList = (orderList as TObject[]).reduce<TObject[]>(
           (result, curr) => {
-            const { plan } = curr || {};
+            const { plan, quotation } = curr || {};
             const orderGetter = Listing(curr as TListing);
             const orderMetadata = orderGetter.getMetadata();
             const { title } = orderGetter.getAttributes();
-            const { companyName = 'PCC' } = orderGetter.getMetadata();
+            const {
+              companyName = 'PCC',
+              orderVATPercentage,
+              serviceFees = {},
+            } = orderGetter.getMetadata();
             const { orderDetail = {}, orderId } = Listing(plan).getMetadata();
 
             const subOrders = Object.entries<TObject>(orderDetail)
@@ -197,6 +201,9 @@ const PartnerManageOrdersSlice = createSlice({
                       companyName,
                       ...orderMetadata,
                       orderId,
+                      serviceFees,
+                      quotation,
+                      orderVATPercentage,
                     });
               }, []);
 
