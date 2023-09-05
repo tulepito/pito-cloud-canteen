@@ -39,7 +39,6 @@ export const prepareDataForTabs = ({
     memberInfoReduceFn,
     {},
   );
-
   const data = memberOrderList.reduce<TAllTabData>(
     (result, currentOrderItem) => {
       const {
@@ -51,11 +50,12 @@ export const prepareDataForTabs = ({
 
       const [memberId, orderItemData] = currentOrderItem;
       const { status, foodId, requirement = '' } = orderItemData;
-      const memberData = memberInfoMap[memberId];
+      const memberData =
+        memberInfoMap[memberId] || anonymousMemberInfoMap[memberId] || {};
 
       const itemData: TItemData = {
         isAnonymous: isEmpty(memberData),
-        memberData: memberData || anonymousMemberInfoMap[memberId],
+        memberData,
         status,
         foodData:
           foodId?.length > 0 && foodList[foodId]
