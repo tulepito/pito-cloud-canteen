@@ -21,7 +21,9 @@ export type TFilterPartnerOrderFormValues = {
   subOrderStatus: string[];
 };
 
-type TExtraProps = {};
+type TExtraProps = {
+  onClearFilter: () => void;
+};
 type TFilterPartnerOrderFormComponentProps =
   FormRenderProps<TFilterPartnerOrderFormValues> & Partial<TExtraProps>;
 type TFilterPartnerOrderFormProps = FormProps<TFilterPartnerOrderFormValues> &
@@ -62,6 +64,7 @@ const FilterPartnerOrderFormComponent: React.FC<
     form,
     pristine,
     values: { subOrderStartTime },
+    onClearFilter,
   } = props;
   const intl = useIntl();
 
@@ -159,12 +162,22 @@ const FilterPartnerOrderFormComponent: React.FC<
           name="subOrderStatus"
         />
       </div>
-
-      <Button className={css.submitBtn} disabled={submitDisabled}>
-        {intl.formatMessage({
-          id: 'FilterPartnerOrderForm.submitButtonText',
-        })}
-      </Button>
+      <div className={css.btns}>
+        <Button
+          className={css.clearFilterBtn}
+          variant="secondary"
+          type="button"
+          onClick={onClearFilter}>
+          {intl.formatMessage({
+            id: 'IntegrationFilterModal.clearBtn',
+          })}
+        </Button>
+        <Button className={css.submitBtn} disabled={submitDisabled}>
+          {intl.formatMessage({
+            id: 'FilterPartnerOrderForm.submitButtonText',
+          })}
+        </Button>
+      </div>
     </Form>
   );
 };
