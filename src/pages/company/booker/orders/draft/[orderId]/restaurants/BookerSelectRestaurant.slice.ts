@@ -208,7 +208,7 @@ const fetchSearchFilter = createAsyncThunk(FETCH_SEARCH_FILTER, async () => {
 const searchRestaurants = createAsyncThunk(
   SEARCH_RESTAURANT,
   async (params: TMenuQueryParams, { extra: sdk, getState, dispatch }) => {
-    const { orderId } = params;
+    const { orderId, timestamp } = params;
 
     await dispatch(orderAsyncActions.fetchOrder(orderId!));
     const { order } = getState().Order;
@@ -269,7 +269,19 @@ const searchRestaurants = createAsyncThunk(
       restaurantsResponse.map(
         ({ chunkRestaurantsResponse }) => chunkRestaurantsResponse,
       ),
-    );
+    ).filter((r: TListing) => {
+      const {
+        stopReceiveOrder = false,
+        startStopReceiveOrderDate = 0,
+        endStopReceiveOrderDate = 0,
+      } = Listing(r).getPublicData();
+      const isInStopReceiveOrderTime =
+        stopReceiveOrder &&
+        Number(timestamp) >= startStopReceiveOrderDate &&
+        Number(timestamp) <= endStopReceiveOrderDate;
+
+      return !isInStopReceiveOrderTime;
+    });
 
     return {
       ...(newRestaurantIds.length > 0 && {
