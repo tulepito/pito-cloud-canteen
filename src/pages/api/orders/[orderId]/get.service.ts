@@ -3,6 +3,7 @@ import isEmpty from 'lodash/isEmpty';
 
 import { fetchListing, fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
+import { EImageVariants } from '@src/utils/enums';
 import { denormalisedResponseEntities, Listing } from '@utils/data';
 import type { TPlan } from '@utils/orderTypes';
 import type { TObject } from '@utils/types';
@@ -31,11 +32,15 @@ const getOrder = async ({ orderId }: { orderId: string }) => {
   const participantData = denormalisedResponseEntities(
     await integrationSdk.users.query({
       meta_id: participants,
+      include: ['profileImage'],
+      'fields.image': [`variants.${EImageVariants.squareSmall2x}`],
     }),
   );
   const anonymousParticipantData = denormalisedResponseEntities(
     await integrationSdk.users.query({
       meta_id: anonymous,
+      include: ['profileImage'],
+      'fields.image': [`variants.${EImageVariants.squareSmall2x}`],
     }),
   );
 
