@@ -1,3 +1,5 @@
+import { DateTime } from 'luxon';
+
 import { getSubmitImageId, getUniqueImages } from '@src/utils/images';
 import type { TOwnListing } from '@src/utils/types';
 
@@ -49,10 +51,22 @@ export const createSubmitUpdatePartnerValues = (
       ...(typeof facebookLink !== 'undefined' ? { facebookLink } : {}),
       // #region Stop receive order fields
       ...(typeof startStopReceiveOrderDate === 'number'
-        ? { startStopReceiveOrderDate }
+        ? {
+            startStopReceiveOrderDate: DateTime.fromMillis(
+              startStopReceiveOrderDate,
+            )
+              .startOf('day')
+              .toMillis(),
+          }
         : {}),
       ...(typeof endStopReceiveOrderDate === 'number'
-        ? { endStopReceiveOrderDate }
+        ? {
+            endStopReceiveOrderDate: DateTime.fromMillis(
+              endStopReceiveOrderDate,
+            )
+              .startOf('day')
+              .toMillis(),
+          }
         : {}),
       ...(typeof stopReceiveOrder !== 'undefined' ? { stopReceiveOrder } : {}),
       ...(contactorName ? { contactorName } : {}),
