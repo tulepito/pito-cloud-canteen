@@ -57,6 +57,7 @@ const recommendFoodForShoppingCart = ({
 
   while (
     currentMealId &&
+    suitablePriceFoodList.length > 1 &&
     Listing(mostSuitableFood!).getId() === currentMealId
   ) {
     mostSuitableFood = recommendFood({
@@ -290,8 +291,23 @@ const recommendFoodSubOrders = createAsyncThunk(
       },
       [],
     );
+    const notJoinedDayFromOrderShoppingCart = Object.keys(
+      orders[currentUserId]?.[plans[0]] || {},
+    ).reduce((acc: any, subOrderDate: string) => {
+      const { foodId } =
+        orders[currentUserId]?.[plans[0]]?.[+subOrderDate] || {};
+      if (foodId === EParticipantOrderStatus.notJoined) {
+        return [...acc, subOrderDate];
+      }
 
-    const recommendSubOrderDays = difference(subOrderDates, notJoinedDay);
+      return acc;
+    }, []);
+    const mergedNotJoinedDay = [
+      ...notJoinedDay,
+      ...notJoinedDayFromOrderShoppingCart,
+    ];
+
+    const recommendSubOrderDays = difference(subOrderDates, mergedNotJoinedDay);
 
     recommendSubOrderDays.forEach((subOrderDate: string) => {
       const currentMealId =
