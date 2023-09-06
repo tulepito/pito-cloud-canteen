@@ -57,6 +57,7 @@ const SubOrderCart: React.FC<TSubOrderCartProps> = (props) => {
     quotationId,
     vatSettings = {},
   } = orderGetter.getMetadata();
+  const orderId = orderGetter.getId();
   const { orderDetail: planOrderDetail = {} } = planGetter.getMetadata();
   const serviceFeePercentage =
     serviceFeePercentageMap[restaurantListingId] || 0;
@@ -105,6 +106,11 @@ const SubOrderCart: React.FC<TSubOrderCartProps> = (props) => {
       dispatch(orderManagementThunks.fetchQuotation(quotationId));
     }
   }, [quotationId]);
+  useEffect(() => {
+    if (orderId) {
+      dispatch(orderManagementThunks.loadData(orderId));
+    }
+  }, [orderId]);
 
   return (
     <div className={rootClasses}>
