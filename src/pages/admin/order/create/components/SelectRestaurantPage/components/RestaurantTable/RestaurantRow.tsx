@@ -10,6 +10,7 @@ import css from './RestaurantTable.module.scss';
 type TRestaurantRowProps = TDefaultProps & {
   restaurant: any;
   onItemClick: () => void;
+  disabledSelectRestaurant?: boolean;
 };
 
 const prepareDataForRestaurant = (restaurant: any) => {
@@ -24,7 +25,13 @@ const prepareDataForRestaurant = (restaurant: any) => {
 
 const RestaurantRow: React.FC<TRestaurantRowProps> = (props) => {
   const intl = useIntl();
-  const { rootClassName, className, restaurant, onItemClick } = props;
+  const {
+    rootClassName,
+    className,
+    restaurant,
+    onItemClick,
+    disabledSelectRestaurant = false,
+  } = props;
   const categoryOptions = useAppSelector(
     (state) => state.BookerSelectRestaurant.categories,
   );
@@ -42,8 +49,12 @@ const RestaurantRow: React.FC<TRestaurantRowProps> = (props) => {
         .join(', ')
     : [];
 
+  const rowClasses = classNames(css.row, {
+    [css.rowDisabled]: disabledSelectRestaurant,
+  });
+
   return (
-    <div className={css.row} onClick={onItemClick}>
+    <div className={rowClasses} onClick={onItemClick}>
       <div className={itemClasses}>
         <div>{title}</div>
         <div>

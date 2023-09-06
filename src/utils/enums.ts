@@ -158,6 +158,7 @@ export enum ERestaurantListingStatus {
 export enum EInvalidRestaurantCase {
   closed = 'closed',
   noMenusValid = 'noMenusValid',
+  stopReceiveOrder = 'stopReceiveOrder',
 }
 
 export enum EParticipantOrderStatus {
@@ -426,6 +427,29 @@ export const MEAL_OPTIONS = [
   {
     key: 'dinner',
     label: 'Ăn tối',
+  },
+  {
+    key: 'brunch',
+    label: 'Ăn xế',
+  },
+  {
+    key: 'snack',
+    label: 'Ăn vặt',
+  },
+];
+
+export const MEAL_OPTIONS_WITH_TIME = [
+  {
+    key: 'breakfast',
+    label: 'Ăn sáng (6h30 - 10h30)',
+  },
+  {
+    key: 'lunch',
+    label: 'Ăn trưa (10h30 - 14h)',
+  },
+  {
+    key: 'dinner',
+    label: 'Ăn tối (16h30 - 22h)',
   },
   {
     key: 'brunch',

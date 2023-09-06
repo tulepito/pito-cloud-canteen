@@ -1,0 +1,59 @@
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.root {
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  row-gap: 16px;
+
+  @include viewportMedium {
+    padding: 0;
+    flex-direction: row;
+    column-gap: 32px;
+  }
+
+  @include viewportSLarge {
+    column-gap: 60px;
+  }
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  row-gap: 8px;
+
+  .label {
+    @include textTemplate(14px, 600, 20px);
+  }
+
+  @include viewportMedium {
+    flex-basis: calc(50% - 16px);
+  }
+
+  @include viewportSLarge {
+    flex-basis: calc(50% - 30px);
+  }
+}
+
+.mealContainer {
+  display: flex;
+  flex-direction: row;
+  gap: 8px 12px;
+  flex-wrap: wrap;
+
+  .mealBadge {
+    padding: 8px 16px;
+  }
+}
+
+.categoryContainer {
+  display: flex;
+  flex-direction: row;
+  gap: 8px 12px;
+  flex-wrap: wrap;
+
+  .categoryBadge {
+    padding: 8px 16px;
+  }
+}

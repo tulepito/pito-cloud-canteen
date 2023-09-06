@@ -17,13 +17,13 @@ import { partnerPaths } from '@src/paths';
 import css from './PartnerNavBar.module.scss';
 
 const PartnerNavBar = () => {
-  const router = useRouter();
+  const { pathname } = useRouter();
   const moreItemsController = useBoolean();
 
   const isMoreItemActive = [
     partnerPaths.Settings,
     partnerPaths.ManagePayments,
-  ].includes(router.pathname);
+  ].includes(pathname);
 
   const handleCloseMoreItemsModal = () => moreItemsController.setFalse();
   const handleOpenMoreItemsModal = () => moreItemsController.setTrue();
@@ -33,7 +33,7 @@ const PartnerNavBar = () => {
       <NamedLink path={partnerPaths.Home} className={css.itemWrapper}>
         <div
           className={classNames(css.item, {
-            [css.active]: router.pathname === partnerPaths.Home,
+            [css.active]: pathname === partnerPaths.Home,
           })}>
           <IconHome className={css.icon} />
           <div className={css.label}>Tổng quan</div>
@@ -43,17 +43,17 @@ const PartnerNavBar = () => {
       <NamedLink path={partnerPaths.ManageOrders} className={css.itemWrapper}>
         <div
           className={classNames(css.item, {
-            [css.active]: router.pathname === partnerPaths.ManageOrders,
+            [css.active]: pathname === partnerPaths.ManageOrders,
           })}>
           <IconOrderManagement className={css.icon} />
           <div className={css.label}>Đơn hàng</div>
         </div>
       </NamedLink>
 
-      <NamedLink path={partnerPaths.Products} className={css.itemWrapper}>
+      <NamedLink path={partnerPaths.ManageFood} className={css.itemWrapper}>
         <div
           className={classNames(css.item, {
-            [css.active]: router.pathname === partnerPaths.Products,
+            [css.active]: pathname === partnerPaths.ManageFood,
           })}>
           <IconCategory className={css.icon} />
           <div className={css.label}>Sản phẩm</div>
@@ -96,10 +96,10 @@ const PartnerNavBar = () => {
             </div>
           </span>
           <span onClick={handleCloseMoreItemsModal}>
-            <div className={css.itemRow}>
+            <NamedLink path={partnerPaths.Settings} className={css.itemRow}>
               <IconSetting className={css.itemIcon} />
               <div>Cài đặt</div>
-            </div>
+            </NamedLink>
           </span>
         </div>
       </SlideModal>

@@ -23,11 +23,11 @@
 
 .container {
   background-color: $neutralGray1;
-  border-radius: 6px;
-  padding: 19px 40px 40px 40px;
   max-width: 100vw;
 
   @include viewportMedium {
+    border-radius: 6px;
+    padding: 19px 40px 40px 40px;
     width: calc(100vw - $adminSidebarLeftPartWidth);
     max-width: calc(100vw - $adminSidebarLeftPartWidth);
   }

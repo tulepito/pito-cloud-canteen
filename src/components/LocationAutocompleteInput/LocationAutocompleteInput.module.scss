@@ -43,6 +43,10 @@
   width: 100%;
 }
 
+.textareaNoResize {
+  resize: none;
+}
+
 /*
 Predictions container can be overriden with new container styles for
 size and position, etc.
@@ -112,6 +116,10 @@ bottom of the container.
       background: $neutralGray3;
     }
   }
+}
+
+.predictionWithMultipleLines {
+  top: 68px;
 }
 
 .currentLocation {

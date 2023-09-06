@@ -14,6 +14,10 @@
   animation: slideIn 0.3s ease-in-out;
 }
 
+.slideModalContent {
+  padding-top: 12px;
+}
+
 .slideModalOpen {
   .slideModalScrollLayer {
     transition: opacity 0.3s ease-in-out;

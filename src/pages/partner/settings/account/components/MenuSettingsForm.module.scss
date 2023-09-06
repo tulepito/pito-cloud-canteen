@@ -1,0 +1,58 @@
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/vars.scss' as *;
+
+.alertMessage {
+  @include textTemplate(14px, 700, 20px);
+}
+
+.formRoot {
+  padding: 16px 16px 80px;
+  display: flex;
+  flex-direction: column;
+  row-gap: 12px;
+
+  .actionContainer {
+    position: fixed;
+    bottom: 0;
+    width: 100vw;
+    padding: 16px;
+    left: 0;
+    background-color: $neutralGray1;
+
+    button {
+      width: 100%;
+    }
+
+    @include viewportMedium {
+      position: static;
+      width: 100%;
+
+      button {
+        max-width: 200px;
+        margin: 0 auto;
+      }
+    }
+  }
+
+  @include viewportMedium {
+    padding: 0;
+    row-gap: 28px;
+    margin-top: 20px;
+  }
+}
+
+.label {
+  @include textTemplate(14px, 600, 20px);
+  margin-bottom: 8px;
+}
+
+.categoryList {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  column-gap: 20px;
+
+  @include viewportMedium {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}

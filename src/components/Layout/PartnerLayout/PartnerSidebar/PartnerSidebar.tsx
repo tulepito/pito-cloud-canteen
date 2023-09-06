@@ -6,6 +6,7 @@ import { useRouter } from 'next/router';
 import IconCategory from '@components/Icons/IconCategory/IconCategory';
 import IconHome from '@components/Icons/IconHome/IconHome';
 import IconOrderManagement from '@components/Icons/IconOrderManagement/IconOrderManagement';
+import IconSetting from '@components/Icons/IconSetting/IconSetting';
 import IconWallet from '@components/Icons/IconWallet/IconWallet';
 import type { TSidebarMenu } from '@components/MultiLevelSidebar/MultiLevelSidebar';
 import MultiLevelSidebar from '@components/MultiLevelSidebar/MultiLevelSidebar';
@@ -59,6 +60,30 @@ const LIST_SIDEBAR_MENU: TSidebarMenu[] = [
     nameLink: partnerPaths.ManagePayments,
     label: 'PartnerSidebar.paymentLabel',
     isFirstLevel: true,
+  },
+  {
+    id: 'settings',
+    Icon: IconSetting,
+    nameLink: partnerPaths.Settings,
+    label: 'PartnerSidebar.settingsLabel',
+    isFirstLevel: true,
+    childrenMenus: [
+      {
+        id: 'accountSettings',
+        label: 'PartnerSidebar.accountSettingsLabel',
+        nameLink: partnerPaths.AccountSettings,
+      },
+      {
+        id: 'restaurantSettings',
+        label: 'PartnerSidebar.restaurantSettingsLabel',
+        nameLink: partnerPaths.RestaurantSettings,
+      },
+      {
+        id: 'passwordSettings',
+        label: 'PartnerSidebar.passwordSettingsLabel',
+        nameLink: partnerPaths.ChangePassword,
+      },
+    ],
   },
 ];
 

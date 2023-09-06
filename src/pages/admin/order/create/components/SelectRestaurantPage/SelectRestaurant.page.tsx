@@ -47,6 +47,7 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
     (state) => state.SelectRestaurantPage.restaurants,
     shallowEqual,
   );
+
   const pagination = useAppSelector(
     (state) => state.SelectRestaurantPage.pagination,
     shallowEqual,
@@ -62,6 +63,7 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
     (state) => state.SelectRestaurantPage.fetchRestaurantsPending,
   );
   const order = useAppSelector((state) => state.Order.order, shallowEqual);
+  const selectedTime = selectedDate.getTime();
   const {
     deliveryHour,
     deliveryAddress,
@@ -167,6 +169,19 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
 
   const handleRestaurantClick = (restaurant: any) => () => {
     const { restaurantInfo, menu } = restaurant;
+    const {
+      stopReceiveOrder = false,
+      startStopReceiveOrderDate = 0,
+      endStopReceiveOrderDate = 0,
+    } = Listing(restaurantInfo).getPublicData();
+    const disabledSelectRestaurant =
+      stopReceiveOrder &&
+      selectedTime >= startStopReceiveOrderDate &&
+      selectedTime <= endStopReceiveOrderDate;
+
+    if (disabledSelectRestaurant) {
+      return;
+    }
 
     dispatch(
       selectRestaurantPageThunks.getRestaurantFood({
@@ -196,6 +211,7 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
         onSearchRestaurant={handleSearchRestaurant}
       />
       <RestaurantTable
+        selectedTime={selectedTime}
         restaurants={restaurants}
         onItemClick={handleRestaurantClick}
       />

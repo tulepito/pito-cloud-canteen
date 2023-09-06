@@ -29,7 +29,8 @@ const SlideModal: React.FC<TSlideModalProps> = (props) => {
           {modalTitle && <div className={css.title}>{modalTitle}</div>}
         </div>
       }
-      containerClassName={css.slideModalContainer}>
+      containerClassName={css.slideModalContainer}
+      contentClassName={css.slideModalContent}>
       {children}
     </PopupModal>
   );
