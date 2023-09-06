@@ -366,7 +366,7 @@ export const calculatePriceQuotationInfoFromQuotation = ({
   const transportFee = 0;
   const promotion = 0;
   const totalWithoutVAT =
-    totalPrice - serviceFee + transportFee + PITOFee - promotion;
+    totalPrice + serviceFee + transportFee + PITOFee - promotion;
   const VATFee = shouldSkipVAT
     ? 0
     : Math.round(totalWithoutVAT * currentOrderVATPercentage || 0);

@@ -26,9 +26,11 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { useViewport } from '@hooks/useViewport';
 import EmptySubOrder from '@pages/participant/orders/components/EmptySubOrder/EmptySubOrder';
+import { currentUserSelector } from '@redux/slices/user.slice';
 import { partnerPaths } from '@src/paths';
+import { CurrentUser } from '@src/utils/data';
 import { formatTimestamp } from '@src/utils/dates';
-import { EOrderDraftStates } from '@utils/enums';
+import { EOrderDraftStates, EPartnerVATSetting } from '@utils/enums';
 import type { TObject, TTableSortValue } from '@utils/types';
 
 import type { TFilterPartnerOrderFormValues } from './components/FilterPartnerOrderForm';
@@ -131,7 +133,10 @@ const TABLE_COLUMN: TColumn[] = [
   },
 ];
 
-const parseEntitiesToTableData = (subOrders: TObject[]) => {
+const parseEntitiesToTableData = (
+  subOrders: TObject[],
+  restaurantId: string,
+) => {
   return subOrders.map((entity) => {
     const {
       orderId,
@@ -148,17 +153,22 @@ const parseEntitiesToTableData = (subOrders: TObject[]) => {
       quotation,
       serviceFees,
       orderVATPercentage,
+      vatSettings,
     } = entity;
     const dayIndex = new Date(Number(date)).getDay();
 
     let totalPrice = 0;
     if (!isEmpty(quotation)) {
       if (!isEmpty(quotation[restaurant.id]?.quotation)) {
+        const partnerVATSetting =
+          vatSettings?.[restaurantId!] || EPartnerVATSetting.vat;
+
         const partnerQuotationBySubOrderDate = calculatePriceQuotationPartner({
           quotation: quotation[restaurant.id].quotation,
           serviceFeePercentage: serviceFees[restaurant.id],
           currentOrderVATPercentage: orderVATPercentage,
           subOrderDate: date,
+          shouldSkipVAT: partnerVATSetting === EPartnerVATSetting.direct,
         });
 
         const { totalWithVAT } = partnerQuotationBySubOrderDate;
@@ -247,7 +257,13 @@ const ManageOrdersPage = () => {
   const fetchOrderError = useAppSelector(
     (state) => state.PartnerManageOrders.fetchOrderError,
   );
-  const dataTable = parseEntitiesToTableData(currentSubOrders);
+  const currentUser = useAppSelector(currentUserSelector);
+  const currentUserGetter = CurrentUser(currentUser);
+  const { restaurantListingId } = currentUserGetter.getMetadata();
+  const dataTable = parseEntitiesToTableData(
+    currentSubOrders,
+    restaurantListingId,
+  );
 
   const sortedData = sortValue ? sortOrders(sortValue, dataTable) : dataTable;
 

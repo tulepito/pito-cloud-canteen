@@ -101,6 +101,7 @@ const OrderQuotationDetail: React.FC<OrderQuotationDetailProps> = (props) => {
       partnerVATSetting,
       vatPercentage,
       JSON.stringify(quotation),
+      currentSubOrderDate,
     ],
   );
 
