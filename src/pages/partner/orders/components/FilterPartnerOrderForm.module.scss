@@ -46,7 +46,15 @@
   @include textTemplate(14px, 600, 20px);
 }
 
+.btns {
+  @include flexAlign(center);
+  gap: 16px;
+}
+
+.clearFilterBtn {
+  width: 100%;
+}
 .submitBtn {
-  width: 160px;
+  width: 100%;
   margin: 0 auto;
 }

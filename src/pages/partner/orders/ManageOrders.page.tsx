@@ -248,6 +248,9 @@ const ManageOrdersPage = () => {
   const currentSubOrders = useAppSelector(
     (state) => state.PartnerManageOrders.currentSubOrders,
   );
+  const allSubOrders = useAppSelector(
+    (state) => state.PartnerManageOrders.allSubOrders,
+  );
   const pagination = useAppSelector(
     (state) => state.PartnerManageOrders.pagination,
   );
@@ -261,7 +264,7 @@ const ManageOrdersPage = () => {
   const currentUserGetter = CurrentUser(currentUser);
   const { restaurantListingId } = currentUserGetter.getMetadata();
   const dataTable = parseEntitiesToTableData(
-    currentSubOrders,
+    isMobileLayout ? allSubOrders : currentSubOrders,
     restaurantListingId,
   );
 
@@ -342,6 +345,13 @@ const ManageOrdersPage = () => {
     });
   };
 
+  const handleClearFilter = () => {
+    router.replace({
+      pathname: partnerPaths.ManageOrders,
+      query: {},
+    });
+  };
+
   useEffect(() => {
     if (isReady) {
       dispatch(
@@ -356,7 +366,16 @@ const ManageOrdersPage = () => {
         }),
       );
     }
-  }, [isReady, page, name, subOrderId, startTime, endTime, status]);
+  }, [
+    isReady,
+    page,
+    name,
+    subOrderId,
+    startTime,
+    endTime,
+    status,
+    isMobileLayout,
+  ]);
 
   useEffect(() => {
     if (isFirstLoad && isReady) {
@@ -369,7 +388,6 @@ const ManageOrdersPage = () => {
             ...(endTime ? { endTime } : {}),
             ...(status ? { status } : {}),
             ...(subOrderId ? { subOrderId } : {}),
-            isMobile: isMobileLayout,
           }),
         );
       });
@@ -398,6 +416,7 @@ const ManageOrdersPage = () => {
           <FilterPartnerOrderForm
             initialValues={initialFilterFormValues}
             onSubmit={handleFilterChange}
+            onClearFilter={handleClearFilter}
           />
         }
         trigger="click"
@@ -419,6 +438,7 @@ const ManageOrdersPage = () => {
           <FilterPartnerOrderForm
             initialValues={initialFilterFormValues}
             onSubmit={handleFilterChange}
+            onClearFilter={handleClearFilter}
           />
         </SlideModal>
       </RenderWhen>
