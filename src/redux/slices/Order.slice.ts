@@ -413,7 +413,19 @@ const recommendRestaurants = createAsyncThunk(
 
           const restaurantsResponse = denormalisedResponseEntities(
             await sdk.listings.query(restaurantsQuery),
-          );
+          ).filter((r: TListing) => {
+            const {
+              stopReceiveOrder = false,
+              startStopReceiveOrderDate = 0,
+              endStopReceiveOrderDate = 0,
+            } = Listing(r).getPublicData();
+            const isInStopReceiveOrderTime =
+              stopReceiveOrder &&
+              Number(dateTime) >= startStopReceiveOrderDate &&
+              Number(dateTime) <= endStopReceiveOrderDate;
+
+            return !isInStopReceiveOrderTime;
+          });
 
           const restaurants = allMenus.reduce((result: any, menu: TListing) => {
             const { restaurantId } = Listing(menu).getMetadata();
@@ -497,7 +509,19 @@ const recommendRestaurantForSpecificDay = createAsyncThunk(
 
     const restaurantsResponse = denormalisedResponseEntities(
       await sdk.listings.query(restaurantsQuery),
-    );
+    ).filter((r: TListing) => {
+      const {
+        stopReceiveOrder = false,
+        startStopReceiveOrderDate = 0,
+        endStopReceiveOrderDate = 0,
+      } = Listing(r).getPublicData();
+      const isInStopReceiveOrderTime =
+        stopReceiveOrder &&
+        Number(dateTime) >= startStopReceiveOrderDate &&
+        Number(dateTime) <= endStopReceiveOrderDate;
+
+      return !isInStopReceiveOrderTime;
+    });
 
     const restaurants = allMenus.reduce((result: any, menu: TListing) => {
       const { restaurantId } = Listing(menu).getMetadata();
