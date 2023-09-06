@@ -155,7 +155,9 @@ const RestaurantSettingFormComponent: React.FC<
         endDate={stopReceiveOrderRange.endDate}
       />
       <div className={css.slideModalActions}>
-        <Button variant="inline" onClick={stopReceiveOrderControl.setFalse}>
+        <Button
+          variant={isMobileLayout ? 'secondary' : 'inline'}
+          onClick={stopReceiveOrderControl.setFalse}>
           Hủy
         </Button>
         <Button
