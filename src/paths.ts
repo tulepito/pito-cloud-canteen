@@ -271,6 +271,8 @@ export const partnerPaths = {
   ManageFood: '/partner/products/food',
   CreateFood: '/partner/products/food/create',
   EditFood: '/partner/products/food/[foodId]',
+  ManageMenus: '/partner/products/menus',
+  Settings: '/partner/settings',
 };
 
 export const partnerRoutes = {
