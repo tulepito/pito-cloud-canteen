@@ -152,7 +152,7 @@ const ManagePaymentsPage = () => {
     const dayIndex = new Date(Number(subOrderDate)).getDay();
     const deliveryHour = paymentRecords[0].deliveryHour || '';
     const orderTitle =
-      `${paymentRecords[0].orderTitle || ''}_` +
+      `${paymentRecords[0].orderTitle || ''}-` +
       `${dayIndex === 0 ? 7 : dayIndex}`;
     const totalAmount = paymentRecords[0].totalPrice || 0;
     const orderId = `${paymentRecords[0].orderId || ''}`;

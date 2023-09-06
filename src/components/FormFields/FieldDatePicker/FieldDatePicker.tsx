@@ -63,6 +63,7 @@ export const FieldDatePickerComponent: React.FC<FieldDatePickerProps> = (
     selected,
     inputRootClassName,
     inputClassName,
+    readOnly = false,
     ...rest
   } = props;
   const { name, onChange, value, onBlur } = input;
@@ -95,6 +96,10 @@ export const FieldDatePickerComponent: React.FC<FieldDatePickerProps> = (
     return EDaysOfWeekInEn[dayOfWeek as keyof typeof EDaysOfWeekInEn];
   };
 
+  const handleFocus = (e: any) => {
+    e.target.readOnly = readOnly;
+  };
+
   return (
     <div className={classNames(css.root, className)}>
       {label && (
@@ -108,6 +113,7 @@ export const FieldDatePickerComponent: React.FC<FieldDatePickerProps> = (
         id={id}
         name={name}
         onChange={onInputChange}
+        onFocus={handleFocus}
         className={inputClasses}
         customInput={customInput}
         renderCustomHeader={renderCustomHeader}

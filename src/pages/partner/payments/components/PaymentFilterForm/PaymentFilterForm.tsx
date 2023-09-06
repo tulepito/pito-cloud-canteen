@@ -119,6 +119,7 @@ const PaymentFilterFormComponent: React.FC<TPaymentFilterFormComponentProps> = (
               dateFormat={'dd MMMM, yyyy'}
               placeholderText={'Từ'}
               autoComplete="off"
+              readOnly
             />
             <FieldDatePicker
               id="endDate"
@@ -131,6 +132,7 @@ const PaymentFilterFormComponent: React.FC<TPaymentFilterFormComponentProps> = (
               autoComplete="off"
               minDate={minEndDate}
               disabled={!values.startDate}
+              readOnly
             />
           </div>
         </div>
