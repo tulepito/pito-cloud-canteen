@@ -58,8 +58,15 @@ const AccountSettingsModal: React.FC<TNavigationModalProps> = (props) => {
   const handleSubmitAccountSettingForm = async (
     values: TAccountSettingsFormValues,
   ) => {
+    // eslint-disable-next-line @typescript-eslint/no-shadow
+    const { website = '', facebookLink = '', ...restValues } = values;
+
     const response = await dispatch(
-      PartnerSettingsThunks.updatePartnerRestaurantListing(values),
+      PartnerSettingsThunks.updatePartnerRestaurantListing({
+        website,
+        facebookLink,
+        ...restValues,
+      }),
     );
 
     if (response.meta.requestStatus !== 'rejected') {
