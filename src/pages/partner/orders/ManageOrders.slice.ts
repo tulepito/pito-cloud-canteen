@@ -183,6 +183,7 @@ const PartnerManageOrdersSlice = createSlice({
               companyName = 'PCC',
               orderVATPercentage,
               serviceFees = {},
+              vatSettings = {},
             } = orderGetter.getMetadata();
             const { orderDetail = {}, orderId } = Listing(plan).getMetadata();
 
@@ -204,6 +205,7 @@ const PartnerManageOrdersSlice = createSlice({
                       serviceFees,
                       quotation,
                       orderVATPercentage,
+                      vatSettings,
                     });
               }, []);
 
