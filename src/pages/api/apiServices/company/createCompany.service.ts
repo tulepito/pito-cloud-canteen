@@ -1,12 +1,17 @@
 import CryptoJS from 'crypto-js';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
+import { generateUncountableIdForSubAccount } from '@helpers/generateUncountableId';
 import { denormalisedResponseEntities } from '@services/data';
+import { fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk, getSdk } from '@services/sdk';
 import { UserInviteStatus, UserPermission } from '@src/types/UserPermission';
 import { User } from '@src/utils/data';
 import { ECompanyStates } from '@src/utils/enums';
 import type { TCreateCompanyApiParams, TObject } from '@src/utils/types';
+
+const { SUB_ACCOUNT_EMAIL = 'pitocloudcanteen@gmail.com', PITO_ADMIN_ID } =
+  process.env;
 
 const normalizeCreateCompanyParams = (dataParams: TCreateCompanyApiParams) => {
   const {
@@ -89,16 +94,25 @@ const createCompany = async ({
   const companyEmail = User(companyAccount).getAttributes().email;
 
   // Create sub master account
-  const splittedEmail = companyEmail.split('@');
+  const admin = await fetchUser(PITO_ADMIN_ID as string);
+  const adminUser = User(admin);
+  const { subAccountIdNumber = 0 } = adminUser.getMetadata();
+  const splittedEmail = SUB_ACCOUNT_EMAIL.split('@');
+  const subAccountId = generateUncountableIdForSubAccount(subAccountIdNumber);
+  integrationSdk.users.updateProfile({
+    id: PITO_ADMIN_ID,
+    metadata: {
+      subAccountIdNumber: subAccountIdNumber + 1,
+    },
+  });
   const subResponse = await sdk.currentUser.create({
     firstName: `Sub account for ${companyAccount.id.uuid}`,
     lastName: ' ',
-    email: `${splittedEmail[0]}+sub-user@${splittedEmail[1]}`,
+    email: `${splittedEmail[0]}+${subAccountId}@${splittedEmail[1]}`,
     password: dataParams.password,
   });
 
   const [subAccount] = denormalisedResponseEntities(subResponse);
-
   const members = {
     [companyEmail]: {
       id: companyAccount.id.uuid,
