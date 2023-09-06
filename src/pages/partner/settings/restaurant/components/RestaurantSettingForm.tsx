@@ -258,6 +258,7 @@ const RestaurantSettingFormComponent: React.FC<
           <FieldTextInput
             id="RestaurantSettingForm.stopReceiveOrderInfo"
             name="stopReceiveOrderInfo"
+            readOnly
             leftIcon={<IconCalendar />}
             onClick={stopReceiveOrderControl.setTrue}
             disabled={!values.stopReceiveOrder || inProgress}

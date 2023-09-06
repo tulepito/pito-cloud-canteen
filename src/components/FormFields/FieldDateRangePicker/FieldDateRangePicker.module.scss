@@ -71,7 +71,8 @@
 
   & :global(.react-datepicker__day--today) {
     border-radius: 4px;
-    background-color: $neutralGray3;
+    background-color: $neutralGray1;
+    border: 1px solid $neutralGray6;
   }
 
   & :global(.react-datepicker__day-name) {
