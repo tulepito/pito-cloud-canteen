@@ -39,4 +39,8 @@ export const generateUncountableIdForQuotation = (countableId: number) => {
   return generateUncountableId(countableId, 'PitoCloudCanteenQuotation');
 };
 
+export const generateUncountableIdForSubAccount = (countableId: number) => {
+  return generateUncountableId(countableId, 'PitoCloudCanteenSubAccount');
+};
+
 export default generateUncountableId;
