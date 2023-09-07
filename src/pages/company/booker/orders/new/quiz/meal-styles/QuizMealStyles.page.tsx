@@ -6,6 +6,7 @@ import classNames from 'classnames';
 import { useRouter } from 'next/router';
 
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import useBoolean from '@hooks/useBoolean';
 import { QuizActions } from '@redux/slices/Quiz.slice';
 import { companyPaths, quizPaths } from '@src/paths';
 
@@ -21,6 +22,7 @@ const QuizMealStyles = () => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
   const router = useRouter();
+  const submittingControl = useBoolean();
 
   useRedirectAfterReloadPage();
   const mealStyles = useAppSelector(
@@ -68,12 +70,20 @@ const QuizMealStyles = () => {
       setSelectedMealStyles([...selectedMealStyles, mealStyle]);
     }
   };
-  const onFormSubmitClick = () => {
-    handleSubmit();
-    router.push({
-      pathname: quizPaths.MealDates,
-      query: { ...router.query },
-    });
+  const onFormSubmitClick = async () => {
+    submittingControl.setTrue();
+
+    try {
+      await handleSubmit();
+      await router.push({
+        pathname: quizPaths.MealDates,
+        query: { ...router.query },
+      });
+    } catch (error) {
+      console.error(error);
+    } finally {
+      submittingControl.setFalse();
+    }
   };
 
   useEffect(() => {
@@ -103,6 +113,7 @@ const QuizMealStyles = () => {
       onCancel={onCancel}
       onSubmit={onFormSubmitClick}
       submitDisabled={hasValidationErrors}
+      submitInProgress={submittingControl.value}
       onBack={goBack}>
       <div className={css.formContainer}>
         {fetchMealStyles ? (

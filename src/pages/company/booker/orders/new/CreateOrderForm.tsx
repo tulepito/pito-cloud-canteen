@@ -73,12 +73,12 @@ const CreateOrderForm: React.FC<TCreateOrderFormProps> = ({
 
   const companyValue = company.input.value;
   const isCompanyListEmpty = isEmpty(companies);
+  const isSubmitting = submitting || submitInprogress;
   const disabledSubmit =
     isCompanyListEmpty ||
     isEmpty(companyValue) ||
-    submitting ||
+    isSubmitting ||
     hasValidationErrors;
-  const isSubmitting = submitting || submitInprogress;
 
   const companyLabel = intl.formatMessage({
     id: 'CreateOrderForm.companyLabel',
@@ -103,6 +103,7 @@ const CreateOrderForm: React.FC<TCreateOrderFormProps> = ({
         key: companyItem.id,
         label: companyItem.name,
       })),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [JSON.stringify(companies)],
   );
 
@@ -164,6 +165,7 @@ const CreateOrderForm: React.FC<TCreateOrderFormProps> = ({
       <InlineTextButton
         onClick={onCancel}
         className={css.cancelBtn}
+        disabled={isSubmitting}
         spinnerClassName={css.spinnerClassName}>
         <FormattedMessage id="CreateOrderForm.cancel" />
       </InlineTextButton>

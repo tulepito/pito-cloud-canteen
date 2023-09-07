@@ -80,6 +80,7 @@ const QuizMealDate = () => {
     }),
     [deliveryHourFromQuery],
   );
+
   const onFormSubmitClick = async () => {
     creatingOrderModalControl.setTrue();
     try {
@@ -94,7 +95,7 @@ const QuizMealDate = () => {
           }
         : {};
 
-      const { payload: orderListing }: { payload: any } = await dispatch(
+      const { payload: orderListing }: { payload: any } = await await dispatch(
         orderAsyncActions.createOrder({
           clientId: User(selectedCompany).getId(),
           bookerId: currentUser?.id?.uuid,
@@ -123,15 +124,15 @@ const QuizMealDate = () => {
         }),
       );
       if (meta.requestStatus !== 'rejected') {
-        router.push({
+        await router.push({
           pathname: `/company/booker/orders/draft/${orderId}`,
           query: { ...router.query },
         });
-      } else {
-        return submittingErrorControl.setFalse();
       }
     } catch (error) {
-      return submittingErrorControl.setFalse();
+      console.error('error: ', error);
+    } finally {
+      submittingErrorControl.setFalse();
     }
   };
 

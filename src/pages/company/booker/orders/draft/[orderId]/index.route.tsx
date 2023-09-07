@@ -2,12 +2,12 @@ import MetaWrapper from '@components/MetaWrapper/MetaWrapper';
 
 import BookerDraftOrderPage from './BookerDraftOrder.page';
 
-function BookerOrderDetailsRoute() {
+function BookerDraftOrderRoute() {
   return (
-    <MetaWrapper>
+    <MetaWrapper routeName="BookerDraftOrderRoute">
       <BookerDraftOrderPage />
     </MetaWrapper>
   );
 }
 
-export default BookerOrderDetailsRoute;
+export default BookerDraftOrderRoute;
