@@ -1,11 +1,11 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import { useEffect, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
+import Skeleton from 'react-loading-skeleton';
 import classNames from 'classnames';
 import { useRouter } from 'next/router';
 
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
-import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import { TableForm } from '@components/Table/Table';
 import type { TTabsItem } from '@components/Tabs/Tabs';
 import Tabs from '@components/Tabs/Tabs';
@@ -98,13 +98,19 @@ const prepareTabItems = ({ intl, currentTab, tableData }: any) => {
     const label = (
       <div className={css.tabLabel}>
         {intl.formatMessage({ id })}
-        <span className={countClasses}>{(totalItemMap as TObject)[key]}</span>
+        <span className={countClasses}>
+          {(totalItemMap as TObject)?.[key] || 0}
+        </span>
       </div>
     );
 
     let content;
     if (queryOrderInProgress) {
-      content = <LoadingContainer />;
+      content = (
+        <div className={css.loading}>
+          <Skeleton height="100%" />
+        </div>
+      );
     } else if (queryOrderError) {
       content = <ErrorMessage message={queryOrderError.message} />;
     } else if (orders.length > 0) {
@@ -143,9 +149,19 @@ const CompanyOrdersTable: React.FC<TCompanyOrdersTableProps> = () => {
   const { query, isReady, replace } = useRouter();
   const dispatch = useAppDispatch();
   const orders = useAppSelector((state) => state.Order.orders) || [];
+  const currentUser = useAppSelector((state) => state.user.currentUser);
+  const plansByOrderIds = useAppSelector(
+    (state) => state.Order.plansByOrderIds,
+  );
+
+  const queryCompanyPlansByOrderIdsInProgress = useAppSelector(
+    (state) => state.Order.queryCompanyPlansByOrderIdsInProgress,
+  );
+
   const queryOrderInProgress = useAppSelector(
     (state) => state.Order.queryOrderInProgress,
   );
+
   const { totalPages = 1 } = useAppSelector(
     (state) => state.Order.manageOrdersPagination,
   );
@@ -183,8 +199,6 @@ const CompanyOrdersTable: React.FC<TCompanyOrdersTableProps> = () => {
 
   const onCancelOrderStateWarningModal = async () => {
     if (orderWarningState === EOrderStates.expiredStart) {
-      console.log('aleleh: ', selectedOrderId, companyId);
-
       await dispatch(
         orderAsyncActions.bookerDeleteOrder({
           orderId: selectedOrderId,
@@ -231,8 +245,11 @@ const CompanyOrdersTable: React.FC<TCompanyOrdersTableProps> = () => {
 
   const orderStateWarningModalConfirmText =
     orderWarningState === 'expireStartOrder' ? 'Tiếp tục' : 'Đặt Đơn Mới';
+
   const tableData = parseEntitiesToTableData(
     orders,
+    plansByOrderIds,
+    queryCompanyPlansByOrderIdsInProgress,
     Number(page),
     currentOrderVATPercentage,
     openOrderStateWarningModal,
@@ -284,15 +301,24 @@ const CompanyOrdersTable: React.FC<TCompanyOrdersTableProps> = () => {
     }
   }, [page, totalPages]);
 
+  const currentUserId = currentUser?.id?.uuid;
+
   useEffect(() => {
     (async () => {
-      if (!currentTab || !isReady || !companyId || companyId === '[companyId]')
+      if (
+        !currentTab ||
+        !isReady ||
+        !companyId ||
+        companyId === '[companyId]' ||
+        !currentUserId
+      )
         return;
 
       let params: TObject = {
         page,
         keywords,
         companyId,
+        bookerId: currentUserId,
       };
 
       const parsedOrderState =
@@ -307,7 +333,7 @@ const CompanyOrdersTable: React.FC<TCompanyOrdersTableProps> = () => {
       };
       await dispatch(orderAsyncActions.queryCompanyOrders(params));
     })();
-  }, [companyId, currentTab, dispatch, isReady, keywords, page]);
+  }, [companyId, currentTab, dispatch, isReady, keywords, page, currentUserId]);
 
   const currentTabIndex = findTabIndexById(
     currentTab as EManageCompanyOrdersTab,

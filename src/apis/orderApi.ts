@@ -191,3 +191,8 @@ export const initializePaymentApi = (orderId: string, planId: string) =>
   postApi(`/orders/${orderId}/plan/${planId}/initialize-payment`);
 export const updateOrderStateToDraftApi = (orderId: string) =>
   putApi(`/orders/${orderId}/update-order-state-to-draft`);
+
+export const recommendRestaurantApi = (orderId: string, dateTime?: number) =>
+  getApi(`/orders/${orderId}/restaurants-recommendation`, {
+    timestamp: dateTime,
+  });

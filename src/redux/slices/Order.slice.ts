@@ -17,6 +17,7 @@ import {
   bookerPublishOrderApi,
   createBookerOrderApi,
   queryOrdersApi,
+  recommendRestaurantApi,
   reorderApi,
   requestApprovalOrderApi,
   updateOrderApi,
@@ -26,24 +27,20 @@ import {
 import { fetchSearchFilterApi } from '@apis/userApi';
 import { queryAllPages } from '@helpers/apiHelpers';
 import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
-import {
-  getMenuQuery,
-  getMenuQueryInSpecificDay,
-  getRestaurantQuery,
-} from '@helpers/listingSearchQuery';
+import { getMenuQueryInSpecificDay } from '@helpers/listingSearchQuery';
 import { LISTING_TYPE } from '@pages/api/helpers/constants';
 import { createAsyncThunk } from '@redux/redux.helper';
 import config from '@src/configs';
 import { CompanyPermission } from '@src/types/UserPermission';
 import { denormalisedResponseEntities, Listing, User } from '@utils/data';
-import { convertWeekDay, renderDateRange } from '@utils/dates';
 import {
   EInvalidRestaurantCase,
   EListingStates,
+  EListingType,
   EManageCompanyOrdersTab,
   ENotificationTypes,
-  EOrderType,
   ERestaurantListingStatus,
+  MANAGE_COMPANY_ORDERS_TAB_MAP,
 } from '@utils/enums';
 import { storableAxiosError, storableError } from '@utils/errors';
 import type {
@@ -104,7 +101,9 @@ type TOrderInitialState = {
   deleteDraftOrderError: any;
   manageOrdersPagination: TPagination;
 
-  totalItemMap: TOrderStateCountMap;
+  queryTotalOrdersCountByTabInProgress: boolean;
+  queryTotalOrdersCountByTabError: any;
+  totalItemMap: TOrderStateCountMap | null;
 
   companyOrderNotificationMap: TCompanyOrderNoticationMap;
   getOrderNotificationInProgress: boolean;
@@ -160,6 +159,11 @@ type TOrderInitialState = {
 
   bookerDeleteOrderInProgress: boolean;
   bookerDeleteOrderError: any;
+
+  queryCompanyPlansByOrderIdsInProgress: boolean;
+  queryCompanyPlansByOrderIdsError: any;
+  plansByOrderIds: TListing[];
+  currentQueryPlansByOrderIdsRequestId: string | null;
 };
 
 const initialState: TOrderInitialState = {
@@ -210,13 +214,18 @@ const initialState: TOrderInitialState = {
     page: 1,
     perPage: 10,
   },
-  totalItemMap: {
-    [EManageCompanyOrdersTab.SCHEDULED]: 0,
-    [EManageCompanyOrdersTab.CANCELED]: 0,
-    [EManageCompanyOrdersTab.DRAFT]: 0,
-    [EManageCompanyOrdersTab.COMPLETED]: 0,
-    [EManageCompanyOrdersTab.ALL]: 0,
-  },
+  // totalItemMap: {
+  //   [EManageCompanyOrdersTab.SCHEDULED]: 0,
+  //   [EManageCompanyOrdersTab.CANCELED]: 0,
+  //   [EManageCompanyOrdersTab.DRAFT]: 0,
+  //   [EManageCompanyOrdersTab.COMPLETED]: 0,
+  //   [EManageCompanyOrdersTab.ALL]: 0,
+  // },
+  totalItemMap: null,
+
+  queryTotalOrdersCountByTabInProgress: false,
+  queryTotalOrdersCountByTabError: null,
+
   getOrderNotificationInProgress: false,
   getOrderNotificationError: null,
   companyOrderNotificationMap: {
@@ -267,6 +276,11 @@ const initialState: TOrderInitialState = {
 
   bookerDeleteOrderInProgress: false,
   bookerDeleteOrderError: null,
+
+  queryCompanyPlansByOrderIdsInProgress: false,
+  queryCompanyPlansByOrderIdsError: null,
+  plansByOrderIds: [],
+  currentQueryPlansByOrderIdsRequestId: null,
 };
 
 const CREATE_ORDER = 'app/Order/CREATE_ORDER';
@@ -348,108 +362,10 @@ const updateOrder = createAsyncThunk(
 
 const recommendRestaurants = createAsyncThunk(
   RECOMMEND_RESTAURANT,
-  async (_, { getState, extra: sdk }) => {
+  async (_, { getState }) => {
     const { order } = getState().Order;
-    const orderDetail: any = {};
-    const {
-      dayInWeek = [],
-      startDate,
-      endDate,
-      orderType = EOrderType.group,
-      memberAmount = 0,
-    } = Listing(order as TListing).getMetadata();
-    const isNormalOrder = orderType === EOrderType.normal;
-    const totalDates = renderDateRange(startDate, endDate);
-
-    await Promise.all(
-      totalDates.map(async (dateTime) => {
-        if (
-          dayInWeek.includes(
-            convertWeekDay(DateTime.fromMillis(dateTime).weekday).key,
-          )
-        ) {
-          const menuQueryParams = {
-            timestamp: dateTime,
-          };
-          const menuQuery = getMenuQuery({ order, params: menuQueryParams });
-          const allMenus = await queryAllPages({
-            sdkModel: sdk.listings,
-            query: menuQuery,
-          });
-          const restaurantIdList = uniq<any>(
-            allMenus.map((menu: TListing) => {
-              const { restaurantId } = Listing(menu).getMetadata();
-
-              return restaurantId;
-            }),
-          ).slice(0, 100);
-
-          const restaurantsQuery = getRestaurantQuery({
-            restaurantIds: restaurantIdList,
-            companyAccount: null,
-            params: {
-              memberAmount,
-            },
-          });
-
-          const restaurantsResponse = denormalisedResponseEntities(
-            await sdk.listings.query(restaurantsQuery),
-          ).filter((r: TListing) => {
-            const {
-              stopReceiveOrder = false,
-              startStopReceiveOrderDate = 0,
-              endStopReceiveOrderDate = 0,
-            } = Listing(r).getPublicData();
-            const isInStopReceiveOrderTime =
-              stopReceiveOrder &&
-              Number(dateTime) >= startStopReceiveOrderDate &&
-              Number(dateTime) <= endStopReceiveOrderDate;
-
-            return !isInStopReceiveOrderTime;
-          });
-
-          const restaurants = allMenus.reduce((result: any, menu: TListing) => {
-            const { restaurantId } = Listing(menu).getMetadata();
-            const restaurantInfo = restaurantsResponse.find(
-              (restaurant: TListing) =>
-                Listing(restaurant).getId() === restaurantId,
-            );
-            if (!restaurantInfo) return result;
-
-            return result.concat({
-              menu,
-              restaurantInfo,
-            });
-          }, []);
-
-          if (restaurants.length > 0) {
-            const randomRestaurant =
-              restaurants[Math.floor(Math.random() * (restaurants.length - 1))];
-            const restaurantGetter = Listing(randomRestaurant?.restaurantInfo);
-            const { minQuantity = 0, maxQuantity = 100 } =
-              restaurantGetter.getPublicData();
-            const lineItemsMaybe = isNormalOrder ? { lineItems: [] } : {};
-
-            orderDetail[dateTime] = {
-              restaurant: {
-                id: restaurantGetter.getId(),
-                restaurantName: restaurantGetter.getAttributes().title,
-                foodList: [],
-                menuId: randomRestaurant?.menu.id.uuid,
-                minQuantity,
-                maxQuantity,
-                restaurantOwnerId:
-                  randomRestaurant?.restaurantInfo?.author?.id?.uuid,
-                phoneNumber: Listing(
-                  randomRestaurant?.restaurantInfo,
-                ).getPublicData()?.phoneNumber,
-              },
-              ...lineItemsMaybe,
-            };
-          }
-        }
-      }),
-    );
+    const orderId = Listing(order).getId();
+    const { data: orderDetail } = await recommendRestaurantApi(orderId);
 
     return orderDetail;
   },
@@ -457,108 +373,24 @@ const recommendRestaurants = createAsyncThunk(
 
 const recommendRestaurantForSpecificDay = createAsyncThunk(
   RECOMMEND_RESTAURANT_FOR_SPECIFIC_DAY,
-  async (dateTime: number, { getState, extra: sdk }) => {
-    const { order, orderDetail } = getState().Order;
-    const orderId = Listing(order as TListing).getId();
-    const { plans = [], memberAmount = 0 } = Listing(
-      order as TListing,
-    ).getMetadata();
-    const menuQueryParams = {
-      timestamp: dateTime,
-    };
-    const menuQuery = getMenuQuery({ order, params: menuQueryParams });
-    const allMenus = await queryAllPages({
-      sdkModel: sdk.listings,
-      query: menuQuery,
+  async (dateTime: number, { getState }) => {
+    const { order } = getState().Order;
+
+    const orderId = Listing(order).getId();
+
+    const { plans = [] } = Listing(order).getMetadata();
+
+    const { data: newOrderDetail } = await recommendRestaurantApi(
+      orderId,
+      dateTime,
+    );
+
+    await updatePlanDetailsApi(orderId, {
+      orderDetail: newOrderDetail,
+      planId: plans[0],
     });
 
-    const restaurantIdList = uniq<any>(
-      allMenus.map((menu: TListing) => {
-        const { restaurantId } = Listing(menu).getMetadata();
-
-        return restaurantId;
-      }),
-    ).slice(0, 100);
-
-    const restaurantsQuery = getRestaurantQuery({
-      restaurantIds: restaurantIdList,
-      companyAccount: null,
-      params: {
-        memberAmount,
-      },
-    });
-
-    const restaurantsResponse = denormalisedResponseEntities(
-      await sdk.listings.query(restaurantsQuery),
-    ).filter((r: TListing) => {
-      const {
-        stopReceiveOrder = false,
-        startStopReceiveOrderDate = 0,
-        endStopReceiveOrderDate = 0,
-      } = Listing(r).getPublicData();
-      const isInStopReceiveOrderTime =
-        stopReceiveOrder &&
-        Number(dateTime) >= startStopReceiveOrderDate &&
-        Number(dateTime) <= endStopReceiveOrderDate;
-
-      return !isInStopReceiveOrderTime;
-    });
-
-    const restaurants = allMenus.reduce((result: any, menu: TListing) => {
-      const { restaurantId } = Listing(menu).getMetadata();
-      const restaurantInfo = restaurantsResponse.find(
-        (restaurant: TListing) => Listing(restaurant).getId() === restaurantId,
-      );
-      if (!restaurantInfo) return result;
-
-      return result.concat({
-        menu,
-        restaurantInfo,
-      });
-    }, []);
-
-    if (restaurants.length > 0) {
-      const randomNumber = Math.floor(Math.random() * (restaurants.length - 1));
-      const otherRandomNumber = Math.abs(randomNumber - restaurants.length + 1);
-
-      const randomRestaurant =
-        restaurants[randomNumber]?.restaurantInfo?.id?.uuid !==
-        orderDetail[dateTime]?.restaurant?.id
-          ? restaurants[randomNumber]?.restaurantInfo
-          : restaurants[otherRandomNumber]?.restaurantInfo;
-
-      const randomRestaurantGetter = Listing(randomRestaurant);
-      const randomRestaurantId = randomRestaurantGetter.getId();
-      const { minQuantity = 0, maxQuantity = Number.MAX_VALUE } =
-        randomRestaurantGetter.getMetadata();
-
-      const newRestaurantData = {
-        id: randomRestaurantId,
-        restaurantName: randomRestaurantGetter.getAttributes().title,
-        restaurantOwnerId: randomRestaurant?.author?.id?.uuid,
-        foodList: [],
-        phoneNumber: randomRestaurantGetter.getPublicData().phoneNumber,
-        menuId: restaurants[randomNumber]?.menu.id.uuid,
-        minQuantity,
-        maxQuantity,
-      };
-
-      const newOrderDetail = {
-        ...orderDetail,
-        [dateTime]: {
-          ...orderDetail[dateTime],
-          restaurant: newRestaurantData,
-        },
-      };
-      await updatePlanDetailsApi(orderId, {
-        orderDetail: newOrderDetail,
-        planId: plans[0],
-      });
-
-      return newOrderDetail;
-    }
-
-    return orderDetail;
+    return newOrderDetail;
   },
 );
 
@@ -605,26 +437,120 @@ const queryAllOrders = createAsyncThunk(
   },
 );
 
+const queryCompanyPlansByOrderIds = createAsyncThunk(
+  'app/Orders/COMPANY_QUERY_PLANS_BY_ORDER_IDS',
+  async (payload: TObject) => {
+    const { orderIds, companyId } = payload;
+
+    const params = {
+      dataParams: {
+        meta_orderId: orderIds.join(','),
+      },
+      queryParams: {
+        expand: true,
+      },
+    };
+
+    const { data } = await companyApi.queryCompanyPlansByOrderIdsApi(
+      companyId,
+      params,
+    );
+
+    return data;
+  },
+  {
+    serializeError: storableError,
+  },
+);
+
+const queryTotalOrderCountByTab = createAsyncThunk(
+  'app/Orders/QUERY_TOTAL_ORDER_COUNT_BY_TAB',
+  async (payload: TObject) => {
+    const {
+      bookerId,
+      companyId,
+      currentTab = EManageCompanyOrdersTab.ALL,
+      page,
+      pagination,
+    } = payload;
+    const { totalItems = 0, totalPages = 1 } = pagination;
+
+    const totalItemMap: TObject = {
+      [currentTab]: page > totalPages ? 0 : totalItems,
+    };
+
+    const queryStates = Object.entries(MANAGE_COMPANY_ORDERS_TAB_MAP).reduce<
+      string[][]
+    >((prev, [key, states]) => {
+      if (key !== currentTab) {
+        const newList = [key, states.join(',')];
+
+        return prev.concat([newList]);
+      }
+
+      return prev;
+    }, []);
+
+    const paramList = queryStates.reduce<TObject[]>(
+      (previousList, [key, parsedStates]) =>
+        previousList.concat([
+          {
+            perPage: MANAGE_ORDER_PAGE_SIZE,
+            states: EListingStates.published,
+            meta_bookerId: bookerId,
+            meta_companyId: companyId,
+            meta_listingType: EListingType.order,
+            sort: 'createdAt',
+            meta_orderState: parsedStates,
+            tab: key,
+          },
+        ]),
+      [],
+    );
+
+    await Promise.all(
+      paramList.map(async (params) => {
+        const { tab, ...restParams } = params;
+        const { data: orderResponse } = await companyApi.queryOrdersApi(
+          companyId,
+          {
+            dataParams: restParams,
+          },
+        );
+        const { totalPages: resTotalPages = 1, totalItems: resTotalItems = 0 } =
+          orderResponse.data.meta;
+
+        totalItemMap[tab] = page > resTotalPages ? 0 : resTotalItems;
+      }),
+    );
+
+    return totalItemMap as any;
+  },
+  {
+    serializeError: storableError,
+  },
+);
+
 const queryCompanyOrders = createAsyncThunk(
   'app/Orders/COMPANY_QUERY_ORDERS',
-  async (payload: TObject, { rejectWithValue, extra: sdk }) => {
-    const { companyId = '', ...restPayload } = payload;
+  async (payload: TObject, { rejectWithValue, dispatch, getState }) => {
+    const { companyId = '', bookerId, ...restPayload } = payload;
 
     if (companyId === '') {
       return rejectWithValue('Company ID is empty');
     }
 
-    const bookerId = denormalisedResponseEntities(
-      await sdk.currentUser.show(),
-    )[0]?.id?.uuid;
+    if (!bookerId) {
+      return rejectWithValue('Booker ID is empty');
+    }
 
     const params = {
       dataParams: {
         ...restPayload,
         perPage: MANAGE_ORDER_PAGE_SIZE,
         states: EListingStates.published,
-        meta_bookerId: bookerId,
         meta_companyId: companyId,
+        meta_bookerId: bookerId,
         meta_listingType: LISTING_TYPE.ORDER,
         sort: 'createdAt',
       },
@@ -632,10 +558,36 @@ const queryCompanyOrders = createAsyncThunk(
         expand: true,
       },
     };
-    const { data } = await companyApi.queryOrdersApi(companyId, params);
-    const { orders, pagination, totalItemMap } = data;
+    const { data: response } = await companyApi.queryOrdersApi(
+      companyId,
+      params,
+    );
+    const orders = denormalisedResponseEntities(response);
+    const orderIds = orders.map((order: TListing) => Listing(order).getId());
+    const pagination = response.data.meta;
 
-    return { orders, pagination, totalItemMap, queryParams: payload };
+    dispatch(
+      queryCompanyPlansByOrderIds({
+        orderIds,
+        companyId,
+      }),
+    );
+
+    const alreadyFetchOrderCount = !!getState().Order.totalItemMap;
+
+    if (!alreadyFetchOrderCount) {
+      dispatch(
+        queryTotalOrderCountByTab({
+          bookerId,
+          companyId,
+          currentTab: restPayload.currentTab,
+          page: restPayload.page,
+          pagination,
+        }),
+      );
+    }
+
+    return { orders, pagination, queryParams: payload };
   },
   {
     serializeError: storableError,
@@ -1020,6 +972,7 @@ export const orderAsyncActions = {
   bookerReorder,
   updateOrderStateToDraft,
   bookerDeleteOrder,
+  queryCompanyPlansByOrderIds,
 };
 
 const orderSlice = createSlice({
@@ -1129,13 +1082,6 @@ const orderSlice = createSlice({
         totalPages: 1,
         page: 1,
         perPage: 10,
-      },
-      totalItemMap: {
-        [EManageCompanyOrdersTab.SCHEDULED]: 0,
-        [EManageCompanyOrdersTab.CANCELED]: 0,
-        [EManageCompanyOrdersTab.DRAFT]: 0,
-        [EManageCompanyOrdersTab.COMPLETED]: 0,
-        [EManageCompanyOrdersTab.ALL]: 0,
       },
     }),
     changeStep4SubmitStatus: (state, { payload }) => ({
@@ -1260,21 +1206,18 @@ const orderSlice = createSlice({
       }))
       /* =============== queryCompanyOrders =============== */
       .addCase(queryCompanyOrders.pending, (state) => {
+        state.orders = [];
         state.queryOrderInProgress = true;
         state.queryOrderError = null;
       })
       .addCase(
         queryCompanyOrders.fulfilled,
-        (
-          state,
-          { payload: { orders, pagination, totalItemMap, queryParams } },
-        ) => ({
+        (state, { payload: { orders, pagination, queryParams } }) => ({
           ...state,
           queryParams,
           queryOrderInProgress: false,
           orders,
           manageOrdersPagination: pagination,
-          totalItemMap,
         }),
       )
       .addCase(queryCompanyOrders.rejected, (state, { payload }) => {
@@ -1526,6 +1469,39 @@ const orderSlice = createSlice({
       .addCase(bookerDeleteOrder.rejected, (state, { error }) => {
         state.bookerDeleteOrderInProgress = false;
         state.bookerDeleteOrderError = error.message;
+      })
+      .addCase(queryCompanyPlansByOrderIds.pending, (state, { meta }) => {
+        state.currentQueryPlansByOrderIdsRequestId = meta.requestId;
+        state.plansByOrderIds = [];
+        state.queryCompanyPlansByOrderIdsInProgress = true;
+        state.queryCompanyPlansByOrderIdsError = null;
+      })
+      .addCase(
+        queryCompanyPlansByOrderIds.fulfilled,
+        (state, { payload: fetchedPlans, meta }) => {
+          if (meta.requestId !== state.currentQueryPlansByOrderIdsRequestId) {
+            return;
+          }
+
+          state.queryCompanyPlansByOrderIdsInProgress = false;
+          state.plansByOrderIds = fetchedPlans;
+        },
+      )
+      .addCase(queryCompanyPlansByOrderIds.rejected, (state, { error }) => {
+        state.queryCompanyPlansByOrderIdsInProgress = false;
+        state.queryCompanyPlansByOrderIdsError = error;
+      })
+      .addCase(queryTotalOrderCountByTab.pending, (state) => {
+        state.queryTotalOrdersCountByTabInProgress = true;
+        state.queryTotalOrdersCountByTabError = null;
+      })
+      .addCase(queryTotalOrderCountByTab.fulfilled, (state, { payload }) => {
+        state.queryTotalOrdersCountByTabInProgress = false;
+        state.totalItemMap = payload;
+      })
+      .addCase(queryTotalOrderCountByTab.rejected, (state, { error }) => {
+        state.queryTotalOrdersCountByTabInProgress = false;
+        state.queryTotalOrdersCountByTabError = error;
       });
   },
 });

@@ -16,18 +16,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           JSONParams as string,
         );
 
-        const { orderWithCompany, totalItemMap, queryOrdersPagination } =
-          await queryCompanyOrders({
-            companyId: companyId as string,
-            dataParams,
-            queryParams,
-          });
-
-        res.json({
-          orders: orderWithCompany,
-          pagination: queryOrdersPagination,
-          totalItemMap,
+        const { response } = await queryCompanyOrders({
+          companyId: companyId as string,
+          dataParams,
+          queryParams,
         });
+
+        return res.json(response);
       } catch (error) {
         handleError(res, error);
       }
