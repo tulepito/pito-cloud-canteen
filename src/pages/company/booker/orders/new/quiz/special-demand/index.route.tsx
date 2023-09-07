@@ -4,7 +4,7 @@ import SpecialDemandPage from './QuizSpecialDemand.page';
 
 export default function SpecialDemandRoute() {
   return (
-    <MetaWrapper>
+    <MetaWrapper routeName="SpecialDemandRoute">
       <SpecialDemandPage />
     </MetaWrapper>
   );

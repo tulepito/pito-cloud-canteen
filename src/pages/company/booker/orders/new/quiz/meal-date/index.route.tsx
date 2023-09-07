@@ -4,7 +4,7 @@ import MealDatePage from './QuizMealDate.page';
 
 export default function MealDateRoute() {
   return (
-    <MetaWrapper>
+    <MetaWrapper routeName="MealDateRoute">
       <MealDatePage />
     </MetaWrapper>
   );

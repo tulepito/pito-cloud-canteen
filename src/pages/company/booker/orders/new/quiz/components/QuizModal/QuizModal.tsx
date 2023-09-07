@@ -71,7 +71,7 @@ const QuizModal: React.FC<QuizModalProps> = (props) => {
           <Button
             className={css.submitBtn}
             onClick={onSubmit}
-            disabled={submitDisabled}
+            disabled={submitDisabled || submitInProgress}
             inProgress={submitInProgress}>
             {submitText}
           </Button>
@@ -79,6 +79,7 @@ const QuizModal: React.FC<QuizModalProps> = (props) => {
             <Button
               className={css.cancelBtn}
               onClick={onCancel}
+              disabled={submitInProgress}
               variant="inline">
               {cancelText}
             </Button>
