@@ -27,6 +27,7 @@ import {
   sendRemindEmailToMemberApi,
   updateOrderApi,
   updateOrderDetailFromDraftApi,
+  updatePaymentApi,
   updatePlanDetailsApi,
 } from '@apis/orderApi';
 import { checkUserExistedApi } from '@apis/userApi';
@@ -1009,7 +1010,8 @@ const updateOrderFromDraftEdit = createAsyncThunk(
       partner: partnerQuotation,
       client: clientQuotation,
     };
-    createQuotationApi(orderId, apiBody);
+
+    await createQuotationApi(orderId, apiBody);
 
     const updatedDateList = Object.keys(draftSubOrderChangesHistory).filter(
       (d, index, array) => array.indexOf(d) === index,
@@ -1059,6 +1061,8 @@ const updateOrderFromDraftEdit = createAsyncThunk(
       createNotificationApi({
         notifications: createNotificationParams,
       });
+
+    updatePaymentApi(orderId, planId);
 
     await dispatch(loadData(orderId));
   },

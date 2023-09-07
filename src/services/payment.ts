@@ -8,6 +8,7 @@ import {
   getDocumentById,
   queryAllCollectionData,
   queryCollectionData,
+  updateCollectionDoc,
 } from './firebase';
 
 const { FIREBASE_PAYMENT_RECORD_COLLECTION_NAME } = process.env;
@@ -196,4 +197,25 @@ export const queryClientPaymentRecordsOnFirebase = async (query: any) => {
   } catch (error) {
     console.error('Error query payment record: ', error);
   }
+};
+
+export const updatePaymentRecordOnFirebase = async (
+  paymentRecordId: string,
+  params: Partial<PaymentBaseParams>,
+) => {
+  await updateCollectionDoc(
+    paymentRecordId,
+    params,
+    FIREBASE_PAYMENT_RECORD_COLLECTION_NAME!,
+  );
+
+  const paymentRecordData = await getDocumentById(
+    paymentRecordId,
+    FIREBASE_PAYMENT_RECORD_COLLECTION_NAME!,
+  );
+
+  return {
+    id: paymentRecordId,
+    ...paymentRecordData,
+  };
 };
