@@ -23,7 +23,7 @@
       @include viewportLarge {
         max-width: 300px;
 
-        & * {
+        & > * {
           flex-basis: 132px;
         }
       }
