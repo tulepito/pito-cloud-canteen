@@ -72,8 +72,11 @@ const OrderListPage = () => {
   const { selectedDay, handleSelectDay } = useSelectDay();
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [selectedMonth, setSelectedMonth] = useState<Date | null>(
-    getStartOfMonth(new Date()),
+    getStartOfMonth(selectedDay || new Date()),
   );
+
+  console.log({ selectedDay });
+
   const [maxSelectedMonth, setMaxSelectedMonth] = useState<Date | null>(
     getStartOfMonth(new Date()),
   );
