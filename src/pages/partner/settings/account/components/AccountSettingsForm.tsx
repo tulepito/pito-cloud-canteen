@@ -140,7 +140,10 @@ const AccountSettingsFormComponent: React.FC<
 
   useEffect(() => {
     if (mountedControl.value && typeof onFormChange !== 'undefined') {
-      onFormChange(values);
+      // eslint-disable-next-line @typescript-eslint/no-shadow
+      const { website = '', facebookLink = '', ...restValues } = values;
+
+      onFormChange({ website, facebookLink, ...restValues });
     }
   }, [JSON.stringify(values)]);
 
