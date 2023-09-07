@@ -17,6 +17,8 @@
   }
 
   & :global(.react-datepicker__triangle) {
+    display: none;
+
     &::after {
       border-bottom-color: $neutralGray1 !important;
     }

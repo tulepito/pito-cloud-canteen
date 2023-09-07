@@ -110,6 +110,7 @@ const FilterPartnerOrderFormComponent: React.FC<
     placeholderText: intl.formatMessage({
       id: 'FilterPartnerOrderForm.subOrderStartTime.placeholder',
     }),
+    autoComplete: 'off',
   };
   const fieldSubOrderEndTimeProps = {
     name: 'subOrderEndTime',
@@ -122,6 +123,7 @@ const FilterPartnerOrderFormComponent: React.FC<
     placeholderText: intl.formatMessage({
       id: 'FilterPartnerOrderForm.subOrderEndTime.placeholder',
     }),
+    autoComplete: 'off',
   };
 
   const generateStatusOptions = () => {
