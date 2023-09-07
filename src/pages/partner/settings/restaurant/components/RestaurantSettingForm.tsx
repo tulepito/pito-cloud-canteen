@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-shadow */
 import { useEffect, useState } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
@@ -89,8 +90,12 @@ const RestaurantSettingFormComponent: React.FC<
   useEffect(
     () =>
       setStopReceiveOrderRange({
-        startDate: new Date(initialValues.startStopReceiveOrderDate || 0),
-        endDate: new Date(initialValues.endStopReceiveOrderDate || 0),
+        startDate: initialValues.startStopReceiveOrderDate
+          ? new Date(initialValues.startStopReceiveOrderDate)
+          : today,
+        endDate: initialValues.endStopReceiveOrderDate
+          ? new Date(initialValues.endStopReceiveOrderDate)
+          : today,
       }),
     [
       initialValues.startStopReceiveOrderDate,
@@ -101,9 +106,11 @@ const RestaurantSettingFormComponent: React.FC<
   const { isActive = true } = Listing(restaurantListing).getPublicData();
 
   const handleChangeStopReceiveOrder = (value: boolean) => {
-    if (isMobileLayout && !value) {
+    if (isMobileLayout) {
       dispatch(
         PartnerSettingsThunks.updatePartnerRestaurantListing({
+          startStopReceiveOrderDate: stopReceiveOrderRange.startDate?.getTime(),
+          endStopReceiveOrderDate: stopReceiveOrderRange.endDate?.getTime(),
           stopReceiveOrder: value,
         }),
       );
