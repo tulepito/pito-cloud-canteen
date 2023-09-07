@@ -4,6 +4,26 @@
 
 .header {
   @include flexAlign(center, space-between);
+  padding: 8px 16px;
+  border-bottom: 1px solid $neutralGray3;
+
+  @include viewportMedium {
+    padding: 0;
+    border-bottom: none;
+  }
+
+  .title {
+    @include textTemplate(16px, 700, 24px);
+  }
+
+  .filterBtn {
+    padding: 7px 6px;
+    min-height: unset;
+
+    @include viewportMedium {
+      display: none;
+    }
+  }
 }
 
 .orderTitle {
@@ -24,8 +44,13 @@
 }
 
 .actionSection {
-  display: flex;
-  justify-content: space-between;
+  display: none;
+
+  @include viewportMedium {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 32px;
+  }
 
   .filterButtonWrapper {
     position: relative;
@@ -75,7 +100,12 @@
 }
 
 .tableWrapper {
-  margin-top: 24px;
+  display: none;
+
+  @include viewportMedium {
+    display: initial;
+    margin-top: 24px;
+  }
 }
 
 .filterLabels {
@@ -106,4 +136,27 @@
       fill: $neutralGray5;
     }
   }
+}
+
+.mobileFilterModalContainer.mobileFilterModalContainer {
+  padding: 20px 16px;
+}
+
+.mobilePaymentsEmpty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  row-gap: 12px;
+  margin-top: calc(50vh - 62px - 60px);
+  margin-top: calc(50dvh - 62px - 60px);
+
+  @include textTemplate(14px, 400, 20px);
+  color: $neutralGray5;
+}
+
+.mobilePaymentsContainer {
+  display: flex;
+  flex-direction: column;
+  padding: 24px 16px;
+  row-gap: 12px;
 }
