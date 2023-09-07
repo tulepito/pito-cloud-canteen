@@ -48,16 +48,17 @@ function BookerNewOrderPage() {
 
   const handleSubmit = async (values: any) => {
     setiIsSubmitting(true);
+
     try {
       await dispatch(QuizThunks.fetchSelectedCompany(values.company));
-      setiIsSubmitting(false);
-      route.push({
+      await route.push({
         pathname: quizPaths.PerpackMemberAmount,
         query: route.query,
       });
     } catch (error) {
-      setiIsSubmitting(false);
       console.error('error', error);
+    } finally {
+      setiIsSubmitting(false);
     }
   };
 

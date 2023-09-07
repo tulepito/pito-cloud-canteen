@@ -177,6 +177,7 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
     return listEvent;
   });
   const flattenEvents = flatten<Event>(events);
+
   const recommendFoodForSubOrder = () => {
     const neededRecommendSubOrders = flattenEvents.reduce(
       (result: any, _event: Event) => {

@@ -5,6 +5,7 @@ import { shallowEqual } from 'react-redux';
 import { useRouter } from 'next/router';
 
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import useBoolean from '@hooks/useBoolean';
 import { QuizActions, QuizThunks } from '@redux/slices/Quiz.slice';
 import { companyPaths, quizPaths } from '@src/paths';
 import { User } from '@src/utils/data';
@@ -20,6 +21,7 @@ import css from './QuizSpecialDemand.module.scss';
 const QuizSpecialDemand = () => {
   const intl = useIntl();
   const router = useRouter();
+  const submittingControl = useBoolean();
   const dispatch = useAppDispatch();
   useRedirectAfterReloadPage();
   const formSubmitRef = useRef<any>();
@@ -41,15 +43,24 @@ const QuizSpecialDemand = () => {
   }, [formValues?.nutritions, formValues?.mealType]);
 
   const { nutritions } = User(selectedCompany).getPublicData();
-  const onFormSubmitClick = () => {
-    formSubmitRef?.current.submit();
-    router.push({
-      pathname: quizPaths.MealStyles,
-      query: { ...router.query },
-    });
+  const onFormSubmitClick = async () => {
+    submittingControl.setTrue();
+
+    try {
+      await formSubmitRef?.current.submit();
+      await router.push({
+        pathname: quizPaths.MealStyles,
+        query: { ...router.query },
+      });
+    } catch (error) {
+      console.error(error);
+    } finally {
+      submittingControl.setFalse();
+    }
   };
-  const onFormSubmit = (values: TSpecialDemandFormValues) => {
-    dispatch(QuizActions.updateQuiz({ ...values }));
+
+  const onFormSubmit = async (values: TSpecialDemandFormValues) => {
+    await dispatch(QuizActions.updateQuiz({ ...values }));
   };
 
   const onCancel = () => {
@@ -93,6 +104,7 @@ const QuizSpecialDemand = () => {
       onCancel={onCancel}
       onSubmit={onFormSubmitClick}
       submitDisabled={submitDisabled}
+      submitInProgress={submittingControl.value}
       onBack={goBack}>
       <div className={css.formContainer}>
         {fetchSearchFilter ? (

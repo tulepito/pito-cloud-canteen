@@ -28,6 +28,7 @@ export const updateFirstTimeViewOrderApi = (orderId: string) =>
 export const recommendFoodForSubOrdersApi = (body: {
   mappedRecommendFoodToOrderDetail: any;
 }) => putApi('/participants/plans/recommend-food-for-sub-orders', body);
+
 export type TFetchOrdersApiParams = {
   selectedMonth: Date;
 };

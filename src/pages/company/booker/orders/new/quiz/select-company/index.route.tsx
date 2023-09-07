@@ -4,7 +4,7 @@ import QuizSelectCompanyPage from './QuizSelectCompany.page';
 
 export default function QuizSelectCompanyRoute() {
   return (
-    <MetaWrapper>
+    <MetaWrapper routeName="QuizSelectCompanyRoute">
       <QuizSelectCompanyPage />
     </MetaWrapper>
   );

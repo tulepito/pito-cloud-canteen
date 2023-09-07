@@ -24,6 +24,7 @@ export const queryAllPartnerPaymentRecordsApi = ({ partnerId }: TObject) => {
 export const toggleAppStatusApi = ({ partnerId }: TObject, body: TObject) => {
   return putApi(`${BASE_URL}/${partnerId}/toggle-app-status`, body);
 };
+
 export type TQueryPartnerFoodApiParams = {
   restaurantId: string;
   keywords?: string;

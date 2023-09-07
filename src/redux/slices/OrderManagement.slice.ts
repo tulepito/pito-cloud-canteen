@@ -531,23 +531,29 @@ const addOrUpdateMemberOrder = createAsyncThunk(
         updateParams,
       );
       const subOrderId = `${participantId} - ${planId} - ${currentViewDate}`;
-      const { data: firebaseSubOrderDocument } =
-        await participantSubOrderGetByIdApi(subOrderId);
 
-      if (!firebaseSubOrderDocument) {
-        participantSubOrderAddDocumentApi({
-          participantId,
-          planId,
-          timestamp: currentViewDate,
-        });
-      } else {
-        participantSubOrderUpdateDocumentApi({
-          subOrderId,
-          params: {
-            foodId,
-          },
-        });
-      }
+      const addDocumentMemberSuborder = async () => {
+        const { data: firebaseSubOrderDocument } =
+          await participantSubOrderGetByIdApi(subOrderId);
+
+        if (!firebaseSubOrderDocument) {
+          participantSubOrderAddDocumentApi({
+            participantId,
+            planId,
+            timestamp: currentViewDate,
+          });
+        } else {
+          participantSubOrderUpdateDocumentApi({
+            subOrderId,
+            params: {
+              foodId,
+            },
+          });
+        }
+      };
+      // dont need to wait this line
+      addDocumentMemberSuborder();
+
       const planListing = Listing(updatePlanListing.planListing);
       const { orderDetail } = planListing.getMetadata();
 

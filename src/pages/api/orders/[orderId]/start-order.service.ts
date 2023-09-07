@@ -56,6 +56,13 @@ export const startOrder = async (orderId: string, planId: string) => {
     },
   });
 
+  await integrationSdk.listings.update({
+    id: planId,
+    metadata: {
+      partnerIds,
+    },
+  });
+
   emailSendingFactory(EmailTemplateTypes.BOOKER.BOOKER_ORDER_SUCCESS, {
     orderId,
   });

@@ -343,9 +343,9 @@ const fetchOrders = createAsyncThunk(
     return {
       orders,
       allPlans,
-      company,
       restaurants,
       mappingSubOrderToOrder,
+      company,
     };
   },
 );
@@ -808,7 +808,7 @@ const OrderListSlice = createSlice({
 
         state.restaurants = payload.restaurants;
         state.allPlans = uniqBy(
-          [...state.allPlans, ...payload.allPlans],
+          [...payload.allPlans, ...state.allPlans],
           'id.uuid',
         );
         state.mappingSubOrderToOrder = {

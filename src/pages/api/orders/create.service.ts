@@ -8,7 +8,7 @@ import {
   getScheduler,
   updateScheduler,
 } from '@services/awsEventBrigdeScheduler';
-import getAdminAccount from '@services/getAdminAccount';
+import getAdminAccount, { updateOrderNumber } from '@services/getAdminAccount';
 import { fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { ListingTypes } from '@src/types/listingTypes';
@@ -22,7 +22,36 @@ import {
 } from '@utils/enums';
 import type { TObject } from '@utils/types';
 
-const ADMIN_ID = process.env.PITO_ADMIN_ID || '';
+const createDeadlineScheduler = async ({
+  deadlineDate,
+  orderFlexId,
+}: {
+  deadlineDate: number;
+  orderFlexId: string;
+}) => {
+  const reminderTime = DateTime.fromMillis(deadlineDate)
+    .setZone(VNTimezone)
+    .minus({
+      minutes: 30,
+    })
+    .toMillis();
+  try {
+    await getScheduler(`sendRemindPOE_${orderFlexId}`);
+    await updateScheduler({
+      customName: `sendRemindPOE_${orderFlexId}`,
+      timeExpression: formatTimestamp(reminderTime, "yyyy-MM-dd'T'hh:mm:ss"),
+    });
+  } catch (error) {
+    console.error('create scheduler in create order');
+    await createScheduler({
+      customName: `sendRemindPOE_${orderFlexId}`,
+      timeExpression: formatTimestamp(reminderTime, "yyyy-MM-dd'T'hh:mm:ss"),
+      params: {
+        orderId: orderFlexId,
+      },
+    });
+  }
+};
 
 const createOrder = async ({
   companyId,
@@ -42,12 +71,8 @@ const createOrder = async ({
   const adminAccount = await getAdminAccount();
 
   const { currentOrderNumber = 0 } = adminAccount.attributes.profile.metadata;
-  await integrationSdk.users.updateProfile({
-    id: ADMIN_ID,
-    metadata: {
-      currentOrderNumber: currentOrderNumber + 1,
-    },
-  });
+
+  updateOrderNumber();
 
   // Get sub account id
   const companyAccount = await fetchUser(companyId);
@@ -139,28 +164,7 @@ const createOrder = async ({
   const orderFlexId = orderListing.id.uuid;
 
   if (!isNormalOrder && deadlineDate) {
-    const reminderTime = DateTime.fromMillis(deadlineDate)
-      .setZone(VNTimezone)
-      .minus({
-        minutes: 30,
-      })
-      .toMillis();
-    try {
-      await getScheduler(`sendRemindPOE_${orderFlexId}`);
-      await updateScheduler({
-        customName: `sendRemindPOE_${orderFlexId}`,
-        timeExpression: formatTimestamp(reminderTime, "yyyy-MM-dd'T'hh:mm:ss"),
-      });
-    } catch (error) {
-      console.error('create scheduler in create order');
-      await createScheduler({
-        customName: `sendRemindPOE_${orderFlexId}`,
-        timeExpression: formatTimestamp(reminderTime, "yyyy-MM-dd'T'hh:mm:ss"),
-        params: {
-          orderId: orderFlexId,
-        },
-      });
-    }
+    createDeadlineScheduler({ deadlineDate, orderFlexId });
   }
 
   return orderListing;

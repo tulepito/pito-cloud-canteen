@@ -69,6 +69,7 @@ export const calculateTotalPriceAndDishes = ({
             ...result,
             totalPrice: result.totalPrice + totalInfo.totalPrice,
             totalDishes: result.totalDishes + totalInfo.totalDishes,
+            [dateKey]: foodDataList,
           };
         },
         {
@@ -104,11 +105,18 @@ export const calculateTotalPriceAndDishes = ({
             },
             { totalPrice: 0, totalDishes: 0 },
           );
+          const foodDataList = lineItems.map((item: TObject) => {
+            return {
+              foodName: item?.name,
+              frequency: item?.quantity,
+            };
+          });
 
           return {
             ...result,
             totalPrice: result.totalPrice + totalInfo.totalPrice,
             totalDishes: result.totalDishes + totalInfo.totalDishes,
+            [dateKey]: foodDataList,
           };
         },
         {
@@ -116,6 +124,41 @@ export const calculateTotalPriceAndDishes = ({
           totalPrice: 0,
         },
       );
+};
+
+export const calculatePCCFeeByDate = ({
+  isGroupOrder,
+  memberOrders,
+  lineItems,
+  hasSpecificPCCFee,
+  specificPCCFee,
+}: {
+  isGroupOrder: boolean;
+  memberOrders: TObject;
+  lineItems: TObject[];
+  hasSpecificPCCFee?: boolean;
+  specificPCCFee: number;
+}) => {
+  const memberAmountOfDate = isGroupOrder
+    ? Object.values(memberOrders).reduce(
+        (resultOfDate: number, currentMemberOrder: any) => {
+          const { foodId, status } = currentMemberOrder;
+
+          return isJoinedPlan(foodId, status) ? resultOfDate + 1 : resultOfDate;
+        },
+        0,
+      )
+    : lineItems.reduce((res: number, item: TObject) => {
+        return res + (item?.quantity || 1);
+      }, 0);
+
+  const PCCFeeOfDate = hasSpecificPCCFee
+    ? memberAmountOfDate > 0
+      ? specificPCCFee
+      : 0
+    : getPCCFeeByMemberAmount(memberAmountOfDate);
+
+  return PCCFeeOfDate;
 };
 
 export const calculatePriceQuotationInfo = ({
@@ -169,26 +212,13 @@ export const calculatePriceQuotationInfo = ({
   const PCCFee = Object.values(currentOrderDetail).reduce(
     (result, currentOrderDetailOfDate) => {
       const { memberOrders, lineItems = [] } = currentOrderDetailOfDate;
-      const memberAmountOfDate = isGroupOrder
-        ? Object.values(memberOrders).reduce(
-            (resultOfDate: number, currentMemberOrder: any) => {
-              const { foodId, status } = currentMemberOrder;
-
-              return isJoinedPlan(foodId, status)
-                ? resultOfDate + 1
-                : resultOfDate;
-            },
-            0,
-          )
-        : lineItems.reduce((res: number, item: TObject) => {
-            return res + (item?.quantity || 1);
-          }, 0);
-
-      const PCCFeeOfDate = hasSpecificPCCFee
-        ? memberAmountOfDate > 0
-          ? specificPCCFee
-          : 0
-        : getPCCFeeByMemberAmount(memberAmountOfDate);
+      const PCCFeeOfDate = calculatePCCFeeByDate({
+        isGroupOrder,
+        memberOrders,
+        lineItems,
+        hasSpecificPCCFee,
+        specificPCCFee,
+      });
 
       return result + PCCFeeOfDate;
     },

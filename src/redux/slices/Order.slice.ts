@@ -17,6 +17,7 @@ import {
   bookerPublishOrderApi,
   createBookerOrderApi,
   queryOrdersApi,
+  recommendRestaurantApi,
   reorderApi,
   requestApprovalOrderApi,
   updateOrderApi,
@@ -26,24 +27,18 @@ import {
 import { fetchSearchFilterApi } from '@apis/userApi';
 import { queryAllPages } from '@helpers/apiHelpers';
 import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
-import {
-  getMenuQuery,
-  getMenuQueryInSpecificDay,
-  getRestaurantQuery,
-} from '@helpers/listingSearchQuery';
+import { getMenuQueryInSpecificDay } from '@helpers/listingSearchQuery';
 import { LISTING_TYPE } from '@pages/api/helpers/constants';
 import { createAsyncThunk } from '@redux/redux.helper';
 import config from '@src/configs';
 import { CompanyPermission } from '@src/types/UserPermission';
 import { denormalisedResponseEntities, Listing, User } from '@utils/data';
-import { convertWeekDay, renderDateRange } from '@utils/dates';
 import {
   EInvalidRestaurantCase,
   EListingStates,
   EListingType,
   EManageCompanyOrdersTab,
   ENotificationTypes,
-  EOrderType,
   ERestaurantListingStatus,
   MANAGE_COMPANY_ORDERS_TAB_MAP,
 } from '@utils/enums';
@@ -367,108 +362,10 @@ const updateOrder = createAsyncThunk(
 
 const recommendRestaurants = createAsyncThunk(
   RECOMMEND_RESTAURANT,
-  async (_, { getState, extra: sdk }) => {
+  async (_, { getState }) => {
     const { order } = getState().Order;
-    const orderDetail: any = {};
-    const {
-      dayInWeek = [],
-      startDate,
-      endDate,
-      orderType = EOrderType.group,
-      memberAmount = 0,
-    } = Listing(order as TListing).getMetadata();
-    const isNormalOrder = orderType === EOrderType.normal;
-    const totalDates = renderDateRange(startDate, endDate);
-
-    await Promise.all(
-      totalDates.map(async (dateTime) => {
-        if (
-          dayInWeek.includes(
-            convertWeekDay(DateTime.fromMillis(dateTime).weekday).key,
-          )
-        ) {
-          const menuQueryParams = {
-            timestamp: dateTime,
-          };
-          const menuQuery = getMenuQuery({ order, params: menuQueryParams });
-          const allMenus = await queryAllPages({
-            sdkModel: sdk.listings,
-            query: menuQuery,
-          });
-          const restaurantIdList = uniq<any>(
-            allMenus.map((menu: TListing) => {
-              const { restaurantId } = Listing(menu).getMetadata();
-
-              return restaurantId;
-            }),
-          ).slice(0, 100);
-
-          const restaurantsQuery = getRestaurantQuery({
-            restaurantIds: restaurantIdList,
-            companyAccount: null,
-            params: {
-              memberAmount,
-            },
-          });
-
-          const restaurantsResponse = denormalisedResponseEntities(
-            await sdk.listings.query(restaurantsQuery),
-          ).filter((r: TListing) => {
-            const {
-              stopReceiveOrder = false,
-              startStopReceiveOrderDate = 0,
-              endStopReceiveOrderDate = 0,
-            } = Listing(r).getPublicData();
-            const isInStopReceiveOrderTime =
-              stopReceiveOrder &&
-              Number(dateTime) >= startStopReceiveOrderDate &&
-              Number(dateTime) <= endStopReceiveOrderDate;
-
-            return !isInStopReceiveOrderTime;
-          });
-
-          const restaurants = allMenus.reduce((result: any, menu: TListing) => {
-            const { restaurantId } = Listing(menu).getMetadata();
-            const restaurantInfo = restaurantsResponse.find(
-              (restaurant: TListing) =>
-                Listing(restaurant).getId() === restaurantId,
-            );
-            if (!restaurantInfo) return result;
-
-            return result.concat({
-              menu,
-              restaurantInfo,
-            });
-          }, []);
-
-          if (restaurants.length > 0) {
-            const randomRestaurant =
-              restaurants[Math.floor(Math.random() * (restaurants.length - 1))];
-            const restaurantGetter = Listing(randomRestaurant?.restaurantInfo);
-            const { minQuantity = 0, maxQuantity = 100 } =
-              restaurantGetter.getPublicData();
-            const lineItemsMaybe = isNormalOrder ? { lineItems: [] } : {};
-
-            orderDetail[dateTime] = {
-              restaurant: {
-                id: restaurantGetter.getId(),
-                restaurantName: restaurantGetter.getAttributes().title,
-                foodList: [],
-                menuId: randomRestaurant?.menu.id.uuid,
-                minQuantity,
-                maxQuantity,
-                restaurantOwnerId:
-                  randomRestaurant?.restaurantInfo?.author?.id?.uuid,
-                phoneNumber: Listing(
-                  randomRestaurant?.restaurantInfo,
-                ).getPublicData()?.phoneNumber,
-              },
-              ...lineItemsMaybe,
-            };
-          }
-        }
-      }),
-    );
+    const orderId = Listing(order).getId();
+    const { data: orderDetail } = await recommendRestaurantApi(orderId);
 
     return orderDetail;
   },
@@ -476,108 +373,24 @@ const recommendRestaurants = createAsyncThunk(
 
 const recommendRestaurantForSpecificDay = createAsyncThunk(
   RECOMMEND_RESTAURANT_FOR_SPECIFIC_DAY,
-  async (dateTime: number, { getState, extra: sdk }) => {
-    const { order, orderDetail } = getState().Order;
-    const orderId = Listing(order as TListing).getId();
-    const { plans = [], memberAmount = 0 } = Listing(
-      order as TListing,
-    ).getMetadata();
-    const menuQueryParams = {
-      timestamp: dateTime,
-    };
-    const menuQuery = getMenuQuery({ order, params: menuQueryParams });
-    const allMenus = await queryAllPages({
-      sdkModel: sdk.listings,
-      query: menuQuery,
+  async (dateTime: number, { getState }) => {
+    const { order } = getState().Order;
+
+    const orderId = Listing(order).getId();
+
+    const { plans = [] } = Listing(order).getMetadata();
+
+    const { data: newOrderDetail } = await recommendRestaurantApi(
+      orderId,
+      dateTime,
+    );
+
+    await updatePlanDetailsApi(orderId, {
+      orderDetail: newOrderDetail,
+      planId: plans[0],
     });
 
-    const restaurantIdList = uniq<any>(
-      allMenus.map((menu: TListing) => {
-        const { restaurantId } = Listing(menu).getMetadata();
-
-        return restaurantId;
-      }),
-    ).slice(0, 100);
-
-    const restaurantsQuery = getRestaurantQuery({
-      restaurantIds: restaurantIdList,
-      companyAccount: null,
-      params: {
-        memberAmount,
-      },
-    });
-
-    const restaurantsResponse = denormalisedResponseEntities(
-      await sdk.listings.query(restaurantsQuery),
-    ).filter((r: TListing) => {
-      const {
-        stopReceiveOrder = false,
-        startStopReceiveOrderDate = 0,
-        endStopReceiveOrderDate = 0,
-      } = Listing(r).getPublicData();
-      const isInStopReceiveOrderTime =
-        stopReceiveOrder &&
-        Number(dateTime) >= startStopReceiveOrderDate &&
-        Number(dateTime) <= endStopReceiveOrderDate;
-
-      return !isInStopReceiveOrderTime;
-    });
-
-    const restaurants = allMenus.reduce((result: any, menu: TListing) => {
-      const { restaurantId } = Listing(menu).getMetadata();
-      const restaurantInfo = restaurantsResponse.find(
-        (restaurant: TListing) => Listing(restaurant).getId() === restaurantId,
-      );
-      if (!restaurantInfo) return result;
-
-      return result.concat({
-        menu,
-        restaurantInfo,
-      });
-    }, []);
-
-    if (restaurants.length > 0) {
-      const randomNumber = Math.floor(Math.random() * (restaurants.length - 1));
-      const otherRandomNumber = Math.abs(randomNumber - restaurants.length + 1);
-
-      const randomRestaurant =
-        restaurants[randomNumber]?.restaurantInfo?.id?.uuid !==
-        orderDetail[dateTime]?.restaurant?.id
-          ? restaurants[randomNumber]?.restaurantInfo
-          : restaurants[otherRandomNumber]?.restaurantInfo;
-
-      const randomRestaurantGetter = Listing(randomRestaurant);
-      const randomRestaurantId = randomRestaurantGetter.getId();
-      const { minQuantity = 0, maxQuantity = Number.MAX_VALUE } =
-        randomRestaurantGetter.getMetadata();
-
-      const newRestaurantData = {
-        id: randomRestaurantId,
-        restaurantName: randomRestaurantGetter.getAttributes().title,
-        restaurantOwnerId: randomRestaurant?.author?.id?.uuid,
-        foodList: [],
-        phoneNumber: randomRestaurantGetter.getPublicData().phoneNumber,
-        menuId: restaurants[randomNumber]?.menu.id.uuid,
-        minQuantity,
-        maxQuantity,
-      };
-
-      const newOrderDetail = {
-        ...orderDetail,
-        [dateTime]: {
-          ...orderDetail[dateTime],
-          restaurant: newRestaurantData,
-        },
-      };
-      await updatePlanDetailsApi(orderId, {
-        orderDetail: newOrderDetail,
-        planId: plans[0],
-      });
-
-      return newOrderDetail;
-    }
-
-    return orderDetail;
+    return newOrderDetail;
   },
 );
 
