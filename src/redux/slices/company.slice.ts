@@ -241,11 +241,6 @@ const adminCreateCompany = createAsyncThunk(
       });
 
       const [company] = denormalisedResponseEntities(data);
-      const companyId = User(company).getId();
-
-      unActiveCompanyApi(companyId, {
-        expand: true,
-      });
 
       return fulfillWithValue(company);
     } catch (error: any) {
