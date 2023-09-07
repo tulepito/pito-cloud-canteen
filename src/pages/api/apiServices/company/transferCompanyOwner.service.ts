@@ -1,26 +1,68 @@
+import type { NextApiResponse } from 'next';
+
 import { denormalisedResponseEntities } from '@services/data';
 import { fetchUser, fetchUserByEmail } from '@services/integrationHelper';
-import { getIntegrationSdk } from '@services/sdk';
+import { getIntegrationSdk, handleError } from '@services/sdk';
 import { UserPermission } from '@src/types/UserPermission';
 import { User } from '@src/utils/data';
+import { EErrorCode } from '@src/utils/enums';
 
 import isBookerInOrderProgress from './isBookerInOrderProgress.service';
 
 export type TChangeOwnerParams = {
+  res: NextApiResponse;
   companyId: string;
   newOwnerEmail: string;
   permissionForOldOwner?: UserPermission;
   newOwnerProfileImageId?: string;
 };
 
+const customErrorResponse = ({
+  code,
+  message,
+  status,
+  statusText,
+}: {
+  code: string;
+  message: string;
+  status: number;
+  statusText: string;
+}) => {
+  return {
+    name: code,
+    message,
+    status,
+    statusText,
+    data: {
+      errors: [
+        {
+          id: new Date().getTime(),
+          status,
+          code,
+          title: message,
+        },
+      ],
+    },
+  };
+};
+
 const transferCompanyOwner = async ({
+  res,
   companyId,
   newOwnerEmail,
   permissionForOldOwner,
   newOwnerProfileImageId,
 }: TChangeOwnerParams) => {
   if (!companyId || !newOwnerEmail) {
-    throw new Error('Missing required params');
+    return handleError(
+      res,
+      customErrorResponse({
+        code: 'missing-params',
+        message: 'Missing params',
+        status: 400,
+        statusText: 'Bad Request',
+      }),
+    );
   }
 
   const integrationSdk = getIntegrationSdk();
@@ -44,13 +86,37 @@ const transferCompanyOwner = async ({
 
   const newCompanyAccount = await fetchUserByEmail(newOwnerEmail);
 
+  const { isCompany } = User(newCompanyAccount).getMetadata();
+
+  if (isCompany) {
+    return handleError(
+      res,
+      customErrorResponse({
+        code: EErrorCode.newOwnerAlreadyACompanyUser,
+        message: 'New owner is company',
+        status: 409,
+        statusText: 'New owner is company',
+      }),
+    );
+  }
+
   await isBookerInOrderProgress({ members, memberEmail: newOwnerEmail });
 
-  const { companyList: companyListOfNewCompany } =
-    User(newCompanyAccount).getMetadata();
+  const {
+    companyList: companyListOfNewCompany,
+    company: prevCompanyObjOfNewCompany,
+  } = User(newCompanyAccount).getMetadata();
 
   if (!newCompanyAccount) {
-    throw new Error('User not found');
+    return handleError(
+      res,
+      customErrorResponse({
+        code: 'new-owner-not-found',
+        message: 'New owner not found',
+        status: 404,
+        statusText: 'Not Found',
+      }),
+    );
   }
 
   const newMembers = Object.keys(members).reduce((acc, key) => {
@@ -72,10 +138,28 @@ const transferCompanyOwner = async ({
 
     return memberList;
   }, members);
-
   const newOwnerCompanyList = companyListOfNewCompany.map((id: string) =>
     id === companyId ? User(newCompanyAccount).getId() : id,
   );
+
+  const newCompanyObjOfNewCompany = Object.keys(
+    prevCompanyObjOfNewCompany,
+  ).reduce((acc, cur) => {
+    let newCompanyData = { ...acc } as any;
+    if (cur === companyId) {
+      // replace old company id with new company id
+      newCompanyData = {
+        ...newCompanyData,
+        [User(newCompanyAccount).getId()]: {
+          ...(newCompanyData[cur] || {}),
+          permission: UserPermission.OWNER,
+        },
+      };
+      delete newCompanyData[cur];
+    }
+
+    return newCompanyData;
+  }, prevCompanyObjOfNewCompany);
 
   // Update new member data to new company ( owner )
   const newCompanyResponse = await integrationSdk.users.updateProfile(
@@ -108,6 +192,7 @@ const transferCompanyOwner = async ({
         status,
         userState,
         companyList: newOwnerCompanyList,
+        company: newCompanyObjOfNewCompany,
       },
     },
     {
@@ -123,7 +208,7 @@ const transferCompanyOwner = async ({
       const { id, permission } = member;
 
       // if owner dont need to update because it already updated above;
-      if (permission === UserPermission.OWNER) return;
+      if (permission === UserPermission.OWNER || !id) return;
 
       const memberAccount = await fetchUser(id);
 
@@ -138,13 +223,14 @@ const transferCompanyOwner = async ({
             ...newCompanyData,
             [User(newCompanyAccount).getId()]: {
               ...(newCompanyData[cur] || {}),
+              permission: permissionForOldOwner || UserPermission.PARTICIPANT,
             },
           };
           delete newCompanyData[cur];
         }
 
         return newCompanyData;
-      }, {});
+      }, company);
 
       const newMemberCompanyList = memberCompanyList.map(
         (memberCompanyId: string) =>
