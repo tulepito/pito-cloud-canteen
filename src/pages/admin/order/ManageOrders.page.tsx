@@ -6,6 +6,7 @@ import { FormattedMessage } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import classNames from 'classnames';
 import addDays from 'date-fns/addDays';
+import { flatten } from 'lodash';
 import compact from 'lodash/compact';
 import { useRouter } from 'next/router';
 
@@ -22,7 +23,10 @@ import type { TColumn } from '@components/Table/Table';
 import { TableForm } from '@components/Table/Table';
 import StateItem from '@components/TimeLine/StateItem';
 import Tooltip from '@components/Tooltip/Tooltip';
-import { calculateTotalPriceAndDishes } from '@helpers/order/cartInfoHelper';
+import {
+  calculatePCCFeeByDate,
+  calculateTotalPriceAndDishes,
+} from '@helpers/order/cartInfoHelper';
 import { combineOrderDetailWithPriceInfo } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { orderAsyncActions, resetOrder } from '@redux/slices/Order.slice';
@@ -399,7 +403,10 @@ const TABLE_COLUMN: TColumn[] = [
   },
 ];
 
-const parseEntitiesToTableData = (orders: TIntegrationOrderListing[]) => {
+const parseEntitiesToTableData = (
+  orders: TIntegrationOrderListing[],
+  systemVATPercentage: number,
+) => {
   if (orders.length === 0) return [];
 
   return orders.map((entity) => {
@@ -461,12 +468,40 @@ const parseEntitiesToTableData = (orders: TIntegrationOrderListing[]) => {
       isGroupOrder,
     });
 
+    const orderVATPercentage = entity?.attributes?.metadata?.orderVATPercentage;
+    const hasSpecificPCCFee = entity?.attributes?.metadata?.hasSpecificPCCFee;
+    const specificPCCFee = entity?.attributes?.metadata?.specificPCCFee;
+
+    const orderVATPercentageToUse =
+      orderState === EOrderStates.picking ||
+      orderState === EOrderDraftStates.draft
+        ? systemVATPercentage
+        : orderVATPercentage;
+
     const subOrderDates = compact(
       Object.keys(orderDetail).map((key) => {
-        const { totalDishes: childTotalDishes } = calculateTotalPriceAndDishes({
-          orderDetail: { key: orderDetail[key] },
+        const { memberOrders, lineItems } = orderDetail[key];
+        const {
+          totalDishes: childTotalDishes,
+          totalPrice: childTotalPrice,
+          ...rest
+        } = calculateTotalPriceAndDishes({
+          orderDetail: { [key]: orderDetail[key] },
           isGroupOrder,
         });
+
+        const PCCFeeByDate = calculatePCCFeeByDate({
+          isGroupOrder,
+          memberOrders,
+          lineItems,
+          hasSpecificPCCFee,
+          specificPCCFee,
+        });
+
+        const childPrice =
+          childTotalPrice +
+          PCCFeeByDate +
+          (childTotalPrice + PCCFeeByDate) * orderVATPercentageToUse;
 
         if (!orderDetail[key]?.transactionId) return null;
 
@@ -497,9 +532,16 @@ const parseEntitiesToTableData = (orders: TIntegrationOrderListing[]) => {
                 _restaurant.id.uuid === orderDetail[key]?.restaurant?.id,
             )?.attributes?.publicData?.location?.address,
             isPaid: orderDetail[key]?.isPaid,
+            foodList: rest[key],
+            price: childPrice,
           },
         };
       }),
+    );
+
+    const orderPrice = subOrderDates.reduce(
+      (prev: number, item: any) => prev + item.data.price,
+      0,
     );
 
     return {
@@ -537,6 +579,8 @@ const parseEntitiesToTableData = (orders: TIntegrationOrderListing[]) => {
           (_restaurant: any) =>
             _restaurant.attributes?.publicData?.location?.address,
         ),
+        foodList: flatten(subOrderDates.map((item) => item.data.foodList)),
+        price: orderPrice,
       },
     };
   });
@@ -593,8 +637,11 @@ const ManageOrdersPage = () => {
     manageOrdersPagination,
     queryAllOrdersInProgress,
   } = useAppSelector((state) => state.Order, shallowEqual);
+  const systemVATPercentage = useAppSelector(
+    (state) => state.SystemAttributes.systemVATPercentage,
+  );
 
-  const dataTable = parseEntitiesToTableData(orders);
+  const dataTable = parseEntitiesToTableData(orders, systemVATPercentage);
 
   const sortedData = sortValue ? sortOrders(sortValue, dataTable) : dataTable;
   const onDownloadOrderList = async (values: TDownloadColumnListFormValues) => {
@@ -616,7 +663,10 @@ const ManageOrdersPage = () => {
       }),
     );
     if (meta.requestStatus === 'fulfilled') {
-      const allOrdersData = parseEntitiesToTableData(payload);
+      const allOrdersData = parseEntitiesToTableData(
+        payload,
+        systemVATPercentage,
+      );
       const sortedExportOrdersData = sortValue
         ? sortOrders(sortValue, allOrdersData)
         : allOrdersData;

@@ -2,7 +2,9 @@ import flatten from 'lodash/flatten';
 import uniq from 'lodash/uniq';
 import * as XLSX from 'xlsx';
 
+import { parseThousandNumber } from '@helpers/format';
 import { formatTimestamp } from '@src/utils/dates';
+import { getLabelByKey, ORDER_STATES_OPTIONS } from '@src/utils/enums';
 import type { TObject } from '@src/utils/types';
 
 export const parseEntitiesToExportCsv = (
@@ -23,6 +25,10 @@ export const parseEntitiesToExportCsv = (
   const hasParentOrder = exportColumns.includes('group');
   const hasPartnersPhoneNumbers = exportColumns.includes('partnerPhoneNumber');
   const hasPartnersAddress = exportColumns.includes('partnerAddress');
+  const hastOrderState = exportColumns.includes('orderState');
+  const hasFoodList = exportColumns.includes('foodList');
+  const hasNumberPerFood = exportColumns.includes('numberPerFood');
+  const hasPrice = exportColumns.includes('price');
 
   const orderToExport = orders.map((order) => {
     const {
@@ -41,6 +47,9 @@ export const parseEntitiesToExportCsv = (
       orderNote,
       partnerLocation,
       deliveryHour,
+      state,
+      foodList,
+      price,
     } = order.data || {};
 
     const parentOrderData = {
@@ -48,15 +57,30 @@ export const parseEntitiesToExportCsv = (
       ...(hasOrderCreatedAtCol && {
         'Ngày tạo đơn': orderCreatedAt,
       }),
+      ...(hastOrderState && {
+        'Trạng thái đơn': getLabelByKey(ORDER_STATES_OPTIONS, state),
+      }),
       ...(hasCompanyNameCol && { 'Tên công ty': companyName }),
       ...(hasBookerPhoneNumberCol && {
         'SĐT người đại diện': bookerPhoneNumber,
       }),
       ...(hasCompanyAddressCol && { 'Địa chỉ công ty': companyLocation }),
       ...(hasDeliveryDate && {
-        'Ngày giao hàng': `${deliveryHour}\n${startDate}-${endDate}`,
+        'Giờ giao hàng': deliveryHour,
+        'Ngày giao hàng': `${startDate}-${endDate}`,
       }),
       ...(hasTotalDishes && { 'Số phần ăn': totalDishes }),
+      ...(hasFoodList && {
+        'Danh sách món': foodList.map((item: any) => item.foodName).join('\n'),
+      }),
+      ...(hasNumberPerFood && {
+        'Số lượng từng món': foodList
+          .map((item: any) => item.frequency)
+          .join('\n'),
+      }),
+      ...(hasPrice && {
+        'Thành tiền ': parseThousandNumber(price),
+      }),
       ...(hasOrderNotes && {
         'Ghi chú đơn hàng': orderNote,
       }),
@@ -79,15 +103,32 @@ export const parseEntitiesToExportCsv = (
           ...(hasOrderCreatedAtCol && {
             'Ngày tạo đơn': orderCreatedAt,
           }),
+          ...(hastOrderState && {
+            'Trạng thái đơn': getLabelByKey(ORDER_STATES_OPTIONS, state),
+          }),
           ...(hasCompanyNameCol && { 'Tên công ty': companyName }),
           ...(hasBookerPhoneNumberCol && {
             'SĐT người đại diện': bookerPhoneNumber,
           }),
           ...(hasCompanyAddressCol && { 'Địa chỉ công ty': companyLocation }),
           ...(hasDeliveryDate && {
-            'Ngày giao hàng': `${deliveryHour}\n${child.data.subOrderDate}`,
+            'Giờ giao hàng': deliveryHour,
+            'Ngày giao hàng': `${startDate}-${endDate}`,
           }),
           ...(hasTotalDishes && { 'Số phần ăn': child.data.totalDishes }),
+          ...(hasFoodList && {
+            'Danh sách món': child.data.foodList
+              .map((item: any) => item.foodName)
+              .join('\n'),
+          }),
+          ...(hasNumberPerFood && {
+            'Số lượng từng món': child.data.foodList
+              .map((item: any) => item.frequency)
+              .join('\n'),
+          }),
+          ...(hasPrice && {
+            'Thành tiền ': parseThousandNumber(child.data.price),
+          }),
           ...(hasOrderNotes && {
             'Ghi chú đơn hàng': orderNotes[child.data.restaurantId],
           }),

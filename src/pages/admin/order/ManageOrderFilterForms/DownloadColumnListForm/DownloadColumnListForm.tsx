@@ -11,6 +11,7 @@ import css from './DownloadColumnListForm.module.scss';
 
 export type TDownloadColumnListFormValues = {
   downloadColumnListName: string[];
+  downloadColumnListNameCheckAll?: string[];
 };
 
 type TExtraProps = {
@@ -31,8 +32,16 @@ const DOWNLOAD_COLUMN_LIST_OPTIONS = [
     label: 'Ngày tạo đơn',
   },
   {
+    key: 'orderState',
+    label: 'Trạng thái đơn',
+  },
+  {
     key: 'companyName',
     label: 'Tên công ty',
+  },
+  {
+    key: 'bookerName',
+    label: 'Người đại diện',
   },
   {
     key: 'bookerPhoneNumber',
@@ -49,6 +58,18 @@ const DOWNLOAD_COLUMN_LIST_OPTIONS = [
   {
     key: 'totalDishes',
     label: 'Số phần ăn',
+  },
+  {
+    key: 'foodList',
+    label: 'Danh sách món',
+  },
+  {
+    key: 'numberPerFood',
+    label: 'Số lượng từng món',
+  },
+  {
+    key: 'price',
+    label: 'Thành tiền',
   },
   {
     key: 'orderNotes',
@@ -82,15 +103,62 @@ const ORDER_TYPE_OPTIONS = [
 const DownloadColumnListFormComponent: React.FC<
   TDownloadColumnListFormComponentProps
 > = (props) => {
-  const { handleSubmit, values, inProgress } = props;
+  const { handleSubmit, values, inProgress, form } = props;
   const { downloadColumnListName } = values;
   const isOrderTitleSelected = downloadColumnListName?.includes('title');
   const submitDisabled = !downloadColumnListName?.length || inProgress;
+
+  const onCheckboxChange = (event: any) => {
+    const { checked, value, name } = event.target;
+    const newValues = [...downloadColumnListName];
+    if (!checked) {
+      const index = newValues.indexOf(value);
+      if (index > -1) {
+        newValues.splice(index, 1);
+      }
+      form.change('downloadColumnListNameCheckAll', []);
+    } else {
+      newValues.push(value);
+    }
+    if (
+      newValues.length ===
+      DOWNLOAD_COLUMN_LIST_OPTIONS.length + ORDER_TYPE_OPTIONS.length
+    ) {
+      form.change('downloadColumnListNameCheckAll', ['all']);
+    }
+
+    form.change(name, newValues);
+  };
+
+  const onCheckAllChange = (event: any) => {
+    const { checked, value, name } = event.target;
+
+    let newValues = [...downloadColumnListName];
+    if (!checked) {
+      newValues = [];
+      form.change(name, []);
+    } else {
+      form.change(name, [value]);
+      newValues = [
+        ...DOWNLOAD_COLUMN_LIST_OPTIONS.map((option) => option.key),
+        ...ORDER_TYPE_OPTIONS.map((option) => option.key),
+      ];
+    }
+    form.change('downloadColumnListName', newValues);
+  };
 
   return (
     <Form onSubmit={handleSubmit} className={css.formContainer}>
       <div className={css.formTitle}>Tải danh sách</div>
       <div className={css.formDesc}>Chọn thông tin để tải xuống danh sách</div>
+      <FieldCheckbox
+        id={`downloadColumnList-all`}
+        name="downloadColumnListNameCheckAll"
+        value="all"
+        label="Tất cả"
+        className={css.fieldInput}
+        customOnChange={onCheckAllChange}
+      />
       {DOWNLOAD_COLUMN_LIST_OPTIONS.map((options) => {
         return (
           <>
@@ -101,6 +169,7 @@ const DownloadColumnListFormComponent: React.FC<
               value={options.key}
               label={options.label}
               className={css.fieldInput}
+              customOnChange={onCheckboxChange}
             />
             <RenderWhen
               condition={isOrderTitleSelected && options.key === 'title'}>
@@ -112,6 +181,7 @@ const DownloadColumnListFormComponent: React.FC<
                   value={orderOption.key}
                   label={orderOption.label}
                   className={classNames(css.fieldInput, css.childFieldInput)}
+                  customOnChange={onCheckboxChange}
                 />
               ))}
             </RenderWhen>
