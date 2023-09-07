@@ -63,8 +63,19 @@ export const deleteParticipantFromOrderApi = (orderId: string, body: TObject) =>
   deleteApi(`/orders/${orderId}/participant`, body);
 // ------------------------- //
 
-export const addUpdateMemberOrder = (orderId: string, body: TObject) =>
-  putApi(`/orders/${orderId}/member-order`, body);
+type AddUpdateMemberOrderApiBody = {
+  planId: string;
+  currentViewDate: string;
+  participantId?: string;
+  newMemberOrderValues?: TObject;
+  newMembersOrderValues?: TObject;
+  anonymous?: string[];
+};
+
+export const addUpdateMemberOrder = (
+  orderId: string,
+  body: AddUpdateMemberOrderApiBody,
+) => putApi(`/orders/${orderId}/member-order`, body);
 
 export const sendRemindEmailToMemberApi = (orderId: string, body: TObject) =>
   postApi(`/orders/${orderId}/remind-member`, body);
@@ -196,3 +207,5 @@ export const recommendRestaurantApi = (orderId: string, dateTime?: number) =>
   getApi(`/orders/${orderId}/restaurants-recommendation`, {
     timestamp: dateTime,
   });
+export const updateOrderDetailFromDraftApi = (orderId: string, body: TObject) =>
+  putApi(`/orders/${orderId}/update-order-detail-from-draft`, body);

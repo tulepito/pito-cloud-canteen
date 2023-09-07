@@ -102,12 +102,14 @@ export const updateFirebaseDocument = async (
   subOrderId: string,
   params: any,
 ) => {
-  const { txStatus, reviewId, status, foodId, foodImage } = params;
+  const { txStatus, reviewId, status, foodId, foodImage, foodName } = params;
+
   const allowedParams = {
     ...(txStatus && { txStatus }),
     ...(reviewId && { reviewId }),
     ...(status && { status }),
     ...(foodId && { foodId }),
+    ...(foodName && { foodName }),
     ...(foodImage && { foodImage }),
   };
   await updateCollectionDoc(

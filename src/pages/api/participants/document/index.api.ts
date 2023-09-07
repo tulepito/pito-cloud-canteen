@@ -3,8 +3,10 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { HttpMethod } from '@apis/configs';
 import cookies from '@services/cookie';
 import { queryCollectionData } from '@services/firebase';
+import { fetchListing } from '@services/integrationHelper';
 import { handleError } from '@services/sdk';
-import { EParticipantOrderStatus } from '@src/utils/enums';
+import { Listing } from '@src/utils/data';
+import { EImageVariants, EParticipantOrderStatus } from '@src/utils/enums';
 
 import {
   addFirebaseDocument,
@@ -63,7 +65,34 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     case HttpMethod.PUT:
       try {
         const { subOrderId, params } = req.body;
-        await updateFirebaseDocument(subOrderId!, params);
+        const { foodId } = params;
+        let foodName = '';
+        let foodImage = null;
+        if (foodId) {
+          const foodResponse = await fetchListing(
+            foodId,
+            ['images'],
+            [`variants.${EImageVariants.squareSmall2x}`],
+          );
+          const foodListing = Listing(foodResponse);
+          const newFoodImages = foodListing.getImages();
+          foodName = foodListing.getAttributes().title;
+
+          foodImage =
+            newFoodImages.length > 0
+              ? {
+                  ...newFoodImages[0],
+                  id: {
+                    uuid: newFoodImages[0].id.uuid,
+                  },
+                }
+              : null;
+        }
+        await updateFirebaseDocument(subOrderId!, {
+          ...params,
+          ...(foodImage && { foodImage }),
+          ...(foodName && { foodName }),
+        });
         res.json({ message: 'Update document successfully' });
       } catch (error) {
         handleError(res, error);
