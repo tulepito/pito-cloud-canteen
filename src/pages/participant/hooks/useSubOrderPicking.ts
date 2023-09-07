@@ -29,6 +29,13 @@ const useSubOrderPicking = () => {
   const participantPostRatingInProgress = useAppSelector(
     (state) => state.ParticipantOrderList.participantPostRatingInProgress,
   );
+  const pickFoodForSubOrdersInProgress = useAppSelector(
+    (state) => state.ParticipantOrderList.pickFoodForSubOrdersInProgress,
+  );
+
+  const pickFoodForSpecificSubOrderInProgress = useAppSelector(
+    (state) => state.ParticipantOrderList.pickFoodForSpecificSubOrderInProgress,
+  );
 
   const onRejectSelectDish = (params: any) => {
     const { orderId, orderDay, planId } = params;
@@ -59,6 +66,8 @@ const useSubOrderPicking = () => {
     participantPostRatingInProgress,
     updateSubOrderInProgress,
     updateOrderInProgress,
+    pickFoodForSubOrdersInProgress,
+    pickFoodForSpecificSubOrderInProgress,
   };
 };
 

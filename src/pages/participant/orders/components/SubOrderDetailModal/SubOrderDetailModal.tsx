@@ -20,7 +20,7 @@ import { participantOrderManagementThunks } from '@redux/slices/ParticipantOrder
 import { currentUserSelector } from '@redux/slices/user.slice';
 import { participantPaths } from '@src/paths';
 import { CurrentUser } from '@src/utils/data';
-import { EOrderStates } from '@src/utils/enums';
+import { EOrderStates, EParticipantOrderStatus } from '@src/utils/enums';
 import { txIsDelivered } from '@src/utils/transaction';
 import type { TTransaction } from '@src/utils/types';
 
@@ -34,10 +34,24 @@ type TSubOrderDetailModalProps = {
   event: Event;
   openRatingSubOrderModal: () => void;
   from: string;
+  recommendFoodForSpecificSubOrder: (params: {
+    planId: string;
+    orderId: string;
+    subOrderDate: string;
+  }) => void;
+  pickFoodForSpecificSubOrderInProgress?: boolean;
 };
 
 const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
-  const { isOpen, onClose, event, openRatingSubOrderModal, from } = props;
+  const {
+    isOpen,
+    onClose,
+    event,
+    openRatingSubOrderModal,
+    from,
+    recommendFoodForSpecificSubOrder,
+    pickFoodForSpecificSubOrderInProgress,
+  } = props;
   const intl = useIntl();
   const router = useRouter();
   const dispatch = useAppDispatch();
@@ -72,7 +86,7 @@ const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
     (state) => state.ParticipantOrderList.subOrderDocument,
     shallowEqual,
   );
-  const timestamp = last(orderDay.split(' - '));
+  const timestamp = last<string>(orderDay.split(' - '));
   const subOrderTx = useMemo(
     () => subOrderTxs.find((tx) => tx.id.uuid === transactionId),
     [JSON.stringify(subOrderTxs), transactionId],
@@ -93,6 +107,15 @@ const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
     router.push({
       pathname: participantPaths.PlanDetail,
       query: { orderDay: timestamp as string, planId, from },
+    });
+  };
+
+  const onPickForMe = () => {
+    if (status !== EParticipantOrderStatus.empty) return;
+    recommendFoodForSpecificSubOrder({
+      planId,
+      orderId,
+      subOrderDate: timestamp!,
     });
   };
 
@@ -180,6 +203,8 @@ const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
                     onSubmit={onSelectDish}
                     subOrderStatus={status}
                     initialValues={dishSelectionFormInitialValues}
+                    onPickForMe={onPickForMe}
+                    pickForMeInProgress={pickFoodForSpecificSubOrderInProgress}
                   />
                 </div>
               </div>

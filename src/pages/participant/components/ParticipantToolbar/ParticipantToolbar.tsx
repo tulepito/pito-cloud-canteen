@@ -10,6 +10,7 @@ import {
 } from '@components/CalendarDashboard/helpers/constant';
 import useSelectDay from '@components/CalendarDashboard/hooks/useSelectDay';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
+import IconRefreshing from '@components/Icons/IconRefreshing/IconRefreshing';
 import { setItem } from '@helpers/localStorageHelpers';
 import type { TObject } from '@utils/types';
 
@@ -50,6 +51,8 @@ const ParticipantToolbar: React.FC<TToolbarProps> = (props) => {
     isAllowChangePeriod = false,
     date,
     onCustomPeriodClick,
+    onPickForMe,
+    onPickForMeLoading,
   } = props;
   const intl = useIntl();
   const mountedRef = useRef(false);
@@ -121,13 +124,10 @@ const ParticipantToolbar: React.FC<TToolbarProps> = (props) => {
 
   return (
     <div className={css.root}>
-      {/* <Button
-        className={css.pickForMeBtn}
-        variant="secondary"
-        onClick={onPickForMe}>
+      <div className={css.pickForMeBtn} onClick={onPickForMe}>
         <IconRefreshing inProgress={onPickForMeLoading} />
         <FormattedMessage id="Toolbar.action.pickForMe" />
-      </Button> */}
+      </div>
       <div className={css.actions}>
         <div className={css.btnGroup}>
           {views.length > 1 ? (

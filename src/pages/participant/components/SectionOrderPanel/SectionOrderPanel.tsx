@@ -80,7 +80,9 @@ const SectionOrderPanel: React.FC<TSectionOrderPanelProps> = ({
     setIsSubmitSuccess(false);
   };
 
-  const handleAutoSelect = () => {};
+  const handleAutoSelect = () => {
+    dispatch(ParticipantPlanThunks.recommendFoodSubOrders());
+  };
 
   return (
     <div className={css.root}>

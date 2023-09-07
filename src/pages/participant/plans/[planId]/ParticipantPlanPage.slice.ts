@@ -1,18 +1,82 @@
 import { createSlice } from '@reduxjs/toolkit';
+import difference from 'lodash/difference';
 
 import { participantSubOrderAddDocumentApi } from '@apis/firebaseApi';
 import { loadPlanDataApi, updateParticipantOrderApi } from '@apis/index';
+import { recommendFood } from '@pages/participant/orders/OrderList.slice';
 import { createAsyncThunk } from '@redux/redux.helper';
 import {
   shoppingCartActions,
   shoppingCartThunks,
 } from '@redux/slices/shoppingCart.slice';
+import { CurrentUser, Listing } from '@src/utils/data';
+import type { TListing } from '@src/utils/types';
 import { EParticipantOrderStatus } from '@utils/enums';
 import { storableError } from '@utils/errors';
 
 const LOAD_DATA = 'app/ParticipantPlanPage/LOAD_DATA';
 const RELOAD_DATA = 'app/ParticipantPlanPage/RELOAD_DATA';
 const UPDATE_ORDER = 'app/ParticipantPlanPage/UPDATE_ORDER';
+const RECOMMEND_FOOD_SUB_ORDER =
+  'app/ParticipantPlanPage/RECOMMEND_FOOD_SUB_ORDER';
+const RECOMMEND_FOOD_SUB_ORDERS =
+  'app/ParticipantPlanPage/RECOMMEND_FOOD_SUB_ORDERS';
+
+const recommendFoodForShoppingCart = ({
+  plan,
+  subOrderDate,
+  packagePerMember,
+  allergies,
+  plans,
+  dispatch,
+  currentMealId,
+}: {
+  plan: any;
+  subOrderDate: string;
+  packagePerMember: number;
+  allergies: string[];
+  plans: string[];
+  dispatch: any;
+  currentMealId?: string;
+}) => {
+  const subOrder = plan[subOrderDate];
+  const { foodList } = subOrder;
+
+  const suitablePriceFoodList = foodList.filter(
+    (food: TListing) =>
+      Listing(food).getAttributes().price.amount <= packagePerMember,
+  );
+
+  let mostSuitableFood = recommendFood({
+    foodList: suitablePriceFoodList,
+    subOrderFoodIds: suitablePriceFoodList.map((food: TListing) =>
+      Listing(food).getId(),
+    ),
+    allergies,
+  });
+
+  while (
+    currentMealId &&
+    suitablePriceFoodList.length > 1 &&
+    Listing(mostSuitableFood!).getId() === currentMealId
+  ) {
+    mostSuitableFood = recommendFood({
+      foodList: suitablePriceFoodList,
+      subOrderFoodIds: suitablePriceFoodList.map((food: TListing) =>
+        Listing(food).getId(),
+      ),
+      allergies,
+    });
+  }
+
+  dispatch(
+    shoppingCartThunks.addToCart({
+      planId: plans[0],
+      dayId: subOrderDate,
+      mealId: Listing(mostSuitableFood!).getId(),
+    }),
+  );
+};
 
 type TParticipantPlanState = {
   restaurant: any;
@@ -176,7 +240,101 @@ const updateOrder = createAsyncThunk(
   },
 );
 
-export const ParticipantPlanThunks = { loadData, reloadData, updateOrder };
+export const recommendFoodSubOrder = createAsyncThunk(
+  RECOMMEND_FOOD_SUB_ORDER,
+  async (subOrderDate: string, { getState, dispatch }) => {
+    const { currentUser } = getState().user;
+    const { plan, order } = getState().ParticipantPlanPage;
+    const { orders } = getState().shoppingCart;
+    const currentUserGetter = CurrentUser(currentUser!);
+    const { allergies = [] } = currentUserGetter.getPublicData();
+    const orderListing = Listing(order!);
+    const { packagePerMember = 0, plans = [] } = orderListing.getMetadata();
+    const currentMealId =
+      orders[currentUserGetter.getId()]?.[plans[0]]?.[+subOrderDate]?.foodId;
+    recommendFoodForShoppingCart({
+      plan,
+      subOrderDate,
+      packagePerMember,
+      allergies,
+      plans,
+      dispatch,
+      currentMealId,
+    });
+  },
+  {
+    serializeError: storableError,
+  },
+);
+
+const recommendFoodSubOrders = createAsyncThunk(
+  RECOMMEND_FOOD_SUB_ORDERS,
+  async (_, { getState, dispatch }) => {
+    const { currentUser } = getState().user;
+    const { plan, order } = getState().ParticipantPlanPage;
+    const { orders } = getState().shoppingCart;
+    const currentUserGetter = CurrentUser(currentUser!);
+    const currentUserId = currentUserGetter.getId();
+    const { allergies = [] } = currentUserGetter.getPublicData();
+    const orderListing = Listing(order!);
+    const { packagePerMember = 0, plans = [] } = orderListing.getMetadata();
+    const subOrderDates = Object.keys(plan);
+    const notJoinedDay = Object.keys(plan).reduce(
+      (acc: any, subOrderDate: string) => {
+        const { memberOrder } = plan[subOrderDate];
+        const { status } = memberOrder[currentUserId] || {};
+        if (status === EParticipantOrderStatus.notJoined) {
+          return [...acc, subOrderDate];
+        }
+
+        return acc;
+      },
+      [],
+    );
+    const notJoinedDayFromOrderShoppingCart = Object.keys(
+      orders[currentUserId]?.[plans[0]] || {},
+    ).reduce((acc: any, subOrderDate: string) => {
+      const { foodId } =
+        orders[currentUserId]?.[plans[0]]?.[+subOrderDate] || {};
+      if (foodId === EParticipantOrderStatus.notJoined) {
+        return [...acc, subOrderDate];
+      }
+
+      return acc;
+    }, []);
+    const mergedNotJoinedDay = [
+      ...notJoinedDay,
+      ...notJoinedDayFromOrderShoppingCart,
+    ];
+
+    const recommendSubOrderDays = difference(subOrderDates, mergedNotJoinedDay);
+
+    recommendSubOrderDays.forEach((subOrderDate: string) => {
+      const currentMealId =
+        orders[currentUserGetter.getId()]?.[plans[0]]?.[+subOrderDate]?.foodId;
+      recommendFoodForShoppingCart({
+        plan,
+        subOrderDate,
+        packagePerMember,
+        allergies,
+        plans,
+        dispatch,
+        currentMealId,
+      });
+    });
+  },
+  {
+    serializeError: storableError,
+  },
+);
+
+export const ParticipantPlanThunks = {
+  loadData,
+  reloadData,
+  updateOrder,
+  recommendFoodSubOrder,
+  recommendFoodSubOrders,
+};
 
 const participantPlanSlice = createSlice({
   name: 'ParticipantPlanPage',

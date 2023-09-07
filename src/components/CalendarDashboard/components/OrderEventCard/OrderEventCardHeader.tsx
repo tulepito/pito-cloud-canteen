@@ -3,6 +3,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { MORNING_SESSION } from '@components/CalendarDashboard/helpers/constant';
 import { isOver } from '@helpers/orderHelper';
+import { EParticipantOrderStatus } from '@src/utils/enums';
 
 import css from './OrderEventCard.module.scss';
 
@@ -15,11 +16,16 @@ const OrderEventCardHeader: React.FC<TOrderEventCardHeaderProps> = ({
 }) => {
   const intl = useIntl();
   const startTime = event.resource.deliveryHour;
-  const { daySession = MORNING_SESSION, dishSelection } = event.resource;
+  const {
+    daySession = MORNING_SESSION,
+    dishSelection,
+    status,
+  } = event.resource;
   const { orderColor } = event?.resource || {};
   const isFoodPicked = !!dishSelection?.dishSelection;
   const isExpired = isOver(event.resource?.expiredTime);
-  const isExpiredToPickFood = isExpired && !isFoodPicked;
+  const isNotJoined = status === EParticipantOrderStatus.notJoined;
+  const isExpiredToPickFood = isExpired && !isFoodPicked && !isNotJoined;
   const headerStyles = {
     backgroundColor: isExpiredToPickFood ? '#8C8C8C' : orderColor,
   };

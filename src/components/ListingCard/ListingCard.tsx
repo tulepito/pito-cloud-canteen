@@ -1,14 +1,18 @@
 import { useRef } from 'react';
 import classNames from 'classnames';
 
-import Badge from '@components/Badge/Badge';
+import Badge, { EBadgeType } from '@components/Badge/Badge';
 import IconCheckmarkWithCircle from '@components/Icons/IconCheckmark/IconCheckmarkWithCircle';
 import IconPlusDish from '@components/Icons/IconPlusDish/IconPlusDish';
 import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { shoppingCartThunks } from '@redux/slices/shoppingCart.slice';
-import { EImageVariants, SPECIAL_DIET_OPTIONS } from '@src/utils/enums';
+import {
+  EImageVariants,
+  FOOD_TYPE_OPTIONS,
+  getLabelByKey,
+} from '@src/utils/enums';
 import { CurrentUser, Listing } from '@utils/data';
 
 import ListingDetailModal from './ListingDetailModal';
@@ -23,6 +27,8 @@ type TListCardProps = {
   isSelected?: boolean;
   selectDisabled?: boolean;
   isOrderAlreadyStarted: boolean;
+  getNextSubOrderDay: (dayId: string) => string;
+  onSelectTab: (item: any) => void;
 };
 
 const ListingCard: React.FC<TListCardProps> = ({
@@ -33,6 +39,8 @@ const ListingCard: React.FC<TListCardProps> = ({
   isSelected,
   selectDisabled,
   isOrderAlreadyStarted,
+  getNextSubOrderDay,
+  onSelectTab,
 }) => {
   const detailModalController = useBoolean();
   const requirementRef = useRef<string | undefined>();
@@ -46,7 +54,7 @@ const ListingCard: React.FC<TListCardProps> = ({
   const requirement = requirementRef.current;
   const mealId = listing?.id?.uuid;
   const { title, description } = Listing(listing).getAttributes();
-  const { specialDiets = [], allergicIngredients = [] } =
+  const { allergicIngredients = [], foodType } =
     Listing(listing).getPublicData();
   const listingImage = Listing(listing).getImages()[0];
   const dispatch = useAppDispatch();
@@ -56,18 +64,18 @@ const ListingCard: React.FC<TListCardProps> = ({
       dispatch(
         shoppingCartThunks.addToCart({ planId, dayId, mealId, requirement }),
       );
+      const nextDate = getNextSubOrderDay(dayId);
+      onSelectTab({ id: nextDate });
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth',
+      });
     }
   };
   const handleRemoveFromCard = () => {
     if (isOrderAlreadyStarted) return;
     dispatch(shoppingCartThunks.removeFromCart({ planId, dayId }));
   };
-
-  const badges = specialDiets
-    .slice(0, 3)
-    .map((diet: string) =>
-      SPECIAL_DIET_OPTIONS.find((item) => item.key === diet),
-    );
 
   const classes = classNames(css.root, className);
 
@@ -104,14 +112,11 @@ const ListingCard: React.FC<TListCardProps> = ({
           <div className={css.listingCardInfo} onClick={viewListingDetail}>
             <h6 className={css.title}>{title}</h6>
             <div className={css.categories}>
-              {badges.map((badge: any) => (
-                <Badge
-                  className={css.badge}
-                  key={badge?.key}
-                  label={badge?.label}
-                  type={badge?.badgeType}
-                />
-              ))}
+              <Badge
+                className={css.badge}
+                label={getLabelByKey(FOOD_TYPE_OPTIONS, foodType)}
+                type={EBadgeType.success}
+              />
             </div>
             <p className={css.description}>{description}</p>
           </div>

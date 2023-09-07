@@ -2,6 +2,8 @@ import classNames from 'classnames';
 
 import IconClose from '@components/Icons/IconClose/IconClose';
 import IconRefreshing from '@components/Icons/IconRefreshing/IconRefreshing';
+import { useAppDispatch } from '@hooks/reduxHooks';
+import { ParticipantPlanThunks } from '@pages/participant/plans/[planId]/ParticipantPlanPage.slice';
 
 import css from './CartItem.module.scss';
 
@@ -10,6 +12,7 @@ type TCartItemProps = {
   label: string;
   value: string;
   removeDisabled?: boolean;
+  subOrderDate?: string;
   onRemove: () => void;
 };
 
@@ -18,8 +21,15 @@ const CartItem: React.FC<TCartItemProps> = ({
   label,
   value,
   removeDisabled = false,
+  subOrderDate,
   onRemove,
 }) => {
+  const dispatch = useAppDispatch();
+
+  const handleAutoSelect = () => {
+    dispatch(ParticipantPlanThunks.recommendFoodSubOrder(subOrderDate!));
+  };
+
   return (
     <div className={classNames(css.root, className)}>
       <div className={css.label}>
@@ -29,7 +39,7 @@ const CartItem: React.FC<TCartItemProps> = ({
         )}
       </div>
       <div className={css.value}>
-        <IconRefreshing className={css.icon} />
+        <IconRefreshing className={css.icon} onClick={handleAutoSelect} />
         <span>{value}</span>
       </div>
     </div>
