@@ -15,11 +15,23 @@
   }
 
   & > div:nth-of-type(1) {
-    flex-basis: 30px;
+    flex-basis: 40px;
+    font-size: 14px;
+
+    @include viewportLarge {
+      flex-basis: 30px;
+      font-size: 16px;
+    }
   }
   & > div:nth-of-type(2) {
-    max-width: 200px;
-    flex-grow: 1;
+    flex-basis: 40%;
+    font-size: 14px;
+
+    @include viewportLarge {
+      max-width: 200px;
+      flex-grow: 1;
+      font-size: 16px;
+    }
 
     @include viewportLargeWithPaddings {
       max-width: 250px;
@@ -30,11 +42,21 @@
     }
   }
   & > div:nth-of-type(3) {
-    flex-basis: 50px;
+    flex-basis: 40%;
+    font-size: 14px;
+
+    @include viewportLarge {
+      flex-basis: 50px;
+      font-size: 16px;
+    }
   }
   & > div:nth-of-type(4) {
-    text-align: right;
-    flex-basis: 15%;
+    flex-basis: 20px;
+
+    @include viewportLarge {
+      text-align: right;
+      flex-basis: 15%;
+    }
   }
   & > div:nth-of-type(5) {
     text-align: right;
@@ -48,12 +70,53 @@
 .tableContainer {
   border-radius: 8px;
   overflow: hidden;
+  padding: 0 16px;
+
+  @include viewportLarge {
+    padding: 0;
+  }
 
   .tableHead {
     color: $neutralGray1;
     background-color: $neutralGray5;
     @include textTemplate(14px, 700, 20px);
     @include tableColumnsLayout;
+    display: none;
+
+    @include viewportLarge {
+      display: flex;
+    }
+  }
+
+  .tableHeadMobile {
+    color: $neutralGray1;
+    background-color: $neutralGray4;
+    @include textTemplate(14px, 700, 20px);
+    @include flexAlign(center);
+    gap: 8px;
+    padding: 10px 12px;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+
+    @include viewportLarge {
+      display: none;
+    }
+
+    & > div:nth-of-type(1) {
+      flex-basis: 40px;
+    }
+
+    & > div:nth-of-type(2) {
+      flex-basis: 40%;
+    }
+
+    & > div:nth-of-type(3) {
+      flex-basis: 40%;
+    }
+
+    & > div:nth-of-type(4) {
+      flex-basis: 20px;
+    }
   }
 
   .tableBody {
@@ -71,18 +134,44 @@
 
       .row {
         & > div:nth-of-type(1) {
-          flex-basis: 72px;
+          flex-basis: 40px;
+          font-size: 12px;
+
+          @include viewportLarge {
+            flex-basis: 72px;
+            font-size: 14px;
+          }
         }
         & > div:nth-of-type(2) {
-          max-width: 150px;
+          flex-basis: 40%;
+          font-size: 12px;
+
+          @include viewportLarge {
+            max-width: 150px;
+            font-size: 14px;
+          }
 
           @include viewportSLarge {
             max-width: 180px;
           }
         }
         & > div:nth-of-type(3) {
-          flex-basis: 65%;
+          flex-basis: 40%;
           @include lineClamp(2);
+          font-size: 12px;
+
+          @include viewportLarge {
+            flex-basis: 65%;
+            font-size: 14px;
+          }
+        }
+
+        & > div:nth-of-type(4) {
+          flex-basis: 20px;
+
+          // @include viewportLarge {
+          //   flex-basis: 15%;
+          // }
         }
       }
 
@@ -133,17 +222,30 @@
 .root {
   margin-top: 28px;
 
-  .goBackBtn {
-    padding: 0;
-    display: flex;
-    flex-direction: row;
-    column-gap: 4px;
-    align-items: center;
-    @include textTemplate(16px, 700, 24px);
+  .goBackBtnWrapper {
+    padding: 8px 16px;
+    border-bottom: 1px solid $neutralGray3;
+    .goBackBtn {
+      padding: 0;
+      display: flex;
+      flex-direction: row;
+      column-gap: 4px;
+      min-height: 32px;
+      align-items: center;
+      @include textTemplate(16px, 700, 24px);
 
-    .arrowIcon {
-      width: 20px;
-      height: 20px;
+      .arrowIcon {
+        width: 20px;
+        height: 20px;
+      }
+
+      .goBackText {
+        display: none;
+
+        @include viewportLarge {
+          display: block;
+        }
+      }
     }
   }
 
@@ -153,17 +255,27 @@
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
+    padding: 0 16px;
+
+    @include viewportLarge {
+      padding: 0;
+    }
+
     .title {
       @include textTemplate(18px, 700, 24px);
     }
 
     .downloadBtn {
-      padding: 10px 20px;
-      display: flex;
-      flex-direction: row;
-      column-gap: 8px;
-      align-items: center;
-      @include textTemplate(16px, 700, 24px);
+      display: none;
+
+      @include viewportLarge {
+        padding: 10px 20px;
+        display: flex;
+        flex-direction: row;
+        column-gap: 8px;
+        align-items: center;
+        @include textTemplate(16px, 700, 24px);
+      }
     }
   }
 

@@ -8,21 +8,24 @@ import uniqBy from 'lodash/uniqBy';
 import { useRouter } from 'next/router';
 
 import Button from '@components/Button/Button';
-import Modal from '@components/Modal/Modal';
+import IconArrow from '@components/Icons/IconArrow/IconArrow';
+import PopupModal from '@components/PopupModal/PopupModal';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { groupFoodOrderByDate } from '@helpers/order/orderDetailHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
+import { useViewport } from '@hooks/useViewport';
 import {
   NotificationActions,
   NotificationThunks,
 } from '@redux/slices/notification.slice';
-import { orderManagementThunks } from '@redux/slices/OrderManagement.slice';
+import { partnerPaths } from '@src/paths';
 import { Listing } from '@src/utils/data';
 import { formatTimestamp } from '@src/utils/dates';
 import { ENotificationType, EOrderType } from '@src/utils/enums';
 import type { TListing, TObject } from '@src/utils/types';
 
+import MobileSubOrderSummary from './components/MobileSubOrderSummary/MobileSubOrderSummary';
 import SubOrderCart from './components/SubOrderCart';
 import SubOrderDetail from './components/SubOrderDetail';
 import SubOrderInfo from './components/SubOrderInfo';
@@ -56,6 +59,7 @@ const PartnerSubOrderDetailPage: React.FC<
   const [viewMode, setViewMode] = useState(
     EPartnerSubOrderDetailPageViewMode.summary,
   );
+  const { isMobileLayout } = useViewport();
 
   const {
     isReady,
@@ -148,10 +152,13 @@ const PartnerSubOrderDetailPage: React.FC<
     updateOrderModalContainer.setFalse();
   };
 
+  const onGoBack = () => {
+    router.push(partnerPaths.ManageOrders);
+  };
+
   useEffect(() => {
     if (subOrderId && isReady) {
       dispatch(PartnerSubOrderDetailThunks.loadData({ orderId, date }));
-      dispatch(orderManagementThunks.loadData(orderId));
     }
   }, [isReady, subOrderId]);
 
@@ -195,24 +202,41 @@ const PartnerSubOrderDetailPage: React.FC<
 
   return (
     <div className={css.root}>
-      <SubOrderTitle />
+      <RenderWhen condition={!isMobileLayout || isSummaryViewMode}>
+        <>
+          <div className={css.goBackContainer} onClick={onGoBack}>
+            <IconArrow direction="left" />
+          </div>
+          <SubOrderTitle />
+        </>
+      </RenderWhen>
       <RenderWhen condition={isSummaryViewMode}>
         <div className={css.container}>
           <div className={css.leftPart}>
-            <SubOrderInfo />
-            <SubOrderSummary onChangeViewMode={handleChangeViewMode} />
+            <SubOrderInfo inProgress={fetchOrderInProgress} />
+            <div className={css.mobileSubOrderCartWrapper}>
+              <SubOrderCart
+                title="Thực đơn phục vụ"
+                inProgress={fetchOrderInProgress}
+              />
+            </div>
+            <div className={css.mobileSubOrderSummaryWrapper}>
+              <MobileSubOrderSummary onChangeViewMode={handleChangeViewMode} />
+            </div>
+            <div className={css.subOrderSummaryWrapper}>
+              <SubOrderSummary onChangeViewMode={handleChangeViewMode} />
+            </div>
             <SubOrderNote />
           </div>
           <div className={css.rightPart}>
-            <SubOrderCart />
+            <SubOrderCart inProgress={fetchOrderInProgress} />
           </div>
         </div>
 
         <RenderWhen condition={!isEmpty(newUpdatedOrderNotification)}>
-          <Modal
+          <PopupModal
             isOpen={!fetchOrderInProgress && updateOrderModalContainer.value}
             handleClose={handleCloseModal}
-            shouldHideIconClose
             className={css.updatedOrderModal}
             headerClassName={css.updatedOrderModalHeader}
             containerClassName={css.updatedOrderModalContainer}>
@@ -283,7 +307,7 @@ const PartnerSubOrderDetailPage: React.FC<
                 </Button>
               </div>
             </div>
-          </Modal>
+          </PopupModal>
         </RenderWhen>
 
         <RenderWhen.False>

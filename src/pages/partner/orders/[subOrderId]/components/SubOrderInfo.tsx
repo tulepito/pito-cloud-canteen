@@ -1,6 +1,8 @@
 import { useIntl } from 'react-intl';
+import Skeleton from 'react-loading-skeleton';
 import { useRouter } from 'next/router';
 
+import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { Listing, User } from '@src/utils/data';
 import { formatTimestamp } from '@src/utils/dates';
@@ -8,9 +10,11 @@ import type { TListing } from '@src/utils/types';
 
 import css from './SubOrderInfo.module.scss';
 
-type TSubOrderInfoProps = {};
+type TSubOrderInfoProps = {
+  inProgress: boolean;
+};
 
-const SubOrderInfo: React.FC<TSubOrderInfoProps> = () => {
+const SubOrderInfo: React.FC<TSubOrderInfoProps> = ({ inProgress }) => {
   const intl = useIntl();
   const router = useRouter();
   const order = useAppSelector((state) => state.PartnerSubOrderDetail.order);
@@ -41,30 +45,37 @@ const SubOrderInfo: React.FC<TSubOrderInfoProps> = () => {
       <div className={css.title}>
         {intl.formatMessage({ id: 'SubOrderInfo.title' })}
       </div>
-      <div className={css.row}>
-        <div className={css.label}>
-          {intl.formatMessage({ id: 'SubOrderInfo.companyLabel' })}
+      <RenderWhen condition={!inProgress}>
+        <div className={css.inforWrapper}>
+          <div className={css.row}>
+            <div className={css.label}>
+              {intl.formatMessage({ id: 'SubOrderInfo.companyLabel' })}
+            </div>
+            <div className={css.value}>{companyName}</div>
+          </div>
+          <div className={css.row}>
+            <div className={css.label}>
+              {intl.formatMessage({ id: 'SubOrderInfo.deliveryAddressLabel' })}
+            </div>
+            <div className={css.value}>{deliveryAddress?.address || ''}</div>
+          </div>
+          <div className={css.row}>
+            <div className={css.label}>
+              {intl.formatMessage({ id: 'SubOrderInfo.deliveryTimeLabel' })}
+            </div>
+            <div className={css.value}>{formattedDeliveryHour}</div>
+          </div>
+          <div className={css.row}>
+            <div className={css.label}>
+              {intl.formatMessage({ id: 'SubOrderInfo.staffNameLabel' })}
+            </div>
+            <div className={css.value}>{staffName}</div>
+          </div>
         </div>
-        <div className={css.value}>{companyName}</div>
-      </div>
-      <div className={css.row}>
-        <div className={css.label}>
-          {intl.formatMessage({ id: 'SubOrderInfo.deliveryAddressLabel' })}
-        </div>
-        <div className={css.value}>{deliveryAddress?.address || ''}</div>
-      </div>
-      <div className={css.row}>
-        <div className={css.label}>
-          {intl.formatMessage({ id: 'SubOrderInfo.deliveryTimeLabel' })}
-        </div>
-        <div className={css.value}>{formattedDeliveryHour}</div>
-      </div>
-      <div className={css.row}>
-        <div className={css.label}>
-          {intl.formatMessage({ id: 'SubOrderInfo.staffNameLabel' })}
-        </div>
-        <div className={css.value}>{staffName}</div>
-      </div>
+        <RenderWhen.False>
+          <Skeleton className={css.loading} />
+        </RenderWhen.False>
+      </RenderWhen>
     </div>
   );
 };

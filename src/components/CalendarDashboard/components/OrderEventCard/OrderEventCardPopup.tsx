@@ -13,8 +13,7 @@ import { participantOrderManagementThunks } from '@redux/slices/ParticipantOrder
 import { currentUserSelector } from '@redux/slices/user.slice';
 import { participantPaths } from '@src/paths';
 import { EOrderStates, EParticipantOrderStatus } from '@src/utils/enums';
-import { txIsDelivered } from '@src/utils/transaction';
-import type { TTransaction } from '@src/utils/types';
+import { ETransition } from '@src/utils/transaction';
 import { CurrentUser } from '@utils/data';
 
 import type { TEventStatus } from '../../helpers/types';
@@ -31,7 +30,7 @@ type TOrderEventCardPopupProps = {
   status?: TEventStatus;
   isExpired: boolean;
   subOrderDocument: any;
-  subOrderTx?: TTransaction;
+  lastTransition: string;
   fetchSubOrderTxInProgress: boolean;
   fetchSubOrderDocumentInProgress: boolean;
   openRatingSubOrderModal: () => void;
@@ -45,7 +44,7 @@ const OrderEventCardPopup: React.FC<TOrderEventCardPopupProps> = ({
   status,
   isExpired = false,
   subOrderDocument,
-  subOrderTx,
+  lastTransition,
   fetchSubOrderTxInProgress,
   fetchSubOrderDocumentInProgress,
   openRatingSubOrderModal,
@@ -69,7 +68,6 @@ const OrderEventCardPopup: React.FC<TOrderEventCardPopupProps> = ({
     deliveryHour: startTime,
     isOrderStarted = false,
     orderState,
-    subOrderTx: subOrderTxFromEvent,
   } = event.resource;
   const isOrderCancelled = orderState === EOrderStates.canceled;
 
@@ -149,7 +147,7 @@ const OrderEventCardPopup: React.FC<TOrderEventCardPopupProps> = ({
         {status && (
           <OrderEventCardStatus
             status={status}
-            subOrderTx={subOrderTxFromEvent}
+            lastTransition={lastTransition}
           />
         )}
       </div>
@@ -188,7 +186,7 @@ const OrderEventCardPopup: React.FC<TOrderEventCardPopupProps> = ({
       <RenderWhen
         condition={
           !reviewId &&
-          txIsDelivered(subOrderTx as TTransaction) &&
+          lastTransition === ETransition.COMPLETE_DELIVERY &&
           status === EParticipantOrderStatus.joined
         }>
         <div className={css.ratingWrapper}>

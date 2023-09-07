@@ -1,3 +1,6 @@
+import chunk from 'lodash/chunk';
+import flatten from 'lodash/flatten';
+
 import { getIntegrationSdk } from '@services/sdk';
 import type { TListing, TObject } from '@src/utils/types';
 import { denormalisedResponseEntities, Listing } from '@utils/data';
@@ -133,4 +136,18 @@ export const prepareNewOrderDetailPlan = ({
   );
 
   return newOrderDetail;
+};
+
+export const fetchListingsByChunkedIds = async (ids: string[], sdk: any) => {
+  const listingsResponse = await Promise.all(
+    chunk<string>(ids, 100).map(async (_ids) => {
+      const response = await sdk.listings.query({
+        ids: _ids,
+      });
+
+      return denormalisedResponseEntities(response);
+    }),
+  );
+
+  return flatten(listingsResponse);
 };

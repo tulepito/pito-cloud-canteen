@@ -9,23 +9,19 @@ import AlertModal from '@components/Modal/AlertModal';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { OrderDetailThunks } from '@pages/admin/order/[orderId]/OrderDetail.slice';
-import { Transaction } from '@src/utils/data';
-import {
-  ETransition,
-  txIsCanceled,
-  txIsCompleted,
-  txIsDelivering,
-  txIsInitiated,
-} from '@src/utils/transaction';
-import type { TTransaction } from '@src/utils/types';
+import { ETransition } from '@src/utils/transaction';
 
 import css from './StateItemTooltip.module.scss';
 
 type TStateItemTooltipProps = {
-  tx: TTransaction;
+  lastTransition: string;
+  transactionId: string;
 };
 
-const StateItemTooltip: React.FC<TStateItemTooltipProps> = ({ tx }) => {
+const StateItemTooltip: React.FC<TStateItemTooltipProps> = ({
+  lastTransition,
+  transactionId,
+}) => {
   const dispatch = useAppDispatch();
   const transitInProgress = useAppSelector(
     (state) => state.OrderDetail.transitInProgress,
@@ -35,8 +31,6 @@ const StateItemTooltip: React.FC<TStateItemTooltipProps> = ({ tx }) => {
   // const failedController = useBoolean();
   const confirmCancelController = useBoolean();
   const canceledController = useBoolean();
-
-  const transactionId = Transaction(tx).getId();
 
   const transitTx = (transition: ETransition) => async () => {
     await dispatch(
@@ -65,23 +59,23 @@ const StateItemTooltip: React.FC<TStateItemTooltipProps> = ({ tx }) => {
       return;
     }
 
-    if (txIsInitiated(tx)) {
+    if (lastTransition === ETransition.INITIATE_TRANSACTION) {
       canceledController.setTrue();
       deliveringController.setTrue();
-    } else if (txIsDelivering(tx)) {
+    } else if (lastTransition === ETransition.START_DELIVERY) {
       deliveringController.setFalse();
       deliveredController.setTrue();
       canceledController.setFalse();
-    } else if (txIsCompleted(tx)) {
+    } else if (lastTransition === ETransition.COMPLETE_DELIVERY) {
       deliveredController.setFalse();
       deliveringController.setFalse();
-    } else if (txIsCanceled(tx)) {
+    } else if (lastTransition === ETransition.OPERATOR_CANCEL_PLAN) {
       deliveringController.setFalse();
       deliveredController.setFalse();
       canceledController.setFalse();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [transitInProgress, JSON.stringify(tx)]);
+  }, [transitInProgress, lastTransition]);
 
   return (
     <div className={css.root}>

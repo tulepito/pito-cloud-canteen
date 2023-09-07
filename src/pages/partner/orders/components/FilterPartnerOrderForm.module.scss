@@ -16,15 +16,28 @@
 
     .fieldContainerRow {
       display: flex;
-      row-gap: 8px;
+      gap: 8px;
       flex-direction: row;
-      max-width: 300px;
       justify-content: space-between;
 
-      & * {
-        flex-basis: 132px;
+      @include viewportLarge {
+        max-width: 300px;
+
+        & * {
+          flex-basis: 132px;
+        }
       }
     }
+  }
+}
+
+.fieldCheckboxContainer {
+  .label {
+    @include textTemplate(14px, $fontWeightSemiBold, 20px);
+  }
+
+  .checkboxGroup {
+    @include textTemplate(14px, $fontWeightRegular, 24px);
   }
 }
 
@@ -33,7 +46,15 @@
   @include textTemplate(14px, 600, 20px);
 }
 
+.btns {
+  @include flexAlign(center);
+  gap: 16px;
+}
+
+.clearFilterBtn {
+  width: 100%;
+}
 .submitBtn {
-  width: 160px;
+  width: 100%;
   margin: 0 auto;
 }

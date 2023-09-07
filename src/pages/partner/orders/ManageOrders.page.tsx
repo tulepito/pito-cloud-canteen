@@ -3,6 +3,7 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 import React, { useEffect, useMemo, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
+import { isEmpty } from 'lodash';
 import { DateTime } from 'luxon';
 import { useRouter } from 'next/router';
 
@@ -12,21 +13,29 @@ import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import IconFilter from '@components/Icons/IconFilter/IconFilter';
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import NamedLink from '@components/NamedLink/NamedLink';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
+import SlideModal from '@components/SlideModal/SlideModal';
 import SubOrderBadge from '@components/SubOrderBadge/SubOrderBadge';
 import type { TColumn } from '@components/Table/Table';
 import { TableForm } from '@components/Table/Table';
 import Tooltip from '@components/Tooltip/Tooltip';
 import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
 import { parseThousandNumber } from '@helpers/format';
-import { calculateSubOrderPrice } from '@helpers/orderHelper';
+import { calculatePriceQuotationPartner } from '@helpers/order/cartInfoHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import useBoolean from '@hooks/useBoolean';
+import { useViewport } from '@hooks/useViewport';
+import EmptySubOrder from '@pages/participant/orders/components/EmptySubOrder/EmptySubOrder';
+import { currentUserSelector } from '@redux/slices/user.slice';
 import { partnerPaths } from '@src/paths';
+import { CurrentUser } from '@src/utils/data';
 import { formatTimestamp } from '@src/utils/dates';
-import { EOrderDraftStates, EOrderType } from '@utils/enums';
+import { EOrderDraftStates, EPartnerVATSetting } from '@utils/enums';
 import type { TObject, TTableSortValue } from '@utils/types';
 
 import type { TFilterPartnerOrderFormValues } from './components/FilterPartnerOrderForm';
 import FilterPartnerOrderForm from './components/FilterPartnerOrderForm';
+import PartnerSubOrderCard from './components/PartnerSubOrderCard/PartnerSubOrderCard';
 import {
   PartnerManageOrdersActions,
   PartnerManageOrdersThunks,
@@ -104,8 +113,8 @@ const TABLE_COLUMN: TColumn[] = [
   {
     key: 'state',
     label: 'Trạng thái',
-    render: ({ transaction = {} }: TObject) => {
-      return <SubOrderBadge transaction={transaction} />;
+    render: ({ lastTransition }: TObject) => {
+      return <SubOrderBadge lastTransition={lastTransition} />;
     },
   },
   {
@@ -124,34 +133,48 @@ const TABLE_COLUMN: TColumn[] = [
   },
 ];
 
-const parseEntitiesToTableData = (subOrders: TObject[]) => {
+const parseEntitiesToTableData = (
+  subOrders: TObject[],
+  restaurantId: string,
+) => {
   return subOrders.map((entity) => {
     const {
       orderId,
       date,
       companyName,
       orderTitle,
-      orderType = EOrderType.group,
       staffName,
       startDate,
       endDate,
       deliveryHour,
-      memberOrders = {},
       restaurant,
-      lineItems = [],
-      transaction,
+      lastTransition,
       isPaid,
+      quotation,
+      serviceFees,
+      orderVATPercentage,
+      vatSettings,
     } = entity;
     const dayIndex = new Date(Number(date)).getDay();
 
-    const { totalPrice } = calculateSubOrderPrice({
-      orderType,
-      data: {
-        memberOrders,
-        restaurant,
-        lineItems,
-      },
-    });
+    let totalPrice = 0;
+    if (!isEmpty(quotation)) {
+      if (!isEmpty(quotation[restaurant.id]?.quotation)) {
+        const partnerVATSetting =
+          vatSettings?.[restaurantId!] || EPartnerVATSetting.vat;
+
+        const partnerQuotationBySubOrderDate = calculatePriceQuotationPartner({
+          quotation: quotation[restaurant.id].quotation,
+          serviceFeePercentage: serviceFees[restaurant.id],
+          currentOrderVATPercentage: orderVATPercentage,
+          subOrderDate: date,
+          shouldSkipVAT: partnerVATSetting === EPartnerVATSetting.direct,
+        });
+
+        const { totalWithVAT } = partnerQuotationBySubOrderDate;
+        totalPrice = totalWithVAT;
+      }
+    }
 
     const subOrderTitle = `${orderTitle}-${dayIndex > 0 ? dayIndex : 7}`;
     const formattedDeliveryHour = `${deliveryHour}`;
@@ -174,7 +197,7 @@ const parseEntitiesToTableData = (subOrders: TObject[]) => {
         endDate: endDate ? formatTimestamp(endDate) : '',
         state: EOrderDraftStates.pendingApproval,
         deliveryHour: formattedDeliveryHour,
-        transaction,
+        lastTransition,
         isPaid,
       },
     };
@@ -210,6 +233,8 @@ const sortOrders = ({ columnName, type }: TTableSortValue, data: any) => {
 const ManageOrdersPage = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
+  const { isMobileLayout } = useViewport();
+  const filterPartnerSubOrderModalController = useBoolean();
   // eslint-disable-next-line @typescript-eslint/naming-convention
   const {
     query: { page = 1, name, subOrderId, startTime, endTime, status },
@@ -223,6 +248,9 @@ const ManageOrdersPage = () => {
   const currentSubOrders = useAppSelector(
     (state) => state.PartnerManageOrders.currentSubOrders,
   );
+  const allSubOrders = useAppSelector(
+    (state) => state.PartnerManageOrders.allSubOrders,
+  );
   const pagination = useAppSelector(
     (state) => state.PartnerManageOrders.pagination,
   );
@@ -232,7 +260,13 @@ const ManageOrdersPage = () => {
   const fetchOrderError = useAppSelector(
     (state) => state.PartnerManageOrders.fetchOrderError,
   );
-  const dataTable = parseEntitiesToTableData(currentSubOrders);
+  const currentUser = useAppSelector(currentUserSelector);
+  const currentUserGetter = CurrentUser(currentUser);
+  const { restaurantListingId } = currentUserGetter.getMetadata();
+  const dataTable = parseEntitiesToTableData(
+    isMobileLayout ? allSubOrders : currentSubOrders,
+    restaurantListingId,
+  );
 
   const sortedData = sortValue ? sortOrders(sortValue, dataTable) : dataTable;
 
@@ -242,7 +276,7 @@ const ManageOrdersPage = () => {
       subOrderId: subOrderId as string,
       subOrderStartTime: Number(startTime || 0),
       subOrderEndTime: Number(endTime || 0),
-      subOrderStatus: status as string,
+      subOrderStatus: ((status as string) || '').split(','),
     }),
     [name, subOrderId, startTime, endTime, status],
   );
@@ -262,26 +296,33 @@ const ManageOrdersPage = () => {
   } else if (currentSubOrders?.length > 0) {
     content = (
       <>
-        <TableForm
-          columns={TABLE_COLUMN}
-          data={sortedData}
-          pagination={pagination}
-          paginationPath={partnerPaths.ManageOrders}
-          shouldReplacePathWhenChangePage
-          tableBodyCellClassName={css.bodyCell}
-          tableHeadCellClassName={css.headCell}
-          handleSort={handleSort}
-          sortValue={sortValue}
-          tableWrapperClassName={css.tableWrapper}
-          tableClassName={css.table}
-        />
+        <div className={css.mobileContentWrapper}>
+          {sortedData.map((item: TObject) => (
+            <PartnerSubOrderCard key={item.key} data={item.data} />
+          ))}
+        </div>
+        <div className={css.desktopContentWrapper}>
+          <TableForm
+            columns={TABLE_COLUMN}
+            data={sortedData}
+            pagination={pagination}
+            paginationPath={partnerPaths.ManageOrders}
+            shouldReplacePathWhenChangePage
+            tableBodyCellClassName={css.bodyCell}
+            tableHeadCellClassName={css.headCell}
+            handleSort={handleSort}
+            sortValue={sortValue}
+            tableWrapperClassName={css.tableWrapper}
+            tableClassName={css.table}
+          />
+        </div>
       </>
     );
   } else {
     content = (
-      <p>
-        <FormattedMessage id="ManageOrders.noResults" />
-      </p>
+      <div className={css.emptyWrapper}>
+        <EmptySubOrder />
+      </div>
     );
   }
 
@@ -298,9 +339,16 @@ const ManageOrdersPage = () => {
         ...(name ? { name } : {}),
         ...(startTime ? { startTime } : {}),
         ...(endTime ? { endTime } : {}),
-        ...(status ? { status } : {}),
+        ...(status ? { status: status.join(',') } : {}),
         ...(subOrderId ? { subOrderId } : {}),
       },
+    });
+  };
+
+  const handleClearFilter = () => {
+    router.replace({
+      pathname: partnerPaths.ManageOrders,
+      query: {},
     });
   };
 
@@ -314,10 +362,20 @@ const ManageOrdersPage = () => {
           ...(endTime ? { endTime } : {}),
           ...(status ? { status } : {}),
           ...(subOrderId ? { subOrderId } : {}),
+          isMobile: isMobileLayout,
         }),
       );
     }
-  }, [isReady, page, name, subOrderId, startTime, endTime, status]);
+  }, [
+    isReady,
+    page,
+    name,
+    subOrderId,
+    startTime,
+    endTime,
+    status,
+    isMobileLayout,
+  ]);
 
   useEffect(() => {
     if (isFirstLoad && isReady) {
@@ -342,6 +400,14 @@ const ManageOrdersPage = () => {
         <h1 className={css.title}>
           <FormattedMessage id="ManageOrders.title" />
         </h1>
+        <Button
+          variant="secondary"
+          className={css.mobileFilterBtn}
+          onClick={filterPartnerSubOrderModalController.setTrue}>
+          <div className={css.filterIconContainer}>
+            <IconFilter className={css.filterIcon} />
+          </div>
+        </Button>
       </div>
 
       <Tooltip
@@ -350,6 +416,7 @@ const ManageOrdersPage = () => {
           <FilterPartnerOrderForm
             initialValues={initialFilterFormValues}
             onSubmit={handleFilterChange}
+            onClearFilter={handleClearFilter}
           />
         }
         trigger="click"
@@ -362,6 +429,19 @@ const ManageOrdersPage = () => {
         </Button>
       </Tooltip>
       {content}
+
+      <RenderWhen condition={isMobileLayout}>
+        <SlideModal
+          id="FilterPartnerSubOrderModal"
+          isOpen={filterPartnerSubOrderModalController.value}
+          onClose={filterPartnerSubOrderModalController.setFalse}>
+          <FilterPartnerOrderForm
+            initialValues={initialFilterFormValues}
+            onSubmit={handleFilterChange}
+            onClearFilter={handleClearFilter}
+          />
+        </SlideModal>
+      </RenderWhen>
     </div>
   );
 };

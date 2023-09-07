@@ -7,7 +7,6 @@ import { LISTING_TYPE } from '@pages/api/helpers/constants';
 import cookies from '@services/cookie';
 import { getIntegrationSdk, handleError } from '@services/sdk';
 import { denormalisedResponseEntities, Listing } from '@utils/data';
-import { EOrderStates } from '@utils/enums';
 import type { TIntegrationOrderListing, TListing } from '@utils/types';
 
 const { NEXT_PUBLIC_ENV } = process.env;
@@ -50,11 +49,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             : denormalisedResponseEntities(response);
           const orderWithOthersData = await Promise.all(
             orders.map(async (order: TIntegrationOrderListing) => {
-              const {
-                companyId,
-                plans = [],
-                orderState,
-              } = Listing(order as TListing).getMetadata();
+              const { companyId, plans = [] } = Listing(
+                order as TListing,
+              ).getMetadata();
               const [company] = denormalisedResponseEntities(
                 (await integrationSdk.users.show({
                   id: companyId,
@@ -88,39 +85,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
                     return restaurant;
                   }),
                 );
-
-                const orderDetailsWithTransaction = planOrderDetail;
-
-                if (
-                  [
-                    EOrderStates.inProgress,
-                    EOrderStates.pendingPayment,
-                    EOrderStates.completed,
-                    EOrderStates.reviewed,
-                  ].includes(orderState)
-                ) {
-                  await Promise.all(
-                    Object.keys(planOrderDetail).map(async (key) => {
-                      const { transactionId } = planOrderDetail[key];
-                      const txResponse =
-                        transactionId &&
-                        (await integrationSdk.transactions.show({
-                          id: transactionId,
-                        }));
-                      const [transaction] = txResponse
-                        ? denormalisedResponseEntities(txResponse)
-                        : [{}];
-
-                      orderDetailsWithTransaction[key] = {
-                        ...planOrderDetail[key],
-                        transaction,
-                      };
-                    }),
-                  );
-                }
-
-                plan.attributes.metadata.orderDetail =
-                  orderDetailsWithTransaction;
 
                 return {
                   ...order,

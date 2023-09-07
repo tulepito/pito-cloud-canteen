@@ -326,7 +326,7 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
         />
         <RenderWhen condition={showStateSectionCondition}>
           <ReviewOrderStatesSection
-            data={{ transactionDataMap, isCanceledOrder: false }}
+            data={{ orderDetail, isCanceledOrder: false }}
             isAdminLayout
             className={css.reviewOrderStates}
           />

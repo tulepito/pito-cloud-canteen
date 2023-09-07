@@ -1,4 +1,3 @@
-import { useMemo } from 'react';
 import type { Event } from 'react-big-calendar';
 import { shallowEqual } from 'react-redux';
 import classNames from 'classnames';
@@ -38,11 +37,10 @@ const OrderEventCard: React.FC<TOrderEventCardProps> = ({
     status,
     expiredTime,
     isOrderStarted = false,
-    transactionId,
-    subOrderTx: subOrderTxFromEvent,
     planId,
     orderId,
     timestamp,
+    lastTransition,
   } = event.resource || {};
 
   const tooltipVisibleController = useBoolean();
@@ -60,11 +58,6 @@ const OrderEventCard: React.FC<TOrderEventCardProps> = ({
   const cardStyles = {
     borderColor: isExpiredAndNotPickedFood ? '#8C8C8C' : orderColor,
   };
-
-  const subOrderTxs = useAppSelector(
-    (state) => state.ParticipantOrderList.subOrderTxs,
-    shallowEqual,
-  );
   const subOrderDocument = useAppSelector(
     (state) => state.ParticipantOrderList.subOrderDocument,
     shallowEqual,
@@ -76,17 +69,10 @@ const OrderEventCard: React.FC<TOrderEventCardProps> = ({
     (state) => state.ParticipantOrderList.fetchSubOrderDocumentInProgress,
   );
 
-  const subOrderTx = useMemo(
-    () =>
-      subOrderTxs.find((tx) => tx.id.uuid === transactionId) ||
-      subOrderTxFromEvent,
-    [subOrderTxFromEvent, subOrderTxs, transactionId],
-  );
-
   const handleOpenRatingModal = () => {
     if (typeof openRatingSubOrderModal === 'function') {
       tooltipVisibleController.setFalse();
-      openRatingSubOrderModal(subOrderTx);
+      openRatingSubOrderModal();
     }
   };
 
@@ -108,7 +94,7 @@ const OrderEventCard: React.FC<TOrderEventCardProps> = ({
           status={status}
           isExpired={isExpired}
           subOrderDocument={subOrderDocument}
-          subOrderTx={subOrderTx}
+          lastTransition={lastTransition}
           fetchSubOrderTxInProgress={fetchSubOrderTxInProgress}
           fetchSubOrderDocumentInProgress={fetchSubOrderDocumentInProgress}
           openRatingSubOrderModal={handleOpenRatingModal}
@@ -139,7 +125,7 @@ const OrderEventCard: React.FC<TOrderEventCardProps> = ({
             <OrderEventCardStatus
               className={css.cardStatus}
               status={status}
-              subOrderTx={subOrderTx}
+              lastTransition={lastTransition}
             />
             <OrderEventCardContentItems event={event} />
           </div>

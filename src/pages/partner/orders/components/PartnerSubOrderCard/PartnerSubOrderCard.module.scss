@@ -1,0 +1,53 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.container {
+  border-radius: 8px;
+  border: 1px solid $neutralGray4;
+  background: $neutralGray1;
+  color: $neutralGray6;
+
+  .cardHeader {
+    @include flexAlign(center, space-between);
+    padding: 8px 16px;
+
+    .title {
+      @include lineClamp(1);
+      @include textTemplate(14px, $fontWeightSemiBold, 20px);
+    }
+  }
+
+  .cardContent {
+    @include flexAlign(center, space-between);
+    padding: 8px 16px;
+    font-size: 14px;
+
+    .iconReceipt {
+      width: 20px;
+      height: 20px;
+    }
+
+    .flexRow {
+      @include flexAlign(center);
+      gap: 8px;
+    }
+  }
+
+  .cardFooter {
+    @include flexAlign(center);
+    padding: 8px 16px 12px;
+    gap: 8px;
+    font-size: 14px;
+
+    .iconClock {
+      width: 20px;
+      height: 20px;
+    }
+
+    .verticalDevider {
+      border-left: 1px solid $neutralGray4;
+      height: 20px;
+    }
+  }
+}
