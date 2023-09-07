@@ -57,7 +57,7 @@ const PaymentFilterFormComponent: React.FC<TPaymentFilterFormComponentProps> = (
 
   const { isMobileLayout } = useViewport();
 
-  const minEndDate = addDays(values.startDate!, 1);
+  const minEndDate = addDays(values.startDate!, 0);
 
   const setStartDate = (date: number) => {
     form.change('startDate', date);
