@@ -5,8 +5,9 @@ import { HttpMethod } from '@apis/configs';
 import { queryAllPages } from '@helpers/apiHelpers';
 import { LISTING_TYPE } from '@pages/api/helpers/constants';
 import cookies from '@services/cookie';
+import { fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk, handleError } from '@services/sdk';
-import { denormalisedResponseEntities, Listing } from '@utils/data';
+import { denormalisedResponseEntities, Listing, User } from '@utils/data';
 import type { TIntegrationOrderListing, TListing } from '@utils/types';
 
 const { NEXT_PUBLIC_ENV } = process.env;
@@ -49,14 +50,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             : denormalisedResponseEntities(response);
           const orderWithOthersData = await Promise.all(
             orders.map(async (order: TIntegrationOrderListing) => {
-              const { companyId, plans = [] } = Listing(
-                order as TListing,
-              ).getMetadata();
-              const [company] = denormalisedResponseEntities(
-                (await integrationSdk.users.show({
-                  id: companyId,
-                })) || [{}],
-              );
+              const {
+                companyId,
+                plans = [],
+                bookerId,
+              } = Listing(order as TListing).getMetadata();
+              const company = await fetchUser(companyId);
 
               if (plans.length > 0) {
                 const [planId] = plans;
@@ -85,12 +84,24 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
                     return restaurant;
                   }),
                 );
+                let bookerName = '';
+                if (bookerId === companyId) {
+                  const companyUser = User(company);
+                  const { firstName, lastName } = companyUser.getProfile();
+                  bookerName = `${lastName} ${firstName}`;
+                } else {
+                  const booker = await fetchUser(bookerId);
+                  const bookerUser = User(booker);
+                  const { firstName, lastName } = bookerUser.getProfile();
+                  bookerName = `${lastName} ${firstName}`;
+                }
 
                 return {
                   ...order,
                   company,
                   subOrders: [plan],
                   allRestaurants,
+                  bookerName,
                 };
               }
 

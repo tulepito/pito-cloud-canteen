@@ -410,7 +410,7 @@ const parseEntitiesToTableData = (
   if (orders.length === 0) return [];
 
   return orders.map((entity) => {
-    const { company, subOrders = [], allRestaurants = [] } = entity;
+    const { company, subOrders = [], allRestaurants = [], bookerName } = entity;
     const restaurants = subOrders.reduce(
       // eslint-disable-next-line array-callback-return
       (prevSubOrders: any[], subOrder: TIntegrationListing) => {
@@ -534,6 +534,7 @@ const parseEntitiesToTableData = (
             isPaid: orderDetail[key]?.isPaid,
             foodList: rest[key],
             price: childPrice,
+            bookerName,
           },
         };
       }),
@@ -581,6 +582,7 @@ const parseEntitiesToTableData = (
         ),
         foodList: flatten(subOrderDates.map((item) => item.data.foodList)),
         price: orderPrice,
+        bookerName,
       },
     };
   });

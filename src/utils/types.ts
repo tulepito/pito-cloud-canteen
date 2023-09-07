@@ -502,6 +502,7 @@ export type TIntegrationOrderListing = {
   plan?: TListing;
   subOrders?: TIntegrationListing[];
   allRestaurants?: TListing[];
+  bookerName?: string;
 };
 
 export type TCompanyMemberWithDetails = {
