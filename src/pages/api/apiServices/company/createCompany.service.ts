@@ -136,7 +136,7 @@ const createCompany = async ({
           isCompany: true,
           members,
           companyList: [companyAccount.id.uuid],
-          userState: ECompanyStates.draft,
+          userState: ECompanyStates.unactive,
           company: {
             [companyAccount.id.uuid]: {
               permission: UserPermission.OWNER,
