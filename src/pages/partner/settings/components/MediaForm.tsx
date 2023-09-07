@@ -5,7 +5,6 @@ import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import Form from '@components/Form/Form';
 import FieldPhotoUpload from '@components/FormFields/FieldPhotoUpload/FieldPhotoUpload';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { useViewport } from '@hooks/useViewport';
 import { EImageVariants } from '@src/utils/enums';
 import { isUploadImageOverLimitError } from '@src/utils/errors';
 import { pickRenderableImagesByProperty } from '@src/utils/images';
@@ -28,7 +27,7 @@ type TMediaFormProps = {};
 const MediaForm: React.FC<TMediaFormProps> = () => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
-  const { isMobileLayout } = useViewport();
+
   const {
     uploadedCovers,
     uploadCoverError,
@@ -108,7 +107,7 @@ const MediaForm: React.FC<TMediaFormProps> = () => {
                     iconUploadClassName={css.coverIconUpload}
                     shouldHideIconWhenEmpty
                     shouldShowClearBtn={false}
-                    shouldShowUploadBtnWithImg={!!isMobileLayout}
+                    shouldShowUploadBtnWithImg
                   />
                   <FieldPhotoUpload
                     name="avatar"
