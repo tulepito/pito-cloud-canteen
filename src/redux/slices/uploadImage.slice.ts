@@ -76,18 +76,29 @@ const uploadImages = createAsyncThunk(
     };
     const response = await Promise.all(
       payload.map(async (image: any) => {
-        const bodyParams = {
-          image: image.file,
-        };
-        const uploadImageResponse = denormalisedResponseEntities(
-          await sdk.images.upload(bodyParams, queryParams),
-        )[0];
+        try {
+          const bodyParams = {
+            image: image.file,
+          };
+          const uploadImageResponse = denormalisedResponseEntities(
+            await sdk.images.upload(bodyParams, queryParams),
+          )[0];
 
-        return {
-          id: image.id,
-          imageId: uploadImageResponse.id.uuid,
-          uploadedImage: uploadImageResponse,
-        };
+          return {
+            id: image.id,
+            imageId: uploadImageResponse.id.uuid,
+            uploadedImage: uploadImageResponse,
+          };
+        } catch (error) {
+          console.error(`Upload image ${image.id} error:`, error);
+
+          return {
+            id: image.id,
+            imageId: null,
+            uploadedImage: null,
+            uploadError: storableError(error),
+          };
+        }
       }),
     );
 

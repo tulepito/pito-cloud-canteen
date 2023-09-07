@@ -74,3 +74,18 @@
   width: 12px;
   height: 12px;
 }
+
+.error {
+  color: $sematicRed2;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background-color: rgba($neutralGray1, 0.8);
+  font-size: 14px;
+}
