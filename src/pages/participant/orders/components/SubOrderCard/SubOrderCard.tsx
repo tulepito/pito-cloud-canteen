@@ -16,7 +16,6 @@ import css from './SubOrderCard.module.scss';
 
 type TSubOrderCardProps = {
   event: Event;
-  onRejectSelectDish: (params: any) => void;
   setSelectedEvent: (event: Event) => void;
   openSubOrderDetailModal: () => void;
 };

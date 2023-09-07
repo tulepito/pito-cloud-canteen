@@ -742,6 +742,21 @@ const OrderListSlice = createSlice({
         participantFirebaseNotifications: newNotifications,
       };
     },
+    updatePlanDetail: (state, action) => {
+      const { payload: plan } = action;
+      const newAllPlans = state.allPlans.map((oldPlan: any) => {
+        if (oldPlan.id.uuid === plan.id.uuid) {
+          return plan;
+        }
+
+        return oldPlan;
+      });
+
+      return {
+        ...state,
+        allPlans: newAllPlans,
+      };
+    },
   },
   extraReducers: (builder) => {
     builder

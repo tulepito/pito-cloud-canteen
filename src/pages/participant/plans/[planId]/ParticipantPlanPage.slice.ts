@@ -3,7 +3,10 @@ import difference from 'lodash/difference';
 
 import { participantSubOrderAddDocumentApi } from '@apis/firebaseApi';
 import { loadPlanDataApi, updateParticipantOrderApi } from '@apis/index';
-import { recommendFood } from '@pages/participant/orders/OrderList.slice';
+import {
+  OrderListActions,
+  recommendFood,
+} from '@pages/participant/orders/OrderList.slice';
 import { createAsyncThunk } from '@redux/redux.helper';
 import {
   shoppingCartActions,
@@ -216,7 +219,10 @@ const updateOrder = createAsyncThunk(
       planData: updatedPlan,
     };
 
-    await updateParticipantOrderApi(orderId, updateValues);
+    const {
+      data: { plan: newPlan },
+    } = await updateParticipantOrderApi(orderId, updateValues);
+    dispatch(OrderListActions.updatePlanDetail(newPlan));
     orderDays.forEach((timestamp: string) => {
       participantSubOrderAddDocumentApi({
         participantId: currentUserId,
