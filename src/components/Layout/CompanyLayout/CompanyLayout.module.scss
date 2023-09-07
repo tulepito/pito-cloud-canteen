@@ -10,7 +10,7 @@
   }
 
   .title {
-    @include lineClamp(1);
+    @include lineClamp(1, 24px);
   }
 }
 
