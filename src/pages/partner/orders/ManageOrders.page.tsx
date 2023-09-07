@@ -388,6 +388,7 @@ const ManageOrdersPage = () => {
             ...(endTime ? { endTime } : {}),
             ...(status ? { status } : {}),
             ...(subOrderId ? { subOrderId } : {}),
+            isMobile: isMobileLayout,
           }),
         );
       });
