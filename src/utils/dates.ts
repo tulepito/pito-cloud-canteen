@@ -168,7 +168,10 @@ export const renderDateRange = (
 
   while (currentDate <= endDate) {
     result.push(currentDate);
-    currentDate = DateTime.fromMillis(currentDate).plus({ day: 1 }).toMillis();
+    currentDate = DateTime.fromMillis(currentDate)
+      .setZone(VNTimezone)
+      .plus({ day: 1 })
+      .toMillis();
   }
 
   return result;

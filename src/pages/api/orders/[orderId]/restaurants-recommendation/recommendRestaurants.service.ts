@@ -5,7 +5,7 @@ import { queryAllListings } from '@helpers/apiHelpers';
 import { getMenuQuery, getRestaurantQuery } from '@helpers/listingSearchQuery';
 import { adminQueryListings, fetchListing } from '@services/integrationHelper';
 import { Listing } from '@src/utils/data';
-import { convertWeekDay, renderDateRange } from '@src/utils/dates';
+import { convertWeekDay, renderDateRange, VNTimezone } from '@src/utils/dates';
 import { EOrderType } from '@src/utils/enums';
 import type { TListing } from '@src/utils/types';
 
@@ -118,7 +118,9 @@ export const recommendRestaurants = async (orderId: string) => {
     totalDates.map(async (dateTime) => {
       if (
         dayInWeek.includes(
-          convertWeekDay(DateTime.fromMillis(dateTime).weekday).key,
+          convertWeekDay(
+            DateTime.fromMillis(dateTime).setZone(VNTimezone).weekday,
+          ).key,
         )
       ) {
         const menuQueryParams = {
