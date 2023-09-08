@@ -54,6 +54,10 @@ const PartnerSubOrderDetailPage: React.FC<
   const fetchOrderInProgress = useAppSelector(
     (state) => state.PartnerSubOrderDetail.fetchOrderInProgress,
   );
+  const isFetchingOrderDetails = useAppSelector(
+    (state) => state.OrderManagement.isFetchingOrderDetails,
+  );
+
   const updateOrderModalContainer = useBoolean();
   const dispatch = useAppDispatch();
   const [viewMode, setViewMode] = useState(
@@ -217,7 +221,7 @@ const PartnerSubOrderDetailPage: React.FC<
             <div className={css.mobileSubOrderCartWrapper}>
               <SubOrderCart
                 title="Thực đơn phục vụ"
-                inProgress={fetchOrderInProgress}
+                inProgress={fetchOrderInProgress || isFetchingOrderDetails}
               />
             </div>
             <div className={css.mobileSubOrderSummaryWrapper}>
@@ -229,7 +233,9 @@ const PartnerSubOrderDetailPage: React.FC<
             <SubOrderNote />
           </div>
           <div className={css.rightPart}>
-            <SubOrderCart inProgress={fetchOrderInProgress} />
+            <SubOrderCart
+              inProgress={fetchOrderInProgress || isFetchingOrderDetails}
+            />
           </div>
         </div>
 
