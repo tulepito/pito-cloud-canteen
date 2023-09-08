@@ -501,7 +501,9 @@ const parseEntitiesToTableData = (
         const childPrice =
           childTotalPrice +
           PCCFeeByDate +
-          (childTotalPrice + PCCFeeByDate) * orderVATPercentageToUse;
+          Math.round(
+            (childTotalPrice + PCCFeeByDate) * orderVATPercentageToUse,
+          );
 
         if (!orderDetail[key]?.transactionId) return null;
 
@@ -646,6 +648,7 @@ const ManageOrdersPage = () => {
   const dataTable = parseEntitiesToTableData(orders, systemVATPercentage);
 
   const sortedData = sortValue ? sortOrders(sortValue, dataTable) : dataTable;
+  console.log('sortedData', sortedData);
   const onDownloadOrderList = async (values: TDownloadColumnListFormValues) => {
     const endDateWithOneMoreDay = addDays(new Date(meta_endDate as string), 1);
     const { meta, payload } = await dispatch(
