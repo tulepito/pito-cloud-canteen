@@ -1,4 +1,5 @@
 import type { EParticipantOrderStatus } from './enums';
+import type { ETransition } from './transaction';
 
 export type TOrder = {
   orderId: string;
@@ -22,6 +23,7 @@ export type TPlan = {
     [date: string]: {
       note?: any;
       transactionId?: string;
+      lastTransition?: ETransition;
       restaurant: {
         id?: string; // restaurant listing id
         menuId?: string;

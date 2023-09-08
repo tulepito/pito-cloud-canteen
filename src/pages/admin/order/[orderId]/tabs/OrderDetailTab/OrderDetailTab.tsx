@@ -29,7 +29,7 @@ import {
 import { Listing } from '@src/utils/data';
 import { formatTimestamp } from '@src/utils/dates';
 import { EOrderStates, EOrderType } from '@src/utils/enums';
-import { txIsInitiated } from '@src/utils/transaction';
+import { ETransition } from '@src/utils/transaction';
 import type { TListing, TObject, TTransaction, TUser } from '@src/utils/types';
 
 import OrderHeaderInfor from '../../components/OrderHeaderInfor/OrderHeaderInfor';
@@ -69,7 +69,6 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
     updateOrderStaffNameInProgress,
     updateOrderState,
     updateOrderStateInProgress,
-    transactionDataMap = {},
     onSaveOrderNote,
   } = props;
 
@@ -84,7 +83,6 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
     orderValidationsInProgressState,
     isFetchingOrderDetails,
   } = useAppSelector((state) => state.OrderManagement);
-
   const dispatch = useAppDispatch();
   const router = useRouter();
   const {
@@ -136,14 +134,14 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
   const orderDetailsNotChanged =
     isDraftEditing && isEqual(orderDetail, draftOrderDetail);
 
-  const currentTxIsInitiated = txIsInitiated(
-    transactionDataMap[currentViewDate],
-  );
+  const { lastTransition = ETransition.INITIATE_TRANSACTION } =
+    draftOrderDetail?.[currentViewDate] || {};
 
   const ableToUpdateOrder =
     !isFetchingOrderDetails &&
     isRouterReady &&
-    ((currentTxIsInitiated && isDraftEditing) || isPickingState);
+    ((lastTransition === ETransition.INITIATE_TRANSACTION && isDraftEditing) ||
+      isPickingState);
 
   const { orderTitle, priceQuotationData, editViewData, reviewViewData } =
     // eslint-disable-next-line react-hooks/rules-of-hooks
