@@ -213,12 +213,12 @@ const RestaurantSettingFormComponent: React.FC<
     !isActive || (isActive && inProgressTransactionsAfterToDayCount === 0);
   const isToggleAppStatusDisabled = toggleAppStatusInProgress;
 
-  const handleToggleStatusClick = () => {
+  const handleToggleStatusClick = (newActiveStatus: boolean) => {
     if (isEnableTurnOffAppStatus) {
       if (isMobileLayout) {
         dispatch(PartnerSettingsThunks.toggleRestaurantActiveStatus());
       } else if (setFormValues) {
-        setFormValues(values);
+        setFormValues({ ...values, isActive: newActiveStatus });
       }
     } else {
       cannotTurnOffAppStatusControl.setTrue();
@@ -315,8 +315,11 @@ const RestaurantSettingFormComponent: React.FC<
                 disabled={isToggleAppStatusDisabled || inProgress}
                 status={input.value ? 'off' : 'on'}
                 onClick={(value) => {
-                  if (isEnableTurnOffAppStatus) input.onChange(value);
-                  handleToggleStatusClick();
+                  if (isEnableTurnOffAppStatus) {
+                    input.onChange(isMobileLayout ? value : !value);
+                  }
+
+                  handleToggleStatusClick(value);
                 }}
                 className={css.activeAppToggle}
               />

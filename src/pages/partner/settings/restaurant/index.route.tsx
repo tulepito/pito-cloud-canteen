@@ -60,10 +60,7 @@ const PartnerRestaurantSettingRoute = () => {
 
   const formInitialValues = useMemo(
     () => ({
-      isActive:
-        typeof formValues?.isActive !== 'undefined'
-          ? formValues?.isActive
-          : isActive,
+      isActive,
       stopReceiveOrder:
         typeof formValues?.stopReceiveOrder !== 'undefined'
           ? formValues?.stopReceiveOrder

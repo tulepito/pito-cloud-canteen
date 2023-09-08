@@ -1,9 +1,11 @@
-@use '/src/styles/customMediaQueries.scss' as *;
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
 
 .container {
-  max-height: 540px;
+  @media (min-width: 768px) {
+    max-height: 540px;
+  }
 }
 
 .contentContainer {
