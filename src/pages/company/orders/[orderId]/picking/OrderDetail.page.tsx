@@ -32,7 +32,7 @@ import {
 import { companyPaths } from '@src/paths';
 import { diffDays } from '@src/utils/dates';
 import type { TPlan } from '@src/utils/orderTypes';
-import { txIsInitiated } from '@src/utils/transaction';
+import { ETransition } from '@src/utils/transaction';
 import { CurrentUser, Listing } from '@utils/data';
 import {
   EOrderDraftStates,
@@ -201,7 +201,6 @@ const OrderDetailPage = () => {
     draftOrderDetail,
     planData,
     draftSubOrderChangesHistory,
-    transactionDataMap,
     orderValidationsInProgressState,
   } = useAppSelector((state) => state.OrderManagement);
   const {
@@ -371,14 +370,13 @@ const OrderDetailPage = () => {
         id: 'EditView.OrderTitle.updateOrderButtonText',
       });
 
-  const currentTxIsInitiated = txIsInitiated(
-    transactionDataMap[currentViewDate],
-  );
+  const { lastTransition = ETransition.INITIATE_TRANSACTION } =
+    draftOrderDetail?.[currentViewDate] || {};
 
   const ableToUpdateOrder =
     !isFetchingOrderDetails &&
     isRouterReady &&
-    ((currentTxIsInitiated &&
+    ((lastTransition === ETransition.INITIATE_TRANSACTION &&
       isDraftEditing &&
       Number(diffDays(currentViewDate, NOW, 'day').days) > ONE_DAY) ||
       isPicking);
