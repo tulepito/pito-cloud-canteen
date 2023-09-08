@@ -59,6 +59,14 @@ const MenuInfoModal: React.FC<TNavigationModalProps> = (props) => {
     }
   };
 
+  const handleIconArrowClick = () => {
+    if (isViewMode) {
+      onClose();
+    } else {
+      viewModeController.setTrue();
+    }
+  };
+
   return (
     <Modal
       isOpen={isOpen}
@@ -69,7 +77,7 @@ const MenuInfoModal: React.FC<TNavigationModalProps> = (props) => {
       shouldHideIconClose>
       <div>
         <div className={css.heading}>
-          <IconArrow direction="left" onClick={onClose} />
+          <IconArrow direction="left" onClick={handleIconArrowClick} />
           <RenderWhen condition={isViewMode}>
             <div>Thực đơn</div>
             <div
