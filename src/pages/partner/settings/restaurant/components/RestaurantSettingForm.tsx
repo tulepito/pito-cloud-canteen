@@ -218,7 +218,7 @@ const RestaurantSettingFormComponent: React.FC<
       if (isMobileLayout) {
         dispatch(PartnerSettingsThunks.toggleRestaurantActiveStatus());
       } else if (setFormValues) {
-        setFormValues({ ...values, isActive: newActiveStatus });
+        setFormValues({ ...values, isActive: !newActiveStatus });
       }
     } else {
       cannotTurnOffAppStatusControl.setTrue();
