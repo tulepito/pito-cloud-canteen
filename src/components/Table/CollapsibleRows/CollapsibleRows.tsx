@@ -27,45 +27,47 @@ const CollapsibleRows: React.FC<TCollapsibleRowsProps> = (props) => {
     hasCheckbox,
     rowCheckboxChange,
   } = props;
-  const showRowsController = useBoolean();
+  const showRowsController = useBoolean(!!row.data.isHide);
 
   return (
     <>
-      <tr className={classNames(tableBodyRowClassName, css.bodyRow)}>
-        {hasCheckbox && (
-          <>
-            <td
-              className={classNames(tableBodyCellClassName, css.bodyCell, {
-                [css.isParent]: row.data.isParent && showRowsController.value,
-              })}>
-              <FieldCheckbox
-                labelClassName={css.checkboxLabel}
-                svgClassName={css.checkboxSvg}
-                name="rowCheckbox"
-                id={`rowCheckbox.${row.key}`}
-                value={row.key as any}
-                label=" "
-                customOnChange={rowCheckboxChange}
-              />
-            </td>
-          </>
-        )}
-        {columns.map((col: TColumn) => {
-          const rowCheckbox = values?.rowCheckbox || [];
-          const isChecked = rowCheckbox.includes(row.key);
+      <RenderWhen condition={!row.data.isHide}>
+        <tr className={classNames(tableBodyRowClassName, css.bodyRow)}>
+          {hasCheckbox && (
+            <>
+              <td
+                className={classNames(tableBodyCellClassName, css.bodyCell, {
+                  [css.isParent]: row.data.isParent && showRowsController.value,
+                })}>
+                <FieldCheckbox
+                  labelClassName={css.checkboxLabel}
+                  svgClassName={css.checkboxSvg}
+                  name="rowCheckbox"
+                  id={`rowCheckbox.${row.key}`}
+                  value={row.key as any}
+                  label=" "
+                  customOnChange={rowCheckboxChange}
+                />
+              </td>
+            </>
+          )}
+          {columns.map((col: TColumn) => {
+            const rowCheckbox = values?.rowCheckbox || [];
+            const isChecked = rowCheckbox.includes(row.key);
 
-          return (
-            <td
-              className={classNames(tableBodyCellClassName, css.bodyCell, {
-                [css.isParent]: row.data.isParent && showRowsController.value,
-              })}
-              data-label={col.label}
-              key={col.key}>
-              {col.render(row.data, isChecked, showRowsController)}
-            </td>
-          );
-        })}
-      </tr>
+            return (
+              <td
+                className={classNames(tableBodyCellClassName, css.bodyCell, {
+                  [css.isParent]: row.data.isParent && showRowsController.value,
+                })}
+                data-label={col.label}
+                key={col.key}>
+                {col.render(row.data, isChecked, showRowsController)}
+              </td>
+            );
+          })}
+        </tr>
+      </RenderWhen>
       <RenderWhen condition={row.data.isParent && showRowsController.value}>
         {row.data?.children.map((child: TRowData) => (
           <tr
