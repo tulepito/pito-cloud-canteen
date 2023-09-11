@@ -5,8 +5,8 @@ import keyBy from 'lodash/keyBy';
 import mapValue from 'lodash/mapValues';
 import uniq from 'lodash/uniq';
 import uniqBy from 'lodash/uniqBy';
-import { DateTime } from 'luxon';
 
+import { fetchFoodListFromMenuApi } from '@apis/admin';
 import { updatePlanDetailsApi } from '@apis/orderApi';
 import { fetchSearchFilterApi } from '@apis/userApi';
 import { queryAllPages } from '@helpers/apiHelpers';
@@ -14,10 +14,8 @@ import type { TMenuQueryParams } from '@helpers/listingSearchQuery';
 import { getMenuQuery, getRestaurantQuery } from '@helpers/listingSearchQuery';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
-import { ListingTypes } from '@src/types/listingTypes';
 import { CompanyPermission, UserPermission } from '@src/types/UserPermission';
 import { denormalisedResponseEntities, Listing } from '@utils/data';
-import { convertWeekDay } from '@utils/dates';
 import { EImageVariants, EListingType } from '@utils/enums';
 import type { TListing, TPagination, TUser } from '@utils/types';
 
@@ -352,31 +350,31 @@ const fetchCompanyAccount = createAsyncThunk(
 
 const fetchFoodListFromRestaurant = createAsyncThunk(
   FETCH_FOOD_LIST_FROM_RESTAURANT,
-  async (params: Record<string, any>, { getState, dispatch, extra: sdk }) => {
-    const { restaurantId, menuId: menuIdParam, timestamp, keywords } = params;
+  async (params: Record<string, any>, { getState, dispatch }) => {
     const { combinedRestaurantMenuData = [], restaurantFood = {} } =
       getState().BookerSelectRestaurant;
-    const dateTime = DateTime.fromMillis(timestamp);
-    const dayOfWeek = convertWeekDay(dateTime.weekday).key;
+    const {
+      menuId: menuIdParam,
+      timestamp,
+      favoriteFoodIdList = [],
+      restaurantId,
+    } = params;
+    const { order } = getState().BookerSelectRestaurant;
+    const { nutritions = [] } = Listing(order as TListing).getMetadata();
     const menuId =
       menuIdParam ||
       combinedRestaurantMenuData.find(
         (item) => item.restaurantId === restaurantId,
       )?.menuId;
-    const { order } = getState().BookerSelectRestaurant;
-    const { nutritions = [] } = Listing(order as TListing).getMetadata();
+    // handle case when food list is already fetched
+    if (restaurantFood[restaurantId]) return restaurantFood;
 
-    const response = await sdk.listings.query({
-      pub_menuIdList: `has_any:${menuId}`,
-      meta_listingType: ListingTypes.FOOD,
-      pub_menuWeekDay: `has_any:${dayOfWeek}`,
-      ...(nutritions.length > 0
-        ? { pub_specialDiets: `has_any:${nutritions.join(',')}` }
-        : {}),
-      include: ['images'],
-      ...(keywords && { keywords }),
+    const { data: foodList } = await fetchFoodListFromMenuApi({
+      menuId,
+      subOrderDate: timestamp,
+      favoriteFoodIdList,
+      nutritions,
     });
-    const foodList = denormalisedResponseEntities(response);
 
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     dispatch(BookerSelectRestaurantActions.setCurrentMenuId(menuId));
