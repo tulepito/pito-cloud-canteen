@@ -159,3 +159,10 @@
     height: 60dvh;
   }
 }
+
+.orderDetailTooltip {
+  background-color: $neutralGray1;
+  &:global.rc-tooltip {
+    opacity: 1 !important;
+  }
+}
