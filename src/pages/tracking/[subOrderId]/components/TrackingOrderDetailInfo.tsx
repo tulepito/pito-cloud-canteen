@@ -47,8 +47,8 @@ const TrackingOrderDetailInfo: React.FC<TTrackingOrderDetailInfoProps> = ({
   }).fill(0);
   const [isCollapsed, setIsCollapsed] = useState(initialCollapseStates);
   const totalFood = (isGroupOrder ? foodDataList : lineItems).reduce(
-    (total: number, { frequency }: TObject) => {
-      return total + frequency;
+    (total: number, { frequency = 1, quantity = 1 }: TObject) => {
+      return total + (isGroupOrder ? frequency : quantity);
     },
     0,
   );
