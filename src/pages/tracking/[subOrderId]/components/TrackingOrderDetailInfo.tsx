@@ -46,7 +46,12 @@ const TrackingOrderDetailInfo: React.FC<TTrackingOrderDetailInfoProps> = ({
     length: foodDataList?.length,
   }).fill(0);
   const [isCollapsed, setIsCollapsed] = useState(initialCollapseStates);
-
+  const totalFood = (isGroupOrder ? foodDataList : lineItems).reduce(
+    (total: number, { frequency }: TObject) => {
+      return total + frequency;
+    },
+    0,
+  );
   const handleClickGroupTitle = (idx: number) => () => {
     const changeValue = !isCollapsed[idx];
 
@@ -98,6 +103,12 @@ const TrackingOrderDetailInfo: React.FC<TTrackingOrderDetailInfoProps> = ({
         </div>
 
         <div className={css.tableBody}>
+          <div className={css.totalFoodRow}>
+            <div></div>
+            <div></div>
+            <div>{totalFood}</div>
+            <div></div>
+          </div>
           <RenderWhen condition={isGroupOrder}>
             {foodDataList?.map((foodData: TObject, foodIndex: number) => {
               const { foodName, frequency, notes } = foodData;
