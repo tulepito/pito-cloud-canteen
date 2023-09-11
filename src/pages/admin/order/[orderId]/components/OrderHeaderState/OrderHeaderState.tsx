@@ -142,24 +142,6 @@ const OrderHeaderState: React.FC<OrderHeaderStateProps> = (props) => {
                 </div>
               </RenderWhen>
             </OutsideClickHandler>
-
-            <AlertModal
-              isOpen={confirmCancelOrderActions.value}
-              handleClose={confirmCancelOrderActions.setFalse}
-              title={intl.formatMessage({
-                id: 'BookerOrderDetailsPage.confirmCancelOrderModal.title',
-              })}
-              confirmLabel={intl.formatMessage({
-                id: 'BookerOrderDetailsPage.confirmCancelOrderModal.confirmText',
-              })}
-              cancelLabel={intl.formatMessage({
-                id: 'BookerOrderDetailsPage.confirmCancelOrderModal.cancelText',
-              })}
-              onConfirm={handleAgreeCancelOrder}
-              onCancel={handleDisagreeCancelOrder}
-              confirmInProgress={updateOrderStateInProgress}
-              cancelDisabled={updateOrderStateInProgress}
-            />
           </RenderWhen>
         </div>
       </div>
@@ -191,6 +173,23 @@ const OrderHeaderState: React.FC<OrderHeaderStateProps> = (props) => {
           Cập nhật
         </Button>
       </RenderWhen>
+      <AlertModal
+        isOpen={confirmCancelOrderActions.value}
+        handleClose={confirmCancelOrderActions.setFalse}
+        title={intl.formatMessage({
+          id: 'BookerOrderDetailsPage.confirmCancelOrderModal.title',
+        })}
+        confirmLabel={intl.formatMessage({
+          id: 'BookerOrderDetailsPage.confirmCancelOrderModal.confirmText',
+        })}
+        cancelLabel={intl.formatMessage({
+          id: 'BookerOrderDetailsPage.confirmCancelOrderModal.cancelText',
+        })}
+        onConfirm={handleAgreeCancelOrder}
+        onCancel={handleDisagreeCancelOrder}
+        confirmInProgress={updateOrderStateInProgress}
+        cancelDisabled={updateOrderStateInProgress}
+      />
     </div>
   );
 };
