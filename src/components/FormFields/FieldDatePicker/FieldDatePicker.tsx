@@ -16,6 +16,7 @@ registerLocale('vi', viLocale);
 type FieldDatePickerProps = FieldRenderProps<string, any> & {
   label?: string;
   name?: string;
+  shouldSkipTouched?: boolean;
 };
 
 const renderCustomHeader = (props: ReactDatePickerCustomHeaderProps) => {
@@ -64,6 +65,7 @@ export const FieldDatePickerComponent: React.FC<FieldDatePickerProps> = (
     inputRootClassName,
     inputClassName,
     readOnly = false,
+    shouldSkipTouched = true,
     ...rest
   } = props;
   const { name, onChange, value, onBlur } = input;
@@ -79,7 +81,7 @@ export const FieldDatePickerComponent: React.FC<FieldDatePickerProps> = (
   const errorText = customErrorText || error;
   const hasError = !!customErrorText || !!(touched && invalid && error);
   const fieldMeta = {
-    shouldSkipTouched: true,
+    shouldSkipTouched,
     touched: hasError,
     error: errorText,
   };
@@ -89,7 +91,7 @@ export const FieldDatePickerComponent: React.FC<FieldDatePickerProps> = (
   const inputClasses =
     inputRootClassName ||
     classNames(css.input, inputClassName, {
-      [css.inputError]: !!customErrorText || !!(invalid && error),
+      [css.inputError]: hasError,
     });
 
   const formatWeekDay = (dayOfWeek: string) => {
