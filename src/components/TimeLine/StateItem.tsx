@@ -37,13 +37,13 @@ const StateItem: React.FC<TStateItemProps> = ({
       stateComponent = <IconTickWithBackground className={css.icon} />;
       break;
     case ETransition.EXPIRED_START_DELIVERY:
-      stateComponent = <IconCancel className={css.icon} />;
+      stateComponent = <IconTickWithBackground className={css.icon} />;
       break;
     case ETransition.CANCEL_DELIVERY:
       stateComponent = <IconCancel className={css.icon} />;
       break;
     case ETransition.OPERATOR_CANCEL_PLAN:
-      stateComponent = <IconTickWithBackground className={css.icon} />;
+      stateComponent = <IconCancel className={css.icon} />;
       break;
 
     default:
