@@ -105,7 +105,7 @@ const signUp = createAsyncThunk(
     await sdk.currentUser.create(createUserParams);
     await dispatch(login({ email, password }));
 
-    postSignUpApi();
+    await postSignUpApi();
   },
   {
     serializeError: storableError,

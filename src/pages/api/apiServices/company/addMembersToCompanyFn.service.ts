@@ -61,8 +61,9 @@ const addMembersToCompanyFn = async (params: TAddMembersToCompanyParams) => {
   });
 
   // Step update data for existed user
+  const newParticipantIds = difference(userIdList, membersIdList);
   const newParticipantMembers = await Promise.all(
-    difference(userIdList, membersIdList).map(async (userId: string) => {
+    newParticipantIds.map(async (userId: string) => {
       const userAccount = await fetchUser(userId);
       const { companyList: userCompanyList = [] } =
         User(userAccount).getMetadata();
