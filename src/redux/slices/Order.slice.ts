@@ -385,7 +385,7 @@ const recommendRestaurantForSpecificDay = createAsyncThunk(
       dateTime,
     );
 
-    await updatePlanDetailsApi(orderId, {
+    updatePlanDetailsApi(orderId, {
       orderDetail: newOrderDetail,
       planId: plans[0],
     });
