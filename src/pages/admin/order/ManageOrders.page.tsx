@@ -403,6 +403,21 @@ const TABLE_COLUMN: TColumn[] = [
   },
 ];
 
+const filterOrder = (subOrders: any[], filterList: TObject) => {
+  const { startDate, endDate } = filterList;
+
+  const filterFn = (item: any) => {
+    if (startDate && +item.data.timestamp < new Date(startDate).getTime())
+      return false;
+    if (endDate && +item.data.timestamp > new Date(endDate).getTime())
+      return false;
+
+    return true;
+  };
+
+  return subOrders.filter(filterFn);
+};
+
 const parseEntitiesToTableData = (
   orders: TIntegrationOrderListing[],
   systemVATPercentage: number,
@@ -541,6 +556,10 @@ const parseEntitiesToTableData = (
       }),
     );
 
+    if (shouldHideOrderRow) {
+      return subOrderDates;
+    }
+
     const orderPrice = subOrderDates.reduce(
       (prev: number, item: any) => prev + item.data.price,
       0,
@@ -588,7 +607,7 @@ const parseEntitiesToTableData = (
     };
   });
 
-  return result;
+  return shouldHideOrderRow ? flatten(result as any[]) : result;
 };
 
 const sortOrders = ({ columnName, type }: TTableSortValue, data: any) => {
@@ -632,6 +651,7 @@ const ManageOrdersPage = () => {
     TABLE_COLUMN.map((column) => column.key),
   );
 
+  const shouldHideOrder = showMode === 'subOrder';
   const shouldShowTableColums = TABLE_COLUMN.filter((column) => {
     return displayedColumns.includes(column.key);
   });
@@ -652,9 +672,19 @@ const ManageOrdersPage = () => {
     systemVATPercentage,
     showMode as string,
   );
+  const filteredTableData = shouldHideOrder
+    ? filterOrder(dataTable, {
+        endDate: meta_endDate,
+        startDate: meta_startDate,
+      })
+    : dataTable;
+  const sortedData = sortValue
+    ? sortOrders(sortValue, filteredTableData)
+    : filteredTableData;
 
-  const sortedData = sortValue ? sortOrders(sortValue, dataTable) : dataTable;
-  const onDownloadOrderList = async (values: TDownloadColumnListFormValues) => {
+  const handleDownloadOrderList = async (
+    values: TDownloadColumnListFormValues,
+  ) => {
     const endDateWithOneMoreDay = addDays(new Date(meta_endDate as string), 1);
     const { meta, payload } = await dispatch(
       orderAsyncActions.queryAllOrders({
@@ -853,7 +883,7 @@ const ManageOrdersPage = () => {
               <Tooltip
                 tooltipContent={
                   <DownloadColumnListForm
-                    onSubmit={onDownloadOrderList}
+                    onSubmit={handleDownloadOrderList}
                     initialValues={downloadColumnsListInitialValues}
                     inProgress={queryAllOrdersInProgress}
                   />
