@@ -406,10 +406,12 @@ const TABLE_COLUMN: TColumn[] = [
 const parseEntitiesToTableData = (
   orders: TIntegrationOrderListing[],
   systemVATPercentage: number,
+  showMode = 'order',
 ) => {
   if (orders.length === 0) return [];
+  const shouldHideOrderRow = showMode === 'subOrder';
 
-  return orders.map((entity) => {
+  const result = orders.map((entity) => {
     const { company, subOrders = [], allRestaurants = [] } = entity;
     const restaurants = subOrders.reduce(
       // eslint-disable-next-line array-callback-return
@@ -462,7 +464,7 @@ const parseEntitiesToTableData = (
       return orderDetail[key]?.restaurant;
     });
     const isGroupOrder =
-      (entity?.attributes?.metadata?.orderType || 'group') === 'group';
+      (entity?.attributes?.metadata?.showMode || 'group') === 'group';
     const { totalDishes } = calculateTotalPriceAndDishes({
       orderDetail,
       isGroupOrder,
@@ -564,6 +566,7 @@ const parseEntitiesToTableData = (
         orderName: entity.attributes.publicData.orderName,
         deliveryHour,
         isParent: true,
+        isHide: shouldHideOrderRow,
         children: subOrderDates,
         isPaid: isClientSufficientPaid && isPartnerSufficientPaid,
         orderCreatedAt: formatTimestamp(
@@ -584,6 +587,8 @@ const parseEntitiesToTableData = (
       },
     };
   });
+
+  return result;
 };
 
 const sortOrders = ({ columnName, type }: TTableSortValue, data: any) => {
@@ -620,6 +625,7 @@ const ManageOrdersPage = () => {
     meta_endDate,
     meta_startDate,
     meta_orderState,
+    showMode = 'order',
   } = router.query;
   const [sortValue, setSortValue] = useState<TTableSortValue>();
   const [displayedColumns, setDisplayedColumns] = useState<string[]>(
@@ -641,7 +647,11 @@ const ManageOrdersPage = () => {
     (state) => state.SystemAttributes.systemVATPercentage,
   );
 
-  const dataTable = parseEntitiesToTableData(orders, systemVATPercentage);
+  const dataTable = parseEntitiesToTableData(
+    orders,
+    systemVATPercentage,
+    showMode as string,
+  );
 
   const sortedData = sortValue ? sortOrders(sortValue, dataTable) : dataTable;
   const onDownloadOrderList = async (values: TDownloadColumnListFormValues) => {
@@ -747,11 +757,12 @@ const ManageOrdersPage = () => {
     meta_startDate,
     meta_endDate,
     meta_orderState,
+    showMode,
   }: any) => {
     router.push({
       pathname: adminRoutes.ManageOrders.path,
       query: {
-        keywords,
+        ...(keywords ? { keywords } : {}),
         ...(meta_startDate
           ? { meta_startDate: new Date(meta_startDate).toISOString() }
           : {}),
@@ -759,6 +770,7 @@ const ManageOrdersPage = () => {
           ? { meta_endDate: new Date(meta_endDate).toISOString() }
           : {}),
         ...(meta_orderState ? { meta_orderState } : {}),
+        ...(showMode ? { showMode } : {}),
       },
     });
   };
@@ -793,6 +805,7 @@ const ManageOrdersPage = () => {
                     meta_state: groupStateString,
                     keywords,
                     meta_orderState,
+                    showMode: showMode as string,
                     meta_startDate: meta_startDate
                       ? new Date(meta_startDate as string).getTime()
                       : undefined,
