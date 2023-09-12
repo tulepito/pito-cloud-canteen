@@ -65,6 +65,7 @@ type TTableProps = TDefaultProps & {
   tableWrapperClassName?: string;
   shouldReplacePathWhenChangePage?: boolean;
   onCustomPageChange?: (page: number) => void;
+  paginationProps?: TObject;
 };
 
 const getUniqueString = (list: string[]) => {
@@ -98,8 +99,8 @@ const Table = (props: TTableProps) => {
     extraRows,
     tableWrapperClassName,
     onCustomPageChange,
+    paginationProps = {},
   } = props;
-
   const tableClasses = classNames(css.table, tableClassName);
   const router = useRouter();
 
@@ -289,6 +290,7 @@ const Table = (props: TTableProps) => {
           pageSize={pagination.perPage}
           current={pagination.page}
           onChange={onPageChange}
+          {...paginationProps}
         />
       )}
     </>

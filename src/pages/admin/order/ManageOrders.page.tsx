@@ -740,6 +740,7 @@ const ManageOrdersPage = () => {
           tableWrapperClassName={css.tableWrapper}
           tableClassName={css.table}
           tableBodyClassName={css.tableBody}
+          paginationProps={shouldHideOrder ? { showInfo: false } : {}}
         />
       </>
     );
