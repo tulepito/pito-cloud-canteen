@@ -29,6 +29,7 @@ export const parseEntitiesToExportCsv = (
   const hasFoodList = exportColumns.includes('foodList');
   const hasNumberPerFood = exportColumns.includes('numberPerFood');
   const hasPrice = exportColumns.includes('price');
+  const hasBookerName = exportColumns.includes('bookerName');
 
   const orderToExport = orders.map((order) => {
     const {
@@ -50,6 +51,7 @@ export const parseEntitiesToExportCsv = (
       state,
       foodList,
       price,
+      bookerName,
     } = order.data || {};
 
     const parentOrderData = {
@@ -61,6 +63,7 @@ export const parseEntitiesToExportCsv = (
         'Trạng thái đơn': getLabelByKey(ORDER_STATES_OPTIONS, state),
       }),
       ...(hasCompanyNameCol && { 'Tên công ty': companyName }),
+      ...(hasBookerName && { 'Người đại diện': bookerName }),
       ...(hasBookerPhoneNumberCol && {
         'SĐT người đại diện': bookerPhoneNumber,
       }),
@@ -107,13 +110,14 @@ export const parseEntitiesToExportCsv = (
             'Trạng thái đơn': getLabelByKey(ORDER_STATES_OPTIONS, state),
           }),
           ...(hasCompanyNameCol && { 'Tên công ty': companyName }),
+          ...(hasBookerName && { 'Người đại diện': bookerName }),
           ...(hasBookerPhoneNumberCol && {
             'SĐT người đại diện': bookerPhoneNumber,
           }),
           ...(hasCompanyAddressCol && { 'Địa chỉ công ty': companyLocation }),
           ...(hasDeliveryDate && {
             'Giờ giao hàng': deliveryHour,
-            'Ngày giao hàng': `${startDate}-${endDate}`,
+            'Ngày giao hàng': child.data.subOrderDate,
           }),
           ...(hasTotalDishes && { 'Số phần ăn': child.data.totalDishes }),
           ...(hasFoodList && {

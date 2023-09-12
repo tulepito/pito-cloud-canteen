@@ -410,7 +410,7 @@ const parseEntitiesToTableData = (
   if (orders.length === 0) return [];
 
   return orders.map((entity) => {
-    const { company, subOrders = [], allRestaurants = [] } = entity;
+    const { company, subOrders = [], allRestaurants = [], bookerName } = entity;
     const restaurants = subOrders.reduce(
       // eslint-disable-next-line array-callback-return
       (prevSubOrders: any[], subOrder: TIntegrationListing) => {
@@ -501,7 +501,9 @@ const parseEntitiesToTableData = (
         const childPrice =
           childTotalPrice +
           PCCFeeByDate +
-          (childTotalPrice + PCCFeeByDate) * orderVATPercentageToUse;
+          Math.round(
+            (childTotalPrice + PCCFeeByDate) * orderVATPercentageToUse,
+          );
 
         if (!orderDetail[key]?.transactionId) return null;
 
@@ -534,6 +536,7 @@ const parseEntitiesToTableData = (
             isPaid: orderDetail[key]?.isPaid,
             foodList: rest[key],
             price: childPrice,
+            bookerName,
           },
         };
       }),
@@ -581,6 +584,7 @@ const parseEntitiesToTableData = (
         ),
         foodList: flatten(subOrderDates.map((item) => item.data.foodList)),
         price: orderPrice,
+        bookerName,
       },
     };
   });
@@ -644,6 +648,7 @@ const ManageOrdersPage = () => {
   const dataTable = parseEntitiesToTableData(orders, systemVATPercentage);
 
   const sortedData = sortValue ? sortOrders(sortValue, dataTable) : dataTable;
+  console.log('sortedData', sortedData);
   const onDownloadOrderList = async (values: TDownloadColumnListFormValues) => {
     const endDateWithOneMoreDay = addDays(new Date(meta_endDate as string), 1);
     const { meta, payload } = await dispatch(
