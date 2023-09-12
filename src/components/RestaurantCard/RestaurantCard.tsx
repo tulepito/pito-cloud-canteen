@@ -5,7 +5,6 @@ import classNames from 'classnames';
 import Badge from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
 import IconBox from '@components/Icons/IconBox/IconBox';
-import IconGift from '@components/Icons/IconGift/IconGift';
 import IconHeart from '@components/Icons/IconHeart/IconHeart';
 import IconStar from '@components/Icons/IconStar/IconStar';
 import IconTruck from '@components/Icons/IconTruck/IconTruck';
@@ -95,10 +94,10 @@ const RestaurantCard: React.FC<TRestaurantCardProps> = ({
 
   return (
     <div className={classes}>
-      <div className={css.bonusBadge}>
+      {/* <div className={css.bonusBadge}>
         <IconGift className={css.gift} />
         <span>x2</span>
-      </div>
+      </div> */}
       <div className={css.coverImage} onClick={handleClickCard}>
         <ResponsiveImage
           alt="card"
