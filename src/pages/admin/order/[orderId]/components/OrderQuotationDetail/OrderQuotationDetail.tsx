@@ -106,7 +106,7 @@ const OrderQuotationDetail: React.FC<OrderQuotationDetailProps> = (props) => {
   );
 
   const handleTabChange = (tab: any) => {
-    setCrrSubOrderDate(tab.key);
+    setCrrSubOrderDate(tab?.key);
   };
 
   const tabItems = useMemo(() => {
