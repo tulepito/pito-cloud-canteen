@@ -41,7 +41,7 @@ const FilterFormComponent: React.FC<TFilterFormComponentProps> = (props) => {
   const setEndDate = (date: number) => {
     form.change('meta_endDate', date);
   };
-  const minEndDate = addDays(values.meta_startDate!, 1);
+  const minEndDate = addDays(values.meta_startDate!, 0);
 
   return (
     <Form className={css.filterForm} onSubmit={handleSubmit}>
