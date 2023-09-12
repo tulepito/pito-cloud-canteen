@@ -403,13 +403,30 @@ const TABLE_COLUMN: TColumn[] = [
   },
 ];
 
+const filterOrder = (subOrders: any[], filterList: TObject) => {
+  const { startDate, endDate } = filterList;
+
+  const filterFn = (item: any) => {
+    if (startDate && +item.data.timestamp < new Date(startDate).getTime())
+      return false;
+    if (endDate && +item.data.timestamp > new Date(endDate).getTime())
+      return false;
+
+    return true;
+  };
+
+  return subOrders.filter(filterFn);
+};
+
 const parseEntitiesToTableData = (
   orders: TIntegrationOrderListing[],
   systemVATPercentage: number,
+  showMode = 'order',
 ) => {
   if (orders.length === 0) return [];
+  const shouldHideOrderRow = showMode === 'subOrder';
 
-  return orders.map((entity) => {
+  const result = orders.map((entity) => {
     const { company, subOrders = [], allRestaurants = [], bookerName } = entity;
     const restaurants = subOrders.reduce(
       // eslint-disable-next-line array-callback-return
@@ -462,7 +479,7 @@ const parseEntitiesToTableData = (
       return orderDetail[key]?.restaurant;
     });
     const isGroupOrder =
-      (entity?.attributes?.metadata?.orderType || 'group') === 'group';
+      (entity?.attributes?.metadata?.showMode || 'group') === 'group';
     const { totalDishes } = calculateTotalPriceAndDishes({
       orderDetail,
       isGroupOrder,
@@ -542,6 +559,10 @@ const parseEntitiesToTableData = (
       }),
     );
 
+    if (shouldHideOrderRow) {
+      return subOrderDates;
+    }
+
     const orderPrice = subOrderDates.reduce(
       (prev: number, item: any) => prev + item.data.price,
       0,
@@ -567,6 +588,7 @@ const parseEntitiesToTableData = (
         orderName: entity.attributes.publicData.orderName,
         deliveryHour,
         isParent: true,
+        isHide: shouldHideOrderRow,
         children: subOrderDates,
         isPaid: isClientSufficientPaid && isPartnerSufficientPaid,
         orderCreatedAt: formatTimestamp(
@@ -588,6 +610,8 @@ const parseEntitiesToTableData = (
       },
     };
   });
+
+  return shouldHideOrderRow ? flatten(result as any[]) : result;
 };
 
 const sortOrders = ({ columnName, type }: TTableSortValue, data: any) => {
@@ -624,12 +648,14 @@ const ManageOrdersPage = () => {
     meta_endDate,
     meta_startDate,
     meta_orderState,
+    showMode = 'order',
   } = router.query;
   const [sortValue, setSortValue] = useState<TTableSortValue>();
   const [displayedColumns, setDisplayedColumns] = useState<string[]>(
     TABLE_COLUMN.map((column) => column.key),
   );
 
+  const shouldHideOrder = showMode === 'subOrder';
   const shouldShowTableColums = TABLE_COLUMN.filter((column) => {
     return displayedColumns.includes(column.key);
   });
@@ -645,11 +671,24 @@ const ManageOrdersPage = () => {
     (state) => state.SystemAttributes.systemVATPercentage,
   );
 
-  const dataTable = parseEntitiesToTableData(orders, systemVATPercentage);
+  const dataTable = parseEntitiesToTableData(
+    orders,
+    systemVATPercentage,
+    showMode as string,
+  );
+  const filteredTableData = shouldHideOrder
+    ? filterOrder(dataTable, {
+        endDate: meta_endDate,
+        startDate: meta_startDate,
+      })
+    : dataTable;
+  const sortedData = sortValue
+    ? sortOrders(sortValue, filteredTableData)
+    : filteredTableData;
 
-  const sortedData = sortValue ? sortOrders(sortValue, dataTable) : dataTable;
-  console.log('sortedData', sortedData);
-  const onDownloadOrderList = async (values: TDownloadColumnListFormValues) => {
+  const handleDownloadOrderList = async (
+    values: TDownloadColumnListFormValues,
+  ) => {
     const endDateWithOneMoreDay = addDays(new Date(meta_endDate as string), 1);
     const { meta, payload } = await dispatch(
       orderAsyncActions.queryAllOrders({
@@ -705,6 +744,7 @@ const ManageOrdersPage = () => {
           tableWrapperClassName={css.tableWrapper}
           tableClassName={css.table}
           tableBodyClassName={css.tableBody}
+          paginationProps={shouldHideOrder ? { showInfo: false } : {}}
         />
       </>
     );
@@ -752,11 +792,12 @@ const ManageOrdersPage = () => {
     meta_startDate,
     meta_endDate,
     meta_orderState,
+    showMode,
   }: any) => {
     router.push({
       pathname: adminRoutes.ManageOrders.path,
       query: {
-        keywords,
+        ...(keywords ? { keywords } : {}),
         ...(meta_startDate
           ? { meta_startDate: new Date(meta_startDate).toISOString() }
           : {}),
@@ -764,6 +805,7 @@ const ManageOrdersPage = () => {
           ? { meta_endDate: new Date(meta_endDate).toISOString() }
           : {}),
         ...(meta_orderState ? { meta_orderState } : {}),
+        ...(showMode ? { showMode } : {}),
       },
     });
   };
@@ -798,6 +840,7 @@ const ManageOrdersPage = () => {
                     meta_state: groupStateString,
                     keywords,
                     meta_orderState,
+                    showMode: showMode as string,
                     meta_startDate: meta_startDate
                       ? new Date(meta_startDate as string).getTime()
                       : undefined,
@@ -845,7 +888,7 @@ const ManageOrdersPage = () => {
               <Tooltip
                 tooltipContent={
                   <DownloadColumnListForm
-                    onSubmit={onDownloadOrderList}
+                    onSubmit={handleDownloadOrderList}
                     initialValues={downloadColumnsListInitialValues}
                     inProgress={queryAllOrdersInProgress}
                   />

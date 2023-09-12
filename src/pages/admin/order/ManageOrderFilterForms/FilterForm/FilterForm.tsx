@@ -8,7 +8,10 @@ import Form from '@components/Form/Form';
 import FieldDatePicker from '@components/FormFields/FieldDatePicker/FieldDatePicker';
 import FieldDropdownSelect from '@components/FormFields/FieldDropdownSelect/FieldDropdownSelect';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
-import { ORDER_ADMIN_FILTER_OPTIONS } from '@src/utils/enums';
+import {
+  ADMIN_ORDER_TYPE_FILTER_OPTIONS,
+  ORDER_ADMIN_FILTER_OPTIONS,
+} from '@src/utils/enums';
 
 import css from './FilterForm.module.scss';
 
@@ -18,6 +21,7 @@ export type TFilterFormValues = {
   meta_state?: string[];
   keywords?: string | string[];
   meta_orderState: string | string[];
+  showMode?: string;
 };
 
 type TExtraProps = {};
@@ -82,6 +86,17 @@ const FilterFormComponent: React.FC<TFilterFormComponentProps> = (props) => {
         </div>
         <div className={css.orderStateSelect}>
           <FieldDropdownSelect
+            id="FilterForm.showMode"
+            name="showMode"
+            label="Loại đơn"
+            labelClassName={css.label}
+            placeholder="Chọn loại đơn"
+            options={ADMIN_ORDER_TYPE_FILTER_OPTIONS}
+            initialFieldValue={values.showMode}
+          />
+        </div>
+        <div className={css.orderStateSelect}>
+          <FieldDropdownSelect
             id="meta_orderState"
             name="meta_orderState"
             label="Trạng thái đơn"
@@ -91,6 +106,7 @@ const FilterFormComponent: React.FC<TFilterFormComponentProps> = (props) => {
             initialFieldValue={values.meta_orderState}
           />
         </div>
+
         <Button type="submit" className={css.filterBtn} size="medium">
           {intl.formatMessage({
             id: 'IntegrationFilterModal.filterMessage',

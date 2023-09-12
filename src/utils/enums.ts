@@ -1053,6 +1053,17 @@ export enum ENotificationPopupTypes {
   error = 'error',
 }
 
+export const ADMIN_ORDER_TYPE_FILTER_OPTIONS = [
+  {
+    key: 'order',
+    label: 'Đơn nhóm',
+  },
+  {
+    key: 'subOrder',
+    label: 'Đơn lẻ',
+  },
+];
+
 export const ORDER_ADMIN_FILTER_OPTIONS = [
   {
     key: 'draft',
