@@ -17,8 +17,10 @@ import participantCompanyInvitation, {
   participantCompanyInvitationSubject,
 } from '@src/utils/emailTemplate/participantCompanyInvitation';
 import {
+  EBookerOrderDraftStates,
   EListingType,
   ENotificationType,
+  EOrderDraftStates,
   EOrderStates,
   EOrderType,
 } from '@src/utils/enums';
@@ -50,11 +52,11 @@ const addMembersToCompanyFn = async (params: TAddMembersToCompanyParams) => {
 
   // TODO: update picking for new member
   // Step 1: query picking order
-  const allPickingOrders = await queryAllListings({
+  const allNeedOrders = await queryAllListings({
     query: {
       meta_listingType: EListingType.order,
       meta_orderType: EOrderType.group,
-      meta_orderState: EOrderStates.picking,
+      meta_orderState: `has_any:${EOrderStates.picking},${EOrderDraftStates.draft},${EOrderDraftStates.pendingApproval},${EBookerOrderDraftStates.bookerDraft}`,
       meta_companyId: companyId,
       meta_selectedGroups: 'has_any:allMembers',
     },
@@ -124,7 +126,7 @@ const addMembersToCompanyFn = async (params: TAddMembersToCompanyParams) => {
         }
       };
       // Step 3. Call function update data
-      mapLimit(allPickingOrders, 10, updateFn);
+      mapLimit(allNeedOrders, 10, updateFn);
 
       return {
         [userEmail]: {
