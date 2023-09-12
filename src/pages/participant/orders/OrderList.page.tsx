@@ -75,8 +75,6 @@ const OrderListPage = () => {
     getStartOfMonth(selectedDay || new Date()),
   );
 
-  console.log({ selectedDay });
-
   const [maxSelectedMonth, setMaxSelectedMonth] = useState<Date | null>(
     getStartOfMonth(new Date()),
   );
@@ -295,6 +293,7 @@ const OrderListPage = () => {
 
   const handleOnBoardingModalOpen = () => {
     onBoardingModal.setTrue();
+    updateProfileModalControl.setFalse();
     setTimeout(() => {
       tourControl.setTrue();
     }, 0);
