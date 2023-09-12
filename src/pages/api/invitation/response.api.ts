@@ -14,8 +14,10 @@ import { createFirebaseDocNotification } from '@services/notifications';
 import { getSdk, handleError } from '@services/sdk';
 import { UserPermission } from '@src/types/UserPermission';
 import {
+  EBookerOrderDraftStates,
   EListingType,
   ENotificationType,
+  EOrderDraftStates,
   EOrderStates,
   EOrderType,
 } from '@src/utils/enums';
@@ -94,11 +96,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
     // TODO: update picking for new member
     // Step 1: query picking order
-    const allPickingOrders = await queryAllListings({
+    const allNeedOrders = await queryAllListings({
       query: {
         meta_listingType: EListingType.order,
         meta_orderType: EOrderType.group,
-        meta_orderState: `has_any:${EOrderStates.picking}`,
+        meta_orderState: `has_any:${EOrderStates.picking},${EOrderDraftStates.draft},${EOrderDraftStates.pendingApproval},${EBookerOrderDraftStates.bookerDraft}`,
         meta_companyId: companyId,
         meta_selectedGroups: 'has_any:allMembers',
       },
@@ -147,7 +149,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       }
     };
     // Step 3. Call function update data
-    mapLimit(allPickingOrders, 10, updateFn);
+    mapLimit(allNeedOrders, 10, updateFn);
 
     return res.json({
       message: 'userAccept',
