@@ -7,7 +7,8 @@ import { fetchListing } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { handleError } from '@services/sdk';
 import { denormalisedResponseEntities, Listing } from '@src/utils/data';
-import { convertWeekDay } from '@src/utils/dates';
+import { convertWeekDay, VNTimezone } from '@src/utils/dates';
+import { EImageVariants } from '@src/utils/enums';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
@@ -16,11 +17,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
     switch (apiMethod) {
       case HttpMethod.GET: {
-        const { menuId, subOrderDate } = JSON.parse(
-          req.query.JSONParams as string,
-        );
+        const {
+          menuId,
+          subOrderDate,
+          nutritions = [],
+        } = JSON.parse(req.query.JSONParams as string);
 
-        const dateTime = DateTime.fromMillis(+subOrderDate);
+        const dateTime = DateTime.fromMillis(+subOrderDate).setZone(VNTimezone);
         const dayOfWeek = convertWeekDay(dateTime.weekday).key;
 
         const menu = await fetchListing(menuId as string);
@@ -28,6 +31,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         const foodIdList = menuListing.getMetadata()[`${dayOfWeek}FoodIdList`];
         const foodList = await integrationSdk.listings.query({
           ids: foodIdList,
+          ...(nutritions.length > 0
+            ? { pub_specialDiets: `has_any:${nutritions.join(',')}` }
+            : {}),
+          include: ['images'],
+          'fields.image': [`variants.${EImageVariants.default}`],
         });
 
         return res.status(200).json(denormalisedResponseEntities(foodList));
