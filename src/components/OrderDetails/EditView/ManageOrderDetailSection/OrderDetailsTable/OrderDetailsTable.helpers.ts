@@ -50,11 +50,12 @@ export const prepareDataForTabs = ({
 
       const [memberId, orderItemData] = currentOrderItem;
       const { status, foodId, requirement = '' } = orderItemData;
-      const memberData =
-        memberInfoMap[memberId] || anonymousMemberInfoMap[memberId] || {};
+      const memberDataMaybe = memberInfoMap[memberId];
+      const anonymousDataMaybe = anonymousMemberInfoMap[memberId];
+      const memberData = memberDataMaybe || anonymousDataMaybe || {};
 
       const itemData: TItemData = {
-        isAnonymous: isEmpty(memberData),
+        isAnonymous: isEmpty(memberDataMaybe),
         memberData,
         status,
         foodData:
