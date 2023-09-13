@@ -3,8 +3,9 @@ import { emailSendingFactory, EmailTemplateTypes } from '@services/email';
 import getSystemAttributes from '@services/getSystemAttributes';
 import { fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
+import { createNativeNotification } from '@services/nativeNotification';
 import { Listing, User } from '@utils/data';
-import { EOrderStates } from '@utils/enums';
+import { ENativeNotificationType, EOrderStates } from '@utils/enums';
 
 export const startOrder = async (orderId: string, planId: string) => {
   const integrationSdk = getIntegrationSdk();
@@ -19,6 +20,8 @@ export const startOrder = async (orderId: string, planId: string) => {
     orderState,
     orderStateHistory = [],
     partnerIds = [],
+    participants = [],
+    anonymous = [],
   } = Listing(orderListing).getMetadata();
 
   if (orderState !== EOrderStates.picking) {
@@ -65,5 +68,24 @@ export const startOrder = async (orderId: string, planId: string) => {
 
   emailSendingFactory(EmailTemplateTypes.BOOKER.BOOKER_ORDER_SUCCESS, {
     orderId,
+  });
+
+  participants.map(async (participantId: string) => {
+    createNativeNotification(
+      ENativeNotificationType.BookerTransitOrderStateToPicking,
+      {
+        participantId,
+        order: orderListing,
+      },
+    );
+  });
+  anonymous.map(async (anonymousId: string) => {
+    createNativeNotification(
+      ENativeNotificationType.BookerTransitOrderStateToPicking,
+      {
+        participantId: anonymousId,
+        order: orderListing,
+      },
+    );
   });
 };

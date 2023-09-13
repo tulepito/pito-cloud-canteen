@@ -8,6 +8,7 @@ import { CustomError, EHttpStatusCode } from '@apis/errors';
 import createQuotation from '@pages/api/orders/[orderId]/quotation/create-quotation.service';
 import { emailSendingFactory, EmailTemplateTypes } from '@services/email';
 import { fetchListing } from '@services/integrationHelper';
+import { createNativeNotification } from '@services/nativeNotification';
 import { createFirebaseDocNotification } from '@services/notifications';
 import adminChecker from '@services/permissionChecker/admin';
 import { getIntegrationSdk, handleError } from '@services/sdk';
@@ -17,7 +18,11 @@ import {
   Transaction,
 } from '@src/utils/data';
 import { VNTimezone } from '@src/utils/dates';
-import { ENotificationType, EQuotationStatus } from '@src/utils/enums';
+import {
+  ENativeNotificationType,
+  ENotificationType,
+  EQuotationStatus,
+} from '@src/utils/enums';
 import { isTransactionsTransitionInvalidTransition } from '@src/utils/errors';
 import { ETransition } from '@src/utils/transaction';
 import type { TError } from '@src/utils/types';
@@ -92,6 +97,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         const planId = planListing.getId();
 
         const { orderDetail } = planListing.getMetadata();
+        const { memberOrders = {}, restaurant = {} } = orderDetail;
 
         const updatePlanListing = async (lastTransition: string) => {
           const newOrderDetail = {
@@ -116,6 +122,18 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
               ...generalNotificationData,
               userId: participantId,
             });
+
+            const { foodId } = memberOrders[participantId];
+            const { foodName } = restaurant.foodList[foodId];
+            createNativeNotification(
+              ENativeNotificationType.AdminTransitSubOrderToDelivering,
+              {
+                participantId,
+                planId,
+                subOrderDate: startTimestamp.toString(),
+                foodName,
+              },
+            );
           });
 
           await updatePlanListing(ETransition.START_DELIVERY);
@@ -126,6 +144,17 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
               ...generalNotificationData,
               userId: participantId,
             });
+            const { foodId } = memberOrders[participantId];
+            const { foodName } = restaurant.foodList[foodId];
+            createNativeNotification(
+              ENativeNotificationType.AdminTransitSubOrderToDelivered,
+              {
+                participantId,
+                planId,
+                subOrderDate: startTimestamp.toString(),
+                foodName,
+              },
+            );
           });
           await transitionOrderStatus(order, plan, integrationSdk);
           await updatePlanListing(ETransition.COMPLETE_DELIVERY);
@@ -147,6 +176,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
                 orderId,
                 timestamp,
                 participantId,
+              },
+            );
+            createNativeNotification(
+              ENativeNotificationType.AdminTransitSubOrderToCanceled,
+              {
+                participantId,
+                planId,
+                subOrderDate: startTimestamp.toString(),
               },
             );
           });

@@ -5,6 +5,7 @@ import Script from 'next/script';
 import nProgress from 'nprogress';
 
 import AuthGuard from '@components/Guards/AuthGuard';
+import GoNativeProvider from '@components/Guards/GoNativeProvider';
 import PermissionGuard from '@components/Guards/PermissionGuard';
 import ToastifyProvider from '@components/ToastifyProvider/ToastifyProvider';
 import UIProvider from '@components/UIProvider/UIProvider';
@@ -43,7 +44,9 @@ const MyApp = ({
           <AuthGuard>
             <PermissionGuard>
               <ToastifyProvider>
-                <Component {...restProps.pageProps} key={router.asPath} />
+                <GoNativeProvider>
+                  <Component {...restProps.pageProps} key={router.asPath} />
+                </GoNativeProvider>
               </ToastifyProvider>
             </PermissionGuard>
           </AuthGuard>

@@ -1,5 +1,5 @@
+/* eslint-disable @next/next/no-sync-scripts */
 import { Head, Html, Main, NextScript } from 'next/document';
-
 /**
  * Use https://realfavicongenerator.net/ for generate favicon
  */
@@ -49,6 +49,7 @@ export default function Document() {
           href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap"
           rel="stylesheet"
         />
+        <script id="gn" src={'@src/assets/GoNativeJSBridgeLibrary'} />
       </Head>
       <body>
         <Main />

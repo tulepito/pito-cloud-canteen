@@ -1103,3 +1103,12 @@ export enum EOrderPaymentState {
   isPaid = 'isPaid',
   isNotPaid = 'isNotPaid',
 }
+
+export enum ENativeNotificationType {
+  BookerTransitOrderStateToPicking = 'BookerTransitOrderStateToPicking',
+  BookerTransitOrderStateToInProgress = 'BookerTransitOrderStateToInProgress',
+  AdminTransitSubOrderToDelivering = 'AdminTransitSubOrderToDelivering',
+  AdminTransitSubOrderToDelivered = 'AdminTransitSubOrderToDelivered',
+  AdminTransitSubOrderToCanceled = 'AdminTransitSubOrderToCanceled',
+  TransitOrderStateToCanceled = 'TransitOrderStateToCanceled',
+}

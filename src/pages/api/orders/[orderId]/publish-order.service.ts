@@ -3,11 +3,13 @@ import uniq from 'lodash/uniq';
 
 import { denormalisedResponseEntities } from '@services/data';
 import { getIntegrationSdk } from '@services/integrationSdk';
+import { createNativeNotification } from '@services/nativeNotification';
 import { createFirebaseDocNotification } from '@services/notifications';
 import type { TPlan } from '@src/utils/orderTypes';
 import { Listing, User } from '@utils/data';
 import {
   EBookerOrderDraftStates,
+  ENativeNotificationType,
   ENotificationType,
   EOrderDraftStates,
   EOrderStates,
@@ -54,6 +56,7 @@ export const publishOrder = async (orderId: string) => {
     orderStateHistory = [],
     participants = [],
     serviceFees = {},
+    anonymous = [],
   } = orderListing.getMetadata();
   const { title: orderTitle } = orderListing.getAttributes();
 
@@ -124,5 +127,22 @@ export const publishOrder = async (orderId: string) => {
       orderTitle,
       userId: participantId,
     });
+
+    createNativeNotification(
+      ENativeNotificationType.BookerTransitOrderStateToPicking,
+      {
+        participantId,
+        order,
+      },
+    );
+  });
+  anonymous.map(async (anonymousId: string) => {
+    createNativeNotification(
+      ENativeNotificationType.BookerTransitOrderStateToPicking,
+      {
+        participantId: anonymousId,
+        order,
+      },
+    );
   });
 };
