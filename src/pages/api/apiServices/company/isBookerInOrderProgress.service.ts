@@ -26,7 +26,7 @@ const isBookerInOrderProgress = async ({
       meta_bookerId: updatingMember?.id,
       page: 1,
       perPage: 1,
-      meta_orderState: `has_any:${EBookerOrderDraftStates.bookerDraft},${EOrderStates.inProgress},${EOrderStates.picking},${EOrderDraftStates.draft},${EOrderDraftStates.pendingApproval}`,
+      meta_orderState: `${EBookerOrderDraftStates.bookerDraft},${EOrderStates.inProgress},${EOrderStates.picking},${EOrderDraftStates.draft},${EOrderDraftStates.pendingApproval}`,
     });
     const inProgressOrders = denormalisedResponseEntities(response);
     if (inProgressOrders.length > 0) {
