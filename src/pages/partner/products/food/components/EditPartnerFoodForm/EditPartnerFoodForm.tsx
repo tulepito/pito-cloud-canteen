@@ -92,14 +92,12 @@ const EditPartnerFoodFormComponent: React.FC<
     categories: categoriesOptions = [],
     packaging: packagingOptions = [],
   } = useAppSelector((state) => state.SystemAttributes, shallowEqual);
-  console.log('removedImageIds', removedImageIds);
   const images = pickRenderableImages(
     currentFoodListing,
     uploadedImages,
     uploadedImagesOrder,
     removedImageIds,
   );
-  console.log('images', images);
 
   const onImageUpload = (params: { id: string; file: File }) => {
     return dispatch(
