@@ -3,7 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import cookies from '@services/cookie';
 import adminChecker from '@services/permissionChecker/admin';
 import { getIntegrationSdk, handleError } from '@services/sdk';
-import { LISTING_TYPE } from '@src/pages/api/helpers/constants';
+import { EListingType } from '@src/utils/enums';
 import { denormalisedResponseEntities } from '@utils/data';
 import type { TIntegrationOrderListing } from '@utils/types';
 
@@ -15,7 +15,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     const response = await integrationSdk.listings.query(
       {
         ...dataParams,
-        meta_listingType: LISTING_TYPE.SUB_ORDER,
+        meta_listingType: EListingType.subOrder,
       },
       queryParams,
     );

@@ -2,12 +2,12 @@ import { createSlice } from '@reduxjs/toolkit';
 
 import { fetchUserApi } from '@apis/index';
 import { fetchSearchFilterApi } from '@apis/userApi';
-import { LISTING_TYPE } from '@pages/api/helpers/constants';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { denormalisedResponseEntities } from '@utils/data';
 import {
   EImageVariants,
   EListingStates,
+  EListingType,
   ERestaurantListingStatus,
 } from '@utils/enums';
 import type { TListing, TObject, TUser } from '@utils/types';
@@ -65,7 +65,7 @@ const fetchRestaurants = createAsyncThunk(
   FETCH_RESTAURANTS,
   async (_, { extra: sdk }) => {
     const query = {
-      meta_listingType: LISTING_TYPE.RESTAURANT,
+      meta_listingType: EListingType.subOrder,
       meta_status: ERestaurantListingStatus.authorized,
       meta_listingState: EListingStates.published,
       include: ['images'],

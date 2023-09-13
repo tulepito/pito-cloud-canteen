@@ -3,8 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { HttpMethod } from '@apis/configs';
 import { denormalisedResponseEntities } from '@services/data';
 import { getIntegrationSdk } from '@services/sdk';
-
-import { LISTING_TYPE } from '../helpers/constants';
+import { EListingType } from '@src/utils/enums';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const apiMethod = req.method;
@@ -35,7 +34,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           authorId,
           metadata: {
             restaurantId,
-            listingType: LISTING_TYPE.FOOD,
+            listingType: EListingType.food,
           },
         };
 

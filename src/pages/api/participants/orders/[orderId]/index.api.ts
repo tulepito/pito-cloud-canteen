@@ -3,10 +3,10 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HttpMethod } from '@apis/configs';
-import { LISTING_TYPE } from '@pages/api/helpers/constants';
 import cookies from '@services/cookie';
 import { fetchListing, fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk, getSdk, handleError } from '@services/sdk';
+import { EListingType } from '@src/utils/enums';
 import type { TListing } from '@src/utils/types';
 import {
   CurrentUser,
@@ -33,7 +33,7 @@ const fetchSubOrder = async (orderDetail: any) => {
     const foodListData = denormalisedResponseEntities(
       await integrationSdk.listings.query({
         ids: foodListIds.slice(0, 50),
-        meta_listingType: 'food',
+        meta_listingType: EListingType.food,
       }),
     );
     orderDetailResult = {
@@ -77,7 +77,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         const plans = denormalisedResponseEntities(
           await integrationSdk.listings.query({
             ids: planIds.slice(0, 50),
-            meta_listingType: LISTING_TYPE.SUB_ORDER,
+            meta_listingType: EListingType.subOrder,
           }),
         );
 

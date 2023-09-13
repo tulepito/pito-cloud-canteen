@@ -3,10 +3,10 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HttpMethod } from '@apis/configs';
 import { queryAllPages } from '@helpers/apiHelpers';
-import { LISTING_TYPE } from '@pages/api/helpers/constants';
 import cookies from '@services/cookie';
 import { fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk, handleError } from '@services/sdk';
+import { EListingType } from '@src/utils/enums';
 import { denormalisedResponseEntities, Listing, User } from '@utils/data';
 import type { TIntegrationOrderListing, TListing } from '@utils/types';
 
@@ -33,13 +33,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
                 sdkModel: integrationSdk.listings,
                 query: {
                   ...dataParams,
-                  meta_listingType: LISTING_TYPE.ORDER,
+                  meta_listingType: EListingType.order,
                 },
               })
             : await integrationSdk.listings.query(
                 {
                   ...dataParams,
-                  meta_listingType: LISTING_TYPE.ORDER,
+                  meta_listingType: EListingType.order,
                 },
                 queryParams,
               );

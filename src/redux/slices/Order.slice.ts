@@ -28,7 +28,6 @@ import { fetchSearchFilterApi } from '@apis/userApi';
 import { queryAllPages } from '@helpers/apiHelpers';
 import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
 import { getMenuQueryInSpecificDay } from '@helpers/listingSearchQuery';
-import { LISTING_TYPE } from '@pages/api/helpers/constants';
 import { createAsyncThunk } from '@redux/redux.helper';
 import config from '@src/configs';
 import { CompanyPermission } from '@src/types/UserPermission';
@@ -551,7 +550,7 @@ const queryCompanyOrders = createAsyncThunk(
         states: EListingStates.published,
         meta_companyId: companyId,
         meta_bookerId: bookerId,
-        meta_listingType: LISTING_TYPE.ORDER,
+        meta_listingType: EListingType.order,
         sort: 'createdAt',
       },
       queryParams: {
