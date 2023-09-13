@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-shadow */
 import flatten from 'lodash/flatten';
 import uniq from 'lodash/uniq';
 import * as XLSX from 'xlsx';
@@ -74,11 +75,11 @@ export const parseEntitiesToExportCsv = (
       }),
       ...(hasTotalDishes && { 'Số phần ăn': totalDishes }),
       ...(hasFoodList && {
-        'Danh sách món': foodList.map((item: any) => item.foodName).join('\n'),
+        'Danh sách món': foodList.map((item: any) => item?.foodName).join('\n'),
       }),
       ...(hasNumberPerFood && {
         'Số lượng từng món': foodList
-          .map((item: any) => item.frequency)
+          .map((item: any) => item?.frequency)
           .join('\n'),
       }),
       ...(hasPrice && {
@@ -92,7 +93,7 @@ export const parseEntitiesToExportCsv = (
       }),
       ...(hasPartnersPhoneNumbers && {
         'SĐT đối tác': uniq(
-          fullRestaurantsData.map((item: any) => item.phoneNumber || ''),
+          fullRestaurantsData.map((item: any) => item?.phoneNumber || ''),
         ).join('\n'),
       }),
       ...(hasPartnersAddress && {
@@ -101,51 +102,65 @@ export const parseEntitiesToExportCsv = (
     };
 
     const subOrdersData = hasSubOrders
-      ? children.map((child: any) => ({
-          ...(hasTitleCol && { 'Mã đơn': child.data.title }),
-          ...(hasOrderCreatedAtCol && {
-            'Ngày tạo đơn': orderCreatedAt,
-          }),
-          ...(hastOrderState && {
-            'Trạng thái đơn': getLabelByKey(ORDER_STATES_OPTIONS, state),
-          }),
-          ...(hasCompanyNameCol && { 'Tên công ty': companyName }),
-          ...(hasBookerName && { 'Người đại diện': bookerName }),
-          ...(hasBookerPhoneNumberCol && {
-            'SĐT người đại diện': bookerPhoneNumber,
-          }),
-          ...(hasCompanyAddressCol && { 'Địa chỉ công ty': companyLocation }),
-          ...(hasDeliveryDate && {
-            'Giờ giao hàng': deliveryHour,
-            'Ngày giao hàng': child.data.subOrderDate,
-          }),
-          ...(hasTotalDishes && { 'Số phần ăn': child.data.totalDishes }),
-          ...(hasFoodList && {
-            'Danh sách món': child.data.foodList
-              .map((item: any) => item.foodName)
-              .join('\n'),
-          }),
-          ...(hasNumberPerFood && {
-            'Số lượng từng món': child.data.foodList
-              .map((item: any) => item.frequency)
-              .join('\n'),
-          }),
-          ...(hasPrice && {
-            'Thành tiền ': parseThousandNumber(child.data.price),
-          }),
-          ...(hasOrderNotes && {
-            'Ghi chú đơn hàng': orderNotes[child.data.restaurantId],
-          }),
-          ...(hasPartners && {
-            'Đối tác': child.data.restaurants.join('\n'),
-          }),
-          ...(hasPartnersPhoneNumbers && {
-            'SĐT đối tác': child.data.partnerPhoneNumber,
-          }),
-          ...(hasPartnersAddress && {
-            'Địa chỉ đối tác': child.data.partnerLocation,
-          }),
-        }))
+      ? children.map((child: any) => {
+          const {
+            price,
+            title,
+            totalDishes,
+            foodList = [],
+            partnerPhoneNumber,
+            partnerLocation,
+            restaurants = [],
+            restaurantId,
+            subOrderDate,
+          } = child?.data || {};
+
+          return {
+            ...(hasTitleCol && { 'Mã đơn': title }),
+            ...(hasOrderCreatedAtCol && {
+              'Ngày tạo đơn': orderCreatedAt,
+            }),
+            ...(hastOrderState && {
+              'Trạng thái đơn': getLabelByKey(ORDER_STATES_OPTIONS, state),
+            }),
+            ...(hasCompanyNameCol && { 'Tên công ty': companyName }),
+            ...(hasBookerName && { 'Người đại diện': bookerName }),
+            ...(hasBookerPhoneNumberCol && {
+              'SĐT người đại diện': bookerPhoneNumber,
+            }),
+            ...(hasCompanyAddressCol && { 'Địa chỉ công ty': companyLocation }),
+            ...(hasDeliveryDate && {
+              'Giờ giao hàng': deliveryHour,
+              'Ngày giao hàng': subOrderDate,
+            }),
+            ...(hasTotalDishes && { 'Số phần ăn': totalDishes }),
+            ...(hasFoodList && {
+              'Danh sách món': foodList
+                .map((item: any) => item?.foodName)
+                .join('\n'),
+            }),
+            ...(hasNumberPerFood && {
+              'Số lượng từng món': foodList
+                .map((item: any) => item.frequency)
+                .join('\n'),
+            }),
+            ...(hasPrice && {
+              'Thành tiền ': parseThousandNumber(price),
+            }),
+            ...(hasOrderNotes && {
+              'Ghi chú đơn hàng': orderNotes[restaurantId],
+            }),
+            ...(hasPartners && {
+              'Đối tác': restaurants.join('\n'),
+            }),
+            ...(hasPartnersPhoneNumbers && {
+              'SĐT đối tác': partnerPhoneNumber,
+            }),
+            ...(hasPartnersAddress && {
+              'Địa chỉ đối tác': partnerLocation,
+            }),
+          };
+        })
       : [];
 
     if (!hasTitleCol || (hasTitleCol && !hasSubOrders && !hasParentOrder)) {

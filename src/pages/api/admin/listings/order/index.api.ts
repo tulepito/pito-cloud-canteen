@@ -1,14 +1,21 @@
+/* eslint-disable @typescript-eslint/no-shadow */
+import compact from 'lodash/compact';
+import flatten from 'lodash/flatten';
 import uniq from 'lodash/uniq';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HttpMethod } from '@apis/configs';
-import { queryAllPages } from '@helpers/apiHelpers';
-import { LISTING_TYPE } from '@pages/api/helpers/constants';
+import { convertListIdToQueries, queryAllPages } from '@helpers/apiHelpers';
 import cookies from '@services/cookie';
-import { fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk, handleError } from '@services/sdk';
+import { EListingType } from '@src/utils/enums';
 import { denormalisedResponseEntities, Listing, User } from '@utils/data';
-import type { TIntegrationOrderListing, TListing } from '@utils/types';
+import type {
+  TIntegrationOrderListing,
+  TListing,
+  TObject,
+  TUser,
+} from '@utils/types';
 
 const { NEXT_PUBLIC_ENV } = process.env;
 const isProduction = NEXT_PUBLIC_ENV === 'production';
@@ -33,74 +40,188 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
                 sdkModel: integrationSdk.listings,
                 query: {
                   ...dataParams,
-                  meta_listingType: LISTING_TYPE.ORDER,
+                  meta_listingType: EListingType.order,
                 },
               })
             : await integrationSdk.listings.query(
                 {
                   ...dataParams,
-                  meta_listingType: LISTING_TYPE.ORDER,
+                  meta_listingType: EListingType.order,
                 },
                 queryParams,
               );
+
           const orders = isQueryAllPages
             ? isProduction
               ? response
               : response.slice(0, 20)
             : denormalisedResponseEntities(response);
-          const orderWithOthersData = await Promise.all(
-            orders.map(async (order: TIntegrationOrderListing) => {
+
+          // TODO: query plan(s) for mapping with orders
+          // #region query plan(s)
+          let allPlans: TListing[] = [];
+
+          if (isProduction && isQueryAllPages) {
+            allPlans = await queryAllPages({
+              sdkModel: integrationSdk.listings,
+              query: {
+                meta_listingType: EListingType.subOrder,
+              },
+            });
+          } else {
+            const allPlanIds = compact(
+              orders.map((order: TListing) => {
+                const { plans = [] } = Listing(order).getMetadata();
+
+                return plans[0];
+              }),
+            );
+
+            allPlans = denormalisedResponseEntities(
+              await integrationSdk.listings.query({
+                ids: allPlanIds,
+              }),
+            );
+          }
+          // #endregion query plan(s)
+
+          // TODO: query restaurant(s) for mapping with orders
+          // #region query restaurant(s)
+          const allRestaurantIds = uniq(
+            compact(
+              allPlans.reduce<Array<string | undefined>>(
+                (restaurantIdList, plan: TListing) => {
+                  const { orderDetail = {} } = Listing(plan).getMetadata();
+
+                  const newIds: Array<string | undefined> = Object.values(
+                    orderDetail,
+                  ).map((_orderDetail: any) => _orderDetail?.restaurant?.id);
+
+                  return restaurantIdList.concat(newIds);
+                },
+                [],
+              ),
+            ),
+          );
+          const restaurantQueries = convertListIdToQueries({
+            idList: allRestaurantIds,
+          });
+          const allRestaurants: TListing[] = flatten(
+            await Promise.all(
+              restaurantQueries.map(async ({ ids }) => {
+                return denormalisedResponseEntities(
+                  await integrationSdk.listings.query({
+                    ids: `${ids}`,
+                  }),
+                );
+              }),
+            ),
+          );
+          // #endregion query restaurant(s)
+
+          // TODO: query company(ies)/booker(s) for mapping with orders
+          // #region query company(ies)/booker(s)
+          let allCompanies: TUser[] = [];
+          let allBookers: TUser[] = [];
+
+          const { companyIds, bookerIds } = orders.reduce(
+            (result: TObject, order: TListing) => {
+              const { companyId, bookerId } = Listing(order).getMetadata();
+
+              return {
+                companyIds: result.companyIds.concat(companyId),
+                bookerIds: result.bookerIds.concat(bookerId),
+              };
+            },
+            {
+              companyIds: [],
+              bookerIds: [],
+            },
+          );
+          const allCompanyIds = uniq(compact(companyIds));
+          const allBookerIds = uniq(compact(bookerIds));
+
+          if (isProduction && isQueryAllPages) {
+            const companyQueries = convertListIdToQueries({
+              idList: allCompanyIds,
+            });
+            allCompanies = flatten(
+              await Promise.all(
+                companyQueries.map(async ({ ids }) => {
+                  return denormalisedResponseEntities(
+                    await integrationSdk.users.query({
+                      meta_id: `${ids}`,
+                    }),
+                  );
+                }),
+              ),
+            );
+
+            const bookerQueries = convertListIdToQueries({
+              idList: allBookerIds,
+            });
+            allBookers = flatten(
+              await Promise.all(
+                bookerQueries.map(async ({ ids }) => {
+                  return denormalisedResponseEntities(
+                    await integrationSdk.users.query({
+                      meta_id: `${ids}`,
+                    }),
+                  );
+                }),
+              ),
+            );
+          } else {
+            allCompanies = denormalisedResponseEntities(
+              await integrationSdk.users.query({
+                meta_id: allCompanyIds,
+              }),
+            );
+            allBookers = denormalisedResponseEntities(
+              await integrationSdk.users.query({
+                meta_id: allBookerIds,
+              }),
+            );
+          }
+          // #endregion query company(ies)/booker(s)
+
+          const orderWithOthersData = orders.map(
+            (order: TIntegrationOrderListing) => {
               const {
                 companyId,
                 plans = [],
                 bookerId,
               } = Listing(order as TListing).getMetadata();
-              const company = await fetchUser(companyId);
+              const company = allCompanies.find((c) => c.id.uuid === companyId);
+              const booker = allBookers.find((b) => b.id.uuid === bookerId);
 
               if (plans.length > 0) {
                 const [planId] = plans;
-                const [plan] = denormalisedResponseEntities(
-                  await integrationSdk.listings.show({ id: planId }),
-                );
+                const plan = allPlans.find((p) => p.id.uuid === planId);
 
                 const { orderDetail: planOrderDetail } = Listing(
                   plan as TListing,
                 ).getMetadata();
 
-                const allRestaurantsIds = uniq(
+                const restaurantsIds = uniq(
                   Object.values(planOrderDetail).map(
-                    (orderDetail: any) => orderDetail.restaurant.id,
+                    (orderDetail: any) => orderDetail?.restaurant?.id,
                   ),
                 );
-
-                const allRestaurants = await Promise.all(
-                  allRestaurantsIds.map(async (restaurantId) => {
-                    const [restaurant] = denormalisedResponseEntities(
-                      await integrationSdk.listings.show({
-                        id: restaurantId,
-                      }),
-                    );
-
-                    return restaurant;
-                  }),
+                const restaurants = allRestaurants.filter((r: TListing) =>
+                  restaurantsIds.includes(r.id.uuid),
                 );
-                let bookerName = '';
-                if (bookerId === companyId) {
-                  const companyUser = User(company);
-                  const { firstName, lastName } = companyUser.getProfile();
-                  bookerName = `${lastName} ${firstName}`;
-                } else {
-                  const booker = await fetchUser(bookerId);
-                  const bookerUser = User(booker);
-                  const { firstName, lastName } = bookerUser.getProfile();
-                  bookerName = `${lastName} ${firstName}`;
-                }
+
+                const { firstName, lastName } = User(
+                  bookerId === companyId ? company! : booker!,
+                ).getProfile();
+                const bookerName = `${lastName} ${firstName}`;
 
                 return {
                   ...order,
                   company,
                   subOrders: [plan],
-                  allRestaurants,
+                  allRestaurants: restaurants,
                   bookerName,
                 };
               }
@@ -110,7 +231,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
                 company,
                 subOrders: [],
               };
-            }),
+            },
           );
 
           res.json({
