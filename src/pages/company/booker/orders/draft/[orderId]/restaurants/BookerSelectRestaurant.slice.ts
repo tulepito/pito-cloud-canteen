@@ -210,8 +210,7 @@ const searchRestaurants = createAsyncThunk(
 
     await dispatch(orderAsyncActions.fetchOrder(orderId!));
     const { order } = getState().Order;
-    const { restaurantIdList = [], companyAccount } =
-      getState().BookerSelectRestaurant;
+    const { companyAccount } = getState().BookerSelectRestaurant;
 
     const query = getMenuQuery({ order, params });
     const orderListing = Listing(order);
@@ -228,7 +227,7 @@ const searchRestaurants = createAsyncThunk(
       combinedRestaurantMenuData,
       'restaurantId',
     ).map((item) => item.restaurantId);
-    const totalRestaurantIds = uniq([...restaurantIdList, ...newRestaurantIds]);
+    const totalRestaurantIds = uniq([...newRestaurantIds]);
     const slicedRestaurantIdsBy100 = chunk(totalRestaurantIds, 100);
 
     const restaurantQueries = slicedRestaurantIdsBy100.map((restaurantIds) =>
