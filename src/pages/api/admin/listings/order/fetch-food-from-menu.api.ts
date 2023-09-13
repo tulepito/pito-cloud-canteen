@@ -7,7 +7,7 @@ import { fetchListing } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { handleError } from '@services/sdk';
 import { denormalisedResponseEntities, Listing } from '@src/utils/data';
-import { convertWeekDay } from '@src/utils/dates';
+import { convertWeekDay, VNTimezone } from '@src/utils/dates';
 import { EImageVariants } from '@src/utils/enums';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
@@ -23,7 +23,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           nutritions = [],
         } = JSON.parse(req.query.JSONParams as string);
 
-        const dateTime = DateTime.fromMillis(+subOrderDate);
+        const dateTime = DateTime.fromMillis(+subOrderDate).setZone(VNTimezone);
         const dayOfWeek = convertWeekDay(dateTime.weekday).key;
 
         const menu = await fetchListing(menuId as string);
