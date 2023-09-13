@@ -650,6 +650,7 @@ const ManageOrdersPage = () => {
     meta_orderState,
     showMode = 'order',
   } = router.query;
+  const { isReady } = router;
   const [sortValue, setSortValue] = useState<TTableSortValue>();
   const [displayedColumns, setDisplayedColumns] = useState<string[]>(
     TABLE_COLUMN.map((column) => column.key),
@@ -763,22 +764,28 @@ const ManageOrdersPage = () => {
     .filter((item: string) => !!item);
 
   useEffect(() => {
-    const endDateWithOneMoreDay = addDays(new Date(meta_endDate as string), 1);
-    const hasDateFilter = meta_startDate || meta_endDate;
-    const metaStartDateQuery = `${
-      meta_startDate ? new Date(meta_startDate as string).getTime() : ''
-    },${meta_endDate ? new Date(endDateWithOneMoreDay).getTime() : ''}`;
-
-    dispatch(
-      orderAsyncActions.queryOrders({
-        page,
-        keywords,
-        ...(meta_orderState ? { meta_orderState } : {}),
-        ...(hasDateFilter ? { meta_startDate: metaStartDateQuery } : {}),
-      }),
-    );
     dispatch(resetOrder());
-  }, []);
+
+    if (isReady) {
+      const endDateWithOneMoreDay = addDays(
+        new Date(meta_endDate as string),
+        1,
+      );
+      const hasDateFilter = meta_startDate || meta_endDate;
+      const metaStartDateQuery = `${
+        meta_startDate ? new Date(meta_startDate as string).getTime() : ''
+      },${meta_endDate ? new Date(endDateWithOneMoreDay).getTime() : ''}`;
+
+      dispatch(
+        orderAsyncActions.queryOrders({
+          page,
+          keywords,
+          ...(meta_orderState ? { meta_orderState } : {}),
+          ...(hasDateFilter ? { meta_startDate: metaStartDateQuery } : {}),
+        }),
+      );
+    }
+  }, [isReady]);
 
   const onClearFilter = () => {
     router.push({
