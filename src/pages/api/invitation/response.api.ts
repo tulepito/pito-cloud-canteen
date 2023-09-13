@@ -100,7 +100,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       query: {
         meta_listingType: EListingType.order,
         meta_orderType: EOrderType.group,
-        meta_orderState: `has_any:${EOrderStates.picking},${EOrderDraftStates.draft},${EOrderDraftStates.pendingApproval},${EBookerOrderDraftStates.bookerDraft}`,
+        meta_orderState: `${[
+          EOrderStates.picking,
+          EOrderDraftStates.draft,
+          EOrderDraftStates.pendingApproval,
+          EBookerOrderDraftStates.bookerDraft,
+        ].join(',')}`,
         meta_companyId: companyId,
         meta_selectedGroups: 'has_any:allMembers',
       },

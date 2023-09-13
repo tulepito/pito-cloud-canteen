@@ -9,7 +9,7 @@ import {
 
 const ORDER_QUERY_PARAMS_BY_NOTIFICATION_TYPE = {
   [ENotificationTypes.completedOrder]: {
-    meta_orderState: `has_any:${[
+    meta_orderState: `${[
       EOrderStates.pendingPayment,
       EOrderStates.reviewed,
       EOrderStates.completed,
@@ -17,10 +17,9 @@ const ORDER_QUERY_PARAMS_BY_NOTIFICATION_TYPE = {
     sort: 'createdAt',
   },
   [ENotificationTypes.pickingOrder]: {
-    meta_orderState: `has_any:${[
-      EOrderStates.inProgress,
-      EOrderStates.picking,
-    ].join(',')}`,
+    meta_orderState: `${[EOrderStates.inProgress, EOrderStates.picking].join(
+      ',',
+    )}`,
     sort: 'createdAt',
   },
   [ENotificationTypes.draftOrder]: {
