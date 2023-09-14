@@ -43,6 +43,7 @@ import { formatTimestamp, getDayOfWeek } from '@utils/dates';
 import {
   EOrderDraftStates,
   EOrderStates,
+  EOrderType,
   getLabelByKey,
   ORDER_STATES_OPTIONS,
 } from '@utils/enums';
@@ -443,6 +444,21 @@ const parseEntitiesToTableData = (
       [],
     );
 
+    const {
+      startDate,
+      endDate,
+      orderState,
+      staffName,
+      deliveryAddress,
+      deliveryHour,
+      isClientSufficientPaid = false,
+      isPartnerSufficientPaid = false,
+      orderType = EOrderType.group,
+      hasSpecificPCCFee = false,
+      specificPCCFee = 0,
+      orderVATPercentage = 0,
+    } = entity?.attributes?.metadata || {};
+
     const newSubOrders = subOrders.map((plan: TObject) => {
       const { orderDetail: planOrderDetail = {} } = Listing(
         plan as TListing,
@@ -456,44 +472,29 @@ const parseEntitiesToTableData = (
             ...(plan as TListing).attributes.metadata,
             orderDetail: combineOrderDetailWithPriceInfo({
               orderDetail: planOrderDetail,
-              orderType: entity?.attributes?.metadata?.orderType,
+              orderType,
             }),
           },
         },
       };
     });
 
-    const {
-      startDate,
-      endDate,
-      orderState,
-      staffName,
-      deliveryAddress,
-      deliveryHour,
-      isClientSufficientPaid = false,
-      isPartnerSufficientPaid = false,
-    } = entity?.attributes?.metadata || {};
-
     const orderDetail = subOrders[0]?.attributes?.metadata?.orderDetail || {};
     const fullRestaurantsData = Object.keys(orderDetail).map((key) => {
       return orderDetail[key]?.restaurant;
     });
-    const isGroupOrder =
-      (entity?.attributes?.metadata?.showMode || 'group') === 'group';
+    const isGroupOrder = orderType === EOrderType.group;
     const { totalDishes } = calculateTotalPriceAndDishes({
       orderDetail,
       isGroupOrder,
     });
 
-    const orderVATPercentage = entity?.attributes?.metadata?.orderVATPercentage;
-    const hasSpecificPCCFee = entity?.attributes?.metadata?.hasSpecificPCCFee;
-    const specificPCCFee = entity?.attributes?.metadata?.specificPCCFee;
-
-    const orderVATPercentageToUse =
-      orderState === EOrderStates.picking ||
-      orderState === EOrderDraftStates.draft
-        ? systemVATPercentage
-        : orderVATPercentage;
+    const orderVATPercentageToUse = [
+      EOrderDraftStates.draft,
+      EOrderStates.picking,
+    ].includes(orderState)
+      ? systemVATPercentage
+      : orderVATPercentage;
 
     const subOrderDates = compact(
       Object.keys(orderDetail).map((key) => {
@@ -503,10 +504,10 @@ const parseEntitiesToTableData = (
           totalPrice: childTotalPrice,
           ...rest
         } = calculateTotalPriceAndDishes({
-          orderDetail: { [key]: orderDetail[key] },
+          orderDetail,
           isGroupOrder,
+          date: key,
         });
-
         const PCCFeeByDate = calculatePCCFeeByDate({
           isGroupOrder,
           memberOrders,
@@ -514,14 +515,12 @@ const parseEntitiesToTableData = (
           hasSpecificPCCFee,
           specificPCCFee,
         });
-
         const childPrice =
           childTotalPrice +
           PCCFeeByDate +
           Math.round(
             (childTotalPrice + PCCFeeByDate) * orderVATPercentageToUse,
           );
-
         if (!orderDetail[key]?.transactionId) return null;
 
         return {
@@ -558,11 +557,9 @@ const parseEntitiesToTableData = (
         };
       }),
     );
-
     if (shouldHideOrderRow) {
       return subOrderDates;
     }
-
     const orderPrice = subOrderDates.reduce(
       (prev: number, item: any) => prev + item.data.price,
       0,
