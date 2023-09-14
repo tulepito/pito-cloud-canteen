@@ -38,8 +38,6 @@ export const NonRequireAuthenticationRoutes = [
 export const IgnoredAuthCheckRoutes = [
   generalPaths.StyleGuide,
   generalPaths.RecoveryPassword,
-  generalPaths.EmailVerification,
-  enGeneralPaths.EmailVerification,
   enGeneralPaths.RecoveryPassword,
   generalPaths.ResetPassword,
   enGeneralPaths.ResetPassword,
