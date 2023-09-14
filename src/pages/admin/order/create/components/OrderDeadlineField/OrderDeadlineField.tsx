@@ -1,9 +1,12 @@
-import { forwardRef, useMemo, useState } from 'react';
+/* eslint-disable @typescript-eslint/no-shadow */
+/* eslint-disable react-hooks/exhaustive-deps */
+import { forwardRef, useEffect, useMemo, useState } from 'react';
 import { OnChange } from 'react-final-form-listeners';
 import { useIntl } from 'react-intl';
 import classNames from 'classnames';
 import format from 'date-fns/format';
 import viLocale from 'date-fns/locale/vi';
+import { DateTime } from 'luxon';
 
 import FieldDatePicker from '@components/FormFields/FieldDatePicker/FieldDatePicker';
 import FieldDropdownSelect from '@components/FormFields/FieldDropdownSelect/FieldDropdownSelect';
@@ -11,8 +14,11 @@ import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput
 import IconCalendar from '@components/Icons/IconCalender/IconCalender';
 import IconClock from '@components/Icons/IconClock/IconClock';
 import Tooltip from '@components/Tooltip/Tooltip';
+import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
 import { findValidRangeForDeadlineDate } from '@helpers/orderHelper';
-import { TimeOptions } from '@utils/dates';
+import { useAppSelector } from '@hooks/reduxHooks';
+import { EUserPermission } from '@src/utils/enums';
+import { renderListTimeOptions, TimeOptions } from '@utils/dates';
 import type { TObject } from '@utils/types';
 import { required } from '@utils/validators';
 
@@ -77,11 +83,15 @@ const OrderDeadlineField: React.FC<TOrderDeadlineFieldProps> = (props) => {
   const {
     deadlineDate: deadlineDateInitialValue,
     startDate: startDateInitialValue,
+    deliveryHour,
   } = values;
+  const userPermission = useAppSelector((state) => state.user.userPermission);
 
-  const { minSelectedDate, maxSelectedDate } = findValidRangeForDeadlineDate(
-    startDateInitialValue,
-  );
+  const isAdminFlow = EUserPermission.admin === userPermission;
+
+  const { minSelectedDate, maxSelectedDate } = isAdminFlow
+    ? { minSelectedDate: new Date(), maxSelectedDate: startDateInitialValue }
+    : findValidRangeForDeadlineDate(startDateInitialValue);
 
   const initialDeadlineDate = deadlineDateInitialValue
     ? new Date(deadlineDateInitialValue)
@@ -117,14 +127,49 @@ const OrderDeadlineField: React.FC<TOrderDeadlineFieldProps> = (props) => {
     !deadlineDate && css.placeholder,
   );
 
-  const parsedDeliveryHourOptions = useMemo(
-    () =>
-      TimeOptions.map((option) => ({
-        label: option.label,
-        key: option.key,
-      })),
-    [],
-  );
+  const isDeliveryDateSameWithStartDate =
+    values.deadlineDate !== null &&
+    startDateInitialValue !== null &&
+    DateTime.fromMillis(values.deadlineDate || 0)
+      .startOf('day')
+      .toMillis() ===
+      DateTime.fromMillis(startDateInitialValue || 0)
+        .startOf('day')
+        .toMillis();
+
+  const parsedDeliveryHourOptions = useMemo(() => {
+    return (
+      isAdminFlow && isDeliveryDateSameWithStartDate
+        ? renderListTimeOptions({
+            endTime: deliveryHour.toString(),
+          })
+        : TimeOptions
+    ).map((option) => ({
+      label: option.label,
+      key: option.key,
+    }));
+  }, [deliveryHour, isDeliveryDateSameWithStartDate, isAdminFlow]);
+
+  useEffect(() => {
+    const { hours: deadlineHour, minutes: deadlineMinute } =
+      convertHHmmStringToTimeParts(
+        values.deadlineHour === null ? undefined : values.deadlineHour,
+      );
+    const { hours: deliveryHour, minutes: deliveryMinute } =
+      convertHHmmStringToTimeParts(
+        values.deliveryHour === null ? undefined : values.deliveryHour,
+      );
+    const deadlineInterval = 60 * deadlineHour + deadlineMinute;
+    const deliveryInterval = 60 * deliveryHour + deliveryMinute;
+
+    if (
+      isDeliveryDateSameWithStartDate &&
+      deadlineInterval > deliveryInterval &&
+      isAdminFlow
+    ) {
+      form.change('deadlineHour', null);
+    }
+  }, [values.deliveryHour, isDeliveryDateSameWithStartDate]);
 
   return (
     <div className={containerClasses}>

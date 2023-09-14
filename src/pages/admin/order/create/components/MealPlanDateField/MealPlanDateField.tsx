@@ -12,13 +12,15 @@ import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput
 import IconCalendar from '@components/Icons/IconCalender/IconCalender';
 import IconClock from '@components/Icons/IconClock/IconClock';
 import { findMinStartDate } from '@helpers/orderHelper';
+import { useAppSelector } from '@hooks/reduxHooks';
+import { EUserPermission } from '@src/utils/enums';
 import { renderListTimeOptions } from '@utils/dates';
 import type { TObject } from '@utils/types';
 import { composeValidators, nonSatOrSunDay, required } from '@utils/validators';
 
 import css from './MealPlanDateField.module.scss';
 
-const TIME_OPTIONS = renderListTimeOptions();
+const TIME_OPTIONS = renderListTimeOptions({});
 
 type MealPlanDateFieldProps = {
   form: any;
@@ -86,9 +88,13 @@ const MealPlanDateField: React.FC<MealPlanDateFieldProps> = (props) => {
     layoutClassName,
     containerClassName,
   } = props;
+  const intl = useIntl();
+  const userPermission = useAppSelector((state) => state.user.userPermission);
+
+  const idAdminFlow = EUserPermission.admin === userPermission;
   const { startDate: startDateInitialValue, endDate: endDateInitialValue } =
     values;
-  const intl = useIntl();
+
   const initialStartDate = startDateInitialValue
     ? new Date(startDateInitialValue)
     : null;
@@ -98,7 +104,7 @@ const MealPlanDateField: React.FC<MealPlanDateFieldProps> = (props) => {
   const [startDate, setStartDate] = useState<Date>(initialStartDate!);
   const [endDate, setEndDate] = useState<Date>(initialEndDate!);
 
-  const minStartDate = findMinStartDate();
+  const minStartDate = idAdminFlow ? new Date() : findMinStartDate();
 
   const startDateRequiredMessage = intl.formatMessage({
     id: 'MealPlanDateField.startDateRequired',
@@ -173,10 +179,14 @@ const MealPlanDateField: React.FC<MealPlanDateFieldProps> = (props) => {
           placeholderText={format(new Date(), 'EEE, dd MMMM, yyyy', {
             locale: viLocale,
           })}
-          validate={composeValidators(
-            required(startDateRequiredMessage),
-            nonSatOrSunDay(startDateNonSatOrSunDayMessage),
-          )}
+          validate={
+            idAdminFlow
+              ? required(startDateRequiredMessage)
+              : composeValidators(
+                  required(startDateRequiredMessage),
+                  nonSatOrSunDay(startDateNonSatOrSunDayMessage),
+                )
+          }
           customInput={<CustomStartDateFieldInput />}
         />
         <FieldDatePicker

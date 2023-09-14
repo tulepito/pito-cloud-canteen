@@ -539,17 +539,34 @@ export const getEndOfMonth = (date: Date) => {
     .toJSDate();
 };
 
-export const renderListTimeOptions = (
-  startTime: string = '06:30',
-  endTime: string = '23:00',
-  interval: number = 15,
-) => {
+export const renderListTimeOptions = ({
+  startTime = '06:30',
+  endTime = '23:00',
+  interval = 15,
+  isToday = false,
+}: {
+  startTime?: string;
+  endTime?: string;
+  interval?: number;
+  isToday?: boolean;
+}) => {
   const [startHour, startMinute] = startTime?.split(':') || [];
   const [endHour, endMinute] = endTime?.split(':') || [];
   const startInterval = Number(startHour) * 60 + Number(startMinute);
   const endInterval = Number(endHour) * 60 + Number(endMinute);
   const result = [];
+
+  const today = new Date();
+  const currentHour = today.getHours();
+  const currentMinute = today.getMinutes();
+  const currentInterval = 60 * currentHour + currentMinute;
+
   for (let i = startInterval; i <= endInterval; i += interval) {
+    if (isToday && startInterval <= currentInterval) {
+      // eslint-disable-next-line no-continue
+      continue;
+    }
+
     const hours = Math.floor(i / 60);
     const minutes = i % 60;
 
@@ -568,4 +585,4 @@ export const renderListTimeOptions = (
   return result;
 };
 
-export const TimeOptions = renderListTimeOptions();
+export const TimeOptions = renderListTimeOptions({});
