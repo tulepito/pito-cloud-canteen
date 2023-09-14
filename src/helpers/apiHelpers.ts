@@ -78,6 +78,7 @@ export const convertListIdToQueries = ({
   idList = [],
   query = {},
   include = [],
+  ...restParams
 }: any = {}) => {
   let queries: TObject[] = [];
   const queryCount = Math.round(idList.length / 100 + 0.5);
@@ -91,6 +92,7 @@ export const convertListIdToQueries = ({
         ...query,
       },
       include,
+      ...restParams,
     });
   }
 
