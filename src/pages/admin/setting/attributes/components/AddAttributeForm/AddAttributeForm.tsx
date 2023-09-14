@@ -13,7 +13,7 @@ import { required } from '@src/utils/validators';
 
 import css from './AddAttributeForm.module.scss';
 
-const TIME_OPTIONS = renderListTimeOptions();
+const TIME_OPTIONS = renderListTimeOptions({});
 
 export type TAddAttributeFormValues = {
   attribute: EAttributeSetting;
