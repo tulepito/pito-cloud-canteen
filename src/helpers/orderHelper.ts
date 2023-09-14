@@ -199,6 +199,7 @@ export const isOrderDetailDatePickedFood = (date: any) => {
 export const isEnableToStartOrder = (
   orderDetail: TPlan['orderDetail'],
   isGroupOrder = true,
+  isAdminFlow = false,
 ) => {
   if (isEmpty(orderDetail)) return false;
 
@@ -243,7 +244,7 @@ export const isEnableToStartOrder = (
         const isQuantityValid =
           quantity >= minQuantity && quantity <= maxQuantity;
 
-        return isSetupRestaurant && isQuantityValid;
+        return isSetupRestaurant && (isQuantityValid || isAdminFlow);
       });
 };
 

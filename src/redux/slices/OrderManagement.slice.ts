@@ -1181,11 +1181,12 @@ const OrderManagementSlice = createSlice({
           currentViewDate as keyof typeof planValidationsInProgressState
         ] || {};
 
-      if (
+      const hasValidationError =
         planReachMaxRestaurantQuantity ||
         planReachMinRestaurantQuantity ||
-        planReachMaxCanModify
-      ) {
+        planReachMaxCanModify;
+
+      if (!isAdminFlow && hasValidationError) {
         return {
           ...state,
           orderValidationsInProgressState,
@@ -1224,6 +1225,7 @@ const OrderManagementSlice = createSlice({
             ...state.draftSubOrderChangesHistory,
             [currentViewDate]: currentDraftSubOrderChanges,
           },
+          orderValidationsInProgressState,
         };
       }
 
@@ -1341,11 +1343,12 @@ const OrderManagementSlice = createSlice({
           currentViewDate as keyof typeof planValidationsInProgressState
         ] || {};
 
-      if (
+      const hasValidationError =
         planReachMaxRestaurantQuantity ||
         planReachMinRestaurantQuantity ||
-        planReachMaxCanModify
-      ) {
+        planReachMaxCanModify;
+
+      if (!isAdminFlow && hasValidationError) {
         return {
           ...state,
           orderValidationsInProgressState,
@@ -1454,12 +1457,11 @@ const OrderManagementSlice = createSlice({
         planValidationsInProgressState[
           currentViewDate as keyof typeof planValidationsInProgressState
         ] || {};
-
-      if (
+      const hasValidationError =
         planReachMaxRestaurantQuantity ||
         planReachMinRestaurantQuantity ||
-        planReachMaxCanModify
-      ) {
+        planReachMaxCanModify;
+      if (!isAdminFlow && hasValidationError) {
         return {
           ...state,
           orderValidationsInProgressState,

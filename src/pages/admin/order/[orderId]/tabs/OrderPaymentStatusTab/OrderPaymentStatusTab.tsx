@@ -240,6 +240,7 @@ const OrderPaymentStatusTab: React.FC<OrderPaymentStatusTabProps> = (props) => {
         order={order}
         handleUpdateOrderState={handleUpdateOrderState}
         updateOrderStateInProgress={updateOrderStateInProgress}
+        isAdminFlow
       />
       <RenderWhen condition={!isEmpty(quotations)}>
         <div className={css.tabContainer}>
