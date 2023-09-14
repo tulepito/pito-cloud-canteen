@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import React from 'react';
 import classNames from 'classnames';
 
@@ -6,7 +7,7 @@ import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
 import css from './LoadingContainer.module.scss';
 
 type TLoadingContainerProps = {
-  loadingText?: string;
+  loadingText?: ReactNode;
   loadingTextClassName?: string;
   className?: string;
   iconClassName?: string;

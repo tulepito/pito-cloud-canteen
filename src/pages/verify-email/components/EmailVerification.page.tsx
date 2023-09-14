@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { useRouter } from 'next/router';
 
+import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import {
   useAppDispatch,
   useAppSelector,
@@ -57,7 +58,11 @@ const EmailVerificationPage = () => {
             verificationError={verificationError}
           />
         ) : (
-          <FormattedMessage id="EmailVerificationPage.loadingUserInformation" />
+          <LoadingContainer
+            loadingText={
+              <FormattedMessage id="EmailVerificationPage.loadingUserInformation" />
+            }
+          />
         )}
       </div>
     </div>
