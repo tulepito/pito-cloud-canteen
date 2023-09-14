@@ -151,17 +151,21 @@ const parseEntitiesToTableData = (
       lastTransition,
       isPaid,
       quotation,
-      serviceFees,
+      serviceFees = {},
       orderVATPercentage,
-      vatSettings,
+      vatSettings = {},
     } = entity;
     const dayIndex = new Date(Number(date)).getDay();
 
     let totalPrice = 0;
     if (!isEmpty(quotation)) {
       if (!isEmpty(quotation[restaurant.id]?.quotation)) {
+        const vatSettingFromOrder = vatSettings[restaurantId!];
+
         const partnerVATSetting =
-          vatSettings?.[restaurantId!] || EPartnerVATSetting.vat;
+          vatSettingFromOrder in EPartnerVATSetting
+            ? vatSettingFromOrder
+            : EPartnerVATSetting.vat;
 
         const partnerQuotationBySubOrderDate = calculatePriceQuotationPartner({
           quotation: quotation[restaurant.id].quotation,

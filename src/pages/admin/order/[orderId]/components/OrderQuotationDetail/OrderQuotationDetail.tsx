@@ -70,8 +70,12 @@ const OrderQuotationDetail: React.FC<OrderQuotationDetailProps> = (props) => {
   const currentPartnerId = (Object.entries(partnerQuotation).find(
     ([, value]) => (value as TObject)?.quotation[currentSubOrderDate],
   ) || [])[0];
+  const vatSettingFromOrder = vatSettings[currentPartnerId!];
   const partnerVATSetting =
-    vatSettings?.[currentPartnerId!] || EPartnerVATSetting.vat;
+    vatSettingFromOrder in EPartnerVATSetting
+      ? vatSettingFromOrder
+      : EPartnerVATSetting.vat;
+
   const partnerServiceFee = serviceFees[currentPartnerId!] || 0;
   const vatPercentage = isPartner
     ? vatPercentageBaseOnVatSetting({

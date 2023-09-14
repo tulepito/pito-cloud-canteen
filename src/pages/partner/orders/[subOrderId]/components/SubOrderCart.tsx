@@ -18,6 +18,7 @@ import { useDownloadPriceQuotation } from '@hooks/useDownloadPriceQuotation';
 import { usePrepareOrderDetailPageData } from '@hooks/usePrepareOrderManagementData';
 import { orderManagementThunks } from '@redux/slices/OrderManagement.slice';
 import { CurrentUser, Listing } from '@src/utils/data';
+import { EPartnerVATSetting } from '@src/utils/enums';
 import type { TListing } from '@utils/types';
 
 import css from './SubOrderCart.module.scss';
@@ -61,7 +62,11 @@ const SubOrderCart: React.FC<TSubOrderCartProps> = (props) => {
   const { orderDetail: planOrderDetail = {} } = planGetter.getMetadata();
   const serviceFeePercentage =
     serviceFeePercentageMap[restaurantListingId] || 0;
-  const vatSetting = vatSettings[restaurantListingId];
+  const vatSettingFromOrder = vatSettings[restaurantListingId];
+  const vatSetting =
+    vatSettingFromOrder in EPartnerVATSetting
+      ? vatSettingFromOrder
+      : EPartnerVATSetting.vat;
   const vatPercentage = vatPercentageBaseOnVatSetting({
     vatSetting,
     vatPercentage: orderVATPercentage,
