@@ -6,6 +6,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { composeApiCheckers, HttpMethod } from '@apis/configs';
 import { CustomError, EHttpStatusCode } from '@apis/errors';
 import createQuotation from '@pages/api/orders/[orderId]/quotation/create-quotation.service';
+import { createFoodRatingNotificationScheduler } from '@services/awsEventBrigdeScheduler';
 import { emailSendingFactory, EmailTemplateTypes } from '@services/email';
 import { fetchListing } from '@services/integrationHelper';
 import { createNativeNotification } from '@services/nativeNotification';
@@ -17,7 +18,7 @@ import {
   Listing,
   Transaction,
 } from '@src/utils/data';
-import { VNTimezone } from '@src/utils/dates';
+import { formatTimestamp, VNTimezone } from '@src/utils/dates';
 import {
   ENativeNotificationType,
   ENotificationType,
@@ -155,6 +156,19 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
                 foodName,
               },
             );
+          });
+          createFoodRatingNotificationScheduler({
+            customName: `sendFoodRatingNotification_${orderId}`,
+            timeExpression: formatTimestamp(
+              +startTimestamp + 30 * 60 * 1000, // after 30 minutes
+              "yyyy-MM-dd'T'hh:mm:ss",
+            ),
+            params: {
+              orderId,
+              participantIds,
+              subOrderDate: startTimestamp,
+              planId,
+            },
           });
           await transitionOrderStatus(order, plan, integrationSdk);
           await updatePlanListing(ETransition.COMPLETE_DELIVERY);

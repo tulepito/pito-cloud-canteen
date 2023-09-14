@@ -2,6 +2,7 @@ import AWS from 'aws-sdk';
 
 const LAMBDA_ARN = `${process.env.LAMBDA_ARN}`;
 const ROLE_ARN = `${process.env.ROLE_ARN}`;
+const SEND_FOOD_RATING_NOTIFICATION_LAMBDA_ARN = `${process.env.SEND_FOOD_RATING_NOTIFICATION_LAMBDA_ARN}`;
 
 const Scheduler = new AWS.Scheduler({
   accessKeyId: `${process.env.NEXT_APP_SCHEDULER_ACCESS_KEY}`,
@@ -65,4 +66,26 @@ export const updateScheduler = ({
   };
 
   return Scheduler.updateSchedule(schedulerParams).promise();
+};
+
+export const createFoodRatingNotificationScheduler = async ({
+  params,
+  customName,
+  timeExpression,
+}: CreateSchedulerParams) => {
+  const schedulerParams = {
+    FlexibleTimeWindow: {
+      Mode: 'OFF',
+    },
+    Name: customName,
+    ScheduleExpression: `at(${timeExpression})`,
+    ScheduleExpressionTimezone: 'Asia/Ho_Chi_Minh',
+    Target: {
+      Arn: SEND_FOOD_RATING_NOTIFICATION_LAMBDA_ARN,
+      RoleArn: ROLE_ARN,
+      Input: JSON.stringify(params),
+    },
+  };
+
+  return Scheduler.createSchedule(schedulerParams).promise();
 };

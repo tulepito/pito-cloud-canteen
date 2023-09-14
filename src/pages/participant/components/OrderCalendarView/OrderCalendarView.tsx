@@ -5,6 +5,7 @@ import { Views } from 'react-big-calendar';
 import Skeleton from 'react-loading-skeleton';
 import flatten from 'lodash/flatten';
 import { DateTime } from 'luxon';
+import { useRouter } from 'next/router';
 
 import Avatar from '@components/Avatar/Avatar';
 import BottomNavigationBar from '@components/BottomNavigationBar/BottomNavigationBar';
@@ -54,6 +55,8 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
     loadDataInProgress,
   } = props;
   const dispatch = useAppDispatch();
+  const router = useRouter();
+  const { openRatingModal, subOrderDate } = router.query;
 
   const companyTitle = User(company).getPublicData().displayName;
   const ensureCompanyUser = User(company).getFullData();
@@ -269,6 +272,22 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
   useEffect(() => {
     dispatch(CalendarActions.setSelectedDay(null));
   }, []);
+
+  useEffect(() => {
+    if (subOrderDate && openRatingModal === 'true') {
+      const selectedEventFromUrl = flattenEvents.find((_event: any) => {
+        const { resource } = _event;
+        const { timestamp } = resource;
+
+        return subOrderDate === `${timestamp}`;
+      });
+
+      if (selectedEventFromUrl) {
+        setSelectedEvent(selectedEventFromUrl);
+        ratingSubOrderModalControl.setTrue();
+      }
+    }
+  }, [openRatingModal, subOrderDate]);
 
   return (
     <div className={css.container}>
