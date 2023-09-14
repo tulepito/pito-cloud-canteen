@@ -28,7 +28,7 @@ type TFilterFormComponentProps = FormRenderProps<TFilterFormValues> &
 type TFilterFormProps = FormProps<TFilterFormValues> & TExtraProps;
 
 const FilterFormComponent: React.FC<TFilterFormComponentProps> = (props) => {
-  const { handleSubmit, onClearForm, values } = props;
+  const { handleSubmit, onClearForm, values, form } = props;
   const {
     createAtStart: createAtStartInitialValue,
     createAtEnd: createAtEndInitialValue,
@@ -46,6 +46,19 @@ const FilterFormComponent: React.FC<TFilterFormComponentProps> = (props) => {
   const [endDate, setEndDate] = useState<Date>(initialCreateAtEnd!);
 
   const maxEndDate = new Date();
+
+  const handleStartDateChange = (date: Date) => {
+    setStartDate(date);
+
+    if (endDate !== null && date > endDate) {
+      setEndDate(null!);
+      form.change('createAtEnd', null!);
+    }
+  };
+
+  const handleEndDateChange = (date: Date) => {
+    setEndDate(date);
+  };
 
   return (
     <Form onSubmit={handleSubmit} className={css.formContainer}>
@@ -89,15 +102,16 @@ const FilterFormComponent: React.FC<TFilterFormComponentProps> = (props) => {
             id="createAtStart"
             name="createAtStart"
             selected={startDate}
-            onChange={(date: Date) => setStartDate(date)}
+            onChange={handleStartDateChange}
             autoComplete="off"
             dateFormat={'EEE, dd MMMM, yyyy'}
             placeholderText="Từ"
+            maxDate={maxEndDate}
           />
           <FieldDatePicker
             id="createAtEnd"
             name="createAtEnd"
-            onChange={(date: Date) => setEndDate(date)}
+            onChange={handleEndDateChange}
             selected={endDate}
             minDate={startDate}
             maxDate={maxEndDate}
