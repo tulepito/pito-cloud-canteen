@@ -167,7 +167,7 @@ export const initiateTransaction = async ({
 
       return {
         ...res,
-        [partnerId]: vat,
+        [partnerId]: vat in EPartnerVATSetting ? vat : EPartnerVATSetting.vat,
       };
     },
     {},

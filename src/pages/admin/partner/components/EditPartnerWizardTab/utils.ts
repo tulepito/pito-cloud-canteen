@@ -1,6 +1,6 @@
 import { ALL_WEEK_APPLY } from '@components/FormFields/FieldAvailability/FieldAvailability';
 import { getDefaultTimeZoneOnBrowser } from '@utils/dates';
-import { EDayOfWeek, OTHER_OPTION } from '@utils/enums';
+import { EDayOfWeek, EPartnerVATSetting, OTHER_OPTION } from '@utils/enums';
 import type { TAvailabilityPlan, TOwnListing } from '@utils/types';
 
 export const defaultTimeZone = () =>
@@ -236,7 +236,7 @@ export const createSubmitCreatePartnerValues = (values: any) => {
     contactorName,
     companyName,
     facebookLink,
-    vat,
+    vat = EPartnerVATSetting.vat,
     minPrice,
     phoneNumber,
     availabilityApplyType,
@@ -287,7 +287,7 @@ export const createSubmitCreatePartnerValues = (values: any) => {
       facebookLink,
       contactorName,
       companyName,
-      vat,
+      vat: vat in EPartnerVATSetting ? vat : EPartnerVATSetting.vat,
       avatarImageId: getSubmitImageId(uploadedAvatars)?.[0]?.uuid,
       coverImageId: getSubmitImageId(uploadedCovers)?.[0]?.uuid,
       availabilityApplyType,
