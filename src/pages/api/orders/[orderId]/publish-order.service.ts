@@ -121,7 +121,7 @@ export const publishOrder = async (orderId: string) => {
   });
 
   // create order picking notification for all participants
-  participants.map(async (participantId: string) => {
+  [...participants, ...anonymous].map(async (participantId: string) => {
     createFirebaseDocNotification(ENotificationType.ORDER_PICKING, {
       orderId,
       orderTitle,
@@ -132,15 +132,6 @@ export const publishOrder = async (orderId: string) => {
       ENativeNotificationType.BookerTransitOrderStateToPicking,
       {
         participantId,
-        order,
-      },
-    );
-  });
-  anonymous.map(async (anonymousId: string) => {
-    createNativeNotification(
-      ENativeNotificationType.BookerTransitOrderStateToPicking,
-      {
-        participantId: anonymousId,
         order,
       },
     );

@@ -69,7 +69,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
         const tx = denormalisedResponseEntities(txResponse)[0];
         const txGetter = Transaction(tx);
-        const { participantIds = [], orderId } = txGetter.getMetadata();
+        const {
+          participantIds = [],
+          orderId,
+          anonymous = [],
+        } = txGetter.getMetadata();
         const { booking, listing } = txGetter.getFullData();
         const listingGetter = Listing(listing);
         const restaurantId = listingGetter.getId();
@@ -118,45 +122,52 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         };
 
         if (transition === ETransition.START_DELIVERY) {
-          participantIds.map(async (participantId: string) => {
-            createFirebaseDocNotification(ENotificationType.ORDER_DELIVERING, {
-              ...generalNotificationData,
-              userId: participantId,
-            });
+          [...participantIds, ...anonymous].map(
+            async (participantId: string) => {
+              createFirebaseDocNotification(
+                ENotificationType.ORDER_DELIVERING,
+                {
+                  ...generalNotificationData,
+                  userId: participantId,
+                },
+              );
 
-            const { foodId } = memberOrders[participantId];
-            const { foodName } = restaurant.foodList[foodId];
-            createNativeNotification(
-              ENativeNotificationType.AdminTransitSubOrderToDelivering,
-              {
-                participantId,
-                planId,
-                subOrderDate: startTimestamp.toString(),
-                foodName,
-              },
-            );
-          });
+              const { foodId } = memberOrders[participantId];
+              const { foodName } = restaurant.foodList[foodId];
+              createNativeNotification(
+                ENativeNotificationType.AdminTransitSubOrderToDelivering,
+                {
+                  participantId,
+                  planId,
+                  subOrderDate: startTimestamp.toString(),
+                  foodName,
+                },
+              );
+            },
+          );
 
           await updatePlanListing(ETransition.START_DELIVERY);
         }
         if (transition === ETransition.COMPLETE_DELIVERY) {
-          participantIds.map(async (participantId: string) => {
-            createFirebaseDocNotification(ENotificationType.ORDER_SUCCESS, {
-              ...generalNotificationData,
-              userId: participantId,
-            });
-            const { foodId } = memberOrders[participantId];
-            const { foodName } = restaurant.foodList[foodId];
-            createNativeNotification(
-              ENativeNotificationType.AdminTransitSubOrderToDelivered,
-              {
-                participantId,
-                planId,
-                subOrderDate: startTimestamp.toString(),
-                foodName,
-              },
-            );
-          });
+          [...participantIds, ...anonymous].map(
+            async (participantId: string) => {
+              createFirebaseDocNotification(ENotificationType.ORDER_SUCCESS, {
+                ...generalNotificationData,
+                userId: participantId,
+              });
+              const { foodId } = memberOrders[participantId];
+              const { foodName } = restaurant.foodList[foodId];
+              createNativeNotification(
+                ENativeNotificationType.AdminTransitSubOrderToDelivered,
+                {
+                  participantId,
+                  planId,
+                  subOrderDate: startTimestamp.toString(),
+                  foodName,
+                },
+              );
+            },
+          );
           createFoodRatingNotificationScheduler({
             customName: `sendFoodRatingNotification_${orderId}`,
             timeExpression: formatTimestamp(
@@ -183,7 +194,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             },
           );
 
-          participantIds.forEach((participantId: string) => {
+          [...participantIds, ...anonymous].forEach((participantId: string) => {
             emailSendingFactory(
               EmailTemplateTypes.PARTICIPANT.PARTICIPANT_SUB_ORDER_CANCELED,
               {
@@ -215,12 +226,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             );
           }
 
-          participantIds.map(async (participantId: string) => {
-            createFirebaseDocNotification(ENotificationType.ORDER_CANCEL, {
-              ...generalNotificationData,
-              userId: participantId,
-            });
-          });
+          [...participantIds, ...anonymous].map(
+            async (participantId: string) => {
+              createFirebaseDocNotification(ENotificationType.ORDER_CANCEL, {
+                ...generalNotificationData,
+                userId: participantId,
+              });
+            },
+          );
 
           const quotation = await fetchListing(quotationId);
           const quotationListing = Listing(quotation);

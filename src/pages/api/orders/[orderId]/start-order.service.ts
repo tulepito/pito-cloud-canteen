@@ -70,20 +70,11 @@ export const startOrder = async (orderId: string, planId: string) => {
     orderId,
   });
 
-  participants.map(async (participantId: string) => {
+  [...participants, ...anonymous].map(async (participantId: string) => {
     createNativeNotification(
       ENativeNotificationType.BookerTransitOrderStateToPicking,
       {
         participantId,
-        order: orderListing,
-      },
-    );
-  });
-  anonymous.map(async (anonymousId: string) => {
-    createNativeNotification(
-      ENativeNotificationType.BookerTransitOrderStateToPicking,
-      {
-        participantId: anonymousId,
         order: orderListing,
       },
     );
