@@ -62,7 +62,7 @@ const AddingPaymentTableField: React.FC<TAddPartnerPaymentFormValues> = (
     if (percentage !== 0) {
       form.change(
         `paymentAmount - ${orderTitle} - ${subOrderDate} - ${id}`,
-        parseThousandNumber((totalAmount * percentage) / 100),
+        parseThousandNumber(Math.round((totalAmount * percentage) / 100)),
       );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
