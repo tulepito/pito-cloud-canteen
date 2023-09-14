@@ -212,7 +212,9 @@ const searchRestaurants = createAsyncThunk(
     const { order } = getState().Order;
     const { companyAccount } = getState().BookerSelectRestaurant;
 
-    const query = getMenuQuery({ order, params });
+    // eslint-disable-next-line unused-imports/no-unused-vars
+    const { keywords, ...queryWithoutKeywords } = params;
+    const query = getMenuQuery({ order, params: queryWithoutKeywords });
     const orderListing = Listing(order);
     const { memberAmount = 0 } = orderListing.getMetadata();
 
@@ -365,8 +367,6 @@ const fetchFoodListFromRestaurant = createAsyncThunk(
       combinedRestaurantMenuData.find(
         (item) => item.restaurantId === restaurantId,
       )?.menuId;
-    // handle case when food list is already fetched
-    if (restaurantFood[restaurantId]) return restaurantFood;
 
     const { data: foodList } = await fetchFoodListFromMenuApi({
       menuId,
