@@ -329,7 +329,14 @@ const ManagePartnerFoods = () => {
       query: {
         ...(foodType ? { foodType } : {}),
         ...(createAtStart ? { createAtStart } : {}),
-        ...(createAtEnd ? { createAtEnd } : {}),
+        ...(createAtEnd
+          ? {
+              createAtEnd:
+                createAtStart && createAtEnd === createAtStart
+                  ? createAtEnd + 1
+                  : createAtEnd,
+            }
+          : {}),
         ...(keywords ? { keywords } : {}),
       },
     });
