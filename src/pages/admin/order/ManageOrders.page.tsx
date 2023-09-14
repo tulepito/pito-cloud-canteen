@@ -767,11 +767,6 @@ const ManageOrdersPage = () => {
     dispatch(resetOrder());
 
     if (isReady) {
-      const endDateWithOneMoreDay = addDays(
-        new Date(meta_endDate as string),
-        1,
-      );
-
       dispatch(
         orderAsyncActions.queryOrders({
           page,
@@ -789,7 +784,9 @@ const ManageOrdersPage = () => {
           ...(meta_endDate
             ? {
                 meta_endDate: `${
-                  meta_endDate ? new Date(endDateWithOneMoreDay).getTime() : ''
+                  meta_endDate
+                    ? new Date(meta_endDate as string).getTime() - 1
+                    : ''
                 },`,
               }
             : meta_startDate
