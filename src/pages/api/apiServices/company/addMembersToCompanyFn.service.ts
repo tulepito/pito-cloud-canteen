@@ -2,14 +2,16 @@ import { mapLimit } from 'async';
 import { isEmpty, uniq } from 'lodash';
 import compact from 'lodash/compact';
 import difference from 'lodash/difference';
+import flatten from 'lodash/flatten';
 
 import {
+  convertListIdToQueries,
   prepareNewOrderDetailPlan,
   queryAllListings,
 } from '@helpers/apiHelpers';
 import { sendIndividualEmail } from '@services/awsSES';
 import { emailSendingFactory, EmailTemplateTypes } from '@services/email';
-import { fetchListing, fetchUser } from '@services/integrationHelper';
+import { fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { createFirebaseDocNotification } from '@services/notifications';
 import { UserInviteStatus, UserPermission } from '@src/types/UserPermission';
@@ -66,6 +68,31 @@ const addMembersToCompanyFn = async (params: TAddMembersToCompanyParams) => {
       meta_selectedGroups: 'has_any:allMembers',
     },
   });
+
+  const allNeedUpdatePlanIds = uniq(
+    compact(
+      allNeedOrders.map((order: TListing) => {
+        const { plans = [] } = Listing(order).getMetadata();
+
+        return plans[0];
+      }),
+    ),
+  );
+  const planQueries = convertListIdToQueries({
+    idList: allNeedUpdatePlanIds,
+  });
+  const allNeedUpdatePlans = flatten(
+    await Promise.all(
+      planQueries.map(async ({ ids }) => {
+        return denormalisedResponseEntities(
+          await integrationSdk.listings.query({
+            ids,
+          }),
+        );
+      }),
+    ),
+  );
+
   // Step update data for existed user
   const newParticipantIds = difference(userIdList, membersIdList);
   const newParticipantMembers = await Promise.all(
@@ -115,10 +142,12 @@ const addMembersToCompanyFn = async (params: TAddMembersToCompanyParams) => {
 
         const planId = plans[0];
         if (!isEmpty(planId)) {
-          const planListing = await fetchListing(planId);
+          const planListing = allNeedUpdatePlans.find(
+            (p: TListing) => p.id.uuid === planId,
+          );
 
           const newOrderDetail = prepareNewOrderDetailPlan({
-            planListing,
+            planListing: planListing!,
             newMemberId: userId,
           });
           await integrationSdk.listings.update({

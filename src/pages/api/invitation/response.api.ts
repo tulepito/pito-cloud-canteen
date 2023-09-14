@@ -1,14 +1,17 @@
 import { mapLimit } from 'async';
+import compact from 'lodash/compact';
+import flatten from 'lodash/flatten';
 import isEmpty from 'lodash/isEmpty';
 import uniq from 'lodash/uniq';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import {
+  convertListIdToQueries,
   prepareNewOrderDetailPlan,
   queryAllListings,
 } from '@helpers/apiHelpers';
 import cookies from '@services/cookie';
-import { fetchListing, fetchUser } from '@services/integrationHelper';
+import { fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { createFirebaseDocNotification } from '@services/notifications';
 import { getSdk, handleError } from '@services/sdk';
@@ -110,6 +113,30 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         meta_selectedGroups: 'has_any:allMembers',
       },
     });
+    const allNeedUpdatePlanIds = uniq(
+      compact(
+        allNeedOrders.map((order: TListing) => {
+          const { plans = [] } = Listing(order).getMetadata();
+
+          return plans[0];
+        }),
+      ),
+    );
+    const planQueries = convertListIdToQueries({
+      idList: allNeedUpdatePlanIds,
+    });
+    const allNeedUpdatePlans: TListing[] = flatten(
+      await Promise.all(
+        planQueries.map(async ({ ids }) => {
+          return denormalisedResponseEntities(
+            await integrationSdk.listings.query({
+              ids,
+            }),
+          );
+        }),
+      ),
+    );
+
     // Step 2. Create update function
     const updateFn = async (order: TListing) => {
       const orderId = Listing(order).getId();
@@ -139,10 +166,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
       const planId = plans[0];
       if (!isEmpty(planId)) {
-        const planListing = await fetchListing(planId);
+        const planListing = allNeedUpdatePlans.find(
+          (p: TListing) => p.id.uuid === planId,
+        );
 
         const newOrderDetail = prepareNewOrderDetailPlan({
-          planListing,
+          planListing: planListing!,
           newMemberId: userId,
         });
         await integrationSdk.listings.update({
