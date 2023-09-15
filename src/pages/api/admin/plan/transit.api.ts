@@ -176,7 +176,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           const { client, partner } = quotationListing.getMetadata();
           const newClient = {
             ...client,
-            quotation: omit(client.quotation, [startTimestamp]),
+            quotation: omit(client.quotation, [`${startTimestamp}`]),
           };
 
           const newPartner = {
@@ -184,7 +184,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             [restaurantId]: {
               ...partner[restaurantId],
               quotation: omit(partner[restaurantId].quotation, [
-                startTimestamp,
+                `${startTimestamp}`,
               ]),
             },
           };
