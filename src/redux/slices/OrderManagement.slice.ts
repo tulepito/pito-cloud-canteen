@@ -848,7 +848,7 @@ const bookerStartOrder = createAsyncThunk(
         partner: partnerQuotation,
       });
     }
-    initializePaymentApi(orderId, plans[0]);
+    await initializePaymentApi(orderId, plans[0]);
 
     return response;
   },
