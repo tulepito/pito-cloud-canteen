@@ -1,6 +1,8 @@
 /* eslint-disable import/no-cycle */
 /* eslint-disable @typescript-eslint/no-shadow */
 import { createSlice } from '@reduxjs/toolkit';
+import flatten from 'lodash/flatten';
+import isEmpty from 'lodash/isEmpty';
 
 import { showAttributesApi } from '@apis/attributes';
 import type {
@@ -32,6 +34,7 @@ import {
   showCompanyApi,
   unActiveCompanyApi,
 } from '@apis/index';
+import { convertListIdToQueries } from '@helpers/apiHelpers';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { denormalisedResponseEntities, User } from '@utils/data';
 import { ECompanyStates, EImageVariants } from '@utils/enums';
@@ -291,42 +294,59 @@ const companyInfo = createAsyncThunk(
   COMPANY_INFO,
   async (_, { getState, extra: sdk }) => {
     const { workspaceCompanyId } = getState().company;
-    const { data: companyAccount } = await fetchCompanyInfo(workspaceCompanyId);
-    const companyImageId = companyAccount.profileImage?.id;
-    const { data: allEmployeesData } = await getAllCompanyMembersApi(
+    const { data: company } = await fetchCompanyInfo(workspaceCompanyId);
+    const companyImageId = company.profileImage?.id;
+    const { data: companyMembers } = await getAllCompanyMembersApi(
       workspaceCompanyId,
     );
     const { favoriteRestaurantList = [], favoriteFoodList = [] } =
-      User(companyAccount).getPublicData();
+      User(company).getPublicData();
+    const { groups = [], members = {} } = User(company).getMetadata();
 
-    const { groups = [], members = {} } =
-      companyAccount.attributes.profile.metadata;
-    const favoriteRestaurants = await Promise.all(
-      favoriteRestaurantList.map(
-        async (restaurantId: string) =>
-          denormalisedResponseEntities(
-            await sdk.listings.show({ id: restaurantId }),
-          )[0],
-      ),
-    );
+    // TODO: query restaurants
+    const restaurantQueries = convertListIdToQueries({
+      idList: favoriteRestaurantList,
+    });
+    const favoriteRestaurants = isEmpty(favoriteRestaurantList)
+      ? []
+      : flatten(
+          await Promise.all(
+            restaurantQueries.map(async ({ ids }) => {
+              return denormalisedResponseEntities(
+                await sdk.listings.query({
+                  ids,
+                }),
+              );
+            }),
+          ),
+        );
 
-    const favoriteFood = await Promise.all(
-      favoriteFoodList.map(
-        async (foodId: string) =>
-          denormalisedResponseEntities(
-            await sdk.listings.show({ id: foodId }),
-          )[0],
-      ),
-    );
+    // TODO: query food
+    const foodQueries = convertListIdToQueries({
+      idList: favoriteFoodList,
+    });
+    const favoriteFood = isEmpty(favoriteFoodList)
+      ? []
+      : flatten(
+          await Promise.all(
+            foodQueries.map(async ({ ids }) => {
+              return denormalisedResponseEntities(
+                await sdk.listings.query({
+                  ids,
+                }),
+              );
+            }),
+          ),
+        );
 
     return {
       companyImage: {
         imageId: companyImageId || null,
       },
       groupList: groups,
-      company: companyAccount,
+      company,
       originCompanyMembers: members,
-      companyMembers: allEmployeesData,
+      companyMembers,
       favoriteRestaurants,
       favoriteFood,
     };
