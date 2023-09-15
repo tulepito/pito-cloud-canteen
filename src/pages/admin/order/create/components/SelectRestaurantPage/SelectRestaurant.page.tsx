@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
@@ -40,6 +41,7 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
   const [currentRestaurant, setCurrentRestaurant] = useState<any>();
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
+  const [titleValue, setTitleValue] = useState('');
   const intl = useIntl();
   const { value: isModalOpen, setValue: setModalOpen } = useBoolean();
   const dispatch = useAppDispatch();
@@ -95,13 +97,13 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
       selectRestaurantPageThunks.getRestaurants({
         dateTime: dateTime.toMillis(),
         packagePerMember,
+        title: titleValue,
         deliveryHour,
         nutritions,
         page,
         perPage,
       }),
     );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     packagePerMember,
     deliveryHour,
@@ -109,6 +111,7 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
     dispatch,
     page,
     perPage,
+    titleValue,
   ]);
 
   const handlePageChange = (pageValue: number) => {
@@ -130,15 +133,7 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
     }
 
     currDebounceRef = setTimeout(() => {
-      dispatch(
-        selectRestaurantPageThunks.getRestaurants({
-          dateTime: dateTime.toMillis(),
-          title,
-          packagePerMember,
-          deliveryHour,
-          nutritions,
-        }),
-      );
+      setTitleValue(title);
     }, DEBOUNCE_TIME);
   };
 
