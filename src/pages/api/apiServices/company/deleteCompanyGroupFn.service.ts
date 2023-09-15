@@ -1,5 +1,3 @@
-import { difference } from 'lodash';
-
 import { fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { denormalisedResponseEntities, User } from '@utils/data';
@@ -50,22 +48,6 @@ const deleteCompanyGroupFn = async ({
     );
   const [updatedCompanyAccount] = denormalisedResponseEntities(
     updatedCompanyAccountResponse,
-  );
-
-  await Promise.all(
-    onDeletingGroup.members.map(async ({ id }: TMemberApi) => {
-      const memberResponse = await integrationSdk.users.show({
-        id,
-      });
-      const [memberData] = denormalisedResponseEntities(memberResponse);
-      const { groupList = [] } = memberData.attributes.profile.metadata || {};
-      await integrationSdk.users.updateProfile({
-        id,
-        metadata: {
-          groupList: difference(groupList, [groupId]),
-        },
-      });
-    }),
   );
 
   return updatedCompanyAccount;

@@ -56,22 +56,6 @@ const createCompanyGroupFn = async ({
     updatedCompanyAccountResponse,
   );
 
-  await Promise.all(
-    groupMembers.map(async ({ id }: TMemberApi) => {
-      const memberResponse = await integrationSdk.users.show({
-        id,
-      });
-      const [memberData] = denormalisedResponseEntities(memberResponse);
-      const { groupList = [] } = memberData.attributes.profile.metadata || {};
-      await integrationSdk.users.updateProfile({
-        id,
-        metadata: {
-          groupList: Array.from(new Set(groupList).add(newGroupId)),
-        },
-      });
-    }),
-  );
-
   return updatedCompanyAccount;
 };
 
