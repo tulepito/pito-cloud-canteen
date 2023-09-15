@@ -89,6 +89,8 @@ const ParticipantOrderManagement = () => {
   const isOrderCanceled = orderState === EOrderStates.canceled;
   const isOrderExpiredStart = orderState === EOrderStates.expiredStart;
   const today = new Date().getTime();
+  const isOrderExpiredPickingDate =
+    Number(diffDays(deadlineDate, today, 'day').days) < 0;
   const isTodayAfterStartDate =
     Number(diffDays(startDate, today, 'day').days) < 0;
   const selectedGroupNames =
@@ -210,6 +212,7 @@ const ParticipantOrderManagement = () => {
           !isOrderCanceled &&
           !isOrderExpiredStart &&
           !isTodayAfterStartDate &&
+          !isOrderExpiredPickingDate &&
           shouldShowFirstTimeOrderModal
         }>
         <RenderWhen condition={pickingOrderModalControl.value}>
