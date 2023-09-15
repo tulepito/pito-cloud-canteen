@@ -68,7 +68,10 @@ const GroupDetailPage = () => {
     (state) => state.company.groupMembers,
     shallowEqual,
   );
-
+  const groupMembersPagination = useAppSelector(
+    (state) => state.company.groupMembersPagination,
+    shallowEqual,
+  );
   const companyMembers = useAppSelector(
     (state) => state.company.companyMembers,
     shallowEqual,
@@ -87,7 +90,7 @@ const GroupDetailPage = () => {
   } = useAppSelector((state) => state.company);
 
   const getGroupNames = (groupIds: string[]) => {
-    return filter(groupList, (group: any) => groupIds.includes(group.id))
+    return filter(groupList, (group: any) => groupIds?.includes(group.id))
       .map((group: any) => group.name)
       .join(', ');
   };
@@ -104,7 +107,7 @@ const GroupDetailPage = () => {
                 member.attributes.profile?.firstName || ''
               }`,
               email: User(member).getAttributes()?.email,
-              group: getGroupNames(User(member).getMetadata()?.groupList),
+              group: getGroupNames(User(member).getMetadata()?.groupList || []),
               allergy: User(member)
                 .getPublicData()
                 ?.allergies?.map((allergy: string) =>
@@ -297,6 +300,7 @@ const GroupDetailPage = () => {
           tableBodyClassName={css.tableBody}
           tableBodyRowClassName={css.tableBodyRow}
           tableBodyCellClassName={css.tableBodyCell}
+          pagination={groupMembersPagination}
           extraRows={
             <td className={css.addMemberBtn} onClick={openAddNewMembersModal}>
               <IconPlus className={css.plusIcon} />

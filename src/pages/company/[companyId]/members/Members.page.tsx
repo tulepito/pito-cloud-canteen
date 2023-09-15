@@ -189,7 +189,7 @@ const MembersPage = () => {
               }`,
               email: member.attributes.email,
               group: getGroupNames(
-                member.attributes.profile?.metadata?.groupList,
+                member.attributes.profile?.metadata?.groupList || [],
                 groupList,
               ),
               allergy:
@@ -213,6 +213,7 @@ const MembersPage = () => {
       ),
     [groupList, mergedCompanyMembers, nutritions],
   );
+
   useEffect(() => {
     const fetchData = async () => {
       dispatch(resetError());

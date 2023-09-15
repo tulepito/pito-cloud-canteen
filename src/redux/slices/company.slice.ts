@@ -376,11 +376,15 @@ const groupDetailInfo = createAsyncThunk(
       companyAccountResponse,
     );
     const { groups = [] } = companyAccount.attributes.profile.metadata;
-    const { id, name, description } = groups.find(
-      (_group: any) => _group.id === groupId,
-    );
+    const {
+      id,
+      name,
+      members = [],
+      description,
+    } = groups.find((_group: any) => _group.id === groupId);
+
     const apiParams: GetGroupDetailApiParams = {
-      groupId,
+      memberIds: members.map((m: TObject) => m.id),
       page,
       perPage: MEMBER_PER_PAGE,
     };

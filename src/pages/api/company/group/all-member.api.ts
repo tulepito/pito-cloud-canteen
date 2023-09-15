@@ -5,18 +5,24 @@ import { getIntegrationSdk } from '@services/integrationSdk';
 import { denormalisedResponseEntities } from '@utils/data';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
-  const { groupId, page, perPage } = req.query;
-  const integrationSdk = getIntegrationSdk();
-  const allMembersResponse = await integrationSdk.users.query({
-    meta_groupList: `has_all:${groupId}`,
-    page,
-    perPage,
-  });
-  const {
-    data: { meta },
-  } = allMembersResponse;
-  const allMembers = denormalisedResponseEntities(allMembersResponse);
-  res.json({ allMembers, meta });
+  const { JSONParams = '', groupId /* page, */ /* perPage */ } = req.query;
+
+  const { memberIds = [] } = JSON.parse(JSONParams as string) || {};
+
+  try {
+    const integrationSdk = getIntegrationSdk();
+    const allMembersResponse = await integrationSdk.users.query({
+      meta_id: memberIds,
+    });
+    const {
+      data: { meta },
+    } = allMembersResponse;
+    const allMembers = denormalisedResponseEntities(allMembersResponse);
+
+    return res.json({ allMembers, meta });
+  } catch (error) {
+    console.error('Error query all group members, group ID: ', groupId);
+  }
 }
 
 export default cookies(handler);

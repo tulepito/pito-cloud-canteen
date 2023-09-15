@@ -46,18 +46,18 @@ export const updateCompany = (body: UpdateCompanyApiBody) =>
   putApi(`/company`, body);
 
 export type GetGroupDetailApiParams = {
-  groupId: string;
+  memberIds: string[];
   page: number;
   perPage: number;
 };
 export const getGroupDetailApi = ({
-  groupId,
+  memberIds,
   page,
   perPage,
 }: GetGroupDetailApiParams) =>
-  getApi(
-    `/company/group/all-member?groupId=${groupId}&perPage=${perPage}&page=${page}`,
-  );
+  getApi(`/company/group/all-member?perPage=${perPage}&page=${page}`, {
+    memberIds,
+  });
 
 export type CreateGroupApiBody = {
   companyId: string;
