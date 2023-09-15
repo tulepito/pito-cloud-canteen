@@ -12,7 +12,8 @@ import {
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
     const apiMethod = req.method;
-    const { orderId, timestamp } = req.query;
+    const { orderId, JSONParams } = req.query;
+    const { timestamp } = JSON.parse(JSONParams as string);
     console.log(
       `[API-REQUEST]: ${apiMethod} api get restaurant recommendation for order: ${orderId} `,
     );
