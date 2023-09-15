@@ -26,7 +26,6 @@ import { useViewport } from '@hooks/useViewport';
 import { CalendarActions } from '@redux/slices/Calendar.slice';
 import { CurrentUser, Listing, User } from '@src/utils/data';
 import {
-  diffDays,
   getDaySessionFromDeliveryTime,
   getNextMonth,
   getPrevMonth,
@@ -71,14 +70,16 @@ const OrderListPage = () => {
   const ratingSubOrderModalControl = useBoolean();
   const { selectedDay, handleSelectDay } = useSelectDay();
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
-  const [selectedMonth, setSelectedMonth] = useState<Date | null>(
+  const [selectedMonth, setSelectedMonth] = useState<Date>(
     getStartOfMonth(selectedDay || new Date()),
   );
-
-  const [maxSelectedMonth, setMaxSelectedMonth] = useState<Date | null>(
+  const [maxSelectedMonth, setMaxSelectedMonth] = useState<Date>(
     getStartOfMonth(new Date()),
   );
-  const isPrevMonthController = useBoolean();
+  const [minSelectedMonth, setMinSelectedMonth] = useState<Date>(
+    getStartOfMonth(new Date()),
+  );
+  const isFirstTimeReachMinOrMaxMonthControl = useBoolean();
 
   const subOrderDetailModalControl = useBoolean();
   const { isMobileLayout } = useViewport();
@@ -119,27 +120,21 @@ const OrderListPage = () => {
   );
   const notifications = useAppSelector(
     (state) => state.ParticipantOrderList.participantFirebaseNotifications,
-    shallowEqual,
   );
   const fetchParticipantFirebaseNotificationsInProgress = useAppSelector(
     (state) =>
       state.ParticipantOrderList
         .fetchParticipantFirebaseNotificationsInProgress,
-    shallowEqual,
   );
   const fetchSubOrderTxInProgress = useAppSelector(
     (state) => state.ParticipantOrderList.fetchSubOrderTxInProgress,
-    shallowEqual,
   );
-
   const pickFoodForSubOrdersInProgress = useAppSelector(
     (state) => state.ParticipantOrderList.pickFoodForSubOrdersInProgress,
   );
-
   const pickFoodForSpecificSubOrderInProgress = useAppSelector(
     (state) => state.ParticipantOrderList.pickFoodForSpecificSubOrderInProgress,
   );
-
   const company = useAppSelector(
     (state) => state.ParticipantOrderList.company,
     shallowEqual,
@@ -272,16 +267,6 @@ const OrderListPage = () => {
     isSameDate(_event.start, selectedDay),
   );
 
-  useEffect(() => {
-    if (isMobileLayout) {
-      setItem('participant_calendarView', Views.MONTH);
-      setDefaultCalendarView(Views.MONTH);
-    } else {
-      setItem('participant_calendarView', Views.WEEK);
-      setDefaultCalendarView(Views.WEEK);
-    }
-  }, [isMobileLayout]);
-
   const openUpdateProfileModal = () => {
     updateProfileModalControl.setTrue();
   };
@@ -315,20 +300,27 @@ const OrderListPage = () => {
 
   const handleChangeTimePeriod = (action: string) => {
     if (action === 'NEXT') {
-      isPrevMonthController.setFalse();
       const nextMonth = getNextMonth(selectedMonth!);
       setSelectedMonth(nextMonth);
-      if (
-        diffDays(nextMonth?.getTime(), maxSelectedMonth?.getTime(), ['months'])
-          .months! > 0
-      ) {
+
+      if (nextMonth.getTime() > maxSelectedMonth.getTime()!) {
         setMaxSelectedMonth(nextMonth);
+        isFirstTimeReachMinOrMaxMonthControl.setTrue();
+
+        return;
       }
     } else {
-      isPrevMonthController.setTrue();
       const prevMonth = getPrevMonth(selectedMonth!);
       setSelectedMonth(prevMonth);
+
+      if (minSelectedMonth.getTime() > prevMonth.getTime()) {
+        setMinSelectedMonth(prevMonth);
+        isFirstTimeReachMinOrMaxMonthControl.setTrue();
+
+        return;
+      }
     }
+    isFirstTimeReachMinOrMaxMonthControl.setFalse();
   };
 
   const recommendFoodForSubOrder = () => {
@@ -375,6 +367,16 @@ const OrderListPage = () => {
   };
 
   useEffect(() => {
+    if (isMobileLayout) {
+      setItem('participant_calendarView', Views.MONTH);
+      setDefaultCalendarView(Views.MONTH);
+    } else {
+      setItem('participant_calendarView', Views.WEEK);
+      setDefaultCalendarView(Views.WEEK);
+    }
+  }, [isMobileLayout]);
+
+  useEffect(() => {
     if (selectedEvent) {
       const { timestamp, planId } = selectedEvent.resource;
       const subOrderId = `${currentUserId} - ${planId} - ${timestamp}`;
@@ -384,11 +386,13 @@ const OrderListPage = () => {
 
   useEffect(() => {
     (async () => {
+      const isOutOfMinMaxSelectedMonthRange =
+        selectedMonth?.getTime()! >= maxSelectedMonth.getTime()! ||
+        minSelectedMonth.getTime() >= selectedMonth?.getTime()!;
+
       if (
-        !isPrevMonthController.value &&
-        diffDays(selectedMonth?.getTime(), maxSelectedMonth?.getTime(), [
-          'months',
-        ]).months! >= 0
+        isOutOfMinMaxSelectedMonthRange &&
+        isFirstTimeReachMinOrMaxMonthControl.value
       ) {
         await dispatch(
           OrderListThunks.fetchOrders({ userId: currentUserId, selectedMonth }),
@@ -399,8 +403,9 @@ const OrderListPage = () => {
   }, [
     currentUserId,
     selectedMonth,
-    isPrevMonthController.value,
+    minSelectedMonth,
     maxSelectedMonth,
+    isFirstTimeReachMinOrMaxMonthControl.value,
   ]);
 
   useEffect(() => {
@@ -420,12 +425,13 @@ const OrderListPage = () => {
           DateTime.fromMillis(+timestamp).toJSDate(),
         );
         setSelectedMonth(getStartOfMonth(monthInQuery));
-        if (
-          diffDays(monthInQuery?.getTime(), maxSelectedMonth?.getTime(), [
-            'months',
-          ]).months! > 0
-        ) {
+
+        if (monthInQuery.getTime() > maxSelectedMonth?.getTime()!) {
           setMaxSelectedMonth(monthInQuery);
+        }
+
+        if (minSelectedMonth.getTime() > monthInQuery.getTime()) {
+          setMinSelectedMonth(monthInQuery);
         }
       }
     }
@@ -445,7 +451,7 @@ const OrderListPage = () => {
           events={walkthroughEnable ? EVENTS_MOCKUP : flattenEvents}
           renderEvent={OrderEventCard}
           inProgress={fetchOrdersInProgress}
-          defautlView={defaultCalendarView}
+          defaultView={defaultCalendarView}
           // exposeAnchorDate={handleAnchorDateChange}
           components={{
             toolbar: (toolBarProps: any) => (
