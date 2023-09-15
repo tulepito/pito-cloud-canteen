@@ -16,7 +16,10 @@ import Pagination from '@components/Pagination/Pagination';
 import type { TColumn } from '@components/Table/Table';
 import Table from '@components/Table/Table';
 import { UserInviteStatus, UserPermission } from '@src/types/UserPermission';
-import { isNewOwnerAlreadyACompanyUser } from '@src/utils/errors';
+import {
+  isBookerInOrderProgress,
+  isNewOwnerAlreadyACompanyUser,
+} from '@src/utils/errors';
 import type { TCompanyGroup, TCompanyMemberWithDetails } from '@utils/types';
 
 import css from './ManageCompanyMembersTable.module.scss';
@@ -353,6 +356,7 @@ const ManageCompanyMembersTable: React.FC<TManageCompanyMembersTable> = (
   };
 
   const closeTransferOwnerModal = () => {
+    resetTransferError && resetTransferError();
     setMemberToTransferOwner(null);
     setPermissionForOldOwner(null);
   };
@@ -433,7 +437,7 @@ const ManageCompanyMembersTable: React.FC<TManageCompanyMembersTable> = (
   const onPageChange = (page: number) => {
     setPage(page);
   };
-  console.log({ transferCompanyOwnerError });
+
   const transferErrorMessage =
     !transferCompanyOwnerError ? null : isNewOwnerAlreadyACompanyUser(
         transferCompanyOwnerError,
@@ -441,6 +445,12 @@ const ManageCompanyMembersTable: React.FC<TManageCompanyMembersTable> = (
       <ErrorMessage
         message={intl.formatMessage({
           id: 'ManageCompanyMembersTable.newOwnerAlreadyCompanyUser',
+        })}
+      />
+    ) : isBookerInOrderProgress(transferCompanyOwnerError) ? (
+      <ErrorMessage
+        message={intl.formatMessage({
+          id: 'ManageCompanyMembersTable.newOwnerIsBookerInOrderProgress',
         })}
       />
     ) : (
@@ -465,13 +475,20 @@ const ManageCompanyMembersTable: React.FC<TManageCompanyMembersTable> = (
         current={pagination.page}
         onChange={onPageChange}
       />
-      {updateMemberPermissionError && (
-        <ErrorMessage
-          message={intl.formatMessage({
-            id: 'ManageCompanyMembersTable.updateMemberPermissionError',
-          })}
-        />
-      )}
+      {updateMemberPermissionError &&
+        (isBookerInOrderProgress(updateMemberPermissionError) ? (
+          <ErrorMessage
+            message={intl.formatMessage({
+              id: 'ManageCompanyMembersTable.bookerIsBookerInOrderProgress',
+            })}
+          />
+        ) : (
+          <ErrorMessage
+            message={intl.formatMessage({
+              id: 'ManageCompanyMembersTable.updateMemberPermissionError',
+            })}
+          />
+        ))}
 
       <AlertModal
         isOpen={!!memberToRemove}
@@ -567,6 +584,7 @@ const ManageCompanyMembersTable: React.FC<TManageCompanyMembersTable> = (
               );
             })}
         </select>
+        {transferErrorMessage}
       </AlertModal>
       <AlertModal
         onConfirm={upgradeCompanyOwner}

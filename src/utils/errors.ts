@@ -204,6 +204,12 @@ export const isNewOwnerAlreadyACompanyUser = (error: TError) => {
   );
 };
 
+// Check if the given API error (from `transfer-owner`) is due to booker is in a order progress.*/
+
+export const isBookerInOrderProgress = (error: TError) => {
+  return error && hasErrorWithCode(error, EErrorCode.bookerInOrderProgress);
+};
+
 /**
  * Check if the given API error (from `sdk.currentUser.changePassword(params)`)
  * is due to giving wrong password.

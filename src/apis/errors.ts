@@ -1,3 +1,4 @@
+import { EErrorCode } from '@src/utils/enums';
 import type { TObject } from '@src/utils/types';
 
 export enum EHttpStatusCode {
@@ -98,5 +99,10 @@ export const errorMessages = {
     message: 'Bad request',
     id: 'bad-request',
     code: EHttpStatusCode.BadRequest,
+  },
+  BOOKER_IN_ORDER_PROGRESS: {
+    message: 'Booker đang tham gia order',
+    id: EErrorCode.bookerInOrderProgress,
+    code: EHttpStatusCode.Conflict,
   },
 };
