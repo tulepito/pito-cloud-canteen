@@ -79,7 +79,7 @@ const OrderListPage = () => {
   const [minSelectedMonth, setMinSelectedMonth] = useState<Date>(
     getStartOfMonth(new Date()),
   );
-  const isFirstTimeReachMinOrMaxMonthControl = useBoolean();
+  const isFirstTimeReachMinOrMaxMonthControl = useBoolean(true);
 
   const subOrderDetailModalControl = useBoolean();
   const { isMobileLayout } = useViewport();
