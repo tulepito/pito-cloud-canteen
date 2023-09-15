@@ -223,7 +223,10 @@ const transferCompanyOwner = async ({
             ...newCompanyData,
             [User(newCompanyAccount).getId()]: {
               ...(newCompanyData[cur] || {}),
-              permission: permissionForOldOwner || UserPermission.PARTICIPANT,
+              permission:
+                newCompanyData[cur]?.permission === UserPermission.OWNER
+                  ? permissionForOldOwner || UserPermission.PARTICIPANT
+                  : newCompanyData[cur]?.permission,
             },
           };
           delete newCompanyData[cur];
