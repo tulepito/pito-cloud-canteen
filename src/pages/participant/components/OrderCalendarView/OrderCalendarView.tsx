@@ -280,7 +280,7 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
           renderEvent={OrderEventCard}
           inProgress={loadDataInProgress}
           exposeAnchorDate={handleAnchorDateChange}
-          defautlView={defaultView}
+          defaultView={defaultView}
           components={{
             toolbar: (toolBarProps: any) => (
               <ParticipantToolbar

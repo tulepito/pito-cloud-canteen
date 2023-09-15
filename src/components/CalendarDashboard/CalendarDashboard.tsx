@@ -37,7 +37,7 @@ type TCalendarDashboardProps = TDefaultProps & {
   eventExtraProps?: TObject;
   resources?: any;
   exposeAnchorDate?: (date?: Date) => void;
-  defautlView?: View;
+  defaultView?: View;
 };
 
 const CalendarDashboard: React.FC<TCalendarDashboardProps> = ({
@@ -59,7 +59,7 @@ const CalendarDashboard: React.FC<TCalendarDashboardProps> = ({
   eventExtraProps,
   resources,
   exposeAnchorDate,
-  defautlView = Views.WEEK,
+  defaultView = Views.WEEK,
 }) => {
   const [calDate, setCalDate] = useState<Date | undefined>(anchorDate);
 
@@ -146,7 +146,7 @@ const CalendarDashboard: React.FC<TCalendarDashboardProps> = ({
     <div className={classes}>
       <Calendar
         {...anchorDateProps}
-        defaultView={defautlView}
+        defaultView={defaultView}
         localizer={localizer}
         events={events}
         views={views}
