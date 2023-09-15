@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
@@ -219,10 +220,10 @@ const MembersPage = () => {
       await dispatch(companyThunks.companyInfo());
       await dispatch(companyThunks.fetchAttributes());
     };
-    fetchData();
-  }, [companyId, dispatch, router]);
+    if (companyId) fetchData();
+  }, [companyId]);
 
-  const onConfirmDeleteMember = useCallback(() => {
+  const handleConfirmDeleteMember = useCallback(() => {
     dispatch(
       companyMemberThunks.deleteMember(deletingMemberEmail as string),
     ).then(async ({ error }: any) => {
@@ -231,7 +232,7 @@ const MembersPage = () => {
         await dispatch(companyThunks.companyInfo());
       }
     });
-  }, [deletingMemberEmail, dispatch, onDeleteMemberConfirmationModalClose]);
+  }, [deletingMemberEmail, onDeleteMemberConfirmationModalClose]);
 
   return (
     <div className={css.container}>
@@ -284,7 +285,7 @@ const MembersPage = () => {
           id: 'MembersPage.deleteMemberModalTitle',
         })}
         isConfirmButtonLoading={deleteMemberInProgress}
-        onConfirm={onConfirmDeleteMember}
+        onConfirm={handleConfirmDeleteMember}
         onCancel={onDeleteMemberConfirmationModalClose}
         hasError={deleteMemberError}
       />

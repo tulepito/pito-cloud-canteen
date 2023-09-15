@@ -28,7 +28,8 @@ const useFetchCompanyInfo = () => {
         await dispatch(companyThunks.companyInfo());
       })();
     }
-  }, [companyId, currentWorkspaceCompanyId, dispatch, isReady]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [companyId, currentWorkspaceCompanyId, isReady]);
 };
 
 export default useFetchCompanyInfo;

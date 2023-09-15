@@ -10,6 +10,7 @@ import IconDelete from '@components/Icons/IconDelete/IconDelete';
 import IconEdit from '@components/Icons/IconEdit/IconEdit';
 import IconOutlinePlus from '@components/Icons/IconOutlinePlus/IconOutlinePlus';
 import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
 import type { TColumn, TRowData } from '@components/Table/Table';
 import Table from '@components/Table/Table';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
@@ -33,15 +34,15 @@ const GroupSettingPage = () => {
   const { companyId = '' } = router.query;
   const dispatch = useAppDispatch();
   const {
-    value: isOpenCreateGroupModal,
-    setFalse: onClose,
-    setTrue: openCreateGroupModal,
+    value: isCreateGroupModalOpen,
+    setFalse: handleCloseCreateGroupModal,
+    setTrue: handleOpenCreateGroupModal,
   } = useBoolean();
 
   const {
     value: isDeleteGroupConfirmationModalOpen,
-    setFalse: onDeleteGroupConfirmationModalClose,
-    setTrue: openDeleteGroupConfirmationModal,
+    setFalse: handleCloseDeleteGroupConfirmationModal,
+    setTrue: handleOpenDeleteGroupConfirmationModal,
   } = useBoolean();
 
   const [selectingDeleteGroupId, setSelectingDeleteGroupId] =
@@ -110,7 +111,7 @@ const GroupSettingPage = () => {
         };
         const onDeleteGroup = () => {
           setSelectingDeleteGroupId(id);
-          openDeleteGroupConfirmationModal();
+          handleOpenDeleteGroupConfirmationModal();
         };
 
         return (
@@ -127,23 +128,22 @@ const GroupSettingPage = () => {
     },
   ];
 
-  const onConfirmDeleteGroup = () => {
+  const handleConfirmDeleteGroup = () => {
     dispatch(companyThunks.deleteGroup(selectingDeleteGroupId)).then(() =>
-      onDeleteGroupConfirmationModalClose(),
+      handleCloseDeleteGroupConfirmationModal(),
     );
   };
-
-  useEffect(() => {
-    dispatch(addWorkspaceCompanyId(companyId));
-  }, [companyId, dispatch]);
 
   useEffect(() => {
     const fetchData = async () => {
       dispatch(addWorkspaceCompanyId(companyId));
       await dispatch(companyThunks.companyInfo());
     };
-    fetchData();
-  }, [companyId, dispatch, router]);
+    if (companyId) {
+      fetchData();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [companyId]);
 
   const noGroupFound = (
     <div className={css.noGroupFound}>
@@ -160,14 +160,18 @@ const GroupSettingPage = () => {
         <div className={css.titleWrapper}>
           <h2>{intl.formatMessage({ id: 'GroupSetting.pageTitle' })}</h2>
         </div>
-        <Button className={css.createGroupBtn} onClick={openCreateGroupModal}>
+        <Button
+          className={css.createGroupBtn}
+          onClick={handleOpenCreateGroupModal}>
           <IconOutlinePlus />
           {intl.formatMessage({ id: 'GroupSetting.addGroup' })}
         </Button>
       </div>
       <div className={css.tableContainer}>
-        {(formattedGroupList && formattedGroupList.length > 0) ||
-        fetchCompanyInfoInProgress ? (
+        <RenderWhen
+          condition={
+            formattedGroupList?.length > 0 || fetchCompanyInfoInProgress
+          }>
           <Table
             columns={TABLE_COLUMN}
             data={formattedGroupList}
@@ -179,26 +183,25 @@ const GroupSettingPage = () => {
             tableBodyRowClassName={css.tableBodyRow}
             tableBodyCellClassName={css.tableBodyCell}
           />
-        ) : (
-          noGroupFound
-        )}
+          <RenderWhen.False>{noGroupFound}</RenderWhen.False>
+        </RenderWhen>
       </div>
       <CreateGroupModal
-        isOpen={isOpenCreateGroupModal}
-        onClose={onClose}
+        isOpen={isCreateGroupModalOpen}
+        onClose={handleCloseCreateGroupModal}
         companyMembers={companyMembers}
         originCompanyMembers={originCompanyMembers}
       />
       <ConfirmationModal
         id="DeleteGroupModal"
         isOpen={isDeleteGroupConfirmationModalOpen}
-        onClose={onDeleteGroupConfirmationModalClose}
+        onClose={handleCloseDeleteGroupConfirmationModal}
         confirmText={intl.formatMessage({ id: 'GroupSetting.confirmText' })}
         cancelText={intl.formatMessage({ id: 'GroupSetting.cancelText' })}
         title={intl.formatMessage({ id: 'GroupSetting.deleteGroupModalTitle' })}
         isConfirmButtonLoading={deleteGroupInProgress}
-        onConfirm={onConfirmDeleteGroup}
-        onCancel={onDeleteGroupConfirmationModalClose}
+        onConfirm={handleConfirmDeleteGroup}
+        onCancel={handleCloseDeleteGroupConfirmationModal}
       />
     </div>
   );

@@ -68,8 +68,9 @@ const GroupMemberDetailPage: React.FC<GroupMemberDetailPageProps> = () => {
       await dispatch(companyThunks.companyInfo());
       await dispatch(companyThunks.fetchAttributes());
     };
-    fetchData();
-  }, [companyId, dispatch]);
+    if (companyId) fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [companyId]);
 
   const handleGoBack = () => {
     router.back();

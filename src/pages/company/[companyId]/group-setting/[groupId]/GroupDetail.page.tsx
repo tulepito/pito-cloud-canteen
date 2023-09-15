@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
@@ -215,7 +216,7 @@ const GroupDetailPage = () => {
     [name, description],
   );
 
-  const onConfirmDeleteMember = async () => {
+  const handleConfirmDeleteMember = async () => {
     const { meta } = await dispatch(
       companyThunks.updateGroup({
         groupId,
@@ -232,7 +233,7 @@ const GroupDetailPage = () => {
     }
   };
 
-  const onConfirmDeleteGroup = () => {
+  const handleConfirmDeleteGroup = () => {
     dispatch(companyThunks.deleteGroup(groupId as string)).then(
       ({ error }: any) => {
         if (!error) {
@@ -292,6 +293,7 @@ const GroupDetailPage = () => {
           tableClassName={css.tableRoot}
           tableHeadClassName={css.tableHead}
           tableHeadCellClassName={css.tableHeadCell}
+          tableHeadCellLabelClassName={css.tableHeadCellLabel}
           tableBodyClassName={css.tableBody}
           tableBodyRowClassName={css.tableBodyRow}
           tableBodyCellClassName={css.tableBodyCell}
@@ -324,7 +326,7 @@ const GroupDetailPage = () => {
           id: 'GroupDetail.deleteMemberModalTitle',
         })}
         isConfirmButtonLoading={updateGroupInProgress}
-        onConfirm={onConfirmDeleteMember}
+        onConfirm={handleConfirmDeleteMember}
         onCancel={closeDeleteMemberConfirmationModal}
         hasError={updateGroupError}
       />
@@ -342,7 +344,7 @@ const GroupDetailPage = () => {
           id: 'GroupDetail.deleteGroupModalTitle',
         })}
         isConfirmButtonLoading={deleteGroupInProgress}
-        onConfirm={onConfirmDeleteGroup}
+        onConfirm={handleConfirmDeleteGroup}
         onCancel={onDeleteGroupConfirmationModalClose}
         hasError={deleteGroupError}
       />
