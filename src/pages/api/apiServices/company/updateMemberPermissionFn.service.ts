@@ -7,6 +7,16 @@ import type { TCompany, TObject } from '@utils/types';
 
 import isBookerInOrderProgress from './isBookerInOrderProgress.service';
 
+const customFetchUserByEmail = async (email: string) => {
+  try {
+    const user = await fetchUserByEmail(email);
+
+    return user;
+  } catch (_) {
+    return null;
+  }
+};
+
 const updateMemberCompanyData = async ({
   email,
   permission,
@@ -18,7 +28,14 @@ const updateMemberCompanyData = async ({
 }) => {
   try {
     const intergrationSdk = getIntegrationSdk();
-    const memberAccount = await fetchUserByEmail(email);
+    const memberAccount = await customFetchUserByEmail(email);
+
+    if (!memberAccount) {
+      console.error(
+        '[updateMemberCompanyData] error: ',
+        'memberAccount not found with email: '.concat(email),
+      );
+    }
 
     const { company: memberCompany = {} } = User(memberAccount).getMetadata();
 

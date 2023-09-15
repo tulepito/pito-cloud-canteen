@@ -46,6 +46,26 @@ const customErrorResponse = ({
   };
 };
 
+const customFetchUserByEmail = async (email: string) => {
+  try {
+    const user = await fetchUserByEmail(email);
+
+    return user;
+  } catch (_) {
+    return null;
+  }
+};
+
+const customFetchUserById = async (id: string) => {
+  try {
+    const user = await fetchUser(id);
+
+    return user;
+  } catch (_) {
+    return null;
+  }
+};
+
 const transferCompanyOwner = async ({
   res,
   companyId,
@@ -84,7 +104,19 @@ const transferCompanyOwner = async ({
   const { companyEmail, companyLocation, companyName, note, phoneNumber } =
     User(companyAccount).getPublicData();
 
-  const newCompanyAccount = await fetchUserByEmail(newOwnerEmail);
+  const newCompanyAccount = await customFetchUserByEmail(newOwnerEmail);
+
+  if (!newCompanyAccount) {
+    return handleError(
+      res,
+      customErrorResponse({
+        code: 'new-owner-not-found',
+        message: 'New owner not found',
+        status: 404,
+        statusText: 'Not Found',
+      }),
+    );
+  }
 
   const { isCompany } = User(newCompanyAccount).getMetadata();
 
@@ -210,7 +242,11 @@ const transferCompanyOwner = async ({
       // if owner dont need to update because it already updated above;
       if (permission === UserPermission.OWNER || !id) return;
 
-      const memberAccount = await fetchUser(id);
+      const memberAccount = await customFetchUserById(id);
+
+      if (!memberAccount) {
+        return;
+      }
 
       const { companyList: memberCompanyList = [], company = {} } =
         User(memberAccount).getMetadata();
