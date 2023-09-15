@@ -41,6 +41,7 @@ type TTableProps = TDefaultProps & {
   tableHeadClassName?: string;
   tableHeadRowClassName?: string;
   tableHeadCellClassName?: string;
+  tableHeadCellLabelClassName?: string;
   tableBodyClassName?: string;
   tableBodyRowClassName?: string;
   tableBodyCellClassName?: string;
@@ -81,6 +82,7 @@ const Table = (props: TTableProps) => {
     tableHeadClassName,
     tableHeadRowClassName,
     tableHeadCellClassName,
+    tableHeadCellLabelClassName,
     tableBodyClassName,
     tableBodyRowClassName,
     tableBodyCellClassName,
@@ -187,7 +189,11 @@ const Table = (props: TTableProps) => {
                 <td
                   className={classNames(tableHeadCellClassName, css.headCell)}
                   key={col.key}>
-                  <div className={css.headCellLabel}>
+                  <div
+                    className={classNames(
+                      css.headCellLabel,
+                      tableHeadCellLabelClassName,
+                    )}>
                     {col.label}
                     {col.sortable && (
                       <IconSort
