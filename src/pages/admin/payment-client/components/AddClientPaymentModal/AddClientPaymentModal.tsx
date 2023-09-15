@@ -16,6 +16,7 @@ type TAddClientPaymentModalProps = {
   onQueryCompanyBookers: (id: string) => void;
   companyBookers: TCompanyMemberWithDetails[];
   queryBookersInProgress: boolean;
+  hasSelectedPaymentRecords?: boolean;
 };
 
 const AddClientPaymentModal: React.FC<TAddClientPaymentModalProps> = (
@@ -32,6 +33,7 @@ const AddClientPaymentModal: React.FC<TAddClientPaymentModalProps> = (
     onQueryCompanyBookers,
     companyBookers,
     queryBookersInProgress,
+    hasSelectedPaymentRecords,
   } = props;
 
   const selectInputRef = useRef<any>(null);
@@ -57,6 +59,7 @@ const AddClientPaymentModal: React.FC<TAddClientPaymentModalProps> = (
         onQueryCompanyBookers={onQueryCompanyBookers}
         companyBookers={companyBookers}
         queryBookersInProgress={queryBookersInProgress}
+        hasSelectedPaymentRecords={hasSelectedPaymentRecords}
       />
     </Modal>
   );
