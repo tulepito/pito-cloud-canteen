@@ -13,6 +13,7 @@ import {
   EPartnerVATSetting,
   ESubOrderStatus,
 } from '@src/utils/enums';
+import { ETransition } from '@src/utils/transaction';
 import { Listing } from '@utils/data';
 import type { TListing, TObject, TQuotation } from '@utils/types';
 
@@ -55,9 +56,13 @@ export const calculateTotalPriceAndDishes = ({
             memberOrders,
             restaurant = {},
             status,
+            lastTransition,
           } = rawOrderDetailOfDate;
           const { foodList: foodListOfDate } = restaurant;
-          if (status === ESubOrderStatus.CANCELED) {
+          if (
+            status === ESubOrderStatus.CANCELED ||
+            lastTransition === ETransition.OPERATOR_CANCEL_PLAN
+          ) {
             return result;
           }
 
@@ -80,11 +85,16 @@ export const calculateTotalPriceAndDishes = ({
     : Object.entries<TObject>(orderDetail).reduce<TObject>(
         (result, currentOrderDetailEntry) => {
           const [dateKey, rawOrderDetailOfDate] = currentOrderDetailEntry;
-          const { lineItems = [], status } = rawOrderDetailOfDate;
+          const {
+            lineItems = [],
+            status,
+            lastTransition,
+          } = rawOrderDetailOfDate;
 
           if (
             (date && date?.toString() !== dateKey) ||
-            status === ESubOrderStatus.CANCELED
+            status === ESubOrderStatus.CANCELED ||
+            lastTransition === ETransition.OPERATOR_CANCEL_PLAN
           ) {
             return result;
           }
@@ -192,10 +202,11 @@ export const calculatePriceQuotationInfo = ({
     planOrderDetail,
   ).reduce<TObject>((result, currentOrderDetailEntry) => {
     const [subOrderDate, rawOrderDetailOfDate] = currentOrderDetailEntry;
-    const { status, transactionId } = rawOrderDetailOfDate;
+    const { status, transactionId, lastTransition } = rawOrderDetailOfDate;
 
     if (
       status === ESubOrderStatus.CANCELED ||
+      lastTransition === ETransition.OPERATOR_CANCEL_PLAN ||
       (!transactionId && isOrderInProgress)
     ) {
       return result;

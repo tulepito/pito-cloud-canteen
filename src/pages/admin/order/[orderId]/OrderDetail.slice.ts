@@ -255,7 +255,7 @@ const updateOrderState = createAsyncThunk(
 
 const transit = createAsyncThunk(
   'app/OrderDetail/TRANSIT',
-  async ({ transactionId, transition }: TObject, { getState }) => {
+  async ({ transactionId, transition }: TObject, { getState, dispatch }) => {
     const { company } = getState().OrderDetail;
     const { companyName } = User(company!).getPublicData();
     const { data: response } = await transitPlanApi({
@@ -307,6 +307,13 @@ const transit = createAsyncThunk(
         },
       ],
     });
+
+    dispatch(
+      OrderManagementsAction.updateOrderDetailLastTransition({
+        lastTransition,
+        subOrderDate: subOrderTimestamp,
+      }),
+    );
 
     return { transactionId, transition, createdAt: new Date().toISOString() };
   },
