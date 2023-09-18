@@ -49,7 +49,7 @@ export const prepareDataForTabs = ({
       } = result;
 
       const [memberId, orderItemData] = currentOrderItem;
-      const { status, foodId, requirement = '' } = orderItemData;
+      const { status, foodId, requirement = '' } = orderItemData || {};
       const memberDataMaybe = memberInfoMap[memberId];
       const anonymousDataMaybe = anonymousMemberInfoMap[memberId];
       const memberData = memberDataMaybe || anonymousDataMaybe || {};

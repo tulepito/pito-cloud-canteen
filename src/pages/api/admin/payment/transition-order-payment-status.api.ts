@@ -22,7 +22,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
     const plan = await fetchListing(planId);
     const planListing = Listing(plan);
-    const { orderDetail } = planListing.getMetadata();
+    const { orderDetail = {} } = planListing.getMetadata();
 
     // get all client payment records
     const clientPaymentRecords = await queryPaymentRecordOnFirebase({

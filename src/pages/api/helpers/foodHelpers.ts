@@ -473,7 +473,7 @@ export const updateMenuAfterFoodUpdated = async (updatedFoodId: string) => {
 
               const newFoodList = Object.keys(foodList).reduce(
                 (foodListResult: any, foodId: string) => {
-                  const food = foodList[foodId];
+                  const food = foodList[foodId] || {};
                   if (foodId === updatedFoodId) {
                     return {
                       ...foodListResult,

@@ -20,7 +20,7 @@ export const transitionOrderStatus = async (
     isPartnerSufficientPaid,
     orderStateHistory = [],
   } = orderListing.getMetadata();
-  const { orderDetail } = planListing.getMetadata();
+  const { orderDetail = {} } = planListing.getMetadata();
 
   const isOrderInProgress = orderState === EOrderStates.inProgress;
   const isOrderPendingPayment = orderState === EOrderStates.pendingPayment;

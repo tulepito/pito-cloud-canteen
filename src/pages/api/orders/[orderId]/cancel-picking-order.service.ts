@@ -45,12 +45,12 @@ export const cancelPickingOrder = async (orderId: string) => {
 
       Promise.all(
         Object.keys(orderDetail).map((dateAsTimeStamp) => {
-          const { memberOrders = {} } = orderDetail[dateAsTimeStamp];
+          const { memberOrders = {} } = orderDetail[dateAsTimeStamp] || {};
 
           const participantIds: string[] = [];
 
           Object.keys(memberOrders).forEach((partId) => {
-            const { status, foodId } = memberOrders[partId];
+            const { status, foodId } = memberOrders[partId] || {};
             if (status === EParticipantOrderStatus.joined && !!foodId) {
               participantIds.push(partId);
             }

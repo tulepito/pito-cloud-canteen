@@ -52,7 +52,7 @@ const getOrder = async ({ orderId }: { orderId: string }) => {
 
     data = { ...data, planListing };
 
-    const { orderDetail } = Listing(planListing).getMetadata();
+    const { orderDetail = {} } = Listing(planListing).getMetadata();
     const orderDetailEntries =
       Object.entries<TPlan['orderDetail'][keyof TPlan['orderDetail']]>(
         orderDetail,

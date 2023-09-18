@@ -136,7 +136,7 @@ const LineItemsTable: React.FC<TLineItemsTableProps> = (props) => {
       const itemIndex = lineItems.findIndex((x: TObject) => x?.id === foodId);
       let newLineItems = lineItems;
 
-      const { foodPrice, foodName } = foodList[foodId];
+      const { foodPrice, foodName } = foodList[foodId] || {};
 
       if (itemIndex === -1) {
         newLineItems = newLineItems.concat({

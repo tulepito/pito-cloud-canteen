@@ -396,7 +396,7 @@ const sendRemindEmailToMember = createAsyncThunk(
 
     const {
       attributes: {
-        metadata: { orderDetail },
+        metadata: { orderDetail = {} },
       },
     } = getState().OrderManagement.planData!;
 
@@ -555,7 +555,7 @@ const addOrUpdateMemberOrder = createAsyncThunk(
       addDocumentMemberSuborder();
 
       const planListing = Listing(updatePlanListing.planListing);
-      const { orderDetail } = planListing.getMetadata();
+      const { orderDetail = {} } = planListing.getMetadata();
 
       return {
         planData: updatePlanListing.planListing,
@@ -584,7 +584,7 @@ const disallowMember = createAsyncThunk(
 
     const memberOrderDetailOnUpdateDate =
       metadata?.orderDetail[currentViewDate].memberOrders[memberId];
-    const { status } = memberOrderDetailOnUpdateDate;
+    const { status } = memberOrderDetailOnUpdateDate || {};
 
     const validStatuses = [
       EParticipantOrderStatus.notJoined,
@@ -629,7 +629,7 @@ const restoredDisAllowedMember = createAsyncThunk(
       (result, memberId) => {
         const memberOrderDetailOnUpdateDate =
           metadata?.orderDetail[currentViewDate].memberOrders[memberId];
-        const { foodId } = memberOrderDetailOnUpdateDate;
+        const { foodId } = memberOrderDetailOnUpdateDate || {};
         const newStatus =
           foodId === ''
             ? EParticipantOrderStatus.empty
@@ -708,7 +708,7 @@ const addParticipant = createAsyncThunk(
     const {
       id: { uuid: planId },
       attributes: {
-        metadata: { orderDetail },
+        metadata: { orderDetail = {} },
       },
     } = getState().OrderManagement.planData!;
 
@@ -749,7 +749,7 @@ const deleteParticipant = createAsyncThunk(
       const {
         id: { uuid: planId },
         attributes: {
-          metadata: { orderDetail },
+          metadata: { orderDetail = {} },
         },
       } = getState().OrderManagement.planData!;
 
@@ -938,7 +938,7 @@ const updateOrderFromDraftEdit = createAsyncThunk(
       orderData as TListing,
     ).getMetadata();
     const planId = Listing(planData as TListing).getId();
-    const { orderDetail } = Listing(planData as TListing).getMetadata();
+    const { orderDetail = {} } = Listing(planData as TListing).getMetadata();
     const updateParams = {
       planId,
       orderDetail: draftOrderDetail,
@@ -1139,13 +1139,13 @@ const OrderManagementSlice = createSlice({
         orderData,
       } = state;
 
-      const { orderDetail: defaultOrderDetail } = Listing(
+      const { orderDetail: defaultOrderDetail = {} } = Listing(
         planData as TListing,
       ).getMetadata();
 
       const { orderType } = Listing(orderData as TListing).getMetadata();
       const { foodId: defaultFoodId } =
-        defaultOrderDetail[currentViewDate].memberOrders[memberId];
+        defaultOrderDetail[currentViewDate].memberOrders[memberId] || {};
 
       const memberOrderBeforeUpdate =
         draftOrderDetail[currentViewDate].memberOrders[memberId];
@@ -1286,12 +1286,12 @@ const OrderManagementSlice = createSlice({
         isAdminFlow = false,
       } = payload;
       const { draftOrderDetail, planData, orderData } = state;
-      const { orderDetail: defaultOrderDetail } = Listing(
+      const { orderDetail: defaultOrderDetail = {} } = Listing(
         planData as TListing,
       ).getMetadata();
       const { orderType } = Listing(orderData as TListing).getMetadata();
       const { status: defaultStatus } =
-        defaultOrderDetail[currentViewDate].memberOrders[memberId];
+        defaultOrderDetail[currentViewDate].memberOrders[memberId] || {};
       const memberOrderDetailOnUpdateDate =
         draftOrderDetail[currentViewDate].memberOrders[memberId];
 
@@ -1610,7 +1610,7 @@ const OrderManagementSlice = createSlice({
     },
     resetDraftOrderDetails: (state) => {
       const { planData } = state;
-      const { orderDetail } = Listing(planData as TListing).getMetadata();
+      const { orderDetail = {} } = Listing(planData as TListing).getMetadata();
 
       return {
         ...state,
@@ -1647,7 +1647,7 @@ const OrderManagementSlice = createSlice({
           ...restPayload
         } = payload;
 
-        const { orderDetail } = Listing(planData).getMetadata();
+        const { orderDetail = {} } = Listing(planData).getMetadata();
 
         return {
           ...state,

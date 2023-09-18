@@ -58,7 +58,7 @@ export const createMinPriceByDayOfWeek = (foodsByDate: any) => {
   Object.keys(foodsByDate).forEach((keyAsDate) => {
     let minPriceByDate = 0;
     Object.keys(foodsByDate[keyAsDate]).forEach((foodId, index) => {
-      const { price = 0 } = foodsByDate[keyAsDate][foodId];
+      const { price = 0 } = foodsByDate[keyAsDate][foodId] || {};
       if (index === 0) minPriceByDate = price;
       else {
         minPriceByDate = price < minPriceByDate ? price : minPriceByDate;
@@ -98,7 +98,7 @@ export const createListFoodNutritionByFoodsByDate = (foodsByDate: any) => {
   Object.keys(foodsByDate).forEach((keyAsDate) => {
     let nutritionListByDate: string[] = [];
     Object.keys(foodsByDate[keyAsDate]).forEach((foodId) => {
-      const { nutritionsList = [] } = foodsByDate[keyAsDate][foodId];
+      const { nutritionsList = [] } = foodsByDate[keyAsDate][foodId] || {};
       nutritionListByDate = getUniqueString([
         ...nutritionListByDate,
         ...nutritionsList,

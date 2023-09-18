@@ -33,7 +33,7 @@ const partnerOrderDetailsUpdated = ({
   const restaurantId = restaurantListing.getId();
   const { title: restaurantName } = restaurantListing.getAttributes();
 
-  const { orderDetail: planOrderDetail } = planListing.getMetadata();
+  const { orderDetail: planOrderDetail = {} } = planListing.getMetadata();
 
   const {
     staffName,

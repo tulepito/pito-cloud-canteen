@@ -205,7 +205,7 @@ const transferCompanyOwner = async ({
   Promise.all(
     Object.keys(newMembers).map(async (key) => {
       const member = newMembers[key as keyof typeof newMembers];
-      const { id, permission } = member;
+      const { id, permission } = member || {};
 
       // if owner dont need to update because it already updated above;
       if (permission === UserPermission.OWNER || !id) return;

@@ -29,7 +29,7 @@ const bookerSubOrderIsCanceled = ({
   const { displayName: bookerName } = bookerUser.getProfile();
   const orderId = orderListing.getId();
   const { orderName } = orderListing.getPublicData();
-  const { orderDetail: planOrderDetail } = planListing.getMetadata();
+  const { orderDetail: planOrderDetail = {} } = planListing.getMetadata();
   const currentOrderDetail = Object.entries<TObject>(
     planOrderDetail,
   ).reduce<TObject>((result, currentOrderDetailEntry) => {

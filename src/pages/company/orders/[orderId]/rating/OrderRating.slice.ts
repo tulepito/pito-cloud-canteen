@@ -108,7 +108,7 @@ const fetchFoodListByRestaurant = createAsyncThunk(
     const { memberOrders = {} } = orderInDay;
     const orderedFoodIdList = uniq(
       Object.values(memberOrders).reduce((result: string[], member: any) => {
-        if (member.foodId) {
+        if (member?.foodId) {
           return [...result, member.foodId];
         }
 

@@ -103,7 +103,7 @@ const updatePlan = async ({
   if (enabledToUpdateRelatedBookingInfo) {
     if (updateMode === EApiUpdateMode.MERGE) {
       currPlan = await fetchListing(planId as string);
-      const { orderDetail: oldOrderDetail, menuIds = [] } =
+      const { orderDetail: oldOrderDetail = {}, menuIds = [] } =
         Listing(currPlan).getMetadata();
 
       updatedOrderDetail = getNormalizeDetail({
@@ -117,7 +117,7 @@ const updatePlan = async ({
 
     if (updateMode === EApiUpdateMode.DIRECT_UPDATE) {
       currPlan = await fetchListing(planId as string);
-      const { orderDetail: oldOrderDetail, menuIds = [] } =
+      const { orderDetail: oldOrderDetail = {}, menuIds = [] } =
         Listing(currPlan).getMetadata();
       updatedOrderDetail = {
         ...oldOrderDetail,

@@ -37,14 +37,14 @@ const partnerNewOrderAppear = ({
   const { companyName } = companyUser.getPublicData();
 
   const { partner = {} } = quotationListing.getMetadata();
-  const partnerQuotation = partner[restaurantId];
+  const partnerQuotation = partner[restaurantId] || {};
 
-  const totalPrice = Object.keys(partnerQuotation.quotation).reduce(
+  const totalPrice = Object.keys(partnerQuotation?.quotation).reduce(
     (sum: number, date: string) => {
       return (
         sum +
         sumBy(
-          partnerQuotation.quotation[date],
+          partnerQuotation?.quotation[date],
           (o: any) => o.frequency * o.foodPrice,
         )
       );

@@ -199,7 +199,7 @@ export const updateRatingForOrderFn = async ({
   service: any;
 }) => {
   const integrationSdk = getIntegrationSdk();
-  const { orderId } = ratings[0];
+  const { orderId } = ratings[0] || {};
   const order = await fetchListing(orderId);
   const orderListing = Listing(order);
   const { orderState, orderStateHistory = [] } = orderListing.getMetadata();

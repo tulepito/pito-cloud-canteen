@@ -13,7 +13,7 @@ export const formatQuotationToFoodTableData = (
   quotationDetail: any,
   restaurantId: string,
 ) => {
-  const restaurantQuotation = quotationDetail[restaurantId];
+  const restaurantQuotation = quotationDetail[restaurantId] || {};
 
   return Object.keys(restaurantQuotation?.quotation || {}).map(
     (date: string, index: number) => {

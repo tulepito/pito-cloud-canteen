@@ -25,10 +25,10 @@ export const addFirebaseDocument = async ({
   const order = await fetchListing(orderId);
   const orderListing = Listing(order);
   const { deliveryHour } = orderListing.getMetadata();
-  const subOrder = orderDetail[timestamp];
+  const subOrder = orderDetail[timestamp] || {};
   const { memberOrders = {}, transactionId, restaurant = {} } = subOrder;
   const { id: restaurantId, restaurantName, foodList } = restaurant;
-  const { foodId, status } = memberOrders[participantId];
+  const { foodId, status } = memberOrders[participantId] || {};
   const restaurantResponse = await fetchListing(
     restaurantId,
     ['images'],
@@ -67,7 +67,7 @@ export const addFirebaseDocument = async ({
   };
 
   if (status !== EParticipantOrderStatus.notJoined && foodId) {
-    const { foodName } = foodList[foodId];
+    const { foodName } = foodList[foodId] || {};
     const foodResponse = await fetchListing(
       foodId,
       ['images'],

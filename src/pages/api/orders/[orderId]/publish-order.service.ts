@@ -69,7 +69,8 @@ export const publishOrder = async (orderId: string) => {
   const [planListing] = denormalisedResponseEntities(
     await integrationSdk.listings.show({ id: planId }),
   );
-  const { orderDetail: planOrderDetails } = Listing(planListing).getMetadata();
+  const { orderDetail: planOrderDetails = {} } =
+    Listing(planListing).getMetadata();
 
   await integrationSdk.listings.update({
     id: planId,

@@ -91,7 +91,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         const planListing = Listing(plan);
         const planId = planListing.getId();
 
-        const { orderDetail } = planListing.getMetadata();
+        const { orderDetail = {} } = planListing.getMetadata();
 
         const updatePlanListing = async (lastTransition: string) => {
           const newOrderDetail = {

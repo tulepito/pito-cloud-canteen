@@ -100,7 +100,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
         const currentPlan = await fetchListing(planId);
         const currentPlanListing = Listing(currentPlan);
-        const { orderDetail } = currentPlanListing.getMetadata();
+        const { orderDetail = {} } = currentPlanListing.getMetadata();
 
         const newOrderDetail = {
           ...orderDetail,

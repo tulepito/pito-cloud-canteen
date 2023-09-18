@@ -30,8 +30,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         const { reviewerId, timestamp } = rating;
         const plan = await fetchListing(planId);
         const planListing = Listing(plan);
-        const { orderDetail } = planListing.getMetadata();
-        const { foodId } = orderDetail[timestamp].memberOrders[reviewerId];
+        const { orderDetail = {} } = planListing.getMetadata();
+        const { foodId } =
+          orderDetail[timestamp]?.memberOrders?.[reviewerId] || {};
         const food = await fetchListing(foodId);
         const foodListing = Listing(food);
         const { title: foodName } = foodListing.getAttributes();
@@ -57,6 +58,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           subOrderDate: timestamp,
           foodName,
         });
+
         res.status(200).json({ success: true });
       } catch (error) {
         handleError(res, error);

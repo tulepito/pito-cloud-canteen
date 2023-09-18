@@ -82,7 +82,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         );
 
         const subOrderPromises = plans.map(async (plan: TListing) => {
-          const { orderDetail } = Listing(plan).getMetadata();
+          const { orderDetail = {} } = Listing(plan).getMetadata();
           const planId = Listing(plan).getId();
 
           return {
@@ -124,7 +124,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
         const { participants = [], anonymous = [] } =
           Listing(orderListing).getMetadata();
-        const { orderDetail } = Listing(updatingPlan).getMetadata();
+        const { orderDetail = {} } = Listing(updatingPlan).getMetadata();
 
         if (orderDay && memberOrders) {
           orderDetail[orderDay].memberOrders[currentUserId] =

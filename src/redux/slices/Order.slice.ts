@@ -640,7 +640,7 @@ const fetchOrderDetail = createAsyncThunk(
 const fetchRestaurantCoverImages = createAsyncThunk(
   FETCH_RESTAURANT_COVER_IMAGE,
   async (_, { extra: sdk, getState }) => {
-    const { orderDetail } = getState().Order;
+    const { orderDetail = {} } = getState().Order;
     const restaurantIdList = uniq(
       Object.values(orderDetail).map((item: any) => item.restaurant.id),
     );
@@ -861,7 +861,7 @@ const checkRestaurantStillAvailable = createAsyncThunk(
 const fetchOrderRestaurants = createAsyncThunk(
   FETCH_ORDER_RESTAURANTS,
   async (_, { extra: sdk, getState }) => {
-    const { orderDetail } = getState().Order;
+    const { orderDetail = {} } = getState().Order;
     const restaurantIdList = uniq(
       Object.values(orderDetail).map((item: any) => item.restaurant.id),
     );
@@ -993,7 +993,7 @@ const orderSlice = createSlice({
       selectedBooker: payload,
     }),
     updateDraftMealPlan: (state, { payload }) => {
-      const { orderDetail } = payload;
+      const { orderDetail = {} } = payload;
       const {
         dateTimestamp,
         restaurantId,
@@ -1001,7 +1001,7 @@ const orderSlice = createSlice({
         foodList,
         phoneNumber,
       } = orderDetail;
-      const { orderDetail: oldOrderDetail } = state;
+      const { orderDetail: oldOrderDetail = {} } = state;
       const existedOrderDetailDate = Object.keys(oldOrderDetail).includes(
         dateTimestamp.toString(),
       );

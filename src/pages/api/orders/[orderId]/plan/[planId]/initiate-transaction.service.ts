@@ -62,7 +62,8 @@ export const initiateTransaction = async ({
   const { subAccountId } = companyAccount.attributes.profile.privateData;
   const companySubAccount = await fetchUser(subAccountId);
   const subAccountTrustedSdk = await getSubAccountTrustedSdk(companySubAccount);
-  const { orderDetail: planOrderDetail } = Listing(planListing).getMetadata();
+  const { orderDetail: planOrderDetail = {} } =
+    Listing(planListing).getMetadata();
 
   // Normalize order detail
   const normalizedOrderDetail = normalizeOrderDetail({

@@ -38,7 +38,7 @@ const ManageParticipantsModal: React.FC<ManageParticipantsModalProps> = (
   } = props;
 
   const { participants = [] } = data;
-  const { orderDetail } = Listing(data.planData as TListing).getMetadata();
+  const { orderDetail = {} } = Listing(data.planData as TListing).getMetadata();
   const numberOfCompletedPickings = participants.filter((participantId) =>
     isCompletePickFood({ participantId, orderDetail }),
   ).length;

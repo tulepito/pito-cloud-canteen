@@ -17,8 +17,7 @@ const fetchSubOrder = async (orderDetail: any, currentUserId: string) => {
   const planKeys = Object.keys(orderDetail);
 
   for (const planKey of planKeys) {
-    const planItem = orderDetail[planKey];
-    const { restaurant = {}, memberOrders = {} } = planItem;
+    const { restaurant = {}, memberOrders = {} } = orderDetail[planKey] || {};
     const { foodList = {}, id: restaurantId } = restaurant;
 
     // Fetch restaurant data

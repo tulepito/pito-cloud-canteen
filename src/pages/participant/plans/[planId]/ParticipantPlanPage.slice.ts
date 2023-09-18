@@ -117,8 +117,12 @@ const loadData = createAsyncThunk(
     const orderDays = Object.keys(plan);
 
     orderDays.forEach((day) => {
-      const userOder = plan?.[day]?.memberOrder?.[currentUserId];
-      const { status, foodId, requirement = '' } = userOder || {};
+      const {
+        status,
+        foodId,
+        requirement = '',
+      } = plan?.[day]?.memberOrder?.[currentUserId] || {};
+
       if (status !== EParticipantOrderStatus.empty) {
         dispatch(
           shoppingCartActions.addToCart({
@@ -183,7 +187,7 @@ const updateOrder = createAsyncThunk(
     const { currentUser } = getState().user;
     const currentUserId = currentUser?.id?.uuid;
     const { orders } = getState().shoppingCart;
-    const planData = orders?.[currentUserId]?.[planId];
+    const planData = orders?.[currentUserId]?.[planId] || {};
     const orderDays = Object.keys(planData);
 
     const updatedPlan = orderDays.reduce((acc: any, curr: any) => {

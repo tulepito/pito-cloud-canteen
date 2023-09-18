@@ -176,8 +176,7 @@ export const getFoodIdListWithSuitablePrice = ({
   const { foodList } = subOrder.restaurant;
   const suitablePriceFoodList = Object.keys(foodList).reduce(
     (result: any, foodId: string) => {
-      const food = foodList[foodId];
-      const { foodPrice } = food;
+      const { foodPrice = 0 } = foodList[foodId] || {};
       if (foodPrice <= packagePerMember) {
         result.push(foodId);
       }
