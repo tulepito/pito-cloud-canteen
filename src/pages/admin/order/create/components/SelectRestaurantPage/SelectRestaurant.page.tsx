@@ -74,8 +74,12 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
   } = Listing(order as TListing).getMetadata();
   const shouldShowRestaurantPagination =
     !!restaurants && restaurants?.length > 0 && !fetchRestaurantsPending;
-  const { totalItems: total } = pagination || {};
-  const paginationProps = { total, current: page, pageSize: perPage };
+  const { totalItems: total, page: pageFromRedux } = pagination || {};
+  const paginationProps = {
+    total,
+    current: pageFromRedux && page !== pageFromRedux ? pageFromRedux : page,
+    pageSize: perPage,
+  };
   const showModalCondition = isModalOpen && !fetchFoodPending;
 
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();

@@ -25,10 +25,10 @@ export const queryAllPages = async ({
   const queryPage = async ({ page }: any) => {
     const response = await sdkModel.query({
       include,
-      page,
       pagesPerRequest,
       ...fields,
       ...query,
+      page,
     });
     result = [...result, ...denormalisedResponseEntities(response)];
 

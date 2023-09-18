@@ -1,9 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit';
+import compact from 'lodash/compact';
 import flatten from 'lodash/flatten';
 import uniq from 'lodash/uniq';
 
 import { fetchFoodListFromMenuApi } from '@apis/admin';
-import { convertListIdToQueries } from '@helpers/apiHelpers';
+import { convertListIdToQueries, queryAllPages } from '@helpers/apiHelpers';
 import { getMenuQuery } from '@helpers/listingSearchQuery';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { denormalisedResponseEntities, Listing } from '@utils/data';
@@ -57,6 +58,7 @@ const getRestaurants = createAsyncThunk(
       page = 1,
       perPage = 10,
     } = params || {};
+
     const menuQuery = getMenuQuery({
       order,
       params: {
@@ -67,11 +69,12 @@ const getRestaurants = createAsyncThunk(
         timestamp: dateTime,
       },
     });
-    const response = await sdk.listings.query(menuQuery);
 
-    const { meta } = response?.data || {};
+    const menuList = await queryAllPages({
+      sdkModel: sdk.listings,
+      query: { ...menuQuery, perPage: 100 },
+    });
 
-    const menuList = denormalisedResponseEntities(response);
     const restaurantIdList = uniq(
       menuList.map((menu: TListing) => {
         const { restaurantId } = Listing(menu).getMetadata();
@@ -79,7 +82,6 @@ const getRestaurants = createAsyncThunk(
         return restaurantId;
       }),
     );
-
     const restaurantQueries = convertListIdToQueries({
       idList: restaurantIdList,
       include: ['images'],
@@ -88,7 +90,7 @@ const getRestaurants = createAsyncThunk(
       },
       'fields.image': ['variants.landscape-crop', 'variants.landscape-crop2x'],
     });
-    const restaurants = flatten(
+    const restaurantList = flatten(
       await Promise.all(
         restaurantQueries.map(async ({ ids, query, ...rest }) => {
           return denormalisedResponseEntities(
@@ -100,18 +102,41 @@ const getRestaurants = createAsyncThunk(
           );
         }),
       ),
-    ).map((restaurantInfo) => {
-      const menu = menuList.find((m: TListing) => {
-        return m?.attributes?.metadata?.restaurantId === restaurantInfo.id.uuid;
-      });
+    );
 
-      return {
-        restaurantInfo,
-        menu,
-      };
-    });
+    const restaurantWithMenuList = compact(
+      menuList.map((menu: TListing) => {
+        const restaurantInfo = restaurantList.find((r: TListing) => {
+          return menu?.attributes?.metadata?.restaurantId === r.id.uuid;
+        });
 
-    return { restaurants, pagination: meta };
+        if (restaurantInfo) {
+          return {
+            restaurantInfo,
+            menu,
+          };
+        }
+
+        return null;
+      }),
+    );
+
+    const totalRestaurants = restaurantWithMenuList.length;
+    const totalPages = Math.round(totalRestaurants / perPage + 0.5);
+    const newPage = page > totalPages ? 1 : page;
+    const customMeta = {
+      totalItems: totalRestaurants,
+      totalPages,
+      page: newPage,
+      paginationLimit: totalPages,
+      perPage,
+    };
+    const suitableRestaurantList = restaurantWithMenuList.slice(
+      (customMeta.page - 1) * perPage,
+      customMeta.page * perPage,
+    );
+
+    return { restaurants: suitableRestaurantList, pagination: customMeta };
   },
 );
 
