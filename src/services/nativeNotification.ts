@@ -22,7 +22,7 @@ export const createNativeNotification = async (
   const { participantId } = notificationParams;
   const participant = await fetchUser(participantId);
   const participantUser = User(participant);
-  const { lastName } = participantUser.getProfile();
+  const { firstName } = participantUser.getProfile();
   const { oneSignalUserId } = participantUser.getPrivateData();
 
   if (!oneSignalUserId) return;
@@ -43,7 +43,7 @@ export const createNativeNotification = async (
           )}-${formatTimestamp(
             +endDate,
             'dd/MM',
-          )} đã sẵn sàng, mời ${lastName} chọn món nhé!`,
+          )} đã sẵn sàng, mời ${firstName} chọn món nhé!`,
           url,
           oneSignalUserId,
         });
@@ -64,7 +64,7 @@ export const createNativeNotification = async (
           )}-${formatTimestamp(
             +endDate,
             'dd/MM',
-          )} của ${lastName} được đặt thành công`,
+          )} của ${firstName} được đặt thành công`,
           url,
           oneSignalUserId,
         });
@@ -76,7 +76,7 @@ export const createNativeNotification = async (
         const url = `${BASE_URL}/participant/orders/?planId=${planId}&subOrderDate=${subOrderDate}`;
         sendNotification({
           title: '🛵 🛵 🛵 Cơm sắp đến',
-          content: `🌟 ${foodName} sắp đến rồi. Chúc ${lastName} ngon miệng`,
+          content: `🌟 ${foodName} sắp đến rồi. Chúc ${firstName} ngon miệng`,
           url,
           oneSignalUserId,
         });
@@ -88,7 +88,7 @@ export const createNativeNotification = async (
         const url = `${BASE_URL}/participant/orders/?planId=${planId}&subOrderDate=${subOrderDate}`;
         sendNotification({
           title: 'Đã có cơm 😍 😍 😍',
-          content: `${foodName} đã được giao đến bạn. Chúc ${lastName} ngon miệng.`,
+          content: `${foodName} đã được giao đến bạn. Chúc ${firstName} ngon miệng.`,
           url,
           oneSignalUserId,
         });
@@ -100,7 +100,7 @@ export const createNativeNotification = async (
         const url = `${BASE_URL}/participant/orders/?planId=${planId}&subOrderDate=${subOrderDate}`;
         sendNotification({
           title: 'Opps! Ngày ăn bị hủy!',
-          content: `😢 ${lastName} ơi, rất tiếc phải thông báo ngày ăn ${formatTimestamp(
+          content: `😢 ${firstName} ơi, rất tiếc phải thông báo ngày ăn ${formatTimestamp(
             +subOrderDate!,
             'dd/MM',
           )} đã bị hủy`,
@@ -117,7 +117,7 @@ export const createNativeNotification = async (
         const url = `${BASE_URL}/participant/orders/?planId=${planId}&startDate=${startDate}`;
         sendNotification({
           title: 'Opps! Tuần ăn bị hủy!',
-          content: `😢 ${lastName} ơi, rất tiếc phải thông báo tuần ăn ${formatTimestamp(
+          content: `😢 ${firstName} ơi, rất tiếc phải thông báo tuần ăn ${formatTimestamp(
             +startDate!,
             'dd/MM',
           )}-${formatTimestamp(+endDate!, 'dd/MM')} đã bị hủy`,

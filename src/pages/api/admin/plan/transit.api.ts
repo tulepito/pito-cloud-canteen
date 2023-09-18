@@ -102,7 +102,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         const planId = planListing.getId();
 
         const { orderDetail } = planListing.getMetadata();
-        const { memberOrders = {}, restaurant = {} } = orderDetail;
+        const { memberOrders = {}, restaurant = {} } =
+          orderDetail[startTimestamp];
         const { foodList = {} } = restaurant;
 
         const updatePlanListing = async (lastTransition: string) => {
@@ -123,75 +124,64 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         };
 
         if (transition === ETransition.START_DELIVERY) {
-          [...participantIds, ...anonymous].map(
-            async (participantId: string) => {
-              createFirebaseDocNotification(
-                ENotificationType.ORDER_DELIVERING,
+          [...participantIds, ...anonymous].forEach((participantId: string) => {
+            createFirebaseDocNotification(ENotificationType.ORDER_DELIVERING, {
+              ...generalNotificationData,
+              userId: participantId,
+            });
+
+            const { foodId } = memberOrders[participantId] || {};
+
+            if (foodId) {
+              const { foodName = '' } = foodList[foodId];
+              createNativeNotification(
+                ENativeNotificationType.AdminTransitSubOrderToDelivering,
                 {
-                  ...generalNotificationData,
-                  userId: participantId,
+                  participantId,
+                  planId,
+                  subOrderDate: startTimestamp.toString(),
+                  foodName,
                 },
               );
-
-              const { foodId } = memberOrders[participantId] || {};
-
-              if (foodId) {
-                const { foodName = '' } = foodList[foodId];
-                createNativeNotification(
-                  ENativeNotificationType.AdminTransitSubOrderToDelivering,
-                  {
-                    participantId,
-                    planId,
-                    subOrderDate: startTimestamp.toString(),
-                    foodName,
-                  },
-                );
-              }
-            },
-          );
+            }
+          });
 
           await updatePlanListing(ETransition.START_DELIVERY);
         }
         if (transition === ETransition.COMPLETE_DELIVERY) {
-          [...participantIds, ...anonymous].map(
-            async (participantId: string) => {
-              createFirebaseDocNotification(ENotificationType.ORDER_SUCCESS, {
-                ...generalNotificationData,
-                userId: participantId,
-              });
-              const { foodId } = memberOrders[participantId] || {};
-
-              if (foodId) {
-                const { foodName = '' } = foodList[foodId];
-                createNativeNotification(
-                  ENativeNotificationType.AdminTransitSubOrderToDelivered,
-                  {
-                    participantId,
-                    planId,
-                    subOrderDate: startTimestamp.toString(),
-                    foodName,
-                  },
-                );
-              }
-            },
-          );
-          try {
-            createFoodRatingNotificationScheduler({
-              customName: `sendFoodRatingNotification_${orderId}_${startTimestamp}`,
-              timeExpression: formatTimestamp(
-                +startTimestamp + 30 * 60 * 1000, // after 30 minutes
-                "yyyy-MM-dd'T'hh:mm:ss",
-              ),
-              params: {
-                orderId,
-                participantIds,
-                subOrderDate: startTimestamp,
-                planId,
-              },
+          [...participantIds, ...anonymous].forEach((participantId: string) => {
+            createFirebaseDocNotification(ENotificationType.ORDER_SUCCESS, {
+              ...generalNotificationData,
+              userId: participantId,
             });
-          } catch (error) {
-            console.error('sendFoodRatingNotification: ', error);
-          }
+            const { foodId } = memberOrders[participantId] || {};
+
+            if (foodId) {
+              const { foodName = '' } = foodList[foodId];
+              createNativeNotification(
+                ENativeNotificationType.AdminTransitSubOrderToDelivered,
+                {
+                  participantId,
+                  planId,
+                  subOrderDate: startTimestamp.toString(),
+                  foodName,
+                },
+              );
+            }
+          });
+          createFoodRatingNotificationScheduler({
+            customName: `sendFRN_${orderId}_${startTimestamp}`,
+            timeExpression: formatTimestamp(
+              +startTimestamp + 30 * 60 * 1000, // after 30 minutes
+              "yyyy-MM-dd'T'hh:mm:ss",
+            ),
+            params: {
+              orderId,
+              participantIds,
+              subOrderDate: startTimestamp,
+              planId,
+            },
+          });
           await transitionOrderStatus(order, plan, integrationSdk);
           await updatePlanListing(ETransition.COMPLETE_DELIVERY);
         }

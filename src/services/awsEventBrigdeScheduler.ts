@@ -87,5 +87,12 @@ export const createFoodRatingNotificationScheduler = async ({
     },
   };
 
-  return Scheduler.createSchedule(schedulerParams).promise();
+  Scheduler.createSchedule(schedulerParams)
+    .promise()
+    .then((res) => {
+      console.log('Create Food Rating Notification Scheduler Success: ', res);
+    })
+    .catch((err) => {
+      console.log('Create Food Rating Notification Scheduler Error: ', err);
+    });
 };
