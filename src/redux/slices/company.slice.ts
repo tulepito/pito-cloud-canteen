@@ -359,7 +359,7 @@ const groupInfo = createAsyncThunk(
     const { workspaceCompanyId } = getState().company;
     const response = await sdk.users.show({ id: workspaceCompanyId });
     const groupsResponse =
-      response.data.data?.attributes?.profile?.metadata?.groups;
+      response.data.data?.attributes?.profile?.metadata?.groups || [];
 
     return groupsResponse;
   },

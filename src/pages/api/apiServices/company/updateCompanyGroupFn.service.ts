@@ -1,4 +1,4 @@
-import { difference, differenceBy } from 'lodash';
+import { differenceBy } from 'lodash';
 
 import { fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
@@ -71,38 +71,6 @@ const updateCompanyGroupFn = async ({
     );
   const [updatedCompanyAccount] = denormalisedResponseEntities(
     updatedCompanyAccountResponse,
-  );
-
-  await Promise.all(
-    addedMembers.map(async ({ id }: TMemberApi) => {
-      const memberResponse = await integrationSdk.users.show({
-        id,
-      });
-      const [memberData] = denormalisedResponseEntities(memberResponse);
-      const { groupList = [] } = memberData.attributes.profile.metadata || {};
-      await integrationSdk.users.updateProfile({
-        id,
-        metadata: {
-          groupList: Array.from(new Set(groupList).add(groupId)),
-        },
-      });
-    }),
-  );
-
-  await Promise.all(
-    deletedMembers.map(async ({ id }: TMemberApi) => {
-      const memberResponse = await integrationSdk.users.show({
-        id,
-      });
-      const [memberData] = denormalisedResponseEntities(memberResponse);
-      const { groupList = [] } = memberData.attributes.profile.metadata || {};
-      await integrationSdk.users.updateProfile({
-        id,
-        metadata: {
-          groupList: difference(groupList, [groupId]),
-        },
-      });
-    }),
   );
 
   return updatedCompanyAccount;
