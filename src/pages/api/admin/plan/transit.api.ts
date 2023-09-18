@@ -175,19 +175,23 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
               }
             },
           );
-          createFoodRatingNotificationScheduler({
-            customName: `sendFoodRatingNotification_${orderId}`,
-            timeExpression: formatTimestamp(
-              +startTimestamp + 30 * 60 * 1000, // after 30 minutes
-              "yyyy-MM-dd'T'hh:mm:ss",
-            ),
-            params: {
-              orderId,
-              participantIds,
-              subOrderDate: startTimestamp,
-              planId,
-            },
-          });
+          try {
+            createFoodRatingNotificationScheduler({
+              customName: `sendFoodRatingNotification_${orderId}_${startTimestamp}`,
+              timeExpression: formatTimestamp(
+                +startTimestamp + 30 * 60 * 1000, // after 30 minutes
+                "yyyy-MM-dd'T'hh:mm:ss",
+              ),
+              params: {
+                orderId,
+                participantIds,
+                subOrderDate: startTimestamp,
+                planId,
+              },
+            });
+          } catch (error) {
+            console.error('sendFoodRatingNotification: ', error);
+          }
           await transitionOrderStatus(order, plan, integrationSdk);
           await updatePlanListing(ETransition.COMPLETE_DELIVERY);
         }
