@@ -133,16 +133,18 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
               );
 
               const { foodId } = memberOrders[participantId];
-              const { foodName } = restaurant.foodList[foodId];
-              createNativeNotification(
-                ENativeNotificationType.AdminTransitSubOrderToDelivering,
-                {
-                  participantId,
-                  planId,
-                  subOrderDate: startTimestamp.toString(),
-                  foodName,
-                },
-              );
+              if (foodId) {
+                const { foodName } = restaurant.foodList[foodId];
+                createNativeNotification(
+                  ENativeNotificationType.AdminTransitSubOrderToDelivering,
+                  {
+                    participantId,
+                    planId,
+                    subOrderDate: startTimestamp.toString(),
+                    foodName,
+                  },
+                );
+              }
             },
           );
 
@@ -156,16 +158,18 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
                 userId: participantId,
               });
               const { foodId } = memberOrders[participantId];
-              const { foodName } = restaurant.foodList[foodId];
-              createNativeNotification(
-                ENativeNotificationType.AdminTransitSubOrderToDelivered,
-                {
-                  participantId,
-                  planId,
-                  subOrderDate: startTimestamp.toString(),
-                  foodName,
-                },
-              );
+              if (foodId) {
+                const { foodName } = restaurant.foodList[foodId];
+                createNativeNotification(
+                  ENativeNotificationType.AdminTransitSubOrderToDelivered,
+                  {
+                    participantId,
+                    planId,
+                    subOrderDate: startTimestamp.toString(),
+                    foodName,
+                  },
+                );
+              }
             },
           );
           createFoodRatingNotificationScheduler({

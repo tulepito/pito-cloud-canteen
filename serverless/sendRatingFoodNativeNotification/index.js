@@ -45,13 +45,15 @@ exports.handler = async (_event) => {
 
     participantIds.forEach((participantId) => {
       const { foodId } = memberOrders[participantId];
-      const { foodName } = restaurant.foodList[foodId];
-      createNativeNotification({
-        participantId,
-        orderId,
-        subOrderDate,
-        foodName,
-      });
+      if (foodId) {
+        const { foodName } = restaurant.foodList[foodId];
+        createNativeNotification({
+          participantId,
+          orderId,
+          subOrderDate,
+          foodName,
+        });
+      }
     });
 
     console.log(
