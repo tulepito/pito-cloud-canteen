@@ -114,7 +114,7 @@ export const createNativeNotification = async (
         const { order, planId } = notificationParams;
         const orderListing = Listing(order!);
         const { startDate, endDate } = orderListing.getMetadata();
-        const url = `${BASE_URL}/participant/orders/?planId=${planId}&startDate=${startDate}`;
+        const url = `${BASE_URL}/participant/orders/?planId=${planId}&timestamp=${startDate}`;
         sendNotification({
           title: 'Opps! Tuần ăn bị hủy!',
           content: `😢 ${firstName} ơi, rất tiếc phải thông báo tuần ăn ${formatTimestamp(
