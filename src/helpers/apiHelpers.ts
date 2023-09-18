@@ -151,3 +151,17 @@ export const fetchListingsByChunkedIds = async (ids: string[], sdk: any) => {
 
   return flatten(listingsResponse);
 };
+
+export const fetchUserByChunkedIds = async (ids: string[], sdk: any) => {
+  const usersResponse = await Promise.all(
+    chunk<string>(ids, 100).map(async (_ids) => {
+      const response = await sdk.users.query({
+        meta_id: _ids,
+      });
+
+      return denormalisedResponseEntities(response);
+    }),
+  );
+
+  return flatten(usersResponse);
+};
