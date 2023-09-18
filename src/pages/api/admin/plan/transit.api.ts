@@ -134,20 +134,19 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
               );
 
               const { foodId } = memberOrders[participantId] || {};
-              if (isEmpty(foodId)) {
-                return;
-              }
 
-              const { foodName = '' } = foodList[foodId];
-              createNativeNotification(
-                ENativeNotificationType.AdminTransitSubOrderToDelivering,
-                {
-                  participantId,
-                  planId,
-                  subOrderDate: startTimestamp.toString(),
-                  foodName,
-                },
-              );
+              if (foodId) {
+                const { foodName = '' } = foodList[foodId];
+                createNativeNotification(
+                  ENativeNotificationType.AdminTransitSubOrderToDelivering,
+                  {
+                    participantId,
+                    planId,
+                    subOrderDate: startTimestamp.toString(),
+                    foodName,
+                  },
+                );
+              }
             },
           );
 
@@ -160,22 +159,20 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
                 ...generalNotificationData,
                 userId: participantId,
               });
-              const { foodId } = memberOrders[participantId];
+              const { foodId } = memberOrders[participantId] || {};
 
-              if (isEmpty(foodId)) {
-                return;
+              if (foodId) {
+                const { foodName = '' } = foodList[foodId];
+                createNativeNotification(
+                  ENativeNotificationType.AdminTransitSubOrderToDelivered,
+                  {
+                    participantId,
+                    planId,
+                    subOrderDate: startTimestamp.toString(),
+                    foodName,
+                  },
+                );
               }
-
-              const { foodName = '' } = foodList[foodId];
-              createNativeNotification(
-                ENativeNotificationType.AdminTransitSubOrderToDelivered,
-                {
-                  participantId,
-                  planId,
-                  subOrderDate: startTimestamp.toString(),
-                  foodName,
-                },
-              );
             },
           );
           createFoodRatingNotificationScheduler({
