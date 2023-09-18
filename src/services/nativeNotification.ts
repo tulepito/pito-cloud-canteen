@@ -73,7 +73,7 @@ export const createNativeNotification = async (
     case ENativeNotificationType.AdminTransitSubOrderToDelivering:
       {
         const { foodName, planId, subOrderDate } = notificationParams;
-        const url = `${BASE_URL}/participant/orders/?planId=${planId}&subOrderDate=${subOrderDate}`;
+        const url = `${BASE_URL}/participant/orders/?planId=${planId}&timestamp=${subOrderDate}`;
         sendNotification({
           title: '🛵 🛵 🛵 Cơm sắp đến',
           content: `🌟 ${foodName} sắp đến rồi. Chúc ${firstName} ngon miệng`,
@@ -85,7 +85,7 @@ export const createNativeNotification = async (
     case ENativeNotificationType.AdminTransitSubOrderToDelivered:
       {
         const { foodName, planId, subOrderDate } = notificationParams;
-        const url = `${BASE_URL}/participant/orders/?planId=${planId}&subOrderDate=${subOrderDate}`;
+        const url = `${BASE_URL}/participant/orders/?planId=${planId}&timestamp=${subOrderDate}`;
         sendNotification({
           title: 'Đã có cơm 😍 😍 😍',
           content: `${foodName} đã được giao đến bạn. Chúc ${firstName} ngon miệng.`,
@@ -97,7 +97,7 @@ export const createNativeNotification = async (
     case ENativeNotificationType.AdminTransitSubOrderToCanceled:
       {
         const { planId, subOrderDate } = notificationParams;
-        const url = `${BASE_URL}/participant/orders/?planId=${planId}&subOrderDate=${subOrderDate}`;
+        const url = `${BASE_URL}/participant/orders/?planId=${planId}&timestamp=${subOrderDate}`;
         sendNotification({
           title: 'Opps! Ngày ăn bị hủy!',
           content: `😢 ${firstName} ơi, rất tiếc phải thông báo ngày ăn ${formatTimestamp(
