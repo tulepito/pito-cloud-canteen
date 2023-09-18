@@ -82,7 +82,7 @@ export function addCommand(command, params, persistCallback) {
 
   // 2. Add the following to provide compatibility for both iOS and Android
   if (navigator.vendor === 'Apple Computer, Inc.') {
-    window.webkit.messageHandlers.JSBridge.postMessage(commandObject);
+    window?.webkit?.messageHandlers?.JSBridge?.postMessage(commandObject);
   } else if (params) commandObject = JSON.stringify(commandObject);
   // End of changes
 }
