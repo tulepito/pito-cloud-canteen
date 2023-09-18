@@ -103,6 +103,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
         const { orderDetail } = planListing.getMetadata();
         const { memberOrders = {}, restaurant = {} } = orderDetail;
+        const { foodList = {} } = restaurant;
 
         const updatePlanListing = async (lastTransition: string) => {
           const newOrderDetail = {
@@ -132,8 +133,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
                 },
               );
 
-              const { foodId } = memberOrders[participantId];
-              const { foodName } = restaurant.foodList[foodId];
+              const { foodId } = memberOrders[participantId] || {};
+              if (isEmpty(foodId)) {
+                return;
+              }
+
+              const { foodName = '' } = foodList[foodId];
               createNativeNotification(
                 ENativeNotificationType.AdminTransitSubOrderToDelivering,
                 {
@@ -156,7 +161,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
                 userId: participantId,
               });
               const { foodId } = memberOrders[participantId];
-              const { foodName } = restaurant.foodList[foodId];
+
+              if (isEmpty(foodId)) {
+                return;
+              }
+
+              const { foodName = '' } = foodList[foodId];
               createNativeNotification(
                 ENativeNotificationType.AdminTransitSubOrderToDelivered,
                 {
