@@ -1661,7 +1661,7 @@ const OrderManagementSlice = createSlice({
           } = payload;
 
           const { orderDetail, orderType } = Listing(planData).getMetadata();
-          console.log({ orderDetail });
+
           const orderValidationsInProgressState =
             !state.orderValidationsInProgressState
               ? checkMinMaxQuantityInProgressState(
