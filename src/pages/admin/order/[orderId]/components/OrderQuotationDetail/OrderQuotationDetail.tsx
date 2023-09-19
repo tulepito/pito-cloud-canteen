@@ -64,6 +64,7 @@ const OrderQuotationDetail: React.FC<OrderQuotationDetailProps> = (props) => {
     packagePerMember = 0,
     hasSpecificPCCFee = false,
     specificPCCFee = 0,
+    orderVATPercentage,
   } = Listing(order).getMetadata();
   const { title: orderTitle = '' } = Listing(order).getAttributes();
 
@@ -82,7 +83,7 @@ const OrderQuotationDetail: React.FC<OrderQuotationDetailProps> = (props) => {
         vatSetting: partnerVATSetting,
         vatPercentage: currentOrderVATPercentage,
       })
-    : currentOrderVATPercentage;
+    : orderVATPercentage;
 
   const priceQuotation = useMemo(
     () =>
