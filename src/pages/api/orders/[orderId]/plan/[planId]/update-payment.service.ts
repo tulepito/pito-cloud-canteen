@@ -1,12 +1,13 @@
 import {
   calculatePriceQuotationInfo,
   calculatePriceQuotationPartner,
+  vatPercentageBaseOnVatSetting,
 } from '@helpers/order/cartInfoHelper';
 import { queryAllCollectionData } from '@services/firebase';
 import { fetchListing } from '@services/integrationHelper';
 import { updatePaymentRecordOnFirebase } from '@services/payment';
 import { Listing } from '@src/utils/data';
-import { EPaymentType } from '@src/utils/enums';
+import { EPartnerVATSetting, EPaymentType } from '@src/utils/enums';
 import type { TPlan } from '@src/utils/orderTypes';
 import type { TListing, TObject } from '@src/utils/types';
 
@@ -18,17 +19,28 @@ const updatePartnerPaymentRecord = async (
   orderDetail: TPlan['orderDetail'],
   serviceFees: TObject,
   orderVATPercentage: number,
+  vatSettings: TObject,
 ) => {
   await Promise.all(
     Object.entries(orderDetail).map(
       async ([subOrderDate, subOrderData]: [string, any]) => {
         const { restaurant = {} } = subOrderData;
         const { id: restaurantId } = restaurant;
+        const vatSettingFromOrder = vatSettings[restaurantId];
+        const partnerVATSetting =
+          vatSettingFromOrder in EPartnerVATSetting
+            ? vatSettingFromOrder
+            : EPartnerVATSetting.vat;
+        const vatPercentage = vatPercentageBaseOnVatSetting({
+          vatSetting: partnerVATSetting,
+          vatPercentage: orderVATPercentage,
+        });
         const { totalWithVAT: totalPrice } = calculatePriceQuotationPartner({
           quotation: partner[restaurantId]?.quotation,
           serviceFeePercentage: serviceFees[restaurantId],
-          currentOrderVATPercentage: orderVATPercentage,
+          currentOrderVATPercentage: vatPercentage,
           subOrderDate,
+          shouldSkipVAT: partnerVATSetting === EPartnerVATSetting.direct,
         });
 
         const paymentRecords = await queryAllCollectionData({
@@ -116,6 +128,7 @@ const updatePayment = async (orderId: string, planId: string) => {
     serviceFees = {},
     hasSpecificPCCFee,
     specificPCCFee,
+    vatSettings,
   } = orderListingGetter.getMetadata();
 
   const quotationListing = await fetchListing(quotationId);
@@ -129,6 +142,7 @@ const updatePayment = async (orderId: string, planId: string) => {
     orderDetail,
     serviceFees,
     orderVATPercentage,
+    vatSettings,
   );
 
   await updateClientPaymentRecord(
