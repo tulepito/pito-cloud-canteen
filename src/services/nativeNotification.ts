@@ -76,7 +76,7 @@ export const createNativeNotification = async (
         const url = `${BASE_URL}/participant/orders/?planId=${planId}&timestamp=${subOrderDate}`;
         sendNotification({
           title: '🛵 🛵 🛵 Cơm sắp đến',
-          content: `🌟 ${foodName} sắp đến rồi. Chúc ${firstName} ngon miệng`,
+          content: `🌟 ${foodName} sắp đến rồi. Chuẩn bị ăn thôi`,
           url,
           oneSignalUserId,
         });

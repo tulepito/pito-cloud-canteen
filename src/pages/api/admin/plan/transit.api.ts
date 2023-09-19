@@ -30,6 +30,9 @@ import type { TError } from '@src/utils/types';
 
 import { transitionOrderStatus } from './transition-order-status.service';
 
+const TIME_TO_SEND_FOOD_RATING_NOTIFICATION =
+  process.env.TIME_TO_SEND_FOOD_RATING_NOTIFICATION || '30';
+
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
     const apiMethod = req.method;
@@ -172,7 +175,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           createFoodRatingNotificationScheduler({
             customName: `sendFRN_${orderId}_${startTimestamp}`,
             timeExpression: formatTimestamp(
-              +startTimestamp + 30 * 60 * 1000, // after 30 minutes
+              DateTime.now().setZone(VNTimezone).toMillis() +
+                +TIME_TO_SEND_FOOD_RATING_NOTIFICATION * 60 * 1000,
               "yyyy-MM-dd'T'hh:mm:ss",
             ),
             params: {

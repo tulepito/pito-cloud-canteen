@@ -58,6 +58,7 @@ export const updateScheduler = ({
     Name: customName,
     ScheduleExpression: `at(${timeExpression})`,
     ScheduleExpressionTimezone: 'Asia/Ho_Chi_Minh',
+    ActionAfterCompletion: 'DELETE',
     Target: {
       Arn: LAMBDA_ARN,
       RoleArn: ROLE_ARN,

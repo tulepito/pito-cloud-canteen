@@ -14,7 +14,7 @@ const createNativeNotification = async ({ notificationParams, sdk }) => {
   const participantUser = User(participant);
   const { lastName } = participantUser.getProfile();
   const { oneSignalUserId } = participantUser.getPrivateData();
-  const url = `${BASE_URL}/participant/order/${orderId}&${subOrderDate}&openRatingModal=true`;
+  const url = `${BASE_URL}/participant/order/${orderId}&subOrderDate=${subOrderDate}&openRatingModal=true`;
 
   sendNotification({
     title: 'Đánh giá ngày ăn',

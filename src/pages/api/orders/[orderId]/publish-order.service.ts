@@ -121,7 +121,7 @@ export const publishOrder = async (orderId: string) => {
   });
 
   // create order picking notification for all participants
-  [...participants, ...anonymous].map(async (participantId: string) => {
+  [...participants, ...anonymous].forEach((participantId: string) => {
     createFirebaseDocNotification(ENotificationType.ORDER_PICKING, {
       orderId,
       orderTitle,
