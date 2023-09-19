@@ -19,9 +19,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           return handleError(res, error);
         }
 
-      case HttpMethod.POST:
-      case HttpMethod.DELETE:
-      case HttpMethod.PUT:
       default:
         return res.status(400).json({ message: 'Method is not allow' });
     }

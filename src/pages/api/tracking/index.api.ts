@@ -1,3 +1,4 @@
+import chunk from 'lodash/chunk';
 import flatten from 'lodash/flatten';
 import isEmpty from 'lodash/isEmpty';
 import type { NextApiRequest, NextApiResponse } from 'next';
@@ -64,15 +65,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             };
           }
           if (!isEmpty(anonymous)) {
-            const anonymousParticipantQueries = convertListIdToQueries({
-              idList: anonymous,
-            });
             const anonymousParticipantData = flatten(
               await Promise.all(
-                anonymousParticipantQueries.map(async ({ ids }) => {
+                chunk(anonymous, 100).map(async (ids) => {
                   return denormalisedResponseEntities(
                     await integrationSdk.users.query({
-                      meta_id: `${ids}`,
+                      meta_id: ids,
                     }),
                   );
                 }),

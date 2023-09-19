@@ -37,8 +37,7 @@
   }
 
   .content {
-    transition: height 0.3s;
-    height: initial;
+    height: fit-content;
 
     &.isClose {
       height: 0;
