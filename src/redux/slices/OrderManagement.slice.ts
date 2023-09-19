@@ -44,6 +44,7 @@ import { denormalisedResponseEntities, Listing, User } from '@utils/data';
 import {
   ENotificationType,
   EOrderHistoryTypes,
+  EOrderStates,
   EOrderType,
   EParticipantOrderStatus,
 } from '@utils/enums';
@@ -62,12 +63,22 @@ import { SystemAttributesThunks } from './systemAttributes.slice';
 export const QUERY_SUB_ORDER_CHANGES_HISTORY_PER_PAGE = 3;
 
 export const checkMinMaxQuantityInProgressState = (
+  isInProgress: boolean,
   isNormalOrder: boolean,
   orderDetail: TPlan['orderDetail'] = {},
   oldOrderDetail: TPlan['orderDetail'] = {},
   isAdminFlow = false,
 ) => {
   let planValidationsInProgressState = {};
+
+  if (!isInProgress) {
+    return {
+      planValidationsInProgressState,
+      orderReachMaxRestaurantQuantity: false,
+      orderReachMinRestaurantQuantity: false,
+      orderReachMaxCanModify: false,
+    };
+  }
   if (isNormalOrder) {
     planValidationsInProgressState = Object.keys(orderDetail).reduce(
       (prev: any, dateAsTimeStamp) => {
@@ -310,6 +321,7 @@ type TOrderManagementState = {
     orderReachMinRestaurantQuantity: boolean;
     orderReachMaxCanModify: boolean;
   } | null;
+  isAdminFlow: boolean;
 };
 
 const initialState: TOrderManagementState = {
@@ -350,6 +362,7 @@ const initialState: TOrderManagementState = {
   quotation: {},
   fetchQuotationInProgress: false,
   fetchQuotationError: null,
+  isAdminFlow: false,
 };
 
 // ================ Thunk types ================ //
@@ -382,7 +395,12 @@ const updateOrderGeneralInfo = createAsyncThunk(
     };
 
     await updateOrderApi(orderId, updateParams);
-    await dispatch(loadData({ orderId }));
+    await dispatch(
+      loadData({
+        orderId,
+        isAdminFlow: getState().OrderManagement.isAdminFlow,
+      }),
+    );
   },
 );
 
@@ -730,7 +748,12 @@ const addParticipant = createAsyncThunk(
       return rejectWithValue(data?.message);
     }
 
-    await dispatch(loadData({ orderId }));
+    await dispatch(
+      loadData({
+        orderId,
+        isAdminFlow: getState().OrderManagement.isAdminFlow,
+      }),
+    );
 
     return {};
   },
@@ -1065,7 +1088,12 @@ const updateOrderFromDraftEdit = createAsyncThunk(
 
     updatePaymentApi(orderId, planId);
 
-    await dispatch(loadData({ orderId }));
+    await dispatch(
+      loadData({
+        orderId,
+        isAdminFlow: getState().OrderManagement.isAdminFlow,
+      }),
+    );
   },
 );
 
@@ -1144,7 +1172,9 @@ const OrderManagementSlice = createSlice({
         planData as TListing,
       ).getMetadata();
 
-      const { orderType } = Listing(orderData as TListing).getMetadata();
+      const { orderType, orderState } = Listing(
+        orderData as TListing,
+      ).getMetadata();
       const { foodId: defaultFoodId } =
         defaultOrderDetail[currentViewDate].memberOrders[memberId];
 
@@ -1165,6 +1195,7 @@ const OrderManagementSlice = createSlice({
 
       const orderValidationsInProgressState =
         checkMinMaxQuantityInProgressState(
+          orderState === EOrderStates.inProgress,
           orderType === EOrderType.normal,
           newOrderDetail,
           defaultOrderDetail,
@@ -1327,6 +1358,8 @@ const OrderManagementSlice = createSlice({
 
       const orderValidationsInProgressState =
         checkMinMaxQuantityInProgressState(
+          orderData?.attributes?.metadata?.orderState ===
+            EOrderStates.inProgress,
           orderType === EOrderType.normal,
           newOrderDetail,
           defaultOrderDetail,
@@ -1442,6 +1475,8 @@ const OrderManagementSlice = createSlice({
 
       const orderValidationsInProgressState =
         checkMinMaxQuantityInProgressState(
+          orderData?.attributes?.metadata?.orderState ===
+            EOrderStates.inProgress,
           orderType === EOrderType.normal,
           newOrderDetail,
           orderDetail,
@@ -1629,17 +1664,8 @@ const OrderManagementSlice = createSlice({
       };
     },
     updateOrderData: (state, { payload }) => {
-      const orderValidationsInProgressState =
-        checkMinMaxQuantityInProgressState(
-          payload.attributes.metadata.orderType === EOrderType.normal,
-          state.draftOrderDetail,
-          state.draftOrderDetail,
-          true,
-        );
-
       return {
         ...state,
-        orderValidationsInProgressState,
         orderData: payload,
       };
     },
@@ -1657,7 +1683,7 @@ const OrderManagementSlice = createSlice({
           {
             payload,
             meta: {
-              arg: { isAdminFlow },
+              arg: { isAdminFlow = false },
             },
           },
         ) => {
@@ -1673,6 +1699,8 @@ const OrderManagementSlice = createSlice({
 
           const orderValidationsInProgressState =
             checkMinMaxQuantityInProgressState(
+              orderData?.attributes?.metadata?.orderState ===
+                EOrderStates.inProgress,
               orderType === EOrderType.normal,
               orderDetail,
               orderDetail,
@@ -1686,6 +1714,7 @@ const OrderManagementSlice = createSlice({
             planData,
             draftOrderDetail: orderDetail,
             orderValidationsInProgressState,
+            isAdminFlow,
             ...restPayload,
           };
         },
