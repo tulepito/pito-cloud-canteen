@@ -764,21 +764,35 @@ const ManageOrdersPage = () => {
     dispatch(resetOrder());
 
     if (isReady) {
-      const endDateWithOneMoreDay = addDays(
-        new Date(meta_endDate as string),
-        1,
-      );
-      const hasDateFilter = meta_startDate || meta_endDate;
-      const metaStartDateQuery = `${
-        meta_startDate ? new Date(meta_startDate as string).getTime() : ''
-      },${meta_endDate ? new Date(endDateWithOneMoreDay).getTime() : ''}`;
-
       dispatch(
         orderAsyncActions.queryOrders({
           page,
           keywords,
           ...(meta_orderState ? { meta_orderState } : {}),
-          ...(hasDateFilter ? { meta_startDate: metaStartDateQuery } : {}),
+          ...(meta_startDate
+            ? {
+                meta_startDate: `,${
+                  meta_startDate
+                    ? new Date(meta_startDate as string).getTime() + 1
+                    : ''
+                }`,
+              }
+            : {}),
+          ...(meta_endDate
+            ? {
+                meta_endDate: `${
+                  meta_endDate
+                    ? new Date(meta_endDate as string).getTime() - 1
+                    : ''
+                },`,
+              }
+            : meta_startDate
+            ? {
+                meta_endDate: `${
+                  new Date(meta_startDate as string).getTime() - 1
+                },`,
+              }
+            : {}),
         }),
       );
     }
