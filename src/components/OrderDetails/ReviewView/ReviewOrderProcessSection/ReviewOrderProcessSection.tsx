@@ -93,7 +93,14 @@ const ReviewOrderProcessSection: React.FC<
   ).getMetadata();
   const { orderDetail = {} } = Listing(planData as TListing).getMetadata();
 
+  const hasAnyInProgressSubOrdersMaybe = (
+    Object.values(orderDetail) as TObject[]
+  ).some(({ lastTransition = ETransition.INITIATE_TRANSACTION }: TObject) => {
+    return lastTransition === ETransition.INITIATE_TRANSACTION;
+  });
   const orderIsInProgress = orderState === EOrderStates.inProgress;
+  const shouldShowUpdateMemberOrderBtn =
+    orderIsInProgress && hasAnyInProgressSubOrdersMaybe;
   const orderId = Listing(orderData as TListing).getId();
 
   const totalDays = Object.values(orderDetail as TObject).filter(
@@ -156,7 +163,7 @@ const ReviewOrderProcessSection: React.FC<
           </RenderWhen.False>
         </RenderWhen>
       </div>
-      <RenderWhen condition={orderIsInProgress}>
+      <RenderWhen condition={shouldShowUpdateMemberOrderBtn}>
         <div className={css.separator}></div>
         <Link
           className={css.pickingLink}

@@ -347,7 +347,7 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
                     setCurrentViewDate={(date) => setCurrentViewDate(date)}
                     currentViewDate={currentViewDate}
                     isDraftEditing={isDraftEditing}
-                    ableToUpdateOrder
+                    ableToUpdateOrder={ableToUpdateOrder}
                     planReachMaxCanModify={planReachMaxCanModifyInProgressState}
                     planReachMaxRestaurantQuantity={
                       planReachMaxRestaurantQuantityInPickingState ||
@@ -364,18 +364,18 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
                   <OrderDeadlineCountdownSection
                     className={css.container}
                     data={editViewData.countdownSectionData}
-                    ableToUpdateOrder
+                    ableToUpdateOrder={ableToUpdateOrder}
                   />
                   <OrderLinkSection
                     className={css.container}
                     data={editViewData.linkSectionData}
                     isAminLayout
-                    ableToUpdateOrder
+                    ableToUpdateOrder={ableToUpdateOrder}
                   />
                   <ManageParticipantsSection
                     className={css.container}
                     data={editViewData.manageParticipantData}
-                    ableToUpdateOrder
+                    ableToUpdateOrder={ableToUpdateOrder}
                   />
                   <RenderWhen condition={isDraftEditing}>
                     <SubOrderChangesHistorySection
