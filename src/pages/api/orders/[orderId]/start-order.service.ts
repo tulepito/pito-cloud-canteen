@@ -38,6 +38,7 @@ export const startOrder = async (orderId: string, planId: string) => {
   const { hasSpecificPCCFee = false, specificPCCFee = 0 } =
     User(companyUser).getMetadata();
 
+  // TODO: update state, save vat and PCC fee in order listing
   await integrationSdk.listings.update({
     id: orderId,
     metadata: {
@@ -49,6 +50,7 @@ export const startOrder = async (orderId: string, planId: string) => {
     },
   });
 
+  // TODO: save partner ID list in plan  listing
   await integrationSdk.listings.update({
     id: planId,
     metadata: {
@@ -56,13 +58,7 @@ export const startOrder = async (orderId: string, planId: string) => {
     },
   });
 
-  await integrationSdk.listings.update({
-    id: planId,
-    metadata: {
-      partnerIds,
-    },
-  });
-
+  // TODO: send noti email
   emailSendingFactory(EmailTemplateTypes.BOOKER.BOOKER_ORDER_SUCCESS, {
     orderId,
   });

@@ -58,22 +58,16 @@ const loadData = createAsyncThunk(
     const currentUserId = currentUser?.id?.uuid;
     let returnValues = {};
     const order = denormalisedResponseEntities(
-      await sdk.listings.show(
-        {
-          id: orderId,
-        },
-        { expand: true },
-      ),
+      await sdk.listings.show({
+        id: orderId,
+      }),
     )[0];
     const orderListing = Listing(order);
     const { plans = [], companyId } = orderListing.getMetadata();
     const plan = denormalisedResponseEntities(
-      await sdk.listings.show(
-        {
-          id: plans[0],
-        },
-        { expand: true },
-      ),
+      await sdk.listings.show({
+        id: plans[0],
+      }),
     )[0];
     const planListing = Listing(plan);
     const { orderDetail = {} } = planListing.getMetadata();
@@ -113,14 +107,11 @@ const loadData = createAsyncThunk(
     if (companyId) {
       const company =
         (denormalisedResponseEntities(
-          await sdk.users.show(
-            {
-              id: companyId,
-              include: ['profileImage'],
-              'fields.image': [`variants.${EImageVariants.squareSmall}`],
-            },
-            { expand: true },
-          ),
+          await sdk.users.show({
+            id: companyId,
+            include: ['profileImage'],
+            'fields.image': [`variants.${EImageVariants.squareSmall}`],
+          }),
         ) || [])[0] || {};
 
       returnValues = { ...returnValues, company };

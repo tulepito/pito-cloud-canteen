@@ -423,9 +423,7 @@ const queryAllOrders = createAsyncThunk(
         ...payload,
         states: EListingStates.published,
       },
-      queryParams: {
-        expand: true,
-      },
+      queryParams: {},
       isQueryAllPages: true,
     };
 
@@ -445,9 +443,7 @@ const queryCompanyPlansByOrderIds = createAsyncThunk(
       dataParams: {
         meta_orderId: orderIds.join(','),
       },
-      queryParams: {
-        expand: true,
-      },
+      queryParams: {},
     };
 
     const { data } = await companyApi.queryCompanyPlansByOrderIdsApi(
@@ -553,9 +549,7 @@ const queryCompanyOrders = createAsyncThunk(
         meta_listingType: EListingType.order,
         sort: 'createdAt',
       },
-      queryParams: {
-        expand: true,
-      },
+      queryParams: {},
     };
     const { data: response } = await companyApi.queryOrdersApi(
       companyId,
@@ -597,12 +591,9 @@ const fetchCompanyBookers = createAsyncThunk(
   FETCH_COMPANY_BOOKERS,
   async (companyId: string, { extra: sdk }) => {
     const companyAccount = denormalisedResponseEntities(
-      await sdk.users.show(
-        {
-          id: companyId,
-        },
-        { expand: true },
-      ),
+      await sdk.users.show({
+        id: companyId,
+      }),
     )[0];
     const { members = {} } = User(companyAccount).getMetadata();
     const bookerEmails = Object.keys(members).filter((email) =>

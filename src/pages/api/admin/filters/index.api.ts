@@ -12,13 +12,10 @@ import { denormalisedResponseEntities, User } from '@utils/data';
 const ADMIN_FLEX_ID = process.env.PITO_ADMIN_ID;
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   const integrationSdk = getIntegrationSdk();
-  const response = denormalisedResponseEntities(
-    await integrationSdk.users.show(
-      {
-        id: ADMIN_FLEX_ID,
-      },
-      { expand: true },
-    ),
+  const adminUser = denormalisedResponseEntities(
+    await integrationSdk.users.show({
+      id: ADMIN_FLEX_ID,
+    }),
   )[0];
   const {
     menuTypes = [],
@@ -27,9 +24,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     daySessions = [],
     nutritions = [],
     deliveryPeople = [],
-  } = User(response).getMetadata();
-  const { method } = req;
-  switch (method) {
+  } = User(adminUser).getMetadata();
+
+  switch (req.method) {
     case HttpMethod.GET:
       try {
         res.json({

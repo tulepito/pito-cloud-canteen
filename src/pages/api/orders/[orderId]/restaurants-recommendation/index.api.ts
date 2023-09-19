@@ -33,9 +33,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
         return res.status(200).json(recommendation);
       }
-      case HttpMethod.POST:
-      case HttpMethod.DELETE:
-      case HttpMethod.PUT:
+
       default:
         return res.status(405).end(`Method ${apiMethod} Not Allowed`);
     }

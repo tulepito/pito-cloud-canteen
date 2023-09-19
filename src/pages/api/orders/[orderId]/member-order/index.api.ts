@@ -20,12 +20,9 @@ const mappingOrderDetailsToOrderAndTransaction = async (
   const planId = Listing(planListing).getId();
   const { orderId, orderDetail } = Listing(planListing).getMetadata();
 
-  const orderResponse = await integrationSdk.listings.show(
-    {
-      id: orderId,
-    },
-    { expand: true },
-  );
+  const orderResponse = await integrationSdk.listings.show({
+    id: orderId,
+  });
 
   const [orderListing] = denormalisedResponseEntities(orderResponse);
 

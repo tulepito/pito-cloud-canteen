@@ -86,12 +86,9 @@ const updateMenuIdListAndMenuWeekDayListForFood = async (
     );
   }
 
-  const response = await integrationSdk.listings.query(
-    {
-      pub_menuIdList: menuId,
-    },
-    { expand: true },
-  );
+  const response = await integrationSdk.listings.query({
+    pub_menuIdList: menuId,
+  });
 
   const addedFoods = denormalisedResponseEntities(
     response,

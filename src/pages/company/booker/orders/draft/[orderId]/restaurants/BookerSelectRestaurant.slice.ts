@@ -409,53 +409,61 @@ const fetchRestaurantReviews = createAsyncThunk(
     });
     const { meta } = rawResponse.data;
 
-    const response = denormalisedResponseEntities(rawResponse);
-    const reviewerResponse = await Promise.all(
-      response
-        .map((item: TListing) => ({
-          reviewerId: Listing(item).getMetadata()?.reviewerId,
-          reviewId: Listing(item).getId(),
-        }))
-        .map(async ({ reviewerId, reviewId }: any) => {
-          const reviewer = await sdk.users.show({
-            id: reviewerId,
-            include: ['profileImage'],
-            'fields.image': [
-              'variants.square-small',
-              'variants.square-small2x',
-            ],
-          });
+    const fetchedReviews = denormalisedResponseEntities(rawResponse);
 
-          return {
-            id: reviewId,
-            value: denormalisedResponseEntities(reviewer)[0],
-          };
-        }),
+    const reviewerIdList = fetchedReviews.map(
+      (item: TListing) => Listing(item).getMetadata().reviewerId,
+    );
+
+    const reviewers = denormalisedResponseEntities(
+      await sdk.users.query({
+        meta_id: reviewerIdList,
+      }),
+    );
+
+    const reviewerWithReviewIdList = fetchedReviews.fetchedReviews.map(
+      (review: TListing) => {
+        const reviewGetter = Listing(review);
+        const reviewId = reviewGetter.getId();
+        const { reviewerId } = reviewGetter.getMetadata();
+
+        const suitableReviewer = reviewers.find(
+          (reviewer: TUser) => reviewer.id.uuid === reviewerId,
+        );
+
+        return {
+          id: reviewId,
+          value: suitableReviewer,
+        };
+      },
     );
 
     return {
       ...(CompanyPermission.includes(reviewRole) && {
         restaurantBookerReviews: isViewAll
-          ? uniqBy([...restaurantBookerReviews, ...response], 'id.uuid')
-          : response,
+          ? uniqBy([...restaurantBookerReviews, ...fetchedReviews], 'id.uuid')
+          : fetchedReviews,
         restaurantBookerReviewers: isViewAll
           ? {
               ...restaurantBookerReviewers,
-              ...mapValue(keyBy(reviewerResponse, 'id'), 'value'),
+              ...mapValue(keyBy(reviewerWithReviewIdList, 'id'), 'value'),
             }
-          : mapValue(keyBy(reviewerResponse, 'id'), 'value'),
+          : mapValue(keyBy(reviewerWithReviewIdList, 'id'), 'value'),
         bookerReviewPagination: meta,
       }),
       ...(reviewRole === UserPermission.PARTICIPANT && {
         restaurantParticipantReviews: isViewAll
-          ? uniqBy([...restaurantParticipantReviews, ...response], 'id.uuid')
-          : response,
+          ? uniqBy(
+              [...restaurantParticipantReviews, ...fetchedReviews],
+              'id.uuid',
+            )
+          : fetchedReviews,
         restaurantParticipantReviewers: isViewAll
           ? {
               ...restaurantParticipantReviewers,
-              ...mapValue(keyBy(reviewerResponse, 'id'), 'value'),
+              ...mapValue(keyBy(reviewerWithReviewIdList, 'id'), 'value'),
             }
-          : mapValue(keyBy(reviewerResponse, 'id'), 'value'),
+          : mapValue(keyBy(reviewerWithReviewIdList, 'id'), 'value'),
         participantReviewPagination: meta,
       }),
     };

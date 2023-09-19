@@ -63,12 +63,9 @@ const fetchVATPercentageByOrderId = createAsyncThunk(
   'app/SystemAttributes/FETCH_VAT_PERCENTAGE_BY_ORDER_ID',
   async (orderId: string, { extra: sdk, getState }) => {
     const order = denormalisedResponseEntities(
-      await sdk.listings.show(
-        {
-          id: orderId,
-        },
-        { expand: true },
-      ),
+      await sdk.listings.show({
+        id: orderId,
+      }),
     )[0];
 
     const { orderState, orderVATPercentage } = Listing(order).getMetadata();

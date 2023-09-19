@@ -31,14 +31,9 @@ const fetchListingsByChunkedIds = async (ids: string[], sdk: any) => {
 const queryMenuByIdList = async (menuIdList: string[]) => {
   const integrationSdk = getIntegrationSdk();
 
-  const menuResponse = await integrationSdk.listings.query(
-    {
-      ids: menuIdList,
-    },
-    {
-      expand: true,
-    },
-  );
+  const menuResponse = await integrationSdk.listings.query({
+    ids: menuIdList,
+  });
 
   const menus = denormalisedResponseEntities(menuResponse);
 

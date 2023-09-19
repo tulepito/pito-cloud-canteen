@@ -10,12 +10,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   const integrationSdk = getIntegrationSdk();
   try {
     const response = denormalisedResponseEntities(
-      await integrationSdk.users.show(
-        {
-          id: ADMIN_FLEX_ID,
-        },
-        { expand: true },
-      ),
+      await integrationSdk.users.show({
+        id: ADMIN_FLEX_ID,
+      }),
     )[0];
     const {
       menuTypes = [],
@@ -23,7 +20,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       packaging = [],
       nutritions = [],
     } = User(response).getMetadata();
-    res.json({
+
+    return res.json({
       menuTypes,
       categories,
       packaging,

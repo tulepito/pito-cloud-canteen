@@ -5,19 +5,15 @@ import { EImageVariants } from '@src/utils/enums';
 import type { TUser } from '@src/utils/types';
 
 const queryCompanyMembers = async (companyId: string) => {
-  const intergrationSdk = getIntegrationSdk();
-  const response = await intergrationSdk.users.show(
-    {
-      id: companyId,
-    },
-    { expand: true },
-  );
+  const integrationSdk = getIntegrationSdk();
+  const response = await integrationSdk.users.show({
+    id: companyId,
+  });
 
   const [company] = denormalisedResponseEntities(response);
-
   const { members = {} } = User(company).getMetadata();
 
-  const existedUserQueryResponse = await intergrationSdk.users.query({
+  const existedUserQueryResponse = await integrationSdk.users.query({
     meta_companyList: companyId,
     include: 'profileImage',
     'fields.image': [
@@ -31,8 +27,8 @@ const queryCompanyMembers = async (companyId: string) => {
     .filter((key: string) => !members[key].id)
     .map((key: string) => members[key]);
 
-  const existedusers = denormalisedResponseEntities(existedUserQueryResponse);
-  const membersWithDetails = existedusers.map((user: TUser) => {
+  const existedUsers = denormalisedResponseEntities(existedUserQueryResponse);
+  const membersWithDetails = existedUsers.map((user: TUser) => {
     const key = Object.keys(members).find(
       (email) => email === user.attributes.email,
     );
