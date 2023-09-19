@@ -1672,14 +1672,12 @@ const OrderManagementSlice = createSlice({
           const { orderDetail, orderType } = Listing(planData).getMetadata();
 
           const orderValidationsInProgressState =
-            !state.orderValidationsInProgressState
-              ? checkMinMaxQuantityInProgressState(
-                  orderType === EOrderType.normal,
-                  orderDetail,
-                  orderDetail,
-                  isAdminFlow,
-                )
-              : state.orderValidationsInProgressState;
+            checkMinMaxQuantityInProgressState(
+              orderType === EOrderType.normal,
+              orderDetail,
+              orderDetail,
+              isAdminFlow,
+            );
 
           return {
             ...state,
