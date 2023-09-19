@@ -358,7 +358,8 @@ const FETCH_QUOTATION = 'app/OrderManagement/FETCH_QUOTATION';
 // ================ Async thunks ================ //
 const loadData = createAsyncThunk(
   'app/OrderManagement/LOAD_DATA',
-  async (orderId: string, { dispatch }) => {
+  async (payload: { orderId: string; isAdminFlow?: boolean }, { dispatch }) => {
+    const { orderId } = payload;
     const response: any = await getBookerOrderDataApi(orderId);
     dispatch(SystemAttributesThunks.fetchVATPercentageByOrderId(orderId));
 
@@ -1640,26 +1641,48 @@ const OrderManagementSlice = createSlice({
       .addCase(loadData.pending, (state) => {
         state.isFetchingOrderDetails = true;
       })
-      .addCase(loadData.fulfilled, (state, { payload }) => {
-        const {
-          orderListing: orderData,
-          planListing: planData,
-          // eslint-disable-next-line unused-imports/no-unused-vars
-          statusCode,
-          ...restPayload
-        } = payload;
+      .addCase(
+        loadData.fulfilled,
+        (
+          state,
+          {
+            payload,
+            meta: {
+              arg: { isAdminFlow },
+            },
+          },
+        ) => {
+          const {
+            orderListing: orderData,
+            planListing: planData,
+            // eslint-disable-next-line unused-imports/no-unused-vars
+            statusCode,
+            ...restPayload
+          } = payload;
 
-        const { orderDetail } = Listing(planData).getMetadata();
+          const { orderDetail, orderType } = Listing(planData).getMetadata();
+          console.log({ orderDetail });
+          const orderValidationsInProgressState =
+            !state.orderValidationsInProgressState
+              ? checkMinMaxQuantityInProgressState(
+                  orderType === EOrderType.normal,
+                  orderDetail,
+                  orderDetail,
+                  isAdminFlow,
+                )
+              : state.orderValidationsInProgressState;
 
-        return {
-          ...state,
-          isFetchingOrderDetails: false,
-          orderData,
-          planData,
-          draftOrderDetail: orderDetail,
-          ...restPayload,
-        };
-      })
+          return {
+            ...state,
+            isFetchingOrderDetails: false,
+            orderData,
+            planData,
+            draftOrderDetail: orderDetail,
+            orderValidationsInProgressState,
+            ...restPayload,
+          };
+        },
+      )
       .addCase(loadData.rejected, (state) => {
         state.isFetchingOrderDetails = false;
       })

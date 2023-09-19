@@ -108,7 +108,11 @@ const SubOrderCart: React.FC<TSubOrderCartProps> = (props) => {
   }, [quotationId]);
   useEffect(() => {
     if (orderId) {
-      dispatch(orderManagementThunks.loadData(orderId));
+      dispatch(
+        orderManagementThunks.loadData({
+          orderId: orderId as string,
+        }),
+      );
     }
   }, [orderId]);
 

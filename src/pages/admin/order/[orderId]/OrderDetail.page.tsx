@@ -82,7 +82,12 @@ const OrderDetailPage = () => {
 
   useEffect(() => {
     if (orderId) {
-      dispatch(orderManagementThunks.loadData(orderId as string));
+      dispatch(
+        orderManagementThunks.loadData({
+          orderId: orderId as string,
+          isAdminFlow: true,
+        }),
+      );
       dispatch(OrderDetailThunks.fetchOrder(orderId as string));
     }
   }, [dispatch, orderId]);
