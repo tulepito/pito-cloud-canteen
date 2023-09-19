@@ -3,10 +3,9 @@ import { DateTime } from 'luxon';
 
 import { calculateBounds } from '@helpers/mapHelpers';
 import { deliveryDaySessionAdapter } from '@helpers/orderHelper';
-import { ListingTypes } from '@src/types/listingTypes';
 import { Listing, User } from '@utils/data';
 import { convertWeekDay, getDaySessionFromDeliveryTime } from '@utils/dates';
-import { EImageVariants } from '@utils/enums';
+import { EImageVariants, EListingStates, EListingType } from '@utils/enums';
 import type { TListing, TUser } from '@utils/types';
 
 export const getMenuQuery = ({
@@ -33,8 +32,8 @@ export const getMenuQuery = ({
   const mealType = deliveryDaySessionAdapter(deliveryDaySession);
 
   const query = {
-    meta_listingState: 'published',
-    meta_listingType: ListingTypes.MENU,
+    meta_listingState: EListingStates.published,
+    meta_listingType: EListingType.menu,
     pub_startDate: `,${dateTime.toMillis()}`,
     pub_daysOfWeek: `has_any:${dayOfWeek}`,
     pub_mealType: mealType,

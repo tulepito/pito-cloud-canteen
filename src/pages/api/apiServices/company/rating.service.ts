@@ -8,6 +8,7 @@ import { getIntegrationSdk } from '@services/sdk';
 import { UserPermission } from '@src/types/UserPermission';
 import { Listing, User } from '@src/utils/data';
 import {
+  EListingStates,
   EListingType,
   ENotificationType,
   EOrderStates,
@@ -31,7 +32,7 @@ export const postRatingFn = async ({
       const response = await integrationSdk.listings.create({
         title: `Review for ${restaurantListing.attributes.title} - ${orderId} - ${timestamp}`,
         authorId,
-        state: 'published',
+        state: EListingStates.published,
         metadata: {
           ...rating,
           listingType: EListingType.rating,
@@ -79,7 +80,7 @@ export const postParticipantRatingFn = async ({
   const response = await integrationSdk.listings.create({
     title: `Review for ${restaurantListing.attributes.title} - ${orderId} - ${timestamp}`,
     authorId,
-    state: 'published',
+    state: EListingStates.published,
     images: imageIdList,
     metadata: {
       ...rating,

@@ -10,10 +10,9 @@ import {
 } from '@pages/api/apiUtils/menu';
 import { denormalisedResponseEntities } from '@services/data';
 import { getIntegrationSdk } from '@services/integrationSdk';
-import { ListingTypes } from '@src/types/listingTypes';
 import { IntegrationListing } from '@src/utils/data';
 import { addWeeksToDate } from '@src/utils/dates';
-import { EListingStates, EMenuTypes } from '@src/utils/enums';
+import { EListingStates, EListingType, EMenuTypes } from '@src/utils/enums';
 import type { TDuplicateMenuApiParams, TObject } from '@src/utils/types';
 
 const duplicateMenu = async (
@@ -190,7 +189,7 @@ const duplicateMenu = async (
         ? { ...createListFoodNutritionByFoodsByDate(foodsByDate) }
         : {}),
       ...(menuType ? { menuType } : { menuType: menuTypeFromMenu }),
-      listingType: ListingTypes.MENU,
+      listingType: EListingType.menu,
       restaurantId,
       listingState: IntegrationListing(menu).getMetadata().listingState,
     },

@@ -2,7 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 
 import { fetchSearchFilterApi } from '@apis/userApi';
 import { createAsyncThunk } from '@redux/redux.helper';
-import { ListingTypes } from '@src/types/listingTypes';
+import { EListingType } from '@src/utils/enums';
 import { denormalisedResponseEntities } from '@utils/data';
 import type { TListing } from '@utils/types';
 
@@ -72,7 +72,7 @@ const fetchFoodFromRestaurant = createAsyncThunk(
   async (restaurantId: string, { extra: sdk, getState }) => {
     const { restaurantFoodList = {} } = getState().Nutrition;
     const response = await sdk.listings.query({
-      meta_listingType: ListingTypes.FOOD,
+      meta_listingType: EListingType.food,
       meta_restaurantId: restaurantId,
       include: ['images'],
       'fields.image': ['variants.default'],
@@ -93,7 +93,7 @@ const searchFoodInRestaurant = createAsyncThunk(
     const { restaurantFoodList = {} } = getState().Nutrition;
     const { restaurantId, keywords } = params;
     const response = await sdk.listings.query({
-      meta_listingType: ListingTypes.FOOD,
+      meta_listingType: EListingType.food,
       meta_restaurantId: restaurantId,
       include: ['images'],
       'fields.image': ['variants.default'],

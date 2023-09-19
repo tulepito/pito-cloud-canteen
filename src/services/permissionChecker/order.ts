@@ -5,7 +5,11 @@ import { EHttpStatusCode } from '@apis/errors';
 import { fetchListing } from '@services/integrationHelper';
 import { getSdk, handleError } from '@services/sdk';
 import { CompanyPermission } from '@src/types/UserPermission';
-import { denormalisedResponseEntities, Listing, User } from '@utils/data';
+import {
+  CurrentUser,
+  denormalisedResponseEntities,
+  Listing,
+} from '@utils/data';
 
 const orderChecker =
   (handler: NextApiHandler) =>
@@ -16,7 +20,9 @@ const orderChecker =
       const { companyId, orderId } = req.body;
       const apiMethod = req.method;
       const [currentUser] = denormalisedResponseEntities(currentUserResponse);
-      const { isAdmin = false, company = {} } = User(currentUser).getMetadata();
+
+      const { isAdmin = false, company = {} } =
+        CurrentUser(currentUser).getMetadata();
 
       switch (apiMethod) {
         case HttpMethod.POST: {

@@ -3,6 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { HttpMethod } from '@apis/configs';
 import cookies from '@services/cookie';
 import { getIntegrationSdk, handleError } from '@services/sdk';
+import { EListingStates } from '@src/utils/enums';
 import { denormalisedResponseEntities } from '@utils/data';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
@@ -23,8 +24,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         const response = await integrationSdk.listings.create(
           {
             ...dataParams,
-            state: 'published',
-            authorId: restaurant.author.id.uuid,
+            state: EListingStates.published,
+            authorId: restaurant?.author?.id?.uuid,
           },
           queryParams,
         );

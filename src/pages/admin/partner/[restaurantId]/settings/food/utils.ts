@@ -1,13 +1,15 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 /* eslint-disable unused-imports/no-unused-vars */
 import { types as sdkTypes } from '@helpers/sdkLoader';
-import { ListingTypes } from '@src/types/listingTypes';
+import {
+  EListingType,
+  FOOD_TYPE_OPTIONS,
+  MENU_OPTIONS,
+} from '@src/utils/enums';
 import type { EMenuTypes } from '@utils/enums';
 import { getSubmitImageId, getUniqueImages } from '@utils/images';
 import { toNonAccentVietnamese } from '@utils/string';
 import type { TImage } from '@utils/types';
-
-import { FOOD_TYPE_OPTIONS, MENU_OPTIONS } from '../../../../../../utils/enums';
 
 const { Money } = sdkTypes;
 
@@ -70,7 +72,7 @@ export const getSubmitFoodData = (values: TEditPartnerFoodFormValues) => {
     },
     metadata: {
       restaurantId,
-      listingType: ListingTypes.FOOD,
+      listingType: EListingType.food,
     },
   };
 };
@@ -121,7 +123,7 @@ export const getDuplicateData = (values: TEditPartnerFoodFormValues) => {
     },
     metadata: {
       restaurantId,
-      listingType: ListingTypes.FOOD,
+      listingType: EListingType.food,
     },
   };
 };
@@ -264,7 +266,7 @@ export const getImportDataFromCsv = (
     },
     metadata: {
       restaurantId,
-      listingType: ListingTypes.FOOD,
+      listingType: EListingType.food,
     },
   };
 };
