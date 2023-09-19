@@ -16,7 +16,7 @@ const createNativeNotification = async ({ notificationParams, sdk }) => {
   const { oneSignalUserId } = participantUser.getPrivateData();
   const url = `${BASE_URL}/participant/order/${orderId}&subOrderDate=${subOrderDate}&openRatingModal=true`;
 
-  sendNotification({
+  await sendNotification({
     title: 'Đánh giá ngày ăn',
     content: `🌟 ${lastName} ơi, chấm ${foodName} hôm nay mấy điểm?`,
     url,
@@ -40,21 +40,26 @@ exports.handler = async (_event) => {
     const planListing = Listing(planResponse);
 
     const { orderDetail } = planListing.getMetadata();
-    const subOrder = orderDetail[subOrderDate];
+    const subOrder = orderDetail[`${subOrderDate}`];
     const { memberOrders, restaurant } = subOrder;
 
-    participantIds.forEach((participantId) => {
-      const { foodId } = memberOrders[participantId];
-      if (foodId) {
-        const { foodName } = restaurant.foodList[foodId];
-        createNativeNotification({
-          participantId,
-          orderId,
-          subOrderDate,
-          foodName,
-        });
-      }
-    });
+    await Promise.all(
+      participantIds.map(async (participantId) => {
+        const { foodId } = memberOrders[participantId];
+        if (foodId) {
+          const { foodName } = restaurant.foodList[foodId];
+          await createNativeNotification({
+            notificationParams: {
+              participantId,
+              orderId,
+              subOrderDate,
+              foodName,
+            },
+            sdk: integrationSdk,
+          });
+        }
+      }),
+    );
 
     console.log(
       'End to run schedule to send food rating native notification...',

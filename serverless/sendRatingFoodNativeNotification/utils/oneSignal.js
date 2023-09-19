@@ -19,7 +19,8 @@ const sendNotification = async ({ title, content, url, oneSignalUserId }) => {
   };
 
   try {
-    await oneSignalClient.createNotification(notification);
+    const response = await oneSignalClient.createNotification(notification);
+    console.log('response: ', response);
   } catch (e) {
     console.log(e);
   }

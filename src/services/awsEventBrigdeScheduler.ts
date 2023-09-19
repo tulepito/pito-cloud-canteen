@@ -3,6 +3,9 @@ import AWS from 'aws-sdk';
 const LAMBDA_ARN = `${process.env.LAMBDA_ARN}`;
 const ROLE_ARN = `${process.env.ROLE_ARN}`;
 const SEND_FOOD_RATING_NOTIFICATION_LAMBDA_ARN = `${process.env.SEND_FOOD_RATING_NOTIFICATION_LAMBDA_ARN}`;
+const NEXT_PUBLIC_ENV = `${process.env.NEXT_PUBLIC_ENV}`;
+
+const isProduction = NEXT_PUBLIC_ENV === 'production';
 
 const Scheduler = new AWS.Scheduler({
   accessKeyId: `${process.env.NEXT_APP_SCHEDULER_ACCESS_KEY}`,
@@ -58,7 +61,7 @@ export const updateScheduler = ({
     Name: customName,
     ScheduleExpression: `at(${timeExpression})`,
     ScheduleExpressionTimezone: 'Asia/Ho_Chi_Minh',
-    ActionAfterCompletion: 'DELETE',
+    ActionAfterCompletion: isProduction ? 'NONE' : 'DELETE',
     Target: {
       Arn: LAMBDA_ARN,
       RoleArn: ROLE_ARN,
@@ -81,6 +84,7 @@ export const createFoodRatingNotificationScheduler = async ({
     Name: customName,
     ScheduleExpression: `at(${timeExpression})`,
     ScheduleExpressionTimezone: 'Asia/Ho_Chi_Minh',
+    ActionAfterCompletion: isProduction ? 'NONE' : 'DELETE',
     Target: {
       Arn: SEND_FOOD_RATING_NOTIFICATION_LAMBDA_ARN,
       RoleArn: ROLE_ARN,
