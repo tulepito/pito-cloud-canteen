@@ -382,7 +382,7 @@ const updateOrderGeneralInfo = createAsyncThunk(
     };
 
     await updateOrderApi(orderId, updateParams);
-    await dispatch(loadData(orderId));
+    await dispatch(loadData({ orderId }));
   },
 );
 
@@ -730,7 +730,7 @@ const addParticipant = createAsyncThunk(
       return rejectWithValue(data?.message);
     }
 
-    await dispatch(loadData(orderId));
+    await dispatch(loadData({ orderId }));
 
     return {};
   },
@@ -1065,7 +1065,7 @@ const updateOrderFromDraftEdit = createAsyncThunk(
 
     updatePaymentApi(orderId, planId);
 
-    await dispatch(loadData(orderId));
+    await dispatch(loadData({ orderId }));
   },
 );
 
@@ -1629,8 +1629,17 @@ const OrderManagementSlice = createSlice({
       };
     },
     updateOrderData: (state, { payload }) => {
+      const orderValidationsInProgressState =
+        checkMinMaxQuantityInProgressState(
+          payload.attributes.metadata.orderType === EOrderType.normal,
+          state.draftOrderDetail,
+          state.draftOrderDetail,
+          true,
+        );
+
       return {
         ...state,
+        orderValidationsInProgressState,
         orderData: payload,
       };
     },
@@ -1756,9 +1765,9 @@ const OrderManagementSlice = createSlice({
         state.orderData = {
           ...state.orderData,
           attributes: {
-            ...state.orderData.attributes,
+            ...(state.orderData?.attributes || {}),
             metadata: {
-              ...state.orderData.attributes.metadata,
+              ...(state.orderData?.attributes?.metadata || {}),
               participants: payload.participants,
             },
           },
@@ -1791,7 +1800,9 @@ const OrderManagementSlice = createSlice({
         state.addOrUpdateMemberOrderInProgress = false;
         state.draftOrderDetail = payload?.orderDetail;
         state.planData = payload?.planData;
-        state.orderData.attributes.metadata.anonymous = payload?.anonymous;
+        if (state.orderData) {
+          state.orderData.attributes.metadata.anonymous = payload?.anonymous;
+        }
         state.anonymousParticipantData = state.anonymousParticipantData.concat(
           payload?.newUser,
         );

@@ -74,7 +74,7 @@ export const recommendRestaurantForSpecificDay = async (
     const randomRestaurantGetter = Listing(randomRestaurant);
     const randomRestaurantId = randomRestaurantGetter.getId();
     const { minQuantity = 0, maxQuantity = Number.MAX_VALUE } =
-      randomRestaurantGetter.getMetadata();
+      randomRestaurantGetter.getPublicData();
 
     const newRestaurantData = {
       id: randomRestaurantId,
@@ -171,6 +171,7 @@ export const recommendRestaurants = async (orderId: string) => {
           const restaurantGetter = Listing(randomRestaurant?.restaurantInfo);
           const { minQuantity = 0, maxQuantity = 100 } =
             restaurantGetter.getPublicData();
+          console.log(restaurantGetter.getPublicData());
           const lineItemsMaybe = isNormalOrder ? { lineItems: [] } : {};
 
           orderDetail[dateTime] = {

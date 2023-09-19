@@ -556,6 +556,8 @@ export const getSelectedRestaurantAndFoodList = ({
     id: currRestaurantId,
     restaurantName: currentRestaurant?.attributes?.title,
     phoneNumber: currentRestaurant?.attributes?.publicData?.phoneNumber,
+    minQuantity: currentRestaurant?.attributes?.publicData?.minQuantity,
+    maxQuantity: currentRestaurant?.attributes?.publicData?.maxQuantity,
   };
 
   return {
