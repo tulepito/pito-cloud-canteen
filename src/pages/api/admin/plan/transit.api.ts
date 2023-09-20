@@ -22,6 +22,8 @@ import { isTransactionsTransitionInvalidTransition } from '@src/utils/errors';
 import { ETransition } from '@src/utils/transaction';
 import type { TError } from '@src/utils/types';
 
+import { modifyPaymentWhenCancelSubOrderService } from '../payment/modify-payment-when-cancel-sub-order.service';
+
 import { transitionOrderStatus } from './transition-order-status.service';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
@@ -200,7 +202,15 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             client: newClient,
             partner: newPartner,
           });
-          await transitionOrderStatus(order, plan, integrationSdk);
+          await Promise.all([
+            modifyPaymentWhenCancelSubOrderService({
+              order,
+              subOrderDate: startTimestamp,
+              clientQuotation: newClient,
+              partnerQuotation: newPartner,
+            }),
+            transitionOrderStatus(order, plan, integrationSdk),
+          ]);
         }
 
         return res.status(200).json({
