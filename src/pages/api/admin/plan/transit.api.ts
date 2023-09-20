@@ -200,22 +200,25 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           );
 
           [...participantIds, ...anonymous].forEach((participantId: string) => {
-            emailSendingFactory(
-              EmailTemplateTypes.PARTICIPANT.PARTICIPANT_SUB_ORDER_CANCELED,
-              {
-                orderId,
-                timestamp,
-                participantId,
-              },
-            );
-            createNativeNotification(
-              ENativeNotificationType.AdminTransitSubOrderToCanceled,
-              {
-                participantId,
-                planId,
-                subOrderDate: startTimestamp.toString(),
-              },
-            );
+            const { foodId } = memberOrders[participantId] || {};
+            if (foodId) {
+              emailSendingFactory(
+                EmailTemplateTypes.PARTICIPANT.PARTICIPANT_SUB_ORDER_CANCELED,
+                {
+                  orderId,
+                  timestamp,
+                  participantId,
+                },
+              );
+              createNativeNotification(
+                ENativeNotificationType.AdminTransitSubOrderToCanceled,
+                {
+                  participantId,
+                  planId,
+                  subOrderDate: startTimestamp.toString(),
+                },
+              );
+            }
           });
 
           // Function is not ready on production
