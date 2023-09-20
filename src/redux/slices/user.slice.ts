@@ -1,5 +1,7 @@
 /* eslint-disable unused-imports/no-unused-vars */
 import { createSlice } from '@reduxjs/toolkit';
+import chunk from 'lodash/chunk';
+import flatten from 'lodash/flatten';
 
 import { createAsyncThunk, createDeepEqualSelector } from '@redux/redux.helper';
 import type { RootState } from '@redux/store';
@@ -90,10 +92,7 @@ const initialState: TUserState = {
 // ================ Thunks ================ //
 const fetchCurrentUser = createAsyncThunk(
   'app/user/FETCH_CURRENT_USER',
-  async (
-    params: TObject | undefined,
-    { extra: sdk, rejectWithValue, fulfillWithValue },
-  ) => {
+  async (params: TObject | undefined, { extra: sdk, rejectWithValue }) => {
     const parameters = params || {
       include: ['profileImage'],
       'fields.image': [
@@ -115,21 +114,24 @@ const fetchCurrentUser = createAsyncThunk(
 
     const { favoriteRestaurantList = [], favoriteFoodList = [] } =
       CurrentUser(currentUser).getPublicData();
-    const favoriteRestaurants = await Promise.all(
-      favoriteRestaurantList.map(
-        async (restaurantId: string) =>
+
+    const favoriteRestaurants = flatten(
+      await Promise.all(
+        chunk<string>(favoriteRestaurantList, 100).map(async (restaurantIds) =>
           denormalisedResponseEntities(
-            await sdk.listings.show({ id: restaurantId }),
-          )[0],
+            await sdk.listings.query({ ids: restaurantIds }),
+          ),
+        ),
       ),
     );
 
-    const favoriteFood = await Promise.all(
-      favoriteFoodList.map(
-        async (foodId: string) =>
+    const favoriteFood = flatten(
+      await Promise.all(
+        chunk<string>(favoriteFoodList, 100).map(async (restaurantIds) =>
           denormalisedResponseEntities(
-            await sdk.listings.show({ id: foodId }),
-          )[0],
+            await sdk.listings.query({ ids: restaurantIds }),
+          ),
+        ),
       ),
     );
 

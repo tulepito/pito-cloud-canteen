@@ -460,7 +460,6 @@ const updateBookerAccount = createAsyncThunk(
   UPDATE_BOOKER_ACCOUNT,
   async (params: any, { extra: sdk, dispatch }) => {
     const queryParams = {
-      expand: true,
       include: ['profileImage'],
       'fields.image': ['variants.square-small', 'variants.square-small2x'],
     };
