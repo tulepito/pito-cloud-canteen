@@ -63,14 +63,17 @@ import { SystemAttributesThunks } from './systemAttributes.slice';
 export const QUERY_SUB_ORDER_CHANGES_HISTORY_PER_PAGE = 3;
 
 export const checkMinMaxQuantityInProgressState = (
-  isInProgress: boolean,
-  isNormalOrder: boolean,
+  orderData: TObject | null,
   orderDetail: TPlan['orderDetail'] = {},
   oldOrderDetail: TPlan['orderDetail'] = {},
   isAdminFlow = false,
 ) => {
   let planValidationsInProgressState = {};
-
+  const { orderState, orderType } = Listing(
+    orderData as TListing,
+  ).getMetadata();
+  const isInProgress = orderState === EOrderStates.inProgress;
+  const isNormalOrder = orderType === EOrderType.normal;
   if (!isInProgress) {
     return {
       planValidationsInProgressState,
@@ -1172,9 +1175,6 @@ const OrderManagementSlice = createSlice({
         planData as TListing,
       ).getMetadata();
 
-      const { orderType, orderState } = Listing(
-        orderData as TListing,
-      ).getMetadata();
       const { foodId: defaultFoodId } =
         defaultOrderDetail[currentViewDate].memberOrders[memberId];
 
@@ -1195,8 +1195,7 @@ const OrderManagementSlice = createSlice({
 
       const orderValidationsInProgressState =
         checkMinMaxQuantityInProgressState(
-          orderState === EOrderStates.inProgress,
-          orderType === EOrderType.normal,
+          orderData,
           newOrderDetail,
           defaultOrderDetail,
           isAdminFlow,
@@ -1323,7 +1322,7 @@ const OrderManagementSlice = createSlice({
       const { orderDetail: defaultOrderDetail } = Listing(
         planData as TListing,
       ).getMetadata();
-      const { orderType } = Listing(orderData as TListing).getMetadata();
+
       const { status: defaultStatus } =
         defaultOrderDetail[currentViewDate].memberOrders[memberId];
       const memberOrderDetailOnUpdateDate =
@@ -1358,9 +1357,7 @@ const OrderManagementSlice = createSlice({
 
       const orderValidationsInProgressState =
         checkMinMaxQuantityInProgressState(
-          orderData?.attributes?.metadata?.orderState ===
-            EOrderStates.inProgress,
-          orderType === EOrderType.normal,
+          orderData,
           newOrderDetail,
           defaultOrderDetail,
           isAdminFlow,
@@ -1469,15 +1466,12 @@ const OrderManagementSlice = createSlice({
       } = updateValues;
       const { planData, orderData } = state;
       const planDataGetter = Listing(planData as TListing);
-      const { orderType } = Listing(orderData as TListing).getMetadata();
 
       const { orderDetail = {} } = planDataGetter.getMetadata();
 
       const orderValidationsInProgressState =
         checkMinMaxQuantityInProgressState(
-          orderData?.attributes?.metadata?.orderState ===
-            EOrderStates.inProgress,
-          orderType === EOrderType.normal,
+          orderData,
           newOrderDetail,
           orderDetail,
           isAdminFlow,
@@ -1695,13 +1689,11 @@ const OrderManagementSlice = createSlice({
             ...restPayload
           } = payload;
 
-          const { orderDetail, orderType } = Listing(planData).getMetadata();
+          const { orderDetail } = Listing(planData).getMetadata();
 
           const orderValidationsInProgressState =
             checkMinMaxQuantityInProgressState(
-              orderData?.attributes?.metadata?.orderState ===
-                EOrderStates.inProgress,
-              orderType === EOrderType.normal,
+              orderData,
               orderDetail,
               orderDetail,
               isAdminFlow,
