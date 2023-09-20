@@ -13,6 +13,7 @@ import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
 import type { TColumn } from '@components/Table/Table';
 import Table from '@components/Table/Table';
 import { parseThousandNumber } from '@helpers/format';
+import useBoolean from '@hooks/useBoolean';
 import { formatTimestamp } from '@src/utils/dates';
 import type { TCompanyMemberWithDetails, TObject } from '@src/utils/types';
 
@@ -41,6 +42,7 @@ type TExtraProps = {
   onQueryCompanyBookers: (id: string) => void;
   companyBookers: TCompanyMemberWithDetails[];
   queryBookersInProgress: boolean;
+  hasSelectedPaymentRecords?: boolean;
 };
 type AddClientPaymentFormComponentProps =
   FormRenderProps<TAddClientPaymentFormValues> & Partial<TExtraProps>;
@@ -62,9 +64,11 @@ const AddClientPaymentFormComponent: React.FC<
     onQueryCompanyBookers,
     companyBookers,
     queryBookersInProgress,
+    hasSelectedPaymentRecords,
   } = props;
 
   const selectFieldRef = useRef<any>(null);
+  const isFilterClicked = useBoolean();
 
   const paymentRecordData = Object.keys(values).filter((key) =>
     key.includes('paymentAmount'),
@@ -173,11 +177,13 @@ const AddClientPaymentFormComponent: React.FC<
 
   const filterUnPaidPaymentList = () => {
     setSubmittedFilters(filters);
+    isFilterClicked.setTrue();
   };
 
   const handleSubmitForm = (_values: any) => {
     handleSubmit(_values);
     form.restart();
+    isFilterClicked.setFalse();
   };
 
   // eslint-disable-next-line @typescript-eslint/no-shadow
@@ -197,6 +203,10 @@ const AddClientPaymentFormComponent: React.FC<
     (submittedFilters?.startDate && submittedFilters?.endDate) ||
     submittedFilters?.partnerId
   );
+
+  const showTableData =
+    hasSelectedPaymentRecords ||
+    (!hasSelectedPaymentRecords && hasFilters && isFilterClicked.value);
 
   const filteredPayments = filterClientPayment(
     unPaidPaymentList,
@@ -280,7 +290,7 @@ const AddClientPaymentFormComponent: React.FC<
       <div className={css.tableWrapper}>
         <Table
           columns={TABLE_COLUMNS}
-          data={hasFilters ? filteredPayments : []}
+          data={showTableData ? filteredPayments : []}
           tableBodyCellClassName={css.tableBodyCell}
         />
       </div>

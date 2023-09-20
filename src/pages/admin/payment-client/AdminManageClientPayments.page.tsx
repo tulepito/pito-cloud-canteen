@@ -373,6 +373,16 @@ const AdminManageClientPaymentsPage = () => {
     }
   };
 
+  const hasSelectedPaymentRecords = !isEmpty(
+    selectedPaymentRecords.rowCheckbox,
+  );
+
+  const selectedPaymentRecordsData = hasSelectedPaymentRecords
+    ? filteredTableData.filter((item) =>
+        selectedPaymentRecords.rowCheckbox.includes(item.key),
+      )
+    : filteredTableData;
+
   const filterLabels = Object.keys(filters).map((key) => {
     const isArray = Array.isArray(filters[key]);
     if (isArray && filters[key].length <= 0) return <></>;
@@ -452,7 +462,7 @@ const AdminManageClientPaymentsPage = () => {
           onClose={addClientPaymentModalController.setFalse}
           companyList={companyList}
           partnerList={partnerList}
-          paymentList={filterPaymentPartner(formattedTableData, {
+          paymentList={filterPaymentPartner(selectedPaymentRecordsData, {
             status: ['isNotPaid'],
           })}
           onQueryCompanyBookers={onQueryCompanyBookers}
@@ -460,6 +470,7 @@ const AdminManageClientPaymentsPage = () => {
           queryBookersInProgress={queryMembersInProgress}
           onClientPaymentRecordsSubmit={onClientPaymentRecordsSubmit}
           inProgress={createClientPaymentsInProgress}
+          hasSelectedPaymentRecords={hasSelectedPaymentRecords}
         />
       )}
     </div>
