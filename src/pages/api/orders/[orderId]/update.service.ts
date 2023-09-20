@@ -11,7 +11,7 @@ import {
 import { fetchListing, fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { createNativeNotification } from '@services/nativeNotification';
-import { ENativeNotificationType } from '@src/utils/enums';
+import { ENativeNotificationType, EOrderStates } from '@src/utils/enums';
 import { denormalisedResponseEntities, Listing } from '@utils/data';
 import { formatTimestamp, VNTimezone } from '@utils/dates';
 
@@ -98,15 +98,19 @@ const updateOrder = async ({
       ),
     )[0];
 
-    participants.forEach((participantId) => {
-      createNativeNotification(
-        ENativeNotificationType.BookerTransitOrderStateToPicking,
-        {
-          participantId,
-          order: orderListing,
-        },
-      );
-    });
+    const { orderState } = generalInfo || {};
+
+    if (orderState === EOrderStates.picking) {
+      participants.forEach((participantId) => {
+        createNativeNotification(
+          ENativeNotificationType.BookerTransitOrderStateToPicking,
+          {
+            participantId,
+            order: orderListing,
+          },
+        );
+      });
+    }
   }
 
   sendNotificationToParticipantOnUpdateOrder(orderId);

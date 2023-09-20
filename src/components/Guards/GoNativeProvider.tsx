@@ -33,7 +33,9 @@ const GoNativeProvider: React.FC<TGoNativeProvider> = ({ children }) => {
       );
     }
     window.gonative_onesignal_info = gonative_onesignal_info;
-    gonative.onesignal.run.onesignalInfo();
+    if (currentUser && !currentUser.privateData?.oneSignalUserId) {
+      gonative.onesignal.run.onesignalInfo();
+    }
   }, [currentUser, dispatch]);
 
   return <>{children}</>;
