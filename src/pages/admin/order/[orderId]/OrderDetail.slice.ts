@@ -80,9 +80,7 @@ type TOrderDetailState = {
   booker: TUser;
   participantData: Array<TUser>;
   anonymousParticipantData: Array<TUser>;
-  transactionDataMap: {
-    [date: number]: TTransaction;
-  };
+
   fetchOrderInProgress: boolean;
   fetchOrderError: any;
 
@@ -129,7 +127,7 @@ const initialState: TOrderDetailState = {
   booker: null!,
   participantData: [],
   anonymousParticipantData: [],
-  transactionDataMap: {},
+
   fetchOrderInProgress: false,
   fetchOrderError: null,
 
@@ -195,7 +193,6 @@ const fetchOrder = createAsyncThunk(
       bookerData: booker,
       companyData: company,
       planListing,
-      transactionDataMap,
       orderListing: order,
       participantData,
       anonymousParticipantData,
@@ -209,7 +206,6 @@ const fetchOrder = createAsyncThunk(
       orderDetail,
       company,
       booker,
-      transactionDataMap,
       participantData,
       anonymousParticipantData,
     };

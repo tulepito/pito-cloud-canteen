@@ -30,7 +30,7 @@ import { Listing } from '@src/utils/data';
 import { formatTimestamp } from '@src/utils/dates';
 import { EOrderStates, EOrderType } from '@src/utils/enums';
 import { ETransition } from '@src/utils/transaction';
-import type { TListing, TObject, TTransaction, TUser } from '@src/utils/types';
+import type { TListing, TObject, TUser } from '@src/utils/types';
 
 import OrderHeaderInfor from '../../components/OrderHeaderInfor/OrderHeaderInfor';
 import OrderHeaderState from '../../components/OrderHeaderState/OrderHeaderState';
@@ -49,9 +49,6 @@ type OrderDetailTabProps = {
   orderDetail: any;
   company: TUser;
   booker: TUser;
-  transactionDataMap: {
-    [date: string]: TTransaction;
-  };
   updateStaffName: (staffName: string) => void;
   updateOrderStaffNameInProgress: boolean;
   updateOrderState: (newOrderState: string) => void;

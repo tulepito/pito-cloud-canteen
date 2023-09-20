@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useCallback, useEffect, useState } from 'react';
 import { shallowEqual } from 'react-redux';
 import compact from 'lodash/compact';
@@ -30,7 +31,6 @@ const OrderDetailPage = () => {
     (state) => state.OrderDetail.order,
     shallowEqual,
   );
-
   const orderDetail = useAppSelector(
     (state) => state.OrderDetail.orderDetail,
     shallowEqual,
@@ -39,16 +39,10 @@ const OrderDetailPage = () => {
     (state) => state.OrderDetail.company,
     shallowEqual,
   );
-
   const booker = useAppSelector(
     (state) => state.OrderDetail.booker,
     shallowEqual,
   );
-
-  const transactionDataMap = useAppSelector(
-    (state) => state.OrderDetail.transactionDataMap,
-  );
-
   const fetchOrderInProgress = useAppSelector(
     (state) => state.OrderDetail.fetchOrderInProgress,
   );
@@ -85,7 +79,7 @@ const OrderDetailPage = () => {
       dispatch(orderManagementThunks.loadData(orderId as string));
       dispatch(OrderDetailThunks.fetchOrder(orderId as string));
     }
-  }, [dispatch, orderId]);
+  }, [orderId]);
 
   const updateStaffName = useCallback(
     (staffName: string) => {
@@ -96,7 +90,7 @@ const OrderDetailPage = () => {
         }),
       );
     },
-    [dispatch, orderId],
+    [orderId],
   );
 
   const updateOrderState = async (newOrderState: string) => {
@@ -133,7 +127,6 @@ const OrderDetailPage = () => {
         order,
         company,
         booker,
-        transactionDataMap,
         updateStaffName,
         updateOrderStaffNameInProgress,
         updateOrderState,

@@ -53,7 +53,6 @@ import type {
   TListing,
   TObject,
   TSubOrderChangeHistoryItem,
-  TTransaction,
   TUser,
 } from '@utils/types';
 
@@ -275,9 +274,6 @@ type TOrderManagementState = {
   bookerData: TUser | null;
   participantData: Array<TUser>;
   anonymousParticipantData: Array<TUser>;
-  transactionDataMap: {
-    [date: number]: TTransaction;
-  };
   restaurantData: TObject[];
   subOrderChangesHistory: TSubOrderChangeHistoryItem[];
   querySubOrderChangesHistoryInProgress: boolean;
@@ -333,7 +329,6 @@ const initialState: TOrderManagementState = {
   bookerData: null,
   participantData: [],
   anonymousParticipantData: [],
-  transactionDataMap: {},
   restaurantData: [],
   subOrderChangesHistory: [],
   querySubOrderChangesHistoryInProgress: false,
