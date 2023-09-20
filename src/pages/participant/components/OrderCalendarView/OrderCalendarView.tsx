@@ -274,7 +274,7 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
   }, []);
 
   useEffect(() => {
-    if (subOrderDate && openRatingModal === 'true') {
+    if (subOrderDate) {
       const selectedEventFromUrl = flattenEvents.find((_event: any) => {
         const { resource } = _event;
         const { timestamp } = resource;
@@ -284,7 +284,12 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
 
       if (selectedEventFromUrl) {
         setSelectedEvent(selectedEventFromUrl);
-        ratingSubOrderModalControl.setTrue();
+
+        if (openRatingModal === 'true') {
+          ratingSubOrderModalControl.setTrue();
+        } else {
+          subOrderDetailModalControl.setTrue();
+        }
       }
     }
   }, [openRatingModal, subOrderDate]);

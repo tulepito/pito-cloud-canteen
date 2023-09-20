@@ -34,7 +34,7 @@ export const createNativeNotification = async (
         const orderListing = Listing(order!);
         const orderId = orderListing.getId();
         const { startDate, endDate } = orderListing.getMetadata();
-        const url = `${BASE_URL}/participant/order/${orderId}`;
+        const url = `${BASE_URL}/participant/order/${orderId}/?subOrderDate=${startDate}`;
         sendNotification({
           title: `Bạn muốn ăn gì nào 🤔 ?`,
           content: `Tuần ăn ${formatTimestamp(
