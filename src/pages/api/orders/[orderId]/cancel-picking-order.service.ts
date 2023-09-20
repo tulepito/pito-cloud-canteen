@@ -20,6 +20,8 @@ export const cancelPickingOrder = async (orderId: string) => {
     orderState,
     orderStateHistory = [],
     plans = [],
+    participants = [],
+    anonymous = [],
   } = Listing(orderListing).getMetadata();
 
   if (orderState !== EOrderStates.picking) {
@@ -47,6 +49,16 @@ export const cancelPickingOrder = async (orderId: string) => {
     plans.map(async (planId: string) => {
       const plan = await fetchListing(planId);
       const { orderDetail = {} } = Listing(plan).getMetadata();
+      [...participants, ...anonymous].forEach((participantId: string) => {
+        createNativeNotification(
+          ENativeNotificationType.TransitOrderStateToCanceled,
+          {
+            participantId,
+            planId,
+            order: orderListing,
+          },
+        );
+      });
 
       Promise.all(
         Object.keys(orderDetail).map((dateAsTimeStamp) => {
@@ -68,14 +80,6 @@ export const cancelPickingOrder = async (orderId: string) => {
                 orderId,
                 timestamp: dateAsTimeStamp,
                 participantId,
-              },
-            );
-            createNativeNotification(
-              ENativeNotificationType.AdminTransitSubOrderToCanceled,
-              {
-                participantId,
-                planId,
-                order: orderListing,
               },
             );
           });
