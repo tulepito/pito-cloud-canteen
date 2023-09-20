@@ -116,17 +116,20 @@ export const ReviewContent: React.FC<any> = (props) => {
     (state) => state.Order.orderDetail,
   );
   const orderInPickingState = useAppSelector(
-    (state) => state.OrderDetail.order,
+    (state) => state.OrderManagement.orderData,
   );
-  const orderDetailInPickingState = useAppSelector(
-    (state) => state.OrderDetail.orderDetail,
-  );
+  const orderDetailInPickingState = useAppSelector((state) => {
+    const planListing = state.OrderManagement.planData;
+    const { orderDetail = {} } = Listing(planListing as TListing).getMetadata();
+
+    return orderDetail;
+  });
 
   const participantData = useAppSelector(
-    (state) => state.OrderDetail.participantData,
+    (state) => state.OrderManagement.participantData,
   );
   const anonymousParticipantData = useAppSelector(
-    (state) => state.OrderDetail.anonymousParticipantData,
+    (state) => state.OrderManagement.anonymousParticipantData,
   );
   const deliveryManOptions = useAppSelector(
     (state) => state.AdminAttributes.deliveryPeople,

@@ -247,7 +247,7 @@ export const prepareOrderDetail = ({
 // ================ Initial states ================ //
 type TOrderManagementState = {
   // Fetch data state
-  isFetchingOrderDetails: boolean;
+  fetchOrderInProgress: boolean;
   // Delete state
   isDeletingParticipant: boolean;
   // Update state
@@ -309,7 +309,7 @@ type TOrderManagementState = {
 };
 
 const initialState: TOrderManagementState = {
-  isFetchingOrderDetails: false,
+  fetchOrderInProgress: false,
   isDeletingParticipant: false,
   isUpdatingOrderDetails: false,
   isSendingRemindEmail: false,
@@ -1631,7 +1631,7 @@ const OrderManagementSlice = createSlice({
     builder
       /* =============== loadData =============== */
       .addCase(loadData.pending, (state) => {
-        state.isFetchingOrderDetails = true;
+        state.fetchOrderInProgress = true;
       })
       .addCase(loadData.fulfilled, (state, { payload }) => {
         const {
@@ -1646,7 +1646,7 @@ const OrderManagementSlice = createSlice({
 
         return {
           ...state,
-          isFetchingOrderDetails: false,
+          fetchOrderInProgress: false,
           orderData,
           planData,
           draftOrderDetail: orderDetail,
@@ -1654,7 +1654,7 @@ const OrderManagementSlice = createSlice({
         };
       })
       .addCase(loadData.rejected, (state) => {
-        state.isFetchingOrderDetails = false;
+        state.fetchOrderInProgress = false;
       })
 
       /* =============== updateOrderGeneralInfo =============== */
@@ -1975,12 +1975,12 @@ export default OrderManagementSlice.reducer;
 // ================ Selectors ================ //
 export const orderDetailsAnyActionsInProgress = (state: RootState) => {
   const {
-    isFetchingOrderDetails,
+    fetchOrderInProgress,
     isDeletingParticipant,
     isUpdatingOrderDetails,
   } = state.OrderManagement;
 
   return (
-    isFetchingOrderDetails || isDeletingParticipant || isUpdatingOrderDetails
+    fetchOrderInProgress || isDeletingParticipant || isUpdatingOrderDetails
   );
 };

@@ -2,8 +2,8 @@ import Button from '@components/Button/Button';
 import { parseThousandNumberToInteger } from '@helpers/format';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
+import { OrderDetailThunks } from '@pages/admin/order/[orderId]/AdminManageOrder.slice';
 import { generateSKU } from '@pages/admin/order/[orderId]/helpers/AdminOrderDetail';
-import { OrderDetailThunks } from '@pages/admin/order/[orderId]/OrderDetail.slice';
 import { User } from '@src/utils/data';
 import { EPaymentType } from '@src/utils/enums';
 import type { TUser } from '@src/utils/types';
@@ -40,13 +40,13 @@ const ClientPaymentDetail: React.FC<ClientPaymentDetailProps> = (props) => {
   const addPaymentModalController = useBoolean();
 
   const createClientPaymentRecordInProgress = useAppSelector(
-    (state) => state.OrderDetail.createClientPaymentRecordInProgress,
+    (state) => state.AdminManageOrder.createClientPaymentRecordInProgress,
   );
   const createClientPaymentRecordError = useAppSelector(
-    (state) => state.OrderDetail.createClientPaymentRecordError,
+    (state) => state.AdminManageOrder.createClientPaymentRecordError,
   );
   const deleteClientPaymentRecordInProgress = useAppSelector(
-    (state) => state.OrderDetail.deleteClientPaymentRecordInProgress,
+    (state) => state.AdminManageOrder.deleteClientPaymentRecordInProgress,
   );
 
   const companyUser = User(company);

@@ -32,9 +32,9 @@ import { EOrderStates, EOrderType } from '@src/utils/enums';
 import { ETransition } from '@src/utils/transaction';
 import type { TListing, TObject, TUser } from '@src/utils/types';
 
+import { OrderDetailThunks } from '../../AdminManageOrder.slice';
 import OrderHeaderInfor from '../../components/OrderHeaderInfor/OrderHeaderInfor';
 import OrderHeaderState from '../../components/OrderHeaderState/OrderHeaderState';
-import { OrderDetailThunks } from '../../OrderDetail.slice';
 
 import css from './OrderDetailTab.module.scss';
 
@@ -78,7 +78,7 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
     draftOrderDetail,
     draftSubOrderChangesHistory,
     orderValidationsInProgressState,
-    isFetchingOrderDetails,
+    fetchOrderInProgress,
   } = useAppSelector((state) => state.OrderManagement);
   const dispatch = useAppDispatch();
   const router = useRouter();
@@ -135,7 +135,7 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
     draftOrderDetail?.[currentViewDate] || {};
 
   const ableToUpdateOrder =
-    !isFetchingOrderDetails &&
+    !fetchOrderInProgress &&
     isRouterReady &&
     ((lastTransition === ETransition.INITIATE_TRANSACTION && isDraftEditing) ||
       isPickingState);

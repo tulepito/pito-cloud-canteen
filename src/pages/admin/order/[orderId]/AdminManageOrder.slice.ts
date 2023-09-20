@@ -13,14 +13,15 @@ import { participantSubOrderUpdateDocumentApi } from '@apis/firebaseApi';
 import { createNotificationApi } from '@apis/notificationApi';
 import {
   adminUpdateOrderStateApi,
-  getBookerOrderDataApi,
   updateOrderApi,
   updatePlanDetailsApi,
 } from '@apis/orderApi';
 import { getOrderQuotationsQuery } from '@helpers/listingSearchQuery';
 import { createAsyncThunk } from '@redux/redux.helper';
-import { OrderManagementsAction } from '@redux/slices/OrderManagement.slice';
-import { SystemAttributesThunks } from '@redux/slices/systemAttributes.slice';
+import {
+  OrderManagementsAction,
+  orderManagementThunks,
+} from '@redux/slices/OrderManagement.slice';
 import type { NotificationInvitationParams } from '@services/notifications';
 import {
   denormalisedResponseEntities,
@@ -166,53 +167,26 @@ const initialState: TOrderDetailState = {
 };
 
 // ================ Thunk types ================ //
-const FETCH_ORDER = 'app/OrderDetail/FETCH_ORDER';
-const UPDATE_STAFF_NAME = 'app/OrderDetail/UPDATE_STAFF_NAME';
-const UPDATE_ORDER_STATE = 'app/OrderDetail/UPDATE_ORDER_STATE';
-const FETCH_QUOTATIONS = 'app/OrderDetail/FETCH_QUOTATIONS';
+const UPDATE_STAFF_NAME = 'app/AdminManageOrder/UPDATE_STAFF_NAME';
+const UPDATE_ORDER_STATE = 'app/AdminManageOrder/UPDATE_ORDER_STATE';
+const FETCH_QUOTATIONS = 'app/AdminManageOrder/FETCH_QUOTATIONS';
 const CREATE_PARTNER_PAYMENT_RECORD =
-  'app/OrderDetail/CREATE_PARTNER_PAYMENT_RECORD';
+  'app/AdminManageOrder/CREATE_PARTNER_PAYMENT_RECORD';
 const FETCH_PARTNER_PAYMENT_RECORD =
-  'app/OrderDetail/FETCH_PARTNER_PAYMENT_RECORD';
+  'app/AdminManageOrder/FETCH_PARTNER_PAYMENT_RECORD';
 const DELETE_PARTNER_PAYMENT_RECORD =
-  'app/OrderDetail/DELETE_PARTNER_PAYMENT_RECORD';
+  'app/AdminManageOrder/DELETE_PARTNER_PAYMENT_RECORD';
 const FETCH_CLIENT_PAYMENT_RECORD =
-  'app/OrderDetail/FETCH_CLIENT_PAYMENT_RECORD';
+  'app/AdminManageOrder/FETCH_CLIENT_PAYMENT_RECORD';
 const CREATE_CLIENT_PAYMENT_RECORD =
-  'app/OrderDetail/CREATE_CLIENT_PAYMENT_RECORD';
+  'app/AdminManageOrder/CREATE_CLIENT_PAYMENT_RECORD';
 const DELETE_CLIENT_PAYMENT_RECORD =
-  'app/OrderDetail/DELETE_CLIENT_PAYMENT_RECORD';
-const FETCH_ONLY_ORDER = 'app/OrderDetail/FETCH_ONLY_ORDER';
+  'app/AdminManageOrder/DELETE_CLIENT_PAYMENT_RECORD';
+const FETCH_ORDER = 'app/AdminManageOrder/FETCH_ORDER';
 // ================ Async thunks ================ //
+
 const fetchOrder = createAsyncThunk(
   FETCH_ORDER,
-  async (orderId: string, { dispatch }) => {
-    const response = await getBookerOrderDataApi(orderId);
-
-    const {
-      bookerData: booker,
-      companyData: company,
-      planListing,
-      orderListing: order,
-      participantData,
-      anonymousParticipantData,
-    } = response?.data || {};
-    const { orderDetail } = Listing(planListing).getMetadata();
-
-    dispatch(SystemAttributesThunks.fetchVATPercentageByOrderId(orderId));
-
-    return {
-      order,
-      orderDetail,
-      company,
-      booker,
-      participantData,
-      anonymousParticipantData,
-    };
-  },
-);
-const fetchOnlyOrder = createAsyncThunk(
-  FETCH_ONLY_ORDER,
   async (orderId: string, { extra: sdk }) => {
     const order = await sdk.listings.show({ id: orderId });
 
@@ -250,9 +224,9 @@ const updateOrderState = createAsyncThunk(
 );
 
 const transit = createAsyncThunk(
-  'app/OrderDetail/TRANSIT',
+  'app/AdminManageOrder/TRANSIT',
   async ({ transactionId, transition }: TObject, { getState }) => {
-    const { company } = getState().OrderDetail;
+    const { company } = getState().AdminManageOrder;
     const { companyName } = User(company!).getPublicData();
     const { data: response } = await transitPlanApi({
       transactionId,
@@ -325,7 +299,7 @@ const fetchQuotations = createAsyncThunk(
 );
 
 const updatePlanDetail = createAsyncThunk(
-  'app/OrderDetail/UPDATE_PLAN_DETAIL',
+  'app/AdminManageOrder/UPDATE_PLAN_DETAIL',
   async (
     { orderId, planId, orderDetail, skipRefetch = false }: TObject,
     { dispatch, fulfillWithValue, rejectWithValue },
@@ -341,7 +315,7 @@ const updatePlanDetail = createAsyncThunk(
         return fulfillWithValue(orderDetail);
       }
       if (orderId) {
-        await dispatch(fetchOrder(orderId));
+        await dispatch(orderManagementThunks.loadData(orderId as string));
       }
 
       return fulfillWithValue(null);
@@ -365,7 +339,7 @@ const fetchPartnerPaymentRecords = createAsyncThunk(
 const createPartnerPaymentRecord = createAsyncThunk(
   CREATE_PARTNER_PAYMENT_RECORD,
   async (payload: TObject, { getState, dispatch }) => {
-    const { partnerPaymentRecords = {}, order } = getState().OrderDetail;
+    const { partnerPaymentRecords = {}, order } = getState().AdminManageOrder;
     const orderListing = Listing(order);
     const orderId = orderListing.getId();
     const { plans = [] } = orderListing.getMetadata();
@@ -384,7 +358,7 @@ const createPartnerPaymentRecord = createAsyncThunk(
       [subOrderDate]: [newPaymentRecord, ...currentPaymentRecordsBySubOrder],
     };
     await transitionOrderPaymentStatusApi(orderId, plans[0]);
-    await dispatch(fetchOnlyOrder(orderId));
+    await dispatch(fetchOrder(orderId));
 
     return newPartnerPaymentRecords;
   },
@@ -393,7 +367,7 @@ const createPartnerPaymentRecord = createAsyncThunk(
 const deletePartnerPaymentRecord = createAsyncThunk(
   DELETE_PARTNER_PAYMENT_RECORD,
   async (paymentRecordId: string, { getState, dispatch }) => {
-    const { partnerPaymentRecords = {}, order } = getState().OrderDetail;
+    const { partnerPaymentRecords = {}, order } = getState().AdminManageOrder;
     const orderListing = Listing(order);
     const orderId = orderListing.getId();
     const { plans = [] } = orderListing.getMetadata();
@@ -410,7 +384,7 @@ const deletePartnerPaymentRecord = createAsyncThunk(
       return acc;
     }, {});
     await transitionOrderPaymentStatusApi(orderId, plans[0]);
-    await dispatch(fetchOnlyOrder(orderId));
+    await dispatch(fetchOrder(orderId));
 
     return newPartnerPaymentRecords;
   },
@@ -430,7 +404,7 @@ const fetchClientPaymentRecords = createAsyncThunk(
 const createClientPaymentRecord = createAsyncThunk(
   CREATE_CLIENT_PAYMENT_RECORD,
   async (payload: TObject, { getState, dispatch }) => {
-    const { clientPaymentRecords = [], order } = getState().OrderDetail;
+    const { clientPaymentRecords = [], order } = getState().AdminManageOrder;
     const orderListing = Listing(order);
     const orderId = orderListing.getId();
     const { plans = [] } = orderListing.getMetadata();
@@ -443,7 +417,7 @@ const createClientPaymentRecord = createAsyncThunk(
     };
     const { data: newPaymentRecord } = await createPaymentRecordApi(apiBody);
     await transitionOrderPaymentStatusApi(orderId, plans[0]);
-    await dispatch(fetchOnlyOrder(orderId));
+    await dispatch(fetchOrder(orderId));
 
     return [newPaymentRecord, ...clientPaymentRecords];
   },
@@ -452,7 +426,7 @@ const createClientPaymentRecord = createAsyncThunk(
 const deleteClientPaymentRecord = createAsyncThunk(
   DELETE_CLIENT_PAYMENT_RECORD,
   async (paymentRecordId: string, { getState, dispatch }) => {
-    const { clientPaymentRecords = [], order } = getState().OrderDetail;
+    const { clientPaymentRecords = [], order } = getState().AdminManageOrder;
     const orderListing = Listing(order);
     const orderId = orderListing.getId();
     const { plans = [] } = orderListing.getMetadata();
@@ -462,14 +436,13 @@ const deleteClientPaymentRecord = createAsyncThunk(
       (paymentRecord: any) => paymentRecord.id !== paymentRecordId,
     );
     await transitionOrderPaymentStatusApi(orderId, plans[0]);
-    await dispatch(fetchOnlyOrder(orderId));
+    await dispatch(fetchOrder(orderId));
 
     return newClientPaymentRecords;
   },
 );
 
 export const OrderDetailThunks = {
-  fetchOrder,
   updateStaffName,
   updateOrderState,
   fetchQuotations,
@@ -486,27 +459,11 @@ export const OrderDetailThunks = {
 
 // ================ Slice ================ //
 const OrderDetailSlice = createSlice({
-  name: 'OrderDetail',
+  name: 'AdminManageOrder',
   initialState,
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(fetchOrder.pending, (state) => ({
-        ...state,
-        fetchOrderInProgress: true,
-        fetchOrderError: null,
-      }))
-      .addCase(fetchOrder.fulfilled, (state, { payload }) => ({
-        ...state,
-        fetchOrderInProgress: false,
-        ...payload,
-      }))
-      .addCase(fetchOrder.rejected, (state, { error }) => ({
-        ...state,
-        fetchOrderInProgress: false,
-        fetchOrderError: error.message,
-      }))
-
       .addCase(updateStaffName.pending, (state) => ({
         ...state,
         updateOrderStaffNameInProgress: true,
@@ -680,14 +637,14 @@ const OrderDetailSlice = createSlice({
         state.deleteClientPaymentRecordError = error.message;
       })
 
-      .addCase(fetchOnlyOrder.pending, (state) => {
+      .addCase(fetchOrder.pending, (state) => {
         state.fetchOnlyOrderInProgress = true;
       })
-      .addCase(fetchOnlyOrder.fulfilled, (state, { payload }) => {
+      .addCase(fetchOrder.fulfilled, (state, { payload }) => {
         state.fetchOnlyOrderInProgress = false;
         state.order = payload;
       })
-      .addCase(fetchOnlyOrder.rejected, (state) => {
+      .addCase(fetchOrder.rejected, (state) => {
         state.fetchOnlyOrderInProgress = false;
       });
   },

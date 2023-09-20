@@ -12,10 +12,10 @@ import { formatTimestamp } from '@src/utils/dates';
 import { type EOrderStates, EQuotationStatus } from '@src/utils/enums';
 import type { TListing, TPagination, TUser } from '@src/utils/types';
 
+import { OrderDetailThunks } from '../../AdminManageOrder.slice';
 import OrderHeaderInfor from '../../components/OrderHeaderInfor/OrderHeaderInfor';
 import OrderHeaderState from '../../components/OrderHeaderState/OrderHeaderState';
 import OrderQuotationDetail from '../../components/OrderQuotationDetail/OrderQuotationDetail';
-import { OrderDetailThunks } from '../../OrderDetail.slice';
 
 import css from './OrderQuotationTab.module.scss';
 

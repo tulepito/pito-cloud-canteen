@@ -8,7 +8,7 @@ import IconTickWithBackground from '@components/Icons/IconTickWithBackground/Ico
 import AlertModal from '@components/Modal/AlertModal';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
-import { OrderDetailThunks } from '@pages/admin/order/[orderId]/OrderDetail.slice';
+import { OrderDetailThunks } from '@pages/admin/order/[orderId]/AdminManageOrder.slice';
 import { ETransition } from '@src/utils/transaction';
 
 import css from './StateItemTooltip.module.scss';
@@ -24,7 +24,7 @@ const StateItemTooltip: React.FC<TStateItemTooltipProps> = ({
 }) => {
   const dispatch = useAppDispatch();
   const transitInProgress = useAppSelector(
-    (state) => state.OrderDetail.transitInProgress,
+    (state) => state.AdminManageOrder.transitInProgress,
   );
   const deliveringController = useBoolean();
   const deliveredController = useBoolean();

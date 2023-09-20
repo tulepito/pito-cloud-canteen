@@ -2,8 +2,8 @@ import Button from '@components/Button/Button';
 import { parseThousandNumberToInteger } from '@helpers/format';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
+import { OrderDetailThunks } from '@pages/admin/order/[orderId]/AdminManageOrder.slice';
 import { generateSKU } from '@pages/admin/order/[orderId]/helpers/AdminOrderDetail';
-import { OrderDetailThunks } from '@pages/admin/order/[orderId]/OrderDetail.slice';
 import { User } from '@src/utils/data';
 import { EPaymentType } from '@src/utils/enums';
 import type { TUser } from '@src/utils/types';
@@ -47,13 +47,13 @@ const PartnerPaymentDetail: React.FC<PartnerPaymentDetailProps> = (props) => {
   const { companyName } = companyUser.getPublicData();
 
   const createPartnerPaymentRecordInProgress = useAppSelector(
-    (state) => state.OrderDetail.createPartnerPaymentRecordInProgress,
+    (state) => state.AdminManageOrder.createPartnerPaymentRecordInProgress,
   );
   const createPartnerPaymentRecordError = useAppSelector(
-    (state) => state.OrderDetail.createPartnerPaymentRecordError,
+    (state) => state.AdminManageOrder.createPartnerPaymentRecordError,
   );
   const deletePartnerPaymentRecordInProgress = useAppSelector(
-    (state) => state.OrderDetail.deletePartnerPaymentRecordInProgress,
+    (state) => state.AdminManageOrder.deletePartnerPaymentRecordInProgress,
   );
   const addPaymentDisabled = totalWithVAT === paidAmount;
 

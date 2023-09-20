@@ -55,7 +55,7 @@ const PartnerSubOrderDetailPage: React.FC<
     (state) => state.PartnerSubOrderDetail.fetchOrderInProgress,
   );
   const isFetchingOrderDetails = useAppSelector(
-    (state) => state.OrderManagement.isFetchingOrderDetails,
+    (state) => state.OrderManagement.fetchOrderInProgress,
   );
 
   const updateOrderModalContainer = useBoolean();

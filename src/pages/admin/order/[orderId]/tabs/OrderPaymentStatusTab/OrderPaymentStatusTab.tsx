@@ -21,9 +21,9 @@ import {
 } from '@src/utils/enums';
 import type { TListing, TUser } from '@src/utils/types';
 
+import { OrderDetailThunks } from '../../AdminManageOrder.slice';
 import OrderHeaderState from '../../components/OrderHeaderState/OrderHeaderState';
 import { calculatePaidAmountBySubOrderDate } from '../../helpers/AdminOrderDetail';
-import { OrderDetailThunks } from '../../OrderDetail.slice';
 
 import ClientPaymentDetail from './components/ClientPaymentDetail/ClientPaymentDetail';
 import PartnerPaymentDetail from './components/PartnerPaymentDetail/PartnerPaymentDetail';
@@ -60,12 +60,12 @@ const OrderPaymentStatusTab: React.FC<OrderPaymentStatusTabProps> = (props) => {
     (state) => state.SystemAttributes.currentOrderVATPercentage,
   );
   const partnerPaymentRecords = useAppSelector(
-    (state) => state.OrderDetail.partnerPaymentRecords,
+    (state) => state.AdminManageOrder.partnerPaymentRecords,
     shallowEqual,
   );
 
   const clientPaymentRecords = useAppSelector(
-    (state) => state.OrderDetail.clientPaymentRecords,
+    (state) => state.AdminManageOrder.clientPaymentRecords,
     shallowEqual,
   );
 
