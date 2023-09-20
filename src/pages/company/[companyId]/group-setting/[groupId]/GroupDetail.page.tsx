@@ -77,7 +77,7 @@ const GroupDetailPage = () => {
     shallowEqual,
   );
   const nutritions = useAppSelector(
-    (state) => state.company.nutritions,
+    (state) => state.SystemAttributes.nutritions,
     shallowEqual,
   );
 
@@ -208,7 +208,6 @@ const GroupDetailPage = () => {
         groupId: groupId as string,
       }),
     );
-    dispatch(companyThunks.fetchAttributes());
   }, [groupId]);
 
   const groupInfoFormInitialValues = useMemo(

@@ -33,7 +33,7 @@ const NutritionForm: React.FC<TNutritionFormProps> = ({
 
   const intl = useIntl();
   const nutritionsOptions =
-    useAppSelector((state) => state.BookerDraftOrderPage.nutritions) || [];
+    useAppSelector((state) => state.SystemAttributes.nutritions) || [];
 
   const nutritions = useField('nutritions', form);
   const mealType = useField('mealType', form);

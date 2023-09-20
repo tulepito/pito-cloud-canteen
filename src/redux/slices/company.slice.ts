@@ -4,7 +4,6 @@ import { createSlice } from '@reduxjs/toolkit';
 import flatten from 'lodash/flatten';
 import isEmpty from 'lodash/isEmpty';
 
-import { showAttributesApi } from '@apis/attributes';
 import type {
   CreateGroupApiBody,
   DeleteGroupApiData,
@@ -43,7 +42,6 @@ import type {
   TCompany,
   TCreateCompanyApiParams,
   TImage,
-  TKeyValue,
   TObject,
   TPagination,
   TUpdateCompanyApiParams,
@@ -120,10 +118,6 @@ type TCompanyState = {
 
   adminUpdateCompanyStateInProgress: boolean;
   adminUpdateCompanyStateError: any;
-
-  nutritions: TKeyValue[];
-  fetchAttributesInProgress: boolean;
-  fetchAttributesError: any;
 };
 
 // ================ Thunk types ================ //
@@ -148,8 +142,6 @@ const ADMIN_TRANSFER_COMPANY_OWNER = 'app/Company/ADMIN_TRANSFER_COMPANY_OWNER';
 const ADMIN_QUERY_COMPANIES = 'app/ManageCompanies/ADMIN_QUERY_COMPANIES';
 const ADMIN_UPDATE_COMPANY_STATE =
   'app/ManageCompanies/ADMIN_UPDATE_COMPANY_STATE';
-
-const FETCH_ATTRIBUTES = 'app/ManageCompanies/FETCH_ATTRIBUTES';
 
 const initialState: TCompanyState = {
   groupList: [],
@@ -200,10 +192,6 @@ const initialState: TCompanyState = {
   adminUpdateCompanyStateInProgress: false,
   adminUpdateCompanyStateError: undefined,
   totalItems: 0,
-
-  nutritions: [],
-  fetchAttributesInProgress: false,
-  fetchAttributesError: null,
 };
 
 const requestUploadCompanyLogo = createAsyncThunk(
@@ -644,12 +632,6 @@ const adminUpdateCompanyState = createAsyncThunk(
   },
 );
 
-const fetchAttributes = createAsyncThunk(FETCH_ATTRIBUTES, async () => {
-  const { data: response } = await showAttributesApi();
-
-  return response;
-});
-
 export const companyThunks = {
   companyInfo,
   groupInfo,
@@ -669,7 +651,6 @@ export const companyThunks = {
   adminTransferCompanyOwner,
   adminQueryCompanies,
   adminUpdateCompanyState,
-  fetchAttributes,
 };
 
 export const companySlice = createSlice({
@@ -1107,31 +1088,7 @@ export const companySlice = createSlice({
         ...state,
         queryCompaniesError: action.payload,
         queryCompaniesInProgress: false,
-      }))
-
-      .addCase(fetchAttributes.pending, (state) => {
-        return {
-          ...state,
-          fetchAttributesInProgress: true,
-          fetchAttributesError: null,
-        };
-      })
-      .addCase(fetchAttributes.fulfilled, (state, { payload }) => {
-        const { nutritions = [] } = payload;
-
-        return {
-          ...state,
-          fetchAttributesInProgress: false,
-          nutritions,
-        };
-      })
-      .addCase(fetchAttributes.rejected, (state, { error }) => {
-        return {
-          ...state,
-          fetchAttributesInProgress: false,
-          fetchAttributesError: error.message,
-        };
-      });
+      }));
   },
 });
 

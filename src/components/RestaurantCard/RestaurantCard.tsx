@@ -13,6 +13,7 @@ import { calculateDistance } from '@helpers/mapHelpers';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { getListingImageById } from '@pages/company/booker/orders/draft/[orderId]/restaurants/helpers';
 import { BadgeTypeBaseOnCategory } from '@src/utils/attributes';
+import type { TKeyValue } from '@src/utils/types';
 import { Listing } from '@utils/data';
 import { EImageVariants } from '@utils/enums';
 
@@ -45,10 +46,10 @@ const RestaurantCard: React.FC<TRestaurantCardProps> = ({
   const intl = useIntl();
   const classes = classNames(css.root, className);
   const categoryOptions = useAppSelector(
-    (state) => state.BookerSelectRestaurant.categories,
+    (state) => state.SystemAttributes.categories,
   );
   const packagingOptions = useAppSelector(
-    (state) => state.BookerSelectRestaurant.packaging,
+    (state) => state.SystemAttributes.packaging,
   );
   const restaurantId = Listing(restaurant).getId();
   const { geolocation: origin } = Listing(restaurant).getAttributes();
@@ -71,7 +72,7 @@ const RestaurantCard: React.FC<TRestaurantCardProps> = ({
     () =>
       categories.slice(0, 3).map((category: string) => {
         return {
-          ...categoryOptions.find((item) => {
+          ...categoryOptions.find((item: TKeyValue) => {
             return Intl.Collator('vi').compare(item.key, category) === 0;
           }),
           badgeType: BadgeTypeBaseOnCategory(category),
@@ -81,7 +82,7 @@ const RestaurantCard: React.FC<TRestaurantCardProps> = ({
     [JSON.stringify(categories), JSON.stringify(categoryOptions)],
   );
   const restaurantPackaging = packagingOptions.find(
-    (item) => item.key === packaging[0],
+    (item: TKeyValue) => item.key === packaging[0],
   )?.label;
 
   const handleClickCard = () => {

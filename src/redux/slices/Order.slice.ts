@@ -24,7 +24,6 @@ import {
   updateOrderStateToDraftApi,
   updatePlanDetailsApi,
 } from '@apis/orderApi';
-import { fetchSearchFilterApi } from '@apis/userApi';
 import { queryAllPages } from '@helpers/apiHelpers';
 import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
 import { getMenuQueryInSpecificDay } from '@helpers/listingSearchQuery';
@@ -126,10 +125,6 @@ type TOrderInitialState = {
   onRescommendRestaurantForSpecificDateInProgress: boolean;
   onRescommendRestaurantForSpecificDateError: any;
 
-  nutritions: {
-    key: string;
-    label: string;
-  }[];
   availableOrderDetailCheckList: {
     [timestamp: string]: {
       isAvailable: boolean;
@@ -249,7 +244,6 @@ const initialState: TOrderInitialState = {
   onRescommendRestaurantForSpecificDateInProgress: false,
   onRescommendRestaurantForSpecificDateError: null,
 
-  nutritions: [],
   availableOrderDetailCheckList: {},
   orderRestaurantList: [],
   fetchOrderRestaurantListInProgress: false,
@@ -294,7 +288,6 @@ const FETCH_RESTAURANT_COVER_IMAGE = 'app/Order/FETCH_RESTAURANT_COVER_IMAGE';
 const RECOMMEND_RESTAURANT = 'app/Order/RECOMMEND_RESTAURANT';
 const RECOMMEND_RESTAURANT_FOR_SPECIFIC_DAY =
   'app/Order/RECOMMEND_RESTAURANT_FOR_SPECIFIC_DAY';
-const FETCH_NUTRITIONS = 'app/Order/FETCH_NUTRITIONS';
 const CHECK_RESTAURANT_STILL_AVAILABLE =
   'app/Order/CHECK_RESTAURANT_STILL_AVAILABLE';
 const FETCH_ORDER_RESTAURANTS = 'app/Order/FETCH_ORDER_RESTAURANTS';
@@ -770,12 +763,6 @@ const bookerPublishOrder = createAsyncThunk(
   },
 );
 
-const fetchNutritions = createAsyncThunk(FETCH_NUTRITIONS, async () => {
-  const { data: searchFiltersResponse } = await fetchSearchFilterApi();
-
-  return searchFiltersResponse.nutritions;
-});
-
 const checkRestaurantStillAvailable = createAsyncThunk(
   CHECK_RESTAURANT_STILL_AVAILABLE,
   async (_, { getState, extra: sdk }) => {
@@ -953,7 +940,6 @@ export const orderAsyncActions = {
   fetchRestaurantCoverImages,
   recommendRestaurants,
   recommendRestaurantForSpecificDay,
-  fetchNutritions,
   checkRestaurantStillAvailable,
   fetchOrderRestaurants,
   getCompanyOrderNotification,
@@ -1339,11 +1325,6 @@ const orderSlice = createSlice({
           onRescommendRestaurantForSpecificDateError: error.message,
         }),
       )
-
-      .addCase(fetchNutritions.fulfilled, (state, { payload }) => ({
-        ...state,
-        nutritions: payload,
-      }))
 
       .addCase(checkRestaurantStillAvailable.pending, () => {})
       .addCase(

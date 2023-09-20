@@ -33,7 +33,7 @@ const UpdateProfileModal: React.FC<UpdateProfileModalProps> = (props) => {
   } = props;
   const dispatch = useAppDispatch();
   const nutritionOptions = useAppSelector(
-    (state) => state.ParticipantOrderList.nutritions,
+    (state) => state.SystemAttributes.nutritions,
     shallowEqual,
   );
   const updateProfileInProgress = useAppSelector(

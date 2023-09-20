@@ -31,10 +31,6 @@ export const useLoadData = ({ orderId }: { orderId: string }) => {
     })();
   }, [dispatch, orderId]);
 
-  useEffect(() => {
-    dispatch(BookerDraftOrderPageThunks.fetchAttributes());
-  }, []);
-
   return {
     order,
     fetchOrderInProgress,

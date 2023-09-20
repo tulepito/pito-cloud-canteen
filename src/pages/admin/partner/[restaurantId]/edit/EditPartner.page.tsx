@@ -74,10 +74,13 @@ const EditPartnerPage = () => {
 
     restaurantTableActionInProgress,
     restaurantTableActionError,
-    packaging,
-    categories,
-    daySessions,
   } = useAppSelector((state) => state.partners);
+  const {
+    packaging = [],
+    categories = [],
+    daySessions = [],
+  } = useAppSelector((state) => state.SystemAttributes);
+
   const dispatch = useAppDispatch();
   const router = useRouter();
   const { query } = router;
@@ -149,10 +152,6 @@ const EditPartnerPage = () => {
     // should reset initial states
     dispatch(resetInitialStates());
   }, [dispatch]);
-
-  useEffect(() => {
-    dispatch(partnerThunks.fetchAttributes());
-  }, []);
 
   useEffect(() => {
     if (!restaurantId) return;

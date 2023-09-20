@@ -127,10 +127,6 @@ const CreatePartnerFoodPage = () => {
     }
   }, [restaurantId, dispatch]);
 
-  useEffect(() => {
-    dispatch(foodSliceThunks.fetchAttributes());
-  }, []);
-
   if (showFoodInProgress || showPartnerListingInProgress) {
     return <LoadingContainer />;
   }

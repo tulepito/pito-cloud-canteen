@@ -67,7 +67,7 @@ const OrderSettingModal: React.FC<TOrderSettingModalProps> = (props) => {
     (state) => state.Order.updateOrderDetailInProgress,
   );
   const nutritionsOptions = useAppSelector(
-    (state) => state.Order.nutritions,
+    (state) => state.SystemAttributes.nutritions,
     shallowEqual,
   );
 

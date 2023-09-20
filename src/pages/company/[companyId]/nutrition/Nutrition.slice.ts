@@ -1,6 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-import { fetchSearchFilterApi } from '@apis/userApi';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { EListingType } from '@src/utils/enums';
 import { denormalisedResponseEntities } from '@utils/data';
@@ -20,12 +19,6 @@ type TNutritionState = {
 
   searchFoodInRestaurantInProgress: boolean;
   searchFoodInRestaurantError: any;
-
-  nutritions: {
-    key: string;
-    label: string;
-  }[];
-  fetchFilterInProgress: boolean;
 };
 const initialState: TNutritionState = {
   selectedRestaurant: null,
@@ -38,16 +31,13 @@ const initialState: TNutritionState = {
 
   searchFoodInRestaurantInProgress: false,
   searchFoodInRestaurantError: null,
-
-  nutritions: [],
-  fetchFilterInProgress: false,
 };
 
 // ================ Thunk types ================ //
 const FETCH_SELECTED_RESTAURANT = 'app/Nutrition/FETCH_SELECTED_RESTAURANT';
 const FETCH_FOOD_FROM_RESTAURANT = 'app/Nutrition/FETCH_FOOD_FROM_RESTAURANT';
 const SEARCH_FOOD_IN_RESTAURANT = 'app/Nutrition/SEARCH_FOOD_IN_RESTAURANT';
-const FETCH_SEARCH_FILTER = 'app/Nutrition/FETCH_SEARCH_FILTER';
+
 // ================ Async thunks ================ //
 const fetchSelectedRestaurant = createAsyncThunk(
   FETCH_SELECTED_RESTAURANT,
@@ -109,17 +99,10 @@ const searchFoodInRestaurant = createAsyncThunk(
   },
 );
 
-const fetchSearchFilter = createAsyncThunk(FETCH_SEARCH_FILTER, async () => {
-  const { data: searchFiltersResponse } = await fetchSearchFilterApi();
-
-  return searchFiltersResponse;
-});
-
 export const NutritionThunks = {
   fetchSelectedRestaurant,
   fetchFoodFromRestaurant,
   searchFoodInRestaurant,
-  fetchSearchFilter,
 };
 
 // ================ Slice ================ //
@@ -166,14 +149,6 @@ const NutritionSlice = createSlice({
       .addCase(searchFoodInRestaurant.rejected, (state, { error }) => {
         state.searchFoodInRestaurantInProgress = false;
         state.searchFoodInRestaurantError = error;
-      })
-
-      .addCase(fetchSearchFilter.pending, (state) => {
-        state.fetchFilterInProgress = true;
-      })
-      .addCase(fetchSearchFilter.fulfilled, (state, action) => {
-        state.fetchFilterInProgress = false;
-        state.nutritions = action.payload.nutritions;
       });
   },
 });

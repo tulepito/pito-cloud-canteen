@@ -2,7 +2,6 @@ import { createSlice } from '@reduxjs/toolkit';
 import omit from 'lodash/omit';
 
 import { toggleAppStatusApi } from '@apis/partnerApi';
-import { fetchSearchFilterApi } from '@apis/userApi';
 import { queryAllPages } from '@helpers/apiHelpers';
 import { createSubmitUpdatePartnerValues } from '@helpers/partnerHelper';
 import { createAsyncThunk } from '@redux/redux.helper';
@@ -15,22 +14,13 @@ import { EImageVariants } from '@src/utils/enums';
 import { storableError } from '@src/utils/errors';
 import { pickRenderableImagesByProperty } from '@src/utils/images';
 import { ETransition } from '@src/utils/transaction';
-import type {
-  TCurrentUser,
-  TKeyValue,
-  TObject,
-  TOwnListing,
-} from '@src/utils/types';
+import type { TCurrentUser, TObject, TOwnListing } from '@src/utils/types';
 
 // ================ Initial states ================ //
 type TPartnerSettingsState = {
-  nutritions: TKeyValue[];
   restaurantListing: TOwnListing | null;
   fetchDataInProgress: boolean;
   fetchDataError: any;
-
-  fetchAttributesInProgress: boolean;
-  fetchAttributesError: any;
 
   uploadedAvatars: any;
   uploadedAvatarsOrder: any[];
@@ -58,13 +48,9 @@ type TPartnerSettingsState = {
   toggleAppStatusError: any;
 };
 const initialState: TPartnerSettingsState = {
-  nutritions: [],
   restaurantListing: null,
   fetchDataInProgress: false,
   fetchDataError: null,
-
-  fetchAttributesInProgress: false,
-  fetchAttributesError: null,
 
   // Handle upload image
   uploadedAvatars: {},
@@ -92,7 +78,6 @@ const initialState: TPartnerSettingsState = {
 };
 
 // ================ Thunk types ================ //
-const FETCH_ATTRIBUTES = 'app/PartnerSettings/FETCH_ATTRIBUTES';
 
 // ================ Async thunks ================ //
 
@@ -188,12 +173,6 @@ const updatePartnerRestaurantListing = createAsyncThunk(
     }
   },
 );
-
-const fetchAttributes = createAsyncThunk(FETCH_ATTRIBUTES, async () => {
-  const { data: response } = await fetchSearchFilterApi();
-
-  return response;
-});
 
 const uploadAvatar = createAsyncThunk(
   'app/PartnerSettings/REQUEST_AVATAR_UPLOAD',
@@ -323,7 +302,6 @@ const toggleRestaurantActiveStatus = createAsyncThunk(
 
 export const PartnerSettingsThunks = {
   loadData,
-  fetchAttributes,
   requestCoverUpload: uploadCover,
   requestAvatarUpload: uploadAvatar,
   updatePartnerRestaurantListing,
@@ -398,19 +376,6 @@ const PartnerSettingsSlice = createSlice({
       .addCase(loadData.rejected, (state, { payload }) => {
         state.fetchDataInProgress = false;
         state.fetchDataError = payload;
-      })
-      .addCase(fetchAttributes.pending, (state) => {
-        state.fetchAttributesInProgress = true;
-        state.fetchAttributesError = false;
-      })
-      .addCase(fetchAttributes.fulfilled, (state, action) => {
-        const { nutritions = [] } = action.payload;
-        state.nutritions = nutritions;
-        state.fetchAttributesInProgress = false;
-      })
-      .addCase(fetchAttributes.rejected, (state) => {
-        state.fetchAttributesInProgress = false;
-        state.fetchAttributesError = true;
       })
       .addCase(uploadAvatar.pending, (state, action) => {
         const { id } = action.meta.arg;

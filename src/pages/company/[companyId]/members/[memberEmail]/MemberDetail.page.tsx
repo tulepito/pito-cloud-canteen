@@ -50,7 +50,7 @@ const MemberDetailPage: React.FC<MemberDetailPageProps> = () => {
     (state) => state.companyMember,
   );
   const nutritions = useAppSelector(
-    (state) => state.company.nutritions,
+    (state) => state.SystemAttributes.nutritions,
     shallowEqual,
   );
 
@@ -87,7 +87,6 @@ const MemberDetailPage: React.FC<MemberDetailPageProps> = () => {
     const fetchData = async () => {
       dispatch(addWorkspaceCompanyId(companyId));
       await dispatch(companyThunks.companyInfo());
-      await dispatch(companyThunks.fetchAttributes());
     };
     fetchData();
   }, [companyId, dispatch]);

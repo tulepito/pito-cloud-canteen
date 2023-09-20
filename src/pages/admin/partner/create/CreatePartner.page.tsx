@@ -27,9 +27,10 @@ const CreatePartnerPage: React.FC<any> = () => {
     removedCoverIds,
     createDraftPartnerInProgress,
     createDraftPartnerError,
-    packaging,
-    categories,
   } = useAppSelector((state) => state.partners);
+  const { packaging = [], categories = [] } = useAppSelector(
+    (state) => state.SystemAttributes,
+  );
   const dispatch = useAppDispatch();
 
   const onAvatarUpload = (params: TObject) => {
@@ -63,10 +64,6 @@ const CreatePartnerPage: React.FC<any> = () => {
     // should reset initial states
     dispatch(resetInitialStates());
   }, [dispatch]);
-
-  useEffect(() => {
-    dispatch(partnerThunks.fetchAttributes());
-  }, []);
 
   return (
     <EditPartnerWizard

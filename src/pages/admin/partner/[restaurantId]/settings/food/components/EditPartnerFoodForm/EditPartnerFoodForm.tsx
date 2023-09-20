@@ -77,14 +77,16 @@ const EditPartnerFoodFormComponent: React.FC<
   const dispatch = useAppDispatch();
   const ready = isEqual(submittedValues, values);
   const {
+    nutritions: nutritionsOptions = [],
+    categories: categoriesOptions = [],
+    packaging: packagingOptions = [],
+  } = useAppSelector((state) => state.SystemAttributes, shallowEqual);
+  const {
     uploadedImages,
     uploadedImagesOrder,
     removedImageIds,
     uploadImageError,
     currentFoodListing = {},
-    nutritions: nutritionsOptions = [],
-    categories: categoriesOptions = [],
-    packaging: packagingOptions = [],
   } = useAppSelector((state) => state.foods, shallowEqual);
 
   const images = pickRenderableImages(

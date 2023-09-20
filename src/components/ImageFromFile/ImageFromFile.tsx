@@ -42,11 +42,13 @@ const ImageFromFile: React.FC<TImageFromFileProps> = (props) => {
   const { className, rootClassName, aspectRatioClassName, file, id, children } =
     props;
 
-  useEffect(() => {
-    setPromisedImage(readImage(file));
-  }, []);
   const classes = classNames(rootClassName || css.root, className);
   const aspectRatioClasses = aspectRatioClassName || css.aspectWrapper;
+
+  useEffect(() => {
+    setPromisedImage(readImage(file));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <Promised

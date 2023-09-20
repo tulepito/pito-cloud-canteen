@@ -24,7 +24,6 @@ import {
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { normalizePlanDetailsToEvent } from '@pages/company/booker/orders/draft/[orderId]/helpers/normalizeData';
-import { BookerSelectRestaurantThunks } from '@pages/company/booker/orders/draft/[orderId]/restaurants/BookerSelectRestaurant.slice';
 import { useGetCalendarExtraResources } from '@pages/company/booker/orders/draft/[orderId]/restaurants/hooks/calendar';
 import {
   addCurrentSelectedMenuId,
@@ -325,11 +324,6 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
       dispatch(orderAsyncActions.fetchRestaurantCoverImages());
     }
   }, [JSON.stringify(restaurantListFromOrder)]);
-
-  useEffect(() => {
-    dispatch(orderAsyncActions.fetchNutritions());
-    dispatch(BookerSelectRestaurantThunks.fetchSearchFilter());
-  }, []);
 
   const handleSelectFood = async (values: TSelectFoodFormValues) => {
     dispatch(setCanNotGoToStep4(true));

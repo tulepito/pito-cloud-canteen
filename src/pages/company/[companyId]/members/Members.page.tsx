@@ -44,7 +44,7 @@ const MembersPage = () => {
     shallowEqual,
   );
   const nutritions = useAppSelector(
-    (state) => state.company.nutritions,
+    (state) => state.SystemAttributes.nutritions,
     shallowEqual,
   );
 
@@ -219,7 +219,6 @@ const MembersPage = () => {
       dispatch(resetError());
       dispatch(addWorkspaceCompanyId(companyId));
       await dispatch(companyThunks.companyInfo());
-      await dispatch(companyThunks.fetchAttributes());
     };
     if (companyId) fetchData();
   }, [companyId]);

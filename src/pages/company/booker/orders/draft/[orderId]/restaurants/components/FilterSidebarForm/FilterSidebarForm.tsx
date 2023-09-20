@@ -28,13 +28,13 @@ const FilterSidebarFormComponent: React.FC<TFilterSidebarFormComponentProps> = (
   const router = useRouter();
 
   const menuTypesOptions = useAppSelector(
-    (state) => state.BookerSelectRestaurant.menuTypes,
+    (state) => state.SystemAttributes.menuTypes,
   );
   const categoriesOptions = useAppSelector(
-    (state) => state.BookerSelectRestaurant.categories,
+    (state) => state.SystemAttributes.categories,
   );
   const packagingOptions = useAppSelector(
-    (state) => state.BookerSelectRestaurant.packaging,
+    (state) => state.SystemAttributes.packaging,
   );
 
   const onResetAllFilters = () => {

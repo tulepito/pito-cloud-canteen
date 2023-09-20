@@ -8,7 +8,6 @@ import uniqBy from 'lodash/uniqBy';
 
 import { fetchFoodListFromMenuApi } from '@apis/admin';
 import { updatePlanDetailsApi } from '@apis/orderApi';
-import { fetchSearchFilterApi } from '@apis/userApi';
 import { queryAllPages } from '@helpers/apiHelpers';
 import type { TMenuQueryParams } from '@helpers/listingSearchQuery';
 import { getMenuQuery, getRestaurantQuery } from '@helpers/listingSearchQuery';
@@ -17,22 +16,13 @@ import { orderAsyncActions } from '@redux/slices/Order.slice';
 import { CompanyPermission, UserPermission } from '@src/types/UserPermission';
 import { denormalisedResponseEntities, Listing } from '@utils/data';
 import { EImageVariants, EListingType } from '@utils/enums';
-import type { TListing, TPagination, TUser } from '@utils/types';
+import type { TListing, TObject, TPagination, TUser } from '@utils/types';
 
 export const MANAGE_ORDER_PAGE_SIZE = 10;
 
 // ================ Initial states ================ //
-type TKeyValue<T = string> = {
-  key: string;
-  label: T;
-};
-
 type TOrderInitialState = {
   restaurant: TListing | null;
-
-  menuTypes: TKeyValue[];
-  categories: TKeyValue[];
-  packaging: TKeyValue[];
   restaurantIdList: string[];
 
   searchResult: TListing[];
@@ -42,7 +32,6 @@ type TOrderInitialState = {
     menuId: string;
   }[];
 
-  fetchFilterInProgress: boolean;
   searchInProgress: boolean;
 
   order: TListing | null;
@@ -83,17 +72,12 @@ type TOrderInitialState = {
 
 const initialState: TOrderInitialState = {
   restaurant: null,
-
-  menuTypes: [],
-  categories: [],
-  packaging: [],
   restaurantIdList: [],
 
   searchResult: [],
   totalItems: 0,
   combinedRestaurantMenuData: [],
 
-  fetchFilterInProgress: false,
   searchInProgress: false,
 
   order: null,
@@ -133,7 +117,6 @@ const initialState: TOrderInitialState = {
 
 // ================ Thunk types ================ //
 const FETCH_RESTAURANT = 'app/BookerSelectRestaurant/FETCH_RESTAURANT';
-const FETCH_SEARCH_FILTER = 'app/BookerSelectRestaurant/FETCH_SEARCH_FILTER';
 const SEARCH_RESTAURANT = 'app/BookerSelectRestaurant/SEARCH_RESTAURANT';
 const FETCH_FOOD_LIST_FROM_RESTAURANT =
   'app/BookerSelectRestaurant/FETCH_FOOD_LIST_FROM_RESTAURANT';
@@ -196,12 +179,6 @@ const fetchRestaurant = createAsyncThunk(
     };
   },
 );
-
-const fetchSearchFilter = createAsyncThunk(FETCH_SEARCH_FILTER, async () => {
-  const { data: searchFiltersResponse } = await fetchSearchFilterApi();
-
-  return searchFiltersResponse;
-});
 
 const searchRestaurants = createAsyncThunk(
   SEARCH_RESTAURANT,
@@ -365,7 +342,7 @@ const fetchFoodListFromRestaurant = createAsyncThunk(
     const menuId =
       menuIdParam ||
       combinedRestaurantMenuData.find(
-        (item) => item.restaurantId === restaurantId,
+        (item: TObject) => item.restaurantId === restaurantId,
       )?.menuId;
 
     const { data: foodList } = await fetchFoodListFromMenuApi({
@@ -472,15 +449,11 @@ const fetchRestaurantReviews = createAsyncThunk(
 
 export const BookerSelectRestaurantThunks = {
   fetchRestaurant,
-
-  fetchSearchFilter,
   searchRestaurants,
   fetchFoodListFromRestaurant,
-
   fetchOrder,
   fetchPlanDetail,
   updatePlanDetail,
-
   fetchCompanyAccount,
   fetchRestaurantReviews,
 };
@@ -498,15 +471,6 @@ const BookerSelectRestaurantSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchSearchFilter.pending, (state) => {
-        state.fetchFilterInProgress = true;
-      })
-      .addCase(fetchSearchFilter.fulfilled, (state, action) => {
-        state.fetchFilterInProgress = false;
-        state.menuTypes = action.payload.menuTypes;
-        state.categories = action.payload.categories;
-        state.packaging = action.payload.packaging;
-      })
       .addCase(searchRestaurants.pending, (state) => {
         state.searchInProgress = true;
       })
