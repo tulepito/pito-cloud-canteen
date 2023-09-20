@@ -21,6 +21,7 @@ import {
   EPaymentType,
   ESubOrderStatus,
 } from '@src/utils/enums';
+import { ETransition } from '@src/utils/transaction';
 import type { TListing, TUser } from '@src/utils/types';
 
 import OrderHeaderState from '../../components/OrderHeaderState/OrderHeaderState';
@@ -96,6 +97,8 @@ const OrderPaymentStatusTab: React.FC<OrderPaymentStatusTabProps> = (props) => {
               partner[orderDetail[subOrderDate].restaurant.id]?.quotation,
             ) ||
             orderDetail[subOrderDate].status === ESubOrderStatus.CANCELED ||
+            orderDetail[subOrderDate].lastTransition ===
+              ETransition.OPERATOR_CANCEL_PLAN ||
             !orderDetail[subOrderDate].transactionId
           ) {
             return null;

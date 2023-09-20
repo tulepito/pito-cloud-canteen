@@ -1,6 +1,7 @@
 import isEmpty from 'lodash/isEmpty';
 
 import { Listing, User } from '@src/utils/data';
+import { ETransition } from '@src/utils/transaction';
 import type { TListing, TObject, TUser } from '@src/utils/types';
 import { EParticipantOrderStatus, ESubOrderStatus } from '@utils/enums';
 
@@ -16,10 +17,12 @@ const groupFoodForGroupOrder = (
         memberOrders,
         restaurant = {},
         status: subOrderStatus,
+        lastTransition,
       } = rawOrderDetailOfDate as TObject;
       const { id, restaurantName, foodList: foodListOfDate = {} } = restaurant;
       if (
         subOrderStatus === ESubOrderStatus.CANCELED ||
+        lastTransition === ETransition.OPERATOR_CANCEL_PLAN ||
         (date && d !== date.toString())
       ) {
         return result;
@@ -109,11 +112,13 @@ const groupFoodForNormal = (orderDetail: TObject, date?: number | string) => {
         lineItems = [],
         restaurant = {},
         status: subOrderStatus,
+        lastTransition,
       } = rawOrderDetailOfDate as TObject;
       const { id, restaurantName, foodList: foodListOfDate = {} } = restaurant;
 
       if (
         subOrderStatus === ESubOrderStatus.CANCELED ||
+        lastTransition === ETransition.OPERATOR_CANCEL_PLAN ||
         (date && d !== date.toString())
       ) {
         return result;

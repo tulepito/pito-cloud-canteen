@@ -3,6 +3,7 @@ import { calculatePriceQuotationInfo } from '@helpers/order/cartInfoHelper';
 
 import { formatTimestamp } from '../dates';
 import { ESubOrderStatus } from '../enums';
+import { ETransition } from '../transaction';
 import type { TObject } from '../types';
 
 const BASE_URL = process.env.NEXT_PUBLIC_CANONICAL_URL;
@@ -34,8 +35,11 @@ const bookerSubOrderIsCanceled = ({
     planOrderDetail,
   ).reduce<TObject>((result, currentOrderDetailEntry) => {
     const [subOrderDate, rawOrderDetailOfDate] = currentOrderDetailEntry;
-    const { status } = rawOrderDetailOfDate;
-    if (status === ESubOrderStatus.CANCELED) {
+    const { status, lastTransition } = rawOrderDetailOfDate;
+    if (
+      status === ESubOrderStatus.CANCELED ||
+      lastTransition === ETransition.OPERATOR_CANCEL_PLAN
+    ) {
       return result;
     }
 

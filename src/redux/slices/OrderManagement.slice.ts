@@ -1631,6 +1631,43 @@ const OrderManagementSlice = createSlice({
         orderData: payload,
       };
     },
+    updateOrderDetailLastTransition: (state, { payload }) => {
+      const { planData, draftOrderDetail } = state;
+      const { lastTransition, subOrderDate } = payload;
+      const { orderDetail } = Listing(planData as TListing).getMetadata();
+      const newOrderDetail = {
+        ...orderDetail,
+        [subOrderDate]: {
+          ...(orderDetail[subOrderDate] || {}),
+          lastTransition,
+        },
+      };
+
+      const newPlanData = {
+        ...planData,
+        attributes: {
+          ...planData.attributes,
+          metadata: {
+            ...planData.attributes.metadata,
+            orderDetail: newOrderDetail,
+          },
+        },
+      };
+
+      const newDraftOrderDetail = {
+        ...draftOrderDetail,
+        [subOrderDate]: {
+          ...(draftOrderDetail[subOrderDate] || {}),
+          lastTransition,
+        },
+      };
+
+      return {
+        ...state,
+        draftOrderDetail: newDraftOrderDetail,
+        planData: newPlanData,
+      };
+    },
   },
   extraReducers: (builder) => {
     builder

@@ -8,6 +8,7 @@ import { queryPaymentRecordOnFirebase } from '@services/payment';
 import { handleError } from '@services/sdk';
 import { Listing } from '@src/utils/data';
 import { EOrderStates, EPaymentType, ESubOrderStatus } from '@src/utils/enums';
+import { ETransition } from '@src/utils/transaction';
 
 import { calculateClientTotalPriceAndPaidAmount } from './check-valid-payment.service';
 
@@ -63,7 +64,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       if (
         !orderDetail[subOrderDate]?.transactionId ||
         (orderDetail[subOrderDate]?.transactionId &&
-          orderDetail[subOrderDate]?.status === ESubOrderStatus.CANCELED)
+          orderDetail[subOrderDate]?.status === ESubOrderStatus.CANCELED) ||
+        orderDetail[subOrderDate]?.lastTransition ===
+          ETransition.OPERATOR_CANCEL_PLAN
       ) {
         return result;
       }
@@ -103,7 +106,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         if (
           !orderDetail[subOrderDate]?.transactionId ||
           (orderDetail[subOrderDate]?.transactionId &&
-            orderDetail[subOrderDate]?.status === ESubOrderStatus.CANCELED)
+            orderDetail[subOrderDate]?.status === ESubOrderStatus.CANCELED) ||
+          orderDetail[subOrderDate]?.lastTransition ===
+            ETransition.OPERATOR_CANCEL_PLAN
         ) {
           return result;
         }

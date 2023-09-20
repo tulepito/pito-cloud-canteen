@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { isEmpty } from 'lodash';
 
 import { useAppSelector } from '@hooks/reduxHooks';
+import { ETransition } from '@src/utils/transaction';
 import { Listing, User } from '@utils/data';
 import { EParticipantOrderStatus } from '@utils/enums';
 import type { TListing, TObject, TUser } from '@utils/types';
@@ -22,9 +23,12 @@ export const usePrepareManageOrdersSectionData = (
 
   const dateList = Object.entries(draftOrderDetail)
     .reduce<number[]>((prev, [date, orderOnDate]) => {
-      const { restaurant } = orderOnDate as TObject;
+      const { restaurant, lastTransition } = orderOnDate as TObject;
 
-      return !isEmpty(restaurant?.foodList) ? prev.concat(Number(date)) : prev;
+      return !isEmpty(restaurant?.foodList) &&
+        lastTransition !== ETransition.OPERATOR_CANCEL_PLAN
+        ? prev.concat(Number(date))
+        : prev;
     }, [])
     .sort((x, y) => x - y);
   const indexOfTimestamp = useMemo(
