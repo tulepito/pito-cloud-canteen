@@ -7,6 +7,7 @@ import { handleError } from '@services/sdk';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
+    console.log('[API-REQUEST]: update-permission.api.ts');
     const { companyId } = req.query;
     const { memberEmail, permission } = req.body;
     const company = await updateMemberPermissionFn({
@@ -17,6 +18,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
     return res.status(200).json(company);
   } catch (error) {
+    console.error('[API-ERROR]: update-permission.api.ts', error);
+
     return handleError(res, error);
   }
 };

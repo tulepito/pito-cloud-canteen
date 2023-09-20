@@ -9,6 +9,7 @@ import type { UserPermission } from '@src/types/UserPermission';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
+    console.log('[API-REQUEST]: transfer-owner.api.ts');
     if (req.method !== HttpMethod.POST) return res.status(405).end();
 
     const { companyId } = req.query;
@@ -25,7 +26,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
     return res.status(200).json(newCompany);
   } catch (error) {
-    console.error('transfer owner error', error);
+    console.error('[API-ERROR]: transfer-owner.api.ts', error);
 
     return handleError(res, error);
   }

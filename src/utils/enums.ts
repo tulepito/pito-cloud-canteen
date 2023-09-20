@@ -104,6 +104,7 @@ export enum EErrorCode {
   forbidden = 'forbidden',
   missingStripeAccount = 'transaction-missing-stripe-account',
   newOwnerAlreadyACompanyUser = 'new-owner-already-a-company-user',
+  bookerInOrderProgress = 'booker-in-order-progress',
 }
 
 export enum ECompanyStatus {
