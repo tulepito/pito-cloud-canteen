@@ -10,12 +10,14 @@ import Tooltip from '@components/Tooltip/Tooltip';
 import {
   calculatePriceQuotationInfo,
   calculatePriceQuotationPartner,
+  vatPercentageBaseOnVatSetting,
 } from '@helpers/order/cartInfoHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { Listing } from '@src/utils/data';
 import { getDayOfWeek } from '@src/utils/dates';
 import {
   type EOrderStates,
+  EPartnerVATSetting,
   EPaymentType,
   ESubOrderStatus,
 } from '@src/utils/enums';
@@ -78,6 +80,7 @@ const OrderPaymentStatusTab: React.FC<OrderPaymentStatusTabProps> = (props) => {
     deliveryHour,
     hasSpecificPCCFee = false,
     specificPCCFee = 0,
+    vatSettings,
   } = orderListing.getMetadata();
   const partnerCurrentQuotation = quotations.find(
     (_quotation) => _quotation.id.uuid === quotationId,
@@ -97,6 +100,16 @@ const OrderPaymentStatusTab: React.FC<OrderPaymentStatusTabProps> = (props) => {
           ) {
             return null;
           }
+          const vatSettingFromOrder =
+            vatSettings[orderDetail[subOrderDate].restaurant.id];
+          const partnerVATSetting =
+            vatSettingFromOrder in EPartnerVATSetting
+              ? vatSettingFromOrder
+              : EPartnerVATSetting.vat;
+          const vatPercentage = vatPercentageBaseOnVatSetting({
+            vatSetting: partnerVATSetting,
+            vatPercentage: currentOrderVATPercentage,
+          });
 
           const partnerQuotationBySubOrderDate = calculatePriceQuotationPartner(
             {
@@ -104,8 +117,9 @@ const OrderPaymentStatusTab: React.FC<OrderPaymentStatusTabProps> = (props) => {
                 partner[orderDetail[subOrderDate].restaurant.id]?.quotation,
               serviceFeePercentage:
                 serviceFees[orderDetail[subOrderDate].restaurant.id],
-              currentOrderVATPercentage,
+              currentOrderVATPercentage: vatPercentage,
               subOrderDate,
+              shouldSkipVAT: partnerVATSetting === EPartnerVATSetting.direct,
             },
           );
 

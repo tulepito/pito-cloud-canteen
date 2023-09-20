@@ -1,6 +1,7 @@
 import {
   calculatePriceQuotationInfo,
   calculatePriceQuotationPartner,
+  vatPercentageBaseOnVatSetting,
 } from '@helpers/order/cartInfoHelper';
 import { generateSKU } from '@pages/admin/order/[orderId]/helpers/AdminOrderDetail';
 import {
@@ -11,7 +12,7 @@ import {
 import type { PaymentBaseParams } from '@services/payment';
 import { createPaymentRecordOnFirebase } from '@services/payment';
 import { Listing, User } from '@src/utils/data';
-import { EPaymentType } from '@src/utils/enums';
+import { EPartnerVATSetting, EPaymentType } from '@src/utils/enums';
 import type { TListing } from '@src/utils/types';
 
 export const initializePayment = async (
@@ -29,6 +30,7 @@ export const initializePayment = async (
     orderVATPercentage,
     quotationId,
     serviceFees = {},
+    vatSettings,
   } = orderListingGetter.getMetadata();
 
   const quotationListing = await fetchListing(quotationId);
@@ -40,11 +42,23 @@ export const initializePayment = async (
       ([subOrderDate, subOrderData]: [string, any]) => {
         const { restaurant = {} } = subOrderData;
         const { id, restaurantName } = restaurant;
+
+        const vatSettingFromOrder = vatSettings[id];
+        const partnerVATSetting =
+          vatSettingFromOrder in EPartnerVATSetting
+            ? vatSettingFromOrder
+            : EPartnerVATSetting.vat;
+        const vatPercentage = vatPercentageBaseOnVatSetting({
+          vatSetting: partnerVATSetting,
+          vatPercentage: orderVATPercentage,
+        });
+
         const { totalWithVAT: totalPrice } = calculatePriceQuotationPartner({
           quotation: partner[id].quotation,
           serviceFeePercentage: serviceFees[id],
-          currentOrderVATPercentage: orderVATPercentage,
+          currentOrderVATPercentage: vatPercentage,
           subOrderDate,
+          shouldSkipVAT: partnerVATSetting === EPartnerVATSetting.direct,
         });
 
         return {
