@@ -24,8 +24,12 @@ export const modifyPaymentWhenCancelSubOrderService = async ({
 }) => {
   const orderListing = Listing(order);
   const orderId = orderListing.getId();
-  const { packagePerMember, orderVATPercentage, hasSpecificPCCFee } =
-    orderListing.getMetadata();
+  const {
+    packagePerMember,
+    orderVATPercentage,
+    hasSpecificPCCFee,
+    orderPCCFee,
+  } = orderListing.getMetadata();
   const partnerPaymentRecord = await queryPaymentRecordOnFirebase({
     paymentType: EPaymentType.PARTNER,
     orderId,
@@ -63,6 +67,7 @@ export const modifyPaymentWhenCancelSubOrderService = async ({
         packagePerMember,
         currentOrderVATPercentage: orderVATPercentage || systemVATPercentage,
         hasSpecificPCCFee,
+        specificPCCFee: orderPCCFee,
       });
 
     if (newTotalPrice === 0) {
