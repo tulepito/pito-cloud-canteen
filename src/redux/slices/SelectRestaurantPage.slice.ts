@@ -8,6 +8,7 @@ import { fetchFoodListFromMenuApi } from '@apis/admin';
 import { queryAllPages } from '@helpers/apiHelpers';
 import { getMenuQuery } from '@helpers/listingSearchQuery';
 import { createAsyncThunk } from '@redux/redux.helper';
+import { toNonAccentVietnamese } from '@src/utils/string';
 import { denormalisedResponseEntities, Listing } from '@utils/data';
 import type { TListing, TObject, TPagination } from '@utils/types';
 
@@ -83,7 +84,6 @@ const getRestaurants = createAsyncThunk(
         return restaurantId;
       }),
     );
-
     const restaurantList = flatten(
       await Promise.all(
         chunk<string>(restaurantIdList, 100).map(async (ids) => {
@@ -91,9 +91,7 @@ const getRestaurants = createAsyncThunk(
             await sdk.listings.query({
               ids,
               include: ['images'],
-              query: {
-                keywords: title,
-              },
+              keywords: title,
               'fields.image': [
                 'variants.landscape-crop',
                 'variants.landscape-crop2x',
@@ -103,8 +101,7 @@ const getRestaurants = createAsyncThunk(
         }),
       ),
     );
-
-    const restaurantWithMenuList = compact(
+    const restaurantWithMenuList = compact<TObject>(
       menuList.map((menu: TListing) => {
         const restaurantInfo = restaurantList.find((r: TListing) => {
           return menu?.attributes?.metadata?.restaurantId === r.id.uuid;
@@ -119,7 +116,21 @@ const getRestaurants = createAsyncThunk(
 
         return null;
       }),
-    );
+    ).sort((obj1: TObject, obj2: TObject) => {
+      const title1 = toNonAccentVietnamese(
+        obj1.restaurantInfo?.attributes?.title,
+        true,
+      );
+      const title2 = toNonAccentVietnamese(
+        obj2.restaurantInfo?.attributes?.title,
+        true,
+      );
+
+      if (title1 < title2) return -1;
+      if (title2 < title1) return 1;
+
+      return 0;
+    });
 
     const totalRestaurants = restaurantWithMenuList.length;
     const totalPages = Math.round(totalRestaurants / perPage + 0.5);
