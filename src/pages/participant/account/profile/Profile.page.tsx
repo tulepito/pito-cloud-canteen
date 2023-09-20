@@ -10,7 +10,6 @@ import { participantPaths } from '@src/paths';
 import { User } from '@src/utils/data';
 import { splitNameFormFullName } from '@src/utils/string';
 
-import { AccountThunks } from '../Account.slice';
 import type { TProfileFormValues } from '../components/ProfileForm/ProfileForm';
 import ProfileForm from '../components/ProfileForm/ProfileForm';
 import ProfileModal from '../components/ProfileModal/ProfileModal';
@@ -21,11 +20,11 @@ const ProfilePage = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
 
-  const updateProfileSucessModalControl = useBoolean();
+  const updateProfileSuccessModalControl = useBoolean();
 
   const currentUser = useAppSelector((state) => state.user.currentUser);
   const updateProfileInProgress = useAppSelector(
-    (state) => state.ParticipantAccount.updateProfileInProgress,
+    (state) => state.user.updateProfileInProgress,
   );
 
   const currentUserGetter = User(currentUser!);
@@ -37,7 +36,7 @@ const ProfilePage = () => {
     [email, firstName, lastName, phoneNumber],
   );
 
-  const goBack = () => {
+  const handleGoBack = () => {
     router.push(participantPaths.Account);
   };
 
@@ -45,18 +44,19 @@ const ProfilePage = () => {
     const { name: fullName, phoneNumber: phoneNumberValue } = values;
     const splitName = splitNameFormFullName(fullName);
     const { meta } = await dispatch(
-      AccountThunks.updateProfile({
+      userThunks.updateProfile({
         firstName: splitName.firstName,
         lastName: splitName.lastName,
-        phoneNumber: phoneNumberValue,
+        protectedData: {
+          phoneNumber: phoneNumberValue,
+        },
       }),
     );
 
     if (meta.requestStatus !== 'fulfilled') {
       console.log('error');
     } else {
-      dispatch(userThunks.fetchCurrentUser());
-      updateProfileSucessModalControl.setTrue();
+      updateProfileSuccessModalControl.setTrue();
     }
   };
 
@@ -76,7 +76,7 @@ const ProfilePage = () => {
       <div className={css.mobileView}>
         <ProfileModal
           isOpen={true}
-          onClose={goBack}
+          onClose={handleGoBack}
           currentUser={currentUser!}
           handleSubmit={handleSubmit}
           initialValues={initialValues}
@@ -85,8 +85,8 @@ const ProfilePage = () => {
       <ConfirmationModal
         isPopup
         id="ProfileModalConfirmation"
-        isOpen={updateProfileSucessModalControl.value}
-        onClose={updateProfileSucessModalControl.setFalse}
+        isOpen={updateProfileSuccessModalControl.value}
+        onClose={updateProfileSuccessModalControl.setFalse}
         title="Thông báo"
         description="Thông tin của bạn đã được cập nhật thành công."
         secondForAutoClose={3}

@@ -34,7 +34,7 @@ import { adminPaths } from '@src/paths';
 import { Listing } from '@utils/data';
 import { formatTimestamp } from '@utils/dates';
 import { EOrderDraftStates, EOrderStates } from '@utils/enums';
-import type { TListing, TObject } from '@utils/types';
+import type { TKeyValue, TListing, TObject } from '@utils/types';
 import { required } from '@utils/validators';
 
 // eslint-disable-next-line import/no-cycle
@@ -213,7 +213,7 @@ export const ReviewContent: React.FC<any> = (props) => {
 
   const handleFieldDeliveryManChange = (value: string) => {
     const currDeliveryInfoOption = deliveryManOptions.find(
-      ({ key }) => key === value,
+      ({ key }: TKeyValue) => key === value,
     );
 
     updatePlanDetail(
@@ -228,7 +228,7 @@ export const ReviewContent: React.FC<any> = (props) => {
 
   const parsedDeliveryManOptions = useMemo(
     () =>
-      deliveryManOptions.map((d) => ({
+      deliveryManOptions.map((d: TObject) => ({
         key: d.key,
         label: d.name,
       })),

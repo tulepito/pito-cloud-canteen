@@ -1,8 +1,8 @@
 import React, { useMemo, useState } from 'react';
 
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { adminAccountSettingThunks } from '@redux/slices/adminAccountSetting.slice';
 import { NotificationSliceAction } from '@redux/slices/notificationPopup.slice';
+import { userThunks } from '@redux/slices/user.slice';
 import { CurrentUser } from '@src/utils/data';
 import type { TCurrentUser } from '@src/utils/types';
 
@@ -13,9 +13,13 @@ import AdminAccountInformationSettingForm from './components/AdminAccountInforma
 
 const AdminAccountInformationSettingPage = () => {
   const currentUser = useAppSelector((state) => state.user.currentUser);
-  const { updateInProgress, updateError } = useAppSelector(
-    (state) => state.adminAccountSetting,
+  const updateProfileInProgress = useAppSelector(
+    (state) => state.user.updateProfileInProgress,
   );
+  const updateProfileError = useAppSelector(
+    (state) => state.user.updateProfileError,
+  );
+
   const [submittedValues, setSubmittedValues] = useState<any>();
   const currentUserGetter = CurrentUser(currentUser as TCurrentUser);
 
@@ -61,9 +65,7 @@ const AdminAccountInformationSettingPage = () => {
         : {}),
     };
 
-    const { payload } = await dispatch(
-      adminAccountSettingThunks.updateAdminAccount(updateValues),
-    );
+    const { payload } = await dispatch(userThunks.updateProfile(updateValues));
     if (payload) {
       setSubmittedValues(values);
       dispatch(
@@ -84,8 +86,8 @@ const AdminAccountInformationSettingPage = () => {
         onSubmit={onUpdateAdminAccount}
         currentUser={currentUser}
         initialValues={initialValues}
-        inProgress={updateInProgress}
-        updateError={updateError}
+        inProgress={updateProfileInProgress}
+        updateError={updateProfileError}
         submittedValues={submittedValues}
       />
     </div>

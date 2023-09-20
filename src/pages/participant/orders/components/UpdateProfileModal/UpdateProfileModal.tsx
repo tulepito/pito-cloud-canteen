@@ -5,11 +5,11 @@ import { shallowEqual } from 'react-redux';
 import IconClose from '@components/Icons/IconClose/IconClose';
 import PopupModal from '@components/PopupModal/PopupModal';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { userThunks } from '@redux/slices/user.slice';
 import { User } from '@src/utils/data';
 import { splitNameFormFullName } from '@src/utils/string';
 import type { TCurrentUser, TUser } from '@src/utils/types';
 
-import { OrderListThunks } from '../../OrderList.slice';
 import type { TUpdateProfileFormValues } from '../UpdateProfileForm/UpdateProfileForm';
 import UpdateProfileForm from '../UpdateProfileForm/UpdateProfileForm';
 
@@ -74,7 +74,7 @@ const UpdateProfileModal: React.FC<UpdateProfileModalProps> = (props) => {
         nutritions: values.nutritions,
       },
     };
-    await dispatch(OrderListThunks.updateProfile(params));
+    await dispatch(userThunks.updateProfile(params));
     onClose();
     setTimeout(() => {
       handleOnBoardingModalOpen();

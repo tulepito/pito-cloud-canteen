@@ -286,7 +286,6 @@ const updateRecommendFoodToOrderDetail = ({
 };
 // ================ Thunk types ================ //
 const FETCH_ATTRIBUTES = 'app/ParticipantOrderList/FETCH_ATTRIBUTES';
-const UPDATE_PROFILE = 'app/ParticipantOrderList/UPDATE_PROFILE';
 const DISABLE_WALKTHROUGH = 'app/ParticipantOrderList/DISABLE_WALKTHROUGH';
 const FETCH_ORDERS = 'app/ParticipantOrderList/FETCH_ORDERS';
 const UPDATE_SUB_ORDER = 'app/ParticipantOrderList/UPDATE_SUB_ORDER';
@@ -312,14 +311,6 @@ const fetchAttributes = createAsyncThunk(FETCH_ATTRIBUTES, async () => {
 
   return response;
 });
-
-const updateProfile = createAsyncThunk(
-  UPDATE_PROFILE,
-  async (payload: any, { extra: sdk, dispatch }) => {
-    await sdk.currentUser.updateProfile(payload);
-    await dispatch(userThunks.fetchCurrentUser());
-  },
-);
 
 const disableWalkthrough = createAsyncThunk(
   DISABLE_WALKTHROUGH,
@@ -680,7 +671,6 @@ const pickFoodForSpecificSubOrder = createAsyncThunk(
 
 export const OrderListThunks = {
   fetchAttributes,
-  updateProfile,
   disableWalkthrough,
   fetchOrders,
   postParticipantRating,
@@ -771,18 +761,6 @@ const OrderListSlice = createSlice({
       .addCase(fetchAttributes.rejected, (state, { error }) => {
         state.fetchAttributesInProgress = false;
         state.fetchAttributesError = error.message;
-      })
-
-      .addCase(updateProfile.pending, (state) => {
-        state.updateProfileInProgress = true;
-        state.updateProfileError = false;
-      })
-      .addCase(updateProfile.fulfilled, (state) => {
-        state.updateProfileInProgress = false;
-      })
-      .addCase(updateProfile.rejected, (state, { error }) => {
-        state.updateProfileInProgress = false;
-        state.updateProfileError = error.message;
       })
 
       .addCase(disableWalkthrough.pending, (state) => {

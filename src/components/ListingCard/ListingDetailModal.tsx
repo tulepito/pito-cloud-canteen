@@ -19,6 +19,7 @@ import {
   SPECIAL_DIET_OPTIONS,
 } from '@src/utils/enums';
 import { toNonAccentVietnamese } from '@src/utils/string';
+import type { TKeyValue } from '@src/utils/types';
 import { maxLength } from '@src/utils/validators';
 
 import css from './ListingDetailModal.module.scss';
@@ -71,7 +72,7 @@ const ListingDetailModal: React.FC<TListingDetailModalProps> = (props) => {
     packaging,
   } = listingObj.getPublicData();
   const packagingLabel = packagingOptions.find(
-    ({ key }) =>
+    ({ key }: TKeyValue) =>
       toNonAccentVietnamese(packaging, true) ===
       toNonAccentVietnamese(key, true),
   )?.label;
