@@ -86,6 +86,7 @@ const DeliveryTimeForm: React.FC<TDeliveryTimeFormProps> = ({
       }
       startDateValueRef.current = startDate.input.value;
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [endDateInitialValue, startDate.input.value],
   );
 

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
@@ -133,7 +134,7 @@ const AddingPaymentRecordFormComponent: React.FC<
         parseThousandNumber(`${totalPrice - paidAmount}`),
       );
     }
-  }, [form, paidAmount, paymentAmountValue, totalPrice]);
+  }, [paidAmount, paymentAmountValue, totalPrice]);
 
   useEffect(() => {
     if (percentage !== 0) {

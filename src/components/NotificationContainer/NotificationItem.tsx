@@ -30,6 +30,7 @@ const NotificationItem: React.FC<TNotificationItem> = (props) => {
       dispatch(NotificationThunks.delayedHideNotifications(notification));
       clearTimeout(t);
     }, 100 * (index + 1));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const messageRender =
