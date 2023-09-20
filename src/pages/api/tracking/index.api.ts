@@ -5,7 +5,6 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HttpMethod } from '@apis/configs';
 import { EHttpStatusCode } from '@apis/errors';
-import { convertListIdToQueries } from '@helpers/apiHelpers';
 import { denormalisedResponseEntities } from '@services/data';
 import { getIntegrationSdk, handleError } from '@services/sdk';
 import { Listing } from '@src/utils/data';
@@ -33,41 +32,20 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         const {
           plans = [],
           companyId,
-          participants = [],
-          anonymous = [],
+          participants: participantIds = [],
+          anonymous: anonymousIds = [],
           orderType = EOrderType.group,
           bookerId,
         } = Listing(order).getMetadata();
         const planId = plans[0];
         const isGroupOrder = EOrderType.group === orderType;
-        let orderWithPlanDataMaybe = { ...order };
+        let orderWithOtherDataMaybe = { ...order };
 
         if (isGroupOrder) {
-          if (!isEmpty(participants)) {
-            const participantQueries = convertListIdToQueries({
-              idList: participants,
-            });
-            const participantData = flatten(
+          if (!isEmpty(participantIds)) {
+            const participants = flatten(
               await Promise.all(
-                participantQueries.map(async ({ ids }) => {
-                  return denormalisedResponseEntities(
-                    await integrationSdk.users.query({
-                      meta_id: `${ids}`,
-                    }),
-                  );
-                }),
-              ),
-            );
-
-            orderWithPlanDataMaybe = {
-              ...orderWithPlanDataMaybe,
-              participants: participantData,
-            };
-          }
-          if (!isEmpty(anonymous)) {
-            const anonymousParticipantData = flatten(
-              await Promise.all(
-                chunk(anonymous, 100).map(async (ids) => {
+                chunk(participantIds, 100).map(async (ids) => {
                   return denormalisedResponseEntities(
                     await integrationSdk.users.query({
                       meta_id: ids,
@@ -76,9 +54,27 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
                 }),
               ),
             );
-            orderWithPlanDataMaybe = {
-              ...orderWithPlanDataMaybe,
-              anonymous: anonymousParticipantData,
+
+            orderWithOtherDataMaybe = {
+              ...orderWithOtherDataMaybe,
+              participants,
+            };
+          }
+          if (!isEmpty(anonymousIds)) {
+            const anonymous = flatten(
+              await Promise.all(
+                chunk(anonymousIds, 100).map(async (ids) => {
+                  return denormalisedResponseEntities(
+                    await integrationSdk.users.query({
+                      meta_id: ids,
+                    }),
+                  );
+                }),
+              ),
+            );
+            orderWithOtherDataMaybe = {
+              ...orderWithOtherDataMaybe,
+              anonymous,
             };
           }
         }
@@ -89,21 +85,28 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         });
         const [booker] = denormalisedResponseEntities(bookerResponse);
         if (!isEmpty(booker)) {
-          orderWithPlanDataMaybe = { ...orderWithPlanDataMaybe, booker };
+          orderWithOtherDataMaybe = { ...orderWithOtherDataMaybe, booker };
         }
 
         // TODO: query company info
-        const companyResponse = await integrationSdk.users.show({
-          id: companyId,
-        });
-        const [company] = denormalisedResponseEntities(companyResponse);
+        if (companyId !== bookerId) {
+          const companyResponse = await integrationSdk.users.show({
+            id: companyId,
+          });
+          const [company] = denormalisedResponseEntities(companyResponse);
 
-        if (!isEmpty(company)) {
-          orderWithPlanDataMaybe = { ...orderWithPlanDataMaybe, company };
+          if (!isEmpty(company)) {
+            orderWithOtherDataMaybe = { ...orderWithOtherDataMaybe, company };
+          }
+        } else {
+          orderWithOtherDataMaybe = {
+            ...orderWithOtherDataMaybe,
+            company: booker,
+          };
         }
 
+        // TODO: query plan info
         if (planId) {
-          // TODO: query plan info
           const [planListing] = denormalisedResponseEntities(
             (await integrationSdk.listings.show({ id: planId })) || [{}],
           );
@@ -116,21 +119,21 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
           const { orderDetail = {} } = Listing(planListing).getMetadata();
           const orderDetailOfDate = orderDetail[date] || {};
-          const { restaurant = {} } = orderDetailOfDate;
-          const { id: restaurantId } = restaurant;
+          const { restaurant: restaurantObj = {} } = orderDetailOfDate;
+          const { id: restaurantId } = restaurantObj;
 
-          const [restaurantListing] = denormalisedResponseEntities(
+          const [restaurant] = denormalisedResponseEntities(
             (await integrationSdk.listings.show({ id: restaurantId })) || [{}],
           );
 
-          orderWithPlanDataMaybe = {
-            ...orderWithPlanDataMaybe,
+          orderWithOtherDataMaybe = {
+            ...orderWithOtherDataMaybe,
             orderDetailOfDate,
-            restaurant: restaurantListing,
+            restaurant,
           };
         }
 
-        return res.status(200).json(orderWithPlanDataMaybe);
+        return res.status(200).json(orderWithOtherDataMaybe);
       }
 
       default:

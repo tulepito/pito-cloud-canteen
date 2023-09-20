@@ -71,6 +71,7 @@ const TrackingPage: React.FC<TTrackingPageProps> = () => {
           </RenderWhen.False>
         </RenderWhen>
       </div>
+
       <TrackingOrderInfo />
       <TrackingDeliveryInfo subOrderDate={date} />
       <TrackingOrderDetailInfo subOrderDate={date} />
