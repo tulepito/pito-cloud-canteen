@@ -1,4 +1,5 @@
 import { mapLimit } from 'async';
+import chunk from 'lodash/chunk';
 import compact from 'lodash/compact';
 import flatten from 'lodash/flatten';
 import isEmpty from 'lodash/isEmpty';
@@ -6,7 +7,6 @@ import uniq from 'lodash/uniq';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import {
-  convertListIdToQueries,
   prepareNewOrderDetailPlan,
   queryAllListings,
 } from '@helpers/apiHelpers';
@@ -113,7 +113,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         meta_selectedGroups: 'has_any:allMembers',
       },
     });
-    const allNeedUpdatePlanIds = uniq(
+    const allNeedUpdatePlanIds: string[] = uniq(
       compact(
         allNeedOrders.map((order: TListing) => {
           const { plans = [] } = Listing(order).getMetadata();
@@ -122,12 +122,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         }),
       ),
     );
-    const planQueries = convertListIdToQueries({
-      idList: allNeedUpdatePlanIds,
-    });
+
     const allNeedUpdatePlans: TListing[] = flatten(
       await Promise.all(
-        planQueries.map(async ({ ids }) => {
+        chunk<string>(allNeedUpdatePlanIds, 100).map(async (ids) => {
           return denormalisedResponseEntities(
             await integrationSdk.listings.query({
               ids,

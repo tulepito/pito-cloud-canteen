@@ -1,10 +1,11 @@
 import { createSlice } from '@reduxjs/toolkit';
+import chunk from 'lodash/chunk';
 import compact from 'lodash/compact';
 import flatten from 'lodash/flatten';
 import uniq from 'lodash/uniq';
 
 import { fetchFoodListFromMenuApi } from '@apis/admin';
-import { convertListIdToQueries, queryAllPages } from '@helpers/apiHelpers';
+import { queryAllPages } from '@helpers/apiHelpers';
 import { getMenuQuery } from '@helpers/listingSearchQuery';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { denormalisedResponseEntities, Listing } from '@utils/data';
@@ -75,29 +76,28 @@ const getRestaurants = createAsyncThunk(
       query: { ...menuQuery, perPage: 100 },
     });
 
-    const restaurantIdList = uniq(
+    const restaurantIdList: string[] = uniq(
       menuList.map((menu: TListing) => {
         const { restaurantId } = Listing(menu).getMetadata();
 
         return restaurantId;
       }),
     );
-    const restaurantQueries = convertListIdToQueries({
-      idList: restaurantIdList,
-      include: ['images'],
-      query: {
-        keywords: title,
-      },
-      'fields.image': ['variants.landscape-crop', 'variants.landscape-crop2x'],
-    });
+
     const restaurantList = flatten(
       await Promise.all(
-        restaurantQueries.map(async ({ ids, query, ...rest }) => {
+        chunk<string>(restaurantIdList, 100).map(async (ids) => {
           return denormalisedResponseEntities(
             await sdk.listings.query({
               ids,
-              ...query,
-              ...rest,
+              include: ['images'],
+              query: {
+                keywords: title,
+              },
+              'fields.image': [
+                'variants.landscape-crop',
+                'variants.landscape-crop2x',
+              ],
             }),
           );
         }),

@@ -1,11 +1,12 @@
 import { mapLimit } from 'async';
-import { isEmpty, uniq } from 'lodash';
+import chunk from 'lodash/chunk';
 import compact from 'lodash/compact';
 import difference from 'lodash/difference';
 import flatten from 'lodash/flatten';
+import isEmpty from 'lodash/isEmpty';
+import uniq from 'lodash/uniq';
 
 import {
-  convertListIdToQueries,
   prepareNewOrderDetailPlan,
   queryAllListings,
 } from '@helpers/apiHelpers';
@@ -69,7 +70,7 @@ const addMembersToCompanyFn = async (params: TAddMembersToCompanyParams) => {
     },
   });
 
-  const allNeedUpdatePlanIds = uniq(
+  const allNeedUpdatePlanIds: string[] = uniq(
     compact(
       allNeedOrders.map((order: TListing) => {
         const { plans = [] } = Listing(order).getMetadata();
@@ -78,12 +79,10 @@ const addMembersToCompanyFn = async (params: TAddMembersToCompanyParams) => {
       }),
     ),
   );
-  const planQueries = convertListIdToQueries({
-    idList: allNeedUpdatePlanIds,
-  });
+
   const allNeedUpdatePlans = flatten(
     await Promise.all(
-      planQueries.map(async ({ ids }) => {
+      chunk<string>(allNeedUpdatePlanIds, 100).map(async (ids: string[]) => {
         return denormalisedResponseEntities(
           await integrationSdk.listings.query({
             ids,

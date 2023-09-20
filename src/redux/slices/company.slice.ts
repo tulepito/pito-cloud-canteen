@@ -1,6 +1,7 @@
 /* eslint-disable import/no-cycle */
 /* eslint-disable @typescript-eslint/no-shadow */
 import { createSlice } from '@reduxjs/toolkit';
+import chunk from 'lodash/chunk';
 import flatten from 'lodash/flatten';
 import isEmpty from 'lodash/isEmpty';
 
@@ -33,7 +34,6 @@ import {
   showCompanyApi,
   unActiveCompanyApi,
 } from '@apis/index';
-import { convertListIdToQueries } from '@helpers/apiHelpers';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { denormalisedResponseEntities, User } from '@utils/data';
 import { ECompanyStates, EImageVariants } from '@utils/enums';
@@ -292,14 +292,11 @@ const companyInfo = createAsyncThunk(
     const { groups = [], members = {} } = User(company).getMetadata();
 
     // TODO: query restaurants
-    const restaurantQueries = convertListIdToQueries({
-      idList: favoriteRestaurantList,
-    });
     const favoriteRestaurants = isEmpty(favoriteRestaurantList)
       ? []
       : flatten(
           await Promise.all(
-            restaurantQueries.map(async ({ ids }) => {
+            chunk<string>(favoriteRestaurantList, 100).map(async (ids) => {
               return denormalisedResponseEntities(
                 await sdk.listings.query({
                   ids,
@@ -310,14 +307,11 @@ const companyInfo = createAsyncThunk(
         );
 
     // TODO: query food
-    const foodQueries = convertListIdToQueries({
-      idList: favoriteFoodList,
-    });
     const favoriteFood = isEmpty(favoriteFoodList)
       ? []
       : flatten(
           await Promise.all(
-            foodQueries.map(async ({ ids }) => {
+            chunk<string>(favoriteFoodList, 100).map(async (ids) => {
               return denormalisedResponseEntities(
                 await sdk.listings.query({
                   ids,
