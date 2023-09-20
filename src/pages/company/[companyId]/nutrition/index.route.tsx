@@ -2,9 +2,9 @@ import MetaWrapper from '@components/MetaWrapper/MetaWrapper';
 
 import NutritionPage from './Nutrition.page';
 
-export default function NutritionPageRoute() {
+export default function CompanyNutritionPageRoute() {
   return (
-    <MetaWrapper>
+    <MetaWrapper routeName="CompanyNutritionPageRoute">
       <NutritionPage />
     </MetaWrapper>
   );

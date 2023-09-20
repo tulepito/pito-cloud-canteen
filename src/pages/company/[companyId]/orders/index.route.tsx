@@ -5,7 +5,7 @@ import ManageCompanyOrdersPage from './ManageCompanyOrders.page';
 const CompanyOrdersRoute = () => {
   return (
     <>
-      <MetaWrapper>
+      <MetaWrapper routeName="CompanyOrdersRoute">
         <ManageCompanyOrdersPage />
       </MetaWrapper>
     </>

@@ -2,12 +2,12 @@ import MetaWrapper from '@components/MetaWrapper/MetaWrapper';
 
 import ChangePasswordPage from './ChangePassword.page';
 
-const ChangePasswordRoute = () => {
+const ParticipantChangePasswordRoute = () => {
   return (
-    <MetaWrapper>
+    <MetaWrapper routeName="ParticipantChangePasswordRoute">
       <ChangePasswordPage />
     </MetaWrapper>
   );
 };
 
-export default ChangePasswordRoute;
+export default ParticipantChangePasswordRoute;

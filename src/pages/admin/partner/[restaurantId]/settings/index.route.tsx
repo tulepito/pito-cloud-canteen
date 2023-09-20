@@ -6,7 +6,7 @@ import EditPartnerPage from '../edit/EditPartner.page';
 
 const PartnerSettingsRoute = () => {
   return (
-    <MetaWrapper>
+    <MetaWrapper routeName="PartnerSettingsRoute">
       <EditPartnerPage />
     </MetaWrapper>
   );

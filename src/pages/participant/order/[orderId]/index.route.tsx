@@ -4,7 +4,7 @@ import ParticipantOrderManagement from './ParticipantOrderManagement.page';
 
 const ParticipantOrderManagementRoute = () => {
   return (
-    <MetaWrapper>
+    <MetaWrapper routeName="ParticipantOrderManagementRoute">
       <ParticipantOrderManagement />
     </MetaWrapper>
   );

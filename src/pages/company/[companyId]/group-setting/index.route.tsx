@@ -2,12 +2,12 @@ import MetaWrapper from '@components/MetaWrapper/MetaWrapper';
 
 import GroupSettingPage from './GroupSetting.page';
 
-function GroupSettingRoute() {
+function CompanyGroupSettingRoute() {
   return (
-    <MetaWrapper>
+    <MetaWrapper routeName="CompanyGroupSettingRoute">
       <GroupSettingPage />
     </MetaWrapper>
   );
 }
 
-export default GroupSettingRoute;
+export default CompanyGroupSettingRoute;
