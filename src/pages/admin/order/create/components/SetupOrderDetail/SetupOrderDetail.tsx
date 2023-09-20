@@ -183,6 +183,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
 
   const handleSubmitRestaurant = async (values: TObject) => {
     const { restaurant, selectedFoodList } = values;
+
     dispatch(setCanNotGoToStep4(true));
     await dispatch(
       orderAsyncActions.updatePlanDetail({
@@ -195,6 +196,8 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
               menuId: restaurant.menuId,
               phoneNumber: restaurant.phoneNumber,
               foodList: selectedFoodList,
+              minQuantity: restaurant.minQuantity || 1,
+              maxQuantity: restaurant.maxQuantity || 100,
             },
           },
         },

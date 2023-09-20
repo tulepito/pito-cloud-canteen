@@ -99,12 +99,8 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
   const isEditMode = viewMode === EPageViewMode.edit;
   const { handler: onDownloadReviewOrderResults } = useExportOrderDetails();
 
-  const {
-    planValidationsInProgressState,
-    orderReachMaxCanModify,
-    orderReachMaxRestaurantQuantity,
-    orderReachMinRestaurantQuantity,
-  } = orderValidationsInProgressState || {};
+  const { planValidationsInProgressState } =
+    orderValidationsInProgressState || {};
 
   const planReachMaxRestaurantQuantityInProgressState =
     planValidationsInProgressState?.[currentViewDate]
@@ -145,7 +141,9 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
 
   const { orderTitle, priceQuotationData, editViewData, reviewViewData } =
     // eslint-disable-next-line react-hooks/rules-of-hooks
-    usePrepareOrderDetailPageData({});
+    usePrepareOrderDetailPageData({
+      isAdminLayout: true,
+    });
 
   const handleDownloadPriceQuotation = useDownloadPriceQuotation({
     orderTitle,
@@ -261,33 +259,10 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
     dispatch(AdminAttributesThunks.fetchAttributes());
   }, []);
 
-  useEffect(() => {
-    if (
-      planReachMaxRestaurantQuantityInProgressState ||
-      planReachMinRestaurantQuantityInProgressState ||
-      planReachMaxCanModifyInProgressState
-    ) {
-      const i = setTimeout(() => {
-        dispatch(OrderManagementsAction.resetOrderDetailValidation());
-        clearTimeout(i);
-      }, 4000);
-    }
-  }, [
-    planReachMaxRestaurantQuantityInProgressState,
-    planReachMinRestaurantQuantityInProgressState,
-    planReachMaxCanModifyInProgressState,
-  ]);
-
   const isNormalOrder = orderType === EOrderType.normal;
   const isPicking = orderState === EOrderStates.picking;
 
-  const {
-    planValidations,
-    orderReachMaxRestaurantQuantity:
-      orderReachMaxRestaurantQuantityInPickingState,
-    orderReachMinRestaurantQuantity:
-      orderReachMinRestaurantQuantityInPickingState,
-  } = checkMinMaxQuantityInPickingState(
+  const { planValidations } = checkMinMaxQuantityInPickingState(
     isNormalOrder,
     isPicking,
     draftOrderDetail,
@@ -299,13 +274,6 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
     planReachMinRestaurantQuantity:
       planReachMinRestaurantQuantityInPickingState,
   } = planValidations[currentViewDate as keyof typeof planValidations] || {};
-
-  const disabledSubmit =
-    orderReachMinRestaurantQuantity ||
-    orderReachMaxRestaurantQuantity ||
-    orderReachMaxCanModify ||
-    orderReachMaxRestaurantQuantityInPickingState ||
-    orderReachMinRestaurantQuantityInPickingState;
 
   const { minQuantity = 1 } =
     draftOrderDetail?.[currentViewDate]?.restaurant || {};
@@ -320,7 +288,8 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
           onConfirmOrder={handleConfirmOrder}
           isDraftEditing={isDraftEditing}
           turnOnDraftEditMode={turnOnDraftEditMode}
-          confirmUpdateDisabled={disabledSubmit || orderDetailsNotChanged}
+          confirmUpdateDisabled={orderDetailsNotChanged}
+          isAdminFlow
         />
         <RenderWhen condition={showStateSectionCondition}>
           <ReviewOrderStatesSection

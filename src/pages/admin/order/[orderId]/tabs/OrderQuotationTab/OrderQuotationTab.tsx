@@ -283,6 +283,7 @@ const OrderQuotationTab: React.FC<OrderQuotationTabProps> = (props) => {
         order={order}
         handleUpdateOrderState={handleUpdateOrderState}
         updateOrderStateInProgress={updateOrderStateInProgress}
+        isAdminFlow
       />
       <RenderWhen condition={!selectedQuotation}>
         <div className={css.quotationWrapper}>

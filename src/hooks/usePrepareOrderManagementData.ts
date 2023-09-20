@@ -26,11 +26,13 @@ export const usePrepareOrderDetailPageData = ({
   VATPercentage,
   serviceFeePercentage,
   partnerId,
+  isAdminLayout = false,
 }: {
   date?: string | number;
   VATPercentage?: number;
   serviceFeePercentage?: number;
   partnerId?: string;
+  isAdminLayout?: boolean;
 }) => {
   const router = useRouter();
   const [reviewInfoValues, setReviewInfoValues] =
@@ -103,7 +105,11 @@ export const usePrepareOrderDetailPageData = ({
   const isCanceledOrder = [
     EOrderStates.canceled || EOrderStates.canceledByBooker,
   ].includes(orderState);
-  const canStartOrder = isEnableToStartOrder(orderDetail, isGroupOrder);
+  const canStartOrder = isEnableToStartOrder(
+    orderDetail,
+    isGroupOrder,
+    isAdminLayout,
+  );
   const isOrderIsPicking = orderState === EOrderStates.picking;
   const isOrderIsInProgress = orderState === EOrderStates.inProgress;
   const vatPercentage = isOrderIsInProgress

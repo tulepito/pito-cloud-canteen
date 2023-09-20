@@ -44,6 +44,7 @@ import { denormalisedResponseEntities, Listing, User } from '@utils/data';
 import {
   ENotificationType,
   EOrderHistoryTypes,
+  EOrderStates,
   EOrderType,
   EParticipantOrderStatus,
 } from '@utils/enums';
@@ -62,12 +63,25 @@ import { SystemAttributesThunks } from './systemAttributes.slice';
 export const QUERY_SUB_ORDER_CHANGES_HISTORY_PER_PAGE = 3;
 
 export const checkMinMaxQuantityInProgressState = (
-  isNormalOrder: boolean,
+  orderData: TObject | null,
   orderDetail: TPlan['orderDetail'] = {},
   oldOrderDetail: TPlan['orderDetail'] = {},
   isAdminFlow = false,
 ) => {
   let planValidationsInProgressState = {};
+  const { orderState, orderType } = Listing(
+    orderData as TListing,
+  ).getMetadata();
+  const isInProgress = orderState === EOrderStates.inProgress;
+  const isNormalOrder = orderType === EOrderType.normal;
+  if (!isInProgress) {
+    return {
+      planValidationsInProgressState,
+      orderReachMaxRestaurantQuantity: false,
+      orderReachMinRestaurantQuantity: false,
+      orderReachMaxCanModify: false,
+    };
+  }
   if (isNormalOrder) {
     planValidationsInProgressState = Object.keys(orderDetail).reduce(
       (prev: any, dateAsTimeStamp) => {
@@ -310,6 +324,7 @@ type TOrderManagementState = {
     orderReachMinRestaurantQuantity: boolean;
     orderReachMaxCanModify: boolean;
   } | null;
+  isAdminFlow: boolean;
 };
 
 const initialState: TOrderManagementState = {
@@ -350,6 +365,7 @@ const initialState: TOrderManagementState = {
   quotation: {},
   fetchQuotationInProgress: false,
   fetchQuotationError: null,
+  isAdminFlow: false,
 };
 
 // ================ Thunk types ================ //
@@ -358,7 +374,8 @@ const FETCH_QUOTATION = 'app/OrderManagement/FETCH_QUOTATION';
 // ================ Async thunks ================ //
 const loadData = createAsyncThunk(
   'app/OrderManagement/LOAD_DATA',
-  async (orderId: string, { dispatch }) => {
+  async (payload: { orderId: string; isAdminFlow?: boolean }, { dispatch }) => {
+    const { orderId } = payload;
     const response: any = await getBookerOrderDataApi(orderId);
     dispatch(SystemAttributesThunks.fetchVATPercentageByOrderId(orderId));
 
@@ -381,7 +398,12 @@ const updateOrderGeneralInfo = createAsyncThunk(
     };
 
     await updateOrderApi(orderId, updateParams);
-    await dispatch(loadData(orderId));
+    await dispatch(
+      loadData({
+        orderId,
+        isAdminFlow: getState().OrderManagement.isAdminFlow,
+      }),
+    );
   },
 );
 
@@ -729,7 +751,12 @@ const addParticipant = createAsyncThunk(
       return rejectWithValue(data?.message);
     }
 
-    await dispatch(loadData(orderId));
+    await dispatch(
+      loadData({
+        orderId,
+        isAdminFlow: getState().OrderManagement.isAdminFlow,
+      }),
+    );
 
     return {};
   },
@@ -1064,7 +1091,12 @@ const updateOrderFromDraftEdit = createAsyncThunk(
 
     updatePaymentApi(orderId, planId);
 
-    await dispatch(loadData(orderId));
+    await dispatch(
+      loadData({
+        orderId,
+        isAdminFlow: getState().OrderManagement.isAdminFlow,
+      }),
+    );
   },
 );
 
@@ -1143,7 +1175,6 @@ const OrderManagementSlice = createSlice({
         planData as TListing,
       ).getMetadata();
 
-      const { orderType } = Listing(orderData as TListing).getMetadata();
       const { foodId: defaultFoodId } =
         defaultOrderDetail[currentViewDate].memberOrders[memberId] || {};
 
@@ -1164,7 +1195,7 @@ const OrderManagementSlice = createSlice({
 
       const orderValidationsInProgressState =
         checkMinMaxQuantityInProgressState(
-          orderType === EOrderType.normal,
+          orderData,
           newOrderDetail,
           defaultOrderDetail,
           isAdminFlow,
@@ -1181,11 +1212,12 @@ const OrderManagementSlice = createSlice({
           currentViewDate as keyof typeof planValidationsInProgressState
         ] || {};
 
-      if (
+      const hasValidationError =
         planReachMaxRestaurantQuantity ||
         planReachMinRestaurantQuantity ||
-        planReachMaxCanModify
-      ) {
+        planReachMaxCanModify;
+
+      if (!isAdminFlow && hasValidationError) {
         return {
           ...state,
           orderValidationsInProgressState,
@@ -1224,6 +1256,7 @@ const OrderManagementSlice = createSlice({
             ...state.draftSubOrderChangesHistory,
             [currentViewDate]: currentDraftSubOrderChanges,
           },
+          orderValidationsInProgressState,
         };
       }
 
@@ -1289,7 +1322,7 @@ const OrderManagementSlice = createSlice({
       const { orderDetail: defaultOrderDetail = {} } = Listing(
         planData as TListing,
       ).getMetadata();
-      const { orderType } = Listing(orderData as TListing).getMetadata();
+
       const { status: defaultStatus } =
         defaultOrderDetail[currentViewDate].memberOrders[memberId] || {};
       const memberOrderDetailOnUpdateDate =
@@ -1324,7 +1357,7 @@ const OrderManagementSlice = createSlice({
 
       const orderValidationsInProgressState =
         checkMinMaxQuantityInProgressState(
-          orderType === EOrderType.normal,
+          orderData,
           newOrderDetail,
           defaultOrderDetail,
           isAdminFlow,
@@ -1341,11 +1374,12 @@ const OrderManagementSlice = createSlice({
           currentViewDate as keyof typeof planValidationsInProgressState
         ] || {};
 
-      if (
+      const hasValidationError =
         planReachMaxRestaurantQuantity ||
         planReachMinRestaurantQuantity ||
-        planReachMaxCanModify
-      ) {
+        planReachMaxCanModify;
+
+      if (!isAdminFlow && hasValidationError) {
         return {
           ...state,
           orderValidationsInProgressState,
@@ -1432,13 +1466,12 @@ const OrderManagementSlice = createSlice({
       } = updateValues;
       const { planData, orderData } = state;
       const planDataGetter = Listing(planData as TListing);
-      const { orderType } = Listing(orderData as TListing).getMetadata();
 
       const { orderDetail = {} } = planDataGetter.getMetadata();
 
       const orderValidationsInProgressState =
         checkMinMaxQuantityInProgressState(
-          orderType === EOrderType.normal,
+          orderData,
           newOrderDetail,
           orderDetail,
           isAdminFlow,
@@ -1454,12 +1487,11 @@ const OrderManagementSlice = createSlice({
         planValidationsInProgressState[
           currentViewDate as keyof typeof planValidationsInProgressState
         ] || {};
-
-      if (
+      const hasValidationError =
         planReachMaxRestaurantQuantity ||
         planReachMinRestaurantQuantity ||
-        planReachMaxCanModify
-      ) {
+        planReachMaxCanModify;
+      if (!isAdminFlow && hasValidationError) {
         return {
           ...state,
           orderValidationsInProgressState,
@@ -1675,26 +1707,47 @@ const OrderManagementSlice = createSlice({
       .addCase(loadData.pending, (state) => {
         state.isFetchingOrderDetails = true;
       })
-      .addCase(loadData.fulfilled, (state, { payload }) => {
-        const {
-          orderListing: orderData,
-          planListing: planData,
-          // eslint-disable-next-line unused-imports/no-unused-vars
-          statusCode,
-          ...restPayload
-        } = payload;
+      .addCase(
+        loadData.fulfilled,
+        (
+          state,
+          {
+            payload,
+            meta: {
+              arg: { isAdminFlow = false },
+            },
+          },
+        ) => {
+          const {
+            orderListing: orderData,
+            planListing: planData,
+            // eslint-disable-next-line unused-imports/no-unused-vars
+            statusCode,
+            ...restPayload
+          } = payload;
 
-        const { orderDetail = {} } = Listing(planData).getMetadata();
+          const { orderDetail = {} } = Listing(planData).getMetadata();
 
-        return {
-          ...state,
-          isFetchingOrderDetails: false,
-          orderData,
-          planData,
-          draftOrderDetail: orderDetail,
-          ...restPayload,
-        };
-      })
+          const orderValidationsInProgressState =
+            checkMinMaxQuantityInProgressState(
+              orderData,
+              orderDetail,
+              orderDetail,
+              isAdminFlow,
+            );
+
+          return {
+            ...state,
+            isFetchingOrderDetails: false,
+            orderData,
+            planData,
+            draftOrderDetail: orderDetail,
+            orderValidationsInProgressState,
+            isAdminFlow,
+            ...restPayload,
+          };
+        },
+      )
       .addCase(loadData.rejected, (state) => {
         state.isFetchingOrderDetails = false;
       })
@@ -1768,9 +1821,9 @@ const OrderManagementSlice = createSlice({
         state.orderData = {
           ...state.orderData,
           attributes: {
-            ...state.orderData.attributes,
+            ...(state.orderData?.attributes || {}),
             metadata: {
-              ...state.orderData.attributes.metadata,
+              ...(state.orderData?.attributes?.metadata || {}),
               participants: payload.participants,
             },
           },
@@ -1803,7 +1856,9 @@ const OrderManagementSlice = createSlice({
         state.addOrUpdateMemberOrderInProgress = false;
         state.draftOrderDetail = payload?.orderDetail;
         state.planData = payload?.planData;
-        state.orderData.attributes.metadata.anonymous = payload?.anonymous;
+        if (state.orderData) {
+          state.orderData.attributes.metadata.anonymous = payload?.anonymous;
+        }
         state.anonymousParticipantData = state.anonymousParticipantData.concat(
           payload?.newUser,
         );

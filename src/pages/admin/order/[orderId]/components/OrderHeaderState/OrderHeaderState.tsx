@@ -30,6 +30,7 @@ type OrderHeaderStateProps = {
   isDraftEditing?: boolean;
   confirmUpdateDisabled?: boolean;
   turnOnDraftEditMode?: () => void;
+  isAdminFlow?: boolean;
 };
 
 const OrderHeaderState: React.FC<OrderHeaderStateProps> = (props) => {
@@ -41,6 +42,7 @@ const OrderHeaderState: React.FC<OrderHeaderStateProps> = (props) => {
     turnOnDraftEditMode,
     isDraftEditing = false,
     confirmUpdateDisabled = true,
+    isAdminFlow = false,
   } = props;
 
   const intl = useIntl();
@@ -64,6 +66,7 @@ const OrderHeaderState: React.FC<OrderHeaderStateProps> = (props) => {
   const canStartOrder = isEnableToStartOrder(
     orderDetail,
     orderType === EOrderType.group,
+    isAdminFlow,
   );
   const disableConfirmButton = !canStartOrder || updateOrderStateInProgress;
 

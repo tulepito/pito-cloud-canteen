@@ -90,6 +90,7 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
   const isStartOrderDisabled = !isEnableToStartOrder(
     orderDetail,
     orderType === EOrderType.group,
+    isAdminLayout,
   );
 
   const isDraftEditing = orderState === EOrderStates.inProgress;
