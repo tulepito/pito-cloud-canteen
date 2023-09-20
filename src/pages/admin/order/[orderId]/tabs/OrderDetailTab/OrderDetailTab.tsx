@@ -19,7 +19,6 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { useDownloadPriceQuotation } from '@hooks/useDownloadPriceQuotation';
 import useExportOrderDetails from '@hooks/useExportOrderDetails';
 import { usePrepareOrderDetailPageData } from '@hooks/usePrepareOrderManagementData';
-import { AdminAttributesThunks } from '@pages/admin/Attributes.slice';
 import { ReviewContent } from '@pages/admin/order/create/components/ReviewOrder/ReviewOrder';
 import { checkMinMaxQuantityInPickingState } from '@pages/company/orders/[orderId]/picking/OrderDetail.page';
 import {
@@ -254,8 +253,6 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
         return dispatch(OrderManagementsAction.resetDraftOrderDetails());
       };
     }
-
-    dispatch(AdminAttributesThunks.fetchAttributes());
   }, []);
 
   useEffect(() => {

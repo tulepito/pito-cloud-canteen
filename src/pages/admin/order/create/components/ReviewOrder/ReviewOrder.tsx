@@ -132,7 +132,7 @@ export const ReviewContent: React.FC<any> = (props) => {
     (state) => state.OrderManagement.anonymousParticipantData,
   );
   const deliveryManOptions = useAppSelector(
-    (state) => state.AdminAttributes.deliveryPeople,
+    (state) => state.SystemAttributes.deliveryPeople,
   );
 
   const defaultCopyText = intl.formatMessage({

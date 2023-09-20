@@ -18,29 +18,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     }),
   )[0];
   const {
-    menuTypes = [],
     categories = [],
     packaging = [],
     daySessions = [],
     nutritions = [],
-    deliveryPeople = [],
   } = User(adminUser).getMetadata();
 
   switch (req.method) {
-    case HttpMethod.GET:
-      try {
-        res.json({
-          menuTypes,
-          categories,
-          packaging,
-          daySessions,
-          nutritions,
-          deliveryPeople,
-        });
-      } catch (error) {
-        handleError(res, error);
-      }
-      break;
     case HttpMethod.POST:
       try {
         const {

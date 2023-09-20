@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 
 import Button from '@components/Button/Button';
@@ -12,7 +12,7 @@ import { TableForm } from '@components/Table/Table';
 import Tabs from '@components/Tabs/Tabs';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
-import { AdminAttributesThunks } from '@pages/admin/Attributes.slice';
+import { AdminAttributesThunks } from '@pages/admin/AdminAttributes.slice';
 import KeywordSearchForm from '@pages/admin/partner/components/KeywordSearchForm/KeywordSearchForm';
 import { EAttributeSetting } from '@src/utils/enums';
 import { toNonAccentVietnamese } from '@src/utils/string';
@@ -48,26 +48,26 @@ const AdminAttributesSettingPage = () => {
   const { rowCheckbox = [] } = currentTableFormValue;
 
   const getExposeValues = ({ values }: any) => {
-    // need set timeout here to wait FormSpy render first to avoid React warning
+    // TODO: set timeout to wait FormSpy render first to avoid React warning
     setTimeout(() => {
       setCurrentTableFormValue(values);
     }, 0);
   };
   const mealStyles = useAppSelector(
-    (state) => state.AdminAttributes.categories,
+    (state) => state.SystemAttributes.categories,
   );
   const nutritions = useAppSelector(
-    (state) => state.AdminAttributes.nutritions,
+    (state) => state.SystemAttributes.nutritions,
   );
   const daySessions = useAppSelector(
-    (state) => state.AdminAttributes.daySessions,
+    (state) => state.SystemAttributes.daySessions,
   );
-  const packaging = useAppSelector((state) => state.AdminAttributes.packaging);
+  const packaging = useAppSelector((state) => state.SystemAttributes.packaging);
+  const fetchAttributesInProgress = useAppSelector(
+    (state) => state.SystemAttributes.fetchAttributesInProgress,
+  );
   const updateAttributeInProgress = useAppSelector(
     (state) => state.AdminAttributes.updateAttributeInProgress,
-  );
-  const fetchAttributesInProgress = useAppSelector(
-    (state) => state.AdminAttributes.fetchAttributesInProgress,
   );
 
   const allAttributes: any = {
@@ -180,10 +180,6 @@ const AdminAttributesSettingPage = () => {
     }),
     [searchKeywords],
   );
-
-  useEffect(() => {
-    dispatch(AdminAttributesThunks.fetchAttributes());
-  }, []);
 
   const onOpenAddAttributeModal = () => {
     addAttributeModalControl.setTrue();

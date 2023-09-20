@@ -18,6 +18,11 @@ type TAttributesState = {
   daySessions: TKeyValue[];
   packaging: TKeyValue[];
   nutritions: TKeyValue[];
+  deliveryPeople: {
+    key: string;
+    name: string;
+    phoneNumber: string;
+  }[];
 
   fetchAttributesInProgress: boolean;
   fetchAttributesError: boolean;
@@ -35,6 +40,7 @@ const initialState: TAttributesState = {
   daySessions: [],
   packaging: [],
   nutritions: [],
+  deliveryPeople: [],
 
   fetchAttributesInProgress: false,
   fetchAttributesError: false,
@@ -68,9 +74,8 @@ const fetchVATPercentageByOrderId = createAsyncThunk(
       }),
     )[0];
 
-    const { orderState, orderVATPercentage } = Listing(order).getMetadata();
-
-    const { systemVATPercentage } = getState().SystemAttributes;
+    const { orderState, orderVATPercentage = 0 } = Listing(order).getMetadata();
+    const { systemVATPercentage = 0 } = getState().SystemAttributes;
 
     const orderVATPercentageToUse =
       orderState === EOrderStates.picking ||
@@ -91,29 +96,22 @@ export const SystemAttributesThunks = {
 const SystemAttributesSlice = createSlice({
   name: 'SystemAttributes',
   initialState,
-  reducers: {},
+  reducers: {
+    updateAttributes: (state, { payload }) => {
+      return {
+        ...state,
+        ...payload,
+      };
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchAttributes.pending, (state) => {
         state.fetchAttributesInProgress = true;
         state.fetchAttributesError = false;
       })
-      .addCase(fetchAttributes.fulfilled, (state, action) => {
-        const {
-          categories = [],
-          packaging = [],
-          daySessions = [],
-          nutritions = [],
-          systemVATPercentage = 0,
-          systemServiceFeePercentage,
-        } = action.payload;
-        state.categories = categories;
-        state.packaging = packaging;
-        state.daySessions = daySessions;
-        state.nutritions = nutritions;
-        state.fetchAttributesInProgress = false;
-        state.systemVATPercentage = systemVATPercentage;
-        state.systemServiceFeePercentage = systemServiceFeePercentage;
+      .addCase(fetchAttributes.fulfilled, (state, { payload }) => {
+        return { ...state, ...payload, fetchAttributesInProgress: false };
       })
       .addCase(fetchAttributes.rejected, (state) => {
         state.fetchAttributesInProgress = false;

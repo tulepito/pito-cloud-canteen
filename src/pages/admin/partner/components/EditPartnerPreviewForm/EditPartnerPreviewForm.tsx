@@ -44,10 +44,10 @@ const EditPartnerPreviewForm: React.FC<any> = (props) => {
   const intl = useIntl();
 
   const packagingOptions = useAppSelector(
-    (state) => state.AdminAttributes.packaging,
+    (state) => state.SystemAttributes.packaging,
   );
   const categoryOptions = useAppSelector(
-    (state) => state.AdminAttributes.categories,
+    (state) => state.SystemAttributes.categories,
   );
 
   return (

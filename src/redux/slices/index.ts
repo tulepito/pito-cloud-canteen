@@ -27,7 +27,7 @@ export { default as UI } from './UI.slice';
 export { default as uploadImage } from './uploadImage.slice';
 export { default as user } from './user.slice';
 export { default as walkthrough } from './walkthrough.slice';
-export { default as AdminAttributes } from '@pages/admin/Attributes.slice';
+export { default as AdminAttributes } from '@pages/admin/AdminAttributes.slice';
 export { default as AdminManageOrder } from '@pages/admin/order/[orderId]/AdminManageOrder.slice';
 export { default as AdminManageClientPayments } from '@pages/admin/payment-client/AdminManageClientPayments.slice';
 export { default as PaymentPartner } from '@pages/admin/payment-partner/PaymentPartner.slice';

@@ -135,7 +135,7 @@ const parseEntitiesToTableData = (
   extraData: any,
 ) => {
   const categoryOptions = useAppSelector(
-    (state) => state.AdminAttributes.categories,
+    (state) => state.SystemAttributes.categories,
   );
 
   return foods.map((food) => {
@@ -169,10 +169,10 @@ const parseEntitiesToExportCsv = (
   ids: string[],
 ) => {
   const packagingOptions = useAppSelector(
-    (state) => state.AdminAttributes.packaging,
+    (state) => state.SystemAttributes.packaging,
   );
   const categoryOptions = useAppSelector(
-    (state) => state.AdminAttributes.categories,
+    (state) => state.SystemAttributes.categories,
   );
 
   const foodsToExport = foods
@@ -239,7 +239,7 @@ const ManagePartnerFoods = () => {
   const router = useRouter();
 
   const categoryOptions = useAppSelector(
-    (state) => state.AdminAttributes.categories,
+    (state) => state.SystemAttributes.categories,
   );
 
   const [idsToAction, setIdsToAction] = useState<string[]>([]);
