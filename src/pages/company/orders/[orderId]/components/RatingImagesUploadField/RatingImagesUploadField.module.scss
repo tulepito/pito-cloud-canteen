@@ -89,3 +89,19 @@
   background-color: rgba($neutralGray1, 0.8);
   font-size: 14px;
 }
+
+.loadingUpload {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: $neutralGray1;
+  opacity: 0.6;
+  @include flexCenter;
+  z-index: 1;
+
+  svg {
+    stroke: $neutralGray6;
+  }
+}

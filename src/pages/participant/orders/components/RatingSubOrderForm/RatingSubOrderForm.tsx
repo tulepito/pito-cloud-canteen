@@ -45,6 +45,9 @@ const RatingSubOrderFormComponent: React.FC<
     (state) => state.uploadImage.images,
     shallowEqual,
   );
+  const uploadImageInProgress = useAppSelector(
+    (state) => state.uploadImage.uploadImageInProgress,
+  );
   const postRatingInProgress = useAppSelector(
     (state) => state.ParticipantOrderList.participantPostRatingInProgress,
   );
@@ -52,7 +55,10 @@ const RatingSubOrderFormComponent: React.FC<
   const hasErrorImages = Object.values(images).some((i: any) => i.uploadError);
 
   const submitDisabled =
-    postRatingInProgress || !hasGeneralRating || hasErrorImages;
+    postRatingInProgress ||
+    !hasGeneralRating ||
+    hasErrorImages ||
+    uploadImageInProgress;
 
   return (
     <Form className={css.container} onSubmit={handleSubmit}>
@@ -108,6 +114,7 @@ const RatingSubOrderFormComponent: React.FC<
             <RatingImagesUploadField
               images={images}
               containerClassName={css.imagesFieldWrapper}
+              uploadImageInProgress={uploadImageInProgress}
             />
           </div>
         </>
