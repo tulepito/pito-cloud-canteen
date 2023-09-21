@@ -422,6 +422,7 @@ const OrderListPage = () => {
           _event.resource.timestamp === timestamp,
       );
       if (event) {
+        dispatch(CalendarActions.setSelectedDay(new Date(+timestamp)));
         setSelectedEvent(event);
         subOrderDetailModalControl.setTrue();
       } else {
