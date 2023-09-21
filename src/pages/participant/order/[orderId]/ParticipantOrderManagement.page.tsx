@@ -202,19 +202,18 @@ const ParticipantOrderManagement = () => {
     }
   };
 
+  const showModalMaybe =
+    (pickingOrderModalControl.value || missingPickingOrderModalControl.value) &&
+    !loadDataInProgress &&
+    !isOrderCanceled &&
+    !isOrderExpiredStart &&
+    !isTodayAfterStartDate &&
+    !isOrderExpiredPickingDate &&
+    shouldShowFirstTimeOrderModal;
+
   return (
-    <ParticipantLayout>
-      <RenderWhen
-        condition={
-          (pickingOrderModalControl.value ||
-            missingPickingOrderModalControl.value) &&
-          !loadDataInProgress &&
-          !isOrderCanceled &&
-          !isOrderExpiredStart &&
-          !isTodayAfterStartDate &&
-          !isOrderExpiredPickingDate &&
-          shouldShowFirstTimeOrderModal
-        }>
+    <ParticipantLayout className={showModalMaybe ? css.container : ''}>
+      <RenderWhen condition={showModalMaybe}>
         <RenderWhen condition={pickingOrderModalControl.value}>
           <CoverBox
             coverSrc={pickingOrderCover}

@@ -2,6 +2,10 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/mixins.scss' as *;
 
+.container {
+  padding-bottom: 0;
+}
+
 .companyTab {
   @include flexAlign(center, space-between);
 
