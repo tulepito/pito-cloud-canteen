@@ -3,9 +3,10 @@
 @use '/src/styles/customMediaQueries.scss' as *;
 
 .foodBackground {
-  width: 100vw;
-  height: 100vh;
-  height: 100dvh;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 16px 0;
+  margin-top: 20px;
 
   @include viewportMedium {
     background-color: $neutralGray2;
