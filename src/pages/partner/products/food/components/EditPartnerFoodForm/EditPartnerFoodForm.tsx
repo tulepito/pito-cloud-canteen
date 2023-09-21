@@ -21,7 +21,6 @@ import FieldTextArea from '@components/FormFields/FieldTextArea/FieldTextArea';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import FieldTextInputWithBottomBox from '@components/FormFields/FieldTextInputWithBottomBox/FieldTextInputWithBottomBox';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { foodSliceAction, foodSliceThunks } from '@redux/slices/foods.slice';
 import { partnerPaths } from '@src/paths';
 import type { TKeyValue } from '@src/utils/types';
 import {
@@ -43,6 +42,10 @@ import {
   validFoodTitle,
 } from '@utils/validators';
 
+import {
+  partnerFoodSliceActions,
+  partnerFoodSliceThunks,
+} from '../../PartnerFood.slice';
 import type { TEditPartnerFoodFormValues } from '../../utils';
 
 import css from './EditPartnerFoodForm.module.scss';
@@ -89,7 +92,6 @@ const EditPartnerFoodFormComponent: React.FC<
     categories: categoriesOptions = [],
     packaging: packagingOptions = [],
   } = useAppSelector((state) => state.SystemAttributes, shallowEqual);
-
   const images = pickRenderableImages(
     currentFoodListing,
     uploadedImages,
@@ -99,12 +101,12 @@ const EditPartnerFoodFormComponent: React.FC<
 
   const onImageUpload = (params: { id: string; file: File }) => {
     return dispatch(
-      foodSliceThunks.requestUploadFoodImages(params),
+      partnerFoodSliceThunks.requestUploadFoodImages(params),
     ) as Promise<{ payload: any }>;
   };
 
   const onRemoveImage = (id: string) => {
-    return dispatch(foodSliceAction.removeImage(id));
+    return dispatch(partnerFoodSliceActions.removeImage(id));
   };
 
   const intl = useIntl();
