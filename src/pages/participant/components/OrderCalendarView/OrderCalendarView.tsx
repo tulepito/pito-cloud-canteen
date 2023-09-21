@@ -1,3 +1,4 @@
+/* eslint-disable no-unneeded-ternary */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
 import type { Event, View } from 'react-big-calendar';
@@ -56,7 +57,7 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
   } = props;
   const dispatch = useAppDispatch();
   const router = useRouter();
-  const { openRatingModal, subOrderDate } = router.query;
+  const { openRatingModal, subOrderDate, viewMode } = router.query;
 
   const companyTitle = User(company).getPublicData().displayName;
   const ensureCompanyUser = User(company).getFullData();
@@ -232,7 +233,11 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
   const isValidLocalStorageView = ['month', 'week'].includes(
     localStorageView as View,
   );
-  const defaultView = isValidLocalStorageView ? localStorageView : Views.WEEK;
+  const defaultView = viewMode
+    ? viewMode
+    : isValidLocalStorageView
+    ? localStorageView
+    : Views.WEEK;
 
   const sectionCompanyBranding = loadDataInProgress ? (
     <div className={css.sectionCompanyBranding}>
@@ -288,7 +293,7 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
         if (openRatingModal === 'true') {
           ratingSubOrderModalControl.setTrue();
         } else {
-          subOrderDetailModalControl.setTrue();
+          dispatch(CalendarActions.setSelectedDay(new Date(+subOrderDate)));
         }
       }
     }

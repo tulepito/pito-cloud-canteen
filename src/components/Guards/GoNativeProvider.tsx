@@ -1,9 +1,11 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { type PropsWithChildren, useEffect } from 'react';
+import { uniq } from 'lodash';
 
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { currentUserSelector, userThunks } from '@redux/slices/user.slice';
 import { gonative } from '@src/assets/GoNativeJSBridgeLibrary';
+import { CurrentUser } from '@src/utils/data';
 
 interface CWindow extends Window {
   gonative_onesignal_info?: any;
@@ -19,15 +21,19 @@ const GoNativeProvider: React.FC<TGoNativeProvider> = ({ children }) => {
   useEffect(() => {
     function gonative_onesignal_info(oneSignalInfo: any) {
       window.sessionStorage.setItem(
-        'oneSignalInfo2',
+        'oneSignalInfo',
         oneSignalInfo.oneSignalUserId,
       );
       if (!currentUser) return;
+      const currentUserGetter = CurrentUser(currentUser);
+      const { oneSignalUserIds = [] } = currentUserGetter.getPrivateData();
       dispatch(
         userThunks.updateProfile({
           privateData: {
-            oneSignalUserId: oneSignalInfo.oneSignalUserId,
-            oneSignalPushToken: oneSignalInfo.oneSignalPushToken,
+            oneSignalUserIds: uniq([
+              ...oneSignalUserIds,
+              oneSignalInfo.oneSignalUserId,
+            ]),
           },
         }),
       );

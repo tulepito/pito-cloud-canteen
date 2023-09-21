@@ -4,6 +4,7 @@ import isEmpty from 'lodash/isEmpty';
 import { postSignUpApi } from '@apis/userApi';
 import { createAsyncThunk } from '@redux/redux.helper';
 import type { RootState } from '@redux/store';
+import { CurrentUser } from '@src/utils/data';
 import { storableError } from '@utils/errors';
 import type { TObject } from '@utils/types';
 
@@ -73,7 +74,17 @@ const login = createAsyncThunk(
 
 const logout = createAsyncThunk(
   LOGOUT,
-  async (_, { extra: sdk }) => {
+  async (oneSignalInfo: string, { extra: sdk, getState }) => {
+    const { currentUser } = getState().user;
+    const currentUserGetter = CurrentUser(currentUser!);
+    const { oneSignalUserIds = [] } = currentUserGetter.getPrivateData();
+    await sdk.currentUser.updateProfile({
+      privateData: {
+        oneSignalUserIds: oneSignalUserIds.filter(
+          (id: string) => id !== oneSignalInfo,
+        ),
+      },
+    });
     await sdk.logout();
   },
   {

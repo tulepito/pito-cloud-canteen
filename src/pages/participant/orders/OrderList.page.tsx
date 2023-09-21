@@ -1,3 +1,4 @@
+/* eslint-disable no-unneeded-ternary */
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from 'react';
 import type { Event, View } from 'react-big-calendar';
@@ -55,15 +56,22 @@ import css from './OrderList.module.scss';
 const OrderListPage = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
-  const { planId: planIdFromQuery, timestamp: timestampFromQuery } =
-    router.query;
+  const {
+    planId: planIdFromQuery,
+    timestamp: timestampFromQuery,
+    viewMode,
+  } = router.query;
   const localStorageView = getItem('participant_calendarView');
   const isValidLocalStorageView = ['month', 'week'].includes(
     localStorageView as View,
   );
 
   const [defaultCalendarView, setDefaultCalendarView] = useState<View>(
-    isValidLocalStorageView ? localStorageView : Views.WEEK,
+    viewMode
+      ? viewMode
+      : isValidLocalStorageView
+      ? localStorageView
+      : Views.WEEK,
   );
   const updateProfileModalControl = useBoolean();
   const onBoardingModal = useBoolean();
