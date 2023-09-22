@@ -13,15 +13,19 @@ const createNativeNotification = async ({ notificationParams, sdk }) => {
   )[0];
   const participantUser = User(participant);
   const { firstName } = participantUser.getProfile();
-  const { oneSignalUserId } = participantUser.getPrivateData();
+  const { oneSignalUserIds = [] } = participantUser.getPrivateData();
   const url = `${BASE_URL}/participant/order/${orderId}/?subOrderDate=${subOrderDate}&openRatingModal=true`;
 
-  await sendNotification({
-    title: 'Đánh giá ngày ăn',
-    content: `🌟 ${firstName} ơi, chấm ${foodName} hôm nay mấy điểm?`,
-    url,
-    oneSignalUserId,
-  });
+  await Promise.all(
+    oneSignalUserIds.map(async (oneSignalUserId) => {
+      await sendNotification({
+        title: 'Đánh giá ngày ăn',
+        content: `🌟 ${firstName} ơi, chấm ${foodName} hôm nay mấy điểm?`,
+        url,
+        oneSignalUserId,
+      });
+    }),
+  );
 };
 
 exports.handler = async (_event) => {
