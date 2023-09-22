@@ -78,13 +78,15 @@ const logout = createAsyncThunk(
     const { currentUser } = getState().user;
     const currentUserGetter = CurrentUser(currentUser!);
     const { oneSignalUserIds = [] } = currentUserGetter.getPrivateData();
-    await sdk.currentUser.updateProfile({
-      privateData: {
-        oneSignalUserIds: oneSignalUserIds.filter(
-          (id: string) => id !== oneSignalInfo,
-        ),
-      },
-    });
+    if (oneSignalInfo) {
+      await sdk.currentUser.updateProfile({
+        privateData: {
+          oneSignalUserIds: oneSignalUserIds.filter(
+            (id: string) => id !== oneSignalInfo,
+          ),
+        },
+      });
+    }
     await sdk.logout();
   },
   {
