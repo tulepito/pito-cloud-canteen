@@ -189,13 +189,15 @@ const reorder = async (
     authorId: subAccountId,
     title: generatedOrderTitle,
     state: EListingStates.published,
-    metadata: normalizeOrderMetadata({
-      ...Listing(oldOrder).getMetadata(),
+    metadata: {
       bookerId,
       orderStateHistory,
       orderState,
       companyName,
-    }),
+      ...normalizeOrderMetadata({
+        ...Listing(oldOrder).getMetadata(),
+      }),
+    },
   });
 
   const [newOrder] = denormalisedResponseEntities(newOrderResponse);
