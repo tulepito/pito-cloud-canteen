@@ -18,7 +18,12 @@ import {
   getLabelByKey,
   ORDER_STATES_OPTIONS,
 } from '@src/utils/enums';
-import type { TListing, TTransitionOrderState } from '@src/utils/types';
+import { ETransition } from '@src/utils/transaction';
+import type {
+  TListing,
+  TObject,
+  TTransitionOrderState,
+} from '@src/utils/types';
 
 import css from './OrderHeaderState.module.scss';
 
@@ -78,7 +83,13 @@ const OrderHeaderState: React.FC<OrderHeaderStateProps> = (props) => {
     typeof onConfirmOrder !== 'undefined' &&
     orderState === EOrderStates.picking;
 
-  const shouldManagePickingBtn = orderState === EOrderStates.inProgress;
+  const hasAnyInProgressSubOrdersMaybe = (
+    Object.values(orderDetail) as TObject[]
+  ).some(({ lastTransition = ETransition.INITIATE_TRANSACTION }: TObject) => {
+    return lastTransition === ETransition.INITIATE_TRANSACTION;
+  });
+  const shouldManagePickingBtn =
+    orderState === EOrderStates.inProgress && hasAnyInProgressSubOrdersMaybe;
   const canCancelOrder = orderFlow?.[
     orderState as TTransitionOrderState
   ]?.includes(EOrderStates.canceled);
