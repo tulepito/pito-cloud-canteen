@@ -12,7 +12,7 @@ import { formatTimestamp } from '@src/utils/dates';
 import { EOrderDraftStates } from '@src/utils/enums';
 import type { TObject, TTableSortValue } from '@src/utils/types';
 
-import css from './InProgressOrdersModal.module.css';
+import css from './InProgressOrdersModal.module.scss';
 
 const TABLE_COLUMN: TColumn[] = [
   {

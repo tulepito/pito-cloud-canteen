@@ -95,7 +95,7 @@ const QuizMealDate = () => {
           }
         : {};
 
-      const { payload: orderListing }: { payload: any } = await await dispatch(
+      const { payload: orderListing }: { payload: any } = await dispatch(
         orderAsyncActions.createOrder({
           clientId: User(selectedCompany).getId(),
           bookerId: currentUser?.id?.uuid,

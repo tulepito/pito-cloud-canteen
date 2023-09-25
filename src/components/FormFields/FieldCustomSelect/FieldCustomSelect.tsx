@@ -6,7 +6,7 @@ import classNames from 'classnames';
 import ValidationError from '@components/ValidationError/ValidationError';
 import useBoolean from '@hooks/useBoolean';
 
-import css from './FieldCustomSelect.module.css';
+import css from './FieldCustomSelect.module.scss';
 
 const LOADING_TIME = 500;
 
