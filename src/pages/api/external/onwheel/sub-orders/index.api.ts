@@ -212,7 +212,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       const companyUser = User(company);
       const bookerUser = User(booker);
 
-      const { location: companyLocation } = companyUser.getPublicData();
+      const { companyLocation } = companyUser.getPublicData();
       const { address: companyAddress } = companyLocation || {};
 
       const { firstName, lastName } = bookerUser.getProfile();
