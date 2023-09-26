@@ -763,12 +763,8 @@ const ManageOrdersPage = () => {
   useEffect(() => {
     dispatch(resetOrder());
 
-    if (isReady) {
-      dispatch(
-        orderAsyncActions.queryOrders({
-          page,
-          keywords,
-          ...(meta_orderState ? { meta_orderState } : {}),
+    const dateQueriesMaybe = shouldHideOrder
+      ? {
           ...(meta_startDate
             ? {
                 meta_startDate: `,${
@@ -793,6 +789,35 @@ const ManageOrdersPage = () => {
                 },`,
               }
             : {}),
+        }
+      : {
+          ...(meta_startDate
+            ? {
+                meta_startDate: `${
+                  meta_startDate
+                    ? new Date(meta_startDate as string).getTime() - 1
+                    : ''
+                },`,
+              }
+            : {}),
+          ...(meta_endDate
+            ? {
+                meta_endDate: `,${
+                  meta_endDate
+                    ? new Date(meta_endDate as string).getTime() + 1
+                    : ''
+                }`,
+              }
+            : {}),
+        };
+
+    if (isReady) {
+      dispatch(
+        orderAsyncActions.queryOrders({
+          page,
+          keywords,
+          ...(meta_orderState ? { meta_orderState } : {}),
+          ...dateQueriesMaybe,
         }),
       );
     }
