@@ -1,3 +1,5 @@
+import omit from 'lodash/omit';
+
 import { generateUncountableIdForOrder } from '@helpers/generateUncountableId';
 import { getInitMemberOrder } from '@pages/api/orders/[orderId]/plan/memberOrder.helper';
 import { denormalisedResponseEntities } from '@services/data';
@@ -33,16 +35,53 @@ const createSubOrderHistoryRecordToFirestore = async (
 };
 
 const normalizeOrderMetadata = (metadata: TObject = {}) => {
-  const newOrderMetadata = {
-    ...metadata,
-  };
+  const {
+    companyId,
+    vatSettings = {},
+    serviceFees = {},
+    listingType,
+    dayInWeek,
+    deliveryAddress,
+    detailAddress,
+    displayedDurationTime,
+    durationTimeMode,
+    memberAmount,
+    notes,
+    nutritions,
+    orderType,
+    orderVATPercentage,
+    packagePerMember,
+    participants,
+    pickAllow,
+    selectedGroups,
+    shipperName,
+    staffName,
+    vatAllow,
+  } = metadata;
 
-  delete newOrderMetadata?.startDate;
-  delete newOrderMetadata?.endDate;
-  delete newOrderMetadata?.deadlineHour;
-  delete newOrderMetadata?.deliveryHour;
-  delete newOrderMetadata?.plans;
-  delete newOrderMetadata?.quotationId;
+  const newOrderMetadata = {
+    companyId,
+    vatSettings,
+    serviceFees,
+    listingType,
+    dayInWeek,
+    deliveryAddress,
+    detailAddress,
+    displayedDurationTime,
+    durationTimeMode,
+    memberAmount,
+    notes,
+    nutritions,
+    orderType,
+    orderVATPercentage,
+    packagePerMember,
+    participants,
+    pickAllow,
+    selectedGroups,
+    shipperName,
+    staffName,
+    vatAllow,
+  };
 
   return newOrderMetadata;
 };
@@ -150,13 +189,15 @@ const reorder = async (
     authorId: subAccountId,
     title: generatedOrderTitle,
     state: EListingStates.published,
-    metadata: normalizeOrderMetadata({
-      ...Listing(oldOrder).getMetadata(),
+    metadata: {
       bookerId,
       orderStateHistory,
       orderState,
       companyName,
-    }),
+      ...normalizeOrderMetadata({
+        ...Listing(oldOrder).getMetadata(),
+      }),
+    },
   });
 
   const [newOrder] = denormalisedResponseEntities(newOrderResponse);
@@ -175,10 +216,16 @@ const reorder = async (
       const { orderDetail = {} } = Listing(oldPlan).getMetadata();
       const updatedOrderDetail = Object.keys(orderDetail).reduce(
         (result, date) => {
+          const subOrderNeededData = omit(orderDetail[date], [
+            'isPaid',
+            'lastTransition',
+            'transactionId',
+          ]);
+
           return {
             ...result,
             [date]: {
-              ...orderDetail[date],
+              ...subOrderNeededData,
               memberOrders: isGroupOrder ? {} : initialMemberOrder,
             },
           };

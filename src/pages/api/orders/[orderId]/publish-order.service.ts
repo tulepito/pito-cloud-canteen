@@ -1,3 +1,4 @@
+import { difference } from 'lodash';
 import isEmpty from 'lodash/isEmpty';
 import uniq from 'lodash/uniq';
 
@@ -89,14 +90,14 @@ export const publishOrder = async (orderId: string) => {
   )[0];
   const { systemServiceFeePercentage = 0 } = User(response).getPrivateData();
 
+  const allRestaurantIdList = uniq(
+    Object.values(planOrderDetails).map(
+      (subOrder: any) => subOrder?.restaurant?.id,
+    ),
+  );
+
   let newServiceFees = serviceFees;
   if (isEmpty(serviceFees)) {
-    const allRestaurantIdList = uniq(
-      Object.values(planOrderDetails).map(
-        (subOrder: any) => subOrder?.restaurant?.id,
-      ),
-    );
-
     newServiceFees = allRestaurantIdList.reduce(
       (prev, restaurantId) => ({
         ...prev,
@@ -104,6 +105,29 @@ export const publishOrder = async (orderId: string) => {
       }),
       {},
     );
+  } else {
+    const diffFromOrderDetailRestaurant = difference(
+      allRestaurantIdList,
+      Object.keys(serviceFees),
+    );
+
+    const diffFromServiceFeesRestaurant = difference(
+      Object.keys(serviceFees),
+      allRestaurantIdList,
+    );
+
+    if (diffFromOrderDetailRestaurant.length > 0) {
+      diffFromServiceFeesRestaurant.forEach((restaurantId) => {
+        delete newServiceFees[restaurantId];
+      });
+
+      diffFromOrderDetailRestaurant.forEach((restaurantId) => {
+        newServiceFees = {
+          ...newServiceFees,
+          [restaurantId]: systemServiceFeePercentage * 100,
+        };
+      });
+    }
   }
 
   await integrationSdk.listings.update({

@@ -1,7 +1,11 @@
+import { useEffect } from 'react';
+import isEmpty from 'lodash/isEmpty';
 import { useRouter } from 'next/router';
 
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import { companyPaths } from '@src/paths';
+import { Listing } from '@src/utils/data';
+import { EBookerOrderDraftStates, EOrderDraftStates } from '@src/utils/enums';
 
 import FilterLabelsSection from './components/FilterLabels/FilterLabelsSection';
 import FilterSidebar from './components/FilterSidebar/FilterSidebar';
@@ -19,12 +23,31 @@ import { useSearchRestaurants } from './hooks/restaurants';
 
 import css from './BookerSelectRestaurant.module.scss';
 
+const EnableToAccessPageOrderStates = [
+  EOrderDraftStates.pendingApproval,
+  EBookerOrderDraftStates.bookerDraft,
+];
+
 function BookerSelectRestaurant() {
   const router = useRouter();
   const { orderId } = router.query;
 
   const { order } = useGetOrder({ orderId: orderId as string });
+  const orderListing = Listing(order!);
+  const { orderState } = orderListing.getMetadata();
   const { companyAccount } = useGetCompanyAccount();
+  useEffect(() => {
+    if (!isEmpty(orderState)) {
+      if (orderState === EOrderDraftStates.draft) {
+        router.push({ pathname: companyPaths.CreateNewOrder });
+      } else if (!EnableToAccessPageOrderStates.includes(orderState)) {
+        router.push({
+          pathname: companyPaths.ManageOrderPicking,
+          query: { orderId: orderId as string },
+        });
+      }
+    }
+  }, [orderId, orderState, router]);
   const { restaurants, searchInProgress, totalResultItems } =
     useSearchRestaurants();
 
