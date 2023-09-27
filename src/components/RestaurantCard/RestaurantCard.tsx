@@ -94,35 +94,34 @@ const RestaurantCard: React.FC<TRestaurantCardProps> = ({
 
   return (
     <div className={classes}>
-      {/* <div className={css.bonusBadge}>
-        <IconGift className={css.gift} />
-        <span>x2</span>
-      </div> */}
-      <div className={css.coverImage} onClick={handleClickCard}>
-        <ResponsiveImage
-          alt="card"
-          image={restaurantCoverImage}
-          variants={[EImageVariants.default]}
-        />
-      </div>
-      <div className={css.header}>
-        <p
-          className={css.restaurantName}
-          onClick={handleClickCard}
-          title={restaurantName}>
-          {restaurantName}
-        </p>
-        {!hideFavoriteIcon && <IconHeart className={css.favoriteIcon} />}
-      </div>
-      <div className={css.nutritions}>
-        {mealStyles.map((style: any) => (
-          <Badge
-            key={style?.key}
-            className={css.badge}
-            label={style?.label}
-            type={style?.badgeType}
+      <div>
+        <div className={css.coverImage} onClick={handleClickCard}>
+          <ResponsiveImage
+            alt="card"
+            image={restaurantCoverImage}
+            variants={[EImageVariants.default]}
           />
-        ))}
+        </div>
+        <div className={css.header}>
+          <p
+            className={css.restaurantName}
+            onClick={handleClickCard}
+            title={restaurantName}>
+            {restaurantName}
+          </p>
+          {!hideFavoriteIcon && <IconHeart className={css.favoriteIcon} />}
+        </div>
+        <div className={css.nutritions}>
+          {mealStyles.map((style: any) => (
+            <Badge
+              key={style?.key}
+              className={css.badge}
+              label={style?.label}
+              type={style?.badgeType}
+              labelClassName={css.badgeLabel}
+            />
+          ))}
+        </div>
       </div>
 
       <div className={css.footer}>

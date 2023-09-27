@@ -90,7 +90,9 @@ const Badge: React.FC<TBadgeProps> = (props) => {
     <div className={badgeContainerClassName}>
       <div className={css.badgeContent}>
         {hasDotIcon && <span className={badgeDotClasses}></span>}
-        <div className={labelClasses}>{label}</div>
+        <div className={labelClasses} title={label}>
+          {label}
+        </div>
       </div>
       {hasCloseIcon && (
         <div className={css.badgeClose} onClick={onCloseIcon}>
