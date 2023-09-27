@@ -26,145 +26,166 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
     switch (apiMethod) {
       case HttpMethod.POST: {
-        const { event } = req.body;
+        const event = req.body;
 
         console.log('event', event);
-
+        const { path } = event;
         switch (event.status) {
           case 'ASSIGNING': {
-            const { orderId, subOrderDate } = event;
-            const { plan } = await fetchData(orderId);
-            const planListing = Listing(plan);
-            const planId = planListing.getId();
-            const { orderDetail = {} } = planListing.getMetadata();
-            const subOrder = orderDetail[subOrderDate];
-            const newOrderDetail = {
-              ...orderDetail,
-              [subOrderDate]: {
-                ...subOrder,
-                isOnWheelOrderCreated: true,
-              },
-            };
+            await Promise.all(
+              path.map(async (OWSubOrder: any) => {
+                const { tracking_number: trackingNumber } = OWSubOrder;
+                if (!trackingNumber) return;
 
-            await integrationSdk.listings.update({
-              id: planId,
-              metadata: {
-                orderDetail: newOrderDetail,
-              },
-            });
+                const [orderId, subOrderDate] = trackingNumber.split('_');
+                const { plan } = await fetchData(orderId);
+                const planListing = Listing(plan);
+                const planId = planListing.getId();
+                const { orderDetail = {} } = planListing.getMetadata();
+                const subOrder = orderDetail[subOrderDate];
+                const { isOnWheelOrderCreated = false } = subOrder;
+                if (!isOnWheelOrderCreated) {
+                  const newOrderDetail = {
+                    ...orderDetail,
+                    [subOrderDate]: {
+                      ...subOrder,
+                      isOnWheelOrderCreated: true,
+                    },
+                  };
+
+                  await integrationSdk.listings.update({
+                    id: planId,
+                    metadata: {
+                      orderDetail: newOrderDetail,
+                    },
+                  });
+                }
+              }),
+            );
 
             return res.status(200).end();
           }
 
           case 'IN PROGRESS': {
-            const { tracking_number: trackingNumber } = event;
-            const [orderId, subOrderDate] = trackingNumber.split('_');
-            const { plan } = await fetchData(orderId);
-            const planListing = Listing(plan);
-            const planId = planListing.getId();
-            const { orderDetail = {} } = planListing.getMetadata();
-            const subOrder = orderDetail[subOrderDate];
-            const { transactionId } = subOrder || {};
+            await Promise.all(
+              path.map(async (OWSubOrder: any) => {
+                const { tracking_number: trackingNumber } = OWSubOrder;
+                if (!trackingNumber) return;
 
-            await integrationSdk.transactions.transition({
-              id: transactionId,
-              transition: ETransition.START_DELIVERY,
-              params: {},
-            });
+                const [orderId, subOrderDate] = trackingNumber.split('_');
+                const { plan } = await fetchData(orderId);
+                const planListing = Listing(plan);
+                const planId = planListing.getId();
+                const { orderDetail = {} } = planListing.getMetadata();
+                const subOrder = orderDetail[subOrderDate];
+                const { transactionId } = subOrder || {};
+                await integrationSdk.transactions.transition({
+                  id: transactionId,
+                  transition: ETransition.START_DELIVERY,
+                  params: {},
+                });
 
-            const newOrderDetail = {
-              ...orderDetail,
-              [subOrderDate]: {
-                ...subOrder,
-                lastTransition: ETransition.START_DELIVERY,
-              },
-            };
+                const newOrderDetail = {
+                  ...orderDetail,
+                  [subOrderDate]: {
+                    ...subOrder,
+                    lastTransition: ETransition.START_DELIVERY,
+                  },
+                };
 
-            await integrationSdk.listings.update({
-              id: planId,
-              metadata: {
-                orderDetail: newOrderDetail,
-              },
-            });
+                await integrationSdk.listings.update({
+                  id: planId,
+                  metadata: {
+                    orderDetail: newOrderDetail,
+                  },
+                });
+              }),
+            );
 
             return res.status(200).end();
           }
 
           case 'COMPLETED': {
-            const { tracking_number: trackingNumber, path } = event;
-            const isAllPathCompleted = path.every(
-              (pathItem: any) => pathItem.status === 'COMPLETED',
+            await Promise.all(
+              path.map(async (OWSubOrder: any) => {
+                const { tracking_number: trackingNumber, status } = OWSubOrder;
+                if (!trackingNumber) return;
+
+                if (status === 'COMPLETED') {
+                  const [orderId, subOrderDate] = trackingNumber.split('_');
+                  const { plan } = await fetchData(orderId);
+                  const planListing = Listing(plan);
+                  const planId = planListing.getId();
+                  const { orderDetail = {} } = planListing.getMetadata();
+                  const subOrder = orderDetail[subOrderDate];
+                  const { transactionId } = subOrder || {};
+                  const transition = ETransition.COMPLETE_DELIVERY;
+
+                  await integrationSdk.transactions.transition({
+                    id: transactionId,
+                    transition,
+                    params: {},
+                  });
+
+                  const newOrderDetail = {
+                    ...orderDetail,
+                    [subOrderDate]: {
+                      ...subOrder,
+                      lastTransition: transition,
+                    },
+                  };
+
+                  await integrationSdk.listings.update({
+                    id: planId,
+                    metadata: {
+                      orderDetail: newOrderDetail,
+                    },
+                  });
+                }
+              }),
             );
-
-            const [orderId, subOrderDate] = trackingNumber.split('_');
-            const { plan } = await fetchData(orderId);
-            const planListing = Listing(plan);
-            const planId = planListing.getId();
-            const { orderDetail = {} } = planListing.getMetadata();
-            const subOrder = orderDetail[subOrderDate];
-            const { transactionId } = subOrder || {};
-            let transition;
-
-            if (isAllPathCompleted) {
-              transition = ETransition.COMPLETE_DELIVERY;
-            } else {
-              transition = ETransition.CANCEL_DELIVERY;
-            }
-
-            await integrationSdk.transactions.transition({
-              id: transactionId,
-              transition,
-              params: {},
-            });
-
-            const newOrderDetail = {
-              ...orderDetail,
-              [subOrderDate]: {
-                ...subOrder,
-                lastTransition: transition,
-              },
-            };
-
-            await integrationSdk.listings.update({
-              id: planId,
-              metadata: {
-                orderDetail: newOrderDetail,
-              },
-            });
 
             return res.status(200).end();
           }
 
           case 'CANCELED': {
-            const { tracking_number: trackingNumber } = event;
-            const [orderId, subOrderDate] = trackingNumber.split('_');
-            const { plan } = await fetchData(orderId);
-            const planListing = Listing(plan);
-            const planId = planListing.getId();
-            const { orderDetail = {} } = planListing.getMetadata();
-            const subOrder = orderDetail[subOrderDate];
-            const { transactionId } = subOrder || {};
+            await Promise.all(
+              path.map(async (OWSubOrder: any) => {
+                const { tracking_number: trackingNumber, status } = OWSubOrder;
+                if (!trackingNumber) return;
 
-            await integrationSdk.transactions.transition({
-              id: transactionId,
-              transition: ETransition.CANCEL_DELIVERY,
-              params: {},
-            });
+                if (status === 'CANCELED') {
+                  const [orderId, subOrderDate] = trackingNumber.split('_');
+                  const { plan } = await fetchData(orderId);
+                  const planListing = Listing(plan);
+                  const planId = planListing.getId();
+                  const { orderDetail = {} } = planListing.getMetadata();
+                  const subOrder = orderDetail[subOrderDate];
+                  const { transactionId } = subOrder || {};
 
-            const newOrderDetail = {
-              ...orderDetail,
-              [subOrderDate]: {
-                ...subOrder,
-                lastTransition: ETransition.CANCEL_DELIVERY,
-              },
-            };
+                  await integrationSdk.transactions.transition({
+                    id: transactionId,
+                    transition: ETransition.CANCEL_DELIVERY,
+                    params: {},
+                  });
 
-            await integrationSdk.listings.update({
-              id: planId,
-              metadata: {
-                orderDetail: newOrderDetail,
-              },
-            });
+                  const newOrderDetail = {
+                    ...orderDetail,
+                    [subOrderDate]: {
+                      ...subOrder,
+                      lastTransition: ETransition.CANCEL_DELIVERY,
+                    },
+                  };
+
+                  await integrationSdk.listings.update({
+                    id: planId,
+                    metadata: {
+                      orderDetail: newOrderDetail,
+                    },
+                  });
+                }
+              }),
+            );
 
             return res.status(200).end();
           }
