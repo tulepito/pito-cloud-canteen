@@ -31,7 +31,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         console.log('event', event);
 
         switch (event.status) {
-          case 'create': {
+          case 'ASSIGNING': {
             const { orderId, subOrderDate } = event;
             const { plan } = await fetchData(orderId);
             const planListing = Listing(plan);
