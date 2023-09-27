@@ -4,7 +4,9 @@ import classNames from 'classnames';
 
 import IconClose from '@components/Icons/IconClose/IconClose';
 import IconImage from '@components/Icons/IconImage/IconImage';
+import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
 import ImageFromFile from '@components/ImageFromFile/ImageFromFile';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useAppDispatch } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import type { TImageActionPayload } from '@redux/slices/uploadImage.slice';
@@ -42,11 +44,13 @@ const UploadImageError = (image: any) => {
 type TRatingImagesUploadFieldProps = {
   images: {};
   containerClassName?: string;
+  uploadImageInProgress?: boolean;
 };
 
 const RatingImagesUploadField: React.FC<TRatingImagesUploadFieldProps> = ({
   images,
   containerClassName,
+  uploadImageInProgress,
 }) => {
   const dispatch = useAppDispatch();
   const imageUploadRequestControl = useBoolean();
@@ -162,6 +166,11 @@ const RatingImagesUploadField: React.FC<TRatingImagesUploadFieldProps> = ({
                 onClick={onDeleteImage(image.id)}>
                 <IconClose className={css.deleteIcon} />
               </div>
+              <RenderWhen condition={uploadImageInProgress && !image.imageId}>
+                <div className={css.loadingUpload}>
+                  <IconSpinner />
+                </div>
+              </RenderWhen>
               <ImageFromFile
                 id={image.id}
                 file={image.file}
