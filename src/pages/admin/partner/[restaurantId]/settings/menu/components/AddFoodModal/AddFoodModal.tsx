@@ -190,9 +190,6 @@ const AddFoodModal: React.FC<TAddFoodModal> = (props) => {
     if (!newFoodsByDate[currentDate]) {
       newFoodsByDate[currentDate] = {};
     }
-    const foodsLength = Object.keys(foodsByDate?.[currentDate] || {}).length;
-
-    if (foodsLength > 10) return;
 
     rowCheckbox.forEach((key: string) => {
       const food = menuPickedFoods.find(
