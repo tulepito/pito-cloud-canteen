@@ -1,4 +1,4 @@
-import React, { forwardRef, useState } from 'react';
+import React, { useState } from 'react';
 import { OnChange } from 'react-final-form-listeners';
 import { useIntl } from 'react-intl';
 import classNames from 'classnames';
@@ -27,50 +27,6 @@ type TFieldMenuApplyTimeGroup = {
   className?: string;
   inputFieldsClassName?: string;
 };
-
-// eslint-disable-next-line react/display-name
-const CustomStartDateFieldInput = forwardRef((props, ref) => {
-  return (
-    <FieldTextInput
-      {...props}
-      id="startDate"
-      name="startDate"
-      className={css.customInput}
-      format={(value) => {
-        return value
-          ? format(new Date(value), 'EEE, dd MMMM, yyyy', {
-              locale: viLocale,
-            })
-          : format(new Date(), 'EEE, dd MMMM, yyyy', {
-              locale: viLocale,
-            });
-      }}
-      inputRef={ref}
-    />
-  );
-});
-
-// eslint-disable-next-line react/display-name
-const CustomEndDateFieldInput = forwardRef((props, ref) => {
-  return (
-    <FieldTextInput
-      {...props}
-      id="endDate"
-      name="endDate"
-      className={css.customInput}
-      format={(value) => {
-        return value
-          ? format(new Date(value), 'EEE, dd MMMM, yyyy', {
-              locale: viLocale,
-            })
-          : format(new Date(), 'EEE, dd MMMM, yyyy', {
-              locale: viLocale,
-            });
-      }}
-      inputRef={ref}
-    />
-  );
-});
 
 const FieldMenuApplyTimeGroup: React.FC<TFieldMenuApplyTimeGroup> = (props) => {
   const { values, form, dateInputClassName, className, inputFieldsClassName } =
@@ -140,7 +96,6 @@ const FieldMenuApplyTimeGroup: React.FC<TFieldMenuApplyTimeGroup> = (props) => {
           })}
           position="bottom"
           autoComplete="off"
-          withPortal
           label={intl.formatMessage({
             id: 'EditMenuInformationForm.startDateLabel',
           })}
@@ -149,7 +104,7 @@ const FieldMenuApplyTimeGroup: React.FC<TFieldMenuApplyTimeGroup> = (props) => {
               id: 'EditMenuInformationForm.startDateRequired',
             }),
           )}
-          customInput={<CustomStartDateFieldInput />}
+          shouldSkipTouched={false}
         />
         {values.menuType === EMenuTypes.fixedMenu && (
           <FieldDatePicker
@@ -163,7 +118,6 @@ const FieldMenuApplyTimeGroup: React.FC<TFieldMenuApplyTimeGroup> = (props) => {
             dateFormat={'dd MMMM, yyyy'}
             placeholderText={'Nhập ngày kết thúc'}
             autoComplete="off"
-            withPortal
             label={intl.formatMessage({
               id: 'EditMenuInformationForm.endDateLabel',
             })}
@@ -172,7 +126,7 @@ const FieldMenuApplyTimeGroup: React.FC<TFieldMenuApplyTimeGroup> = (props) => {
                 id: 'EditMenuInformationForm.endDateRequired',
               }),
             )}
-            customInput={<CustomEndDateFieldInput />}
+            shouldSkipTouched={false}
           />
         )}
         {isCycleMenu && (
