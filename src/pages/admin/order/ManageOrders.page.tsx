@@ -776,11 +776,11 @@ const ManageOrdersPage = () => {
             : {}),
           ...(meta_endDate
             ? {
-                meta_endDate: `${
+                meta_endDate: `,${
                   meta_endDate
-                    ? new Date(meta_endDate as string).getTime() - 1
+                    ? new Date(meta_endDate as string).getTime() + 1
                     : ''
-                },`,
+                }`,
               }
             : meta_startDate
             ? {
