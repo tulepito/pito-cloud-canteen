@@ -453,6 +453,7 @@ const ManagePartnersPage: React.FC<TManagePartnersPage> = () => {
               }
               placement="bottomLeft"
               trigger="click"
+              overlayClassName={css.overlay}
               overlayInnerStyle={{ backgroundColor: '#fff', padding: 20 }}>
               <Button
                 type="button"
