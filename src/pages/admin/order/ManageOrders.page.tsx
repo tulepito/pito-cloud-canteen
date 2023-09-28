@@ -768,11 +768,9 @@ const ManageOrdersPage = () => {
       ? {
           ...(meta_startDate
             ? {
-                meta_startDate: `${
-                  meta_startDate
-                    ? new Date(meta_startDate as string).getTime()
-                    : ''
-                },`,
+                meta_startDate: `${DateTime.fromISO(meta_startDate as string)
+                  .minus({ days: 7 })
+                  .toMillis()},`,
               }
             : {}),
           ...(meta_endDate
