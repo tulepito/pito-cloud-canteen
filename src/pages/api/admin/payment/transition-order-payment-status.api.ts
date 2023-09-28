@@ -19,7 +19,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
     const order = await fetchListing(orderId);
     const orderListing = Listing(order);
-    const { orderStateHistory, orderState } = orderListing.getMetadata();
+    const {
+      orderStateHistory,
+      orderState,
+      isClientSufficientPaid: currIsClientSufficientPaid = false,
+    } = orderListing.getMetadata();
 
     const plan = await fetchListing(planId);
     const planListing = Listing(plan);
@@ -82,11 +86,16 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
     const newOrderDetail = Object.keys(orderDetail).reduce(
       (result: any, subOrderDate: string) => {
+        const { isAdminPaymentConfirmed = false } =
+          orderDetail[subOrderDate] || {};
+
         return {
           ...result,
           [subOrderDate]: {
             ...orderDetail[subOrderDate],
-            isPaid: Boolean(subOrderDatePaymentStatus[subOrderDate]),
+            isPaid:
+              Boolean(subOrderDatePaymentStatus[subOrderDate]) ||
+              isAdminPaymentConfirmed,
           },
         };
       },
@@ -125,9 +134,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       Object.keys(activeOrderDetail).length ===
       Object.keys(subOrderDatePaymentStatus).length;
 
-    const isPartnerPaidAmountEnough = Object.values(
+    const isPartnerPaidAmountEnough = Object.keys(
       subOrderDatePaymentStatus,
-    ).every((status: any) => Boolean(status));
+    ).every((date: any) => {
+      const status = subOrderDatePaymentStatus[date];
+      const { isAdminPaymentConfirmed = false } = activeOrderDetail[date] || {};
+
+      return isAdminPaymentConfirmed || Boolean(status);
+    });
 
     const isOrderPendingPayment = orderState === EOrderStates.pendingPayment;
     const isOrderStateIncludePendingPaymentOrComplete = orderStateHistory.some(
@@ -139,7 +153,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     await integrationSdk.listings.update({
       id: orderId,
       metadata: {
-        isClientSufficientPaid: isClientPaidAmountEnough,
+        isClientSufficientPaid:
+          currIsClientSufficientPaid || isClientPaidAmountEnough,
         isPartnerSufficientPaid:
           isPartnerPaidAmountEnough && isPaymentNumberEqualToSubOrderDateNumber,
         ...(isOrderPendingPayment &&
