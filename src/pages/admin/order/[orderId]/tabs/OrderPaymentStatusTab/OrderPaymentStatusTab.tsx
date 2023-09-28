@@ -82,6 +82,7 @@ const OrderPaymentStatusTab: React.FC<OrderPaymentStatusTabProps> = (props) => {
     specificPCCFee = 0,
     vatSettings,
     plans = [],
+    isClientSufficientPaid = false,
   } = orderListing.getMetadata();
   const planId = plans.length > 0 ? plans[0] : undefined;
 
@@ -200,7 +201,9 @@ const OrderPaymentStatusTab: React.FC<OrderPaymentStatusTabProps> = (props) => {
 
   const clientPaidAmount =
     calculatePaidAmountBySubOrderDate(clientPaymentRecords);
-  const showClientCheckmark = clientTotalPrice === clientPaidAmount;
+  const showClientCheckmark =
+    isClientSufficientPaid || clientTotalPrice === clientPaidAmount;
+
   const clientTabItem = {
     key: 'client',
     label: (
