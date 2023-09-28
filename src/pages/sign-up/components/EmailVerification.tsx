@@ -1,7 +1,11 @@
+import { useEffect } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { useDispatch } from 'react-redux';
 import { useRouter } from 'next/router';
 
+import Button from '@components/Button/Button';
+import PitoLogoV2 from '@components/PitoLogoV2/PitoLogoV2';
+import { companyInvitationThunks } from '@redux/slices/companyInvitation.slice';
 import { userThunks } from '@redux/slices/user.slice';
 import type { AppDispatch } from '@redux/store';
 import { generalPaths } from '@src/paths';
@@ -17,7 +21,7 @@ type TEmailVerificationProps = {
 };
 
 const EmailVerification: React.FC<TEmailVerificationProps> = (props) => {
-  const { name, email, sendVerificationEmailError, inProgress } = props;
+  const { sendVerificationEmailError } = props;
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
 
@@ -39,12 +43,6 @@ const EmailVerification: React.FC<TEmailVerificationProps> = (props) => {
     </span>
   );
 
-  const toHomePageLink = (
-    <div className={css.toHomePageLink} onClick={navigateToHomePageMaybe}>
-      <FormattedMessage id="EmailVerification.toHomePageLinkText" />
-    </div>
-  );
-
   const resendErrorTranslationId = isTooManyEmailVerificationRequestsError(
     sendVerificationEmailError,
   )
@@ -57,40 +55,43 @@ const EmailVerification: React.FC<TEmailVerificationProps> = (props) => {
     </p>
   ) : null;
 
+  useEffect(() => {
+    const fromUrlExtracted = (fromUrl as string)?.split('/') || [];
+    const isCompanyInvitation = fromUrlExtracted.includes('invitation');
+    if (isCompanyInvitation) {
+      const invitationIndex = fromUrlExtracted.indexOf('invitation');
+      const companyId = fromUrlExtracted[invitationIndex + 1];
+      dispatch(
+        companyInvitationThunks.responseToInvitation({
+          companyId: companyId as string,
+          response: 'accept',
+        }),
+      );
+    }
+  }, [dispatch, fromUrl]);
+
   return (
     <div className={css.root}>
       <div className={css.content}>
+        <PitoLogoV2 />
         <h2 className={css.modalTitle}>
-          <FormattedMessage
-            id="EmailVerification.verifyEmailTitle"
-            values={{ name: <span className={css.name}>{name}</span> }}
-          />
+          <FormattedMessage id="EmailVerification.verifyEmailTitle" />
         </h2>
         <div className={css.modalMessage}>
           <FormattedMessage
             id="EmailVerification.verifyEmailText"
-            values={{ email }}
+            values={{ breakLine: <br /> }}
           />
         </div>
         {resendErrorMessage}
-      </div>
-      <div className={css.bottomWrapper}>
-        <div className={css.modalHelperText}>
-          {inProgress ? (
-            <FormattedMessage id="EmailVerification.sendingEmail" />
-          ) : (
-            <div className={css.actions}>
-              <div>
-                <FormattedMessage
-                  id="EmailVerification.resendEmail"
-                  values={{ resendEmailLink }}
-                />
-              </div>
-
-              {toHomePageLink}
-            </div>
-          )}
+        <div className={css.divider}></div>
+        <Button className={css.continueBtn} onClick={navigateToHomePageMaybe}>
+          <FormattedMessage id="EmailVerificationForm.successButtonText" />
+        </Button>
+        <div className={css.modalMessage}>
+          Không nhận được Email? Vui lòng kiểm tra hộp thư Spam Hoặc{' '}
         </div>
+        {resendEmailLink}
       </div>
     </div>
   );

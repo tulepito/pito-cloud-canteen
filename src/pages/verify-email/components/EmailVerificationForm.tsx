@@ -2,11 +2,11 @@ import React from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Field, Form as FinalForm } from 'react-final-form';
 import { FormattedMessage } from 'react-intl';
-import last from 'lodash/last';
 import Link from 'next/link';
 
 import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
+import PitoLogoV2 from '@components/PitoLogoV2/PitoLogoV2';
 
 import css from './EmailVerificationForm.module.scss';
 
@@ -28,11 +28,8 @@ const EmailVerificationFormComponent: React.FC<
   TEmailVerificationFormComponentProps
 > = (props) => {
   const { currentUser, inProgress, verificationError, handleSubmit } = props;
-  const { email, emailVerified, pendingEmail, profile } =
-    currentUser.attributes;
+  const { email, emailVerified, pendingEmail } = currentUser.attributes;
   const emailToVerify = <strong>{pendingEmail || email}</strong>;
-  const name =
-    profile?.firstName && (last(profile.firstName.split(' ')) as string);
 
   const errorMessage = (
     <div className={css.error}>
@@ -82,11 +79,9 @@ const EmailVerificationFormComponent: React.FC<
   const alreadyVerified = (
     <div className={css.root}>
       <div>
+        <PitoLogoV2 />
         <h2 className={css.modalTitle}>
-          <FormattedMessage
-            id="EmailVerificationForm.successTitle"
-            values={{ name }}
-          />
+          <FormattedMessage id="EmailVerificationForm.successTitle" />
         </h2>
 
         <p className={css.modalMessage}>
@@ -104,26 +99,21 @@ const EmailVerificationFormComponent: React.FC<
     </div>
   );
 
-  const currentEmail = <strong>{email}</strong>;
   const alreadyVerifiedButErrorReturned = (
     <div className={css.root}>
-      <div>
+      <div className={css.content}>
+        <PitoLogoV2 />
         <h2 className={css.modalTitle}>
-          <FormattedMessage
-            id="EmailVerificationForm.noPendingTitle"
-            values={{ name }}
-          />
+          <FormattedMessage id="EmailVerificationForm.noPendingTitle" />
         </h2>
 
         <p className={css.modalMessage}>
           <FormattedMessage
             id="EmailVerificationForm.noPendingText"
-            values={{ email: currentEmail, breakline: <br /> }}
+            values={{ email }}
           />
         </p>
-      </div>
-
-      <div className={css.bottomWrapper}>
+        <div className={css.divider}></div>
         <Button>
           <Link className={css.submitButton} href="/">
             <FormattedMessage id="EmailVerificationForm.successButtonText" />
