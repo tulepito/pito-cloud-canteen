@@ -66,7 +66,6 @@ const OrderPaymentStatusTab: React.FC<OrderPaymentStatusTabProps> = (props) => {
     (state) => state.OrderDetail.partnerPaymentRecords,
     shallowEqual,
   );
-
   const clientPaymentRecords = useAppSelector(
     (state) => state.OrderDetail.clientPaymentRecords,
     shallowEqual,
@@ -82,7 +81,10 @@ const OrderPaymentStatusTab: React.FC<OrderPaymentStatusTabProps> = (props) => {
     hasSpecificPCCFee = false,
     specificPCCFee = 0,
     vatSettings,
+    plans = [],
   } = orderListing.getMetadata();
+  const planId = plans.length > 0 ? plans[0] : undefined;
+
   const partnerCurrentQuotation = quotations.find(
     (_quotation) => _quotation.id.uuid === quotationId,
   );
@@ -134,7 +136,11 @@ const OrderPaymentStatusTab: React.FC<OrderPaymentStatusTabProps> = (props) => {
           const paidAmount = calculatePaidAmountBySubOrderDate(
             partnerPaymentRecordsByDate,
           );
-          const showCheckmark = totalWithVAT === paidAmount;
+
+          const { isAdminPaymentConfirmed = false } =
+            orderDetail[subOrderDate] || {};
+          const showCheckmark =
+            isAdminPaymentConfirmed || totalWithVAT <= paidAmount;
 
           return {
             key: subOrderDate,
@@ -170,6 +176,7 @@ const OrderPaymentStatusTab: React.FC<OrderPaymentStatusTabProps> = (props) => {
               partnerName: orderDetail[subOrderDate].restaurant.restaurantName,
               subOrderDate: selectedSubOrderDate,
               orderId,
+              planId,
               partnerId: orderDetail[subOrderDate].restaurant.id,
               partnerPaymentRecordsByDate,
               totalWithVAT,

@@ -19,6 +19,7 @@ type PartnerPaymentDetailProps = {
   partnerName: string;
   totalWithVAT: number;
   orderId: string;
+  planId?: string;
   partnerId: string;
   subOrderDate: string;
   partnerPaymentRecordsByDate: any[];
@@ -33,6 +34,7 @@ const PartnerPaymentDetail: React.FC<PartnerPaymentDetailProps> = (props) => {
     partnerName,
     totalWithVAT,
     orderId,
+    planId,
     partnerId,
     subOrderDate,
     partnerPaymentRecordsByDate = [],
@@ -46,6 +48,10 @@ const PartnerPaymentDetail: React.FC<PartnerPaymentDetailProps> = (props) => {
   const companyUser = User(company);
   const { companyName } = companyUser.getPublicData();
 
+  const orderDetail = useAppSelector((state) => state.OrderDetail.orderDetail);
+  const confirmPartnerPaymentInProgress = useAppSelector(
+    (state) => state.OrderDetail.confirmPartnerPaymentInProgress,
+  );
   const createPartnerPaymentRecordInProgress = useAppSelector(
     (state) => state.OrderDetail.createPartnerPaymentRecordInProgress,
   );
@@ -55,7 +61,10 @@ const PartnerPaymentDetail: React.FC<PartnerPaymentDetailProps> = (props) => {
   const deletePartnerPaymentRecordInProgress = useAppSelector(
     (state) => state.OrderDetail.deletePartnerPaymentRecordInProgress,
   );
-  const addPaymentDisabled = totalWithVAT === paidAmount;
+
+  const { isAdminPaymentConfirmed = false } = orderDetail[subOrderDate] || {};
+  const confirmPaymentDisabled = !!isAdminPaymentConfirmed;
+  const addPaymentDisabled = !!isAdminPaymentConfirmed;
 
   const handleAddPartnerPaymentRecord = async (
     values: TAddingPaymentRecordFormValues,
@@ -86,6 +95,15 @@ const PartnerPaymentDetail: React.FC<PartnerPaymentDetailProps> = (props) => {
     }
   };
 
+  const handleConfirmPayment = () => {
+    dispatch(
+      OrderDetailThunks.confirmPartnerPayment({
+        planId: planId as string,
+        subOrderDate,
+      }),
+    );
+  };
+
   const handleDeletePartnerPaymentRecord = async (paymentRecordId: string) => {
     return dispatch(
       OrderDetailThunks.deletePartnerPaymentRecord(paymentRecordId),
@@ -100,6 +118,14 @@ const PartnerPaymentDetail: React.FC<PartnerPaymentDetailProps> = (props) => {
         paidAmount={paidAmount}
       />
       <div className={css.buttonsWrapper}>
+        <Button
+          variant="secondary"
+          className={css.confirmPaymentBtn}
+          onClick={handleConfirmPayment}
+          inProgress={confirmPartnerPaymentInProgress}
+          disabled={confirmPaymentDisabled}>
+          Xác nhận thanh toán
+        </Button>
         <Button
           variant="secondary"
           onClick={addPaymentModalController.setTrue}
