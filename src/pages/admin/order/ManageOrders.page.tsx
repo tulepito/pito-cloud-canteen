@@ -8,6 +8,7 @@ import classNames from 'classnames';
 import addDays from 'date-fns/addDays';
 import { flatten } from 'lodash';
 import compact from 'lodash/compact';
+import { DateTime } from 'luxon';
 import { useRouter } from 'next/router';
 
 import Badge, { EBadgeType } from '@components/Badge/Badge';
@@ -293,12 +294,12 @@ const TABLE_COLUMN: TColumn[] = [
     key: 'startDate',
     label: 'Thời gian',
     render: (data: any) => {
-      const { startDate, endDate, parentKey, subOrderDate } = data;
+      const { startDate, endDate, parentKey } = data;
 
       return startDate && endDate ? (
         <div className={css.rowText}>
           <div className={css.deliveryHour}>{data.deliveryHour}</div>
-          {parentKey ? subOrderDate : `${data.startDate} - ${data.endDate}`}
+          {parentKey ? startDate : `${startDate} - ${endDate}`}
         </div>
       ) : (
         <></>
@@ -528,7 +529,7 @@ const parseEntitiesToTableData = (
           data: {
             id: `${entity.id.uuid}-${key}`,
             title: `${entity.attributes.title}-${getDayOfWeek(+key)}`,
-            startDate: startDate && formatTimestamp(startDate),
+            startDate: formatTimestamp(+key, 'dd/MM/yyyy'),
             endDate: endDate && formatTimestamp(endDate),
             subOrderDate: formatTimestamp(+key, 'dd/MM/yyyy'),
             state: orderState || EOrderDraftStates.pendingApproval,
@@ -763,36 +764,55 @@ const ManageOrdersPage = () => {
   useEffect(() => {
     dispatch(resetOrder());
 
+    const dateQueriesMaybe = shouldHideOrder
+      ? {
+          ...(meta_startDate
+            ? {
+                meta_startDate: `${
+                  meta_startDate
+                    ? new Date(meta_startDate as string).getTime()
+                    : ''
+                },`,
+              }
+            : {}),
+          ...(meta_endDate
+            ? {
+                meta_endDate: `,${
+                  DateTime.fromISO(meta_startDate as string)
+                    .plus({ days: 14 })
+                    .toMillis() + 1
+                }`,
+              }
+            : {}),
+        }
+      : {
+          ...(meta_startDate
+            ? {
+                meta_startDate: `${
+                  meta_startDate
+                    ? new Date(meta_startDate as string).getTime()
+                    : ''
+                },`,
+              }
+            : {}),
+          ...(meta_endDate
+            ? {
+                meta_endDate: `,${
+                  meta_endDate
+                    ? new Date(meta_endDate as string).getTime() + 1
+                    : ''
+                }`,
+              }
+            : {}),
+        };
+
     if (isReady) {
       dispatch(
         orderAsyncActions.queryOrders({
           page,
           keywords,
           ...(meta_orderState ? { meta_orderState } : {}),
-          ...(meta_startDate
-            ? {
-                meta_startDate: `,${
-                  meta_startDate
-                    ? new Date(meta_startDate as string).getTime() + 1
-                    : ''
-                }`,
-              }
-            : {}),
-          ...(meta_endDate
-            ? {
-                meta_endDate: `${
-                  meta_endDate
-                    ? new Date(meta_endDate as string).getTime() - 1
-                    : ''
-                },`,
-              }
-            : meta_startDate
-            ? {
-                meta_endDate: `${
-                  new Date(meta_startDate as string).getTime() - 1
-                },`,
-              }
-            : {}),
+          ...dateQueriesMaybe,
         }),
       );
     }
