@@ -1,8 +1,9 @@
 import { createSlice, current } from '@reduxjs/toolkit';
-import isEmpty from 'lodash/isEmpty';
 import { DateTime } from 'luxon';
 
 import {
+  confirmClientPaymentApi,
+  confirmPartnerPaymentApi,
   createPaymentRecordApi,
   deletePaymentRecordApi,
   getPaymentRecordsApi,
@@ -89,6 +90,9 @@ type TOrderDetailState = {
   transitInProgress: boolean;
   transitError: any;
 
+  confirmPartnerPaymentInProgress: boolean;
+  confirmClientPaymentInProgress: boolean;
+
   updateOrderStaffNameInProgress: boolean;
   updateOrderStaffNameError: any;
 
@@ -136,6 +140,9 @@ const initialState: TOrderDetailState = {
   transitInProgress: false,
   transitError: null,
 
+  confirmPartnerPaymentInProgress: false,
+  confirmClientPaymentInProgress: false,
+
   updateOrderStaffNameInProgress: false,
   updateOrderStaffNameError: null,
 
@@ -171,6 +178,7 @@ const initialState: TOrderDetailState = {
 const FETCH_ORDER = 'app/OrderDetail/FETCH_ORDER';
 const UPDATE_STAFF_NAME = 'app/OrderDetail/UPDATE_STAFF_NAME';
 const UPDATE_ORDER_STATE = 'app/OrderDetail/UPDATE_ORDER_STATE';
+const CONFIRM_CLIENT_PAYMENT = 'app/OrderDetail/CONFIRM_CLIENT_PAYMENT';
 const FETCH_QUOTATIONS = 'app/OrderDetail/FETCH_QUOTATIONS';
 const CREATE_PARTNER_PAYMENT_RECORD =
   'app/OrderDetail/CREATE_PARTNER_PAYMENT_RECORD';
@@ -362,6 +370,30 @@ const updatePlanDetail = createAsyncThunk(
   },
 );
 
+const confirmPartnerPayment = createAsyncThunk(
+  'app/OrderDetail/CONFIRM_PARTNER_PAYMENT',
+  async ({
+    planId,
+    subOrderDate,
+  }: {
+    planId: string;
+    subOrderDate: string | number;
+  }) => {
+    const response = await confirmPartnerPaymentApi({ planId, subOrderDate });
+
+    return response.data.orderDetail;
+  },
+);
+
+const confirmClientPayment = createAsyncThunk(
+  CONFIRM_CLIENT_PAYMENT,
+  async (orderId: string) => {
+    const response = await confirmClientPaymentApi(orderId);
+
+    return response.data?.order;
+  },
+);
+
 const fetchPartnerPaymentRecords = createAsyncThunk(
   FETCH_PARTNER_PAYMENT_RECORD,
   async (orderId: string) => {
@@ -486,6 +518,10 @@ export const OrderDetailThunks = {
   fetchQuotations,
   transit,
   updatePlanDetail,
+
+  confirmClientPayment,
+  confirmPartnerPayment,
+
   fetchPartnerPaymentRecords,
   createPartnerPaymentRecord,
   deletePartnerPaymentRecord,
@@ -700,6 +736,28 @@ const OrderDetailSlice = createSlice({
       })
       .addCase(fetchOnlyOrder.rejected, (state) => {
         state.fetchOnlyOrderInProgress = false;
+      })
+      /* =============== confirmClientPayment =============== */
+      .addCase(confirmClientPayment.pending, (state) => {
+        state.confirmClientPaymentInProgress = true;
+      })
+      .addCase(confirmClientPayment.fulfilled, (state, { payload }) => {
+        state.confirmClientPaymentInProgress = false;
+        state.order = payload;
+      })
+      .addCase(confirmClientPayment.rejected, (state) => {
+        state.confirmClientPaymentInProgress = false;
+      })
+      /* =============== confirmPartnerPayment =============== */
+      .addCase(confirmPartnerPayment.pending, (state) => {
+        state.confirmPartnerPaymentInProgress = true;
+      })
+      .addCase(confirmPartnerPayment.fulfilled, (state, { payload }) => {
+        state.confirmPartnerPaymentInProgress = false;
+        state.orderDetail = payload;
+      })
+      .addCase(confirmPartnerPayment.rejected, (state) => {
+        state.confirmPartnerPaymentInProgress = false;
       });
   },
 });

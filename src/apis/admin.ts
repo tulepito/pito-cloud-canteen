@@ -43,5 +43,22 @@ export const transitionOrderPaymentStatusApi = (
     planId,
   });
 
+export const confirmClientPaymentApi = (orderId: string) =>
+  putApi('/admin/payment/confirm-client-payment', {
+    orderId,
+  });
+
+export const confirmPartnerPaymentApi = ({
+  planId,
+  subOrderDate,
+}: {
+  planId: string;
+  subOrderDate: string | number;
+}) =>
+  putApi('/admin/payment/confirm-partner-payment', {
+    planId,
+    subOrderDate,
+  });
+
 export const fetchFoodListFromMenuApi = (params: TObject) =>
   getApi('/admin/listings/order/fetch-food-from-menu', params);
