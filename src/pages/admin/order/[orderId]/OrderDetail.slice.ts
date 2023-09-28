@@ -1,4 +1,5 @@
 import { createSlice, current } from '@reduxjs/toolkit';
+import isEmpty from 'lodash/isEmpty';
 import { DateTime } from 'luxon';
 
 import {
@@ -372,14 +373,21 @@ const updatePlanDetail = createAsyncThunk(
 
 const confirmPartnerPayment = createAsyncThunk(
   'app/OrderDetail/CONFIRM_PARTNER_PAYMENT',
-  async ({
-    planId,
-    subOrderDate,
-  }: {
-    planId: string;
-    subOrderDate: string | number;
-  }) => {
+  async (
+    {
+      planId,
+      subOrderDate,
+    }: {
+      planId: string;
+      subOrderDate: string | number;
+    },
+    { getState },
+  ) => {
+    const { order } = getState().OrderDetail;
+    const orderId = Listing(order).getId();
+
     const response = await confirmPartnerPaymentApi({ planId, subOrderDate });
+    await transitionOrderPaymentStatusApi(orderId, planId);
 
     return response.data.orderDetail;
   },
@@ -387,8 +395,13 @@ const confirmPartnerPayment = createAsyncThunk(
 
 const confirmClientPayment = createAsyncThunk(
   CONFIRM_CLIENT_PAYMENT,
-  async (orderId: string) => {
+  async (orderId: string, { getState }) => {
+    const { order } = getState().OrderDetail;
+    const orderListing = Listing(order);
+    const { plans = [] } = orderListing.getMetadata();
+
     const response = await confirmClientPaymentApi(orderId);
+    await transitionOrderPaymentStatusApi(orderId, plans[0]);
 
     return response.data?.order;
   },
@@ -404,7 +417,6 @@ const fetchPartnerPaymentRecords = createAsyncThunk(
     return partnerPaymentRecords || {};
   },
 );
-
 const createPartnerPaymentRecord = createAsyncThunk(
   CREATE_PARTNER_PAYMENT_RECORD,
   async (payload: TObject, { getState, dispatch }) => {
