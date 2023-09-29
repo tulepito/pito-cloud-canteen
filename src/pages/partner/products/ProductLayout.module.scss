@@ -27,6 +27,7 @@
   position: sticky;
   top: 53px;
   z-index: 1;
+  min-height: 70px;
 }
 
 .tabHeaders {
@@ -55,4 +56,6 @@
 .contentContainer {
   background-color: $neutralGray3;
   padding: 16px;
+  min-height: calc(100vh - 84px - 70px - 53px);
+  min-height: calc(100dvh - 84px - 70px - 53px);
 }
