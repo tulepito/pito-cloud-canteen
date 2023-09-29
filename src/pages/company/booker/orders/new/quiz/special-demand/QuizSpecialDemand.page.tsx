@@ -96,9 +96,18 @@ const QuizSpecialDemand = () => {
       id="QuizSpecialDemand"
       isOpen
       handleClose={handleCancel}
-      modalTitle={intl.formatMessage({
-        id: 'QuizSpecialDemand.title',
-      })}
+      modalTitle={
+        <div className={css.headerContainer}>
+          <div className={css.main}>
+            {intl.formatMessage({
+              id: 'QuizSpecialDemand.title',
+            })}
+          </div>
+          <div className={css.semi}>
+            (Có thể áp dụng cho 1 hoặc một số khẩu phần)
+          </div>
+        </div>
+      }
       submitText="Tiếp tục"
       cancelText="Bỏ qua"
       onCancel={onCancel}

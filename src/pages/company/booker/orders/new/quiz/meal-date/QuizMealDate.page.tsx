@@ -76,7 +76,7 @@ const QuizMealDate = () => {
       durationTime: '1',
       durationTimeMode: 'week',
       deliveryHour: deliveryHourFromQuery as string,
-      isGroupOrder: true,
+      isGroupOrder: [],
     }),
     [deliveryHourFromQuery],
   );
@@ -152,6 +152,7 @@ const QuizMealDate = () => {
       submitText="Tạo đơn"
       onSubmit={onFormSubmitClick}
       submitDisabled={formInvalid}
+      modalContainerClassName={css.modalContainer}
       onBack={goBack}>
       <MealDateForm
         onSubmit={() => {}}

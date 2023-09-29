@@ -3,7 +3,7 @@ import { useField, useForm } from 'react-final-form-hooks';
 import { FormattedMessage, useIntl } from 'react-intl';
 import isEmpty from 'lodash/isEmpty';
 
-import Button, { InlineTextButton } from '@components/Button/Button';
+import Button from '@components/Button/Button';
 import { FieldDropdownSelectComponent } from '@components/FormFields/FieldDropdownSelect/FieldDropdownSelect';
 import { FieldSelectComponent } from '@components/FormFields/FieldSelect/FieldSelect';
 
@@ -19,7 +19,6 @@ type TCreateOrderFormProps = {
     name: string;
   }[];
   onSubmit: (values: TCreateOrderFormValues, reject?: boolean) => void;
-  onCancel: () => void;
   initialValues?: TCreateOrderFormValues;
   submitInprogress?: boolean;
   submitError?: any;
@@ -48,7 +47,6 @@ const CreateOrderForm: React.FC<TCreateOrderFormProps> = ({
   companies = [],
   previousOrders = [],
   onSubmit,
-  onCancel,
   initialValues,
   submitInprogress,
   queryInprogress,
@@ -162,13 +160,6 @@ const CreateOrderForm: React.FC<TCreateOrderFormProps> = ({
         spinnerClassName={css.spinnerClassName}>
         <FormattedMessage id="CreateOrderForm.submit" />
       </Button>
-      <InlineTextButton
-        onClick={onCancel}
-        className={css.cancelBtn}
-        disabled={isSubmitting}
-        spinnerClassName={css.spinnerClassName}>
-        <FormattedMessage id="CreateOrderForm.cancel" />
-      </InlineTextButton>
     </form>
   );
 };

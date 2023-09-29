@@ -17,6 +17,7 @@ type FieldDatePickerProps = FieldRenderProps<string, any> & {
   label?: string;
   name?: string;
   shouldSkipTouched?: boolean;
+  shouldHideBoxShadow?: boolean;
 };
 
 const renderCustomHeader = (props: ReactDatePickerCustomHeaderProps) => {
@@ -66,6 +67,7 @@ export const FieldDatePickerComponent: React.FC<FieldDatePickerProps> = (
     inputClassName,
     readOnly = false,
     shouldSkipTouched = true,
+    shouldHideBoxShadow = false,
     ...rest
   } = props;
   const { name, onChange, value, onBlur } = input;
@@ -76,6 +78,10 @@ export const FieldDatePickerComponent: React.FC<FieldDatePickerProps> = (
     onChange(date?.getTime());
     onBlur();
   };
+
+  const classes = classNames(css.root, className, {
+    [css.hideBoxShadow]: shouldHideBoxShadow,
+  });
 
   const { invalid, error, touched } = meta;
   const errorText = customErrorText || error;
@@ -103,7 +109,7 @@ export const FieldDatePickerComponent: React.FC<FieldDatePickerProps> = (
   };
 
   return (
-    <div className={classNames(css.root, className)}>
+    <div className={classes}>
       {label && (
         <label className={labelClasses} htmlFor={id}>
           {label}

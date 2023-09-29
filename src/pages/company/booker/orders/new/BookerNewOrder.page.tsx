@@ -69,20 +69,23 @@ function BookerNewOrderPage() {
         handleClose={handleCancel}
         containerClassName={css.modalContainer}
         scrollLayerClassName={css.modalScrollLayer}
-        openClassName={css.openModal}
-        title={intl.formatMessage({
-          id: 'BookerNewOrder.modal.createTitle',
-        })}>
+        openClassName={css.openModal}>
         <div className={css.modalContent}>
-          <CreateOrderForm
-            companies={normalizedCompanies}
-            previousOrders={[]}
-            onSubmit={handleSubmit}
-            onCancel={handleCancel}
-            queryInprogress={queryCompanyInprogress}
-            submitInprogress={createOrderInProcess || isSubmitting}
-            submitError={createOrderError}
-          />
+          <div className={css.title}>
+            {intl.formatMessage({
+              id: 'BookerNewOrder.modal.createTitle',
+            })}
+          </div>
+          <div className={css.formContainer}>
+            <CreateOrderForm
+              companies={normalizedCompanies}
+              previousOrders={[]}
+              onSubmit={handleSubmit}
+              queryInprogress={queryCompanyInprogress}
+              submitInprogress={createOrderInProcess || isSubmitting}
+              submitError={createOrderError}
+            />
+          </div>
         </div>
       </Modal>
     </div>

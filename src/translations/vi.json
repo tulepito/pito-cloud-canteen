@@ -288,7 +288,7 @@
   "CreateOrderForm.companyLabel": "Chọn đơn vị đặt",
   "CreateOrderForm.previousOrder.placeholder": "Chọn 1 đơn đã đặt",
   "CreateOrderForm.previousOrderLabel": "Đơn hàng đã đặt",
-  "CreateOrderForm.submit": "Tạo đơn hàng",
+  "CreateOrderForm.submit": "Tiếp theo",
   "CreateOrderForm.usePreviousDataLabel": "Sao chép đơn hàng đã đặt",
   "CreateOrderPage.title": "Tạo đơn hàng",
   "CreateOrderRoute.description": "Tạo đơn hàng",

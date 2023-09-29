@@ -1,16 +1,17 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
-import { Field, Form as FinalForm } from 'react-final-form';
+import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
 
 import Form from '@components/Form/Form';
+import FieldCheckbox from '@components/FormFields/FieldCheckbox/FieldCheckbox';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
-import Toggle from '@components/Toggle/Toggle';
 import DayInWeekField from '@pages/admin/order/create/components/DayInWeekField/DayInWeekField';
-import DurationForNextOrderField from '@pages/admin/order/create/components/DurationForNextOrderField/DurationForNextOrderField';
-import MealPlanDateField from '@pages/admin/order/create/components/MealPlanDateField/MealPlanDateField';
-import OrderDeadlineField from '@pages/admin/order/create/components/OrderDeadlineField/OrderDeadlineField';
+
+import DaySessionField from '../DaySessionField/DaySessionField';
+import OrderDateField from '../OrderDateField/OrderDateField';
+import OrderDeadlineField from '../OrderDeadlineField/OrderDeadlineField';
 
 import css from './MealDateForm.module.scss';
 
@@ -21,7 +22,10 @@ export type TMealDateFormValues = {
   deadlineDate: number;
   deadlineHour: string;
   dayInWeek: string[];
-  isGroupOrder: boolean;
+  isGroupOrder: string[];
+  orderDeadlineHour?: string;
+  orderDeadlineMinute?: string;
+  daySession: string;
 };
 
 type TExtraProps = {
@@ -39,25 +43,32 @@ const MealDateFormComponent: React.FC<TMealDateFormComponentProps> = (
     props;
   const intl = useIntl();
 
-  const { isGroupOrder } = values;
+  const {
+    startDate: startDateInitialValue,
+    endDate: endDateInitialValue,
+    deadlineDate: deadlineDateInitialValue,
+    isGroupOrder,
+    daySession,
+  } = values;
 
   useEffect(() => {
     setFormValues?.(values);
   }, [JSON.stringify(values)]);
 
   useEffect(() => {
-    setFormInvalid?.(invalid);
-  }, [invalid]);
+    const formInvalid =
+      invalid ||
+      !startDateInitialValue ||
+      !endDateInitialValue ||
+      !daySession ||
+      (isGroupOrder.length > 0 && !deadlineDateInitialValue);
+    setFormInvalid?.(formInvalid);
+  }, [invalid, JSON.stringify(values)]);
 
   return (
     <Form onSubmit={handleSubmit}>
       <div className={css.datePickersWrapper}>
-        <MealPlanDateField
-          form={form}
-          values={values}
-          columnLayout
-          layoutClassName={css.dateLayout}
-        />
+        <OrderDateField form={form} values={values} />
         <DayInWeekField
           form={form}
           values={values}
@@ -68,49 +79,25 @@ const MealDateFormComponent: React.FC<TMealDateFormComponentProps> = (
             id: 'MealDateForm.dayInWeekField.title',
           })}
         />
-        <DurationForNextOrderField
-          containerClassName={css.planDurationFieldContainer}
+        <DaySessionField
           form={form}
-          displayedDurationTimeValue={values.displayedDurationTime}
-          title={intl.formatMessage({
-            id: 'MealDateForm.durationForNextOrderField.label',
-          })}
+          values={values}
+          containerClassName={css.fieldContainer}
+          titleClassName={css.fieldTitle}
         />
 
-        <Field name={'isGroupOrder'}>
-          {(fieldProps) => {
-            const { input } = fieldProps;
-
-            return (
-              <Toggle
-                label={intl.formatMessage({
-                  id: 'MealDateForm.orderTypeField.label',
-                })}
-                id={'MealDateForm.orderType'}
-                status={input.value ? 'on' : 'off'}
-                className={css.orderTypeField}
-                onClick={(value) => {
-                  input.onChange(value);
-                }}
-              />
-            );
-          }}
-        </Field>
-
-        <RenderWhen condition={isGroupOrder}>
-          <OrderDeadlineField
-            form={form}
-            values={values}
-            columnLayout
-            containerClassName={css.deadlineFieldContainer}
-            layoutClassName={css.deadlineFieldLayout}
-            deadlineDateLabel={intl.formatMessage({
-              id: 'MealDateForm.OrderDeadlineField.label.date',
-            })}
-            deadlineHourLabel={intl.formatMessage({
-              id: 'MealDateForm.OrderDeadlineField.label.hour',
-            })}
+        <div className={css.fieldContainer}>
+          <FieldCheckbox
+            id="isGroupOrder"
+            name="isGroupOrder"
+            value="true"
+            label="Tôi muốn mời thành viên tham gia chọn món"
           />
+        </div>
+        <RenderWhen condition={isGroupOrder.length > 0}>
+          <div className={css.fieldContainer}>
+            <OrderDeadlineField form={form} values={values} />
+          </div>
         </RenderWhen>
       </div>
     </Form>

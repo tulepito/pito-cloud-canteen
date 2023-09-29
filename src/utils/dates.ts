@@ -586,3 +586,10 @@ export const renderListTimeOptions = ({
 };
 
 export const TimeOptions = renderListTimeOptions({});
+
+export const getNextWeek = (date: Date) => {
+  return DateTime.fromJSDate(date)
+    .plus({ weeks: 1 })
+    .startOf('week')
+    .toJSDate();
+};

@@ -5,9 +5,17 @@
 .root {
 }
 
+.title {
+  text-align: center;
+  @include textTemplate(24px, $fontWeightBold, 32px);
+}
+
+.formContainer {
+  margin-top: 32px;
+}
+
 .openModal .modalContainer {
-  max-width: 700px;
-  flex-basis: 700px;
+  flex-basis: 480px;
 }
 
 .openModal .modalScrollLayer {

@@ -11,7 +11,7 @@ import css from './QuizModal.module.scss';
 type QuizModalProps = {
   id: string;
   isOpen: boolean;
-  modalTitle: string;
+  modalTitle: string | React.ReactNode;
   submitText?: string;
   cancelText?: string;
   submitDisabled?: boolean;

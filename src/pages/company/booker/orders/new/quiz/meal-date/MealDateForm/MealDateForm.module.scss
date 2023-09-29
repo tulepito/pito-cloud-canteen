@@ -4,7 +4,6 @@
 
 .fieldContainer {
   margin: 24px auto 0;
-  width: fit-content;
 }
 
 .fieldTitle {
@@ -23,7 +22,7 @@
 }
 
 .datePickersWrapper {
-  width: 340px;
+  max-width: 468px;
   margin: 0 auto;
 
   .planDurationFieldContainer {
