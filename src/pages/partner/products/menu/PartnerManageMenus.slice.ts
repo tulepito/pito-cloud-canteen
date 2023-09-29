@@ -5,7 +5,7 @@ import { createAsyncThunk } from '@redux/redux.helper';
 import { CurrentUser } from '@src/utils/data';
 import { EListingType } from '@src/utils/enums';
 import { storableError } from '@src/utils/errors';
-import type { TCurrentUser, TListing } from '@src/utils/types';
+import type { TCurrentUser, TListing, TObject } from '@src/utils/types';
 
 // ================ Initial states ================ //
 type TPartnerManageMenusState = {
@@ -24,7 +24,7 @@ const initialState: TPartnerManageMenusState = {
 // ================ Async thunks ================ //
 const loadData = createAsyncThunk(
   'app/PartnerManageMenus/LOAD_DATA',
-  async (_, { extra: sdk, getState, rejectWithValue }) => {
+  async (payload: TObject, { extra: sdk, getState, rejectWithValue }) => {
     try {
       const { currentUser } = getState().user;
       const { restaurantListingId } = CurrentUser(
@@ -37,6 +37,7 @@ const loadData = createAsyncThunk(
           meta_listingType: EListingType.menu,
           meta_restaurantId: restaurantListingId,
           meta_isDeleted: false,
+          ...payload,
         },
       });
 

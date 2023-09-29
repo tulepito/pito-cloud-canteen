@@ -1,7 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useField, useForm } from 'react-final-form-hooks';
 import classNames from 'classnames';
+import debounce from 'lodash/debounce';
 
 import Button from '@components/Button/Button';
 import { FieldTextInputComponent } from '@components/FormFields/FieldTextInput/FieldTextInput';
@@ -16,14 +17,17 @@ import { PartnerManageMenusThunks } from './PartnerManageMenus.slice';
 
 import css from './PartnerManageMenusPage.module.scss';
 
+const DEBOUNCE_TIME = 1000;
+
 const NEED_HANDLE_MENU_TYPES = MENU_MEAL_TYPE_OPTIONS.slice(0, 3);
 type TPartnerManageMenusPageProps = {};
 
 const PartnerManageMenusPage: React.FC<TPartnerManageMenusPageProps> = () => {
+  const dispatch = useAppDispatch();
+  const [searchTitle, setSearchTitle] = useState('');
   const [currentTab, setCurrentTab] = useState<string | EMenuMealType>(
     EMenuMealType.breakfast,
   );
-  const dispatch = useAppDispatch();
   const menus = useAppSelector((state) => state.PartnerManageMenus.menus);
   const { form } = useForm({
     initialValues: {},
@@ -68,9 +72,27 @@ const PartnerManageMenusPage: React.FC<TPartnerManageMenusPageProps> = () => {
     });
   }, [currentTab, JSON.stringify(menus)]);
 
+  const debounceFn = useCallback(
+    debounce(
+      // eslint-disable-next-line @typescript-eslint/no-shadow
+      (searchTitle?: string) =>
+        dispatch(
+          PartnerManageMenusThunks.loadData({
+            keywords: searchTitle || '',
+          }),
+        ),
+      DEBOUNCE_TIME,
+    ),
+    [],
+  );
+
   useEffect(() => {
-    dispatch(PartnerManageMenusThunks.loadData());
-  }, []);
+    setSearchTitle(titleField.input.value);
+  }, [titleField.input.value]);
+
+  useEffect(() => {
+    debounceFn(searchTitle);
+  }, [searchTitle]);
 
   return (
     <div className={css.root}>
