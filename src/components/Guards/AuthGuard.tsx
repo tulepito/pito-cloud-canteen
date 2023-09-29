@@ -13,6 +13,7 @@ import { currentUserSelector, userThunks } from '@redux/slices/user.slice';
 import { enGeneralPaths, generalPaths } from '@src/paths';
 
 import { usePathChecker } from './Guards.helper';
+import useVerifyAuthentication from './useVerifyAuthentication';
 
 type TAuthGuardProps = PropsWithChildren<{}>;
 
@@ -84,7 +85,7 @@ const AuthGuard: React.FC<TAuthGuardProps> = ({ children }) => {
   }, [isAuthenticated]);
 
   // TODO: verify authentication
-  // useVerifyAuthentication(homePageNavigateCondition);
+  useVerifyAuthentication(homePageNavigateCondition);
 
   return <>{renderComponent()}</>;
 };
