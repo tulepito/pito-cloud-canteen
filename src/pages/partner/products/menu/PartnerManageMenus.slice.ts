@@ -1,6 +1,8 @@
 import { createSlice } from '@reduxjs/toolkit';
+import differenceBy from 'lodash/differenceBy';
 
 import { closePartnerMenuApi, publishPartnerMenuApi } from '@apis/menuApi';
+import { deleteMenusApi } from '@apis/partnerApi';
 import { queryAllPages } from '@helpers/apiHelpers';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { CurrentUser, denormalisedResponseEntities } from '@src/utils/data';
@@ -15,6 +17,8 @@ type TPartnerManageMenusState = {
   menus: TListing[];
   // toggle menu active status
   toggleMenuActiveStatusInProgress: boolean;
+  // delete menu
+  deleteMenusInProgress: boolean;
 };
 const initialState: TPartnerManageMenusState = {
   fetchMenusInProgress: false,
@@ -22,6 +26,8 @@ const initialState: TPartnerManageMenusState = {
   menus: [],
   // toggle menu active status
   toggleMenuActiveStatusInProgress: false,
+  // delete menu
+  deleteMenusInProgress: false,
 };
 
 // ================ Thunk types ================ //
@@ -74,9 +80,25 @@ const toggleMenuActiveStatus = createAsyncThunk(
   },
 );
 
+const deleteMenus = createAsyncThunk(
+  'app/PartnerManageMenus/DELELE_MENUS',
+  async (payload: TObject, { fulfillWithValue, rejectWithValue }) => {
+    try {
+      const { id, ids } = payload;
+
+      await deleteMenusApi({ id, ids });
+
+      return fulfillWithValue({ id, ids });
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  },
+);
+
 export const PartnerManageMenusThunks = {
   loadData,
   toggleMenuActiveStatus,
+  deleteMenus,
 };
 
 // ================ Slice ================ //
@@ -117,6 +139,28 @@ const PartnerManageMenusSlice = createSlice({
       })
       .addCase(toggleMenuActiveStatus.rejected, (state) => {
         state.toggleMenuActiveStatusInProgress = false;
+      }) /* =============== deleteMenus =============== */
+      .addCase(deleteMenus.pending, (state) => {
+        state.deleteMenusInProgress = true;
+      })
+      .addCase(deleteMenus.fulfilled, (state, { payload }) => {
+        const { id, ids } = payload;
+        let newMenuList = state.menus;
+        const fakeDeletedMenuList = (ids && ids.length > 0 ? ids : [id]).map(
+          (uuid: string) => ({
+            id: {
+              uuid,
+            },
+          }),
+        );
+
+        newMenuList = differenceBy(newMenuList, fakeDeletedMenuList, 'id.uuid');
+
+        state.deleteMenusInProgress = false;
+        state.menus = newMenuList;
+      })
+      .addCase(deleteMenus.rejected, (state) => {
+        state.deleteMenusInProgress = false;
       });
   },
 });
