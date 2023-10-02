@@ -63,7 +63,8 @@ const PartnerPaymentDetail: React.FC<PartnerPaymentDetailProps> = (props) => {
   );
 
   const { isAdminPaymentConfirmed = false } = orderDetail[subOrderDate] || {};
-  const confirmPaymentDisabled = !!isAdminPaymentConfirmed;
+  const confirmPaymentDisabled =
+    !!isAdminPaymentConfirmed || totalWithVAT === paidAmount;
   const addPaymentDisabled = !!isAdminPaymentConfirmed;
 
   const handleAddPartnerPaymentRecord = async (
