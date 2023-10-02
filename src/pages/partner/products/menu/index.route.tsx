@@ -15,7 +15,7 @@ const PartnerManageMenusRoute = () => {
   const menus = useAppSelector((state) => state.PartnerManageMenus.menus);
 
   const shouldHideAddMenuButton =
-    queryMenusInProgress || (!queryMenusInProgress && !isEmpty(menus));
+    queryMenusInProgress || (!queryMenusInProgress && isEmpty(menus));
 
   return (
     <MetaWrapper routeName="PartnerManageMenusRoute">
