@@ -4,15 +4,15 @@ import { useField, useForm } from 'react-final-form-hooks';
 import classNames from 'classnames';
 import debounce from 'lodash/debounce';
 
-import Button from '@components/Button/Button';
 import { FieldTextInputComponent } from '@components/FormFields/FieldTextInput/FieldTextInput';
-import IconFilter from '@components/Icons/IconFilter/IconFilter';
 import IconSearch from '@components/Icons/IconSearch/IconSearch';
 import type { TTabsItem } from '@components/Tabs/Tabs';
 import Tabs from '@components/Tabs/Tabs';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { Listing } from '@src/utils/data';
 import { EMenuMealType, MENU_MEAL_TYPE_OPTIONS } from '@src/utils/enums';
 
+import MenuCard from './components/MenuCard';
 import { PartnerManageMenusThunks } from './PartnerManageMenus.slice';
 
 import css from './PartnerManageMenusPage.module.scss';
@@ -57,17 +57,31 @@ const PartnerManageMenusPage: React.FC<TPartnerManageMenusPageProps> = () => {
         [css.countActive]: isTabActive,
       });
 
+      const menusForTab = menus.filter((m) => {
+        const { mealType } = Listing(m).getPublicData();
+
+        return mealType === key;
+      });
+
       const tabLabel = (
         <div className={css.tabLabel}>
           {label}
-          <span className={countClasses}>{0}</span>
+          <span className={countClasses}>{menusForTab.length}</span>
+        </div>
+      );
+
+      const tabChildren = (
+        <div>
+          {menusForTab.map((m) => {
+            return <MenuCard key={m.id.uuid} menu={m} />;
+          })}
         </div>
       );
 
       return {
         id: key,
         label: tabLabel,
-        children: <div></div>,
+        children: tabChildren,
       };
     });
   }, [currentTab, JSON.stringify(menus)]);
@@ -96,13 +110,16 @@ const PartnerManageMenusPage: React.FC<TPartnerManageMenusPageProps> = () => {
 
   return (
     <div className={css.root}>
-      <Tabs items={tabItems} onChange={handleTabChanged} />
-      <div className={css.searchFilterContainer}>
-        <FieldTextInputComponent {...fieldTitleProps} />
-        <Button variant="secondary">
-          <IconFilter />
-        </Button>
-      </div>
+      <Tabs
+        items={tabItems}
+        onChange={handleTabChanged}
+        actionsClassName={css.tabAction}
+        actionsComponent={
+          <div className={css.searchFilterContainer}>
+            <FieldTextInputComponent {...fieldTitleProps} />
+          </div>
+        }
+      />
     </div>
   );
 };

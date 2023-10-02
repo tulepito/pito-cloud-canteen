@@ -26,17 +26,6 @@
   }
 }
 
-.searchFilterContainer {
-  display: flex;
-  column-gap: 16px;
-  width: 100%;
-
-  .titleFieldContainer {
-    flex-basis: calc(100% - 44px - 16px);
-  }
-
-  button {
-    min-height: unset;
-    padding: 10px 13px;
-  }
+.tabAction {
+  margin-bottom: 16px;
 }
