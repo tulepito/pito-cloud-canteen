@@ -1,10 +1,10 @@
+/* eslint-disable unused-imports/no-unused-vars */
 import { calculatePriceQuotationInfo } from '@helpers/order/cartInfoHelper';
 import { calculatePaidAmountBySubOrderDate } from '@pages/admin/order/[orderId]/helpers/AdminOrderDetail';
 import { fetchListing } from '@services/integrationHelper';
 import type { PaymentBaseParams } from '@services/payment';
-import { queryPaymentRecordOnFirebase } from '@services/payment';
 import { Listing } from '@src/utils/data';
-import { EPaymentType } from '@src/utils/enums';
+import type { EPaymentType } from '@src/utils/enums';
 import type { TPaymentRecord } from '@src/utils/types';
 
 export const calculateClientTotalPriceAndPaidAmount = async (
@@ -44,39 +44,41 @@ export const checkPaymentRecordValid = async (
   const { orderId, subOrderDate: subOrderDateParam, amount } = paymentRecord;
   if (amount === 0) return false;
 
-  const paymentRecords = await queryPaymentRecordOnFirebase({
-    paymentType,
-    orderId,
-  });
+  return true;
 
-  const isPartnerPayment = paymentType === EPaymentType.PARTNER;
+  // const paymentRecords = await queryPaymentRecordOnFirebase({
+  //   paymentType,
+  //   orderId,
+  // });
 
-  if (isPartnerPayment) {
-    const groupPaymentRecordsBySubOrderDate = paymentRecords?.reduce(
-      (acc: any, cur: any) => {
-        const { subOrderDate } = cur;
-        if (!acc[subOrderDate]) {
-          acc[subOrderDate] = [];
-        }
-        acc[subOrderDate].push(cur);
+  // const isPartnerPayment = paymentType === EPaymentType.PARTNER;
 
-        return acc;
-      },
-      {},
-    );
+  // if (isPartnerPayment) {
+  //   const groupPaymentRecordsBySubOrderDate = paymentRecords?.reduce(
+  //     (acc: any, cur: any) => {
+  //       const { subOrderDate } = cur;
+  //       if (!acc[subOrderDate]) {
+  //         acc[subOrderDate] = [];
+  //       }
+  //       acc[subOrderDate].push(cur);
 
-    const paymentRecordsBySubOrderDate =
-      groupPaymentRecordsBySubOrderDate?.[subOrderDateParam!] || [];
+  //       return acc;
+  //     },
+  //     {},
+  //   );
 
-    const totalPrice = paymentRecordsBySubOrderDate?.[0]?.totalPrice || 0;
-    const paidAmount = calculatePaidAmountBySubOrderDate(
-      paymentRecordsBySubOrderDate,
-    );
+  //   const paymentRecordsBySubOrderDate =
+  //     groupPaymentRecordsBySubOrderDate?.[subOrderDateParam!] || [];
 
-    return totalPrice - paidAmount >= amount;
-  }
-  const { clientTotalPrice, clientPaidAmount } =
-    await calculateClientTotalPriceAndPaidAmount(orderId, paymentRecords!);
+  //   const totalPrice = paymentRecordsBySubOrderDate?.[0]?.totalPrice || 0;
+  //   const paidAmount = calculatePaidAmountBySubOrderDate(
+  //     paymentRecordsBySubOrderDate,
+  //   );
 
-  return clientTotalPrice - clientPaidAmount >= amount;
+  //   return totalPrice - paidAmount >= amount;
+  // }
+  // const { clientTotalPrice, clientPaidAmount } =
+  //   await calculateClientTotalPriceAndPaidAmount(orderId, paymentRecords!);
+
+  // return clientTotalPrice - clientPaidAmount >= amount;
 };
