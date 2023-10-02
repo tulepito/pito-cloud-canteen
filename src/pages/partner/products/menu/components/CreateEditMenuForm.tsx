@@ -7,10 +7,12 @@ import FieldCheckboxGroup from '@components/FormFields/FieldCheckboxGroup/FieldC
 import FieldRadioButton from '@components/FormFields/FieldRadioButton/FieldRadioButton';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import { MENU_MEAL_TYPE_OPTIONS } from '@src/utils/enums';
+import { maxLength } from '@src/utils/validators';
 
 import css from './CreateEditMenuForm.module.scss';
 
 const NEED_HANDLE_MENU_TYPES = MENU_MEAL_TYPE_OPTIONS.slice(0, 3);
+const MAX_MENU_LENGTH = 200;
 
 export type TCreateEditMenuFormValues = {};
 
@@ -28,16 +30,32 @@ const CreateEditMenuFormComponent: React.FC<
   return (
     <Form onSubmit={handleSubmit}>
       <div>
-        <div className={css.fieldsContainer}>
+        <div className={css.container}>
           <div className={css.containerTitle}>Thông tin menu</div>
-          <div className={css.fieldContainer}>
-            <FieldTextInput id="CreateEditMenuForm.menuName" name="menuName" />
+          <div className={css.fieldsContainer}>
+            <div className={css.fieldContainer}>
+              <label>
+                Tên menu <span>*</span>
+              </label>
+              <FieldTextInput
+                id="CreateEditMenuForm.menuName"
+                name="menuName"
+                placeholder="Nhập tên thực đơn"
+                validate={maxLength(
+                  'Vui lòng nhập tên dưới 200 ký tự',
+                  MAX_MENU_LENGTH,
+                )}
+              />
+            </div>
+            <div className={css.fieldContainer}>
+              <label>
+                Bữa phục vụ <span>*</span>
+              </label>
+              <FieldCheckboxGroup
+                name="menuTypes"
+                options={NEED_HANDLE_MENU_TYPES}
+              />
 
-            <FieldCheckboxGroup
-              name="menuTypes"
-              options={NEED_HANDLE_MENU_TYPES}
-            />
-            <div>
               {NEED_HANDLE_MENU_TYPES.map(({ key, label }) => (
                 <FieldRadioButton
                   key={key}
@@ -50,10 +68,10 @@ const CreateEditMenuFormComponent: React.FC<
             </div>
           </div>
         </div>
-        <div className={css.fieldsContainer}>
+        <div className={css.container}>
           <div className={css.containerTitle}>Thời gian áp dụng</div>
         </div>
-        <div className={css.fieldsContainer}>
+        <div className={css.container}>
           <div className={css.containerTitle}>Chọn món ăn</div>
         </div>
       </div>
