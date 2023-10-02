@@ -5,8 +5,19 @@ const HIDING_PARTNER_HEADER_PATHNAMES = [
   partnerPaths.ManageOrders,
   partnerPaths.ManageFood,
   partnerPaths.ManageMenus,
+  partnerPaths.CreateMenu,
+  partnerPaths.EditMenu,
 ];
 
 export const shouldShowPartnerHeader = (pathName: string) => {
   return !HIDING_PARTNER_HEADER_PATHNAMES.includes(pathName);
+};
+
+const HIDING_PARTNER_NAV_BAR_PATHNAMES = [
+  partnerPaths.CreateMenu,
+  partnerPaths.EditMenu,
+];
+
+export const shouldShowPartnerNavBar = (pathName: string) => {
+  return !HIDING_PARTNER_NAV_BAR_PATHNAMES.includes(pathName);
 };
