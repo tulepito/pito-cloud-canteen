@@ -1,0 +1,15 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.fieldsContainer {
+  margin-bottom: 16px;
+  background-color: $neutralGray1;
+  padding: 16px;
+
+  .containerTitle {
+    @include textTemplate(20px, 700, 24px);
+  }
+
+  .fieldContainer {
+  }
+}

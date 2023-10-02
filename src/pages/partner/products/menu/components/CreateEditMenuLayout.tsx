@@ -7,6 +7,8 @@ import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import MobileBottomContainer from '@components/MobileBottomContainer/MobileBottomContainer';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 
+import CreateEditMenuForm from './CreateEditMenuForm';
+
 import css from './CreateEditMenuLayout.module.scss';
 
 enum EEditPartnerMenuMobileStep {
@@ -77,7 +79,9 @@ const CreateEditMenuLayout: React.FC<TCreateEditMenuLayoutProps> = () => {
         </div>
       </div>
 
-      <div className={css.contentContainer}></div>
+      <div className={css.contentContainer}>
+        <CreateEditMenuForm onSubmit={() => {}} />
+      </div>
 
       <MobileBottomContainer>
         <div className={css.actionContainer}>
