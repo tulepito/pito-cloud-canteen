@@ -12,7 +12,7 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { Listing } from '@src/utils/data';
 import { formatTimestamp } from '@src/utils/dates';
 import { EListingStates } from '@src/utils/enums';
-import type { TListing } from '@src/utils/types';
+import type { TListing, TObject } from '@src/utils/types';
 
 import { PartnerManageMenusThunks } from '../PartnerManageMenus.slice';
 
@@ -73,6 +73,12 @@ const MenuCard: React.FC<TMenuCardProps> = ({ menu }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isActiveValue]);
 
+  const handleDeleteMenus =
+    ({ id, ids }: TObject) =>
+    () => {
+      dispatch(PartnerManageMenusThunks.deleteMenus({ id, ids }));
+    };
+
   return (
     <div className={css.root}>
       <div className={css.titleContainer}>
@@ -98,7 +104,9 @@ const MenuCard: React.FC<TMenuCardProps> = ({ menu }) => {
         <div className={css.iconContainer}>
           <IconEdit />
         </div>
-        <div className={css.iconContainer}>
+        <div
+          className={css.iconContainer}
+          onClick={handleDeleteMenus({ id: menuId })}>
           <IconDelete />
         </div>
         <RenderWhen condition={shouldShowActiveMenuToggle}>
