@@ -6,7 +6,7 @@ import { deleteMenusApi } from '@apis/partnerApi';
 import { queryAllPages } from '@helpers/apiHelpers';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { CurrentUser, denormalisedResponseEntities } from '@src/utils/data';
-import { EListingStates, EListingType } from '@src/utils/enums';
+import { EListingStates, EListingType, EOrderStates } from '@src/utils/enums';
 import { storableError } from '@src/utils/errors';
 import type { TCurrentUser, TListing, TObject } from '@src/utils/types';
 
@@ -82,13 +82,28 @@ const toggleMenuActiveStatus = createAsyncThunk(
 
 const deleteMenus = createAsyncThunk(
   'app/PartnerManageMenus/DELELE_MENUS',
-  async (payload: TObject, { fulfillWithValue, rejectWithValue }) => {
+  async (
+    payload: TObject,
+    { extra: sdk, fulfillWithValue, rejectWithValue },
+  ) => {
     try {
       const { id, ids } = payload;
 
-      await deleteMenusApi({ id, ids });
+      const idList = ids?.length > 0 ? ids : [id];
 
-      return fulfillWithValue({ id, ids });
+      const inProgressOrders = denormalisedResponseEntities(
+        await sdk.listings.query({
+          meta_menuIds: `has_any:${idList.join(',')}`,
+          meta_listingType: EListingType.order,
+          meta_orderState: `${EOrderStates.inProgress},${EOrderStates.picking}`,
+        }),
+      );
+
+      if (inProgressOrders?.length === 0) {
+        await deleteMenusApi({ id, ids });
+      }
+
+      return fulfillWithValue({ id, ids, inProgressOrders });
     } catch (error) {
       return rejectWithValue(error);
     }
@@ -144,20 +159,27 @@ const PartnerManageMenusSlice = createSlice({
         state.deleteMenusInProgress = true;
       })
       .addCase(deleteMenus.fulfilled, (state, { payload }) => {
-        const { id, ids } = payload;
-        let newMenuList = state.menus;
-        const fakeDeletedMenuList = (ids && ids.length > 0 ? ids : [id]).map(
-          (uuid: string) => ({
-            id: {
-              uuid,
-            },
-          }),
-        );
+        const { id, ids, inProgressOrders } = payload;
 
-        newMenuList = differenceBy(newMenuList, fakeDeletedMenuList, 'id.uuid');
+        if (inProgressOrders?.length === 0) {
+          let newMenuList = state.menus;
+          const fakeDeletedMenuList = (ids && ids.length > 0 ? ids : [id]).map(
+            (uuid: string) => ({
+              id: {
+                uuid,
+              },
+            }),
+          );
 
+          newMenuList = differenceBy(
+            newMenuList,
+            fakeDeletedMenuList,
+            'id.uuid',
+          );
+
+          state.menus = newMenuList;
+        }
         state.deleteMenusInProgress = false;
-        state.menus = newMenuList;
       })
       .addCase(deleteMenus.rejected, (state) => {
         state.deleteMenusInProgress = false;

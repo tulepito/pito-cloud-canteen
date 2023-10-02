@@ -4,11 +4,14 @@ import { useField, useForm } from 'react-final-form-hooks';
 import Badge from '@components/Badge/Badge';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import IconClock from '@components/Icons/IconClock/IconClock';
+import IconDanger from '@components/Icons/IconDanger/IconDanger';
 import IconDelete from '@components/Icons/IconDelete/IconDelete';
 import IconEdit from '@components/Icons/IconEdit/IconEdit';
+import AlertModal from '@components/Modal/AlertModal';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import Toggle from '@components/Toggle/Toggle';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import useBoolean from '@hooks/useBoolean';
 import { Listing } from '@src/utils/data';
 import { formatTimestamp } from '@src/utils/dates';
 import { EListingStates } from '@src/utils/enums';
@@ -27,6 +30,8 @@ const MenuCard: React.FC<TMenuCardProps> = ({ menu }) => {
   const toggleMenuActiveStatusInProgress = useAppSelector(
     (state) => state.PartnerManageMenus.toggleMenuActiveStatusInProgress,
   );
+  const confirmDeleteMenuModalControl = useBoolean();
+  const cannotDeleteModalControl = useBoolean();
 
   const menuGetter = Listing(menu);
   const menuId = menuGetter.getId();
@@ -73,11 +78,19 @@ const MenuCard: React.FC<TMenuCardProps> = ({ menu }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isActiveValue]);
 
-  const handleDeleteMenus =
-    ({ id, ids }: TObject) =>
-    () => {
-      dispatch(PartnerManageMenusThunks.deleteMenus({ id, ids }));
-    };
+  const handleConfirmDeleteMenusClick = async () => {
+    confirmDeleteMenuModalControl.setFalse();
+
+    const { payload } = await dispatch(
+      PartnerManageMenusThunks.deleteMenus({ id: menuId }),
+    );
+
+    const { inProgressOrders = [] } = (payload || {}) as TObject;
+
+    if (inProgressOrders.length > 0) {
+      cannotDeleteModalControl.setTrue();
+    }
+  };
 
   return (
     <div className={css.root}>
@@ -106,7 +119,7 @@ const MenuCard: React.FC<TMenuCardProps> = ({ menu }) => {
         </div>
         <div
           className={css.iconContainer}
-          onClick={handleDeleteMenus({ id: menuId })}>
+          onClick={confirmDeleteMenuModalControl.setTrue}>
           <IconDelete />
         </div>
         <RenderWhen condition={shouldShowActiveMenuToggle}>
@@ -121,6 +134,41 @@ const MenuCard: React.FC<TMenuCardProps> = ({ menu }) => {
           />
         </RenderWhen>
       </div>
+
+      <AlertModal
+        isOpen={cannotDeleteModalControl.value}
+        shouldFullScreenInMobile={false}
+        shouldHideIconClose
+        containerClassName={css.cannotDeleteMenuModal}
+        handleClose={cannotDeleteModalControl.setFalse}
+        cancelLabel={'Đã hiểu'}
+        onCancel={cannotDeleteModalControl.setFalse}
+        actionsClassName={css.cannotDeleteMenuModalAction}>
+        <div className={css.iconContainer}>
+          <IconDanger />
+        </div>
+        <div className={css.modalTitle}>Không thể xoá Menu</div>
+        <div className={css.modalDescription}>
+          Menu đang được triển khai trong các đơn hàng.
+        </div>
+      </AlertModal>
+
+      <AlertModal
+        isOpen={confirmDeleteMenuModalControl.value}
+        title="Xoá Menu"
+        shouldFullScreenInMobile={false}
+        containerClassName={css.confirmDeleteMenuModal}
+        handleClose={confirmDeleteMenuModalControl.setFalse}
+        cancelLabel={'Huỷ'}
+        confirmLabel="Xoá menu"
+        onCancel={confirmDeleteMenuModalControl.setFalse}
+        onConfirm={handleConfirmDeleteMenusClick}
+        actionsClassName={css.confirmDeleteModalAction}>
+        <div className={css.menuDescription}>
+          Bạn có chắc chắn muốn xoá{' '}
+          <span className={css.menuName}>{menuName}</span> không?
+        </div>
+      </AlertModal>
     </div>
   );
 };
