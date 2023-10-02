@@ -3,12 +3,17 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useField, useForm } from 'react-final-form-hooks';
 import classNames from 'classnames';
 import debounce from 'lodash/debounce';
+import { useRouter } from 'next/router';
 
+import Button from '@components/Button/Button';
 import { FieldTextInputComponent } from '@components/FormFields/FieldTextInput/FieldTextInput';
+import IconEmpty from '@components/Icons/IconEmpty/IconEmpty';
 import IconSearch from '@components/Icons/IconSearch/IconSearch';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
 import type { TTabsItem } from '@components/Tabs/Tabs';
 import Tabs from '@components/Tabs/Tabs';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { partnerPaths } from '@src/paths';
 import { Listing } from '@src/utils/data';
 import { EMenuMealType, MENU_MEAL_TYPE_OPTIONS } from '@src/utils/enums';
 
@@ -24,6 +29,7 @@ type TPartnerManageMenusPageProps = {};
 
 const PartnerManageMenusPage: React.FC<TPartnerManageMenusPageProps> = () => {
   const dispatch = useAppDispatch();
+  const router = useRouter();
   const [searchTitle, setSearchTitle] = useState('');
   const [currentTab, setCurrentTab] = useState<string | EMenuMealType>(
     EMenuMealType.breakfast,
@@ -49,6 +55,10 @@ const PartnerManageMenusPage: React.FC<TPartnerManageMenusPageProps> = () => {
     setCurrentTab(params?.id?.toString());
   };
 
+  const handleNavigateToCreateMenuPage = () => {
+    router.push(partnerPaths.CreateMenu);
+  };
+
   const tabItems = useMemo(() => {
     return NEED_HANDLE_MENU_TYPES.map(({ key, label }) => {
       const isTabActive = currentTab === key;
@@ -72,9 +82,23 @@ const PartnerManageMenusPage: React.FC<TPartnerManageMenusPageProps> = () => {
 
       const tabChildren = (
         <div>
-          {menusForTab.map((m) => {
-            return <MenuCard key={m.id.uuid} menu={m} />;
-          })}
+          <RenderWhen condition={menusForTab.length > 0}>
+            {menusForTab.map((m) => {
+              return <MenuCard key={m?.id?.uuid} menu={m} />;
+            })}
+            <RenderWhen.False>
+              <div className={css.emptyMenuList}>
+                <IconEmpty variant="price" />
+                <div>Bạn chưa có thực đơn nào</div>
+
+                <Button
+                  className={css.createMenuBtn}
+                  onClick={handleNavigateToCreateMenuPage}>
+                  Tạo menu
+                </Button>
+              </div>
+            </RenderWhen.False>
+          </RenderWhen>
         </div>
       );
 

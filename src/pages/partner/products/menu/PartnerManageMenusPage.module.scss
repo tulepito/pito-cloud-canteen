@@ -29,3 +29,18 @@
 .tabAction {
   margin-bottom: 16px;
 }
+
+.emptyMenuList {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  row-gap: 12px;
+
+  @include textTemplate(14px, 400, 20px);
+  color: $neutralGray6;
+
+  .createMenuBtn {
+    min-width: 240px;
+  }
+}
