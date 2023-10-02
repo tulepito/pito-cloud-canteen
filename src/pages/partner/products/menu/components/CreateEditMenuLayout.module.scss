@@ -1,0 +1,83 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.root {
+  max-height: calc(100vh - 56px);
+  max-height: calc(100dvh - 56px);
+  overflow: hidden auto;
+}
+
+.titleContainer {
+  background-color: $neutralGray1;
+  padding: 8px 16px;
+  display: flex;
+  column-gap: 8px;
+  align-items: center;
+  @include textTemplate(16px, 700, 24px);
+  border-bottom: 1px solid $neutralGray3;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.stepsContainer {
+  background-color: $neutralGray1;
+  padding: 8px 16px;
+  display: flex;
+  column-gap: 20px;
+  justify-content: center;
+  align-items: center;
+  position: sticky;
+  top: 42px;
+  z-index: 1;
+
+  .stepContainer {
+    display: flex;
+    flex-direction: column;
+    row-gap: 4px;
+    align-items: center;
+    @include textTemplate(12px, 400, 16px);
+    color: $neutralGray5;
+
+    .stepNumber {
+      width: 20px;
+      height: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 10px;
+      border: 1px solid $neutralGray5;
+      background-color: $neutralGray2;
+    }
+
+    .stepNumberActive {
+      color: $neutralGray1;
+      background-color: $neutralGray6;
+      border-color: $neutralGray6;
+    }
+
+    .stepInfoActive {
+      color: $neutralGray6;
+    }
+  }
+
+  .separator {
+    width: 24px;
+    height: 1px;
+    background-color: $neutralGray3;
+  }
+}
+
+.contentContainer {
+  padding: 8px 0;
+  background-color: $neutralGray3;
+
+  min-height: calc(100vh - 41px - 56px - 96px);
+  min-height: calc(100dvh - 41px - 56px - 96px);
+}
+
+.actionContainer {
+  display: flex;
+  flex-direction: column;
+  row-gap: 16px;
+}
