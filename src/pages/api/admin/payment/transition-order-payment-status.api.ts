@@ -158,7 +158,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         isPartnerSufficientPaid:
           isPartnerPaidAmountEnough && isPaymentNumberEqualToSubOrderDateNumber,
         ...(isOrderPendingPayment &&
-        isClientPaidAmountEnough &&
+        (currIsClientSufficientPaid || isClientPaidAmountEnough) &&
         isPartnerPaidAmountEnough &&
         isPaymentNumberEqualToSubOrderDateNumber
           ? {
