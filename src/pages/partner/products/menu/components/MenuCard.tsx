@@ -30,8 +30,19 @@ const MenuCard: React.FC<TMenuCardProps> = ({ menu }) => {
   const toggleMenuActiveStatusInProgress = useAppSelector(
     (state) => state.PartnerManageMenus.toggleMenuActiveStatusInProgress,
   );
+  const deleteMenusInProgress = useAppSelector(
+    (state) => state.PartnerManageMenus.deleteMenusInProgress,
+  );
+  const preDeleteMenusInProgress = useAppSelector(
+    (state) => state.PartnerManageMenus.preDeleteMenusInProgress,
+  );
   const confirmDeleteMenuModalControl = useBoolean();
   const cannotDeleteModalControl = useBoolean();
+
+  const isAnyMenuActionsInProgress =
+    toggleMenuActiveStatusInProgress ||
+    deleteMenusInProgress ||
+    preDeleteMenusInProgress;
 
   const menuGetter = Listing(menu);
   const menuId = menuGetter.getId();
@@ -78,18 +89,24 @@ const MenuCard: React.FC<TMenuCardProps> = ({ menu }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isActiveValue]);
 
-  const handleConfirmDeleteMenusClick = async () => {
-    confirmDeleteMenuModalControl.setFalse();
-
+  const handleDeleteMenuClick = async () => {
     const { payload } = await dispatch(
-      PartnerManageMenusThunks.deleteMenus({ id: menuId }),
+      PartnerManageMenusThunks.preDeleteMenus({ id: menuId }),
     );
 
     const { inProgressOrders = [] } = (payload || {}) as TObject;
 
     if (inProgressOrders.length > 0) {
       cannotDeleteModalControl.setTrue();
+    } else {
+      confirmDeleteMenuModalControl.setTrue();
     }
+  };
+
+  const handleConfirmDeleteMenusClick = () => {
+    confirmDeleteMenuModalControl.setFalse();
+
+    dispatch(PartnerManageMenusThunks.deleteMenus({ id: menuId }));
   };
 
   return (
@@ -114,19 +131,22 @@ const MenuCard: React.FC<TMenuCardProps> = ({ menu }) => {
         </RenderWhen>
       </div>
       <div className={css.actionContainer}>
-        <div className={css.iconContainer}>
+        <div
+          className={css.iconContainer}
+          aria-disabled={isAnyMenuActionsInProgress}>
           <IconEdit />
         </div>
         <div
           className={css.iconContainer}
-          onClick={confirmDeleteMenuModalControl.setTrue}>
+          aria-disabled={isAnyMenuActionsInProgress}
+          onClick={handleDeleteMenuClick}>
           <IconDelete />
         </div>
         <RenderWhen condition={shouldShowActiveMenuToggle}>
           <Toggle
             id={'MealDateForm.orderType'}
             status={isActiveValue ? 'on' : 'off'}
-            disabled={toggleMenuActiveStatusInProgress}
+            disabled={isAnyMenuActionsInProgress}
             className={css.isActiveField}
             onClick={(value) => {
               isActiveField.input.onChange(value);

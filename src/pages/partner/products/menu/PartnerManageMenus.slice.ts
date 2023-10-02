@@ -18,6 +18,7 @@ type TPartnerManageMenusState = {
   // toggle menu active status
   toggleMenuActiveStatusInProgress: boolean;
   // delete menu
+  preDeleteMenusInProgress: boolean;
   deleteMenusInProgress: boolean;
 };
 const initialState: TPartnerManageMenusState = {
@@ -27,6 +28,7 @@ const initialState: TPartnerManageMenusState = {
   // toggle menu active status
   toggleMenuActiveStatusInProgress: false,
   // delete menu
+  preDeleteMenusInProgress: false,
   deleteMenusInProgress: false,
 };
 
@@ -80,8 +82,8 @@ const toggleMenuActiveStatus = createAsyncThunk(
   },
 );
 
-const deleteMenus = createAsyncThunk(
-  'app/PartnerManageMenus/DELELE_MENUS',
+const preDeleteMenus = createAsyncThunk(
+  'app/PartnerManageMenus/PRE_DELETE_MENUS',
   async (
     payload: TObject,
     { extra: sdk, fulfillWithValue, rejectWithValue },
@@ -99,11 +101,23 @@ const deleteMenus = createAsyncThunk(
         }),
       );
 
-      if (inProgressOrders?.length === 0) {
-        await deleteMenusApi({ id, ids });
-      }
+      return fulfillWithValue({ inProgressOrders });
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  },
+);
 
-      return fulfillWithValue({ id, ids, inProgressOrders });
+const deleteMenus = createAsyncThunk(
+  'app/PartnerManageMenus/DELETE_MENUS',
+  async (payload: TObject, { fulfillWithValue, rejectWithValue }) => {
+    try {
+      const { id, ids } = payload;
+      const idList = ids?.length > 0 ? ids : [id];
+
+      await deleteMenusApi({ ids: idList });
+
+      return fulfillWithValue(idList);
     } catch (error) {
       return rejectWithValue(error);
     }
@@ -113,6 +127,7 @@ const deleteMenus = createAsyncThunk(
 export const PartnerManageMenusThunks = {
   loadData,
   toggleMenuActiveStatus,
+  preDeleteMenus,
   deleteMenus,
 };
 
@@ -159,30 +174,32 @@ const PartnerManageMenusSlice = createSlice({
         state.deleteMenusInProgress = true;
       })
       .addCase(deleteMenus.fulfilled, (state, { payload }) => {
-        const { id, ids, inProgressOrders } = payload;
+        const { ids } = payload;
 
-        if (inProgressOrders?.length === 0) {
-          let newMenuList = state.menus;
-          const fakeDeletedMenuList = (ids && ids.length > 0 ? ids : [id]).map(
-            (uuid: string) => ({
-              id: {
-                uuid,
-              },
-            }),
-          );
+        let newMenuList = state.menus;
+        const fakeDeletedMenuList = ids.map((uuid: string) => ({
+          id: {
+            uuid,
+          },
+        }));
 
-          newMenuList = differenceBy(
-            newMenuList,
-            fakeDeletedMenuList,
-            'id.uuid',
-          );
+        newMenuList = differenceBy(newMenuList, fakeDeletedMenuList, 'id.uuid');
 
-          state.menus = newMenuList;
-        }
+        state.menus = newMenuList;
         state.deleteMenusInProgress = false;
       })
       .addCase(deleteMenus.rejected, (state) => {
         state.deleteMenusInProgress = false;
+      })
+      /* =============== preDeleteMenus =============== */
+      .addCase(preDeleteMenus.pending, (state) => {
+        state.preDeleteMenusInProgress = true;
+      })
+      .addCase(preDeleteMenus.fulfilled, (state) => {
+        state.preDeleteMenusInProgress = false;
+      })
+      .addCase(preDeleteMenus.rejected, (state) => {
+        state.preDeleteMenusInProgress = false;
       });
   },
 });
