@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useField, useForm } from 'react-final-form-hooks';
 
 import Badge from '@components/Badge/Badge';
@@ -7,10 +8,13 @@ import IconDelete from '@components/Icons/IconDelete/IconDelete';
 import IconEdit from '@components/Icons/IconEdit/IconEdit';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import Toggle from '@components/Toggle/Toggle';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { Listing } from '@src/utils/data';
 import { formatTimestamp } from '@src/utils/dates';
 import { EListingStates } from '@src/utils/enums';
 import type { TListing } from '@src/utils/types';
+
+import { PartnerManageMenusThunks } from '../PartnerManageMenus.slice';
 
 import css from './MenuCard.module.scss';
 
@@ -19,7 +23,13 @@ type TMenuCardProps = {
 };
 
 const MenuCard: React.FC<TMenuCardProps> = ({ menu }) => {
+  const dispatch = useAppDispatch();
+  const toggleMenuActiveStatusInProgress = useAppSelector(
+    (state) => state.PartnerManageMenus.toggleMenuActiveStatusInProgress,
+  );
+
   const menuGetter = Listing(menu);
+  const menuId = menuGetter.getId();
   const { title: menuName } = menuGetter.getAttributes();
   const { startDate, endDate } = menuGetter.getPublicData();
   const { listingState = EListingStates.draft } = menuGetter.getMetadata();
@@ -27,9 +37,9 @@ const MenuCard: React.FC<TMenuCardProps> = ({ menu }) => {
   const isDraftMenu = listingState === EListingStates.draft;
 
   const today = new Date().getTime();
-  const isInvalidTimeRangeMenu = endDate >= today;
+  const isInvalidTimeRangeMenu = endDate < today;
   const shouldShowActiveMenuToggle =
-    isInvalidTimeRangeMenu &&
+    !isInvalidTimeRangeMenu &&
     [EListingStates.published, EListingStates.closed].includes(listingState);
 
   const { form } = useForm({
@@ -40,9 +50,28 @@ const MenuCard: React.FC<TMenuCardProps> = ({ menu }) => {
   });
   const isActiveField = useField(`isActive`, form);
 
+  const isActiveValue = isActiveField.input.value;
   const formattedMenuValidTimeRange = `${formatTimestamp(
     startDate,
   )} - ${formatTimestamp(endDate)}`;
+
+  useEffect(() => {
+    if (typeof isActiveValue === 'boolean') {
+      const newListingState = isActiveValue
+        ? EListingStates.published
+        : EListingStates.closed;
+
+      if (newListingState !== listingState) {
+        dispatch(
+          PartnerManageMenusThunks.toggleMenuActiveStatus({
+            id: menuId,
+            newListingState,
+          }),
+        );
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isActiveValue]);
 
   return (
     <div className={css.root}>
@@ -75,7 +104,8 @@ const MenuCard: React.FC<TMenuCardProps> = ({ menu }) => {
         <RenderWhen condition={shouldShowActiveMenuToggle}>
           <Toggle
             id={'MealDateForm.orderType'}
-            status={isActiveField.input.value ? 'on' : 'off'}
+            status={isActiveValue ? 'on' : 'off'}
+            disabled={toggleMenuActiveStatusInProgress}
             className={css.isActiveField}
             onClick={(value) => {
               isActiveField.input.onChange(value);
