@@ -17,6 +17,7 @@ type TPartnerLayoutContentProps = PropsWithChildren<
   TDefaultProps & {
     isMenuOpen?: boolean;
     hideHeader?: boolean;
+    hideNavBar?: boolean;
   }
 >;
 
@@ -27,6 +28,7 @@ const PartnerLayoutContent: React.FC<TPartnerLayoutContentProps> = (props) => {
     children,
     isMenuOpen,
     hideHeader = false,
+    hideNavBar = false,
   } = props;
   const { isMobileLayout } = useViewport();
 
@@ -34,6 +36,7 @@ const PartnerLayoutContent: React.FC<TPartnerLayoutContentProps> = (props) => {
     rootClassName || css.root,
     {
       [css.hideHeader]: hideHeader,
+      [css.hideNavBar]: hideNavBar,
       [css.menuOpen]: isMenuOpen,
     },
     className,

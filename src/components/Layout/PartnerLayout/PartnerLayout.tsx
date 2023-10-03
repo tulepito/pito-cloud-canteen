@@ -41,6 +41,7 @@ const PartnerLayout: React.FC<PropsWithChildren> = (props) => {
         </RenderWhen>
         <PartnerLayoutContent
           hideHeader={!showHeaderMaybe}
+          hideNavBar={!showNavBarMaybe}
           isMenuOpen={isMenuOpen}>
           {children}
         </PartnerLayoutContent>
