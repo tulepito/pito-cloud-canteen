@@ -34,6 +34,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           ...(nutritions.length > 0
             ? { pub_specialDiets: `has_any:${nutritions.join(',')}` }
             : {}),
+          meta_isFoodEnable: true,
           include: ['images'],
           'fields.image': [`variants.${EImageVariants.default}`],
         });

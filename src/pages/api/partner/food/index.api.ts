@@ -45,6 +45,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           meta_listingType: EListingType.food,
           meta_restaurantId: restaurantId || restaurantListingId,
           meta_isDeleted: false,
+          meta_isFoodEnable: true,
           perPage: MANAGE_FOOD_PAGE_SIZE,
           include: ['images'],
           'fields.image': [`variants.${EImageVariants.squareSmall2x}`],

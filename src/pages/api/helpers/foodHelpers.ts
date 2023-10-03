@@ -14,7 +14,7 @@ import {
 } from '@src/utils/enums';
 import type { TIntegrationListing } from '@src/utils/types';
 
-const fetchListingsByChunkedIds = async (ids: string[], sdk: any) => {
+export const fetchListingsByChunkedIds = async (ids: string[], sdk: any) => {
   const listingsResponse = await Promise.all(
     chunk<string>(ids, 100).map(async (_ids) => {
       const response = await sdk.listings.query({
@@ -28,7 +28,7 @@ const fetchListingsByChunkedIds = async (ids: string[], sdk: any) => {
   return flatten(listingsResponse);
 };
 
-const queryMenuByIdList = async (menuIdList: string[]) => {
+export const queryMenuByIdList = async (menuIdList: string[]) => {
   const integrationSdk = getIntegrationSdk();
 
   const menuResponse = await integrationSdk.listings.query(
@@ -153,6 +153,7 @@ export const updateMenuAfterFoodDeletedByListId = async (foodIds: string[]) => {
             const minPriceChanged = newMinFoodPrice !== currentMinFoodPrice;
             const menuId = IntegrationListing(details).getId();
             updateMap = {
+              ...updateMap,
               [menuId]: {
                 publicData: {
                   ...(updateMap[menuId as keyof typeof updateMap]?.publicData ||
@@ -284,6 +285,7 @@ export const updateMenuAfterFoodDeleted = async (deletedFoodId: string) => {
             const minPriceChanged = newMinFoodPrice !== currentMinFoodPrice;
             const menuId = IntegrationListing(menu).getId();
             updateMap = {
+              ...updateMap,
               [menuId]: {
                 publicData: {
                   ...(updateMap[menuId as keyof typeof updateMap]?.publicData ||
@@ -314,7 +316,6 @@ export const updateMenuAfterFoodDeleted = async (deletedFoodId: string) => {
     );
     const response = await Promise.all(
       Object.keys(updateMap).map(async (menuId) => {
-        console.log(updateMap[menuId as keyof typeof updateMap]?.metadata);
         await integrationSdk.listings.update({
           id: menuId,
           publicData: {
@@ -399,6 +400,7 @@ export const updateMenuAfterFoodUpdated = async (updatedFoodId: string) => {
               const menuId = menu.id.uuid;
 
               updateMap = {
+                ...updateMap,
                 [menuId]: {
                   publicData: {
                     ...(updateMap?.[menuId]?.publicData || {}),
