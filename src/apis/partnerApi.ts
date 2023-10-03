@@ -55,11 +55,12 @@ export const deleteMenusApi = (body: TObject) => {
 export const createDraftMenuApi = (body: TObject) => {
   return postApi(`${BASE_URL}/menus`, body);
 };
-
 export const updateMenuApi = (body: TObject) => {
   return putApi(`${BASE_URL}/menus`, body);
 };
-
 export const publishDraftMenuApi = (body: TObject) => {
   return putApi(`${BASE_URL}/menus/publish-draft`, body);
+};
+export const getMenuApi = (menuId: string) => {
+  return getApi(`${BASE_URL}/menus`, { menuId });
 };

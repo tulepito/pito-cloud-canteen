@@ -1,5 +1,7 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useMemo, useState } from 'react';
 import classNames from 'classnames';
+import { isEqual } from 'lodash';
 import isEmpty from 'lodash/isEmpty';
 import { useRouter } from 'next/router';
 
@@ -11,6 +13,10 @@ import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { Listing } from '@src/utils/data';
 import { EListingStates } from '@src/utils/enums';
+import {
+  historyPushState,
+  parseLocationSearchToObject,
+} from '@src/utils/history';
 import type { TObject } from '@src/utils/types';
 
 import { PartnerManageMenusThunks } from '../PartnerManageMenus.slice';
@@ -19,22 +25,62 @@ import CreateEditMenuForm, { MAX_MENU_LENGTH } from './CreateEditMenuForm';
 
 import css from './CreateEditMenuLayout.module.scss';
 
-const verifyDraftData = (data: TObject, isDraftEditFlow = false) => {
-  const { menuName, mealTypes = [], startDate, endDate } = data || {};
-
-  return isDraftEditFlow
-    ? !isEmpty(menuName) &&
-        menuName?.length <= MAX_MENU_LENGTH &&
-        !isEmpty(mealTypes) &&
-        typeof startDate === 'number' &&
-        typeof endDate === 'number'
-    : true;
-};
-
 export enum EEditPartnerMenuMobileStep {
   info = 'info',
   mealSettings = 'mealSettings',
 }
+
+const verifyData = ({
+  draftMenu,
+  currStep,
+  initialValues,
+  isCreateFlow = false,
+}: {
+  draftMenu: TObject;
+  initialValues: TObject;
+  currStep: EEditPartnerMenuMobileStep;
+  isCreateFlow: boolean;
+}) => {
+  console.debug(
+    '💫 > file: CreateEditMenuLayout.tsx:44 > initialValues: ',
+    initialValues,
+  );
+  const { menuName, mealTypes = [], startDate, endDate } = draftMenu || {};
+  console.debug(
+    '💫 > file: CreateEditMenuLayout.tsx:46 > draftMenu: ',
+    draftMenu,
+  );
+
+  const isDraftDataValid =
+    !isEmpty(menuName) &&
+    menuName?.length <= MAX_MENU_LENGTH &&
+    !isEmpty(mealTypes) &&
+    typeof startDate === 'number' &&
+    typeof endDate === 'number';
+
+  const enableNext = isDraftDataValid;
+  let enableSubmit = false;
+
+  switch (currStep) {
+    case EEditPartnerMenuMobileStep.info: {
+      enableSubmit =
+        isDraftDataValid &&
+        (isCreateFlow ||
+          menuName !== initialValues.menuName ||
+          isEqual(mealTypes, initialValues.mealTypes) ||
+          startDate !== initialValues.startDate ||
+          endDate !== initialValues.endDate);
+      break;
+    }
+    case EEditPartnerMenuMobileStep.mealSettings: {
+      break;
+    }
+    default:
+      break;
+  }
+
+  return { enableNext, enableSubmit };
+};
 
 type TCreateEditMenuLayoutProps = {};
 
@@ -42,9 +88,10 @@ const CreateEditMenuLayout: React.FC<TCreateEditMenuLayoutProps> = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const {
-    query: { menuId },
+    query: { menuId: menuIdFromRouter },
     isReady: isRouterReady,
   } = router;
+  const { menuId: menuIdFromSearch } = parseLocationSearchToObject();
 
   const [currStep, setCurrStep] = useState(EEditPartnerMenuMobileStep.info);
   const menu = useAppSelector((state) => state.PartnerManageMenus.menu);
@@ -58,20 +105,34 @@ const CreateEditMenuLayout: React.FC<TCreateEditMenuLayoutProps> = () => {
     (state) => state.PartnerManageMenus.draftMenu,
   );
 
+  const menuGetter = Listing(menu);
+  const { title } = menuGetter.getAttributes();
   const { listingState = EListingStates.draft } = Listing(menu).getMetadata();
-  const isDraftEditFlow =
-    listingState === EListingStates.draft || menu === null;
+  const { startDate, endDate, mealTypes = [] } = Listing(menu).getPublicData();
+  const isCreateFlow = menu === null;
+  const isDraftEditFlow = listingState === EListingStates.draft || isCreateFlow;
 
   const isInfoTab = currStep === EEditPartnerMenuMobileStep.info;
   const isMealSettingsTab =
     currStep === EEditPartnerMenuMobileStep.mealSettings;
 
   const infoSubmitting = createDraftMenuInProgress;
+  const initialValues = {
+    menuName: title,
+    startDate,
+    endDate,
+    mealTypes,
+  };
 
-  const enableInfoTabNextBtn = useMemo(
-    () => isInfoTab && verifyDraftData(draftMenu, isDraftEditFlow),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [isInfoTab, JSON.stringify(draftMenu), isDraftEditFlow],
+  const { enableNext, enableSubmit } = useMemo(
+    () => verifyData({ draftMenu, initialValues, currStep, isCreateFlow }),
+
+    [
+      JSON.stringify(initialValues),
+      JSON.stringify(draftMenu),
+      isDraftEditFlow,
+      isCreateFlow,
+    ],
   );
 
   const infoNumberClasses = classNames(css.stepNumber, {
@@ -94,14 +155,20 @@ const CreateEditMenuLayout: React.FC<TCreateEditMenuLayoutProps> = () => {
   });
 
   const handleNavigateToNextStep = async () => {
-    if (isInfoTab && enableInfoTabNextBtn && !infoSubmitting) {
-      const { meta } = await dispatch(
-        PartnerManageMenusThunks.createDraftMenu(),
-      );
+    if (isInfoTab && enableSubmit && !infoSubmitting) {
+      if (isCreateFlow) {
+        const { meta, payload } = await dispatch(
+          PartnerManageMenusThunks.createDraftMenu(),
+        );
 
-      if (meta.requestStatus === 'fulfilled') {
-        setCurrStep(EEditPartnerMenuMobileStep.mealSettings);
+        if (meta.requestStatus === 'fulfilled') {
+          historyPushState('menuId', payload.id.uuid);
+        }
       }
+    }
+
+    if (enableNext) {
+      setCurrStep(EEditPartnerMenuMobileStep.mealSettings);
     }
   };
 
@@ -117,7 +184,7 @@ const CreateEditMenuLayout: React.FC<TCreateEditMenuLayoutProps> = () => {
         <IconArrow direction="left" />
 
         <RenderWhen condition={isRouterReady}>
-          {menuId ? 'Chỉnh sửa menu' : 'Tạo menu'}
+          {menuIdFromRouter || menuIdFromSearch ? 'Chỉnh sửa menu' : 'Tạo menu'}
         </RenderWhen>
       </div>
       <div className={css.stepsContainer}>
@@ -137,6 +204,7 @@ const CreateEditMenuLayout: React.FC<TCreateEditMenuLayoutProps> = () => {
           isDraftEditFlow={isDraftEditFlow}
           isMealSettingsTab={isMealSettingsTab}
           onSubmit={() => {}}
+          initialValues={initialValues}
         />
       </div>
 
@@ -145,7 +213,7 @@ const CreateEditMenuLayout: React.FC<TCreateEditMenuLayoutProps> = () => {
           <RenderWhen condition={isInfoTab}>
             <Button
               inProgress={infoSubmitting}
-              disabled={!enableInfoTabNextBtn}
+              disabled={!enableNext}
               onClick={handleNavigateToNextStep}>
               Tiếp theo
             </Button>

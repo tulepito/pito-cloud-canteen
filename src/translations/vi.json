@@ -1299,6 +1299,8 @@
   "PartnerChangePasswordRoute.title": "Đối tác | Đổi mật khẩu",
   "PartnerCreateMenuRoute.description": "Tạo thực đơn",
   "PartnerCreateMenuRoute.title": "Đối tác | Tạo thực đơn",
+  "PartnerEditMenuRoute.description": "Chỉnh sửa đơn",
+  "PartnerEditMenuRoute.title": "Đối tác | Chỉnh sửa đơn",
   "PartnerEditPartnerFoodRoute.description": "Đối tác - Chỉnh sửa thực đơn",
   "PartnerEditPartnerFoodRoute.title": "Đối tác - Chỉnh sửa món ăn",
   "PartnerHomePageRoute.description": "Trang chủ",

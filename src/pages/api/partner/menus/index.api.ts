@@ -4,15 +4,33 @@ import { HttpMethod } from '@apis/configs';
 import checkUnConflictedMenuMiddleware from '@pages/api/apiServices/menu/checkUnConflictedMenuMiddleware.service';
 import createMenu from '@pages/api/apiServices/menu/createMenu.service';
 import cookies from '@services/cookie';
+import { denormalisedResponseEntities } from '@services/data';
+import { getIntegrationSdk } from '@services/integrationSdk';
 import partnerChecker from '@services/permissionChecker/partner';
 import { handleError } from '@services/sdk';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
     const apiMethod = req.method;
+    const integrationSdk = getIntegrationSdk();
+    const { JSONParams = '' } = req.query;
     const { dataParams, queryParams = {} } = req.body;
 
     switch (apiMethod) {
+      case HttpMethod.GET: {
+        const { menuId } = JSON.parse(JSONParams as string);
+
+        const [menu] = denormalisedResponseEntities(
+          await integrationSdk.listings.show(
+            {
+              id: menuId,
+            },
+            { expand: true },
+          ),
+        );
+
+        return res.status(200).json(menu);
+      }
       case HttpMethod.POST: {
         const menu = await createMenu(dataParams, queryParams);
 

@@ -1,28 +1,33 @@
 import React, { useEffect } from 'react';
-import isEmpty from 'lodash/isEmpty';
+import { useRouter } from 'next/router';
 
 import MetaWrapper from '@components/MetaWrapper/MetaWrapper';
 import { useAppDispatch } from '@hooks/reduxHooks';
-import { parseLocationSearchToObject } from '@src/utils/history';
 
 import CreateEditMenuLayout from '../components/CreateEditMenuLayout';
 import { PartnerManageMenusThunks } from '../PartnerManageMenus.slice';
 
-const PartnerCreateMenuRoute = () => {
+const PartnerEditMenuRoute = () => {
+  const router = useRouter();
   const dispatch = useAppDispatch();
-  const { menuId } = parseLocationSearchToObject();
+
+  const {
+    query: { menuId },
+    isReady,
+  } = router;
 
   useEffect(() => {
-    if (!isEmpty(menuId)) {
-      dispatch(PartnerManageMenusThunks.loadMenuData({ menuId }));
-    }
-  }, [menuId]);
+    dispatch(
+      PartnerManageMenusThunks.loadMenuData({ menuId: menuId as string }),
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isReady]);
 
   return (
-    <MetaWrapper routeName="PartnerCreateMenuRoute">
+    <MetaWrapper routeName="PartnerEditMenuRoute">
       <CreateEditMenuLayout />
     </MetaWrapper>
   );
 };
 
-export default PartnerCreateMenuRoute;
+export default PartnerEditMenuRoute;

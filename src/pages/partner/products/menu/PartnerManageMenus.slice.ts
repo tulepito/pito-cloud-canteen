@@ -2,7 +2,11 @@ import { createSlice } from '@reduxjs/toolkit';
 import differenceBy from 'lodash/differenceBy';
 
 import { closePartnerMenuApi, publishPartnerMenuApi } from '@apis/menuApi';
-import { createDraftMenuApi, deleteMenusApi } from '@apis/partnerApi';
+import {
+  createDraftMenuApi,
+  deleteMenusApi,
+  getMenuApi,
+} from '@apis/partnerApi';
 import { queryAllPages } from '@helpers/apiHelpers';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { CurrentUser, denormalisedResponseEntities } from '@src/utils/data';
@@ -28,6 +32,7 @@ type TPartnerManageMenusState = {
   // create/edit menu
   draftMenu: TObject;
   menu: TListing | null;
+  loadMenuDataInProgress: boolean;
   createDraftMenuInProgress: boolean;
   createDraftMenuError: any;
 };
@@ -43,6 +48,7 @@ const initialState: TPartnerManageMenusState = {
   // create/edit menu
   draftMenu: {},
   menu: null,
+  loadMenuDataInProgress: false,
   createDraftMenuInProgress: false,
   createDraftMenuError: null,
 };
@@ -123,6 +129,21 @@ const preDeleteMenus = createAsyncThunk(
   },
 );
 
+const loadMenuData = createAsyncThunk(
+  'app/PartnerManageMenus/LOAD_MENU_DATA',
+  async (payload: TObject, { fulfillWithValue, rejectWithValue }) => {
+    try {
+      const { menuId } = payload;
+
+      const response = await getMenuApi(menuId);
+
+      return fulfillWithValue(response.data);
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  },
+);
+
 const deleteMenus = createAsyncThunk(
   'app/PartnerManageMenus/DELETE_MENUS',
   async (payload: TObject, { fulfillWithValue, rejectWithValue }) => {
@@ -168,6 +189,9 @@ const createDraftMenu = createAsyncThunk(
           daysOfWeek,
           restaurantId: restaurantListingId,
         },
+        queryParams: {
+          expand: true,
+        },
       });
 
       return fulfillWithValue(
@@ -187,6 +211,7 @@ export const PartnerManageMenusThunks = {
   preDeleteMenus,
   deleteMenus,
   createDraftMenu,
+  loadMenuData,
 };
 
 // ================ Slice ================ //
@@ -278,6 +303,17 @@ const PartnerManageMenusSlice = createSlice({
       .addCase(createDraftMenu.rejected, (state, { payload }) => {
         state.createDraftMenuInProgress = false;
         state.createDraftMenuError = payload;
+      })
+      /* =============== loadMenuData =============== */
+      .addCase(loadMenuData.pending, (state) => {
+        state.loadMenuDataInProgress = true;
+      })
+      .addCase(loadMenuData.fulfilled, (state, { payload }) => {
+        state.loadMenuDataInProgress = false;
+        state.menu = payload;
+      })
+      .addCase(loadMenuData.rejected, (state) => {
+        state.loadMenuDataInProgress = false;
       });
   },
 });

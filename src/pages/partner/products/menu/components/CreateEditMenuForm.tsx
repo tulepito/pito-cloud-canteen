@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/display-name */
 import { forwardRef, useEffect, useState } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
@@ -77,7 +78,6 @@ const CreateEditMenuFormComponent: React.FC<
     isDraftEditFlow = false,
   } = props;
   const dispatch = useAppDispatch();
-
   const { startDate: startDateFromValues, endDate: endDateFromValues } = values;
   const initialStartDate = startDateFromValues
     ? new Date(startDateFromValues)
@@ -96,6 +96,15 @@ const CreateEditMenuFormComponent: React.FC<
     !endDate && css.placeholder,
   );
 
+  const handleStartDateChange = (value: any, prevValue: any) => {
+    if (endDateFromValues && value !== prevValue) {
+      form.batch(() => {
+        form.change('endDate', undefined);
+        setEndDate(undefined!);
+      });
+    }
+  };
+
   useEffect(() => {
     dispatch(
       PartnerManageMenusActions.saveDraft({
@@ -111,17 +120,14 @@ const CreateEditMenuFormComponent: React.FC<
       }),
     );
     dispatch(PartnerManageMenusActions.clearCreateOrUpdateMenuError());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(values)]);
 
-  const handleStartDateChange = (value: any, prevValue: any) => {
-    if (endDateFromValues && value !== prevValue) {
-      form.batch(() => {
-        form.change('endDate', undefined);
-        setEndDate(undefined!);
-      });
-    }
-  };
+  useEffect(() => {
+    setStartDate(initialStartDate!);
+  }, [JSON.stringify(initialStartDate)]);
+  useEffect(() => {
+    setEndDate(initialEndDate!);
+  }, [JSON.stringify(initialEndDate)]);
 
   return (
     <Form onSubmit={handleSubmit}>
