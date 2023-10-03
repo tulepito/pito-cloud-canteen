@@ -71,6 +71,7 @@ export const getSubmitFoodData = (values: TEditPartnerFoodFormValues) => {
     metadata: {
       restaurantId,
       listingType: ListingTypes.FOOD,
+      isFoodEnable: true,
     },
   };
 };
@@ -122,6 +123,7 @@ export const getDuplicateData = (values: TEditPartnerFoodFormValues) => {
     metadata: {
       restaurantId,
       listingType: ListingTypes.FOOD,
+      isFoodEnable: true,
     },
   };
 };
@@ -265,6 +267,7 @@ export const getImportDataFromCsv = (
     metadata: {
       restaurantId,
       listingType: ListingTypes.FOOD,
+      isFoodEnable: true,
     },
   };
 };
