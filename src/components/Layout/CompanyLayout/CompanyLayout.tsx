@@ -6,8 +6,11 @@ import { useRouter } from 'next/router';
 import Dropdown from '@components/CompanyLayout/Dropdown/Dropdown';
 import FeatureIcons from '@components/FeatureIcons/FeatureIcons';
 import IconArrowHead from '@components/Icons/IconArrowHead/IconArrowHead';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import QuizFlow from '@pages/company/booker/orders/new/quiz/QuizFlow';
 import { BookerCompaniesThunks } from '@redux/slices/BookerCompanies.slice';
+import { QuizActions } from '@redux/slices/Quiz.slice';
 import { companyPaths } from '@src/paths';
 import { User } from '@utils/data';
 import type { TUser } from '@utils/types';
@@ -38,6 +41,8 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
   const { pathname } = router;
   const showFeatureHeader = shouldShowFeatureHeader(router.pathname);
   const showSidebar = shouldShowSidebar(pathname);
+
+  const quizFlowOpen = useAppSelector((state) => state.Quiz.quizFlowOpen);
 
   const companyList = useAppSelector(
     (state) => state.BookerCompanies.companies,
@@ -89,6 +94,7 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
         </div>
       ),
       pathname: companyPaths.CreateNewOrder,
+      extraFunc: () => dispatch(QuizActions.openQuizFlow()),
     },
     {
       key: 'order',
@@ -212,6 +218,9 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
         {children}
       </CompanyMainContent>
       <CompanyFooter />
+      <RenderWhen condition={quizFlowOpen}>
+        <QuizFlow />
+      </RenderWhen>
     </>
   );
 };

@@ -12,7 +12,7 @@ import css from './OrderDeadlineDateFieldModal.module.scss';
 type OrderDeadlineDateFieldModalProps = {
   onClose: () => void;
   form: any;
-  values: TMealDateFormValues;
+  values: Partial<TMealDateFormValues>;
   startOrderDate: Date | null;
 };
 

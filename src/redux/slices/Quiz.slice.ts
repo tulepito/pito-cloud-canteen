@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 
+import { queryOrdersApi } from '@apis/companyApi';
 import { fetchUserApi } from '@apis/index';
 import { fetchSearchFilterApi } from '@apis/userApi';
 import { createAsyncThunk } from '@redux/redux.helper';
@@ -8,6 +9,7 @@ import {
   EImageVariants,
   EListingStates,
   EListingType,
+  EOrderStates,
   ERestaurantListingStatus,
 } from '@utils/enums';
 import type { TListing, TObject, TUser } from '@utils/types';
@@ -33,6 +35,11 @@ type TQuizState = {
   fetchRestaurantsError: any;
 
   allowCreateOrder: boolean;
+  quizFlowOpen: boolean;
+  previousOrder: TListing;
+  fetchCompanyOrdersInProgress: boolean;
+  fetchCompanyOrdersError: any;
+  isCopyPreviousOrder: boolean;
 };
 const initialState: TQuizState = {
   selectedCompany: null!,
@@ -47,12 +54,18 @@ const initialState: TQuizState = {
   fetchRestaurantsError: null,
 
   allowCreateOrder: false,
+  quizFlowOpen: false,
+  previousOrder: null!,
+  fetchCompanyOrdersInProgress: false,
+  fetchCompanyOrdersError: null,
+  isCopyPreviousOrder: false,
 };
 
 // ================ Thunk types ================ //
 const FETCH_SEARCH_FILTER = 'app/Quiz/FETCH_SEARCH_FILTER';
 const FETCH_RESTAURANTS = 'app/Quiz/FETCH_RESTAURANTS';
 const FETCH_SELECTED_COMPANY = 'app/Quiz/FETCH_SELECTED_COMPANY';
+const QUERY_COMPANY_ORDERS = 'app/Quiz/queryCompanyOrders';
 
 // ================ Async thunks ================ //
 const fetchSearchFilter = createAsyncThunk(FETCH_SEARCH_FILTER, async () => {
@@ -92,10 +105,37 @@ const fetchSelectedCompany = createAsyncThunk(
     return companyAccount;
   },
 );
+
+const queryCompanyOrders = createAsyncThunk(
+  QUERY_COMPANY_ORDERS,
+  async (companyId: string) => {
+    const apiBody = {
+      dataParams: {
+        meta_orderState: [
+          EOrderStates.picking,
+          EOrderStates.inProgress,
+          EOrderStates.pendingPayment,
+          EOrderStates.completed,
+        ],
+        meta_companyId: companyId,
+      },
+    };
+    const { data: ordersResponse } = await queryOrdersApi(companyId, apiBody);
+
+    const orders = denormalisedResponseEntities(ordersResponse);
+    if (orders.length === 0) {
+      return null;
+    }
+
+    return orders[0];
+  },
+);
+
 export const QuizThunks = {
   fetchSearchFilter,
   fetchRestaurants,
   fetchSelectedCompany,
+  queryCompanyOrders,
 };
 
 // ================ Slice ================ //
@@ -113,12 +153,26 @@ const QuizSlice = createSlice({
     clearQuizData: (state) => {
       state.quiz = {};
       state.selectedCompany = null!;
+      state.previousOrder = null!;
+      state.isCopyPreviousOrder = false;
     },
     allowCreateOrder: (state) => {
       state.allowCreateOrder = true;
     },
     disallowCreateOrder: (state) => {
       state.allowCreateOrder = false;
+    },
+    openQuizFlow: (state) => {
+      state.quizFlowOpen = true;
+    },
+    closeQuizFlow: (state) => {
+      state.quizFlowOpen = false;
+    },
+    copyPreviousOrder: (state) => {
+      state.isCopyPreviousOrder = true;
+    },
+    clearPreviousOrder: (state) => {
+      state.isCopyPreviousOrder = false;
     },
   },
   extraReducers: (builder) => {
@@ -156,6 +210,19 @@ const QuizSlice = createSlice({
       .addCase(fetchSelectedCompany.rejected, (state, { error }) => {
         state.fetchSelectedCompanyInProgress = false;
         state.fetchSelectedCompanyError = error.message;
+      })
+
+      .addCase(queryCompanyOrders.pending, (state) => {
+        state.fetchCompanyOrdersInProgress = true;
+        state.fetchCompanyOrdersError = null;
+      })
+      .addCase(queryCompanyOrders.fulfilled, (state, { payload }) => {
+        state.fetchCompanyOrdersInProgress = false;
+        state.previousOrder = payload;
+      })
+      .addCase(queryCompanyOrders.rejected, (state, { error }) => {
+        state.fetchCompanyOrdersInProgress = false;
+        state.fetchCompanyOrdersError = error.message;
       });
   },
 });

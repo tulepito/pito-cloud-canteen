@@ -98,7 +98,7 @@ export type DeleteGroupApiData = {
 export const deleteGroupApi = (data: DeleteGroupApiData) =>
   deleteApi('/company/group', data);
 
-const queryOrdersApi = (companyId: string, params: TObject = {}) => {
+export const queryOrdersApi = (companyId: string, params: TObject = {}) => {
   return getApi(`/company/${companyId}/orders`, params);
 };
 

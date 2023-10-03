@@ -12,7 +12,7 @@ import css from './OrderDeadlineField.module.scss';
 
 type OrderDeadlineFieldProps = {
   form: any;
-  values: TMealDateFormValues;
+  values: Partial<TMealDateFormValues>;
 };
 const OrderDeadlineField: React.FC<OrderDeadlineFieldProps> = (props) => {
   const { form, values } = props;

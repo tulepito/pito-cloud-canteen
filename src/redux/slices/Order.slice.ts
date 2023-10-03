@@ -31,13 +31,20 @@ import { getMenuQueryInSpecificDay } from '@helpers/listingSearchQuery';
 import { createAsyncThunk } from '@redux/redux.helper';
 import config from '@src/configs';
 import { CompanyPermission } from '@src/types/UserPermission';
-import { denormalisedResponseEntities, Listing, User } from '@utils/data';
+import { getSelectedDaysOfWeek } from '@src/utils/dates';
+import {
+  CurrentUser,
+  denormalisedResponseEntities,
+  Listing,
+  User,
+} from '@utils/data';
 import {
   EInvalidRestaurantCase,
   EListingStates,
   EListingType,
   EManageCompanyOrdersTab,
   ENotificationTypes,
+  EOrderType,
   ERestaurantListingStatus,
   MANAGE_COMPANY_ORDERS_TAB_MAP,
 } from '@utils/enums';
@@ -309,18 +316,86 @@ const BOOKER_REORDER = 'app/Order/BOOKER_REORDER';
 const UPDATE_ORDER_STATE_TO_DRAFT = 'app/Order/UPDATE_ORDER_STATE_TO_DRAFT';
 const BOOKER_DELETE_ORDER = 'app/Order/BOOKER_DELETE_ORDER';
 
-const createOrder = createAsyncThunk(CREATE_ORDER, async (params: any) => {
-  const { clientId, bookerId, isCreatedByAdmin = false, generalInfo } = params;
-  const apiBody = {
-    companyId: clientId,
-    bookerId,
-    isCreatedByAdmin,
-    generalInfo,
-  };
-  const { data: orderListing } = await createBookerOrderApi(apiBody);
+const createOrder = createAsyncThunk(
+  CREATE_ORDER,
+  async (
+    params: { isCreatedByAdmin: boolean; clientId?: string; bookerId?: string },
+    { getState },
+  ) => {
+    const { isCreatedByAdmin = false, clientId, bookerId } = params;
+    const { quiz, previousOrder, isCopyPreviousOrder, selectedCompany } =
+      getState().Quiz;
+    const { currentUser } = getState().user;
+    const currentUserGetter = CurrentUser(currentUser!);
+    const { hasOrderBefore = false, quizData: bookerQuizData } =
+      currentUserGetter.getPrivateData();
 
-  return orderListing;
-});
+    const {
+      startDate,
+      endDate,
+      isGroupOrder = [],
+      deadlineDate,
+      orderDeadlineHour,
+      orderDeadlineMinute,
+      dayInWeek,
+    } = quiz;
+
+    const newIsGroupOrder = isCopyPreviousOrder
+      ? Listing(previousOrder).getMetadata().orderType === EOrderType.group
+      : isGroupOrder.length > 0;
+
+    const startDateTimestamp = new Date(startDate).getTime();
+    const endDateTimestamp = new Date(endDate).getTime();
+    const deadlineDateTimestamp = new Date(deadlineDate).getTime();
+
+    const selectedDays = getSelectedDaysOfWeek(
+      startDateTimestamp,
+      endDateTimestamp,
+      dayInWeek,
+    );
+
+    const deadlineInfoMaybe = newIsGroupOrder
+      ? {
+          deadlineDate: DateTime.fromISO(deadlineDate)
+            .plus({
+              hours: orderDeadlineHour,
+              minutes: orderDeadlineMinute,
+            })
+            .toMillis(),
+          deadlineHour: `${orderDeadlineHour}:${orderDeadlineMinute}`,
+        }
+      : {};
+
+    const newOrderApiBody = {
+      companyId: clientId || User(selectedCompany).getId(),
+      bookerId: bookerId || User(currentUser!).getId(),
+      isCreatedByAdmin,
+      generalInfo: {
+        ...(hasOrderBefore ? bookerQuizData : quiz),
+        orderType: newIsGroupOrder ? EOrderType.group : EOrderType.normal,
+        ...deadlineInfoMaybe,
+        deliveryAddress:
+          User(selectedCompany).getPublicData().companyLocation || {},
+        dayInWeek: selectedDays,
+        startDate: startDateTimestamp,
+        endDate: endDateTimestamp,
+        deadlineDate: deadlineDateTimestamp,
+        deadlineHour: `${orderDeadlineHour}:${orderDeadlineMinute}`,
+      },
+    };
+
+    const { data: orderListing } = isCopyPreviousOrder
+      ? await reorderApi(Listing(previousOrder!).getId(), {
+          startDate: startDateTimestamp,
+          endDate: endDateTimestamp,
+          deadlineDate: deadlineDateTimestamp,
+          deadlineHour: `${orderDeadlineHour}:${orderDeadlineMinute}`,
+        })
+      : await createBookerOrderApi(newOrderApiBody);
+
+    return orderListing;
+  },
+);
 
 const updateOrder = createAsyncThunk(
   UPDATE_ORDER,
@@ -908,7 +983,7 @@ const getCompanyOrderSummary = createAsyncThunk(
 const bookerReorder = createAsyncThunk(
   BOOKER_REORDER,
   async (orderId: string) => {
-    const { data } = await reorderApi(orderId);
+    const { data } = await reorderApi(orderId, {});
 
     return data;
   },

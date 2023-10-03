@@ -12,7 +12,7 @@ import css from './OrderDateFieldModal.module.scss';
 
 type TOrderDateFieldModalProps = {
   form: any;
-  values: TMealDateFormValues;
+  values: Partial<TMealDateFormValues>;
   onClose: () => void;
 };
 

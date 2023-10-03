@@ -5,6 +5,8 @@ import Button from '@components/Button/Button';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import IconCloseV2 from '@components/Icons/IconCloseV2/IconCloseV2';
 import Modal from '@components/Modal/Modal';
+import { useAppDispatch } from '@hooks/reduxHooks';
+import { QuizActions } from '@redux/slices/Quiz.slice';
 
 import css from './QuizModal.module.scss';
 
@@ -17,7 +19,7 @@ type QuizModalProps = {
   submitDisabled?: boolean;
   modalContainerClassName?: string;
   submitInProgress?: boolean;
-  handleClose: () => void;
+  handleClose?: () => void;
   onSubmit?: () => void;
   onCancel?: () => void;
   onBack?: () => void;
@@ -27,7 +29,6 @@ const QuizModal: React.FC<QuizModalProps> = (props) => {
   const {
     id,
     isOpen,
-    handleClose,
     modalTitle,
     submitText,
     cancelText,
@@ -40,22 +41,28 @@ const QuizModal: React.FC<QuizModalProps> = (props) => {
     children,
   } = props;
 
+  const dispatch = useAppDispatch();
+
   const modalContainerClasses = classNames(
     css.modalContainer,
     modalContainerClassName,
   );
 
+  const handleCancel = () => {
+    dispatch(QuizActions.closeQuizFlow());
+  };
+
   return (
     <Modal
       id={id}
       isOpen={isOpen}
-      handleClose={handleClose}
+      handleClose={handleCancel}
       containerClassName={modalContainerClasses}
       shouldHideIconClose
       customHeader={<div></div>}>
       <div className={css.container}>
         <div className={css.modalTop}>
-          <div className={css.closeBtn} onClick={handleClose}>
+          <div className={css.closeBtn} onClick={handleCancel}>
             <IconCloseV2 className={css.closeIcon} />
           </div>
           {onBack && (

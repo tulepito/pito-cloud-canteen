@@ -2,16 +2,16 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
-import { useRouter } from 'next/router';
 
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { QuizActions, QuizThunks } from '@redux/slices/Quiz.slice';
-import { companyPaths, quizPaths } from '@src/paths';
 import { User } from '@src/utils/data';
+import { QuizStep } from '@src/utils/enums';
 
 import useRedirectAfterReloadPage from '../../hooks/useRedirectAfterReloadPage';
 import QuizModal from '../components/QuizModal/QuizModal';
+import { useQuizFlow } from '../hooks/useQuizFlow';
 
 import type { TSpecialDemandFormValues } from './SpecialDemandForm/SpecialDemandForm';
 import SpecialDemandForm from './SpecialDemandForm/SpecialDemandForm';
@@ -20,13 +20,13 @@ import css from './QuizSpecialDemand.module.scss';
 
 const QuizSpecialDemand = () => {
   const intl = useIntl();
-  const router = useRouter();
   const submittingControl = useBoolean();
   const dispatch = useAppDispatch();
   useRedirectAfterReloadPage();
   const formSubmitRef = useRef<any>();
   const [formValues, setFormValues] = useState<TSpecialDemandFormValues>();
   const quizData = useAppSelector((state) => state.Quiz.quiz, shallowEqual);
+  const { nextStep, backStep } = useQuizFlow(QuizStep.SPECIAL_DEMAND);
   const selectedCompany = useAppSelector(
     (state) => state.Quiz.selectedCompany,
     shallowEqual,
@@ -47,11 +47,8 @@ const QuizSpecialDemand = () => {
     submittingControl.setTrue();
 
     try {
-      await formSubmitRef?.current.submit();
-      await router.push({
-        pathname: quizPaths.MealStyles,
-        query: { ...router.query },
-      });
+      formSubmitRef?.current.submit();
+      nextStep();
     } catch (error) {
       console.error(error);
     } finally {
@@ -60,15 +57,11 @@ const QuizSpecialDemand = () => {
   };
 
   const onFormSubmit = async (values: TSpecialDemandFormValues) => {
-    await dispatch(QuizActions.updateQuiz({ ...values }));
+    dispatch(QuizActions.updateQuiz({ ...values }));
   };
 
   const onCancel = () => {
-    router.push(quizPaths.MealStyles);
-  };
-
-  const goBack = () => {
-    router.back();
+    nextStep();
   };
 
   useEffect(() => {
@@ -87,15 +80,10 @@ const QuizSpecialDemand = () => {
     ],
   );
 
-  const handleCancel = () => {
-    router.push(companyPaths.Home);
-  };
-
   return (
     <QuizModal
       id="QuizSpecialDemand"
       isOpen
-      handleClose={handleCancel}
       modalTitle={
         <div className={css.headerContainer}>
           <div className={css.main}>
@@ -114,7 +102,7 @@ const QuizSpecialDemand = () => {
       onSubmit={onFormSubmitClick}
       submitDisabled={submitDisabled}
       submitInProgress={submittingControl.value}
-      onBack={goBack}>
+      onBack={backStep}>
       <div className={css.formContainer}>
         {fetchSearchFilter ? (
           <div className={css.loading}>

@@ -1,18 +1,13 @@
-import { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 
 import Button from '@components/Button/Button';
 import Modal from '@components/Modal/Modal';
 import OutsideClickHandler from '@components/OutsideClickHandler/OutsideClickHandler';
-import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import {
-  companyMemberThunks,
-  resetCheckedEmailInputChunk,
-} from '@redux/slices/companyMember.slice';
-import { User } from '@utils/data';
+import { useAppSelector } from '@hooks/reduxHooks';
 import type { TCurrentUser, TUser } from '@utils/types';
 
+import { useAddMemberEmail } from '../../hooks/useAddMemberEmail';
 import AddCompanyMembersForm from '../AddCompanyMembersForm/AddCompanyMembersForm';
 
 import css from './AddCompanyMembersModal.module.scss';
@@ -23,17 +18,18 @@ type CreateGroupModalProps = {
 };
 const AddCompanyMembersModal: React.FC<CreateGroupModalProps> = (props) => {
   const intl = useIntl();
-  const dispatch = useAppDispatch();
   const { isOpen, onClose } = props;
-  const [emailList, setEmailList] = useState<string[]>([]);
-  const [loadedResult, setLoadedResult] = useState<any[]>([]);
+  const {
+    emailList,
+    setEmailList,
+    loadedResult,
+    removeEmailValue,
+    onAddMembersSubmit,
+    checkEmailList,
+  } = useAddMemberEmail();
 
   const checkEmailExistedInProgress = useAppSelector(
     (state) => state.companyMember.checkEmailExistedInProgress,
-  );
-  const checkedEmailInputChunk = useAppSelector(
-    (state) => state.companyMember.checkedEmailInputChunk,
-    shallowEqual,
   );
   const { addMembersInProgress, addMembersError } = useAppSelector(
     (state) => state.companyMember,
@@ -48,39 +44,9 @@ const AddCompanyMembersModal: React.FC<CreateGroupModalProps> = (props) => {
     shallowEqual,
   );
 
-  const removeEmailValue = (email: string) => {
-    const newEmailList = emailList.filter((_email) => _email !== email);
-    const newLoadResult = loadedResult.filter(
-      (_result) => _result.email !== email,
-    );
-    setEmailList(newEmailList);
-    setLoadedResult(newLoadResult);
-  };
-
-  useEffect(() => {
-    if (checkedEmailInputChunk) {
-      setLoadedResult([...loadedResult, ...checkedEmailInputChunk]);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [checkedEmailInputChunk]);
-  const checkEmailList = (value: string[]) => {
-    dispatch(companyMemberThunks.checkEmailExisted(value));
-  };
-  const onAddMembersSubmit = () => {
-    dispatch(resetCheckedEmailInputChunk());
-    const noAccountEmailList = loadedResult
-      .filter((_result) => _result.response.status === 404)
-      .map((_result) => _result.email);
-    const userIdList = loadedResult
-      .filter((_result) => _result.response.status === 200)
-      .map((_result) => User(_result.response.user).getId());
-    dispatch(
-      companyMemberThunks.addMembers({ noAccountEmailList, userIdList }),
-    ).then(() => {
-      setEmailList([]);
-      setLoadedResult([]);
-      onClose();
-    });
+  const handleSubmit = async () => {
+    await onAddMembersSubmit();
+    onClose();
   };
 
   return (
@@ -93,7 +59,7 @@ const AddCompanyMembersModal: React.FC<CreateGroupModalProps> = (props) => {
         <div className={css.modalContainer}>
           <div className={css.modalContent}>
             <AddCompanyMembersForm
-              onSubmit={onAddMembersSubmit}
+              onSubmit={handleSubmit}
               initialValues={[]}
               emailList={emailList}
               setEmailList={setEmailList}

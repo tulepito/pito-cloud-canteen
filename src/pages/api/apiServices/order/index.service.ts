@@ -57,6 +57,7 @@ const normalizeOrderMetadata = (metadata: TObject = {}) => {
     shipperName,
     staffName,
     vatAllow,
+    deliveryHour,
   } = metadata;
 
   const newOrderMetadata = {
@@ -81,6 +82,7 @@ const normalizeOrderMetadata = (metadata: TObject = {}) => {
     shipperName,
     staffName,
     vatAllow,
+    deliveryHour,
   };
 
   return newOrderMetadata;
@@ -143,11 +145,22 @@ const getSubOrderHistoryCount = async ({
   return result as number;
 };
 
-const reorder = async (
-  orderIdToReOrder: string,
-  bookerId: string,
-  isCreatedByAdmin?: boolean,
-) => {
+const reorder = async ({
+  orderIdToReOrder,
+  bookerId,
+  isCreatedByAdmin,
+  dateParams,
+}: {
+  orderIdToReOrder: string;
+  bookerId: string;
+  isCreatedByAdmin?: boolean;
+  dateParams: {
+    startDate: number;
+    endDate: number;
+    deadlineDate: number;
+    deadlineHour: number;
+  };
+}) => {
   const integrationSdk = getIntegrationSdk();
   const response = await integrationSdk.listings.show(
     {
@@ -164,6 +177,7 @@ const reorder = async (
     orderType,
     selectedGroups = [],
   } = Listing(oldOrder).getMetadata();
+  const { startDate, endDate, deadlineDate, deadlineHour } = dateParams;
 
   const companyAccount = await fetchUser(companyId);
   const currentOrderNumber = await getOrderNumber();
@@ -197,6 +211,10 @@ const reorder = async (
       ...normalizeOrderMetadata({
         ...Listing(oldOrder).getMetadata(),
       }),
+      startDate,
+      endDate,
+      deadlineDate,
+      deadlineHour,
     },
   });
 
@@ -249,12 +267,15 @@ const reorder = async (
     }),
   );
 
-  const updatedOrder = await integrationSdk.listings.update({
-    id: Listing(newOrder).getId(),
-    metadata: {
-      plans,
+  const updatedOrder = await integrationSdk.listings.update(
+    {
+      id: Listing(newOrder).getId(),
+      metadata: {
+        plans,
+      },
     },
-  });
+    { expand: true },
+  );
 
   updateOrderNumber();
 

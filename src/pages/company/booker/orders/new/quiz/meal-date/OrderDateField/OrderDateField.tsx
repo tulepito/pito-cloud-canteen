@@ -12,7 +12,7 @@ import css from './OrderDateField.module.scss';
 
 type OrderDateFieldProps = {
   form: any;
-  values: TMealDateFormValues;
+  values: Partial<TMealDateFormValues>;
 };
 const OrderDateField: React.FC<OrderDateFieldProps> = (props) => {
   const { form, values } = props;

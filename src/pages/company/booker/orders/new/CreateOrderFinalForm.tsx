@@ -1,14 +1,16 @@
 import { useEffect, useMemo } from 'react';
-import { useField, useForm } from 'react-final-form-hooks';
+import type { FormProps, FormRenderProps } from 'react-final-form';
+import { Form as FinalForm } from 'react-final-form';
 import { FormattedMessage, useIntl } from 'react-intl';
 import classNames from 'classnames';
 import isEmpty from 'lodash/isEmpty';
 
 import Button from '@components/Button/Button';
-import { FieldDropdownSelectComponent } from '@components/FormFields/FieldDropdownSelect/FieldDropdownSelect';
+import Form from '@components/Form/Form';
+import FieldDropdownSelect from '@components/FormFields/FieldDropdownSelect/FieldDropdownSelect';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import Toggle from '@components/Toggle/Toggle';
-import { useAppDispatch } from '@hooks/reduxHooks';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { QuizActions, QuizThunks } from '@redux/slices/Quiz.slice';
 import { Listing } from '@src/utils/data';
 import { EOrderType } from '@src/utils/enums';
@@ -19,25 +21,7 @@ import OrderDeadlineField from './quiz/meal-date/OrderDeadlineField/OrderDeadlin
 
 import css from './BookerNewOrder.module.scss';
 
-type TCreateOrderFormProps = {
-  companies: {
-    id: string;
-    name: string;
-  }[];
-  previousOrders?: {
-    id: string;
-    name: string;
-  }[];
-  onSubmit: (values: TCreateOrderFormValues, reject?: boolean) => void;
-  initialValues?: TCreateOrderFormValues;
-  submitInprogress?: boolean;
-  submitError?: any;
-  queryInprogress?: boolean;
-  hasPreviousOrder?: boolean;
-  previousOrder?: TListing;
-};
-
-export type TCreateOrderFormValues = {
+export type TCreateOrderFinalFormValues = {
   company: string;
   usePreviousData?: boolean;
   startDate?: number;
@@ -47,60 +31,60 @@ export type TCreateOrderFormValues = {
   orderDeadlineMinute?: string;
 };
 
-const validate = (values: TCreateOrderFormValues) => {
-  const errors: any = {};
-  if (!values.company) {
-    errors.company = 'Vui lòng chọn công ty cần đặt đơn';
-  }
-
-  return errors;
+type TExtraProps = {
+  companies: {
+    id: string;
+    name: string;
+  }[];
+  previousOrders?: {
+    id: string;
+    name: string;
+  }[];
+  submitInprogress?: boolean;
+  queryInprogress?: boolean;
+  hasPreviousOrder?: boolean;
+  previousOrder?: TListing;
 };
+type TCreateOrderFinalFormComponentProps =
+  FormRenderProps<TCreateOrderFinalFormValues> & Partial<TExtraProps>;
+type TCreateOrderFinalFormProps = FormProps<TCreateOrderFinalFormValues> &
+  TExtraProps;
 
-const CreateOrderForm: React.FC<TCreateOrderFormProps> = ({
-  companies = [],
-  onSubmit,
-  initialValues,
-  submitInprogress,
-  queryInprogress,
-  hasPreviousOrder,
-  previousOrder,
-}) => {
+const CreateOrderFinalFormComponent: React.FC<
+  TCreateOrderFinalFormComponentProps
+> = (props) => {
+  const {
+    handleSubmit,
+    values: formValues,
+    submitting,
+    invalid,
+    submitInprogress,
+    previousOrder,
+    companies = [],
+    hasPreviousOrder,
+    queryInprogress,
+    form,
+  } = props;
   const intl = useIntl();
   const dispatch = useAppDispatch();
-
-  const handleCustomSubmit = (values: TCreateOrderFormValues) => {
-    onSubmit(values);
-  };
-
-  const {
-    form,
-    handleSubmit,
-    submitting,
-    hasValidationErrors,
-    values: formValues,
-  } = useForm<TCreateOrderFormValues>({
-    onSubmit: handleCustomSubmit,
-    validate,
-    initialValues,
-    destroyOnUnregister: true,
-  });
-
-  const company = useField('company', form);
-  const usePreviousData = useField('usePreviousData', form);
   const previousOrderListing = Listing(previousOrder!);
   const { orderType = EOrderType.group } = previousOrderListing.getMetadata();
   const isGroupOrder = orderType === EOrderType.group;
+  const isCopyPreviousOrder = useAppSelector(
+    (state) => state.Quiz.isCopyPreviousOrder,
+  );
 
-  const companyValue = company.input.value;
   const isCompanyListEmpty = isEmpty(companies);
   const isSubmitting = submitting || submitInprogress;
   const disabledSubmit =
     isCompanyListEmpty ||
     isSubmitting ||
-    hasValidationErrors ||
-    !formValues?.startDate ||
-    !formValues?.endDate ||
-    (isGroupOrder && !formValues?.deadlineDate);
+    invalid ||
+    !formValues?.company ||
+    (!!formValues.usePreviousData &&
+      (!formValues?.startDate ||
+        !formValues?.endDate ||
+        (isGroupOrder && !formValues?.deadlineDate)));
 
   const companyLabel = intl.formatMessage({
     id: 'CreateOrderForm.companyLabel',
@@ -110,7 +94,7 @@ const CreateOrderForm: React.FC<TCreateOrderFormProps> = ({
   });
 
   const handleUsePreviousData = (checked: boolean) => {
-    usePreviousData.input.onChange(checked);
+    form.change('usePreviousData', checked);
     dispatch(QuizActions.copyPreviousOrder());
     if (!checked) {
       dispatch(QuizActions.clearPreviousOrder());
@@ -128,18 +112,16 @@ const CreateOrderForm: React.FC<TCreateOrderFormProps> = ({
   );
 
   useEffect(() => {
-    if (companyValue) {
-      dispatch(QuizThunks.queryCompanyOrders(companyValue));
+    if (formValues.company) {
+      dispatch(QuizThunks.queryCompanyOrders(formValues.company));
     }
-  }, [companyValue, dispatch]);
+  }, [formValues.company, dispatch]);
 
   return (
-    <form className={css.root} onSubmit={handleSubmit}>
-      <FieldDropdownSelectComponent
+    <Form onSubmit={handleSubmit}>
+      <FieldDropdownSelect
         className={css.input}
         label={companyLabel}
-        input={company.input}
-        meta={company.meta}
         id={`company`}
         name="company"
         disabled={isCompanyListEmpty}
@@ -155,13 +137,13 @@ const CreateOrderForm: React.FC<TCreateOrderFormProps> = ({
         <Toggle
           className={classNames(css.toggle, css.input)}
           onClick={handleUsePreviousData}
-          status={usePreviousData.input.value ? 'on' : 'off'}
+          status={formValues?.usePreviousData ? 'on' : 'off'}
           label={usePreviousDataLabel}
-          name={usePreviousData.input.name}
-          id={usePreviousData.input.name}
+          name="usePreviousData"
+          id="usePreviousData"
         />
       </RenderWhen>
-      <RenderWhen condition={usePreviousData.input.value}>
+      <RenderWhen condition={!!formValues?.usePreviousData}>
         <OrderDateField form={form} values={formValues} />
         <RenderWhen condition={isGroupOrder}>
           <div className={css.fieldContainer}>
@@ -176,10 +158,19 @@ const CreateOrderForm: React.FC<TCreateOrderFormProps> = ({
         disabled={disabledSubmit}
         inProgress={isSubmitting}
         spinnerClassName={css.spinnerClassName}>
-        <FormattedMessage id="CreateOrderForm.submit" />
+        <RenderWhen condition={isCopyPreviousOrder}>
+          Tạo đơn hàng
+          <RenderWhen.False>
+            <FormattedMessage id="CreateOrderForm.submit" />
+          </RenderWhen.False>
+        </RenderWhen>
       </Button>
-    </form>
+    </Form>
   );
 };
 
-export default CreateOrderForm;
+const CreateOrderFinalForm: React.FC<TCreateOrderFinalFormProps> = (props) => {
+  return <FinalForm {...props} component={CreateOrderFinalFormComponent} />;
+};
+
+export default CreateOrderFinalForm;
