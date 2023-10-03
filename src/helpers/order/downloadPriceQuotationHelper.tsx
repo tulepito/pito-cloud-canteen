@@ -94,8 +94,15 @@ export const downloadPriceQuotation =
     const { doc, id } = await createNewPrint({ id: 'priceQuotation' });
     document.body.removeChild(div);
 
+    const dayIndex = subOrderDate
+      ? new Date(Number(subOrderDate)).getDay()
+      : null;
+
     if (doc && id) {
-      const fileName = `${'Báo giá'}#${orderTitle}.pdf`;
+      const fileName =
+        typeof dayIndex === 'number'
+          ? `${'Báo giá'}#${orderTitle}-${dayIndex}.pdf`
+          : `${'Báo giá'}#${orderTitle}.pdf`;
       doc.save(fileName, { returnPromise: true });
     }
   };

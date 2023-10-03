@@ -317,6 +317,7 @@ export const usePrepareOrderDetailPageData = ({
       companyName,
       startDate,
       endDate,
+      deliveryHour,
     },
     cartData: {
       serviceFee: `${parseThousandNumber(serviceFee)}đ`,

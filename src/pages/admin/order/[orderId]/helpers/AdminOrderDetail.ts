@@ -102,6 +102,7 @@ export const relatedOrderDataSource = ({
     startDate,
     endDate,
     orderType = EOrderType.group,
+    deliveryHour,
   } = orderListing.getMetadata();
 
   return {
@@ -115,6 +116,7 @@ export const relatedOrderDataSource = ({
     staffName,
     deliveryAddress: deliveryAddress?.address,
     isGroupOrder: orderType === EOrderType.group,
+    deliveryHour,
   };
 };
 
@@ -220,6 +222,7 @@ export const formatPriceQuotationDataPartner = ({
     bookerPhoneNumber,
     staffName,
     deliveryAddress,
+    deliveryHour,
   } = relatedOrderDataSource({
     company,
     booker,
@@ -250,6 +253,7 @@ export const formatPriceQuotationDataPartner = ({
       companyName,
       startDate,
       endDate,
+      deliveryHour,
     },
     cartData: {
       serviceFee: `${parseThousandNumber(serviceFee)}đ`,

@@ -1,4 +1,7 @@
 import { useIntl } from 'react-intl';
+import classNames from 'classnames';
+
+import { formatDate } from '@src/utils/dates';
 
 import css from './InfoSection.module.scss';
 
@@ -11,6 +14,9 @@ type TInfoSectionProps = {
   deliveryAddress?: string;
   startDate: string;
   endDate: string;
+  isPartnerQuotation?: boolean;
+  subOrderDate?: number | string;
+  deliveryHour?: string;
 };
 
 const InfoSection: React.FC<TInfoSectionProps> = (props) => {
@@ -23,44 +29,53 @@ const InfoSection: React.FC<TInfoSectionProps> = (props) => {
     deliveryAddress,
     startDate,
     endDate,
+    isPartnerQuotation = false,
+    subOrderDate,
+    deliveryHour,
   } = props;
   const intl = useIntl();
 
   return (
-    <div className={css.infoContainer} id={id}>
-      <div className={css.customerSection}>
-        <div className={css.sectionTitle}>
-          {intl.formatMessage({
-            id: 'OrderDetails.PriceQuotation.customerSection.label',
-          })}
+    <div
+      className={classNames(css.infoContainer, {
+        [css.partnerQuotation]: isPartnerQuotation,
+      })}
+      id={id}>
+      {!isPartnerQuotation && (
+        <div className={css.customerSection}>
+          <div className={css.sectionTitle}>
+            {intl.formatMessage({
+              id: 'OrderDetails.PriceQuotation.customerSection.label',
+            })}
+          </div>
+          <div className={css.sectionContent}>
+            <div>
+              <span>
+                {intl.formatMessage({
+                  id: 'OrderDetails.PriceQuotation.customerSection.fullName',
+                })}
+              </span>
+              <span> {contactPeopleName}</span>
+            </div>
+            <div>
+              <span>
+                {intl.formatMessage({
+                  id: 'OrderDetails.PriceQuotation.customerSection.phoneNumber',
+                })}
+              </span>
+              <span>{contactPhoneNumber}</span>
+            </div>
+            <div>
+              <span>
+                {intl.formatMessage({
+                  id: 'OrderDetails.PriceQuotation.customerSection.email',
+                })}
+              </span>
+              <span>{email}</span>
+            </div>
+          </div>
         </div>
-        <div className={css.sectionContent}>
-          <div>
-            <span>
-              {intl.formatMessage({
-                id: 'OrderDetails.PriceQuotation.customerSection.fullName',
-              })}
-            </span>
-            <span> {contactPeopleName}</span>
-          </div>
-          <div>
-            <span>
-              {intl.formatMessage({
-                id: 'OrderDetails.PriceQuotation.customerSection.phoneNumber',
-              })}
-            </span>
-            <span>{contactPhoneNumber}</span>
-          </div>
-          <div>
-            <span>
-              {intl.formatMessage({
-                id: 'OrderDetails.PriceQuotation.customerSection.email',
-              })}
-            </span>
-            <span>{email}</span>
-          </div>
-        </div>
-      </div>
+      )}
       <div className={css.orderSection}>
         <div className={css.sectionTitle}>
           {intl.formatMessage({
@@ -68,6 +83,18 @@ const InfoSection: React.FC<TInfoSectionProps> = (props) => {
           })}
         </div>
         <div className={css.sectionContent}>
+          <div>
+            {isPartnerQuotation ? (
+              <>
+                <span>
+                  {intl.formatMessage({
+                    id: 'OrderDetails.PriceQuotation.customerSection.fullName',
+                  })}
+                </span>
+                <span> {contactPeopleName}</span>
+              </>
+            ) : null}
+          </div>
           <div>
             <span>
               {intl.formatMessage({
@@ -83,14 +110,31 @@ const InfoSection: React.FC<TInfoSectionProps> = (props) => {
                 id: 'OrderDetails.PriceQuotation.orderSection.duration.label',
               })}
             </span>
-            <span>
-              {intl.formatMessage(
-                {
-                  id: 'OrderDetails.PriceQuotation.orderSection.duration.text',
-                },
-                { start: startDate, end: endDate },
-              )}
-            </span>
+            {isPartnerQuotation ? (
+              <span>
+                {intl.formatMessage(
+                  {
+                    id: 'OrderDetails.PriceQuotation.orderSection.partnerDuration.text',
+                  },
+                  {
+                    subOrderDate: formatDate(
+                      new Date(Number(subOrderDate)),
+                      'EEE, dd/MM/yyyy',
+                    ),
+                    deliveryHour,
+                  },
+                )}
+              </span>
+            ) : (
+              <span>
+                {intl.formatMessage(
+                  {
+                    id: 'OrderDetails.PriceQuotation.orderSection.duration.text',
+                  },
+                  { start: startDate, end: endDate },
+                )}
+              </span>
+            )}
           </div>
 
           <div>
