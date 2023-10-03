@@ -20,6 +20,9 @@ type TPartnerManageMenusState = {
   // delete menu
   preDeleteMenusInProgress: boolean;
   deleteMenusInProgress: boolean;
+  // create/edit menu
+  draftMenu: TObject;
+  menu: TListing | null;
 };
 const initialState: TPartnerManageMenusState = {
   fetchMenusInProgress: false,
@@ -30,6 +33,9 @@ const initialState: TPartnerManageMenusState = {
   // delete menu
   preDeleteMenusInProgress: false,
   deleteMenusInProgress: false,
+  // create/edit menu
+  draftMenu: {},
+  menu: null,
 };
 
 // ================ Thunk types ================ //

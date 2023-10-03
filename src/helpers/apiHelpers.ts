@@ -101,6 +101,7 @@ export const convertListIdToQueries = ({
 
 export type TCheckUnConflictedParams = {
   mealType: EMenuMealType;
+  mealTypes?: EMenuMealType[];
   daysOfWeek: string[];
   restaurantId: string;
   id?: string;
