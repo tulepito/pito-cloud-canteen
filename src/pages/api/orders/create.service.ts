@@ -108,6 +108,7 @@ const createOrder = async ({
     deadlineDate,
     mealType,
     orderType = EOrderType.group,
+    daySession,
   } = generalInfo;
 
   const isNormalOrder = orderType === EOrderType.normal;
@@ -146,6 +147,7 @@ const createOrder = async ({
         endDate,
         mealType,
         companyName,
+        daySession,
       },
       ...(shouldUpdateOrderName
         ? {

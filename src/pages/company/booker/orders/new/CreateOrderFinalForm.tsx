@@ -44,6 +44,7 @@ type TExtraProps = {
   queryInprogress?: boolean;
   hasPreviousOrder?: boolean;
   previousOrder?: TListing;
+  reorderOpen?: boolean;
 };
 type TCreateOrderFinalFormComponentProps =
   FormRenderProps<TCreateOrderFinalFormValues> & Partial<TExtraProps>;
@@ -64,6 +65,7 @@ const CreateOrderFinalFormComponent: React.FC<
     hasPreviousOrder,
     queryInprogress,
     form,
+    reorderOpen,
   } = props;
   const intl = useIntl();
   const dispatch = useAppDispatch();
@@ -81,7 +83,7 @@ const CreateOrderFinalFormComponent: React.FC<
     isSubmitting ||
     invalid ||
     !formValues?.company ||
-    (!!formValues.usePreviousData &&
+    ((!!formValues.usePreviousData || reorderOpen) &&
       (!formValues?.startDate ||
         !formValues?.endDate ||
         (isGroupOrder && !formValues?.deadlineDate)));
@@ -112,10 +114,10 @@ const CreateOrderFinalFormComponent: React.FC<
   );
 
   useEffect(() => {
-    if (formValues.company) {
+    if (formValues.company && !reorderOpen) {
       dispatch(QuizThunks.queryCompanyOrders(formValues.company));
     }
-  }, [formValues.company, dispatch]);
+  }, [formValues.company, dispatch, reorderOpen]);
 
   return (
     <Form onSubmit={handleSubmit}>
@@ -133,7 +135,7 @@ const CreateOrderFinalFormComponent: React.FC<
         }
       />
 
-      <RenderWhen condition={hasPreviousOrder}>
+      <RenderWhen condition={hasPreviousOrder && !reorderOpen}>
         <Toggle
           className={classNames(css.toggle, css.input)}
           onClick={handleUsePreviousData}
@@ -143,7 +145,7 @@ const CreateOrderFinalFormComponent: React.FC<
           id="usePreviousData"
         />
       </RenderWhen>
-      <RenderWhen condition={!!formValues?.usePreviousData}>
+      <RenderWhen condition={!!formValues?.usePreviousData || reorderOpen}>
         <OrderDateField form={form} values={formValues} />
         <RenderWhen condition={isGroupOrder}>
           <div className={css.fieldContainer}>
@@ -158,7 +160,7 @@ const CreateOrderFinalFormComponent: React.FC<
         disabled={disabledSubmit}
         inProgress={isSubmitting}
         spinnerClassName={css.spinnerClassName}>
-        <RenderWhen condition={isCopyPreviousOrder}>
+        <RenderWhen condition={isCopyPreviousOrder || reorderOpen}>
           Tạo đơn hàng
           <RenderWhen.False>
             <FormattedMessage id="CreateOrderForm.submit" />

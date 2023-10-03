@@ -14,13 +14,13 @@ import IconClock from '@components/Icons/IconClock/IconClock';
 import { findMinStartDate } from '@helpers/orderHelper';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { EUserPermission } from '@src/utils/enums';
-import { renderListTimeOptions } from '@utils/dates';
+import { generateTimeRangeItems } from '@utils/dates';
 import type { TObject } from '@utils/types';
 import { composeValidators, nonSatOrSunDay, required } from '@utils/validators';
 
 import css from './MealPlanDateField.module.scss';
 
-const TIME_OPTIONS = renderListTimeOptions({});
+const TIME_OPTIONS = generateTimeRangeItems({});
 
 type MealPlanDateFieldProps = {
   form: any;

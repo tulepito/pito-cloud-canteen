@@ -16,6 +16,9 @@ const useLoadCompanies = () => {
   const queryError = useAppSelector(
     (state) => state.BookerNewOrderPage.queryError,
   );
+  const companyId = useAppSelector(
+    (state) => state.BookerNewOrderPage.companyId,
+  );
 
   const currentUserId = currentUser?.id?.uuid;
 
@@ -26,7 +29,7 @@ const useLoadCompanies = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUserId]);
 
-  return { myCompanies, queryInprogress, queryError };
+  return { myCompanies, queryInprogress, queryError, companyId };
 };
 
 export default useLoadCompanies;

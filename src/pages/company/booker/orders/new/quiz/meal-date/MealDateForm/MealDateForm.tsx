@@ -10,7 +10,7 @@ import FieldDropdownSelect from '@components/FormFields/FieldDropdownSelect/Fiel
 import IconClock from '@components/Icons/IconClock/IconClock';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import DayInWeekField from '@pages/admin/order/create/components/DayInWeekField/DayInWeekField';
-import { renderListTimeOptions } from '@src/utils/dates';
+import { generateTimeRangeItems } from '@src/utils/dates';
 import { required } from '@src/utils/validators';
 
 import DaySessionField from '../DaySessionField/DaySessionField';
@@ -19,7 +19,7 @@ import OrderDeadlineField from '../OrderDeadlineField/OrderDeadlineField';
 
 import css from './MealDateForm.module.scss';
 
-const TIME_OPTIONS = renderListTimeOptions({});
+const TIME_OPTIONS = generateTimeRangeItems({});
 
 export type TMealDateFormValues = {
   startDate: number;

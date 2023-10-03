@@ -147,7 +147,7 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
       packagePerMember: addCommas(packagePerMember?.toString()) || '',
       selectedGroups,
       nutritions: !isEmpty(nutritions) ? nutritions : [],
-      deliveryHour: deliveryHour || '07:00',
+      deliveryHour: deliveryHour || '07:00 - 07:15',
       deliveryAddress:
         location || deliveryAddress
           ? {

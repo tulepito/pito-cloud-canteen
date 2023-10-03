@@ -26,7 +26,6 @@ import { useViewport } from '@hooks/useViewport';
 import { CalendarActions } from '@redux/slices/Calendar.slice';
 import { CurrentUser, Listing, User } from '@src/utils/data';
 import {
-  getDaySessionFromDeliveryTime,
   getNextMonth,
   getPrevMonth,
   getStartOfMonth,
@@ -177,6 +176,7 @@ const OrderListPage = () => {
       orderStateHistory = [],
       orderState,
       companyName = 'PCC',
+      daySession,
     } = orderListing.getMetadata();
     const { title: orderTitle } = orderListing.getAttributes();
     const isOrderCanceled =
@@ -224,7 +224,7 @@ const OrderListPage = () => {
           subOrderId: planId,
           orderId,
           planId,
-          daySession: getDaySessionFromDeliveryTime(deliveryHour),
+          daySession,
           status: pickFoodStatus,
           type: 'dailyMeal',
           restaurantAddress:

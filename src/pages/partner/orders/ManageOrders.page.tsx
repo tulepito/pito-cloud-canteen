@@ -196,7 +196,9 @@ const parseEntitiesToTableData = (
         startDate: startDate ? formatTimestamp(startDate) : '',
         time: DateTime.fromMillis(Number(date || 0))
           .startOf('day')
-          .plus({ ...convertHHmmStringToTimeParts(deliveryHour) })
+          .plus({
+            ...convertHHmmStringToTimeParts(deliveryHour.split(' - ')[0]),
+          })
           .toMillis(),
         endDate: endDate ? formatTimestamp(endDate) : '',
         state: EOrderDraftStates.pendingApproval,

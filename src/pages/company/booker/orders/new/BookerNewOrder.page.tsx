@@ -1,10 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useIntl } from 'react-intl';
 import classNames from 'classnames';
 
 import Modal from '@components/Modal/Modal';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { resetOrder } from '@redux/slices/Order.slice';
 import { QuizActions, QuizThunks } from '@redux/slices/Quiz.slice';
 import { QuizStep } from '@src/utils/enums';
 import { User } from '@utils/data';
@@ -37,17 +36,21 @@ function BookerNewOrderPage() {
     (state) => state.Order.createOrderInProcess,
   );
   const previousOrder = useAppSelector((state) => state.Quiz.previousOrder);
+  const reorderOpen = useAppSelector((state) => state.Quiz.reorderOpen);
 
-  const { myCompanies = [], queryInprogress: queryCompanyInprogress } =
-    useLoadCompanies();
+  const {
+    myCompanies = [],
+    queryInprogress: queryCompanyInprogress,
+    companyId,
+  } = useLoadCompanies();
 
   const modalContainerClasses = classNames(css.modalContainer, {
-    [css.largeContainer]: isCopyPreviousOrder,
+    [css.largeContainer]: isCopyPreviousOrder || reorderOpen,
   });
 
-  useEffect(() => {
-    dispatch(resetOrder());
-  }, [dispatch]);
+  // useEffect(() => {
+  //   dispatch(resetOrder());
+  // }, [dispatch]);
 
   const normalizedCompanies = myCompanies.map((company) => ({
     id: company?.id?.uuid,
@@ -63,7 +66,7 @@ function BookerNewOrderPage() {
     setiIsSubmitting(true);
     try {
       await dispatch(QuizThunks.fetchSelectedCompany(values.company));
-      if (values.usePreviousData) {
+      if (values.usePreviousData || reorderOpen) {
         dispatch(QuizActions.updateQuiz({ ...values }));
         submitCreateOrder();
       } else {
@@ -98,6 +101,10 @@ function BookerNewOrderPage() {
               queryInprogress={queryCompanyInprogress}
               submitInprogress={createOrderInProcess || isSubmitting}
               hasPreviousOrder={!!previousOrder}
+              reorderOpen={reorderOpen}
+              initialValues={{
+                company: companyId,
+              }}
             />
           </div>
         </div>

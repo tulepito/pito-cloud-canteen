@@ -40,6 +40,7 @@ type TQuizState = {
   fetchCompanyOrdersInProgress: boolean;
   fetchCompanyOrdersError: any;
   isCopyPreviousOrder: boolean;
+  reorderOpen: boolean;
 };
 const initialState: TQuizState = {
   selectedCompany: null!,
@@ -59,6 +60,7 @@ const initialState: TQuizState = {
   fetchCompanyOrdersInProgress: false,
   fetchCompanyOrdersError: null,
   isCopyPreviousOrder: false,
+  reorderOpen: false,
 };
 
 // ================ Thunk types ================ //
@@ -173,6 +175,18 @@ const QuizSlice = createSlice({
     },
     clearPreviousOrder: (state) => {
       state.isCopyPreviousOrder = false;
+    },
+    openReorder: (state) => {
+      state.reorderOpen = true;
+    },
+    closeReorder: (state) => {
+      state.reorderOpen = false;
+    },
+    setSelectedCompany: (state, { payload }) => {
+      state.selectedCompany = payload;
+    },
+    setPreviousOrder: (state, { payload }) => {
+      state.previousOrder = payload;
     },
   },
   extraReducers: (builder) => {

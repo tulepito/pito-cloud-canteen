@@ -7,11 +7,7 @@ import {
 } from '@helpers/orderHelper';
 import { ListingTypes } from '@src/types/listingTypes';
 import { Listing, User } from '@utils/data';
-import {
-  convertWeekDay,
-  getDaySessionFromDeliveryTime,
-  VNTimezone,
-} from '@utils/dates';
+import { convertWeekDay, VNTimezone } from '@utils/dates';
 import {
   EImageVariants,
   EOrderStates,
@@ -46,15 +42,14 @@ export const getMenuQuery = ({
     perPage,
   } = params;
   const {
-    deliveryHour,
     nutritions = [],
     mealType: mealFoodType = [],
     packagePerMember,
+    daySession,
   } = Listing(order as TListing).getMetadata();
   const dateTime = DateTime.fromMillis(timestamp).setZone(VNTimezone);
   const dayOfWeek = convertWeekDay(dateTime.weekday).key;
-  const deliveryDaySession = getDaySessionFromDeliveryTime(deliveryHour);
-  const mealType = deliveryDaySessionAdapter(deliveryDaySession);
+  const mealType = deliveryDaySessionAdapter(daySession);
   const convertedMealFoodType = mealFoodType.map((item: string) =>
     mealTypeAdapter(item),
   );
@@ -162,15 +157,14 @@ export const getMenuQueryInSpecificDay = ({
   timestamp: number;
 }) => {
   const {
-    deliveryHour,
     nutritions = [],
     mealType: mealFoodType = [],
     packagePerMember,
+    daySession,
   } = Listing(order as TListing).getMetadata();
   const dateTime = DateTime.fromMillis(timestamp);
   const dayOfWeek = convertWeekDay(dateTime.weekday).key;
-  const deliveryDaySession = getDaySessionFromDeliveryTime(deliveryHour);
-  const mealType = deliveryDaySessionAdapter(deliveryDaySession);
+  const mealType = deliveryDaySessionAdapter(daySession);
   const convertedMealFoodType = mealFoodType.map((item: string) =>
     mealTypeAdapter(item),
   );

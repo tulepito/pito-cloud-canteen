@@ -19,9 +19,10 @@ import { parseThousandNumber } from '@helpers/format';
 import { getParticipantPickingLink } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
+import { BookerNewOrderAction } from '@pages/company/booker/orders/new/BookerNewOrder.slice';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
+import { QuizActions } from '@redux/slices/Quiz.slice';
 import { companyPaths } from '@src/paths';
-import { Listing } from '@src/utils/data';
 import { diffDays } from '@src/utils/dates';
 import {
   EBookerOrderDraftStates,
@@ -83,6 +84,9 @@ const CompanyOrdersActionColumn = ({
   const reorderInProgressId = useAppSelector(
     (state) => state.Order.reorderInProgressId,
   );
+
+  const company = useAppSelector((state) => state.company.company);
+  const orders = useAppSelector((state) => state.Order.orders);
 
   const orderLink = getParticipantPickingLink(orderId);
 
@@ -148,20 +152,15 @@ const CompanyOrdersActionColumn = ({
     });
   };
 
-  const handleReorder = async () => {
-    const { payload } = await dispatch(
-      orderAsyncActions.bookerReorder(orderId),
-    );
-
-    const newOrderId = Listing(payload).getId();
-    if (payload) {
-      router.push({
-        pathname: companyPaths.EditDraftOrder,
-        query: {
-          orderId: newOrderId,
-        },
-      });
-    }
+  const handleReorder = () => {
+    dispatch(QuizActions.openReorder());
+    dispatch(QuizActions.openQuizFlow());
+    dispatch(QuizActions.copyPreviousOrder());
+    dispatch(BookerNewOrderAction.setMyCompanies([company]));
+    dispatch(BookerNewOrderAction.setCompanyId(companyId));
+    dispatch(QuizActions.setSelectedCompany(company));
+    const order = orders.find((o) => o.id.uuid === orderId);
+    dispatch(QuizActions.setPreviousOrder(order));
   };
 
   const secondaryButtonProps = {
@@ -260,6 +259,7 @@ const CompanyOrdersActionColumn = ({
       {...secondaryButtonProps}
       onClick={handleReorder}
       inProgress={reorderInProgress}
+      type="button"
       disabled={reorderInProgress}>
       {intl.formatMessage({
         id: 'ManageCompanyOrdersPage.actionBtn.reorder',

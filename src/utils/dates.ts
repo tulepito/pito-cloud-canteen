@@ -14,6 +14,7 @@ import {
 
 import { getUniqueString } from './data';
 import { EDayOfWeek, EMenuMealType } from './enums';
+import type { TKeyValue } from './types';
 
 export const VNTimezone = 'Asia/Ho_Chi_Minh';
 
@@ -585,7 +586,48 @@ export const renderListTimeOptions = ({
   return result;
 };
 
-export const TimeOptions = renderListTimeOptions({});
+export const generateTimeRangeItems = ({
+  startTime = '06:30',
+  endTime = '23:00',
+  interval = 1,
+}: {
+  startTime?: string;
+  endTime?: string;
+  interval?: number;
+}): TKeyValue[] => {
+  const timeRangeItems: TKeyValue[] = [];
+
+  // Convert start and end times to Date objects for easier manipulation
+  const startDate = new Date(`2023-01-01T${startTime}`);
+  const endDate = new Date(`2023-01-01T${endTime}`);
+
+  // Calculate the time interval in minutes
+  const intervalInMinutes = interval * 15; // Assuming interval is in 15-minute increments
+
+  // Iterate through the time range and generate items
+  while (startDate < endDate) {
+    const itemStartTime = `${startDate
+      .getHours()
+      .toString()
+      .padStart(2, '0')}:${startDate.getMinutes().toString().padStart(2, '0')}`;
+
+    startDate.setMinutes(startDate.getMinutes() + intervalInMinutes);
+
+    const itemEndTime = `${startDate
+      .getHours()
+      .toString()
+      .padStart(2, '0')}:${startDate.getMinutes().toString().padStart(2, '0')}`;
+
+    timeRangeItems.push({
+      key: `${itemStartTime}-${itemEndTime}`,
+      label: `${itemStartTime} - ${itemEndTime}`,
+    });
+  }
+
+  return timeRangeItems;
+};
+
+export const TimeOptions = generateTimeRangeItems({});
 
 export const getNextWeek = (date: Date) => {
   return DateTime.fromJSDate(date)

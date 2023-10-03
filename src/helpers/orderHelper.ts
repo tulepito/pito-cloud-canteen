@@ -9,7 +9,7 @@ import {
   MORNING_SESSION,
 } from '@components/CalendarDashboard/helpers/constant';
 import { Listing } from '@utils/data';
-import { generateTimeOptions, renderDateRange } from '@utils/dates';
+import { generateTimeRangeItems, renderDateRange } from '@utils/dates';
 import {
   EBookerOrderDraftStates,
   EFoodTypes,
@@ -140,7 +140,7 @@ export const orderDataCheckers = (order: TListing) => {
     deliveryAddress,
     orderType,
   } = Listing(order).getMetadata();
-  const timeOptions = generateTimeOptions();
+  const timeOptions = generateTimeRangeItems({});
   const minStartTimeStamp = findMinStartDate().getTime();
   const minDeadlineTimeStamp = findMinDeadlineDate().getTime();
   const isNormalOrder = orderType === EOrderType.normal;

@@ -2,8 +2,15 @@ import React, { useEffect } from 'react';
 import { FormattedMessage } from 'react-intl';
 import Image from 'next/image';
 
-import NamedLink from '@components/NamedLink/NamedLink';
+import {
+  AFTERNOON_SESSION,
+  EVENING_SESSION,
+  MORNING_SESSION,
+} from '@components/CalendarDashboard/helpers/constant';
+import { useAppDispatch } from '@hooks/reduxHooks';
 import { useViewport } from '@hooks/useViewport';
+import { BookerNewOrderAction } from '@pages/company/booker/orders/new/BookerNewOrder.slice';
+import { QuizActions } from '@redux/slices/Quiz.slice';
 import { getDeliveryTimeFromMealType } from '@src/utils/dates';
 import { EMenuMealType } from '@src/utils/enums';
 
@@ -21,6 +28,7 @@ const HOMEPAGE_MEAL_LINKS = [
       EMenuMealType.breakfast,
     )}`,
     image: breadImage,
+    daySession: MORNING_SESSION,
   },
   {
     key: EMenuMealType.lunch,
@@ -29,6 +37,7 @@ const HOMEPAGE_MEAL_LINKS = [
       EMenuMealType.lunch,
     )}`,
     image: miquangImage,
+    daySession: AFTERNOON_SESSION,
   },
   {
     key: EMenuMealType.dinner,
@@ -37,11 +46,13 @@ const HOMEPAGE_MEAL_LINKS = [
       EMenuMealType.dinner,
     )}`,
     image: xoixeoImage,
+    daySession: EVENING_SESSION,
   },
 ];
 
 const CompanyDashboardHeroSection = () => {
   const { isMobileLayout, isTabletLayout } = useViewport();
+  const dispatch = useAppDispatch();
 
   const isNotDesktop = isTabletLayout || isMobileLayout;
 
@@ -57,6 +68,17 @@ const CompanyDashboardHeroSection = () => {
       middle.offsetLeft + middle.offsetWidth / 2 - container.offsetWidth / 2;
   }, [isNotDesktop]);
 
+  const handleMealClick = (daySession: string) => () => {
+    dispatch(QuizActions.clearQuizData());
+    dispatch(QuizActions.openQuizFlow());
+    dispatch(BookerNewOrderAction.setCurrentStep(0));
+    dispatch(
+      QuizActions.updateQuiz({
+        daySession,
+      }),
+    );
+  };
+
   return (
     <div className={css.root}>
       <div className={css.content}>
@@ -65,10 +87,10 @@ const CompanyDashboardHeroSection = () => {
         </h1>
         <div id="homePageMealLinks" className={css.homePageMealLinks}>
           {HOMEPAGE_MEAL_LINKS.map((item) => (
-            <NamedLink
+            <div
               key={item.key}
               className={css.homePageLink}
-              path={item.path}>
+              onClick={handleMealClick(item.daySession)}>
               <Image
                 src={item.image}
                 className={css.image}
@@ -76,7 +98,7 @@ const CompanyDashboardHeroSection = () => {
                 fill
               />
               <p className={css.label}>{item.label}</p>
-            </NamedLink>
+            </div>
           ))}
         </div>
       </div>
