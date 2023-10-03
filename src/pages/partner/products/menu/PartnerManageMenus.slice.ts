@@ -141,7 +141,11 @@ export const PartnerManageMenusThunks = {
 const PartnerManageMenusSlice = createSlice({
   name: 'PartnerManageMenus',
   initialState,
-  reducers: {},
+  reducers: {
+    saveDraft: (state, { payload }) => {
+      state.draftMenu = payload;
+    },
+  },
   extraReducers: (builder) => {
     builder
       /* =============== loadData =============== */

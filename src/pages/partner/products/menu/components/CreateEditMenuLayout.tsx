@@ -1,17 +1,32 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import classNames from 'classnames';
+import isEmpty from 'lodash/isEmpty';
 import { useRouter } from 'next/router';
 
 import Button from '@components/Button/Button';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import MobileBottomContainer from '@components/MobileBottomContainer/MobileBottomContainer';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
+import { useAppSelector } from '@hooks/reduxHooks';
+import type { TObject } from '@src/utils/types';
 
-import CreateEditMenuForm from './CreateEditMenuForm';
+import CreateEditMenuForm, { MAX_MENU_LENGTH } from './CreateEditMenuForm';
 
 import css from './CreateEditMenuLayout.module.scss';
 
-enum EEditPartnerMenuMobileStep {
+const verifyDraftData = (data: TObject, isDraftEditFlow = false) => {
+  const { menuName, menuTypes = [], startDate, endDate } = data || {};
+
+  return isDraftEditFlow
+    ? !isEmpty(menuName) &&
+        menuName?.length <= MAX_MENU_LENGTH &&
+        !isEmpty(menuTypes) &&
+        typeof startDate === 'number' &&
+        typeof endDate === 'number'
+    : true;
+};
+
+export enum EEditPartnerMenuMobileStep {
   info = 'info',
   mealSettings = 'mealSettings',
 }
@@ -27,11 +42,22 @@ const CreateEditMenuLayout: React.FC<TCreateEditMenuLayoutProps> = () => {
   } = router;
 
   const [currStep, setCurrStep] = useState(EEditPartnerMenuMobileStep.info);
+  const menu = useAppSelector((state) => state.PartnerManageMenus.menu);
+  const draftMenu = useAppSelector(
+    (state) => state.PartnerManageMenus.draftMenu,
+  );
+
+  const isDraftEditFlow = menu === null;
 
   const isInfoTab = currStep === EEditPartnerMenuMobileStep.info;
   const isMealSettingsTab =
     currStep === EEditPartnerMenuMobileStep.mealSettings;
 
+  const enableInfoTabNextBtn = useMemo(
+    () => verifyDraftData(draftMenu, isDraftEditFlow),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [JSON.stringify(draftMenu), isDraftEditFlow],
+  );
   const infoNumberClasses = classNames(css.stepNumber, {
     [css.stepNumberActive]: isInfoTab,
   });
@@ -80,13 +106,20 @@ const CreateEditMenuLayout: React.FC<TCreateEditMenuLayoutProps> = () => {
       </div>
 
       <div className={css.contentContainer}>
-        <CreateEditMenuForm onSubmit={() => {}} />
+        <CreateEditMenuForm
+          isMealSettingsTab={isMealSettingsTab}
+          onSubmit={() => {}}
+        />
       </div>
 
       <MobileBottomContainer>
         <div className={css.actionContainer}>
           <RenderWhen condition={isInfoTab}>
-            <Button onClick={handleNavigateToNextStep}>Tiếp theo</Button>
+            <Button
+              disabled={!enableInfoTabNextBtn}
+              onClick={handleNavigateToNextStep}>
+              Tiếp theo
+            </Button>
 
             <RenderWhen.False>
               <Button>Hoàn tất</Button>
