@@ -4,6 +4,7 @@ import classNames from 'classnames';
 
 import Modal from '@components/Modal/Modal';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import useFetchCompanyInfo from '@hooks/useFetchCompanyInfo';
 import { QuizActions, QuizThunks } from '@redux/slices/Quiz.slice';
 import { QuizStep } from '@src/utils/enums';
 import { User } from '@utils/data';
@@ -30,6 +31,7 @@ function BookerNewOrderPage() {
     creatingOrderInProgress,
     creatingOrderError,
   } = useQuizFlow(QuizStep.NEW_ORDER);
+  useFetchCompanyInfo();
 
   // Redux
   const createOrderInProcess = useAppSelector(

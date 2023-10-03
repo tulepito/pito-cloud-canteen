@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+import { useEffect } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
@@ -23,9 +25,10 @@ type TExtraProps = {
   currentUser: TCurrentUser | null;
   emailList: string[];
   setEmailList: (value: string[]) => void;
-  checkEmailList: (value: string[]) => void;
+  checkEmailList: (value: string[]) => Promise<void>;
   loadedResult: any[];
   openMemberModal: () => void;
+  onAddMembersSubmit: () => Promise<void>;
 };
 type TInviteMemberFormComponentProps =
   FormRenderProps<TInviteMemberFormValues> & Partial<TExtraProps>;
@@ -44,9 +47,11 @@ const InviteMemberFormComponent: React.FC<TInviteMemberFormComponentProps> = (
     checkEmailList,
     loadedResult = [],
     openMemberModal,
+    onAddMembersSubmit,
   } = props;
   const intl = useIntl();
   const invalidEmailControl = useBoolean();
+  const afterCheckingEmailControl = useBoolean();
 
   const companyUser = User(selectedCompany!);
   const currentUserGetter = User(currentUser!);
@@ -64,7 +69,7 @@ const InviteMemberFormComponent: React.FC<TInviteMemberFormComponentProps> = (
     id: 'AddCompanyMembersForm.emailInvalid',
   });
 
-  const handleEmailFieldBlur = (event: any) => {
+  const handleEmailFieldBlur = async (event: any) => {
     const { value } = event.target;
     if (!value) {
       return;
@@ -103,8 +108,10 @@ const InviteMemberFormComponent: React.FC<TInviteMemberFormComponentProps> = (
       new Set([...emailList!, ...formatListEmailValue]),
     );
     setEmailList?.(newEmailList);
-    form.change('emailList', '');
-    checkEmailList?.(difference(Array.from(formatListEmailValue), emailList!));
+    await checkEmailList?.(
+      difference(Array.from(formatListEmailValue), emailList!),
+    );
+    afterCheckingEmailControl.setTrue();
   };
 
   const handleKeyUp = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -121,6 +128,13 @@ const InviteMemberFormComponent: React.FC<TInviteMemberFormComponentProps> = (
       event.preventDefault();
     }
   };
+
+  useEffect(() => {
+    if (afterCheckingEmailControl.value) {
+      onAddMembersSubmit?.();
+      afterCheckingEmailControl.setFalse();
+    }
+  }, [afterCheckingEmailControl.value]);
 
   return (
     <Form onSubmit={handleSubmit}>

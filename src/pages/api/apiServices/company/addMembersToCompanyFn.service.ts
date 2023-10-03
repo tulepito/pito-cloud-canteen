@@ -183,7 +183,12 @@ const addMembersToCompanyFn = async (params: TAddMembersToCompanyParams) => {
   );
 
   // Step format no account email list to company member object
-  const newNoAccountMembers = difference(noAccountEmailList, membersEmailList)
+  const newNoAccountMemberEmailList = difference(
+    noAccountEmailList,
+    membersEmailList,
+  );
+
+  const newNoAccountMembers = newNoAccountMemberEmailList
     .map((email: string) => ({
       email,
       id: null,
@@ -254,12 +259,12 @@ const addMembersToCompanyFn = async (params: TAddMembersToCompanyParams) => {
   });
 
   const noFlexAccountEmailParamsData = {
-    receiver: noAccountEmailList,
+    receiver: newNoAccountMemberEmailList,
     subject: participantCompanyInvitationSubject(companyName),
     content: emailTemplate as string,
     sender: systemSenderEmail as string,
   };
-  if (noAccountEmailList.length > 0) {
+  if (newNoAccountMemberEmailList.length > 0) {
     sendIndividualEmail(noFlexAccountEmailParamsData);
   }
 

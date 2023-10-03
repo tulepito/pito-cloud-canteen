@@ -28,9 +28,8 @@ const QuizInviteMember = () => {
     loadedResult,
     removeEmailValue,
     checkEmailList,
+    onAddMembersSubmit,
   } = useAddMemberEmail();
-  console.log('emailList: ', emailList);
-  console.log('loadedResult: ', loadedResult);
 
   const {
     backStep,
@@ -76,6 +75,7 @@ const QuizInviteMember = () => {
             checkEmailList={checkEmailList}
             loadedResult={loadedResult}
             openMemberModal={memberEmailModalController.setTrue}
+            onAddMembersSubmit={onAddMembersSubmit}
           />
         </div>
       </QuizModal>

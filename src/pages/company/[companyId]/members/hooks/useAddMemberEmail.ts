@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { shallowEqual } from 'react-redux';
+import { uniqBy } from 'lodash';
 
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import {
@@ -20,7 +21,9 @@ export const useAddMemberEmail = () => {
 
   useEffect(() => {
     if (checkedEmailInputChunk) {
-      setLoadedResult([...loadedResult, ...checkedEmailInputChunk]);
+      setLoadedResult(
+        uniqBy([...loadedResult, ...checkedEmailInputChunk], 'email'),
+      );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [checkedEmailInputChunk]);
@@ -35,7 +38,6 @@ export const useAddMemberEmail = () => {
   };
 
   const onAddMembersSubmit = async () => {
-    dispatch(companyMemberActions.resetCheckedEmailInputChunk());
     const noAccountEmailList = loadedResult
       .filter((_result) => _result.response.status === 404)
       .map((_result) => _result.email);
@@ -48,11 +50,12 @@ export const useAddMemberEmail = () => {
     if (meta.requestStatus === 'fulfilled') {
       setEmailList([]);
       setLoadedResult([]);
+      dispatch(companyMemberActions.resetCheckedEmailInputChunk());
     }
   };
 
-  const checkEmailList = (value: string[]) => {
-    dispatch(companyMemberThunks.checkEmailExisted(value));
+  const checkEmailList = async (value: string[]) => {
+    await dispatch(companyMemberThunks.checkEmailExisted(value));
   };
 
   return {
