@@ -27,9 +27,6 @@
   column-gap: 20px;
   justify-content: center;
   align-items: center;
-  position: sticky;
-  top: 42px;
-  z-index: 1;
 
   .stepContainer {
     display: flex;
@@ -72,12 +69,25 @@
   padding: 8px 0;
   background-color: $neutralGray3;
 
-  min-height: calc(100vh - 41px - 56px - 96px);
-  min-height: calc(100dvh - 41px - 56px - 96px);
+  &.infoTab {
+    margin-bottom: calc(96px - 8px - 56px);
+    min-height: calc(100vh - 41px - 96px);
+    min-height: calc(100dvh - 41px - 96px);
+  }
+
+  &.mealSettingsTab {
+    margin-bottom: calc(160px - 8px - 56px);
+    min-height: calc(100vh - 41px - 160px);
+    min-height: calc(100dvh - 41px - 160px);
+  }
 }
 
 .actionContainer {
   display: flex;
   flex-direction: column;
   row-gap: 16px;
+
+  .errorMessage {
+    margin: -8px 0 0;
+  }
 }

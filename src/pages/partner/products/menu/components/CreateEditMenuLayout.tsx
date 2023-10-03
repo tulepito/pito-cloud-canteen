@@ -4,23 +4,26 @@ import isEmpty from 'lodash/isEmpty';
 import { useRouter } from 'next/router';
 
 import Button from '@components/Button/Button';
+import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import MobileBottomContainer from '@components/MobileBottomContainer/MobileBottomContainer';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
-import { useAppSelector } from '@hooks/reduxHooks';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import type { TObject } from '@src/utils/types';
+
+import { PartnerManageMenusThunks } from '../PartnerManageMenus.slice';
 
 import CreateEditMenuForm, { MAX_MENU_LENGTH } from './CreateEditMenuForm';
 
 import css from './CreateEditMenuLayout.module.scss';
 
 const verifyDraftData = (data: TObject, isDraftEditFlow = false) => {
-  const { menuName, menuTypes = [], startDate, endDate } = data || {};
+  const { menuName, mealTypes = [], startDate, endDate } = data || {};
 
   return isDraftEditFlow
     ? !isEmpty(menuName) &&
         menuName?.length <= MAX_MENU_LENGTH &&
-        !isEmpty(menuTypes) &&
+        !isEmpty(mealTypes) &&
         typeof startDate === 'number' &&
         typeof endDate === 'number'
     : true;
@@ -35,7 +38,7 @@ type TCreateEditMenuLayoutProps = {};
 
 const CreateEditMenuLayout: React.FC<TCreateEditMenuLayoutProps> = () => {
   const router = useRouter();
-
+  const dispatch = useAppDispatch();
   const {
     query: { menuId },
     isReady: isRouterReady,
@@ -43,6 +46,12 @@ const CreateEditMenuLayout: React.FC<TCreateEditMenuLayoutProps> = () => {
 
   const [currStep, setCurrStep] = useState(EEditPartnerMenuMobileStep.info);
   const menu = useAppSelector((state) => state.PartnerManageMenus.menu);
+  const createDraftMenuInProgress = useAppSelector(
+    (state) => state.PartnerManageMenus.createDraftMenuInProgress,
+  );
+  const createDraftMenuError = useAppSelector(
+    (state) => state.PartnerManageMenus.createDraftMenuError,
+  );
   const draftMenu = useAppSelector(
     (state) => state.PartnerManageMenus.draftMenu,
   );
@@ -53,28 +62,42 @@ const CreateEditMenuLayout: React.FC<TCreateEditMenuLayoutProps> = () => {
   const isMealSettingsTab =
     currStep === EEditPartnerMenuMobileStep.mealSettings;
 
+  const infoSubmitting = createDraftMenuInProgress;
+
   const enableInfoTabNextBtn = useMemo(
-    () => verifyDraftData(draftMenu, isDraftEditFlow),
+    () => isInfoTab && verifyDraftData(draftMenu, isDraftEditFlow),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [JSON.stringify(draftMenu), isDraftEditFlow],
+    [isInfoTab, JSON.stringify(draftMenu), isDraftEditFlow],
   );
+
   const infoNumberClasses = classNames(css.stepNumber, {
     [css.stepNumberActive]: isInfoTab,
   });
-  const mealSettingsNumberClasses = classNames(css.stepNumber, {
-    [css.stepNumberActive]: isMealSettingsTab,
-  });
-
   const infoStepInfoClasses = classNames({
     [css.stepInfoActive]: isInfoTab,
+  });
+
+  const mealSettingsNumberClasses = classNames(css.stepNumber, {
+    [css.stepNumberActive]: isMealSettingsTab,
   });
   const mealSettingsStepInfoClasses = classNames({
     [css.stepInfoActive]: isMealSettingsTab,
   });
 
-  const handleNavigateToNextStep = () => {
-    if (isInfoTab) {
-      setCurrStep(EEditPartnerMenuMobileStep.mealSettings);
+  const contentContainerClasses = classNames(css.contentContainer, {
+    [css.infoTab]: isInfoTab,
+    [css.mealSettingsTab]: isMealSettingsTab,
+  });
+
+  const handleNavigateToNextStep = async () => {
+    if (isInfoTab && enableInfoTabNextBtn && !infoSubmitting) {
+      const { meta } = await dispatch(
+        PartnerManageMenusThunks.createDraftMenu(),
+      );
+
+      if (meta.requestStatus === 'fulfilled') {
+        setCurrStep(EEditPartnerMenuMobileStep.mealSettings);
+      }
     }
   };
 
@@ -105,7 +128,7 @@ const CreateEditMenuLayout: React.FC<TCreateEditMenuLayoutProps> = () => {
         </div>
       </div>
 
-      <div className={css.contentContainer}>
+      <div className={contentContainerClasses}>
         <CreateEditMenuForm
           isMealSettingsTab={isMealSettingsTab}
           onSubmit={() => {}}
@@ -116,6 +139,7 @@ const CreateEditMenuLayout: React.FC<TCreateEditMenuLayoutProps> = () => {
         <div className={css.actionContainer}>
           <RenderWhen condition={isInfoTab}>
             <Button
+              inProgress={infoSubmitting}
               disabled={!enableInfoTabNextBtn}
               onClick={handleNavigateToNextStep}>
               Tiếp theo
@@ -128,6 +152,13 @@ const CreateEditMenuLayout: React.FC<TCreateEditMenuLayoutProps> = () => {
               </Button>
             </RenderWhen.False>
           </RenderWhen>
+
+          {createDraftMenuError !== null && (
+            <ErrorMessage
+              className={css.errorMessage}
+              message={createDraftMenuError.message}
+            />
+          )}
         </div>
       </MobileBottomContainer>
     </div>

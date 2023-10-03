@@ -617,6 +617,7 @@ export type TUpdateCompanyApiParams = {
 export type TCreateMenuApiParams = {
   menuType: EMenuTypes;
   mealType: EMenuMealType;
+  mealTypes?: EMenuMealType[];
   startDate: number;
   daysOfWeek: EDayOfWeek[];
   restaurantId: string;

@@ -19,8 +19,9 @@ const createMenu = async (
   const {
     menuType,
     mealType,
+    mealTypes,
     startDate,
-    daysOfWeek,
+    daysOfWeek = [],
     restaurantId,
     title,
     numberOfCycles,
@@ -51,6 +52,7 @@ const createMenu = async (
         mealType,
         startDate,
         endDate: endDateToSubmit,
+        ...(mealTypes ? { mealTypes } : {}),
         ...(isCycleMenu ? { numberOfCycles } : {}),
       },
       metadata: {

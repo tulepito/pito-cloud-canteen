@@ -52,7 +52,7 @@ export const removePartnerMultipleFoodApi = (body: TBodyParams) =>
 export const deleteMenusApi = (body: TObject) => {
   return deleteApi(`${BASE_URL}/menus/delete`, body);
 };
-export const createMenuApi = (body: TObject) => {
+export const createDraftMenuApi = (body: TObject) => {
   return postApi(`${BASE_URL}/menus`, body);
 };
 

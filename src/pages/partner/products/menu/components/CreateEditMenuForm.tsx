@@ -16,8 +16,9 @@ import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput
 import IconCalendar from '@components/Icons/IconCalender/IconCalender';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { getWeekDayList } from '@src/utils/dates';
 import type { EMenuMealType } from '@src/utils/enums';
-import { MENU_MEAL_TYPE_OPTIONS } from '@src/utils/enums';
+import { PARTNER_MENU_MEAL_TYPE_OPTIONS } from '@src/utils/enums';
 import type { TObject } from '@src/utils/types';
 import { composeValidators, maxLength, required } from '@src/utils/validators';
 
@@ -25,7 +26,6 @@ import { PartnerManageMenusActions } from '../PartnerManageMenus.slice';
 
 import css from './CreateEditMenuForm.module.scss';
 
-const NEED_HANDLE_MENU_TYPES = MENU_MEAL_TYPE_OPTIONS.slice(0, 3);
 export const MAX_MENU_LENGTH = 200;
 
 const CustomFieldDateInput = forwardRef((props: TObject, ref) => {
@@ -95,8 +95,17 @@ const CreateEditMenuFormComponent: React.FC<
     dispatch(
       PartnerManageMenusActions.saveDraft({
         ...values,
+        ...(startDateFromValues && endDateFromValues
+          ? {
+              daysOfWeek: getWeekDayList(
+                new Date(startDateFromValues),
+                new Date(endDateFromValues),
+              ),
+            }
+          : {}),
       }),
     );
+    dispatch(PartnerManageMenusActions.clearCreateOrUpdateMenuError());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(values)]);
 
@@ -141,11 +150,11 @@ const CreateEditMenuFormComponent: React.FC<
 
                   <RenderWhen condition={isDraftEditFlow}>
                     <FieldCheckboxGroup
-                      name="menuTypes"
-                      options={NEED_HANDLE_MENU_TYPES}
+                      name="mealTypes"
+                      options={PARTNER_MENU_MEAL_TYPE_OPTIONS}
                     />
                     <RenderWhen.False>
-                      {NEED_HANDLE_MENU_TYPES.map(({ key, label }) => (
+                      {PARTNER_MENU_MEAL_TYPE_OPTIONS.map(({ key, label }) => (
                         <FieldRadioButton
                           key={key}
                           name="mealType"

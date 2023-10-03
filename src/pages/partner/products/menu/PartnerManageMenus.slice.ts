@@ -2,12 +2,17 @@ import { createSlice } from '@reduxjs/toolkit';
 import differenceBy from 'lodash/differenceBy';
 
 import { closePartnerMenuApi, publishPartnerMenuApi } from '@apis/menuApi';
-import { deleteMenusApi } from '@apis/partnerApi';
+import { createDraftMenuApi, deleteMenusApi } from '@apis/partnerApi';
 import { queryAllPages } from '@helpers/apiHelpers';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { CurrentUser, denormalisedResponseEntities } from '@src/utils/data';
-import { EListingStates, EListingType, EOrderStates } from '@src/utils/enums';
-import { storableError } from '@src/utils/errors';
+import {
+  EListingStates,
+  EListingType,
+  EMenuTypes,
+  EOrderStates,
+} from '@src/utils/enums';
+import { storableAxiosError, storableError } from '@src/utils/errors';
 import type { TCurrentUser, TListing, TObject } from '@src/utils/types';
 
 // ================ Initial states ================ //
@@ -23,6 +28,8 @@ type TPartnerManageMenusState = {
   // create/edit menu
   draftMenu: TObject;
   menu: TListing | null;
+  createDraftMenuInProgress: boolean;
+  createDraftMenuError: any;
 };
 const initialState: TPartnerManageMenusState = {
   fetchMenusInProgress: false,
@@ -36,6 +43,8 @@ const initialState: TPartnerManageMenusState = {
   // create/edit menu
   draftMenu: {},
   menu: null,
+  createDraftMenuInProgress: false,
+  createDraftMenuError: null,
 };
 
 // ================ Thunk types ================ //
@@ -130,11 +139,54 @@ const deleteMenus = createAsyncThunk(
   },
 );
 
+const createDraftMenu = createAsyncThunk(
+  'app/PartnerManageMenus/CREATE_DRAFT_MENU',
+  async (
+    _: TObject | undefined,
+    { getState, fulfillWithValue, rejectWithValue },
+  ) => {
+    try {
+      const {
+        menuName,
+        startDate,
+        endDate,
+        mealTypes = [],
+        daysOfWeek = [],
+      } = getState().PartnerManageMenus.draftMenu || {};
+      const { currentUser } = getState().user;
+
+      const { restaurantListingId } = CurrentUser(currentUser!).getMetadata();
+
+      const createMenuResponse = await createDraftMenuApi({
+        dataParams: {
+          title: menuName,
+          menuType: EMenuTypes.fixedMenu,
+          startDate,
+          endDate,
+          mealTypes,
+          mealType: mealTypes[0],
+          daysOfWeek,
+          restaurantId: restaurantListingId,
+        },
+      });
+
+      return fulfillWithValue(
+        denormalisedResponseEntities(createMenuResponse?.data)[0],
+      );
+    } catch (error) {
+      console.error(`CREATE_DRAFT_MENU error: `, error);
+
+      return rejectWithValue(storableAxiosError(error));
+    }
+  },
+);
+
 export const PartnerManageMenusThunks = {
   loadData,
   toggleMenuActiveStatus,
   preDeleteMenus,
   deleteMenus,
+  createDraftMenu,
 };
 
 // ================ Slice ================ //
@@ -144,6 +196,9 @@ const PartnerManageMenusSlice = createSlice({
   reducers: {
     saveDraft: (state, { payload }) => {
       state.draftMenu = payload;
+    },
+    clearCreateOrUpdateMenuError: (state) => {
+      state.createDraftMenuError = null;
     },
   },
   extraReducers: (builder) => {
@@ -210,6 +265,19 @@ const PartnerManageMenusSlice = createSlice({
       })
       .addCase(preDeleteMenus.rejected, (state) => {
         state.preDeleteMenusInProgress = false;
+      })
+      /* =============== createDraftMenu =============== */
+      .addCase(createDraftMenu.pending, (state) => {
+        state.createDraftMenuInProgress = true;
+        state.createDraftMenuError = null;
+      })
+      .addCase(createDraftMenu.fulfilled, (state, { payload }) => {
+        state.createDraftMenuInProgress = false;
+        state.menu = payload;
+      })
+      .addCase(createDraftMenu.rejected, (state, { payload }) => {
+        state.createDraftMenuInProgress = false;
+        state.createDraftMenuError = payload;
       });
   },
 });
