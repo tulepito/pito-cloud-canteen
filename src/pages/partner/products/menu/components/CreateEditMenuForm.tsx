@@ -15,7 +15,7 @@ import FieldRadioButton from '@components/FormFields/FieldRadioButton/FieldRadio
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import IconCalendar from '@components/Icons/IconCalender/IconCalender';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
-import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { useAppDispatch } from '@hooks/reduxHooks';
 import { getWeekDayList } from '@src/utils/dates';
 import type { EMenuMealType } from '@src/utils/enums';
 import { PARTNER_MENU_MEAL_TYPE_OPTIONS } from '@src/utils/enums';
@@ -59,6 +59,7 @@ export type TCreateEditMenuFormValues = {
 
 type TExtraProps = {
   isMealSettingsTab: boolean;
+  isDraftEditFlow: boolean;
 };
 type TCreateEditMenuFormComponentProps =
   FormRenderProps<TCreateEditMenuFormValues> & Partial<TExtraProps>;
@@ -68,9 +69,15 @@ type TCreateEditMenuFormProps = FormProps<TCreateEditMenuFormValues> &
 const CreateEditMenuFormComponent: React.FC<
   TCreateEditMenuFormComponentProps
 > = (props) => {
-  const { handleSubmit, form, values, isMealSettingsTab } = props;
+  const {
+    handleSubmit,
+    form,
+    values,
+    isMealSettingsTab,
+    isDraftEditFlow = false,
+  } = props;
   const dispatch = useAppDispatch();
-  const menu = useAppSelector((state) => state.PartnerManageMenus.menu);
+
   const { startDate: startDateFromValues, endDate: endDateFromValues } = values;
   const initialStartDate = startDateFromValues
     ? new Date(startDateFromValues)
@@ -78,8 +85,6 @@ const CreateEditMenuFormComponent: React.FC<
   const initialEndDate = endDateFromValues ? new Date(endDateFromValues) : null;
   const [startDate, setStartDate] = useState<Date>(initialStartDate!);
   const [endDate, setEndDate] = useState<Date>(initialEndDate!);
-
-  const isDraftEditFlow = menu === null;
 
   const startDateClasses = classNames(
     css.customInput,

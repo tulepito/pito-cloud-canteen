@@ -62,11 +62,11 @@ const checkUnConflictedMenuMiddleware =
       ) as TIntegrationListing[];
       listings = listings.concat(listingsBaseOnMealType);
 
-      if (mealTypes.length > 1) {
+      if (mealTypes.length > 0) {
         const listingsBaseOnMealTypes = await queryAllPages({
           sdkModel: integrationSdk.listings,
           query: {
-            pub_mealType: mealTypes.slice(1, mealTypes.length).join(','),
+            pub_mealTypes: `has_any:${mealTypes.join(',')}`,
             pub_daysOfWeek: `has_any:${daysOfWeekAsString}`,
             meta_listingState: listingStatesAsString,
             ...defaultQueryParams,

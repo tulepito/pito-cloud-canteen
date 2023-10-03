@@ -9,6 +9,8 @@ import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import MobileBottomContainer from '@components/MobileBottomContainer/MobileBottomContainer';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { Listing } from '@src/utils/data';
+import { EListingStates } from '@src/utils/enums';
 import type { TObject } from '@src/utils/types';
 
 import { PartnerManageMenusThunks } from '../PartnerManageMenus.slice';
@@ -56,7 +58,9 @@ const CreateEditMenuLayout: React.FC<TCreateEditMenuLayoutProps> = () => {
     (state) => state.PartnerManageMenus.draftMenu,
   );
 
-  const isDraftEditFlow = menu === null;
+  const { listingState = EListingStates.draft } = Listing(menu).getMetadata();
+  const isDraftEditFlow =
+    listingState === EListingStates.draft || menu === null;
 
   const isInfoTab = currStep === EEditPartnerMenuMobileStep.info;
   const isMealSettingsTab =
@@ -130,6 +134,7 @@ const CreateEditMenuLayout: React.FC<TCreateEditMenuLayoutProps> = () => {
 
       <div className={contentContainerClasses}>
         <CreateEditMenuForm
+          isDraftEditFlow={isDraftEditFlow}
           isMealSettingsTab={isMealSettingsTab}
           onSubmit={() => {}}
         />
