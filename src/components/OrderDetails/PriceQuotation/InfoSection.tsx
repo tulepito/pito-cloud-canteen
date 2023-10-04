@@ -84,24 +84,25 @@ const InfoSection: React.FC<TInfoSectionProps> = (props) => {
         </div>
         <div className={css.sectionContent}>
           <div>
-            {isPartnerQuotation ? (
-              <>
-                <span>
-                  {intl.formatMessage({
-                    id: 'OrderDetails.PriceQuotation.customerSection.fullName',
-                  })}
-                </span>
-                <span> {contactPeopleName}</span>
-              </>
-            ) : null}
-          </div>
-          <div>
             <span>
               {intl.formatMessage({
                 id: 'OrderDetails.PriceQuotation.orderSection.companyName',
               })}
             </span>
             <span>{companyName}</span>
+          </div>
+
+          <div>
+            {isPartnerQuotation ? (
+              <>
+                <span>
+                  {intl.formatMessage({
+                    id: 'OrderDetails.PriceQuotation.orderSection.fullName',
+                  })}
+                </span>
+                <span> {contactPeopleName}</span>
+              </>
+            ) : null}
           </div>
 
           <div>
