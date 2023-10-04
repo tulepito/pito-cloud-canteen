@@ -7,6 +7,7 @@ import {
   fetchUserByChunkedIds,
   queryAllTransactions,
 } from '@helpers/apiHelpers';
+import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
 import { calculateTotalPriceAndDishes } from '@helpers/order/cartInfoHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import externalOnWheelChecker from '@services/permissionChecker/external/onwheel';
@@ -231,7 +232,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         {
           trackingNumber: `${orderId}_${timestamp}`,
           deliveryDate,
-          deliveryHour,
+          deliveryHour: DateTime.fromMillis(Number(timestamp))
+            .setZone(VNTimezone)
+            .plus({
+              ...convertHHmmStringToTimeParts(deliveryHour.split(' - ')[0]),
+            })
+            .toUnixInteger(),
           subOrderTitle,
           trackingUrl: `${NEXT_PUBLIC_CANONICAL_URL}/tracking/${orderId}_${timestamp}`,
           restaurantName,
