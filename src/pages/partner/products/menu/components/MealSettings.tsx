@@ -117,10 +117,14 @@ const MealSettingItem = ({
         </RenderWhen>
       </RenderWhen>
 
-      <SelectFoodForMealModal
-        isOpen={addFoodControl.value}
-        onClose={addFoodControl.setFalse}
-      />
+      {meal && addFoodControl.value && (
+        <SelectFoodForMealModal
+          meal={meal}
+          isOpen={addFoodControl.value}
+          onClose={addFoodControl.setFalse}
+          onOpen={addFoodControl.setTrue}
+        />
+      )}
     </div>
   );
 };

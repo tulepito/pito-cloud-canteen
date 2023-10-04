@@ -4,7 +4,6 @@ import { Form as FinalForm } from 'react-final-form';
 import { shallowEqual } from 'react-redux';
 import arrayMutators from 'final-form-arrays';
 
-import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useAppSelector } from '@hooks/reduxHooks';
@@ -27,7 +26,7 @@ export type TSelectFoodForMealFormValues = {
   checkAll: boolean;
 };
 
-type TExtraProps = {};
+type TExtraProps = { formId: string };
 type TSelectFoodForMealFormComponentProps =
   FormRenderProps<TSelectFoodForMealFormValues> & Partial<TExtraProps>;
 type TSelectFoodForMealFormProps = FormProps<TSelectFoodForMealFormValues> &
@@ -39,6 +38,7 @@ const SelectFoodForMealFormComponent: React.FC<
   const {
     form,
     handleSubmit,
+    formId,
     values: { food: selectedFoodIds = [] },
   } = props;
   const foods = useAppSelector((state) => state.foods.foods, shallowEqual);
@@ -91,23 +91,14 @@ const SelectFoodForMealFormComponent: React.FC<
   }, [foodOptions.length, JSON.stringify(selectedFoodIds)]);
 
   return (
-    <Form className={css.root} onSubmit={customHandleSubmit}>
-      <FieldFoodSelectAll
-        id={`SelectFoodForMealForm.food.checkAll`}
-        name="checkAll"
-        customOnChange={handleCheckAllFieldChange}
-      />
-      <FieldFoodSelectCheckboxGroup name="food" options={foodOptions} />
-
-      <RenderWhen condition={isEmptyFoodList}>
-        <Button className={css.submitButton} type="submit">
-          Thêm món ăn
-        </Button>
-        <RenderWhen.False>
-          <Button className={css.submitButton} type="submit">
-            Chọn món
-          </Button>
-        </RenderWhen.False>
+    <Form id={formId} className={css.root} onSubmit={customHandleSubmit}>
+      <RenderWhen condition={!isEmptyFoodList}>
+        <FieldFoodSelectAll
+          id={`SelectFoodForMealForm.food.checkAll`}
+          name="checkAll"
+          customOnChange={handleCheckAllFieldChange}
+        />
+        <FieldFoodSelectCheckboxGroup name="food" options={foodOptions} />
       </RenderWhen>
     </Form>
   );
