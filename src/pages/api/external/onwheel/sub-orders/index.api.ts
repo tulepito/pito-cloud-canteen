@@ -53,7 +53,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           lastTransition: ETransition.INITIATE_TRANSACTION,
           include: ['provider'],
         }),
-      ).slice(0, 10);
+      ).slice(0, 20);
     }
     const { orderIdList, planIdList, restaurantIdList } = txs.reduce(
       (acc: any, tx: TTransaction) => {
