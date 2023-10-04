@@ -48,3 +48,9 @@ export const removePartnerFoodApi = (foodId: string) =>
   deleteApi(`${BASE_URL}/food/${foodId}`);
 export const removePartnerMultipleFoodApi = (body: TBodyParams) =>
   deleteApi(`${BASE_URL}/food/delete-by-ids`, body);
+
+export const fetchFoodEditableApi = (foodId: string) =>
+  getApi(`${BASE_URL}/food/${foodId}/fetch-editable`);
+
+export const fetchFoodDeletableApi = (foodId: string) =>
+  getApi(`${BASE_URL}/food/${foodId}/fetch-deletable`);

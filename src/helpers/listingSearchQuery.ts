@@ -12,6 +12,7 @@ import {
   getDaySessionFromDeliveryTime,
   VNTimezone,
 } from '@utils/dates';
+import type { EFoodApprovalState } from '@utils/enums';
 import {
   EImageVariants,
   EOrderStates,
@@ -259,4 +260,15 @@ export const getFoodQuery = ({ foodIds, params }: TGetOrderQuery) => {
   };
 
   return query;
+};
+
+export const getPartnerFoodByApprovalStatusQuery = (
+  status: EFoodApprovalState,
+  restaurantListingId: string,
+) => {
+  return {
+    meta_adminApproval: status,
+    meta_restaurantId: restaurantListingId,
+    meta_listingType: ListingTypes.FOOD,
+  };
 };

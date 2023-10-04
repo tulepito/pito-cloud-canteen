@@ -29,6 +29,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           createAtStart,
           createAtEnd,
           page = 1,
+          adminApproval,
         } = JSON.parse(JSONParams as string);
         const { restaurantListingId } = currentUserGetter.getMetadata();
 
@@ -46,6 +47,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           meta_restaurantId: restaurantId || restaurantListingId,
           meta_isDeleted: false,
           perPage: MANAGE_FOOD_PAGE_SIZE,
+          meta_adminApproval: adminApproval,
           include: ['images'],
           'fields.image': [`variants.${EImageVariants.squareSmall2x}`],
         });

@@ -9,17 +9,20 @@ import { getAttributesApi } from '@apis/admin';
 import { partnerFoodApi } from '@apis/foodApi';
 import {
   createPartnerFoodApi,
+  fetchFoodDeletableApi,
+  fetchFoodEditableApi,
   fetchPartnerFoodApi,
   queryPartnerFoodsApi,
   removePartnerFoodApi,
   removePartnerMultipleFoodApi,
   updatePartnerFoodApi,
 } from '@apis/partnerApi';
+import { getPartnerFoodByApprovalStatusQuery } from '@helpers/listingSearchQuery';
 import { getImportDataFromCsv } from '@pages/admin/partner/[restaurantId]/settings/food/utils';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { bottomRightToastOptions } from '@src/utils/toastify';
 import { CurrentUser, denormalisedResponseEntities } from '@utils/data';
-import { EImageVariants, EListingType } from '@utils/enums';
+import { EFoodApprovalState, EImageVariants, EListingType } from '@utils/enums';
 import { storableAxiosError, storableError } from '@utils/errors';
 import type {
   TImage,
@@ -71,6 +74,27 @@ type TFoodSliceState = {
   packaging: TKeyValue[];
   fetchAttributesInProgress: boolean;
   fetchAttributesError: any;
+
+  acceptedFoods: TListing[];
+  pendingFoods: TListing[];
+  declinedFoods: TListing[];
+  totalAcceptedFoods: number;
+  totalPendingFoods: number;
+  totalDeclinedFoods: number;
+  fetchApprovalFoodsInProgress: boolean;
+  fetchApprovalFoodsError: any;
+
+  editableFoodMap: {
+    [foodId: string]: boolean;
+  };
+  fetchEditableFoodInProgress: boolean;
+  fetchEditableFoodError: any;
+
+  deletableFoodMap: {
+    [foodId: string]: boolean;
+  };
+  fetchDeletableFoodInProgress: boolean;
+  fetchDeletableFoodError: any;
 };
 
 const initialState: TFoodSliceState = {
@@ -116,6 +140,23 @@ const initialState: TFoodSliceState = {
   packaging: [],
   fetchAttributesInProgress: false,
   fetchAttributesError: null,
+
+  acceptedFoods: [],
+  pendingFoods: [],
+  declinedFoods: [],
+  totalAcceptedFoods: 0,
+  totalPendingFoods: 0,
+  totalDeclinedFoods: 0,
+  fetchApprovalFoodsInProgress: false,
+  fetchApprovalFoodsError: null,
+
+  editableFoodMap: {},
+  fetchEditableFoodInProgress: false,
+  fetchEditableFoodError: null,
+
+  deletableFoodMap: {},
+  fetchDeletableFoodInProgress: false,
+  fetchDeletableFoodError: null,
 };
 
 // ================ Thunk types ================ //
@@ -140,6 +181,9 @@ const CREATE_FOOD_FROM_FILE = 'app/ManageFoodsPage/CREATE_FOOD_FROM_FILE';
 
 const QUERY_MENU_PICKED_FOODS = 'app/ManageFoodsPage/QUERY_MENU_PICKED_FOODS';
 const FETCH_ATTRIBUTES = 'app/ManageFoodsPage/FETCH_ATTRIBUTES';
+const FETCH_APPROVAL_FOODS = 'app/ManageFoodsPage/FETCH_APPROVAL_FOODS';
+const FETCH_EDITABLE_FOOD = 'app/ManageFoodsPage/FETCH_EDITABLE_FOOD';
+const FETCH_DELETABLE_FOOD = 'app/ManageFoodsPage/FETCH_DELETABLE_FOOD';
 
 // ================ Async thunks ================ //
 
@@ -480,6 +524,64 @@ const fetchAttributes = createAsyncThunk(FETCH_ATTRIBUTES, async () => {
   return response;
 });
 
+const fetchApprovalFoods = createAsyncThunk(
+  FETCH_APPROVAL_FOODS,
+  async (status: EFoodApprovalState, { extra: sdk, getState }) => {
+    const { currentUser } = getState().user;
+    const currentUserGetter = CurrentUser(currentUser!);
+    const { restaurantListingId } = currentUserGetter.getMetadata();
+    const foodQuery = getPartnerFoodByApprovalStatusQuery(
+      status,
+      restaurantListingId,
+    );
+    const response = await sdk.listings.query(foodQuery);
+    const { totalItems } = response.data.meta;
+
+    return {
+      ...(status === EFoodApprovalState.ACCEPTED && {
+        acceptedFoods: denormalisedResponseEntities(response),
+        totalAcceptedFoods: totalItems,
+      }),
+      ...(status === EFoodApprovalState.PENDING && {
+        pendingFoods: denormalisedResponseEntities(response),
+        totalPendingFoods: totalItems,
+      }),
+      ...(status === EFoodApprovalState.DECLINED && {
+        declinedFoods: denormalisedResponseEntities(response),
+        totalDeclinedFoods: totalItems,
+      }),
+    };
+  },
+);
+
+const fetchEditableFood = createAsyncThunk(
+  FETCH_EDITABLE_FOOD,
+  async (id: string) => {
+    const {
+      data: { isEditable },
+    } = await fetchFoodEditableApi(id);
+
+    return {
+      foodId: id,
+      isEditable,
+    };
+  },
+);
+
+const fetchDeletableFood = createAsyncThunk(
+  FETCH_DELETABLE_FOOD,
+  async (id: string) => {
+    const {
+      data: { isDeletable },
+    } = await fetchFoodDeletableApi(id);
+
+    return {
+      foodId: id,
+      isDeletable,
+    };
+  },
+);
+
 export const partnerFoodSliceThunks = {
   queryPartnerFoods,
   requestUploadFoodImages,
@@ -492,6 +594,9 @@ export const partnerFoodSliceThunks = {
   createPartnerFoodFromCsv,
   queryMenuPickedFoods,
   fetchAttributes,
+  fetchApprovalFoods,
+  fetchEditableFood,
+  fetchDeletableFood,
 };
 
 // ================ Slice ================ //
@@ -715,7 +820,61 @@ const partnerFoodSlice = createSlice({
           fetchAttributesInProgress: false,
           fetchAttributesError: error.message,
         };
-      });
+      })
+
+      .addCase(fetchApprovalFoods.pending, (state) => ({
+        ...state,
+        fetchApprovalFoodsInProgress: true,
+        fetchApprovalFoodsError: null,
+      }))
+      .addCase(fetchApprovalFoods.fulfilled, (state, { payload }) => ({
+        ...state,
+        fetchApprovalFoodsInProgress: false,
+        ...payload,
+      }))
+      .addCase(fetchApprovalFoods.rejected, (state, { error }) => ({
+        ...state,
+        fetchApprovalFoodsInProgress: false,
+        fetchApprovalFoodsError: error.message,
+      }))
+
+      .addCase(fetchEditableFood.pending, (state) => ({
+        ...state,
+        fetchEditableFoodInProgress: true,
+        fetchEditableFoodError: null,
+      }))
+      .addCase(fetchEditableFood.fulfilled, (state, { payload }) => ({
+        ...state,
+        fetchEditableFoodInProgress: false,
+        editableFoodMap: {
+          ...state.editableFoodMap,
+          [payload.foodId]: payload.isEditable,
+        },
+      }))
+      .addCase(fetchEditableFood.rejected, (state, { error }) => ({
+        ...state,
+        fetchEditableFoodInProgress: false,
+        fetchEditableFoodError: error.message,
+      }))
+
+      .addCase(fetchDeletableFood.pending, (state) => ({
+        ...state,
+        fetchDeletableFoodInProgress: true,
+        fetchDeletableFoodError: null,
+      }))
+      .addCase(fetchDeletableFood.fulfilled, (state, { payload }) => ({
+        ...state,
+        fetchDeletableFoodInProgress: false,
+        deletableFoodMap: {
+          ...state.deletableFoodMap,
+          [payload.foodId]: payload.isDeletable,
+        },
+      }))
+      .addCase(fetchDeletableFood.rejected, (state, { error }) => ({
+        ...state,
+        fetchDeletableFoodInProgress: false,
+        fetchDeletableFoodError: error.message,
+      }));
   },
 });
 

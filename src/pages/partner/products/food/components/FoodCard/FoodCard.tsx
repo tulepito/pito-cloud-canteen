@@ -1,3 +1,5 @@
+import { useEffect } from 'react';
+
 import Badge, { EBadgeType } from '@components/Badge/Badge';
 import FieldCheckbox from '@components/FormFields/FieldCheckbox/FieldCheckbox';
 import IconLightOutline from '@components/Icons/IconLightOutline/IconLightOutline';
@@ -5,17 +7,23 @@ import NamedLink from '@components/NamedLink/NamedLink';
 import OutsideClickHandler from '@components/OutsideClickHandler/OutsideClickHandler';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
+import Toggle from '@components/Toggle/Toggle';
+import { parseThousandNumber } from '@helpers/format';
+import { useAppDispatch } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
+import { useViewport } from '@hooks/useViewport';
 import { partnerPaths } from '@src/paths';
 import { Listing } from '@src/utils/data';
 import {
+  EFoodApprovalState,
   EImageVariants,
+  FOOD_APPROVAL_STATE_OPTIONS,
   FOOD_TYPE_OPTIONS,
   getLabelByKey,
-  MENU_OPTIONS,
-  SPECIAL_DIET_OPTIONS,
 } from '@src/utils/enums';
 import type { TListing } from '@src/utils/types';
+
+import { partnerFoodSliceThunks } from '../../PartnerFood.slice';
 
 import css from './FoodCard.module.scss';
 
@@ -23,12 +31,42 @@ type TFoodCardProps = {
   id: string;
   name: string;
   food: TListing;
+  editableFoodMap: Record<string, boolean>;
+  deletableFoodMap: Record<string, boolean>;
+  isFoodAcceptedTab: boolean;
   setFoodToRemove: (params: any) => void;
+  setSelectedFood: (food: TListing) => void;
+  openManipulateFoodModal: () => void;
+};
+
+const getApprovalStateType = (approvalState: EFoodApprovalState) => {
+  switch (approvalState) {
+    case EFoodApprovalState.ACCEPTED:
+      return EBadgeType.success;
+    case EFoodApprovalState.PENDING:
+      return EBadgeType.warning;
+    case EFoodApprovalState.DECLINED:
+      return EBadgeType.danger;
+    default:
+      return EBadgeType.success;
+  }
 };
 
 const FoodCard: React.FC<TFoodCardProps> = (props) => {
-  const { id, name, food, setFoodToRemove } = props;
+  const {
+    id,
+    name,
+    food,
+    setFoodToRemove,
+    setSelectedFood,
+    openManipulateFoodModal,
+    editableFoodMap,
+    deletableFoodMap,
+    isFoodAcceptedTab,
+  } = props;
   const actionController = useBoolean();
+  const { isMobileLayout } = useViewport();
+  const dispatch = useAppDispatch();
 
   const foodListing = Listing(food);
   const foodId = foodListing.getId();
@@ -36,7 +74,10 @@ const FoodCard: React.FC<TFoodCardProps> = (props) => {
   const foodImage = foodListing.getImages()[0] || null;
 
   const { title: foodName } = foodListing.getAttributes();
-  const { menuType, foodType, specialDiets = [] } = foodListing.getPublicData();
+  const { foodType, unit } = foodListing.getPublicData();
+  const { adminApproval } = foodListing.getMetadata();
+  const { price } = foodListing.getAttributes();
+  const images = foodListing.getImages();
 
   const checkBoxContent = (
     <NamedLink path={partnerPaths.EditFood.replace('[foodId]', foodId)}>
@@ -47,6 +88,7 @@ const FoodCard: React.FC<TFoodCardProps> = (props) => {
             alt={foodName}
             variants={[EImageVariants.squareSmall2x]}
           />
+          <div className={css.imageAmountLabel}>{`${images.length}/5`}</div>
         </div>
         <div className={css.content}>
           <div className={css.infoWrapper}>
@@ -54,17 +96,22 @@ const FoodCard: React.FC<TFoodCardProps> = (props) => {
               {foodName}
             </div>
             <div className={css.menuType}>
-              {getLabelByKey(MENU_OPTIONS, menuType)}
+              <div className={css.priceWrapper}>{`${parseThousandNumber(
+                price.amount,
+              )}đ / ${unit}`}</div>
+              <div>
+                <Badge
+                  type={getApprovalStateType(adminApproval)}
+                  label={getLabelByKey(
+                    FOOD_APPROVAL_STATE_OPTIONS,
+                    adminApproval,
+                  )}
+                />
+              </div>
             </div>
           </div>
           <div className={css.bottomWrapper}>
             <div className={css.foodType}>
-              <RenderWhen condition={!!specialDiets[0]}>
-                <Badge
-                  type={EBadgeType.info}
-                  label={getLabelByKey(SPECIAL_DIET_OPTIONS, specialDiets[0])}
-                />
-              </RenderWhen>
               <Badge
                 type={EBadgeType.success}
                 label={getLabelByKey(FOOD_TYPE_OPTIONS, foodType)}
@@ -81,6 +128,25 @@ const FoodCard: React.FC<TFoodCardProps> = (props) => {
     setFoodToRemove({ id: foodId, title: foodName });
   };
 
+  const handleActionsBtnClick = () => {
+    if (isMobileLayout) {
+      setSelectedFood(food);
+      openManipulateFoodModal();
+    } else {
+      actionController.setTrue();
+    }
+  };
+
+  useEffect(() => {
+    if (!editableFoodMap[foodId]) {
+      dispatch(partnerFoodSliceThunks.fetchEditableFood(foodId));
+    }
+
+    if (!deletableFoodMap[foodId]) {
+      dispatch(partnerFoodSliceThunks.fetchDeletableFood(foodId));
+    }
+  }, [foodId]);
+
   return (
     <div className={css.cardWrapper}>
       <FieldCheckbox
@@ -92,7 +158,18 @@ const FoodCard: React.FC<TFoodCardProps> = (props) => {
         textClassName={css.checkboxText}
         checkboxWrapperClassName={css.checkboxWrapper}
       />
-      <div className={css.actionsWrapper} onClick={actionController.setTrue}>
+      <RenderWhen condition={!!isFoodAcceptedTab}>
+        <Toggle
+          id="foodEnable"
+          name="foodEnable"
+          // status={input.value ? 'on' : 'off'}
+          onClick={(value) => {
+            console.log(value);
+          }}
+          className={css.toggle}
+        />
+      </RenderWhen>
+      <div className={css.actionsWrapper} onClick={handleActionsBtnClick}>
         <IconLightOutline />
 
         <RenderWhen condition={actionController.value}>

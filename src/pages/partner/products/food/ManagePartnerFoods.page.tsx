@@ -12,6 +12,7 @@ import * as XLSX from 'xlsx';
 import Button, { InlineTextButton } from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import IconCategory from '@components/Icons/IconCategory/IconCategory';
+import IconDanger from '@components/Icons/IconDanger/IconDanger';
 import IconDelete from '@components/Icons/IconDelete/IconDelete';
 import IconEdit from '@components/Icons/IconEdit/IconEdit';
 import IconFilter from '@components/Icons/IconFilter/IconFilter';
@@ -19,29 +20,36 @@ import IconFoodListEmpty from '@components/Icons/IconFoodListEmpty/IconFoodListE
 import IconInfoCircle from '@components/Icons/IconInfoCircle/IconInfoCircle';
 import IconList from '@components/Icons/IconList/IconList';
 import IconPrint from '@components/Icons/IconPrint/IconPrint';
+import IconSwap from '@components/Icons/IconSwap/IconSwap';
 import IntegrationFilterModal from '@components/IntegrationFilterModal/IntegrationFilterModal';
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import AlertModal from '@components/Modal/AlertModal';
 import NamedLink from '@components/NamedLink/NamedLink';
+import PopupModal from '@components/PopupModal/PopupModal';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
+import SlideModal from '@components/SlideModal/SlideModal';
 import type { TColumn } from '@components/Table/Table';
 import { TableForm } from '@components/Table/Table';
+import Tabs from '@components/Tabs/Tabs';
 import Tooltip from '@components/Tooltip/Tooltip';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import KeywordSearchForm from '@pages/admin/partner/components/KeywordSearchForm/KeywordSearchForm';
 import { partnerPaths } from '@src/paths';
+import { Listing } from '@src/utils/data';
 import { formatTimestamp } from '@src/utils/dates';
 import {
+  EFoodApprovalState,
   FOOD_TYPE_OPTIONS,
   getLabelByKey,
   MENU_OPTIONS,
   SIDE_DISH_OPTIONS,
   SPECIAL_DIET_OPTIONS,
 } from '@utils/enums';
-import type { TIntegrationListing } from '@utils/types';
+import type { TIntegrationListing, TListing } from '@utils/types';
 
 import GridFoodListForm from './components/GridFoodListForm/GridFoodListForm';
+import RowFoodListForm from './components/RowFoodListForm/RowFoodListForm';
 import FilterForm from './FilterForm/FilterForm';
 import { partnerFoodSliceThunks } from './PartnerFood.slice';
 
@@ -258,6 +266,9 @@ const GOOGLE_SHEET_LINK = 'GOOGLE_SHEET_LINK';
 const ManagePartnerFoods = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
+  const filterFoodSlideModalController = useBoolean();
+  const manipulateFoodSlideModalController = useBoolean();
+  const cannotRemoveFoodModalController = useBoolean();
 
   const categoryOptions = useAppSelector(
     (state) => state.SystemAttributes.categories,
@@ -273,6 +284,9 @@ const ManagePartnerFoods = () => {
   const [googleSheetUrl, setGoogleSheetUrl] = useState<string>();
   const [importType, setImportType] = useState<string>(IMPORT_FILE);
   const [viewListMode, setViewListMode] = useState<string>('grid');
+  const [foodApprovalActiveTab, setFoodApprovalActiveTab] =
+    useState<EFoodApprovalState>(EFoodApprovalState.ACCEPTED);
+  const [selectedFood, setSelectedFood] = useState<TListing>(null!);
 
   const {
     value: isImportModalOpen,
@@ -309,6 +323,11 @@ const ManagePartnerFoods = () => {
     createPartnerFoodFromCsvInProgress,
     createPartnerFoodFromCsvError,
     managePartnerFoodPagination,
+    totalAcceptedFoods,
+    totalPendingFoods,
+    totalDeclinedFoods,
+    editableFoodMap,
+    deletableFoodMap,
   } = useAppSelector((state) => state.PartnerFood, shallowEqual);
 
   const getExposeValues = ({ values }: any) => {
@@ -387,6 +406,49 @@ const ManagePartnerFoods = () => {
     categoryOptions,
   );
 
+  const foodApprovalStateTabItems = [
+    {
+      key: EFoodApprovalState.ACCEPTED,
+      label: (
+        <div className={css.tabLabel}>
+          <span>Được duyệt</span>
+          <div data-number className={css.totalItems}>
+            {totalAcceptedFoods}
+          </div>
+        </div>
+      ),
+      childrenFn: () => {},
+    },
+    {
+      key: EFoodApprovalState.PENDING,
+      label: (
+        <div className={css.tabLabel}>
+          <span>Chờ duyệt</span>
+          <div data-number className={css.totalItems}>
+            {totalPendingFoods}
+          </div>
+        </div>
+      ),
+      childrenFn: () => {},
+    },
+    {
+      key: EFoodApprovalState.DECLINED,
+      label: (
+        <div className={css.tabLabel}>
+          <span>Từ chối</span>
+          <div data-number className={css.totalItems}>
+            {totalDeclinedFoods}
+          </div>
+        </div>
+      ),
+      childrenFn: () => {},
+    },
+  ];
+
+  const onTabChange = (tab: any) => {
+    setFoodApprovalActiveTab(tab?.key);
+  };
+
   const handleClearFilter = () => {
     router.push({
       pathname: partnerPaths.ManageFood,
@@ -400,9 +462,17 @@ const ManagePartnerFoods = () => {
       ...(createAtStart ? { createAtStart } : {}),
       ...(createAtEnd ? { createAtEnd } : {}),
       ...(keywords ? { keywords } : {}),
+      adminApproval: foodApprovalActiveTab,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, keywords, foodType, createAtStart, createAtEnd]);
+  }, [
+    page,
+    keywords,
+    foodType,
+    createAtStart,
+    createAtEnd,
+    foodApprovalActiveTab,
+  ]);
 
   const onImportFoodFromCsv = async () => {
     const hasValue = importType === IMPORT_FILE ? file : googleSheetUrl;
@@ -497,20 +567,46 @@ const ManagePartnerFoods = () => {
         pagination={managePartnerFoodPagination}
         onPageChange={onPageChangeInGridFoodListForm}
         setFoodToRemove={setFoodToRemove}
+        setSelectedFood={setSelectedFood}
+        openManipulateFoodModal={manipulateFoodSlideModalController.setTrue}
+        editableFoodMap={editableFoodMap}
+        deletableFoodMap={deletableFoodMap}
+        isFoodAcceptedTab={
+          foodApprovalActiveTab === EFoodApprovalState.ACCEPTED
+        }
       />
     ) : (
-      <TableForm
-        columns={TABLE_COLUMN}
-        data={parsedFoods}
-        isLoading={queryFoodsInProgress}
-        hasCheckbox
-        exposeValues={getExposeValues}
-        tableBodyCellClassName={css.tableBodyCell}
-        pagination={managePartnerFoodPagination}
-        paginationPath={partnerPaths.ManageFood}
-        tableWrapperClassName={css.tableWrapper}
-        tableClassName={css.table}
-      />
+      <>
+        <div className={css.mobileListWrapper}>
+          <RowFoodListForm
+            onSubmit={() => {}}
+            getGridFoodListFormValues={getGridFoodListFormValues}
+            foodList={foods}
+            pagination={managePartnerFoodPagination}
+            onPageChange={onPageChangeInGridFoodListForm}
+            setFoodToRemove={setFoodToRemove}
+            setSelectedFood={setSelectedFood}
+            openManipulateFoodModal={manipulateFoodSlideModalController.setTrue}
+            isFoodAcceptedTab={
+              foodApprovalActiveTab === EFoodApprovalState.ACCEPTED
+            }
+          />
+        </div>
+        <div className={css.desktopListWrapper}>
+          <TableForm
+            columns={TABLE_COLUMN}
+            data={parsedFoods}
+            isLoading={queryFoodsInProgress}
+            hasCheckbox
+            exposeValues={getExposeValues}
+            tableBodyCellClassName={css.tableBodyCell}
+            pagination={managePartnerFoodPagination}
+            paginationPath={partnerPaths.ManageFood}
+            tableWrapperClassName={css.tableWrapper}
+            tableClassName={css.table}
+          />
+        </div>
+      </>
     );
 
   const onSearchByFoodName = (values: any) => {
@@ -525,41 +621,62 @@ const ManagePartnerFoods = () => {
     }
   };
 
+  const handleSelectRemoveFood = () => {
+    manipulateFoodSlideModalController.setFalse();
+    const selectedFoodListing = Listing(selectedFood);
+    const foodName = selectedFoodListing.getAttributes().title;
+    const foodId = selectedFoodListing.getId();
+    if (deletableFoodMap[foodId]) {
+      setFoodToRemove({ id: foodId, title: foodName });
+    } else {
+      cannotRemoveFoodModalController.setTrue();
+    }
+  };
+
+  const handleEditFood = () => {
+    manipulateFoodSlideModalController.setFalse();
+    router.push(partnerPaths.EditFood.replace('[foodId]', selectedFood.id));
+  };
+
+  useEffect(() => {
+    dispatch(
+      partnerFoodSliceThunks.fetchApprovalFoods(EFoodApprovalState.ACCEPTED),
+    );
+    dispatch(
+      partnerFoodSliceThunks.fetchApprovalFoods(EFoodApprovalState.PENDING),
+    );
+    dispatch(
+      partnerFoodSliceThunks.fetchApprovalFoods(EFoodApprovalState.DECLINED),
+    );
+  }, []);
+
   return (
     <div className={css.root}>
-      <div className={css.titleWrapper}>
-        <h1 className={css.title}>
-          <FormattedMessage id="ManagePartnerFoods.title" />
-        </h1>
-        <RenderWhen condition={foods.length !== 0}>
-          <div className={css.titleCtaBtnWrapper}>
-            <Button
-              onClick={openImportModal}
-              variant="secondary"
-              className={css.lightButton}>
-              Thêm món ăn hàng loạt
-            </Button>
-            <NamedLink className={css.link} path={partnerPaths.CreateFood}>
-              <Button className={css.addButton}>Thêm món ăn</Button>
-            </NamedLink>
-          </div>
-        </RenderWhen>
-      </div>
       <div className={css.tableActions}>
-        <div className={css.viewTypeWrapper}>
-          <div
-            className={classNames(css.viewIcon, {
-              [css.active]: viewListMode === 'grid',
-            })}
-            onClick={onSetViewListMode('grid')}>
-            <IconCategory />
+        <div className={css.ctaViewTypeWrapper}>
+          <div className={css.viewTypeWrapper}>
+            <div
+              className={classNames(css.viewIcon, {
+                [css.active]: viewListMode === 'grid',
+              })}
+              onClick={onSetViewListMode('grid')}>
+              <IconCategory />
+            </div>
+            <div
+              className={classNames(css.viewIcon, {
+                [css.active]: viewListMode === 'list',
+              })}
+              onClick={onSetViewListMode('list')}>
+              <IconList />
+            </div>
           </div>
-          <div
-            className={classNames(css.viewIcon, {
-              [css.active]: viewListMode === 'list',
-            })}
-            onClick={onSetViewListMode('list')}>
-            <IconList />
+          <div className={css.ctaIconBtns}>
+            <div className={css.iconBtn}>
+              <IconPrint />
+            </div>
+            <div className={css.iconBtn}>
+              <IconDelete />
+            </div>
           </div>
         </div>
 
@@ -636,11 +753,27 @@ const ManagePartnerFoods = () => {
               In danh sách món ăn
             </div>
           </InlineTextButton>
+
           <KeywordSearchForm
             onSubmit={onSearchByFoodName}
             initialValues={{
               keywords: keywords as string,
             }}
+            inputClassName={css.searchInput}
+          />
+          <Button
+            type="button"
+            variant="secondary"
+            className={css.filterButton}
+            onClick={filterFoodSlideModalController.setTrue}>
+            <IconFilter className={css.filterIcon} />
+          </Button>
+        </div>
+
+        <div className={css.foodApprovalTabWrapper}>
+          <Tabs
+            items={foodApprovalStateTabItems as any}
+            onChange={onTabChange}
           />
         </div>
       </div>
@@ -752,7 +885,10 @@ const ManagePartnerFoods = () => {
       </AlertModal>
       <AlertModal
         title={<FormattedMessage id="ManagePartnerFoods.removeTitle" />}
-        isOpen={foodToRemove || removeCheckedModalOpen}
+        isOpen={
+          (foodToRemove || removeCheckedModalOpen) &&
+          deletableFoodMap[foodToRemove?.id]
+        }
         handleClose={
           removeCheckedModalOpen ? closeRemoveCheckedModal : onClearFoodToRemove
         }
@@ -768,6 +904,8 @@ const ManagePartnerFoods = () => {
         confirmLabel="Xóa món ăn"
         confirmInProgress={removeFoodInProgress}
         childrenClassName={css.removeModalContent}
+        containerClassName={css.confirmContainer}
+        shouldFullScreenInMobile={false}
         confirmDisabled={removeFoodInProgress}>
         <p className={css.removeContent}>
           <FormattedMessage
@@ -789,6 +927,77 @@ const ManagePartnerFoods = () => {
           />
         </p>
       </AlertModal>
+
+      <PopupModal
+        id="CannotRemoveFoodModal"
+        isOpen={cannotRemoveFoodModalController.value}
+        handleClose={cannotRemoveFoodModalController.setFalse}
+        containerClassName={css.confirmContainer}
+        shouldHideIconClose>
+        <>
+          <div className={css.cannotRemoveFoodModalTitle}>
+            <IconDanger className={css.icon} />
+            <span className={css.title}>Không thể xoá Món</span>
+          </div>
+          <div className={css.content}>
+            Món ăn đang được triển khai trong đơn hàng.
+          </div>
+          <Button
+            onClick={cannotRemoveFoodModalController.setFalse}
+            variant="secondary"
+            type="button"
+            className={css.noRemoveFoodConfirmBtn}>
+            Đã hiểu
+          </Button>
+        </>
+      </PopupModal>
+
+      <SlideModal
+        id="FilterFoodModal"
+        isOpen={filterFoodSlideModalController.value}
+        onClose={filterFoodSlideModalController.setFalse}>
+        <FilterForm
+          onSubmit={handleSubmitFilter}
+          categoryOptions={categoryOptions}
+          onClearForm={handleClearFilter}
+          initialValues={{
+            keywords,
+            foodType: foodType as string,
+            createAtStart: createAtStart
+              ? new Date(+createAtStart).getTime()
+              : undefined,
+            createAtEnd: createAtEnd
+              ? new Date(+createAtEnd).getTime()
+              : undefined,
+          }}
+        />
+      </SlideModal>
+      <SlideModal
+        id="ManipulateFoodModal"
+        isOpen={manipulateFoodSlideModalController.value}
+        onClose={manipulateFoodSlideModalController.setFalse}>
+        <div className={css.actionsBtnWrapper}>
+          <RenderWhen
+            condition={foodApprovalActiveTab === EFoodApprovalState.ACCEPTED}>
+            <div className={css.item}>
+              <IconSwap />
+              <span>Di chuyển vào menu</span>
+            </div>
+          </RenderWhen>
+          <div
+            className={classNames(css.item, {
+              [css.disabled]: !editableFoodMap[selectedFood?.id.uuid],
+            })}
+            onClick={handleEditFood}>
+            <IconEdit />
+            <span>Chỉnh sửa món ăn</span>
+          </div>
+          <div className={css.item} onClick={handleSelectRemoveFood}>
+            <IconDelete />
+            <span>Xóa món ăn</span>
+          </div>
+        </div>
+      </SlideModal>
     </div>
   );
 };

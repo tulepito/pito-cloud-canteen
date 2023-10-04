@@ -42,27 +42,36 @@
   fill: $neutralGray6;
   width: 14px;
   height: 14px;
-  margin-right: 10px;
+
+  @include viewportLarge {
+    margin-right: 10px;
+  }
 }
 
 .tableActions {
   display: flex;
-  margin: 20px 0 40px 0;
   flex-direction: column;
-  row-gap: 40px;
+  gap: 12px;
+
   @include viewportLarge {
     flex-direction: row;
     justify-content: space-between;
+    margin: 20px 0 40px 0;
+    row-gap: 40px;
   }
 }
 
 .ctaButtons {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+  @include flexAlign(center, space-between);
+  gap: 12px;
 
   @include viewportLarge {
     flex-direction: row;
+    gap: 16px;
+  }
+
+  .searchInput {
+    margin-right: 0;
   }
 }
 
@@ -87,6 +96,7 @@
 
 .filterButton {
   border-width: 1px;
+  min-height: 44px;
 }
 
 .addButton {
@@ -197,24 +207,26 @@
 }
 
 .removeButton {
-  border: 1px solid $neutralGray4;
-  padding: 10px 20px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: $neutralGray6;
-  font-weight: $fontWeightBold;
-  font-size: 14px;
+  display: none;
 
-  &:not(:disabled) {
-    &:hover {
-      background-color: $neutralGray6;
-      color: $neutralGray1;
+  @include viewportLarge {
+    border: 1px solid $neutralGray4;
+    padding: 10px 20px;
+    border-radius: 8px;
+    @include flexAlign(center, center);
+    color: $neutralGray6;
+    font-weight: $fontWeightBold;
+    font-size: 14px;
 
-      svg {
-        path {
-          fill: $neutralGray1;
+    &:not(:disabled) {
+      &:hover {
+        background-color: $neutralGray6;
+        color: $neutralGray1;
+
+        svg {
+          path {
+            fill: $neutralGray1;
+          }
         }
       }
     }
@@ -313,6 +325,32 @@
 
 .filterTooltip {
   width: auto;
+  display: none;
+
+  @include viewportLarge {
+    display: block;
+  }
+}
+
+.ctaViewTypeWrapper {
+  @include flexAlign(center, space-between);
+
+  .ctaIconBtns {
+    @include flexAlign(center);
+    gap: 12px;
+
+    @include viewportLarge {
+      display: none;
+    }
+
+    .iconBtn {
+      @include flexCenter;
+      width: 32px;
+      height: 32px;
+      background-color: $neutralGray1;
+      border-radius: 100%;
+    }
+  }
 }
 
 .viewTypeWrapper {
@@ -371,4 +409,78 @@
 
 .overlay {
   opacity: 1 !important;
+}
+
+.tabLabel {
+  @include flexAlign(center);
+  gap: 12px;
+}
+
+.actionsBtnWrapper {
+  @include flexAlign(normal);
+  flex-direction: column;
+
+  .item {
+    padding-bottom: 16px;
+    color: $neutralGray6;
+    border-bottom: 1px solid $neutralGray3;
+    @include textTemplate(16px, $fontWeightBold, 24px);
+    margin-bottom: 12px;
+    @include flexAlign(center);
+    gap: 8px;
+
+    &:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+    }
+
+    &.disabled {
+      pointer-events: none;
+      color: $neutralGray5;
+    }
+  }
+}
+
+.desktopListWrapper {
+  display: none;
+
+  @include viewportLarge {
+    display: block;
+  }
+}
+
+.mobileListWrapper {
+  display: block;
+
+  @include viewportLarge {
+    display: none;
+  }
+}
+
+.confirmContainer.confirmContainer {
+  flex-basis: calc(100% - 32px);
+
+  .content {
+    text-align: center;
+    margin-top: 8px;
+  }
+}
+
+.cannotRemoveFoodModalTitle {
+  @include flexCenter;
+  flex-direction: column;
+  gap: 12px;
+
+  .icon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .title {
+    @include textTemplate(16px, $fontWeightBold, 24px);
+  }
+}
+
+.noRemoveFoodConfirmBtn {
+  margin: 12px auto 0;
 }
