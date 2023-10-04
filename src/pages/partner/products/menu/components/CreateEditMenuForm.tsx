@@ -101,10 +101,6 @@ const CreateEditMenuFormComponent: React.FC<
     : null;
   const initialEndDate = endDateFromValues ? new Date(endDateFromValues) : null;
   const [currentDay, setCurrentDay] = useState(daysOfWeek[0]);
-  console.debug(
-    '💫 > file: CreateEditMenuForm.tsx:104 > currentDay: ',
-    currentDay,
-  );
   const [startDate, setStartDate] = useState<Date>(initialStartDate!);
   const [endDate, setEndDate] = useState<Date>(initialEndDate!);
 

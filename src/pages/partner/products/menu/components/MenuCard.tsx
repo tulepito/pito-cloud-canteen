@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useField, useForm } from 'react-final-form-hooks';
+import { useRouter } from 'next/router';
 
 import Badge from '@components/Badge/Badge';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
@@ -12,6 +13,7 @@ import RenderWhen from '@components/RenderWhen/RenderWhen';
 import Toggle from '@components/Toggle/Toggle';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
+import { partnerPaths } from '@src/paths';
 import { Listing } from '@src/utils/data';
 import { formatTimestamp } from '@src/utils/dates';
 import { EListingStates } from '@src/utils/enums';
@@ -26,6 +28,7 @@ type TMenuCardProps = {
 };
 
 const MenuCard: React.FC<TMenuCardProps> = ({ menu }) => {
+  const router = useRouter();
   const dispatch = useAppDispatch();
   const toggleMenuActiveStatusInProgress = useAppSelector(
     (state) => state.PartnerManageMenus.toggleMenuActiveStatusInProgress,
@@ -89,6 +92,10 @@ const MenuCard: React.FC<TMenuCardProps> = ({ menu }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isActiveValue]);
 
+  const handleEditMenuClick = () => {
+    router.push({ pathname: partnerPaths.EditMenu, query: { menuId } });
+  };
+
   const handleDeleteMenuClick = async () => {
     const { payload } = await dispatch(
       PartnerManageMenusThunks.preDeleteMenus({ id: menuId }),
@@ -132,6 +139,7 @@ const MenuCard: React.FC<TMenuCardProps> = ({ menu }) => {
       </div>
       <div className={css.actionContainer}>
         <div
+          onClick={handleEditMenuClick}
           className={css.iconContainer}
           aria-disabled={isAnyMenuActionsInProgress}>
           <IconEdit />

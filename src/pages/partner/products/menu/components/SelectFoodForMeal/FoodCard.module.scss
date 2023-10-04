@@ -1,0 +1,33 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.root {
+  display: flex;
+  align-items: center;
+  column-gap: 12px;
+}
+.foodImg {
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+  flex-basis: 48px;
+}
+
+.infoContainer {
+  display: flex;
+  flex-direction: column;
+  row-gap: 8px;
+
+  .foodTitle {
+    @include lineClamp(1);
+    @include textTemplate(14px, 700, 20px);
+  }
+
+  .badge {
+    padding: 2px 8px;
+    width: fit-content;
+    @include textTemplate(12px, 600, 16px);
+    border-radius: 20px;
+    background-color: $sematicGreen1;
+  }
+}

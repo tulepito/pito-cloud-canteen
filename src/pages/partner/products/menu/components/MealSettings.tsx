@@ -11,6 +11,8 @@ import { Listing } from '@src/utils/data';
 import { PARTNER_MENU_MEAL_TYPE_OPTIONS } from '@src/utils/enums';
 import type { TObject } from '@src/utils/types';
 
+import SelectFoodForMealModal from './SelectFoodForMeal/SelectFoodForMealModal';
+
 import css from './MealSettings.module.scss';
 
 const MAX_ITEM_TO_SHOW = 3;
@@ -30,6 +32,7 @@ const MealSettingItem = ({
   const isEmptyFoodList = foodList.length === 0;
   const isOverMaxItemsToShow = foodList.length > MAX_ITEM_TO_SHOW;
   const showMoreControl = useBoolean(isOverMaxItemsToShow);
+  const addFoodControl = useBoolean();
 
   const foodListToRender =
     isOverMaxItemsToShow && showMoreControl.value
@@ -92,14 +95,16 @@ const MealSettingItem = ({
         </div>
 
         <div className={css.actionContainer}>
-          <div className={css.addFoodBtn}>
+          <div className={css.addFoodBtn} onClick={addFoodControl.setTrue}>
             <IconAdd />
             <div>Thêm món ăn</div>
           </div>
 
-          <div className={css.applyFoodBtn}>
-            Áp dụng món cho các thứ còn lại
-          </div>
+          <RenderWhen condition={!isEmptyFoodList}>
+            <div className={css.applyFoodBtn}>
+              Áp dụng món cho các thứ còn lại
+            </div>
+          </RenderWhen>
         </div>
 
         <RenderWhen condition={isOverMaxItemsToShow}>
@@ -111,6 +116,11 @@ const MealSettingItem = ({
           </div>
         </RenderWhen>
       </RenderWhen>
+
+      <SelectFoodForMealModal
+        isOpen={addFoodControl.value}
+        onClose={addFoodControl.setFalse}
+      />
     </div>
   );
 };

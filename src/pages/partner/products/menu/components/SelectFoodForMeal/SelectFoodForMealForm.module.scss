@@ -1,0 +1,11 @@
+.root {
+  max-height: calc(100vh - 46px - 12px - 24px - 56px - 32px - 56px);
+  overflow: hidden auto;
+  position: relative;
+}
+
+.submitButton {
+  position: sticky;
+  bottom: 0px;
+  width: 100%;
+}
