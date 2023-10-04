@@ -9,7 +9,12 @@ import {
 } from '@apis/partnerApi';
 import { queryAllPages } from '@helpers/apiHelpers';
 import { createAsyncThunk } from '@redux/redux.helper';
-import { CurrentUser, denormalisedResponseEntities } from '@src/utils/data';
+import { foodSliceThunks } from '@redux/slices/foods.slice';
+import {
+  CurrentUser,
+  denormalisedResponseEntities,
+  IntegrationMenuListing,
+} from '@src/utils/data';
 import {
   EListingStates,
   EListingType,
@@ -35,6 +40,7 @@ type TPartnerManageMenusState = {
   loadMenuDataInProgress: boolean;
   createDraftMenuInProgress: boolean;
   createDraftMenuError: any;
+  pickedFood: any[];
 };
 const initialState: TPartnerManageMenusState = {
   fetchMenusInProgress: false,
@@ -51,6 +57,7 @@ const initialState: TPartnerManageMenusState = {
   loadMenuDataInProgress: false,
   createDraftMenuInProgress: false,
   createDraftMenuError: null,
+  pickedFood: [],
 };
 
 // ================ Thunk types ================ //
@@ -131,13 +138,30 @@ const preDeleteMenus = createAsyncThunk(
 
 const loadMenuData = createAsyncThunk(
   'app/PartnerManageMenus/LOAD_MENU_DATA',
-  async (payload: TObject, { fulfillWithValue, rejectWithValue }) => {
+  async (
+    payload: TObject,
+    { getState, dispatch, fulfillWithValue, rejectWithValue },
+  ) => {
     try {
       const { menuId } = payload;
+      const { currentUser } = getState().user;
+
+      const { restaurantListingId } = CurrentUser(currentUser!).getMetadata();
 
       const response = await getMenuApi(menuId);
+      const menu = response.data;
 
-      return fulfillWithValue(response.data);
+      const { payload: queryFoodPayload, error } = (await dispatch(
+        foodSliceThunks.queryMenuPickedFoods({
+          restaurantId: restaurantListingId,
+          ids: IntegrationMenuListing(response.data).getListFoodIds(),
+        }),
+      )) as any;
+
+      return fulfillWithValue({
+        menu,
+        pickedFood: !error ? queryFoodPayload : [],
+      });
     } catch (error) {
       return rejectWithValue(error);
     }
@@ -310,7 +334,8 @@ const PartnerManageMenusSlice = createSlice({
       })
       .addCase(loadMenuData.fulfilled, (state, { payload }) => {
         state.loadMenuDataInProgress = false;
-        state.menu = payload;
+        state.menu = payload.menu;
+        state.pickedFood = payload.pickedFood;
       })
       .addCase(loadMenuData.rejected, (state) => {
         state.loadMenuDataInProgress = false;
