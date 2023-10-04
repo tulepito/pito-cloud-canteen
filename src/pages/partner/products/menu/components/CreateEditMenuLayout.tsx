@@ -11,6 +11,7 @@ import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import MobileBottomContainer from '@components/MobileBottomContainer/MobileBottomContainer';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { partnerPaths } from '@src/paths';
 import { Listing } from '@src/utils/data';
 import { EListingStates } from '@src/utils/enums';
 import {
@@ -192,10 +193,14 @@ const CreateEditMenuLayout: React.FC<TCreateEditMenuLayoutProps> = () => {
     }
   };
 
+  const handleNavigateToMenuPage = () => {
+    router.push(partnerPaths.ManageMenus);
+  };
+
   return (
     <div className={css.root}>
       <div className={css.titleContainer}>
-        <IconArrow direction="left" />
+        <IconArrow direction="left" onClick={handleNavigateToMenuPage} />
 
         <RenderWhen condition={isRouterReady}>
           {menuIdFromRouter || menuIdFromSearch ? 'Chỉnh sửa menu' : 'Tạo menu'}
