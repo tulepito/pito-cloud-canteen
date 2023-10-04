@@ -64,7 +64,10 @@ export type TCreateEditMenuFormValues = {
 type TExtraProps = {
   isMealSettingsTab: boolean;
   isDraftEditFlow: boolean;
+  mealType: string;
+  foodsByDate?: TObject;
   daysOfWeek: string[];
+  draftFoodByDate: TObject;
 };
 type TCreateEditMenuFormComponentProps =
   FormRenderProps<TCreateEditMenuFormValues> & Partial<TExtraProps>;
@@ -77,10 +80,14 @@ const CreateEditMenuFormComponent: React.FC<
   const {
     handleSubmit,
     form,
+    initialValues,
     values,
+    mealType,
     isMealSettingsTab,
     isDraftEditFlow = false,
     daysOfWeek = [],
+    foodsByDate = {},
+    draftFoodByDate = {},
   } = props;
   const intl = useIntl();
   const dispatch = useAppDispatch();
@@ -103,7 +110,11 @@ const CreateEditMenuFormComponent: React.FC<
   );
 
   const handleStartDateChange = (value: any, prevValue: any) => {
-    if (endDateFromValues && value !== prevValue) {
+    if (
+      endDateFromValues &&
+      value !== prevValue &&
+      value !== initialValues.startDate
+    ) {
       form.batch(() => {
         form.change('endDate', undefined);
         setEndDate(undefined!);
@@ -130,10 +141,10 @@ const CreateEditMenuFormComponent: React.FC<
 
   useEffect(() => {
     setStartDate(initialStartDate!);
-  }, [JSON.stringify(initialStartDate)]);
+  }, [startDateFromValues, JSON.stringify(initialStartDate)]);
   useEffect(() => {
     setEndDate(initialEndDate!);
-  }, [JSON.stringify(initialEndDate)]);
+  }, [endDateFromValues, JSON.stringify(initialEndDate)]);
 
   return (
     <Form onSubmit={handleSubmit}>
@@ -152,7 +163,14 @@ const CreateEditMenuFormComponent: React.FC<
                 )}
             </div>
 
-            <WeekDays daysOfWeek={daysOfWeek} />
+            <WeekDays
+              foodsByDate={foodsByDate}
+              mealType={mealType!}
+              draftFoodByDate={draftFoodByDate}
+              isDraftEditFlow={isDraftEditFlow}
+              daysOfWeek={daysOfWeek}
+              mealTypes={values.mealTypes}
+            />
           </div>
           <RenderWhen.False>
             <div className={css.container}>

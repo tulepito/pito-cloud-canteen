@@ -102,8 +102,11 @@ const CreateEditMenuLayout: React.FC<TCreateEditMenuLayoutProps> = () => {
   const {
     startDate,
     endDate,
+    mealType,
     mealTypes = [],
     daysOfWeek = [],
+    foodsByDate = {},
+    draftFoodByDate = {},
   } = Listing(menu).getPublicData();
   const isCreateFlow = menu === null;
   const isDraftEditFlow = listingState === EListingStates.draft || isCreateFlow;
@@ -113,16 +116,22 @@ const CreateEditMenuLayout: React.FC<TCreateEditMenuLayoutProps> = () => {
     currStep === EEditPartnerMenuMobileStep.mealSettings;
 
   const infoSubmitting = createDraftMenuInProgress;
-  const initialValues = {
-    menuName: title,
-    startDate,
-    endDate,
-    mealTypes,
-  };
-
+  const initialValues = useMemo(
+    () => ({
+      menuName: title,
+      startDate,
+      endDate,
+      mealTypes,
+    }),
+    [
+      title,
+      endDate?.toString(),
+      startDate?.toString(),
+      JSON.stringify(mealTypes),
+    ],
+  );
   const { enableNext, enableSubmit } = useMemo(
     () => verifyData({ draftMenu, initialValues, currStep, isCreateFlow }),
-
     [
       JSON.stringify(initialValues),
       JSON.stringify(draftMenu),
@@ -197,6 +206,9 @@ const CreateEditMenuLayout: React.FC<TCreateEditMenuLayoutProps> = () => {
 
       <div className={contentContainerClasses}>
         <CreateEditMenuForm
+          mealType={mealType}
+          foodsByDate={foodsByDate}
+          draftFoodByDate={draftFoodByDate}
           daysOfWeek={daysOfWeek}
           isDraftEditFlow={isDraftEditFlow}
           isMealSettingsTab={isMealSettingsTab}

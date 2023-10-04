@@ -16,6 +16,7 @@ const PartnerCreateMenuRoute = () => {
     if (!isEmpty(menuId)) {
       dispatch(PartnerManageMenusThunks.loadMenuData({ menuId }));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [menuId]);
 
   return (

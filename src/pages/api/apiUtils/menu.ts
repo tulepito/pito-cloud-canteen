@@ -49,7 +49,7 @@ export const createPartnerDraftFoodByDateByDaysOfWeekField = (
   }, {});
 
   return mealTypes.reduce((prev, meal) => {
-    return { [meal]: newFoodByDates };
+    return { ...prev, [meal]: newFoodByDates };
   }, {});
 };
 

@@ -57,7 +57,7 @@ const createMenu = async (
         ...(isCycleMenu ? { numberOfCycles } : {}),
         ...(daysOfWeek
           ? {
-              draftFoodsByDate: createPartnerDraftFoodByDateByDaysOfWeekField(
+              draftFoodByDate: createPartnerDraftFoodByDateByDaysOfWeekField(
                 daysOfWeek,
                 mealTypes,
               ),
