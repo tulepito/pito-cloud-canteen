@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect } from 'react';
 import isEmpty from 'lodash/isEmpty';
 
@@ -6,7 +7,10 @@ import { useAppDispatch } from '@hooks/reduxHooks';
 import { parseLocationSearchToObject } from '@src/utils/history';
 
 import CreateEditMenuLayout from '../components/CreateEditMenuLayout';
-import { PartnerManageMenusThunks } from '../PartnerManageMenus.slice';
+import {
+  PartnerManageMenusActions,
+  PartnerManageMenusThunks,
+} from '../PartnerManageMenus.slice';
 
 const PartnerCreateMenuRoute = () => {
   const dispatch = useAppDispatch();
@@ -16,8 +20,11 @@ const PartnerCreateMenuRoute = () => {
     if (!isEmpty(menuId)) {
       dispatch(PartnerManageMenusThunks.loadMenuData({ menuId }));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [menuId]);
+
+  useEffect(() => {
+    dispatch(PartnerManageMenusActions.clearLoadedMenuData());
+  }, []);
 
   return (
     <MetaWrapper routeName="PartnerCreateMenuRoute">

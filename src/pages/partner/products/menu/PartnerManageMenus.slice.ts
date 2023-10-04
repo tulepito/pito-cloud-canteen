@@ -6,6 +6,7 @@ import {
   createDraftMenuApi,
   deleteMenusApi,
   getMenuApi,
+  updateMenuApi,
 } from '@apis/partnerApi';
 import { queryAllPages } from '@helpers/apiHelpers';
 import { createAsyncThunk } from '@redux/redux.helper';
@@ -14,6 +15,7 @@ import {
   CurrentUser,
   denormalisedResponseEntities,
   IntegrationMenuListing,
+  Listing,
 } from '@src/utils/data';
 import {
   EListingStates,
@@ -40,6 +42,8 @@ type TPartnerManageMenusState = {
   loadMenuDataInProgress: boolean;
   createDraftMenuInProgress: boolean;
   createDraftMenuError: any;
+  updateDraftMenuInProgress: boolean;
+  updateDraftMenuError: any;
   pickedFood: any[];
 };
 const initialState: TPartnerManageMenusState = {
@@ -57,6 +61,8 @@ const initialState: TPartnerManageMenusState = {
   loadMenuDataInProgress: false,
   createDraftMenuInProgress: false,
   createDraftMenuError: null,
+  updateDraftMenuInProgress: false,
+  updateDraftMenuError: null,
   pickedFood: [],
 };
 
@@ -229,12 +235,61 @@ const createDraftMenu = createAsyncThunk(
   },
 );
 
+const updateDraftMenu = createAsyncThunk(
+  'app/PartnerManageMenus/UPDATE_DRAFT_MENU',
+  async (
+    _: TObject | undefined,
+    { getState, fulfillWithValue, rejectWithValue },
+  ) => {
+    try {
+      const {
+        menuName,
+        startDate,
+        endDate,
+        mealTypes = [],
+        daysOfWeek = [],
+      } = getState().PartnerManageMenus.draftMenu || {};
+      const menu = getState().PartnerManageMenus.menu || {};
+      const { currentUser } = getState().user;
+
+      const menuGetter = Listing(menu! as TListing);
+      const { restaurantListingId } = CurrentUser(currentUser!).getMetadata();
+
+      const updateMenuResponse = await updateMenuApi({
+        dataParams: {
+          id: menuGetter.getId(),
+          title: menuName,
+          menuType: EMenuTypes.fixedMenu,
+          startDate,
+          endDate,
+          mealTypes,
+          mealType: mealTypes[0],
+          daysOfWeek,
+          restaurantId: restaurantListingId,
+        },
+        queryParams: {
+          expand: true,
+        },
+      });
+
+      return fulfillWithValue(
+        denormalisedResponseEntities(updateMenuResponse?.data)[0],
+      );
+    } catch (error) {
+      console.error(`CREATE_DRAFT_MENU error: `, error);
+
+      return rejectWithValue(storableAxiosError(error));
+    }
+  },
+);
+
 export const PartnerManageMenusThunks = {
   loadData,
   toggleMenuActiveStatus,
   preDeleteMenus,
   deleteMenus,
   createDraftMenu,
+  updateDraftMenu,
   loadMenuData,
 };
 
@@ -248,6 +303,10 @@ const PartnerManageMenusSlice = createSlice({
     },
     clearCreateOrUpdateMenuError: (state) => {
       state.createDraftMenuError = null;
+      state.updateDraftMenuError = null;
+    },
+    clearLoadedMenuData: (state) => {
+      state.menu = null;
     },
   },
   extraReducers: (builder) => {
@@ -335,6 +394,19 @@ const PartnerManageMenusSlice = createSlice({
       })
       .addCase(loadMenuData.rejected, (state) => {
         state.loadMenuDataInProgress = false;
+      })
+      /* =============== updateDraftMenu =============== */
+      .addCase(updateDraftMenu.pending, (state) => {
+        state.updateDraftMenuInProgress = true;
+        state.updateDraftMenuError = null;
+      })
+      .addCase(updateDraftMenu.fulfilled, (state, { payload }) => {
+        state.updateDraftMenuInProgress = false;
+        state.menu = payload;
+      })
+      .addCase(updateDraftMenu.rejected, (state, { payload }) => {
+        state.updateDraftMenuInProgress = false;
+        state.updateDraftMenuError = payload;
       });
   },
 });

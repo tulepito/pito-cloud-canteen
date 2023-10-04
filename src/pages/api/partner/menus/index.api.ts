@@ -3,6 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { HttpMethod } from '@apis/configs';
 import checkUnConflictedMenuMiddleware from '@pages/api/apiServices/menu/checkUnConflictedMenuMiddleware.service';
 import createMenu from '@pages/api/apiServices/menu/createMenu.service';
+import updateMenu from '@pages/api/apiServices/menu/updateMenu.service';
 import cookies from '@services/cookie';
 import { denormalisedResponseEntities } from '@services/data';
 import { getIntegrationSdk } from '@services/integrationSdk';
@@ -37,6 +38,16 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         return res.status(200).json(menu);
       }
 
+      case HttpMethod.PUT: {
+        const menu = await updateMenu(
+          dataParams?.id as string,
+          dataParams,
+          queryParams,
+        );
+
+        return res.status(200).json(menu);
+      }
+
       default:
         break;
     }
@@ -48,7 +59,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
 const handlerWrapper = (req: NextApiRequest, res: NextApiResponse) => {
   switch (req.method) {
-    case HttpMethod.POST: {
+    case HttpMethod.POST:
+    case HttpMethod.PUT: {
       const { dataParams = {} } = req.body;
 
       const {
@@ -58,6 +70,7 @@ const handlerWrapper = (req: NextApiRequest, res: NextApiResponse) => {
         startDate,
         endDate,
         restaurantId,
+        id,
       } = dataParams;
 
       const dataToCheck = {
@@ -67,6 +80,7 @@ const handlerWrapper = (req: NextApiRequest, res: NextApiResponse) => {
         daysOfWeek,
         startDate,
         endDate,
+        id,
       };
 
       return checkUnConflictedMenuMiddleware(handler)(req, res, dataToCheck);

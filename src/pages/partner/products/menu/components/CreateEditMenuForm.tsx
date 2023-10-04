@@ -17,7 +17,7 @@ import FieldRadioButton from '@components/FormFields/FieldRadioButton/FieldRadio
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import IconCalendar from '@components/Icons/IconCalender/IconCalender';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
-import { useAppDispatch } from '@hooks/reduxHooks';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { getWeekDayList } from '@src/utils/dates';
 import type { EMenuMealType } from '@src/utils/enums';
 import { PARTNER_MENU_MEAL_TYPE_OPTIONS } from '@src/utils/enums';
@@ -94,6 +94,9 @@ const CreateEditMenuFormComponent: React.FC<
   } = props;
   const intl = useIntl();
   const dispatch = useAppDispatch();
+  const loadMenuDataInProgress = useAppSelector(
+    (state) => state.PartnerManageMenus.loadMenuDataInProgress,
+  );
 
   const { startDate: startDateFromValues, endDate: endDateFromValues } = values;
   const initialStartDate = startDateFromValues
@@ -103,6 +106,8 @@ const CreateEditMenuFormComponent: React.FC<
   const [currentDay, setCurrentDay] = useState(daysOfWeek[0]);
   const [startDate, setStartDate] = useState<Date>(initialStartDate!);
   const [endDate, setEndDate] = useState<Date>(initialEndDate!);
+
+  const shouldDisableField = loadMenuDataInProgress;
 
   const startDateClasses = classNames(
     css.customInput,
@@ -211,6 +216,7 @@ const CreateEditMenuFormComponent: React.FC<
                       'Vui lòng nhập tên dưới 200 ký tự',
                       MAX_MENU_LENGTH,
                     )}
+                    disabled={shouldDisableField}
                   />
                 </div>
                 <div className={css.fieldContainer}>
@@ -224,13 +230,14 @@ const CreateEditMenuFormComponent: React.FC<
                       options={PARTNER_MENU_MEAL_TYPE_OPTIONS}
                     />
                     <RenderWhen.False>
-                      {PARTNER_MENU_MEAL_TYPE_OPTIONS.map(({ key, label }) => (
+                      {PARTNER_MENU_MEAL_TYPE_OPTIONS?.map(({ key, label }) => (
                         <FieldRadioButton
                           key={key}
                           name="mealType"
                           id={`CreateEditMenuForm.mealType.${key}`}
                           value={key}
                           label={label}
+                          disabled={shouldDisableField}
                         />
                       ))}
                     </RenderWhen.False>
@@ -262,6 +269,7 @@ const CreateEditMenuFormComponent: React.FC<
                   validate={composeValidators(
                     required('Vui lòng chọn ngày bắt đầu'),
                   )}
+                  disabled={shouldDisableField}
                   customInput={<CustomFieldDateInput />}
                 />
               </div>
@@ -277,7 +285,7 @@ const CreateEditMenuFormComponent: React.FC<
                   dateFormat={'EEE, dd MMMM, yyyy'}
                   autoComplete="off"
                   validate={required('Vui lòng chọn ngày kết thúc')}
-                  disabled={!startDate}
+                  disabled={shouldDisableField || !startDate}
                   placeholderText={format(new Date(), 'EEE, dd MMMM, yyyy', {
                     locale: viLocale,
                   })}

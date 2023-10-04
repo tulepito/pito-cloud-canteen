@@ -24,6 +24,7 @@ const updateMenu = async (
   const {
     menuType,
     mealType,
+    mealTypes,
     startDate,
     daysOfWeek,
     restaurantId,
@@ -107,6 +108,7 @@ const updateMenu = async (
         ...(daysOfWeek ? { daysOfWeek } : {}),
         ...(menuType ? { menuType } : {}),
         ...(mealType ? { mealType } : {}),
+        ...(mealTypes ? { mealTypes } : {}),
         ...(startDate ? { startDate } : {}),
         ...(endDateToSubmit ? { endDate: endDateToSubmit } : {}),
         ...(isCycleMenu

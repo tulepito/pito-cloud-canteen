@@ -65,7 +65,7 @@ const verifyData = ({
         isDraftDataValid &&
         (isCreateFlow ||
           menuName !== initialValues.menuName ||
-          isEqual(mealTypes, initialValues.mealTypes) ||
+          !isEqual(mealTypes, initialValues.mealTypes) ||
           startDate !== initialValues.startDate ||
           endDate !== initialValues.endDate);
       break;
@@ -99,6 +99,12 @@ const CreateEditMenuLayout: React.FC<TCreateEditMenuLayoutProps> = () => {
   const createDraftMenuError = useAppSelector(
     (state) => state.PartnerManageMenus.createDraftMenuError,
   );
+  const updateDraftMenuInProgress = useAppSelector(
+    (state) => state.PartnerManageMenus.updateDraftMenuInProgress,
+  );
+  const updateDraftMenuError = useAppSelector(
+    (state) => state.PartnerManageMenus.updateDraftMenuError,
+  );
   const draftMenu = useAppSelector(
     (state) => state.PartnerManageMenus.draftMenu,
   );
@@ -122,13 +128,14 @@ const CreateEditMenuLayout: React.FC<TCreateEditMenuLayoutProps> = () => {
   const isMealSettingsTab =
     currStep === EEditPartnerMenuMobileStep.mealSettings;
 
-  const infoSubmitting = createDraftMenuInProgress;
+  const infoSubmitting = createDraftMenuInProgress || updateDraftMenuInProgress;
   const initialValues = useMemo(
     () => ({
       menuName: title,
       startDate,
       endDate,
       mealType,
+      mealTypes,
       foodsByDate,
     }),
     [
@@ -143,9 +150,9 @@ const CreateEditMenuLayout: React.FC<TCreateEditMenuLayoutProps> = () => {
   const { enableNext, enableSubmit } = useMemo(
     () => verifyData({ draftMenu, initialValues, currStep, isCreateFlow }),
     [
+      currStep,
       JSON.stringify(initialValues),
       JSON.stringify(draftMenu),
-      isDraftEditFlow,
       isCreateFlow,
     ],
   );
@@ -170,6 +177,8 @@ const CreateEditMenuLayout: React.FC<TCreateEditMenuLayoutProps> = () => {
   });
 
   const handleNavigateToNextStep = async () => {
+    let shouldNavigateToNextStep = true;
+
     if (isInfoTab && enableSubmit && !infoSubmitting) {
       if (isCreateFlow) {
         const { meta, payload } = await dispatch(
@@ -178,11 +187,21 @@ const CreateEditMenuLayout: React.FC<TCreateEditMenuLayoutProps> = () => {
 
         if (meta.requestStatus === 'fulfilled') {
           historyPushState('menuId', payload.id.uuid);
+        } else {
+          shouldNavigateToNextStep = false;
+        }
+      } else {
+        const { meta } = await dispatch(
+          PartnerManageMenusThunks.updateDraftMenu(),
+        );
+
+        if (meta.requestStatus !== 'fulfilled') {
+          shouldNavigateToNextStep = false;
         }
       }
     }
 
-    if (enableNext) {
+    if (enableNext && shouldNavigateToNextStep) {
       setCurrStep(EEditPartnerMenuMobileStep.mealSettings);
     }
   };
@@ -253,6 +272,12 @@ const CreateEditMenuLayout: React.FC<TCreateEditMenuLayoutProps> = () => {
             <ErrorMessage
               className={css.errorMessage}
               message={createDraftMenuError.message}
+            />
+          )}
+          {updateDraftMenuError !== null && (
+            <ErrorMessage
+              className={css.errorMessage}
+              message={updateDraftMenuError.message}
             />
           )}
         </div>

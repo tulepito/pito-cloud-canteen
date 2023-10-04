@@ -16,6 +16,7 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { partnerPaths } from '@src/paths';
 import { Listing } from '@src/utils/data';
 import { EMenuMealType, MENU_MEAL_TYPE_OPTIONS } from '@src/utils/enums';
+import type { TListing } from '@src/utils/types';
 
 import MenuCard from './components/MenuCard';
 import { PartnerManageMenusThunks } from './PartnerManageMenus.slice';
@@ -67,7 +68,7 @@ const PartnerManageMenusPage: React.FC<TPartnerManageMenusPageProps> = () => {
         [css.countActive]: isTabActive,
       });
 
-      const menusForTab = menus.filter((m) => {
+      const menusForTab = menus.filter((m: TListing) => {
         const { mealType } = Listing(m).getPublicData();
 
         return mealType === key;
@@ -83,7 +84,7 @@ const PartnerManageMenusPage: React.FC<TPartnerManageMenusPageProps> = () => {
       const tabChildren = (
         <div>
           <RenderWhen condition={menusForTab.length > 0}>
-            {menusForTab.map((m) => {
+            {menusForTab.map((m: TListing) => {
               return <MenuCard key={m?.id?.uuid} menu={m} />;
             })}
             <RenderWhen.False>

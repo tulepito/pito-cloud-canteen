@@ -631,6 +631,7 @@ export type TUpdateMenuApiParams = {
   foodsByDate: TObject;
   menuType: EMenuTypes;
   mealType: EMenuMealType;
+  mealTypes?: EMenuMealType[];
   startDate: number;
   daysOfWeek: EDayOfWeek[];
   restaurantId: string;

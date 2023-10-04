@@ -80,7 +80,10 @@ const MenuCard: React.FC<TMenuCardProps> = ({ menu }) => {
         ? EListingStates.published
         : EListingStates.closed;
 
-      if (newListingState !== listingState) {
+      if (
+        newListingState !== listingState &&
+        listingState !== EListingStates.draft
+      ) {
         dispatch(
           PartnerManageMenusThunks.toggleMenuActiveStatus({
             id: menuId,
@@ -90,7 +93,7 @@ const MenuCard: React.FC<TMenuCardProps> = ({ menu }) => {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isActiveValue]);
+  }, [isActiveValue, listingState]);
 
   const handleEditMenuClick = () => {
     router.push({ pathname: partnerPaths.EditMenu, query: { menuId } });
