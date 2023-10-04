@@ -41,11 +41,17 @@ const verifyData = ({
   currStep: EEditPartnerMenuMobileStep;
   isCreateFlow: boolean;
 }) => {
-  const { menuName, mealTypes = [], startDate, endDate } = draftMenu || {};
+  const {
+    menuName,
+    mealType,
+    mealTypes = [],
+    startDate,
+    endDate,
+  } = draftMenu || {};
   const isDraftDataValid =
     !isEmpty(menuName) &&
     menuName?.length <= MAX_MENU_LENGTH &&
-    !isEmpty(mealTypes) &&
+    !isEmpty(isCreateFlow ? mealTypes : mealType) &&
     typeof startDate === 'number' &&
     typeof endDate === 'number';
 
@@ -121,12 +127,15 @@ const CreateEditMenuLayout: React.FC<TCreateEditMenuLayoutProps> = () => {
       menuName: title,
       startDate,
       endDate,
-      mealTypes,
+      mealType,
+      foodsByDate,
     }),
     [
       title,
       endDate?.toString(),
       startDate?.toString(),
+      mealType,
+      JSON.stringify(foodsByDate),
       JSON.stringify(mealTypes),
     ],
   );

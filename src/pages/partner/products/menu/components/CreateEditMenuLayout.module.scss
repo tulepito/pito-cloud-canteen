@@ -77,8 +77,8 @@
 
   &.mealSettingsTab {
     margin-bottom: calc(160px - 8px - 56px);
-    min-height: calc(100vh - 41px - 160px);
-    min-height: calc(100dvh - 41px - 160px);
+    min-height: calc(100vh - 41px - 170px - 160px);
+    min-height: calc(100dvh - 41px - 170px - 160px);
   }
 }
 

@@ -24,8 +24,10 @@ import { PARTNER_MENU_MEAL_TYPE_OPTIONS } from '@src/utils/enums';
 import type { TObject } from '@src/utils/types';
 import { composeValidators, maxLength, required } from '@src/utils/validators';
 
+import { prepareFoodListForOrder } from '../helpers/menu.helpers';
 import { PartnerManageMenusActions } from '../PartnerManageMenus.slice';
 
+import MealSettings from './MealSettings';
 import WeekDays from './WeekDays';
 
 import css from './CreateEditMenuForm.module.scss';
@@ -59,6 +61,7 @@ export type TCreateEditMenuFormValues = {
   mealType?: EMenuMealType;
   startDate: number;
   endDate: number;
+  foodsByDate: TObject;
 };
 
 type TExtraProps = {
@@ -91,11 +94,17 @@ const CreateEditMenuFormComponent: React.FC<
   } = props;
   const intl = useIntl();
   const dispatch = useAppDispatch();
+
   const { startDate: startDateFromValues, endDate: endDateFromValues } = values;
   const initialStartDate = startDateFromValues
     ? new Date(startDateFromValues)
     : null;
   const initialEndDate = endDateFromValues ? new Date(endDateFromValues) : null;
+  const [currentDay, setCurrentDay] = useState(daysOfWeek[0]);
+  console.debug(
+    '💫 > file: CreateEditMenuForm.tsx:104 > currentDay: ',
+    currentDay,
+  );
   const [startDate, setStartDate] = useState<Date>(initialStartDate!);
   const [endDate, setEndDate] = useState<Date>(initialEndDate!);
 
@@ -108,6 +117,15 @@ const CreateEditMenuFormComponent: React.FC<
     css.customInput,
     !endDate && css.placeholder,
   );
+
+  const foodListByMealAndDay: TObject = prepareFoodListForOrder({
+    daysOfWeek,
+    mealTypes: values.mealTypes!,
+    draftFoodByDate,
+    isDraftEditFlow,
+    mealType: mealType!,
+    foodsByDate,
+  });
 
   const handleStartDateChange = (value: any, prevValue: any) => {
     if (
@@ -140,6 +158,9 @@ const CreateEditMenuFormComponent: React.FC<
   }, [JSON.stringify(values)]);
 
   useEffect(() => {
+    setCurrentDay(daysOfWeek[0]);
+  }, [JSON.stringify(daysOfWeek)]);
+  useEffect(() => {
     setStartDate(initialStartDate!);
   }, [startDateFromValues, JSON.stringify(initialStartDate)]);
   useEffect(() => {
@@ -164,14 +185,20 @@ const CreateEditMenuFormComponent: React.FC<
             </div>
 
             <WeekDays
-              foodsByDate={foodsByDate}
-              mealType={mealType!}
-              draftFoodByDate={draftFoodByDate}
-              isDraftEditFlow={isDraftEditFlow}
+              currentDay={currentDay}
+              setCurrentDay={setCurrentDay}
+              foodListByMealAndDay={foodListByMealAndDay}
               daysOfWeek={daysOfWeek}
-              mealTypes={values.mealTypes}
             />
           </div>
+
+          <div className={css.mealSettingContainer}>
+            <MealSettings
+              currentDay={currentDay}
+              foodListByMealAndDay={foodListByMealAndDay}
+            />
+          </div>
+
           <RenderWhen.False>
             <div className={css.container}>
               <div className={css.containerTitle}>Thông tin menu</div>
