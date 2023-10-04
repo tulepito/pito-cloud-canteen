@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useField, useForm } from 'react-final-form-hooks';
 import { shallowEqual } from 'react-redux';
+import compact from 'lodash/compact';
 import { useRouter } from 'next/router';
 
 import Button from '@components/Button/Button';
@@ -12,7 +13,8 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { foodSliceThunks } from '@redux/slices/foods.slice';
 import { currentUserSelector } from '@redux/slices/user.slice';
 import { partnerPaths } from '@src/paths';
-import { CurrentUser } from '@src/utils/data';
+import { CurrentUser, Listing } from '@src/utils/data';
+import type { TListing } from '@src/utils/types';
 
 import type { TSelectFoodForMealFormValues } from './SelectFoodForMealForm';
 import SelectFoodForMealForm from './SelectFoodForMealForm';
@@ -46,9 +48,34 @@ const SelectFoodForMealModal: React.FC<TSelectFoodForMealModalProps> = ({
 
   const handleSubmit = (values: TSelectFoodForMealFormValues) => {
     if (isEmptyFoodList) {
+      // TODO: navigate to create food page
       router.push(partnerPaths.CreateFood);
     } else {
-      console.debug('💫 > values: ', values);
+      const { food = [] } = values;
+
+      const foodToUpdate = compact(
+        food.map((id) => {
+          const foodListingMaybe = foods.find(
+            (f: TListing) => f.id.uuid === id,
+          );
+
+          if (foodListingMaybe) {
+            const foodGetter = Listing(foodListingMaybe);
+            const { sideDishes = [] } = foodGetter.getPublicData();
+
+            return {
+              foodNote: '',
+              id,
+              price: foodListingMaybe.attributes.price,
+              sideDishes,
+            };
+          }
+
+          return null;
+        }),
+      );
+
+      return foodToUpdate;
     }
   };
 
