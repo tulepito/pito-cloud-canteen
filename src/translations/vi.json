@@ -1230,7 +1230,7 @@
   "OrderDetails.PriceQuotation.orderSection.deliveryAddress": "Địa điểm: ",
   "OrderDetails.PriceQuotation.orderSection.duration.label": "Thời gian: ",
   "OrderDetails.PriceQuotation.orderSection.duration.text": "Từ {start} đến {end}",
-  "OrderDetails.PriceQuotation.orderSection.fullName": "Khách hàng",
+  "OrderDetails.PriceQuotation.orderSection.fullName": "Khách hàng: ",
   "OrderDetails.PriceQuotation.orderSection.label": "THÔNG TIN ĐƠN HÀNG",
   "OrderDetails.PriceQuotation.orderSection.partnerDuration.text": "{deliveryHour}, {subOrderDate}",
   "OrderDetails.PriceQuotation.title": "ĐƠN HÀNG #{orderName}",
