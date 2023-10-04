@@ -288,17 +288,13 @@ const PartnerManageMenusSlice = createSlice({
         state.deleteMenusInProgress = true;
       })
       .addCase(deleteMenus.fulfilled, (state, { payload }) => {
-        const { ids } = payload;
-
         let newMenuList = state.menus;
-        const fakeDeletedMenuList = ids.map((uuid: string) => ({
+        const fakeDeletedMenuList = payload.map((uuid: string) => ({
           id: {
             uuid,
           },
         }));
-
         newMenuList = differenceBy(newMenuList, fakeDeletedMenuList, 'id.uuid');
-
         state.menus = newMenuList;
         state.deleteMenusInProgress = false;
       })
