@@ -4,6 +4,7 @@ import { forwardRef, useEffect, useState } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import { OnChange } from 'react-final-form-listeners';
+import { useIntl } from 'react-intl';
 import classNames from 'classnames';
 import format from 'date-fns/format';
 import viLocale from 'date-fns/locale/vi';
@@ -24,6 +25,8 @@ import type { TObject } from '@src/utils/types';
 import { composeValidators, maxLength, required } from '@src/utils/validators';
 
 import { PartnerManageMenusActions } from '../PartnerManageMenus.slice';
+
+import WeekDays from './WeekDays';
 
 import css from './CreateEditMenuForm.module.scss';
 
@@ -61,6 +64,7 @@ export type TCreateEditMenuFormValues = {
 type TExtraProps = {
   isMealSettingsTab: boolean;
   isDraftEditFlow: boolean;
+  daysOfWeek: string[];
 };
 type TCreateEditMenuFormComponentProps =
   FormRenderProps<TCreateEditMenuFormValues> & Partial<TExtraProps>;
@@ -76,7 +80,9 @@ const CreateEditMenuFormComponent: React.FC<
     values,
     isMealSettingsTab,
     isDraftEditFlow = false,
+    daysOfWeek = [],
   } = props;
+  const intl = useIntl();
   const dispatch = useAppDispatch();
   const { startDate: startDateFromValues, endDate: endDateFromValues } = values;
   const initialStartDate = startDateFromValues
@@ -135,6 +141,18 @@ const CreateEditMenuFormComponent: React.FC<
         <RenderWhen condition={isMealSettingsTab}>
           <div className={css.container}>
             <div className={css.containerTitle}>Chọn món ăn</div>
+            <div className={css.timeRangeContainer}>
+              <IconCalendar />
+              {startDateFromValues &&
+                endDateFromValues &&
+                intl.formatDateTimeRange(
+                  startDateFromValues,
+                  endDateFromValues,
+                  { dateStyle: 'long' },
+                )}
+            </div>
+
+            <WeekDays daysOfWeek={daysOfWeek} />
           </div>
           <RenderWhen.False>
             <div className={css.container}>

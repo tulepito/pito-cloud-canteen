@@ -41,16 +41,7 @@ const verifyData = ({
   currStep: EEditPartnerMenuMobileStep;
   isCreateFlow: boolean;
 }) => {
-  console.debug(
-    '💫 > file: CreateEditMenuLayout.tsx:44 > initialValues: ',
-    initialValues,
-  );
   const { menuName, mealTypes = [], startDate, endDate } = draftMenu || {};
-  console.debug(
-    '💫 > file: CreateEditMenuLayout.tsx:46 > draftMenu: ',
-    draftMenu,
-  );
-
   const isDraftDataValid =
     !isEmpty(menuName) &&
     menuName?.length <= MAX_MENU_LENGTH &&
@@ -108,7 +99,12 @@ const CreateEditMenuLayout: React.FC<TCreateEditMenuLayoutProps> = () => {
   const menuGetter = Listing(menu);
   const { title } = menuGetter.getAttributes();
   const { listingState = EListingStates.draft } = Listing(menu).getMetadata();
-  const { startDate, endDate, mealTypes = [] } = Listing(menu).getPublicData();
+  const {
+    startDate,
+    endDate,
+    mealTypes = [],
+    daysOfWeek = [],
+  } = Listing(menu).getPublicData();
   const isCreateFlow = menu === null;
   const isDraftEditFlow = listingState === EListingStates.draft || isCreateFlow;
 
@@ -201,6 +197,7 @@ const CreateEditMenuLayout: React.FC<TCreateEditMenuLayoutProps> = () => {
 
       <div className={contentContainerClasses}>
         <CreateEditMenuForm
+          daysOfWeek={daysOfWeek}
           isDraftEditFlow={isDraftEditFlow}
           isMealSettingsTab={isMealSettingsTab}
           onSubmit={() => {}}

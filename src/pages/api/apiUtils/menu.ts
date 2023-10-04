@@ -1,6 +1,7 @@
 import { denormalisedResponseEntities } from '@services/data';
 import { getIntegrationSdk } from '@services/sdk';
 import { getUniqueString, Listing } from '@src/utils/data';
+import type { EMenuMealType } from '@src/utils/enums';
 import type { TListing } from '@src/utils/types';
 
 export const createMinPriceByDayOfWeek = (foodsByDate: any) => {
@@ -39,16 +40,30 @@ export const createFoodAveragePriceByDaysOfWeekField = (
   return newData;
 };
 
+export const createPartnerDraftFoodByDateByDaysOfWeekField = (
+  daysOfWeek: string[],
+  mealTypes: EMenuMealType[] = [],
+) => {
+  const newFoodByDates = daysOfWeek.reduce((res, day) => {
+    return { ...res, [day]: {} };
+  }, {});
+
+  return mealTypes.reduce((prev, meal) => {
+    return { [meal]: newFoodByDates };
+  }, {});
+};
+
 export const createFoodByDateByDaysOfWeekField = (
   foodByDate: any,
   daysOfWeek: string[],
+  shouldContainEmpty: boolean = false,
 ) => {
   const newFoodByDates = Object.keys(foodByDate).reduce((prev, key) => {
     if (daysOfWeek.includes(key)) {
       return { ...prev, [key]: foodByDate[key] };
     }
 
-    return { ...prev };
+    return { ...(shouldContainEmpty ? { [key]: {} } : {}), ...prev };
   }, {});
 
   return newFoodByDates;

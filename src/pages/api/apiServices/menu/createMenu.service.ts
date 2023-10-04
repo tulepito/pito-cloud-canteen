@@ -1,3 +1,4 @@
+import { createPartnerDraftFoodByDateByDaysOfWeekField } from '@pages/api/apiUtils/menu';
 import { denormalisedResponseEntities } from '@services/data';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { ListingTypes } from '@src/types/listingTypes';
@@ -54,6 +55,14 @@ const createMenu = async (
         endDate: endDateToSubmit,
         ...(mealTypes ? { mealTypes } : {}),
         ...(isCycleMenu ? { numberOfCycles } : {}),
+        ...(daysOfWeek
+          ? {
+              draftFoodsByDate: createPartnerDraftFoodByDateByDaysOfWeekField(
+                daysOfWeek,
+                mealTypes,
+              ),
+            }
+          : {}),
       },
       metadata: {
         menuType,
