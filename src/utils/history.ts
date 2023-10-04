@@ -7,10 +7,12 @@ export const historyPushState = (state: string, value: string | number) => {
 export const parseLocationSearchToObject = () => {
   const search = window?.location?.search?.slice(1);
 
-  return JSON.parse(
-    `{"${decodeURI(search)
-      .replace(/"/g, '\\"')
-      .replace(/&/g, '","')
-      .replace(/=/g, '":"')}"}`,
-  );
+  return search
+    ? JSON.parse(
+        `{"${decodeURI(search)
+          .replace(/"/g, '\\"')
+          .replace(/&/g, '","')
+          .replace(/=/g, '":"')}"}`,
+      )
+    : {};
 };
