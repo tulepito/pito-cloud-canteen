@@ -17,11 +17,6 @@ const FoodCard: React.FC<TFoodCardProps> = ({ data }) => {
   const { foodType = EFoodTypes.savoryDish } = foodGetter.getPublicData();
   const foodId = foodGetter.getId();
   const foodImage = foodGetter.getImages()[0] || null;
-  console.debug(
-    '💫 > file: FoodCard.tsx:20 > foodGetter.getImages(): ',
-    foodGetter.getImages(),
-  );
-
   const foodTypeLabel =
     FOOD_TYPE_OPTIONS.find(({ key }) => foodType === key)?.label ||
     FOOD_TYPE_OPTIONS[1].label;

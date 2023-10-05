@@ -196,6 +196,7 @@ const CreateEditMenuFormComponent: React.FC<
 
           <div className={css.mealSettingContainer}>
             <MealSettings
+              daysOfWeek={daysOfWeek}
               isDraftEditFlow={isDraftEditFlow}
               foodByDate={values.foodByDate}
               currentDay={currentDay}

@@ -1,4 +1,8 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+import { useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
+import classNames from 'classnames';
+import isEqual from 'lodash/isEqual';
 import omit from 'lodash/omit';
 
 import Alert, { EAlertPosition, EAlertType } from '@components/Alert/Alert';
@@ -15,6 +19,7 @@ import { PARTNER_MENU_MEAL_TYPE_OPTIONS } from '@src/utils/enums';
 import type { TObject } from '@src/utils/types';
 
 import SelectFoodForMealModal from './SelectFoodForMeal/SelectFoodForMealModal';
+import ApplyForAnotherDayForm from './ApplyForAnotherDayForm';
 
 import css from './MealSettings.module.scss';
 
@@ -25,6 +30,7 @@ type TMealSettingsProps = {
   currentDay: string;
   foodByDate: TObject;
   isDraftEditFlow: boolean;
+  daysOfWeek?: string[];
   saveDraftFoodByDate: (value: TObject) => void;
 };
 
@@ -37,6 +43,7 @@ const MealSettingItem = ({
   foodByDate,
   saveDraftFoodByDate,
   mealLabel,
+  daysOfWeek,
 }: any) => {
   const isEmptyFoodList = foodList.length === 0;
   const expandControl = useBoolean(isEmptyFoodList);
@@ -44,21 +51,99 @@ const MealSettingItem = ({
   const showMoreControl = useBoolean(true);
   const addFoodControl = useBoolean();
   const addFoodSuccessControl = useBoolean();
+  const applyFoodForAnotherDayControl = useBoolean();
   const confirmDeleteMealControl = useBoolean();
+  const confirmApplyForAnotherDayControl = useBoolean();
+  const selectAllDaysControl = useBoolean();
   const lowerCaseMealName = mealLabel.toLowerCase();
+  const createDraftMenuInProgress = useAppSelector(
+    (state) => state.PartnerManageMenus.createDraftMenuInProgress,
+  );
+  const updateDraftMenuInProgress = useAppSelector(
+    (state) => state.PartnerManageMenus.updateDraftMenuInProgress,
+  );
+
+  const publishDraftMenuInProgress = useAppSelector(
+    (state) => state.PartnerManageMenus.publishDraftMenuInProgress,
+  );
+  const [daysToApply, setDaysToApply] = useState([currentDay]);
 
   const foodListToRender =
     isOverMaxItemsToShow && showMoreControl.value
       ? foodList.slice(0, 3)
       : foodList;
+  const daysOfWeekEnableToApply = daysOfWeek.filter(
+    (d: string) => d !== currentDay,
+  );
+  const shouldShowApplyToAnotherDayBtn =
+    !isEmptyFoodList && !(daysOfWeekEnableToApply?.length === 0);
+
+  const submitting =
+    createDraftMenuInProgress ||
+    updateDraftMenuInProgress ||
+    publishDraftMenuInProgress;
+
+  const disableSubmitApplyToAnotherDay = daysToApply?.length === 0;
 
   const currentFoodIds = foodList.map((f: TObject) => f.id);
+
+  const handleSelectAllDay = () => {
+    if (selectAllDaysControl.value) {
+      setDaysToApply([]);
+    } else {
+      setDaysToApply(daysOfWeekEnableToApply);
+    }
+    selectAllDaysControl.toggle();
+  };
+
+  const selectAllDaysClasses = classNames(css.dayLabel, {
+    [css.dayLabelActive]: selectAllDaysControl.value,
+  });
+
+  const handleApplyForAnotherDay = () => {
+    if (submitting) {
+      return;
+    }
+    let newFoodByDate = foodByDate;
+
+    if (isDraftEditFlow) {
+      if (foodByDate[meal] && foodByDate[meal][currentDay]) {
+        const currentDayData = foodByDate[meal][currentDay];
+
+        newFoodByDate = {
+          ...foodByDate,
+          [meal]: {
+            ...foodByDate[meal],
+            ...daysToApply.reduce((prev, day) => {
+              return { ...prev, [day]: currentDayData };
+            }, {}),
+          },
+        };
+      }
+    } else if (foodByDate[currentDay]) {
+      const currentDayData = foodByDate[currentDay];
+
+      newFoodByDate = {
+        ...foodByDate,
+        ...daysToApply.reduce((prev, day) => {
+          return { ...prev, [day]: currentDayData };
+        }, {}),
+      };
+    }
+
+    saveDraftFoodByDate(newFoodByDate);
+    confirmApplyForAnotherDayControl.setFalse();
+    applyFoodForAnotherDayControl.setTrue();
+  };
 
   const handleClickDeleteMeal = () => {
     confirmDeleteMealControl.setTrue();
   };
 
   const handleDeleteMeal = () => {
+    if (submitting) {
+      return;
+    }
     let newFoodByDate = foodByDate;
 
     if (isDraftEditFlow) {
@@ -76,6 +161,9 @@ const MealSettingItem = ({
   };
 
   const handleRemoveFoodFromMeal = (id: string) => () => {
+    if (submitting) {
+      return;
+    }
     let newFoodByDate = foodByDate;
 
     if (isDraftEditFlow) {
@@ -97,6 +185,20 @@ const MealSettingItem = ({
 
     saveDraftFoodByDate(newFoodByDate);
   };
+
+  useEffect(() => {
+    if (
+      isEqual(daysToApply, daysOfWeekEnableToApply) &&
+      !selectAllDaysControl.value
+    ) {
+      selectAllDaysControl.setTrue();
+    } else if (
+      !isEqual(daysToApply, daysOfWeekEnableToApply) &&
+      selectAllDaysControl.value
+    ) {
+      selectAllDaysControl.setFalse();
+    }
+  }, [JSON.stringify(daysToApply)]);
 
   return (
     <div className={css.mealContainer} key={meal}>
@@ -161,8 +263,10 @@ const MealSettingItem = ({
             <div>Thêm món ăn</div>
           </div>
 
-          <RenderWhen condition={!isEmptyFoodList}>
-            <div className={css.applyFoodBtn}>
+          <RenderWhen condition={shouldShowApplyToAnotherDayBtn}>
+            <div
+              className={css.applyFoodBtn}
+              onClick={confirmApplyForAnotherDayControl.setTrue}>
               Áp dụng món cho các thứ còn lại
             </div>
           </RenderWhen>
@@ -205,6 +309,18 @@ const MealSettingItem = ({
         position={EAlertPosition.bottom}
       />
 
+      <Alert
+        className={css.addFoodSuccess}
+        openClassName={css.addFoodSuccessOpen}
+        message={'Áp dụng món thành công'}
+        isOpen={applyFoodForAnotherDayControl.value}
+        onClose={applyFoodForAnotherDayControl.setFalse}
+        autoClose
+        hasCloseButton={false}
+        type={EAlertType.success}
+        position={EAlertPosition.bottom}
+      />
+
       <AlertModal
         isOpen={confirmDeleteMealControl.value}
         title={`Xóa ${lowerCaseMealName}`}
@@ -221,6 +337,32 @@ const MealSettingItem = ({
           <span className={css.mealName}>{lowerCaseMealName}</span> không?
         </div>
       </AlertModal>
+
+      <AlertModal
+        isOpen={confirmApplyForAnotherDayControl.value}
+        title={'Chọn thứ áp dụng món'}
+        shouldFullScreenInMobile={false}
+        containerClassName={css.confirmDeleteMenuModal}
+        handleClose={confirmApplyForAnotherDayControl.setFalse}
+        cancelLabel={'Huỷ'}
+        confirmLabel={'Áp dụng'}
+        confirmDisabled={disableSubmitApplyToAnotherDay}
+        onCancel={confirmApplyForAnotherDayControl.setFalse}
+        onConfirm={handleApplyForAnotherDay}
+        actionsClassName={css.confirmDeleteModalAction}>
+        <div onClick={handleSelectAllDay} className={selectAllDaysClasses}>
+          Cả tuần
+        </div>
+
+        <ApplyForAnotherDayForm
+          onSubmit={() => {}}
+          initialValues={{
+            daysToApply,
+          }}
+          setDaysToApply={setDaysToApply}
+          daysOfWeek={daysOfWeekEnableToApply}
+        />
+      </AlertModal>
     </div>
   );
 };
@@ -232,6 +374,7 @@ const MealSettings: React.FC<TMealSettingsProps> = (props) => {
     foodByDate,
     isDraftEditFlow,
     saveDraftFoodByDate,
+    daysOfWeek = [],
   } = props;
   const pickedFood = useAppSelector(
     (state) => state.PartnerManageMenus.pickedFood,
@@ -251,6 +394,7 @@ const MealSettings: React.FC<TMealSettingsProps> = (props) => {
 
           return (
             <MealSettingItem
+              daysOfWeek={daysOfWeek}
               key={`${currentDay}.${meal}.${index}`}
               meal={meal}
               mealLabel={mealLabel}
