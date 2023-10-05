@@ -2,7 +2,7 @@ import { denormalisedResponseEntities } from '@services/data';
 import { getIntegrationSdk } from '@services/sdk';
 import { getUniqueString, Listing } from '@src/utils/data';
 import type { EMenuMealType } from '@src/utils/enums';
-import type { TListing } from '@src/utils/types';
+import type { TListing, TObject } from '@src/utils/types';
 
 export const createMinPriceByDayOfWeek = (foodsByDate: any) => {
   let avaragePriceByDayOfWeek = {};
@@ -43,12 +43,15 @@ export const createFoodAveragePriceByDaysOfWeekField = (
 export const createPartnerDraftFoodByDateByDaysOfWeekField = (
   daysOfWeek: string[],
   mealTypes: EMenuMealType[] = [],
+  currentDraftFoodByDate: TObject = {},
 ) => {
-  const newFoodByDates = daysOfWeek.reduce((res, day) => {
-    return { ...res, [day]: {} };
-  }, {});
-
   return mealTypes.reduce((prev, meal) => {
+    const currMealDataMaybe = currentDraftFoodByDate[meal] || {};
+
+    const newFoodByDates = daysOfWeek.reduce((res, day) => {
+      return { ...res, [day]: currMealDataMaybe[day] || {} };
+    }, {});
+
     return { ...prev, [meal]: newFoodByDates };
   }, {});
 };

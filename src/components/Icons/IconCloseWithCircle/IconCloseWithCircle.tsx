@@ -6,7 +6,7 @@ import type { TIconProps } from '@utils/types';
 import css from './IconCloseWithCircle.module.scss';
 
 const IconCloseWithCircle: React.FC<TIconProps> = (props) => {
-  const { className } = props;
+  const { className, onClick } = props;
   const classes = classNames(css.root, className);
 
   return (
@@ -16,6 +16,7 @@ const IconCloseWithCircle: React.FC<TIconProps> = (props) => {
       viewBox="0 0 20 20"
       fill="none"
       preserveAspectRatio="none"
+      onClick={onClick}
       className={classes}
       xmlns="http://www.w3.org/2000/svg">
       <g clipPath="url(#clip0_1202_131926)">

@@ -6,6 +6,7 @@ import {
   createDraftMenuApi,
   deleteMenusApi,
   getMenuApi,
+  publishDraftMenuApi,
   updateMenuApi,
 } from '@apis/partnerApi';
 import { queryAllPages } from '@helpers/apiHelpers';
@@ -44,6 +45,8 @@ type TPartnerManageMenusState = {
   createDraftMenuError: any;
   updateDraftMenuInProgress: boolean;
   updateDraftMenuError: any;
+  publishDraftMenuInProgress: boolean;
+  publishDraftMenuError: any;
   pickedFood: any[];
 };
 const initialState: TPartnerManageMenusState = {
@@ -63,6 +66,8 @@ const initialState: TPartnerManageMenusState = {
   createDraftMenuError: null,
   updateDraftMenuInProgress: false,
   updateDraftMenuError: null,
+  publishDraftMenuInProgress: false,
+  publishDraftMenuError: null,
   pickedFood: [],
 };
 
@@ -246,6 +251,7 @@ const updateDraftMenu = createAsyncThunk(
         menuName,
         startDate,
         endDate,
+        mealType,
         mealTypes = [],
         daysOfWeek = [],
       } = getState().PartnerManageMenus.draftMenu || {};
@@ -259,11 +265,10 @@ const updateDraftMenu = createAsyncThunk(
         dataParams: {
           id: menuGetter.getId(),
           title: menuName,
-          menuType: EMenuTypes.fixedMenu,
           startDate,
           endDate,
           mealTypes,
-          mealType: mealTypes[0],
+          mealType: mealType || mealTypes[0],
           daysOfWeek,
           restaurantId: restaurantListingId,
         },
@@ -276,9 +281,57 @@ const updateDraftMenu = createAsyncThunk(
         denormalisedResponseEntities(updateMenuResponse?.data)[0],
       );
     } catch (error) {
-      console.error(`CREATE_DRAFT_MENU error: `, error);
+      console.error(`UPDATE_DRAFT_MENU error: `, error);
 
       return rejectWithValue(storableAxiosError(error));
+    }
+  },
+);
+
+const publishDraftMenu = createAsyncThunk(
+  'app/PartnerManageMenus/PUBLISH_DRAFT_MENU',
+  async (
+    _: TObject | undefined,
+    { getState, fulfillWithValue, rejectWithValue },
+  ) => {
+    try {
+      const {
+        menuName,
+        startDate,
+        endDate,
+        foodByDate = {},
+        mealTypes = [],
+        daysOfWeek = [],
+      } = getState().PartnerManageMenus.draftMenu || {};
+      const menu = getState().PartnerManageMenus.menu || {};
+      const { currentUser } = getState().user;
+
+      const menuGetter = Listing(menu! as TListing);
+      const { restaurantListingId } = CurrentUser(currentUser!).getMetadata();
+
+      await publishDraftMenuApi({
+        dataParams: {
+          id: menuGetter.getId(),
+          title: menuName,
+          menuType: EMenuTypes.fixedMenu,
+          startDate,
+          endDate,
+          mealTypes,
+          draftFoodByDate: foodByDate,
+          mealType: mealTypes[0],
+          daysOfWeek,
+          restaurantId: restaurantListingId,
+        },
+        queryParams: {
+          expand: true,
+        },
+      });
+
+      return fulfillWithValue(null);
+    } catch (error) {
+      console.error(`PUBLISH_DRAFT_MENU error: `, error);
+
+      return rejectWithValue(error);
     }
   },
 );
@@ -291,6 +344,7 @@ export const PartnerManageMenusThunks = {
   createDraftMenu,
   updateDraftMenu,
   loadMenuData,
+  publishDraftMenu,
 };
 
 // ================ Slice ================ //
@@ -301,8 +355,12 @@ const PartnerManageMenusSlice = createSlice({
     saveDraft: (state, { payload }) => {
       state.draftMenu = payload;
     },
+    addPickedFood: (state, { payload }) => {
+      state.pickedFood = state.pickedFood.concat(payload);
+    },
     clearCreateOrUpdateMenuError: (state) => {
       state.createDraftMenuError = null;
+      state.publishDraftMenuError = null;
       state.updateDraftMenuError = null;
     },
     clearLoadedMenuData: (state) => {
@@ -407,6 +465,19 @@ const PartnerManageMenusSlice = createSlice({
       .addCase(updateDraftMenu.rejected, (state, { payload }) => {
         state.updateDraftMenuInProgress = false;
         state.updateDraftMenuError = payload;
+      })
+      /* =============== publishDraftMenu =============== */
+      .addCase(publishDraftMenu.pending, (state) => {
+        state.publishDraftMenuInProgress = true;
+        state.publishDraftMenuError = null;
+      })
+      .addCase(publishDraftMenu.fulfilled, (state, { payload }) => {
+        state.publishDraftMenuInProgress = false;
+        state.menu = payload;
+      })
+      .addCase(publishDraftMenu.rejected, (state, { payload }) => {
+        state.publishDraftMenuInProgress = false;
+        state.publishDraftMenuError = payload;
       });
   },
 });

@@ -1,3 +1,5 @@
+import isEqual from 'lodash/isEqual';
+
 import {
   createFoodAveragePriceByDaysOfWeekField,
   createFoodByDateByDaysOfWeekField,
@@ -6,6 +8,7 @@ import {
   createListFoodTypeByFoodIds,
   createMinPriceByDayOfWeek,
   createNutritionsByDaysOfWeekField,
+  createPartnerDraftFoodByDateByDaysOfWeekField,
 } from '@pages/api/apiUtils/menu';
 import { denormalisedResponseEntities } from '@services/data';
 import { getIntegrationSdk } from '@services/sdk';
@@ -28,6 +31,7 @@ const updateMenu = async (
     startDate,
     daysOfWeek,
     restaurantId,
+    draftFoodByDate,
     foodsByDate,
     title,
     endDate,
@@ -47,6 +51,7 @@ const updateMenu = async (
   const [menu] = denormalisedResponseEntities(menuResponse);
 
   const {
+    daysOfWeek: daysOfWeekFromMenu = [],
     foodsByDate: foodsByDateFromMenu = {},
     monMinFoodPrice: monMinFoodPriceFromMenu = 0,
     tueMinFoodPrice: tueMinFoodPriceFromMenu = 0,
@@ -55,7 +60,10 @@ const updateMenu = async (
     friMinFoodPrice: friMinFoodPriceFromMenu = 0,
     satMinFoodPrice: satMinFoodPriceFromMenu = 0,
     sunMinFoodPrice: sunMinFoodPriceFromMenu = 0,
+    draftFoodByDate: currentDraftFoodByDate,
   } = IntegrationListing(menu).getPublicData();
+
+  const isDaysOfWeekChanged = !isEqual(daysOfWeekFromMenu, daysOfWeek);
 
   const {
     monFoodIdList: monFoodIdListFromMenu = [],
@@ -78,8 +86,11 @@ const updateMenu = async (
   const endDateToSubmit = isCycleMenu
     ? addWeeksToDate(new Date(startDate), numberOfCycles).getTime()
     : endDate;
+  // TODO: save food id in menu
+  // id, nutrition, min price,
+
   const listFoodIdsByDate =
-    restaurantId && daysOfWeek
+    restaurantId && daysOfWeek && isDaysOfWeekChanged
       ? createFoodListIdByDaysOfWeekField(
           {
             monFoodIdList: monFoodIdListFromMenu,
@@ -116,8 +127,20 @@ const updateMenu = async (
           : {}),
         ...(daysOfWeek
           ? {
+              draftFoodByDate:
+                typeof draftFoodByDate === 'undefined'
+                  ? createPartnerDraftFoodByDateByDaysOfWeekField(
+                      daysOfWeek,
+                      mealTypes,
+                      currentDraftFoodByDate || {},
+                    )
+                  : draftFoodByDate,
+            }
+          : {}),
+        ...(daysOfWeek
+          ? {
               foodsByDate: createFoodByDateByDaysOfWeekField(
-                foodsByDateFromMenu,
+                foodsByDate || foodsByDateFromMenu,
                 daysOfWeek,
               ),
             }
