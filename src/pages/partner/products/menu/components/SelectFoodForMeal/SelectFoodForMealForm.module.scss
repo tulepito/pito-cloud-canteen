@@ -1,4 +1,11 @@
 .root {
+  /*
+  note 90% device height
+  20px and 40px for padding top of slide modal title
+  46px for height of search, filter section
+  12px for section content margin
+  56px for action container (submit section)
+  */
   max-height: calc(90vh - 20px - 40px - 46px - 12px - 24px - 32px - 56px);
   max-height: calc(90dvh - 20px - 40px - 46px - 12px - 24px - 32px - 56px);
   overflow: hidden auto;
