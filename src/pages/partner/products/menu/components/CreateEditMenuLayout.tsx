@@ -36,11 +36,13 @@ const verifyData = ({
   currStep,
   initialValues,
   isCreateFlow = false,
+  isDraftEditFlow = false,
 }: {
   draftMenu: TObject;
   initialValues: TObject;
   currStep: EEditPartnerMenuMobileStep;
   isCreateFlow: boolean;
+  isDraftEditFlow: boolean;
 }) => {
   const {
     menuName,
@@ -48,6 +50,7 @@ const verifyData = ({
     mealTypes = [],
     startDate,
     endDate,
+    foodByDate = {},
   } = draftMenu || {};
   const isDraftDataValid =
     !isEmpty(menuName) &&
@@ -56,7 +59,14 @@ const verifyData = ({
     typeof startDate === 'number' &&
     typeof endDate === 'number';
 
-  const enableNext = isDraftDataValid;
+  const isFoodByDateValid = isDraftEditFlow
+    ? Object.keys(foodByDate).length > 0 &&
+      Object.values(foodByDate).some((mealByDate: any) => {
+        return Object.values(mealByDate).some((item) => !isEmpty(item));
+      })
+    : Object.values(foodByDate).some((item) => !isEmpty(item));
+
+  let enableNext = isDraftDataValid;
   let enableSubmit = false;
 
   switch (currStep) {
@@ -71,6 +81,8 @@ const verifyData = ({
       break;
     }
     case EEditPartnerMenuMobileStep.mealSettings: {
+      enableSubmit = isFoodByDateValid;
+      enableNext = isFoodByDateValid;
       break;
     }
     default:
@@ -105,6 +117,12 @@ const CreateEditMenuLayout: React.FC<TCreateEditMenuLayoutProps> = () => {
   const updateDraftMenuError = useAppSelector(
     (state) => state.PartnerManageMenus.updateDraftMenuError,
   );
+  const publishDraftMenuInProgress = useAppSelector(
+    (state) => state.PartnerManageMenus.publishDraftMenuInProgress,
+  );
+  const publishDraftMenuError = useAppSelector(
+    (state) => state.PartnerManageMenus.publishDraftMenuError,
+  );
   const draftMenu = useAppSelector(
     (state) => state.PartnerManageMenus.draftMenu,
   );
@@ -128,7 +146,10 @@ const CreateEditMenuLayout: React.FC<TCreateEditMenuLayoutProps> = () => {
   const isMealSettingsTab =
     currStep === EEditPartnerMenuMobileStep.mealSettings;
 
-  const infoSubmitting = createDraftMenuInProgress || updateDraftMenuInProgress;
+  const submitting =
+    createDraftMenuInProgress ||
+    updateDraftMenuInProgress ||
+    publishDraftMenuInProgress;
   const initialValues = useMemo(
     () => ({
       menuName: title,
@@ -137,23 +158,35 @@ const CreateEditMenuLayout: React.FC<TCreateEditMenuLayoutProps> = () => {
       mealType,
       mealTypes,
       foodsByDate,
+      draftFoodByDate,
+      foodByDate: isDraftEditFlow ? draftFoodByDate : foodsByDate,
     }),
     [
+      isDraftEditFlow,
       title,
       endDate?.toString(),
       startDate?.toString(),
       mealType,
-      JSON.stringify(foodsByDate),
+      JSON.stringify(draftFoodByDate),
+      JSON.stringify(mealTypes),
       JSON.stringify(mealTypes),
     ],
   );
   const { enableNext, enableSubmit } = useMemo(
-    () => verifyData({ draftMenu, initialValues, currStep, isCreateFlow }),
+    () =>
+      verifyData({
+        draftMenu,
+        initialValues,
+        currStep,
+        isCreateFlow,
+        isDraftEditFlow,
+      }),
     [
       currStep,
       JSON.stringify(initialValues),
       JSON.stringify(draftMenu),
       isCreateFlow,
+      isDraftEditFlow,
     ],
   );
 
@@ -179,7 +212,7 @@ const CreateEditMenuLayout: React.FC<TCreateEditMenuLayoutProps> = () => {
   const handleNavigateToNextStep = async () => {
     let shouldNavigateToNextStep = true;
 
-    if (isInfoTab && enableSubmit && !infoSubmitting) {
+    if (isInfoTab && enableSubmit && !submitting) {
       if (isCreateFlow) {
         const { meta, payload } = await dispatch(
           PartnerManageMenusThunks.createDraftMenu(),
@@ -198,6 +231,18 @@ const CreateEditMenuLayout: React.FC<TCreateEditMenuLayoutProps> = () => {
         if (meta.requestStatus !== 'fulfilled') {
           shouldNavigateToNextStep = false;
         }
+      }
+    }
+
+    if (isMealSettingsTab && enableSubmit && !submitting) {
+      shouldNavigateToNextStep = false;
+
+      const { meta } = await dispatch(
+        PartnerManageMenusThunks.publishDraftMenu(),
+      );
+
+      if (meta.requestStatus === 'fulfilled') {
+        // router.push(partnerPaths.ManageMenus);
       }
     }
 
@@ -254,14 +299,19 @@ const CreateEditMenuLayout: React.FC<TCreateEditMenuLayoutProps> = () => {
         <div className={css.actionContainer}>
           <RenderWhen condition={isInfoTab}>
             <Button
-              inProgress={infoSubmitting}
+              inProgress={submitting}
               disabled={!enableNext}
               onClick={handleNavigateToNextStep}>
               Tiếp theo
             </Button>
 
             <RenderWhen.False>
-              <Button>Hoàn tất</Button>
+              <Button
+                inProgress={submitting}
+                disabled={!enableNext}
+                onClick={handleNavigateToNextStep}>
+                Hoàn tất
+              </Button>
               <Button variant="secondary" onClick={handleNavigateToPrevStep}>
                 Trở về
               </Button>
@@ -278,6 +328,12 @@ const CreateEditMenuLayout: React.FC<TCreateEditMenuLayoutProps> = () => {
             <ErrorMessage
               className={css.errorMessage}
               message={updateDraftMenuError.message}
+            />
+          )}
+          {publishDraftMenuError !== null && (
+            <ErrorMessage
+              className={css.errorMessage}
+              message={publishDraftMenuError.message}
             />
           )}
         </div>

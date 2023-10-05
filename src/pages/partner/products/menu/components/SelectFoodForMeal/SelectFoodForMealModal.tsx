@@ -1,7 +1,7 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from 'react';
 import { useField, useForm } from 'react-final-form-hooks';
 import { shallowEqual } from 'react-redux';
-import compact from 'lodash/compact';
 import isEmpty from 'lodash/isEmpty';
 import { useRouter } from 'next/router';
 
@@ -19,8 +19,9 @@ import { partnerPaths } from '@src/paths';
 import { CurrentUser, Listing } from '@src/utils/data';
 import type { TListing, TObject } from '@src/utils/types';
 
+import { PartnerManageMenusActions } from '../../PartnerManageMenus.slice';
+
 import FilterForm from './FilterFoodForm';
-import type { TSelectFoodForMealFormValues } from './SelectFoodForMealForm';
 import SelectFoodForMealForm from './SelectFoodForMealForm';
 
 import css from './SelectFoodForMealModal.module.scss';
@@ -30,12 +31,24 @@ type TSelectFoodForMealModalProps = {
   onClose: () => void;
   onOpen: () => void;
   meal: string;
+  currentDay: string;
+  foodByDate: TObject;
+  currentFoodIds: string[];
+  isDraftEditFlow: boolean;
+  saveDraftFoodByDate: (value: TObject) => void;
+  turnOnSuccessAddFoodAlert: () => void;
 };
 
 const SelectFoodForMealModal: React.FC<TSelectFoodForMealModalProps> = ({
   isOpen,
   onClose,
   meal,
+  isDraftEditFlow,
+  currentDay,
+  foodByDate = {},
+  saveDraftFoodByDate,
+  currentFoodIds,
+  turnOnSuccessAddFoodAlert,
 }) => {
   const router = useRouter();
   const dispatch = useAppDispatch();
@@ -45,7 +58,7 @@ const SelectFoodForMealModal: React.FC<TSelectFoodForMealModalProps> = ({
   const shouldClearFilterFormControl = useBoolean();
   const filterFormValidControl = useBoolean();
   const [filterValues, setFilterValues] = useState({});
-
+  const [selectedFoodIds, setSelectedFoodIds] = useState<string[]>([]);
   const isEmptyFoodList = foods?.length === 0;
 
   const { restaurantListingId: restaurantId } =
@@ -57,36 +70,51 @@ const SelectFoodForMealModal: React.FC<TSelectFoodForMealModalProps> = ({
   });
   const keywordsField = useField('keywords', form);
 
-  const handleSubmit = (values: TSelectFoodForMealFormValues) => {
+  const handleSubmit = () => {
     if (isEmptyFoodList) {
       // TODO: navigate to create food page
       router.push(partnerPaths.CreateFood);
     } else {
-      const { food = [] } = values;
+      const newPickedFood: TListing[] = [];
 
-      const foodToUpdate = compact(
-        food.map((id) => {
-          const foodListingMaybe = foods.find(
-            (f: TListing) => f.id.uuid === id,
-          );
+      const foodToUpdate = selectedFoodIds.reduce((prev, id) => {
+        const foodListingMaybe = foods.find((f: TListing) => f.id.uuid === id);
 
-          if (foodListingMaybe) {
-            const foodGetter = Listing(foodListingMaybe);
-            const { sideDishes = [] } = foodGetter.getPublicData();
+        if (foodListingMaybe) {
+          newPickedFood.push(foodListingMaybe);
 
-            return {
+          const foodGetter = Listing(foodListingMaybe);
+          const { sideDishes = [] } = foodGetter.getPublicData();
+
+          return {
+            ...prev,
+            [id]: {
               foodNote: '',
               id,
-              price: foodListingMaybe.attributes.price,
+              price: foodListingMaybe.attributes.price.amount || 0,
               sideDishes,
-            };
+            },
+          };
+        }
+
+        return prev;
+      }, {});
+
+      dispatch(PartnerManageMenusActions.addPickedFood(newPickedFood));
+
+      const newFoodByDate = isDraftEditFlow
+        ? {
+            ...foodByDate,
+            [meal]: {
+              ...foodByDate[meal],
+              [currentDay]: foodToUpdate,
+            },
           }
+        : { ...foodByDate, [currentDay]: foodToUpdate };
 
-          return null;
-        }),
-      );
-
-      return foodToUpdate;
+      saveDraftFoodByDate(newFoodByDate);
+      turnOnSuccessAddFoodAlert();
+      onClose();
     }
   };
 
@@ -162,8 +190,10 @@ const SelectFoodForMealModal: React.FC<TSelectFoodForMealModalProps> = ({
         }),
       );
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, restaurantId, keywordsField.input.value]);
+  useEffect(() => {
+    setSelectedFoodIds(currentFoodIds);
+  }, [JSON.stringify(currentFoodIds)]);
 
   return (
     <div className={css.root}>
@@ -178,6 +208,7 @@ const SelectFoodForMealModal: React.FC<TSelectFoodForMealModalProps> = ({
             leftIcon={<IconSearch />}
             input={keywordsField.input}
             meta={keywordsField.meta}
+            placeholder="Tìm kiếm"
           />
           <Button
             variant="secondary"
@@ -191,13 +222,19 @@ const SelectFoodForMealModal: React.FC<TSelectFoodForMealModalProps> = ({
           <SelectFoodForMealForm
             formId={`SelectFoodForMealForm.${meal}`}
             onSubmit={handleSubmit}
+            initialValues={{ food: currentFoodIds }}
+            setSelectedFoodIds={setSelectedFoodIds}
           />
         )}
 
         <RenderWhen condition={isEmptyFoodList}>
-          <Button className={css.submitButton}>Thêm món ăn</Button>
+          <Button className={css.submitButton} onClick={handleSubmit}>
+            Thêm món ăn
+          </Button>
           <RenderWhen.False>
-            <Button className={css.submitButton}>Chọn món</Button>
+            <Button className={css.submitButton} onClick={handleSubmit}>
+              Chọn món
+            </Button>
           </RenderWhen.False>
         </RenderWhen>
       </SlideModal>
@@ -221,14 +258,15 @@ const SelectFoodForMealModal: React.FC<TSelectFoodForMealModalProps> = ({
             className={css.filterFormBtn}
             size="medium"
             variant="secondary"
-            onClick={handleClearFilter}>
+            onClick={handleClearFilter}
+            disabled={isEmpty(filterValues)}>
             Xoá bộ lọc
           </Button>
 
           <Button
             type="submit"
             className={css.filterFormBtn}
-            disabled={!filterFormValidControl.value}
+            disabled={isEmpty(filterValues) || !filterFormValidControl.value}
             size="medium"
             onClick={handleSubmitFilter}>
             Lọc

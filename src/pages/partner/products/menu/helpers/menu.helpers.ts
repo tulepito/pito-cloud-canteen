@@ -4,31 +4,29 @@ export const prepareFoodListForOrder = ({
   daysOfWeek = [],
   mealTypes = [],
   mealType,
-  draftFoodByDate,
-  foodsByDate,
+  foodByDate,
   isDraftEditFlow,
 }: {
   mealTypes: string[];
   mealType: string;
   daysOfWeek: string[];
   isDraftEditFlow: boolean;
-  foodsByDate: TObject;
-  draftFoodByDate: TObject;
+  foodByDate: TObject;
 }) => {
   return daysOfWeek.reduce((prev, day) => {
     const foodListGroupByDateAndMeal = isDraftEditFlow
       ? mealTypes.reduce<TObject[]>((res, meal) => {
-          if (draftFoodByDate[meal] && draftFoodByDate[meal][day]) {
+          if (foodByDate[meal] && foodByDate[meal][day]) {
             return res.concat({
               meal,
-              foodList: draftFoodByDate[meal][day],
+              foodList: foodByDate[meal][day],
             });
           }
 
           return res;
         }, [])
-      : foodsByDate[day]
-      ? [{ meal: mealType, foodList: foodsByDate[day] }]
+      : foodByDate[day]
+      ? [{ meal: mealType, foodList: foodByDate[day] }]
       : [];
 
     return { ...prev, [day]: foodListGroupByDateAndMeal };

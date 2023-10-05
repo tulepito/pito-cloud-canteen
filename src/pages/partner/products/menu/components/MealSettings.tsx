@@ -1,9 +1,12 @@
 import { FormattedMessage } from 'react-intl';
+import omit from 'lodash/omit';
 
+import Alert, { EAlertPosition, EAlertType } from '@components/Alert/Alert';
 import IconAdd from '@components/Icons/IconAdd/IconAdd';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import IconClose from '@components/Icons/IconClose/IconClose';
 import IconCloseWithCircle from '@components/Icons/IconCloseWithCircle/IconCloseWithCircle';
+import AlertModal from '@components/Modal/AlertModal';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
@@ -20,30 +23,63 @@ const MAX_ITEM_TO_SHOW = 3;
 type TMealSettingsProps = {
   foodListByMealAndDay: TObject;
   currentDay: string;
+  foodByDate: TObject;
+  isDraftEditFlow: boolean;
+  saveDraftFoodByDate: (value: TObject) => void;
 };
 
 const MealSettingItem = ({
   pickedFood = [],
   foodList = [],
   meal,
+  isDraftEditFlow,
+  currentDay,
+  foodByDate,
+  saveDraftFoodByDate,
   mealLabel,
 }: any) => {
   const expandControl = useBoolean(true);
   const isEmptyFoodList = foodList.length === 0;
   const isOverMaxItemsToShow = foodList.length > MAX_ITEM_TO_SHOW;
-  const showMoreControl = useBoolean(isOverMaxItemsToShow);
+  const showMoreControl = useBoolean(true);
   const addFoodControl = useBoolean();
+  const addFoodSuccessControl = useBoolean();
+  const confirmDeleteMealControl = useBoolean();
+  const lowerCaseMealName = mealLabel.toLowerCase();
 
   const foodListToRender =
     isOverMaxItemsToShow && showMoreControl.value
       ? foodList.slice(0, 3)
       : foodList;
 
+  const currentFoodIds = foodList.map((f: TObject) => f.id);
+
+  const handleClickDeleteMeal = () => {
+    confirmDeleteMealControl.setTrue();
+  };
+
+  const handleDeleteMeal = () => {
+    let newFoodByDate = foodByDate;
+
+    if (isDraftEditFlow) {
+      if (foodByDate[meal] && foodByDate[meal][currentDay]) {
+        newFoodByDate = {
+          ...foodByDate,
+          [meal]: omit(foodByDate[meal], [currentDay]),
+        };
+      }
+    } else if (foodByDate[currentDay]) {
+      newFoodByDate = omit(foodByDate, [currentDay]);
+    }
+
+    saveDraftFoodByDate(newFoodByDate);
+  };
+
   return (
     <div className={css.mealContainer} key={meal}>
       <div className={css.mealHeadContainer}>
         <div>
-          <IconCloseWithCircle />
+          <IconCloseWithCircle onClick={handleClickDeleteMeal} />
           <span>
             {mealLabel} {isEmptyFoodList ? '' : `(${foodList.length})`}
           </span>
@@ -123,14 +159,55 @@ const MealSettingItem = ({
           isOpen={addFoodControl.value}
           onClose={addFoodControl.setFalse}
           onOpen={addFoodControl.setTrue}
+          isDraftEditFlow={isDraftEditFlow}
+          currentDay={currentDay}
+          foodByDate={foodByDate}
+          saveDraftFoodByDate={saveDraftFoodByDate}
+          currentFoodIds={currentFoodIds}
+          turnOnSuccessAddFoodAlert={addFoodSuccessControl.setTrue}
         />
       )}
+
+      <Alert
+        className={css.addFoodSuccess}
+        openClassName={css.addFoodSuccessOpen}
+        message={'Thêm món thành công'}
+        isOpen={addFoodSuccessControl.value}
+        onClose={addFoodSuccessControl.setFalse}
+        autoClose
+        hasCloseButton={false}
+        type={EAlertType.success}
+        position={EAlertPosition.bottom}
+      />
+
+      <AlertModal
+        isOpen={confirmDeleteMealControl.value}
+        title={`Xóa ${lowerCaseMealName}`}
+        shouldFullScreenInMobile={false}
+        containerClassName={css.confirmDeleteMenuModal}
+        handleClose={confirmDeleteMealControl.setFalse}
+        cancelLabel={'Huỷ'}
+        confirmLabel={`Xóa ${lowerCaseMealName}`}
+        onCancel={confirmDeleteMealControl.setFalse}
+        onConfirm={handleDeleteMeal}
+        actionsClassName={css.confirmDeleteModalAction}>
+        <div className={css.menuDescription}>
+          Bạn có chắc chắn muốn xoá{' '}
+          <span className={css.mealName}>{lowerCaseMealName}</span> không?
+        </div>
+      </AlertModal>
     </div>
   );
 };
 
 const MealSettings: React.FC<TMealSettingsProps> = (props) => {
-  const { currentDay, foodListByMealAndDay = {} } = props;
+  const {
+    currentDay,
+    foodListByMealAndDay = {},
+    foodByDate,
+    isDraftEditFlow,
+    saveDraftFoodByDate,
+  } = props;
   const pickedFood = useAppSelector(
     (state) => state.PartnerManageMenus.pickedFood,
   );
@@ -154,6 +231,10 @@ const MealSettings: React.FC<TMealSettingsProps> = (props) => {
               mealLabel={mealLabel}
               pickedFood={pickedFood}
               foodList={foodList}
+              isDraftEditFlow={isDraftEditFlow}
+              currentDay={currentDay}
+              foodByDate={foodByDate}
+              saveDraftFoodByDate={saveDraftFoodByDate}
             />
           );
         },

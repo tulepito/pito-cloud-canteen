@@ -125,3 +125,36 @@
 
   justify-content: center;
 }
+
+.confirmDeleteMenuModal.confirmDeleteMenuModal.confirmDeleteMenuModal {
+  width: calc(100vw - 32px);
+  padding: 0 16px 16px;
+
+  .menuDescription {
+    @include textTemplate(14px, 400, 20px);
+  }
+
+  .mealName {
+    font-weight: 700;
+    color: $neutralGray6;
+  }
+
+  .confirmDeleteModalAction {
+    margin-top: -28px;
+  }
+}
+
+.addFoodSuccess {
+  width: 295px;
+  left: -300px;
+
+  & > div {
+    column-gap: 16px;
+    margin: 0 auto;
+  }
+}
+
+.addFoodSuccessOpen {
+  bottom: 180px;
+  left: calc((100vw - 295px) / 2);
+}

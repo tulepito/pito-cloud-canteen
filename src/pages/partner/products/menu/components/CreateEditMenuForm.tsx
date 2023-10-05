@@ -61,7 +61,7 @@ export type TCreateEditMenuFormValues = {
   mealType?: EMenuMealType;
   startDate: number;
   endDate: number;
-  foodsByDate: TObject;
+  foodByDate: TObject;
 };
 
 type TExtraProps = {
@@ -89,8 +89,6 @@ const CreateEditMenuFormComponent: React.FC<
     isMealSettingsTab,
     isDraftEditFlow = false,
     daysOfWeek = [],
-    foodsByDate = {},
-    draftFoodByDate = {},
   } = props;
   const intl = useIntl();
   const dispatch = useAppDispatch();
@@ -122,10 +120,9 @@ const CreateEditMenuFormComponent: React.FC<
   const foodListByMealAndDay: TObject = prepareFoodListForOrder({
     daysOfWeek,
     mealTypes: values.mealTypes!,
-    draftFoodByDate,
+    foodByDate: values.foodByDate,
     isDraftEditFlow,
     mealType: mealType!,
-    foodsByDate,
   });
 
   const handleStartDateChange = (value: any, prevValue: any) => {
@@ -139,6 +136,10 @@ const CreateEditMenuFormComponent: React.FC<
         setEndDate(undefined!);
       });
     }
+  };
+
+  const handleChangeMealSettings = (value: TObject) => {
+    form.change('foodByDate', value);
   };
 
   useEffect(() => {
@@ -195,8 +196,11 @@ const CreateEditMenuFormComponent: React.FC<
 
           <div className={css.mealSettingContainer}>
             <MealSettings
+              isDraftEditFlow={isDraftEditFlow}
+              foodByDate={values.foodByDate}
               currentDay={currentDay}
               foodListByMealAndDay={foodListByMealAndDay}
+              saveDraftFoodByDate={handleChangeMealSettings}
             />
           </div>
 

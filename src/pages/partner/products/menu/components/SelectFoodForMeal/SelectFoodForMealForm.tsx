@@ -26,7 +26,7 @@ export type TSelectFoodForMealFormValues = {
   checkAll: boolean;
 };
 
-type TExtraProps = { formId: string };
+type TExtraProps = { formId: string; setSelectedFoodIds: (value: any) => void };
 type TSelectFoodForMealFormComponentProps =
   FormRenderProps<TSelectFoodForMealFormValues> & Partial<TExtraProps>;
 type TSelectFoodForMealFormProps = FormProps<TSelectFoodForMealFormValues> &
@@ -40,6 +40,7 @@ const SelectFoodForMealFormComponent: React.FC<
     handleSubmit,
     formId,
     values: { food: selectedFoodIds = [] },
+    setSelectedFoodIds,
   } = props;
   const foods = useAppSelector((state) => state.foods.foods, shallowEqual);
 
@@ -87,6 +88,9 @@ const SelectFoodForMealFormComponent: React.FC<
     } else {
       form.change('checkAll', true);
     }
+
+    if (setSelectedFoodIds) setSelectedFoodIds(selectedFoodIds);
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [foodOptions.length, JSON.stringify(selectedFoodIds)]);
 
