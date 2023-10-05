@@ -3,8 +3,10 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { shallowEqual } from 'react-redux';
 import isEmpty from 'lodash/isEmpty';
+import Image from 'next/image';
 import { useRouter } from 'next/router';
 
+import Button from '@components/Button/Button';
 import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
 import MealPlanCard from '@components/CalendarDashboard/components/MealPlanCard/MealPlanCard';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
@@ -24,6 +26,7 @@ import { Listing, User } from '@utils/data';
 import { EBookerOrderDraftStates, EOrderDraftStates } from '@utils/enums';
 import type { TListing, TUser } from '@utils/types';
 
+import emptyResultImg from '../../../../../../assets/emptyResult.png';
 import Layout from '../../components/Layout/Layout';
 import LayoutMain from '../../components/Layout/LayoutMain';
 import LayoutSidebar from '../../components/Layout/LayoutSidebar';
@@ -181,6 +184,7 @@ function BookerDraftOrderPage() {
     isFinishOrderDisabled,
     handleFinishOrder,
     order,
+    shouldHideDayItems: isEmpty(orderDetail),
   });
 
   useEffect(() => {
@@ -292,6 +296,26 @@ function BookerDraftOrderPage() {
               }}
               components={componentsProps}
             />
+
+            <RenderWhen condition={isEmpty(orderDetail)}>
+              <div className={css.emptyResult}>
+                <div className={css.emptyResultImg}>
+                  <Image src={emptyResultImg} alt="empty result" />
+                </div>
+                <div className={css.emptyTitle}>
+                  <p>Không tìm thấy kết quả phù hợp</p>
+                  <p className={css.emptyContent}>
+                    Rất tiếc, hệ thống chúng tôi không tìm thấy kết quả phù hợp
+                    với yêu cầu của bạn. Tuy nhiên, đừng ngần ngại{' '}
+                    <span>chat với chúng tôi để tìm thấy menu nhanh nhất</span>{' '}
+                    nhé.
+                  </p>
+                  <Button className={css.contactUsBtn} variant="secondary">
+                    Chat với chúng tôi
+                  </Button>
+                </div>
+              </div>
+            </RenderWhen>
           </div>
           <RenderWhen condition={walkthroughEnable}>
             <WelcomeModal

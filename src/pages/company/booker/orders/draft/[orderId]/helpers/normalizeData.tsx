@@ -10,6 +10,15 @@ export const normalizePlanDetailsToEvent = (
   coverImageList: any,
 ) => {
   const dateList = Object.keys(planDetails);
+
+  const isAllDatesHaveNoRestaurants: boolean = Object.values(planDetails).every(
+    ({ hasNoRestaurants }: any) => hasNoRestaurants,
+  );
+
+  if (isAllDatesHaveNoRestaurants) {
+    return [];
+  }
+
   const { plans = [], deliveryHour } = Listing(order).getMetadata();
   const planId = plans.length > 0 ? plans[0] : undefined;
 
