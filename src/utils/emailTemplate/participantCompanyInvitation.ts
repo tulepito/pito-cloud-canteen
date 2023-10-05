@@ -10,20 +10,12 @@ export const participantCompanyInvitationSubject = (companyName: string) =>
 
 const participantCompanyInvitation = ({
   companyUser,
-  participantUser,
 }: ParticipantCompanyInvitationParams) => {
   const { displayName: bookerName } = companyUser.getProfile();
   const { email: bookerEmail } = companyUser.getAttributes();
   const { companyName } = companyUser.getPublicData();
 
   const companyId = companyUser.getId();
-
-  let participantNameMaybe = '';
-  if (participantUser) {
-    const { firstName, lastName } = participantUser.getProfile();
-    participantNameMaybe =
-      firstName && lastName ? `${lastName} ${firstName}` : '';
-  }
 
   const invitationUrl = `${BASE_URL}/participant/invitation/${companyId}`;
 
@@ -550,7 +542,7 @@ const participantCompanyInvitation = ({
                                 <td align="left" style="padding:0;Margin:0">
                                   <p
                                     style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#333333;font-size:14px">
-                                    Xin chào, <strong>${participantNameMaybe}</strong></p>
+                                    Xin chào,</p>
                                 </td>
                               </tr>
                               <tr>
