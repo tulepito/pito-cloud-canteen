@@ -99,6 +99,7 @@
   .modalIconContainer {
     display: flex;
     justify-content: center;
+    margin-bottom: 12px;
   }
 
   .menuDescription {
@@ -115,6 +116,45 @@
 
   .confirmPublishModalActions {
     margin-top: -28px;
+    @include textTemplate(14px, 700, 24px);
+
+    button {
+      padding: 5px;
+    }
+  }
+}
+
+.completePublishModal.completePublishModal.completePublishModal {
+  width: calc(100vw - 32px);
+  padding: 16px;
+
+  .modalIconContainer {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 12px;
+
+    .iconCheckmark {
+      path {
+        fill: $neutralGray3;
+      }
+
+      rect {
+        fill: $sematicGreen2;
+        stroke: $sematicGreen2;
+      }
+    }
+  }
+
+  .menuDescription {
+    color: $neutralGray6;
+    text-align: center;
+    @include textTemplate(14px, 400, 20px);
+  }
+
+  .completePublishModalActions {
+    margin-top: -28px;
+    justify-content: center;
+
     @include textTemplate(14px, 700, 24px);
 
     button {

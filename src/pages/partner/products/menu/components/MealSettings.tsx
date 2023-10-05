@@ -38,8 +38,8 @@ const MealSettingItem = ({
   saveDraftFoodByDate,
   mealLabel,
 }: any) => {
-  const expandControl = useBoolean(true);
   const isEmptyFoodList = foodList.length === 0;
+  const expandControl = useBoolean(isEmptyFoodList);
   const isOverMaxItemsToShow = foodList.length > MAX_ITEM_TO_SHOW;
   const showMoreControl = useBoolean(true);
   const addFoodControl = useBoolean();
