@@ -91,3 +91,34 @@
     margin: -8px 0 0;
   }
 }
+
+.confirmPublishModal.confirmPublishModal.confirmPublishModal {
+  width: calc(100vw - 32px);
+  padding: 16px;
+
+  .modalIconContainer {
+    display: flex;
+    justify-content: center;
+  }
+
+  .menuDescription {
+    color: $neutralGray6;
+    text-align: center;
+    @include textTemplate(14px, 400, 20px);
+    span {
+      font-weight: 700;
+    }
+    p {
+      margin: 0;
+    }
+  }
+
+  .confirmPublishModalActions {
+    margin-top: -28px;
+    @include textTemplate(14px, 700, 24px);
+
+    button {
+      padding: 5px;
+    }
+  }
+}

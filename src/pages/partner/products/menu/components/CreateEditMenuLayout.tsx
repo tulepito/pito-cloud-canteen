@@ -8,9 +8,12 @@ import { useRouter } from 'next/router';
 import Button from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
+import IconDangerWithCircle from '@components/Icons/IconDangerWithCircle/IconDangerWithCircle';
 import MobileBottomContainer from '@components/MobileBottomContainer/MobileBottomContainer';
+import AlertModal from '@components/Modal/AlertModal';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import useBoolean from '@hooks/useBoolean';
 import { partnerPaths } from '@src/paths';
 import { Listing } from '@src/utils/data';
 import { EListingStates } from '@src/utils/enums';
@@ -52,6 +55,10 @@ const verifyData = ({
     endDate,
     foodByDate = {},
   } = draftMenu || {};
+  console.debug(
+    '💫 > file: CreateEditMenuLayout.tsx:54 > foodByDate: ',
+    foodByDate,
+  );
   const isDraftDataValid =
     !isEmpty(menuName) &&
     menuName?.length <= MAX_MENU_LENGTH &&
@@ -65,6 +72,13 @@ const verifyData = ({
         return Object.values(mealByDate).some((item) => !isEmpty(item));
       })
     : Object.values(foodByDate).some((item) => !isEmpty(item));
+
+  const isAllMealsSetup = isDraftEditFlow
+    ? Object.keys(foodByDate).length > 0 &&
+      Object.values(foodByDate).every((mealByDate: any) => {
+        return Object.values(mealByDate).every((item) => !isEmpty(item));
+      })
+    : Object.values(foodByDate).every((item) => !isEmpty(item));
 
   let enableNext = isDraftDataValid;
   let enableSubmit = false;
@@ -89,7 +103,7 @@ const verifyData = ({
       break;
   }
 
-  return { enableNext, enableSubmit };
+  return { enableNext, enableSubmit, isAllMealsSetup };
 };
 
 type TCreateEditMenuLayoutProps = {};
@@ -97,6 +111,7 @@ type TCreateEditMenuLayoutProps = {};
 const CreateEditMenuLayout: React.FC<TCreateEditMenuLayoutProps> = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
+  const confirmPublishDraftMenuControl = useBoolean();
   const {
     query: { menuId: menuIdFromRouter },
     isReady: isRouterReady,
@@ -172,7 +187,7 @@ const CreateEditMenuLayout: React.FC<TCreateEditMenuLayoutProps> = () => {
       JSON.stringify(mealTypes),
     ],
   );
-  const { enableNext, enableSubmit } = useMemo(
+  const { enableNext, enableSubmit, isAllMealsSetup } = useMemo(
     () =>
       verifyData({
         draftMenu,
@@ -209,6 +224,16 @@ const CreateEditMenuLayout: React.FC<TCreateEditMenuLayoutProps> = () => {
     [css.mealSettingsTab]: isMealSettingsTab,
   });
 
+  const handlePublishDraftMenu = async () => {
+    const { meta } = await dispatch(
+      PartnerManageMenusThunks.publishDraftMenu(),
+    );
+
+    if (meta.requestStatus === 'fulfilled') {
+      router.push(partnerPaths.ManageMenus);
+    }
+  };
+
   const handleNavigateToNextStep = async () => {
     let shouldNavigateToNextStep = true;
 
@@ -237,12 +262,10 @@ const CreateEditMenuLayout: React.FC<TCreateEditMenuLayoutProps> = () => {
     if (isMealSettingsTab && enableSubmit && !submitting) {
       shouldNavigateToNextStep = false;
 
-      const { meta } = await dispatch(
-        PartnerManageMenusThunks.publishDraftMenu(),
-      );
-
-      if (meta.requestStatus === 'fulfilled') {
-        // router.push(partnerPaths.ManageMenus);
+      if (isAllMealsSetup && isDraftEditFlow) {
+        await handlePublishDraftMenu();
+      } else {
+        confirmPublishDraftMenuControl.setTrue();
       }
     }
 
@@ -294,6 +317,27 @@ const CreateEditMenuLayout: React.FC<TCreateEditMenuLayoutProps> = () => {
           initialValues={initialValues}
         />
       </div>
+
+      <AlertModal
+        isOpen={confirmPublishDraftMenuControl.value}
+        shouldFullScreenInMobile={false}
+        containerClassName={css.confirmPublishModal}
+        handleClose={confirmPublishDraftMenuControl.setFalse}
+        cancelLabel={'Tiếp tục thêm món'}
+        shouldHideIconClose
+        confirmLabel={'Hoàn tất'}
+        onCancel={confirmPublishDraftMenuControl.setFalse}
+        onConfirm={handlePublishDraftMenu}
+        actionsClassName={css.confirmPublishModalActions}>
+        <div className={css.modalIconContainer}>
+          <IconDangerWithCircle />
+        </div>
+        <div className={css.menuDescription}>
+          Các Thứ (hoặc Bữa ăn) còn lại trong tuần{' '}
+          <span>chưa được thêm món ăn.</span>
+          <p>Bạn có muốn hoàn tất menu?</p>
+        </div>
+      </AlertModal>
 
       <MobileBottomContainer>
         <div className={css.actionContainer}>
