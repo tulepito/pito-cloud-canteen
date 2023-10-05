@@ -140,8 +140,8 @@ const OrderPaymentStatusTab: React.FC<OrderPaymentStatusTabProps> = (props) => {
 
           const { isAdminPaymentConfirmed = false } =
             orderDetail[subOrderDate] || {};
-          const showCheckmark =
-            isAdminPaymentConfirmed || totalWithVAT <= paidAmount;
+          const showPartnerCheckMark =
+            isAdminPaymentConfirmed || totalWithVAT === paidAmount;
 
           return {
             key: subOrderDate,
@@ -164,7 +164,7 @@ const OrderPaymentStatusTab: React.FC<OrderPaymentStatusTabProps> = (props) => {
                       orderDetail[subOrderDate].restaurant.restaurantName
                     } #${orderTitle}-${getDayOfWeek(+subOrderDate)}`}
                   </div>
-                  <RenderWhen condition={showCheckmark}>
+                  <RenderWhen condition={showPartnerCheckMark}>
                     <IconCheckmarkWithCircle className={css.checkIcon} />
                   </RenderWhen>
                 </div>
