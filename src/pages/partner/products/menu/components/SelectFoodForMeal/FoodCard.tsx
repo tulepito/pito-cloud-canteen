@@ -15,6 +15,12 @@ const FoodCard: React.FC<TFoodCardProps> = ({ data }) => {
   const foodGetter = Listing(data as TListing);
   const { title } = foodGetter.getAttributes();
   const { foodType = EFoodTypes.savoryDish } = foodGetter.getPublicData();
+  const foodId = foodGetter.getId();
+  const foodImage = foodGetter.getImages()[0] || null;
+  console.debug(
+    '💫 > file: FoodCard.tsx:20 > foodGetter.getImages(): ',
+    foodGetter.getImages(),
+  );
 
   const foodTypeLabel =
     FOOD_TYPE_OPTIONS.find(({ key }) => foodType === key)?.label ||
@@ -22,11 +28,13 @@ const FoodCard: React.FC<TFoodCardProps> = ({ data }) => {
 
   return (
     <div className={css.root}>
-      <div className={css.foodImg}>
+      <div className={css.foodImgContainer}>
         <ResponsiveImage
-          alt={`food`}
-          image={null}
+          className={css.foodImg}
+          alt={`Food${foodId}`}
+          image={foodImage}
           variants={[EImageVariants.squareSmall2x]}
+          // sizes={'48px'}
         />
       </div>
       <div className={css.infoContainer}>

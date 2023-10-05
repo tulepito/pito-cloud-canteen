@@ -6,11 +6,18 @@
   align-items: center;
   column-gap: 12px;
 }
-.foodImg {
+.foodImgContainer {
+  overflow: hidden;
   width: 48px;
   height: 48px;
   min-width: 48px;
+  max-width: 48px;
   flex-basis: 48px;
+  border-radius: 8px;
+}
+
+.foodImg {
+  position: static !important;
 }
 
 .infoContainer {
