@@ -59,6 +59,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           needPublishMenuIds.map(async (id: string) => {
             await integrationSdk.listings.update({
               id,
+              publicData: {
+                mealTypes: undefined,
+              },
               metadata: {
                 listingState: EListingStates.published,
               },

@@ -1,3 +1,5 @@
+import isEmpty from 'lodash/isEmpty';
+
 import { denormalisedResponseEntities, Listing } from '@src/utils/data';
 import type {
   TCreateMenuApiParams,
@@ -38,8 +40,11 @@ const publishDraftMenu = async (
     numberOfCycles = 1,
   } = dataParams;
 
-  const needPublishMenuIds: string[] = [menuId];
-  const menuFoodsByDate = draftFoodByDate[mealType] || {};
+  const menuFoodByDate = draftFoodByDate[mealType] || {};
+  const isAllMenuMealsEmpty = Object.values(menuFoodByDate).every((item) =>
+    isEmpty(item),
+  );
+  const needPublishMenuIds: string[] = isAllMenuMealsEmpty ? [] : [menuId];
 
   await updateMenu(
     menuId,
@@ -49,7 +54,14 @@ const publishDraftMenu = async (
       mealType,
       startDate,
       restaurantId,
-      foodsByDate: menuFoodsByDate,
+      ...(isAllMenuMealsEmpty
+        ? {
+            mealTypes: [mealType],
+            draftFoodByDate: {
+              [mealType]: menuFoodByDate,
+            },
+          }
+        : { foodsByDate: menuFoodByDate }),
       title,
       endDate,
       numberOfCycles,
@@ -75,6 +87,12 @@ const publishDraftMenu = async (
         );
         const subMenuFoodsByDate = draftFoodByDate[meal] || {};
         if (subMenuFoodsByDate) {
+          const isAllSubMenuFoodByDateEmpty = Object.values(
+            subMenuFoodsByDate,
+          ).every((item) => isEmpty(item));
+
+          if (!isAllSubMenuFoodByDateEmpty) needPublishMenuIds.push(subMenuId);
+
           await updateMenu(
             subMenuId,
             {
@@ -83,15 +101,15 @@ const publishDraftMenu = async (
               mealType: meal,
               startDate,
               restaurantId,
-              foodsByDate: subMenuFoodsByDate,
+              ...(isAllSubMenuFoodByDateEmpty
+                ? { mealTypes: [meal] }
+                : { foodsByDate: { [meal]: subMenuFoodsByDate } }),
               title,
               endDate,
               numberOfCycles,
             },
             {},
           );
-
-          needPublishMenuIds.push(subMenuId);
         }
       }),
     );
