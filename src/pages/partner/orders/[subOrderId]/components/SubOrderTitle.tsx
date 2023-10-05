@@ -41,7 +41,7 @@ const SubOrderTitle: React.FC<TSubOrderTitleProps> = () => {
               {
                 orderTitle: (
                   <span className={css.orderTitle}>
-                    #{orderTitle}_{dayIndex === 0 ? 7 : dayIndex}
+                    #{orderTitle}-{dayIndex === 0 ? 7 : dayIndex}
                   </span>
                 ),
               },

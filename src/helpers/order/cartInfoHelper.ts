@@ -353,7 +353,7 @@ export const calculatePriceQuotationInfoFromQuotation = ({
 
   const clientQuotation = client.quotation;
   const partnerQuotation = isPartnerFlow
-    ? pick(partner[partnerId].quotation, date)
+    ? pick(partner[partnerId]?.quotation || {}, date)
     : {};
 
   const {

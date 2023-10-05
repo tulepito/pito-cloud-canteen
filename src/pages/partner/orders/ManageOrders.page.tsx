@@ -21,7 +21,10 @@ import { TableForm } from '@components/Table/Table';
 import Tooltip from '@components/Tooltip/Tooltip';
 import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
 import { parseThousandNumber } from '@helpers/format';
-import { calculatePriceQuotationPartner } from '@helpers/order/cartInfoHelper';
+import {
+  calculatePriceQuotationPartner,
+  vatPercentageBaseOnVatSetting,
+} from '@helpers/order/cartInfoHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { useViewport } from '@hooks/useViewport';
@@ -135,7 +138,7 @@ const TABLE_COLUMN: TColumn[] = [
 
 const parseEntitiesToTableData = (
   subOrders: TObject[],
-  restaurantId: string,
+  _restaurantId: string,
 ) => {
   return subOrders.map((entity) => {
     const {
@@ -147,7 +150,7 @@ const parseEntitiesToTableData = (
       startDate,
       endDate,
       deliveryHour,
-      restaurant,
+      restaurant = {},
       lastTransition,
       isPaid,
       quotation,
@@ -160,17 +163,21 @@ const parseEntitiesToTableData = (
     let totalPrice = 0;
     if (!isEmpty(quotation)) {
       if (!isEmpty(quotation[restaurant.id]?.quotation)) {
-        const vatSettingFromOrder = vatSettings[restaurantId!];
-
+        const vatSettingFromOrder = vatSettings[restaurant?.id];
         const partnerVATSetting =
           vatSettingFromOrder in EPartnerVATSetting
             ? vatSettingFromOrder
             : EPartnerVATSetting.vat;
 
+        const vatPercentage = vatPercentageBaseOnVatSetting({
+          vatSetting: partnerVATSetting,
+          vatPercentage: orderVATPercentage,
+        });
+
         const partnerQuotationBySubOrderDate = calculatePriceQuotationPartner({
           quotation: quotation[restaurant.id].quotation,
           serviceFeePercentage: serviceFees[restaurant.id],
-          currentOrderVATPercentage: orderVATPercentage,
+          currentOrderVATPercentage: vatPercentage,
           subOrderDate: date,
           shouldSkipVAT: partnerVATSetting === EPartnerVATSetting.direct,
         });
