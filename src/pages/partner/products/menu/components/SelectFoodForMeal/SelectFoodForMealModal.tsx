@@ -120,7 +120,6 @@ const SelectFoodForMealModal: React.FC<TSelectFoodForMealModalProps> = ({
 
   const handleOpenFilterFoodModal = () => {
     filterModalControl.setTrue();
-    // onClose();
   };
 
   const handleSubmitFilter = () => {

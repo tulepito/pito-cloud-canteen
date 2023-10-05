@@ -75,6 +75,29 @@ const MealSettingItem = ({
     saveDraftFoodByDate(newFoodByDate);
   };
 
+  const handleRemoveFoodFromMeal = (id: string) => () => {
+    let newFoodByDate = foodByDate;
+
+    if (isDraftEditFlow) {
+      if (foodByDate[meal] && foodByDate[meal][currentDay]) {
+        newFoodByDate = {
+          ...foodByDate,
+          [meal]: {
+            ...foodByDate[meal],
+            [currentDay]: omit(foodByDate[meal][currentDay], id),
+          },
+        };
+      }
+    } else if (foodByDate[currentDay]) {
+      newFoodByDate = {
+        ...foodByDate,
+        [currentDay]: omit(foodByDate[currentDay], id),
+      };
+    }
+
+    saveDraftFoodByDate(newFoodByDate);
+  };
+
   return (
     <div className={css.mealContainer} key={meal}>
       <div className={css.mealHeadContainer}>
@@ -107,7 +130,9 @@ const MealSettingItem = ({
                 <div className={css.foodTitle}>
                   <div>{title}</div>
 
-                  <div className={css.deleteFoodBtn}>
+                  <div
+                    className={css.deleteFoodBtn}
+                    onClick={handleRemoveFoodFromMeal(id)}>
                     <IconClose />
                   </div>
                 </div>
