@@ -53,13 +53,16 @@ const ClientPaymentDetail: React.FC<ClientPaymentDetailProps> = (props) => {
     (state) => state.OrderDetail.deleteClientPaymentRecordInProgress,
   );
 
-  const { isClientSufficientPaid = false } = Listing(order).getMetadata();
+  const { isAdminConfirmedClientPayment = false } =
+    Listing(order).getMetadata();
 
   const companyUser = User(company);
   const { companyName } = companyUser.getPublicData();
 
-  const confirmPaymentDisabled = !!isClientSufficientPaid;
-  const addPaymentDisabled = !!isClientSufficientPaid;
+  const confirmPaymentDisabled =
+    isAdminConfirmedClientPayment || paidAmount === totalWithVAT;
+  const addPaymentDisabled =
+    isAdminConfirmedClientPayment || paidAmount === totalWithVAT;
 
   const onAddClientPaymentRecord = async (
     values: TAddingPaymentRecordFormValues,
@@ -93,7 +96,10 @@ const ClientPaymentDetail: React.FC<ClientPaymentDetailProps> = (props) => {
 
   const handleDeleteClientPaymentRecord = async (paymentRecordId: string) => {
     return dispatch(
-      OrderDetailThunks.deleteClientPaymentRecord(paymentRecordId),
+      OrderDetailThunks.deleteClientPaymentRecord({
+        paymentRecordId,
+        shouldDisapprovePayment: isAdminConfirmedClientPayment,
+      }),
     );
   };
 

@@ -25,9 +25,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         const { isAdminConfirmedClientPayment = false } =
           Listing(orderListing).getMetadata();
 
-        if (isAdminConfirmedClientPayment) {
+        if (!isAdminConfirmedClientPayment) {
           return res.status(EHttpStatusCode.BadRequest).json({
-            error: 'Cannot confirm client payment confirmed order',
+            error: 'Cannot disapprove client payment confirmed order',
           });
         }
 
@@ -36,7 +36,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             {
               id: orderId,
               metadata: {
-                isAdminConfirmedClientPayment: true,
+                isAdminConfirmedClientPayment: false,
               },
             },
             {
@@ -46,7 +46,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         );
 
         return res.status(EHttpStatusCode.Ok).json({
-          message: 'Successfully confirm client payment',
+          message: 'Successfully disapprove client payment',
           order: updateOrderListing,
         });
       }

@@ -22,7 +22,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     const {
       orderStateHistory,
       orderState,
-      isClientSufficientPaid: currIsClientSufficientPaid = false,
+      isAdminConfirmedClientPayment = false,
     } = orderListing.getMetadata();
 
     const plan = await fetchListing(planId);
@@ -150,17 +150,19 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         state.state === EOrderStates.completed,
     );
 
+    const updateIsClientSufficientPaid =
+      isClientPaidAmountEnough || isAdminConfirmedClientPayment;
+    const updateIsPartnerSufficientPaid =
+      isPartnerPaidAmountEnough && isPaymentNumberEqualToSubOrderDateNumber;
+
     await integrationSdk.listings.update({
       id: orderId,
       metadata: {
-        isClientSufficientPaid:
-          currIsClientSufficientPaid || isClientPaidAmountEnough,
-        isPartnerSufficientPaid:
-          isPartnerPaidAmountEnough && isPaymentNumberEqualToSubOrderDateNumber,
+        isClientSufficientPaid: updateIsClientSufficientPaid,
+        isPartnerSufficientPaid: updateIsPartnerSufficientPaid,
         ...(isOrderPendingPayment &&
-        (currIsClientSufficientPaid || isClientPaidAmountEnough) &&
-        isPartnerPaidAmountEnough &&
-        isPaymentNumberEqualToSubOrderDateNumber
+        updateIsClientSufficientPaid &&
+        updateIsPartnerSufficientPaid
           ? {
               orderState: EOrderStates.completed,
               orderStateHistory: [

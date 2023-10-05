@@ -47,6 +47,10 @@ export const confirmClientPaymentApi = (orderId: string) =>
   putApi('/admin/payment/confirm-client-payment', {
     orderId,
   });
+export const disapproveClientPaymentApi = (orderId: string) =>
+  putApi('/admin/payment/disapprove-client-payment', {
+    orderId,
+  });
 
 export const confirmPartnerPaymentApi = ({
   planId,
@@ -56,6 +60,17 @@ export const confirmPartnerPaymentApi = ({
   subOrderDate: string | number;
 }) =>
   putApi('/admin/payment/confirm-partner-payment', {
+    planId,
+    subOrderDate,
+  });
+export const disapprovePartnerPaymentApi = ({
+  planId,
+  subOrderDate,
+}: {
+  planId: string;
+  subOrderDate: string | number;
+}) =>
+  putApi('/admin/payment/disapprove-partner-payment', {
     planId,
     subOrderDate,
   });

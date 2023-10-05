@@ -10,44 +10,49 @@ import { Listing } from '@src/utils/data';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   const apiMethod = req.method;
-  const { orderId } = req.body;
+  const { planId, subOrderDate } = req.body;
   const integrationSdk = getIntegrationSdk();
 
   try {
     switch (apiMethod) {
       case HttpMethod.PUT: {
-        const [orderListing] = denormalisedResponseEntities(
+        const [plan] = denormalisedResponseEntities(
           await integrationSdk.listings.show({
-            id: orderId,
+            id: planId,
           }),
         );
 
-        const { isAdminConfirmedClientPayment = false } =
-          Listing(orderListing).getMetadata();
+        const { orderDetail = {} } = Listing(plan).getMetadata();
 
-        if (isAdminConfirmedClientPayment) {
+        const { isAdminPaymentConfirmed = false } =
+          orderDetail[subOrderDate] || {};
+
+        if (!isAdminPaymentConfirmed) {
           return res.status(EHttpStatusCode.BadRequest).json({
-            error: 'Cannot confirm client payment confirmed order',
+            error: 'Cannot disapprove partner payment unconfirmed order',
           });
         }
 
-        const [updateOrderListing] = denormalisedResponseEntities(
-          await integrationSdk.listings.update(
-            {
-              id: orderId,
-              metadata: {
-                isAdminConfirmedClientPayment: true,
-              },
+        const updateOrderDetail = {
+          ...orderDetail,
+          [subOrderDate]: {
+            ...orderDetail[subOrderDate],
+            isAdminPaymentConfirmed: false,
+          },
+        };
+
+        denormalisedResponseEntities(
+          await integrationSdk.listings.update({
+            id: planId,
+            metadata: {
+              orderDetail: updateOrderDetail,
             },
-            {
-              expand: true,
-            },
-          ),
+          }),
         );
 
         return res.status(EHttpStatusCode.Ok).json({
-          message: 'Successfully confirm client payment',
-          order: updateOrderListing,
+          message: 'Successfully disapprove partner payment',
+          orderDetail: updateOrderDetail,
         });
       }
       default:

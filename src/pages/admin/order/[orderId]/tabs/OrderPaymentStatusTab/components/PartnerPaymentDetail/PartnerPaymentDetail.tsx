@@ -65,7 +65,8 @@ const PartnerPaymentDetail: React.FC<PartnerPaymentDetailProps> = (props) => {
   const { isAdminPaymentConfirmed = false } = orderDetail[subOrderDate] || {};
   const confirmPaymentDisabled =
     !!isAdminPaymentConfirmed || totalWithVAT === paidAmount;
-  const addPaymentDisabled = !!isAdminPaymentConfirmed;
+  const addPaymentDisabled =
+    !!isAdminPaymentConfirmed || totalWithVAT === paidAmount;
 
   const handleAddPartnerPaymentRecord = async (
     values: TAddingPaymentRecordFormValues,
@@ -107,7 +108,11 @@ const PartnerPaymentDetail: React.FC<PartnerPaymentDetailProps> = (props) => {
 
   const handleDeletePartnerPaymentRecord = async (paymentRecordId: string) => {
     return dispatch(
-      OrderDetailThunks.deletePartnerPaymentRecord(paymentRecordId),
+      OrderDetailThunks.deletePartnerPaymentRecord({
+        paymentRecordId,
+        subOrderDate,
+        shouldDisapprovePayment: isAdminPaymentConfirmed,
+      }),
     );
   };
 

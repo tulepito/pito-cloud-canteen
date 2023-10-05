@@ -201,8 +201,7 @@ const OrderPaymentStatusTab: React.FC<OrderPaymentStatusTabProps> = (props) => {
 
   const clientPaidAmount =
     calculatePaidAmountBySubOrderDate(clientPaymentRecords);
-  const showClientCheckmark =
-    isClientSufficientPaid || clientTotalPrice === clientPaidAmount;
+  const showClientCheckmark = isClientSufficientPaid;
 
   const clientTabItem = {
     key: 'client',

@@ -123,7 +123,9 @@ const AddingPaymentRecordFormComponent: React.FC<
       if (percentage === 100) {
         form.change(
           'paymentAmount',
-          parseThousandNumber(totalPrice - paidAmount),
+          parseThousandNumber(
+            paidAmount < totalPrice ? totalPrice - paidAmount : totalPrice,
+          ),
         );
       } else {
         form.change(
