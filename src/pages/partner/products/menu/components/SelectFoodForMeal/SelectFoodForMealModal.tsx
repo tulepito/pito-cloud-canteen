@@ -58,6 +58,7 @@ const SelectFoodForMealModal: React.FC<TSelectFoodForMealModalProps> = ({
   const shouldClearFilterFormControl = useBoolean();
   const filterFormValidControl = useBoolean();
   const [filterValues, setFilterValues] = useState({});
+  const [submittedFilterValues, setSubmittedFilterValues] = useState({});
   const [selectedFoodIds, setSelectedFoodIds] = useState<string[]>([]);
   const isEmptyFoodList = foods?.length === 0;
 
@@ -123,9 +124,20 @@ const SelectFoodForMealModal: React.FC<TSelectFoodForMealModalProps> = ({
   };
 
   const handleSubmitFilter = () => {
+    setSubmittedFilterValues(filterValues);
+    filterModalControl.setFalse();
+  };
+
+  const handleClearFilter = () => {
+    shouldClearFilterFormControl.setTrue();
+    setFilterValues({});
+    setSubmittedFilterValues({});
+  };
+
+  useEffect(() => {
     if (restaurantId && isOpen) {
       const { startPrice, endPrice, foodType, createAtStart, createAtEnd } =
-        (filterValues || {}) as TObject;
+        (submittedFilterValues || {}) as TObject;
 
       const priceFilterMaybe =
         startPrice || endPrice
@@ -160,36 +172,12 @@ const SelectFoodForMealModal: React.FC<TSelectFoodForMealModalProps> = ({
         }),
       );
     }
-
-    filterModalControl.setFalse();
-  };
-
-  const handleClearFilter = () => {
-    shouldClearFilterFormControl.setTrue();
-    setFilterValues({});
-
-    if (restaurantId && isOpen && !isEmpty(filterValues)) {
-      dispatch(
-        foodSliceThunks.queryPartnerFoods({
-          restaurantId,
-          page: 1,
-          keywords: keywordsField.input.value,
-        }),
-      );
-    }
-  };
-
-  useEffect(() => {
-    if (restaurantId && isOpen) {
-      dispatch(
-        foodSliceThunks.queryPartnerFoods({
-          restaurantId,
-          page: 1,
-          keywords: keywordsField.input.value,
-        }),
-      );
-    }
-  }, [isOpen, restaurantId, keywordsField.input.value]);
+  }, [
+    isOpen,
+    restaurantId,
+    keywordsField.input.value,
+    JSON.stringify(submittedFilterValues),
+  ]);
   useEffect(() => {
     setSelectedFoodIds(currentFoodIds);
   }, [JSON.stringify(currentFoodIds)]);
