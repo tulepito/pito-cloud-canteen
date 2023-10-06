@@ -79,6 +79,9 @@ function BookerDraftOrderPage() {
   const fetchRestaurantFoodInProgress = useAppSelector(
     (state) => state.BookerSelectRestaurant.fetchRestaurantFoodInProgress,
   );
+  const isAllDatesHaveNoRestaurants = useAppSelector(
+    (state) => state.Order.isAllDatesHaveNoRestaurants,
+  );
   const searchInProgress = useAppSelector(
     (state) => state.BookerSelectRestaurant.searchInProgress,
   );
@@ -184,7 +187,7 @@ function BookerDraftOrderPage() {
     isFinishOrderDisabled,
     handleFinishOrder,
     order,
-    shouldHideDayItems: isEmpty(orderDetail),
+    shouldHideDayItems: isAllDatesHaveNoRestaurants,
   });
 
   useEffect(() => {
@@ -297,7 +300,7 @@ function BookerDraftOrderPage() {
               components={componentsProps}
             />
 
-            <RenderWhen condition={isEmpty(orderDetail)}>
+            <RenderWhen condition={isAllDatesHaveNoRestaurants}>
               <div className={css.emptyResult}>
                 <div className={css.emptyResultImg}>
                   <Image src={emptyResultImg} alt="empty result" />

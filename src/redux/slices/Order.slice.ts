@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
+import compact from 'lodash/compact';
 import isNumber from 'lodash/isNumber';
 import isString from 'lodash/isString';
 import uniq from 'lodash/uniq';
@@ -114,6 +115,7 @@ type TOrderInitialState = {
   fetchRestaurantCoverImageInProgress: boolean;
   fetchRestaurantCoverImageError: any;
 
+  isAllDatesHaveNoRestaurants: boolean;
   recommendRestaurantInProgress: boolean;
   recommendRestaurantError: any;
 
@@ -238,6 +240,7 @@ const initialState: TOrderInitialState = {
   fetchRestaurantCoverImageInProgress: false,
   fetchRestaurantCoverImageError: null,
 
+  isAllDatesHaveNoRestaurants: false,
   recommendRestaurantInProgress: false,
   recommendRestaurantError: null,
   step2SubmitInProgress: false,
@@ -641,9 +644,10 @@ const fetchRestaurantCoverImages = createAsyncThunk(
   FETCH_RESTAURANT_COVER_IMAGE,
   async (_, { extra: sdk, getState }) => {
     const { orderDetail = {} } = getState().Order;
-    const restaurantIdList = uniq(
-      Object.values(orderDetail).map((item: any) => item.restaurant.id),
+    const restaurantIdList = compact(
+      uniq(Object.values(orderDetail).map((item: any) => item?.restaurant?.id)),
     );
+
     const restaurantCoverImageList = await Promise.all(
       restaurantIdList.map(async (restaurantId) => {
         const restaurantResponse = denormalisedResponseEntities(
@@ -1317,10 +1321,12 @@ const orderSlice = createSlice({
         recommendRestaurantInProgress: true,
         recommendRestaurantError: null,
       }))
-      .addCase(recommendRestaurants.fulfilled, (state) => ({
-        ...state,
-        recommendRestaurantInProgress: false,
-      }))
+      .addCase(recommendRestaurants.fulfilled, (state, { payload }) => {
+        state.isAllDatesHaveNoRestaurants = Object.values(payload).every(
+          ({ hasNoRestaurants = false }: any) => hasNoRestaurants,
+        );
+        state.recommendRestaurantInProgress = false;
+      })
       .addCase(recommendRestaurants.rejected, (state, { error }) => ({
         ...state,
         recommendRestaurantInProgress: false,

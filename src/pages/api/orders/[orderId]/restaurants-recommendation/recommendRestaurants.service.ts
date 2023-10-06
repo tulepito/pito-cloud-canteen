@@ -261,6 +261,12 @@ export const recommendRestaurants = async ({
               ).getPublicData()?.phoneNumber,
             },
             ...lineItemsMaybe,
+            hasNoRestaurants: false,
+          };
+        } else {
+          orderDetail[dateTime] = {
+            ...lineItemsMaybe,
+            hasNoRestaurants: false,
           };
         }
       } else {
