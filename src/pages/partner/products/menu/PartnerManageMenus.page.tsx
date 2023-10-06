@@ -9,10 +9,12 @@ import Button from '@components/Button/Button';
 import { FieldTextInputComponent } from '@components/FormFields/FieldTextInput/FieldTextInput';
 import IconEmpty from '@components/Icons/IconEmpty/IconEmpty';
 import IconSearch from '@components/Icons/IconSearch/IconSearch';
+import LoadingModal from '@components/LoadingModal/LoadingModal';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import type { TTabsItem } from '@components/Tabs/Tabs';
 import Tabs from '@components/Tabs/Tabs';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import useBoolean from '@hooks/useBoolean';
 import { partnerPaths } from '@src/paths';
 import { Listing } from '@src/utils/data';
 import { EMenuMealType, MENU_MEAL_TYPE_OPTIONS } from '@src/utils/enums';
@@ -31,11 +33,15 @@ type TPartnerManageMenusPageProps = {};
 const PartnerManageMenusPage: React.FC<TPartnerManageMenusPageProps> = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
+  const firstLoadControl = useBoolean(true);
   const [searchTitle, setSearchTitle] = useState('');
   const [currentTab, setCurrentTab] = useState<string | EMenuMealType>(
     EMenuMealType.breakfast,
   );
   const menus = useAppSelector((state) => state.PartnerManageMenus.menus);
+  const fetchMenusInProgress = useAppSelector(
+    (state) => state.PartnerManageMenus.fetchMenusInProgress,
+  );
   const { form } = useForm({
     initialValues: {},
     onSubmit: () => {},
@@ -82,7 +88,7 @@ const PartnerManageMenusPage: React.FC<TPartnerManageMenusPageProps> = () => {
       );
 
       const tabChildren = (
-        <div>
+        <RenderWhen condition={!fetchMenusInProgress}>
           <RenderWhen condition={menusForTab.length > 0}>
             {menusForTab.map((m: TListing) => {
               return <MenuCard key={m?.id?.uuid} menu={m} />;
@@ -100,7 +106,7 @@ const PartnerManageMenusPage: React.FC<TPartnerManageMenusPageProps> = () => {
               </div>
             </RenderWhen.False>
           </RenderWhen>
-        </div>
+        </RenderWhen>
       );
 
       return {
@@ -109,7 +115,7 @@ const PartnerManageMenusPage: React.FC<TPartnerManageMenusPageProps> = () => {
         children: tabChildren,
       };
     });
-  }, [currentTab, JSON.stringify(menus)]);
+  }, [fetchMenusInProgress, currentTab, JSON.stringify(menus)]);
 
   const debounceFn = useCallback(
     debounce(
@@ -120,21 +126,24 @@ const PartnerManageMenusPage: React.FC<TPartnerManageMenusPageProps> = () => {
             keywords: searchTitle || '',
           }),
         ),
-      DEBOUNCE_TIME,
+      firstLoadControl.value ? 0 : DEBOUNCE_TIME,
     ),
-    [],
+    [firstLoadControl.value],
   );
 
   useEffect(() => {
     setSearchTitle(titleField.input.value);
   }, [titleField.input.value]);
-
   useEffect(() => {
     debounceFn(searchTitle);
   }, [searchTitle]);
+  useEffect(() => {
+    firstLoadControl.setFalse();
+  }, []);
 
   return (
     <div className={css.root}>
+      <LoadingModal isOpen={fetchMenusInProgress} />
       <Tabs
         items={tabItems}
         onChange={handleTabChanged}
