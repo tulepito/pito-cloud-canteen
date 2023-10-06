@@ -27,6 +27,12 @@ import {
 import type { TListing } from '@src/utils/types';
 import { denormalisedResponseEntities, Listing, User } from '@utils/data';
 
+const ENABLE_INVITE_PERMISSION = [
+  UserPermission.PARTICIPANT,
+  UserPermission.BOOKER,
+  UserPermission.ACCOUNTANT,
+];
+
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   const sdk = getSdk(req, res);
   const integrationSdk = getIntegrationSdk();
@@ -45,7 +51,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
     if (
       userCompany[userId] &&
-      userCompany[userId].permission === UserPermission.PARTICIPANT
+      ENABLE_INVITE_PERMISSION.includes(userCompany[userId].permission)
     ) {
       return res.json({
         message: 'userAccept',
@@ -55,7 +61,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     const companyUser = User(companyAccount);
     const { companyName } = companyUser.getPublicData();
     const { members = {} } = companyUser.getMetadata();
-    const userMember = members[userEmail];
+    const userMember = members[userEmail] || {};
 
     if (isEmpty(userMember)) {
       return res.json({
@@ -85,7 +91,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           company: {
             ...userCompany,
             [companyId]: {
-              permission: UserPermission.PARTICIPANT,
+              permission: userMember.permission || UserPermission.PARTICIPANT,
             },
           },
         },
