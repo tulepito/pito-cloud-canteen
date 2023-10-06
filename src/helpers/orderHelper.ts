@@ -9,7 +9,11 @@ import {
   MORNING_SESSION,
 } from '@components/CalendarDashboard/helpers/constant';
 import { Listing } from '@utils/data';
-import { generateTimeRangeItems, renderDateRange } from '@utils/dates';
+import {
+  generateTimeRangeItems,
+  renderDateRange,
+  renderListTimeOptions,
+} from '@utils/dates';
 import {
   EBookerOrderDraftStates,
   EFoodTypes,
@@ -140,10 +144,12 @@ export const orderDataCheckers = (order: TListing) => {
     deliveryAddress,
     orderType,
   } = Listing(order).getMetadata();
-  const timeOptions = generateTimeRangeItems({});
+  const timeRangeOptions = generateTimeRangeItems({});
+  const timeOptions = renderListTimeOptions({});
   const minStartTimeStamp = findMinStartDate().getTime();
   const minDeadlineTimeStamp = findMinDeadlineDate().getTime();
   const isNormalOrder = orderType === EOrderType.normal;
+  const timeRangeOptionsValues = timeRangeOptions.map(({ key }) => key);
   const timeOptionsValues = timeOptions.map(({ key }) => key);
 
   const checkers = {
@@ -157,7 +163,7 @@ export const orderDataCheckers = (order: TListing) => {
       Number.isInteger(startDate) && minStartTimeStamp <= (startDate || 0),
     isEndDateValid:
       Number.isInteger(endDate) && (endDate || 0) >= (startDate || 0),
-    isDeliveryHourValid: timeOptionsValues.includes(deliveryHour),
+    isDeliveryHourValid: timeRangeOptionsValues.includes(deliveryHour),
     isDeadlineHourValid:
       isNormalOrder || timeOptionsValues.includes(deadlineHour),
     isPackagePerMemberValid: Number.isInteger(packagePerMember),
