@@ -99,6 +99,11 @@ const MenuCard: React.FC<TMenuCardProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isActiveValue, listingState]);
 
+  const handleMenuCardClick = (event: any) => {
+    event.stopPropagation();
+    router.push({ pathname: partnerPaths.EditMenu, query: { menuId } });
+  };
+
   const handleEditMenuClick = () => {
     router.push({ pathname: partnerPaths.EditMenu, query: { menuId } });
   };
@@ -131,11 +136,11 @@ const MenuCard: React.FC<TMenuCardProps> = ({
 
   return (
     <div className={css.root}>
-      <div className={css.titleContainer}>
+      <div className={css.titleContainer} onClick={handleMenuCardClick}>
         <div>{menuName}</div>
         <IconArrow className={css.arrowIcon} direction="right" />
       </div>
-      <div className={css.infoContainer}>
+      <div className={css.infoContainer} onClick={handleMenuCardClick}>
         <div className={css.timeContainer}>
           <IconClock />
 
