@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useField, useForm } from 'react-final-form-hooks';
 import { shallowEqual } from 'react-redux';
 import isEmpty from 'lodash/isEmpty';
@@ -13,6 +13,7 @@ import RenderWhen from '@components/RenderWhen/RenderWhen';
 import SlideModal from '@components/SlideModal/SlideModal';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
+import { useViewport } from '@hooks/useViewport';
 import { foodSliceThunks } from '@redux/slices/foods.slice';
 import { currentUserSelector } from '@redux/slices/user.slice';
 import { partnerPaths } from '@src/paths';
@@ -52,8 +53,15 @@ const SelectFoodForMealModal: React.FC<TSelectFoodForMealModalProps> = ({
 }) => {
   const router = useRouter();
   const dispatch = useAppDispatch();
+  const { isMobileLayout } = useViewport();
   const currentUser = useAppSelector(currentUserSelector);
   const foods = useAppSelector((state) => state.foods.foods, shallowEqual);
+  const { totalPages = 1 } = useAppSelector((state) => {
+    const pagination = state.foods.managePartnerFoodPagination;
+
+    return pagination === null ? {} : pagination;
+  }, shallowEqual);
+  const [page, setPage] = useState(1);
   const filterModalControl = useBoolean();
   const shouldClearFilterFormControl = useBoolean();
   const filterFormValidControl = useBoolean();
@@ -134,6 +142,11 @@ const SelectFoodForMealModal: React.FC<TSelectFoodForMealModalProps> = ({
     setSubmittedFilterValues({});
   };
 
+  const setPageCallBack = useCallback(() => {
+    setPage((p) =>
+      isMobileLayout ? (p + 1 > totalPages ? totalPages : p + 1) : p,
+    );
+  }, [page, totalPages, isMobileLayout]);
   useEffect(() => {
     if (restaurantId && isOpen) {
       const { startPrice, endPrice, foodType, createAtStart, createAtEnd } =
@@ -152,8 +165,9 @@ const SelectFoodForMealModal: React.FC<TSelectFoodForMealModalProps> = ({
 
       dispatch(
         foodSliceThunks.queryPartnerFoods({
+          isMobileLayout,
           restaurantId,
-          page: 1,
+          page,
           keywords: keywordsField.input.value,
           ...priceFilterMaybe,
           ...(foodType ? { pub_foodType: foodType } : {}),
@@ -174,6 +188,8 @@ const SelectFoodForMealModal: React.FC<TSelectFoodForMealModalProps> = ({
     }
   }, [
     isOpen,
+    isMobileLayout,
+    page,
     restaurantId,
     keywordsField.input.value,
     JSON.stringify(submittedFilterValues),
@@ -211,6 +227,7 @@ const SelectFoodForMealModal: React.FC<TSelectFoodForMealModalProps> = ({
             onSubmit={handleSubmit}
             initialValues={{ food: currentFoodIds }}
             setSelectedFoodIds={setSelectedFoodIds}
+            setPageCallBack={setPageCallBack}
           />
         )}
 

@@ -7,6 +7,7 @@ import arrayMutators from 'final-form-arrays';
 import Form from '@components/Form/Form';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useAppSelector } from '@hooks/reduxHooks';
+import { useBottomScroll } from '@hooks/useBottomScroll';
 import { Listing } from '@src/utils/data';
 import type { TListing } from '@src/utils/types';
 
@@ -26,7 +27,11 @@ export type TSelectFoodForMealFormValues = {
   checkAll: boolean;
 };
 
-type TExtraProps = { formId: string; setSelectedFoodIds: (value: any) => void };
+type TExtraProps = {
+  formId: string;
+  setSelectedFoodIds: (value: any) => void;
+  setPageCallBack: () => void;
+};
 type TSelectFoodForMealFormComponentProps =
   FormRenderProps<TSelectFoodForMealFormValues> & Partial<TExtraProps>;
 type TSelectFoodForMealFormProps = FormProps<TSelectFoodForMealFormValues> &
@@ -41,6 +46,7 @@ const SelectFoodForMealFormComponent: React.FC<
     formId,
     values: { food: selectedFoodIds = [] },
     setSelectedFoodIds,
+    setPageCallBack,
   } = props;
   const foods = useAppSelector((state) => state.foods.foods, shallowEqual);
 
@@ -78,6 +84,18 @@ const SelectFoodForMealFormComponent: React.FC<
     setTimeout(() => form.change('food', newFoodList), DELAY_UPDATE_TIME);
   };
 
+  useBottomScroll(setPageCallBack!);
+
+  const handleScroll = (e: any) => {
+    const bottom =
+      Math.floor(e.target.scrollHeight - e.target.scrollTop) >=
+      Math.floor(e.target.clientHeight);
+
+    if (bottom && setPageCallBack) {
+      setPageCallBack();
+    }
+  };
+
   useEffect(() => {
     if (
       foodOptions?.length === 0 ||
@@ -95,7 +113,11 @@ const SelectFoodForMealFormComponent: React.FC<
   }, [foodOptions.length, JSON.stringify(selectedFoodIds)]);
 
   return (
-    <Form id={formId} className={css.root} onSubmit={customHandleSubmit}>
+    <Form
+      id={formId}
+      className={css.root}
+      onSubmit={customHandleSubmit}
+      onScroll={handleScroll}>
       <RenderWhen condition={!isEmptyFoodList}>
         <FieldFoodSelectAll
           id={`SelectFoodForMealForm.food.checkAll`}

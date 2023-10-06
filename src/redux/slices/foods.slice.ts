@@ -1,11 +1,14 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 import { createSlice } from '@reduxjs/toolkit';
+import chunk from 'lodash/chunk';
+import flatten from 'lodash/flatten';
 import omit from 'lodash/omit';
 import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
 
 import { getAttributesApi } from '@apis/admin';
 import { partnerFoodApi } from '@apis/foodApi';
+import { queryAllPages } from '@helpers/apiHelpers';
 import { getImportDataFromCsv } from '@pages/admin/partner/[restaurantId]/settings/food/utils';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { denormalisedResponseEntities } from '@utils/data';
@@ -137,14 +140,21 @@ const queryMenuPickedFoods = createAsyncThunk(
   QUERY_MENU_PICKED_FOODS,
   async (payload: any, { extra: sdk }) => {
     const { restaurantId, ids } = payload;
-    const response = await sdk.listings.query({
-      ids,
-      meta_listingType: EListingType.food,
-      meta_restaurantId: restaurantId,
-      meta_isDeleted: false,
-    });
+    const response = await Promise.all(
+      chunk(ids, 100).map(async (_ids) =>
+        queryAllPages({
+          sdkModel: sdk.listings,
+          query: {
+            ids: _ids,
+            meta_listingType: EListingType.food,
+            meta_restaurantId: restaurantId,
+            meta_isDeleted: false,
+          },
+        }),
+      ),
+    );
 
-    const foods = denormalisedResponseEntities(response);
+    const foods = flatten(response);
 
     return foods;
   },
@@ -156,7 +166,8 @@ const queryMenuPickedFoods = createAsyncThunk(
 const queryPartnerFoods = createAsyncThunk(
   QUERY_PARTNER_FOODS,
   async (payload: any, { extra: sdk }) => {
-    const { restaurantId, ...rest } = payload;
+    const { isMobileLayout = false, restaurantId, ...rest } = payload;
+
     const response = await sdk.listings.query({
       ...rest,
       meta_listingType: EListingType.food,
@@ -168,7 +179,11 @@ const queryPartnerFoods = createAsyncThunk(
     });
     const foods = denormalisedResponseEntities(response);
 
-    return { foods, managePartnerFoodPagination: response.data.meta };
+    return {
+      isMobileLayout,
+      foods,
+      managePartnerFoodPagination: response.data.meta,
+    };
   },
   {
     serializeError: storableError,
@@ -548,7 +563,9 @@ const foodSlice = createSlice({
       .addCase(queryPartnerFoods.fulfilled, (state, { payload }) => ({
         ...state,
         queryFoodsInProgress: false,
-        foods: payload.foods,
+        foods: payload.isMobileLayout
+          ? state.foods.concat(payload.foods)
+          : payload.foods,
         managePartnerFoodPagination: payload.managePartnerFoodPagination,
       }))
       .addCase(queryPartnerFoods.rejected, (state, { payload }) => ({
