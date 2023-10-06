@@ -93,7 +93,7 @@ const FilterFormComponent: React.FC<TFilterFormComponentProps> = (props) => {
           <FieldTextInput
             name="startPrice"
             id="startPrice"
-            placeholder={'Đến'}
+            placeholder={'Từ'}
             inputClassName={css.inputWithSuffix}
             rightIcon={
               <div>
@@ -105,7 +105,7 @@ const FilterFormComponent: React.FC<TFilterFormComponentProps> = (props) => {
           <FieldTextInput
             name="endPrice"
             id="endPrice"
-            placeholder={'Từ'}
+            placeholder={'Đến'}
             inputClassName={css.inputWithSuffix}
             rightIcon={
               <div>
