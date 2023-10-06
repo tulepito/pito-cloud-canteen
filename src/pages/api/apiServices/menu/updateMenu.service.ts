@@ -49,7 +49,6 @@ const updateMenu = async (
   );
 
   const [menu] = denormalisedResponseEntities(menuResponse);
-
   const {
     daysOfWeek: daysOfWeekFromMenu = [],
     foodsByDate: foodsByDateFromMenu = {},
@@ -106,11 +105,9 @@ const updateMenu = async (
       : foodsByDate
       ? createListFoodIdsByFoodsByDate(foodsByDate)
       : {};
-
   const foodTypesByDayOfWeek = await createListFoodTypeByFoodIds(
     listFoodIdsByDate,
   );
-
   const response = await integrationSdk.listings.update(
     {
       id: menuId,
@@ -196,7 +193,6 @@ const updateMenu = async (
   );
 
   const [newMenu] = denormalisedResponseEntities(response);
-
   await updateMenuIdListAndMenuWeekDayListForFood(newMenu);
 
   return response;

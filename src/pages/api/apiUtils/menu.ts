@@ -1,3 +1,5 @@
+import isEmpty from 'lodash/isEmpty';
+
 import { denormalisedResponseEntities } from '@services/data';
 import { getIntegrationSdk } from '@services/sdk';
 import { getUniqueString, Listing } from '@src/utils/data';
@@ -145,6 +147,10 @@ export const createListFoodTypeByFoodIds = async (listFoodIdsByDate: any) => {
   const listFoodTypesByDay = await new Promise((resolve, reject) => {
     let result = {};
     const dayKeyAsArray = Object.keys(listFoodIdsByDate);
+
+    if (isEmpty(dayKeyAsArray)) {
+      resolve(null);
+    }
     dayKeyAsArray.map(async (key, index) => {
       try {
         const substringKey = key.substring(0, 3);

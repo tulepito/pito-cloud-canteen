@@ -11,6 +11,7 @@ import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import IconCheckmarkWithCircle from '@components/Icons/IconCheckmark/IconCheckmarkWithCircle';
 import IconDangerWithCircle from '@components/Icons/IconDangerWithCircle/IconDangerWithCircle';
+import LoadingModal from '@components/LoadingModal/LoadingModal';
 import MobileBottomContainer from '@components/MobileBottomContainer/MobileBottomContainer';
 import AlertModal from '@components/Modal/AlertModal';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
@@ -120,6 +121,9 @@ const CreateEditMenuLayout: React.FC<TCreateEditMenuLayoutProps> = () => {
 
   const [currStep, setCurrStep] = useState(EEditPartnerMenuMobileStep.info);
   const menu = useAppSelector((state) => state.PartnerManageMenus.menu);
+  const loadMenuDataInProgress = useAppSelector(
+    (state) => state.PartnerManageMenus.loadMenuDataInProgress,
+  );
   const createDraftMenuInProgress = useAppSelector(
     (state) => state.PartnerManageMenus.createDraftMenuInProgress,
   );
@@ -294,9 +298,10 @@ const CreateEditMenuLayout: React.FC<TCreateEditMenuLayoutProps> = () => {
 
   return (
     <div className={css.root}>
+      <LoadingModal isOpen={loadMenuDataInProgress} />
+
       <div className={css.titleContainer}>
         <IconArrow direction="left" onClick={handleNavigateToMenuPage} />
-
         <RenderWhen condition={isRouterReady}>
           {menuIdFromRouter || menuIdFromSearch ? 'Chỉnh sửa menu' : 'Tạo menu'}
         </RenderWhen>

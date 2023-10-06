@@ -35,7 +35,7 @@ const PartnerManageMenusPage: React.FC<TPartnerManageMenusPageProps> = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const firstLoadControl = useBoolean(true);
-  const confirmDeletedMenuControl = useBoolean(true);
+  const confirmDeletedMenuControl = useBoolean();
   const [searchTitle, setSearchTitle] = useState('');
   const [currentTab, setCurrentTab] = useState<string | EMenuMealType>(
     EMenuMealType.breakfast,

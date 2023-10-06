@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/router';
 
@@ -5,7 +6,10 @@ import MetaWrapper from '@components/MetaWrapper/MetaWrapper';
 import { useAppDispatch } from '@hooks/reduxHooks';
 
 import CreateEditMenuLayout from '../components/CreateEditMenuLayout';
-import { PartnerManageMenusThunks } from '../PartnerManageMenus.slice';
+import {
+  PartnerManageMenusActions,
+  PartnerManageMenusThunks,
+} from '../PartnerManageMenus.slice';
 
 const PartnerEditMenuRoute = () => {
   const router = useRouter();
@@ -20,8 +24,13 @@ const PartnerEditMenuRoute = () => {
     dispatch(
       PartnerManageMenusThunks.loadMenuData({ menuId: menuId as string }),
     );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isReady]);
+
+  useEffect(() => {
+    return () => {
+      dispatch(PartnerManageMenusActions.clearLoadedMenuData());
+    };
+  }, []);
 
   return (
     <MetaWrapper routeName="PartnerEditMenuRoute">

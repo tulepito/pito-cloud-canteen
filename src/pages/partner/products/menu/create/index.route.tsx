@@ -23,7 +23,9 @@ const PartnerCreateMenuRoute = () => {
   }, [menuId]);
 
   useEffect(() => {
-    dispatch(PartnerManageMenusActions.clearLoadedMenuData());
+    return () => {
+      dispatch(PartnerManageMenusActions.clearLoadedMenuData());
+    };
   }, []);
 
   return (
