@@ -547,6 +547,9 @@
   "EditPartnerFoodForm.unitPlaceholder": "Nhập",
   "EditPartnerFoodForm.unitRequired": "Vui lòng nhập đơn vị tính",
   "EditPartnerFoodForm.updateBtn": "Cập nhật",
+  "EditPartnerFoodForm.minOrderNumberInAdvancePlaceholder": "Nhập số lượng đặt tối thiểu",
+  "EditPartnerFoodForm.minOrderNumberInAdvanceRequired": "Vui lòng nhập số lượng đặt tối thiểu",
+  "EditPartnerFoodForm.minOrderNumberInAdvanceInvalid": "Số lượng đặt tối thiểu không hợp lệ",
   "EditPartnerForm.addressLabel": "Địa chỉ",
   "EditPartnerForm.addressPlaceholder": "Địa chỉ",
   "EditPartnerForm.bagasseBox": "Hộp bã mía",
@@ -1734,5 +1737,8 @@
   "UserPermission.accountant": "Kế toán viên",
   "UserPermission.booker": "Booker",
   "UserPermission.owner": "Quản trị viên",
+  "PartnerCreateFoodTab.foodBasicInfo.label": "Thông tin cơ bản",
+  "PartnerCreateFoodTab.foodDetailInfo.label": "Chi tiết món ăn",
+  "PartnerCreateFoodTab.foodAdditionalInfo.label": "Thông tin thêm",
   "UserPermission.participant": "Thành viên"
 }

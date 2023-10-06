@@ -1,0 +1,102 @@
+import {
+  FOOD_TYPE_OPTIONS,
+  getLabelByKey,
+  MENU_OPTIONS,
+  SIDE_DISH_OPTIONS,
+  SPECIAL_DIET_OPTIONS,
+} from '@src/utils/enums';
+import type { TIntegrationListing } from '@src/utils/types';
+
+export const parseEntitiesToTableData = (
+  foods: TIntegrationListing[],
+  extraData: any,
+  categoryOptions: any,
+) => {
+  return foods.map((food) => {
+    return {
+      key: food.id.uuid,
+      data: {
+        isDeleted: food.attributes.metadata.isDeleted,
+        title: food.attributes.title,
+        description: food.attributes.description,
+        id: food.id.uuid,
+        menuType: getLabelByKey(
+          MENU_OPTIONS,
+          food.attributes.publicData.menuType,
+        ),
+        category: getLabelByKey(
+          categoryOptions,
+          food.attributes.publicData.category,
+        ),
+        foodType: getLabelByKey(
+          FOOD_TYPE_OPTIONS,
+          food.attributes.publicData.foodType,
+        ),
+        ...extraData,
+      },
+    };
+  });
+};
+
+export const parseEntitiesToExportCsv = (
+  foods: TIntegrationListing[],
+  ids: string[],
+  packagingOptions: any,
+  categoryOptions: any,
+) => {
+  const filteredFoods =
+    ids.length > 0 ? foods.filter((food) => ids.includes(food.id.uuid)) : foods;
+
+  const foodsToExport = filteredFoods.map((food) => {
+    const {
+      publicData = {},
+      description,
+      title,
+      price,
+    } = food.attributes || {};
+    const {
+      sideDishes = [],
+      specialDiets = [],
+      category,
+      foodType,
+      menuType,
+      allergicIngredients = [],
+      maxQuantity,
+      minOrderHourInAdvance,
+      minQuantity,
+      notes,
+      unit,
+      numberOfMainDishes,
+      packaging,
+    } = publicData;
+
+    return {
+      'Mã món': food.id.uuid,
+      'Tên món ăn': title,
+      'Mô tả': description,
+      'Đơn giá': `${price?.amount} VND`,
+      'Thành phần dị ứng': allergicIngredients.join(','),
+      'Chất liệu bao bì': getLabelByKey(packagingOptions, packaging),
+      'Phong cách ẩm thực': getLabelByKey(categoryOptions, category),
+      'Loại món ăn': getLabelByKey(FOOD_TYPE_OPTIONS, foodType),
+      'Loại menu': getLabelByKey(MENU_OPTIONS, menuType),
+      'Món ăn kèm': sideDishes
+        .map((key: string) => getLabelByKey(SIDE_DISH_OPTIONS, key))
+        .join(','),
+      'Chế độ dinh dưỡng đặc biệt': specialDiets
+        .map((key: string) => getLabelByKey(SPECIAL_DIET_OPTIONS, key))
+        .join(','),
+      'Số nguời tối đa': maxQuantity,
+      'Giờ đặt trước tối thiểu': minOrderHourInAdvance,
+      'Số lượng tối thiểu': minQuantity,
+      'Ghi chú': notes,
+      'Đơn vị tính': unit,
+      'Số món chính': numberOfMainDishes,
+      'Hình ảnh': food.images?.map(
+        (image) => image.attributes.variants['square-small2x'].url,
+      ),
+    };
+  });
+
+  return foodsToExport;
+};

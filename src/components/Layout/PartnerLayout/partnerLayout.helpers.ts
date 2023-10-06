@@ -5,6 +5,7 @@ const HIDING_PARTNER_HEADER_PATHNAMES = [
   partnerPaths.ManageOrders,
   partnerPaths.ManageFood,
   partnerPaths.ManageMenus,
+  partnerPaths.CreateFood,
 ];
 
 export const shouldShowPartnerHeader = (pathName: string) => {

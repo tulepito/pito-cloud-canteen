@@ -93,7 +93,7 @@ export const FieldDropdownSelectComponent: React.FC<TFieldDropdownSelect> = (
         <div className={labelWrapperClasses}>
           <label htmlFor={id} className={labelClasses}>
             {label}
-            {required && <span>*</span>}
+            {required && <span className={css.requiredStar}>*</span>}
           </label>
         </div>
       ) : null}

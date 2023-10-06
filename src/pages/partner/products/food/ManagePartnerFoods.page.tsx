@@ -32,21 +32,20 @@ import type { TColumn } from '@components/Table/Table';
 import { TableForm } from '@components/Table/Table';
 import Tabs from '@components/Tabs/Tabs';
 import Tooltip from '@components/Tooltip/Tooltip';
+import {
+  parseEntitiesToExportCsv,
+  parseEntitiesToTableData,
+} from '@helpers/food';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import KeywordSearchForm from '@pages/admin/partner/components/KeywordSearchForm/KeywordSearchForm';
 import { partnerPaths } from '@src/paths';
 import { Listing } from '@src/utils/data';
 import { formatTimestamp } from '@src/utils/dates';
-import {
-  EFoodApprovalState,
-  FOOD_TYPE_OPTIONS,
-  getLabelByKey,
-  MENU_OPTIONS,
-  SIDE_DISH_OPTIONS,
-  SPECIAL_DIET_OPTIONS,
-} from '@utils/enums';
-import type { TIntegrationListing, TListing } from '@utils/types';
+import { EFoodApprovalState } from '@utils/enums';
+import type { TListing } from '@utils/types';
+
+import ProductLayout from '../ProductLayout';
 
 import GridFoodListForm from './components/GridFoodListForm/GridFoodListForm';
 import RowFoodListForm from './components/RowFoodListForm/RowFoodListForm';
@@ -166,100 +165,6 @@ const TABLE_COLUMN: TColumn[] = [
   },
 ];
 
-const parseEntitiesToTableData = (
-  foods: TIntegrationListing[],
-  extraData: any,
-  categoryOptions: any,
-) => {
-  return foods.map((food) => {
-    return {
-      key: food.id.uuid,
-      data: {
-        isDeleted: food.attributes.metadata.isDeleted,
-        title: food.attributes.title,
-        description: food.attributes.description,
-        id: food.id.uuid,
-        menuType: getLabelByKey(
-          MENU_OPTIONS,
-          food.attributes.publicData.menuType,
-        ),
-        category: getLabelByKey(
-          categoryOptions,
-          food.attributes.publicData.category,
-        ),
-        foodType: getLabelByKey(
-          FOOD_TYPE_OPTIONS,
-          food.attributes.publicData.foodType,
-        ),
-        ...extraData,
-      },
-    };
-  });
-};
-
-const parseEntitiesToExportCsv = (
-  foods: TIntegrationListing[],
-  ids: string[],
-  packagingOptions: any,
-  categoryOptions: any,
-) => {
-  const filteredFoods =
-    ids.length > 0 ? foods.filter((food) => ids.includes(food.id.uuid)) : foods;
-
-  const foodsToExport = filteredFoods.map((food) => {
-    const {
-      publicData = {},
-      description,
-      title,
-      price,
-    } = food.attributes || {};
-    const {
-      sideDishes = [],
-      specialDiets = [],
-      category,
-      foodType,
-      menuType,
-      allergicIngredients = [],
-      maxQuantity,
-      minOrderHourInAdvance,
-      minQuantity,
-      notes,
-      unit,
-      numberOfMainDishes,
-      packaging,
-    } = publicData;
-
-    return {
-      'Mã món': food.id.uuid,
-      'Tên món ăn': title,
-      'Mô tả': description,
-      'Đơn giá': `${price?.amount} VND`,
-      'Thành phần dị ứng': allergicIngredients.join(','),
-      'Chất liệu bao bì': getLabelByKey(packagingOptions, packaging),
-      'Phong cách ẩm thực': getLabelByKey(categoryOptions, category),
-      'Loại món ăn': getLabelByKey(FOOD_TYPE_OPTIONS, foodType),
-      'Loại menu': getLabelByKey(MENU_OPTIONS, menuType),
-      'Món ăn kèm': sideDishes
-        .map((key: string) => getLabelByKey(SIDE_DISH_OPTIONS, key))
-        .join(','),
-      'Chế độ dinh dưỡng đặc biệt': specialDiets
-        .map((key: string) => getLabelByKey(SPECIAL_DIET_OPTIONS, key))
-        .join(','),
-      'Số nguời tối đa': maxQuantity,
-      'Giờ đặt trước tối thiểu': minOrderHourInAdvance,
-      'Số lượng tối thiểu': minQuantity,
-      'Ghi chú': notes,
-      'Đơn vị tính': unit,
-      'Số món chính': numberOfMainDishes,
-      'Hình ảnh': food.images?.map(
-        (image) => image.attributes.variants['square-small2x'].url,
-      ),
-    };
-  });
-
-  return foodsToExport;
-};
-
 const IMPORT_FILE = 'IMPORT_FILE';
 const GOOGLE_SHEET_LINK = 'GOOGLE_SHEET_LINK';
 
@@ -269,6 +174,7 @@ const ManagePartnerFoods = () => {
   const filterFoodSlideModalController = useBoolean();
   const manipulateFoodSlideModalController = useBoolean();
   const cannotRemoveFoodModalController = useBoolean();
+  const addFoodSlideModalController = useBoolean();
 
   const categoryOptions = useAppSelector(
     (state) => state.SystemAttributes.categories,
@@ -638,6 +544,10 @@ const ManagePartnerFoods = () => {
     router.push(partnerPaths.EditFood.replace('[foodId]', selectedFood.id));
   };
 
+  const handleAddFood = () => {
+    router.push(partnerPaths.CreateFood);
+  };
+
   useEffect(() => {
     dispatch(
       partnerFoodSliceThunks.fetchApprovalFoods(EFoodApprovalState.ACCEPTED),
@@ -651,354 +561,377 @@ const ManagePartnerFoods = () => {
   }, []);
 
   return (
-    <div className={css.root}>
-      <div className={css.tableActions}>
-        <div className={css.ctaViewTypeWrapper}>
-          <div className={css.viewTypeWrapper}>
-            <div
-              className={classNames(css.viewIcon, {
-                [css.active]: viewListMode === 'grid',
-              })}
-              onClick={onSetViewListMode('grid')}>
-              <IconCategory />
-            </div>
-            <div
-              className={classNames(css.viewIcon, {
-                [css.active]: viewListMode === 'list',
-              })}
-              onClick={onSetViewListMode('list')}>
-              <IconList />
-            </div>
-          </div>
-          <div className={css.ctaIconBtns}>
-            <div className={css.iconBtn}>
-              <IconPrint />
-            </div>
-            <div className={css.iconBtn}>
-              <IconDelete />
-            </div>
-          </div>
-        </div>
-
-        <div className={css.ctaButtons}>
-          <IntegrationFilterModal
-            onClear={handleClearFilter}
-            className={css.filterTooltip}
-            leftFilters={
-              <Tooltip
-                overlayClassName={css.overlay}
-                tooltipContent={
-                  <FilterForm
-                    onSubmit={handleSubmitFilter}
-                    categoryOptions={categoryOptions}
-                    onClearForm={handleClearFilter}
-                    initialValues={{
-                      keywords,
-                      foodType: foodType as string,
-                      createAtStart: createAtStart
-                        ? new Date(+createAtStart).getTime()
-                        : undefined,
-                      createAtEnd: createAtEnd
-                        ? new Date(+createAtEnd).getTime()
-                        : undefined,
-                    }}
-                  />
-                }
-                placement="bottomLeft"
-                trigger="click"
-                overlayInnerStyle={{ backgroundColor: '#fff', padding: 20 }}>
-                <Button
-                  type="button"
-                  variant="secondary"
-                  className={css.filterButton}>
-                  <IconFilter className={css.filterIcon} />
-                  <FormattedMessage id="IntegrationFilterModal.filterMessage" />
-                </Button>
-              </Tooltip>
-            }
-          />
-          <InlineTextButton
-            inProgress={removeFoodInProgress}
-            onClick={openRemoveCheckedModal}
-            disabled={idsToAction.length === 0 || removeFoodInProgress}
-            className={css.removeButton}>
-            <IconDelete
-              className={classNames(css.buttonIcon, {
-                [css.disabled]:
-                  idsToAction.length === 0 || removeFoodInProgress,
-              })}
-            />
-            <div
-              className={classNames({
-                [css.disabled]:
-                  idsToAction.length === 0 || removeFoodInProgress,
-              })}>
-              Xóa món
-            </div>
-          </InlineTextButton>
-
-          <InlineTextButton
-            onClick={makeExcelFile}
-            disabled={hasFilterApplied && foods.length === 0}
-            className={css.removeButton}>
-            <IconPrint
-              className={classNames(css.buttonIcon, {
-                [css.disabled]: foods.length === 0,
-              })}
-            />
-            <div
-              className={classNames(css.buttonIcon, {
-                [css.disabled]: hasFilterApplied && foods.length === 0,
-              })}>
-              In danh sách món ăn
-            </div>
-          </InlineTextButton>
-
-          <KeywordSearchForm
-            onSubmit={onSearchByFoodName}
-            initialValues={{
-              keywords: keywords as string,
-            }}
-            inputClassName={css.searchInput}
-          />
-          <Button
-            type="button"
-            variant="secondary"
-            className={css.filterButton}
-            onClick={filterFoodSlideModalController.setTrue}>
-            <IconFilter className={css.filterIcon} />
-          </Button>
-        </div>
-
-        <div className={css.foodApprovalTabWrapper}>
-          <Tabs
-            items={foodApprovalStateTabItems as any}
-            onChange={onTabChange}
-          />
-        </div>
-      </div>
-      {queryFoodsError && <ErrorMessage message={queryFoodsError.message} />}
-      {queryFoodsInProgress ? <LoadingContainer /> : viewModeContentRendered}
-      <AlertModal
-        isOpen={isImportModalOpen}
-        handleClose={closeImportModal}
-        confirmLabel="Nhập"
-        onCancel={closeImportModal}
-        onConfirm={onImportFoodFromCsv}
-        title={<FormattedMessage id="ManagePartnerFoods.importTitle" />}
-        cancelLabel="Hủy"
-        confirmInProgress={createPartnerFoodFromCsvInProgress}
-        confirmDisabled={createPartnerFoodFromCsvInProgress}>
-        <div className={css.radioButton}>
-          <div className={css.inputWrapper}>
-            <input
-              id="importFile"
-              type="radio"
-              checked={importType === IMPORT_FILE}
-              onChange={() => setImportType(IMPORT_FILE)}
-            />
-            <label htmlFor="importFile">Nhập file</label>
-          </div>
-          <div className={css.inputWrapper}>
-            <input
-              id="googleSheetLink"
-              type="radio"
-              checked={importType === GOOGLE_SHEET_LINK}
-              onChange={() => setImportType(GOOGLE_SHEET_LINK)}
-            />
-            <label htmlFor="googleSheetLink">Link Google Sheet</label>
-          </div>
-        </div>
-        <p className={css.downloadFileHere}>
-          {importType !== GOOGLE_SHEET_LINK ? (
-            <FormattedMessage
-              id="ManagePartnerFoods.downloadFileHere"
-              values={{
-                link: (
-                  <NamedLink
-                    target="_blank"
-                    path={process.env.NEXT_PUBLIC_IMPORT_FOOD_GUIDE_FILE_URL}>
-                    <FormattedMessage id="ManagePartnerFoods.templateLink" />
-                  </NamedLink>
-                ),
-              }}
-            />
-          ) : (
-            <FormattedMessage
-              id="ManagePartnerFoods.sampleFileHere"
-              values={{
-                link: (
-                  <NamedLink
-                    target="_blank"
-                    path={process.env.NEXT_PUBLIC_IMPORT_FOOD_TEMPLATE}>
-                    <FormattedMessage id="ManagePartnerFoods.templateLink" />
-                  </NamedLink>
-                ),
-              }}
-            />
-          )}
-        </p>
-        {importType === GOOGLE_SHEET_LINK ? (
-          <div>
-            <input
-              onChange={({ target }) => setGoogleSheetUrl(target.value)}
-              type="text"
-              name="file"
-              value={googleSheetUrl}
-              id="file"
-              placeholder="Nhập link google sheet"
-              className={css.googleSheetInput}
-            />
-            <p>
-              {
-                'Vào Google Sheet -> chọn File -> chọn Share -> chọn Publish to the web -> Chọn dạng publish là CSV -> Publish -> Copy pubished link -> Paste vào ô nhập'
-              }
-            </p>
-          </div>
-        ) : (
-          <div className={css.inputWrapper}>
-            <input
-              accept=".xlsx,.xls"
-              onChange={onChangeFile}
-              type="file"
-              className={css.inputFile}
-              name="file"
-              id="file"
-            />
-            <label className={css.importLabel}>
-              <FormattedMessage id="ManagePartnerFoods.importLabel" />
-            </label>
-            <label htmlFor="file">
-              <div className={css.fileLabel}>
-                {file ? (
-                  file.name
-                ) : (
-                  <FormattedMessage id="ManagePartnerFoods.inputFile" />
-                )}
+    <ProductLayout
+      currentPage="food"
+      shouldHideAddProductButton={false}
+      handleAddProduct={addFoodSlideModalController.setTrue}>
+      <div className={css.root}>
+        <div className={css.tableActions}>
+          <div className={css.ctaViewTypeWrapper}>
+            <div className={css.viewTypeWrapper}>
+              <div
+                className={classNames(css.viewIcon, {
+                  [css.active]: viewListMode === 'grid',
+                })}
+                onClick={onSetViewListMode('grid')}>
+                <IconCategory />
               </div>
-            </label>
-            {createPartnerFoodFromCsvError && (
-              <ErrorMessage message={createPartnerFoodFromCsvError.message} />
-            )}
-          </div>
-        )}
-      </AlertModal>
-      <AlertModal
-        title={<FormattedMessage id="ManagePartnerFoods.removeTitle" />}
-        isOpen={
-          (foodToRemove || removeCheckedModalOpen) &&
-          deletableFoodMap[foodToRemove?.id]
-        }
-        handleClose={
-          removeCheckedModalOpen ? closeRemoveCheckedModal : onClearFoodToRemove
-        }
-        onCancel={
-          removeCheckedModalOpen ? closeRemoveCheckedModal : onClearFoodToRemove
-        }
-        onConfirm={
-          removeCheckedModalOpen
-            ? removeCheckedFoods
-            : (removeFood as unknown as () => void)
-        }
-        cancelLabel="Hủy"
-        confirmLabel="Xóa món ăn"
-        confirmInProgress={removeFoodInProgress}
-        childrenClassName={css.removeModalContent}
-        containerClassName={css.confirmContainer}
-        shouldFullScreenInMobile={false}
-        confirmDisabled={removeFoodInProgress}>
-        <p className={css.removeContent}>
-          <FormattedMessage
-            id="ManagePartnerFoods.removeContent"
-            values={{
-              foodName: (
-                <span className={css.foodTitle}>
-                  {removeCheckedModalOpen ? (
-                    <FormattedMessage
-                      id="ManagePartnerFoods.foodLength"
-                      values={{ foodLength: idsToAction.length }}
-                    />
-                  ) : (
-                    foodToRemove?.title
-                  )}
-                </span>
-              ),
-            }}
-          />
-        </p>
-      </AlertModal>
-
-      <PopupModal
-        id="CannotRemoveFoodModal"
-        isOpen={cannotRemoveFoodModalController.value}
-        handleClose={cannotRemoveFoodModalController.setFalse}
-        containerClassName={css.confirmContainer}
-        shouldHideIconClose>
-        <>
-          <div className={css.cannotRemoveFoodModalTitle}>
-            <IconDanger className={css.icon} />
-            <span className={css.title}>Không thể xoá Món</span>
-          </div>
-          <div className={css.content}>
-            Món ăn đang được triển khai trong đơn hàng.
-          </div>
-          <Button
-            onClick={cannotRemoveFoodModalController.setFalse}
-            variant="secondary"
-            type="button"
-            className={css.noRemoveFoodConfirmBtn}>
-            Đã hiểu
-          </Button>
-        </>
-      </PopupModal>
-
-      <SlideModal
-        id="FilterFoodModal"
-        isOpen={filterFoodSlideModalController.value}
-        onClose={filterFoodSlideModalController.setFalse}>
-        <FilterForm
-          onSubmit={handleSubmitFilter}
-          categoryOptions={categoryOptions}
-          onClearForm={handleClearFilter}
-          initialValues={{
-            keywords,
-            foodType: foodType as string,
-            createAtStart: createAtStart
-              ? new Date(+createAtStart).getTime()
-              : undefined,
-            createAtEnd: createAtEnd
-              ? new Date(+createAtEnd).getTime()
-              : undefined,
-          }}
-        />
-      </SlideModal>
-      <SlideModal
-        id="ManipulateFoodModal"
-        isOpen={manipulateFoodSlideModalController.value}
-        onClose={manipulateFoodSlideModalController.setFalse}>
-        <div className={css.actionsBtnWrapper}>
-          <RenderWhen
-            condition={foodApprovalActiveTab === EFoodApprovalState.ACCEPTED}>
-            <div className={css.item}>
-              <IconSwap />
-              <span>Di chuyển vào menu</span>
+              <div
+                className={classNames(css.viewIcon, {
+                  [css.active]: viewListMode === 'list',
+                })}
+                onClick={onSetViewListMode('list')}>
+                <IconList />
+              </div>
             </div>
-          </RenderWhen>
-          <div
-            className={classNames(css.item, {
-              [css.disabled]: !editableFoodMap[selectedFood?.id.uuid],
-            })}
-            onClick={handleEditFood}>
-            <IconEdit />
-            <span>Chỉnh sửa món ăn</span>
+            <div className={css.ctaIconBtns}>
+              <div className={css.iconBtn}>
+                <IconPrint />
+              </div>
+              <div className={css.iconBtn}>
+                <IconDelete />
+              </div>
+            </div>
           </div>
-          <div className={css.item} onClick={handleSelectRemoveFood}>
-            <IconDelete />
-            <span>Xóa món ăn</span>
+
+          <div className={css.ctaButtons}>
+            <IntegrationFilterModal
+              onClear={handleClearFilter}
+              className={css.filterTooltip}
+              leftFilters={
+                <Tooltip
+                  overlayClassName={css.overlay}
+                  tooltipContent={
+                    <FilterForm
+                      onSubmit={handleSubmitFilter}
+                      categoryOptions={categoryOptions}
+                      onClearForm={handleClearFilter}
+                      initialValues={{
+                        keywords,
+                        foodType: foodType as string,
+                        createAtStart: createAtStart
+                          ? new Date(+createAtStart).getTime()
+                          : undefined,
+                        createAtEnd: createAtEnd
+                          ? new Date(+createAtEnd).getTime()
+                          : undefined,
+                      }}
+                    />
+                  }
+                  placement="bottomLeft"
+                  trigger="click"
+                  overlayInnerStyle={{ backgroundColor: '#fff', padding: 20 }}>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    className={css.filterButton}>
+                    <IconFilter className={css.filterIcon} />
+                    <FormattedMessage id="IntegrationFilterModal.filterMessage" />
+                  </Button>
+                </Tooltip>
+              }
+            />
+            <InlineTextButton
+              inProgress={removeFoodInProgress}
+              onClick={openRemoveCheckedModal}
+              disabled={idsToAction.length === 0 || removeFoodInProgress}
+              className={css.removeButton}>
+              <IconDelete
+                className={classNames(css.buttonIcon, {
+                  [css.disabled]:
+                    idsToAction.length === 0 || removeFoodInProgress,
+                })}
+              />
+              <div
+                className={classNames({
+                  [css.disabled]:
+                    idsToAction.length === 0 || removeFoodInProgress,
+                })}>
+                Xóa món
+              </div>
+            </InlineTextButton>
+
+            <InlineTextButton
+              onClick={makeExcelFile}
+              disabled={hasFilterApplied && foods.length === 0}
+              className={css.removeButton}>
+              <IconPrint
+                className={classNames(css.buttonIcon, {
+                  [css.disabled]: foods.length === 0,
+                })}
+              />
+              <div
+                className={classNames(css.buttonIcon, {
+                  [css.disabled]: hasFilterApplied && foods.length === 0,
+                })}>
+                In danh sách món ăn
+              </div>
+            </InlineTextButton>
+
+            <KeywordSearchForm
+              onSubmit={onSearchByFoodName}
+              initialValues={{
+                keywords: keywords as string,
+              }}
+              inputClassName={css.searchInput}
+            />
+            <Button
+              type="button"
+              variant="secondary"
+              className={css.filterButton}
+              onClick={filterFoodSlideModalController.setTrue}>
+              <IconFilter className={css.filterIcon} />
+            </Button>
+          </div>
+
+          <div className={css.foodApprovalTabWrapper}>
+            <Tabs
+              items={foodApprovalStateTabItems as any}
+              onChange={onTabChange}
+            />
           </div>
         </div>
-      </SlideModal>
-    </div>
+        {queryFoodsError && <ErrorMessage message={queryFoodsError.message} />}
+        {queryFoodsInProgress ? <LoadingContainer /> : viewModeContentRendered}
+        <AlertModal
+          isOpen={isImportModalOpen}
+          handleClose={closeImportModal}
+          confirmLabel="Nhập"
+          onCancel={closeImportModal}
+          onConfirm={onImportFoodFromCsv}
+          title={<FormattedMessage id="ManagePartnerFoods.importTitle" />}
+          cancelLabel="Hủy"
+          confirmInProgress={createPartnerFoodFromCsvInProgress}
+          confirmDisabled={createPartnerFoodFromCsvInProgress}>
+          <div className={css.radioButton}>
+            <div className={css.inputWrapper}>
+              <input
+                id="importFile"
+                type="radio"
+                checked={importType === IMPORT_FILE}
+                onChange={() => setImportType(IMPORT_FILE)}
+              />
+              <label htmlFor="importFile">Nhập file</label>
+            </div>
+            <div className={css.inputWrapper}>
+              <input
+                id="googleSheetLink"
+                type="radio"
+                checked={importType === GOOGLE_SHEET_LINK}
+                onChange={() => setImportType(GOOGLE_SHEET_LINK)}
+              />
+              <label htmlFor="googleSheetLink">Link Google Sheet</label>
+            </div>
+          </div>
+          <p className={css.downloadFileHere}>
+            {importType !== GOOGLE_SHEET_LINK ? (
+              <FormattedMessage
+                id="ManagePartnerFoods.downloadFileHere"
+                values={{
+                  link: (
+                    <NamedLink
+                      target="_blank"
+                      path={process.env.NEXT_PUBLIC_IMPORT_FOOD_GUIDE_FILE_URL}>
+                      <FormattedMessage id="ManagePartnerFoods.templateLink" />
+                    </NamedLink>
+                  ),
+                }}
+              />
+            ) : (
+              <FormattedMessage
+                id="ManagePartnerFoods.sampleFileHere"
+                values={{
+                  link: (
+                    <NamedLink
+                      target="_blank"
+                      path={process.env.NEXT_PUBLIC_IMPORT_FOOD_TEMPLATE}>
+                      <FormattedMessage id="ManagePartnerFoods.templateLink" />
+                    </NamedLink>
+                  ),
+                }}
+              />
+            )}
+          </p>
+          {importType === GOOGLE_SHEET_LINK ? (
+            <div>
+              <input
+                onChange={({ target }) => setGoogleSheetUrl(target.value)}
+                type="text"
+                name="file"
+                value={googleSheetUrl}
+                id="file"
+                placeholder="Nhập link google sheet"
+                className={css.googleSheetInput}
+              />
+              <p>
+                {
+                  'Vào Google Sheet -> chọn File -> chọn Share -> chọn Publish to the web -> Chọn dạng publish là CSV -> Publish -> Copy pubished link -> Paste vào ô nhập'
+                }
+              </p>
+            </div>
+          ) : (
+            <div className={css.inputWrapper}>
+              <input
+                accept=".xlsx,.xls"
+                onChange={onChangeFile}
+                type="file"
+                className={css.inputFile}
+                name="file"
+                id="file"
+              />
+              <label className={css.importLabel}>
+                <FormattedMessage id="ManagePartnerFoods.importLabel" />
+              </label>
+              <label htmlFor="file">
+                <div className={css.fileLabel}>
+                  {file ? (
+                    file.name
+                  ) : (
+                    <FormattedMessage id="ManagePartnerFoods.inputFile" />
+                  )}
+                </div>
+              </label>
+              {createPartnerFoodFromCsvError && (
+                <ErrorMessage message={createPartnerFoodFromCsvError.message} />
+              )}
+            </div>
+          )}
+        </AlertModal>
+        <AlertModal
+          title={<FormattedMessage id="ManagePartnerFoods.removeTitle" />}
+          isOpen={
+            (foodToRemove || removeCheckedModalOpen) &&
+            deletableFoodMap[foodToRemove?.id]
+          }
+          handleClose={
+            removeCheckedModalOpen
+              ? closeRemoveCheckedModal
+              : onClearFoodToRemove
+          }
+          onCancel={
+            removeCheckedModalOpen
+              ? closeRemoveCheckedModal
+              : onClearFoodToRemove
+          }
+          onConfirm={
+            removeCheckedModalOpen
+              ? removeCheckedFoods
+              : (removeFood as unknown as () => void)
+          }
+          cancelLabel="Hủy"
+          confirmLabel="Xóa món ăn"
+          confirmInProgress={removeFoodInProgress}
+          childrenClassName={css.removeModalContent}
+          containerClassName={css.confirmContainer}
+          shouldFullScreenInMobile={false}
+          confirmDisabled={removeFoodInProgress}>
+          <p className={css.removeContent}>
+            <FormattedMessage
+              id="ManagePartnerFoods.removeContent"
+              values={{
+                foodName: (
+                  <span className={css.foodTitle}>
+                    {removeCheckedModalOpen ? (
+                      <FormattedMessage
+                        id="ManagePartnerFoods.foodLength"
+                        values={{ foodLength: idsToAction.length }}
+                      />
+                    ) : (
+                      foodToRemove?.title
+                    )}
+                  </span>
+                ),
+              }}
+            />
+          </p>
+        </AlertModal>
+
+        <PopupModal
+          id="CannotRemoveFoodModal"
+          isOpen={cannotRemoveFoodModalController.value}
+          handleClose={cannotRemoveFoodModalController.setFalse}
+          containerClassName={css.confirmContainer}
+          shouldHideIconClose>
+          <>
+            <div className={css.cannotRemoveFoodModalTitle}>
+              <IconDanger className={css.icon} />
+              <span className={css.title}>Không thể xoá Món</span>
+            </div>
+            <div className={css.content}>
+              Món ăn đang được triển khai trong đơn hàng.
+            </div>
+            <Button
+              onClick={cannotRemoveFoodModalController.setFalse}
+              variant="secondary"
+              type="button"
+              className={css.noRemoveFoodConfirmBtn}>
+              Đã hiểu
+            </Button>
+          </>
+        </PopupModal>
+
+        <SlideModal
+          id="FilterFoodModal"
+          isOpen={filterFoodSlideModalController.value}
+          onClose={filterFoodSlideModalController.setFalse}>
+          <FilterForm
+            onSubmit={handleSubmitFilter}
+            categoryOptions={categoryOptions}
+            onClearForm={handleClearFilter}
+            initialValues={{
+              keywords,
+              foodType: foodType as string,
+              createAtStart: createAtStart
+                ? new Date(+createAtStart).getTime()
+                : undefined,
+              createAtEnd: createAtEnd
+                ? new Date(+createAtEnd).getTime()
+                : undefined,
+            }}
+          />
+        </SlideModal>
+        <SlideModal
+          id="ManipulateFoodModal"
+          isOpen={manipulateFoodSlideModalController.value}
+          onClose={manipulateFoodSlideModalController.setFalse}>
+          <div className={css.actionsBtnWrapper}>
+            <RenderWhen
+              condition={foodApprovalActiveTab === EFoodApprovalState.ACCEPTED}>
+              <div className={css.item}>
+                <IconSwap />
+                <span>Di chuyển vào menu</span>
+              </div>
+            </RenderWhen>
+            <div
+              className={classNames(css.item, {
+                [css.disabled]: !editableFoodMap[selectedFood?.id.uuid],
+              })}
+              onClick={handleEditFood}>
+              <IconEdit />
+              <span>Chỉnh sửa món ăn</span>
+            </div>
+            <div className={css.item} onClick={handleSelectRemoveFood}>
+              <IconDelete />
+              <span>Xóa món ăn</span>
+            </div>
+          </div>
+        </SlideModal>
+        <SlideModal
+          id="AddFoodModal"
+          modalTitle="Thêm"
+          isOpen={addFoodSlideModalController.value}
+          onClose={addFoodSlideModalController.setFalse}>
+          <div className={css.actionsBtnWrapper}>
+            <div className={css.item} onClick={handleAddFood}>
+              <span>Thêm món ăn</span>
+            </div>
+            <div className={css.item}>
+              <span>Thêm món ăn hàng loạt</span>
+            </div>
+          </div>
+        </SlideModal>
+      </div>
+    </ProductLayout>
   );
 };
 

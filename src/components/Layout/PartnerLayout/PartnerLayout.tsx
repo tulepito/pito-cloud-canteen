@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import useBoolean from '@hooks/useBoolean';
 import { useViewport } from '@hooks/useViewport';
+import { partnerPaths } from '@src/paths';
 
 import PartnerHeader from './PartnerHeader/PartnerHeader';
 import PartnerLayoutContent from './PartnerLayoutContent/PartnerLayoutContent';
@@ -26,6 +27,7 @@ const PartnerLayout: React.FC<PropsWithChildren> = (props) => {
   const { isMobileLayout } = useViewport();
 
   const showHeaderMaybe = !isMobileLayout || shouldShowPartnerHeader(pathname);
+  const shouldHidePartnerNavBar = [partnerPaths.CreateFood].includes(pathname);
 
   return (
     <div className={css.root}>
@@ -41,8 +43,9 @@ const PartnerLayout: React.FC<PropsWithChildren> = (props) => {
           {children}
         </PartnerLayoutContent>
       </div>
-
-      <PartnerNavBar />
+      <RenderWhen condition={!shouldHidePartnerNavBar}>
+        <PartnerNavBar />
+      </RenderWhen>
 
       <RenderWhen condition={!isMobileLayout}>
         <PartnerLayoutSidebar isMenuOpen={isMenuOpen}>

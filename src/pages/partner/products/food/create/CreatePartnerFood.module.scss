@@ -1,4 +1,49 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/defaults.scss' as *;
+
 .title {
   font-size: 32px;
   margin-top: 0;
+
+  display: none;
+
+  @include viewportLarge {
+    display: block;
+  }
+}
+
+.mobileHeader {
+  @include flexAlign(center);
+  gap: 8px;
+  padding: 12px 16px;
+  border-bottom: 1px solid $neutralGray3;
+
+  @include viewportLarge {
+    display: none;
+  }
+
+  .icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  .headerTitle {
+    @include textTemplate(16px, $fontWeightBold, 24px);
+  }
+}
+
+.desktopFormWrapper {
+  display: none;
+
+  @include viewportLarge {
+    display: block;
+  }
+}
+
+.mobileFormWrapper {
+  @include viewportLarge {
+    display: none;
+  }
 }

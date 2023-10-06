@@ -21,7 +21,11 @@ import { getPartnerFoodByApprovalStatusQuery } from '@helpers/listingSearchQuery
 import { getImportDataFromCsv } from '@pages/admin/partner/[restaurantId]/settings/food/utils';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { bottomRightToastOptions } from '@src/utils/toastify';
-import { CurrentUser, denormalisedResponseEntities } from '@utils/data';
+import {
+  CurrentUser,
+  denormalisedResponseEntities,
+  Listing,
+} from '@utils/data';
 import { EFoodApprovalState, EImageVariants, EListingType } from '@utils/enums';
 import { storableAxiosError, storableError } from '@utils/errors';
 import type {
@@ -336,7 +340,12 @@ const updatePartnerFoodListing = createAsyncThunk(
         queryParams,
       });
 
-      toast.success('Cập nhật món ăn thành công', bottomRightToastOptions);
+      const foodListing = Listing(food);
+      const { isDraft } = foodListing.getMetadata();
+
+      if (!isDraft) {
+        toast.success('Cập nhật món ăn thành công', bottomRightToastOptions);
+      }
 
       return food;
     } catch (error) {

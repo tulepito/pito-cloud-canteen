@@ -1,0 +1,50 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/defaults.scss' as *;
+
+.root {
+  @include flexAlign(center, space-between);
+}
+
+.tabWrapper {
+  @include flexAlign(center);
+  flex-direction: column;
+  gap: 4px;
+  flex-shrink: 0;
+
+  &.active {
+    .tabNumber {
+      border: 1px solid $neutralGray6;
+      background-color: $neutralGray6;
+      color: $neutralGray1;
+    }
+
+    .tabLabel {
+      color: $neutralGray6;
+    }
+  }
+
+  .tabNumber {
+    border-radius: 100%;
+    @include flexCenter;
+    border: 1px solid $neutralGray5;
+    background-color: $neutralGray2;
+    color: $neutralGray5;
+    width: 20px;
+    height: 20px;
+    font-size: 12px;
+  }
+
+  .tabLabel {
+    @include textTemplate(12px, 500, 16px);
+    color: $neutralGray5;
+  }
+}
+
+.connector {
+  width: 24px;
+  height: 1px;
+  padding: 0 16px;
+  background-color: $neutralGray4;
+}
