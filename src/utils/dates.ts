@@ -627,7 +627,8 @@ export const generateTimeRangeItems = ({
   return timeRangeItems;
 };
 
-export const TimeOptions = generateTimeRangeItems({});
+export const TimeOptions = renderListTimeOptions({});
+export const TimeRangeItems = generateTimeRangeItems({});
 
 export const getNextWeek = (date: Date) => {
   return DateTime.fromJSDate(date)

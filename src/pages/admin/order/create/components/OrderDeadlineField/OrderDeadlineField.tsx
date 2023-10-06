@@ -18,7 +18,7 @@ import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
 import { findValidRangeForDeadlineDate } from '@helpers/orderHelper';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { EUserPermission } from '@src/utils/enums';
-import { generateTimeRangeItems, TimeOptions } from '@utils/dates';
+import { renderListTimeOptions, TimeOptions } from '@utils/dates';
 import type { TObject } from '@utils/types';
 import { required } from '@utils/validators';
 
@@ -140,8 +140,8 @@ const OrderDeadlineField: React.FC<TOrderDeadlineFieldProps> = (props) => {
   const parsedDeliveryHourOptions = useMemo(() => {
     return (
       isAdminFlow && isDeliveryDateSameWithStartDate
-        ? generateTimeRangeItems({
-            endTime: deliveryHour.toString(),
+        ? renderListTimeOptions({
+            endTime: deliveryHour.split('-')[0],
           })
         : TimeOptions
     ).map((option) => ({

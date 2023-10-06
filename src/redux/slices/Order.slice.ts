@@ -372,7 +372,11 @@ const createOrder = createAsyncThunk(
       isCreatedByAdmin,
       generalInfo: {
         ...(hasOrderBefore ? bookerQuizData : quiz),
-        orderType: newIsGroupOrder ? EOrderType.group : EOrderType.normal,
+        orderType: isCreatedByAdmin
+          ? EOrderType.group
+          : newIsGroupOrder
+          ? EOrderType.group
+          : EOrderType.normal,
         ...deadlineInfoMaybe,
         deliveryAddress:
           User(selectedCompany).getPublicData().companyLocation || {},
