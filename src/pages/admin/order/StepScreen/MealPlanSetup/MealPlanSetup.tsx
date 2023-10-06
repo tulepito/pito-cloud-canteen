@@ -10,6 +10,7 @@ import {
   changeStep2SubmitStatus,
   orderAsyncActions,
 } from '@redux/slices/Order.slice';
+import { EOrderType } from '@src/utils/enums';
 import { Listing, User } from '@utils/data';
 import { getSelectedDaysOfWeek } from '@utils/dates';
 import type { TListing } from '@utils/types';
@@ -98,7 +99,7 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
           address: addressValue,
           origin: originValue,
         },
-        pickAllow: pickAllowSubmitValue,
+        orderType: pickAllowSubmitValue ? EOrderType.group : EOrderType.normal,
         packagePerMember: parseInt(
           packagePerMemberValue?.replace(/,/g, '') || 0,
           10,
