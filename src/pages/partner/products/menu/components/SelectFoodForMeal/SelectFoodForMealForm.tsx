@@ -102,8 +102,8 @@ const SelectFoodForMealFormComponent: React.FC<
           name="checkAll"
           customOnChange={handleCheckAllFieldChange}
         />
-        <FieldFoodSelectCheckboxGroup name="food" options={foodOptions} />
       </RenderWhen>
+      <FieldFoodSelectCheckboxGroup name="food" options={foodOptions} />
     </Form>
   );
 };
