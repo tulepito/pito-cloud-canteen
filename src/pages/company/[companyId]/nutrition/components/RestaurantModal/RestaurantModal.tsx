@@ -54,7 +54,7 @@ const RestaurantModal: React.FC<TRestaurantModalProps> = (props) => {
     coverImageId,
     Listing(currentRestaurant!).getImages(),
   );
-  const foodList = restaurantFoodList[restaurantId] || {};
+  const foodList = restaurantFoodList[restaurantId] || [];
   const { geolocation: restaurantOrigin } = Listing(
     currentRestaurant!,
   ).getAttributes();
