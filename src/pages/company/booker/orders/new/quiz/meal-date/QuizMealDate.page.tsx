@@ -69,7 +69,8 @@ const QuizMealDate = () => {
 
   const onFormSubmitClick = async () => {
     dispatch(QuizActions.updateQuiz({ ...formValues }));
-    if (hasOrderBefore) {
+    const { isGroupOrder: isGroupOrderFormValue } = formValues;
+    if (hasOrderBefore || isGroupOrderFormValue?.length === 0) {
       submitCreateOrder();
     } else {
       nextStep();

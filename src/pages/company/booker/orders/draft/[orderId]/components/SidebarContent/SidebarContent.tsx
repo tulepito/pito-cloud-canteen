@@ -210,7 +210,7 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
       startDate !== finalStartDate ||
       endDate !== finalEndDate ||
       difference(nutritions, finalNutritions).length > 0 ||
-      getDaySessionFromDeliveryTime(deliveryHour) !==
+      getDaySessionFromDeliveryTime(deliveryHour.split('-')[0]) !==
         getDaySessionFromDeliveryTime(finalDeliveryHour) ||
       packagePerMember !== +finalPackagePerMember ||
       memberAmount !== +memberAmountValue;

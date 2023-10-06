@@ -144,6 +144,7 @@ export const orderDataCheckers = (order: TListing) => {
   const minStartTimeStamp = findMinStartDate().getTime();
   const minDeadlineTimeStamp = findMinDeadlineDate().getTime();
   const isNormalOrder = orderType === EOrderType.normal;
+  const timeOptionsValues = timeOptions.map(({ key }) => key);
 
   const checkers = {
     isDeadlineDateValid:
@@ -156,8 +157,9 @@ export const orderDataCheckers = (order: TListing) => {
       Number.isInteger(startDate) && minStartTimeStamp <= (startDate || 0),
     isEndDateValid:
       Number.isInteger(endDate) && (endDate || 0) >= (startDate || 0),
-    isDeliveryHourValid: timeOptions.includes(deliveryHour),
-    isDeadlineHourValid: isNormalOrder || timeOptions.includes(deadlineHour),
+    isDeliveryHourValid: timeOptionsValues.includes(deliveryHour),
+    isDeadlineHourValid:
+      isNormalOrder || timeOptionsValues.includes(deadlineHour),
     isPackagePerMemberValid: Number.isInteger(packagePerMember),
     haveAnyPlans: !isEmpty(plans),
   };
