@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useMemo, useState } from 'react';
 import classNames from 'classnames';
@@ -364,7 +365,7 @@ const CreateEditMenuLayout: React.FC<TCreateEditMenuLayoutProps> = () => {
           <IconCheckmarkWithCircle className={css.iconCheckmark} />
         </div>
         <div className={css.menuDescription}>
-          Menu “Bữa ăn vui vẻ” của bạn đã được tạo thành công.
+          Menu "{title}" của bạn đã được tạo thành công.
         </div>
       </AlertModal>
 
