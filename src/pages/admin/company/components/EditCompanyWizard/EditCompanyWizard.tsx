@@ -21,6 +21,7 @@ import { getInitialLocationValues } from '@helpers/mapHelpers';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useRedirectTabWizard from '@hooks/useRedirectTabWizard';
 import {
+  clearStates,
   clearTransferOwnerError,
   companySlice,
   companyThunks,
@@ -456,6 +457,12 @@ const EditCompanyWizard = () => {
     if (!companyId) return;
     dispatch(companyThunks.showCompany(companyId as string));
   }, [companyId]);
+
+  useEffect(() => {
+    return () => {
+      dispatch(clearStates());
+    };
+  }, []);
 
   const tabLink = (tab: string) => {
     return {
