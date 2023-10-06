@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useField, useForm } from 'react-final-form-hooks';
+import { DateTime } from 'luxon';
 import { useRouter } from 'next/router';
 
 import Badge from '@components/Badge/Badge';
@@ -60,7 +61,9 @@ const MenuCard: React.FC<TMenuCardProps> = ({
   const isDraftMenu = listingState === EListingStates.draft;
 
   const today = new Date().getTime();
-  const isInvalidTimeRangeMenu = endDate < today;
+  const isInvalidTimeRangeMenu =
+    DateTime.fromMillis(endDate).startOf('day') <
+    DateTime.fromMillis(today).startOf('day');
   const shouldShowActiveMenuToggle =
     !isInvalidTimeRangeMenu &&
     [EListingStates.published, EListingStates.closed].includes(listingState);
