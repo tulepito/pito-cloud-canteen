@@ -216,7 +216,7 @@ const searchRestaurants = createAsyncThunk(
     const { keywords, ...queryWithoutKeywords } = params;
     const query = getMenuQuery({ order, params: queryWithoutKeywords });
     const orderListing = Listing(order);
-    const { memberAmount = 0 } = orderListing.getMetadata();
+    const { memberAmount = 0, startDate, endDate } = orderListing.getMetadata();
 
     const allMenus = await queryAllPages({ sdkModel: sdk.listings, query });
 
@@ -239,6 +239,8 @@ const searchRestaurants = createAsyncThunk(
         params: {
           ...params,
           memberAmount,
+          startDate,
+          endDate,
         },
       }),
     );

@@ -98,25 +98,24 @@ const QuizInviteMember = () => {
               <div key={index} className={css.memberItem}>
                 <div className={css.memberWrapper}>
                   {hasNoAccount ? (
-                    <div className={css.grayCircle} />
-                  ) : (
-                    <Avatar
-                      className={css.avatar}
-                      user={record.response.user}
-                      disableProfileLink
-                    />
-                  )}
-                  {hasNoAccount ? (
                     <>
+                      <div className={css.grayCircle} />
                       <div className={css.fullRowEmail}>{record.email}</div>
                     </>
                   ) : (
-                    <div>
-                      <div className={css.name}>
-                        {`${lastName || ''} ${firstName || ''}`}
+                    <>
+                      <Avatar
+                        className={css.avatar}
+                        user={record.response.user}
+                        disableProfileLink
+                      />
+                      <div>
+                        <div className={css.name}>
+                          {`${lastName || ''} ${firstName || ''}`}
+                        </div>
+                        <div className={css.email}>{record.email}</div>
                       </div>
-                      <div className={css.email}>{record.email}</div>
-                    </div>
+                    </>
                   )}
                 </div>
                 <div className={css.actionsWrapper}>

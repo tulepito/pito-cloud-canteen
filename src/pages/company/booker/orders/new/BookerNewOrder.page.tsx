@@ -50,10 +50,6 @@ function BookerNewOrderPage() {
     [css.largeContainer]: isCopyPreviousOrder || reorderOpen,
   });
 
-  // useEffect(() => {
-  //   dispatch(resetOrder());
-  // }, [dispatch]);
-
   const normalizedCompanies = myCompanies.map((company) => ({
     id: company?.id?.uuid,
     name: User(company).getPublicData()?.companyName,

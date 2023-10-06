@@ -113,6 +113,8 @@ export const getRestaurantQuery = ({
     categories = [],
     packaging = [],
     memberAmount,
+    startDate,
+    endDate,
   } = params;
 
   const origin = User(companyAccount as TUser).getPublicData()?.location
@@ -135,6 +137,12 @@ export const getRestaurantQuery = ({
     }),
     ...(memberAmount && {
       pub_maxQuantity: `${memberAmount},`,
+    }),
+    ...(startDate && {
+      pub_startStopReceiveOrderDate: `,${startDate + 1}`,
+    }),
+    ...(endDate && {
+      pub_endStopReceiveOrderDate: `${endDate},`,
     }),
     meta_status: ERestaurantListingStatus.authorized,
     include: ['images'],
