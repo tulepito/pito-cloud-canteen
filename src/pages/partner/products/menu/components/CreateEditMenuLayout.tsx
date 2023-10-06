@@ -171,7 +171,7 @@ const CreateEditMenuLayout: React.FC<TCreateEditMenuLayoutProps> = () => {
       startDate,
       endDate,
       mealType,
-      mealTypes,
+      mealTypes: isEmpty(mealTypes) ? [mealType] : mealTypes,
       foodsByDate,
       draftFoodByDate,
       foodByDate: isDraftEditFlow ? draftFoodByDate : foodsByDate,
@@ -183,7 +183,7 @@ const CreateEditMenuLayout: React.FC<TCreateEditMenuLayoutProps> = () => {
       startDate?.toString(),
       mealType,
       JSON.stringify(draftFoodByDate),
-      JSON.stringify(mealTypes),
+      JSON.stringify(foodsByDate),
       JSON.stringify(mealTypes),
     ],
   );

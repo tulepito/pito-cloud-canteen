@@ -25,9 +25,13 @@ import css from './MenuCard.module.scss';
 
 type TMenuCardProps = {
   menu: TListing;
+  onDeleteMenuCompleted: () => void;
 };
 
-const MenuCard: React.FC<TMenuCardProps> = ({ menu }) => {
+const MenuCard: React.FC<TMenuCardProps> = ({
+  menu,
+  onDeleteMenuCompleted,
+}) => {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const toggleMenuActiveStatusInProgress = useAppSelector(
@@ -113,10 +117,16 @@ const MenuCard: React.FC<TMenuCardProps> = ({ menu }) => {
     }
   };
 
-  const handleConfirmDeleteMenusClick = () => {
+  const handleConfirmDeleteMenusClick = async () => {
     confirmDeleteMenuModalControl.setFalse();
 
-    dispatch(PartnerManageMenusThunks.deleteMenus({ id: menuId }));
+    const { meta } = await dispatch(
+      PartnerManageMenusThunks.deleteMenus({ id: menuId }),
+    );
+
+    if (meta.requestStatus === 'fulfilled') {
+      onDeleteMenuCompleted();
+    }
   };
 
   return (

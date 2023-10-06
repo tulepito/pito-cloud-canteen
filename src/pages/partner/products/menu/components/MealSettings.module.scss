@@ -147,6 +147,7 @@
 .addFoodSuccess {
   width: 295px;
   left: -300px;
+  bottom: 180px;
 
   & > div {
     column-gap: 16px;
@@ -155,7 +156,6 @@
 }
 
 .addFoodSuccessOpen {
-  bottom: 180px;
   left: calc((100vw - 295px) / 2);
 }
 

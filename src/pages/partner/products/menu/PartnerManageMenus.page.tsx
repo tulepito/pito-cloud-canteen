@@ -5,6 +5,7 @@ import classNames from 'classnames';
 import debounce from 'lodash/debounce';
 import { useRouter } from 'next/router';
 
+import Alert, { EAlertPosition, EAlertType } from '@components/Alert/Alert';
 import Button from '@components/Button/Button';
 import { FieldTextInputComponent } from '@components/FormFields/FieldTextInput/FieldTextInput';
 import IconEmpty from '@components/Icons/IconEmpty/IconEmpty';
@@ -34,6 +35,7 @@ const PartnerManageMenusPage: React.FC<TPartnerManageMenusPageProps> = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const firstLoadControl = useBoolean(true);
+  const confirmDeletedMenuControl = useBoolean(true);
   const [searchTitle, setSearchTitle] = useState('');
   const [currentTab, setCurrentTab] = useState<string | EMenuMealType>(
     EMenuMealType.breakfast,
@@ -91,7 +93,13 @@ const PartnerManageMenusPage: React.FC<TPartnerManageMenusPageProps> = () => {
         <RenderWhen condition={!fetchMenusInProgress}>
           <RenderWhen condition={menusForTab.length > 0}>
             {menusForTab.map((m: TListing) => {
-              return <MenuCard key={m?.id?.uuid} menu={m} />;
+              return (
+                <MenuCard
+                  key={m?.id?.uuid}
+                  menu={m}
+                  onDeleteMenuCompleted={confirmDeletedMenuControl.setTrue}
+                />
+              );
             })}
             <RenderWhen.False>
               <div className={css.emptyMenuList}>
@@ -153,6 +161,18 @@ const PartnerManageMenusPage: React.FC<TPartnerManageMenusPageProps> = () => {
             <FieldTextInputComponent {...fieldTitleProps} />
           </div>
         }
+      />
+
+      <Alert
+        message="Xóa menu thành công"
+        isOpen={confirmDeletedMenuControl.value}
+        autoClose
+        className={css.confirmDeletedMenu}
+        openClassName={css.confirmDeletedMenuOpen}
+        onClose={confirmDeletedMenuControl.setFalse}
+        type={EAlertType.success}
+        hasCloseButton={false}
+        position={EAlertPosition.bottomLeft}
       />
     </div>
   );

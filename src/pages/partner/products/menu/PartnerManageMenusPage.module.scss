@@ -44,3 +44,18 @@
     min-width: 240px;
   }
 }
+
+.confirmDeletedMenu.confirmDeletedMenu {
+  width: 295px;
+  left: -300px;
+  bottom: 92px;
+
+  & > div {
+    column-gap: 16px;
+    margin: 0 auto;
+  }
+}
+
+.confirmDeletedMenuOpen.confirmDeletedMenuOpen {
+  left: calc((100vw - 295px) / 2);
+}
