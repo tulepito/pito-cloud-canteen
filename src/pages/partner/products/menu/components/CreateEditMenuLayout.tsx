@@ -1,6 +1,7 @@
 /* eslint-disable react/no-unescaped-entities */
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useMemo, useState } from 'react';
+import { shallowEqual } from 'react-redux';
 import classNames from 'classnames';
 import { isEqual } from 'lodash';
 import isEmpty from 'lodash/isEmpty';
@@ -120,7 +121,10 @@ const CreateEditMenuLayout: React.FC<TCreateEditMenuLayoutProps> = () => {
   const { menuId: menuIdFromSearch } = parseLocationSearchToObject();
 
   const [currStep, setCurrStep] = useState(EEditPartnerMenuMobileStep.info);
-  const menu = useAppSelector((state) => state.PartnerManageMenus.menu);
+  const menu = useAppSelector(
+    (state) => state.PartnerManageMenus.menu,
+    shallowEqual,
+  );
   const loadMenuDataInProgress = useAppSelector(
     (state) => state.PartnerManageMenus.loadMenuDataInProgress,
   );

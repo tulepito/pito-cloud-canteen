@@ -8,6 +8,10 @@
   align-items: center;
 }
 
+.fieldKeyWords {
+  flex-basis: calc(100% - 12px - 94px);
+}
+
 .filterBtn {
   display: flex;
   column-gap: 8px;

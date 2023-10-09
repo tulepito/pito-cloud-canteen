@@ -142,6 +142,14 @@ const SelectFoodForMealModal: React.FC<TSelectFoodForMealModalProps> = ({
     setSubmittedFilterValues({});
   };
 
+  const handleFoodKeywordsChange = (event: any) => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+
+      return false;
+    }
+  };
+
   const setPageCallBack = useCallback(() => {
     setPage((p) =>
       isMobileLayout ? (p + 1 > totalPages ? totalPages : p + 1) : p,
@@ -211,7 +219,9 @@ const SelectFoodForMealModal: React.FC<TSelectFoodForMealModalProps> = ({
             leftIcon={<IconSearch />}
             input={keywordsField.input}
             meta={keywordsField.meta}
+            className={css.fieldKeyWords}
             placeholder="Tìm kiếm"
+            onKeyPress={handleFoodKeywordsChange}
           />
           <Button
             variant="secondary"
