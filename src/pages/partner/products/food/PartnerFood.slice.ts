@@ -16,6 +16,7 @@ import {
   removePartnerFoodApi,
   removePartnerMultipleFoodApi,
   sendSlackNotificationToAdminApi,
+  toggleFoodEnableApi,
   updatePartnerFoodApi,
   updatePartnerMenuApi,
 } from '@apis/partnerApi';
@@ -217,6 +218,7 @@ const FETCH_DRAFT_FOODS = 'app/ManageFoodsPage/FETCH_DRAFT_FOODS';
 const FETCH_ACTIVE_MENUS = 'app/ManageFoodsPage/FETCH_ACTIVE_MENUS';
 const UPDATE_PARTNER_MENU = 'app/ManageFoodsPage/UPDATE_PARTNER_MENU';
 const SEND_SLACK_NOTIFICATION = 'app/ManageFoodsPage/SEND_SLACK_NOTIFICATION';
+const TOGGLE_FOOD_ENABLED = 'app/ManageFoodsPage/TOGGLE_FOOD_ENABLED';
 
 // ================ Async thunks ================ //
 
@@ -623,12 +625,14 @@ const fetchDeletableFood = createAsyncThunk(
 const fetchActiveMenus = createAsyncThunk(
   FETCH_ACTIVE_MENUS,
   async (payload: any, { extra: sdk, getState }) => {
-    const { keywords } = payload;
+    const { keywords, startDate, endDate } = payload;
     const { currentUser } = getState().user;
     const currentUserGetter = CurrentUser(currentUser!);
     const { restaurantListingId } = currentUserGetter.getMetadata();
     const partnerMenuQuery = getPartnerMenuQuery(restaurantListingId, {
       keywords,
+      startDate,
+      endDate,
     });
     const response = await sdk.listings.query(partnerMenuQuery);
 
@@ -684,6 +688,26 @@ const sendSlackNotification = createAsyncThunk(
   },
 );
 
+const toggleFoodEnabled = createAsyncThunk(
+  TOGGLE_FOOD_ENABLED,
+  async (payload: any, { rejectWithValue }) => {
+    try {
+      const { foodId, action } = payload;
+      const { data: food } = await toggleFoodEnableApi(foodId, {
+        dataParams: { action },
+        queryParams: {},
+      });
+      console.log('SLICE food', food);
+
+      return food;
+    } catch (error) {
+      console.error(`${TOGGLE_FOOD_ENABLED} error: `, error);
+
+      return rejectWithValue(storableError(error));
+    }
+  },
+);
+
 export const partnerFoodSliceThunks = {
   queryPartnerFoods,
   requestUploadFoodImages,
@@ -703,6 +727,7 @@ export const partnerFoodSliceThunks = {
   updatePartnerMenu,
   fetchDraftFood,
   sendSlackNotification,
+  toggleFoodEnabled,
 };
 
 // ================ Slice ================ //
@@ -1027,6 +1052,24 @@ const partnerFoodSlice = createSlice({
         ...state,
         fetchApprovalFoodsInProgress: false,
         fetchApprovalFoodsError: error.message,
+      }))
+
+      .addCase(toggleFoodEnabled.pending, (state) => ({
+        ...state,
+        updateFoodInProgress: true,
+        updateFoodError: null,
+      }))
+      .addCase(toggleFoodEnabled.fulfilled, (state, { payload }) => ({
+        ...state,
+        updateFoodInProgress: false,
+        foods: state.foods.map((food: any) =>
+          food.id.uuid === payload.id.uuid ? payload : food,
+        ),
+      }))
+      .addCase(toggleFoodEnabled.rejected, (state, { error }) => ({
+        ...state,
+        updateFoodInProgress: false,
+        updateFoodError: error.message,
       }));
   },
 });

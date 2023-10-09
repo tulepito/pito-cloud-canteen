@@ -29,3 +29,7 @@
     @include textTemplate(16px, $fontWeightBold, 24px);
   }
 }
+
+.filterMenuModalContainer.filterMenuModalContainer {
+  overflow-y: initial;
+}

@@ -6,6 +6,7 @@ import IconFilter from '@components/Icons/IconFilter/IconFilter';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import SlideModal from '@components/SlideModal/SlideModal';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import useBoolean from '@hooks/useBoolean';
 import type { TKeywordSearchFormValues } from '@pages/admin/partner/components/KeywordSearchForm/KeywordSearchForm';
 import KeywordSearchForm from '@pages/admin/partner/components/KeywordSearchForm/KeywordSearchForm';
 import { Listing } from '@src/utils/data';
@@ -16,6 +17,7 @@ import {
   STEP_SELECT_MENU,
 } from '../../helpers/moveFoodToMenu';
 import { partnerFoodSliceThunks } from '../../PartnerFood.slice';
+import FilterMenuForm from '../FilterMenuForm/FilterMenuForm';
 import type { TMoveFoodToMenuFormValues } from '../MoveFoodToMenuForm/MoveFoodToMenuForm';
 import MoveFoodToMenuForm from '../MoveFoodToMenuForm/MoveFoodToMenuForm';
 
@@ -35,12 +37,17 @@ const MoveFoodToMenuModal: React.FC<TMoveFoodToMenuModalProps> = (props) => {
   const [currentStep, setCurrentStep] = useState<string>(
     moveFoodToMenuSteps[0],
   );
+  const filterMenuModalController = useBoolean();
 
   const updatePartnerMenuInProgress = useAppSelector(
     (state) => state.PartnerFood.updatePartnerMenuInProgress,
   );
 
   const { menuId } = formValues || {};
+
+  const selectedMenu = menuId
+    ? menus.find((menu: TListing) => menu.id.uuid === menuId)
+    : undefined;
 
   const goBackStep = () => {
     setCurrentStep(STEP_SELECT_MENU);
@@ -54,10 +61,16 @@ const MoveFoodToMenuModal: React.FC<TMoveFoodToMenuModalProps> = (props) => {
     );
   };
 
+  const onFilterMenuSubmit = (values: any) => {
+    dispatch(
+      partnerFoodSliceThunks.fetchActiveMenus({
+        ...values,
+      }),
+    );
+  };
+
   const onMoveFoodToMenuSubmit = (values: TMoveFoodToMenuFormValues) => {
     const { selectedDays } = values;
-    const selectedMenu =
-      menuId && menus.find((menu: TListing) => menu.id.uuid === menuId);
     const selectedMenuListing = selectedMenu && Listing(selectedMenu!);
     const {
       foodsByDate = {},
@@ -123,6 +136,7 @@ const MoveFoodToMenuModal: React.FC<TMoveFoodToMenuModalProps> = (props) => {
               <div className={css.searchFilterWrapper}>
                 <KeywordSearchForm onSubmit={onQueryMenuSubmit} />
                 <Button
+                  onClick={filterMenuModalController.setTrue}
                   type="button"
                   variant="secondary"
                   className={css.filterBtn}>
@@ -136,6 +150,7 @@ const MoveFoodToMenuModal: React.FC<TMoveFoodToMenuModalProps> = (props) => {
             <MoveFoodToMenuForm
               onSubmit={onMoveFoodToMenuSubmit}
               menus={menus}
+              selectedMenu={selectedMenu}
               setFormValues={setFormValues}
               currentStep={currentStep}
               setCurrentStep={setCurrentStep}
@@ -144,6 +159,14 @@ const MoveFoodToMenuModal: React.FC<TMoveFoodToMenuModalProps> = (props) => {
             />
           </div>
         </div>
+      </SlideModal>
+      <SlideModal
+        id="FilterMenuModal"
+        modalTitle="Lọc menu"
+        isOpen={filterMenuModalController.value}
+        containerClassName={css.filterMenuModalContainer}
+        onClose={filterMenuModalController.setFalse}>
+        <FilterMenuForm onSubmit={onFilterMenuSubmit} />
       </SlideModal>
     </>
   );

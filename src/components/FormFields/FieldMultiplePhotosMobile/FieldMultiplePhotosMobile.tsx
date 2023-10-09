@@ -180,7 +180,9 @@ const FieldMultiplePhotosMobile: React.FC<TFieldMultiplePhotosMobileProps> = (
                   <>
                     {allImages.map((image: any) => {
                       return (
-                        <div key={image.id} className={css.imageWrapper}>
+                        <div
+                          key={image.imageId.uuid}
+                          className={css.imageWrapper}>
                           <div
                             className={css.deleteImageBtn}
                             onClick={onDeleteImage(image.id)}>

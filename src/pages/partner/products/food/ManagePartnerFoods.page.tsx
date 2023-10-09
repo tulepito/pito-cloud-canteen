@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/no-shadow */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import classNames from 'classnames';
@@ -483,6 +483,18 @@ const ManagePartnerFoods = () => {
   ) : (
     <div>Không có món ăn nào</div>
   );
+  const foodEnableInitialValues = useMemo(
+    () =>
+      foods.reduce((result: any, _food: TListing) => {
+        return {
+          ...result,
+          [`foodEnable-${_food.id.uuid}`]:
+            Listing(_food).getMetadata().isFoodEnable,
+        };
+      }, {}),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [JSON.stringify(foods)],
+  );
 
   const viewModeContentRendered =
     foods.length === 0 ? (
@@ -502,6 +514,7 @@ const ManagePartnerFoods = () => {
         isFoodAcceptedTab={
           foodApprovalActiveTab === EFoodApprovalState.ACCEPTED
         }
+        initialValues={foodEnableInitialValues}
       />
     ) : (
       <>
@@ -518,6 +531,7 @@ const ManagePartnerFoods = () => {
             isFoodAcceptedTab={
               foodApprovalActiveTab === EFoodApprovalState.ACCEPTED
             }
+            initialValues={foodEnableInitialValues}
           />
         </div>
         <div className={css.desktopListWrapper}>
@@ -704,6 +718,7 @@ const ManagePartnerFoods = () => {
                 keywords: keywords as string,
               }}
               inputClassName={css.searchInput}
+              className={css.searchInputWrapper}
             />
             <Button
               type="button"
@@ -908,6 +923,7 @@ const ManagePartnerFoods = () => {
             onSubmit={handleSubmitFilter}
             categoryOptions={categoryOptions}
             onClearForm={handleClearFilter}
+            isMobile
             initialValues={{
               keywords,
               foodType: foodType as string,

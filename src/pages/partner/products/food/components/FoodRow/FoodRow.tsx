@@ -1,11 +1,16 @@
+import { Field } from 'react-final-form';
+
 import FieldCheckbox from '@components/FormFields/FieldCheckbox/FieldCheckbox';
 import IconLightOutline from '@components/Icons/IconLightOutline/IconLightOutline';
 import NamedLink from '@components/NamedLink/NamedLink';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import Toggle from '@components/Toggle/Toggle';
+import { useAppDispatch } from '@hooks/reduxHooks';
 import { partnerPaths } from '@src/paths';
 import { Listing } from '@src/utils/data';
 import type { TListing } from '@src/utils/types';
+
+import { partnerFoodSliceThunks } from '../../PartnerFood.slice';
 
 import css from './FoodRow.module.scss';
 
@@ -28,6 +33,7 @@ const FoodRow: React.FC<TFoodRowProps> = (props) => {
     openManipulateFoodModal,
     isFoodAcceptedTab,
   } = props;
+  const dispatch = useAppDispatch();
 
   const foodListing = Listing(food);
   const foodId = foodListing.getId();
@@ -44,6 +50,16 @@ const FoodRow: React.FC<TFoodRowProps> = (props) => {
     openManipulateFoodModal();
   };
 
+  const handleToggleFoodEnable = (input: any) => (value: any) => {
+    dispatch(
+      partnerFoodSliceThunks.toggleFoodEnabled({
+        foodId,
+        action: value ? 'enable' : 'disable',
+      }),
+    );
+    input.onChange(value);
+  };
+
   return (
     <div className={css.root}>
       <FieldCheckbox
@@ -56,15 +72,22 @@ const FoodRow: React.FC<TFoodRowProps> = (props) => {
         checkboxWrapperClassName={css.checkboxWrapper}
       />
       <RenderWhen condition={!!isFoodAcceptedTab}>
-        <Toggle
-          id="foodEnable"
-          name="foodEnable"
-          // status={input.value ? 'on' : 'off'}
-          onClick={(value) => {
-            console.log(value);
+        <Field id={`foodEnable-${foodId}`} name={`foodEnable-${foodId}`}>
+          {(fieldProps) => {
+            const { input } = fieldProps;
+
+            return (
+              <Toggle
+                id={'MealDateForm.orderType'}
+                status={input.value ? 'on' : 'off'}
+                className={css.toggle}
+                onClick={(value) => {
+                  handleToggleFoodEnable(input)(value);
+                }}
+              />
+            );
           }}
-          className={css.toggle}
-        />
+        </Field>
       </RenderWhen>
       <div className={css.actionsWrapper} onClick={handleActionsBtnClick}>
         <IconLightOutline />

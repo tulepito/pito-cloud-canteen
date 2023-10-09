@@ -73,6 +73,12 @@
   .searchInput {
     margin-right: 0;
   }
+
+  .searchInputWrapper {
+    @include viewportLarge {
+      width: auto;
+    }
+  }
 }
 
 .titleRow {
@@ -499,5 +505,11 @@
 
   @include viewportLarge {
     display: none;
+  }
+}
+
+.tabLabel {
+  .totalItems {
+    background-color: $neutralGray1;
   }
 }

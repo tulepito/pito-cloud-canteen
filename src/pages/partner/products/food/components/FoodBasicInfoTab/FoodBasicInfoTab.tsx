@@ -184,6 +184,18 @@ const FoodBasicInfoTabComponent: React.FC<TFoodBasicInfoTabComponentProps> = (
         )}
         parse={parsePrice}
       />
+      <FieldTextInput
+        name="unit"
+        className={css.field}
+        id="unit"
+        placeholder={intl.formatMessage({
+          id: 'EditPartnerFoodForm.unitPlaceholder',
+        })}
+        label={intl.formatMessage({
+          id: 'EditPartnerFoodForm.unitLabel',
+        })}
+        parse={upperCaseFirstLetter}
+      />
 
       <div className={css.fixedBottomBtn}>
         <Button

@@ -19,10 +19,12 @@ import FieldRadioButton from '@components/FormFields/FieldRadioButton/FieldRadio
 import FieldTextArea from '@components/FormFields/FieldTextArea/FieldTextArea';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import FieldTextInputWithBottomBox from '@components/FormFields/FieldTextInputWithBottomBox/FieldTextInputWithBottomBox';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { foodSliceAction, foodSliceThunks } from '@redux/slices/foods.slice';
 import type { TKeyValue } from '@src/utils/types';
 import {
+  EFoodApprovalState,
   EImageVariants,
   FOOD_TYPE_OPTIONS,
   MENU_OPTIONS,
@@ -53,6 +55,8 @@ type TExtraProps = {
   formError?: any;
   isEditting?: boolean;
   disabled?: boolean;
+  viewModeOnly?: boolean;
+  foodId?: string;
   handleSubmitOnClick?: (values: TEditPartnerFoodFormValues) => any;
 };
 type TEditPartnerFoodFormComponentProps =
@@ -73,6 +77,8 @@ const EditPartnerFoodFormComponent: React.FC<
     form,
     handleSubmitOnClick,
     invalid,
+    viewModeOnly,
+    foodId,
   } = props;
   const dispatch = useAppDispatch();
   const ready = isEqual(submittedValues, values);
@@ -134,9 +140,28 @@ const EditPartnerFoodFormComponent: React.FC<
     [JSON.stringify(categoriesOptions)],
   );
 
+  const declineFood = () => {
+    dispatch(
+      foodSliceThunks.responseApprovalRequest({
+        foodId: foodId as string,
+        response: EFoodApprovalState.DECLINED,
+      }),
+    );
+  };
+
+  const acceptFood = () => {
+    dispatch(
+      foodSliceThunks.responseApprovalRequest({
+        foodId: foodId as string,
+        response: EFoodApprovalState.ACCEPTED,
+      }),
+    );
+  };
+
   return (
     <Form className={css.root}>
-      <div className={css.fieldPhotos}>
+      <div
+        className={classNames(css.fieldPhotos, viewModeOnly && css.viewOnly)}>
         <FieldMutiplePhotos
           name="images"
           id="images"
@@ -149,7 +174,8 @@ const EditPartnerFoodFormComponent: React.FC<
           uploadImageError={uploadImageError}
         />
       </div>
-      <div className={css.radioFields}>
+      <div
+        className={classNames(css.radioFields, viewModeOnly && css.viewOnly)}>
         <label className={css.label}>
           {intl.formatMessage({ id: 'EditPartnerFoodForm.menuLabel' })}
         </label>
@@ -163,7 +189,7 @@ const EditPartnerFoodFormComponent: React.FC<
           />
         ))}
       </div>
-      <div className={css.flexField}>
+      <div className={classNames(css.flexField, viewModeOnly && css.viewOnly)}>
         <div className={classNames(css.field, css.minOrderFieldWrapper)}>
           <label className={css.label}>
             {intl.formatMessage({
@@ -224,7 +250,11 @@ const EditPartnerFoodFormComponent: React.FC<
           </div>
         </div>
         <FieldTextInput
-          className={classNames(css.field, css.maxQuantityField)}
+          className={classNames(
+            css.field,
+            css.maxQuantityField,
+            viewModeOnly && css.viewOnly,
+          )}
           name="maxQuantity"
           type="number"
           id="maxQuantity"
@@ -252,7 +282,7 @@ const EditPartnerFoodFormComponent: React.FC<
           )}
         />
       </div>
-      <div className={css.flexField}>
+      <div className={classNames(css.flexField, viewModeOnly && css.viewOnly)}>
         <div className={classNames(css.field, css.titleFields)}>
           <FieldTextInput
             name="title"
@@ -299,7 +329,12 @@ const EditPartnerFoodFormComponent: React.FC<
             )}
           />
         </div>
-        <div className={classNames(css.flexField, css.innerFlexfield)}>
+        <div
+          className={classNames(
+            css.flexField,
+            css.innerFlexfield,
+            viewModeOnly && css.viewOnly,
+          )}>
           <FieldTextInput
             className={classNames(css.field, css.priceField)}
             name="price"
@@ -342,7 +377,7 @@ const EditPartnerFoodFormComponent: React.FC<
           />
         </div>
       </div>
-      <div className={css.flexField}>
+      <div className={classNames(css.flexField, viewModeOnly && css.viewOnly)}>
         <FieldCheckboxGroup
           className={css.field}
           options={nutritionsOptions || []}
@@ -390,7 +425,7 @@ const EditPartnerFoodFormComponent: React.FC<
           />
         </div>
       </div>
-      <div className={css.flexField}>
+      <div className={classNames(css.flexField, viewModeOnly && css.viewOnly)}>
         <FieldTextInputWithBottomBox
           className={css.field}
           name="allergicIngredients"
@@ -439,7 +474,7 @@ const EditPartnerFoodFormComponent: React.FC<
           )}
         />
       </div>
-      <div className={css.flexField}>
+      <div className={classNames(css.flexField, viewModeOnly && css.viewOnly)}>
         <FieldCheckboxGroup
           className={css.field}
           listClassName={css.sideDishesList}
@@ -455,7 +490,7 @@ const EditPartnerFoodFormComponent: React.FC<
         />
         <div className={css.field}></div>
       </div>
-      <div className={css.flexField}>
+      <div className={classNames(css.flexField, viewModeOnly && css.viewOnly)}>
         <FieldTextArea
           className={css.field}
           name="description"
@@ -495,13 +530,15 @@ const EditPartnerFoodFormComponent: React.FC<
       <div className={css.submitButtons}>
         <ErrorMessage message={formError?.message} />
         <Button
-          onClick={handleSubmitForm}
+          onClick={viewModeOnly ? acceptFood : handleSubmitForm}
           type="button"
           ready={ready}
           inProgress={inProgress}
           disabled={disabled}
           className={css.submitBtn}>
-          {isEditting
+          {viewModeOnly
+            ? 'Duyệt'
+            : isEditting
             ? intl.formatMessage({
                 id: 'EditPartnerFoodForm.updateBtn',
               })
@@ -509,6 +546,18 @@ const EditPartnerFoodFormComponent: React.FC<
                 id: 'EditPartnerFoodForm.submitBtn',
               })}
         </Button>
+        <RenderWhen condition={viewModeOnly}>
+          <Button
+            onClick={declineFood}
+            type="button"
+            ready={ready}
+            variant="secondary"
+            inProgress={inProgress}
+            disabled={disabled}
+            className={css.submitBtn}>
+            Từ chối
+          </Button>
+        </RenderWhen>
       </div>
     </Form>
   );

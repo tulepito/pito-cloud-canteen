@@ -285,15 +285,23 @@ export const getPartnerDraftFoodQuery = (restaurantListingId: string) => {
 
 export type TgetPartnerMenuQueryParams = {
   keywords?: string;
+  startDate?: number;
+  endDate?: number;
 };
 export const getPartnerMenuQuery = (
   restaurantId: string,
   params: TgetPartnerMenuQueryParams,
 ) => {
-  const { keywords } = params;
+  const { keywords, startDate, endDate } = params;
 
   return {
     ...(keywords && { keywords }),
+    ...(startDate && {
+      pub_startDate: `,${startDate + 1}`,
+    }),
+    ...(endDate && {
+      pub_endDate: `${endDate},`,
+    }),
     meta_listingType: EListingType.menu,
     meta_restaurantId: restaurantId,
     meta_isDeleted: false,

@@ -45,3 +45,6 @@ export const transitionOrderPaymentStatusApi = (
 
 export const fetchFoodListFromMenuApi = (params: TObject) =>
   getApi('/admin/listings/order/fetch-food-from-menu', params);
+
+export const responseApprovalRequestApi = (body: TObject) =>
+  postApi('/admin/listings/foods/response-approval-request', body);

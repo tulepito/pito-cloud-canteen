@@ -3,6 +3,14 @@
 @use '/src/styles/customMediaQueries.scss' as *;
 @use '/src/styles/defaults.scss' as *;
 
+.root {
+  background-color: #f2f2f7;
+
+  @include viewportLarge {
+    background-color: $neutralGray1;
+  }
+}
+
 .title {
   font-size: 32px;
   margin-top: 0;
@@ -19,6 +27,7 @@
   gap: 8px;
   padding: 12px 16px;
   border-bottom: 1px solid $neutralGray3;
+  background-color: $neutralGray1;
 
   @include viewportLarge {
     display: none;
@@ -43,6 +52,20 @@
 }
 
 .mobileFormWrapper {
+  margin-top: 8px;
+  background-color: $neutralGray1;
+  padding-bottom: 104px;
+
+  @include viewportLarge {
+    display: none;
+  }
+}
+
+.stepTabContainer {
+  padding: 16px;
+  box-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.08);
+  background-color: $neutralGray1;
+
   @include viewportLarge {
     display: none;
   }

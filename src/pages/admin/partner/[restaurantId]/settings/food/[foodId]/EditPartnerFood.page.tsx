@@ -21,7 +21,7 @@ import { getUpdateFoodData } from '../utils';
 import css from './EditPartnerFood.module.scss';
 
 const EditPartnerFoodPage = () => {
-  const { foodId = '', restaurantId = '' } = useRouter().query;
+  const { foodId = '', restaurantId = '', mode = '' } = useRouter().query;
   const dispatch = useAppDispatch();
 
   const {
@@ -31,6 +31,7 @@ const EditPartnerFoodPage = () => {
     updateFoodInProgress,
     updateFoodError,
     uploadingImages,
+    responseApprovalRequestInProgress,
   } = useAppSelector((state) => state.foods, shallowEqual);
 
   const {
@@ -123,11 +124,13 @@ const EditPartnerFoodPage = () => {
       </h3>
       <EditPartnerFoodForm
         onSubmit={handleSubmit}
-        inProgress={updateFoodInProgress}
+        inProgress={updateFoodInProgress || responseApprovalRequestInProgress}
         disabled={uploadingImages || updateFoodInProgress}
         formError={updateFoodError}
         initialValues={initialValues}
         isEditting
+        viewModeOnly={mode === 'viewOnly'}
+        foodId={foodId as string}
       />
     </>
   );

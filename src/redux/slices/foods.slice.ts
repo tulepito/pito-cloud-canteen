@@ -4,11 +4,12 @@ import omit from 'lodash/omit';
 import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
 
-import { getAttributesApi } from '@apis/admin';
+import { getAttributesApi, responseApprovalRequestApi } from '@apis/admin';
 import { partnerFoodApi } from '@apis/foodApi';
 import { getImportDataFromCsv } from '@pages/admin/partner/[restaurantId]/settings/food/utils';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { denormalisedResponseEntities } from '@utils/data';
+import type { EFoodApprovalState } from '@utils/enums';
 import { EImageVariants, EListingType } from '@utils/enums';
 import { storableAxiosError, storableError } from '@utils/errors';
 import type {
@@ -61,6 +62,9 @@ type TFoodSliceState = {
   packaging: TKeyValue[];
   fetchAttributesInProgress: boolean;
   fetchAttributesError: any;
+
+  responseApprovalRequestInProgress: boolean;
+  responseApprovalRequestError: any;
 };
 
 const initialState: TFoodSliceState = {
@@ -106,6 +110,9 @@ const initialState: TFoodSliceState = {
   packaging: [],
   fetchAttributesInProgress: false,
   fetchAttributesError: null,
+
+  responseApprovalRequestInProgress: false,
+  responseApprovalRequestError: null,
 };
 
 // ================ Thunk types ================ //
@@ -130,7 +137,8 @@ const CREATE_FOOD_FROM_FILE = 'app/ManageFoodsPage/CREATE_FOOD_FROM_FILE';
 
 const QUERY_MENU_PICKED_FOODS = 'app/ManageFoodsPage/QUERY_MENU_PICKED_FOODS';
 const FETCH_ATTRIBUTES = 'app/ManageFoodsPage/FETCH_ATTRIBUTES';
-
+const RESPONSE_APPROVAL_REQUEST =
+  'app/ManageFoodsPage/RESPONSE_APPROVAL_REQUEST';
 // ================ Async thunks ================ //
 
 const queryMenuPickedFoods = createAsyncThunk(
@@ -492,6 +500,22 @@ const fetchAttributes = createAsyncThunk(FETCH_ATTRIBUTES, async () => {
   return response;
 });
 
+const responseApprovalRequest = createAsyncThunk(
+  RESPONSE_APPROVAL_REQUEST,
+  async (
+    { foodId, response }: { foodId: string; response: EFoodApprovalState },
+    { rejectWithValue },
+  ) => {
+    try {
+      await responseApprovalRequestApi({ foodId, response });
+    } catch (error) {
+      console.error(`${RESPONSE_APPROVAL_REQUEST} error: `, error);
+
+      return rejectWithValue(storableError(error));
+    }
+  },
+);
+
 export const foodSliceThunks = {
   queryPartnerFoods,
   requestUploadFoodImages,
@@ -504,6 +528,7 @@ export const foodSliceThunks = {
   createPartnerFoodFromCsv,
   queryMenuPickedFoods,
   fetchAttributes,
+  responseApprovalRequest,
 };
 
 // ================ Slice ================ //
@@ -727,7 +752,22 @@ const foodSlice = createSlice({
           fetchAttributesInProgress: false,
           fetchAttributesError: error.message,
         };
-      });
+      })
+
+      .addCase(responseApprovalRequest.pending, (state) => ({
+        ...state,
+        responseApprovalRequestInProgress: true,
+        responseApprovalRequestError: null,
+      }))
+      .addCase(responseApprovalRequest.fulfilled, (state) => ({
+        ...state,
+        responseApprovalRequestInProgress: false,
+      }))
+      .addCase(responseApprovalRequest.rejected, (state, { payload }) => ({
+        ...state,
+        responseApprovalRequestInProgress: false,
+        responseApprovalRequestError: payload,
+      }));
   },
 });
 

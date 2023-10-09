@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { Field } from 'react-final-form';
 
 import Badge, { EBadgeType } from '@components/Badge/Badge';
 import FieldCheckbox from '@components/FormFields/FieldCheckbox/FieldCheckbox';
@@ -98,7 +99,7 @@ const FoodCard: React.FC<TFoodCardProps> = (props) => {
             <div className={css.menuType}>
               <div className={css.priceWrapper}>{`${parseThousandNumber(
                 price.amount,
-              )}đ / ${unit}`}</div>
+              )}đ ${unit ? `/ ${unit}` : ''}`}</div>
               <div>
                 <Badge
                   type={getApprovalStateType(adminApproval)}
@@ -137,6 +138,16 @@ const FoodCard: React.FC<TFoodCardProps> = (props) => {
     }
   };
 
+  const handleToggleFoodEnable = (input: any) => (value: any) => {
+    dispatch(
+      partnerFoodSliceThunks.toggleFoodEnabled({
+        foodId,
+        action: value ? 'enable' : 'disable',
+      }),
+    );
+    input.onChange(value);
+  };
+
   useEffect(() => {
     if (!editableFoodMap[foodId]) {
       dispatch(partnerFoodSliceThunks.fetchEditableFood(foodId));
@@ -159,15 +170,22 @@ const FoodCard: React.FC<TFoodCardProps> = (props) => {
         checkboxWrapperClassName={css.checkboxWrapper}
       />
       <RenderWhen condition={!!isFoodAcceptedTab}>
-        <Toggle
-          id="foodEnable"
-          name="foodEnable"
-          // status={input.value ? 'on' : 'off'}
-          onClick={(value) => {
-            console.log(value);
+        <Field id={`foodEnable-${foodId}`} name={`foodEnable-${foodId}`}>
+          {(fieldProps) => {
+            const { input } = fieldProps;
+
+            return (
+              <Toggle
+                id={'MealDateForm.orderType'}
+                status={input.value ? 'on' : 'off'}
+                className={css.toggle}
+                onClick={(value) => {
+                  handleToggleFoodEnable(input)(value);
+                }}
+              />
+            );
           }}
-          className={css.toggle}
-        />
+        </Field>
       </RenderWhen>
       <div className={css.actionsWrapper} onClick={handleActionsBtnClick}>
         <IconLightOutline />

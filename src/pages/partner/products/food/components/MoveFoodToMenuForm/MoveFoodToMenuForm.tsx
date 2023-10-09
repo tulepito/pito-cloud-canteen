@@ -37,6 +37,7 @@ type TExtraProps = {
   setCurrentStep?: (step: string) => void;
   selectedFood: TListing;
   inProgress?: boolean;
+  selectedMenu?: TListing;
 };
 type TMoveFoodToMenuFormComponentProps =
   FormRenderProps<TMoveFoodToMenuFormValues> & Partial<TExtraProps>;
@@ -56,14 +57,14 @@ const MoveFoodToMenuFormComponent: React.FC<
     setCurrentStep = () => {},
     selectedFood,
     inProgress,
+    selectedMenu,
   } = props;
+
   const intl = useIntl();
 
   const [selectedMenuWeekDay, setSelectedMenuWeekDay] = useState<string>();
 
   const { menuId, selectedDays = [] } = values;
-  const selectedMenu =
-    menuId && menus.find((menu: TListing) => menu.id.uuid === menuId);
   const selectedMenuListing = selectedMenu && Listing(selectedMenu!);
   const {
     startDate: selectedMenuStartDate,

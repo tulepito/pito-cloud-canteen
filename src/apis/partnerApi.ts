@@ -64,3 +64,5 @@ export const sendSlackNotificationToAdminApi = (
   body: TBodyParams,
 ) =>
   postApi(`${BASE_URL}/food/${foodId}/send-slack-notification-to-admin`, body);
+export const toggleFoodEnableApi = (foodId: string, body: TBodyParams) =>
+  putApi(`${BASE_URL}/food/${foodId}/toggle-food-enable`, body);

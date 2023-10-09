@@ -205,7 +205,7 @@ const CreatePartnerFoodPage = () => {
   }
 
   return (
-    <>
+    <div className={css.root}>
       <h3 className={css.title}>
         <FormattedMessage id="CreatePartnerFood.title" />
       </h3>
@@ -217,12 +217,14 @@ const CreatePartnerFoodPage = () => {
         />
         <div className={css.headerTitle}>Tạo món ăn</div>
       </div>
-      <StepTabs
-        tabs={TAB_STEPS}
-        currentTab={currentTab}
-        setCurrentTab={setCurrentTab}
-        moveableSteps={[FOOD_BASIC_INFO_TAB]}
-      />
+      <div className={css.stepTabContainer}>
+        <StepTabs
+          tabs={TAB_STEPS}
+          currentTab={currentTab}
+          setCurrentTab={setCurrentTab}
+          moveableSteps={[FOOD_BASIC_INFO_TAB]}
+        />
+      </div>
       <div className={css.mobileFormWrapper}>
         <FoodWizard
           tab={currentTab}
@@ -242,7 +244,7 @@ const CreatePartnerFoodPage = () => {
           formError={createFoodError}
         />
       </div>
-    </>
+    </div>
   );
 };
 

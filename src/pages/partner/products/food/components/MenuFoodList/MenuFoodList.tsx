@@ -21,6 +21,9 @@ const MenuFoodList: React.FC<TMenuFoodListProps> = (props) => {
   const foodNumber = Object.keys(foodList).length;
 
   const classes = classNames(css.root, containerClassName);
+  const isNewFoodExistInFoodList = Object.values(foodList).some(
+    (food: any) => food.id === newFoodItem.id,
+  );
 
   return (
     <div className={classes}>
@@ -42,15 +45,17 @@ const MenuFoodList: React.FC<TMenuFoodListProps> = (props) => {
             </div>
           );
         })}
-        <div className={classNames(css.foodItem, css.new)}>
-          <div className={css.name}>{newFoodItem.title}</div>
-          <RenderWhen condition={newFoodItem?.sideDishes.length > 0}>
-            <div className={css.sideDishWrapper}>
-              có <span className={css.sideDish}>Món ăn kèm</span>
-            </div>
-          </RenderWhen>
-          <IconClose className={css.iconClose} />
-        </div>
+        <RenderWhen condition={!isNewFoodExistInFoodList}>
+          <div className={classNames(css.foodItem, css.new)}>
+            <div className={css.name}>{newFoodItem.title}</div>
+            <RenderWhen condition={newFoodItem?.sideDishes.length > 0}>
+              <div className={css.sideDishWrapper}>
+                có <span className={css.sideDish}>Món ăn kèm</span>
+              </div>
+            </RenderWhen>
+            <IconClose className={css.iconClose} />
+          </div>
+        </RenderWhen>
       </div>
     </div>
   );
