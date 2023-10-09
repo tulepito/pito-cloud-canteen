@@ -1,0 +1,35 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.fieldWrapper {
+  border: 1px solid $neutralGray4;
+  border-radius: 8px;
+  padding: 8px 12px;
+  @include flexAlign(center);
+  gap: 12px;
+  margin-bottom: 12px;
+
+  .menuTitle {
+    @include textTemplate(14px, $fontWeightBold, 20px);
+  }
+
+  .content {
+    @include flexAlign(center);
+    margin-top: 4px;
+
+    .iconClock {
+      width: 20px;
+      height: 20px;
+    }
+  }
+}
+
+.menuFoodListContainer {
+  margin-top: 32px;
+}
+
+.submitBtn {
+  width: 100%;
+  margin-top: 24px;
+}

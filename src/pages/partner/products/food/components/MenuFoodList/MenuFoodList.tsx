@@ -1,0 +1,59 @@
+import { useIntl } from 'react-intl';
+import classNames from 'classnames';
+
+import IconClose from '@components/Icons/IconClose/IconClose';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
+import type { TObject } from '@src/utils/types';
+
+import css from './MenuFoodList.module.scss';
+
+type TMenuFoodListProps = {
+  menuDaySession: string;
+  foodList: TObject;
+  newFoodItem: TObject;
+  onNewFoodItemDelete?: () => void;
+  containerClassName?: string;
+};
+
+const MenuFoodList: React.FC<TMenuFoodListProps> = (props) => {
+  const { menuDaySession, foodList, newFoodItem, containerClassName } = props;
+  const intl = useIntl();
+  const foodNumber = Object.keys(foodList).length;
+
+  const classes = classNames(css.root, containerClassName);
+
+  return (
+    <div className={classes}>
+      <div className={css.header}>
+        {intl.formatMessage({ id: `MenuMealType.label.${menuDaySession}` })}
+        {` (${foodNumber})`}
+      </div>
+      <div className={css.foodList}>
+        {Object.values(foodList).map((food: any) => {
+          return (
+            <div key={food.id} className={css.foodItem}>
+              <div className={css.name}>{food.title}</div>
+              <RenderWhen
+                condition={!!food.sideDishes && food.sideDishes.length > 0}>
+                <div className={css.sideDishWrapper}>
+                  có <span className={css.sideDish}>Món ăn kèm</span>
+                </div>
+              </RenderWhen>
+            </div>
+          );
+        })}
+        <div className={classNames(css.foodItem, css.new)}>
+          <div className={css.name}>{newFoodItem.title}</div>
+          <RenderWhen condition={newFoodItem?.sideDishes.length > 0}>
+            <div className={css.sideDishWrapper}>
+              có <span className={css.sideDish}>Món ăn kèm</span>
+            </div>
+          </RenderWhen>
+          <IconClose className={css.iconClose} />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default MenuFoodList;

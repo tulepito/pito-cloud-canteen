@@ -5,8 +5,14 @@ import { MANAGE_FOOD_PAGE_SIZE } from '@pages/partner/products/food/PartnerFood.
 import cookies from '@services/cookie';
 import partnerChecker from '@services/permissionChecker/partner';
 import { getIntegrationSdk, getSdk, handleError } from '@services/sdk';
+import { createSlackNotification } from '@services/slackNotification';
 import { CurrentUser, denormalisedResponseEntities } from '@src/utils/data';
-import { EImageVariants, EListingStates, EListingType } from '@src/utils/enums';
+import {
+  EImageVariants,
+  EListingStates,
+  EListingType,
+  ESlackNotificationType,
+} from '@src/utils/enums';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
@@ -30,6 +36,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           createAtEnd,
           page = 1,
           adminApproval,
+          isDraft,
         } = JSON.parse(JSONParams as string);
         const { restaurantListingId } = currentUserGetter.getMetadata();
 
@@ -47,7 +54,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           meta_restaurantId: restaurantId || restaurantListingId,
           meta_isDeleted: false,
           perPage: MANAGE_FOOD_PAGE_SIZE,
-          meta_adminApproval: adminApproval,
+          ...(adminApproval && {
+            meta_adminApproval: adminApproval,
+          }),
+          ...(isDraft && {
+            meta_isDraft: isDraft,
+          }),
           include: ['images'],
           'fields.image': [`variants.${EImageVariants.squareSmall2x}`],
         });
@@ -74,6 +86,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           },
           queryParams,
         );
+
+        await createSlackNotification(ESlackNotificationType.CREATE_NEW_FOOD, {
+          foodId: response.data.data.id.uuid,
+          restaurantId: restaurantListingId,
+        });
 
         return res.status(200).json(denormalisedResponseEntities(response)[0]);
       }

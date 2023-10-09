@@ -15,6 +15,7 @@ import {
 import type { EFoodApprovalState } from '@utils/enums';
 import {
   EImageVariants,
+  EListingType,
   EOrderStates,
   ERestaurantListingStatus,
 } from '@utils/enums';
@@ -270,5 +271,31 @@ export const getPartnerFoodByApprovalStatusQuery = (
     meta_adminApproval: status,
     meta_restaurantId: restaurantListingId,
     meta_listingType: ListingTypes.FOOD,
+    meta_isDraft: false,
+  };
+};
+
+export const getPartnerDraftFoodQuery = (restaurantListingId: string) => {
+  return {
+    meta_restaurantId: restaurantListingId,
+    meta_listingType: ListingTypes.FOOD,
+    meta_isDraft: true,
+  };
+};
+
+export type TgetPartnerMenuQueryParams = {
+  keywords?: string;
+};
+export const getPartnerMenuQuery = (
+  restaurantId: string,
+  params: TgetPartnerMenuQueryParams,
+) => {
+  const { keywords } = params;
+
+  return {
+    ...(keywords && { keywords }),
+    meta_listingType: EListingType.menu,
+    meta_restaurantId: restaurantId,
+    meta_isDeleted: false,
   };
 };

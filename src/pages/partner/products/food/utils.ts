@@ -48,6 +48,7 @@ export type TEditPartnerFoodFormValues = {
   unit?: string;
   tempValue?: string;
   isDraft: boolean;
+  adminApproval?: EFoodApprovalState;
 };
 
 export const getSubmitFoodData = (values: TEditPartnerFoodFormValues) => {
@@ -93,6 +94,7 @@ export const getUpdateFoodData = (values: TEditPartnerFoodFormValues) => {
     addImages,
     tempValue,
     isDraft,
+    adminApproval,
     ...rest
   } = values;
 
@@ -106,7 +108,8 @@ export const getUpdateFoodData = (values: TEditPartnerFoodFormValues) => {
       ...rest,
     },
     metadata: {
-      isDraft,
+      ...(isDraft ? { isDraft } : {}),
+      ...(adminApproval ? { adminApproval } : {}),
     },
   };
 };

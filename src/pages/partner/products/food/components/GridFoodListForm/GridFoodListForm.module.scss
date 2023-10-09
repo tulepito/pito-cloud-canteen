@@ -16,6 +16,12 @@
   .fieldInput {
     align-self: flex-start;
     padding-left: 12px;
+
+    &.selectAll {
+      @include viewportLarge {
+        display: none;
+      }
+    }
   }
 }
 

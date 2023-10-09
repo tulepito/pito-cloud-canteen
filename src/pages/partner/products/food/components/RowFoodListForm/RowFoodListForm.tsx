@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
+import classNames from 'classnames';
 
 import Form from '@components/Form/Form';
 import FieldCheckbox from '@components/FormFields/FieldCheckbox/FieldCheckbox';
@@ -69,7 +70,7 @@ const RowFoodListFormComponent: React.FC<TRowFoodListFormComponentProps> = (
         name="foodId-all"
         value="all"
         label="Chọn tất cả"
-        className={css.fieldInput}
+        className={classNames(css.fieldInput, css.selectAll)}
         customOnChange={onCheckAllChange}
       />
       {foodList.map((food) => (

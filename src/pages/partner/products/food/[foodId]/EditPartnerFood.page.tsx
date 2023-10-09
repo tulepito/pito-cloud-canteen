@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { shallowEqual } from 'react-redux';
+import { intersection } from 'lodash';
 import { useRouter } from 'next/router';
 
 import Button from '@components/Button/Button';
@@ -25,16 +26,21 @@ import { partnerPaths } from '@src/paths';
 import { IntegrationListing } from '@src/utils/data';
 import type { TObject } from '@src/utils/types';
 import { parsePrice } from '@src/utils/validators';
-import { EFoodTypes, EMenuTypes } from '@utils/enums';
+import {
+  EFoodApprovalState,
+  EFoodTypes,
+  EMenuTypes,
+  ESlackNotificationType,
+} from '@utils/enums';
 import { getInitialAddImages } from '@utils/images';
 
 import EditPartnerFoodForm from '../components/EditPartnerFoodForm/EditPartnerFoodForm';
+import { getObjectDifferences } from '../helpers/editFood';
 import {
   partnerFoodSliceActions,
   partnerFoodSliceThunks,
 } from '../PartnerFood.slice';
-import type { TEditPartnerFoodFormValues } from '../utils';
-import { getUpdateFoodData } from '../utils';
+import { type TEditPartnerFoodFormValues, getUpdateFoodData } from '../utils';
 
 import css from './EditPartnerFood.module.scss';
 
@@ -43,11 +49,13 @@ const EditPartnerFoodPage = () => {
   const { foodId = '', restaurantId = '', tab: tabFromQuery } = router.query;
   const dispatch = useAppDispatch();
   const sendingApprovalToAdminModalController = useBoolean();
+  const reSendingApprovalToAdminModalController = useBoolean();
 
   const [currentTab, setCurrentTab] = useState<string>(
     (tabFromQuery as string) || FOOD_BASIC_INFO_TAB,
   );
 
+  const [changeContent, setChangeContent] = useState<TObject>({}); // for slack notification
   const {
     currentFoodListing,
     showFoodInProgress,
@@ -63,36 +71,22 @@ const EditPartnerFoodPage = () => {
     partnerListingRef,
   } = useAppSelector((state) => state.partners, shallowEqual);
   const currentFoodListingGetter = IntegrationListing(currentFoodListing);
-  const { packaging, foodType, category } =
-    currentFoodListingGetter.getPublicData();
+  const {
+    packaging,
+    foodType,
+    category,
+    sideDishes: currentSideDishes,
+  } = currentFoodListingGetter.getPublicData();
+  const {
+    adminApproval: currentAdminApproval,
+    restaurantId: foodRestaurantId,
+    isDraft: currentIsDraft,
+  } = currentFoodListingGetter.getMetadata();
 
   const moveableSteps =
     !packaging || !foodType || !category
       ? [FOOD_BASIC_INFO_TAB, FOOD_DETAIL_INFO_TAB]
       : [FOOD_BASIC_INFO_TAB, FOOD_DETAIL_INFO_TAB, FOOD_ADDITIONAL_INFO_TAB];
-
-  const handleSubmit = async (values: TEditPartnerFoodFormValues) => {
-    const currentTabIndex = CREATE_FOOD_TABS.indexOf(currentTab);
-    await dispatch(
-      partnerFoodSliceThunks.updatePartnerFoodListing(
-        getUpdateFoodData({
-          ...values,
-          id: foodId as string,
-          ...(currentTabIndex === CREATE_FOOD_TABS.length - 1 && {
-            isDraft: false,
-          }),
-        }),
-      ),
-    );
-
-    if (currentTabIndex !== CREATE_FOOD_TABS.length - 1) {
-      setCurrentTab(
-        CREATE_FOOD_TABS[currentTabIndex + 1] || FOOD_BASIC_INFO_TAB,
-      );
-    } else {
-      sendingApprovalToAdminModalController.setTrue();
-    }
-  };
 
   const {
     minQuantity: minQuantityFromPartner,
@@ -108,8 +102,13 @@ const EditPartnerFoodPage = () => {
       title,
       description,
     } = attributes || ({} as TObject);
-    const { menuType, minQuantity, maxQuantity, minOrderHourInAdvance } =
-      publicData;
+    const {
+      menuType,
+      minQuantity,
+      maxQuantity,
+      minOrderHourInAdvance,
+      minOrderNumberInAdvance,
+    } = publicData;
 
     return {
       images: getInitialAddImages(currentFoodListing?.images || []),
@@ -122,6 +121,7 @@ const EditPartnerFoodPage = () => {
       minQuantity: minQuantity || minQuantityFromPartner,
       maxQuantity: maxQuantity || maxQuantityFromPartner,
       minOrderHourInAdvance: minOrderHourInAdvance || 24,
+      minOrderNumberInAdvance: minOrderNumberInAdvance || 1,
     };
   }, [
     currentFoodListing?.attributes,
@@ -138,6 +138,115 @@ const EditPartnerFoodPage = () => {
   const handleConfirmBtnClick = () => {
     sendingApprovalToAdminModalController.setFalse();
     router.push(partnerPaths.ManageFood);
+  };
+
+  const handleNoResendApprovalBtnClick = () => {
+    reSendingApprovalToAdminModalController.setFalse();
+    router.push(partnerPaths.ManageFood);
+  };
+
+  const handleResendApprovalBtnClick = async () => {
+    await dispatch(
+      partnerFoodSliceThunks.updatePartnerFoodListing({
+        id: foodId as string,
+        metadata: {
+          adminApproval: EFoodApprovalState.PENDING,
+        },
+      }),
+    );
+    dispatch(
+      partnerFoodSliceThunks.sendSlackNotification({
+        foodId: foodId as string,
+        restaurantId: foodRestaurantId,
+        changeContent,
+      }),
+    );
+    reSendingApprovalToAdminModalController.setFalse();
+    router.push(partnerPaths.ManageFood);
+  };
+
+  const handleSubmit = async (values: TEditPartnerFoodFormValues) => {
+    const currentTabIndex = CREATE_FOOD_TABS.indexOf(currentTab);
+    const differentAttributesAfterEditFood = getObjectDifferences(
+      initialValues,
+      values,
+    );
+    const { sideDishes: changeSideDishes } = differentAttributesAfterEditFood;
+    const { sideDishes: newSideDishes } = values;
+    const changeApprovalAttributes = intersection(
+      Object.keys(differentAttributesAfterEditFood),
+      ['title', 'description', 'price', 'images', 'mealType', 'sideDishes'],
+    );
+
+    const shouldChangeAdminApprovalToPending =
+      changeApprovalAttributes.length > 0 &&
+      currentAdminApproval !== EFoodApprovalState.DECLINED;
+    await dispatch(
+      partnerFoodSliceThunks.updatePartnerFoodListing(
+        getUpdateFoodData({
+          ...values,
+          id: foodId as string,
+          ...(currentTabIndex === CREATE_FOOD_TABS.length - 1 && {
+            isDraft: false,
+          }),
+          ...(shouldChangeAdminApprovalToPending && {
+            adminApproval: EFoodApprovalState.PENDING,
+          }),
+        }),
+      ),
+    );
+
+    setChangeContent({
+      ...changeContent,
+      ...differentAttributesAfterEditFood,
+      ...(changeSideDishes && {
+        sideDishes: {
+          oldValues: currentSideDishes,
+          newValues: newSideDishes,
+        },
+      }),
+    });
+
+    if (!currentIsDraft) {
+      if (currentAdminApproval === EFoodApprovalState.PENDING) {
+        sendingApprovalToAdminModalController.setTrue();
+      } else if (
+        currentAdminApproval === EFoodApprovalState.ACCEPTED &&
+        changeApprovalAttributes.length > 0
+      ) {
+        sendingApprovalToAdminModalController.setTrue();
+        dispatch(
+          partnerFoodSliceThunks.sendSlackNotification({
+            foodId: foodId as string,
+            notificationType: ESlackNotificationType.UPDATE_FOOD,
+            params: {
+              foodId: foodId as string,
+              restaurantId: foodRestaurantId,
+              changeContent: {
+                ...differentAttributesAfterEditFood,
+                ...(changeSideDishes && {
+                  sideDishes: {
+                    oldValues: currentSideDishes,
+                    newValues: newSideDishes,
+                  },
+                }),
+              },
+            },
+          }),
+        );
+      } else if (
+        currentAdminApproval === EFoodApprovalState.DECLINED &&
+        changeApprovalAttributes.length > 0
+      ) {
+        reSendingApprovalToAdminModalController.setTrue();
+      }
+    } else if (currentTabIndex !== CREATE_FOOD_TABS.length - 1) {
+      setCurrentTab(
+        CREATE_FOOD_TABS[currentTabIndex + 1] || FOOD_BASIC_INFO_TAB,
+      );
+    } else {
+      sendingApprovalToAdminModalController.setTrue();
+    }
   };
 
   useEffect(() => {
@@ -228,6 +337,36 @@ const EditPartnerFoodPage = () => {
             className={css.noRemoveFoodConfirmBtn}>
             Đã hiểu
           </Button>
+        </>
+      </PopupModal>
+      <PopupModal
+        id="ReSendingApprovalToAdminModal"
+        isOpen={reSendingApprovalToAdminModalController.value}
+        handleClose={reSendingApprovalToAdminModalController.setFalse}
+        containerClassName={css.confirmContainer}
+        shouldHideIconClose>
+        <>
+          <div className={css.cannotRemoveFoodModalTitle}>
+            <IconTickWithBackground className={css.icon} />
+          </div>
+          <div className={css.content}>
+            Cập nhật món thành công, bạn có muốn gửi kiểm duyệt lại?
+          </div>
+          <div className={css.bottomBtns}>
+            <Button
+              onClick={handleNoResendApprovalBtnClick}
+              type="button"
+              variant="secondary"
+              className={css.noRemoveFoodConfirmBtn}>
+              Không
+            </Button>
+            <Button
+              onClick={handleResendApprovalBtnClick}
+              type="button"
+              className={css.noRemoveFoodConfirmBtn}>
+              Gửi kiểm duyệt lại
+            </Button>
+          </div>
         </>
       </PopupModal>
     </div>

@@ -54,3 +54,13 @@ export const fetchFoodEditableApi = (foodId: string) =>
 
 export const fetchFoodDeletableApi = (foodId: string) =>
   getApi(`${BASE_URL}/food/${foodId}/fetch-deletable`);
+
+export const updatePartnerMenuApi = (
+  { menuId, partnerId }: { menuId: string; partnerId: string },
+  body: TBodyParams,
+) => putApi(`${BASE_URL}/${partnerId}/menus/${menuId}`, body);
+export const sendSlackNotificationToAdminApi = (
+  foodId: string,
+  body: TBodyParams,
+) =>
+  postApi(`${BASE_URL}/food/${foodId}/send-slack-notification-to-admin`, body);

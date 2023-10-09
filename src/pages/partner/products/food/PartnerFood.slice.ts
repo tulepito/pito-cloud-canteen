@@ -15,9 +15,15 @@ import {
   queryPartnerFoodsApi,
   removePartnerFoodApi,
   removePartnerMultipleFoodApi,
+  sendSlackNotificationToAdminApi,
   updatePartnerFoodApi,
+  updatePartnerMenuApi,
 } from '@apis/partnerApi';
-import { getPartnerFoodByApprovalStatusQuery } from '@helpers/listingSearchQuery';
+import {
+  getPartnerDraftFoodQuery,
+  getPartnerFoodByApprovalStatusQuery,
+  getPartnerMenuQuery,
+} from '@helpers/listingSearchQuery';
 import { getImportDataFromCsv } from '@pages/admin/partner/[restaurantId]/settings/food/utils';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { bottomRightToastOptions } from '@src/utils/toastify';
@@ -82,9 +88,11 @@ type TFoodSliceState = {
   acceptedFoods: TListing[];
   pendingFoods: TListing[];
   declinedFoods: TListing[];
+  draftFoods: TListing[];
   totalAcceptedFoods: number;
   totalPendingFoods: number;
   totalDeclinedFoods: number;
+  totalDraftFoods: number;
   fetchApprovalFoodsInProgress: boolean;
   fetchApprovalFoodsError: any;
 
@@ -99,6 +107,13 @@ type TFoodSliceState = {
   };
   fetchDeletableFoodInProgress: boolean;
   fetchDeletableFoodError: any;
+
+  menus: TListing[];
+  fetchMenusInProgress: boolean;
+  fetchMenusError: any;
+
+  updatePartnerMenuInProgress: boolean;
+  updatePartnerMenuError: any;
 };
 
 const initialState: TFoodSliceState = {
@@ -148,9 +163,11 @@ const initialState: TFoodSliceState = {
   acceptedFoods: [],
   pendingFoods: [],
   declinedFoods: [],
+  draftFoods: [],
   totalAcceptedFoods: 0,
   totalPendingFoods: 0,
   totalDeclinedFoods: 0,
+  totalDraftFoods: 0,
   fetchApprovalFoodsInProgress: false,
   fetchApprovalFoodsError: null,
 
@@ -161,6 +178,13 @@ const initialState: TFoodSliceState = {
   deletableFoodMap: {},
   fetchDeletableFoodInProgress: false,
   fetchDeletableFoodError: null,
+
+  menus: [],
+  fetchMenusInProgress: false,
+  fetchMenusError: null,
+
+  updatePartnerMenuInProgress: false,
+  updatePartnerMenuError: null,
 };
 
 // ================ Thunk types ================ //
@@ -188,6 +212,11 @@ const FETCH_ATTRIBUTES = 'app/ManageFoodsPage/FETCH_ATTRIBUTES';
 const FETCH_APPROVAL_FOODS = 'app/ManageFoodsPage/FETCH_APPROVAL_FOODS';
 const FETCH_EDITABLE_FOOD = 'app/ManageFoodsPage/FETCH_EDITABLE_FOOD';
 const FETCH_DELETABLE_FOOD = 'app/ManageFoodsPage/FETCH_DELETABLE_FOOD';
+const FETCH_DRAFT_FOODS = 'app/ManageFoodsPage/FETCH_DRAFT_FOODS';
+
+const FETCH_ACTIVE_MENUS = 'app/ManageFoodsPage/FETCH_ACTIVE_MENUS';
+const UPDATE_PARTNER_MENU = 'app/ManageFoodsPage/UPDATE_PARTNER_MENU';
+const SEND_SLACK_NOTIFICATION = 'app/ManageFoodsPage/SEND_SLACK_NOTIFICATION';
 
 // ================ Async thunks ================ //
 
@@ -591,6 +620,70 @@ const fetchDeletableFood = createAsyncThunk(
   },
 );
 
+const fetchActiveMenus = createAsyncThunk(
+  FETCH_ACTIVE_MENUS,
+  async (payload: any, { extra: sdk, getState }) => {
+    const { keywords } = payload;
+    const { currentUser } = getState().user;
+    const currentUserGetter = CurrentUser(currentUser!);
+    const { restaurantListingId } = currentUserGetter.getMetadata();
+    const partnerMenuQuery = getPartnerMenuQuery(restaurantListingId, {
+      keywords,
+    });
+    const response = await sdk.listings.query(partnerMenuQuery);
+
+    return denormalisedResponseEntities(response);
+  },
+);
+
+const updatePartnerMenu = createAsyncThunk(
+  UPDATE_PARTNER_MENU,
+  async (payload: any, { getState }) => {
+    const { currentUser } = getState().user;
+    const { id, dataParams } = payload;
+    const queryParams = {
+      expand: true,
+    };
+    const { data } = await updatePartnerMenuApi(
+      {
+        menuId: id,
+        partnerId: CurrentUser(currentUser!).getMetadata().restaurantListingId,
+      },
+      {
+        dataParams,
+        queryParams,
+      },
+    );
+
+    return data;
+  },
+);
+
+const fetchDraftFood = createAsyncThunk(
+  FETCH_DRAFT_FOODS,
+  async (_, { extra: sdk, getState }) => {
+    const { currentUser } = getState().user;
+    const currentUserGetter = CurrentUser(currentUser!);
+    const { restaurantListingId } = currentUserGetter.getMetadata();
+    const foodQuery = getPartnerDraftFoodQuery(restaurantListingId);
+    const response = await sdk.listings.query(foodQuery);
+    const { totalItems } = response.data.meta;
+
+    return {
+      draftFoods: denormalisedResponseEntities(response),
+      totalDraftFoods: totalItems,
+    };
+  },
+);
+
+const sendSlackNotification = createAsyncThunk(
+  SEND_SLACK_NOTIFICATION,
+  async (payload: any) => {
+    const { foodId } = payload;
+    await sendSlackNotificationToAdminApi(foodId, payload);
+  },
+);
+
 export const partnerFoodSliceThunks = {
   queryPartnerFoods,
   requestUploadFoodImages,
@@ -606,6 +699,10 @@ export const partnerFoodSliceThunks = {
   fetchApprovalFoods,
   fetchEditableFood,
   fetchDeletableFood,
+  fetchActiveMenus,
+  updatePartnerMenu,
+  fetchDraftFood,
+  sendSlackNotification,
 };
 
 // ================ Slice ================ //
@@ -883,6 +980,53 @@ const partnerFoodSlice = createSlice({
         ...state,
         fetchDeletableFoodInProgress: false,
         fetchDeletableFoodError: error.message,
+      }))
+
+      .addCase(fetchActiveMenus.pending, (state) => ({
+        ...state,
+        fetchMenusInProgress: true,
+        fetchMenusError: null,
+      }))
+      .addCase(fetchActiveMenus.fulfilled, (state, { payload }) => ({
+        ...state,
+        fetchMenusInProgress: false,
+        menus: payload,
+      }))
+      .addCase(fetchActiveMenus.rejected, (state, { error }) => ({
+        ...state,
+        fetchMenusInProgress: false,
+        fetchMenusError: error.message,
+      }))
+
+      .addCase(updatePartnerMenu.pending, (state) => ({
+        ...state,
+        updatePartnerMenuInProgress: true,
+        updatePartnerMenuError: null,
+      }))
+      .addCase(updatePartnerMenu.fulfilled, (state) => ({
+        ...state,
+        updatePartnerMenuInProgress: false,
+      }))
+      .addCase(updatePartnerMenu.rejected, (state, { error }) => ({
+        ...state,
+        updatePartnerMenuInProgress: false,
+        updatePartnerMenuError: error.message,
+      }))
+
+      .addCase(fetchDraftFood.pending, (state) => ({
+        ...state,
+        fetchApprovalFoodsInProgress: true,
+        fetchApprovalFoodsError: null,
+      }))
+      .addCase(fetchDraftFood.fulfilled, (state, { payload }) => ({
+        ...state,
+        fetchApprovalFoodsInProgress: false,
+        ...payload,
+      }))
+      .addCase(fetchDraftFood.rejected, (state, { error }) => ({
+        ...state,
+        fetchApprovalFoodsInProgress: false,
+        fetchApprovalFoodsError: error.message,
       }));
   },
 });

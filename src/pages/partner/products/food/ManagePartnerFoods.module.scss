@@ -99,6 +99,15 @@
   min-height: 44px;
 }
 
+.mobileFilterBtn {
+  border-width: 1px;
+  min-height: 44px;
+
+  @include viewportLarge {
+    display: none;
+  }
+}
+
 .addButton {
   background-color: #000000;
   color: $neutralGray1;
@@ -483,4 +492,12 @@
 
 .noRemoveFoodConfirmBtn {
   margin: 12px auto 0;
+}
+
+.foodApprovalTabWrapper {
+  display: block;
+
+  @include viewportLarge {
+    display: none;
+  }
 }

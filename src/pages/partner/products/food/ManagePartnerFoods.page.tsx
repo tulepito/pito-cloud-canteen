@@ -48,6 +48,7 @@ import type { TListing } from '@utils/types';
 import ProductLayout from '../ProductLayout';
 
 import GridFoodListForm from './components/GridFoodListForm/GridFoodListForm';
+import MoveFoodToMenuModal from './components/MoveFoodToMenuModal/MoveFoodToMenuModal';
 import RowFoodListForm from './components/RowFoodListForm/RowFoodListForm';
 import FilterForm from './FilterForm/FilterForm';
 import { partnerFoodSliceThunks } from './PartnerFood.slice';
@@ -175,6 +176,7 @@ const ManagePartnerFoods = () => {
   const manipulateFoodSlideModalController = useBoolean();
   const cannotRemoveFoodModalController = useBoolean();
   const addFoodSlideModalController = useBoolean();
+  const moveFoodToMenuSlideModalController = useBoolean();
 
   const categoryOptions = useAppSelector(
     (state) => state.SystemAttributes.categories,
@@ -232,8 +234,10 @@ const ManagePartnerFoods = () => {
     totalAcceptedFoods,
     totalPendingFoods,
     totalDeclinedFoods,
+    totalDraftFoods,
     editableFoodMap,
     deletableFoodMap,
+    menus,
   } = useAppSelector((state) => state.PartnerFood, shallowEqual);
 
   const getExposeValues = ({ values }: any) => {
@@ -349,6 +353,18 @@ const ManagePartnerFoods = () => {
       ),
       childrenFn: () => {},
     },
+    {
+      key: 'draft',
+      label: (
+        <div className={css.tabLabel}>
+          <span>Nháp</span>
+          <div data-number className={css.totalItems}>
+            {totalDraftFoods}
+          </div>
+        </div>
+      ),
+      childrenFn: () => {},
+    },
   ];
 
   const onTabChange = (tab: any) => {
@@ -368,7 +384,13 @@ const ManagePartnerFoods = () => {
       ...(createAtStart ? { createAtStart } : {}),
       ...(createAtEnd ? { createAtEnd } : {}),
       ...(keywords ? { keywords } : {}),
-      adminApproval: foodApprovalActiveTab,
+      ...(Object.values(EFoodApprovalState).includes(foodApprovalActiveTab)
+        ? {
+            adminApproval: foodApprovalActiveTab,
+          }
+        : {
+            isDraft: true,
+          }),
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
@@ -541,7 +563,10 @@ const ManagePartnerFoods = () => {
 
   const handleEditFood = () => {
     manipulateFoodSlideModalController.setFalse();
-    router.push(partnerPaths.EditFood.replace('[foodId]', selectedFood.id));
+
+    router.push(
+      partnerPaths.EditFood.replace('[foodId]', selectedFood.id.uuid),
+    );
   };
 
   const handleAddFood = () => {
@@ -558,7 +583,12 @@ const ManagePartnerFoods = () => {
     dispatch(
       partnerFoodSliceThunks.fetchApprovalFoods(EFoodApprovalState.DECLINED),
     );
-  }, []);
+    dispatch(partnerFoodSliceThunks.fetchDraftFood());
+  }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(partnerFoodSliceThunks.fetchActiveMenus({}));
+  }, [dispatch]);
 
   return (
     <ProductLayout
@@ -678,7 +708,7 @@ const ManagePartnerFoods = () => {
             <Button
               type="button"
               variant="secondary"
-              className={css.filterButton}
+              className={css.mobileFilterBtn}
               onClick={filterFoodSlideModalController.setTrue}>
               <IconFilter className={css.filterIcon} />
             </Button>
@@ -896,8 +926,13 @@ const ManagePartnerFoods = () => {
           onClose={manipulateFoodSlideModalController.setFalse}>
           <div className={css.actionsBtnWrapper}>
             <RenderWhen
-              condition={foodApprovalActiveTab === EFoodApprovalState.ACCEPTED}>
-              <div className={css.item}>
+              condition={
+                foodApprovalActiveTab === EFoodApprovalState.ACCEPTED &&
+                menus.length > 0
+              }>
+              <div
+                className={css.item}
+                onClick={moveFoodToMenuSlideModalController.setTrue}>
                 <IconSwap />
                 <span>Di chuyển vào menu</span>
               </div>
@@ -930,6 +965,13 @@ const ManagePartnerFoods = () => {
             </div>
           </div>
         </SlideModal>
+
+        <MoveFoodToMenuModal
+          isOpen={moveFoodToMenuSlideModalController.value}
+          onClose={moveFoodToMenuSlideModalController.setFalse}
+          selectedFood={selectedFood}
+          menus={menus}
+        />
       </div>
     </ProductLayout>
   );

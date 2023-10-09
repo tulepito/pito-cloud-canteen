@@ -54,6 +54,7 @@
 .mobileFormWrapper {
   margin-top: 8px;
   background-color: $neutralGray1;
+  padding-bottom: 104px;
   @include viewportLarge {
     display: none;
   }
@@ -95,4 +96,9 @@
 
 .noRemoveFoodConfirmBtn {
   margin: 12px auto 0;
+}
+
+.bottomBtns {
+  @include flexAlign(center);
+  gap: 8px;
 }

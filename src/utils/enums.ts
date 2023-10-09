@@ -1136,3 +1136,8 @@ export const FOOD_APPROVAL_STATE_OPTIONS = [
     label: 'Từ chối',
   },
 ];
+
+export enum ESlackNotificationType {
+  CREATE_NEW_FOOD = 'createNewFood',
+  UPDATE_FOOD = 'updateFood',
+}
