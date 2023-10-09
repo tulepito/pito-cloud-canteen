@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from 'react';
 
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
@@ -35,28 +36,21 @@ const AddingPaymentTableField: React.FC<TAddPartnerPaymentFormValues> = (
   } = props;
   const [percentage, setPercentage] = useState(0);
 
-  const paymentAmountValue =
-    values?.[`paymentAmount - ${orderTitle} - ${subOrderDate} - ${id}`] || 0;
+  const fieldName = `paymentAmount - ${orderTitle} - ${subOrderDate} - ${id}`;
+  const paymentAmountValue = values?.[fieldName] || 0;
 
   useEffect(() => {
     if (
+      paidAmount <= totalAmount &&
       parseThousandNumberToInteger(`${paymentAmountValue}`) >
-      totalAmount - paidAmount
+        totalAmount - paidAmount
     ) {
       form.change(
-        `paymentAmount - ${orderTitle} - ${subOrderDate} - ${id}`,
+        fieldName,
         parseThousandNumber(`${totalAmount - paidAmount}`),
       );
     }
-  }, [
-    form,
-    orderTitle,
-    paidAmount,
-    paymentAmountValue,
-    subOrderDate,
-    totalAmount,
-    id,
-  ]);
+  }, [fieldName, paidAmount, paymentAmountValue, totalAmount]);
 
   useEffect(() => {
     if (percentage !== 0) {
@@ -65,7 +59,6 @@ const AddingPaymentTableField: React.FC<TAddPartnerPaymentFormValues> = (
         parseThousandNumber(Math.round((totalAmount * percentage) / 100)),
       );
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [percentage]);
 
   return (
