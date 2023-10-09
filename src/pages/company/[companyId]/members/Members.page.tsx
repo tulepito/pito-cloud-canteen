@@ -72,10 +72,6 @@ const MembersPage = () => {
     (state) => state.company.groupList,
     shallowEqual,
   );
-  console.debug(
-    '💫 > file: Members.page.tsx:75 > MembersPage > groupList: ',
-    groupList,
-  );
   const { fetchCompanyInfoInProgress } = useAppSelector(
     (state) => state.company,
   );
@@ -182,9 +178,9 @@ const MembersPage = () => {
   const formattedCompanyMembers = useMemo<TRowData[]>(
     () =>
       mergedCompanyMembers.reduce((result: any, member: any) => {
-        const email = member?.attributes?.email;
         const id = member?.id?.uuid;
-        const memberGroupList = groupList.reduce(
+        const email = member?.attributes?.email;
+        const memberGroupIds = groupList.reduce(
           (groupIds: string[], curr: TObject) => {
             const { members = [], id: groupId } = curr || {};
 
@@ -211,14 +207,14 @@ const MembersPage = () => {
         return [
           ...result,
           {
-            key: member?.id?.uuid || member.attributes.email,
+            key: id || email,
             data: {
               id,
               name: `${member.attributes.profile?.lastName || ''} ${
                 member.attributes.profile?.firstName || ''
               }`,
               email,
-              group: getGroupNames(memberGroupList, groupList),
+              group: getGroupNames(memberGroupIds, groupList),
               allergy:
                 User(member)
                   .getPublicData()
@@ -237,7 +233,11 @@ const MembersPage = () => {
           },
         ];
       }, []),
-    [groupList, mergedCompanyMembers, nutritions],
+    [
+      JSON.stringify(groupList),
+      JSON.stringify(mergedCompanyMembers),
+      JSON.stringify(nutritions),
+    ],
   );
 
   useEffect(() => {
