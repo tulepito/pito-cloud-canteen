@@ -194,11 +194,15 @@ export const numberMaxLength =
 export const numberMinLength =
   (message: string, minimumLength: number, shouldPassIfEmpty = false) =>
   (value: number) => {
-    if (shouldPassIfEmpty && isEmpty(value)) {
+    const isValueEmpty = isEmpty(value);
+
+    if (shouldPassIfEmpty && isValueEmpty) {
       return VALID;
     }
 
-    const parsedValue = Number(removeNonNumeric(value.toString()));
+    const parsedValue = isValueEmpty
+      ? 0
+      : Number(removeNonNumeric(value.toString()));
     const isNumber = typeof parsedValue === 'number';
 
     return isNumber && parsedValue >= minimumLength ? VALID : message;
