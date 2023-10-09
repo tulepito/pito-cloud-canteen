@@ -64,7 +64,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       if (
         !orderDetail[subOrderDate]?.transactionId ||
         (orderDetail[subOrderDate]?.transactionId &&
-          orderDetail[subOrderDate]?.status === ESubOrderStatus.CANCELED) ||
+          orderDetail[subOrderDate]?.status === ESubOrderStatus.canceled) ||
         orderDetail[subOrderDate]?.lastTransition ===
           ETransition.OPERATOR_CANCEL_PLAN
       ) {
@@ -106,7 +106,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         if (
           !orderDetail[subOrderDate]?.transactionId ||
           (orderDetail[subOrderDate]?.transactionId &&
-            orderDetail[subOrderDate]?.status === ESubOrderStatus.CANCELED) ||
+            orderDetail[subOrderDate]?.status === ESubOrderStatus.canceled) ||
           orderDetail[subOrderDate]?.lastTransition ===
             ETransition.OPERATOR_CANCEL_PLAN
         ) {

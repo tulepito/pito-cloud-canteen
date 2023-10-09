@@ -96,7 +96,7 @@ const OrderPaymentStatusTab: React.FC<OrderPaymentStatusTabProps> = (props) => {
             isEmpty(
               partner[orderDetail[subOrderDate].restaurant.id]?.quotation,
             ) ||
-            orderDetail[subOrderDate].status === ESubOrderStatus.CANCELED ||
+            orderDetail[subOrderDate].status === ESubOrderStatus.canceled ||
             orderDetail[subOrderDate].lastTransition ===
               ETransition.OPERATOR_CANCEL_PLAN ||
             !orderDetail[subOrderDate].transactionId
