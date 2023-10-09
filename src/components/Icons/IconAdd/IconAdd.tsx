@@ -34,8 +34,8 @@ const IconAdd: React.FC<TIconAddProps> = (props) => {
       fill="none"
       xmlns="http://www.w3.org/2000/svg">
       <path
-        fill-rule="evenodd"
-        clip-rule="evenodd"
+        fillRule="evenodd"
+        clipRule="evenodd"
         d="M0.285156 4.99984C0.285328 2.61462 1.97038 0.561675 4.3098 0.0964973C6.64922 -0.36868 8.99146 0.883468 9.90411 3.08718C10.8168 5.2909 10.0456 7.83242 8.06232 9.15747C6.07901 10.4825 3.43588 10.222 1.74936 8.53535C0.811751 7.59765 0.285061 6.32589 0.285156 4.99984Z"
         fill="#262626"
       />
