@@ -35,7 +35,10 @@ const OrderDeadlineField: React.FC<OrderDeadlineFieldProps> = (props) => {
             !!deadlineDate && !!orderDeadlineHour && !!orderDeadlineMinute
           }>
           <span>
-            {`${values.orderDeadlineHour}:${values.orderDeadlineMinute} - `}
+            {`${values.orderDeadlineHour?.padStart(
+              2,
+              '0',
+            )}:${values.orderDeadlineMinute?.padStart(2, '0')} - `}
             {!!deadlineDate &&
               format(deadlineDate!, 'EEE, dd MMMM, yyyy', {
                 locale: viLocale,

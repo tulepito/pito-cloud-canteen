@@ -49,8 +49,10 @@ const OrderDateFieldModal: React.FC<TOrderDateFieldModalProps> = (props) => {
   const handleTimeRangeSelect = (key: string) => {
     switch (key) {
       case 'next7Days':
-        setStartDate(new Date());
-        setEndDate(DateTime.now().plus({ days: 6 }).toJSDate());
+        setStartDate(
+          DateTime.now().plus({ days: 3 }).startOf('day').toJSDate(),
+        );
+        setEndDate(DateTime.now().plus({ days: 9 }).startOf('day').toJSDate());
         break;
 
       case 'nextWeek':
@@ -58,6 +60,7 @@ const OrderDateFieldModal: React.FC<TOrderDateFieldModalProps> = (props) => {
         setEndDate(
           DateTime.fromJSDate(getNextWeek(new Date()))
             .plus({ days: 6 })
+            .startOf('day')
             .toJSDate(),
         );
         break;

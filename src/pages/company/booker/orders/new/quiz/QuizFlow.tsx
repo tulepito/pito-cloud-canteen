@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 
-import { useAppSelector } from '@hooks/reduxHooks';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { resetOrder } from '@redux/slices/Order.slice';
 import { CurrentUser } from '@src/utils/data';
 import { QuizStep } from '@src/utils/enums';
 
@@ -51,6 +52,7 @@ const secondTimeQuizFlowSteps = [
 ];
 
 const QuizFlow = () => {
+  const dispatch = useAppDispatch();
   const currentStep = useAppSelector(
     (state) => state.BookerNewOrderPage.currentStep,
   );
@@ -61,6 +63,10 @@ const QuizFlow = () => {
 
   const [quizStepsWithComponent, setQuizStepsWithComponent] =
     useState<any>(firstTimeQuizSteps);
+
+  useEffect(() => {
+    dispatch(resetOrder());
+  }, [dispatch]);
 
   useEffect(() => {
     if (hasOrderBefore) {

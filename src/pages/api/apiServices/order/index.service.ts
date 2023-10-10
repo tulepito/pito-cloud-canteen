@@ -13,6 +13,11 @@ import { fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/sdk';
 import { Listing, User } from '@src/utils/data';
 import {
+  generateWeekDayList,
+  getDayOfWeek,
+  renderDateRange,
+} from '@src/utils/dates';
+import {
   EBookerOrderDraftStates,
   EListingStates,
   EOrderDraftStates,
@@ -218,6 +223,9 @@ const reorder = async ({
     },
   });
 
+  const orderDatesInTimestamp = renderDateRange(startDate, endDate);
+  const orderDatesWeekdayList = generateWeekDayList(startDate, endDate);
+
   const [newOrder] = denormalisedResponseEntities(newOrderResponse);
   const isGroupOrder = orderType === EOrderType.group;
   const initialMemberOrder = getInitMemberOrder({
@@ -239,10 +247,15 @@ const reorder = async ({
             'lastTransition',
             'transactionId',
           ]);
+          const weekDayOfOldDate = getDayOfWeek(+date);
+          const newDate =
+            orderDatesInTimestamp[
+              orderDatesWeekdayList.indexOf(weekDayOfOldDate)
+            ];
 
           return {
             ...result,
-            [date]: {
+            [`${newDate}`]: {
               ...subOrderNeededData,
               memberOrders: isGroupOrder ? {} : initialMemberOrder,
             },

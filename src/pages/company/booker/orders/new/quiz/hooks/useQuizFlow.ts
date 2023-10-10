@@ -43,6 +43,7 @@ export const useQuizFlow = (step: string) => {
   const isCopyPreviousOrder = useAppSelector(
     (state) => state.Quiz.isCopyPreviousOrder,
   );
+  const reorderOpen = useAppSelector((state) => state.Quiz.reorderOpen);
 
   const selectedCompany = useAppSelector(
     (state) => state.Quiz.selectedCompany,
@@ -52,7 +53,6 @@ export const useQuizFlow = (step: string) => {
   const currentUserGetter = CurrentUser(currentUser!);
   const { hasOrderBefore = false, quizData: bookerQuizData } =
     currentUserGetter.getPrivateData();
-
   const currentQuizSteps = hasOrderBefore ? secondQuizSteps : quizSteps;
   const nextStep = () => {
     const nextStepIndex =
@@ -66,70 +66,78 @@ export const useQuizFlow = (step: string) => {
     dispatch(BookerNewOrderAction.setCurrentStep(backStepIndex));
   };
 
-  const submitCreateOrder = useCallback(async () => {
-    creatingOrderModalControl.setTrue();
-    try {
-      const { payload: orderListing }: { payload: any } = await dispatch(
-        orderAsyncActions.createOrder({
-          isCreatedByAdmin: false,
-        }),
-      );
-      const orderId = Listing(orderListing as TListing).getId();
-      const { plans = [] } = Listing(orderListing as TListing).getMetadata();
-      const planId = plans[0];
-      const { payload: recommendOrderDetail }: any = await dispatch(
-        orderAsyncActions.recommendRestaurants(),
-      );
-      const { meta } = await dispatch(
-        orderAsyncActions.updatePlanDetail({
-          orderId,
-          planId,
-          orderDetail: recommendOrderDetail,
-        }),
-      );
-      if (meta.requestStatus !== 'rejected') {
-        if (!hasOrderBefore) {
+  const submitCreateOrder = useCallback(
+    async (submitQuizData?: any) => {
+      creatingOrderModalControl.setTrue();
+      try {
+        const { meta, payload: orderListing }: { meta: any; payload: any } =
           await dispatch(
-            userThunks.updateProfile({
-              privateData: {
-                hasOrderBefore: true,
-                quizData: {
-                  packagePerMember: quizData.packagePerMember,
-                  memberAmount: quizData.memberAmount,
-                  daySession: quizData.daySession,
-                  deliveryHour: quizData.deliveryHour,
-                  mealStyles: quizData.mealStyles || [],
-                  nutritions: quizData.nutritions || [],
-                  mealType: quizData.mealType || [],
-                },
-              },
+            orderAsyncActions.createOrder({
+              isCreatedByAdmin: false,
+            }),
+          );
+        const orderId = Listing(orderListing as TListing).getId();
+        if (!isCopyPreviousOrder && !reorderOpen) {
+          const { plans = [] } = Listing(
+            orderListing as TListing,
+          ).getMetadata();
+          const planId = plans[0];
+          const { payload: recommendOrderDetail }: any = await dispatch(
+            orderAsyncActions.recommendRestaurants(),
+          );
+          await dispatch(
+            orderAsyncActions.updatePlanDetail({
+              orderId,
+              planId,
+              orderDetail: recommendOrderDetail,
             }),
           );
         }
-        dispatch(QuizActions.closeQuizFlow());
-        dispatch(BookerNewOrderAction.setCurrentStep(0));
-        await router.push({
-          pathname: `/company/booker/orders/draft/${orderId}`,
-          query: { ...router.query },
-        });
+        if (meta.requestStatus !== 'rejected') {
+          if (!hasOrderBefore) {
+            await dispatch(
+              userThunks.updateProfile({
+                privateData: {
+                  hasOrderBefore: true,
+                  quizData: {
+                    packagePerMember: quizData.packagePerMember,
+                    memberAmount: quizData.memberAmount,
+                    daySession: submitQuizData.daySession,
+                    deliveryHour: submitQuizData.deliveryHour,
+                    mealStyles: quizData.mealStyles || [],
+                    nutritions: quizData.nutritions || [],
+                    mealType: quizData.mealType || [],
+                  },
+                },
+              }),
+            );
+          }
+          dispatch(QuizActions.closeQuizFlow());
+          dispatch(BookerNewOrderAction.setCurrentStep(0));
+          await router.push({
+            pathname: `/company/booker/orders/draft/${orderId}`,
+            query: { ...router.query },
+          });
+        }
+      } catch (error) {
+        console.error('error: ', error);
+      } finally {
+        submittingErrorControl.setFalse();
       }
-    } catch (error) {
-      console.error('error: ', error);
-    } finally {
-      submittingErrorControl.setFalse();
-    }
-  }, [
-    JSON.stringify(bookerQuizData),
-    creatingOrderModalControl,
-    currentUser?.id?.uuid,
-    dispatch,
-    hasOrderBefore,
-    isCopyPreviousOrder,
-    JSON.stringify(previousOrder),
-    JSON.stringify(quizData),
-    JSON.stringify(selectedCompany),
-    submittingErrorControl,
-  ]);
+    },
+    [
+      JSON.stringify(bookerQuizData),
+      creatingOrderModalControl,
+      currentUser?.id?.uuid,
+      dispatch,
+      hasOrderBefore,
+      isCopyPreviousOrder,
+      JSON.stringify(previousOrder),
+      JSON.stringify(quizData),
+      JSON.stringify(selectedCompany),
+      submittingErrorControl,
+    ],
+  );
 
   return {
     nextStep,

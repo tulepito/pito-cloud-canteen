@@ -45,7 +45,7 @@ const OrderDeadlineDateFieldModal: React.FC<
       parseInt(_values, 10) >= 0 &&
       parseInt(_values, 10) <= 23
     ) {
-      return _values.padStart(2, '0');
+      return _values;
     }
   };
 
@@ -55,7 +55,7 @@ const OrderDeadlineDateFieldModal: React.FC<
       parseInt(_values, 10) >= 0 &&
       parseInt(_values, 10) <= 59
     ) {
-      return _values.padStart(2, '0');
+      return _values;
     }
   };
 

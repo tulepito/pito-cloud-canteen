@@ -634,5 +634,29 @@ export const getNextWeek = (date: Date) => {
   return DateTime.fromJSDate(date)
     .plus({ weeks: 1 })
     .startOf('week')
+    .startOf('day')
     .toJSDate();
+};
+
+export const generateWeekDayList = (startDate: number, endDate: number) => {
+  const weekdays = [];
+
+  // Convert the timestamps to Luxon DateTime objects
+  const startDateDT = DateTime.fromMillis(startDate);
+  const endDateDT = DateTime.fromMillis(endDate);
+
+  // Start at the beginning of the start date
+  let currentDay = startDateDT.startOf('day');
+
+  while (currentDay <= endDateDT) {
+    // Check if the current day is a weekday (Monday: 1, Friday: 5)
+    if (currentDay.weekday >= 1 && currentDay.weekday <= 5) {
+      weekdays.push(currentDay.weekday);
+    }
+
+    // Move to the next day
+    currentDay = currentDay.plus({ days: 1 });
+  }
+
+  return weekdays;
 };

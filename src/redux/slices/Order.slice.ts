@@ -383,8 +383,13 @@ const createOrder = createAsyncThunk(
         dayInWeek: selectedDays,
         startDate: startDateTimestamp,
         endDate: endDateTimestamp,
-        deadlineDate: deadlineDateTimestamp,
-        deadlineHour: `${orderDeadlineHour}:${orderDeadlineMinute}`,
+        ...(newIsGroupOrder && {
+          deadlineDate: deadlineDateTimestamp,
+          deadlineHour: `${orderDeadlineHour.padStart(
+            2,
+            '0',
+          )}:${orderDeadlineMinute.padStart(2, '0')}`,
+        }),
       },
     };
 
