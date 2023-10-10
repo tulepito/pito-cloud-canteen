@@ -86,8 +86,6 @@ const updateMenu = async (
   const endDateToSubmit = isCycleMenu
     ? addWeeksToDate(new Date(startDate), numberOfCycles).getTime()
     : endDate;
-  // TODO: save food id in menu
-  // id, nutrition, min price,
 
   const listFoodIdsByDate =
     restaurantId && daysOfWeek && isDaysOfWeekChanged

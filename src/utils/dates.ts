@@ -302,6 +302,11 @@ export const getStartOfDay = (anchorDate: number) => {
   return DateTime.fromMillis(anchorDate).startOf('day').second;
 };
 
+export const getDateEndDate = (date: Date) =>
+  DateTime.fromJSDate(date).endOf('day').toJSDate();
+export const getDateStartOfDate = (date: Date) =>
+  DateTime.fromJSDate(date).startOf('day').toJSDate();
+
 export const DAY_AS_INDEX = {
   [EDayOfWeek.sun]: -1,
   [EDayOfWeek.mon]: 0,

@@ -18,7 +18,7 @@ import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput
 import IconCalendar from '@components/Icons/IconCalender/IconCalender';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { getWeekDayList } from '@src/utils/dates';
+import { getDateStartOfDate, getWeekDayList } from '@src/utils/dates';
 import type { EMenuMealType } from '@src/utils/enums';
 import { PARTNER_MENU_MEAL_TYPE_OPTIONS } from '@src/utils/enums';
 import type { TObject } from '@src/utils/types';
@@ -125,6 +125,13 @@ const CreateEditMenuFormComponent: React.FC<
     mealType: mealType!,
   });
 
+  const handlePickStartDate = (newPickedDate: Date) => {
+    setStartDate(getDateStartOfDate(newPickedDate));
+  };
+  const handlePickEndDate = (newPickedDate: Date) => {
+    setEndDate(getDateStartOfDate(newPickedDate));
+  };
+
   const handleStartDateChange = (value: any, prevValue: any) => {
     if (
       endDateFromValues &&
@@ -132,8 +139,8 @@ const CreateEditMenuFormComponent: React.FC<
       value !== initialValues.startDate
     ) {
       form.batch(() => {
-        form.change('endDate', undefined);
-        setEndDate(undefined!);
+        form.change('endDate', value);
+        setEndDate(new Date(value));
       });
     }
   };
@@ -262,7 +269,7 @@ const CreateEditMenuFormComponent: React.FC<
                   id="startDate"
                   name="startDate"
                   selected={startDate}
-                  onChange={(date: Date) => setStartDate(date)}
+                  onChange={handlePickStartDate}
                   minDate={new Date()}
                   autoComplete="off"
                   label={'Ngày bắt đầu'}
@@ -282,7 +289,7 @@ const CreateEditMenuFormComponent: React.FC<
                 <FieldDatePicker
                   id="endDate"
                   name="endDate"
-                  onChange={(date: Date) => setEndDate(date)}
+                  onChange={handlePickEndDate}
                   selected={endDate}
                   label={'Ngày kết thúc'}
                   className={endDateClasses}

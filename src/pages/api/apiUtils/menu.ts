@@ -172,7 +172,7 @@ export const createListFoodTypeByFoodIds = async (listFoodIdsByDate: any) => {
           resolve(result);
         }
       } catch (error) {
-        reject();
+        reject(error);
       }
     });
   });

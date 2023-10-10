@@ -102,8 +102,11 @@ const publishDraftMenu = async (
               startDate,
               restaurantId,
               ...(isAllSubMenuFoodByDateEmpty
-                ? { mealTypes: [meal] }
-                : { foodsByDate: { [meal]: subMenuFoodsByDate } }),
+                ? {
+                    mealTypes: [meal],
+                    draftFoodByDate: { [meal]: subMenuFoodsByDate },
+                  }
+                : { foodsByDate: subMenuFoodsByDate }),
               title,
               endDate,
               numberOfCycles,

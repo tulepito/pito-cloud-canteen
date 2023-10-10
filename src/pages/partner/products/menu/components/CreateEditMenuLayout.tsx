@@ -5,6 +5,7 @@ import { shallowEqual } from 'react-redux';
 import classNames from 'classnames';
 import { isEqual } from 'lodash';
 import isEmpty from 'lodash/isEmpty';
+import { DateTime } from 'luxon';
 import { useRouter } from 'next/router';
 
 import Button from '@components/Button/Button';
@@ -171,6 +172,8 @@ const CreateEditMenuLayout: React.FC<TCreateEditMenuLayoutProps> = () => {
   const isMealSettingsTab =
     currStep === EEditPartnerMenuMobileStep.mealSettings;
 
+  const currentTime = DateTime.now().startOf('day').toMillis();
+
   const submitting =
     createDraftMenuInProgress ||
     updateDraftMenuInProgress ||
@@ -178,10 +181,14 @@ const CreateEditMenuLayout: React.FC<TCreateEditMenuLayoutProps> = () => {
   const initialValues = useMemo(
     () => ({
       menuName: title,
-      startDate,
-      endDate,
+      startDate: startDate && startDate !== null ? startDate : currentTime,
+      endDate: endDate && endDate !== null ? endDate : currentTime,
       mealType,
-      mealTypes: isEmpty(mealTypes) ? [mealType] : mealTypes,
+      mealTypes: isEmpty(mealTypes)
+        ? mealType !== null && !isEmpty(mealType)
+          ? [mealType]
+          : []
+        : mealTypes,
       foodsByDate,
       draftFoodByDate,
       foodByDate: isDraftEditFlow ? draftFoodByDate : foodsByDate,
@@ -189,6 +196,7 @@ const CreateEditMenuLayout: React.FC<TCreateEditMenuLayoutProps> = () => {
     [
       isDraftEditFlow,
       title,
+      currentTime?.toString(),
       endDate?.toString(),
       startDate?.toString(),
       mealType,
