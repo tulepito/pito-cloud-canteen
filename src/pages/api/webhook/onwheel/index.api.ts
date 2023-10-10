@@ -1,10 +1,15 @@
+import omit from 'lodash/omit';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HttpMethod } from '@apis/configs';
 import { transitionOrderStatus } from '@pages/api/admin/plan/transition-order-status.service';
+import createQuotation from '@pages/api/orders/[orderId]/quotation/create-quotation.service';
+import { emailSendingFactory, EmailTemplateTypes } from '@services/email';
 import { fetchListing, fetchUser } from '@services/integrationHelper';
+import { createFirebaseDocNotification } from '@services/notifications';
 import { getIntegrationSdk, handleError } from '@services/sdk';
 import { Listing, User } from '@src/utils/data';
+import { ENotificationType, EQuotationStatus } from '@src/utils/enums';
 import { ETransition } from '@src/utils/transaction';
 
 const fetchData = async (orderId: string) => {
@@ -104,7 +109,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
                 const planId = planListing.getId();
                 const { orderDetail = {} } = planListing.getMetadata();
                 const subOrder = orderDetail[subOrderDate];
-                const { transactionId, lastTransition } = subOrder || {};
+                const { transactionId, lastTransition, restaurant } =
+                  subOrder || {};
 
                 if (lastTransition === transition) return;
 
@@ -128,10 +134,121 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
                     orderDetail: newOrderDetail,
                   },
                 });
-                if (
-                  transition === ETransition.COMPLETE_DELIVERY ||
-                  transition === ETransition.OPERATOR_CANCEL_PLAN
-                ) {
+
+                const orderListing = Listing(order);
+                const { title: orderTitle } = orderListing.getAttributes();
+                const {
+                  participantIds = [],
+                  anonymous = [],
+                  quotationId,
+                  companyId,
+                } = orderListing.getMetadata();
+                const generalNotificationData = {
+                  orderId,
+                  orderTitle,
+                  planId,
+                  subOrderDate,
+                };
+                if (transition === ETransition.START_DELIVERY) {
+                  [participantIds, anonymous].map(
+                    async (participantId: string) => {
+                      createFirebaseDocNotification(
+                        ENotificationType.ORDER_DELIVERING,
+                        {
+                          ...generalNotificationData,
+                          userId: participantId,
+                        },
+                      );
+                    },
+                  );
+                }
+                if (transition === ETransition.COMPLETE_DELIVERY) {
+                  [participantIds, anonymous].map(
+                    async (participantId: string) => {
+                      createFirebaseDocNotification(
+                        ENotificationType.ORDER_SUCCESS,
+                        {
+                          ...generalNotificationData,
+                          userId: participantId,
+                        },
+                      );
+                    },
+                  );
+                  await transitionOrderStatus(order, plan, integrationSdk);
+                }
+                if (transition === ETransition.OPERATOR_CANCEL_PLAN) {
+                  emailSendingFactory(
+                    EmailTemplateTypes.BOOKER.BOOKER_SUB_ORDER_CANCELED,
+                    {
+                      orderId,
+                      timestamp: subOrderDate,
+                    },
+                  );
+
+                  participantIds.forEach((participantId: string) => {
+                    emailSendingFactory(
+                      EmailTemplateTypes.PARTICIPANT
+                        .PARTICIPANT_SUB_ORDER_CANCELED,
+                      {
+                        orderId,
+                        timestamp: subOrderDate,
+                        participantId,
+                      },
+                    );
+                  });
+
+                  if (
+                    process.env.NEXT_APP_ALLOW_PARTNER_EMAIL_SEND === 'true'
+                  ) {
+                    emailSendingFactory(
+                      EmailTemplateTypes.PARTNER.PARTNER_SUB_ORDER_CANCELED,
+                      {
+                        orderId,
+                        timestamp: subOrderDate,
+                        restaurantId: restaurant.id,
+                      },
+                    );
+                  }
+
+                  participantIds.map(async (participantId: string) => {
+                    createFirebaseDocNotification(
+                      ENotificationType.ORDER_CANCEL,
+                      {
+                        ...generalNotificationData,
+                        userId: participantId,
+                      },
+                    );
+                  });
+
+                  const quotation = await fetchListing(quotationId);
+                  const quotationListing = Listing(quotation);
+                  const { client, partner } = quotationListing.getMetadata();
+                  const newClient = {
+                    ...client,
+                    quotation: omit(client.quotation, [subOrderDate]),
+                  };
+
+                  const newPartner = {
+                    ...partner,
+                    [restaurant.id]: {
+                      ...partner[restaurant.id],
+                      quotation: omit(partner[restaurant.id].quotation, [
+                        subOrderDate,
+                      ]),
+                    },
+                  };
+                  integrationSdk.listings.update({
+                    id: quotationId,
+                    metadata: {
+                      status: EQuotationStatus.INACTIVE,
+                    },
+                  });
+                  createQuotation({
+                    orderId,
+                    companyId,
+                    client: newClient,
+                    partner: newPartner,
+                  });
                   await transitionOrderStatus(order, plan, integrationSdk);
                 }
               }),
@@ -139,49 +256,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
             return res.status(200).end();
           }
-
-          case 'CANCELED': {
-            await Promise.all(
-              path.map(async (OWSubOrder: any) => {
-                const { tracking_number: trackingNumber, status } = OWSubOrder;
-                if (!trackingNumber) return;
-
-                if (status === 'CANCELED') {
-                  const [orderId, subOrderDate] = trackingNumber.split('_');
-                  const { plan } = await fetchData(orderId);
-                  const planListing = Listing(plan);
-                  const planId = planListing.getId();
-                  const { orderDetail = {} } = planListing.getMetadata();
-                  const subOrder = orderDetail[subOrderDate];
-                  const { transactionId } = subOrder || {};
-
-                  await integrationSdk.transactions.transition({
-                    id: transactionId,
-                    transition: ETransition.CANCEL_DELIVERY,
-                    params: {},
-                  });
-
-                  const newOrderDetail = {
-                    ...orderDetail,
-                    [subOrderDate]: {
-                      ...subOrder,
-                      lastTransition: ETransition.CANCEL_DELIVERY,
-                    },
-                  };
-
-                  await integrationSdk.listings.update({
-                    id: planId,
-                    metadata: {
-                      orderDetail: newOrderDetail,
-                    },
-                  });
-                }
-              }),
-            );
-
-            return res.status(200).end();
-          }
-
           default:
             break;
         }
