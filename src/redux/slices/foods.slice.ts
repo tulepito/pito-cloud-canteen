@@ -560,14 +560,16 @@ const foodSlice = createSlice({
         queryFoodsInProgress: true,
         queryFoodsError: null,
       }))
-      .addCase(queryPartnerFoods.fulfilled, (state, { payload }) => ({
-        ...state,
-        queryFoodsInProgress: false,
-        foods: payload.isMobileLayout
-          ? state.foods.concat(payload.foods)
-          : payload.foods,
-        managePartnerFoodPagination: payload.managePartnerFoodPagination,
-      }))
+      .addCase(queryPartnerFoods.fulfilled, (state, { payload }) => {
+        const { page = 1 } = payload.managePartnerFoodPagination || {};
+
+        state.queryFoodsInProgress = false;
+        state.foods =
+          payload.isMobileLayout && page !== 1
+            ? state.foods.concat(payload.foods)
+            : payload.foods;
+        state.managePartnerFoodPagination = payload.managePartnerFoodPagination;
+      })
       .addCase(queryPartnerFoods.rejected, (state, { payload }) => ({
         ...state,
         queryFoodsInProgress: false,

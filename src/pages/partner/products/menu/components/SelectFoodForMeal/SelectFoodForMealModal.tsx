@@ -152,7 +152,13 @@ const SelectFoodForMealModal: React.FC<TSelectFoodForMealModalProps> = ({
 
   const setPageCallBack = useCallback(() => {
     setPage((p) =>
-      isMobileLayout ? (p + 1 > totalPages ? totalPages : p + 1) : p,
+      isMobileLayout
+        ? p + 1 > totalPages
+          ? totalPages === 0
+            ? 1
+            : totalPages
+          : p + 1
+        : p,
     );
   }, [page, totalPages, isMobileLayout]);
   useEffect(() => {
@@ -199,6 +205,15 @@ const SelectFoodForMealModal: React.FC<TSelectFoodForMealModalProps> = ({
     isMobileLayout,
     page,
     restaurantId,
+    keywordsField.input.value,
+    JSON.stringify(submittedFilterValues),
+  ]);
+  useEffect(() => {
+    if (isMobileLayout) {
+      setPage(1);
+    }
+  }, [
+    isMobileLayout,
     keywordsField.input.value,
     JSON.stringify(submittedFilterValues),
   ]);
