@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-hooks/rules-of-hooks */
 import { useEffect, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -14,13 +15,14 @@ import { createDeepEqualSelector } from '@redux/redux.helper';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
 import type { RootState } from '@redux/store';
 import { companyPaths } from '@src/paths';
+import { User } from '@src/utils/data';
 import { historyPushState } from '@src/utils/history';
 import {
   EManageCompanyOrdersTab,
   EOrderStates,
   MANAGE_COMPANY_ORDERS_TAB_MAP,
 } from '@utils/enums';
-import type { TObject } from '@utils/types';
+import type { TObject, TUser } from '@utils/types';
 
 import { parseEntitiesToTableData } from '../helpers/parseEntitiesToTableData';
 
@@ -150,22 +152,21 @@ const CompanyOrdersTable: React.FC<TCompanyOrdersTableProps> = () => {
   const dispatch = useAppDispatch();
   const orders = useAppSelector((state) => state.Order.orders) || [];
   const currentUser = useAppSelector((state) => state.user.currentUser);
+  const bookerCompanies = useAppSelector(
+    (state) => state.BookerCompanies.companies,
+  );
   const plansByOrderIds = useAppSelector(
     (state) => state.Order.plansByOrderIds,
   );
-
   const queryCompanyPlansByOrderIdsInProgress = useAppSelector(
     (state) => state.Order.queryCompanyPlansByOrderIdsInProgress,
   );
-
   const queryOrderInProgress = useAppSelector(
     (state) => state.Order.queryOrderInProgress,
   );
-
   const { totalPages = 1 } = useAppSelector(
     (state) => state.Order.manageOrdersPagination,
   );
-
   const currentOrderVATPercentage = useAppSelector(
     (state) => state.SystemAttributes.currentOrderVATPercentage,
   );
@@ -326,14 +327,37 @@ const CompanyOrdersTable: React.FC<TCompanyOrdersTableProps> = () => {
           currentTab as keyof typeof MANAGE_COMPANY_ORDERS_TAB_MAP
         ].join(',');
 
+      const companyUser = bookerCompanies.find(
+        (c: TUser) => c.id.uuid === companyId,
+      );
+      const { subAccountId: subAccountIdMaybe } = User(
+        companyUser!,
+      ).getPrivateData();
+      const authorIdMaybe =
+        typeof subAccountIdMaybe !== 'undefined'
+          ? { authorId: subAccountIdMaybe }
+          : {};
+
       params = {
         ...params,
+        ...authorIdMaybe,
         meta_orderState: parsedOrderState,
         currentTab,
       };
-      await dispatch(orderAsyncActions.queryCompanyOrders(params));
+      if (typeof subAccountIdMaybe !== 'undefined') {
+        await dispatch(orderAsyncActions.queryCompanyOrders(params));
+      }
     })();
-  }, [companyId, currentTab, dispatch, isReady, keywords, page, currentUserId]);
+  }, [
+    companyId,
+    currentTab,
+    dispatch,
+    isReady,
+    keywords,
+    page,
+    currentUserId,
+    JSON.stringify(bookerCompanies),
+  ]);
 
   const currentTabIndex = findTabIndexById(
     currentTab as EManageCompanyOrdersTab,

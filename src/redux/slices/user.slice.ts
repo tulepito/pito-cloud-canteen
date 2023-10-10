@@ -3,6 +3,7 @@ import { createSlice } from '@reduxjs/toolkit';
 
 import { createAsyncThunk, createDeepEqualSelector } from '@redux/redux.helper';
 import type { RootState } from '@redux/store';
+import { UserPermission } from '@src/types/UserPermission';
 import {
   CurrentUser,
   denormalisedResponseEntities,
@@ -50,7 +51,7 @@ const detectUserPermission = (currentUser: TCurrentUser) => {
     isBooker = false;
   } else {
     isBooker = Object.values(company).some(({ permission }: any) => {
-      return permission === 'booker';
+      return permission === UserPermission.BOOKER;
     });
   }
 

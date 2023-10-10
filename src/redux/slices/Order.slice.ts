@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
+import isEmpty from 'lodash/isEmpty';
 import isNumber from 'lodash/isNumber';
 import isString from 'lodash/isString';
 import uniq from 'lodash/uniq';
@@ -466,11 +467,11 @@ const queryTotalOrderCountByTab = createAsyncThunk(
   'app/Orders/QUERY_TOTAL_ORDER_COUNT_BY_TAB',
   async (payload: TObject) => {
     const {
-      bookerId,
       companyId,
       currentTab = EManageCompanyOrdersTab.ALL,
       page,
       pagination,
+      ...rest
     } = payload;
     const { totalItems = 0, totalPages = 1 } = pagination;
 
@@ -496,12 +497,11 @@ const queryTotalOrderCountByTab = createAsyncThunk(
           {
             perPage: MANAGE_ORDER_PAGE_SIZE,
             states: EListingStates.published,
-            meta_bookerId: bookerId,
-            meta_companyId: companyId,
             meta_listingType: EListingType.order,
             sort: 'createdAt',
             meta_orderState: parsedStates,
             tab: key,
+            ...rest,
           },
         ]),
       [],
@@ -533,11 +533,13 @@ const queryTotalOrderCountByTab = createAsyncThunk(
 const queryCompanyOrders = createAsyncThunk(
   'app/Orders/COMPANY_QUERY_ORDERS',
   async (payload: TObject, { rejectWithValue, dispatch, getState }) => {
-    const { companyId = '', bookerId, ...restPayload } = payload;
-
-    if (companyId === '') {
-      return rejectWithValue('Company ID is empty');
-    }
+    const {
+      companyId = '',
+      bookerId,
+      authorId,
+      currentTab,
+      ...restPayload
+    } = payload;
 
     if (!bookerId) {
       return rejectWithValue('Booker ID is empty');
@@ -548,8 +550,8 @@ const queryCompanyOrders = createAsyncThunk(
         ...restPayload,
         perPage: MANAGE_ORDER_PAGE_SIZE,
         states: EListingStates.published,
-        meta_companyId: companyId,
-        meta_bookerId: bookerId,
+        ...(authorId ? { authorId } : {}),
+        ...(companyId !== bookerId ? { meta_bookerId: bookerId } : {}),
         meta_listingType: EListingType.order,
         sort: 'createdAt',
       },
@@ -574,12 +576,13 @@ const queryCompanyOrders = createAsyncThunk(
 
     const alreadyFetchOrderCount = !!getState().Order.totalItemMap;
 
-    if (!alreadyFetchOrderCount) {
+    if (!isEmpty(authorId) && !alreadyFetchOrderCount) {
       dispatch(
         queryTotalOrderCountByTab({
-          bookerId,
+          ...(authorId ? { authorId } : {}),
+          ...(companyId !== bookerId ? { meta_bookerId: bookerId } : {}),
           companyId,
-          currentTab: restPayload.currentTab,
+          currentTab,
           page: restPayload.page,
           pagination,
         }),
