@@ -192,6 +192,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         orderType = EOrderType.group,
       } = orderListing.getMetadata();
 
+      if (!deliveryHour || !orderTitle) {
+        return acc;
+      }
+
       const {
         restaurantName,
         phoneNumber: restaurantPhoneNumber,
