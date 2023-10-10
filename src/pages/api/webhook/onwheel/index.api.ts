@@ -95,7 +95,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
                   status === 'COMPLETED'
                     ? ETransition.COMPLETE_DELIVERY
                     : status === 'CANCELED'
-                    ? ETransition.OPERATOR_CANCEL_PLAN
+                    ? ETransition.CANCEL_DELIVERY
                     : ETransition.START_DELIVERY;
 
                 const [orderId, subOrderDate] = trackingNumber.split('_');
@@ -176,7 +176,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
                   );
                   await transitionOrderStatus(order, plan, integrationSdk);
                 }
-                if (transition === ETransition.OPERATOR_CANCEL_PLAN) {
+                if (transition === ETransition.CANCEL_DELIVERY) {
                   emailSendingFactory(
                     EmailTemplateTypes.BOOKER.BOOKER_SUB_ORDER_CANCELED,
                     {
