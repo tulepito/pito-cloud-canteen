@@ -78,18 +78,19 @@ const EmailVerificationFormComponent: React.FC<
 
   const alreadyVerified = (
     <div className={css.root}>
-      <div>
+      <div className={css.content}>
         <PitoLogoV2 />
         <h2 className={css.modalTitle}>
-          <FormattedMessage id="EmailVerificationForm.successTitle" />
+          <FormattedMessage id="EmailVerificationForm.noPendingTitle" />
         </h2>
 
         <p className={css.modalMessage}>
-          <FormattedMessage id="EmailVerificationForm.successText" />
+          <FormattedMessage
+            id="EmailVerificationForm.noPendingText"
+            values={{ email }}
+          />
         </p>
-      </div>
-
-      <div className={css.bottomWrapper}>
+        <div className={css.divider}></div>
         <Button>
           <Link className={css.submitButton} href="/">
             <FormattedMessage id="EmailVerificationForm.successButtonText" />
