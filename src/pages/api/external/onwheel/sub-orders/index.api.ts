@@ -12,12 +12,7 @@ import { calculateTotalPriceAndDishes } from '@helpers/order/cartInfoHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import externalOnWheelChecker from '@services/permissionChecker/external/onwheel';
 import { handleError } from '@services/sdk';
-import {
-  denormalisedResponseEntities,
-  Listing,
-  Transaction,
-  User,
-} from '@src/utils/data';
+import { Listing, Transaction, User } from '@src/utils/data';
 import { VNTimezone } from '@src/utils/dates';
 import { EOrderType } from '@src/utils/enums';
 import { ETransition } from '@src/utils/transaction';
@@ -45,15 +40,19 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       txs = await queryAllTransactions({
         query: {
           lastTransition: ETransition.INITIATE_TRANSACTION,
+          include: ['provider'],
         },
       });
     } else {
-      txs = denormalisedResponseEntities(
-        await integrationSdk.transactions.query({
-          lastTransition: ETransition.INITIATE_TRANSACTION,
-          include: ['provider'],
-        }),
-      ).slice(0, 20);
+      const hasTimeParams = startDeliveryTime || endDeliveryTime;
+      txs = (
+        await queryAllTransactions({
+          query: {
+            lastTransition: ETransition.INITIATE_TRANSACTION,
+            include: ['provider'],
+          },
+        })
+      ).slice(0, hasTimeParams ? undefined : 20);
     }
     const { orderIdList, planIdList, restaurantIdList } = txs.reduce(
       (acc: any, tx: TTransaction) => {
@@ -159,14 +158,19 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       },
       {},
     );
-
     const subOrders = txs.reduce((acc: any, tx: TTransaction) => {
       const txGetter = Transaction(tx);
       const { orderId, planId, timestamp } = txGetter.getMetadata();
+      const { lastTransition } = txGetter.getAttributes();
+
+      if (lastTransition !== ETransition.INITIATE_TRANSACTION) {
+        return acc;
+      }
 
       if (
         timestamp < demandStartDeliveryTime ||
-        timestamp > demandEndDeliveryTime
+        timestamp > demandEndDeliveryTime ||
+        !timestamp
       ) {
         return acc;
       }
