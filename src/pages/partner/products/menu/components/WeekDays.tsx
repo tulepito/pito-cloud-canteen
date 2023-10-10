@@ -32,7 +32,6 @@ const WeekDays: React.FC<TWeekDaysProps> = (props) => {
     currentDay,
     setCurrentDay,
   } = props;
-
   const handleDayItemClick =
     (key: string, isDisabled = false) =>
     () => {
@@ -45,14 +44,16 @@ const WeekDays: React.FC<TWeekDaysProps> = (props) => {
     <div className={css.root}>
       <div className={css.dayContainer}>
         {ALL_WEEK_DAYS.map(({ key, label }) => {
+          const foodListByMealAndDayOnCurrentDay =
+            foodListByMealAndDay[key] || [];
+
+          const isAllMealsEmpty = isEmpty(foodListByMealAndDayOnCurrentDay);
           const isItemDisabled = !daysOfWeek.includes(key);
           const isCurrentDay = currentDay === key;
 
-          const isAllMealsEmpty = isEmpty(foodListByMealAndDay[key]);
-
           const hasAnyMealOfDayEmpty =
             !isItemDisabled &&
-            foodListByMealAndDay[key].some(({ foodList }: TObject) => {
+            foodListByMealAndDayOnCurrentDay.some(({ foodList }: TObject) => {
               return isEmpty(foodList);
             });
 

@@ -36,6 +36,7 @@ const updateMenu = async (
     title,
     endDate,
     numberOfCycles,
+    isDraftEditFlow = false,
   } = dataParams;
 
   const integrationSdk = getIntegrationSdk();
@@ -116,13 +117,15 @@ const updateMenu = async (
         ...(daysOfWeek ? { daysOfWeek } : {}),
         ...(menuType ? { menuType } : {}),
         ...(mealType ? { mealType } : {}),
-        ...(mealTypes ? { mealTypes } : {}),
+        ...(mealTypes && isDraftEditFlow
+          ? { mealTypes }
+          : { mealTypes: undefined }),
         ...(startDate ? { startDate } : {}),
         ...(endDateToSubmit ? { endDate: endDateToSubmit } : {}),
         ...(isCycleMenu
           ? { ...(numberOfCycles ? { numberOfCycles } : {}) }
           : {}),
-        ...(daysOfWeek
+        ...(daysOfWeek && isDaysOfWeekChanged && isDraftEditFlow
           ? {
               draftFoodByDate:
                 typeof draftFoodByDate === 'undefined'
@@ -133,8 +136,8 @@ const updateMenu = async (
                     )
                   : draftFoodByDate,
             }
-          : {}),
-        ...(daysOfWeek
+          : { draftFoodByDate: undefined }),
+        ...(daysOfWeek && isDaysOfWeekChanged
           ? {
               foodsByDate: createFoodByDateByDaysOfWeekField(
                 foodsByDate || foodsByDateFromMenu,
@@ -144,7 +147,7 @@ const updateMenu = async (
           : {
               ...(foodsByDate ? { foodsByDate } : {}),
             }),
-        ...(daysOfWeek
+        ...(daysOfWeek && isDaysOfWeekChanged
           ? {
               ...createFoodAveragePriceByDaysOfWeekField(
                 {

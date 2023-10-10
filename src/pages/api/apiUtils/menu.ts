@@ -7,7 +7,7 @@ import type { EMenuMealType } from '@src/utils/enums';
 import type { TListing, TObject } from '@src/utils/types';
 
 export const createMinPriceByDayOfWeek = (foodsByDate: any) => {
-  let avaragePriceByDayOfWeek = {};
+  let averagePriceByDayOfWeek = {};
   Object.keys(foodsByDate).forEach((keyAsDayOfWeek) => {
     let minPriceByDate = 0;
     Object.keys(foodsByDate[keyAsDayOfWeek]).forEach((foodId, index) => {
@@ -17,13 +17,13 @@ export const createMinPriceByDayOfWeek = (foodsByDate: any) => {
         minPriceByDate = price < minPriceByDate ? price : minPriceByDate;
       }
     });
-    avaragePriceByDayOfWeek = {
-      ...avaragePriceByDayOfWeek,
+    averagePriceByDayOfWeek = {
+      ...averagePriceByDayOfWeek,
       [`${keyAsDayOfWeek}MinFoodPrice`]: minPriceByDate || 0,
     };
   });
 
-  return avaragePriceByDayOfWeek;
+  return averagePriceByDayOfWeek;
 };
 
 export const createFoodAveragePriceByDaysOfWeekField = (
@@ -61,14 +61,9 @@ export const createPartnerDraftFoodByDateByDaysOfWeekField = (
 export const createFoodByDateByDaysOfWeekField = (
   foodByDate: any,
   daysOfWeek: string[],
-  shouldContainEmpty: boolean = false,
 ) => {
-  const newFoodByDates = Object.keys(foodByDate).reduce((prev, key) => {
-    if (daysOfWeek.includes(key)) {
-      return { ...prev, [key]: foodByDate[key] };
-    }
-
-    return { ...(shouldContainEmpty ? { [key]: {} } : {}), ...prev };
+  const newFoodByDates = daysOfWeek.reduce((prev, key) => {
+    return { ...prev, [key]: foodByDate[key] || {} };
   }, {});
 
   return newFoodByDates;

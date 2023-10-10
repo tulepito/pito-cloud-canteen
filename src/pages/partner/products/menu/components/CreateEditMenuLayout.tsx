@@ -73,6 +73,7 @@ const verifyData = ({
         return Object.values(mealByDate).some((item) => !isEmpty(item));
       })
     : Object.values(foodByDate).some((item) => !isEmpty(item));
+  const isFoodByDateChanged = !isEqual(foodByDate, initialValues.foodByDate);
 
   const isAllMealsSetup = isDraftEditFlow
     ? Object.keys(foodByDate).length > 0 &&
@@ -90,14 +91,16 @@ const verifyData = ({
         isDraftDataValid &&
         (isCreateFlow ||
           menuName !== initialValues.menuName ||
-          !isEqual(mealTypes, initialValues.mealTypes) ||
+          (isDraftEditFlow
+            ? !isEqual(mealTypes, initialValues.mealTypes)
+            : !isEqual(mealType, initialValues.mealType)) ||
           startDate !== initialValues.startDate ||
           endDate !== initialValues.endDate);
       break;
     }
     case EEditPartnerMenuMobileStep.mealSettings: {
-      enableSubmit = isFoodByDateValid;
-      enableNext = isFoodByDateValid;
+      enableSubmit = isFoodByDateChanged && isFoodByDateValid;
+      enableNext = enableSubmit;
       break;
     }
     default:
@@ -164,7 +167,6 @@ const CreateEditMenuLayout: React.FC<TCreateEditMenuLayoutProps> = () => {
   } = Listing(menu).getPublicData();
   const isCreateFlow = menu === null;
   const isDraftEditFlow = listingState === EListingStates.draft || isCreateFlow;
-
   const isInfoTab = currStep === EEditPartnerMenuMobileStep.info;
   const isMealSettingsTab =
     currStep === EEditPartnerMenuMobileStep.mealSettings;
@@ -241,11 +243,15 @@ const CreateEditMenuLayout: React.FC<TCreateEditMenuLayoutProps> = () => {
   const handlePublishDraftMenu = async () => {
     confirmPublishDraftMenuControl.setFalse();
 
-    const { meta } = await dispatch(
-      PartnerManageMenusThunks.publishDraftMenu(),
-    );
+    const { meta } = isDraftEditFlow
+      ? await dispatch(PartnerManageMenusThunks.publishDraftMenu())
+      : await dispatch(
+          PartnerManageMenusThunks.updateDraftMenu({
+            isDraftEditFlow,
+          }),
+        );
 
-    if (meta.requestStatus === 'fulfilled') {
+    if (meta.requestStatus === 'fulfilled' && isDraftEditFlow) {
       confirmCompleteDraftMenuControl.setTrue();
     }
   };
@@ -266,7 +272,9 @@ const CreateEditMenuLayout: React.FC<TCreateEditMenuLayoutProps> = () => {
         }
       } else {
         const { meta } = await dispatch(
-          PartnerManageMenusThunks.updateDraftMenu(),
+          PartnerManageMenusThunks.updateDraftMenu({
+            isDraftEditFlow,
+          }),
         );
 
         if (meta.requestStatus !== 'fulfilled') {
@@ -278,8 +286,16 @@ const CreateEditMenuLayout: React.FC<TCreateEditMenuLayoutProps> = () => {
     if (isMealSettingsTab && enableSubmit && !submitting) {
       shouldNavigateToNextStep = false;
 
-      if (isAllMealsSetup && isDraftEditFlow) {
-        await handlePublishDraftMenu();
+      if (isAllMealsSetup) {
+        if (isDraftEditFlow) {
+          await handlePublishDraftMenu();
+        } else {
+          dispatch(
+            PartnerManageMenusThunks.updateDraftMenu({
+              isDraftEditFlow,
+            }),
+          );
+        }
       } else {
         confirmPublishDraftMenuControl.setTrue();
       }

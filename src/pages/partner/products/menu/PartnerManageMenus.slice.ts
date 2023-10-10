@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import differenceBy from 'lodash/differenceBy';
+import isEqual from 'lodash/isEqual';
 
 import { closePartnerMenuApi, publishPartnerMenuApi } from '@apis/menuApi';
 import {
@@ -243,7 +244,7 @@ const createDraftMenu = createAsyncThunk(
 const updateDraftMenu = createAsyncThunk(
   'app/PartnerManageMenus/UPDATE_DRAFT_MENU',
   async (
-    _: TObject | undefined,
+    { isDraftEditFlow }: TObject,
     { getState, fulfillWithValue, rejectWithValue },
   ) => {
     try {
@@ -254,6 +255,9 @@ const updateDraftMenu = createAsyncThunk(
         mealType,
         mealTypes = [],
         daysOfWeek = [],
+        foodsByDate, // init food by date for publish menu
+        draftFoodByDate, // init food by date for draft menu
+        foodByDate, // update value
       } = getState().PartnerManageMenus.draftMenu || {};
       const menu = getState().PartnerManageMenus.menu || {};
       const { currentUser } = getState().user;
@@ -261,16 +265,27 @@ const updateDraftMenu = createAsyncThunk(
       const menuGetter = Listing(menu! as TListing);
       const { restaurantListingId } = CurrentUser(currentUser!).getMetadata();
 
+      const mealTypesMaybe = isDraftEditFlow ? { mealTypes } : {};
+      const isFoodByDateChanged = !isEqual(
+        foodByDate,
+        isDraftEditFlow ? draftFoodByDate : foodsByDate,
+      );
+      const foodByDateMaybe = isFoodByDateChanged
+        ? { foodsByDate: foodByDate }
+        : {};
+
       const updateMenuResponse = await updateMenuApi({
         dataParams: {
           id: menuGetter.getId(),
           title: menuName,
           startDate,
           endDate,
-          mealTypes,
+          ...mealTypesMaybe,
+          ...foodByDateMaybe,
           mealType: mealType || mealTypes[0],
           daysOfWeek,
           restaurantId: restaurantListingId,
+          isDraftEditFlow,
         },
         queryParams: {
           expand: true,
@@ -471,9 +486,8 @@ const PartnerManageMenusSlice = createSlice({
         state.publishDraftMenuInProgress = true;
         state.publishDraftMenuError = null;
       })
-      .addCase(publishDraftMenu.fulfilled, (state, { payload }) => {
+      .addCase(publishDraftMenu.fulfilled, (state) => {
         state.publishDraftMenuInProgress = false;
-        state.menu = payload;
       })
       .addCase(publishDraftMenu.rejected, (state, { payload }) => {
         state.publishDraftMenuInProgress = false;

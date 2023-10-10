@@ -639,6 +639,7 @@ export type TUpdateMenuApiParams = {
   title: string;
   numberOfCycles: number;
   endDate: number;
+  isDraftEditFlow?: boolean;
 };
 
 export type TDuplicateMenuApiParams = {
