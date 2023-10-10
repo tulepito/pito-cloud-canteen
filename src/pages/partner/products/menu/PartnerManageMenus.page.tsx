@@ -103,14 +103,18 @@ const PartnerManageMenusPage: React.FC<TPartnerManageMenusPageProps> = () => {
             })}
             <RenderWhen.False>
               <div className={css.emptyMenuList}>
-                <IconEmpty variant="price" />
-                <div>Bạn chưa có thực đơn nào</div>
-
-                <Button
-                  className={css.createMenuBtn}
-                  onClick={handleNavigateToCreateMenuPage}>
-                  Tạo menu
-                </Button>
+                <RenderWhen condition={searchTitle?.length > 0}>
+                  <div>Không tìm thấy thực đơn phù hợp</div>
+                  <RenderWhen.False>
+                    <IconEmpty variant="price" />
+                    <div>Bạn chưa có thực đơn nào</div>
+                    <Button
+                      className={css.createMenuBtn}
+                      onClick={handleNavigateToCreateMenuPage}>
+                      Tạo menu
+                    </Button>
+                  </RenderWhen.False>
+                </RenderWhen>
               </div>
             </RenderWhen.False>
           </RenderWhen>

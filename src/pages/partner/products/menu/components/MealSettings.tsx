@@ -225,6 +225,9 @@ const MealSettingItem = ({
               (f: TObject) => f.id.uuid === id,
             );
 
+            if (typeof foodListingMaybe === 'undefined') {
+              return null;
+            }
             const { title } = Listing(foodListingMaybe).getAttributes();
 
             return (
