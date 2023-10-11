@@ -198,7 +198,7 @@ export const numberMinLength =
       return VALID;
     }
 
-    const parsedValue = Number(removeNonNumeric(value.toString()));
+    const parsedValue = Number(removeNonNumeric(value?.toString()));
     const isNumber = typeof parsedValue === 'number';
 
     return isNumber && parsedValue >= minimumLength ? VALID : message;
