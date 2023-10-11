@@ -60,7 +60,7 @@ export const calculateTotalPriceAndDishes = ({
           } = rawOrderDetailOfDate;
           const { foodList: foodListOfDate } = restaurant;
           if (
-            status === ESubOrderStatus.CANCELED ||
+            status === ESubOrderStatus.canceled ||
             lastTransition === ETransition.OPERATOR_CANCEL_PLAN
           ) {
             return result;
@@ -93,7 +93,7 @@ export const calculateTotalPriceAndDishes = ({
 
           if (
             (date && date?.toString() !== dateKey) ||
-            status === ESubOrderStatus.CANCELED ||
+            status === ESubOrderStatus.canceled ||
             lastTransition === ETransition.OPERATOR_CANCEL_PLAN
           ) {
             return result;
@@ -205,7 +205,7 @@ export const calculatePriceQuotationInfo = ({
     const { status, transactionId, lastTransition } = rawOrderDetailOfDate;
 
     if (
-      status === ESubOrderStatus.CANCELED ||
+      status === ESubOrderStatus.canceled ||
       lastTransition === ETransition.OPERATOR_CANCEL_PLAN ||
       (!transactionId && isOrderInProgress)
     ) {

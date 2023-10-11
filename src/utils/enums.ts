@@ -1010,7 +1010,10 @@ export enum ESubOrderTxStatus {
 }
 
 export enum ESubOrderStatus {
-  CANCELED = 'canceled',
+  canceled = 'canceled',
+  inProgress = 'inProgress',
+  delivered = 'delivered',
+  delivering = 'delivering',
 }
 
 export enum EOrderHistoryTypes {

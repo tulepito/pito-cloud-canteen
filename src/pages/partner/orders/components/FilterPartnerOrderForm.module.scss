@@ -8,6 +8,23 @@
   flex-direction: column;
 }
 
+.fieldsContainer {
+  display: flex;
+  row-gap: 20px;
+  flex-direction: column;
+
+  /*
+    * 58px: page Header
+    * 20px + 40px: slide modal padding top + bottom
+    * 12px: slide modal content padding
+    * 12px: slide modal header
+    * 48px: action buttons
+    * 20px: section row gap
+  */
+  max-height: calc(100vh - 58px - 60px - 12px - 12px - 48px - 20px);
+  overflow: hidden auto;
+}
+
 .fieldContainer {
   &:nth-of-type(3) {
     display: flex;

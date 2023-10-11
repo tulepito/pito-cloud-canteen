@@ -196,7 +196,7 @@ const parseEntitiesToTableData = (
         id: orderId,
         date,
         subOrderTitle,
-        totalPrice: `${parseThousandNumber(totalPrice)}đ`,
+        totalPrice: `${parseThousandNumber(totalPrice) || 0}đ`,
         companyName,
         orderName: `${companyName}_${formatTimestamp(date)}`,
         staffName,
@@ -259,9 +259,6 @@ const ManageOrdersPage = () => {
   const currentSubOrders = useAppSelector(
     (state) => state.PartnerManageOrders.currentSubOrders,
   );
-  const allSubOrders = useAppSelector(
-    (state) => state.PartnerManageOrders.allSubOrders,
-  );
   const pagination = useAppSelector(
     (state) => state.PartnerManageOrders.pagination,
   );
@@ -275,7 +272,7 @@ const ManageOrdersPage = () => {
   const currentUserGetter = CurrentUser(currentUser);
   const { restaurantListingId } = currentUserGetter.getMetadata();
   const dataTable = parseEntitiesToTableData(
-    isMobileLayout ? allSubOrders : currentSubOrders,
+    currentSubOrders,
     restaurantListingId,
   );
 
@@ -364,7 +361,7 @@ const ManageOrdersPage = () => {
   };
 
   useEffect(() => {
-    if (isReady) {
+    if (isReady && !isFirstLoad) {
       dispatch(
         PartnerManageOrdersActions.filterData({
           page: Number(page),
@@ -386,6 +383,7 @@ const ManageOrdersPage = () => {
     endTime,
     status,
     isMobileLayout,
+    isFirstLoad,
   ]);
 
   useEffect(() => {
@@ -399,6 +397,7 @@ const ManageOrdersPage = () => {
             ...(endTime ? { endTime } : {}),
             ...(status ? { status } : {}),
             ...(subOrderId ? { subOrderId } : {}),
+            isMobile: isMobileLayout,
           }),
         );
       });

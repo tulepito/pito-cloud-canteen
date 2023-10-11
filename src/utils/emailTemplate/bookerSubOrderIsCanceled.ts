@@ -37,7 +37,7 @@ const bookerSubOrderIsCanceled = ({
     const [subOrderDate, rawOrderDetailOfDate] = currentOrderDetailEntry;
     const { status, lastTransition } = rawOrderDetailOfDate;
     if (
-      status === ESubOrderStatus.CANCELED ||
+      status === ESubOrderStatus.canceled ||
       lastTransition === ETransition.OPERATOR_CANCEL_PLAN
     ) {
       return result;

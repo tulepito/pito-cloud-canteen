@@ -5,6 +5,7 @@ import { queryPartnerOrdersApi } from '@apis/partnerApi';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { CurrentUser, Listing } from '@src/utils/data';
 import { formatTimestamp } from '@src/utils/dates';
+import { EOrderPaymentState } from '@src/utils/enums';
 import { toNonAccentVietnamese } from '@src/utils/string';
 import { ETransition } from '@src/utils/transaction';
 import type { TListing, TObject, TPagination } from '@src/utils/types';
@@ -32,24 +33,24 @@ const initialState: TPartnerManageOrdersState = {
   },
 };
 
-const isValidStatus = (lastTransition: ETransition, status: string) => {
-  if (lastTransition === ETransition.INITIATE_TRANSACTION) {
-    return status.includes('inProgress');
-  }
-  if (lastTransition === ETransition.COMPLETE_DELIVERY) {
-    return status.includes('delivered');
-  }
-  if (lastTransition === ETransition.START_DELIVERY) {
-    return status.includes('delivering');
-  }
-  if (
-    lastTransition === ETransition.CANCEL_DELIVERY ||
-    lastTransition === ETransition.OPERATOR_CANCEL_PLAN
-  ) {
-    return status.includes('canceled');
-  }
+const isValidStatus = (lastTransition: ETransition, statuses: string[]) => {
+  switch (lastTransition) {
+    case ETransition.INITIATE_TRANSACTION:
+      return statuses.includes('inProgress');
 
-  return false;
+    case ETransition.COMPLETE_DELIVERY:
+      return statuses.includes('delivered');
+
+    case ETransition.START_DELIVERY:
+      return statuses.includes('delivering');
+
+    case ETransition.CANCEL_DELIVERY:
+    case ETransition.OPERATOR_CANCEL_PLAN:
+      return statuses.includes('canceled');
+
+    default:
+      return false;
+  }
 };
 
 // ================ Thunk types ================ //
@@ -99,50 +100,54 @@ const PartnerManageOrdersSlice = createSlice({
         isMobile,
       } = payload;
       const statusList = status.split(',') || [];
-      const isPaidStatus = statusList.includes('isPaid');
-      const isNotPaidStatus = statusList.includes('isNotPaid');
+      const isPaidStatus = statusList.includes(EOrderPaymentState.isPaid);
+      const isNotPaidStatus = statusList.includes(EOrderPaymentState.isPaid);
+      const statuses = statusList.filter(
+        (orderStateMaybe: any) =>
+          orderStateMaybe !== '' && !(orderStateMaybe in EOrderPaymentState),
+      );
 
-      const validSubOrders = allSubOrders
-        .filter((subOrder) => {
-          const {
-            date,
-            companyName,
-            orderTitle,
-            startDate,
-            endDate,
-            lastTransition,
-          } = subOrder;
-          const dayIndex = new Date(Number(date)).getDay();
-          const subOrderTitle = `#${orderTitle}-${dayIndex > 0 ? dayIndex : 7}`;
-          const isValid =
-            (isEmpty(name) ||
-              toNonAccentVietnamese(
-                `${companyName}_${formatTimestamp(date)}`,
-                true,
-              ).includes(toNonAccentVietnamese(name, true))) &&
-            (isEmpty(subOrderId) ||
-              toNonAccentVietnamese(subOrderTitle, true).includes(
-                toNonAccentVietnamese(subOrderId, true),
-              )) &&
-            (isEmpty(status) || isValidStatus(lastTransition, status)) &&
-            (isEmpty(startTime) ||
-              (Number(startTime) >= Number(startDate || 0) &&
-                Number(startTime) <= Number(endDate || 0))) &&
-            (isEmpty(endTime) ||
-              (Number(endTime) <= Number(endDate || 0) &&
-                Number(startTime) >= Number(startDate || 0)));
+      const validSubOrders = allSubOrders.filter((subOrder) => {
+        const {
+          date,
+          companyName,
+          orderTitle,
+          startDate,
+          endDate,
+          lastTransition,
+          isPaid,
+        } = subOrder;
+        const dayIndex = new Date(Number(date)).getDay();
+        const subOrderTitle = `#${orderTitle}-${dayIndex > 0 ? dayIndex : 7}`;
+        const subOrderName = `${companyName}_${formatTimestamp(date)}`;
 
-          return isValid;
-        })
-        .filter((filteredSubOrder) => {
-          const { isPaid } = filteredSubOrder;
+        const statusCheck =
+          isEmpty(statuses) || isValidStatus(lastTransition, statuses);
+        const paidStatusCheck =
+          (isPaidStatus && isPaid) ||
+          (isNotPaidStatus && !isPaid) ||
+          (!isPaidStatus && !isNotPaidStatus);
 
-          return (
-            (isPaidStatus && isPaid) ||
-            (isNotPaidStatus && !isPaid) ||
-            (!isPaidStatus && !isNotPaidStatus)
-          );
-        });
+        const isValid =
+          statusCheck &&
+          paidStatusCheck &&
+          (isEmpty(name) ||
+            toNonAccentVietnamese(subOrderName, true).includes(
+              toNonAccentVietnamese(name, true),
+            )) &&
+          (isEmpty(subOrderId) ||
+            toNonAccentVietnamese(subOrderTitle, true).includes(
+              toNonAccentVietnamese(subOrderId, true),
+            )) &&
+          (isEmpty(startTime) ||
+            (Number(startTime) >= Number(startDate || 0) &&
+              Number(startTime) <= Number(endDate || 0))) &&
+          (isEmpty(endTime) ||
+            (Number(endTime) <= Number(endDate || 0) &&
+              Number(startTime) >= Number(startDate || 0)));
+
+        return isValid;
+      });
 
       state.pagination = {
         ...pagination,
