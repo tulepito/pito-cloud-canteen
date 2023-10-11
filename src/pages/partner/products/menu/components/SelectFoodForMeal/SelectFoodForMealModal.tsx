@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useField, useForm } from 'react-final-form-hooks';
 import { shallowEqual } from 'react-redux';
 import isEmpty from 'lodash/isEmpty';
@@ -78,6 +78,15 @@ const SelectFoodForMealModal: React.FC<TSelectFoodForMealModalProps> = ({
     onSubmit: () => {},
   });
   const keywordsField = useField('keywords', form);
+  const keyWordsValue = keywordsField.input.value;
+  const isAllSearchFilterValueEmpty =
+    isEmpty(keyWordsValue) && isEmpty(submittedFilterValues);
+
+  const emptyFoodLabel = useMemo(() => {
+    return isAllSearchFilterValueEmpty
+      ? 'Tạo món ăn đầu tiên ngay bạn nhé!'
+      : 'Không tìm thấy món ăn phù hợp';
+  }, [isAllSearchFilterValueEmpty]);
 
   const handleSubmit = () => {
     if (isEmptyFoodList) {
@@ -182,7 +191,7 @@ const SelectFoodForMealModal: React.FC<TSelectFoodForMealModalProps> = ({
           isMobileLayout,
           restaurantId,
           page,
-          keywords: keywordsField.input.value,
+          keywords: keyWordsValue,
           ...priceFilterMaybe,
           ...(foodType ? { pub_foodType: foodType } : {}),
           ...(createAtStart
@@ -205,18 +214,14 @@ const SelectFoodForMealModal: React.FC<TSelectFoodForMealModalProps> = ({
     isMobileLayout,
     page,
     restaurantId,
-    keywordsField.input.value,
+    keyWordsValue,
     JSON.stringify(submittedFilterValues),
   ]);
   useEffect(() => {
     if (isMobileLayout) {
       setPage(1);
     }
-  }, [
-    isMobileLayout,
-    keywordsField.input.value,
-    JSON.stringify(submittedFilterValues),
-  ]);
+  }, [isMobileLayout, keyWordsValue, JSON.stringify(submittedFilterValues)]);
   useEffect(() => {
     setSelectedFoodIds(currentFoodIds);
   }, [JSON.stringify(currentFoodIds)]);
@@ -253,15 +258,19 @@ const SelectFoodForMealModal: React.FC<TSelectFoodForMealModalProps> = ({
             initialValues={{ food: currentFoodIds }}
             setSelectedFoodIds={setSelectedFoodIds}
             setPageCallBack={setPageCallBack}
+            emptyFoodLabel={emptyFoodLabel}
           />
         )}
 
-        <RenderWhen condition={isEmptyFoodList}>
+        <RenderWhen condition={isEmptyFoodList && isAllSearchFilterValueEmpty}>
           <Button className={css.submitButton} onClick={handleSubmit}>
             Thêm món ăn
           </Button>
           <RenderWhen.False>
-            <Button className={css.submitButton} onClick={handleSubmit}>
+            <Button
+              className={css.submitButton}
+              disabled={isEmptyFoodList}
+              onClick={handleSubmit}>
               Chọn món
             </Button>
           </RenderWhen.False>

@@ -29,6 +29,7 @@ export type TSelectFoodForMealFormValues = {
 
 type TExtraProps = {
   formId: string;
+  emptyFoodLabel: string;
   setSelectedFoodIds: (value: any) => void;
   setPageCallBack: () => void;
 };
@@ -45,6 +46,7 @@ const SelectFoodForMealFormComponent: React.FC<
     handleSubmit,
     formId,
     values: { food: selectedFoodIds = [] },
+    emptyFoodLabel,
     setSelectedFoodIds,
     setPageCallBack,
   } = props;
@@ -125,7 +127,11 @@ const SelectFoodForMealFormComponent: React.FC<
           customOnChange={handleCheckAllFieldChange}
         />
       </RenderWhen>
-      <FieldFoodSelectCheckboxGroup name="food" options={foodOptions} />
+      <FieldFoodSelectCheckboxGroup
+        name="food"
+        options={foodOptions}
+        emptyFoodLabel={emptyFoodLabel}
+      />
     </Form>
   );
 };

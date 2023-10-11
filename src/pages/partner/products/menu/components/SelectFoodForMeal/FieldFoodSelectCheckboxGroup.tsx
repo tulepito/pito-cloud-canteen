@@ -78,12 +78,13 @@ type TFieldFoodSelectCheckboxGroupRendererProps = TDefaultProps & {
   meta: any;
   name: string;
   disabled: boolean;
+  emptyFoodLabel?: string;
 };
 
 const FieldFoodSelectCheckboxGroupRenderer: React.FC<
   TFieldFoodSelectCheckboxGroupRendererProps
 > = (props) => {
-  const { className, rootClassName, fields, options } = props;
+  const { className, rootClassName, fields, options, emptyFoodLabel } = props;
 
   const classes = classNames(rootClassName || css.root, className);
   const listClasses = classNames(css.list);
@@ -109,7 +110,7 @@ const FieldFoodSelectCheckboxGroupRenderer: React.FC<
         ) : (
           <div className={css.emptyFoodListContainer}>
             <IconFoodListEmpty />
-            <div>Tạo món ăn đầu tiên ngay bạn nhé!</div>
+            <div>{emptyFoodLabel}</div>
           </div>
         )}
       </ul>
