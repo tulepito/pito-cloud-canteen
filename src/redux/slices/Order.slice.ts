@@ -338,6 +338,8 @@ const createOrder = createAsyncThunk(
       orderDeadlineHour,
       orderDeadlineMinute,
       dayInWeek,
+      daySession,
+      deliveryHour,
     } = quiz;
 
     const newIsGroupOrder = isCopyPreviousOrder
@@ -383,6 +385,8 @@ const createOrder = createAsyncThunk(
         dayInWeek: selectedDays,
         startDate: startDateTimestamp,
         endDate: endDateTimestamp,
+        daySession,
+        deliveryHour,
         ...(newIsGroupOrder && {
           deadlineDate: deadlineDateTimestamp,
           deadlineHour: `${orderDeadlineHour.padStart(

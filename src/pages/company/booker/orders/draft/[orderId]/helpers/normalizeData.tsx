@@ -10,7 +10,7 @@ export const normalizePlanDetailsToEvent = (
   coverImageList: any,
 ) => {
   const dateList = Object.keys(planDetails);
-  const { plans = [], deliveryHour } = Listing(order).getMetadata();
+  const { plans = [], deliveryHour, daySession } = Listing(order).getMetadata();
   const planId = plans.length > 0 ? plans[0] : undefined;
 
   const normalizeData = dateList.map((timestamp) => {
@@ -34,7 +34,9 @@ export const normalizePlanDetailsToEvent = (
     return {
       resource: {
         id: timestamp,
-        daySession: getDaySessionFromDeliveryTime(deliveryHour),
+        daySession:
+          daySession ||
+          getDaySessionFromDeliveryTime(deliveryHour.split('-')[0]),
         isSelectedFood: !isEmpty(restaurant.id) && !isEmpty(foodList),
         restaurant,
         meal: {

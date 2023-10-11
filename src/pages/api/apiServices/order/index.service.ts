@@ -15,6 +15,7 @@ import { Listing, User } from '@src/utils/data';
 import {
   generateWeekDayList,
   getDayOfWeek,
+  getDaySessionFromDeliveryTime,
   renderDateRange,
 } from '@src/utils/dates';
 import {
@@ -63,6 +64,7 @@ const normalizeOrderMetadata = (metadata: TObject = {}) => {
     staffName,
     vatAllow,
     deliveryHour,
+    daySession,
   } = metadata;
 
   const newOrderMetadata = {
@@ -88,6 +90,8 @@ const normalizeOrderMetadata = (metadata: TObject = {}) => {
     staffName,
     vatAllow,
     deliveryHour,
+    daySession:
+      daySession || getDaySessionFromDeliveryTime(deliveryHour.split('-')[0]),
   };
 
   return newOrderMetadata;
