@@ -8,7 +8,7 @@ import Button from '@components/Button/Button';
 import LoadingModal from '@components/LoadingModal/LoadingModal';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { companyInvitationThunks } from '@redux/slices/companyInvitation.slice';
-import { currentUserSelector } from '@redux/slices/user.slice';
+import { currentUserSelector, userThunks } from '@redux/slices/user.slice';
 import invitationCover from '@src/assets/invitationCover.png';
 import { participantPaths } from '@src/paths';
 import { User } from '@utils/data';
@@ -84,8 +84,12 @@ const CompanyInvitationPage = () => {
     }
   }, [companyId, currentUser, dispatch, isReady]);
 
-  const goToHomePage = () => {
-    router.push(participantPaths.OrderList);
+  const goToHomePage = async () => {
+    const { meta } = await dispatch(userThunks.fetchCurrentUser());
+
+    if (meta.requestStatus === 'fulfilled') {
+      router.push('/');
+    }
   };
 
   return (
