@@ -35,7 +35,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           });
         }
         // TODO: update firebase payment status
-        updatePartnerRootPaymentRecord({
+        await updatePartnerRootPaymentRecord({
           orderId,
           subOrderDate,
           updateData: {

@@ -34,7 +34,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         }
 
         // TODO: update firebase payment status
-        updateClientRootPaymentRecord({
+        await updateClientRootPaymentRecord({
           orderId,
           updateData: {
             isAdminConfirmed: false,

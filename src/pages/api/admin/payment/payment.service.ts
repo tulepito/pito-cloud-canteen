@@ -32,7 +32,7 @@ export const updatePartnerRootPaymentRecord = async ({
   const recordId = record.id;
 
   if (recordId) {
-    updatePaymentRecordOnFirebase(recordId, updateData);
+    await updatePaymentRecordOnFirebase(recordId, updateData);
   }
 };
 
@@ -60,6 +60,6 @@ export const updateClientRootPaymentRecord = async ({
   const recordId = record.id;
 
   if (recordId) {
-    updatePaymentRecordOnFirebase(recordId, updateData);
+    await updatePaymentRecordOnFirebase(recordId, updateData);
   }
 };
