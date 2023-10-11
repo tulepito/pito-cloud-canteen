@@ -140,6 +140,8 @@ const EditPartnerFoodFormComponent: React.FC<
     [JSON.stringify(categoriesOptions)],
   );
 
+  const fieldClasses = classNames(css.field, viewModeOnly && css.viewOnly);
+
   const declineFood = () => {
     dispatch(
       foodSliceThunks.responseApprovalRequest({
@@ -189,7 +191,7 @@ const EditPartnerFoodFormComponent: React.FC<
           />
         ))}
       </div>
-      <div className={classNames(css.flexField, viewModeOnly && css.viewOnly)}>
+      <div className={fieldClasses}>
         <div className={classNames(css.field, css.minOrderFieldWrapper)}>
           <label className={css.label}>
             {intl.formatMessage({
@@ -282,7 +284,7 @@ const EditPartnerFoodFormComponent: React.FC<
           )}
         />
       </div>
-      <div className={classNames(css.flexField, viewModeOnly && css.viewOnly)}>
+      <div className={fieldClasses}>
         <div className={classNames(css.field, css.titleFields)}>
           <FieldTextInput
             name="title"
@@ -377,7 +379,7 @@ const EditPartnerFoodFormComponent: React.FC<
           />
         </div>
       </div>
-      <div className={classNames(css.flexField, viewModeOnly && css.viewOnly)}>
+      <div className={fieldClasses}>
         <FieldCheckboxGroup
           className={css.field}
           options={nutritionsOptions || []}
@@ -425,7 +427,7 @@ const EditPartnerFoodFormComponent: React.FC<
           />
         </div>
       </div>
-      <div className={classNames(css.flexField, viewModeOnly && css.viewOnly)}>
+      <div className={fieldClasses}>
         <FieldTextInputWithBottomBox
           className={css.field}
           name="allergicIngredients"
@@ -474,7 +476,7 @@ const EditPartnerFoodFormComponent: React.FC<
           )}
         />
       </div>
-      <div className={classNames(css.flexField, viewModeOnly && css.viewOnly)}>
+      <div className={fieldClasses}>
         <FieldCheckboxGroup
           className={css.field}
           listClassName={css.sideDishesList}
@@ -490,7 +492,7 @@ const EditPartnerFoodFormComponent: React.FC<
         />
         <div className={css.field}></div>
       </div>
-      <div className={classNames(css.flexField, viewModeOnly && css.viewOnly)}>
+      <div className={fieldClasses}>
         <FieldTextArea
           className={css.field}
           name="description"

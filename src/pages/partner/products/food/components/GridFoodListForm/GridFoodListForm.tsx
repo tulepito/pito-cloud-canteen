@@ -53,14 +53,15 @@ const GridFoodListFormComponent: React.FC<TGridFoodListFormComponentProps> = (
 
   const onCheckAllChange = (event: any) => {
     const { checked, value, name } = event.target;
+    const foodIds = foodList.map((_food) => _food.id.uuid);
 
-    let newValues = [...foodList.map((_food) => _food.id.uuid)];
+    let newValues = [...foodIds];
     if (!checked) {
       newValues = [];
       form.change(name, []);
     } else {
       form.change(name, [value]);
-      newValues = [...foodList.map((_food) => _food.id.uuid)];
+      newValues = [...foodIds];
     }
     form.change('foodId', newValues);
   };
