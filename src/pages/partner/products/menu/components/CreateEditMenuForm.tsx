@@ -281,6 +281,7 @@ const CreateEditMenuFormComponent: React.FC<
                   validate={composeValidators(
                     required('Vui lòng chọn ngày bắt đầu'),
                   )}
+                  readOnly
                   disabled={shouldDisableField}
                   customInput={<CustomFieldDateInput />}
                 />
@@ -301,6 +302,7 @@ const CreateEditMenuFormComponent: React.FC<
                   placeholderText={format(new Date(), 'EEE, dd MMMM, yyyy', {
                     locale: viLocale,
                   })}
+                  readOnly
                   customInput={<CustomFieldDateInput />}
                 />
               </div>
