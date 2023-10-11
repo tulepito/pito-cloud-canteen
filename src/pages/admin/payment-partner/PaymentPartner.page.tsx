@@ -186,21 +186,25 @@ const PaymentPartnerPage = () => {
 
   const formattedTableData = tableData.map((item) => {
     const { id, paymentRecords } = item;
-    const partnerName = paymentRecords[0].partnerName || '';
-    const companyName = paymentRecords[0].companyName || '';
-    const subOrderDate = paymentRecords[0].subOrderDate || '';
-    const deliveryHour = paymentRecords[0].deliveryHour || '';
-    const orderTitle = paymentRecords[0].orderTitle || '';
-    const totalAmount = paymentRecords[0].totalPrice || 0;
-    const orderId = paymentRecords[0].orderId || '';
-    const partnerId = paymentRecords[0].partnerId || '';
+    const {
+      partnerName = '',
+      companyName = '',
+      subOrderDate = '',
+      deliveryHour = '',
+      orderTitle = '',
+      totalPrice: totalAmount = 0,
+      orderId = '',
+      partnerId = '',
+      isAdminConfirmed,
+    } = paymentRecords[0] || {};
+
     const paidAmount = paymentRecords.reduce(
       (acc, cur) => acc + (cur.amount || 0),
       0,
     );
     const remainAmount = totalAmount - paidAmount;
     const status =
-      remainAmount === 0
+      isAdminConfirmed === true || remainAmount === 0
         ? EOrderPaymentState.isPaid
         : EOrderPaymentState.isNotPaid;
 
