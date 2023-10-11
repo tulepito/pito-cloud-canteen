@@ -13,3 +13,5 @@ const useBoolean = (defaultValue = false) => {
 };
 
 export default useBoolean;
+
+export type TUseBooleanReturns = ReturnType<typeof useBoolean>;

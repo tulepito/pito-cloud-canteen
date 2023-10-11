@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
+import classNames from 'classnames';
 
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import {
   parseThousandNumber,
   parseThousandNumberToInteger,
 } from '@helpers/format';
+import useBoolean from '@hooks/useBoolean';
 import { PaymentPercentageDropdown } from '@pages/admin/order/[orderId]/tabs/OrderPaymentStatusTab/components/AddingPaymentRecordForm/AddingPaymentRecordForm';
 
 import css from './AddPartnerPaymentForm.module.scss';
@@ -33,10 +35,15 @@ const AddingPaymentTableField: React.FC<TAddPartnerPaymentFormValues> = (
     values,
     id,
   } = props;
+  const showPercentageController = useBoolean();
   const [percentage, setPercentage] = useState(0);
 
   const paymentAmountValue =
     values?.[`paymentAmount - ${orderTitle} - ${subOrderDate} - ${id}`] || 0;
+
+  const rightIconContainerClasses = classNames(css.rightIcon, {
+    [css.rightIconActive]: showPercentageController.value,
+  });
 
   useEffect(() => {
     if (
@@ -79,9 +86,10 @@ const AddingPaymentTableField: React.FC<TAddPartnerPaymentFormValues> = (
           paidAmount={paidAmount}
           percentage={percentage}
           setPercentage={setPercentage}
+          showPercentageController={showPercentageController}
         />
       }
-      rightIconContainerClassName={css.rightIcon}
+      rightIconContainerClassName={rightIconContainerClasses}
       parse={handleParseInputValue}
     />
   );

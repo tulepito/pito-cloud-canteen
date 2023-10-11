@@ -4,11 +4,11 @@ import { Field } from 'react-final-form';
 import classNames from 'classnames';
 
 import ValidationError from '@components/ValidationError/ValidationError';
-import type { TDefaultProps, TIconProps } from '@utils/types';
+import type { TDefaultProps } from '@utils/types';
 
 import css from './FieldTextInput.module.scss';
 
-type TIconComponent = React.ReactElement<TIconProps>;
+type TIconComponent = React.ReactElement<any>;
 type InputComponentProps = FieldRenderProps<string, any> &
   TDefaultProps & {
     id: string;
@@ -85,10 +85,10 @@ export const FieldTextInputComponent: React.FC<InputComponentProps> = (
     : undefined;
   const rightIconElement = rightIcon
     ? React.cloneElement(rightIcon, {
+        ...rightIcon.props,
         className: css.rightIcon,
       })
     : undefined;
-
   // Classes
   const inputClasses =
     inputRootClass ||
