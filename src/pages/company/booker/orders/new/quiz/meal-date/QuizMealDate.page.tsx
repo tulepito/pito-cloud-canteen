@@ -11,6 +11,7 @@ import { QuizStep } from '@src/utils/enums';
 import QuizModal from '../components/QuizModal/QuizModal';
 import QuizCreateOrderLoadingModal from '../create-order-loading/QuizCreateOrderLoadingModal';
 import { useQuizFlow } from '../hooks/useQuizFlow';
+import { useQuizModalScrollControl } from '../hooks/useQuizModalScrollControl';
 
 import type { TMealDateFormValues } from './MealDateForm/MealDateForm';
 import MealDateForm from './MealDateForm/MealDateForm';
@@ -34,6 +35,14 @@ const QuizMealDate = () => {
     creatingOrderInProgress,
     creatingOrderError,
   } = useQuizFlow(QuizStep.MEAL_DATE);
+
+  const {
+    modalContentRef,
+    onClickOrderDates,
+    onClickDeliveryHour,
+    onClickIsGroupOrder,
+    onClickDeadlineDate,
+  } = useQuizModalScrollControl();
 
   const {
     startDate,
@@ -86,12 +95,17 @@ const QuizMealDate = () => {
       onSubmit={onFormSubmitClick}
       submitDisabled={formInvalid}
       modalContainerClassName={css.modalContainer}
+      modalContentRef={modalContentRef}
       onBack={backStep}>
       <MealDateForm
         onSubmit={() => {}}
         setFormValues={setFormValues}
         setFormInvalid={setFormInvalid}
         initialValues={initialValues}
+        onClickOrderDates={onClickOrderDates}
+        onClickDeliveryHour={onClickDeliveryHour}
+        onClickIsGroupOrder={onClickIsGroupOrder}
+        onClickDeadlineDate={onClickDeadlineDate}
       />
     </QuizModal>
   ) : (

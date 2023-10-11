@@ -35,6 +35,10 @@ export type TMealDateFormValues = {
 type TExtraProps = {
   setFormValues: (values: TMealDateFormValues) => void;
   setFormInvalid: (invalid: boolean) => void;
+  onClickOrderDates: () => void;
+  onClickDeliveryHour: () => void;
+  onClickIsGroupOrder: () => void;
+  onClickDeadlineDate: () => void;
 };
 type TMealDateFormComponentProps = FormRenderProps<TMealDateFormValues> &
   Partial<TExtraProps>;
@@ -43,8 +47,18 @@ type TMealDateFormProps = FormProps<TMealDateFormValues> & TExtraProps;
 const MealDateFormComponent: React.FC<TMealDateFormComponentProps> = (
   props,
 ) => {
-  const { handleSubmit, form, values, setFormValues, invalid, setFormInvalid } =
-    props;
+  const {
+    handleSubmit,
+    form,
+    values,
+    setFormValues,
+    invalid,
+    setFormInvalid,
+    onClickOrderDates,
+    onClickDeliveryHour,
+    onClickIsGroupOrder,
+    onClickDeadlineDate,
+  } = props;
   const intl = useIntl();
 
   const deliveryHourRequiredMessage = intl.formatMessage({
@@ -85,7 +99,11 @@ const MealDateFormComponent: React.FC<TMealDateFormComponentProps> = (
   return (
     <Form onSubmit={handleSubmit}>
       <div className={css.datePickersWrapper}>
-        <OrderDateField form={form} values={values} />
+        <OrderDateField
+          form={form}
+          values={values}
+          onClick={onClickOrderDates}
+        />
         <DayInWeekField
           form={form}
           values={values}
@@ -103,22 +121,24 @@ const MealDateFormComponent: React.FC<TMealDateFormComponentProps> = (
           titleClassName={css.fieldTitle}
         />
 
-        <FieldDropdownSelect
-          id="deliveryHour"
-          name="deliveryHour"
-          label={intl.formatMessage({
-            id: 'MealPlanDateField.deliveryHourLabel',
-          })}
-          className={css.fieldContainer}
-          leftIcon={<IconClock />}
-          validate={required(deliveryHourRequiredMessage)}
-          placeholder={intl.formatMessage({
-            id: 'OrderDeadlineField.deliveryHour.placeholder',
-          })}
-          options={parsedDeliveryHourOptions}
-        />
+        <div onClick={onClickDeliveryHour}>
+          <FieldDropdownSelect
+            id="deliveryHour"
+            name="deliveryHour"
+            label={intl.formatMessage({
+              id: 'MealPlanDateField.deliveryHourLabel',
+            })}
+            className={css.fieldContainer}
+            leftIcon={<IconClock />}
+            validate={required(deliveryHourRequiredMessage)}
+            placeholder={intl.formatMessage({
+              id: 'OrderDeadlineField.deliveryHour.placeholder',
+            })}
+            options={parsedDeliveryHourOptions}
+          />
+        </div>
 
-        <div className={css.fieldContainer}>
+        <div className={css.fieldContainer} onClick={onClickIsGroupOrder}>
           <FieldCheckbox
             id="isGroupOrder"
             name="isGroupOrder"
@@ -128,7 +148,11 @@ const MealDateFormComponent: React.FC<TMealDateFormComponentProps> = (
         </div>
         <RenderWhen condition={isGroupOrder.length > 0}>
           <div className={css.fieldContainer}>
-            <OrderDeadlineField form={form} values={values} />
+            <OrderDeadlineField
+              form={form}
+              values={values}
+              onClick={onClickDeadlineDate}
+            />
           </div>
         </RenderWhen>
       </div>

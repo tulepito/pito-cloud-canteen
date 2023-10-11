@@ -14,6 +14,8 @@ type TOrderDateFieldModalProps = {
   form: any;
   values: Partial<TMealDateFormValues>;
   onClose: () => void;
+  selectedTimeRangeOption: string;
+  setSelectedTimeRangeOption: (key: string) => void;
 };
 
 const timeRangeOptions = [
@@ -32,7 +34,13 @@ const timeRangeOptions = [
 ];
 
 const OrderDateFieldModal: React.FC<TOrderDateFieldModalProps> = (props) => {
-  const { form, values, onClose } = props;
+  const {
+    form,
+    values,
+    onClose,
+    selectedTimeRangeOption,
+    setSelectedTimeRangeOption,
+  } = props;
   const { startDate: startDateInitialValue, endDate: endDateInitialValue } =
     values;
   const initialStartDate = startDateInitialValue
@@ -43,8 +51,14 @@ const OrderDateFieldModal: React.FC<TOrderDateFieldModalProps> = (props) => {
     : null;
   const [startDate, setStartDate] = useState<Date | null>(initialStartDate!);
   const [endDate, setEndDate] = useState<Date | null>(initialEndDate!);
-  const [selectedTimeRangeOption, setSelectedTimeRangeOption] =
-    useState<string>('custom');
+
+  const minDate = selectedTimeRangeOption === 'custom' ? undefined : startDate;
+  const maxDate =
+    selectedTimeRangeOption !== 'custom'
+      ? endDate
+      : selectedTimeRangeOption === 'custom' && !!startDate && !endDate
+      ? DateTime.fromJSDate(startDate!).plus({ days: 6 }).toJSDate()
+      : undefined;
 
   const handleTimeRangeSelect = (key: string) => {
     switch (key) {
@@ -126,7 +140,8 @@ const OrderDateFieldModal: React.FC<TOrderDateFieldModalProps> = (props) => {
           endDate={endDate}
           shouldHideInput
           monthsShown={2}
-          minDate={new Date()}
+          minDate={minDate || new Date()}
+          maxDate={maxDate}
         />
         <div className={css.bottomBtns}>
           <Button variant="inline" type="button" onClick={onClose}>

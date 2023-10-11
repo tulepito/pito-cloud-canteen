@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import format from 'date-fns/format';
 import viLocale from 'date-fns/locale/vi';
 
@@ -13,18 +14,26 @@ import css from './OrderDateField.module.scss';
 type OrderDateFieldProps = {
   form: any;
   values: Partial<TMealDateFormValues>;
+  onClick?: () => void;
 };
 const OrderDateField: React.FC<OrderDateFieldProps> = (props) => {
-  const { form, values } = props;
+  const { form, values, onClick } = props;
+  const [selectedTimeRangeOption, setSelectedTimeRangeOption] =
+    useState<string>('custom');
   const orderDateFieldModalController = useBoolean();
   const { startDate, endDate } = values;
+
+  const handleOrderDateFieldClick = () => {
+    onClick?.();
+    orderDateFieldModalController.setTrue();
+  };
 
   return (
     <div className={css.orderDateFieldWrapper}>
       <div className={css.orderDateFieldLabel}>Chọn thời gian đặt</div>
       <div
         className={css.orderDateFieldInput}
-        onClick={orderDateFieldModalController.setTrue}>
+        onClick={handleOrderDateFieldClick}>
         <IconCalendar />
         <RenderWhen condition={!!startDate && !!endDate}>
           <span>
@@ -49,6 +58,8 @@ const OrderDateField: React.FC<OrderDateFieldProps> = (props) => {
             form={form}
             values={values}
             onClose={orderDateFieldModalController.setFalse}
+            selectedTimeRangeOption={selectedTimeRangeOption}
+            setSelectedTimeRangeOption={setSelectedTimeRangeOption}
           />
         </div>
       </RenderWhen>

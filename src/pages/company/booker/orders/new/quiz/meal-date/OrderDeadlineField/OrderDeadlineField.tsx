@@ -13,13 +13,19 @@ import css from './OrderDeadlineField.module.scss';
 type OrderDeadlineFieldProps = {
   form: any;
   values: Partial<TMealDateFormValues>;
+  onClick?: () => void;
 };
 const OrderDeadlineField: React.FC<OrderDeadlineFieldProps> = (props) => {
-  const { form, values } = props;
+  const { form, values, onClick } = props;
   const { deadlineDate, orderDeadlineHour, orderDeadlineMinute, startDate } =
     values;
   const startOrderDate = startDate ? new Date(startDate) : null;
   const orderDeadlineFieldModalController = useBoolean();
+
+  const handleOrderDeadlineFieldClick = () => {
+    onClick?.();
+    orderDeadlineFieldModalController.setTrue();
+  };
 
   return (
     <div className={css.orderDeadlineWrapper}>
@@ -28,7 +34,7 @@ const OrderDeadlineField: React.FC<OrderDeadlineFieldProps> = (props) => {
       </div>
       <div
         className={css.orderDeadlineFieldInput}
-        onClick={orderDeadlineFieldModalController.setTrue}>
+        onClick={handleOrderDeadlineFieldClick}>
         <IconCalendar />
         <RenderWhen
           condition={

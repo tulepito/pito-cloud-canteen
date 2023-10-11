@@ -12,6 +12,7 @@ import { User } from '@utils/data';
 import useLoadCompanies from './hooks/loadCompanies';
 import QuizCreateOrderLoadingModal from './quiz/create-order-loading/QuizCreateOrderLoadingModal';
 import { useQuizFlow } from './quiz/hooks/useQuizFlow';
+import { useQuizModalScrollControl } from './quiz/hooks/useQuizModalScrollControl';
 import CreateOrderFinalForm from './CreateOrderFinalForm';
 
 import css from './BookerNewOrder.module.scss';
@@ -32,6 +33,9 @@ function BookerNewOrderPage() {
     creatingOrderError,
   } = useQuizFlow(QuizStep.NEW_ORDER);
   useFetchCompanyInfo();
+
+  const { modalContentRef, onClickOrderDates, onClickDeadlineDate } =
+    useQuizModalScrollControl();
 
   // Redux
   const createOrderInProcess = useAppSelector(
@@ -84,6 +88,7 @@ function BookerNewOrderPage() {
         handleClose={handleCancel}
         containerClassName={modalContainerClasses}
         scrollLayerClassName={css.modalScrollLayer}
+        modalContainerRef={modalContentRef}
         openClassName={css.openModal}>
         <div className={css.modalContent}>
           <div className={css.title}>
@@ -100,6 +105,8 @@ function BookerNewOrderPage() {
               submitInprogress={createOrderInProcess || isSubmitting}
               hasPreviousOrder={!!previousOrder}
               reorderOpen={reorderOpen}
+              onClickOrderDates={onClickOrderDates}
+              onClickDeadlineDate={onClickDeadlineDate}
               initialValues={{
                 company: companyId,
               }}

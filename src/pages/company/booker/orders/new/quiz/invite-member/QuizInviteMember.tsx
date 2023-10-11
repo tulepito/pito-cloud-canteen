@@ -43,6 +43,11 @@ const QuizInviteMember = () => {
   );
   const currentUser = useAppSelector((state) => state.user.currentUser);
 
+  const onSubmit = async () => {
+    await onAddMembersSubmit();
+    await submitCreateOrder();
+  };
+
   return !creatingOrderInProgress ? (
     <>
       <QuizModal
@@ -62,7 +67,7 @@ const QuizInviteMember = () => {
           </div>
         }
         submitText="Tạo đơn hàng"
-        onSubmit={submitCreateOrder}
+        onSubmit={onSubmit}
         submitInProgress={submittingControl.value}
         onBack={backStep}>
         <div className={css.formContainer}>

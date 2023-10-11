@@ -19,6 +19,7 @@ type QuizModalProps = {
   submitDisabled?: boolean;
   modalContainerClassName?: string;
   submitInProgress?: boolean;
+  modalContentRef?: React.RefObject<HTMLDivElement>;
   handleClose?: () => void;
   onSubmit?: () => void;
   onCancel?: () => void;
@@ -39,6 +40,7 @@ const QuizModal: React.FC<QuizModalProps> = (props) => {
     onCancel,
     onBack,
     children,
+    modalContentRef,
   } = props;
 
   const dispatch = useAppDispatch();
@@ -73,7 +75,9 @@ const QuizModal: React.FC<QuizModalProps> = (props) => {
           )}
         </div>
         <div className={css.modalHeader}>{modalTitle}</div>
-        <div className={css.modalContent}>{children}</div>
+        <div ref={modalContentRef!} className={css.modalContent}>
+          {children}
+        </div>
         <div className={css.modalFooter}>
           <Button
             className={css.submitBtn}

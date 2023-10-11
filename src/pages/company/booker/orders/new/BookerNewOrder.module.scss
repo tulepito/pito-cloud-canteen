@@ -17,6 +17,10 @@
 .openModal .modalContainer {
   flex-basis: 480px;
 
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
   &.largeContainer {
     flex-basis: 900px;
   }
@@ -32,7 +36,13 @@
 
 .modalContent {
   width: calc(100% - 48px);
+  // max-height: 500px;
+  // overflow-y: auto;
   margin: auto;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 
   @include viewportMedium {
     padding: 25px 0 0;

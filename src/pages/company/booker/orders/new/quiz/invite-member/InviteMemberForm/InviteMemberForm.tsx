@@ -1,5 +1,4 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
@@ -47,7 +46,6 @@ const InviteMemberFormComponent: React.FC<TInviteMemberFormComponentProps> = (
     checkEmailList,
     loadedResult = [],
     openMemberModal,
-    onAddMembersSubmit,
   } = props;
   const intl = useIntl();
   const invalidEmailControl = useBoolean();
@@ -128,13 +126,6 @@ const InviteMemberFormComponent: React.FC<TInviteMemberFormComponentProps> = (
       event.preventDefault();
     }
   };
-
-  useEffect(() => {
-    if (afterCheckingEmailControl.value) {
-      onAddMembersSubmit?.();
-      afterCheckingEmailControl.setFalse();
-    }
-  }, [afterCheckingEmailControl.value]);
 
   return (
     <Form onSubmit={handleSubmit}>

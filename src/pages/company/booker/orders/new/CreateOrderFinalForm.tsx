@@ -45,6 +45,8 @@ type TExtraProps = {
   hasPreviousOrder?: boolean;
   previousOrder?: TListing;
   reorderOpen?: boolean;
+  onClickOrderDates?: (scrollBy?: number) => void;
+  onClickDeadlineDate?: () => void;
 };
 type TCreateOrderFinalFormComponentProps =
   FormRenderProps<TCreateOrderFinalFormValues> & Partial<TExtraProps>;
@@ -66,6 +68,8 @@ const CreateOrderFinalFormComponent: React.FC<
     queryInprogress,
     form,
     reorderOpen,
+    onClickOrderDates,
+    onClickDeadlineDate,
   } = props;
   const intl = useIntl();
   const dispatch = useAppDispatch();
@@ -146,9 +150,13 @@ const CreateOrderFinalFormComponent: React.FC<
         />
       </RenderWhen>
       <RenderWhen condition={!!formValues?.usePreviousData || reorderOpen}>
-        <OrderDateField form={form} values={formValues} />
+        <OrderDateField
+          form={form}
+          values={formValues}
+          onClick={() => onClickOrderDates?.(400)}
+        />
         <RenderWhen condition={isGroupOrder}>
-          <div className={css.fieldContainer}>
+          <div className={css.fieldContainer} onClick={onClickDeadlineDate}>
             <OrderDeadlineField form={form} values={formValues} />
           </div>
         </RenderWhen>
