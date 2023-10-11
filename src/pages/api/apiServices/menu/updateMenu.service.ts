@@ -51,6 +51,7 @@ const updateMenu = async (
 
   const [menu] = denormalisedResponseEntities(menuResponse);
   const {
+    mealTypes: mealTypesFromMenu = [],
     daysOfWeek: daysOfWeekFromMenu = [],
     foodsByDate: foodsByDateFromMenu = {},
     monMinFoodPrice: monMinFoodPriceFromMenu = 0,
@@ -64,6 +65,7 @@ const updateMenu = async (
   } = IntegrationListing(menu).getPublicData();
 
   const isDaysOfWeekChanged = !isEqual(daysOfWeekFromMenu, daysOfWeek);
+  const isMealTypesChanged = !isEqual(mealTypesFromMenu, mealTypes || []);
 
   const {
     monFoodIdList: monFoodIdListFromMenu = [],
@@ -123,7 +125,9 @@ const updateMenu = async (
         ...(isCycleMenu
           ? { ...(numberOfCycles ? { numberOfCycles } : {}) }
           : {}),
-        ...(daysOfWeek && isDaysOfWeekChanged && isDraftEditFlow
+        ...(daysOfWeek &&
+        (isDaysOfWeekChanged || isMealTypesChanged) &&
+        isDraftEditFlow
           ? {
               draftFoodByDate:
                 typeof draftFoodByDate === 'undefined'
