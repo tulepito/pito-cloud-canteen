@@ -46,7 +46,7 @@ const QuizCreateOrderLoadingModal: React.FC<
     <Modal isOpen handleClose={() => {}} shouldHideIconClose>
       <div className={css.container}>
         {!creatingOrderError && (
-          <div>
+          <div className={css.iconWrapper}>
             <Spinner />
           </div>
         )}
