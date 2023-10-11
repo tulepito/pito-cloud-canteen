@@ -22,6 +22,7 @@ import { orderAsyncActions } from '@redux/slices/Order.slice';
 import { QuizActions } from '@redux/slices/Quiz.slice';
 import { currentUserSelector } from '@redux/slices/user.slice';
 import { companyPaths } from '@src/paths';
+import Gleap from '@src/utils/gleap';
 import { Listing, User } from '@utils/data';
 import { EBookerOrderDraftStates, EOrderDraftStates } from '@utils/enums';
 import type { TListing, TUser } from '@utils/types';
@@ -262,6 +263,10 @@ function BookerDraftOrderPage() {
     dispatch(OrderListThunks.disableWalkthrough(currentUserId));
   };
 
+  const onChatClick = () => {
+    Gleap.openChat();
+  };
+
   return (
     <WalkThroughTourProvider onCloseTour={handleCloseWalkThrough}>
       <Layout className={css.root}>
@@ -313,7 +318,10 @@ function BookerDraftOrderPage() {
                     <span>chat với chúng tôi để tìm thấy menu nhanh nhất</span>{' '}
                     nhé.
                   </p>
-                  <Button className={css.contactUsBtn} variant="secondary">
+                  <Button
+                    className={css.contactUsBtn}
+                    variant="secondary"
+                    onClick={onChatClick}>
                     Chat với chúng tôi
                   </Button>
                 </div>
