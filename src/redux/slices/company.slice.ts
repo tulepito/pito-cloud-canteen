@@ -677,6 +677,7 @@ export const companySlice = createSlice({
   name: 'company',
   initialState,
   reducers: {
+    clearStates: () => initialState,
     clearTransferOwnerError: (state) => ({
       ...state,
       transferCompanyOwnerError: null,
@@ -1137,6 +1138,7 @@ export const companySlice = createSlice({
 });
 
 export const {
+  clearStates,
   addWorkspaceCompanyId,
   resetCompanySliceStates,
   paginateCompanies,
