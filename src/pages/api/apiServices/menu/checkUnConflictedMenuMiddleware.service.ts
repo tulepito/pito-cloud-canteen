@@ -62,18 +62,33 @@ const checkUnConflictedMenuMiddleware =
       ) as TIntegrationListing[];
       listings = listings.concat(listingsBaseOnMealType);
 
-      if (mealTypes.length > 0) {
+      if (mealTypes.length > 1) {
+        const extraListingsBaseOnMealTypes = await queryAllPages({
+          sdkModel: integrationSdk.listings,
+          query: {
+            pub_mealType: `${mealTypes.slice(1, mealTypes.length).join(',')}`,
+            pub_daysOfWeek: `has_any:${daysOfWeekAsString}`,
+            meta_listingState: EListingStates.draft,
+            ...defaultQueryParams,
+          },
+        });
+
         const listingsBaseOnMealTypes = await queryAllPages({
           sdkModel: integrationSdk.listings,
           query: {
             pub_mealTypes: `has_any:${mealTypes.join(',')}`,
             pub_daysOfWeek: `has_any:${daysOfWeekAsString}`,
-            meta_listingState: listingStatesAsString,
+            meta_listingState: EListingStates.draft,
             ...defaultQueryParams,
           },
         });
 
-        listings = uniqBy(listings.concat(listingsBaseOnMealTypes), 'id.uuid');
+        listings = uniqBy(
+          listings
+            .concat(listingsBaseOnMealTypes)
+            .concat(extraListingsBaseOnMealTypes),
+          'id.uuid',
+        );
       }
 
       const inValidListings = listings.filter((l) => {
