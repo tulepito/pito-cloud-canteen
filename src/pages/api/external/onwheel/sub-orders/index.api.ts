@@ -12,7 +12,12 @@ import { calculateTotalPriceAndDishes } from '@helpers/order/cartInfoHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import externalOnWheelChecker from '@services/permissionChecker/external/onwheel';
 import { handleError } from '@services/sdk';
-import { Listing, Transaction, User } from '@src/utils/data';
+import {
+  denormalisedResponseEntities,
+  Listing,
+  Transaction,
+  User,
+} from '@src/utils/data';
 import { VNTimezone } from '@src/utils/dates';
 import { EOrderType } from '@src/utils/enums';
 import { ETransition } from '@src/utils/transaction';
@@ -45,13 +50,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       });
     } else {
       const hasTimeParams = startDeliveryTime || endDeliveryTime;
-      txs = (
-        await queryAllTransactions({
-          query: {
-            lastTransition: ETransition.INITIATE_TRANSACTION,
-            include: ['provider'],
-          },
-        })
+      txs = denormalisedResponseEntities(
+        await integrationSdk.transactions.query({
+          lastTransition: ETransition.INITIATE_TRANSACTION,
+          include: ['provider'],
+        }),
       ).slice(0, hasTimeParams ? undefined : 20);
     }
     const { orderIdList, planIdList, restaurantIdList } = txs.reduce(
