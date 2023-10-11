@@ -29,6 +29,7 @@ const EmailVerificationFormComponent: React.FC<
 > = (props) => {
   const { currentUser, inProgress, verificationError, handleSubmit } = props;
   const { email, emailVerified, pendingEmail } = currentUser.attributes;
+  const { firstName, lastName } = currentUser.attributes.profile;
   const emailToVerify = <strong>{pendingEmail || email}</strong>;
 
   const errorMessage = (
@@ -87,7 +88,7 @@ const EmailVerificationFormComponent: React.FC<
         <p className={css.modalMessage}>
           <FormattedMessage
             id="EmailVerificationForm.noPendingText"
-            values={{ email }}
+            values={{ name: `${lastName} ${firstName}` }}
           />
         </p>
         <div className={css.divider}></div>
@@ -111,7 +112,7 @@ const EmailVerificationFormComponent: React.FC<
         <p className={css.modalMessage}>
           <FormattedMessage
             id="EmailVerificationForm.noPendingText"
-            values={{ email }}
+            values={{ name: `${lastName} ${firstName}` }}
           />
         </p>
         <div className={css.divider}></div>
