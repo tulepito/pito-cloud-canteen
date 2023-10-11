@@ -202,11 +202,13 @@ const PaymentPartnerPage = () => {
       (acc, cur) => acc + (cur.amount || 0),
       0,
     );
-    const remainAmount = totalAmount - paidAmount;
     const status =
-      isAdminConfirmed === true || remainAmount === 0
+      isAdminConfirmed === true || totalAmount - paidAmount === 0
         ? EOrderPaymentState.isPaid
         : EOrderPaymentState.isNotPaid;
+
+    const remainAmount =
+      paidAmount > totalAmount ? 0 : totalAmount - paidAmount;
 
     return {
       key: id,

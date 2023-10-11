@@ -1,10 +1,8 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from 'react';
 
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
-import {
-  parseThousandNumber,
-  parseThousandNumberToInteger,
-} from '@helpers/format';
+import { parseThousandNumber } from '@helpers/format';
 import { PaymentPercentageDropdown } from '@pages/admin/order/[orderId]/tabs/OrderPaymentStatusTab/components/AddingPaymentRecordForm/AddingPaymentRecordForm';
 
 import css from './AddPartnerPaymentForm.module.scss';
@@ -30,42 +28,18 @@ const AddingPaymentTableField: React.FC<TAddPartnerPaymentFormValues> = (
     orderTitle,
     subOrderDate,
     form,
-    values,
     id,
   } = props;
   const [percentage, setPercentage] = useState(0);
-
-  const paymentAmountValue =
-    values?.[`paymentAmount - ${orderTitle} - ${subOrderDate} - ${id}`] || 0;
-
-  useEffect(() => {
-    if (
-      parseThousandNumberToInteger(`${paymentAmountValue}`) >
-      totalAmount - paidAmount
-    ) {
-      form.change(
-        `paymentAmount - ${orderTitle} - ${subOrderDate} - ${id}`,
-        parseThousandNumber(`${totalAmount - paidAmount}`),
-      );
-    }
-  }, [
-    form,
-    orderTitle,
-    paidAmount,
-    paymentAmountValue,
-    subOrderDate,
-    totalAmount,
-    id,
-  ]);
+  const fieldName = `paymentAmount - ${orderTitle} - ${subOrderDate} - ${id}`;
 
   useEffect(() => {
     if (percentage !== 0) {
       form.change(
-        `paymentAmount - ${orderTitle} - ${subOrderDate} - ${id}`,
+        fieldName,
         parseThousandNumber(Math.round((totalAmount * percentage) / 100)),
       );
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [percentage]);
 
   return (
