@@ -29,6 +29,7 @@ export type PaymentBaseParams = {
   totalPrice?: number;
   deliveryHour?: string;
   isHideFromHistory?: boolean;
+  isAdminConfirmed?: boolean;
   company?: TObject;
   restaurants?: TObject[];
 };
@@ -66,7 +67,8 @@ export const createPaymentRecordOnFirebase = async (
 
 export const queryPaymentRecordOnFirebase = async (query: any) => {
   try {
-    const { paymentType, partnerId, orderId, subOrderDate } = query;
+    const { paymentType, partnerId, orderId, subOrderDate, isHideFromHistory } =
+      query;
     const paymentQuery = {
       ...(partnerId && {
         partnerId: {
@@ -82,6 +84,12 @@ export const queryPaymentRecordOnFirebase = async (query: any) => {
         subOrderDate: {
           operator: '==',
           value: subOrderDate,
+        },
+      }),
+      ...(isHideFromHistory && {
+        isHideFromHistory: {
+          operator: '==',
+          value: true,
         },
       }),
     };
