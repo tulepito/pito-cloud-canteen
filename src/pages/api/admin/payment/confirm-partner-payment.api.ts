@@ -8,6 +8,8 @@ import adminChecker from '@services/permissionChecker/admin';
 import { handleError } from '@services/sdk';
 import { Listing } from '@src/utils/data';
 
+import { updatePartnerRootPaymentRecord } from './payment.service';
+
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   const apiMethod = req.method;
   const { planId, subOrderDate } = req.body;
@@ -22,7 +24,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           }),
         );
 
-        const { orderDetail = {} } = Listing(plan).getMetadata();
+        const { orderDetail = {}, orderId } = Listing(plan).getMetadata();
 
         const { isAdminPaymentConfirmed = false } =
           orderDetail[subOrderDate] || {};
@@ -32,6 +34,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             error: 'Cannot confirm partner payment confirmed order',
           });
         }
+        // TODO: update firebase payment status
+        updatePartnerRootPaymentRecord({
+          orderId,
+          subOrderDate,
+          updateData: {
+            isAdminConfirmed: true,
+          },
+        });
 
         const updateOrderDetail = {
           ...orderDetail,
@@ -41,14 +51,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           },
         };
 
-        denormalisedResponseEntities(
-          await integrationSdk.listings.update({
-            id: planId,
-            metadata: {
-              orderDetail: updateOrderDetail,
-            },
-          }),
-        );
+        await integrationSdk.listings.update({
+          id: planId,
+          metadata: {
+            orderDetail: updateOrderDetail,
+          },
+        });
 
         return res.status(EHttpStatusCode.Ok).json({
           message: 'Successfully confirm partner payment',

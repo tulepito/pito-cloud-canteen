@@ -29,7 +29,7 @@ export const calculateClientTotalPriceAndPaidAmount = async (
     hasSpecificPCCFee,
     specificPCCFee,
   });
-  const clientPaidAmount = calculatePaidAmountBySubOrderDate(paymentRecords!);
+  const clientPaidAmount = calculatePaidAmountBySubOrderDate(paymentRecords);
 
   return {
     clientTotalPrice,

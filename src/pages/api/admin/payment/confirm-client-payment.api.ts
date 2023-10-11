@@ -8,6 +8,8 @@ import adminChecker from '@services/permissionChecker/admin';
 import { handleError } from '@services/sdk';
 import { Listing } from '@src/utils/data';
 
+import { updateClientRootPaymentRecord } from './payment.service';
+
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   const apiMethod = req.method;
   const { orderId } = req.body;
@@ -30,6 +32,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             error: 'Cannot confirm client payment confirmed order',
           });
         }
+
+        // TODO: update firebase payment status
+        updateClientRootPaymentRecord({
+          orderId,
+          updateData: {
+            isAdminConfirmed: true,
+          },
+        });
 
         const [updateOrderListing] = denormalisedResponseEntities(
           await integrationSdk.listings.update(
