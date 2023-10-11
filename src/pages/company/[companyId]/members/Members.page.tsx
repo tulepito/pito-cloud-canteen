@@ -24,7 +24,7 @@ import {
 import { CompanyPermission, UserInviteStatus } from '@src/types/UserPermission';
 import { ALLERGIES_OPTIONS, getLabelByKey } from '@src/utils/enums';
 import { ensureUser, User } from '@utils/data';
-import type { TUser } from '@utils/types';
+import type { TObject, TUser } from '@utils/types';
 
 import AddCompanyMembersModal from './components/AddCompanyMembersModal/AddCompanyMembersModal';
 
@@ -177,21 +177,44 @@ const MembersPage = () => {
 
   const formattedCompanyMembers = useMemo<TRowData[]>(
     () =>
-      mergedCompanyMembers.reduce(
-        (result: any, member: any) => [
+      mergedCompanyMembers.reduce((result: any, member: any) => {
+        const id = member?.id?.uuid;
+        const email = member?.attributes?.email;
+        const memberGroupIds = groupList.reduce(
+          (groupIds: string[], curr: TObject) => {
+            const { members = [], id: groupId } = curr || {};
+
+            if (
+              typeof members.find(
+                ({
+                  id: memberIdFromGroup,
+                  email: memberEmailFromGroup,
+                }: TObject) => {
+                  return (
+                    memberIdFromGroup === id || memberEmailFromGroup === email
+                  );
+                },
+              ) !== 'undefined'
+            ) {
+              return [...groupIds, groupId];
+            }
+
+            return groupIds;
+          },
+          [],
+        );
+
+        return [
           ...result,
           {
-            key: member?.id?.uuid || member.attributes.email,
+            key: id || email,
             data: {
-              id: member?.id?.uuid,
+              id,
               name: `${member.attributes.profile?.lastName || ''} ${
                 member.attributes.profile?.firstName || ''
               }`,
-              email: member.attributes.email,
-              group: getGroupNames(
-                member.attributes.profile?.metadata?.groupList || [],
-                groupList,
-              ),
+              email,
+              group: getGroupNames(memberGroupIds, groupList),
               allergy:
                 User(member)
                   .getPublicData()
@@ -208,10 +231,13 @@ const MembersPage = () => {
                   ?.join(', ') || [],
             },
           },
-        ],
-        [],
-      ),
-    [groupList, mergedCompanyMembers, nutritions],
+        ];
+      }, []),
+    [
+      JSON.stringify(groupList),
+      JSON.stringify(mergedCompanyMembers),
+      JSON.stringify(nutritions),
+    ],
   );
 
   useEffect(() => {
