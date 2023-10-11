@@ -66,7 +66,7 @@ const MealSettingItem = ({
   const publishDraftMenuInProgress = useAppSelector(
     (state) => state.PartnerManageMenus.publishDraftMenuInProgress,
   );
-  const [daysToApply, setDaysToApply] = useState([currentDay]);
+  const [daysToApply, setDaysToApply] = useState([]);
 
   const foodListToRender =
     isOverMaxItemsToShow && showMoreControl.value
