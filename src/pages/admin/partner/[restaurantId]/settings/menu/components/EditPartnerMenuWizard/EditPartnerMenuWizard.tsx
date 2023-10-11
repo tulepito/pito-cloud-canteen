@@ -376,6 +376,12 @@ const EditPartnerMenuWizard = () => {
   });
 
   useEffect(() => {
+    return () => {
+      dispatch(menusSliceAction.setInitialStates());
+    };
+  }, []);
+
+  useEffect(() => {
     setSubmittedValues(null);
   }, [tab]);
 
