@@ -20,7 +20,7 @@ import { companyMemberThunks } from '@redux/slices/companyMember.slice';
 import { adminPaths } from '@src/paths';
 import { UserPermission } from '@src/types/UserPermission';
 import { formatTimestamp } from '@src/utils/dates';
-import { EOrderDetailTabs } from '@src/utils/enums';
+import { EOrderDetailTabs, EOrderPaymentState } from '@src/utils/enums';
 import type { TObject, TPagination } from '@src/utils/types';
 
 import { generateSKU } from '../order/[orderId]/helpers/AdminOrderDetail';
@@ -229,29 +229,32 @@ const AdminManageClientPaymentsPage = () => {
   );
 
   const formattedTableData = tableData.map((item: any) => {
-    const { id, paymentRecords } = item;
-    const totalPrice = paymentRecords[0]?.totalPrice || 0;
-    const companyName = paymentRecords[0].companyName || '';
-    const startDate = paymentRecords[0].startDate || '';
-    const endDate = paymentRecords[0].endDate || '';
-
-    const deliveryHour = paymentRecords[0].deliveryHour || '';
-    const orderTitle = paymentRecords[0].orderTitle || '';
-
-    const orderId = paymentRecords[0].orderId || '';
-    const partnerId = paymentRecords[0].partnerId || '';
-    const booker = paymentRecords[0].booker || '';
-    const company = paymentRecords[0].company || {};
-
+    const { id, paymentRecords = [] } = item;
+    const {
+      totalPrice = 0,
+      companyName = '',
+      startDate = '',
+      endDate = '',
+      deliveryHour = '',
+      orderTitle = '',
+      orderId = '',
+      partnerId = '',
+      booker = '',
+      company = '',
+      isAdminConfirmed,
+    } = paymentRecords[0] || {};
     const restaurants = paymentRecords[0].restaurants || [];
 
     const paidAmount = paymentRecords.reduce(
       (acc: number, cur: TObject) => acc + (cur.amount || 0),
       0,
     );
-    const remainAmount = totalPrice - paidAmount;
 
-    const status = remainAmount === 0 ? 'isPaid' : 'isNotPaid';
+    const status =
+      isAdminConfirmed === true || totalPrice - paidAmount === 0
+        ? EOrderPaymentState.isPaid
+        : EOrderPaymentState.isNotPaid;
+    const remainAmount = paidAmount > totalPrice ? 0 : totalPrice - paidAmount;
 
     return {
       key: id,
