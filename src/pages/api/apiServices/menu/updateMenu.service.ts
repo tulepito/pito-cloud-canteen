@@ -109,6 +109,41 @@ const updateMenu = async (
   const foodTypesByDayOfWeek = await createListFoodTypeByFoodIds(
     listFoodIdsByDate,
   );
+  // * prepare mealTypes value
+  const mealTypesMaybe = isDraftEditFlow
+    ? mealTypes
+      ? { mealTypes }
+      : {}
+    : { mealTypes: undefined };
+  // * prepare draftFoodByDate value
+  const draftFoodByDateMaybe = isDraftEditFlow
+    ? daysOfWeek && (isDaysOfWeekChanged || isMealTypesChanged)
+      ? {
+          draftFoodByDate:
+            typeof draftFoodByDate === 'undefined'
+              ? createPartnerDraftFoodByDateByDaysOfWeekField(
+                  daysOfWeek,
+                  mealTypes,
+                  currentDraftFoodByDate || {},
+                )
+              : draftFoodByDate,
+        }
+      : {}
+    : { draftFoodByDate: undefined };
+
+  // * prepare foodsByDate value
+  const foodsByDateMaybe =
+    daysOfWeek && isDaysOfWeekChanged
+      ? {
+          foodsByDate: createFoodByDateByDaysOfWeekField(
+            foodsByDate || foodsByDateFromMenu,
+            daysOfWeek,
+          ),
+        }
+      : {
+          ...(foodsByDate ? { foodsByDate } : {}),
+        };
+
   const response = await integrationSdk.listings.update(
     {
       id: menuId,
@@ -117,38 +152,14 @@ const updateMenu = async (
         ...(daysOfWeek ? { daysOfWeek } : {}),
         ...(menuType ? { menuType } : {}),
         ...(mealType ? { mealType } : {}),
-        ...(mealTypes && isDraftEditFlow
-          ? { mealTypes }
-          : { mealTypes: undefined }),
+        ...mealTypesMaybe,
         ...(startDate ? { startDate } : {}),
         ...(endDateToSubmit ? { endDate: endDateToSubmit } : {}),
         ...(isCycleMenu
           ? { ...(numberOfCycles ? { numberOfCycles } : {}) }
           : {}),
-        ...(daysOfWeek &&
-        (isDaysOfWeekChanged || isMealTypesChanged) &&
-        isDraftEditFlow
-          ? {
-              draftFoodByDate:
-                typeof draftFoodByDate === 'undefined'
-                  ? createPartnerDraftFoodByDateByDaysOfWeekField(
-                      daysOfWeek,
-                      mealTypes,
-                      currentDraftFoodByDate || {},
-                    )
-                  : draftFoodByDate,
-            }
-          : { draftFoodByDate: undefined }),
-        ...(daysOfWeek && isDaysOfWeekChanged
-          ? {
-              foodsByDate: createFoodByDateByDaysOfWeekField(
-                foodsByDate || foodsByDateFromMenu,
-                daysOfWeek,
-              ),
-            }
-          : {
-              ...(foodsByDate ? { foodsByDate } : {}),
-            }),
+        ...draftFoodByDateMaybe,
+        ...foodsByDateMaybe,
         ...(daysOfWeek && isDaysOfWeekChanged
           ? {
               ...createFoodAveragePriceByDaysOfWeekField(
