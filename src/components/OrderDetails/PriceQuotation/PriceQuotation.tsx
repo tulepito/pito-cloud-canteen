@@ -27,6 +27,7 @@ type TPriceQuotationProps = {
       companyName: string;
       startDate: number;
       endDate: number;
+      deliveryHour: string;
     };
     cartData: {
       serviceFee: string;
@@ -53,7 +54,7 @@ const PriceQuotation: React.FC<TPriceQuotationProps> = ({
   const {
     customerData,
     cartData,
-    orderData: { orderTitle, companyName, startDate, endDate },
+    orderData: { orderTitle, companyName, startDate, endDate, deliveryHour },
     orderDetailData,
   } = data;
   const intl = useIntl();
@@ -66,6 +67,9 @@ const PriceQuotation: React.FC<TPriceQuotationProps> = ({
     companyName,
     startDate: formattedStartDate,
     endDate: formattedEndDate,
+    subOrderDate,
+    isPartnerQuotation,
+    deliveryHour,
   };
 
   const cartProps = {
@@ -74,13 +78,22 @@ const PriceQuotation: React.FC<TPriceQuotationProps> = ({
     vatSetting,
   };
 
+  const subOrderDayIndex = subOrderDate
+    ? new Date(Number(subOrderDate)).getDay()
+    : null;
+
+  const formattedOrderTitle =
+    typeof subOrderDayIndex === 'number'
+      ? `${orderTitle}-${subOrderDayIndex}`
+      : orderTitle;
+
   return (
     <div className={css.root} id="priceQuotation">
       <div className={css.titleContainer} id="header">
         <div>
           {intl.formatMessage(
             { id: 'OrderDetails.PriceQuotation.title' },
-            { orderName: orderTitle },
+            { orderName: formattedOrderTitle },
           )}
         </div>
         <PitoLogo className={css.PITOlogo} variant="secondary" />

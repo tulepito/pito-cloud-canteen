@@ -13,6 +13,10 @@
     flex-basis: 45%;
   }
 
+  &.partnerQuotation > div {
+    flex-basis: unset;
+  }
+
   &::after {
     @include absolute(100%, 1px);
     bottom: 0;

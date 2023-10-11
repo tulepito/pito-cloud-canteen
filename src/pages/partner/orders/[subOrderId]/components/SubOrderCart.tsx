@@ -99,6 +99,7 @@ const SubOrderCart: React.FC<TSubOrderCartProps> = (props) => {
     priceQuotationData,
     isPartnerQuotation: true,
     vatSetting,
+    subOrderDate: date,
   });
   const rootClasses = classNames(css.root, className);
   const titleClasses = classNames(css.title, {});
