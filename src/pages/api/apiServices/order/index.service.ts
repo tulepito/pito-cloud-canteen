@@ -65,6 +65,7 @@ const normalizeOrderMetadata = (metadata: TObject = {}) => {
     vatAllow,
     deliveryHour,
     daySession,
+    mealType,
   } = metadata;
 
   const newOrderMetadata = {
@@ -92,6 +93,7 @@ const normalizeOrderMetadata = (metadata: TObject = {}) => {
     deliveryHour,
     daySession:
       daySession || getDaySessionFromDeliveryTime(deliveryHour.split('-')[0]),
+    mealType,
   };
 
   return newOrderMetadata;
