@@ -12,6 +12,7 @@ import { fetchSearchFilterApi } from '@apis/userApi';
 import { queryAllPages } from '@helpers/apiHelpers';
 import type { TMenuQueryParams } from '@helpers/listingSearchQuery';
 import { getMenuQuery, getRestaurantQuery } from '@helpers/listingSearchQuery';
+import { calculateDistance } from '@helpers/mapHelpers';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
 import { CompanyPermission, UserPermission } from '@src/types/UserPermission';
@@ -216,7 +217,8 @@ const searchRestaurants = createAsyncThunk(
     const { keywords, ...queryWithoutKeywords } = params;
     const query = getMenuQuery({ order, params: queryWithoutKeywords });
     const orderListing = Listing(order);
-    const { memberAmount = 0 } = orderListing.getMetadata();
+    const { memberAmount = 0, deliveryAddress = {} } =
+      orderListing.getMetadata();
 
     const allMenus = await queryAllPages({ sdkModel: sdk.listings, query });
 
@@ -255,20 +257,13 @@ const searchRestaurants = createAsyncThunk(
       }),
     );
 
-    const totalItems = restaurantsResponse.reduce(
-      (acc, { chunkRestaurantResponseMeta }) => {
-        const { totalItems: chunkTotalItems } = chunkRestaurantResponseMeta;
-
-        return acc + chunkTotalItems;
-      },
-      0,
-    );
-
     const searchResult = flatten(
       restaurantsResponse.map(
         ({ chunkRestaurantsResponse }) => chunkRestaurantsResponse,
       ),
     ).filter((r: TListing) => {
+      const restaurantGetter = Listing(r);
+
       const {
         stopReceiveOrder = false,
         startStopReceiveOrderDate = 0,
@@ -279,7 +274,22 @@ const searchRestaurants = createAsyncThunk(
         Number(timestamp) >= startStopReceiveOrderDate &&
         Number(timestamp) <= endStopReceiveOrderDate;
 
-      return !isInStopReceiveOrderTime;
+      const { geolocation: restaurantOrigin } =
+        restaurantGetter.getAttributes();
+
+      const distanceToDeliveryPlace = calculateDistance(
+        deliveryAddress?.origin,
+        restaurantOrigin,
+      );
+      const isValidRestaurant =
+        !isInStopReceiveOrderTime &&
+        distanceToDeliveryPlace <=
+          Number(
+            process.env
+              .NEXT_PUBLIC_MAX_KILOMETER_FROM_RESTAURANT_TO_DELIVERY_ADDRESS_FOR_BOOKER,
+          );
+
+      return isValidRestaurant;
     });
 
     return {
@@ -288,7 +298,7 @@ const searchRestaurants = createAsyncThunk(
       }),
       searchResult,
       combinedRestaurantMenuData,
-      totalItems,
+      totalItems: searchResult.length,
     };
   },
 );
