@@ -509,7 +509,7 @@ export const calcPastTime = (timestamp: number) => {
   return 'Vừa xong';
 };
 export const getDayOfWeek = (timestamp: number) => {
-  return DateTime.fromMillis(timestamp).weekday;
+  return DateTime.fromMillis(timestamp).setZone(VNTimezone).weekday;
 };
 
 export const getNextMonth = (date: Date) => {
