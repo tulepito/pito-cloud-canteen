@@ -25,5 +25,10 @@
     @include textTemplate(14px, $fontWeightRegular, 20px);
     margin-top: 8px;
     color: $neutralGray5;
+    text-transform: lowercase;
+
+    &::first-letter {
+      text-transform: uppercase;
+    }
   }
 }

@@ -113,8 +113,8 @@ const Modal: React.FC<TModalProps> = (props) => {
         <div ref={modalContainerRef} className={containerClasses}>
           {!customHeader && (
             <div className={headerClasses}>
-              {hasTitle && <div className={css.title}>{title}</div>}
               {closeBtn}
+              {hasTitle && <div className={css.title}>{title}</div>}
             </div>
           )}
           {customHeader}
