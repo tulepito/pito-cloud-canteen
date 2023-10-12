@@ -37,7 +37,7 @@ type TFoodDetailInfoTabProps = FormProps<TFoodDetailInfoTabValues> &
 const FoodDetailInfoTabComponent: React.FC<TFoodDetailInfoTabComponentProps> = (
   props,
 ) => {
-  const { handleSubmit, form, inProgress, invalid } = props;
+  const { handleSubmit, form, inProgress, invalid, values } = props;
   const intl = useIntl();
 
   const {
@@ -65,8 +65,16 @@ const FoodDetailInfoTabComponent: React.FC<TFoodDetailInfoTabComponentProps> = (
     [JSON.stringify(categoriesOptions)],
   );
 
+  const onSubmit = () => {
+    handleSubmit(values);
+  };
+
+  const onPreventSubmit = (e: any) => {
+    e.preventDefault();
+  };
+
   return (
-    <Form onSubmit={handleSubmit} className={css.root}>
+    <Form onSubmit={onPreventSubmit} className={css.root}>
       <div className={css.formTitle}>Chi tiết món ăn</div>
       <FieldDropdownSelect
         className={css.field}
@@ -164,9 +172,10 @@ const FoodDetailInfoTabComponent: React.FC<TFoodDetailInfoTabComponentProps> = (
 
       <div className={css.fixedBottomBtn}>
         <Button
-          type="submit"
+          type="button"
           className={css.nextButton}
           disabled={invalid}
+          onClick={onSubmit}
           inProgress={inProgress}>
           Tiếp theo
         </Button>

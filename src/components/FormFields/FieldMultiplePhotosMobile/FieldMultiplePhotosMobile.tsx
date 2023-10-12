@@ -158,11 +158,12 @@ const FieldMultiplePhotosMobile: React.FC<TFieldMultiplePhotosMobileProps> = (
                 <input
                   {...inputProps}
                   multiple
+                  disabled={maxImages}
                   className={css.addImageInput}
                   key={new Date().getTime()}
                 />
               )}
-              {!maxImages && (
+              {
                 <div
                   className={containerClasses}
                   onDrop={handleDrop}
@@ -214,7 +215,7 @@ const FieldMultiplePhotosMobile: React.FC<TFieldMultiplePhotosMobileProps> = (
                     })}
                   </>
                 </div>
-              )}
+              }
             </>
           );
         }}

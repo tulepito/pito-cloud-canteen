@@ -5,14 +5,8 @@ import { MANAGE_FOOD_PAGE_SIZE } from '@pages/partner/products/food/PartnerFood.
 import cookies from '@services/cookie';
 import partnerChecker from '@services/permissionChecker/partner';
 import { getIntegrationSdk, getSdk, handleError } from '@services/sdk';
-import { createSlackNotification } from '@services/slackNotification';
 import { CurrentUser, denormalisedResponseEntities } from '@src/utils/data';
-import {
-  EImageVariants,
-  EListingStates,
-  EListingType,
-  ESlackNotificationType,
-} from '@src/utils/enums';
+import { EImageVariants, EListingStates, EListingType } from '@src/utils/enums';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
@@ -57,7 +51,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           ...(adminApproval && {
             meta_adminApproval: adminApproval,
           }),
-          ...(isDraft && {
+          ...(isDraft !== undefined && {
             meta_isDraft: isDraft,
           }),
           include: ['images'],
@@ -86,11 +80,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           },
           queryParams,
         );
-
-        await createSlackNotification(ESlackNotificationType.CREATE_NEW_FOOD, {
-          foodId: response.data.data.id.uuid,
-          restaurantId: restaurantListingId,
-        });
 
         return res.status(200).json(denormalisedResponseEntities(response)[0]);
       }

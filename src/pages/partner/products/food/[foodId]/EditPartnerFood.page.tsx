@@ -22,6 +22,7 @@ import {
   TAB_STEPS,
 } from '@pages/partner/products/food/create/CreatePartnerFood.page';
 import { partnerThunks } from '@redux/slices/partners.slice';
+import { resetImage } from '@redux/slices/uploadImage.slice';
 import { partnerPaths } from '@src/paths';
 import { IntegrationListing } from '@src/utils/data';
 import type { TObject } from '@src/utils/types';
@@ -46,7 +47,12 @@ import css from './EditPartnerFood.module.scss';
 
 const EditPartnerFoodPage = () => {
   const router = useRouter();
-  const { foodId = '', restaurantId = '', tab: tabFromQuery } = router.query;
+  const {
+    foodId = '',
+    restaurantId = '',
+    tab: tabFromQuery,
+    fromTab,
+  } = router.query;
   const dispatch = useAppDispatch();
   const sendingApprovalToAdminModalController = useBoolean();
   const reSendingApprovalToAdminModalController = useBoolean();
@@ -137,12 +143,25 @@ const EditPartnerFoodPage = () => {
 
   const handleConfirmBtnClick = () => {
     sendingApprovalToAdminModalController.setFalse();
-    router.push(partnerPaths.ManageFood);
+    dispatch(
+      partnerFoodSliceThunks.fetchApprovalFoods(EFoodApprovalState.PENDING),
+    );
+    dispatch(
+      partnerFoodSliceThunks.sendSlackNotification({
+        foodId: foodId as string,
+        notificationType: ESlackNotificationType.CREATE_NEW_FOOD,
+        params: {
+          foodId: foodId as string,
+          restaurantId: foodRestaurantId,
+        },
+      }),
+    );
+    router.push({ pathname: partnerPaths.ManageFood, query: { tab: fromTab } });
   };
 
   const handleNoResendApprovalBtnClick = () => {
     reSendingApprovalToAdminModalController.setFalse();
-    router.push(partnerPaths.ManageFood);
+    router.push({ pathname: partnerPaths.ManageFood, query: { tab: fromTab } });
   };
 
   const handleResendApprovalBtnClick = async () => {
@@ -154,7 +173,10 @@ const EditPartnerFoodPage = () => {
         },
       }),
     );
-    dispatch(
+    await dispatch(
+      partnerFoodSliceThunks.fetchApprovalFoods(EFoodApprovalState.PENDING),
+    );
+    await dispatch(
       partnerFoodSliceThunks.sendSlackNotification({
         foodId: foodId as string,
         restaurantId: foodRestaurantId,
@@ -162,7 +184,7 @@ const EditPartnerFoodPage = () => {
       }),
     );
     reSendingApprovalToAdminModalController.setFalse();
-    router.push(partnerPaths.ManageFood);
+    router.push({ pathname: partnerPaths.ManageFood, query: { tab: fromTab } });
   };
 
   const handleSubmit = async (values: TEditPartnerFoodFormValues) => {
@@ -181,6 +203,7 @@ const EditPartnerFoodPage = () => {
     const shouldChangeAdminApprovalToPending =
       changeApprovalAttributes.length > 0 &&
       currentAdminApproval !== EFoodApprovalState.DECLINED;
+
     await dispatch(
       partnerFoodSliceThunks.updatePartnerFoodListing(
         getUpdateFoodData({
@@ -265,6 +288,10 @@ const EditPartnerFoodPage = () => {
     dispatch(partnerFoodSliceThunks.showPartnerFoodListing(foodId));
   }, [dispatch, foodId]);
 
+  useEffect(() => {
+    dispatch(resetImage());
+  }, []);
+
   if (showFoodInProgress || showPartnerListingInProgress) {
     return <LoadingContainer />;
   }
@@ -332,7 +359,6 @@ const EditPartnerFoodPage = () => {
           </div>
           <Button
             onClick={handleConfirmBtnClick}
-            variant="secondary"
             type="button"
             className={css.noRemoveFoodConfirmBtn}>
             Đã hiểu

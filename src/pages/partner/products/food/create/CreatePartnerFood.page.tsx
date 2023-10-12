@@ -8,6 +8,7 @@ import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import StepTabs from '@components/StepTabs/StepTabs';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { resetImage } from '@redux/slices/uploadImage.slice';
 import { partnerPaths } from '@src/paths';
 import { CurrentUser, IntegrationListing } from '@utils/data';
 import { EFoodTypes, EMenuTypes } from '@utils/enums';
@@ -89,7 +90,7 @@ export const FoodWizard: React.FC<any> = (props) => {
 const CreatePartnerFoodPage = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
-  const { duplicateId, tab: tabFromQuery } = router.query;
+  const { duplicateId, tab: tabFromQuery, fromTab } = router.query;
   const [currentTab, setCurrentTab] = useState<string>(
     (tabFromQuery as string) || FOOD_BASIC_INFO_TAB,
   );
@@ -137,11 +138,14 @@ const CreatePartnerFoodPage = () => {
         ),
       );
 
-      router.push({
+      dispatch(partnerFoodSliceThunks.fetchDraftFood());
+
+      router.replace({
         pathname: partnerPaths.EditFood,
         query: {
           foodId: foodListing.id.uuid,
           tab: FOOD_DETAIL_INFO_TAB,
+          fromTab,
         },
       });
     }
@@ -180,7 +184,7 @@ const CreatePartnerFoodPage = () => {
   ]) as TEditPartnerFoodFormValues;
 
   const goBackToManageFood = () => {
-    router.push(partnerPaths.ManageFood);
+    router.push({ pathname: partnerPaths.ManageFood, query: { tab: fromTab } });
   };
 
   useEffect(() => {
@@ -193,6 +197,10 @@ const CreatePartnerFoodPage = () => {
     if (!duplicateId) return;
     dispatch(partnerFoodSliceThunks.showDuplicateFood(duplicateId));
   }, [duplicateId, dispatch]);
+
+  useEffect(() => {
+    dispatch(resetImage());
+  }, []);
 
   if (showFoodInProgress || showPartnerListingInProgress) {
     return <LoadingContainer />;

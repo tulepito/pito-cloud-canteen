@@ -499,7 +499,7 @@ const EditPartnerFoodForm: React.FC<TEditPartnerFoodFormProps> = (props) => {
   const [submittedValues, setSubmittedValues] =
     useState<TEditPartnerFoodFormValues>();
   const handleSubmit = async (values: TEditPartnerFoodFormValues) => {
-    const { error } = (await props.onSubmit(values, {} as any)) as any;
+    const { error } = (await props.onSubmit(values, {} as any)) || ({} as any);
     if (!error) {
       setSubmittedValues(values);
       router.push(partnerPaths.ManageFood);

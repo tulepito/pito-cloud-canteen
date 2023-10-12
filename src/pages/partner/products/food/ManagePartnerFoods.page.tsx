@@ -38,6 +38,7 @@ import {
 } from '@helpers/food';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
+import { useViewport } from '@hooks/useViewport';
 import KeywordSearchForm from '@pages/admin/partner/components/KeywordSearchForm/KeywordSearchForm';
 import { partnerPaths } from '@src/paths';
 import { Listing } from '@src/utils/data';
@@ -177,6 +178,7 @@ const ManagePartnerFoods = () => {
   const cannotRemoveFoodModalController = useBoolean();
   const addFoodSlideModalController = useBoolean();
   const moveFoodToMenuSlideModalController = useBoolean();
+  const { isMobileLayout } = useViewport();
 
   const categoryOptions = useAppSelector(
     (state) => state.SystemAttributes.categories,
@@ -192,15 +194,11 @@ const ManagePartnerFoods = () => {
   const [googleSheetUrl, setGoogleSheetUrl] = useState<string>();
   const [importType, setImportType] = useState<string>(IMPORT_FILE);
   const [viewListMode, setViewListMode] = useState<string>('grid');
-  const [foodApprovalActiveTab, setFoodApprovalActiveTab] =
-    useState<EFoodApprovalState>(EFoodApprovalState.ACCEPTED);
+
   const [selectedFood, setSelectedFood] = useState<TListing>(null!);
 
-  const {
-    value: isImportModalOpen,
-    setTrue: openImportModal,
-    setFalse: closeImportModal,
-  } = useBoolean(false);
+  const { value: isImportModalOpen, setFalse: closeImportModal } =
+    useBoolean(false);
 
   const {
     value: removeCheckedModalOpen,
@@ -214,7 +212,13 @@ const ManagePartnerFoods = () => {
     foodType = '',
     createAtStart = '',
     createAtEnd = '',
+    tab: tabFromQuery = '',
   } = router.query;
+  const [foodApprovalActiveTab, setFoodApprovalActiveTab] =
+    useState<EFoodApprovalState>(
+      (tabFromQuery as EFoodApprovalState) || EFoodApprovalState.ACCEPTED,
+    );
+  const [defaultActiveKey, setDefaultActiveKey] = useState<number>(1);
 
   const hasFilterApplied = !!(
     keywords ||
@@ -316,56 +320,64 @@ const ManagePartnerFoods = () => {
     categoryOptions,
   );
 
-  const foodApprovalStateTabItems = [
-    {
-      key: EFoodApprovalState.ACCEPTED,
-      label: (
-        <div className={css.tabLabel}>
-          <span>Được duyệt</span>
-          <div data-number className={css.totalItems}>
-            {totalAcceptedFoods}
+  const foodApprovalStateTabItems = useMemo(
+    () => [
+      {
+        key: EFoodApprovalState.ACCEPTED,
+        label: (
+          <div className={css.tabLabel}>
+            <span>Được duyệt</span>
+            <div data-number className={css.totalItems}>
+              {totalAcceptedFoods}
+            </div>
           </div>
-        </div>
-      ),
-      childrenFn: () => {},
-    },
-    {
-      key: EFoodApprovalState.PENDING,
-      label: (
-        <div className={css.tabLabel}>
-          <span>Chờ duyệt</span>
-          <div data-number className={css.totalItems}>
-            {totalPendingFoods}
+        ),
+        childrenFn: () => {},
+      },
+      {
+        key: EFoodApprovalState.PENDING,
+        label: (
+          <div className={css.tabLabel}>
+            <span>Chờ duyệt</span>
+            <div data-number className={css.totalItems}>
+              {totalPendingFoods}
+            </div>
           </div>
-        </div>
-      ),
-      childrenFn: () => {},
-    },
-    {
-      key: EFoodApprovalState.DECLINED,
-      label: (
-        <div className={css.tabLabel}>
-          <span>Từ chối</span>
-          <div data-number className={css.totalItems}>
-            {totalDeclinedFoods}
+        ),
+        childrenFn: () => {},
+      },
+      {
+        key: EFoodApprovalState.DECLINED,
+        label: (
+          <div className={css.tabLabel}>
+            <span>Từ chối</span>
+            <div data-number className={css.totalItems}>
+              {totalDeclinedFoods}
+            </div>
           </div>
-        </div>
-      ),
-      childrenFn: () => {},
-    },
-    {
-      key: 'draft',
-      label: (
-        <div className={css.tabLabel}>
-          <span>Nháp</span>
-          <div data-number className={css.totalItems}>
-            {totalDraftFoods}
+        ),
+        childrenFn: () => {},
+      },
+      {
+        key: 'draft',
+        label: (
+          <div className={css.tabLabel}>
+            <span>Nháp</span>
+            <div data-number className={css.totalItems}>
+              {totalDraftFoods}
+            </div>
           </div>
-        </div>
-      ),
-      childrenFn: () => {},
-    },
-  ];
+        ),
+        childrenFn: () => {},
+      },
+    ],
+    [
+      totalAcceptedFoods,
+      totalDeclinedFoods,
+      totalDraftFoods,
+      totalPendingFoods,
+    ],
+  );
 
   const onTabChange = (tab: any) => {
     setFoodApprovalActiveTab(tab?.key);
@@ -384,13 +396,16 @@ const ManagePartnerFoods = () => {
       ...(createAtStart ? { createAtStart } : {}),
       ...(createAtEnd ? { createAtEnd } : {}),
       ...(keywords ? { keywords } : {}),
-      ...(Object.values(EFoodApprovalState).includes(foodApprovalActiveTab)
-        ? {
-            adminApproval: foodApprovalActiveTab,
-          }
-        : {
-            isDraft: true,
-          }),
+      ...(isMobileLayout && {
+        ...(Object.values(EFoodApprovalState).includes(foodApprovalActiveTab)
+          ? {
+              adminApproval: foodApprovalActiveTab,
+              isDraft: false,
+            }
+          : {
+              isDraft: true,
+            }),
+      }),
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
@@ -400,6 +415,7 @@ const ManagePartnerFoods = () => {
     createAtStart,
     createAtEnd,
     foodApprovalActiveTab,
+    isMobileLayout,
   ]);
 
   const onImportFoodFromCsv = async () => {
@@ -474,11 +490,6 @@ const ManagePartnerFoods = () => {
           Thêm món ăn
         </Button>
       </NamedLink>
-      <Button
-        onClick={openImportModal}
-        className={classNames(css.lightButton, css.empty)}>
-        Thêm món ăn hàng loạt
-      </Button>
     </div>
   ) : (
     <div>Không có món ăn nào</div>
@@ -578,14 +589,33 @@ const ManagePartnerFoods = () => {
   const handleEditFood = () => {
     manipulateFoodSlideModalController.setFalse();
 
-    router.push(
-      partnerPaths.EditFood.replace('[foodId]', selectedFood.id.uuid),
-    );
+    router.push({
+      pathname: partnerPaths.EditFood.replace('[foodId]', selectedFood.id.uuid),
+      query: {
+        fromTab: foodApprovalActiveTab,
+      },
+    });
   };
 
   const handleAddFood = () => {
-    router.push(partnerPaths.CreateFood);
+    router.push({
+      pathname: partnerPaths.CreateFood,
+      query: {
+        fromTab: foodApprovalActiveTab,
+      },
+    });
   };
+
+  useEffect(() => {
+    if (tabFromQuery) {
+      const tabIndexMaybe =
+        (foodApprovalStateTabItems || []).findIndex(
+          (item) => item.key === tabFromQuery,
+        ) + 1;
+      setDefaultActiveKey(tabIndexMaybe === 0 ? 1 : tabIndexMaybe);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tabFromQuery, foodApprovalStateTabItems]);
 
   useEffect(() => {
     dispatch(
@@ -733,6 +763,7 @@ const ManagePartnerFoods = () => {
             <Tabs
               items={foodApprovalStateTabItems as any}
               onChange={onTabChange}
+              defaultActiveKey={`${defaultActiveKey}`}
             />
           </div>
         </div>

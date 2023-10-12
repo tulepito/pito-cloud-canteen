@@ -108,7 +108,7 @@ export const getUpdateFoodData = (values: TEditPartnerFoodFormValues) => {
       ...rest,
     },
     metadata: {
-      ...(isDraft ? { isDraft } : {}),
+      ...(isDraft !== undefined ? { isDraft } : {}),
       ...(adminApproval ? { adminApproval } : {}),
     },
   };
