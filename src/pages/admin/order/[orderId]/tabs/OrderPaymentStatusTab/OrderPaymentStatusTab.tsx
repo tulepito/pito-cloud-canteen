@@ -189,7 +189,9 @@ const OrderPaymentStatusTab: React.FC<OrderPaymentStatusTabProps> = (props) => {
           };
         }),
       )
-    : null;
+    : [];
+
+  const tabItemKeys = partnerTabItems.map(({ key }) => key);
 
   const { totalWithVAT: clientTotalPrice } = calculatePriceQuotationInfo({
     planOrderDetail: orderDetail,
@@ -245,13 +247,11 @@ const OrderPaymentStatusTab: React.FC<OrderPaymentStatusTabProps> = (props) => {
   useEffect(() => {
     if (subOrderDateFromQuery) {
       const tabIndexMaybe =
-        (partnerTabItems || []).findIndex(
-          (item) => item.key === subOrderDateFromQuery,
-        ) + 1;
-      setDefaultActiveKey(tabIndexMaybe === 0 ? 1 : tabIndexMaybe);
+        tabItemKeys.findIndex((item) => item === subOrderDateFromQuery) + 2;
+      setDefaultActiveKey(tabIndexMaybe === 0 ? 2 : tabIndexMaybe);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [subOrderDateFromQuery, partnerTabItems]);
+  }, [subOrderDateFromQuery, tabItemKeys]);
 
   const handleUpdateOrderState = (state: EOrderStates) => () => {
     updateOrderState(state);
@@ -271,11 +271,13 @@ const OrderPaymentStatusTab: React.FC<OrderPaymentStatusTabProps> = (props) => {
       />
       <RenderWhen condition={!isEmpty(quotations)}>
         <div className={css.tabContainer}>
-          <Tabs
-            items={totalTabItems as any}
-            onChange={onTabChange}
-            defaultActiveKey={`${defaultActiveKey}`}
-          />
+          {defaultActiveKey && (
+            <Tabs
+              items={totalTabItems as any}
+              onChange={onTabChange}
+              defaultActiveKey={`${defaultActiveKey}`}
+            />
+          )}
         </div>
       </RenderWhen>
     </div>
