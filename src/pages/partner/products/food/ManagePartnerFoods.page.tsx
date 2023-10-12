@@ -52,6 +52,7 @@ import GridFoodListForm from './components/GridFoodListForm/GridFoodListForm';
 import MoveFoodToMenuModal from './components/MoveFoodToMenuModal/MoveFoodToMenuModal';
 import RowFoodListForm from './components/RowFoodListForm/RowFoodListForm';
 import FilterForm from './FilterForm/FilterForm';
+import { NEW_FOOD_ID } from './helpers/editFood';
 import { partnerFoodSliceThunks } from './PartnerFood.slice';
 
 import css from './ManagePartnerFoods.module.scss';
@@ -599,7 +600,7 @@ const ManagePartnerFoods = () => {
 
   const handleAddFood = () => {
     router.push({
-      pathname: partnerPaths.CreateFood,
+      pathname: partnerPaths.EditFood.replace('[foodId]', NEW_FOOD_ID),
       query: {
         fromTab: foodApprovalActiveTab,
       },

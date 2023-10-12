@@ -1,5 +1,7 @@
 import type { TObject } from '@src/utils/types';
 
+export const NEW_FOOD_ID = '00000000-0000-0000-0000-000000000000';
+
 export const getObjectDifferences = (obj1: TObject, obj2: TObject) => {
   const differences: any = {};
 

@@ -8,7 +8,6 @@ import Button from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import IconTickWithBackground from '@components/Icons/IconTickWithBackground/IconTickWithBackground';
-import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import PopupModal from '@components/PopupModal/PopupModal';
 import StepTabs from '@components/StepTabs/StepTabs';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
@@ -24,7 +23,7 @@ import {
 import { partnerThunks } from '@redux/slices/partners.slice';
 import { resetImage } from '@redux/slices/uploadImage.slice';
 import { partnerPaths } from '@src/paths';
-import { IntegrationListing } from '@src/utils/data';
+import { CurrentUser, IntegrationListing } from '@src/utils/data';
 import type { TObject } from '@src/utils/types';
 import { parsePrice } from '@src/utils/validators';
 import {
@@ -36,12 +35,16 @@ import {
 import { getInitialAddImages } from '@utils/images';
 
 import EditPartnerFoodForm from '../components/EditPartnerFoodForm/EditPartnerFoodForm';
-import { getObjectDifferences } from '../helpers/editFood';
+import { getObjectDifferences, NEW_FOOD_ID } from '../helpers/editFood';
 import {
   partnerFoodSliceActions,
   partnerFoodSliceThunks,
 } from '../PartnerFood.slice';
-import { type TEditPartnerFoodFormValues, getUpdateFoodData } from '../utils';
+import {
+  type TEditPartnerFoodFormValues,
+  getSubmitFoodData,
+  getUpdateFoodData,
+} from '../utils';
 
 import css from './EditPartnerFood.module.scss';
 
@@ -56,26 +59,29 @@ const EditPartnerFoodPage = () => {
   const dispatch = useAppDispatch();
   const sendingApprovalToAdminModalController = useBoolean();
   const reSendingApprovalToAdminModalController = useBoolean();
-
+  const [isNewFood, setIsNewFood] = useState<boolean>(!foodId || true);
   const [currentTab, setCurrentTab] = useState<string>(
     (tabFromQuery as string) || FOOD_BASIC_INFO_TAB,
   );
 
+  const currentUser = useAppSelector((state) => state.user.currentUser);
+  const currentUserGetter = CurrentUser(currentUser!);
+  const { restaurantListingId } = currentUserGetter.getMetadata();
+
   const [changeContent, setChangeContent] = useState<TObject>({}); // for slack notification
   const {
     currentFoodListing,
-    showFoodInProgress,
     showFoodError,
     updateFoodInProgress,
     updateFoodError,
     uploadingImages,
+    createFoodInProgress,
   } = useAppSelector((state) => state.foods, shallowEqual);
 
-  const {
-    showPartnerListingInProgress,
-    showPartnerListingError,
-    partnerListingRef,
-  } = useAppSelector((state) => state.partners, shallowEqual);
+  const { showPartnerListingError, partnerListingRef } = useAppSelector(
+    (state) => state.partners,
+    shallowEqual,
+  );
   const currentFoodListingGetter = IntegrationListing(currentFoodListing);
   const {
     packaging,
@@ -116,6 +122,10 @@ const EditPartnerFoodPage = () => {
       minOrderNumberInAdvance,
     } = publicData;
 
+    if (isNewFood) {
+      return {};
+    }
+
     return {
       images: getInitialAddImages(currentFoodListing?.images || []),
       title,
@@ -135,6 +145,7 @@ const EditPartnerFoodPage = () => {
     foodType,
     maxQuantityFromPartner,
     minQuantityFromPartner,
+    isNewFood,
   ]) as TEditPartnerFoodFormValues;
 
   const goBackToManageFood = () => {
@@ -188,6 +199,30 @@ const EditPartnerFoodPage = () => {
   };
 
   const handleSubmit = async (values: TEditPartnerFoodFormValues) => {
+    if (isNewFood) {
+      const { payload: foodListing } = await dispatch(
+        partnerFoodSliceThunks.createPartnerFoodListing(
+          getSubmitFoodData({
+            ...values,
+            restaurantId: restaurantListingId,
+            isDraft: currentTab !== FOOD_ADDITIONAL_INFO_TAB,
+          }),
+        ),
+      );
+      setCurrentTab(CREATE_FOOD_TABS[1]);
+      setIsNewFood(false);
+      dispatch(partnerFoodSliceThunks.fetchDraftFood());
+
+      return router.replace({
+        pathname: partnerPaths.EditFood,
+        query: {
+          foodId: foodListing.id.uuid,
+          tab: FOOD_DETAIL_INFO_TAB,
+          fromTab,
+        },
+      });
+    }
+
     const currentTabIndex = CREATE_FOOD_TABS.indexOf(currentTab);
     const differentAttributesAfterEditFood = getObjectDifferences(
       initialValues,
@@ -284,17 +319,14 @@ const EditPartnerFoodPage = () => {
   }, []);
 
   useEffect(() => {
-    if (!foodId) return;
+    if (!foodId || foodId === NEW_FOOD_ID) return;
+    setIsNewFood(false);
     dispatch(partnerFoodSliceThunks.showPartnerFoodListing(foodId));
   }, [dispatch, foodId]);
 
   useEffect(() => {
     dispatch(resetImage());
-  }, []);
-
-  if (showFoodInProgress || showPartnerListingInProgress) {
-    return <LoadingContainer />;
-  }
+  }, [dispatch]);
 
   const showError = showFoodError || showPartnerListingError;
 
@@ -329,7 +361,7 @@ const EditPartnerFoodPage = () => {
           goBack={() => {}}
           disabled={false}
           handleSubmit={handleSubmit}
-          inProgress={updateFoodInProgress}
+          inProgress={updateFoodInProgress || createFoodInProgress}
           initialValues={initialValues}
         />
       </div>
