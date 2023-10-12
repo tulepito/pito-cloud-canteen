@@ -52,7 +52,10 @@ const OrderDateFieldModal: React.FC<TOrderDateFieldModalProps> = (props) => {
   const [startDate, setStartDate] = useState<Date | null>(initialStartDate!);
   const [endDate, setEndDate] = useState<Date | null>(initialEndDate!);
 
-  const minDate = selectedTimeRangeOption === 'custom' ? undefined : startDate;
+  const minDate =
+    selectedTimeRangeOption === 'custom'
+      ? DateTime.now().plus({ days: 3 }).toJSDate()
+      : startDate;
   const maxDate =
     selectedTimeRangeOption !== 'custom'
       ? endDate

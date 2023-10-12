@@ -257,11 +257,19 @@ const reorder = async ({
               orderDatesWeekdayList.indexOf(weekDayOfOldDate)
             ];
 
+          if (!newDate) {
+            return result;
+          }
+
           return {
             ...result,
             [`${newDate}`]: {
               ...subOrderNeededData,
               memberOrders: isGroupOrder ? {} : initialMemberOrder,
+              restaurant: {
+                ...subOrderNeededData.restaurant,
+                foodList: {},
+              },
             },
           };
         },
