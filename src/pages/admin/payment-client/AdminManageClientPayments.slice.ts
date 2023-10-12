@@ -1,8 +1,12 @@
 /* eslint-disable no-restricted-syntax */
 import { createSlice } from '@reduxjs/toolkit';
 import { groupBy } from 'lodash';
+import uniq from 'lodash/uniq';
 
-import { createPaymentRecordApi } from '@apis/admin';
+import {
+  createPaymentRecordApi,
+  transitionOrderPaymentStatusApi,
+} from '@apis/admin';
 import { adminQueryAllClientPaymentsApi } from '@apis/companyApi';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { EPaymentType } from '@src/utils/enums';
@@ -51,13 +55,7 @@ const fetchPartnerPaymentRecords = createAsyncThunk(
     const sortedRecordsGroupedByOrderId = orderIds.reduce((res, curr) => {
       return {
         ...res,
-        [curr]: paymentRecordsGroupedByOrderId[curr].sort((r1, r2) =>
-          r1.isHideFromHistory === true
-            ? -1
-            : r2.isHideFromHistory === true
-            ? 1
-            : 0,
-        ),
+        [curr]: paymentRecordsGroupedByOrderId[curr],
       };
     }, {});
 
@@ -71,6 +69,13 @@ const adminCreateClientPayment = createAsyncThunk(
     const oldClientPaymentMap = {
       ...getState().AdminManageClientPayments.clientPaymentsMap,
     };
+
+    const orderIdList: string[] = uniq(payload.map(({ orderId }) => orderId));
+
+    orderIdList.map(async (orderId: string) =>
+      transitionOrderPaymentStatusApi(orderId, ''),
+    );
+
     const newClientPaymentRecords = await Promise.all(
       payload.map(async (paymentRecord) => {
         const apiBody = {

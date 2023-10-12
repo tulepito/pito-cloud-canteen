@@ -143,7 +143,13 @@ const ManagePaymentsPage = () => {
       flatMapDeep(paymentPartnerRecords, (subOrders, orderId) =>
         flatMapDeep(subOrders, (subOrderData, subOrderDate) => ({
           id: `${orderId}_${subOrderDate}`,
-          paymentRecords: [...subOrderData],
+          paymentRecords: [...subOrderData].sort((r1, r2) =>
+            r1.isHideFromHistory === true
+              ? -1
+              : r2.isHideFromHistory === true
+              ? 1
+              : 0,
+          ),
         })),
       ),
     [JSON.stringify(paymentPartnerRecords)],

@@ -226,7 +226,13 @@ const AdminManageClientPaymentsPage = () => {
     () =>
       flatMapDeep(clientPaymentsMap, (subOrders, orderId) => ({
         id: orderId,
-        paymentRecords: [...subOrders],
+        paymentRecords: [...subOrders].sort((r1, r2) =>
+          r1.isHideFromHistory === true
+            ? -1
+            : r2.isHideFromHistory === true
+            ? 1
+            : 0,
+        ),
       })),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [JSON.stringify(clientPaymentsMap)],
@@ -236,12 +242,7 @@ const AdminManageClientPaymentsPage = () => {
     () =>
       tableData.map((item: any) => {
         const { id, paymentRecords = [] } = item;
-        if (id === '65265d77-792c-4ad9-9ea8-0e167c75b4a3') {
-          console.debug(
-            '💫 > file: AdminManageClientPayments.page.tsx:233 > tableData.map > paymentRecords: ',
-            paymentRecords[0],
-          );
-        }
+
         const {
           totalPrice = 0,
           companyName = '',

@@ -15,7 +15,7 @@ import { calculateClientTotalPriceAndPaidAmount } from './check-valid-payment.se
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   const integrationSdk = getIntegrationSdk();
   try {
-    const { orderId, planId } = req.body;
+    const { orderId, planId: planIdFromBody } = req.body;
 
     const order = await fetchListing(orderId);
     const orderListing = Listing(order);
@@ -23,7 +23,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       orderStateHistory,
       orderState,
       isAdminConfirmedClientPayment = false,
+      plans = [],
     } = orderListing.getMetadata();
+
+    const planId = planIdFromBody || plans[0];
 
     const plan = await fetchListing(planId);
     const planListing = Listing(plan);
