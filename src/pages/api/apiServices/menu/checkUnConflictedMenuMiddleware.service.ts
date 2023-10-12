@@ -9,7 +9,7 @@ import {
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { handleError } from '@services/sdk';
 import { denormalisedResponseEntities, IntegrationListing } from '@utils/data';
-import { findClassDays } from '@utils/dates';
+import { findClassDays, isSameDate } from '@utils/dates';
 import { EListingMenuStates, EListingStates, EListingType } from '@utils/enums';
 import type { TIntegrationListing } from '@utils/types';
 
@@ -105,7 +105,9 @@ const checkUnConflictedMenuMiddleware =
         );
 
         const checkResult = daysOfWeekInRange.some((d) =>
-          listingDaysOfWeekInRange.includes(d),
+          listingDaysOfWeekInRange.some((d2) =>
+            isSameDate(new Date(d), new Date(d2)),
+          ),
         );
 
         return checkResult;
