@@ -1,4 +1,4 @@
-import { EPaymentStatus, EPaymentType } from '@src/utils/enums';
+import { EFirebasePaymentStatus, EPaymentType } from '@src/utils/enums';
 import type { TObject } from '@src/utils/types';
 
 import {
@@ -17,7 +17,7 @@ export type PaymentBaseParams = {
   SKU: string;
   amount: number;
   paymentNote: string;
-  paymentStatus: EPaymentStatus;
+  paymentStatus: EFirebasePaymentStatus;
   orderId: string;
   partnerId?: string;
   partnerName?: string;
@@ -43,7 +43,7 @@ export const createPaymentRecordOnFirebase = async (
     const data = {
       ...params,
       paymentType: type,
-      paymentStatus: EPaymentStatus.SUCCESS,
+      paymentStatus: EFirebasePaymentStatus.SUCCESS,
       createdAt: paymentCreatedAt,
     };
     const paymentRecordId = await addCollectionDoc(
