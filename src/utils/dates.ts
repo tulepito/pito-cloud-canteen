@@ -355,7 +355,7 @@ export const printHoursToString = (hours: number, minutes: number) => {
 
 const DAYS = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
 
-const addDays = (d: Date, days: number) => {
+export const addDays = (d: Date, days: number) => {
   const date = new Date(d);
   date.setDate(date.getDate() + days);
 
@@ -364,10 +364,16 @@ const addDays = (d: Date, days: number) => {
 
 export const getDates = (startDate: Date, stopDate: Date) => {
   const dateArray = [];
-  let currentDate = new Date(startDate);
+  let currentDate = DateTime.fromJSDate(startDate)
+    .setZone(VNTimezone)
+    .startOf('day')
+    .toJSDate();
   while (currentDate <= stopDate) {
-    dateArray.push(new Date(currentDate));
-    currentDate = addDays(currentDate, 1);
+    dateArray.push(currentDate);
+    currentDate = DateTime.fromJSDate(currentDate)
+      .setZone(VNTimezone)
+      .plus({ day: 1 })
+      .toJSDate();
   }
 
   return dateArray;
