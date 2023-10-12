@@ -1,8 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import classNames from 'classnames';
-import isEqual from 'lodash/isEqual';
+import difference from 'lodash/difference';
+import isEmpty from 'lodash/isEmpty';
 import omit from 'lodash/omit';
 
 import Alert, { EAlertPosition, EAlertType } from '@components/Alert/Alert';
@@ -67,14 +68,14 @@ const MealSettingItem = ({
   const publishDraftMenuInProgress = useAppSelector(
     (state) => state.PartnerManageMenus.publishDraftMenuInProgress,
   );
-  const [daysToApply, setDaysToApply] = useState([]);
-
+  const [daysToApply, setDaysToApply] = useState<string[]>([]);
   const foodListToRender =
     isOverMaxItemsToShow && showMoreControl.value
       ? foodList.slice(0, 3)
       : foodList;
-  const daysOfWeekEnableToApply = daysOfWeek.filter(
-    (d: string) => d !== currentDay,
+  const daysOfWeekEnableToApply = useMemo(
+    () => daysOfWeek.filter((d: string) => d !== currentDay),
+    [JSON.stringify(daysOfWeek), currentDay],
   );
   const shouldShowApplyToAnotherDayBtn =
     !isEmptyFoodList && !(daysOfWeekEnableToApply?.length === 0);
@@ -88,13 +89,16 @@ const MealSettingItem = ({
 
   const currentFoodIds = foodList.map((f: TObject) => f.id);
 
+  const handleSelectDaysToApply = (value: string[]) => {
+    setDaysToApply(value);
+  };
+
   const handleSelectAllDay = () => {
     if (selectAllDaysControl.value) {
       setDaysToApply([]);
     } else {
       setDaysToApply(daysOfWeekEnableToApply);
     }
-    selectAllDaysControl.toggle();
   };
 
   const selectAllDaysClasses = classNames(css.dayLabel, {
@@ -188,18 +192,22 @@ const MealSettingItem = ({
   };
 
   useEffect(() => {
-    if (
-      isEqual(daysToApply, daysOfWeekEnableToApply) &&
-      !selectAllDaysControl.value
-    ) {
+    const hasNoDiffs = isEmpty(
+      difference(daysOfWeekEnableToApply, daysToApply),
+    );
+    const isSelectDaysEmpty = isEmpty(daysToApply);
+    if (isSelectDaysEmpty) {
+      selectAllDaysControl.setFalse();
+    } else if (hasNoDiffs && !selectAllDaysControl.value) {
       selectAllDaysControl.setTrue();
-    } else if (
-      !isEqual(daysToApply, daysOfWeekEnableToApply) &&
-      selectAllDaysControl.value
-    ) {
+    } else if (!hasNoDiffs && selectAllDaysControl.value) {
       selectAllDaysControl.setFalse();
     }
-  }, [JSON.stringify(daysToApply)]);
+  }, [
+    JSON.stringify(daysToApply),
+    JSON.stringify(daysOfWeekEnableToApply),
+    selectAllDaysControl.value,
+  ]);
 
   return (
     <div className={css.mealContainer} key={meal}>
@@ -343,6 +351,7 @@ const MealSettingItem = ({
       </AlertModal>
 
       <AlertModal
+        id={`confirmApplyForAnotherDayModal.${currentDay}.${meal}`}
         isOpen={confirmApplyForAnotherDayControl.value}
         title={'Chọn thứ áp dụng món'}
         shouldFullScreenInMobile={false}
@@ -358,14 +367,16 @@ const MealSettingItem = ({
           Cả tuần
         </div>
 
-        <ApplyForAnotherDayForm
-          onSubmit={() => {}}
-          initialValues={{
-            daysToApply,
-          }}
-          setDaysToApply={setDaysToApply}
-          daysOfWeek={daysOfWeekEnableToApply}
-        />
+        {meal && confirmApplyForAnotherDayControl.value && (
+          <ApplyForAnotherDayForm
+            onSubmit={() => {}}
+            initialValues={{
+              daysToApply,
+            }}
+            setDaysToApply={handleSelectDaysToApply}
+            daysOfWeek={daysOfWeekEnableToApply}
+          />
+        )}
       </AlertModal>
     </div>
   );

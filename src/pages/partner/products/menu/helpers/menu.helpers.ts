@@ -2,7 +2,7 @@ import type { TObject } from '@src/utils/types';
 
 import { EMenuMealType } from '../../../../../utils/enums';
 
-const MEAL_PRIORITIES: TObject<EMenuMealType, number> = {
+export const MEAL_PRIORITIES: TObject<EMenuMealType, number> = {
   [EMenuMealType.breakfast]: 0,
   [EMenuMealType.lunch]: 1,
   [EMenuMealType.dinner]: 2,

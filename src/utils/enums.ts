@@ -47,6 +47,16 @@ export enum EDayOfWeek {
   sun = 'sun',
 }
 
+export const DAY_OF_WEEK_PRIORITIES = {
+  [EDayOfWeek.mon]: 0,
+  [EDayOfWeek.tue]: 1,
+  [EDayOfWeek.wed]: 2,
+  [EDayOfWeek.thu]: 3,
+  [EDayOfWeek.fri]: 4,
+  [EDayOfWeek.sat]: 5,
+  [EDayOfWeek.sun]: 6,
+};
+
 export enum EBookingStates {
   pending = 'pending',
   accepted = 'accepted',
