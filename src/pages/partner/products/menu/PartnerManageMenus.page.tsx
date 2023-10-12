@@ -29,9 +29,14 @@ import css from './PartnerManageMenusPage.module.scss';
 const DEBOUNCE_TIME = 1000;
 
 const NEED_HANDLE_MENU_TYPES = MENU_MEAL_TYPE_OPTIONS.slice(0, 3);
-type TPartnerManageMenusPageProps = {};
 
-const PartnerManageMenusPage: React.FC<TPartnerManageMenusPageProps> = () => {
+type TPartnerManageMenusPageProps = {
+  setShowAddMenuBtn: (value: boolean) => void;
+};
+
+const PartnerManageMenusPage: React.FC<TPartnerManageMenusPageProps> = ({
+  setShowAddMenuBtn,
+}) => {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const firstLoadControl = useBoolean(true);
@@ -61,7 +66,8 @@ const PartnerManageMenusPage: React.FC<TPartnerManageMenusPageProps> = () => {
   };
 
   const handleTabChanged = (params: TTabsItem) => {
-    setCurrentTab(params?.id?.toString());
+    const tab = params?.id?.toString();
+    setCurrentTab(tab);
   };
 
   const handleNavigateToCreateMenuPage = () => {
@@ -143,6 +149,14 @@ const PartnerManageMenusPage: React.FC<TPartnerManageMenusPageProps> = () => {
     [firstLoadControl.value],
   );
 
+  useEffect(() => {
+    const menusForTab = menus.filter((m: TListing) => {
+      const { mealType } = Listing(m).getPublicData();
+
+      return mealType === currentTab;
+    });
+    setShowAddMenuBtn(menusForTab.length > 0);
+  }, [currentTab, JSON.stringify(menus)]);
   useEffect(() => {
     setSearchTitle(titleField.input.value);
   }, [titleField.input.value]);
