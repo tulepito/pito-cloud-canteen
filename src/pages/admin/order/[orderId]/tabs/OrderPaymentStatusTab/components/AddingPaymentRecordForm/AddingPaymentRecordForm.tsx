@@ -1,17 +1,21 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
+import classNames from 'classnames';
 
 import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
 import FieldTextArea from '@components/FormFields/FieldTextArea/FieldTextArea';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
+import OutsideClickHandler from '@components/OutsideClickHandler/OutsideClickHandler';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import {
   parseThousandNumber,
   parseThousandNumberToInteger,
 } from '@helpers/format';
+import type { TUseBooleanReturns } from '@hooks/useBoolean';
 import useBoolean from '@hooks/useBoolean';
 import { EPaymentType } from '@src/utils/enums';
 import { maxLength, required } from '@src/utils/validators';
@@ -41,14 +45,15 @@ export const PaymentPercentageDropdown = ({
   percentage,
   setPercentage,
   hasOnlyMaxOption = false,
+  showPercentageController,
 }: {
   totalPrice: number;
   paidAmount: number;
   percentage: number;
   hasOnlyMaxOption?: boolean;
+  showPercentageController: TUseBooleanReturns;
   setPercentage: (percentage: number) => void;
 }) => {
-  const showPercentageController = useBoolean();
   const remainingAmount = totalPrice - paidAmount;
   const isRemainingAmountGreaterOrEqualThan30Percent =
     remainingAmount >= (totalPrice * 30) / 100;
@@ -62,41 +67,47 @@ export const PaymentPercentageDropdown = ({
   };
 
   return (
-    <div className={css.dropdownContainer}>
-      <RenderWhen condition={hasOnlyMaxOption}>
-        <div className={css.maxOption} onClick={handleClickPercentage(100)}>
-          max
-        </div>
-        <RenderWhen.False>
-          <>
-            <div className={css.percentage}>{percentage}%</div>
-            <IconArrow
-              onClick={showPercentageController.toggle}
-              direction={showPercentageController.value ? 'down' : 'right'}
-            />
-          </>
-        </RenderWhen.False>
-      </RenderWhen>
+    <OutsideClickHandler
+      rootClassName={css.outSideContainer}
+      onOutsideClick={showPercentageController.setFalse}>
+      <div className={css.dropdownContainer}>
+        <RenderWhen condition={hasOnlyMaxOption}>
+          <div className={css.maxOption} onClick={handleClickPercentage(100)}>
+            max
+          </div>
+          <RenderWhen.False>
+            <>
+              <div className={css.percentage}>{percentage}%</div>
+              <IconArrow
+                onClick={showPercentageController.toggle}
+                direction={showPercentageController.value ? 'down' : 'right'}
+              />
+            </>
+          </RenderWhen.False>
+        </RenderWhen>
 
-      <RenderWhen condition={showPercentageController.value}>
-        <div className={css.dropdownWrapper}>
-          <RenderWhen condition={isRemainingAmountGreaterOrEqualThan30Percent}>
-            <div
-              className={css.percentageRow}
-              onClick={handleClickPercentage(30)}>
-              30%
-            </div>
-          </RenderWhen>
-          <RenderWhen condition={isRemainingAmountGreaterOrEqualThan70Percent}>
-            <div
-              className={css.percentageRow}
-              onClick={handleClickPercentage(70)}>
-              70%
-            </div>
-          </RenderWhen>
-        </div>
-      </RenderWhen>
-    </div>
+        <RenderWhen condition={showPercentageController.value}>
+          <div className={css.dropdownWrapper}>
+            <RenderWhen
+              condition={isRemainingAmountGreaterOrEqualThan30Percent}>
+              <div
+                className={css.percentageRow}
+                onClick={handleClickPercentage(30)}>
+                30%
+              </div>
+            </RenderWhen>
+            <RenderWhen
+              condition={isRemainingAmountGreaterOrEqualThan70Percent}>
+              <div
+                className={css.percentageRow}
+                onClick={handleClickPercentage(70)}>
+                70%
+              </div>
+            </RenderWhen>
+          </div>
+        </RenderWhen>
+      </div>{' '}
+    </OutsideClickHandler>
   );
 };
 
@@ -114,10 +125,15 @@ const AddingPaymentRecordFormComponent: React.FC<
     paymentType = EPaymentType.PARTNER,
     createPaymentError,
   } = props;
+  const showPercentageController = useBoolean();
   const [percentage, setPercentage] = useState<number>(0);
 
   const paymentAmountValue = values?.paymentAmount || 0;
   const submitDisabled = invalid || inProgress;
+
+  const rightIconContainerClasses = classNames(css.rightIcon, {
+    [css.rightIconActive]: showPercentageController.value,
+  });
 
   const handleParseInputValue = (value: string) => {
     return parseThousandNumber(value);
@@ -172,9 +188,10 @@ const AddingPaymentRecordFormComponent: React.FC<
             percentage={percentage}
             setPercentage={setPercentage}
             hasOnlyMaxOption={paymentType === EPaymentType.CLIENT}
+            showPercentageController={showPercentageController}
           />
         }
-        rightIconContainerClassName={css.rightIcon}
+        rightIconContainerClassName={rightIconContainerClasses}
         parse={handleParseInputValue}
         validate={required('Số tiền không được để trống')}
       />
