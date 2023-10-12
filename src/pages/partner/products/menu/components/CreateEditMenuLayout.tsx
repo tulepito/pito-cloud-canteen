@@ -22,10 +22,7 @@ import useBoolean from '@hooks/useBoolean';
 import { partnerPaths } from '@src/paths';
 import { Listing } from '@src/utils/data';
 import { EListingStates } from '@src/utils/enums';
-import {
-  historyPushState,
-  parseLocationSearchToObject,
-} from '@src/utils/history';
+import { historyPushState } from '@src/utils/history';
 import type { TObject } from '@src/utils/types';
 
 import { PartnerManageMenusThunks } from '../PartnerManageMenus.slice';
@@ -118,11 +115,7 @@ const CreateEditMenuLayout: React.FC<TCreateEditMenuLayoutProps> = () => {
   const dispatch = useAppDispatch();
   const confirmPublishDraftMenuControl = useBoolean();
   const confirmCompleteDraftMenuControl = useBoolean();
-  const {
-    query: { menuId: menuIdFromRouter },
-    isReady: isRouterReady,
-  } = router;
-  const { menuId: menuIdFromSearch } = parseLocationSearchToObject();
+  const { isReady: isRouterReady, pathname } = router;
 
   const [currStep, setCurrStep] = useState(EEditPartnerMenuMobileStep.info);
   const menu = useAppSelector(
@@ -154,6 +147,7 @@ const CreateEditMenuLayout: React.FC<TCreateEditMenuLayoutProps> = () => {
     (state) => state.PartnerManageMenus.draftMenu,
   );
 
+  const isCreateMenuPath = pathname === partnerPaths.CreateMenu;
   const menuGetter = Listing(menu);
   const { title } = menuGetter.getAttributes();
   const { listingState = EListingStates.draft } = Listing(menu).getMetadata();
@@ -331,7 +325,7 @@ const CreateEditMenuLayout: React.FC<TCreateEditMenuLayoutProps> = () => {
       <div className={css.titleContainer}>
         <IconArrow direction="left" onClick={handleNavigateToMenuPage} />
         <RenderWhen condition={isRouterReady}>
-          {menuIdFromRouter || menuIdFromSearch ? 'Chỉnh sửa menu' : 'Tạo menu'}
+          {!isCreateMenuPath ? 'Chỉnh sửa menu' : 'Tạo menu'}
         </RenderWhen>
       </div>
       <div className={css.stepsContainer}>
@@ -417,7 +411,7 @@ const CreateEditMenuLayout: React.FC<TCreateEditMenuLayoutProps> = () => {
                 inProgress={submitting}
                 disabled={!enableNext}
                 onClick={handleNavigateToNextStep}>
-                Hoàn tất
+                {isCreateMenuPath ? 'Hoàn tất' : 'Cập nhật'}
               </Button>
               <Button variant="secondary" onClick={handleNavigateToPrevStep}>
                 Trở về
