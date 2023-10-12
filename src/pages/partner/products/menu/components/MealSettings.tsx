@@ -38,6 +38,7 @@ const MealSettingItem = ({
   pickedFood = [],
   foodList = [],
   meal,
+  isFirst,
   isDraftEditFlow,
   currentDay,
   foodByDate,
@@ -46,7 +47,7 @@ const MealSettingItem = ({
   daysOfWeek,
 }: any) => {
   const isEmptyFoodList = foodList.length === 0;
-  const expandControl = useBoolean(isEmptyFoodList);
+  const expandControl = useBoolean(isFirst || isEmptyFoodList);
   const isOverMaxItemsToShow = foodList.length > MAX_ITEM_TO_SHOW;
   const showMoreControl = useBoolean(true);
   const addFoodControl = useBoolean();
@@ -400,6 +401,7 @@ const MealSettings: React.FC<TMealSettingsProps> = (props) => {
               daysOfWeek={daysOfWeek}
               key={`${currentDay}.${meal}.${index}`}
               meal={meal}
+              isFirst={index === 0}
               mealLabel={mealLabel}
               pickedFood={pickedFood}
               foodList={foodList}
