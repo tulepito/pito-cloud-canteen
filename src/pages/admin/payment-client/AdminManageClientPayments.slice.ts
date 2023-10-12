@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 import { createSlice } from '@reduxjs/toolkit';
 import { groupBy } from 'lodash';
 
@@ -40,12 +41,27 @@ const fetchPartnerPaymentRecords = createAsyncThunk(
   async () => {
     const { data: allPaymentRecords } = await adminQueryAllClientPaymentsApi();
 
-    const paymentRecordsGrouppedByOrderId = groupBy(
+    const paymentRecordsGroupedByOrderId = groupBy(
       allPaymentRecords,
       'orderId',
     );
 
-    return paymentRecordsGrouppedByOrderId;
+    const orderIds = Object.keys(paymentRecordsGroupedByOrderId);
+
+    const sortedRecordsGroupedByOrderId = orderIds.reduce((res, curr) => {
+      return {
+        ...res,
+        [curr]: paymentRecordsGroupedByOrderId[curr].sort((r1, r2) =>
+          r1.isHideFromHistory === true
+            ? -1
+            : r2.isHideFromHistory === true
+            ? 1
+            : 0,
+        ),
+      };
+    }, {});
+
+    return sortedRecordsGroupedByOrderId;
   },
 );
 
