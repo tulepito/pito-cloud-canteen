@@ -104,9 +104,11 @@ const checkUnConflictedMenuMiddleware =
           new Date(listingEndDate),
         );
 
-        return daysOfWeekInRange.some((d) =>
+        const checkResult = daysOfWeekInRange.some((d) =>
           listingDaysOfWeekInRange.includes(d),
         );
+
+        return checkResult;
       });
 
       const listingWithoutNewMenu = id

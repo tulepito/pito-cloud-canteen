@@ -388,11 +388,13 @@ export const findClassDays = (
   const rangeDates = getDates(new Date(firstDay), new Date(lastDay)) || [];
   const daysOfWeekUpperCase = daysOfWeek.map((d) => capitalize(d));
 
-  classDays = rangeDates.filter((f) =>
-    daysOfWeekUpperCase.some(
-      (d) => DAYS[d as keyof typeof DAYS] === f.getDay(),
-    ),
-  );
+  classDays = rangeDates.filter((f) => {
+    const weekdayIdx = DateTime.fromJSDate(f).setZone(VNTimezone).weekday % 7;
+
+    return daysOfWeekUpperCase.some((d) => {
+      return DAYS[d as keyof typeof DAYS] === weekdayIdx;
+    });
+  });
 
   return classDays.map((d) => d.getTime());
 };
