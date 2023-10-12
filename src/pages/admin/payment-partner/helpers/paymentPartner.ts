@@ -19,18 +19,16 @@ export const filterPaymentPartner = (
     )
       return false;
     if (
-      (orderTitle &&
-        /-/.test(orderTitle) &&
-        !`${item.data.subOrderTitle}`
-          .toLocaleLowerCase()
-          .includes(orderTitle.toLocaleLowerCase())) ||
-      (orderTitle &&
-        !/-/.test(orderTitle) &&
-        !`${item.data.orderTitle}`
-          .toLocaleLowerCase()
-          .includes(orderTitle.toLocaleLowerCase()))
-    )
+      orderTitle &&
+      !`${item.data.subOrderTitle}`
+        .toLocaleLowerCase()
+        .includes(orderTitle.toLocaleLowerCase()) &&
+      !`${item.data.orderTitle}`
+        .toLocaleLowerCase()
+        .includes(orderTitle.toLocaleLowerCase())
+    ) {
       return false;
+    }
     if (startDate && +item.data.subOrderDate < startDate) return false;
     if (endDate && +item.data.subOrderDate > endDate) return false;
     if (status && !status.includes(item.data.status)) return false;
