@@ -45,7 +45,6 @@ const checkUnConflictedMenuMiddleware =
       const listings = denormalisedResponseEntities(
         response,
       ) as TIntegrationListing[];
-
       const inValidListings = listings.filter((l) => {
         const {
           startDate: listingStartDate,
@@ -58,7 +57,6 @@ const checkUnConflictedMenuMiddleware =
           new Date(startDate),
           new Date(endDate),
         );
-
         const listingDaysOfWeekInRange = findClassDays(
           listingDayOfWeek,
           new Date(listingStartDate),
