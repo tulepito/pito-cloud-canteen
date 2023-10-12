@@ -9,7 +9,7 @@ import Form from '@components/Form/Form';
 import FieldCheckboxGroup from '@components/FormFields/FieldCheckboxGroup/FieldCheckboxGroup';
 import FieldDatePicker from '@components/FormFields/FieldDatePicker/FieldDatePicker';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
-import { EOrderPaymentState } from '@src/utils/enums';
+import { EOrderPaymentStatus } from '@src/utils/enums';
 
 import css from './FilterPartnerOrderForm.module.scss';
 
@@ -43,11 +43,11 @@ const SUB_ORDER_STATUS_OPTIONS = [
     labelId: 'FilterPartnerOrderForm.subOrderStatus.delivered',
   },
   {
-    key: EOrderPaymentState.isPaid,
+    key: EOrderPaymentStatus.isPaid,
     labelId: 'FilterPartnerOrderForm.subOrderStatus.isPaid',
   },
   {
-    key: EOrderPaymentState.isNotPaid,
+    key: EOrderPaymentStatus.isNotPaid,
     labelId: 'FilterPartnerOrderForm.subOrderStatus.isNotPaid',
   },
   {

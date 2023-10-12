@@ -1096,7 +1096,7 @@ export const ORDER_ADMIN_FILTER_OPTIONS = [
   },
 ];
 
-export enum EPaymentStatus {
+export enum EFirebasePaymentStatus {
   SUCCESS = 'success',
 }
 
@@ -1111,7 +1111,18 @@ export enum EPartnerVATSetting {
   direct = 'direct',
 }
 
-export enum EOrderPaymentState {
+export enum EOrderPaymentStatus {
   isPaid = 'isPaid',
   isNotPaid = 'isNotPaid',
 }
+
+export const CONFIGS_BASE_ON_PAYMENT_STATUS = {
+  [EOrderPaymentStatus.isPaid]: {
+    label: 'Đã thanh toán',
+    badgeType: EBadgeType.success,
+  },
+  [EOrderPaymentStatus.isNotPaid]: {
+    label: 'Chưa thanh toán',
+    badgeType: EBadgeType.warning,
+  },
+};

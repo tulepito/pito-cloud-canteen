@@ -11,7 +11,7 @@ import FieldCheckboxGroup from '@components/FormFields/FieldCheckboxGroup/FieldC
 import FieldDatePicker from '@components/FormFields/FieldDatePicker/FieldDatePicker';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import IconSearch from '@components/Icons/IconSearch/IconSearch';
-import { EOrderPaymentState } from '@src/utils/enums';
+import { EOrderPaymentStatus } from '@src/utils/enums';
 
 import css from './PaymentFilterForm.module.scss';
 
@@ -25,11 +25,11 @@ export type TPaymentFilterFormValues = {
 
 const PAYMENT_STATUS_OPTIONS = [
   {
-    key: EOrderPaymentState.isNotPaid,
+    key: EOrderPaymentStatus.isNotPaid,
     label: 'Chưa thanh toán',
   },
   {
-    key: EOrderPaymentState.isPaid,
+    key: EOrderPaymentStatus.isPaid,
     label: 'Đã thanh toán',
   },
 ];

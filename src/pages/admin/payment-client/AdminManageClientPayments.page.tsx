@@ -1,9 +1,10 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import classNames from 'classnames';
 import { flatMapDeep, isEmpty } from 'lodash';
 
-import Badge, { EBadgeType } from '@components/Badge/Badge';
+import Badge from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
 import IconClose from '@components/Icons/IconClose/IconClose';
 import IconFilter from '@components/Icons/IconFilter/IconFilter';
@@ -20,7 +21,11 @@ import { companyMemberThunks } from '@redux/slices/companyMember.slice';
 import { adminPaths } from '@src/paths';
 import { UserPermission } from '@src/types/UserPermission';
 import { formatTimestamp } from '@src/utils/dates';
-import { EOrderDetailTabs, EOrderPaymentState } from '@src/utils/enums';
+import {
+  CONFIGS_BASE_ON_PAYMENT_STATUS,
+  EOrderDetailTabs,
+  EOrderPaymentStatus,
+} from '@src/utils/enums';
 import type { TObject, TPagination } from '@src/utils/types';
 
 import { generateSKU } from '../order/[orderId]/helpers/AdminOrderDetail';
@@ -44,8 +49,10 @@ const getFilterLabelText = (key: string, value: string | string[]) => {
     case 'status':
       return Array.isArray(value)
         ? value
-            .map((item: string) =>
-              item === 'isPaid' ? 'Đã thanh toán' : 'Chưa thanh toán',
+            .map(
+              (item: string) =>
+                CONFIGS_BASE_ON_PAYMENT_STATUS[item as EOrderPaymentStatus]
+                  .label,
             )
             .join(', ')
         : value === 'isPaid'
@@ -145,11 +152,11 @@ const TABLE_COLUMNS: TColumn[] = [
   {
     key: 'status',
     label: 'Trạng thái',
-    render: ({ status }: any) => (
+    render: ({ status }: { status: EOrderPaymentStatus }) => (
       <div>
         <Badge
-          type={status === 'isPaid' ? EBadgeType.success : EBadgeType.warning}
-          label={status === 'isPaid' ? 'Đã thanh toán' : 'Chưa thanh toán'}
+          type={CONFIGS_BASE_ON_PAYMENT_STATUS[status].badgeType}
+          label={CONFIGS_BASE_ON_PAYMENT_STATUS[status].label}
         />
       </div>
     ),
@@ -177,32 +184,29 @@ export const getUniquePaymentRelationship = (
 const AdminManageClientPaymentsPage = () => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
+  // * react state
   const [filters, setFilters] = useState({} as any);
   const [selectedPaymentRecords, setSelectedPaymentRecords] = useState(
     {} as any,
   );
   const [page, setPage] = useState(1);
-
   const filterPaymentModalController = useBoolean();
   const addClientPaymentModalController = useBoolean();
-  const title = intl.formatMessage({
-    id: 'AdminManageClientPaymentsPage.title',
-  });
-
+  // * redux state
   const fetchClientPaymentsInProgress = useAppSelector(
     (state) => state.AdminManageClientPayments.fetchClientPaymentsInProgress,
   );
-
   const clientPaymentsMap = useAppSelector(
     (state) => state.AdminManageClientPayments.clientPaymentsMap,
   );
-
   const createClientPaymentsInProgress = useAppSelector(
     (state) => state.AdminManageClientPayments.createClientPaymentsInProgress,
   );
-
   const companyMembers = useAppSelector(
     (state) => state.companyMember.companyMembers,
+  );
+  const queryMembersInProgress = useAppSelector(
+    (state) => state.companyMember.queryMembersInProgress,
   );
 
   const companyBookers = companyMembers.filter(
@@ -211,11 +215,11 @@ const AdminManageClientPaymentsPage = () => {
       member.permission === UserPermission.BOOKER,
   );
 
-  const queryMembersInProgress = useAppSelector(
-    (state) => state.companyMember.queryMembersInProgress,
-  );
+  const title = intl.formatMessage({
+    id: 'AdminManageClientPaymentsPage.title',
+  });
 
-  const onQueryCompanyBookers = (id: string) =>
+  const handleQueryCompanyBookers = (id: string) =>
     dispatch(companyMemberThunks.queryCompanyMembers(id));
 
   const tableData = useMemo(
@@ -228,55 +232,67 @@ const AdminManageClientPaymentsPage = () => {
     [JSON.stringify(clientPaymentsMap)],
   );
 
-  const formattedTableData = tableData.map((item: any) => {
-    const { id, paymentRecords = [] } = item;
-    const {
-      totalPrice = 0,
-      companyName = '',
-      startDate = '',
-      endDate = '',
-      deliveryHour = '',
-      orderTitle = '',
-      orderId = '',
-      partnerId = '',
-      booker = '',
-      company = '',
-      isAdminConfirmed,
-    } = paymentRecords[0] || {};
-    const restaurants = paymentRecords[0].restaurants || [];
+  const formattedTableData = useMemo(
+    () =>
+      tableData.map((item: any) => {
+        const { id, paymentRecords = [] } = item;
+        if (id === '65265d77-792c-4ad9-9ea8-0e167c75b4a3') {
+          console.debug(
+            '💫 > file: AdminManageClientPayments.page.tsx:233 > tableData.map > paymentRecords: ',
+            paymentRecords[0],
+          );
+        }
+        const {
+          totalPrice = 0,
+          companyName = '',
+          startDate = '',
+          endDate = '',
+          deliveryHour = '',
+          orderTitle = '',
+          orderId = '',
+          partnerId = '',
+          booker = '',
+          company = '',
+          isAdminConfirmed,
+        } = paymentRecords[0] || {};
+        const restaurants = paymentRecords[0].restaurants || [];
 
-    const paidAmount = paymentRecords.reduce(
-      (acc: number, cur: TObject) => acc + (cur.amount || 0),
-      0,
-    );
+        const paidAmount = paymentRecords.reduce(
+          (acc: number, cur: TObject) => acc + (cur.amount || 0),
+          0,
+        );
 
-    const status =
-      isAdminConfirmed === true || totalPrice - paidAmount === 0
-        ? EOrderPaymentState.isPaid
-        : EOrderPaymentState.isNotPaid;
-    const remainAmount = paidAmount > totalPrice ? 0 : totalPrice - paidAmount;
+        const status =
+          isAdminConfirmed === true || totalPrice - paidAmount === 0
+            ? EOrderPaymentStatus.isPaid
+            : EOrderPaymentStatus.isNotPaid;
+        const remainAmount =
+          paidAmount > totalPrice ? 0 : totalPrice - paidAmount;
 
-    return {
-      key: id,
-      data: {
-        id,
-        companyName,
-        orderTitle,
-        totalAmount: totalPrice,
-        remainAmount,
-        paidAmount,
-        status,
-        deliveryHour,
-        orderId,
-        partnerId,
-        startDate,
-        endDate,
-        booker,
-        restaurants,
-        company,
-      },
-    };
-  });
+        return {
+          key: id,
+          data: {
+            id,
+            companyName,
+            orderTitle,
+            totalAmount: totalPrice,
+            remainAmount,
+            paidAmount,
+            status,
+            deliveryHour,
+            orderId,
+            partnerId,
+            startDate,
+            endDate,
+            booker,
+            restaurants,
+            company,
+          },
+        };
+      }),
+    [JSON.stringify(tableData)],
+  );
+
   const companyList = getUniquePaymentRelationship(
     formattedTableData
       .filter((item) => !!item.data.company?.companyName)
@@ -291,7 +307,11 @@ const AdminManageClientPaymentsPage = () => {
     'restaurantId',
   );
 
-  const filteredTableData = filterClientPayment(formattedTableData, filters);
+  const filteredTableData = useMemo(
+    () => filterClientPayment(formattedTableData, filters),
+    [JSON.stringify(filters), JSON.stringify(formattedTableData)],
+  );
+
   const filteredTableDataWithPagination = useMemo(
     () => filteredTableData.slice((page - 1) * 10, page * 10),
     [filteredTableData, page],
@@ -304,22 +324,18 @@ const AdminManageClientPaymentsPage = () => {
     totalPages: Math.ceil(filteredTableData.length / 10),
   };
 
-  useEffect(() => {
-    dispatch(AdminManageClientPaymentsThunks.fetchPartnerPaymentRecords());
-  }, [dispatch]);
-
-  const onClearFilters = () => {
+  const handleClearFilters = () => {
     setFilters({});
   };
 
-  const onRemoveFilter = (key: string) => () => {
+  const handleRemoveFilter = (key: string) => () => {
     const currentFilters = { ...filters };
     delete currentFilters[key];
 
     setFilters(currentFilters);
   };
 
-  const onClientPaymentRecordsSubmit = async (values: any) => {
+  const handleClientPaymentRecordsSubmit = async (values: any) => {
     const newPaymentRecords = Object.keys(values).filter((key) =>
       key.includes('paymentAmount'),
     );
@@ -364,7 +380,7 @@ const AdminManageClientPaymentsPage = () => {
     }, 0);
   };
 
-  const onDownloadPaymentList = () => {
+  const handleDownloadPaymentList = () => {
     const hasSelectedPaymentRecords = !isEmpty(selectedPaymentRecords);
     if (hasSelectedPaymentRecords) {
       const selectedPaymentRecordsData = filteredTableData.filter((item) =>
@@ -399,10 +415,17 @@ const AdminManageClientPaymentsPage = () => {
           {' :'}
         </span>{' '}
         <span>{getFilterLabelText(key, filters[key])}</span>
-        <IconClose className={css.iconClose} onClick={onRemoveFilter(key)} />
+        <IconClose
+          className={css.iconClose}
+          onClick={handleRemoveFilter(key)}
+        />
       </div>
     );
   });
+
+  useEffect(() => {
+    dispatch(AdminManageClientPaymentsThunks.fetchPartnerPaymentRecords());
+  }, [dispatch]);
 
   return (
     <div className={css.root}>
@@ -412,7 +435,7 @@ const AdminManageClientPaymentsPage = () => {
       </div>
       <div className={css.filterForm}>
         <IntegrationFilterModal
-          onClear={onClearFilters}
+          onClear={handleClearFilters}
           leftFilters={
             <Button
               type="button"
@@ -428,7 +451,7 @@ const AdminManageClientPaymentsPage = () => {
               <Button
                 type="button"
                 variant="secondary"
-                onClick={onDownloadPaymentList}>
+                onClick={handleDownloadPaymentList}>
                 <FormattedMessage id="PaymentPartnerPage.actionButton.downloadPayment" />
               </Button>
               <Button
@@ -468,10 +491,10 @@ const AdminManageClientPaymentsPage = () => {
           paymentList={filterPaymentPartner(selectedPaymentRecordsData, {
             status: ['isNotPaid'],
           })}
-          onQueryCompanyBookers={onQueryCompanyBookers}
+          onQueryCompanyBookers={handleQueryCompanyBookers}
           companyBookers={companyBookers}
           queryBookersInProgress={queryMembersInProgress}
-          onClientPaymentRecordsSubmit={onClientPaymentRecordsSubmit}
+          onClientPaymentRecordsSubmit={handleClientPaymentRecordsSubmit}
           inProgress={createClientPaymentsInProgress}
           hasSelectedPaymentRecords={hasSelectedPaymentRecords}
         />

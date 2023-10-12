@@ -1,10 +1,11 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import flatMapDeep from 'lodash/flatMapDeep';
 import isEmpty from 'lodash/isEmpty';
 import uniq from 'lodash/uniq';
 
-import Badge, { EBadgeType } from '@components/Badge/Badge';
+import Badge from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
 import IconClose from '@components/Icons/IconClose/IconClose';
 import IconFilter from '@components/Icons/IconFilter/IconFilter';
@@ -20,11 +21,13 @@ import {
 } from '@helpers/format';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
+import { filterPayments } from '@pages/partner/payments/helpers/paymentPartner';
 import { adminPaths } from '@src/paths';
 import { formatTimestamp, getDayOfWeek } from '@src/utils/dates';
 import {
+  CONFIGS_BASE_ON_PAYMENT_STATUS,
   EOrderDetailTabs,
-  EOrderPaymentState,
+  EOrderPaymentStatus,
   EPaymentType,
 } from '@src/utils/enums';
 import type { TPagination } from '@src/utils/types';
@@ -48,8 +51,10 @@ const getFilterLabelText = (key: string, value: string | string[]) => {
     case 'status':
       return Array.isArray(value)
         ? value
-            .map((item: string) =>
-              item === 'isPaid' ? 'Đã thanh toán' : 'Chưa thanh toán',
+            .map(
+              (item: string) =>
+                CONFIGS_BASE_ON_PAYMENT_STATUS[item as EOrderPaymentStatus]
+                  .label,
             )
             .join(', ')
         : value === 'isPaid'
@@ -162,11 +167,11 @@ const PaymentPartnerPage = () => {
     {
       key: 'status',
       label: 'Trạng thái',
-      render: ({ status }: any) => (
+      render: ({ status }: { status: EOrderPaymentStatus }) => (
         <div>
           <Badge
-            type={status === 'isPaid' ? EBadgeType.success : EBadgeType.warning}
-            label={status === 'isPaid' ? 'Đã thanh toán' : 'Chưa thanh toán'}
+            type={CONFIGS_BASE_ON_PAYMENT_STATUS[status].badgeType}
+            label={CONFIGS_BASE_ON_PAYMENT_STATUS[status].label}
           />
         </div>
       ),
@@ -181,60 +186,66 @@ const PaymentPartnerPage = () => {
           paymentRecords: [...subOrderData],
         })),
       ),
-    [paymentPartnerRecords],
+    [JSON.stringify(paymentPartnerRecords)],
   );
 
-  const formattedTableData = tableData.map((item) => {
-    const { id, paymentRecords } = item;
-    const {
-      partnerName = '',
-      companyName = '',
-      subOrderDate = '',
-      deliveryHour = '',
-      orderTitle = '',
-      totalPrice: totalAmount = 0,
-      orderId = '',
-      partnerId = '',
-      isAdminConfirmed,
-    } = paymentRecords[0] || {};
+  const formattedTableData = useMemo(
+    () =>
+      tableData.map((item) => {
+        const { id, paymentRecords = [] } = item;
+        const {
+          partnerName = '',
+          companyName = '',
+          subOrderDate = '',
+          deliveryHour = '',
+          orderTitle = '',
+          totalPrice: totalAmount = 0,
+          orderId = '',
+          partnerId = '',
+          isAdminConfirmed,
+        } = paymentRecords[0] || {};
 
-    const paidAmount = paymentRecords.reduce(
-      (acc, cur) => acc + (cur.amount || 0),
-      0,
-    );
-    const status =
-      isAdminConfirmed === true || totalAmount - paidAmount === 0
-        ? EOrderPaymentState.isPaid
-        : EOrderPaymentState.isNotPaid;
+        const paidAmount = paymentRecords.reduce(
+          (acc, cur) => acc + (cur.amount || 0),
+          0,
+        );
+        const status =
+          isAdminConfirmed === true || totalAmount - paidAmount === 0
+            ? EOrderPaymentStatus.isPaid
+            : EOrderPaymentStatus.isNotPaid;
 
-    const remainAmount =
-      paidAmount > totalAmount ? 0 : totalAmount - paidAmount;
+        const remainAmount =
+          paidAmount > totalAmount ? 0 : totalAmount - paidAmount;
 
-    return {
-      key: id,
-      data: {
-        id,
-        partnerName,
-        companyName,
-        subOrderDate,
-        orderTitle,
-        subOrderTitle: `${orderTitle}-${getDayOfWeek(+subOrderDate)}`,
-        totalAmount,
-        paidAmount,
-        remainAmount,
-        status,
-        deliveryHour,
-        orderId,
-        partnerId,
-      },
-    };
-  });
-
+        return {
+          key: id,
+          data: {
+            id,
+            partnerName,
+            companyName,
+            subOrderDate,
+            orderTitle,
+            subOrderTitle: `${orderTitle}-${getDayOfWeek(+subOrderDate)}`,
+            totalAmount,
+            paidAmount,
+            remainAmount,
+            status,
+            deliveryHour,
+            orderId,
+            partnerId,
+          },
+        };
+      }),
+    [JSON.stringify(tableData)],
+  );
   const partnerNameList = uniq(
     formattedTableData.map((item) => item.data.partnerName),
   );
 
-  const filteredTableData = filterPaymentPartner(formattedTableData, filters);
+  const filteredTableData = useMemo(
+    () => filterPayments(formattedTableData, filters),
+    [JSON.stringify(filters), JSON.stringify(formattedTableData)],
+  );
 
   const filteredTableDataWithPagination = useMemo(
     () => filteredTableData.slice((page - 1) * 10, page * 10),
