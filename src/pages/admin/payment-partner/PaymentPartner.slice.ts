@@ -72,10 +72,6 @@ const createPartnerPaymentRecords = createAsyncThunk(
 
     const orderIdList: string[] = uniq(payload.map(({ orderId }) => orderId));
 
-    orderIdList.map(async (orderId: string) =>
-      transitionOrderPaymentStatusApi(orderId, ''),
-    );
-
     const newPartnerPaymentRecords = await Promise.all(
       payload.map(async (paymentRecord) => {
         const { paymentType } = paymentRecord;
@@ -91,6 +87,9 @@ const createPartnerPaymentRecords = createAsyncThunk(
 
         return newPartnerPaymentRecord;
       }),
+    );
+    orderIdList.map(async (orderId: string) =>
+      transitionOrderPaymentStatusApi(orderId, ''),
     );
 
     const mergedPaymentPartnerRecords = newPartnerPaymentRecords.reduce(

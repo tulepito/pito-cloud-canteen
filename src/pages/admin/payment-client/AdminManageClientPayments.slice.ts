@@ -72,10 +72,6 @@ const adminCreateClientPayment = createAsyncThunk(
 
     const orderIdList: string[] = uniq(payload.map(({ orderId }) => orderId));
 
-    orderIdList.map(async (orderId: string) =>
-      transitionOrderPaymentStatusApi(orderId, ''),
-    );
-
     const newClientPaymentRecords = await Promise.all(
       payload.map(async (paymentRecord) => {
         const apiBody = {
@@ -90,6 +86,9 @@ const adminCreateClientPayment = createAsyncThunk(
 
         return newPartnerPaymentRecord;
       }),
+    );
+    orderIdList.map(async (orderId: string) =>
+      transitionOrderPaymentStatusApi(orderId, ''),
     );
 
     const mergedClientPaymentRecords = newClientPaymentRecords.reduce(
