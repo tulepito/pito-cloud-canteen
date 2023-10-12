@@ -976,9 +976,6 @@ const ManagePartnerFoods = () => {
             <div className={css.item} onClick={handleAddFood}>
               <span>Thêm món ăn</span>
             </div>
-            <div className={css.item}>
-              <span>Thêm món ăn hàng loạt</span>
-            </div>
           </div>
         </SlideModal>
 
