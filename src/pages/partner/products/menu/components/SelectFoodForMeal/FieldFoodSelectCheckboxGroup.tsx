@@ -7,6 +7,9 @@ import classNames from 'classnames';
 
 import { IconCheckbox } from '@components/FormFields/FieldCheckbox/FieldCheckbox';
 import IconFoodListEmpty from '@components/Icons/IconFoodListEmpty/IconFoodListEmpty';
+import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
+import { useAppSelector } from '@hooks/reduxHooks';
 import type { TDefaultProps } from '@utils/types';
 
 import FoodCard from './FoodCard';
@@ -84,17 +87,26 @@ type TFieldFoodSelectCheckboxGroupRendererProps = TDefaultProps & {
 const FieldFoodSelectCheckboxGroupRenderer: React.FC<
   TFieldFoodSelectCheckboxGroupRendererProps
 > = (props) => {
-  const { className, rootClassName, fields, options, emptyFoodLabel } = props;
+  const {
+    className,
+    rootClassName,
+    fields,
+    options = [],
+    emptyFoodLabel,
+  } = props;
+  const queryFoodsInProgress = useAppSelector(
+    (state) => state.foods.queryFoodsInProgress,
+  );
 
   const classes = classNames(rootClassName || css.root, className);
   const listClasses = classNames(css.list);
 
   return (
     <fieldset className={classes}>
-      <ul className={listClasses}>
-        {options?.length > 0 ? (
-          options.map((option: any) => {
-            const fieldId = `${option.key}`;
+      {options.length > 0 && (
+        <ul className={listClasses}>
+          {options.map((option: any) => {
+            const fieldId = `FieldFoodSelectCheckboxGroup.${option.key}`;
 
             return (
               <li key={fieldId} className={css.foodItem}>
@@ -106,14 +118,21 @@ const FieldFoodSelectCheckboxGroupRenderer: React.FC<
                 />
               </li>
             );
-          })
-        ) : (
-          <div className={css.emptyFoodListContainer}>
-            <IconFoodListEmpty />
-            <div>{emptyFoodLabel}</div>
-          </div>
-        )}
-      </ul>
+          })}
+        </ul>
+      )}
+
+      <RenderWhen condition={queryFoodsInProgress}>
+        <LoadingContainer className={css.loading} />
+        <RenderWhen.False>
+          <RenderWhen condition={options.length === 0}>
+            <div className={css.emptyFoodListContainer}>
+              <IconFoodListEmpty />
+              <div>{emptyFoodLabel}</div>
+            </div>
+          </RenderWhen>
+        </RenderWhen.False>
+      </RenderWhen>
     </fieldset>
   );
 };

@@ -68,7 +68,14 @@ const SelectFoodForMealModal: React.FC<TSelectFoodForMealModalProps> = ({
   const [filterValues, setFilterValues] = useState({});
   const [submittedFilterValues, setSubmittedFilterValues] = useState({});
   const [selectedFoodIds, setSelectedFoodIds] = useState<string[]>([]);
-  const isEmptyFoodList = foods?.length === 0;
+
+  const suitableFoodList = foods.filter((f: any) => {
+    const { adminApproval = 'approved', isFoodEnable = true } =
+      Listing(f).getMetadata();
+
+    return adminApproval === 'approved' && isFoodEnable;
+  });
+  const isEmptyFoodList = suitableFoodList?.length === 0;
 
   const { restaurantListingId: restaurantId } =
     CurrentUser(currentUser).getMetadata();
@@ -96,7 +103,9 @@ const SelectFoodForMealModal: React.FC<TSelectFoodForMealModalProps> = ({
       const newPickedFood: TListing[] = [];
 
       const foodToUpdate = selectedFoodIds.reduce((prev, id) => {
-        const foodListingMaybe = foods.find((f: TListing) => f.id.uuid === id);
+        const foodListingMaybe = suitableFoodList.find(
+          (f: TListing) => f.id.uuid === id,
+        );
 
         if (foodListingMaybe) {
           newPickedFood.push(foodListingMaybe);
@@ -259,6 +268,7 @@ const SelectFoodForMealModal: React.FC<TSelectFoodForMealModalProps> = ({
             setSelectedFoodIds={setSelectedFoodIds}
             setPageCallBack={setPageCallBack}
             emptyFoodLabel={emptyFoodLabel}
+            suitableFoodList={suitableFoodList}
           />
         )}
 

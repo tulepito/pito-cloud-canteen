@@ -8,6 +8,7 @@
   */
   max-height: calc(90vh - 20px - 40px - 46px - 12px - 24px - 32px - 56px);
   max-height: calc(90dvh - 20px - 40px - 46px - 12px - 24px - 32px - 56px);
+  min-height: 220px;
   overflow: hidden auto;
   position: relative;
 }

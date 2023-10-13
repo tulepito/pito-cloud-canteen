@@ -175,8 +175,6 @@ const queryPartnerFoods = createAsyncThunk(
       perPage: MANAGE_FOOD_PAGE_SIZE,
       include: ['images'],
       'fields.image': [`variants.${EImageVariants.squareSmall2x}`],
-      meta_adminApproval: 'approved',
-      meta_isFoodEnable: true,
       ...rest,
     });
     const foods = denormalisedResponseEntities(response);

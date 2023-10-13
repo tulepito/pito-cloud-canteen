@@ -1,12 +1,10 @@
 import { useEffect, useMemo } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
-import { shallowEqual } from 'react-redux';
 import arrayMutators from 'final-form-arrays';
 
 import Form from '@components/Form/Form';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
-import { useAppSelector } from '@hooks/reduxHooks';
 import { useBottomScroll } from '@hooks/useBottomScroll';
 import { Listing } from '@src/utils/data';
 import type { TListing } from '@src/utils/types';
@@ -30,6 +28,7 @@ export type TSelectFoodForMealFormValues = {
 type TExtraProps = {
   formId: string;
   emptyFoodLabel: string;
+  suitableFoodList: TListing[];
   setSelectedFoodIds: (value: any) => void;
   setPageCallBack: () => void;
 };
@@ -45,25 +44,25 @@ const SelectFoodForMealFormComponent: React.FC<
     form,
     handleSubmit,
     formId,
+    suitableFoodList,
     values: { food: selectedFoodIds = [] },
     emptyFoodLabel,
     setSelectedFoodIds,
     setPageCallBack,
   } = props;
-  const foods = useAppSelector((state) => state.foods.foods, shallowEqual);
 
-  const isEmptyFoodList = foods?.length === 0;
+  const isEmptyFoodList = suitableFoodList?.length === 0;
   const foodOptions = useMemo(
     () =>
-      foods?.map((item: TListing) => {
+      suitableFoodList?.map((item: TListing) => {
         const foodId = Listing(item).getId();
 
         return { key: foodId, value: foodId, data: item };
       }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [JSON.stringify(foods)],
+    [JSON.stringify(suitableFoodList)],
   );
-  const rootFoodIds = generateIdsFromOptions(foodOptions);
+  const rootFoodIds = generateIdsFromOptions(foodOptions!);
 
   const customHandleSubmit = (event: any) => {
     event.preventDefault();
@@ -112,7 +111,7 @@ const SelectFoodForMealFormComponent: React.FC<
     if (setSelectedFoodIds) setSelectedFoodIds(selectedFoodIds);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [foodOptions.length, JSON.stringify(selectedFoodIds)]);
+  }, [foodOptions?.length, JSON.stringify(selectedFoodIds)]);
 
   return (
     <Form
