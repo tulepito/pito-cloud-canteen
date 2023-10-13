@@ -691,7 +691,6 @@ const toggleFoodEnabled = createAsyncThunk(
         dataParams: { action },
         queryParams: {},
       });
-      console.log('SLICE food', food);
 
       return food;
     } catch (error) {

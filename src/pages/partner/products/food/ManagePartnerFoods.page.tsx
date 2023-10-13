@@ -6,6 +6,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import classNames from 'classnames';
+import intersection from 'lodash/intersection';
 import { useRouter } from 'next/router';
 import * as XLSX from 'xlsx';
 
@@ -318,7 +319,19 @@ const ManagePartnerFoods = () => {
     if (!error) {
       onClearFoodToRemove();
 
-      return onQueryPartnerFood({ page: 1 });
+      return onQueryPartnerFood({
+        page: 1,
+        ...(isMobileLayout && {
+          ...(Object.values(EFoodApprovalState).includes(foodApprovalActiveTab)
+            ? {
+                adminApproval: foodApprovalActiveTab,
+                isDraft: false,
+              }
+            : {
+                isDraft: true,
+              }),
+        }),
+      });
     }
   };
 
@@ -330,7 +343,19 @@ const ManagePartnerFoods = () => {
       setIdsToAction([]);
       closeRemoveCheckedModal();
 
-      return onQueryPartnerFood({ page: 1 });
+      return onQueryPartnerFood({
+        page: 1,
+        ...(isMobileLayout && {
+          ...(Object.values(EFoodApprovalState).includes(foodApprovalActiveTab)
+            ? {
+                adminApproval: foodApprovalActiveTab,
+                isDraft: false,
+              }
+            : {
+                isDraft: true,
+              }),
+        }),
+      });
     }
   };
 
@@ -693,12 +718,18 @@ const ManagePartnerFoods = () => {
               </div>
             </div>
             <div className={css.ctaIconBtns}>
-              <div className={css.iconBtn}>
+              <InlineTextButton
+                className={css.iconBtn}
+                onClick={makeExcelFile}
+                disabled={hasFilterApplied && foods.length === 0}>
                 <IconPrint />
-              </div>
-              <div className={css.iconBtn}>
+              </InlineTextButton>
+              <InlineTextButton
+                className={css.iconBtn}
+                disabled={idsToAction.length === 0 || removeFoodInProgress}
+                onClick={openRemoveCheckedModal}>
                 <IconDelete />
-              </div>
+              </InlineTextButton>
             </div>
           </div>
 
@@ -911,7 +942,9 @@ const ManagePartnerFoods = () => {
           title={<FormattedMessage id="ManagePartnerFoods.removeTitle" />}
           isOpen={
             (foodToRemove || removeCheckedModalOpen) &&
-            deletableFoodMap[foodToRemove?.id]
+            (deletableFoodMap[foodToRemove?.id] ||
+              intersection(Object.keys(deletableFoodMap), idsToAction).length >
+                0)
           }
           handleClose={
             removeCheckedModalOpen

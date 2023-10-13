@@ -5,6 +5,7 @@ import cookies from '@services/cookie';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { handleError } from '@services/sdk';
 import { denormalisedResponseEntities } from '@src/utils/data';
+import { EImageVariants } from '@src/utils/enums';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
@@ -28,6 +29,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
               },
               {
                 expand: true,
+                include: ['images'],
+                'fields.image': [`variants.${EImageVariants.squareSmall2x}`],
               },
             ),
           )[0];
