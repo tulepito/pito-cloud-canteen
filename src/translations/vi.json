@@ -1160,7 +1160,7 @@
   "MoveFoodToMenuForm.formStep.selectDays.submitText": "Áp dụng",
   "MoveFoodToMenuForm.formStep.selectDays.title": "Chọn ngày áp dụng món",
   "MoveFoodToMenuForm.formStep.selectMenu.submitText": "Tiếp theo",
-  "MoveFoodToMenuForm.formStep.selectMenu.title": "",
+  "MoveFoodToMenuForm.formStep.selectMenu.title": " ",
   "NavigateButtons.complete": "Hoàn tất",
   "NavigateButtons.continue": "Tiếp theo",
   "NavigateButtons.goBack": "Quay lại",

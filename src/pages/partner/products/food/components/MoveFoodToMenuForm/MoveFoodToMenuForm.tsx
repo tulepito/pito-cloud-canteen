@@ -72,6 +72,7 @@ const MoveFoodToMenuFormComponent: React.FC<
     foodsByDate = {},
     mealType,
   } = selectedMenuListing ? selectedMenuListing.getPublicData() : ({} as any);
+  const menuWeekDays = Object.keys(foodsByDate);
   const foodList = pick(foodsByDate, selectedDays!)[
     selectedMenuWeekDay || selectedDays[0]
   ];
@@ -115,6 +116,11 @@ const MoveFoodToMenuFormComponent: React.FC<
 
   return (
     <Form onSubmit={handleSubmit}>
+      <div className={css.formTitle}>
+        {intl.formatMessage({
+          id: `MoveFoodToMenuForm.formStep.${currentStep}.title`,
+        })}
+      </div>
       <RenderWhen condition={currentStep === STEP_SELECT_MENU}>
         {menus.map((menu) => {
           const menuListing = Listing(menu);
@@ -142,7 +148,7 @@ const MoveFoodToMenuFormComponent: React.FC<
       </RenderWhen>
 
       <RenderWhen condition={currentStep === STEP_SELECT_DAYS}>
-        <MenuDayInWeekField form={form} />
+        <MenuDayInWeekField form={form} enableDays={menuWeekDays} />
       </RenderWhen>
 
       <RenderWhen condition={currentStep === STEP_REVIEW}>

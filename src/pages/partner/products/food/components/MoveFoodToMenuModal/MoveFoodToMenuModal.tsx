@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import Button from '@components/Button/Button';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
@@ -37,6 +37,9 @@ const MoveFoodToMenuModal: React.FC<TMoveFoodToMenuModalProps> = (props) => {
   const [currentStep, setCurrentStep] = useState<string>(
     moveFoodToMenuSteps[0],
   );
+
+  const [filterValues, setFilterValues] = useState<any>({});
+  const [searchValues, setSearchValues] = useState<any>({});
   const filterMenuModalController = useBoolean();
 
   const updatePartnerMenuInProgress = useAppSelector(
@@ -54,19 +57,13 @@ const MoveFoodToMenuModal: React.FC<TMoveFoodToMenuModalProps> = (props) => {
   };
 
   const onQueryMenuSubmit = (values: TKeywordSearchFormValues) => {
-    dispatch(
-      partnerFoodSliceThunks.fetchActiveMenus({
-        ...values,
-      }),
-    );
+    setSearchValues(values);
   };
 
   const onFilterMenuSubmit = (values: any) => {
-    dispatch(
-      partnerFoodSliceThunks.fetchActiveMenus({
-        ...values,
-      }),
-    );
+    setFilterValues(values);
+
+    filterMenuModalController.setFalse();
   };
 
   const onMoveFoodToMenuSubmit = (values: TMoveFoodToMenuFormValues) => {
@@ -115,6 +112,15 @@ const MoveFoodToMenuModal: React.FC<TMoveFoodToMenuModalProps> = (props) => {
       }),
     );
   };
+
+  useEffect(() => {
+    dispatch(
+      partnerFoodSliceThunks.fetchActiveMenus({
+        ...filterValues,
+        ...searchValues,
+      }),
+    );
+  }, [JSON.stringify(filterValues), JSON.stringify(searchValues)]);
 
   return (
     <>

@@ -40,6 +40,8 @@
   @include flexAlign(center, space-between);
   gap: 12px;
   color: $neutralGray6;
+  @include lineClamp(1, 24px);
+  width: 70%;
 
   .image {
     width: 84px;

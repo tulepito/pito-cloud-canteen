@@ -25,6 +25,11 @@
   }
 }
 
+.formTitle {
+  @include textTemplate(20px, $fontWeightBold, 24px);
+  margin-bottom: 16px;
+}
+
 .menuFoodListContainer {
   margin-top: 32px;
 }

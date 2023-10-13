@@ -297,10 +297,10 @@ export const getPartnerMenuQuery = (
   return {
     ...(keywords && { keywords }),
     ...(startDate && {
-      pub_startDate: `,${startDate + 1}`,
+      pub_startDate: `${startDate},`,
     }),
     ...(endDate && {
-      pub_endDate: `${endDate},`,
+      pub_endDate: `,${endDate + 1}`,
     }),
     meta_listingType: EListingType.menu,
     meta_restaurantId: restaurantId,

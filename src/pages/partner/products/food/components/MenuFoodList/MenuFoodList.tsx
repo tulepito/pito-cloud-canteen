@@ -29,7 +29,7 @@ const MenuFoodList: React.FC<TMenuFoodListProps> = (props) => {
     <div className={classes}>
       <div className={css.header}>
         {intl.formatMessage({ id: `MenuMealType.label.${menuDaySession}` })}
-        {` (${foodNumber})`}
+        {` (${isNewFoodExistInFoodList ? foodNumber : foodNumber + 1})`}
       </div>
       <div className={css.foodList}>
         {Object.values(foodList).map((food: any) => {

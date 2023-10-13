@@ -9,6 +9,7 @@ import css from './MenuDayInWeekField.module.scss';
 
 type TMenuDayInWeekFieldProps = {
   form: any;
+  enableDays?: string[];
 };
 
 const DAY_IN_WEEK = [
@@ -21,10 +22,14 @@ const DAY_IN_WEEK = [
   { key: 'sun', label: 'DayInWeekField.sun' },
 ];
 
-const MenuDayInWeekField: React.FC<TMenuDayInWeekFieldProps> = ({ form }) => {
+const MenuDayInWeekField: React.FC<TMenuDayInWeekFieldProps> = ({
+  form,
+  enableDays,
+}) => {
   const intl = useIntl();
   const [selectedDays, setSelectedDays] = useState<string[]>([]);
   const selectFullWeekController = useBoolean();
+  const enableFullWeek = !enableDays ? true : enableDays?.length === 7;
 
   useEffect(() => {
     if (selectFullWeekController.value) {
@@ -44,6 +49,7 @@ const MenuDayInWeekField: React.FC<TMenuDayInWeekFieldProps> = ({ form }) => {
       <div
         className={classNames(css.dayItem, {
           [css.selected]: selectFullWeekController.value,
+          [css.disabled]: !enableFullWeek,
         })}
         onClick={selectFullWeekController.toggle}>
         Cả tuần
@@ -61,7 +67,9 @@ const MenuDayInWeekField: React.FC<TMenuDayInWeekFieldProps> = ({ form }) => {
               key={day.key}
               className={classNames(css.dayItem, {
                 [css.selected]: selectedDays.includes(day.key),
-                [css.disabled]: selectFullWeekController.value,
+                [css.disabled]:
+                  selectFullWeekController.value ||
+                  (enableDays && !enableDays?.includes(day.key)),
               })}
               onClick={onDaySelect}>
               {intl.formatMessage({ id: day.label })}
