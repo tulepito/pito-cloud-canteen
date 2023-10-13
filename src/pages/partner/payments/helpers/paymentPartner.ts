@@ -3,6 +3,8 @@ import * as XLSX from 'xlsx';
 
 import { parseThousandNumber } from '@helpers/format';
 import { formatTimestamp } from '@src/utils/dates';
+import type { EOrderPaymentStatus } from '@src/utils/enums';
+import { CONFIGS_BASE_ON_PAYMENT_STATUS } from '@src/utils/enums';
 import type { TObject } from '@src/utils/types';
 
 export const filterPayments = (paymentRecords: any[], filterList: TObject) => {
@@ -54,7 +56,8 @@ export const parseEntitiesToExportCsv = (paymentRecords: any[]) => {
       'Tổng giá trị': parseThousandNumber(totalAmount),
       'Đã thanh toán': parseThousandNumber(paidAmount),
       'Còn lại': parseThousandNumber(remainAmount),
-      'Trạng thái': status === 'isPaid' ? 'Đã thanh toán' : 'Chưa thanh toán',
+      'Trạng thái':
+        CONFIGS_BASE_ON_PAYMENT_STATUS[status as EOrderPaymentStatus].label,
     };
   });
 

@@ -4,7 +4,7 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { generateSKU } from '@pages/admin/order/[orderId]/helpers/AdminOrderDetail';
 import { OrderDetailThunks } from '@pages/admin/order/[orderId]/OrderDetail.slice';
-import { User } from '@src/utils/data';
+import { Listing, User } from '@src/utils/data';
 import { EPaymentType } from '@src/utils/enums';
 import type { TUser } from '@src/utils/types';
 
@@ -39,6 +39,10 @@ const ClientPaymentDetail: React.FC<ClientPaymentDetailProps> = (props) => {
   const dispatch = useAppDispatch();
   const addPaymentModalController = useBoolean();
 
+  const order = useAppSelector((state) => state.OrderDetail.order);
+  const confirmClientPaymentInProgress = useAppSelector(
+    (state) => state.OrderDetail.confirmClientPaymentInProgress,
+  );
   const createClientPaymentRecordInProgress = useAppSelector(
     (state) => state.OrderDetail.createClientPaymentRecordInProgress,
   );
@@ -49,9 +53,16 @@ const ClientPaymentDetail: React.FC<ClientPaymentDetailProps> = (props) => {
     (state) => state.OrderDetail.deleteClientPaymentRecordInProgress,
   );
 
+  const { isAdminConfirmedClientPayment = false } =
+    Listing(order).getMetadata();
+
   const companyUser = User(company);
   const { companyName } = companyUser.getPublicData();
-  const addPaymentDisabled = totalWithVAT === paidAmount;
+
+  const confirmPaymentDisabled =
+    isAdminConfirmedClientPayment || paidAmount === totalWithVAT;
+  const addPaymentDisabled =
+    isAdminConfirmedClientPayment || paidAmount === totalWithVAT;
 
   const onAddClientPaymentRecord = async (
     values: TAddingPaymentRecordFormValues,
@@ -79,9 +90,16 @@ const ClientPaymentDetail: React.FC<ClientPaymentDetailProps> = (props) => {
     }
   };
 
+  const handleConfirmPayment = () => {
+    dispatch(OrderDetailThunks.confirmClientPayment(orderId));
+  };
+
   const handleDeleteClientPaymentRecord = async (paymentRecordId: string) => {
     return dispatch(
-      OrderDetailThunks.deleteClientPaymentRecord(paymentRecordId),
+      OrderDetailThunks.deleteClientPaymentRecord({
+        paymentRecordId,
+        shouldDisapprovePayment: isAdminConfirmedClientPayment,
+      }),
     );
   };
 
@@ -89,6 +107,14 @@ const ClientPaymentDetail: React.FC<ClientPaymentDetailProps> = (props) => {
     <div>
       <PaymentAmountTable totalPrice={totalWithVAT} paidAmount={paidAmount} />
       <div className={css.buttonsWrapper}>
+        <Button
+          variant="secondary"
+          className={css.confirmPaymentBtn}
+          inProgress={confirmClientPaymentInProgress}
+          onClick={handleConfirmPayment}
+          disabled={confirmPaymentDisabled}>
+          Xác nhận thanh toán
+        </Button>
         <Button
           variant="secondary"
           onClick={addPaymentModalController.setTrue}

@@ -5,7 +5,7 @@ import { queryPartnerOrdersApi } from '@apis/partnerApi';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { CurrentUser, Listing } from '@src/utils/data';
 import { formatTimestamp } from '@src/utils/dates';
-import { EOrderPaymentState } from '@src/utils/enums';
+import { EOrderPaymentStatus } from '@src/utils/enums';
 import { toNonAccentVietnamese } from '@src/utils/string';
 import { ETransition } from '@src/utils/transaction';
 import type { TListing, TObject, TPagination } from '@src/utils/types';
@@ -100,11 +100,11 @@ const PartnerManageOrdersSlice = createSlice({
         isMobile,
       } = payload;
       const statusList = status.split(',') || [];
-      const isPaidStatus = statusList.includes(EOrderPaymentState.isPaid);
-      const isNotPaidStatus = statusList.includes(EOrderPaymentState.isPaid);
+      const isPaidStatus = statusList.includes(EOrderPaymentStatus.isPaid);
+      const isNotPaidStatus = statusList.includes(EOrderPaymentStatus.isPaid);
       const statuses = statusList.filter(
         (orderStateMaybe: any) =>
-          orderStateMaybe !== '' && !(orderStateMaybe in EOrderPaymentState),
+          orderStateMaybe !== '' && !(orderStateMaybe in EOrderPaymentStatus),
       );
 
       const validSubOrders = allSubOrders.filter((subOrder) => {

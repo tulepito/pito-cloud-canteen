@@ -1,4 +1,4 @@
-import { EPaymentStatus, EPaymentType } from '@src/utils/enums';
+import { EFirebasePaymentStatus, EPaymentType } from '@src/utils/enums';
 import type { TObject } from '@src/utils/types';
 
 import {
@@ -17,7 +17,7 @@ export type PaymentBaseParams = {
   SKU: string;
   amount: number;
   paymentNote: string;
-  paymentStatus: EPaymentStatus;
+  paymentStatus: EFirebasePaymentStatus;
   orderId: string;
   partnerId?: string;
   partnerName?: string;
@@ -29,6 +29,7 @@ export type PaymentBaseParams = {
   totalPrice?: number;
   deliveryHour?: string;
   isHideFromHistory?: boolean;
+  isAdminConfirmed?: boolean;
   company?: TObject;
   restaurants?: TObject[];
 };
@@ -42,7 +43,7 @@ export const createPaymentRecordOnFirebase = async (
     const data = {
       ...params,
       paymentType: type,
-      paymentStatus: EPaymentStatus.SUCCESS,
+      paymentStatus: EFirebasePaymentStatus.SUCCESS,
       createdAt: paymentCreatedAt,
     };
     const paymentRecordId = await addCollectionDoc(
@@ -66,7 +67,8 @@ export const createPaymentRecordOnFirebase = async (
 
 export const queryPaymentRecordOnFirebase = async (query: any) => {
   try {
-    const { paymentType, partnerId, orderId, subOrderDate } = query;
+    const { paymentType, partnerId, orderId, subOrderDate, isHideFromHistory } =
+      query;
     const paymentQuery = {
       ...(partnerId && {
         partnerId: {
@@ -82,6 +84,12 @@ export const queryPaymentRecordOnFirebase = async (query: any) => {
         subOrderDate: {
           operator: '==',
           value: subOrderDate,
+        },
+      }),
+      ...(isHideFromHistory && {
+        isHideFromHistory: {
+          operator: '==',
+          value: true,
         },
       }),
     };

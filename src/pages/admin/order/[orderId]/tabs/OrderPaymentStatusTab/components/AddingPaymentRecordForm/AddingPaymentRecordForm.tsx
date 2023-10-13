@@ -11,10 +11,7 @@ import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import OutsideClickHandler from '@components/OutsideClickHandler/OutsideClickHandler';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
-import {
-  parseThousandNumber,
-  parseThousandNumberToInteger,
-} from '@helpers/format';
+import { parseThousandNumber } from '@helpers/format';
 import type { TUseBooleanReturns } from '@hooks/useBoolean';
 import useBoolean from '@hooks/useBoolean';
 import { EPaymentType } from '@src/utils/enums';
@@ -119,7 +116,6 @@ const AddingPaymentRecordFormComponent: React.FC<
     totalPrice = 0,
     paidAmount = 0,
     form,
-    values,
     invalid,
     inProgress,
     paymentType = EPaymentType.PARTNER,
@@ -128,7 +124,6 @@ const AddingPaymentRecordFormComponent: React.FC<
   const showPercentageController = useBoolean();
   const [percentage, setPercentage] = useState<number>(0);
 
-  const paymentAmountValue = values?.paymentAmount || 0;
   const submitDisabled = invalid || inProgress;
 
   const rightIconContainerClasses = classNames(css.rightIcon, {
@@ -140,23 +135,13 @@ const AddingPaymentRecordFormComponent: React.FC<
   };
 
   useEffect(() => {
-    if (
-      parseThousandNumberToInteger(`${paymentAmountValue}`) >
-      totalPrice - paidAmount
-    ) {
-      form.change(
-        'paymentAmount',
-        parseThousandNumber(`${totalPrice - paidAmount}`),
-      );
-    }
-  }, [form, paidAmount, paymentAmountValue, totalPrice]);
-
-  useEffect(() => {
     if (percentage !== 0) {
       if (percentage === 100) {
         form.change(
           'paymentAmount',
-          parseThousandNumber(totalPrice - paidAmount),
+          parseThousandNumber(
+            paidAmount < totalPrice ? totalPrice - paidAmount : totalPrice,
+          ),
         );
       } else {
         form.change(
@@ -165,6 +150,7 @@ const AddingPaymentRecordFormComponent: React.FC<
         );
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [percentage]);
 
   const handleFormSubmit = async (_values: any) => {

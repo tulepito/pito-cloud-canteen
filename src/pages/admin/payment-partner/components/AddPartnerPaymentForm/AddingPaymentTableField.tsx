@@ -3,10 +3,7 @@ import { useEffect, useState } from 'react';
 import classNames from 'classnames';
 
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
-import {
-  parseThousandNumber,
-  parseThousandNumberToInteger,
-} from '@helpers/format';
+import { parseThousandNumber } from '@helpers/format';
 import useBoolean from '@hooks/useBoolean';
 import { PaymentPercentageDropdown } from '@pages/admin/order/[orderId]/tabs/OrderPaymentStatusTab/components/AddingPaymentRecordForm/AddingPaymentRecordForm';
 
@@ -33,36 +30,21 @@ const AddingPaymentTableField: React.FC<TAddPartnerPaymentFormValues> = (
     orderTitle,
     subOrderDate,
     form,
-    values,
     id,
   } = props;
   const showPercentageController = useBoolean();
   const [percentage, setPercentage] = useState(0);
 
   const fieldName = `paymentAmount - ${orderTitle} - ${subOrderDate} - ${id}`;
-  const paymentAmountValue = values?.[fieldName] || 0;
 
   const rightIconContainerClasses = classNames(css.rightIcon, {
     [css.rightIconActive]: showPercentageController.value,
   });
 
   useEffect(() => {
-    if (
-      paidAmount <= totalAmount &&
-      parseThousandNumberToInteger(`${paymentAmountValue}`) >
-        totalAmount - paidAmount
-    ) {
-      form.change(
-        fieldName,
-        parseThousandNumber(`${totalAmount - paidAmount}`),
-      );
-    }
-  }, [fieldName, paidAmount, paymentAmountValue, totalAmount]);
-
-  useEffect(() => {
     if (percentage !== 0) {
       form.change(
-        `paymentAmount - ${orderTitle} - ${subOrderDate} - ${id}`,
+        fieldName,
         parseThousandNumber(Math.round((totalAmount * percentage) / 100)),
       );
     }

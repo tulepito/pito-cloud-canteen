@@ -4,7 +4,12 @@
 
 .buttonsWrapper {
   @include flexAlign(center, flex-end);
+  column-gap: 16px;
   margin-top: 36px;
+}
+
+.confirmPaymentBtn {
+  width: 200px;
 }
 
 .tableWrapper {

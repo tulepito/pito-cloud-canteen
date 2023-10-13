@@ -66,7 +66,6 @@ const OrderPaymentStatusTab: React.FC<OrderPaymentStatusTabProps> = (props) => {
     (state) => state.OrderDetail.partnerPaymentRecords,
     shallowEqual,
   );
-
   const clientPaymentRecords = useAppSelector(
     (state) => state.OrderDetail.clientPaymentRecords,
     shallowEqual,
@@ -82,7 +81,11 @@ const OrderPaymentStatusTab: React.FC<OrderPaymentStatusTabProps> = (props) => {
     hasSpecificPCCFee = false,
     specificPCCFee = 0,
     vatSettings,
+    plans = [],
+    isClientSufficientPaid = false,
   } = orderListing.getMetadata();
+  const planId = plans.length > 0 ? plans[0] : undefined;
+
   const partnerCurrentQuotation = quotations.find(
     (_quotation) => _quotation.id.uuid === quotationId,
   );
@@ -134,7 +137,11 @@ const OrderPaymentStatusTab: React.FC<OrderPaymentStatusTabProps> = (props) => {
           const paidAmount = calculatePaidAmountBySubOrderDate(
             partnerPaymentRecordsByDate,
           );
-          const showCheckmark = totalWithVAT === paidAmount;
+
+          const { isAdminPaymentConfirmed = false } =
+            orderDetail[subOrderDate] || {};
+          const showPartnerCheckMark =
+            isAdminPaymentConfirmed || totalWithVAT === paidAmount;
 
           return {
             key: subOrderDate,
@@ -157,7 +164,7 @@ const OrderPaymentStatusTab: React.FC<OrderPaymentStatusTabProps> = (props) => {
                       orderDetail[subOrderDate].restaurant.restaurantName
                     } #${orderTitle}-${getDayOfWeek(+subOrderDate)}`}
                   </div>
-                  <RenderWhen condition={showCheckmark}>
+                  <RenderWhen condition={showPartnerCheckMark}>
                     <IconCheckmarkWithCircle className={css.checkIcon} />
                   </RenderWhen>
                 </div>
@@ -170,6 +177,7 @@ const OrderPaymentStatusTab: React.FC<OrderPaymentStatusTabProps> = (props) => {
               partnerName: orderDetail[subOrderDate].restaurant.restaurantName,
               subOrderDate: selectedSubOrderDate,
               orderId,
+              planId,
               partnerId: orderDetail[subOrderDate].restaurant.id,
               partnerPaymentRecordsByDate,
               totalWithVAT,
@@ -181,7 +189,9 @@ const OrderPaymentStatusTab: React.FC<OrderPaymentStatusTabProps> = (props) => {
           };
         }),
       )
-    : null;
+    : [];
+
+  const tabItemKeys = partnerTabItems.map(({ key }) => key);
 
   const { totalWithVAT: clientTotalPrice } = calculatePriceQuotationInfo({
     planOrderDetail: orderDetail,
@@ -193,7 +203,9 @@ const OrderPaymentStatusTab: React.FC<OrderPaymentStatusTabProps> = (props) => {
 
   const clientPaidAmount =
     calculatePaidAmountBySubOrderDate(clientPaymentRecords);
-  const showClientCheckmark = clientTotalPrice === clientPaidAmount;
+  const showClientCheckmark =
+    isClientSufficientPaid || clientPaidAmount === clientTotalPrice;
+
   const clientTabItem = {
     key: 'client',
     label: (
@@ -235,13 +247,11 @@ const OrderPaymentStatusTab: React.FC<OrderPaymentStatusTabProps> = (props) => {
   useEffect(() => {
     if (subOrderDateFromQuery) {
       const tabIndexMaybe =
-        (partnerTabItems || []).findIndex(
-          (item) => item.key === subOrderDateFromQuery,
-        ) + 1;
-      setDefaultActiveKey(tabIndexMaybe === 0 ? 1 : tabIndexMaybe);
+        tabItemKeys.findIndex((item) => item === subOrderDateFromQuery) + 2;
+      setDefaultActiveKey(tabIndexMaybe === 0 ? 2 : tabIndexMaybe);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [subOrderDateFromQuery, partnerTabItems]);
+  }, [subOrderDateFromQuery, tabItemKeys]);
 
   const handleUpdateOrderState = (state: EOrderStates) => () => {
     updateOrderState(state);
@@ -261,11 +271,13 @@ const OrderPaymentStatusTab: React.FC<OrderPaymentStatusTabProps> = (props) => {
       />
       <RenderWhen condition={!isEmpty(quotations)}>
         <div className={css.tabContainer}>
-          <Tabs
-            items={totalTabItems as any}
-            onChange={onTabChange}
-            defaultActiveKey={`${defaultActiveKey}`}
-          />
+          {defaultActiveKey && (
+            <Tabs
+              items={totalTabItems as any}
+              onChange={onTabChange}
+              defaultActiveKey={`${defaultActiveKey}`}
+            />
+          )}
         </div>
       </RenderWhen>
     </div>

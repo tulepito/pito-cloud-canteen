@@ -3,8 +3,12 @@ import isEmpty from 'lodash/isEmpty';
 import { DateTime } from 'luxon';
 
 import {
+  confirmClientPaymentApi,
+  confirmPartnerPaymentApi,
   createPaymentRecordApi,
   deletePaymentRecordApi,
+  disapproveClientPaymentApi,
+  disapprovePartnerPaymentApi,
   getPaymentRecordsApi,
   transitionOrderPaymentStatusApi,
   transitPlanApi,
@@ -89,6 +93,9 @@ type TOrderDetailState = {
   transitInProgress: boolean;
   transitError: any;
 
+  confirmPartnerPaymentInProgress: boolean;
+  confirmClientPaymentInProgress: boolean;
+
   updateOrderStaffNameInProgress: boolean;
   updateOrderStaffNameError: any;
 
@@ -136,6 +143,9 @@ const initialState: TOrderDetailState = {
   transitInProgress: false,
   transitError: null,
 
+  confirmPartnerPaymentInProgress: false,
+  confirmClientPaymentInProgress: false,
+
   updateOrderStaffNameInProgress: false,
   updateOrderStaffNameError: null,
 
@@ -171,6 +181,7 @@ const initialState: TOrderDetailState = {
 const FETCH_ORDER = 'app/OrderDetail/FETCH_ORDER';
 const UPDATE_STAFF_NAME = 'app/OrderDetail/UPDATE_STAFF_NAME';
 const UPDATE_ORDER_STATE = 'app/OrderDetail/UPDATE_ORDER_STATE';
+const CONFIRM_CLIENT_PAYMENT = 'app/OrderDetail/CONFIRM_CLIENT_PAYMENT';
 const FETCH_QUOTATIONS = 'app/OrderDetail/FETCH_QUOTATIONS';
 const CREATE_PARTNER_PAYMENT_RECORD =
   'app/OrderDetail/CREATE_PARTNER_PAYMENT_RECORD';
@@ -362,6 +373,70 @@ const updatePlanDetail = createAsyncThunk(
   },
 );
 
+const confirmPartnerPayment = createAsyncThunk(
+  'app/OrderDetail/CONFIRM_PARTNER_PAYMENT',
+  async (
+    {
+      planId,
+      subOrderDate,
+    }: {
+      planId: string;
+      subOrderDate: string | number;
+    },
+    { getState },
+  ) => {
+    const { order } = getState().OrderDetail;
+    const orderId = Listing(order).getId();
+
+    const response = await confirmPartnerPaymentApi({ planId, subOrderDate });
+    await transitionOrderPaymentStatusApi(orderId, planId);
+
+    return response.data.orderDetail;
+  },
+);
+
+const disapprovePartnerPayment = createAsyncThunk(
+  'app/OrderDetail/DISAPPROVE_PARTNER_PAYMENT',
+  async ({
+    planId,
+    subOrderDate,
+  }: {
+    planId: string;
+    subOrderDate: string | number;
+  }) => {
+    const response = await disapprovePartnerPaymentApi({
+      planId,
+      subOrderDate,
+    });
+
+    return response.data.orderDetail;
+  },
+);
+
+const confirmClientPayment = createAsyncThunk(
+  CONFIRM_CLIENT_PAYMENT,
+  async (orderId: string, { getState, dispatch }) => {
+    const { order } = getState().OrderDetail;
+    const orderListing = Listing(order);
+    const { plans = [] } = orderListing.getMetadata();
+
+    const response = await confirmClientPaymentApi(orderId);
+    await transitionOrderPaymentStatusApi(orderId, plans[0]);
+    await dispatch(fetchOnlyOrder(orderId));
+
+    return response.data?.order;
+  },
+);
+
+const disapproveClientPayment = createAsyncThunk(
+  'app/OrderDetail/DISAPPROVE_CLIENT_PAYMENT',
+  async (orderId: string) => {
+    const response = await disapproveClientPaymentApi(orderId);
+
+    return response.data?.order;
+  },
+);
+
 const fetchPartnerPaymentRecords = createAsyncThunk(
   FETCH_PARTNER_PAYMENT_RECORD,
   async (orderId: string) => {
@@ -372,7 +447,6 @@ const fetchPartnerPaymentRecords = createAsyncThunk(
     return partnerPaymentRecords || {};
   },
 );
-
 const createPartnerPaymentRecord = createAsyncThunk(
   CREATE_PARTNER_PAYMENT_RECORD,
   async (payload: TObject, { getState, dispatch }) => {
@@ -403,7 +477,18 @@ const createPartnerPaymentRecord = createAsyncThunk(
 
 const deletePartnerPaymentRecord = createAsyncThunk(
   DELETE_PARTNER_PAYMENT_RECORD,
-  async (paymentRecordId: string, { getState, dispatch }) => {
+  async (
+    {
+      paymentRecordId,
+      subOrderDate,
+      shouldDisapprovePayment,
+    }: {
+      paymentRecordId: string;
+      subOrderDate: string | number;
+      shouldDisapprovePayment: boolean;
+    },
+    { getState, dispatch },
+  ) => {
     const { partnerPaymentRecords = {}, order } = getState().OrderDetail;
     const orderListing = Listing(order);
     const orderId = orderListing.getId();
@@ -412,6 +497,7 @@ const deletePartnerPaymentRecord = createAsyncThunk(
 
     const newPartnerPaymentRecords = Object.entries(
       partnerPaymentRecords,
+      // eslint-disable-next-line @typescript-eslint/no-shadow
     ).reduce((acc: any, [subOrderDate, paymentRecords]) => {
       const newPaymentRecords = paymentRecords.filter(
         (paymentRecord: any) => paymentRecord.id !== paymentRecordId,
@@ -420,6 +506,12 @@ const deletePartnerPaymentRecord = createAsyncThunk(
 
       return acc;
     }, {});
+
+    if (shouldDisapprovePayment) {
+      await dispatch(
+        disapprovePartnerPayment({ subOrderDate, planId: plans[0] }),
+      );
+    }
     await transitionOrderPaymentStatusApi(orderId, plans[0]);
     await dispatch(fetchOnlyOrder(orderId));
 
@@ -462,7 +554,16 @@ const createClientPaymentRecord = createAsyncThunk(
 
 const deleteClientPaymentRecord = createAsyncThunk(
   DELETE_CLIENT_PAYMENT_RECORD,
-  async (paymentRecordId: string, { getState, dispatch }) => {
+  async (
+    {
+      paymentRecordId,
+      shouldDisapprovePayment,
+    }: {
+      paymentRecordId: string;
+      shouldDisapprovePayment: boolean;
+    },
+    { getState, dispatch },
+  ) => {
     const { clientPaymentRecords = [], order } = getState().OrderDetail;
     const orderListing = Listing(order);
     const orderId = orderListing.getId();
@@ -472,6 +573,9 @@ const deleteClientPaymentRecord = createAsyncThunk(
     const newClientPaymentRecords = clientPaymentRecords.filter(
       (paymentRecord: any) => paymentRecord.id !== paymentRecordId,
     );
+    if (shouldDisapprovePayment) {
+      await dispatch(disapproveClientPayment(orderId));
+    }
     await transitionOrderPaymentStatusApi(orderId, plans[0]);
     await dispatch(fetchOnlyOrder(orderId));
 
@@ -486,6 +590,12 @@ export const OrderDetailThunks = {
   fetchQuotations,
   transit,
   updatePlanDetail,
+
+  confirmClientPayment,
+  confirmPartnerPayment,
+
+  disapprovePartnerPayment,
+
   fetchPartnerPaymentRecords,
   createPartnerPaymentRecord,
   deletePartnerPaymentRecord,
@@ -700,6 +810,38 @@ const OrderDetailSlice = createSlice({
       })
       .addCase(fetchOnlyOrder.rejected, (state) => {
         state.fetchOnlyOrderInProgress = false;
+      })
+      /* =============== confirmClientPayment =============== */
+      .addCase(confirmClientPayment.pending, (state) => {
+        state.confirmClientPaymentInProgress = true;
+      })
+      .addCase(confirmClientPayment.fulfilled, (state) => {
+        state.confirmClientPaymentInProgress = false;
+      })
+      .addCase(confirmClientPayment.rejected, (state) => {
+        state.confirmClientPaymentInProgress = false;
+      })
+      /* =============== confirmPartnerPayment =============== */
+      .addCase(confirmPartnerPayment.pending, (state) => {
+        state.confirmPartnerPaymentInProgress = true;
+      })
+      .addCase(confirmPartnerPayment.fulfilled, (state, { payload }) => {
+        state.confirmPartnerPaymentInProgress = false;
+        state.orderDetail = payload;
+      })
+      .addCase(confirmPartnerPayment.rejected, (state) => {
+        state.confirmPartnerPaymentInProgress = false;
+      })
+      /* =============== disapprovePartnerPayment =============== */
+      .addCase(disapprovePartnerPayment.pending, (state) => {
+        state.confirmPartnerPaymentInProgress = true;
+      })
+      .addCase(disapprovePartnerPayment.fulfilled, (state, { payload }) => {
+        state.confirmPartnerPaymentInProgress = false;
+        state.orderDetail = payload;
+      })
+      .addCase(disapprovePartnerPayment.rejected, (state) => {
+        state.confirmPartnerPaymentInProgress = false;
       });
   },
 });
