@@ -70,10 +70,10 @@ const SelectFoodForMealModal: React.FC<TSelectFoodForMealModalProps> = ({
   const [selectedFoodIds, setSelectedFoodIds] = useState<string[]>([]);
 
   const suitableFoodList = foods.filter((f: any) => {
-    const { adminApproval = 'approved', isFoodEnable = true } =
+    const { adminApproval = 'pending', isFoodEnable = false } =
       Listing(f).getMetadata();
 
-    return adminApproval === 'approved' && isFoodEnable;
+    return adminApproval === 'accepted' && isFoodEnable;
   });
   const isEmptyFoodList = suitableFoodList?.length === 0;
 
