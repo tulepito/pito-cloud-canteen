@@ -4,7 +4,6 @@ import { forwardRef, useEffect, useState } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import { OnChange } from 'react-final-form-listeners';
-import { useIntl } from 'react-intl';
 import classNames from 'classnames';
 import format from 'date-fns/format';
 import viLocale from 'date-fns/locale/vi';
@@ -18,7 +17,11 @@ import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput
 import IconCalendar from '@components/Icons/IconCalender/IconCalender';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { getDateStartOfDate, getWeekDayList } from '@src/utils/dates';
+import {
+  formatTimestamp,
+  getDateStartOfDate,
+  getWeekDayList,
+} from '@src/utils/dates';
 import type { EMenuMealType } from '@src/utils/enums';
 import { PARTNER_MENU_MEAL_TYPE_OPTIONS } from '@src/utils/enums';
 import type { TObject } from '@src/utils/types';
@@ -90,7 +93,6 @@ const CreateEditMenuFormComponent: React.FC<
     isDraftEditFlow = false,
     daysOfWeek = [],
   } = props;
-  const intl = useIntl();
   const dispatch = useAppDispatch();
   const loadMenuDataInProgress = useAppSelector(
     (state) => state.PartnerManageMenus.loadMenuDataInProgress,
@@ -184,13 +186,14 @@ const CreateEditMenuFormComponent: React.FC<
             <div className={css.containerTitle}>Chọn món ăn</div>
             <div className={css.timeRangeContainer}>
               <IconCalendar />
-              {startDateFromValues &&
-                endDateFromValues &&
-                intl.formatDateTimeRange(
-                  startDateFromValues,
-                  endDateFromValues,
-                  { dateStyle: 'long' },
-                )}
+
+              <RenderWhen
+                condition={!!startDateFromValues && !!endDateFromValues}>
+                <div className={css.menuTimeRange}>
+                  {formatTimestamp(startDateFromValues)} -{' '}
+                  {formatTimestamp(endDateFromValues)}
+                </div>
+              </RenderWhen>
             </div>
 
             <WeekDays
