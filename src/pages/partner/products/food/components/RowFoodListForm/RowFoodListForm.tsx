@@ -5,6 +5,7 @@ import classNames from 'classnames';
 
 import Form from '@components/Form/Form';
 import FieldCheckbox from '@components/FormFields/FieldCheckbox/FieldCheckbox';
+import type { EFoodApprovalState } from '@src/utils/enums';
 import type { TListing, TPagination } from '@src/utils/types';
 
 import FoodRow from '../FoodRow/FoodRow';
@@ -18,7 +19,7 @@ export type TRowFoodListFormValues = {
 type TExtraProps = {
   foodList: TListing[];
   pagination: TPagination;
-  isFoodAcceptedTab: boolean;
+  foodApprovalActiveTab: EFoodApprovalState;
   getGridFoodListFormValues: (values: string[]) => void;
   onPageChange: (page: number) => void;
   setFoodToRemove: (params: { id: string }) => void;
@@ -41,7 +42,7 @@ const RowFoodListFormComponent: React.FC<TRowFoodListFormComponentProps> = (
     setSelectedFood,
     openManipulateFoodModal,
     form,
-    isFoodAcceptedTab,
+    foodApprovalActiveTab,
   } = props;
 
   const onCheckAllChange = (event: any) => {
@@ -83,7 +84,7 @@ const RowFoodListFormComponent: React.FC<TRowFoodListFormComponentProps> = (
           setFoodToRemove={setFoodToRemove!}
           setSelectedFood={setSelectedFood!}
           openManipulateFoodModal={openManipulateFoodModal!}
-          isFoodAcceptedTab={isFoodAcceptedTab!}
+          foodApprovalActiveTab={foodApprovalActiveTab!}
         />
       ))}
     </Form>

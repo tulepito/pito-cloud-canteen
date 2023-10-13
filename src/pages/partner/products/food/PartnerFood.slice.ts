@@ -28,11 +28,7 @@ import {
 import { getImportDataFromCsv } from '@pages/admin/partner/[restaurantId]/settings/food/utils';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { bottomRightToastOptions } from '@src/utils/toastify';
-import {
-  CurrentUser,
-  denormalisedResponseEntities,
-  Listing,
-} from '@utils/data';
+import { CurrentUser, denormalisedResponseEntities } from '@utils/data';
 import { EFoodApprovalState, EImageVariants, EListingType } from '@utils/enums';
 import { storableAxiosError, storableError } from '@utils/errors';
 import type {
@@ -358,8 +354,9 @@ const updatePartnerFoodListing = createAsyncThunk(
   UPDATE_PARTNER_FOOD_LISTING,
   async (payload: TObject, { rejectWithValue }) => {
     try {
+      const { shouldShowToast = true, ...rest } = payload;
       const dataParams = {
-        ...payload,
+        ...rest,
       };
       const queryParams = {
         include: ['images'],
@@ -371,10 +368,7 @@ const updatePartnerFoodListing = createAsyncThunk(
         queryParams,
       });
 
-      const foodListing = Listing(food);
-      const { isDraft } = foodListing.getMetadata();
-
-      if (!isDraft) {
+      if (shouldShowToast) {
         toast.success('Cập nhật món ăn thành công', bottomRightToastOptions);
       }
 

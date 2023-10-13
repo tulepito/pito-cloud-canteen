@@ -34,7 +34,7 @@ type TFoodCardProps = {
   food: TListing;
   editableFoodMap: Record<string, boolean>;
   deletableFoodMap: Record<string, boolean>;
-  isFoodAcceptedTab: boolean;
+  foodApprovalActiveTab: string;
   setFoodToRemove: (params: any) => void;
   setSelectedFood: (food: TListing) => void;
   openManipulateFoodModal: () => void;
@@ -63,11 +63,14 @@ const FoodCard: React.FC<TFoodCardProps> = (props) => {
     openManipulateFoodModal,
     editableFoodMap,
     deletableFoodMap,
-    isFoodAcceptedTab,
+    foodApprovalActiveTab,
   } = props;
   const actionController = useBoolean();
   const { isMobileLayout } = useViewport();
   const dispatch = useAppDispatch();
+
+  const isFoodAcceptedTab =
+    foodApprovalActiveTab === EFoodApprovalState.ACCEPTED;
 
   const foodListing = Listing(food);
   const foodId = foodListing.getId();
@@ -81,7 +84,9 @@ const FoodCard: React.FC<TFoodCardProps> = (props) => {
   const images = foodListing.getImages();
 
   const checkBoxContent = (
-    <NamedLink path={partnerPaths.EditFood.replace('[foodId]', foodId)}>
+    <NamedLink
+      path={partnerPaths.EditFood.replace('[foodId]', foodId)}
+      params={{ fromTab: foodApprovalActiveTab }}>
       <div className={css.contentWrapper}>
         <div className={css.image}>
           <ResponsiveImage

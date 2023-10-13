@@ -63,6 +63,7 @@ const EditPartnerFoodPage = () => {
   const [currentTab, setCurrentTab] = useState<string>(
     (tabFromQuery as string) || FOOD_BASIC_INFO_TAB,
   );
+  const backToPendingTabController = useBoolean();
 
   const currentUser = useAppSelector((state) => state.user.currentUser);
   const currentUserGetter = CurrentUser(currentUser!);
@@ -149,7 +150,7 @@ const EditPartnerFoodPage = () => {
   ]) as TEditPartnerFoodFormValues;
 
   const goBackToManageFood = () => {
-    router.push(partnerPaths.ManageFood);
+    router.push({ pathname: partnerPaths.ManageFood, query: { tab: fromTab } });
   };
 
   const handleConfirmBtnClick = () => {
@@ -157,17 +158,26 @@ const EditPartnerFoodPage = () => {
     dispatch(
       partnerFoodSliceThunks.fetchApprovalFoods(EFoodApprovalState.PENDING),
     );
-    dispatch(
-      partnerFoodSliceThunks.sendSlackNotification({
-        foodId: foodId as string,
-        notificationType: ESlackNotificationType.CREATE_NEW_FOOD,
-        params: {
+    if (isNewFood) {
+      dispatch(
+        partnerFoodSliceThunks.sendSlackNotification({
           foodId: foodId as string,
-          restaurantId: foodRestaurantId,
-        },
-      }),
-    );
-    router.push({ pathname: partnerPaths.ManageFood, query: { tab: fromTab } });
+          notificationType: ESlackNotificationType.CREATE_NEW_FOOD,
+          params: {
+            foodId: foodId as string,
+            restaurantId: foodRestaurantId,
+          },
+        }),
+      );
+    }
+    router.push({
+      pathname: partnerPaths.ManageFood,
+      query: {
+        tab: backToPendingTabController.value
+          ? EFoodApprovalState.PENDING
+          : fromTab,
+      },
+    });
   };
 
   const handleNoResendApprovalBtnClick = () => {
@@ -240,8 +250,9 @@ const EditPartnerFoodPage = () => {
       currentAdminApproval !== EFoodApprovalState.DECLINED;
 
     await dispatch(
-      partnerFoodSliceThunks.updatePartnerFoodListing(
-        getUpdateFoodData({
+      partnerFoodSliceThunks.updatePartnerFoodListing({
+        shouldShowToast: false,
+        ...getUpdateFoodData({
           ...values,
           id: foodId as string,
           ...(currentTabIndex === CREATE_FOOD_TABS.length - 1 && {
@@ -251,7 +262,7 @@ const EditPartnerFoodPage = () => {
             adminApproval: EFoodApprovalState.PENDING,
           }),
         }),
-      ),
+      }),
     );
 
     setChangeContent({
@@ -304,6 +315,7 @@ const EditPartnerFoodPage = () => {
       );
     } else {
       sendingApprovalToAdminModalController.setTrue();
+      backToPendingTabController.setTrue();
     }
   };
 

@@ -191,9 +191,7 @@ const FoodBasicInfoTabComponent: React.FC<TFoodBasicInfoTabComponentProps> = (
         placeholder={intl.formatMessage({
           id: 'EditPartnerFoodForm.unitPlaceholder',
         })}
-        label={intl.formatMessage({
-          id: 'EditPartnerFoodForm.unitLabel',
-        })}
+        label="Phần/Tô/Hộp"
         parse={upperCaseFirstLetter}
       />
 

@@ -8,6 +8,7 @@ import Toggle from '@components/Toggle/Toggle';
 import { useAppDispatch } from '@hooks/reduxHooks';
 import { partnerPaths } from '@src/paths';
 import { Listing } from '@src/utils/data';
+import { EFoodApprovalState } from '@src/utils/enums';
 import type { TListing } from '@src/utils/types';
 
 import { partnerFoodSliceThunks } from '../../PartnerFood.slice';
@@ -18,7 +19,7 @@ type TFoodRowProps = {
   id: string;
   name: string;
   food: TListing;
-  isFoodAcceptedTab: boolean;
+  foodApprovalActiveTab: EFoodApprovalState;
   setFoodToRemove: (params: any) => void;
   setSelectedFood: (food: TListing) => void;
   openManipulateFoodModal: () => void;
@@ -31,16 +32,20 @@ const FoodRow: React.FC<TFoodRowProps> = (props) => {
     food,
     setSelectedFood,
     openManipulateFoodModal,
-    isFoodAcceptedTab,
+    foodApprovalActiveTab,
   } = props;
   const dispatch = useAppDispatch();
 
   const foodListing = Listing(food);
   const foodId = foodListing.getId();
   const { title: foodName } = foodListing.getAttributes();
+  const isFoodAcceptedTab =
+    foodApprovalActiveTab === EFoodApprovalState.ACCEPTED;
 
   const checkBoxContent = (
-    <NamedLink path={partnerPaths.EditFood.replace('[foodId]', foodId)}>
+    <NamedLink
+      path={partnerPaths.EditFood.replace('[foodId]', foodId)}
+      params={{ fromTab: foodApprovalActiveTab }}>
       <div className={css.contentWrapper}>{foodName}</div>
     </NamedLink>
   );

@@ -92,6 +92,8 @@ const EditPartnerFoodFormComponent: React.FC<
     categories: categoriesOptions = [],
     packaging: packagingOptions = [],
   } = useAppSelector((state) => state.foods, shallowEqual);
+  const [responseApprovalRequest, setResponseApprovalRequest] =
+    useState<string>('');
 
   const images = pickRenderableImages(
     currentFoodListing,
@@ -143,6 +145,7 @@ const EditPartnerFoodFormComponent: React.FC<
   const fieldClasses = classNames(css.field, viewModeOnly && css.viewOnly);
 
   const declineFood = () => {
+    setResponseApprovalRequest(EFoodApprovalState.DECLINED);
     dispatch(
       foodSliceThunks.responseApprovalRequest({
         foodId: foodId as string,
@@ -152,6 +155,7 @@ const EditPartnerFoodFormComponent: React.FC<
   };
 
   const acceptFood = () => {
+    setResponseApprovalRequest(EFoodApprovalState.ACCEPTED);
     dispatch(
       foodSliceThunks.responseApprovalRequest({
         foodId: foodId as string,
@@ -535,7 +539,12 @@ const EditPartnerFoodFormComponent: React.FC<
           onClick={viewModeOnly ? acceptFood : handleSubmitForm}
           type="button"
           ready={ready}
-          inProgress={inProgress}
+          inProgress={
+            (!viewModeOnly && inProgress) ||
+            (viewModeOnly &&
+              inProgress &&
+              responseApprovalRequest === EFoodApprovalState.ACCEPTED)
+          }
           disabled={disabled}
           className={css.submitBtn}>
           {viewModeOnly
@@ -554,7 +563,10 @@ const EditPartnerFoodFormComponent: React.FC<
             type="button"
             ready={ready}
             variant="secondary"
-            inProgress={inProgress}
+            inProgress={
+              inProgress &&
+              responseApprovalRequest === EFoodApprovalState.DECLINED
+            }
             disabled={disabled}
             className={css.submitBtn}>
             Từ chối

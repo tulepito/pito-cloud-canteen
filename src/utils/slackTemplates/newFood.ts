@@ -12,7 +12,7 @@ type TNewFoodTemplate = {
 export const newFoodTemplate = (params: TNewFoodTemplate) => {
   const { restaurantId, foodId, partnerName, foodName, createdAt } = params;
   const content = `Đối tác vừa đăng tải một món ăn mới 😍\n
-${NEXT_PUBLIC_CANONICAL_URL}/admin/partner/${restaurantId}/settings/food/${foodId}/\n
+${NEXT_PUBLIC_CANONICAL_URL}/admin/partner/${restaurantId}/settings/food/${foodId}/?mode=viewOnly/\n
 *Tên đối tác*\n
 ${partnerName}\n
 *Món ăn*\n

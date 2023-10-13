@@ -170,6 +170,12 @@ const TABLE_COLUMN: TColumn[] = [
 
 const IMPORT_FILE = 'IMPORT_FILE';
 const GOOGLE_SHEET_LINK = 'GOOGLE_SHEET_LINK';
+const defaultFoodApprovalTabs = [
+  EFoodApprovalState.ACCEPTED,
+  EFoodApprovalState.PENDING,
+  EFoodApprovalState.DECLINED,
+  'draft',
+];
 
 const ManagePartnerFoods = () => {
   const dispatch = useAppDispatch();
@@ -219,8 +225,20 @@ const ManagePartnerFoods = () => {
     useState<EFoodApprovalState>(
       (tabFromQuery as EFoodApprovalState) || EFoodApprovalState.ACCEPTED,
     );
-  const [defaultActiveKey, setDefaultActiveKey] = useState<number>(1);
+  const initDefaultActiveKey = useMemo(() => {
+    if (tabFromQuery) {
+      const tabIndexMaybe =
+        defaultFoodApprovalTabs.findIndex((item) => item === tabFromQuery) + 1;
 
+      return tabIndexMaybe === 0 ? 1 : tabIndexMaybe;
+    }
+
+    return 1;
+  }, [tabFromQuery]);
+
+  const [defaultActiveKey, setDefaultActiveKey] = useState<number>(
+    initDefaultActiveKey!,
+  );
   const hasFilterApplied = !!(
     keywords ||
     foodType ||
@@ -272,6 +290,9 @@ const ManagePartnerFoods = () => {
             }
           : {}),
         ...(keywords ? { keywords } : {}),
+        ...(foodApprovalActiveTab && {
+          tab: foodApprovalActiveTab,
+        }),
       },
     });
   };
@@ -329,7 +350,9 @@ const ManagePartnerFoods = () => {
           <div className={css.tabLabel}>
             <span>Được duyệt</span>
             <div data-number className={css.totalItems}>
-              {totalAcceptedFoods}
+              {foodApprovalActiveTab === EFoodApprovalState.ACCEPTED
+                ? foods.length
+                : totalAcceptedFoods}
             </div>
           </div>
         ),
@@ -341,7 +364,9 @@ const ManagePartnerFoods = () => {
           <div className={css.tabLabel}>
             <span>Chờ duyệt</span>
             <div data-number className={css.totalItems}>
-              {totalPendingFoods}
+              {foodApprovalActiveTab === EFoodApprovalState.PENDING
+                ? foods.length
+                : totalPendingFoods}
             </div>
           </div>
         ),
@@ -353,7 +378,9 @@ const ManagePartnerFoods = () => {
           <div className={css.tabLabel}>
             <span>Từ chối</span>
             <div data-number className={css.totalItems}>
-              {totalDeclinedFoods}
+              {foodApprovalActiveTab === EFoodApprovalState.DECLINED
+                ? foods.length
+                : totalDeclinedFoods}
             </div>
           </div>
         ),
@@ -365,7 +392,9 @@ const ManagePartnerFoods = () => {
           <div className={css.tabLabel}>
             <span>Nháp</span>
             <div data-number className={css.totalItems}>
-              {totalDraftFoods}
+              {foodApprovalActiveTab === ('draft' as any)
+                ? foods.length
+                : totalDraftFoods}
             </div>
           </div>
         ),
@@ -377,6 +406,8 @@ const ManagePartnerFoods = () => {
       totalDeclinedFoods,
       totalDraftFoods,
       totalPendingFoods,
+      foodApprovalActiveTab,
+      foods.length,
     ],
   );
 
@@ -385,8 +416,14 @@ const ManagePartnerFoods = () => {
   };
 
   const handleClearFilter = () => {
+    console.log('foodApprovalActiveTab: ', foodApprovalActiveTab);
     router.push({
       pathname: partnerPaths.ManageFood,
+      query: {
+        ...(foodApprovalActiveTab && {
+          tab: foodApprovalActiveTab,
+        }),
+      },
     });
   };
 
@@ -523,9 +560,7 @@ const ManagePartnerFoods = () => {
         openManipulateFoodModal={manipulateFoodSlideModalController.setTrue}
         editableFoodMap={editableFoodMap}
         deletableFoodMap={deletableFoodMap}
-        isFoodAcceptedTab={
-          foodApprovalActiveTab === EFoodApprovalState.ACCEPTED
-        }
+        foodApprovalActiveTab={foodApprovalActiveTab}
         initialValues={foodEnableInitialValues}
       />
     ) : (
@@ -540,9 +575,7 @@ const ManagePartnerFoods = () => {
             setFoodToRemove={setFoodToRemove}
             setSelectedFood={setSelectedFood}
             openManipulateFoodModal={manipulateFoodSlideModalController.setTrue}
-            isFoodAcceptedTab={
-              foodApprovalActiveTab === EFoodApprovalState.ACCEPTED
-            }
+            foodApprovalActiveTab={foodApprovalActiveTab}
             initialValues={foodEnableInitialValues}
           />
         </div>
@@ -639,7 +672,7 @@ const ManagePartnerFoods = () => {
     <ProductLayout
       currentPage="food"
       shouldHideAddProductButton={false}
-      handleAddProduct={addFoodSlideModalController.setTrue}>
+      handleAddProduct={handleAddFood}>
       <div className={css.root}>
         <div className={css.tableActions}>
           <div className={css.ctaViewTypeWrapper}>
