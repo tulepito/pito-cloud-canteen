@@ -91,7 +91,7 @@ const PaymentPartnerPage = () => {
     {
       key: 'id',
       label: 'ID',
-      render: ({ orderTitle, orderId, subOrderDate }: any) => (
+      render: ({ orderId, subOrderDate, subOrderTitle }: any) => (
         <div>
           <NamedLink
             className={css.orderTitle}
@@ -101,7 +101,7 @@ const PaymentPartnerPage = () => {
               tab: EOrderDetailTabs.PAYMENT_STATUS,
               subOrderDate,
             }}>
-            {`#${orderTitle}-${getDayOfWeek(+subOrderDate)}`}
+            {subOrderTitle}
           </NamedLink>
         </div>
       ),
@@ -212,7 +212,7 @@ const PaymentPartnerPage = () => {
         companyName,
         subOrderDate,
         orderTitle,
-        subOrderTitle: `${orderTitle}-${getDayOfWeek(+subOrderDate)}`,
+        subOrderTitle: `#${orderTitle}-${getDayOfWeek(+subOrderDate)}`,
         totalAmount,
         paidAmount,
         remainAmount,
