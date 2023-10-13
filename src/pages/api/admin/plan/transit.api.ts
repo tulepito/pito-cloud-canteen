@@ -155,7 +155,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
           // Function is not ready on production
 
-          if (process.env.NEXT_APP_ALLOW_PARTNER_EMAIL_SEND === 'true') {
+          if (process.env.NEXT_PUBLIC_ALLOW_PARTNER_EMAIL_SEND === 'true') {
             emailSendingFactory(
               EmailTemplateTypes.PARTNER.PARTNER_SUB_ORDER_CANCELED,
               {
