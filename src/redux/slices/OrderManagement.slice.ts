@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 /* eslint-disable @typescript-eslint/no-shadow */
 import { createSlice } from '@reduxjs/toolkit';
 import groupBy from 'lodash/groupBy';
@@ -36,6 +37,7 @@ import {
   calculateClientQuotation,
   calculatePartnerQuotation,
 } from '@helpers/orderHelper';
+import { OrderDetailActions } from '@pages/admin/order/[orderId]/AdminManageOrder.slice';
 import { createAsyncThunk } from '@redux/redux.helper';
 import type { RootState } from '@redux/store';
 import type { NotificationInvitationParams } from '@services/notifications';
@@ -353,9 +355,14 @@ const FETCH_QUOTATION = 'app/OrderManagement/FETCH_QUOTATION';
 // ================ Async thunks ================ //
 const loadData = createAsyncThunk(
   'app/OrderManagement/LOAD_DATA',
-  async (orderId: string, { dispatch }) => {
+  async (payload: { orderId: string; isAdminFlow?: boolean }, { dispatch }) => {
+    const { orderId, isAdminFlow = false } = payload;
     const response: any = await getBookerOrderDataApi(orderId);
     dispatch(SystemAttributesThunks.fetchVATPercentageByOrderId(orderId));
+
+    if (isAdminFlow) {
+      dispatch(OrderDetailActions.saveOrder(response.data.orderListing));
+    }
 
     return response.data;
   },

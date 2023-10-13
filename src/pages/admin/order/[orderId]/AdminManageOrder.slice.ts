@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 import { createSlice, current } from '@reduxjs/toolkit';
 import isEmpty from 'lodash/isEmpty';
 import { DateTime } from 'luxon';
@@ -461,7 +462,11 @@ export const OrderDetailThunks = {
 const OrderDetailSlice = createSlice({
   name: 'AdminManageOrder',
   initialState,
-  reducers: {},
+  reducers: {
+    saveOrder: (state, { payload }) => {
+      state.order = payload;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(updateStaffName.pending, (state) => ({
