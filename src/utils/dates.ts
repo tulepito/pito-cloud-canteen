@@ -642,8 +642,8 @@ export const generateWeekDayList = (startDate: number, endDate: number) => {
   const weekdays = [];
 
   // Convert the timestamps to Luxon DateTime objects
-  const startDateDT = DateTime.fromMillis(startDate);
-  const endDateDT = DateTime.fromMillis(endDate);
+  const startDateDT = DateTime.fromMillis(startDate).setZone(VNTimezone);
+  const endDateDT = DateTime.fromMillis(endDate).setZone(VNTimezone);
 
   // Start at the beginning of the start date
   let currentDay = startDateDT.startOf('day');
