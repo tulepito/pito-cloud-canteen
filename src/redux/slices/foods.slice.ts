@@ -169,13 +169,15 @@ const queryPartnerFoods = createAsyncThunk(
     const { isMobileLayout = false, restaurantId, ...rest } = payload;
 
     const response = await sdk.listings.query({
-      ...rest,
       meta_listingType: EListingType.food,
       meta_restaurantId: restaurantId,
       meta_isDeleted: false,
       perPage: MANAGE_FOOD_PAGE_SIZE,
       include: ['images'],
       'fields.image': [`variants.${EImageVariants.squareSmall2x}`],
+      meta_adminApproval: 'approved',
+      meta_isFoodEnable: true,
+      ...rest,
     });
     const foods = denormalisedResponseEntities(response);
 
