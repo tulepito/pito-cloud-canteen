@@ -30,7 +30,21 @@
     @include textTemplate(14px, 700, 20px);
   }
 
-  .badge {
+  .badges {
+    display: flex;
+    flex-direction: row;
+    column-gap: 4px;
+  }
+
+  .specialDiet {
+    padding: 2px 8px;
+    width: fit-content;
+    @include textTemplate(12px, 600, 16px);
+    border-radius: 20px;
+    background-color: $labelBlue1;
+  }
+
+  .foodType {
     padding: 2px 8px;
     width: fit-content;
     @include textTemplate(12px, 600, 16px);
