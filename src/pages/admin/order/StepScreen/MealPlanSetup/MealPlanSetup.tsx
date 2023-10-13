@@ -3,6 +3,7 @@ import { memo, useCallback, useEffect, useMemo } from 'react';
 import { shallowEqual } from 'react-redux';
 import isEmpty from 'lodash/isEmpty';
 
+import { MORNING_SESSION } from '@components/CalendarDashboard/helpers/constant';
 import { calculateGroupMembersAmount } from '@helpers/company';
 import { addCommas } from '@helpers/format';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
@@ -57,6 +58,7 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
     memberAmount,
     displayedDurationTime,
     durationTimeMode,
+    daySession,
   } = Listing(order as TListing).getMetadata();
   const { address, origin } = deliveryAddress || {};
   const companies = useAppSelector(
@@ -167,6 +169,7 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
       memberAmount: allMembersAmount,
       durationTimeMode: durationTimeMode || 'week',
       displayedDurationTime: displayedDurationTime || 1,
+      daySession: daySession || MORNING_SESSION,
     }),
     [
       JSON.stringify(dayInWeek),
