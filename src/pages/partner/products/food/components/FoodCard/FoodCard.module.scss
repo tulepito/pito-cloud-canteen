@@ -129,3 +129,8 @@
   bottom: 15px;
   right: 40px;
 }
+
+.disabledLink {
+  pointer-events: none;
+  cursor: default;
+}

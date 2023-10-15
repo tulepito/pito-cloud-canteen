@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { Field } from 'react-final-form';
+import classNames from 'classnames';
 
 import Badge, { EBadgeType } from '@components/Badge/Badge';
 import FieldCheckbox from '@components/FormFields/FieldCheckbox/FieldCheckbox';
@@ -86,7 +87,8 @@ const FoodCard: React.FC<TFoodCardProps> = (props) => {
   const checkBoxContent = (
     <NamedLink
       path={partnerPaths.EditFood.replace('[foodId]', foodId)}
-      params={{ fromTab: foodApprovalActiveTab }}>
+      params={{ fromTab: foodApprovalActiveTab }}
+      className={classNames(!editableFoodMap[foodId] && css.disabledLink)}>
       <div className={css.contentWrapper}>
         <div className={css.image}>
           <ResponsiveImage
