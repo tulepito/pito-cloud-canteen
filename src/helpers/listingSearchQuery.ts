@@ -272,6 +272,7 @@ export const getPartnerFoodByApprovalStatusQuery = (
     meta_restaurantId: restaurantListingId,
     meta_listingType: ListingTypes.FOOD,
     meta_isDraft: false,
+    meta_isDeleted: false,
   };
 };
 
@@ -280,6 +281,7 @@ export const getPartnerDraftFoodQuery = (restaurantListingId: string) => {
     meta_restaurantId: restaurantListingId,
     meta_listingType: ListingTypes.FOOD,
     meta_isDraft: true,
+    meta_isDeleted: false,
   };
 };
 

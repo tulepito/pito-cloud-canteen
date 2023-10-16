@@ -4,7 +4,7 @@ import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import classNames from 'classnames';
 import arrayMutators from 'final-form-arrays';
-import { keyBy, mapValues } from 'lodash';
+import { isEmpty, keyBy, mapValues } from 'lodash';
 
 import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
@@ -66,6 +66,8 @@ const FoodBasicInfoTabComponent: React.FC<TFoodBasicInfoTabComponentProps> = (
     ...uploadedImages,
     ...formattedCurrentFoodListingImages,
   };
+
+  const submitDisabled = invalid || isEmpty(images) || inProgress;
 
   return (
     <Form onSubmit={handleSubmit} className={css.root}>
@@ -199,7 +201,7 @@ const FoodBasicInfoTabComponent: React.FC<TFoodBasicInfoTabComponentProps> = (
         <Button
           type="submit"
           className={css.nextButton}
-          disabled={invalid}
+          disabled={submitDisabled}
           inProgress={inProgress}>
           Tiếp theo
         </Button>

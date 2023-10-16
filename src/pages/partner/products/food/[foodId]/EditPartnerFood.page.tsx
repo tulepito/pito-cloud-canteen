@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { shallowEqual } from 'react-redux';
-import { intersection } from 'lodash';
+import { intersection, isEmpty } from 'lodash';
 import { useRouter } from 'next/router';
 
 import Button from '@components/Button/Button';
@@ -77,18 +77,21 @@ const EditPartnerFoodPage = () => {
     updateFoodError,
     uploadingImages,
     createFoodInProgress,
-  } = useAppSelector((state) => state.foods, shallowEqual);
+  } = useAppSelector((state) => state.PartnerFood, shallowEqual);
 
   const { showPartnerListingError, partnerListingRef } = useAppSelector(
     (state) => state.partners,
     shallowEqual,
   );
   const currentFoodListingGetter = IntegrationListing(currentFoodListing);
+  const { title, price } = currentFoodListingGetter.getAttributes();
   const {
     packaging,
     foodType,
     category,
     sideDishes: currentSideDishes,
+    minOrderNumberInAdvance,
+    minOrderHourInAdvance,
   } = currentFoodListingGetter.getPublicData();
   const {
     adminApproval: currentAdminApproval,
@@ -97,7 +100,12 @@ const EditPartnerFoodPage = () => {
   } = currentFoodListingGetter.getMetadata();
 
   const moveableSteps =
-    !packaging || !foodType || !category
+    !title ||
+    isEmpty(price) ||
+    !minOrderNumberInAdvance ||
+    !minOrderHourInAdvance
+      ? [FOOD_BASIC_INFO_TAB]
+      : !packaging || !foodType || !category
       ? [FOOD_BASIC_INFO_TAB, FOOD_DETAIL_INFO_TAB]
       : [FOOD_BASIC_INFO_TAB, FOOD_DETAIL_INFO_TAB, FOOD_ADDITIONAL_INFO_TAB];
 
@@ -109,19 +117,8 @@ const EditPartnerFoodPage = () => {
   const initialValues = useMemo(() => {
     const attributes = currentFoodListing?.attributes || {};
 
-    const {
-      publicData = {},
-      price,
-      title,
-      description,
-    } = attributes || ({} as TObject);
-    const {
-      menuType,
-      minQuantity,
-      maxQuantity,
-      minOrderHourInAdvance,
-      minOrderNumberInAdvance,
-    } = publicData;
+    const { publicData = {}, description } = attributes || ({} as TObject);
+    const { menuType, minQuantity, maxQuantity } = publicData;
 
     if (isNewFood) {
       return {};
@@ -143,10 +140,14 @@ const EditPartnerFoodPage = () => {
   }, [
     currentFoodListing?.attributes,
     currentFoodListing?.images,
-    foodType,
-    maxQuantityFromPartner,
-    minQuantityFromPartner,
     isNewFood,
+    title,
+    price?.amount,
+    foodType,
+    minQuantityFromPartner,
+    maxQuantityFromPartner,
+    minOrderHourInAdvance,
+    minOrderNumberInAdvance,
   ]) as TEditPartnerFoodFormValues;
 
   const goBackToManageFood = () => {
@@ -251,7 +252,8 @@ const EditPartnerFoodPage = () => {
 
     await dispatch(
       partnerFoodSliceThunks.updatePartnerFoodListing({
-        shouldShowToast: false,
+        shouldShowToast:
+          currentAdminApproval === EFoodApprovalState.PENDING || false,
         ...getUpdateFoodData({
           ...values,
           id: foodId as string,
@@ -277,9 +279,7 @@ const EditPartnerFoodPage = () => {
     });
 
     if (!currentIsDraft) {
-      if (currentAdminApproval === EFoodApprovalState.PENDING) {
-        sendingApprovalToAdminModalController.setTrue();
-      } else if (
+      if (
         currentAdminApproval === EFoodApprovalState.ACCEPTED &&
         changeApprovalAttributes.length > 0
       ) {

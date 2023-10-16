@@ -113,8 +113,9 @@
     }
 
     .bottomWrapper {
-      @include flexAlign(center, space-between);
+      @include flexAlign(center);
       margin-top: 12px;
+      gap: 8px;
 
       .foodType {
         @include flexAlign(center);
@@ -133,4 +134,17 @@
 .disabledLink {
   pointer-events: none;
   cursor: default;
+}
+
+.reApprovalBtn {
+  color: $neutralGray6;
+  border: 1px solid $neutralGray3;
+  border-radius: 8px;
+  padding: 0 14px;
+  min-height: unset;
+  position: absolute;
+  bottom: 12px;
+  right: 40px;
+
+  @include textTemplate(14px, $fontWeightBold, 24px);
 }

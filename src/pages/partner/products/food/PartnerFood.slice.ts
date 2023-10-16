@@ -13,6 +13,7 @@ import {
   fetchFoodEditableApi,
   fetchPartnerFoodApi,
   queryPartnerFoodsApi,
+  reApprovalFoodApi,
   removePartnerFoodApi,
   removePartnerMultipleFoodApi,
   sendSlackNotificationToAdminApi,
@@ -111,6 +112,9 @@ type TFoodSliceState = {
 
   updatePartnerMenuInProgress: boolean;
   updatePartnerMenuError: any;
+
+  reApprovalFoodInProgress: boolean;
+  reApprovalFoodError: any;
 };
 
 const initialState: TFoodSliceState = {
@@ -182,6 +186,9 @@ const initialState: TFoodSliceState = {
 
   updatePartnerMenuInProgress: false,
   updatePartnerMenuError: null,
+
+  reApprovalFoodInProgress: false,
+  reApprovalFoodError: null,
 };
 
 // ================ Thunk types ================ //
@@ -215,6 +222,7 @@ const FETCH_ACTIVE_MENUS = 'app/ManageFoodsPage/FETCH_ACTIVE_MENUS';
 const UPDATE_PARTNER_MENU = 'app/ManageFoodsPage/UPDATE_PARTNER_MENU';
 const SEND_SLACK_NOTIFICATION = 'app/ManageFoodsPage/SEND_SLACK_NOTIFICATION';
 const TOGGLE_FOOD_ENABLED = 'app/ManageFoodsPage/TOGGLE_FOOD_ENABLED';
+const RE_APPROVAL_FOOD = 'app/ManageFoodsPage/RE_APPROVAL_FOOD';
 
 // ================ Async thunks ================ //
 
@@ -703,6 +711,22 @@ const toggleFoodEnabled = createAsyncThunk(
   },
 );
 
+const reApprovalFood = createAsyncThunk(
+  RE_APPROVAL_FOOD,
+  async (payload: any, { rejectWithValue }) => {
+    try {
+      const { foodId } = payload;
+      await reApprovalFoodApi(foodId);
+
+      return foodId;
+    } catch (error) {
+      console.error(`${RE_APPROVAL_FOOD} error: `, error);
+
+      return rejectWithValue(storableError(error));
+    }
+  },
+);
+
 export const partnerFoodSliceThunks = {
   queryPartnerFoods,
   requestUploadFoodImages,
@@ -723,6 +747,7 @@ export const partnerFoodSliceThunks = {
   fetchDraftFood,
   sendSlackNotification,
   toggleFoodEnabled,
+  reApprovalFood,
 };
 
 // ================ Slice ================ //
@@ -849,8 +874,9 @@ const partnerFoodSlice = createSlice({
         updateFoodInProgress: true,
         updateFoodError: null,
       }))
-      .addCase(updatePartnerFoodListing.fulfilled, (state) => ({
+      .addCase(updatePartnerFoodListing.fulfilled, (state, { payload }) => ({
         ...state,
+        currentFoodListing: payload,
         updateFoodInProgress: false,
       }))
       .addCase(updatePartnerFoodListing.rejected, (state, { payload }) => ({
@@ -1065,6 +1091,22 @@ const partnerFoodSlice = createSlice({
         ...state,
         updateFoodInProgress: false,
         updateFoodError: error.message,
+      }))
+
+      .addCase(reApprovalFood.pending, (state) => ({
+        ...state,
+        reApprovalFoodInProgress: true,
+        reApprovalFoodError: null,
+      }))
+      .addCase(reApprovalFood.fulfilled, (state, { payload }) => ({
+        ...state,
+        reApprovalFoodInProgress: false,
+        foods: state.foods.filter((food: any) => food.id.uuid !== payload),
+      }))
+      .addCase(reApprovalFood.rejected, (state, { error }) => ({
+        ...state,
+        reApprovalFoodInProgress: false,
+        reApprovalFoodError: error.message,
       }));
   },
 });

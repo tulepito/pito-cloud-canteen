@@ -3,6 +3,7 @@ import { Field } from 'react-final-form';
 import classNames from 'classnames';
 
 import Badge, { EBadgeType } from '@components/Badge/Badge';
+import { InlineTextButton } from '@components/Button/Button';
 import FieldCheckbox from '@components/FormFields/FieldCheckbox/FieldCheckbox';
 import IconLightOutline from '@components/Icons/IconLightOutline/IconLightOutline';
 import NamedLink from '@components/NamedLink/NamedLink';
@@ -84,6 +85,14 @@ const FoodCard: React.FC<TFoodCardProps> = (props) => {
   const { price } = foodListing.getAttributes();
   const images = foodListing.getImages();
 
+  const onReApprovalFood = async (e: any) => {
+    e.stopPropagation();
+    await dispatch(partnerFoodSliceThunks.reApprovalFood({ foodId }));
+    await dispatch(
+      partnerFoodSliceThunks.fetchApprovalFoods(EFoodApprovalState.PENDING),
+    );
+  };
+
   const checkBoxContent = (
     <NamedLink
       path={partnerPaths.EditFood.replace('[foodId]', foodId)}
@@ -121,12 +130,14 @@ const FoodCard: React.FC<TFoodCardProps> = (props) => {
             </div>
           </div>
           <div className={css.bottomWrapper}>
-            <div className={css.foodType}>
-              <Badge
-                type={EBadgeType.success}
-                label={getLabelByKey(FOOD_TYPE_OPTIONS, foodType)}
-              />
-            </div>
+            <RenderWhen condition={!!foodType}>
+              <div className={css.foodType}>
+                <Badge
+                  type={EBadgeType.success}
+                  label={getLabelByKey(FOOD_TYPE_OPTIONS, foodType)}
+                />
+              </div>
+            </RenderWhen>
           </div>
         </div>
       </div>
@@ -195,6 +206,14 @@ const FoodCard: React.FC<TFoodCardProps> = (props) => {
             );
           }}
         </Field>
+      </RenderWhen>
+      <RenderWhen
+        condition={foodApprovalActiveTab === EFoodApprovalState.DECLINED}>
+        <InlineTextButton
+          className={css.reApprovalBtn}
+          onClick={onReApprovalFood}>
+          Duyệt lại
+        </InlineTextButton>
       </RenderWhen>
       <div className={css.actionsWrapper} onClick={handleActionsBtnClick}>
         <IconLightOutline />
