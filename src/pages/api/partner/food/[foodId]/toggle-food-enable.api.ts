@@ -7,6 +7,8 @@ import { handleError } from '@services/sdk';
 import { denormalisedResponseEntities } from '@src/utils/data';
 import { EImageVariants } from '@src/utils/enums';
 
+import { checkAllFoodsEnableInMenu } from './check-all-foods-enable-in-menu.service';
+
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
     const apiMethod = req.method;
@@ -34,6 +36,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
               },
             ),
           )[0];
+
+          try {
+            checkAllFoodsEnableInMenu(foodId as string);
+          } catch (error) {
+            console.error('Check all foods enable in menu error', error);
+          }
 
           res.json(response);
         }
