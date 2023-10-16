@@ -90,6 +90,14 @@ const MoveFoodToMenuFormComponent: React.FC<
     sideDishes,
   };
 
+  const filteredMenuAlreadyHasFood = menus.filter((menu) => {
+    const menuListing = Listing(menu);
+    const { foodsByDate: menuFoodByDate = {} } = menuListing.getPublicData();
+    const menuFoodList = Object.values(menuFoodByDate).flat();
+
+    return menuFoodList.every((weekdayObj: any) => !weekdayObj[selectedFoodId]);
+  });
+
   const submitValid = () => {
     switch (currentStep) {
       case STEP_SELECT_MENU:
@@ -122,7 +130,7 @@ const MoveFoodToMenuFormComponent: React.FC<
         })}
       </div>
       <RenderWhen condition={currentStep === STEP_SELECT_MENU}>
-        {menus.map((menu) => {
+        {filteredMenuAlreadyHasFood.map((menu) => {
           const menuListing = Listing(menu);
           const { startDate, endDate } = menuListing.getPublicData();
 

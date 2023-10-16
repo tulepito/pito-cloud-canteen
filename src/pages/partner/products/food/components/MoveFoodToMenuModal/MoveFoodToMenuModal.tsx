@@ -28,10 +28,12 @@ type TMoveFoodToMenuModalProps = {
   onClose: () => void;
   selectedFood: TListing;
   menus: TListing[];
+  onCloseManiplateFoodModal?: () => void;
 };
 
 const MoveFoodToMenuModal: React.FC<TMoveFoodToMenuModalProps> = (props) => {
-  const { isOpen, onClose, selectedFood, menus } = props;
+  const { isOpen, onClose, selectedFood, menus, onCloseManiplateFoodModal } =
+    props;
   const dispatch = useAppDispatch();
   const [formValues, setFormValues] = useState<TMoveFoodToMenuFormValues>();
   const [currentStep, setCurrentStep] = useState<string>(
@@ -66,7 +68,7 @@ const MoveFoodToMenuModal: React.FC<TMoveFoodToMenuModalProps> = (props) => {
     filterMenuModalController.setFalse();
   };
 
-  const onMoveFoodToMenuSubmit = (values: TMoveFoodToMenuFormValues) => {
+  const onMoveFoodToMenuSubmit = async (values: TMoveFoodToMenuFormValues) => {
     const { selectedDays } = values;
     const selectedMenuListing = selectedMenu && Listing(selectedMenu!);
     const {
@@ -100,7 +102,7 @@ const MoveFoodToMenuModal: React.FC<TMoveFoodToMenuModalProps> = (props) => {
       }, {}),
     };
 
-    dispatch(
+    await dispatch(
       partnerFoodSliceThunks.updatePartnerMenu({
         id: menuId,
         dataParams: {
@@ -111,6 +113,9 @@ const MoveFoodToMenuModal: React.FC<TMoveFoodToMenuModalProps> = (props) => {
         },
       }),
     );
+
+    onClose();
+    onCloseManiplateFoodModal?.();
   };
 
   useEffect(() => {

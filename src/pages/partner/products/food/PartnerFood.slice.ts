@@ -653,6 +653,8 @@ const updatePartnerMenu = createAsyncThunk(
       },
     );
 
+    toast.success('Cập nhật menu thành công', bottomRightToastOptions);
+
     return data;
   },
 );

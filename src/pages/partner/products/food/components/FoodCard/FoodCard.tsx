@@ -107,15 +107,17 @@ const FoodCard: React.FC<TFoodCardProps> = (props) => {
               <div className={css.priceWrapper}>{`${parseThousandNumber(
                 price.amount,
               )}đ ${unit ? `/ ${unit}` : ''}`}</div>
-              <div>
-                <Badge
-                  type={getApprovalStateType(adminApproval)}
-                  label={getLabelByKey(
-                    FOOD_APPROVAL_STATE_OPTIONS,
-                    adminApproval,
-                  )}
-                />
-              </div>
+              <RenderWhen condition={foodApprovalActiveTab !== 'draft'}>
+                <div>
+                  <Badge
+                    type={getApprovalStateType(adminApproval)}
+                    label={getLabelByKey(
+                      FOOD_APPROVAL_STATE_OPTIONS,
+                      adminApproval,
+                    )}
+                  />
+                </div>
+              </RenderWhen>
             </div>
           </div>
           <div className={css.bottomWrapper}>

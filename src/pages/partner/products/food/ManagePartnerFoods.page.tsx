@@ -1082,6 +1082,9 @@ const ManagePartnerFoods = () => {
           onClose={moveFoodToMenuSlideModalController.setFalse}
           selectedFood={selectedFood}
           menus={menus}
+          onCloseManiplateFoodModal={
+            manipulateFoodSlideModalController.setFalse
+          }
         />
       </div>
     </ProductLayout>
