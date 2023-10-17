@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
-import { pick } from 'lodash';
+import { isEmpty, pick } from 'lodash';
 
 import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
@@ -38,6 +38,8 @@ type TExtraProps = {
   selectedFood: TListing;
   inProgress?: boolean;
   selectedMenu?: TListing;
+  onRemoveNewFoodFromMenu?: (selectedDay: string) => void;
+  handleCloseModal?: () => void;
 };
 type TMoveFoodToMenuFormComponentProps =
   FormRenderProps<TMoveFoodToMenuFormValues> & Partial<TExtraProps>;
@@ -58,6 +60,8 @@ const MoveFoodToMenuFormComponent: React.FC<
     selectedFood,
     inProgress,
     selectedMenu,
+    onRemoveNewFoodFromMenu,
+    handleCloseModal,
   } = props;
 
   const intl = useIntl();
@@ -82,20 +86,15 @@ const MoveFoodToMenuFormComponent: React.FC<
   });
   const selectedFoodListing = Listing(selectedFood!) || {};
   const selectedFoodId = selectedFoodListing.getId();
-  const { title: selectedFoodName } = selectedFoodListing.getAttributes();
-  const { sideDishes = [] } = selectedFoodListing.getPublicData();
-  const formattedSelectedFood = {
-    id: selectedFoodId,
-    title: selectedFoodName,
-    sideDishes,
-  };
 
   const filteredMenuAlreadyHasFood = menus.filter((menu) => {
     const menuListing = Listing(menu);
     const { foodsByDate: menuFoodByDate = {} } = menuListing.getPublicData();
     const menuFoodList = Object.values(menuFoodByDate).flat();
 
-    return menuFoodList.every((weekdayObj: any) => !weekdayObj[selectedFoodId]);
+    return menuFoodList.some(
+      (weekdayObj: any) => !isEmpty(weekdayObj) && !weekdayObj[selectedFoodId],
+    );
   });
 
   const submitValid = () => {
@@ -109,13 +108,23 @@ const MoveFoodToMenuFormComponent: React.FC<
     }
   };
 
-  const onSubmitBtnClick = () => {
+  const onSubmitBtnClick = async () => {
     const currentStepIndex = moveFoodToMenuSteps.indexOf(currentStep);
+    if (currentStepIndex === moveFoodToMenuSteps.length - 2) {
+      await handleSubmit();
+    }
+
     if (currentStepIndex === moveFoodToMenuSteps.length - 1) {
-      return handleSubmit();
+      handleCloseModal?.();
     }
 
     setCurrentStep(moveFoodToMenuSteps[currentStepIndex + 1]);
+  };
+
+  const handleFoodRemoveClick = () => {
+    if (selectedMenuWeekDay) {
+      onRemoveNewFoodFromMenu?.(selectedMenuWeekDay);
+    }
   };
 
   useEffect(() => {
@@ -169,8 +178,9 @@ const MoveFoodToMenuFormComponent: React.FC<
         <MenuFoodList
           menuDaySession={mealType || ''}
           foodList={foodList}
-          newFoodItem={formattedSelectedFood}
           containerClassName={css.menuFoodListContainer}
+          handleFoodRemoveClick={handleFoodRemoveClick}
+          selectedFoodId={selectedFoodId}
         />
       </RenderWhen>
 

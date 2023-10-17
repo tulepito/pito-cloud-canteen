@@ -663,7 +663,7 @@ const updatePartnerMenu = createAsyncThunk(
 
     toast.success('Cập nhật menu thành công', bottomRightToastOptions);
 
-    return data;
+    return denormalisedResponseEntities(data)[0];
   },
 );
 
@@ -1049,8 +1049,11 @@ const partnerFoodSlice = createSlice({
         updatePartnerMenuInProgress: true,
         updatePartnerMenuError: null,
       }))
-      .addCase(updatePartnerMenu.fulfilled, (state) => ({
+      .addCase(updatePartnerMenu.fulfilled, (state, { payload }) => ({
         ...state,
+        menus: state.menus.map((menu: any) =>
+          menu.id.uuid === payload.id.uuid ? payload : menu,
+        ),
         updatePartnerMenuInProgress: false,
       }))
       .addCase(updatePartnerMenu.rejected, (state, { error }) => ({

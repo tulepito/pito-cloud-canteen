@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { omit } from 'lodash';
 
 import Button from '@components/Button/Button';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
@@ -53,6 +54,16 @@ const MoveFoodToMenuModal: React.FC<TMoveFoodToMenuModalProps> = (props) => {
   const selectedMenu = menuId
     ? menus.find((menu: TListing) => menu.id.uuid === menuId)
     : undefined;
+  const selectedMenuListing = selectedMenu && Listing(selectedMenu!);
+
+  const {
+    foodsByDate = {},
+    startDate,
+    endData,
+  } = selectedMenuListing ? selectedMenuListing.getPublicData() : ({} as any);
+  const { menuType } = selectedMenuListing
+    ? selectedMenuListing.getMetadata()
+    : ({} as any);
 
   const goBackStep = () => {
     setCurrentStep(STEP_SELECT_MENU);
@@ -70,15 +81,7 @@ const MoveFoodToMenuModal: React.FC<TMoveFoodToMenuModalProps> = (props) => {
 
   const onMoveFoodToMenuSubmit = async (values: TMoveFoodToMenuFormValues) => {
     const { selectedDays } = values;
-    const selectedMenuListing = selectedMenu && Listing(selectedMenu!);
-    const {
-      foodsByDate = {},
-      startDate,
-      endData,
-    } = selectedMenuListing ? selectedMenuListing.getPublicData() : ({} as any);
-    const { menuType } = selectedMenuListing
-      ? selectedMenuListing.getMetadata()
-      : ({} as any);
+
     const newFoodByDate = {
       ...foodsByDate,
       ...selectedDays.reduce((acc: any, day: string) => {
@@ -113,7 +116,27 @@ const MoveFoodToMenuModal: React.FC<TMoveFoodToMenuModalProps> = (props) => {
         },
       }),
     );
+  };
 
+  const onRemoveNewFoodFromMenu = async (selectedDay: string) => {
+    const newFoodByDate = {
+      ...foodsByDate,
+      [selectedDay]: omit(foodsByDate[selectedDay], [selectedFood?.id.uuid]),
+    };
+    await dispatch(
+      partnerFoodSliceThunks.updatePartnerMenu({
+        id: menuId,
+        dataParams: {
+          foodsByDate: newFoodByDate,
+          menuType,
+          startDate,
+          endData,
+        },
+      }),
+    );
+  };
+
+  const handleCloseModal = () => {
     onClose();
     onCloseManiplateFoodModal?.();
   };
@@ -167,6 +190,8 @@ const MoveFoodToMenuModal: React.FC<TMoveFoodToMenuModalProps> = (props) => {
               setCurrentStep={setCurrentStep}
               selectedFood={selectedFood}
               inProgress={updatePartnerMenuInProgress}
+              onRemoveNewFoodFromMenu={onRemoveNewFoodFromMenu}
+              handleCloseModal={handleCloseModal}
             />
           </div>
         </div>

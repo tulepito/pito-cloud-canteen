@@ -375,9 +375,7 @@ const ManagePartnerFoods = () => {
           <div className={css.tabLabel}>
             <span>Được duyệt</span>
             <div data-number className={css.totalItems}>
-              {foodApprovalActiveTab === EFoodApprovalState.ACCEPTED
-                ? foods.length
-                : totalAcceptedFoods}
+              {totalAcceptedFoods}
             </div>
           </div>
         ),
@@ -389,9 +387,7 @@ const ManagePartnerFoods = () => {
           <div className={css.tabLabel}>
             <span>Chờ duyệt</span>
             <div data-number className={css.totalItems}>
-              {foodApprovalActiveTab === EFoodApprovalState.PENDING
-                ? foods.length
-                : totalPendingFoods}
+              {totalPendingFoods}
             </div>
           </div>
         ),
@@ -403,9 +399,7 @@ const ManagePartnerFoods = () => {
           <div className={css.tabLabel}>
             <span>Từ chối</span>
             <div data-number className={css.totalItems}>
-              {foodApprovalActiveTab === EFoodApprovalState.DECLINED
-                ? foods.length
-                : totalDeclinedFoods}
+              {totalDeclinedFoods}
             </div>
           </div>
         ),
@@ -417,9 +411,7 @@ const ManagePartnerFoods = () => {
           <div className={css.tabLabel}>
             <span>Nháp</span>
             <div data-number className={css.totalItems}>
-              {foodApprovalActiveTab === ('draft' as any)
-                ? foods.length
-                : totalDraftFoods}
+              {totalDraftFoods}
             </div>
           </div>
         ),
@@ -431,8 +423,6 @@ const ManagePartnerFoods = () => {
       totalDeclinedFoods,
       totalDraftFoods,
       totalPendingFoods,
-      foodApprovalActiveTab,
-      foods.length,
     ],
   );
 

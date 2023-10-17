@@ -10,26 +10,30 @@ import css from './MenuFoodList.module.scss';
 type TMenuFoodListProps = {
   menuDaySession: string;
   foodList: TObject;
-  newFoodItem: TObject;
   onNewFoodItemDelete?: () => void;
   containerClassName?: string;
+  handleFoodRemoveClick: () => void;
+  selectedFoodId: string;
 };
 
 const MenuFoodList: React.FC<TMenuFoodListProps> = (props) => {
-  const { menuDaySession, foodList, newFoodItem, containerClassName } = props;
+  const {
+    menuDaySession,
+    foodList,
+    containerClassName,
+    handleFoodRemoveClick,
+    selectedFoodId,
+  } = props;
   const intl = useIntl();
   const foodNumber = Object.keys(foodList).length;
 
   const classes = classNames(css.root, containerClassName);
-  const isNewFoodExistInFoodList = Object.values(foodList).some(
-    (food: any) => food.id === newFoodItem.id,
-  );
 
   return (
     <div className={classes}>
       <div className={css.header}>
         {intl.formatMessage({ id: `MenuMealType.label.${menuDaySession}` })}
-        {` (${isNewFoodExistInFoodList ? foodNumber : foodNumber + 1})`}
+        {` (${foodNumber})`}
       </div>
       <div className={css.foodList}>
         {Object.values(foodList).map((food: any) => {
@@ -42,20 +46,15 @@ const MenuFoodList: React.FC<TMenuFoodListProps> = (props) => {
                   có <span className={css.sideDish}>Món ăn kèm</span>
                 </div>
               </RenderWhen>
+              <RenderWhen condition={food.id === selectedFoodId}>
+                <IconClose
+                  className={css.iconClose}
+                  onClick={handleFoodRemoveClick}
+                />
+              </RenderWhen>
             </div>
           );
         })}
-        <RenderWhen condition={!isNewFoodExistInFoodList}>
-          <div className={classNames(css.foodItem, css.new)}>
-            <div className={css.name}>{newFoodItem.title}</div>
-            <RenderWhen condition={newFoodItem?.sideDishes.length > 0}>
-              <div className={css.sideDishWrapper}>
-                có <span className={css.sideDish}>Món ăn kèm</span>
-              </div>
-            </RenderWhen>
-            <IconClose className={css.iconClose} />
-          </div>
-        </RenderWhen>
       </div>
     </div>
   );
