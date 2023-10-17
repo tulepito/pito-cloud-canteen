@@ -91,7 +91,7 @@ const QuizMealDate = () => {
       id="QuizMealDateModal"
       isOpen={!creatingOrderModalControl.value}
       modalTitle={intl.formatMessage({ id: 'QuizMealDate.title' })}
-      submitText="Tiếp tục"
+      submitText={hasOrderBefore ? 'Tìm nhà hàng' : 'Tiếp tục'}
       onSubmit={onFormSubmitClick}
       submitDisabled={formInvalid}
       modalContainerClassName={css.modalContainer}
