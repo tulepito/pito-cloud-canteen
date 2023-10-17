@@ -39,7 +39,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     const demandEndDeliveryTime = DateTime.fromISO(endDeliveryTime as string)
       .setZone(VNTimezone)
       .toMillis();
-
+    console.log('demandStartDeliveryTime', demandStartDeliveryTime);
+    console.log('demandEndDeliveryTime', demandEndDeliveryTime);
     let txs = [];
     if (NEXT_PUBLIC_ENV === 'production') {
       txs = await queryAllTransactions({
