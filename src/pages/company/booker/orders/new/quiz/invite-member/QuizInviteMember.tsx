@@ -29,6 +29,7 @@ const QuizInviteMember = () => {
     removeEmailValue,
     checkEmailList,
     onAddMembersSubmit,
+    addMembersInProgress,
   } = useAddMemberEmail();
 
   const {
@@ -66,9 +67,9 @@ const QuizInviteMember = () => {
             </div>
           </div>
         }
-        submitText="Tạo đơn hàng"
+        submitText="Tìm nhà hàng"
         onSubmit={onSubmit}
-        submitInProgress={submittingControl.value}
+        submitInProgress={submittingControl.value || addMembersInProgress}
         onBack={backStep}>
         <div className={css.formContainer}>
           <InviteMemberForm

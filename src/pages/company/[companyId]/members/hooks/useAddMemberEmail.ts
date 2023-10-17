@@ -19,6 +19,10 @@ export const useAddMemberEmail = () => {
     shallowEqual,
   );
 
+  const addMembersInProgress = useAppSelector(
+    (state) => state.companyMember.addMembersInProgress,
+  );
+
   useEffect(() => {
     if (checkedEmailInputChunk) {
       setLoadedResult(
@@ -66,5 +70,6 @@ export const useAddMemberEmail = () => {
     removeEmailValue,
     onAddMembersSubmit,
     checkEmailList,
+    addMembersInProgress,
   };
 };
