@@ -102,8 +102,10 @@ export const useQuizFlow = (step: string) => {
                   quizData: {
                     packagePerMember: quizData.packagePerMember,
                     memberAmount: quizData.memberAmount,
-                    daySession: submitQuizData.daySession,
-                    deliveryHour: submitQuizData.deliveryHour,
+                    daySession:
+                      submitQuizData?.daySession || quizData.daySession,
+                    deliveryHour:
+                      submitQuizData?.deliveryHour || quizData.deliveryHour,
                     mealStyles: quizData.mealStyles || [],
                     nutritions: quizData.nutritions || [],
                     mealType: quizData.mealType || [],
