@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import { intersection, isEmpty } from 'lodash';
@@ -29,6 +29,7 @@ import { parsePrice } from '@src/utils/validators';
 import {
   EFoodApprovalState,
   EFoodTypes,
+  EListingStates,
   EMenuTypes,
   ESlackNotificationType,
 } from '@utils/enums';
@@ -98,9 +99,7 @@ const EditPartnerFoodPage = () => {
     restaurantId: foodRestaurantId,
     isDraft: currentIsDraft,
   } = currentFoodListingGetter.getMetadata();
-  const isFoodDraftRef = useRef<boolean>(
-    foodId === NEW_FOOD_ID || (!!foodId && fromTab === 'draft'),
-  );
+  const { state: foodState } = currentFoodListingGetter.getAttributes();
 
   const moveableSteps =
     !title ||
@@ -162,8 +161,7 @@ const EditPartnerFoodPage = () => {
     dispatch(
       partnerFoodSliceThunks.fetchApprovalFoods(EFoodApprovalState.PENDING),
     );
-    console.log('isFoodDraftRef.current', isFoodDraftRef.current);
-    if (isFoodDraftRef.current) {
+    if (foodState === EListingStates.pendingApproval) {
       dispatch(
         partnerFoodSliceThunks.sendSlackNotification({
           foodId: foodId as string,
@@ -172,6 +170,12 @@ const EditPartnerFoodPage = () => {
             foodId: foodId as string,
             restaurantId: foodRestaurantId,
           },
+        }),
+      );
+      dispatch(
+        partnerFoodSliceThunks.updatePartnerFoodListing({
+          id: foodId as string,
+          state: EListingStates.published,
         }),
       );
     }
@@ -323,6 +327,30 @@ const EditPartnerFoodPage = () => {
     }
   };
 
+  const handleDesktopSubmit = async (values: TEditPartnerFoodFormValues) => {
+    const { payload: foodListing } = await dispatch(
+      partnerFoodSliceThunks.createPartnerFoodListing(
+        getSubmitFoodData({
+          ...values,
+          restaurantId: restaurantListingId,
+          isDraft: currentTab !== FOOD_ADDITIONAL_INFO_TAB,
+          state: EListingStates.published,
+        }),
+      ),
+    );
+
+    dispatch(partnerFoodSliceThunks.fetchDraftFood());
+
+    router.replace({
+      pathname: partnerPaths.EditFood,
+      query: {
+        foodId: foodListing.id.uuid,
+        tab: FOOD_DETAIL_INFO_TAB,
+        fromTab,
+      },
+    });
+  };
+
   useEffect(() => {
     if (restaurantId) {
       dispatch(partnerThunks.showPartnerRestaurantListing(restaurantId));
@@ -383,12 +411,14 @@ const EditPartnerFoodPage = () => {
       </div>
       <div className={css.desktopFormWrapper}>
         <EditPartnerFoodForm
-          onSubmit={handleSubmit}
-          inProgress={updateFoodInProgress}
+          onSubmit={handleDesktopSubmit}
+          inProgress={updateFoodInProgress || createFoodInProgress}
           disabled={uploadingImages || updateFoodInProgress}
           formError={updateFoodError}
           initialValues={initialValues}
-          isEditting
+          isEditting={
+            !isNewFood && foodState !== EListingStates.pendingApproval
+          }
         />
       </div>
       <PopupModal

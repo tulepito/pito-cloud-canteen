@@ -2,6 +2,7 @@
 /* eslint-disable unused-imports/no-unused-vars */
 import { types as sdkTypes } from '@helpers/sdkLoader';
 import { ListingTypes } from '@src/types/listingTypes';
+import type { EListingStates } from '@utils/enums';
 import {
   type EMenuTypes,
   EFoodApprovalState,
@@ -49,6 +50,7 @@ export type TEditPartnerFoodFormValues = {
   tempValue?: string;
   isDraft: boolean;
   adminApproval?: EFoodApprovalState;
+  state?: EListingStates;
 };
 
 export const getSubmitFoodData = (values: TEditPartnerFoodFormValues) => {
@@ -61,6 +63,7 @@ export const getSubmitFoodData = (values: TEditPartnerFoodFormValues) => {
     tempValue,
     restaurantId,
     isDraft,
+    state,
     ...rest
   } = values;
   const priceRemoveComma = price.toString().split('.');
@@ -72,6 +75,7 @@ export const getSubmitFoodData = (values: TEditPartnerFoodFormValues) => {
     title,
     ...(description && { description }),
     price: new Money(Number(parsePrice), 'VND'),
+    ...(state && { state }),
     publicData: {
       ...rest,
     },

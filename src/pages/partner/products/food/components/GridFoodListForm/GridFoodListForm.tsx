@@ -20,7 +20,6 @@ type TExtraProps = {
   foodList: TListing[];
   pagination: TPagination;
   editableFoodMap: Record<string, boolean>;
-  deletableFoodMap: Record<string, boolean>;
   foodApprovalActiveTab: string;
   getGridFoodListFormValues: (values: string[]) => void;
   onPageChange: (page: number) => void;
@@ -47,7 +46,6 @@ const GridFoodListFormComponent: React.FC<TGridFoodListFormComponentProps> = (
     openManipulateFoodModal,
     form,
     editableFoodMap,
-    deletableFoodMap,
     foodApprovalActiveTab,
   } = props;
 
@@ -92,7 +90,6 @@ const GridFoodListFormComponent: React.FC<TGridFoodListFormComponentProps> = (
             setSelectedFood={setSelectedFood!}
             openManipulateFoodModal={openManipulateFoodModal!}
             editableFoodMap={editableFoodMap!}
-            deletableFoodMap={deletableFoodMap!}
             foodApprovalActiveTab={foodApprovalActiveTab!}
           />
         ))}

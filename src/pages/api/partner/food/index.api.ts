@@ -75,7 +75,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         const response = await integrationSdk.listings.create(
           {
             ...dataParams,
-            state: EListingStates.published,
+            state: dataParams.state || EListingStates.pendingApproval,
             authorId: restaurant.author.id.uuid,
           },
           queryParams,

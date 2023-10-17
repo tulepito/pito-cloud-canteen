@@ -35,7 +35,6 @@ type TFoodCardProps = {
   name: string;
   food: TListing;
   editableFoodMap: Record<string, boolean>;
-  deletableFoodMap: Record<string, boolean>;
   foodApprovalActiveTab: string;
   setFoodToRemove: (params: any) => void;
   setSelectedFood: (food: TListing) => void;
@@ -64,7 +63,6 @@ const FoodCard: React.FC<TFoodCardProps> = (props) => {
     setSelectedFood,
     openManipulateFoodModal,
     editableFoodMap,
-    deletableFoodMap,
     foodApprovalActiveTab,
   } = props;
   const actionController = useBoolean();
@@ -171,10 +169,6 @@ const FoodCard: React.FC<TFoodCardProps> = (props) => {
   useEffect(() => {
     if (!editableFoodMap[foodId]) {
       dispatch(partnerFoodSliceThunks.fetchEditableFood(foodId));
-    }
-
-    if (!deletableFoodMap[foodId]) {
-      dispatch(partnerFoodSliceThunks.fetchDeletableFood(foodId));
     }
   }, [foodId]);
 

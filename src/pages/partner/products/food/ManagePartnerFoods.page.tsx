@@ -260,7 +260,6 @@ const ManagePartnerFoods = () => {
     totalDeclinedFoods,
     totalDraftFoods,
     editableFoodMap,
-    deletableFoodMap,
     menus,
   } = useAppSelector((state) => state.PartnerFood, shallowEqual);
 
@@ -574,7 +573,6 @@ const ManagePartnerFoods = () => {
         setSelectedFood={setSelectedFood}
         openManipulateFoodModal={manipulateFoodSlideModalController.setTrue}
         editableFoodMap={editableFoodMap}
-        deletableFoodMap={deletableFoodMap}
         foodApprovalActiveTab={foodApprovalActiveTab}
         initialValues={foodEnableInitialValues}
       />
@@ -628,7 +626,7 @@ const ManagePartnerFoods = () => {
     const selectedFoodListing = Listing(selectedFood);
     const foodName = selectedFoodListing.getAttributes().title;
     const foodId = selectedFoodListing.getId();
-    if (deletableFoodMap[foodId]) {
+    if (editableFoodMap[foodId]) {
       setFoodToRemove({ id: foodId, title: foodName });
     } else {
       cannotRemoveFoodModalController.setTrue();
@@ -932,8 +930,8 @@ const ManagePartnerFoods = () => {
           title={<FormattedMessage id="ManagePartnerFoods.removeTitle" />}
           isOpen={
             (foodToRemove || removeCheckedModalOpen) &&
-            (deletableFoodMap[foodToRemove?.id] ||
-              intersection(Object.keys(deletableFoodMap), idsToAction).length >
+            (editableFoodMap[foodToRemove?.id] ||
+              intersection(Object.keys(editableFoodMap), idsToAction).length >
                 0)
           }
           handleClose={
