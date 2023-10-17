@@ -99,7 +99,7 @@ const EditPartnerFoodPage = () => {
     isDraft: currentIsDraft,
   } = currentFoodListingGetter.getMetadata();
   const isFoodDraftRef = useRef<boolean>(
-    currentIsDraft !== undefined ? currentIsDraft : true,
+    foodId === NEW_FOOD_ID || (!!foodId && fromTab === 'draft'),
   );
 
   const moveableSteps =
@@ -162,6 +162,7 @@ const EditPartnerFoodPage = () => {
     dispatch(
       partnerFoodSliceThunks.fetchApprovalFoods(EFoodApprovalState.PENDING),
     );
+    console.log('isFoodDraftRef.current', isFoodDraftRef.current);
     if (isFoodDraftRef.current) {
       dispatch(
         partnerFoodSliceThunks.sendSlackNotification({
@@ -342,11 +343,6 @@ const EditPartnerFoodPage = () => {
   useEffect(() => {
     dispatch(resetImage());
   }, [dispatch]);
-
-  useEffect(() => {
-    isFoodDraftRef.current =
-      currentIsDraft !== undefined ? currentIsDraft : true;
-  }, [currentIsDraft]);
 
   const showError = showFoodError || showPartnerListingError;
 
