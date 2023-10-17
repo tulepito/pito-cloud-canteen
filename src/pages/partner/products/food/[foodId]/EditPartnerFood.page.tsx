@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import { intersection, isEmpty } from 'lodash';
@@ -98,6 +98,9 @@ const EditPartnerFoodPage = () => {
     restaurantId: foodRestaurantId,
     isDraft: currentIsDraft,
   } = currentFoodListingGetter.getMetadata();
+  const isFoodDraftRef = useRef<boolean>(
+    currentIsDraft !== undefined ? currentIsDraft : true,
+  );
 
   const moveableSteps =
     !title ||
@@ -159,7 +162,7 @@ const EditPartnerFoodPage = () => {
     dispatch(
       partnerFoodSliceThunks.fetchApprovalFoods(EFoodApprovalState.PENDING),
     );
-    if (isNewFood) {
+    if (isFoodDraftRef.current) {
       dispatch(
         partnerFoodSliceThunks.sendSlackNotification({
           foodId: foodId as string,
@@ -193,6 +196,7 @@ const EditPartnerFoodPage = () => {
         metadata: {
           adminApproval: EFoodApprovalState.PENDING,
         },
+        shouldShowToast: false,
       }),
     );
     await dispatch(
@@ -252,8 +256,7 @@ const EditPartnerFoodPage = () => {
 
     await dispatch(
       partnerFoodSliceThunks.updatePartnerFoodListing({
-        shouldShowToast:
-          currentAdminApproval === EFoodApprovalState.PENDING || false,
+        shouldShowToast: false,
         ...getUpdateFoodData({
           ...values,
           id: foodId as string,
@@ -339,6 +342,11 @@ const EditPartnerFoodPage = () => {
   useEffect(() => {
     dispatch(resetImage());
   }, [dispatch]);
+
+  useEffect(() => {
+    isFoodDraftRef.current =
+      currentIsDraft !== undefined ? currentIsDraft : true;
+  }, [currentIsDraft]);
 
   const showError = showFoodError || showPartnerListingError;
 
