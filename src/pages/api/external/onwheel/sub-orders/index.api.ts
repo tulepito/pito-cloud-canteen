@@ -36,9 +36,15 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       .setZone(VNTimezone)
       .toMillis();
 
-    const demandEndDeliveryTime = DateTime.fromISO(endDeliveryTime as string)
-      .setZone(VNTimezone)
-      .toMillis();
+    const demandEndDeliveryTime =
+      NEXT_PUBLIC_ENV === 'staging'
+        ? DateTime.fromISO(endDeliveryTime as string)
+            .setZone(VNTimezone)
+            .minus({ hours: 7 })
+            .toMillis()
+        : DateTime.fromISO(endDeliveryTime as string)
+            .setZone(VNTimezone)
+            .toMillis();
     console.log('demandStartDeliveryTime', demandStartDeliveryTime);
     console.log('demandEndDeliveryTime', demandEndDeliveryTime);
     let txs = [];
