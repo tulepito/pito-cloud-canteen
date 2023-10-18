@@ -132,6 +132,7 @@ const InviteMemberFormComponent: React.FC<TInviteMemberFormComponentProps> = (
       <FieldTextInput
         onKeyUp={handleKeyUp}
         onKeyDown={handleKeyDown}
+        customOnBlur={handleEmailFieldBlur}
         className={css.emailField}
         id="emailList"
         name="emailList"
