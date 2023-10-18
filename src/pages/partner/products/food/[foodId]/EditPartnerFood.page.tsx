@@ -210,8 +210,11 @@ const EditPartnerFoodPage = () => {
     await dispatch(
       partnerFoodSliceThunks.sendSlackNotification({
         foodId: foodId as string,
-        restaurantId: foodRestaurantId,
-        changeContent,
+        notificationType: ESlackNotificationType.UPDATE_FOOD,
+        params: {
+          restaurantId: foodRestaurantId,
+          changeContent,
+        },
       }),
     );
     reSendingApprovalToAdminModalController.setFalse();
