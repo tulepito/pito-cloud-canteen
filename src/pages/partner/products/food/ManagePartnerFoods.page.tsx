@@ -678,6 +678,24 @@ const ManagePartnerFoods = () => {
   }, [dispatch]);
 
   useEffect(() => {
+    if (foodApprovalActiveTab === ('draft' as EFoodApprovalState)) {
+      dispatch(partnerFoodSliceThunks.fetchDraftFood());
+    } else if (foodApprovalActiveTab === EFoodApprovalState.ACCEPTED) {
+      dispatch(
+        partnerFoodSliceThunks.fetchApprovalFoods(EFoodApprovalState.ACCEPTED),
+      );
+    } else if (foodApprovalActiveTab === EFoodApprovalState.PENDING) {
+      dispatch(
+        partnerFoodSliceThunks.fetchApprovalFoods(EFoodApprovalState.PENDING),
+      );
+    } else if (foodApprovalActiveTab === EFoodApprovalState.DECLINED) {
+      dispatch(
+        partnerFoodSliceThunks.fetchApprovalFoods(EFoodApprovalState.DECLINED),
+      );
+    }
+  }, [dispatch, foodApprovalActiveTab]);
+
+  useEffect(() => {
     dispatch(partnerFoodSliceThunks.fetchActiveMenus({}));
   }, [dispatch]);
 

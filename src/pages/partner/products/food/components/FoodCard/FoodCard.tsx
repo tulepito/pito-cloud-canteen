@@ -182,6 +182,7 @@ const FoodCard: React.FC<TFoodCardProps> = (props) => {
         labelClassName={css.checkboxLabel}
         textClassName={css.checkboxText}
         checkboxWrapperClassName={css.checkboxWrapper}
+        svgClassName={css.checkboxSvg}
       />
       <RenderWhen condition={!!isFoodAcceptedTab}>
         <Field id={`foodEnable-${foodId}`} name={`foodEnable-${foodId}`}>

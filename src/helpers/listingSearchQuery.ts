@@ -15,6 +15,7 @@ import {
 import type { EFoodApprovalState } from '@utils/enums';
 import {
   EImageVariants,
+  EListingStates,
   EListingType,
   EOrderStates,
   ERestaurantListingStatus,
@@ -306,6 +307,7 @@ export const getPartnerMenuQuery = (
     }),
     meta_listingType: EListingType.menu,
     meta_restaurantId: restaurantId,
+    meta_listingState: EListingStates.published,
     meta_isDeleted: false,
   };
 };

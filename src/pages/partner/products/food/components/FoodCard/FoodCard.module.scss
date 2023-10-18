@@ -18,6 +18,11 @@
     }
   }
 
+  .checkboxSvg {
+    width: 16px;
+    height: 16px;
+  }
+
   .actionsWrapper {
     position: absolute;
     bottom: 12px;
@@ -94,7 +99,7 @@
   }
 
   .content {
-    flex-basis: calc(100% - 112px);
+    flex-basis: calc(100% - 100px);
 
     .infoWrapper {
       .foodName {
@@ -144,7 +149,7 @@
   min-height: unset;
   position: absolute;
   bottom: 12px;
-  right: 40px;
+  right: 36px;
 
   @include textTemplate(14px, $fontWeightBold, 24px);
 }
