@@ -35,7 +35,11 @@ const BookerOrderDetailsRoute = () => {
   useEffect(() => {
     if (isReady && !isEmpty(orderId)) {
       const fetchOrderDetails = async () => {
-        await dispatch(orderManagementThunks.loadData(orderId as string));
+        dispatch(
+          orderManagementThunks.loadData({
+            orderId: orderId as string,
+          }),
+        );
         dispatch(OrderManagementsAction.resetDraftSubOrderChangeHistory());
       };
       fetchOrderDetails();

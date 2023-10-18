@@ -14,7 +14,6 @@ import {
 } from '@redux/slices/OrderManagement.slice';
 import { Listing } from '@src/utils/data';
 import { EOrderDetailTabs, EOrderStates } from '@src/utils/enums';
-import type { TListing } from '@src/utils/types';
 
 import OrderDetailTab from './tabs/OrderDetailTab/OrderDetailTab';
 import OrderPaymentStatusTab from './tabs/OrderPaymentStatusTab/OrderPaymentStatusTab';
@@ -30,14 +29,11 @@ const OrderDetailPage = () => {
   const [defaultActiveKey, setDefaultActiveKey] = useState<number>(1);
 
   const order = useAppSelector(
-    (state) => state.OrderManagement.orderData,
+    (state) => state.AdminManageOrder.order,
     shallowEqual,
   );
   const orderDetail = useAppSelector((state) => {
-    const planListing = state.OrderManagement.planData;
-    const { orderDetail = {} } = Listing(planListing as TListing).getMetadata();
-
-    return orderDetail;
+    return state.AdminManageOrder.orderDetail;
   }, shallowEqual);
   const company = useAppSelector(
     (state) => state.OrderManagement.companyData,
@@ -82,7 +78,12 @@ const OrderDetailPage = () => {
 
   useEffect(() => {
     if (orderId) {
-      dispatch(orderManagementThunks.loadData(orderId as string));
+      dispatch(
+        orderManagementThunks.loadData({
+          orderId: orderId as string,
+          isAdminFlow: true,
+        }),
+      );
     }
   }, [orderId]);
 

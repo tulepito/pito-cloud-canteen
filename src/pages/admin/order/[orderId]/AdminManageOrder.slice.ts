@@ -316,7 +316,12 @@ const updatePlanDetail = createAsyncThunk(
         return fulfillWithValue(orderDetail);
       }
       if (orderId) {
-        await dispatch(orderManagementThunks.loadData(orderId as string));
+        dispatch(
+          orderManagementThunks.loadData({
+            orderId: orderId as string,
+            isAdminFlow: true,
+          }),
+        );
       }
 
       return fulfillWithValue(null);
@@ -459,12 +464,15 @@ export const OrderDetailThunks = {
 };
 
 // ================ Slice ================ //
-const OrderDetailSlice = createSlice({
+const AdminManageOrderSlice = createSlice({
   name: 'AdminManageOrder',
   initialState,
   reducers: {
     saveOrder: (state, { payload }) => {
       state.order = payload;
+    },
+    saveOrderDetail: (state, { payload }) => {
+      state.orderDetail = payload;
     },
   },
   extraReducers: (builder) => {
@@ -656,7 +664,7 @@ const OrderDetailSlice = createSlice({
 });
 
 // ================ Actions ================ //
-export const OrderDetailActions = OrderDetailSlice.actions;
-export default OrderDetailSlice.reducer;
+export const AdminManageOrderActions = AdminManageOrderSlice.actions;
+export default AdminManageOrderSlice.reducer;
 
 // ================ Selectors ================ //

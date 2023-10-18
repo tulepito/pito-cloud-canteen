@@ -33,7 +33,11 @@ const CompanyOrderDetailRoute = () => {
 
   useEffect(() => {
     if (isReady && !isEmpty(orderId)) {
-      dispatch(orderManagementThunks.loadData(orderId as string));
+      dispatch(
+        orderManagementThunks.loadData({
+          orderId: orderId as string,
+        }),
+      );
     }
   }, [dispatch, isReady, orderId]);
 

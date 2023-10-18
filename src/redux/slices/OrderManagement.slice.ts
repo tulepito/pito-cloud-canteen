@@ -37,7 +37,7 @@ import {
   calculateClientQuotation,
   calculatePartnerQuotation,
 } from '@helpers/orderHelper';
-import { OrderDetailActions } from '@pages/admin/order/[orderId]/AdminManageOrder.slice';
+import { AdminManageOrderActions } from '@pages/admin/order/[orderId]/AdminManageOrder.slice';
 import { createAsyncThunk } from '@redux/redux.helper';
 import type { RootState } from '@redux/store';
 import type { NotificationInvitationParams } from '@services/notifications';
@@ -361,7 +361,13 @@ const loadData = createAsyncThunk(
     dispatch(SystemAttributesThunks.fetchVATPercentageByOrderId(orderId));
 
     if (isAdminFlow) {
-      dispatch(OrderDetailActions.saveOrder(response.data.orderListing));
+      const { orderListing: orderData = {}, planListing: planData = {} } =
+        response.data || {};
+
+      const { orderDetail = {} } = Listing(planData).getMetadata();
+
+      dispatch(AdminManageOrderActions.saveOrder(orderData));
+      dispatch(AdminManageOrderActions.saveOrderDetail(orderDetail));
     }
 
     return response.data;
