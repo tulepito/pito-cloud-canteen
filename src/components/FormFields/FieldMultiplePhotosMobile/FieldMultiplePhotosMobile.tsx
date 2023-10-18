@@ -201,12 +201,14 @@ const FieldMultiplePhotosMobile: React.FC<TFieldMultiplePhotosMobileProps> = (
                               file={image.file}
                               className={css.image}></ImageFromFile>
                             <RenderWhen.False>
-                              <ResponsiveImage
-                                rootClassName={css.image}
-                                image={image.uploadedImage}
-                                alt={''}
-                                variants={variants}
-                              />
+                              <div className={css.img}>
+                                <ResponsiveImage
+                                  rootClassName={css.image}
+                                  image={image.uploadedImage}
+                                  alt={''}
+                                  variants={variants}
+                                />
+                              </div>
                             </RenderWhen.False>
                           </RenderWhen>
                           <UploadImageError {...image} />

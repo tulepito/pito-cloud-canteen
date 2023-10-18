@@ -118,3 +118,14 @@
     stroke: $neutralGray6;
   }
 }
+
+.img {
+  display: block;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  background-color: $neutralGray1; /* Loading BG color */
+  padding-bottom: 100px;
+}
