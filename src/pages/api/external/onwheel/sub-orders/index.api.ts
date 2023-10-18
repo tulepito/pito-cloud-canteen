@@ -30,11 +30,15 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     const { startDeliveryTime, endDeliveryTime } = req.query;
     const integrationSdk = getIntegrationSdk();
 
-    const demandStartDeliveryTime = DateTime.fromISO(
-      startDeliveryTime as string,
-    )
-      .setZone(VNTimezone)
-      .toMillis();
+    const demandStartDeliveryTime =
+      NEXT_PUBLIC_ENV === 'staging'
+        ? DateTime.fromISO(startDeliveryTime as string)
+            .setZone(VNTimezone)
+            .minus({ hours: 7 })
+            .toMillis()
+        : DateTime.fromISO(startDeliveryTime as string)
+            .setZone(VNTimezone)
+            .toMillis();
 
     const demandEndDeliveryTime =
       NEXT_PUBLIC_ENV === 'staging'
