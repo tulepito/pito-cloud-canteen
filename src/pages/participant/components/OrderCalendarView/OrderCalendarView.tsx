@@ -1,3 +1,4 @@
+/* eslint-disable no-unneeded-ternary */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
 import type { Event, View } from 'react-big-calendar';
@@ -5,6 +6,7 @@ import { Views } from 'react-big-calendar';
 import Skeleton from 'react-loading-skeleton';
 import flatten from 'lodash/flatten';
 import { DateTime } from 'luxon';
+import { useRouter } from 'next/router';
 
 import Avatar from '@components/Avatar/Avatar';
 import BottomNavigationBar from '@components/BottomNavigationBar/BottomNavigationBar';
@@ -54,6 +56,8 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
     loadDataInProgress,
   } = props;
   const dispatch = useAppDispatch();
+  const router = useRouter();
+  const { openRatingModal, subOrderDate, viewMode } = router.query;
 
   const companyTitle = User(company).getPublicData().displayName;
   const ensureCompanyUser = User(company).getFullData();
@@ -229,7 +233,11 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
   const isValidLocalStorageView = ['month', 'week'].includes(
     localStorageView as View,
   );
-  const defaultView = isValidLocalStorageView ? localStorageView : Views.WEEK;
+  const defaultView = viewMode
+    ? viewMode
+    : isValidLocalStorageView
+    ? localStorageView
+    : Views.WEEK;
 
   const sectionCompanyBranding = loadDataInProgress ? (
     <div className={css.sectionCompanyBranding}>
@@ -269,6 +277,27 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
   useEffect(() => {
     dispatch(CalendarActions.setSelectedDay(null));
   }, []);
+
+  useEffect(() => {
+    if (subOrderDate) {
+      const selectedEventFromUrl = flattenEvents.find((_event: any) => {
+        const { resource } = _event;
+        const { timestamp } = resource;
+
+        return subOrderDate === `${timestamp}`;
+      });
+
+      if (selectedEventFromUrl) {
+        setSelectedEvent(selectedEventFromUrl);
+
+        if (openRatingModal === 'true') {
+          ratingSubOrderModalControl.setTrue();
+        } else {
+          dispatch(CalendarActions.setSelectedDay(new Date(+subOrderDate)));
+        }
+      }
+    }
+  }, [openRatingModal, subOrderDate]);
 
   return (
     <div className={css.container}>

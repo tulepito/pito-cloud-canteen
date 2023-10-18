@@ -6,8 +6,10 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { composeApiCheckers, HttpMethod } from '@apis/configs';
 import { CustomError, EHttpStatusCode } from '@apis/errors';
 import createQuotation from '@pages/api/orders/[orderId]/quotation/create-quotation.service';
+import { createFoodRatingNotificationScheduler } from '@services/awsEventBrigdeScheduler';
 import { emailSendingFactory, EmailTemplateTypes } from '@services/email';
 import { fetchListing } from '@services/integrationHelper';
+import { createNativeNotification } from '@services/nativeNotification';
 import { createFirebaseDocNotification } from '@services/notifications';
 import adminChecker from '@services/permissionChecker/admin';
 import { getIntegrationSdk, handleError } from '@services/sdk';
@@ -16,8 +18,12 @@ import {
   Listing,
   Transaction,
 } from '@src/utils/data';
-import { VNTimezone } from '@src/utils/dates';
-import { ENotificationType, EQuotationStatus } from '@src/utils/enums';
+import { formatTimestamp, VNTimezone } from '@src/utils/dates';
+import {
+  ENativeNotificationType,
+  ENotificationType,
+  EQuotationStatus,
+} from '@src/utils/enums';
 import { isTransactionsTransitionInvalidTransition } from '@src/utils/errors';
 import { ETransition } from '@src/utils/transaction';
 import type { TError } from '@src/utils/types';
@@ -25,6 +31,9 @@ import type { TError } from '@src/utils/types';
 import { modifyPaymentWhenCancelSubOrderService } from '../payment/modify-payment-when-cancel-sub-order.service';
 
 import { transitionOrderStatus } from './transition-order-status.service';
+
+const TIME_TO_SEND_FOOD_RATING_NOTIFICATION =
+  process.env.TIME_TO_SEND_FOOD_RATING_NOTIFICATION || '30';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
@@ -65,7 +74,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
         const tx = denormalisedResponseEntities(txResponse)[0];
         const txGetter = Transaction(tx);
-        const { participantIds = [], orderId } = txGetter.getMetadata();
+        const {
+          participantIds = [],
+          orderId,
+          anonymous = [],
+        } = txGetter.getMetadata();
         const { booking, listing } = txGetter.getFullData();
         const listingGetter = Listing(listing);
         const restaurantId = listingGetter.getId();
@@ -94,6 +107,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         const planId = planListing.getId();
 
         const { orderDetail = {} } = planListing.getMetadata();
+        const { memberOrders = {}, restaurant = {} } =
+          orderDetail[startTimestamp];
+        const { foodList = {} } = restaurant;
 
         const updatePlanListing = async (lastTransition: string) => {
           const newOrderDetail = {
@@ -113,21 +129,64 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         };
 
         if (transition === ETransition.START_DELIVERY) {
-          participantIds.map(async (participantId: string) => {
+          [...participantIds, ...anonymous].forEach((participantId: string) => {
             createFirebaseDocNotification(ENotificationType.ORDER_DELIVERING, {
               ...generalNotificationData,
               userId: participantId,
             });
+
+            const { foodId } = memberOrders[participantId] || {};
+
+            if (foodId) {
+              const { foodName = '' } = foodList[foodId];
+              createNativeNotification(
+                ENativeNotificationType.AdminTransitSubOrderToDelivering,
+                {
+                  participantId,
+                  planId,
+                  subOrderDate: startTimestamp.toString(),
+                  foodName,
+                },
+              );
+            }
           });
 
           await updatePlanListing(ETransition.START_DELIVERY);
         }
         if (transition === ETransition.COMPLETE_DELIVERY) {
-          participantIds.map(async (participantId: string) => {
+          [...participantIds, ...anonymous].forEach((participantId: string) => {
             createFirebaseDocNotification(ENotificationType.ORDER_SUCCESS, {
               ...generalNotificationData,
               userId: participantId,
             });
+            const { foodId } = memberOrders[participantId] || {};
+
+            if (foodId) {
+              const { foodName = '' } = foodList[foodId];
+              createNativeNotification(
+                ENativeNotificationType.AdminTransitSubOrderToDelivered,
+                {
+                  participantId,
+                  planId,
+                  subOrderDate: startTimestamp.toString(),
+                  foodName,
+                },
+              );
+            }
+          });
+          createFoodRatingNotificationScheduler({
+            customName: `sendFRN_${orderId}_${startTimestamp}`,
+            timeExpression: formatTimestamp(
+              DateTime.now().setZone(VNTimezone).toMillis() +
+                +TIME_TO_SEND_FOOD_RATING_NOTIFICATION * 60 * 1000,
+              "yyyy-MM-dd'T'hh:mm:ss",
+            ),
+            params: {
+              orderId,
+              participantIds,
+              subOrderDate: startTimestamp,
+              planId,
+            },
           });
           await transitionOrderStatus(order, plan, integrationSdk);
           await updatePlanListing(ETransition.COMPLETE_DELIVERY);
@@ -142,15 +201,26 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             },
           );
 
-          participantIds.forEach((participantId: string) => {
-            emailSendingFactory(
-              EmailTemplateTypes.PARTICIPANT.PARTICIPANT_SUB_ORDER_CANCELED,
-              {
-                orderId,
-                timestamp,
-                participantId,
-              },
-            );
+          [...participantIds, ...anonymous].forEach((participantId: string) => {
+            const { foodId } = memberOrders[participantId] || {};
+            if (foodId) {
+              emailSendingFactory(
+                EmailTemplateTypes.PARTICIPANT.PARTICIPANT_SUB_ORDER_CANCELED,
+                {
+                  orderId,
+                  timestamp,
+                  participantId,
+                },
+              );
+              createNativeNotification(
+                ENativeNotificationType.AdminTransitSubOrderToCanceled,
+                {
+                  participantId,
+                  planId,
+                  subOrderDate: startTimestamp.toString(),
+                },
+              );
+            }
           });
 
           // Function is not ready on production
@@ -166,12 +236,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             );
           }
 
-          participantIds.map(async (participantId: string) => {
-            createFirebaseDocNotification(ENotificationType.ORDER_CANCEL, {
-              ...generalNotificationData,
-              userId: participantId,
-            });
-          });
+          [...participantIds, ...anonymous].map(
+            async (participantId: string) => {
+              createFirebaseDocNotification(ENotificationType.ORDER_CANCEL, {
+                ...generalNotificationData,
+                userId: participantId,
+              });
+            },
+          );
 
           const quotation = await fetchListing(quotationId);
           const quotationListing = Listing(quotation);

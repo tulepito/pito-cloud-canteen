@@ -1,5 +1,6 @@
 import { addDays, min, subDays } from 'date-fns';
 import isEmpty from 'lodash/isEmpty';
+import uniq from 'lodash/uniq';
 import { DateTime } from 'luxon';
 
 import {
@@ -619,4 +620,21 @@ export const calculatePartnerQuotation = (
       },
     };
   }, {});
+};
+
+export const getPickFoodParticipants = (orderDetail: TObject) => {
+  const shouldSendNativeNotificationParticipantIdList = Object.entries(
+    orderDetail,
+  ).reduce<string[]>((acc, [, subOrder]: any) => {
+    const { memberOrders } = subOrder;
+    const memberHasPickFood = Object.keys(memberOrders).filter(
+      (memberId: string) => {
+        return memberOrders[memberId].foodId;
+      },
+    );
+
+    return uniq([...acc, ...memberHasPickFood]);
+  }, []);
+
+  return shouldSendNativeNotificationParticipantIdList;
 };

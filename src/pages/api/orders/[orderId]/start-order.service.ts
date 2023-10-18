@@ -1,10 +1,12 @@
+import { getPickFoodParticipants } from '@helpers/orderHelper';
 import { denormalisedResponseEntities } from '@services/data';
 import { emailSendingFactory, EmailTemplateTypes } from '@services/email';
 import getSystemAttributes from '@services/getSystemAttributes';
 import { fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
+import { createNativeNotification } from '@services/nativeNotification';
 import { Listing, User } from '@utils/data';
-import { EOrderStates } from '@utils/enums';
+import { ENativeNotificationType, EOrderStates } from '@utils/enums';
 
 export const startOrder = async (orderId: string, planId: string) => {
   const integrationSdk = getIntegrationSdk();
@@ -49,21 +51,38 @@ export const startOrder = async (orderId: string, planId: string) => {
     },
   });
 
-  await integrationSdk.listings.update({
-    id: planId,
-    metadata: {
-      partnerIds,
-    },
-  });
+  const [plan] = denormalisedResponseEntities(
+    await integrationSdk.listings.update(
+      {
+        id: planId,
+        metadata: {
+          partnerIds,
+        },
+      },
+      {
+        expand: true,
+      },
+    ),
+  );
+  const planListing = Listing(plan);
+  const { orderDetail = {} } = planListing.getMetadata();
 
-  await integrationSdk.listings.update({
-    id: planId,
-    metadata: {
-      partnerIds,
-    },
-  });
+  const shouldSendNativeNotificationParticipantIdList =
+    getPickFoodParticipants(orderDetail);
 
   emailSendingFactory(EmailTemplateTypes.BOOKER.BOOKER_ORDER_SUCCESS, {
     orderId,
   });
+
+  shouldSendNativeNotificationParticipantIdList.map(
+    async (participantId: string) => {
+      createNativeNotification(
+        ENativeNotificationType.BookerTransitOrderStateToInProgress,
+        {
+          participantId,
+          order: orderListing,
+        },
+      );
+    },
+  );
 };
