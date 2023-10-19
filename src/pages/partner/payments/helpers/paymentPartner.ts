@@ -24,7 +24,10 @@ export const filterPayments = (paymentRecords: any[], filterList: TObject) => {
           .toLocaleLowerCase()
           .includes(subOrderName.toLocaleLowerCase())) &&
       (isEmpty(orderTitle) ||
-        `${item.data.orderTitle}`
+        `#${item.data.orderTitle}`
+          .toLocaleLowerCase()
+          .includes(orderTitle.toLocaleLowerCase()) ||
+        `${item.data.subOrderTitle}`
           .toLocaleLowerCase()
           .includes(orderTitle.toLocaleLowerCase())) &&
       isValidWithStartDateMaybe &&
