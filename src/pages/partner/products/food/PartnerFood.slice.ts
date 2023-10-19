@@ -23,7 +23,6 @@ import {
 } from '@apis/partnerApi';
 import {
   getPartnerDraftFoodQuery,
-  getPartnerFoodByApprovalStatusQuery,
   getPartnerMenuQuery,
 } from '@helpers/listingSearchQuery';
 import { getImportDataFromCsv } from '@pages/admin/partner/[restaurantId]/settings/food/utils';
@@ -568,29 +567,26 @@ const fetchAttributes = createAsyncThunk(FETCH_ATTRIBUTES, async () => {
 
 const fetchApprovalFoods = createAsyncThunk(
   FETCH_APPROVAL_FOODS,
-  async (status: EFoodApprovalState, { extra: sdk, getState }) => {
-    const { currentUser } = getState().user;
-    const currentUserGetter = CurrentUser(currentUser!);
-    const { restaurantListingId } = currentUserGetter.getMetadata();
-    const foodQuery = getPartnerFoodByApprovalStatusQuery(
-      status,
-      restaurantListingId,
-    );
-    const response = await sdk.listings.query(foodQuery);
-    const { totalItems } = response.data.meta;
+  async (status: EFoodApprovalState) => {
+    const { data: response } = await queryPartnerFoodsApi({
+      adminApproval: status,
+      isDraft: false,
+      perPage: 100,
+    });
+    const { foodList, managePartnerFoodPagination: totalItems } = response;
 
     return {
       ...(status === EFoodApprovalState.ACCEPTED && {
-        acceptedFoods: denormalisedResponseEntities(response),
-        totalAcceptedFoods: totalItems,
+        acceptedFoods: foodList,
+        totalAcceptedFoods: totalItems.totalItems,
       }),
       ...(status === EFoodApprovalState.PENDING && {
-        pendingFoods: denormalisedResponseEntities(response),
-        totalPendingFoods: totalItems,
+        pendingFoods: foodList,
+        totalPendingFoods: totalItems.totalItems,
       }),
       ...(status === EFoodApprovalState.DECLINED && {
-        declinedFoods: denormalisedResponseEntities(response),
-        totalDeclinedFoods: totalItems,
+        declinedFoods: foodList,
+        totalDeclinedFoods: totalItems.totalItems,
       }),
     };
   },

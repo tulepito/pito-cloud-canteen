@@ -444,6 +444,7 @@ const ManagePartnerFoods = () => {
   useEffect(() => {
     onQueryPartnerFood({
       page,
+      perPage: isMobileLayout ? 100 : undefined,
       ...(foodType ? { foodType } : {}),
       ...(createAtStart ? { createAtStart } : {}),
       ...(createAtEnd ? { createAtEnd } : {}),

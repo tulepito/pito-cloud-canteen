@@ -31,6 +31,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           page = 1,
           adminApproval,
           isDraft,
+          perPage,
         } = JSON.parse(JSONParams as string);
         const { restaurantListingId } = currentUserGetter.getMetadata();
 
@@ -47,7 +48,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           meta_listingType: EListingType.food,
           meta_restaurantId: restaurantId || restaurantListingId,
           meta_isDeleted: false,
-          perPage: MANAGE_FOOD_PAGE_SIZE,
+          perPage: perPage || MANAGE_FOOD_PAGE_SIZE,
           ...(adminApproval && {
             meta_adminApproval: adminApproval,
           }),
