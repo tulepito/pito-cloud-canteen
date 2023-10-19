@@ -19,10 +19,10 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { companyMemberThunks } from '@redux/slices/companyMember.slice';
 import { adminPaths } from '@src/paths';
-import { UserPermission } from '@src/types/UserPermission';
 import { formatTimestamp } from '@src/utils/dates';
 import {
   CONFIGS_BASE_ON_PAYMENT_STATUS,
+  ECompanyPermission,
   EOrderDetailTabs,
   EOrderPaymentStatus,
 } from '@src/utils/enums';
@@ -211,8 +211,8 @@ const AdminManageClientPaymentsPage = () => {
 
   const companyBookers = companyMembers.filter(
     (member) =>
-      member.permission === UserPermission.OWNER ||
-      member.permission === UserPermission.BOOKER,
+      member.permission === ECompanyPermission.owner ||
+      member.permission === ECompanyPermission.booker,
   );
 
   const title = intl.formatMessage({

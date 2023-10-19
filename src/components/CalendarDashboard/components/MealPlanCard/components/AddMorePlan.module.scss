@@ -12,42 +12,42 @@
     @include textTemplate(14px, 700, 14px, '');
     border-radius: 8px;
     background-color: $neutralGray1;
-    border: 1px solid $neutralGray4;
-    color: $neutralGray6;
+    border: 1px solid $neutralGray5;
+    color: $neutralGray7;
 
     &:hover {
       background-color: $neutralGray1;
-      color: $neutralGray6;
-      border-color: $neutralGray6;
+      color: $neutralGray7;
+      border-color: $neutralGray7;
 
       path {
-        fill: $neutralGray6;
+        fill: $neutralGray7;
       }
     }
 
     &:active,
     &:focus {
       background-color: $neutralGray1;
-      color: $neutralGray6;
+      color: $neutralGray7;
     }
 
     .plusIcon {
       margin-right: 10px;
       & path {
-        fill: $neutralGray6;
+        fill: $neutralGray7;
       }
     }
   }
 
   .haveNoMeal {
-    color: $neutralGray5;
+    color: $neutralGray6;
     @include textTemplate(12px, 400, 16px, '');
     text-align: center;
   }
 
   .spinner {
     display: block;
-    stroke: $neutralGray6;
+    stroke: $neutralGray7;
     margin: 0 auto 10px;
   }
 }

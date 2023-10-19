@@ -48,7 +48,7 @@
 .restaurantName {
   @include textTemplate(16px, 700, 24px);
   @include lineClamp(1, 24px);
-  color: $neutralGray6;
+  color: $neutralGray7;
   margin-right: 20px;
   margin: 0 20px 0 0;
   cursor: pointer;
@@ -112,7 +112,7 @@
 
 .footerItemIcon {
   & > g > path {
-    fill: $neutralGray6;
+    fill: $neutralGray7;
   }
 }
 

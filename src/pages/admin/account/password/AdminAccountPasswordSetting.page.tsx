@@ -1,8 +1,8 @@
 import React from 'react';
 
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { adminAccountSettingThunks } from '@redux/slices/adminAccountSetting.slice';
 import { NotificationSliceAction } from '@redux/slices/notificationPopup.slice';
+import { passwordThunks } from '@redux/slices/password.slice';
 
 import PageHeader from '../components/PageHeader/PageHeader';
 
@@ -11,16 +11,19 @@ import AdminAccountResetPasswordForm from './AdminAccountResetPasswordForm/Admin
 
 const AdminAccountPasswordSettingPage = () => {
   const dispatch = useAppDispatch();
-  const { changingPassword, changePasswordError } = useAppSelector(
-    (state) => state.adminAccountSetting,
+  const changePasswordInProgress = useAppSelector(
+    (state) => state.password.changePasswordInProgress,
+  );
+  const changePasswordError = useAppSelector(
+    (state) => state.password.changePasswordError,
   );
 
-  const onSubmit = async ({
+  const handleSubmit = async ({
     currentPassword,
     newPassword,
   }: TAdminAccountResetPasswordFormValues) => {
     const { payload } = await dispatch(
-      adminAccountSettingThunks.adminChangePassword({
+      passwordThunks.changePassword({
         currentPassword,
         newPassword,
       }),
@@ -44,8 +47,8 @@ const AdminAccountPasswordSettingPage = () => {
         <span>Mật khẩu</span>
       </PageHeader>
       <AdminAccountResetPasswordForm
-        inProgress={changingPassword}
-        onSubmit={onSubmit}
+        inProgress={changePasswordInProgress}
+        onSubmit={handleSubmit}
         changePasswordError={changePasswordError}
       />
     </div>

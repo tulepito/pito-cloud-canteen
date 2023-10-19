@@ -1,8 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
+import Skeleton from 'react-loading-skeleton';
 
 import Collapsible from '@components/Collapsible/Collapsible';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { Listing, User } from '@src/utils/data';
 import { formatTimestamp } from '@src/utils/dates';
@@ -16,6 +18,9 @@ const TrackingDeliveryInfo: React.FC<TTrackingDeliveryInfoProps> = ({
   subOrderDate,
 }) => {
   const intl = useIntl();
+  const loadDataInProgress = useAppSelector(
+    (state) => state.TrackingPage.loadDataInProgress,
+  );
   const order = useAppSelector((state) => state.TrackingPage.order);
 
   const { booker } = order || {};
@@ -82,7 +87,12 @@ const TrackingDeliveryInfo: React.FC<TTrackingDeliveryInfoProps> = ({
               <div className={css.label}>
                 {index + 1}. {label}
               </div>
-              <div className={css.value}>{value}</div>
+              <RenderWhen condition={loadDataInProgress}>
+                <Skeleton key={index} className={css.rowDataLoading} />
+                <RenderWhen.False>
+                  <div className={css.value}>{value}</div>
+                </RenderWhen.False>
+              </RenderWhen>
             </div>
           );
         })}

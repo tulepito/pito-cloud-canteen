@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { shallowEqual } from 'react-redux';
 import { useRouter } from 'next/router';
 
@@ -10,7 +10,6 @@ import { userThunks } from '@redux/slices/user.slice';
 import { participantPaths } from '@src/paths';
 import { User } from '@src/utils/data';
 
-import { AccountThunks } from '../Account.slice';
 import type { TSpecialDemandFormValues } from '../components/SpecialDemandForm/SpecialDemandForm';
 import SpecialDemandForm from '../components/SpecialDemandForm/SpecialDemandForm';
 import SpecialDemandModal from '../components/SpecialDemandModal/SpecialDemandModal';
@@ -25,20 +24,15 @@ const SpecialDemandPage: React.FC = () => {
   const currentUserGetter = User(currentUser!);
   const { allergies = [], nutritions = [] } = currentUserGetter.getPublicData();
   const updateSpecialDemandInProgress = useAppSelector(
-    (state) => state.ParticipantAccount.updateSpecialDemandInProgress,
+    (state) => state.user.updateProfileInProgress,
   );
 
   const nutritionOptions = useAppSelector(
-    (state) => state.ParticipantAccount.nutritions,
+    (state) => state.SystemAttributes.nutritions,
     shallowEqual,
   );
 
-  useEffect(() => {
-    dispatch(AccountThunks.fetchAttributes());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const goBack = () => {
+  const handleGoBack = () => {
     router.push(participantPaths.Account);
   };
 
@@ -48,16 +42,11 @@ const SpecialDemandPage: React.FC = () => {
     [JSON.stringify(allergies), JSON.stringify(nutritions)],
   );
   const handleSubmit = async (values: TSpecialDemandFormValues) => {
-    const { meta: updateSpecialDemandMeta } = await dispatch(
-      AccountThunks.updateSpecialDemand(values),
+    const { meta } = await dispatch(
+      userThunks.updateProfile({ publicData: { ...values } }),
     );
-    const { meta: fetchCurrentUserMeta } = await dispatch(
-      userThunks.fetchCurrentUser(),
-    );
-    if (
-      updateSpecialDemandMeta.requestStatus === 'fulfilled' &&
-      fetchCurrentUserMeta.requestStatus === 'fulfilled'
-    ) {
+
+    if (meta.requestStatus === 'fulfilled') {
       updateSpecialDemandSuccessModalControl.setTrue();
     }
   };
@@ -79,7 +68,7 @@ const SpecialDemandPage: React.FC = () => {
       <div className={css.mobileView}>
         <SpecialDemandModal
           isOpen={true}
-          onClose={goBack}
+          onClose={handleGoBack}
           nutritionOptions={nutritionOptions}
           handleSubmit={handleSubmit}
           currentUser={currentUser!}

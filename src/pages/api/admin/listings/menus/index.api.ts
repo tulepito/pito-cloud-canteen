@@ -7,7 +7,7 @@ import cookies from '@services/cookie';
 import adminChecker from '@services/permissionChecker/admin';
 import { handleError } from '@services/sdk';
 import { addWeeksToDate } from '@src/utils/dates';
-import { EMenuTypes } from '@src/utils/enums';
+import { EMenuType } from '@src/utils/enums';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
@@ -49,7 +49,7 @@ const handlerWrapper = (req: NextApiRequest, res: NextApiResponse) => {
         restaurantId,
       } = dataParams;
 
-      const isCycleMenu = menuType === EMenuTypes.cycleMenu;
+      const isCycleMenu = menuType === EMenuType.cycleMenu;
       const endDate = isCycleMenu
         ? addWeeksToDate(new Date(startDate), numberOfCycles).getTime()
         : endDateFromParams;

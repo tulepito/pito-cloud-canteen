@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useMemo, useState } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
@@ -63,6 +64,7 @@ const EditOrderRowFormComponent: React.FC<TEditOrderRowFormComponentProps> = (
         key: f.foodId,
         label: shortenString(f.foodName, 16),
       })),
+
     [JSON.stringify(foodOptions)],
   );
 
@@ -77,12 +79,9 @@ const EditOrderRowFormComponent: React.FC<TEditOrderRowFormComponentProps> = (
   }, [requirement]);
 
   useEffect(() => {
-    if (isRequirementInputShow) {
-      setCurrentRequirementFieldActionText(hideRequirementText);
-    } else {
-      setCurrentRequirementFieldActionText(showRequirementText);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    setCurrentRequirementFieldActionText(
+      isRequirementInputShow ? hideRequirementText : showRequirementText,
+    );
   }, [isRequirementInputShow]);
 
   return (

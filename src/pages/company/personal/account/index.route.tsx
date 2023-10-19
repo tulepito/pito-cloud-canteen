@@ -1,5 +1,11 @@
+import MetaWrapper from '@components/MetaWrapper/MetaWrapper';
+
 import PersonalAccountPage from './PersonalAccount.page';
 
 export default function PersonalAccountPageRoute() {
-  return <PersonalAccountPage />;
+  return (
+    <MetaWrapper>
+      <PersonalAccountPage />;
+    </MetaWrapper>
+  );
 }

@@ -3,7 +3,7 @@ import classNames from 'classnames';
 
 import { useAppSelector } from '@hooks/reduxHooks';
 import { Listing } from '@utils/data';
-import type { TDefaultProps } from '@utils/types';
+import type { TDefaultProps, TKeyValue } from '@utils/types';
 
 import css from './RestaurantTable.module.scss';
 
@@ -33,7 +33,7 @@ const RestaurantRow: React.FC<TRestaurantRowProps> = (props) => {
     disabledSelectRestaurant = false,
   } = props;
   const categoryOptions = useAppSelector(
-    (state) => state.BookerSelectRestaurant.categories,
+    (state) => state.SystemAttributes.categories,
   );
 
   const itemClasses = classNames(rootClassName || css.item, className);
@@ -41,7 +41,9 @@ const RestaurantRow: React.FC<TRestaurantRowProps> = (props) => {
   const categoriesContent = categories
     ? categories
         .map((cat: string) => {
-          const category = categoryOptions.find((item) => item.key === cat);
+          const category = categoryOptions.find(
+            (item: TKeyValue) => item.key === cat,
+          );
 
           return category?.label || undefined;
         })

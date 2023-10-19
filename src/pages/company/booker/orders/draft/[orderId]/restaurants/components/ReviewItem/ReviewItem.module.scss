@@ -16,7 +16,7 @@
 .reviewWrapper {
   .reviewerName {
     @include textTemplate(12px, $fontWeightSemiBold, 16px);
-    color: $neutralGray5;
+    color: $neutralGray6;
   }
 
   .generalRating {
@@ -33,12 +33,12 @@
       height: 16px;
 
       path {
-        fill: $neutralGray6;
+        fill: $neutralGray7;
       }
     }
 
     .label {
-      color: $neutralGray5;
+      color: $neutralGray6;
       margin-left: 7px;
     }
 
@@ -50,7 +50,7 @@
   .textReview {
     margin-top: 8px;
     @include textTemplate(14px, $fontWeightRegular, 20px);
-    color: $neutralGray5;
+    color: $neutralGray6;
 
     span {
       font-weight: $fontWeightSemiBold;
@@ -58,7 +58,7 @@
   }
 
   .detailTextRating {
-    color: $neutralGray6;
+    color: $neutralGray7;
     margin-top: 16px;
   }
 
@@ -69,6 +69,6 @@
   .reviewAt {
     margin-top: 8px;
     @include textTemplate(12px, $fontWeightRegular, 16px);
-    color: $neutralGray5;
+    color: $neutralGray6;
   }
 }

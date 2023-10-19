@@ -21,6 +21,7 @@ const CompanyDetailPage = () => {
 
   useEffect(() => {
     if (isReady) dispatch(companyThunks.companyInfo());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isReady]);
 
   if (isCompanyNotFound) {

@@ -1,5 +1,6 @@
 import type { NextApiHandler, NextApiRequest, NextApiResponse } from 'next';
 
+import { EHttpStatusCode } from '@apis/errors';
 import { getSdk, handleError } from '@services/sdk';
 import { denormalisedResponseEntities } from '@src/utils/data';
 
@@ -11,8 +12,9 @@ const participantChecker =
       const currentUser = denormalisedResponseEntities(
         await sdk.currentUser.show(),
       );
+
       if (!currentUser) {
-        return res.status(401).json({
+        return res.status(EHttpStatusCode.Unauthorized).json({
           message: "You don't have permission to access this api!",
         });
       }

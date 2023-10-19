@@ -14,7 +14,7 @@
 .uploadImageLabel {
   @include flexAlign(center);
   flex-direction: column;
-  border: 1px dashed $neutralGray4;
+  border: 1px dashed $neutralGray5;
   border-radius: 12px;
   padding: 24px;
 
@@ -25,7 +25,7 @@
 
   .secondText {
     @include textTemplate(12px, $fontWeightRegular, 20px);
-    color: $neutralGray5;
+    color: $neutralGray6;
   }
 }
 

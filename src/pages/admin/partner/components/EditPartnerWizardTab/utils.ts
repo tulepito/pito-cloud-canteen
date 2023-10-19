@@ -1,6 +1,7 @@
 import { ALL_WEEK_APPLY } from '@components/FormFields/FieldAvailability/FieldAvailability';
+import { OTHER_OPTION } from '@src/utils/options';
 import { getDefaultTimeZoneOnBrowser } from '@utils/dates';
-import { EDayOfWeek, EPartnerVATSetting, OTHER_OPTION } from '@utils/enums';
+import { EDayOfWeek, EPartnerVATSetting } from '@utils/enums';
 import type { TAvailabilityPlan, TOwnListing } from '@utils/types';
 
 export const defaultTimeZone = () =>

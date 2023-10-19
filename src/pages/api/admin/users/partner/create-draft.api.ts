@@ -29,7 +29,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       {
         ...listingDataParams,
         authorId: createdPartner?.id?.uuid,
-        state: 'published',
+        state: EListingStates.published,
         metadata: {
           listingState: EListingStates.draft,
           listingType: EListingType.restaurant,

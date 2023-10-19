@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-shadow */
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useCallback, useEffect, useState } from 'react';
 import { shallowEqual } from 'react-redux';
 import compact from 'lodash/compact';
@@ -10,10 +12,11 @@ import { orderManagementThunks } from '@redux/slices/OrderManagement.slice';
 import { Listing } from '@src/utils/data';
 import { EOrderDetailTabs, EOrderStates } from '@src/utils/enums';
 
+import { AdminManageOrderThunks } from '../AdminManageOrder.slice';
+
 import OrderDetailTab from './tabs/OrderDetailTab/OrderDetailTab';
 import OrderPaymentStatusTab from './tabs/OrderPaymentStatusTab/OrderPaymentStatusTab';
 import OrderQuotationTab from './tabs/OrderQuotationTab/OrderQuotationTab';
-import { OrderDetailThunks } from './OrderDetail.slice';
 
 import css from './OrderDetail.module.scss';
 
@@ -24,47 +27,41 @@ const OrderDetailPage = () => {
   const [defaultActiveKey, setDefaultActiveKey] = useState<number>(1);
 
   const order = useAppSelector(
-    (state) => state.OrderDetail.order,
+    (state) => state.AdminManageOrder.order,
     shallowEqual,
   );
-
-  const orderDetail = useAppSelector(
-    (state) => state.OrderDetail.orderDetail,
-    shallowEqual,
-  );
+  const orderDetail = useAppSelector((state) => {
+    return state.AdminManageOrder.orderDetail;
+  }, shallowEqual);
   const company = useAppSelector(
-    (state) => state.OrderDetail.company,
+    (state) => state.OrderManagement.companyData,
     shallowEqual,
   );
-
   const booker = useAppSelector(
-    (state) => state.OrderDetail.booker,
+    (state) => state.OrderManagement.bookerData,
     shallowEqual,
   );
-
-  const transactionDataMap = useAppSelector(
-    (state) => state.OrderDetail.transactionDataMap,
-  );
-
   const fetchOrderInProgress = useAppSelector(
-    (state) => state.OrderDetail.fetchOrderInProgress,
+    (state) =>
+      state.AdminManageOrder.fetchOrderInProgress ||
+      state.OrderManagement.fetchOrderInProgress,
   );
 
   const updateOrderStaffNameInProgress = useAppSelector(
-    (state) => state.OrderDetail.updateOrderStaffNameInProgress,
+    (state) => state.AdminManageOrder.updateOrderStaffNameInProgress,
   );
 
   const updateOrderStateInProgress = useAppSelector(
-    (state) => state.OrderDetail.updateOrderStateInProgress,
+    (state) => state.AdminManageOrder.updateOrderStateInProgress,
   );
 
   const quotations = useAppSelector(
-    (state) => state.OrderDetail.quotations,
+    (state) => state.AdminManageOrder.quotations,
     shallowEqual,
   );
 
   const quotationsPagination = useAppSelector(
-    (state) => state.OrderDetail.quotationsPagination,
+    (state) => state.AdminManageOrder.quotationsPagination,
     shallowEqual,
   );
 
@@ -85,25 +82,24 @@ const OrderDetailPage = () => {
           isAdminFlow: true,
         }),
       );
-      dispatch(OrderDetailThunks.fetchOrder(orderId as string));
     }
-  }, [dispatch, orderId]);
+  }, [orderId]);
 
   const updateStaffName = useCallback(
     (staffName: string) => {
       dispatch(
-        OrderDetailThunks.updateStaffName({
+        AdminManageOrderThunks.updateStaffName({
           orderId: orderId as string,
           staffName,
         }),
       );
     },
-    [dispatch, orderId],
+    [orderId],
   );
 
-  const updateOrderState = async (newOrderState: string) => {
+  const handleUpdateOrderState = async (newOrderState: string) => {
     await dispatch(
-      OrderDetailThunks.updateOrderState({
+      AdminManageOrderThunks.updateOrderState({
         orderId: orderId as string,
         orderState: newOrderState,
       }),
@@ -117,7 +113,7 @@ const OrderDetailPage = () => {
     );
   };
 
-  const onSaveOrderNote = (orderNote: string) => {
+  const handleSaveOrderNote = (orderNote: string) => {
     return dispatch(
       orderManagementThunks.updateOrderGeneralInfo({
         orderNote,
@@ -140,12 +136,11 @@ const OrderDetailPage = () => {
         order,
         company,
         booker,
-        transactionDataMap,
         updateStaffName,
         updateOrderStaffNameInProgress,
-        updateOrderState,
+        updateOrderState: handleUpdateOrderState,
         updateOrderStateInProgress,
-        onSaveOrderNote,
+        onSaveOrderNote: handleSaveOrderNote,
       },
     },
     {
@@ -164,7 +159,7 @@ const OrderDetailPage = () => {
         booker,
         updateStaffName,
         updateOrderStaffNameInProgress,
-        updateOrderState,
+        updateOrderState: handleUpdateOrderState,
         updateOrderStateInProgress,
         quotations,
         quotationsPagination,
@@ -186,7 +181,7 @@ const OrderDetailPage = () => {
         booker,
         updateStaffName,
         updateOrderStaffNameInProgress,
-        updateOrderState,
+        updateOrderState: handleUpdateOrderState,
         updateOrderStateInProgress,
         quotations,
         quotationsPagination,

@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/no-shadow */
+import chunk from 'lodash/chunk';
 import compact from 'lodash/compact';
 import flatten from 'lodash/flatten';
 import uniq from 'lodash/uniq';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HttpMethod } from '@apis/configs';
-import { convertListIdToQueries, queryAllPages } from '@helpers/apiHelpers';
+import { queryAllPages } from '@helpers/apiHelpers';
 import cookies from '@services/cookie';
 import { getIntegrationSdk, handleError } from '@services/sdk';
 import { EListingType } from '@src/utils/enums';
@@ -103,15 +104,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
               ),
             ),
           );
-          const restaurantQueries = convertListIdToQueries({
-            idList: allRestaurantIds,
-          });
+
           const allRestaurants: TListing[] = flatten(
             await Promise.all(
-              restaurantQueries.map(async ({ ids }) => {
+              chunk<string>(allRestaurantIds, 100).map(async (ids) => {
                 return denormalisedResponseEntities(
                   await integrationSdk.listings.query({
-                    ids: `${ids}`,
+                    ids,
                   }),
                 );
               }),
@@ -138,34 +137,28 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
               bookerIds: [],
             },
           );
-          const allCompanyIds = uniq(compact(companyIds));
-          const allBookerIds = uniq(compact(bookerIds));
+          const allCompanyIds: string[] = uniq(compact(companyIds));
+          const allBookerIds: string[] = uniq(compact(bookerIds));
 
           if (isProduction && isQueryAllPages) {
-            const companyQueries = convertListIdToQueries({
-              idList: allCompanyIds,
-            });
             allCompanies = flatten(
               await Promise.all(
-                companyQueries.map(async ({ ids }) => {
+                chunk<string>(allCompanyIds, 100).map(async (ids) => {
                   return denormalisedResponseEntities(
                     await integrationSdk.users.query({
-                      meta_id: `${ids}`,
+                      meta_id: ids,
                     }),
                   );
                 }),
               ),
             );
 
-            const bookerQueries = convertListIdToQueries({
-              idList: allBookerIds,
-            });
             allBookers = flatten(
               await Promise.all(
-                bookerQueries.map(async ({ ids }) => {
+                chunk<string>(allBookerIds, 100).map(async (ids) => {
                   return denormalisedResponseEntities(
                     await integrationSdk.users.query({
-                      meta_id: `${ids}`,
+                      meta_id: ids,
                     }),
                   );
                 }),

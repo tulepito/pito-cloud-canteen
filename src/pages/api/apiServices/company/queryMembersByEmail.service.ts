@@ -1,3 +1,5 @@
+import compact from 'lodash/compact';
+
 import { denormalisedResponseEntities } from '@services/data';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { User } from '@src/utils/data';
@@ -16,7 +18,7 @@ const queryMembersByEmail = async ({
   companyId: string;
 }) => {
   const emailsAsArray = Array.isArray(emails) ? emails : [emails];
-  const intergrationSdk = getIntegrationSdk();
+  const integrationSdk = getIntegrationSdk();
   const noExistedUsers: string[] = [];
 
   const companyMembers = await queryCompanyMembers(companyId);
@@ -24,7 +26,7 @@ const queryMembersByEmail = async ({
   const users = await Promise.all(
     emailsAsArray.map(async (email: string) => {
       try {
-        const response = await intergrationSdk.users.show(
+        const response = await integrationSdk.users.show(
           {
             email,
             include: 'profileImage',
@@ -68,9 +70,7 @@ const queryMembersByEmail = async ({
     }),
   );
 
-  const userNotNull = users.filter((user) => user !== null);
-
-  return { users: userNotNull, noExistedUsers };
+  return { users: compact(users), noExistedUsers };
 };
 
 export default queryMembersByEmail;

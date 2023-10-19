@@ -13,11 +13,10 @@ import ImageFromFile from '@components/ImageFromFile/ImageFromFile';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import type { TImageActionPayload } from '@redux/slices/uploadImage.slice';
 import { uploadImageThunks } from '@redux/slices/uploadImage.slice';
+import { userThunks } from '@redux/slices/user.slice';
 import { User } from '@src/utils/data';
 import { isUploadImageOverLimitError } from '@src/utils/errors';
 import type { TCurrentUser, TUser } from '@src/utils/types';
-
-import { AccountThunks } from '../../Account.slice';
 
 import css from './AvatarForm.module.scss';
 
@@ -41,7 +40,6 @@ const AvatarFormComponent: React.FC<TAvatarFormComponentProps> = (props) => {
     (state) => state.uploadImage.image,
     shallowEqual,
   );
-
   const fileUploadInProgress = useAppSelector(
     (state) => state.uploadImage.uploadImageInProgress,
   );
@@ -71,6 +69,7 @@ const AvatarFormComponent: React.FC<TAvatarFormComponentProps> = (props) => {
       clearTimeout(uploadTimeoutRef.current);
     };
   }, [fileUploadInProgress]);
+
   const currentUserGetter = User(currentUser as TUser);
   const profileImageId = currentUserGetter.getProfileImage()?.id;
 
@@ -132,8 +131,11 @@ const AvatarFormComponent: React.FC<TAvatarFormComponentProps> = (props) => {
     const { payload } = (await dispatch(
       uploadImageThunks.uploadImage({ id, file }),
     )) as any;
+
     await dispatch(
-      AccountThunks.updateProfileImage(payload?.uploadedImage.id.uuid),
+      userThunks.updateProfile({
+        profileImageId: payload?.uploadedImage.id.uuid,
+      }),
     );
   };
 

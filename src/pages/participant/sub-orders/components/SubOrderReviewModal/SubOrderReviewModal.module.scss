@@ -40,7 +40,7 @@
 
 .modalHeader {
   padding: 0 16px 20px;
-  border-bottom: 1px solid $neutralGray4;
+  border-bottom: 1px solid $neutralGray5;
 
   .goBackContainer {
     display: flex;
@@ -78,7 +78,7 @@
 
   @include viewportLarge {
     padding: 0 0 20px;
-    border-bottom: 1px solid $neutralGray4;
+    border-bottom: 1px solid $neutralGray5;
   }
 
   .leftSide {
@@ -104,7 +104,7 @@
 
     .restaurantName {
       @include textTemplate(12px, $fontWeightRegular, 16px);
-      color: $neutralGray5;
+      color: $neutralGray6;
     }
 
     .dishName {
@@ -114,7 +114,7 @@
 
     .time {
       @include textTemplate(10px, $fontWeightRegular, 16px);
-      color: $neutralGray5;
+      color: $neutralGray6;
       margin-top: 8px;
     }
 
@@ -128,7 +128,7 @@
         height: 28px;
 
         path {
-          fill: $neutralGray6;
+          fill: $neutralGray7;
         }
       }
 
@@ -152,7 +152,7 @@
       height: 20px;
 
       path {
-        fill: $neutralGray6;
+        fill: $neutralGray7;
       }
     }
 
@@ -160,7 +160,7 @@
       @include textTemplate(14px, $fontWeightRegular, 20px);
 
       span {
-        color: $neutralGray5;
+        color: $neutralGray6;
       }
     }
   }
@@ -205,6 +205,6 @@
   height: 80vh;
 
   svg {
-    stroke: $neutralGray6;
+    stroke: $neutralGray7;
   }
 }

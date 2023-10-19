@@ -1,7 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 import { fetchUserApi } from '@apis/index';
-import { fetchSearchFilterApi } from '@apis/userApi';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { denormalisedResponseEntities } from '@utils/data';
 import {
@@ -13,10 +12,6 @@ import {
 import type { TListing, TObject, TUser } from '@utils/types';
 
 // ================ Initial states ================ //
-type TKeyValue<T = string> = {
-  key: string;
-  label: T;
-};
 
 type TQuizState = {
   selectedCompany: TUser;
@@ -24,9 +19,6 @@ type TQuizState = {
   fetchSelectedCompanyError: any;
 
   quiz: TObject;
-  categories: TKeyValue[];
-  nutritions: TKeyValue[];
-  fetchFilterInProgress: boolean;
 
   restaurants: TListing[];
   fetchRestaurantsInProgress: boolean;
@@ -39,9 +31,7 @@ const initialState: TQuizState = {
   fetchSelectedCompanyInProgress: false,
   fetchSelectedCompanyError: null,
   quiz: {},
-  categories: [],
-  nutritions: [],
-  fetchFilterInProgress: false,
+
   restaurants: [],
   fetchRestaurantsInProgress: false,
   fetchRestaurantsError: null,
@@ -50,17 +40,10 @@ const initialState: TQuizState = {
 };
 
 // ================ Thunk types ================ //
-const FETCH_SEARCH_FILTER = 'app/Quiz/FETCH_SEARCH_FILTER';
 const FETCH_RESTAURANTS = 'app/Quiz/FETCH_RESTAURANTS';
 const FETCH_SELECTED_COMPANY = 'app/Quiz/FETCH_SELECTED_COMPANY';
 
 // ================ Async thunks ================ //
-const fetchSearchFilter = createAsyncThunk(FETCH_SEARCH_FILTER, async () => {
-  const { data: searchFiltersResponse } = await fetchSearchFilterApi();
-
-  return searchFiltersResponse;
-});
-
 const fetchRestaurants = createAsyncThunk(
   FETCH_RESTAURANTS,
   async (_, { extra: sdk }) => {
@@ -93,7 +76,6 @@ const fetchSelectedCompany = createAsyncThunk(
   },
 );
 export const QuizThunks = {
-  fetchSearchFilter,
   fetchRestaurants,
   fetchSelectedCompany,
 };
@@ -123,15 +105,6 @@ const QuizSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchSearchFilter.pending, (state) => {
-        state.fetchFilterInProgress = true;
-      })
-      .addCase(fetchSearchFilter.fulfilled, (state, action) => {
-        state.fetchFilterInProgress = false;
-        state.categories = action.payload.categories;
-        state.nutritions = action.payload.nutritions;
-      })
-
       .addCase(fetchRestaurants.pending, (state) => {
         state.fetchRestaurantsInProgress = true;
         state.fetchRestaurantsError = null;

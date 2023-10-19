@@ -7,7 +7,7 @@
 .labelRoot {
   font-size: 14px;
   line-height: 24px;
-  color: $neutralGray6;
+  color: $neutralGray7;
   margin-bottom: 8px;
   display: inline-block;
   display: flex;
@@ -21,17 +21,17 @@
 .select {
   @include inputStyles;
   width: 100%;
-  color: $neutralGray4;
+  color: $neutralGray5;
 }
 
 .selectedColor {
-  color: $neutralGray6;
+  color: $neutralGray7;
 }
 
 .selectSuccess {
 }
 .selectError {
-  color: $neutralGray5;
+  color: $neutralGray6;
 }
 
 .selectContainer {

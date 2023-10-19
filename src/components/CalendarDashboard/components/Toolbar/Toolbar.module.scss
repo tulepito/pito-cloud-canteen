@@ -16,7 +16,7 @@
 
 .label {
   @include textTemplate(16px, 700, 24px, '');
-  color: $neutralGray6;
+  color: $neutralGray7;
   margin-bottom: 20px;
 
   @include viewportLarge {
@@ -26,7 +26,7 @@
 
 .companyId {
   @include textTemplate(24px, 700, 32px, '');
-  color: $neutralGray6;
+  color: $neutralGray7;
   margin-bottom: 8px;
 }
 
@@ -56,7 +56,7 @@
   -webkit-tap-highlight-color: transparent;
 
   @include textTemplate(12px, 700, 20px, '');
-  color: $neutralGray5;
+  color: $neutralGray6;
 
   &:last-child {
     border-right: 0px;
@@ -70,7 +70,7 @@
   &:active,
   &:focus {
     background-color: $neutralGray1;
-    color: $neutralGray6;
+    color: $neutralGray7;
     border: none;
     outline: none;
   }
@@ -78,14 +78,14 @@
 
 .activeViewMode {
   background-color: $neutralGray1;
-  color: $neutralGray6;
+  color: $neutralGray7;
   box-shadow: 0px 2px 4px -2px rgba(16, 24, 40, 0.06),
     0px 4px 8px -2px rgba(16, 24, 40, 0.1);
 
   &:active,
   &:focus {
     background-color: $neutralGray1;
-    color: $neutralGray6;
+    color: $neutralGray7;
   }
 }
 
@@ -96,13 +96,13 @@
   padding: 8px;
   margin-right: 28px;
   text-align: center;
-  border: 1px solid $neutralGray5;
+  border: 1px solid $neutralGray6;
   background-color: $neutralGray1;
   @include textTemplate(12px, 700, 36px, '');
-  color: $neutralGray6;
+  color: $neutralGray7;
 
   &:hover {
-    background-color: $neutralGray5;
+    background-color: $neutralGray6;
   }
 
   &:active,
@@ -124,7 +124,7 @@
   border-radius: 4px;
 
   &:hover {
-    background-color: $neutralGray4;
+    background-color: $neutralGray5;
   }
 
   &.disabled {

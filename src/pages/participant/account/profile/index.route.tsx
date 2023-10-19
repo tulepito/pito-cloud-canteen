@@ -2,12 +2,12 @@ import MetaWrapper from '@components/MetaWrapper/MetaWrapper';
 
 import ProfilePage from './Profile.page';
 
-const AccountPageRoute = () => {
+const ParticipantAccountSettingRoute = () => {
   return (
-    <MetaWrapper>
+    <MetaWrapper routeName="ParticipantAccountSettingRoute">
       <ProfilePage />
     </MetaWrapper>
   );
 };
 
-export default AccountPageRoute;
+export default ParticipantAccountSettingRoute;

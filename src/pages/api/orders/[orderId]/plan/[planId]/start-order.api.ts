@@ -13,31 +13,29 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     const apiMethod = req.method;
 
     switch (apiMethod) {
-      case HttpMethod.PUT:
-        {
-          const { orderId, planId } = req.query;
+      case HttpMethod.PUT: {
+        const { orderId, planId } = req.query;
 
-          if (isEmpty(orderId) || isEmpty(planId)) {
-            res.status(400).json({ error: 'Missing orderId or planId' });
-
-            return;
-          }
-
-          await startOrder(orderId as string, planId as string);
-          console.info('>> Started order: ', orderId);
-          await initiateTransaction({
-            orderId: orderId as string,
-            planId: planId as string,
-          });
-          console.info('>> Initiated transactions');
-
-          res.status(200).json({
-            message: `Successfully finish picking order`,
-            orderId,
-            planId,
-          });
+        if (isEmpty(orderId) || isEmpty(planId)) {
+          return res.status(400).json({ error: 'Missing orderId or planId' });
         }
-        break;
+
+        await startOrder(orderId as string, planId as string);
+        console.info('>> Started order: ', orderId);
+
+        await initiateTransaction({
+          orderId: orderId as string,
+          planId: planId as string,
+        });
+        console.info('>> Initiated transactions');
+
+        return res.status(200).json({
+          message: `Successfully finish picking order`,
+          orderId,
+          planId,
+        });
+      }
+
       default:
         break;
     }

@@ -29,7 +29,7 @@
     justify-content: space-between;
     width: 100%;
     .label {
-      color: $neutralGray6;
+      color: $neutralGray7;
       font-size: 16px;
       font-weight: $fontWeightBold;
       text-transform: uppercase;
@@ -37,8 +37,7 @@
   }
 
   .content {
-    transition: height 0.3s;
-    height: initial;
+    height: fit-content;
 
     &.isClose {
       height: 0;

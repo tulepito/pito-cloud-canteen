@@ -6,7 +6,7 @@ import Button from '@components/Button/Button';
 import { IconCheckbox } from '@components/FormFields/FieldCheckbox/FieldCheckbox';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useAppSelector } from '@hooks/reduxHooks';
-import { FOOD_TYPE_OPTIONS } from '@src/utils/enums';
+import { FOOD_TYPE_OPTIONS } from '@src/utils/options';
 
 import css from './NutritionForm.module.scss';
 
@@ -33,7 +33,7 @@ const NutritionForm: React.FC<TNutritionFormProps> = ({
 
   const intl = useIntl();
   const nutritionsOptions =
-    useAppSelector((state) => state.BookerDraftOrderPage.nutritions) || [];
+    useAppSelector((state) => state.SystemAttributes.nutritions) || [];
 
   const nutritions = useField('nutritions', form);
   const mealType = useField('mealType', form);

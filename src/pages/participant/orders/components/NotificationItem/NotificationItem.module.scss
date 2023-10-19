@@ -30,7 +30,7 @@
 
   .pastTime {
     @include textTemplate(12px, $fontWeightRegular, 16px);
-    color: $neutralGray5;
+    color: $neutralGray6;
     margin-top: 2px;
   }
 }

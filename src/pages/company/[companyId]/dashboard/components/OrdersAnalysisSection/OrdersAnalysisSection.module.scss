@@ -65,7 +65,7 @@
       .orderLink {
         font-weight: $fontWeightBold;
         font-size: 14px;
-        color: $neutralGray6;
+        color: $neutralGray7;
         @include flexAlign(center);
       }
       &.completedOrders {

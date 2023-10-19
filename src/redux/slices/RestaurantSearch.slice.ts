@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 import { createAsyncThunk } from '@redux/redux.helper';
-import { ListingTypes } from '@src/types/listingTypes';
+import { EListingType } from '@src/utils/enums';
 import { denormalisedResponseEntities } from '@utils/data';
 import type { TListing, TObject, TPagination } from '@utils/types';
 
@@ -40,15 +40,13 @@ const searchRestaurant = createAsyncThunk(
       ...rest,
       page,
       perPage,
-      meta_listingType: ListingTypes.RESTAURANT,
+      meta_listingType: EListingType.restaurant,
     };
     const response = await sdk.listings.query(searchParams);
-    const { meta } = response.data;
-    const results = denormalisedResponseEntities(response);
 
     return {
-      pagination: meta,
-      results,
+      pagination: response?.data?.meta,
+      results: denormalisedResponseEntities(response),
     };
   },
 );

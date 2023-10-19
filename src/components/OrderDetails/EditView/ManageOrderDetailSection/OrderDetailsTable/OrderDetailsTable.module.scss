@@ -71,13 +71,13 @@
       border-radius: 8px;
       padding: 0 6px;
       height: 16px;
-      color: $neutralGray5;
+      color: $neutralGray6;
       background-color: $neutralGray3;
       line-height: 24px;
 
       &.numberActive {
         color: $neutralGray1;
-        background-color: $neutralGray6;
+        background-color: $neutralGray7;
       }
     }
   }
@@ -91,7 +91,7 @@
     thead {
       justify-content: space-between;
       background-color: $neutralGray2;
-      color: $neutralGray5;
+      color: $neutralGray6;
       @include textTemplate(12px, 600, 16px);
 
       tr {
@@ -132,7 +132,7 @@
       & > tr {
         .stranger {
           @include textTemplate(12px, 600, 16px);
-          color: $neutralGray5;
+          color: $neutralGray6;
         }
 
         &:nth-child(2) > td {
@@ -170,7 +170,7 @@
             top: 50%;
             left: 16px;
             height: 1px;
-            background-color: $neutralGray5;
+            background-color: $neutralGray6;
           }
         }
       }
@@ -206,6 +206,6 @@
     width: 100%;
     @include textTemplate(14px, 400, 24px);
     white-space: pre-line;
-    color: $neutralGray5;
+    color: $neutralGray6;
   }
 }

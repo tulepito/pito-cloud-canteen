@@ -9,7 +9,12 @@ import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import Form from '@components/Form/Form';
 import FieldCheckboxGroup from '@components/FormFields/FieldCheckboxGroup/FieldCheckboxGroup';
 import FieldRadioButton from '@components/FormFields/FieldRadioButton/FieldRadioButton';
-import { EXTRA_SERVICE_OPTIONS, MEAL_OPTIONS } from '@utils/enums';
+import {
+  EXTRA_SERVICE_OPTIONS,
+  MEAL_OPTIONS,
+  NO,
+  YES,
+} from '@src/utils/options';
 
 import css from './EditPartnerMenuForm.module.scss';
 
@@ -24,9 +29,6 @@ type TEditPartnerMenuForm = {
   goBack?: () => void;
   categories: any[];
 };
-
-export const YES = 'yes';
-export const NO = 'no';
 
 const EditPartnerMenuForm: React.FC<TEditPartnerMenuForm> = (props) => {
   const intl = useIntl();

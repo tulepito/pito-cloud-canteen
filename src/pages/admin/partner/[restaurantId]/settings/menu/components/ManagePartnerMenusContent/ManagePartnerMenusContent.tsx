@@ -20,7 +20,7 @@ import type { TMenuMealTypeCount } from '@redux/slices/menus.slice';
 import { menusSliceThunks } from '@redux/slices/menus.slice';
 import { adminRoutes } from '@src/paths';
 import { formatTimestamp } from '@utils/dates';
-import type { EMenuTypes } from '@utils/enums';
+import type { EMenuType } from '@utils/enums';
 import {
   EListingMenuStates,
   EListingStates,
@@ -224,7 +224,7 @@ const parseEntitiesToTableData = (
 };
 
 type TTabContentProps = {
-  menuType: typeof EMenuTypes.cycleMenu | typeof EMenuTypes.fixedMenu;
+  menuType: typeof EMenuType.cycleMenu | typeof EMenuType.fixedMenu;
   restaurantId: string;
   id: string;
   keywords: string;

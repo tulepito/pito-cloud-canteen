@@ -17,7 +17,7 @@ const ChangePasswordModal: React.FC<TChangePasswordModalProps> = (props) => {
   const { isOpen, onClose, handleSubmit, initialValues } = props;
 
   const changePasswordInProgress = useAppSelector(
-    (state) => state.ParticipantAccount.changePasswordInProgress,
+    (state) => state.password.changePasswordInProgress,
   );
 
   return (

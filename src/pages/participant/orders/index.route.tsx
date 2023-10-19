@@ -3,7 +3,7 @@ import MetaWrapper from '@components/MetaWrapper/MetaWrapper';
 import OrderListPage from './OrderList.page';
 
 const ParticipantDashboardRoute = () => (
-  <MetaWrapper>
+  <MetaWrapper routeName="ParticipantDashboardRoute">
     <OrderListPage />
   </MetaWrapper>
 );

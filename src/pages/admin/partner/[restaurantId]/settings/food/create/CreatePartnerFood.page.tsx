@@ -10,7 +10,7 @@ import { foodSliceAction, foodSliceThunks } from '@redux/slices/foods.slice';
 import { partnerThunks } from '@redux/slices/partners.slice';
 import { adminRoutes } from '@src/paths';
 import { IntegrationListing } from '@utils/data';
-import { EFoodTypes, EMenuTypes } from '@utils/enums';
+import { EFoodType, EMenuType } from '@utils/enums';
 import { getInitialAddImages } from '@utils/images';
 import type { TIntegrationListing, TObject } from '@utils/types';
 
@@ -96,8 +96,8 @@ const CreatePartnerFoodPage = () => {
       title,
       description,
       price: price?.amount,
-      menuType: menuType || EMenuTypes.cycleMenu,
-      foodType: foodType || EFoodTypes.savoryDish,
+      menuType: menuType || EMenuType.cycleMenu,
+      foodType: foodType || EFoodType.savoryDish,
       minOrderHourInAdvance: 24,
       minQuantity,
       maxQuantity,
@@ -126,10 +126,6 @@ const CreatePartnerFoodPage = () => {
       dispatch(partnerThunks.showPartnerRestaurantListing(restaurantId));
     }
   }, [restaurantId, dispatch]);
-
-  useEffect(() => {
-    dispatch(foodSliceThunks.fetchAttributes());
-  }, []);
 
   if (showFoodInProgress || showPartnerListingInProgress) {
     return <LoadingContainer />;

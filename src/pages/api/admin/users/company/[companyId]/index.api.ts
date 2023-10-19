@@ -21,13 +21,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       }
       case HttpMethod.GET: {
         const integrationSdk = getIntegrationSdk();
-        const response = await integrationSdk.users.show(
-          {
-            id: companyId,
-            include: ['profileImage'],
-          },
-          { expand: true },
-        );
+        const response = await integrationSdk.users.show({
+          id: companyId,
+          include: ['profileImage'],
+        });
 
         return res.json(response);
       }

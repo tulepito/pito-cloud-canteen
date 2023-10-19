@@ -16,13 +16,13 @@
       padding: 4px;
       text-align: center;
       border-radius: 8px;
-      color: $neutralGray5;
+      color: $neutralGray6;
       background-color: $neutralGray3;
       @include textTemplate(8px, 400, 1);
 
       &.countActive {
         color: $neutralGray1;
-        background-color: $neutralGray6;
+        background-color: $neutralGray7;
       }
     }
   }
@@ -36,7 +36,7 @@
 
       .createdByAmin {
         @include textTemplate(12px, 600, 16px);
-        color: $neutralGray5;
+        color: $neutralGray6;
       }
     }
 
@@ -64,7 +64,7 @@
 
       button:first-child {
         @include buttonColorSecondary;
-        outline-color: $neutralGray4;
+        outline-color: $neutralGray5;
       }
     }
 

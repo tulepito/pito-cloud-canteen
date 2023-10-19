@@ -45,7 +45,6 @@ export const usePrepareOrderDetailPageData = ({
     anonymousParticipantData,
     companyData,
     bookerData,
-    transactionDataMap,
     quotation,
     draftOrderDetail,
     draftSubOrderChangesHistory,
@@ -300,7 +299,6 @@ export const usePrepareOrderDetailPageData = ({
     reviewCartData,
     foodOrderGroupedByDate,
     isCanceledOrder,
-    transactionDataMap,
     orderNoteData: {
       orderNote,
       disabled: orderState !== EOrderStates.picking,

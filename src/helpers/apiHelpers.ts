@@ -74,31 +74,6 @@ export const queryAllTransactions = async ({
   });
 };
 
-export const convertListIdToQueries = ({
-  idList = [],
-  query = {},
-  include = [],
-  ...restParams
-}: any = {}) => {
-  let queries: TObject[] = [];
-  const queryCount = Math.round(idList.length / 100 + 0.5);
-
-  for (let index = 0; index < queryCount; index++) {
-    const subList = idList.slice(index * 100, (index + 1) * 100);
-
-    queries = queries.concat({
-      ids: subList.join(','),
-      query: {
-        ...query,
-      },
-      include,
-      ...restParams,
-    });
-  }
-
-  return queries;
-};
-
 export type TCheckUnConflictedParams = {
   mealType: EMenuMealType;
   daysOfWeek: string[];

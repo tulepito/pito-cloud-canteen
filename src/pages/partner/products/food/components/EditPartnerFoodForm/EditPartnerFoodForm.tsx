@@ -22,14 +22,14 @@ import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput
 import FieldTextInputWithBottomBox from '@components/FormFields/FieldTextInputWithBottomBox/FieldTextInputWithBottomBox';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { partnerPaths } from '@src/paths';
-import type { TKeyValue } from '@src/utils/types';
 import {
-  EImageVariants,
+  FOOD_SIDE_DISH_OPTIONS,
   FOOD_TYPE_OPTIONS,
-  MENU_OPTIONS,
+  MENU_TYPE_OPTIONS,
   OTHER_OPTION,
-  SIDE_DISH_OPTIONS,
-} from '@utils/enums';
+} from '@src/utils/options';
+import type { TKeyValue } from '@src/utils/types';
+import { EImageVariants } from '@utils/enums';
 import { pickRenderableImages } from '@utils/images';
 import {
   composeValidators,
@@ -158,7 +158,7 @@ const EditPartnerFoodFormComponent: React.FC<
         <label className={css.label}>
           {intl.formatMessage({ id: 'EditPartnerFoodForm.menuLabel' })}
         </label>
-        {MENU_OPTIONS.map((option) => (
+        {MENU_TYPE_OPTIONS.map((option) => (
           <FieldRadioButton
             key={option.key}
             name="menuType"
@@ -431,7 +431,7 @@ const EditPartnerFoodFormComponent: React.FC<
           label={intl.formatMessage({
             id: 'EditPartnerFoodForm.sideDishLabel',
           })}
-          options={SIDE_DISH_OPTIONS}
+          options={FOOD_SIDE_DISH_OPTIONS}
         />
         <div className={css.field}></div>
       </div>

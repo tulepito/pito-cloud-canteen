@@ -27,7 +27,7 @@
   .scenarioLabel {
     grid-column: 1 / span 1;
     @include textTemplate(14px, $fontWeightSemiBold, 20px);
-    color: $neutralGray5;
+    color: $neutralGray6;
   }
 
   .ratingBar {
@@ -43,7 +43,7 @@
     top: 0;
     bottom: 0;
     left: 0;
-    background-color: $neutralGray6;
+    background-color: $neutralGray7;
     border-radius: 100px;
   }
 

@@ -1,4 +1,5 @@
 import { mapLimit } from 'async';
+import chunk from 'lodash/chunk';
 import compact from 'lodash/compact';
 import flatten from 'lodash/flatten';
 import isEmpty from 'lodash/isEmpty';
@@ -8,7 +9,6 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { EHttpStatusCode } from '@apis/errors';
 import {
-  convertListIdToQueries,
   prepareNewOrderDetailPlan,
   queryAllListings,
 } from '@helpers/apiHelpers';
@@ -17,9 +17,9 @@ import { fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { createFirebaseDocNotification } from '@services/notifications';
 import { getSdk, handleError } from '@services/sdk';
-import { UserPermission } from '@src/types/UserPermission';
 import {
   EBookerOrderDraftStates,
+  ECompanyPermission,
   EListingType,
   ENotificationType,
   EOrderDraftStates,
@@ -54,9 +54,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     if (!isEmpty(userCompany)) {
       if (
         userCompany[companyId] &&
-        userCompany[companyId].permission in UserPermission
+        userCompany[companyId].permission in ECompanyPermission
       ) {
         return res.json({
+          statusCode: EHttpStatusCode.BadRequest,
           message: 'User is already in company',
         });
       }
@@ -102,7 +103,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           company: {
             ...userCompany,
             [companyId]: {
-              permission: userMember.permission || UserPermission.PARTICIPANT,
+              permission:
+                userMember.permission || ECompanyPermission.participant,
             },
           },
         },
@@ -130,7 +132,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         meta_selectedGroups: 'has_any:allMembers',
       },
     });
-    const allNeedUpdatePlanIds = uniq(
+    const allNeedUpdatePlanIds: string[] = uniq(
       compact(
         allNeedOrders.map((order: TListing) => {
           const { plans = [] } = Listing(order).getMetadata();
@@ -139,12 +141,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         }),
       ),
     );
-    const planQueries = convertListIdToQueries({
-      idList: allNeedUpdatePlanIds,
-    });
+
     const allNeedUpdatePlans: TListing[] = flatten(
       await Promise.all(
-        planQueries.map(async ({ ids }) => {
+        chunk<string>(allNeedUpdatePlanIds, 100).map(async (ids) => {
           return denormalisedResponseEntities(
             await integrationSdk.listings.query({
               ids,

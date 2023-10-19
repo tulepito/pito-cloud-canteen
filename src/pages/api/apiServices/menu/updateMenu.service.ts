@@ -11,7 +11,7 @@ import { denormalisedResponseEntities } from '@services/data';
 import { getIntegrationSdk } from '@services/sdk';
 import { IntegrationListing } from '@src/utils/data';
 import { addWeeksToDate } from '@src/utils/dates';
-import { EMenuTypes } from '@src/utils/enums';
+import { EMenuType } from '@src/utils/enums';
 import type { TObject, TUpdateMenuApiParams } from '@src/utils/types';
 
 import updateMenuIdListAndMenuWeekDayListForFood from './updateMenuIdListAndMenuWeekDayListForFood.service';
@@ -35,13 +35,10 @@ const updateMenu = async (
 
   const integrationSdk = getIntegrationSdk();
 
-  const isCycleMenu = menuType === EMenuTypes.cycleMenu;
-  const menuResponse = await integrationSdk.listings.show(
-    {
-      id: menuId,
-    },
-    { expand: true },
-  );
+  const isCycleMenu = menuType === EMenuType.cycleMenu;
+  const menuResponse = await integrationSdk.listings.show({
+    id: menuId,
+  });
 
   const [menu] = denormalisedResponseEntities(menuResponse);
 

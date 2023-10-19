@@ -5,8 +5,6 @@
 .weekDay {
   display: flex;
   flex-direction: column;
-  // border-top: 1px solid $neutralGray5;
-  // border-bottom: 1px solid $neutralGray5;
 
   min-height: 54px;
   flex-basis: calc((100vw - 32px) / 7);
@@ -132,7 +130,7 @@
     width: 28px;
     height: 28px;
     border-radius: 50%;
-    background-color: $neutralGray6;
+    background-color: $neutralGray7;
     z-index: -1;
   }
 }

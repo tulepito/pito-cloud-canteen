@@ -1,5 +1,6 @@
 import type { NextApiHandler, NextApiRequest, NextApiResponse } from 'next';
 
+import { EHttpStatusCode } from '@apis/errors';
 import { getSdk, handleError } from '@services/sdk';
 import { CurrentUser, denormalisedResponseEntities } from '@src/utils/data';
 
@@ -11,16 +12,17 @@ const partnerChecker =
       const [currentUser] = denormalisedResponseEntities(
         await sdk.currentUser.show(),
       );
+
       if (!currentUser) {
-        return res.status(401).json({
+        return res.status(EHttpStatusCode.Unauthorized).json({
           message: 'Unauthenticated!',
         });
       }
 
-      const currentUserGetter = CurrentUser(currentUser);
-      const { isPartner } = currentUserGetter.getMetadata();
+      const { isPartner = false } = CurrentUser(currentUser).getMetadata();
+
       if (!isPartner) {
-        return res.status(401).json({
+        return res.status(EHttpStatusCode.Forbidden).json({
           message: "You don't have permission to access this api!",
         });
       }

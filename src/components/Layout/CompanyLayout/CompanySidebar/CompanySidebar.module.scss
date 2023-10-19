@@ -8,11 +8,11 @@
   height: 100vh;
   z-index: 1;
   background-color: $neutralGray1;
-  border-right: 1px solid $neutralGray4;
+  border-right: 1px solid $neutralGray5;
 
   .companyName {
     @include textTemplate(24px, $fontWeightBold, 32px);
-    color: $neutralGray6;
+    color: $neutralGray7;
     padding: 32px 24px 0;
 
     @include lineClamp(2, 32px);

@@ -47,7 +47,7 @@
 
   .tableHead {
     color: $neutralGray1;
-    background-color: $neutralGray5;
+    background-color: $neutralGray6;
     @include textTemplate(14px, 700, 20px);
     @include tableColumnsLayout;
   }

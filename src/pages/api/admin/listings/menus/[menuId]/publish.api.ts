@@ -19,27 +19,17 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       case HttpMethod.POST: {
         const { menuId } = req.query;
 
-        const menuResponse = await integrationSdk.listings.show(
-          {
-            id: menuId,
-          },
-          {
-            expand: true,
-          },
-        );
+        const menuResponse = await integrationSdk.listings.show({
+          id: menuId,
+        });
 
         const [menu] = denormalisedResponseEntities(menuResponse);
 
         const { restaurantId } = IntegrationListing(menu).getMetadata();
 
-        const restaurantResponse = await integrationSdk.listings.show(
-          {
-            id: restaurantId,
-          },
-          {
-            expand: true,
-          },
-        );
+        const restaurantResponse = await integrationSdk.listings.show({
+          id: restaurantId,
+        });
 
         const [restaurant] = denormalisedResponseEntities(restaurantResponse);
 

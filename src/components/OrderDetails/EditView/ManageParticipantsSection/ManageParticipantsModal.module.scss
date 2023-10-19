@@ -15,7 +15,7 @@
 
     .subTitle {
       @include textTemplate(16px, 400, 24px);
-      color: $neutralGray5;
+      color: $neutralGray6;
       margin-bottom: 8px;
     }
 
@@ -69,7 +69,7 @@
 
 .tooltipContent {
   @include textTemplate(10px, 400, 1.6);
-  color: $neutralGray4;
+  color: $neutralGray5;
 
   .title {
     @include textTemplate(12px, 700, 1.6);
@@ -79,7 +79,7 @@
 }
 
 .tooltipOverlay :global(.rc-tooltip-arrow) {
-  border-color: $neutralGray6;
+  border-color: $neutralGray7;
   border-right-color: $neutralGray1;
   border-left-color: $neutralGray1;
 }

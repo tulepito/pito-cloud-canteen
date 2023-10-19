@@ -46,14 +46,9 @@ const handlerWrapper = async (req: NextApiRequest, res: NextApiResponse) => {
 
       const integrationSdk = getIntegrationSdk();
 
-      const menuResponse = await integrationSdk.listings.show(
-        {
-          id: menuId,
-        },
-        {
-          expand: true,
-        },
-      );
+      const menuResponse = await integrationSdk.listings.show({
+        id: menuId,
+      });
 
       const [menu] = denormalisedResponseEntities(menuResponse);
 

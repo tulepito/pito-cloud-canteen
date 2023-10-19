@@ -15,7 +15,7 @@
     display: block;
     margin: 0 auto;
     overflow: hidden;
-    background: $neutralGray4;
+    background: $neutralGray5;
     border-radius: 9px;
     transition: background-color 0.25s linear;
     transform: matrix(1, 0, 0, -1, 0, 0);
@@ -37,7 +37,7 @@
     display: none;
 
     &:checked + .switch {
-      background-color: $neutralGray6;
+      background-color: $neutralGray7;
       transform: matrix(-1, 0, 0, 1, 0, 0);
     }
 
@@ -51,12 +51,12 @@
     }
 
     &:checked + .disabled {
-      background: $neutralGray4;
+      background: $neutralGray5;
       cursor: not-allowed;
     }
 
     & + .disabled {
-      background: $neutralGray4;
+      background: $neutralGray5;
       cursor: not-allowed;
 
       &::after {
@@ -69,6 +69,6 @@
     font-size: 14px;
     font-weight: $fontWeightMedium;
     line-height: 24px;
-    color: $neutralGray6;
+    color: $neutralGray7;
   }
 }

@@ -26,6 +26,7 @@ import { addCommas, parseThousandNumber } from '@helpers/format';
 import { getTrackingLink } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
+import { AdminManageOrderThunks } from '@pages/admin/order/AdminManageOrder.slice';
 import {
   changeStep4SubmitStatus,
   orderAsyncActions,
@@ -34,7 +35,7 @@ import { adminPaths } from '@src/paths';
 import { Listing } from '@utils/data';
 import { formatTimestamp } from '@utils/dates';
 import { EOrderDraftStates, EOrderStates } from '@utils/enums';
-import type { TListing, TObject } from '@utils/types';
+import type { TKeyValue, TListing, TObject } from '@utils/types';
 import { required } from '@utils/validators';
 
 // eslint-disable-next-line import/no-cycle
@@ -116,20 +117,23 @@ export const ReviewContent: React.FC<any> = (props) => {
     (state) => state.Order.orderDetail,
   );
   const orderInPickingState = useAppSelector(
-    (state) => state.OrderDetail.order,
+    (state) => state.OrderManagement.orderData,
   );
-  const orderDetailInPickingState = useAppSelector(
-    (state) => state.OrderDetail.orderDetail,
-  );
+  const orderDetailInPickingState = useAppSelector((state) => {
+    const planListing = state.OrderManagement.planData;
+    const { orderDetail = {} } = Listing(planListing as TListing).getMetadata();
+
+    return orderDetail;
+  });
 
   const participantData = useAppSelector(
-    (state) => state.OrderDetail.participantData,
+    (state) => state.OrderManagement.participantData,
   );
   const anonymousParticipantData = useAppSelector(
-    (state) => state.OrderDetail.anonymousParticipantData,
+    (state) => state.OrderManagement.anonymousParticipantData,
   );
   const deliveryManOptions = useAppSelector(
-    (state) => state.AdminAttributes.deliveryPeople,
+    (state) => state.SystemAttributes.deliveryPeople,
   );
 
   const defaultCopyText = intl.formatMessage({
@@ -210,7 +214,7 @@ export const ReviewContent: React.FC<any> = (props) => {
 
   const handleFieldDeliveryManChange = (value: string) => {
     const currDeliveryInfoOption = deliveryManOptions.find(
-      ({ key }) => key === value,
+      ({ key }: TKeyValue) => key === value,
     );
 
     updatePlanDetail(
@@ -225,7 +229,7 @@ export const ReviewContent: React.FC<any> = (props) => {
 
   const parsedDeliveryManOptions = useMemo(
     () =>
-      deliveryManOptions.map((d) => ({
+      deliveryManOptions.map((d: TObject) => ({
         key: d.key,
         label: d.name,
       })),
@@ -470,8 +474,14 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
   const updateOrderDetailInProgress = useAppSelector(
     (state) => state.Order.updateOrderDetailInProgress,
   );
+  const updateOrderStateInProgress = useAppSelector(
+    (state) => state.AdminManageOrder.updateOrderStateInProgress,
+  );
 
-  const submitInProgress = updateOrderInProgress || updateOrderDetailInProgress;
+  const submitInProgress =
+    updateOrderInProgress ||
+    updateOrderDetailInProgress ||
+    updateOrderStateInProgress;
 
   const {
     value: isSuccessModalOpen,
@@ -517,7 +527,7 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
       );
     }
     if (orderState === EOrderDraftStates.draft) {
-      await dispatch(orderAsyncActions.requestApprovalOrder({ orderId }));
+      await dispatch(AdminManageOrderThunks.requestApprovalOrder({ orderId }));
     }
 
     const { error } = (await dispatch(

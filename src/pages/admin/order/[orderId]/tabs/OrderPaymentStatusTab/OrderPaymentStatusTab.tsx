@@ -13,6 +13,7 @@ import {
   vatPercentageBaseOnVatSetting,
 } from '@helpers/order/cartInfoHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { AdminManageOrderThunks } from '@pages/admin/order/AdminManageOrder.slice';
 import { Listing } from '@src/utils/data';
 import { getDayOfWeek } from '@src/utils/dates';
 import {
@@ -26,7 +27,6 @@ import type { TListing, TUser } from '@src/utils/types';
 
 import OrderHeaderState from '../../components/OrderHeaderState/OrderHeaderState';
 import { calculatePaidAmountBySubOrderDate } from '../../helpers/AdminOrderDetail';
-import { OrderDetailThunks } from '../../OrderDetail.slice';
 
 import ClientPaymentDetail from './components/ClientPaymentDetail/ClientPaymentDetail';
 import PartnerPaymentDetail from './components/PartnerPaymentDetail/PartnerPaymentDetail';
@@ -63,11 +63,11 @@ const OrderPaymentStatusTab: React.FC<OrderPaymentStatusTabProps> = (props) => {
     (state) => state.SystemAttributes.currentOrderVATPercentage,
   );
   const partnerPaymentRecords = useAppSelector(
-    (state) => state.OrderDetail.partnerPaymentRecords,
+    (state) => state.AdminManageOrder.partnerPaymentRecords,
     shallowEqual,
   );
   const clientPaymentRecords = useAppSelector(
-    (state) => state.OrderDetail.clientPaymentRecords,
+    (state) => state.AdminManageOrder.clientPaymentRecords,
     shallowEqual,
   );
 
@@ -235,13 +235,10 @@ const OrderPaymentStatusTab: React.FC<OrderPaymentStatusTabProps> = (props) => {
 
   useEffect(() => {
     if (orderId) {
-      dispatch(OrderDetailThunks.fetchQuotations(orderId));
+      dispatch(AdminManageOrderThunks.fetchQuotations(orderId));
+      dispatch(AdminManageOrderThunks.fetchPartnerPaymentRecords(orderId));
+      dispatch(AdminManageOrderThunks.fetchClientPaymentRecords(orderId));
     }
-  }, [dispatch, orderId]);
-
-  useEffect(() => {
-    dispatch(OrderDetailThunks.fetchPartnerPaymentRecords(orderId));
-    dispatch(OrderDetailThunks.fetchClientPaymentRecords(orderId));
   }, [dispatch, orderId]);
 
   useEffect(() => {

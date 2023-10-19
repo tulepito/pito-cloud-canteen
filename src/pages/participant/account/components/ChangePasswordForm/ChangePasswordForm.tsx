@@ -7,10 +7,9 @@ import Form from '@components/Form/Form';
 import { FieldPasswordInputComponent } from '@components/FormFields/FieldPasswordInput/FieldPasswordInput';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { passwordActions } from '@redux/slices/password.slice';
 import { generalPaths } from '@src/paths';
 import { passwordFormatValid } from '@src/utils/validators';
-
-import { AccountActions } from '../../Account.slice';
 
 import css from './ChangePasswordForm.module.scss';
 
@@ -63,7 +62,7 @@ const ChangePasswordForm: React.FC<TChangePasswordFormProps> = ({
   const router = useRouter();
   const dispatch = useAppDispatch();
   const changePasswordError = useAppSelector(
-    (state) => state.ParticipantAccount.changePasswordError,
+    (state) => state.password.changePasswordError,
   );
 
   const { form, handleSubmit, submitting, hasValidationErrors } =
@@ -74,7 +73,7 @@ const ChangePasswordForm: React.FC<TChangePasswordFormProps> = ({
     });
 
   const handleAnyFieldChange = () => {
-    dispatch(AccountActions.clearChangePasswordError());
+    dispatch(passwordActions.clearChangePasswordError());
   };
 
   const password = useField('password', form);

@@ -30,19 +30,19 @@
 
 .arrowIcon {
   /* Color for svg icons */
-  fill: $neutralGray5;
-  stroke: $neutralGray5;
+  fill: $neutralGray6;
+  stroke: $neutralGray6;
 
   &:hover {
-    fill: $neutralGray6;
-    stroke: $neutralGray6;
+    fill: $neutralGray7;
+    stroke: $neutralGray7;
   }
 }
 
 .disabled,
 .disabled:hover {
-  fill: $neutralGray4;
-  stroke: $neutralGray4;
+  fill: $neutralGray5;
+  stroke: $neutralGray5;
 }
 
 .pageNumberList {
@@ -89,7 +89,7 @@
   padding: 8px 4px;
 
   /* Color for svg icons */
-  color: $neutralGray5;
+  color: $neutralGray6;
 
   &:hover {
     text-decoration: none;
@@ -102,7 +102,7 @@
   border-bottom: 3px solid $primaryPri2;
 
   /* Color */
-  color: $neutralGray6;
+  color: $neutralGray7;
 }
 
 .paginationGap {
@@ -110,7 +110,7 @@
   padding: 21px 5px;
 
   /* Color for svg icons */
-  color: $neutralGray5;
+  color: $neutralGray6;
 
   /* Ellipsis is raised from baseline */
   line-height: 13px;

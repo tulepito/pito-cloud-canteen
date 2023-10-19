@@ -66,7 +66,7 @@ export const publishOrder = async (orderId: string) => {
   }
 
   if (isEmpty(plans)) {
-    throw new Error(`No plan was set up`);
+    throw new Error(`No plans were set up`);
   }
 
   const [planId] = plans;
@@ -84,12 +84,9 @@ export const publishOrder = async (orderId: string) => {
   });
 
   const response = denormalisedResponseEntities(
-    await integrationSdk.users.show(
-      {
-        id: ADMIN_FLEX_ID,
-      },
-      { expand: true },
-    ),
+    await integrationSdk.users.show({
+      id: ADMIN_FLEX_ID,
+    }),
   )[0];
   const { systemServiceFeePercentage = 0 } = User(response).getPrivateData();
 

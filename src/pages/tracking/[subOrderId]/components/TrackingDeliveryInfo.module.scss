@@ -21,12 +21,21 @@
       font-weight: 600;
     }
 
+    .rowDataLoading {
+      width: calc(100vw - 16px * 4);
+      height: 24px;
+    }
+
     @include viewportMedium {
       flex-direction: row;
       column-gap: 40px;
 
       .label {
         flex-basis: 165px;
+      }
+
+      .rowDataLoading {
+        width: 420px;
       }
     }
   }

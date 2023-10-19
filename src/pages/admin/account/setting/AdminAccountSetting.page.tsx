@@ -1,8 +1,8 @@
 import React, { useMemo, useState } from 'react';
 
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { adminAccountSettingThunks } from '@redux/slices/adminAccountSetting.slice';
 import { NotificationSliceAction } from '@redux/slices/notificationPopup.slice';
+import { userThunks } from '@redux/slices/user.slice';
 import { CurrentUser } from '@src/utils/data';
 import type { TCurrentUser } from '@src/utils/types';
 
@@ -14,8 +14,11 @@ import AdminAccountSettingForm from './AdminAccountSettingForm/AdminAccountSetti
 const AdminAccountSettingPage = () => {
   const dispatch = useAppDispatch();
   const currentUser = useAppSelector((state) => state.user.currentUser);
-  const { updateInProgress, updateError } = useAppSelector(
-    (state) => state.adminAccountSetting,
+  const updateProfileInProgress = useAppSelector(
+    (state) => state.user.updateProfileInProgress,
+  );
+  const updateProfileError = useAppSelector(
+    (state) => state.user.updateProfileError,
   );
 
   const [submittedValues, setSubmittedValues] = useState<any>();
@@ -30,9 +33,7 @@ const AdminAccountSettingPage = () => {
         systemVATPercentage: systemVATPercentage / 100,
       },
     };
-    const { payload } = await dispatch(
-      adminAccountSettingThunks.updateAdminAccount(updateValues),
-    );
+    const { payload } = await dispatch(userThunks.updateProfile(updateValues));
     if (payload) {
       setSubmittedValues({ systemVATPercentage, systemServiceFeePercentage });
       dispatch(
@@ -62,8 +63,8 @@ const AdminAccountSettingPage = () => {
       <AdminAccountSettingForm
         onSubmit={onSubmit}
         initialValues={initialValues}
-        inProgress={updateInProgress}
-        updateError={updateError}
+        inProgress={updateProfileInProgress}
+        updateError={updateProfileError}
         submittedValues={submittedValues}
       />
     </div>

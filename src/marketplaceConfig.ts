@@ -9,20 +9,6 @@ export const menuTypesOptions = [
   { key: 'cycle-menu', label: 'SearchFilter.menu.cycle-menu' },
 ];
 
-export const mealTypesOptions = [
-  { key: 'vietname', label: 'SearchFilter.mealTypes.vietnam' },
-  { key: 'northStyle', label: 'SearchFilter.mealTypes.northStyle' },
-  { key: 'eastStyle', label: 'SearchFilter.mealTypes.eastStyle' },
-  { key: 'middleSideStyle', label: 'SearchFilter.mealTypes.middleSideStyle' },
-  { key: 'asiaStyle', label: 'SearchFilter.mealTypes.asiaStyle' },
-  { key: 'thaiStyle', label: 'SearchFilter.mealTypes.thaiStyle' },
-  { key: 'japanStyle', label: 'SearchFilter.mealTypes.japanStyle' },
-  { key: 'koreaStyle', label: 'SearchFilter.mealTypes.koreaStyle' },
-  { key: 'europeStyle', label: 'SearchFilter.mealTypes.europeStyle' },
-  { key: 'chineseStyle', label: 'SearchFilter.mealTypes.chineseStyle' },
-  { key: 'indianStyle', label: 'SearchFilter.mealTypes.indianStyle' },
-];
-
 export const distanceOptions = [
   { key: '2', label: 'Dưới 2km' },
   { key: '3', label: 'Dưới 3km' },

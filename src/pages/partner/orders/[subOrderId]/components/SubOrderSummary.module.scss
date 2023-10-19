@@ -64,7 +64,7 @@
 
   .tableHead {
     color: $neutralGray1;
-    background-color: $neutralGray5;
+    background-color: $neutralGray6;
     @include textTemplate(14px, 700, 20px);
     @include tableColumnsLayout;
   }
@@ -112,7 +112,7 @@
 }
 
 .tooltipOverlay :global(.rc-tooltip-arrow) {
-  border-color: $neutralGray6;
+  border-color: $neutralGray7;
   border-right-color: $neutralGray1;
   border-left-color: $neutralGray1;
 }

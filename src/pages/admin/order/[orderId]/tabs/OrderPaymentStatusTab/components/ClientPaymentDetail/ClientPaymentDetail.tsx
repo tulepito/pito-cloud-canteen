@@ -3,7 +3,7 @@ import { parseThousandNumberToInteger } from '@helpers/format';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { generateSKU } from '@pages/admin/order/[orderId]/helpers/AdminOrderDetail';
-import { OrderDetailThunks } from '@pages/admin/order/[orderId]/OrderDetail.slice';
+import { AdminManageOrderThunks } from '@pages/admin/order/AdminManageOrder.slice';
 import { Listing, User } from '@src/utils/data';
 import { EPaymentType } from '@src/utils/enums';
 import type { TUser } from '@src/utils/types';
@@ -39,18 +39,18 @@ const ClientPaymentDetail: React.FC<ClientPaymentDetailProps> = (props) => {
   const dispatch = useAppDispatch();
   const addPaymentModalController = useBoolean();
 
-  const order = useAppSelector((state) => state.OrderDetail.order);
+  const order = useAppSelector((state) => state.AdminManageOrder.order);
   const confirmClientPaymentInProgress = useAppSelector(
-    (state) => state.OrderDetail.confirmClientPaymentInProgress,
+    (state) => state.AdminManageOrder.confirmClientPaymentInProgress,
   );
   const createClientPaymentRecordInProgress = useAppSelector(
-    (state) => state.OrderDetail.createClientPaymentRecordInProgress,
+    (state) => state.AdminManageOrder.createClientPaymentRecordInProgress,
   );
   const createClientPaymentRecordError = useAppSelector(
-    (state) => state.OrderDetail.createClientPaymentRecordError,
+    (state) => state.AdminManageOrder.createClientPaymentRecordError,
   );
   const deleteClientPaymentRecordInProgress = useAppSelector(
-    (state) => state.OrderDetail.deleteClientPaymentRecordInProgress,
+    (state) => state.AdminManageOrder.deleteClientPaymentRecordInProgress,
   );
 
   const { isAdminConfirmedClientPayment = false } =
@@ -70,7 +70,7 @@ const ClientPaymentDetail: React.FC<ClientPaymentDetailProps> = (props) => {
     const { paymentAmount, paymentNote } = values;
 
     const { meta } = await dispatch(
-      OrderDetailThunks.createClientPaymentRecord({
+      AdminManageOrderThunks.createClientPaymentRecord({
         paymentType: EPaymentType.CLIENT,
         orderId,
         amount: parseThousandNumberToInteger(paymentAmount),
@@ -86,17 +86,17 @@ const ClientPaymentDetail: React.FC<ClientPaymentDetailProps> = (props) => {
     if (meta.requestStatus === 'fulfilled') {
       addPaymentModalController.setFalse();
     } else {
-      dispatch(OrderDetailThunks.fetchClientPaymentRecords(orderId));
+      dispatch(AdminManageOrderThunks.fetchClientPaymentRecords(orderId));
     }
   };
 
   const handleConfirmPayment = () => {
-    dispatch(OrderDetailThunks.confirmClientPayment(orderId));
+    dispatch(AdminManageOrderThunks.confirmClientPayment(orderId));
   };
 
   const handleDeleteClientPaymentRecord = async (paymentRecordId: string) => {
     return dispatch(
-      OrderDetailThunks.deleteClientPaymentRecord({
+      AdminManageOrderThunks.deleteClientPaymentRecord({
         paymentRecordId,
         shouldDisapprovePayment: isAdminConfirmedClientPayment,
       }),

@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 
 import { useAppSelector } from '@hooks/reduxHooks';
 import { IgnoredPermissionCheckRoutes } from '@src/paths';
-import type { EUserPermission } from '@utils/enums';
+import type { EUserSystemPermission } from '@utils/enums';
 
 import {
   getHomePageRouteBaseOnPermission,
@@ -19,7 +19,7 @@ const verifyPermissionFn = ({
 }: {
   isPassChecking: boolean;
   isMatchedPermission: boolean | null;
-  userPermission: EUserPermission;
+  userPermission: EUserSystemPermission;
   router: NextRouter;
 }) => {
   if (isPassChecking) {

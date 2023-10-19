@@ -447,7 +447,6 @@ const OrderListPage = () => {
   }, [planIdFromQuery, timestampFromQuery, JSON.stringify(flattenEvents)]);
 
   useEffect(() => {
-    dispatch(OrderListThunks.fetchAttributes());
     dispatch(OrderListThunks.fetchParticipantFirebaseNotifications());
     dispatch(CalendarActions.setSelectedDay(null));
   }, []);

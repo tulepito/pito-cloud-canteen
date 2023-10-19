@@ -4,7 +4,6 @@ import omit from 'lodash/omit';
 import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
 
-import { getAttributesApi } from '@apis/admin';
 import { partnerFoodApi } from '@apis/foodApi';
 import { getImportDataFromCsv } from '@pages/admin/partner/[restaurantId]/settings/food/utils';
 import { createAsyncThunk } from '@redux/redux.helper';
@@ -14,7 +13,6 @@ import { storableAxiosError, storableError } from '@utils/errors';
 import type {
   TImage,
   TIntegrationListing,
-  TKeyValue,
   TListing,
   TObject,
   TPagination,
@@ -55,12 +53,6 @@ type TFoodSliceState = {
   menuPickedFoods: TIntegrationListing[];
   queryMenuPickedFoodsInProgress: boolean;
   queryMenuPickedFoodsError: any;
-
-  nutritions: TKeyValue[];
-  categories: TKeyValue[];
-  packaging: TKeyValue[];
-  fetchAttributesInProgress: boolean;
-  fetchAttributesError: any;
 
   publishOrCloseFoodId: string | null;
   publishOrCloseFoodIdError: any;
@@ -104,14 +96,7 @@ const initialState: TFoodSliceState = {
   queryMenuPickedFoodsInProgress: false,
   queryMenuPickedFoodsError: null,
 
-  nutritions: [],
-  categories: [],
-  packaging: [],
-  fetchAttributesInProgress: false,
-  fetchAttributesError: null,
-
   // active food
-
   publishOrCloseFoodId: null,
   publishOrCloseFoodIdError: null,
 };
@@ -137,7 +122,6 @@ const DUPLICATE_FOOD = 'app/ManageFoodsPage/DUPLICATE_FOOD';
 const CREATE_FOOD_FROM_FILE = 'app/ManageFoodsPage/CREATE_FOOD_FROM_FILE';
 
 const QUERY_MENU_PICKED_FOODS = 'app/ManageFoodsPage/QUERY_MENU_PICKED_FOODS';
-const FETCH_ATTRIBUTES = 'app/ManageFoodsPage/FETCH_ATTRIBUTES';
 
 const PUBLISH_OR_CLOSE_FOOD = 'app/ManageFoodsPage/PUBLISH_OR_CLOSE_FOOD';
 
@@ -386,7 +370,7 @@ const createPartnerFoodFromCsv = createAsyncThunk(
         async complete({ data = [] }: { data: any[] }) {
           const isProduction = process.env.NEXT_PUBLIC_ENV === 'production';
           const dataLengthToImport = isProduction ? data.length : 3;
-          const packagingOptions = getState().AdminAttributes.packaging;
+          const packagingOptions = getState().SystemAttributes.packaging;
           const response = await Promise.all(
             data.slice(0, dataLengthToImport).map(async (foodData: any) => {
               const dataParams = getImportDataFromCsv(
@@ -497,12 +481,6 @@ const showDuplicateFood = createAsyncThunk(
   },
 );
 
-const fetchAttributes = createAsyncThunk(FETCH_ATTRIBUTES, async () => {
-  const { data: response } = await getAttributesApi();
-
-  return response;
-});
-
 export const publishOrCloseFood = createAsyncThunk(
   PUBLISH_OR_CLOSE_FOOD,
   async (payload: any) => {
@@ -538,7 +516,6 @@ export const foodSliceThunks = {
   duplicateFood,
   createPartnerFoodFromCsv,
   queryMenuPickedFoods,
-  fetchAttributes,
   publishOrCloseFood,
 };
 
@@ -740,30 +717,6 @@ const foodSlice = createSlice({
         createPartnerFoodFromCsvInProgress: false,
         createPartnerFoodFromCsvError: payload,
       }))
-
-      .addCase(fetchAttributes.pending, (state) => {
-        return {
-          ...state,
-          fetchAttributesInProgress: true,
-          fetchAttributesError: null,
-        };
-      })
-      .addCase(fetchAttributes.fulfilled, (state, { payload }) => {
-        return {
-          ...state,
-          fetchAttributesInProgress: false,
-          nutritions: payload?.nutritions,
-          categories: payload?.categories,
-          packaging: payload?.packaging,
-        };
-      })
-      .addCase(fetchAttributes.rejected, (state, { error }) => {
-        return {
-          ...state,
-          fetchAttributesInProgress: false,
-          fetchAttributesError: error.message,
-        };
-      })
       .addCase(
         publishOrCloseFood.pending,
         (

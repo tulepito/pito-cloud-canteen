@@ -17,7 +17,7 @@ import Tooltip from '@components/Tooltip/Tooltip';
 import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
 import { findValidRangeForDeadlineDate } from '@helpers/orderHelper';
 import { useAppSelector } from '@hooks/reduxHooks';
-import { EUserPermission } from '@src/utils/enums';
+import { EUserSystemPermission } from '@src/utils/enums';
 import { renderListTimeOptions, TimeOptions } from '@utils/dates';
 import type { TObject } from '@utils/types';
 import { required } from '@utils/validators';
@@ -87,7 +87,7 @@ const OrderDeadlineField: React.FC<TOrderDeadlineFieldProps> = (props) => {
   } = values;
   const userPermission = useAppSelector((state) => state.user.userPermission);
 
-  const isAdminFlow = EUserPermission.admin === userPermission;
+  const isAdminFlow = EUserSystemPermission.admin === userPermission;
 
   const { minSelectedDate, maxSelectedDate } = isAdminFlow
     ? { minSelectedDate: new Date(), maxSelectedDate: startDateInitialValue }

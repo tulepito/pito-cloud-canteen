@@ -4,7 +4,7 @@ import BookerSelectRestaurant from './BookerSelectRestaurant.page';
 
 function BookerSelectRestaurantRoute() {
   return (
-    <MetaWrapper>
+    <MetaWrapper routeName="BookerSelectRestaurantRoute">
       <BookerSelectRestaurant />
     </MetaWrapper>
   );

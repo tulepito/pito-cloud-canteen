@@ -12,7 +12,7 @@
 }
 .generalRatingWrapper {
   padding-bottom: 20px;
-  border-bottom: 1px solid $neutralGray4;
+  border-bottom: 1px solid $neutralGray5;
 
   @include viewportLarge {
     width: 400px;
@@ -75,7 +75,7 @@
 .detailTextRatingWrapper {
   margin-top: 28px;
   padding-bottom: 20px;
-  border-bottom: 1px solid $neutralGray4;
+  border-bottom: 1px solid $neutralGray5;
 
   .detailTextRatingLabel {
     @include textTemplate(16px, $fontWeightBold, 24px);
@@ -92,7 +92,7 @@
   width: 100%;
   margin-top: 28px;
   padding-bottom: 20px;
-  border-bottom: 1px solid $neutralGray4;
+  border-bottom: 1px solid $neutralGray5;
 
   .imagesFieldWrapper {
     width: 100%;
@@ -117,7 +117,7 @@
   gap: 64px;
   padding-bottom: 20px;
   margin-top: 20px;
-  border-bottom: 1px solid $neutralGray4;
+  border-bottom: 1px solid $neutralGray5;
 
   .ratingSectionTitle {
     @include textTemplate(18px, $fontWeightBold, 24px);

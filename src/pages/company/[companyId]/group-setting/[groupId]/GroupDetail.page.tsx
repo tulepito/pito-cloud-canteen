@@ -19,7 +19,7 @@ import useBoolean from '@hooks/useBoolean';
 import useFetchCompanyInfo from '@hooks/useFetchCompanyInfo';
 import { companyPaths } from '@src/paths';
 import { companyThunks } from '@src/redux/slices/company.slice';
-import { ALLERGIES_OPTIONS, getLabelByKey } from '@src/utils/enums';
+import { ALLERGIES_OPTIONS, getLabelByKey } from '@src/utils/options';
 import { User } from '@utils/data';
 import type { TObject } from '@utils/types';
 
@@ -77,7 +77,7 @@ const GroupDetailPage = () => {
     shallowEqual,
   );
   const nutritions = useAppSelector(
-    (state) => state.company.nutritions,
+    (state) => state.SystemAttributes.nutritions,
     shallowEqual,
   );
 
@@ -208,7 +208,6 @@ const GroupDetailPage = () => {
         groupId: groupId as string,
       }),
     );
-    dispatch(companyThunks.fetchAttributes());
   }, [groupId]);
 
   const groupInfoFormInitialValues = useMemo(

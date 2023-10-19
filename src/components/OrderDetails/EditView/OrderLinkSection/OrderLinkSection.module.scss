@@ -34,7 +34,7 @@
       display: inline-block;
 
       padding: 10px 16px;
-      outline: 1px solid $neutralGray4;
+      outline: 1px solid $neutralGray5;
       outline-offset: -1px;
       border-radius: 16px;
       flex-grow: 1;
@@ -50,7 +50,7 @@
 }
 
 .toolTipOverlay :global(.rc-tooltip-arrow) {
-  border-color: $neutralGray6;
+  border-color: $neutralGray7;
   border-right-color: $neutralGray1;
   border-left-color: $neutralGray1;
 }

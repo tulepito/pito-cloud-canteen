@@ -29,7 +29,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
           if (orderState !== EOrderDraftStates.draft) {
             throw new Error(
-              'You can publish draft order (with orderState is "draft") only',
+              'You can publish draft order (with orderState "draft") only',
             );
           }
 

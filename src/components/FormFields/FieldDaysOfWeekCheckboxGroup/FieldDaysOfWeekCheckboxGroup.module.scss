@@ -11,12 +11,12 @@
   margin-bottom: 15px;
   gap: 7px;
   .dayButton {
-    border: 1px solid $neutralGray4;
+    border: 1px solid $neutralGray5;
 
     padding: 7px 16px;
     margin-right: 4px;
     font-size: 15px;
-    color: $neutralGray5;
+    color: $neutralGray6;
     border-radius: 20px;
     cursor: pointer;
     &.disabled {
@@ -25,10 +25,10 @@
       pointer-events: none;
     }
     &.active {
-      border: 2px solid $neutralGray6;
+      border: 2px solid $neutralGray7;
 
       font-weight: $fontWeightBold;
-      color: $neutralGray6;
+      color: $neutralGray7;
     }
     * {
       cursor: pointer;

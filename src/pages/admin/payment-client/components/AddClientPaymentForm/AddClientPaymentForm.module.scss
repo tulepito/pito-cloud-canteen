@@ -79,8 +79,8 @@
 
 .bookerButton {
   border-radius: 20px;
-  border: 1px solid $neutralGray4;
-  color: $neutralGray4;
+  border: 1px solid $neutralGray5;
+  color: $neutralGray5;
   display: inline-flex;
   gap: 8px;
   font-size: 14px;
@@ -97,8 +97,8 @@
     cursor: pointer;
   }
   &.active {
-    border: 1px solid $neutralGray6;
-    color: $neutralGray6;
+    border: 1px solid $neutralGray7;
+    color: $neutralGray7;
   }
 }
 

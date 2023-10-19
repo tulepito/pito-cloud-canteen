@@ -7,10 +7,10 @@ import type { FormApi } from 'final-form';
 import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
 import Form from '@components/Form/Form';
 import ValidationError from '@components/ValidationError/ValidationError';
+import { getLabelByKey, MENU_TYPE_OPTIONS } from '@src/utils/options';
 import { foodByDatesAtLeastOneDayHasFood } from '@src/utils/validators';
 import { IntegrationListing } from '@utils/data';
 import { formatTimestamp } from '@utils/dates';
-import { getLabelByKey, MENU_OPTIONS } from '@utils/enums';
 import type { TIntegrationListing } from '@utils/types';
 
 import AddFoodModal from '../AddFoodModal/AddFoodModal';
@@ -135,7 +135,7 @@ const EditMenuCompleteFormComponent: React.FC<
                 <label className={css.label}>
                   <FormattedMessage id="EditMenuCompleteForm.menuType" />
                 </label>
-                <div>{getLabelByKey(MENU_OPTIONS, menuType)}</div>
+                <div>{getLabelByKey(MENU_TYPE_OPTIONS, menuType)}</div>
               </div>
             </div>
           </div>

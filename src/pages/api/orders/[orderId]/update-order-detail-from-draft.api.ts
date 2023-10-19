@@ -17,26 +17,20 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         const { planId, orderDetail } = req.body;
         const { orderId } = req.query;
 
-        const response = await integrationSdk.listings.update(
-          {
+        const [planListing] = denormalisedResponseEntities(
+          await integrationSdk.listings.update({
             id: planId,
             metadata: {
               orderDetail,
             },
-          },
-          { expand: true },
+          }),
         );
 
-        const [planListing] = denormalisedResponseEntities(response);
-
-        const orderResponse = await integrationSdk.listings.show(
-          {
+        const [orderListing] = denormalisedResponseEntities(
+          await integrationSdk.listings.show({
             id: orderId,
-          },
-          { expand: true },
+          }),
         );
-
-        const [orderListing] = denormalisedResponseEntities(orderResponse);
 
         const { deliveryHour } = Listing(orderListing).getMetadata();
 

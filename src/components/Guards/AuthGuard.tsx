@@ -71,9 +71,10 @@ const AuthGuard: React.FC<TAuthGuardProps> = ({ children }) => {
   // TODO: fetch current user if authenticated
   useEffect(() => {
     if (isAuthenticated) {
-      dispatch(userThunks.fetchCurrentUser(undefined));
-      const isVerified = isUserEmailVerified;
-      dispatch(emailVerificationActions.updateVerificationState(isVerified));
+      dispatch(userThunks.fetchCurrentUser());
+      dispatch(
+        emailVerificationActions.updateVerificationState(isUserEmailVerified),
+      );
     }
   }, [isAuthenticated, isUserEmailVerified]);
 

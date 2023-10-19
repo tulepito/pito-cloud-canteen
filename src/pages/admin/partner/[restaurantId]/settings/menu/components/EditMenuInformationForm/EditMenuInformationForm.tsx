@@ -8,7 +8,7 @@ import arrayMutators from 'final-form-arrays';
 import Form from '@components/Form/Form';
 import FieldRadioButton from '@components/FormFields/FieldRadioButton/FieldRadioButton';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
-import { MENU_MEAL_TYPE_OPTIONS, MENU_OPTIONS } from '@utils/enums';
+import { MENU_MEAL_TYPE_OPTIONS, MENU_TYPE_OPTIONS } from '@src/utils/options';
 import { required } from '@utils/validators';
 
 import type { TEditMenuInformationFormValues } from '../EditPartnerMenuWizard/utils';
@@ -60,7 +60,7 @@ const EditMenuInformationFormComponent: React.FC<
               <FormattedMessage id="EditMenuInformationForm.menuTypeLabel" />
             </label>
             <div className={css.radioGroup}>
-              {MENU_OPTIONS.map((opt) => (
+              {MENU_TYPE_OPTIONS.map((opt) => (
                 <FieldRadioButton
                   name="menuType"
                   id={opt.key}

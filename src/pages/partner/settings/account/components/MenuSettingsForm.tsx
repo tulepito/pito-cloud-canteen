@@ -9,7 +9,7 @@ import Form from '@components/Form/Form';
 import FieldCheckboxGroup from '@components/FormFields/FieldCheckboxGroup/FieldCheckboxGroup';
 import { useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
-import { MEAL_OPTIONS_WITH_TIME } from '@src/utils/enums';
+import { MEAL_OPTIONS_WITH_TIME } from '@src/utils/options';
 
 import css from './MenuSettingsForm.module.scss';
 

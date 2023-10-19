@@ -3,7 +3,7 @@ import flatten from 'lodash/flatten';
 import isEmpty from 'lodash/isEmpty';
 import uniq from 'lodash/uniq';
 
-import { UserPermission } from '@src/types/UserPermission';
+import { ECompanyPermission } from '@src/utils/enums';
 import { User } from '@utils/data';
 import type { TCurrentUser, TObject, TUser } from '@utils/types';
 
@@ -23,7 +23,7 @@ export const getCompanyIdFromBookerUser = (user: TUser | TCurrentUser) => {
   const companyIds = Object.entries(companies).find((entry) => {
     const [, permissionData] = entry;
 
-    return [UserPermission.BOOKER, UserPermission.OWNER].includes(
+    return [ECompanyPermission.booker, ECompanyPermission.owner].includes(
       (permissionData as TObject).permission,
     );
   });

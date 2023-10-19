@@ -21,25 +21,23 @@ import {
   queryOrdersApi,
   recommendRestaurantApi,
   reorderApi,
-  requestApprovalOrderApi,
   updateOrderApi,
   updateOrderStateToDraftApi,
   updatePlanDetailsApi,
 } from '@apis/orderApi';
-import { fetchSearchFilterApi } from '@apis/userApi';
 import { queryAllPages } from '@helpers/apiHelpers';
 import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
 import { getMenuQueryInSpecificDay } from '@helpers/listingSearchQuery';
 import { createAsyncThunk } from '@redux/redux.helper';
 import config from '@src/configs';
-import { CompanyPermission } from '@src/types/UserPermission';
+import { CompanyPermissions } from '@src/types/UserPermission';
 import { denormalisedResponseEntities, Listing, User } from '@utils/data';
 import {
+  ECompanyDashboardNotificationType,
   EInvalidRestaurantCase,
   EListingStates,
   EListingType,
   EManageCompanyOrdersTab,
-  ENotificationTypes,
   ERestaurantListingStatus,
   MANAGE_COMPANY_ORDERS_TAB_MAP,
 } from '@utils/enums';
@@ -129,10 +127,6 @@ type TOrderInitialState = {
   onRescommendRestaurantForSpecificDateInProgress: boolean;
   onRescommendRestaurantForSpecificDateError: any;
 
-  nutritions: {
-    key: string;
-    label: string;
-  }[];
   availableOrderDetailCheckList: {
     [timestamp: string]: {
       isAvailable: boolean;
@@ -231,10 +225,10 @@ const initialState: TOrderInitialState = {
   getOrderNotificationInProgress: false,
   getOrderNotificationError: null,
   companyOrderNotificationMap: {
-    [ENotificationTypes.completedOrder]: null,
-    [ENotificationTypes.deadlineDueOrder]: null,
-    [ENotificationTypes.draftOrder]: null,
-    [ENotificationTypes.pickingOrder]: null,
+    [ECompanyDashboardNotificationType.completedOrder]: null,
+    [ECompanyDashboardNotificationType.deadlineDueOrder]: null,
+    [ECompanyDashboardNotificationType.draftOrder]: null,
+    [ECompanyDashboardNotificationType.pickingOrder]: null,
   },
 
   restaurantCoverImageList: {},
@@ -253,7 +247,6 @@ const initialState: TOrderInitialState = {
   onRescommendRestaurantForSpecificDateInProgress: false,
   onRescommendRestaurantForSpecificDateError: null,
 
-  nutritions: [],
   availableOrderDetailCheckList: {},
   orderRestaurantList: [],
   fetchOrderRestaurantListInProgress: false,
@@ -298,7 +291,6 @@ const FETCH_RESTAURANT_COVER_IMAGE = 'app/Order/FETCH_RESTAURANT_COVER_IMAGE';
 const RECOMMEND_RESTAURANT = 'app/Order/RECOMMEND_RESTAURANT';
 const RECOMMEND_RESTAURANT_FOR_SPECIFIC_DAY =
   'app/Order/RECOMMEND_RESTAURANT_FOR_SPECIFIC_DAY';
-const FETCH_NUTRITIONS = 'app/Order/FETCH_NUTRITIONS';
 const CHECK_RESTAURANT_STILL_AVAILABLE =
   'app/Order/CHECK_RESTAURANT_STILL_AVAILABLE';
 const FETCH_ORDER_RESTAURANTS = 'app/Order/FETCH_ORDER_RESTAURANTS';
@@ -427,9 +419,7 @@ const queryAllOrders = createAsyncThunk(
         ...payload,
         states: EListingStates.published,
       },
-      queryParams: {
-        expand: true,
-      },
+      queryParams: {},
       isQueryAllPages: true,
     };
 
@@ -449,9 +439,7 @@ const queryCompanyPlansByOrderIds = createAsyncThunk(
       dataParams: {
         meta_orderId: orderIds.join(','),
       },
-      queryParams: {
-        expand: true,
-      },
+      queryParams: {},
     };
 
     const { data } = await companyApi.queryCompanyPlansByOrderIdsApi(
@@ -558,9 +546,7 @@ const queryCompanyOrders = createAsyncThunk(
         meta_listingType: EListingType.order,
         sort: 'createdAt',
       },
-      queryParams: {
-        expand: true,
-      },
+      queryParams: {},
     };
     const { data: response } = await companyApi.queryOrdersApi(
       companyId,
@@ -603,16 +589,13 @@ const fetchCompanyBookers = createAsyncThunk(
   FETCH_COMPANY_BOOKERS,
   async (companyId: string, { extra: sdk }) => {
     const companyAccount = denormalisedResponseEntities(
-      await sdk.users.show(
-        {
-          id: companyId,
-        },
-        { expand: true },
-      ),
+      await sdk.users.show({
+        id: companyId,
+      }),
     )[0];
     const { members = {} } = User(companyAccount).getMetadata();
     const bookerEmails = Object.keys(members).filter((email) =>
-      CompanyPermission.includes(members[email].permission),
+      CompanyPermissions.includes(members[email].permission),
     );
     const bookers = await Promise.all(
       bookerEmails.map(async (email) => {
@@ -752,15 +735,6 @@ const bookerDeleteDraftOrder = createAsyncThunk(
   },
 );
 
-const requestApprovalOrder = createAsyncThunk(
-  'app/Order/REQUEST_APPROVAL_ORDER',
-  async ({ orderId }: TObject) => {
-    const { data: responseData } = await requestApprovalOrderApi(orderId);
-
-    return responseData;
-  },
-);
-
 const cancelPendingApprovalOrder = createAsyncThunk(
   'app/Order/CANCEL_PENDING_APPROVAL_ORDER',
   async ({ orderId }: TObject, { getState, dispatch }) => {
@@ -785,12 +759,6 @@ const bookerPublishOrder = createAsyncThunk(
     serializeError: storableError,
   },
 );
-
-const fetchNutritions = createAsyncThunk(FETCH_NUTRITIONS, async () => {
-  const { data: searchFiltersResponse } = await fetchSearchFilterApi();
-
-  return searchFiltersResponse.nutritions;
-});
 
 const checkRestaurantStillAvailable = createAsyncThunk(
   CHECK_RESTAURANT_STILL_AVAILABLE,
@@ -963,13 +931,11 @@ export const orderAsyncActions = {
   queryCompanyOrders,
   fetchPlanDetail,
   updatePlanDetail,
-  requestApprovalOrder,
   bookerPublishOrder,
   cancelPendingApprovalOrder,
   fetchRestaurantCoverImages,
   recommendRestaurants,
   recommendRestaurantForSpecificDay,
-  fetchNutritions,
   checkRestaurantStillAvailable,
   fetchOrderRestaurants,
   getCompanyOrderNotification,
@@ -1258,22 +1224,6 @@ const orderSlice = createSlice({
         updateOrderDetailInProgress: false,
         updateOrderDetailError: error.message,
       }))
-      /* =============== requestApprovalOrder =============== */
-      .addCase(requestApprovalOrder.pending, (state) => ({
-        ...state,
-        updateOrderInProgress: true,
-        updateOrderError: null,
-      }))
-      .addCase(requestApprovalOrder.fulfilled, (state, { payload }) => ({
-        ...state,
-        updateOrderInProgress: false,
-        order: payload,
-      }))
-      .addCase(requestApprovalOrder.rejected, (state, { error }) => ({
-        ...state,
-        updateOrderInProgress: false,
-        updateOrderError: error.message,
-      }))
       /* =============== cancelNeedApprovalOrder =============== */
       .addCase(cancelPendingApprovalOrder.pending, (state) => ({
         ...state,
@@ -1357,11 +1307,6 @@ const orderSlice = createSlice({
           onRescommendRestaurantForSpecificDateError: error.message,
         }),
       )
-
-      .addCase(fetchNutritions.fulfilled, (state, { payload }) => ({
-        ...state,
-        nutritions: payload,
-      }))
 
       .addCase(checkRestaurantStillAvailable.pending, () => {})
       .addCase(

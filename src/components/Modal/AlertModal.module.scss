@@ -18,7 +18,7 @@
 
 .children {
   @include textTemplate(14px, 500, 24px, '');
-  color: $neutralGray5;
+  color: $neutralGray6;
 
   &.hasActionSection {
     padding-bottom: 40px;

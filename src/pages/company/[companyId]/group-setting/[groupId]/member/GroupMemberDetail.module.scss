@@ -11,7 +11,7 @@
   cursor: pointer;
   font-weight: $fontWeightBold;
   &:hover {
-    border-bottom: 1px solid $neutralGray5;
+    border-bottom: 1px solid $neutralGray6;
   }
 }
 
@@ -30,7 +30,7 @@
     }
 
     .name {
-      color: $neutralGray6;
+      color: $neutralGray7;
     }
   }
 }
@@ -45,7 +45,7 @@
     @include flexAlign(center);
 
     .title {
-      color: $neutralGray6;
+      color: $neutralGray7;
       width: 60px;
       margin-right: 16px;
       font-weight: $fontWeightSemiBold;
@@ -59,11 +59,11 @@
   &:hover {
     border: none;
   }
-  color: $neutralGray6;
+  color: $neutralGray7;
 }
 
 .restrictionTable {
-  border: 1px solid $neutralGray4;
+  border: 1px solid $neutralGray5;
   border-radius: 8px;
   overflow: hidden;
   margin-top: 30px;
@@ -77,7 +77,7 @@
     .headerCol {
       flex-basis: 50%;
       @include text(14px, 20px);
-      color: $neutralGray5;
+      color: $neutralGray6;
     }
   }
 
@@ -91,7 +91,7 @@
       flex-direction: column;
       gap: 6px;
       text-transform: capitalize;
-      color: $neutralGray6;
+      color: $neutralGray7;
     }
   }
 }
