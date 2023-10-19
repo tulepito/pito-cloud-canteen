@@ -5,14 +5,9 @@ import classNames from 'classnames';
 import FieldCheckbox from '@components/FormFields/FieldCheckbox/FieldCheckbox';
 import OutsideClickHandler from '@components/OutsideClickHandler/OutsideClickHandler';
 import useBoolean from '@hooks/useBoolean';
+import { getLabelByKey } from '@src/utils/options';
 
 import css from './FieldMultipleSelect.module.scss';
-
-const getLabelByKey = (list: any[], key: any) => {
-  const item = list?.find((l: any) => l.key === key);
-
-  return item && item.label ? item.label : key;
-};
 
 const FieldMultipleSelectComponent = (props: any) => {
   const { options, placeholder, className, label, input } = props;

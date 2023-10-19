@@ -20,7 +20,7 @@ import { menusSliceAction, menusSliceThunks } from '@redux/slices/menus.slice';
 import { adminRoutes } from '@src/paths';
 import { IntegrationMenuListing } from '@utils/data';
 import { findClassDays } from '@utils/dates';
-import { EListingStates, EMenuMealType, EMenuTypes } from '@utils/enums';
+import { EListingStates, EMenuMealType, EMenuType } from '@utils/enums';
 import type {
   TCreateMenuApiParams,
   TDuplicateMenuApiParams,
@@ -127,7 +127,7 @@ const EditPartnerMenuTab: React.FC<TEditPartnerMenuTabProps> = (props) => {
 
     const isFixedMenu =
       IntegrationMenuListing(listing).getMetadata().menuType ===
-      EMenuTypes.fixedMenu;
+      EMenuType.fixedMenu;
 
     const { mealType } = IntegrationMenuListing(listing).getPublicData();
 
@@ -207,7 +207,7 @@ const EditPartnerMenuTab: React.FC<TEditPartnerMenuTabProps> = (props) => {
               endDate,
             }
           : {
-              menuType: EMenuTypes.fixedMenu,
+              menuType: EMenuType.fixedMenu,
               mealType: EMenuMealType.breakfast,
             };
       case MENU_PRICING_TAB: {

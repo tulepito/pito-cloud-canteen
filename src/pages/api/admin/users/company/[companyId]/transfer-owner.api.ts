@@ -5,7 +5,7 @@ import transferCompanyOwner from '@pages/api/apiServices/company/transferCompany
 import cookies from '@services/cookie';
 import adminChecker from '@services/permissionChecker/admin';
 import { handleError } from '@services/sdk';
-import type { UserPermission } from '@src/types/UserPermission';
+import type { ECompanyPermission } from '@src/utils/enums';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
@@ -19,7 +19,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       res,
       companyId: companyId as string,
       newOwnerEmail: newOwnerEmail as string,
-      permissionForOldOwner: permissionForOldOwner as UserPermission,
+      permissionForOldOwner: permissionForOldOwner as ECompanyPermission,
       newOwnerProfileImageId,
     });
 

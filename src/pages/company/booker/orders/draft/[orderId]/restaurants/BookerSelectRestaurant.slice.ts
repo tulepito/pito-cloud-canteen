@@ -13,9 +13,9 @@ import type { TMenuQueryParams } from '@helpers/listingSearchQuery';
 import { getMenuQuery, getRestaurantQuery } from '@helpers/listingSearchQuery';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
-import { CompanyPermission, UserPermission } from '@src/types/UserPermission';
+import { CompanyPermissions } from '@src/types/UserPermission';
 import { denormalisedResponseEntities, Listing } from '@utils/data';
-import { EImageVariants, EListingType } from '@utils/enums';
+import { ECompanyPermission, EImageVariants, EListingType } from '@utils/enums';
 import type { TListing, TObject, TPagination, TUser } from '@utils/types';
 
 export const MANAGE_ORDER_PAGE_SIZE = 10;
@@ -416,7 +416,7 @@ const fetchRestaurantReviews = createAsyncThunk(
     );
 
     return {
-      ...(CompanyPermission.includes(reviewRole) && {
+      ...(CompanyPermissions.includes(reviewRole) && {
         restaurantBookerReviews: isViewAll
           ? uniqBy([...restaurantBookerReviews, ...fetchedReviews], 'id.uuid')
           : fetchedReviews,
@@ -428,7 +428,7 @@ const fetchRestaurantReviews = createAsyncThunk(
           : mapValue(keyBy(reviewerWithReviewIdList, 'id'), 'value'),
         bookerReviewPagination: meta,
       }),
-      ...(reviewRole === UserPermission.PARTICIPANT && {
+      ...(reviewRole === ECompanyPermission.participant && {
         restaurantParticipantReviews: isViewAll
           ? uniqBy(
               [...restaurantParticipantReviews, ...fetchedReviews],

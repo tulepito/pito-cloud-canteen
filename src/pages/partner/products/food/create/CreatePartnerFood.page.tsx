@@ -7,7 +7,7 @@ import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { CurrentUser, IntegrationListing } from '@utils/data';
-import { EFoodTypes, EMenuTypes } from '@utils/enums';
+import { EFoodType, EMenuType } from '@utils/enums';
 import { getInitialAddImages } from '@utils/images';
 import type { TObject } from '@utils/types';
 
@@ -86,8 +86,8 @@ const CreatePartnerFoodPage = () => {
       title,
       description,
       price: price?.amount,
-      menuType: menuType || EMenuTypes.cycleMenu,
-      foodType: foodType || EFoodTypes.savoryDish,
+      menuType: menuType || EMenuType.cycleMenu,
+      foodType: foodType || EFoodType.savoryDish,
       minOrderHourInAdvance: 24,
       minQuantity,
       maxQuantity,

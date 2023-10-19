@@ -8,7 +8,7 @@ import IconDanger from '@components/Icons/IconDanger/IconDanger';
 import IconWarning from '@components/Icons/IconWarning/IconWarning';
 import { useAppDispatch } from '@hooks/reduxHooks';
 import { NotificationThunks } from '@redux/slices/notificationPopup.slice';
-import { ENotificationPopupTypes } from '@src/utils/enums';
+import { ENotificationPopupType } from '@src/utils/enums';
 import type { TNotification } from '@src/utils/types';
 
 import css from './NotificationItem.module.scss';
@@ -46,7 +46,7 @@ const NotificationItem: React.FC<TNotificationItem> = (props) => {
   let messageWrapper;
 
   switch (type) {
-    case ENotificationPopupTypes.success:
+    case ENotificationPopupType.success:
       messageWrapper = (
         <div
           className={classNames(css.messageWrapper, css.messageWrapperSucces)}>
@@ -55,7 +55,7 @@ const NotificationItem: React.FC<TNotificationItem> = (props) => {
         </div>
       );
       break;
-    case ENotificationPopupTypes.warning:
+    case ENotificationPopupType.warning:
       messageWrapper = (
         <div
           className={classNames(css.messageWrapper, css.messageWrapperWarning)}>
@@ -65,7 +65,7 @@ const NotificationItem: React.FC<TNotificationItem> = (props) => {
       );
       break;
 
-    case ENotificationPopupTypes.error:
+    case ENotificationPopupType.error:
       messageWrapper = (
         <div
           className={classNames(css.messageWrapper, css.messageWrapperError)}>

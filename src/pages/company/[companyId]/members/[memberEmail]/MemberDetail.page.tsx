@@ -15,7 +15,7 @@ import {
   companyThunks,
 } from '@redux/slices/company.slice';
 import { companyMemberThunks } from '@redux/slices/companyMember.slice';
-import { ALLERGIES_OPTIONS, getLabelByKey } from '@src/utils/enums';
+import { ALLERGIES_OPTIONS, getLabelByKey } from '@src/utils/options';
 import { ensureUser, User } from '@utils/data';
 import type { TUser } from '@utils/types';
 

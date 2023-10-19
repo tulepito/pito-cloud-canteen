@@ -30,12 +30,12 @@ import { foodSliceThunks } from '@redux/slices/foods.slice';
 import { adminRoutes } from '@src/paths';
 import { formatTimestamp } from '@src/utils/dates';
 import {
+  FOOD_SIDE_DISH_OPTIONS,
+  FOOD_SPECIAL_DIET_OPTIONS,
   FOOD_TYPE_OPTIONS,
   getLabelByKey,
-  MENU_OPTIONS,
-  SIDE_DISH_OPTIONS,
-  SPECIAL_DIET_OPTIONS,
-} from '@utils/enums';
+  MENU_TYPE_OPTIONS,
+} from '@src/utils/options';
 import type { TIntegrationListing } from '@utils/types';
 
 import FilterForm from './FilterForm/FilterForm';
@@ -147,7 +147,7 @@ const parseEntitiesToTableData = (
         description: food.attributes.description,
         id: food.id.uuid,
         menuType: getLabelByKey(
-          MENU_OPTIONS,
+          MENU_TYPE_OPTIONS,
           food.attributes.publicData.menuType,
         ),
         category: getLabelByKey(
@@ -209,12 +209,12 @@ const parseEntitiesToExportCsv = (
         'Chất liệu bao bì': getLabelByKey(packagingOptions, packaging),
         'Phong cách ẩm thực': getLabelByKey(categoryOptions, category),
         'Loại món ăn': getLabelByKey(FOOD_TYPE_OPTIONS, foodType),
-        'Loại menu': getLabelByKey(MENU_OPTIONS, menuType),
+        'Loại menu': getLabelByKey(MENU_TYPE_OPTIONS, menuType),
         'Món ăn kèm': sideDishes
-          .map((key: string) => getLabelByKey(SIDE_DISH_OPTIONS, key))
+          .map((key: string) => getLabelByKey(FOOD_SIDE_DISH_OPTIONS, key))
           .join(','),
         'Chế độ dinh dưỡng đặc biệt': specialDiets
-          .map((key: string) => getLabelByKey(SPECIAL_DIET_OPTIONS, key))
+          .map((key: string) => getLabelByKey(FOOD_SPECIAL_DIET_OPTIONS, key))
           .join(','),
         'Số nguời tối đa': maxQuantity,
         'Giờ đặt trước tối thiểu': minOrderHourInAdvance,

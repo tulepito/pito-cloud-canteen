@@ -5,9 +5,9 @@ import { denormalisedResponseEntities } from '@services/data';
 import { fetchListing } from '@services/integrationHelper';
 import { createFirebaseDocNotification } from '@services/notifications';
 import { getIntegrationSdk } from '@services/sdk';
-import { UserPermission } from '@src/types/UserPermission';
 import { Listing, User } from '@src/utils/data';
 import {
+  ECompanyPermission,
   EListingStates,
   EListingType,
   ENotificationType,
@@ -36,7 +36,7 @@ export const postRatingFn = async ({
         metadata: {
           ...rating,
           listingType: EListingType.rating,
-          reviewRole: UserPermission.BOOKER,
+          reviewRole: ECompanyPermission.booker,
         },
       });
 
@@ -86,7 +86,7 @@ export const postParticipantRatingFn = async ({
       ...rating,
       detailTextRating,
       listingType: EListingType.rating,
-      reviewRole: UserPermission.PARTICIPANT,
+      reviewRole: ECompanyPermission.participant,
       foodName,
       foodId,
     },

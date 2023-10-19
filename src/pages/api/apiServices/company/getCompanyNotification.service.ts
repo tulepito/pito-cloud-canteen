@@ -2,13 +2,13 @@ import { denormalisedResponseEntities } from '@services/data';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { minusDays } from '@src/utils/dates';
 import {
-  ENotificationTypes,
+  ECompanyDashboardNotificationType,
   EOrderDraftStates,
   EOrderStates,
 } from '@src/utils/enums';
 
 const ORDER_QUERY_PARAMS_BY_NOTIFICATION_TYPE = {
-  [ENotificationTypes.completedOrder]: {
+  [ECompanyDashboardNotificationType.completedOrder]: {
     meta_orderState: `${[
       EOrderStates.pendingPayment,
       EOrderStates.reviewed,
@@ -16,17 +16,17 @@ const ORDER_QUERY_PARAMS_BY_NOTIFICATION_TYPE = {
     ].join(',')}`,
     sort: 'createdAt',
   },
-  [ENotificationTypes.pickingOrder]: {
+  [ECompanyDashboardNotificationType.pickingOrder]: {
     meta_orderState: `${[EOrderStates.inProgress, EOrderStates.picking].join(
       ',',
     )}`,
     sort: 'createdAt',
   },
-  [ENotificationTypes.draftOrder]: {
+  [ECompanyDashboardNotificationType.draftOrder]: {
     meta_orderState: EOrderDraftStates.pendingApproval,
     sort: 'createdAt',
   },
-  [ENotificationTypes.deadlineDueOrder]: {
+  [ECompanyDashboardNotificationType.deadlineDueOrder]: {
     meta_orderState: `${EOrderStates.picking}`,
     meta_deadlineDate: `${minusDays(new Date(), 1).getTime()},`,
   },
@@ -35,9 +35,11 @@ const ORDER_QUERY_PARAMS_BY_NOTIFICATION_TYPE = {
 const getCompanyNotifications = async (companyId: string) => {
   const integrationSdk = getIntegrationSdk();
   const orders = await Promise.all(
-    Object.keys(ENotificationTypes).map(async (key) => {
+    Object.keys(ECompanyDashboardNotificationType).map(async (key) => {
       const notificationType =
-        ENotificationTypes[key as keyof typeof ENotificationTypes];
+        ECompanyDashboardNotificationType[
+          key as keyof typeof ECompanyDashboardNotificationType
+        ];
       const params = ORDER_QUERY_PARAMS_BY_NOTIFICATION_TYPE[notificationType];
       const notificationResponse = await integrationSdk.listings.query({
         meta_companyId: companyId,
@@ -52,7 +54,7 @@ const getCompanyNotifications = async (companyId: string) => {
 
       return {
         ...responseOrder,
-        notificationType: key as ENotificationTypes,
+        notificationType: key as ECompanyDashboardNotificationType,
       };
     }),
   );

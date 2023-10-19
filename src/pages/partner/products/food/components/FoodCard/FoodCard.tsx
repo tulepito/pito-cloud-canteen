@@ -8,13 +8,13 @@ import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
 import useBoolean from '@hooks/useBoolean';
 import { partnerPaths } from '@src/paths';
 import { Listing } from '@src/utils/data';
+import { EImageVariants } from '@src/utils/enums';
 import {
-  EImageVariants,
+  FOOD_SPECIAL_DIET_OPTIONS,
   FOOD_TYPE_OPTIONS,
   getLabelByKey,
-  MENU_OPTIONS,
-  SPECIAL_DIET_OPTIONS,
-} from '@src/utils/enums';
+  MENU_TYPE_OPTIONS,
+} from '@src/utils/options';
 import type { TListing } from '@src/utils/types';
 
 import css from './FoodCard.module.scss';
@@ -54,7 +54,7 @@ const FoodCard: React.FC<TFoodCardProps> = (props) => {
               {foodName}
             </div>
             <div className={css.menuType}>
-              {getLabelByKey(MENU_OPTIONS, menuType)}
+              {getLabelByKey(MENU_TYPE_OPTIONS, menuType)}
             </div>
           </div>
           <div className={css.bottomWrapper}>
@@ -62,7 +62,10 @@ const FoodCard: React.FC<TFoodCardProps> = (props) => {
               <RenderWhen condition={!!specialDiets[0]}>
                 <Badge
                   type={EBadgeType.info}
-                  label={getLabelByKey(SPECIAL_DIET_OPTIONS, specialDiets[0])}
+                  label={getLabelByKey(
+                    FOOD_SPECIAL_DIET_OPTIONS,
+                    specialDiets[0],
+                  )}
                 />
               </RenderWhen>
               <Badge

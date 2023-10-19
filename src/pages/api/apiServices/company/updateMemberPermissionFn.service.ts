@@ -1,6 +1,6 @@
 import { fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
-import type { UserPermission } from '@src/types/UserPermission';
+import type { ECompanyPermission } from '@src/utils/enums';
 import { denormalisedResponseEntities, User } from '@utils/data';
 import type { TCompany, TObject } from '@utils/types';
 
@@ -13,7 +13,7 @@ const updateMemberPermissionFn = async ({
 }: {
   companyId: string;
   memberEmail: string;
-  permission: UserPermission;
+  permission: ECompanyPermission;
 }) => {
   const company = await fetchUser(companyId);
 

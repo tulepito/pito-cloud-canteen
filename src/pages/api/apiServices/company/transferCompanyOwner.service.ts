@@ -3,9 +3,8 @@ import type { NextApiResponse } from 'next';
 import { denormalisedResponseEntities } from '@services/data';
 import { fetchUser, fetchUserByEmail } from '@services/integrationHelper';
 import { getIntegrationSdk, handleError } from '@services/sdk';
-import { UserPermission } from '@src/types/UserPermission';
 import { User } from '@src/utils/data';
-import { EErrorCode } from '@src/utils/enums';
+import { ECompanyPermission, EErrorCode } from '@src/utils/enums';
 
 import isBookerInOrderProgress from './isBookerInOrderProgress.service';
 
@@ -13,7 +12,7 @@ export type TChangeOwnerParams = {
   res: NextApiResponse;
   companyId: string;
   newOwnerEmail: string;
-  permissionForOldOwner?: UserPermission;
+  permissionForOldOwner?: ECompanyPermission;
   newOwnerProfileImageId?: string;
 };
 
@@ -122,15 +121,15 @@ const transferCompanyOwner = async ({
   const newMembers = Object.keys(members).reduce((acc, key) => {
     const memberList: any = { ...acc };
 
-    if (memberList[key].permission === UserPermission.OWNER) {
+    if (memberList[key].permission === ECompanyPermission.owner) {
       memberList[key] = {
         ...members[key],
-        permission: permissionForOldOwner || UserPermission.PARTICIPANT,
+        permission: permissionForOldOwner || ECompanyPermission.participant,
       };
     } else if (key === newOwnerEmail) {
       memberList[key] = {
         ...members[key],
-        permission: UserPermission.OWNER,
+        permission: ECompanyPermission.owner,
       };
     } else {
       memberList[key] = members[key];
@@ -152,7 +151,7 @@ const transferCompanyOwner = async ({
         ...newCompanyData,
         [User(newCompanyAccount).getId()]: {
           ...(newCompanyData[cur] || {}),
-          permission: UserPermission.OWNER,
+          permission: ECompanyPermission.owner,
         },
       };
       delete newCompanyData[cur];
@@ -208,7 +207,7 @@ const transferCompanyOwner = async ({
       const { id, permission } = member || {};
 
       // if owner dont need to update because it already updated above;
-      if (permission === UserPermission.OWNER || !id) return;
+      if (permission === ECompanyPermission.owner || !id) return;
 
       const memberAccount = await fetchUser(id);
 
@@ -223,7 +222,8 @@ const transferCompanyOwner = async ({
             ...newCompanyData,
             [User(newCompanyAccount).getId()]: {
               ...(newCompanyData[cur] || {}),
-              permission: permissionForOldOwner || UserPermission.PARTICIPANT,
+              permission:
+                permissionForOldOwner || ECompanyPermission.participant,
             },
           };
           delete newCompanyData[cur];

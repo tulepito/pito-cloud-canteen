@@ -8,11 +8,8 @@ import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { shoppingCartThunks } from '@redux/slices/shoppingCart.slice';
-import {
-  EImageVariants,
-  FOOD_TYPE_OPTIONS,
-  getLabelByKey,
-} from '@src/utils/enums';
+import { EImageVariants } from '@src/utils/enums';
+import { FOOD_TYPE_OPTIONS, getLabelByKey } from '@src/utils/options';
 import { CurrentUser, Listing } from '@utils/data';
 
 import ListingDetailModal from './ListingDetailModal';

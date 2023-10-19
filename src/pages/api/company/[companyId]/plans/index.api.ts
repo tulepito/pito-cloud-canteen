@@ -8,9 +8,8 @@ import {
   showCurrentUser,
   showUserById,
 } from '@services/sdkHelper';
-import { UserPermission } from '@src/types/UserPermission';
 import { CurrentUser, User } from '@src/utils/data';
-import { EListingType } from '@src/utils/enums';
+import { ECompanyPermission, EListingType } from '@src/utils/enums';
 import type { TCurrentUser, TUser } from '@src/utils/types';
 
 const isBookerOrOwner = (currentUser: TCurrentUser, companyUser: TUser) => {
@@ -22,7 +21,10 @@ const isBookerOrOwner = (currentUser: TCurrentUser, companyUser: TUser) => {
     const { permission, id } = members[member];
 
     if (id === currentUserId) {
-      return permission === UserPermission.BOOKER || UserPermission.OWNER;
+      return (
+        permission === ECompanyPermission.booker ||
+        permission === ECompanyPermission.owner
+      );
     }
 
     return false;

@@ -19,7 +19,7 @@ import useBoolean from '@hooks/useBoolean';
 import useFetchCompanyInfo from '@hooks/useFetchCompanyInfo';
 import { companyPaths } from '@src/paths';
 import { companyThunks } from '@src/redux/slices/company.slice';
-import { ALLERGIES_OPTIONS, getLabelByKey } from '@src/utils/enums';
+import { ALLERGIES_OPTIONS, getLabelByKey } from '@src/utils/options';
 import { User } from '@utils/data';
 import type { TObject } from '@utils/types';
 

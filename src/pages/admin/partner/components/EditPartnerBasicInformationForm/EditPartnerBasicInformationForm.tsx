@@ -18,7 +18,8 @@ import FieldTextArea from '@components/FormFields/FieldTextArea/FieldTextArea';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import { LocationAutocompleteInputField } from '@components/LocationAutocompleteInput/LocationAutocompleteInput';
 import { useViewport } from '@hooks/useViewport';
-import { EImageVariants, EPartnerVATSetting, OTHER_OPTION } from '@utils/enums';
+import { OTHER_OPTION } from '@src/utils/options';
+import { EImageVariants, EPartnerVATSetting } from '@utils/enums';
 import { isUploadImageOverLimitError } from '@utils/errors';
 import type { TImage } from '@utils/types';
 import {

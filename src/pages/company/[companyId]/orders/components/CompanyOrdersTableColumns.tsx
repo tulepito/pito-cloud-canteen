@@ -23,12 +23,11 @@ import { orderAsyncActions } from '@redux/slices/Order.slice';
 import { companyPaths } from '@src/paths';
 import { Listing } from '@src/utils/data';
 import { diffDays } from '@src/utils/dates';
+import { getLabelByKey, ORDER_STATE_OPTIONS } from '@src/utils/options';
 import {
   EBookerOrderDraftStates,
   EOrderDraftStates,
   EOrderStates,
-  getLabelByKey,
-  ORDER_STATES_OPTIONS,
 } from '@utils/enums';
 import type { TIntegrationListing, TObject } from '@utils/types';
 
@@ -558,7 +557,7 @@ export const CompanyOrdersTableColumns: TColumn[] = [
                 type={
                   BADGE_TYPE_BASE_ON_ORDER_STATE[state] || EBadgeType.default
                 }
-                label={getLabelByKey(ORDER_STATES_OPTIONS, state)}
+                label={getLabelByKey(ORDER_STATE_OPTIONS, state)}
               />
             </RenderWhen.False>
           </RenderWhen>

@@ -1,7 +1,7 @@
 import { CustomError } from '@apis/errors';
 import { denormalisedResponseEntities } from '@services/data';
 import { getIntegrationSdk } from '@services/integrationSdk';
-import { CompanyPermission } from '@src/types/UserPermission';
+import { CompanyPermissions } from '@src/types/UserPermission';
 import {
   EBookerOrderDraftStates,
   EOrderDraftStates,
@@ -17,7 +17,7 @@ const isBookerInOrderProgress = async ({
   memberEmail: string;
 }) => {
   const updatingMember = members[memberEmail] || {};
-  const updateMemberIsBooker = CompanyPermission.includes(
+  const updateMemberIsBooker = CompanyPermissions.includes(
     updatingMember.permission,
   );
   const integrationSdk = getIntegrationSdk();

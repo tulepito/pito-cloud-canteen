@@ -15,12 +15,13 @@ import { emailSendingFactory, EmailTemplateTypes } from '@services/email';
 import { fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { createFirebaseDocNotification } from '@services/notifications';
-import { UserInviteStatus, UserPermission } from '@src/types/UserPermission';
+import { UserInviteStatus } from '@src/types/UserPermission';
 import participantCompanyInvitation, {
   participantCompanyInvitationSubject,
 } from '@src/utils/emailTemplate/participantCompanyInvitation';
 import {
   EBookerOrderDraftStates,
+  ECompanyPermission,
   EListingType,
   ENotificationType,
   EOrderDraftStates,
@@ -105,7 +106,7 @@ const addMembersToCompanyFn = async (params: TAddMembersToCompanyParams) => {
           companyList: Array.from(new Set([...userCompanyList, companyId])),
           company: {
             [companyId]: {
-              permission: UserPermission.PARTICIPANT,
+              permission: ECompanyPermission.participant,
             },
           },
         },
@@ -164,7 +165,7 @@ const addMembersToCompanyFn = async (params: TAddMembersToCompanyParams) => {
         [userEmail]: {
           id: userId,
           email: userEmail,
-          permission: UserPermission.PARTICIPANT,
+          permission: ECompanyPermission.participant,
           groups: [],
           inviteStatus: UserInviteStatus.ACCEPTED,
         },
@@ -186,7 +187,7 @@ const addMembersToCompanyFn = async (params: TAddMembersToCompanyParams) => {
     .map((email: string) => ({
       email,
       id: null,
-      permission: UserPermission.PARTICIPANT,
+      permission: ECompanyPermission.participant,
       groups: [],
       inviteStatus: UserInviteStatus.ACCEPTED,
     }))

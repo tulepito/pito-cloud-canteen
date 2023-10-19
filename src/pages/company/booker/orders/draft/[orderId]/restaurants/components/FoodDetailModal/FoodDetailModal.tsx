@@ -7,8 +7,9 @@ import IconClose from '@components/Icons/IconClose/IconClose';
 import Modal from '@components/Modal/Modal';
 import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
 import { addCommas } from '@helpers/format';
+import { FOOD_SIDE_DISH_OPTIONS } from '@src/utils/options';
 import { Listing } from '@utils/data';
-import { EImageVariants, SIDE_DISH_OPTIONS } from '@utils/enums';
+import { EImageVariants } from '@utils/enums';
 import type { TListing } from '@utils/types';
 
 import css from './FoodDetailModal.module.scss';
@@ -32,7 +33,10 @@ const FoodDetailModal: React.FC<TFoodDetailModalProps> = ({
   const renderedSideDishes = sideDishes?.map(
     (sideDish: string, index: number) => (
       <div className={css.sideDish} key={`${index}-${sideDish}`}>
-        {SIDE_DISH_OPTIONS.find((option) => option.key === sideDish)?.label}
+        {
+          FOOD_SIDE_DISH_OPTIONS.find((option) => option.key === sideDish)
+            ?.label
+        }
       </div>
     ),
   );

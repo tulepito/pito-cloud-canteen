@@ -44,8 +44,8 @@ import type { NotificationInvitationParams } from '@services/notifications';
 import type { TPlan } from '@src/utils/orderTypes';
 import { denormalisedResponseEntities, Listing, User } from '@utils/data';
 import {
+  EEditSubOrderHistoryType,
   ENotificationType,
-  EOrderHistoryTypes,
   EOrderType,
   EParticipantOrderStatus,
 } from '@utils/enums';
@@ -1259,8 +1259,8 @@ const OrderManagementSlice = createSlice({
             },
             planOrderDate: currentViewDate,
             type: oldFoodId
-              ? EOrderHistoryTypes.MEMBER_FOOD_CHANGED
-              : EOrderHistoryTypes.MEMBER_FOOD_ADDED,
+              ? EEditSubOrderHistoryType.MEMBER_FOOD_CHANGED
+              : EEditSubOrderHistoryType.MEMBER_FOOD_ADDED,
             oldValue: oldFoodId
               ? {
                   foodId: oldFoodId,
@@ -1398,7 +1398,7 @@ const OrderManagementSlice = createSlice({
               seconds: new Date().getTime() / 1000,
             },
             planOrderDate: currentViewDate,
-            type: EOrderHistoryTypes.MEMBER_FOOD_REMOVED,
+            type: EEditSubOrderHistoryType.MEMBER_FOOD_REMOVED,
             newValue: null,
             oldValue: {
               foodName: oldFoodName,
@@ -1508,7 +1508,7 @@ const OrderManagementSlice = createSlice({
               // fake a draft Firestore date object
               seconds: new Date().getTime() / 1000,
             },
-            type: EOrderHistoryTypes.FOOD_REMOVED,
+            type: EEditSubOrderHistoryType.FOOD_REMOVED,
             oldValue: {
               foodName,
               foodPrice,
@@ -1543,8 +1543,8 @@ const OrderManagementSlice = createSlice({
           },
           type:
             newQuantity < defaultQuantity
-              ? EOrderHistoryTypes.FOOD_DECREASED
-              : EOrderHistoryTypes.FOOD_INCREASED,
+              ? EEditSubOrderHistoryType.FOOD_DECREASED
+              : EEditSubOrderHistoryType.FOOD_INCREASED,
           oldValue: {
             foodName,
             foodPrice,
@@ -1584,8 +1584,8 @@ const OrderManagementSlice = createSlice({
         },
         type:
           newQuantity < defaultQuantity
-            ? EOrderHistoryTypes.FOOD_DECREASED
-            : EOrderHistoryTypes.FOOD_INCREASED,
+            ? EEditSubOrderHistoryType.FOOD_DECREASED
+            : EEditSubOrderHistoryType.FOOD_INCREASED,
         oldValue: {
           foodName,
           foodPrice,

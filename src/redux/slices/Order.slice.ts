@@ -28,14 +28,14 @@ import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
 import { getMenuQueryInSpecificDay } from '@helpers/listingSearchQuery';
 import { createAsyncThunk } from '@redux/redux.helper';
 import config from '@src/configs';
-import { CompanyPermission } from '@src/types/UserPermission';
+import { CompanyPermissions } from '@src/types/UserPermission';
 import { denormalisedResponseEntities, Listing, User } from '@utils/data';
 import {
+  ECompanyDashboardNotificationType,
   EInvalidRestaurantCase,
   EListingStates,
   EListingType,
   EManageCompanyOrdersTab,
-  ENotificationTypes,
   ERestaurantListingStatus,
   MANAGE_COMPANY_ORDERS_TAB_MAP,
 } from '@utils/enums';
@@ -222,10 +222,10 @@ const initialState: TOrderInitialState = {
   getOrderNotificationInProgress: false,
   getOrderNotificationError: null,
   companyOrderNotificationMap: {
-    [ENotificationTypes.completedOrder]: null,
-    [ENotificationTypes.deadlineDueOrder]: null,
-    [ENotificationTypes.draftOrder]: null,
-    [ENotificationTypes.pickingOrder]: null,
+    [ECompanyDashboardNotificationType.completedOrder]: null,
+    [ECompanyDashboardNotificationType.deadlineDueOrder]: null,
+    [ECompanyDashboardNotificationType.draftOrder]: null,
+    [ECompanyDashboardNotificationType.pickingOrder]: null,
   },
 
   restaurantCoverImageList: {},
@@ -589,7 +589,7 @@ const fetchCompanyBookers = createAsyncThunk(
     )[0];
     const { members = {} } = User(companyAccount).getMetadata();
     const bookerEmails = Object.keys(members).filter((email) =>
-      CompanyPermission.includes(members[email].permission),
+      CompanyPermissions.includes(members[email].permission),
     );
     const bookers = await Promise.all(
       bookerEmails.map(async (email) => {

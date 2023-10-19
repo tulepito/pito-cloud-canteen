@@ -10,7 +10,7 @@ import IconTimer from '@components/Icons/IconTimer/IconTimer';
 import NamedLink from '@components/NamedLink/NamedLink';
 import { Listing } from '@src/utils/data';
 import { timeAgo } from '@src/utils/dates';
-import { ENotificationTypes } from '@src/utils/enums';
+import { ECompanyDashboardNotificationType } from '@src/utils/enums';
 import type { TCompanyOrderNoticationMap, TListing } from '@src/utils/types';
 
 import css from './NotificationSection.module.scss';
@@ -24,7 +24,7 @@ type TCompanyOrderNotification = {
 
 const NOTIFICATION_LIST: TCompanyOrderNotification[] = [
   {
-    key: ENotificationTypes.draftOrder,
+    key: ECompanyDashboardNotificationType.draftOrder,
     icon: <IconCheckStatus />,
     label: (orderId: string) => (
       <FormattedMessage
@@ -36,7 +36,7 @@ const NOTIFICATION_LIST: TCompanyOrderNotification[] = [
     ),
   },
   {
-    key: ENotificationTypes.completedOrder,
+    key: ECompanyDashboardNotificationType.completedOrder,
     icon: <IconReviewStar />,
     label: (orderId: string) => (
       <FormattedMessage
@@ -48,7 +48,7 @@ const NOTIFICATION_LIST: TCompanyOrderNotification[] = [
     ),
   },
   {
-    key: ENotificationTypes.deadlineDueOrder,
+    key: ECompanyDashboardNotificationType.deadlineDueOrder,
     icon: <IconTimer />,
     label: (orderId: string) => (
       <FormattedMessage
@@ -60,7 +60,7 @@ const NOTIFICATION_LIST: TCompanyOrderNotification[] = [
     ),
   },
   {
-    key: ENotificationTypes.pickingOrder,
+    key: ECompanyDashboardNotificationType.pickingOrder,
     icon: <IconSharing />,
     label: (orderId: string) => (
       <FormattedMessage
@@ -115,14 +115,14 @@ const NotificationSection: React.FC<TNotificationSectionProps> = (props) => {
   const onNotificationClick = (item: TCompanyOrderNotification) => () => {
     const { order, key } = item;
     if (
-      key === ENotificationTypes.deadlineDueOrder ||
-      key === ENotificationTypes.pickingOrder
+      key === ECompanyDashboardNotificationType.deadlineDueOrder ||
+      key === ECompanyDashboardNotificationType.pickingOrder
     ) {
       return router.push({
         pathname: `/company/orders/${order?.id?.uuid}/picking`,
       });
     }
-    if (key === ENotificationTypes.draftOrder) {
+    if (key === ECompanyDashboardNotificationType.draftOrder) {
       return router.push({
         pathname: `/company/booker/orders/draft/${order?.id?.uuid}`,
       });

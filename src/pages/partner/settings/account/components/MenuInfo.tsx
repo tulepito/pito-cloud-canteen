@@ -3,7 +3,7 @@ import isEmpty from 'lodash/isEmpty';
 import Badge, { EBadgeType } from '@components/Badge/Badge';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useAppSelector } from '@hooks/reduxHooks';
-import { getLabelByKey, MEAL_OPTIONS } from '@src/utils/enums';
+import { getLabelByKey, MEAL_OPTIONS } from '@src/utils/options';
 
 import css from './MenuInfo.module.scss';
 

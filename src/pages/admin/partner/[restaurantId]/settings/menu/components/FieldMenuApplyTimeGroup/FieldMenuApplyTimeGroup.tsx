@@ -10,7 +10,7 @@ import FieldDatePicker from '@components/FormFields/FieldDatePicker/FieldDatePic
 import FieldDaysOfWeekCheckboxGroup from '@components/FormFields/FieldDaysOfWeekCheckboxGroup/FieldDaysOfWeekCheckboxGroup';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import { getWeekDayList } from '@utils/dates';
-import { EDayOfWeek, EMenuTypes } from '@utils/enums';
+import { EDayOfWeek, EMenuType } from '@utils/enums';
 import {
   composeValidators,
   nonEmptyArray,
@@ -87,7 +87,7 @@ const FieldMenuApplyTimeGroup: React.FC<TFieldMenuApplyTimeGroup> = (props) => {
   const [startDate, setStartDate] = useState<Date>(initialStartDate!);
   const [endDate, setEndDate] = useState<Date>(initialEndDate!);
 
-  const isCycleMenu = values.menuType === EMenuTypes.cycleMenu;
+  const isCycleMenu = values.menuType === EMenuType.cycleMenu;
 
   const today = new Date();
   const startDateAsDate = new Date(values.startDate);
@@ -151,7 +151,7 @@ const FieldMenuApplyTimeGroup: React.FC<TFieldMenuApplyTimeGroup> = (props) => {
           )}
           customInput={<CustomStartDateFieldInput />}
         />
-        {values.menuType === EMenuTypes.fixedMenu && (
+        {values.menuType === EMenuType.fixedMenu && (
           <FieldDatePicker
             id="endDate"
             name="endDate"

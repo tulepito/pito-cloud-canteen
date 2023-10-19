@@ -5,7 +5,7 @@ import isEqual from 'lodash/isEqual';
 import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
 import FieldCheckbox from '@components/FormFields/FieldCheckbox/FieldCheckbox';
-import { ALLERGIES_OPTIONS } from '@src/utils/enums';
+import { ALLERGIES_OPTIONS } from '@src/utils/options';
 
 import css from './SpecialDemandForm.module.scss';
 

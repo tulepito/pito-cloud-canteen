@@ -4,7 +4,7 @@ import { HttpMethod } from '@apis/configs';
 import { EHttpStatusCode } from '@apis/errors';
 import { fetchListing } from '@services/integrationHelper';
 import { getSdk, handleError } from '@services/sdk';
-import { CompanyPermission } from '@src/types/UserPermission';
+import { CompanyPermissions } from '@src/types/UserPermission';
 import {
   CurrentUser,
   denormalisedResponseEntities,
@@ -35,7 +35,7 @@ const orderChecker =
 
           if (
             userPermission &&
-            CompanyPermission.includes(userPermission) &&
+            CompanyPermissions.includes(userPermission) &&
             !isAdmin
           ) {
             return res.status(EHttpStatusCode.Forbidden).json({
@@ -56,7 +56,7 @@ const orderChecker =
           const userPermission = company[clientId]?.permission;
           if (
             userPermission &&
-            !CompanyPermission.includes(userPermission) &&
+            !CompanyPermissions.includes(userPermission) &&
             !isAdmin
           ) {
             return res.status(EHttpStatusCode.Forbidden).json({

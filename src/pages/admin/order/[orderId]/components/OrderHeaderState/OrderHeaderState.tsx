@@ -14,13 +14,8 @@ import {
 import { useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { Listing } from '@src/utils/data';
-import {
-  EOrderDraftStates,
-  EOrderStates,
-  EOrderType,
-  getLabelByKey,
-  ORDER_STATES_OPTIONS,
-} from '@src/utils/enums';
+import { EOrderDraftStates, EOrderStates, EOrderType } from '@src/utils/enums';
+import { getLabelByKey, ORDER_STATE_OPTIONS } from '@src/utils/options';
 import type { TListing, TTransitionOrderState } from '@src/utils/types';
 
 import css from './OrderHeaderState.module.scss';
@@ -58,7 +53,7 @@ const OrderHeaderState: React.FC<OrderHeaderStateProps> = (props) => {
   const { orderState, orderType = EOrderType.group } =
     orderListing.getMetadata();
   const orderStateLabel = useMemo(
-    () => getLabelByKey(ORDER_STATES_OPTIONS, orderState),
+    () => getLabelByKey(ORDER_STATE_OPTIONS, orderState),
     [orderState],
   );
   const statusClasses = classNames(css.status, {

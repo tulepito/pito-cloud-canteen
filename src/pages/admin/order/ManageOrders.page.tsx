@@ -32,6 +32,7 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { orderAsyncActions, resetOrder } from '@redux/slices/Order.slice';
 import { adminPaths, adminRoutes } from '@src/paths';
 import { Listing } from '@src/utils/data';
+import { getLabelByKey, ORDER_STATE_OPTIONS } from '@src/utils/options';
 import {
   ETransition,
   txIsCanceled,
@@ -40,13 +41,7 @@ import {
   txIsInitiated,
 } from '@src/utils/transaction';
 import { formatTimestamp, getDayOfWeek } from '@utils/dates';
-import {
-  EOrderDraftStates,
-  EOrderStates,
-  EOrderType,
-  getLabelByKey,
-  ORDER_STATES_OPTIONS,
-} from '@utils/enums';
+import { EOrderDraftStates, EOrderStates, EOrderType } from '@utils/enums';
 import type {
   TIntegrationListing,
   TIntegrationOrderListing,
@@ -118,7 +113,7 @@ const renderBadgeForSubOrder = (
         )}
         labelClassName={css.badgeLabel}
         type={BADGE_TYPE_BASE_ON_ORDER_STATE[state] || EBadgeType.default}
-        label={getLabelByKey(ORDER_STATES_OPTIONS, state)}
+        label={getLabelByKey(ORDER_STATE_OPTIONS, state)}
       />
     );
   if (txIsInitiated(tx)) {
@@ -361,7 +356,7 @@ const TABLE_COLUMN: TColumn[] = [
               )}
               labelClassName={css.badgeLabel}
               type={BADGE_TYPE_BASE_ON_ORDER_STATE[state] || EBadgeType.default}
-              label={getLabelByKey(ORDER_STATES_OPTIONS, state)}
+              label={getLabelByKey(ORDER_STATE_OPTIONS, state)}
             />
           </RenderWhen.False>
         </RenderWhen>

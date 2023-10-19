@@ -5,9 +5,9 @@ import { generateUncountableIdForSubAccount } from '@helpers/generateUncountable
 import { denormalisedResponseEntities } from '@services/data';
 import { fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk, getSdk } from '@services/sdk';
-import { UserInviteStatus, UserPermission } from '@src/types/UserPermission';
+import { UserInviteStatus } from '@src/types/UserPermission';
 import { User } from '@src/utils/data';
-import { ECompanyStates } from '@src/utils/enums';
+import { ECompanyPermission, ECompanyStates } from '@src/utils/enums';
 import type { TCreateCompanyApiParams, TObject } from '@src/utils/types';
 
 const { SUB_ACCOUNT_EMAIL = 'pitocloudcanteen@gmail.com', PITO_ADMIN_ID } =
@@ -117,7 +117,7 @@ const createCompany = async ({
     [companyEmail]: {
       id: companyAccount.id.uuid,
       email: companyEmail,
-      permission: UserPermission.OWNER,
+      permission: ECompanyPermission.owner,
       groups: [],
       inviteStatus: UserInviteStatus.ACCEPTED,
     },
@@ -139,7 +139,7 @@ const createCompany = async ({
           userState: ECompanyStates.unactive,
           company: {
             [companyAccount.id.uuid]: {
-              permission: UserPermission.OWNER,
+              permission: ECompanyPermission.owner,
             },
           },
         },

@@ -18,9 +18,8 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { companyMemberThunks } from '@redux/slices/companyMember.slice';
 import { adminPaths } from '@src/paths';
-import { UserPermission } from '@src/types/UserPermission';
 import { formatTimestamp } from '@src/utils/dates';
-import { EOrderDetailTabs } from '@src/utils/enums';
+import { ECompanyPermission, EOrderDetailTabs } from '@src/utils/enums';
 import type { TObject, TPagination } from '@src/utils/types';
 
 import { generateSKU } from '../order/[orderId]/helpers/AdminOrderDetail';
@@ -207,8 +206,8 @@ const AdminManageClientPaymentsPage = () => {
 
   const companyBookers = companyMembers.filter(
     (member) =>
-      member.permission === UserPermission.OWNER ||
-      member.permission === UserPermission.BOOKER,
+      member.permission === ECompanyPermission.owner ||
+      member.permission === ECompanyPermission.booker,
   );
 
   const queryMembersInProgress = useAppSelector(

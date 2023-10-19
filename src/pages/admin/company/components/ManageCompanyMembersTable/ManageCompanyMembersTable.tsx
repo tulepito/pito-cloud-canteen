@@ -15,7 +15,8 @@ import AlertModal from '@components/Modal/AlertModal';
 import Pagination from '@components/Pagination/Pagination';
 import type { TColumn } from '@components/Table/Table';
 import Table from '@components/Table/Table';
-import { UserInviteStatus, UserPermission } from '@src/types/UserPermission';
+import { UserInviteStatus } from '@src/types/UserPermission';
+import { ECompanyPermission } from '@src/utils/enums';
 import { isNewOwnerAlreadyACompanyUser } from '@src/utils/errors';
 import type { TCompanyGroup, TCompanyMemberWithDetails } from '@utils/types';
 
@@ -102,11 +103,12 @@ const TABLE_COLUMN: TColumn[] &
 
       const permissionList =
         inviteStatus === UserInviteStatus.ACCEPTED
-          ? Object.keys(UserPermission)
-          : Object.keys(UserPermission).filter(
+          ? Object.keys(ECompanyPermission)
+          : Object.keys(ECompanyPermission).filter(
               (permission) =>
-                UserPermission[permission as keyof typeof UserPermission] !==
-                UserPermission.OWNER,
+                ECompanyPermission[
+                  permission as keyof typeof ECompanyPermission
+                ] !== ECompanyPermission.owner,
             );
 
       return (
@@ -116,11 +118,13 @@ const TABLE_COLUMN: TColumn[] &
           className={css.fieldSelect}>
           {permissionList.map((key) => (
             <option
-              key={UserPermission[key as keyof typeof UserPermission]}
-              value={UserPermission[key as keyof typeof UserPermission]}>
+              key={ECompanyPermission[key as keyof typeof ECompanyPermission]}
+              value={
+                ECompanyPermission[key as keyof typeof ECompanyPermission]
+              }>
               {intl.formatMessage({
                 id: `UserPermission.${
-                  UserPermission[key as keyof typeof UserPermission]
+                  ECompanyPermission[key as keyof typeof ECompanyPermission]
                 }`,
               })}
             </option>
@@ -162,7 +166,8 @@ const TABLE_COLUMN: TColumn[] &
     key: 'action',
     label: '',
     render: ({ handleToRemoveMember, permission, canRemoveOwner }) => {
-      const isOwner = !canRemoveOwner && permission === UserPermission.OWNER;
+      const isOwner =
+        !canRemoveOwner && permission === ECompanyPermission.owner;
 
       return (
         <div
@@ -198,7 +203,7 @@ const parseEntitiesToTableData = ({
   updatingMemberPermissionEmail?: string | null;
   openTransferOwnerModal: (
     member: TCompanyMemberWithDetails,
-    permission: UserPermission,
+    permission: ECompanyPermission,
   ) => void;
   openUpgradeToOwnerModal: (member: TCompanyMemberWithDetails) => void;
   canRemoveOwner?: boolean;
@@ -219,14 +224,17 @@ const parseEntitiesToTableData = ({
       const { value } = e.target;
 
       if (
-        companyMember.permission !== UserPermission.OWNER &&
-        value === UserPermission.OWNER
+        companyMember.permission !== ECompanyPermission.owner &&
+        value === ECompanyPermission.owner
       ) {
         return openUpgradeToOwnerModal(companyMember);
       }
 
-      if (companyMember.permission === UserPermission.OWNER) {
-        return openTransferOwnerModal(companyMember, value as UserPermission);
+      if (companyMember.permission === ECompanyPermission.owner) {
+        return openTransferOwnerModal(
+          companyMember,
+          value as ECompanyPermission,
+        );
       }
 
       if (!onUpdateMemberPermission) return;
@@ -324,7 +332,7 @@ const ManageCompanyMembersTable: React.FC<TManageCompanyMembersTable> = (
   const [newOwnerEmail, setNewOwnerEmail] = useState<string | null>(null);
 
   const [permissionForOldOwner, setPermissionForOldOwner] =
-    useState<UserPermission | null>(null);
+    useState<ECompanyPermission | null>(null);
 
   const [page, setPage] = useState<number>(1);
 
@@ -342,7 +350,7 @@ const ManageCompanyMembersTable: React.FC<TManageCompanyMembersTable> = (
 
   const openTransferOwnerModal = (
     member: TCompanyMemberWithDetails,
-    permission: UserPermission,
+    permission: ECompanyPermission,
   ) => {
     setMemberToTransferOwner(member);
     setPermissionForOldOwner(permission);
@@ -550,7 +558,7 @@ const ManageCompanyMembersTable: React.FC<TManageCompanyMembersTable> = (
           {companyMembers
             .filter(
               (member) =>
-                member.permission !== UserPermission.OWNER && member.id,
+                member.permission !== ECompanyPermission.owner && member.id,
             )
             .map((member) => {
               const { lastName = '', firstName = '' } =

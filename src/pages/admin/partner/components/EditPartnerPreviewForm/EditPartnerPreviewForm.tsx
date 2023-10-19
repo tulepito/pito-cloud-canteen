@@ -16,13 +16,15 @@ import NamedLink from '@components/NamedLink/NamedLink';
 import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
 import { useAppSelector } from '@hooks/reduxHooks';
 import {
+  BANK_OPTIONS,
   BUSINESS_TYPE_OPTIONS,
+  EXTRA_SERVICE_OPTIONS,
+  MEAL_OPTIONS,
+} from '@src/utils/options';
+import {
   EImageVariants,
   EPartnerVATSetting,
   ERestaurantListingStatus,
-  EXTRA_SERVICE_OPTIONS,
-  LIST_BANKS,
-  MEAL_OPTIONS,
 } from '@utils/enums';
 
 import {
@@ -588,7 +590,7 @@ const EditPartnerPreviewForm: React.FC<any> = (props) => {
                             })}
                           </p>
                           <p className={css.content}>
-                            {getLabelByKey(LIST_BANKS, bank.bankId)}
+                            {getLabelByKey(BANK_OPTIONS, bank.bankId)}
                           </p>
                         </div>
                         <div className={css.left}>

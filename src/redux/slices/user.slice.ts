@@ -10,7 +10,7 @@ import {
   denormalisedResponseEntities,
   ensureCurrentUser,
 } from '@utils/data';
-import { EImageVariants, EUserPermission } from '@utils/enums';
+import { EImageVariants, EUserSystemPermission } from '@utils/enums';
 import { storableError } from '@utils/errors';
 import type { TCurrentUser, TObject } from '@utils/types';
 
@@ -56,17 +56,17 @@ const detectUserPermission = (currentUser: TCurrentUser) => {
     });
   }
 
-  if (isAdmin) return EUserPermission.admin;
-  if (isPartner) return EUserPermission.partner;
-  if (isCompany || isBooker) return EUserPermission.company;
+  if (isAdmin) return EUserSystemPermission.admin;
+  if (isPartner) return EUserSystemPermission.partner;
+  if (isCompany || isBooker) return EUserSystemPermission.company;
 
-  return EUserPermission.normal;
+  return EUserSystemPermission.normal;
 };
 
 type TUserState = {
   currentUser: TCurrentUser | null;
   currentUserShowError: any;
-  userPermission: EUserPermission;
+  userPermission: EUserSystemPermission;
   sendVerificationEmailInProgress: boolean;
   sendVerificationEmailError: any;
   favoriteRestaurants: any[];
@@ -79,7 +79,7 @@ type TUserState = {
 const initialState: TUserState = {
   currentUser: null,
   currentUserShowError: null,
-  userPermission: EUserPermission.normal,
+  userPermission: EUserSystemPermission.normal,
   sendVerificationEmailInProgress: false,
   sendVerificationEmailError: null,
   favoriteRestaurants: [],
@@ -176,7 +176,7 @@ const userSlice = createSlice({
         ...state,
         currentUser: null,
         currentUserShowError: null,
-        userPermission: EUserPermission.normal,
+        userPermission: EUserSystemPermission.normal,
         sendVerificationEmailInProgress: false,
         sendVerificationEmailError: null,
       };

@@ -12,7 +12,7 @@ import { Listing } from '@utils/data';
 import { generateTimeOptions, renderDateRange } from '@utils/dates';
 import {
   EBookerOrderDraftStates,
-  EFoodTypes,
+  EFoodType,
   EOrderDraftStates,
   EOrderStates,
   EOrderType,
@@ -566,9 +566,9 @@ export const getSelectedRestaurantAndFoodList = ({
 export const mealTypeAdapter = (mealType: string) => {
   switch (mealType) {
     case 'vegetarian':
-      return EFoodTypes.vegetarianDish;
+      return EFoodType.vegetarianDish;
     case 'unVegetarian':
-      return EFoodTypes.savoryDish;
+      return EFoodType.savoryDish;
     default:
       return '';
   }
@@ -576,9 +576,9 @@ export const mealTypeAdapter = (mealType: string) => {
 
 export const mealTypeReverseAdapter = (mealType: string) => {
   switch (mealType) {
-    case EFoodTypes.vegetarianDish:
+    case EFoodType.vegetarianDish:
       return 'vegetarian';
-    case EFoodTypes.savoryDish:
+    case EFoodType.savoryDish:
       return 'unVegetarian';
     default:
       return '';

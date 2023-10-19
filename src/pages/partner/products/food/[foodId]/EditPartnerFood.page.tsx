@@ -9,7 +9,7 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { IntegrationListing } from '@src/utils/data';
 import type { TObject } from '@src/utils/types';
 import { parsePrice } from '@src/utils/validators';
-import { EFoodTypes, EMenuTypes } from '@utils/enums';
+import { EFoodType, EMenuType } from '@utils/enums';
 import { getInitialAddImages } from '@utils/images';
 
 import EditPartnerFoodForm from '../components/EditPartnerFoodForm/EditPartnerFoodForm';
@@ -77,8 +77,8 @@ const EditPartnerFoodPage = () => {
       description,
       price: parsePrice(price?.amount || 0),
       ...publicData,
-      menuType: menuType || EMenuTypes.fixedMenu,
-      foodType: foodType || EFoodTypes.savoryDish,
+      menuType: menuType || EMenuType.fixedMenu,
+      foodType: foodType || EFoodType.savoryDish,
       minQuantity: minQuantity || minQuantityFromPartner,
       maxQuantity: maxQuantity || maxQuantityFromPartner,
       minOrderHourInAdvance: minOrderHourInAdvance || 24,

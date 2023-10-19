@@ -29,13 +29,9 @@ import {
   denormalisedResponseEntities,
   Listing,
 } from '@src/utils/data';
-import {
-  ALLERGIES_OPTIONS,
-  EParticipantOrderStatus,
-  ESubOrderTxStatus,
-  getLabelByKey,
-} from '@src/utils/enums';
+import { EParticipantOrderStatus, ESubOrderTxStatus } from '@src/utils/enums';
 import { convertStringToNumber } from '@src/utils/number';
+import { ALLERGIES_OPTIONS, getLabelByKey } from '@src/utils/options';
 import { toNonAccentVietnamese } from '@src/utils/string';
 import type { TListing, TObject, TTransaction, TUser } from '@src/utils/types';
 

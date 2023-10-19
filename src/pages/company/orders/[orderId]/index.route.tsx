@@ -13,11 +13,14 @@ import {
 } from '@redux/slices/OrderManagement.slice';
 import { currentUserSelector } from '@redux/slices/user.slice';
 import { companyPaths } from '@src/paths';
-import { UserPermission } from '@src/types/UserPermission';
+import { ECompanyPermission } from '@src/utils/enums';
 
 import CompanyOrderDetailPage from './components/CompanyOrderDetail.page';
 
-const allowedPermissions = [UserPermission.BOOKER, UserPermission.OWNER];
+const allowedPermissions = [
+  ECompanyPermission.booker,
+  ECompanyPermission.owner,
+];
 
 const CompanyOrderDetailRoute = () => {
   const dispatch = useAppDispatch();

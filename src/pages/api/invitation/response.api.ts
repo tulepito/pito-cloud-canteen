@@ -15,9 +15,9 @@ import { fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { createFirebaseDocNotification } from '@services/notifications';
 import { getSdk, handleError } from '@services/sdk';
-import { UserPermission } from '@src/types/UserPermission';
 import {
   EBookerOrderDraftStates,
+  ECompanyPermission,
   EListingType,
   ENotificationType,
   EOrderDraftStates,
@@ -45,7 +45,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
     if (
       userCompany[userId] &&
-      userCompany[userId].permission === UserPermission.PARTICIPANT
+      userCompany[userId].permission === ECompanyPermission.participant
     ) {
       return res.json({
         message: 'userAccept',
@@ -85,7 +85,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           company: {
             ...userCompany,
             [companyId]: {
-              permission: UserPermission.PARTICIPANT,
+              permission: ECompanyPermission.participant,
             },
           },
         },

@@ -1,7 +1,7 @@
 import { denormalisedResponseEntities } from '@services/data';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { addWeeksToDate } from '@src/utils/dates';
-import { EListingStates, EListingType, EMenuTypes } from '@src/utils/enums';
+import { EListingStates, EListingType, EMenuType } from '@src/utils/enums';
 import type {
   TCreateMenuApiParams,
   TIntegrationListing,
@@ -34,7 +34,7 @@ const createMenu = async (
 
   const { geolocation } = restaurant.attributes;
 
-  const isCycleMenu = menuType === EMenuTypes.cycleMenu;
+  const isCycleMenu = menuType === EMenuType.cycleMenu;
 
   const endDateToSubmit = isCycleMenu
     ? addWeeksToDate(new Date(startDate), numberOfCycles).getTime()

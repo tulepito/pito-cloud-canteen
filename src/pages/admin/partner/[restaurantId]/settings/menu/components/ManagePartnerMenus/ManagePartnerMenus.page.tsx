@@ -8,7 +8,7 @@ import AlertModal from '@components/Modal/AlertModal';
 import type { TSecondaryKeywordSearchFormValues } from '@components/SecondaryKeywordSearchForm/SecondaryKeywordSearchForm';
 import SecondaryKeywordSearchForm from '@components/SecondaryKeywordSearchForm/SecondaryKeywordSearchForm';
 import { adminRoutes } from '@src/paths';
-import { EMenuTypes } from '@utils/enums';
+import { EMenuType } from '@utils/enums';
 
 import type { TCreateMenuOptionFormValues } from '../CreateMenuOptionForm/CreateMenuOptionForm';
 import CreateMenuOptionForm from '../CreateMenuOptionForm/CreateMenuOptionForm';
@@ -17,14 +17,14 @@ import ManagePartnerMenusContent from '../ManagePartnerMenusContent/ManagePartne
 import css from './ManagePartnerMenus.module.scss';
 
 type TManagePartnerMenusPageProps = {
-  menuType: typeof EMenuTypes.cycleMenu | typeof EMenuTypes.fixedMenu;
+  menuType: typeof EMenuType.cycleMenu | typeof EMenuType.fixedMenu;
 };
 
 const ManagePartnerMenusPage: React.FC<TManagePartnerMenusPageProps> = (
   props,
 ) => {
   const { menuType } = props;
-  const isFixedMenu = menuType === EMenuTypes.fixedMenu;
+  const isFixedMenu = menuType === EMenuType.fixedMenu;
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const router = useRouter();
   const formRef = useRef<FormApi>();

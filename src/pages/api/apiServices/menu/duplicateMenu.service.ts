@@ -12,7 +12,7 @@ import { denormalisedResponseEntities } from '@services/data';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { IntegrationListing } from '@src/utils/data';
 import { addWeeksToDate } from '@src/utils/dates';
-import { EListingStates, EListingType, EMenuTypes } from '@src/utils/enums';
+import { EListingStates, EListingType, EMenuType } from '@src/utils/enums';
 import type { TDuplicateMenuApiParams, TObject } from '@src/utils/types';
 
 const duplicateMenu = async (
@@ -32,7 +32,7 @@ const duplicateMenu = async (
     numberOfCycles,
     endDate,
   } = dataParams;
-  const isCycleMenu = menuType === EMenuTypes.cycleMenu;
+  const isCycleMenu = menuType === EMenuType.cycleMenu;
 
   const response = await integrationSdk.listings.show({
     id: menuId,
@@ -81,7 +81,7 @@ const duplicateMenu = async (
   const { menuType: menuTypeFromMenu } = IntegrationListing(menu).getMetadata();
 
   const endDateFromMenuToSubmit =
-    menuTypeFromMenu === EMenuTypes.cycleMenu
+    menuTypeFromMenu === EMenuType.cycleMenu
       ? addWeeksToDate(
           new Date(startDateFromMenu),
           numberOfCyclesFromMenu,
