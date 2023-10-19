@@ -589,6 +589,7 @@ const ManagePartnerFoods = () => {
             setFoodToRemove={setFoodToRemove}
             setSelectedFood={setSelectedFood}
             openManipulateFoodModal={manipulateFoodSlideModalController.setTrue}
+            editableFoodMap={editableFoodMap}
             foodApprovalActiveTab={foodApprovalActiveTab}
             initialValues={foodEnableInitialValues}
           />

@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { Field } from 'react-final-form';
 import classNames from 'classnames';
+import { useRouter } from 'next/router';
 
 import Badge, { EBadgeType } from '@components/Badge/Badge';
 import { InlineTextButton } from '@components/Button/Button';
@@ -68,6 +69,7 @@ const FoodCard: React.FC<TFoodCardProps> = (props) => {
   const actionController = useBoolean();
   const { isMobileLayout } = useViewport();
   const dispatch = useAppDispatch();
+  const router = useRouter();
 
   const isFoodAcceptedTab =
     foodApprovalActiveTab === EFoodApprovalState.ACCEPTED;
@@ -91,11 +93,20 @@ const FoodCard: React.FC<TFoodCardProps> = (props) => {
     );
   };
 
+  const handleRedirect = () => {
+    if (!editableFoodMap[foodId]) {
+      return;
+    }
+    router.push({
+      pathname: partnerPaths.EditFood.replace('[foodId]', foodId),
+      query: { fromTab: foodApprovalActiveTab },
+    });
+  };
+
   const checkBoxContent = (
-    <NamedLink
-      path={partnerPaths.EditFood.replace('[foodId]', foodId)}
-      params={{ fromTab: foodApprovalActiveTab }}
-      className={classNames(!editableFoodMap[foodId] && css.disabledLink)}>
+    <div
+      className={classNames(css.card, !editableFoodMap[foodId] && css.disabled)}
+      onClick={handleRedirect}>
       <div className={css.contentWrapper}>
         <div className={css.image}>
           <ResponsiveImage
@@ -139,7 +150,7 @@ const FoodCard: React.FC<TFoodCardProps> = (props) => {
           </div>
         </div>
       </div>
-    </NamedLink>
+    </div>
   );
 
   const handleRemoveFood = () => {

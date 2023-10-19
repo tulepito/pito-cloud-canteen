@@ -155,16 +155,13 @@ const EditPartnerFoodPage = () => {
   const goBackToManageFood = () => {
     router.push({ pathname: partnerPaths.ManageFood, query: { tab: fromTab } });
   };
+
   const handleConfirmBtnClick = () => {
     sendingApprovalToAdminModalController.setFalse();
     dispatch(
       partnerFoodSliceThunks.fetchApprovalFoods(EFoodApprovalState.PENDING),
     );
-    if (
-      foodState === EListingStates.pendingApproval &&
-      fromTab !== EFoodApprovalState.PENDING &&
-      fromTab !== EFoodApprovalState.DECLINED
-    ) {
+    if (!currentAdminApproval) {
       dispatch(
         partnerFoodSliceThunks.sendSlackNotification({
           foodId: foodId as string,
@@ -178,7 +175,9 @@ const EditPartnerFoodPage = () => {
       dispatch(
         partnerFoodSliceThunks.updatePartnerFoodListing({
           id: foodId as string,
-          state: EListingStates.published,
+          metadata: {
+            adminApproval: EFoodApprovalState.PENDING,
+          },
         }),
       );
     }
@@ -263,6 +262,7 @@ const EditPartnerFoodPage = () => {
 
     const shouldChangeAdminApprovalToPending =
       changeApprovalAttributes.length > 0 &&
+      currentAdminApproval &&
       currentAdminApproval !== EFoodApprovalState.DECLINED;
 
     await dispatch(

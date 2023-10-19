@@ -21,10 +21,7 @@ import {
   updatePartnerFoodApi,
   updatePartnerMenuApi,
 } from '@apis/partnerApi';
-import {
-  getPartnerDraftFoodQuery,
-  getPartnerMenuQuery,
-} from '@helpers/listingSearchQuery';
+import { getPartnerMenuQuery } from '@helpers/listingSearchQuery';
 import { getImportDataFromCsv } from '@pages/admin/partner/[restaurantId]/settings/food/utils';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { bottomRightToastOptions } from '@src/utils/toastify';
@@ -663,22 +660,18 @@ const updatePartnerMenu = createAsyncThunk(
   },
 );
 
-const fetchDraftFood = createAsyncThunk(
-  FETCH_DRAFT_FOODS,
-  async (_, { extra: sdk, getState }) => {
-    const { currentUser } = getState().user;
-    const currentUserGetter = CurrentUser(currentUser!);
-    const { restaurantListingId } = currentUserGetter.getMetadata();
-    const foodQuery = getPartnerDraftFoodQuery(restaurantListingId);
-    const response = await sdk.listings.query(foodQuery);
-    const { totalItems } = response.data.meta;
+const fetchDraftFood = createAsyncThunk(FETCH_DRAFT_FOODS, async () => {
+  const { data: response } = await queryPartnerFoodsApi({
+    isDraft: true,
+    perPage: 100,
+  });
+  const { foodList, managePartnerFoodPagination } = response;
 
-    return {
-      draftFoods: denormalisedResponseEntities(response),
-      totalDraftFoods: totalItems,
-    };
-  },
-);
+  return {
+    draftFoods: foodList,
+    totalDraftFoods: managePartnerFoodPagination.totalItems,
+  };
+});
 
 const sendSlackNotification = createAsyncThunk(
   SEND_SLACK_NOTIFICATION,

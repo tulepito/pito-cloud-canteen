@@ -10,6 +10,14 @@
   width: 100%;
   position: relative;
 
+  .card {
+    cursor: pointer;
+
+    &.disabled {
+      cursor: default;
+    }
+  }
+
   .checkboxLabel {
     width: 100%;
 

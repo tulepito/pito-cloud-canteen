@@ -1,8 +1,8 @@
 import { Field } from 'react-final-form';
+import { useRouter } from 'next/router';
 
 import FieldCheckbox from '@components/FormFields/FieldCheckbox/FieldCheckbox';
 import IconLightOutline from '@components/Icons/IconLightOutline/IconLightOutline';
-import NamedLink from '@components/NamedLink/NamedLink';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import Toggle from '@components/Toggle/Toggle';
 import { useAppDispatch } from '@hooks/reduxHooks';
@@ -20,6 +20,7 @@ type TFoodRowProps = {
   name: string;
   food: TListing;
   foodApprovalActiveTab: EFoodApprovalState;
+  editableFoodMap: Record<string, boolean>;
   setFoodToRemove: (params: any) => void;
   setSelectedFood: (food: TListing) => void;
   openManipulateFoodModal: () => void;
@@ -33,21 +34,30 @@ const FoodRow: React.FC<TFoodRowProps> = (props) => {
     setSelectedFood,
     openManipulateFoodModal,
     foodApprovalActiveTab,
+    editableFoodMap,
   } = props;
   const dispatch = useAppDispatch();
+  const router = useRouter();
 
   const foodListing = Listing(food);
   const foodId = foodListing.getId();
   const { title: foodName } = foodListing.getAttributes();
   const isFoodAcceptedTab =
     foodApprovalActiveTab === EFoodApprovalState.ACCEPTED;
+  const handleRedirect = () => {
+    if (!editableFoodMap[foodId]) {
+      return;
+    }
+    router.push({
+      pathname: partnerPaths.EditFood.replace('[foodId]', foodId),
+      query: { fromTab: foodApprovalActiveTab },
+    });
+  };
 
   const checkBoxContent = (
-    <NamedLink
-      path={partnerPaths.EditFood.replace('[foodId]', foodId)}
-      params={{ fromTab: foodApprovalActiveTab }}>
+    <div className={css.row} onClick={handleRedirect}>
       <div className={css.contentWrapper}>{foodName}</div>
-    </NamedLink>
+    </div>
   );
 
   const handleActionsBtnClick = () => {

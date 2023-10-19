@@ -2,13 +2,8 @@
 /* eslint-disable unused-imports/no-unused-vars */
 import { types as sdkTypes } from '@helpers/sdkLoader';
 import { ListingTypes } from '@src/types/listingTypes';
-import type { EListingStates } from '@utils/enums';
-import {
-  type EMenuTypes,
-  EFoodApprovalState,
-  FOOD_TYPE_OPTIONS,
-  MENU_OPTIONS,
-} from '@utils/enums';
+import type { EFoodApprovalState, EListingStates } from '@utils/enums';
+import { type EMenuTypes, FOOD_TYPE_OPTIONS, MENU_OPTIONS } from '@utils/enums';
 import { getSubmitImageId, getUniqueImages } from '@utils/images';
 import { toNonAccentVietnamese } from '@utils/string';
 import type { TImage } from '@utils/types';
@@ -83,7 +78,6 @@ export const getSubmitFoodData = (values: TEditPartnerFoodFormValues) => {
       restaurantId,
       listingType: ListingTypes.FOOD,
       isDraft,
-      adminApproval: EFoodApprovalState.PENDING,
     },
   };
 };

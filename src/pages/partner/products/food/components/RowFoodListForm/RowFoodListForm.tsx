@@ -20,6 +20,7 @@ type TExtraProps = {
   foodList: TListing[];
   pagination: TPagination;
   foodApprovalActiveTab: EFoodApprovalState;
+  editableFoodMap: Record<string, boolean>;
   getGridFoodListFormValues: (values: string[]) => void;
   onPageChange: (page: number) => void;
   setFoodToRemove: (params: { id: string }) => void;
@@ -43,6 +44,7 @@ const RowFoodListFormComponent: React.FC<TRowFoodListFormComponentProps> = (
     openManipulateFoodModal,
     form,
     foodApprovalActiveTab,
+    editableFoodMap,
   } = props;
 
   const onCheckAllChange = (event: any) => {
@@ -85,6 +87,7 @@ const RowFoodListFormComponent: React.FC<TRowFoodListFormComponentProps> = (
           setSelectedFood={setSelectedFood!}
           openManipulateFoodModal={openManipulateFoodModal!}
           foodApprovalActiveTab={foodApprovalActiveTab!}
+          editableFoodMap={editableFoodMap!}
         />
       ))}
     </Form>
