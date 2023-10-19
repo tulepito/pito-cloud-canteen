@@ -12,15 +12,10 @@
 }
 
 .content {
-  @include formContainer;
-
-  margin: 0 auto;
-  width: fit-content;
-  row-gap: 16px;
-  display: flex;
-  justify-content: center;
+  @include flexCenter;
   flex-direction: column;
-  width: 90%;
+  max-width: 516px;
+  margin: 48px auto;
 }
 
 .name {
@@ -59,7 +54,6 @@
 
 .resendEmailLink {
   color: $labelBlue2;
-  font-weight: $fontWeightBold;
   cursor: pointer;
 }
 
@@ -71,4 +65,24 @@
 
 .error {
   color: $sematicRed2;
+}
+
+.modalTitle {
+  text-align: center;
+  @include textTemplate(32px, $fontWeightBold, 48px);
+}
+
+.modalMessage {
+  text-align: center;
+}
+
+.divider {
+  width: 100%;
+  border-bottom: 2px solid $neutralGray3;
+  margin-top: 24px;
+}
+
+.continueBtn {
+  margin-top: 24px;
+  margin-bottom: 24px;
 }
