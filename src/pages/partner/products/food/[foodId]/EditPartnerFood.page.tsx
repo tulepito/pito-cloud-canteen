@@ -174,6 +174,7 @@ const EditPartnerFoodPage = () => {
       );
       dispatch(
         partnerFoodSliceThunks.updatePartnerFoodListing({
+          shouldShowToast: false,
           id: foodId as string,
           metadata: {
             adminApproval: EFoodApprovalState.PENDING,

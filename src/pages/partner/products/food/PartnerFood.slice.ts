@@ -379,7 +379,10 @@ const updatePartnerFoodListing = createAsyncThunk(
       return food;
     } catch (error) {
       console.error(`${UPDATE_PARTNER_FOOD_LISTING} error: `, error);
-      toast.error('Cập nhật món ăn thất bại', bottomRightToastOptions);
+      const { shouldShowToast = true } = payload;
+      if (shouldShowToast) {
+        toast.error('Cập nhật món ăn thất bại', bottomRightToastOptions);
+      }
 
       return rejectWithValue(storableError(error));
     }
