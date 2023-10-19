@@ -26,7 +26,12 @@
 }
 
 .actionBtn {
+  display: inline-flex !important;
   margin: 0 10px;
+}
+
+.iconLoading {
+  stroke: $neutralGray6;
 }
 
 .filterIcon {

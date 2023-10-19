@@ -122,7 +122,7 @@ export const createSubmitFoodsByDate = (foodsByDate: any) => {
     let newFoodByDate = {};
     Object.keys(foodByDate).forEach((k) => {
       const food = foodByDate[k];
-      const { dayOfWeek, sideDishes = [], id, foodNote, price } = food;
+      const { dayOfWeek, sideDishes = [], id, foodNote, price, ...rest } = food;
       newFoodByDate = {
         ...newFoodByDate,
         [k]: {
@@ -131,6 +131,7 @@ export const createSubmitFoodsByDate = (foodsByDate: any) => {
           sideDishes,
           foodNote,
           price,
+          ...rest,
         },
       };
     });

@@ -160,6 +160,7 @@ const AddFoodModal: React.FC<TAddFoodModal> = (props) => {
           page,
           pub_menuType: menuType,
           keywords,
+          meta_isFoodEnable: true,
         }),
       );
     }

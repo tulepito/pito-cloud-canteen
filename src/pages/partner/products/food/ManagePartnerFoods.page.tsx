@@ -351,7 +351,12 @@ const ManagePartnerFoods = () => {
   };
 
   const onQueryPartnerFood = (params: any = {}) => {
-    return dispatch(partnerFoodSliceThunks.queryPartnerFoods(params));
+    return dispatch(
+      partnerFoodSliceThunks.queryPartnerFoods({
+        ...params,
+        meta_isFoodEnable: true,
+      }),
+    );
   };
 
   const removeFood = async () => {

@@ -25,10 +25,20 @@ const deleteFoodByIds = (body: TBodyParams) => {
   return deleteApi(`${baseUrl}/delete-by-ids`, body);
 };
 
+const publishFoodApi = (foodId: string, body: TBodyParams) => {
+  return postApi(`${baseUrl}/${foodId}/publish`, body);
+};
+
+const closeFoodApi = (foodId: string, body: TBodyParams) => {
+  return postApi(`${baseUrl}/${foodId}/close`, body);
+};
+
 export const partnerFoodApi = {
   showFood,
   createFood,
   updateFood,
   deleteFood,
   deleteFoodByIds,
+  publishFoodApi,
+  closeFoodApi,
 };

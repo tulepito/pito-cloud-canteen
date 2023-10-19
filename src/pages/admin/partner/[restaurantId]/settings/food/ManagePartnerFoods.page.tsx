@@ -16,6 +16,7 @@ import IconDuplicate from '@components/Icons/IconDuplicate/IconDuplicate';
 import IconEdit from '@components/Icons/IconEdit/IconEdit';
 import IconFilter from '@components/Icons/IconFilter/IconFilter';
 import IconPrint from '@components/Icons/IconPrint/IconPrint';
+import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
 import IconUploadFile from '@components/Icons/IconUploadFile/IconUploadFile';
 import IntegrationFilterModal from '@components/IntegrationFilterModal/IntegrationFilterModal';
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
@@ -23,6 +24,7 @@ import AlertModal from '@components/Modal/AlertModal';
 import NamedLink from '@components/NamedLink/NamedLink';
 import type { TColumn } from '@components/Table/Table';
 import { TableForm } from '@components/Table/Table';
+import Toggle from '@components/Toggle/Toggle';
 import Tooltip from '@components/Tooltip/Tooltip';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
@@ -106,8 +108,23 @@ const TABLE_COLUMN: TColumn[] = [
         return <div></div>;
       }
 
+      const onPublishOrCloseFood = async () => {
+        await data.handlePublishOrCloseFood(data.id, !data.isPublished);
+      };
+
       return (
         <div>
+          {data.isCloseOrPublishInProgress ? (
+            <IconSpinner
+              className={classNames(css.actionBtn, css.iconLoading)}
+            />
+          ) : (
+            <Toggle
+              className={css.actionBtn}
+              status={data.isPublished ? 'on' : 'off'}
+              onClick={onPublishOrCloseFood}
+            />
+          )}
           <NamedLink
             path={`/admin/partner/${data.restaurantId}/settings/food/${data.id}`}
             className={css.actionBtn}>
@@ -138,11 +155,18 @@ const parseEntitiesToTableData = (
     (state) => state.AdminAttributes.categories,
   );
 
+  const { publishOrCloseFoodId, ...restExtraData } = extraData;
+
   return foods.map((food) => {
     return {
       key: food.id.uuid,
       data: {
         isDeleted: food.attributes.metadata.isDeleted,
+        isPublished:
+          typeof food.attributes.metadata.isFoodEnable === 'undefined'
+            ? true
+            : food.attributes.metadata.isFoodEnable,
+        isCloseOrPublishInProgress: publishOrCloseFoodId === food.id.uuid,
         title: food.attributes.title,
         description: food.attributes.description,
         id: food.id.uuid,
@@ -158,7 +182,7 @@ const parseEntitiesToTableData = (
           FOOD_TYPE_OPTIONS,
           food.attributes.publicData.foodType,
         ),
-        ...extraData,
+        ...restExtraData,
       },
     };
   });
@@ -270,6 +294,8 @@ const ManagePartnerFoods = () => {
     createPartnerFoodFromCsvInProgress,
     createPartnerFoodFromCsvError,
     managePartnerFoodPagination,
+    publishOrCloseFoodId,
+    publishOrCloseFoodError,
   } = useAppSelector((state) => state.foods, shallowEqual);
 
   const categoryString = pub_category as string;
@@ -292,6 +318,15 @@ const ManagePartnerFoods = () => {
         restaurantId,
       },
     });
+  };
+
+  const handlePublishOrCloseFood = async (id: string, isPublish: boolean) => {
+    await dispatch(
+      foodSliceThunks.publishOrCloseFood({
+        id,
+        isPublish,
+      }),
+    );
   };
 
   const onSetFoodToRemove = (foodData: any) => () => {
@@ -334,6 +369,9 @@ const ManagePartnerFoods = () => {
   const parsedFoods = parseEntitiesToTableData(foods, {
     restaurantId,
     onSetFoodToRemove,
+    handlePublishOrCloseFood,
+    publishOrCloseFoodId,
+    publishOrCloseFoodError,
   });
 
   const handleClearFilter = () => {
