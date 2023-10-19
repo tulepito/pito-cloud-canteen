@@ -13,12 +13,12 @@
   width: 100%;
   box-shadow: $boxShadow;
   .iconClose {
-    stroke: $neutralGray5;
+    stroke: $neutralGray6;
     stroke-width: 0;
     width: 15px;
     height: 15px;
     path {
-      fill: $neutralGray5;
+      fill: $neutralGray6;
     }
   }
 
@@ -38,7 +38,7 @@
       .companyHeaderLink {
         padding-bottom: 8px;
         font-size: 16px;
-        color: $neutralGray6;
+        color: $neutralGray7;
         width: fit-content;
       }
     }
@@ -49,13 +49,13 @@
       .headerItem {
         @include flexAlign(flex-start);
         gap: 18px;
-        color: $neutralGray5;
+        color: $neutralGray6;
         width: 100%;
         padding-bottom: 10px;
 
         &.active {
           font-weight: $fontWeightBold;
-          color: $neutralGray6;
+          color: $neutralGray7;
         }
 
         .title {

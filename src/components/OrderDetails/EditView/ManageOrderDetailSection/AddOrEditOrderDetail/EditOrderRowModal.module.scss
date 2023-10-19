@@ -8,10 +8,10 @@
 
   .subTitle {
     @include textTemplate(14px, 400, 20px);
-    color: $neutralGray5;
+    color: $neutralGray6;
 
     b {
-      color: $neutralGray6;
+      color: $neutralGray7;
     }
   }
   .modalContainer {

@@ -12,20 +12,20 @@
   gap: 8px;
   flex-direction: column;
   @include textTemplate(14px, $fontWeightSemiBold, 20px);
-  color: $neutralGray4;
+  color: $neutralGray5;
   cursor: pointer;
-  border: 1px solid $neutralGray4;
+  border: 1px solid $neutralGray5;
   border-radius: 20px;
   padding: 8px 16px;
 
   &:hover {
     svg {
       path {
-        fill: $neutralGray6;
+        fill: $neutralGray7;
       }
     }
 
-    color: $neutralGray6;
+    color: $neutralGray7;
   }
 }
 
@@ -35,10 +35,10 @@
   &:checked + label {
     svg {
       path {
-        fill: $neutralGray6;
+        fill: $neutralGray7;
       }
     }
-    color: $neutralGray6;
-    border-color: $neutralGray6;
+    color: $neutralGray7;
+    border-color: $neutralGray7;
   }
 }

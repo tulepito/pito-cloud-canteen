@@ -45,7 +45,7 @@
         width: 150px;
         padding: 12px;
         cursor: pointer;
-        color: $neutralGray6;
+        color: $neutralGray7;
 
         &:hover {
           background-color: $neutralGray2;
@@ -62,7 +62,7 @@
 .contentWrapper {
   @include flexAlign(center, space-between);
   gap: 12px;
-  color: $neutralGray6;
+  color: $neutralGray7;
 
   .image {
     width: 84px;
@@ -88,7 +88,7 @@
 
       .menuType {
         @include textTemplate(14px, $fontWeightRegular, 20px);
-        color: $neutralGray5;
+        color: $neutralGray6;
         margin-top: 4px;
       }
     }

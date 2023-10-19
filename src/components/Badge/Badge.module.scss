@@ -7,7 +7,7 @@
   align-items: center;
   justify-content: flex-start;
   border-radius: 4px;
-  color: $neutralGray6;
+  color: $neutralGray7;
 
   /* ===============  background =============== */
   &.default {
@@ -57,7 +57,7 @@
     /* =============== close icon =============== */
     & .default {
       path {
-        fill: $neutralGray6;
+        fill: $neutralGray7;
       }
     }
     & .processing {
@@ -97,7 +97,7 @@
 
     /* =============== dot =============== */
     &.default {
-      background: $neutralGray6;
+      background: $neutralGray7;
     }
     &.info {
       background: $labelBlue2;

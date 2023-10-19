@@ -33,7 +33,7 @@
       border-bottom-color: $neutralGray1 !important;
     }
     &::before {
-      border-bottom-color: $neutralGray4 !important;
+      border-bottom-color: $neutralGray5 !important;
     }
   }
 
@@ -56,9 +56,9 @@
       width: 40px;
 
       &:hover {
-        border: 1px solid $neutralGray5;
+        border: 1px solid $neutralGray6;
         background-color: transparent;
-        color: $neutralGray6;
+        color: $neutralGray7;
       }
     }
   }
@@ -72,11 +72,11 @@
   & :global(.react-datepicker__day--today) {
     border-radius: 4px;
     background-color: $neutralGray1;
-    border: 1px solid $neutralGray6;
+    border: 1px solid $neutralGray7;
   }
 
   & :global(.react-datepicker__day-name) {
-    color: $neutralGray5;
+    color: $neutralGray6;
     width: min(calc(calc(100vw - 32px - 1.7rem * 2) / 7), 72px);
 
     @include viewportMedium {
@@ -108,7 +108,7 @@
 
   & :global(.react-datepicker__day--in-range) {
     background: $labelBlue1;
-    color: $neutralGray6;
+    color: $neutralGray7;
     border-radius: 0;
   }
 
@@ -130,7 +130,7 @@
 
   & :global(.react-datepicker__day--in-selecting-range) {
     background: $labelBlue1;
-    color: $neutralGray6;
+    color: $neutralGray7;
     border-radius: 0;
   }
 
@@ -170,7 +170,7 @@
     cursor: pointer;
     height: auto;
     path {
-      stroke: $neutralGray5;
+      stroke: $neutralGray6;
     }
   }
 }

@@ -15,12 +15,12 @@
 
 .formTitle {
   @include textTemplate(20px, $fontWeightBold, 32px);
-  color: $neutralGray6;
+  color: $neutralGray7;
 }
 
 .formDesc {
   @include textTemplate(14px, $fontWeightRegular, 20px);
-  color: $neutralGray5;
+  color: $neutralGray6;
 }
 
 .fieldInput {

@@ -2,7 +2,7 @@
 
 @mixin timeLineBar {
   position: absolute;
-  background-color: $neutralGray4;
+  background-color: $neutralGray5;
   top: 0;
   left: 8.5px;
   width: 3px;
@@ -23,7 +23,7 @@
 
   & > .activeBar {
     @include timeLineBar;
-    background-color: $neutralGray6;
+    background-color: $neutralGray7;
     z-index: 2;
   }
 
@@ -34,7 +34,7 @@
 
     &::after {
       position: absolute;
-      background-color: $neutralGray4;
+      background-color: $neutralGray5;
       top: 0;
       left: 0;
       width: 20px;
@@ -45,7 +45,7 @@
     }
 
     &.isActive::after {
-      background-color: $neutralGray6;
+      background-color: $neutralGray7;
     }
 
     &:last-child {

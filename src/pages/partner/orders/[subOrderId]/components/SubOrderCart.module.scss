@@ -28,7 +28,7 @@
   }
 
   .inforWrapper {
-    border: 1px solid $neutralGray4;
+    border: 1px solid $neutralGray5;
     border-radius: 8px;
     padding: 12px;
     margin-top: 12px;
@@ -76,7 +76,7 @@
 
           .VATBadge {
             span {
-              color: $neutralGray5;
+              color: $neutralGray6;
             }
           }
         }
@@ -87,7 +87,7 @@
         }
 
         &.VATItemContainer {
-          color: $neutralGray5;
+          color: $neutralGray6;
         }
       }
 
@@ -111,7 +111,7 @@
       .totalDescription {
         margin-top: 4px;
         text-align: right;
-        color: $neutralGray5;
+        color: $neutralGray6;
         @include textTemplate(12px, 600, 16px);
       }
     }
@@ -152,7 +152,7 @@
         .totalDescription {
           margin-top: 4px;
           text-align: right;
-          color: $neutralGray5;
+          color: $neutralGray6;
           @include textTemplate(12px, $fontWeightRegular, 16px);
         }
       }

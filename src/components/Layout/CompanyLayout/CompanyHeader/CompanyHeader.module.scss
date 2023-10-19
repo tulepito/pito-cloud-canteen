@@ -21,7 +21,7 @@
   }
 
   &.bottomLine {
-    border-bottom: 1px solid $neutralGray4;
+    border-bottom: 1px solid $neutralGray5;
   }
 
   .headerLeft {
@@ -36,7 +36,7 @@
       display: flex;
       gap: 24px;
       .headerLink {
-        color: $neutralGray6;
+        color: $neutralGray7;
         font-weight: $fontWeightBold;
         font-size: 16px;
         position: relative;
@@ -54,7 +54,7 @@
     .headerPhoneNumber {
       font-size: 16px;
       font-weight: $fontWeightBold;
-      color: $neutralGray6;
+      color: $neutralGray7;
     }
 
     .separator {

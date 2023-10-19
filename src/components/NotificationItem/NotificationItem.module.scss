@@ -24,13 +24,13 @@
 
 .contentWrapper {
   .content {
-    color: $neutralGray6;
+    color: $neutralGray7;
     @include textTemplate(14px, $fontWeightRegular, 20px);
   }
 
   .pastTime {
     @include textTemplate(12px, $fontWeightRegular, 16px);
-    color: $neutralGray5;
+    color: $neutralGray6;
     margin-top: 2px;
   }
 }

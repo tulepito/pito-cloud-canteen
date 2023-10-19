@@ -49,7 +49,7 @@
 
       .time {
         @include textTemplate(10px, $fontWeightRegular, 16px);
-        color: $neutralGray5;
+        color: $neutralGray6;
         margin-top: 4px;
       }
     }
@@ -85,7 +85,7 @@
 
       .time {
         @include textTemplate(16px, $fontWeightRegular, 24px);
-        color: $neutralGray5;
+        color: $neutralGray6;
         margin-top: 4px;
         @include lineClamp(1);
       }
@@ -123,7 +123,7 @@
 
         .ratingText {
           @include textTemplate(14px, $fontWeightRegular, 20px);
-          color: $neutralGray5;
+          color: $neutralGray6;
         }
       }
 

@@ -68,11 +68,11 @@
   left: 0px;
   height: calc(100% - 7px);
   width: 6px;
-  background-color: $neutralGray6;
+  background-color: $neutralGray7;
 }
 
 .menuItem {
-  color: $neutralGray5;
+  color: $neutralGray6;
   background-color: transparent;
   /* Layout */
   position: relative;
@@ -90,7 +90,7 @@
 
   &:focus,
   &:hover {
-    color: $neutralGray6;
+    color: $neutralGray7;
   }
 
   &:hover .menuItemBorder {
@@ -100,7 +100,7 @@
 
 .clearMenuItem {
   font-weight: $fontWeightMedium;
-  color: $neutralGray4;
+  color: $neutralGray5;
   background-color: transparent;
   /* Layout */
   position: relative;
@@ -118,7 +118,7 @@
 
   &:focus,
   &:hover {
-    color: $neutralGray5;
+    color: $neutralGray6;
     transition: width $transitionStyleButton;
   }
 }

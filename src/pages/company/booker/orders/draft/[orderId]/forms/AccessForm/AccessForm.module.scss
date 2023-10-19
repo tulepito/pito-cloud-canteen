@@ -26,14 +26,14 @@
 .groupsSettings {
   @include textTemplate(14px, 700, 24px);
   margin-bottom: 24px;
-  color: $neutralGray6;
+  color: $neutralGray7;
   display: block;
   cursor: pointer;
 }
 
 .emptyGroups {
   @include textTemplate(14px, 400, 20px);
-  color: $neutralGray5;
+  color: $neutralGray6;
   margin-bottom: 16px;
 }
 

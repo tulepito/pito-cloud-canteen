@@ -78,7 +78,7 @@
 
   .tableHead {
     color: $neutralGray1;
-    background-color: $neutralGray5;
+    background-color: $neutralGray6;
     @include textTemplate(14px, 700, 20px);
     @include tableColumnsLayout;
     display: none;
@@ -90,7 +90,7 @@
 
   .tableHeadMobile {
     color: $neutralGray1;
-    background-color: $neutralGray4;
+    background-color: $neutralGray5;
     @include textTemplate(14px, 700, 20px);
     @include flexAlign(center);
     gap: 8px;
@@ -168,10 +168,6 @@
 
         & > div:nth-of-type(4) {
           flex-basis: 20px;
-
-          // @include viewportLarge {
-          //   flex-basis: 15%;
-          // }
         }
       }
 

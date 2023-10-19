@@ -15,7 +15,6 @@
 
   @include viewportMedium {
     width: 1440px;
-    // height: calc(100vh - 350px);
   }
 
   @include viewportLargeWithPaddings {
@@ -45,6 +44,6 @@
 }
 
 .calendarTitle {
-  color: $neutralGray6;
+  color: $neutralGray7;
   @include textTemplate(14px, 400, 24px, '');
 }

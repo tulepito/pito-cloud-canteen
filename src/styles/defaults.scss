@@ -6,7 +6,7 @@
   display: block;
   width: auto;
 
-  color: $neutralGray6;
+  color: $neutralGray7;
   background-color: $neutralGray1;
   border-radius: 8px;
   border-radius: 8px;
@@ -22,11 +22,11 @@
   transition: border-color 0.15s ease-in-out, background-color 0.15s ease-in-out;
   -webkit-transition: border-color 0.15s ease-in-out,
     background-color 0.15s ease-in-out;
-  outline: 1px solid $neutralGray4;
+  outline: 1px solid $neutralGray5;
   outline-offset: -1px;
 
   &::placeholder {
-    color: $neutralGray4;
+    color: $neutralGray5;
     transition: color 0.15s ease-in-out;
     -webkit-transition: color 0.15s ease-in-out;
   }
@@ -34,11 +34,11 @@
     background-color: $neutralGray2;
 
     &::placeholder {
-      color: $neutralGray5;
+      color: $neutralGray6;
     }
   }
   &:focus {
-    outline-color: $neutralGray6;
+    outline-color: $neutralGray7;
     outline-width: 2px;
     outline-offset: -2px;
   }
@@ -47,7 +47,7 @@
     cursor: not-allowed;
 
     &::placeholder {
-      color: $neutralGray4;
+      color: $neutralGray5;
     }
   }
 
@@ -91,7 +91,7 @@
       @include viewportMedium {
         .box,
         .boxSuccess {
-          stroke: $neutralGray6;
+          stroke: $neutralGray7;
         }
 
         path:nth-of-type(2) {
@@ -105,15 +105,15 @@
     &:checked + label .checked {
       display: inline;
       stroke-width: 1px;
-      fill: $neutralGray6;
-      stroke: $neutralGray6;
+      fill: $neutralGray7;
+      stroke: $neutralGray7;
     }
 
     /* Display the "check" when checked */
     &:checked + label .checkedSuccess {
       display: inline;
       stroke-width: 1px;
-      stroke: $neutralGray6;
+      stroke: $neutralGray7;
     }
 
     &:disabled + label {
@@ -124,14 +124,14 @@
       &:hover {
         .checked,
         .checkedSuccess {
-          stroke: $neutralGray4;
+          stroke: $neutralGray5;
           fill: $neutralGray3;
         }
       }
 
       .checked,
       .checkedSuccess {
-        stroke: $neutralGray4;
+        stroke: $neutralGray5;
         fill: $neutralGray3;
       }
 
@@ -144,7 +144,7 @@
     &:checked:disabled + label {
       .box,
       .boxSuccess {
-        stroke: $neutralGray4;
+        stroke: $neutralGray5;
       }
     }
   }
@@ -167,13 +167,13 @@
 
       .checked {
         fill: none;
-        stroke: $neutralGray4;
+        stroke: $neutralGray5;
         transition: all 0.15s ease-in-out;
       }
       .checkedSuccess {
         display: none;
-        fill: $neutralGray4;
-        stroke: $neutralGray4;
+        fill: $neutralGray5;
+        stroke: $neutralGray5;
         transition: all 0.15s ease-in-out;
       }
 
@@ -184,7 +184,7 @@
 
       :hover .checked,
       :hover .checkedSuccess {
-        stroke: $neutralGray6;
+        stroke: $neutralGray7;
       }
     }
   }
@@ -216,7 +216,7 @@
 
     .leftIcon {
       & path {
-        fill: $neutralGray6;
+        fill: $neutralGray7;
       }
     }
   }
@@ -229,7 +229,7 @@
 
     .rightIcon {
       & path {
-        fill: $neutralGray6;
+        fill: $neutralGray7;
       }
     }
   }
@@ -237,7 +237,7 @@
 
 @mixin inputLabelStyles {
   @include textTemplate(14px, 400, 24px, '');
-  color: $neutralGray6;
+  color: $neutralGray7;
   margin-bottom: 8px;
   display: inline-flex;
 
@@ -262,7 +262,7 @@
       content: '';
       width: 100%;
       left: 0;
-      background-color: $neutralGray6;
+      background-color: $neutralGray7;
     }
   }
 }

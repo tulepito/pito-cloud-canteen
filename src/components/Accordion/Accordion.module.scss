@@ -7,19 +7,19 @@
   align-items: center;
   justify-content: space-between;
   padding: 8px 0;
-  border-bottom: 1px solid $neutralGray5;
+  border-bottom: 1px solid $neutralGray6;
   user-select: none;
   cursor: pointer;
   .title {
     font-weight: $fontWeightBold;
     font-size: 14px;
     line-height: 24px;
-    color: $neutralGray6;
+    color: $neutralGray7;
   }
 }
 .accordionContent {
   padding: 12px 0;
-  color: $neutralGray6;
+  color: $neutralGray7;
 }
 
 .accordionContent {

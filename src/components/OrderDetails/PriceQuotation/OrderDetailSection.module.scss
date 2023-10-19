@@ -19,7 +19,6 @@
   }
   & > div:nth-of-type(2) {
     flex-basis: 250px;
-    // @include lineClamp(2);
   }
   & > div:nth-of-type(3) {
     flex-basis: 50px;
@@ -46,9 +45,9 @@
 
     .tableHead {
       @include orderDetailColumnsLayout;
-      background-color: $neutralGray5;
+      background-color: $neutralGray6;
       @include textTemplate(10px, 700, 16px);
-      border-bottom: 1px solid $neutralGray4;
+      border-bottom: 1px solid $neutralGray5;
       color: $neutralGray1;
     }
 
@@ -72,7 +71,7 @@
 
         .restaurantName {
           @include textTemplate(10px, 400, 16px);
-          color: $neutralGray5;
+          color: $neutralGray6;
         }
       }
 

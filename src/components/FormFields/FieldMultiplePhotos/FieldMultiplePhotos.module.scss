@@ -72,8 +72,8 @@
     position: absolute;
     top: 12px;
     left: 12px;
-    fill: $neutralGray5;
-    stroke: $neutralGray5;
+    fill: $neutralGray6;
+    stroke: $neutralGray6;
   }
 
   &:hover svg {
@@ -124,7 +124,7 @@
   border-radius: 50%;
   align-items: center;
   justify-content: center;
-  background-color: $neutralGray4;
+  background-color: $neutralGray5;
   opacity: 0;
   box-shadow: $boxShadow;
   svg {

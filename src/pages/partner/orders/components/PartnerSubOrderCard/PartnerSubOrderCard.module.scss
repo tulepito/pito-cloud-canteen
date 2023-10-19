@@ -4,9 +4,9 @@
 
 .container {
   border-radius: 8px;
-  border: 1px solid $neutralGray4;
+  border: 1px solid $neutralGray5;
   background: $neutralGray1;
-  color: $neutralGray6;
+  color: $neutralGray7;
 
   .cardHeader {
     @include flexAlign(center, space-between);
@@ -46,7 +46,7 @@
     }
 
     .verticalDevider {
-      border-left: 1px solid $neutralGray4;
+      border-left: 1px solid $neutralGray5;
       height: 20px;
     }
   }

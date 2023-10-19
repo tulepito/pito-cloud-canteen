@@ -3,7 +3,7 @@
 @use '/src/styles/customMediaQueries.scss' as *;
 
 .step {
-  color: $neutralGray5;
+  color: $neutralGray6;
 }
 
 .stepTitle {
@@ -14,7 +14,7 @@
 .stepContent {
   margin-top: 8px;
   padding-bottom: 24px;
-  border-bottom: 1px solid $neutralGray4;
+  border-bottom: 1px solid $neutralGray5;
 }
 
 .nextBtn {
@@ -25,19 +25,19 @@
   width: 92px;
   border-radius: 8px;
   color: $neutralGray1;
-  background-color: $neutralGray6;
+  background-color: $neutralGray7;
 }
 
 .skipBtn.skipBtn {
   @include textTemplate(12px, $fontWeightMedium, 16px);
-  color: $neutralGray6;
+  color: $neutralGray7;
   padding: 0;
   @include flexAlign(center);
   gap: 8px;
 
   svg {
     path {
-      fill: $neutralGray6;
+      fill: $neutralGray7;
     }
   }
 }

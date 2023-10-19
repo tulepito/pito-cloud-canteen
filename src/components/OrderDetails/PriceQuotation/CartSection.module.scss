@@ -41,9 +41,9 @@
 
     .tableHead {
       @include cartColumnsLayout;
-      background-color: $neutralGray5;
+      background-color: $neutralGray6;
       @include textTemplate(10px, 700, 1.6);
-      border-bottom: 1px solid $neutralGray4;
+      border-bottom: 1px solid $neutralGray5;
       color: $neutralGray1;
     }
 

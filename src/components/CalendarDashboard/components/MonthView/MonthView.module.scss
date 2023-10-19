@@ -6,7 +6,6 @@
   width: 100%;
   height: 100%;
   position: relative;
-  // overflow-x: scroll;
 }
 
 .scrollContainer {
@@ -25,19 +24,16 @@
 }
 
 .dayInWeekHeader {
-  // flex-basis: calc((100% - 32px) / 7);
   @include flexCenter;
   height: 40px;
   @include textTemplate(12px, $fontWeightRegular, 20px, '');
-  color: $neutralGray6;
+  color: $neutralGray7;
   text-align: center;
   background-color: $neutralGray2;
   border-radius: 8px;
   margin: 0 8px 16px;
 
   &:first-child {
-    // border-left: 1px solid $neutralGray4;
-
     @include viewportMedium {
       border-top-left-radius: 9px;
     }
@@ -53,7 +49,7 @@
 .activeDayHeader {
   background-color: $primaryPri1;
   border-bottom: 1px solid $primaryPri2;
-  color: $neutralGray6;
+  color: $neutralGray7;
 }
 
 .emptyDay {

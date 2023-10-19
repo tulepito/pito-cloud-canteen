@@ -62,7 +62,7 @@
       @include textTemplate(14px, $fontWeightRegular, 20px);
 
       &:first-child {
-        color: $neutralGray5;
+        color: $neutralGray6;
       }
     }
   }
@@ -74,7 +74,7 @@
     cursor: pointer;
 
     path {
-      fill: $neutralGray5;
+      fill: $neutralGray6;
     }
   }
 }

@@ -4,7 +4,7 @@
 
 .generalRatingWrapper {
   padding-bottom: 20px;
-  border-bottom: 1px solid $neutralGray4;
+  border-bottom: 1px solid $neutralGray5;
 
   .generalRatingTitle {
     @include textTemplate(16px, $fontWeightBold, 24px);
@@ -69,7 +69,7 @@
 .detailTextRatingWrapper {
   margin-top: 28px;
   padding-bottom: 20px;
-  border-bottom: 1px solid $neutralGray4;
+  border-bottom: 1px solid $neutralGray5;
 
   .detailTextRatingLabel {
     @include textTemplate(18px, $fontWeightBold, 24px);
@@ -85,7 +85,7 @@
 .imagesRatingWrapper {
   margin-top: 28px;
   padding-bottom: 20px;
-  border-bottom: 1px solid $neutralGray4;
+  border-bottom: 1px solid $neutralGray5;
 
   .imagesRatingTitle {
     @include textTemplate(18px, $fontWeightBold, 24px);
@@ -105,7 +105,7 @@
   gap: 64px;
   padding-bottom: 20px;
   margin-top: 20px;
-  border-bottom: 1px solid $neutralGray4;
+  border-bottom: 1px solid $neutralGray5;
 
   .ratingSectionTitle {
     @include textTemplate(18px, $fontWeightBold, 24px);

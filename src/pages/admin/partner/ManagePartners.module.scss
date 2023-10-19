@@ -61,7 +61,7 @@
 
   &:focus,
   &:hover {
-    background-color: $neutralGray4;
+    background-color: $neutralGray5;
 
     svg * {
       fill: $neutralGray1;
@@ -113,12 +113,12 @@
     margin: 0;
   }
   &:hover {
-    color: $neutralGray6;
+    color: $neutralGray7;
   }
 }
 
 .loadingIcon {
-  stroke: $neutralGray5;
+  stroke: $neutralGray6;
 }
 
 .filterWrapper {
@@ -166,7 +166,7 @@
 }
 
 .rowTitle {
-  color: $neutralGray6;
+  color: $neutralGray7;
 }
 
 .viewAndEdit {

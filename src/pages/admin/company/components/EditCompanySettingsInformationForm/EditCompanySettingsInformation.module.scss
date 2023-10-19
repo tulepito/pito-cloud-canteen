@@ -17,11 +17,11 @@
   align-items: center;
   gap: 10px;
   font-weight: $fontWeightBold;
-  color: $neutralGray6;
+  color: $neutralGray7;
 }
 
 .addIconWrapper {
-  border: 2px solid $neutralGray6;
+  border: 2px solid $neutralGray7;
   width: 20px;
   height: 20px;
   display: flex;
@@ -48,7 +48,7 @@
 .line {
   height: 1px;
   width: 100%;
-  background-color: $neutralGray4;
+  background-color: $neutralGray5;
   margin: 48px 0;
 }
 

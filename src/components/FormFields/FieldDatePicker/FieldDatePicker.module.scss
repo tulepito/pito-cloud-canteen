@@ -23,7 +23,7 @@
       border-bottom-color: $neutralGray1 !important;
     }
     &::before {
-      border-bottom-color: $neutralGray4 !important;
+      border-bottom-color: $neutralGray5 !important;
     }
   }
 
@@ -44,7 +44,7 @@
       height: 37px;
     }
     &:hover {
-      border: 1px solid $neutralGray5;
+      border: 1px solid $neutralGray6;
       background-color: transparent;
     }
   }
@@ -67,7 +67,7 @@
   }
 
   & :global(.react-datepicker__day-name) {
-    color: $neutralGray6;
+    color: $neutralGray7;
     width: 30px;
     @include viewportMedium {
       width: 37px;
@@ -102,7 +102,7 @@
     cursor: pointer;
     height: auto;
     path {
-      stroke: $neutralGray5;
+      stroke: $neutralGray6;
     }
   }
 }

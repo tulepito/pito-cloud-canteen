@@ -60,7 +60,7 @@
 
     .tableHead {
       color: $neutralGray1;
-      background-color: $neutralGray5;
+      background-color: $neutralGray6;
       @include textTemplate(14px, 700, 20px);
       @include tableColumnsLayout;
     }
@@ -90,7 +90,7 @@
 
           .restaurantName {
             @include textTemplate(14px, 400, 20px);
-            color: $neutralGray5;
+            color: $neutralGray6;
             max-width: 100%;
             @include lineClamp(1);
           }
@@ -136,7 +136,7 @@
 
   .tableHead {
     color: $neutralGray1;
-    background-color: $neutralGray5;
+    background-color: $neutralGray6;
     @include textTemplate(14px, 700, 20px);
     @include tableColumnsLayout;
   }
@@ -166,7 +166,7 @@
 
         .restaurantName {
           @include textTemplate(14px, 400, 20px);
-          color: $neutralGray5;
+          color: $neutralGray6;
           max-width: 100%;
           @include lineClamp(1);
         }

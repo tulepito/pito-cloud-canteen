@@ -13,7 +13,7 @@
   @include viewportLargeWithPaddings {
     position: relative;
     background-color: $neutralGray1;
-    border-right: 1px solid $neutralGray4;
+    border-right: 1px solid $neutralGray5;
     height: auto;
     background-color: transparent;
     left: 0;
@@ -27,7 +27,7 @@
   flex-direction: column;
   flex-basis: 280px;
   left: 0;
-  border-right: 1px solid $neutralGray4;
+  border-right: 1px solid $neutralGray5;
   background-color: $neutralGray1;
   height: calc(100vh - 65px);
 

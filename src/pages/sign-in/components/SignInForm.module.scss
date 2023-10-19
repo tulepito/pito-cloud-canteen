@@ -23,7 +23,7 @@
 }
 
 .formTitle {
-  color: $neutralGray6;
+  color: $neutralGray7;
   @include textTemplate(24px, $fontWeightBold, 32px);
   text-transform: capitalize;
 
@@ -35,7 +35,7 @@
 .forgotPassword {
   text-align: right;
   font-size: 14px;
-  color: $neutralGray5;
+  color: $neutralGray6;
 
   & > span {
     cursor: pointer;
@@ -59,14 +59,14 @@
   & > span {
     position: relative;
     z-index: 2;
-    color: $neutralGray5;
+    color: $neutralGray6;
     background-color: $neutralGray1;
     padding: 0 8px;
   }
 }
 
 .googleLoginButton {
-  color: $neutralGray6;
+  color: $neutralGray7;
   font-size: 16px;
   cursor: pointer;
   padding: 8px 12px;
@@ -76,13 +76,13 @@
   margin: 0 auto;
   @include flexCenter;
   background-color: $neutralGray1;
-  border: 1px solid $neutralGray4;
+  border: 1px solid $neutralGray5;
   gap: 16px;
 
   &:disabled {
     background-color: $neutralGray3;
-    border-color: $neutralGray5;
-    color: $neutralGray5;
+    border-color: $neutralGray6;
+    color: $neutralGray6;
   }
 
   @include viewportMedium {
