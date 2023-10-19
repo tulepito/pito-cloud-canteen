@@ -2,9 +2,11 @@ import { mapLimit } from 'async';
 import compact from 'lodash/compact';
 import flatten from 'lodash/flatten';
 import isEmpty from 'lodash/isEmpty';
+import omit from 'lodash/omit';
 import uniq from 'lodash/uniq';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
+import { EHttpStatusCode } from '@apis/errors';
 import {
   convertListIdToQueries,
   prepareNewOrderDetailPlan,
@@ -27,12 +29,6 @@ import {
 import type { TListing } from '@src/utils/types';
 import { denormalisedResponseEntities, Listing, User } from '@utils/data';
 
-const ENABLE_INVITE_PERMISSION = [
-  UserPermission.PARTICIPANT,
-  UserPermission.BOOKER,
-  UserPermission.ACCOUNTANT,
-];
-
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   const sdk = getSdk(req, res);
   const integrationSdk = getIntegrationSdk();
@@ -47,21 +43,36 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     const { email: userEmail } = currentUserGetter.getAttributes();
     const { company: userCompany = {}, companyList = [] } =
       currentUserGetter.getMetadata();
-    const userId = User(currentUser).getId();
+    const userId = currentUserGetter.getId();
 
-    if (
-      userCompany[userId] &&
-      ENABLE_INVITE_PERMISSION.includes(userCompany[userId].permission)
-    ) {
+    const companyAccount = await fetchUser(companyId);
+    const companyUserGetter = User(companyAccount);
+    const { companyName } = companyUserGetter.getPublicData();
+    const { members = {} } = companyUserGetter.getMetadata();
+    const userMember = members[userEmail] || {};
+
+    if (!isEmpty(userCompany)) {
+      if (
+        userCompany[companyId] &&
+        userCompany[companyId].permission in UserPermission
+      ) {
+        return res.json({
+          message: 'User is already in company',
+        });
+      }
+
+      await integrationSdk.users.updateProfile({
+        id: companyId,
+        metadata: {
+          members: omit(members, [userEmail]),
+        },
+      });
+
       return res.json({
-        message: 'userAccept',
+        statusCode: EHttpStatusCode.BadRequest,
+        error: `User already has company`,
       });
     }
-    const companyAccount = await fetchUser(companyId);
-    const companyUser = User(companyAccount);
-    const { companyName } = companyUser.getPublicData();
-    const { members = {} } = companyUser.getMetadata();
-    const userMember = members[userEmail] || {};
 
     if (isEmpty(userMember)) {
       return res.json({

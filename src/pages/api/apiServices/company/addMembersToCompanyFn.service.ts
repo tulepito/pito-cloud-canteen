@@ -93,7 +93,7 @@ const addMembersToCompanyFn = async (params: TAddMembersToCompanyParams) => {
     ),
   );
 
-  // Step update data for existed user
+  // * Step update data for existed user
   const newParticipantIds = difference(userIdList, membersIdList);
   const newParticipantMembers = await Promise.all(
     newParticipantIds.map(async (userId: string) => {

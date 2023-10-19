@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
+import compact from 'lodash/compact';
+import isEmpty from 'lodash/isEmpty';
 
 import Button from '@components/Button/Button';
 import Modal from '@components/Modal/Modal';
@@ -71,9 +73,18 @@ const AddCompanyMembersModal: React.FC<CreateGroupModalProps> = (props) => {
     const noAccountEmailList = loadedResult
       .filter((_result) => _result.response.status === 404)
       .map((_result) => _result.email);
-    const userIdList = loadedResult
-      .filter((_result) => _result.response.status === 200)
-      .map((_result) => User(_result.response.user).getId());
+    const userIdList = compact(
+      loadedResult
+        .filter((_result) => _result.response.status === 200)
+        .map((_result) => {
+          const userGetter = User(_result.response.user);
+          const { company = {} } = userGetter.getMetadata();
+
+          if (isEmpty(company)) return userGetter.getId();
+
+          return null;
+        }),
+    );
     dispatch(
       companyMemberThunks.addMembers({ noAccountEmailList, userIdList }),
     ).then(() => {
