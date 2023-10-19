@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import { orderFlow } from '@helpers/orderHelper';
+import { ORDER_STATE_TRANSIT_FLOW } from '@helpers/orderHelper';
 import updateOrder from '@pages/api/orders/[orderId]/update.service';
 import cookies from '@services/cookie';
 import { fetchListing } from '@services/integrationHelper';
@@ -20,9 +20,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       orderListing.getMetadata();
 
     if (
-      orderFlow?.[currentOrderState as TTransitionOrderState].includes(
-        newOrderState,
-      )
+      ORDER_STATE_TRANSIT_FLOW[
+        currentOrderState as TTransitionOrderState
+      ].includes(newOrderState)
     ) {
       const generalInfo = {
         orderState: newOrderState,

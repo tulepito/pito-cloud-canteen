@@ -15,10 +15,11 @@ import {
 import { Listing } from '@src/utils/data';
 import { EOrderDetailTabs, EOrderStates } from '@src/utils/enums';
 
+import { AdminManageOrderThunks } from '../AdminManageOrder.slice';
+
 import OrderDetailTab from './tabs/OrderDetailTab/OrderDetailTab';
 import OrderPaymentStatusTab from './tabs/OrderPaymentStatusTab/OrderPaymentStatusTab';
 import OrderQuotationTab from './tabs/OrderQuotationTab/OrderQuotationTab';
-import { OrderDetailThunks } from './AdminManageOrder.slice';
 
 import css from './OrderDetail.module.scss';
 
@@ -90,7 +91,7 @@ const OrderDetailPage = () => {
   const updateStaffName = useCallback(
     (staffName: string) => {
       dispatch(
-        OrderDetailThunks.updateStaffName({
+        AdminManageOrderThunks.updateStaffName({
           orderId: orderId as string,
           staffName,
         }),
@@ -101,7 +102,7 @@ const OrderDetailPage = () => {
 
   const handleUpdateOrderState = async (newOrderState: string) => {
     const { payload } = await dispatch(
-      OrderDetailThunks.updateOrderState({
+      AdminManageOrderThunks.updateOrderState({
         orderId: orderId as string,
         orderState: newOrderState,
       }),

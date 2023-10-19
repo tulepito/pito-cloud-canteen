@@ -7,7 +7,10 @@ import IconLightOutline from '@components/Icons/IconLightOutline/IconLightOutlin
 import AlertModal from '@components/Modal/AlertModal';
 import OutsideClickHandler from '@components/OutsideClickHandler/OutsideClickHandler';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
-import { isEnableToStartOrder, orderFlow } from '@helpers/orderHelper';
+import {
+  isEnableToStartOrder,
+  ORDER_STATE_TRANSIT_FLOW,
+} from '@helpers/orderHelper';
 import { useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { Listing } from '@src/utils/data';
@@ -76,7 +79,7 @@ const OrderHeaderState: React.FC<OrderHeaderStateProps> = (props) => {
     orderState === EOrderStates.picking;
 
   const shouldManagePickingBtn = orderState === EOrderStates.inProgress;
-  const canCancelOrder = orderFlow?.[
+  const canCancelOrder = ORDER_STATE_TRANSIT_FLOW?.[
     orderState as TTransitionOrderState
   ]?.includes(EOrderStates.canceled);
 

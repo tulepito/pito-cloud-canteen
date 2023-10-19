@@ -12,6 +12,7 @@ import {
   calculatePriceQuotationPartner,
 } from '@helpers/order/cartInfoHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { AdminManageOrderThunks } from '@pages/admin/order/AdminManageOrder.slice';
 import { Listing } from '@src/utils/data';
 import { getDayOfWeek } from '@src/utils/dates';
 import {
@@ -21,7 +22,6 @@ import {
 } from '@src/utils/enums';
 import type { TListing, TUser } from '@src/utils/types';
 
-import { OrderDetailThunks } from '../../AdminManageOrder.slice';
 import OrderHeaderState from '../../components/OrderHeaderState/OrderHeaderState';
 import { calculatePaidAmountBySubOrderDate } from '../../helpers/AdminOrderDetail';
 
@@ -206,13 +206,10 @@ const OrderPaymentStatusTab: React.FC<OrderPaymentStatusTabProps> = (props) => {
 
   useEffect(() => {
     if (orderId) {
-      dispatch(OrderDetailThunks.fetchQuotations(orderId));
+      dispatch(AdminManageOrderThunks.fetchQuotations(orderId));
+      dispatch(AdminManageOrderThunks.fetchPartnerPaymentRecords(orderId));
+      dispatch(AdminManageOrderThunks.fetchClientPaymentRecords(orderId));
     }
-  }, [dispatch, orderId]);
-
-  useEffect(() => {
-    dispatch(OrderDetailThunks.fetchPartnerPaymentRecords(orderId));
-    dispatch(OrderDetailThunks.fetchClientPaymentRecords(orderId));
   }, [dispatch, orderId]);
 
   useEffect(() => {

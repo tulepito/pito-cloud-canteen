@@ -26,6 +26,7 @@ import { addCommas, parseThousandNumber } from '@helpers/format';
 import { getTrackingLink } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
+import { AdminManageOrderThunks } from '@pages/admin/order/AdminManageOrder.slice';
 import {
   changeStep4SubmitStatus,
   orderAsyncActions,
@@ -473,8 +474,14 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
   const updateOrderDetailInProgress = useAppSelector(
     (state) => state.Order.updateOrderDetailInProgress,
   );
+  const updateOrderStateInProgress = useAppSelector(
+    (state) => state.AdminManageOrder.updateOrderStateInProgress,
+  );
 
-  const submitInProgress = updateOrderInProgress || updateOrderDetailInProgress;
+  const submitInProgress =
+    updateOrderInProgress ||
+    updateOrderDetailInProgress ||
+    updateOrderStateInProgress;
 
   const {
     value: isSuccessModalOpen,
@@ -520,7 +527,7 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
       );
     }
     if (orderState === EOrderDraftStates.draft) {
-      await dispatch(orderAsyncActions.requestApprovalOrder({ orderId }));
+      await dispatch(AdminManageOrderThunks.requestApprovalOrder({ orderId }));
     }
 
     const { error } = (await dispatch(

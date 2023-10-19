@@ -19,6 +19,7 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { useDownloadPriceQuotation } from '@hooks/useDownloadPriceQuotation';
 import useExportOrderDetails from '@hooks/useExportOrderDetails';
 import { usePrepareOrderDetailPageData } from '@hooks/usePrepareOrderManagementData';
+import { AdminManageOrderThunks } from '@pages/admin/order/AdminManageOrder.slice';
 import { ReviewContent } from '@pages/admin/order/create/components/ReviewOrder/ReviewOrder';
 import { checkMinMaxQuantityInPickingState } from '@pages/company/orders/[orderId]/picking/OrderDetail.page';
 import {
@@ -31,7 +32,6 @@ import { EOrderStates, EOrderType } from '@src/utils/enums';
 import { ETransition } from '@src/utils/transaction';
 import type { TListing, TObject, TUser } from '@src/utils/types';
 
-import { OrderDetailThunks } from '../../AdminManageOrder.slice';
 import OrderHeaderInfor from '../../components/OrderHeaderInfor/OrderHeaderInfor';
 import OrderHeaderState from '../../components/OrderHeaderState/OrderHeaderState';
 
@@ -179,7 +179,7 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
         const updatePlanDetail = (updateData: TObject, skipRefetch = false) => {
           if (planId) {
             dispatch(
-              OrderDetailThunks.updatePlanDetail({
+              AdminManageOrderThunks.updatePlanDetail({
                 planId,
                 orderId,
                 orderDetail: {

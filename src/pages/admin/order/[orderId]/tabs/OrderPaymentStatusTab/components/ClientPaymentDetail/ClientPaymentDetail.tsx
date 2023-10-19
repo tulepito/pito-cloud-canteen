@@ -2,8 +2,8 @@ import Button from '@components/Button/Button';
 import { parseThousandNumberToInteger } from '@helpers/format';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
-import { OrderDetailThunks } from '@pages/admin/order/[orderId]/AdminManageOrder.slice';
 import { generateSKU } from '@pages/admin/order/[orderId]/helpers/AdminOrderDetail';
+import { AdminManageOrderThunks } from '@pages/admin/order/AdminManageOrder.slice';
 import { User } from '@src/utils/data';
 import { EPaymentType } from '@src/utils/enums';
 import type { TUser } from '@src/utils/types';
@@ -59,7 +59,7 @@ const ClientPaymentDetail: React.FC<ClientPaymentDetailProps> = (props) => {
     const { paymentAmount, paymentNote } = values;
 
     const { meta } = await dispatch(
-      OrderDetailThunks.createClientPaymentRecord({
+      AdminManageOrderThunks.createClientPaymentRecord({
         paymentType: EPaymentType.CLIENT,
         orderId,
         amount: parseThousandNumberToInteger(paymentAmount),
@@ -75,13 +75,13 @@ const ClientPaymentDetail: React.FC<ClientPaymentDetailProps> = (props) => {
     if (meta.requestStatus === 'fulfilled') {
       addPaymentModalController.setFalse();
     } else {
-      dispatch(OrderDetailThunks.fetchClientPaymentRecords(orderId));
+      dispatch(AdminManageOrderThunks.fetchClientPaymentRecords(orderId));
     }
   };
 
   const handleDeleteClientPaymentRecord = async (paymentRecordId: string) => {
     return dispatch(
-      OrderDetailThunks.deleteClientPaymentRecord(paymentRecordId),
+      AdminManageOrderThunks.deleteClientPaymentRecord(paymentRecordId),
     );
   };
 

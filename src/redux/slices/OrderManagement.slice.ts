@@ -37,7 +37,7 @@ import {
   calculateClientQuotation,
   calculatePartnerQuotation,
 } from '@helpers/orderHelper';
-import { AdminManageOrderActions } from '@pages/admin/order/[orderId]/AdminManageOrder.slice';
+import { AdminManageOrderActions } from '@pages/admin/order/AdminManageOrder.slice';
 import { createAsyncThunk } from '@redux/redux.helper';
 import type { RootState } from '@redux/store';
 import type { NotificationInvitationParams } from '@services/notifications';

@@ -496,7 +496,7 @@ export const getPCCFeeByMemberAmount = (memberAmount: number) => {
   return 500000;
 };
 
-export const orderFlow = {
+export const ORDER_STATE_TRANSIT_FLOW = {
   [EOrderDraftStates.draft]: [
     EOrderDraftStates.pendingApproval,
     EOrderStates.canceled,

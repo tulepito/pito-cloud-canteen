@@ -19,7 +19,6 @@ import {
   queryOrdersApi,
   recommendRestaurantApi,
   reorderApi,
-  requestApprovalOrderApi,
   updateOrderApi,
   updateOrderStateToDraftApi,
   updatePlanDetailsApi,
@@ -729,15 +728,6 @@ const bookerDeleteDraftOrder = createAsyncThunk(
   },
 );
 
-const requestApprovalOrder = createAsyncThunk(
-  'app/Order/REQUEST_APPROVAL_ORDER',
-  async ({ orderId }: TObject) => {
-    const { data: responseData } = await requestApprovalOrderApi(orderId);
-
-    return responseData;
-  },
-);
-
 const cancelPendingApprovalOrder = createAsyncThunk(
   'app/Order/CANCEL_PENDING_APPROVAL_ORDER',
   async ({ orderId }: TObject, { getState, dispatch }) => {
@@ -934,7 +924,6 @@ export const orderAsyncActions = {
   queryCompanyOrders,
   fetchPlanDetail,
   updatePlanDetail,
-  requestApprovalOrder,
   bookerPublishOrder,
   cancelPendingApprovalOrder,
   fetchRestaurantCoverImages,
@@ -1227,22 +1216,6 @@ const orderSlice = createSlice({
         ...state,
         updateOrderDetailInProgress: false,
         updateOrderDetailError: error.message,
-      }))
-      /* =============== requestApprovalOrder =============== */
-      .addCase(requestApprovalOrder.pending, (state) => ({
-        ...state,
-        updateOrderInProgress: true,
-        updateOrderError: null,
-      }))
-      .addCase(requestApprovalOrder.fulfilled, (state, { payload }) => ({
-        ...state,
-        updateOrderInProgress: false,
-        order: payload,
-      }))
-      .addCase(requestApprovalOrder.rejected, (state, { error }) => ({
-        ...state,
-        updateOrderInProgress: false,
-        updateOrderError: error.message,
       }))
       /* =============== cancelNeedApprovalOrder =============== */
       .addCase(cancelPendingApprovalOrder.pending, (state) => ({

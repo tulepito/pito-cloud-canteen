@@ -7,12 +7,12 @@ import type { TColumn } from '@components/Table/Table';
 import Table from '@components/Table/Table';
 import Tabs from '@components/Tabs/Tabs';
 import { useAppDispatch } from '@hooks/reduxHooks';
+import { AdminManageOrderThunks } from '@pages/admin/order/AdminManageOrder.slice';
 import { Listing, User } from '@src/utils/data';
 import { formatTimestamp } from '@src/utils/dates';
 import { type EOrderStates, EQuotationStatus } from '@src/utils/enums';
 import type { TListing, TPagination, TUser } from '@src/utils/types';
 
-import { OrderDetailThunks } from '../../AdminManageOrder.slice';
 import OrderHeaderInfor from '../../components/OrderHeaderInfor/OrderHeaderInfor';
 import OrderHeaderState from '../../components/OrderHeaderState/OrderHeaderState';
 import OrderQuotationDetail from '../../components/OrderQuotationDetail/OrderQuotationDetail';
@@ -220,7 +220,7 @@ const OrderQuotationTab: React.FC<OrderQuotationTabProps> = (props) => {
 
   useEffect(() => {
     if (order?.id.uuid) {
-      dispatch(OrderDetailThunks.fetchQuotations(order?.id.uuid));
+      dispatch(AdminManageOrderThunks.fetchQuotations(order?.id.uuid));
     }
   }, [dispatch, order?.id.uuid]);
 

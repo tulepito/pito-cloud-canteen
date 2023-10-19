@@ -14,6 +14,7 @@ import { participantSubOrderUpdateDocumentApi } from '@apis/firebaseApi';
 import { createNotificationApi } from '@apis/notificationApi';
 import {
   adminUpdateOrderStateApi,
+  requestApprovalOrderApi,
   updateOrderApi,
   updatePlanDetailsApi,
 } from '@apis/orderApi';
@@ -212,6 +213,15 @@ const updateStaffName = createAsyncThunk(
   },
 );
 
+const requestApprovalOrder = createAsyncThunk(
+  'app/Order/REQUEST_APPROVAL_ORDER',
+  async ({ orderId }: TObject) => {
+    const { data: responseData } = await requestApprovalOrderApi(orderId);
+
+    return responseData;
+  },
+);
+
 const updateOrderState = createAsyncThunk(
   UPDATE_ORDER_STATE,
   async (payload: { orderId: string; orderState: string }) => {
@@ -382,7 +392,7 @@ const deletePartnerPaymentRecord = createAsyncThunk(
     const newPartnerPaymentRecords = Object.entries(
       partnerPaymentRecords,
     ).reduce((acc: any, [subOrderDate, paymentRecords]) => {
-      const newPaymentRecords = paymentRecords.filter(
+      const newPaymentRecords = (paymentRecords as TObject[]).filter(
         (paymentRecord: any) => paymentRecord.id !== paymentRecordId,
       );
       acc[subOrderDate] = newPaymentRecords;
@@ -448,16 +458,18 @@ const deleteClientPaymentRecord = createAsyncThunk(
   },
 );
 
-export const OrderDetailThunks = {
+export const AdminManageOrderThunks = {
   updateStaffName,
   updateOrderState,
   fetchQuotations,
   transit,
+  requestApprovalOrder,
   updatePlanDetail,
+  // Partner payment thunks
   fetchPartnerPaymentRecords,
   createPartnerPaymentRecord,
   deletePartnerPaymentRecord,
-
+  // Client payment thunks
   fetchClientPaymentRecords,
   createClientPaymentRecord,
   deleteClientPaymentRecord,
@@ -492,7 +504,22 @@ const AdminManageOrderSlice = createSlice({
         updateOrderStaffNameInProgress: false,
         updateOrderStaffNameError: error.message,
       }))
-
+      /* =============== requestApprovalOrder =============== */
+      .addCase(requestApprovalOrder.pending, (state) => ({
+        ...state,
+        updateOrderStateInProgress: true,
+        updateOrderStateError: null,
+      }))
+      .addCase(requestApprovalOrder.fulfilled, (state, { payload }) => ({
+        ...state,
+        updateOrderStateInProgress: false,
+        order: payload,
+      }))
+      .addCase(requestApprovalOrder.rejected, (state, { error }) => ({
+        ...state,
+        updateOrderStateInProgress: false,
+        updateOrderStateError: error.message,
+      }))
       .addCase(updateOrderState.pending, (state) => ({
         ...state,
         updateOrderStateInProgress: true,
