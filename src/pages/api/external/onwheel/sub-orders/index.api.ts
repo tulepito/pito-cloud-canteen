@@ -55,7 +55,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     if (NEXT_PUBLIC_ENV === 'production') {
       txs = await queryAllTransactions({
         query: {
-          lastTransition: ETransition.INITIATE_TRANSACTION,
+          lastTransition: ETransition.PARTNER_CONFIRM_SUB_ORDER,
           include: ['provider'],
         },
       });
@@ -63,7 +63,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       const hasTimeParams = startDeliveryTime || endDeliveryTime;
       txs = denormalisedResponseEntities(
         await integrationSdk.transactions.query({
-          lastTransition: ETransition.INITIATE_TRANSACTION,
+          lastTransition: ETransition.PARTNER_CONFIRM_SUB_ORDER,
           include: ['provider'],
         }),
       ).slice(0, hasTimeParams ? undefined : 20);
@@ -177,7 +177,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       const { orderId, planId, timestamp } = txGetter.getMetadata();
       const { lastTransition } = txGetter.getAttributes();
 
-      if (lastTransition !== ETransition.INITIATE_TRANSACTION) {
+      if (lastTransition !== ETransition.PARTNER_CONFIRM_SUB_ORDER) {
         return acc;
       }
 
