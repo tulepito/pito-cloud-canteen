@@ -19,8 +19,10 @@ import FieldRadioButton from '@components/FormFields/FieldRadioButton/FieldRadio
 import FieldTextArea from '@components/FormFields/FieldTextArea/FieldTextArea';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import FieldTextInputWithBottomBox from '@components/FormFields/FieldTextInputWithBottomBox/FieldTextInputWithBottomBox';
+import PopupModal from '@components/PopupModal/PopupModal';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import useBoolean from '@hooks/useBoolean';
 import { foodSliceAction, foodSliceThunks } from '@redux/slices/foods.slice';
 import type { TKeyValue } from '@src/utils/types';
 import {
@@ -95,6 +97,7 @@ const EditPartnerFoodFormComponent: React.FC<
   const [responseApprovalRequest, setResponseApprovalRequest] =
     useState<string>('');
 
+  const approvalModalController = useBoolean();
   const images = pickRenderableImages(
     currentFoodListing,
     uploadedImages,
@@ -142,26 +145,28 @@ const EditPartnerFoodFormComponent: React.FC<
     [JSON.stringify(categoriesOptions)],
   );
 
-  const fieldClasses = classNames(css.field, viewModeOnly && css.viewOnly);
+  const fieldClasses = classNames(css.flexField, viewModeOnly && css.viewOnly);
 
-  const declineFood = () => {
+  const declineFood = async () => {
     setResponseApprovalRequest(EFoodApprovalState.DECLINED);
-    dispatch(
+    await dispatch(
       foodSliceThunks.responseApprovalRequest({
         foodId: foodId as string,
         response: EFoodApprovalState.DECLINED,
       }),
     );
+    approvalModalController.setTrue();
   };
 
-  const acceptFood = () => {
+  const acceptFood = async () => {
     setResponseApprovalRequest(EFoodApprovalState.ACCEPTED);
-    dispatch(
+    await dispatch(
       foodSliceThunks.responseApprovalRequest({
         foodId: foodId as string,
         response: EFoodApprovalState.ACCEPTED,
       }),
     );
+    approvalModalController.setTrue();
   };
 
   return (
@@ -572,6 +577,17 @@ const EditPartnerFoodFormComponent: React.FC<
             Từ chối
           </Button>
         </RenderWhen>
+        <PopupModal
+          id="ApprovalModal"
+          isOpen={approvalModalController.value}
+          handleClose={approvalModalController.setFalse}
+          title="Thông báo">
+          <div>
+            {responseApprovalRequest === EFoodApprovalState.ACCEPTED
+              ? 'Duyệt món ăn thành công'
+              : 'Từ chối món ăn thành công'}
+          </div>
+        </PopupModal>
       </div>
     </Form>
   );

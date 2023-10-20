@@ -17,7 +17,6 @@ import {
   FOOD_ADDITIONAL_INFO_TAB,
   FOOD_BASIC_INFO_TAB,
   FOOD_DETAIL_INFO_TAB,
-  FoodWizard,
   TAB_STEPS,
 } from '@pages/partner/products/food/create/CreatePartnerFood.page';
 import { partnerThunks } from '@redux/slices/partners.slice';
@@ -36,6 +35,7 @@ import {
 import { getInitialAddImages } from '@utils/images';
 
 import EditPartnerFoodForm from '../components/EditPartnerFoodForm/EditPartnerFoodForm';
+import EditPartnerFoodFormMobile from '../components/EditPartnerFoodFormMobile/EditPartnerFoodFormMobile';
 import { getObjectDifferences, NEW_FOOD_ID } from '../helpers/editFood';
 import {
   partnerFoodSliceActions,
@@ -225,6 +225,7 @@ const EditPartnerFoodPage = () => {
   };
 
   const handleSubmit = async (values: TEditPartnerFoodFormValues) => {
+    console.log('values', values);
     if (isNewFood) {
       const { payload: foodListing } = await dispatch(
         partnerFoodSliceThunks.createPartnerFoodListing(
@@ -266,74 +267,76 @@ const EditPartnerFoodPage = () => {
       currentAdminApproval &&
       currentAdminApproval !== EFoodApprovalState.DECLINED;
 
-    await dispatch(
-      partnerFoodSliceThunks.updatePartnerFoodListing({
-        shouldShowToast: false,
-        ...getUpdateFoodData({
-          ...values,
-          id: foodId as string,
-          ...(currentTabIndex === CREATE_FOOD_TABS.length - 1 && {
-            isDraft: false,
-          }),
-          ...(shouldChangeAdminApprovalToPending && {
-            adminApproval: EFoodApprovalState.PENDING,
+    if (currentTabIndex === CREATE_FOOD_TABS.length - 1) {
+      await dispatch(
+        partnerFoodSliceThunks.updatePartnerFoodListing({
+          shouldShowToast: false,
+          ...getUpdateFoodData({
+            ...values,
+            id: foodId as string,
+            ...(currentTabIndex === CREATE_FOOD_TABS.length - 1 && {
+              isDraft: false,
+            }),
+            ...(shouldChangeAdminApprovalToPending && {
+              adminApproval: EFoodApprovalState.PENDING,
+            }),
           }),
         }),
-      }),
-    );
+      );
 
-    setChangeContent({
-      ...changeContent,
-      ...differentAttributesAfterEditFood,
-      ...(changeSideDishes && {
-        sideDishes: {
-          oldValues: currentSideDishes,
-          newValues: newSideDishes,
-        },
-      }),
-    });
+      setChangeContent({
+        ...changeContent,
+        ...differentAttributesAfterEditFood,
+        ...(changeSideDishes && {
+          sideDishes: {
+            oldValues: currentSideDishes,
+            newValues: newSideDishes,
+          },
+        }),
+      });
 
-    if (!currentIsDraft) {
-      if (
-        currentAdminApproval === EFoodApprovalState.ACCEPTED &&
-        changeApprovalAttributes.length > 0
-      ) {
-        sendingApprovalToAdminModalController.setTrue();
-        dispatch(
-          partnerFoodSliceThunks.sendSlackNotification({
-            foodId: foodId as string,
-            notificationType: ESlackNotificationType.UPDATE_FOOD,
-            params: {
+      if (!currentIsDraft) {
+        if (
+          currentAdminApproval === EFoodApprovalState.ACCEPTED &&
+          changeApprovalAttributes.length > 0
+        ) {
+          sendingApprovalToAdminModalController.setTrue();
+          dispatch(
+            partnerFoodSliceThunks.sendSlackNotification({
               foodId: foodId as string,
-              restaurantId: foodRestaurantId,
-              changeContent: {
-                ...differentAttributesAfterEditFood,
-                ...(changeSideDishes && {
-                  sideDishes: {
-                    oldValues: currentSideDishes,
-                    newValues: newSideDishes,
-                  },
-                }),
+              notificationType: ESlackNotificationType.UPDATE_FOOD,
+              params: {
+                foodId: foodId as string,
+                restaurantId: foodRestaurantId,
+                changeContent: {
+                  ...differentAttributesAfterEditFood,
+                  ...(changeSideDishes && {
+                    sideDishes: {
+                      oldValues: currentSideDishes,
+                      newValues: newSideDishes,
+                    },
+                  }),
+                },
               },
-            },
-          }),
-        );
-      } else if (
-        currentAdminApproval === EFoodApprovalState.DECLINED &&
-        changeApprovalAttributes.length > 0
-      ) {
-        reSendingApprovalToAdminModalController.setTrue();
+            }),
+          );
+        } else if (
+          currentAdminApproval === EFoodApprovalState.DECLINED &&
+          changeApprovalAttributes.length > 0
+        ) {
+          reSendingApprovalToAdminModalController.setTrue();
+        } else {
+          sendingApprovalToAdminModalController.setTrue();
+          backToPendingTabController.setTrue();
+        }
       } else {
         sendingApprovalToAdminModalController.setTrue();
         backToPendingTabController.setTrue();
       }
-    } else if (currentTabIndex !== CREATE_FOOD_TABS.length - 1) {
+    } else {
       setCurrentTab(
         CREATE_FOOD_TABS[currentTabIndex + 1] || FOOD_BASIC_INFO_TAB,
       );
-    } else {
-      sendingApprovalToAdminModalController.setTrue();
-      backToPendingTabController.setTrue();
     }
   };
 
@@ -410,13 +413,11 @@ const EditPartnerFoodPage = () => {
         />
       </div>
       <div className={css.mobileFormWrapper}>
-        <FoodWizard
-          tab={currentTab}
-          goBack={() => {}}
-          disabled={false}
-          handleSubmit={handleSubmit}
-          inProgress={updateFoodInProgress || createFoodInProgress}
+        <EditPartnerFoodFormMobile
+          onSubmit={handleSubmit as any}
           initialValues={initialValues}
+          currentTab={currentTab}
+          inProgress={updateFoodInProgress || createFoodInProgress}
         />
       </div>
       <div className={css.desktopFormWrapper}>
