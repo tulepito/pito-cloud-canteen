@@ -48,3 +48,17 @@ export const removePartnerFoodApi = (foodId: string) =>
   deleteApi(`${BASE_URL}/food/${foodId}`);
 export const removePartnerMultipleFoodApi = (body: TBodyParams) =>
   deleteApi(`${BASE_URL}/food/delete-by-ids`, body);
+
+export const transitSubOrderTransactionApi = ({
+  orderId,
+  subOrderDate,
+  transactionId,
+  newTransition,
+  partnerId,
+}: TObject) => {
+  return putApi(`${BASE_URL}/${partnerId}/orders/${orderId}/transit`, {
+    subOrderDate,
+    transactionId,
+    newTransition,
+  });
+};
