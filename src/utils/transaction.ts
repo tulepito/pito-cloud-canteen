@@ -14,8 +14,11 @@ export enum ETransition {
   INITIATE_TRANSACTION = 'transition/initiate-transaction',
   EXPIRED_START_DELIVERY = 'transition/expired-start-delivery',
   START_DELIVERY = 'transition/start-delivery',
+  PARTNER_CONFIRM_SUB_ORDER = 'transition/partner-confirm-sub-order',
+  PARTNER_REJECT_SUB_ORDER = 'transition/partner-reject-sub-order',
   EXPIRED_DELIVERY = 'transition/expired-delivery',
   OPERATOR_CANCEL_PLAN = 'transition/operator-cancel-plan',
+  OPERATOR_CANCEL_AFTER_PARTNER_REJECTED = 'transition/operator-cancel-after-partner-rejected',
   CANCEL_DELIVERY = 'transition/cancel-delivery',
   COMPLETE_DELIVERY = 'transition/complete-delivery',
   REVIEW_RESTAURANT = 'transition/restaurant-review',
@@ -26,6 +29,8 @@ export enum ETransition {
 export enum ETransactionState {
   INITIAL = 'initial',
   INITIATED = 'initiated',
+  PARTNER_CONFIRMED = 'partner-confirmed',
+  PARTNER_REJECTED = 'partner-rejected',
   DELIVERING = 'delivering',
   CANCELED = 'canceled',
   FAILED_DELIVERY = 'failed-delivery',
@@ -60,7 +65,21 @@ const stateDescription: TStateDescription = {
       on: {
         [ETransition.OPERATOR_CANCEL_PLAN]: ETransactionState.CANCELED,
         [ETransition.EXPIRED_START_DELIVERY]: ETransactionState.FAILED_DELIVERY,
+        [ETransition.PARTNER_CONFIRM_SUB_ORDER]:
+          ETransactionState.PARTNER_CONFIRMED,
+        [ETransition.PARTNER_REJECT_SUB_ORDER]:
+          ETransactionState.PARTNER_REJECTED,
+      },
+    },
+    [ETransactionState.PARTNER_CONFIRMED]: {
+      on: {
         [ETransition.START_DELIVERY]: ETransactionState.DELIVERING,
+      },
+    },
+    [ETransactionState.PARTNER_REJECTED]: {
+      on: {
+        [ETransition.OPERATOR_CANCEL_AFTER_PARTNER_REJECTED]:
+          ETransactionState.CANCELED,
       },
     },
     [ETransactionState.CANCELED]: {},
@@ -152,6 +171,14 @@ export const txIsReviewed = (tx: TTransaction) => {
 
 export const txIsExpiredReview = (tx: TTransaction) => {
   return [ETransition.EXPIRED_REVIEW_TIME].includes(txLastTransition(tx));
+};
+
+export const txIsPartnerConfirmed = (tx: TTransaction) => {
+  return [ETransition.PARTNER_CONFIRM_SUB_ORDER].includes(txLastTransition(tx));
+};
+
+export const txIsPartnerRejected = (tx: TTransaction) => {
+  return [ETransition.PARTNER_REJECT_SUB_ORDER].includes(txLastTransition(tx));
 };
 
 export const txIsDelivering = (tx: TTransaction) => {
