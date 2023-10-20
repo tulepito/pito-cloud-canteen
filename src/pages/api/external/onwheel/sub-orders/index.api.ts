@@ -226,8 +226,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
       const { address: restaurantAddress } = restaurantLocation || {};
 
-      const dayIndex = new Date(Number(timestamp)).getDay();
-      const subOrderTitle = `${orderTitle}-${dayIndex > 0 ? dayIndex : 7}`;
+      const { weekday } = DateTime.fromMillis(Number(timestamp)).setZone(
+        VNTimezone,
+      );
+      const subOrderTitle = `${orderTitle}-${weekday}`;
 
       const company = companiesObjWithCompanyIdKey[companyId];
       const booker = bookersObjWithBookerIdKey[bookerId];
@@ -252,7 +254,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       return [
         ...acc,
         {
-          trackingNumber: `${orderId}_${timestamp}`,
+          trackingNumber: subOrderTitle,
           deliveryDate,
           deliveryHour: DateTime.fromMillis(Number(timestamp))
             .setZone(VNTimezone)
