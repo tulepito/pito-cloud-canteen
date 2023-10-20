@@ -58,8 +58,29 @@ export const useAddMemberEmail = () => {
     }
   };
 
+  const onAddMembersSubmitInQuizFlow = async (_loadedResult: any[]) => {
+    const noAccountEmailList = _loadedResult
+      .filter((_result) => _result.response.status === 404)
+      .map((_result) => _result.email);
+    const userIdList = _loadedResult
+      .filter((_result) => _result.response.status === 200)
+      .map((_result) => User(_result.response.user).getId());
+    const { meta } = await dispatch(
+      companyMemberThunks.addMembers({ noAccountEmailList, userIdList }),
+    );
+    if (meta.requestStatus === 'fulfilled') {
+      setEmailList([]);
+      setLoadedResult([]);
+      dispatch(companyMemberActions.resetCheckedEmailInputChunk());
+    }
+  };
+
   const checkEmailList = async (value: string[]) => {
-    await dispatch(companyMemberThunks.checkEmailExisted(value));
+    const { payload } = await dispatch(
+      companyMemberThunks.checkEmailExisted(value),
+    );
+
+    return payload;
   };
 
   return {
@@ -71,5 +92,6 @@ export const useAddMemberEmail = () => {
     onAddMembersSubmit,
     checkEmailList,
     addMembersInProgress,
+    onAddMembersSubmitInQuizFlow,
   };
 };

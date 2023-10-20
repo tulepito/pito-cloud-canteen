@@ -1,5 +1,7 @@
+import { useState } from 'react';
 import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
+import difference from 'lodash/difference';
 
 import Avatar from '@components/Avatar/Avatar';
 import IconClose from '@components/Icons/IconClose/IconClose';
@@ -9,6 +11,7 @@ import useBoolean from '@hooks/useBoolean';
 import { useAddMemberEmail } from '@pages/company/[companyId]/members/hooks/useAddMemberEmail';
 import { User } from '@src/utils/data';
 import { QuizStep } from '@src/utils/enums';
+import { emailFormatValid } from '@src/utils/validators';
 
 import QuizModal from '../components/QuizModal/QuizModal';
 import QuizCreateOrderLoadingModal from '../create-order-loading/QuizCreateOrderLoadingModal';
@@ -22,14 +25,15 @@ const QuizInviteMember = () => {
   const intl = useIntl();
   const submittingControl = useBoolean();
   const memberEmailModalController = useBoolean();
+  const [formEmailList, setFormEmailList] = useState<string>('');
   const {
     emailList,
     setEmailList,
     loadedResult,
     removeEmailValue,
     checkEmailList,
-    onAddMembersSubmit,
     addMembersInProgress,
+    onAddMembersSubmitInQuizFlow,
   } = useAddMemberEmail();
 
   const {
@@ -43,9 +47,59 @@ const QuizInviteMember = () => {
     shallowEqual,
   );
   const currentUser = useAppSelector((state) => state.user.currentUser);
+  const companyUser = User(selectedCompany!);
+  const currentUserGetter = User(currentUser!);
+  const { members: originCompanyMembers = {} } = companyUser.getMetadata();
+  const { email: companyEmail } = companyUser.getAttributes();
+  const { email: currentUserEmail } = currentUserGetter.getAttributes();
+
+  const restrictEmailList = [
+    ...Object.keys(originCompanyMembers),
+    companyEmail,
+    currentUserEmail,
+  ];
+
+  const onFormatEmailList = (value: string) => {
+    const rawEmailListValue = value
+      .trim()
+      .split(' ')
+      .map((email: string) => email.trim());
+    const emailListValue = difference(rawEmailListValue, restrictEmailList);
+    let invalidEmail = false;
+    emailListValue.forEach((email: string) => {
+      if (emailFormatValid('email invalid')(email)) {
+        invalidEmail = true;
+      }
+    });
+    if (invalidEmail) {
+      return [];
+    }
+
+    // setLoadingRow(emailListValue.length);
+    const formatListEmailValue = emailListValue.reduce(
+      (result: string[], separatedEmail: string) => {
+        const isEmailInValid = emailFormatValid('email invalid')(
+          separatedEmail.trim(),
+        );
+
+        return isEmailInValid
+          ? result
+          : new Set([...result, separatedEmail.trim().toLowerCase()]);
+      },
+      [],
+    );
+    const newEmailList = Array.from(
+      new Set([...emailList!, ...formatListEmailValue]),
+    );
+    setEmailList(newEmailList);
+
+    return newEmailList;
+  };
 
   const onSubmit = async () => {
-    await onAddMembersSubmit();
+    const formattedEmailList = onFormatEmailList(formEmailList);
+    const payload = await checkEmailList(formattedEmailList);
+    await onAddMembersSubmitInQuizFlow(payload as any);
     await submitCreateOrder();
   };
 
@@ -74,14 +128,9 @@ const QuizInviteMember = () => {
         <div className={css.formContainer}>
           <InviteMemberForm
             onSubmit={() => {}}
-            selectedCompany={selectedCompany}
-            currentUser={currentUser}
-            emailList={emailList}
-            setEmailList={setEmailList}
-            checkEmailList={checkEmailList}
             loadedResult={loadedResult}
             openMemberModal={memberEmailModalController.setTrue}
-            onAddMembersSubmit={onAddMembersSubmit}
+            setFormEmailList={setFormEmailList}
           />
         </div>
       </QuizModal>
