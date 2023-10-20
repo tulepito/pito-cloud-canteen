@@ -382,3 +382,12 @@ export enum ENativeNotificationType {
   AdminTransitSubOrderToCanceled = 'AdminTransitSubOrderToCanceled',
   TransitOrderStateToCanceled = 'TransitOrderStateToCanceled',
 }
+
+export enum EOnWheelOrderStatus {
+  idle = 'IDLE',
+  inProcess = 'IN PROCESS',
+  cancelled = 'CANCELLED',
+  completed = 'COMPLETED',
+  accepted = 'ACCEPTED',
+  assigning = 'ASSIGNING',
+}

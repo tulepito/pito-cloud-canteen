@@ -9,7 +9,11 @@ import { fetchListing, fetchUser } from '@services/integrationHelper';
 import { createFirebaseDocNotification } from '@services/notifications';
 import { getIntegrationSdk, handleError } from '@services/sdk';
 import { Listing, User } from '@src/utils/data';
-import { ENotificationType, EQuotationStatus } from '@src/utils/enums';
+import {
+  ENotificationType,
+  EOnWheelOrderStatus,
+  EQuotationStatus,
+} from '@src/utils/enums';
 import { ETransition } from '@src/utils/transaction';
 
 const fetchData = async (orderId: string) => {
@@ -43,7 +47,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         console.log('event', event);
         const { path } = event;
         switch (event.status) {
-          case 'ASSIGNING': {
+          case EOnWheelOrderStatus.assigning: {
             await Promise.all(
               path.map(async (OWSubOrder: any) => {
                 const { tracking_number: trackingNumber, address } = OWSubOrder;
@@ -81,7 +85,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             return res.status(200).end();
           }
 
-          case 'IN PROCESS': {
+          case EOnWheelOrderStatus.inProcess: {
             await Promise.all(
               path.map(async (OWSubOrder: any) => {
                 const {
@@ -256,6 +260,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
             return res.status(200).end();
           }
+
+          // case EOnWheelOrderStatus.cancelled: {
+          // }
+
           default:
             break;
         }
