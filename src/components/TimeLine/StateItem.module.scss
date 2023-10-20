@@ -25,6 +25,18 @@
         border: 1px solid $neutralGray5;
         background-color: $neutralGray3;
       }
+
+      &.confirmIcon {
+        rect {
+          fill: $labelOrange2;
+        }
+      }
+
+      &.rejectIcon {
+        path:first-child {
+          fill: $neutralGray5;
+        }
+      }
     }
   }
 
