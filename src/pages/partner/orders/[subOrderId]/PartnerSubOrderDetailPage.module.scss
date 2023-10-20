@@ -48,6 +48,33 @@
           display: block;
         }
       }
+
+      .subOrderSummaryActionWrapper {
+        display: none;
+        justify-content: flex-end;
+        column-gap: 16px;
+
+        button {
+          padding: 12px 0;
+          max-width: 170px;
+          min-height: unset;
+          flex-basis: 170px;
+        }
+
+        @include viewportLarge {
+          display: flex;
+        }
+      }
+
+      .subOrderSummaryMobileActionWrapper {
+        display: flex;
+        flex-direction: column-reverse;
+        row-gap: 16px;
+
+        @include viewportLarge {
+          display: none;
+        }
+      }
     }
     .rightPart {
       display: none;
