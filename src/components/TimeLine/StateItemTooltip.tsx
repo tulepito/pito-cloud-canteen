@@ -12,18 +12,25 @@ import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { AdminManageOrderThunks } from '@pages/admin/order/AdminManageOrder.slice';
-import { ETransition } from '@src/utils/transaction';
+import { Transaction } from '@src/utils/data';
+import {
+  CHANGE_STRUCTURE_TX_PROCESS_VERSION,
+  ETransition,
+} from '@src/utils/transaction';
+import type { TTransaction } from '@src/utils/types';
 
 import css from './StateItemTooltip.module.scss';
 
 type TStateItemTooltipProps = {
   lastTransition: string;
   transactionId: string;
+  transaction: TTransaction;
 };
 
 const StateItemTooltip: React.FC<TStateItemTooltipProps> = ({
   lastTransition,
   transactionId,
+  transaction,
 }) => {
   const dispatch = useAppDispatch();
   const transitInProgress = useAppSelector(
@@ -37,7 +44,11 @@ const StateItemTooltip: React.FC<TStateItemTooltipProps> = ({
   const confirmCancelController = useBoolean();
   const canceledController = useBoolean();
 
-  const shouldShowPartnerActions = true;
+  const { processVersion = CHANGE_STRUCTURE_TX_PROCESS_VERSION - 1 } =
+    Transaction(transaction).getAttributes();
+  const isNewStructureTxVersion =
+    processVersion >= CHANGE_STRUCTURE_TX_PROCESS_VERSION;
+  const shouldShowPartnerActions = isNewStructureTxVersion;
   const cancelTransition =
     lastTransition === ETransition.PARTNER_REJECT_SUB_ORDER
       ? ETransition.OPERATOR_CANCEL_AFTER_PARTNER_REJECTED
@@ -72,11 +83,13 @@ const StateItemTooltip: React.FC<TStateItemTooltipProps> = ({
 
     if (lastTransition === ETransition.INITIATE_TRANSACTION) {
       canceledController.setTrue();
-      // TODO: handle with old version tx
-      deliveringController.setTrue();
-      // TODO: handle with new version tx
-      partnerConfirmController.setTrue();
-      partnerRejectController.setTrue();
+
+      if (isNewStructureTxVersion) {
+        partnerConfirmController.setTrue();
+        partnerRejectController.setTrue();
+      } else {
+        deliveringController.setTrue();
+      }
     } else if (lastTransition === ETransition.PARTNER_CONFIRM_SUB_ORDER) {
       partnerConfirmController.setFalse();
       partnerRejectController.setFalse();
@@ -89,6 +102,10 @@ const StateItemTooltip: React.FC<TStateItemTooltipProps> = ({
       deliveringController.setFalse();
       deliveredController.setTrue();
       canceledController.setFalse();
+
+      if (isNewStructureTxVersion) {
+        partnerConfirmController.setFalse();
+      }
     } else if (lastTransition === ETransition.COMPLETE_DELIVERY) {
       deliveredController.setFalse();
       deliveringController.setFalse();

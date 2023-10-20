@@ -18,13 +18,13 @@ import css from './StateItem.module.scss';
 type TStateItemProps = TTimeLineItemProps;
 
 const StateItem: React.FC<TStateItemProps> = ({
-  data: { date, tx },
+  data: { date, orderData, transactionData },
   rootClassName,
   className,
   isAdminLayout = false,
 }) => {
   const rootClasses = classNames(rootClassName || css.root, className);
-  const { lastTransition, transactionId } = tx || {};
+  const { lastTransition, transactionId } = orderData || {};
 
   let stateComponent = <div className={classNames(css.icon, css.iconEmpty)} />;
 
@@ -76,9 +76,10 @@ const StateItem: React.FC<TStateItemProps> = ({
       <StateItemTooltip
         lastTransition={lastTransition}
         transactionId={transactionId}
+        transaction={transactionData}
       />
     );
-  }, [JSON.stringify(tx)]);
+  }, [lastTransition, transactionId, JSON.stringify(transactionData)]);
 
   const stateItemComponent = useMemo(
     () => (

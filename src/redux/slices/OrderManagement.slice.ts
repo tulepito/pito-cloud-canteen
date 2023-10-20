@@ -31,6 +31,7 @@ import {
   updatePaymentApi,
   updatePlanDetailsApi,
 } from '@apis/orderApi';
+import { fetchTxApi } from '@apis/txApi';
 import { checkUserExistedApi } from '@apis/userApi';
 import { EOrderDetailsTableTab } from '@components/OrderDetails/EditView/ManageOrderDetailSection/OrderDetailsTable/OrderDetailsTable.utils';
 import {
@@ -56,6 +57,7 @@ import type {
   TListing,
   TObject,
   TSubOrderChangeHistoryItem,
+  TTransaction,
   TUser,
 } from '@utils/types';
 
@@ -279,6 +281,9 @@ type TOrderManagementState = {
   //
   addOrUpdateMemberOrderInProgress: boolean;
   addOrUpdateMemberOrderError: any;
+  // transactions
+  queryTransactionsInProgress: boolean;
+  transactionMap: TObject<string, TTransaction>;
 
   isStartOrderInProgress: boolean;
   // Data states
@@ -336,6 +341,8 @@ const initialState: TOrderManagementState = {
   updateParticipantsError: null,
   addOrUpdateMemberOrderInProgress: false,
   addOrUpdateMemberOrderError: null,
+  queryTransactionsInProgress: false,
+  transactionMap: {},
   isStartOrderInProgress: false,
   companyId: null,
   companyData: null,
@@ -369,6 +376,29 @@ const initialState: TOrderManagementState = {
 const FETCH_QUOTATION = 'app/OrderManagement/FETCH_QUOTATION';
 
 // ================ Async thunks ================ //
+const queryTransactions = createAsyncThunk(
+  'app/OrderManagement/QUERY_TRANSACTIONS',
+  async (payload: { orderDetail: TObject }) => {
+    const { orderDetail } = payload;
+    const transactionMap: TObject = {};
+
+    await Promise.all(
+      Object.entries(orderDetail).map(async (entry) => {
+        const [subOrderDate, subOrderDateData] = entry;
+        const { transactionId } = (subOrderDateData as TObject) || {};
+
+        if (transactionId) {
+          const txResponse = await fetchTxApi(transactionId);
+
+          transactionMap[subOrderDate as string] = txResponse.data;
+        }
+      }),
+    );
+
+    return transactionMap;
+  },
+);
+
 const loadData = createAsyncThunk(
   'app/OrderManagement/LOAD_DATA',
   async (payload: { orderId: string; isAdminFlow?: boolean }, { dispatch }) => {
@@ -382,6 +412,7 @@ const loadData = createAsyncThunk(
 
       const { orderDetail = {} } = Listing(planData).getMetadata();
 
+      dispatch(queryTransactions({ orderDetail }));
       dispatch(AdminManageOrderActions.saveOrder(orderData));
       dispatch(AdminManageOrderActions.saveOrderDetail(orderDetail));
     }
@@ -1710,6 +1741,17 @@ const OrderManagementSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      /* =============== queryTransactions =============== */
+      .addCase(queryTransactions.pending, (state) => {
+        state.queryTransactionsInProgress = true;
+      })
+      .addCase(queryTransactions.fulfilled, (state, { payload }) => {
+        state.queryTransactionsInProgress = false;
+        state.transactionMap = payload;
+      })
+      .addCase(queryTransactions.rejected, (state) => {
+        state.queryTransactionsInProgress = false;
+      })
       /* =============== loadData =============== */
       .addCase(loadData.pending, (state) => {
         state.fetchOrderInProgress = true;
