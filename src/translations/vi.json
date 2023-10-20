@@ -1667,6 +1667,8 @@
   "SubOrderBadge.delivered": "Đã giao hàng",
   "SubOrderBadge.delivering": "Đang giao hàng",
   "SubOrderBadge.inProgress": "Đang triển khai",
+  "SubOrderBadge.partnerConfirmed": "Đã xác nhận",
+  "SubOrderBadge.partnerRejected": "Từ chối",
   "SubOrderCart.adminPromotion": "Ưu đãi",
   "SubOrderCart.downloadPriceQuotation": "Tải báo giá",
   "SubOrderCart.makePayment": "Xác nhận đơn",
