@@ -1660,6 +1660,8 @@
   "StateItemToolTip.stateDelivering": "Đang giao hàng",
   "StateItemToolTip.stateFailed": "Lỗi đơn",
   "StateItemToolTip.stateInitiated": "Chưa xảy ra",
+  "StateItemToolTip.statePartnerConfirmed": "Đối tác xác nhận",
+  "StateItemToolTip.statePartnerRejected": "Đối tác từ chối",
   "StateItemToolTip.stateSubOrderCanceled": "Đã huỷ",
   "SubOrderBadge.canceled": "Huỷ đơn",
   "SubOrderBadge.delivered": "Đã giao hàng",

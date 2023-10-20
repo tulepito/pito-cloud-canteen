@@ -1,11 +1,14 @@
 import { useEffect } from 'react';
 import { FormattedMessage } from 'react-intl';
+import classNames from 'classnames';
 
 import Button from '@components/Button/Button';
 import IconCancel from '@components/Icons/IconCancel/IconCancel';
 import IconDelivering from '@components/Icons/IconDelivering/IconDelivering';
 import IconTickWithBackground from '@components/Icons/IconTickWithBackground/IconTickWithBackground';
+import IconWarning from '@components/Icons/IconWarning/IconWarning';
 import AlertModal from '@components/Modal/AlertModal';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { AdminManageOrderThunks } from '@pages/admin/order/AdminManageOrder.slice';
@@ -26,11 +29,19 @@ const StateItemTooltip: React.FC<TStateItemTooltipProps> = ({
   const transitInProgress = useAppSelector(
     (state) => state.AdminManageOrder.transitInProgress,
   );
+  const partnerConfirmController = useBoolean();
+  const partnerRejectController = useBoolean();
   const deliveringController = useBoolean();
   const deliveredController = useBoolean();
   // const failedController = useBoolean();
   const confirmCancelController = useBoolean();
   const canceledController = useBoolean();
+
+  const shouldShowPartnerActions = true;
+  const cancelTransition =
+    lastTransition === ETransition.PARTNER_REJECT_SUB_ORDER
+      ? ETransition.OPERATOR_CANCEL_AFTER_PARTNER_REJECTED
+      : ETransition.OPERATOR_CANCEL_PLAN;
 
   const transitTx = (transition: ETransition) => async () => {
     await dispatch(
@@ -51,7 +62,7 @@ const StateItemTooltip: React.FC<TStateItemTooltipProps> = ({
 
   const handleConfirmCancel = () => {
     confirmCancelController.setFalse();
-    transitTx(ETransition.OPERATOR_CANCEL_PLAN)();
+    transitTx(cancelTransition)();
   };
 
   useEffect(() => {
@@ -61,7 +72,19 @@ const StateItemTooltip: React.FC<TStateItemTooltipProps> = ({
 
     if (lastTransition === ETransition.INITIATE_TRANSACTION) {
       canceledController.setTrue();
+      // TODO: handle with old version tx
       deliveringController.setTrue();
+      // TODO: handle with new version tx
+      partnerConfirmController.setTrue();
+      partnerRejectController.setTrue();
+    } else if (lastTransition === ETransition.PARTNER_CONFIRM_SUB_ORDER) {
+      partnerConfirmController.setFalse();
+      partnerRejectController.setFalse();
+      deliveringController.setTrue();
+    } else if (lastTransition === ETransition.PARTNER_REJECT_SUB_ORDER) {
+      partnerConfirmController.setFalse();
+      partnerRejectController.setFalse();
+      deliveringController.setFalse();
     } else if (lastTransition === ETransition.START_DELIVERY) {
       deliveringController.setFalse();
       deliveredController.setTrue();
@@ -98,6 +121,31 @@ const StateItemTooltip: React.FC<TStateItemTooltipProps> = ({
         onConfirm={handleConfirmCancel}>
         Bạn có chắc chắn muốn huỷ đơn không?
       </AlertModal>
+
+      <RenderWhen condition={shouldShowPartnerActions}>
+        <Button
+          variant="inline"
+          className={css.row}
+          disabled={!partnerConfirmController.value}
+          onClick={transitTx(ETransition.PARTNER_CONFIRM_SUB_ORDER)}>
+          <IconTickWithBackground
+            className={classNames(css.icon, css.confirmIcon)}
+          />
+          <div className={css.stateText}>
+            <FormattedMessage id="StateItemToolTip.statePartnerConfirmed" />
+          </div>
+        </Button>
+        <Button
+          variant="inline"
+          className={css.row}
+          disabled={!partnerRejectController.value}
+          onClick={transitTx(ETransition.PARTNER_REJECT_SUB_ORDER)}>
+          <IconWarning className={classNames(css.icon, css.rejectIcon)} />
+          <div className={css.stateText}>
+            <FormattedMessage id="StateItemToolTip.statePartnerRejected" />
+          </div>
+        </Button>
+      </RenderWhen>
       <Button
         variant="inline"
         className={css.row}
