@@ -37,6 +37,8 @@ export enum EBadgeType {
   darkBlue = 'darkBlue',
   strongSuccess = 'strongSuccess',
   strongDanger = 'strongDanger',
+  strongWarning = 'strongWarning',
+  strongDefault = 'strongDefault',
 }
 
 type TBadgeProps = {

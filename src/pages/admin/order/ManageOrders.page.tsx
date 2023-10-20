@@ -40,6 +40,8 @@ import {
   txIsDelivered,
   txIsDelivering,
   txIsInitiated,
+  txIsPartnerConfirmed,
+  txIsPartnerRejected,
 } from '@src/utils/transaction';
 import { formatTimestamp, getDayOfWeek } from '@utils/dates';
 import { EOrderDraftStates, EOrderStates, EOrderType } from '@utils/enums';
@@ -125,6 +127,12 @@ const renderBadgeForSubOrder = (
         label="Đang triển khai"
       />
     );
+  }
+  if (txIsPartnerConfirmed(tx)) {
+    return <Badge type={EBadgeType.strongWarning} label="Đối tác xác nhận" />;
+  }
+  if (txIsPartnerRejected(tx)) {
+    return <Badge type={EBadgeType.strongDefault} label="Đối tác từ chối" />;
   }
   if (txIsDelivering(tx)) {
     return (
