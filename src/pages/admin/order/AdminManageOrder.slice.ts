@@ -248,8 +248,8 @@ const updateOrderState = createAsyncThunk(
 const transit = createAsyncThunk(
   'app/AdminManageOrder/TRANSIT',
   async ({ transactionId, transition }: TObject, { getState, dispatch }) => {
-    const { company } = getState().AdminManageOrder;
-    const { companyName } = User(company!).getPublicData();
+    const { companyData } = getState().OrderManagement;
+    const { companyName } = User(companyData!).getPublicData();
     const { data: response } = await transitPlanApi({
       transactionId,
       transition,
