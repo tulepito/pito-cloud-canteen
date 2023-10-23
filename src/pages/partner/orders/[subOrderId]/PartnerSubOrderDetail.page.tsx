@@ -269,22 +269,19 @@ const PartnerSubOrderDetailPage: React.FC<
               <SubOrderSummary onChangeViewMode={handleChangeViewMode} />
             </div>
             <SubOrderNote />
-
-            <RenderWhen condition={shouldShowActionWrapper}>
-              <div className={css.subOrderSummaryActionWrapper}>
-                {actionBtns}
-              </div>
-              <MobileBottomContainer
-                className={css.subOrderSummaryMobileActionWrapper}>
-                {actionBtns}
-              </MobileBottomContainer>
-            </RenderWhen>
           </div>
           <div className={css.rightPart}>
             <SubOrderCart
               inProgress={fetchOrderInProgress || isFetchingOrderDetails}
             />
           </div>
+          <RenderWhen condition={shouldShowActionWrapper}>
+            <div className={css.subOrderSummaryActionWrapper}>{actionBtns}</div>
+            <MobileBottomContainer
+              className={css.subOrderSummaryMobileActionWrapper}>
+              {actionBtns}
+            </MobileBottomContainer>
+          </RenderWhen>
         </div>
 
         <RenderWhen condition={!isEmpty(newUpdatedOrderNotification)}>
