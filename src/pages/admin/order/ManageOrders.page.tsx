@@ -184,16 +184,17 @@ const OrderDetailTooltip = ({
           lastTransition,
           transactionId,
           totalPrice = 0,
-        } = orderDetail[key];
+        } = orderDetail[key] || {};
 
         return (
           <div key={key} className={css.orderDetailTooltipItem}>
             <StateItem
               className={css.stateItem}
               data={{
-                tx: { lastTransition, transactionId },
+                orderData: { lastTransition, transactionId },
                 date: formatTimestamp(Number(key)),
               }}
+              isAdminLayout
             />
             <span>{parsePrice(String(totalPrice))}đ</span>
           </div>
