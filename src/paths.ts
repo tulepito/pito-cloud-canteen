@@ -70,6 +70,7 @@ export const adminPaths = {
   ManageOrders: '/admin/order',
   CreateOrder: '/admin/order/create',
   UpdateDraftOrder: '/admin/order/create/[orderId]',
+  EditOrder: '/admin/order/edit/[orderId]',
   OrderDetail: '/admin/order/[orderId]',
 };
 
@@ -171,13 +172,17 @@ export const adminRoutes = {
     path: '/admin/partner/[restaurantId]/settings/menu/[menuId]',
     label: 'Chỉnh sửa thực đơn',
   },
-  EditOrder: {
+  OrderDetail: {
     path: '/admin/order/[orderId]',
-    label: 'Tạo đơn hàng',
+    label: 'Chi tiết đơn hàng',
   },
   UpdateDraftOrder: {
     path: adminPaths.UpdateDraftOrder,
     label: 'Chỉnh sửa',
+  },
+  EditOrderMissingId: {
+    path: '/admin/order/edit',
+    label: 'Chỉnh sửa đơn hàng',
   },
   Setting: {
     path: '/admin/setting',
