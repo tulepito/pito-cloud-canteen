@@ -106,7 +106,9 @@ export const useGetCalendarExtraResources = ({
           DateTime.fromMillis(date).toJSDate(),
         ),
       );
-      dispatch(orderAsyncActions.recommendRestaurantForSpecificDay(date));
+      dispatch(
+        orderAsyncActions.recommendRestaurantForSpecificDay({ dateTime: date }),
+      );
     },
     [dispatch],
   );
@@ -193,7 +195,7 @@ export const useGetCalendarComponentProps = ({
     if (!onRecommendRestaurantInProgress) {
       dispatch(setOnRecommendRestaurantInProcess(true));
       const { payload: recommendOrderDetail }: any = await dispatch(
-        orderAsyncActions.recommendRestaurants(),
+        orderAsyncActions.recommendRestaurants({}),
       );
       await dispatch(
         orderAsyncActions.updatePlanDetail({

@@ -446,18 +446,24 @@ const updateOrder = createAsyncThunk(
 
 const recommendRestaurants = createAsyncThunk(
   RECOMMEND_RESTAURANT,
-  async (_, { getState }) => {
+  async (
+    { shouldUpdatePlanOrderOrderDetail = true }: TObject,
+    { getState },
+  ) => {
     const { order } = getState().Order;
     const orderId = Listing(order).getId();
     const { data: orderDetail } = await recommendRestaurantApi(orderId);
 
-    return orderDetail;
+    return { orderDetail, shouldUpdatePlanOrderOrderDetail };
   },
 );
 
 const recommendRestaurantForSpecificDay = createAsyncThunk(
   RECOMMEND_RESTAURANT_FOR_SPECIFIC_DAY,
-  async (dateTime: number, { getState }) => {
+  async (
+    { shouldUpdatePlanOrderOrderDetail = true, dateTime }: TObject,
+    { getState },
+  ) => {
     const { order } = getState().Order;
 
     const orderId = Listing(order).getId();
@@ -469,12 +475,14 @@ const recommendRestaurantForSpecificDay = createAsyncThunk(
       dateTime,
     );
 
-    updatePlanDetailsApi(orderId, {
-      orderDetail: newOrderDetail,
-      planId: plans[0],
-    });
+    if (shouldUpdatePlanOrderOrderDetail) {
+      updatePlanDetailsApi(orderId, {
+        orderDetail: newOrderDetail,
+        planId: plans[0],
+      });
+    }
 
-    return newOrderDetail;
+    return { orderDetail: newOrderDetail, shouldUpdatePlanOrderOrderDetail };
   },
 );
 
@@ -1395,11 +1403,19 @@ const orderSlice = createSlice({
       }))
       .addCase(
         recommendRestaurantForSpecificDay.fulfilled,
-        (state, { payload }) => ({
-          ...state,
-          onRescommendRestaurantForSpecificDateInProgress: false,
-          orderDetail: payload,
-        }),
+        (state, { payload }) => {
+          const { shouldUpdatePlanOrderOrderDetail, orderDetail } = payload;
+          state.onRescommendRestaurantForSpecificDateInProgress = false;
+
+          if (shouldUpdatePlanOrderOrderDetail) {
+            state.orderDetail = orderDetail;
+          } else {
+            state.draftEditOrderData = {
+              ...state.draftEditOrderData,
+              orderDetail,
+            };
+          }
+        },
       )
       .addCase(
         recommendRestaurantForSpecificDay.rejected,

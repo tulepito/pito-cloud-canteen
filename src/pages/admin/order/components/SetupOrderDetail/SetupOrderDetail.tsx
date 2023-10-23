@@ -399,7 +399,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
   const onRecommendNewRestaurants = useCallback(async () => {
     dispatch(setOnRecommendRestaurantInProcess(true));
     const { payload: recommendOrderDetail }: any = await dispatch(
-      orderAsyncActions.recommendRestaurants(),
+      orderAsyncActions.recommendRestaurants({}),
     );
     await dispatch(
       orderAsyncActions.updatePlanDetail({
@@ -442,7 +442,9 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
 
   const onRecommendRestaurantForSpecificDay = (date: number) => {
     dispatch(selectCalendarDate(DateTime.fromMillis(date).toJSDate()));
-    dispatch(orderAsyncActions.recommendRestaurantForSpecificDay(date));
+    dispatch(
+      orderAsyncActions.recommendRestaurantForSpecificDay({ dateTime: date }),
+    );
   };
 
   return (
