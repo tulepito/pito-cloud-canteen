@@ -34,7 +34,7 @@ const findSubOrderDate = (orderDetail: TObject, subOrderWeekDay: string) => {
 
 const fetchData = async (orderTitle: string) => {
   const [order] = await adminQueryListings({
-    title: orderTitle,
+    keywords: orderTitle,
     meta_listingType: EListingType.order,
   });
 
