@@ -9,12 +9,13 @@ import css from './FoodAdditionalInfoTab.module.scss';
 type TFoodAdditionalInfoTabFormPartProps = {
   invalid?: boolean;
   inProgress?: boolean;
+  onTabBack?: () => void;
 };
 
 const FoodAdditionalInfoTabFormPart: React.FC<
   TFoodAdditionalInfoTabFormPartProps
 > = (props) => {
-  const { invalid, inProgress } = props;
+  const { invalid, inProgress, onTabBack } = props;
   const intl = useIntl();
 
   return (
@@ -51,7 +52,11 @@ const FoodAdditionalInfoTabFormPart: React.FC<
           inProgress={inProgress}>
           Hoàn tất
         </Button>
-        <Button type="button" variant="secondary" className={css.nextButton}>
+        <Button
+          type="button"
+          variant="secondary"
+          className={css.nextButton}
+          onClick={onTabBack}>
           Trở về
         </Button>
       </div>

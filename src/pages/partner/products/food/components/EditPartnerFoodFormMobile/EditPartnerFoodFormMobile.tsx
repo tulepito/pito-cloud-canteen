@@ -18,6 +18,7 @@ import FoodDetailInforTabFormPart from '../FoodDetailInfoTab/FoodDetailInforTabF
 type TExtraProps = {
   currentTab: string;
   inProgress?: boolean;
+  onTabBack?: () => void;
 };
 type TEditPartnerFoodFormMobileComponentProps =
   FormRenderProps<TEditPartnerFoodFormValues> & Partial<TExtraProps>;
@@ -27,7 +28,15 @@ type TEditPartnerFoodFormMobileProps = FormProps<TEditPartnerFoodFormValues> &
 const EditPartnerFoodFormMobileComponent: React.FC<
   TEditPartnerFoodFormMobileComponentProps
 > = (props) => {
-  const { handleSubmit, currentTab, form, invalid, inProgress, values } = props;
+  const {
+    handleSubmit,
+    currentTab,
+    form,
+    invalid,
+    inProgress,
+    values,
+    onTabBack,
+  } = props;
 
   const onSubmit = (e: any) => {
     if (currentTab === FOOD_DETAIL_INFO_TAB) {
@@ -48,12 +57,14 @@ const EditPartnerFoodFormMobileComponent: React.FC<
           invalid={invalid}
           handleSubmit={handleSubmit as any}
           values={values}
+          onTabBack={onTabBack}
         />
       </RenderWhen>
       <RenderWhen condition={currentTab === FOOD_ADDITIONAL_INFO_TAB}>
         <FoodAdditionalInfoTabFormPart
           invalid={invalid}
           inProgress={inProgress}
+          onTabBack={onTabBack}
         />
       </RenderWhen>
     </Form>
