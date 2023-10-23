@@ -695,7 +695,7 @@ const ManagePartnerFoods = () => {
         partnerFoodSliceThunks.fetchApprovalFoods(EFoodApprovalState.DECLINED),
       );
     }
-  }, [dispatch, foodApprovalActiveTab]);
+  }, [dispatch, foodApprovalActiveTab, JSON.stringify(foodToRemove)]);
 
   useEffect(() => {
     dispatch(partnerFoodSliceThunks.fetchActiveMenus({}));
