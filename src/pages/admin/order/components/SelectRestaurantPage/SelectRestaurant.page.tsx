@@ -14,7 +14,6 @@ import { selectRestaurantPageThunks } from '@redux/slices/SelectRestaurantPage.s
 import { Listing } from '@utils/data';
 import type { TListing, TObject } from '@utils/types';
 
-// eslint-disable-next-line import/no-cycle
 import type { TSelectFoodFormValues } from '../SelectFoodModal/components/SelectFoodForm/SelectFoodForm';
 import SelectFoodModal from '../SelectFoodModal/SelectFoodModal';
 

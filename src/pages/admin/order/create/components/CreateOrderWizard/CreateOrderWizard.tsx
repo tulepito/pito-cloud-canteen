@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
@@ -8,20 +9,15 @@ import { useRouter } from 'next/router';
 import FormWizard from '@components/FormWizard/FormWizard';
 import { setItem } from '@helpers/localStorageHelpers';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-// eslint-disable-next-line import/no-cycle
+import SetupOrderDetail from '@pages/admin/order/components/SetupOrderDetail/SetupOrderDetail';
+import ReviewOrder from '@pages/admin/order/StepScreen/ReviewOrder/ReviewOrder';
 import ServiceFeesAndNotes from '@pages/admin/order/StepScreen/ServiceFeesAndNotes/ServiceFeesAndNotes';
 import { orderAsyncActions, resetOrder } from '@redux/slices/Order.slice';
 import { Listing } from '@utils/data';
 import type { TListing } from '@utils/types';
 
 import ClientSelector from '../../../StepScreen/ClientSelector/ClientSelector';
-// eslint-disable-next-line import/no-cycle, import/no-named-as-default
-// eslint-disable-next-line import/no-named-as-default, import/no-cycle
 import MealPlanSetup from '../../../StepScreen/MealPlanSetup/MealPlanSetup';
-// eslint-disable-next-line import/no-cycle
-import ReviewOrder from '../ReviewOrder/ReviewOrder';
-// eslint-disable-next-line import/no-cycle
-import SetupOrderDetail from '../SetupOrderDetail/SetupOrderDetail';
 
 import { isGeneralInfoSetupCompleted } from './CreateOrderWizard.helper';
 

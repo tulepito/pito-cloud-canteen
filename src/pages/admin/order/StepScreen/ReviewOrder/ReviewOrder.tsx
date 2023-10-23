@@ -39,7 +39,7 @@ import type { TKeyValue, TListing, TObject } from '@utils/types';
 import { required } from '@utils/validators';
 
 // eslint-disable-next-line import/no-cycle
-import NavigateButtons from '../NavigateButtons/NavigateButtons';
+import NavigateButtons from '../../components/NavigateButtons/NavigateButtons';
 
 import css from './ReviewOrder.module.scss';
 

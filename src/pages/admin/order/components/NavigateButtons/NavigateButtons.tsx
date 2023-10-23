@@ -8,7 +8,7 @@ import { getItem } from '@helpers/localStorageHelpers';
 import {
   CREATE_ORDER_STEP_LOCAL_STORAGE_NAME,
   REVIEW_TAB,
-} from '../CreateOrderWizard/CreateOrderWizard';
+} from '../../create/components/CreateOrderWizard/CreateOrderWizard';
 
 import css from './NavigateButtons.module.scss';
 

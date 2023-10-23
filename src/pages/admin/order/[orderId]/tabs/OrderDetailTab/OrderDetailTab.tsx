@@ -20,7 +20,7 @@ import { useDownloadPriceQuotation } from '@hooks/useDownloadPriceQuotation';
 import useExportOrderDetails from '@hooks/useExportOrderDetails';
 import { usePrepareOrderDetailPageData } from '@hooks/usePrepareOrderManagementData';
 import { AdminManageOrderThunks } from '@pages/admin/order/AdminManageOrder.slice';
-import { ReviewContent } from '@pages/admin/order/create/components/ReviewOrder/ReviewOrder';
+import { ReviewContent } from '@pages/admin/order/StepScreen/ReviewOrder/ReviewOrder';
 import { checkMinMaxQuantityInPickingState } from '@pages/company/orders/[orderId]/picking/OrderDetail.page';
 import {
   OrderManagementsAction,
