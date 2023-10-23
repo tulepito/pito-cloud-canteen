@@ -118,7 +118,7 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
       const { plans = [] } = Listing(orderListing as TListing).getMetadata();
       const planId = plans[0];
       const { payload: recommendOrderDetail }: any = await dispatch(
-        orderAsyncActions.recommendRestaurants(),
+        orderAsyncActions.recommendRestaurants({}),
       );
       await dispatch(
         orderAsyncActions.updatePlanDetail({

@@ -332,7 +332,7 @@ const OrderSettingModal: React.FC<TOrderSettingModalProps> = (props) => {
         packagePerMember !==
           parseInt(packagePerMemberValue?.replace(/,/g, '') || 0, 10);
       const { payload: newOrderDetail } = await dispatch(
-        orderAsyncActions.recommendRestaurants(),
+        orderAsyncActions.recommendRestaurants({}),
       );
 
       if (!isEqual(orderDetail, newOrderDetail) && changedOrderDetailFactor) {
