@@ -64,6 +64,10 @@ export const MANAGE_ORDER_PAGE_SIZE = 10;
 
 type TOrderInitialState = {
   order: TListing | null;
+  draftEditOrderData: {
+    generalInfo: TObject;
+    orderDetail: TObject;
+  };
   fetchOrderInProgress: boolean;
   fetchOrderError: any;
   plans: TListing[];
@@ -175,6 +179,10 @@ const initialState: TOrderInitialState = {
   fetchOrderError: null,
   plans: [] as TListing[],
   orderDetail: {},
+  draftEditOrderData: {
+    generalInfo: {},
+    orderDetail: {},
+  },
   justDeletedMemberOrder: false,
   createOrderInProcess: false,
   createOrderError: null,
@@ -1158,6 +1166,19 @@ const orderSlice = createSlice({
     }),
     setOnRecommendRestaurantInProcess: (state, { payload }) => {
       state.onRecommendRestaurantInProgress = payload;
+    },
+    saveDraftEditOrder: (state, { payload }) => {
+      state.draftEditOrderData = {
+        ...state.draftEditOrderData,
+        generalInfo: {
+          ...state.draftEditOrderData.generalInfo,
+          ...payload.generalInfo,
+        },
+        orderDetail: {
+          ...state.draftEditOrderData.orderDetail,
+          ...payload.orderDetail,
+        },
+      };
     },
   },
   extraReducers: (builder) => {
