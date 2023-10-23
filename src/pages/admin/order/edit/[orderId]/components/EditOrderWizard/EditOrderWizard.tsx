@@ -1,12 +1,14 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
+import { useIntl } from 'react-intl';
 import { useRouter } from 'next/router';
 
 import FormWizard from '@components/FormWizard/FormWizard';
 import { useAppDispatch } from '@hooks/reduxHooks';
+import ClientView from '@pages/admin/order/StepScreen/ClientView/ClientView';
 import { orderAsyncActions, resetOrder } from '@redux/slices/Order.slice';
 
-import css from './CreateOrderWizard.module.scss';
+import css from './EditOrderWizard.module.scss';
 
 export enum EEditOrderTab {
   clientView = 'clientView',
@@ -31,6 +33,7 @@ const EditOrderTab: React.FC<any> = (props) => {
 
   switch (tab) {
     case EEditOrderTab.clientView:
+      return <ClientView nextTab={nextTab} />;
     case EEditOrderTab.orderSetup:
     case EEditOrderTab.restaurantSetup:
     case EEditOrderTab.serviceAndNote:
@@ -42,10 +45,13 @@ const EditOrderTab: React.FC<any> = (props) => {
 };
 
 const EditOrderWizard = () => {
+  const intl = useIntl();
   const dispatch = useAppDispatch();
   const router = useRouter();
   const { orderId } = router.query;
-  const [, setCurrentStep] = useState<string>(EEditOrderTab.clientView);
+  const [currentStep, setCurrentStep] = useState<string>(
+    EEditOrderTab.clientView,
+  );
 
   useEffect(() => {
     if (orderId) {
@@ -88,6 +94,11 @@ const EditOrderWizard = () => {
           <EditOrderTab
             key={tab}
             tab={tab}
+            tabId={tab}
+            selected={currentStep === tab}
+            tabLabel={intl.formatMessage({
+              id: `EditOrderWizard.${tab}Label`,
+            })}
             nextTab={nextTab(tab)}
             goBack={goBack(tab)}
           />

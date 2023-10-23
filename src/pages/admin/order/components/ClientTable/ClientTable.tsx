@@ -28,11 +28,11 @@ type ClientTableProps = {
   pageSize: number;
   bookerList: TUser[];
   fetchBookersInProgress: boolean;
-  createOrderInProgress: boolean;
+  createOrderInProgress?: boolean;
   onPageChange: (value: number) => void;
   onItemClick?: (value: string) => void;
   onSubmit: (values: any) => void;
-  toggleSort: () => void;
+  toggleSort?: () => void;
   onPageSizeChange?: (value: number, perPageValue: number) => void;
 };
 
@@ -48,8 +48,7 @@ const ClientTable: React.FC<ClientTableProps> = (props) => {
     onSubmit,
     bookerList,
     fetchBookersInProgress,
-    // toggleSort,
-    createOrderInProgress,
+    createOrderInProgress = false,
     onPageSizeChange,
     pageSize,
   } = props;
