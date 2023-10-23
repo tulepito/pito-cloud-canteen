@@ -13,6 +13,12 @@ import { fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/sdk';
 import { Listing, User } from '@src/utils/data';
 import {
+  generateWeekDayList,
+  getDayOfWeek,
+  getDaySessionFromDeliveryTime,
+  renderDateRange,
+} from '@src/utils/dates';
+import {
   EBookerOrderDraftStates,
   EListingStates,
   EOrderDraftStates,
@@ -57,6 +63,9 @@ const normalizeOrderMetadata = (metadata: TObject = {}) => {
     shipperName,
     staffName,
     vatAllow,
+    deliveryHour,
+    daySession,
+    mealType,
   } = metadata;
 
   const newOrderMetadata = {
@@ -81,6 +90,10 @@ const normalizeOrderMetadata = (metadata: TObject = {}) => {
     shipperName,
     staffName,
     vatAllow,
+    deliveryHour,
+    daySession:
+      daySession || getDaySessionFromDeliveryTime(deliveryHour.split('-')[0]),
+    mealType,
   };
 
   return newOrderMetadata;
@@ -143,11 +156,22 @@ const getSubOrderHistoryCount = async ({
   return result as number;
 };
 
-const reorder = async (
-  orderIdToReOrder: string,
-  bookerId: string,
-  isCreatedByAdmin?: boolean,
-) => {
+const reorder = async ({
+  orderIdToReOrder,
+  bookerId,
+  isCreatedByAdmin,
+  dateParams,
+}: {
+  orderIdToReOrder: string;
+  bookerId: string;
+  isCreatedByAdmin?: boolean;
+  dateParams: {
+    startDate: number;
+    endDate: number;
+    deadlineDate: number;
+    deadlineHour: number;
+  };
+}) => {
   const integrationSdk = getIntegrationSdk();
   const response = await integrationSdk.listings.show({
     id: orderIdToReOrder,
@@ -159,6 +183,7 @@ const reorder = async (
     orderType,
     selectedGroups = [],
   } = Listing(oldOrder).getMetadata();
+  const { startDate, endDate, deadlineDate, deadlineHour } = dateParams;
 
   const companyAccount = await fetchUser(companyId);
   const currentOrderNumber = await getOrderNumber();
@@ -192,8 +217,15 @@ const reorder = async (
       ...normalizeOrderMetadata({
         ...Listing(oldOrder).getMetadata(),
       }),
+      startDate,
+      endDate,
+      deadlineDate,
+      deadlineHour,
     },
   });
+
+  const orderDatesInTimestamp = renderDateRange(startDate, endDate);
+  const orderDatesWeekdayList = generateWeekDayList(startDate, endDate);
 
   const [newOrder] = denormalisedResponseEntities(newOrderResponse);
   const isGroupOrder = orderType === EOrderType.group;
@@ -215,12 +247,25 @@ const reorder = async (
             'lastTransition',
             'transactionId',
           ]);
+          const weekDayOfOldDate = getDayOfWeek(+date);
+          const newDate =
+            orderDatesInTimestamp[
+              orderDatesWeekdayList.indexOf(weekDayOfOldDate)
+            ];
+
+          if (!newDate) {
+            return result;
+          }
 
           return {
             ...result,
-            [date]: {
+            [`${newDate}`]: {
               ...subOrderNeededData,
               memberOrders: isGroupOrder ? {} : initialMemberOrder,
+              restaurant: {
+                ...subOrderNeededData.restaurant,
+                foodList: {},
+              },
             },
           };
         },
@@ -243,12 +288,15 @@ const reorder = async (
     }),
   );
 
-  const updatedOrder = await integrationSdk.listings.update({
-    id: Listing(newOrder).getId(),
-    metadata: {
-      plans,
+  const updatedOrder = await integrationSdk.listings.update(
+    {
+      id: Listing(newOrder).getId(),
+      metadata: {
+        plans,
+      },
     },
-  });
+    { expand: true },
+  );
 
   updateOrderNumber();
 

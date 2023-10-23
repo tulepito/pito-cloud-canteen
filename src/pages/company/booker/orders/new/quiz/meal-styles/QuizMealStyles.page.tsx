@@ -3,16 +3,16 @@ import { useField, useForm } from 'react-final-form-hooks';
 import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import classNames from 'classnames';
-import { useRouter } from 'next/router';
 
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { QuizActions } from '@redux/slices/Quiz.slice';
-import { companyPaths, quizPaths } from '@src/paths';
+import { QuizStep } from '@src/utils/enums';
 import type { TKeyValue } from '@src/utils/types';
 
 import useRedirectAfterReloadPage from '../../hooks/useRedirectAfterReloadPage';
 import QuizModal from '../components/QuizModal/QuizModal';
+import { useQuizFlow } from '../hooks/useQuizFlow';
 
 import css from './QuizMealStyles.module.scss';
 
@@ -22,7 +22,6 @@ type QuizMealStylesFormValues = {
 const QuizMealStyles = () => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
-  const router = useRouter();
   const submittingControl = useBoolean();
 
   useRedirectAfterReloadPage();
@@ -34,6 +33,7 @@ const QuizMealStyles = () => {
     (state) => state.SystemAttributes.fetchAttributesInProgress,
   );
   const quizData = useAppSelector((state) => state.Quiz.quiz, shallowEqual);
+  const { nextStep, backStep } = useQuizFlow(QuizStep.MEAL_STYLES);
   const [selectedMealStyles, setSelectedMealStyles] = useState<string[]>(
     quizData.mealStyles || [],
   );
@@ -75,11 +75,8 @@ const QuizMealStyles = () => {
     submittingControl.setTrue();
 
     try {
-      await handleSubmit();
-      await router.push({
-        pathname: quizPaths.MealDates,
-        query: { ...router.query },
-      });
+      handleSubmit();
+      nextStep();
     } catch (error) {
       console.error(error);
     } finally {
@@ -92,22 +89,13 @@ const QuizMealStyles = () => {
   }, [form, selectedMealStyles, selectedMealStyles.length]);
 
   const onCancel = () => {
-    router.push(quizPaths.MealDates);
-  };
-
-  const goBack = () => {
-    router.back();
-  };
-
-  const handleCancel = () => {
-    router.push(companyPaths.Home);
+    nextStep();
   };
 
   return (
     <QuizModal
       id="QuizMealStyles"
       isOpen
-      handleClose={handleCancel}
       modalTitle={intl.formatMessage({ id: 'QuizMealStyles.title' })}
       submitText="Tiếp tục"
       cancelText="Bỏ qua"
@@ -115,7 +103,7 @@ const QuizMealStyles = () => {
       onSubmit={onFormSubmitClick}
       submitDisabled={hasValidationErrors}
       submitInProgress={submittingControl.value}
-      onBack={goBack}>
+      onBack={backStep}>
       <div className={css.formContainer}>
         {fetchMealStylesInProgress ? (
           <div className={css.loading}>

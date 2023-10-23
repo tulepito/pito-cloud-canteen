@@ -29,6 +29,7 @@ export type TModalProps = PropsWithChildren<{
   shouldFullScreenInMobile?: boolean;
   shouldHideGreyBackground?: boolean;
   headerClassName?: string;
+  modalContainerRef?: React.RefObject<HTMLDivElement>;
 }>;
 
 const Modal: React.FC<TModalProps> = (props) => {
@@ -50,6 +51,7 @@ const Modal: React.FC<TModalProps> = (props) => {
     shouldFullScreenInMobile = true,
     shouldHideGreyBackground = false,
     headerClassName,
+    modalContainerRef,
   } = props;
 
   const intl = useIntl();
@@ -108,11 +110,11 @@ const Modal: React.FC<TModalProps> = (props) => {
   return (
     <div id={id} className={classes}>
       <div className={scrollLayerClasses}>
-        <div className={containerClasses}>
+        <div ref={modalContainerRef} className={containerClasses}>
           {!customHeader && (
             <div className={headerClasses}>
-              {hasTitle && <div className={css.title}>{title}</div>}
               {closeBtn}
+              {hasTitle && <div className={css.title}>{title}</div>}
             </div>
           )}
           {customHeader}

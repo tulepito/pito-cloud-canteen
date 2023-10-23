@@ -2,8 +2,8 @@
 @use '/src/styles/mixins.scss' as *;
 
 .formContainer {
-  width: 550px;
   margin: 32px auto;
+  max-height: 40vh;
 }
 
 .form {

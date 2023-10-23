@@ -18,8 +18,8 @@ import {
   companyThunks,
 } from '@redux/slices/company.slice';
 import {
+  companyMemberActions,
   companyMemberThunks,
-  resetError,
 } from '@redux/slices/companyMember.slice';
 import {
   CompanyPermissions,
@@ -245,7 +245,7 @@ const MembersPage = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      dispatch(resetError());
+      dispatch(companyMemberActions.resetError());
       dispatch(addWorkspaceCompanyId(companyId));
       await dispatch(companyThunks.companyInfo());
     };

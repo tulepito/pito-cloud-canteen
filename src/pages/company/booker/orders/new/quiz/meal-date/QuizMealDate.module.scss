@@ -6,26 +6,6 @@
   margin: 0 auto;
 }
 
-.container {
-  text-align: center;
-}
-
-.initialOrderText {
-  @include textTemplate(24px, $fontWeightBold, 32px);
-  margin-top: 32px;
-  text-transform: capitalize;
-}
-
-.orderTitle {
-  margin-top: 32px;
-}
-
-.orderDateWrapper {
-  margin-top: 4px;
-
-  .orderDateRange {
-    @include textTemplate(20px, $fontWeightBold, 32px);
-    margin-left: 8px;
-    text-transform: capitalize;
-  }
+.modalContainer.modalContainer {
+  flex-basis: 900px;
 }

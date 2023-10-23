@@ -15,6 +15,7 @@ export type FeaturesHeaderProps = {
     pathname: string;
     query?: TObject;
     shouldActivePathname?: string[];
+    extraFunc?: () => void;
   }[];
 };
 
@@ -33,7 +34,15 @@ const FeaturesHeader: React.FC<FeaturesHeaderProps> = (props) => {
   return (
     <nav className={css.container}>
       <ul className={css.navWrapper}>
-        {headerData.map(({ key, title, pathname, query }) => {
+        {headerData.map(({ key, title, pathname, query, extraFunc }) => {
+          if (typeof extraFunc === 'function') {
+            return (
+              <div key={key} className={css.headerItem} onClick={extraFunc}>
+                {title}
+              </div>
+            );
+          }
+
           const activeHeaderItemClasses = classNames(css.headerItem, {
             [css.active]: key === activeKey,
           });

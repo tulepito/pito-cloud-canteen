@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 
 import { getCompanyIdFromBookerUser } from '@helpers/company';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import useFetchCompanyInfo from '@hooks/useFetchCompanyInfo';
 import { resetCompanyOrdersStates } from '@redux/slices/Order.slice';
 import { currentUserSelector } from '@redux/slices/user.slice';
 import { companyPaths } from '@src/paths';
@@ -26,7 +27,7 @@ const ManageCompanyOrdersPage: React.FC<TManageCompanyOrdersPageProps> = () => {
     replace,
     query: { companyId: companyIdFormQuery },
   } = router;
-
+  useFetchCompanyInfo();
   const sectionTitle = intl.formatMessage({
     id: 'ManageCompanyOrdersPage.titleSection.title',
   });

@@ -10,7 +10,8 @@ import { parseThousandNumber } from '@helpers/format';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { QuizActions } from '@redux/slices/Quiz.slice';
-import { companyPaths, quizPaths } from '@src/paths';
+import { companyPaths } from '@src/paths';
+import { QuizStep } from '@src/utils/enums';
 import {
   greaterThanOneThousand,
   greaterThanZero,
@@ -19,6 +20,7 @@ import {
 
 import useRedirectAfterReloadPage from '../../hooks/useRedirectAfterReloadPage';
 import QuizModal from '../components/QuizModal/QuizModal';
+import { useQuizFlow } from '../hooks/useQuizFlow';
 
 import css from './QuizPerPackMemberAmount.module.scss';
 
@@ -43,6 +45,7 @@ const QuizPerPackMemberAmountPage = () => {
 
   useRedirectAfterReloadPage();
   const quizData = useAppSelector((state) => state.Quiz.quiz, shallowEqual);
+  const { nextStep, backStep } = useQuizFlow(QuizStep.PACKAGE_PER_MEMBER);
 
   const onSubmit = async (values: any) => {
     const {
@@ -133,11 +136,8 @@ const QuizPerPackMemberAmountPage = () => {
     submittingControl.setTrue();
 
     try {
-      await handleSubmit();
-      await router.push({
-        pathname: quizPaths.SpecialDemand,
-        query: router.query,
-      });
+      handleSubmit();
+      nextStep();
     } catch (error) {
       console.error(error);
     } finally {
@@ -145,9 +145,6 @@ const QuizPerPackMemberAmountPage = () => {
     }
   };
 
-  const goBack = () => {
-    router.back();
-  };
   const handleCancel = () => {
     router.push(companyPaths.Home);
   };
@@ -164,7 +161,7 @@ const QuizPerPackMemberAmountPage = () => {
       submitDisabled={hasValidationErrors}
       submitInProgress={submittingControl.value}
       onSubmit={onFormSubmitClick}
-      onBack={goBack}>
+      onBack={backStep}>
       <form className={css.formContainer}>
         <FieldTextInputComponent
           id="packagePerMember"

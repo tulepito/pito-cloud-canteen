@@ -20,8 +20,7 @@ export const normalizePlanDetailsToEvent = (
     return [];
   }
 
-  const { plans = [], deliveryHour } = Listing(order).getMetadata();
-  const planId = plans.length > 0 ? plans[0] : undefined;
+  const { deliveryHour, daySession } = Listing(order).getMetadata();
 
   const normalizeData = compact(
     dateList.map((timestamp) => {
@@ -50,16 +49,19 @@ export const normalizePlanDetailsToEvent = (
       return {
         resource: {
           id: timestamp,
-          daySession: getDaySessionFromDeliveryTime(deliveryHour),
+          daySession:
+            daySession ||
+            getDaySessionFromDeliveryTime(deliveryHour.split('-')[0]),
           isSelectedFood: !isEmpty(restaurantMaybe.id) && !isEmpty(foodList),
           restaurant: restaurantMaybe,
           meal: {
             dishes: foodList,
           },
-          planId,
+          start: DateTime.fromMillis(Number(timestamp))
+            .startOf('day')
+            .toJSDate(),
+          end: DateTime.fromMillis(Number(timestamp)).endOf('day').toJSDate(),
         },
-        start: DateTime.fromMillis(Number(timestamp)).startOf('day').toJSDate(),
-        end: DateTime.fromMillis(Number(timestamp)).endOf('day').toJSDate(),
       };
     }),
   );

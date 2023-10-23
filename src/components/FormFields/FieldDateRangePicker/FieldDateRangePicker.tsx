@@ -6,6 +6,7 @@ import classNames from 'classnames';
 import viLocale from 'date-fns/locale/vi';
 
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
 import ValidationError from '@components/ValidationError/ValidationError';
 import { formatDate } from '@src/utils/dates';
 
@@ -23,10 +24,11 @@ type FieldDateRangePickerProps = FieldRenderProps<
 > & {
   label?: string;
   name?: string;
+  shouldHideInput?: boolean;
 };
 
 const renderCustomHeader = (props: ReactDatePickerCustomHeaderProps) => {
-  const { date, increaseMonth, decreaseMonth } = props;
+  const { increaseMonth, decreaseMonth, monthDate } = props;
 
   return (
     <div className={css.calendarHear}>
@@ -35,7 +37,9 @@ const renderCustomHeader = (props: ReactDatePickerCustomHeaderProps) => {
         direction="left"
         className={css.arrow}
       />
-      <div className={css.date}>{formatDate(new Date(date), 'MMMM, yyyy')}</div>
+      <div className={css.date}>
+        {formatDate(new Date(monthDate), 'MMMM, yyyy')}
+      </div>
       <IconArrow
         onClick={increaseMonth}
         direction="right"
@@ -71,6 +75,7 @@ const FieldDateRangePickerComponent: React.FC<FieldDateRangePickerProps> = (
     selected,
     startDate: startDateProps,
     endDate: endDateProps,
+    shouldHideInput = false,
     ...rest
   } = props;
   const { name, onChange, value, onBlur } = input;
@@ -117,14 +122,18 @@ const FieldDateRangePickerComponent: React.FC<FieldDateRangePickerProps> = (
           {fieldMeta.error && <span className={labelRequiredRedStar}>*</span>}
         </label>
       )}
-      <div className={css.fieldsWrapper}>
-        <div className={inputClasses}>
-          {startDate && formatDate(new Date(startDate), 'dd/MM/yyyy')}
-        </div>
-        <div className={inputClasses}>
-          {endDate && formatDate(new Date(endDate), 'dd/MM/yyyy')}
-        </div>
-      </div>
+      <RenderWhen condition={!shouldHideInput}>
+        <>
+          <div className={css.fieldsWrapper}>
+            <div className={inputClasses}>
+              {startDate && formatDate(new Date(startDate), 'dd/MM/yyyy')}
+            </div>
+            <div className={inputClasses}>
+              {endDate && formatDate(new Date(endDate), 'dd/MM/yyyy')}
+            </div>
+          </div>
+        </>
+      </RenderWhen>
       <DatePicker
         locale="vi"
         id={id}
