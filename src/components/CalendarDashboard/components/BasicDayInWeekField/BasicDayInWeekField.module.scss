@@ -24,6 +24,7 @@
 
   &.selected {
     color: $neutralGray7;
+    background-color: $neutralGray2;
     outline: 2px solid $neutralGray7;
     outline-offset: -2px;
   }
