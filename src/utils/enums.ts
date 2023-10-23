@@ -382,3 +382,29 @@ export enum ENativeNotificationType {
   AdminTransitSubOrderToCanceled = 'AdminTransitSubOrderToCanceled',
   TransitOrderStateToCanceled = 'TransitOrderStateToCanceled',
 }
+
+export enum EFoodApprovalState {
+  PENDING = 'pending',
+  ACCEPTED = 'accepted',
+  DECLINED = 'declined',
+}
+
+export const FOOD_APPROVAL_STATE_OPTIONS = [
+  {
+    key: EFoodApprovalState.PENDING,
+    label: 'Chờ duyệt',
+  },
+  {
+    key: EFoodApprovalState.ACCEPTED,
+    label: 'Đã duyệt',
+  },
+  {
+    key: EFoodApprovalState.DECLINED,
+    label: 'Từ chối',
+  },
+];
+
+export enum ESlackNotificationType {
+  CREATE_NEW_FOOD = 'createNewFood',
+  UPDATE_FOOD = 'updateFood',
+}

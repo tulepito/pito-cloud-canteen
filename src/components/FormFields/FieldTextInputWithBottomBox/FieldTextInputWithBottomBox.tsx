@@ -47,9 +47,9 @@ const FieldTextInputWithBottomBox: React.FC<TFieldTextInputWithBottomBox> = (
   const tempValue = form.getFieldState('tempValue')?.value || '';
 
   const onKeyUp = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    e.preventDefault();
     e.stopPropagation();
     if (e.key === 'Enter') {
+      e.preventDefault();
       if (tempValue && tempValue.replace(/\s/g, '').length) {
         fieldsArrayRef.current.push(tempValue.trim());
         form.change('tempValue', '');

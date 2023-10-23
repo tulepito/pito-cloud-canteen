@@ -4,15 +4,18 @@ import omit from 'lodash/omit';
 import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
 
+import { responseApprovalRequestApi } from '@apis/admin';
 import { partnerFoodApi } from '@apis/foodApi';
 import { getImportDataFromCsv } from '@pages/admin/partner/[restaurantId]/settings/food/utils';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { denormalisedResponseEntities } from '@utils/data';
+import type { EFoodApprovalState } from '@utils/enums';
 import { EImageVariants, EListingType } from '@utils/enums';
 import { storableAxiosError, storableError } from '@utils/errors';
 import type {
   TImage,
   TIntegrationListing,
+  TKeyValue,
   TListing,
   TObject,
   TPagination,
@@ -56,6 +59,14 @@ type TFoodSliceState = {
 
   publishOrCloseFoodId: string | null;
   publishOrCloseFoodIdError: any;
+  nutritions: TKeyValue[];
+  categories: TKeyValue[];
+  packaging: TKeyValue[];
+  fetchAttributesInProgress: boolean;
+  fetchAttributesError: any;
+
+  responseApprovalRequestInProgress: boolean;
+  responseApprovalRequestError: any;
 };
 
 const initialState: TFoodSliceState = {
@@ -99,6 +110,14 @@ const initialState: TFoodSliceState = {
   // active food
   publishOrCloseFoodId: null,
   publishOrCloseFoodIdError: null,
+  nutritions: [],
+  categories: [],
+  packaging: [],
+  fetchAttributesInProgress: false,
+  fetchAttributesError: null,
+
+  responseApprovalRequestInProgress: false,
+  responseApprovalRequestError: null,
 };
 
 // ================ Thunk types ================ //
@@ -125,6 +144,8 @@ const QUERY_MENU_PICKED_FOODS = 'app/ManageFoodsPage/QUERY_MENU_PICKED_FOODS';
 
 const PUBLISH_OR_CLOSE_FOOD = 'app/ManageFoodsPage/PUBLISH_OR_CLOSE_FOOD';
 
+const RESPONSE_APPROVAL_REQUEST =
+  'app/ManageFoodsPage/RESPONSE_APPROVAL_REQUEST';
 // ================ Async thunks ================ //
 
 const queryMenuPickedFoods = createAsyncThunk(
@@ -505,6 +526,22 @@ export const publishOrCloseFood = createAsyncThunk(
   },
 );
 
+const responseApprovalRequest = createAsyncThunk(
+  RESPONSE_APPROVAL_REQUEST,
+  async (
+    { foodId, response }: { foodId: string; response: EFoodApprovalState },
+    { rejectWithValue },
+  ) => {
+    try {
+      await responseApprovalRequestApi({ foodId, response });
+    } catch (error) {
+      console.error(`${RESPONSE_APPROVAL_REQUEST} error: `, error);
+
+      return rejectWithValue(storableError(error));
+    }
+  },
+);
+
 export const foodSliceThunks = {
   queryPartnerFoods,
   requestUploadFoodImages,
@@ -517,6 +554,7 @@ export const foodSliceThunks = {
   createPartnerFoodFromCsv,
   queryMenuPickedFoods,
   publishOrCloseFood,
+  responseApprovalRequest,
 };
 
 // ================ Slice ================ //
@@ -755,6 +793,21 @@ const foodSlice = createSlice({
         ...state,
         publishOrCloseFoodId: null,
         publishOrCloseFoodIdError: error,
+      }))
+
+      .addCase(responseApprovalRequest.pending, (state) => ({
+        ...state,
+        responseApprovalRequestInProgress: true,
+        responseApprovalRequestError: null,
+      }))
+      .addCase(responseApprovalRequest.fulfilled, (state) => ({
+        ...state,
+        responseApprovalRequestInProgress: false,
+      }))
+      .addCase(responseApprovalRequest.rejected, (state, { payload }) => ({
+        ...state,
+        responseApprovalRequestInProgress: false,
+        responseApprovalRequestError: payload,
       }));
   },
 });

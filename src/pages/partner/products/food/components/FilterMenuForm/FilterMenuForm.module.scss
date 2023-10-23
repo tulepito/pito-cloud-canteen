@@ -1,0 +1,20 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/defaults.scss' as *;
+
+.dateInputGroup {
+  @include flexAlign(center);
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.bottomBtns {
+  @include flexAlign(center);
+  gap: 8px;
+  margin-top: 24px;
+
+  .btn {
+    width: 100%;
+  }
+}

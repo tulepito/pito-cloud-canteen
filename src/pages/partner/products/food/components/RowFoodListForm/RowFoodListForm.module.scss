@@ -1,0 +1,29 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.formWrapper {
+  @include flexAlign(center);
+  flex-direction: column;
+  gap: 12px;
+
+  @include viewportLarge {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+
+  .fieldInput {
+    align-self: flex-start;
+    padding-left: 12px;
+  }
+  &.selectAll {
+    @include viewportLarge {
+      display: none;
+    }
+  }
+}
+
+.pagination {
+  margin-top: 40px;
+}

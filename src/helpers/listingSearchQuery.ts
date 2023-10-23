@@ -11,6 +11,7 @@ import {
   getDaySessionFromDeliveryTime,
   VNTimezone,
 } from '@utils/dates';
+import type { EFoodApprovalState } from '@utils/enums';
 import {
   EImageVariants,
   EListingStates,
@@ -260,4 +261,52 @@ export const getFoodQuery = ({ foodIds, params }: TGetOrderQuery) => {
   };
 
   return query;
+};
+
+export const getPartnerFoodByApprovalStatusQuery = (
+  status: EFoodApprovalState,
+  restaurantListingId: string,
+) => {
+  return {
+    meta_adminApproval: status,
+    meta_restaurantId: restaurantListingId,
+    meta_listingType: EListingType.food,
+    meta_isDraft: false,
+    meta_isDeleted: false,
+  };
+};
+
+export const getPartnerDraftFoodQuery = (restaurantListingId: string) => {
+  return {
+    meta_restaurantId: restaurantListingId,
+    meta_listingType: EListingType.food,
+    meta_isDraft: true,
+    meta_isDeleted: false,
+  };
+};
+
+export type TgetPartnerMenuQueryParams = {
+  keywords?: string;
+  startDate?: number;
+  endDate?: number;
+};
+export const getPartnerMenuQuery = (
+  restaurantId: string,
+  params: TgetPartnerMenuQueryParams,
+) => {
+  const { keywords, startDate, endDate } = params;
+
+  return {
+    ...(keywords && { keywords }),
+    ...(startDate && {
+      pub_startDate: `${startDate},`,
+    }),
+    ...(endDate && {
+      pub_endDate: `,${endDate + 1}`,
+    }),
+    meta_listingType: EListingType.menu,
+    meta_restaurantId: restaurantId,
+    meta_listingState: EListingStates.published,
+    meta_isDeleted: false,
+  };
 };

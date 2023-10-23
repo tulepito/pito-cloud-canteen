@@ -276,6 +276,9 @@ export const partnerPaths = {
   ManageFood: '/partner/products/food',
   CreateFood: '/partner/products/food/create',
   EditFood: '/partner/products/food/[foodId]',
+  ManageMenus: '/partner/products/menu',
+  CreateMenu: '/partner/products/menu/create',
+  EditMenu: '/partner/products/menu/[menuId]',
 };
 
 export const partnerRoutes = {

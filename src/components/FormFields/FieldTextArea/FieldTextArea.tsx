@@ -21,6 +21,7 @@ type InputComponentProps = FieldRenderProps<string, any> &
     meta: any;
     inputRef?: any;
     fullWidth?: boolean;
+    required?: boolean;
   };
 const CONTENT_MAX_LENGTH = 5000;
 
@@ -57,6 +58,7 @@ export const FieldTextAreaComponent: React.FC<InputComponentProps> = (
     meta,
     inputRef,
     onChange,
+    required,
     ...rest
   } = props;
   if (label && !id) {
@@ -108,14 +110,14 @@ export const FieldTextAreaComponent: React.FC<InputComponentProps> = (
   const inputContainerClasses = classNames(css.inputContainer);
 
   const labelClasses = classNames(css.labelRoot, labelClassName);
-  const labelRequiredRedStar = fieldMeta.error ? css.labelRequiredRedStar : '';
+  const labelRequiredRedStar = required ? css.labelRequiredRedStar : '';
 
   return (
     <div className={classes}>
       {label && (
         <label className={labelClasses} htmlFor={id}>
           {label}
-          {fieldMeta.error && <span className={labelRequiredRedStar}>*</span>}
+          {required && <span className={labelRequiredRedStar}>*</span>}
         </label>
       )}
       <div className={inputContainerClasses}>

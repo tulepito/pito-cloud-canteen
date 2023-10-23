@@ -17,7 +17,7 @@ import { EDayOfWeek, EMenuMealType } from './enums';
 
 export const VNTimezone = 'Asia/Ho_Chi_Minh';
 
-const DAY_IN_WEEK = [
+export const DAY_IN_WEEK = [
   { key: 'mon', label: 'DayInWeekField.mon' },
   { key: 'tue', label: 'DayInWeekField.tue' },
   { key: 'wed', label: 'DayInWeekField.wed' },

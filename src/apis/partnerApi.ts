@@ -48,3 +48,23 @@ export const removePartnerFoodApi = (foodId: string) =>
   deleteApi(`${BASE_URL}/food/${foodId}`);
 export const removePartnerMultipleFoodApi = (body: TBodyParams) =>
   deleteApi(`${BASE_URL}/food/delete-by-ids`, body);
+
+export const fetchFoodEditableApi = (foodId: string) =>
+  getApi(`${BASE_URL}/food/${foodId}/fetch-editable`);
+
+export const fetchFoodDeletableApi = (foodId: string) =>
+  getApi(`${BASE_URL}/food/${foodId}/fetch-deletable`);
+
+export const updatePartnerMenuApi = (
+  { menuId, partnerId }: { menuId: string; partnerId: string },
+  body: TBodyParams,
+) => putApi(`${BASE_URL}/${partnerId}/menus/${menuId}`, body);
+export const sendSlackNotificationToAdminApi = (
+  foodId: string,
+  body: TBodyParams,
+) =>
+  postApi(`${BASE_URL}/food/${foodId}/send-slack-notification-to-admin`, body);
+export const toggleFoodEnableApi = (foodId: string, body: TBodyParams) =>
+  putApi(`${BASE_URL}/food/${foodId}/toggle-food-enable`, body);
+export const reApprovalFoodApi = (foodId: string) =>
+  putApi(`${BASE_URL}/food/${foodId}/re-approval`);

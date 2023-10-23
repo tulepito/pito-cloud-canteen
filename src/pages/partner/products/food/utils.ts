@@ -2,6 +2,7 @@
 /* eslint-disable unused-imports/no-unused-vars */
 import { types as sdkTypes } from '@helpers/sdkLoader';
 import { FOOD_TYPE_OPTIONS, MENU_TYPE_OPTIONS } from '@src/utils/options';
+import type { EFoodApprovalState, EListingStates } from '@utils/enums';
 import { type EMenuType, EListingType } from '@utils/enums';
 import { getSubmitImageId, getUniqueImages } from '@utils/images';
 import { toNonAccentVietnamese } from '@utils/string';
@@ -27,6 +28,7 @@ export type TEditPartnerFoodFormValues = {
   title: string;
   menuType: typeof EMenuType.fixedMenu | typeof EMenuType.cycleMenu;
   minOrderHourInAdvance: string;
+  minOrderNumberInAdvance: string;
   minQuantity: string;
   maxMember: string;
   category: string[];
@@ -41,6 +43,9 @@ export type TEditPartnerFoodFormValues = {
   restaurantId?: string;
   unit?: string;
   tempValue?: string;
+  isDraft: boolean;
+  adminApproval?: EFoodApprovalState;
+  state?: EListingStates;
 };
 
 export const getSubmitFoodData = (values: TEditPartnerFoodFormValues) => {
@@ -52,6 +57,8 @@ export const getSubmitFoodData = (values: TEditPartnerFoodFormValues) => {
     addImages,
     tempValue,
     restaurantId,
+    isDraft,
+    state,
     ...rest
   } = values;
   const priceRemoveComma = price.toString().split('.');
@@ -61,8 +68,9 @@ export const getSubmitFoodData = (values: TEditPartnerFoodFormValues) => {
   return {
     images: getUniqueImages([...getSubmitImageId(images)]),
     title,
-    description,
+    ...(description && { description }),
     price: new Money(Number(parsePrice), 'VND'),
+    ...(state && { state }),
     publicData: {
       ...rest,
     },
@@ -70,6 +78,7 @@ export const getSubmitFoodData = (values: TEditPartnerFoodFormValues) => {
       restaurantId,
       listingType: EListingType.food,
       isFoodEnable: true,
+      isDraft,
     },
   };
 };
@@ -83,6 +92,8 @@ export const getUpdateFoodData = (values: TEditPartnerFoodFormValues) => {
     price,
     addImages,
     tempValue,
+    isDraft,
+    adminApproval,
     ...rest
   } = values;
 
@@ -94,6 +105,10 @@ export const getUpdateFoodData = (values: TEditPartnerFoodFormValues) => {
     price: parsePriceToMoneyFormat(price),
     publicData: {
       ...rest,
+    },
+    metadata: {
+      ...(isDraft !== undefined ? { isDraft } : {}),
+      ...(adminApproval ? { adminApproval } : {}),
     },
   };
 };

@@ -1,0 +1,35 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.searchFilterWrapper {
+  @include flexAlign(center);
+  gap: 12px;
+
+  .filterBtn {
+    min-height: 44px;
+
+    @include flexCenter;
+    gap: 8px;
+  }
+}
+
+.formWrapper {
+  margin-top: 24px;
+}
+
+.menuNameWrapper {
+  padding: 8px 16px;
+  border-bottom: 1px solid $neutralGray4;
+  margin: 0 -16px;
+  @include flexAlign(center);
+  gap: 12px;
+
+  span {
+    @include textTemplate(16px, $fontWeightBold, 24px);
+  }
+}
+
+.filterMenuModalContainer.filterMenuModalContainer {
+  overflow-y: initial;
+}

@@ -23,13 +23,14 @@ export type TFilterFormValues = {
 type TExtraProps = {
   categoryOptions: any;
   onClearForm: () => void;
+  isMobile?: boolean;
 };
 type TFilterFormComponentProps = FormRenderProps<TFilterFormValues> &
   Partial<TExtraProps>;
 type TFilterFormProps = FormProps<TFilterFormValues> & TExtraProps;
 
 const FilterFormComponent: React.FC<TFilterFormComponentProps> = (props) => {
-  const { handleSubmit, onClearForm, values, form } = props;
+  const { handleSubmit, onClearForm, values, form, isMobile } = props;
   const {
     createAtStart: createAtStartInitialValue,
     createAtEnd: createAtEndInitialValue,
@@ -108,6 +109,7 @@ const FilterFormComponent: React.FC<TFilterFormComponentProps> = (props) => {
             dateFormat={'EEE, dd MMMM, yyyy'}
             placeholderText="Từ"
             maxDate={maxEndDate}
+            popperPlacement={isMobile ? 'top-start' : 'bottom-start'}
           />
           <FieldDatePicker
             id="createAtEnd"
@@ -120,6 +122,7 @@ const FilterFormComponent: React.FC<TFilterFormComponentProps> = (props) => {
             autoComplete="off"
             disabled={!startDate}
             placeholderText="Đến"
+            popperPlacement={isMobile ? 'top-start' : 'bottom-start'}
           />
         </div>
       </div>

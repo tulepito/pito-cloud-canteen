@@ -9,3 +9,7 @@
 .labelRoot {
   @include inputLabelStyles;
 }
+
+.labelRequiredRedStar {
+  color: $primaryPri2;
+}
