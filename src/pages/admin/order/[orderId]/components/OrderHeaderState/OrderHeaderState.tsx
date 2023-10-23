@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import classNames from 'classnames';
+import { useRouter } from 'next/router';
 
 import Button from '@components/Button/Button';
 import IconLightOutline from '@components/Icons/IconLightOutline/IconLightOutline';
@@ -13,6 +14,7 @@ import {
 } from '@helpers/orderHelper';
 import { useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
+import { adminPaths } from '@src/paths';
 import { Listing } from '@src/utils/data';
 import { EOrderDraftStates, EOrderStates, EOrderType } from '@src/utils/enums';
 import { getLabelByKey, ORDER_STATE_OPTIONS } from '@src/utils/options';
@@ -24,6 +26,12 @@ import type {
 } from '@src/utils/types';
 
 import css from './OrderHeaderState.module.scss';
+
+const ORDER_STATES_TO_ENABLE_EDIT_ABILITY = [
+  EOrderDraftStates.pendingApproval,
+  EOrderStates.picking,
+  EOrderStates.inProgress,
+];
 
 type OrderHeaderStateProps = {
   order: TListing;
@@ -49,6 +57,7 @@ const OrderHeaderState: React.FC<OrderHeaderStateProps> = (props) => {
   } = props;
 
   const intl = useIntl();
+  const router = useRouter();
   const orderStateActionDropdownControl = useBoolean();
   const planData = useAppSelector((state) => state.OrderManagement.planData);
   const confirmCancelOrderActions = useBoolean();
@@ -56,6 +65,7 @@ const OrderHeaderState: React.FC<OrderHeaderStateProps> = (props) => {
   const planDataGetter = Listing(planData as TListing);
   const { orderDetail = {} } = planDataGetter.getMetadata();
   const orderListing = Listing(order);
+  const orderId = orderListing.getId();
   const { title } = orderListing.getAttributes();
   const { orderState, orderType = EOrderType.group } =
     orderListing.getMetadata();
@@ -91,9 +101,22 @@ const OrderHeaderState: React.FC<OrderHeaderStateProps> = (props) => {
   const canCancelOrder = ORDER_STATE_TRANSIT_FLOW[
     orderState as TTransitionOrderState
   ]?.includes(EOrderStates.canceled);
+  const canEditOrder = ORDER_STATES_TO_ENABLE_EDIT_ABILITY.includes(orderState);
 
   const hasAnyActionsCanDo =
-    canCancelOrder || shouldShowUpdateOrderStateBtn || shouldManagePickingBtn;
+    canEditOrder ||
+    canCancelOrder ||
+    shouldShowUpdateOrderStateBtn ||
+    shouldManagePickingBtn;
+
+  const handleClickEditOrder = () => {
+    router.push({
+      pathname: adminPaths.EditOrder,
+      query: {
+        orderId,
+      },
+    });
+  };
 
   const handleAgreeCancelOrder = () => {
     if (canCancelOrder) {
@@ -132,6 +155,11 @@ const OrderHeaderState: React.FC<OrderHeaderStateProps> = (props) => {
             <OutsideClickHandler
               className={css.actionList}
               onOutsideClick={orderStateActionDropdownControl.setFalse}>
+              <RenderWhen condition={canEditOrder}>
+                <div className={css.actionItem} onClick={handleClickEditOrder}>
+                  Chỉnh sửa đơn hàng
+                </div>
+              </RenderWhen>
               <RenderWhen condition={canCancelOrder}>
                 <div
                   className={css.actionItem}
