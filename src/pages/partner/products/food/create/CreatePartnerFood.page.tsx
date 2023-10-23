@@ -200,7 +200,7 @@ const CreatePartnerFoodPage = () => {
 
   useEffect(() => {
     dispatch(resetImage());
-  }, []);
+  }, [dispatch]);
 
   if (showFoodInProgress || showPartnerListingInProgress) {
     return <LoadingContainer />;
