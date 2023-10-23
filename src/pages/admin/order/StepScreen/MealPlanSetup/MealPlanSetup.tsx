@@ -16,8 +16,7 @@ import { Listing, User } from '@utils/data';
 import { getSelectedDaysOfWeek } from '@utils/dates';
 import type { TListing } from '@utils/types';
 
-// eslint-disable-next-line import/no-cycle
-import MealPlanSetupForm from '../../create/components/MealPlanSetupForm/MealPlanSetupForm';
+import MealPlanSetupForm from '../../components/MealPlanSetupForm/MealPlanSetupForm';
 
 type MealPlanSetupProps = {
   goBack: () => void;

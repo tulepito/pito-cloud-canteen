@@ -12,9 +12,9 @@ import { Listing, User } from '@src/utils/data';
 import type { TListing } from '@src/utils/types';
 
 // eslint-disable-next-line import/no-cycle
-import NavigateButtons from '../../create/components/NavigateButtons/NavigateButtons';
-import PartnerFeeForm from '../../create/components/PartnerFeeForm/PartnerFeeForm';
-import ServiceFeeAndNoteForm from '../../create/components/ServiceFeeAndNoteForm/ServiceFeeAndNoteForm';
+import NavigateButtons from '../../components/NavigateButtons/NavigateButtons';
+import PartnerFeeForm from '../../components/PartnerFeeForm/PartnerFeeForm';
+import ServiceFeeAndNoteForm from '../../components/ServiceFeeAndNoteForm/ServiceFeeAndNoteForm';
 
 import css from './ServiceFeesAndNotes.module.scss';
 
