@@ -772,11 +772,17 @@ const fetchOrder = createAsyncThunk(
       }),
     )[0];
 
-    const { bookerId } = Listing(response).getMetadata();
+    const { bookerId, companyId } = Listing(response).getMetadata();
 
     const selectedBooker = denormalisedResponseEntities(
       await sdk.users.show({
         id: bookerId,
+      }),
+    )[0];
+
+    const selectedCompany = denormalisedResponseEntities(
+      await sdk.users.show({
+        id: companyId,
       }),
     )[0];
 
@@ -785,6 +791,7 @@ const fetchOrder = createAsyncThunk(
     return {
       order: response,
       selectedBooker,
+      selectedCompany,
     };
   },
 );
@@ -1263,6 +1270,7 @@ const orderSlice = createSlice({
         fetchOrderInProgress: false,
         order: payload.order,
         selectedBooker: payload.selectedBooker,
+        selectedCompany: payload.selectedCompany,
         currentOrderVATPercentage: config.VATPercentage,
       }))
       .addCase(fetchOrder.rejected, (state, { error }) => ({

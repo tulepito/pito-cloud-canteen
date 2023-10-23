@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -15,7 +15,7 @@ import Pagination from '@components/Pagination/Pagination';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { addBooker } from '@redux/slices/Order.slice';
 import { User } from '@utils/data';
-import type { TUser } from '@utils/types';
+import type { TObject, TUser } from '@utils/types';
 
 import IconNoClientsFound from './IconNoClientsFound';
 
@@ -27,8 +27,11 @@ type ClientTableProps = {
   page: number;
   pageSize: number;
   bookerList: TUser[];
+  shouldHidePagination?: boolean;
+  shouldDisableAllFields?: boolean;
   fetchBookersInProgress: boolean;
   createOrderInProgress?: boolean;
+  initialValues?: TObject;
   onPageChange: (value: number) => void;
   onItemClick?: (value: string) => void;
   onSubmit: (values: any) => void;
@@ -49,18 +52,30 @@ const ClientTable: React.FC<ClientTableProps> = (props) => {
     bookerList,
     fetchBookersInProgress,
     createOrderInProgress = false,
-    onPageSizeChange,
+    shouldDisableAllFields = false,
+    shouldHidePagination = false,
+    initialValues = {},
     pageSize,
+    onPageSizeChange,
   } = props;
-  const [selectedCompanyId, setSelectedCompanyId] = useState<string>('');
-  const [selectedBookerId, setSelectedBookerId] = useState<string>('');
-  const shouldShowPagination = page && data?.length > 0;
+  const [selectedCompanyId, setSelectedCompanyId] = useState<string>(
+    initialValues?.clientId || '',
+  );
+  const [selectedBookerId, setSelectedBookerId] = useState<string>(
+    initialValues?.booker || '',
+  );
+  const shouldShowPagination =
+    !shouldHidePagination && page && data?.length > 0;
   const queryCompaniesInProgress = useAppSelector(
     (state) => state.company.queryCompaniesInProgress,
   );
   const renderTableRowFn = (tableData: any, form: any) => {
     return tableData.map(({ key, data: itemData }: any, index: number) => {
-      const onCustomItemClick = () => {
+      const handleItemClick = () => {
+        if (shouldDisableAllFields) {
+          return;
+        }
+
         if (selectedCompanyId === itemData.id) {
           return;
         }
@@ -74,6 +89,7 @@ const ClientTable: React.FC<ClientTableProps> = (props) => {
           onItemClick(itemData.id);
         }
       };
+
       const showBookerList =
         selectedCompanyId === itemData.id &&
         bookerList.length > 0 &&
@@ -84,12 +100,13 @@ const ClientTable: React.FC<ClientTableProps> = (props) => {
 
       return (
         <div key={key} className={css.bodyRow}>
-          <div className={css.mainRow} onClick={onCustomItemClick}>
+          <div className={css.mainRow} onClick={handleItemClick}>
             <span>
               <FieldRadioButton
                 id={`clientId-${itemData.id}`}
                 name="clientId"
                 value={itemData.id}
+                disabled={shouldDisableAllFields}
               />
             </span>
             <span className={css.bodyCell}>{currentIdx}</span>
@@ -119,6 +136,9 @@ const ClientTable: React.FC<ClientTableProps> = (props) => {
                 const bookerName = `${lastName} ${firstName}`;
 
                 const handleBookerClick = () => {
+                  if (shouldDisableAllFields) {
+                    return;
+                  }
                   form.change('booker', bookerId);
                   setSelectedBookerId(bookerId);
                   dispatch(addBooker(booker));
@@ -154,6 +174,7 @@ const ClientTable: React.FC<ClientTableProps> = (props) => {
                       id={`booker-${bookerId}`}
                       name="booker"
                       value={bookerId}
+                      disabled={shouldDisableAllFields}
                       rootClassName={css.bookerRadio}
                     />
                   </div>
@@ -175,8 +196,15 @@ const ClientTable: React.FC<ClientTableProps> = (props) => {
     </div>
   );
 
+  useEffect(() => {
+    setSelectedCompanyId(initialValues?.clientId || '');
+    setSelectedBookerId(initialValues?.booker || '');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [JSON.stringify(initialValues)]);
+
   return (
     <FinalForm
+      initialValues={initialValues}
       onSubmit={onSubmit}
       render={(formRenderProps: FormRenderProps) => {
         const { handleSubmit, form, values } = formRenderProps;
@@ -196,7 +224,6 @@ const ClientTable: React.FC<ClientTableProps> = (props) => {
                   <span>{intl.formatMessage({ id: 'ClientTable.id' })}</span>
                   <span className={css.companyNameHeaderCol}>
                     {intl.formatMessage({ id: 'ClientTable.companyName' })}
-                    {/* <IconSort className={css.sortIcon} onClick={toggleSort} /> */}
                   </span>
                   <span>
                     {intl.formatMessage({ id: 'ClientTable.address' })}

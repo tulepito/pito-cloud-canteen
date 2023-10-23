@@ -64,28 +64,30 @@ export const parseEntitiesToTableData = (
   companyMembers?: TCompanyMembersByCompanyId | null,
 ) => {
   return companies.map((company) => {
-    const { profile = {}, email } = company.attributes || {};
+    const companyUserGetter = User(company);
+
+    const companyId = companyUserGetter.getId();
+    const { email } = companyUserGetter.getAttributes();
+    const { lastName = '', firstName = '' } = companyUserGetter.getProfile();
+    const { userState } = companyUserGetter.getMetadata();
     const {
-      lastName = '',
-      firstName = '',
-      publicData = {},
-      metadata = {},
-    } = profile as any;
-    const { userState } = metadata;
-    const { companyLocation = {}, companyName, phoneNumber } = publicData;
+      companyLocation = {},
+      companyName,
+      phoneNumber,
+    } = companyUserGetter.getPublicData();
 
     return {
-      key: company.id.uuid,
+      key: companyId,
       data: {
         userState,
         isDraft: userState === ECompanyStates.draft,
-        id: company.id.uuid,
+        id: companyId,
         displayName: `${lastName} ${firstName}`,
         phoneNumber,
         email,
         companyName,
         address: companyLocation?.address,
-        ...(companyMembers ? { members: companyMembers[company.id.uuid] } : {}),
+        ...(companyMembers ? { members: companyMembers[companyId] } : {}),
         ...extraData,
       },
     };
