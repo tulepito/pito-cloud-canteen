@@ -225,13 +225,6 @@ const initialState: TOrderInitialState = {
     page: 1,
     perPage: 10,
   },
-  // totalItemMap: {
-  //   [EManageCompanyOrdersTab.SCHEDULED]: 0,
-  //   [EManageCompanyOrdersTab.CANCELED]: 0,
-  //   [EManageCompanyOrdersTab.DRAFT]: 0,
-  //   [EManageCompanyOrdersTab.COMPLETED]: 0,
-  //   [EManageCompanyOrdersTab.ALL]: 0,
-  // },
   totalItemMap: null,
 
   queryTotalOrdersCountByTabInProgress: false,

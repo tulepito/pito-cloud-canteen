@@ -4,9 +4,10 @@ import { useIntl } from 'react-intl';
 import { useRouter } from 'next/router';
 
 import FormWizard from '@components/FormWizard/FormWizard';
-import { useAppDispatch } from '@hooks/reduxHooks';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import ClientView from '@pages/admin/order/StepScreen/ClientView/ClientView';
 import { orderAsyncActions, resetOrder } from '@redux/slices/Order.slice';
+import { adminPaths } from '@src/paths';
 
 import css from './EditOrderWizard.module.scss';
 
@@ -48,16 +49,30 @@ const EditOrderWizard = () => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
   const router = useRouter();
-  const { orderId } = router.query;
+  const {
+    query: { orderId },
+    isReady,
+  } = router;
+  const fetchOrderError = useAppSelector(
+    (state) => state.Order.fetchOrderError,
+  );
   const [currentStep, setCurrentStep] = useState<string>(
     EEditOrderTab.clientView,
   );
 
   useEffect(() => {
-    if (orderId) {
-      dispatch(orderAsyncActions.fetchOrder(orderId as string));
+    if (fetchOrderError === 'Request failed with status code 400') {
+      router.push(adminPaths.ManageOrders);
     }
-  }, [dispatch, orderId]);
+  }, [fetchOrderError]);
+
+  useEffect(() => {
+    if (isReady) {
+      if (orderId) {
+        dispatch(orderAsyncActions.fetchOrder(orderId as string));
+      }
+    }
+  }, [dispatch, isReady, orderId]);
 
   useEffect(() => {
     return () => {
