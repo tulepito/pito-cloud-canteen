@@ -30,11 +30,11 @@ const EDIT_ORDER_TABS = [
 
 const EditOrderTab: React.FC<any> = (props) => {
   // eslint-disable-next-line unused-imports/no-unused-vars
-  const { tab, goBack, nextTab } = props;
+  const { tab, goBack, nextTab, nextToReviewTab } = props;
 
   switch (tab) {
     case EEditOrderTab.clientView:
-      return <ClientView nextTab={nextTab} />;
+      return <ClientView nextTab={nextTab} nextToReviewTab={nextToReviewTab} />;
     case EEditOrderTab.orderSetup:
     case EEditOrderTab.restaurantSetup:
     case EEditOrderTab.serviceAndNote:
@@ -84,7 +84,11 @@ const EditOrderWizard = () => {
     setCurrentStep(tab);
   };
 
-  const nextTab = (tab: string) => () => {
+  const handleNextToReviewTab = () => {
+    saveStep(EEditOrderTab.review);
+  };
+
+  const handleNextTab = (tab: string) => () => {
     const tabIndex = EDIT_ORDER_TABS.indexOf(tab as EEditOrderTab);
 
     if (tabIndex < EDIT_ORDER_TABS.length - 1) {
@@ -93,7 +97,7 @@ const EditOrderWizard = () => {
     }
   };
 
-  const goBack = (tab: string) => () => {
+  const handleGoBack = (tab: string) => () => {
     const tabIndex = EDIT_ORDER_TABS.indexOf(tab as EEditOrderTab);
 
     if (tabIndex > 0) {
@@ -114,8 +118,9 @@ const EditOrderWizard = () => {
             tabLabel={intl.formatMessage({
               id: `EditOrderWizard.${tab}Label`,
             })}
-            nextTab={nextTab(tab)}
-            goBack={goBack(tab)}
+            nextToReviewTab={handleNextToReviewTab}
+            nextTab={handleNextTab(tab)}
+            goBack={handleGoBack(tab)}
           />
         );
       })}

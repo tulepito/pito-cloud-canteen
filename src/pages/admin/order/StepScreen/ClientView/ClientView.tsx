@@ -10,15 +10,19 @@ import { parseEntitiesToTableData } from '@src/pages/admin/company/helpers';
 import { User } from '@utils/data';
 
 import ClientTable from '../../components/ClientTable/ClientTable';
+import NavigateButtons, {
+  EFlowType,
+} from '../../components/NavigateButtons/NavigateButtons';
 
 import css from './ClientView.module.scss';
 
-type TClientSelector = {
+type TClientView = {
   nextTab: () => void;
+  nextToReviewTab: () => void;
 };
 
-const ClientSelector: React.FC<TClientSelector> = (props) => {
-  const { nextTab } = props;
+const ClientView: React.FC<TClientView> = (props) => {
+  const { nextTab, nextToReviewTab } = props;
   const [page, setPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(10);
   const dispatch = useAppDispatch();
@@ -67,32 +71,36 @@ const ClientSelector: React.FC<TClientSelector> = (props) => {
   };
   const handleSelectClientClick = () => {};
 
-  const handleNextTab = () => {
-    nextTab();
-  };
-
   return (
-    <div className={css.clientTable}>
-      <ClientTable
-        data={companiesTableData}
-        shouldHidePagination
-        shouldDisableAllFields
-        initialValues={{
-          clientId: companyId,
-          booker: User(selectedBooker).getId(),
-        }}
-        page={page}
-        pageSize={pageSize}
-        totalItems={1}
-        onPageChange={handlePageChange}
-        onPageSizeChange={handlePageSizeChange}
-        onItemClick={handleSelectClientClick}
-        onSubmit={handleNextTab}
-        bookerList={bookerList}
-        fetchBookersInProgress={fetchBookersInProgress}
+    <div>
+      <div className={css.clientTable}>
+        <ClientTable
+          data={companiesTableData}
+          shouldHidePagination
+          shouldDisableAllFields
+          shouldHideSubmitBtn
+          initialValues={{
+            clientId: companyId,
+            booker: User(selectedBooker).getId(),
+          }}
+          page={page}
+          pageSize={pageSize}
+          totalItems={1}
+          onPageChange={handlePageChange}
+          onPageSizeChange={handlePageSizeChange}
+          onItemClick={handleSelectClientClick}
+          onSubmit={nextTab}
+          bookerList={bookerList}
+          fetchBookersInProgress={fetchBookersInProgress}
+        />
+      </div>
+      <NavigateButtons
+        onNextClick={nextTab}
+        onCompleteClick={nextToReviewTab}
+        flowType={EFlowType.edit}
       />
     </div>
   );
 };
 
-export default ClientSelector;
+export default ClientView;

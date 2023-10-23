@@ -13,3 +13,9 @@
   min-width: 252px;
   height: 48px;
 }
+
+.actionWrapper {
+  display: flex;
+  flex-direction: row;
+  column-gap: 16px;
+}
