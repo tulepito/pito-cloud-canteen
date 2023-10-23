@@ -28,6 +28,7 @@ type ClientTableProps = {
   pageSize: number;
   bookerList: TUser[];
   shouldHidePagination?: boolean;
+  shouldHideSubmitBtn?: boolean;
   shouldDisableAllFields?: boolean;
   fetchBookersInProgress: boolean;
   createOrderInProgress?: boolean;
@@ -52,6 +53,7 @@ const ClientTable: React.FC<ClientTableProps> = (props) => {
     bookerList,
     fetchBookersInProgress,
     createOrderInProgress = false,
+    shouldHideSubmitBtn = false,
     shouldDisableAllFields = false,
     shouldHidePagination = false,
     initialValues = {},
@@ -252,14 +254,16 @@ const ClientTable: React.FC<ClientTableProps> = (props) => {
                 </div>
               )}
             </div>
-            <div className={css.submitBtnWrapper}>
-              <Button
-                className={css.submitBtn}
-                inProgress={createOrderInProgress}
-                disabled={disabled}>
-                {intl.formatMessage({ id: 'ClientTable.submit' })}
-              </Button>
-            </div>
+            {!shouldHideSubmitBtn && (
+              <div className={css.submitBtnWrapper}>
+                <Button
+                  className={css.submitBtn}
+                  inProgress={createOrderInProgress}
+                  disabled={disabled}>
+                  {intl.formatMessage({ id: 'ClientTable.submit' })}
+                </Button>
+              </div>
+            )}
           </Form>
         );
       }}
