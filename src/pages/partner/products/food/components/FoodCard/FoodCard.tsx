@@ -89,6 +89,9 @@ const FoodCard: React.FC<TFoodCardProps> = (props) => {
     e.stopPropagation();
     await dispatch(partnerFoodSliceThunks.reApprovalFood({ foodId }));
     await dispatch(
+      partnerFoodSliceThunks.fetchApprovalFoods(EFoodApprovalState.DECLINED),
+    );
+    await dispatch(
       partnerFoodSliceThunks.fetchApprovalFoods(EFoodApprovalState.PENDING),
     );
   };
