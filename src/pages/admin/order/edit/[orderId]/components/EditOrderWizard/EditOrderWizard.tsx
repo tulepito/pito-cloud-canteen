@@ -1,0 +1,100 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
+
+import FormWizard from '@components/FormWizard/FormWizard';
+import { useAppDispatch } from '@hooks/reduxHooks';
+import { orderAsyncActions, resetOrder } from '@redux/slices/Order.slice';
+
+import css from './CreateOrderWizard.module.scss';
+
+export enum EEditOrderTab {
+  clientView = 'clientView',
+  orderSetup = 'orderSetup',
+  restaurantSetup = 'restaurantSetup',
+  manageFood = 'manageFood',
+  serviceAndNote = 'serviceAndNote',
+  review = 'review',
+}
+
+const EDIT_ORDER_TABS = [
+  EEditOrderTab.clientView,
+  EEditOrderTab.orderSetup,
+  EEditOrderTab.restaurantSetup,
+  EEditOrderTab.serviceAndNote,
+  EEditOrderTab.review,
+];
+
+const EditOrderTab: React.FC<any> = (props) => {
+  // eslint-disable-next-line unused-imports/no-unused-vars
+  const { tab, goBack, nextTab } = props;
+
+  switch (tab) {
+    case EEditOrderTab.clientView:
+    case EEditOrderTab.orderSetup:
+    case EEditOrderTab.restaurantSetup:
+    case EEditOrderTab.serviceAndNote:
+    case EEditOrderTab.manageFood:
+    case EEditOrderTab.review:
+    default:
+      return <></>;
+  }
+};
+
+const EditOrderWizard = () => {
+  const dispatch = useAppDispatch();
+  const router = useRouter();
+  const { orderId } = router.query;
+  const [, setCurrentStep] = useState<string>(EEditOrderTab.clientView);
+
+  useEffect(() => {
+    if (orderId) {
+      dispatch(orderAsyncActions.fetchOrder(orderId as string));
+    }
+  }, [dispatch, orderId]);
+
+  useEffect(() => {
+    return () => {
+      dispatch(resetOrder());
+    };
+  }, []);
+
+  const saveStep = (tab: string) => {
+    setCurrentStep(tab);
+  };
+
+  const nextTab = (tab: string) => () => {
+    const tabIndex = EDIT_ORDER_TABS.indexOf(tab as EEditOrderTab);
+
+    if (tabIndex < EDIT_ORDER_TABS.length - 1) {
+      const backTab = EDIT_ORDER_TABS[tabIndex + 1];
+      saveStep(backTab);
+    }
+  };
+
+  const goBack = (tab: string) => () => {
+    const tabIndex = EDIT_ORDER_TABS.indexOf(tab as EEditOrderTab);
+
+    if (tabIndex > 0) {
+      const backTab = EDIT_ORDER_TABS[tabIndex - 1];
+      saveStep(backTab);
+    }
+  };
+
+  return (
+    <FormWizard formTabNavClassName={css.formTabNav}>
+      {EDIT_ORDER_TABS.map((tab: string) => {
+        return (
+          <EditOrderTab
+            key={tab}
+            tab={tab}
+            nextTab={nextTab(tab)}
+            goBack={goBack(tab)}
+          />
+        );
+      })}
+    </FormWizard>
+  );
+};
+
+export default EditOrderWizard;
