@@ -7,17 +7,15 @@ import IconLightOutline from '@components/Icons/IconLightOutline/IconLightOutlin
 import AlertModal from '@components/Modal/AlertModal';
 import OutsideClickHandler from '@components/OutsideClickHandler/OutsideClickHandler';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
-import { isEnableToStartOrder, orderFlow } from '@helpers/orderHelper';
+import {
+  isEnableToStartOrder,
+  ORDER_STATE_TRANSIT_FLOW,
+} from '@helpers/orderHelper';
 import { useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { Listing } from '@src/utils/data';
-import {
-  EOrderDraftStates,
-  EOrderStates,
-  EOrderType,
-  getLabelByKey,
-  ORDER_STATES_OPTIONS,
-} from '@src/utils/enums';
+import { EOrderDraftStates, EOrderStates, EOrderType } from '@src/utils/enums';
+import { getLabelByKey, ORDER_STATE_OPTIONS } from '@src/utils/options';
 import { ETransition } from '@src/utils/transaction';
 import type {
   TListing,
@@ -62,7 +60,7 @@ const OrderHeaderState: React.FC<OrderHeaderStateProps> = (props) => {
   const { orderState, orderType = EOrderType.group } =
     orderListing.getMetadata();
   const orderStateLabel = useMemo(
-    () => getLabelByKey(ORDER_STATES_OPTIONS, orderState),
+    () => getLabelByKey(ORDER_STATE_OPTIONS, orderState),
     [orderState],
   );
   const statusClasses = classNames(css.status, {
@@ -90,7 +88,7 @@ const OrderHeaderState: React.FC<OrderHeaderStateProps> = (props) => {
   });
   const shouldManagePickingBtn =
     orderState === EOrderStates.inProgress && hasAnyInProgressSubOrdersMaybe;
-  const canCancelOrder = orderFlow?.[
+  const canCancelOrder = ORDER_STATE_TRANSIT_FLOW[
     orderState as TTransitionOrderState
   ]?.includes(EOrderStates.canceled);
 

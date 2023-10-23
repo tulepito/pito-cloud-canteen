@@ -55,7 +55,7 @@ const PartnerSubOrderDetailPage: React.FC<
     (state) => state.PartnerSubOrderDetail.fetchOrderInProgress,
   );
   const isFetchingOrderDetails = useAppSelector(
-    (state) => state.OrderManagement.isFetchingOrderDetails,
+    (state) => state.OrderManagement.fetchOrderInProgress,
   );
 
   const updateOrderModalContainer = useBoolean();
@@ -156,15 +156,15 @@ const PartnerSubOrderDetailPage: React.FC<
     updateOrderModalContainer.setFalse();
   };
 
-  const onGoBack = () => {
+  const handleGoBack = () => {
     router.push(partnerPaths.ManageOrders);
   };
 
   useEffect(() => {
-    if (subOrderId && isReady) {
+    if (subOrderId && date && isReady) {
       dispatch(PartnerSubOrderDetailThunks.loadData({ orderId, date }));
     }
-  }, [isReady, subOrderId]);
+  }, [isReady, subOrderId, date]);
 
   useEffect(() => {
     if (!fetchOrderInProgress && newUpdatedOrderNotification && hasAnyChanges) {
@@ -177,11 +177,6 @@ const PartnerSubOrderDetailPage: React.FC<
           newUpdatedOrderNotificationIds,
         ),
       );
-      dispatch(
-        NotificationActions.markNotificationsSeen(
-          newUpdatedOrderNotificationIds,
-        ),
-      );
     }
   }, [
     fetchOrderInProgress,
@@ -189,26 +184,11 @@ const PartnerSubOrderDetailPage: React.FC<
     JSON.stringify(newUpdatedOrderNotification),
   ]);
 
-  useEffect(() => {
-    return () => {
-      dispatch(
-        NotificationThunks.markNotificationsSeen(
-          newUpdatedOrderNotificationIds,
-        ),
-      );
-      dispatch(
-        NotificationActions.markNotificationsSeen(
-          newUpdatedOrderNotificationIds,
-        ),
-      );
-    };
-  }, []);
-
   return (
     <div className={css.root}>
       <RenderWhen condition={!isMobileLayout || isSummaryViewMode}>
         <>
-          <div className={css.goBackContainer} onClick={onGoBack}>
+          <div className={css.goBackContainer} onClick={handleGoBack}>
             <IconArrow direction="left" />
           </div>
           <SubOrderTitle />

@@ -1,12 +1,14 @@
 import { mapLimit } from 'async';
+import chunk from 'lodash/chunk';
 import compact from 'lodash/compact';
 import flatten from 'lodash/flatten';
 import isEmpty from 'lodash/isEmpty';
+import omit from 'lodash/omit';
 import uniq from 'lodash/uniq';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
+import { EHttpStatusCode } from '@apis/errors';
 import {
-  convertListIdToQueries,
   prepareNewOrderDetailPlan,
   queryAllListings,
 } from '@helpers/apiHelpers';
@@ -15,9 +17,9 @@ import { fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { createFirebaseDocNotification } from '@services/notifications';
 import { getSdk, handleError } from '@services/sdk';
-import { UserPermission } from '@src/types/UserPermission';
 import {
   EBookerOrderDraftStates,
+  ECompanyPermission,
   EListingType,
   ENotificationType,
   EOrderDraftStates,
@@ -41,21 +43,37 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     const { email: userEmail } = currentUserGetter.getAttributes();
     const { company: userCompany = {}, companyList = [] } =
       currentUserGetter.getMetadata();
-    const userId = User(currentUser).getId();
+    const userId = currentUserGetter.getId();
 
-    if (
-      userCompany[userId] &&
-      userCompany[userId].permission === UserPermission.PARTICIPANT
-    ) {
+    const companyAccount = await fetchUser(companyId);
+    const companyUserGetter = User(companyAccount);
+    const { companyName } = companyUserGetter.getPublicData();
+    const { members = {} } = companyUserGetter.getMetadata();
+    const userMember = members[userEmail] || {};
+
+    if (!isEmpty(userCompany)) {
+      if (
+        userCompany[companyId] &&
+        userCompany[companyId].permission in ECompanyPermission
+      ) {
+        return res.json({
+          statusCode: EHttpStatusCode.BadRequest,
+          message: 'User is already in company',
+        });
+      }
+
+      await integrationSdk.users.updateProfile({
+        id: companyId,
+        metadata: {
+          members: omit(members, [userEmail]),
+        },
+      });
+
       return res.json({
-        message: 'userAccept',
+        statusCode: EHttpStatusCode.BadRequest,
+        error: `User already has company`,
       });
     }
-    const companyAccount = await fetchUser(companyId);
-    const companyUser = User(companyAccount);
-    const { companyName } = companyUser.getPublicData();
-    const { members = {} } = companyUser.getMetadata();
-    const userMember = members[userEmail];
 
     if (isEmpty(userMember)) {
       return res.json({
@@ -85,7 +103,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           company: {
             ...userCompany,
             [companyId]: {
-              permission: UserPermission.PARTICIPANT,
+              permission:
+                userMember.permission || ECompanyPermission.participant,
             },
           },
         },
@@ -113,7 +132,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         meta_selectedGroups: 'has_any:allMembers',
       },
     });
-    const allNeedUpdatePlanIds = uniq(
+    const allNeedUpdatePlanIds: string[] = uniq(
       compact(
         allNeedOrders.map((order: TListing) => {
           const { plans = [] } = Listing(order).getMetadata();
@@ -122,12 +141,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         }),
       ),
     );
-    const planQueries = convertListIdToQueries({
-      idList: allNeedUpdatePlanIds,
-    });
+
     const allNeedUpdatePlans: TListing[] = flatten(
       await Promise.all(
-        planQueries.map(async ({ ids }) => {
+        chunk<string>(allNeedUpdatePlanIds, 100).map(async (ids) => {
           return denormalisedResponseEntities(
             await integrationSdk.listings.query({
               ids,

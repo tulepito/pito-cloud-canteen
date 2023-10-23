@@ -1,7 +1,7 @@
 import { CustomError } from '@apis/errors';
 import { fetchUser, fetchUserByEmail } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
-import { UserPermission } from '@src/types/UserPermission';
+import { ECompanyPermission } from '@src/utils/enums';
 import { denormalisedResponseEntities, User } from '@utils/data';
 import type { TCompany, TObject } from '@utils/types';
 
@@ -23,7 +23,7 @@ const updateMemberCompanyData = async ({
   companyId,
 }: {
   email: string;
-  permission: UserPermission;
+  permission: ECompanyPermission;
   companyId: string;
 }) => {
   try {
@@ -86,9 +86,9 @@ const updateMemberPermissionFn = async ({
 }: {
   companyId: string;
   memberEmail: string;
-  permission: UserPermission;
+  permission: ECompanyPermission;
 }) => {
-  if (permission === UserPermission.OWNER) {
+  if (permission === ECompanyPermission.owner) {
     throw new CustomError('Forbidden', 403, {
       errors: [
         {
@@ -102,7 +102,7 @@ const updateMemberPermissionFn = async ({
   }
   const company = await fetchUser(companyId);
 
-  const intergrationSdk = getIntegrationSdk();
+  const integrationSdk = getIntegrationSdk();
 
   const { members = {} } = User(company as unknown as TCompany).getMetadata();
 
@@ -131,7 +131,7 @@ const updateMemberPermissionFn = async ({
     {},
   );
 
-  const response = await intergrationSdk.users.updateProfile(
+  const response = await integrationSdk.users.updateProfile(
     {
       id: companyId,
       metadata: { members: newMembers },

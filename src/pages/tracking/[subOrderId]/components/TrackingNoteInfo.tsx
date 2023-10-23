@@ -27,24 +27,31 @@ const TrackingNoteInfo: React.FC<TTrackingOrderInfoProps> = () => {
   const isGroupOrder = orderType === EOrderType.group;
   const { note: bookerSubOrderNote } = orderDetailOfDate || {};
 
+  const hasGroupOrderNote = isGroupOrder && !isEmpty(bookerOrderNote);
+  const hasNormalOrderNote = !isGroupOrder && !isEmpty(bookerSubOrderNote);
+  const hasAnyNotes = hasGroupOrderNote || hasNormalOrderNote;
+
   return (
     <Collapsible
       label={intl.formatMessage({
         id: 'Tracking.NoteInfo.title',
       })}>
-      <div className={css.note}>
-        <RenderWhen condition={!loadDataInProgress}>
-          <RenderWhen condition={isGroupOrder && !isEmpty(bookerOrderNote)}>
-            <>{bookerOrderNote}</>
+      <RenderWhen condition={loadDataInProgress}>
+        <Skeleton className={css.loading} />
+
+        <RenderWhen.False>
+          <RenderWhen condition={hasAnyNotes}>
+            <div className={css.note}>
+              <RenderWhen condition={hasGroupOrderNote}>
+                <>{bookerOrderNote}</>
+              </RenderWhen>
+              <RenderWhen condition={hasNormalOrderNote}>
+                <>{bookerSubOrderNote}</>
+              </RenderWhen>
+            </div>
           </RenderWhen>
-          <RenderWhen condition={!isGroupOrder && !isEmpty(bookerSubOrderNote)}>
-            <>{bookerSubOrderNote}</>
-          </RenderWhen>
-          <RenderWhen.False>
-            <Skeleton className={css.loading} />
-          </RenderWhen.False>
-        </RenderWhen>
-      </div>
+        </RenderWhen.False>
+      </RenderWhen>
     </Collapsible>
   );
 };

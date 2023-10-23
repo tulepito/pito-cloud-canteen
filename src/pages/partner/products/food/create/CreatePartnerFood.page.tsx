@@ -11,7 +11,7 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { resetImage } from '@redux/slices/uploadImage.slice';
 import { partnerPaths } from '@src/paths';
 import { CurrentUser, IntegrationListing } from '@utils/data';
-import { EFoodTypes, EMenuTypes } from '@utils/enums';
+import { EFoodType, EMenuType } from '@utils/enums';
 import { getInitialAddImages } from '@utils/images';
 import type { TKeyValue, TObject } from '@utils/types';
 
@@ -169,8 +169,8 @@ const CreatePartnerFoodPage = () => {
       title,
       description,
       price: price?.amount,
-      menuType: menuType || EMenuTypes.cycleMenu,
-      foodType: foodType || EFoodTypes.savoryDish,
+      menuType: menuType || EMenuType.cycleMenu,
+      foodType: foodType || EFoodType.savoryDish,
       minOrderHourInAdvance: 24,
       minQuantity,
       maxQuantity,

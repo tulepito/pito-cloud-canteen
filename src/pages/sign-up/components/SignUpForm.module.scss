@@ -30,7 +30,7 @@
 }
 
 .formTitle {
-  color: $neutralGray6;
+  color: $neutralGray7;
   @include textTemplate(24px, $fontWeightBold, 32px);
   text-transform: capitalize;
 
@@ -41,7 +41,7 @@
 
 .policyText {
   @include textTemplate(14px, $fontWeightRegular, 20px);
-  color: $neutralGray5;
+  color: $neutralGray6;
 }
 
 .privacyPolicyText {

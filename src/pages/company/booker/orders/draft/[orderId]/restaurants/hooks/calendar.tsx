@@ -160,12 +160,14 @@ export const useGetCalendarComponentProps = ({
   isFinishOrderDisabled,
   handleFinishOrder,
   order,
+  shouldHideDayItems = false,
 }: {
   startDate: Date;
   endDate: Date;
   isFinishOrderDisabled: boolean;
   handleFinishOrder: () => Promise<void>;
   order: TListing | null;
+  shouldHideDayItems: boolean;
 }) => {
   const router = useRouter();
   const dispatch = useAppDispatch();
@@ -243,9 +245,9 @@ export const useGetCalendarComponentProps = ({
   const componentsProps = useMemo(() => {
     return {
       toolbar: toolbarComponent,
-      contentEnd: contentEndComponent,
+      contentEnd: shouldHideDayItems ? () => null : contentEndComponent,
     };
-  }, [toolbarComponent, contentEndComponent]);
+  }, [shouldHideDayItems, toolbarComponent, contentEndComponent]);
 
   return componentsProps;
 };

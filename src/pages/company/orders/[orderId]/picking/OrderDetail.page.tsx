@@ -189,7 +189,7 @@ const OrderDetailPage = () => {
     (state) => state.SystemAttributes.systemVATPercentage,
   );
   const isFetchingOrderDetails = useAppSelector(
-    (state) => state.OrderManagement.isFetchingOrderDetails,
+    (state) => state.OrderManagement.fetchOrderInProgress,
   );
 
   const {

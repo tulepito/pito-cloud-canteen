@@ -1,9 +1,11 @@
 import { createSlice } from '@reduxjs/toolkit';
 import groupBy from 'lodash/groupBy';
+import uniq from 'lodash/uniq';
 
 import {
   createPaymentRecordApi,
   getPartnerPaymentRecordsApi,
+  transitionOrderPaymentStatusApi,
 } from '@apis/admin';
 import { createAsyncThunk } from '@redux/redux.helper';
 import type { TObject } from '@src/utils/types';
@@ -67,6 +69,9 @@ const createPartnerPaymentRecords = createAsyncThunk(
   CREATE_PARTNER_PAYMENT_RECORDS,
   async (payload: any[], { getState }) => {
     const { paymentPartnerRecords } = getState().PaymentPartner;
+
+    const orderIdList: string[] = uniq(payload.map(({ orderId }) => orderId));
+
     const newPartnerPaymentRecords = await Promise.all(
       payload.map(async (paymentRecord) => {
         const { paymentType } = paymentRecord;
@@ -82,6 +87,9 @@ const createPartnerPaymentRecords = createAsyncThunk(
 
         return newPartnerPaymentRecord;
       }),
+    );
+    orderIdList.map(async (orderId: string) =>
+      transitionOrderPaymentStatusApi(orderId, ''),
     );
 
     const mergedPaymentPartnerRecords = newPartnerPaymentRecords.reduce(

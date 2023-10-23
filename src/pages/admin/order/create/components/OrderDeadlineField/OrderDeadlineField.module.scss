@@ -51,11 +51,11 @@
 
 .tooltipOverlay :global(.rc-tooltip-inner) {
   opacity: 1;
-  background-color: $neutralGray6;
+  background-color: $neutralGray7;
 }
 
 .tooltipOverlay :global(.rc-tooltip-arrow) {
-  border-color: $neutralGray6;
+  border-color: $neutralGray7;
   border-right-color: $neutralGray1;
   border-left-color: $neutralGray1;
 }
@@ -65,5 +65,5 @@
 }
 
 .optionPlaceholder {
-  color: $neutralGray4;
+  color: $neutralGray5;
 }

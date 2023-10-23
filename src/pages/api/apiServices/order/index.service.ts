@@ -149,14 +149,9 @@ const reorder = async (
   isCreatedByAdmin?: boolean,
 ) => {
   const integrationSdk = getIntegrationSdk();
-  const response = await integrationSdk.listings.show(
-    {
-      id: orderIdToReOrder,
-    },
-    {
-      expand: true,
-    },
-  );
+  const response = await integrationSdk.listings.show({
+    id: orderIdToReOrder,
+  });
   const [oldOrder] = denormalisedResponseEntities(response);
   const {
     companyId,
@@ -208,11 +203,10 @@ const reorder = async (
   });
   const plans = await Promise.all(
     oldPlans.map(async (id: string, index: number) => {
-      const planResponse = await integrationSdk.listings.show(
-        { id },
-        { expand: true },
+      const [oldPlan] = denormalisedResponseEntities(
+        await integrationSdk.listings.show({ id }),
       );
-      const [oldPlan] = denormalisedResponseEntities(planResponse);
+
       const { orderDetail = {} } = Listing(oldPlan).getMetadata();
       const updatedOrderDetail = Object.keys(orderDetail).reduce(
         (result, date) => {

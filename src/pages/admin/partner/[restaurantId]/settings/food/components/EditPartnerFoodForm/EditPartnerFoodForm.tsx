@@ -24,15 +24,14 @@ import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { foodSliceAction, foodSliceThunks } from '@redux/slices/foods.slice';
-import type { TKeyValue } from '@src/utils/types';
+import { EFoodApprovalState, EImageVariants } from '@src/utils/enums';
 import {
-  EFoodApprovalState,
-  EImageVariants,
+  FOOD_SIDE_DISH_OPTIONS,
   FOOD_TYPE_OPTIONS,
-  MENU_OPTIONS,
+  MENU_TYPE_OPTIONS,
   OTHER_OPTION,
-  SIDE_DISH_OPTIONS,
-} from '@utils/enums';
+} from '@src/utils/options';
+import type { TKeyValue } from '@src/utils/types';
 import { pickRenderableImages } from '@utils/images';
 import {
   composeValidators,
@@ -85,14 +84,16 @@ const EditPartnerFoodFormComponent: React.FC<
   const dispatch = useAppDispatch();
   const ready = isEqual(submittedValues, values);
   const {
+    nutritions: nutritionsOptions = [],
+    categories: categoriesOptions = [],
+    packaging: packagingOptions = [],
+  } = useAppSelector((state) => state.SystemAttributes, shallowEqual);
+  const {
     uploadedImages,
     uploadedImagesOrder,
     removedImageIds,
     uploadImageError,
     currentFoodListing = {},
-    nutritions: nutritionsOptions = [],
-    categories: categoriesOptions = [],
-    packaging: packagingOptions = [],
   } = useAppSelector((state) => state.foods, shallowEqual);
   const [responseApprovalRequest, setResponseApprovalRequest] =
     useState<string>('');
@@ -190,7 +191,7 @@ const EditPartnerFoodFormComponent: React.FC<
         <label className={css.label}>
           {intl.formatMessage({ id: 'EditPartnerFoodForm.menuLabel' })}
         </label>
-        {MENU_OPTIONS.map((option) => (
+        {MENU_TYPE_OPTIONS.map((option) => (
           <FieldRadioButton
             key={option.key}
             name="menuType"
@@ -497,7 +498,7 @@ const EditPartnerFoodFormComponent: React.FC<
           label={intl.formatMessage({
             id: 'EditPartnerFoodForm.sideDishLabel',
           })}
-          options={SIDE_DISH_OPTIONS}
+          options={FOOD_SIDE_DISH_OPTIONS}
         />
         <div className={css.field}></div>
       </div>

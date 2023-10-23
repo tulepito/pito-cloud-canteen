@@ -15,7 +15,7 @@ import {
   companyThunks,
 } from '@redux/slices/company.slice';
 import { companyMemberThunks } from '@redux/slices/companyMember.slice';
-import { ALLERGIES_OPTIONS, getLabelByKey } from '@src/utils/enums';
+import { ALLERGIES_OPTIONS, getLabelByKey } from '@src/utils/options';
 import { User } from '@utils/data';
 import type { TUser } from '@utils/types';
 
@@ -49,7 +49,7 @@ const GroupMemberDetailPage: React.FC<GroupMemberDetailPageProps> = () => {
     (state) => state.companyMember.deleteMemberError,
   );
   const nutritions = useAppSelector(
-    (state) => state.company.nutritions,
+    (state) => state.SystemAttributes.nutritions,
     shallowEqual,
   );
   const companyMember = getMemberById(
@@ -66,7 +66,6 @@ const GroupMemberDetailPage: React.FC<GroupMemberDetailPageProps> = () => {
     const fetchData = async () => {
       dispatch(addWorkspaceCompanyId(companyId));
       await dispatch(companyThunks.companyInfo());
-      await dispatch(companyThunks.fetchAttributes());
     };
     if (companyId) fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -52,7 +52,7 @@
 
           .VATBadge {
             span {
-              color: $neutralGray5;
+              color: $neutralGray6;
             }
           }
         }
@@ -63,7 +63,7 @@
         }
 
         &.VATItemContainer {
-          color: $neutralGray5;
+          color: $neutralGray6;
         }
       }
 
@@ -87,7 +87,7 @@
       .totalDescription {
         margin-top: 4px;
         text-align: right;
-        color: $neutralGray5;
+        color: $neutralGray6;
         @include textTemplate(12px, 600, 16px);
       }
     }

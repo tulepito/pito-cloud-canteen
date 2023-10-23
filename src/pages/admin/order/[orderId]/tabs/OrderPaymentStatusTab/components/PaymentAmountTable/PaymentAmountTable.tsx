@@ -30,7 +30,13 @@ const PaymentAmountTable: React.FC<PaymentAmountTableProps> = (props) => {
         <div className={css.row}>
           <span>Còn lại</span>
           <span>
-            {parseThousandNumber((totalPrice - paidAmount).toString())}đ
+            {parseThousandNumber(
+              (paidAmount >= totalPrice
+                ? 0
+                : totalPrice - paidAmount
+              ).toString(),
+            )}
+            đ
           </span>
         </div>
       </div>

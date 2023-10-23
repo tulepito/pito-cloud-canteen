@@ -40,7 +40,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           if (!isEmpty(participants)) {
             const participantData = denormalisedResponseEntities(
               await integrationSdk.users.query({
-                ids: participants,
+                meta_id: participants,
               }),
             );
 
@@ -52,7 +52,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           if (!isEmpty(anonymous)) {
             const anonymousParticipantData = denormalisedResponseEntities(
               await integrationSdk.users.query({
-                ids: anonymous,
+                meta_id: anonymous,
               }),
             );
 

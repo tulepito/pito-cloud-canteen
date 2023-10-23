@@ -3,8 +3,10 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { shallowEqual } from 'react-redux';
 import isEmpty from 'lodash/isEmpty';
+import Image from 'next/image';
 import { useRouter } from 'next/router';
 
+import Button from '@components/Button/Button';
 import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
 import MealPlanCard from '@components/CalendarDashboard/components/MealPlanCard/MealPlanCard';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
@@ -20,10 +22,12 @@ import { orderAsyncActions } from '@redux/slices/Order.slice';
 import { QuizActions } from '@redux/slices/Quiz.slice';
 import { currentUserSelector } from '@redux/slices/user.slice';
 import { companyPaths } from '@src/paths';
+import Gleap from '@src/utils/gleap';
 import { Listing, User } from '@utils/data';
 import { EBookerOrderDraftStates, EOrderDraftStates } from '@utils/enums';
 import type { TListing, TUser } from '@utils/types';
 
+import emptyResultImg from '../../../../../../assets/emptyResult.png';
 import Layout from '../../components/Layout/Layout';
 import LayoutMain from '../../components/Layout/LayoutMain';
 import LayoutSidebar from '../../components/Layout/LayoutSidebar';
@@ -75,6 +79,9 @@ function BookerDraftOrderPage() {
   );
   const fetchRestaurantFoodInProgress = useAppSelector(
     (state) => state.BookerSelectRestaurant.fetchRestaurantFoodInProgress,
+  );
+  const isAllDatesHaveNoRestaurants = useAppSelector(
+    (state) => state.Order.isAllDatesHaveNoRestaurants,
   );
   const searchInProgress = useAppSelector(
     (state) => state.BookerSelectRestaurant.searchInProgress,
@@ -181,6 +188,7 @@ function BookerDraftOrderPage() {
     isFinishOrderDisabled,
     handleFinishOrder,
     order,
+    shouldHideDayItems: isAllDatesHaveNoRestaurants,
   });
 
   useEffect(() => {
@@ -255,6 +263,10 @@ function BookerDraftOrderPage() {
     dispatch(OrderListThunks.disableWalkthrough(currentUserId));
   };
 
+  const onChatClick = () => {
+    Gleap.openChat();
+  };
+
   return (
     <WalkThroughTourProvider onCloseTour={handleCloseWalkThrough}>
       <Layout className={css.root}>
@@ -292,6 +304,29 @@ function BookerDraftOrderPage() {
               }}
               components={componentsProps}
             />
+
+            <RenderWhen condition={isAllDatesHaveNoRestaurants}>
+              <div className={css.emptyResult}>
+                <div className={css.emptyResultImg}>
+                  <Image src={emptyResultImg} alt="empty result" />
+                </div>
+                <div className={css.emptyTitle}>
+                  <p>Không tìm thấy kết quả phù hợp</p>
+                  <p className={css.emptyContent}>
+                    Rất tiếc, hệ thống chúng tôi không tìm thấy kết quả phù hợp
+                    với yêu cầu của bạn. Tuy nhiên, đừng ngần ngại{' '}
+                    <span>chat với chúng tôi để tìm thấy menu nhanh nhất</span>{' '}
+                    nhé.
+                  </p>
+                  <Button
+                    className={css.contactUsBtn}
+                    variant="secondary"
+                    onClick={onChatClick}>
+                    Chat với chúng tôi
+                  </Button>
+                </div>
+              </div>
+            </RenderWhen>
           </div>
           <RenderWhen condition={walkthroughEnable}>
             <WelcomeModal

@@ -1,19 +1,15 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 
-import { useAppDispatch } from '@hooks/reduxHooks';
-import { AdminAttributesThunks } from '@pages/admin/Attributes.slice';
+import MetaWrapper from '@components/MetaWrapper/MetaWrapper';
 
 import CreatePartnerFoodPage from './CreatePartnerFood.page';
 
-const CreatePartnerFoodRoute = () => {
-  const dispatch = useAppDispatch();
-
-  useEffect(() => {
-    dispatch(AdminAttributesThunks.fetchAttributes());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  return <CreatePartnerFoodPage />;
+const AdminCreatePartnerFoodRoute = () => {
+  return (
+    <MetaWrapper routeName="AdminCreatePartnerFoodRoute">
+      <CreatePartnerFoodPage />;
+    </MetaWrapper>
+  );
 };
 
-export default CreatePartnerFoodRoute;
+export default AdminCreatePartnerFoodRoute;

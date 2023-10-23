@@ -22,9 +22,8 @@ import {
   EFoodApprovalState,
   EImageVariants,
   FOOD_APPROVAL_STATE_OPTIONS,
-  FOOD_TYPE_OPTIONS,
-  getLabelByKey,
 } from '@src/utils/enums';
+import { FOOD_TYPE_OPTIONS, getLabelByKey } from '@src/utils/options';
 import type { TListing } from '@src/utils/types';
 
 import { partnerFoodSliceThunks } from '../../PartnerFood.slice';

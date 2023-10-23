@@ -1,4 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
+import compact from 'lodash/compact';
+import isEmpty from 'lodash/isEmpty';
 import isNumber from 'lodash/isNumber';
 import isString from 'lodash/isString';
 import uniq from 'lodash/uniq';
@@ -19,25 +21,23 @@ import {
   queryOrdersApi,
   recommendRestaurantApi,
   reorderApi,
-  requestApprovalOrderApi,
   updateOrderApi,
   updateOrderStateToDraftApi,
   updatePlanDetailsApi,
 } from '@apis/orderApi';
-import { fetchSearchFilterApi } from '@apis/userApi';
 import { queryAllPages } from '@helpers/apiHelpers';
 import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
 import { getMenuQueryInSpecificDay } from '@helpers/listingSearchQuery';
 import { createAsyncThunk } from '@redux/redux.helper';
 import config from '@src/configs';
-import { CompanyPermission } from '@src/types/UserPermission';
+import { CompanyPermissions } from '@src/types/UserPermission';
 import { denormalisedResponseEntities, Listing, User } from '@utils/data';
 import {
+  ECompanyDashboardNotificationType,
   EInvalidRestaurantCase,
   EListingStates,
   EListingType,
   EManageCompanyOrdersTab,
-  ENotificationTypes,
   ERestaurantListingStatus,
   MANAGE_COMPANY_ORDERS_TAB_MAP,
 } from '@utils/enums';
@@ -114,6 +114,7 @@ type TOrderInitialState = {
   fetchRestaurantCoverImageInProgress: boolean;
   fetchRestaurantCoverImageError: any;
 
+  isAllDatesHaveNoRestaurants: boolean;
   recommendRestaurantInProgress: boolean;
   recommendRestaurantError: any;
 
@@ -126,10 +127,6 @@ type TOrderInitialState = {
   onRescommendRestaurantForSpecificDateInProgress: boolean;
   onRescommendRestaurantForSpecificDateError: any;
 
-  nutritions: {
-    key: string;
-    label: string;
-  }[];
   availableOrderDetailCheckList: {
     [timestamp: string]: {
       isAvailable: boolean;
@@ -228,16 +225,17 @@ const initialState: TOrderInitialState = {
   getOrderNotificationInProgress: false,
   getOrderNotificationError: null,
   companyOrderNotificationMap: {
-    [ENotificationTypes.completedOrder]: null,
-    [ENotificationTypes.deadlineDueOrder]: null,
-    [ENotificationTypes.draftOrder]: null,
-    [ENotificationTypes.pickingOrder]: null,
+    [ECompanyDashboardNotificationType.completedOrder]: null,
+    [ECompanyDashboardNotificationType.deadlineDueOrder]: null,
+    [ECompanyDashboardNotificationType.draftOrder]: null,
+    [ECompanyDashboardNotificationType.pickingOrder]: null,
   },
 
   restaurantCoverImageList: {},
   fetchRestaurantCoverImageInProgress: false,
   fetchRestaurantCoverImageError: null,
 
+  isAllDatesHaveNoRestaurants: false,
   recommendRestaurantInProgress: false,
   recommendRestaurantError: null,
   step2SubmitInProgress: false,
@@ -249,7 +247,6 @@ const initialState: TOrderInitialState = {
   onRescommendRestaurantForSpecificDateInProgress: false,
   onRescommendRestaurantForSpecificDateError: null,
 
-  nutritions: [],
   availableOrderDetailCheckList: {},
   orderRestaurantList: [],
   fetchOrderRestaurantListInProgress: false,
@@ -294,7 +291,6 @@ const FETCH_RESTAURANT_COVER_IMAGE = 'app/Order/FETCH_RESTAURANT_COVER_IMAGE';
 const RECOMMEND_RESTAURANT = 'app/Order/RECOMMEND_RESTAURANT';
 const RECOMMEND_RESTAURANT_FOR_SPECIFIC_DAY =
   'app/Order/RECOMMEND_RESTAURANT_FOR_SPECIFIC_DAY';
-const FETCH_NUTRITIONS = 'app/Order/FETCH_NUTRITIONS';
 const CHECK_RESTAURANT_STILL_AVAILABLE =
   'app/Order/CHECK_RESTAURANT_STILL_AVAILABLE';
 const FETCH_ORDER_RESTAURANTS = 'app/Order/FETCH_ORDER_RESTAURANTS';
@@ -423,9 +419,7 @@ const queryAllOrders = createAsyncThunk(
         ...payload,
         states: EListingStates.published,
       },
-      queryParams: {
-        expand: true,
-      },
+      queryParams: {},
       isQueryAllPages: true,
     };
 
@@ -445,9 +439,7 @@ const queryCompanyPlansByOrderIds = createAsyncThunk(
       dataParams: {
         meta_orderId: orderIds.join(','),
       },
-      queryParams: {
-        expand: true,
-      },
+      queryParams: {},
     };
 
     const { data } = await companyApi.queryCompanyPlansByOrderIdsApi(
@@ -466,11 +458,11 @@ const queryTotalOrderCountByTab = createAsyncThunk(
   'app/Orders/QUERY_TOTAL_ORDER_COUNT_BY_TAB',
   async (payload: TObject) => {
     const {
-      bookerId,
       companyId,
       currentTab = EManageCompanyOrdersTab.ALL,
       page,
       pagination,
+      ...rest
     } = payload;
     const { totalItems = 0, totalPages = 1 } = pagination;
 
@@ -496,12 +488,11 @@ const queryTotalOrderCountByTab = createAsyncThunk(
           {
             perPage: MANAGE_ORDER_PAGE_SIZE,
             states: EListingStates.published,
-            meta_bookerId: bookerId,
-            meta_companyId: companyId,
             meta_listingType: EListingType.order,
             sort: 'createdAt',
             meta_orderState: parsedStates,
             tab: key,
+            ...rest,
           },
         ]),
       [],
@@ -533,11 +524,13 @@ const queryTotalOrderCountByTab = createAsyncThunk(
 const queryCompanyOrders = createAsyncThunk(
   'app/Orders/COMPANY_QUERY_ORDERS',
   async (payload: TObject, { rejectWithValue, dispatch, getState }) => {
-    const { companyId = '', bookerId, ...restPayload } = payload;
-
-    if (companyId === '') {
-      return rejectWithValue('Company ID is empty');
-    }
+    const {
+      companyId = '',
+      bookerId,
+      authorId,
+      currentTab,
+      ...restPayload
+    } = payload;
 
     if (!bookerId) {
       return rejectWithValue('Booker ID is empty');
@@ -548,14 +541,12 @@ const queryCompanyOrders = createAsyncThunk(
         ...restPayload,
         perPage: MANAGE_ORDER_PAGE_SIZE,
         states: EListingStates.published,
-        meta_companyId: companyId,
-        meta_bookerId: bookerId,
+        ...(authorId ? { authorId } : {}),
+        ...(companyId !== bookerId ? { meta_bookerId: bookerId } : {}),
         meta_listingType: EListingType.order,
         sort: 'createdAt',
       },
-      queryParams: {
-        expand: true,
-      },
+      queryParams: {},
     };
     const { data: response } = await companyApi.queryOrdersApi(
       companyId,
@@ -574,12 +565,13 @@ const queryCompanyOrders = createAsyncThunk(
 
     const alreadyFetchOrderCount = !!getState().Order.totalItemMap;
 
-    if (!alreadyFetchOrderCount) {
+    if (!isEmpty(authorId) && !alreadyFetchOrderCount) {
       dispatch(
         queryTotalOrderCountByTab({
-          bookerId,
+          ...(authorId ? { authorId } : {}),
+          ...(companyId !== bookerId ? { meta_bookerId: bookerId } : {}),
           companyId,
-          currentTab: restPayload.currentTab,
+          currentTab,
           page: restPayload.page,
           pagination,
         }),
@@ -597,16 +589,13 @@ const fetchCompanyBookers = createAsyncThunk(
   FETCH_COMPANY_BOOKERS,
   async (companyId: string, { extra: sdk }) => {
     const companyAccount = denormalisedResponseEntities(
-      await sdk.users.show(
-        {
-          id: companyId,
-        },
-        { expand: true },
-      ),
+      await sdk.users.show({
+        id: companyId,
+      }),
     )[0];
     const { members = {} } = User(companyAccount).getMetadata();
     const bookerEmails = Object.keys(members).filter((email) =>
-      CompanyPermission.includes(members[email].permission),
+      CompanyPermissions.includes(members[email].permission),
     );
     const bookers = await Promise.all(
       bookerEmails.map(async (email) => {
@@ -641,9 +630,10 @@ const fetchRestaurantCoverImages = createAsyncThunk(
   FETCH_RESTAURANT_COVER_IMAGE,
   async (_, { extra: sdk, getState }) => {
     const { orderDetail = {} } = getState().Order;
-    const restaurantIdList = uniq(
-      Object.values(orderDetail).map((item: any) => item.restaurant.id),
+    const restaurantIdList = compact(
+      uniq(Object.values(orderDetail).map((item: any) => item?.restaurant?.id)),
     );
+
     const restaurantCoverImageList = await Promise.all(
       restaurantIdList.map(async (restaurantId) => {
         const restaurantResponse = denormalisedResponseEntities(
@@ -745,15 +735,6 @@ const bookerDeleteDraftOrder = createAsyncThunk(
   },
 );
 
-const requestApprovalOrder = createAsyncThunk(
-  'app/Order/REQUEST_APPROVAL_ORDER',
-  async ({ orderId }: TObject) => {
-    const { data: responseData } = await requestApprovalOrderApi(orderId);
-
-    return responseData;
-  },
-);
-
 const cancelPendingApprovalOrder = createAsyncThunk(
   'app/Order/CANCEL_PENDING_APPROVAL_ORDER',
   async ({ orderId }: TObject, { getState, dispatch }) => {
@@ -778,12 +759,6 @@ const bookerPublishOrder = createAsyncThunk(
     serializeError: storableError,
   },
 );
-
-const fetchNutritions = createAsyncThunk(FETCH_NUTRITIONS, async () => {
-  const { data: searchFiltersResponse } = await fetchSearchFilterApi();
-
-  return searchFiltersResponse.nutritions;
-});
 
 const checkRestaurantStillAvailable = createAsyncThunk(
   CHECK_RESTAURANT_STILL_AVAILABLE,
@@ -956,13 +931,11 @@ export const orderAsyncActions = {
   queryCompanyOrders,
   fetchPlanDetail,
   updatePlanDetail,
-  requestApprovalOrder,
   bookerPublishOrder,
   cancelPendingApprovalOrder,
   fetchRestaurantCoverImages,
   recommendRestaurants,
   recommendRestaurantForSpecificDay,
-  fetchNutritions,
   checkRestaurantStillAvailable,
   fetchOrderRestaurants,
   getCompanyOrderNotification,
@@ -1251,22 +1224,6 @@ const orderSlice = createSlice({
         updateOrderDetailInProgress: false,
         updateOrderDetailError: error.message,
       }))
-      /* =============== requestApprovalOrder =============== */
-      .addCase(requestApprovalOrder.pending, (state) => ({
-        ...state,
-        updateOrderInProgress: true,
-        updateOrderError: null,
-      }))
-      .addCase(requestApprovalOrder.fulfilled, (state, { payload }) => ({
-        ...state,
-        updateOrderInProgress: false,
-        order: payload,
-      }))
-      .addCase(requestApprovalOrder.rejected, (state, { error }) => ({
-        ...state,
-        updateOrderInProgress: false,
-        updateOrderError: error.message,
-      }))
       /* =============== cancelNeedApprovalOrder =============== */
       .addCase(cancelPendingApprovalOrder.pending, (state) => ({
         ...state,
@@ -1317,10 +1274,12 @@ const orderSlice = createSlice({
         recommendRestaurantInProgress: true,
         recommendRestaurantError: null,
       }))
-      .addCase(recommendRestaurants.fulfilled, (state) => ({
-        ...state,
-        recommendRestaurantInProgress: false,
-      }))
+      .addCase(recommendRestaurants.fulfilled, (state, { payload }) => {
+        state.isAllDatesHaveNoRestaurants = Object.values(payload).every(
+          ({ hasNoRestaurants = false }: any) => hasNoRestaurants,
+        );
+        state.recommendRestaurantInProgress = false;
+      })
       .addCase(recommendRestaurants.rejected, (state, { error }) => ({
         ...state,
         recommendRestaurantInProgress: false,
@@ -1348,11 +1307,6 @@ const orderSlice = createSlice({
           onRescommendRestaurantForSpecificDateError: error.message,
         }),
       )
-
-      .addCase(fetchNutritions.fulfilled, (state, { payload }) => ({
-        ...state,
-        nutritions: payload,
-      }))
 
       .addCase(checkRestaurantStillAvailable.pending, () => {})
       .addCase(

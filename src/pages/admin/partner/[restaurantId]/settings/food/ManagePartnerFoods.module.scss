@@ -26,11 +26,16 @@
 }
 
 .actionBtn {
+  display: inline-flex !important;
   margin: 0 10px;
 }
 
+.iconLoading {
+  stroke: $neutralGray6;
+}
+
 .filterIcon {
-  fill: $neutralGray6;
+  fill: $neutralGray7;
   width: 20px;
   margin-right: 10px;
 }
@@ -59,13 +64,13 @@
 .titleRow {
   min-width: 200px;
   display: block;
-  color: $neutralGray6;
+  color: $neutralGray7;
 }
 
 .secondaryButton {
   @include buttonColorSecondary;
   background-color: $neutralGray2;
-  outline: 1px solid $neutralGray4;
+  outline: 1px solid $neutralGray5;
 
   &:focus,
   &:hover {
@@ -142,7 +147,7 @@
 }
 
 .iconSpinner {
-  stroke: $neutralGray5;
+  stroke: $neutralGray6;
 }
 
 .buttonIcon {
@@ -168,14 +173,14 @@
 .removeTitle {
   font-weight: $fontWeightBold;
   font-size: 20px;
-  color: $neutralGray6;
+  color: $neutralGray7;
   margin-bottom: 28px;
 }
 
 .removeContent {
   font-size: 14px;
   font-weight: $fontWeightRegular;
-  color: $neutralGray5;
+  color: $neutralGray6;
   margin: 0;
 }
 
@@ -184,15 +189,15 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: $neutralGray6;
+  color: $neutralGray7;
   font-weight: $fontWeightBold;
   font-size: 14px;
 }
 
 .disabled {
-  color: $neutralGray5;
+  color: $neutralGray6;
   path {
-    fill: $neutralGray5;
+    fill: $neutralGray6;
   }
 }
 
@@ -221,27 +226,27 @@
 .fileLabel {
   width: 100%;
   min-height: 200px;
-  border: 1px dashed $neutralGray5;
+  border: 1px dashed $neutralGray6;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: $neutralGray5;
+  color: $neutralGray6;
 }
 
 .importTitle {
-  color: $neutralGray6;
+  color: $neutralGray7;
   margin: 0 0 30px 0;
 }
 
 .importLabel {
-  color: $neutralGray6;
+  color: $neutralGray7;
   margin-bottom: 30px;
 }
 
 .downloadFileHere {
-  color: $neutralGray5;
+  color: $neutralGray6;
   a {
-    color: $neutralGray6;
+    color: $neutralGray7;
     font-weight: $fontWeightBold;
   }
 }

@@ -1,3 +1,9 @@
+import MetaWrapper from '@components/MetaWrapper/MetaWrapper';
+
 export default function CompanyRoute() {
-  return <div>Company Route</div>;
+  return (
+    <MetaWrapper>
+      <div>Company Route</div>;
+    </MetaWrapper>
+  );
 }

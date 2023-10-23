@@ -35,13 +35,14 @@ export const queryCompanyOrders = async ({
     throw new Error('Company not found');
   }
 
+  const dataParamsToQuery = {
+    ...dataParams,
+    ...(isEmpty(orderStateFromParams)
+      ? { meta_orderState: initOrderStatesToQuery }
+      : {}),
+  };
   const queryOrdersResponse = await integrationSdk.listings.query(
-    isEmpty(orderStateFromParams)
-      ? {
-          ...dataParams,
-          meta_orderState: initOrderStatesToQuery,
-        }
-      : dataParams,
+    dataParamsToQuery,
     queryParams,
   );
 

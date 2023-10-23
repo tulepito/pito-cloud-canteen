@@ -21,7 +21,7 @@
     .grayCircle {
       width: 28px;
       height: 28px;
-      background-color: $neutralGray4;
+      background-color: $neutralGray5;
       border-radius: 50%;
       flex-basis: 28px;
       margin-right: 12px;
@@ -29,19 +29,19 @@
 
     .fullRowEmail {
       @include text(14px);
-      color: $neutralGray6;
+      color: $neutralGray7;
       word-break: break-all;
       width: 200px;
     }
 
     .email {
       @include text(12px);
-      color: $neutralGray5;
+      color: $neutralGray6;
     }
 
     .name {
       @include text(14px);
-      color: $neutralGray6;
+      color: $neutralGray7;
     }
   }
 

@@ -36,6 +36,10 @@
 .rightIcon {
   right: 36px !important;
   z-index: 1;
+
+  &.rightIconActive {
+    z-index: 2;
+  }
 }
 
 .paymentBtn {

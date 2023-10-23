@@ -2,7 +2,7 @@
 @use '/src/styles/mixins.scss' as *;
 
 .header {
-  border-bottom: 1px solid $neutralGray4;
+  border-bottom: 1px solid $neutralGray5;
   @include flexAlign(center, space-between);
   padding: 24px;
 
@@ -37,7 +37,7 @@
 
   .tableRoot {
     width: 100%;
-    border: 1px solid $neutralGray4;
+    border: 1px solid $neutralGray5;
     border-radius: 8px;
     border-spacing: 0;
     border-collapse: unset;
@@ -49,7 +49,7 @@
           background-color: $neutralGray2;
           padding: 0 16px;
           font-size: 16px;
-          color: $neutralGray5;
+          color: $neutralGray6;
         }
       }
 
@@ -86,7 +86,7 @@
         .tableBodyCell {
           padding: 9px 16px;
           font-size: 16px;
-          color: $neutralGray6;
+          color: $neutralGray7;
         }
         &:last-child .tableBodyCell {
           border-bottom: none;
@@ -112,6 +112,6 @@
   cursor: pointer;
 
   &:hover {
-    border-bottom: 1px solid $neutralGray5;
+    border-bottom: 1px solid $neutralGray6;
   }
 }

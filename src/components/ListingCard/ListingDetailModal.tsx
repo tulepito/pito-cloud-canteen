@@ -13,12 +13,13 @@ import RenderWhen from '@components/RenderWhen/RenderWhen';
 import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { Listing } from '@src/utils/data';
+import { EImageVariants } from '@src/utils/enums';
 import {
-  EImageVariants,
-  SIDE_DISH_OPTIONS,
-  SPECIAL_DIET_OPTIONS,
-} from '@src/utils/enums';
+  FOOD_SIDE_DISH_OPTIONS,
+  FOOD_SPECIAL_DIET_OPTIONS,
+} from '@src/utils/options';
 import { toNonAccentVietnamese } from '@src/utils/string';
+import type { TKeyValue } from '@src/utils/types';
 import { maxLength } from '@src/utils/validators';
 
 import css from './ListingDetailModal.module.scss';
@@ -71,7 +72,7 @@ const ListingDetailModal: React.FC<TListingDetailModalProps> = (props) => {
     packaging,
   } = listingObj.getPublicData();
   const packagingLabel = packagingOptions.find(
-    ({ key }) =>
+    ({ key }: TKeyValue) =>
       toNonAccentVietnamese(packaging, true) ===
       toNonAccentVietnamese(key, true),
   )?.label;
@@ -79,10 +80,12 @@ const ListingDetailModal: React.FC<TListingDetailModalProps> = (props) => {
   const badges = specialDiets
     .slice(0, 3)
     .map((diet: string) =>
-      SPECIAL_DIET_OPTIONS.find((item) => item.key === diet),
+      FOOD_SPECIAL_DIET_OPTIONS.find((item) => item.key === diet),
     );
   const sideDishesText = sideDishes.reduce((res: any, dishKey: string) => {
-    const suitableSideDish = SIDE_DISH_OPTIONS.find((d) => d.key === dishKey);
+    const suitableSideDish = FOOD_SIDE_DISH_OPTIONS.find(
+      (d) => d.key === dishKey,
+    );
 
     if (!isEmpty(suitableSideDish)) {
       return res.concat(<div key={dishKey}>{suitableSideDish.label}</div>);

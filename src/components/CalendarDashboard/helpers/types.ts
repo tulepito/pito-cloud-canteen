@@ -29,4 +29,6 @@ export type TDayColumnHeaderProps = {
   date: Date;
   resources?: any;
   className?: string;
+  shouldHideDate?: boolean;
+  shouldHideDateText?: boolean;
 };

@@ -5,9 +5,10 @@ import { denormalisedResponseEntities } from '@services/data';
 import { fetchListing } from '@services/integrationHelper';
 import { createFirebaseDocNotification } from '@services/notifications';
 import { getIntegrationSdk } from '@services/sdk';
-import { UserPermission } from '@src/types/UserPermission';
 import { Listing, User } from '@src/utils/data';
 import {
+  ECompanyPermission,
+  EListingStates,
   EListingType,
   ENotificationType,
   EOrderStates,
@@ -31,11 +32,11 @@ export const postRatingFn = async ({
       const response = await integrationSdk.listings.create({
         title: `Review for ${restaurantListing.attributes.title} - ${orderId} - ${timestamp}`,
         authorId,
-        state: 'published',
+        state: EListingStates.published,
         metadata: {
           ...rating,
           listingType: EListingType.rating,
-          reviewRole: UserPermission.BOOKER,
+          reviewRole: ECompanyPermission.booker,
         },
       });
 
@@ -79,13 +80,13 @@ export const postParticipantRatingFn = async ({
   const response = await integrationSdk.listings.create({
     title: `Review for ${restaurantListing.attributes.title} - ${orderId} - ${timestamp}`,
     authorId,
-    state: 'published',
+    state: EListingStates.published,
     images: imageIdList,
     metadata: {
       ...rating,
       detailTextRating,
       listingType: EListingType.rating,
-      reviewRole: UserPermission.PARTICIPANT,
+      reviewRole: ECompanyPermission.participant,
       foodName,
       foodId,
     },

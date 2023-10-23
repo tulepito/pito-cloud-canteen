@@ -2,7 +2,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 import { createAsyncThunk } from '@redux/redux.helper';
-import { ENotificationPopupTypes } from '@src/utils/enums';
+import { ENotificationPopupType } from '@src/utils/enums';
 import type { TNotification } from '@src/utils/types';
 
 const HIDE_NOTIFICATION_TIMEOUT_MS = 5000;
@@ -59,19 +59,19 @@ const NotificationSlice = createSlice({
     triggerSuccessNotification: (state, { payload }) => {
       state.notifications = [
         ...state.notifications,
-        { ...payload, type: ENotificationPopupTypes.success },
+        { ...payload, type: ENotificationPopupType.success },
       ];
     },
     triggerWarningNotification: (state, { payload }) => {
       state.notifications = [
         ...state.notifications,
-        { ...payload, type: ENotificationPopupTypes.warning },
+        { ...payload, type: ENotificationPopupType.warning },
       ];
     },
     triggerErrorNotification: (state, { payload }) => {
       state.notifications = [
         ...state.notifications,
-        { ...payload, type: ENotificationPopupTypes.error },
+        { ...payload, type: ENotificationPopupType.error },
       ];
     },
   },

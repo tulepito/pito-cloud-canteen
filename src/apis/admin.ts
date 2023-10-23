@@ -2,7 +2,6 @@ import type { TObject } from '@src/utils/types';
 
 import { deleteApi, getApi, postApi, putApi } from './configs';
 
-export const getAttributesApi = () => getApi('/admin/filters');
 export const addAttributesApi = (body: TObject) =>
   postApi('/admin/filters', body);
 export const updateAttributesApi = (body: TObject) =>
@@ -41,6 +40,38 @@ export const transitionOrderPaymentStatusApi = (
   postApi('/admin/payment/transition-order-payment-status', {
     orderId,
     planId,
+  });
+
+export const confirmClientPaymentApi = (orderId: string) =>
+  putApi('/admin/payment/confirm-client-payment', {
+    orderId,
+  });
+export const disapproveClientPaymentApi = (orderId: string) =>
+  putApi('/admin/payment/disapprove-client-payment', {
+    orderId,
+  });
+
+export const confirmPartnerPaymentApi = ({
+  planId,
+  subOrderDate,
+}: {
+  planId: string;
+  subOrderDate: string | number;
+}) =>
+  putApi('/admin/payment/confirm-partner-payment', {
+    planId,
+    subOrderDate,
+  });
+export const disapprovePartnerPaymentApi = ({
+  planId,
+  subOrderDate,
+}: {
+  planId: string;
+  subOrderDate: string | number;
+}) =>
+  putApi('/admin/payment/disapprove-partner-payment', {
+    planId,
+    subOrderDate,
   });
 
 export const fetchFoodListFromMenuApi = (params: TObject) =>

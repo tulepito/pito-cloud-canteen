@@ -13,6 +13,12 @@
     min-height: calc(100vh - 84px);
     min-height: calc(100dvh - 84px);
   }
+  &.hideNavBar {
+    margin-top: 0;
+    min-height: calc(100vh);
+    min-height: calc(100dvh);
+    margin-bottom: 0px;
+  }
 
   @include viewportMedium {
     width: calc(100vw - $adminSidebarLeftPartWidth);

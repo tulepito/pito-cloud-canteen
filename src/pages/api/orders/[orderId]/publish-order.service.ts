@@ -4,11 +4,13 @@ import uniq from 'lodash/uniq';
 
 import { denormalisedResponseEntities } from '@services/data';
 import { getIntegrationSdk } from '@services/integrationSdk';
+import { createNativeNotification } from '@services/nativeNotification';
 import { createFirebaseDocNotification } from '@services/notifications';
 import type { TPlan } from '@src/utils/orderTypes';
 import { Listing, User } from '@utils/data';
 import {
   EBookerOrderDraftStates,
+  ENativeNotificationType,
   ENotificationType,
   EOrderDraftStates,
   EOrderStates,
@@ -55,6 +57,7 @@ export const publishOrder = async (orderId: string) => {
     orderStateHistory = [],
     participants = [],
     serviceFees = {},
+    anonymous = [],
   } = orderListing.getMetadata();
   const { title: orderTitle } = orderListing.getAttributes();
 
@@ -63,7 +66,7 @@ export const publishOrder = async (orderId: string) => {
   }
 
   if (isEmpty(plans)) {
-    throw new Error(`No plan was set up`);
+    throw new Error(`No plans were set up`);
   }
 
   const [planId] = plans;
@@ -81,12 +84,9 @@ export const publishOrder = async (orderId: string) => {
   });
 
   const response = denormalisedResponseEntities(
-    await integrationSdk.users.show(
-      {
-        id: ADMIN_FLEX_ID,
-      },
-      { expand: true },
-    ),
+    await integrationSdk.users.show({
+      id: ADMIN_FLEX_ID,
+    }),
   )[0];
   const { systemServiceFeePercentage = 0 } = User(response).getPrivateData();
 
@@ -143,11 +143,19 @@ export const publishOrder = async (orderId: string) => {
   });
 
   // create order picking notification for all participants
-  participants.map(async (participantId: string) => {
+  [...participants, ...anonymous].forEach((participantId: string) => {
     createFirebaseDocNotification(ENotificationType.ORDER_PICKING, {
       orderId,
       orderTitle,
       userId: participantId,
     });
+
+    createNativeNotification(
+      ENativeNotificationType.BookerTransitOrderStateToPicking,
+      {
+        participantId,
+        order,
+      },
+    );
   });
 };

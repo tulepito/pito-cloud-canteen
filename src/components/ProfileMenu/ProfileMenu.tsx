@@ -76,7 +76,7 @@ const ProfileMenu: React.FC<TProfileMenuProps> = (props) => {
 
   useEffect(() => {
     setReady(true);
-  }, []);
+  }, [setReady]);
 
   const onBlur = (event: FocusEvent<HTMLElement>) => {
     // FocusEvent is fired faster than the link elements native click handler

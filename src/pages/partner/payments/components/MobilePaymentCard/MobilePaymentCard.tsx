@@ -1,7 +1,7 @@
 import Badge, { EBadgeType } from '@components/Badge/Badge';
 import IconReceipt from '@components/Icons/IconReceipt/IconReceipt';
 import { parseThousandNumber } from '@helpers/format';
-import { EOrderPaymentState } from '@src/utils/enums';
+import { EOrderPaymentStatus } from '@src/utils/enums';
 import type { TObject } from '@src/utils/types';
 
 import css from './MobilePaymentCard.module.scss';
@@ -17,11 +17,11 @@ const MobilePaymentCard: React.FC<TMobilePaymentCardProps> = ({
     subOrderName = '-',
     orderTitle = '-',
     totalAmount = 0,
-    status = EOrderPaymentState.isNotPaid,
+    status = EOrderPaymentStatus.isNotPaid,
     paidAmount = 0,
     remainAmount = 0,
   } = paymentData;
-  const isPaid = status === EOrderPaymentState.isPaid;
+  const isPaid = status === EOrderPaymentStatus.isPaid;
 
   return (
     <div className={css.root}>

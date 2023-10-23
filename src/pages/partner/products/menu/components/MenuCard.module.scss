@@ -1,0 +1,111 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.root {
+  background-color: $neutralGray1;
+  border-radius: 8px;
+  box-shadow: 0px 8px 8px 0px rgba(140, 140, 218, 0.08);
+  margin-bottom: 12px;
+}
+
+.titleContainer {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 12px;
+
+  div {
+    @include lineClamp(1);
+    max-width: calc(100% - 12px - 20px);
+    @include textTemplate(16px, 700, 24px);
+  }
+}
+
+.infoContainer {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 12px;
+  align-items: center;
+
+  .timeContainer {
+    display: flex;
+    column-gap: 8px;
+    align-items: center;
+
+    @include textTemplate(14px, 400, 20px);
+  }
+}
+
+.actionContainer {
+  padding: 8px 16px 12px;
+  display: flex;
+  justify-content: flex-end;
+  column-gap: 12px;
+
+  .iconContainer {
+    display: flex;
+    width: 32px;
+    height: 32px;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    background-color: $neutralGray3;
+    border-radius: 100px;
+    cursor: pointer;
+
+    svg {
+      width: 20px;
+      height: 20px;
+    }
+  }
+
+  .isActiveField {
+    margin-left: 4px;
+  }
+}
+
+.cannotDeleteMenuModal.cannotDeleteMenuModal {
+  width: calc(100vw - 32px);
+  padding: 16px;
+
+  .iconContainer {
+    margin: 0 auto;
+    width: fit-content;
+  }
+
+  .modalTitle {
+    @include textTemplate(16px, 700, 24px);
+    color: $neutralGray6;
+    text-align: center;
+    margin-bottom: 8px;
+  }
+
+  .modalDescription {
+    @include textTemplate(14px, 400, 20px);
+    color: $neutralGray6;
+    text-align: center;
+  }
+
+  .cannotDeleteMenuModalAction {
+    margin-top: -28px;
+    display: flex;
+    justify-content: center;
+  }
+}
+
+.confirmDeleteMenuModal.confirmDeleteMenuModal {
+  width: calc(100vw - 32px);
+  padding: 0 16px 16px;
+
+  .menuDescription {
+    @include textTemplate(14px, 400, 20px);
+  }
+
+  .menuName {
+    font-weight: 700;
+    color: $neutralGray6;
+  }
+
+  .confirmDeleteModalAction {
+    margin-top: -28px;
+  }
+}

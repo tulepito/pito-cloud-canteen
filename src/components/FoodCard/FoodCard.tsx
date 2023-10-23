@@ -6,13 +6,9 @@ import IconCheckmarkWithCircle from '@components/Icons/IconCheckmark/IconCheckma
 import IconPlusCircle from '@components/Icons/IconPlusCircle/IconPlusCircle';
 import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
 import { addCommas } from '@helpers/format';
+import { FOOD_TYPE_OPTIONS, getLabelByKey } from '@src/utils/options';
 import { Listing } from '@utils/data';
-import {
-  EFoodTypes,
-  EImageVariants,
-  FOOD_TYPE_OPTIONS,
-  getLabelByKey,
-} from '@utils/enums';
+import { EFoodType, EImageVariants } from '@utils/enums';
 import type { TListing } from '@utils/types';
 
 import css from './FoodCard.module.scss';
@@ -56,7 +52,7 @@ const FoodCard: React.FC<TFoodCardProps> = ({
     <IconPlusCircle onClick={handleSelect} className={css.plusIcon} />
   );
   const foodTypeLabel = getLabelByKey(FOOD_TYPE_OPTIONS, foodType);
-  const isVegetarian = foodType === EFoodTypes.vegetarianDish;
+  const isVegetarian = foodType === EFoodType.vegetarianDish;
 
   return (
     <div className={classes}>

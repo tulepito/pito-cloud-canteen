@@ -17,7 +17,7 @@
   justify-content: space-between;
   width: 100%;
   @include textTemplate(14px, 700, 20px, '');
-  color: $neutralGray6;
+  color: $neutralGray7;
   margin-bottom: 4px;
 
   .titleContainer {
@@ -52,13 +52,13 @@
 
 .dishes {
   @include textTemplate(12px, 400, 16px);
-  color: $neutralGray5;
+  color: $neutralGray6;
   margin-left: 4px;
   margin-right: 12px;
 }
 
 .verticalDivider {
-  @include verticalDivider($neutralGray4, 1px, 12px);
+  @include verticalDivider($neutralGray5, 1px, 12px);
 }
 
 .searchIcon {
@@ -127,7 +127,7 @@
     background-color: $neutralGray1;
 
     @include textTemplate(14px, 700, 20px, '');
-    color: $neutralGray6;
+    color: $neutralGray7;
     margin-bottom: 12px;
   }
 
@@ -139,7 +139,7 @@
 
 .applyForOtherDays {
   @include textTemplate(12px, 700, 16px);
-  color: $neutralGray6;
+  color: $neutralGray7;
   text-align: center;
   cursor: pointer;
 }

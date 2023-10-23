@@ -7,7 +7,7 @@ import classNames from 'classnames';
 import { InlineTextButton } from '@components/Button/Button';
 import useBoolean from '@hooks/useBoolean';
 import { formatTimestamp } from '@src/utils/dates';
-import { EOrderHistoryTypes } from '@src/utils/enums';
+import { EEditSubOrderHistoryType } from '@src/utils/enums';
 import type { TSubOrderChangeHistoryItem } from '@src/utils/types';
 
 import css from './SubOrderChangesHistorySection.module.scss';
@@ -34,7 +34,7 @@ const SubOrderChangesHistoryItem = (props: TSubOrderChangeHistoryItem) => {
 
   const itemContent = () => {
     switch (type) {
-      case EOrderHistoryTypes.MEMBER_FOOD_ADDED: {
+      case EEditSubOrderHistoryType.MEMBER_FOOD_ADDED: {
         const { foodName } = newValue;
 
         return {
@@ -52,7 +52,7 @@ const SubOrderChangesHistoryItem = (props: TSubOrderChangeHistoryItem) => {
           ),
         };
       }
-      case EOrderHistoryTypes.MEMBER_FOOD_CHANGED: {
+      case EEditSubOrderHistoryType.MEMBER_FOOD_CHANGED: {
         const { foodName: oldFoodName } = oldValue;
         const { foodName: newFoodName } = newValue;
 
@@ -76,7 +76,7 @@ const SubOrderChangesHistoryItem = (props: TSubOrderChangeHistoryItem) => {
           ),
         };
       }
-      case EOrderHistoryTypes.MEMBER_FOOD_REMOVED:
+      case EEditSubOrderHistoryType.MEMBER_FOOD_REMOVED:
         return {
           title: intl.formatMessage({
             id: 'SubOrderChangesHistoryItem.memberFoodRemoved',
@@ -91,7 +91,7 @@ const SubOrderChangesHistoryItem = (props: TSubOrderChangeHistoryItem) => {
             },
           ),
         };
-      case EOrderHistoryTypes.FOOD_ADDED: {
+      case EEditSubOrderHistoryType.FOOD_ADDED: {
         const { foodName } = newValue;
 
         return {
@@ -109,7 +109,7 @@ const SubOrderChangesHistoryItem = (props: TSubOrderChangeHistoryItem) => {
           ),
         };
       }
-      case EOrderHistoryTypes.FOOD_REMOVED: {
+      case EEditSubOrderHistoryType.FOOD_REMOVED: {
         const { foodName, quantity } = oldValue;
 
         return {
@@ -127,7 +127,7 @@ const SubOrderChangesHistoryItem = (props: TSubOrderChangeHistoryItem) => {
           ),
         };
       }
-      case EOrderHistoryTypes.FOOD_DECREASED: {
+      case EEditSubOrderHistoryType.FOOD_DECREASED: {
         const { quantity: oldQuantity, foodName } = oldValue;
         const { quantity } = newValue;
 
@@ -148,7 +148,7 @@ const SubOrderChangesHistoryItem = (props: TSubOrderChangeHistoryItem) => {
           ),
         };
       }
-      case EOrderHistoryTypes.FOOD_INCREASED: {
+      case EEditSubOrderHistoryType.FOOD_INCREASED: {
         const { quantity: oldQuantity, foodName } = oldValue;
         const { quantity } = newValue;
 

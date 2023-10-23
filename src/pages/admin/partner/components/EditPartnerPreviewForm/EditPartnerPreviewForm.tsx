@@ -16,13 +16,16 @@ import NamedLink from '@components/NamedLink/NamedLink';
 import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
 import { useAppSelector } from '@hooks/reduxHooks';
 import {
+  BANK_OPTIONS,
   BUSINESS_TYPE_OPTIONS,
+  EXTRA_SERVICE_OPTIONS,
+  getLabelByKey,
+  MEAL_OPTIONS,
+} from '@src/utils/options';
+import {
   EImageVariants,
   EPartnerVATSetting,
   ERestaurantListingStatus,
-  EXTRA_SERVICE_OPTIONS,
-  LIST_BANKS,
-  MEAL_OPTIONS,
 } from '@utils/enums';
 
 import {
@@ -34,20 +37,14 @@ import { createAvailabilityPlanInitialValues } from '../EditPartnerWizardTab/uti
 
 import css from './EditPartnerPreviewForm.module.scss';
 
-const getLabelByKey = (list: any[], key: any) => {
-  const item = list?.find((l: any) => l.key === key);
-
-  return item && item.label ? item.label : key;
-};
-
 const EditPartnerPreviewForm: React.FC<any> = (props) => {
   const intl = useIntl();
 
   const packagingOptions = useAppSelector(
-    (state) => state.AdminAttributes.packaging,
+    (state) => state.SystemAttributes.packaging,
   );
   const categoryOptions = useAppSelector(
-    (state) => state.AdminAttributes.categories,
+    (state) => state.SystemAttributes.categories,
   );
 
   return (
@@ -588,7 +585,7 @@ const EditPartnerPreviewForm: React.FC<any> = (props) => {
                             })}
                           </p>
                           <p className={css.content}>
-                            {getLabelByKey(LIST_BANKS, bank.bankId)}
+                            {getLabelByKey(BANK_OPTIONS, bank.bankId)}
                           </p>
                         </div>
                         <div className={css.left}>

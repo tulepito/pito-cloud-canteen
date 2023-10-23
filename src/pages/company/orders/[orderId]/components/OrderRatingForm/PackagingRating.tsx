@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useMemo } from 'react';
 
 import FieldDropdownSelect from '@components/FormFields/FieldDropdownSelect/FieldDropdownSelect';
@@ -98,7 +99,6 @@ const PackagingRating: React.FC<TPackagingRatingProps> = (props) => {
         key: `${values?.[OPTIONAL_PACKAGING_RESTAURANT_SATISFACTED]} - ${option.key}`,
       }));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isPackagingSatifactedSelected, values]);
 
   const parsedRestaurantByDayOptions = useMemo(

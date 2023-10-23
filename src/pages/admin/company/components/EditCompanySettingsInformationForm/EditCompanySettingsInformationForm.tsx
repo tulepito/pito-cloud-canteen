@@ -18,8 +18,8 @@ import useBoolean from '@hooks/useBoolean';
 import useQueryNewMemberUsers from '@hooks/useQueryNewMemberUsers';
 import { COMPANY_LOGO_VARIANTS } from '@redux/slices/company.slice';
 import type { TCompanyGroup } from '@src/types/companyGroup';
+import { FOOD_SPECIAL_DIET_OPTIONS } from '@src/utils/options';
 import { User } from '@utils/data';
-import { SPECIAL_DIET_OPTIONS } from '@utils/enums';
 import type {
   TCompany,
   TCompanyMemberWithDetails,
@@ -336,7 +336,7 @@ const EditCompanySettingsInformationFormComponent: React.FC<
               <FieldCheckboxGroup
                 listClassName={css.checkboxGroup}
                 id="EditCompanySettingsInformationForm.mealSetting"
-                options={SPECIAL_DIET_OPTIONS}
+                options={FOOD_SPECIAL_DIET_OPTIONS}
                 name="nutritions"
                 label={intl.formatMessage({
                   id: 'EditCompanySettingsInformationForm.mealSetting',

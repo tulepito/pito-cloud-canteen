@@ -12,7 +12,14 @@ import {
   participantPaths,
   partnerPaths,
 } from '@src/paths';
-import { EUserPermission, startRouteBaseOnPermission } from '@utils/enums';
+import { EUserSystemPermission } from '@utils/enums';
+
+export const START_ROUTE_BASE_ON_PERMISSION = {
+  [EUserSystemPermission.company]: '/company',
+  [EUserSystemPermission.admin]: '/admin',
+  [EUserSystemPermission.normal]: '/participant',
+  [EUserSystemPermission.partner]: '/partner',
+};
 
 export const usePathChecker = (pathname: string) => {
   return {
@@ -22,15 +29,17 @@ export const usePathChecker = (pathname: string) => {
   };
 };
 
-export const getLayoutBaseOnPermission = (permission: EUserPermission) => {
+export const getLayoutBaseOnPermission = (
+  permission: EUserSystemPermission,
+) => {
   switch (permission) {
-    case EUserPermission.admin:
+    case EUserSystemPermission.admin:
       return AdminLayout;
-    case EUserPermission.partner:
+    case EUserSystemPermission.partner:
       return PartnerLayout;
-    case EUserPermission.company:
+    case EUserSystemPermission.company:
       return CompanyLayout;
-    case EUserPermission.normal:
+    case EUserSystemPermission.normal:
       return GeneralLayout;
     default:
       return React.Fragment;
@@ -39,26 +48,26 @@ export const getLayoutBaseOnPermission = (permission: EUserPermission) => {
 
 export const isPathMatchedPermission = (
   pathName: string,
-  permission: EUserPermission,
+  permission: EUserSystemPermission,
 ) => {
-  const startPath = startRouteBaseOnPermission[permission];
+  const startPath = START_ROUTE_BASE_ON_PERMISSION[permission];
 
   return pathName.startsWith(startPath);
 };
 
 export const getHomePageRouteBaseOnPermission = (
-  permission: EUserPermission,
+  permission: EUserSystemPermission,
 ) => {
   let homePageRoute;
 
   switch (permission) {
-    case EUserPermission.admin:
+    case EUserSystemPermission.admin:
       homePageRoute = adminPaths.Dashboard;
       break;
-    case EUserPermission.partner:
+    case EUserSystemPermission.partner:
       homePageRoute = partnerPaths.Home;
       break;
-    case EUserPermission.company:
+    case EUserSystemPermission.company:
       homePageRoute = companyPaths.Home;
       break;
     default:

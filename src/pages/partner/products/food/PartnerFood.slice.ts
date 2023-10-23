@@ -5,7 +5,6 @@ import omit from 'lodash/omit';
 import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
 
-import { getAttributesApi } from '@apis/admin';
 import { partnerFoodApi } from '@apis/foodApi';
 import {
   createPartnerFoodApi,
@@ -208,7 +207,6 @@ const DUPLICATE_FOOD = 'app/ManageFoodsPage/DUPLICATE_FOOD';
 const CREATE_FOOD_FROM_FILE = 'app/ManageFoodsPage/CREATE_FOOD_FROM_FILE';
 
 const QUERY_MENU_PICKED_FOODS = 'app/ManageFoodsPage/QUERY_MENU_PICKED_FOODS';
-const FETCH_ATTRIBUTES = 'app/ManageFoodsPage/FETCH_ATTRIBUTES';
 const FETCH_APPROVAL_FOODS = 'app/ManageFoodsPage/FETCH_APPROVAL_FOODS';
 const FETCH_EDITABLE_FOOD = 'app/ManageFoodsPage/FETCH_EDITABLE_FOOD';
 const FETCH_DELETABLE_FOOD = 'app/ManageFoodsPage/FETCH_DELETABLE_FOOD';
@@ -470,7 +468,7 @@ const createPartnerFoodFromCsv = createAsyncThunk(
         async complete({ data = [] }: { data: any[] }) {
           const isProduction = process.env.NEXT_PUBLIC_ENV === 'production';
           const dataLengthToImport = isProduction ? data.length : 3;
-          const packagingOptions = getState().AdminAttributes.packaging;
+          const packagingOptions = getState().SystemAttributes.packaging;
           const response = await Promise.all(
             data.slice(0, dataLengthToImport).map(async (foodData: any) => {
               const dataParams = getImportDataFromCsv(
@@ -558,12 +556,6 @@ const showDuplicateFood = createAsyncThunk(
     }
   },
 );
-
-const fetchAttributes = createAsyncThunk(FETCH_ATTRIBUTES, async () => {
-  const { data: response } = await getAttributesApi();
-
-  return response;
-});
 
 const fetchApprovalFoods = createAsyncThunk(
   FETCH_APPROVAL_FOODS,
@@ -730,7 +722,6 @@ export const partnerFoodSliceThunks = {
   duplicateFood,
   createPartnerFoodFromCsv,
   queryMenuPickedFoods,
-  fetchAttributes,
   fetchApprovalFoods,
   fetchEditableFood,
   fetchDeletableFood,
@@ -941,30 +932,6 @@ const partnerFoodSlice = createSlice({
         createPartnerFoodFromCsvInProgress: false,
         createPartnerFoodFromCsvError: error,
       }))
-
-      .addCase(fetchAttributes.pending, (state) => {
-        return {
-          ...state,
-          fetchAttributesInProgress: true,
-          fetchAttributesError: null,
-        };
-      })
-      .addCase(fetchAttributes.fulfilled, (state, { payload }) => {
-        return {
-          ...state,
-          fetchAttributesInProgress: false,
-          nutritions: payload?.nutritions,
-          categories: payload?.categories,
-          packaging: payload?.packaging,
-        };
-      })
-      .addCase(fetchAttributes.rejected, (state, { error }) => {
-        return {
-          ...state,
-          fetchAttributesInProgress: false,
-          fetchAttributesError: error.message,
-        };
-      })
 
       .addCase(fetchApprovalFoods.pending, (state) => ({
         ...state,

@@ -13,7 +13,7 @@
   width: 318px;
   padding-right: 34px;
   gap: 8px;
-  border-right: 1px solid $neutralGray5;
+  border-right: 1px solid $neutralGray6;
 
   .fieldSelector {
     @include flexAlign(center, space-between);
@@ -29,7 +29,7 @@
     }
     .fieldName {
       @include text(14px, 24px);
-      color: $neutralGray6;
+      color: $neutralGray7;
       font-weight: $fontWeightBold;
     }
 
@@ -69,7 +69,7 @@
 
     .subLabel {
       @include text(14px, 20px);
-      color: $neutralGray5;
+      color: $neutralGray6;
 
       &:not(:first-child) {
         margin-top: 20px;

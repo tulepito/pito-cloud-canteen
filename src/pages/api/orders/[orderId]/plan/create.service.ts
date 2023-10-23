@@ -1,8 +1,7 @@
 import { fetchListing, fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
-import { ListingTypes } from '@src/types/listingTypes';
 import { denormalisedResponseEntities } from '@utils/data';
-import { EListingStates, EOrderType } from '@utils/enums';
+import { EListingStates, EListingType, EOrderType } from '@utils/enums';
 
 import { getInitMemberOrder } from './memberOrder.helper';
 
@@ -51,7 +50,7 @@ const createPlan = async ({
     metadata: {
       orderDetail: updatedOrderDetail,
       orderId,
-      listingType: ListingTypes.PLAN,
+      listingType: EListingType.subOrder,
     },
   });
 

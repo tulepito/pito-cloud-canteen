@@ -5,8 +5,8 @@ import { useRouter } from 'next/router';
 import { getCompanyIdFromBookerUser } from '@helpers/company';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
-import { CurrentUser } from '@src/utils/data';
-import type { TCurrentUser } from '@src/utils/types';
+import { CurrentUser, User } from '@src/utils/data';
+import type { TCurrentUser, TUser } from '@src/utils/types';
 
 import CompanyDashboardHeroSection from './components/CompanyDashboardHeroSection/CompanyDashboardHeroSection';
 import NotificationSection from './components/NotificationSection/NotificationSection';
@@ -27,21 +27,21 @@ const CompanyDashboardPage = () => {
   const currentUser = useAppSelector((state) => state.user.currentUser);
   const currentUserId = CurrentUser(currentUser as TCurrentUser).getId();
   const totalItemMap = useAppSelector((state) => state.Order.totalItemMap);
+  const bookerCompanies = useAppSelector(
+    (state) => state.BookerCompanies.companies,
+  );
   const companyOrderNotificationMap = useAppSelector(
     (state) => state.Order.companyOrderNotificationMap,
   );
   const companyOrderSummary = useAppSelector(
     (state) => state.Order.companyOrderSummary,
   );
-
   const queryOrderInProgress = useAppSelector(
     (state) => state.Order.queryOrderInProgress,
   );
-
   const getCompanyOrderNotificationInProgress = useAppSelector(
     (state) => state.Order.getOrderNotificationInProgress,
   );
-
   const getCompanyOrderSummaryInProgress = useAppSelector(
     (state) => state.Order.getCompanyOrderSummaryInProgress,
   );
@@ -67,10 +67,23 @@ const CompanyDashboardPage = () => {
 
     const isPersonal = companyId === 'personal';
     const companyIdToQuery = isPersonal ? currentUserId : companyId;
+
+    const companyUser = bookerCompanies.find(
+      (c: TUser) => c.id.uuid === companyIdToQuery,
+    );
+    const { subAccountId: subAccountIdMaybe } = User(
+      companyUser!,
+    ).getPrivateData();
+    const authorIdMaybe =
+      typeof subAccountIdMaybe !== 'undefined'
+        ? { authorId: subAccountIdMaybe }
+        : {};
+
     dispatch(
       orderAsyncActions.queryCompanyOrders({
         companyId: companyIdToQuery,
         bookerId: currentUserId,
+        ...authorIdMaybe,
       }),
     );
     dispatch(
@@ -79,7 +92,7 @@ const CompanyDashboardPage = () => {
     dispatch(
       orderAsyncActions.getCompanyOrderSummary(companyIdToQuery as string),
     );
-  }, [dispatch, companyId, currentUserId]);
+  }, [dispatch, companyId, currentUserId, JSON.stringify(bookerCompanies)]);
 
   return (
     <div className={css.root}>

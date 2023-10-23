@@ -1,11 +1,12 @@
 import { mapLimit } from 'async';
-import { isEmpty, uniq } from 'lodash';
+import chunk from 'lodash/chunk';
 import compact from 'lodash/compact';
 import difference from 'lodash/difference';
 import flatten from 'lodash/flatten';
+import isEmpty from 'lodash/isEmpty';
+import uniq from 'lodash/uniq';
 
 import {
-  convertListIdToQueries,
   prepareNewOrderDetailPlan,
   queryAllListings,
 } from '@helpers/apiHelpers';
@@ -14,12 +15,13 @@ import { emailSendingFactory, EmailTemplateTypes } from '@services/email';
 import { fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { createFirebaseDocNotification } from '@services/notifications';
-import { UserInviteStatus, UserPermission } from '@src/types/UserPermission';
+import { UserInviteStatus } from '@src/types/UserPermission';
 import participantCompanyInvitation, {
   participantCompanyInvitationSubject,
 } from '@src/utils/emailTemplate/participantCompanyInvitation';
 import {
   EBookerOrderDraftStates,
+  ECompanyPermission,
   EListingType,
   ENotificationType,
   EOrderDraftStates,
@@ -69,7 +71,7 @@ const addMembersToCompanyFn = async (params: TAddMembersToCompanyParams) => {
     },
   });
 
-  const allNeedUpdatePlanIds = uniq(
+  const allNeedUpdatePlanIds: string[] = uniq(
     compact(
       allNeedOrders.map((order: TListing) => {
         const { plans = [] } = Listing(order).getMetadata();
@@ -78,12 +80,10 @@ const addMembersToCompanyFn = async (params: TAddMembersToCompanyParams) => {
       }),
     ),
   );
-  const planQueries = convertListIdToQueries({
-    idList: allNeedUpdatePlanIds,
-  });
+
   const allNeedUpdatePlans = flatten(
     await Promise.all(
-      planQueries.map(async ({ ids }) => {
+      chunk<string>(allNeedUpdatePlanIds, 100).map(async (ids: string[]) => {
         return denormalisedResponseEntities(
           await integrationSdk.listings.query({
             ids,
@@ -93,7 +93,7 @@ const addMembersToCompanyFn = async (params: TAddMembersToCompanyParams) => {
     ),
   );
 
-  // Step update data for existed user
+  // * Step update data for existed user
   const newParticipantIds = difference(userIdList, membersIdList);
   const newParticipantMembers = await Promise.all(
     newParticipantIds.map(async (userId: string) => {
@@ -106,7 +106,7 @@ const addMembersToCompanyFn = async (params: TAddMembersToCompanyParams) => {
           companyList: Array.from(new Set([...userCompanyList, companyId])),
           company: {
             [companyId]: {
-              permission: UserPermission.PARTICIPANT,
+              permission: ECompanyPermission.participant,
             },
           },
         },
@@ -165,7 +165,7 @@ const addMembersToCompanyFn = async (params: TAddMembersToCompanyParams) => {
         [userEmail]: {
           id: userId,
           email: userEmail,
-          permission: UserPermission.PARTICIPANT,
+          permission: ECompanyPermission.participant,
           groups: [],
           inviteStatus: UserInviteStatus.ACCEPTED,
         },
@@ -187,7 +187,7 @@ const addMembersToCompanyFn = async (params: TAddMembersToCompanyParams) => {
     .map((email: string) => ({
       email,
       id: null,
-      permission: UserPermission.PARTICIPANT,
+      permission: ECompanyPermission.participant,
       groups: [],
       inviteStatus: UserInviteStatus.ACCEPTED,
     }))

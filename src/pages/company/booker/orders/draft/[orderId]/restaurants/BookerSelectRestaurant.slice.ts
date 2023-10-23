@@ -8,31 +8,22 @@ import uniqBy from 'lodash/uniqBy';
 
 import { fetchFoodListFromMenuApi } from '@apis/admin';
 import { updatePlanDetailsApi } from '@apis/orderApi';
-import { fetchSearchFilterApi } from '@apis/userApi';
 import { queryAllPages } from '@helpers/apiHelpers';
 import type { TMenuQueryParams } from '@helpers/listingSearchQuery';
 import { getMenuQuery, getRestaurantQuery } from '@helpers/listingSearchQuery';
+import { calculateDistance } from '@helpers/mapHelpers';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
-import { CompanyPermission, UserPermission } from '@src/types/UserPermission';
+import { CompanyPermissions } from '@src/types/UserPermission';
 import { denormalisedResponseEntities, Listing } from '@utils/data';
-import { EImageVariants, EListingType } from '@utils/enums';
-import type { TListing, TPagination, TUser } from '@utils/types';
+import { ECompanyPermission, EImageVariants, EListingType } from '@utils/enums';
+import type { TListing, TObject, TPagination, TUser } from '@utils/types';
 
 export const MANAGE_ORDER_PAGE_SIZE = 10;
 
 // ================ Initial states ================ //
-type TKeyValue<T = string> = {
-  key: string;
-  label: T;
-};
-
 type TOrderInitialState = {
   restaurant: TListing | null;
-
-  menuTypes: TKeyValue[];
-  categories: TKeyValue[];
-  packaging: TKeyValue[];
   restaurantIdList: string[];
 
   searchResult: TListing[];
@@ -42,7 +33,6 @@ type TOrderInitialState = {
     menuId: string;
   }[];
 
-  fetchFilterInProgress: boolean;
   searchInProgress: boolean;
 
   order: TListing | null;
@@ -83,17 +73,12 @@ type TOrderInitialState = {
 
 const initialState: TOrderInitialState = {
   restaurant: null,
-
-  menuTypes: [],
-  categories: [],
-  packaging: [],
   restaurantIdList: [],
 
   searchResult: [],
   totalItems: 0,
   combinedRestaurantMenuData: [],
 
-  fetchFilterInProgress: false,
   searchInProgress: false,
 
   order: null,
@@ -133,7 +118,6 @@ const initialState: TOrderInitialState = {
 
 // ================ Thunk types ================ //
 const FETCH_RESTAURANT = 'app/BookerSelectRestaurant/FETCH_RESTAURANT';
-const FETCH_SEARCH_FILTER = 'app/BookerSelectRestaurant/FETCH_SEARCH_FILTER';
 const SEARCH_RESTAURANT = 'app/BookerSelectRestaurant/SEARCH_RESTAURANT';
 const FETCH_FOOD_LIST_FROM_RESTAURANT =
   'app/BookerSelectRestaurant/FETCH_FOOD_LIST_FROM_RESTAURANT';
@@ -197,12 +181,6 @@ const fetchRestaurant = createAsyncThunk(
   },
 );
 
-const fetchSearchFilter = createAsyncThunk(FETCH_SEARCH_FILTER, async () => {
-  const { data: searchFiltersResponse } = await fetchSearchFilterApi();
-
-  return searchFiltersResponse;
-});
-
 const searchRestaurants = createAsyncThunk(
   SEARCH_RESTAURANT,
   async (params: TMenuQueryParams, { extra: sdk, getState, dispatch }) => {
@@ -216,7 +194,8 @@ const searchRestaurants = createAsyncThunk(
     const { keywords, ...queryWithoutKeywords } = params;
     const query = getMenuQuery({ order, params: queryWithoutKeywords });
     const orderListing = Listing(order);
-    const { memberAmount = 0 } = orderListing.getMetadata();
+    const { memberAmount = 0, deliveryAddress = {} } =
+      orderListing.getMetadata();
 
     const allMenus = await queryAllPages({ sdkModel: sdk.listings, query });
 
@@ -255,20 +234,13 @@ const searchRestaurants = createAsyncThunk(
       }),
     );
 
-    const totalItems = restaurantsResponse.reduce(
-      (acc, { chunkRestaurantResponseMeta }) => {
-        const { totalItems: chunkTotalItems } = chunkRestaurantResponseMeta;
-
-        return acc + chunkTotalItems;
-      },
-      0,
-    );
-
     const searchResult = flatten(
       restaurantsResponse.map(
         ({ chunkRestaurantsResponse }) => chunkRestaurantsResponse,
       ),
     ).filter((r: TListing) => {
+      const restaurantGetter = Listing(r);
+
       const {
         stopReceiveOrder = false,
         startStopReceiveOrderDate = 0,
@@ -279,7 +251,22 @@ const searchRestaurants = createAsyncThunk(
         Number(timestamp) >= startStopReceiveOrderDate &&
         Number(timestamp) <= endStopReceiveOrderDate;
 
-      return !isInStopReceiveOrderTime;
+      const { geolocation: restaurantOrigin } =
+        restaurantGetter.getAttributes();
+
+      const distanceToDeliveryPlace = calculateDistance(
+        deliveryAddress?.origin,
+        restaurantOrigin,
+      );
+      const isValidRestaurant =
+        !isInStopReceiveOrderTime &&
+        distanceToDeliveryPlace <=
+          Number(
+            process.env
+              .NEXT_PUBLIC_MAX_KILOMETER_FROM_RESTAURANT_TO_DELIVERY_ADDRESS_FOR_BOOKER,
+          );
+
+      return isValidRestaurant;
     });
 
     return {
@@ -288,7 +275,7 @@ const searchRestaurants = createAsyncThunk(
       }),
       searchResult,
       combinedRestaurantMenuData,
-      totalItems,
+      totalItems: searchResult.length,
     };
   },
 );
@@ -365,7 +352,7 @@ const fetchFoodListFromRestaurant = createAsyncThunk(
     const menuId =
       menuIdParam ||
       combinedRestaurantMenuData.find(
-        (item) => item.restaurantId === restaurantId,
+        (item: TObject) => item.restaurantId === restaurantId,
       )?.menuId;
 
     const { data: foodList } = await fetchFoodListFromMenuApi({
@@ -409,53 +396,61 @@ const fetchRestaurantReviews = createAsyncThunk(
     });
     const { meta } = rawResponse.data;
 
-    const response = denormalisedResponseEntities(rawResponse);
-    const reviewerResponse = await Promise.all(
-      response
-        .map((item: TListing) => ({
-          reviewerId: Listing(item).getMetadata()?.reviewerId,
-          reviewId: Listing(item).getId(),
-        }))
-        .map(async ({ reviewerId, reviewId }: any) => {
-          const reviewer = await sdk.users.show({
-            id: reviewerId,
-            include: ['profileImage'],
-            'fields.image': [
-              'variants.square-small',
-              'variants.square-small2x',
-            ],
-          });
+    const fetchedReviews = denormalisedResponseEntities(rawResponse);
 
-          return {
-            id: reviewId,
-            value: denormalisedResponseEntities(reviewer)[0],
-          };
-        }),
+    const reviewerIdList = fetchedReviews.map(
+      (item: TListing) => Listing(item).getMetadata().reviewerId,
+    );
+
+    const reviewers = denormalisedResponseEntities(
+      await sdk.users.query({
+        meta_id: reviewerIdList,
+      }),
+    );
+
+    const reviewerWithReviewIdList = fetchedReviews.fetchedReviews.map(
+      (review: TListing) => {
+        const reviewGetter = Listing(review);
+        const reviewId = reviewGetter.getId();
+        const { reviewerId } = reviewGetter.getMetadata();
+
+        const suitableReviewer = reviewers.find(
+          (reviewer: TUser) => reviewer.id.uuid === reviewerId,
+        );
+
+        return {
+          id: reviewId,
+          value: suitableReviewer,
+        };
+      },
     );
 
     return {
-      ...(CompanyPermission.includes(reviewRole) && {
+      ...(CompanyPermissions.includes(reviewRole) && {
         restaurantBookerReviews: isViewAll
-          ? uniqBy([...restaurantBookerReviews, ...response], 'id.uuid')
-          : response,
+          ? uniqBy([...restaurantBookerReviews, ...fetchedReviews], 'id.uuid')
+          : fetchedReviews,
         restaurantBookerReviewers: isViewAll
           ? {
               ...restaurantBookerReviewers,
-              ...mapValue(keyBy(reviewerResponse, 'id'), 'value'),
+              ...mapValue(keyBy(reviewerWithReviewIdList, 'id'), 'value'),
             }
-          : mapValue(keyBy(reviewerResponse, 'id'), 'value'),
+          : mapValue(keyBy(reviewerWithReviewIdList, 'id'), 'value'),
         bookerReviewPagination: meta,
       }),
-      ...(reviewRole === UserPermission.PARTICIPANT && {
+      ...(reviewRole === ECompanyPermission.participant && {
         restaurantParticipantReviews: isViewAll
-          ? uniqBy([...restaurantParticipantReviews, ...response], 'id.uuid')
-          : response,
+          ? uniqBy(
+              [...restaurantParticipantReviews, ...fetchedReviews],
+              'id.uuid',
+            )
+          : fetchedReviews,
         restaurantParticipantReviewers: isViewAll
           ? {
               ...restaurantParticipantReviewers,
-              ...mapValue(keyBy(reviewerResponse, 'id'), 'value'),
+              ...mapValue(keyBy(reviewerWithReviewIdList, 'id'), 'value'),
             }
-          : mapValue(keyBy(reviewerResponse, 'id'), 'value'),
+          : mapValue(keyBy(reviewerWithReviewIdList, 'id'), 'value'),
         participantReviewPagination: meta,
       }),
     };
@@ -464,15 +459,11 @@ const fetchRestaurantReviews = createAsyncThunk(
 
 export const BookerSelectRestaurantThunks = {
   fetchRestaurant,
-
-  fetchSearchFilter,
   searchRestaurants,
   fetchFoodListFromRestaurant,
-
   fetchOrder,
   fetchPlanDetail,
   updatePlanDetail,
-
   fetchCompanyAccount,
   fetchRestaurantReviews,
 };
@@ -490,15 +481,6 @@ const BookerSelectRestaurantSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchSearchFilter.pending, (state) => {
-        state.fetchFilterInProgress = true;
-      })
-      .addCase(fetchSearchFilter.fulfilled, (state, action) => {
-        state.fetchFilterInProgress = false;
-        state.menuTypes = action.payload.menuTypes;
-        state.categories = action.payload.categories;
-        state.packaging = action.payload.packaging;
-      })
       .addCase(searchRestaurants.pending, (state) => {
         state.searchInProgress = true;
       })

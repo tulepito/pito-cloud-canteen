@@ -10,6 +10,7 @@ const useSelectDay = () => {
 
   const handleSelectDay = useCallback((day: Date) => {
     dispatch(CalendarActions.setSelectedDay(day));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return {

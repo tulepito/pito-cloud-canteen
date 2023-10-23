@@ -13,7 +13,7 @@
 
 .label {
   @include textTemplate(14px, $fontWeightRegular, 16px);
-  color: $neutralGray6;
+  color: $neutralGray7;
 }
 
 .requiredStar {
@@ -24,8 +24,8 @@
   width: 100%;
   height: 46px;
   border-radius: 8px;
-  border: 1px solid $neutralGray4;
-  color: $neutralGray4;
+  border: 1px solid $neutralGray5;
+  color: $neutralGray5;
   padding: 10px 16px;
   position: relative;
   display: flex;
@@ -37,7 +37,7 @@
 
 .value {
   @include textTemplate(16px, $fontWeightRegular, 24px);
-  color: $neutralGray6;
+  color: $neutralGray7;
 }
 
 .paddingWithLeftIcon {
@@ -77,7 +77,7 @@
 
   .dropdownItem {
     @include textTemplate(16px, $fontWeightRegular, 24px);
-    color: $neutralGray6;
+    color: $neutralGray7;
     padding: 10px 16px;
     cursor: pointer;
     transition: background-color 0.15s ease-in-out;

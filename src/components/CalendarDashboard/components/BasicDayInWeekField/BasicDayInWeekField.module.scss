@@ -4,7 +4,7 @@
 
 .fieldLabel {
   @include text(15px, 24px);
-  color: $neutralGray6;
+  color: $neutralGray7;
 }
 
 .fieldGroups {
@@ -16,22 +16,23 @@
 .dayItem {
   @include flexAlign(center, center);
   padding: 8px 16px;
-  color: $neutralGray5;
-  outline: 1px solid $neutralGray4;
+  color: $neutralGray6;
+  outline: 1px solid $neutralGray5;
   outline-offset: -1px;
   border-radius: 20px;
   cursor: pointer;
 
   &.selected {
-    color: $neutralGray6;
-    outline: 2px solid $neutralGray6;
+    color: $neutralGray7;
+    background-color: $neutralGray2;
+    outline: 2px solid $neutralGray7;
     outline-offset: -2px;
   }
 
   &.disabled {
     cursor: not-allowed;
-    color: $neutralGray5;
-    outline: 1px solid $neutralGray4;
+    color: $neutralGray6;
+    outline: 1px solid $neutralGray5;
     opacity: 0.5;
     pointer-events: none;
   }

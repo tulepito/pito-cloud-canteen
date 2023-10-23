@@ -1,9 +1,14 @@
 import { denormalisedResponseEntities } from '@services/data';
 import { emailSendingFactory, EmailTemplateTypes } from '@services/email';
 import { fetchListing } from '@services/integrationHelper';
+import { createNativeNotification } from '@services/nativeNotification';
 import { getIntegrationSdk } from '@services/sdk';
 import { Listing } from '@utils/data';
-import { EOrderStates, EParticipantOrderStatus } from '@utils/enums';
+import {
+  ENativeNotificationType,
+  EOrderStates,
+  EParticipantOrderStatus,
+} from '@utils/enums';
 
 export const cancelPickingOrder = async (orderId: string) => {
   const integrationSdk = await getIntegrationSdk();
@@ -15,6 +20,8 @@ export const cancelPickingOrder = async (orderId: string) => {
     orderState,
     orderStateHistory = [],
     plans = [],
+    participants = [],
+    anonymous = [],
   } = Listing(orderListing).getMetadata();
 
   if (orderState !== EOrderStates.picking) {
@@ -42,6 +49,16 @@ export const cancelPickingOrder = async (orderId: string) => {
     plans.map(async (planId: string) => {
       const plan = await fetchListing(planId);
       const { orderDetail = {} } = Listing(plan).getMetadata();
+      [...participants, ...anonymous].forEach((participantId: string) => {
+        createNativeNotification(
+          ENativeNotificationType.TransitOrderStateToCanceled,
+          {
+            participantId,
+            planId,
+            order: orderListing,
+          },
+        );
+      });
 
       Promise.all(
         Object.keys(orderDetail).map((dateAsTimeStamp) => {
@@ -56,7 +73,7 @@ export const cancelPickingOrder = async (orderId: string) => {
             }
           });
 
-          return participantIds.map((participantId: string) =>
+          return participantIds.forEach((participantId: string) => {
             emailSendingFactory(
               EmailTemplateTypes.PARTICIPANT.PARTICIPANT_SUB_ORDER_CANCELED,
               {
@@ -64,8 +81,8 @@ export const cancelPickingOrder = async (orderId: string) => {
                 timestamp: dateAsTimeStamp,
                 participantId,
               },
-            ),
-          );
+            );
+          });
         }),
       );
     }),

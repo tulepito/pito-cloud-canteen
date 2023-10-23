@@ -8,7 +8,8 @@ import Form from '@components/Form/Form';
 import FieldDatePicker from '@components/FormFields/FieldDatePicker/FieldDatePicker';
 import FieldRadioButton from '@components/FormFields/FieldRadioButton/FieldRadioButton';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
-import { EFoodTypes, FOOD_TYPE_OPTIONS, getLabelByKey } from '@src/utils/enums';
+import { EFoodType } from '@src/utils/enums';
+import { FOOD_TYPE_OPTIONS, getLabelByKey } from '@src/utils/options';
 
 import css from './FilterForm.module.scss';
 
@@ -84,15 +85,15 @@ const FilterFormComponent: React.FC<TFilterFormComponentProps> = (props) => {
         <div className={css.label}>Loại món</div>
         <FieldRadioButton
           name="foodType"
-          id={`foodType-${EFoodTypes.vegetarianDish}`}
-          value={EFoodTypes.vegetarianDish}
-          label={getLabelByKey(FOOD_TYPE_OPTIONS, EFoodTypes.vegetarianDish)}
+          id={`foodType-${EFoodType.vegetarianDish}`}
+          value={EFoodType.vegetarianDish}
+          label={getLabelByKey(FOOD_TYPE_OPTIONS, EFoodType.vegetarianDish)}
         />
         <FieldRadioButton
           name="foodType"
-          id={`foodType-${EFoodTypes.savoryDish}`}
-          value={EFoodTypes.savoryDish}
-          label={getLabelByKey(FOOD_TYPE_OPTIONS, EFoodTypes.savoryDish)}
+          id={`foodType-${EFoodType.savoryDish}`}
+          value={EFoodType.savoryDish}
+          label={getLabelByKey(FOOD_TYPE_OPTIONS, EFoodType.savoryDish)}
         />
       </div>
 

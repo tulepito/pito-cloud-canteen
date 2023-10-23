@@ -4,7 +4,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import flatMapDeep from 'lodash/flatMapDeep';
 import isEmpty from 'lodash/isEmpty';
 
-import Badge, { EBadgeType } from '@components/Badge/Badge';
+import Badge from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
 import IconDownload from '@components/Icons/IconDownload/IconDownload';
 import IconEmpty from '@components/Icons/IconEmpty/IconEmpty';
@@ -22,7 +22,11 @@ import { useBottomScroll } from '@hooks/useBottomScroll';
 import { useViewport } from '@hooks/useViewport';
 import { adminPaths } from '@src/paths';
 import { formatTimestamp } from '@src/utils/dates';
-import { EOrderDetailTabs, EOrderPaymentState } from '@src/utils/enums';
+import {
+  CONFIGS_BASE_ON_PAYMENT_STATUS,
+  EOrderDetailTabs,
+  EOrderPaymentStatus,
+} from '@src/utils/enums';
 import type { TPagination } from '@src/utils/types';
 
 import MobilePaymentCard from './components/MobilePaymentCard/MobilePaymentCard';
@@ -123,11 +127,11 @@ const ManagePaymentsPage = () => {
     {
       key: 'status',
       label: 'Trạng thái',
-      render: ({ status }: any) => (
+      render: ({ status }: { status: EOrderPaymentStatus }) => (
         <div>
           <Badge
-            type={status === 'isPaid' ? EBadgeType.success : EBadgeType.warning}
-            label={status === 'isPaid' ? 'Đã thanh toán' : 'Chưa thanh toán'}
+            type={CONFIGS_BASE_ON_PAYMENT_STATUS[status].badgeType}
+            label={CONFIGS_BASE_ON_PAYMENT_STATUS[status].label}
           />
         </div>
       ),
@@ -139,52 +143,69 @@ const ManagePaymentsPage = () => {
       flatMapDeep(paymentPartnerRecords, (subOrders, orderId) =>
         flatMapDeep(subOrders, (subOrderData, subOrderDate) => ({
           id: `${orderId}_${subOrderDate}`,
-          paymentRecords: [...subOrderData],
+          paymentRecords: [...subOrderData].sort((r1, r2) =>
+            r1.isHideFromHistory === true
+              ? -1
+              : r2.isHideFromHistory === true
+              ? 1
+              : 0,
+          ),
         })),
       ),
     [JSON.stringify(paymentPartnerRecords)],
   );
 
-  const formattedTableData = tableData.map((item) => {
-    const { id, paymentRecords } = item;
-    const companyName = paymentRecords[0].companyName || '';
-    const subOrderDate = paymentRecords[0].subOrderDate || '';
-    const dayIndex = new Date(Number(subOrderDate)).getDay();
-    const deliveryHour = paymentRecords[0].deliveryHour || '';
-    const orderTitle =
-      `${paymentRecords[0].orderTitle || ''}-` +
-      `${dayIndex === 0 ? 7 : dayIndex}`;
-    const totalAmount = paymentRecords[0].totalPrice || 0;
-    const orderId = `${paymentRecords[0].orderId || ''}`;
-    const partnerId = paymentRecords[0].partnerId || '';
-    const paidAmount = paymentRecords.reduce(
-      (acc, cur) => acc + (cur.amount || 0),
-      0,
-    );
-    const subOrderName = `${companyName}_${formatTimestamp(subOrderDate)}`;
-    const remainAmount = totalAmount - paidAmount;
-    const status =
-      remainAmount === 0
-        ? EOrderPaymentState.isPaid
-        : EOrderPaymentState.isNotPaid;
+  const formattedTableData = useMemo(
+    () =>
+      tableData.map((item) => {
+        const { id, paymentRecords = [] } = item;
+        const {
+          companyName = '',
+          subOrderDate = '',
+          deliveryHour = '',
+          orderTitle: orderTitleFromRecord = '',
+          totalPrice: totalAmount = 0,
+          orderId = '',
+          partnerId = '',
+          isAdminConfirmed,
+        } = paymentRecords[0] || {};
 
-    return {
-      key: id,
-      data: {
-        id,
-        subOrderDate,
-        orderTitle,
-        totalAmount,
-        paidAmount,
-        remainAmount,
-        status,
-        deliveryHour,
-        orderId,
-        partnerId,
-        subOrderName,
-      },
-    };
-  });
+        const dayIndex = new Date(Number(subOrderDate)).getDay();
+        const orderTitle = `${orderTitleFromRecord}-${
+          dayIndex === 0 ? 7 : dayIndex
+        }`;
+        const paidAmount = paymentRecords.reduce(
+          (acc, cur) => acc + (cur.amount || 0),
+          0,
+        );
+        const subOrderName = `${companyName}_${formatTimestamp(subOrderDate)}`;
+        const status =
+          isAdminConfirmed === true || totalAmount - paidAmount === 0
+            ? EOrderPaymentStatus.isPaid
+            : EOrderPaymentStatus.isNotPaid;
+
+        const remainAmount =
+          paidAmount > totalAmount ? 0 : totalAmount - paidAmount;
+
+        return {
+          key: id,
+          data: {
+            id,
+            subOrderDate,
+            orderTitle,
+            totalAmount,
+            paidAmount,
+            remainAmount,
+            status,
+            deliveryHour,
+            orderId,
+            partnerId,
+            subOrderName,
+          },
+        };
+      }),
+    [JSON.stringify(tableData)],
+  );
 
   const filteredTableData = useMemo(
     () => filterPayments(formattedTableData, filters),

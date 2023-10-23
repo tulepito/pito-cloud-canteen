@@ -5,7 +5,7 @@ import * as XLSX from 'xlsx';
 
 import { parseThousandNumber } from '@helpers/format';
 import { formatTimestamp } from '@src/utils/dates';
-import { getLabelByKey, ORDER_STATES_OPTIONS } from '@src/utils/enums';
+import { getLabelByKey, ORDER_STATE_OPTIONS } from '@src/utils/options';
 import type { TObject } from '@src/utils/types';
 
 export const parseEntitiesToExportCsv = (
@@ -61,7 +61,7 @@ export const parseEntitiesToExportCsv = (
         'Ngày tạo đơn': orderCreatedAt,
       }),
       ...(hastOrderState && {
-        'Trạng thái đơn': getLabelByKey(ORDER_STATES_OPTIONS, state),
+        'Trạng thái đơn': getLabelByKey(ORDER_STATE_OPTIONS, state),
       }),
       ...(hasCompanyNameCol && { 'Tên công ty': companyName }),
       ...(hasBookerName && { 'Người đại diện': bookerName }),
@@ -121,7 +121,7 @@ export const parseEntitiesToExportCsv = (
               'Ngày tạo đơn': orderCreatedAt,
             }),
             ...(hastOrderState && {
-              'Trạng thái đơn': getLabelByKey(ORDER_STATES_OPTIONS, state),
+              'Trạng thái đơn': getLabelByKey(ORDER_STATE_OPTIONS, state),
             }),
             ...(hasCompanyNameCol && { 'Tên công ty': companyName }),
             ...(hasBookerName && { 'Người đại diện': bookerName }),

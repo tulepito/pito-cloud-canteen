@@ -1,19 +1,15 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 
-import { useAppDispatch } from '@hooks/reduxHooks';
-import { AdminAttributesThunks } from '@pages/admin/Attributes.slice';
+import MetaWrapper from '@components/MetaWrapper/MetaWrapper';
 
 import EditPartnerPage from '../edit/EditPartner.page';
 
 const PartnerSettingsRoute = () => {
-  const dispatch = useAppDispatch();
-
-  useEffect(() => {
-    dispatch(AdminAttributesThunks.fetchAttributes());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  return <EditPartnerPage />;
+  return (
+    <MetaWrapper routeName="PartnerSettingsRoute">
+      <EditPartnerPage />
+    </MetaWrapper>
+  );
 };
 
 export default PartnerSettingsRoute;

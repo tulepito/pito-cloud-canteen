@@ -18,7 +18,7 @@ type TProfileModalProps = {
 const ProfileModal: React.FC<TProfileModalProps> = (props) => {
   const { isOpen, onClose, handleSubmit, initialValues, currentUser } = props;
   const updateProfileInProgress = useAppSelector(
-    (state) => state.ParticipantAccount.updateProfileInProgress,
+    (state) => state.user.updateProfileInProgress,
   );
 
   return (

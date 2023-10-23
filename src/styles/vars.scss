@@ -3,7 +3,6 @@
 $primaryPri1: #ffecea;
 $primaryPri2: #ef3d2a;
 $buttonCTAHoverColor: #ff9f95;
-$black: #000000;
 $pink: #ffbab3;
 
 /* =============== Neutral =============== */
@@ -11,9 +10,10 @@ $pink: #ffbab3;
 $neutralGray1: #ffffff;
 $neutralGray2: #fafafa;
 $neutralGray3: #f0f0f0;
-$neutralGray4: #bfbfbf;
-$neutralGray5: #8c8c8c;
-$neutralGray6: #262626;
+$neutralGray4: #d9d9d9;
+$neutralGray5: #bfbfbf;
+$neutralGray6: #8c8c8c;
+$neutralGray7: #262626;
 
 /* =============== Sematic =============== */
 
@@ -36,14 +36,7 @@ $labelYellow2: #fadb14;
 
 $bannedColorLight: $primaryPri2;
 $bannedColorDark: $primaryPri2;
-
-$googleBackground: #dc4e41;
-
-$formFieldBorderColor: #dee2e6;
-$formFieldBorderColorFocus: #5e72e4;
-$formFieldColor: #242424;
-$formFieldPlaceholderColor: #adb5bd;
-$formLabelColor: $neutralGray6;
+$formFieldPlaceholderColor: $neutralGray5;
 $fieldTextAreaMinHeight: 158px;
 
 /* =============== Font =============== */
@@ -56,15 +49,10 @@ $fontWeightMedium: 500;
 $fontWeightSemiBold: 600;
 $fontWeightBold: 700;
 
-$fontWeightHighlightEmail: $fontWeightBold;
-
 /* =============== Box shadow =============== */
 
 $boxShadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
 $boxShadowPopup: 0 8px 16px 0 rgba(0, 0, 0, 0.3);
-$shadowInput: 0 3px 2px rgb(233 236 239 / 5%);
-$boxShadowInputFocus: 0 3px 9px rgb(50 50 9 / 0%),
-  3px 4px 8px rgb(94 114 228 / 10%);
 
 /* =============== Z-index base levels =============== */
 
@@ -86,8 +74,3 @@ $adminSidebarLeftPartWidth: 60px;
 $adminSidebarRightPartWidth: 220px;
 
 $marketplaceButtonSmallDesktopPadding: 9px 16px 9px 16px;
-
-$singleUseTabRed: #db4a37;
-$singleUseTableTanColor: #fbefd2;
-$singleUseBadgeGreen1: #ebffd6;
-$singleUseBadgeGreen2: #65db63;

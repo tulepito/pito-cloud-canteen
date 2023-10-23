@@ -302,6 +302,11 @@ export const getStartOfDay = (anchorDate: number) => {
   return DateTime.fromMillis(anchorDate).startOf('day').second;
 };
 
+export const getDateEndDate = (date: Date) =>
+  DateTime.fromJSDate(date).endOf('day').toJSDate();
+export const getDateStartOfDate = (date: Date) =>
+  DateTime.fromJSDate(date).startOf('day').toJSDate();
+
 export const DAY_AS_INDEX = {
   [EDayOfWeek.sun]: -1,
   [EDayOfWeek.mon]: 0,
@@ -350,7 +355,7 @@ export const printHoursToString = (hours: number, minutes: number) => {
 
 const DAYS = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
 
-const addDays = (d: Date, days: number) => {
+export const addDays = (d: Date, days: number) => {
   const date = new Date(d);
   date.setDate(date.getDate() + days);
 
@@ -359,10 +364,16 @@ const addDays = (d: Date, days: number) => {
 
 export const getDates = (startDate: Date, stopDate: Date) => {
   const dateArray = [];
-  let currentDate = new Date(startDate);
+  let currentDate = DateTime.fromJSDate(startDate)
+    .setZone(VNTimezone)
+    .startOf('day')
+    .toJSDate();
   while (currentDate <= stopDate) {
-    dateArray.push(new Date(currentDate));
-    currentDate = addDays(currentDate, 1);
+    dateArray.push(currentDate);
+    currentDate = DateTime.fromJSDate(currentDate)
+      .setZone(VNTimezone)
+      .plus({ day: 1 })
+      .toJSDate();
   }
 
   return dateArray;
@@ -377,11 +388,13 @@ export const findClassDays = (
   const rangeDates = getDates(new Date(firstDay), new Date(lastDay)) || [];
   const daysOfWeekUpperCase = daysOfWeek.map((d) => capitalize(d));
 
-  classDays = rangeDates.filter((f) =>
-    daysOfWeekUpperCase.some(
-      (d) => DAYS[d as keyof typeof DAYS] === f.getDay(),
-    ),
-  );
+  classDays = rangeDates.filter((f) => {
+    const weekdayIdx = DateTime.fromJSDate(f).setZone(VNTimezone).weekday % 7;
+
+    return daysOfWeekUpperCase.some((d) => {
+      return DAYS[d as keyof typeof DAYS] === weekdayIdx;
+    });
+  });
 
   return classDays.map((d) => d.getTime());
 };

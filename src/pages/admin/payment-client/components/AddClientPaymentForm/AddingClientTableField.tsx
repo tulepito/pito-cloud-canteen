@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
+import classNames from 'classnames';
 
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
-import {
-  parseThousandNumber,
-  parseThousandNumberToInteger,
-} from '@helpers/format';
+import { parseThousandNumber } from '@helpers/format';
+import useBoolean from '@hooks/useBoolean';
 import { PaymentPercentageDropdown } from '@pages/admin/order/[orderId]/tabs/OrderPaymentStatusTab/components/AddingPaymentRecordForm/AddingPaymentRecordForm';
 
 import css from './AddClientPaymentForm.module.scss';
@@ -28,35 +27,26 @@ const AddingClientTableField: React.FC<TAddClientPaymentFormValues> = (
     handleParseInputValue,
     orderTitle,
     form,
-    values,
     id,
   } = props;
+  const showPercentageController = useBoolean();
   const [percentage, setPercentage] = useState(0);
 
-  const paymentAmountValue =
-    values?.[`paymentAmount - ${orderTitle} - ${id}`] || 0;
+  const fieldName = `paymentAmount - ${orderTitle} - ${id}`;
 
-  useEffect(() => {
-    if (
-      parseThousandNumberToInteger(`${paymentAmountValue}`) >
-      totalAmount - paidAmount
-    ) {
-      form.change(
-        `paymentAmount - ${orderTitle} - ${id}`,
-        parseThousandNumber(`${totalAmount - paidAmount}`),
-      );
-    }
-  }, [form, orderTitle, paidAmount, paymentAmountValue, totalAmount, id]);
+  const rightIconContainerClasses = classNames(css.rightIcon, {
+    [css.rightIconActive]: showPercentageController.value,
+  });
 
   useEffect(() => {
     if (percentage !== 0) {
       form.change(
-        `paymentAmount - ${orderTitle} - ${id}`,
+        fieldName,
         parseThousandNumber((totalAmount * percentage) / 100),
       );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [percentage]);
+  }, [percentage, fieldName]);
 
   return (
     <FieldTextInput
@@ -71,9 +61,10 @@ const AddingClientTableField: React.FC<TAddClientPaymentFormValues> = (
           percentage={percentage}
           setPercentage={setPercentage}
           hasOnlyMaxOption
+          showPercentageController={showPercentageController}
         />
       }
-      rightIconContainerClassName={css.rightIcon}
+      rightIconContainerClassName={rightIconContainerClasses}
       parse={handleParseInputValue}
     />
   );

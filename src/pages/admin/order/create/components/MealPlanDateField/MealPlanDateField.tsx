@@ -13,7 +13,7 @@ import IconCalendar from '@components/Icons/IconCalender/IconCalender';
 import IconClock from '@components/Icons/IconClock/IconClock';
 import { findMinStartDate } from '@helpers/orderHelper';
 import { useAppSelector } from '@hooks/reduxHooks';
-import { EUserPermission } from '@src/utils/enums';
+import { EUserSystemPermission } from '@src/utils/enums';
 import { renderListTimeOptions } from '@utils/dates';
 import type { TObject } from '@utils/types';
 import { composeValidators, nonSatOrSunDay, required } from '@utils/validators';
@@ -91,7 +91,7 @@ const MealPlanDateField: React.FC<MealPlanDateFieldProps> = (props) => {
   const intl = useIntl();
   const userPermission = useAppSelector((state) => state.user.userPermission);
 
-  const idAdminFlow = EUserPermission.admin === userPermission;
+  const idAdminFlow = EUserSystemPermission.admin === userPermission;
   const { startDate: startDateInitialValue, endDate: endDateInitialValue } =
     values;
 

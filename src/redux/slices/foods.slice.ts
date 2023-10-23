@@ -1,11 +1,14 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 import { createSlice } from '@reduxjs/toolkit';
+import chunk from 'lodash/chunk';
+import flatten from 'lodash/flatten';
 import omit from 'lodash/omit';
 import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
 
-import { getAttributesApi, responseApprovalRequestApi } from '@apis/admin';
+import { responseApprovalRequestApi } from '@apis/admin';
 import { partnerFoodApi } from '@apis/foodApi';
+import { queryAllPages } from '@helpers/apiHelpers';
 import { getImportDataFromCsv } from '@pages/admin/partner/[restaurantId]/settings/food/utils';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { denormalisedResponseEntities } from '@utils/data';
@@ -15,7 +18,6 @@ import { storableAxiosError, storableError } from '@utils/errors';
 import type {
   TImage,
   TIntegrationListing,
-  TKeyValue,
   TListing,
   TObject,
   TPagination,
@@ -57,12 +59,8 @@ type TFoodSliceState = {
   queryMenuPickedFoodsInProgress: boolean;
   queryMenuPickedFoodsError: any;
 
-  nutritions: TKeyValue[];
-  categories: TKeyValue[];
-  packaging: TKeyValue[];
-  fetchAttributesInProgress: boolean;
-  fetchAttributesError: any;
-
+  publishOrCloseFoodId: string | null;
+  publishOrCloseFoodIdError: any;
   responseApprovalRequestInProgress: boolean;
   responseApprovalRequestError: any;
 };
@@ -105,12 +103,9 @@ const initialState: TFoodSliceState = {
   queryMenuPickedFoodsInProgress: false,
   queryMenuPickedFoodsError: null,
 
-  nutritions: [],
-  categories: [],
-  packaging: [],
-  fetchAttributesInProgress: false,
-  fetchAttributesError: null,
-
+  // active food
+  publishOrCloseFoodId: null,
+  publishOrCloseFoodIdError: null,
   responseApprovalRequestInProgress: false,
   responseApprovalRequestError: null,
 };
@@ -136,7 +131,9 @@ const DUPLICATE_FOOD = 'app/ManageFoodsPage/DUPLICATE_FOOD';
 const CREATE_FOOD_FROM_FILE = 'app/ManageFoodsPage/CREATE_FOOD_FROM_FILE';
 
 const QUERY_MENU_PICKED_FOODS = 'app/ManageFoodsPage/QUERY_MENU_PICKED_FOODS';
-const FETCH_ATTRIBUTES = 'app/ManageFoodsPage/FETCH_ATTRIBUTES';
+
+const PUBLISH_OR_CLOSE_FOOD = 'app/ManageFoodsPage/PUBLISH_OR_CLOSE_FOOD';
+
 const RESPONSE_APPROVAL_REQUEST =
   'app/ManageFoodsPage/RESPONSE_APPROVAL_REQUEST';
 // ================ Async thunks ================ //
@@ -145,14 +142,22 @@ const queryMenuPickedFoods = createAsyncThunk(
   QUERY_MENU_PICKED_FOODS,
   async (payload: any, { extra: sdk }) => {
     const { restaurantId, ids } = payload;
-    const response = await sdk.listings.query({
-      ids,
-      meta_listingType: EListingType.food,
-      meta_restaurantId: restaurantId,
-      meta_isDeleted: false,
-    });
+    const response = await Promise.all(
+      chunk(ids, 100).map(async (_ids) =>
+        queryAllPages({
+          sdkModel: sdk.listings,
+          query: {
+            ids: _ids,
+            meta_listingType: EListingType.food,
+            meta_restaurantId: restaurantId,
+            meta_isDeleted: false,
+            meta_isFoodEnable: true,
+          },
+        }),
+      ),
+    );
 
-    const foods = denormalisedResponseEntities(response);
+    const foods = flatten(response);
 
     return foods;
   },
@@ -164,19 +169,24 @@ const queryMenuPickedFoods = createAsyncThunk(
 const queryPartnerFoods = createAsyncThunk(
   QUERY_PARTNER_FOODS,
   async (payload: any, { extra: sdk }) => {
-    const { restaurantId, ...rest } = payload;
+    const { isMobileLayout = false, restaurantId, ...rest } = payload;
+
     const response = await sdk.listings.query({
-      ...rest,
       meta_listingType: EListingType.food,
       meta_restaurantId: restaurantId,
       meta_isDeleted: false,
       perPage: MANAGE_FOOD_PAGE_SIZE,
       include: ['images'],
       'fields.image': [`variants.${EImageVariants.squareSmall2x}`],
+      ...rest,
     });
     const foods = denormalisedResponseEntities(response);
 
-    return { foods, managePartnerFoodPagination: response.data.meta };
+    return {
+      isMobileLayout,
+      foods,
+      managePartnerFoodPagination: response.data.meta,
+    };
   },
   {
     serializeError: storableError,
@@ -383,7 +393,7 @@ const createPartnerFoodFromCsv = createAsyncThunk(
         async complete({ data = [] }: { data: any[] }) {
           const isProduction = process.env.NEXT_PUBLIC_ENV === 'production';
           const dataLengthToImport = isProduction ? data.length : 3;
-          const packagingOptions = getState().AdminAttributes.packaging;
+          const packagingOptions = getState().SystemAttributes.packaging;
           const response = await Promise.all(
             data.slice(0, dataLengthToImport).map(async (foodData: any) => {
               const dataParams = getImportDataFromCsv(
@@ -494,11 +504,29 @@ const showDuplicateFood = createAsyncThunk(
   },
 );
 
-const fetchAttributes = createAsyncThunk(FETCH_ATTRIBUTES, async () => {
-  const { data: response } = await getAttributesApi();
+export const publishOrCloseFood = createAsyncThunk(
+  PUBLISH_OR_CLOSE_FOOD,
+  async (payload: any) => {
+    const { id, isPublish } = payload;
+    const promise = isPublish
+      ? partnerFoodApi.publishFoodApi
+      : partnerFoodApi.closeFoodApi;
 
-  return response;
-});
+    const { data } = await promise(id, {
+      dataParams: {},
+      queryParams: {
+        expand: true,
+      },
+    });
+
+    const [food] = denormalisedResponseEntities(data);
+
+    return food;
+  },
+  {
+    serializeError: storableAxiosError,
+  },
+);
 
 const responseApprovalRequest = createAsyncThunk(
   RESPONSE_APPROVAL_REQUEST,
@@ -527,7 +555,7 @@ export const foodSliceThunks = {
   duplicateFood,
   createPartnerFoodFromCsv,
   queryMenuPickedFoods,
-  fetchAttributes,
+  publishOrCloseFood,
   responseApprovalRequest,
 };
 
@@ -570,12 +598,16 @@ const foodSlice = createSlice({
         queryFoodsInProgress: true,
         queryFoodsError: null,
       }))
-      .addCase(queryPartnerFoods.fulfilled, (state, { payload }) => ({
-        ...state,
-        queryFoodsInProgress: false,
-        foods: payload.foods,
-        managePartnerFoodPagination: payload.managePartnerFoodPagination,
-      }))
+      .addCase(queryPartnerFoods.fulfilled, (state, { payload }) => {
+        const { page = 1 } = payload.managePartnerFoodPagination || {};
+
+        state.queryFoodsInProgress = false;
+        state.foods =
+          payload.isMobileLayout && page !== 1
+            ? state.foods.concat(payload.foods)
+            : payload.foods;
+        state.managePartnerFoodPagination = payload.managePartnerFoodPagination;
+      })
       .addCase(queryPartnerFoods.rejected, (state, { payload }) => ({
         ...state,
         queryFoodsInProgress: false,
@@ -729,30 +761,45 @@ const foodSlice = createSlice({
         createPartnerFoodFromCsvInProgress: false,
         createPartnerFoodFromCsvError: payload,
       }))
-
-      .addCase(fetchAttributes.pending, (state) => {
-        return {
+      .addCase(
+        publishOrCloseFood.pending,
+        (
+          state,
+          {
+            meta: {
+              arg: { id: foodId },
+            },
+          },
+        ) => ({
           ...state,
-          fetchAttributesInProgress: true,
-          fetchAttributesError: null,
-        };
-      })
-      .addCase(fetchAttributes.fulfilled, (state, { payload }) => {
-        return {
+          publishOrCloseFoodId: foodId,
+          publishOrCloseFoodIdError: null,
+        }),
+      )
+      .addCase(
+        publishOrCloseFood.fulfilled,
+        (
+          state,
+          {
+            payload,
+            meta: {
+              arg: { id: foodId },
+            },
+          },
+        ) => ({
           ...state,
-          fetchAttributesInProgress: false,
-          nutritions: payload?.nutritions,
-          categories: payload?.categories,
-          packaging: payload?.packaging,
-        };
-      })
-      .addCase(fetchAttributes.rejected, (state, { error }) => {
-        return {
-          ...state,
-          fetchAttributesInProgress: false,
-          fetchAttributesError: error.message,
-        };
-      })
+          publishOrCloseFoodId: null,
+          publishOrCloseFoodIdError: null,
+          foods: state.foods.map((food: TListing) =>
+            food.id.uuid === foodId ? payload : food,
+          ),
+        }),
+      )
+      .addCase(publishOrCloseFood.rejected, (state, { error }) => ({
+        ...state,
+        publishOrCloseFoodId: null,
+        publishOrCloseFoodIdError: error,
+      }))
 
       .addCase(responseApprovalRequest.pending, (state) => ({
         ...state,

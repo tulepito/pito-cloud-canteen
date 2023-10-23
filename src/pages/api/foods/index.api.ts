@@ -1,9 +1,11 @@
+import compact from 'lodash/compact';
+import uniq from 'lodash/uniq';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HttpMethod } from '@apis/configs';
 import { denormalisedResponseEntities } from '@services/data';
 import { getIntegrationSdk } from '@services/sdk';
-import { EListingType } from '@src/utils/enums';
+import { EListingStates, EListingType } from '@src/utils/enums';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const apiMethod = req.method;
@@ -24,12 +26,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
         const restaurantData =
           denormalisedResponseEntities(restaurantResponse)[0];
-        const foodIds = restaurantData?.attributes.metadata?.foods || [];
+        const foodIds = restaurantData?.attributes?.metadata?.foods || [];
         const authorId = restaurantData?.author.id.uuid;
 
         const foodListingData = {
           title,
-          state: 'published',
+          state: EListingStates.published,
           description,
           authorId,
           metadata: {
@@ -48,7 +50,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         await integrationSdk.listings.update({
           id: restaurantId,
           metadata: {
-            foods: [...foodIds, foodListingId],
+            foods: uniq(compact(foodIds.concat(foodListingId))),
           },
         });
 

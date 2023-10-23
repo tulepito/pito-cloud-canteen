@@ -12,9 +12,10 @@ export const useLogout = () => {
   const router = useRouter();
 
   const logoutFn = useCallback(async () => {
-    await router.push(generalPaths.SignIn);
-    await dispatch(authThunks.logout());
-    await dispatch(userActions.clearCurrentUser());
+    const oneSignalInfo = window.sessionStorage.getItem('oneSignalInfo');
+    await dispatch(authThunks.logout(oneSignalInfo!));
+    dispatch(userActions.clearCurrentUser());
+    router.push(generalPaths.SignIn);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

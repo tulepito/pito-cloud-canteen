@@ -65,7 +65,7 @@
       height: 30px;
       width: 1px;
       margin: 0 26px;
-      background-color: $neutralGray4;
+      background-color: $neutralGray5;
 
       @include viewportMedium {
         display: block;
@@ -83,7 +83,7 @@
 
     .iconMail {
       & path {
-        fill: $neutralGray6;
+        fill: $neutralGray7;
       }
     }
 

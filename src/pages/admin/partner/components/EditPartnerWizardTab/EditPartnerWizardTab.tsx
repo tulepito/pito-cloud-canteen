@@ -4,7 +4,8 @@ import React, { useMemo } from 'react';
 import { useRouter } from 'next/router';
 
 import { adminRoutes } from '@src/paths';
-import { EListingStates, OTHER_OPTION } from '@utils/enums';
+import { OTHER_OPTION } from '@src/utils/options';
+import { EListingStates } from '@utils/enums';
 import { parsePrice } from '@utils/validators';
 
 import EditPartnerBasicInformationForm from '../EditPartnerBasicInformationForm/EditPartnerBasicInformationForm';

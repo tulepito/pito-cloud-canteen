@@ -1,5 +1,7 @@
 /* eslint-disable unused-imports/no-unused-vars */
 import { createSlice } from '@reduxjs/toolkit';
+import chunk from 'lodash/chunk';
+import flatten from 'lodash/flatten';
 
 import { createAsyncThunk, createDeepEqualSelector } from '@redux/redux.helper';
 import type { RootState } from '@redux/store';
@@ -8,7 +10,11 @@ import {
   denormalisedResponseEntities,
   ensureCurrentUser,
 } from '@utils/data';
-import { EImageVariants, EUserPermission } from '@utils/enums';
+import {
+  ECompanyPermission,
+  EImageVariants,
+  EUserSystemPermission,
+} from '@utils/enums';
 import { storableError } from '@utils/errors';
 import type { TCurrentUser, TObject } from '@utils/types';
 
@@ -50,21 +56,21 @@ const detectUserPermission = (currentUser: TCurrentUser) => {
     isBooker = false;
   } else {
     isBooker = Object.values(company).some(({ permission }: any) => {
-      return permission === 'booker';
+      return permission === ECompanyPermission.booker;
     });
   }
 
-  if (isAdmin) return EUserPermission.admin;
-  if (isPartner) return EUserPermission.partner;
-  if (isCompany || isBooker) return EUserPermission.company;
+  if (isAdmin) return EUserSystemPermission.admin;
+  if (isPartner) return EUserSystemPermission.partner;
+  if (isCompany || isBooker) return EUserSystemPermission.company;
 
-  return EUserPermission.normal;
+  return EUserSystemPermission.normal;
 };
 
 type TUserState = {
   currentUser: TCurrentUser | null;
   currentUserShowError: any;
-  userPermission: EUserPermission;
+  userPermission: EUserSystemPermission;
   sendVerificationEmailInProgress: boolean;
   sendVerificationEmailError: any;
   favoriteRestaurants: any[];
@@ -77,7 +83,7 @@ type TUserState = {
 const initialState: TUserState = {
   currentUser: null,
   currentUserShowError: null,
-  userPermission: EUserPermission.normal,
+  userPermission: EUserSystemPermission.normal,
   sendVerificationEmailInProgress: false,
   sendVerificationEmailError: null,
   favoriteRestaurants: [],
@@ -90,10 +96,7 @@ const initialState: TUserState = {
 // ================ Thunks ================ //
 const fetchCurrentUser = createAsyncThunk(
   'app/user/FETCH_CURRENT_USER',
-  async (
-    params: TObject | undefined,
-    { extra: sdk, rejectWithValue, fulfillWithValue },
-  ) => {
+  async (params: TObject | undefined, { extra: sdk, rejectWithValue }) => {
     const parameters = params || {
       include: ['profileImage'],
       'fields.image': [
@@ -115,21 +118,24 @@ const fetchCurrentUser = createAsyncThunk(
 
     const { favoriteRestaurantList = [], favoriteFoodList = [] } =
       CurrentUser(currentUser).getPublicData();
-    const favoriteRestaurants = await Promise.all(
-      favoriteRestaurantList.map(
-        async (restaurantId: string) =>
+
+    const favoriteRestaurants = flatten(
+      await Promise.all(
+        chunk<string>(favoriteRestaurantList, 100).map(async (restaurantIds) =>
           denormalisedResponseEntities(
-            await sdk.listings.show({ id: restaurantId }),
-          )[0],
+            await sdk.listings.query({ ids: restaurantIds }),
+          ),
+        ),
       ),
     );
 
-    const favoriteFood = await Promise.all(
-      favoriteFoodList.map(
-        async (foodId: string) =>
+    const favoriteFood = flatten(
+      await Promise.all(
+        chunk<string>(favoriteFoodList, 100).map(async (restaurantIds) =>
           denormalisedResponseEntities(
-            await sdk.listings.show({ id: foodId }),
-          )[0],
+            await sdk.listings.query({ ids: restaurantIds }),
+          ),
+        ),
       ),
     );
 
@@ -174,7 +180,7 @@ const userSlice = createSlice({
         ...state,
         currentUser: null,
         currentUserShowError: null,
-        userPermission: EUserPermission.normal,
+        userPermission: EUserSystemPermission.normal,
         sendVerificationEmailInProgress: false,
         sendVerificationEmailError: null,
       };

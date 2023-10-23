@@ -1,3 +1,5 @@
+import isEqual from 'lodash/isEqual';
+
 import {
   createFoodAveragePriceByDaysOfWeekField,
   createFoodByDateByDaysOfWeekField,
@@ -6,12 +8,13 @@ import {
   createListFoodTypeByFoodIds,
   createMinPriceByDayOfWeek,
   createNutritionsByDaysOfWeekField,
+  createPartnerDraftFoodByDateByDaysOfWeekField,
 } from '@pages/api/apiUtils/menu';
 import { denormalisedResponseEntities } from '@services/data';
 import { getIntegrationSdk } from '@services/sdk';
 import { IntegrationListing } from '@src/utils/data';
 import { addWeeksToDate } from '@src/utils/dates';
-import { EMenuTypes } from '@src/utils/enums';
+import { EMenuType } from '@src/utils/enums';
 import type { TObject, TUpdateMenuApiParams } from '@src/utils/types';
 
 import updateMenuIdListAndMenuWeekDayListForFood from './updateMenuIdListAndMenuWeekDayListForFood.service';
@@ -24,28 +27,29 @@ const updateMenu = async (
   const {
     menuType,
     mealType,
+    mealTypes,
     startDate,
     daysOfWeek,
     restaurantId,
+    draftFoodByDate,
     foodsByDate,
     title,
     endDate,
     numberOfCycles,
+    isDraftEditFlow = false,
   } = dataParams;
 
   const integrationSdk = getIntegrationSdk();
 
-  const isCycleMenu = menuType === EMenuTypes.cycleMenu;
-  const menuResponse = await integrationSdk.listings.show(
-    {
-      id: menuId,
-    },
-    { expand: true },
-  );
+  const isCycleMenu = menuType === EMenuType.cycleMenu;
+  const menuResponse = await integrationSdk.listings.show({
+    id: menuId,
+  });
 
   const [menu] = denormalisedResponseEntities(menuResponse);
-
   const {
+    mealTypes: mealTypesFromMenu = [],
+    daysOfWeek: daysOfWeekFromMenu = [],
     foodsByDate: foodsByDateFromMenu = {},
     monMinFoodPrice: monMinFoodPriceFromMenu = 0,
     tueMinFoodPrice: tueMinFoodPriceFromMenu = 0,
@@ -54,7 +58,11 @@ const updateMenu = async (
     friMinFoodPrice: friMinFoodPriceFromMenu = 0,
     satMinFoodPrice: satMinFoodPriceFromMenu = 0,
     sunMinFoodPrice: sunMinFoodPriceFromMenu = 0,
+    draftFoodByDate: currentDraftFoodByDate,
   } = IntegrationListing(menu).getPublicData();
+
+  const isDaysOfWeekChanged = !isEqual(daysOfWeekFromMenu, daysOfWeek);
+  const isMealTypesChanged = !isEqual(mealTypesFromMenu, mealTypes || []);
 
   const {
     monFoodIdList: monFoodIdListFromMenu = [],
@@ -77,8 +85,9 @@ const updateMenu = async (
   const endDateToSubmit = isCycleMenu
     ? addWeeksToDate(new Date(startDate), numberOfCycles).getTime()
     : endDate;
+
   const listFoodIdsByDate =
-    restaurantId && daysOfWeek
+    restaurantId && daysOfWeek && isDaysOfWeekChanged
       ? createFoodListIdByDaysOfWeekField(
           {
             monFoodIdList: monFoodIdListFromMenu,
@@ -94,10 +103,43 @@ const updateMenu = async (
       : foodsByDate
       ? createListFoodIdsByFoodsByDate(foodsByDate)
       : {};
-
   const foodTypesByDayOfWeek = await createListFoodTypeByFoodIds(
     listFoodIdsByDate,
   );
+  // * prepare mealTypes value
+  const mealTypesMaybe = isDraftEditFlow
+    ? mealTypes
+      ? { mealTypes }
+      : {}
+    : { mealTypes: undefined };
+  // * prepare draftFoodByDate value
+  const draftFoodByDateMaybe = isDraftEditFlow
+    ? daysOfWeek && (isDaysOfWeekChanged || isMealTypesChanged)
+      ? {
+          draftFoodByDate:
+            typeof draftFoodByDate === 'undefined'
+              ? createPartnerDraftFoodByDateByDaysOfWeekField(
+                  daysOfWeek,
+                  mealTypes,
+                  currentDraftFoodByDate || {},
+                )
+              : draftFoodByDate,
+        }
+      : {}
+    : { draftFoodByDate: undefined };
+
+  // * prepare foodsByDate value
+  const foodsByDateMaybe =
+    daysOfWeek && isDaysOfWeekChanged
+      ? {
+          foodsByDate: createFoodByDateByDaysOfWeekField(
+            foodsByDate || foodsByDateFromMenu,
+            daysOfWeek,
+          ),
+        }
+      : {
+          ...(foodsByDate ? { foodsByDate } : {}),
+        };
 
   const response = await integrationSdk.listings.update(
     {
@@ -107,22 +149,15 @@ const updateMenu = async (
         ...(daysOfWeek ? { daysOfWeek } : {}),
         ...(menuType ? { menuType } : {}),
         ...(mealType ? { mealType } : {}),
+        ...mealTypesMaybe,
         ...(startDate ? { startDate } : {}),
         ...(endDateToSubmit ? { endDate: endDateToSubmit } : {}),
         ...(isCycleMenu
           ? { ...(numberOfCycles ? { numberOfCycles } : {}) }
           : {}),
-        ...(daysOfWeek
-          ? {
-              foodsByDate: createFoodByDateByDaysOfWeekField(
-                foodsByDateFromMenu,
-                daysOfWeek,
-              ),
-            }
-          : {
-              ...(foodsByDate ? { foodsByDate } : {}),
-            }),
-        ...(daysOfWeek
+        ...draftFoodByDateMaybe,
+        ...foodsByDateMaybe,
+        ...(daysOfWeek && isDaysOfWeekChanged
           ? {
               ...createFoodAveragePriceByDaysOfWeekField(
                 {
@@ -171,7 +206,6 @@ const updateMenu = async (
   );
 
   const [newMenu] = denormalisedResponseEntities(response);
-
   await updateMenuIdListAndMenuWeekDayListForFood(newMenu);
 
   return response;

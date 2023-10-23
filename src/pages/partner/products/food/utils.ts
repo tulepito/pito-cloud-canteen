@@ -1,9 +1,9 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 /* eslint-disable unused-imports/no-unused-vars */
 import { types as sdkTypes } from '@helpers/sdkLoader';
-import { ListingTypes } from '@src/types/listingTypes';
+import { FOOD_TYPE_OPTIONS, MENU_TYPE_OPTIONS } from '@src/utils/options';
 import type { EFoodApprovalState, EListingStates } from '@utils/enums';
-import { type EMenuTypes, FOOD_TYPE_OPTIONS, MENU_OPTIONS } from '@utils/enums';
+import { type EMenuType, EListingType } from '@utils/enums';
 import { getSubmitImageId, getUniqueImages } from '@utils/images';
 import { toNonAccentVietnamese } from '@utils/string';
 import type { TImage } from '@utils/types';
@@ -26,7 +26,7 @@ export type TEditPartnerFoodFormValues = {
   images: TImage[];
   addImages: TImage[] | number[];
   title: string;
-  menuType: typeof EMenuTypes.fixedMenu | typeof EMenuTypes.cycleMenu;
+  menuType: typeof EMenuType.fixedMenu | typeof EMenuType.cycleMenu;
   minOrderHourInAdvance: string;
   minOrderNumberInAdvance: string;
   minQuantity: string;
@@ -76,8 +76,9 @@ export const getSubmitFoodData = (values: TEditPartnerFoodFormValues) => {
     },
     metadata: {
       restaurantId,
-      listingType: ListingTypes.FOOD,
       isDraft,
+      listingType: EListingType.food,
+      isFoodEnable: true,
     },
   };
 };
@@ -134,7 +135,8 @@ export const getDuplicateData = (values: TEditPartnerFoodFormValues) => {
     },
     metadata: {
       restaurantId,
-      listingType: ListingTypes.FOOD,
+      listingType: EListingType.food,
+      isFoodEnable: true,
     },
   };
 };
@@ -249,7 +251,7 @@ export const getImportDataFromCsv = (
       toNonAccentVietnamese(foodType, true).trim(),
   )?.key;
 
-  const menuTypeValue = MENU_OPTIONS.find(
+  const menuTypeValue = MENU_TYPE_OPTIONS.find(
     (item) =>
       toNonAccentVietnamese(item.label, true).trim() ===
       toNonAccentVietnamese(menuType, true).trim(),
@@ -277,7 +279,8 @@ export const getImportDataFromCsv = (
     },
     metadata: {
       restaurantId,
-      listingType: ListingTypes.FOOD,
+      listingType: EListingType.food,
+      isFoodEnable: true,
     },
   };
 };

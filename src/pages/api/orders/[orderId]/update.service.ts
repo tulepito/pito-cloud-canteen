@@ -10,6 +10,8 @@ import {
 } from '@services/awsEventBrigdeScheduler';
 import { fetchListing, fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
+import { createNativeNotification } from '@services/nativeNotification';
+import { ENativeNotificationType, EOrderStates } from '@src/utils/enums';
 import { denormalisedResponseEntities, Listing } from '@utils/data';
 import { formatTimestamp, VNTimezone } from '@utils/dates';
 
@@ -95,6 +97,20 @@ const updateOrder = async ({
         { expand: true },
       ),
     )[0];
+
+    const { orderState } = generalInfo || {};
+
+    if (orderState === EOrderStates.picking) {
+      participants.forEach((participantId) => {
+        createNativeNotification(
+          ENativeNotificationType.BookerTransitOrderStateToPicking,
+          {
+            participantId,
+            order: orderListing,
+          },
+        );
+      });
+    }
   }
 
   sendNotificationToParticipantOnUpdateOrder(orderId);

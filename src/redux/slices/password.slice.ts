@@ -114,9 +114,9 @@ const passwordSlice = createSlice({
       .addCase(changePassword.fulfilled, (state) => {
         state.changePasswordInProgress = false;
       })
-      .addCase(changePassword.rejected, (state, { error }) => {
+      .addCase(changePassword.rejected, (state, { payload }) => {
         state.changePasswordInProgress = false;
-        state.changePasswordError = error;
+        state.changePasswordError = payload;
       })
 
       .addCase(recoverPassword.pending, (state) => {

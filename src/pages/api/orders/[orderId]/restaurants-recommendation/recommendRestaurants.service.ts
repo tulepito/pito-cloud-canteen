@@ -3,20 +3,43 @@ import { DateTime } from 'luxon';
 
 import { queryAllListings } from '@helpers/apiHelpers';
 import { getMenuQuery, getRestaurantQuery } from '@helpers/listingSearchQuery';
-import { adminQueryListings, fetchListing } from '@services/integrationHelper';
-import { Listing } from '@src/utils/data';
+import { calculateDistance } from '@helpers/mapHelpers';
+import {
+  adminQueryListings,
+  fetchListing,
+  fetchUser,
+} from '@services/integrationHelper';
+import { Listing, User } from '@src/utils/data';
 import { convertWeekDay, renderDateRange, VNTimezone } from '@src/utils/dates';
 import { EOrderType } from '@src/utils/enums';
 import type { TListing } from '@src/utils/types';
 
-export const recommendRestaurantForSpecificDay = async (
-  orderId: string,
-  timestamp: number,
-) => {
+const maxKilometerFromRestaurantToDeliveryAddressForBooker =
+  process.env
+    .NEXT_PUBLIC_MAX_KILOMETER_FROM_RESTAURANT_TO_DELIVERY_ADDRESS_FOR_BOOKER;
+
+export const recommendRestaurantForSpecificDay = async ({
+  orderId,
+  timestamp,
+  shouldCalculateDistance,
+}: {
+  orderId: string;
+  timestamp: number;
+  shouldCalculateDistance: boolean;
+}) => {
   const order = await fetchListing(orderId);
-  const { plans = [], memberAmount = 0 } = Listing(
-    order as TListing,
-  ).getMetadata();
+  const {
+    plans = [],
+    memberAmount = 0,
+    deliveryAddress = {},
+    companyId,
+  } = Listing(order as TListing).getMetadata();
+
+  const orderDeliveryOriginMaybe = deliveryAddress?.origin;
+  const company = await fetchUser(companyId);
+  const { companyLocation = {} } = User(company).getPublicData();
+  const companyOriginMaybe = companyLocation?.origin;
+  const deliveryOrigin = orderDeliveryOriginMaybe || companyOriginMaybe;
 
   const planListing = await fetchListing(plans[0]);
 
@@ -50,9 +73,27 @@ export const recommendRestaurantForSpecificDay = async (
 
   const restaurants = allMenus.reduce((result: any, menu: TListing) => {
     const { restaurantId } = Listing(menu).getMetadata();
-    const restaurantInfo = restaurantsResponse.find(
-      (restaurant: TListing) => Listing(restaurant).getId() === restaurantId,
-    );
+    const restaurantInfo = restaurantsResponse.find((restaurant: TListing) => {
+      const restaurantGetter = Listing(restaurant);
+
+      if (shouldCalculateDistance) {
+        const { geolocation: restaurantOrigin } =
+          restaurantGetter.getAttributes();
+
+        const distanceToDeliveryPlace = calculateDistance(
+          deliveryOrigin,
+          restaurantOrigin,
+        );
+        const isValidRestaurant =
+          distanceToDeliveryPlace <=
+          Number(maxKilometerFromRestaurantToDeliveryAddressForBooker);
+
+        return isValidRestaurant && restaurantGetter.getId() === restaurantId;
+      }
+
+      return restaurantGetter.getId() === restaurantId;
+    });
+
     if (!restaurantInfo) return result;
 
     return result.concat({
@@ -101,7 +142,13 @@ export const recommendRestaurantForSpecificDay = async (
   return orderDetail;
 };
 
-export const recommendRestaurants = async (orderId: string) => {
+export const recommendRestaurants = async ({
+  orderId,
+  shouldCalculateDistance,
+}: {
+  orderId: string;
+  shouldCalculateDistance: boolean;
+}) => {
   const order = await fetchListing(orderId as string);
   const orderDetail: any = {};
   const {
@@ -109,71 +156,96 @@ export const recommendRestaurants = async (orderId: string) => {
     startDate,
     endDate,
     orderType = EOrderType.group,
+    companyId,
+    deliveryAddress = {},
     memberAmount = 0,
   } = Listing(order as TListing).getMetadata();
   const isNormalOrder = orderType === EOrderType.normal;
-  const totalDates = renderDateRange(startDate, endDate);
 
+  const orderDeliveryOriginMaybe = deliveryAddress?.origin;
+  const company = await fetchUser(companyId);
+  const { companyLocation = {} } = User(company).getPublicData();
+  const companyOriginMaybe = companyLocation?.origin;
+  const deliveryOrigin = orderDeliveryOriginMaybe || companyOriginMaybe;
+
+  const totalDates = renderDateRange(startDate, endDate);
   await Promise.all(
     totalDates.map(async (dateTime) => {
-      if (
-        dayInWeek.includes(
-          convertWeekDay(
-            DateTime.fromMillis(dateTime).setZone(VNTimezone).weekday,
-          ).key,
-        )
-      ) {
-        const menuQueryParams = {
-          timestamp: dateTime,
-        };
-        const menuQuery = getMenuQuery({
-          order,
-          params: menuQueryParams,
-        });
-        const allMenus = await queryAllListings({
-          query: menuQuery,
-        });
-        const restaurantIdList = uniq<any>(
-          allMenus.map((menu: TListing) => {
-            const { restaurantId } = Listing(menu).getMetadata();
-
-            return restaurantId;
-          }),
-        ).slice(0, 100);
-
-        const restaurantsQuery = getRestaurantQuery({
-          restaurantIds: restaurantIdList,
-          companyAccount: null,
-          params: {
-            memberAmount,
-          },
-        });
-
-        const listings = await adminQueryListings(restaurantsQuery);
-
-        const restaurants = allMenus.reduce((result: any, menu: TListing) => {
+      const menuQueryParams = {
+        timestamp: dateTime,
+      };
+      const menuQuery = getMenuQuery({
+        order,
+        params: menuQueryParams,
+      });
+      const allMenus = await queryAllListings({
+        query: menuQuery,
+      });
+      const restaurantIdList = uniq<any>(
+        allMenus.map((menu: TListing) => {
           const { restaurantId } = Listing(menu).getMetadata();
-          const restaurantInfo = listings.find(
-            (restaurant: TListing) =>
-              Listing(restaurant).getId() === restaurantId,
-          );
-          if (!restaurantInfo) return result;
 
-          return result.concat({
-            menu,
-            restaurantInfo,
-          });
-        }, []);
+          return restaurantId;
+        }),
+      ).slice(0, 100);
 
-        if (restaurants.length > 0) {
-          const randomRestaurant =
-            restaurants[Math.floor(Math.random() * (restaurants.length - 1))];
-          const restaurantGetter = Listing(randomRestaurant?.restaurantInfo);
-          const { minQuantity = 0, maxQuantity = 100 } =
-            restaurantGetter.getPublicData();
-          console.log(restaurantGetter.getPublicData());
-          const lineItemsMaybe = isNormalOrder ? { lineItems: [] } : {};
+      const restaurantsQuery = getRestaurantQuery({
+        restaurantIds: restaurantIdList,
+        companyAccount: null,
+        params: {
+          memberAmount,
+        },
+      });
 
+      const listings = await adminQueryListings(restaurantsQuery);
+
+      const restaurants = allMenus.reduce((result: any, menu: TListing) => {
+        const { restaurantId } = Listing(menu).getMetadata();
+        const restaurantInfo = listings.find((restaurant: TListing) => {
+          const restaurantGetter = Listing(restaurant);
+
+          if (shouldCalculateDistance) {
+            const { geolocation: restaurantOrigin } =
+              restaurantGetter.getAttributes();
+
+            const distanceToDeliveryPlace = calculateDistance(
+              deliveryOrigin,
+              restaurantOrigin,
+            );
+            const isValidRestaurant =
+              distanceToDeliveryPlace <=
+              Number(maxKilometerFromRestaurantToDeliveryAddressForBooker);
+
+            return (
+              isValidRestaurant && restaurantGetter.getId() === restaurantId
+            );
+          }
+
+          return restaurantGetter.getId() === restaurantId;
+        });
+        if (!restaurantInfo) return result;
+
+        return result.concat({
+          menu,
+          restaurantInfo,
+        });
+      }, []);
+
+      const lineItemsMaybe = isNormalOrder ? { lineItems: [] } : {};
+      if (restaurants.length > 0) {
+        const randomRestaurant =
+          restaurants[Math.floor(Math.random() * (restaurants.length - 1))];
+        const restaurantGetter = Listing(randomRestaurant?.restaurantInfo);
+        const { minQuantity = 0, maxQuantity = 100 } =
+          restaurantGetter.getPublicData();
+
+        if (
+          dayInWeek.includes(
+            convertWeekDay(
+              DateTime.fromMillis(dateTime).setZone(VNTimezone).weekday,
+            ).key,
+          )
+        ) {
           orderDetail[dateTime] = {
             restaurant: {
               id: restaurantGetter.getId(),
@@ -189,8 +261,19 @@ export const recommendRestaurants = async (orderId: string) => {
               ).getPublicData()?.phoneNumber,
             },
             ...lineItemsMaybe,
+            hasNoRestaurants: false,
+          };
+        } else {
+          orderDetail[dateTime] = {
+            ...lineItemsMaybe,
+            hasNoRestaurants: false,
           };
         }
+      } else {
+        orderDetail[dateTime] = {
+          ...lineItemsMaybe,
+          hasNoRestaurants: true,
+        };
       }
     }),
   );

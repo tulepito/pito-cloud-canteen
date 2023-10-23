@@ -22,18 +22,16 @@
     &::-webkit-inner-spin-button {
       -webkit-appearance: none;
       margin: 0;
-      // -moz-appearance: textfield;
     }
 
     &::-webkit-outer-spin-button {
       -webkit-appearance: none;
       margin: 0;
-      // -moz-appearance: textfield;
     }
   }
 }
 .label {
-  border-left: 1px solid $neutralGray4;
+  border-left: 1px solid $neutralGray5;
   padding-left: 12px;
-  color: $neutralGray4;
+  color: $neutralGray5;
 }

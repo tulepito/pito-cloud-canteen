@@ -3,6 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import cookies from '@services/cookie';
 import adminChecker from '@services/permissionChecker/admin';
 import { getIntegrationSdk, handleError } from '@services/sdk';
+import { EListingStates } from '@src/utils/enums';
 import { denormalisedResponseEntities } from '@utils/data';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
@@ -15,7 +16,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       {
         id,
         metadata: {
-          userState: 'published',
+          userState: EListingStates.published,
         },
       },
       {
@@ -36,7 +37,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         {
           id: listingId,
           metadata: {
-            listingState: 'published',
+            listingState: EListingStates.published,
           },
         },
         { expand: true },

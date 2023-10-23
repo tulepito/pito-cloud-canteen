@@ -13,8 +13,8 @@ import { customPristine } from '@helpers/form';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import NutritionField from '@pages/admin/order/create/components/NutritionField/NutritionField';
+import { FOOD_CATEGORY_OPTIONS } from '@src/utils/options';
 import { Listing, User } from '@utils/data';
-import { CATEGORY_OPTIONS } from '@utils/enums';
 import type { TUser } from '@utils/types';
 
 import { NutritionThunks } from '../../Nutrition.slice';
@@ -118,8 +118,9 @@ const NutritionFormComponent: React.FC<TNutritionFormComponentProps> = (
                       ?.categories?.slice(0, 3)
                       .map(
                         (category: string) =>
-                          CATEGORY_OPTIONS.find((item) => item.key === category)
-                            ?.label,
+                          FOOD_CATEGORY_OPTIONS.find(
+                            (item) => item.key === category,
+                          )?.label,
                       )
                       .join(', '),
                   },

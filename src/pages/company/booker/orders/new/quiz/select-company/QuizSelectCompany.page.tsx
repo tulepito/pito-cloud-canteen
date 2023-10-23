@@ -97,6 +97,7 @@ const QuizSelectCompany = () => {
         label: companyItem.name,
         key: companyItem.id,
       })),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [JSON.stringify(bookerCompanyIdList)],
   );
 

@@ -15,8 +15,8 @@ import Table from '@components/Table/Table';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { foodSliceThunks } from '@redux/slices/foods.slice';
 import KeywordSearchForm from '@src/pages/admin/partner/components/KeywordSearchForm/KeywordSearchForm';
+import { FOOD_SIDE_DISH_OPTIONS, getLabelByKey } from '@src/utils/options';
 import { IntegrationListing } from '@utils/data';
-import { getLabelByKey, SIDE_DISH_OPTIONS } from '@utils/enums';
 import type {
   TIntegrationListing,
   TObject,
@@ -55,7 +55,7 @@ const FOOD_TABLE_COLUMNS: TColumn[] = [
               id={`${data.id}.${item}`}
               value={item}
               disabled={!isChecked}
-              label={getLabelByKey(SIDE_DISH_OPTIONS, item)}
+              label={getLabelByKey(FOOD_SIDE_DISH_OPTIONS, item)}
             />
           ))}
         </div>
@@ -160,6 +160,7 @@ const AddFoodModal: React.FC<TAddFoodModal> = (props) => {
           page,
           pub_menuType: menuType,
           keywords,
+          meta_isFoodEnable: true,
         }),
       );
     }

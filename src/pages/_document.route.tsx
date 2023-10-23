@@ -1,5 +1,5 @@
+/* eslint-disable @next/next/no-sync-scripts */
 import { Head, Html, Main, NextScript } from 'next/document';
-
 /**
  * Use https://realfavicongenerator.net/ for generate favicon
  */

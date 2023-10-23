@@ -17,20 +17,18 @@
     &::-webkit-inner-spin-button {
       -webkit-appearance: none;
       margin: 0;
-      // -moz-appearance: textfield;
     }
 
     &::-webkit-outer-spin-button {
       -webkit-appearance: none;
       margin: 0;
-      // -moz-appearance: textfield;
     }
   }
 }
 .vndIcon {
-  border-left: 1px solid $neutralGray4;
+  border-left: 1px solid $neutralGray5;
   padding: 0 16px;
-  color: $neutralGray4;
+  color: $neutralGray5;
 }
 
 .toggle {

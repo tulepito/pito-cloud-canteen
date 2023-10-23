@@ -14,12 +14,24 @@
   border-radius: 16px;
 }
 
+.content {
+  @include flexCenter;
+  flex-direction: column;
+  max-width: 516px;
+  margin: 48px auto;
+}
+
+.modalMessage {
+  text-align: center;
+}
+
 .error {
   color: $sematicRed2;
 }
 
-.bottomWrapper {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+.divider {
+  width: 100%;
+  border-bottom: 2px solid $neutralGray3;
+  margin-top: 24px;
+  margin-bottom: 24px;
 }

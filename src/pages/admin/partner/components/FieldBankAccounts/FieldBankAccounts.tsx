@@ -9,7 +9,7 @@ import FieldDropdownSelect from '@components/FormFields/FieldDropdownSelect/Fiel
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import IconAdd from '@components/Icons/IconAdd/IconAdd';
 import IconDelete from '@components/Icons/IconDelete/IconDelete';
-import { LIST_BANKS } from '@utils/enums';
+import { BANK_OPTIONS } from '@utils/options';
 import {
   composeValidators,
   numberMinLength,
@@ -76,7 +76,7 @@ const FieldBankAccounts: React.FC<TFieldBankAccounts> = (props) => {
                       id={`${fieldName}.bankId`}
                       name={`${fieldName}.bankId`}
                       required
-                      options={LIST_BANKS}
+                      options={BANK_OPTIONS}
                       validate={required(
                         intl.formatMessage({
                           id: 'FieldBankAccounts.bankIdRequired',

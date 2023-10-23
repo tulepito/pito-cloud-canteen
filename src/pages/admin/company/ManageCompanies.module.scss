@@ -72,7 +72,7 @@
     }
 
     &:hover {
-      background-color: $neutralGray4;
+      background-color: $neutralGray5;
 
       .icon * {
         fill: $neutralGray1;
@@ -158,13 +158,13 @@
     text-align: center;
     font-size: 12px;
     font-weight: 600 !important;
-    color: $neutralGray5 !important;
+    color: $neutralGray6 !important;
   }
   &.badgeContainerActive {
     max-width: 77px !important;
-    background-color: $singleUseBadgeGreen1 !important;
+    background-color: $sematicGreen1 !important;
     .badgeLabel {
-      color: $singleUseBadgeGreen2 !important;
+      color: $sematicGreen2 !important;
     }
   }
 }
@@ -181,7 +181,7 @@
 
 .memberEmail,
 .memberPhoneNumber {
-  color: $neutralGray5;
+  color: $neutralGray6;
 }
 
 .tableWrapper {

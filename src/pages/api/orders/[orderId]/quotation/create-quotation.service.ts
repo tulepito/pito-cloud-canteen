@@ -5,16 +5,15 @@ import { getIntegrationSdk } from '@services/integrationSdk';
 import { denormalisedResponseEntities, Listing, User } from '@src/utils/data';
 import { EListingStates, EListingType } from '@src/utils/enums';
 
-import updateQuotationStatus from './update-quotation-status.service';
-
 const ADMIN_ID = process.env.PITO_ADMIN_ID || '';
 
 const createQuotation = async (params: TCreateQuotationApiBody) => {
   const { companyId, orderId } = params;
   const integrationSdk = getIntegrationSdk();
+
+  // TODO: get current and update new quotation number
   const admin = await fetchUser(ADMIN_ID as string);
-  const adminUser = User(admin);
-  const { quotationIdNumber = 0 } = adminUser.getMetadata();
+  const { quotationIdNumber = 0 } = User(admin).getMetadata();
   await integrationSdk.users.updateProfile({
     id: ADMIN_ID,
     metadata: {
@@ -29,12 +28,10 @@ const createQuotation = async (params: TCreateQuotationApiBody) => {
   const companyAccount = await fetchUser(companyId);
   const { subAccountId } = companyAccount.attributes.profile.privateData;
 
-  const quotationId = generateUncountableIdForQuotation(quotationIdNumber);
-
   const quotationResponse = await integrationSdk.listings.create(
     {
+      title: generateUncountableIdForQuotation(quotationIdNumber),
       authorId: subAccountId,
-      title: quotationId,
       state: EListingStates.published,
       metadata: {
         ...params,
@@ -47,10 +44,17 @@ const createQuotation = async (params: TCreateQuotationApiBody) => {
 
   const quotation = denormalisedResponseEntities(quotationResponse)[0];
 
+  // TODO: inactive old quotation listing
   if (oldQuotationId) {
-    updateQuotationStatus(oldQuotationId);
+    integrationSdk.listings.update({
+      id: oldQuotationId,
+      metadata: {
+        status: 'inactive',
+      },
+    });
   }
 
+  // TODO: update new listing quotation ID
   await integrationSdk.listings.update({
     id: orderId,
     metadata: {

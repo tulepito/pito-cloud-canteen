@@ -27,9 +27,9 @@ import type { TObject } from '@src/utils/types';
 import { parsePrice } from '@src/utils/validators';
 import {
   EFoodApprovalState,
-  EFoodTypes,
+  EFoodType,
   EListingStates,
-  EMenuTypes,
+  EMenuType,
   ESlackNotificationType,
 } from '@utils/enums';
 import { getInitialAddImages } from '@utils/images';
@@ -132,8 +132,8 @@ const EditPartnerFoodPage = () => {
       description,
       price: parsePrice(price?.amount || 0),
       ...publicData,
-      menuType: menuType || EMenuTypes.fixedMenu,
-      foodType: foodType || EFoodTypes.savoryDish,
+      menuType: menuType || EMenuType.fixedMenu,
+      foodType: foodType || EFoodType.savoryDish,
       minQuantity: minQuantity || minQuantityFromPartner,
       maxQuantity: maxQuantity || maxQuantityFromPartner,
       minOrderHourInAdvance: minOrderHourInAdvance || 24,

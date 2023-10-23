@@ -1,4 +1,3 @@
-export { default as adminAccountSetting } from './adminAccountSetting.slice';
 export { default as auth } from './auth.slice';
 export { default as BookerCompanies } from './BookerCompanies.slice';
 export { default as Calendar } from './Calendar.slice';
@@ -27,8 +26,8 @@ export { default as UI } from './UI.slice';
 export { default as uploadImage } from './uploadImage.slice';
 export { default as user } from './user.slice';
 export { default as walkthrough } from './walkthrough.slice';
-export { default as AdminAttributes } from '@pages/admin/Attributes.slice';
-export { default as OrderDetail } from '@pages/admin/order/[orderId]/OrderDetail.slice';
+export { default as AdminAttributes } from '@pages/admin/AdminAttributes.slice';
+export { default as AdminManageOrder } from '@pages/admin/order/AdminManageOrder.slice';
 export { default as AdminManageClientPayments } from '@pages/admin/payment-client/AdminManageClientPayments.slice';
 export { default as PaymentPartner } from '@pages/admin/payment-partner/PaymentPartner.slice';
 export { default as Nutrition } from '@pages/company/[companyId]/nutrition/Nutrition.slice';
@@ -36,7 +35,6 @@ export { default as BookerDraftOrderPage } from '@pages/company/booker/orders/dr
 export { default as BookerSelectRestaurant } from '@pages/company/booker/orders/draft/[orderId]/restaurants/BookerSelectRestaurant.slice';
 export { default as BookerNewOrderPage } from '@pages/company/booker/orders/new/BookerNewOrder.slice';
 export { default as OrderRating } from '@pages/company/orders/[orderId]/rating/OrderRating.slice';
-export { default as ParticipantAccount } from '@pages/participant/account/Account.slice';
 export { default as ParticipantOrderList } from '@pages/participant/orders/OrderList.slice';
 export { default as ParticipantPlanPage } from '@pages/participant/plans/[planId]/ParticipantPlanPage.slice';
 export { default as ParticipantSubOrderList } from '@pages/participant/sub-orders/SubOrders.slice';
@@ -44,5 +42,6 @@ export { default as PartnerSubOrderDetail } from '@pages/partner/orders/[subOrde
 export { default as PartnerManageOrders } from '@pages/partner/orders/ManageOrders.slice';
 export { default as PartnerManagePayments } from '@pages/partner/payments/PartnerManagePayments.slice';
 export { default as PartnerFood } from '@pages/partner/products/food/PartnerFood.slice';
+export { default as PartnerManageMenus } from '@pages/partner/products/menu/PartnerManageMenus.slice';
 export { default as PartnerSettingsPage } from '@pages/partner/settings/PartnerSettings.slice';
 export { default as TrackingPage } from '@pages/tracking/[subOrderId]/TrackingPage.slice';

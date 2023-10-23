@@ -11,10 +11,10 @@ import FieldTextInputWithBottomBox from '@components/FormFields/FieldTextInputWi
 import { useAppSelector } from '@hooks/reduxHooks';
 import type { TEditPartnerFoodFormValues } from '@pages/admin/partner/[restaurantId]/settings/food/utils';
 import {
+  FOOD_SIDE_DISH_OPTIONS,
   FOOD_TYPE_OPTIONS,
   OTHER_OPTION,
-  SIDE_DISH_OPTIONS,
-} from '@src/utils/enums';
+} from '@src/utils/options';
 import type { TKeyValue } from '@src/utils/types';
 import { required } from '@src/utils/validators';
 
@@ -158,7 +158,7 @@ const FoodDetailInforTabFormPart: React.FC<TFoodDetailInforTabFormPartProps> = (
           id: 'EditPartnerFoodForm.sideDishLabel',
         })}
         labelClassName={css.label}
-        options={SIDE_DISH_OPTIONS}
+        options={FOOD_SIDE_DISH_OPTIONS}
       />
 
       <div className={css.fixedBottomBtn}>

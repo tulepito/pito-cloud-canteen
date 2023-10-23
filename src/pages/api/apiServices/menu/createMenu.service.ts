@@ -1,8 +1,8 @@
+import { createPartnerDraftFoodByDateByDaysOfWeekField } from '@pages/api/apiUtils/menu';
 import { denormalisedResponseEntities } from '@services/data';
 import { getIntegrationSdk } from '@services/integrationSdk';
-import { ListingTypes } from '@src/types/listingTypes';
 import { addWeeksToDate } from '@src/utils/dates';
-import { EListingStates, EMenuTypes } from '@src/utils/enums';
+import { EListingStates, EListingType, EMenuType } from '@src/utils/enums';
 import type {
   TCreateMenuApiParams,
   TIntegrationListing,
@@ -19,8 +19,9 @@ const createMenu = async (
   const {
     menuType,
     mealType,
+    mealTypes,
     startDate,
-    daysOfWeek,
+    daysOfWeek = [],
     restaurantId,
     title,
     numberOfCycles,
@@ -35,7 +36,7 @@ const createMenu = async (
 
   const { geolocation } = restaurant.attributes;
 
-  const isCycleMenu = menuType === EMenuTypes.cycleMenu;
+  const isCycleMenu = menuType === EMenuType.cycleMenu;
 
   const endDateToSubmit = isCycleMenu
     ? addWeeksToDate(new Date(startDate), numberOfCycles).getTime()
@@ -51,16 +52,25 @@ const createMenu = async (
         mealType,
         startDate,
         endDate: endDateToSubmit,
+        ...(mealTypes ? { mealTypes } : {}),
         ...(isCycleMenu ? { numberOfCycles } : {}),
+        ...(daysOfWeek
+          ? {
+              draftFoodByDate: createPartnerDraftFoodByDateByDaysOfWeekField(
+                daysOfWeek,
+                mealTypes,
+              ),
+            }
+          : {}),
       },
       metadata: {
         menuType,
-        listingType: ListingTypes.MENU,
+        listingType: EListingType.menu,
         restaurantId,
         listingState: EListingStates.draft,
         ...(geolocation ? { geolocation } : {}),
-        state: 'published',
-        authorId: restaurant?.author.id.uuid,
+        state: EListingStates.published,
+        authorId: restaurant?.author?.id?.uuid,
       },
     },
     queryParams,

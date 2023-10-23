@@ -9,21 +9,21 @@ import type {
   EAvailabilityPlans,
   EBookerOrderDraftStates,
   EBookingStates,
+  ECompanyDashboardNotificationType,
   EDayOfWeek,
+  EEditSubOrderHistoryType,
   EErrorCode,
   EImageVariants,
   EListingStates,
   EManageCompanyOrdersTab,
   EMenuMealType,
-  EMenuTypes,
-  ENotificationPopupTypes,
-  ENotificationTypes,
+  EMenuType,
+  ENotificationPopupType,
   EOrderDraftStates,
-  EOrderHistoryTypes,
   EOrderStates,
   EPaymentType,
   EReviewRatings,
-  EReviewTypes,
+  EReviewType,
   ETimeSlots,
   ETransactionRoles,
   ETxTransitionActors,
@@ -336,7 +336,7 @@ export type TTransition = {
 };
 
 export type TReviewRating = EReviewRatings;
-export type TReviewType = EReviewTypes;
+export type TReviewType = EReviewType;
 
 export type TReviewAttributes = {
   createdAt: Date;
@@ -543,10 +543,10 @@ export type TOrderStateCountMap = {
 };
 
 export type TCompanyOrderNoticationMap = {
-  [ENotificationTypes.completedOrder]: TListing | null;
-  [ENotificationTypes.deadlineDueOrder]: TListing | null;
-  [ENotificationTypes.draftOrder]: TListing | null;
-  [ENotificationTypes.pickingOrder]: TListing | null;
+  [ECompanyDashboardNotificationType.completedOrder]: TListing | null;
+  [ECompanyDashboardNotificationType.deadlineDueOrder]: TListing | null;
+  [ECompanyDashboardNotificationType.draftOrder]: TListing | null;
+  [ECompanyDashboardNotificationType.pickingOrder]: TListing | null;
 };
 
 export type TCompanyOrderSummary = {
@@ -615,8 +615,9 @@ export type TUpdateCompanyApiParams = {
 };
 
 export type TCreateMenuApiParams = {
-  menuType: EMenuTypes;
+  menuType: EMenuType;
   mealType: EMenuMealType;
+  mealTypes?: EMenuMealType[];
   startDate: number;
   daysOfWeek: EDayOfWeek[];
   restaurantId: string;
@@ -627,21 +628,24 @@ export type TCreateMenuApiParams = {
 
 export type TUpdateMenuApiParams = {
   id: string;
-  foodsByDate: TObject;
-  menuType: EMenuTypes;
+  foodsByDate?: TObject;
+  menuType: EMenuType;
   mealType: EMenuMealType;
+  mealTypes?: EMenuMealType[];
+  draftFoodByDate?: TObject;
   startDate: number;
-  daysOfWeek: EDayOfWeek[];
+  daysOfWeek?: EDayOfWeek[];
   restaurantId: string;
   title: string;
   numberOfCycles: number;
   endDate: number;
+  isDraftEditFlow?: boolean;
 };
 
 export type TDuplicateMenuApiParams = {
   id: string;
   foodsByDate: TObject;
-  menuType: EMenuTypes;
+  menuType: EMenuType;
   mealType: EMenuMealType;
   startDate: number;
   daysOfWeek: EDayOfWeek[];
@@ -675,7 +679,7 @@ export type TNotification = {
   messageValues: TObject;
   linkProps: any;
   hidden: boolean;
-  type: ENotificationPopupTypes;
+  type: ENotificationPopupType;
 };
 
 export type TSubOrderChangeHistoryItem = {
@@ -690,7 +694,7 @@ export type TSubOrderChangeHistoryItem = {
   oldValue?: any;
   planId?: string;
   planOrderDate?: Date;
-  type?: EOrderHistoryTypes;
+  type?: EEditSubOrderHistoryType;
 };
 
 export type TPaymentRecord = {

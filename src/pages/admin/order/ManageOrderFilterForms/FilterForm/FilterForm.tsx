@@ -8,10 +8,11 @@ import Form from '@components/Form/Form';
 import FieldDatePicker from '@components/FormFields/FieldDatePicker/FieldDatePicker';
 import FieldDropdownSelect from '@components/FormFields/FieldDropdownSelect/FieldDropdownSelect';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
+
 import {
-  ADMIN_ORDER_TYPE_FILTER_OPTIONS,
-  ORDER_ADMIN_FILTER_OPTIONS,
-} from '@src/utils/enums';
+  ADMIN_FILTER_ORDER_STATE_OPTIONS,
+  ADMIN_FILTER_ORDER_TYPE_TO_SHOW_OPTIONS,
+} from './options';
 
 import css from './FilterForm.module.scss';
 
@@ -91,7 +92,7 @@ const FilterFormComponent: React.FC<TFilterFormComponentProps> = (props) => {
             label="Loại đơn"
             labelClassName={css.label}
             placeholder="Chọn loại đơn"
-            options={ADMIN_ORDER_TYPE_FILTER_OPTIONS}
+            options={ADMIN_FILTER_ORDER_TYPE_TO_SHOW_OPTIONS}
             initialFieldValue={values.showMode}
           />
         </div>
@@ -102,7 +103,7 @@ const FilterFormComponent: React.FC<TFilterFormComponentProps> = (props) => {
             label="Trạng thái đơn"
             labelClassName={css.label}
             placeholder="Chọn trạng thái đơn"
-            options={ORDER_ADMIN_FILTER_OPTIONS}
+            options={ADMIN_FILTER_ORDER_STATE_OPTIONS}
             initialFieldValue={values.meta_orderState}
           />
         </div>

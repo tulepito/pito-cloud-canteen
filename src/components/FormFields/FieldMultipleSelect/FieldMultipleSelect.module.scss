@@ -13,7 +13,7 @@
   top: calc(100% + 10px);
   left: 0;
   background-color: $neutralGray1;
-  border: 1px solid $neutralGray4;
+  border: 1px solid $neutralGray5;
   width: 100%;
   max-height: 160px;
   overflow-y: scroll;
@@ -29,7 +29,7 @@
     display: flex;
     width: 100%;
     align-items: center;
-    border-bottom: 1px solid $neutralGray4;
+    border-bottom: 1px solid $neutralGray5;
     padding: 0 10px;
     .itemLabel {
       width: 100%;
@@ -54,7 +54,7 @@
 .labelRoot {
   font-size: 14px;
   line-height: 24px;
-  color: $neutralGray6;
+  color: $neutralGray7;
   margin-bottom: 8px;
   display: inline-block;
   display: flex;
@@ -67,5 +67,5 @@
 }
 
 .placeholder {
-  color: $neutralGray4;
+  color: $neutralGray5;
 }

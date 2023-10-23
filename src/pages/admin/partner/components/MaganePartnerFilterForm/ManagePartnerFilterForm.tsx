@@ -6,7 +6,7 @@ import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
 import FieldMultipleSelect from '@components/FormFields/FieldMultipleSelect/FieldMultipleSelect';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
-import { RESTAURANT_STATUS_OPTIONS } from '@src/utils/enums';
+import { RESTAURANT_STATUS_OPTIONS } from '@src/utils/options';
 
 import css from './ManagePartnerFilterForm.module.scss';
 

@@ -9,14 +9,11 @@ export const fetchListing = async (
   imageVariants?: string[],
 ) => {
   const integrationSdk = getIntegrationSdk();
-  const response = await integrationSdk.listings.show(
-    {
-      id: listingId,
-      include,
-      ...(imageVariants && { 'fields.image': imageVariants }),
-    },
-    { expand: true },
-  );
+  const response = await integrationSdk.listings.show({
+    id: listingId,
+    include,
+    ...(imageVariants && { 'fields.image': imageVariants }),
+  });
 
   return denormalisedResponseEntities(response)[0];
 };
@@ -27,14 +24,11 @@ export const adminQueryListings = async (
   imageVariants?: string[],
 ) => {
   const integrationSdk = getIntegrationSdk();
-  const response = await integrationSdk.listings.query(
-    {
-      ...params,
-      include,
-      ...(imageVariants && { 'fields.image': imageVariants }),
-    },
-    { expand: true },
-  );
+  const response = await integrationSdk.listings.query({
+    ...params,
+    include,
+    ...(imageVariants && { 'fields.image': imageVariants }),
+  });
 
   return denormalisedResponseEntities(response);
 };
@@ -42,19 +36,15 @@ export const adminQueryListings = async (
 export const fetchUser = async (userId: string) => {
   const integrationSdk = getIntegrationSdk();
   console.log(`[API-UTIL]: fetchUser`, userId);
-
-  const response = await integrationSdk.users.show(
-    {
-      id: userId,
-      include: ['profileImage'],
-      'fields.image': [
-        'variants.square-small',
-        'variants.square-small2x',
-        'variants.default',
-      ],
-    },
-    { expand: true },
-  );
+  const response = await integrationSdk.users.show({
+    id: userId,
+    include: ['profileImage'],
+    'fields.image': [
+      'variants.square-small',
+      'variants.square-small2x',
+      'variants.default',
+    ],
+  });
 
   return denormalisedResponseEntities(response)[0];
 };
@@ -62,14 +52,10 @@ export const fetchUser = async (userId: string) => {
 export const fetchUserByEmail = async (email: string) => {
   const integrationSdk = getIntegrationSdk();
   console.log(`[API-UTIL]: fetchUserByEmail`, email);
-
-  const response = await integrationSdk.users.show(
-    {
-      email,
-      include: ['profileImage'],
-    },
-    { expand: true },
-  );
+  const response = await integrationSdk.users.show({
+    email,
+    include: ['profileImage'],
+  });
 
   return denormalisedResponseEntities(response)[0];
 };
@@ -93,15 +79,10 @@ export const fetchTransaction = async (
 ) => {
   const integrationSdk = getIntegrationSdk();
 
-  const response = await integrationSdk.transactions.show(
-    {
-      id: transactionId,
-      include,
-    },
-    {
-      expand: true,
-    },
-  );
+  const response = await integrationSdk.transactions.show({
+    id: transactionId,
+    include,
+  });
 
   return denormalisedResponseEntities(response)[0];
 };
@@ -123,15 +104,10 @@ export const updateTransactionMetadata = async (
 export const queryTransactions = async (query: any, include: string[] = []) => {
   const integrationSdk = getIntegrationSdk();
 
-  const response = await integrationSdk.transactions.query(
-    {
-      ...query,
-      include,
-    },
-    {
-      expand: true,
-    },
-  );
+  const response = await integrationSdk.transactions.query({
+    ...query,
+    include,
+  });
 
   return denormalisedResponseEntities(response);
 };

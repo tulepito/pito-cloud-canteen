@@ -5,7 +5,6 @@ import {
   deliveryDaySessionAdapter,
   mealTypeAdapter,
 } from '@helpers/orderHelper';
-import { ListingTypes } from '@src/types/listingTypes';
 import { Listing, User } from '@utils/data';
 import {
   convertWeekDay,
@@ -63,8 +62,8 @@ export const getMenuQuery = ({
   );
 
   const query = {
-    meta_listingState: 'published',
-    meta_listingType: ListingTypes.MENU,
+    meta_listingState: EListingStates.published,
+    meta_listingType: EListingType.menu,
     pub_startDate: `,${dateTime.toMillis() + 1}`,
     pub_endDate: `${dateTime.toMillis()},`,
     pub_daysOfWeek: `has_any:${dayOfWeek}`,
@@ -178,8 +177,8 @@ export const getMenuQueryInSpecificDay = ({
     mealTypeAdapter(item),
   );
   const query = {
-    meta_listingState: 'published',
-    meta_listingType: ListingTypes.MENU,
+    meta_listingState: EListingStates.published,
+    meta_listingType: EListingType.menu,
     pub_startDate: `,${dateTime.toMillis() + 1}`,
     pub_endDate: `${dateTime.toMillis()},`,
     pub_daysOfWeek: `has_any:${dayOfWeek}`,
@@ -211,7 +210,7 @@ export const getOrderQuotationsQuery = ({
   status?: 'active' | 'inactive';
 }) => {
   const query = {
-    meta_listingType: ListingTypes.QUOTATION,
+    meta_listingType: EListingType.quotation,
     meta_orderId: orderId,
     ...(status && { meta_status: status }),
   };
@@ -230,13 +229,13 @@ export const getParticipantOrdersQueries = ({
 }) => {
   const queries = [
     {
-      meta_listingType: ListingTypes.ORDER,
+      meta_listingType: EListingType.order,
       meta_participants: `has_any:${userId}`,
       meta_orderState: Object.values(EOrderStates).join(','),
       meta_startDate: `${startDate},${endDate + 1}`,
     },
     {
-      meta_listingType: ListingTypes.ORDER,
+      meta_listingType: EListingType.order,
       meta_anonymous: `has_any:${userId}`,
       meta_orderState: Object.values(EOrderStates).join(','),
       meta_startDate: `${startDate},${endDate + 1}`,
@@ -257,7 +256,7 @@ export const getFoodQuery = ({ foodIds, params }: TGetOrderQuery) => {
   const { specialDiets } = params;
   const query = {
     ids: foodIds,
-    meta_listingType: ListingTypes.FOOD,
+    meta_listingType: EListingType.food,
     ...(specialDiets ? { pub_specialDiets: `has_any:${specialDiets}` } : {}),
   };
 
@@ -271,7 +270,7 @@ export const getPartnerFoodByApprovalStatusQuery = (
   return {
     meta_adminApproval: status,
     meta_restaurantId: restaurantListingId,
-    meta_listingType: ListingTypes.FOOD,
+    meta_listingType: EListingType.food,
     meta_isDraft: false,
     meta_isDeleted: false,
   };
@@ -280,7 +279,7 @@ export const getPartnerFoodByApprovalStatusQuery = (
 export const getPartnerDraftFoodQuery = (restaurantListingId: string) => {
   return {
     meta_restaurantId: restaurantListingId,
-    meta_listingType: ListingTypes.FOOD,
+    meta_listingType: EListingType.food,
     meta_isDraft: true,
     meta_isDeleted: false,
   };

@@ -9,6 +9,7 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { QuizActions } from '@redux/slices/Quiz.slice';
 import { companyPaths, quizPaths } from '@src/paths';
+import type { TKeyValue } from '@src/utils/types';
 
 import useRedirectAfterReloadPage from '../../hooks/useRedirectAfterReloadPage';
 import QuizModal from '../components/QuizModal/QuizModal';
@@ -26,11 +27,11 @@ const QuizMealStyles = () => {
 
   useRedirectAfterReloadPage();
   const mealStyles = useAppSelector(
-    (state) => state.Quiz.categories,
+    (state) => state.SystemAttributes.categories,
     shallowEqual,
   );
-  const fetchMealStyles = useAppSelector(
-    (state) => state.Quiz.fetchFilterInProgress,
+  const fetchMealStylesInProgress = useAppSelector(
+    (state) => state.SystemAttributes.fetchAttributesInProgress,
   );
   const quizData = useAppSelector((state) => state.Quiz.quiz, shallowEqual);
   const [selectedMealStyles, setSelectedMealStyles] = useState<string[]>(
@@ -116,7 +117,7 @@ const QuizMealStyles = () => {
       submitInProgress={submittingControl.value}
       onBack={goBack}>
       <div className={css.formContainer}>
-        {fetchMealStyles ? (
+        {fetchMealStylesInProgress ? (
           <div className={css.loading}>
             {intl.formatMessage({ id: 'QuizMealStyles.loading' })}
           </div>
@@ -128,7 +129,7 @@ const QuizMealStyles = () => {
               id="mealStyles"
               name="mealStyles"
             />
-            {mealStyles.map((mealStyle) => (
+            {mealStyles.map((mealStyle: TKeyValue) => (
               <div
                 key={mealStyle.key}
                 className={classNames(css.item, {

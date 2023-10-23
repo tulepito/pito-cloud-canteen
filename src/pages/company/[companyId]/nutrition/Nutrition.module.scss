@@ -3,7 +3,7 @@
 
 .header {
   padding: 24px 0 24px 24px;
-  border-bottom: 1px solid $neutralGray4;
+  border-bottom: 1px solid $neutralGray5;
   @include textTemplate(24px, $fontWeightBold, 32px);
   text-transform: capitalize;
 }

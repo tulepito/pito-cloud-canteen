@@ -13,6 +13,7 @@ import {
   vatPercentageBaseOnVatSetting,
 } from '@helpers/order/cartInfoHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { AdminManageOrderThunks } from '@pages/admin/order/AdminManageOrder.slice';
 import { Listing } from '@src/utils/data';
 import { getDayOfWeek } from '@src/utils/dates';
 import {
@@ -26,7 +27,6 @@ import type { TListing, TUser } from '@src/utils/types';
 
 import OrderHeaderState from '../../components/OrderHeaderState/OrderHeaderState';
 import { calculatePaidAmountBySubOrderDate } from '../../helpers/AdminOrderDetail';
-import { OrderDetailThunks } from '../../OrderDetail.slice';
 
 import ClientPaymentDetail from './components/ClientPaymentDetail/ClientPaymentDetail';
 import PartnerPaymentDetail from './components/PartnerPaymentDetail/PartnerPaymentDetail';
@@ -63,12 +63,11 @@ const OrderPaymentStatusTab: React.FC<OrderPaymentStatusTabProps> = (props) => {
     (state) => state.SystemAttributes.currentOrderVATPercentage,
   );
   const partnerPaymentRecords = useAppSelector(
-    (state) => state.OrderDetail.partnerPaymentRecords,
+    (state) => state.AdminManageOrder.partnerPaymentRecords,
     shallowEqual,
   );
-
   const clientPaymentRecords = useAppSelector(
-    (state) => state.OrderDetail.clientPaymentRecords,
+    (state) => state.AdminManageOrder.clientPaymentRecords,
     shallowEqual,
   );
 
@@ -82,7 +81,11 @@ const OrderPaymentStatusTab: React.FC<OrderPaymentStatusTabProps> = (props) => {
     hasSpecificPCCFee = false,
     specificPCCFee = 0,
     vatSettings,
+    plans = [],
+    isClientSufficientPaid = false,
   } = orderListing.getMetadata();
+  const planId = plans.length > 0 ? plans[0] : undefined;
+
   const partnerCurrentQuotation = quotations.find(
     (_quotation) => _quotation.id.uuid === quotationId,
   );
@@ -96,7 +99,7 @@ const OrderPaymentStatusTab: React.FC<OrderPaymentStatusTabProps> = (props) => {
             isEmpty(
               partner[orderDetail[subOrderDate].restaurant.id]?.quotation,
             ) ||
-            orderDetail[subOrderDate].status === ESubOrderStatus.CANCELED ||
+            orderDetail[subOrderDate].status === ESubOrderStatus.canceled ||
             orderDetail[subOrderDate].lastTransition ===
               ETransition.OPERATOR_CANCEL_PLAN ||
             !orderDetail[subOrderDate].transactionId
@@ -134,7 +137,11 @@ const OrderPaymentStatusTab: React.FC<OrderPaymentStatusTabProps> = (props) => {
           const paidAmount = calculatePaidAmountBySubOrderDate(
             partnerPaymentRecordsByDate,
           );
-          const showCheckmark = totalWithVAT === paidAmount;
+
+          const { isAdminPaymentConfirmed = false } =
+            orderDetail[subOrderDate] || {};
+          const showPartnerCheckMark =
+            isAdminPaymentConfirmed || totalWithVAT === paidAmount;
 
           return {
             key: subOrderDate,
@@ -157,7 +164,7 @@ const OrderPaymentStatusTab: React.FC<OrderPaymentStatusTabProps> = (props) => {
                       orderDetail[subOrderDate].restaurant.restaurantName
                     } #${orderTitle}-${getDayOfWeek(+subOrderDate)}`}
                   </div>
-                  <RenderWhen condition={showCheckmark}>
+                  <RenderWhen condition={showPartnerCheckMark}>
                     <IconCheckmarkWithCircle className={css.checkIcon} />
                   </RenderWhen>
                 </div>
@@ -170,6 +177,7 @@ const OrderPaymentStatusTab: React.FC<OrderPaymentStatusTabProps> = (props) => {
               partnerName: orderDetail[subOrderDate].restaurant.restaurantName,
               subOrderDate: selectedSubOrderDate,
               orderId,
+              planId,
               partnerId: orderDetail[subOrderDate].restaurant.id,
               partnerPaymentRecordsByDate,
               totalWithVAT,
@@ -181,7 +189,9 @@ const OrderPaymentStatusTab: React.FC<OrderPaymentStatusTabProps> = (props) => {
           };
         }),
       )
-    : null;
+    : [];
+
+  const tabItemKeys = partnerTabItems.map(({ key }) => key);
 
   const { totalWithVAT: clientTotalPrice } = calculatePriceQuotationInfo({
     planOrderDetail: orderDetail,
@@ -193,7 +203,9 @@ const OrderPaymentStatusTab: React.FC<OrderPaymentStatusTabProps> = (props) => {
 
   const clientPaidAmount =
     calculatePaidAmountBySubOrderDate(clientPaymentRecords);
-  const showClientCheckmark = clientTotalPrice === clientPaidAmount;
+  const showClientCheckmark =
+    isClientSufficientPaid || clientPaidAmount === clientTotalPrice;
+
   const clientTabItem = {
     key: 'client',
     label: (
@@ -223,25 +235,20 @@ const OrderPaymentStatusTab: React.FC<OrderPaymentStatusTabProps> = (props) => {
 
   useEffect(() => {
     if (orderId) {
-      dispatch(OrderDetailThunks.fetchQuotations(orderId));
+      dispatch(AdminManageOrderThunks.fetchQuotations(orderId));
+      dispatch(AdminManageOrderThunks.fetchPartnerPaymentRecords(orderId));
+      dispatch(AdminManageOrderThunks.fetchClientPaymentRecords(orderId));
     }
-  }, [dispatch, orderId]);
-
-  useEffect(() => {
-    dispatch(OrderDetailThunks.fetchPartnerPaymentRecords(orderId));
-    dispatch(OrderDetailThunks.fetchClientPaymentRecords(orderId));
   }, [dispatch, orderId]);
 
   useEffect(() => {
     if (subOrderDateFromQuery) {
       const tabIndexMaybe =
-        (partnerTabItems || []).findIndex(
-          (item) => item.key === subOrderDateFromQuery,
-        ) + 1;
-      setDefaultActiveKey(tabIndexMaybe === 0 ? 1 : tabIndexMaybe);
+        tabItemKeys.findIndex((item) => item === subOrderDateFromQuery) + 2;
+      setDefaultActiveKey(tabIndexMaybe === 0 ? 2 : tabIndexMaybe);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [subOrderDateFromQuery, partnerTabItems]);
+  }, [subOrderDateFromQuery, tabItemKeys]);
 
   const handleUpdateOrderState = (state: EOrderStates) => () => {
     updateOrderState(state);
@@ -261,11 +268,13 @@ const OrderPaymentStatusTab: React.FC<OrderPaymentStatusTabProps> = (props) => {
       />
       <RenderWhen condition={!isEmpty(quotations)}>
         <div className={css.tabContainer}>
-          <Tabs
-            items={totalTabItems as any}
-            onChange={onTabChange}
-            defaultActiveKey={`${defaultActiveKey}`}
-          />
+          {defaultActiveKey && (
+            <Tabs
+              items={totalTabItems as any}
+              onChange={onTabChange}
+              defaultActiveKey={`${defaultActiveKey}`}
+            />
+          )}
         </div>
       </RenderWhen>
     </div>

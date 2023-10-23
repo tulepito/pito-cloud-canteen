@@ -3,7 +3,7 @@
 @use '/src/styles/customMediaQueries.scss' as *;
 
 .container {
-  border-bottom: 1px solid $neutralGray4;
+  border-bottom: 1px solid $neutralGray5;
   z-index: 2;
   width: 100%;
   background-color: $neutralGray1;
@@ -18,7 +18,7 @@
 
   .headerItem {
     @include flexAlign(center);
-    color: $neutralGray5;
+    color: $neutralGray6;
     height: 64px;
     padding: 20px 12px;
     position: relative;
@@ -36,41 +36,41 @@
 
     &.active {
       position: relative;
-      color: $neutralGray6;
+      color: $neutralGray7;
       font-weight: 700;
 
       &::before {
         content: '';
         width: 100%;
         left: 0;
-        background-color: $neutralGray6;
+        background-color: $neutralGray7;
       }
       svg {
         path {
-          fill: $neutralGray6;
+          fill: $neutralGray7;
         }
       }
     }
 
     &:hover {
-      color: $neutralGray6;
+      color: $neutralGray7;
 
       &::before {
         content: '';
         width: 100%;
         left: 0;
-        background-color: $neutralGray6;
+        background-color: $neutralGray7;
       }
       svg {
         path {
-          fill: $neutralGray6;
+          fill: $neutralGray7;
         }
       }
     }
 
     svg {
       path {
-        fill: $neutralGray5;
+        fill: $neutralGray6;
       }
     }
 

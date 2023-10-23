@@ -74,6 +74,7 @@ export const initializePayment = async (
           totalPrice,
           deliveryHour,
           isHideFromHistory: true,
+          isAdminConfirmed: false,
         };
       },
     );
@@ -124,6 +125,7 @@ export const initializePayment = async (
     paymentNote: '',
     companyName,
     isHideFromHistory: true,
+    isAdminConfirmed: false,
     orderTitle,
     totalPrice: clientTotalPrice,
     deliveryHour,

@@ -11,13 +11,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     const { restaurantId, timestamp } = req.body;
     const integrationSdk = getIntegrationSdk();
     const [restaurant] = denormalisedResponseEntities(
-      await integrationSdk.listings.show(
-        {
-          id: restaurantId,
-          include: ['author'],
-        },
-        { expand: true },
-      ),
+      await integrationSdk.listings.show({
+        id: restaurantId,
+        include: ['author'],
+      }),
     );
 
     const partnerId = User(restaurant?.author).getId();

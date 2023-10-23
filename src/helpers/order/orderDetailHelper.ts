@@ -21,7 +21,7 @@ const groupFoodForGroupOrder = (
       } = rawOrderDetailOfDate as TObject;
       const { id, restaurantName, foodList: foodListOfDate = {} } = restaurant;
       if (
-        subOrderStatus === ESubOrderStatus.CANCELED ||
+        subOrderStatus === ESubOrderStatus.canceled ||
         lastTransition === ETransition.OPERATOR_CANCEL_PLAN ||
         (date && d !== date.toString())
       ) {
@@ -117,7 +117,7 @@ const groupFoodForNormal = (orderDetail: TObject, date?: number | string) => {
       const { id, restaurantName, foodList: foodListOfDate = {} } = restaurant;
 
       if (
-        subOrderStatus === ESubOrderStatus.CANCELED ||
+        subOrderStatus === ESubOrderStatus.canceled ||
         lastTransition === ETransition.OPERATOR_CANCEL_PLAN ||
         (date && d !== date.toString())
       ) {
@@ -261,7 +261,7 @@ export const groupPickingOrderByFood = ({
       } = rawOrderDetailOfDate as TObject;
       const { id, foodList: foodListOfDate = {} } = restaurant;
       if (
-        subOrderStatus === ESubOrderStatus.CANCELED ||
+        subOrderStatus === ESubOrderStatus.canceled ||
         (date && d !== date.toString())
       ) {
         return result;

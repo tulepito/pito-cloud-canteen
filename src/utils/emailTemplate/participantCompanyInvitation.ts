@@ -2,6 +2,7 @@ const BASE_URL = process.env.NEXT_PUBLIC_CANONICAL_URL;
 
 type ParticipantCompanyInvitationParams = {
   companyUser: any;
+  participantUser?: any;
 };
 
 export const participantCompanyInvitationSubject = (companyName: string) =>
@@ -21,8 +22,7 @@ const participantCompanyInvitation = ({
   return `
   <!DOCTYPE html
   PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:o="urn:schemas-microsoft-com:office:office"
-  style="font-family:arial, 'helvetica neue', helvetica, sans-serif">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:o="urn:schemas-microsoft-com:office:office">
 
 <head>
   <meta charset="UTF-8">
@@ -30,19 +30,9 @@ const participantCompanyInvitation = ({
   <meta name="x-apple-disable-message-reformatting">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta content="telephone=no" name="format-detection">
-  <title>Participant - Add to company</title><!--[if (mso 16)]>
-    <style type="text/css">
-    a {text-decoration: none;}
-    </style>
-    <![endif]--><!--[if gte mso 9]><style>sup { font-size: 100% !important; }</style><![endif]--><!--[if gte mso 9]>
-<xml>
-    <o:OfficeDocumentSettings>
-    <o:AllowPNG></o:AllowPNG>
-    <o:PixelsPerInch>96</o:PixelsPerInch>
-    </o:OfficeDocumentSettings>
-</xml>
-<![endif]--><!--[if !mso]><!-- -->
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <title>Participant - Add to company</title>
+  <!--[if (mso 16)]><style type="text/css"> a {text-decoration: none;} </style><![endif]--><!--[if gte mso 9]><style>sup { font-size: 100% !important; }</style><![endif]--><!--[if gte mso 9]><xml> <o:OfficeDocumentSettings> <o:AllowPNG></o:AllowPNG> <o:PixelsPerInch>96</o:PixelsPerInch> </o:OfficeDocumentSettings> </xml><![endif]--><!--[if !mso]><!-- -->
+  <link href="https://fonts.googleapis.com/css2?family=arial:wght@400;500;600;700&display=swap" rel="stylesheet">
   <!--<![endif]-->
   <style type="text/css">
     #outlook a {
@@ -71,10 +61,6 @@ const participantCompanyInvitation = ({
       max-height: 0;
       line-height: 0;
       mso-hide: all;
-    }
-
-    [data-ogsb] .es-button.es-button-1 {
-      padding: 12px 65px !important;
     }
 
     @media only screen and (max-width:600px) {
@@ -488,13 +474,10 @@ const participantCompanyInvitation = ({
   </style>
 </head>
 
-<body
+<body data-new-gr-c-s-loaded="14.1129.0"
   style="width:100%;font-family:arial, 'helvetica neue', helvetica, sans-serif;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;padding:0;Margin:0">
-  <div class="es-wrapper-color" style="background-color:#FAFAFA"><!--[if gte mso 9]>
-			<v:background xmlns:v="urn:schemas-microsoft-com:vml" fill="t">
-				<v:fill type="tile" color="#fafafa"></v:fill>
-			</v:background>
-		<![endif]-->
+  <div class="es-wrapper-color" style="background-color:#FAFAFA">
+    <!--[if gte mso 9]><v:background xmlns:v="urn:schemas-microsoft-com:vml" fill="t"> <v:fill type="tile" color="#fafafa"></v:fill> </v:background><![endif]-->
     <table class="es-wrapper" width="100%" cellspacing="0" cellpadding="0"
       style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;padding:0;Margin:0;width:100%;height:100%;background-repeat:repeat;background-position:center top;background-color:#FAFAFA">
       <tr>
@@ -551,23 +534,43 @@ const participantCompanyInvitation = ({
                                 <td class="es-m-txt-l" align="left"
                                   style="padding:0;Margin:0;padding-bottom:10px;padding-top:20px">
                                   <h1
-                                    style="Margin:0;line-height:24px;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;font-size:24px;font-style:normal;font-weight:bold;color:#262626">
+                                    style="Margin:0;line-height:24px;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;font-size:24px;font-style:normal;font-weight:bold;color:#333333">
                                     Bạn vừa được mời tham gia nhóm Cơm trưa văn phòng của ${companyName}</h1>
                                 </td>
                               </tr>
                               <tr>
                                 <td align="left" style="padding:0;Margin:0">
                                   <p
-                                    style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#262626;font-size:14px">
+                                    style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#333333;font-size:14px">
                                     Xin chào,</p>
                                 </td>
                               </tr>
                               <tr>
                                 <td align="left" style="padding:0;Margin:0;padding-top:10px">
                                   <p
-                                    style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#262626;font-size:14px">
-                                    Bạn nhận được lời mời tham gia nhóm Cơm trưa văn phòng của ${companyName}, vui lòng
-                                    xác nhận để tận hưởng những bữa cơm ngon miệng và chất lượng nhé.</p>
+                                    style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#333333;font-size:14px">
+                                    Bạn nhận được lời mời tham gia nhóm Cơm trưa văn phòng của <strong>${companyName}</strong>, vui lòng
+                                    xác nhận bằng cách:</p>
+                                  <p
+                                    style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#333333;font-size:14px">
+                                    <br></p>
+                                  <p
+                                    style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#333333;font-size:14px">
+                                    <strong>Bước 1: Click vào nút "Tham gia ngay"</strong> bên dưới</p>
+                                  <p
+                                    style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#333333;font-size:14px">
+                                    <strong>Bước 2:</strong> Tiến hành <strong>Đăng ký tài khoản bằng email được
+                                      mời</strong></p>
+                                  <p
+                                    style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#333333;font-size:14px">
+                                    <strong>Bước 3: Đăng nhập</strong> và tham gia nhóm Cơm trưa văn phòng</p>
+                                  <p
+                                    style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#333333;font-size:14px">
+                                    <br></p>
+                                  <p
+                                    style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#333333;font-size:14px">
+                                    Như vậy bạn đã có thể tận hưởng những bữa cơm ngon miệng và chất lượng từ
+                                    <strong>${companyName}</strong> rồi nhé!</p>
                                 </td>
                               </tr>
                             </table>
@@ -595,17 +598,13 @@ const participantCompanyInvitation = ({
                             <table cellpadding="0" cellspacing="0" width="100%" role="presentation"
                               style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
                               <tr>
-                                <td align="center" class="es-m-txt-c" style="padding:0;Margin:0"><!--[if mso]><a href="${invitationUrl}" target="_blank" hidden>
-	<v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" esdevVmlButton href="${invitationUrl}" 
-                style="height:43px; v-text-anchor:middle; width:236px" arcsize="19%" stroke="f"  fillcolor="#ef3d2a">
-		<w:anchorlock></w:anchorlock>
-		<center style='color:#ffffff; font-family:arial, 'helvetica neue', helvetica, sans-serif; font-size:15px; font-weight:400; line-height:15px;  mso-text-raise:1px'>Tham gia ngay</center>
-	</v:roundrect></a>
-<![endif]--><!--[if !mso]><!-- --><span class="msohide es-button-border"
-                                    style="border-style:solid;border-color:#2CB543;background:#ef3d2a;border-width:0px;display:inline-block;border-radius:8px;width:auto;mso-border-alt:10px;mso-hide:all"><a
+                                <td align="center" class="es-m-txt-c" style="padding:0;Margin:0">
+                                  <!--[if mso]><a href="${invitationUrl}" target="_blank" hidden> <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" esdevVmlButton href="${invitationUrl}" style="height:43px; v-text-anchor:middle; width:236px" arcsize="19%" stroke="f" fillcolor="#ef3d2a"> <w:anchorlock></w:anchorlock> <center style='color:#ffffff; font-family:arial, 'helvetica neue', helvetica, sans-serif; font-size:15px; font-weight:400; line-height:15px; mso-text-raise:1px'>Tham gia ngay</center> </v:roundrect></a><![endif]--><!--[if !mso]><!-- --><span
+                                    class="msohide es-button-border"
+                                    style="border-style:solid;border-color:#2CB543;background:#ef3d2a;border-width:0px;display:inline-block;border-radius:8px;width:auto;mso-hide:all"><a
                                       href="${invitationUrl}"
-                                      class="es-button msohide es-button-1" target="_blank"
-                                      style="mso-style-priority:100 !important;text-decoration:none;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;color:#FFFFFF;font-size:16px;padding:12px 65px;display:inline-block;background:#ef3d2a;border-radius:8px;font-family:arial, 'helvetica neue', helvetica, sans-serif;font-weight:normal;font-style:normal;line-height:19px;width:auto;text-align:center;mso-hide:all;border-color:#ef3d2a">Tham
+                                      class="es-button msohide es-button-1681787532151" target="_blank"
+                                      style="mso-style-priority:100 !important;text-decoration:none;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;color:#FFFFFF;font-size:16px;padding:12px 65px;display:inline-block;background:#ef3d2a;border-radius:8px;font-family:arial, 'helvetica neue', helvetica, sans-serif;font-weight:normal;font-style:normal;line-height:19px;width:auto;text-align:center;mso-padding-alt:0;mso-border-alt:10px solid #ef3d2a;mso-hide:all">Tham
                                       gia ngay</a></span><!--<![endif]--></td>
                               </tr>
                             </table>
@@ -647,7 +646,7 @@ const participantCompanyInvitation = ({
                                     <tr>
                                       <td align="left" style="padding:0;Margin:0">
                                         <p
-                                          style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#262626;font-size:14px">
+                                          style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#333333;font-size:14px">
                                           <b>${companyName}</b></p>
                                       </td>
                                     </tr>
@@ -674,14 +673,14 @@ const participantCompanyInvitation = ({
                                     <tr>
                                       <td align="left" style="padding:0;Margin:0">
                                         <p
-                                          style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#262626;font-size:14px">
+                                          style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#333333;font-size:14px">
                                           <strong>${bookerName}</strong></p>
                                       </td>
                                     </tr>
                                     <tr>
                                       <td align="left" style="padding:0;Margin:0">
                                         <p
-                                          style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#262626;font-size:14px;word-break:break-all">
+                                          style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#333333;font-size:14px;word-break:break-all">
                                           ${bookerEmail}</p>
                                       </td>
                                     </tr>
@@ -730,7 +729,7 @@ const participantCompanyInvitation = ({
                               <tr>
                                 <td align="left" style="padding:0;Margin:0">
                                   <p
-                                    style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#262626;font-size:14px">
+                                    style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#333333;font-size:14px">
                                     Nếu có bất cứ yêu cầu nào, vui lòng liên hệ Hotline <strong>1900 25 25 30</strong> của PITO để được hỗ trợ sớm nhất.</p>
                                 </td>
                               </tr>
@@ -744,7 +743,7 @@ const participantCompanyInvitation = ({
                               <tr>
                                 <td align="left" style="padding:0;Margin:0;padding-top:15px">
                                   <p
-                                    style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#262626;font-size:14px">
+                                    style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#333333;font-size:14px">
                                     <strong>Customer Success Team</strong></p>
                                 </td>
                               </tr>
@@ -758,7 +757,7 @@ const participantCompanyInvitation = ({
                               <tr>
                                 <td align="left" style="padding:0;Margin:0;padding-top:5px">
                                   <p
-                                    style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#262626;font-size:14px">
+                                    style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#333333;font-size:14px">
                                     <strong>PITO CLOUD CANTEEN</strong></p>
                                 </td>
                               </tr>
@@ -798,7 +797,7 @@ const participantCompanyInvitation = ({
                                     <tr>
                                       <td valign="top" align="center" style="padding:0;Margin:0;padding-right:5px"><a
                                           target="_blank" href="https://www.facebook.com/PITO.vn/"
-                                          style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:underline;color:#262626;font-size:12px"><img
+                                          style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:underline;color:#333333;font-size:12px"><img
                                             title="Facebook"
                                             src="https://vpldml.stripocdn.email/content/assets/img/social-icons/logo-black/facebook-logo-black.png"
                                             alt="Fb" width="32" height="32"
@@ -806,7 +805,7 @@ const participantCompanyInvitation = ({
                                       </td>
                                       <td valign="top" align="center" style="padding:0;Margin:0;padding-right:5px"><a
                                           target="_blank" href="https://www.instagram.com/pito.vn/"
-                                          style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:underline;color:#262626;font-size:12px"><img
+                                          style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:underline;color:#333333;font-size:12px"><img
                                             title="Instagram"
                                             src="https://vpldml.stripocdn.email/content/assets/img/social-icons/logo-black/instagram-logo-black.png"
                                             alt="Inst" width="32" height="32"
@@ -814,7 +813,7 @@ const participantCompanyInvitation = ({
                                       </td>
                                       <td valign="top" align="center" style="padding:0;Margin:0"><a target="_blank"
                                           href="https://www.linkedin.com/company/pito-vn/"
-                                          style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:underline;color:#262626;font-size:12px"><img
+                                          style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:underline;color:#333333;font-size:12px"><img
                                             title="Linkedin"
                                             src="https://vpldml.stripocdn.email/content/assets/img/social-icons/logo-black/linkedin-logo-black.png"
                                             alt="In" width="32" height="32"
@@ -842,8 +841,8 @@ const participantCompanyInvitation = ({
                             </table>
                           </td>
                         </tr>
-                      </table>
-                      <!--[if mso]></td><td style="width:20px"></td><td style="width:248px" valign="top"><![endif]-->
+                      </table><!--[if mso]></td><td style="width:20px"></td>
+<td style="width:248px" valign="top"><![endif]-->
                       <table cellpadding="0" cellspacing="0" class="es-right" align="right"
                         style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;float:right">
                         <tr>
@@ -858,7 +857,7 @@ const participantCompanyInvitation = ({
                                     <tr>
                                       <td valign="top" align="center" style="padding:0;Margin:0;padding-right:5px"><a
                                           target="_blank" href="https://www.facebook.com/PITO.vn/"
-                                          style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:underline;color:#262626;font-size:12px"><img
+                                          style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:underline;color:#333333;font-size:12px"><img
                                             title="Facebook"
                                             src="https://vpldml.stripocdn.email/content/assets/img/social-icons/logo-black/facebook-logo-black.png"
                                             alt="Fb" width="32" height="32"
@@ -866,7 +865,7 @@ const participantCompanyInvitation = ({
                                       </td>
                                       <td valign="top" align="center" style="padding:0;Margin:0;padding-right:5px"><a
                                           target="_blank" href="https://www.instagram.com/pito.vn/"
-                                          style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:underline;color:#262626;font-size:12px"><img
+                                          style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:underline;color:#333333;font-size:12px"><img
                                             title="Instagram"
                                             src="https://vpldml.stripocdn.email/content/assets/img/social-icons/logo-black/instagram-logo-black.png"
                                             alt="Inst" width="32" height="32"
@@ -874,7 +873,7 @@ const participantCompanyInvitation = ({
                                       </td>
                                       <td valign="top" align="center" style="padding:0;Margin:0"><a target="_blank"
                                           href="https://www.linkedin.com/company/pito-vn/"
-                                          style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:underline;color:#262626;font-size:12px"><img
+                                          style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:underline;color:#333333;font-size:12px"><img
                                             title="Linkedin"
                                             src="https://vpldml.stripocdn.email/content/assets/img/social-icons/logo-black/linkedin-logo-black.png"
                                             alt="In" width="32" height="32"

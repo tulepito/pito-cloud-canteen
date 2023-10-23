@@ -12,7 +12,7 @@ import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput
 import IconClose from '@components/Icons/IconClose/IconClose';
 import IconSearch from '@components/Icons/IconSearch/IconSearch';
 import { useViewport } from '@hooks/useViewport';
-import { EOrderPaymentState } from '@src/utils/enums';
+import { EOrderPaymentStatus } from '@src/utils/enums';
 
 import css from './PaymentFilterForm.module.scss';
 
@@ -26,11 +26,11 @@ export type TPaymentFilterFormValues = {
 
 const PAYMENT_STATUS_OPTIONS = [
   {
-    key: EOrderPaymentState.isPaid,
+    key: EOrderPaymentStatus.isPaid,
     label: 'Đã thanh toán',
   },
   {
-    key: EOrderPaymentState.isNotPaid,
+    key: EOrderPaymentStatus.isNotPaid,
     label: 'Chờ thanh toán',
   },
 ];

@@ -1,10 +1,10 @@
 /* eslint-disable import/no-cycle */
 /* eslint-disable @typescript-eslint/no-shadow */
 import { createSlice } from '@reduxjs/toolkit';
+import chunk from 'lodash/chunk';
 import flatten from 'lodash/flatten';
 import isEmpty from 'lodash/isEmpty';
 
-import { showAttributesApi } from '@apis/attributes';
 import type {
   CreateGroupApiBody,
   DeleteGroupApiData,
@@ -34,7 +34,6 @@ import {
   showCompanyApi,
   unActiveCompanyApi,
 } from '@apis/index';
-import { convertListIdToQueries } from '@helpers/apiHelpers';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { denormalisedResponseEntities, User } from '@utils/data';
 import { ECompanyStates, EImageVariants } from '@utils/enums';
@@ -43,7 +42,6 @@ import type {
   TCompany,
   TCreateCompanyApiParams,
   TImage,
-  TKeyValue,
   TObject,
   TPagination,
   TUpdateCompanyApiParams,
@@ -120,10 +118,6 @@ type TCompanyState = {
 
   adminUpdateCompanyStateInProgress: boolean;
   adminUpdateCompanyStateError: any;
-
-  nutritions: TKeyValue[];
-  fetchAttributesInProgress: boolean;
-  fetchAttributesError: any;
 };
 
 // ================ Thunk types ================ //
@@ -148,8 +142,6 @@ const ADMIN_TRANSFER_COMPANY_OWNER = 'app/Company/ADMIN_TRANSFER_COMPANY_OWNER';
 const ADMIN_QUERY_COMPANIES = 'app/ManageCompanies/ADMIN_QUERY_COMPANIES';
 const ADMIN_UPDATE_COMPANY_STATE =
   'app/ManageCompanies/ADMIN_UPDATE_COMPANY_STATE';
-
-const FETCH_ATTRIBUTES = 'app/ManageCompanies/FETCH_ATTRIBUTES';
 
 const initialState: TCompanyState = {
   groupList: [],
@@ -200,10 +192,6 @@ const initialState: TCompanyState = {
   adminUpdateCompanyStateInProgress: false,
   adminUpdateCompanyStateError: undefined,
   totalItems: 0,
-
-  nutritions: [],
-  fetchAttributesInProgress: false,
-  fetchAttributesError: null,
 };
 
 const requestUploadCompanyLogo = createAsyncThunk(
@@ -304,14 +292,11 @@ const companyInfo = createAsyncThunk(
     const { groups = [], members = {} } = User(company).getMetadata();
 
     // TODO: query restaurants
-    const restaurantQueries = convertListIdToQueries({
-      idList: favoriteRestaurantList,
-    });
     const favoriteRestaurants = isEmpty(favoriteRestaurantList)
       ? []
       : flatten(
           await Promise.all(
-            restaurantQueries.map(async ({ ids }) => {
+            chunk<string>(favoriteRestaurantList, 100).map(async (ids) => {
               return denormalisedResponseEntities(
                 await sdk.listings.query({
                   ids,
@@ -322,14 +307,11 @@ const companyInfo = createAsyncThunk(
         );
 
     // TODO: query food
-    const foodQueries = convertListIdToQueries({
-      idList: favoriteFoodList,
-    });
     const favoriteFood = isEmpty(favoriteFoodList)
       ? []
       : flatten(
           await Promise.all(
-            foodQueries.map(async ({ ids }) => {
+            chunk<string>(favoriteFoodList, 100).map(async (ids) => {
               return denormalisedResponseEntities(
                 await sdk.listings.query({
                   ids,
@@ -460,7 +442,6 @@ const updateBookerAccount = createAsyncThunk(
   UPDATE_BOOKER_ACCOUNT,
   async (params: any, { extra: sdk, dispatch }) => {
     const queryParams = {
-      expand: true,
       include: ['profileImage'],
       'fields.image': ['variants.square-small', 'variants.square-small2x'],
     };
@@ -645,12 +626,6 @@ const adminUpdateCompanyState = createAsyncThunk(
   },
 );
 
-const fetchAttributes = createAsyncThunk(FETCH_ATTRIBUTES, async () => {
-  const { data: response } = await showAttributesApi();
-
-  return response;
-});
-
 export const companyThunks = {
   companyInfo,
   groupInfo,
@@ -670,13 +645,13 @@ export const companyThunks = {
   adminTransferCompanyOwner,
   adminQueryCompanies,
   adminUpdateCompanyState,
-  fetchAttributes,
 };
 
 export const companySlice = createSlice({
   name: 'company',
   initialState,
   reducers: {
+    clearStates: () => initialState,
     clearTransferOwnerError: (state) => ({
       ...state,
       transferCompanyOwnerError: null,
@@ -1108,35 +1083,12 @@ export const companySlice = createSlice({
         ...state,
         queryCompaniesError: action.payload,
         queryCompaniesInProgress: false,
-      }))
-
-      .addCase(fetchAttributes.pending, (state) => {
-        return {
-          ...state,
-          fetchAttributesInProgress: true,
-          fetchAttributesError: null,
-        };
-      })
-      .addCase(fetchAttributes.fulfilled, (state, { payload }) => {
-        const { nutritions = [] } = payload;
-
-        return {
-          ...state,
-          fetchAttributesInProgress: false,
-          nutritions,
-        };
-      })
-      .addCase(fetchAttributes.rejected, (state, { error }) => {
-        return {
-          ...state,
-          fetchAttributesInProgress: false,
-          fetchAttributesError: error.message,
-        };
-      });
+      }));
   },
 });
 
 export const {
+  clearStates,
   addWorkspaceCompanyId,
   resetCompanySliceStates,
   paginateCompanies,

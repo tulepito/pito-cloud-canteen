@@ -5,9 +5,9 @@ import ConfirmationModal from '@components/ConfirmationModal/ConfirmationModal';
 import ParticipantSidebar from '@components/ParticipantLayout/ParticipantSidebar/ParticipantSidebar';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
+import { passwordActions, passwordThunks } from '@redux/slices/password.slice';
 import { participantPaths } from '@src/paths';
 
-import { AccountActions, AccountThunks } from '../Account.slice';
 import type { TChangePasswordFormValues } from '../components/ChangePasswordForm/ChangePasswordForm';
 import ChangePasswordForm from '../components/ChangePasswordForm/ChangePasswordForm';
 import ChangePasswordModal from '../components/ChangePasswordModal/ChangePasswordModal';
@@ -20,12 +20,12 @@ const ChangePasswordPage: React.FC = () => {
   const changePasswordSuccessModalControl = useBoolean();
 
   const changePasswordInProgress = useAppSelector(
-    (state) => state.ParticipantAccount.changePasswordInProgress,
+    (state) => state.password.changePasswordInProgress,
   );
 
   useEffect(() => {
     return () => {
-      dispatch(AccountActions.clearChangePasswordError());
+      dispatch(passwordActions.clearChangePasswordError());
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -38,7 +38,7 @@ const ChangePasswordPage: React.FC = () => {
   const handleSubmit = async (values: TChangePasswordFormValues) => {
     const { password, newPassword } = values;
     const { meta } = await dispatch(
-      AccountThunks.changePassword({
+      passwordThunks.changePassword({
         currentPassword: password,
         newPassword,
       }),

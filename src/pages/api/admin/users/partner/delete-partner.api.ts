@@ -13,6 +13,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
     const { id } = req.body;
 
+    if (isEmpty(id)) {
+      return res
+        .status(EHttpStatusCode.BadRequest)
+        .json({ message: 'Missing partner ID' });
+    }
+
     const integrationSdk = getIntegrationSdk();
     const [partnerUser] = denormalisedResponseEntities(
       await integrationSdk.users.show({
@@ -22,20 +28,18 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     const { restaurantListingId: partnerListingId } =
       User(partnerUser).getMetadata();
 
-    if (id) {
-      const partnerListingTxsMaybe = denormalisedResponseEntities(
-        (await integrationSdk.transactions.query({
-          providerId: id,
-        })) || [[]],
-      );
-      const hasAnyOrdersInProgress = partnerListingTxsMaybe?.some((tx: any) => {
-        return !isEmpty(tx) && txIsDelivering(tx);
-      });
-      if (hasAnyOrdersInProgress) {
-        return res
-          .status(EHttpStatusCode.BadRequest)
-          .json({ hasAnyOrdersInProgress: true });
-      }
+    const partnerListingTxsMaybe = denormalisedResponseEntities(
+      (await integrationSdk.transactions.query({
+        providerId: id,
+      })) || [[]],
+    );
+    const hasAnyOrdersInProgress = partnerListingTxsMaybe?.some((tx: any) => {
+      return !isEmpty(tx) && txIsDelivering(tx);
+    });
+    if (hasAnyOrdersInProgress) {
+      return res
+        .status(EHttpStatusCode.BadRequest)
+        .json({ hasAnyOrdersInProgress: true });
     }
 
     const updatedPartnerResponse = await integrationSdk.users.updateProfile(

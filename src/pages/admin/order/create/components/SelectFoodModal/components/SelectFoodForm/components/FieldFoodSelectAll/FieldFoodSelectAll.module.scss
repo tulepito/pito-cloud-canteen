@@ -19,7 +19,7 @@
       justify-content: space-between;
       padding-left: 12px;
       @include textTemplate(12px, 400, 16px, '');
-      color: $neutralGray5;
+      color: $neutralGray6;
 
       :nth-child(2) {
         flex-basis: 80px;

@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 /* eslint-disable @typescript-eslint/no-shadow */
 import { createSlice } from '@reduxjs/toolkit';
 import groupBy from 'lodash/groupBy';
@@ -36,14 +37,15 @@ import {
   calculateClientQuotation,
   calculatePartnerQuotation,
 } from '@helpers/orderHelper';
+import { AdminManageOrderActions } from '@pages/admin/order/AdminManageOrder.slice';
 import { createAsyncThunk } from '@redux/redux.helper';
 import type { RootState } from '@redux/store';
 import type { NotificationInvitationParams } from '@services/notifications';
 import type { TPlan } from '@src/utils/orderTypes';
 import { denormalisedResponseEntities, Listing, User } from '@utils/data';
 import {
+  EEditSubOrderHistoryType,
   ENotificationType,
-  EOrderHistoryTypes,
   EOrderStates,
   EOrderType,
   EParticipantOrderStatus,
@@ -54,7 +56,6 @@ import type {
   TListing,
   TObject,
   TSubOrderChangeHistoryItem,
-  TTransaction,
   TUser,
 } from '@utils/types';
 
@@ -262,7 +263,7 @@ export const prepareOrderDetail = ({
 // ================ Initial states ================ //
 type TOrderManagementState = {
   // Fetch data state
-  isFetchingOrderDetails: boolean;
+  fetchOrderInProgress: boolean;
   // Delete state
   isDeletingParticipant: boolean;
   // Update state
@@ -289,9 +290,6 @@ type TOrderManagementState = {
   bookerData: TUser | null;
   participantData: Array<TUser>;
   anonymousParticipantData: Array<TUser>;
-  transactionDataMap: {
-    [date: number]: TTransaction;
-  };
   restaurantData: TObject[];
   subOrderChangesHistory: TSubOrderChangeHistoryItem[];
   querySubOrderChangesHistoryInProgress: boolean;
@@ -328,7 +326,7 @@ type TOrderManagementState = {
 };
 
 const initialState: TOrderManagementState = {
-  isFetchingOrderDetails: false,
+  fetchOrderInProgress: false,
   isDeletingParticipant: false,
   isUpdatingOrderDetails: false,
   isSendingRemindEmail: false,
@@ -348,7 +346,6 @@ const initialState: TOrderManagementState = {
   bookerData: null,
   participantData: [],
   anonymousParticipantData: [],
-  transactionDataMap: {},
   restaurantData: [],
   subOrderChangesHistory: [],
   querySubOrderChangesHistoryInProgress: false,
@@ -375,9 +372,19 @@ const FETCH_QUOTATION = 'app/OrderManagement/FETCH_QUOTATION';
 const loadData = createAsyncThunk(
   'app/OrderManagement/LOAD_DATA',
   async (payload: { orderId: string; isAdminFlow?: boolean }, { dispatch }) => {
-    const { orderId } = payload;
+    const { orderId, isAdminFlow = false } = payload;
     const response: any = await getBookerOrderDataApi(orderId);
     dispatch(SystemAttributesThunks.fetchVATPercentageByOrderId(orderId));
+
+    if (isAdminFlow) {
+      const { orderListing: orderData = {}, planListing: planData = {} } =
+        response.data || {};
+
+      const { orderDetail = {} } = Listing(planData).getMetadata();
+
+      dispatch(AdminManageOrderActions.saveOrder(orderData));
+      dispatch(AdminManageOrderActions.saveOrderDetail(orderDetail));
+    }
 
     return response.data;
   },
@@ -869,7 +876,7 @@ const bookerStartOrder = createAsyncThunk(
     };
     const { data: response } = await createQuotationApi(orderId, apiBody);
 
-    if (process.env.NEXT_APP_ALLOW_PARTNER_EMAIL_SEND === 'true') {
+    if (process.env.NEXT_PUBLIC_ALLOW_PARTNER_EMAIL_SEND === 'true') {
       await sendPartnerNewOrderAppearEmailApi(orderId, {
         orderId,
         partner: partnerQuotation,
@@ -980,7 +987,7 @@ const updateOrderFromDraftEdit = createAsyncThunk(
         if (draftSubOrderChangesHistoryByDate.length > 0) {
           const { restaurant = {} } = draftOrderDetail[date] || {};
 
-          if (process.env.NEXT_APP_ALLOW_PARTNER_EMAIL_SEND === 'true') {
+          if (process.env.NEXT_PUBLIC_ALLOW_PARTNER_EMAIL_SEND === 'true') {
             await sendOrderDetailUpdatedEmailApi({
               orderId,
               timestamp: date,
@@ -1284,8 +1291,8 @@ const OrderManagementSlice = createSlice({
             },
             planOrderDate: currentViewDate,
             type: oldFoodId
-              ? EOrderHistoryTypes.MEMBER_FOOD_CHANGED
-              : EOrderHistoryTypes.MEMBER_FOOD_ADDED,
+              ? EEditSubOrderHistoryType.MEMBER_FOOD_CHANGED
+              : EEditSubOrderHistoryType.MEMBER_FOOD_ADDED,
             oldValue: oldFoodId
               ? {
                   foodId: oldFoodId,
@@ -1424,7 +1431,7 @@ const OrderManagementSlice = createSlice({
               seconds: new Date().getTime() / 1000,
             },
             planOrderDate: currentViewDate,
-            type: EOrderHistoryTypes.MEMBER_FOOD_REMOVED,
+            type: EEditSubOrderHistoryType.MEMBER_FOOD_REMOVED,
             newValue: null,
             oldValue: {
               foodName: oldFoodName,
@@ -1532,7 +1539,7 @@ const OrderManagementSlice = createSlice({
               // fake a draft Firestore date object
               seconds: new Date().getTime() / 1000,
             },
-            type: EOrderHistoryTypes.FOOD_REMOVED,
+            type: EEditSubOrderHistoryType.FOOD_REMOVED,
             oldValue: {
               foodName,
               foodPrice,
@@ -1567,8 +1574,8 @@ const OrderManagementSlice = createSlice({
           },
           type:
             newQuantity < defaultQuantity
-              ? EOrderHistoryTypes.FOOD_DECREASED
-              : EOrderHistoryTypes.FOOD_INCREASED,
+              ? EEditSubOrderHistoryType.FOOD_DECREASED
+              : EEditSubOrderHistoryType.FOOD_INCREASED,
           oldValue: {
             foodName,
             foodPrice,
@@ -1608,8 +1615,8 @@ const OrderManagementSlice = createSlice({
         },
         type:
           newQuantity < defaultQuantity
-            ? EOrderHistoryTypes.FOOD_DECREASED
-            : EOrderHistoryTypes.FOOD_INCREASED,
+            ? EEditSubOrderHistoryType.FOOD_DECREASED
+            : EEditSubOrderHistoryType.FOOD_INCREASED,
         oldValue: {
           foodName,
           foodPrice,
@@ -1705,7 +1712,7 @@ const OrderManagementSlice = createSlice({
     builder
       /* =============== loadData =============== */
       .addCase(loadData.pending, (state) => {
-        state.isFetchingOrderDetails = true;
+        state.fetchOrderInProgress = true;
       })
       .addCase(
         loadData.fulfilled,
@@ -1738,18 +1745,18 @@ const OrderManagementSlice = createSlice({
 
           return {
             ...state,
-            isFetchingOrderDetails: false,
             orderData,
             planData,
             draftOrderDetail: orderDetail,
             orderValidationsInProgressState,
             isAdminFlow,
+            fetchOrderInProgress: false,
             ...restPayload,
           };
         },
       )
       .addCase(loadData.rejected, (state) => {
-        state.isFetchingOrderDetails = false;
+        state.fetchOrderInProgress = false;
       })
 
       /* =============== updateOrderGeneralInfo =============== */
@@ -2072,12 +2079,12 @@ export default OrderManagementSlice.reducer;
 // ================ Selectors ================ //
 export const orderDetailsAnyActionsInProgress = (state: RootState) => {
   const {
-    isFetchingOrderDetails,
+    fetchOrderInProgress,
     isDeletingParticipant,
     isUpdatingOrderDetails,
   } = state.OrderManagement;
 
   return (
-    isFetchingOrderDetails || isDeletingParticipant || isUpdatingOrderDetails
+    fetchOrderInProgress || isDeletingParticipant || isUpdatingOrderDetails
   );
 };

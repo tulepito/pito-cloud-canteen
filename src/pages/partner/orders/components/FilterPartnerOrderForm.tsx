@@ -9,7 +9,7 @@ import Form from '@components/Form/Form';
 import FieldCheckboxGroup from '@components/FormFields/FieldCheckboxGroup/FieldCheckboxGroup';
 import FieldDatePicker from '@components/FormFields/FieldDatePicker/FieldDatePicker';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
-import { EOrderPaymentState } from '@src/utils/enums';
+import { EOrderPaymentStatus } from '@src/utils/enums';
 
 import css from './FilterPartnerOrderForm.module.scss';
 
@@ -43,11 +43,11 @@ const SUB_ORDER_STATUS_OPTIONS = [
     labelId: 'FilterPartnerOrderForm.subOrderStatus.delivered',
   },
   {
-    key: EOrderPaymentState.isPaid,
+    key: EOrderPaymentStatus.isPaid,
     labelId: 'FilterPartnerOrderForm.subOrderStatus.isPaid',
   },
   {
-    key: EOrderPaymentState.isNotPaid,
+    key: EOrderPaymentStatus.isNotPaid,
     labelId: 'FilterPartnerOrderForm.subOrderStatus.isNotPaid',
   },
   {
@@ -137,32 +137,36 @@ const FilterPartnerOrderFormComponent: React.FC<
 
   return (
     <Form onSubmit={handleSubmit} className={css.form}>
-      <div className={css.fieldContainer}>
-        <FieldTextInput {...fieldSubOrderIdProps} />
-      </div>
-      <div className={css.fieldContainer}>
-        <FieldTextInput {...fieldSubOrderNameProps} />
-      </div>
-      <div className={css.fieldContainer}>
-        <div className={css.fieldLabel}>
-          {intl.formatMessage({
-            id: 'FilterPartnerOrderForm.subOrderTime',
-          })}
+      <div className={css.fieldsContainer}>
+        <div className={css.fieldContainer}>
+          <FieldTextInput {...fieldSubOrderIdProps} />
         </div>
-        <div className={css.fieldContainerRow}>
-          <OnChange name="subOrderStartTime">{handleStartDateChange}</OnChange>
-          <FieldDatePicker {...fieldSubOrderStartTimeProps} />
-          <FieldDatePicker {...fieldSubOrderEndTimeProps} />
+        <div className={css.fieldContainer}>
+          <FieldTextInput {...fieldSubOrderNameProps} />
         </div>
-      </div>
-      <div className={css.fieldCheckboxContainer}>
-        <label className={css.label}>Trạng thái đơn hàng</label>
-        <FieldCheckboxGroup
-          itemClassName={css.checkboxGroup}
-          id="subOrderStatus"
-          options={generateStatusOptions()}
-          name="subOrderStatus"
-        />
+        <div className={css.fieldContainer}>
+          <div className={css.fieldLabel}>
+            {intl.formatMessage({
+              id: 'FilterPartnerOrderForm.subOrderTime',
+            })}
+          </div>
+          <div className={css.fieldContainerRow}>
+            <OnChange name="subOrderStartTime">
+              {handleStartDateChange}
+            </OnChange>
+            <FieldDatePicker {...fieldSubOrderStartTimeProps} />
+            <FieldDatePicker {...fieldSubOrderEndTimeProps} />
+          </div>
+        </div>
+        <div className={css.fieldCheckboxContainer}>
+          <label className={css.label}>Trạng thái đơn hàng</label>
+          <FieldCheckboxGroup
+            itemClassName={css.checkboxGroup}
+            id="subOrderStatus"
+            options={generateStatusOptions()}
+            name="subOrderStatus"
+          />
+        </div>
       </div>
       <div className={css.btns}>
         <Button

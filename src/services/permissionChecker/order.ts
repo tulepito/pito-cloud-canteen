@@ -4,8 +4,12 @@ import { HttpMethod } from '@apis/configs';
 import { EHttpStatusCode } from '@apis/errors';
 import { fetchListing } from '@services/integrationHelper';
 import { getSdk, handleError } from '@services/sdk';
-import { CompanyPermission } from '@src/types/UserPermission';
-import { denormalisedResponseEntities, Listing, User } from '@utils/data';
+import { CompanyPermissions } from '@src/types/UserPermission';
+import {
+  CurrentUser,
+  denormalisedResponseEntities,
+  Listing,
+} from '@utils/data';
 
 const orderChecker =
   (handler: NextApiHandler) =>
@@ -16,7 +20,9 @@ const orderChecker =
       const { companyId, orderId } = req.body;
       const apiMethod = req.method;
       const [currentUser] = denormalisedResponseEntities(currentUserResponse);
-      const { isAdmin = false, company = {} } = User(currentUser).getMetadata();
+
+      const { isAdmin = false, company = {} } =
+        CurrentUser(currentUser).getMetadata();
 
       switch (apiMethod) {
         case HttpMethod.POST: {
@@ -29,7 +35,7 @@ const orderChecker =
 
           if (
             userPermission &&
-            CompanyPermission.includes(userPermission) &&
+            CompanyPermissions.includes(userPermission) &&
             !isAdmin
           ) {
             return res.status(EHttpStatusCode.Forbidden).json({
@@ -50,7 +56,7 @@ const orderChecker =
           const userPermission = company[clientId]?.permission;
           if (
             userPermission &&
-            !CompanyPermission.includes(userPermission) &&
+            !CompanyPermissions.includes(userPermission) &&
             !isAdmin
           ) {
             return res.status(EHttpStatusCode.Forbidden).json({

@@ -3,7 +3,7 @@ import { parseThousandNumberToInteger } from '@helpers/format';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { generateSKU } from '@pages/admin/order/[orderId]/helpers/AdminOrderDetail';
-import { OrderDetailThunks } from '@pages/admin/order/[orderId]/OrderDetail.slice';
+import { AdminManageOrderThunks } from '@pages/admin/order/AdminManageOrder.slice';
 import { User } from '@src/utils/data';
 import { EPaymentType } from '@src/utils/enums';
 import type { TUser } from '@src/utils/types';
@@ -19,6 +19,7 @@ type PartnerPaymentDetailProps = {
   partnerName: string;
   totalWithVAT: number;
   orderId: string;
+  planId?: string;
   partnerId: string;
   subOrderDate: string;
   partnerPaymentRecordsByDate: any[];
@@ -33,6 +34,7 @@ const PartnerPaymentDetail: React.FC<PartnerPaymentDetailProps> = (props) => {
     partnerName,
     totalWithVAT,
     orderId,
+    planId,
     partnerId,
     subOrderDate,
     partnerPaymentRecordsByDate = [],
@@ -46,16 +48,27 @@ const PartnerPaymentDetail: React.FC<PartnerPaymentDetailProps> = (props) => {
   const companyUser = User(company);
   const { companyName } = companyUser.getPublicData();
 
+  const orderDetail = useAppSelector(
+    (state) => state.AdminManageOrder.orderDetail,
+  );
+  const confirmPartnerPaymentInProgress = useAppSelector(
+    (state) => state.AdminManageOrder.confirmPartnerPaymentInProgress,
+  );
   const createPartnerPaymentRecordInProgress = useAppSelector(
-    (state) => state.OrderDetail.createPartnerPaymentRecordInProgress,
+    (state) => state.AdminManageOrder.createPartnerPaymentRecordInProgress,
   );
   const createPartnerPaymentRecordError = useAppSelector(
-    (state) => state.OrderDetail.createPartnerPaymentRecordError,
+    (state) => state.AdminManageOrder.createPartnerPaymentRecordError,
   );
   const deletePartnerPaymentRecordInProgress = useAppSelector(
-    (state) => state.OrderDetail.deletePartnerPaymentRecordInProgress,
+    (state) => state.AdminManageOrder.deletePartnerPaymentRecordInProgress,
   );
-  const addPaymentDisabled = totalWithVAT === paidAmount;
+
+  const { isAdminPaymentConfirmed = false } = orderDetail[subOrderDate] || {};
+  const confirmPaymentDisabled =
+    !!isAdminPaymentConfirmed || totalWithVAT === paidAmount;
+  const addPaymentDisabled =
+    !!isAdminPaymentConfirmed || totalWithVAT === paidAmount;
 
   const handleAddPartnerPaymentRecord = async (
     values: TAddingPaymentRecordFormValues,
@@ -63,7 +76,7 @@ const PartnerPaymentDetail: React.FC<PartnerPaymentDetailProps> = (props) => {
     const { paymentAmount, paymentNote } = values;
 
     const { meta } = await dispatch(
-      OrderDetailThunks.createPartnerPaymentRecord({
+      AdminManageOrderThunks.createPartnerPaymentRecord({
         paymentType: EPaymentType.PARTNER,
         orderId,
         partnerId,
@@ -82,13 +95,26 @@ const PartnerPaymentDetail: React.FC<PartnerPaymentDetailProps> = (props) => {
     if (meta.requestStatus === 'fulfilled') {
       addPaymentModalController.setFalse();
     } else {
-      dispatch(OrderDetailThunks.fetchPartnerPaymentRecords(orderId));
+      dispatch(AdminManageOrderThunks.fetchPartnerPaymentRecords(orderId));
     }
+  };
+
+  const handleConfirmPayment = () => {
+    dispatch(
+      AdminManageOrderThunks.confirmPartnerPayment({
+        planId: planId as string,
+        subOrderDate,
+      }),
+    );
   };
 
   const handleDeletePartnerPaymentRecord = async (paymentRecordId: string) => {
     return dispatch(
-      OrderDetailThunks.deletePartnerPaymentRecord(paymentRecordId),
+      AdminManageOrderThunks.deletePartnerPaymentRecord({
+        paymentRecordId,
+        subOrderDate,
+        shouldDisapprovePayment: isAdminPaymentConfirmed,
+      }),
     );
   };
 
@@ -100,6 +126,14 @@ const PartnerPaymentDetail: React.FC<PartnerPaymentDetailProps> = (props) => {
         paidAmount={paidAmount}
       />
       <div className={css.buttonsWrapper}>
+        <Button
+          variant="secondary"
+          className={css.confirmPaymentBtn}
+          onClick={handleConfirmPayment}
+          inProgress={confirmPartnerPaymentInProgress}
+          disabled={confirmPaymentDisabled}>
+          Xác nhận thanh toán
+        </Button>
         <Button
           variant="secondary"
           onClick={addPaymentModalController.setTrue}

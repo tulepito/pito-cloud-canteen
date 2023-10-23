@@ -11,7 +11,7 @@
 
   .removeFilters {
     @include textTemplate(14px, $fontWeightBold, 20px);
-    color: $neutralGray5;
+    color: $neutralGray6;
     cursor: pointer;
   }
 }

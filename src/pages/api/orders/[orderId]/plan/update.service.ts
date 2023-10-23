@@ -98,42 +98,42 @@ const updatePlan = async ({
   });
 
   let updatedOrderDetail = normalizeDetail;
-  let updateMenuIds = [];
 
   if (enabledToUpdateRelatedBookingInfo) {
-    if (updateMode === EApiUpdateMode.MERGE) {
-      currPlan = await fetchListing(planId as string);
-      const { orderDetail: oldOrderDetail = {}, menuIds = [] } =
-        Listing(currPlan).getMetadata();
+    currPlan = await fetchListing(planId as string);
+    const { orderDetail: oldOrderDetail = {}, menuIds = [] } =
+      Listing(currPlan).getMetadata();
 
+    if (updateMode === EApiUpdateMode.MERGE) {
       updatedOrderDetail = getNormalizeDetail({
         orderDetail: { ...oldOrderDetail, ...orderDetail },
         initialMemberOrder,
         isNormalOrder,
       });
-
-      updateMenuIds = menuIds;
     }
 
     if (updateMode === EApiUpdateMode.DIRECT_UPDATE) {
-      currPlan = await fetchListing(planId as string);
-      const { orderDetail: oldOrderDetail = {}, menuIds = [] } =
-        Listing(currPlan).getMetadata();
       updatedOrderDetail = {
         ...oldOrderDetail,
         ...orderDetail,
       };
-      updateMenuIds = menuIds;
     }
+    const updateMenuIds = uniq(
+      menuIds.concat(getMenuListFromOrderDetail(updatedOrderDetail)),
+    );
 
+    integrationSdk.listings.update({
+      id: orderId,
+      metadata: {
+        menuIds: updateMenuIds,
+      },
+    });
     const planListingResponse = await integrationSdk.listings.update(
       {
         id: planId,
         metadata: {
           orderDetail: updatedOrderDetail,
-          menuIds: uniq(
-            updateMenuIds.concat(getMenuListFromOrderDetail(orderDetail)),
-          ),
+          menuIds: updateMenuIds,
         },
       },
       { expand: true },

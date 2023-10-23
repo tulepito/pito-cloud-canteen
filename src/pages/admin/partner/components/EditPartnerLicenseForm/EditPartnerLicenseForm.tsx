@@ -10,12 +10,12 @@ import FieldRadioButton from '@components/FormFields/FieldRadioButton/FieldRadio
 import {
   BUSINESS_LICENSE_OPTIONS,
   BUSINESS_TYPE_OPTIONS,
-  EImageVariants,
-  FOOD_CERTIFICATE_RADIO_OPTIONS,
+  FOOD_CERTIFICATE_OPTIONS,
   NO,
   PARTY_INSURANCE_RADIO_OPTIONS,
   YES,
-} from '@utils/enums';
+} from '@src/utils/options';
+import { EImageVariants } from '@utils/enums';
 
 import FieldRadioButtonPhoto from '../FieldRadioButtonPhoto/FieldRadioButtonPhoto';
 
@@ -58,7 +58,7 @@ const businessTypeRadioOptions = () => {
 };
 
 const foodCertificateOptions = () => {
-  return FOOD_CERTIFICATE_RADIO_OPTIONS.map((value) => {
+  return FOOD_CERTIFICATE_OPTIONS.map((value) => {
     if (value.key === YES) {
       return {
         ...value,

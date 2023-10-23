@@ -53,6 +53,7 @@ const SubOrderDetail: React.FC<TSubOrderDetailProps> = ({
     participants,
     anonymous,
   }) || [{}];
+
   const { foodDataList = [] } = data || {};
   const initialCollapseStates = Array.from({
     length: foodDataList?.length,

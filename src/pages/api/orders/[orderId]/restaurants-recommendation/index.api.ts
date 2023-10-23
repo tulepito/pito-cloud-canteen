@@ -2,7 +2,9 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HttpMethod } from '@apis/configs';
 import cookies from '@services/cookie';
-import { handleError } from '@services/sdk';
+import { denormalisedResponseEntities } from '@services/data';
+import { getSdk, handleError } from '@services/sdk';
+import { CurrentUser } from '@src/utils/data';
 
 import {
   recommendRestaurantForSpecificDay,
@@ -14,6 +16,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     const apiMethod = req.method;
     const { orderId, JSONParams } = req.query;
     const { timestamp } = JSON.parse(JSONParams as string);
+    const sdk = getSdk(req, res);
+    const [currentUser] = denormalisedResponseEntities(
+      await sdk.currentUser.show(),
+    );
+    const { isAdmin = false } = CurrentUser(currentUser).getMetadata();
+
     console.log(
       `[API-REQUEST]: ${apiMethod} api get restaurant recommendation for order: ${orderId} `,
     );
@@ -25,17 +33,19 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           throw new Error('timestamp is invalid');
 
         const recommendation = timestamp
-          ? await recommendRestaurantForSpecificDay(
-              String(orderId),
-              Number(timestamp),
-            )
-          : await recommendRestaurants(String(orderId));
+          ? await recommendRestaurantForSpecificDay({
+              orderId: String(orderId),
+              timestamp: Number(timestamp),
+              shouldCalculateDistance: !isAdmin,
+            })
+          : await recommendRestaurants({
+              orderId: String(orderId),
+              shouldCalculateDistance: !isAdmin,
+            });
 
         return res.status(200).json(recommendation);
       }
-      case HttpMethod.POST:
-      case HttpMethod.DELETE:
-      case HttpMethod.PUT:
+
       default:
         return res.status(405).end(`Method ${apiMethod} Not Allowed`);
     }

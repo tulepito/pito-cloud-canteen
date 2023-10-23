@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import type { Event } from 'react-big-calendar';
 import { shallowEqual } from 'react-redux';
 import clone from 'lodash/clone';
+import omit from 'lodash/omit';
 
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { removeMealDay } from '@redux/slices/Order.slice';
@@ -50,8 +51,12 @@ const MealPlanCard: React.FC<TMealPlanCardProps> = ({
   const removeEventItem =
     onRemove ||
     ((resourceId: string) => {
-      const cloneOrderDetail = clone(orderDetail);
-      delete cloneOrderDetail[resourceId];
+      let cloneOrderDetail = clone(orderDetail);
+      cloneOrderDetail = {
+        ...cloneOrderDetail,
+        [resourceId]: omit(cloneOrderDetail[resourceId], ['restaurant']),
+      };
+
       dispatch(removeMealDay(cloneOrderDetail));
     });
 

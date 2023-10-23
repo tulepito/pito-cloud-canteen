@@ -42,7 +42,7 @@
 
 .orderInforWrapper {
   padding: 24px 0;
-  border-bottom: 1px solid $neutralGray4;
+  border-bottom: 1px solid $neutralGray5;
 
   .title {
     @include textTemplate(16px, $fontWeightBold, 24px);
@@ -99,12 +99,12 @@
       flex-direction: column;
       .boxTitle {
         font-size: 14px;
-        color: $neutralGray5;
+        color: $neutralGray6;
         margin-bottom: 16px;
       }
       .boxContent {
         font-size: 16px;
-        color: $neutralGray6;
+        color: $neutralGray7;
         font-weight: $fontWeightBold;
         max-width: 260px;
       }
@@ -184,7 +184,7 @@
       border-radius: 16px;
 
       background-color: $neutralGray1;
-      outline: 1px solid $neutralGray4;
+      outline: 1px solid $neutralGray5;
       outline-offset: -1px;
 
       & > div:first-of-type {
@@ -261,7 +261,7 @@
   border-radius: 16px;
 
   background-color: $neutralGray1;
-  outline: 1px solid $neutralGray4;
+  outline: 1px solid $neutralGray5;
   outline-offset: -1px;
 
   & > div:first-of-type {
@@ -325,7 +325,7 @@
       border-radius: 16px;
 
       background-color: $neutralGray1;
-      outline: 1px solid $neutralGray4;
+      outline: 1px solid $neutralGray5;
       outline-offset: -1px;
 
       & > div:first-of-type {

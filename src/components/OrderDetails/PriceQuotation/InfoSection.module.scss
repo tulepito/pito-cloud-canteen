@@ -13,12 +13,16 @@
     flex-basis: 45%;
   }
 
+  &.partnerQuotation > div {
+    flex-basis: unset;
+  }
+
   &::after {
     @include absolute(100%, 1px);
     bottom: 0;
     left: 0;
 
-    background-color: $neutralGray5;
+    background-color: $neutralGray6;
   }
 
   .sectionTitle {

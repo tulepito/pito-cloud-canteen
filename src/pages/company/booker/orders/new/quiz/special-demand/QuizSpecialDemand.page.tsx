@@ -1,12 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import { useRouter } from 'next/router';
 
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
-import { QuizActions, QuizThunks } from '@redux/slices/Quiz.slice';
+import { QuizActions } from '@redux/slices/Quiz.slice';
 import { companyPaths, quizPaths } from '@src/paths';
 import { User } from '@src/utils/data';
 
@@ -32,18 +32,18 @@ const QuizSpecialDemand = () => {
     shallowEqual,
   );
   const nutritionsOptions = useAppSelector(
-    (state) => state.Quiz.nutritions,
+    (state) => state.SystemAttributes.nutritions,
     shallowEqual,
   );
-  const fetchSearchFilter = useAppSelector(
-    (state) => state.Quiz.fetchFilterInProgress,
+  const fetchAttributesInProgress = useAppSelector(
+    (state) => state.SystemAttributes.fetchAttributesInProgress,
   );
   const submitDisabled = useMemo(() => {
     return !formValues?.nutritions?.length && !formValues?.mealType?.length;
   }, [formValues?.nutritions, formValues?.mealType]);
 
   const { nutritions } = User(selectedCompany).getPublicData();
-  const onFormSubmitClick = async () => {
+  const handleFormSubmitClick = async () => {
     submittingControl.setTrue();
 
     try {
@@ -71,10 +71,6 @@ const QuizSpecialDemand = () => {
     router.back();
   };
 
-  useEffect(() => {
-    if (nutritionsOptions.length === 0)
-      dispatch(QuizThunks.fetchSearchFilter());
-  }, [dispatch]);
   const initialValues: TSpecialDemandFormValues = useMemo(
     () => ({
       nutritions: quizData.nutritions || nutritions || [],
@@ -102,12 +98,12 @@ const QuizSpecialDemand = () => {
       submitText="Tiếp tục"
       cancelText="Bỏ qua"
       onCancel={onCancel}
-      onSubmit={onFormSubmitClick}
+      onSubmit={handleFormSubmitClick}
       submitDisabled={submitDisabled}
       submitInProgress={submittingControl.value}
       onBack={goBack}>
       <div className={css.formContainer}>
-        {fetchSearchFilter ? (
+        {fetchAttributesInProgress ? (
           <div className={css.loading}>
             {intl.formatMessage({ id: 'QuizMealStyles.loading' })}
           </div>

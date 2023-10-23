@@ -19,7 +19,7 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { useDownloadPriceQuotation } from '@hooks/useDownloadPriceQuotation';
 import useExportOrderDetails from '@hooks/useExportOrderDetails';
 import { usePrepareOrderDetailPageData } from '@hooks/usePrepareOrderManagementData';
-import { AdminAttributesThunks } from '@pages/admin/Attributes.slice';
+import { AdminManageOrderThunks } from '@pages/admin/order/AdminManageOrder.slice';
 import { ReviewContent } from '@pages/admin/order/create/components/ReviewOrder/ReviewOrder';
 import { checkMinMaxQuantityInPickingState } from '@pages/company/orders/[orderId]/picking/OrderDetail.page';
 import {
@@ -30,11 +30,10 @@ import { Listing } from '@src/utils/data';
 import { formatTimestamp } from '@src/utils/dates';
 import { EOrderStates, EOrderType } from '@src/utils/enums';
 import { ETransition } from '@src/utils/transaction';
-import type { TListing, TObject, TTransaction, TUser } from '@src/utils/types';
+import type { TListing, TObject, TUser } from '@src/utils/types';
 
 import OrderHeaderInfor from '../../components/OrderHeaderInfor/OrderHeaderInfor';
 import OrderHeaderState from '../../components/OrderHeaderState/OrderHeaderState';
-import { OrderDetailThunks } from '../../OrderDetail.slice';
 
 import css from './OrderDetailTab.module.scss';
 
@@ -49,9 +48,6 @@ type OrderDetailTabProps = {
   orderDetail: any;
   company: TUser;
   booker: TUser;
-  transactionDataMap: {
-    [date: string]: TTransaction;
-  };
   updateStaffName: (staffName: string) => void;
   updateOrderStaffNameInProgress: boolean;
   updateOrderState: (newOrderState: string) => void;
@@ -81,7 +77,7 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
     draftOrderDetail,
     draftSubOrderChangesHistory,
     orderValidationsInProgressState,
-    isFetchingOrderDetails,
+    fetchOrderInProgress,
   } = useAppSelector((state) => state.OrderManagement);
   const dispatch = useAppDispatch();
   const router = useRouter();
@@ -134,7 +130,7 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
     draftOrderDetail?.[currentViewDate] || {};
 
   const ableToUpdateOrder =
-    !isFetchingOrderDetails &&
+    !fetchOrderInProgress &&
     isRouterReady &&
     ((lastTransition === ETransition.INITIATE_TRANSACTION && isDraftEditing) ||
       isPickingState);
@@ -181,7 +177,7 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
         const updatePlanDetail = (updateData: TObject, skipRefetch = false) => {
           if (planId) {
             dispatch(
-              OrderDetailThunks.updatePlanDetail({
+              AdminManageOrderThunks.updatePlanDetail({
                 planId,
                 orderId,
                 orderDetail: {
@@ -255,8 +251,6 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
         return dispatch(OrderManagementsAction.resetDraftOrderDetails());
       };
     }
-
-    dispatch(AdminAttributesThunks.fetchAttributes());
   }, []);
 
   const isNormalOrder = orderType === EOrderType.normal;

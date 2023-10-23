@@ -75,11 +75,11 @@
     .orderEndAt {
       margin-bottom: 8px;
       @include textTemplate(12px, 400, 20px);
-      color: $neutralGray5;
+      color: $neutralGray6;
 
       .orderEndAtTime {
         @include textTemplate(12px, 600, 24px);
-        color: $neutralGray6;
+        color: $neutralGray7;
       }
     }
 
@@ -135,6 +135,6 @@
 
 .goBackBtn {
   @include textTemplate(16px, $fontWeightBold, 24px);
-  color: $neutralGray6;
+  color: $neutralGray7;
   @include flexAlign(center);
 }

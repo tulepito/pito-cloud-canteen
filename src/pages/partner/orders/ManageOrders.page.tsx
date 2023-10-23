@@ -21,7 +21,10 @@ import { TableForm } from '@components/Table/Table';
 import Tooltip from '@components/Tooltip/Tooltip';
 import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
 import { parseThousandNumber } from '@helpers/format';
-import { calculatePriceQuotationPartner } from '@helpers/order/cartInfoHelper';
+import {
+  calculatePriceQuotationPartner,
+  vatPercentageBaseOnVatSetting,
+} from '@helpers/order/cartInfoHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { useViewport } from '@hooks/useViewport';
@@ -135,7 +138,7 @@ const TABLE_COLUMN: TColumn[] = [
 
 const parseEntitiesToTableData = (
   subOrders: TObject[],
-  restaurantId: string,
+  _restaurantId: string,
 ) => {
   return subOrders.map((entity) => {
     const {
@@ -147,7 +150,7 @@ const parseEntitiesToTableData = (
       startDate,
       endDate,
       deliveryHour,
-      restaurant,
+      restaurant = {},
       lastTransition,
       isPaid,
       quotation,
@@ -160,17 +163,21 @@ const parseEntitiesToTableData = (
     let totalPrice = 0;
     if (!isEmpty(quotation)) {
       if (!isEmpty(quotation[restaurant.id]?.quotation)) {
-        const vatSettingFromOrder = vatSettings[restaurantId!];
-
+        const vatSettingFromOrder = vatSettings[restaurant?.id];
         const partnerVATSetting =
           vatSettingFromOrder in EPartnerVATSetting
             ? vatSettingFromOrder
             : EPartnerVATSetting.vat;
 
+        const vatPercentage = vatPercentageBaseOnVatSetting({
+          vatSetting: partnerVATSetting,
+          vatPercentage: orderVATPercentage,
+        });
+
         const partnerQuotationBySubOrderDate = calculatePriceQuotationPartner({
           quotation: quotation[restaurant.id].quotation,
           serviceFeePercentage: serviceFees[restaurant.id],
-          currentOrderVATPercentage: orderVATPercentage,
+          currentOrderVATPercentage: vatPercentage,
           subOrderDate: date,
           shouldSkipVAT: partnerVATSetting === EPartnerVATSetting.direct,
         });
@@ -189,7 +196,7 @@ const parseEntitiesToTableData = (
         id: orderId,
         date,
         subOrderTitle,
-        totalPrice: `${parseThousandNumber(totalPrice)}đ`,
+        totalPrice: `${parseThousandNumber(totalPrice) || 0}đ`,
         companyName,
         orderName: `${companyName}_${formatTimestamp(date)}`,
         staffName,
@@ -252,9 +259,6 @@ const ManageOrdersPage = () => {
   const currentSubOrders = useAppSelector(
     (state) => state.PartnerManageOrders.currentSubOrders,
   );
-  const allSubOrders = useAppSelector(
-    (state) => state.PartnerManageOrders.allSubOrders,
-  );
   const pagination = useAppSelector(
     (state) => state.PartnerManageOrders.pagination,
   );
@@ -268,7 +272,7 @@ const ManageOrdersPage = () => {
   const currentUserGetter = CurrentUser(currentUser);
   const { restaurantListingId } = currentUserGetter.getMetadata();
   const dataTable = parseEntitiesToTableData(
-    isMobileLayout ? allSubOrders : currentSubOrders,
+    currentSubOrders,
     restaurantListingId,
   );
 
@@ -357,7 +361,7 @@ const ManageOrdersPage = () => {
   };
 
   useEffect(() => {
-    if (isReady) {
+    if (isReady && !isFirstLoad) {
       dispatch(
         PartnerManageOrdersActions.filterData({
           page: Number(page),
@@ -379,6 +383,7 @@ const ManageOrdersPage = () => {
     endTime,
     status,
     isMobileLayout,
+    isFirstLoad,
   ]);
 
   useEffect(() => {
@@ -392,6 +397,7 @@ const ManageOrdersPage = () => {
             ...(endTime ? { endTime } : {}),
             ...(status ? { status } : {}),
             ...(subOrderId ? { subOrderId } : {}),
+            isMobile: isMobileLayout,
           }),
         );
       });

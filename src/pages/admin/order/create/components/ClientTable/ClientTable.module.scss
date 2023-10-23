@@ -14,7 +14,7 @@
     span {
       display: inline-block;
       @include text(12px, 16px);
-      color: $neutralGray5;
+      color: $neutralGray6;
     }
     span:nth-child(1) {
       width: 3%;
@@ -120,7 +120,7 @@
           cursor: pointer;
 
           &.selected {
-            border-color: $neutralGray6;
+            border-color: $neutralGray7;
             border-width: 1.5px;
             background-color: $neutralGray2;
           }
@@ -134,7 +134,7 @@
 
             .name {
               @include text(14px, 20px);
-              color: $neutralGray6;
+              color: $neutralGray7;
               font-weight: $fontWeightBold;
               margin-left: 8px;
             }
@@ -151,7 +151,7 @@
               }
 
               div {
-                color: $neutralGray5;
+                color: $neutralGray6;
                 margin-left: 8px;
                 @include text(12px, 16px);
                 width: 160px;
@@ -180,12 +180,12 @@
     }
 
     .phone {
-      color: $neutralGray6;
+      color: $neutralGray7;
       @include text(14px, 20px);
     }
 
     .email {
-      color: $neutralGray5;
+      color: $neutralGray6;
       @include text(12px, 20px);
       margin-top: 4px;
       overflow: hidden;
@@ -207,7 +207,7 @@
   padding-top: 12px;
 
   .loadingIcon {
-    stroke: $neutralGray6;
+    stroke: $neutralGray7;
   }
 }
 

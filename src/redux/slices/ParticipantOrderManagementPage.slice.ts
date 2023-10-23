@@ -1,11 +1,11 @@
 import { createSlice } from '@reduxjs/toolkit';
 import compact from 'lodash/compact';
+import uniq from 'lodash/uniq';
 
 import { updateParticipantOrderApi } from '@apis/index';
 import { updateFirstTimeViewOrderApi } from '@apis/participantApi';
 import { fetchTxApi } from '@apis/txApi';
 import { createAsyncThunk } from '@redux/redux.helper';
-import { userThunks } from '@redux/slices/user.slice';
 import { denormalisedResponseEntities, Listing } from '@src/utils/data';
 import { EImageVariants } from '@src/utils/enums';
 import { storableError } from '@utils/errors';
@@ -53,32 +53,31 @@ const initialState: TParticipantOrderManagementState = {
 
 const loadData = createAsyncThunk(
   LOAD_DATA,
-  async (orderId: string, { dispatch, extra: sdk, getState }) => {
+  async (orderId: string, { extra: sdk, getState }) => {
     const { currentUser } = getState().user;
     const currentUserId = currentUser?.id?.uuid;
     let returnValues = {};
+
     const order = denormalisedResponseEntities(
-      await sdk.listings.show(
-        {
-          id: orderId,
-        },
-        { expand: true },
-      ),
+      await sdk.listings.show({
+        id: orderId,
+      }),
     )[0];
     const orderListing = Listing(order);
     const { plans = [], companyId } = orderListing.getMetadata();
     const plan = denormalisedResponseEntities(
-      await sdk.listings.show(
-        {
-          id: plans[0],
-        },
-        { expand: true },
-      ),
+      await sdk.listings.show({
+        id: plans[0],
+      }),
     )[0];
-    const planListing = Listing(plan);
-    const { orderDetail = {} } = planListing.getMetadata();
-    const allRelatedRestaurantsIdList = Object.values(orderDetail).map(
-      (subOrder: any) => subOrder?.restaurant?.id,
+
+    const { orderDetail = {} } = Listing(plan).getMetadata();
+    const allRelatedRestaurantsIdList = uniq(
+      compact(
+        Object.values(orderDetail).map(
+          (subOrder: any) => subOrder?.restaurant?.id,
+        ),
+      ),
     );
     const allRelatedRestaurants = denormalisedResponseEntities(
       await sdk.listings.query({
@@ -111,22 +110,16 @@ const loadData = createAsyncThunk(
     };
 
     if (companyId) {
-      const company =
-        (denormalisedResponseEntities(
-          await sdk.users.show(
-            {
-              id: companyId,
-              include: ['profileImage'],
-              'fields.image': [`variants.${EImageVariants.squareSmall}`],
-            },
-            { expand: true },
-          ),
-        ) || [])[0] || {};
+      const company = (denormalisedResponseEntities(
+        await sdk.users.show({
+          id: companyId,
+          include: ['profileImage'],
+          'fields.image': [`variants.${EImageVariants.squareSmall}`],
+        }),
+      ) || [{}])[0];
 
       returnValues = { ...returnValues, company };
     }
-
-    await dispatch(userThunks.fetchCurrentUser({}));
 
     return returnValues;
   },

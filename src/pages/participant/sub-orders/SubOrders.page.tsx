@@ -76,6 +76,7 @@ const SubOrders = () => {
         subOrderReviewModalControl.setTrue();
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUserId, deliveredSubOrders, planIdFromQuery, timestampFromQuery]);
 
   useEffect(() => {

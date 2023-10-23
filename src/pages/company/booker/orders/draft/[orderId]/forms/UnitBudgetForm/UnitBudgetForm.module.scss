@@ -6,14 +6,14 @@
 }
 
 .vndIcon {
-  color: $neutralGray4;
-  border-left: 1px solid $neutralGray4;
+  color: $neutralGray5;
+  border-left: 1px solid $neutralGray5;
   padding: 0 16px;
 }
 
 .minPriceNote {
   @include textTemplate(12px, 400, 16px);
-  color: $neutralGray5;
+  color: $neutralGray6;
   margin-bottom: 14px;
 }
 

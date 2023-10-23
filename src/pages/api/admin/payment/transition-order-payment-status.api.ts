@@ -15,11 +15,18 @@ import { calculateClientTotalPriceAndPaidAmount } from './check-valid-payment.se
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   const integrationSdk = getIntegrationSdk();
   try {
-    const { orderId, planId } = req.body;
+    const { orderId, planId: planIdFromBody } = req.body;
 
     const order = await fetchListing(orderId);
     const orderListing = Listing(order);
-    const { orderStateHistory, orderState } = orderListing.getMetadata();
+    const {
+      orderStateHistory,
+      orderState,
+      isAdminConfirmedClientPayment = false,
+      plans = [],
+    } = orderListing.getMetadata();
+
+    const planId = planIdFromBody || plans[0];
 
     const plan = await fetchListing(planId);
     const planListing = Listing(plan);
@@ -64,7 +71,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       if (
         !orderDetail[subOrderDate]?.transactionId ||
         (orderDetail[subOrderDate]?.transactionId &&
-          orderDetail[subOrderDate]?.status === ESubOrderStatus.CANCELED) ||
+          orderDetail[subOrderDate]?.status === ESubOrderStatus.canceled) ||
         orderDetail[subOrderDate]?.lastTransition ===
           ETransition.OPERATOR_CANCEL_PLAN
       ) {
@@ -82,11 +89,16 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
     const newOrderDetail = Object.keys(orderDetail).reduce(
       (result: any, subOrderDate: string) => {
+        const { isAdminPaymentConfirmed = false } =
+          orderDetail[subOrderDate] || {};
+
         return {
           ...result,
           [subOrderDate]: {
             ...orderDetail[subOrderDate],
-            isPaid: Boolean(subOrderDatePaymentStatus[subOrderDate]),
+            isPaid:
+              Boolean(subOrderDatePaymentStatus[subOrderDate]) ||
+              isAdminPaymentConfirmed,
           },
         };
       },
@@ -106,7 +118,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         if (
           !orderDetail[subOrderDate]?.transactionId ||
           (orderDetail[subOrderDate]?.transactionId &&
-            orderDetail[subOrderDate]?.status === ESubOrderStatus.CANCELED) ||
+            orderDetail[subOrderDate]?.status === ESubOrderStatus.canceled) ||
           orderDetail[subOrderDate]?.lastTransition ===
             ETransition.OPERATOR_CANCEL_PLAN
         ) {
@@ -125,9 +137,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       Object.keys(activeOrderDetail).length ===
       Object.keys(subOrderDatePaymentStatus).length;
 
-    const isPartnerPaidAmountEnough = Object.values(
+    const isPartnerPaidAmountEnough = Object.keys(
       subOrderDatePaymentStatus,
-    ).every((status: any) => Boolean(status));
+    ).every((date: any) => {
+      const status = subOrderDatePaymentStatus[date];
+      const { isAdminPaymentConfirmed = false } = activeOrderDetail[date] || {};
+
+      return isAdminPaymentConfirmed || Boolean(status);
+    });
 
     const isOrderPendingPayment = orderState === EOrderStates.pendingPayment;
     const isOrderStateIncludePendingPaymentOrComplete = orderStateHistory.some(
@@ -136,16 +153,19 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         state.state === EOrderStates.completed,
     );
 
+    const updateIsClientSufficientPaid =
+      isClientPaidAmountEnough || isAdminConfirmedClientPayment;
+    const updateIsPartnerSufficientPaid =
+      isPartnerPaidAmountEnough && isPaymentNumberEqualToSubOrderDateNumber;
+
     await integrationSdk.listings.update({
       id: orderId,
       metadata: {
-        isClientSufficientPaid: isClientPaidAmountEnough,
-        isPartnerSufficientPaid:
-          isPartnerPaidAmountEnough && isPaymentNumberEqualToSubOrderDateNumber,
+        isClientSufficientPaid: updateIsClientSufficientPaid,
+        isPartnerSufficientPaid: updateIsPartnerSufficientPaid,
         ...(isOrderPendingPayment &&
-        isClientPaidAmountEnough &&
-        isPartnerPaidAmountEnough &&
-        isPaymentNumberEqualToSubOrderDateNumber
+        updateIsClientSufficientPaid &&
+        updateIsPartnerSufficientPaid
           ? {
               orderState: EOrderStates.completed,
               orderStateHistory: [

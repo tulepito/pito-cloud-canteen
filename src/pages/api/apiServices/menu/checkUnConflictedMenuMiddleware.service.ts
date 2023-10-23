@@ -1,11 +1,15 @@
+import uniqBy from 'lodash/uniqBy';
 import type { NextApiHandler, NextApiRequest, NextApiResponse } from 'next';
 
 import { errorMessages } from '@apis/errors';
-import type { TCheckUnConflictedParams } from '@helpers/apiHelpers';
+import {
+  type TCheckUnConflictedParams,
+  queryAllPages,
+} from '@helpers/apiHelpers';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { handleError } from '@services/sdk';
 import { denormalisedResponseEntities, IntegrationListing } from '@utils/data';
-import { findClassDays } from '@utils/dates';
+import { findClassDays, isSameDate } from '@utils/dates';
 import { EListingMenuStates, EListingStates, EListingType } from '@utils/enums';
 import type { TIntegrationListing } from '@utils/types';
 
@@ -20,6 +24,7 @@ const checkUnConflictedMenuMiddleware =
       const integrationSdk = getIntegrationSdk();
       const {
         mealType,
+        mealTypes = [],
         daysOfWeek = [],
         restaurantId,
         id,
@@ -27,24 +32,64 @@ const checkUnConflictedMenuMiddleware =
         endDate,
       } = params;
 
+      const defaultQueryParams = {
+        meta_listingType: EListingType.menu,
+        meta_restaurantId: restaurantId,
+        meta_isDeleted: false,
+      };
+
+      const daysOfWeekInRange = findClassDays(
+        daysOfWeek,
+        new Date(startDate),
+        new Date(endDate),
+      );
+
       const daysOfWeekAsString = daysOfWeek.join(',');
       const listingStatesAsString = [
         EListingStates.published,
         EListingStates.draft,
         EListingMenuStates.pendingRestaurantApproval,
       ].join(',');
-      const response = await integrationSdk.listings.query({
-        pub_mealType: mealType,
-        pub_daysOfWeek: `has_any:${daysOfWeekAsString}`,
-        meta_listingType: EListingType.menu,
-        meta_restaurantId: restaurantId,
-        meta_isDeleted: false,
-        meta_listingState: listingStatesAsString,
-      });
+      let listings: TIntegrationListing[] = [];
 
-      const listings = denormalisedResponseEntities(
-        response,
+      const listingsBaseOnMealType = denormalisedResponseEntities(
+        await integrationSdk.listings.query({
+          pub_mealType: mealType,
+          pub_daysOfWeek: `has_any:${daysOfWeekAsString}`,
+          meta_listingState: listingStatesAsString,
+          ...defaultQueryParams,
+        }),
       ) as TIntegrationListing[];
+      listings = listings.concat(listingsBaseOnMealType);
+
+      if (mealTypes.length > 1) {
+        const extraListingsBaseOnMealTypes = await queryAllPages({
+          sdkModel: integrationSdk.listings,
+          query: {
+            pub_mealType: `${mealTypes.slice(1, mealTypes.length).join(',')}`,
+            pub_daysOfWeek: `has_any:${daysOfWeekAsString}`,
+            meta_listingState: EListingStates.draft,
+            ...defaultQueryParams,
+          },
+        });
+
+        const listingsBaseOnMealTypes = await queryAllPages({
+          sdkModel: integrationSdk.listings,
+          query: {
+            pub_mealTypes: `has_any:${mealTypes.join(',')}`,
+            pub_daysOfWeek: `has_any:${daysOfWeekAsString}`,
+            meta_listingState: EListingStates.draft,
+            ...defaultQueryParams,
+          },
+        });
+
+        listings = uniqBy(
+          listings
+            .concat(listingsBaseOnMealTypes)
+            .concat(extraListingsBaseOnMealTypes),
+          'id.uuid',
+        );
+      }
 
       const inValidListings = listings.filter((l) => {
         const {
@@ -53,21 +98,19 @@ const checkUnConflictedMenuMiddleware =
           daysOfWeek: listingDayOfWeek,
         } = IntegrationListing(l).getPublicData();
 
-        const daysOfWeekInRange = findClassDays(
-          daysOfWeek,
-          new Date(startDate),
-          new Date(endDate),
-        );
-
         const listingDaysOfWeekInRange = findClassDays(
           listingDayOfWeek,
           new Date(listingStartDate),
           new Date(listingEndDate),
         );
 
-        return daysOfWeekInRange.some((d) =>
-          listingDaysOfWeekInRange.includes(d),
+        const checkResult = daysOfWeekInRange.some((d) =>
+          listingDaysOfWeekInRange.some((d2) =>
+            isSameDate(new Date(d), new Date(d2)),
+          ),
         );
+
+        return checkResult;
       });
 
       const listingWithoutNewMenu = id

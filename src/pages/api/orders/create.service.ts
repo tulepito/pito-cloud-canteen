@@ -11,12 +11,12 @@ import {
 import getAdminAccount, { updateOrderNumber } from '@services/getAdminAccount';
 import { fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
-import { ListingTypes } from '@src/types/listingTypes';
 import { formatTimestamp, VNTimezone } from '@src/utils/dates';
 import { denormalisedResponseEntities } from '@utils/data';
 import {
   EBookerOrderDraftStates,
   EListingStates,
+  EListingType,
   EOrderDraftStates,
   EOrderType,
 } from '@utils/enums';
@@ -131,7 +131,7 @@ const createOrder = async ({
         bookerId,
         memberAmount,
         orderType,
-        listingType: ListingTypes.ORDER,
+        listingType: EListingType.order,
         orderState: isCreatedByAdmin
           ? EOrderDraftStates.draft
           : EBookerOrderDraftStates.bookerDraft,

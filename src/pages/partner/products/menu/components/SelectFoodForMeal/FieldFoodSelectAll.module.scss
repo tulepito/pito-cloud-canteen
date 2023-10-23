@@ -1,0 +1,15 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/defaults.scss' as *;
+
+.root {
+  @include checkBoxInputStyles;
+  background-color: $neutralGray1;
+  padding-left: 12px;
+  z-index: 2;
+
+  .row {
+    display: flex;
+    padding-bottom: 7px;
+  }
+}

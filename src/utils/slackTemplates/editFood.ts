@@ -3,7 +3,7 @@ import { DateTime } from 'luxon';
 import { parseThousandNumber } from '@helpers/format';
 
 import { formatTimestamp, VNTimezone } from '../dates';
-import { getLabelByKey, SIDE_DISH_OPTIONS } from '../enums';
+import { FOOD_SIDE_DISH_OPTIONS, getLabelByKey } from '../options';
 
 const { NEXT_PUBLIC_CANONICAL_URL } = process.env;
 
@@ -70,7 +70,7 @@ Nội dung cũ:\n${title ? `Tên món ăn: ${title.oldValue}\n` : ''}${
   }${price ? `Đơn giá: ${parseThousandNumber(price.oldValue)}đ\n` : ''}${
     sideDishes
       ? `Món ăn kèm: ${sideDishes.oldValue
-          .map((item: string) => getLabelByKey(SIDE_DISH_OPTIONS, item))
+          .map((item: string) => getLabelByKey(FOOD_SIDE_DISH_OPTIONS, item))
           .join(', ')}\n`
       : ''
   }
@@ -83,7 +83,7 @@ ${title ? `Tên món ăn: ${title.newValue}\n` : ''}${
   }${price ? `Đơn giá: ${parseThousandNumber(price.newValue)}đ\n` : ''}${
     sideDishes
       ? `Món ăn kèm: ${sideDishes.newValue
-          .map((item: string) => getLabelByKey(SIDE_DISH_OPTIONS, item))
+          .map((item: string) => getLabelByKey(FOOD_SIDE_DISH_OPTIONS, item))
           .join(', ')}\n`
       : ''
   }`;

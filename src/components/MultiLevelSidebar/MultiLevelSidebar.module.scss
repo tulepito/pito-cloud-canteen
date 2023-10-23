@@ -43,7 +43,7 @@
 
         .label {
           @include textTemplate(16px, $fontWeightBold, 24px);
-          color: $neutralGray6;
+          color: $neutralGray7;
           padding-bottom: 3px;
           &.active {
             color: $primaryPri2;

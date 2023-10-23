@@ -1,20 +1,23 @@
 /* eslint-disable @typescript-eslint/no-loop-func */
 /* eslint-disable no-await-in-loop */
+import { mapLimit } from 'async';
 import { chunk, flatten, uniq } from 'lodash';
 
+import { queryAllListings } from '@helpers/apiHelpers';
 import { denormalisedResponseEntities } from '@services/data';
 import { fetchListing } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
-import { getUniqueString, IntegrationListing } from '@src/utils/data';
+import { getUniqueString, IntegrationListing, Listing } from '@src/utils/data';
 import {
   EBookerOrderDraftStates,
   EDayOfWeek,
   EListingStates,
   EListingType,
+  EOrderDraftStates,
 } from '@src/utils/enums';
-import type { TIntegrationListing } from '@src/utils/types';
+import type { TIntegrationListing, TListing } from '@src/utils/types';
 
-const fetchListingsByChunkedIds = async (ids: string[], sdk: any) => {
+export const fetchListingsByChunkedIds = async (ids: string[], sdk: any) => {
   const listingsResponse = await Promise.all(
     chunk<string>(ids, 100).map(async (_ids) => {
       const response = await sdk.listings.query({
@@ -28,17 +31,12 @@ const fetchListingsByChunkedIds = async (ids: string[], sdk: any) => {
   return flatten(listingsResponse);
 };
 
-const queryMenuByIdList = async (menuIdList: string[]) => {
+export const queryMenuByIdList = async (menuIdList: string[]) => {
   const integrationSdk = getIntegrationSdk();
 
-  const menuResponse = await integrationSdk.listings.query(
-    {
-      ids: menuIdList,
-    },
-    {
-      expand: true,
-    },
-  );
+  const menuResponse = await integrationSdk.listings.query({
+    ids: menuIdList,
+  });
 
   const menus = denormalisedResponseEntities(menuResponse);
 
@@ -153,6 +151,7 @@ export const updateMenuAfterFoodDeletedByListId = async (foodIds: string[]) => {
             const minPriceChanged = newMinFoodPrice !== currentMinFoodPrice;
             const menuId = IntegrationListing(details).getId();
             updateMap = {
+              ...updateMap,
               [menuId]: {
                 publicData: {
                   ...(updateMap[menuId as keyof typeof updateMap]?.publicData ||
@@ -201,6 +200,100 @@ export const updateMenuAfterFoodDeletedByListId = async (foodIds: string[]) => {
   }
 };
 
+const removeFoodFromDraftOrder = async (
+  menuIds: string[],
+  deletedFoodId: string,
+) => {
+  const integrationSdk = getIntegrationSdk();
+
+  const plans = await queryAllListings({
+    query: {
+      meta_listingType: EListingType.subOrder,
+      meta_menuIds: `has_any:${menuIds.join(',')}`,
+    },
+  });
+
+  await mapLimit(plans, 10, async (plan: TListing) => {
+    try {
+      const planListing = Listing(plan);
+
+      const { orderId } = planListing.getMetadata();
+
+      const order = await fetchListing(orderId);
+
+      const orderListing = Listing(order);
+
+      const { orderState } = orderListing.getMetadata();
+
+      const orderIsDraft = [
+        EOrderDraftStates.draft,
+        EBookerOrderDraftStates.bookerDraft,
+        EOrderDraftStates.pendingApproval,
+      ].includes(orderState);
+
+      if (!orderIsDraft) return;
+
+      const { orderDetail = {} } = planListing.getMetadata();
+
+      let newOrderDetail = { ...orderDetail };
+
+      Object.keys(newOrderDetail).forEach((subOrderDate: string) => {
+        const {
+          memberOrders = {},
+          restaurant = {},
+          lineItems = [],
+        } = newOrderDetail[subOrderDate];
+
+        const newMemberOrders = { ...memberOrders };
+
+        const newFoodList = { ...restaurant.foodList };
+
+        const newLineItems = [...lineItems];
+
+        Object.keys(newMemberOrders).forEach((memberId: string) => {
+          const { foodId } = newMemberOrders[memberId];
+
+          if (foodId === deletedFoodId) {
+            newMemberOrders[memberId].foodId = '';
+          }
+        });
+
+        Object.keys(newFoodList).forEach((foodId: string) => {
+          if (foodId === deletedFoodId) {
+            delete newFoodList[foodId];
+          }
+        });
+
+        newLineItems.filter((lineItem: any) => {
+          return lineItem.id !== deletedFoodId;
+        });
+
+        newOrderDetail = {
+          ...newOrderDetail,
+          [subOrderDate]: {
+            ...newOrderDetail[subOrderDate],
+            memberOrders: newMemberOrders,
+            restaurant: {
+              ...restaurant,
+              foodList: newFoodList,
+            },
+            lineItems: newLineItems,
+          },
+        };
+      });
+
+      await integrationSdk.listings.update({
+        id: plan.id.uuid,
+        metadata: {
+          orderDetail: newOrderDetail,
+        },
+      });
+    } catch (error) {
+      console.error(`SERVER removeFoodFromDraftOrder`, error);
+    }
+  });
+};
+
 export const updateMenuAfterFoodDeleted = async (deletedFoodId: string) => {
   try {
     const integrationSdk = getIntegrationSdk();
@@ -214,6 +307,8 @@ export const updateMenuAfterFoodDeleted = async (deletedFoodId: string) => {
     const menus = await queryMenuByIdList(menuIdList);
 
     let updateMap: any = {};
+
+    const menuIds = menus.map((menu: TIntegrationListing) => menu.id.uuid);
 
     await Promise.all(
       menus.map(async (menu: TIntegrationListing) => {
@@ -284,6 +379,7 @@ export const updateMenuAfterFoodDeleted = async (deletedFoodId: string) => {
             const minPriceChanged = newMinFoodPrice !== currentMinFoodPrice;
             const menuId = IntegrationListing(menu).getId();
             updateMap = {
+              ...updateMap,
               [menuId]: {
                 publicData: {
                   ...(updateMap[menuId as keyof typeof updateMap]?.publicData ||
@@ -314,7 +410,6 @@ export const updateMenuAfterFoodDeleted = async (deletedFoodId: string) => {
     );
     const response = await Promise.all(
       Object.keys(updateMap).map(async (menuId) => {
-        console.log(updateMap[menuId as keyof typeof updateMap]?.metadata);
         await integrationSdk.listings.update({
           id: menuId,
           publicData: {
@@ -326,6 +421,8 @@ export const updateMenuAfterFoodDeleted = async (deletedFoodId: string) => {
         });
       }),
     );
+
+    await removeFoodFromDraftOrder(menuIds, deletedFoodId);
 
     return response;
   } catch (error) {
@@ -399,6 +496,7 @@ export const updateMenuAfterFoodUpdated = async (updatedFoodId: string) => {
               const menuId = menu.id.uuid;
 
               updateMap = {
+                ...updateMap,
                 [menuId]: {
                   publicData: {
                     ...(updateMap?.[menuId]?.publicData || {}),

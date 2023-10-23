@@ -11,6 +11,7 @@ import IconUser from '@components/Icons/IconUser2/IconUser2';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { useLogout } from '@hooks/useLogout';
 import { useViewport } from '@hooks/useViewport';
+import { currentUserSelector } from '@redux/slices/user.slice';
 import { participantPaths } from '@src/paths';
 
 import AvatarForm from './components/AvatarForm/AvatarForm';
@@ -21,7 +22,7 @@ const AccountPage = () => {
   const router = useRouter();
   const handleLogout = useLogout();
   const { isMobileLayout } = useViewport();
-  const currentUser = useAppSelector((state) => state.user.currentUser);
+  const currentUser = useAppSelector(currentUserSelector);
 
   useEffect(() => {
     if (!isMobileLayout) {
@@ -29,15 +30,15 @@ const AccountPage = () => {
     }
   }, [isMobileLayout]);
 
-  const openProfileModal = () => {
+  const handleOpenProfileModal = () => {
     router.push(participantPaths.AccountProfile);
   };
 
-  const openChangePasswordModal = () => {
+  const handleOpenChangePasswordModal = () => {
     router.push(participantPaths.AccountChangePassword);
   };
 
-  const openSpecialDemandModal = () => {
+  const handleOpenSpecialDemandModal = () => {
     router.push(participantPaths.AccountSpecialDemand);
   };
 
@@ -48,21 +49,25 @@ const AccountPage = () => {
         <AvatarForm onSubmit={() => {}} currentUser={currentUser!} />
       </div>
       <div className={css.navigationWrapper}>
-        <div className={css.navigationItem} onClick={openProfileModal}>
+        <div className={css.navigationItem} onClick={handleOpenProfileModal}>
           <div className={css.iconGroup}>
             <IconUser />
             <span>Tài khoản cá nhân</span>
           </div>
           <IconArrow direction="right" />
         </div>
-        <div className={css.navigationItem} onClick={openChangePasswordModal}>
+        <div
+          className={css.navigationItem}
+          onClick={handleOpenChangePasswordModal}>
           <div className={css.iconGroup}>
             <IconLock />
             <span>Đổi mật khẩu</span>
           </div>
           <IconArrow direction="right" />
         </div>
-        <div className={css.navigationItem} onClick={openSpecialDemandModal}>
+        <div
+          className={css.navigationItem}
+          onClick={handleOpenSpecialDemandModal}>
           <div className={css.iconGroup}>
             <IconFood />
             <span>Yêu cầu đặc biệt</span>

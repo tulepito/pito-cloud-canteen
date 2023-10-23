@@ -1,11 +1,9 @@
-export enum UserPermission {
-  BOOKER = 'booker',
-  ACCOUNTANT = 'accountant',
-  PARTICIPANT = 'participant',
-  OWNER = 'owner',
-}
+import { ECompanyPermission } from '@src/utils/enums';
 
-export const CompanyPermission = [UserPermission.BOOKER, UserPermission.OWNER];
+export const CompanyPermissions = [
+  ECompanyPermission.booker,
+  ECompanyPermission.owner,
+];
 
 export enum UserInviteStatus {
   NOT_ACCEPTED = 'pending',

@@ -63,7 +63,6 @@
 
   .slideModalContainer {
     bottom: -100%;
-    // animation: slideOut 0.3s ease-in-out;
   }
 }
 
@@ -81,7 +80,7 @@
 
 .modalContent {
   .horizontalLine {
-    border-bottom: 1px solid $neutralGray4;
+    border-bottom: 1px solid $neutralGray5;
   }
   .sectionWrapper {
     padding: 16px 0;
@@ -112,7 +111,7 @@
     }
 
     .greyText {
-      color: $neutralGray4;
+      color: $neutralGray5;
     }
 
     .orderDeadline {

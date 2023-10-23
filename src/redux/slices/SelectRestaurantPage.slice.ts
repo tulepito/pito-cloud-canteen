@@ -1,12 +1,14 @@
 import { createSlice } from '@reduxjs/toolkit';
+import chunk from 'lodash/chunk';
 import compact from 'lodash/compact';
 import flatten from 'lodash/flatten';
 import uniq from 'lodash/uniq';
 
 import { fetchFoodListFromMenuApi } from '@apis/admin';
-import { convertListIdToQueries, queryAllPages } from '@helpers/apiHelpers';
+import { queryAllPages } from '@helpers/apiHelpers';
 import { getMenuQuery } from '@helpers/listingSearchQuery';
 import { createAsyncThunk } from '@redux/redux.helper';
+import { toNonAccentVietnamese } from '@src/utils/string';
 import { denormalisedResponseEntities, Listing } from '@utils/data';
 import type { TListing, TObject, TPagination } from '@utils/types';
 
@@ -75,36 +77,31 @@ const getRestaurants = createAsyncThunk(
       query: { ...menuQuery, perPage: 100 },
     });
 
-    const restaurantIdList = uniq(
+    const restaurantIdList: string[] = uniq(
       menuList.map((menu: TListing) => {
         const { restaurantId } = Listing(menu).getMetadata();
 
         return restaurantId;
       }),
     );
-    const restaurantQueries = convertListIdToQueries({
-      idList: restaurantIdList,
-      include: ['images'],
-      query: {
-        keywords: title,
-      },
-      'fields.image': ['variants.landscape-crop', 'variants.landscape-crop2x'],
-    });
     const restaurantList = flatten(
       await Promise.all(
-        restaurantQueries.map(async ({ ids, query, ...rest }) => {
+        chunk<string>(restaurantIdList, 100).map(async (ids) => {
           return denormalisedResponseEntities(
             await sdk.listings.query({
               ids,
-              ...query,
-              ...rest,
+              include: ['images'],
+              keywords: title,
+              'fields.image': [
+                'variants.landscape-crop',
+                'variants.landscape-crop2x',
+              ],
             }),
           );
         }),
       ),
     );
-
-    const restaurantWithMenuList = compact(
+    const restaurantWithMenuList = compact<TObject>(
       menuList.map((menu: TListing) => {
         const restaurantInfo = restaurantList.find((r: TListing) => {
           return menu?.attributes?.metadata?.restaurantId === r.id.uuid;
@@ -119,7 +116,21 @@ const getRestaurants = createAsyncThunk(
 
         return null;
       }),
-    );
+    ).sort((obj1: TObject, obj2: TObject) => {
+      const title1 = toNonAccentVietnamese(
+        obj1.restaurantInfo?.attributes?.title,
+        true,
+      );
+      const title2 = toNonAccentVietnamese(
+        obj2.restaurantInfo?.attributes?.title,
+        true,
+      );
+
+      if (title1 < title2) return -1;
+      if (title2 < title1) return 1;
+
+      return 0;
+    });
 
     const totalRestaurants = restaurantWithMenuList.length;
     const totalPages = Math.round(totalRestaurants / perPage + 0.5);

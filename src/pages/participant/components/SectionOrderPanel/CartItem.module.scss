@@ -8,14 +8,14 @@
 
 .label {
   @include textTemplate(14px, 700, 24px, '');
-  color: $neutralGray6;
+  color: $neutralGray7;
   margin-bottom: 12px;
   @include flexAlign(center, space-between);
 }
 
 .value {
   @include textTemplate(14px, 400, 24px, '');
-  color: $neutralGray6;
+  color: $neutralGray7;
   @include flexAlign(center);
   gap: 8px;
 }

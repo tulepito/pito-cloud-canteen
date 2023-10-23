@@ -1,10 +1,11 @@
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
+import isEqual from 'lodash/isEqual';
 
 import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
 import FieldCheckbox from '@components/FormFields/FieldCheckbox/FieldCheckbox';
-import { ALLERGIES_OPTIONS } from '@src/utils/enums';
+import { ALLERGIES_OPTIONS } from '@src/utils/options';
 
 import css from './SpecialDemandForm.module.scss';
 
@@ -29,12 +30,16 @@ const SpecialDemandFormComponent: React.FC<TSpecialDemandFormComponentProps> = (
   const {
     handleSubmit,
     nutritionOptions = [],
+    initialValues,
+    values,
     invalid,
     submitting,
     inProgress,
     view,
   } = props;
-  const disabledSubmit = submitting || invalid || inProgress;
+  const isFormNotChanged = isEqual(initialValues, values);
+  const disabledSubmit =
+    isFormNotChanged || submitting || invalid || inProgress;
 
   return (
     <Form onSubmit={handleSubmit} className={css.root}>

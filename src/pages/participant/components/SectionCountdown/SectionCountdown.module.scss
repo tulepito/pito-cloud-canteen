@@ -4,12 +4,12 @@
 
 .root {
   padding: 16px;
-  border: 1px solid $neutralGray4;
+  border: 1px solid $neutralGray5;
   border-radius: 16px;
 
   .title {
     @include textTemplate(18px, 700, 24px, '');
-    color: $neutralGray6;
+    color: $neutralGray7;
     position: relative;
     margin: 0 0 25px;
 
@@ -26,13 +26,13 @@
   }
 
   .orderEndAtMessage {
-    color: $neutralGray6;
+    color: $neutralGray7;
     margin: 16px 0 16px;
     padding-bottom: 16px;
-    border-bottom: 1px solid $neutralGray5;
+    border-bottom: 1px solid $neutralGray6;
     @include textTemplate(14px, 400, 24px, '');
     .orderEndAtLabel {
-      color: $neutralGray5;
+      color: $neutralGray6;
     }
   }
 }

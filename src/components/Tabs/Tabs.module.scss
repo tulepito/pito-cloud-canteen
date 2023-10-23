@@ -60,7 +60,7 @@
   div[data-number='true'] {
     background-color: $neutralGray3;
     border-radius: 100%;
-    color: $neutralGray5;
+    color: $neutralGray6;
     border-radius: 100%;
     @include textTemplate(8px, $fontWeightBold, 8px);
     width: 16px;
@@ -75,7 +75,7 @@
     width: 0;
     left: 0;
     bottom: 0;
-    background-color: $neutralGray6;
+    background-color: $neutralGray7;
   }
 
   &.tabActive::after {
@@ -86,12 +86,12 @@
     left: 0;
     bottom: 0;
     transition: width 0.3s;
-    background-color: $neutralGray6;
+    background-color: $neutralGray7;
   }
 
   &.tabActive {
     div[data-number='true'] {
-      background-color: $neutralGray6;
+      background-color: $neutralGray7;
       color: $neutralGray1;
     }
   }
@@ -102,11 +102,11 @@
 
 .tabItemContent {
   width: max-content;
-  color: $neutralGray5;
+  color: $neutralGray6;
   @include textTemplate(14px, 400, 20px);
 
   &.tabActive {
-    color: $neutralGray6;
+    color: $neutralGray7;
     transition: color 0.3s;
     font-weight: $fontWeightBold;
   }

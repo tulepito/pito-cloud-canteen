@@ -13,7 +13,6 @@ import IconArrowFull from '@components/Icons/IconArrow/IconArrowFull';
 import ParticipantLayout from '@components/ParticipantLayout/ParticipantLayout';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
-import { SystemAttributesThunks } from '@redux/slices/systemAttributes.slice';
 import { UIActions } from '@redux/slices/UI.slice';
 import type { RootState } from '@redux/store';
 import { participantPaths } from '@src/paths';
@@ -101,10 +100,6 @@ const ParticipantPlan = () => {
       router.push(participantPaths.OrderList);
     }
   }, [isRouterReady, loadDataInProgress, isGroupOrder]);
-
-  useEffect(() => {
-    dispatch(SystemAttributesThunks.fetchAttributes());
-  }, []);
 
   useEffect(() => {
     if (infoSectionController.value) {

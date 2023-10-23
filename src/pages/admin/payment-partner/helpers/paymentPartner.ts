@@ -2,6 +2,8 @@ import * as XLSX from 'xlsx';
 
 import { parseThousandNumber } from '@helpers/format';
 import { formatTimestamp, getDayOfWeek } from '@src/utils/dates';
+import type { EOrderPaymentStatus } from '@src/utils/enums';
+import { CONFIGS_BASE_ON_PAYMENT_STATUS } from '@src/utils/enums';
 import type { TObject } from '@src/utils/types';
 
 export const filterPaymentPartner = (
@@ -19,18 +21,16 @@ export const filterPaymentPartner = (
     )
       return false;
     if (
-      (orderTitle &&
-        /-/.test(orderTitle) &&
-        !`${item.data.subOrderTitle}`
-          .toLocaleLowerCase()
-          .includes(orderTitle.toLocaleLowerCase())) ||
-      (orderTitle &&
-        !/-/.test(orderTitle) &&
-        !`${item.data.orderTitle}`
-          .toLocaleLowerCase()
-          .includes(orderTitle.toLocaleLowerCase()))
-    )
+      orderTitle &&
+      !`${item.data.subOrderTitle}`
+        .toLocaleLowerCase()
+        .includes(orderTitle.toLocaleLowerCase()) &&
+      !`#${item.data.orderTitle}`
+        .toLocaleLowerCase()
+        .includes(orderTitle.toLocaleLowerCase())
+    ) {
       return false;
+    }
     if (startDate && +item.data.subOrderDate < startDate) return false;
     if (endDate && +item.data.subOrderDate > endDate) return false;
     if (status && !status.includes(item.data.status)) return false;
@@ -63,7 +63,8 @@ export const parseEntitiesToExportCsv = (paymentRecords: any[]) => {
       'Tổng giá trị': parseThousandNumber(totalAmount),
       'Đã thanh toán': parseThousandNumber(paidAmount),
       'Còn lại': parseThousandNumber(remainAmount),
-      'Trạng thái': status === 'isPaid' ? 'Đã thanh toán' : 'Chưa thanh toán',
+      'Trạng thái':
+        CONFIGS_BASE_ON_PAYMENT_STATUS[status as EOrderPaymentStatus].label,
     };
   });
 
