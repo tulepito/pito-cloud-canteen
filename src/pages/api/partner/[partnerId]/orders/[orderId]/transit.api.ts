@@ -22,6 +22,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         const txResponse = await integrationSdk.transactions.transition({
           id: transactionId,
           transition: newTransition,
+          params: {},
         });
         const transaction = denormalisedResponseEntities(txResponse)[0];
 
