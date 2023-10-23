@@ -30,13 +30,13 @@
     width: calc((100vw - 32px) / 7);
     height: 50px;
     background-color: $neutralGray2;
-    color: $neutralGray6;
+    color: $neutralGray7;
     border-radius: 8px;
     @include flexCenter;
     pointer-events: none;
 
     &.actived {
-      border: 2px solid $neutralGray6;
+      border: 2px solid $neutralGray7;
       pointer-events: auto;
     }
   }

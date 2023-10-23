@@ -438,7 +438,7 @@
 
   .item {
     padding-bottom: 16px;
-    color: $neutralGray6;
+    color: $neutralGray7;
     border-bottom: 1px solid $neutralGray3;
     @include textTemplate(16px, $fontWeightBold, 24px);
     margin-bottom: 12px;
@@ -511,6 +511,11 @@
 
 .tabLabel {
   .totalItems {
-    background-color: $neutralGray1;
+    background-color: $neutralGray1 !important;
+
+    &.tabActive {
+      background-color: $neutralGray7 !important;
+      color: $neutralGray1 !important;
+    }
   }
 }

@@ -16,8 +16,9 @@ import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { Listing } from '@src/utils/data';
+import { EFoodApprovalState } from '@src/utils/enums';
 import { PARTNER_MENU_MEAL_TYPE_OPTIONS } from '@src/utils/options';
-import type { TObject } from '@src/utils/types';
+import type { TListing, TObject } from '@src/utils/types';
 
 import SelectFoodForMealModal from './SelectFoodForMeal/SelectFoodForMealModal';
 import ApplyForAnotherDayForm from './ApplyForAnotherDayForm';
@@ -49,7 +50,6 @@ const MealSettingItem = ({
 }: any) => {
   const isEmptyFoodList = foodList.length === 0;
   const expandControl = useBoolean(isFirst || isEmptyFoodList);
-  const isOverMaxItemsToShow = foodList.length > MAX_ITEM_TO_SHOW;
   const showMoreControl = useBoolean(true);
   const addFoodControl = useBoolean();
   const addFoodSuccessControl = useBoolean();
@@ -69,6 +69,15 @@ const MealSettingItem = ({
     (state) => state.PartnerManageMenus.publishDraftMenuInProgress,
   );
   const [daysToApply, setDaysToApply] = useState<string[]>([]);
+
+  const acceptedFoodList = useMemo(() => {
+    return pickedFood.filter(
+      (f: TListing) =>
+        Listing(f).getMetadata().adminApproval === EFoodApprovalState.ACCEPTED,
+    );
+  }, [JSON.stringify(pickedFood)]);
+
+  const isOverMaxItemsToShow = acceptedFoodList.length > MAX_ITEM_TO_SHOW;
   const foodListToRender =
     isOverMaxItemsToShow && showMoreControl.value
       ? foodList.slice(0, 3)
@@ -215,7 +224,7 @@ const MealSettingItem = ({
         <div>
           <IconCloseWithCircle onClick={handleClickDeleteMeal} />
           <span>
-            {mealLabel} {isEmptyFoodList ? '' : `(${foodList.length})`}
+            {mealLabel} {isEmptyFoodList ? '' : `(${acceptedFoodList.length})`}
           </span>
         </div>
 
@@ -238,6 +247,11 @@ const MealSettingItem = ({
               return null;
             }
             const { title } = Listing(foodListingMaybe).getAttributes();
+            const { adminApproval } = Listing(foodListingMaybe).getMetadata();
+
+            if (adminApproval !== EFoodApprovalState.ACCEPTED) {
+              return null;
+            }
 
             return (
               <div key={id} className={css.pickedFoodItem}>
