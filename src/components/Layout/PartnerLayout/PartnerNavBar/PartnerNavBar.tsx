@@ -25,6 +25,11 @@ const PartnerNavBar = () => {
     partnerPaths.ManagePayments,
   ].includes(pathname);
 
+  const isProduceItemActive = [
+    partnerPaths.ManageFood,
+    partnerPaths.ManageMenus,
+  ].includes(pathname);
+
   const handleCloseMoreItemsModal = () => moreItemsController.setFalse();
   const handleOpenMoreItemsModal = () => moreItemsController.setTrue();
 
@@ -53,7 +58,7 @@ const PartnerNavBar = () => {
       <NamedLink path={partnerPaths.ManageFood} className={css.itemWrapper}>
         <div
           className={classNames(css.item, {
-            [css.active]: pathname === partnerPaths.ManageFood,
+            [css.active]: isProduceItemActive,
           })}>
           <IconCategory className={css.icon} />
           <div className={css.label}>Sản phẩm</div>

@@ -3,15 +3,21 @@
 
 .root {
   margin-top: $adminTopbarHeight;
-  min-height: calc(100vh - $adminTopbarHeight - 96px);
-  min-height: calc(100dvh - $adminTopbarHeight - 96px);
+  min-height: calc(100vh - $adminTopbarHeight - 84px);
+  min-height: calc(100dvh - $adminTopbarHeight - 84px);
   transition: all 0.5s;
-  margin-bottom: 96px;
+  margin-bottom: 84px;
 
   &.hideHeader {
     margin-top: 0;
-    min-height: calc(100vh - 96px);
-    min-height: calc(100dvh - 96px);
+    min-height: calc(100vh - 84px);
+    min-height: calc(100dvh - 84px);
+  }
+  &.hideNavBar {
+    margin-top: 0;
+    min-height: calc(100vh);
+    min-height: calc(100dvh);
+    margin-bottom: 0px;
   }
 
   @include viewportMedium {

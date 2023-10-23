@@ -76,6 +76,7 @@ export const queryAllTransactions = async ({
 
 export type TCheckUnConflictedParams = {
   mealType: EMenuMealType;
+  mealTypes?: EMenuMealType[];
   daysOfWeek: string[];
   restaurantId: string;
   id?: string;

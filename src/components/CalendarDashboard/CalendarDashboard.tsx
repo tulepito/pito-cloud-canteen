@@ -38,6 +38,9 @@ type TCalendarDashboardProps = TDefaultProps & {
   resources?: any;
   exposeAnchorDate?: (date?: Date) => void;
   defaultView?: View;
+  toolbarLabel?: ReactNode;
+  hidePrevToolbarNavButton?: boolean;
+  hideNextToolbarNavButton?: boolean;
 };
 
 const CalendarDashboard: React.FC<TCalendarDashboardProps> = ({
@@ -59,7 +62,10 @@ const CalendarDashboard: React.FC<TCalendarDashboardProps> = ({
   eventExtraProps,
   resources,
   exposeAnchorDate,
+  toolbarLabel,
   defaultView = Views.WEEK,
+  hidePrevToolbarNavButton = false,
+  hideNextToolbarNavButton = false,
 }) => {
   const [calDate, setCalDate] = useState<Date | undefined>(anchorDate);
 
@@ -98,7 +104,6 @@ const CalendarDashboard: React.FC<TCalendarDashboardProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [inProgress, propsDefaultDate],
   );
-
   const anchorDateProps = useMemo(() => {
     return anchorDate
       ? {
@@ -117,8 +122,20 @@ const CalendarDashboard: React.FC<TCalendarDashboardProps> = ({
       startDate,
       endDate,
       anchorDate: calDate,
+      label: toolbarLabel,
+      hidePrevNavButton: hidePrevToolbarNavButton,
+      hideNextNavButton: hideNextToolbarNavButton,
     };
-  }, [companyLogo, recommendButton, startDate, endDate, calDate]);
+  }, [
+    companyLogo,
+    recommendButton,
+    startDate,
+    endDate,
+    calDate,
+    toolbarLabel,
+    hidePrevToolbarNavButton,
+    hideNextToolbarNavButton,
+  ]);
 
   useEffect(() => {
     setCalDate(anchorDate);
@@ -132,7 +149,15 @@ const CalendarDashboard: React.FC<TCalendarDashboardProps> = ({
   }, [calDate]);
 
   const defaultToolbar = useCallback(
-    (props: any) => <Toolbar {...props} {...toolbarExtraProps} />,
+    (props: any) => {
+      return (
+        <Toolbar
+          {...props}
+          {...toolbarExtraProps}
+          label={toolbarExtraProps.label || props.label}
+        />
+      );
+    },
     [toolbarExtraProps],
   );
 

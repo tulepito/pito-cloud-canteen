@@ -270,7 +270,7 @@ export const validURL = (message: string) => (str: string) => {
 
 export const minPriceLength =
   (message: string, minimumLength: number) => (value: number | number) => {
-    const removeComma = value.toString().split('.');
+    const removeComma = value?.toString().split('.') || [];
     const mergeWithoutComma = removeComma.join('');
     const parsedValue = Number(mergeWithoutComma);
     const isNumber = typeof parsedValue === 'number';

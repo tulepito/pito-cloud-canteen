@@ -1,0 +1,54 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.root {
+  display: flex;
+  align-items: center;
+  column-gap: 12px;
+}
+.foodImgContainer {
+  overflow: hidden;
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+  max-width: 48px;
+  flex-basis: 48px;
+  border-radius: 8px;
+}
+
+.foodImg {
+  position: static !important;
+}
+
+.infoContainer {
+  display: flex;
+  flex-direction: column;
+  row-gap: 8px;
+
+  .foodTitle {
+    @include lineClamp(1);
+    @include textTemplate(14px, 700, 20px);
+  }
+
+  .badges {
+    display: flex;
+    flex-direction: row;
+    column-gap: 4px;
+  }
+
+  .specialDiet {
+    padding: 2px 8px;
+    width: fit-content;
+    @include textTemplate(12px, 600, 16px);
+    border-radius: 20px;
+    background-color: $labelBlue1;
+  }
+
+  .foodType {
+    padding: 2px 8px;
+    width: fit-content;
+    @include textTemplate(12px, 600, 16px);
+    border-radius: 20px;
+    background-color: $sematicGreen1;
+  }
+}
