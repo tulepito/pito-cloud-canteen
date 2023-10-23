@@ -19,11 +19,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     switch (apiMethod) {
       case HttpMethod.PUT: {
         // TODO: transit transaction
-        const txResponse = await integrationSdk.transactions.transition({
-          id: transactionId,
-          transition: newTransition,
-          params: {},
-        });
+        const txResponse = await integrationSdk.transactions.transition(
+          {
+            id: transactionId,
+            transition: newTransition,
+            params: {},
+          },
+          { expand: true, include: ['booking', 'listing', 'provider'] },
+        );
         const transaction = denormalisedResponseEntities(txResponse)[0];
 
         // TODO: save lastTransition in orderDetail
