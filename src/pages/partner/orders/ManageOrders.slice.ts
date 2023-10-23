@@ -87,6 +87,7 @@ const PartnerManageOrdersSlice = createSlice({
   name: 'PartnerManageOrders',
   initialState,
   reducers: {
+    resetStates: () => ({ ...initialState }),
     filterData: (state, { payload }) => {
       const { allSubOrders, pagination } = current(state);
       const { perPage } = pagination;
