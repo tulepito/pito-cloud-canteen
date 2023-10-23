@@ -276,7 +276,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     !onRecommendRestaurantInProgress;
 
   const missingSelectedFood = Object.keys(orderDetail).filter(
-    (dateTime) => orderDetail[dateTime].restaurant.foodList.length === 0,
+    (dateTime) => orderDetail[dateTime]?.restaurant?.foodList?.length === 0,
   );
 
   const disabledSubmit =
