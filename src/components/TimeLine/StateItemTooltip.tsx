@@ -94,10 +94,12 @@ const StateItemTooltip: React.FC<TStateItemTooltipProps> = ({
       partnerConfirmController.setFalse();
       partnerRejectController.setFalse();
       deliveringController.setTrue();
+      canceledController.setTrue();
     } else if (lastTransition === ETransition.PARTNER_REJECT_SUB_ORDER) {
       partnerConfirmController.setFalse();
       partnerRejectController.setFalse();
       deliveringController.setFalse();
+      canceledController.setTrue();
     } else if (lastTransition === ETransition.START_DELIVERY) {
       deliveringController.setFalse();
       deliveredController.setTrue();

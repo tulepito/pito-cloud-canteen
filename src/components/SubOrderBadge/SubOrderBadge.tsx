@@ -11,6 +11,7 @@ type TSubOrderBadgeProps = { lastTransition: ETransition };
 const SubOrderBadge: React.FC<TSubOrderBadgeProps> = ({ lastTransition }) => {
   let badgeComponent = null;
   const intl = useIntl();
+
   switch (lastTransition) {
     case ETransition.INITIATE_TRANSACTION:
       badgeComponent = (
