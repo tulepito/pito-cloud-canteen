@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useMemo, useState } from 'react';
 import { Form as FinalForm } from 'react-final-form';
@@ -30,6 +31,7 @@ import { AdminManageOrderThunks } from '@pages/admin/order/AdminManageOrder.slic
 import {
   changeStep4SubmitStatus,
   orderAsyncActions,
+  saveDraftEditOrder,
 } from '@redux/slices/Order.slice';
 import { adminPaths } from '@src/paths';
 import { Listing } from '@utils/data';
@@ -38,9 +40,9 @@ import { EOrderDraftStates, EOrderStates } from '@utils/enums';
 import type { TKeyValue, TListing, TObject } from '@utils/types';
 import { required } from '@utils/validators';
 
-import type { EFlowType } from '../../components/NavigateButtons/NavigateButtons';
-// eslint-disable-next-line import/no-cycle
-import NavigateButtons from '../../components/NavigateButtons/NavigateButtons';
+import NavigateButtons, {
+  EFlowType,
+} from '../../components/NavigateButtons/NavigateButtons';
 
 import css from './ReviewOrder.module.scss';
 
@@ -467,7 +469,12 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
     shallowEqual,
   );
   const order = useAppSelector((state) => state.Order.order, shallowEqual);
-
+  const draftEditOrderData = useAppSelector(
+    (state) => state.Order.draftEditOrderData.generalInfo,
+  );
+  const draftEditOrderDetail = useAppSelector(
+    (state) => state.Order.draftEditOrderData.orderDetail,
+  );
   const createOrderError = useAppSelector(
     (state) => state.Order.createOrderError,
   );
@@ -491,7 +498,7 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
     setTrue: openSuccessModal,
     setFalse: closeSuccessModal,
   } = useBoolean();
-
+  const isEditFlow = props.flowType === EFlowType.edit;
   const orderId = Listing(order as TListing).getId();
   const {
     staffName,
@@ -509,43 +516,75 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
     useMemo(() => {
       return {
         renderedOrderDetail: parseDataToReviewTab({
-          orderDetail,
-          deliveryHour,
-          deliveryAddress,
-          notes,
+          orderDetail: draftEditOrderDetail || orderDetail,
+          deliveryHour: draftEditOrderData?.deliveryHour || deliveryHour,
+          deliveryAddress:
+            draftEditOrderData?.deliveryAddress || deliveryAddress,
+          notes: draftEditOrderData?.notes || notes,
         }),
       };
-    }, [deliveryAddress, deliveryHour, orderDetail]) || {};
+    }, [
+      deliveryAddress,
+      deliveryHour,
+      JSON.stringify(draftEditOrderData),
+      JSON.stringify(orderDetail),
+      JSON.stringify(draftEditOrderDetail),
+    ]) || {};
 
   const onSubmit = async (values: any) => {
     const { staffName: staffNameValue, shipperName: shipperNameValue } = values;
-    dispatch(changeStep4SubmitStatus(true));
-    if (planId && orderId) {
-      await dispatch(
-        orderAsyncActions.updatePlanDetail({
-          orderId,
-          planId,
-          orderDetail,
+    if (isEditFlow) {
+      if (planId && orderId) {
+        await dispatch(
+          orderAsyncActions.updatePlanDetail({
+            orderId,
+            planId,
+            orderDetail: draftEditOrderDetail,
+          }),
+        );
+
+        await dispatch(
+          orderAsyncActions.updateOrder({
+            generalInfo: {
+              ...draftEditOrderData,
+              staffName: staffNameValue,
+              shipperName: shipperNameValue,
+            },
+          }),
+        );
+
+        await dispatch(
+          saveDraftEditOrder({
+            generalInfo: {
+              staffName: staffNameValue,
+              shipperName: shipperNameValue,
+            },
+          }),
+        );
+      }
+    } else {
+      dispatch(changeStep4SubmitStatus(true));
+
+      if (orderState === EOrderDraftStates.draft) {
+        await dispatch(
+          AdminManageOrderThunks.requestApprovalOrder({ orderId }),
+        );
+      }
+
+      const { error } = (await dispatch(
+        orderAsyncActions.updateOrder({
+          generalInfo: {
+            staffName: staffNameValue,
+            shipperName: shipperNameValue,
+          },
         }),
-      );
-    }
-    if (orderState === EOrderDraftStates.draft) {
-      await dispatch(AdminManageOrderThunks.requestApprovalOrder({ orderId }));
-    }
+      )) as any;
 
-    const { error } = (await dispatch(
-      orderAsyncActions.updateOrder({
-        generalInfo: {
-          staffName: staffNameValue,
-          shipperName: shipperNameValue,
-        },
-      }),
-    )) as any;
-
-    if (!error) {
-      openSuccessModal();
+      if (!error) {
+        openSuccessModal();
+      }
+      dispatch(changeStep4SubmitStatus(false));
     }
-    dispatch(changeStep4SubmitStatus(false));
   };
 
   const onConfirm = () => {
@@ -570,6 +609,18 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
     JSON.stringify(plans),
   ]);
 
+  const missingSelectedFood =
+    isEmpty(orderDetail) ||
+    Object.keys(orderDetail).filter(
+      (dateTime) => orderDetail[dateTime]?.restaurant?.foodList?.length === 0,
+    )?.length === 0;
+  const missingDraftSelectedFood =
+    isEmpty(draftEditOrderDetail) ||
+    Object.keys(draftEditOrderDetail).filter(
+      (dateTime) =>
+        draftEditOrderDetail?.[dateTime]?.restaurant?.foodList?.length === 0,
+    )?.length === 0;
+
   return (
     <div className={css.root}>
       <h1 className={css.title}>
@@ -583,6 +634,9 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
         render={(fieldRenderProps: any) => {
           const { tab, handleSubmit, goBack, flowType, invalid } =
             fieldRenderProps;
+
+          const submitDisabled =
+            invalid || missingDraftSelectedFood || missingSelectedFood;
 
           return (
             <Form onSubmit={handleSubmit}>
@@ -647,7 +701,7 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
                 currentTab={tab}
                 onCompleteClick={handleSubmit}
                 goBack={goBack}
-                submitDisabled={invalid}
+                submitDisabled={submitDisabled}
                 inProgress={submitInProgress}
               />
               {createOrderError && (
