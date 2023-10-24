@@ -1,7 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import differenceBy from 'lodash/differenceBy';
 import isEqual from 'lodash/isEqual';
-import uniqBy from 'lodash/uniqBy';
 
 import { closePartnerMenuApi, publishPartnerMenuApi } from '@apis/menuApi';
 import {
@@ -372,7 +371,7 @@ const PartnerManageMenusSlice = createSlice({
       state.draftMenu = payload;
     },
     addPickedFood: (state, { payload }) => {
-      state.pickedFood = uniqBy(state.pickedFood.concat(payload), 'id.uuid');
+      state.pickedFood = payload;
     },
     clearCreateOrUpdateMenuError: (state) => {
       state.createDraftMenuError = null;
