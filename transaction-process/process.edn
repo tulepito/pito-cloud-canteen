@@ -32,6 +32,13 @@
                 :to      :state/canceled
                 }
                {
+                :name    :transition/operator-cancel-after-partner-confirmed,
+                :actor   :actor.role/operator,
+                :actions [{:name :action/decline-booking}],
+                :from    :state/partner-confirmed
+                :to      :state/canceled
+                }
+               {
                 :name    :transition/expired-start-delivery,
                 :actor   :actor.role/operator,
                 :actions [],

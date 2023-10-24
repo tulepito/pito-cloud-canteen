@@ -16,6 +16,7 @@ import { Transaction } from '@src/utils/data';
 import {
   CHANGE_STRUCTURE_TX_PROCESS_VERSION,
   ETransition,
+  TRANSITIONS_TO_STATE_CANCELED,
 } from '@src/utils/transaction';
 import type { TTransaction } from '@src/utils/types';
 
@@ -52,6 +53,8 @@ const StateItemTooltip: React.FC<TStateItemTooltipProps> = ({
   const cancelTransition =
     lastTransition === ETransition.PARTNER_REJECT_SUB_ORDER
       ? ETransition.OPERATOR_CANCEL_AFTER_PARTNER_REJECTED
+      : lastTransition === ETransition.PARTNER_CONFIRM_SUB_ORDER
+      ? ETransition.OPERATOR_CANCEL_AFTER_PARTNER_CONFIRMED
       : ETransition.OPERATOR_CANCEL_PLAN;
 
   const transitTx = (transition: ETransition) => async () => {
@@ -111,7 +114,9 @@ const StateItemTooltip: React.FC<TStateItemTooltipProps> = ({
     } else if (lastTransition === ETransition.COMPLETE_DELIVERY) {
       deliveredController.setFalse();
       deliveringController.setFalse();
-    } else if (lastTransition === ETransition.OPERATOR_CANCEL_PLAN) {
+    } else if (
+      TRANSITIONS_TO_STATE_CANCELED.includes(lastTransition as ETransition)
+    ) {
       deliveringController.setFalse();
       deliveredController.setFalse();
       canceledController.setFalse();

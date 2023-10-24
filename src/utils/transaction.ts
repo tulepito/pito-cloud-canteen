@@ -3,7 +3,7 @@ import configs from '@src/configs';
 import { ensureTransaction } from './data';
 import type { TTransaction } from './types';
 
-export const CHANGE_STRUCTURE_TX_PROCESS_VERSION = 19;
+export const CHANGE_STRUCTURE_TX_PROCESS_VERSION = 20;
 
 export enum ETransactionActor {
   CUSTOMER = 'customer',
@@ -21,6 +21,7 @@ export enum ETransition {
   EXPIRED_DELIVERY = 'transition/expired-delivery',
   OPERATOR_CANCEL_PLAN = 'transition/operator-cancel-plan',
   OPERATOR_CANCEL_AFTER_PARTNER_REJECTED = 'transition/operator-cancel-after-partner-rejected',
+  OPERATOR_CANCEL_AFTER_PARTNER_CONFIRMED = 'transition/operator-cancel-after-partner-confirmed',
   CANCEL_DELIVERY = 'transition/cancel-delivery',
   COMPLETE_DELIVERY = 'transition/complete-delivery',
   REVIEW_RESTAURANT = 'transition/restaurant-review',
@@ -76,6 +77,8 @@ const stateDescription: TStateDescription = {
     [ETransactionState.PARTNER_CONFIRMED]: {
       on: {
         [ETransition.START_DELIVERY]: ETransactionState.DELIVERING,
+        [ETransition.OPERATOR_CANCEL_AFTER_PARTNER_CONFIRMED]:
+          ETransactionState.CANCELED,
       },
     },
     [ETransactionState.PARTNER_REJECTED]: {
@@ -198,5 +201,11 @@ export const txIsDeliveryFailed = (tx: TTransaction) => {
 };
 
 export const txIsCanceled = (tx: TTransaction) => {
-  return [ETransition.OPERATOR_CANCEL_PLAN].includes(txLastTransition(tx));
+  return getTransitionsToState(ETransactionState.CANCELED).includes(
+    txLastTransition(tx),
+  );
 };
+
+export const TRANSITIONS_TO_STATE_CANCELED = getTransitionsToState(
+  ETransactionState.CANCELED,
+);
