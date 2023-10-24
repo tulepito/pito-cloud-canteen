@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 /* eslint-disable react-hooks/exhaustive-deps */
 import { memo, useCallback, useMemo } from 'react';
 import { shallowEqual } from 'react-redux';
@@ -16,15 +17,22 @@ import { Listing, User } from '@utils/data';
 import { getSelectedDaysOfWeek } from '@utils/dates';
 import type { TListing } from '@utils/types';
 
-// eslint-disable-next-line import/no-cycle
 import MealPlanSetupForm from '../../components/MealPlanSetupForm/MealPlanSetupForm';
+import { EFlowType } from '../../components/NavigateButtons/NavigateButtons';
 
 type MealPlanSetupProps = {
   goBack: () => void;
   nextTab: () => void;
+  nextToReviewTab?: () => void;
+  flowType?: EFlowType;
 };
 const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
-  const { nextTab } = props;
+  const {
+    flowType = EFlowType.createOrEditDraft,
+    nextTab,
+    nextToReviewTab,
+    goBack,
+  } = props;
 
   const dispatch = useAppDispatch();
   const selectedBooker = useAppSelector(
@@ -201,6 +209,10 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
       selectedBooker={selectedBooker}
       clientId={clientId}
       nutritionsOptions={nutritionsOptions}
+      flowType={flowType}
+      onGoBack={goBack}
+      onCompleteClick={nextToReviewTab}
+      onNextClick={nextTab}
     />
   );
 };

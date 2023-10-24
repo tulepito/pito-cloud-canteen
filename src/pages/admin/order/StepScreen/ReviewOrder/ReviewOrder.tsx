@@ -38,6 +38,7 @@ import { EOrderDraftStates, EOrderStates } from '@utils/enums';
 import type { TKeyValue, TListing, TObject } from '@utils/types';
 import { required } from '@utils/validators';
 
+import type { EFlowType } from '../../components/NavigateButtons/NavigateButtons';
 // eslint-disable-next-line import/no-cycle
 import NavigateButtons from '../../components/NavigateButtons/NavigateButtons';
 
@@ -436,10 +437,6 @@ export const ReviewContent: React.FC<any> = (props) => {
   );
 };
 
-type TReviewOrder = {
-  goBack: () => void;
-};
-
 const parseDataToReviewTab = (values: any) => {
   const { orderDetail = {}, ...rest } = values || {};
   const items = Object.keys(orderDetail).map((key: any) => {
@@ -452,6 +449,12 @@ const parseDataToReviewTab = (values: any) => {
   });
 
   return items;
+};
+
+type TReviewOrder = {
+  goBack: () => void;
+  flowType?: EFlowType;
+  tab?: string;
 };
 
 const ReviewOrder: React.FC<TReviewOrder> = (props) => {
@@ -578,7 +581,8 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
         initialValues={initialValues}
         onSubmit={onSubmit}
         render={(fieldRenderProps: any) => {
-          const { handleSubmit, goBack, invalid } = fieldRenderProps;
+          const { tab, handleSubmit, goBack, flowType, invalid } =
+            fieldRenderProps;
 
           return (
             <Form onSubmit={handleSubmit}>
@@ -639,6 +643,9 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
               </Collapsible>
               <Tabs items={renderedOrderDetail as any} showNavigation />
               <NavigateButtons
+                flowType={flowType}
+                currentTab={tab}
+                onCompleteClick={handleSubmit}
                 goBack={goBack}
                 submitDisabled={invalid}
                 inProgress={submitInProgress}
