@@ -34,7 +34,7 @@
                {
                 :name    :transition/operator-cancel-after-partner-confirmed,
                 :actor   :actor.role/operator,
-                :actions [{:name :action/decline-booking}],
+                :actions [{:name :action/cancel-booking}],
                 :from    :state/partner-confirmed
                 :to      :state/canceled
                 }
