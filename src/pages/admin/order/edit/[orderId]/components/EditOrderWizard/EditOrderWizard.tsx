@@ -139,10 +139,8 @@ const EditOrderWizard = () => {
   }, [dispatch, isReady, orderId]);
 
   useEffect(() => {
-    return () => {
-      dispatch(resetOrder());
-    };
-  }, []);
+    dispatch(resetOrder());
+  }, [dispatch]);
 
   return (
     <FormWizard formTabNavClassName={css.formTabNav}>
