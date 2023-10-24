@@ -118,6 +118,12 @@ const EditOrderWizard = () => {
   const handleGoBack = (tab: string) => () => {
     const tabIndex = EDIT_ORDER_TABS.indexOf(tab as EEditOrderTab);
 
+    if (tab === EEditOrderTab.review) {
+      router.push(adminPaths.ManageOrders);
+
+      return;
+    }
+
     if (tabIndex > 0) {
       const backTab = EDIT_ORDER_TABS[tabIndex - 1];
       saveStep(backTab);
