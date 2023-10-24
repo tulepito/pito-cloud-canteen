@@ -254,11 +254,10 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
   }, []);
 
   const isNormalOrder = orderType === EOrderType.normal;
-  const isPicking = orderState === EOrderStates.picking;
 
   const { planValidations } = checkMinMaxQuantityInPickingState(
     isNormalOrder,
-    isPicking,
+    isPickingState,
     draftOrderDetail,
   );
 
