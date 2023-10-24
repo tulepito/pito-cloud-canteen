@@ -94,29 +94,12 @@ const EditOrderWizard = () => {
   const [currentStep, setCurrentStep] = useState<string>(
     EEditOrderTab.clientView,
   );
-
-  useEffect(() => {
-    if (fetchOrderError === 'Request failed with status code 400') {
-      router.push(adminPaths.ManageOrders);
-    }
-  }, [fetchOrderError]);
-
-  useEffect(() => {
-    if (isReady) {
-      if (orderId) {
-        dispatch(orderAsyncActions.fetchOrder(orderId as string));
-      }
-    }
-  }, [dispatch, isReady, orderId]);
-
-  useEffect(() => {
-    return () => {
-      dispatch(resetOrder());
-    };
-  }, []);
-
   const saveStep = (tab: string) => {
     setCurrentStep(tab);
+  };
+
+  const handleTabClick = (tab: string) => () => {
+    saveStep(tab);
   };
 
   const handleNextToReviewTab = () => {
@@ -141,6 +124,26 @@ const EditOrderWizard = () => {
     }
   };
 
+  useEffect(() => {
+    if (fetchOrderError === 'Request failed with status code 400') {
+      router.push(adminPaths.ManageOrders);
+    }
+  }, [fetchOrderError]);
+
+  useEffect(() => {
+    if (isReady) {
+      if (orderId) {
+        dispatch(orderAsyncActions.fetchOrder(orderId as string));
+      }
+    }
+  }, [dispatch, isReady, orderId]);
+
+  useEffect(() => {
+    return () => {
+      dispatch(resetOrder());
+    };
+  }, []);
+
   return (
     <FormWizard formTabNavClassName={css.formTabNav}>
       {EDIT_ORDER_TABS.map((tab: string) => {
@@ -153,6 +156,7 @@ const EditOrderWizard = () => {
             tabLabel={intl.formatMessage({
               id: `EditOrderWizard.${tab}Label`,
             })}
+            onClick={handleTabClick(tab)}
             nextToReviewTab={handleNextToReviewTab}
             nextTab={handleNextTab(tab)}
             goBack={handleGoBack(tab)}
