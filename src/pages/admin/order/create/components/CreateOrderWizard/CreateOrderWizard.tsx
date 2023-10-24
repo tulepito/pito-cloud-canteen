@@ -49,7 +49,7 @@ const tabCompleted = (
   const { staffName, plans = [], notes = {} } = Listing(order).getMetadata();
 
   const missingSelectedFood = Object.keys(orderDetail).filter((dateTime) =>
-    isEmpty(orderDetail[dateTime].restaurant.foodList),
+    isEmpty(orderDetail[dateTime]?.restaurant?.foodList),
   );
   const isMealPlanTabCompleted =
     !isEmpty(plans) && isEmpty(missingSelectedFood);

@@ -11,6 +11,7 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import {
   changeStep2SubmitStatus,
   orderAsyncActions,
+  saveDraftEditOrder,
 } from '@redux/slices/Order.slice';
 import { EOrderType } from '@src/utils/enums';
 import { Listing, User } from '@utils/data';
@@ -51,6 +52,8 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
     (state) => state.company.companyRefs,
     shallowEqual,
   );
+
+  const isEditFlow = flowType === EFlowType.edit;
 
   const orderMetadata = Listing(order as TListing).getMetadata();
   const {
@@ -94,7 +97,7 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
     pickAllow: draftPickAllow,
     selectedGroups: draftSelectGroups,
     deliveryHour: draftDeliveryHour,
-    startDate: draftStateDate,
+    startDate: draftStartDate,
     endDate: draftEndDate,
     nutritions: draftNutritions,
     deliveryAddress: draftDeliveryAddress,
@@ -143,7 +146,7 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
             }
           : null,
       detailAddress: draftDetailAddress || detailAddress || '',
-      startDate: draftStateDate || startDate || '',
+      startDate: draftStartDate || startDate || '',
       endDate: draftEndDate || endDate || '',
       deadlineDate: draftDeadlineDate || deadlineDate || null,
       deadlineHour: draftDeadlineHour || deadlineHour || '07:00',
@@ -206,13 +209,22 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
       const { payload: recommendOrderDetail }: any = await dispatch(
         orderAsyncActions.recommendRestaurants({}),
       );
-      await dispatch(
-        orderAsyncActions.updatePlanDetail({
-          orderId,
-          planId,
-          orderDetail: recommendOrderDetail,
-        }),
-      );
+
+      if (!isEditFlow) {
+        await dispatch(
+          orderAsyncActions.updatePlanDetail({
+            orderId,
+            planId,
+            orderDetail: recommendOrderDetail,
+          }),
+        );
+      } else {
+        await dispatch(
+          saveDraftEditOrder({
+            orderDetail: recommendOrderDetail,
+          }),
+        );
+      }
       dispatch(changeStep2SubmitStatus(false));
       nextTab();
     },
@@ -230,7 +242,7 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
       flowType={flowType}
       onGoBack={goBack}
       onCompleteClick={nextToReviewTab}
-      onNextClick={nextTab}
+      onNextClick={isEditFlow ? nextTab : undefined}
     />
   );
 };

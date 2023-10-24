@@ -66,7 +66,7 @@ type TOrderInitialState = {
   order: TListing | null;
   draftEditOrderData: {
     generalInfo: TObject;
-    orderDetail: TObject;
+    orderDetail?: TObject;
   };
   fetchOrderInProgress: boolean;
   fetchOrderError: any;
@@ -181,7 +181,6 @@ const initialState: TOrderInitialState = {
   orderDetail: {},
   draftEditOrderData: {
     generalInfo: {},
-    orderDetail: {},
   },
   justDeletedMemberOrder: false,
   createOrderInProcess: false,
@@ -447,6 +446,7 @@ const updateOrder = createAsyncThunk(
 const recommendRestaurants = createAsyncThunk(
   RECOMMEND_RESTAURANT,
   async (
+    // eslint-disable-next-line unused-imports/no-unused-vars
     { shouldUpdatePlanOrderOrderDetail = true }: TObject,
     { getState },
   ) => {
@@ -454,7 +454,7 @@ const recommendRestaurants = createAsyncThunk(
     const orderId = Listing(order).getId();
     const { data: orderDetail } = await recommendRestaurantApi(orderId);
 
-    return { orderDetail, shouldUpdatePlanOrderOrderDetail };
+    return orderDetail;
   },
 );
 
@@ -462,7 +462,7 @@ const recommendRestaurantForSpecificDay = createAsyncThunk(
   RECOMMEND_RESTAURANT_FOR_SPECIFIC_DAY,
   async (
     { shouldUpdatePlanOrderOrderDetail = true, dateTime }: TObject,
-    { getState },
+    { getState, dispatch },
   ) => {
     const { order } = getState().Order;
 
@@ -480,6 +480,13 @@ const recommendRestaurantForSpecificDay = createAsyncThunk(
         orderDetail: newOrderDetail,
         planId: plans[0],
       });
+    } else {
+      dispatch(
+        // eslint-disable-next-line @typescript-eslint/no-use-before-define
+        saveDraftEditOrder({
+          orderDetail: newOrderDetail,
+        }),
+      );
     }
 
     return { orderDetail: newOrderDetail, shouldUpdatePlanOrderOrderDetail };
@@ -1182,10 +1189,9 @@ const orderSlice = createSlice({
           ...state.draftEditOrderData.generalInfo,
           ...payload.generalInfo,
         },
-        orderDetail: {
-          ...state.draftEditOrderData.orderDetail,
-          ...payload.orderDetail,
-        },
+        ...(!isEmpty(payload.orderDetail)
+          ? { orderDetail: payload.orderDetail }
+          : {}),
       };
     },
   },
@@ -1602,6 +1608,7 @@ export const {
   addCurrentSelectedMenuId,
   setCanNotGoToStep4,
   setOnRecommendRestaurantInProcess,
+  saveDraftEditOrder,
 } = orderSlice.actions;
 
 export default orderSlice.reducer;
