@@ -951,6 +951,7 @@ const fetchOrderRestaurants = createAsyncThunk(
     const restaurantIdList = uniq(
       Object.values(orderDetail).map((item: any) => item.restaurant.id),
     );
+
     const restaurantList = await Promise.all(
       restaurantIdList.map(async (restaurantId) => {
         const restaurantResponse = denormalisedResponseEntities(
