@@ -199,6 +199,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             break;
           }
           case ETransition.OPERATOR_CANCEL_PLAN:
+          case ETransition.OPERATOR_CANCEL_AFTER_PARTNER_CONFIRMED:
           case ETransition.OPERATOR_CANCEL_AFTER_PARTNER_REJECTED: {
             // TODO:  send email notification to booker
             emailSendingFactory(

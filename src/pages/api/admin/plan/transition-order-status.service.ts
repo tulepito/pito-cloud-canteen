@@ -3,7 +3,10 @@ import compact from 'lodash/compact';
 import { fetchTransaction } from '@services/integrationHelper';
 import { Listing, Transaction } from '@src/utils/data';
 import { EOrderStates } from '@src/utils/enums';
-import { ETransition } from '@src/utils/transaction';
+import {
+  ETransition,
+  TRANSITIONS_TO_STATE_CANCELED,
+} from '@src/utils/transaction';
 import type { TListing } from '@src/utils/types';
 
 export const transitionOrderStatus = async (
@@ -44,7 +47,7 @@ export const transitionOrderStatus = async (
   const isAllTransactionCompleted = txsLastTransitions.every(
     (transition: string) =>
       transition === ETransition.COMPLETE_DELIVERY ||
-      transition === ETransition.OPERATOR_CANCEL_PLAN,
+      TRANSITIONS_TO_STATE_CANCELED.includes(transition as ETransition),
   );
 
   const shouldTransitToOrderCompleted =

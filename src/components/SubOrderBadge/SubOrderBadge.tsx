@@ -56,6 +56,7 @@ const SubOrderBadge: React.FC<TSubOrderBadgeProps> = ({ lastTransition }) => {
 
     case ETransition.CANCEL_DELIVERY:
     case ETransition.OPERATOR_CANCEL_PLAN:
+    case ETransition.OPERATOR_CANCEL_AFTER_PARTNER_CONFIRMED:
     case ETransition.OPERATOR_CANCEL_AFTER_PARTNER_REJECTED:
       badgeComponent = (
         <Badge

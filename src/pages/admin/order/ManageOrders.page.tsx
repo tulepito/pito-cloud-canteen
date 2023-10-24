@@ -85,6 +85,9 @@ const BADGE_TYPE_BASE_ON_ORDER_STATE = {
   [ETransition.START_DELIVERY]: EBadgeType.darkBlue,
   [ETransition.COMPLETE_DELIVERY]: EBadgeType.strongSuccess,
   [ETransition.OPERATOR_CANCEL_PLAN]: EBadgeType.strongDanger,
+  [ETransition.OPERATOR_CANCEL_AFTER_PARTNER_CONFIRMED]:
+    EBadgeType.strongDanger,
+  [ETransition.OPERATOR_CANCEL_AFTER_PARTNER_REJECTED]: EBadgeType.strongDanger,
 };
 
 const BADGE_CLASS_NAME_BASE_ON_ORDER_STATE = {

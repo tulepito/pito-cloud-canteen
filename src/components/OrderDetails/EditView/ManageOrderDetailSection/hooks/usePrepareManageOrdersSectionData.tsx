@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { isEmpty } from 'lodash';
 
 import { useAppSelector } from '@hooks/reduxHooks';
-import { ETransition } from '@src/utils/transaction';
+import { TRANSITIONS_TO_STATE_CANCELED } from '@src/utils/transaction';
 import { Listing, User } from '@utils/data';
 import { EParticipantOrderStatus } from '@utils/enums';
 import type { TListing, TObject, TUser } from '@utils/types';
@@ -26,7 +26,7 @@ export const usePrepareManageOrdersSectionData = (
       const { restaurant, lastTransition } = orderOnDate as TObject;
 
       return !isEmpty(restaurant?.foodList) &&
-        lastTransition !== ETransition.OPERATOR_CANCEL_PLAN
+        !TRANSITIONS_TO_STATE_CANCELED.includes(lastTransition)
         ? prev.concat(Number(date))
         : prev;
     }, [])
