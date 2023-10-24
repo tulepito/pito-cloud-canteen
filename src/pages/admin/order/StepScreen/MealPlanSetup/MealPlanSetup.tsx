@@ -39,12 +39,20 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
     (state) => state.Order.selectedBooker,
     shallowEqual,
   );
+  const draftEditOrderData = useAppSelector(
+    (state) => state.Order.draftEditOrderData.generalInfo,
+  );
   const order = useAppSelector((state) => state.Order.order, shallowEqual);
   const nutritionsOptions = useAppSelector(
     (state) => state.SystemAttributes.nutritions,
     shallowEqual,
   );
+  const companies = useAppSelector(
+    (state) => state.company.companyRefs,
+    shallowEqual,
+  );
 
+  const orderMetadata = Listing(order as TListing).getMetadata();
   const {
     companyId: clientId,
     dayInWeek,
@@ -64,12 +72,9 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
     displayedDurationTime,
     durationTimeMode,
     daySession,
-  } = Listing(order as TListing).getMetadata();
+  } = orderMetadata;
   const { address, origin } = deliveryAddress || {};
-  const companies = useAppSelector(
-    (state) => state.company.companyRefs,
-    shallowEqual,
-  );
+
   const currentClient = companies.find(
     (company) => company.id.uuid === clientId,
   );
@@ -82,7 +87,80 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
     companyLocation: location,
   } = User(currentClient).getPublicData();
 
-  const onSubmit = useCallback(
+  const {
+    dayInWeek: draftDayInWeek,
+    packagePerMember: draftPackagePerMember,
+    vatAllow: draftVatAllow,
+    pickAllow: draftPickAllow,
+    selectedGroups: draftSelectGroups,
+    deliveryHour: draftDeliveryHour,
+    startDate: draftStateDate,
+    endDate: draftEndDate,
+    nutritions: draftNutritions,
+    deliveryAddress: draftDeliveryAddress,
+    detailAddress: draftDetailAddress,
+    deadlineDate: draftDeadlineDate,
+    deadlineHour: draftDeadlineHour,
+    memberAmount: draftMemberAmount,
+    displayedDurationTime: draftDisplayedDurationTime,
+    durationTimeMode: draftDurationTimeMode,
+    daySession: draftDaySession,
+  } = draftEditOrderData;
+  const { address: draftAddress, origin: draftOrigin } =
+    draftDeliveryAddress || {};
+
+  const allMembersAmount =
+    draftMemberAmount ||
+    memberAmount ||
+    (currentClient &&
+      calculateGroupMembersAmount(
+        currentClient,
+        draftSelectGroups || selectedGroups,
+      ));
+
+  const initialValues = useMemo(
+    () => ({
+      vatAllow: typeof draftVatAllow !== 'undefined' ? draftVatAllow : vatAllow,
+      pickAllow:
+        typeof draftPickAllow !== 'undefined' ? draftPickAllow : pickAllow,
+      dayInWeek:
+        draftDayInWeek ||
+        (!isEmpty(dayInWeek) ? dayInWeek : ['mon', 'tue', 'wed', 'thu', 'fri']),
+      packagePerMember:
+        addCommas((draftPackagePerMember || packagePerMember)?.toString()) ||
+        '',
+      selectedGroups: draftSelectGroups || selectedGroups,
+      nutritions: draftNutritions || (!isEmpty(nutritions) ? nutritions : []),
+      deliveryHour: draftDeliveryHour || deliveryHour || '07:00 - 07:15',
+      deliveryAddress:
+        draftDeliveryAddress || deliveryAddress || location
+          ? {
+              search: draftAddress || address || defaultAddress,
+              selectedPlace: {
+                address: draftAddress || address || defaultAddress,
+                origin: draftOrigin || origin || defaultOrigin,
+              },
+            }
+          : null,
+      detailAddress: draftDetailAddress || detailAddress || '',
+      startDate: draftStateDate || startDate || '',
+      endDate: draftEndDate || endDate || '',
+      deadlineDate: draftDeadlineDate || deadlineDate || null,
+      deadlineHour: draftDeadlineHour || deadlineHour || '07:00',
+      memberAmount: allMembersAmount,
+      durationTimeMode: draftDurationTimeMode || durationTimeMode || 'week',
+      displayedDurationTime:
+        draftDisplayedDurationTime || displayedDurationTime || 1,
+      daySession: draftDaySession || daySession || MORNING_SESSION,
+    }),
+    [
+      JSON.stringify(location),
+      JSON.stringify(orderMetadata),
+      JSON.stringify(draftEditOrderData),
+    ],
+  );
+
+  const handleSubmit = useCallback(
     async (values: any) => {
       const {
         deliveryAddress: deliveryAddressValues,
@@ -140,71 +218,11 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
     },
     [dispatch, nextTab],
   );
-  const allMembersAmount =
-    memberAmount ||
-    (currentClient &&
-      calculateGroupMembersAmount(currentClient, selectedGroups));
-
-  const initialValues = useMemo(
-    () => ({
-      vatAllow,
-      pickAllow,
-      dayInWeek: !isEmpty(dayInWeek)
-        ? dayInWeek
-        : ['mon', 'tue', 'wed', 'thu', 'fri'],
-      packagePerMember: addCommas(packagePerMember?.toString()) || '',
-      selectedGroups,
-      nutritions: !isEmpty(nutritions) ? nutritions : [],
-      deliveryHour: deliveryHour || '07:00 - 07:15',
-      deliveryAddress:
-        location || deliveryAddress
-          ? {
-              search: address || defaultAddress,
-              selectedPlace: {
-                address: address || defaultAddress,
-                origin: origin || defaultOrigin,
-              },
-            }
-          : null,
-      detailAddress: detailAddress || '',
-      startDate: startDate || '',
-      endDate: endDate || '',
-      deadlineDate: deadlineDate || null,
-      deadlineHour: deadlineHour || '07:00',
-      memberAmount: allMembersAmount,
-      durationTimeMode: durationTimeMode || 'week',
-      displayedDurationTime: displayedDurationTime || 1,
-      daySession: daySession || MORNING_SESSION,
-    }),
-    [
-      JSON.stringify(dayInWeek),
-      JSON.stringify(packagePerMember),
-      vatAllow,
-      pickAllow,
-      JSON.stringify(nutritions),
-      JSON.stringify(selectedGroups),
-      deliveryHour,
-      JSON.stringify(location),
-      JSON.stringify(deliveryAddress),
-      JSON.stringify(defaultAddress),
-      JSON.stringify(detailAddress),
-      JSON.stringify(address),
-      JSON.stringify(defaultOrigin),
-      JSON.stringify(origin),
-      startDate,
-      endDate,
-      JSON.stringify(deadlineDate),
-      deadlineHour,
-      allMembersAmount,
-      displayedDurationTime,
-      durationTimeMode,
-    ],
-  );
 
   return (
     <MealPlanSetupForm
       initialValues={initialValues}
-      onSubmit={onSubmit}
+      onSubmit={handleSubmit}
       currentClient={currentClient}
       selectedBooker={selectedBooker}
       clientId={clientId}
