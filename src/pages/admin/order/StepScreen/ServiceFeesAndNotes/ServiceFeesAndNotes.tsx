@@ -7,7 +7,10 @@ import classNames from 'classnames';
 import { addCommas } from '@helpers/format';
 import { getPCCFeeByMemberAmount } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { orderAsyncActions } from '@redux/slices/Order.slice';
+import {
+  orderAsyncActions,
+  saveDraftEditOrder,
+} from '@redux/slices/Order.slice';
 import { Listing, User } from '@src/utils/data';
 import type { TListing } from '@src/utils/types';
 
@@ -51,13 +54,11 @@ const ServiceFeesAndNotes: React.FC<ServiceFeesAndNotesProps> = (props) => {
     (state) => state.Order.orderDetail,
     shallowEqual,
   );
-  const orderListing = Listing(order);
-
   const restaurantList = useAppSelector(
     (state) => state.Order.orderRestaurantList,
     shallowEqual,
   );
-
+  console.debug('💫 > restaurantList: ', restaurantList);
   const systemServiceFeePercentage = useAppSelector(
     (state) => state.SystemAttributes.systemServiceFeePercentage,
     shallowEqual,
@@ -68,16 +69,13 @@ const ServiceFeesAndNotes: React.FC<ServiceFeesAndNotesProps> = (props) => {
   const updateOrderInProgress = useAppSelector(
     (state) => state.Order.updateOrderInProgress,
   );
-  const { notes, serviceFees, memberAmount = 0 } = orderListing.getMetadata();
-  const { companyId: clientId } = Listing(order as TListing).getMetadata();
-
-  const companies = useAppSelector(
-    (state) => state.company.companyRefs,
+  const currentClient = useAppSelector(
+    (state) => state.Order.selectedCompany,
     shallowEqual,
   );
-  const currentClient = companies.find(
-    (company) => company.id.uuid === clientId,
-  );
+
+  const orderListing = Listing(order);
+  const { notes, serviceFees, memberAmount = 0 } = orderListing.getMetadata();
 
   const isEditFlow = flowType === EFlowType.edit;
 
@@ -114,7 +112,7 @@ const ServiceFeesAndNotes: React.FC<ServiceFeesAndNotesProps> = (props) => {
 
   useEffect(() => {
     dispatch(orderAsyncActions.fetchOrderRestaurants());
-  }, []);
+  }, [dispatch]);
 
   const handleFormSubmit = async (values: any) => {
     const newNotes = Object.keys(values).reduce((result, note) => {
@@ -127,13 +125,24 @@ const ServiceFeesAndNotes: React.FC<ServiceFeesAndNotesProps> = (props) => {
 
       return result;
     }, {});
-    await dispatch(
-      orderAsyncActions.updateOrder({
-        generalInfo: {
-          notes: newNotes,
-        },
-      }),
-    );
+
+    if (isEditFlow) {
+      await dispatch(
+        saveDraftEditOrder({
+          generalInfo: {
+            notes: newNotes,
+          },
+        }),
+      );
+    } else {
+      await dispatch(
+        orderAsyncActions.updateOrder({
+          generalInfo: {
+            notes: newNotes,
+          },
+        }),
+      );
+    }
   };
 
   const handlePartnerFeeFormSubmit = async (values: any) => {
@@ -147,21 +156,38 @@ const ServiceFeesAndNotes: React.FC<ServiceFeesAndNotesProps> = (props) => {
 
       return result;
     }, {});
-    await dispatch(
-      orderAsyncActions.updateOrder({
-        generalInfo: {
-          serviceFees: newPartnerFees,
-        },
-      }),
-    );
+
+    if (isEditFlow) {
+      await dispatch(
+        saveDraftEditOrder({
+          generalInfo: {
+            serviceFees: newPartnerFees,
+          },
+        }),
+      );
+    } else {
+      await dispatch(
+        orderAsyncActions.updateOrder({
+          generalInfo: {
+            serviceFees: newPartnerFees,
+          },
+        }),
+      );
+    }
   };
 
-  const onSubmit = async () => {
-    if (!isEditFlow) {
-      await formSubmitRef?.current();
-      await partnerFormSubmitRef?.current();
-    }
+  const handleSubmitAllForms = async () => {
+    await formSubmitRef?.current();
+    await partnerFormSubmitRef?.current();
+  };
+
+  const handleNextTabInEditMode = () => {
+    handleSubmitAllForms();
     nextTab();
+  };
+  const handleNextToReviewTabInEditMode = () => {
+    handleSubmitAllForms();
+    if (nextToReviewTab) nextToReviewTab();
   };
 
   const noteInitialValues = useMemo(
@@ -229,8 +255,8 @@ const ServiceFeesAndNotes: React.FC<ServiceFeesAndNotesProps> = (props) => {
           <div>
             <NavigateButtons
               goBack={goBack}
-              onNextClick={onSubmit}
-              onCompleteClick={nextToReviewTab}
+              onNextClick={handleNextTabInEditMode}
+              onCompleteClick={handleNextToReviewTabInEditMode}
               flowType={flowType}
               submitDisabled={partnerFormDisabled}
               inProgress={updateOrderInProgress}
