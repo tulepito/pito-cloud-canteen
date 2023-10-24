@@ -12,7 +12,9 @@ import { Listing, User } from '@src/utils/data';
 import type { TListing } from '@src/utils/types';
 
 // eslint-disable-next-line import/no-cycle
-import NavigateButtons from '../../components/NavigateButtons/NavigateButtons';
+import NavigateButtons, {
+  EFlowType,
+} from '../../components/NavigateButtons/NavigateButtons';
 import PartnerFeeForm from '../../components/PartnerFeeForm/PartnerFeeForm';
 import ServiceFeeAndNoteForm from '../../components/ServiceFeeAndNoteForm/ServiceFeeAndNoteForm';
 
@@ -27,10 +29,17 @@ const INITIAL_NOTE = `- Đối tác vui lòng giao đúng giờ, vận chuyển 
 type ServiceFeesAndNotesProps = {
   goBack: () => void;
   nextTab: () => void;
+  nextToReviewTab?: () => void;
+  flowType?: EFlowType;
 };
 
 const ServiceFeesAndNotes: React.FC<ServiceFeesAndNotesProps> = (props) => {
-  const { goBack, nextTab } = props;
+  const {
+    goBack,
+    nextTab,
+    nextToReviewTab,
+    flowType = EFlowType.createOrEditDraft,
+  } = props;
   const intl = useIntl();
   const dispatch = useAppDispatch();
   const formSubmitRef = useRef<any>();
@@ -69,6 +78,8 @@ const ServiceFeesAndNotes: React.FC<ServiceFeesAndNotesProps> = (props) => {
   const currentClient = companies.find(
     (company) => company.id.uuid === clientId,
   );
+
+  const isEditFlow = flowType === EFlowType.edit;
 
   const { hasSpecificPCCFee = false, specificPCCFee = 0 } =
     User(currentClient).getMetadata();
@@ -146,8 +157,10 @@ const ServiceFeesAndNotes: React.FC<ServiceFeesAndNotesProps> = (props) => {
   };
 
   const onSubmit = async () => {
-    await formSubmitRef?.current();
-    await partnerFormSubmitRef?.current();
+    if (!isEditFlow) {
+      await formSubmitRef?.current();
+      await partnerFormSubmitRef?.current();
+    }
     nextTab();
   };
 
@@ -217,6 +230,8 @@ const ServiceFeesAndNotes: React.FC<ServiceFeesAndNotesProps> = (props) => {
             <NavigateButtons
               goBack={goBack}
               onNextClick={onSubmit}
+              onCompleteClick={nextToReviewTab}
+              flowType={flowType}
               submitDisabled={partnerFormDisabled}
               inProgress={updateOrderInProgress}
             />

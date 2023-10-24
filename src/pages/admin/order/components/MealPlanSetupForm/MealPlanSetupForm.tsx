@@ -14,6 +14,7 @@ import DurationForNextOrderField from '../DurationForNextOrderField/DurationForN
 import FoodPickingField from '../FoodPickingField/FoodPickingField';
 import MealPlanDateField from '../MealPlanDateField/MealPlanDateField';
 import MemberAmountField from '../MemberAmountField/MemberAmountField';
+import type { EFlowType } from '../NavigateButtons/NavigateButtons';
 // eslint-disable-next-line import/no-cycle
 import NavigateButtons from '../NavigateButtons/NavigateButtons';
 import NutritionField from '../NutritionField/NutritionField';
@@ -36,6 +37,10 @@ type TExtraProps = {
     label: string;
     key: string;
   }[];
+  flowType: EFlowType;
+  onGoBack?: () => void;
+  onNextClick?: () => void;
+  onCompleteClick?: () => void;
 };
 type TMealPlanSetupFormComponentProps =
   FormRenderProps<TMealPlanSetupFormValues> & Partial<TExtraProps>;
@@ -53,6 +58,10 @@ const MealPlanSetupFormComponent: React.FC<TMealPlanSetupFormComponentProps> = (
     form,
     clientId,
     nutritionsOptions,
+    flowType,
+    onGoBack,
+    onCompleteClick,
+    onNextClick,
   } = props;
   const intl = useIntl();
   const step2SubmitInProgress = useAppSelector(
@@ -150,7 +159,13 @@ const MealPlanSetupFormComponent: React.FC<TMealPlanSetupFormComponentProps> = (
         )}
       </div>
 
-      <NavigateButtons inProgress={step2SubmitInProgress} />
+      <NavigateButtons
+        flowType={flowType}
+        onNextClick={onNextClick}
+        goBack={onGoBack}
+        onCompleteClick={onCompleteClick}
+        inProgress={step2SubmitInProgress}
+      />
     </Form>
   );
 };

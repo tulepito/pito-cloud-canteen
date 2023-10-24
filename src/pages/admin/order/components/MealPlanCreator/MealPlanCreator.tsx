@@ -10,7 +10,7 @@ import CalendarPage from '@src/pages/calendar/CalendarPage.page';
 
 import OrderSettingModal, {
   OrderSettingField,
-} from '../../components/OrderSettingModal/OrderSettingModal';
+} from '../OrderSettingModal/OrderSettingModal';
 
 import css from './MealPlanCreator.module.scss';
 

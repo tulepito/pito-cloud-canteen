@@ -40,24 +40,30 @@ import { Listing } from '@utils/data';
 import type { TListing, TObject } from '@utils/types';
 
 // eslint-disable-next-line import/no-cycle
-import NavigateButtons from '../NavigateButtons/NavigateButtons';
+import NavigateButtons, {
+  EFlowType,
+} from '../../components/NavigateButtons/NavigateButtons';
 import OrderSettingModal, {
   OrderSettingField,
-} from '../OrderSettingModal/OrderSettingModal';
-import type { TSelectFoodFormValues } from '../SelectFoodModal/components/SelectFoodForm/SelectFoodForm';
-import SelectFoodModal from '../SelectFoodModal/SelectFoodModal';
-import SelectRestaurantPage from '../SelectRestaurantPage/SelectRestaurant.page';
+} from '../../components/OrderSettingModal/OrderSettingModal';
+import type { TSelectFoodFormValues } from '../../components/SelectFoodModal/components/SelectFoodForm/SelectFoodForm';
+import SelectFoodModal from '../../components/SelectFoodModal/SelectFoodModal';
+import SelectRestaurantPage from '../../components/SelectRestaurantPage/SelectRestaurant.page';
 
 import css from './SetupOrderDetail.module.scss';
 
 type TSetupOrderDetailProps = {
   goBack: () => void;
   nextTab: () => void;
+  nextToReviewTab?: () => void;
+  flowType?: EFlowType;
 };
 
 const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
   goBack,
   nextTab,
+  nextToReviewTab,
+  flowType = EFlowType.createOrEditDraft,
 }) => {
   const dispatch = useAppDispatch();
   const intl = useIntl();
@@ -539,6 +545,8 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
               onNextClick={onSubmit}
               submitDisabled={disabledSubmit}
               inProgress={inProgress}
+              onCompleteClick={nextToReviewTab}
+              flowType={flowType}
             />
           </div>
           <OrderSettingModal

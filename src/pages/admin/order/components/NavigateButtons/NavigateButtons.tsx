@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
@@ -5,11 +6,11 @@ import Button from '@components/Button/Button';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { getItem } from '@helpers/localStorageHelpers';
 
-// eslint-disable-next-line import/no-cycle
 import {
   CREATE_ORDER_STEP_LOCAL_STORAGE_NAME,
   REVIEW_TAB,
 } from '../../create/components/CreateOrderWizard/CreateOrderWizard';
+import { EEditOrderTab } from '../../edit/[orderId]/components/EditOrderWizard/EditOrderWizard';
 
 import css from './NavigateButtons.module.scss';
 
@@ -24,6 +25,7 @@ type TNavigateButtons = {
   submitDisabled?: boolean;
   inProgress?: boolean;
   flowType?: EFlowType;
+  currentTab?: string;
 };
 
 const NavigateButtons: React.FC<TNavigateButtons> = (props) => {
@@ -34,11 +36,13 @@ const NavigateButtons: React.FC<TNavigateButtons> = (props) => {
     inProgress,
     submitDisabled = false,
     flowType = EFlowType.createOrEditDraft,
+    currentTab,
   } = props;
 
   const step = getItem(CREATE_ORDER_STEP_LOCAL_STORAGE_NAME);
 
   const isCreateOrEditDraftFlow = flowType === EFlowType.createOrEditDraft;
+  const isEditReviewTab = currentTab === EEditOrderTab.review;
 
   return (
     <div className={css.navigationBtn}>
@@ -64,14 +68,23 @@ const NavigateButtons: React.FC<TNavigateButtons> = (props) => {
               inProgress={inProgress}
               disabled={submitDisabled}
               onClick={onNextClick}>
-              <FormattedMessage id="NavigateButtons.continue" />
+              {isEditReviewTab ? (
+                <FormattedMessage id="NavigateButtons.cancel" />
+              ) : (
+                <FormattedMessage id="NavigateButtons.continue" />
+              )}
             </Button>
             <Button
               className={css.button}
               inProgress={inProgress}
               disabled={submitDisabled}
+              type={isEditReviewTab ? 'submit' : 'button'}
               onClick={onCompleteClick}>
-              <FormattedMessage id="NavigateButtons.complete" />
+              {isEditReviewTab ? (
+                <FormattedMessage id="NavigateButtons.update" />
+              ) : (
+                <FormattedMessage id="NavigateButtons.complete" />
+              )}
             </Button>
           </div>
         </RenderWhen.False>

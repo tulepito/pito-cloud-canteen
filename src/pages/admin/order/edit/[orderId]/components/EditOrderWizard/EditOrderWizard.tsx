@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
@@ -5,9 +6,15 @@ import { useRouter } from 'next/router';
 
 import FormWizard from '@components/FormWizard/FormWizard';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { EFlowType } from '@pages/admin/order/components/NavigateButtons/NavigateButtons';
 import ClientView from '@pages/admin/order/StepScreen/ClientView/ClientView';
+import ReviewOrder from '@pages/admin/order/StepScreen/ReviewOrder/ReviewOrder';
+import ServiceFeesAndNotes from '@pages/admin/order/StepScreen/ServiceFeesAndNotes/ServiceFeesAndNotes';
+import SetupOrderDetail from '@pages/admin/order/StepScreen/SetupOrderDetail/SetupOrderDetail';
 import { orderAsyncActions, resetOrder } from '@redux/slices/Order.slice';
 import { adminPaths } from '@src/paths';
+
+import MealPlanSetup from '../../../../StepScreen/MealPlanSetup/MealPlanSetup';
 
 import css from './EditOrderWizard.module.scss';
 
@@ -36,10 +43,38 @@ const EditOrderTab: React.FC<any> = (props) => {
     case EEditOrderTab.clientView:
       return <ClientView nextTab={nextTab} nextToReviewTab={nextToReviewTab} />;
     case EEditOrderTab.orderSetup:
+      return (
+        <MealPlanSetup
+          flowType={EFlowType.edit}
+          nextTab={nextTab}
+          nextToReviewTab={nextToReviewTab}
+          goBack={goBack}
+        />
+      );
     case EEditOrderTab.restaurantSetup:
+      return (
+        <SetupOrderDetail
+          flowType={EFlowType.edit}
+          nextTab={nextTab}
+          nextToReviewTab={nextToReviewTab}
+          goBack={goBack}
+        />
+      );
     case EEditOrderTab.serviceAndNote:
-    case EEditOrderTab.manageFood:
+      return (
+        <ServiceFeesAndNotes
+          flowType={EFlowType.edit}
+          nextTab={nextTab}
+          nextToReviewTab={nextToReviewTab}
+          goBack={goBack}
+        />
+      );
     case EEditOrderTab.review:
+      return (
+        <ReviewOrder tab={tab} flowType={EFlowType.edit} goBack={goBack} />
+      );
+
+    case EEditOrderTab.manageFood:
     default:
       return <></>;
   }
