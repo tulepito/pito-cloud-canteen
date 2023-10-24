@@ -69,9 +69,16 @@ const MealSettingItem = ({
     (state) => state.PartnerManageMenus.publishDraftMenuInProgress,
   );
   const [daysToApply, setDaysToApply] = useState<string[]>([]);
-
+  const foodListIds = useMemo(
+    () => foodList.map((f: TObject) => f.id),
+    [JSON.stringify(foodList)],
+  );
+  const foodListingByDay = useMemo(
+    () => pickedFood.filter((f: TListing) => foodListIds.includes(f.id.uuid)),
+    [JSON.stringify(pickedFood), JSON.stringify(foodListIds)],
+  );
   const acceptedFoodList = useMemo(() => {
-    return pickedFood.filter(
+    return foodListingByDay.filter(
       (f: TListing) =>
         Listing(f).getMetadata().adminApproval === EFoodApprovalState.ACCEPTED,
     );
