@@ -1,8 +1,10 @@
+/* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable import/no-cycle */
 /* eslint-disable react-hooks/exhaustive-deps */
-import { memo, useCallback, useMemo } from 'react';
+import { memo, useCallback, useMemo, useState } from 'react';
 import { shallowEqual } from 'react-redux';
 import isEmpty from 'lodash/isEmpty';
+import isEqual from 'lodash/isEqual';
 
 import { MORNING_SESSION } from '@components/CalendarDashboard/helpers/constant';
 import { calculateGroupMembersAmount } from '@helpers/company';
@@ -16,7 +18,7 @@ import {
 import { EOrderType } from '@src/utils/enums';
 import { Listing, User } from '@utils/data';
 import { getSelectedDaysOfWeek } from '@utils/dates';
-import type { TListing } from '@utils/types';
+import type { TListing, TObject } from '@utils/types';
 
 import MealPlanSetupForm from '../../components/MealPlanSetupForm/MealPlanSetupForm';
 import { EFlowType } from '../../components/NavigateButtons/NavigateButtons';
@@ -34,7 +36,7 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
     nextToReviewTab,
     goBack,
   } = props;
-
+  const [draftEditValues, setDraftEditValues] = useState({});
   const dispatch = useAppDispatch();
   const selectedBooker = useAppSelector(
     (state) => state.Order.selectedBooker,
@@ -126,6 +128,12 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
       vatAllow: typeof draftVatAllow !== 'undefined' ? draftVatAllow : vatAllow,
       pickAllow:
         typeof draftPickAllow !== 'undefined' ? draftPickAllow : pickAllow,
+      orderType:
+        typeof draftPickAllow !== 'undefined'
+          ? draftPickAllow
+          : pickAllow
+          ? EOrderType.group
+          : EOrderType.normal,
       dayInWeek:
         draftDayInWeek ||
         (!isEmpty(dayInWeek) ? dayInWeek : ['mon', 'tue', 'wed', 'thu', 'fri']),
@@ -210,26 +218,53 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
         orderAsyncActions.recommendRestaurants({}),
       );
 
-      if (!isEditFlow) {
-        await dispatch(
-          orderAsyncActions.updatePlanDetail({
-            orderId,
-            planId,
-            orderDetail: recommendOrderDetail,
-          }),
-        );
-      } else {
-        await dispatch(
-          saveDraftEditOrder({
-            orderDetail: recommendOrderDetail,
-          }),
-        );
-      }
+      await dispatch(
+        orderAsyncActions.updatePlanDetail({
+          orderId,
+          planId,
+          orderDetail: recommendOrderDetail,
+        }),
+      );
+
       dispatch(changeStep2SubmitStatus(false));
       nextTab();
     },
     [dispatch, nextTab],
   );
+
+  const handleSaveDraft = () => {
+    const { deliveryAddress, ...restDraftValues } = draftEditValues as TObject;
+    const { deliveryAddress: initDeliveryAddress, ...restInitialValues } =
+      initialValues;
+
+    if (
+      !isEqual(restInitialValues, restDraftValues) ||
+      (deliveryAddress?.address &&
+        deliveryAddress?.address !== initDeliveryAddress?.search)
+    ) {
+      const generalInfo = {
+        ...restDraftValues,
+        deliveryAddress,
+        packagePerMember: parseInt(
+          restDraftValues?.packagePerMember.replace(/,/g, '') || 0,
+          10,
+        ),
+      };
+      // TODO: add recommend restaurant logic here
+
+      dispatch(saveDraftEditOrder({ generalInfo }));
+    }
+  };
+
+  const handleNextTabInEditMode = () => {
+    handleSaveDraft();
+    nextTab();
+  };
+
+  const handleNextToReviewTabInEditMode = () => {
+    handleSaveDraft();
+    if (nextToReviewTab) nextToReviewTab();
+  };
 
   return (
     <MealPlanSetupForm
@@ -241,8 +276,9 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
       nutritionsOptions={nutritionsOptions}
       flowType={flowType}
       onGoBack={goBack}
-      onCompleteClick={nextToReviewTab}
-      onNextClick={isEditFlow ? nextTab : undefined}
+      onCompleteClick={handleNextToReviewTabInEditMode}
+      setDraftEditValues={setDraftEditValues}
+      onNextClick={isEditFlow ? handleNextTabInEditMode : undefined}
     />
   );
 };
