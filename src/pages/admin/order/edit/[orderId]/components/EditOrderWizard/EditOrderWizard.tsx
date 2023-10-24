@@ -8,11 +8,14 @@ import FormWizard from '@components/FormWizard/FormWizard';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { EFlowType } from '@pages/admin/order/components/NavigateButtons/NavigateButtons';
 import ClientView from '@pages/admin/order/StepScreen/ClientView/ClientView';
+import ManageFood from '@pages/admin/order/StepScreen/ManageFood/ManageFood';
 import ReviewOrder from '@pages/admin/order/StepScreen/ReviewOrder/ReviewOrder';
 import ServiceFeesAndNotes from '@pages/admin/order/StepScreen/ServiceFeesAndNotes/ServiceFeesAndNotes';
 import SetupOrderDetail from '@pages/admin/order/StepScreen/SetupOrderDetail/SetupOrderDetail';
 import { orderAsyncActions, resetOrder } from '@redux/slices/Order.slice';
 import { adminPaths } from '@src/paths';
+import { Listing } from '@src/utils/data';
+import { EOrderType } from '@src/utils/enums';
 
 import MealPlanSetup from '../../../../StepScreen/MealPlanSetup/MealPlanSetup';
 
@@ -27,10 +30,19 @@ export enum EEditOrderTab {
   review = 'review',
 }
 
-const EDIT_ORDER_TABS = [
+const EDIT_GROUP_ORDER_TABS = [
   EEditOrderTab.clientView,
   EEditOrderTab.orderSetup,
   EEditOrderTab.restaurantSetup,
+  EEditOrderTab.serviceAndNote,
+  EEditOrderTab.review,
+];
+
+const EDIT_NORMAL_ORDER_TABS = [
+  EEditOrderTab.clientView,
+  EEditOrderTab.orderSetup,
+  EEditOrderTab.restaurantSetup,
+  EEditOrderTab.manageFood,
   EEditOrderTab.serviceAndNote,
   EEditOrderTab.review,
 ];
@@ -69,12 +81,19 @@ const EditOrderTab: React.FC<any> = (props) => {
           goBack={goBack}
         />
       );
+    case EEditOrderTab.manageFood:
+      return (
+        <ManageFood
+          nextTab={nextTab}
+          nextToReviewTab={nextToReviewTab}
+          goBack={goBack}
+        />
+      );
     case EEditOrderTab.review:
       return (
         <ReviewOrder tab={tab} flowType={EFlowType.edit} goBack={goBack} />
       );
 
-    case EEditOrderTab.manageFood:
     default:
       return <></>;
   }
@@ -91,9 +110,17 @@ const EditOrderWizard = () => {
   const fetchOrderError = useAppSelector(
     (state) => state.Order.fetchOrderError,
   );
+  const order = useAppSelector((state) => state.Order.order);
   const [currentStep, setCurrentStep] = useState<string>(
     EEditOrderTab.clientView,
   );
+
+  const { orderType = EOrderType.group } = Listing(order).getMetadata();
+  const isGroupOrder = orderType === EOrderType.group;
+  const suitableTabList = isGroupOrder
+    ? EDIT_GROUP_ORDER_TABS
+    : EDIT_NORMAL_ORDER_TABS;
+
   const saveStep = (tab: string) => {
     setCurrentStep(tab);
   };
@@ -107,16 +134,16 @@ const EditOrderWizard = () => {
   };
 
   const handleNextTab = (tab: string) => () => {
-    const tabIndex = EDIT_ORDER_TABS.indexOf(tab as EEditOrderTab);
+    const tabIndex = suitableTabList.indexOf(tab as EEditOrderTab);
 
-    if (tabIndex < EDIT_ORDER_TABS.length - 1) {
-      const backTab = EDIT_ORDER_TABS[tabIndex + 1];
+    if (tabIndex < suitableTabList.length - 1) {
+      const backTab = suitableTabList[tabIndex + 1];
       saveStep(backTab);
     }
   };
 
   const handleGoBack = (tab: string) => () => {
-    const tabIndex = EDIT_ORDER_TABS.indexOf(tab as EEditOrderTab);
+    const tabIndex = suitableTabList.indexOf(tab as EEditOrderTab);
 
     if (tab === EEditOrderTab.review) {
       router.push(adminPaths.ManageOrders);
@@ -125,7 +152,7 @@ const EditOrderWizard = () => {
     }
 
     if (tabIndex > 0) {
-      const backTab = EDIT_ORDER_TABS[tabIndex - 1];
+      const backTab = suitableTabList[tabIndex - 1];
       saveStep(backTab);
     }
   };
@@ -150,7 +177,7 @@ const EditOrderWizard = () => {
 
   return (
     <FormWizard formTabNavClassName={css.formTabNav}>
-      {EDIT_ORDER_TABS.map((tab: string) => {
+      {suitableTabList.map((tab: string) => {
         return (
           <EditOrderTab
             key={tab}
