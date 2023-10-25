@@ -30,6 +30,7 @@ import { storableAxiosError, storableError } from '@utils/errors';
 import type {
   TImage,
   TIntegrationListing,
+  TKeyValue,
   TListing,
   TObject,
   TPagination,
@@ -70,6 +71,45 @@ type TFoodSliceState = {
   menuPickedFoods: TIntegrationListing[];
   queryMenuPickedFoodsInProgress: boolean;
   queryMenuPickedFoodsError: any;
+
+  nutritions: TKeyValue[];
+  categories: TKeyValue[];
+  packaging: TKeyValue[];
+  fetchAttributesInProgress: boolean;
+  fetchAttributesError: any;
+
+  acceptedFoods: TListing[];
+  pendingFoods: TListing[];
+  declinedFoods: TListing[];
+  draftFoods: TListing[];
+  totalAcceptedFoods: number;
+  totalPendingFoods: number;
+  totalDeclinedFoods: number;
+  totalDraftFoods: number;
+  fetchApprovalFoodsInProgress: boolean;
+  fetchApprovalFoodsError: any;
+
+  editableFoodMap: {
+    [foodId: string]: boolean;
+  };
+  fetchEditableFoodInProgress: boolean;
+  fetchEditableFoodError: any;
+
+  deletableFoodMap: {
+    [foodId: string]: boolean;
+  };
+  fetchDeletableFoodInProgress: boolean;
+  fetchDeletableFoodError: any;
+
+  menus: TListing[];
+  fetchMenusInProgress: boolean;
+  fetchMenusError: any;
+
+  updatePartnerMenuInProgress: boolean;
+  updatePartnerMenuError: any;
+
+  reApprovalFoodInProgress: boolean;
+  reApprovalFoodError: any;
 };
 
 const initialState: TFoodSliceState = {
@@ -109,6 +149,41 @@ const initialState: TFoodSliceState = {
   menuPickedFoods: [],
   queryMenuPickedFoodsInProgress: false,
   queryMenuPickedFoodsError: null,
+
+  nutritions: [],
+  categories: [],
+  packaging: [],
+  fetchAttributesInProgress: false,
+  fetchAttributesError: null,
+
+  acceptedFoods: [],
+  pendingFoods: [],
+  declinedFoods: [],
+  draftFoods: [],
+  totalAcceptedFoods: 0,
+  totalPendingFoods: 0,
+  totalDeclinedFoods: 0,
+  totalDraftFoods: 0,
+  fetchApprovalFoodsInProgress: false,
+  fetchApprovalFoodsError: null,
+
+  editableFoodMap: {},
+  fetchEditableFoodInProgress: false,
+  fetchEditableFoodError: null,
+
+  deletableFoodMap: {},
+  fetchDeletableFoodInProgress: false,
+  fetchDeletableFoodError: null,
+
+  menus: [],
+  fetchMenusInProgress: false,
+  fetchMenusError: null,
+
+  updatePartnerMenuInProgress: false,
+  updatePartnerMenuError: null,
+
+  reApprovalFoodInProgress: false,
+  reApprovalFoodError: null,
 };
 
 // ================ Thunk types ================ //

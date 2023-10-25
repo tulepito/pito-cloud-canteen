@@ -26,12 +26,13 @@ type TFoodDetailInforTabFormPartProps = {
   form?: any;
   handleSubmit: (values: TEditPartnerFoodFormValues) => void;
   values: TEditPartnerFoodFormValues;
+  onTabBack?: () => void;
 };
 
 const FoodDetailInforTabFormPart: React.FC<TFoodDetailInforTabFormPartProps> = (
   props,
 ) => {
-  const { inProgress, invalid, form, handleSubmit, values } = props;
+  const { inProgress, invalid, form, handleSubmit, values, onTabBack } = props;
   const intl = useIntl();
 
   const {
@@ -169,7 +170,11 @@ const FoodDetailInforTabFormPart: React.FC<TFoodDetailInforTabFormPartProps> = (
           inProgress={inProgress}>
           Tiếp theo
         </Button>
-        <Button type="button" variant="secondary" className={css.nextButton}>
+        <Button
+          type="button"
+          variant="secondary"
+          className={css.nextButton}
+          onClick={onTabBack}>
           Trở về
         </Button>
       </div>

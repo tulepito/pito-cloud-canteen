@@ -19,7 +19,8 @@ export const normalizePlanDetailsToEvent = (
     return [];
   }
 
-  const { deliveryHour, daySession } = order || {};
+  const { plans = [], deliveryHour, daySession } = order || {};
+  const planId = plans.length > 0 ? plans[0] : undefined;
 
   const normalizeData = compact(
     dateList.map((timestamp) => {
@@ -56,6 +57,7 @@ export const normalizePlanDetailsToEvent = (
           meal: {
             dishes: foodList,
           },
+          planId,
         },
         start: DateTime.fromMillis(Number(timestamp)).startOf('day').toJSDate(),
         end: DateTime.fromMillis(Number(timestamp)).endOf('day').toJSDate(),

@@ -225,7 +225,6 @@ const EditPartnerFoodPage = () => {
   };
 
   const handleSubmit = async (values: TEditPartnerFoodFormValues) => {
-    console.log('values', values);
     if (isNewFood) {
       const { payload: foodListing } = await dispatch(
         partnerFoodSliceThunks.createPartnerFoodListing(
@@ -364,6 +363,13 @@ const EditPartnerFoodPage = () => {
     });
   };
 
+  const onTabBack = () => {
+    if (currentTab === FOOD_BASIC_INFO_TAB) {
+      return;
+    }
+    setCurrentTab(CREATE_FOOD_TABS[CREATE_FOOD_TABS.indexOf(currentTab) - 1]);
+  };
+
   useEffect(() => {
     if (restaurantId) {
       dispatch(partnerThunks.showPartnerRestaurantListing(restaurantId));
@@ -418,6 +424,7 @@ const EditPartnerFoodPage = () => {
           initialValues={initialValues}
           currentTab={currentTab}
           inProgress={updateFoodInProgress || createFoodInProgress}
+          onTabBack={onTabBack}
         />
       </div>
       <div className={css.desktopFormWrapper}>

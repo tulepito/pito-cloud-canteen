@@ -24,6 +24,7 @@ import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { foodSliceAction, foodSliceThunks } from '@redux/slices/foods.slice';
+import { EFoodApprovalState, EImageVariants } from '@src/utils/enums';
 import {
   FOOD_SIDE_DISH_OPTIONS,
   FOOD_TYPE_OPTIONS,
@@ -31,7 +32,6 @@ import {
   OTHER_OPTION,
 } from '@src/utils/options';
 import type { TKeyValue } from '@src/utils/types';
-import { EFoodApprovalState, EImageVariants } from '@utils/enums';
 import { pickRenderableImages } from '@utils/images';
 import {
   composeValidators,

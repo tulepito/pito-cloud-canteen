@@ -378,7 +378,12 @@ const ManagePartnerFoods = () => {
         label: (
           <div className={css.tabLabel}>
             <span>Được duyệt</span>
-            <div data-number className={css.totalItems}>
+            <div
+              data-number
+              className={classNames(css.totalItems, {
+                [css.tabActive]:
+                  foodApprovalActiveTab === EFoodApprovalState.ACCEPTED,
+              })}>
               {totalAcceptedFoods}
             </div>
           </div>
@@ -390,7 +395,12 @@ const ManagePartnerFoods = () => {
         label: (
           <div className={css.tabLabel}>
             <span>Chờ duyệt</span>
-            <div data-number className={css.totalItems}>
+            <div
+              data-number
+              className={classNames(css.totalItems, {
+                [css.tabActive]:
+                  foodApprovalActiveTab === EFoodApprovalState.PENDING,
+              })}>
               {totalPendingFoods}
             </div>
           </div>
@@ -402,7 +412,12 @@ const ManagePartnerFoods = () => {
         label: (
           <div className={css.tabLabel}>
             <span>Từ chối</span>
-            <div data-number className={css.totalItems}>
+            <div
+              data-number
+              className={classNames(css.totalItems, {
+                [css.tabActive]:
+                  foodApprovalActiveTab === EFoodApprovalState.DECLINED,
+              })}>
               {totalDeclinedFoods}
             </div>
           </div>
@@ -414,7 +429,12 @@ const ManagePartnerFoods = () => {
         label: (
           <div className={css.tabLabel}>
             <span>Nháp</span>
-            <div data-number className={css.totalItems}>
+            <div
+              data-number
+              className={classNames(css.totalItems, {
+                [css.tabActive]:
+                  foodApprovalActiveTab === ('draft' as EFoodApprovalState),
+              })}>
               {totalDraftFoods}
             </div>
           </div>
@@ -427,6 +447,7 @@ const ManagePartnerFoods = () => {
       totalDeclinedFoods,
       totalDraftFoods,
       totalPendingFoods,
+      foodApprovalActiveTab,
     ],
   );
 
@@ -700,7 +721,7 @@ const ManagePartnerFoods = () => {
         partnerFoodSliceThunks.fetchApprovalFoods(EFoodApprovalState.DECLINED),
       );
     }
-  }, [dispatch, foodApprovalActiveTab]);
+  }, [dispatch, foodApprovalActiveTab, JSON.stringify(foodToRemove)]);
 
   useEffect(() => {
     dispatch(partnerFoodSliceThunks.fetchActiveMenus({}));

@@ -18,7 +18,6 @@ import { storableAxiosError, storableError } from '@utils/errors';
 import type {
   TImage,
   TIntegrationListing,
-  TKeyValue,
   TListing,
   TObject,
   TPagination,
@@ -62,12 +61,6 @@ type TFoodSliceState = {
 
   publishOrCloseFoodId: string | null;
   publishOrCloseFoodIdError: any;
-  nutritions: TKeyValue[];
-  categories: TKeyValue[];
-  packaging: TKeyValue[];
-  fetchAttributesInProgress: boolean;
-  fetchAttributesError: any;
-
   responseApprovalRequestInProgress: boolean;
   responseApprovalRequestError: any;
 };
@@ -113,12 +106,6 @@ const initialState: TFoodSliceState = {
   // active food
   publishOrCloseFoodId: null,
   publishOrCloseFoodIdError: null,
-  nutritions: [],
-  categories: [],
-  packaging: [],
-  fetchAttributesInProgress: false,
-  fetchAttributesError: null,
-
   responseApprovalRequestInProgress: false,
   responseApprovalRequestError: null,
 };
