@@ -5,7 +5,6 @@ import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
 
 import Form from '@components/Form/Form';
-import { useAppSelector } from '@hooks/reduxHooks';
 import DaySessionField from '@pages/company/booker/orders/new/quiz/meal-date/DaySessionField/DaySessionField';
 import { getSelectedDaysOfWeek } from '@src/utils/dates';
 import { EOrderType } from '@src/utils/enums';
@@ -18,7 +17,7 @@ import DurationForNextOrderField from '../DurationForNextOrderField/DurationForN
 import FoodPickingField from '../FoodPickingField/FoodPickingField';
 import MealPlanDateField from '../MealPlanDateField/MealPlanDateField';
 import MemberAmountField from '../MemberAmountField/MemberAmountField';
-import NavigateButtons, { EFlowType } from '../NavigateButtons/NavigateButtons';
+import { EFlowType } from '../NavigateButtons/NavigateButtons';
 import NutritionField from '../NutritionField/NutritionField';
 import OrderDeadlineField from '../OrderDeadlineField/OrderDeadlineField';
 import ParticipantSetupField from '../ParticipantSetupField/ParticipantSetupField';
@@ -37,9 +36,7 @@ type TExtraProps = {
     key: string;
   }[];
   flowType: EFlowType;
-  onGoBack?: () => void;
-  onNextClick?: () => void;
-  onCompleteClick?: () => void;
+  formSubmitRef: any;
   setDraftEditValues: (value: any) => void;
 };
 type TMealPlanSetupFormComponentProps =
@@ -59,15 +56,13 @@ const MealPlanSetupFormComponent: React.FC<TMealPlanSetupFormComponentProps> = (
     clientId,
     nutritionsOptions,
     flowType,
-    onGoBack,
-    onCompleteClick,
-    onNextClick,
     setDraftEditValues,
+    formSubmitRef,
   } = props;
   const intl = useIntl();
-  const step2SubmitInProgress = useAppSelector(
-    (state) => state.Order.step2SubmitInProgress,
-  );
+
+  formSubmitRef.current = handleSubmit;
+
   const isEditFlow = flowType === EFlowType.edit;
   const { pickAllow: pickAllowValue = true } = values;
 
@@ -195,14 +190,6 @@ const MealPlanSetupFormComponent: React.FC<TMealPlanSetupFormComponentProps> = (
           </div>
         )}
       </div>
-
-      <NavigateButtons
-        flowType={flowType}
-        onNextClick={onNextClick}
-        goBack={onGoBack}
-        onCompleteClick={onCompleteClick}
-        inProgress={step2SubmitInProgress}
-      />
     </Form>
   );
 };
