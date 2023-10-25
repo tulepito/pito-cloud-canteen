@@ -106,7 +106,6 @@ const EditOrderWizard = () => {
   const router = useRouter();
   const {
     query: { orderId },
-    isReady,
   } = router;
   const fetchOrderInProgress = useAppSelector(
     (state) => state.Order.fetchOrderInProgress,
@@ -179,16 +178,14 @@ const EditOrderWizard = () => {
   }, [fetchOrderInProgress]);
 
   useEffect(() => {
-    if (isReady) {
-      if (orderId) {
-        dispatch(orderAsyncActions.fetchOrder(orderId as string));
-      }
+    if (orderId) {
+      dispatch(orderAsyncActions.fetchOrder(orderId as string));
     }
-  }, [dispatch, isReady, orderId]);
+  }, [orderId]);
 
   useEffect(() => {
     dispatch(resetOrder());
-  }, [dispatch]);
+  }, []);
 
   useEffect(() => {
     if (isEmpty(orderDetail) && !justDeletedMemberOrder && !isEmpty(plans)) {

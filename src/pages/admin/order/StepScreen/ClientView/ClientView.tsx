@@ -2,6 +2,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { shallowEqual } from 'react-redux';
+import isEmpty from 'lodash/isEmpty';
 
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { companyThunks } from '@redux/slices/company.slice';
@@ -43,14 +44,13 @@ const ClientView: React.FC<TClientView> = (props) => {
   const fetchBookersInProgress = useAppSelector(
     (state) => state.Order.fetchBookersInProgress,
   );
-
   const companyId = User(selectedCompany).getId();
 
   useEffect(() => {
-    if (companyId) {
+    if (companyId && isEmpty(bookerList)) {
       dispatch(orderAsyncActions.fetchCompanyBookers(companyId));
     }
-  }, [JSON.stringify(selectedCompany)]);
+  }, [companyId, JSON.stringify(bookerList)]);
 
   const updateStatus = useCallback((updateData: TUpdateStatus) => {
     dispatch(companyThunks.adminUpdateCompanyState(updateData));
@@ -74,32 +74,36 @@ const ClientView: React.FC<TClientView> = (props) => {
 
   return (
     <div>
-      <div className={css.clientTable}>
-        <ClientTable
-          data={companiesTableData}
-          shouldHidePagination
-          shouldDisableAllFields
-          shouldHideSubmitBtn
-          initialValues={{
-            clientId: companyId,
-            booker: User(selectedBooker).getId(),
-          }}
-          page={page}
-          pageSize={pageSize}
-          totalItems={1}
-          onPageChange={handlePageChange}
-          onPageSizeChange={handlePageSizeChange}
-          onItemClick={handleSelectClientClick}
-          onSubmit={nextTab}
-          bookerList={bookerList}
-          fetchBookersInProgress={fetchBookersInProgress}
-        />
-      </div>
-      <NavigateButtons
-        onNextClick={nextTab}
-        onCompleteClick={nextToReviewTab}
-        flowType={EFlowType.edit}
-      />
+      {!fetchBookersInProgress && (
+        <>
+          <div className={css.clientTable}>
+            <ClientTable
+              data={companiesTableData}
+              shouldHidePagination
+              shouldDisableAllFields
+              shouldHideSubmitBtn
+              initialValues={{
+                clientId: companyId,
+                booker: User(selectedBooker).getId(),
+              }}
+              page={page}
+              pageSize={pageSize}
+              totalItems={1}
+              onPageChange={handlePageChange}
+              onPageSizeChange={handlePageSizeChange}
+              onItemClick={handleSelectClientClick}
+              onSubmit={nextTab}
+              bookerList={bookerList}
+              fetchBookersInProgress={fetchBookersInProgress}
+            />
+          </div>
+          <NavigateButtons
+            onNextClick={nextTab}
+            onCompleteClick={nextToReviewTab}
+            flowType={EFlowType.edit}
+          />
+        </>
+      )}
     </div>
   );
 };
