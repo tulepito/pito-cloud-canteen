@@ -7,7 +7,9 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import classNames from 'classnames';
 import arrayMutators from 'final-form-arrays';
+import compact from 'lodash/compact';
 import isEmpty from 'lodash/isEmpty';
+import isEqual from 'lodash/isEqual';
 import { useRouter } from 'next/router';
 
 import Collapsible from '@components/Collapsible/Collapsible';
@@ -444,14 +446,24 @@ export const ReviewContent: React.FC<any> = (props) => {
 
 const parseDataToReviewTab = (values: any) => {
   const { orderDetail = {}, ...rest } = values || {};
-  const items = Object.keys(orderDetail).map((key: any) => {
-    return {
-      key,
-      label: formatTimestamp(Number(key)),
-      childrenFn: (childProps: any) => <ReviewContent {...childProps} />,
-      childrenProps: { ...orderDetail[key], ...rest, order: values },
-    };
-  });
+  const items = compact(
+    Object.keys(orderDetail)
+      .sort((a, b) => Number(a) - Number(b))
+      .map((key: any) => {
+        const { restaurant } = orderDetail[key] || {};
+
+        if (isEmpty(restaurant) || isEmpty(restaurant?.foodList)) {
+          return null;
+        }
+
+        return {
+          key,
+          label: formatTimestamp(Number(key)),
+          childrenFn: (childProps: any) => <ReviewContent {...childProps} />,
+          childrenProps: { ...orderDetail[key], ...rest, order: values },
+        };
+      }),
+  );
 
   return items;
 };
@@ -622,11 +634,14 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
       (dateTime) => orderDetail[dateTime]?.restaurant?.foodList?.length === 0,
     )?.length === 0;
   const missingDraftSelectedFood =
-    isEmpty(draftEditOrderDetail) ||
-    Object.keys(draftEditOrderDetail).filter(
-      (dateTime) =>
-        draftEditOrderDetail?.[dateTime]?.restaurant?.foodList?.length === 0,
-    )?.length === 0;
+    !isEmpty(draftEditOrderDetail) &&
+    !isEqual(draftEditOrderDetail, orderDetail)
+      ? Object.keys(draftEditOrderDetail).filter(
+          (dateTime) =>
+            draftEditOrderDetail?.[dateTime]?.restaurant?.foodList?.length ===
+            0,
+        )?.length === 0
+      : missingSelectedFood;
 
   return (
     <div className={css.root}>

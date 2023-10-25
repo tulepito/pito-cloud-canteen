@@ -317,6 +317,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     nutritions: draftNutritions || nutritions,
     packagePerMember: draftPackagePerMember || packagePerMember,
     daySession: draftDaySession || daySession,
+    orderDetail: draftEditOrderDetail || orderDetail,
   };
 
   const initialFieldValues = useMemo(
@@ -376,20 +377,14 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
   const missingSelectedFood = Object.keys(orderDetail).filter(
     (dateTime) => orderDetail[dateTime]?.restaurant?.foodList?.length === 0,
   );
-  // eslint-disable-next-line unused-imports/no-unused-vars
-  const missingDraftSelectedFood = Object.keys(
-    draftEditOrderDetail || {},
-  ).filter(
-    (dateTime) =>
-      draftEditOrderDetail?.[dateTime]?.restaurant?.foodList?.length === 0,
-  );
 
   const disabledSubmit =
-    Object.keys(orderDetail).length === 0 ||
-    missingSelectedFood.length > 0 ||
-    Object.keys(availableOrderDetailCheckList).some(
-      (item) => !availableOrderDetailCheckList[item].isAvailable,
-    );
+    !isEditFlow &&
+    (Object.keys(orderDetail).length === 0 ||
+      missingSelectedFood.length > 0 ||
+      Object.keys(availableOrderDetailCheckList).some(
+        (item) => !availableOrderDetailCheckList[item].isAvailable,
+      ));
   const initialFoodList = isPickFoodModalOpen
     ? (draftEditOrderDetail || orderDetail)[selectedDate?.getTime()]?.restaurant
         ?.foodList
@@ -679,16 +674,14 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
                 }
               />
             </div>
-            <div>
-              <NavigateButtons
-                goBack={goBack}
-                onNextClick={onSubmit}
-                submitDisabled={disabledSubmit}
-                inProgress={inProgress}
-                onCompleteClick={nextToReviewTab}
-                flowType={flowType}
-              />
-            </div>
+            <NavigateButtons
+              goBack={goBack}
+              onNextClick={onSubmit}
+              submitDisabled={disabledSubmit}
+              inProgress={inProgress}
+              onCompleteClick={nextToReviewTab}
+              flowType={flowType}
+            />
             <OrderSettingModal
               isOpen={isOrderSettingModalOpen}
               onClose={onOrderSettingModalClose}
