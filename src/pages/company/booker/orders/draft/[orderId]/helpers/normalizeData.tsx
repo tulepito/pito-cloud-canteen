@@ -2,7 +2,6 @@ import compact from 'lodash/compact';
 import isEmpty from 'lodash/isEmpty';
 import { DateTime } from 'luxon';
 
-import { Listing } from '@utils/data';
 import { getDaySessionFromDeliveryTime } from '@utils/dates';
 
 export const normalizePlanDetailsToEvent = (
@@ -20,7 +19,7 @@ export const normalizePlanDetailsToEvent = (
     return [];
   }
 
-  const { plans = [], deliveryHour, daySession } = Listing(order).getMetadata();
+  const { plans = [], deliveryHour, daySession } = order || {};
   const planId = plans.length > 0 ? plans[0] : undefined;
 
   const normalizeData = compact(
