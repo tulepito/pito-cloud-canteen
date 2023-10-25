@@ -1,0 +1,131 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.container {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+
+  label {
+    cursor: pointer;
+  }
+}
+
+.uploadImageLabel {
+  @include flexAlign(center, center);
+  flex-direction: column;
+  border: 1px dashed $neutralGray4;
+  border-radius: 12px;
+  gap: 4px;
+  height: 100px;
+
+  .iconPlus {
+    width: 24px;
+    height: 24px;
+
+    path {
+      fill: $neutralGray5;
+    }
+  }
+
+  .firstText {
+    @include textTemplate(14px, $fontWeightSemiBold, 24px);
+    color: $neutralGray5;
+  }
+
+  .secondText {
+    @include textTemplate(12px, $fontWeightRegular, 20px);
+    color: $primaryPri2;
+  }
+}
+
+.addImageInput {
+  display: none;
+}
+
+.imageList {
+  @include flexAlign(center);
+  gap: 12px;
+  margin-top: 24px;
+  overflow: auto;
+}
+
+.imageWrapper {
+  position: relative;
+}
+
+.image {
+  // width: 100%;
+  height: 100px;
+  border-radius: 8px;
+  position: relative;
+  box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.1);
+  object-fit: cover;
+}
+
+.deleteImageBtn {
+  width: 24px;
+  height: 24px;
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  z-index: 1;
+  @include flexAlign(center, center);
+  background-color: $neutralGray2;
+  box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  cursor: pointer;
+
+  &:hover {
+    box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.deleteIcon {
+  width: 12px;
+  height: 12px;
+}
+
+.error {
+  color: $sematicRed2;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background-color: rgba($neutralGray1, 0.8);
+  font-size: 14px;
+}
+
+.loadingUpload {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: $neutralGray1;
+  opacity: 0.6;
+  @include flexCenter;
+  z-index: 1;
+
+  svg {
+    stroke: $neutralGray6;
+  }
+}
+
+.img {
+  display: block;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  background-color: $neutralGray1; /* Loading BG color */
+  padding-bottom: 100px;
+}

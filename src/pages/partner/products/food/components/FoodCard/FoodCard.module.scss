@@ -10,6 +10,14 @@
   width: 100%;
   position: relative;
 
+  .card {
+    cursor: pointer;
+
+    &.disabled {
+      cursor: default;
+    }
+  }
+
   .checkboxLabel {
     width: 100%;
 
@@ -18,10 +26,17 @@
     }
   }
 
+  .checkboxSvg {
+    width: 16px;
+    height: 16px;
+  }
+
   .actionsWrapper {
     position: absolute;
     bottom: 12px;
     right: 12px;
+    width: 24px;
+    height: 24px;
 
     svg {
       cursor: pointer;
@@ -75,27 +90,47 @@
       width: 24px;
       height: 24px;
     }
+
+    .imageAmountLabel {
+      position: absolute;
+      width: 20px;
+      height: 16px;
+      @include textTemplate(10px, $fontWeightRegular, 16px);
+      color: $neutralGray1;
+      text-align: center;
+      border-radius: 8px;
+      background-color: rgba($neutralGray1, 0.2);
+      backdrop-filter: blur(10px);
+      bottom: 8px;
+      right: 4px;
+    }
   }
 
   .content {
-    flex-basis: calc(100% - 112px);
+    flex-basis: calc(100% - 100px);
 
     .infoWrapper {
       .foodName {
         @include textTemplate(16px, $fontWeightBold, 24px);
-        @include lineClamp(1);
+        @include lineClamp(1, 24px);
       }
 
       .menuType {
+        @include flexAlign(center, space-between);
         @include textTemplate(14px, $fontWeightRegular, 20px);
         color: $neutralGray6;
         margin-top: 4px;
+
+        .priceWrapper {
+          @include textTemplate(14px, $fontWeightRegular, 20px);
+        }
       }
     }
 
     .bottomWrapper {
-      @include flexAlign(center, space-between);
+      @include flexAlign(center);
       margin-top: 12px;
+      gap: 8px;
 
       .foodType {
         @include flexAlign(center);
@@ -103,4 +138,28 @@
       }
     }
   }
+}
+
+.toggle {
+  position: absolute;
+  bottom: 15px;
+  right: 40px;
+}
+
+.disabledLink {
+  pointer-events: none;
+  cursor: default;
+}
+
+.reApprovalBtn {
+  color: $neutralGray6;
+  border: 1px solid $neutralGray3;
+  border-radius: 8px;
+  padding: 0 14px;
+  min-height: unset;
+  position: absolute;
+  bottom: 12px;
+  right: 36px;
+
+  @include textTemplate(14px, $fontWeightBold, 24px);
 }

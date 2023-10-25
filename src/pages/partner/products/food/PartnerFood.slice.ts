@@ -8,21 +8,29 @@ import * as XLSX from 'xlsx';
 import { partnerFoodApi } from '@apis/foodApi';
 import {
   createPartnerFoodApi,
+  fetchFoodDeletableApi,
+  fetchFoodEditableApi,
   fetchPartnerFoodApi,
   queryPartnerFoodsApi,
+  reApprovalFoodApi,
   removePartnerFoodApi,
   removePartnerMultipleFoodApi,
+  sendSlackNotificationToAdminApi,
+  toggleFoodEnableApi,
   updatePartnerFoodApi,
+  updatePartnerMenuApi,
 } from '@apis/partnerApi';
+import { getPartnerMenuQuery } from '@helpers/listingSearchQuery';
 import { getImportDataFromCsv } from '@pages/admin/partner/[restaurantId]/settings/food/utils';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { bottomRightToastOptions } from '@src/utils/toastify';
 import { CurrentUser, denormalisedResponseEntities } from '@utils/data';
-import { EImageVariants, EListingType } from '@utils/enums';
+import { EFoodApprovalState, EImageVariants, EListingType } from '@utils/enums';
 import { storableAxiosError, storableError } from '@utils/errors';
 import type {
   TImage,
   TIntegrationListing,
+  TKeyValue,
   TListing,
   TObject,
   TPagination,
@@ -63,6 +71,45 @@ type TFoodSliceState = {
   menuPickedFoods: TIntegrationListing[];
   queryMenuPickedFoodsInProgress: boolean;
   queryMenuPickedFoodsError: any;
+
+  nutritions: TKeyValue[];
+  categories: TKeyValue[];
+  packaging: TKeyValue[];
+  fetchAttributesInProgress: boolean;
+  fetchAttributesError: any;
+
+  acceptedFoods: TListing[];
+  pendingFoods: TListing[];
+  declinedFoods: TListing[];
+  draftFoods: TListing[];
+  totalAcceptedFoods: number;
+  totalPendingFoods: number;
+  totalDeclinedFoods: number;
+  totalDraftFoods: number;
+  fetchApprovalFoodsInProgress: boolean;
+  fetchApprovalFoodsError: any;
+
+  editableFoodMap: {
+    [foodId: string]: boolean;
+  };
+  fetchEditableFoodInProgress: boolean;
+  fetchEditableFoodError: any;
+
+  deletableFoodMap: {
+    [foodId: string]: boolean;
+  };
+  fetchDeletableFoodInProgress: boolean;
+  fetchDeletableFoodError: any;
+
+  menus: TListing[];
+  fetchMenusInProgress: boolean;
+  fetchMenusError: any;
+
+  updatePartnerMenuInProgress: boolean;
+  updatePartnerMenuError: any;
+
+  reApprovalFoodInProgress: boolean;
+  reApprovalFoodError: any;
 };
 
 const initialState: TFoodSliceState = {
@@ -102,6 +149,41 @@ const initialState: TFoodSliceState = {
   menuPickedFoods: [],
   queryMenuPickedFoodsInProgress: false,
   queryMenuPickedFoodsError: null,
+
+  nutritions: [],
+  categories: [],
+  packaging: [],
+  fetchAttributesInProgress: false,
+  fetchAttributesError: null,
+
+  acceptedFoods: [],
+  pendingFoods: [],
+  declinedFoods: [],
+  draftFoods: [],
+  totalAcceptedFoods: 0,
+  totalPendingFoods: 0,
+  totalDeclinedFoods: 0,
+  totalDraftFoods: 0,
+  fetchApprovalFoodsInProgress: false,
+  fetchApprovalFoodsError: null,
+
+  editableFoodMap: {},
+  fetchEditableFoodInProgress: false,
+  fetchEditableFoodError: null,
+
+  deletableFoodMap: {},
+  fetchDeletableFoodInProgress: false,
+  fetchDeletableFoodError: null,
+
+  menus: [],
+  fetchMenusInProgress: false,
+  fetchMenusError: null,
+
+  updatePartnerMenuInProgress: false,
+  updatePartnerMenuError: null,
+
+  reApprovalFoodInProgress: false,
+  reApprovalFoodError: null,
 };
 
 // ================ Thunk types ================ //
@@ -125,6 +207,16 @@ const DUPLICATE_FOOD = 'app/ManageFoodsPage/DUPLICATE_FOOD';
 const CREATE_FOOD_FROM_FILE = 'app/ManageFoodsPage/CREATE_FOOD_FROM_FILE';
 
 const QUERY_MENU_PICKED_FOODS = 'app/ManageFoodsPage/QUERY_MENU_PICKED_FOODS';
+const FETCH_APPROVAL_FOODS = 'app/ManageFoodsPage/FETCH_APPROVAL_FOODS';
+const FETCH_EDITABLE_FOOD = 'app/ManageFoodsPage/FETCH_EDITABLE_FOOD';
+const FETCH_DELETABLE_FOOD = 'app/ManageFoodsPage/FETCH_DELETABLE_FOOD';
+const FETCH_DRAFT_FOODS = 'app/ManageFoodsPage/FETCH_DRAFT_FOODS';
+
+const FETCH_ACTIVE_MENUS = 'app/ManageFoodsPage/FETCH_ACTIVE_MENUS';
+const UPDATE_PARTNER_MENU = 'app/ManageFoodsPage/UPDATE_PARTNER_MENU';
+const SEND_SLACK_NOTIFICATION = 'app/ManageFoodsPage/SEND_SLACK_NOTIFICATION';
+const TOGGLE_FOOD_ENABLED = 'app/ManageFoodsPage/TOGGLE_FOOD_ENABLED';
+const RE_APPROVAL_FOOD = 'app/ManageFoodsPage/RE_APPROVAL_FOOD';
 
 // ================ Async thunks ================ //
 
@@ -264,8 +356,9 @@ const updatePartnerFoodListing = createAsyncThunk(
   UPDATE_PARTNER_FOOD_LISTING,
   async (payload: TObject, { rejectWithValue }) => {
     try {
+      const { shouldShowToast = true, ...rest } = payload;
       const dataParams = {
-        ...payload,
+        ...rest,
       };
       const queryParams = {
         include: ['images'],
@@ -277,12 +370,17 @@ const updatePartnerFoodListing = createAsyncThunk(
         queryParams,
       });
 
-      toast.success('Cập nhật món ăn thành công', bottomRightToastOptions);
+      if (shouldShowToast) {
+        toast.success('Cập nhật món ăn thành công', bottomRightToastOptions);
+      }
 
       return food;
     } catch (error) {
       console.error(`${UPDATE_PARTNER_FOOD_LISTING} error: `, error);
-      toast.error('Cập nhật món ăn thất bại', bottomRightToastOptions);
+      const { shouldShowToast = true } = payload;
+      if (shouldShowToast) {
+        toast.error('Cập nhật món ăn thất bại', bottomRightToastOptions);
+      }
 
       return rejectWithValue(storableError(error));
     }
@@ -459,6 +557,160 @@ const showDuplicateFood = createAsyncThunk(
   },
 );
 
+const fetchApprovalFoods = createAsyncThunk(
+  FETCH_APPROVAL_FOODS,
+  async (status: EFoodApprovalState) => {
+    const { data: response } = await queryPartnerFoodsApi({
+      adminApproval: status,
+      isDraft: false,
+      perPage: 100,
+    });
+    const { foodList, managePartnerFoodPagination: totalItems } = response;
+
+    return {
+      ...(status === EFoodApprovalState.ACCEPTED && {
+        acceptedFoods: foodList,
+        totalAcceptedFoods: totalItems.totalItems,
+      }),
+      ...(status === EFoodApprovalState.PENDING && {
+        pendingFoods: foodList,
+        totalPendingFoods: totalItems.totalItems,
+      }),
+      ...(status === EFoodApprovalState.DECLINED && {
+        declinedFoods: foodList,
+        totalDeclinedFoods: totalItems.totalItems,
+      }),
+    };
+  },
+);
+
+const fetchEditableFood = createAsyncThunk(
+  FETCH_EDITABLE_FOOD,
+  async (id: string) => {
+    const {
+      data: { isEditable },
+    } = await fetchFoodEditableApi(id);
+
+    return {
+      foodId: id,
+      isEditable,
+    };
+  },
+);
+
+const fetchDeletableFood = createAsyncThunk(
+  FETCH_DELETABLE_FOOD,
+  async (id: string) => {
+    const {
+      data: { isDeletable },
+    } = await fetchFoodDeletableApi(id);
+
+    return {
+      foodId: id,
+      isDeletable,
+    };
+  },
+);
+
+const fetchActiveMenus = createAsyncThunk(
+  FETCH_ACTIVE_MENUS,
+  async (payload: any, { extra: sdk, getState }) => {
+    const { keywords, startDate, endDate } = payload;
+    const { currentUser } = getState().user;
+    const currentUserGetter = CurrentUser(currentUser!);
+    const { restaurantListingId } = currentUserGetter.getMetadata();
+    const partnerMenuQuery = getPartnerMenuQuery(restaurantListingId, {
+      keywords,
+      startDate,
+      endDate,
+    });
+    const response = await sdk.listings.query(partnerMenuQuery);
+
+    return denormalisedResponseEntities(response);
+  },
+);
+
+const updatePartnerMenu = createAsyncThunk(
+  UPDATE_PARTNER_MENU,
+  async (payload: any, { getState }) => {
+    const { currentUser } = getState().user;
+    const { id, dataParams } = payload;
+    const queryParams = {
+      expand: true,
+    };
+    const { data } = await updatePartnerMenuApi(
+      {
+        menuId: id,
+        partnerId: CurrentUser(currentUser!).getMetadata().restaurantListingId,
+      },
+      {
+        dataParams,
+        queryParams,
+      },
+    );
+
+    toast.success('Cập nhật menu thành công', bottomRightToastOptions);
+
+    return denormalisedResponseEntities(data)[0];
+  },
+);
+
+const fetchDraftFood = createAsyncThunk(FETCH_DRAFT_FOODS, async () => {
+  const { data: response } = await queryPartnerFoodsApi({
+    isDraft: true,
+    perPage: 100,
+  });
+  const { foodList, managePartnerFoodPagination } = response;
+
+  return {
+    draftFoods: foodList,
+    totalDraftFoods: managePartnerFoodPagination.totalItems,
+  };
+});
+
+const sendSlackNotification = createAsyncThunk(
+  SEND_SLACK_NOTIFICATION,
+  async (payload: any) => {
+    const { foodId } = payload;
+    await sendSlackNotificationToAdminApi(foodId, payload);
+  },
+);
+
+const toggleFoodEnabled = createAsyncThunk(
+  TOGGLE_FOOD_ENABLED,
+  async (payload: any, { rejectWithValue }) => {
+    try {
+      const { foodId, action } = payload;
+      const { data: food } = await toggleFoodEnableApi(foodId, {
+        dataParams: { action },
+        queryParams: {},
+      });
+
+      return food;
+    } catch (error) {
+      console.error(`${TOGGLE_FOOD_ENABLED} error: `, error);
+
+      return rejectWithValue(storableError(error));
+    }
+  },
+);
+
+const reApprovalFood = createAsyncThunk(
+  RE_APPROVAL_FOOD,
+  async (payload: any, { rejectWithValue }) => {
+    try {
+      const { foodId } = payload;
+      await reApprovalFoodApi(foodId);
+
+      return foodId;
+    } catch (error) {
+      console.error(`${RE_APPROVAL_FOOD} error: `, error);
+
+      return rejectWithValue(storableError(error));
+    }
+  },
+);
+
 export const partnerFoodSliceThunks = {
   queryPartnerFoods,
   requestUploadFoodImages,
@@ -470,6 +722,15 @@ export const partnerFoodSliceThunks = {
   duplicateFood,
   createPartnerFoodFromCsv,
   queryMenuPickedFoods,
+  fetchApprovalFoods,
+  fetchEditableFood,
+  fetchDeletableFood,
+  fetchActiveMenus,
+  updatePartnerMenu,
+  fetchDraftFood,
+  sendSlackNotification,
+  toggleFoodEnabled,
+  reApprovalFood,
 };
 
 // ================ Slice ================ //
@@ -596,8 +857,9 @@ const partnerFoodSlice = createSlice({
         updateFoodInProgress: true,
         updateFoodError: null,
       }))
-      .addCase(updatePartnerFoodListing.fulfilled, (state) => ({
+      .addCase(updatePartnerFoodListing.fulfilled, (state, { payload }) => ({
         ...state,
+        currentFoodListing: payload,
         updateFoodInProgress: false,
       }))
       .addCase(updatePartnerFoodListing.rejected, (state, { payload }) => ({
@@ -669,6 +931,144 @@ const partnerFoodSlice = createSlice({
         ...state,
         createPartnerFoodFromCsvInProgress: false,
         createPartnerFoodFromCsvError: error,
+      }))
+
+      .addCase(fetchApprovalFoods.pending, (state) => ({
+        ...state,
+        fetchApprovalFoodsInProgress: true,
+        fetchApprovalFoodsError: null,
+      }))
+      .addCase(fetchApprovalFoods.fulfilled, (state, { payload }) => ({
+        ...state,
+        fetchApprovalFoodsInProgress: false,
+        ...payload,
+      }))
+      .addCase(fetchApprovalFoods.rejected, (state, { error }) => ({
+        ...state,
+        fetchApprovalFoodsInProgress: false,
+        fetchApprovalFoodsError: error.message,
+      }))
+
+      .addCase(fetchEditableFood.pending, (state) => ({
+        ...state,
+        fetchEditableFoodInProgress: true,
+        fetchEditableFoodError: null,
+      }))
+      .addCase(fetchEditableFood.fulfilled, (state, { payload }) => ({
+        ...state,
+        fetchEditableFoodInProgress: false,
+        editableFoodMap: {
+          ...state.editableFoodMap,
+          [payload.foodId]: payload.isEditable,
+        },
+      }))
+      .addCase(fetchEditableFood.rejected, (state, { error }) => ({
+        ...state,
+        fetchEditableFoodInProgress: false,
+        fetchEditableFoodError: error.message,
+      }))
+
+      .addCase(fetchDeletableFood.pending, (state) => ({
+        ...state,
+        fetchDeletableFoodInProgress: true,
+        fetchDeletableFoodError: null,
+      }))
+      .addCase(fetchDeletableFood.fulfilled, (state, { payload }) => ({
+        ...state,
+        fetchDeletableFoodInProgress: false,
+        deletableFoodMap: {
+          ...state.deletableFoodMap,
+          [payload.foodId]: payload.isDeletable,
+        },
+      }))
+      .addCase(fetchDeletableFood.rejected, (state, { error }) => ({
+        ...state,
+        fetchDeletableFoodInProgress: false,
+        fetchDeletableFoodError: error.message,
+      }))
+
+      .addCase(fetchActiveMenus.pending, (state) => ({
+        ...state,
+        fetchMenusInProgress: true,
+        fetchMenusError: null,
+      }))
+      .addCase(fetchActiveMenus.fulfilled, (state, { payload }) => ({
+        ...state,
+        fetchMenusInProgress: false,
+        menus: payload,
+      }))
+      .addCase(fetchActiveMenus.rejected, (state, { error }) => ({
+        ...state,
+        fetchMenusInProgress: false,
+        fetchMenusError: error.message,
+      }))
+
+      .addCase(updatePartnerMenu.pending, (state) => ({
+        ...state,
+        updatePartnerMenuInProgress: true,
+        updatePartnerMenuError: null,
+      }))
+      .addCase(updatePartnerMenu.fulfilled, (state, { payload }) => ({
+        ...state,
+        menus: state.menus.map((menu: any) =>
+          menu.id.uuid === payload.id.uuid ? payload : menu,
+        ),
+        updatePartnerMenuInProgress: false,
+      }))
+      .addCase(updatePartnerMenu.rejected, (state, { error }) => ({
+        ...state,
+        updatePartnerMenuInProgress: false,
+        updatePartnerMenuError: error.message,
+      }))
+
+      .addCase(fetchDraftFood.pending, (state) => ({
+        ...state,
+        fetchApprovalFoodsInProgress: true,
+        fetchApprovalFoodsError: null,
+      }))
+      .addCase(fetchDraftFood.fulfilled, (state, { payload }) => ({
+        ...state,
+        fetchApprovalFoodsInProgress: false,
+        ...payload,
+      }))
+      .addCase(fetchDraftFood.rejected, (state, { error }) => ({
+        ...state,
+        fetchApprovalFoodsInProgress: false,
+        fetchApprovalFoodsError: error.message,
+      }))
+
+      .addCase(toggleFoodEnabled.pending, (state) => ({
+        ...state,
+        updateFoodInProgress: true,
+        updateFoodError: null,
+      }))
+      .addCase(toggleFoodEnabled.fulfilled, (state, { payload }) => ({
+        ...state,
+        updateFoodInProgress: false,
+        foods: state.foods.map((food: any) =>
+          food.id.uuid === payload.id.uuid ? payload : food,
+        ),
+      }))
+      .addCase(toggleFoodEnabled.rejected, (state, { error }) => ({
+        ...state,
+        updateFoodInProgress: false,
+        updateFoodError: error.message,
+      }))
+
+      .addCase(reApprovalFood.pending, (state) => ({
+        ...state,
+        reApprovalFoodInProgress: true,
+        reApprovalFoodError: null,
+      }))
+      .addCase(reApprovalFood.fulfilled, (state, { payload }) => ({
+        ...state,
+        reApprovalFoodInProgress: false,
+        foods: state.foods.filter((food: any) => food.id.uuid !== payload),
+      }))
+      .addCase(reApprovalFood.rejected, (state, { error }) => ({
+        ...state,
+        reApprovalFoodInProgress: false,
+        reApprovalFoodError: error.message,
       }));
   },
 });

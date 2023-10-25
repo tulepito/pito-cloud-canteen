@@ -18,6 +18,7 @@ import { foodSliceThunks } from '@redux/slices/foods.slice';
 import { currentUserSelector } from '@redux/slices/user.slice';
 import { partnerPaths } from '@src/paths';
 import { CurrentUser, Listing } from '@src/utils/data';
+import { EFoodApprovalState } from '@src/utils/enums';
 import type { TListing, TObject } from '@src/utils/types';
 
 import { PartnerManageMenusActions } from '../../PartnerManageMenus.slice';
@@ -68,12 +69,10 @@ const SelectFoodForMealModal: React.FC<TSelectFoodForMealModalProps> = ({
   const [filterValues, setFilterValues] = useState({});
   const [submittedFilterValues, setSubmittedFilterValues] = useState({});
   const [selectedFoodIds, setSelectedFoodIds] = useState<string[]>([]);
-
   const suitableFoodList = foods.filter((f: any) => {
-    const { adminApproval = 'pending', isFoodEnable = false } =
-      Listing(f).getMetadata();
+    const { adminApproval, isFoodEnable = false } = Listing(f).getMetadata();
 
-    return adminApproval === 'accepted' && isFoodEnable;
+    return adminApproval === EFoodApprovalState.ACCEPTED && isFoodEnable;
   });
   const isEmptyFoodList = suitableFoodList?.length === 0;
 
@@ -120,6 +119,7 @@ const SelectFoodForMealModal: React.FC<TSelectFoodForMealModalProps> = ({
               id,
               price: foodListingMaybe.attributes.price.amount || 0,
               sideDishes,
+              title: foodListingMaybe.attributes.title,
             },
           };
         }
@@ -200,6 +200,7 @@ const SelectFoodForMealModal: React.FC<TSelectFoodForMealModalProps> = ({
           isMobileLayout,
           restaurantId,
           page,
+          perPage: 100,
           keywords: keyWordsValue,
           ...priceFilterMaybe,
           ...(foodType ? { pub_foodType: foodType } : {}),

@@ -1,0 +1,43 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.dateTitleWrapper {
+  @include flexAlign(center, space-between);
+
+  .icon {
+    &.disabled {
+      pointer-events: none;
+
+      path {
+        stroke: $neutralGray4;
+      }
+    }
+  }
+
+  .dateTitle {
+    @include textTemplate(16px, $fontWeightSemiBold, 24px);
+    @include flexCenter;
+    gap: 8px;
+  }
+}
+.weekDayWrapper {
+  @include flexAlign(center);
+  margin-top: 24px;
+  gap: 4px;
+
+  .weekDay {
+    width: calc((100vw - 32px) / 7);
+    height: 50px;
+    background-color: $neutralGray2;
+    color: $neutralGray7;
+    border-radius: 8px;
+    @include flexCenter;
+    pointer-events: none;
+
+    &.actived {
+      border: 2px solid $neutralGray7;
+      pointer-events: auto;
+    }
+  }
+}

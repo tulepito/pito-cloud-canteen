@@ -57,7 +57,7 @@ const FieldCheckboxRenderer: React.FC<TFieldCheckboxRenderer> = (props) => {
   return (
     <fieldset className={classes}>
       {label ? (
-        <p className={classNames(css.label, labelClassName)}>{label}</p>
+        <div className={classNames(css.label, labelClassName)}>{label}</div>
       ) : null}
       <ul className={listClasses}>
         {options.map((option: any) => {

@@ -1,0 +1,79 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.root {
+  border-radius: 12px;
+  border: 1px solid $neutralGray3;
+  background: $neutralGray1;
+  padding: 12px;
+  width: 100%;
+  position: relative;
+
+  .checkboxLabel {
+    width: 100%;
+
+    .checkboxWrapper {
+      align-self: center;
+    }
+  }
+
+  .actionsWrapper {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    right: 16px;
+    width: 24px;
+    height: 24px;
+
+    svg {
+      cursor: pointer;
+    }
+  }
+}
+
+.checkboxText {
+  width: 100%;
+}
+
+.contentWrapper {
+  @include flexAlign(center, space-between);
+  gap: 12px;
+  color: $neutralGray6;
+  @include lineClamp(1, 24px);
+  width: 70%;
+
+  .image {
+    width: 84px;
+    height: 84px;
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+
+    svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    .imageAmountLabel {
+      position: absolute;
+      width: 20px;
+      height: 16px;
+      @include textTemplate(10px, $fontWeightRegular, 16px);
+      color: $neutralGray1;
+      text-align: center;
+      border-radius: 8px;
+      background-color: rgba($neutralGray1, 0.2);
+      backdrop-filter: blur(10px);
+      bottom: 8px;
+      right: 4px;
+    }
+  }
+}
+
+.toggle {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  right: 52px;
+}

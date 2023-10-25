@@ -6,6 +6,7 @@ import cookie from '@services/cookie';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import partnerChecker from '@services/permissionChecker/partner';
 import { handleError } from '@services/sdk';
+import { denormalisedResponseEntities } from '@src/utils/data';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
@@ -19,8 +20,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     const { ids = [] } = dataParams;
 
     const responses = await Promise.all(
-      ids.map(async (id: string) =>
-        integrationSdk.listings.update(
+      ids.map(async (id: string) => {
+        const response = await integrationSdk.listings.update(
           {
             id,
             metadata: {
@@ -28,8 +29,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             },
           },
           queryParams,
-        ),
-      ),
+        );
+
+        return denormalisedResponseEntities(response)[0];
+      }),
     );
 
     updateMenuAfterFoodDeletedByListId(ids);

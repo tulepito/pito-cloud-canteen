@@ -2,16 +2,18 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/no-shadow */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import classNames from 'classnames';
+import intersection from 'lodash/intersection';
 import { useRouter } from 'next/router';
 import * as XLSX from 'xlsx';
 
 import Button, { InlineTextButton } from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import IconCategory from '@components/Icons/IconCategory/IconCategory';
+import IconDanger from '@components/Icons/IconDanger/IconDanger';
 import IconDelete from '@components/Icons/IconDelete/IconDelete';
 import IconEdit from '@components/Icons/IconEdit/IconEdit';
 import IconFilter from '@components/Icons/IconFilter/IconFilter';
@@ -19,30 +21,39 @@ import IconFoodListEmpty from '@components/Icons/IconFoodListEmpty/IconFoodListE
 import IconInfoCircle from '@components/Icons/IconInfoCircle/IconInfoCircle';
 import IconList from '@components/Icons/IconList/IconList';
 import IconPrint from '@components/Icons/IconPrint/IconPrint';
+import IconSwap from '@components/Icons/IconSwap/IconSwap';
 import IntegrationFilterModal from '@components/IntegrationFilterModal/IntegrationFilterModal';
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import AlertModal from '@components/Modal/AlertModal';
 import NamedLink from '@components/NamedLink/NamedLink';
+import PopupModal from '@components/PopupModal/PopupModal';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
+import SlideModal from '@components/SlideModal/SlideModal';
 import type { TColumn } from '@components/Table/Table';
 import { TableForm } from '@components/Table/Table';
+import Tabs from '@components/Tabs/Tabs';
 import Tooltip from '@components/Tooltip/Tooltip';
+import {
+  parseEntitiesToExportCsv,
+  parseEntitiesToTableData,
+} from '@helpers/food';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
+import { useViewport } from '@hooks/useViewport';
 import KeywordSearchForm from '@pages/admin/partner/components/KeywordSearchForm/KeywordSearchForm';
 import { partnerPaths } from '@src/paths';
+import { Listing } from '@src/utils/data';
 import { formatTimestamp } from '@src/utils/dates';
-import {
-  FOOD_SIDE_DISH_OPTIONS,
-  FOOD_SPECIAL_DIET_OPTIONS,
-  FOOD_TYPE_OPTIONS,
-  getLabelByKey,
-  MENU_TYPE_OPTIONS,
-} from '@src/utils/options';
-import type { TIntegrationListing } from '@utils/types';
+import { EFoodApprovalState } from '@utils/enums';
+import type { TListing } from '@utils/types';
+
+import ProductLayout from '../ProductLayout';
 
 import GridFoodListForm from './components/GridFoodListForm/GridFoodListForm';
+import MoveFoodToMenuModal from './components/MoveFoodToMenuModal/MoveFoodToMenuModal';
+import RowFoodListForm from './components/RowFoodListForm/RowFoodListForm';
 import FilterForm from './FilterForm/FilterForm';
+import { NEW_FOOD_ID } from './helpers/editFood';
 import { partnerFoodSliceThunks } from './PartnerFood.slice';
 
 import css from './ManagePartnerFoods.module.scss';
@@ -158,106 +169,24 @@ const TABLE_COLUMN: TColumn[] = [
   },
 ];
 
-const parseEntitiesToTableData = (
-  foods: TIntegrationListing[],
-  extraData: any,
-  categoryOptions: any,
-) => {
-  return foods.map((food) => {
-    return {
-      key: food.id.uuid,
-      data: {
-        isDeleted: food.attributes.metadata.isDeleted,
-        title: food.attributes.title,
-        description: food.attributes.description,
-        id: food.id.uuid,
-        menuType: getLabelByKey(
-          MENU_TYPE_OPTIONS,
-          food.attributes.publicData.menuType,
-        ),
-        category: getLabelByKey(
-          categoryOptions,
-          food.attributes.publicData.category,
-        ),
-        foodType: getLabelByKey(
-          FOOD_TYPE_OPTIONS,
-          food.attributes.publicData.foodType,
-        ),
-        ...extraData,
-      },
-    };
-  });
-};
-
-const parseEntitiesToExportCsv = (
-  foods: TIntegrationListing[],
-  ids: string[],
-  packagingOptions: any,
-  categoryOptions: any,
-) => {
-  const filteredFoods =
-    ids.length > 0 ? foods.filter((food) => ids.includes(food.id.uuid)) : foods;
-
-  const foodsToExport = filteredFoods.map((food) => {
-    const {
-      publicData = {},
-      description,
-      title,
-      price,
-    } = food.attributes || {};
-    const {
-      sideDishes = [],
-      specialDiets = [],
-      category,
-      foodType,
-      menuType,
-      allergicIngredients = [],
-      maxQuantity,
-      minOrderHourInAdvance,
-      minQuantity,
-      notes,
-      unit,
-      numberOfMainDishes,
-      packaging,
-    } = publicData;
-
-    return {
-      'Mã món': food.id.uuid,
-      'Tên món ăn': title,
-      'Mô tả': description,
-      'Đơn giá': `${price?.amount} VND`,
-      'Thành phần dị ứng': allergicIngredients.join(','),
-      'Chất liệu bao bì': getLabelByKey(packagingOptions, packaging),
-      'Phong cách ẩm thực': getLabelByKey(categoryOptions, category),
-      'Loại món ăn': getLabelByKey(FOOD_TYPE_OPTIONS, foodType),
-      'Loại menu': getLabelByKey(MENU_TYPE_OPTIONS, menuType),
-      'Món ăn kèm': sideDishes
-        .map((key: string) => getLabelByKey(FOOD_SIDE_DISH_OPTIONS, key))
-        .join(','),
-      'Chế độ dinh dưỡng đặc biệt': specialDiets
-        .map((key: string) => getLabelByKey(FOOD_SPECIAL_DIET_OPTIONS, key))
-        .join(','),
-      'Số nguời tối đa': maxQuantity,
-      'Giờ đặt trước tối thiểu': minOrderHourInAdvance,
-      'Số lượng tối thiểu': minQuantity,
-      'Ghi chú': notes,
-      'Đơn vị tính': unit,
-      'Số món chính': numberOfMainDishes,
-      'Hình ảnh': food.images?.map(
-        (image) => image.attributes.variants['square-small2x'].url,
-      ),
-    };
-  });
-
-  return foodsToExport;
-};
-
 const IMPORT_FILE = 'IMPORT_FILE';
 const GOOGLE_SHEET_LINK = 'GOOGLE_SHEET_LINK';
+const defaultFoodApprovalTabs = [
+  EFoodApprovalState.ACCEPTED,
+  EFoodApprovalState.PENDING,
+  EFoodApprovalState.DECLINED,
+  'draft',
+];
 
 const ManagePartnerFoods = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
+  const filterFoodSlideModalController = useBoolean();
+  const manipulateFoodSlideModalController = useBoolean();
+  const cannotRemoveFoodModalController = useBoolean();
+  const addFoodSlideModalController = useBoolean();
+  const moveFoodToMenuSlideModalController = useBoolean();
+  const { isMobileLayout } = useViewport();
 
   const categoryOptions = useAppSelector(
     (state) => state.SystemAttributes.categories,
@@ -274,11 +203,10 @@ const ManagePartnerFoods = () => {
   const [importType, setImportType] = useState<string>(IMPORT_FILE);
   const [viewListMode, setViewListMode] = useState<string>('grid');
 
-  const {
-    value: isImportModalOpen,
-    setTrue: openImportModal,
-    setFalse: closeImportModal,
-  } = useBoolean(false);
+  const [selectedFood, setSelectedFood] = useState<TListing>(null!);
+
+  const { value: isImportModalOpen, setFalse: closeImportModal } =
+    useBoolean(false);
 
   const {
     value: removeCheckedModalOpen,
@@ -292,8 +220,26 @@ const ManagePartnerFoods = () => {
     foodType = '',
     createAtStart = '',
     createAtEnd = '',
+    tab: tabFromQuery = '',
   } = router.query;
+  const [foodApprovalActiveTab, setFoodApprovalActiveTab] =
+    useState<EFoodApprovalState>(
+      (tabFromQuery as EFoodApprovalState) || EFoodApprovalState.ACCEPTED,
+    );
+  const initDefaultActiveKey = useMemo(() => {
+    if (tabFromQuery) {
+      const tabIndexMaybe =
+        defaultFoodApprovalTabs.findIndex((item) => item === tabFromQuery) + 1;
 
+      return tabIndexMaybe === 0 ? 1 : tabIndexMaybe;
+    }
+
+    return 1;
+  }, [tabFromQuery]);
+
+  const [defaultActiveKey, setDefaultActiveKey] = useState<number>(
+    initDefaultActiveKey!,
+  );
   const hasFilterApplied = !!(
     keywords ||
     foodType ||
@@ -309,6 +255,12 @@ const ManagePartnerFoods = () => {
     createPartnerFoodFromCsvInProgress,
     createPartnerFoodFromCsvError,
     managePartnerFoodPagination,
+    totalAcceptedFoods,
+    totalPendingFoods,
+    totalDeclinedFoods,
+    totalDraftFoods,
+    editableFoodMap,
+    menus,
   } = useAppSelector((state) => state.PartnerFood, shallowEqual);
 
   const getExposeValues = ({ values }: any) => {
@@ -338,6 +290,9 @@ const ManagePartnerFoods = () => {
             }
           : {}),
         ...(keywords ? { keywords } : {}),
+        ...(foodApprovalActiveTab && {
+          tab: foodApprovalActiveTab,
+        }),
       },
     });
   };
@@ -368,7 +323,19 @@ const ManagePartnerFoods = () => {
     if (!error) {
       onClearFoodToRemove();
 
-      return onQueryPartnerFood({ page: 1 });
+      return onQueryPartnerFood({
+        page: 1,
+        ...(isMobileLayout && {
+          ...(Object.values(EFoodApprovalState).includes(foodApprovalActiveTab)
+            ? {
+                adminApproval: foodApprovalActiveTab,
+                isDraft: false,
+              }
+            : {
+                isDraft: true,
+              }),
+        }),
+      });
     }
   };
 
@@ -380,7 +347,19 @@ const ManagePartnerFoods = () => {
       setIdsToAction([]);
       closeRemoveCheckedModal();
 
-      return onQueryPartnerFood({ page: 1 });
+      return onQueryPartnerFood({
+        page: 1,
+        ...(isMobileLayout && {
+          ...(Object.values(EFoodApprovalState).includes(foodApprovalActiveTab)
+            ? {
+                adminApproval: foodApprovalActiveTab,
+                isDraft: false,
+              }
+            : {
+                isDraft: true,
+              }),
+        }),
+      });
     }
   };
 
@@ -392,22 +371,131 @@ const ManagePartnerFoods = () => {
     categoryOptions,
   );
 
+  const foodApprovalStateTabItems = useMemo(
+    () => [
+      {
+        key: EFoodApprovalState.ACCEPTED,
+        label: (
+          <div className={css.tabLabel}>
+            <span>Được duyệt</span>
+            <div
+              data-number
+              className={classNames(css.totalItems, {
+                [css.tabActive]:
+                  foodApprovalActiveTab === EFoodApprovalState.ACCEPTED,
+              })}>
+              {totalAcceptedFoods}
+            </div>
+          </div>
+        ),
+        childrenFn: () => {},
+      },
+      {
+        key: EFoodApprovalState.PENDING,
+        label: (
+          <div className={css.tabLabel}>
+            <span>Chờ duyệt</span>
+            <div
+              data-number
+              className={classNames(css.totalItems, {
+                [css.tabActive]:
+                  foodApprovalActiveTab === EFoodApprovalState.PENDING,
+              })}>
+              {totalPendingFoods}
+            </div>
+          </div>
+        ),
+        childrenFn: () => {},
+      },
+      {
+        key: EFoodApprovalState.DECLINED,
+        label: (
+          <div className={css.tabLabel}>
+            <span>Từ chối</span>
+            <div
+              data-number
+              className={classNames(css.totalItems, {
+                [css.tabActive]:
+                  foodApprovalActiveTab === EFoodApprovalState.DECLINED,
+              })}>
+              {totalDeclinedFoods}
+            </div>
+          </div>
+        ),
+        childrenFn: () => {},
+      },
+      {
+        key: 'draft',
+        label: (
+          <div className={css.tabLabel}>
+            <span>Nháp</span>
+            <div
+              data-number
+              className={classNames(css.totalItems, {
+                [css.tabActive]:
+                  foodApprovalActiveTab === ('draft' as EFoodApprovalState),
+              })}>
+              {totalDraftFoods}
+            </div>
+          </div>
+        ),
+        childrenFn: () => {},
+      },
+    ],
+    [
+      totalAcceptedFoods,
+      totalDeclinedFoods,
+      totalDraftFoods,
+      totalPendingFoods,
+      foodApprovalActiveTab,
+    ],
+  );
+
+  const onTabChange = (tab: any) => {
+    setFoodApprovalActiveTab(tab?.key);
+  };
+
   const handleClearFilter = () => {
+    console.log('foodApprovalActiveTab: ', foodApprovalActiveTab);
     router.push({
       pathname: partnerPaths.ManageFood,
+      query: {
+        ...(foodApprovalActiveTab && {
+          tab: foodApprovalActiveTab,
+        }),
+      },
     });
   };
 
   useEffect(() => {
     onQueryPartnerFood({
       page,
+      perPage: isMobileLayout ? 100 : undefined,
       ...(foodType ? { foodType } : {}),
       ...(createAtStart ? { createAtStart } : {}),
       ...(createAtEnd ? { createAtEnd } : {}),
       ...(keywords ? { keywords } : {}),
+      ...(isMobileLayout && {
+        ...(Object.values(EFoodApprovalState).includes(foodApprovalActiveTab)
+          ? {
+              adminApproval: foodApprovalActiveTab,
+              isDraft: false,
+            }
+          : {
+              isDraft: true,
+            }),
+      }),
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, keywords, foodType, createAtStart, createAtEnd]);
+  }, [
+    page,
+    keywords,
+    foodType,
+    createAtStart,
+    createAtEnd,
+    foodApprovalActiveTab,
+    isMobileLayout,
+  ]);
 
   const onImportFoodFromCsv = async () => {
     const hasValue = importType === IMPORT_FILE ? file : googleSheetUrl;
@@ -481,14 +569,21 @@ const ManagePartnerFoods = () => {
           Thêm món ăn
         </Button>
       </NamedLink>
-      <Button
-        onClick={openImportModal}
-        className={classNames(css.lightButton, css.empty)}>
-        Thêm món ăn hàng loạt
-      </Button>
     </div>
   ) : (
     <div>Không có món ăn nào</div>
+  );
+  const foodEnableInitialValues = useMemo(
+    () =>
+      foods.reduce((result: any, _food: TListing) => {
+        return {
+          ...result,
+          [`foodEnable-${_food.id.uuid}`]:
+            Listing(_food).getMetadata().isFoodEnable,
+        };
+      }, {}),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [JSON.stringify(foods)],
   );
 
   const viewModeContentRendered =
@@ -502,20 +597,44 @@ const ManagePartnerFoods = () => {
         pagination={managePartnerFoodPagination}
         onPageChange={onPageChangeInGridFoodListForm}
         setFoodToRemove={setFoodToRemove}
+        setSelectedFood={setSelectedFood}
+        openManipulateFoodModal={manipulateFoodSlideModalController.setTrue}
+        editableFoodMap={editableFoodMap}
+        foodApprovalActiveTab={foodApprovalActiveTab}
+        initialValues={foodEnableInitialValues}
       />
     ) : (
-      <TableForm
-        columns={TABLE_COLUMN}
-        data={parsedFoods}
-        isLoading={queryFoodsInProgress}
-        hasCheckbox
-        exposeValues={getExposeValues}
-        tableBodyCellClassName={css.tableBodyCell}
-        pagination={managePartnerFoodPagination}
-        paginationPath={partnerPaths.ManageFood}
-        tableWrapperClassName={css.tableWrapper}
-        tableClassName={css.table}
-      />
+      <>
+        <div className={css.mobileListWrapper}>
+          <RowFoodListForm
+            onSubmit={() => {}}
+            getGridFoodListFormValues={getGridFoodListFormValues}
+            foodList={foods}
+            pagination={managePartnerFoodPagination}
+            onPageChange={onPageChangeInGridFoodListForm}
+            setFoodToRemove={setFoodToRemove}
+            setSelectedFood={setSelectedFood}
+            openManipulateFoodModal={manipulateFoodSlideModalController.setTrue}
+            editableFoodMap={editableFoodMap}
+            foodApprovalActiveTab={foodApprovalActiveTab}
+            initialValues={foodEnableInitialValues}
+          />
+        </div>
+        <div className={css.desktopListWrapper}>
+          <TableForm
+            columns={TABLE_COLUMN}
+            data={parsedFoods}
+            isLoading={queryFoodsInProgress}
+            hasCheckbox
+            exposeValues={getExposeValues}
+            tableBodyCellClassName={css.tableBodyCell}
+            pagination={managePartnerFoodPagination}
+            paginationPath={partnerPaths.ManageFood}
+            tableWrapperClassName={css.tableWrapper}
+            tableClassName={css.table}
+          />
+        </div>
+      </>
     );
 
   const onSearchByFoodName = (values: any) => {
@@ -530,271 +649,479 @@ const ManagePartnerFoods = () => {
     }
   };
 
+  const handleSelectRemoveFood = () => {
+    manipulateFoodSlideModalController.setFalse();
+    const selectedFoodListing = Listing(selectedFood);
+    const foodName = selectedFoodListing.getAttributes().title;
+    const foodId = selectedFoodListing.getId();
+    if (editableFoodMap[foodId]) {
+      setFoodToRemove({ id: foodId, title: foodName });
+    } else {
+      cannotRemoveFoodModalController.setTrue();
+    }
+  };
+
+  const handleEditFood = () => {
+    manipulateFoodSlideModalController.setFalse();
+
+    router.push({
+      pathname: partnerPaths.EditFood.replace('[foodId]', selectedFood.id.uuid),
+      query: {
+        fromTab: foodApprovalActiveTab,
+      },
+    });
+  };
+
+  const handleAddFood = () => {
+    router.push({
+      pathname: partnerPaths.EditFood.replace('[foodId]', NEW_FOOD_ID),
+      query: {
+        fromTab: foodApprovalActiveTab,
+      },
+    });
+  };
+
+  useEffect(() => {
+    if (tabFromQuery) {
+      const tabIndexMaybe =
+        (foodApprovalStateTabItems || []).findIndex(
+          (item) => item.key === tabFromQuery,
+        ) + 1;
+      setDefaultActiveKey(tabIndexMaybe === 0 ? 1 : tabIndexMaybe);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tabFromQuery, foodApprovalStateTabItems]);
+
+  useEffect(() => {
+    dispatch(
+      partnerFoodSliceThunks.fetchApprovalFoods(EFoodApprovalState.ACCEPTED),
+    );
+    dispatch(
+      partnerFoodSliceThunks.fetchApprovalFoods(EFoodApprovalState.PENDING),
+    );
+    dispatch(
+      partnerFoodSliceThunks.fetchApprovalFoods(EFoodApprovalState.DECLINED),
+    );
+    dispatch(partnerFoodSliceThunks.fetchDraftFood());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (foodApprovalActiveTab === ('draft' as EFoodApprovalState)) {
+      dispatch(partnerFoodSliceThunks.fetchDraftFood());
+    } else if (foodApprovalActiveTab === EFoodApprovalState.ACCEPTED) {
+      dispatch(
+        partnerFoodSliceThunks.fetchApprovalFoods(EFoodApprovalState.ACCEPTED),
+      );
+    } else if (foodApprovalActiveTab === EFoodApprovalState.PENDING) {
+      dispatch(
+        partnerFoodSliceThunks.fetchApprovalFoods(EFoodApprovalState.PENDING),
+      );
+    } else if (foodApprovalActiveTab === EFoodApprovalState.DECLINED) {
+      dispatch(
+        partnerFoodSliceThunks.fetchApprovalFoods(EFoodApprovalState.DECLINED),
+      );
+    }
+  }, [dispatch, foodApprovalActiveTab, JSON.stringify(foodToRemove)]);
+
+  useEffect(() => {
+    dispatch(partnerFoodSliceThunks.fetchActiveMenus({}));
+  }, [dispatch]);
+
   return (
-    <div className={css.root}>
-      <div className={css.titleWrapper}>
-        <h1 className={css.title}>
-          <FormattedMessage id="ManagePartnerFoods.title" />
-        </h1>
-        <RenderWhen condition={foods.length !== 0}>
-          <div className={css.titleCtaBtnWrapper}>
-            <Button
-              onClick={openImportModal}
-              variant="secondary"
-              className={css.lightButton}>
-              Thêm món ăn hàng loạt
-            </Button>
-            <NamedLink className={css.link} path={partnerPaths.CreateFood}>
-              <Button className={css.addButton}>Thêm món ăn</Button>
-            </NamedLink>
-          </div>
-        </RenderWhen>
-      </div>
-      <div className={css.tableActions}>
-        <div className={css.viewTypeWrapper}>
-          <div
-            className={classNames(css.viewIcon, {
-              [css.active]: viewListMode === 'grid',
-            })}
-            onClick={onSetViewListMode('grid')}>
-            <IconCategory />
-          </div>
-          <div
-            className={classNames(css.viewIcon, {
-              [css.active]: viewListMode === 'list',
-            })}
-            onClick={onSetViewListMode('list')}>
-            <IconList />
-          </div>
-        </div>
-
-        <div className={css.ctaButtons}>
-          <IntegrationFilterModal
-            onClear={handleClearFilter}
-            className={css.filterTooltip}
-            leftFilters={
-              <Tooltip
-                overlayClassName={css.overlay}
-                tooltipContent={
-                  <FilterForm
-                    onSubmit={handleSubmitFilter}
-                    categoryOptions={categoryOptions}
-                    onClearForm={handleClearFilter}
-                    initialValues={{
-                      keywords,
-                      foodType: foodType as string,
-                      createAtStart: createAtStart
-                        ? new Date(+createAtStart).getTime()
-                        : undefined,
-                      createAtEnd: createAtEnd
-                        ? new Date(+createAtEnd).getTime()
-                        : undefined,
-                    }}
-                  />
-                }
-                placement="bottomLeft"
-                trigger="click"
-                overlayInnerStyle={{ backgroundColor: '#fff', padding: 20 }}>
-                <Button
-                  type="button"
-                  variant="secondary"
-                  className={css.filterButton}>
-                  <IconFilter className={css.filterIcon} />
-                  <FormattedMessage id="IntegrationFilterModal.filterMessage" />
-                </Button>
-              </Tooltip>
-            }
-          />
-          <InlineTextButton
-            inProgress={removeFoodInProgress}
-            onClick={openRemoveCheckedModal}
-            disabled={idsToAction.length === 0 || removeFoodInProgress}
-            className={css.removeButton}>
-            <IconDelete
-              className={classNames(css.buttonIcon, {
-                [css.disabled]:
-                  idsToAction.length === 0 || removeFoodInProgress,
-              })}
-            />
-            <div
-              className={classNames({
-                [css.disabled]:
-                  idsToAction.length === 0 || removeFoodInProgress,
-              })}>
-              Xóa món
-            </div>
-          </InlineTextButton>
-
-          <InlineTextButton
-            onClick={makeExcelFile}
-            disabled={hasFilterApplied && foods.length === 0}
-            className={css.removeButton}>
-            <IconPrint
-              className={classNames(css.buttonIcon, {
-                [css.disabled]: foods.length === 0,
-              })}
-            />
-            <div
-              className={classNames(css.buttonIcon, {
-                [css.disabled]: hasFilterApplied && foods.length === 0,
-              })}>
-              In danh sách món ăn
-            </div>
-          </InlineTextButton>
-          <KeywordSearchForm
-            onSubmit={onSearchByFoodName}
-            initialValues={{
-              keywords: keywords as string,
-            }}
-          />
-        </div>
-      </div>
-      {queryFoodsError && <ErrorMessage message={queryFoodsError.message} />}
-      {queryFoodsInProgress ? <LoadingContainer /> : viewModeContentRendered}
-      <AlertModal
-        isOpen={isImportModalOpen}
-        handleClose={closeImportModal}
-        confirmLabel="Nhập"
-        onCancel={closeImportModal}
-        onConfirm={onImportFoodFromCsv}
-        title={<FormattedMessage id="ManagePartnerFoods.importTitle" />}
-        cancelLabel="Hủy"
-        confirmInProgress={createPartnerFoodFromCsvInProgress}
-        confirmDisabled={createPartnerFoodFromCsvInProgress}>
-        <div className={css.radioButton}>
-          <div className={css.inputWrapper}>
-            <input
-              id="importFile"
-              type="radio"
-              checked={importType === IMPORT_FILE}
-              onChange={() => setImportType(IMPORT_FILE)}
-            />
-            <label htmlFor="importFile">Nhập file</label>
-          </div>
-          <div className={css.inputWrapper}>
-            <input
-              id="googleSheetLink"
-              type="radio"
-              checked={importType === GOOGLE_SHEET_LINK}
-              onChange={() => setImportType(GOOGLE_SHEET_LINK)}
-            />
-            <label htmlFor="googleSheetLink">Link Google Sheet</label>
-          </div>
-        </div>
-        <p className={css.downloadFileHere}>
-          {importType !== GOOGLE_SHEET_LINK ? (
-            <FormattedMessage
-              id="ManagePartnerFoods.downloadFileHere"
-              values={{
-                link: (
-                  <NamedLink
-                    target="_blank"
-                    path={process.env.NEXT_PUBLIC_IMPORT_FOOD_GUIDE_FILE_URL}>
-                    <FormattedMessage id="ManagePartnerFoods.templateLink" />
-                  </NamedLink>
-                ),
-              }}
-            />
-          ) : (
-            <FormattedMessage
-              id="ManagePartnerFoods.sampleFileHere"
-              values={{
-                link: (
-                  <NamedLink
-                    target="_blank"
-                    path={process.env.NEXT_PUBLIC_IMPORT_FOOD_TEMPLATE}>
-                    <FormattedMessage id="ManagePartnerFoods.templateLink" />
-                  </NamedLink>
-                ),
-              }}
-            />
-          )}
-        </p>
-        {importType === GOOGLE_SHEET_LINK ? (
-          <div>
-            <input
-              onChange={({ target }) => setGoogleSheetUrl(target.value)}
-              type="text"
-              name="file"
-              value={googleSheetUrl}
-              id="file"
-              placeholder="Nhập link google sheet"
-              className={css.googleSheetInput}
-            />
-            <p>
-              {
-                'Vào Google Sheet -> chọn File -> chọn Share -> chọn Publish to the web -> Chọn dạng publish là CSV -> Publish -> Copy pubished link -> Paste vào ô nhập'
-              }
-            </p>
-          </div>
-        ) : (
-          <div className={css.inputWrapper}>
-            <input
-              accept=".xlsx,.xls"
-              onChange={onChangeFile}
-              type="file"
-              className={css.inputFile}
-              name="file"
-              id="file"
-            />
-            <label className={css.importLabel}>
-              <FormattedMessage id="ManagePartnerFoods.importLabel" />
-            </label>
-            <label htmlFor="file">
-              <div className={css.fileLabel}>
-                {file ? (
-                  file.name
-                ) : (
-                  <FormattedMessage id="ManagePartnerFoods.inputFile" />
-                )}
+    <ProductLayout
+      currentPage="food"
+      shouldHideAddProductButton={false}
+      handleAddProduct={handleAddFood}>
+      <div className={css.root}>
+        <div className={css.tableActions}>
+          <div className={css.ctaViewTypeWrapper}>
+            <div className={css.viewTypeWrapper}>
+              <div
+                className={classNames(css.viewIcon, {
+                  [css.active]: viewListMode === 'grid',
+                })}
+                onClick={onSetViewListMode('grid')}>
+                <IconCategory />
               </div>
-            </label>
-            {createPartnerFoodFromCsvError && (
-              <ErrorMessage message={createPartnerFoodFromCsvError.message} />
-            )}
+              <div
+                className={classNames(css.viewIcon, {
+                  [css.active]: viewListMode === 'list',
+                })}
+                onClick={onSetViewListMode('list')}>
+                <IconList />
+              </div>
+            </div>
+            <div className={css.ctaIconBtns}>
+              <InlineTextButton
+                className={css.iconBtn}
+                onClick={makeExcelFile}
+                disabled={hasFilterApplied && foods.length === 0}>
+                <IconPrint />
+              </InlineTextButton>
+              <InlineTextButton
+                className={css.iconBtn}
+                disabled={idsToAction.length === 0 || removeFoodInProgress}
+                onClick={openRemoveCheckedModal}>
+                <IconDelete />
+              </InlineTextButton>
+            </div>
           </div>
-        )}
-      </AlertModal>
-      <AlertModal
-        title={<FormattedMessage id="ManagePartnerFoods.removeTitle" />}
-        isOpen={foodToRemove || removeCheckedModalOpen}
-        handleClose={
-          removeCheckedModalOpen ? closeRemoveCheckedModal : onClearFoodToRemove
-        }
-        onCancel={
-          removeCheckedModalOpen ? closeRemoveCheckedModal : onClearFoodToRemove
-        }
-        onConfirm={
-          removeCheckedModalOpen
-            ? removeCheckedFoods
-            : (removeFood as unknown as () => void)
-        }
-        cancelLabel="Hủy"
-        confirmLabel="Xóa món ăn"
-        confirmInProgress={removeFoodInProgress}
-        childrenClassName={css.removeModalContent}
-        confirmDisabled={removeFoodInProgress}>
-        <p className={css.removeContent}>
-          <FormattedMessage
-            id="ManagePartnerFoods.removeContent"
-            values={{
-              foodName: (
-                <span className={css.foodTitle}>
-                  {removeCheckedModalOpen ? (
-                    <FormattedMessage
-                      id="ManagePartnerFoods.foodLength"
-                      values={{ foodLength: idsToAction.length }}
+
+          <div className={css.ctaButtons}>
+            <IntegrationFilterModal
+              onClear={handleClearFilter}
+              className={css.filterTooltip}
+              leftFilters={
+                <Tooltip
+                  overlayClassName={css.overlay}
+                  tooltipContent={
+                    <FilterForm
+                      onSubmit={handleSubmitFilter}
+                      categoryOptions={categoryOptions}
+                      onClearForm={handleClearFilter}
+                      initialValues={{
+                        keywords,
+                        foodType: foodType as string,
+                        createAtStart: createAtStart
+                          ? new Date(+createAtStart).getTime()
+                          : undefined,
+                        createAtEnd: createAtEnd
+                          ? new Date(+createAtEnd).getTime()
+                          : undefined,
+                      }}
                     />
+                  }
+                  placement="bottomLeft"
+                  trigger="click"
+                  overlayInnerStyle={{ backgroundColor: '#fff', padding: 20 }}>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    className={css.filterButton}>
+                    <IconFilter className={css.filterIcon} />
+                    <FormattedMessage id="IntegrationFilterModal.filterMessage" />
+                  </Button>
+                </Tooltip>
+              }
+            />
+            <InlineTextButton
+              inProgress={removeFoodInProgress}
+              onClick={openRemoveCheckedModal}
+              disabled={idsToAction.length === 0 || removeFoodInProgress}
+              className={css.removeButton}>
+              <IconDelete
+                className={classNames(css.buttonIcon, {
+                  [css.disabled]:
+                    idsToAction.length === 0 || removeFoodInProgress,
+                })}
+              />
+              <div
+                className={classNames({
+                  [css.disabled]:
+                    idsToAction.length === 0 || removeFoodInProgress,
+                })}>
+                Xóa món
+              </div>
+            </InlineTextButton>
+
+            <InlineTextButton
+              onClick={makeExcelFile}
+              disabled={hasFilterApplied && foods.length === 0}
+              className={css.removeButton}>
+              <IconPrint
+                className={classNames(css.buttonIcon, {
+                  [css.disabled]: foods.length === 0,
+                })}
+              />
+              <div
+                className={classNames(css.buttonIcon, {
+                  [css.disabled]: hasFilterApplied && foods.length === 0,
+                })}>
+                In danh sách món ăn
+              </div>
+            </InlineTextButton>
+
+            <KeywordSearchForm
+              onSubmit={onSearchByFoodName}
+              initialValues={{
+                keywords: keywords as string,
+              }}
+              inputClassName={css.searchInput}
+              className={css.searchInputWrapper}
+            />
+            <Button
+              type="button"
+              variant="secondary"
+              className={css.mobileFilterBtn}
+              onClick={filterFoodSlideModalController.setTrue}>
+              <IconFilter className={css.filterIcon} />
+            </Button>
+          </div>
+
+          <div className={css.foodApprovalTabWrapper}>
+            <Tabs
+              items={foodApprovalStateTabItems as any}
+              onChange={onTabChange}
+              defaultActiveKey={`${defaultActiveKey}`}
+            />
+          </div>
+        </div>
+        {queryFoodsError && <ErrorMessage message={queryFoodsError.message} />}
+        {queryFoodsInProgress ? <LoadingContainer /> : viewModeContentRendered}
+        <AlertModal
+          isOpen={isImportModalOpen}
+          handleClose={closeImportModal}
+          confirmLabel="Nhập"
+          onCancel={closeImportModal}
+          onConfirm={onImportFoodFromCsv}
+          title={<FormattedMessage id="ManagePartnerFoods.importTitle" />}
+          cancelLabel="Hủy"
+          confirmInProgress={createPartnerFoodFromCsvInProgress}
+          confirmDisabled={createPartnerFoodFromCsvInProgress}>
+          <div className={css.radioButton}>
+            <div className={css.inputWrapper}>
+              <input
+                id="importFile"
+                type="radio"
+                checked={importType === IMPORT_FILE}
+                onChange={() => setImportType(IMPORT_FILE)}
+              />
+              <label htmlFor="importFile">Nhập file</label>
+            </div>
+            <div className={css.inputWrapper}>
+              <input
+                id="googleSheetLink"
+                type="radio"
+                checked={importType === GOOGLE_SHEET_LINK}
+                onChange={() => setImportType(GOOGLE_SHEET_LINK)}
+              />
+              <label htmlFor="googleSheetLink">Link Google Sheet</label>
+            </div>
+          </div>
+          <p className={css.downloadFileHere}>
+            {importType !== GOOGLE_SHEET_LINK ? (
+              <FormattedMessage
+                id="ManagePartnerFoods.downloadFileHere"
+                values={{
+                  link: (
+                    <NamedLink
+                      target="_blank"
+                      path={process.env.NEXT_PUBLIC_IMPORT_FOOD_GUIDE_FILE_URL}>
+                      <FormattedMessage id="ManagePartnerFoods.templateLink" />
+                    </NamedLink>
+                  ),
+                }}
+              />
+            ) : (
+              <FormattedMessage
+                id="ManagePartnerFoods.sampleFileHere"
+                values={{
+                  link: (
+                    <NamedLink
+                      target="_blank"
+                      path={process.env.NEXT_PUBLIC_IMPORT_FOOD_TEMPLATE}>
+                      <FormattedMessage id="ManagePartnerFoods.templateLink" />
+                    </NamedLink>
+                  ),
+                }}
+              />
+            )}
+          </p>
+          {importType === GOOGLE_SHEET_LINK ? (
+            <div>
+              <input
+                onChange={({ target }) => setGoogleSheetUrl(target.value)}
+                type="text"
+                name="file"
+                value={googleSheetUrl}
+                id="file"
+                placeholder="Nhập link google sheet"
+                className={css.googleSheetInput}
+              />
+              <p>
+                {
+                  'Vào Google Sheet -> chọn File -> chọn Share -> chọn Publish to the web -> Chọn dạng publish là CSV -> Publish -> Copy pubished link -> Paste vào ô nhập'
+                }
+              </p>
+            </div>
+          ) : (
+            <div className={css.inputWrapper}>
+              <input
+                accept=".xlsx,.xls"
+                onChange={onChangeFile}
+                type="file"
+                className={css.inputFile}
+                name="file"
+                id="file"
+              />
+              <label className={css.importLabel}>
+                <FormattedMessage id="ManagePartnerFoods.importLabel" />
+              </label>
+              <label htmlFor="file">
+                <div className={css.fileLabel}>
+                  {file ? (
+                    file.name
                   ) : (
-                    foodToRemove?.title
+                    <FormattedMessage id="ManagePartnerFoods.inputFile" />
                   )}
-                </span>
-              ),
+                </div>
+              </label>
+              {createPartnerFoodFromCsvError && (
+                <ErrorMessage message={createPartnerFoodFromCsvError.message} />
+              )}
+            </div>
+          )}
+        </AlertModal>
+        <AlertModal
+          title={<FormattedMessage id="ManagePartnerFoods.removeTitle" />}
+          isOpen={
+            (foodToRemove || removeCheckedModalOpen) &&
+            (editableFoodMap[foodToRemove?.id] ||
+              intersection(Object.keys(editableFoodMap), idsToAction).length >
+                0)
+          }
+          handleClose={
+            removeCheckedModalOpen
+              ? closeRemoveCheckedModal
+              : onClearFoodToRemove
+          }
+          onCancel={
+            removeCheckedModalOpen
+              ? closeRemoveCheckedModal
+              : onClearFoodToRemove
+          }
+          onConfirm={
+            removeCheckedModalOpen
+              ? removeCheckedFoods
+              : (removeFood as unknown as () => void)
+          }
+          cancelLabel="Hủy"
+          confirmLabel="Xóa món ăn"
+          confirmInProgress={removeFoodInProgress}
+          childrenClassName={css.removeModalContent}
+          containerClassName={css.confirmContainer}
+          shouldFullScreenInMobile={false}
+          confirmDisabled={removeFoodInProgress}>
+          <p className={css.removeContent}>
+            <FormattedMessage
+              id="ManagePartnerFoods.removeContent"
+              values={{
+                foodName: (
+                  <span className={css.foodTitle}>
+                    {removeCheckedModalOpen ? (
+                      <FormattedMessage
+                        id="ManagePartnerFoods.foodLength"
+                        values={{ foodLength: idsToAction.length }}
+                      />
+                    ) : (
+                      foodToRemove?.title
+                    )}
+                  </span>
+                ),
+              }}
+            />
+          </p>
+        </AlertModal>
+
+        <PopupModal
+          id="CannotRemoveFoodModal"
+          isOpen={cannotRemoveFoodModalController.value}
+          handleClose={cannotRemoveFoodModalController.setFalse}
+          containerClassName={css.confirmContainer}
+          shouldHideIconClose>
+          <>
+            <div className={css.cannotRemoveFoodModalTitle}>
+              <IconDanger className={css.icon} />
+              <span className={css.title}>Không thể xoá Món</span>
+            </div>
+            <div className={css.content}>
+              Món ăn đang được triển khai trong đơn hàng.
+            </div>
+            <Button
+              onClick={cannotRemoveFoodModalController.setFalse}
+              variant="secondary"
+              type="button"
+              className={css.noRemoveFoodConfirmBtn}>
+              Đã hiểu
+            </Button>
+          </>
+        </PopupModal>
+
+        <SlideModal
+          id="FilterFoodModal"
+          isOpen={filterFoodSlideModalController.value}
+          onClose={filterFoodSlideModalController.setFalse}>
+          <FilterForm
+            onSubmit={handleSubmitFilter}
+            categoryOptions={categoryOptions}
+            onClearForm={handleClearFilter}
+            isMobile
+            initialValues={{
+              keywords,
+              foodType: foodType as string,
+              createAtStart: createAtStart
+                ? new Date(+createAtStart).getTime()
+                : undefined,
+              createAtEnd: createAtEnd
+                ? new Date(+createAtEnd).getTime()
+                : undefined,
             }}
           />
-        </p>
-      </AlertModal>
-    </div>
+        </SlideModal>
+        <SlideModal
+          id="ManipulateFoodModal"
+          isOpen={manipulateFoodSlideModalController.value}
+          onClose={manipulateFoodSlideModalController.setFalse}>
+          <div className={css.actionsBtnWrapper}>
+            <RenderWhen
+              condition={
+                foodApprovalActiveTab === EFoodApprovalState.ACCEPTED &&
+                menus.length > 0
+              }>
+              <div
+                className={css.item}
+                onClick={moveFoodToMenuSlideModalController.setTrue}>
+                <IconSwap />
+                <span>Di chuyển vào menu</span>
+              </div>
+            </RenderWhen>
+            <div
+              className={classNames(css.item, {
+                [css.disabled]: !editableFoodMap[selectedFood?.id.uuid],
+              })}
+              onClick={handleEditFood}>
+              <IconEdit />
+              <span>Chỉnh sửa món ăn</span>
+            </div>
+            <div className={css.item} onClick={handleSelectRemoveFood}>
+              <IconDelete />
+              <span>Xóa món ăn</span>
+            </div>
+          </div>
+        </SlideModal>
+        <SlideModal
+          id="AddFoodModal"
+          modalTitle="Thêm"
+          isOpen={addFoodSlideModalController.value}
+          onClose={addFoodSlideModalController.setFalse}>
+          <div className={css.actionsBtnWrapper}>
+            <div className={css.item} onClick={handleAddFood}>
+              <span>Thêm món ăn</span>
+            </div>
+          </div>
+        </SlideModal>
+
+        <MoveFoodToMenuModal
+          isOpen={moveFoodToMenuSlideModalController.value}
+          onClose={moveFoodToMenuSlideModalController.setFalse}
+          selectedFood={selectedFood}
+          menus={menus}
+          onCloseManiplateFoodModal={
+            manipulateFoodSlideModalController.setFalse
+          }
+        />
+      </div>
+    </ProductLayout>
   );
 };
 
