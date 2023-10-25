@@ -65,7 +65,6 @@ const NavigateButtons: React.FC<TNavigateButtons> = (props) => {
             <Button
               className={css.button}
               variant="secondary"
-              inProgress={inProgress}
               onClick={onNextClick}>
               {isEditReviewTab ? (
                 <FormattedMessage id="NavigateButtons.cancel" />

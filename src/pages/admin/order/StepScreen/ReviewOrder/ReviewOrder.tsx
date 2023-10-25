@@ -534,6 +534,10 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
       JSON.stringify(draftEditOrderDetail),
     ]) || {};
 
+  const handleGoBackToManageOrderPage = () => {
+    router.push(adminPaths.ManageOrders);
+  };
+
   const onSubmit = async (values: any) => {
     const { staffName: staffNameValue, shipperName: shipperNameValue } = values;
     if (isEditFlow) {
@@ -705,6 +709,7 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
                 flowType={flowType}
                 currentTab={tab}
                 onCompleteClick={handleSubmit}
+                onNextClick={handleGoBackToManageOrderPage}
                 goBack={goBack}
                 submitDisabled={submitDisabled}
                 inProgress={submitInProgress}
