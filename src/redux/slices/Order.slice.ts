@@ -447,12 +447,15 @@ const recommendRestaurants = createAsyncThunk(
   RECOMMEND_RESTAURANT,
   async (
     // eslint-disable-next-line unused-imports/no-unused-vars
-    { shouldUpdatePlanOrderOrderDetail = true }: TObject,
+    { shouldUpdatePlanOrderOrderDetail = true, recommendParams = {} }: TObject,
     { getState },
   ) => {
     const { order } = getState().Order;
     const orderId = Listing(order).getId();
-    const { data: orderDetail } = await recommendRestaurantApi(orderId);
+    const { data: orderDetail } = await recommendRestaurantApi({
+      orderId,
+      recommendParams,
+    });
 
     return orderDetail;
   },
@@ -461,7 +464,11 @@ const recommendRestaurants = createAsyncThunk(
 const recommendRestaurantForSpecificDay = createAsyncThunk(
   RECOMMEND_RESTAURANT_FOR_SPECIFIC_DAY,
   async (
-    { shouldUpdatePlanOrderOrderDetail = true, dateTime }: TObject,
+    {
+      shouldUpdatePlanOrderOrderDetail = true,
+      dateTime,
+      recommendParams = {},
+    }: TObject,
     { getState, dispatch },
   ) => {
     const { order } = getState().Order;
@@ -470,10 +477,11 @@ const recommendRestaurantForSpecificDay = createAsyncThunk(
 
     const { plans = [] } = Listing(order).getMetadata();
 
-    const { data: newOrderDetail } = await recommendRestaurantApi(
+    const { data: newOrderDetail } = await recommendRestaurantApi({
       orderId,
       dateTime,
-    );
+      recommendParams,
+    });
 
     if (shouldUpdatePlanOrderOrderDetail) {
       updatePlanDetailsApi(orderId, {
