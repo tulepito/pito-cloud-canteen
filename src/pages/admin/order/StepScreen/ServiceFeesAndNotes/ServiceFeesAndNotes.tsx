@@ -1,9 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import classNames from 'classnames';
+import isEmpty from 'lodash/isEmpty';
 
+import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { addCommas } from '@helpers/format';
 import { getPCCFeeByMemberAmount } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
@@ -19,6 +21,8 @@ import NavigateButtons, {
   EFlowType,
 } from '../../components/NavigateButtons/NavigateButtons';
 import PartnerFeeForm from '../../components/PartnerFeeForm/PartnerFeeForm';
+import type { TPCCFormValues } from '../../components/PCCFeeForm/PCCForm';
+import PCCForm from '../../components/PCCFeeForm/PCCForm';
 import ServiceFeeAndNoteForm from '../../components/ServiceFeeAndNoteForm/ServiceFeeAndNoteForm';
 
 import css from './ServiceFeesAndNotes.module.scss';
@@ -46,6 +50,7 @@ const ServiceFeesAndNotes: React.FC<ServiceFeesAndNotesProps> = (props) => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
   const formSubmitRef = useRef<any>();
+  const PCCFeeFormSubmitRef = useRef<any>();
   const partnerFormSubmitRef = useRef<any>();
   const [partnerFormDisabled, setPartnerFormDisabled] = useState(false);
 
@@ -62,6 +67,9 @@ const ServiceFeesAndNotes: React.FC<ServiceFeesAndNotesProps> = (props) => {
     (state) => state.SystemAttributes.systemServiceFeePercentage,
     shallowEqual,
   );
+  const fetchOrderInProgress = useAppSelector(
+    (state) => state.Order.fetchOrderInProgress,
+  );
   const fetchOrderRestaurantListInProgress = useAppSelector(
     (state) => state.Order.fetchOrderRestaurantListInProgress,
   );
@@ -72,48 +80,57 @@ const ServiceFeesAndNotes: React.FC<ServiceFeesAndNotesProps> = (props) => {
     (state) => state.Order.selectedCompany,
     shallowEqual,
   );
+  const draftEditOrderDetail = useAppSelector(
+    (state) => state.Order.draftEditOrderData.orderDetail,
+  );
+  const draftEditOrderData = useAppSelector(
+    (state) => state.Order.draftEditOrderData.generalInfo,
+  );
 
+  const {
+    memberAmount: draftMemberAmount,
+    specificPCCFee: draftSpecificPCCFee,
+    serviceFees: draftServiceFees = {},
+    notes: draftNotes = {},
+  } = draftEditOrderData;
   const orderListing = Listing(order);
-  const { notes, serviceFees, memberAmount = 0 } = orderListing.getMetadata();
+  const {
+    notes,
+    serviceFees,
+    memberAmount = 0,
+    hasSpecificPCCFee: orderHasSpecificPCCFee = false,
+    specificPCCFee: orderSpecificPCCFee,
+  } = orderListing.getMetadata();
 
   const isEditFlow = flowType === EFlowType.edit;
+  const isLoading = fetchOrderInProgress || fetchOrderRestaurantListInProgress;
 
   const { hasSpecificPCCFee = false, specificPCCFee = 0 } =
     User(currentClient).getMetadata();
 
-  const numberOfOrderDays = Object.keys(orderDetail).length;
-  const PITOFee =
-    (hasSpecificPCCFee
-      ? specificPCCFee
-      : getPCCFeeByMemberAmount(memberAmount)) * numberOfOrderDays;
+  const numberOfOrderDays = Object.keys(
+    isEditFlow
+      ? isEmpty(draftEditOrderDetail)
+        ? orderDetail
+        : draftEditOrderDetail
+      : orderDetail,
+  ).length;
+  const PITOFee = isEditFlow
+    ? (orderHasSpecificPCCFee
+        ? draftSpecificPCCFee || orderSpecificPCCFee
+        : getPCCFeeByMemberAmount(draftMemberAmount || memberAmount)) *
+      numberOfOrderDays
+    : (hasSpecificPCCFee
+        ? specificPCCFee
+        : getPCCFeeByMemberAmount(memberAmount)) * numberOfOrderDays;
+  const formattedPCCFee = addCommas(PITOFee.toString());
+
   const restaurantOptions = restaurantList.map((restaurant: TListing) => ({
     label: Listing(restaurant).getAttributes().title,
     key: Listing(restaurant).getId(),
   }));
 
-  const partnerFormInitialValues = useMemo(() => {
-    return restaurantList.reduce((result: any, restaurant: TListing | null) => {
-      const restaurantListing = Listing(restaurant);
-
-      return {
-        ...result,
-        [`partnerFee-${restaurantListing.getId()}`]:
-          systemServiceFeePercentage * 100 ||
-          serviceFees?.[restaurantListing.getId()] ||
-          0,
-      };
-    }, {});
-  }, [
-    JSON.stringify(restaurantList),
-    JSON.stringify(serviceFees),
-    systemServiceFeePercentage,
-  ]);
-
-  useEffect(() => {
-    dispatch(orderAsyncActions.fetchOrderRestaurants());
-  }, [dispatch]);
-
-  const handleFormSubmit = async (values: any) => {
+  const handleNoteFormSubmit = async (values: any) => {
     const newNotes = Object.keys(values).reduce((result, note) => {
       if (note.startsWith('note-')) {
         return {
@@ -175,9 +192,20 @@ const ServiceFeesAndNotes: React.FC<ServiceFeesAndNotesProps> = (props) => {
     }
   };
 
+  const handlePCCFeeSubmit = async (values: TPCCFormValues) => {
+    await dispatch(
+      saveDraftEditOrder({
+        generalInfo: {
+          specificPCCFee: values.PCCFee,
+        },
+      }),
+    );
+  };
+
   const handleSubmitAllForms = async () => {
     await formSubmitRef?.current();
     await partnerFormSubmitRef?.current();
+    await PCCFeeFormSubmitRef?.current();
   };
 
   const handleNextTabInEditMode = () => {
@@ -189,16 +217,42 @@ const ServiceFeesAndNotes: React.FC<ServiceFeesAndNotesProps> = (props) => {
     if (nextToReviewTab) nextToReviewTab();
   };
 
+  const partnerFormInitialValues = useMemo(() => {
+    return restaurantList.reduce((result: any, restaurant: TListing | null) => {
+      const restaurantListing = Listing(restaurant);
+      const restaurantId = restaurantListing.getId();
+
+      return {
+        ...result,
+        [`partnerFee-${restaurantId}`]:
+          draftServiceFees?.[restaurantId] ||
+          systemServiceFeePercentage * 100 ||
+          serviceFees?.[restaurantId] ||
+          0,
+      };
+    }, {});
+  }, [
+    JSON.stringify(restaurantList),
+    JSON.stringify(serviceFees),
+    JSON.stringify(draftServiceFees),
+    systemServiceFeePercentage,
+  ]);
   const noteInitialValues = useMemo(
     () =>
       restaurantList.reduce((result, restaurant) => {
+        const restaurantId = Listing(restaurant).getId();
+
         return {
           ...result,
-          [`note-${Listing(restaurant).getId()}`]:
-            notes?.[Listing(restaurant).getId()] || INITIAL_NOTE,
+          [`note-${restaurantId}`]:
+            draftNotes?.[restaurantId] || notes?.[restaurantId] || INITIAL_NOTE,
         };
       }, {}),
-    [notes, restaurantList],
+    [
+      JSON.stringify(notes),
+      JSON.stringify(restaurantList),
+      JSON.stringify(draftNotes),
+    ],
   );
   const initialValues = useMemo(
     () => ({
@@ -210,16 +264,16 @@ const ServiceFeesAndNotes: React.FC<ServiceFeesAndNotesProps> = (props) => {
 
   return (
     <div className={css.container}>
-      {fetchOrderRestaurantListInProgress ? (
+      <RenderWhen condition={isLoading}>
         <div className={css.loading}>
           {intl.formatMessage({ id: 'ServiceFeesAndNotes.loading' })}
         </div>
-      ) : (
-        <>
+
+        <RenderWhen.False>
           <div className={css.mainLayout}>
             <div className={css.leftCol}>
               <ServiceFeeAndNoteForm
-                onSubmit={handleFormSubmit}
+                onSubmit={handleNoteFormSubmit}
                 initialValues={initialValues}
                 restaurantOptions={restaurantOptions}
                 formSubmitRef={formSubmitRef}
@@ -232,9 +286,20 @@ const ServiceFeesAndNotes: React.FC<ServiceFeesAndNotesProps> = (props) => {
                 </h3>
                 <div className={css.feeRow}>
                   <div className={css.feeLabel}>PITO</div>
-                  <div className={classNames(css.price, css.vnd)}>
-                    {addCommas(PITOFee.toString())}
-                  </div>
+                  <RenderWhen condition={isEditFlow}>
+                    <PCCForm
+                      initialValues={{ PCCFee: formattedPCCFee }}
+                      onSubmit={handlePCCFeeSubmit}
+                      PCCFeePlaceholder={formattedPCCFee}
+                      formSubmitRef={PCCFeeFormSubmitRef}
+                    />
+
+                    <RenderWhen.False>
+                      <div className={classNames(css.price, css.vnd)}>
+                        {formattedPCCFee}
+                      </div>
+                    </RenderWhen.False>
+                  </RenderWhen>
                 </div>
               </div>
               <div className={css.serviceFee}>
@@ -251,18 +316,17 @@ const ServiceFeesAndNotes: React.FC<ServiceFeesAndNotesProps> = (props) => {
               </div>
             </div>
           </div>
-          <div>
-            <NavigateButtons
-              goBack={goBack}
-              onNextClick={handleNextTabInEditMode}
-              onCompleteClick={handleNextToReviewTabInEditMode}
-              flowType={flowType}
-              submitDisabled={partnerFormDisabled}
-              inProgress={updateOrderInProgress}
-            />
-          </div>
-        </>
-      )}
+
+          <NavigateButtons
+            goBack={goBack}
+            onNextClick={handleNextTabInEditMode}
+            onCompleteClick={handleNextToReviewTabInEditMode}
+            flowType={flowType}
+            submitDisabled={partnerFormDisabled}
+            inProgress={updateOrderInProgress}
+          />
+        </RenderWhen.False>
+      </RenderWhen>
     </div>
   );
 };

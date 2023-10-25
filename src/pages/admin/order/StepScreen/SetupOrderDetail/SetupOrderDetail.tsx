@@ -95,9 +95,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     (state) => state.Order.orderDetail,
     shallowEqual,
   );
-  const justDeletedMemberOrder = useAppSelector(
-    (state) => state.Order.justDeletedMemberOrder,
-  );
+
   const order = useAppSelector((state) => state.Order.order, shallowEqual);
   const selectedCompany = useAppSelector(
     (state) => state.Order.selectedCompany,
@@ -393,23 +391,6 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     nextTab();
   };
 
-  useEffect(() => {
-    if (isEmpty(orderDetail) && !justDeletedMemberOrder && !isEmpty(plans)) {
-      dispatch(orderAsyncActions.fetchOrderDetail(plans));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    JSON.stringify(order),
-    JSON.stringify(orderDetail),
-    JSON.stringify(plans),
-  ]);
-
-  useEffect(() => {
-    if (!isEmpty(orderDetail)) {
-      dispatch(orderAsyncActions.checkRestaurantStillAvailable());
-    }
-  }, [dispatch, JSON.stringify(orderDetail)]);
-
   const restaurantListFromOrder = Object.keys(
     getRestaurantListFromOrderDetail(orderDetail),
   );
@@ -419,6 +400,12 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
       dispatch(orderAsyncActions.fetchRestaurantCoverImages());
     }
   }, [JSON.stringify(restaurantListFromOrder)]);
+
+  useEffect(() => {
+    if (!isEmpty(orderDetail)) {
+      dispatch(orderAsyncActions.checkRestaurantStillAvailable());
+    }
+  }, [dispatch, JSON.stringify(orderDetail)]);
 
   const handleSelectFood = async (values: TSelectFoodFormValues) => {
     dispatch(setCanNotGoToStep4(true));
