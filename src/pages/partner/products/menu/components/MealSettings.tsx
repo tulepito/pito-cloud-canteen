@@ -82,7 +82,7 @@ const MealSettingItem = ({
       (f: TListing) =>
         Listing(f).getMetadata().adminApproval === EFoodApprovalState.ACCEPTED,
     );
-  }, [JSON.stringify(pickedFood)]);
+  }, [JSON.stringify(pickedFood), JSON.stringify(foodListingByDay)]);
 
   const isOverMaxItemsToShow = acceptedFoodList.length > MAX_ITEM_TO_SHOW;
   const foodListToRender =
