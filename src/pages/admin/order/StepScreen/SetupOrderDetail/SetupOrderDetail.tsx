@@ -156,6 +156,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     memberAmount,
     plans = [],
     dayInWeek,
+    daySession,
   } = orderGetter.getMetadata();
   const { title: orderTitle } = orderGetter.getAttributes();
   const orderId = orderGetter.getId();
@@ -172,6 +173,8 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     deadlineDate: draftDeadlineDate,
     deadlineHour: draftDeadlineHour,
     memberAmount: draftMemberAmount,
+    dayInWeek: draftDayInWeek,
+    daySession: draftDaySession,
   } = draftEditOrderData;
   const { address: draftAddress } = draftDeliveryAddress || {};
 
@@ -198,10 +201,25 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
   const { lastName: clientLastName, firstName: clientFirstName } =
     User(selectedCompany).getProfile();
   const partnerName = `${clientLastName} ${clientFirstName}`;
-  const resourcesForCalender = normalizePlanDetailsToEvent(
-    draftEditOrderDetail || orderDetail,
-    order,
-    restaurantCoverImageList,
+  const resourcesForCalender = useMemo(
+    () =>
+      normalizePlanDetailsToEvent(
+        draftEditOrderDetail || orderDetail,
+        {
+          deliveryHour: draftDeliveryHour || deliveryHour,
+          daySession: draftDaySession || daySession,
+        },
+        restaurantCoverImageList,
+      ),
+    [
+      deliveryHour,
+      draftDeliveryHour,
+      daySession,
+      draftDaySession,
+      JSON.stringify(restaurantCoverImageList),
+      JSON.stringify(orderDetail),
+      JSON.stringify(draftEditOrderDetail),
+    ],
   );
   const showPickFoodModal = isPickFoodModalOpen && !fetchFoodInProgress;
 
@@ -596,25 +614,27 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
               <CalendarDashboard
                 anchorDate={suitableStartDate}
                 events={resourcesForCalender}
-                renderEvent={(props: any) => (
-                  <MealPlanCard
-                    {...props}
-                    removeInprogress={
-                      props?.resources?.updatePlanDetailInprogress
-                    }
-                    onRemove={handleRemoveMeal(props?.resources?.planId)}
-                  />
-                )}
+                renderEvent={(props: any) => {
+                  return (
+                    <MealPlanCard
+                      {...props}
+                      removeInprogress={
+                        props?.resources?.updatePlanDetailInprogress
+                      }
+                      onRemove={handleRemoveMeal(props?.resources?.planId)}
+                    />
+                  );
+                }}
                 companyLogo="Company"
-                startDate={new Date(startDate)}
-                endDate={new Date(endDate)}
+                startDate={new Date(draftStartDate || startDate)}
+                endDate={new Date(draftEndDate || endDate)}
                 resources={{
                   ...calendarExtraResources,
                   onEditFood: onEditFoodInMealPlanCard,
                   onSearchRestaurant: handleAddMorePlanClick,
                   onEditFoodInProgress,
                   onApplyOtherDays,
-                  dayInWeek,
+                  dayInWeek: draftDayInWeek || dayInWeek,
                   onApplyOtherDaysInProgress,
                   onRecommendRestaurantForSpecificDay,
                   onRecommendRestaurantForSpecificDayInProgress,
