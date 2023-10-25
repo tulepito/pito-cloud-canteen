@@ -22,6 +22,12 @@ import {
 import type { TPlan } from '@utils/orderTypes';
 import type { TListing, TObject } from '@utils/types';
 
+export const ORDER_STATES_TO_ENABLE_EDIT_ABILITY = [
+  EOrderDraftStates.pendingApproval,
+  // EOrderStates.picking,
+  // EOrderStates.inProgress,
+];
+
 export const getParticipantPickingLink = (orderId: string) =>
   `${process.env.NEXT_PUBLIC_CANONICAL_URL}/participant/order/${orderId}`;
 export const getTrackingLink = (orderId: string, timestamp: string | number) =>

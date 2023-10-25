@@ -11,6 +11,7 @@ import RenderWhen from '@components/RenderWhen/RenderWhen';
 import {
   isEnableToStartOrder,
   ORDER_STATE_TRANSIT_FLOW,
+  ORDER_STATES_TO_ENABLE_EDIT_ABILITY,
 } from '@helpers/orderHelper';
 import { useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
@@ -26,12 +27,6 @@ import type {
 } from '@src/utils/types';
 
 import css from './OrderHeaderState.module.scss';
-
-const ORDER_STATES_TO_ENABLE_EDIT_ABILITY = [
-  EOrderDraftStates.pendingApproval,
-  EOrderStates.picking,
-  EOrderStates.inProgress,
-];
 
 type OrderHeaderStateProps = {
   order: TListing;

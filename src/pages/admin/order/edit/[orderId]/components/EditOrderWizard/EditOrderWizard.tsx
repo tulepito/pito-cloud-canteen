@@ -6,6 +6,7 @@ import isEmpty from 'lodash/isEmpty';
 import { useRouter } from 'next/router';
 
 import FormWizard from '@components/FormWizard/FormWizard';
+import { ORDER_STATES_TO_ENABLE_EDIT_ABILITY } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { EFlowType } from '@pages/admin/order/components/NavigateButtons/NavigateButtons';
 import ClientView from '@pages/admin/order/StepScreen/ClientView/ClientView';
@@ -123,9 +124,14 @@ const EditOrderWizard = () => {
     EEditOrderTab.clientView,
   );
 
-  const { orderType = EOrderType.group, plans = [] } =
-    Listing(order).getMetadata();
+  const {
+    orderState,
+    orderType = EOrderType.group,
+    plans = [],
+  } = Listing(order).getMetadata();
   const isGroupOrder = orderType === EOrderType.group;
+  const isInvalidOrderStateToEdit =
+    !ORDER_STATES_TO_ENABLE_EDIT_ABILITY.includes(orderState);
   const suitableTabList = isGroupOrder
     ? EDIT_GROUP_ORDER_TABS
     : EDIT_NORMAL_ORDER_TABS;
@@ -167,10 +173,13 @@ const EditOrderWizard = () => {
   };
 
   useEffect(() => {
-    if (fetchOrderError === 'Request failed with status code 400') {
+    if (
+      fetchOrderError === 'Request failed with status code 400' ||
+      (isInvalidOrderStateToEdit && order !== null && !isEmpty(order))
+    ) {
       router.push(adminPaths.ManageOrders);
     }
-  }, [fetchOrderError]);
+  }, [fetchOrderError, isInvalidOrderStateToEdit, JSON.stringify(order)]);
 
   useEffect(() => {
     if (!fetchOrderInProgress) {
