@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable import/no-cycle */
 /* eslint-disable react-hooks/exhaustive-deps */
-import { memo, useCallback, useMemo, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { shallowEqual } from 'react-redux';
 import isEmpty from 'lodash/isEmpty';
 import isEqual from 'lodash/isEqual';
@@ -9,6 +9,7 @@ import isEqual from 'lodash/isEqual';
 import { MORNING_SESSION } from '@components/CalendarDashboard/helpers/constant';
 import { calculateGroupMembersAmount } from '@helpers/company';
 import { addCommas } from '@helpers/format';
+import { getRestaurantListFromOrderDetail } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import {
   changeStep2SubmitStatus,
@@ -42,10 +43,17 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
     (state) => state.Order.selectedBooker,
     shallowEqual,
   );
+  const draftEditOrderDetail = useAppSelector(
+    (state) => state.Order.draftEditOrderData.orderDetail,
+  );
   const draftEditOrderData = useAppSelector(
     (state) => state.Order.draftEditOrderData.generalInfo,
   );
   const order = useAppSelector((state) => state.Order.order, shallowEqual);
+  const orderDetail = useAppSelector(
+    (state) => state.Order.orderDetail,
+    shallowEqual,
+  );
   const nutritionsOptions = useAppSelector(
     (state) => state.SystemAttributes.nutritions,
     shallowEqual,
@@ -122,6 +130,16 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
         currentClient,
         draftSelectGroups || selectedGroups,
       ));
+
+  const restaurantListFromOrder = Object.keys(
+    getRestaurantListFromOrderDetail(
+      isEditFlow
+        ? isEmpty(draftEditOrderDetail)
+          ? orderDetail
+          : draftEditOrderDetail
+        : orderDetail,
+    ),
+  );
 
   const initialValues = useMemo(
     () => ({
@@ -232,7 +250,7 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
     [dispatch, nextTab],
   );
 
-  const handleSaveDraft = () => {
+  const handleSaveDraft = async () => {
     const { deliveryAddress, ...restDraftValues } = draftEditValues as TObject;
     const { deliveryAddress: initDeliveryAddress, ...restInitialValues } =
       initialValues;
@@ -242,7 +260,7 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
       (deliveryAddress?.address &&
         deliveryAddress?.address !== initDeliveryAddress?.search)
     ) {
-      const generalInfo = {
+      const generalInfo: TObject = {
         ...restDraftValues,
         deliveryAddress,
         packagePerMember: parseInt(
@@ -251,8 +269,27 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
         ),
       };
       // TODO: add recommend restaurant logic here
+      const { payload: recommendOrderDetail }: any = await dispatch(
+        orderAsyncActions.recommendRestaurants({
+          recommendParams: {
+            startDate: generalInfo.startDate,
+            endDate: generalInfo.endDate,
+            dayInWeek: generalInfo.dayInWeek,
+            deliveryOrigin: generalInfo.deliveryAddress.origin,
+            memberAmount: generalInfo.memberAmount,
+            isNormalOrder: generalInfo.pickAllow
+              ? EOrderType.group
+              : EOrderType.normal,
+            nutritions: generalInfo.nutritions || [],
+            packagePerMember: generalInfo.packagePerMember,
+            daySession: generalInfo.daySession,
+          },
+        }),
+      );
 
-      dispatch(saveDraftEditOrder({ generalInfo }));
+      dispatch(
+        saveDraftEditOrder({ generalInfo, orderDetail: recommendOrderDetail }),
+      );
     }
   };
 
@@ -265,6 +302,12 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
     handleSaveDraft();
     if (nextToReviewTab) nextToReviewTab();
   };
+
+  useEffect(() => {
+    if (!isEmpty(restaurantListFromOrder)) {
+      dispatch(orderAsyncActions.fetchRestaurantCoverImages({ isEditFlow }));
+    }
+  }, [JSON.stringify(restaurantListFromOrder), isEditFlow]);
 
   return (
     <MealPlanSetupForm

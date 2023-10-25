@@ -740,8 +740,10 @@ const fetchOrderDetail = createAsyncThunk(
 
 const fetchRestaurantCoverImages = createAsyncThunk(
   FETCH_RESTAURANT_COVER_IMAGE,
-  async (_, { extra: sdk, getState }) => {
-    const { orderDetail = {} } = getState().Order;
+  async ({ isEditFlow = false }: any, { extra: sdk, getState }) => {
+    const { orderDetail = {} } = isEditFlow
+      ? getState().Order.draftEditOrderData
+      : getState().Order;
     const restaurantIdList = compact(
       uniq(Object.values(orderDetail).map((item: any) => item?.restaurant?.id)),
     );

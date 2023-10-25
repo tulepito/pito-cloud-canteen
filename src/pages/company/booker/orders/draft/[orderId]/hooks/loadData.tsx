@@ -80,7 +80,7 @@ export const useGetPlanDetails = () => {
 
   useEffect(() => {
     if (normalizeData && normalizeData.length > 0) {
-      dispatch(orderAsyncActions.fetchRestaurantCoverImages());
+      dispatch(orderAsyncActions.fetchRestaurantCoverImages({}));
     }
   }, [dispatch, JSON.stringify(normalizeData)]);
 

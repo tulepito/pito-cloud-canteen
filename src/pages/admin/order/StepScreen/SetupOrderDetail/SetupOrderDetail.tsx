@@ -38,6 +38,7 @@ import {
 } from '@redux/slices/Order.slice';
 import { selectRestaurantPageThunks } from '@redux/slices/SelectRestaurantPage.slice';
 import { convertWeekDay, renderDateRange } from '@src/utils/dates';
+import { EOrderType } from '@src/utils/enums';
 import { Listing, User } from '@utils/data';
 import type { TListing, TObject } from '@utils/types';
 
@@ -152,6 +153,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     deadlineDate,
     deadlineHour,
     memberAmount,
+    nutritions = [],
     plans = [],
     dayInWeek,
     daySession,
@@ -173,8 +175,10 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     memberAmount: draftMemberAmount,
     dayInWeek: draftDayInWeek,
     daySession: draftDaySession,
+    nutritions: draftNutritions,
   } = draftEditOrderData;
-  const { address: draftAddress } = draftDeliveryAddress || {};
+  const { address: draftAddress, origin: draftOrigin } =
+    draftDeliveryAddress || {};
 
   const suitableStartDate = useMemo(() => {
     const temp = findSuitableStartDate({
@@ -194,8 +198,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     JSON.stringify(orderDetail),
     JSON.stringify(draftEditOrderDetail),
   ]);
-
-  const { address } = deliveryAddress || {};
+  const { address, origin } = deliveryAddress || {};
   const { lastName: clientLastName, firstName: clientFirstName } =
     User(selectedCompany).getProfile();
   const partnerName = `${clientLastName} ${clientFirstName}`;
@@ -249,7 +252,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
       dispatch(
         saveDraftEditOrder({
           orderDetail: {
-            ...orderDetail,
+            ...draftEditOrderDetail,
             [subOrderDate]: restaurantData,
           },
         }),
@@ -303,6 +306,18 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
         selectedCompany,
         draftSelectGroups || selectedGroups,
       ));
+  const recommendParams = {
+    startDate: draftStartDate || startDate,
+    endDate: draftEndDate || endDate,
+    dayInWeek: draftDayInWeek || dayInWeek,
+    deliveryOrigin: draftOrigin || origin,
+    memberAmount: draftMemberAmount || memberAmount,
+    isNormalOrder:
+      draftPickAllow || pickAllow ? EOrderType.group : EOrderType.normal,
+    nutritions: draftNutritions || nutritions,
+    packagePerMember: draftPackagePerMember || packagePerMember,
+    daySession: draftDaySession || daySession,
+  };
 
   const initialFieldValues = useMemo(
     () => ({
@@ -376,7 +391,8 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
       (item) => !availableOrderDetailCheckList[item].isAvailable,
     );
   const initialFoodList = isPickFoodModalOpen
-    ? orderDetail[selectedDate?.getTime()]?.restaurant?.foodList
+    ? (draftEditOrderDetail || orderDetail)[selectedDate?.getTime()]?.restaurant
+        ?.foodList
     : {};
 
   const calendarExtraResources = useGetCalendarExtraResources({
@@ -392,14 +408,20 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
   };
 
   const restaurantListFromOrder = Object.keys(
-    getRestaurantListFromOrderDetail(orderDetail),
+    getRestaurantListFromOrderDetail(
+      isEditFlow
+        ? isEmpty(draftEditOrderDetail)
+          ? orderDetail
+          : draftEditOrderDetail
+        : orderDetail,
+    ),
   );
 
   useEffect(() => {
     if (!isEmpty(restaurantListFromOrder)) {
-      dispatch(orderAsyncActions.fetchRestaurantCoverImages());
+      dispatch(orderAsyncActions.fetchRestaurantCoverImages({ isEditFlow }));
     }
-  }, [JSON.stringify(restaurantListFromOrder)]);
+  }, [JSON.stringify(restaurantListFromOrder), isEditFlow]);
 
   useEffect(() => {
     if (!isEmpty(orderDetail)) {
@@ -477,17 +499,25 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
 
   const onRecommendNewRestaurants = useCallback(async () => {
     dispatch(setOnRecommendRestaurantInProcess(true));
-    const { payload: recommendOrderDetail }: any = await dispatch(
-      orderAsyncActions.recommendRestaurants({
-        shouldUpdatePlanOrderOrderDetail: !isEditFlow,
-      }),
-    );
 
     if (isEditFlow) {
-      saveDraftEditOrder({
-        orderDetail: recommendOrderDetail,
-      });
+      const { payload: recommendOrderDetail }: any = await dispatch(
+        orderAsyncActions.recommendRestaurants({
+          shouldUpdatePlanOrderOrderDetail: false,
+          recommendParams,
+        }),
+      );
+      dispatch(
+        saveDraftEditOrder({
+          orderDetail: recommendOrderDetail,
+        }),
+      );
     } else {
+      const { payload: recommendOrderDetail }: any = await dispatch(
+        orderAsyncActions.recommendRestaurants({
+          shouldUpdatePlanOrderOrderDetail: true,
+        }),
+      );
       await dispatch(
         orderAsyncActions.updatePlanDetail({
           orderId,
@@ -556,6 +586,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
       orderAsyncActions.recommendRestaurantForSpecificDay({
         shouldUpdatePlanOrderOrderDetail: !isEditFlow,
         dateTime: date,
+        ...(isEditFlow ? { recommendParams } : {}),
       }),
     );
   };
