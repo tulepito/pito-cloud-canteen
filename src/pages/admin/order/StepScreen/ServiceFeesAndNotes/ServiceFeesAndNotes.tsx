@@ -58,7 +58,6 @@ const ServiceFeesAndNotes: React.FC<ServiceFeesAndNotesProps> = (props) => {
     (state) => state.Order.orderRestaurantList,
     shallowEqual,
   );
-  console.debug('💫 > restaurantList: ', restaurantList);
   const systemServiceFeePercentage = useAppSelector(
     (state) => state.SystemAttributes.systemServiceFeePercentage,
     shallowEqual,
