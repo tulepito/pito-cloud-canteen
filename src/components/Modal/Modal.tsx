@@ -5,6 +5,7 @@ import classNames from 'classnames';
 
 import Button from '@components/Button/Button';
 import IconClose from '@components/Icons/IconClose/IconClose';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useAppDispatch } from '@hooks/reduxHooks';
 import { useViewport } from '@hooks/useViewport';
 import { UIActions } from '@redux/slices/UI.slice';
@@ -111,13 +112,15 @@ const Modal: React.FC<TModalProps> = (props) => {
     <div id={id} className={classes}>
       <div className={scrollLayerClasses}>
         <div ref={modalContainerRef} className={containerClasses}>
-          {!customHeader && (
+          <RenderWhen
+            condition={!customHeader && (!shouldHideIconClose || hasTitle)}>
             <div className={headerClasses}>
               {closeBtn}
               {hasTitle && <div className={css.title}>{title}</div>}
             </div>
-          )}
-          {customHeader}
+            <RenderWhen.False>{customHeader}</RenderWhen.False>
+          </RenderWhen>
+
           <div className={classNames(contentClassName || css.content)}>
             {children}
           </div>

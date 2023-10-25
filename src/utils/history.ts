@@ -3,3 +3,16 @@ export const historyPushState = (state: string, value: string | number) => {
   url.searchParams.set(state.toString(), value.toString());
   window.history.pushState({}, '', url);
 };
+
+export const parseLocationSearchToObject = () => {
+  const search = window?.location?.search?.slice(1);
+
+  return search
+    ? JSON.parse(
+        `{"${decodeURI(search)
+          .replace(/"/g, '\\"')
+          .replace(/&/g, '","')
+          .replace(/=/g, '":"')}"}`,
+      )
+    : {};
+};

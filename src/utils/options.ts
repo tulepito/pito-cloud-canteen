@@ -423,6 +423,21 @@ export const MENU_MEAL_TYPE_OPTIONS = [
   },
 ];
 
+export const PARTNER_MENU_MEAL_TYPE_OPTIONS = [
+  {
+    key: EMenuMealType.breakfast,
+    label: 'Bữa sáng',
+  },
+  {
+    key: EMenuMealType.lunch,
+    label: 'Bữa trưa',
+  },
+  {
+    key: EMenuMealType.dinner,
+    label: 'Bữa tối',
+  },
+];
+
 // #endregion
 
 // #region //* FOOD *//

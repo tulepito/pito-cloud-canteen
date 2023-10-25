@@ -1,0 +1,29 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.formContainer {
+  @include flexAlign(normal);
+  flex-direction: column;
+  gap: 20px;
+}
+
+.label {
+  color: $neutralGray6;
+  @include textTemplate(14px, $fontWeightSemiBold, 20px);
+}
+
+.dateInputGroup {
+  @include flexAlign(center, space-between);
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.inputSuffixed {
+  color: $neutralGray5;
+  padding: 0 10px;
+  width: unset !important;
+  flex-direction: row !important;
+  justify-content: flex-end !important;
+  border-left: 1px solid $neutralGray3 !important;
+}

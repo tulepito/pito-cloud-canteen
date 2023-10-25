@@ -19,6 +19,7 @@ import {
   BANK_OPTIONS,
   BUSINESS_TYPE_OPTIONS,
   EXTRA_SERVICE_OPTIONS,
+  getLabelByKey,
   MEAL_OPTIONS,
 } from '@src/utils/options';
 import {
@@ -35,12 +36,6 @@ import {
 import { createAvailabilityPlanInitialValues } from '../EditPartnerWizardTab/utils';
 
 import css from './EditPartnerPreviewForm.module.scss';
-
-const getLabelByKey = (list: any[], key: any) => {
-  const item = list?.find((l: any) => l.key === key);
-
-  return item && item.label ? item.label : key;
-};
 
 const EditPartnerPreviewForm: React.FC<any> = (props) => {
   const intl = useIntl();

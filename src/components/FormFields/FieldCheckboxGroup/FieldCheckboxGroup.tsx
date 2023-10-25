@@ -40,7 +40,7 @@ const FieldCheckboxRenderer: React.FC<TFieldCheckboxRenderer> = (props) => {
     twoColumns,
     id,
     fields,
-    options,
+    options = [],
     meta,
     disabled,
     listClassName,

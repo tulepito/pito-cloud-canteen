@@ -5,6 +5,7 @@ import { DateTime } from 'luxon';
 
 import Button from '@components/Button/Button';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
 import type { TObject } from '@utils/types';
 
 import { ENavigate } from '../../helpers/constant';
@@ -23,6 +24,8 @@ export type TToolbarProps = {
   startDate: Date;
   endDate: Date;
   anchorDate: Date;
+  hidePrevNavButton?: boolean;
+  hideNextNavButton?: boolean;
 };
 
 const Toolbar: React.FC<TToolbarProps> = (props) => {
@@ -36,6 +39,8 @@ const Toolbar: React.FC<TToolbarProps> = (props) => {
     onView,
     views,
     view,
+    hidePrevNavButton = false,
+    hideNextNavButton = false,
   } = props;
   const intl = useIntl();
   const shouldShowNavigateToday = false;
@@ -76,11 +81,9 @@ const Toolbar: React.FC<TToolbarProps> = (props) => {
   return (
     <div className={css.root}>
       <div className={css.actions}>
-        {views.length > 1 ? (
+        <RenderWhen condition={Object.keys(views).length > 1}>
           <div className={css.viewModeGroup}>{viewNamesGroupFunc()}</div>
-        ) : (
-          <div />
-        )}
+        </RenderWhen>
         {shouldShowNavigateToday && (
           <Button
             className={css.todayBtn}
@@ -89,17 +92,21 @@ const Toolbar: React.FC<TToolbarProps> = (props) => {
           </Button>
         )}
         <div className={css.toolbarNavigation}>
-          <div
-            className={classNames(css.arrowBtn, !showPrevBtn && css.disabled)}
-            onClick={navigateFunc(ENavigate.PREVIOUS)}>
-            <IconArrow className={css.arrowIcon} direction="left" />
-          </div>
+          <RenderWhen condition={!hidePrevNavButton}>
+            <div
+              className={classNames(css.arrowBtn, !showPrevBtn && css.disabled)}
+              onClick={navigateFunc(ENavigate.PREVIOUS)}>
+              <IconArrow className={css.arrowIcon} direction="left" />
+            </div>
+          </RenderWhen>
           {label}
-          <div
-            className={classNames(css.arrowBtn, !showNextBtn && css.disabled)}
-            onClick={navigateFunc(ENavigate.NEXT)}>
-            <IconArrow className={css.arrowIcon} direction="right" />
-          </div>
+          <RenderWhen condition={!hideNextNavButton}>
+            <div
+              className={classNames(css.arrowBtn, !showNextBtn && css.disabled)}
+              onClick={navigateFunc(ENavigate.NEXT)}>
+              <IconArrow className={css.arrowIcon} direction="right" />
+            </div>
+          </RenderWhen>
         </div>
       </div>
       {recommendButton}

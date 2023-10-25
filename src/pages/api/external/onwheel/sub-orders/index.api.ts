@@ -31,23 +31,23 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     const integrationSdk = getIntegrationSdk();
 
     const demandStartDeliveryTime =
-      NEXT_PUBLIC_ENV === 'staging'
+      NEXT_PUBLIC_ENV === 'development'
         ? DateTime.fromISO(startDeliveryTime as string)
             .setZone(VNTimezone)
-            .minus({ hours: 7 })
             .toMillis()
         : DateTime.fromISO(startDeliveryTime as string)
             .setZone(VNTimezone)
+            .minus({ hours: 7 })
             .toMillis();
 
     const demandEndDeliveryTime =
-      NEXT_PUBLIC_ENV === 'staging'
+      NEXT_PUBLIC_ENV === 'development'
         ? DateTime.fromISO(endDeliveryTime as string)
             .setZone(VNTimezone)
-            .minus({ hours: 7 })
             .toMillis()
         : DateTime.fromISO(endDeliveryTime as string)
             .setZone(VNTimezone)
+            .minus({ hours: 7 })
             .toMillis();
     console.log('demandStartDeliveryTime', demandStartDeliveryTime);
     console.log('demandEndDeliveryTime', demandEndDeliveryTime);
@@ -245,7 +245,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       const isGroupOrder = orderType === EOrderType.group;
 
       const { totalDishes } = calculateTotalPriceAndDishes({
-        orderDetail,
+        orderDetail: {
+          [timestamp]: subOrder,
+        },
         isGroupOrder,
       });
 

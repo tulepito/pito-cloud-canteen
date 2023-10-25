@@ -1,10 +1,13 @@
+import isEmpty from 'lodash/isEmpty';
+
 import { denormalisedResponseEntities } from '@services/data';
 import { getIntegrationSdk } from '@services/sdk';
 import { getUniqueString, Listing } from '@src/utils/data';
-import type { TListing } from '@src/utils/types';
+import type { EMenuMealType } from '@src/utils/enums';
+import type { TListing, TObject } from '@src/utils/types';
 
 export const createMinPriceByDayOfWeek = (foodsByDate: any) => {
-  let avaragePriceByDayOfWeek = {};
+  let averagePriceByDayOfWeek = {};
   Object.keys(foodsByDate).forEach((keyAsDayOfWeek) => {
     let minPriceByDate = 0;
     Object.keys(foodsByDate[keyAsDayOfWeek]).forEach((foodId, index) => {
@@ -14,13 +17,13 @@ export const createMinPriceByDayOfWeek = (foodsByDate: any) => {
         minPriceByDate = price < minPriceByDate ? price : minPriceByDate;
       }
     });
-    avaragePriceByDayOfWeek = {
-      ...avaragePriceByDayOfWeek,
+    averagePriceByDayOfWeek = {
+      ...averagePriceByDayOfWeek,
       [`${keyAsDayOfWeek}MinFoodPrice`]: minPriceByDate || 0,
     };
   });
 
-  return avaragePriceByDayOfWeek;
+  return averagePriceByDayOfWeek;
 };
 
 export const createFoodAveragePriceByDaysOfWeekField = (
@@ -39,16 +42,28 @@ export const createFoodAveragePriceByDaysOfWeekField = (
   return newData;
 };
 
+export const createPartnerDraftFoodByDateByDaysOfWeekField = (
+  daysOfWeek: string[],
+  mealTypes: EMenuMealType[] = [],
+  currentDraftFoodByDate: TObject = {},
+) => {
+  return mealTypes.reduce((prev, meal) => {
+    const currMealDataMaybe = currentDraftFoodByDate[meal] || {};
+
+    const newFoodByDates = daysOfWeek.reduce((res, day) => {
+      return { ...res, [day]: currMealDataMaybe[day] || {} };
+    }, {});
+
+    return { ...prev, [meal]: newFoodByDates };
+  }, {});
+};
+
 export const createFoodByDateByDaysOfWeekField = (
   foodByDate: any,
   daysOfWeek: string[],
 ) => {
-  const newFoodByDates = Object.keys(foodByDate).reduce((prev, key) => {
-    if (daysOfWeek.includes(key)) {
-      return { ...prev, [key]: foodByDate[key] };
-    }
-
-    return { ...prev };
+  const newFoodByDates = daysOfWeek.reduce((prev, key) => {
+    return { ...prev, [key]: foodByDate[key] || {} };
   }, {});
 
   return newFoodByDates;
@@ -127,6 +142,10 @@ export const createListFoodTypeByFoodIds = async (listFoodIdsByDate: any) => {
   const listFoodTypesByDay = await new Promise((resolve, reject) => {
     let result = {};
     const dayKeyAsArray = Object.keys(listFoodIdsByDate);
+
+    if (isEmpty(dayKeyAsArray)) {
+      resolve(null);
+    }
     dayKeyAsArray.map(async (key, index) => {
       try {
         const substringKey = key.substring(0, 3);
@@ -153,7 +172,7 @@ export const createListFoodTypeByFoodIds = async (listFoodIdsByDate: any) => {
           resolve(result);
         }
       } catch (error) {
-        reject();
+        reject(error);
       }
     });
   });

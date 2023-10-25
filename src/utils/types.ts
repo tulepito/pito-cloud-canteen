@@ -618,6 +618,7 @@ export type TUpdateCompanyApiParams = {
 export type TCreateMenuApiParams = {
   menuType: EMenuType;
   mealType: EMenuMealType;
+  mealTypes?: EMenuMealType[];
   startDate: number;
   daysOfWeek: EDayOfWeek[];
   restaurantId: string;
@@ -628,15 +629,18 @@ export type TCreateMenuApiParams = {
 
 export type TUpdateMenuApiParams = {
   id: string;
-  foodsByDate: TObject;
+  foodsByDate?: TObject;
   menuType: EMenuType;
   mealType: EMenuMealType;
+  mealTypes?: EMenuMealType[];
+  draftFoodByDate?: TObject;
   startDate: number;
-  daysOfWeek: EDayOfWeek[];
+  daysOfWeek?: EDayOfWeek[];
   restaurantId: string;
   title: string;
   numberOfCycles: number;
   endDate: number;
+  isDraftEditFlow?: boolean;
 };
 
 export type TDuplicateMenuApiParams = {

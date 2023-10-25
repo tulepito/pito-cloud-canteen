@@ -1,0 +1,36 @@
+@use '/src/styles/mixins.scss' as *;
+
+.searchFilterContainer {
+  display: flex;
+  column-gap: 12px;
+  margin-top: 12px;
+  margin-bottom: 24px;
+  align-items: center;
+}
+
+.fieldKeyWords {
+  flex-basis: calc(100% - 12px - 94px);
+}
+
+.filterBtn {
+  display: flex;
+  column-gap: 8px;
+  padding: 10px 20px;
+  min-height: unset;
+}
+
+.submitButton {
+  position: sticky;
+  bottom: 0px;
+  width: 100%;
+}
+
+.filterFormBtn {
+  width: 100%;
+  height: 48px;
+  margin-top: 20px;
+}
+.btns {
+  @include flexAlign(center, space-between);
+  gap: 16px;
+}

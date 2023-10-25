@@ -68,3 +68,19 @@ export const toggleFoodEnableApi = (foodId: string, body: TBodyParams) =>
   putApi(`${BASE_URL}/food/${foodId}/toggle-food-enable`, body);
 export const reApprovalFoodApi = (foodId: string) =>
   putApi(`${BASE_URL}/food/${foodId}/re-approval`);
+export const deleteMenusApi = (body: TObject) => {
+  return deleteApi(`${BASE_URL}/menus/delete`, body);
+};
+
+export const createDraftMenuApi = (body: TObject) => {
+  return postApi(`${BASE_URL}/menus`, body);
+};
+export const updateMenuApi = (body: TObject) => {
+  return putApi(`${BASE_URL}/menus`, body);
+};
+export const publishDraftMenuApi = (body: TObject) => {
+  return putApi(`${BASE_URL}/menus/publish-draft`, body);
+};
+export const getMenuApi = (menuId: string) => {
+  return getApi(`${BASE_URL}/menus`, { menuId });
+};

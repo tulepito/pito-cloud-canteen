@@ -1,0 +1,61 @@
+@use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.tabLabel {
+  display: flex;
+  align-items: center;
+  column-gap: 12px;
+
+  .count {
+    @include textTemplate(8px, 700, 1);
+    min-width: 16px;
+    height: 16px;
+    display: inline-block;
+    padding: 4px;
+    text-align: center;
+    border-radius: 8px;
+    color: $neutralGray5;
+    background-color: $neutralGray1;
+    @include textTemplate(8px, 400, 1);
+
+    &.countActive {
+      color: $neutralGray1;
+      background-color: $neutralGray6;
+    }
+  }
+}
+
+.tabAction {
+  margin-bottom: 16px;
+}
+
+.emptyMenuList {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  row-gap: 12px;
+
+  @include textTemplate(14px, 400, 20px);
+  color: $neutralGray6;
+
+  .createMenuBtn {
+    min-width: 240px;
+  }
+}
+
+.confirmDeletedMenu.confirmDeletedMenu {
+  width: 295px;
+  left: -300px;
+  bottom: 92px;
+
+  & > div {
+    column-gap: 16px;
+    margin: 0 auto;
+  }
+}
+
+.confirmDeletedMenuOpen.confirmDeletedMenuOpen {
+  left: calc((100vw - 295px) / 2);
+}
