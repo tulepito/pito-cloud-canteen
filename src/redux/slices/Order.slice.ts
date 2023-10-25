@@ -956,8 +956,10 @@ const checkRestaurantStillAvailable = createAsyncThunk(
 
 const fetchOrderRestaurants = createAsyncThunk(
   FETCH_ORDER_RESTAURANTS,
-  async (_, { extra: sdk, getState }) => {
-    const { orderDetail = {} } = getState().Order;
+  async ({ isEditFlow = false }: any, { extra: sdk, getState }) => {
+    const { orderDetail = {} } = isEditFlow
+      ? getState().Order.draftEditOrderData
+      : getState().Order;
     const restaurantIdList = uniq(
       Object.values(orderDetail).map((item: any) => item.restaurant.id),
     );
