@@ -56,11 +56,9 @@ export const normalizePlanDetailsToEvent = (
           meal: {
             dishes: foodList,
           },
-          start: DateTime.fromMillis(Number(timestamp))
-            .startOf('day')
-            .toJSDate(),
-          end: DateTime.fromMillis(Number(timestamp)).endOf('day').toJSDate(),
         },
+        start: DateTime.fromMillis(Number(timestamp)).startOf('day').toJSDate(),
+        end: DateTime.fromMillis(Number(timestamp)).endOf('day').toJSDate(),
       };
     }),
   );
