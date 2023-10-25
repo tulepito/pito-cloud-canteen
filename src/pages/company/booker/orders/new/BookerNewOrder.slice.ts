@@ -9,11 +9,15 @@ type TBookerNewOrderState = {
   queryInprogress: boolean;
   queryError?: any;
   myCompanies: any[];
+  currentStep: number;
+  companyId: string;
 };
 const initialState: TBookerNewOrderState = {
   queryInprogress: false,
   queryError: null,
   myCompanies: [],
+  currentStep: 0,
+  companyId: '',
 };
 
 // ================ Thunk types ================ //
@@ -39,7 +43,26 @@ export const BookerNewOrderThunks = { queryMyCompanies };
 const BookerNewOrderSlice = createSlice({
   name: 'BookerNewOrder',
   initialState,
-  reducers: {},
+  reducers: {
+    setCurrentStep: (state, { payload }) => {
+      return {
+        ...state,
+        currentStep: payload,
+      };
+    },
+    setMyCompanies: (state, { payload }) => {
+      return {
+        ...state,
+        myCompanies: payload,
+      };
+    },
+    setCompanyId: (state, { payload }) => {
+      return {
+        ...state,
+        companyId: payload,
+      };
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(queryMyCompanies.pending, (state) => {

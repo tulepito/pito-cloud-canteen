@@ -8,7 +8,7 @@ import { FieldDatePickerComponent } from '@components/FormFields/FieldDatePicker
 import { FieldDropdownSelectComponent } from '@components/FormFields/FieldDropdownSelect/FieldDropdownSelect';
 import IconClock from '@components/Icons/IconClock/IconClock';
 import { findMinStartDate } from '@helpers/orderHelper';
-import { TimeOptions } from '@utils/dates';
+import { TimeRangeItems } from '@utils/dates';
 
 import css from './DeliveryTimeForm.module.scss';
 
@@ -99,7 +99,7 @@ const DeliveryTimeForm: React.FC<TDeliveryTimeFormProps> = ({
 
   const parsedDeliveryHourOptions = useMemo(
     () =>
-      TimeOptions.map((option) => ({
+      TimeRangeItems.map((option) => ({
         label: option.label,
         key: option.key,
       })),

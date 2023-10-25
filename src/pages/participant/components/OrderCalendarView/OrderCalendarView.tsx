@@ -12,7 +12,10 @@ import Avatar from '@components/Avatar/Avatar';
 import BottomNavigationBar from '@components/BottomNavigationBar/BottomNavigationBar';
 import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
 import OrderEventCard from '@components/CalendarDashboard/components/OrderEventCard/OrderEventCard';
-import { EVENT_STATUS } from '@components/CalendarDashboard/helpers/constant';
+import {
+  EVENT_STATUS,
+  MORNING_SESSION,
+} from '@components/CalendarDashboard/helpers/constant';
 import LoadingModal from '@components/LoadingModal/LoadingModal';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { getItem } from '@helpers/localStorageHelpers';
@@ -26,7 +29,7 @@ import SubOrderDetailModal from '@pages/participant/orders/components/SubOrderDe
 import SuccessRatingModal from '@pages/participant/orders/components/SuccessRatingModal/SuccessRatingModal';
 import { OrderListThunks } from '@pages/participant/orders/OrderList.slice';
 import { CalendarActions } from '@redux/slices/Calendar.slice';
-import { getDaySessionFromDeliveryTime, isSameDate } from '@src/utils/dates';
+import { isSameDate } from '@src/utils/dates';
 import { EOrderStates, EParticipantOrderStatus } from '@src/utils/enums';
 import { convertStringToNumber } from '@src/utils/number';
 import { CurrentUser, Listing, User } from '@utils/data';
@@ -82,8 +85,14 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
     pickFoodForSpecificSubOrderInProgress,
   } = useSubOrderPicking();
 
-  const { deadlineDate, deliveryHour, startDate, endDate, orderState } =
-    orderObj.getMetadata();
+  const {
+    deadlineDate,
+    deliveryHour,
+    startDate,
+    endDate,
+    orderState,
+    daySession = MORNING_SESSION,
+  } = orderObj.getMetadata();
   const isOrderCanceled =
     orderState === EOrderStates.canceled ||
     orderState === EOrderStates.canceledByBooker;
@@ -146,7 +155,7 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
           subOrderId: planId,
           orderId,
           timestamp: +planItemKey,
-          daySession: getDaySessionFromDeliveryTime(deliveryHour),
+          daySession,
           status: pickFoodStatus,
           type: 'dailyMeal',
           restaurantAddress:

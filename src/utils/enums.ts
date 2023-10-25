@@ -418,3 +418,13 @@ export enum ENativeNotificationType {
   AdminTransitSubOrderToCanceled = 'AdminTransitSubOrderToCanceled',
   TransitOrderStateToCanceled = 'TransitOrderStateToCanceled',
 }
+
+export enum QuizStep {
+  NEW_ORDER = 'new',
+  PACKAGE_PER_MEMBER = 'perpack-member-amount',
+  SPECIAL_DEMAND = 'special-demand',
+  MEAL_STYLES = 'meal-styles',
+  MEAL_DATE = 'meal-date',
+  INVITE_MEMBER = 'invite-member',
+  ORDER_CREATING = 'order-creating',
+}

@@ -6,11 +6,7 @@ import {
   mealTypeAdapter,
 } from '@helpers/orderHelper';
 import { Listing, User } from '@utils/data';
-import {
-  convertWeekDay,
-  getDaySessionFromDeliveryTime,
-  VNTimezone,
-} from '@utils/dates';
+import { convertWeekDay, VNTimezone } from '@utils/dates';
 import type { EFoodApprovalState } from '@utils/enums';
 import {
   EImageVariants,
@@ -48,15 +44,14 @@ export const getMenuQuery = ({
     perPage,
   } = params;
   const {
-    deliveryHour,
     nutritions = [],
     mealType: mealFoodType = [],
     packagePerMember,
+    daySession,
   } = Listing(order as TListing).getMetadata();
   const dateTime = DateTime.fromMillis(timestamp).setZone(VNTimezone);
   const dayOfWeek = convertWeekDay(dateTime.weekday).key;
-  const deliveryDaySession = getDaySessionFromDeliveryTime(deliveryHour);
-  const mealType = deliveryDaySessionAdapter(deliveryDaySession);
+  const mealType = deliveryDaySessionAdapter(daySession);
   const convertedMealFoodType = mealFoodType.map((item: string) =>
     mealTypeAdapter(item),
   );
@@ -120,6 +115,8 @@ export const getRestaurantQuery = ({
     categories = [],
     packaging = [],
     memberAmount,
+    startDate,
+    endDate,
   } = params;
 
   const origin = User(companyAccount as TUser).getPublicData()?.location
@@ -143,6 +140,12 @@ export const getRestaurantQuery = ({
     ...(memberAmount && {
       pub_maxQuantity: `${memberAmount},`,
     }),
+    ...(startDate && {
+      pub_startStopReceiveOrderDate: `,${startDate + 1}`,
+    }),
+    ...(endDate && {
+      pub_endStopReceiveOrderDate: `${endDate},`,
+    }),
     meta_status: ERestaurantListingStatus.authorized,
     include: ['images'],
     'fields.image': [
@@ -164,15 +167,14 @@ export const getMenuQueryInSpecificDay = ({
   timestamp: number;
 }) => {
   const {
-    deliveryHour,
     nutritions = [],
     mealType: mealFoodType = [],
     packagePerMember,
+    daySession,
   } = Listing(order as TListing).getMetadata();
   const dateTime = DateTime.fromMillis(timestamp);
   const dayOfWeek = convertWeekDay(dateTime.weekday).key;
-  const deliveryDaySession = getDaySessionFromDeliveryTime(deliveryHour);
-  const mealType = deliveryDaySessionAdapter(deliveryDaySession);
+  const mealType = deliveryDaySessionAdapter(daySession);
   const convertedMealFoodType = mealFoodType.map((item: string) =>
     mealTypeAdapter(item),
   );

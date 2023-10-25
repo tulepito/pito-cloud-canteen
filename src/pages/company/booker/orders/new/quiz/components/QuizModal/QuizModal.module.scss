@@ -1,14 +1,14 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/mixins.scss' as *;
 
-.modalContainer {
+.modalContainer.modalContainer {
   padding: 36px 36px 40px;
+  flex-basis: 480px;
 }
 
 .modalTop {
   @include flexAlign(center, space-between);
   flex-direction: row-reverse;
-  margin-top: 36px;
 
   .backBtn {
     @include flexAlign(center, center);
@@ -30,13 +30,18 @@
   @include textTemplate(24px, $fontWeightBold, 32px);
   margin-top: 20px;
   text-transform: capitalize;
+  text-align: center;
 }
 
 .modalContent {
   margin-top: 32px;
-  max-height: 400px;
+  max-height: 500px;
   overflow-y: auto;
   padding-bottom: 4px;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 .modalFooter {

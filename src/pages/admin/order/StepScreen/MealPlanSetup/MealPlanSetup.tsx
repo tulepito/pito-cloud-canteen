@@ -3,6 +3,7 @@ import { memo, useCallback, useMemo } from 'react';
 import { shallowEqual } from 'react-redux';
 import isEmpty from 'lodash/isEmpty';
 
+import { MORNING_SESSION } from '@components/CalendarDashboard/helpers/constant';
 import { calculateGroupMembersAmount } from '@helpers/company';
 import { addCommas } from '@helpers/format';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
@@ -10,6 +11,7 @@ import {
   changeStep2SubmitStatus,
   orderAsyncActions,
 } from '@redux/slices/Order.slice';
+import { EOrderType } from '@src/utils/enums';
 import { Listing, User } from '@utils/data';
 import { getSelectedDaysOfWeek } from '@utils/dates';
 import type { TListing } from '@utils/types';
@@ -53,6 +55,7 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
     memberAmount,
     displayedDurationTime,
     durationTimeMode,
+    daySession,
   } = Listing(order as TListing).getMetadata();
   const { address, origin } = deliveryAddress || {};
   const companies = useAppSelector(
@@ -95,7 +98,7 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
           address: addressValue,
           origin: originValue,
         },
-        pickAllow: pickAllowSubmitValue,
+        orderType: pickAllowSubmitValue ? EOrderType.group : EOrderType.normal,
         packagePerMember: parseInt(
           packagePerMemberValue?.replace(/,/g, '') || 0,
           10,
@@ -144,7 +147,7 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
       packagePerMember: addCommas(packagePerMember?.toString()) || '',
       selectedGroups,
       nutritions: !isEmpty(nutritions) ? nutritions : [],
-      deliveryHour: deliveryHour || '07:00',
+      deliveryHour: deliveryHour || '07:00 - 07:15',
       deliveryAddress:
         location || deliveryAddress
           ? {
@@ -163,6 +166,7 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
       memberAmount: allMembersAmount,
       durationTimeMode: durationTimeMode || 'week',
       displayedDurationTime: displayedDurationTime || 1,
+      daySession: daySession || MORNING_SESSION,
     }),
     [
       JSON.stringify(dayInWeek),

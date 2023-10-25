@@ -1,0 +1,60 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.emailWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 30px;
+  .emailField {
+    width: 100%;
+  }
+  .addButton {
+    border-radius: 5px;
+    border: 2px solid $neutralGray6;
+  }
+}
+.fieldMember {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  column-gap: 35px;
+  row-gap: 24px;
+}
+
+.tipWrapper {
+  @include flexAlign(normal);
+  gap: 8px;
+  background-color: $labelBlue1;
+  padding: 12px 8px;
+  border-radius: 8px;
+  margin-top: 12px;
+
+  .tipContentWrapper {
+    color: $labelBlue2;
+
+    .title {
+      text-transform: uppercase;
+      @include textTemplate(16px, $fontWeightSemiBold, 24px);
+    }
+
+    .content {
+      @include textTemplate(14px, $fontWeightRegular, 20px);
+    }
+  }
+}
+
+.noteTip {
+  margin-top: 12px;
+  color: $neutralGray5;
+  @include textTemplate(10px, $fontWeightRegular, 20px);
+}
+
+.openMemberModalBtn {
+  @include textTemplate(14px, $fontWeightRegular, 20px);
+  text-align: right;
+  margin-top: 12px;
+  color: $neutralGray5;
+  cursor: pointer;
+}

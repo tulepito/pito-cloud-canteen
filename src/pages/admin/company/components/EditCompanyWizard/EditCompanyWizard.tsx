@@ -27,8 +27,8 @@ import {
   companyThunks,
 } from '@redux/slices/company.slice';
 import {
+  companyMemberActions,
   companyMemberThunks,
-  resetError,
 } from '@redux/slices/companyMember.slice';
 import { adminRoutes } from '@src/paths';
 import { User } from '@utils/data';
@@ -613,7 +613,7 @@ const EditCompanyWizard = () => {
   };
 
   const resetCompanyMemberSliceError = () => {
-    dispatch(resetError());
+    dispatch(companyMemberActions.resetError());
   };
 
   const resetTransferError = () => {

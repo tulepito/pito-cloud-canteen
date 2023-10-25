@@ -6,7 +6,7 @@
 .root {
   @include inputContainerStyles;
   @include viewportLarge {
-    width: 310px;
+    width: 100%;
   }
 
   & :global(.react-datepicker-popper) {
@@ -65,7 +65,8 @@
 
   & :global(.react-datepicker__day--selected),
   & :global(.react-datepicker__day--keyboard-selected) {
-    background-color: $labelDarkBlue;
+    background-color: $neutralGray1;
+    color: $neutralGray6;
     border-radius: 16px;
   }
 
@@ -132,6 +133,10 @@
     background: $labelBlue1;
     color: $neutralGray7;
     border-radius: 0;
+  }
+
+  & :global(.react-datepicker__day--outside-month) {
+    visibility: hidden;
   }
 
   .fieldsWrapper {

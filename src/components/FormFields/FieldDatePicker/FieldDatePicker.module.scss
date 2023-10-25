@@ -16,6 +16,12 @@
     border: none;
   }
 
+  &.hideBoxShadow {
+    & :global(.react-datepicker) {
+      box-shadow: none;
+    }
+  }
+
   & :global(.react-datepicker__triangle) {
     display: none;
 

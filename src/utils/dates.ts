@@ -14,6 +14,7 @@ import {
 
 import { getUniqueString } from './data';
 import { EDayOfWeek, EMenuMealType } from './enums';
+import type { TKeyValue } from './types';
 
 export const VNTimezone = 'Asia/Ho_Chi_Minh';
 
@@ -521,7 +522,7 @@ export const calcPastTime = (timestamp: number) => {
   return 'Vừa xong';
 };
 export const getDayOfWeek = (timestamp: number) => {
-  return DateTime.fromMillis(timestamp).weekday;
+  return DateTime.fromMillis(timestamp).setZone(VNTimezone).weekday;
 };
 
 export const getNextMonth = (date: Date) => {
@@ -598,4 +599,77 @@ export const renderListTimeOptions = ({
   return result;
 };
 
+export const generateTimeRangeItems = ({
+  startTime = '06:30',
+  endTime = '23:00',
+  interval = 1,
+}: {
+  startTime?: string;
+  endTime?: string;
+  interval?: number;
+}): TKeyValue[] => {
+  const timeRangeItems: TKeyValue[] = [];
+
+  // Convert start and end times to Date objects for easier manipulation
+  const startDate = new Date(`2023-01-01T${startTime}`);
+  const endDate = new Date(`2023-01-01T${endTime}`);
+
+  // Calculate the time interval in minutes
+  const intervalInMinutes = interval * 15; // Assuming interval is in 15-minute increments
+
+  // Iterate through the time range and generate items
+  while (startDate < endDate) {
+    const itemStartTime = `${startDate
+      .getHours()
+      .toString()
+      .padStart(2, '0')}:${startDate.getMinutes().toString().padStart(2, '0')}`;
+
+    startDate.setMinutes(startDate.getMinutes() + intervalInMinutes);
+
+    const itemEndTime = `${startDate
+      .getHours()
+      .toString()
+      .padStart(2, '0')}:${startDate.getMinutes().toString().padStart(2, '0')}`;
+
+    timeRangeItems.push({
+      key: `${itemStartTime}-${itemEndTime}`,
+      label: `${itemStartTime} - ${itemEndTime}`,
+    });
+  }
+
+  return timeRangeItems;
+};
+
 export const TimeOptions = renderListTimeOptions({});
+export const TimeRangeItems = generateTimeRangeItems({});
+
+export const getNextWeek = (date: Date) => {
+  return DateTime.fromJSDate(date)
+    .plus({ weeks: 1 })
+    .startOf('week')
+    .startOf('day')
+    .toJSDate();
+};
+
+export const generateWeekDayList = (startDate: number, endDate: number) => {
+  const weekdays = [];
+
+  // Convert the timestamps to Luxon DateTime objects
+  const startDateDT = DateTime.fromMillis(startDate).setZone(VNTimezone);
+  const endDateDT = DateTime.fromMillis(endDate).setZone(VNTimezone);
+
+  // Start at the beginning of the start date
+  let currentDay = startDateDT.startOf('day');
+
+  while (currentDay <= endDateDT) {
+    // Check if the current day is a weekday (Monday: 1, Friday: 5)
+    if (currentDay.weekday >= 1 && currentDay.weekday <= 5) {
+      weekdays.push(currentDay.weekday);
+    }
+
+    // Move to the next day
+    currentDay = currentDay.plus({ days: 1 });
+  }
+
+  return weekdays;
+};

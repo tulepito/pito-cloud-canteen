@@ -4,6 +4,7 @@ import { useIntl } from 'react-intl';
 
 import Form from '@components/Form/Form';
 import { useAppSelector } from '@hooks/reduxHooks';
+import DaySessionField from '@pages/company/booker/orders/new/quiz/meal-date/DaySessionField/DaySessionField';
 import { User } from '@utils/data';
 import type { TUser } from '@utils/types';
 
@@ -97,6 +98,12 @@ const MealPlanSetupFormComponent: React.FC<TMealPlanSetupFormComponentProps> = (
           form={form}
           values={values}
           title={intl.formatMessage({ id: 'MealPlanDateField.title' })}
+        />
+        <DaySessionField
+          form={form}
+          values={values}
+          containerClassName={css.fieldSection}
+          titleClassName={css.fieldTitle}
         />
         <div className={css.verticalSpace}>
           <DayInWeekField

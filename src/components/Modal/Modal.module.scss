@@ -120,6 +120,7 @@
   justify-content: space-between;
   padding-top: 20px;
   margin-bottom: 8px;
+  flex-direction: row-reverse;
 }
 .title {
   font-weight: $fontWeightBold;

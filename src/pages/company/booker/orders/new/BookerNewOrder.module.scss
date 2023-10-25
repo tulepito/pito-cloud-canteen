@@ -5,9 +5,25 @@
 .root {
 }
 
+.title {
+  text-align: center;
+  @include textTemplate(24px, $fontWeightBold, 32px);
+}
+
+.formContainer {
+  margin-top: 32px;
+}
+
 .openModal .modalContainer {
-  max-width: 700px;
-  flex-basis: 700px;
+  flex-basis: 480px;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  &.largeContainer {
+    flex-basis: 900px;
+  }
 }
 
 .openModal .modalScrollLayer {
@@ -20,12 +36,18 @@
 
 .modalContent {
   width: calc(100% - 48px);
+  // max-height: 500px;
+  // overflow-y: auto;
   margin: auto;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 
   @include viewportMedium {
     padding: 25px 0 0;
     width: 100%;
-    max-width: 400px;
+    max-width: 468px;
   }
 }
 
@@ -50,4 +72,8 @@
   width: 100%;
   color: $neutralGray7;
   @include textTemplate(16px, 700, 24px);
+}
+
+.fieldContainer {
+  margin: 24px auto 0;
 }

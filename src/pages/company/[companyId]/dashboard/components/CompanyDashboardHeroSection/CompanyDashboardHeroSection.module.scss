@@ -71,6 +71,7 @@
         flex-shrink: 0;
         width: 320px;
         height: 224px;
+        cursor: pointer;
 
         @include viewportMedium {
           width: 200px;

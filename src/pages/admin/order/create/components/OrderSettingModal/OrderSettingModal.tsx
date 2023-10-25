@@ -19,7 +19,6 @@ import { addCommas } from '@helpers/format';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
 import { Listing } from '@utils/data';
-import { getDaySessionFromDeliveryTime } from '@utils/dates';
 import type { TListing } from '@utils/types';
 
 import DeliveryAddressField from '../DeliveryAddressField/DeliveryAddressField';
@@ -330,8 +329,6 @@ const OrderSettingModal: React.FC<TOrderSettingModalProps> = (props) => {
         startDate !== startDateValue ||
         endDate !== endDateValue ||
         difference(nutritions, nutritionsValue).length > 0 ||
-        getDaySessionFromDeliveryTime(deliveryHour) !==
-          getDaySessionFromDeliveryTime(deliveryHourValue) ||
         packagePerMember !==
           parseInt(packagePerMemberValue?.replace(/,/g, '') || 0, 10);
       const { payload: newOrderDetail } = await dispatch(

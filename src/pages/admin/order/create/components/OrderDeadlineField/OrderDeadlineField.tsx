@@ -141,7 +141,7 @@ const OrderDeadlineField: React.FC<TOrderDeadlineFieldProps> = (props) => {
     return (
       isAdminFlow && isDeliveryDateSameWithStartDate
         ? renderListTimeOptions({
-            endTime: deliveryHour.toString(),
+            endTime: deliveryHour.split('-')[0],
           })
         : TimeOptions
     ).map((option) => ({

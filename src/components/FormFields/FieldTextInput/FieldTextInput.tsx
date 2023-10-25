@@ -114,9 +114,9 @@ export const FieldTextInputComponent: React.FC<InputComponentProps> = (
     }
   };
 
-  const onInputBlur = () => {
+  const onInputBlur = (event: any) => {
     if (customOnBlur) {
-      customOnBlur();
+      customOnBlur(event);
     }
 
     input.onBlur();

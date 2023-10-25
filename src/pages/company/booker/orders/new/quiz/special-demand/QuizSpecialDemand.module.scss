@@ -10,3 +10,25 @@
 .loading {
   text-align: center;
 }
+
+.headerContainer {
+  @include flexAlign(center, center);
+  flex-direction: column;
+
+  .main {
+    @include textTemplate(24px, $fontWeightBold, 32px);
+    margin-top: 20px;
+    text-transform: capitalize;
+  }
+
+  .semi {
+    @include textTemplate(14px, $fontWeightRegular, 20px);
+    margin-top: 8px;
+    color: $neutralGray5;
+    text-transform: lowercase;
+
+    &::first-letter {
+      text-transform: uppercase;
+    }
+  }
+}

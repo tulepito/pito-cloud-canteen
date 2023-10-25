@@ -364,6 +364,5 @@ export const companyMemberSlice = createSlice({
       }));
   },
 });
-export const { resetCheckedEmailInputChunk, resetError } =
-  companyMemberSlice.actions;
+export const companyMemberActions = companyMemberSlice.actions;
 export default companyMemberSlice.reducer;

@@ -40,7 +40,7 @@ export const normalizeOrderDetail = ({
   orderId,
   planId,
   planOrderDetail,
-  deliveryHour = '6:30',
+  deliveryHour = '06:30 - 06:45',
   isGroupOrder = true,
 }: {
   orderId: string;
@@ -62,7 +62,7 @@ export const normalizeOrderDetail = ({
       const bookingEnd = startDate.plus({ days: 1 }).toJSDate();
       const bookingDisplayStart = startDate
         .plus({
-          ...convertHHmmStringToTimeParts(deliveryHour),
+          ...convertHHmmStringToTimeParts(deliveryHour.split(' - ')[0]),
         })
         .toJSDate();
       const bookingDisplayEnd = bookingEnd;
