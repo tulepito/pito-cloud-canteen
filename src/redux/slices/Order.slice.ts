@@ -181,6 +181,7 @@ const initialState: TOrderInitialState = {
   orderDetail: {},
   draftEditOrderData: {
     generalInfo: {},
+    orderDetail: {},
   },
   justDeletedMemberOrder: false,
   createOrderInProcess: false,
@@ -979,7 +980,11 @@ const fetchOrderRestaurants = createAsyncThunk(
       : orderDetail;
 
     const restaurantIdList = uniq(
-      Object.values(suitableOrderDetail).map((item: any) => item.restaurant.id),
+      compact(
+        Object.values(suitableOrderDetail).map(
+          (item: any) => item?.restaurant?.id,
+        ),
+      ),
     );
 
     const restaurantList = await Promise.all(
