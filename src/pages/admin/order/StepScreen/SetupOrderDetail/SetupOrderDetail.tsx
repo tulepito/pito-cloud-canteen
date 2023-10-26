@@ -38,7 +38,7 @@ import {
 } from '@redux/slices/Order.slice';
 import { selectRestaurantPageThunks } from '@redux/slices/SelectRestaurantPage.slice';
 import { convertWeekDay, renderDateRange } from '@src/utils/dates';
-import { EOrderType } from '@src/utils/enums';
+import { EOrderStates, EOrderType } from '@src/utils/enums';
 import { Listing, User } from '@utils/data';
 import type { TListing, TObject } from '@utils/types';
 
@@ -143,6 +143,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
 
   const orderGetter = Listing(order as TListing);
   const {
+    orderState,
     packagePerMember = '',
     pickAllow = true,
     selectedGroups = [],
@@ -180,6 +181,21 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
   const { address: draftAddress, origin: draftOrigin } =
     draftDeliveryAddress || {};
 
+  const isPickingOrder = orderState === EOrderStates.picking;
+  const shouldHideRemoveMealIcon = isEditFlow && isPickingOrder;
+  const shouldHideAddMorePlan = isEditFlow && isPickingOrder;
+
+  const missingSelectedFood = Object.keys(orderDetail).filter(
+    (dateTime) => orderDetail[dateTime]?.restaurant?.foodList?.length === 0,
+  );
+  const draftSelectedFoodTime = Object.keys(draftEditOrderDetail!).filter(
+    (dateTime) =>
+      !isEmpty(draftEditOrderDetail?.[dateTime]?.restaurant?.foodList),
+  );
+  const draftSelectedFoodDays = draftSelectedFoodTime.map(
+    (time) => convertWeekDay(DateTime.fromMillis(Number(time)).weekday).key,
+  );
+
   const suitableStartDate = useMemo(() => {
     const temp = isEditFlow
       ? findSuitableStartDate({
@@ -206,6 +222,14 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     JSON.stringify(orderDetail),
     JSON.stringify(draftEditOrderDetail),
   ]);
+  const suitableDayInWeek = useMemo(() => {
+    if (isEditFlow) {
+      return draftDayInWeek || dayInWeek;
+    }
+
+    return dayInWeek;
+  }, [isEditFlow, JSON.stringify(dayInWeek), JSON.stringify(draftDayInWeek)]);
+
   const { address, origin } = deliveryAddress || {};
   const { lastName: clientLastName, firstName: clientFirstName } =
     User(selectedCompany).getProfile();
@@ -324,10 +348,11 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
         selectedCompany,
         draftSelectGroups || selectedGroups,
       ));
+
   const recommendParams = {
     startDate: draftStartDate || startDate,
     endDate: draftEndDate || endDate,
-    dayInWeek: draftDayInWeek || dayInWeek,
+    dayInWeek: suitableDayInWeek,
     deliveryOrigin: draftOrigin || origin,
     memberAmount: draftMemberAmount || memberAmount,
     isNormalOrder:
@@ -391,10 +416,6 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
   const inProgress =
     (updateOrderInProgress || updateOrderDetailInProgress) &&
     !onRecommendRestaurantInProgress;
-
-  const missingSelectedFood = Object.keys(orderDetail).filter(
-    (dateTime) => orderDetail[dateTime]?.restaurant?.foodList?.length === 0,
-  );
 
   const disabledSubmit =
     !isEditFlow &&
@@ -460,7 +481,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     closePickFoodModal();
   };
 
-  const onEditFoodInMealPlanCard = async (
+  const handleEditFoodInMealPlanCard = async (
     dateTime: any,
     restaurantId: string,
     menuId: string,
@@ -549,11 +570,19 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
         draftEndDate || endDate,
       );
       const newOrderDetail = totalDates.reduce((result, curr) => {
-        if (
-          selectedDates.includes(
-            convertWeekDay(DateTime.fromMillis(curr).weekday).key,
-          )
-        ) {
+        const currWeekday = convertWeekDay(
+          DateTime.fromMillis(curr).weekday,
+        ).key;
+
+        if (selectedDates.includes(currWeekday)) {
+          if (
+            isPickingOrder &&
+            isEditFlow &&
+            !draftSelectedFoodDays.includes(currWeekday)
+          ) {
+            return result;
+          }
+
           return {
             ...result,
             [curr]: { ...orderDetail[date] },
@@ -562,11 +591,12 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
 
         return result;
       }, draftEditOrderDetail || orderDetail);
-
       if (isEditFlow) {
-        saveDraftEditOrder({
-          orderDetail: newOrderDetail,
-        });
+        dispatch(
+          saveDraftEditOrder({
+            orderDetail: newOrderDetail,
+          }),
+        );
       } else {
         dispatch(setCanNotGoToStep4(true));
 
@@ -582,6 +612,9 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     [
       dispatch,
       orderId,
+      isPickingOrder,
+      isEditFlow,
+      JSON.stringify(draftSelectedFoodDays),
       JSON.stringify(orderDetail),
       JSON.stringify(draftEditOrderDetail),
       planId,
@@ -661,15 +694,17 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
                 endDate={new Date(draftEndDate || endDate)}
                 resources={{
                   ...calendarExtraResources,
-                  onEditFood: onEditFoodInMealPlanCard,
+                  onEditFood: handleEditFoodInMealPlanCard,
                   onSearchRestaurant: handleAddMorePlanClick,
                   onEditFoodInProgress,
+                  dayInWeek: suitableDayInWeek,
                   onApplyOtherDays,
-                  dayInWeek: draftDayInWeek || dayInWeek,
                   onApplyOtherDaysInProgress,
                   onRecommendRestaurantForSpecificDay,
                   onRecommendRestaurantForSpecificDayInProgress,
                   availableOrderDetailCheckList,
+                  shouldHideAddMorePlan,
+                  shouldHideRemoveMealIcon,
                 }}
                 components={{
                   contentEnd: (props) => (
