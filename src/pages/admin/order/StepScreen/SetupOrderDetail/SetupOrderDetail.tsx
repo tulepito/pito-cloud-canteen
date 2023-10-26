@@ -181,15 +181,23 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     draftDeliveryAddress || {};
 
   const suitableStartDate = useMemo(() => {
-    const temp = findSuitableStartDate({
-      selectedDate,
-      startDate: draftStartDate || startDate,
-      endDate: draftEndDate || endDate,
-      orderDetail: draftEditOrderDetail || orderDetail,
-    });
+    const temp = isEditFlow
+      ? findSuitableStartDate({
+          selectedDate,
+          startDate: draftStartDate || startDate,
+          endDate: draftEndDate || endDate,
+          orderDetail: draftEditOrderDetail || orderDetail,
+        })
+      : findSuitableStartDate({
+          selectedDate,
+          startDate,
+          endDate,
+          orderDetail,
+        });
 
     return temp instanceof Date ? temp : new Date(temp!);
   }, [
+    isEditFlow,
     selectedDate,
     draftStartDate,
     startDate,
@@ -204,15 +212,25 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
   const partnerName = `${clientLastName} ${clientFirstName}`;
   const resourcesForCalender = useMemo(
     () =>
-      normalizePlanDetailsToEvent(
-        draftEditOrderDetail || orderDetail,
-        {
-          deliveryHour: draftDeliveryHour || deliveryHour,
-          daySession: draftDaySession || daySession,
-        },
-        restaurantCoverImageList,
-      ),
+      isEditFlow
+        ? normalizePlanDetailsToEvent(
+            draftEditOrderDetail || orderDetail,
+            {
+              deliveryHour: draftDeliveryHour || deliveryHour,
+              daySession: draftDaySession || daySession,
+            },
+            restaurantCoverImageList,
+          )
+        : normalizePlanDetailsToEvent(
+            orderDetail,
+            {
+              deliveryHour,
+              daySession,
+            },
+            restaurantCoverImageList,
+          ),
     [
+      isEditFlow,
       deliveryHour,
       draftDeliveryHour,
       daySession,
