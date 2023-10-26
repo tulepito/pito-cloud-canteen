@@ -1230,6 +1230,12 @@ const orderSlice = createSlice({
           : {}),
       };
     },
+    clearDraftEditOrder: (state) => {
+      state.draftEditOrderData = {
+        ...state.draftEditOrderData,
+        generalInfo: {},
+      };
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -1645,6 +1651,7 @@ export const {
   setCanNotGoToStep4,
   setOnRecommendRestaurantInProcess,
   saveDraftEditOrder,
+  clearDraftEditOrder,
 } = orderSlice.actions;
 
 export default orderSlice.reducer;

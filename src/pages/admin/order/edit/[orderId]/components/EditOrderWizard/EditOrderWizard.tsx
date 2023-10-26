@@ -14,7 +14,11 @@ import ManageFood from '@pages/admin/order/StepScreen/ManageFood/ManageFood';
 import ReviewOrder from '@pages/admin/order/StepScreen/ReviewOrder/ReviewOrder';
 import ServiceFeesAndNotes from '@pages/admin/order/StepScreen/ServiceFeesAndNotes/ServiceFeesAndNotes';
 import SetupOrderDetail from '@pages/admin/order/StepScreen/SetupOrderDetail/SetupOrderDetail';
-import { orderAsyncActions, resetOrder } from '@redux/slices/Order.slice';
+import {
+  orderAsyncActions,
+  resetOrder,
+  saveDraftEditOrder,
+} from '@redux/slices/Order.slice';
 import { adminPaths } from '@src/paths';
 import { Listing } from '@src/utils/data';
 import { EOrderType } from '@src/utils/enums';
@@ -119,6 +123,9 @@ const EditOrderWizard = () => {
   );
   const order = useAppSelector((state) => state.Order.order);
   const orderDetail = useAppSelector((state) => state.Order.orderDetail);
+  const draftEditOrderDetail = useAppSelector(
+    (state) => state.Order.draftEditOrderData.orderDetail,
+  );
   const [currentStep, setCurrentStep] = useState<string>(
     EEditOrderTab.clientView,
   );
@@ -184,7 +191,11 @@ const EditOrderWizard = () => {
     if (!fetchOrderInProgress) {
       dispatch(orderAsyncActions.fetchOrderRestaurants({ isEditFlow: true }));
     }
-  }, [fetchOrderInProgress]);
+  }, [
+    fetchOrderInProgress,
+    JSON.stringify(orderDetail),
+    JSON.stringify(draftEditOrderDetail),
+  ]);
 
   useEffect(() => {
     if (orderId) {
@@ -200,12 +211,15 @@ const EditOrderWizard = () => {
     if (isEmpty(orderDetail) && !justDeletedMemberOrder && !isEmpty(plans)) {
       dispatch(orderAsyncActions.fetchOrderDetail(plans));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     JSON.stringify(order),
     JSON.stringify(orderDetail),
     JSON.stringify(plans),
   ]);
+
+  useEffect(() => {
+    dispatch(saveDraftEditOrder({ orderDetail }));
+  }, [JSON.stringify(orderDetail)]);
 
   return (
     <FormWizard formTabNavClassName={css.formTabNav}>

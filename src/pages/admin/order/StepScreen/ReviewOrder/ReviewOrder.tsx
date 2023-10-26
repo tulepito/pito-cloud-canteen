@@ -1,8 +1,9 @@
 /* eslint-disable import/no-cycle */
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Form as FinalForm } from 'react-final-form';
 import { useField, useForm } from 'react-final-form-hooks';
+import { OnChange } from 'react-final-form-listeners';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import classNames from 'classnames';
@@ -32,6 +33,7 @@ import useBoolean from '@hooks/useBoolean';
 import { AdminManageOrderThunks } from '@pages/admin/order/AdminManageOrder.slice';
 import {
   changeStep4SubmitStatus,
+  clearDraftEditOrder,
   orderAsyncActions,
   saveDraftEditOrder,
 } from '@redux/slices/Order.slice';
@@ -452,7 +454,7 @@ const parseDataToReviewTab = (values: any) => {
       .map((key: any) => {
         const { restaurant } = orderDetail[key] || {};
 
-        if (isEmpty(restaurant) || isEmpty(restaurant?.foodList)) {
+        if (isEmpty(restaurant)) {
           return null;
         }
 
@@ -475,9 +477,11 @@ type TReviewOrder = {
 };
 
 const ReviewOrder: React.FC<TReviewOrder> = (props) => {
+  const { tab, goBack, flowType } = props;
   const dispatch = useAppDispatch();
   const intl = useIntl();
   const router = useRouter();
+  const formSubmitRef = useRef<any>();
 
   const orderDetail = useAppSelector(
     (state) => state.Order.orderDetail,
@@ -502,7 +506,6 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
   const updateOrderStateInProgress = useAppSelector(
     (state) => state.AdminManageOrder.updateOrderStateInProgress,
   );
-
   const submitInProgress =
     updateOrderInProgress ||
     updateOrderDetailInProgress ||
@@ -527,18 +530,60 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
   const planId = plans.length > 0 ? plans[0] : undefined;
   const { address } = deliveryAddress || {};
 
+  const validFields =
+    (!isEmpty(staffName) || !isEmpty(draftEditOrderData?.staffName)) &&
+    (!isEmpty(shipperName) || !isEmpty(draftEditOrderData?.shipperName));
+  const missingDraftGeneralInfo = isEmpty(draftEditOrderData);
+  const isDraftOrderDetailNotChanged = isEqual(
+    draftEditOrderDetail,
+    orderDetail,
+  );
+
+  const missingSelectedFood =
+    isEmpty(orderDetail) ||
+    Object.keys(orderDetail).filter((dateTime) => {
+      const { restaurant } = orderDetail?.[dateTime] || {};
+
+      return restaurant?.id && restaurant?.foodList?.length === 0;
+    })?.length > 0;
+  const missingDraftSelectedFood =
+    !missingDraftGeneralInfo && !isDraftOrderDetailNotChanged
+      ? Object.keys(draftEditOrderDetail!).filter((dateTime) => {
+          const { restaurant } = draftEditOrderDetail?.[dateTime] || {};
+
+          return restaurant?.id && restaurant?.foodList?.length === 0;
+        })?.length > 0
+      : missingSelectedFood;
+
+  const submitDisabled =
+    !validFields ||
+    (isEditFlow
+      ? isDraftOrderDetailNotChanged
+        ? missingDraftGeneralInfo || missingSelectedFood
+        : missingDraftSelectedFood
+      : missingSelectedFood);
+
   const { renderedOrderDetail } =
     useMemo(() => {
       return {
-        renderedOrderDetail: parseDataToReviewTab({
-          orderDetail: draftEditOrderDetail || orderDetail,
-          deliveryHour: draftEditOrderData?.deliveryHour || deliveryHour,
-          deliveryAddress:
-            draftEditOrderData?.deliveryAddress || deliveryAddress,
-          notes: draftEditOrderData?.notes || notes,
-        }),
+        renderedOrderDetail: isEditFlow
+          ? parseDataToReviewTab({
+              orderDetail: draftEditOrderDetail || orderDetail,
+              deliveryHour: draftEditOrderData?.deliveryHour || deliveryHour,
+              deliveryAddress:
+                draftEditOrderData?.deliveryAddress || deliveryAddress,
+
+              notes: draftEditOrderData?.notes || notes,
+            })
+          : parseDataToReviewTab({
+              orderDetail,
+              deliveryHour,
+              deliveryAddress,
+              notes,
+            }),
       };
     }, [
+      isEditFlow,
       deliveryAddress,
       deliveryHour,
       JSON.stringify(draftEditOrderData),
@@ -550,10 +595,13 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
     router.push(adminPaths.ManageOrders);
   };
 
-  const onSubmit = async (values: any) => {
-    const { staffName: staffNameValue, shipperName: shipperNameValue } = values;
-    if (isEditFlow) {
-      if (planId && orderId) {
+  const handleCreateFlowSubmitClick = async () => {
+    await formSubmitRef?.current();
+  };
+
+  const handleEditFlowSubmit = async () => {
+    if (planId && orderId) {
+      if (!isDraftOrderDetailNotChanged) {
         await dispatch(
           orderAsyncActions.updatePlanDetail({
             orderId,
@@ -562,26 +610,24 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
           }),
         );
 
+        dispatch(orderAsyncActions.fetchOrderDetail([planId]));
+      }
+      if (!missingDraftGeneralInfo) {
         await dispatch(
           orderAsyncActions.updateOrder({
-            generalInfo: {
-              ...draftEditOrderData,
-              staffName: staffNameValue,
-              shipperName: shipperNameValue,
-            },
+            generalInfo: draftEditOrderData,
           }),
         );
+        dispatch(clearDraftEditOrder());
 
-        await dispatch(
-          saveDraftEditOrder({
-            generalInfo: {
-              staffName: staffNameValue,
-              shipperName: shipperNameValue,
-            },
-          }),
-        );
+        dispatch(orderAsyncActions.fetchOrder(orderId));
       }
-    } else {
+    }
+  };
+
+  const onSubmit = async (values: any) => {
+    const { staffName: staffNameValue, shipperName: shipperNameValue } = values;
+    if (!isEditFlow) {
       dispatch(changeStep4SubmitStatus(true));
 
       if (orderState === EOrderDraftStates.draft) {
@@ -613,10 +659,29 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
 
   const initialValues = useMemo(() => {
     return {
-      staffName,
-      shipperName,
+      staffName: draftEditOrderData.staffName || staffName,
+      shipperName: draftEditOrderData.shipperName || shipperName,
     };
-  }, [staffName, shipperName]);
+  }, [staffName, shipperName, JSON.stringify(draftEditOrderData)]);
+
+  const handleFieldShipperNameChange = (shipperNameValue: string) => {
+    dispatch(
+      saveDraftEditOrder({
+        generalInfo: {
+          shipperName: shipperNameValue,
+        },
+      }),
+    );
+  };
+  const handleFieldStaffNameChange = (staffNameValue: string) => {
+    dispatch(
+      saveDraftEditOrder({
+        generalInfo: {
+          staffName: staffNameValue,
+        },
+      }),
+    );
+  };
 
   useEffect(() => {
     if (isEmpty(orderDetail) && !isEmpty(plans)) {
@@ -627,21 +692,6 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
     JSON.stringify(orderDetail),
     JSON.stringify(plans),
   ]);
-
-  const missingSelectedFood =
-    isEmpty(orderDetail) ||
-    Object.keys(orderDetail).filter(
-      (dateTime) => orderDetail[dateTime]?.restaurant?.foodList?.length === 0,
-    )?.length === 0;
-  const missingDraftSelectedFood =
-    !isEmpty(draftEditOrderDetail) &&
-    !isEqual(draftEditOrderDetail, orderDetail)
-      ? Object.keys(draftEditOrderDetail).filter(
-          (dateTime) =>
-            draftEditOrderDetail?.[dateTime]?.restaurant?.foodList?.length ===
-            0,
-        )?.length === 0
-      : missingSelectedFood;
 
   return (
     <div className={css.root}>
@@ -654,16 +704,17 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
         initialValues={initialValues}
         onSubmit={onSubmit}
         render={(fieldRenderProps: any) => {
-          const { tab, handleSubmit, goBack, flowType, invalid } =
-            fieldRenderProps;
+          const { handleSubmit } = fieldRenderProps;
 
-          const submitDisabled =
-            invalid ||
-            (isEditFlow && missingDraftSelectedFood) ||
-            missingSelectedFood;
+          formSubmitRef.current = handleSubmit;
 
           return (
             <Form onSubmit={handleSubmit}>
+              <OnChange name="staffName">{handleFieldStaffNameChange}</OnChange>
+              <OnChange name="shipperName">
+                {handleFieldShipperNameChange}
+              </OnChange>
+
               <Collapsible
                 label={intl.formatMessage({ id: 'ReviewOrder.generalInfo' })}>
                 <div className={css.contentBox}>
@@ -720,21 +771,26 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
                 </div>
               </Collapsible>
               <Tabs items={renderedOrderDetail as any} showNavigation />
-              <NavigateButtons
-                flowType={flowType}
-                currentTab={tab}
-                onCompleteClick={handleSubmit}
-                onNextClick={handleGoBackToManageOrderPage}
-                goBack={goBack}
-                submitDisabled={submitDisabled}
-                inProgress={submitInProgress}
-              />
+
               {createOrderError && (
                 <div className={css.error}>{createOrderError}</div>
               )}
             </Form>
           );
         }}
+      />
+      <NavigateButtons
+        flowType={flowType}
+        currentTab={tab}
+        onCompleteClick={isEditFlow ? handleEditFlowSubmit : undefined}
+        onNextClick={
+          isEditFlow
+            ? handleGoBackToManageOrderPage
+            : handleCreateFlowSubmitClick
+        }
+        goBack={goBack}
+        submitDisabled={submitDisabled}
+        inProgress={submitInProgress}
       />
       <ConfirmationModal
         id="SuccessOrderModal"
