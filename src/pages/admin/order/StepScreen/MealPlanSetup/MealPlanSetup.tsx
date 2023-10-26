@@ -33,6 +33,7 @@ type MealPlanSetupProps = {
   nextTab: () => void;
   nextToReviewTab?: () => void;
   flowType?: EFlowType;
+  shouldDisableFields?: boolean;
 };
 const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
   const {
@@ -40,6 +41,7 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
     nextTab,
     nextToReviewTab,
     goBack,
+    shouldDisableFields = false,
   } = props;
   const [draftEditValues, setDraftEditValues] = useState({});
   const formSubmitRef = useRef<any>();
@@ -392,6 +394,7 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
         onCompleteClick={handleNextToReviewTabInEditMode}
         setDraftEditValues={setDraftEditValues}
         formSubmitRef={formSubmitRef}
+        shouldDisableFields={shouldDisableFields}
       />
       <NavigateButtons
         flowType={flowType}

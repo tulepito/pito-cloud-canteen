@@ -21,7 +21,7 @@ import {
 } from '@redux/slices/Order.slice';
 import { adminPaths } from '@src/paths';
 import { Listing } from '@src/utils/data';
-import { EOrderType } from '@src/utils/enums';
+import { EOrderStates, EOrderType } from '@src/utils/enums';
 
 import MealPlanSetup from '../../../../StepScreen/MealPlanSetup/MealPlanSetup';
 
@@ -55,7 +55,7 @@ const EDIT_NORMAL_ORDER_TABS = [
 
 const EditOrderTab: React.FC<any> = (props) => {
   // eslint-disable-next-line unused-imports/no-unused-vars
-  const { tab, goBack, nextTab, nextToReviewTab } = props;
+  const { tab, shouldDisableFields, goBack, nextTab, nextToReviewTab } = props;
 
   switch (tab) {
     case EEditOrderTab.clientView:
@@ -63,6 +63,7 @@ const EditOrderTab: React.FC<any> = (props) => {
     case EEditOrderTab.orderSetup:
       return (
         <MealPlanSetup
+          shouldDisableFields={shouldDisableFields}
           flowType={EFlowType.edit}
           nextTab={nextTab}
           nextToReviewTab={nextToReviewTab}
@@ -115,6 +116,12 @@ const EditOrderWizard = () => {
   const fetchOrderInProgress = useAppSelector(
     (state) => state.Order.fetchOrderInProgress,
   );
+  const updateOrderDetailInProgress = useAppSelector(
+    (state) => state.Order.updateOrderDetailInProgress,
+  );
+  const updateOrderInProgress = useAppSelector(
+    (state) => state.Order.updateOrderInProgress,
+  );
   const fetchOrderError = useAppSelector(
     (state) => state.Order.fetchOrderError,
   );
@@ -130,12 +137,18 @@ const EditOrderWizard = () => {
     EEditOrderTab.clientView,
   );
 
+  const anyFetchOrUpdatesInProgress =
+    fetchOrderInProgress ||
+    updateOrderInProgress ||
+    updateOrderDetailInProgress;
+
   const {
     orderState,
     orderType = EOrderType.group,
     plans = [],
   } = Listing(order).getMetadata();
   const isGroupOrder = orderType === EOrderType.group;
+  const isPickingOrder = orderState === EOrderStates.picking;
   const isInvalidOrderStateToEdit =
     !ORDER_STATES_TO_ENABLE_EDIT_ABILITY.includes(orderState);
   const suitableTabList = isGroupOrder
@@ -224,11 +237,16 @@ const EditOrderWizard = () => {
   return (
     <FormWizard formTabNavClassName={css.formTabNav}>
       {suitableTabList.map((tab: string) => {
+        const shouldDisableFields =
+          tab === EEditOrderTab.orderSetup && isPickingOrder;
+
         return (
           <EditOrderTab
             key={tab}
             tab={tab}
             tabId={tab}
+            disabled={anyFetchOrUpdatesInProgress}
+            shouldDisableFields={shouldDisableFields}
             selected={currentStep === tab}
             tabLabel={intl.formatMessage({
               id: `EditOrderWizard.${tab}Label`,

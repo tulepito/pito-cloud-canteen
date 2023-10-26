@@ -24,7 +24,7 @@ import type { TListing, TObject } from '@utils/types';
 
 export const ORDER_STATES_TO_ENABLE_EDIT_ABILITY = [
   EOrderDraftStates.pendingApproval,
-  // EOrderStates.picking,
+  EOrderStates.picking,
   // EOrderStates.inProgress,
 ];
 

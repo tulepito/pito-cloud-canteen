@@ -38,6 +38,7 @@ type TExtraProps = {
   flowType: EFlowType;
   formSubmitRef: any;
   setDraftEditValues: (value: any) => void;
+  shouldDisableFields: boolean;
 };
 type TMealPlanSetupFormComponentProps =
   FormRenderProps<TMealPlanSetupFormValues> & Partial<TExtraProps>;
@@ -58,6 +59,7 @@ const MealPlanSetupFormComponent: React.FC<TMealPlanSetupFormComponentProps> = (
     flowType,
     setDraftEditValues,
     formSubmitRef,
+    shouldDisableFields = false,
   } = props;
   const intl = useIntl();
 
@@ -116,20 +118,24 @@ const MealPlanSetupFormComponent: React.FC<TMealPlanSetupFormComponentProps> = (
       <div className={css.fieldSection}>
         <DeliveryAddressField
           title={intl.formatMessage({ id: 'DeliveryAddressField.title' })}
+          disabled={shouldDisableFields}
         />
       </div>
       <div className={css.fieldSection}>
         <PerPackageField
           title={intl.formatMessage({ id: 'PerPackageField.title' })}
+          disabled={shouldDisableFields}
         />
         <div className={css.verticalSpace}>
           <MemberAmountField
             title={intl.formatMessage({ id: 'MemberAmountField.title' })}
+            disabled={shouldDisableFields}
           />
         </div>
       </div>
       <div className={css.fieldSection}>
         <NutritionField
+          disabled={shouldDisableFields}
           title={intl.formatMessage({ id: 'NutritionField.title' })}
           options={nutritionsOptions}
         />
@@ -137,11 +143,13 @@ const MealPlanSetupFormComponent: React.FC<TMealPlanSetupFormComponentProps> = (
       <div className={css.fieldSection}>
         <MealPlanDateField
           form={form}
+          disabled={shouldDisableFields}
           values={values}
           title={intl.formatMessage({ id: 'MealPlanDateField.title' })}
         />
         <DaySessionField
           form={form}
+          disabled={shouldDisableFields}
           values={values}
           containerClassName={css.fieldSection}
           titleClassName={css.fieldTitle}
@@ -149,6 +157,7 @@ const MealPlanSetupFormComponent: React.FC<TMealPlanSetupFormComponentProps> = (
         <div className={css.verticalSpace}>
           <DayInWeekField
             form={form}
+            disabled={shouldDisableFields}
             values={values}
             title={intl.formatMessage({ id: 'DayInWeekField.label' })}
           />
@@ -157,6 +166,7 @@ const MealPlanSetupFormComponent: React.FC<TMealPlanSetupFormComponentProps> = (
         <div className={css.verticalSpace}>
           <DurationForNextOrderField
             form={form}
+            disabled={shouldDisableFields}
             displayedDurationTimeValue={values.displayedDurationTime}
             title={intl.formatMessage({
               id: 'DurationForNextOrderField.label',
@@ -166,7 +176,7 @@ const MealPlanSetupFormComponent: React.FC<TMealPlanSetupFormComponentProps> = (
       </div>
 
       <div className={css.fieldSection}>
-        <FoodPickingField />
+        <FoodPickingField disabled={shouldDisableFields} />
         {pickAllowValue && (
           <div className={css.verticalSpace}>
             <OrderDeadlineField
@@ -175,6 +185,7 @@ const MealPlanSetupFormComponent: React.FC<TMealPlanSetupFormComponentProps> = (
               })}
               form={form}
               values={values}
+              disabled={shouldDisableFields}
             />
           </div>
         )}
@@ -182,6 +193,7 @@ const MealPlanSetupFormComponent: React.FC<TMealPlanSetupFormComponentProps> = (
           <div className={css.verticalSpace}>
             <ParticipantSetupField
               form={form}
+              disabled={shouldDisableFields}
               clientId={clientId!}
               title={intl.formatMessage({
                 id: 'ParticipantSetupField.title',
