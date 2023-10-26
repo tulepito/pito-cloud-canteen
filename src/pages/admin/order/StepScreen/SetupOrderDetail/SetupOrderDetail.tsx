@@ -564,9 +564,11 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
       }, draftEditOrderDetail || orderDetail);
 
       if (isEditFlow) {
-        saveDraftEditOrder({
-          orderDetail: newOrderDetail,
-        });
+        dispatch(
+          saveDraftEditOrder({
+            orderDetail: newOrderDetail,
+          }),
+        );
       } else {
         dispatch(setCanNotGoToStep4(true));
 
