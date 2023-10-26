@@ -13,9 +13,10 @@ type ParticipantSetupFieldProps = {
   form: any;
   clientId: string;
   title?: string;
+  isEditFlow?: boolean;
 };
 const ParticipantSetupField: React.FC<ParticipantSetupFieldProps> = (props) => {
-  const { clientId, title, form } = props;
+  const { clientId, title, form, isEditFlow } = props;
   const companies = useAppSelector(
     (state) => state.company.companyRefs,
     shallowEqual,
@@ -33,6 +34,7 @@ const ParticipantSetupField: React.FC<ParticipantSetupFieldProps> = (props) => {
       name="selectedGroups"
       value={group.id}
       label={group.name}
+      disabled={isEditFlow}
     />
   ));
   const intl = useIntl();
@@ -65,6 +67,7 @@ const ParticipantSetupField: React.FC<ParticipantSetupFieldProps> = (props) => {
           name="selectedGroups"
           value="allMembers"
           label={intl.formatMessage({ id: 'ParticipantSetupField.allMembers' })}
+          disabled={isEditFlow}
         />
         {groupOptionsRenderer}
       </div>

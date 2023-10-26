@@ -1,16 +1,18 @@
 /* eslint-disable import/no-cycle */
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
 
 import Form from '@components/Form/Form';
-import { useAppSelector } from '@hooks/reduxHooks';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import DaySessionField from '@pages/company/booker/orders/new/quiz/meal-date/DaySessionField/DaySessionField';
+import { saveDraftEditOrder } from '@redux/slices/Order.slice';
 import { getSelectedDaysOfWeek } from '@src/utils/dates';
 import { EOrderType } from '@src/utils/enums';
-import { User } from '@utils/data';
-import type { TUser } from '@utils/types';
+import { Listing, User } from '@utils/data';
+import type { TObject, TUser } from '@utils/types';
 
 import DayInWeekField from '../DayInWeekField/DayInWeekField';
 import DeliveryAddressField from '../DeliveryAddressField/DeliveryAddressField';
@@ -37,6 +39,7 @@ type TExtraProps = {
     key: string;
   }[];
   flowType: EFlowType;
+  isOrderInProgress?: boolean;
   onGoBack?: () => void;
   onNextClick?: () => void;
   onCompleteClick?: () => void;
@@ -63,13 +66,81 @@ const MealPlanSetupFormComponent: React.FC<TMealPlanSetupFormComponentProps> = (
     onCompleteClick,
     onNextClick,
     setDraftEditValues,
+    isOrderInProgress,
   } = props;
   const intl = useIntl();
+  const dispatch = useAppDispatch();
+  const [deliveryHourNotMatchError, setDeliveryHourNotMatchError] =
+    useState<string>('');
   const step2SubmitInProgress = useAppSelector(
     (state) => state.Order.step2SubmitInProgress,
   );
+  const restaurantListings = useAppSelector(
+    (state) => state.Order.restaurantListings,
+  );
   const isEditFlow = flowType === EFlowType.edit;
-  const { pickAllow: pickAllowValue = true } = values;
+  const isEditInProgressOrder = isEditFlow && isOrderInProgress;
+  const {
+    pickAllow: pickAllowValue = true,
+    deliveryAddress,
+    deliveryDetail,
+    deliveryHour,
+    dayInWeek,
+  } = values;
+
+  const onHandleNextClick = () => {
+    if (isEditInProgressOrder) {
+      const [deliveryStartRange, deliveryEndRange] = deliveryHour.split('-');
+      const deliveryHourMatchingRestaurantOpenTime = restaurantListings?.map(
+        (restaurant) => {
+          const {
+            availabilityPlan: { entries = [] },
+          } = Listing(restaurant).getAttributes();
+          const dayInWeekInEntries = entries.filter((entry: TObject) =>
+            dayInWeek.includes(entry.dayOfWeek),
+          );
+
+          const dayInWeekDeliveryHourMatching = dayInWeekInEntries.map(
+            (entry: TObject) => {
+              const { startTime, endTime, dayOfWeek } = entry;
+
+              return {
+                [dayOfWeek]:
+                  deliveryStartRange >= startTime &&
+                  deliveryEndRange <= endTime,
+              };
+            },
+          );
+
+          return { [restaurant.id.uuid]: dayInWeekDeliveryHourMatching };
+        },
+      );
+
+      const isDeliveryHourMatchingRestaurantOpenTime =
+        deliveryHourMatchingRestaurantOpenTime.every((restaurant) =>
+          Object.values(restaurant)[0].every(
+            (_dayInWeek: TObject) => Object.values(_dayInWeek)[0],
+          ),
+        );
+
+      if (isDeliveryHourMatchingRestaurantOpenTime) {
+        dispatch(
+          saveDraftEditOrder({
+            generalInfo: {
+              deliveryAddress,
+              deliveryDetail,
+              deliveryHour,
+            },
+          }),
+        );
+        onNextClick?.();
+      } else {
+        setDeliveryHourNotMatchError(
+          'Thời gian giao hàng bạn chọn không phù hợp với thời gian phục vụ của nhà hàng',
+        );
+      }
+    }
+  };
 
   useEffect(() => {
     const {
@@ -126,10 +197,12 @@ const MealPlanSetupFormComponent: React.FC<TMealPlanSetupFormComponentProps> = (
       <div className={css.fieldSection}>
         <PerPackageField
           title={intl.formatMessage({ id: 'PerPackageField.title' })}
+          isEditFlow={isEditInProgressOrder}
         />
         <div className={css.verticalSpace}>
           <MemberAmountField
             title={intl.formatMessage({ id: 'MemberAmountField.title' })}
+            isEditFlow={isEditInProgressOrder}
           />
         </div>
       </div>
@@ -137,6 +210,7 @@ const MealPlanSetupFormComponent: React.FC<TMealPlanSetupFormComponentProps> = (
         <NutritionField
           title={intl.formatMessage({ id: 'NutritionField.title' })}
           options={nutritionsOptions}
+          isEditFlow={isEditInProgressOrder}
         />
       </div>
       <div className={css.fieldSection}>
@@ -144,18 +218,21 @@ const MealPlanSetupFormComponent: React.FC<TMealPlanSetupFormComponentProps> = (
           form={form}
           values={values}
           title={intl.formatMessage({ id: 'MealPlanDateField.title' })}
+          isEditFlow={isEditInProgressOrder}
         />
         <DaySessionField
           form={form}
           values={values}
           containerClassName={css.fieldSection}
           titleClassName={css.fieldTitle}
+          isEditFlow={isEditInProgressOrder}
         />
         <div className={css.verticalSpace}>
           <DayInWeekField
             form={form}
             values={values}
             title={intl.formatMessage({ id: 'DayInWeekField.label' })}
+            isEditFlow={isEditInProgressOrder}
           />
         </div>
 
@@ -166,12 +243,13 @@ const MealPlanSetupFormComponent: React.FC<TMealPlanSetupFormComponentProps> = (
             title={intl.formatMessage({
               id: 'DurationForNextOrderField.label',
             })}
+            isEditFlow={isEditInProgressOrder}
           />
         </div>
       </div>
 
       <div className={css.fieldSection}>
-        <FoodPickingField />
+        <FoodPickingField isEditFlow={isEditFlow} />
         {pickAllowValue && (
           <div className={css.verticalSpace}>
             <OrderDeadlineField
@@ -180,6 +258,7 @@ const MealPlanSetupFormComponent: React.FC<TMealPlanSetupFormComponentProps> = (
               })}
               form={form}
               values={values}
+              isEditFlow={isEditInProgressOrder}
             />
           </div>
         )}
@@ -191,14 +270,18 @@ const MealPlanSetupFormComponent: React.FC<TMealPlanSetupFormComponentProps> = (
               title={intl.formatMessage({
                 id: 'ParticipantSetupField.title',
               })}
+              isEditFlow={isEditInProgressOrder}
             />
           </div>
         )}
       </div>
+      <RenderWhen condition={!!deliveryHourNotMatchError}>
+        <div className={css.error}>{deliveryHourNotMatchError}</div>
+      </RenderWhen>
 
       <NavigateButtons
         flowType={flowType}
-        onNextClick={onNextClick}
+        onNextClick={onHandleNextClick}
         goBack={onGoBack}
         onCompleteClick={onCompleteClick}
         inProgress={step2SubmitInProgress}

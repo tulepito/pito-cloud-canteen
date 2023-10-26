@@ -612,14 +612,18 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
   const missingSelectedFood =
     isEmpty(orderDetail) ||
     Object.keys(orderDetail).filter(
-      (dateTime) => orderDetail[dateTime]?.restaurant?.foodList?.length === 0,
-    )?.length === 0;
-  const missingDraftSelectedFood =
-    isEmpty(draftEditOrderDetail) ||
-    Object.keys(draftEditOrderDetail).filter(
       (dateTime) =>
-        draftEditOrderDetail?.[dateTime]?.restaurant?.foodList?.length === 0,
+        Object.keys(orderDetail[dateTime]?.restaurant?.foodList)?.length !== 0,
     )?.length === 0;
+
+  const missingDraftSelectedFood = isEditFlow
+    ? isEmpty(draftEditOrderDetail) ||
+      Object.keys(draftEditOrderDetail).filter(
+        (dateTime) =>
+          Object.keys(draftEditOrderDetail?.[dateTime]?.restaurant?.foodList)
+            ?.length !== 0,
+      )?.length === 0
+    : false;
 
   return (
     <div className={css.root}>

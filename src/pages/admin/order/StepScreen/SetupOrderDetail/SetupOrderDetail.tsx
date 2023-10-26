@@ -38,6 +38,7 @@ import {
 } from '@redux/slices/Order.slice';
 import { selectRestaurantPageThunks } from '@redux/slices/SelectRestaurantPage.slice';
 import { convertWeekDay, renderDateRange } from '@src/utils/dates';
+import { EOrderStates } from '@src/utils/enums';
 import { Listing, User } from '@utils/data';
 import type { TListing, TObject } from '@utils/types';
 
@@ -51,6 +52,8 @@ import OrderSettingModal, {
 import type { TSelectFoodFormValues } from '../../components/SelectFoodModal/components/SelectFoodForm/SelectFoodForm';
 import SelectFoodModal from '../../components/SelectFoodModal/SelectFoodModal';
 import SelectRestaurantPage from '../../components/SelectRestaurantPage/SelectRestaurant.page';
+
+import ChangeSelectedFoodConfirmModal from './ChangeSelectedFoodConfirmModal/ChangeSelectedFoodConfirmModal';
 
 import css from './SetupOrderDetail.module.scss';
 
@@ -79,6 +82,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     setTrue: openPickFoodModal,
     setFalse: closePickFoodModal,
   } = useBoolean();
+  const changeSelectedFoodConfirmModal = useBoolean();
   const draftEditOrderDetail = useAppSelector(
     (state) => state.Order.draftEditOrderData.orderDetail,
   );
@@ -157,10 +161,19 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     plans = [],
     dayInWeek,
     daySession,
+    orderState,
   } = orderGetter.getMetadata();
   const { title: orderTitle } = orderGetter.getAttributes();
   const orderId = orderGetter.getId();
   const planId = plans?.[0];
+  const isOrderInProgress = orderState === EOrderStates.inProgress;
+  const isEditInProgressOrder = isEditFlow && isOrderInProgress;
+
+  const currentOrderDetail = isEditInProgressOrder
+    ? isEmpty(draftEditOrderDetail)
+      ? orderDetail
+      : draftEditOrderDetail
+    : orderDetail;
 
   const {
     packagePerMember: draftPackagePerMember,
@@ -208,8 +221,11 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
         {
           deliveryHour: draftDeliveryHour || deliveryHour,
           daySession: draftDaySession || daySession,
+          plans,
+          orderState,
         },
         restaurantCoverImageList,
+        isEditFlow,
       ),
     [
       deliveryHour,
@@ -252,7 +268,17 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
         saveDraftEditOrder({
           orderDetail: {
             ...orderDetail,
-            [subOrderDate]: restaurantData,
+            [subOrderDate]: {
+              ...restaurantData,
+              ...orderDetail[subOrderDate],
+              ...(isEditInProgressOrder && {
+                editTagVersion: orderDetail[selectedDate?.getTime()]?.restaurant
+                  ?.editTagVersion
+                  ? orderDetail[selectedDate?.getTime()].restaurant
+                      .editTagVersion + 1
+                  : 1,
+              }),
+            },
           },
         }),
       );
@@ -378,7 +404,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
       (item) => !availableOrderDetailCheckList[item].isAvailable,
     );
   const initialFoodList = isPickFoodModalOpen
-    ? orderDetail[selectedDate?.getTime()]?.restaurant?.foodList
+    ? currentOrderDetail[selectedDate?.getTime()]?.restaurant?.foodList
     : {};
 
   const calendarExtraResources = useGetCalendarExtraResources({
@@ -421,7 +447,6 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
   }, [JSON.stringify(restaurantListFromOrder)]);
 
   const handleSelectFood = async (values: TSelectFoodFormValues) => {
-    dispatch(setCanNotGoToStep4(true));
     const { food: foodIds } = values;
 
     const { submitRestaurantData, submitFoodListData } =
@@ -436,6 +461,14 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
       selectedFoodList: submitFoodListData,
     });
     closePickFoodModal();
+  };
+
+  const onCancelChangeFood = () => {
+    dispatch(
+      saveDraftEditOrder({
+        orderDetail,
+      }),
+    );
   };
 
   const onEditFoodInMealPlanCard = async (
@@ -492,7 +525,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     dispatch(setOnRecommendRestaurantInProcess(true));
     const { payload: recommendOrderDetail }: any = await dispatch(
       orderAsyncActions.recommendRestaurants({
-        shouldUpdatePlanOrderOrderDetail: !isEditFlow,
+        shouldUpdatePlanOrderOrderDetail: !isEditFlow || isEditInProgressOrder,
       }),
     );
 
@@ -567,7 +600,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     dispatch(selectCalendarDate(DateTime.fromMillis(date).toJSDate()));
     dispatch(
       orderAsyncActions.recommendRestaurantForSpecificDay({
-        shouldUpdatePlanOrderOrderDetail: !isEditFlow,
+        shouldUpdatePlanOrderOrderDetail: !isEditFlow || isEditInProgressOrder,
         dateTime: date,
       }),
     );
@@ -687,6 +720,11 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
         handleClose={closePickFoodModal}
         selectFoodInProgress={updateOrderDetailInProgress}
         handleSelectFood={handleSelectFood}
+      />
+      <ChangeSelectedFoodConfirmModal
+        isOpen={changeSelectedFoodConfirmModal.value}
+        handleClose={changeSelectedFoodConfirmModal.setFalse}
+        onCancelChangeFood={onCancelChangeFood}
       />
     </>
   );

@@ -11,10 +11,11 @@ type NutritionFieldProps = {
   titleClassName?: string;
   fieldClassName?: string;
   options?: { key: string; label: string }[];
+  isEditFlow?: boolean;
 };
 
 const NutritionField: React.FC<NutritionFieldProps> = (props) => {
-  const { title, titleClassName, fieldClassName, options } = props;
+  const { title, titleClassName, fieldClassName, options, isEditFlow } = props;
   const intl = useIntl();
 
   return (
@@ -33,6 +34,7 @@ const NutritionField: React.FC<NutritionFieldProps> = (props) => {
             value={key}
             label={label}
             className={css.field}
+            disabled={isEditFlow}
           />
         ))}
       </div>

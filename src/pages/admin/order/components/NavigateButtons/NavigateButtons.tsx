@@ -63,6 +63,7 @@ const NavigateButtons: React.FC<TNavigateButtons> = (props) => {
         <RenderWhen.False>
           <div className={css.actionWrapper}>
             <Button
+              type="button"
               className={css.button}
               variant="secondary"
               inProgress={inProgress}
@@ -74,6 +75,7 @@ const NavigateButtons: React.FC<TNavigateButtons> = (props) => {
               )}
             </Button>
             <Button
+              type="button"
               className={css.button}
               inProgress={inProgress}
               disabled={submitDisabled}
@@ -88,7 +90,7 @@ const NavigateButtons: React.FC<TNavigateButtons> = (props) => {
         </RenderWhen.False>
       </RenderWhen>
       {goBack && (
-        <Button variant="secondary" onClick={goBack} type="button">
+        <Button type="button" variant="secondary" onClick={goBack}>
           <FormattedMessage id="NavigateButtons.goBack" />
         </Button>
       )}

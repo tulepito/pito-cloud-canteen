@@ -5,7 +5,10 @@ import Toggle from '@components/Toggle/Toggle';
 
 import css from './FoodPickingField.module.scss';
 
-const FoodPickingField = () => {
+type FoodPickingFieldProps = {
+  isEditFlow?: boolean;
+};
+const FoodPickingField: React.FC<FoodPickingFieldProps> = ({ isEditFlow }) => {
   const intl = useIntl();
 
   return (
@@ -30,6 +33,7 @@ const FoodPickingField = () => {
                   input.onChange(value);
                 }}
                 className={css.toggle}
+                disabled={isEditFlow}
               />
             );
           }}

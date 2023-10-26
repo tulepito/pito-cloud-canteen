@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable import/no-cycle */
 /* eslint-disable react-hooks/exhaustive-deps */
-import { memo, useCallback, useMemo, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { shallowEqual } from 'react-redux';
 import isEmpty from 'lodash/isEmpty';
 import isEqual from 'lodash/isEqual';
@@ -15,7 +15,7 @@ import {
   orderAsyncActions,
   saveDraftEditOrder,
 } from '@redux/slices/Order.slice';
-import { EOrderType } from '@src/utils/enums';
+import { EOrderStates, EOrderType } from '@src/utils/enums';
 import { Listing, User } from '@utils/data';
 import { getSelectedDaysOfWeek } from '@utils/dates';
 import type { TListing, TObject } from '@utils/types';
@@ -77,8 +77,11 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
     displayedDurationTime,
     durationTimeMode,
     daySession,
+    plans = [],
+    orderState,
   } = orderMetadata;
   const { address, origin } = deliveryAddress || {};
+  const isOrderInProgress = orderState === EOrderStates.inProgress;
 
   const currentClient = companies.find(
     (company) => company.id.uuid === clientId,
@@ -266,6 +269,15 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
     if (nextToReviewTab) nextToReviewTab();
   };
 
+  useEffect(() => {
+    (async () => {
+      if (isEditFlow) {
+        await dispatch(orderAsyncActions.fetchOrderDetail(plans));
+        await dispatch(orderAsyncActions.fetchRestaurantCoverImages());
+      }
+    })();
+  }, [isEditFlow, dispatch]);
+
   return (
     <MealPlanSetupForm
       initialValues={initialValues}
@@ -278,6 +290,7 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
       onGoBack={goBack}
       onCompleteClick={handleNextToReviewTabInEditMode}
       setDraftEditValues={setDraftEditValues}
+      isOrderInProgress={isOrderInProgress}
       onNextClick={isEditFlow ? handleNextTabInEditMode : undefined}
     />
   );

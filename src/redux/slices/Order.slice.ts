@@ -11,7 +11,7 @@ import {
   getCompanyNotificationsApi,
   getCompanyOrderSummaryApi,
 } from '@apis/companyApi';
-import { fetchUserApi } from '@apis/index';
+import { fetchUserApi, queryRestaurantListingsApi } from '@apis/index';
 import type { TUpdateOrderApiBody } from '@apis/orderApi';
 import {
   bookerCancelPendingApprovalOrderApi,
@@ -122,6 +122,7 @@ type TOrderInitialState = {
   restaurantCoverImageList: {
     [restaurantId: string]: any;
   };
+  restaurantListings: TListing[];
   fetchRestaurantCoverImageInProgress: boolean;
   fetchRestaurantCoverImageError: any;
 
@@ -239,6 +240,7 @@ const initialState: TOrderInitialState = {
   },
 
   restaurantCoverImageList: {},
+  restaurantListings: [],
   fetchRestaurantCoverImageInProgress: false,
   fetchRestaurantCoverImageError: null,
 
@@ -740,41 +742,48 @@ const fetchOrderDetail = createAsyncThunk(
 
 const fetchRestaurantCoverImages = createAsyncThunk(
   FETCH_RESTAURANT_COVER_IMAGE,
-  async (_, { extra: sdk, getState }) => {
+  async (_, { getState }) => {
     const { orderDetail = {} } = getState().Order;
     const restaurantIdList = compact(
       uniq(Object.values(orderDetail).map((item: any) => item?.restaurant?.id)),
     );
 
-    const restaurantCoverImageList = await Promise.all(
-      restaurantIdList.map(async (restaurantId) => {
-        const restaurantResponse = denormalisedResponseEntities(
-          await sdk.listings.show({
-            id: restaurantId,
-            include: ['images'],
-            'fields.image': [
-              'variants.landscape-crop',
-              'variants.landscape-crop2x',
-            ],
-          }),
-        )[0];
-        const { coverImageId } = Listing(restaurantResponse).getPublicData();
+    const { data: restaurantResponses } = await queryRestaurantListingsApi({
+      dataParams: {
+        ids: restaurantIdList,
+        include: ['images'],
+        'fields.image': [
+          'variants.landscape-crop',
+          'variants.landscape-crop2x',
+        ],
+      },
+      queryParams: {
+        expand: true,
+      },
+    });
 
-        return {
-          [restaurantId]: Listing(restaurantResponse)
-            .getFullData()
-            .images.find((image: any) => image.id.uuid === coverImageId),
-        };
-      }),
-    );
+    const restaurants = denormalisedResponseEntities(restaurantResponses);
 
-    return restaurantCoverImageList.reduce(
-      (result, item) => ({
-        ...result,
-        ...item,
-      }),
-      {},
-    );
+    const restaurantCoverImageList = restaurants.map((restaurant: TListing) => {
+      const { coverImageId } = Listing(restaurant).getPublicData();
+
+      return {
+        [restaurant.id.uuid]: Listing(restaurant)
+          .getFullData()
+          .images.find((image: any) => image.id.uuid === coverImageId),
+      };
+    });
+
+    return {
+      restaurantCoverImageList: restaurantCoverImageList.reduce(
+        (result: TObject, item: TObject) => ({
+          ...result,
+          ...item,
+        }),
+        {},
+      ),
+      restaurantListings: restaurants,
+    };
   },
 );
 
@@ -1394,7 +1403,8 @@ const orderSlice = createSlice({
       .addCase(fetchRestaurantCoverImages.fulfilled, (state, { payload }) => ({
         ...state,
         fetchRestaurantCoverImageInProgress: false,
-        restaurantCoverImageList: payload,
+        restaurantCoverImageList: payload.restaurantCoverImageList,
+        restaurantListings: payload.restaurantListings,
       }))
       .addCase(fetchRestaurantCoverImages.rejected, (state, { error }) => ({
         ...state,

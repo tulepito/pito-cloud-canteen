@@ -33,6 +33,7 @@ type TOrderDeadlineFieldProps = {
   layoutClassName?: string;
   deadlineDateLabel?: string;
   deadlineHourLabel?: string;
+  isEditFlow?: boolean;
 };
 
 // eslint-disable-next-line react/display-name
@@ -77,6 +78,7 @@ const OrderDeadlineField: React.FC<TOrderDeadlineFieldProps> = (props) => {
     layoutClassName,
     deadlineDateLabel,
     deadlineHourLabel,
+    isEditFlow,
   } = props;
   const intl = useIntl();
 
@@ -194,6 +196,7 @@ const OrderDeadlineField: React.FC<TOrderDeadlineFieldProps> = (props) => {
           dateFormat={'EEE, dd MMMM, yyyy'}
           validate={required(deadlineDateRequired)}
           customInput={<CustomDeadlineFieldInput />}
+          disabled={isEditFlow}
         />
         <FieldDropdownSelect
           id="deadlineHour"
@@ -211,6 +214,7 @@ const OrderDeadlineField: React.FC<TOrderDeadlineFieldProps> = (props) => {
           placeholder={intl.formatMessage({
             id: 'OrderDeadlineField.deadlineHour.placeholder',
           })}
+          disabled={isEditFlow}
         />
       </div>
     </div>

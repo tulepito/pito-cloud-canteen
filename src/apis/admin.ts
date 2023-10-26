@@ -79,3 +79,6 @@ export const fetchFoodListFromMenuApi = (params: TObject) =>
 
 export const responseApprovalRequestApi = (body: TObject) =>
   postApi('/admin/listings/foods/response-approval-request', body);
+
+export const queryRestaurantListingsApi = (params: TObject) =>
+  getApi('/admin/listings/restaurant/query', params);

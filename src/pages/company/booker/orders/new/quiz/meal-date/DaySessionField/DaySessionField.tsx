@@ -17,6 +17,7 @@ type DaySessionFieldProps = {
   fieldGroupClassName?: string;
   form: any;
   values: TObject;
+  isEditFlow?: boolean;
 };
 const daySessionOptions = [
   {
@@ -39,6 +40,7 @@ const DaySessionField: React.FC<DaySessionFieldProps> = (props) => {
     fieldGroupClassName,
     form,
     values,
+    isEditFlow,
   } = props;
   const { daySession = '' } = values;
   const [selectedSession, setSelectedSession] = useState<string>(daySession);
@@ -53,10 +55,17 @@ const DaySessionField: React.FC<DaySessionFieldProps> = (props) => {
   return (
     <div className={containerClasses}>
       <div className={titleClasses}>Chọn bữa ăn</div>
-      <FieldTextInput id="daySession" name="daySession" type="hidden" />
+      <FieldTextInput
+        id="daySession"
+        name="daySession"
+        type="hidden"
+        disabled={isEditFlow}
+      />
       <div className={fieldGroupsClasses}>
         {daySessionOptions.map(({ key, label }) => {
           const onSesstionSelect = () => {
+            if (isEditFlow) return;
+
             setSelectedSession(key);
           };
 
@@ -65,6 +74,7 @@ const DaySessionField: React.FC<DaySessionFieldProps> = (props) => {
               key={key}
               className={classNames(css.dayItem, {
                 [css.selected]: selectedSession === key,
+                [css.disabled]: isEditFlow,
               })}
               onClick={onSesstionSelect}>
               {label}

@@ -30,6 +30,7 @@ type MealPlanDateFieldProps = {
   layoutClassName?: string;
   containerClassName?: string;
   onCustomStartDateChange?: (date: number) => void;
+  isEditFlow?: boolean;
 };
 
 // eslint-disable-next-line react/display-name
@@ -87,6 +88,7 @@ const MealPlanDateField: React.FC<MealPlanDateFieldProps> = (props) => {
     onCustomStartDateChange,
     layoutClassName,
     containerClassName,
+    isEditFlow,
   } = props;
   const intl = useIntl();
   const userPermission = useAppSelector((state) => state.user.userPermission);
@@ -188,6 +190,7 @@ const MealPlanDateField: React.FC<MealPlanDateFieldProps> = (props) => {
                 )
           }
           customInput={<CustomStartDateFieldInput />}
+          disabled={isEditFlow}
         />
         <FieldDatePicker
           id="endDate"
@@ -201,7 +204,7 @@ const MealPlanDateField: React.FC<MealPlanDateFieldProps> = (props) => {
           dateFormat={'EEE, dd MMMM, yyyy'}
           autoComplete="off"
           validate={required(endDateRequiredMessage)}
-          disabled={!startDate}
+          disabled={!startDate || isEditFlow}
           placeholderText={format(new Date(), 'EEE, dd MMMM, yyyy', {
             locale: viLocale,
           })}

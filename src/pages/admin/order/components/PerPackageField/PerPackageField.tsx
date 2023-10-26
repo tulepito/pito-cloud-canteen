@@ -18,10 +18,11 @@ const VNDIcon = () => {
 
 type PerPackageFieldProps = {
   title?: string;
+  isEditFlow?: boolean;
 };
 
 const PerPackageField: React.FC<PerPackageFieldProps> = (props) => {
-  const { title } = props;
+  const { title, isEditFlow } = props;
   const intl = useIntl();
   const perPackRequiredMessage = intl.formatMessage({
     id: 'PerPackageField.perPackRequired',
@@ -55,6 +56,7 @@ const PerPackageField: React.FC<PerPackageFieldProps> = (props) => {
             required(perPackRequiredMessage),
             greaterThanOneThousand(perPackGreaterThanOneThousandMessage),
           )}
+          disabled={isEditFlow}
         />
 
         <Field id="vatAllow" name="vatAllow">
@@ -73,6 +75,7 @@ const PerPackageField: React.FC<PerPackageFieldProps> = (props) => {
                   input.onChange(value);
                 }}
                 className={css.toggle}
+                disabled={isEditFlow}
               />
             );
           }}

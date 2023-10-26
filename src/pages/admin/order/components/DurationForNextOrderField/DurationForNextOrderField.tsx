@@ -13,11 +13,18 @@ type DurationForNextOrderFieldProps = {
   displayedDurationTimeValue: string;
   title?: string;
   containerClassName?: string;
+  isEditFlow?: boolean;
 };
 const DurationForNextOrderField: React.FC<DurationForNextOrderFieldProps> = (
   props,
 ) => {
-  const { form, displayedDurationTimeValue, title, containerClassName } = props;
+  const {
+    form,
+    displayedDurationTimeValue,
+    title,
+    containerClassName,
+    isEditFlow,
+  } = props;
   const intl = useIntl();
   const [timeMode, setTimeMode] = useState<'week' | 'month'>('week');
   const containerClasses = classNames(css.container, containerClassName);
@@ -46,6 +53,7 @@ const DurationForNextOrderField: React.FC<DurationForNextOrderFieldProps> = (
           className={css.durationTimeInput}
           placeholder="1"
           parse={handleParseNumber}
+          disabled={isEditFlow}
         />
         <div className={css.timeModeBtnWrapper}>
           <Button
@@ -54,7 +62,8 @@ const DurationForNextOrderField: React.FC<DurationForNextOrderFieldProps> = (
             className={classNames(
               css.viewMode,
               timeMode === 'week' && css.active,
-            )}>
+            )}
+            disabled={isEditFlow}>
             {intl.formatMessage({ id: 'DurationForNextOrderField.week' })}
           </Button>
           <Button
@@ -63,7 +72,8 @@ const DurationForNextOrderField: React.FC<DurationForNextOrderFieldProps> = (
             className={classNames(
               css.viewMode,
               timeMode === 'month' && css.active,
-            )}>
+            )}
+            disabled={isEditFlow}>
             {intl.formatMessage({ id: 'DurationForNextOrderField.month' })}
           </Button>
         </div>
