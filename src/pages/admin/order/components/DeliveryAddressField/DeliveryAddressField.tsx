@@ -10,9 +10,10 @@ import css from './DeliveryAddressField.module.scss';
 type DeliveryAddressFieldProps = {
   title?: string;
   containerClassName?: string;
+  disabled?: boolean;
 };
 const DeliveryAddressField: React.FC<DeliveryAddressFieldProps> = (props) => {
-  const { title, containerClassName } = props;
+  const { title, containerClassName, disabled = false } = props;
   const intl = useIntl();
   const deliveryAddressRequiredMessage = intl.formatMessage({
     id: 'DeliveryAddressField.title',
@@ -32,11 +33,13 @@ const DeliveryAddressField: React.FC<DeliveryAddressFieldProps> = (props) => {
         placeholder={intl.formatMessage({
           id: 'EditCompanyForm.addressPlaceholder',
         })}
+        disabled={disabled}
         validate={addressRequired(deliveryAddressRequiredMessage)}
       />
       <FieldTextInput
         id="detailAddress"
         name="detailAddress"
+        disabled={disabled}
         rootClassName={css.field}
         label={intl.formatMessage({
           id: 'DeliveryAddressField.detailAddress.label',

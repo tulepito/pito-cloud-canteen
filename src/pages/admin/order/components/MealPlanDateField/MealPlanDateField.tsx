@@ -30,6 +30,7 @@ type MealPlanDateFieldProps = {
   layoutClassName?: string;
   containerClassName?: string;
   onCustomStartDateChange?: (date: number) => void;
+  disabled?: boolean;
 };
 
 // eslint-disable-next-line react/display-name
@@ -87,6 +88,7 @@ const MealPlanDateField: React.FC<MealPlanDateFieldProps> = (props) => {
     onCustomStartDateChange,
     layoutClassName,
     containerClassName,
+    disabled = false,
   } = props;
   const intl = useIntl();
   const userPermission = useAppSelector((state) => state.user.userPermission);
@@ -179,6 +181,7 @@ const MealPlanDateField: React.FC<MealPlanDateFieldProps> = (props) => {
           placeholderText={format(new Date(), 'EEE, dd MMMM, yyyy', {
             locale: viLocale,
           })}
+          disabled={disabled}
           validate={
             idAdminFlow
               ? required(startDateRequiredMessage)
@@ -201,7 +204,7 @@ const MealPlanDateField: React.FC<MealPlanDateFieldProps> = (props) => {
           dateFormat={'EEE, dd MMMM, yyyy'}
           autoComplete="off"
           validate={required(endDateRequiredMessage)}
-          disabled={!startDate}
+          disabled={disabled || !startDate}
           placeholderText={format(new Date(), 'EEE, dd MMMM, yyyy', {
             locale: viLocale,
           })}
@@ -219,6 +222,7 @@ const MealPlanDateField: React.FC<MealPlanDateFieldProps> = (props) => {
           placeholder={intl.formatMessage({
             id: 'OrderDeadlineField.deliveryHour.placeholder',
           })}
+          disabled={disabled}
           options={parsedDeliveryHourOptions}
         />
       </div>

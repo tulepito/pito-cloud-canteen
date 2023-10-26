@@ -11,10 +11,17 @@ type NutritionFieldProps = {
   titleClassName?: string;
   fieldClassName?: string;
   options?: { key: string; label: string }[];
+  disabled?: boolean;
 };
 
 const NutritionField: React.FC<NutritionFieldProps> = (props) => {
-  const { title, titleClassName, fieldClassName, options } = props;
+  const {
+    title,
+    titleClassName,
+    fieldClassName,
+    options,
+    disabled = false,
+  } = props;
   const intl = useIntl();
 
   return (
@@ -27,6 +34,7 @@ const NutritionField: React.FC<NutritionFieldProps> = (props) => {
       <div className={classNames(css.fieldGroups, fieldClassName)}>
         {(options || nutritionOptions).map(({ key, label }) => (
           <FieldCheckbox
+            disabled={disabled}
             key={key}
             id={`nutritions-${key}`}
             name="nutritions"

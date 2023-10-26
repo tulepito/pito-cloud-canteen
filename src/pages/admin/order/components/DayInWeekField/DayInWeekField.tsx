@@ -26,6 +26,7 @@ type TDayInWeekFieldProps = {
   titleClassName?: string;
   containerClassName?: string;
   fieldGroupClassName?: string;
+  disabled?: boolean;
 };
 
 const DayInWeekField: React.FC<TDayInWeekFieldProps> = (props) => {
@@ -36,6 +37,7 @@ const DayInWeekField: React.FC<TDayInWeekFieldProps> = (props) => {
     containerClassName,
     titleClassName,
     fieldGroupClassName,
+    disabled,
   } = props;
   const intl = useIntl();
 
@@ -62,10 +64,17 @@ const DayInWeekField: React.FC<TDayInWeekFieldProps> = (props) => {
   return (
     <div className={containerClasses}>
       {title && <div className={titleClasses}>{title}</div>}
-      <FieldTextInput id="dayInWeek" name="dayInWeek" type="hidden" />
+      <FieldTextInput
+        id="dayInWeek"
+        name="dayInWeek"
+        type="hidden"
+        disabled={disabled}
+      />
       <div className={fieldGroupsClasses}>
         {DAY_IN_WEEK.map((day) => {
-          const onDaySelect = () => {
+          const handleDaySelect = () => {
+            if (disabled) return;
+
             if (selectedDays.includes(day.key))
               setSelectedDays(selectedDays.filter((key) => key !== day.key));
             else setSelectedDays(selectedDays.concat(day.key));
@@ -78,7 +87,7 @@ const DayInWeekField: React.FC<TDayInWeekFieldProps> = (props) => {
                 [css.selected]: selectedDays.includes(day.key),
                 [css.disabled]: disableDayInWeekOptions.includes(day),
               })}
-              onClick={onDaySelect}>
+              onClick={handleDaySelect}>
               {intl.formatMessage({ id: day.label })}
             </div>
           );

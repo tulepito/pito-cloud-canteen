@@ -5,7 +5,13 @@ import Toggle from '@components/Toggle/Toggle';
 
 import css from './FoodPickingField.module.scss';
 
-const FoodPickingField = () => {
+type TFoodPickingField = {
+  disabled?: boolean;
+};
+
+const FoodPickingField: React.FC<TFoodPickingField> = ({
+  disabled = false,
+}) => {
   const intl = useIntl();
 
   return (
@@ -14,7 +20,7 @@ const FoodPickingField = () => {
         {intl.formatMessage({ id: 'FoodPickingField.title' })}
       </div>
       <div className={css.fieldGroups}>
-        <Field id="pickAllow" name="pickAllow">
+        <Field id="pickAllow" name="pickAllow" disabled={disabled}>
           {(props) => {
             const { id, input } = props;
 
@@ -25,6 +31,7 @@ const FoodPickingField = () => {
                 })}
                 id={id}
                 name={input.name}
+                disabled={disabled}
                 status={input.value ? 'on' : 'off'}
                 onClick={(value) => {
                   input.onChange(value);

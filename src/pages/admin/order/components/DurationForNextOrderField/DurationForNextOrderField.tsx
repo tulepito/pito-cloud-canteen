@@ -13,11 +13,18 @@ type DurationForNextOrderFieldProps = {
   displayedDurationTimeValue: string;
   title?: string;
   containerClassName?: string;
+  disabled?: boolean;
 };
 const DurationForNextOrderField: React.FC<DurationForNextOrderFieldProps> = (
   props,
 ) => {
-  const { form, displayedDurationTimeValue, title, containerClassName } = props;
+  const {
+    form,
+    disabled = false,
+    displayedDurationTimeValue,
+    title,
+    containerClassName,
+  } = props;
   const intl = useIntl();
   const [timeMode, setTimeMode] = useState<'week' | 'month'>('week');
   const containerClasses = classNames(css.container, containerClassName);
@@ -46,11 +53,13 @@ const DurationForNextOrderField: React.FC<DurationForNextOrderFieldProps> = (
           className={css.durationTimeInput}
           placeholder="1"
           parse={handleParseNumber}
+          disabled={disabled}
         />
         <div className={css.timeModeBtnWrapper}>
           <Button
             type="button"
             onClick={onTimeModeChange('week')}
+            disabled={disabled}
             className={classNames(
               css.viewMode,
               timeMode === 'week' && css.active,
@@ -60,6 +69,7 @@ const DurationForNextOrderField: React.FC<DurationForNextOrderFieldProps> = (
           <Button
             type="button"
             onClick={onTimeModeChange('month')}
+            disabled={disabled}
             className={classNames(
               css.viewMode,
               timeMode === 'month' && css.active,
@@ -68,8 +78,14 @@ const DurationForNextOrderField: React.FC<DurationForNextOrderFieldProps> = (
           </Button>
         </div>
       </div>
-      <FieldTextInput id="durationTime" name="durationTime" type="hidden" />
       <FieldTextInput
+        id="durationTime"
+        name="durationTime"
+        type="hidden"
+        disabled={disabled}
+      />
+      <FieldTextInput
+        disabled={disabled}
         id="durationTimeMode"
         name="durationTimeMode"
         type="hidden"
