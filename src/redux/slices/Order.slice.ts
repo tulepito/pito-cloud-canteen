@@ -803,17 +803,8 @@ const fetchOrder = createAsyncThunk(
 
     const { bookerId, companyId } = Listing(response).getMetadata();
 
-    const selectedBooker = denormalisedResponseEntities(
-      await sdk.users.show({
-        id: bookerId,
-      }),
-    )[0];
-
-    const selectedCompany = denormalisedResponseEntities(
-      await sdk.users.show({
-        id: companyId,
-      }),
-    )[0];
+    const { data: selectedBooker } = await fetchUserApi(bookerId);
+    const { data: selectedCompany } = await fetchUserApi(companyId);
 
     dispatch(SystemAttributesThunks.fetchVATPercentageByOrderId(orderId));
 
