@@ -161,6 +161,7 @@ const MealPlanSetupFormComponent: React.FC<TMealPlanSetupFormComponentProps> = (
       values.dayInWeek,
     );
     const generalInfo = {
+      ...rest,
       deliveryAddress: {
         address: addressValue,
         origin: originValue,
@@ -171,7 +172,6 @@ const MealPlanSetupFormComponent: React.FC<TMealPlanSetupFormComponentProps> = (
       deadlineDate: pickAllowSubmitValue ? deadlineDateSubmitValue : null,
       deadlineHour: pickAllowSubmitValue ? deadlineHourSubmitValue : null,
       pickAllow: pickAllowSubmitValue,
-      ...rest,
       dayInWeek: selectedDayInWeek,
     };
     if (isEditFlow && setDraftEditValues) setDraftEditValues(generalInfo);

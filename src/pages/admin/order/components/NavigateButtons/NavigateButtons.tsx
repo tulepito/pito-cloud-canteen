@@ -90,7 +90,7 @@ const NavigateButtons: React.FC<TNavigateButtons> = (props) => {
         </RenderWhen.False>
       </RenderWhen>
       {goBack && (
-        <Button type="button" variant="secondary" onClick={goBack}>
+        <Button variant="secondary" onClick={goBack} type="button">
           <FormattedMessage id="NavigateButtons.goBack" />
         </Button>
       )}

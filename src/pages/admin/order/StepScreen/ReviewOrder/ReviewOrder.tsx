@@ -106,7 +106,7 @@ export const ReviewContent: React.FC<any> = (props) => {
     foodOrder = {},
     onDownloadReviewOrderResults,
   } = props;
-
+  const router = useRouter();
   const intl = useIntl();
   const menuCollapseController = useBoolean();
   const { key: deliveryManKey, phoneNumber: deliveryManPhoneNumber } =
@@ -138,6 +138,8 @@ export const ReviewContent: React.FC<any> = (props) => {
   const deliveryManOptions = useAppSelector(
     (state) => state.SystemAttributes.deliveryPeople,
   );
+
+  const isOrderDetailPage = router.pathname === adminPaths.OrderDetail;
 
   const defaultCopyText = intl.formatMessage({
     id: 'ReviewContent.copyToClipboardTooltip.default',
@@ -259,54 +261,55 @@ export const ReviewContent: React.FC<any> = (props) => {
         />
       </RenderWhen>
       <div className={css.infoSection}>
-        <Collapsible
-          label={intl.formatMessage({
-            id: 'ReviewOrder.deliveryManInfoLabel',
-          })}>
-          <div className={classNames(css.contentBox, css.spaceStart)}>
-            <div className={css.flexChild}>
-              <span className={css.boxTitle}>
-                {intl.formatMessage({ id: 'ReviewOrder.deliveryManName' })}
-              </span>
-              <FieldDropdownSelectComponent
-                id={`${timeStamp}_deliveryMan`}
-                name="deliveryMan"
-                className={css.selectBoxContent}
-                meta={deliveryMan.meta}
-                options={parsedDeliveryManOptions}
-                placeholder="Chọn nhân viên"
-                input={deliveryMan.input}
-                customOnChange={handleFieldDeliveryManChange}
-              />
-            </div>
-            <div className={css.flexChild}>
-              <span className={css.boxTitle}>
-                {intl.formatMessage({ id: 'ReviewOrder.phoneNumberLabel' })}
-              </span>
-              <RenderWhen condition={!isEmpty(currDeliveryPhoneNumber)}>
-                <span className={css.boxContent}>
-                  {currDeliveryPhoneNumber}
+        <RenderWhen condition={isOrderDetailPage}>
+          <Collapsible
+            label={intl.formatMessage({
+              id: 'ReviewOrder.deliveryManInfoLabel',
+            })}>
+            <div className={classNames(css.contentBox, css.spaceStart)}>
+              <div className={css.flexChild}>
+                <span className={css.boxTitle}>
+                  {intl.formatMessage({ id: 'ReviewOrder.deliveryManName' })}
                 </span>
-              </RenderWhen>
+                <FieldDropdownSelectComponent
+                  id={`${timeStamp}_deliveryMan`}
+                  name="deliveryMan"
+                  className={css.selectBoxContent}
+                  meta={deliveryMan.meta}
+                  options={parsedDeliveryManOptions}
+                  placeholder="Chọn nhân viên"
+                  input={deliveryMan.input}
+                  customOnChange={handleFieldDeliveryManChange}
+                />
+              </div>
+              <div className={css.flexChild}>
+                <span className={css.boxTitle}>
+                  {intl.formatMessage({ id: 'ReviewOrder.phoneNumberLabel' })}
+                </span>
+                <RenderWhen condition={!isEmpty(currDeliveryPhoneNumber)}>
+                  <span className={css.boxContent}>
+                    {currDeliveryPhoneNumber}
+                  </span>
+                </RenderWhen>
 
-              <RenderWhen condition={shouldShowTrackingLink}>
-                <div className={css.billOfLading} onClick={handleCopyLink}>
-                  {intl.formatMessage({ id: 'ReviewOrder.billOfLading' })}
-                  <Tooltip
-                    overlayClassName={css.toolTipOverlay}
-                    trigger="hover"
-                    tooltipContent={copyToClipboardTooltip}
-                    placement="bottom">
-                    <div>
-                      <IconCopy className={css.copyIcon} />
-                    </div>
-                  </Tooltip>
-                </div>
-              </RenderWhen>
+                <RenderWhen condition={shouldShowTrackingLink}>
+                  <div className={css.billOfLading} onClick={handleCopyLink}>
+                    {intl.formatMessage({ id: 'ReviewOrder.billOfLading' })}
+                    <Tooltip
+                      overlayClassName={css.toolTipOverlay}
+                      trigger="hover"
+                      tooltipContent={copyToClipboardTooltip}
+                      placement="bottom">
+                      <div>
+                        <IconCopy className={css.copyIcon} />
+                      </div>
+                    </Tooltip>
+                  </div>
+                </RenderWhen>
+              </div>
             </div>
-          </div>
-        </Collapsible>
-
+          </Collapsible>
+        </RenderWhen>
         <Collapsible
           label={intl.formatMessage({
             id: 'ReviewOrder.providerLabel',
@@ -531,6 +534,10 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
       JSON.stringify(draftEditOrderDetail),
     ]) || {};
 
+  const handleGoBackToManageOrderPage = () => {
+    router.push(adminPaths.ManageOrders);
+  };
+
   const onSubmit = async (values: any) => {
     const { staffName: staffNameValue, shipperName: shipperNameValue } = values;
     if (isEditFlow) {
@@ -640,7 +647,9 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
             fieldRenderProps;
 
           const submitDisabled =
-            invalid || missingDraftSelectedFood || missingSelectedFood;
+            invalid ||
+            (isEditFlow && missingDraftSelectedFood) ||
+            missingSelectedFood;
 
           return (
             <Form onSubmit={handleSubmit}>
@@ -704,6 +713,7 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
                 flowType={flowType}
                 currentTab={tab}
                 onCompleteClick={handleSubmit}
+                onNextClick={handleGoBackToManageOrderPage}
                 goBack={goBack}
                 submitDisabled={submitDisabled}
                 inProgress={submitInProgress}

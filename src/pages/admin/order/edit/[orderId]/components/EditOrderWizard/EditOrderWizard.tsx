@@ -2,9 +2,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
+import isEmpty from 'lodash/isEmpty';
 import { useRouter } from 'next/router';
 
 import FormWizard from '@components/FormWizard/FormWizard';
+import { ORDER_STATES_TO_ENABLE_EDIT_ABILITY } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { EFlowType } from '@pages/admin/order/components/NavigateButtons/NavigateButtons';
 import ClientView from '@pages/admin/order/StepScreen/ClientView/ClientView';
@@ -107,16 +109,29 @@ const EditOrderWizard = () => {
     query: { orderId },
     isReady,
   } = router;
+  const fetchOrderInProgress = useAppSelector(
+    (state) => state.Order.fetchOrderInProgress,
+  );
   const fetchOrderError = useAppSelector(
     (state) => state.Order.fetchOrderError,
   );
+  const justDeletedMemberOrder = useAppSelector(
+    (state) => state.Order.justDeletedMemberOrder,
+  );
   const order = useAppSelector((state) => state.Order.order);
+  const orderDetail = useAppSelector((state) => state.Order.orderDetail);
   const [currentStep, setCurrentStep] = useState<string>(
     EEditOrderTab.clientView,
   );
 
-  const { orderType = EOrderType.group } = Listing(order).getMetadata();
+  const {
+    orderState,
+    orderType = EOrderType.group,
+    plans = [],
+  } = Listing(order).getMetadata();
   const isGroupOrder = orderType === EOrderType.group;
+  const isInvalidOrderStateToEdit =
+    !ORDER_STATES_TO_ENABLE_EDIT_ABILITY.includes(orderState);
   const suitableTabList = isGroupOrder
     ? EDIT_GROUP_ORDER_TABS
     : EDIT_NORMAL_ORDER_TABS;
@@ -158,10 +173,19 @@ const EditOrderWizard = () => {
   };
 
   useEffect(() => {
-    if (fetchOrderError === 'Request failed with status code 400') {
+    if (
+      fetchOrderError === 'Request failed with status code 400' ||
+      (isInvalidOrderStateToEdit && order !== null && !isEmpty(order))
+    ) {
       router.push(adminPaths.ManageOrders);
     }
-  }, [fetchOrderError]);
+  }, [fetchOrderError, isInvalidOrderStateToEdit, JSON.stringify(order)]);
+
+  useEffect(() => {
+    if (!fetchOrderInProgress) {
+      dispatch(orderAsyncActions.fetchOrderRestaurants({ isEditFlow: true }));
+    }
+  }, [fetchOrderInProgress]);
 
   useEffect(() => {
     if (isReady) {
@@ -174,6 +198,17 @@ const EditOrderWizard = () => {
   useEffect(() => {
     dispatch(resetOrder());
   }, [dispatch]);
+
+  useEffect(() => {
+    if (isEmpty(orderDetail) && !justDeletedMemberOrder && !isEmpty(plans)) {
+      dispatch(orderAsyncActions.fetchOrderDetail(plans));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    JSON.stringify(order),
+    JSON.stringify(orderDetail),
+    JSON.stringify(plans),
+  ]);
 
   return (
     <FormWizard formTabNavClassName={css.formTabNav}>

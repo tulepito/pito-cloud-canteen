@@ -22,6 +22,12 @@ import {
 import type { TPlan } from '@utils/orderTypes';
 import type { TListing, TObject } from '@utils/types';
 
+export const ORDER_STATES_TO_ENABLE_EDIT_ABILITY = [
+  EOrderDraftStates.pendingApproval,
+  // EOrderStates.picking,
+  // EOrderStates.inProgress,
+];
+
 export const getParticipantPickingLink = (orderId: string) =>
   `${process.env.NEXT_PUBLIC_CANONICAL_URL}/participant/order/${orderId}`;
 export const getTrackingLink = (orderId: string, timestamp: string | number) =>
@@ -257,7 +263,7 @@ export const getRestaurantListFromOrderDetail = (
     const { restaurant } = current;
     const { restaurantName } = restaurant || {};
 
-    if (!result[restaurantName as string]) {
+    if (restaurantName && !result[restaurantName as string]) {
       // eslint-disable-next-line no-param-reassign
       result[restaurantName as string] = true;
     }
