@@ -1,7 +1,8 @@
 const BASE_URL = process.env.NEXT_PUBLIC_CANONICAL_URL;
 
-export const participantPickingSubOrderChangedSubject =
-  'Đơn hàng có sự thay đổi';
+export const participantPickingSubOrderChangedSubject = (
+  formattedTime: string,
+) => `Ngày ăn ${formattedTime} có sự thay đổi`;
 
 type TParticipantPickingSubOrderChangedParams = {
   formattedSubOrderDate: string;
