@@ -115,6 +115,10 @@ const ServiceFeesAndNotes: React.FC<ServiceFeesAndNotesProps> = (props) => {
         : draftEditOrderDetail
       : orderDetail,
   ).length;
+  const initPCCFee =
+    typeof draftSpecificPCCFee !== 'undefined'
+      ? addCommas(draftSpecificPCCFee)
+      : undefined;
   const PITOFee = isEditFlow
     ? (orderHasSpecificPCCFee
         ? draftSpecificPCCFee || orderSpecificPCCFee
@@ -193,19 +197,33 @@ const ServiceFeesAndNotes: React.FC<ServiceFeesAndNotesProps> = (props) => {
   };
 
   const handlePCCFeeSubmit = async (values: TPCCFormValues) => {
-    await dispatch(
-      saveDraftEditOrder({
-        generalInfo: {
-          specificPCCFee: values.PCCFee,
-        },
-      }),
-    );
+    if (!isEmpty(values.PCCFee)) {
+      await dispatch(
+        saveDraftEditOrder({
+          generalInfo: {
+            specificPCCFee: parseInt(values.PCCFee.replace(/,/g, ''), 10),
+            hasSpecificPCCFee: true,
+          },
+        }),
+      );
+    } else {
+      await dispatch(
+        saveDraftEditOrder({
+          generalInfo: {
+            specificPCCFee: undefined,
+            hasSpecificPCCFee: false,
+          },
+        }),
+      );
+    }
   };
 
   const handleSubmitAllForms = async () => {
     await formSubmitRef?.current();
     await partnerFormSubmitRef?.current();
-    await PCCFeeFormSubmitRef?.current();
+
+    if (typeof PCCFeeFormSubmitRef?.current === 'function')
+      await PCCFeeFormSubmitRef?.current();
   };
 
   const handleNextTabInEditMode = () => {
@@ -288,7 +306,7 @@ const ServiceFeesAndNotes: React.FC<ServiceFeesAndNotesProps> = (props) => {
                   <div className={css.feeLabel}>PITO</div>
                   <RenderWhen condition={isEditFlow}>
                     <PCCForm
-                      initialValues={{ PCCFee: formattedPCCFee }}
+                      initialValues={{ PCCFee: initPCCFee }}
                       onSubmit={handlePCCFeeSubmit}
                       PCCFeePlaceholder={formattedPCCFee}
                       formSubmitRef={PCCFeeFormSubmitRef}
