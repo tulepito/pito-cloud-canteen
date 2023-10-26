@@ -147,7 +147,7 @@ const ServiceFeesAndNotes: React.FC<ServiceFeesAndNotesProps> = (props) => {
     }, {});
 
     if (isEditFlow) {
-      await dispatch(
+      dispatch(
         saveDraftEditOrder({
           generalInfo: {
             notes: newNotes,
@@ -178,7 +178,7 @@ const ServiceFeesAndNotes: React.FC<ServiceFeesAndNotesProps> = (props) => {
     }, {});
 
     if (isEditFlow) {
-      await dispatch(
+      dispatch(
         saveDraftEditOrder({
           generalInfo: {
             serviceFees: newPartnerFees,
@@ -198,7 +198,7 @@ const ServiceFeesAndNotes: React.FC<ServiceFeesAndNotesProps> = (props) => {
 
   const handlePCCFeeSubmit = async (values: TPCCFormValues) => {
     if (!isEmpty(values.PCCFee)) {
-      await dispatch(
+      dispatch(
         saveDraftEditOrder({
           generalInfo: {
             specificPCCFee: parseInt(values.PCCFee.replace(/,/g, ''), 10),
@@ -207,7 +207,7 @@ const ServiceFeesAndNotes: React.FC<ServiceFeesAndNotesProps> = (props) => {
         }),
       );
     } else {
-      await dispatch(
+      dispatch(
         saveDraftEditOrder({
           generalInfo: {
             specificPCCFee: undefined,
