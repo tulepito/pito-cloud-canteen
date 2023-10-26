@@ -43,6 +43,7 @@ const MealPlanCard: React.FC<TMealPlanCardProps> = ({
     onRecommendRestaurantForSpecificDayInProgress,
     onSearchRestaurant,
     availableOrderDetailCheckList,
+    shouldHideRemoveMealIcon = false,
   } = resources;
 
   const availableStatus =
@@ -78,6 +79,7 @@ const MealPlanCard: React.FC<TMealPlanCardProps> = ({
         removeEventItem={removeEventItem}
         removeInprogress={removeInprogress}
         onSearchRestaurant={onSearchRestaurant}
+        shouldHideRemoveIcon={shouldHideRemoveMealIcon}
       />
       <MealPlanCardContent
         event={event}
