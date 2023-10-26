@@ -4,6 +4,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import classNames from 'classnames';
 import isEmpty from 'lodash/isEmpty';
+import isEqual from 'lodash/isEqual';
 import { DateTime } from 'luxon';
 
 import Badge, { EBadgeType } from '@components/Badge/Badge';
@@ -11,8 +12,10 @@ import Button from '@components/Button/Button';
 import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
 import AddMorePlan from '@components/CalendarDashboard/components/MealPlanCard/components/AddMorePlan';
 import MealPlanCard from '@components/CalendarDashboard/components/MealPlanCard/MealPlanCard';
+import IconDangerWithCircle from '@components/Icons/IconDangerWithCircle/IconDangerWithCircle';
 import IconRefreshing from '@components/Icons/IconRefreshing/IconRefreshing';
 import IconSetting from '@components/Icons/IconSetting/IconSetting';
+import AlertModal from '@components/Modal/AlertModal';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { calculateGroupMembersAmount } from '@helpers/company';
 import { parseDateFromTimestampAndHourString } from '@helpers/dateHelpers';
@@ -80,6 +83,8 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     setTrue: openPickFoodModal,
     setFalse: closePickFoodModal,
   } = useBoolean();
+  const confirmChangeOrderDetailControl = useBoolean();
+  const shouldNextTabControl = useBoolean();
   const draftEditOrderDetail = useAppSelector(
     (state) => state.Order.draftEditOrderData.orderDetail,
   );
@@ -96,7 +101,6 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     (state) => state.Order.orderDetail,
     shallowEqual,
   );
-
   const order = useAppSelector((state) => state.Order.order, shallowEqual);
   const selectedCompany = useAppSelector(
     (state) => state.Order.selectedCompany,
@@ -266,11 +270,168 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
   );
   const showPickFoodModal = isPickFoodModalOpen && !fetchFoodInProgress;
 
+  const allCompanyGroups =
+    selectedCompany?.attributes.profile.metadata.groups?.reduce(
+      (result: any, group: any) => {
+        return {
+          ...result,
+          [group.id]: group.name,
+        };
+      },
+      {},
+    ) || {};
+  const selectedGroupsName = (draftSelectGroups || selectedGroups).map(
+    (groupId: string) => {
+      if (groupId === 'allMembers') {
+        return intl.formatMessage({ id: 'ParticipantSetupField.allMembers' });
+      }
+
+      return allCompanyGroups[groupId];
+    },
+  );
+  const pickingDeadline = parseDateFromTimestampAndHourString(
+    draftDeadlineDate || deadlineDate,
+    draftDeadlineHour || deadlineHour,
+    'dd/MM/yyyy, hh:mm',
+  );
+  const allMembersAmount =
+    draftMemberAmount ||
+    memberAmount ||
+    (selectedCompany &&
+      calculateGroupMembersAmount(
+        selectedCompany,
+        draftSelectGroups || selectedGroups,
+      ));
+
+  const initialOrderSettingValues = useMemo(
+    () => ({
+      [OrderSettingField.COMPANY]:
+        selectedCompany?.attributes.profile.publicData.companyName,
+      [OrderSettingField.DELIVERY_ADDRESS]: draftAddress || address,
+      [OrderSettingField.DELIVERY_TIME]: draftDeliveryHour || deliveryHour,
+      [OrderSettingField.EMPLOYEE_AMOUNT]: allMembersAmount,
+      [OrderSettingField.SPECIAL_DEMAND]: '',
+      [OrderSettingField.PER_PACK]: intl.formatMessage(
+        { id: 'SetupOrderDetail.perPack' },
+        {
+          value:
+            addCommas(
+              (draftPackagePerMember || packagePerMember)?.toString(),
+            ) || '',
+        },
+      ),
+      ...(typeof draftPickAllow !== 'undefined'
+        ? draftPickAllow
+        : pickAllow
+        ? {
+            [OrderSettingField.PICKING_DEADLINE]: pickingDeadline,
+            [OrderSettingField.ACCESS_SETTING]: (
+              draftSelectGroups || selectedGroupsName
+            )?.join(', '),
+          }
+        : {}),
+    }),
+    [
+      draftAddress,
+      address,
+      allMembersAmount,
+      selectedCompany?.attributes.profile.publicData.companyName,
+      draftDeliveryHour,
+      deliveryHour,
+      draftPackagePerMember,
+      packagePerMember,
+      draftPickAllow,
+      pickAllow,
+      pickingDeadline,
+      JSON.stringify(draftSelectGroups),
+      JSON.stringify(selectedGroupsName),
+    ],
+  );
+
+  const inProgress =
+    (updateOrderInProgress || updateOrderDetailInProgress) &&
+    !onRecommendRestaurantInProgress;
+  const isOrderDetailChanged = !isEqual(orderDetail, draftEditOrderDetail);
+  const shouldShowConfirmChangedModal =
+    isPickingOrder && isEditFlow && isOrderDetailChanged;
+  const disabledSubmit =
+    !isEditFlow &&
+    (Object.keys(orderDetail).length === 0 ||
+      missingSelectedFood.length > 0 ||
+      Object.keys(availableOrderDetailCheckList).some(
+        (item) => !availableOrderDetailCheckList[item].isAvailable,
+      ));
+  const initialFoodList = isPickFoodModalOpen
+    ? (draftEditOrderDetail || orderDetail)[selectedDate?.getTime()]?.restaurant
+        ?.foodList
+    : {};
+
+  const onApplyOtherDaysInProgress = updateOrderDetailInProgress;
+  const restaurantListFromOrder = Object.keys(
+    getRestaurantListFromOrderDetail(
+      isEditFlow
+        ? isEmpty(draftEditOrderDetail)
+          ? orderDetail
+          : draftEditOrderDetail
+        : orderDetail,
+    ),
+  );
+  const recommendParams = {
+    startDate: draftStartDate || startDate,
+    endDate: draftEndDate || endDate,
+    dayInWeek: suitableDayInWeek,
+    deliveryOrigin: draftOrigin || origin,
+    memberAmount: draftMemberAmount || memberAmount,
+    isNormalOrder:
+      draftPickAllow || pickAllow ? EOrderType.group : EOrderType.normal,
+    nutritions: draftNutritions || nutritions,
+    packagePerMember: draftPackagePerMember || packagePerMember,
+    daySession: draftDaySession || daySession,
+    orderDetail: draftEditOrderDetail || orderDetail,
+  };
+
+  // TODO: handle next tab and next to review tab clicks
+  const handleNextTabClick = () => {
+    dispatch(setCanNotGoToStep4(false));
+
+    if (shouldShowConfirmChangedModal) {
+      confirmChangeOrderDetailControl.setTrue();
+      shouldNextTabControl.setTrue();
+    } else {
+      nextTab();
+    }
+  };
+  const handleNextReviewTabClick = () => {
+    if (shouldShowConfirmChangedModal) {
+      confirmChangeOrderDetailControl.setTrue();
+    } else if (nextToReviewTab) {
+      nextToReviewTab();
+    }
+  };
+
+  // TODO: handle confirm order detail changed action clicks
+  const handleConfirmOrderDetailChanges = () => {
+    confirmChangeOrderDetailControl.setFalse();
+    if (shouldNextTabControl.value) {
+      nextTab();
+    } else if (nextToReviewTab) nextToReviewTab();
+  };
+  const handleRejectOrderDetailChanges = () => {
+    dispatch(
+      saveDraftEditOrder({
+        orderDetail,
+      }),
+    );
+    handleConfirmOrderDetailChanges();
+  };
+
+  // TODO: handle click add more plan
   const handleAddMorePlanClick = (date: Date) => {
     dispatch(selectCalendarDate(date));
     dispatch(selectRestaurant());
   };
 
+  // TODO: handle go back calendar flow when selecting restaurant
   const handleGoBackWhenSelectingRestaurant = () => {
     dispatch(unSelectRestaurant());
   };
@@ -316,153 +477,23 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     dispatch(unSelectRestaurant());
   };
 
-  const allCompanyGroups =
-    selectedCompany?.attributes.profile.metadata.groups?.reduce(
-      (result: any, group: any) => {
-        return {
-          ...result,
-          [group.id]: group.name,
-        };
-      },
-      {},
-    ) || {};
-  const selectedGroupsName = (draftSelectGroups || selectedGroups).map(
-    (groupId: string) => {
-      if (groupId === 'allMembers') {
-        return intl.formatMessage({ id: 'ParticipantSetupField.allMembers' });
-      }
-
-      return allCompanyGroups[groupId];
-    },
-  );
-  const pickingDeadline = parseDateFromTimestampAndHourString(
-    draftDeadlineDate || deadlineDate,
-    draftDeadlineHour || deadlineHour,
-    'dd/MM/yyyy, hh:mm',
-  );
-  const allMembersAmount =
-    draftMemberAmount ||
-    memberAmount ||
-    (selectedCompany &&
-      calculateGroupMembersAmount(
-        selectedCompany,
-        draftSelectGroups || selectedGroups,
-      ));
-
-  const recommendParams = {
-    startDate: draftStartDate || startDate,
-    endDate: draftEndDate || endDate,
-    dayInWeek: suitableDayInWeek,
-    deliveryOrigin: draftOrigin || origin,
-    memberAmount: draftMemberAmount || memberAmount,
-    isNormalOrder:
-      draftPickAllow || pickAllow ? EOrderType.group : EOrderType.normal,
-    nutritions: draftNutritions || nutritions,
-    packagePerMember: draftPackagePerMember || packagePerMember,
-    daySession: draftDaySession || daySession,
-    orderDetail: draftEditOrderDetail || orderDetail,
+  // TODO: check edit food is in progress
+  const onEditFoodInProgress = (timestamp: number) => {
+    return (
+      (fetchFoodInProgress || fetchRestaurantsInProgress) &&
+      selectedDate?.getTime() === timestamp
+    );
   };
 
-  const initialFieldValues = useMemo(
-    () => ({
-      [OrderSettingField.COMPANY]:
-        selectedCompany?.attributes.profile.publicData.companyName,
-      [OrderSettingField.DELIVERY_ADDRESS]: draftAddress || address,
-      [OrderSettingField.DELIVERY_TIME]: draftDeliveryHour || deliveryHour,
-      [OrderSettingField.EMPLOYEE_AMOUNT]: allMembersAmount,
-      [OrderSettingField.SPECIAL_DEMAND]: '',
-      [OrderSettingField.PER_PACK]: intl.formatMessage(
-        { id: 'SetupOrderDetail.perPack' },
-        {
-          value:
-            addCommas(
-              (draftPackagePerMember || packagePerMember)?.toString(),
-            ) || '',
-        },
-      ),
-      ...(typeof draftPickAllow !== 'undefined'
-        ? draftPickAllow
-        : pickAllow
-        ? {
-            [OrderSettingField.PICKING_DEADLINE]: pickingDeadline,
-            [OrderSettingField.ACCESS_SETTING]: (
-              draftSelectGroups || selectedGroupsName
-            )?.join(', '),
-          }
-        : {}),
-    }),
-    [
-      draftAddress,
-      address,
-      allMembersAmount,
-      selectedCompany?.attributes.profile.publicData.companyName,
-      draftDeliveryHour,
-      deliveryHour,
-      draftPackagePerMember,
-      packagePerMember,
-      draftPickAllow,
-      pickAllow,
-      pickingDeadline,
-      JSON.stringify(draftSelectGroups),
-      JSON.stringify(selectedGroupsName),
-    ],
-  );
-  const addMorePlanExtraProps = {
-    onClick: handleAddMorePlanClick,
-    startDate: draftStartDate || startDate,
-    endDate: draftEndDate || endDate,
+  // TODO: check recommend restaurant for day is in progress
+  const onRecommendRestaurantForSpecificDayInProgress = (timestamp: number) => {
+    return (
+      onRescommendRestaurantForSpecificDateInProgress &&
+      selectedDate?.getTime() === timestamp
+    );
   };
 
-  const inProgress =
-    (updateOrderInProgress || updateOrderDetailInProgress) &&
-    !onRecommendRestaurantInProgress;
-
-  const disabledSubmit =
-    !isEditFlow &&
-    (Object.keys(orderDetail).length === 0 ||
-      missingSelectedFood.length > 0 ||
-      Object.keys(availableOrderDetailCheckList).some(
-        (item) => !availableOrderDetailCheckList[item].isAvailable,
-      ));
-  const initialFoodList = isPickFoodModalOpen
-    ? (draftEditOrderDetail || orderDetail)[selectedDate?.getTime()]?.restaurant
-        ?.foodList
-    : {};
-
-  const calendarExtraResources = useGetCalendarExtraResources({
-    order,
-    startDate: draftStartDate || startDate,
-    endDate: draftEndDate || endDate,
-  });
-  const onApplyOtherDaysInProgress = updateOrderDetailInProgress;
-
-  const onSubmit = () => {
-    dispatch(setCanNotGoToStep4(false));
-    nextTab();
-  };
-
-  const restaurantListFromOrder = Object.keys(
-    getRestaurantListFromOrderDetail(
-      isEditFlow
-        ? isEmpty(draftEditOrderDetail)
-          ? orderDetail
-          : draftEditOrderDetail
-        : orderDetail,
-    ),
-  );
-
-  useEffect(() => {
-    if (!isEmpty(restaurantListFromOrder)) {
-      dispatch(orderAsyncActions.fetchRestaurantCoverImages({ isEditFlow }));
-    }
-  }, [JSON.stringify(restaurantListFromOrder), isEditFlow]);
-
-  useEffect(() => {
-    if (!isEmpty(orderDetail)) {
-      dispatch(orderAsyncActions.checkRestaurantStillAvailable());
-    }
-  }, [dispatch, JSON.stringify(orderDetail)]);
-
+  // TODO: handle selecting food from food modal
   const handleSelectFood = async (values: TSelectFoodFormValues) => {
     dispatch(setCanNotGoToStep4(true));
     const { food: foodIds } = values;
@@ -481,6 +512,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     closePickFoodModal();
   };
 
+  // TODO: handle change food in meal
   const handleEditFoodInMealPlanCard = async (
     dateTime: any,
     restaurantId: string,
@@ -500,20 +532,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     openPickFoodModal();
   };
 
-  const onEditFoodInProgress = (timestamp: number) => {
-    return (
-      (fetchFoodInProgress || fetchRestaurantsInProgress) &&
-      selectedDate?.getTime() === timestamp
-    );
-  };
-
-  const onRecommendRestaurantForSpecificDayInProgress = (timestamp: number) => {
-    return (
-      onRescommendRestaurantForSpecificDateInProgress &&
-      selectedDate?.getTime() === timestamp
-    );
-  };
-
+  // TODO: handle remove day's meal
   const handleRemoveMeal = useCallback(
     (id: string) => (resourceId: string) => {
       dispatch(setCanNotGoToStep4(true));
@@ -531,6 +550,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     [dispatch, orderId],
   );
 
+  // TODO: handle recommend restaurant days in week
   const onRecommendNewRestaurants = useCallback(async () => {
     dispatch(setOnRecommendRestaurantInProcess(true));
 
@@ -563,6 +583,19 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     dispatch(setOnRecommendRestaurantInProcess(false));
   }, []);
 
+  // TODO: handle recommend restaurant for specific day
+  const onRecommendRestaurantForSpecificDay = (date: number) => {
+    dispatch(selectCalendarDate(DateTime.fromMillis(date).toJSDate()));
+    dispatch(
+      orderAsyncActions.recommendRestaurantForSpecificDay({
+        shouldUpdatePlanOrderOrderDetail: !isEditFlow,
+        dateTime: date,
+        ...(isEditFlow ? { recommendParams } : {}),
+      }),
+    );
+  };
+
+  // TODO: handle apply meal for other days
   const onApplyOtherDays = useCallback(
     async (date: string, selectedDates: string[]) => {
       const totalDates = renderDateRange(
@@ -626,16 +659,68 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     ],
   );
 
-  const onRecommendRestaurantForSpecificDay = (date: number) => {
-    dispatch(selectCalendarDate(DateTime.fromMillis(date).toJSDate()));
-    dispatch(
-      orderAsyncActions.recommendRestaurantForSpecificDay({
-        shouldUpdatePlanOrderOrderDetail: !isEditFlow,
-        dateTime: date,
-        ...(isEditFlow ? { recommendParams } : {}),
-      }),
+  // TODO: prepare calendar resources and props
+  const defaultCalendarExtraResources = useGetCalendarExtraResources({
+    order,
+    startDate: draftStartDate || startDate,
+    endDate: draftEndDate || endDate,
+  });
+  const calendarExtraResources = {
+    ...defaultCalendarExtraResources,
+    onEditFood: handleEditFoodInMealPlanCard,
+    onSearchRestaurant: handleAddMorePlanClick,
+    onEditFoodInProgress,
+    dayInWeek: suitableDayInWeek,
+    onApplyOtherDays,
+    onApplyOtherDaysInProgress,
+    onRecommendRestaurantForSpecificDay,
+    onRecommendRestaurantForSpecificDayInProgress,
+    availableOrderDetailCheckList,
+    shouldHideAddMorePlan,
+    shouldHideRemoveMealIcon,
+  };
+  const addMorePlanExtraProps = {
+    onClick: handleAddMorePlanClick,
+    startDate: draftStartDate || startDate,
+    endDate: draftEndDate || endDate,
+  };
+  const renderEvent = (props: any) => {
+    return (
+      <MealPlanCard
+        {...props}
+        removeInprogress={props?.resources?.updatePlanDetailInprogress}
+        onRemove={handleRemoveMeal(props?.resources?.planId)}
+      />
     );
   };
+  const calendarComponents = {
+    contentEnd: (props: any) => (
+      <AddMorePlan {...props} {...addMorePlanExtraProps} />
+    ),
+  };
+  const recommendButton = (
+    <div className={css.buttonContainer}>
+      <Button
+        onClick={onRecommendNewRestaurants}
+        variant="secondary"
+        className={css.recommendNewRestaurantBtn}>
+        <IconRefreshing inProgress={onRecommendRestaurantInProgress} />
+        <FormattedMessage id="SetupOrderDetail.recommendNewRestaurant" />
+      </Button>
+    </div>
+  );
+
+  useEffect(() => {
+    if (!isEmpty(restaurantListFromOrder)) {
+      dispatch(orderAsyncActions.fetchRestaurantCoverImages({ isEditFlow }));
+    }
+  }, [JSON.stringify(restaurantListFromOrder), isEditFlow]);
+
+  useEffect(() => {
+    if (!isEmpty(orderDetail)) {
+      dispatch(orderAsyncActions.checkRestaurantStillAvailable());
+    }
+  }, [dispatch, JSON.stringify(orderDetail)]);
 
   return (
     <>
@@ -678,67 +763,28 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
               <CalendarDashboard
                 anchorDate={suitableStartDate}
                 events={resourcesForCalender}
-                renderEvent={(props: any) => {
-                  return (
-                    <MealPlanCard
-                      {...props}
-                      removeInprogress={
-                        props?.resources?.updatePlanDetailInprogress
-                      }
-                      onRemove={handleRemoveMeal(props?.resources?.planId)}
-                    />
-                  );
-                }}
+                renderEvent={renderEvent}
                 companyLogo="Company"
                 startDate={new Date(draftStartDate || startDate)}
                 endDate={new Date(draftEndDate || endDate)}
-                resources={{
-                  ...calendarExtraResources,
-                  onEditFood: handleEditFoodInMealPlanCard,
-                  onSearchRestaurant: handleAddMorePlanClick,
-                  onEditFoodInProgress,
-                  dayInWeek: suitableDayInWeek,
-                  onApplyOtherDays,
-                  onApplyOtherDaysInProgress,
-                  onRecommendRestaurantForSpecificDay,
-                  onRecommendRestaurantForSpecificDayInProgress,
-                  availableOrderDetailCheckList,
-                  shouldHideAddMorePlan,
-                  shouldHideRemoveMealIcon,
-                }}
-                components={{
-                  contentEnd: (props) => (
-                    <AddMorePlan {...props} {...addMorePlanExtraProps} />
-                  ),
-                }}
+                resources={calendarExtraResources}
+                components={calendarComponents}
                 hideMonthView
-                recommendButton={
-                  <div className={css.buttonContainer}>
-                    <Button
-                      onClick={onRecommendNewRestaurants}
-                      variant="secondary"
-                      className={css.recommendNewRestaurantBtn}>
-                      <IconRefreshing
-                        inProgress={onRecommendRestaurantInProgress}
-                      />
-                      <FormattedMessage id="SetupOrderDetail.recommendNewRestaurant" />
-                    </Button>
-                  </div>
-                }
+                recommendButton={recommendButton}
               />
             </div>
             <NavigateButtons
               goBack={goBack}
-              onNextClick={onSubmit}
+              onNextClick={handleNextTabClick}
               submitDisabled={disabledSubmit}
               inProgress={inProgress}
-              onCompleteClick={nextToReviewTab}
+              onCompleteClick={handleNextReviewTabClick}
               flowType={flowType}
             />
             <OrderSettingModal
               isOpen={isOrderSettingModalOpen}
               onClose={onOrderSettingModalClose}
-              initialFieldValues={initialFieldValues}
+              initialFieldValues={initialOrderSettingValues}
             />
           </div>
         </RenderWhen.False>
@@ -752,6 +798,24 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
         selectFoodInProgress={updateOrderDetailInProgress}
         handleSelectFood={handleSelectFood}
       />
+      <AlertModal
+        isOpen={confirmChangeOrderDetailControl.value}
+        containerClassName={css.confirmOrderDetailChanged}
+        handleClose={confirmChangeOrderDetailControl.setFalse}
+        cancelLabel={'Huỷ thay đổi'}
+        shouldHideIconClose
+        confirmLabel={'Tiếp tục'}
+        onCancel={handleRejectOrderDetailChanges}
+        onConfirm={handleConfirmOrderDetailChanges}
+        childrenClassName={css.confirmOrderDetailChangedChildren}
+        actionsClassName={css.confirmOrderDetailChangedActions}>
+        <div className={css.modalIconContainer}>
+          <IconDangerWithCircle />
+        </div>
+        <div className={css.description}>
+          Những lựa chọn Nhà hàng & Món ăn sẽ thay đổi.
+        </div>
+      </AlertModal>
     </>
   );
 };
