@@ -3,7 +3,8 @@ import configs from '@src/configs';
 import { ensureTransaction } from './data';
 import type { TTransaction } from './types';
 
-export const CHANGE_STRUCTURE_TX_PROCESS_VERSION = 21;
+export const CHANGE_STRUCTURE_TX_PROCESS_VERSION =
+  process.env.NEXT_PUBLIC_CHANGE_STRUCTURE_TX_PROCESS_VERSION;
 
 export enum ETransactionActor {
   CUSTOMER = 'customer',
