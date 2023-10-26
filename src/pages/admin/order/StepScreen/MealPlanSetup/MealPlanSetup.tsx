@@ -146,14 +146,22 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
         draftSelectGroups || selectedGroups,
       ));
 
-  const restaurantListFromOrder = Object.keys(
-    getRestaurantListFromOrderDetail(
-      isEditFlow
-        ? isEmpty(draftEditOrderDetail)
-          ? orderDetail
-          : draftEditOrderDetail
-        : orderDetail,
-    ),
+  const restaurantListFromOrder = useMemo(
+    () =>
+      Object.keys(
+        getRestaurantListFromOrderDetail(
+          isEditFlow
+            ? isEmpty(draftEditOrderDetail)
+              ? orderDetail
+              : draftEditOrderDetail
+            : orderDetail,
+        ),
+      ),
+    [
+      isEditFlow,
+      JSON.stringify(orderDetail),
+      JSON.stringify(draftEditOrderDetail),
+    ],
   );
 
   const initialValues = useMemo(
@@ -203,13 +211,13 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
     ],
   );
 
-  const handleNextTabOrNextReviewTab = () => {
-    if (shouldNextTabControl.value) {
+  const handleNextTabOrNextReviewTab = (shouldNext = false) => {
+    if (shouldNextTabControl.value || shouldNext) {
       nextTab();
     } else if (nextToReviewTab) nextToReviewTab();
   };
 
-  const handleSubmitSaveDraft = async () => {
+  const handleSubmitSaveDraft = async (shouldNext = false) => {
     const { deliveryAddress, ...restDraftValues } = draftEditValues as TObject;
     const { deliveryAddress: initDeliveryAddress, ...restInitialValues } =
       initialValues;
@@ -258,7 +266,7 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
         );
       }
     } else {
-      handleNextTabOrNextReviewTab();
+      handleNextTabOrNextReviewTab(shouldNext);
     }
   };
 
@@ -357,7 +365,7 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
 
   const handleNextTabInEditMode = () => {
     shouldNextTabControl.setTrue();
-    handleSubmitSaveDraft();
+    handleSubmitSaveDraft(true);
   };
 
   const handleNextToReviewTabInEditMode = () => {
