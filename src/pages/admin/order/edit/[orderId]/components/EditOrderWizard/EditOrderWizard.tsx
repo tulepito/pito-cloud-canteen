@@ -182,7 +182,7 @@ const EditOrderWizard = () => {
 
   useEffect(() => {
     if (!fetchOrderInProgress) {
-      dispatch(orderAsyncActions.fetchOrderRestaurants());
+      dispatch(orderAsyncActions.fetchOrderRestaurants({ isEditFlow: true }));
     }
   }, [fetchOrderInProgress]);
 
