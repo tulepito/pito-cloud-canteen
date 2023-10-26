@@ -263,7 +263,7 @@ export const getRestaurantListFromOrderDetail = (
     const { restaurant } = current;
     const { restaurantName } = restaurant || {};
 
-    if (!result[restaurantName as string]) {
+    if (restaurantName && !result[restaurantName as string]) {
       // eslint-disable-next-line no-param-reassign
       result[restaurantName as string] = true;
     }

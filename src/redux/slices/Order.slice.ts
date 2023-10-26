@@ -741,11 +741,22 @@ const fetchOrderDetail = createAsyncThunk(
 const fetchRestaurantCoverImages = createAsyncThunk(
   FETCH_RESTAURANT_COVER_IMAGE,
   async ({ isEditFlow = false }: any, { extra: sdk, getState }) => {
-    const { orderDetail = {} } = isEditFlow
-      ? getState().Order.draftEditOrderData
-      : getState().Order;
+    const { orderDetail = {} } = getState().Order;
+    const { orderDetail: draftOrderDetail = {} } =
+      getState().Order.draftEditOrderData;
+
+    const suitableOrderDetail = isEditFlow
+      ? isEmpty(draftOrderDetail)
+        ? orderDetail
+        : draftOrderDetail
+      : orderDetail;
+
     const restaurantIdList = compact(
-      uniq(Object.values(orderDetail).map((item: any) => item?.restaurant?.id)),
+      uniq(
+        Object.values(suitableOrderDetail).map(
+          (item: any) => item?.restaurant?.id,
+        ),
+      ),
     );
 
     const restaurantCoverImageList = await Promise.all(
@@ -957,11 +968,18 @@ const checkRestaurantStillAvailable = createAsyncThunk(
 const fetchOrderRestaurants = createAsyncThunk(
   FETCH_ORDER_RESTAURANTS,
   async ({ isEditFlow = false }: any, { extra: sdk, getState }) => {
-    const { orderDetail = {} } = isEditFlow
-      ? getState().Order.draftEditOrderData
-      : getState().Order;
+    const { orderDetail = {} } = getState().Order;
+    const { orderDetail: draftOrderDetail = {} } =
+      getState().Order.draftEditOrderData;
+
+    const suitableOrderDetail = isEditFlow
+      ? isEmpty(draftOrderDetail)
+        ? orderDetail
+        : draftOrderDetail
+      : orderDetail;
+
     const restaurantIdList = uniq(
-      Object.values(orderDetail).map((item: any) => item.restaurant.id),
+      Object.values(suitableOrderDetail).map((item: any) => item.restaurant.id),
     );
 
     const restaurantList = await Promise.all(
