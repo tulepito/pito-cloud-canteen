@@ -135,7 +135,7 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
     displayedDurationTime: draftDisplayedDurationTime,
     durationTimeMode: draftDurationTimeMode,
     daySession: draftDaySession,
-  } = draftEditOrderData;
+  } = draftEditOrderData || {};
   const { address: draftAddress, origin: draftOrigin } =
     draftDeliveryAddress || {};
 
