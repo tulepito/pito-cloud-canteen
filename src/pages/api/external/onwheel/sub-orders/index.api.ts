@@ -1,4 +1,5 @@
 import { uniq } from 'lodash';
+import isEmpty from 'lodash/isEmpty';
 import { DateTime } from 'luxon';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
@@ -259,7 +260,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           deliveryHour: DateTime.fromMillis(Number(timestamp))
             .setZone(VNTimezone)
             .plus({
-              ...convertHHmmStringToTimeParts(deliveryHour.split(' - ')[0]),
+              ...convertHHmmStringToTimeParts(
+                isEmpty(deliveryHour)
+                  ? undefined
+                  : deliveryHour.includes('-')
+                  ? deliveryHour.split('-')[0]
+                  : deliveryHour,
+              ),
             })
             .toUnixInteger(),
           subOrderTitle,
