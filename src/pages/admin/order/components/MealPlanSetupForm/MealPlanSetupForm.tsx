@@ -20,7 +20,7 @@ import DurationForNextOrderField from '../DurationForNextOrderField/DurationForN
 import FoodPickingField from '../FoodPickingField/FoodPickingField';
 import MealPlanDateField from '../MealPlanDateField/MealPlanDateField';
 import MemberAmountField from '../MemberAmountField/MemberAmountField';
-import NavigateButtons, { EFlowType } from '../NavigateButtons/NavigateButtons';
+import { EFlowType } from '../NavigateButtons/NavigateButtons';
 import NutritionField from '../NutritionField/NutritionField';
 import OrderDeadlineField from '../OrderDeadlineField/OrderDeadlineField';
 import ParticipantSetupField from '../ParticipantSetupField/ParticipantSetupField';
@@ -43,7 +43,9 @@ type TExtraProps = {
   onGoBack?: () => void;
   onNextClick?: () => void;
   onCompleteClick?: () => void;
+  formSubmitRef: any;
   setDraftEditValues: (value: any) => void;
+  shouldDisableFields: boolean;
 };
 type TMealPlanSetupFormComponentProps =
   FormRenderProps<TMealPlanSetupFormValues> & Partial<TExtraProps>;
@@ -62,22 +64,21 @@ const MealPlanSetupFormComponent: React.FC<TMealPlanSetupFormComponentProps> = (
     clientId,
     nutritionsOptions,
     flowType,
-    onGoBack,
-    onCompleteClick,
-    onNextClick,
     setDraftEditValues,
     isOrderInProgress,
+    formSubmitRef,
+    shouldDisableFields = false,
   } = props;
   const intl = useIntl();
   const dispatch = useAppDispatch();
   const [deliveryHourNotMatchError, setDeliveryHourNotMatchError] =
     useState<string>('');
-  const step2SubmitInProgress = useAppSelector(
-    (state) => state.Order.step2SubmitInProgress,
-  );
   const restaurantListings = useAppSelector(
     (state) => state.Order.restaurantListings,
   );
+
+  formSubmitRef.current = handleSubmit;
+
   const isEditFlow = flowType === EFlowType.edit;
   const isEditInProgressOrder = isEditFlow && isOrderInProgress;
   const {
@@ -133,13 +134,19 @@ const MealPlanSetupFormComponent: React.FC<TMealPlanSetupFormComponentProps> = (
             },
           }),
         );
-        onNextClick?.();
       } else {
         setDeliveryHourNotMatchError(
           'Thời gian giao hàng bạn chọn không phù hợp với thời gian phục vụ của nhà hàng',
         );
       }
     }
+  };
+
+  const onSubmit = (e: TMealPlanSetupFormValues) => {
+    if (isEditInProgressOrder) {
+      onHandleNextClick();
+    }
+    handleSubmit(e);
   };
 
   useEffect(() => {
@@ -179,7 +186,7 @@ const MealPlanSetupFormComponent: React.FC<TMealPlanSetupFormComponentProps> = (
   }, [JSON.stringify(values)]);
 
   return (
-    <Form onSubmit={handleSubmit}>
+    <Form onSubmit={onSubmit}>
       <div className={css.headerLabel}>
         {intl.formatMessage(
           { id: 'MealPlanSetup.headerLabel' },
@@ -192,64 +199,65 @@ const MealPlanSetupFormComponent: React.FC<TMealPlanSetupFormComponentProps> = (
       <div className={css.fieldSection}>
         <DeliveryAddressField
           title={intl.formatMessage({ id: 'DeliveryAddressField.title' })}
+          disabled={shouldDisableFields}
         />
       </div>
       <div className={css.fieldSection}>
         <PerPackageField
           title={intl.formatMessage({ id: 'PerPackageField.title' })}
-          isEditFlow={isEditInProgressOrder}
+          disabled={shouldDisableFields}
         />
         <div className={css.verticalSpace}>
           <MemberAmountField
             title={intl.formatMessage({ id: 'MemberAmountField.title' })}
-            isEditFlow={isEditInProgressOrder}
+            disabled={shouldDisableFields}
           />
         </div>
       </div>
       <div className={css.fieldSection}>
         <NutritionField
+          disabled={shouldDisableFields}
           title={intl.formatMessage({ id: 'NutritionField.title' })}
           options={nutritionsOptions}
-          isEditFlow={isEditInProgressOrder}
         />
       </div>
       <div className={css.fieldSection}>
         <MealPlanDateField
           form={form}
+          disabled={shouldDisableFields}
           values={values}
           title={intl.formatMessage({ id: 'MealPlanDateField.title' })}
-          isEditFlow={isEditInProgressOrder}
         />
         <DaySessionField
           form={form}
+          disabled={shouldDisableFields}
           values={values}
           containerClassName={css.fieldSection}
           titleClassName={css.fieldTitle}
-          isEditFlow={isEditInProgressOrder}
         />
         <div className={css.verticalSpace}>
           <DayInWeekField
             form={form}
+            disabled={shouldDisableFields}
             values={values}
             title={intl.formatMessage({ id: 'DayInWeekField.label' })}
-            isEditFlow={isEditInProgressOrder}
           />
         </div>
 
         <div className={css.verticalSpace}>
           <DurationForNextOrderField
             form={form}
+            disabled={shouldDisableFields}
             displayedDurationTimeValue={values.displayedDurationTime}
             title={intl.formatMessage({
               id: 'DurationForNextOrderField.label',
             })}
-            isEditFlow={isEditInProgressOrder}
           />
         </div>
       </div>
 
       <div className={css.fieldSection}>
-        <FoodPickingField isEditFlow={isEditFlow} />
+        <FoodPickingField disabled={shouldDisableFields} />
         {pickAllowValue && (
           <div className={css.verticalSpace}>
             <OrderDeadlineField
@@ -258,7 +266,7 @@ const MealPlanSetupFormComponent: React.FC<TMealPlanSetupFormComponentProps> = (
               })}
               form={form}
               values={values}
-              isEditFlow={isEditInProgressOrder}
+              disabled={shouldDisableFields}
             />
           </div>
         )}
@@ -266,11 +274,11 @@ const MealPlanSetupFormComponent: React.FC<TMealPlanSetupFormComponentProps> = (
           <div className={css.verticalSpace}>
             <ParticipantSetupField
               form={form}
+              disabled={shouldDisableFields}
               clientId={clientId!}
               title={intl.formatMessage({
                 id: 'ParticipantSetupField.title',
               })}
-              isEditFlow={isEditInProgressOrder}
             />
           </div>
         )}
@@ -278,14 +286,6 @@ const MealPlanSetupFormComponent: React.FC<TMealPlanSetupFormComponentProps> = (
       <RenderWhen condition={!!deliveryHourNotMatchError}>
         <div className={css.error}>{deliveryHourNotMatchError}</div>
       </RenderWhen>
-
-      <NavigateButtons
-        flowType={flowType}
-        onNextClick={onHandleNextClick}
-        goBack={onGoBack}
-        onCompleteClick={onCompleteClick}
-        inProgress={step2SubmitInProgress}
-      />
     </Form>
   );
 };

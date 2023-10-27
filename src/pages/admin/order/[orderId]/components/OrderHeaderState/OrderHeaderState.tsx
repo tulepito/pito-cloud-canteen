@@ -64,16 +64,20 @@ const OrderHeaderState: React.FC<OrderHeaderStateProps> = (props) => {
   const { title } = orderListing.getAttributes();
   const { orderState, orderType = EOrderType.group } =
     orderListing.getMetadata();
+
+  const isGroupOrder = orderType === EOrderType.group;
+  const isPickingOrder = orderState === EOrderStates.picking;
+
   const orderStateLabel = useMemo(
     () => getLabelByKey(ORDER_STATE_OPTIONS, orderState),
     [orderState],
   );
   const statusClasses = classNames(css.status, {
-    [css.statusPicking]: orderState === EOrderStates.picking,
+    [css.statusPicking]: isPickingOrder,
   });
   const canStartOrder = isEnableToStartOrder(
     orderDetail,
-    orderType === EOrderType.group,
+    isGroupOrder,
     isAdminFlow,
   );
   const disableConfirmButton = !canStartOrder || updateOrderStateInProgress;
@@ -96,7 +100,9 @@ const OrderHeaderState: React.FC<OrderHeaderStateProps> = (props) => {
   const canCancelOrder = ORDER_STATE_TRANSIT_FLOW[
     orderState as TTransitionOrderState
   ]?.includes(EOrderStates.canceled);
-  const canEditOrder = ORDER_STATES_TO_ENABLE_EDIT_ABILITY.includes(orderState);
+  const canEditOrder =
+    ORDER_STATES_TO_ENABLE_EDIT_ABILITY.includes(orderState) &&
+    ((isPickingOrder && isGroupOrder) || !isPickingOrder);
 
   const hasAnyActionsCanDo =
     canEditOrder ||

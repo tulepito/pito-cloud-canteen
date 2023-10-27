@@ -16,11 +16,11 @@ const Amount = () => {
 
 type MemberAmountFieldProps = {
   title?: string;
-  isEditFlow?: boolean;
+  disabled?: boolean;
 };
 
 const MemberAmountField: React.FC<MemberAmountFieldProps> = (props) => {
-  const { title, isEditFlow } = props;
+  const { title, disabled = false } = props;
   const intl = useIntl();
   const perPackRequiredMessage = intl.formatMessage({
     id: 'MemberAmountField.memberAmount.required',
@@ -50,11 +50,11 @@ const MemberAmountField: React.FC<MemberAmountFieldProps> = (props) => {
           className={css.numberInput}
           rightIcon={<Amount />}
           rightIconContainerClassName={css.amountLabel}
+          disabled={disabled}
           validate={composeValidators(
             required(perPackRequiredMessage),
             nonNegativeValue(perPackNonNegativeMessage),
           )}
-          disabled={isEditFlow}
         />
       </div>
     </div>

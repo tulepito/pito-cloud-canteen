@@ -13,7 +13,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     switch (apiMethod) {
       case HttpMethod.POST: {
         try {
-          const { planId } = req.query;
+          const { orderId } = req.query;
           const createData = req.body;
           const { currentUser } = await getCurrentUser(req, res);
           const createdAt = createData?.createdAt
@@ -21,7 +21,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             : new Date();
           const response =
             await orderServices.createOrderHistoryRecordToFirestore({
-              planId,
+              orderId,
               authorId: CurrentUser(currentUser).getId(),
               ...createData,
               createdAt,

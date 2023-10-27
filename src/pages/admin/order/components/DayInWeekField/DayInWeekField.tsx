@@ -26,7 +26,7 @@ type TDayInWeekFieldProps = {
   titleClassName?: string;
   containerClassName?: string;
   fieldGroupClassName?: string;
-  isEditFlow?: boolean;
+  disabled?: boolean;
 };
 
 const DayInWeekField: React.FC<TDayInWeekFieldProps> = (props) => {
@@ -37,7 +37,7 @@ const DayInWeekField: React.FC<TDayInWeekFieldProps> = (props) => {
     containerClassName,
     titleClassName,
     fieldGroupClassName,
-    isEditFlow,
+    disabled,
   } = props;
   const intl = useIntl();
 
@@ -68,12 +68,12 @@ const DayInWeekField: React.FC<TDayInWeekFieldProps> = (props) => {
         id="dayInWeek"
         name="dayInWeek"
         type="hidden"
-        disabled={isEditFlow}
+        disabled={disabled}
       />
       <div className={fieldGroupsClasses}>
         {DAY_IN_WEEK.map((day) => {
-          const onDaySelect = () => {
-            if (isEditFlow) return;
+          const handleDaySelect = () => {
+            if (disabled) return;
 
             if (selectedDays.includes(day.key))
               setSelectedDays(selectedDays.filter((key) => key !== day.key));
@@ -86,9 +86,9 @@ const DayInWeekField: React.FC<TDayInWeekFieldProps> = (props) => {
               className={classNames(css.dayItem, {
                 [css.selected]: selectedDays.includes(day.key),
                 [css.disabled]:
-                  disableDayInWeekOptions.includes(day) || isEditFlow,
+                  disableDayInWeekOptions.includes(day) || disabled,
               })}
-              onClick={onDaySelect}>
+              onClick={handleDaySelect}>
               {intl.formatMessage({ id: day.label })}
             </div>
           );

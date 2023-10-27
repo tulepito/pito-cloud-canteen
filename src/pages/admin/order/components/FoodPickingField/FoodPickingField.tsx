@@ -5,10 +5,13 @@ import Toggle from '@components/Toggle/Toggle';
 
 import css from './FoodPickingField.module.scss';
 
-type FoodPickingFieldProps = {
-  isEditFlow?: boolean;
+type TFoodPickingField = {
+  disabled?: boolean;
 };
-const FoodPickingField: React.FC<FoodPickingFieldProps> = ({ isEditFlow }) => {
+
+const FoodPickingField: React.FC<TFoodPickingField> = ({
+  disabled = false,
+}) => {
   const intl = useIntl();
 
   return (
@@ -17,7 +20,7 @@ const FoodPickingField: React.FC<FoodPickingFieldProps> = ({ isEditFlow }) => {
         {intl.formatMessage({ id: 'FoodPickingField.title' })}
       </div>
       <div className={css.fieldGroups}>
-        <Field id="pickAllow" name="pickAllow">
+        <Field id="pickAllow" name="pickAllow" disabled={disabled}>
           {(props) => {
             const { id, input } = props;
 
@@ -28,12 +31,12 @@ const FoodPickingField: React.FC<FoodPickingFieldProps> = ({ isEditFlow }) => {
                 })}
                 id={id}
                 name={input.name}
+                disabled={disabled}
                 status={input.value ? 'on' : 'off'}
                 onClick={(value) => {
                   input.onChange(value);
                 }}
                 className={css.toggle}
-                disabled={isEditFlow}
               />
             );
           }}

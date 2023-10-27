@@ -13,17 +13,17 @@ type DurationForNextOrderFieldProps = {
   displayedDurationTimeValue: string;
   title?: string;
   containerClassName?: string;
-  isEditFlow?: boolean;
+  disabled?: boolean;
 };
 const DurationForNextOrderField: React.FC<DurationForNextOrderFieldProps> = (
   props,
 ) => {
   const {
     form,
+    disabled = false,
     displayedDurationTimeValue,
     title,
     containerClassName,
-    isEditFlow,
   } = props;
   const intl = useIntl();
   const [timeMode, setTimeMode] = useState<'week' | 'month'>('week');
@@ -53,33 +53,39 @@ const DurationForNextOrderField: React.FC<DurationForNextOrderFieldProps> = (
           className={css.durationTimeInput}
           placeholder="1"
           parse={handleParseNumber}
-          disabled={isEditFlow}
+          disabled={disabled}
         />
         <div className={css.timeModeBtnWrapper}>
           <Button
             type="button"
             onClick={onTimeModeChange('week')}
+            disabled={disabled}
             className={classNames(
               css.viewMode,
               timeMode === 'week' && css.active,
-            )}
-            disabled={isEditFlow}>
+            )}>
             {intl.formatMessage({ id: 'DurationForNextOrderField.week' })}
           </Button>
           <Button
             type="button"
             onClick={onTimeModeChange('month')}
+            disabled={disabled}
             className={classNames(
               css.viewMode,
               timeMode === 'month' && css.active,
-            )}
-            disabled={isEditFlow}>
+            )}>
             {intl.formatMessage({ id: 'DurationForNextOrderField.month' })}
           </Button>
         </div>
       </div>
-      <FieldTextInput id="durationTime" name="durationTime" type="hidden" />
       <FieldTextInput
+        id="durationTime"
+        name="durationTime"
+        type="hidden"
+        disabled={disabled}
+      />
+      <FieldTextInput
+        disabled={disabled}
         id="durationTimeMode"
         name="durationTimeMode"
         type="hidden"

@@ -15,6 +15,7 @@ import {
 import { fetchUserApi, queryRestaurantListingsApi } from '@apis/index';
 import type { TUpdateOrderApiBody } from '@apis/orderApi';
 import {
+  adminNotifyUserPickingOrderChangesApi,
   bookerCancelPendingApprovalOrderApi,
   bookerDeleteDraftOrderApi,
   bookerPublishOrderApi,
@@ -183,6 +184,7 @@ const initialState: TOrderInitialState = {
   orderDetail: {},
   draftEditOrderData: {
     generalInfo: {},
+    orderDetail: {},
   },
   justDeletedMemberOrder: false,
   createOrderInProcess: false,
@@ -814,17 +816,8 @@ const fetchOrder = createAsyncThunk(
 
     const { bookerId, companyId } = Listing(response).getMetadata();
 
-    const selectedBooker = denormalisedResponseEntities(
-      await sdk.users.show({
-        id: bookerId,
-      }),
-    )[0];
-
-    const selectedCompany = denormalisedResponseEntities(
-      await sdk.users.show({
-        id: companyId,
-      }),
-    )[0];
+    const { data: selectedBooker } = await fetchUserApi(bookerId);
+    const { data: selectedCompany } = await fetchUserApi(companyId);
 
     dispatch(SystemAttributesThunks.fetchVATPercentageByOrderId(orderId));
 
@@ -991,7 +984,11 @@ const fetchOrderRestaurants = createAsyncThunk(
       : orderDetail;
 
     const restaurantIdList = uniq(
-      Object.values(suitableOrderDetail).map((item: any) => item.restaurant.id),
+      compact(
+        Object.values(suitableOrderDetail).map(
+          (item: any) => item?.restaurant?.id,
+        ),
+      ),
     );
 
     const restaurantList = await Promise.all(
@@ -1089,6 +1086,22 @@ const handleSendNotificationToParticipant = createAsyncThunk(
   },
 );
 
+const notifyUserPickingOrderChanges = createAsyncThunk(
+  'app/Order/NOTIFY_USER_PICKING_ORDER_CHANGES',
+  async (
+    { orderId, params }: TObject,
+    { fulfillWithValue, rejectWithValue },
+  ) => {
+    try {
+      await adminNotifyUserPickingOrderChangesApi(orderId, params);
+
+      return fulfillWithValue(null);
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  },
+);
+
 export const orderAsyncActions = {
   createOrder,
   updateOrder,
@@ -1115,6 +1128,7 @@ export const orderAsyncActions = {
   bookerDeleteOrder,
   queryCompanyPlansByOrderIds,
   handleSendNotificationToParticipant,
+  notifyUserPickingOrderChanges,
 };
 
 const orderSlice = createSlice({
@@ -1251,6 +1265,12 @@ const orderSlice = createSlice({
         ...(!isEmpty(payload.orderDetail)
           ? { orderDetail: payload.orderDetail }
           : {}),
+      };
+    },
+    clearDraftEditOrder: (state) => {
+      state.draftEditOrderData = {
+        ...state.draftEditOrderData,
+        generalInfo: {},
       };
     },
   },
@@ -1669,6 +1689,7 @@ export const {
   setCanNotGoToStep4,
   setOnRecommendRestaurantInProcess,
   saveDraftEditOrder,
+  clearDraftEditOrder,
 } = orderSlice.actions;
 
 export default orderSlice.reducer;

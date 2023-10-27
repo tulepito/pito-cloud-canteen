@@ -14,10 +14,14 @@ import ManageFood from '@pages/admin/order/StepScreen/ManageFood/ManageFood';
 import ReviewOrder from '@pages/admin/order/StepScreen/ReviewOrder/ReviewOrder';
 import ServiceFeesAndNotes from '@pages/admin/order/StepScreen/ServiceFeesAndNotes/ServiceFeesAndNotes';
 import SetupOrderDetail from '@pages/admin/order/StepScreen/SetupOrderDetail/SetupOrderDetail';
-import { orderAsyncActions, resetOrder } from '@redux/slices/Order.slice';
+import {
+  orderAsyncActions,
+  resetOrder,
+  saveDraftEditOrder,
+} from '@redux/slices/Order.slice';
 import { adminPaths } from '@src/paths';
 import { Listing } from '@src/utils/data';
-import { EOrderType } from '@src/utils/enums';
+import { EOrderStates, EOrderType } from '@src/utils/enums';
 
 import MealPlanSetup from '../../../../StepScreen/MealPlanSetup/MealPlanSetup';
 
@@ -51,7 +55,7 @@ const EDIT_NORMAL_ORDER_TABS = [
 
 const EditOrderTab: React.FC<any> = (props) => {
   // eslint-disable-next-line unused-imports/no-unused-vars
-  const { tab, goBack, nextTab, nextToReviewTab } = props;
+  const { tab, shouldDisableFields, goBack, nextTab, nextToReviewTab } = props;
 
   switch (tab) {
     case EEditOrderTab.clientView:
@@ -59,6 +63,7 @@ const EditOrderTab: React.FC<any> = (props) => {
     case EEditOrderTab.orderSetup:
       return (
         <MealPlanSetup
+          shouldDisableFields={shouldDisableFields}
           flowType={EFlowType.edit}
           nextTab={nextTab}
           nextToReviewTab={nextToReviewTab}
@@ -107,10 +112,18 @@ const EditOrderWizard = () => {
   const router = useRouter();
   const {
     query: { orderId },
-    isReady,
   } = router;
   const fetchOrderInProgress = useAppSelector(
     (state) => state.Order.fetchOrderInProgress,
+  );
+  const fetchOrderDetailInProgress = useAppSelector(
+    (state) => state.Order.fetchOrderDetailInProgress,
+  );
+  const updateOrderDetailInProgress = useAppSelector(
+    (state) => state.Order.updateOrderDetailInProgress,
+  );
+  const updateOrderInProgress = useAppSelector(
+    (state) => state.Order.updateOrderInProgress,
   );
   const fetchOrderError = useAppSelector(
     (state) => state.Order.fetchOrderError,
@@ -120,9 +133,20 @@ const EditOrderWizard = () => {
   );
   const order = useAppSelector((state) => state.Order.order);
   const orderDetail = useAppSelector((state) => state.Order.orderDetail);
+  const draftEditOrderDetail = useAppSelector(
+    (state) => state.Order.draftEditOrderData.orderDetail,
+  );
   const [currentStep, setCurrentStep] = useState<string>(
     EEditOrderTab.clientView,
   );
+
+  const anyFetchOrUpdatesInProgress =
+    fetchOrderInProgress ||
+    fetchOrderDetailInProgress ||
+    order === null ||
+    isEmpty(orderDetail) ||
+    updateOrderInProgress ||
+    updateOrderDetailInProgress;
 
   const {
     orderState,
@@ -130,6 +154,7 @@ const EditOrderWizard = () => {
     plans = [],
   } = Listing(order).getMetadata();
   const isGroupOrder = orderType === EOrderType.group;
+  const isPickingOrder = orderState === EOrderStates.picking;
   const isInvalidOrderStateToEdit =
     !ORDER_STATES_TO_ENABLE_EDIT_ABILITY.includes(orderState);
   const suitableTabList = isGroupOrder
@@ -185,39 +210,49 @@ const EditOrderWizard = () => {
     if (!fetchOrderInProgress) {
       dispatch(orderAsyncActions.fetchOrderRestaurants({ isEditFlow: true }));
     }
-  }, [fetchOrderInProgress]);
+  }, [
+    fetchOrderInProgress,
+    JSON.stringify(orderDetail),
+    JSON.stringify(draftEditOrderDetail),
+  ]);
 
   useEffect(() => {
-    if (isReady) {
-      if (orderId) {
-        dispatch(orderAsyncActions.fetchOrder(orderId as string));
-      }
+    if (orderId) {
+      dispatch(orderAsyncActions.fetchOrder(orderId as string));
     }
-  }, [dispatch, isReady, orderId]);
+  }, [orderId]);
 
   useEffect(() => {
     dispatch(resetOrder());
-  }, [dispatch]);
+  }, []);
 
   useEffect(() => {
     if (isEmpty(orderDetail) && !justDeletedMemberOrder && !isEmpty(plans)) {
       dispatch(orderAsyncActions.fetchOrderDetail(plans));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     JSON.stringify(order),
     JSON.stringify(orderDetail),
     JSON.stringify(plans),
   ]);
 
+  useEffect(() => {
+    dispatch(saveDraftEditOrder({ orderDetail }));
+  }, [JSON.stringify(orderDetail)]);
+
   return (
     <FormWizard formTabNavClassName={css.formTabNav}>
       {suitableTabList.map((tab: string) => {
+        const shouldDisableFields =
+          tab === EEditOrderTab.orderSetup && isPickingOrder;
+
         return (
           <EditOrderTab
             key={tab}
             tab={tab}
             tabId={tab}
+            disabled={anyFetchOrUpdatesInProgress}
+            shouldDisableFields={shouldDisableFields}
             selected={currentStep === tab}
             tabLabel={intl.formatMessage({
               id: `EditOrderWizard.${tab}Label`,

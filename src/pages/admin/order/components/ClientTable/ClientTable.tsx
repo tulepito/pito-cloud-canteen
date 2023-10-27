@@ -152,7 +152,7 @@ const ClientTable: React.FC<ClientTableProps> = (props) => {
 
                 return (
                   <div
-                    key={bookerId}
+                    key={`${key}_${bookerId}`}
                     className={bookerCardClasses}
                     onClick={handleBookerClick}>
                     <div className={css.profile}>

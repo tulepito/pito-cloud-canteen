@@ -13,10 +13,10 @@ type ParticipantSetupFieldProps = {
   form: any;
   clientId: string;
   title?: string;
-  isEditFlow?: boolean;
+  disabled?: boolean;
 };
 const ParticipantSetupField: React.FC<ParticipantSetupFieldProps> = (props) => {
-  const { clientId, title, form, isEditFlow } = props;
+  const { clientId, title, form, disabled = false } = props;
   const companies = useAppSelector(
     (state) => state.company.companyRefs,
     shallowEqual,
@@ -34,11 +34,11 @@ const ParticipantSetupField: React.FC<ParticipantSetupFieldProps> = (props) => {
       name="selectedGroups"
       value={group.id}
       label={group.name}
-      disabled={isEditFlow}
     />
   ));
   const intl = useIntl();
   const handleSelectedGroupsChange = (value: any, previosValue: any) => {
+    if (disabled) return;
     const [newOption] = difference(value, previosValue);
     if (newOption && newOption !== 'allMembers') {
       form.batch(() => {
@@ -66,8 +66,8 @@ const ParticipantSetupField: React.FC<ParticipantSetupFieldProps> = (props) => {
           id={`selectedGroups-allMember`}
           name="selectedGroups"
           value="allMembers"
+          disabled={disabled}
           label={intl.formatMessage({ id: 'ParticipantSetupField.allMembers' })}
-          disabled={isEditFlow}
         />
         {groupOptionsRenderer}
       </div>

@@ -18,11 +18,11 @@ const VNDIcon = () => {
 
 type PerPackageFieldProps = {
   title?: string;
-  isEditFlow?: boolean;
+  disabled?: boolean;
 };
 
 const PerPackageField: React.FC<PerPackageFieldProps> = (props) => {
-  const { title, isEditFlow } = props;
+  const { title, disabled = false } = props;
   const intl = useIntl();
   const perPackRequiredMessage = intl.formatMessage({
     id: 'PerPackageField.perPackRequired',
@@ -52,14 +52,14 @@ const PerPackageField: React.FC<PerPackageFieldProps> = (props) => {
           type="text"
           className={css.numberInput}
           rightIcon={<VNDIcon />}
+          disabled={disabled}
           validate={composeValidators(
             required(perPackRequiredMessage),
             greaterThanOneThousand(perPackGreaterThanOneThousandMessage),
           )}
-          disabled={isEditFlow}
         />
 
-        <Field id="vatAllow" name="vatAllow">
+        <Field id="vatAllow" name="vatAllow" disabled={disabled}>
           {(fieldProps) => {
             const { id, input } = fieldProps;
 
@@ -70,12 +70,12 @@ const PerPackageField: React.FC<PerPackageFieldProps> = (props) => {
                 })}
                 id={id}
                 name={input.name}
+                disabled={disabled}
                 status={input.value ? 'on' : 'off'}
                 onClick={(value) => {
                   input.onChange(value);
                 }}
                 className={css.toggle}
-                disabled={isEditFlow}
               />
             );
           }}

@@ -1,14 +1,17 @@
 /* eslint-disable import/no-cycle */
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Form as FinalForm } from 'react-final-form';
 import { useField, useForm } from 'react-final-form-hooks';
+import { OnChange } from 'react-final-form-listeners';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import classNames from 'classnames';
 import arrayMutators from 'final-form-arrays';
-import { isEqual, omit, pickBy } from 'lodash';
+import { omit, pickBy } from 'lodash';
+import compact from 'lodash/compact';
 import isEmpty from 'lodash/isEmpty';
+import isEqual from 'lodash/isEqual';
 import { useRouter } from 'next/router';
 
 import Collapsible from '@components/Collapsible/Collapsible';
@@ -25,13 +28,17 @@ import Table from '@components/Table/Table';
 import Tabs from '@components/Tabs/Tabs';
 import Tooltip from '@components/Tooltip/Tooltip';
 import { addCommas, parseThousandNumber } from '@helpers/format';
-import { getTrackingLink } from '@helpers/orderHelper';
+import {
+  getTrackingLink,
+  preparePickingOrderChangeNotificationData,
+} from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { AdminManageOrderThunks } from '@pages/admin/order/AdminManageOrder.slice';
 import { EApiUpdateMode } from '@pages/api/orders/[orderId]/plan/update.service';
 import {
   changeStep4SubmitStatus,
+  clearDraftEditOrder,
   orderAsyncActions,
   saveDraftEditOrder,
 } from '@redux/slices/Order.slice';
@@ -42,6 +49,7 @@ import { EOrderDraftStates, EOrderStates } from '@utils/enums';
 import type { TKeyValue, TListing, TObject } from '@utils/types';
 import { required } from '@utils/validators';
 
+import ConfirmNotifyUserModal from '../../components/ConfirmNotifyUserModal/ConfirmNotifyUserModal';
 import NavigateButtons, {
   EFlowType,
 } from '../../components/NavigateButtons/NavigateButtons';
@@ -104,6 +112,7 @@ type TFormDeliveryInfoValues = {
 
 export const ReviewContent: React.FC<any> = (props) => {
   const {
+    isEditFlow = false,
     timeStamp,
     restaurant,
     deliveryManInfo = {},
@@ -200,6 +209,12 @@ export const ReviewContent: React.FC<any> = (props) => {
     orderStateHistory.findIndex(
       (h: TObject) => h.state === EOrderStates.inProgress,
     ) >= 0;
+  const isPickingOrder = orderState === EOrderStates.picking;
+  const shouldShowFoodList =
+    [EOrderDraftStates.draft, EOrderDraftStates.pendingApproval].includes(
+      orderState,
+    ) ||
+    (isEditFlow && isPickingOrder);
 
   const parsedFoodList = Object.keys(foodList).map((key, index) => {
     return {
@@ -339,12 +354,7 @@ export const ReviewContent: React.FC<any> = (props) => {
         label={intl.formatMessage({
           id: 'ReviewOrder.menuLabel',
         })}>
-        <RenderWhen
-          condition={[
-            EOrderDraftStates.draft,
-            EOrderDraftStates.pendingApproval,
-            EOrderStates.inProgress,
-          ].includes(orderState)}>
+        <RenderWhen condition={shouldShowFoodList}>
           <Table
             columns={MenuColumns}
             data={parsedFoodList}
@@ -450,14 +460,24 @@ export const ReviewContent: React.FC<any> = (props) => {
 
 const parseDataToReviewTab = (values: any) => {
   const { orderDetail = {}, ...rest } = values || {};
-  const items = Object.keys(orderDetail).map((key: any) => {
-    return {
-      key,
-      label: formatTimestamp(Number(key)),
-      childrenFn: (childProps: any) => <ReviewContent {...childProps} />,
-      childrenProps: { ...orderDetail[key], ...rest, order: values },
-    };
-  });
+  const items = compact(
+    Object.keys(orderDetail)
+      .sort((a, b) => Number(a) - Number(b))
+      .map((key: any) => {
+        const { restaurant } = orderDetail[key] || {};
+
+        if (isEmpty(restaurant)) {
+          return null;
+        }
+
+        return {
+          key,
+          label: formatTimestamp(Number(key)),
+          childrenFn: (childProps: any) => <ReviewContent {...childProps} />,
+          childrenProps: { ...orderDetail[key], ...rest, order: values },
+        };
+      }),
+  );
 
   return items;
 };
@@ -469,10 +489,12 @@ type TReviewOrder = {
 };
 
 const ReviewOrder: React.FC<TReviewOrder> = (props) => {
+  const { tab, goBack, flowType } = props;
   const dispatch = useAppDispatch();
   const intl = useIntl();
   const router = useRouter();
-
+  const formSubmitRef = useRef<any>();
+  const [userRolesToNotify, setUserRolesToNotify] = useState<string[]>([]);
   const orderDetail = useAppSelector(
     (state) => state.Order.orderDetail,
     shallowEqual,
@@ -496,7 +518,6 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
   const updateOrderStateInProgress = useAppSelector(
     (state) => state.AdminManageOrder.updateOrderStateInProgress,
   );
-
   const submitInProgress =
     updateOrderInProgress ||
     updateOrderDetailInProgress ||
@@ -510,9 +531,11 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
   const editConfirmModalController = useBoolean();
   const [reviewFormValues, setReviewFormValues] = useState<any>({});
 
-  const currentOrderDetail = isEmpty(draftEditOrderDetail)
-    ? orderDetail
-    : draftEditOrderDetail;
+  // const currentOrderDetail = isEmpty(draftEditOrderDetail)
+  //   ? orderDetail
+  //   : draftEditOrderDetail;
+  const confirmNotifyUserModalControl = useBoolean();
+
   const isEditFlow = props.flowType === EFlowType.edit;
   const orderId = Listing(order as TListing).getId();
   const {
@@ -525,20 +548,75 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
     notes = {},
   } = Listing(order as TListing).getMetadata();
   const planId = plans.length > 0 ? plans[0] : undefined;
+  const isPickingOrder = orderState === EOrderStates.picking;
   const { address } = deliveryAddress || {};
+
+  const { staffName: draftStaffName, shipperName: draftShipperName } =
+    draftEditOrderData || {};
+
+  const validFields =
+    (!isEmpty(staffName) || !isEmpty(draftStaffName)) &&
+    (!isEmpty(shipperName) || !isEmpty(draftShipperName));
+  const missingDraftGeneralInfo = isEmpty(draftEditOrderData);
+  const isDraftOrderDetailNotChanged = isEqual(
+    draftEditOrderDetail,
+    orderDetail,
+  );
+
+  const missingSelectedFood =
+    isEmpty(orderDetail) ||
+    Object.keys(orderDetail).filter((dateTime) => {
+      const { restaurant } = orderDetail?.[dateTime] || {};
+
+      return restaurant?.id && restaurant?.foodList?.length === 0;
+    })?.length > 0;
+  const missingDraftSelectedFood =
+    Object.keys(draftEditOrderDetail!).filter((dateTime) => {
+      const { restaurant } = draftEditOrderDetail?.[dateTime] || {};
+
+      return restaurant?.id && restaurant?.foodList?.length === 0;
+    })?.length > 0;
+
+  const submitDisabled =
+    !validFields ||
+    (isEditFlow
+      ? isDraftOrderDetailNotChanged
+        ? missingDraftGeneralInfo || missingSelectedFood
+        : missingDraftSelectedFood
+      : missingSelectedFood);
+
+  const notificationData = preparePickingOrderChangeNotificationData({
+    order: order!,
+    newOrderDetail: draftEditOrderDetail!,
+    oldOrderDetail: orderDetail,
+    updateOrderData: draftEditOrderData,
+  });
+  const shouldHideParticipantOption = isEmpty(
+    notificationData.emailParamsForParticipantNotification,
+  );
 
   const { renderedOrderDetail } =
     useMemo(() => {
       return {
-        renderedOrderDetail: parseDataToReviewTab({
-          orderDetail: draftEditOrderDetail || orderDetail,
-          deliveryHour: draftEditOrderData?.deliveryHour || deliveryHour,
-          deliveryAddress:
-            draftEditOrderData?.deliveryAddress || deliveryAddress,
-          notes: draftEditOrderData?.notes || notes,
-        }),
+        renderedOrderDetail: isEditFlow
+          ? parseDataToReviewTab({
+              isEditFlow,
+              orderDetail: draftEditOrderDetail || orderDetail,
+              deliveryHour: draftEditOrderData?.deliveryHour || deliveryHour,
+              deliveryAddress:
+                draftEditOrderData?.deliveryAddress || deliveryAddress,
+
+              notes: draftEditOrderData?.notes || notes,
+            })
+          : parseDataToReviewTab({
+              orderDetail,
+              deliveryHour,
+              deliveryAddress,
+              notes,
+            }),
       };
     }, [
+      isEditFlow,
       deliveryAddress,
       deliveryHour,
       JSON.stringify(draftEditOrderData),
@@ -612,39 +690,82 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
     );
   };
 
-  const onSubmit = async (values: any) => {
-    const { staffName: staffNameValue, shipperName: shipperNameValue } = values;
+  const handleCreateFlowSubmitClick = async () => {
+    await formSubmitRef?.current();
+  };
+
+  const handleEditFlowSubmit = async () => {
     if (isEditInProgressOrder) {
-      setReviewFormValues(values);
       editConfirmModalController.setTrue();
-    } else if (isEditFlow) {
-      if (planId && orderId) {
+    }
+    if (planId && orderId) {
+      const { normalizedOrderDetail } = notificationData;
+
+      const updateOrderDetail = isPickingOrder
+        ? normalizedOrderDetail
+        : draftEditOrderDetail;
+
+      if (!isDraftOrderDetailNotChanged) {
         await dispatch(
           orderAsyncActions.updatePlanDetail({
             orderId,
             planId,
-            orderDetail: draftEditOrderDetail,
+            orderDetail: updateOrderDetail,
           }),
         );
+
+        dispatch(orderAsyncActions.fetchOrderDetail([planId]));
+      }
+      if (!missingDraftGeneralInfo) {
         await dispatch(
           orderAsyncActions.updateOrder({
-            generalInfo: {
-              ...draftEditOrderData,
-              staffName: staffNameValue,
-              shipperName: shipperNameValue,
-            },
+            generalInfo: draftEditOrderData,
           }),
         );
-        dispatch(
-          saveDraftEditOrder({
-            generalInfo: {
-              staffName: staffNameValue,
-              shipperName: shipperNameValue,
-            },
-          }),
-        );
+        dispatch(clearDraftEditOrder());
+
+        dispatch(orderAsyncActions.fetchOrder(orderId));
       }
+    }
+  };
+
+  const handleEditFlowSubmitClick = () => {
+    if (isPickingOrder) {
+      confirmNotifyUserModalControl.setTrue();
     } else {
+      handleEditFlowSubmit();
+    }
+  };
+
+  const handleCloseNotifyUserForPickingChangesModal = () => {
+    // eslint-disable-next-line unused-imports/no-unused-vars
+    const { normalizedOrderDetail, ...restData } = notificationData;
+
+    dispatch(
+      orderAsyncActions.notifyUserPickingOrderChanges({
+        orderId,
+        params: {
+          ...restData,
+          userRoles: userRolesToNotify,
+        },
+      }),
+    );
+
+    handleEditFlowSubmit();
+    confirmNotifyUserModalControl.setFalse();
+    setUserRolesToNotify([]);
+  };
+  const handleConfirmNotifyUserForPickingChanges = () => {
+    handleCloseNotifyUserForPickingChangesModal();
+  };
+  const handleCancelNotifyUserForPickingChanges = () => {
+    handleCloseNotifyUserForPickingChangesModal();
+  };
+
+  const onSubmit = async (values: any) => {
+    const { staffName: staffNameValue, shipperName: shipperNameValue } = values;
+    setReviewFormValues(values);
+    if (!isEditFlow) {
       dispatch(changeStep4SubmitStatus(true));
 
       if (orderState === EOrderDraftStates.draft) {
@@ -676,10 +797,37 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
 
   const initialValues = useMemo(() => {
     return {
-      staffName,
-      shipperName,
+      staffName: isEditFlow
+        ? typeof draftStaffName !== 'undefined'
+          ? draftStaffName
+          : draftStaffName || staffName
+        : staffName,
+      shipperName: isEditFlow
+        ? typeof draftShipperName !== 'undefined'
+          ? draftShipperName
+          : draftShipperName || shipperName
+        : shipperName,
     };
-  }, [staffName, shipperName]);
+  }, [isEditFlow, staffName, shipperName, JSON.stringify(draftEditOrderData)]);
+
+  const handleFieldShipperNameChange = (shipperNameValue: string) => {
+    dispatch(
+      saveDraftEditOrder({
+        generalInfo: {
+          shipperName: shipperNameValue,
+        },
+      }),
+    );
+  };
+  const handleFieldStaffNameChange = (staffNameValue: string) => {
+    dispatch(
+      saveDraftEditOrder({
+        generalInfo: {
+          staffName: staffNameValue,
+        },
+      }),
+    );
+  };
 
   useEffect(() => {
     if (isEmpty(orderDetail) && !isEmpty(plans)) {
@@ -690,21 +838,6 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
     JSON.stringify(orderDetail),
     JSON.stringify(plans),
   ]);
-
-  const missingSelectedFood =
-    isEmpty(orderDetail) ||
-    Object.keys(orderDetail).filter(
-      (dateTime) =>
-        Object.keys(orderDetail[dateTime]?.restaurant?.foodList)?.length !== 0,
-    )?.length === 0;
-
-  const missingDraftSelectedFood = isEditFlow
-    ? Object.keys(currentOrderDetail).filter(
-        (dateTime) =>
-          Object.keys(currentOrderDetail?.[dateTime]?.restaurant?.foodList)
-            ?.length !== 0,
-      )?.length === 0
-    : false;
 
   const onSubmitEditOrder = async (
     values: TSelectRoleToSendNotificationFormValues,
@@ -739,16 +872,17 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
         initialValues={initialValues}
         onSubmit={onSubmit}
         render={(fieldRenderProps: any) => {
-          const { tab, handleSubmit, goBack, flowType, invalid } =
-            fieldRenderProps;
+          const { handleSubmit } = fieldRenderProps;
 
-          const submitDisabled =
-            invalid ||
-            (isEditFlow && missingDraftSelectedFood) ||
-            missingSelectedFood;
+          formSubmitRef.current = handleSubmit;
 
           return (
             <Form onSubmit={handleSubmit}>
+              <OnChange name="staffName">{handleFieldStaffNameChange}</OnChange>
+              <OnChange name="shipperName">
+                {handleFieldShipperNameChange}
+              </OnChange>
+
               <Collapsible
                 label={intl.formatMessage({ id: 'ReviewOrder.generalInfo' })}>
                 <div className={css.contentBox}>
@@ -805,15 +939,7 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
                 </div>
               </Collapsible>
               <Tabs items={renderedOrderDetail as any} showNavigation />
-              <NavigateButtons
-                flowType={flowType}
-                currentTab={tab}
-                onCompleteClick={handleSubmit}
-                onNextClick={handleGoBackToManageOrderPage}
-                goBack={goBack}
-                submitDisabled={submitDisabled}
-                inProgress={submitInProgress}
-              />
+
               {createOrderError && (
                 <div className={css.error}>{createOrderError}</div>
               )}
@@ -821,6 +947,30 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
           );
         }}
       />
+      <NavigateButtons
+        flowType={flowType}
+        currentTab={tab}
+        onCompleteClick={isEditFlow ? handleEditFlowSubmitClick : undefined}
+        onNextClick={
+          isEditFlow
+            ? handleGoBackToManageOrderPage
+            : handleCreateFlowSubmitClick
+        }
+        goBack={goBack}
+        submitDisabled={submitDisabled}
+        inProgress={submitInProgress}
+      />
+      <ConfirmNotifyUserModal
+        isOpen={confirmNotifyUserModalControl.value}
+        onClose={handleCloseNotifyUserForPickingChangesModal}
+        onCancel={handleCancelNotifyUserForPickingChanges}
+        setUserRoles={setUserRolesToNotify}
+        onConfirm={handleConfirmNotifyUserForPickingChanges}
+        confirmDisabled={isEmpty(userRolesToNotify)}
+        initialValues={{ userRoles: userRolesToNotify }}
+        shouldHideParticipantOption={shouldHideParticipantOption}
+      />
+
       <ConfirmationModal
         id="SuccessOrderModal"
         isOpen={isSuccessModalOpen}
