@@ -78,9 +78,10 @@ const MealPlanSetupFormComponent: React.FC<TMealPlanSetupFormComponentProps> = (
       selectedGroups: selectedGroupsSubmitValue,
       ...rest
     } = values;
-    const {
-      selectedPlace: { address: addressValue, origin: originValue },
-    } = deliveryAddressValues;
+    const { selectedPlace } = deliveryAddressValues || {};
+    const ensuredSelectedPLace =
+      selectedPlace === null ? {} : selectedPlace || {};
+    const { address: addressValue, origin: originValue } = ensuredSelectedPLace;
     const selectedDayInWeek = getSelectedDaysOfWeek(
       values.startDate,
       values.endDate,
