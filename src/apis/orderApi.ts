@@ -221,3 +221,8 @@ export const updateOrderDetailFromDraftApi = (orderId: string, body: TObject) =>
 
 export const updatePaymentApi = (orderId: string, planId: string) =>
   putApi(`/orders/${orderId}/plan/${planId}/update-payment`);
+
+export const adminNotifyUserPickingOrderChangesApi = (
+  orderId: string,
+  params: TObject,
+) => postApi(`/orders/${orderId}/notify-user-picking-order-changes`, params);

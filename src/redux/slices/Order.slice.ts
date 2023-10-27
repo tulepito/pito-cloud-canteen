@@ -14,6 +14,7 @@ import {
 import { fetchUserApi } from '@apis/index';
 import type { TUpdateOrderApiBody } from '@apis/orderApi';
 import {
+  adminNotifyUserPickingOrderChangesApi,
   bookerCancelPendingApprovalOrderApi,
   bookerDeleteDraftOrderApi,
   bookerPublishOrderApi,
@@ -1058,6 +1059,22 @@ const bookerDeleteOrder = createAsyncThunk(
   },
 );
 
+const notifyUserPickingOrderChanges = createAsyncThunk(
+  'app/Order/NOTIFY_USER_PICKING_ORDER_CHANGES',
+  async (
+    { orderId, params }: TObject,
+    { fulfillWithValue, rejectWithValue },
+  ) => {
+    try {
+      await adminNotifyUserPickingOrderChangesApi(orderId, params);
+
+      return fulfillWithValue(null);
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  },
+);
+
 export const orderAsyncActions = {
   createOrder,
   updateOrder,
@@ -1083,6 +1100,7 @@ export const orderAsyncActions = {
   updateOrderStateToDraft,
   bookerDeleteOrder,
   queryCompanyPlansByOrderIds,
+  notifyUserPickingOrderChanges,
 };
 
 const orderSlice = createSlice({
