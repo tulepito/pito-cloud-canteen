@@ -1,10 +1,13 @@
+import isEmpty from 'lodash/isEmpty';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { composeApiCheckers, HttpMethod } from '@apis/configs';
+import orderServices from '@pages/api/apiServices/order/index.service';
 import { emailSendingFactory, EmailTemplateTypes } from '@services/email';
 import adminChecker from '@services/permissionChecker/admin';
-import { handleError } from '@services/sdk';
-import type { TObject } from '@src/utils/types';
+import { getCurrentUser, handleError } from '@services/sdk';
+import { CurrentUser } from '@src/utils/data';
+import type { TObject, TOrderChangeHistoryItem } from '@src/utils/types';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
@@ -13,8 +16,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       userRoles = [],
       emailParamsForParticipantNotification,
       emailParamsForBookerNotification,
-      // firebaseChangeHistory,
+      firebaseChangeHistory,
     } = req.body;
+    const { currentUser } = await getCurrentUser(req, res);
 
     switch (apiMethod) {
       case HttpMethod.POST: {
@@ -31,6 +35,17 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
               EmailTemplateTypes.PARTICIPANT.PARTICIPANT_PICKING_ORDER_CHANGED,
               params,
             ),
+          );
+        }
+
+        if (!isEmpty(firebaseChangeHistory)) {
+          firebaseChangeHistory.forEach(
+            async (data: Partial<TOrderChangeHistoryItem>) => {
+              await orderServices.createOrderHistoryRecordToFirestore({
+                authorId: CurrentUser(currentUser).getId(),
+                ...data,
+              } as TOrderChangeHistoryItem);
+            },
           );
         }
 

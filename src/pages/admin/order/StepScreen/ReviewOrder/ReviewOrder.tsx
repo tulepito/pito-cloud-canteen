@@ -660,11 +660,6 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
   };
 
   const handleCloseNotifyUserForPickingChangesModal = () => {
-    handleEditFlowSubmit();
-    confirmNotifyUserModalControl.setFalse();
-    setUserRolesToNotify([]);
-  };
-  const handleConfirmNotifyUserForPickingChanges = () => {
     // eslint-disable-next-line unused-imports/no-unused-vars
     const { normalizedOrderDetail, ...restData } = notificationData;
 
@@ -678,6 +673,11 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
       }),
     );
 
+    handleEditFlowSubmit();
+    confirmNotifyUserModalControl.setFalse();
+    setUserRolesToNotify([]);
+  };
+  const handleConfirmNotifyUserForPickingChanges = () => {
     handleCloseNotifyUserForPickingChangesModal();
   };
   const handleCancelNotifyUserForPickingChanges = () => {

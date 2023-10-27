@@ -755,7 +755,7 @@ export const preparePickingOrderChangeNotificationData = ({
             // TODO: firebase change history for removing food
             firebaseChangeHistory.push({
               orderId,
-              type: EEditOrderHistoryType.addFood,
+              type: EEditOrderHistoryType.deleteFood,
               createdAt,
               newValue: {},
               oldValue: { ...oldFoodList[removedFoodId] },
