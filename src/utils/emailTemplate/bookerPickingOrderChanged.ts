@@ -20,11 +20,12 @@ const bookerPickingOrderChanged = ({
   changeHistory = [],
 }: TBookerPickingOrderChangedParams) => {
   const orderUrl = `${BASE_URL}/company/orders/${orderId}/picking/?tab=chose`;
-  const changeLines = changeHistory.map(
-    ({
-      oldData: { title: oldTitleMaybe = '', content: oldContentMaybe = '' },
-      newData: { title: newTitleMaybe = '', content: newContentMaybe = '' },
-    }) => `  <tr>
+  const changeLines = changeHistory
+    .map(
+      ({
+        oldData: { title: oldTitleMaybe = '', content: oldContentMaybe = '' },
+        newData: { title: newTitleMaybe = '', content: newContentMaybe = '' },
+      }) => `<tr>
                     <td class="esdev-adapt-off es-m-p15r es-m-p15l" align="left"
                       style="padding:0;Margin:0;padding-top:5px;padding-right:20px;padding-left:40px">
                       <!--[if mso]><table style="width:540px" cellpadding="0" cellspacing="0"><tr><td style="width:260px" valign="top"><![endif]-->
@@ -65,7 +66,8 @@ const bookerPickingOrderChanged = ({
                       </table><!--[if mso]></td></tr></table><![endif]-->
                     </td>
                   </tr>`,
-  );
+    )
+    .join('');
 
   return `<!DOCTYPE html
   PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">

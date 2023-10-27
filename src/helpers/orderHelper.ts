@@ -28,6 +28,8 @@ import {
 import type { TPlan } from '@utils/orderTypes';
 import type { TListing, TObject, TOrderChangeHistoryItem } from '@utils/types';
 
+import { parseThousandNumber } from './format';
+
 export const ORDER_STATES_TO_ENABLE_EDIT_ABILITY = [
   EOrderDraftStates.pendingApproval,
   EOrderStates.picking,
@@ -862,14 +864,15 @@ export const preparePickingOrderChangeNotificationData = ({
     changeHistoryToNotifyBooker.push({
       oldData: {
         title: 'Phí PITO Cloud Canteen:',
-        content: PCCFeePerDate,
+        content: `${parseThousandNumber(PCCFeePerDate)}đ`,
       },
       newData: {
         title: 'Phí PITO Cloud Canteen:',
-        content:
+        content: `${parseThousandNumber(
           updateSpecificPCCFee !== undefined
             ? updateSpecificPCCFee
             : PCCFeeByMemberAmount,
+        )}đ`,
       },
     });
   }
