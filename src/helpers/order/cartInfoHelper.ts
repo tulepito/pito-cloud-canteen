@@ -13,10 +13,7 @@ import {
   EPartnerVATSetting,
   ESubOrderStatus,
 } from '@src/utils/enums';
-import {
-  ETransition,
-  TRANSITIONS_TO_STATE_CANCELED,
-} from '@src/utils/transaction';
+import { TRANSITIONS_TO_STATE_CANCELED } from '@src/utils/transaction';
 import { Listing } from '@utils/data';
 import type { TListing, TObject, TQuotation } from '@utils/types';
 
@@ -97,7 +94,7 @@ export const calculateTotalPriceAndDishes = ({
           if (
             (date && date?.toString() !== dateKey) ||
             status === ESubOrderStatus.canceled ||
-            lastTransition === ETransition.OPERATOR_CANCEL_PLAN
+            TRANSITIONS_TO_STATE_CANCELED.includes(lastTransition)
           ) {
             return result;
           }

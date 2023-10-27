@@ -8,10 +8,7 @@ import { queryPaymentRecordOnFirebase } from '@services/payment';
 import { handleError } from '@services/sdk';
 import { Listing } from '@src/utils/data';
 import { EOrderStates, EPaymentType, ESubOrderStatus } from '@src/utils/enums';
-import {
-  ETransition,
-  TRANSITIONS_TO_STATE_CANCELED,
-} from '@src/utils/transaction';
+import { TRANSITIONS_TO_STATE_CANCELED } from '@src/utils/transaction';
 
 import { calculateClientTotalPriceAndPaidAmount } from './check-valid-payment.service';
 
@@ -119,12 +116,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
     const activeOrderDetail = Object.keys(orderDetail).reduce(
       (result: any, subOrderDate: string) => {
+        const { transactionId, status, lastTransition } =
+          orderDetail[subOrderDate] || {};
+
         if (
-          !orderDetail[subOrderDate]?.transactionId ||
-          (orderDetail[subOrderDate]?.transactionId &&
-            orderDetail[subOrderDate]?.status === ESubOrderStatus.canceled) ||
-          orderDetail[subOrderDate]?.lastTransition ===
-            ETransition.OPERATOR_CANCEL_PLAN
+          !transactionId ||
+          (transactionId && status === ESubOrderStatus.canceled) ||
+          TRANSITIONS_TO_STATE_CANCELED.includes(lastTransition)
         ) {
           return result;
         }
