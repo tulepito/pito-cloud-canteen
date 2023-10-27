@@ -24,7 +24,7 @@ const partnerSubOrderIsCanceled = ({
   const { companyName } = companyUser.getPublicData();
 
   const formattedSubOrderDate = formatTimestamp(timestamp);
-  const viewOrderDetailUrl = `${BASE_URL}/partner/orders/${orderId}`;
+  const viewOrderDetailUrl = `${BASE_URL}/partner/orders/${orderId}_${timestamp}`;
 
   return `
   <!DOCTYPE html
