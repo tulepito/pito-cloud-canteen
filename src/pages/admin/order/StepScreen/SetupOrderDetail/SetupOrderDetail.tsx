@@ -379,7 +379,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
   const recommendParams = {
     startDate: draftStartDate || startDate,
     endDate: draftEndDate || endDate,
-    dayInWeek: suitableDayInWeek,
+    dayInWeek: isPickingOrder ? draftSelectedFoodDays : suitableDayInWeek,
     deliveryOrigin: draftOrigin || origin,
     memberAmount: draftMemberAmount || memberAmount,
     isNormalOrder:
@@ -456,7 +456,10 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
         saveDraftEditOrder({
           orderDetail: {
             ...draftEditOrderDetail,
-            [subOrderDate]: restaurantData,
+            [subOrderDate]: {
+              ...(draftEditOrderDetail?.[subOrderDate] || {}),
+              ...restaurantData,
+            },
           },
         }),
       );
@@ -618,7 +621,10 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
 
           return {
             ...result,
-            [curr]: { ...orderDetail[date] },
+            [curr]: {
+              ...orderDetail[curr],
+              restaurant: orderDetail[date]?.restaurant || {},
+            },
           };
         }
 

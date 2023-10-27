@@ -687,7 +687,7 @@ export type TOrderChangeHistoryItem = {
   orderId: string;
   authorId: string;
   createdAt?: number;
-  subOrderDate?: Date;
+  subOrderDate?: string;
   newValue?: TObject;
   oldValue?: TObject;
   type?: EEditOrderHistoryType;

@@ -23,7 +23,7 @@ const bookerPickingOrderChanged = ({
   const changeLines = changeHistory.map(
     ({
       oldData: { title: oldTitleMaybe = '', content: oldContentMaybe = '' },
-      newDate: { title: newTitleMaybe = '', content: newContentMaybe = '' },
+      newData: { title: newTitleMaybe = '', content: newContentMaybe = '' },
     }) => `  <tr>
                     <td class="esdev-adapt-off es-m-p15r es-m-p15l" align="left"
                       style="padding:0;Margin:0;padding-top:5px;padding-right:20px;padding-left:40px">

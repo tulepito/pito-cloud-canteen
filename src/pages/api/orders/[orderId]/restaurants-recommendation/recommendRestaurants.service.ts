@@ -319,6 +319,7 @@ export const recommendRestaurants = async ({
           )
         ) {
           orderDetail[dateTime] = {
+            ...orderDetail[dateTime],
             restaurant: {
               id: restaurantGetter.getId(),
               restaurantName: restaurantGetter.getAttributes().title,
@@ -337,12 +338,14 @@ export const recommendRestaurants = async ({
           };
         } else {
           orderDetail[dateTime] = {
+            ...orderDetail[dateTime],
             ...lineItemsMaybe,
             hasNoRestaurants: false,
           };
         }
       } else {
         orderDetail[dateTime] = {
+          ...orderDetail[dateTime],
           ...lineItemsMaybe,
           hasNoRestaurants: true,
         };
