@@ -82,3 +82,12 @@ export const responseApprovalRequestApi = (body: TObject) =>
 
 export const queryRestaurantListingsApi = (params: TObject) =>
   getApi('/admin/listings/restaurant/query', params);
+
+export const handleParticipantAfterEditInProgressOrderApi = (
+  orderId: string,
+  body: TObject,
+) =>
+  putApi(
+    `/admin/listings/order/${orderId}/handle-participant-after-edit-in-progress-order`,
+    body,
+  );

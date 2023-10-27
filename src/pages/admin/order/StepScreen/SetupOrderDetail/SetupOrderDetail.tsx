@@ -163,6 +163,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     plans = [],
     dayInWeek,
     daySession,
+    orderStateHistory,
   } = orderGetter.getMetadata();
   const { title: orderTitle } = orderGetter.getAttributes();
   const orderId = orderGetter.getId();
@@ -225,6 +226,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
           daySession: draftDaySession || daySession,
           plans,
           orderState,
+          orderStateHistory,
         },
         restaurantCoverImageList,
         isEditFlow,
@@ -264,15 +266,16 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
         maxQuantity: restaurant.maxQuantity || 100,
       },
     };
+    console.log('restaurantData', restaurantData);
 
     if (isEditFlow) {
       dispatch(
         saveDraftEditOrder({
           orderDetail: {
-            ...draftEditOrderDetail,
+            ...currentOrderDetail,
             [subOrderDate]: {
-              ...restaurantData,
               ...orderDetail[subOrderDate],
+              ...restaurantData,
               ...(isEditInProgressOrder && {
                 editTagVersion: orderDetail[selectedDate?.getTime()]?.restaurant
                   ?.editTagVersion

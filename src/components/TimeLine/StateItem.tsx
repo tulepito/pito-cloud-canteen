@@ -23,7 +23,12 @@ const StateItem: React.FC<TStateItemProps> = ({
   isAdminLayout = false,
 }) => {
   const rootClasses = classNames(rootClassName || css.root, className);
-  const { lastTransition, transactionId } = tx || {};
+  const {
+    lastTransition,
+    transactionId,
+    editTagVersion,
+    oldValues = [],
+  } = tx || {};
 
   let stateComponent = <div className={classNames(css.icon, css.iconEmpty)} />;
 
@@ -63,24 +68,44 @@ const StateItem: React.FC<TStateItemProps> = ({
     () => (
       <div className={rootClasses}>
         <div className={css.stateContainer}>{stateComponent}</div>
-        <div className={css.date}>{date}</div>
+        <div className={css.date}>{`${date}${
+          editTagVersion ? `-${editTagVersion}` : ''
+        }`}</div>
       </div>
     ),
     [date, rootClasses, stateComponent],
   );
 
+  const oldStateItemComponent = useMemo(
+    () =>
+      oldValues.map((_oldValues: any, index: number) => (
+        <div key={index} className={rootClasses}>
+          <div className={css.stateContainer}>
+            <IconCancel className={css.icon} />
+          </div>
+          <div className={css.date}>{`${date}${
+            _oldValues?.editTagVersion ? `-${_oldValues.editTagVersion}` : ''
+          }`}</div>
+        </div>
+      )),
+    [date, rootClasses],
+  );
+
   return (
-    <RenderWhen condition={isAdminLayout}>
-      <Tooltip
-        overlayClassName={css.tooltipOverlay}
-        tooltipContent={tooltipContent}
-        placement="bottom"
-        trigger="hover"
-        overlayInnerStyle={{ backgroundColor: '#fff' }}>
-        {stateItemComponent}
-      </Tooltip>
-      <RenderWhen.False>{stateItemComponent}</RenderWhen.False>
-    </RenderWhen>
+    <>
+      {oldStateItemComponent}
+      <RenderWhen condition={isAdminLayout}>
+        <Tooltip
+          overlayClassName={css.tooltipOverlay}
+          tooltipContent={tooltipContent}
+          placement="bottom"
+          trigger="hover"
+          overlayInnerStyle={{ backgroundColor: '#fff' }}>
+          {stateItemComponent}
+        </Tooltip>
+        <RenderWhen.False>{stateItemComponent}</RenderWhen.False>
+      </RenderWhen>
+    </>
   );
 };
 

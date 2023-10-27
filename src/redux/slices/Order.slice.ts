@@ -6,6 +6,7 @@ import isString from 'lodash/isString';
 import uniq from 'lodash/uniq';
 import { DateTime } from 'luxon';
 
+import { handleParticipantAfterEditInProgressOrderApi } from '@apis/admin';
 import {
   companyApi,
   getCompanyNotificationsApi,
@@ -313,6 +314,8 @@ const QUERY_ALL_ORDERS = 'app/Order/QUERY_ALL_ORDERS';
 const BOOKER_REORDER = 'app/Order/BOOKER_REORDER';
 const UPDATE_ORDER_STATE_TO_DRAFT = 'app/Order/UPDATE_ORDER_STATE_TO_DRAFT';
 const BOOKER_DELETE_ORDER = 'app/Order/BOOKER_DELETE_ORDER';
+const HANDLE_SEND_NOTIFICATION_TO_PARTICIPANT =
+  'app/Order/HANDLE_SEND_NOTIFICATION_TO_PARTICIPANT';
 
 const createOrder = createAsyncThunk(
   CREATE_ORDER,
@@ -1071,6 +1074,21 @@ const bookerDeleteOrder = createAsyncThunk(
   },
 );
 
+const handleSendNotificationToParticipant = createAsyncThunk(
+  HANDLE_SEND_NOTIFICATION_TO_PARTICIPANT,
+  async ({ orderId, planId }: TObject) => {
+    const { data: responseData } =
+      await handleParticipantAfterEditInProgressOrderApi(orderId, {
+        planId,
+      });
+
+    return responseData.data;
+  },
+  {
+    serializeError: storableAxiosError,
+  },
+);
+
 export const orderAsyncActions = {
   createOrder,
   updateOrder,
@@ -1096,6 +1114,7 @@ export const orderAsyncActions = {
   updateOrderStateToDraft,
   bookerDeleteOrder,
   queryCompanyPlansByOrderIds,
+  handleSendNotificationToParticipant,
 };
 
 const orderSlice = createSlice({

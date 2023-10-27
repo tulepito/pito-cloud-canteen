@@ -14,6 +14,7 @@ import { Listing, Transaction, User } from '@src/utils/data';
 import { formatTimestamp } from '@src/utils/dates';
 import {
   ENotificationType,
+  EOrderStates,
   EOrderType,
   EPartnerVATSetting,
 } from '@src/utils/enums';
@@ -51,9 +52,16 @@ export const initiateTransaction = async ({
     serviceFees = {},
     hasSpecificPCCFee = false,
     specificPCCFee = 0,
+    orderStateHistory = [],
   } = orderData.getMetadata();
+  const isOrderHasInProgressState = orderStateHistory.some(
+    (state: { state: string; createdAt: number }) =>
+      state.state === EOrderStates.inProgress,
+  );
   const isGroupOrder = orderType === EOrderType.group;
-
+  if (isOrderHasInProgressState) {
+    return;
+  }
   if (plans.length === 0 || !plans.includes(planId)) {
     throw new Error(`Invalid planId, ${planId}`);
   }

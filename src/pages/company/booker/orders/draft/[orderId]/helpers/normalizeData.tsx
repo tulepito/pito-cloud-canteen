@@ -14,6 +14,7 @@ export const normalizePlanDetailsToEvent = (
     deliveryHour: string;
     daySession: TDaySession;
     orderState: EOrderStates;
+    orderStateHistory?: any;
   },
   coverImageList: any,
   isEditOrder = false,
@@ -28,11 +29,20 @@ export const normalizePlanDetailsToEvent = (
     return [];
   }
 
-  const { plans = [], deliveryHour, daySession, orderState } = order || {};
+  const {
+    plans = [],
+    deliveryHour,
+    daySession,
+    orderStateHistory = [],
+  } = order || {};
   const planId = plans.length > 0 ? plans[0] : undefined;
 
-  const isOrderInProgress = orderState === EOrderStates.inProgress;
-  const isEditInProgressOrder = isEditOrder && isOrderInProgress;
+  const isOrderAlreadyInProgress =
+    orderStateHistory.findIndex(
+      (_state: { state: string; updatedAt: number }) =>
+        _state.state === EOrderStates.inProgress,
+    ) !== -1;
+  const isEditInProgressOrder = isEditOrder && isOrderAlreadyInProgress;
 
   const normalizeData = compact(
     dateList.map((timestamp) => {
