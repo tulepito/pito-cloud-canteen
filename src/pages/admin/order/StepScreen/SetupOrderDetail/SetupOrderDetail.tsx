@@ -24,6 +24,7 @@ import {
   findSuitableStartDate,
   getRestaurantListFromOrderDetail,
   getSelectedRestaurantAndFoodList,
+  mergeRecommendOrderDetailWithCurrentOrderDetail,
 } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
@@ -376,6 +377,15 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
         : orderDetail,
     ),
   );
+  const orderDetailToRecommendRestaurant = Object.keys(
+    orderDetail || {},
+  ).reduce((res, time) => {
+    return {
+      ...res,
+      [time]: { restaurant: { id: orderDetail?.[time]?.restaurant?.id } },
+    };
+  }, {});
+
   const recommendParams = {
     startDate: draftStartDate || startDate,
     endDate: draftEndDate || endDate,
@@ -387,7 +397,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     nutritions: draftNutritions || nutritions,
     packagePerMember: draftPackagePerMember || packagePerMember,
     daySession: draftDaySession || daySession,
-    orderDetail: draftEditOrderDetail || orderDetail,
+    orderDetail: orderDetailToRecommendRestaurant,
   };
 
   // TODO: handle next tab and next to review tab clicks
@@ -566,7 +576,10 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
       );
       dispatch(
         saveDraftEditOrder({
-          orderDetail: recommendOrderDetail,
+          orderDetail: mergeRecommendOrderDetailWithCurrentOrderDetail(
+            draftEditOrderDetail!,
+            recommendOrderDetail,
+          ),
         }),
       );
     } else {

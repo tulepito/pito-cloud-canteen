@@ -887,3 +887,30 @@ export const preparePickingOrderChangeNotificationData = ({
     normalizedOrderDetail,
   };
 };
+
+export const mergeRecommendOrderDetailWithCurrentOrderDetail = (
+  currentOrderDetail: TObject,
+  recommendOrderDetail: TObject,
+  timestamp?: string,
+) => {
+  let mergedResult: TObject = {};
+
+  if (timestamp) {
+    mergedResult = { ...currentOrderDetail };
+    mergedResult[timestamp] = {
+      ...currentOrderDetail[timestamp],
+      ...recommendOrderDetail[timestamp],
+    };
+  } else {
+    mergedResult = { ...recommendOrderDetail };
+
+    Object.keys(currentOrderDetail).forEach((time) => {
+      mergedResult[time] = {
+        ...(recommendOrderDetail[time] || {}),
+        ...currentOrderDetail[time],
+      };
+    });
+  }
+
+  return mergedResult;
+};
