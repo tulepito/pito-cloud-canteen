@@ -107,6 +107,7 @@ type TFormDeliveryInfoValues = {
 
 export const ReviewContent: React.FC<any> = (props) => {
   const {
+    isEditFlow = false,
     timeStamp,
     restaurant,
     deliveryManInfo = {},
@@ -203,6 +204,12 @@ export const ReviewContent: React.FC<any> = (props) => {
     orderStateHistory.findIndex(
       (h: TObject) => h.state === EOrderStates.inProgress,
     ) >= 0;
+  const isPickingOrder = orderState === EOrderStates.picking;
+  const shouldShowFoodList =
+    [EOrderDraftStates.draft, EOrderDraftStates.pendingApproval].includes(
+      orderState,
+    ) ||
+    (isEditFlow && isPickingOrder);
 
   const parsedFoodList = Object.keys(foodList).map((key, index) => {
     return {
@@ -342,11 +349,7 @@ export const ReviewContent: React.FC<any> = (props) => {
         label={intl.formatMessage({
           id: 'ReviewOrder.menuLabel',
         })}>
-        <RenderWhen
-          condition={[
-            EOrderDraftStates.draft,
-            EOrderDraftStates.pendingApproval,
-          ].includes(orderState)}>
+        <RenderWhen condition={shouldShowFoodList}>
           <Table
             columns={MenuColumns}
             data={parsedFoodList}
@@ -588,6 +591,7 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
       return {
         renderedOrderDetail: isEditFlow
           ? parseDataToReviewTab({
+              isEditFlow,
               orderDetail: draftEditOrderDetail || orderDetail,
               deliveryHour: draftEditOrderData?.deliveryHour || deliveryHour,
               deliveryAddress:
