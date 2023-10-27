@@ -27,7 +27,10 @@ import Table from '@components/Table/Table';
 import Tabs from '@components/Tabs/Tabs';
 import Tooltip from '@components/Tooltip/Tooltip';
 import { addCommas, parseThousandNumber } from '@helpers/format';
-import { getTrackingLink } from '@helpers/orderHelper';
+import {
+  getTrackingLink,
+  preparePickingOrderChangeNotificationData,
+} from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { AdminManageOrderThunks } from '@pages/admin/order/AdminManageOrder.slice';
@@ -44,6 +47,7 @@ import { EOrderDraftStates, EOrderStates } from '@utils/enums';
 import type { TKeyValue, TListing, TObject } from '@utils/types';
 import { required } from '@utils/validators';
 
+import ConfirmNotifyUserModal from '../../components/ConfirmNotifyUserModal/ConfirmNotifyUserModal';
 import NavigateButtons, {
   EFlowType,
 } from '../../components/NavigateButtons/NavigateButtons';
@@ -482,7 +486,7 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
   const intl = useIntl();
   const router = useRouter();
   const formSubmitRef = useRef<any>();
-
+  const [userRolesToNotify, setUserRolesToNotify] = useState<string[]>([]);
   const orderDetail = useAppSelector(
     (state) => state.Order.orderDetail,
     shallowEqual,
@@ -516,6 +520,8 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
     setTrue: openSuccessModal,
     setFalse: closeSuccessModal,
   } = useBoolean();
+  const confirmNotifyUserModalControl = useBoolean();
+
   const isEditFlow = props.flowType === EFlowType.edit;
   const orderId = Listing(order as TListing).getId();
   const {
@@ -528,11 +534,15 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
     notes = {},
   } = Listing(order as TListing).getMetadata();
   const planId = plans.length > 0 ? plans[0] : undefined;
+  const isPickingOrder = orderState === EOrderStates.picking;
   const { address } = deliveryAddress || {};
 
+  const { staffName: draftStaffName, shipperName: draftShipperName } =
+    draftEditOrderData || {};
+
   const validFields =
-    (!isEmpty(staffName) || !isEmpty(draftEditOrderData?.staffName)) &&
-    (!isEmpty(shipperName) || !isEmpty(draftEditOrderData?.shipperName));
+    (!isEmpty(staffName) || !isEmpty(draftStaffName)) &&
+    (!isEmpty(shipperName) || !isEmpty(draftShipperName));
   const missingDraftGeneralInfo = isEmpty(draftEditOrderData);
   const isDraftOrderDetailNotChanged = isEqual(
     draftEditOrderDetail,
@@ -562,6 +572,16 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
         ? missingDraftGeneralInfo || missingSelectedFood
         : missingDraftSelectedFood
       : missingSelectedFood);
+
+  const notificationData = preparePickingOrderChangeNotificationData({
+    order: order!,
+    newOrderDetail: draftEditOrderDetail!,
+    oldOrderDetail: orderDetail,
+    updateOrderData: draftEditOrderData,
+  });
+  const shouldHideParticipantOption = isEmpty(
+    notificationData.emailParamsForParticipantNotification,
+  );
 
   const { renderedOrderDetail } =
     useMemo(() => {
@@ -601,12 +621,18 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
 
   const handleEditFlowSubmit = async () => {
     if (planId && orderId) {
+      const { normalizedOrderDetail } = notificationData;
+
+      const updateOrderDetail = isPickingOrder
+        ? normalizedOrderDetail
+        : draftEditOrderDetail;
+
       if (!isDraftOrderDetailNotChanged) {
         await dispatch(
           orderAsyncActions.updatePlanDetail({
             orderId,
             planId,
-            orderDetail: draftEditOrderDetail,
+            orderDetail: updateOrderDetail,
           }),
         );
 
@@ -623,6 +649,39 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
         dispatch(orderAsyncActions.fetchOrder(orderId));
       }
     }
+  };
+
+  const handleEditFlowSubmitClick = () => {
+    if (isPickingOrder) {
+      confirmNotifyUserModalControl.setTrue();
+    } else {
+      handleEditFlowSubmit();
+    }
+  };
+
+  const handleCloseNotifyUserForPickingChangesModal = () => {
+    handleEditFlowSubmit();
+    confirmNotifyUserModalControl.setFalse();
+    setUserRolesToNotify([]);
+  };
+  const handleConfirmNotifyUserForPickingChanges = () => {
+    // eslint-disable-next-line unused-imports/no-unused-vars
+    const { normalizedOrderDetail, ...restData } = notificationData;
+
+    dispatch(
+      orderAsyncActions.notifyUserPickingOrderChanges({
+        orderId,
+        params: {
+          ...restData,
+          userRoles: userRolesToNotify,
+        },
+      }),
+    );
+
+    handleCloseNotifyUserForPickingChangesModal();
+  };
+  const handleCancelNotifyUserForPickingChanges = () => {
+    handleCloseNotifyUserForPickingChangesModal();
   };
 
   const onSubmit = async (values: any) => {
@@ -659,10 +718,18 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
 
   const initialValues = useMemo(() => {
     return {
-      staffName: draftEditOrderData.staffName || staffName,
-      shipperName: draftEditOrderData.shipperName || shipperName,
+      staffName: isEditFlow
+        ? typeof draftStaffName !== 'undefined'
+          ? draftStaffName
+          : draftStaffName || staffName
+        : staffName,
+      shipperName: isEditFlow
+        ? typeof draftShipperName !== 'undefined'
+          ? draftShipperName
+          : draftShipperName || shipperName
+        : shipperName,
     };
-  }, [staffName, shipperName, JSON.stringify(draftEditOrderData)]);
+  }, [isEditFlow, staffName, shipperName, JSON.stringify(draftEditOrderData)]);
 
   const handleFieldShipperNameChange = (shipperNameValue: string) => {
     dispatch(
@@ -782,7 +849,7 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
       <NavigateButtons
         flowType={flowType}
         currentTab={tab}
-        onCompleteClick={isEditFlow ? handleEditFlowSubmit : undefined}
+        onCompleteClick={isEditFlow ? handleEditFlowSubmitClick : undefined}
         onNextClick={
           isEditFlow
             ? handleGoBackToManageOrderPage
@@ -792,6 +859,17 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
         submitDisabled={submitDisabled}
         inProgress={submitInProgress}
       />
+      <ConfirmNotifyUserModal
+        isOpen={confirmNotifyUserModalControl.value}
+        onClose={handleCloseNotifyUserForPickingChangesModal}
+        onCancel={handleCancelNotifyUserForPickingChanges}
+        setUserRoles={setUserRolesToNotify}
+        onConfirm={handleConfirmNotifyUserForPickingChanges}
+        confirmDisabled={isEmpty(userRolesToNotify)}
+        initialValues={{ userRoles: userRolesToNotify }}
+        shouldHideParticipantOption={shouldHideParticipantOption}
+      />
+
       <ConfirmationModal
         id="SuccessOrderModal"
         isOpen={isSuccessModalOpen}
