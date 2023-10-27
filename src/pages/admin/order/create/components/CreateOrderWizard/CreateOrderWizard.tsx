@@ -168,7 +168,6 @@ const CreateOrderWizard = () => {
   };
 
   const order = useAppSelector((state) => state.Order.order, shallowEqual);
-  const { staffName, notes = {} } = Listing(order as TListing).getMetadata();
   const step2SubmitInProgress = useAppSelector(
     (state) => state.Order.step2SubmitInProgress,
   );
@@ -179,6 +178,9 @@ const CreateOrderWizard = () => {
     (state) => state.Order.orderDetail,
     shallowEqual,
   );
+  const justDeletedMemberOrder = useAppSelector(
+    (state) => state.Order.justDeletedMemberOrder,
+  );
   const canNotGoToStep4 = useAppSelector(
     (state) => state.Order.canNotGoToStep4,
   );
@@ -186,6 +188,12 @@ const CreateOrderWizard = () => {
     (state) => state.Order.availableOrderDetailCheckList,
     shallowEqual,
   );
+
+  const {
+    staffName,
+    notes = {},
+    plans = [],
+  } = Listing(order as TListing).getMetadata();
 
   const tabsStatus = tabsActive(
     order,
@@ -233,6 +241,16 @@ const CreateOrderWizard = () => {
       nearestActiveTab && setCurrentStep(nearestActiveTab);
     }
   }, [tabsStatus, currentStep]);
+
+  useEffect(() => {
+    if (isEmpty(orderDetail) && !justDeletedMemberOrder && !isEmpty(plans)) {
+      dispatch(orderAsyncActions.fetchOrderDetail(plans));
+    }
+  }, [
+    JSON.stringify(order),
+    JSON.stringify(orderDetail),
+    JSON.stringify(plans),
+  ]);
 
   useEffect(() => {
     if (!fetchOrderInProgress) {
