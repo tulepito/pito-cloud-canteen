@@ -605,6 +605,10 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
         draftStartDate || startDate,
         draftEndDate || endDate,
       );
+      const orderDetailToHandle = isEditFlow
+        ? draftEditOrderDetail
+        : orderDetail;
+
       const newOrderDetail = totalDates.reduce((result, curr) => {
         const currWeekday = convertWeekDay(
           DateTime.fromMillis(curr).weekday,
@@ -622,14 +626,15 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
           return {
             ...result,
             [curr]: {
-              ...draftEditOrderDetail![curr],
-              restaurant: draftEditOrderDetail![date]?.restaurant || {},
+              ...orderDetailToHandle![curr],
+              restaurant: orderDetailToHandle![date]?.restaurant || {},
             },
           };
         }
 
         return result;
-      }, draftEditOrderDetail || orderDetail);
+      }, orderDetailToHandle);
+
       if (isEditFlow) {
         dispatch(
           saveDraftEditOrder({
