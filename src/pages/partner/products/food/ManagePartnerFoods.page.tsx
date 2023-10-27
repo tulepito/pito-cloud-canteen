@@ -191,7 +191,6 @@ const ManagePartnerFoods = () => {
   const categoryOptions = useAppSelector(
     (state) => state.SystemAttributes.categories,
   );
-
   const packagingOptions = useAppSelector(
     (state) => state.SystemAttributes.packaging,
   );
@@ -363,12 +362,17 @@ const ManagePartnerFoods = () => {
     }
   };
 
-  const parsedFoods = parseEntitiesToTableData(
-    foods,
-    {
-      onSetFoodToRemove,
-    },
-    categoryOptions,
+  const parsedFoods = useMemo(
+    () =>
+      parseEntitiesToTableData(
+        foods,
+        {
+          onSetFoodToRemove,
+        },
+        categoryOptions,
+      ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [JSON.stringify(foods), JSON.stringify(categoryOptions)],
   );
 
   const foodApprovalStateTabItems = useMemo(
@@ -860,6 +864,7 @@ const ManagePartnerFoods = () => {
 
           <div className={css.foodApprovalTabWrapper}>
             <Tabs
+              disabled={queryFoodsInProgress}
               items={foodApprovalStateTabItems as any}
               onChange={onTabChange}
               defaultActiveKey={`${defaultActiveKey}`}
