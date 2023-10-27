@@ -226,12 +226,12 @@ const ServiceFeesAndNotes: React.FC<ServiceFeesAndNotesProps> = (props) => {
       await PCCFeeFormSubmitRef?.current();
   };
 
-  const handleNextTabInEditMode = () => {
-    handleSubmitAllForms();
+  const handleNextTabInEditMode = async () => {
+    await handleSubmitAllForms();
     nextTab();
   };
-  const handleNextToReviewTabInEditMode = () => {
-    handleSubmitAllForms();
+  const handleNextToReviewTabInEditMode = async () => {
+    await handleSubmitAllForms();
     if (nextToReviewTab) nextToReviewTab();
   };
 
