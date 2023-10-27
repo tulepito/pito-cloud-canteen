@@ -45,6 +45,7 @@ import partnerOrderDetailsUpdated, {
 import partnerSubOrderIsCanceled, {
   partnerSubOrderIsCanceledSubject,
 } from '@src/utils/emailTemplate/partnerSubOrderIsCanceled';
+import { DAY_SESSION_OPTIONS, getLabelByKey } from '@src/utils/options';
 
 import { sendIndividualEmail } from './awsSES';
 import getSystemAttributes from './getSystemAttributes';
@@ -391,7 +392,7 @@ export const emailSendingFactory = async (
         const { bookerUser, orderListing } = emailDataSource;
         const { startDate, endDate, deliveryHour } = orderListing.getMetadata();
         const { email: bookerEmail } = bookerUser?.getAttributes() || {};
-        const { lastName, firstName } = bookerUser?.getAttributes() || {};
+        const { lastName, firstName } = bookerUser?.getProfile() || {};
 
         const emailTemplate = bookerPickingOrderChanged({
           orderId,
@@ -493,17 +494,15 @@ export const emailSendingFactory = async (
         });
 
         const { participantUser, orderListing } = emailDataSource;
-        const {
-          email: participantEmail,
-          lastName,
-          firstName,
-        } = participantUser?.getAttributes() || {};
+        const { email: participantEmail } =
+          participantUser?.getAttributes() || {};
+        const { lastName, firstName } = participantUser?.getProfile() || {};
         const { daySession } = orderListing.getMetadata();
         const formattedSubOrderDate = formatTimestamp(timestamp);
 
         const emailTemplate = participantPickingSubOrderChanged({
           orderId,
-          daySession,
+          daySession: getLabelByKey(DAY_SESSION_OPTIONS, daySession),
           formattedSubOrderDate,
           userName: `${lastName} ${firstName}`,
         });
