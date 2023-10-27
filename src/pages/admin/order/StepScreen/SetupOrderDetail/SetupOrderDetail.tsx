@@ -610,7 +610,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
           DateTime.fromMillis(curr).weekday,
         ).key;
 
-        if (selectedDates.includes(currWeekday)) {
+        if (selectedDates.includes(currWeekday) && curr.toString() !== date) {
           if (
             isPickingOrder &&
             isEditFlow &&
@@ -622,8 +622,8 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
           return {
             ...result,
             [curr]: {
-              ...orderDetail[curr],
-              restaurant: orderDetail[date]?.restaurant || {},
+              ...draftEditOrderDetail![curr],
+              restaurant: draftEditOrderDetail![date]?.restaurant || {},
             },
           };
         }
