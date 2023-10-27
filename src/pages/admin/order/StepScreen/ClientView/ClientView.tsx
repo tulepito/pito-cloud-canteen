@@ -1,7 +1,6 @@
 /* eslint-disable import/no-cycle */
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { shallowEqual } from 'react-redux';
 import isEmpty from 'lodash/isEmpty';
 
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
@@ -31,19 +30,14 @@ const ClientView: React.FC<TClientView> = (props) => {
 
   const selectedCompany = useAppSelector(
     (state) => state.Order.selectedCompany,
-    shallowEqual,
   );
-  const bookerList = useAppSelector(
-    (state) => state.Order.bookerList,
-    shallowEqual,
-  );
-  const selectedBooker = useAppSelector(
-    (state) => state.Order.selectedBooker,
-    shallowEqual,
-  );
+  const bookerList = useAppSelector((state) => state.Order.bookerList);
+  const selectedBooker = useAppSelector((state) => state.Order.selectedBooker);
   const fetchBookersInProgress = useAppSelector(
     (state) => state.Order.fetchBookersInProgress,
   );
+  const shouldShowUI =
+    selectedBooker !== null && !isEmpty(bookerList) && selectedCompany !== null;
   const companyId = User(selectedCompany).getId();
 
   useEffect(() => {
@@ -74,7 +68,7 @@ const ClientView: React.FC<TClientView> = (props) => {
 
   return (
     <div>
-      {!fetchBookersInProgress && (
+      {shouldShowUI && (
         <>
           <div className={css.clientTable}>
             <ClientTable

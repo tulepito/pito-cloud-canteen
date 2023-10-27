@@ -116,6 +116,9 @@ const EditOrderWizard = () => {
   const fetchOrderInProgress = useAppSelector(
     (state) => state.Order.fetchOrderInProgress,
   );
+  const fetchOrderDetailInProgress = useAppSelector(
+    (state) => state.Order.fetchOrderDetailInProgress,
+  );
   const updateOrderDetailInProgress = useAppSelector(
     (state) => state.Order.updateOrderDetailInProgress,
   );
@@ -139,6 +142,9 @@ const EditOrderWizard = () => {
 
   const anyFetchOrUpdatesInProgress =
     fetchOrderInProgress ||
+    fetchOrderDetailInProgress ||
+    order === null ||
+    isEmpty(orderDetail) ||
     updateOrderInProgress ||
     updateOrderDetailInProgress;
 
