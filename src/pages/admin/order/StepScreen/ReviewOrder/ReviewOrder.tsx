@@ -560,13 +560,11 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
       return restaurant?.id && restaurant?.foodList?.length === 0;
     })?.length > 0;
   const missingDraftSelectedFood =
-    !missingDraftGeneralInfo && !isDraftOrderDetailNotChanged
-      ? Object.keys(draftEditOrderDetail!).filter((dateTime) => {
-          const { restaurant } = draftEditOrderDetail?.[dateTime] || {};
+    Object.keys(draftEditOrderDetail!).filter((dateTime) => {
+      const { restaurant } = draftEditOrderDetail?.[dateTime] || {};
 
-          return restaurant?.id && restaurant?.foodList?.length === 0;
-        })?.length > 0
-      : missingSelectedFood;
+      return restaurant?.id && restaurant?.foodList?.length === 0;
+    })?.length > 0;
 
   const submitDisabled =
     !validFields ||
