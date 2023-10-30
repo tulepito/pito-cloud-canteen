@@ -529,7 +529,7 @@ export const updateMenuAfterFoodUpdated = async (updatedFoodId: string) => {
           (totalFoodIdListResult: any, subOrder: any) => {
             return [
               ...totalFoodIdListResult,
-              ...Object.keys(subOrder.restaurant.foodList),
+              ...Object.keys(subOrder?.restaurant?.foodList || {}),
             ];
           },
           [],
