@@ -43,6 +43,13 @@ enum EPageViewMode {
   priceQuotation = 'priceQuotation',
 }
 
+const allowedOrderStatesToShowStateSection = [
+  EOrderStates.inProgress,
+  EOrderStates.pendingPayment,
+  EOrderStates.completed,
+  EOrderStates.reviewed,
+];
+
 type OrderDetailTabProps = {
   order: TListing;
   orderDetail: any;
@@ -122,7 +129,7 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
   const showStateSectionCondition =
     orderStateHistory.findIndex(({ state }: { state: EOrderStates }) => {
       return state === EOrderStates.inProgress;
-    }) > 0;
+    }) > 0 && allowedOrderStatesToShowStateSection.includes(orderState);
   const orderDetailsNotChanged =
     isDraftEditing && isEqual(orderDetail, draftOrderDetail);
 

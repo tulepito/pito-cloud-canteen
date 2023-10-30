@@ -1,13 +1,15 @@
-import { difference, isEmpty } from 'lodash';
+import { difference, isEmpty, last } from 'lodash';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HttpMethod } from '@apis/configs';
 import { deleteFirebaseDocumentById } from '@pages/api/participants/document/document.service';
 import cookies from '@services/cookie';
+import { emailSendingFactory, EmailTemplateTypes } from '@services/email';
 import { fetchListing } from '@services/integrationHelper';
 import { handleError } from '@services/sdk';
 import { Listing } from '@src/utils/data';
 import { EParticipantOrderStatus } from '@src/utils/enums';
+import { ETransition } from '@src/utils/transaction';
 import type { TObject } from '@src/utils/types';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
@@ -18,6 +20,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       case HttpMethod.PUT:
         {
           const { planId } = req.body;
+          const { orderId } = req.query;
           const plan = await fetchListing(planId);
 
           const planListing = Listing(plan);
@@ -25,8 +28,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           const { orderDetail = {} } = planListing.getMetadata();
           const editedSubOrders = Object.keys(orderDetail).reduce(
             (result: any, subOrderDate: string) => {
-              const { oldValues } = orderDetail[subOrderDate];
-              if (isEmpty(oldValues)) {
+              const { oldValues, lastTransition } = orderDetail[subOrderDate];
+              if (
+                isEmpty(oldValues) ||
+                lastTransition !== ETransition.INITIATE_TRANSACTION
+              ) {
                 return result;
               }
 
@@ -41,17 +47,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           const handleParticipantNotification = Object.keys(
             editedSubOrders,
           ).map(async (subOrderDate: string) => {
-            const { oldValues, editTagVersion, restaurant } =
-              editedSubOrders[subOrderDate];
+            const { oldValues, restaurant } = editedSubOrders[subOrderDate];
             const { foodList = {} } = restaurant;
 
-            const previousOldValues =
-              editTagVersion === 1
-                ? oldValues[0]
-                : oldValues.find(
-                    (_oldValue: TObject) =>
-                      _oldValue.editTagVersion === editTagVersion - 1,
-                  );
+            const previousOldValues = last<TObject>(oldValues) || {};
 
             const { restaurant: oldRestaurant, memberOrders: oldMembers } =
               previousOldValues;
@@ -72,6 +71,15 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
                 await deleteFirebaseDocumentById(subOrderId);
 
                 // TODO: send email to participant
+                emailSendingFactory(
+                  EmailTemplateTypes.PARTICIPANT
+                    .PARTICIPANT_PICKING_ORDER_CHANGED,
+                  {
+                    participantId,
+                    orderId,
+                    timestamp: subOrderDate,
+                  },
+                );
               });
 
             await Promise.all(deleleSubOrderFromFirebaseAndSendNotification);
@@ -85,6 +93,15 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             participantNotJoined.map(async (participantId: string) => {
               // TODO: send email to participant
               console.log('send email to participant', participantId);
+              emailSendingFactory(
+                EmailTemplateTypes.PARTICIPANT
+                  .PARTICIPANT_PICKING_ORDER_CHANGED,
+                {
+                  participantId,
+                  orderId,
+                  timestamp: subOrderDate,
+                },
+              );
             });
           });
 

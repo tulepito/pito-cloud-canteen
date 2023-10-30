@@ -10,7 +10,7 @@ import type { TObject } from '@src/utils/types';
 type TPlanOrderDetail = TPlan['orderDetail'];
 type TOrderOfDate = TPlanOrderDetail[keyof TPlanOrderDetail];
 
-type TNormalizedOrderDetail = {
+export type TNormalizedOrderDetail = {
   params: {
     listingId: string;
     transactionId?: string;

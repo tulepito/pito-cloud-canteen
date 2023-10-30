@@ -1,5 +1,11 @@
+import isEmpty from 'lodash/isEmpty';
 import uniq from 'lodash/uniq';
 
+import {
+  checkIsOrderHasInProgressState,
+  getEditedSubOrders,
+} from '@helpers/orderHelper';
+import type { TNormalizedOrderDetail } from '@pages/api/orders/utils';
 import {
   normalizeOrderDetail,
   prepareNewPlanOrderDetail,
@@ -14,7 +20,6 @@ import { Listing, Transaction, User } from '@src/utils/data';
 import { formatTimestamp } from '@src/utils/dates';
 import {
   ENotificationType,
-  EOrderStates,
   EOrderType,
   EPartnerVATSetting,
 } from '@src/utils/enums';
@@ -54,14 +59,10 @@ export const initiateTransaction = async ({
     specificPCCFee = 0,
     orderStateHistory = [],
   } = orderData.getMetadata();
-  const isOrderHasInProgressState = orderStateHistory.some(
-    (state: { state: string; createdAt: number }) =>
-      state.state === EOrderStates.inProgress,
-  );
+  const isOrderHasInProgressState =
+    checkIsOrderHasInProgressState(orderStateHistory);
   const isGroupOrder = orderType === EOrderType.group;
-  if (isOrderHasInProgressState) {
-    return;
-  }
+
   if (plans.length === 0 || !plans.includes(planId)) {
     throw new Error(`Invalid planId, ${planId}`);
   }
@@ -81,6 +82,30 @@ export const initiateTransaction = async ({
     deliveryHour,
     isGroupOrder,
   });
+
+  const editedSubOrders = getEditedSubOrders(planOrderDetail);
+  if (isOrderHasInProgressState && !isEmpty(editedSubOrders)) {
+    const handleUpdateTxs = Object.keys(editedSubOrders).map(
+      async (subOrderDate: string) => {
+        const { transactionId } = editedSubOrders[subOrderDate];
+        const txNormalizedData = normalizedOrderDetail.find(
+          (item: TNormalizedOrderDetail) =>
+            item.params.transactionId === transactionId,
+        );
+
+        await integrationSdk.transactions.updateMetadata({
+          id: transactionId,
+          metadata: {
+            ...txNormalizedData?.params.extendedData.metadata,
+          },
+        });
+      },
+    );
+
+    await Promise.all(handleUpdateTxs);
+
+    return;
+  }
 
   const transactionMap: TObject = {};
   const partnerIds: string[] = [];

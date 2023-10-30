@@ -91,3 +91,21 @@ export const handleParticipantAfterEditInProgressOrderApi = (
     `/admin/listings/order/${orderId}/handle-participant-after-edit-in-progress-order`,
     body,
   );
+
+export const handleCompanyAfterEditCompletedOrderApi = (
+  orderId: string,
+  body: TObject,
+) =>
+  putApi(
+    `/admin/listings/order/${orderId}/handle-company-after-edit-completed-order`,
+    body,
+  );
+
+export const handlePartnerAfterEditInProgressOrderApi = (
+  orderId: string,
+  body: TObject,
+) =>
+  putApi(
+    `/admin/listings/order/${orderId}/handle-partner-after-edit-in-progress-order`,
+    body,
+  );

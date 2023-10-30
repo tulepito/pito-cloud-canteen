@@ -10,6 +10,7 @@ import {
   EVENING_SESSION,
   MORNING_SESSION,
 } from '@components/CalendarDashboard/helpers/constant';
+import { ETransition } from '@src/utils/transaction';
 import { Listing } from '@utils/data';
 import {
   generateTimeRangeItems,
@@ -26,7 +27,12 @@ import {
   EParticipantOrderStatus,
 } from '@utils/enums';
 import type { TPlan } from '@utils/orderTypes';
-import type { TListing, TObject, TOrderChangeHistoryItem } from '@utils/types';
+import type {
+  TListing,
+  TObject,
+  TOrderChangeHistoryItem,
+  TOrderStateHistory,
+} from '@utils/types';
 
 import { parseThousandNumber } from './format';
 
@@ -886,4 +892,34 @@ export const preparePickingOrderChangeNotificationData = ({
     firebaseChangeHistory,
     normalizedOrderDetail,
   };
+};
+
+export const getEditedSubOrders = (orderDetail: TObject) => {
+  const editedSubOrders = Object.keys(orderDetail).reduce(
+    (result: any, subOrderDate: string) => {
+      const { oldValues, lastTransition } = orderDetail[subOrderDate];
+      if (
+        isEmpty(oldValues) ||
+        lastTransition !== ETransition.INITIATE_TRANSACTION
+      ) {
+        return result;
+      }
+
+      return {
+        ...result,
+        [subOrderDate]: orderDetail[subOrderDate],
+      };
+    },
+    {},
+  );
+
+  return editedSubOrders;
+};
+
+export const checkIsOrderHasInProgressState = (
+  orderStateHistory: TOrderStateHistory[],
+) => {
+  return orderStateHistory.some(
+    (state: TOrderStateHistory) => state.state === EOrderStates.inProgress,
+  );
 };

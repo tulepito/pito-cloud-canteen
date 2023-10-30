@@ -1,3 +1,4 @@
+/* eslint-disable unused-imports/no-unused-vars */
 /* eslint-disable import/no-cycle */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useMemo, useRef, useState } from 'react';
@@ -8,7 +9,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import classNames from 'classnames';
 import arrayMutators from 'final-form-arrays';
-import { omit, pickBy } from 'lodash';
+import { last, omit, pickBy } from 'lodash';
 import compact from 'lodash/compact';
 import isEmpty from 'lodash/isEmpty';
 import isEqual from 'lodash/isEqual';
@@ -45,7 +46,11 @@ import {
 import { adminPaths } from '@src/paths';
 import { Listing } from '@utils/data';
 import { formatTimestamp } from '@utils/dates';
-import { EOrderDraftStates, EOrderStates } from '@utils/enums';
+import {
+  EOrderDraftStates,
+  EOrderStates,
+  EParticipantOrderStatus,
+} from '@utils/enums';
 import type { TKeyValue, TListing, TObject } from '@utils/types';
 import { required } from '@utils/validators';
 
@@ -211,9 +216,12 @@ export const ReviewContent: React.FC<any> = (props) => {
     ) >= 0;
   const isPickingOrder = orderState === EOrderStates.picking;
   const shouldShowFoodList =
-    [EOrderDraftStates.draft, EOrderDraftStates.pendingApproval].includes(
-      orderState,
-    ) ||
+    [
+      EOrderDraftStates.draft,
+      EOrderDraftStates.pendingApproval,
+      EOrderStates.inProgress,
+      EOrderStates.picking,
+    ].includes(orderState) ||
     (isEditFlow && isPickingOrder);
 
   const parsedFoodList = Object.keys(foodList).map((key, index) => {
@@ -652,6 +660,38 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
         );
         const editedSubOrder = draftEditOrderDetail?.[subOrderDate];
 
+        const isRestaurantChanged = !isEqual(
+          last<TObject>(orderDetail[subOrderDate].oldValues)?.restaurant?.id,
+          editedSubOrder?.restaurant.id,
+        );
+
+        const resettedMemberOrders = editedSubOrder.memberOrders.map(() => {
+          return {
+            foodId: '',
+            status: EParticipantOrderStatus.empty,
+          };
+        });
+
+        const editedMemberOrders = editedSubOrder.memberOrders.map(
+          (memberOrder: TObject) => {
+            const { foodId, status } = memberOrder;
+
+            const isFoodChanged = !isEqual(
+              last<TObject>(
+                orderDetail[subOrderDate].oldValues,
+              )?.memberOrders?.find((oldMemberOrder: TObject) => {
+                return oldMemberOrder.userId === memberOrder.userId;
+              })?.foodId,
+              foodId,
+            );
+
+            return {
+              foodId: isFoodChanged ? '' : foodId,
+              status: isFoodChanged ? EParticipantOrderStatus.empty : status,
+            };
+          },
+        );
+
         return {
           [subOrderDate]: {
             oldValues: [
@@ -659,15 +699,28 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
               subOrderWithoutOldValues,
             ],
             ...editedSubOrder,
+            memberOrders: isRestaurantChanged
+              ? resettedMemberOrders
+              : editedMemberOrders,
           },
         };
       },
       {},
     );
-    const editedOrderDetail = {
+    const editedOrderDetail: TObject = {
       ...orderDetail,
       ...editedSubOrders,
     };
+
+    const newPartnerIds = Object.values(editedOrderDetail).reduce(
+      (result: string[], subOrder: TObject) => {
+        const { restaurant } = subOrder;
+        const { id } = restaurant;
+
+        return [...result, id];
+      },
+      [],
+    );
 
     await dispatch(
       orderAsyncActions.updateOrder({
@@ -677,6 +730,7 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
           shipperName: shipperNameValue,
           orderState: EOrderStates.picking,
           viewed: false,
+          partnerIds: newPartnerIds,
         },
       }),
     );
@@ -696,7 +750,7 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
 
   const handleEditFlowSubmit = async () => {
     if (isEditInProgressOrder) {
-      editConfirmModalController.setTrue();
+      return editConfirmModalController.setTrue();
     }
     if (planId && orderId) {
       const { normalizedOrderDetail } = notificationData;
@@ -847,15 +901,34 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
     role.forEach((r) => {
       if (r === 'participant') {
         dispatch(
-          orderAsyncActions.handleSendNotificationToParticipant({
+          orderAsyncActions.handleSendEditInProgressOrderNotificationToParticipant(
+            {
+              orderId,
+              planId,
+            },
+          ),
+        );
+      } else if (r === 'company') {
+        // TODO: send notification to company
+        const { normalizedOrderDetail, ...restData } = notificationData;
+
+        dispatch(
+          orderAsyncActions.notifyUserPickingOrderChanges({
+            orderId,
+            params: {
+              ...restData,
+              userRoles: ['booker'],
+            },
+          }),
+        );
+      } else if (r === 'partner') {
+        // TODO: send notification to partner
+        dispatch(
+          orderAsyncActions.handleSendEditInProgressOrderNotificationToPartner({
             orderId,
             planId,
           }),
         );
-      } else if (r === 'company') {
-        // TODO: send notification to company
-      } else if (r === 'partner') {
-        // TODO: send notification to partner
       }
     });
     editConfirmModalController.setFalse();

@@ -400,6 +400,7 @@ export enum ENativeNotificationType {
   AdminTransitSubOrderToDelivered = 'AdminTransitSubOrderToDelivered',
   AdminTransitSubOrderToCanceled = 'AdminTransitSubOrderToCanceled',
   TransitOrderStateToCanceled = 'TransitOrderStateToCanceled',
+  PartnerTransitOrderToCanceled = 'PartnerTransitOrderToCanceled',
 }
 
 export enum EFoodApprovalState {

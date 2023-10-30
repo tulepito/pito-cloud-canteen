@@ -204,7 +204,7 @@ const parseEntitiesToTableData = (
         time: DateTime.fromMillis(Number(date || 0))
           .startOf('day')
           .plus({
-            ...convertHHmmStringToTimeParts(deliveryHour.split(' - ')[0]),
+            ...convertHHmmStringToTimeParts(deliveryHour.split('-')[0]),
           })
           .toMillis(),
         endDate: endDate ? formatTimestamp(endDate) : '',

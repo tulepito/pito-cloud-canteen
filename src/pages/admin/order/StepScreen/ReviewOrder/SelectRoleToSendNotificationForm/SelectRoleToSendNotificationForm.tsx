@@ -39,7 +39,7 @@ const SelectRoleToSendNotificationFormComponent: React.FC<
   TSelectRoleToSendNotificationFormComponentProps
 > = (props) => {
   const { handleSubmit, form, values, inProgress } = props;
-  const { role: roleValue } = values;
+  const { role: roleValue = [] } = values;
   const onCheckAllChange = (event: any) => {
     const { checked, value, name } = event.target;
 
