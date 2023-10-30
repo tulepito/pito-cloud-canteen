@@ -52,15 +52,16 @@ const tabCompleted = (
   const orderId = Listing(order).getId();
   const { staffName, plans = [], notes = {} } = Listing(order).getMetadata();
 
-  const missingSelectedFood = Object.keys(orderDetail).filter((dateTime) =>
-    isEmpty(orderDetail[dateTime]?.restaurant?.foodList),
+  const missingSelectedFood = Object.keys(orderDetail).filter(
+    (dateTime) =>
+      !isEmpty(orderDetail[dateTime]?.restaurant?.id) &&
+      isEmpty(orderDetail[dateTime]?.restaurant?.foodList),
   );
   const isMealPlanTabCompleted =
     !isEmpty(plans) && isEmpty(missingSelectedFood);
   const hasInvalidMealDay = Object.keys(availableOrderDetailCheckList).some(
     (item) => !availableOrderDetailCheckList[item].isAvailable,
   );
-
   switch (tab) {
     case CLIENT_SELECT_TAB:
       return !isEmpty(orderId);
