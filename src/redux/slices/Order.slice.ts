@@ -925,8 +925,8 @@ const fetchOrderRestaurants = createAsyncThunk(
   FETCH_ORDER_RESTAURANTS,
   async (_, { extra: sdk, getState }) => {
     const { orderDetail = {} } = getState().Order;
-    const restaurantIdList = uniq(
-      Object.values(orderDetail).map((item: any) => item.restaurant.id),
+    const restaurantIdList = compact(
+      uniq(Object.values(orderDetail).map((item: any) => item?.restaurant?.id)),
     );
     const restaurantList = await Promise.all(
       restaurantIdList.map(async (restaurantId) => {
