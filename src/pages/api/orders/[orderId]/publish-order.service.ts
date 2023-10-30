@@ -25,9 +25,9 @@ const enableToPublishOrderStates = [
 
 const normalizePlanDetailsData = (planDetails: TPlan['orderDetail']) => {
   return Object.entries(planDetails).reduce((prev, [date, planDataOnDate]) => {
-    const { restaurant } = planDataOnDate;
+    const { restaurant } = planDataOnDate || {};
 
-    const { id, restaurantName, foodList } = restaurant;
+    const { id, restaurantName, foodList } = restaurant || {};
     const isSetupRestaurantAndFood =
       !isEmpty(id) && !isEmpty(restaurantName) && !isEmpty(foodList);
 
