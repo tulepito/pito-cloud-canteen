@@ -546,33 +546,30 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
   };
 
   // TODO: handle remove day's meal
-  const handleRemoveMeal = useCallback(
-    (id: string) => (resourceId: string) => {
-      if (isEditFlow) {
-        dispatch(
-          saveDraftEditOrder({
-            orderDetail: {
-              ...draftEditOrderDetail,
-              [resourceId]: { restaurant: { foodList: [] } },
-            },
-          }),
-        );
-      } else {
-        dispatch(setCanNotGoToStep4(true));
-        dispatch(
-          orderAsyncActions.updatePlanDetail({
-            orderId,
-            planId: id,
-            orderDetail: {
-              [resourceId]: null,
-            },
-            updateMode: 'merge',
-          }),
-        );
-      }
-    },
-    [dispatch, orderId, isEditFlow],
-  );
+  const handleRemoveMeal = (id: string) => (resourceId: string) => {
+    if (isEditFlow) {
+      dispatch(
+        saveDraftEditOrder({
+          orderDetail: {
+            ...draftEditOrderDetail,
+            [resourceId]: { restaurant: { foodList: [] } },
+          },
+        }),
+      );
+    } else {
+      dispatch(setCanNotGoToStep4(true));
+      dispatch(
+        orderAsyncActions.updatePlanDetail({
+          orderId,
+          planId: id,
+          orderDetail: {
+            [resourceId]: null,
+          },
+          updateMode: 'merge',
+        }),
+      );
+    }
+  };
 
   // TODO: handle recommend restaurant days in week
   const onRecommendNewRestaurants = useCallback(async () => {
