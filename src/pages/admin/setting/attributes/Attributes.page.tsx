@@ -405,6 +405,7 @@ const AdminAttributesSettingPage = () => {
           {intl.formatMessage({ id: 'AdminAttributesSettingPage.pageTitle' })}
         </h2>
         <KeywordSearchForm
+          className={css.searchForm}
           onSubmit={onKeywordSearch}
           initialValues={searchFormInitialValues}
         />

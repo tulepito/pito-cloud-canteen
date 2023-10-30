@@ -5,6 +5,10 @@
 .container {
   .header {
     @include flexAlign(center, space-between);
+
+    .searchForm {
+      width: unset;
+    }
   }
 
   .tabLabel {

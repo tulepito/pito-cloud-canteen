@@ -432,7 +432,7 @@ const AdminManageClientPaymentsPage = () => {
     <div className={css.root}>
       <div className={css.header}>
         <h1 className={css.title}>{title}</h1>
-        <KeywordSearchForm onSubmit={() => {}} />
+        <KeywordSearchForm className={css.searchForm} onSubmit={() => {}} />
       </div>
       <div className={css.filterForm}>
         <IntegrationFilterModal

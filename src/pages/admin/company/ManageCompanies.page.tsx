@@ -222,7 +222,6 @@ export default function ManageCompanies() {
         </Link>
       </div>
       <div className={css.filterWrapper}>
-        <div></div>
         <KeywordSearchForm
           initialValues={{ keywords: keywords as string }}
           onSubmit={onSearchKeyword}
