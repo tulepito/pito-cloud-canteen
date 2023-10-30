@@ -585,12 +585,14 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
           recommendParams,
         }),
       );
+      const updateOrderDetail = mergeRecommendOrderDetailWithCurrentOrderDetail(
+        draftEditOrderDetail!,
+        recommendOrderDetail,
+      );
+
       dispatch(
         saveDraftEditOrder({
-          orderDetail: mergeRecommendOrderDetailWithCurrentOrderDetail(
-            draftEditOrderDetail!,
-            recommendOrderDetail,
-          ),
+          orderDetail: updateOrderDetail,
         }),
       );
     } else {

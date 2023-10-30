@@ -905,9 +905,13 @@ export const mergeRecommendOrderDetailWithCurrentOrderDetail = (
     mergedResult = { ...recommendOrderDetail };
 
     Object.keys(currentOrderDetail).forEach((time) => {
+      const { restaurant = {}, hasNoRestaurants = false } =
+        recommendOrderDetail[time] || {};
+
       mergedResult[time] = {
-        ...(recommendOrderDetail[time] || {}),
         ...currentOrderDetail[time],
+        restaurant,
+        hasNoRestaurants,
       };
     });
   }
