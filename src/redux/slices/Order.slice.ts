@@ -217,13 +217,6 @@ const initialState: TOrderInitialState = {
     page: 1,
     perPage: 10,
   },
-  // totalItemMap: {
-  //   [EManageCompanyOrdersTab.SCHEDULED]: 0,
-  //   [EManageCompanyOrdersTab.CANCELED]: 0,
-  //   [EManageCompanyOrdersTab.DRAFT]: 0,
-  //   [EManageCompanyOrdersTab.COMPLETED]: 0,
-  //   [EManageCompanyOrdersTab.ALL]: 0,
-  // },
   totalItemMap: null,
 
   queryTotalOrdersCountByTabInProgress: false,
@@ -1122,9 +1115,12 @@ const orderSlice = createSlice({
       ...state,
       bookerList: [],
     }),
-    resetOrder: () => ({
+    resetStates: () => ({
       ...initialState,
     }),
+    resetOrder: (state) => {
+      state.order = null;
+    },
     changeStep2SubmitStatus: (state, { payload }) => ({
       ...state,
       step2SubmitInProgress: payload,
@@ -1557,6 +1553,7 @@ export const {
   selectCalendarDate,
   selectRestaurant,
   unSelectRestaurant,
+  resetStates,
   resetOrder,
   changeStep2SubmitStatus,
   resetCompanyOrdersStates,

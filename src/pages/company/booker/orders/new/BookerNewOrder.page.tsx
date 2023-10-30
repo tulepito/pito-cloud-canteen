@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { useIntl } from 'react-intl';
 import classNames from 'classnames';
+import { useRouter } from 'next/router';
 
 import Modal from '@components/Modal/Modal';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useFetchCompanyInfo from '@hooks/useFetchCompanyInfo';
 import { QuizActions, QuizThunks } from '@redux/slices/Quiz.slice';
+import { companyPaths } from '@src/paths';
 import { QuizStep } from '@src/utils/enums';
 import { User } from '@utils/data';
 
@@ -19,6 +21,7 @@ import css from './BookerNewOrder.module.scss';
 
 function BookerNewOrderPage() {
   const intl = useIntl();
+  const router = useRouter();
   const dispatch = useAppDispatch();
   // Local state
   const [isSubmitting, setiIsSubmitting] = useState(false);
@@ -50,6 +53,8 @@ function BookerNewOrderPage() {
     companyId,
   } = useLoadCompanies();
 
+  const currentPathName = router.pathname;
+
   const modalContainerClasses = classNames(css.modalContainer, {
     [css.largeContainer]: isCopyPreviousOrder || reorderOpen,
   });
@@ -62,6 +67,10 @@ function BookerNewOrderPage() {
 
   const handleCancel = () => {
     dispatch(QuizActions.closeQuizFlow());
+
+    if (currentPathName === companyPaths.CreateNewOrder) {
+      router.push(companyPaths.Home);
+    }
   };
 
   const handleSubmit = async (values: any) => {
