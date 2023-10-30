@@ -30,7 +30,7 @@ import {
 } from '@helpers/order/cartInfoHelper';
 import { combineOrderDetailWithPriceInfo } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { orderAsyncActions, resetOrder } from '@redux/slices/Order.slice';
+import { orderAsyncActions, resetStates } from '@redux/slices/Order.slice';
 import { adminPaths, adminRoutes } from '@src/paths';
 import { Listing } from '@src/utils/data';
 import { getLabelByKey, ORDER_STATE_OPTIONS } from '@src/utils/options';
@@ -757,7 +757,7 @@ const ManageOrdersPage = () => {
     .filter((item: string) => !!item);
 
   useEffect(() => {
-    dispatch(resetOrder());
+    dispatch(resetStates());
 
     const dateQueriesMaybe = shouldHideOrder
       ? {
