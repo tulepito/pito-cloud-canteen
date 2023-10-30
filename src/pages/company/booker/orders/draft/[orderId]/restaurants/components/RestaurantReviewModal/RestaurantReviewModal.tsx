@@ -92,7 +92,7 @@ const RestaurantReviewModal: React.FC<RestaurantReviewModalProps> = (props) => {
     () => Listing(selectedRestaurant as TListing),
     [selectedRestaurant],
   );
-  const { detailRating, totalRatingNumber } =
+  const { detailRating, totalRatingNumber = 0 } =
     selectedRestaurantListing.getMetadata();
 
   const { food, packaging } = detailRating || {};
