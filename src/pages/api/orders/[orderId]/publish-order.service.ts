@@ -76,10 +76,12 @@ export const publishOrder = async (orderId: string) => {
   const { orderDetail: planOrderDetails = {} } =
     Listing(planListing).getMetadata();
 
+  const normalizedOrderDetail = normalizePlanDetailsData(planOrderDetails);
+
   await integrationSdk.listings.update({
     id: planId,
     metadata: {
-      orderDetail: normalizePlanDetailsData(planOrderDetails),
+      orderDetail: normalizedOrderDetail,
     },
   });
 
@@ -91,7 +93,7 @@ export const publishOrder = async (orderId: string) => {
   const { systemServiceFeePercentage = 0 } = User(response).getPrivateData();
 
   const allRestaurantIdList = uniq(
-    Object.values(planOrderDetails).map(
+    Object.values(normalizedOrderDetail).map(
       (subOrder: any) => subOrder?.restaurant?.id,
     ),
   );
