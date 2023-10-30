@@ -93,7 +93,7 @@ const StateItem: React.FC<TStateItemProps> = ({
 
   return (
     <>
-      {oldStateItemComponent}
+      <RenderWhen condition={isAdminLayout}>{oldStateItemComponent}</RenderWhen>
       <RenderWhen condition={isAdminLayout}>
         <Tooltip
           overlayClassName={css.tooltipOverlay}

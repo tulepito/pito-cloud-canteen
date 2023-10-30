@@ -69,15 +69,15 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
                 }
               };
 
+              const oldRestaurantListing = await fetchListing(
+                oldRestaurant.id,
+                ['author'],
+              );
+              const oldRestaurantUser = oldRestaurantListing.author;
+
+              const oldRestaurantUserId = User(oldRestaurantUser).getId();
+
               if (restaurant.id !== oldRestaurant.id) {
-                const oldRestaurantListing = await fetchListing(
-                  oldRestaurant.id,
-                  ['author'],
-                );
-                const oldRestaurantUser = oldRestaurantListing.author;
-
-                const oldRestaurantUserId = User(oldRestaurantUser).getId();
-
                 emailSendingFactory(
                   EmailTemplateTypes.PARTNER.PARTNER_SUB_ORDER_CANCELED,
                   {
@@ -111,6 +111,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
                 await handleDeletePaymentRecord();
               } else {
+                createNativeNotification(
+                  ENativeNotificationType.PartnerTransitOrderToCanceled,
+                  {
+                    order,
+                    participantId: oldRestaurantUserId,
+                    subOrderDate,
+                  },
+                );
                 await handleDeletePaymentRecord();
               }
             },
