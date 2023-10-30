@@ -440,14 +440,8 @@ const deleteGroup = createAsyncThunk(
 
 const updateBookerAccount = createAsyncThunk(
   UPDATE_BOOKER_ACCOUNT,
-  async (params: any, { extra: sdk, dispatch }) => {
-    const queryParams = {
-      include: ['profileImage'],
-      'fields.image': ['variants.square-small', 'variants.square-small2x'],
-    };
-
-    await sdk.currentUser.updateProfile(params, queryParams);
-    await dispatch(userThunks.fetchCurrentUser());
+  async (params: any, { dispatch }) => {
+    await dispatch(userThunks.updateProfile(params));
 
     return '';
   },

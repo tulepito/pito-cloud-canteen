@@ -66,7 +66,7 @@ const AccountPage = () => {
   ).getProfile();
   const { phoneNumber: bookerPhoneNumber = '' } = User(
     currentUser!,
-  ).getPublicData();
+  ).getProtectedData();
   const initialFormValues = useMemo<TContactPointProfileFormValues>(
     () => ({
       displayName: bookerDisplayName,
