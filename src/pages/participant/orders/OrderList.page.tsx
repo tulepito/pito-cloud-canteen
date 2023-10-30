@@ -27,6 +27,7 @@ import { useViewport } from '@hooks/useViewport';
 import { CalendarActions } from '@redux/slices/Calendar.slice';
 import { CurrentUser, Listing, User } from '@src/utils/data';
 import {
+  getDaySessionFromDeliveryTime,
   getNextMonth,
   getPrevMonth,
   getStartOfMonth,
@@ -232,7 +233,13 @@ const OrderListPage = () => {
           subOrderId: planId,
           orderId,
           planId,
-          daySession,
+          daySession:
+            daySession ||
+            getDaySessionFromDeliveryTime(
+              deliveryHour.includes('-')
+                ? deliveryHour.split('-')[0]
+                : deliveryHour,
+            ),
           status: pickFoodStatus,
           type: 'dailyMeal',
           restaurantAddress:
