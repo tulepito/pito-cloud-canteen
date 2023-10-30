@@ -49,6 +49,7 @@ import { formatTimestamp } from '@utils/dates';
 import {
   EOrderDraftStates,
   EOrderStates,
+  EOrderType,
   EParticipantOrderStatus,
 } from '@utils/enums';
 import type { TKeyValue, TListing, TObject } from '@utils/types';
@@ -207,6 +208,7 @@ export const ReviewContent: React.FC<any> = (props) => {
     orderNote,
     orderStateHistory = [],
   } = Listing(order as TListing).getMetadata();
+
   const orderId = Listing(order as TListing).getId();
   const { restaurantName, phoneNumber, foodList = {} } = restaurant || {};
   const isInProgressOrder = orderState === EOrderStates.inProgress;
@@ -554,9 +556,11 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
     orderState,
     plans = [],
     notes = {},
+    orderType = EOrderType.group,
   } = Listing(order as TListing).getMetadata();
   const planId = plans.length > 0 ? plans[0] : undefined;
   const isPickingOrder = orderState === EOrderStates.picking;
+  const isNormalOrder = orderType === EOrderType.normal;
   const { address } = deliveryAddress || {};
 
   const { staffName: draftStaffName, shipperName: draftShipperName } =
@@ -665,32 +669,40 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
           editedSubOrder?.restaurant.id,
         );
 
-        const resettedMemberOrders = editedSubOrder.memberOrders.map(() => {
+        const resettedMemberOrders = Object.keys(
+          editedSubOrder.memberOrders,
+        ).reduce((resettedMemberOrdersResult: any, _participantId: string) => {
           return {
-            foodId: '',
-            status: EParticipantOrderStatus.empty,
+            ...resettedMemberOrdersResult,
+            [_participantId]: {
+              foodId: '',
+              status: EParticipantOrderStatus.empty,
+            },
           };
-        });
+        }, {});
 
-        const editedMemberOrders = editedSubOrder.memberOrders.map(
-          (memberOrder: TObject) => {
-            const { foodId, status } = memberOrder;
+        const editedMemberOrders = Object.keys(
+          editedSubOrder.memberOrders,
+        ).reduce((editedMemberOrdersResult: any, participantId: string) => {
+          const { foodId, status } = editedSubOrder.memberOrders[participantId];
 
-            const isFoodChanged = !isEqual(
-              last<TObject>(
-                orderDetail[subOrderDate].oldValues,
-              )?.memberOrders?.find((oldMemberOrder: TObject) => {
-                return oldMemberOrder.userId === memberOrder.userId;
-              })?.foodId,
-              foodId,
-            );
+          const isFoodChanged = !isEqual(
+            last<TObject>(
+              orderDetail[subOrderDate].oldValues,
+            )?.memberOrders?.find((oldMemberOrder: TObject) => {
+              return oldMemberOrder.userId === participantId;
+            })?.foodId,
+            foodId,
+          );
 
-            return {
+          return {
+            ...editedMemberOrdersResult,
+            [participantId]: {
               foodId: isFoodChanged ? '' : foodId,
               status: isFoodChanged ? EParticipantOrderStatus.empty : status,
-            };
-          },
-        );
+            },
+          };
+        }, {});
 
         return {
           [subOrderDate]: {
@@ -1061,6 +1073,7 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
         isOpen={editConfirmModalController.value}
         onClose={editConfirmModalController.setFalse}
         onSubmit={onSubmitEditOrder}
+        isNormalOrder={isNormalOrder}
       />
     </div>
   );

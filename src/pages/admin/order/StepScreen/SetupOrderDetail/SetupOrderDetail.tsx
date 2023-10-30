@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import classNames from 'classnames';
+import { filter, has } from 'lodash';
 import isEmpty from 'lodash/isEmpty';
 import isEqual from 'lodash/isEqual';
 import { DateTime } from 'luxon';
@@ -169,6 +170,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     dayInWeek,
     daySession,
     orderStateHistory,
+    orderType = EOrderType.group,
   } = orderGetter.getMetadata();
   const { title: orderTitle } = orderGetter.getAttributes();
   const orderId = orderGetter.getId();
@@ -304,27 +306,58 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
         maxQuantity: restaurant.maxQuantity || 100,
       },
     };
-    console.log('restaurantData', restaurantData);
 
     if (isEditFlow) {
-      dispatch(
-        saveDraftEditOrder({
-          orderDetail: {
-            ...currentOrderDetail,
-            [subOrderDate]: {
-              ...orderDetail[subOrderDate],
-              ...restaurantData,
-              ...(isEditInProgressOrder && {
-                editTagVersion: orderDetail[selectedDate?.getTime()]?.restaurant
-                  ?.editTagVersion
-                  ? orderDetail[selectedDate?.getTime()].restaurant
-                      .editTagVersion + 1
-                  : 1,
-              }),
+      if (orderType === EOrderType.normal) {
+        const {
+          restaurant: currentSubOrderRestaurant,
+          lineItems: currentSubOrderLineItems,
+        } = currentOrderDetail[selectedDate?.getTime()] || {};
+        const isRestaurantChanged =
+          restaurantData.restaurant.id !== currentSubOrderRestaurant?.id;
+        const newLineItems = filter(currentSubOrderLineItems, (item: any) =>
+          has(selectedFoodList, item.id),
+        );
+
+        dispatch(
+          saveDraftEditOrder({
+            orderDetail: {
+              ...currentOrderDetail,
+              [subOrderDate]: {
+                ...orderDetail[subOrderDate],
+                ...restaurantData,
+                ...(isEditInProgressOrder && {
+                  editTagVersion: orderDetail[selectedDate?.getTime()]
+                    ?.restaurant?.editTagVersion
+                    ? orderDetail[selectedDate?.getTime()].restaurant
+                        .editTagVersion + 1
+                    : 1,
+                }),
+                lineItems: isRestaurantChanged ? [] : newLineItems,
+              },
             },
-          },
-        }),
-      );
+          }),
+        );
+      } else {
+        dispatch(
+          saveDraftEditOrder({
+            orderDetail: {
+              ...currentOrderDetail,
+              [subOrderDate]: {
+                ...orderDetail[subOrderDate],
+                ...restaurantData,
+                ...(isEditInProgressOrder && {
+                  editTagVersion: orderDetail[selectedDate?.getTime()]
+                    ?.restaurant?.editTagVersion
+                    ? orderDetail[selectedDate?.getTime()].restaurant
+                        .editTagVersion + 1
+                    : 1,
+                }),
+              },
+            },
+          }),
+        );
+      }
     } else {
       dispatch(setCanNotGoToStep4(true));
       await dispatch(

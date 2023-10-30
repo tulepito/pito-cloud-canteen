@@ -9,6 +9,7 @@ import Button from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import { FieldDropdownSelectComponent } from '@components/FormFields/FieldDropdownSelect/FieldDropdownSelect';
 import { FieldTextAreaComponent } from '@components/FormFields/FieldTextArea/FieldTextArea';
+import { checkIsOrderHasInProgressState } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import {
   orderDetailsAnyActionsInProgress,
@@ -16,6 +17,7 @@ import {
   orderManagementThunks,
 } from '@redux/slices/OrderManagement.slice';
 import { Listing } from '@src/utils/data';
+import { EOrderStates } from '@src/utils/enums';
 import { shortenString } from '@src/utils/string';
 import type { TListing, TObject } from '@src/utils/types';
 
@@ -51,11 +53,30 @@ const LineItemsTable: React.FC<TLineItemsTableProps> = (props) => {
   const draftOrderDetail = useAppSelector(
     (state) => state.OrderManagement.draftOrderDetail,
   );
+  const draftEditOrderData = useAppSelector(
+    (state) => state.Order.draftEditOrderData,
+  );
+  const order = useAppSelector((state) => state.Order.order);
+
+  const orderGetter = Listing(order);
+
+  const { orderState, orderStateHistory = [] } = orderGetter.getMetadata();
+
+  const { orderDetail: draftOrderDetailFromOrder = {} } = draftEditOrderData;
+
+  const isOrderHasInProgressState =
+    checkIsOrderHasInProgressState(orderStateHistory);
+  const isOrderInProgressState = orderState === EOrderStates.inProgress;
+
+  const currentDraftOrderDetail =
+    isOrderHasInProgressState && isOrderInProgressState
+      ? draftOrderDetailFromOrder
+      : draftOrderDetail;
 
   const planDataGetter = Listing(planData as TListing);
   const planId = planDataGetter.getId();
   const { orderId } = planDataGetter.getMetadata();
-  const data = draftOrderDetail[currentViewDate] || {};
+  const data = currentDraftOrderDetail[currentViewDate] || {};
   const { lineItems = [], restaurant = {} } = data as any;
   const { foodList = {} } = restaurant;
 
@@ -85,7 +106,7 @@ const LineItemsTable: React.FC<TLineItemsTableProps> = (props) => {
       };
 
       const updateOrderDetail = {
-        ...draftOrderDetail,
+        ...currentDraftOrderDetail,
         [currentViewDate]: currentViewData,
       };
       if (isDraftEditing) {
@@ -165,7 +186,7 @@ const LineItemsTable: React.FC<TLineItemsTableProps> = (props) => {
       }
 
       const updateOrderDetail = {
-        ...draftOrderDetail,
+        ...currentDraftOrderDetail,
         [currentViewDate]: {
           ...data,
           lineItems: newLineItems,

@@ -13,6 +13,7 @@ export type TSelectRoleToSendNotificationFormValues = {
 
 type TExtraProps = {
   inProgress?: boolean;
+  isNormalOrder?: boolean;
 };
 type TSelectRoleToSendNotificationFormComponentProps =
   FormRenderProps<TSelectRoleToSendNotificationFormValues> &
@@ -38,7 +39,8 @@ const ROLE_LIST = [
 const SelectRoleToSendNotificationFormComponent: React.FC<
   TSelectRoleToSendNotificationFormComponentProps
 > = (props) => {
-  const { handleSubmit, form, values, inProgress } = props;
+  const { handleSubmit, form, values, inProgress, isNormalOrder } = props;
+  const roleListMaybe = isNormalOrder ? ROLE_LIST.slice(0, 2) : ROLE_LIST;
   const { role: roleValue = [] } = values;
   const onCheckAllChange = (event: any) => {
     const { checked, value, name } = event.target;
@@ -59,7 +61,7 @@ const SelectRoleToSendNotificationFormComponent: React.FC<
       <div className={css.text}>
         Chọn đối tượng gửi thông báo thay đổi đơn hàng
       </div>
-      {ROLE_LIST.map((role) => (
+      {roleListMaybe.map((role) => (
         <FieldCheckbox
           key={role.key}
           name="role"

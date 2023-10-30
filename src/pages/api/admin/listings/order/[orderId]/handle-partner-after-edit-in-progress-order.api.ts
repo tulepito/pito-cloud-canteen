@@ -111,8 +111,16 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
                 await handleDeletePaymentRecord();
               } else {
+                emailSendingFactory(
+                  EmailTemplateTypes.PARTNER.PARTNER_ORDER_DETAILS_UPDATED,
+                  {
+                    orderId,
+                    restaurantId: oldRestaurant.id,
+                    timestamp: subOrderDate,
+                  },
+                );
                 createNativeNotification(
-                  ENativeNotificationType.PartnerTransitOrderToCanceled,
+                  ENativeNotificationType.PartnerEditSubOrder,
                   {
                     order,
                     participantId: oldRestaurantUserId,

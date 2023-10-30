@@ -9,10 +9,11 @@ type TEditConfirmModalProps = {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (values: any) => void;
+  isNormalOrder?: boolean;
 };
 
 const EditConfirmModal: React.FC<TEditConfirmModalProps> = (props) => {
-  const { isOpen, onClose, onSubmit } = props;
+  const { isOpen, onClose, onSubmit, isNormalOrder } = props;
   const updateOrderInProgress = useAppSelector(
     (state) => state.Order.updateOrderInProgress,
   );
@@ -30,6 +31,7 @@ const EditConfirmModal: React.FC<TEditConfirmModalProps> = (props) => {
       <SelectRoleToSendNotificationForm
         onSubmit={onSubmit}
         inProgress={updateOrderInProgress || updatePlanInProgress}
+        isNormalOrder={isNormalOrder}
       />
     </PopupModal>
   );
