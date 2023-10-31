@@ -1,4 +1,4 @@
-import { forwardRef, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { OnChange } from 'react-final-form-listeners';
 import { useIntl } from 'react-intl';
 import classNames from 'classnames';
@@ -8,7 +8,6 @@ import viLocale from 'date-fns/locale/vi';
 
 import FieldDatePicker from '@components/FormFields/FieldDatePicker/FieldDatePicker';
 import FieldDropdownSelect from '@components/FormFields/FieldDropdownSelect/FieldDropdownSelect';
-import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import IconCalendar from '@components/Icons/IconCalender/IconCalender';
 import IconClock from '@components/Icons/IconClock/IconClock';
 import { findMinStartDate } from '@helpers/orderHelper';
@@ -31,52 +30,6 @@ type MealPlanDateFieldProps = {
   containerClassName?: string;
   onCustomStartDateChange?: (date: number) => void;
 };
-
-// eslint-disable-next-line react/display-name
-const CustomStartDateFieldInput = forwardRef((props, ref) => {
-  return (
-    <FieldTextInput
-      {...props}
-      id="startDate"
-      name="startDate"
-      className={css.customInput}
-      format={(value) => {
-        return value
-          ? format(new Date(value), 'EEE, dd MMMM, yyyy', {
-              locale: viLocale,
-            })
-          : format(new Date(), 'EEE, dd MMMM, yyyy', {
-              locale: viLocale,
-            });
-      }}
-      leftIcon={<IconCalendar />}
-      inputRef={ref}
-    />
-  );
-});
-
-// eslint-disable-next-line react/display-name
-const CustomEndDateFieldInput = forwardRef((props, ref) => {
-  return (
-    <FieldTextInput
-      {...props}
-      id="endDate"
-      name="endDate"
-      className={css.customInput}
-      format={(value) => {
-        return value
-          ? format(new Date(value), 'EEE, dd MMMM, yyyy', {
-              locale: viLocale,
-            })
-          : format(new Date(), 'EEE, dd MMMM, yyyy', {
-              locale: viLocale,
-            });
-      }}
-      leftIcon={<IconCalendar />}
-      inputRef={ref}
-    />
-  );
-});
 
 const MealPlanDateField: React.FC<MealPlanDateFieldProps> = (props) => {
   const {
@@ -187,7 +140,8 @@ const MealPlanDateField: React.FC<MealPlanDateFieldProps> = (props) => {
                   nonSatOrSunDay(startDateNonSatOrSunDayMessage),
                 )
           }
-          customInput={<CustomStartDateFieldInput />}
+          shouldSkipTouched={false}
+          icon={<IconCalendar />}
         />
         <FieldDatePicker
           id="endDate"
@@ -205,7 +159,8 @@ const MealPlanDateField: React.FC<MealPlanDateFieldProps> = (props) => {
           placeholderText={format(new Date(), 'EEE, dd MMMM, yyyy', {
             locale: viLocale,
           })}
-          customInput={<CustomEndDateFieldInput />}
+          shouldSkipTouched={false}
+          icon={<IconCalendar />}
         />
         <FieldDropdownSelect
           id="deliveryHour"
