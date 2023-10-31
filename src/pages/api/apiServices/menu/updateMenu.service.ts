@@ -1,5 +1,5 @@
-import { uniq } from 'lodash';
 import isEqual from 'lodash/isEqual';
+import uniq from 'lodash/uniq';
 
 import {
   createFoodAveragePriceByDaysOfWeekField,
