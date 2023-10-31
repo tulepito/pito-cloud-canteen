@@ -856,10 +856,8 @@ export const preparePickingOrderChangeNotificationData = ({
     });
   }
   if (
-    PCCFeePerDate !==
-    (updateSpecificPCCFee !== undefined
-      ? updateSpecificPCCFee
-      : PCCFeeByMemberAmount)
+    updateSpecificPCCFee !== undefined &&
+    PCCFeePerDate !== updateSpecificPCCFee
   ) {
     changeHistoryToNotifyBooker.push({
       oldData: {
@@ -868,11 +866,7 @@ export const preparePickingOrderChangeNotificationData = ({
       },
       newData: {
         title: 'Phí PITO Cloud Canteen:',
-        content: `${parseThousandNumber(
-          updateSpecificPCCFee !== undefined
-            ? updateSpecificPCCFee
-            : PCCFeeByMemberAmount,
-        )}đ`,
+        content: `${parseThousandNumber(updateSpecificPCCFee)}đ`,
       },
     });
   }
