@@ -15,7 +15,7 @@ import {
   getCompanyNotificationsApi,
   getCompanyOrderSummaryApi,
 } from '@apis/companyApi';
-import { fetchUserApi, queryRestaurantListingsApi } from '@apis/index';
+import { fetchUserApi } from '@apis/index';
 import type { TUpdateOrderApiBody } from '@apis/orderApi';
 import {
   adminNotifyUserPickingOrderChangesApi,
@@ -30,6 +30,7 @@ import {
   updateOrderStateToDraftApi,
   updatePlanDetailsApi,
 } from '@apis/orderApi';
+import { queryRestaurantListingsApi } from '@apis/restaurant';
 import { queryAllPages } from '@helpers/apiHelpers';
 import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
 import { getMenuQueryInSpecificDay } from '@helpers/listingSearchQuery';
