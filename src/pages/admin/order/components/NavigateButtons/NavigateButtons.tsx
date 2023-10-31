@@ -22,6 +22,7 @@ type TNavigateButtons = {
   goBack?: () => void;
   onNextClick?: () => void;
   onCompleteClick?: () => void;
+  nextDisabled?: boolean;
   submitDisabled?: boolean;
   inProgress?: boolean;
   flowType?: EFlowType;
@@ -34,6 +35,7 @@ const NavigateButtons: React.FC<TNavigateButtons> = (props) => {
     onNextClick,
     onCompleteClick,
     inProgress,
+    nextDisabled = false,
     submitDisabled = false,
     flowType = EFlowType.createOrEditDraft,
     currentTab,
@@ -65,7 +67,8 @@ const NavigateButtons: React.FC<TNavigateButtons> = (props) => {
             <Button
               className={css.nextTabButton}
               variant="secondary"
-              onClick={onNextClick}>
+              onClick={onNextClick}
+              disabled={nextDisabled}>
               {isEditReviewTab ? (
                 <FormattedMessage id="NavigateButtons.cancel" />
               ) : (

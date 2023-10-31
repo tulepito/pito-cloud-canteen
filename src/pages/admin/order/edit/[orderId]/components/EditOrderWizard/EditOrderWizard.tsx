@@ -25,6 +25,8 @@ import { EOrderStates, EOrderType } from '@src/utils/enums';
 
 import MealPlanSetup from '../../../../StepScreen/MealPlanSetup/MealPlanSetup';
 
+import { isMealPlanSetupDataValid } from './EditOrderWizard.helper';
+
 import css from './EditOrderWizard.module.scss';
 
 export enum EEditOrderTab {
@@ -55,7 +57,15 @@ const EDIT_NORMAL_ORDER_TABS = [
 
 const EditOrderTab: React.FC<any> = (props) => {
   // eslint-disable-next-line unused-imports/no-unused-vars
-  const { tab, shouldDisableFields, goBack, nextTab, nextToReviewTab } = props;
+  const {
+    tab,
+    shouldDisableFields,
+    goBack,
+    nextTab,
+    nextToReviewTab,
+    draftEditValues,
+    setDraftEditValues,
+  } = props;
 
   switch (tab) {
     case EEditOrderTab.clientView:
@@ -68,6 +78,8 @@ const EditOrderTab: React.FC<any> = (props) => {
           nextTab={nextTab}
           nextToReviewTab={nextToReviewTab}
           goBack={goBack}
+          draftEditValues={draftEditValues}
+          setDraftEditValues={setDraftEditValues}
         />
       );
     case EEditOrderTab.restaurantSetup:
@@ -110,6 +122,7 @@ const EditOrderWizard = () => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
   const router = useRouter();
+  const [draftEditValues, setDraftEditValues] = useState({});
   const {
     query: { orderId },
   } = router;
@@ -245,13 +258,17 @@ const EditOrderWizard = () => {
       {suitableTabList.map((tab: string) => {
         const shouldDisableFields =
           tab === EEditOrderTab.orderSetup && isPickingOrder;
+        const shouldDisableSubmit =
+          ![EEditOrderTab.clientView, EEditOrderTab.orderSetup].includes(
+            tab as EEditOrderTab,
+          ) && !isMealPlanSetupDataValid(draftEditValues);
 
         return (
           <EditOrderTab
             key={tab}
             tab={tab}
             tabId={tab}
-            disabled={anyFetchOrUpdatesInProgress}
+            disabled={anyFetchOrUpdatesInProgress || shouldDisableSubmit}
             shouldDisableFields={shouldDisableFields}
             selected={currentStep === tab}
             tabLabel={intl.formatMessage({
@@ -261,6 +278,8 @@ const EditOrderWizard = () => {
             nextToReviewTab={handleNextToReviewTab}
             nextTab={handleNextTab(tab)}
             goBack={handleGoBack(tab)}
+            draftEditValues={draftEditValues}
+            setDraftEditValues={setDraftEditValues}
           />
         );
       })}
