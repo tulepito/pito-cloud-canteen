@@ -33,6 +33,6 @@ export const sendNotification = async ({
     const response = await oneSignalClient.createNotification(notification);
     console.log('Notification: ', response.body);
   } catch (e) {
-    console.log(e);
+    console.log('Notification failed', e);
   }
 };
