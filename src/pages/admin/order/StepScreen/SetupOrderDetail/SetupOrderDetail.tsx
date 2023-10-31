@@ -363,8 +363,8 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
         (item) => !availableOrderDetailCheckList[item].isAvailable,
       ));
   const initialFoodList = isPickFoodModalOpen
-    ? (draftEditOrderDetail || orderDetail)[selectedDate?.getTime()]?.restaurant
-        ?.foodList
+    ? (isEditFlow ? draftEditOrderDetail : orderDetail)[selectedDate?.getTime()]
+        ?.restaurant?.foodList
     : {};
 
   const onApplyOtherDaysInProgress = updateOrderDetailInProgress;
