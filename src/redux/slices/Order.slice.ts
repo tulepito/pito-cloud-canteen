@@ -34,6 +34,7 @@ import { queryRestaurantListingsApi } from '@apis/restaurant';
 import { queryAllPages } from '@helpers/apiHelpers';
 import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
 import { getMenuQueryInSpecificDay } from '@helpers/listingSearchQuery';
+import { mergeRecommendOrderDetailWithCurrentOrderDetail } from '@helpers/orderHelper';
 import { createAsyncThunk } from '@redux/redux.helper';
 import config from '@src/configs';
 import { CompanyPermissions } from '@src/types/UserPermission';
@@ -484,11 +485,13 @@ const recommendRestaurantForSpecificDay = createAsyncThunk(
     }: TObject,
     { getState, dispatch },
   ) => {
-    const { order } = getState().Order;
+    const { order, draftEditOrderData } = getState().Order;
 
     const orderId = Listing(order).getId();
 
     const { plans = [] } = Listing(order).getMetadata();
+
+    let updateOrderDetail = {};
 
     const { data: newOrderDetail } = await recommendRestaurantApi({
       orderId,
@@ -497,20 +500,27 @@ const recommendRestaurantForSpecificDay = createAsyncThunk(
     });
 
     if (shouldUpdatePlanOrderOrderDetail) {
+      updateOrderDetail = newOrderDetail;
       updatePlanDetailsApi(orderId, {
         orderDetail: newOrderDetail,
         planId: plans[0],
       });
     } else {
+      updateOrderDetail = mergeRecommendOrderDetailWithCurrentOrderDetail(
+        draftEditOrderData?.orderDetail!,
+        newOrderDetail,
+        dateTime,
+      );
+
       dispatch(
         // eslint-disable-next-line @typescript-eslint/no-use-before-define
         saveDraftEditOrder({
-          orderDetail: newOrderDetail,
+          orderDetail: updateOrderDetail,
         }),
       );
     }
 
-    return { orderDetail: newOrderDetail, shouldUpdatePlanOrderOrderDetail };
+    return { orderDetail: updateOrderDetail, shouldUpdatePlanOrderOrderDetail };
   },
 );
 
@@ -1275,14 +1285,23 @@ const orderSlice = createSlice({
       state.onRecommendRestaurantInProgress = payload;
     },
     saveDraftEditOrder: (state, { payload }) => {
+      const { generalInfo, orderDetail, mode = 'replace' } = payload || {};
+
       state.draftEditOrderData = {
         ...state.draftEditOrderData,
         generalInfo: {
           ...state.draftEditOrderData.generalInfo,
-          ...payload.generalInfo,
+          ...generalInfo,
         },
-        ...(!isEmpty(payload.orderDetail)
-          ? { orderDetail: payload.orderDetail }
+        ...(!isEmpty(orderDetail)
+          ? mode === 'merge'
+            ? {
+                orderDetail: {
+                  ...state.draftEditOrderData.orderDetail,
+                  ...orderDetail,
+                },
+              }
+            : { orderDetail }
           : {}),
       };
     },

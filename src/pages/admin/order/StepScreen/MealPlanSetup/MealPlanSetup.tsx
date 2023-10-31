@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable import/no-cycle */
 /* eslint-disable react-hooks/exhaustive-deps */
-import { memo, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useEffect, useMemo, useRef } from 'react';
 import { shallowEqual } from 'react-redux';
 import isEmpty from 'lodash/isEmpty';
 import isEqual from 'lodash/isEqual';
@@ -27,6 +27,7 @@ import MealPlanSetupForm from '../../components/MealPlanSetupForm/MealPlanSetupF
 import NavigateButtons, {
   EFlowType,
 } from '../../components/NavigateButtons/NavigateButtons';
+import { isMealPlanSetupDataValid } from '../../edit/[orderId]/components/EditOrderWizard/EditOrderWizard.helper';
 
 type MealPlanSetupProps = {
   goBack: () => void;
@@ -34,6 +35,8 @@ type MealPlanSetupProps = {
   nextToReviewTab?: () => void;
   flowType?: EFlowType;
   shouldDisableFields?: boolean;
+  draftEditValues?: TObject;
+  setDraftEditValues?: (value: any) => void;
 };
 const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
   const {
@@ -42,8 +45,9 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
     nextToReviewTab,
     goBack,
     shouldDisableFields = false,
+    draftEditValues = {},
+    setDraftEditValues,
   } = props;
-  const [draftEditValues, setDraftEditValues] = useState({});
   const formSubmitRef = useRef<any>();
   const shouldNextTabControl = useBoolean();
   const confirmRcmRestaurantControl = useBoolean();
@@ -148,6 +152,11 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
         currentClient,
         draftSelectGroups || selectedGroups,
       ));
+
+  const shouldDisableNextTab =
+    isEditFlow &&
+    isPendingBookerApprovalOrder &&
+    !isMealPlanSetupDataValid(draftEditValues);
 
   const restaurantListFromOrder = useMemo(
     () =>
@@ -398,7 +407,7 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
         flowType={flowType}
         onGoBack={goBack}
         onCompleteClick={handleNextToReviewTabInEditMode}
-        setDraftEditValues={setDraftEditValues}
+        setDraftEditValues={setDraftEditValues!}
         formSubmitRef={formSubmitRef}
         shouldDisableFields={shouldDisableFields}
       />
@@ -410,6 +419,8 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
         goBack={goBack}
         onCompleteClick={handleNextToReviewTabInEditMode}
         inProgress={step2SubmitInProgress}
+        nextDisabled={shouldDisableNextTab}
+        submitDisabled={shouldDisableNextTab}
       />
 
       <AlertModal

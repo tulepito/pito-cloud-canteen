@@ -25,6 +25,7 @@ import {
   findSuitableStartDate,
   getRestaurantListFromOrderDetail,
   getSelectedRestaurantAndFoodList,
+  mergeRecommendOrderDetailWithCurrentOrderDetail,
 } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
@@ -176,13 +177,8 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
   const orderId = orderGetter.getId();
   const planId = plans?.[0];
   const isOrderInProgress = orderState === EOrderStates.inProgress;
-  const isEditInProgressOrder = isEditFlow && isOrderInProgress;
-
-  const currentOrderDetail = isEditInProgressOrder
-    ? isEmpty(draftEditOrderDetail)
-      ? orderDetail
-      : draftEditOrderDetail
-    : orderDetail;
+  const currentOrderDetail = isEditFlow ? draftEditOrderDetail : orderDetail;
+  const isNormalOrder = orderType === EOrderType.normal;
 
   const {
     packagePerMember: draftPackagePerMember,
@@ -308,7 +304,18 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     };
 
     if (isEditFlow) {
-      if (orderType === EOrderType.normal) {
+      const editTagVersion =
+        currentOrderDetail[selectedDate?.getTime()]?.restaurant?.editTagVersion;
+
+      let updateOrderDetailOnDate = {
+        ...currentOrderDetail[subOrderDate],
+        ...restaurantData,
+        ...(isOrderInProgress && {
+          editTagVersion: editTagVersion ? editTagVersion + 1 : 1,
+        }),
+      };
+
+      if (isNormalOrder) {
         const {
           restaurant: currentSubOrderRestaurant,
           lineItems: currentSubOrderLineItems,
@@ -319,45 +326,20 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
           has(selectedFoodList, item.id),
         );
 
-        dispatch(
-          saveDraftEditOrder({
-            orderDetail: {
-              ...currentOrderDetail,
-              [subOrderDate]: {
-                ...orderDetail[subOrderDate],
-                ...restaurantData,
-                ...(isEditInProgressOrder && {
-                  editTagVersion: orderDetail[selectedDate?.getTime()]
-                    ?.restaurant?.editTagVersion
-                    ? orderDetail[selectedDate?.getTime()].restaurant
-                        .editTagVersion + 1
-                    : 1,
-                }),
-                lineItems: isRestaurantChanged ? [] : newLineItems,
-              },
-            },
-          }),
-        );
-      } else {
-        dispatch(
-          saveDraftEditOrder({
-            orderDetail: {
-              ...currentOrderDetail,
-              [subOrderDate]: {
-                ...orderDetail[subOrderDate],
-                ...restaurantData,
-                ...(isEditInProgressOrder && {
-                  editTagVersion: orderDetail[selectedDate?.getTime()]
-                    ?.restaurant?.editTagVersion
-                    ? orderDetail[selectedDate?.getTime()].restaurant
-                        .editTagVersion + 1
-                    : 1,
-                }),
-              },
-            },
-          }),
-        );
+        updateOrderDetailOnDate = {
+          ...updateOrderDetailOnDate,
+          lineItems: isRestaurantChanged ? [] : newLineItems,
+        };
       }
+
+      dispatch(
+        saveDraftEditOrder({
+          orderDetail: {
+            [subOrderDate]: updateOrderDetailOnDate,
+          },
+          mode: 'merge',
+        }),
+      );
     } else {
       dispatch(setCanNotGoToStep4(true));
       await dispatch(
@@ -484,13 +466,20 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
   ]);
   const restaurantListFromOrder = Object.keys(
     getRestaurantListFromOrderDetail(
-      isEditFlow
-        ? isEmpty(draftEditOrderDetail)
-          ? orderDetail
-          : draftEditOrderDetail
-        : orderDetail,
+      isEditFlow ? draftEditOrderDetail : orderDetail,
     ),
   );
+  const orderDetailToRecommendRestaurant = Object.keys(
+    draftEditOrderDetail || {},
+  ).reduce((res, time) => {
+    return {
+      ...res,
+      [time]: {
+        restaurant: { id: draftEditOrderDetail?.[time]?.restaurant?.id },
+      },
+    };
+  }, {});
+
   const recommendParams = {
     startDate: draftStartDate || startDate,
     endDate: draftEndDate || endDate,
@@ -502,7 +491,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     nutritions: draftNutritions || nutritions,
     packagePerMember: draftPackagePerMember || packagePerMember,
     daySession: draftDaySession || daySession,
-    orderDetail: draftEditOrderDetail || orderDetail,
+    orderDetail: orderDetailToRecommendRestaurant,
   };
 
   // TODO: handle next tab and next to review tab clicks
@@ -621,8 +610,17 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
   };
 
   // TODO: handle remove day's meal
-  const handleRemoveMeal = useCallback(
-    (id: string) => (resourceId: string) => {
+  const handleRemoveMeal = (id: string) => (resourceId: string) => {
+    if (isEditFlow) {
+      dispatch(
+        saveDraftEditOrder({
+          orderDetail: {
+            [resourceId]: { restaurant: { foodList: [] } },
+          },
+          mode: 'merge',
+        }),
+      );
+    } else {
       dispatch(setCanNotGoToStep4(true));
       dispatch(
         orderAsyncActions.updatePlanDetail({
@@ -634,9 +632,8 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
           updateMode: 'merge',
         }),
       );
-    },
-    [dispatch, orderId],
-  );
+    }
+  };
 
   // TODO: handle recommend restaurant days in week
   const onRecommendNewRestaurants = useCallback(async () => {
@@ -645,19 +642,24 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     if (isEditFlow) {
       const { payload: recommendOrderDetail }: any = await dispatch(
         orderAsyncActions.recommendRestaurants({
-          shouldUpdatePlanOrderOrderDetail: isEditInProgressOrder,
+          shouldUpdatePlanOrderOrderDetail: isEditFlow,
           recommendParams,
         }),
       );
+      const updateOrderDetail = mergeRecommendOrderDetailWithCurrentOrderDetail(
+        draftEditOrderDetail!,
+        recommendOrderDetail,
+      );
+
       dispatch(
         saveDraftEditOrder({
-          orderDetail: recommendOrderDetail,
+          orderDetail: updateOrderDetail,
         }),
       );
     } else {
       const { payload: recommendOrderDetail }: any = await dispatch(
         orderAsyncActions.recommendRestaurants({
-          shouldUpdatePlanOrderOrderDetail: isEditInProgressOrder,
+          shouldUpdatePlanOrderOrderDetail: isEditFlow,
         }),
       );
       await dispatch(
@@ -690,6 +692,10 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
         draftStartDate || startDate,
         draftEndDate || endDate,
       );
+      const orderDetailToHandle = isEditFlow
+        ? draftEditOrderDetail
+        : orderDetail;
+
       const newOrderDetail = totalDates.reduce((result, curr) => {
         const currWeekday = convertWeekDay(
           DateTime.fromMillis(curr).weekday,
@@ -707,14 +713,15 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
           return {
             ...result,
             [curr]: {
-              ...draftEditOrderDetail![curr],
-              restaurant: draftEditOrderDetail![date]?.restaurant || {},
+              ...orderDetailToHandle![curr],
+              restaurant: orderDetailToHandle![date]?.restaurant || {},
             },
           };
         }
 
         return result;
-      }, draftEditOrderDetail || orderDetail);
+      }, orderDetailToHandle);
+
       if (isEditFlow) {
         dispatch(
           saveDraftEditOrder({

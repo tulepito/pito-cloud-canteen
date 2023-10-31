@@ -862,10 +862,8 @@ export const preparePickingOrderChangeNotificationData = ({
     });
   }
   if (
-    PCCFeePerDate !==
-    (updateSpecificPCCFee !== undefined
-      ? updateSpecificPCCFee
-      : PCCFeeByMemberAmount)
+    updateSpecificPCCFee !== undefined &&
+    PCCFeePerDate !== updateSpecificPCCFee
   ) {
     changeHistoryToNotifyBooker.push({
       oldData: {
@@ -874,11 +872,7 @@ export const preparePickingOrderChangeNotificationData = ({
       },
       newData: {
         title: 'Phí PITO Cloud Canteen:',
-        content: `${parseThousandNumber(
-          updateSpecificPCCFee !== undefined
-            ? updateSpecificPCCFee
-            : PCCFeeByMemberAmount,
-        )}đ`,
+        content: `${parseThousandNumber(updateSpecificPCCFee)}đ`,
       },
     });
   }
@@ -922,4 +916,35 @@ export const checkIsOrderHasInProgressState = (
   return orderStateHistory.some(
     (state: TOrderStateHistory) => state.state === EOrderStates.inProgress,
   );
+};
+
+export const mergeRecommendOrderDetailWithCurrentOrderDetail = (
+  currentOrderDetail: TObject,
+  recommendOrderDetail: TObject,
+  timestamp?: string,
+) => {
+  let mergedResult: TObject = {};
+
+  if (timestamp) {
+    mergedResult = { ...currentOrderDetail };
+    mergedResult[timestamp] = {
+      ...currentOrderDetail[timestamp],
+      ...recommendOrderDetail[timestamp],
+    };
+  } else {
+    mergedResult = { ...recommendOrderDetail };
+
+    Object.keys(currentOrderDetail).forEach((time) => {
+      const { restaurant = {}, hasNoRestaurants = false } =
+        recommendOrderDetail[time] || {};
+
+      mergedResult[time] = {
+        ...currentOrderDetail[time],
+        restaurant,
+        hasNoRestaurants,
+      };
+    });
+  }
+
+  return mergedResult;
 };

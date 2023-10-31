@@ -211,7 +211,6 @@ const ServiceFeesAndNotes: React.FC<ServiceFeesAndNotesProps> = (props) => {
         saveDraftEditOrder({
           generalInfo: {
             specificPCCFee: undefined,
-            hasSpecificPCCFee: false,
           },
         }),
       );
@@ -226,12 +225,12 @@ const ServiceFeesAndNotes: React.FC<ServiceFeesAndNotesProps> = (props) => {
       await PCCFeeFormSubmitRef?.current();
   };
 
-  const handleNextTabInEditMode = () => {
-    handleSubmitAllForms();
+  const handleNextTabInEditMode = async () => {
+    await handleSubmitAllForms();
     nextTab();
   };
-  const handleNextToReviewTabInEditMode = () => {
-    handleSubmitAllForms();
+  const handleNextToReviewTabInEditMode = async () => {
+    await handleSubmitAllForms();
     if (nextToReviewTab) nextToReviewTab();
   };
 
@@ -244,8 +243,8 @@ const ServiceFeesAndNotes: React.FC<ServiceFeesAndNotesProps> = (props) => {
         ...result,
         [`partnerFee-${restaurantId}`]:
           draftServiceFees?.[restaurantId] ||
-          systemServiceFeePercentage * 100 ||
           serviceFees?.[restaurantId] ||
+          systemServiceFeePercentage * 100 ||
           0,
       };
     }, {});
