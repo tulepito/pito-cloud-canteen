@@ -1238,14 +1238,23 @@ const orderSlice = createSlice({
       state.onRecommendRestaurantInProgress = payload;
     },
     saveDraftEditOrder: (state, { payload }) => {
+      const { generalInfo, orderDetail, mode = 'replace' } = payload || {};
+
       state.draftEditOrderData = {
         ...state.draftEditOrderData,
         generalInfo: {
           ...state.draftEditOrderData.generalInfo,
-          ...payload.generalInfo,
+          ...generalInfo,
         },
-        ...(!isEmpty(payload.orderDetail)
-          ? { orderDetail: payload.orderDetail }
+        ...(!isEmpty(orderDetail)
+          ? mode === 'merge'
+            ? {
+                orderDetail: {
+                  ...state.draftEditOrderData.orderDetail,
+                  ...orderDetail,
+                },
+              }
+            : { orderDetail }
           : {}),
       };
     },

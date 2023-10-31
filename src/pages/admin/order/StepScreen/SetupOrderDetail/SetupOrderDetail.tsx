@@ -551,9 +551,9 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
       dispatch(
         saveDraftEditOrder({
           orderDetail: {
-            ...draftEditOrderDetail,
             [resourceId]: { restaurant: { foodList: [] } },
           },
+          mode: 'merge',
         }),
       );
     } else {
