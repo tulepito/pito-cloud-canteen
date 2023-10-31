@@ -9,7 +9,6 @@ import Button from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import { FieldDropdownSelectComponent } from '@components/FormFields/FieldDropdownSelect/FieldDropdownSelect';
 import { FieldTextAreaComponent } from '@components/FormFields/FieldTextArea/FieldTextArea';
-import { checkIsOrderHasInProgressState } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import {
   orderDetailsAnyActionsInProgress,
@@ -60,18 +59,15 @@ const LineItemsTable: React.FC<TLineItemsTableProps> = (props) => {
 
   const orderGetter = Listing(order);
 
-  const { orderState, orderStateHistory = [] } = orderGetter.getMetadata();
+  const { orderState } = orderGetter.getMetadata();
 
   const { orderDetail: draftOrderDetailFromOrder = {} } = draftEditOrderData;
 
-  const isOrderHasInProgressState =
-    checkIsOrderHasInProgressState(orderStateHistory);
   const isOrderInProgressState = orderState === EOrderStates.inProgress;
 
-  const currentDraftOrderDetail =
-    isOrderHasInProgressState && isOrderInProgressState
-      ? draftOrderDetailFromOrder
-      : draftOrderDetail;
+  const currentDraftOrderDetail = isOrderInProgressState
+    ? draftOrderDetailFromOrder
+    : draftOrderDetail;
 
   const planDataGetter = Listing(planData as TListing);
   const planId = planDataGetter.getId();

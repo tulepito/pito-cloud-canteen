@@ -780,9 +780,6 @@ const fetchRestaurantCoverImages = createAsyncThunk(
           'variants.landscape-crop2x',
         ],
       },
-      queryParams: {
-        expand: true,
-      },
     });
 
     const restaurants = denormalisedResponseEntities(restaurantResponses);

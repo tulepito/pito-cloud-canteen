@@ -9,7 +9,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import classNames from 'classnames';
 import arrayMutators from 'final-form-arrays';
-import { last, omit, pickBy } from 'lodash';
+import { last, omit, pickBy, uniq } from 'lodash';
 import compact from 'lodash/compact';
 import isEmpty from 'lodash/isEmpty';
 import isEqual from 'lodash/isEqual';
@@ -541,9 +541,6 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
   const editConfirmModalController = useBoolean();
   const [reviewFormValues, setReviewFormValues] = useState<any>({});
 
-  // const currentOrderDetail = isEmpty(draftEditOrderDetail)
-  //   ? orderDetail
-  //   : draftEditOrderDetail;
   const confirmNotifyUserModalControl = useBoolean();
 
   const isEditFlow = props.flowType === EFlowType.edit;
@@ -724,14 +721,16 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
       ...editedSubOrders,
     };
 
-    const newPartnerIds = Object.values(editedOrderDetail).reduce(
-      (result: string[], subOrder: TObject) => {
-        const { restaurant } = subOrder;
-        const { id } = restaurant;
+    const newPartnerIds = uniq(
+      Object.values(editedOrderDetail).reduce(
+        (result: string[], subOrder: TObject) => {
+          const { restaurant = {} } = subOrder;
+          const { id } = restaurant;
 
-        return [...result, id];
-      },
-      [],
+          return [...result, id];
+        },
+        [],
+      ),
     );
 
     await dispatch(

@@ -17,7 +17,6 @@ const ChangeSelectedFoodConfirmModal: React.FC<
 > = (props) => {
   const { isOpen, handleClose, onCancelChangeFood } = props;
   const onChange = (e: any) => {
-    console.log(e.target.checked);
     setItem('isHideChangeSelectedFoodConfirmModal', e.target.checked);
   };
 

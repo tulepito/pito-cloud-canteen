@@ -116,7 +116,7 @@ const FoodCard: React.FC<TFoodCardProps> = (props) => {
             alt={foodName}
             variants={[EImageVariants.squareSmall2x]}
           />
-          x<div className={css.imageAmountLabel}>{`${images.length}/5`}</div>
+          <div className={css.imageAmountLabel}>{`${images.length}/5`}</div>
         </div>
         <div className={css.content}>
           <div className={css.infoWrapper}>
