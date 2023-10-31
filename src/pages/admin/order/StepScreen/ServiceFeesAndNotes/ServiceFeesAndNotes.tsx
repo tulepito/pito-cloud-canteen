@@ -211,7 +211,6 @@ const ServiceFeesAndNotes: React.FC<ServiceFeesAndNotesProps> = (props) => {
         saveDraftEditOrder({
           generalInfo: {
             specificPCCFee: undefined,
-            hasSpecificPCCFee: false,
           },
         }),
       );
@@ -244,8 +243,8 @@ const ServiceFeesAndNotes: React.FC<ServiceFeesAndNotesProps> = (props) => {
         ...result,
         [`partnerFee-${restaurantId}`]:
           draftServiceFees?.[restaurantId] ||
-          systemServiceFeePercentage * 100 ||
           serviceFees?.[restaurantId] ||
+          systemServiceFeePercentage * 100 ||
           0,
       };
     }, {});
