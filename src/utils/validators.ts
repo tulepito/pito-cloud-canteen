@@ -181,11 +181,17 @@ export const isInt = (message: string) => (value: any) => {
 };
 
 export const numberMaxLength =
-  (message: string, maximumLength: number) => (value: number) => {
-    const parsedValue = Number(value);
-    if (!parsedValue) {
+  (message: string, maximumLength: number, shouldPassIfEmpty = false) =>
+  (value: number) => {
+    const isValueEmpty = isEmpty(value?.toString());
+
+    if (shouldPassIfEmpty && isValueEmpty) {
       return VALID;
     }
+
+    const parsedValue = isValueEmpty
+      ? 0
+      : Number(removeNonNumeric(value.toString()));
     const isNumber = typeof parsedValue === 'number';
 
     return isNumber && parsedValue <= maximumLength ? VALID : message;
@@ -194,11 +200,15 @@ export const numberMaxLength =
 export const numberMinLength =
   (message: string, minimumLength: number, shouldPassIfEmpty = false) =>
   (value: number) => {
-    if (shouldPassIfEmpty && isEmpty(value)) {
+    const isValueEmpty = isEmpty(value?.toString());
+
+    if (shouldPassIfEmpty && isValueEmpty) {
       return VALID;
     }
 
-    const parsedValue = Number(removeNonNumeric(value?.toString() || ''));
+    const parsedValue = isValueEmpty
+      ? 0
+      : Number(removeNonNumeric(value.toString()));
     const isNumber = typeof parsedValue === 'number';
 
     return isNumber && parsedValue >= minimumLength ? VALID : message;
