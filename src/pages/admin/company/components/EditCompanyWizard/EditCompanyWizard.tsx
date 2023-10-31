@@ -32,7 +32,6 @@ import {
 } from '@redux/slices/companyMember.slice';
 import { adminRoutes } from '@src/paths';
 import { User } from '@utils/data';
-import { ECompanyStates } from '@utils/enums';
 import { isSignUpEmailTakenError } from '@utils/errors';
 import type {
   TCompany,
@@ -413,9 +412,6 @@ const EditCompanyWizard = () => {
           )
     ) as any;
 
-    const isDraft =
-      User(payload).getMetadata().userState === ECompanyStates.draft;
-
     const id = User(payload).getId();
 
     if (!error) {
@@ -425,7 +421,7 @@ const EditCompanyWizard = () => {
       }, 3000);
     }
 
-    if (!error && isDraft) {
+    if (!error) {
       return redirectAfterDraftUpdate(
         id,
         selectedTab as string,
