@@ -13,6 +13,7 @@ import { fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/sdk';
 import { Listing, User } from '@src/utils/data';
 import {
+  formatTimestamp,
   generateWeekDayList,
   getDayOfWeek,
   getDaySessionFromDeliveryTime,
@@ -209,6 +210,12 @@ const reorder = async ({
     authorId: subAccountId,
     title: generatedOrderTitle,
     state: EListingStates.published,
+    publicData: {
+      companyName,
+      orderName: `${companyName}_${formatTimestamp(
+        startDate,
+      )} - ${formatTimestamp(endDate)}`,
+    },
     metadata: {
       bookerId,
       orderStateHistory,
