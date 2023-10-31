@@ -776,6 +776,7 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
             orderId,
             planId,
             orderDetail: updateOrderDetail,
+            updateMode: EApiUpdateMode.DIRECT_UPDATE,
           }),
         );
 
