@@ -172,7 +172,7 @@ export const updateMenuAfterFoodDeletedByListId = async (foodIds: string[]) => {
                     {}),
                   [`${day}FoodIdList`]: newFoodIdList,
                   [`${day}FoodType`]: newFoodTypeList,
-                  [`${day}FoodNutritions`]: newFoodNutritions,
+                  [`${day}Nutritions`]: newFoodNutritions,
                 },
               },
             };
@@ -400,7 +400,7 @@ export const updateMenuAfterFoodDeleted = async (deletedFoodId: string) => {
                     {}),
                   [`${day}FoodIdList`]: newFoodIdList,
                   [`${day}FoodType`]: newFoodTypeList,
-                  [`${day}FoodNutritions`]: newFoodNutritions,
+                  [`${day}Nutritions`]: newFoodNutritions,
                 },
               },
             };
@@ -505,7 +505,7 @@ export const updateMenuAfterFoodUpdated = async (updatedFoodId: string) => {
                   metadata: {
                     ...(updateMap?.[menuId]?.metadata || {}),
                     [`${day}FoodType`]: newFoodTypeList,
-                    [`${day}FoodNutritions`]: newFoodNutritions,
+                    [`${day}Nutritions`]: newFoodNutritions,
                   },
                 },
               };

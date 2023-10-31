@@ -1,3 +1,4 @@
+import { uniq } from 'lodash';
 import isEqual from 'lodash/isEqual';
 
 import {
@@ -5,9 +6,9 @@ import {
   createFoodByDateByDaysOfWeekField,
   createFoodListIdByDaysOfWeekField,
   createListFoodIdsByFoodsByDate,
+  createListFoodNutritionByFoodsByDate,
   createListFoodTypeByFoodIds,
   createMinPriceByDayOfWeek,
-  createNutritionsByDaysOfWeekField,
   createPartnerDraftFoodByDateByDaysOfWeekField,
 } from '@pages/api/apiUtils/menu';
 import { denormalisedResponseEntities } from '@services/data';
@@ -141,6 +142,16 @@ const updateMenu = async (
           ...(foodsByDate ? { foodsByDate } : {}),
         };
 
+  const {
+    monNutritions: monNutritionsMaybe = [],
+    tueNutritions: tueNutritionsMaybe = [],
+    wedNutritions: wedNutritionsMaybe = [],
+    thuNutritions: thuNutritionsMaybe = [],
+    friNutritions: friNutritionsMaybe = [],
+    satNutritions: satNutritionsMaybe = [],
+    sunNutritions: sunNutritionsMaybe = [],
+  } = createListFoodNutritionByFoodsByDate(foodsByDate) || ({} as any);
+
   const response = await integrationSdk.listings.update(
     {
       id: menuId,
@@ -178,26 +189,13 @@ const updateMenu = async (
       metadata: {
         ...(menuType ? { menuType } : {}),
         ...(restaurantId ? { restaurantId } : {}),
-        ...(restaurantId
-          ? {
-              ...(daysOfWeek
-                ? {
-                    ...createNutritionsByDaysOfWeekField(
-                      {
-                        monNutritions: monNutritionsFromMenu,
-                        tueNutritions: tueNutritionsFromMenu,
-                        wedNutritions: wedNutritionsFromMenu,
-                        thuNutritions: thuNutritionsFromMenu,
-                        friNutritions: friNutritionsFromMenu,
-                        satNutritions: satNutritionsFromMenu,
-                        sunNutritions: sunNutritionsFromMenu,
-                      },
-                      daysOfWeek,
-                    ),
-                  }
-                : {}),
-            }
-          : {}),
+        monNutritions: uniq([...monNutritionsFromMenu, ...monNutritionsMaybe]),
+        tueNutritions: uniq([...tueNutritionsFromMenu, ...tueNutritionsMaybe]),
+        wedNutritions: uniq([...wedNutritionsFromMenu, ...wedNutritionsMaybe]),
+        thuNutritions: uniq([...thuNutritionsFromMenu, ...thuNutritionsMaybe]),
+        friNutritions: uniq([...friNutritionsFromMenu, ...friNutritionsMaybe]),
+        satNutritions: uniq([...satNutritionsFromMenu, ...satNutritionsMaybe]),
+        sunNutritions: uniq([...sunNutritionsFromMenu, ...sunNutritionsMaybe]),
         ...listFoodIdsByDate,
         ...foodTypesByDayOfWeek,
       },
