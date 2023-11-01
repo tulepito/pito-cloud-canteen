@@ -126,9 +126,6 @@ const CreateOrderWizard = () => {
   const router = useRouter();
   const { orderId } = router.query;
   const [currentStep, setCurrentStep] = useState<string>(CLIENT_SELECT_TAB);
-  const fetchOrderInProgress = useAppSelector(
-    (state) => state.Order.fetchOrderInProgress,
-  );
 
   useEffect(() => {
     if (orderId) {
@@ -253,10 +250,8 @@ const CreateOrderWizard = () => {
   ]);
 
   useEffect(() => {
-    if (!fetchOrderInProgress) {
-      dispatch(orderAsyncActions.fetchOrderRestaurants({ isEditFlow: true }));
-    }
-  }, [fetchOrderInProgress, JSON.stringify(orderDetail)]);
+    dispatch(orderAsyncActions.fetchOrderRestaurants({}));
+  }, [JSON.stringify(orderDetail)]);
 
   return (
     <FormWizard formTabNavClassName={css.formTabNav}>
