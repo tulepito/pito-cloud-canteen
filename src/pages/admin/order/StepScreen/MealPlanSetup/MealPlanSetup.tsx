@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable import/no-cycle */
 /* eslint-disable react-hooks/exhaustive-deps */
-import { memo, useEffect, useMemo, useRef } from 'react';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { shallowEqual } from 'react-redux';
 import isEmpty from 'lodash/isEmpty';
 import isEqual from 'lodash/isEqual';
@@ -28,6 +28,7 @@ import NavigateButtons, {
   EFlowType,
 } from '../../components/NavigateButtons/NavigateButtons';
 import { isMealPlanSetupDataValid } from '../../edit/[orderId]/components/EditOrderWizard/EditOrderWizard.helper';
+import { checkDeliveryHourIsMatchedWithAllRestaurants } from '../../helpers/editOrder';
 
 type MealPlanSetupProps = {
   goBack: () => void;
@@ -51,6 +52,8 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
   const formSubmitRef = useRef<any>();
   const shouldNextTabControl = useBoolean();
   const confirmRcmRestaurantControl = useBoolean();
+  const [deliveryHourNotMatchError, setDeliveryHourNotMatchError] =
+    useState<string>('');
   const dispatch = useAppDispatch();
   const step2SubmitInProgress = useAppSelector(
     (state) => state.Order.step2SubmitInProgress,
@@ -80,6 +83,9 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
   const companies = useAppSelector(
     (state) => state.company.companyRefs,
     shallowEqual,
+  );
+  const restaurantListings = useAppSelector(
+    (state) => state.Order.restaurantListings,
   );
 
   const isEditFlow = flowType === EFlowType.edit;
@@ -244,15 +250,27 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
         deliveryHour: draftDeliveryHour,
       } = restDraftValues || {};
 
-      dispatch(
-        saveDraftEditOrder({
-          generalInfo: {
-            ...(deliveryAddress && { deliveryAddress }),
-            ...(draftDetailAddress && { detailAddress: draftDetailAddress }),
-            ...(draftDeliveryHour && { deliveryHour: draftDeliveryHour }),
-          },
-        }),
-      );
+      const isDeliveryHourMatchingRestaurantOpenTime =
+        checkDeliveryHourIsMatchedWithAllRestaurants({
+          deliveryHour: draftDeliveryHour,
+          restaurantListings,
+          dayInWeek,
+        });
+      if (isDeliveryHourMatchingRestaurantOpenTime) {
+        dispatch(
+          saveDraftEditOrder({
+            generalInfo: {
+              ...(deliveryAddress && { deliveryAddress }),
+              ...(draftDetailAddress && { detailAddress: draftDetailAddress }),
+              ...(draftDeliveryHour && { deliveryHour: draftDeliveryHour }),
+            },
+          }),
+        );
+      } else {
+        setDeliveryHourNotMatchError(
+          'Thời gian giao hàng bạn chọn không phù hợp với thời gian phục vụ của nhà hàng',
+        );
+      }
       handleNextTabOrNextReviewTab(shouldNext);
     } else if (
       !isEqual(restInitialValues, restDraftValues) ||
@@ -431,6 +449,7 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
         formSubmitRef={formSubmitRef}
         shouldDisableFields={shouldDisableFields}
         isOrderInProgress={isOrderInProgress}
+        deliveryHourNotMatchError={deliveryHourNotMatchError}
       />
       <NavigateButtons
         flowType={flowType}

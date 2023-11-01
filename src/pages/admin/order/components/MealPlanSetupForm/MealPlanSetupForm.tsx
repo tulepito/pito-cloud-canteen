@@ -1,18 +1,16 @@
 /* eslint-disable import/no-cycle */
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
 
 import Form from '@components/Form/Form';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
-import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import DaySessionField from '@pages/company/booker/orders/new/quiz/meal-date/DaySessionField/DaySessionField';
-import { saveDraftEditOrder } from '@redux/slices/Order.slice';
 import { getSelectedDaysOfWeek } from '@src/utils/dates';
 import { EOrderType } from '@src/utils/enums';
-import { Listing, User } from '@utils/data';
-import type { TObject, TUser } from '@utils/types';
+import { User } from '@utils/data';
+import type { TUser } from '@utils/types';
 
 import DayInWeekField from '../DayInWeekField/DayInWeekField';
 import DeliveryAddressField from '../DeliveryAddressField/DeliveryAddressField';
@@ -46,6 +44,7 @@ type TExtraProps = {
   formSubmitRef: any;
   setDraftEditValues: (value: any) => void;
   shouldDisableFields: boolean;
+  deliveryHourNotMatchError: string;
 };
 type TMealPlanSetupFormComponentProps =
   FormRenderProps<TMealPlanSetupFormValues> & Partial<TExtraProps>;
@@ -68,86 +67,15 @@ const MealPlanSetupFormComponent: React.FC<TMealPlanSetupFormComponentProps> = (
     isOrderInProgress,
     formSubmitRef,
     shouldDisableFields = false,
+    deliveryHourNotMatchError,
   } = props;
   const intl = useIntl();
-  const dispatch = useAppDispatch();
-  const [deliveryHourNotMatchError, setDeliveryHourNotMatchError] =
-    useState<string>('');
-  const restaurantListings = useAppSelector(
-    (state) => state.Order.restaurantListings,
-  );
 
   formSubmitRef.current = handleSubmit;
 
   const isEditFlow = flowType === EFlowType.edit;
   const isEditInProgressOrder = isEditFlow && isOrderInProgress;
-  const {
-    pickAllow: pickAllowValue = true,
-    deliveryAddress,
-    deliveryDetail,
-    deliveryHour,
-    dayInWeek,
-  } = values;
-
-  const onHandleNextClick = () => {
-    if (isEditInProgressOrder) {
-      const [deliveryStartRange, deliveryEndRange] = deliveryHour.split('-');
-      const deliveryHourMatchingRestaurantOpenTime = restaurantListings?.map(
-        (restaurant) => {
-          const {
-            availabilityPlan: { entries = [] },
-          } = Listing(restaurant).getAttributes();
-          const dayInWeekInEntries = entries.filter((entry: TObject) =>
-            dayInWeek.includes(entry.dayOfWeek),
-          );
-
-          const dayInWeekDeliveryHourMatching = dayInWeekInEntries.map(
-            (entry: TObject) => {
-              const { startTime, endTime, dayOfWeek } = entry;
-
-              return {
-                [dayOfWeek]:
-                  deliveryStartRange >= startTime &&
-                  deliveryEndRange <= endTime,
-              };
-            },
-          );
-
-          return { [restaurant.id.uuid]: dayInWeekDeliveryHourMatching };
-        },
-      );
-
-      const isDeliveryHourMatchingRestaurantOpenTime =
-        deliveryHourMatchingRestaurantOpenTime.every((restaurant) =>
-          Object.values(restaurant)[0].every(
-            (_dayInWeek: TObject) => Object.values(_dayInWeek)[0],
-          ),
-        );
-
-      if (isDeliveryHourMatchingRestaurantOpenTime) {
-        dispatch(
-          saveDraftEditOrder({
-            generalInfo: {
-              deliveryAddress,
-              deliveryDetail,
-              deliveryHour,
-            },
-          }),
-        );
-      } else {
-        setDeliveryHourNotMatchError(
-          'Thời gian giao hàng bạn chọn không phù hợp với thời gian phục vụ của nhà hàng',
-        );
-      }
-    }
-  };
-
-  const onSubmit = (e: TMealPlanSetupFormValues) => {
-    if (isEditInProgressOrder) {
-      onHandleNextClick();
-    }
-    handleSubmit(e);
-  };
+  const { pickAllow: pickAllowValue = true } = values;
 
   useEffect(() => {
     const {
@@ -187,7 +115,7 @@ const MealPlanSetupFormComponent: React.FC<TMealPlanSetupFormComponentProps> = (
   }, [JSON.stringify(values)]);
 
   return (
-    <Form onSubmit={onSubmit}>
+    <Form onSubmit={handleSubmit}>
       <div className={css.headerLabel}>
         {intl.formatMessage(
           { id: 'MealPlanSetup.headerLabel' },
