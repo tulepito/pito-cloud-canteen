@@ -136,7 +136,6 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
       isPickingState);
 
   const { orderTitle, priceQuotationData, editViewData, reviewViewData } =
-    // eslint-disable-next-line react-hooks/rules-of-hooks
     usePrepareOrderDetailPageData({
       isAdminLayout: true,
     });

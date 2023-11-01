@@ -21,6 +21,8 @@ export const startOrder = async (orderId: string, planId: string) => {
     orderState,
     orderStateHistory = [],
     partnerIds = [],
+    hasSpecificPCCFee: orderHasSpecificPCCFee,
+    specificPCCFee: orderSpecificPCCFee,
   } = Listing(orderListing).getMetadata();
 
   if (orderState !== EOrderStates.picking) {
@@ -47,8 +49,11 @@ export const startOrder = async (orderId: string, planId: string) => {
       orderState: EOrderStates.inProgress,
       orderStateHistory: updateOrderStateHistory,
       orderVATPercentage: systemVATPercentage,
-      hasSpecificPCCFee,
-      specificPCCFee,
+      ...(orderHasSpecificPCCFee === undefined &&
+        orderSpecificPCCFee === undefined && {
+          hasSpecificPCCFee,
+          specificPCCFee,
+        }),
     },
   });
 

@@ -97,7 +97,7 @@ export const usePrepareOrderDetailPageData = ({
     ratings,
     orderType = EOrderType.group,
     orderNote = '',
-    hasSpecificPCCFee: orderHasSpecificPCCFee = false,
+    hasSpecificPCCFee: orderHasSpecificPCCFee,
     specificPCCFee: orderPCCFee = 0,
   } = Listing(orderData as TListing).getMetadata();
   const isGroupOrder = orderType === EOrderType.group;
@@ -191,17 +191,26 @@ export const usePrepareOrderDetailPageData = ({
         date,
         currentOrderServiceFeePercentage: serviceFeePercentage,
         shouldIncludePITOFee: isEmpty(date),
-        hasSpecificPCCFee,
-        specificPCCFee,
+        hasSpecificPCCFee:
+          orderHasSpecificPCCFee !== undefined
+            ? orderHasSpecificPCCFee
+            : hasSpecificPCCFee,
+        specificPCCFee:
+          orderHasSpecificPCCFee !== undefined ? orderPCCFee : specificPCCFee,
       }),
     [
       JSON.stringify(orderData),
       JSON.stringify(orderDetail),
-      currentOrderVATPercentage,
+      date,
+      vatPercentage,
+      serviceFeePercentage,
       hasSpecificPCCFee,
+      orderHasSpecificPCCFee,
       specificPCCFee,
+      orderPCCFee,
     ],
   );
+  console.debug('💫 > quotationInfo: ', quotationInfo);
   const quotationDraftInfor = useMemo(
     () =>
       calculatePriceQuotationInfo({
@@ -222,7 +231,6 @@ export const usePrepareOrderDetailPageData = ({
       orderPCCFee,
     ],
   );
-
   const quotationInfor = useMemo(
     () =>
       calculatePriceQuotationInfoFromQuotation({
@@ -254,11 +262,21 @@ export const usePrepareOrderDetailPageData = ({
     overflow,
     PITOFee = 0,
     totalWithoutVAT = 0,
-  } = isOrderIsPicking
-    ? quotationInfo
-    : isOrderEditing
-    ? quotationDraftInfor
-    : quotationInfor;
+  } = useMemo(
+    () =>
+      isOrderIsPicking
+        ? quotationInfo
+        : isOrderEditing
+        ? quotationDraftInfor
+        : quotationInfor,
+    [
+      isOrderIsPicking,
+      isOrderEditing,
+      JSON.stringify(quotationInfo),
+      JSON.stringify(quotationInfor),
+      JSON.stringify(quotationDraftInfor),
+    ],
+  );
   const reviewInfoData = {
     reviewInfoValues,
     deliveryHour,
