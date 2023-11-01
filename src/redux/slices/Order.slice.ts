@@ -757,11 +757,7 @@ const fetchRestaurantCoverImages = createAsyncThunk(
     const { orderDetail: draftOrderDetail = {} } =
       getState().Order.draftEditOrderData;
 
-    const suitableOrderDetail = isEditFlow
-      ? isEmpty(draftOrderDetail)
-        ? orderDetail
-        : draftOrderDetail
-      : orderDetail;
+    const suitableOrderDetail = isEditFlow ? draftOrderDetail : orderDetail;
 
     const restaurantIdList = compact(
       uniq(
@@ -897,12 +893,27 @@ const bookerPublishOrder = createAsyncThunk(
 
 const checkRestaurantStillAvailable = createAsyncThunk(
   CHECK_RESTAURANT_STILL_AVAILABLE,
-  async (_, { getState, extra: sdk }) => {
+  async ({ isEditFlow = false }: TObject, { getState, extra: sdk }) => {
     const { order, orderDetail } = getState().Order;
+    const { orderDetail: draftOrderDetail = {} } =
+      getState().Order.draftEditOrderData;
+
+    const suitableOrderDetail = isEditFlow ? draftOrderDetail : orderDetail;
+
     const availableOrderDetailCheckList = await Promise.all(
-      Object.keys(orderDetail).map(async (timestamp) => {
-        const { restaurant } = orderDetail[timestamp];
-        const { menuId, id: restaurantId } = restaurant;
+      Object.keys(suitableOrderDetail).map(async (timestamp) => {
+        const { restaurant } = suitableOrderDetail[timestamp] || {};
+        const { menuId, id: restaurantId } = restaurant || {};
+
+        if (isEmpty(restaurantId)) {
+          return {
+            [timestamp]: {
+              isAvailable: true,
+              status: EInvalidRestaurantCase.noMenusValid,
+            },
+          };
+        }
+
         const [restaurantListing] = denormalisedResponseEntities(
           (await sdk.listings.show({ id: restaurantId })) || [{}],
         );
@@ -975,11 +986,7 @@ const fetchOrderRestaurants = createAsyncThunk(
     const { orderDetail: draftOrderDetail = {} } =
       getState().Order.draftEditOrderData;
 
-    const suitableOrderDetail = isEditFlow
-      ? isEmpty(draftOrderDetail)
-        ? orderDetail
-        : draftOrderDetail
-      : orderDetail;
+    const suitableOrderDetail = isEditFlow ? draftOrderDetail : orderDetail;
 
     const restaurantIdList = uniq(
       compact(

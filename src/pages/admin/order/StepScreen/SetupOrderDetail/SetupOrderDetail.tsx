@@ -751,10 +751,15 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
   }, [JSON.stringify(restaurantListFromOrder), isEditFlow]);
 
   useEffect(() => {
-    if (!isEmpty(orderDetail)) {
-      dispatch(orderAsyncActions.checkRestaurantStillAvailable());
+    if (isEditFlow ? !isEmpty(draftEditOrderDetail) : !isEmpty(orderDetail)) {
+      dispatch(orderAsyncActions.checkRestaurantStillAvailable({ isEditFlow }));
     }
-  }, [dispatch, JSON.stringify(orderDetail)]);
+  }, [
+    dispatch,
+    isEditFlow,
+    JSON.stringify(orderDetail),
+    JSON.stringify(draftEditOrderDetail),
+  ]);
 
   return (
     <>

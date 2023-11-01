@@ -510,6 +510,10 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
   const updateOrderDetailInProgress = useAppSelector(
     (state) => state.Order.updateOrderDetailInProgress,
   );
+  const availableOrderDetailCheckList = useAppSelector(
+    (state) => state.Order.availableOrderDetailCheckList,
+    shallowEqual,
+  );
   const updateOrderStateInProgress = useAppSelector(
     (state) => state.AdminManageOrder.updateOrderStateInProgress,
   );
@@ -565,13 +569,16 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
 
       return restaurant?.id && restaurant?.foodList?.length === 0;
     })?.length > 0;
+  const hasInvalidMealDay = Object.keys(availableOrderDetailCheckList).some(
+    (item) => !availableOrderDetailCheckList[item].isAvailable,
+  );
 
   const submitDisabled =
     !validFields ||
     (isEditFlow
       ? isDraftOrderDetailNotChanged
         ? missingDraftGeneralInfo || missingSelectedFood
-        : missingDraftSelectedFood
+        : missingDraftSelectedFood || hasInvalidMealDay
       : missingSelectedFood);
 
   const notificationData = preparePickingOrderChangeNotificationData({

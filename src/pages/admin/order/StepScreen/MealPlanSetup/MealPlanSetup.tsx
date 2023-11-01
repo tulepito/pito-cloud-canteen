@@ -27,7 +27,10 @@ import MealPlanSetupForm from '../../components/MealPlanSetupForm/MealPlanSetupF
 import NavigateButtons, {
   EFlowType,
 } from '../../components/NavigateButtons/NavigateButtons';
-import { isMealPlanSetupDataValid } from '../../edit/[orderId]/components/EditOrderWizard/EditOrderWizard.helper';
+import {
+  isMealPlanSetupDataValid,
+  prepareOrderDetailFromOldOrderDetail,
+} from '../../edit/[orderId]/components/EditOrderWizard/EditOrderWizard.helper';
 
 type MealPlanSetupProps = {
   goBack: () => void;
@@ -307,7 +310,15 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
 
   const handleCloseConfirmRcmRestaurantModal = () => {
     confirmRcmRestaurantControl.setFalse();
-    dispatch(saveDraftEditOrder({ orderDetail }));
+    dispatch(
+      saveDraftEditOrder({
+        orderDetail: prepareOrderDetailFromOldOrderDetail({
+          orderDetail,
+          startDate: draftEditOrderData.startDate,
+          endDate: draftEditOrderData.endDate,
+        }),
+      }),
+    );
 
     handleNextTabOrNextReviewTab();
   };

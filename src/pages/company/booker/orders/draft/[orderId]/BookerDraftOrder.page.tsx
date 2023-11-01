@@ -193,7 +193,7 @@ function BookerDraftOrderPage() {
 
   useEffect(() => {
     if (!isEmpty(orderDetail)) {
-      dispatch(orderAsyncActions.checkRestaurantStillAvailable());
+      dispatch(orderAsyncActions.checkRestaurantStillAvailable({}));
     }
   }, [dispatch, JSON.stringify(orderDetail)]);
 
