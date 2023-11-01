@@ -34,6 +34,7 @@ import {
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { AdminManageOrderThunks } from '@pages/admin/order/AdminManageOrder.slice';
+import { EApiUpdateMode } from '@pages/api/orders/[orderId]/plan/update.service';
 import {
   changeStep4SubmitStatus,
   clearDraftEditOrder,
@@ -541,6 +542,8 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
     notes = {},
   } = Listing(order as TListing).getMetadata();
   const planId = plans.length > 0 ? plans[0] : undefined;
+  const isPendingApprovalOrder =
+    orderState === EOrderDraftStates.pendingApproval;
   const isPickingOrder = orderState === EOrderStates.picking;
   const { address } = deliveryAddress || {};
 
@@ -642,6 +645,9 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
             orderId,
             planId,
             orderDetail: updateOrderDetail,
+            updateMode: isPendingApprovalOrder
+              ? EApiUpdateMode.MERGE
+              : EApiUpdateMode.DIRECT_UPDATE,
           }),
         );
 
