@@ -199,7 +199,9 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     draftDeliveryAddress || {};
 
   const isPickingOrder = orderState === EOrderStates.picking;
-  const shouldHideRemoveMealIcon = isEditFlow && isPickingOrder;
+  const isInProgressOrder = orderState === EOrderStates.inProgress;
+  const shouldHideRemoveMealIcon =
+    isEditFlow && (isPickingOrder || isInProgressOrder);
   const shouldHideAddMorePlan = isEditFlow && isPickingOrder;
 
   const missingSelectedFood = Object.keys(orderDetail).filter(
