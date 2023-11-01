@@ -266,6 +266,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
               orderStateHistory,
             },
             restaurantCoverImageList,
+            isEditFlow,
           )
         : normalizePlanDetailsToEvent(
             orderDetail,
