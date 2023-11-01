@@ -539,7 +539,6 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
     setFalse: closeSuccessModal,
   } = useBoolean();
   const editConfirmModalController = useBoolean();
-  const [reviewFormValues, setReviewFormValues] = useState<any>({});
 
   const confirmNotifyUserModalControl = useBoolean();
 
@@ -638,8 +637,7 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
     router.push(adminPaths.ManageOrders);
   };
 
-  const handleSubmitEditInProgressOrder = async (values: any) => {
-    const { staffName: staffNameValue, shipperName: shipperNameValue } = values;
+  const handleSubmitEditInProgressOrder = async () => {
     const editedSubOrderDays = pickBy(
       draftEditOrderDetail,
       (newValues, key) => {
@@ -737,8 +735,6 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
       orderAsyncActions.updateOrder({
         generalInfo: {
           ...draftEditOrderData,
-          staffName: staffNameValue,
-          shipperName: shipperNameValue,
           orderState: EOrderStates.picking,
           viewed: false,
           partnerIds: newPartnerIds,
@@ -830,7 +826,6 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
 
   const onSubmit = async (values: any) => {
     const { staffName: staffNameValue, shipperName: shipperNameValue } = values;
-    setReviewFormValues(values);
     if (!isEditFlow) {
       dispatch(changeStep4SubmitStatus(true));
 
@@ -908,7 +903,7 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
   const onSubmitEditOrder = async (
     values: TSelectRoleToSendNotificationFormValues,
   ) => {
-    await handleSubmitEditInProgressOrder(reviewFormValues);
+    await handleSubmitEditInProgressOrder();
     const { role = [] } = values;
     role.forEach((r) => {
       if (r === 'participant') {
