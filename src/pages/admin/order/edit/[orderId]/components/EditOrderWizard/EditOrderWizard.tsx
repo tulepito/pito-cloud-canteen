@@ -168,6 +168,7 @@ const EditOrderWizard = () => {
   } = Listing(order).getMetadata();
   const isGroupOrder = orderType === EOrderType.group;
   const isPickingOrder = orderState === EOrderStates.picking;
+  const isInProgressOrder = orderState === EOrderStates.inProgress;
   const isInvalidOrderStateToEdit =
     !ORDER_STATES_TO_ENABLE_EDIT_ABILITY.includes(orderState);
   const suitableTabList = isGroupOrder
@@ -257,7 +258,8 @@ const EditOrderWizard = () => {
     <FormWizard formTabNavClassName={css.formTabNav}>
       {suitableTabList.map((tab: string) => {
         const shouldDisableFields =
-          tab === EEditOrderTab.orderSetup && isPickingOrder;
+          tab === EEditOrderTab.orderSetup &&
+          (isPickingOrder || isInProgressOrder);
         const shouldDisableSubmit =
           ![EEditOrderTab.clientView, EEditOrderTab.orderSetup].includes(
             tab as EEditOrderTab,

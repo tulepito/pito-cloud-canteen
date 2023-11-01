@@ -18,7 +18,7 @@ import {
   orderAsyncActions,
   saveDraftEditOrder,
 } from '@redux/slices/Order.slice';
-import { EOrderDraftStates, EOrderType } from '@src/utils/enums';
+import { EOrderDraftStates, EOrderStates, EOrderType } from '@src/utils/enums';
 import { Listing, User } from '@utils/data';
 import { getSelectedDaysOfWeek } from '@utils/dates';
 import type { TListing, TObject } from '@utils/types';
@@ -110,6 +110,7 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
 
   const isPendingBookerApprovalOrder =
     orderState === EOrderDraftStates.pendingApproval;
+  const isOrderInProgress = orderState === EOrderStates.inProgress;
   const currentClient = companies.find(
     (company) => company.id.uuid === clientId,
   );
@@ -410,6 +411,7 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
         setDraftEditValues={setDraftEditValues!}
         formSubmitRef={formSubmitRef}
         shouldDisableFields={shouldDisableFields}
+        isOrderInProgress={isOrderInProgress}
       />
       <NavigateButtons
         flowType={flowType}

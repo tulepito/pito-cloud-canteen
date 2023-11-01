@@ -200,7 +200,9 @@ const MealPlanSetupFormComponent: React.FC<TMealPlanSetupFormComponentProps> = (
       <div className={css.fieldSection}>
         <DeliveryAddressField
           title={intl.formatMessage({ id: 'DeliveryAddressField.title' })}
-          disabled={shouldDisableFields}
+          disabled={
+            isEditInProgressOrder ? !shouldDisableFields : shouldDisableFields
+          }
         />
       </div>
       <div className={css.fieldSection}>
@@ -226,6 +228,7 @@ const MealPlanSetupFormComponent: React.FC<TMealPlanSetupFormComponentProps> = (
         <MealPlanDateField
           form={form}
           disabled={shouldDisableFields}
+          isEditInProgressOrder={isEditInProgressOrder}
           values={values}
           title={intl.formatMessage({ id: 'MealPlanDateField.title' })}
         />
