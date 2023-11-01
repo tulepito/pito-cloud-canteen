@@ -700,6 +700,7 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
         }, {});
 
         return {
+          ...result,
           [subOrderDate]: {
             oldValues: [
               ...(orderDetail[subOrderDate].oldValues || []),
