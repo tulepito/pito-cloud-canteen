@@ -111,6 +111,7 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
   const isPendingBookerApprovalOrder =
     orderState === EOrderDraftStates.pendingApproval;
   const isOrderInProgress = orderState === EOrderStates.inProgress;
+  const isEditInprogressOrder = isEditFlow && isOrderInProgress;
   const currentClient = companies.find(
     (company) => company.id.uuid === clientId,
   );
@@ -237,8 +238,26 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
     const isAddressChanged =
       deliveryAddress?.address &&
       deliveryAddress.address !== initDeliveryAddress?.search;
+    if (isEditInprogressOrder) {
+      const {
+        detailAddress: draftDetailAddress,
+        deliveryHour: draftDeliveryHour,
+      } = restDraftValues || {};
 
-    if (!isEqual(restInitialValues, restDraftValues) || isAddressChanged) {
+      dispatch(
+        saveDraftEditOrder({
+          generalInfo: {
+            ...(deliveryAddress && { deliveryAddress }),
+            ...(draftDetailAddress && { detailAddress: draftDetailAddress }),
+            ...(draftDeliveryHour && { deliveryHour: draftDeliveryHour }),
+          },
+        }),
+      );
+      handleNextTabOrNextReviewTab(shouldNext);
+    } else if (
+      !isEqual(restInitialValues, restDraftValues) ||
+      isAddressChanged
+    ) {
       const generalInfo: TObject = {
         ...restDraftValues,
         deliveryAddress,

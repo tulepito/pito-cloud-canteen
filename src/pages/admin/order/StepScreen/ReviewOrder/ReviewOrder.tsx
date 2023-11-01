@@ -741,14 +741,16 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
         },
       }),
     );
-    await dispatch(
-      orderAsyncActions.updatePlanDetail({
-        orderId,
-        planId,
-        orderDetail: editedOrderDetail,
-        updateMode: EApiUpdateMode.DIRECT_UPDATE,
-      }),
-    );
+    if (!isEmpty(editedSubOrders)) {
+      await dispatch(
+        orderAsyncActions.updatePlanDetail({
+          orderId,
+          planId,
+          orderDetail: editedOrderDetail,
+          updateMode: EApiUpdateMode.DIRECT_UPDATE,
+        }),
+      );
+    }
   };
 
   const handleCreateFlowSubmitClick = async () => {
