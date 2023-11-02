@@ -49,9 +49,9 @@ const getNormalizeDetail = ({
       return {
         ...acc,
         [curr]: {
-          ...orderDetail[curr],
-          memberOrders: isNormalOrder ? {} : initialMemberOrder,
           ...(isNormalOrder && { lineItems: [] }),
+          memberOrders: isNormalOrder ? {} : initialMemberOrder,
+          ...orderDetail[curr],
         },
       };
     }
