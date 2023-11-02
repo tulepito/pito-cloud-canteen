@@ -681,6 +681,9 @@ export const preparePickingOrderChangeNotificationData = ({
     specificPCCFee = 0,
     hasSpecificPCCFee = false,
     memberAmount = 0,
+    deliveryAddress,
+    detailAddress,
+    deliveryHour,
   } = orderGetter.getMetadata();
   const PCCFeeByMemberAmount = getPCCFeeByMemberAmount(memberAmount);
   const PCCFeePerDate = hasSpecificPCCFee
@@ -835,6 +838,9 @@ export const preparePickingOrderChangeNotificationData = ({
     staffName: updateStaffName,
     shipperName: updateShipperName,
     specificPCCFee: updateSpecificPCCFee,
+    deliveryAddress: updateDeliveryAddress,
+    detailAddress: updateDetailAddress,
+    deliveryHour: updateDeliveryHour,
   } = updateOrderData || {};
   // TODO: change history for other fields
   if (updateStaffName !== undefined && updateStaffName !== staffName) {
@@ -873,6 +879,50 @@ export const preparePickingOrderChangeNotificationData = ({
       newData: {
         title: 'Phí PITO Cloud Canteen:',
         content: `${parseThousandNumber(updateSpecificPCCFee)}đ`,
+      },
+    });
+  }
+  if (
+    updateDeliveryAddress !== undefined &&
+    updateDeliveryAddress.address !== deliveryAddress.address
+  ) {
+    changeHistoryToNotifyBooker.push({
+      oldData: {
+        title: 'Địa chỉ giao hàng:',
+        content: deliveryAddress.address,
+      },
+      newData: {
+        title: 'Địa chỉ giao hàng:',
+        content: updateDeliveryAddress.address,
+      },
+    });
+  }
+
+  if (
+    updateDetailAddress !== undefined &&
+    updateDetailAddress !== detailAddress
+  ) {
+    changeHistoryToNotifyBooker.push({
+      oldData: {
+        title: 'Địa chỉ chi tiết:',
+        content: detailAddress,
+      },
+      newData: {
+        title: 'Địa chỉ chi tiết:',
+        content: updateDetailAddress,
+      },
+    });
+  }
+
+  if (updateDeliveryHour !== undefined && updateDeliveryHour !== deliveryHour) {
+    changeHistoryToNotifyBooker.push({
+      oldData: {
+        title: 'Thời gian giao hàng:',
+        content: deliveryHour,
+      },
+      newData: {
+        title: 'Thời gian giao hàng:',
+        content: updateDeliveryHour,
       },
     });
   }

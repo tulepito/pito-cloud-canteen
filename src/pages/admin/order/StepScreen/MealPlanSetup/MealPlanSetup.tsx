@@ -266,12 +266,12 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
             },
           }),
         );
+        handleNextTabOrNextReviewTab(shouldNext);
       } else {
         setDeliveryHourNotMatchError(
           'Thời gian giao hàng bạn chọn không phù hợp với thời gian phục vụ của nhà hàng',
         );
       }
-      handleNextTabOrNextReviewTab(shouldNext);
     } else if (
       !isEqual(restInitialValues, restDraftValues) ||
       isAddressChanged

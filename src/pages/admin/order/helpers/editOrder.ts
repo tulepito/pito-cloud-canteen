@@ -1,3 +1,5 @@
+import { map } from 'lodash';
+
 import { Listing } from '@src/utils/data';
 import type { TListing, TObject } from '@src/utils/types';
 
@@ -31,7 +33,29 @@ export const checkDeliveryHourIsMatchedWithAllRestaurants = ({
         },
       );
 
-      return { [restaurant.id.uuid]: dayInWeekDeliveryHourMatching };
+      const summarizedDeliveryHourMatchingRestaurantOpenTimeObj =
+        dayInWeekDeliveryHourMatching.reduce((acc: TObject, cur: TObject) => {
+          const [key] = Object.keys(cur);
+          const [value] = Object.values(cur);
+          if (acc[key]) {
+            return acc;
+          }
+
+          return {
+            ...acc,
+            [key]: value,
+          };
+        }, {});
+
+      const summarizedDeliveryHourMatchingRestaurantOpenTimeArr = map(
+        summarizedDeliveryHourMatchingRestaurantOpenTimeObj,
+        (value, key) => ({ [key]: value }),
+      );
+
+      return {
+        [restaurant.id.uuid]:
+          summarizedDeliveryHourMatchingRestaurantOpenTimeArr,
+      };
     },
   );
 
