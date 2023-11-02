@@ -33,6 +33,7 @@ import {
   isSameDate,
 } from '@src/utils/dates';
 import { EOrderStates, EParticipantOrderStatus } from '@src/utils/enums';
+import { ETransition } from '@src/utils/transaction';
 import type { TListing, TObject, TUser } from '@src/utils/types';
 
 import ParticipantToolbar from '../components/ParticipantToolbar/ParticipantToolbar';
@@ -225,6 +226,18 @@ const OrderListPage = () => {
         ? EParticipantOrderStatus.expired
         : foodSelection?.status;
 
+      const isSubOrderNotAbleToEdit = [
+        ETransition.OPERATOR_CANCEL_PLAN,
+        ETransition.START_DELIVERY,
+        ETransition.COMPLETE_DELIVERY,
+      ].includes(lastTransition);
+
+      const isOrderAlreadyInProgress =
+        orderStateHistory.findIndex(
+          (_state: { state: string; updatedAt: number }) =>
+            _state.state === EOrderStates.inProgress,
+        ) !== -1;
+
       const event = {
         resource: {
           id: `${planId} - ${planItemKey}`,
@@ -258,6 +271,8 @@ const OrderListPage = () => {
           lastTransition,
           foodName: dishes.find((_dish) => _dish.key === foodSelection?.foodId)
             ?.value,
+          disableSelectFood:
+            isOrderAlreadyInProgress && isSubOrderNotAbleToEdit,
         },
         title: orderTitle,
         start: DateTime.fromMillis(+planItemKey).toJSDate(),
