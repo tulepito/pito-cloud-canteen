@@ -659,8 +659,12 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
         );
         const editedSubOrder = draftEditOrderDetail?.[subOrderDate];
 
+        const oldSubOrder = isEmpty(orderDetail?.[subOrderDate].oldValues)
+          ? orderDetail?.[subOrderDate]
+          : last<TObject>(orderDetail?.[subOrderDate].oldValues);
+
         const isRestaurantChanged = !isEqual(
-          last<TObject>(orderDetail[subOrderDate].oldValues)?.restaurant?.id,
+          oldSubOrder?.restaurant?.id,
           editedSubOrder?.restaurant.id,
         );
 
@@ -680,15 +684,10 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
           editedSubOrder.memberOrders,
         ).reduce((editedMemberOrdersResult: any, participantId: string) => {
           const { foodId, status } = editedSubOrder.memberOrders[participantId];
+          const { restaurant = {} } = editedSubOrder;
+          const { foodList = {} } = restaurant;
 
-          const isFoodChanged = !isEqual(
-            last<TObject>(
-              orderDetail[subOrderDate].oldValues,
-            )?.memberOrders?.find((oldMemberOrder: TObject) => {
-              return oldMemberOrder.userId === participantId;
-            })?.foodId,
-            foodId,
-          );
+          const isFoodChanged = !Object.keys(foodList).includes(foodId);
 
           return {
             ...editedMemberOrdersResult,
