@@ -42,31 +42,24 @@ const OrderDetailPage = () => {
     shallowEqual,
   );
   const fetchOrderInProgress = useAppSelector(
-    (state) =>
-      state.AdminManageOrder.fetchOrderInProgress ||
-      state.OrderManagement.fetchOrderInProgress,
+    (state) => state.OrderManagement.fetchOrderInProgress,
   );
-
   const updateOrderStaffNameInProgress = useAppSelector(
     (state) => state.AdminManageOrder.updateOrderStaffNameInProgress,
   );
-
   const updateOrderStateInProgress = useAppSelector(
     (state) => state.AdminManageOrder.updateOrderStateInProgress,
   );
-
   const quotations = useAppSelector(
     (state) => state.AdminManageOrder.quotations,
     shallowEqual,
   );
-
   const quotationsPagination = useAppSelector(
     (state) => state.AdminManageOrder.quotationsPagination,
     shallowEqual,
   );
 
-  const orderListing = Listing(order);
-  const { orderState } = orderListing.getMetadata();
+  const { orderState } = Listing(order).getMetadata();
   const isShowOrderPaymentStatusTab = [
     EOrderStates.inProgress,
     EOrderStates.completed,
