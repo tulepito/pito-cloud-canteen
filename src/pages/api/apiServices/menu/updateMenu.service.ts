@@ -150,7 +150,8 @@ const updateMenu = async (
     friNutritions: friNutritionsMaybe = [],
     satNutritions: satNutritionsMaybe = [],
     sunNutritions: sunNutritionsMaybe = [],
-  } = createListFoodNutritionByFoodsByDate(foodsByDate) || ({} as any);
+  } = (createListFoodNutritionByFoodsByDate(foodsByDate || {}) ||
+    {}) as TObject;
 
   const response = await integrationSdk.listings.update(
     {
