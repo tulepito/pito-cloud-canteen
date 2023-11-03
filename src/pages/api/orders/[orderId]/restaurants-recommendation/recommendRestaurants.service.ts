@@ -4,6 +4,7 @@ import { DateTime } from 'luxon';
 import { queryAllListings } from '@helpers/apiHelpers';
 import { getMenuQuery, getRestaurantQuery } from '@helpers/listingSearchQuery';
 import { calculateDistance } from '@helpers/mapHelpers';
+import { getSelectedRestaurantAndFoodList } from '@helpers/orderHelper';
 import {
   adminQueryListings,
   fetchListing,
@@ -17,6 +18,34 @@ import type { TListing } from '@src/utils/types';
 const maxKilometerFromRestaurantToDeliveryAddressForBooker =
   process.env
     .NEXT_PUBLIC_MAX_KILOMETER_FROM_RESTAURANT_TO_DELIVERY_ADDRESS_FOR_BOOKER;
+
+const prepareMenuFoodList = async ({ restaurant, menu, timestamp }: any) => {
+  // TODO: prepare foodList
+  const dateTime = DateTime.fromMillis(+timestamp).setZone(VNTimezone);
+  const dayOfWeek = convertWeekDay(dateTime.weekday).key;
+
+  const menuListing = Listing(menu);
+  const foodIdList = menuListing.getMetadata()[`${dayOfWeek}FoodIdList`];
+  const foodListFromSharetribe = await queryAllListings({
+    query: {
+      ids: foodIdList,
+      meta_isDeleted: false,
+      meta_isFoodEnable: true,
+      // ...(nutritions.length > 0
+      //   ? { pub_specialDiets: `has_any:${nutritions.join(',')}` }
+      //   : {}),
+    },
+  });
+  const normalizedFoodList = getSelectedRestaurantAndFoodList({
+    foodList: foodListFromSharetribe,
+    foodIds: foodListFromSharetribe.map(
+      (foodItem: TListing) => foodItem.id.uuid,
+    ),
+    currentRestaurant: restaurant,
+  }).submitFoodListData;
+
+  return normalizedFoodList;
+};
 
 export const recommendRestaurantForSpecificDay = async ({
   orderId,
@@ -106,24 +135,35 @@ export const recommendRestaurantForSpecificDay = async ({
     const randomNumber = Math.floor(Math.random() * (restaurants.length - 1));
     const otherRandomNumber = Math.abs(randomNumber - restaurants.length + 1);
 
-    const randomRestaurant =
-      restaurants[randomNumber]?.restaurantInfo?.id?.uuid !==
+    const randomRestaurantObjA = restaurants[randomNumber] || {};
+
+    const randomRestaurantObj =
+      randomRestaurantObjA.restaurantInfo?.id?.uuid !==
       orderDetail[timestamp]?.restaurant?.id
-        ? restaurants[randomNumber]?.restaurantInfo
-        : restaurants[otherRandomNumber]?.restaurantInfo;
+        ? randomRestaurantObjA
+        : restaurants[otherRandomNumber];
+
+    const { menu, restaurantInfo: randomRestaurant } =
+      randomRestaurantObj || {};
 
     const randomRestaurantGetter = Listing(randomRestaurant);
     const randomRestaurantId = randomRestaurantGetter.getId();
     const { minQuantity = 0, maxQuantity = Number.MAX_VALUE } =
       randomRestaurantGetter.getPublicData();
 
+    const foodList = await prepareMenuFoodList({
+      menu,
+      restaurant: randomRestaurant,
+      timestamp,
+    });
+
     const newRestaurantData = {
       id: randomRestaurantId,
       restaurantName: randomRestaurantGetter.getAttributes().title,
       restaurantOwnerId: randomRestaurant?.author?.id?.uuid,
-      foodList: [],
+      foodList,
       phoneNumber: randomRestaurantGetter.getPublicData().phoneNumber,
-      menuId: restaurants[randomNumber]?.menu.id.uuid,
+      menuId: menu.id.uuid,
       minQuantity,
       maxQuantity,
     };
@@ -170,9 +210,9 @@ export const recommendRestaurants = async ({
 
   const totalDates = renderDateRange(startDate, endDate);
   await Promise.all(
-    totalDates.map(async (dateTime) => {
+    totalDates.map(async (timestamp) => {
       const menuQueryParams = {
-        timestamp: dateTime,
+        timestamp,
       };
       const menuQuery = getMenuQuery({
         order,
@@ -242,15 +282,21 @@ export const recommendRestaurants = async ({
         if (
           dayInWeek.includes(
             convertWeekDay(
-              DateTime.fromMillis(dateTime).setZone(VNTimezone).weekday,
+              DateTime.fromMillis(timestamp).setZone(VNTimezone).weekday,
             ).key,
           )
         ) {
-          orderDetail[dateTime] = {
+          const foodList = await prepareMenuFoodList({
+            menu: randomRestaurant?.menu,
+            restaurant: randomRestaurant?.restaurantInfo,
+            timestamp,
+          });
+
+          orderDetail[timestamp] = {
             restaurant: {
               id: restaurantGetter.getId(),
               restaurantName: restaurantGetter.getAttributes().title,
-              foodList: [],
+              foodList,
               menuId: randomRestaurant?.menu.id.uuid,
               minQuantity,
               maxQuantity,
@@ -264,13 +310,13 @@ export const recommendRestaurants = async ({
             hasNoRestaurants: false,
           };
         } else {
-          orderDetail[dateTime] = {
+          orderDetail[timestamp] = {
             ...lineItemsMaybe,
             hasNoRestaurants: false,
           };
         }
       } else {
-        orderDetail[dateTime] = {
+        orderDetail[timestamp] = {
           ...lineItemsMaybe,
           hasNoRestaurants: true,
         };
