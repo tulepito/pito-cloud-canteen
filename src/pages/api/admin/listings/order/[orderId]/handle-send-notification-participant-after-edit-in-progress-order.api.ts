@@ -1,15 +1,14 @@
-import { difference, isEmpty, last } from 'lodash';
+import { difference, last } from 'lodash';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HttpMethod } from '@apis/configs';
-import { deleteFirebaseDocumentById } from '@pages/api/participants/document/document.service';
+import { getEditedSubOrders } from '@helpers/orderHelper';
 import cookies from '@services/cookie';
 import { emailSendingFactory, EmailTemplateTypes } from '@services/email';
 import { fetchListing } from '@services/integrationHelper';
 import { handleError } from '@services/sdk';
 import { Listing } from '@src/utils/data';
 import { EParticipantOrderStatus } from '@src/utils/enums';
-import { ETransition } from '@src/utils/transaction';
 import type { TObject } from '@src/utils/types';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
@@ -26,23 +25,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           const planListing = Listing(plan);
 
           const { orderDetail = {} } = planListing.getMetadata();
-          const editedSubOrders = Object.keys(orderDetail).reduce(
-            (result: any, subOrderDate: string) => {
-              const { oldValues, lastTransition } = orderDetail[subOrderDate];
-              if (
-                isEmpty(oldValues) ||
-                lastTransition !== ETransition.INITIATE_TRANSACTION
-              ) {
-                return result;
-              }
-
-              return {
-                ...result,
-                [subOrderDate]: orderDetail[subOrderDate],
-              };
-            },
-            {},
-          );
+          const editedSubOrders = getEditedSubOrders(orderDetail);
 
           const handleParticipantNotification = Object.keys(
             editedSubOrders,
@@ -67,10 +50,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
             const deleleSubOrderFromFirebaseAndSendNotification =
               participantsWithDeletedFood.map(async (participantId: string) => {
-                const subOrderId = `${participantId} - ${planId} - ${subOrderDate}`;
-                await deleteFirebaseDocumentById(subOrderId);
-
-                // TODO: send email to participant
                 emailSendingFactory(
                   EmailTemplateTypes.PARTICIPANT
                     .PARTICIPANT_PICKING_ORDER_CHANGED,
@@ -91,8 +70,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             );
 
             participantNotJoined.map(async (participantId: string) => {
-              // TODO: send email to participant
-              console.log('send email to participant', participantId);
               emailSendingFactory(
                 EmailTemplateTypes.PARTICIPANT
                   .PARTICIPANT_PICKING_ORDER_CHANGED,

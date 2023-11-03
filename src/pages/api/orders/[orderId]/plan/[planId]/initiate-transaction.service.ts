@@ -5,7 +5,6 @@ import {
   checkIsOrderHasInProgressState,
   getEditedSubOrders,
 } from '@helpers/orderHelper';
-import type { TNormalizedOrderDetail } from '@pages/api/orders/utils';
 import {
   normalizeOrderDetail,
   prepareNewPlanOrderDetail,
@@ -25,6 +24,18 @@ import {
 } from '@src/utils/enums';
 import { ETransition } from '@utils/transaction';
 import type { TListing, TObject, TTransaction } from '@utils/types';
+
+const getNextTransition = (lastTransition: ETransition) => {
+  switch (lastTransition) {
+    case ETransition.INITIATE_TRANSACTION:
+      return ETransition.OPERATOR_CANCEL_PLAN;
+
+    // case partner reject & confirm sub order here
+
+    default:
+      break;
+  }
+};
 
 export const initiateTransaction = async ({
   orderId,
@@ -87,24 +98,19 @@ export const initiateTransaction = async ({
   if (isOrderHasInProgressState && !isEmpty(editedSubOrders)) {
     const handleUpdateTxs = Object.keys(editedSubOrders).map(
       async (subOrderDate: string) => {
-        const { transactionId } = editedSubOrders[subOrderDate];
-        const txNormalizedData = normalizedOrderDetail.find(
-          (item: TNormalizedOrderDetail) =>
-            item.params.transactionId === transactionId,
-        );
+        const { transactionId, lastTransition } = editedSubOrders[subOrderDate];
 
-        await integrationSdk.transactions.updateMetadata({
+        const nextTransition = getNextTransition(lastTransition);
+
+        await integrationSdk.transactions.transition({
           id: transactionId,
-          metadata: {
-            ...txNormalizedData?.params.extendedData.metadata,
-          },
+          transition: nextTransition,
+          params: {},
         });
       },
     );
 
     await Promise.all(handleUpdateTxs);
-
-    return;
   }
 
   const transactionMap: TObject = {};

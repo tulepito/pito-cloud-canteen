@@ -7,8 +7,9 @@ import uniq from 'lodash/uniq';
 import { DateTime } from 'luxon';
 
 import {
-  handleParticipantAfterEditInProgressOrderApi,
-  handlePartnerAfterEditInProgressOrderApi,
+  handleDeleteOldDataAfterEditInProgressOrderApi,
+  handleSendNotificationParticipantAfterEditInProgressOrderApi,
+  handleSendNotificationPartnerAfterEditInProgressOrderApi,
 } from '@apis/admin';
 import {
   companyApi,
@@ -325,6 +326,8 @@ const HANDLE_SEND_EDIT_INPROGRESS_ORDER_NOTIFICATION_TO_PARTICIPANT =
   'app/Order/HANDLE_SEND_EDIT_INPROGRESS_ORDER_NOTIFICATION_TO_PARTICIPANT';
 const HANDLE_SEND_EDIT_INPROGRESS_ORDER_NOTIFICATION_TO_PARTNER =
   'app/Order/HANDLE_SEND_EDIT_INPROGRESS_ORDER_NOTIFICATION_TO_PARTNER';
+const HANDLE_DELETE_OLD_DATA_AFTER_EDIT_IN_PROGRESS_ORDER =
+  'app/Order/HANDLE_DELETE_OLD_DATA_AFTER_EDIT_IN_PROGRESS_ORDER';
 
 const createOrder = createAsyncThunk(
   CREATE_ORDER,
@@ -1088,9 +1091,12 @@ const handleSendEditInProgressOrderNotificationToParticipant = createAsyncThunk(
   HANDLE_SEND_EDIT_INPROGRESS_ORDER_NOTIFICATION_TO_PARTICIPANT,
   async ({ orderId, planId }: TObject) => {
     const { data: responseData } =
-      await handleParticipantAfterEditInProgressOrderApi(orderId, {
-        planId,
-      });
+      await handleSendNotificationParticipantAfterEditInProgressOrderApi(
+        orderId,
+        {
+          planId,
+        },
+      );
 
     return responseData.data;
   },
@@ -1119,7 +1125,22 @@ const handleSendEditInProgressOrderNotificationToPartner = createAsyncThunk(
   HANDLE_SEND_EDIT_INPROGRESS_ORDER_NOTIFICATION_TO_PARTNER,
   async ({ orderId, planId }: TObject) => {
     const { data: responseData } =
-      await handlePartnerAfterEditInProgressOrderApi(orderId, {
+      await handleSendNotificationPartnerAfterEditInProgressOrderApi(orderId, {
+        planId,
+      });
+
+    return responseData.data;
+  },
+  {
+    serializeError: storableAxiosError,
+  },
+);
+
+const handleDeleteOldDataAfterEditInProgressOrder = createAsyncThunk(
+  HANDLE_DELETE_OLD_DATA_AFTER_EDIT_IN_PROGRESS_ORDER,
+  async ({ orderId, planId }: TObject) => {
+    const { data: responseData } =
+      await handleDeleteOldDataAfterEditInProgressOrderApi(orderId, {
         planId,
       });
 
@@ -1158,6 +1179,7 @@ export const orderAsyncActions = {
   handleSendEditInProgressOrderNotificationToParticipant,
   notifyUserPickingOrderChanges,
   handleSendEditInProgressOrderNotificationToPartner,
+  handleDeleteOldDataAfterEditInProgressOrder,
 };
 
 const orderSlice = createSlice({

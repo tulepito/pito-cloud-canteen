@@ -750,7 +750,15 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
           updateMode: EApiUpdateMode.DIRECT_UPDATE,
         }),
       );
+
+      await dispatch(
+        orderAsyncActions.handleDeleteOldDataAfterEditInProgressOrder({
+          orderId,
+          planId,
+        }),
+      );
     }
+    dispatch(clearDraftEditOrder());
   };
 
   const handleCreateFlowSubmitClick = async () => {
