@@ -9,18 +9,10 @@ import { emailSendingFactory, EmailTemplateTypes } from '@services/email';
 import { fetchListing } from '@services/integrationHelper';
 import { createNativeNotification } from '@services/nativeNotification';
 import { createFirebaseDocNotification } from '@services/notifications';
-import {
-  deletePaymentRecordByIdOnFirebase,
-  queryPaymentRecordOnFirebase,
-} from '@services/payment';
 import { handleError } from '@services/sdk';
 import { Listing, User } from '@src/utils/data';
 import { formatTimestamp } from '@src/utils/dates';
-import {
-  ENativeNotificationType,
-  ENotificationType,
-  EPaymentType,
-} from '@src/utils/enums';
+import { ENativeNotificationType, ENotificationType } from '@src/utils/enums';
 import { ETransition } from '@src/utils/transaction';
 import type { TObject } from '@src/utils/types';
 
@@ -53,21 +45,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
               if (isEmpty(oldRestaurant)) {
                 return null;
               }
-
-              const handleDeletePaymentRecord = async () => {
-                const paymentRecord = await queryPaymentRecordOnFirebase({
-                  paymentType: EPaymentType.PARTNER,
-                  orderId,
-                  partnerId: oldRestaurant.id,
-                  subOrderDate,
-                });
-
-                if (!isEmpty(paymentRecord)) {
-                  await deletePaymentRecordByIdOnFirebase(
-                    paymentRecord?.[0].id,
-                  );
-                }
-              };
 
               const oldRestaurantListing = await fetchListing(
                 oldRestaurant.id,
@@ -108,26 +85,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
                     subOrderDate,
                   },
                 );
-
-                await handleDeletePaymentRecord();
-              } else {
-                emailSendingFactory(
-                  EmailTemplateTypes.PARTNER.PARTNER_ORDER_DETAILS_UPDATED,
-                  {
-                    orderId,
-                    restaurantId: oldRestaurant.id,
-                    timestamp: subOrderDate,
-                  },
-                );
-                createNativeNotification(
-                  ENativeNotificationType.PartnerEditSubOrder,
-                  {
-                    order,
-                    participantId: oldRestaurantUserId,
-                    subOrderDate,
-                  },
-                );
-                await handleDeletePaymentRecord();
               }
             },
           );
