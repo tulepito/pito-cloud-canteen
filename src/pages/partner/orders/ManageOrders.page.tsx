@@ -149,7 +149,7 @@ const parseEntitiesToTableData = (
       staffName,
       startDate,
       endDate,
-      deliveryHour,
+      deliveryHour = '',
       restaurant = {},
       lastTransition,
       isPaid,
@@ -188,7 +188,6 @@ const parseEntitiesToTableData = (
     }
 
     const subOrderTitle = `${orderTitle}-${dayIndex > 0 ? dayIndex : 7}`;
-    const formattedDeliveryHour = `${deliveryHour}`;
 
     return {
       key: subOrderTitle,
@@ -204,12 +203,18 @@ const parseEntitiesToTableData = (
         time: DateTime.fromMillis(Number(date || 0))
           .startOf('day')
           .plus({
-            ...convertHHmmStringToTimeParts(deliveryHour.split(' - ')[0]),
+            ...convertHHmmStringToTimeParts(
+              isEmpty(deliveryHour)
+                ? undefined
+                : deliveryHour.includes('-')
+                ? deliveryHour.split('-')[0]
+                : deliveryHour,
+            ),
           })
           .toMillis(),
         endDate: endDate ? formatTimestamp(endDate) : '',
         state: EOrderDraftStates.pendingApproval,
-        deliveryHour: formattedDeliveryHour,
+        deliveryHour,
         lastTransition,
         isPaid,
       },
