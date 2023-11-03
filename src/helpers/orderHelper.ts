@@ -107,11 +107,11 @@ export const deliveryDaySessionAdapter = (daySession: string) => {
     case MORNING_SESSION:
       return 'breakfast';
     case DINNER_SESSION:
+    case EVENING_SESSION:
       return 'dinner';
     case AFTERNOON_SESSION:
       return 'lunch';
-    case EVENING_SESSION:
-      return 'brunch';
+
     default:
       break;
   }
