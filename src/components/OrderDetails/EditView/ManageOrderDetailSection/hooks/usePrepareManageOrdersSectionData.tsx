@@ -112,5 +112,6 @@ export const usePrepareManageOrdersSectionData = (
     memberOptions,
     foodOptions,
     currentOrderDetail: draftOrderDetail[currentViewDate] || {},
+    hasSubOrders: !isEmpty(draftOrderDetail),
   };
 };
