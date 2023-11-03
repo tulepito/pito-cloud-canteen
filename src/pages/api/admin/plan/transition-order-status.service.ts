@@ -27,7 +27,7 @@ export const transitionOrderStatus = async (
 
   const isOrderInProgress = orderState === EOrderStates.inProgress;
   const isOrderPendingPayment = orderState === EOrderStates.pendingPayment;
-  const isOrderSuficientPaid =
+  const isOrderSufficientPaid =
     isClientSufficientPaid && isPartnerSufficientPaid;
 
   const txIdList = compact(
@@ -37,7 +37,6 @@ export const transitionOrderStatus = async (
   const txsLastTransitions = await Promise.all(
     txIdList.map(async (txId: string) => {
       const tx = await fetchTransaction(txId);
-
       const { lastTransition } = Transaction(tx).getAttributes();
 
       return lastTransition;
@@ -51,7 +50,7 @@ export const transitionOrderStatus = async (
   );
 
   const shouldTransitToOrderCompleted =
-    isOrderSuficientPaid &&
+    isOrderSufficientPaid &&
     (isOrderPendingPayment || isOrderInProgress) &&
     isAllTransactionCompleted;
 
