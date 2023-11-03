@@ -70,7 +70,7 @@ const ParticipantSetupField: React.FC<ParticipantSetupFieldProps> = (props) => {
       </div>
       <Link
         className={css.groupSetup}
-        href={`/admin/company/${clientId}/group-setting`}>
+        href={`/admin/company/${clientId}/edit/?tab=settings`}>
         Cài đặt nhóm
       </Link>
     </div>
