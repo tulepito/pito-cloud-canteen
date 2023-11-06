@@ -10,6 +10,7 @@ import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import { FieldDropdownSelectComponent } from '@components/FormFields/FieldDropdownSelect/FieldDropdownSelect';
 import { FieldTextAreaComponent } from '@components/FormFields/FieldTextArea/FieldTextArea';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { saveDraftEditOrder } from '@redux/slices/Order.slice';
 import {
   orderDetailsAnyActionsInProgress,
   OrderManagementsAction,
@@ -189,6 +190,13 @@ const LineItemsTable: React.FC<TLineItemsTableProps> = (props) => {
         },
       };
 
+      if (isOrderInProgressState) {
+        dispatch(
+          saveDraftEditOrder({
+            orderDetail: updateOrderDetail,
+          }),
+        );
+      }
       if (isDraftEditing) {
         dispatch(
           OrderManagementsAction.setDraftOrderDetailsAndSubOrderChangeHistory({

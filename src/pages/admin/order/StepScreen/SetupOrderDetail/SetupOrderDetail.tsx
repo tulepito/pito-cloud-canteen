@@ -21,6 +21,7 @@ import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { calculateGroupMembersAmount } from '@helpers/company';
 import { parseDateFromTimestampAndHourString } from '@helpers/dateHelpers';
 import { addCommas } from '@helpers/format';
+import { getItem } from '@helpers/localStorageHelpers';
 import {
   findSuitableStartDate,
   getRestaurantListFromOrderDetail,
@@ -582,6 +583,14 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
       selectedFoodList: submitFoodListData,
     });
     closePickFoodModal();
+
+    const isHideChangeSelectedFoodConfirmModal = getItem(
+      'isHideChangeSelectedFoodConfirmModal',
+    );
+
+    if (!isHideChangeSelectedFoodConfirmModal) {
+      changeSelectedFoodConfirmModal.setTrue();
+    }
   };
 
   const onCancelChangeFood = () => {
