@@ -567,8 +567,10 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
   } = draftEditOrderData || {};
 
   const { address: draftAddress } = draftDeliveryAddress || {};
-  const currentAddress = isEditFlow ? draftAddress : address;
-  const currentDeliveryHour = isEditFlow ? draftDeliveryHour : deliveryHour;
+  const currentAddress = isEditFlow ? draftAddress || address : address;
+  const currentDeliveryHour = isEditFlow
+    ? draftDeliveryHour || deliveryHour
+    : deliveryHour;
 
   const validFields =
     (!isEmpty(staffName) || !isEmpty(draftStaffName)) &&
