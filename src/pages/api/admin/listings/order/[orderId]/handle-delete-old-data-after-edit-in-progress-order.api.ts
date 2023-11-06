@@ -1,5 +1,4 @@
 import difference from 'lodash/difference';
-import isEmpty from 'lodash/isEmpty';
 import last from 'lodash/last';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
@@ -34,32 +33,17 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           const { orderDetail = {} } = planListing.getMetadata();
           const editedSubOrders = getEditedSubOrders(orderDetail);
 
-          const handlePartnerDeletePaymentRecord = Object.keys(
-            editedSubOrders,
-          ).map(async (subOrderDate: string) => {
-            const { oldValues } = editedSubOrders[subOrderDate];
-            const previousOldValues = last<TObject>(oldValues) || {};
-            const { restaurant: oldRestaurant } = previousOldValues;
+          const paymentRecords =
+            (await queryPaymentRecordOnFirebase({
+              paymentType: EPaymentType.PARTNER,
+              orderId,
+            })) || [];
 
-            if (isEmpty(oldRestaurant)) {
-              return null;
-            }
-
-            const handleDeletePaymentRecord = async () => {
-              const paymentRecord = await queryPaymentRecordOnFirebase({
-                paymentType: EPaymentType.PARTNER,
-                orderId,
-                partnerId: oldRestaurant.id,
-                subOrderDate,
-              });
-
-              if (!isEmpty(paymentRecord)) {
-                await deletePaymentRecordByIdOnFirebase(paymentRecord?.[0].id);
-              }
-            };
-
-            await handleDeletePaymentRecord();
-          });
+          const handlePartnerDeletePaymentRecord = paymentRecords.map(
+            async (paymentRecord) => {
+              await deletePaymentRecordByIdOnFirebase(paymentRecord.id);
+            },
+          );
 
           const handleParticipantDeleteSubOrders = Object.keys(
             editedSubOrders,

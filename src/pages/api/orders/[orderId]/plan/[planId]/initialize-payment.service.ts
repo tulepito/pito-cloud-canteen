@@ -101,11 +101,7 @@ export const initializePayment = async (
     );
   };
 
-  if (isEditInProgressOrder) {
-    partnerPaymentRecordsData = generatePaymentRecordData(editedSubOrders);
-  } else {
-    partnerPaymentRecordsData = generatePaymentRecordData(orderDetail);
-  }
+  partnerPaymentRecordsData = generatePaymentRecordData(orderDetail);
 
   const {
     startDate,
