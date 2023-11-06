@@ -559,8 +559,16 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
   const isNormalOrder = orderType === EOrderType.normal;
   const { address } = deliveryAddress || {};
 
-  const { staffName: draftStaffName, shipperName: draftShipperName } =
-    draftEditOrderData || {};
+  const {
+    staffName: draftStaffName,
+    shipperName: draftShipperName,
+    deliveryAddress: draftDeliveryAddress,
+    deliveryHour: draftDeliveryHour,
+  } = draftEditOrderData || {};
+
+  const { address: draftAddress } = draftDeliveryAddress || {};
+  const currentAddress = isEditFlow ? draftAddress : address;
+  const currentDeliveryHour = isEditFlow ? draftDeliveryHour : deliveryHour;
 
   const validFields =
     (!isEmpty(staffName) || !isEmpty(draftStaffName)) &&
@@ -980,13 +988,15 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
                     <span className={css.boxTitle}>
                       {intl.formatMessage({ id: 'ReviewOrder.deliveryTime' })}
                     </span>
-                    <span className={css.boxContent}>{deliveryHour}</span>
+                    <span className={css.boxContent}>
+                      {currentDeliveryHour}
+                    </span>
                   </div>
                   <div className={css.flexChild}>
                     <span className={css.boxTitle}>
                       {intl.formatMessage({ id: 'ReviewOrder.address' })}
                     </span>
-                    <span className={css.boxContent}>{address}</span>
+                    <span className={css.boxContent}>{currentAddress}</span>
                   </div>
                   <div className={css.flexChild}>
                     <span className={css.boxTitle}>
