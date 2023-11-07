@@ -45,11 +45,21 @@ const ManageFood: React.FC<TManageFoodProps> = (props) => {
     fetchOrderInProgress,
   } = useAppSelector((state) => state.OrderManagement);
   const order = useAppSelector((state) => state.Order.order);
+  const orderDetail = useAppSelector((state) => state.Order.orderDetail);
   const draftEditOrderData = useAppSelector(
     (state) => state.Order.draftEditOrderData,
   );
 
-  const { orderDetail: draftOrderDetailFromOrder } = draftEditOrderData;
+  const { orderDetail: draftOrderDetailFromOrder = {} } = draftEditOrderData;
+
+  const unChangedRestaurantDayList = Object.keys(orderDetail || {}).filter(
+    (date) => {
+      const oldRestaurantId = orderDetail[date].restaurant.id;
+      const newRestaurantId = draftOrderDetailFromOrder[date].restaurant.id;
+
+      return oldRestaurantId === newRestaurantId;
+    },
+  );
 
   const { planValidationsInProgressState } =
     orderValidationsInProgressState || {};
@@ -154,6 +164,7 @@ const ManageFood: React.FC<TManageFoodProps> = (props) => {
         currentViewDate={currentViewDate}
         minQuantity={minQuantity}
         isAdminFlow
+        unChangedRestaurantDayList={unChangedRestaurantDayList}
       />
 
       <NavigateButtons
