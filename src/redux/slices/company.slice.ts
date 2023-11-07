@@ -5,6 +5,7 @@ import chunk from 'lodash/chunk';
 import flatten from 'lodash/flatten';
 import isEmpty from 'lodash/isEmpty';
 
+import { verifyEmailApi } from '@apis/admin';
 import type {
   CreateGroupApiBody,
   DeleteGroupApiData,
@@ -232,6 +233,8 @@ const adminCreateCompany = createAsyncThunk(
       });
 
       const [company] = denormalisedResponseEntities(data);
+      const companyId = User(company).getId();
+      verifyEmailApi(companyId);
 
       return fulfillWithValue(company);
     } catch (error: any) {
