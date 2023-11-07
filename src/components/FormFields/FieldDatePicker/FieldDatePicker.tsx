@@ -18,6 +18,7 @@ type FieldDatePickerProps = FieldRenderProps<string, any> & {
   name?: string;
   shouldSkipTouched?: boolean;
   shouldHideBoxShadow?: boolean;
+  icon?: React.ReactNode;
 };
 
 const renderCustomHeader = (props: ReactDatePickerCustomHeaderProps) => {
@@ -68,6 +69,7 @@ export const FieldDatePickerComponent: React.FC<FieldDatePickerProps> = (
     readOnly = false,
     shouldSkipTouched = true,
     shouldHideBoxShadow = false,
+    icon,
     ...rest
   } = props;
   const { name, onChange, value, onBlur } = input;
@@ -116,20 +118,23 @@ export const FieldDatePickerComponent: React.FC<FieldDatePickerProps> = (
           {fieldMeta.error && <span className={labelRequiredRedStar}>*</span>}
         </label>
       )}
-      <DatePicker
-        locale="vi"
-        id={id}
-        name={name}
-        onChange={onInputChange}
-        onFocus={handleFocus}
-        className={inputClasses}
-        customInput={customInput}
-        renderCustomHeader={renderCustomHeader}
-        selected={value || selected}
-        formatWeekDay={formatWeekDay}
-        calendarStartDay={0}
-        {...rest}
-      />
+      <div className={css.fieldWrapper}>
+        <DatePicker
+          locale="vi"
+          id={id}
+          name={name}
+          onChange={onInputChange}
+          onFocus={handleFocus}
+          className={inputClasses}
+          customInput={customInput}
+          renderCustomHeader={renderCustomHeader}
+          selected={value || selected}
+          formatWeekDay={formatWeekDay}
+          calendarStartDay={0}
+          {...rest}
+        />
+        {icon && <div className={css.icon}>{icon}</div>}
+      </div>
       {!customInput && <ValidationError fieldMeta={fieldMeta} />}
     </div>
   );

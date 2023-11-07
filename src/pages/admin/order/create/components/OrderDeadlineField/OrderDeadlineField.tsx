@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable react-hooks/exhaustive-deps */
-import { forwardRef, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { OnChange } from 'react-final-form-listeners';
 import { useIntl } from 'react-intl';
 import classNames from 'classnames';
@@ -10,10 +10,8 @@ import { DateTime } from 'luxon';
 
 import FieldDatePicker from '@components/FormFields/FieldDatePicker/FieldDatePicker';
 import FieldDropdownSelect from '@components/FormFields/FieldDropdownSelect/FieldDropdownSelect';
-import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import IconCalendar from '@components/Icons/IconCalender/IconCalender';
 import IconClock from '@components/Icons/IconClock/IconClock';
-import Tooltip from '@components/Tooltip/Tooltip';
 import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
 import { findValidRangeForDeadlineDate } from '@helpers/orderHelper';
 import { useAppSelector } from '@hooks/reduxHooks';
@@ -34,38 +32,6 @@ type TOrderDeadlineFieldProps = {
   deadlineDateLabel?: string;
   deadlineHourLabel?: string;
 };
-
-// eslint-disable-next-line react/display-name
-const CustomDeadlineFieldInput = forwardRef((props, ref) => {
-  return (
-    <FieldTextInput
-      {...props}
-      id="deadlineDate"
-      name="deadlineDate"
-      className={css.customInput}
-      format={(value) => {
-        return value
-          ? format(new Date(value), 'EEE, dd MMMM, yyyy', {
-              locale: viLocale,
-            })
-          : format(new Date(), 'EEE, dd MMMM, yyyy', {
-              locale: viLocale,
-            });
-      }}
-      leftIcon={
-        <Tooltip
-          overlayClassName={css.tooltipOverlay}
-          tooltipContent={<span>Hạn dành cho người tham gia chọn món</span>}
-          placement="bottomLeft">
-          <div className={css.iconWrapper}>
-            <IconCalendar />
-          </div>
-        </Tooltip>
-      }
-      inputRef={ref}
-    />
-  );
-});
 
 const OrderDeadlineField: React.FC<TOrderDeadlineFieldProps> = (props) => {
   const {
@@ -188,12 +154,16 @@ const OrderDeadlineField: React.FC<TOrderDeadlineFieldProps> = (props) => {
               id: 'OrderDeadlineField.deadlineDateLabel',
             })
           }
+          placeholderText={format(new Date(), 'EEE, dd MMMM, yyyy', {
+            locale: viLocale,
+          })}
           autoComplete="off"
           minDate={minSelectedDate}
           maxDate={maxSelectedDate}
           dateFormat={'EEE, dd MMMM, yyyy'}
           validate={required(deadlineDateRequired)}
-          customInput={<CustomDeadlineFieldInput />}
+          shouldSkipTouched={false}
+          icon={<IconCalendar />}
         />
         <FieldDropdownSelect
           id="deadlineHour"
