@@ -13,6 +13,7 @@ import { Listing } from '@src/utils/data';
 import { EOrderStates, EOrderType } from '@src/utils/enums';
 import { ETransition } from '@src/utils/transaction';
 
+import type { EFlowType } from '../../components/NavigateButtons/NavigateButtons';
 import NavigateButtons from '../../components/NavigateButtons/NavigateButtons';
 
 import css from './ManageFood.module.scss';
@@ -21,10 +22,11 @@ type TManageFoodProps = {
   goBack: () => void;
   nextTab: () => void;
   nextToReviewTab: () => void;
+  flowType?: EFlowType;
 };
 
 const ManageFood: React.FC<TManageFoodProps> = (props) => {
-  const { goBack, nextTab, nextToReviewTab } = props;
+  const { goBack, nextTab, nextToReviewTab, flowType } = props;
   const intl = useIntl();
   const router = useRouter();
   const dispatch = useAppDispatch();
@@ -155,6 +157,7 @@ const ManageFood: React.FC<TManageFoodProps> = (props) => {
       />
 
       <NavigateButtons
+        flowType={flowType}
         goBack={goBack}
         onNextClick={nextTab}
         onCompleteClick={nextToReviewTab}

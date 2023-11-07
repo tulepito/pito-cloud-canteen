@@ -103,6 +103,7 @@ const EditOrderTab: React.FC<any> = (props) => {
     case EEditOrderTab.manageFood:
       return (
         <ManageFood
+          flowType={EFlowType.edit}
           nextTab={nextTab}
           nextToReviewTab={nextToReviewTab}
           goBack={goBack}
