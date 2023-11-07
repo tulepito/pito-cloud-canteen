@@ -10,7 +10,7 @@ import { foodSliceAction, foodSliceThunks } from '@redux/slices/foods.slice';
 import { partnerThunks } from '@redux/slices/partners.slice';
 import { adminRoutes } from '@src/paths';
 import { IntegrationListing } from '@utils/data';
-import { EFoodType, EMenuType } from '@utils/enums';
+import { EFoodApprovalState, EFoodType, EMenuType } from '@utils/enums';
 import { getInitialAddImages } from '@utils/images';
 import type { TIntegrationListing, TObject } from '@utils/types';
 
@@ -70,6 +70,7 @@ const CreatePartnerFoodPage = () => {
         getSubmitFoodData({
           ...values,
           restaurantId: restaurantId as string,
+          adminApproval: EFoodApprovalState.ACCEPTED,
         }),
       ),
     );

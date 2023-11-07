@@ -130,6 +130,10 @@ const uploadImageSlice = createSlice({
         return result;
       }, {}),
     }),
+    addImages: (state, { payload }) => ({
+      ...state,
+      images: payload,
+    }),
   },
   extraReducers: (builder) => {
     builder
@@ -213,7 +217,7 @@ const uploadImageSlice = createSlice({
   },
 });
 
-export const { resetImage, removeImage } = uploadImageSlice.actions;
+export const { resetImage, removeImage, addImages } = uploadImageSlice.actions;
 // ================ Actions ================ //
 export default uploadImageSlice.reducer;
 

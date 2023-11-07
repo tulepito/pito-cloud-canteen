@@ -186,7 +186,9 @@ const FieldMultiplePhotosMobile: React.FC<TFieldMultiplePhotosMobileProps> = (
                           className={css.imageWrapper}>
                           <div
                             className={css.deleteImageBtn}
-                            onClick={onDeleteImage(image.id)}>
+                            onClick={onDeleteImage(
+                              image.id || image.imageId.uuid,
+                            )}>
                             <IconClose className={css.deleteIcon} />
                           </div>
                           <RenderWhen
