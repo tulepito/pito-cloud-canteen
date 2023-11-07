@@ -92,6 +92,8 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
   const confirmChangeOrderDetailControl = useBoolean();
   const shouldNextTabControl = useBoolean();
   const [onNextClick, setOnNextClick] = useState<() => void>(() => () => {});
+  const changedRestaurantController = useBoolean();
+
   const draftEditOrderDetail = useAppSelector(
     (state) => state.Order.draftEditOrderData.orderDetail,
   );
@@ -319,15 +321,14 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
           editTagVersion: editTagVersion ? editTagVersion + 1 : 1,
         }),
       };
+      const { lineItems: currentSubOrderLineItems } =
+        currentOrderDetail[selectedDate?.getTime()] || {};
 
+      const isRestaurantChanged =
+        restaurantData.restaurant.id !==
+        orderDetail[subOrderDate]?.restaurant.id;
+      changedRestaurantController.setValue(isRestaurantChanged);
       if (isNormalOrder) {
-        const {
-          restaurant: currentSubOrderRestaurant,
-          lineItems: currentSubOrderLineItems,
-        } = currentOrderDetail[selectedDate?.getTime()] || {};
-        const isRestaurantChanged =
-          restaurantData.restaurant.id !== currentSubOrderRestaurant?.id;
-
         const createLineItems = (_foodList: TObject) =>
           Object.entries<{
             foodName: string;
@@ -554,7 +555,10 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
       'isHideChangeSelectedFoodConfirmModal',
     );
 
-    if (!isHideChangeSelectedFoodConfirmModal) {
+    if (
+      !isHideChangeSelectedFoodConfirmModal &&
+      changedRestaurantController.value
+    ) {
       changeSelectedFoodConfirmModal.setTrue();
       setOnNextClick(() => handleNextTabClick);
     } else {
@@ -567,7 +571,10 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
       'isHideChangeSelectedFoodConfirmModal',
     );
 
-    if (!isHideChangeSelectedFoodConfirmModal) {
+    if (
+      !isHideChangeSelectedFoodConfirmModal &&
+      changedRestaurantController.value
+    ) {
       changeSelectedFoodConfirmModal.setTrue();
       setOnNextClick(() => handleNextReviewTabClick);
     } else {
@@ -649,6 +656,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
         orderDetail,
       }),
     );
+    changedRestaurantController.setFalse();
   };
 
   // TODO: handle change food in meal
