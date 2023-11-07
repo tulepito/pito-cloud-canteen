@@ -3,6 +3,7 @@ import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
 import classNames from 'classnames';
+import isEmpty from 'lodash/isEmpty';
 import { useRouter } from 'next/router';
 
 import Button from '@components/Button/Button';
@@ -12,6 +13,7 @@ import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput
 import IconGoogle from '@components/Icons/IconGoogle/IconGoogle';
 import IconLock from '@components/Icons/IconLock/IconLock';
 import IconMail from '@components/Icons/IconMail/IconMail';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { generalPaths } from '@src/paths';
 import type { TDefaultProps } from '@utils/types';
 import {
@@ -21,6 +23,8 @@ import {
   required,
 } from '@utils/validators';
 
+import config from '../../../configs';
+
 import css from './SignInForm.module.scss';
 
 export type TSignInFormValues = {
@@ -29,7 +33,6 @@ export type TSignInFormValues = {
 };
 
 type TExtraProps = TDefaultProps & {
-  formId?: string;
   errorMessage?: ReactNode;
   inProgress: boolean;
 };
@@ -46,7 +49,6 @@ const SignInFormComponent: React.FC<TSignInFormComponentProps> = (props) => {
     rootClassName,
     className,
     errorMessage,
-    formId,
     handleSubmit,
     invalid,
     submitting,
@@ -56,38 +58,24 @@ const SignInFormComponent: React.FC<TSignInFormComponentProps> = (props) => {
   const submitInprogress = inProgress || submitting;
   const classes = classNames(rootClassName || css.root, className);
 
+  const shouldShowGoogleSignInBtn = !isEmpty(config.googleClientId);
+  const shouldShowSocialLoginSection = shouldShowGoogleSignInBtn;
+
   const formTitle = intl.formatMessage({
     id: 'SignInForm.title',
   });
-
-  const emailPlaceholder = intl.formatMessage({
-    id: 'SignInForm.email.placeholder',
-  });
-  const emailLabel = intl.formatMessage({
-    id: 'SignInForm.email.label',
-  });
-  const passwordPlaceholder = intl.formatMessage({
-    id: 'SignInForm.password.placeholder',
-  });
-  const passwordLabel = intl.formatMessage({
-    id: 'SignInForm.password.label',
-  });
-
   const submitButtonText = intl.formatMessage({
     id: 'SignInForm.submitButtonText',
   });
-
   const forgotPasswordText = intl.formatMessage({
     id: 'SignInForm.forgotPassword',
   });
   const orText = intl.formatMessage({
     id: 'SignInForm.orText',
   });
-
   const googleLoginText = intl.formatMessage({
     id: 'SignInForm.googleLoginText',
   });
-
   const doNotHaveAnAccountText = intl.formatMessage({
     id: 'SignInForm.doNotHaveAnAccount',
   });
@@ -95,16 +83,38 @@ const SignInFormComponent: React.FC<TSignInFormComponentProps> = (props) => {
     id: 'SignInForm.toSignUp',
   });
 
-  const emailValidators = composeValidators(
-    required(intl.formatMessage({ id: 'SignInForm.email.required' })),
-    emailFormatValid(intl.formatMessage({ id: 'SignInForm.email.invalid' })),
-  );
-  const passwordValidators = composeValidators(
-    required(intl.formatMessage({ id: 'SignInForm.password.required' })),
-    passwordFormatValid(
-      intl.formatMessage({ id: 'SignInForm.password.invalid' }),
+  const fieldEmailProps = {
+    id: 'SignInForm.email',
+    name: 'email',
+    placeholder: intl.formatMessage({
+      id: 'SignInForm.email.placeholder',
+    }),
+    label: intl.formatMessage({
+      id: 'SignInForm.email.label',
+    }),
+    validate: composeValidators(
+      required(intl.formatMessage({ id: 'SignInForm.email.required' })),
+      emailFormatValid(intl.formatMessage({ id: 'SignInForm.email.invalid' })),
     ),
-  );
+    leftIcon: <IconMail />,
+  };
+  const fieldPasswordProps = {
+    id: 'SignInForm.password',
+    name: 'password',
+    placeholder: intl.formatMessage({
+      id: 'SignInForm.password.placeholder',
+    }),
+    label: intl.formatMessage({
+      id: 'SignInForm.password.label',
+    }),
+    validate: composeValidators(
+      required(intl.formatMessage({ id: 'SignInForm.password.required' })),
+      passwordFormatValid(
+        intl.formatMessage({ id: 'SignInForm.password.invalid' }),
+      ),
+    ),
+    leftIcon: <IconLock />,
+  };
 
   const navigateToSignUpPage = () => {
     router.push({ pathname: generalPaths.SignUp, query });
@@ -128,23 +138,8 @@ const SignInFormComponent: React.FC<TSignInFormComponentProps> = (props) => {
               </span>
             </div>
           </div>
-          <FieldTextInput
-            id={formId ? `${formId}.email` : 'email'}
-            name="email"
-            placeholder={emailPlaceholder}
-            validate={emailValidators}
-            leftIcon={<IconMail />}
-            label={emailLabel}
-          />
-
-          <FieldPasswordInput
-            id={formId ? `${formId}.password` : 'password'}
-            name="password"
-            placeholder={passwordPlaceholder}
-            validate={passwordValidators}
-            leftIcon={<IconLock />}
-            label={passwordLabel}
-          />
+          <FieldTextInput {...fieldEmailProps} />
+          <FieldPasswordInput {...fieldPasswordProps} />
 
           <div className={css.forgotPassword}>
             <span onClick={navigateToPasswordRecoverPage}>
@@ -164,13 +159,20 @@ const SignInFormComponent: React.FC<TSignInFormComponentProps> = (props) => {
               inProgress={submitInprogress}>
               {submitButtonText}
             </Button>
-            <div className={css.orText}>
-              <span>{orText}</span>
-            </div>
-            <Button className={css.googleLoginButton} type="button" disabled>
-              <IconGoogle className={css.googleIcon} />
-              <span>{googleLoginText}</span>
-            </Button>
+            <RenderWhen condition={shouldShowSocialLoginSection}>
+              <div className={css.orText}>
+                <span>{orText}</span>
+              </div>
+              <RenderWhen condition={shouldShowGoogleSignInBtn}>
+                <Button
+                  className={css.googleLoginButton}
+                  type="button"
+                  disabled>
+                  <IconGoogle className={css.googleIcon} />
+                  <span>{googleLoginText}</span>
+                </Button>
+              </RenderWhen>
+            </RenderWhen>
           </div>
         </div>
 
@@ -183,11 +185,15 @@ const SignInFormComponent: React.FC<TSignInFormComponentProps> = (props) => {
             inProgress={submitInprogress}>
             {submitButtonText}
           </Button>
-          <div>hoặc</div>
-          <Button className={css.googleLoginButton} type="button" disabled>
-            <IconGoogle className={css.googleIcon} />
-            <span>{googleLoginText}</span>
-          </Button>
+          <RenderWhen condition={shouldShowSocialLoginSection}>
+            <div>hoặc</div>
+            <RenderWhen condition={shouldShowGoogleSignInBtn}>
+              <Button className={css.googleLoginButton} type="button">
+                <IconGoogle className={css.googleIcon} />
+                <span>{googleLoginText}</span>
+              </Button>
+            </RenderWhen>
+          </RenderWhen>
         </div>
       </div>
     </Form>
