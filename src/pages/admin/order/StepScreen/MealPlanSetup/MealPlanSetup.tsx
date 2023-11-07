@@ -95,7 +95,6 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
     dayInWeek,
     packagePerMember = '',
     vatAllow = true,
-    pickAllow = true,
     selectedGroups = ['allMembers'],
     deliveryHour,
     startDate,
@@ -111,7 +110,9 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
     daySession,
     plans = [],
     orderState = EOrderDraftStates.pendingApproval,
+    orderType = EOrderType.group,
   } = orderMetadata;
+  const isGroupOrder = orderType === EOrderType.group;
   const { address, origin } = deliveryAddress || {};
 
   const isPendingBookerApprovalOrder =
@@ -188,9 +189,9 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
     () => ({
       vatAllow: typeof draftVatAllow !== 'undefined' ? draftVatAllow : vatAllow,
       pickAllow:
-        typeof draftPickAllow !== 'undefined' ? draftPickAllow : pickAllow,
+        typeof draftPickAllow !== 'undefined' ? draftPickAllow : isGroupOrder,
       orderType: (
-        typeof draftPickAllow !== 'undefined' ? draftPickAllow : pickAllow
+        typeof draftPickAllow !== 'undefined' ? draftPickAllow : isGroupOrder
       )
         ? EOrderType.group
         : EOrderType.normal,
