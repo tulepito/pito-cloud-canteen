@@ -10,12 +10,14 @@ type TChangeSelectedFoodConfirmModalProps = {
   isOpen: boolean;
   handleClose: () => void;
   onCancelChangeFood: () => void;
+  onConfirmChangeFood: () => void;
 };
 
 const ChangeSelectedFoodConfirmModal: React.FC<
   TChangeSelectedFoodConfirmModalProps
 > = (props) => {
-  const { isOpen, handleClose, onCancelChangeFood } = props;
+  const { isOpen, handleClose, onCancelChangeFood, onConfirmChangeFood } =
+    props;
   const onChange = (e: any) => {
     setItem('isHideChangeSelectedFoodConfirmModal', e.target.checked);
   };
@@ -67,7 +69,10 @@ const ChangeSelectedFoodConfirmModal: React.FC<
             onClick={handleCancel}>
             Huỷ thay đổi
           </Button>
-          <Button className={css.btn} variant="primary" onClick={handleClose}>
+          <Button
+            className={css.btn}
+            variant="primary"
+            onClick={onConfirmChangeFood}>
             Tiếp tục
           </Button>
         </div>

@@ -1,9 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import classNames from 'classnames';
-import { filter, has } from 'lodash';
+import { has, pickBy } from 'lodash';
 import isEmpty from 'lodash/isEmpty';
 import isEqual from 'lodash/isEqual';
 import { DateTime } from 'luxon';
@@ -91,6 +91,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
   const changeSelectedFoodConfirmModal = useBoolean();
   const confirmChangeOrderDetailControl = useBoolean();
   const shouldNextTabControl = useBoolean();
+  const [onNextClick, setOnNextClick] = useState<() => void>(() => () => {});
   const draftEditOrderDetail = useAppSelector(
     (state) => state.Order.draftEditOrderData.orderDetail,
   );
@@ -326,13 +327,44 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
         } = currentOrderDetail[selectedDate?.getTime()] || {};
         const isRestaurantChanged =
           restaurantData.restaurant.id !== currentSubOrderRestaurant?.id;
-        const newLineItems = filter(currentSubOrderLineItems, (item: any) =>
-          has(selectedFoodList, item.id),
+
+        const createLineItems = (_foodList: TObject) =>
+          Object.entries<{
+            foodName: string;
+            foodPrice: number;
+          }>(_foodList).map(([foodId, { foodName, foodPrice }]) => {
+            return {
+              id: foodId,
+              name: foodName,
+              unitPrice: foodPrice,
+              price: foodPrice,
+              quantity: 1,
+            };
+          });
+        const removeDeletedFoodLineItems = currentSubOrderLineItems.filter(
+          (lineItem: TObject) => has(selectedFoodList, lineItem.id),
         );
+        const currentFoodIds = currentSubOrderLineItems.map(
+          (lineItem: TObject) => lineItem.id,
+        );
+        const newFoodList = pickBy(
+          selectedFoodList,
+          (_, foodId: string) => !currentFoodIds.includes(foodId),
+        );
+        const newPickedLineItems = createLineItems(newFoodList);
+
+        const updatedLineItems = [
+          ...removeDeletedFoodLineItems,
+          ...newPickedLineItems,
+        ];
+
+        const newLineItems = isNormalOrder
+          ? createLineItems(selectedFoodList)
+          : [];
 
         updateOrderDetailOnDate = {
           ...updateOrderDetailOnDate,
-          lineItems: isRestaurantChanged ? [] : newLineItems,
+          lineItems: isRestaurantChanged ? newLineItems : updatedLineItems,
         };
       }
 
@@ -517,6 +549,32 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     }
   };
 
+  const handleNextTabClickWithConfirmationModal = () => {
+    const isHideChangeSelectedFoodConfirmModal = getItem(
+      'isHideChangeSelectedFoodConfirmModal',
+    );
+
+    if (!isHideChangeSelectedFoodConfirmModal) {
+      changeSelectedFoodConfirmModal.setTrue();
+      setOnNextClick(() => handleNextTabClick);
+    } else {
+      handleNextTabClick();
+    }
+  };
+
+  const handleNextReviewTabClickWithConfirmationModal = () => {
+    const isHideChangeSelectedFoodConfirmModal = getItem(
+      'isHideChangeSelectedFoodConfirmModal',
+    );
+
+    if (!isHideChangeSelectedFoodConfirmModal) {
+      changeSelectedFoodConfirmModal.setTrue();
+      setOnNextClick(() => handleNextReviewTabClick);
+    } else {
+      handleNextReviewTabClick();
+    }
+  };
+
   useEffect(() => {
     if (!isEmpty(restaurantListFromOrder)) {
       dispatch(orderAsyncActions.fetchRestaurantCoverImages({ isEditFlow }));
@@ -583,14 +641,6 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
       selectedFoodList: submitFoodListData,
     });
     closePickFoodModal();
-
-    const isHideChangeSelectedFoodConfirmModal = getItem(
-      'isHideChangeSelectedFoodConfirmModal',
-    );
-
-    if (!isHideChangeSelectedFoodConfirmModal) {
-      changeSelectedFoodConfirmModal.setTrue();
-    }
   };
 
   const onCancelChangeFood = () => {
@@ -885,10 +935,10 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
             </div>
             <NavigateButtons
               goBack={goBack}
-              onNextClick={handleNextTabClick}
+              onNextClick={handleNextTabClickWithConfirmationModal}
               submitDisabled={disabledSubmit}
               inProgress={inProgress}
-              onCompleteClick={handleNextReviewTabClick}
+              onCompleteClick={handleNextReviewTabClickWithConfirmationModal}
               flowType={flowType}
             />
             <OrderSettingModal
@@ -912,6 +962,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
         isOpen={changeSelectedFoodConfirmModal.value}
         handleClose={changeSelectedFoodConfirmModal.setFalse}
         onCancelChangeFood={onCancelChangeFood}
+        onConfirmChangeFood={onNextClick}
       />
       <AlertModal
         isOpen={confirmChangeOrderDetailControl.value}
