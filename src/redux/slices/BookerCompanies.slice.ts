@@ -4,6 +4,8 @@ import { getCompaniesApi } from '@apis/index';
 import { createAsyncThunk } from '@redux/redux.helper';
 import type { TUser } from '@src/utils/types';
 
+import { QuizActions } from './Quiz.slice';
+
 // ================ Initial states ================ //
 type TBookerCompaniesState = {
   companies: TUser[];
@@ -18,8 +20,10 @@ const FETCH_BOOKER_COMPANIES = 'app/BookerCompanies/FETCH_BOOKER_COMPANIES';
 // ================ Async thunks ================ //
 const fetchBookerCompanies = createAsyncThunk(
   FETCH_BOOKER_COMPANIES,
-  async () => {
+  async (_, { dispatch }) => {
     const { data: response } = await getCompaniesApi();
+    const [company] = response || [];
+    dispatch(QuizActions.setSelectedCompany(company));
 
     return response;
   },

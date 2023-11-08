@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { resetOrder } from '@redux/slices/Order.slice';
-import { QuizActions } from '@redux/slices/Quiz.slice';
 import { CurrentUser } from '@src/utils/data';
 import { QuizStep } from '@src/utils/enums';
 
@@ -42,7 +41,6 @@ const QuizFlow = () => {
   const currentStep = useAppSelector(
     (state) => state.BookerNewOrderPage.currentStep,
   );
-  const [company] = useAppSelector((state) => state.BookerCompanies.companies);
   const currentUser = useAppSelector((state) => state.user.currentUser);
 
   const { hasOrderBefore = false } = CurrentUser(currentUser!).getPrivateData();
@@ -53,11 +51,6 @@ const QuizFlow = () => {
   useEffect(() => {
     dispatch(resetOrder());
   }, [dispatch]);
-
-  useEffect(() => {
-    dispatch(QuizActions.setSelectedCompany(company));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [JSON.stringify(company)]);
 
   useEffect(() => {
     if (hasOrderBefore) {
