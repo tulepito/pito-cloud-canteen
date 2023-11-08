@@ -1099,6 +1099,7 @@
   "MealDateForm.OrderDeadlineField.label.date": "Chọn ngày kết thúc chọn món",
   "MealDateForm.OrderDeadlineField.label.hour": "Chọn giờ kết thúc chọn món",
   "MealDateForm.orderTypeField.label": "Tạo đơn nhóm",
+  "MealDateForm.usePreviousDataLabel": "Sao chép đơn hàng gần nhất",
   "MealDateRoute.description": "Tạo đơn | Cài đặt ngày ăn",
   "MealDateRoute.title": "Tạo đơn | Cài đặt ngày ăn",
   "MealPlanCard.content.viewMenu": "Xem menu",

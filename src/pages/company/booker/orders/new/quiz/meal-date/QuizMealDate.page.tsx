@@ -126,6 +126,7 @@ const QuizMealDate: React.FC<TQuizMealDateProps> = ({ stepInfo }) => {
       onBack={hasOrderBefore ? undefined : backStep}>
       <MealDateForm
         onSubmit={() => {}}
+        hasOrderBefore={hasOrderBefore}
         setFormValues={setFormValues}
         setFormInvalid={setFormInvalid}
         initialValues={initialValues}

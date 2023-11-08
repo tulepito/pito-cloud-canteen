@@ -3,13 +3,17 @@ import { useEffect, useMemo } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
+import classNames from 'classnames';
 
 import Form from '@components/Form/Form';
 import FieldCheckbox from '@components/FormFields/FieldCheckbox/FieldCheckbox';
 import FieldDropdownSelect from '@components/FormFields/FieldDropdownSelect/FieldDropdownSelect';
 import IconClock from '@components/Icons/IconClock/IconClock';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
+import Toggle from '@components/Toggle/Toggle';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import DayInWeekField from '@pages/admin/order/create/components/DayInWeekField/DayInWeekField';
+import { QuizActions } from '@redux/slices/Quiz.slice';
 import { generateTimeRangeItems } from '@src/utils/dates';
 import { required } from '@src/utils/validators';
 
@@ -23,6 +27,7 @@ const TIME_OPTIONS = generateTimeRangeItems({});
 export type TMealDateFormValues = {
   startDate: number;
   endDate: number;
+  usePreviousData?: boolean;
   deadlineDate: number;
   dayInWeek: string[];
   isGroupOrder: string[];
@@ -31,6 +36,7 @@ export type TMealDateFormValues = {
 };
 
 type TExtraProps = {
+  hasOrderBefore?: boolean;
   setFormValues: (values: TMealDateFormValues) => void;
   setFormInvalid: (invalid: boolean) => void;
   onClickOrderDates: () => void;
@@ -48,6 +54,7 @@ const MealDateFormComponent: React.FC<TMealDateFormComponentProps> = (
   const {
     handleSubmit,
     form,
+    hasOrderBefore = false,
     values,
     setFormValues,
     invalid,
@@ -58,7 +65,12 @@ const MealDateFormComponent: React.FC<TMealDateFormComponentProps> = (
     onClickDeadlineDate,
   } = props;
   const intl = useIntl();
+  const dispatch = useAppDispatch();
+  const reorderOpen = useAppSelector((state) => state.Quiz.reorderOpen);
 
+  const usePreviousDataLabel = intl.formatMessage({
+    id: 'MealDateForm.usePreviousDataLabel',
+  });
   const deliveryHourRequiredMessage = intl.formatMessage({
     id: 'MealPlanDateField.deliveryHourRequired',
   });
@@ -78,6 +90,15 @@ const MealDateFormComponent: React.FC<TMealDateFormComponentProps> = (
     deadlineDate: deadlineDateInitialValue,
     isGroupOrder,
   } = values;
+
+  const handleUsePreviousData = (checked: boolean) => {
+    form.change('usePreviousData', checked);
+    dispatch(QuizActions.copyPreviousOrder());
+
+    if (!checked) {
+      dispatch(QuizActions.clearPreviousOrder());
+    }
+  };
 
   useEffect(() => {
     setFormValues?.(values);
@@ -100,6 +121,17 @@ const MealDateFormComponent: React.FC<TMealDateFormComponentProps> = (
           values={values}
           onClick={onClickOrderDates}
         />
+        <RenderWhen condition={hasOrderBefore && !reorderOpen}>
+          <Toggle
+            id="MealDateForm.usePreviousData"
+            name="usePreviousData"
+            className={classNames(css.toggle, css.input)}
+            onClick={handleUsePreviousData}
+            status={values?.usePreviousData ? 'on' : 'off'}
+            label={usePreviousDataLabel}
+          />
+        </RenderWhen>
+
         <DayInWeekField
           form={form}
           values={values}
