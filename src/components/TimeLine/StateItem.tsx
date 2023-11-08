@@ -5,6 +5,7 @@ import classNames from 'classnames';
 import IconCancel from '@components/Icons/IconCancel/IconCancel';
 import IconDelivering from '@components/Icons/IconDelivering/IconDelivering';
 import IconTickWithBackground from '@components/Icons/IconTickWithBackground/IconTickWithBackground';
+import IconWarning from '@components/Icons/IconWarning/IconWarning';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import Tooltip from '@components/Tooltip/Tooltip';
 import { ETransition } from '@utils/transaction';
@@ -17,19 +18,38 @@ import css from './StateItem.module.scss';
 type TStateItemProps = TTimeLineItemProps;
 
 const StateItem: React.FC<TStateItemProps> = ({
-  data: { date, tx },
+  data: { date, orderData, transactionData },
   rootClassName,
   className,
   isAdminLayout = false,
 }) => {
   const rootClasses = classNames(rootClassName || css.root, className);
-  const { lastTransition, transactionId } = tx || {};
+  const { lastTransition, transactionId } = orderData || {};
 
   let stateComponent = <div className={classNames(css.icon, css.iconEmpty)} />;
 
   switch (lastTransition) {
     case ETransition.INITIATE_TRANSACTION:
       break;
+    case ETransition.PARTNER_CONFIRM_SUB_ORDER: {
+      if (isAdminLayout) {
+        stateComponent = (
+          <IconTickWithBackground
+            className={classNames(css.icon, css.confirmIcon)}
+          />
+        );
+      }
+      break;
+    }
+    case ETransition.PARTNER_REJECT_SUB_ORDER: {
+      if (isAdminLayout) {
+        stateComponent = (
+          <IconWarning className={classNames(css.icon, css.rejectIcon)} />
+        );
+      }
+
+      break;
+    }
     case ETransition.START_DELIVERY:
       stateComponent = <IconDelivering className={css.icon} />;
       break;
@@ -43,6 +63,8 @@ const StateItem: React.FC<TStateItemProps> = ({
       stateComponent = <IconCancel className={css.icon} />;
       break;
     case ETransition.OPERATOR_CANCEL_PLAN:
+    case ETransition.OPERATOR_CANCEL_AFTER_PARTNER_CONFIRMED:
+    case ETransition.OPERATOR_CANCEL_AFTER_PARTNER_REJECTED:
       stateComponent = <IconCancel className={css.icon} />;
       break;
 
@@ -55,9 +77,10 @@ const StateItem: React.FC<TStateItemProps> = ({
       <StateItemTooltip
         lastTransition={lastTransition}
         transactionId={transactionId}
+        transaction={transactionData}
       />
     );
-  }, [JSON.stringify(tx)]);
+  }, [lastTransition, transactionId, JSON.stringify(transactionData)]);
 
   const stateItemComponent = useMemo(
     () => (

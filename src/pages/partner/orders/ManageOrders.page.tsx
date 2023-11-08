@@ -409,6 +409,10 @@ const ManageOrdersPage = () => {
         );
       });
     }
+
+    return () => {
+      dispatch(PartnerManageOrdersActions.resetStates());
+    };
   }, []);
 
   return (

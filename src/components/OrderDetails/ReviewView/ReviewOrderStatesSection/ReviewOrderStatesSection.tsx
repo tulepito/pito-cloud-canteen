@@ -11,14 +11,27 @@ import type { TObject, TTransaction } from '@utils/types';
 
 import css from './ReviewOrderStatesSection.module.scss';
 
-const prepareItemFromData = (orderDetail: TObject<number, TTransaction>) => {
+const prepareItemFromData = ({
+  orderDetail,
+  transactionMap,
+}: {
+  transactionMap: TObject<string | number, TTransaction>;
+  orderDetail: TObject;
+}) => {
   const items = Object.entries(orderDetail)
-    .map(([date, tx]) => {
-      return { date: Number(date), tx };
+    .map(([date, orderData]) => {
+      return {
+        date: Number(date),
+        orderData,
+        transactionData: transactionMap[date],
+      };
     })
     .sort((item, item2) => item.date - item2.date)
-    .map(({ date, tx }) => {
-      return { date: formatTimestamp(Number(date), 'dd/M/yyyy'), tx };
+    .map(({ date, ...rest }) => {
+      return {
+        date: formatTimestamp(Number(date), 'dd/M/yyyy'),
+        ...rest,
+      };
     });
 
   return items;
@@ -27,6 +40,7 @@ const prepareItemFromData = (orderDetail: TObject<number, TTransaction>) => {
 type TReviewOrderStatesSectionProps = {
   data: {
     orderDetail: TObject;
+    transactionMap?: TObject<string, TTransaction>;
     isCanceledOrder: boolean;
   };
   isAdminLayout?: boolean;
@@ -34,14 +48,18 @@ type TReviewOrderStatesSectionProps = {
 };
 
 const ReviewOrderStatesSection: React.FC<TReviewOrderStatesSectionProps> = ({
-  data: { orderDetail = {}, isCanceledOrder },
+  data: { orderDetail = {}, isCanceledOrder, transactionMap = {} },
   isAdminLayout = false,
   className,
 }) => {
   const items = useMemo(
-    () => prepareItemFromData(orderDetail),
+    () =>
+      prepareItemFromData({
+        orderDetail,
+        transactionMap,
+      }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [JSON.stringify(orderDetail)],
+    [JSON.stringify(orderDetail), JSON.stringify(transactionMap)],
   );
 
   const classes = classNames(css.root, className);

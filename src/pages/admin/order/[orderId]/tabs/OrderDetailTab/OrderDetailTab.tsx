@@ -70,6 +70,7 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
 
   const {
     subOrderChangesHistory,
+    transactionMap,
     lastRecordSubOrderChangesHistoryCreatedAt,
     querySubOrderChangesHistoryInProgress,
     subOrderChangesHistoryTotalItems,
@@ -287,7 +288,11 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
         />
         <RenderWhen condition={showStateSectionCondition}>
           <ReviewOrderStatesSection
-            data={{ orderDetail, isCanceledOrder: false }}
+            data={{
+              orderDetail,
+              transactionMap,
+              isCanceledOrder: false,
+            }}
             isAdminLayout
             className={css.reviewOrderStates}
           />

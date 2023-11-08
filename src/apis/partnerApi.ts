@@ -83,3 +83,17 @@ export const publishDraftMenuApi = (body: TObject) => {
 export const getMenuApi = (menuId: string) => {
   return getApi(`${BASE_URL}/menus`, { menuId });
 };
+
+export const transitSubOrderTransactionApi = ({
+  orderId,
+  subOrderDate,
+  transactionId,
+  newTransition,
+  partnerId,
+}: TObject) => {
+  return putApi(`${BASE_URL}/${partnerId}/orders/${orderId}/transit`, {
+    subOrderDate,
+    transactionId,
+    newTransition,
+  });
+};

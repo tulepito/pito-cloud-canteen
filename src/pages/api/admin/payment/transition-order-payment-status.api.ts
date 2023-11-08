@@ -1,3 +1,4 @@
+import groupBy from 'lodash/groupBy';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { calculatePaidAmountBySubOrderDate } from '@pages/admin/order/[orderId]/helpers/AdminOrderDetail';
@@ -8,9 +9,20 @@ import { queryPaymentRecordOnFirebase } from '@services/payment';
 import { handleError } from '@services/sdk';
 import { Listing } from '@src/utils/data';
 import { EOrderStates, EPaymentType, ESubOrderStatus } from '@src/utils/enums';
-import { ETransition } from '@src/utils/transaction';
+import { TRANSITIONS_TO_STATE_CANCELED } from '@src/utils/transaction';
+import type { TObject } from '@src/utils/types';
 
 import { calculateClientTotalPriceAndPaidAmount } from './check-valid-payment.service';
+
+const isOrderDetailOnDateInActive = (orderDetailOnDate: TObject) => {
+  const { transactionId, status, lastTransition } = orderDetailOnDate || {};
+
+  return (
+    !transactionId ||
+    (transactionId && status === ESubOrderStatus.canceled) ||
+    TRANSITIONS_TO_STATE_CANCELED.includes(lastTransition)
+  );
+};
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   const integrationSdk = getIntegrationSdk();
@@ -18,19 +30,17 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     const { orderId, planId: planIdFromBody } = req.body;
 
     const order = await fetchListing(orderId);
-    const orderListing = Listing(order);
     const {
       orderStateHistory,
       orderState,
       isAdminConfirmedClientPayment = false,
       plans = [],
-    } = orderListing.getMetadata();
+    } = Listing(order).getMetadata();
 
     const planId = planIdFromBody || plans[0];
 
     const plan = await fetchListing(planId);
-    const planListing = Listing(plan);
-    const { orderDetail = {} } = planListing.getMetadata();
+    const { orderDetail = {} } = Listing(plan).getMetadata();
 
     // get all client payment records
     const clientPaymentRecords = await queryPaymentRecordOnFirebase({
@@ -51,30 +61,15 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       paymentType: EPaymentType.PARTNER,
       orderId,
     });
-
-    const groupPaymentRecordsBySubOrderDate = partnerPaymentRecords?.reduce(
-      (acc: any, cur: any) => {
-        const { subOrderDate } = cur;
-        if (!acc[subOrderDate]) {
-          acc[subOrderDate] = [];
-        }
-        acc[subOrderDate].push(cur);
-
-        return acc;
-      },
-      {},
+    const groupPaymentRecordsBySubOrderDate = groupBy(
+      partnerPaymentRecords || [],
+      'subOrderDate',
     );
 
     const subOrderDatePaymentStatus = Object.keys(
       groupPaymentRecordsBySubOrderDate,
     ).reduce((result: any, subOrderDate: string) => {
-      if (
-        !orderDetail[subOrderDate]?.transactionId ||
-        (orderDetail[subOrderDate]?.transactionId &&
-          orderDetail[subOrderDate]?.status === ESubOrderStatus.canceled) ||
-        orderDetail[subOrderDate]?.lastTransition ===
-          ETransition.OPERATOR_CANCEL_PLAN
-      ) {
+      if (isOrderDetailOnDateInActive(orderDetail[subOrderDate] || {})) {
         return result;
       }
       const paymentRecords = groupPaymentRecordsBySubOrderDate[subOrderDate];
@@ -87,22 +82,40 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       };
     }, {});
 
-    const newOrderDetail = Object.keys(orderDetail).reduce(
+    const { newOrderDetail, activeOrderDetail } = Object.keys(
+      orderDetail,
+    ).reduce(
       (result: any, subOrderDate: string) => {
         const { isAdminPaymentConfirmed = false } =
           orderDetail[subOrderDate] || {};
 
+        const isInActiveDate = isOrderDetailOnDateInActive(
+          orderDetail[subOrderDate],
+        );
+        const isPaid =
+          Boolean(subOrderDatePaymentStatus[subOrderDate]) ||
+          isAdminPaymentConfirmed;
+
         return {
-          ...result,
-          [subOrderDate]: {
-            ...orderDetail[subOrderDate],
-            isPaid:
-              Boolean(subOrderDatePaymentStatus[subOrderDate]) ||
-              isAdminPaymentConfirmed,
+          newOrderDetail: {
+            ...result.newOrderDetail,
+            [subOrderDate]: {
+              ...orderDetail[subOrderDate],
+              isPaid,
+            },
+          },
+          activeOrderDetail: {
+            ...result.activeOrderDetail,
+            ...(!isInActiveDate && {
+              [subOrderDate]: orderDetail[subOrderDate],
+            }),
           },
         };
       },
-      {},
+      {
+        newOrderDetail: {},
+        activeOrderDetail: {},
+      },
     );
 
     // Update payment status for sub order date
@@ -112,26 +125,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         orderDetail: newOrderDetail,
       },
     });
-
-    const activeOrderDetail = Object.keys(orderDetail).reduce(
-      (result: any, subOrderDate: string) => {
-        if (
-          !orderDetail[subOrderDate]?.transactionId ||
-          (orderDetail[subOrderDate]?.transactionId &&
-            orderDetail[subOrderDate]?.status === ESubOrderStatus.canceled) ||
-          orderDetail[subOrderDate]?.lastTransition ===
-            ETransition.OPERATOR_CANCEL_PLAN
-        ) {
-          return result;
-        }
-
-        return {
-          ...result,
-          [subOrderDate]: orderDetail[subOrderDate],
-        };
-      },
-      {},
-    );
 
     const isPaymentNumberEqualToSubOrderDateNumber =
       Object.keys(activeOrderDetail).length ===
@@ -168,25 +161,19 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         updateIsPartnerSufficientPaid
           ? {
               orderState: EOrderStates.completed,
-              orderStateHistory: [
-                ...orderStateHistory,
-                {
-                  state: EOrderStates.completed,
-                  updatedAt: new Date().getTime(),
-                },
-              ],
+              orderStateHistory: orderStateHistory.concat({
+                state: EOrderStates.completed,
+                updatedAt: new Date().getTime(),
+              }),
             }
           : !isOrderPendingPayment &&
             isOrderStateIncludePendingPaymentOrComplete
           ? {
               orderState: EOrderStates.pendingPayment,
-              orderStateHistory: [
-                ...orderStateHistory,
-                {
-                  state: EOrderStates.pendingPayment,
-                  updatedAt: new Date().getTime(),
-                },
-              ],
+              orderStateHistory: orderStateHistory.concat({
+                state: EOrderStates.pendingPayment,
+                updatedAt: new Date().getTime(),
+              }),
             }
           : {}),
       },

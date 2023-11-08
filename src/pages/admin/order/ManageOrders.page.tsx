@@ -40,6 +40,8 @@ import {
   txIsDelivered,
   txIsDelivering,
   txIsInitiated,
+  txIsPartnerConfirmed,
+  txIsPartnerRejected,
 } from '@src/utils/transaction';
 import { formatTimestamp, getDayOfWeek } from '@utils/dates';
 import { EOrderDraftStates, EOrderStates, EOrderType } from '@utils/enums';
@@ -83,6 +85,9 @@ const BADGE_TYPE_BASE_ON_ORDER_STATE = {
   [ETransition.START_DELIVERY]: EBadgeType.darkBlue,
   [ETransition.COMPLETE_DELIVERY]: EBadgeType.strongSuccess,
   [ETransition.OPERATOR_CANCEL_PLAN]: EBadgeType.strongDanger,
+  [ETransition.OPERATOR_CANCEL_AFTER_PARTNER_CONFIRMED]:
+    EBadgeType.strongDanger,
+  [ETransition.OPERATOR_CANCEL_AFTER_PARTNER_REJECTED]: EBadgeType.strongDanger,
 };
 
 const BADGE_CLASS_NAME_BASE_ON_ORDER_STATE = {
@@ -125,6 +130,12 @@ const renderBadgeForSubOrder = (
         label="Đang triển khai"
       />
     );
+  }
+  if (txIsPartnerConfirmed(tx)) {
+    return <Badge type={EBadgeType.strongWarning} label="Đối tác xác nhận" />;
+  }
+  if (txIsPartnerRejected(tx)) {
+    return <Badge type={EBadgeType.strongDefault} label="Đối tác từ chối" />;
   }
   if (txIsDelivering(tx)) {
     return (
@@ -176,16 +187,17 @@ const OrderDetailTooltip = ({
           lastTransition,
           transactionId,
           totalPrice = 0,
-        } = orderDetail[key];
+        } = orderDetail[key] || {};
 
         return (
           <div key={key} className={css.orderDetailTooltipItem}>
             <StateItem
               className={css.stateItem}
               data={{
-                tx: { lastTransition, transactionId },
+                orderData: { lastTransition, transactionId },
                 date: formatTimestamp(Number(key)),
               }}
+              isAdminLayout
             />
             <span>{parsePrice(String(totalPrice))}đ</span>
           </div>

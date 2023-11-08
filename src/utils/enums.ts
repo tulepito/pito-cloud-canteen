@@ -428,3 +428,12 @@ export enum QuizStep {
   INVITE_MEMBER = 'invite-member',
   ORDER_CREATING = 'order-creating',
 }
+
+export enum EOnWheelOrderStatus {
+  idle = 'IDLE',
+  inProcess = 'IN PROCESS',
+  cancelled = 'CANCELLED',
+  completed = 'COMPLETED',
+  accepted = 'ACCEPTED',
+  assigning = 'ASSIGNING',
+}

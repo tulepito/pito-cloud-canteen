@@ -9,6 +9,7 @@ import { useRouter } from 'next/router';
 
 import Button from '@components/Button/Button';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
+import MobileBottomContainer from '@components/MobileBottomContainer/MobileBottomContainer';
 import PopupModal from '@components/PopupModal/PopupModal';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { groupFoodOrderByDate } from '@helpers/order/orderDetailHelper';
@@ -20,9 +21,13 @@ import {
   NotificationThunks,
 } from '@redux/slices/notification.slice';
 import { partnerPaths } from '@src/paths';
-import { Listing } from '@src/utils/data';
+import { Listing, Transaction } from '@src/utils/data';
 import { formatTimestamp } from '@src/utils/dates';
 import { ENotificationType, EOrderType } from '@src/utils/enums';
+import {
+  CHANGE_STRUCTURE_TX_PROCESS_VERSION,
+  ETransition,
+} from '@src/utils/transaction';
 import type { TListing, TObject } from '@src/utils/types';
 
 import MobileSubOrderSummary from './components/MobileSubOrderSummary/MobileSubOrderSummary';
@@ -51,8 +56,17 @@ const PartnerSubOrderDetailPage: React.FC<
     (state) => state.Notification.notifications,
   );
   const order = useAppSelector((state) => state.PartnerSubOrderDetail.order);
+  const transaction = useAppSelector(
+    (state) => state.PartnerSubOrderDetail.transaction,
+  );
+  const transitInProgress = useAppSelector(
+    (state) => state.PartnerSubOrderDetail.transitInProgress,
+  );
   const fetchOrderInProgress = useAppSelector(
     (state) => state.PartnerSubOrderDetail.fetchOrderInProgress,
+  );
+  const queryTransactionInProgress = useAppSelector(
+    (state) => state.PartnerSubOrderDetail.queryTransactionInProgress,
   );
   const isFetchingOrderDetails = useAppSelector(
     (state) => state.OrderManagement.fetchOrderInProgress,
@@ -77,6 +91,23 @@ const PartnerSubOrderDetailPage: React.FC<
   const { orderType = EOrderType.group } = orderGetter.getMetadata();
   const { orderDetail = {} } = planGetter.getMetadata();
   const isGroupOrder = orderType === EOrderType.group;
+
+  // TODO: handle transaction data
+  const txGetter = Transaction(transaction!);
+  const {
+    lastTransition,
+    processVersion = CHANGE_STRUCTURE_TX_PROCESS_VERSION - 1,
+  } = txGetter.getAttributes();
+
+  const isNewStructureTxVersion =
+    processVersion >= CHANGE_STRUCTURE_TX_PROCESS_VERSION;
+
+  const shouldShowActionWrapper =
+    !fetchOrderInProgress &&
+    !queryTransactionInProgress &&
+    isNewStructureTxVersion &&
+    lastTransition === ETransition.INITIATE_TRANSACTION;
+  //
 
   const isSummaryViewMode =
     viewMode === EPartnerSubOrderDetailPageViewMode.summary;
@@ -160,6 +191,33 @@ const PartnerSubOrderDetailPage: React.FC<
     router.push(partnerPaths.ManageOrders);
   };
 
+  const handleTransit = (newTransition: ETransition) => () => {
+    dispatch(
+      PartnerSubOrderDetailThunks.transitSubOrderTransaction({
+        orderId,
+        subOrderDate: date,
+        transactionId: txGetter.getId(),
+        newTransition,
+      }),
+    );
+  };
+
+  const actionBtns = (
+    <>
+      <Button
+        variant="secondary"
+        disabled={transitInProgress}
+        onClick={handleTransit(ETransition.PARTNER_REJECT_SUB_ORDER)}>
+        Từ chối
+      </Button>
+      <Button
+        disabled={transitInProgress}
+        onClick={handleTransit(ETransition.PARTNER_CONFIRM_SUB_ORDER)}>
+        Xác nhận
+      </Button>
+    </>
+  );
+
   useEffect(() => {
     if (subOrderId && date && isReady) {
       dispatch(PartnerSubOrderDetailThunks.loadData({ orderId, date }));
@@ -217,6 +275,13 @@ const PartnerSubOrderDetailPage: React.FC<
               inProgress={fetchOrderInProgress || isFetchingOrderDetails}
             />
           </div>
+          <RenderWhen condition={shouldShowActionWrapper}>
+            <div className={css.subOrderSummaryActionWrapper}>{actionBtns}</div>
+            <MobileBottomContainer
+              className={css.subOrderSummaryMobileActionWrapper}>
+              {actionBtns}
+            </MobileBottomContainer>
+          </RenderWhen>
         </div>
 
         <RenderWhen condition={!isEmpty(newUpdatedOrderNotification)}>

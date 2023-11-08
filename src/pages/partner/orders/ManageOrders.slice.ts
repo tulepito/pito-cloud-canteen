@@ -36,6 +36,8 @@ const initialState: TPartnerManageOrdersState = {
 const isValidStatus = (lastTransition: ETransition, statuses: string[]) => {
   switch (lastTransition) {
     case ETransition.INITIATE_TRANSACTION:
+    case ETransition.PARTNER_CONFIRM_SUB_ORDER:
+    case ETransition.PARTNER_REJECT_SUB_ORDER:
       return statuses.includes('inProgress');
 
     case ETransition.COMPLETE_DELIVERY:
@@ -46,6 +48,8 @@ const isValidStatus = (lastTransition: ETransition, statuses: string[]) => {
 
     case ETransition.CANCEL_DELIVERY:
     case ETransition.OPERATOR_CANCEL_PLAN:
+    case ETransition.OPERATOR_CANCEL_AFTER_PARTNER_CONFIRMED:
+    case ETransition.OPERATOR_CANCEL_AFTER_PARTNER_REJECTED:
       return statuses.includes('canceled');
 
     default:
@@ -87,6 +91,7 @@ const PartnerManageOrdersSlice = createSlice({
   name: 'PartnerManageOrders',
   initialState,
   reducers: {
+    resetStates: () => ({ ...initialState }),
     filterData: (state, { payload }) => {
       const { allSubOrders, pagination } = current(state);
       const { perPage } = pagination;
