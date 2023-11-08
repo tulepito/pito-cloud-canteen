@@ -36,7 +36,12 @@ const Amount = () => {
   return <div className={css.label}>người</div>;
 };
 
-const QuizPerPackMemberAmountPage = () => {
+type TQuizPerPackMemberAmountPageProps = {
+  stepInfo?: string;
+};
+const QuizPerPackMemberAmountPage: React.FC<
+  TQuizPerPackMemberAmountPageProps
+> = ({ stepInfo }) => {
   const intl = useIntl();
   const router = useRouter();
   const submittingControl = useBoolean();
@@ -158,7 +163,8 @@ const QuizPerPackMemberAmountPage = () => {
       submitText="Tiếp tục"
       submitDisabled={hasValidationErrors}
       submitInProgress={submittingControl.value}
-      onSubmit={onFormSubmitClick}>
+      onSubmit={onFormSubmitClick}
+      stepInfo={stepInfo}>
       <form className={css.formContainer}>
         <FieldTextInputComponent
           id="packagePerMember"

@@ -20,6 +20,13 @@
     }
   }
 
+  .stepInfo {
+    flex-basis: calc(50% + 10px);
+    @include textTemplate(14px, 400, 20px);
+    text-align: right;
+    color: $neutralGray6;
+  }
+
   .closeBtn {
     cursor: pointer;
   }
