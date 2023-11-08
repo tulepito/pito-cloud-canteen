@@ -18,7 +18,6 @@
   .main {
     @include textTemplate(24px, $fontWeightBold, 32px);
     margin-top: 20px;
-    text-transform: capitalize;
   }
 
   .semi {

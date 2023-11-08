@@ -29,10 +29,6 @@ const QuizSpecialDemand = () => {
     (state) => state.Quiz.selectedCompany,
     shallowEqual,
   );
-  const nutritionsOptions = useAppSelector(
-    (state) => state.SystemAttributes.nutritions,
-    shallowEqual,
-  );
   const fetchAttributesInProgress = useAppSelector(
     (state) => state.SystemAttributes.fetchAttributesInProgress,
   );
@@ -91,7 +87,7 @@ const QuizSpecialDemand = () => {
         </div>
       }
       submitText="Tiếp tục"
-      cancelText="Bỏ qua"
+      cancelText="Tôi chưa chắc"
       onCancel={onCancel}
       onSubmit={handleFormSubmitClick}
       submitDisabled={submitDisabled}
@@ -108,7 +104,6 @@ const QuizSpecialDemand = () => {
             formRef={formSubmitRef}
             initialValues={initialValues}
             setFormValues={setFormValues}
-            nutritionsOptions={nutritionsOptions}
           />
         )}
       </div>

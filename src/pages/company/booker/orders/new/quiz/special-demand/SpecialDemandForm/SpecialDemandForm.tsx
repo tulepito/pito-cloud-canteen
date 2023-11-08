@@ -2,12 +2,9 @@ import { useEffect, useImperativeHandle } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
-import classNames from 'classnames';
 
 import Form from '@components/Form/Form';
-import RenderWhen from '@components/RenderWhen/RenderWhen';
 import MealTypeField from '@pages/admin/order/create/components/MealTypeField/MealTypeField';
-import NutritionField from '@pages/admin/order/create/components/NutritionField/NutritionField';
 
 import css from './SpecialDemandForm.module.scss';
 
@@ -18,7 +15,6 @@ export type TSpecialDemandFormValues = {
 
 type TExtraProps = {
   formRef: any;
-  nutritionsOptions?: { key: string; label: string }[];
   setFormValues: (values: TSpecialDemandFormValues) => void;
 };
 type TSpecialDemandFormComponentProps =
@@ -29,14 +25,7 @@ type TSpecialDemandFormProps = FormProps<TSpecialDemandFormValues> &
 const SpecialDemandFormComponent: React.FC<TSpecialDemandFormComponentProps> = (
   props,
 ) => {
-  const {
-    handleSubmit,
-    formRef,
-    form,
-    values,
-    setFormValues,
-    nutritionsOptions = [],
-  } = props;
+  const { handleSubmit, formRef, form, values, setFormValues } = props;
   const intl = useIntl();
 
   useImperativeHandle(formRef, () => ({
@@ -58,14 +47,6 @@ const SpecialDemandFormComponent: React.FC<TSpecialDemandFormComponentProps> = (
         {intl.formatMessage({ id: 'Booker.CreateOrder.Form.field.mealType' })}
       </div>
       <MealTypeField />
-      <RenderWhen condition={nutritionsOptions.length > 0}>
-        <div className={classNames(css.label, css.spacing)}>
-          {intl.formatMessage({
-            id: 'Booker.CreateOrder.Form.field.nutritions',
-          })}
-        </div>
-        <NutritionField options={nutritionsOptions} />
-      </RenderWhen>
     </Form>
   );
 };

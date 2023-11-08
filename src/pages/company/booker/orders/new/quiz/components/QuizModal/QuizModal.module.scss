@@ -13,7 +13,6 @@
   .backBtn {
     @include flexAlign(center, center);
     cursor: pointer;
-    text-transform: capitalize;
 
     span {
       @include textTemplate(16px, $fontWeightBold, 24px);
@@ -36,7 +35,6 @@
   @include flexAlign(center, center);
   @include textTemplate(24px, $fontWeightBold, 32px);
   margin-top: 20px;
-  text-transform: capitalize;
   text-align: center;
 }
 
