@@ -15,7 +15,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
     const apiMethod = req.method;
     const { orderId, JSONParams } = req.query;
-    const { timestamp } = JSON.parse(JSONParams as string);
+    const { timestamp, recommendParams = {} } = JSON.parse(
+      JSONParams as string,
+    );
     const sdk = getSdk(req, res);
     const [currentUser] = denormalisedResponseEntities(
       await sdk.currentUser.show(),
@@ -37,10 +39,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
               orderId: String(orderId),
               timestamp: Number(timestamp),
               shouldCalculateDistance: !isAdmin,
+              recommendParams,
             })
           : await recommendRestaurants({
               orderId: String(orderId),
               shouldCalculateDistance: !isAdmin,
+              recommendParams,
             });
 
         return res.status(200).json(recommendation);

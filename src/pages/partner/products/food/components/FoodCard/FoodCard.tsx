@@ -183,7 +183,8 @@ const FoodCard: React.FC<TFoodCardProps> = (props) => {
     if (!editableFoodMap[foodId]) {
       dispatch(partnerFoodSliceThunks.fetchEditableFood(foodId));
     }
-  }, [foodId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [foodId, dispatch, JSON.stringify(editableFoodMap)]);
 
   return (
     <div className={css.cardWrapper}>

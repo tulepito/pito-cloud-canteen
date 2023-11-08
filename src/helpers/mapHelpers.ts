@@ -15,8 +15,8 @@ export const getInitialLocationValues = (location: any) => {
 };
 
 export const calculateDistance = (origin: any, destination: any) => {
-  const { lat: lat1, lng: lng1 } = origin;
-  const { lat: lat2, lng: lng2 } = destination;
+  const { lat: lat1, lng: lng1 } = origin || {};
+  const { lat: lat2, lng: lng2 } = destination || {};
   const R = 6371; // in km
   const φ1 = (lat1 * Math.PI) / 180; // φ, λ in radians
   const φ2 = (lat2 * Math.PI) / 180;

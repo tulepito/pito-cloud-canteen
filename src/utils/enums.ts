@@ -312,6 +312,15 @@ export enum ESubOrderStatus {
   delivering = 'delivering',
 }
 
+export enum EEditOrderHistoryType {
+  addFood = 'ADD_FOOD',
+  deleteFood = 'DELETE_FOOD',
+  changeRestaurant = 'CHANGE_RESTAURANT',
+  changePCCFee = 'CHANGE_PCC_FEE',
+  changeShipperName = 'CHANGE_SHIPPER_NAME',
+  changeStaffName = 'CHANGE_STAFF_NAME',
+}
+
 export enum EEditSubOrderHistoryType {
   MEMBER_FOOD_CHANGED = 'MEMBER_FOOD_CHANGED',
   MEMBER_FOOD_REMOVED = 'MEMBER_FOOD_REMOVED',

@@ -14,6 +14,7 @@ import {
 import { fetchUserApi } from '@apis/index';
 import type { TUpdateOrderApiBody } from '@apis/orderApi';
 import {
+  adminNotifyUserPickingOrderChangesApi,
   bookerCancelPendingApprovalOrderApi,
   bookerDeleteDraftOrderApi,
   bookerPublishOrderApi,
@@ -28,6 +29,7 @@ import {
 import { queryAllPages } from '@helpers/apiHelpers';
 import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
 import { getMenuQueryInSpecificDay } from '@helpers/listingSearchQuery';
+import { mergeRecommendOrderDetailWithCurrentOrderDetail } from '@helpers/orderHelper';
 import { createAsyncThunk } from '@redux/redux.helper';
 import config from '@src/configs';
 import { CompanyPermissions } from '@src/types/UserPermission';
@@ -64,6 +66,10 @@ export const MANAGE_ORDER_PAGE_SIZE = 10;
 
 type TOrderInitialState = {
   order: TListing | null;
+  draftEditOrderData: {
+    generalInfo: TObject;
+    orderDetail?: TObject;
+  };
   fetchOrderInProgress: boolean;
   fetchOrderError: any;
   plans: TListing[];
@@ -175,6 +181,10 @@ const initialState: TOrderInitialState = {
   fetchOrderError: null,
   plans: [] as TListing[],
   orderDetail: {},
+  draftEditOrderData: {
+    generalInfo: {},
+    orderDetail: {},
+  },
   justDeletedMemberOrder: false,
   createOrderInProcess: false,
   createOrderError: null,
@@ -438,10 +448,17 @@ const updateOrder = createAsyncThunk(
 
 const recommendRestaurants = createAsyncThunk(
   RECOMMEND_RESTAURANT,
-  async (_, { getState }) => {
+  async (
+    // eslint-disable-next-line unused-imports/no-unused-vars
+    { shouldUpdatePlanOrderOrderDetail = true, recommendParams = {} }: TObject,
+    { getState },
+  ) => {
     const { order } = getState().Order;
     const orderId = Listing(order).getId();
-    const { data: orderDetail } = await recommendRestaurantApi(orderId);
+    const { data: orderDetail } = await recommendRestaurantApi({
+      orderId,
+      recommendParams,
+    });
 
     return orderDetail;
   },
@@ -449,24 +466,50 @@ const recommendRestaurants = createAsyncThunk(
 
 const recommendRestaurantForSpecificDay = createAsyncThunk(
   RECOMMEND_RESTAURANT_FOR_SPECIFIC_DAY,
-  async (dateTime: number, { getState }) => {
-    const { order } = getState().Order;
+  async (
+    {
+      shouldUpdatePlanOrderOrderDetail = true,
+      dateTime,
+      recommendParams = {},
+    }: TObject,
+    { getState, dispatch },
+  ) => {
+    const { order, draftEditOrderData } = getState().Order;
 
     const orderId = Listing(order).getId();
 
     const { plans = [] } = Listing(order).getMetadata();
 
-    const { data: newOrderDetail } = await recommendRestaurantApi(
+    let updateOrderDetail = {};
+
+    const { data: newOrderDetail } = await recommendRestaurantApi({
       orderId,
       dateTime,
-    );
-
-    updatePlanDetailsApi(orderId, {
-      orderDetail: newOrderDetail,
-      planId: plans[0],
+      recommendParams,
     });
 
-    return newOrderDetail;
+    if (shouldUpdatePlanOrderOrderDetail) {
+      updateOrderDetail = newOrderDetail;
+      updatePlanDetailsApi(orderId, {
+        orderDetail: newOrderDetail,
+        planId: plans[0],
+      });
+    } else {
+      updateOrderDetail = mergeRecommendOrderDetailWithCurrentOrderDetail(
+        draftEditOrderData?.orderDetail!,
+        newOrderDetail,
+        dateTime,
+      );
+
+      dispatch(
+        // eslint-disable-next-line @typescript-eslint/no-use-before-define
+        saveDraftEditOrder({
+          orderDetail: updateOrderDetail,
+        }),
+      );
+    }
+
+    return { orderDetail: updateOrderDetail, shouldUpdatePlanOrderOrderDetail };
   },
 );
 
@@ -709,10 +752,19 @@ const fetchOrderDetail = createAsyncThunk(
 
 const fetchRestaurantCoverImages = createAsyncThunk(
   FETCH_RESTAURANT_COVER_IMAGE,
-  async (_, { extra: sdk, getState }) => {
+  async ({ isEditFlow = false }: any, { extra: sdk, getState }) => {
     const { orderDetail = {} } = getState().Order;
+    const { orderDetail: draftOrderDetail = {} } =
+      getState().Order.draftEditOrderData;
+
+    const suitableOrderDetail = isEditFlow ? draftOrderDetail : orderDetail;
+
     const restaurantIdList = compact(
-      uniq(Object.values(orderDetail).map((item: any) => item?.restaurant?.id)),
+      uniq(
+        Object.values(suitableOrderDetail).map(
+          (item: any) => item?.restaurant?.id,
+        ),
+      ),
     );
 
     const restaurantCoverImageList = await Promise.all(
@@ -756,19 +808,17 @@ const fetchOrder = createAsyncThunk(
       }),
     )[0];
 
-    const { bookerId } = Listing(response).getMetadata();
+    const { bookerId, companyId } = Listing(response).getMetadata();
 
-    const selectedBooker = denormalisedResponseEntities(
-      await sdk.users.show({
-        id: bookerId,
-      }),
-    )[0];
+    const { data: selectedBooker } = await fetchUserApi(bookerId);
+    const { data: selectedCompany } = await fetchUserApi(companyId);
 
     dispatch(SystemAttributesThunks.fetchVATPercentageByOrderId(orderId));
 
     return {
       order: response,
       selectedBooker,
+      selectedCompany,
     };
   },
 );
@@ -843,12 +893,27 @@ const bookerPublishOrder = createAsyncThunk(
 
 const checkRestaurantStillAvailable = createAsyncThunk(
   CHECK_RESTAURANT_STILL_AVAILABLE,
-  async (_, { getState, extra: sdk }) => {
+  async ({ isEditFlow = false }: TObject, { getState, extra: sdk }) => {
     const { order, orderDetail } = getState().Order;
+    const { orderDetail: draftOrderDetail = {} } =
+      getState().Order.draftEditOrderData;
+
+    const suitableOrderDetail = isEditFlow ? draftOrderDetail : orderDetail;
+
     const availableOrderDetailCheckList = await Promise.all(
-      Object.keys(orderDetail).map(async (timestamp) => {
-        const { restaurant } = orderDetail[timestamp];
-        const { menuId, id: restaurantId } = restaurant;
+      Object.keys(suitableOrderDetail).map(async (timestamp) => {
+        const { restaurant } = suitableOrderDetail[timestamp] || {};
+        const { menuId, id: restaurantId } = restaurant || {};
+
+        if (isEmpty(restaurantId)) {
+          return {
+            [timestamp]: {
+              isAvailable: true,
+              status: EInvalidRestaurantCase.noMenusValid,
+            },
+          };
+        }
+
         const [restaurantListing] = denormalisedResponseEntities(
           (await sdk.listings.show({ id: restaurantId })) || [{}],
         );
@@ -916,11 +981,21 @@ const checkRestaurantStillAvailable = createAsyncThunk(
 
 const fetchOrderRestaurants = createAsyncThunk(
   FETCH_ORDER_RESTAURANTS,
-  async (_, { extra: sdk, getState }) => {
+  async ({ isEditFlow = false }: any, { extra: sdk, getState }) => {
     const { orderDetail = {} } = getState().Order;
-    const restaurantIdList = compact(
-      uniq(Object.values(orderDetail).map((item: any) => item?.restaurant?.id)),
+    const { orderDetail: draftOrderDetail = {} } =
+      getState().Order.draftEditOrderData;
+
+    const suitableOrderDetail = isEditFlow ? draftOrderDetail : orderDetail;
+
+    const restaurantIdList = uniq(
+      compact(
+        Object.values(suitableOrderDetail).map(
+          (item: any) => item?.restaurant?.id,
+        ),
+      ),
     );
+
     const restaurantList = await Promise.all(
       restaurantIdList.map(async (restaurantId) => {
         const restaurantResponse = denormalisedResponseEntities(
@@ -1001,6 +1076,22 @@ const bookerDeleteOrder = createAsyncThunk(
   },
 );
 
+const notifyUserPickingOrderChanges = createAsyncThunk(
+  'app/Order/NOTIFY_USER_PICKING_ORDER_CHANGES',
+  async (
+    { orderId, params }: TObject,
+    { fulfillWithValue, rejectWithValue },
+  ) => {
+    try {
+      await adminNotifyUserPickingOrderChangesApi(orderId, params);
+
+      return fulfillWithValue(null);
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  },
+);
+
 export const orderAsyncActions = {
   createOrder,
   updateOrder,
@@ -1026,6 +1117,7 @@ export const orderAsyncActions = {
   updateOrderStateToDraft,
   bookerDeleteOrder,
   queryCompanyPlansByOrderIds,
+  notifyUserPickingOrderChanges,
 };
 
 const orderSlice = createSlice({
@@ -1155,6 +1247,33 @@ const orderSlice = createSlice({
     setOnRecommendRestaurantInProcess: (state, { payload }) => {
       state.onRecommendRestaurantInProgress = payload;
     },
+    saveDraftEditOrder: (state, { payload }) => {
+      const { generalInfo, orderDetail, mode = 'replace' } = payload || {};
+
+      state.draftEditOrderData = {
+        ...state.draftEditOrderData,
+        generalInfo: {
+          ...state.draftEditOrderData.generalInfo,
+          ...generalInfo,
+        },
+        ...(!isEmpty(orderDetail)
+          ? mode === 'merge'
+            ? {
+                orderDetail: {
+                  ...state.draftEditOrderData.orderDetail,
+                  ...orderDetail,
+                },
+              }
+            : { orderDetail }
+          : {}),
+      };
+    },
+    clearDraftEditOrder: (state) => {
+      state.draftEditOrderData = {
+        ...state.draftEditOrderData,
+        generalInfo: {},
+      };
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -1237,6 +1356,7 @@ const orderSlice = createSlice({
         fetchOrderInProgress: false,
         order: payload.order,
         selectedBooker: payload.selectedBooker,
+        selectedCompany: payload.selectedCompany,
         currentOrderVATPercentage: config.VATPercentage,
       }))
       .addCase(fetchOrder.rejected, (state, { error }) => ({
@@ -1377,11 +1497,19 @@ const orderSlice = createSlice({
       }))
       .addCase(
         recommendRestaurantForSpecificDay.fulfilled,
-        (state, { payload }) => ({
-          ...state,
-          onRescommendRestaurantForSpecificDateInProgress: false,
-          orderDetail: payload,
-        }),
+        (state, { payload }) => {
+          const { shouldUpdatePlanOrderOrderDetail, orderDetail } = payload;
+          state.onRescommendRestaurantForSpecificDateInProgress = false;
+
+          if (shouldUpdatePlanOrderOrderDetail) {
+            state.orderDetail = orderDetail;
+          } else {
+            state.draftEditOrderData = {
+              ...state.draftEditOrderData,
+              orderDetail,
+            };
+          }
+        },
       )
       .addCase(
         recommendRestaurantForSpecificDay.rejected,
@@ -1561,6 +1689,8 @@ export const {
   addCurrentSelectedMenuId,
   setCanNotGoToStep4,
   setOnRecommendRestaurantInProcess,
+  saveDraftEditOrder,
+  clearDraftEditOrder,
 } = orderSlice.actions;
 
 export default orderSlice.reducer;

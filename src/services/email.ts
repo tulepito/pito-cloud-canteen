@@ -18,6 +18,9 @@ import bookerOrderPicking, {
 import bookerOrderSuccess, {
   bookerOrderSuccessSubject,
 } from '@src/utils/emailTemplate/bookerOrderSuccess';
+import bookerPickingOrderChanged, {
+  bookerPickingOrderChangedSubject,
+} from '@src/utils/emailTemplate/bookerPickingOrderChanged';
 import bookerSubOrderIsCanceled, {
   bookerSubOrderIsCanceledSubject,
 } from '@src/utils/emailTemplate/bookerSubOrderIsCanceled';
@@ -27,6 +30,9 @@ import participantCompanyInvitation, {
 import participantOrderPicking, {
   participantOrderPickingSubject,
 } from '@src/utils/emailTemplate/participantOrderPicking';
+import participantPickingSubOrderChanged, {
+  participantPickingSubOrderChangedSubject,
+} from '@src/utils/emailTemplate/participantPickingSubOrderChanged';
 import participantSubOrderIsCanceled, {
   participantSubOrderIsCanceledSubject,
 } from '@src/utils/emailTemplate/participantSubOrderIsCanceled';
@@ -39,6 +45,7 @@ import partnerOrderDetailsUpdated, {
 import partnerSubOrderIsCanceled, {
   partnerSubOrderIsCanceledSubject,
 } from '@src/utils/emailTemplate/partnerSubOrderIsCanceled';
+import { DAY_SESSION_OPTIONS, getLabelByKey } from '@src/utils/options';
 
 import { sendIndividualEmail } from './awsSES';
 import getSystemAttributes from './getSystemAttributes';
@@ -55,12 +62,14 @@ export enum EmailTemplateForBookerTypes {
   BOOKER_SUB_ORDER_CANCELED = 'BOOKER_SUB_ORDER_CANCELED',
   BOOKER_REVENUE_ANALYTICS = 'BOOKER_REVENUE_ANALYTICS',
   BOOKER_ORDER_CANCELLED = 'BOOKER_ORDER_CANCELLED',
+  BOOKER_PICKING_ORDER_CHANGED = 'BOOKER_PICKING_ORDER_CHANGED',
 }
 
 export enum EmailTemplateForParticipantTypes {
   PARTICIPANT_COMPANY_INVITATION = 'PARTICIPANT_COMPANY_INVITATION',
   PARTICIPANT_ORDER_PICKING = 'PARTICIPANT_ORDER_PICKING',
   PARTICIPANT_SUB_ORDER_CANCELED = 'PARTICIPANT_SUB_ORDER_CANCELED',
+  PARTICIPANT_PICKING_ORDER_CHANGED = 'PARTICIPANT_PICKING_ORDER_CHANGED',
 }
 
 export enum EmailTemplateForPartnerTypes {
@@ -373,6 +382,37 @@ export const emailSendingFactory = async (
         sendIndividualEmail(emailDataParams);
         break;
       }
+      case EmailTemplateTypes.BOOKER.BOOKER_PICKING_ORDER_CHANGED: {
+        const { orderId, changeHistory } = emailParams;
+        const emailDataSource = await fetchEmailDataSourceWithOrder({
+          receiver: 'booker',
+          orderId,
+        });
+
+        const { bookerUser, orderListing } = emailDataSource;
+        const { startDate, endDate, deliveryHour } = orderListing.getMetadata();
+        const { email: bookerEmail } = bookerUser?.getAttributes() || {};
+        const { lastName, firstName } = bookerUser?.getProfile() || {};
+
+        const emailTemplate = bookerPickingOrderChanged({
+          orderId,
+          deliveryHour,
+          formattedStartDate: formatTimestamp(startDate),
+          formattedEndDate: formatTimestamp(endDate),
+          bookerName: `${lastName} ${firstName}`,
+          changeHistory,
+        });
+
+        const emailDataParams = {
+          receiver: [bookerEmail],
+          subject: bookerPickingOrderChangedSubject,
+          content: emailTemplate as string,
+          sender: systemSenderEmail as string,
+        };
+
+        sendIndividualEmail(emailDataParams);
+        break;
+      }
       case EmailTemplateTypes.PARTICIPANT.PARTICIPANT_ORDER_PICKING: {
         const { orderId, participantId, bookerNote } = emailParams;
         const emailDataSource = await fetchEmailDataSourceWithOrder({
@@ -442,6 +482,40 @@ export const emailSendingFactory = async (
           content: emailTemplate as string,
           sender: systemSenderEmail as string,
         };
+        sendIndividualEmail(emailDataParams);
+        break;
+      }
+      case EmailTemplateTypes.PARTICIPANT.PARTICIPANT_PICKING_ORDER_CHANGED: {
+        const { participantId, orderId, timestamp } = emailParams;
+        const emailDataSource: any = await fetchEmailDataSourceWithOrder({
+          receiver: 'participant',
+          participantId,
+          orderId,
+        });
+
+        const { participantUser, orderListing } = emailDataSource;
+        const { email: participantEmail } =
+          participantUser?.getAttributes() || {};
+        const { lastName, firstName } = participantUser?.getProfile() || {};
+        const { daySession } = orderListing.getMetadata();
+        const formattedSubOrderDate = formatTimestamp(timestamp);
+
+        const emailTemplate = participantPickingSubOrderChanged({
+          orderId,
+          daySession: getLabelByKey(DAY_SESSION_OPTIONS, daySession),
+          formattedSubOrderDate,
+          userName: `${lastName} ${firstName}`,
+        });
+
+        const emailDataParams = {
+          receiver: [participantEmail],
+          subject: participantPickingSubOrderChangedSubject(
+            formattedSubOrderDate,
+          ),
+          content: emailTemplate as string,
+          sender: systemSenderEmail as string,
+        };
+
         sendIndividualEmail(emailDataParams);
         break;
       }

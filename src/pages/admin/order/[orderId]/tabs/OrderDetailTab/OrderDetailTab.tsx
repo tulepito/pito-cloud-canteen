@@ -20,7 +20,7 @@ import { useDownloadPriceQuotation } from '@hooks/useDownloadPriceQuotation';
 import useExportOrderDetails from '@hooks/useExportOrderDetails';
 import { usePrepareOrderDetailPageData } from '@hooks/usePrepareOrderManagementData';
 import { AdminManageOrderThunks } from '@pages/admin/order/AdminManageOrder.slice';
-import { ReviewContent } from '@pages/admin/order/create/components/ReviewOrder/ReviewOrder';
+import { ReviewContent } from '@pages/admin/order/StepScreen/ReviewOrder/ReviewOrder';
 import { checkMinMaxQuantityInPickingState } from '@pages/company/orders/[orderId]/picking/OrderDetail.page';
 import {
   OrderManagementsAction,
@@ -137,7 +137,6 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
       isPickingState);
 
   const { orderTitle, priceQuotationData, editViewData, reviewViewData } =
-    // eslint-disable-next-line react-hooks/rules-of-hooks
     usePrepareOrderDetailPageData({
       isAdminLayout: true,
     });
@@ -255,11 +254,10 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
   }, []);
 
   const isNormalOrder = orderType === EOrderType.normal;
-  const isPicking = orderState === EOrderStates.picking;
 
   const { planValidations } = checkMinMaxQuantityInPickingState(
     isNormalOrder,
-    isPicking,
+    isPickingState,
     draftOrderDetail,
   );
 

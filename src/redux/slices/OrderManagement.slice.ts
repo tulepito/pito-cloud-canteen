@@ -7,7 +7,7 @@ import omit from 'lodash/omit';
 import set from 'lodash/set';
 
 import {
-  createOrderChangesHistoryDocumentApi,
+  createSubOrderChangesHistoryDocumentApi,
   participantSubOrderAddDocumentApi,
   participantSubOrderGetByIdApi,
   participantSubOrderUpdateDocumentApi,
@@ -1049,7 +1049,7 @@ const updateOrderFromDraftEdit = createAsyncThunk(
                   newValue,
                   createdAt: new Date(Number(createdAt?.seconds) * 1000),
                 };
-                await createOrderChangesHistoryDocumentApi(
+                await createSubOrderChangesHistoryDocumentApi(
                   orderId,
                   subOrderChangesHistoryParams,
                 );

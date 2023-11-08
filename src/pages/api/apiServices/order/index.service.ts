@@ -25,10 +25,16 @@ import {
   EOrderDraftStates,
   EOrderType,
 } from '@src/utils/enums';
-import type { TObject, TSubOrderChangeHistoryItem } from '@src/utils/types';
+import type {
+  TObject,
+  TOrderChangeHistoryItem,
+  TSubOrderChangeHistoryItem,
+} from '@src/utils/types';
 
 const FIREBASE_SUB_ORDER_CHANGES_HISTORY_COLLECTION_NAME =
   process.env.FIREBASE_SUB_ORDER_CHANGES_HISTORY_COLLECTION_NAME || '';
+const FIREBASE_ORDER_CHANGES_HISTORY_COLLECTION_NAME =
+  process.env.FIREBASE_ORDER_CHANGES_HISTORY_COLLECTION_NAME || '';
 
 const createSubOrderHistoryRecordToFirestore = async (
   createData: TSubOrderChangeHistoryItem,
@@ -36,6 +42,17 @@ const createSubOrderHistoryRecordToFirestore = async (
   const data = await addCollectionDoc(
     createData,
     FIREBASE_SUB_ORDER_CHANGES_HISTORY_COLLECTION_NAME,
+  );
+
+  return data;
+};
+
+const createOrderHistoryRecordToFirestore = async (
+  createData: TOrderChangeHistoryItem,
+) => {
+  const data = await addCollectionDoc(
+    createData,
+    FIREBASE_ORDER_CHANGES_HISTORY_COLLECTION_NAME,
   );
 
   return data;
@@ -311,6 +328,7 @@ const reorder = async ({
 };
 
 const orderServices = {
+  createOrderHistoryRecordToFirestore,
   createSubOrderHistoryRecordToFirestore,
   querySubOrderHistoryFromFirebase,
   getSubOrderHistoryCount,

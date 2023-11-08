@@ -1,8 +1,13 @@
+import isEmpty from 'lodash/isEmpty';
 import uniq from 'lodash/uniq';
 import { DateTime } from 'luxon';
 
 import { queryAllListings } from '@helpers/apiHelpers';
-import { getMenuQuery, getRestaurantQuery } from '@helpers/listingSearchQuery';
+import {
+  getMenuQuery,
+  getMenuQueryWithDraftOrderData,
+  getRestaurantQuery,
+} from '@helpers/listingSearchQuery';
 import { calculateDistance } from '@helpers/mapHelpers';
 import {
   adminQueryListings,
@@ -12,7 +17,7 @@ import {
 import { Listing, User } from '@src/utils/data';
 import { convertWeekDay, renderDateRange, VNTimezone } from '@src/utils/dates';
 import { EOrderType } from '@src/utils/enums';
-import type { TListing } from '@src/utils/types';
+import type { TListing, TObject } from '@src/utils/types';
 
 const maxKilometerFromRestaurantToDeliveryAddressForBooker =
   process.env
@@ -21,34 +26,69 @@ const maxKilometerFromRestaurantToDeliveryAddressForBooker =
 export const recommendRestaurantForSpecificDay = async ({
   orderId,
   timestamp,
+  recommendParams = {},
   shouldCalculateDistance,
 }: {
   orderId: string;
   timestamp: number;
+  recommendParams?: TObject;
   shouldCalculateDistance: boolean;
 }) => {
   const order = await fetchListing(orderId);
-  const {
-    plans = [],
-    memberAmount = 0,
-    deliveryAddress = {},
-    companyId,
-  } = Listing(order as TListing).getMetadata();
-
-  const orderDeliveryOriginMaybe = deliveryAddress?.origin;
-  const company = await fetchUser(companyId);
-  const { companyLocation = {} } = User(company).getPublicData();
-  const companyOriginMaybe = companyLocation?.origin;
-  const deliveryOrigin = orderDeliveryOriginMaybe || companyOriginMaybe;
-
-  const planListing = await fetchListing(plans[0]);
-
-  const { orderDetail = {} } = Listing(planListing as TListing).getMetadata();
-
+  let deliveryOrigin: any;
+  let orderDetail;
+  let memberAmount;
+  let menuQuery;
   const menuQueryParams = {
     timestamp,
   };
-  const menuQuery = getMenuQuery({ order, params: menuQueryParams });
+
+  if (isEmpty(recommendParams)) {
+    const {
+      plans = [],
+      memberAmount: memberAmountInOrder = 0,
+      deliveryAddress = {},
+      companyId,
+    } = Listing(order as TListing).getMetadata();
+
+    const orderDeliveryOriginMaybe = deliveryAddress?.origin;
+    const company = await fetchUser(companyId);
+    const { companyLocation = {} } = User(company).getPublicData();
+    const companyOriginMaybe = companyLocation?.origin;
+
+    const planListing = await fetchListing(plans[0]);
+
+    deliveryOrigin = orderDeliveryOriginMaybe || companyOriginMaybe;
+    orderDetail =
+      Listing(planListing as TListing).getMetadata().orderDetail || {};
+    memberAmount = memberAmountInOrder;
+
+    menuQuery = getMenuQuery({ order, params: menuQueryParams });
+  } else {
+    const {
+      memberAmount: memberAmountFromParams = 0,
+      deliveryOrigin: deliveryOriginFromParams,
+      orderDetail: orderDetailFromParams,
+      nutritions = [],
+      mealType = [],
+      packagePerMember,
+      daySession,
+    } = recommendParams;
+    deliveryOrigin = deliveryOriginFromParams;
+    orderDetail = orderDetailFromParams;
+    memberAmount = memberAmountFromParams;
+
+    menuQuery = getMenuQueryWithDraftOrderData({
+      orderParams: {
+        nutritions,
+        mealType,
+        packagePerMember,
+        daySession,
+      },
+      params: menuQueryParams,
+    });
+  }
+
   const allMenus = await queryAllListings({
     query: menuQuery,
   });
@@ -144,40 +184,72 @@ export const recommendRestaurantForSpecificDay = async ({
 
 export const recommendRestaurants = async ({
   orderId,
+  recommendParams = {},
   shouldCalculateDistance,
 }: {
   orderId: string;
+  recommendParams?: TObject;
   shouldCalculateDistance: boolean;
 }) => {
+  let deliveryOrigin: any;
+  const orderDetail: TObject = {};
+  let memberAmount: any;
+  let totalDates: number[] = [];
+  let isNormalOrder = false;
+  let dayInWeek: string[] = [];
   const order = await fetchListing(orderId as string);
-  const orderDetail: any = {};
-  const {
-    dayInWeek = [],
-    startDate,
-    endDate,
-    orderType = EOrderType.group,
-    companyId,
-    deliveryAddress = {},
-    memberAmount = 0,
-  } = Listing(order as TListing).getMetadata();
-  const isNormalOrder = orderType === EOrderType.normal;
 
-  const orderDeliveryOriginMaybe = deliveryAddress?.origin;
-  const company = await fetchUser(companyId);
-  const { companyLocation = {} } = User(company).getPublicData();
-  const companyOriginMaybe = companyLocation?.origin;
-  const deliveryOrigin = orderDeliveryOriginMaybe || companyOriginMaybe;
+  if (isEmpty(recommendParams)) {
+    const {
+      dayInWeek: dayInWeekInOrder = [],
+      startDate,
+      endDate,
+      orderType = EOrderType.group,
+      companyId,
+      deliveryAddress = {},
+      memberAmount: memberAmountInOrder = 0,
+    } = Listing(order as TListing).getMetadata();
 
-  const totalDates = renderDateRange(startDate, endDate);
+    const orderDeliveryOriginMaybe = deliveryAddress?.origin;
+    const company = await fetchUser(companyId);
+    const { companyLocation = {} } = User(company).getPublicData();
+    const companyOriginMaybe = companyLocation?.origin;
+
+    isNormalOrder = orderType === EOrderType.normal;
+    memberAmount = memberAmountInOrder;
+    deliveryOrigin = orderDeliveryOriginMaybe || companyOriginMaybe;
+    totalDates = renderDateRange(startDate, endDate);
+    dayInWeek = dayInWeekInOrder;
+  } else {
+    const {
+      memberAmount: memberAmountFromParams = 0,
+      deliveryOrigin: deliveryOriginFromParams,
+      dayInWeek: dayInWeekFromParams,
+      startDate: startDateFromParams,
+      endDate: endDateFromParams,
+      isNormalOrder: isNormalOrderFromParams,
+    } = recommendParams;
+
+    isNormalOrder = isNormalOrderFromParams;
+    deliveryOrigin = deliveryOriginFromParams;
+    memberAmount = memberAmountFromParams;
+    dayInWeek = dayInWeekFromParams;
+    totalDates = renderDateRange(startDateFromParams, endDateFromParams);
+  }
   await Promise.all(
     totalDates.map(async (dateTime) => {
       const menuQueryParams = {
         timestamp: dateTime,
       };
-      const menuQuery = getMenuQuery({
-        order,
-        params: menuQueryParams,
-      });
+      const menuQuery = isEmpty(recommendParams)
+        ? getMenuQuery({
+            order,
+            params: menuQueryParams,
+          })
+        : getMenuQueryWithDraftOrderData({
+            params: menuQueryParams,
+            orderParams: recommendParams,
+          });
       const allMenus = await queryAllListings({
         query: menuQuery,
       });
@@ -247,6 +319,7 @@ export const recommendRestaurants = async ({
           )
         ) {
           orderDetail[dateTime] = {
+            ...orderDetail[dateTime],
             restaurant: {
               id: restaurantGetter.getId(),
               restaurantName: restaurantGetter.getAttributes().title,
@@ -265,12 +338,14 @@ export const recommendRestaurants = async ({
           };
         } else {
           orderDetail[dateTime] = {
+            ...orderDetail[dateTime],
             ...lineItemsMaybe,
             hasNoRestaurants: false,
           };
         }
       } else {
         orderDetail[dateTime] = {
+          ...orderDetail[dateTime],
           ...lineItemsMaybe,
           hasNoRestaurants: true,
         };
