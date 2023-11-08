@@ -8,7 +8,6 @@ import { QuizStep } from '@src/utils/enums';
 
 import QuizInviteMember from './invite-member/QuizInviteMember';
 import QuizMealDatePage from './meal-date/QuizMealDate.page';
-import QuizMealStylesPage from './meal-styles/QuizMealStyles.page';
 import QuizPerPackMemberAmountPage from './perpack-member-amount/QuizPerPackMemberAmount.page';
 import QuizSpecialDemandPage from './special-demand/QuizSpecialDemand.page';
 
@@ -19,15 +18,11 @@ export const firstTimeQuizSteps = [
   },
   {
     key: QuizStep.SPECIAL_DEMAND,
-    component: <QuizSpecialDemandPage /* stepInfo="2/3" */ />,
-  },
-  {
-    key: QuizStep.MEAL_STYLES,
-    component: <QuizMealStylesPage /* stepInfo="3/3" */ />,
+    component: <QuizSpecialDemandPage stepInfo="2/3" />,
   },
   {
     key: QuizStep.MEAL_DATE,
-    component: <QuizMealDatePage />,
+    component: <QuizMealDatePage /* stepInfo="3/3" */ />,
   },
   {
     key: QuizStep.INVITE_MEMBER,

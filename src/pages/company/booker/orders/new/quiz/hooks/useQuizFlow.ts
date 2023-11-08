@@ -17,7 +17,6 @@ import { BookerNewOrderAction } from '../../BookerNewOrder.slice';
 const quizSteps = [
   QuizStep.PACKAGE_PER_MEMBER,
   QuizStep.SPECIAL_DEMAND,
-  QuizStep.MEAL_STYLES,
   QuizStep.MEAL_DATE,
   QuizStep.INVITE_MEMBER,
   QuizStep.ORDER_CREATING,

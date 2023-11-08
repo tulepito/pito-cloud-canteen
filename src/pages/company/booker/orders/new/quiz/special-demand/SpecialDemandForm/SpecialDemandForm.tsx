@@ -9,7 +9,6 @@ import MealTypeField from '@pages/admin/order/create/components/MealTypeField/Me
 import css from './SpecialDemandForm.module.scss';
 
 export type TSpecialDemandFormValues = {
-  nutritions: string[];
   mealType: string[];
 };
 

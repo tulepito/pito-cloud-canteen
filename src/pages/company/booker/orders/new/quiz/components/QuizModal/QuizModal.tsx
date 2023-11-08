@@ -69,7 +69,14 @@ const QuizModal: React.FC<QuizModalProps> = (props) => {
           <div className={css.closeBtn} onClick={handleCancel}>
             <IconCloseV2 className={css.closeIcon} />
           </div>
-          {stepInfo && <div className={css.stepInfo}>{stepInfo}</div>}
+          {stepInfo && (
+            <div
+              className={classNames(css.stepInfo, {
+                [css.stepInfoWithBackBtn]: !!onBack,
+              })}>
+              {stepInfo}
+            </div>
+          )}
           {onBack && (
             <div className={css.backBtn} onClick={onBack}>
               <IconArrow direction="left" />

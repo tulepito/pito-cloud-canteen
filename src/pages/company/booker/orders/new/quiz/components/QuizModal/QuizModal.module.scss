@@ -20,10 +20,18 @@
   }
 
   .stepInfo {
+    // 10px: 50% of step info
     flex-basis: calc(50% + 10px);
     @include textTemplate(14px, 400, 20px);
     text-align: right;
     color: $neutralGray6;
+
+    &.stepInfoWithBackBtn {
+      flex-basis: unset;
+      // 80px: width of back button
+      // 10px: 50% of step info
+      margin-left: calc(-80px + 10px);
+    }
   }
 
   .closeBtn {

@@ -6,37 +6,40 @@ import { shallowEqual } from 'react-redux';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { QuizActions } from '@redux/slices/Quiz.slice';
-import { User } from '@src/utils/data';
 import { QuizStep } from '@src/utils/enums';
 
 import QuizModal from '../components/QuizModal/QuizModal';
 import { useQuizFlow } from '../hooks/useQuizFlow';
+import type { TMealStylesFormValues } from '../meal-styles/MealStylesForm';
+import MealStylesForm from '../meal-styles/MealStylesForm';
 
 import type { TSpecialDemandFormValues } from './SpecialDemandForm/SpecialDemandForm';
 import SpecialDemandForm from './SpecialDemandForm/SpecialDemandForm';
 
 import css from './QuizSpecialDemand.module.scss';
 
-const QuizSpecialDemand = () => {
+type TQuizSpecialDemandProps = {
+  stepInfo?: string;
+};
+
+const QuizSpecialDemand: React.FC<TQuizSpecialDemandProps> = ({ stepInfo }) => {
   const intl = useIntl();
   const submittingControl = useBoolean();
   const dispatch = useAppDispatch();
   const formSubmitRef = useRef<any>();
-  const [formValues, setFormValues] = useState<TSpecialDemandFormValues>();
+  const [formValues, setFormValues] = useState<
+    Partial<TSpecialDemandFormValues & TMealStylesFormValues>
+  >({});
   const quizData = useAppSelector((state) => state.Quiz.quiz, shallowEqual);
   const { nextStep, backStep } = useQuizFlow(QuizStep.SPECIAL_DEMAND);
-  const selectedCompany = useAppSelector(
-    (state) => state.Quiz.selectedCompany,
-    shallowEqual,
-  );
+
   const fetchAttributesInProgress = useAppSelector(
     (state) => state.SystemAttributes.fetchAttributesInProgress,
   );
   const submitDisabled = useMemo(() => {
-    return !formValues?.nutritions?.length && !formValues?.mealType?.length;
-  }, [formValues?.nutritions, formValues?.mealType]);
+    return !formValues?.mealType?.length;
+  }, [formValues?.mealType]);
 
-  const { nutritions } = User(selectedCompany).getPublicData();
   const handleFormSubmitClick = async () => {
     submittingControl.setTrue();
 
@@ -50,24 +53,25 @@ const QuizSpecialDemand = () => {
     }
   };
 
-  const onFormSubmit = async (values: TSpecialDemandFormValues) => {
+  const handleFormSubmit = (values: TSpecialDemandFormValues) => {
     dispatch(QuizActions.updateQuiz({ ...values }));
   };
 
-  const onCancel = () => {
+  const handleSkipStep = () => {
     nextStep();
   };
 
-  const initialValues: TSpecialDemandFormValues = useMemo(
+  const specialDemandInitialValues: TSpecialDemandFormValues = useMemo(
     () => ({
-      nutritions: quizData.nutritions || nutritions || [],
       mealType: quizData.mealType || [],
     }),
-    [
-      JSON.stringify(quizData.nutritions),
-      JSON.stringify(quizData.mealType),
-      JSON.stringify(nutritions),
-    ],
+    [JSON.stringify(quizData.mealType)],
+  );
+  const mealStyleInitialValues = useMemo(
+    () => ({
+      mealStyles: quizData.mealStyles || [],
+    }),
+    [JSON.stringify(quizData.mealStyles)],
   );
 
   return (
@@ -88,23 +92,31 @@ const QuizSpecialDemand = () => {
       }
       submitText="Tiếp tục"
       cancelText="Tôi chưa chắc"
-      onCancel={onCancel}
+      onCancel={handleSkipStep}
       onSubmit={handleFormSubmitClick}
       submitDisabled={submitDisabled}
       submitInProgress={submittingControl.value}
-      onBack={backStep}>
+      onBack={backStep}
+      stepInfo={stepInfo}>
       <div className={css.formContainer}>
         {fetchAttributesInProgress ? (
           <div className={css.loading}>
             {intl.formatMessage({ id: 'QuizMealStyles.loading' })}
           </div>
         ) : (
-          <SpecialDemandForm
-            onSubmit={onFormSubmit}
-            formRef={formSubmitRef}
-            initialValues={initialValues}
-            setFormValues={setFormValues}
-          />
+          <>
+            <SpecialDemandForm
+              onSubmit={handleFormSubmit}
+              formRef={formSubmitRef}
+              initialValues={specialDemandInitialValues}
+              setFormValues={setFormValues}
+            />
+            <MealStylesForm
+              initialValues={mealStyleInitialValues}
+              formValues={formValues}
+              setFormValues={setFormValues}
+            />
+          </>
         )}
       </div>
     </QuizModal>
