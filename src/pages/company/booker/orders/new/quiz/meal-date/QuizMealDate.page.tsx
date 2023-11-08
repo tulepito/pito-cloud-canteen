@@ -96,7 +96,7 @@ const QuizMealDate = () => {
       submitDisabled={formInvalid}
       modalContainerClassName={css.modalContainer}
       modalContentRef={modalContentRef}
-      onBack={backStep}>
+      onBack={hasOrderBefore ? undefined : backStep}>
       <MealDateForm
         onSubmit={() => {}}
         setFormValues={setFormValues}

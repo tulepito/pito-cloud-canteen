@@ -18,7 +18,6 @@ import {
   required,
 } from '@utils/validators';
 
-import useRedirectAfterReloadPage from '../../hooks/useRedirectAfterReloadPage';
 import QuizModal from '../components/QuizModal/QuizModal';
 import { useQuizFlow } from '../hooks/useQuizFlow';
 
@@ -43,9 +42,8 @@ const QuizPerPackMemberAmountPage = () => {
   const submittingControl = useBoolean();
   const dispatch = useAppDispatch();
 
-  useRedirectAfterReloadPage();
   const quizData = useAppSelector((state) => state.Quiz.quiz, shallowEqual);
-  const { nextStep, backStep } = useQuizFlow(QuizStep.PACKAGE_PER_MEMBER);
+  const { nextStep } = useQuizFlow(QuizStep.PACKAGE_PER_MEMBER);
 
   const onSubmit = async (values: any) => {
     const {
@@ -160,8 +158,7 @@ const QuizPerPackMemberAmountPage = () => {
       submitText="Tiếp tục"
       submitDisabled={hasValidationErrors}
       submitInProgress={submittingControl.value}
-      onSubmit={onFormSubmitClick}
-      onBack={backStep}>
+      onSubmit={onFormSubmitClick}>
       <form className={css.formContainer}>
         <FieldTextInputComponent
           id="packagePerMember"

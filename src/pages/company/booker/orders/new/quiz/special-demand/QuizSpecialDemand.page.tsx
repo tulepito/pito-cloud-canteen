@@ -9,7 +9,6 @@ import { QuizActions } from '@redux/slices/Quiz.slice';
 import { User } from '@src/utils/data';
 import { QuizStep } from '@src/utils/enums';
 
-import useRedirectAfterReloadPage from '../../hooks/useRedirectAfterReloadPage';
 import QuizModal from '../components/QuizModal/QuizModal';
 import { useQuizFlow } from '../hooks/useQuizFlow';
 
@@ -22,7 +21,6 @@ const QuizSpecialDemand = () => {
   const intl = useIntl();
   const submittingControl = useBoolean();
   const dispatch = useAppDispatch();
-  useRedirectAfterReloadPage();
   const formSubmitRef = useRef<any>();
   const [formValues, setFormValues] = useState<TSpecialDemandFormValues>();
   const quizData = useAppSelector((state) => state.Quiz.quiz, shallowEqual);
