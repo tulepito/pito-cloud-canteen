@@ -327,7 +327,9 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
       const isRestaurantChanged =
         restaurantData.restaurant.id !==
         orderDetail[subOrderDate]?.restaurant.id;
-      changedRestaurantController.setValue(isRestaurantChanged);
+      changedRestaurantController.setValue(
+        isRestaurantChanged && isInProgressOrder,
+      );
       if (isNormalOrder) {
         const createLineItems = (_foodList: TObject) =>
           Object.entries<{
