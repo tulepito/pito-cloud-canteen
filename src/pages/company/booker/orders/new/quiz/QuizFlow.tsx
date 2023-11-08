@@ -5,7 +5,6 @@ import { resetOrder } from '@redux/slices/Order.slice';
 import { CurrentUser } from '@src/utils/data';
 import { QuizStep } from '@src/utils/enums';
 
-import QuizInviteMember from './invite-member/QuizInviteMember';
 import QuizMealDatePage from './meal-date/QuizMealDate.page';
 import QuizPerPackMemberAmountPage from './perpack-member-amount/QuizPerPackMemberAmount.page';
 import QuizSpecialDemandPage from './special-demand/QuizSpecialDemand.page';
@@ -21,11 +20,7 @@ export const firstTimeQuizSteps = [
   },
   {
     key: QuizStep.MEAL_DATE,
-    component: <QuizMealDatePage /* stepInfo="3/3" */ />,
-  },
-  {
-    key: QuizStep.INVITE_MEMBER,
-    component: <QuizInviteMember />,
+    component: <QuizMealDatePage stepInfo="3/3" />,
   },
 ];
 

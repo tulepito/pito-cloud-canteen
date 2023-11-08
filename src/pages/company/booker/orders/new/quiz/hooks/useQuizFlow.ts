@@ -71,6 +71,7 @@ export const useQuizFlow = (step: string) => {
             }),
           );
         const orderId = Listing(orderListing as TListing).getId();
+
         if (!isCopyPreviousOrder && !reorderOpen) {
           const { plans = [] } = Listing(
             orderListing as TListing,

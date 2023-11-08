@@ -32,7 +32,11 @@ const INITIAL_DELIVERY_TIME_BASE_ON_DAY_SESSION = {
   [DINNER_SESSION]: '18:00-18:15',
 };
 
-const QuizMealDate = () => {
+type TQuizMealDateProps = {
+  stepInfo?: string;
+};
+
+const QuizMealDate: React.FC<TQuizMealDateProps> = ({ stepInfo }) => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
   const creatingOrderModalControl = useBoolean();
@@ -43,7 +47,6 @@ const QuizMealDate = () => {
   const currentUser = useAppSelector((state) => state.user.currentUser);
   const { hasOrderBefore = false } = CurrentUser(currentUser!).getPrivateData();
   const {
-    nextStep,
     backStep,
     submitCreateOrder,
     creatingOrderInProgress,
@@ -96,14 +99,17 @@ const QuizMealDate = () => {
     ],
   );
 
-  const onFormSubmitClick = async () => {
-    dispatch(QuizActions.updateQuiz({ ...formValues }));
-    const { isGroupOrder: isGroupOrderFormValue } = formValues;
-    if (hasOrderBefore || isGroupOrderFormValue?.length === 0) {
-      submitCreateOrder(formValues);
-    } else {
-      nextStep();
-    }
+  const handleSubmitClick = async () => {
+    // eslint-disable-next-line @typescript-eslint/no-shadow
+    const { startDate, endDate } = formValues;
+    const normalizedFormValues = {
+      ...formValues,
+      startDate: new Date(startDate).getTime(),
+      endDate: new Date(endDate).getTime(),
+    };
+    dispatch(QuizActions.updateQuiz(normalizedFormValues));
+
+    submitCreateOrder(normalizedFormValues);
   };
 
   return !creatingOrderInProgress ? (
@@ -111,11 +117,12 @@ const QuizMealDate = () => {
       id="QuizMealDateModal"
       isOpen={!creatingOrderModalControl.value}
       modalTitle={modalTitle}
-      submitText={hasOrderBefore ? 'Tìm nhà hàng' : 'Tiếp tục'}
-      onSubmit={onFormSubmitClick}
+      submitText={'Tìm nhà hàng'}
+      onSubmit={handleSubmitClick}
       submitDisabled={formInvalid}
       modalContainerClassName={css.modalContainer}
       modalContentRef={modalContentRef}
+      stepInfo={stepInfo}
       onBack={hasOrderBefore ? undefined : backStep}>
       <MealDateForm
         onSubmit={() => {}}
