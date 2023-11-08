@@ -1,5 +1,4 @@
 import { useField, useForm } from 'react-final-form-hooks';
-import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import classNames from 'classnames';
 
@@ -28,27 +27,16 @@ const MealStylesForm: React.FC<TMealStylesFormProps> = ({
   formValues,
   setFormValues,
 }) => {
-  const intl = useIntl();
   const dispatch = useAppDispatch();
   const mealStyles = useAppSelector(
     (state) => state.SystemAttributes.categories,
     shallowEqual,
   );
 
-  const validate = (values: TMealStylesFormValues) => {
-    const errors: any = {};
-    if (!values.mealStyles || values.mealStyles.length < 5) {
-      errors.mealStyles = intl.formatMessage({ id: 'QuizMealStyles.error' });
-    }
-
-    return errors;
-  };
-
   const { form } = useForm<TMealStylesFormValues>({
     onSubmit: (values) => {
       dispatch(QuizActions.updateQuiz({ ...values }));
     },
-    validate,
     initialValues,
   });
   const mealStylesInput = useField('mealStyles', form);
@@ -72,6 +60,8 @@ const MealStylesForm: React.FC<TMealStylesFormProps> = ({
 
   return (
     <div className={css.root}>
+      <div className={css.formTitle}>Chọn 5 gu ẩm thực bạn yêu thích</div>
+
       <div className={css.formContainer}>
         <form className={css.form}>
           <input

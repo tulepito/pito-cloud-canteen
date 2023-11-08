@@ -1,10 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
+import isEmpty from 'lodash/isEmpty';
 
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import useBoolean from '@hooks/useBoolean';
 import { QuizActions } from '@redux/slices/Quiz.slice';
 import { QuizStep } from '@src/utils/enums';
 
@@ -24,42 +24,22 @@ type TQuizSpecialDemandProps = {
 
 const QuizSpecialDemand: React.FC<TQuizSpecialDemandProps> = ({ stepInfo }) => {
   const intl = useIntl();
-  const submittingControl = useBoolean();
   const dispatch = useAppDispatch();
-  const formSubmitRef = useRef<any>();
+
+  const quizData = useAppSelector((state) => state.Quiz.quiz, shallowEqual);
+  const { nextStep, backStep } = useQuizFlow(QuizStep.SPECIAL_DEMAND);
   const [formValues, setFormValues] = useState<
     Partial<TSpecialDemandFormValues & TMealStylesFormValues>
   >({});
-  const quizData = useAppSelector((state) => state.Quiz.quiz, shallowEqual);
-  const { nextStep, backStep } = useQuizFlow(QuizStep.SPECIAL_DEMAND);
-
   const fetchAttributesInProgress = useAppSelector(
     (state) => state.SystemAttributes.fetchAttributesInProgress,
   );
+
   const submitDisabled = useMemo(() => {
-    return !formValues?.mealType?.length;
-  }, [formValues?.mealType]);
+    const { mealType, mealStyles = [] } = formValues;
 
-  const handleFormSubmitClick = async () => {
-    submittingControl.setTrue();
-
-    try {
-      formSubmitRef?.current.submit();
-      nextStep();
-    } catch (error) {
-      console.error(error);
-    } finally {
-      submittingControl.setFalse();
-    }
-  };
-
-  const handleFormSubmit = (values: TSpecialDemandFormValues) => {
-    dispatch(QuizActions.updateQuiz({ ...values }));
-  };
-
-  const handleSkipStep = () => {
-    nextStep();
-  };
+    return isEmpty(mealType) || mealStyles.length < 5;
+  }, [JSON.stringify(formValues)]);
 
   const specialDemandInitialValues: TSpecialDemandFormValues = useMemo(
     () => ({
@@ -72,6 +52,24 @@ const QuizSpecialDemand: React.FC<TQuizSpecialDemandProps> = ({ stepInfo }) => {
       mealStyles: quizData.mealStyles || [],
     }),
     [JSON.stringify(quizData.mealStyles)],
+  );
+
+  const handleFormSubmitClick = () => {
+    dispatch(QuizActions.updateQuiz(formValues));
+    nextStep();
+  };
+
+  const handleSkipStep = () => {
+    nextStep();
+  };
+
+  useEffect(
+    () =>
+      setFormValues({
+        mealType: quizData.mealType || [],
+        mealStyles: quizData.mealStyles || [],
+      }),
+    [JSON.stringify(quizData)],
   );
 
   return (
@@ -95,7 +93,6 @@ const QuizSpecialDemand: React.FC<TQuizSpecialDemandProps> = ({ stepInfo }) => {
       onCancel={handleSkipStep}
       onSubmit={handleFormSubmitClick}
       submitDisabled={submitDisabled}
-      submitInProgress={submittingControl.value}
       onBack={backStep}
       stepInfo={stepInfo}>
       <div className={css.formContainer}>
@@ -106,9 +103,9 @@ const QuizSpecialDemand: React.FC<TQuizSpecialDemandProps> = ({ stepInfo }) => {
         ) : (
           <>
             <SpecialDemandForm
-              onSubmit={handleFormSubmit}
-              formRef={formSubmitRef}
+              onSubmit={() => {}}
               initialValues={specialDemandInitialValues}
+              formValues={formValues}
               setFormValues={setFormValues}
             />
             <MealStylesForm

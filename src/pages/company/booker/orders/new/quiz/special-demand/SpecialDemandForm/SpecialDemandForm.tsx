@@ -1,10 +1,12 @@
-import { useEffect, useImperativeHandle } from 'react';
+import { useEffect } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
 
 import Form from '@components/Form/Form';
 import MealTypeField from '@pages/admin/order/create/components/MealTypeField/MealTypeField';
+
+import type { TMealStylesFormValues } from '../../meal-styles/MealStylesForm';
 
 import css from './SpecialDemandForm.module.scss';
 
@@ -13,8 +15,10 @@ export type TSpecialDemandFormValues = {
 };
 
 type TExtraProps = {
-  formRef: any;
-  setFormValues: (values: TSpecialDemandFormValues) => void;
+  formValues: Partial<TSpecialDemandFormValues & TMealStylesFormValues>;
+  setFormValues: (
+    values: Partial<TSpecialDemandFormValues & TMealStylesFormValues>,
+  ) => void;
 };
 type TSpecialDemandFormComponentProps =
   FormRenderProps<TSpecialDemandFormValues> & Partial<TExtraProps>;
@@ -24,19 +28,11 @@ type TSpecialDemandFormProps = FormProps<TSpecialDemandFormValues> &
 const SpecialDemandFormComponent: React.FC<TSpecialDemandFormComponentProps> = (
   props,
 ) => {
-  const { handleSubmit, formRef, form, values, setFormValues } = props;
+  const { handleSubmit, values, formValues, setFormValues } = props;
   const intl = useIntl();
 
-  useImperativeHandle(formRef, () => ({
-    submit: () => {
-      form.submit();
-    },
-    getValues: () => {
-      return form.getState().values;
-    },
-  }));
   useEffect(() => {
-    setFormValues?.(values);
+    if (setFormValues) setFormValues?.({ ...formValues, ...values });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(values)]);
 
