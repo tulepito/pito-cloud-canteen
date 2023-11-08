@@ -15,7 +15,6 @@ import type { TListing } from '@src/utils/types';
 import { BookerNewOrderAction } from '../../BookerNewOrder.slice';
 
 const quizSteps = [
-  QuizStep.NEW_ORDER,
   QuizStep.PACKAGE_PER_MEMBER,
   QuizStep.SPECIAL_DEMAND,
   QuizStep.MEAL_STYLES,
@@ -24,11 +23,7 @@ const quizSteps = [
   QuizStep.ORDER_CREATING,
 ];
 
-const secondQuizSteps = [
-  QuizStep.NEW_ORDER,
-  QuizStep.MEAL_DATE,
-  QuizStep.ORDER_CREATING,
-];
+const secondQuizSteps = [QuizStep.MEAL_DATE, QuizStep.ORDER_CREATING];
 
 export const useQuizFlow = (step: string) => {
   const dispatch = useAppDispatch();
