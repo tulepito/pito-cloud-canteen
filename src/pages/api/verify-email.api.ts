@@ -26,21 +26,21 @@ const login = async () => {
     const loginSuccess = loginResult.status === 200;
 
     if (!loginSuccess) {
-      console.error('Login failed');
+      console.error('Login Sharetribe Console failed');
     }
 
     const [cookie] = loginResult?.headers['set-cookie'] || [];
 
     axiosInstance.defaults.headers.Cookie = cookie;
   } catch (err) {
-    console.error('Login Flex Console Failed - catch -');
+    console.error('Login Sharetribe Console failed - catch -');
     console.error(err);
   }
 };
 
 const verifyEmail = async (userId: string) => {
   try {
-    console.info(`Verify email for user - ${userId}`);
+    console.info(`Verifying email for user - ${userId}`);
 
     const response = await axiosInstance.post('/api/command', [
       '^ ',
@@ -57,7 +57,7 @@ const verifyEmail = async (userId: string) => {
     return response;
   } catch (err) {
     const { response } = err as any;
-    console.error('Verify email Failed');
+    console.error('Verify email failed');
     console.error(err);
 
     return response;
@@ -76,7 +76,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         const { status } = verifyUserResult;
 
         if (status.toString() === '204') {
-          return res.status(200).end(`Successfully verify user ${userId}`);
+          const message = `Successfully verify user ${userId}`;
+          console.info(message);
+
+          return res.status(200).end(message);
         }
 
         return res.status(401).end();
