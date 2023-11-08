@@ -2,10 +2,17 @@ import { useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 
+import {
+  AFTERNOON_SESSION,
+  DINNER_SESSION,
+  EVENING_SESSION,
+  MORNING_SESSION,
+} from '@components/CalendarDashboard/helpers/constant';
+import type { TDaySession } from '@components/CalendarDashboard/helpers/types';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { QuizActions } from '@redux/slices/Quiz.slice';
-import { CurrentUser } from '@src/utils/data';
+import { CurrentUser, User } from '@src/utils/data';
 import { QuizStep } from '@src/utils/enums';
 
 import QuizModal from '../components/QuizModal/QuizModal';
@@ -18,6 +25,13 @@ import MealDateForm from './MealDateForm/MealDateForm';
 
 import css from './QuizMealDate.module.scss';
 
+const INITIAL_DELIVERY_TIME_BASE_ON_DAY_SESSION = {
+  [MORNING_SESSION]: '08:00-08:15',
+  [AFTERNOON_SESSION]: '11:00-11:15',
+  [EVENING_SESSION]: '18:00-18:15',
+  [DINNER_SESSION]: '18:00-18:15',
+};
+
 const QuizMealDate = () => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
@@ -25,9 +39,9 @@ const QuizMealDate = () => {
   const [formValues, setFormValues] = useState<TMealDateFormValues>(null!);
   const [formInvalid, setFormInvalid] = useState<boolean>(false);
   const quizData = useAppSelector((state) => state.Quiz.quiz, shallowEqual);
+  const selectedCompany = useAppSelector((state) => state.Quiz.selectedCompany);
   const currentUser = useAppSelector((state) => state.user.currentUser);
-  const currentUserGetter = CurrentUser(currentUser!);
-  const { hasOrderBefore = false } = currentUserGetter.getPrivateData();
+  const { hasOrderBefore = false } = CurrentUser(currentUser!).getPrivateData();
   const {
     nextStep,
     backStep,
@@ -35,7 +49,6 @@ const QuizMealDate = () => {
     creatingOrderInProgress,
     creatingOrderError,
   } = useQuizFlow(QuizStep.MEAL_DATE);
-
   const {
     modalContentRef,
     onClickOrderDates,
@@ -48,11 +61,16 @@ const QuizMealDate = () => {
     startDate,
     endDate,
     isGroupOrder,
-    daySession,
     deadlineDate,
     orderDeadlineHour,
     orderDeadlineMinute,
+    daySession,
   } = quizData;
+
+  const modalTitle = intl.formatMessage(
+    { id: 'QuizMealDate.title' },
+    { companyName: User(selectedCompany).getPublicData().companyName },
+  );
 
   const initialValues = useMemo(
     () => ({
@@ -63,16 +81,18 @@ const QuizMealDate = () => {
       deadlineDate: deadlineDate ? new Date(deadlineDate).getTime() : undefined,
       orderDeadlineHour: orderDeadlineHour || '',
       orderDeadlineMinute: orderDeadlineMinute || '',
-      daySession: daySession || '',
+      deliveryHour:
+        INITIAL_DELIVERY_TIME_BASE_ON_DAY_SESSION[daySession as TDaySession] ||
+        '',
     }),
     [
-      daySession,
       deadlineDate,
       endDate,
       isGroupOrder,
       orderDeadlineHour,
       orderDeadlineMinute,
       startDate,
+      daySession,
     ],
   );
 
@@ -90,7 +110,7 @@ const QuizMealDate = () => {
     <QuizModal
       id="QuizMealDateModal"
       isOpen={!creatingOrderModalControl.value}
-      modalTitle={intl.formatMessage({ id: 'QuizMealDate.title' })}
+      modalTitle={modalTitle}
       submitText={hasOrderBefore ? 'Tìm nhà hàng' : 'Tiếp tục'}
       onSubmit={onFormSubmitClick}
       submitDisabled={formInvalid}

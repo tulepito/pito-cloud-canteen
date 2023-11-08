@@ -13,7 +13,6 @@ import DayInWeekField from '@pages/admin/order/create/components/DayInWeekField/
 import { generateTimeRangeItems } from '@src/utils/dates';
 import { required } from '@src/utils/validators';
 
-import DaySessionField from '../DaySessionField/DaySessionField';
 import OrderDateField from '../OrderDateField/OrderDateField';
 import OrderDeadlineField from '../OrderDeadlineField/OrderDeadlineField';
 
@@ -29,7 +28,6 @@ export type TMealDateFormValues = {
   isGroupOrder: string[];
   orderDeadlineHour?: string;
   orderDeadlineMinute?: string;
-  daySession: string;
 };
 
 type TExtraProps = {
@@ -79,7 +77,6 @@ const MealDateFormComponent: React.FC<TMealDateFormComponentProps> = (
     endDate: endDateInitialValue,
     deadlineDate: deadlineDateInitialValue,
     isGroupOrder,
-    daySession,
   } = values;
 
   useEffect(() => {
@@ -91,7 +88,6 @@ const MealDateFormComponent: React.FC<TMealDateFormComponentProps> = (
       invalid ||
       !startDateInitialValue ||
       !endDateInitialValue ||
-      !daySession ||
       (isGroupOrder.length > 0 && !deadlineDateInitialValue);
     setFormInvalid?.(formInvalid);
   }, [invalid, JSON.stringify(values)]);
@@ -113,12 +109,6 @@ const MealDateFormComponent: React.FC<TMealDateFormComponentProps> = (
           title={intl.formatMessage({
             id: 'MealDateForm.dayInWeekField.title',
           })}
-        />
-        <DaySessionField
-          form={form}
-          values={values}
-          containerClassName={css.fieldContainer}
-          titleClassName={css.fieldTitle}
         />
 
         <div onClick={onClickDeliveryHour}>
