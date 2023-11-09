@@ -1,0 +1,20 @@
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/vars.scss' as *;
+
+.formRoot {
+  padding: 16px;
+  max-width: 320px;
+  border-radius: 16px;
+  border: 1px solid $neutralGray5;
+  background: $neutralGray1;
+
+  .formContainer {
+    display: flex;
+    flex-direction: column;
+    row-gap: 16px;
+  }
+
+  .formTitle {
+    @include textTemplate(18px, 700, 24px);
+  }
+}

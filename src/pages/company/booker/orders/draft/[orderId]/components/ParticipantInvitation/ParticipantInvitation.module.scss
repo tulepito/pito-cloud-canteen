@@ -52,4 +52,16 @@
     padding: 20px 0 28px;
     font-weight: 400;
   }
+
+  .participantInvitationContainer {
+    margin-top: 16px;
+
+    @include viewportLarge {
+      margin-top: 24px;
+    }
+
+    @include viewportSLarge {
+      margin-top: 28px;
+    }
+  }
 }
