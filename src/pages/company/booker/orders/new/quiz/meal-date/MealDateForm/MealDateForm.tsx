@@ -131,6 +131,7 @@ const MealDateFormComponent: React.FC<TMealDateFormComponentProps> = (
           form={form}
           values={values}
           onClick={onClickOrderDates}
+          usePreviousData={usePreviousData}
         />
         <RenderWhen condition={hasOrderBefore && !reorderOpen}>
           <Toggle

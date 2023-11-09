@@ -28,9 +28,9 @@
 
     &.stepInfoWithBackBtn {
       flex-basis: unset;
-      // 80px: width of back button
+      // 20px: width of back button
       // 10px: 50% of step info
-      margin-left: calc(-80px + 10px);
+      margin-left: calc(-20px + 10px);
     }
   }
 
