@@ -1,4 +1,6 @@
 /* eslint-disable @typescript-eslint/no-shadow */
+import chunk from 'lodash/chunk';
+import flatten from 'lodash/flatten';
 import isEmpty from 'lodash/isEmpty';
 
 import { fetchListing, fetchUser } from '@services/integrationHelper';
@@ -29,19 +31,32 @@ const getOrder = async ({ orderId }: { orderId: string }) => {
   const [companyUser] = denormalisedResponseEntities(companyResponse);
 
   let data: TObject = { companyId, companyData: companyUser, orderListing };
-  const participantData = denormalisedResponseEntities(
-    await integrationSdk.users.query({
-      meta_id: participants,
-      include: ['profileImage'],
-      'fields.image': [`variants.${EImageVariants.squareSmall2x}`],
-    }),
+  const participantData = flatten(
+    await Promise.all(
+      chunk(participants, 100).map(async (ids) => {
+        return denormalisedResponseEntities(
+          await integrationSdk.users.query({
+            meta_id: ids,
+            include: ['profileImage'],
+            'fields.image': [`variants.${EImageVariants.squareSmall2x}`],
+          }),
+        );
+      }),
+    ),
   );
-  const anonymousParticipantData = denormalisedResponseEntities(
-    await integrationSdk.users.query({
-      meta_id: anonymous,
-      include: ['profileImage'],
-      'fields.image': [`variants.${EImageVariants.squareSmall2x}`],
-    }),
+
+  const anonymousParticipantData = flatten(
+    await Promise.all(
+      chunk(anonymous, 100).map(async (ids) => {
+        return denormalisedResponseEntities(
+          await integrationSdk.users.query({
+            meta_id: ids,
+            include: ['profileImage'],
+            'fields.image': [`variants.${EImageVariants.squareSmall2x}`],
+          }),
+        );
+      }),
+    ),
   );
 
   data = { ...data, participantData, anonymousParticipantData };
