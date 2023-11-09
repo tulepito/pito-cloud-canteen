@@ -80,7 +80,6 @@ const QuizModal: React.FC<QuizModalProps> = (props) => {
           {onBack && (
             <div className={css.backBtn} onClick={onBack}>
               <IconArrow direction="left" />
-              <span>Quay lại</span>
             </div>
           )}
         </div>

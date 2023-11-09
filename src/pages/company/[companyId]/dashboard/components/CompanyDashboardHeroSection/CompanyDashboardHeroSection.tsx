@@ -1,5 +1,7 @@
 import React, { useEffect } from 'react';
 import { FormattedMessage } from 'react-intl';
+import classNames from 'classnames';
+import isEmpty from 'lodash/isEmpty';
 import Image from 'next/image';
 
 import {
@@ -57,10 +59,17 @@ const CompanyDashboardHeroSection = () => {
   const { isMobileLayout, isTabletLayout } = useViewport();
 
   const dispatch = useAppDispatch();
+  const selectedCompany = useAppSelector((state) => state.Quiz.selectedCompany);
   const currentUser = useAppSelector(currentUserSelector);
   const { firstName } = CurrentUser(currentUser as TCurrentUser).getProfile();
 
   const isNotDesktop = isTabletLayout || isMobileLayout;
+  const isSelectedCompanyEmpty =
+    selectedCompany === null || isEmpty(selectedCompany);
+
+  const homePageLinkClasses = classNames(css.homePageLink, {
+    [css.homePageLinkDisabled]: isSelectedCompanyEmpty,
+  });
 
   useEffect(() => {
     const container = document.querySelector(
@@ -75,6 +84,9 @@ const CompanyDashboardHeroSection = () => {
   }, [isNotDesktop]);
 
   const handleMealClick = (daySession: string) => () => {
+    if (isSelectedCompanyEmpty) {
+      return;
+    }
     dispatch(QuizActions.clearQuizData());
     dispatch(QuizActions.openQuizFlow());
     dispatch(BookerNewOrderAction.setCurrentStep(0));
@@ -100,7 +112,7 @@ const CompanyDashboardHeroSection = () => {
           {HOMEPAGE_MEAL_LINKS.map((item) => (
             <div
               key={item.key}
-              className={css.homePageLink}
+              className={homePageLinkClasses}
               onClick={handleMealClick(item.daySession)}>
               <Image
                 src={item.image}

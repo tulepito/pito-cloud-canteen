@@ -12,7 +12,7 @@ export const useQuizModalScrollControl = () => {
 
   const onClickOrderDates = (scrollBy?: number) => {
     setTimeout(() => {
-      scrollDown(scrollBy || 50);
+      scrollDown(scrollBy || 80);
     }, 0);
   };
 
