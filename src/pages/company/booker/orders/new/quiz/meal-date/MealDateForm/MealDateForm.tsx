@@ -91,6 +91,7 @@ const MealDateFormComponent: React.FC<TMealDateFormComponentProps> = (
     endDate: endDateInitialValue,
     deadlineDate: deadlineDateInitialValue,
     orderType = EOrderType.normal,
+    usePreviousData,
   } = values;
 
   const isGroupOrder = orderType === EOrderType.group;
@@ -137,71 +138,73 @@ const MealDateFormComponent: React.FC<TMealDateFormComponentProps> = (
             name="usePreviousData"
             className={classNames(css.toggle, css.input)}
             onClick={handleUsePreviousData}
-            status={values?.usePreviousData ? 'on' : 'off'}
+            status={usePreviousData ? 'on' : 'off'}
             label={usePreviousDataLabel}
           />
         </RenderWhen>
 
-        <DayInWeekField
-          form={form}
-          values={values}
-          containerClassName={css.fieldContainer}
-          titleClassName={css.fieldTitle}
-          fieldGroupClassName={css.fieldGroups}
-          title={intl.formatMessage({
-            id: 'MealDateForm.dayInWeekField.title',
-          })}
-        />
-
-        <div onClick={onClickDeliveryHour}>
-          <FieldDropdownSelect
-            id="deliveryHour"
-            name="deliveryHour"
-            label={intl.formatMessage({
-              id: 'MealPlanDateField.deliveryHourLabel',
-            })}
-            className={css.fieldContainer}
-            leftIcon={<IconClock />}
-            validate={required(deliveryHourRequiredMessage)}
-            placeholder={intl.formatMessage({
-              id: 'OrderDeadlineField.deliveryHour.placeholder',
-            })}
-            options={parsedDeliveryHourOptions}
-          />
-        </div>
-
-        <div className={css.orderTypeContainer}>
-          <OnChange name="orderType">{handleChangeOrderType}</OnChange>
-
-          <div className={css.orderTypeLabel}>
-            {intl.formatMessage({ id: 'MealDateForm.fieldOrderType.label' })}
-          </div>
-          <FieldRadioButton
-            name="orderType"
-            id="MealDateForm.orderType.normal"
-            value={EOrderType.normal}
-            label={intl.formatMessage({
-              id: 'MealDateForm.fieldOrderType.normalLabel',
+        <RenderWhen condition={!usePreviousData}>
+          <DayInWeekField
+            form={form}
+            values={values}
+            containerClassName={css.fieldContainer}
+            titleClassName={css.fieldTitle}
+            fieldGroupClassName={css.fieldGroups}
+            title={intl.formatMessage({
+              id: 'MealDateForm.dayInWeekField.title',
             })}
           />
-          <FieldRadioButton
-            name="orderType"
-            id="MealDateForm.orderType.group"
-            value={EOrderType.group}
-            label={intl.formatMessage({
-              id: 'MealDateForm.fieldOrderType.groupLabel',
-            })}
-          />
-        </div>
 
-        <RenderWhen condition={isGroupOrder}>
-          <div className={css.fieldContainer}>
-            <OrderDeadlineField
-              form={form}
-              values={values}
-              onClick={onClickDeadlineDate}
+          <div onClick={onClickDeliveryHour}>
+            <FieldDropdownSelect
+              id="deliveryHour"
+              name="deliveryHour"
+              label={intl.formatMessage({
+                id: 'MealPlanDateField.deliveryHourLabel',
+              })}
+              className={css.fieldContainer}
+              leftIcon={<IconClock />}
+              validate={required(deliveryHourRequiredMessage)}
+              placeholder={intl.formatMessage({
+                id: 'OrderDeadlineField.deliveryHour.placeholder',
+              })}
+              options={parsedDeliveryHourOptions}
             />
           </div>
+
+          <div className={css.orderTypeContainer}>
+            <OnChange name="orderType">{handleChangeOrderType}</OnChange>
+
+            <div className={css.orderTypeLabel}>
+              {intl.formatMessage({ id: 'MealDateForm.fieldOrderType.label' })}
+            </div>
+            <FieldRadioButton
+              name="orderType"
+              id="MealDateForm.orderType.normal"
+              value={EOrderType.normal}
+              label={intl.formatMessage({
+                id: 'MealDateForm.fieldOrderType.normalLabel',
+              })}
+            />
+            <FieldRadioButton
+              name="orderType"
+              id="MealDateForm.orderType.group"
+              value={EOrderType.group}
+              label={intl.formatMessage({
+                id: 'MealDateForm.fieldOrderType.groupLabel',
+              })}
+            />
+          </div>
+
+          <RenderWhen condition={isGroupOrder}>
+            <div className={css.fieldContainer}>
+              <OrderDeadlineField
+                form={form}
+                values={values}
+                onClick={onClickDeadlineDate}
+              />
+            </div>
+          </RenderWhen>
         </RenderWhen>
       </div>
     </Form>

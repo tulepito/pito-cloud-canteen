@@ -76,7 +76,7 @@ const QuizMealDate: React.FC<TQuizMealDateProps> = ({ stepInfo }) => {
 
   const initialValues = useMemo(
     () => ({
-      usePreviousData: true,
+      usePreviousData: hasOrderBefore,
       startDate: startDate ? new Date(startDate).getTime() : undefined,
       endDate: endDate ? new Date(endDate).getTime() : undefined,
       dayInWeek: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'],
@@ -89,6 +89,7 @@ const QuizMealDate: React.FC<TQuizMealDateProps> = ({ stepInfo }) => {
         '',
     }),
     [
+      hasOrderBefore,
       deadlineDate,
       endDate,
       orderDeadlineHour,
