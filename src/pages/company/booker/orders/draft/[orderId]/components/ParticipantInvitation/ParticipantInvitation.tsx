@@ -1,13 +1,16 @@
+import isEqual from 'lodash/isEqual';
 import { DateTime } from 'luxon';
 
 import Badge from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import AlertModal from '@components/Modal/AlertModal';
-import { useAppSelector } from '@hooks/reduxHooks';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
+import { orderAsyncActions } from '@redux/slices/Order.slice';
 import { Listing } from '@src/utils/data';
 
+import type { DeadlineDateTimeFormValues } from './DeadlineDateTimeForm';
 import DeadlineDateTimeForm from './DeadlineDateTimeForm';
 
 import css from './ParticipantInvitation.module.scss';
@@ -22,6 +25,7 @@ const ParticipantInvitation: React.FC<TParticipantInvitationProps> = ({
   onPublishOrder,
 }) => {
   const confirmPublishOrderControl = useBoolean();
+  const dispatch = useAppDispatch();
   const order = useAppSelector((state) => state.Order.order);
 
   const { startDate, deadlineDate, deadlineHour } =
@@ -44,8 +48,22 @@ const ParticipantInvitation: React.FC<TParticipantInvitationProps> = ({
     deadlineHour: deadlineHour || '06:30',
   };
 
-  const handleSubmitPublishOrder = () => {
+  const handleSubmitDeadlineDateTimeForm = (
+    values: DeadlineDateTimeFormValues,
+  ) => {
+    if (!isEqual(deadlineDateTimeInitialValues, values)) {
+      dispatch(
+        orderAsyncActions.updateOrder({
+          generalInfo: values,
+        }),
+      );
+    }
+    confirmPublishOrderControl.setTrue();
+  };
+
+  const handleConfirmPublishOrder = () => {
     confirmPublishOrderControl.setFalse();
+
     onPublishOrder();
   };
 
@@ -70,7 +88,7 @@ const ParticipantInvitation: React.FC<TParticipantInvitationProps> = ({
             <DeadlineDateTimeForm
               deliveryTime={deliveryTime}
               initialValues={deadlineDateTimeInitialValues}
-              onSubmit={confirmPublishOrderControl.setTrue}
+              onSubmit={handleSubmitDeadlineDateTimeForm}
             />
             <AlertModal
               childrenClassName={css.confirmModalChildrenContainer}
@@ -81,7 +99,7 @@ const ParticipantInvitation: React.FC<TParticipantInvitationProps> = ({
               confirmLabel={'Gửi lời mời'}
               confirmDisabled={true}
               onCancel={onGoBack}
-              onConfirm={handleSubmitPublishOrder}>
+              onConfirm={handleConfirmPublishOrder}>
               Sau khi gửi, bạn sẽ không thể chỉnh sửa thực đơn của tuần ăn.
             </AlertModal>
           </div>
