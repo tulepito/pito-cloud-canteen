@@ -13,7 +13,7 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { QuizActions } from '@redux/slices/Quiz.slice';
 import { CurrentUser, User } from '@src/utils/data';
-import { QuizStep } from '@src/utils/enums';
+import { EOrderType, QuizStep } from '@src/utils/enums';
 
 import QuizModal from '../components/QuizModal/QuizModal';
 import QuizCreateOrderLoadingModal from '../create-order-loading/QuizCreateOrderLoadingModal';
@@ -63,7 +63,6 @@ const QuizMealDate: React.FC<TQuizMealDateProps> = ({ stepInfo }) => {
   const {
     startDate,
     endDate,
-    isGroupOrder,
     deadlineDate,
     orderDeadlineHour,
     orderDeadlineMinute,
@@ -77,10 +76,11 @@ const QuizMealDate: React.FC<TQuizMealDateProps> = ({ stepInfo }) => {
 
   const initialValues = useMemo(
     () => ({
+      usePreviousData: true,
       startDate: startDate ? new Date(startDate).getTime() : undefined,
       endDate: endDate ? new Date(endDate).getTime() : undefined,
       dayInWeek: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'],
-      isGroupOrder: isGroupOrder || [],
+      orderType: EOrderType.normal,
       deadlineDate: deadlineDate ? new Date(deadlineDate).getTime() : undefined,
       orderDeadlineHour: orderDeadlineHour || '',
       orderDeadlineMinute: orderDeadlineMinute || '',
@@ -91,7 +91,6 @@ const QuizMealDate: React.FC<TQuizMealDateProps> = ({ stepInfo }) => {
     [
       deadlineDate,
       endDate,
-      isGroupOrder,
       orderDeadlineHour,
       orderDeadlineMinute,
       startDate,

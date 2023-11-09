@@ -2,12 +2,13 @@
 import { useEffect, useMemo } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
+import { OnChange } from 'react-final-form-listeners';
 import { useIntl } from 'react-intl';
 import classNames from 'classnames';
 
 import Form from '@components/Form/Form';
-import FieldCheckbox from '@components/FormFields/FieldCheckbox/FieldCheckbox';
 import FieldDropdownSelect from '@components/FormFields/FieldDropdownSelect/FieldDropdownSelect';
+import FieldRadioButton from '@components/FormFields/FieldRadioButton/FieldRadioButton';
 import IconClock from '@components/Icons/IconClock/IconClock';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import Toggle from '@components/Toggle/Toggle';
@@ -15,6 +16,7 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import DayInWeekField from '@pages/admin/order/create/components/DayInWeekField/DayInWeekField';
 import { QuizActions } from '@redux/slices/Quiz.slice';
 import { generateTimeRangeItems } from '@src/utils/dates';
+import { EOrderType } from '@src/utils/enums';
 import { required } from '@src/utils/validators';
 
 import OrderDateField from '../OrderDateField/OrderDateField';
@@ -30,7 +32,7 @@ export type TMealDateFormValues = {
   usePreviousData?: boolean;
   deadlineDate: number;
   dayInWeek: string[];
-  isGroupOrder: string[];
+  orderType: EOrderType;
   orderDeadlineHour?: string;
   orderDeadlineMinute?: string;
 };
@@ -88,8 +90,16 @@ const MealDateFormComponent: React.FC<TMealDateFormComponentProps> = (
     startDate: startDateInitialValue,
     endDate: endDateInitialValue,
     deadlineDate: deadlineDateInitialValue,
-    isGroupOrder,
+    orderType = EOrderType.normal,
   } = values;
+
+  const isGroupOrder = orderType === EOrderType.group;
+
+  const handleChangeOrderType = (newValue: string) => {
+    if (newValue === EOrderType.group && onClickIsGroupOrder) {
+      onClickIsGroupOrder();
+    }
+  };
 
   const handleUsePreviousData = (checked: boolean) => {
     form.change('usePreviousData', checked);
@@ -109,7 +119,7 @@ const MealDateFormComponent: React.FC<TMealDateFormComponentProps> = (
       invalid ||
       !startDateInitialValue ||
       !endDateInitialValue ||
-      (isGroupOrder.length > 0 && !deadlineDateInitialValue);
+      (isGroupOrder && !deadlineDateInitialValue);
     setFormInvalid?.(formInvalid);
   }, [invalid, JSON.stringify(values)]);
 
@@ -160,15 +170,31 @@ const MealDateFormComponent: React.FC<TMealDateFormComponentProps> = (
           />
         </div>
 
-        <div className={css.fieldContainer} onClick={onClickIsGroupOrder}>
-          <FieldCheckbox
-            id="isGroupOrder"
-            name="isGroupOrder"
-            value="true"
-            label="Tôi muốn mời thành viên tham gia chọn món"
+        <div className={css.orderTypeContainer}>
+          <OnChange name="orderType">{handleChangeOrderType}</OnChange>
+
+          <div className={css.orderTypeLabel}>
+            {intl.formatMessage({ id: 'MealDateForm.fieldOrderType.label' })}
+          </div>
+          <FieldRadioButton
+            name="orderType"
+            id="MealDateForm.orderType.normal"
+            value={EOrderType.normal}
+            label={intl.formatMessage({
+              id: 'MealDateForm.fieldOrderType.normalLabel',
+            })}
+          />
+          <FieldRadioButton
+            name="orderType"
+            id="MealDateForm.orderType.group"
+            value={EOrderType.group}
+            label={intl.formatMessage({
+              id: 'MealDateForm.fieldOrderType.groupLabel',
+            })}
           />
         </div>
-        <RenderWhen condition={isGroupOrder.length > 0}>
+
+        <RenderWhen condition={isGroupOrder}>
           <div className={css.fieldContainer}>
             <OrderDeadlineField
               form={form}
