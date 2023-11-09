@@ -9,7 +9,10 @@ import OrderCalendar from './components/OrderCalendar/OrderCalendar';
 import OrdersAnalytics from './components/OrdersAnalytics/OrdersAnalytics';
 import Overview from './components/Overview/Overview';
 import RevenueAnalytics from './components/RevenueAnalytics/RevenueAnalytics';
-import { calculateOverviewInformation } from './helpers/dashboardData';
+import {
+  calculateOverviewInformation,
+  splitSubOrders,
+} from './helpers/dashboardData';
 import { useControlTimeRange } from './hooks/useControlTimeRange';
 import { PartnerDashboardThunks } from './Dashboard.slice';
 
@@ -63,6 +66,12 @@ const Dashboard: React.FC<TDashboardProps> = () => {
     totalOrders: previousOverviewInformation.totalOrders,
   };
 
+  const splittedSubOrders = useMemo(
+    () =>
+      splitSubOrders(subOrders, restaurantListingId, currentOrderVATPercentage),
+    [currentOrderVATPercentage, restaurantListingId, subOrders],
+  );
+
   useEffect(() => {
     const { previousStartDate, previousEndDate } = getPreviousTimePeriod();
     dispatch(
@@ -77,6 +86,7 @@ const Dashboard: React.FC<TDashboardProps> = () => {
         },
       }),
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, endDate, startDate]);
 
   return (
@@ -91,7 +101,7 @@ const Dashboard: React.FC<TDashboardProps> = () => {
         <RevenueAnalytics data={[]} />
       </section>
       <section className={css.section}>
-        <LatestOrders data={[]} />
+        <LatestOrders data={splittedSubOrders} />
       </section>
       <section className={css.section}>
         <OrderCalendar data={[]} />

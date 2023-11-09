@@ -3,6 +3,8 @@ import NamedLink from '@components/NamedLink/NamedLink';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { partnerPaths } from '@src/paths';
 
+import SubOrderItem from './SubOrderItem/SubOrderItem';
+
 import css from './LatestOrders.module.scss';
 
 type TLatestOrdersProps = {
@@ -28,6 +30,11 @@ const LatestOrders: React.FC<TLatestOrdersProps> = (props) => {
               Chưa có dữ liệu báo cáo trong thời gian này
             </div>
           </div>
+          <RenderWhen.False>
+            {data.map((item: any) => (
+              <SubOrderItem key={item.subOrderId} subOrder={item} />
+            ))}
+          </RenderWhen.False>
         </RenderWhen>
       </div>
     </div>
