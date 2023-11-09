@@ -1,0 +1,31 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.root {
+  border-radius: 4px;
+  border: 1px solid $neutralGray3;
+  background: $neutralGray1;
+  @include flexAlign(center, space-between);
+  padding: 8px;
+}
+
+.leftPart {
+  @include flexAlign(center, flex-start);
+}
+
+.greenMark {
+  width: 4px;
+  height: 24px;
+  background: $sematicGreen2;
+  border-radius: 2px;
+  margin-right: 8px;
+}
+
+.title {
+  @include textTemplate(14px, 600, 20px);
+}
+
+.deliveryHour {
+  @include textTemplate(14px, 400, 20px);
+}

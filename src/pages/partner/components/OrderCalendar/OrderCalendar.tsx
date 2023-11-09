@@ -1,33 +1,76 @@
-import IconNoAnalyticsData from '@components/Icons/IconNoAnalyticsData/IconNoAnalyticsData';
+import { useMemo } from 'react';
+import type { Event } from 'react-big-calendar';
+import { Views } from 'react-big-calendar';
+import { DateTime } from 'luxon';
+
+import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
+import useSelectDay from '@components/CalendarDashboard/hooks/useSelectDay';
 import NamedLink from '@components/NamedLink/NamedLink';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
+import EmptySubOrder from '@pages/participant/orders/components/EmptySubOrder/EmptySubOrder';
 import { partnerPaths } from '@src/paths';
+import { isSameDate } from '@src/utils/dates';
+
+import SubOrderEventCard from './SubOrderEventCard/SubOrderEventCard';
 
 import css from './OrderCalendar.module.scss';
 
 type TOrderCalendarProps = {
   data: any[];
+  inProgress?: boolean;
 };
 
 const OrderCalendar: React.FC<TOrderCalendarProps> = (props) => {
-  const { data = [] } = props;
+  const { data = [], inProgress } = props;
+  const { selectedDay } = useSelectDay();
+
+  const events: Event[] = useMemo(() => {
+    return data.map((item) => ({
+      resource: {
+        subOrderTitle: item.subOrderTitle,
+        deliveryHour: item.deliveryHour,
+        lastTransition: item.lastTransition,
+      },
+      title: item.subOrderTitle,
+      start: DateTime.fromMillis(+item.subOrderDate).toJSDate(),
+      end: DateTime.fromMillis(+item.subOrderDate).plus({ hour: 1 }).toJSDate(),
+    }));
+  }, [data]);
+
+  const subOrdersFromSelectedDay = useMemo(
+    () =>
+      events.filter((_event: Event) => isSameDate(_event.start!, selectedDay)),
+    [events, selectedDay],
+  );
 
   return (
     <div className={css.root}>
       <div className={css.titleHeader}>
         <div>Lịch đơn hàng</div>
         <NamedLink path={partnerPaths.ManageOrders} className={css.link}>
-          Xem chi tiết
+          Xem tất cả đơn hàng
         </NamedLink>
       </div>
       <div className={css.dataWrapper}>
-        <RenderWhen condition={data.length === 0}>
-          <div className={css.empty}>
-            <IconNoAnalyticsData />
-            <div className={css.emptyText}>
-              Chưa có dữ liệu báo cáo trong thời gian này
+        <CalendarDashboard
+          anchorDate={selectedDay}
+          events={events}
+          renderEvent={SubOrderEventCard}
+          inProgress={inProgress}
+          defaultView={Views.WEEK}
+          components={{ toolbar: () => <></> }}
+        />
+        <div className={css.subOrderList}>
+          {subOrdersFromSelectedDay.map((item, index) => (
+            <SubOrderEventCard key={index} event={item} />
+          ))}
+        </div>
+        <RenderWhen condition={!inProgress}>
+          <RenderWhen condition={data.length === 0}>
+            <div className={css.empty}>
+              <EmptySubOrder title="Bạn chưa có đơn hàng nào" />
             </div>
-          </div>
+          </RenderWhen>
         </RenderWhen>
       </div>
     </div>

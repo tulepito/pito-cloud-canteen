@@ -31,6 +31,9 @@ const Dashboard: React.FC<TDashboardProps> = () => {
   const currentUserGetter = CurrentUser(currentUser);
   const { restaurantListingId } = currentUserGetter.getMetadata();
   const subOrders = useAppSelector((state) => state.PartnerDashboard.subOrders);
+  const fetchSubOrdersInProgress = useAppSelector(
+    (state) => state.PartnerDashboard.fetchSubOrdersInProgress,
+  );
   const previousSubOrders = useAppSelector(
     (state) => state.PartnerDashboard.previousSubOrders,
   );
@@ -104,7 +107,10 @@ const Dashboard: React.FC<TDashboardProps> = () => {
         <LatestOrders data={splittedSubOrders} />
       </section>
       <section className={css.section}>
-        <OrderCalendar data={[]} />
+        <OrderCalendar
+          data={splittedSubOrders}
+          inProgress={fetchSubOrdersInProgress}
+        />
       </section>
     </div>
   );
