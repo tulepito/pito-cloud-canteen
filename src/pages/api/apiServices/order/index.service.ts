@@ -1,3 +1,4 @@
+import isEmpty from 'lodash/isEmpty';
 import omit from 'lodash/omit';
 
 import { generateUncountableIdForOrder } from '@helpers/generateUncountableId';
@@ -93,7 +94,14 @@ const normalizeOrderMetadata = (metadata: TObject = {}) => {
     vatAllow,
     deliveryHour,
     daySession:
-      daySession || getDaySessionFromDeliveryTime(deliveryHour.split('-')[0]),
+      daySession ||
+      getDaySessionFromDeliveryTime(
+        isEmpty(deliveryHour)
+          ? undefined
+          : deliveryHour.includes('-')
+          ? deliveryHour.split('-')[0]
+          : deliveryHour,
+      ),
     mealType,
   };
 
