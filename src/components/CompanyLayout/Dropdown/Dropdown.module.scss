@@ -34,10 +34,15 @@
       @include viewportMedium {
         background-color: $neutralGray2;
       }
+
+      .label {
+        font-weight: 600;
+      }
     }
 
     .label {
       @include lineClamp(2);
+      font-weight: 400;
     }
 
     &:first-child {

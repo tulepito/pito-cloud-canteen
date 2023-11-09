@@ -191,29 +191,6 @@ function BookerDraftOrderPage() {
     shouldHideDayItems: isAllDatesHaveNoRestaurants,
   });
 
-  useEffect(() => {
-    if (!isEmpty(orderDetail)) {
-      dispatch(orderAsyncActions.checkRestaurantStillAvailable({}));
-    }
-  }, [dispatch, JSON.stringify(orderDetail)]);
-
-  useEffect(() => {
-    dispatch(QuizActions.clearQuizData());
-  }, []);
-
-  useEffect(() => {
-    if (!isEmpty(orderState)) {
-      if (orderState === EOrderDraftStates.draft) {
-        router.push({ pathname: companyPaths.CreateNewOrder });
-      } else if (!EnableToAccessPageOrderStates.includes(orderState)) {
-        router.push({
-          pathname: companyPaths.ManageOrderPicking,
-          query: { orderId: orderId as string },
-        });
-      }
-    }
-  }, [orderId, orderState]);
-
   const onOpenPickFoodModal = async (
     dateTime: any,
     restaurantId: string,
@@ -242,14 +219,35 @@ function BookerDraftOrderPage() {
     );
     openRestaurantDetailModal();
   };
-  const onEditFoodInProgress = (timestamp: number) => {
+  const isEditFoodInProgress = (timestamp: number) => {
     return (
       (searchInProgress || fetchRestaurantFoodInProgress) &&
       selectedTimestamp === timestamp
     );
   };
 
-  const onSearchSubmit = (keywords: string, _restaurantId: string) => {
+  const calendarProps = {
+    renderEvent: (props: any) => (
+      <MealPlanCard
+        {...props}
+        removeInprogress={props?.resources?.updatePlanDetailInprogress}
+        onRemove={handleRemoveMeal(props?.resources?.planId)}
+      />
+    ),
+    resources: {
+      ...calendarExtraResources,
+      onEditFood: onOpenPickFoodModal,
+      editFoodInprogress: isEditFoodInProgress,
+      availableOrderDetailCheckList,
+      hideEmptySubOrderSection: true,
+    },
+    components: componentsProps,
+  };
+
+  const handleSearchRestaurantSubmit = (
+    keywords: string,
+    _restaurantId: string,
+  ) => {
     dispatch(
       BookerSelectRestaurantThunks.fetchFoodListFromRestaurant({
         keywords,
@@ -263,9 +261,32 @@ function BookerDraftOrderPage() {
     dispatch(OrderListThunks.disableWalkthrough(currentUserId));
   };
 
-  const onChatClick = () => {
+  const handleChatIconClick = () => {
     Gleap.openChat();
   };
+
+  useEffect(() => {
+    if (!isEmpty(orderDetail)) {
+      dispatch(orderAsyncActions.checkRestaurantStillAvailable({}));
+    }
+  }, [dispatch, JSON.stringify(orderDetail)]);
+
+  useEffect(() => {
+    dispatch(QuizActions.clearQuizData());
+  }, []);
+
+  useEffect(() => {
+    if (!isEmpty(orderState)) {
+      if (orderState === EOrderDraftStates.draft) {
+        router.push({ pathname: companyPaths.CreateNewOrder });
+      } else if (!EnableToAccessPageOrderStates.includes(orderState)) {
+        router.push({
+          pathname: companyPaths.ManageOrderPicking,
+          query: { orderId: orderId as string },
+        });
+      }
+    }
+  }, [orderId, orderState]);
 
   return (
     <WalkThroughTourProvider onCloseTour={handleCloseWalkThrough}>
@@ -284,25 +305,9 @@ function BookerDraftOrderPage() {
               startDate={startDate}
               endDate={endDate}
               events={orderDetail}
-              renderEvent={(props: any) => (
-                <MealPlanCard
-                  {...props}
-                  removeInprogress={
-                    props?.resources?.updatePlanDetailInprogress
-                  }
-                  onRemove={handleRemoveMeal(props?.resources?.planId)}
-                />
-              )}
               companyLogo="Company"
               hideMonthView
-              resources={{
-                ...calendarExtraResources,
-                onEditFood: onOpenPickFoodModal,
-                editFoodInprogress: onEditFoodInProgress,
-                availableOrderDetailCheckList,
-                hideEmptySubOrderSection: true,
-              }}
-              components={componentsProps}
+              {...calendarProps}
             />
 
             <RenderWhen condition={isAllDatesHaveNoRestaurants}>
@@ -321,7 +326,7 @@ function BookerDraftOrderPage() {
                   <Button
                     className={css.contactUsBtn}
                     variant="secondary"
-                    onClick={onChatClick}>
+                    onClick={handleChatIconClick}>
                     Chat với chúng tôi
                   </Button>
                 </div>
@@ -341,7 +346,7 @@ function BookerDraftOrderPage() {
             selectedRestaurantId={selectedRestaurantId}
             restaurants={restaurants}
             companyGeoOrigin={companyGeoOrigin}
-            onSearchSubmit={onSearchSubmit}
+            onSearchSubmit={handleSearchRestaurantSubmit}
             fetchFoodInProgress={fetchRestaurantFoodInProgress}
             openFromCalendar
             timestamp={selectedTimestamp}

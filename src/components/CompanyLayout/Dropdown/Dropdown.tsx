@@ -21,7 +21,7 @@ const getAbbreviatedName = (fullName: string) =>
     .map((name) => capitalize(name[0]))
     .join('');
 
-type DropdownProps = {
+type TDropdownProps = {
   options: {
     value: string;
     label: string;
@@ -36,7 +36,7 @@ type DropdownProps = {
     isMobile?: boolean;
   }) => ReactNode;
 };
-const Dropdown: React.FC<DropdownProps> = (props) => {
+const Dropdown: React.FC<TDropdownProps> = (props) => {
   const { options, selectedValue, setSelectedValue, customTitle } = props;
   const router = useRouter();
   const { companyId } = router.query;
