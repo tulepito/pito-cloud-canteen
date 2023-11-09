@@ -70,9 +70,10 @@ const OrderEventCardPopup: React.FC<TOrderEventCardPopupProps> = ({
     orderState,
   } = event.resource;
   const isOrderCancelled = orderState === EOrderStates.canceled;
+  const isOrderPicking = orderState === EOrderStates.picking;
 
   const shouldShowPickFoodSection =
-    !isOrderStarted &&
+    (!isOrderStarted || isOrderPicking) &&
     !isExpired &&
     isEmpty(transactionId) &&
     !isOrderCancelled;

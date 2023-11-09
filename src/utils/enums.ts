@@ -382,6 +382,28 @@ export enum EOrderPaymentStatus {
   isNotPaid = 'isNotPaid',
 }
 
+export const CONFIGS_BASE_ON_PAYMENT_STATUS = {
+  [EOrderPaymentStatus.isPaid]: {
+    label: 'Đã thanh toán',
+    badgeType: EBadgeType.success,
+  },
+  [EOrderPaymentStatus.isNotPaid]: {
+    label: 'Chưa thanh toán',
+    badgeType: EBadgeType.warning,
+  },
+};
+
+export enum ENativeNotificationType {
+  BookerTransitOrderStateToPicking = 'BookerTransitOrderStateToPicking',
+  BookerTransitOrderStateToInProgress = 'BookerTransitOrderStateToInProgress',
+  AdminTransitSubOrderToDelivering = 'AdminTransitSubOrderToDelivering',
+  AdminTransitSubOrderToDelivered = 'AdminTransitSubOrderToDelivered',
+  AdminTransitSubOrderToCanceled = 'AdminTransitSubOrderToCanceled',
+  TransitOrderStateToCanceled = 'TransitOrderStateToCanceled',
+  PartnerTransitOrderToCanceled = 'PartnerTransitOrderToCanceled',
+  PartnerEditSubOrder = 'PartnerEditSubOrder',
+}
+
 export enum EFoodApprovalState {
   PENDING = 'pending',
   ACCEPTED = 'accepted',
@@ -406,26 +428,6 @@ export const FOOD_APPROVAL_STATE_OPTIONS = [
 export enum ESlackNotificationType {
   CREATE_NEW_FOOD = 'createNewFood',
   UPDATE_FOOD = 'updateFood',
-}
-
-export const CONFIGS_BASE_ON_PAYMENT_STATUS = {
-  [EOrderPaymentStatus.isPaid]: {
-    label: 'Đã thanh toán',
-    badgeType: EBadgeType.success,
-  },
-  [EOrderPaymentStatus.isNotPaid]: {
-    label: 'Chưa thanh toán',
-    badgeType: EBadgeType.warning,
-  },
-};
-
-export enum ENativeNotificationType {
-  BookerTransitOrderStateToPicking = 'BookerTransitOrderStateToPicking',
-  BookerTransitOrderStateToInProgress = 'BookerTransitOrderStateToInProgress',
-  AdminTransitSubOrderToDelivering = 'AdminTransitSubOrderToDelivering',
-  AdminTransitSubOrderToDelivered = 'AdminTransitSubOrderToDelivered',
-  AdminTransitSubOrderToCanceled = 'AdminTransitSubOrderToCanceled',
-  TransitOrderStateToCanceled = 'TransitOrderStateToCanceled',
 }
 
 export enum QuizStep {

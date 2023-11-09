@@ -196,9 +196,9 @@ const searchRestaurants = createAsyncThunk(
     const orderListing = Listing(order);
     const {
       memberAmount = 0,
-      deliveryAddress = {},
       startDate,
       endDate,
+      deliveryAddress = {},
     } = orderListing.getMetadata();
 
     const allMenus = await queryAllPages({ sdkModel: sdk.listings, query });

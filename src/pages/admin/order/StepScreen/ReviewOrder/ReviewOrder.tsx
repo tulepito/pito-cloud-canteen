@@ -1,3 +1,4 @@
+/* eslint-disable unused-imports/no-unused-vars */
 /* eslint-disable import/no-cycle */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useMemo, useRef, useState } from 'react';
@@ -8,6 +9,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import classNames from 'classnames';
 import arrayMutators from 'final-form-arrays';
+import { last, omit, pickBy, uniq } from 'lodash';
 import compact from 'lodash/compact';
 import isEmpty from 'lodash/isEmpty';
 import isEqual from 'lodash/isEqual';
@@ -44,7 +46,12 @@ import {
 import { adminPaths } from '@src/paths';
 import { Listing } from '@utils/data';
 import { formatTimestamp } from '@utils/dates';
-import { EOrderDraftStates, EOrderStates } from '@utils/enums';
+import {
+  EOrderDraftStates,
+  EOrderStates,
+  EOrderType,
+  EParticipantOrderStatus,
+} from '@utils/enums';
 import type { TKeyValue, TListing, TObject } from '@utils/types';
 import { required } from '@utils/validators';
 
@@ -52,6 +59,9 @@ import ConfirmNotifyUserModal from '../../components/ConfirmNotifyUserModal/Conf
 import NavigateButtons, {
   EFlowType,
 } from '../../components/NavigateButtons/NavigateButtons';
+
+import EditConfirmModal from './EditConfirmModal/EditConfirmModal';
+import type { TSelectRoleToSendNotificationFormValues } from './SelectRoleToSendNotificationForm/SelectRoleToSendNotificationForm';
 
 import css from './ReviewOrder.module.scss';
 
@@ -198,6 +208,7 @@ export const ReviewContent: React.FC<any> = (props) => {
     orderNote,
     orderStateHistory = [],
   } = Listing(order as TListing).getMetadata();
+
   const orderId = Listing(order as TListing).getId();
   const { restaurantName, phoneNumber, foodList = {} } = restaurant || {};
   const isInProgressOrder = orderState === EOrderStates.inProgress;
@@ -207,9 +218,12 @@ export const ReviewContent: React.FC<any> = (props) => {
     ) >= 0;
   const isPickingOrder = orderState === EOrderStates.picking;
   const shouldShowFoodList =
-    [EOrderDraftStates.draft, EOrderDraftStates.pendingApproval].includes(
-      orderState,
-    ) ||
+    [
+      EOrderDraftStates.draft,
+      EOrderDraftStates.pendingApproval,
+      EOrderStates.inProgress,
+      EOrderStates.picking,
+    ].includes(orderState) ||
     (isEditFlow && isPickingOrder);
 
   const parsedFoodList = Object.keys(foodList).map((key, index) => {
@@ -528,6 +542,8 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
     setTrue: openSuccessModal,
     setFalse: closeSuccessModal,
   } = useBoolean();
+  const editConfirmModalController = useBoolean();
+
   const confirmNotifyUserModalControl = useBoolean();
 
   const isEditFlow = props.flowType === EFlowType.edit;
@@ -540,15 +556,27 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
     orderState,
     plans = [],
     notes = {},
+    orderType = EOrderType.group,
   } = Listing(order as TListing).getMetadata();
   const planId = plans.length > 0 ? plans[0] : undefined;
   const isPendingApprovalOrder =
     orderState === EOrderDraftStates.pendingApproval;
   const isPickingOrder = orderState === EOrderStates.picking;
+  const isNormalOrder = orderType === EOrderType.normal;
   const { address } = deliveryAddress || {};
 
-  const { staffName: draftStaffName, shipperName: draftShipperName } =
-    draftEditOrderData || {};
+  const {
+    staffName: draftStaffName,
+    shipperName: draftShipperName,
+    deliveryAddress: draftDeliveryAddress,
+    deliveryHour: draftDeliveryHour,
+  } = draftEditOrderData || {};
+
+  const { address: draftAddress } = draftDeliveryAddress || {};
+  const currentAddress = isEditFlow ? draftAddress || address : address;
+  const currentDeliveryHour = isEditFlow
+    ? draftDeliveryHour || deliveryHour
+    : deliveryHour;
 
   const validFields =
     (!isEmpty(staffName) || !isEmpty(draftStaffName)) &&
@@ -622,9 +650,134 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
       JSON.stringify(orderDetail),
       JSON.stringify(draftEditOrderDetail),
     ]) || {};
+  const isEditInProgressOrder = orderState === EOrderStates.inProgress;
 
   const handleGoBackToManageOrderPage = () => {
     router.push(adminPaths.ManageOrders);
+  };
+
+  const handleSubmitEditInProgressOrder = async () => {
+    const editedSubOrderDays = pickBy(
+      draftEditOrderDetail,
+      (newValues, key) => {
+        const oldValues = orderDetail?.[key];
+        if (!oldValues) return true;
+
+        return !isEqual(
+          oldValues.restaurant.foodList,
+          newValues.restaurant.foodList,
+        );
+      },
+    );
+
+    const editedSubOrders = Object.keys(editedSubOrderDays).reduce(
+      (result: any, subOrderDate: string) => {
+        const subOrderWithoutOldValues = omit<TObject>(
+          orderDetail?.[subOrderDate],
+          ['oldValues'],
+        );
+        const editedSubOrder = draftEditOrderDetail?.[subOrderDate];
+
+        const oldSubOrder = isEmpty(orderDetail?.[subOrderDate].oldValues)
+          ? orderDetail?.[subOrderDate]
+          : last<TObject>(orderDetail?.[subOrderDate].oldValues);
+
+        const isRestaurantChanged = !isEqual(
+          oldSubOrder?.restaurant?.id,
+          editedSubOrder?.restaurant.id,
+        );
+
+        const resettedMemberOrders = Object.keys(
+          editedSubOrder.memberOrders,
+        ).reduce((resettedMemberOrdersResult: any, _participantId: string) => {
+          return {
+            ...resettedMemberOrdersResult,
+            [_participantId]: {
+              foodId: '',
+              status: EParticipantOrderStatus.empty,
+            },
+          };
+        }, {});
+
+        const editedMemberOrders = Object.keys(
+          editedSubOrder.memberOrders,
+        ).reduce((editedMemberOrdersResult: any, participantId: string) => {
+          const { foodId, status } = editedSubOrder.memberOrders[participantId];
+          const { restaurant = {} } = editedSubOrder;
+          const { foodList = {} } = restaurant;
+
+          const isFoodChanged = !Object.keys(foodList).includes(foodId);
+
+          return {
+            ...editedMemberOrdersResult,
+            [participantId]: {
+              foodId: isFoodChanged ? '' : foodId,
+              status: isFoodChanged ? EParticipantOrderStatus.empty : status,
+            },
+          };
+        }, {});
+
+        return {
+          ...result,
+          [subOrderDate]: {
+            oldValues: [
+              ...(orderDetail[subOrderDate].oldValues || []),
+              subOrderWithoutOldValues,
+            ],
+            ...editedSubOrder,
+            memberOrders: isRestaurantChanged
+              ? resettedMemberOrders
+              : editedMemberOrders,
+          },
+        };
+      },
+      {},
+    );
+    const editedOrderDetail: TObject = {
+      ...orderDetail,
+      ...editedSubOrders,
+    };
+
+    const newPartnerIds = uniq(
+      Object.values(editedOrderDetail).reduce(
+        (result: string[], subOrder: TObject) => {
+          const { restaurant = {} } = subOrder;
+          const { id } = restaurant;
+
+          return [...result, id];
+        },
+        [],
+      ),
+    );
+
+    await dispatch(
+      orderAsyncActions.updateOrder({
+        generalInfo: {
+          ...draftEditOrderData,
+          orderState: EOrderStates.picking,
+          viewed: false,
+          partnerIds: newPartnerIds,
+        },
+      }),
+    );
+    if (!isEmpty(editedSubOrders)) {
+      await dispatch(
+        orderAsyncActions.updatePlanDetail({
+          orderId,
+          planId,
+          orderDetail: editedOrderDetail,
+          updateMode: EApiUpdateMode.DIRECT_UPDATE,
+        }),
+      );
+
+      await dispatch(
+        orderAsyncActions.handleDeleteOldDataAfterEditInProgressOrder({
+          orderId,
+          planId,
+        }),
+      );
+    }
+    dispatch(clearDraftEditOrder());
   };
 
   const handleCreateFlowSubmitClick = async () => {
@@ -632,6 +785,9 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
   };
 
   const handleEditFlowSubmit = async () => {
+    if (isEditInProgressOrder) {
+      return editConfirmModalController.setTrue();
+    }
     if (planId && orderId) {
       const { normalizedOrderDetail } = notificationData;
 
@@ -775,6 +931,47 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
     JSON.stringify(plans),
   ]);
 
+  const onSubmitEditOrder = async (
+    values: TSelectRoleToSendNotificationFormValues,
+  ) => {
+    await handleSubmitEditInProgressOrder();
+    const { role = [] } = values;
+    role.forEach((r) => {
+      if (r === 'participant') {
+        dispatch(
+          orderAsyncActions.handleSendEditInProgressOrderNotificationToParticipant(
+            {
+              orderId,
+              planId,
+            },
+          ),
+        );
+      } else if (r === 'company') {
+        // TODO: send notification to company
+        const { normalizedOrderDetail, ...restData } = notificationData;
+
+        dispatch(
+          orderAsyncActions.notifyUserPickingOrderChanges({
+            orderId,
+            params: {
+              ...restData,
+              userRoles: ['booker'],
+            },
+          }),
+        );
+      } else if (r === 'partner') {
+        // TODO: send notification to partner
+        dispatch(
+          orderAsyncActions.handleSendEditInProgressOrderNotificationToPartner({
+            orderId,
+            planId,
+          }),
+        );
+      }
+    });
+    editConfirmModalController.setFalse();
+  };
+
   return (
     <div className={css.root}>
       <h1 className={css.title}>
@@ -804,13 +1001,15 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
                     <span className={css.boxTitle}>
                       {intl.formatMessage({ id: 'ReviewOrder.deliveryTime' })}
                     </span>
-                    <span className={css.boxContent}>{deliveryHour}</span>
+                    <span className={css.boxContent}>
+                      {currentDeliveryHour}
+                    </span>
                   </div>
                   <div className={css.flexChild}>
                     <span className={css.boxTitle}>
                       {intl.formatMessage({ id: 'ReviewOrder.address' })}
                     </span>
-                    <span className={css.boxContent}>{address}</span>
+                    <span className={css.boxContent}>{currentAddress}</span>
                   </div>
                   <div className={css.flexChild}>
                     <span className={css.boxTitle}>
@@ -897,6 +1096,12 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
           id: 'ReviewOrder.successModal.description',
         })}
         onConfirm={onConfirm}
+      />
+      <EditConfirmModal
+        isOpen={editConfirmModalController.value}
+        onClose={editConfirmModalController.setFalse}
+        onSubmit={onSubmitEditOrder}
+        isNormalOrder={isNormalOrder}
       />
     </div>
   );

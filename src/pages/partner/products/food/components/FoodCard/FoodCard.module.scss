@@ -116,9 +116,9 @@
       }
 
       .menuType {
-        @include flexAlign(center, space-between);
         @include textTemplate(14px, $fontWeightRegular, 20px);
         color: $neutralGray6;
+        @include flexAlign(center, space-between);
         margin-top: 4px;
 
         .priceWrapper {

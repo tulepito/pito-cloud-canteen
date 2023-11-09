@@ -5,6 +5,7 @@ import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
 
 import Form from '@components/Form/Form';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
 import DaySessionField from '@pages/company/booker/orders/new/quiz/meal-date/DaySessionField/DaySessionField';
 import { getSelectedDaysOfWeek } from '@src/utils/dates';
 import { EOrderType } from '@src/utils/enums';
@@ -36,9 +37,14 @@ type TExtraProps = {
     key: string;
   }[];
   flowType: EFlowType;
+  isOrderInProgress?: boolean;
+  onGoBack?: () => void;
+  onNextClick?: () => void;
+  onCompleteClick?: () => void;
   formSubmitRef: any;
   setDraftEditValues: (value: any) => void;
   shouldDisableFields: boolean;
+  deliveryHourNotMatchError: string;
 };
 type TMealPlanSetupFormComponentProps =
   FormRenderProps<TMealPlanSetupFormValues> & Partial<TExtraProps>;
@@ -58,14 +64,17 @@ const MealPlanSetupFormComponent: React.FC<TMealPlanSetupFormComponentProps> = (
     nutritionsOptions,
     flowType,
     setDraftEditValues,
+    isOrderInProgress,
     formSubmitRef,
     shouldDisableFields = false,
+    deliveryHourNotMatchError,
   } = props;
   const intl = useIntl();
 
   formSubmitRef.current = handleSubmit;
 
   const isEditFlow = flowType === EFlowType.edit;
+  const isEditInProgressOrder = isEditFlow && isOrderInProgress;
   const { pickAllow: pickAllowValue = true } = values;
 
   useEffect(() => {
@@ -119,7 +128,9 @@ const MealPlanSetupFormComponent: React.FC<TMealPlanSetupFormComponentProps> = (
       <div className={css.fieldSection}>
         <DeliveryAddressField
           title={intl.formatMessage({ id: 'DeliveryAddressField.title' })}
-          disabled={shouldDisableFields}
+          disabled={
+            isEditInProgressOrder ? !shouldDisableFields : shouldDisableFields
+          }
         />
       </div>
       <div className={css.fieldSection}>
@@ -145,6 +156,7 @@ const MealPlanSetupFormComponent: React.FC<TMealPlanSetupFormComponentProps> = (
         <MealPlanDateField
           form={form}
           disabled={shouldDisableFields}
+          isEditInProgressOrder={isEditInProgressOrder}
           values={values}
           title={intl.formatMessage({ id: 'MealPlanDateField.title' })}
         />
@@ -203,6 +215,9 @@ const MealPlanSetupFormComponent: React.FC<TMealPlanSetupFormComponentProps> = (
           </div>
         )}
       </div>
+      <RenderWhen condition={!!deliveryHourNotMatchError}>
+        <div className={css.error}>{deliveryHourNotMatchError}</div>
+      </RenderWhen>
     </Form>
   );
 };

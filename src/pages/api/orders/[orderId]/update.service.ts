@@ -25,11 +25,18 @@ const updateOrder = async ({
   const integrationSdk = getIntegrationSdk();
 
   const orderListing = await fetchListing(orderId);
-  const { companyId, selectedGroups = [] } =
-    Listing(orderListing).getMetadata();
+  const {
+    companyId,
+    selectedGroups = [],
+    orderStateHistory = [],
+  } = Listing(orderListing).getMetadata();
   const companyAccount = await fetchUser(companyId);
 
   let updatedOrderListing;
+  const isOrderHasInProgressState = orderStateHistory.some(
+    (state: { state: string; createdAt: number }) =>
+      state.state === EOrderStates.inProgress,
+  );
 
   if (!isEmpty(generalInfo)) {
     const newSelectedGroup = generalInfo.selectedGroups || selectedGroups;
@@ -37,7 +44,12 @@ const updateOrder = async ({
     const participants: string[] = isEmpty(newSelectedGroup)
       ? getAllCompanyMembers(companyAccount)
       : calculateGroupMembers(companyAccount, newSelectedGroup);
-    const { startDate, endDate, deadlineDate } = generalInfo;
+    const {
+      startDate,
+      endDate,
+      deadlineDate,
+      orderState: updatedOrderState,
+    } = generalInfo;
 
     if (deadlineDate) {
       const reminderTime = DateTime.fromMillis(deadlineDate)
@@ -73,7 +85,12 @@ const updateOrder = async ({
     const { companyName } = companyAccount.attributes.profile.publicData;
 
     const shouldUpdateOrderName = companyName && startDate && endDate;
-
+    const newOrderStateHistory = updatedOrderState
+      ? orderStateHistory.concat({
+          state: updatedOrderState,
+          updatedAt: Date.now(),
+        })
+      : orderStateHistory;
     // eslint-disable-next-line prefer-destructuring
     updatedOrderListing = denormalisedResponseEntities(
       await integrationSdk.listings.update(
@@ -91,6 +108,7 @@ const updateOrder = async ({
             : {}),
           metadata: {
             ...generalInfo,
+            orderStateHistory: newOrderStateHistory,
             participants,
           },
         },
@@ -100,7 +118,7 @@ const updateOrder = async ({
 
     const { orderState } = generalInfo || {};
 
-    if (orderState === EOrderStates.picking) {
+    if (orderState === EOrderStates.picking && !isOrderHasInProgressState) {
       participants.forEach((participantId) => {
         createNativeNotification(
           ENativeNotificationType.BookerTransitOrderStateToPicking,
@@ -112,8 +130,9 @@ const updateOrder = async ({
       });
     }
   }
-
-  sendNotificationToParticipantOnUpdateOrder(orderId);
+  if (!isOrderHasInProgressState) {
+    sendNotificationToParticipantOnUpdateOrder(orderId);
+  }
 
   return updatedOrderListing;
 };

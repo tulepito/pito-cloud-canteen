@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable import/no-cycle */
 /* eslint-disable react-hooks/exhaustive-deps */
-import { memo, useEffect, useMemo, useRef } from 'react';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { shallowEqual } from 'react-redux';
 import isEmpty from 'lodash/isEmpty';
 import isEqual from 'lodash/isEqual';
@@ -18,7 +18,7 @@ import {
   orderAsyncActions,
   saveDraftEditOrder,
 } from '@redux/slices/Order.slice';
-import { EOrderDraftStates, EOrderType } from '@src/utils/enums';
+import { EOrderDraftStates, EOrderStates, EOrderType } from '@src/utils/enums';
 import { Listing, User } from '@utils/data';
 import { getSelectedDaysOfWeek } from '@utils/dates';
 import type { TListing, TObject } from '@utils/types';
@@ -31,6 +31,7 @@ import {
   isMealPlanSetupDataValid,
   prepareOrderDetailFromOldOrderDetail,
 } from '../../edit/[orderId]/components/EditOrderWizard/EditOrderWizard.helper';
+import { checkDeliveryHourIsMatchedWithAllRestaurants } from '../../helpers/editOrder';
 
 type MealPlanSetupProps = {
   goBack: () => void;
@@ -54,6 +55,8 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
   const formSubmitRef = useRef<any>();
   const shouldNextTabControl = useBoolean();
   const confirmRcmRestaurantControl = useBoolean();
+  const [deliveryHourNotMatchError, setDeliveryHourNotMatchError] =
+    useState<string>('');
   const dispatch = useAppDispatch();
   const step2SubmitInProgress = useAppSelector(
     (state) => state.Order.step2SubmitInProgress,
@@ -84,6 +87,9 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
     (state) => state.company.companyRefs,
     shallowEqual,
   );
+  const restaurantListings = useAppSelector(
+    (state) => state.Order.restaurantListings,
+  );
 
   const isEditFlow = flowType === EFlowType.edit;
   const orderMetadata = Listing(order as TListing).getMetadata();
@@ -92,7 +98,6 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
     dayInWeek,
     packagePerMember = '',
     vatAllow = true,
-    pickAllow = true,
     selectedGroups = ['allMembers'],
     deliveryHour,
     startDate,
@@ -106,12 +111,17 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
     displayedDurationTime,
     durationTimeMode,
     daySession,
+    plans = [],
     orderState = EOrderDraftStates.pendingApproval,
+    orderType = EOrderType.group,
   } = orderMetadata;
+  const isGroupOrder = orderType === EOrderType.group;
   const { address, origin } = deliveryAddress || {};
 
   const isPendingBookerApprovalOrder =
     orderState === EOrderDraftStates.pendingApproval;
+  const isOrderInProgress = orderState === EOrderStates.inProgress;
+  const isEditInprogressOrder = isEditFlow && isOrderInProgress;
   const currentClient = companies.find(
     (company) => company.id.uuid === clientId,
   );
@@ -182,9 +192,9 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
     () => ({
       vatAllow: typeof draftVatAllow !== 'undefined' ? draftVatAllow : vatAllow,
       pickAllow:
-        typeof draftPickAllow !== 'undefined' ? draftPickAllow : pickAllow,
+        typeof draftPickAllow !== 'undefined' ? draftPickAllow : isGroupOrder,
       orderType: (
-        typeof draftPickAllow !== 'undefined' ? draftPickAllow : pickAllow
+        typeof draftPickAllow !== 'undefined' ? draftPickAllow : isGroupOrder
       )
         ? EOrderType.group
         : EOrderType.normal,
@@ -238,8 +248,38 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
     const isAddressChanged =
       deliveryAddress?.address &&
       deliveryAddress.address !== initDeliveryAddress?.search;
+    if (isEditInprogressOrder) {
+      const {
+        detailAddress: draftDetailAddress,
+        deliveryHour: draftDeliveryHour,
+      } = restDraftValues || {};
 
-    if (!isEqual(restInitialValues, restDraftValues) || isAddressChanged) {
+      const isDeliveryHourMatchingRestaurantOpenTime =
+        checkDeliveryHourIsMatchedWithAllRestaurants({
+          deliveryHour: draftDeliveryHour,
+          restaurantListings,
+          dayInWeek,
+        });
+      if (isDeliveryHourMatchingRestaurantOpenTime) {
+        dispatch(
+          saveDraftEditOrder({
+            generalInfo: {
+              ...(deliveryAddress && { deliveryAddress }),
+              ...(draftDetailAddress && { detailAddress: draftDetailAddress }),
+              ...(draftDeliveryHour && { deliveryHour: draftDeliveryHour }),
+            },
+          }),
+        );
+        handleNextTabOrNextReviewTab(shouldNext);
+      } else {
+        setDeliveryHourNotMatchError(
+          'Thời gian giao hàng bạn chọn không phù hợp với thời gian phục vụ của nhà hàng',
+        );
+      }
+    } else if (
+      !isEqual(restInitialValues, restDraftValues) ||
+      isAddressChanged
+    ) {
       const generalInfo: TObject = {
         ...restDraftValues,
         deliveryAddress,
@@ -395,9 +435,14 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
   };
 
   useEffect(() => {
-    if (!isEmpty(restaurantListFromOrder)) {
-      dispatch(orderAsyncActions.fetchRestaurantCoverImages({ isEditFlow }));
-    }
+    (async () => {
+      if (!isEmpty(restaurantListFromOrder)) {
+        await dispatch(orderAsyncActions.fetchOrderDetail(plans));
+        await dispatch(
+          orderAsyncActions.fetchRestaurantCoverImages({ isEditFlow }),
+        );
+      }
+    })();
   }, [JSON.stringify(restaurantListFromOrder), isEditFlow]);
 
   return (
@@ -415,6 +460,8 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
         setDraftEditValues={setDraftEditValues!}
         formSubmitRef={formSubmitRef}
         shouldDisableFields={shouldDisableFields}
+        isOrderInProgress={isOrderInProgress}
+        deliveryHourNotMatchError={deliveryHourNotMatchError}
       />
       <NavigateButtons
         flowType={flowType}

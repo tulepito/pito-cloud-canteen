@@ -1,5 +1,6 @@
 import { getListingImageById } from '@pages/company/booker/orders/draft/[orderId]/restaurants/helpers';
 import {
+  deleteDocument,
   getDocumentById,
   setCollectionDocWithCustomId,
   updateCollectionDoc,
@@ -126,4 +127,11 @@ export const getFirebaseDocumentById = async (subOrderId: string) => {
   );
 
   return response;
+};
+
+export const deleteFirebaseDocumentById = async (subOrderId: string) => {
+  await deleteDocument(
+    subOrderId,
+    FIREBASE_PARTICIPANT_SUB_ORDER_COLLECTION_NAME!,
+  );
 };

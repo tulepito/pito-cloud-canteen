@@ -30,6 +30,7 @@ type MealPlanDateFieldProps = {
   containerClassName?: string;
   onCustomStartDateChange?: (date: number) => void;
   disabled?: boolean;
+  isEditInProgressOrder?: boolean;
 };
 
 const MealPlanDateField: React.FC<MealPlanDateFieldProps> = (props) => {
@@ -42,6 +43,7 @@ const MealPlanDateField: React.FC<MealPlanDateFieldProps> = (props) => {
     layoutClassName,
     containerClassName,
     disabled = false,
+    isEditInProgressOrder,
   } = props;
   const intl = useIntl();
   const userPermission = useAppSelector((state) => state.user.userPermission);
@@ -177,7 +179,7 @@ const MealPlanDateField: React.FC<MealPlanDateFieldProps> = (props) => {
           placeholder={intl.formatMessage({
             id: 'OrderDeadlineField.deliveryHour.placeholder',
           })}
-          disabled={disabled}
+          disabled={isEditInProgressOrder ? !disabled : disabled}
           options={parsedDeliveryHourOptions}
         />
       </div>

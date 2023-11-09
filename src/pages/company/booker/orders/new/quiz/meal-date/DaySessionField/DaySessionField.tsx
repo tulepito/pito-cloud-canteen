@@ -74,6 +74,7 @@ const DaySessionField: React.FC<DaySessionFieldProps> = (props) => {
               key={key}
               className={classNames(css.dayItem, {
                 [css.selected]: selectedSession === key,
+                [css.disabled]: disabled,
               })}
               onClick={onSessionSelect}>
               {label}

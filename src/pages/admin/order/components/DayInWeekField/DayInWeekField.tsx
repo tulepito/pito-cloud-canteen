@@ -85,7 +85,8 @@ const DayInWeekField: React.FC<TDayInWeekFieldProps> = (props) => {
               key={day.key}
               className={classNames(css.dayItem, {
                 [css.selected]: selectedDays.includes(day.key),
-                [css.disabled]: disableDayInWeekOptions.includes(day),
+                [css.disabled]:
+                  disableDayInWeekOptions.includes(day) || disabled,
               })}
               onClick={handleDaySelect}>
               {intl.formatMessage({ id: day.label })}

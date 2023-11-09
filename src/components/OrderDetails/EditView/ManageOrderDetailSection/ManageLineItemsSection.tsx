@@ -25,6 +25,7 @@ type TManageLineItemsSectionProps = {
   ableToUpdateOrder?: boolean;
   minQuantity?: number;
   isAdminFlow?: boolean;
+  unChangedRestaurantDayList?: string[];
 };
 
 const ManageLineItemsSection: React.FC<TManageLineItemsSectionProps> = (
@@ -39,6 +40,7 @@ const ManageLineItemsSection: React.FC<TManageLineItemsSectionProps> = (
     shouldShowOverflowError = false,
     minQuantity = 0,
     isAdminFlow = false,
+    unChangedRestaurantDayList = [],
   } = props;
 
   const intl = useIntl();
@@ -64,7 +66,10 @@ const ManageLineItemsSection: React.FC<TManageLineItemsSectionProps> = (
             <LineItemsTable
               currentViewDate={currentViewDate}
               isDraftEditing={isDraftEditing}
-              ableToUpdateOrder={ableToUpdateOrder}
+              ableToUpdateOrder={
+                ableToUpdateOrder &&
+                !unChangedRestaurantDayList.includes(date.toString())
+              }
               shouldShowOverflowError={shouldShowOverflowError}
               shouldShowUnderError={shouldShowUnderError}
               minQuantity={minQuantity}

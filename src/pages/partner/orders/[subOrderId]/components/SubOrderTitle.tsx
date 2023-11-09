@@ -4,8 +4,11 @@ import { useRouter } from 'next/router';
 
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import SubOrderBadge from '@components/SubOrderBadge/SubOrderBadge';
+import { checkPartnerWasRemovedFromSubOrder } from '@helpers/partnerHelper';
 import { useAppSelector } from '@hooks/reduxHooks';
+import { currentUserSelector } from '@redux/slices/user.slice';
 import { Listing, Transaction } from '@src/utils/data';
+import { ETransition } from '@src/utils/transaction';
 import type { TListing } from '@src/utils/types';
 
 import css from './SubOrderTitle.module.scss';
@@ -19,9 +22,11 @@ const SubOrderTitle: React.FC<TSubOrderTitleProps> = () => {
   const transaction = useAppSelector(
     (state) => state.PartnerSubOrderDetail.transaction,
   );
+
   const fetchOrderInProgress = useAppSelector(
     (state) => state.PartnerSubOrderDetail.fetchOrderInProgress,
   );
+  const currentUser = useAppSelector((state) => currentUserSelector(state));
 
   const {
     query: { subOrderId = '' },
@@ -32,6 +37,18 @@ const SubOrderTitle: React.FC<TSubOrderTitleProps> = () => {
   const dayIndex = new Date(Number(date)).getDay();
   const { title: orderTitle = '' } = Listing(order as TListing).getAttributes();
   const { lastTransition } = Transaction(transaction!).getAttributes();
+  const { plan } = order || {};
+  const planListing = Listing(plan as TListing);
+  const { orderDetail = {} } = planListing.getMetadata();
+  const subOrder = orderDetail?.[date];
+
+  const isPartnerWasRemovedFromSubOrder = checkPartnerWasRemovedFromSubOrder(
+    currentUser,
+    subOrder,
+  );
+  const currentLastransition = isPartnerWasRemovedFromSubOrder
+    ? ETransition.OPERATOR_CANCEL_PLAN
+    : lastTransition;
 
   return (
     <RenderWhen condition={!fetchOrderInProgress}>
@@ -50,7 +67,7 @@ const SubOrderTitle: React.FC<TSubOrderTitleProps> = () => {
             )}
           </div>
 
-          <SubOrderBadge lastTransition={lastTransition} />
+          <SubOrderBadge lastTransition={currentLastransition} />
         </div>
         <div className={css.note}>
           {intl.formatMessage(

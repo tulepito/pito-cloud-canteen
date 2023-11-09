@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 
 import Badge, { EBadgeType } from '@components/Badge/Badge';
 import ManageLineItemsSection from '@components/OrderDetails/EditView/ManageOrderDetailSection/ManageLineItemsSection';
+import { checkIsOrderHasInProgressState } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { checkMinMaxQuantityInPickingState } from '@pages/company/orders/[orderId]/picking/OrderDetail.page';
 import { orderManagementThunks } from '@redux/slices/OrderManagement.slice';
@@ -12,6 +13,7 @@ import { Listing } from '@src/utils/data';
 import { EOrderStates, EOrderType } from '@src/utils/enums';
 import { ETransition } from '@src/utils/transaction';
 
+import type { EFlowType } from '../../components/NavigateButtons/NavigateButtons';
 import NavigateButtons from '../../components/NavigateButtons/NavigateButtons';
 
 import css from './ManageFood.module.scss';
@@ -20,10 +22,11 @@ type TManageFoodProps = {
   goBack: () => void;
   nextTab: () => void;
   nextToReviewTab: () => void;
+  flowType?: EFlowType;
 };
 
 const ManageFood: React.FC<TManageFoodProps> = (props) => {
-  const { goBack, nextTab, nextToReviewTab } = props;
+  const { goBack, nextTab, nextToReviewTab, flowType } = props;
   const intl = useIntl();
   const router = useRouter();
   const dispatch = useAppDispatch();
@@ -42,6 +45,21 @@ const ManageFood: React.FC<TManageFoodProps> = (props) => {
     fetchOrderInProgress,
   } = useAppSelector((state) => state.OrderManagement);
   const order = useAppSelector((state) => state.Order.order);
+  const orderDetail = useAppSelector((state) => state.Order.orderDetail);
+  const draftEditOrderData = useAppSelector(
+    (state) => state.Order.draftEditOrderData,
+  );
+
+  const { orderDetail: draftOrderDetailFromOrder = {} } = draftEditOrderData;
+
+  const unChangedRestaurantDayList = Object.keys(orderDetail || {}).filter(
+    (date) => {
+      const oldRestaurantId = orderDetail[date].restaurant.id;
+      const newRestaurantId = draftOrderDetailFromOrder[date].restaurant.id;
+
+      return oldRestaurantId === newRestaurantId;
+    },
+  );
 
   const { planValidationsInProgressState } =
     orderValidationsInProgressState || {};
@@ -57,24 +75,37 @@ const ManageFood: React.FC<TManageFoodProps> = (props) => {
   const orderGetter = Listing(order);
   const orderId = orderGetter.getId();
   const { title: orderTitle } = orderGetter.getAttributes();
-  const { orderState, orderType = EOrderType.group } =
-    orderGetter.getMetadata();
+  const {
+    orderState,
+    orderType = EOrderType.group,
+    orderStateHistory = [],
+  } = orderGetter.getMetadata();
+
+  const isOrderHasInProgressState =
+    checkIsOrderHasInProgressState(orderStateHistory);
+  const isOrderInProgressState = orderState === EOrderStates.inProgress;
+
+  const currentDraftOrderDetail =
+    isOrderHasInProgressState && isOrderInProgressState
+      ? draftOrderDetailFromOrder
+      : draftOrderDetail;
 
   const isNormalOrder = orderType === EOrderType.normal;
   const isPickingState = orderState === EOrderStates.picking;
 
   const { lastTransition = ETransition.INITIATE_TRANSACTION } =
-    draftOrderDetail?.[currentViewDate] || {};
+    currentDraftOrderDetail?.[currentViewDate] || {};
   const ableToUpdateOrder =
     !fetchOrderInProgress &&
     isRouterReady &&
     ((lastTransition === ETransition.INITIATE_TRANSACTION && isDraftEditing) ||
-      isPickingState);
+      isPickingState ||
+      isOrderHasInProgressState);
 
   const { planValidations } = checkMinMaxQuantityInPickingState(
     isNormalOrder,
     isPickingState,
-    draftOrderDetail,
+    currentDraftOrderDetail,
   );
 
   const {
@@ -85,7 +116,7 @@ const ManageFood: React.FC<TManageFoodProps> = (props) => {
   } = planValidations[currentViewDate as keyof typeof planValidations] || {};
 
   const { minQuantity = 1 } =
-    draftOrderDetail?.[currentViewDate]?.restaurant || {};
+    currentDraftOrderDetail?.[currentViewDate]?.restaurant || {};
 
   useEffect(() => {
     if (orderId) {
@@ -133,9 +164,11 @@ const ManageFood: React.FC<TManageFoodProps> = (props) => {
         currentViewDate={currentViewDate}
         minQuantity={minQuantity}
         isAdminFlow
+        unChangedRestaurantDayList={unChangedRestaurantDayList}
       />
 
       <NavigateButtons
+        flowType={flowType}
         goBack={goBack}
         onNextClick={nextTab}
         onCompleteClick={nextToReviewTab}

@@ -7,6 +7,11 @@ import uniq from 'lodash/uniq';
 import { DateTime } from 'luxon';
 
 import {
+  handleDeleteOldDataAfterEditInProgressOrderApi,
+  handleSendNotificationParticipantAfterEditInProgressOrderApi,
+  handleSendNotificationPartnerAfterEditInProgressOrderApi,
+} from '@apis/admin';
+import {
   companyApi,
   getCompanyNotificationsApi,
   getCompanyOrderSummaryApi,
@@ -26,6 +31,7 @@ import {
   updateOrderStateToDraftApi,
   updatePlanDetailsApi,
 } from '@apis/orderApi';
+import { queryRestaurantListingsApi } from '@apis/restaurant';
 import { queryAllPages } from '@helpers/apiHelpers';
 import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
 import { getMenuQueryInSpecificDay } from '@helpers/listingSearchQuery';
@@ -124,6 +130,7 @@ type TOrderInitialState = {
   restaurantCoverImageList: {
     [restaurantId: string]: any;
   };
+  restaurantListings: TListing[];
   fetchRestaurantCoverImageInProgress: boolean;
   fetchRestaurantCoverImageError: any;
 
@@ -242,6 +249,7 @@ const initialState: TOrderInitialState = {
   },
 
   restaurantCoverImageList: {},
+  restaurantListings: [],
   fetchRestaurantCoverImageInProgress: false,
   fetchRestaurantCoverImageError: null,
 
@@ -314,6 +322,12 @@ const QUERY_ALL_ORDERS = 'app/Order/QUERY_ALL_ORDERS';
 const BOOKER_REORDER = 'app/Order/BOOKER_REORDER';
 const UPDATE_ORDER_STATE_TO_DRAFT = 'app/Order/UPDATE_ORDER_STATE_TO_DRAFT';
 const BOOKER_DELETE_ORDER = 'app/Order/BOOKER_DELETE_ORDER';
+const HANDLE_SEND_EDIT_INPROGRESS_ORDER_NOTIFICATION_TO_PARTICIPANT =
+  'app/Order/HANDLE_SEND_EDIT_INPROGRESS_ORDER_NOTIFICATION_TO_PARTICIPANT';
+const HANDLE_SEND_EDIT_INPROGRESS_ORDER_NOTIFICATION_TO_PARTNER =
+  'app/Order/HANDLE_SEND_EDIT_INPROGRESS_ORDER_NOTIFICATION_TO_PARTNER';
+const HANDLE_DELETE_OLD_DATA_AFTER_EDIT_IN_PROGRESS_ORDER =
+  'app/Order/HANDLE_DELETE_OLD_DATA_AFTER_EDIT_IN_PROGRESS_ORDER';
 
 const createOrder = createAsyncThunk(
   CREATE_ORDER,
@@ -752,7 +766,7 @@ const fetchOrderDetail = createAsyncThunk(
 
 const fetchRestaurantCoverImages = createAsyncThunk(
   FETCH_RESTAURANT_COVER_IMAGE,
-  async ({ isEditFlow = false }: any, { extra: sdk, getState }) => {
+  async ({ isEditFlow = false }: any, { getState }) => {
     const { orderDetail = {} } = getState().Order;
     const { orderDetail: draftOrderDetail = {} } =
       getState().Order.draftEditOrderData;
@@ -767,35 +781,39 @@ const fetchRestaurantCoverImages = createAsyncThunk(
       ),
     );
 
-    const restaurantCoverImageList = await Promise.all(
-      restaurantIdList.map(async (restaurantId) => {
-        const restaurantResponse = denormalisedResponseEntities(
-          await sdk.listings.show({
-            id: restaurantId,
-            include: ['images'],
-            'fields.image': [
-              'variants.landscape-crop',
-              'variants.landscape-crop2x',
-            ],
-          }),
-        )[0];
-        const { coverImageId } = Listing(restaurantResponse).getPublicData();
+    const { data: restaurantResponses } = await queryRestaurantListingsApi({
+      dataParams: {
+        ids: restaurantIdList,
+        include: ['images'],
+        'fields.image': [
+          'variants.landscape-crop',
+          'variants.landscape-crop2x',
+        ],
+      },
+    });
 
-        return {
-          [restaurantId]: Listing(restaurantResponse)
-            .getFullData()
-            .images.find((image: any) => image.id.uuid === coverImageId),
-        };
-      }),
-    );
+    const restaurants = denormalisedResponseEntities(restaurantResponses);
 
-    return restaurantCoverImageList.reduce(
-      (result, item) => ({
-        ...result,
-        ...item,
-      }),
-      {},
-    );
+    const restaurantCoverImageList = restaurants.map((restaurant: TListing) => {
+      const { coverImageId } = Listing(restaurant).getPublicData();
+
+      return {
+        [restaurant.id.uuid]: Listing(restaurant)
+          .getFullData()
+          .images.find((image: any) => image.id.uuid === coverImageId),
+      };
+    });
+
+    return {
+      restaurantCoverImageList: restaurantCoverImageList.reduce(
+        (result: TObject, item: TObject) => ({
+          ...result,
+          ...item,
+        }),
+        {},
+      ),
+      restaurantListings: restaurants,
+    };
   },
 );
 
@@ -1076,6 +1094,24 @@ const bookerDeleteOrder = createAsyncThunk(
   },
 );
 
+const handleSendEditInProgressOrderNotificationToParticipant = createAsyncThunk(
+  HANDLE_SEND_EDIT_INPROGRESS_ORDER_NOTIFICATION_TO_PARTICIPANT,
+  async ({ orderId, planId }: TObject) => {
+    const { data: responseData } =
+      await handleSendNotificationParticipantAfterEditInProgressOrderApi(
+        orderId,
+        {
+          planId,
+        },
+      );
+
+    return responseData.data;
+  },
+  {
+    serializeError: storableAxiosError,
+  },
+);
+
 const notifyUserPickingOrderChanges = createAsyncThunk(
   'app/Order/NOTIFY_USER_PICKING_ORDER_CHANGES',
   async (
@@ -1089,6 +1125,36 @@ const notifyUserPickingOrderChanges = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(error);
     }
+  },
+);
+
+const handleSendEditInProgressOrderNotificationToPartner = createAsyncThunk(
+  HANDLE_SEND_EDIT_INPROGRESS_ORDER_NOTIFICATION_TO_PARTNER,
+  async ({ orderId, planId }: TObject) => {
+    const { data: responseData } =
+      await handleSendNotificationPartnerAfterEditInProgressOrderApi(orderId, {
+        planId,
+      });
+
+    return responseData.data;
+  },
+  {
+    serializeError: storableAxiosError,
+  },
+);
+
+const handleDeleteOldDataAfterEditInProgressOrder = createAsyncThunk(
+  HANDLE_DELETE_OLD_DATA_AFTER_EDIT_IN_PROGRESS_ORDER,
+  async ({ orderId, planId }: TObject) => {
+    const { data: responseData } =
+      await handleDeleteOldDataAfterEditInProgressOrderApi(orderId, {
+        planId,
+      });
+
+    return responseData.data;
+  },
+  {
+    serializeError: storableAxiosError,
   },
 );
 
@@ -1117,7 +1183,10 @@ export const orderAsyncActions = {
   updateOrderStateToDraft,
   bookerDeleteOrder,
   queryCompanyPlansByOrderIds,
+  handleSendEditInProgressOrderNotificationToParticipant,
   notifyUserPickingOrderChanges,
+  handleSendEditInProgressOrderNotificationToPartner,
+  handleDeleteOldDataAfterEditInProgressOrder,
 };
 
 const orderSlice = createSlice({
@@ -1465,7 +1534,8 @@ const orderSlice = createSlice({
       .addCase(fetchRestaurantCoverImages.fulfilled, (state, { payload }) => ({
         ...state,
         fetchRestaurantCoverImageInProgress: false,
-        restaurantCoverImageList: payload,
+        restaurantCoverImageList: payload.restaurantCoverImageList,
+        restaurantListings: payload.restaurantListings,
       }))
       .addCase(fetchRestaurantCoverImages.rejected, (state, { error }) => ({
         ...state,

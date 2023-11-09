@@ -10,6 +10,7 @@ import {
   EVENING_SESSION,
   MORNING_SESSION,
 } from '@components/CalendarDashboard/helpers/constant';
+import { ETransition } from '@src/utils/transaction';
 import { Listing } from '@utils/data';
 import {
   generateTimeRangeItems,
@@ -26,14 +27,19 @@ import {
   EParticipantOrderStatus,
 } from '@utils/enums';
 import type { TPlan } from '@utils/orderTypes';
-import type { TListing, TObject, TOrderChangeHistoryItem } from '@utils/types';
+import type {
+  TListing,
+  TObject,
+  TOrderChangeHistoryItem,
+  TOrderStateHistory,
+} from '@utils/types';
 
 import { parseThousandNumber } from './format';
 
 export const ORDER_STATES_TO_ENABLE_EDIT_ABILITY = [
   EOrderDraftStates.pendingApproval,
   EOrderStates.picking,
-  // EOrderStates.inProgress,
+  EOrderStates.inProgress,
 ];
 
 export const getParticipantPickingLink = (orderId: string) =>
@@ -675,6 +681,9 @@ export const preparePickingOrderChangeNotificationData = ({
     specificPCCFee = 0,
     hasSpecificPCCFee = false,
     memberAmount = 0,
+    deliveryAddress,
+    detailAddress,
+    deliveryHour,
   } = orderGetter.getMetadata();
   const PCCFeeByMemberAmount = getPCCFeeByMemberAmount(memberAmount);
   const PCCFeePerDate = hasSpecificPCCFee
@@ -829,6 +838,9 @@ export const preparePickingOrderChangeNotificationData = ({
     staffName: updateStaffName,
     shipperName: updateShipperName,
     specificPCCFee: updateSpecificPCCFee,
+    deliveryAddress: updateDeliveryAddress,
+    detailAddress: updateDetailAddress,
+    deliveryHour: updateDeliveryHour,
   } = updateOrderData || {};
   // TODO: change history for other fields
   if (updateStaffName !== undefined && updateStaffName !== staffName) {
@@ -870,6 +882,50 @@ export const preparePickingOrderChangeNotificationData = ({
       },
     });
   }
+  if (
+    updateDeliveryAddress !== undefined &&
+    updateDeliveryAddress.address !== deliveryAddress.address
+  ) {
+    changeHistoryToNotifyBooker.push({
+      oldData: {
+        title: 'Địa chỉ giao hàng:',
+        content: deliveryAddress.address,
+      },
+      newData: {
+        title: 'Địa chỉ giao hàng:',
+        content: updateDeliveryAddress.address,
+      },
+    });
+  }
+
+  if (
+    updateDetailAddress !== undefined &&
+    updateDetailAddress !== detailAddress
+  ) {
+    changeHistoryToNotifyBooker.push({
+      oldData: {
+        title: 'Địa chỉ chi tiết:',
+        content: detailAddress,
+      },
+      newData: {
+        title: 'Địa chỉ chi tiết:',
+        content: updateDetailAddress,
+      },
+    });
+  }
+
+  if (updateDeliveryHour !== undefined && updateDeliveryHour !== deliveryHour) {
+    changeHistoryToNotifyBooker.push({
+      oldData: {
+        title: 'Thời gian giao hàng:',
+        content: deliveryHour,
+      },
+      newData: {
+        title: 'Thời gian giao hàng:',
+        content: updateDeliveryHour,
+      },
+    });
+  }
 
   return {
     emailParamsForBookerNotification: {
@@ -880,6 +936,36 @@ export const preparePickingOrderChangeNotificationData = ({
     firebaseChangeHistory,
     normalizedOrderDetail,
   };
+};
+
+export const getEditedSubOrders = (orderDetail: TObject) => {
+  const editedSubOrders = Object.keys(orderDetail).reduce(
+    (result: any, subOrderDate: string) => {
+      const { oldValues, lastTransition } = orderDetail[subOrderDate];
+      if (
+        isEmpty(oldValues) ||
+        lastTransition !== ETransition.INITIATE_TRANSACTION
+      ) {
+        return result;
+      }
+
+      return {
+        ...result,
+        [subOrderDate]: orderDetail[subOrderDate],
+      };
+    },
+    {},
+  );
+
+  return editedSubOrders;
+};
+
+export const checkIsOrderHasInProgressState = (
+  orderStateHistory: TOrderStateHistory[],
+) => {
+  return orderStateHistory.some(
+    (state: TOrderStateHistory) => state.state === EOrderStates.inProgress,
+  );
 };
 
 export const mergeRecommendOrderDetailWithCurrentOrderDetail = (

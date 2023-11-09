@@ -64,6 +64,7 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
     memberOptions,
     foodOptions,
     currentOrderDetail,
+    hasSubOrders,
   } = usePrepareManageOrdersSectionData(currentViewDate, setCurrentViewDate);
 
   const { restaurant = {} } = currentOrderDetail;
@@ -184,7 +185,9 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
       </div>
 
       <RenderWhen.False>
-        <Skeleton className={css.rootSkeleton} />
+        <RenderWhen condition={!hasSubOrders}>
+          <Skeleton className={css.rootSkeleton} />
+        </RenderWhen>
       </RenderWhen.False>
     </RenderWhen>
   );

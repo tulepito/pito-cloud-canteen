@@ -65,6 +65,7 @@ const NavigateButtons: React.FC<TNavigateButtons> = (props) => {
         <RenderWhen.False>
           <div className={css.actionWrapper}>
             <Button
+              type="button"
               className={css.nextTabButton}
               variant="secondary"
               onClick={onNextClick}
@@ -76,6 +77,7 @@ const NavigateButtons: React.FC<TNavigateButtons> = (props) => {
               )}
             </Button>
             <Button
+              type="button"
               className={css.completeTabBtn}
               inProgress={inProgress}
               disabled={submitDisabled}
