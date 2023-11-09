@@ -1,3 +1,4 @@
+import isEmpty from 'lodash/isEmpty';
 import isEqual from 'lodash/isEqual';
 import { DateTime } from 'luxon';
 
@@ -27,6 +28,9 @@ const ParticipantInvitation: React.FC<TParticipantInvitationProps> = ({
   const confirmPublishOrderControl = useBoolean();
   const dispatch = useAppDispatch();
   const order = useAppSelector((state) => state.Order.order);
+  const participantData = useAppSelector(
+    (state) => state.BookerDraftOrderPage.participantData,
+  );
 
   const { startDate, deadlineDate, deadlineHour } =
     Listing(order).getMetadata();
@@ -48,6 +52,11 @@ const ParticipantInvitation: React.FC<TParticipantInvitationProps> = ({
     deadlineHour: deadlineHour || '06:30',
   };
 
+  // * condition to disable publish order
+  const isEmptyParticipantList = isEmpty(participantData);
+  const shouldDisabledSubmitPublishOrder = isEmptyParticipantList;
+
+  // * submit change deadline date & time
   const handleSubmitDeadlineDateTimeForm = (
     values: DeadlineDateTimeFormValues,
   ) => {
@@ -61,6 +70,7 @@ const ParticipantInvitation: React.FC<TParticipantInvitationProps> = ({
     confirmPublishOrderControl.setTrue();
   };
 
+  // * confirm publish draft order
   const handleConfirmPublishOrder = () => {
     confirmPublishOrderControl.setFalse();
 
@@ -89,6 +99,7 @@ const ParticipantInvitation: React.FC<TParticipantInvitationProps> = ({
               deliveryTime={deliveryTime}
               initialValues={deadlineDateTimeInitialValues}
               onSubmit={handleSubmitDeadlineDateTimeForm}
+              shouldDisableSubmit={shouldDisabledSubmitPublishOrder}
             />
             <AlertModal
               childrenClassName={css.confirmModalChildrenContainer}
