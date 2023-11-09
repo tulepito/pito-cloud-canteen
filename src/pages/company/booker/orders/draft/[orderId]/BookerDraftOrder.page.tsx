@@ -24,7 +24,11 @@ import { currentUserSelector } from '@redux/slices/user.slice';
 import { companyPaths } from '@src/paths';
 import Gleap from '@src/utils/gleap';
 import { Listing, User } from '@utils/data';
-import { EBookerOrderDraftStates, EOrderDraftStates } from '@utils/enums';
+import {
+  EBookerOrderDraftStates,
+  EOrderDraftStates,
+  EOrderType,
+} from '@utils/enums';
 import type { TListing, TUser } from '@utils/types';
 
 import emptyResultImg from '../../../../../../assets/emptyResult.png';
@@ -32,6 +36,7 @@ import Layout from '../../components/Layout/Layout';
 import LayoutMain from '../../components/Layout/LayoutMain';
 import LayoutSidebar from '../../components/Layout/LayoutSidebar';
 
+import ParticipantInvitation from './components/ParticipantInvitation/ParticipantInvitation';
 import SidebarContent from './components/SidebarContent/SidebarContent';
 import WalkThroughTourProvider from './components/WalkThroughTour/WalkThroughTour';
 import WelcomeModal from './components/WelcomeModal/WelcomeModal';
@@ -50,10 +55,15 @@ import { useGetOrder } from './restaurants/hooks/orderData';
 
 import css from './BookerDraftOrder.module.scss';
 
-const EnableToAccessPageOrderStates = [
+const ENABLE_TO_ACCESS_PAGE_ORDER_STATES = [
   EOrderDraftStates.pendingApproval,
   EBookerOrderDraftStates.bookerDraft,
 ];
+
+export enum EBookerDraftOrderViewMode {
+  setup = 'setup',
+  memberInvitation = 'memberInvitation',
+}
 
 function BookerDraftOrderPage() {
   const router = useRouter();
@@ -61,8 +71,11 @@ function BookerDraftOrderPage() {
   const [collapse, setCollapse] = useState(false);
   const [selectedRestaurantId, setSelectedRestaurantId] = useState<string>('');
   const [selectedTimestamp, setSelectedTimestamp] = useState<number>(0);
+  const [currentViewMode, setCurrViewMode] =
+    useState<EBookerDraftOrderViewMode>(EBookerDraftOrderViewMode.setup);
   const dispatch = useAppDispatch();
   const currentUser = useAppSelector(currentUserSelector);
+  // * Walkthrough
   const currentUserGetter = User(currentUser);
   const currentUserId = currentUserGetter.getId();
   const { walkthroughEnable = true } = currentUserGetter.getMetadata();
@@ -73,6 +86,9 @@ function BookerDraftOrderPage() {
   });
   useGetOrder({ orderId: orderId as string });
 
+  const fetchOrderParticipantsInProgress = useAppSelector(
+    (state) => state.BookerDraftOrderPage.fetchOrderParticipantsInProgress,
+  );
   const restaurantFood = useAppSelector(
     (state) => state.BookerSelectRestaurant.restaurantFood,
     shallowEqual,
@@ -90,31 +106,6 @@ function BookerDraftOrderPage() {
     (state) => state.Order.availableOrderDetailCheckList,
     shallowEqual,
   );
-
-  const {
-    isRestaurantDetailModalOpen,
-    openRestaurantDetailModal,
-    closeRestaurantDetailModal,
-    menuId,
-    restaurants,
-  } = useRestaurantDetailModal();
-
-  const companyGeoOrigin = useMemo(
-    () => ({
-      ...User(companyAccount as TUser).getPublicData()?.companyLocation?.origin,
-    }),
-    [companyAccount],
-  );
-
-  const {
-    orderState,
-    plans = [],
-    startDate: startDateTimestamp,
-    endDate: endDateTimestamp,
-    packagePerMember = 0,
-  } = Listing(order as TListing).getMetadata();
-  const planId = plans.length > 0 ? plans[0] : undefined;
-
   const selectedDate = useAppSelector(
     (state) => state.Order.selectedCalendarDate,
   );
@@ -125,11 +116,39 @@ function BookerDraftOrderPage() {
     startDate,
     endDate,
   });
+  const {
+    isRestaurantDetailModalOpen,
+    openRestaurantDetailModal,
+    closeRestaurantDetailModal,
+    menuId,
+    restaurants,
+  } = useRestaurantDetailModal();
 
-  const isFinishOrderDisabled = !isEnableSubmitPublishOrder(
-    order as TListing,
-    orderDetail,
-    availableOrderDetailCheckList,
+  const isSetupMode = currentViewMode === EBookerDraftOrderViewMode.setup;
+  const {
+    orderState,
+    plans = [],
+    orderType = EOrderType.normal,
+    startDate: startDateTimestamp,
+    endDate: endDateTimestamp,
+    packagePerMember = 0,
+  } = Listing(order as TListing).getMetadata();
+  const planId = plans.length > 0 ? plans[0] : undefined;
+  const isGroupOrder = orderType === EOrderType.group;
+
+  const isFinishOrderDisabled =
+    (isGroupOrder && fetchOrderParticipantsInProgress) ||
+    !isEnableSubmitPublishOrder(
+      order as TListing,
+      orderDetail,
+      availableOrderDetailCheckList,
+    );
+
+  const companyGeoOrigin = useMemo(
+    () => ({
+      ...User(companyAccount as TUser).getPublicData()?.companyLocation?.origin,
+    }),
+    [JSON.stringify(companyAccount)],
   );
 
   const suitableStartDate = useMemo(() => {
@@ -149,16 +168,27 @@ function BookerDraftOrderPage() {
     JSON.stringify(orderDetail),
   ]);
 
-  const handleFinishOrder = async () => {
+  const handlePublishDraftOrder = async () => {
     const { meta } = await dispatch(
       orderAsyncActions.bookerPublishOrder({ orderId, planId }),
     );
-
     if (meta.requestStatus !== 'rejected') {
       router.push({
         pathname: companyPaths.ManageOrderPicking,
         query: { orderId: orderId as string },
       });
+    }
+  };
+
+  const handleGoBackFromInvitationView = () => {
+    setCurrViewMode(EBookerDraftOrderViewMode.setup);
+  };
+
+  const handleFinishOrderClick = async () => {
+    if (isGroupOrder) {
+      setCurrViewMode(EBookerDraftOrderViewMode.memberInvitation);
+    } else {
+      await handlePublishDraftOrder();
     }
   };
 
@@ -186,7 +216,7 @@ function BookerDraftOrderPage() {
     startDate,
     endDate,
     isFinishOrderDisabled,
-    handleFinishOrder,
+    handleFinishOrder: handleFinishOrderClick,
     order,
     shouldHideDayItems: isAllDatesHaveNoRestaurants,
   });
@@ -279,7 +309,7 @@ function BookerDraftOrderPage() {
     if (!isEmpty(orderState)) {
       if (orderState === EOrderDraftStates.draft) {
         router.push({ pathname: companyPaths.CreateNewOrder });
-      } else if (!EnableToAccessPageOrderStates.includes(orderState)) {
+      } else if (!ENABLE_TO_ACCESS_PAGE_ORDER_STATES.includes(orderState)) {
         router.push({
           pathname: companyPaths.ManageOrderPicking,
           query: { orderId: orderId as string },
@@ -290,70 +320,80 @@ function BookerDraftOrderPage() {
 
   return (
     <WalkThroughTourProvider onCloseTour={handleCloseWalkThrough}>
-      <Layout className={css.root}>
-        <LayoutSidebar
-          logo={<span></span>}
-          collapse={collapse}
-          onCollapse={handleCollapse}>
-          <SidebarContent order={order} companyAccount={companyAccount} />
-        </LayoutSidebar>
-        <LayoutMain>
-          <div className={css.main}>
-            <CalendarDashboard
-              className={css.calendar}
-              anchorDate={suitableStartDate}
-              startDate={startDate}
-              endDate={endDate}
-              events={orderDetail}
-              companyLogo="Company"
-              hideMonthView
-              {...calendarProps}
-            />
+      <RenderWhen condition={isSetupMode}>
+        <Layout className={css.root}>
+          <LayoutSidebar
+            logo={<span></span>}
+            collapse={collapse}
+            onCollapse={handleCollapse}>
+            <SidebarContent order={order} companyAccount={companyAccount} />
+          </LayoutSidebar>
+          <LayoutMain>
+            <div className={css.main}>
+              <CalendarDashboard
+                className={css.calendar}
+                anchorDate={suitableStartDate}
+                startDate={startDate}
+                endDate={endDate}
+                events={orderDetail}
+                companyLogo="Company"
+                hideMonthView
+                {...calendarProps}
+              />
 
-            <RenderWhen condition={isAllDatesHaveNoRestaurants}>
-              <div className={css.emptyResult}>
-                <div className={css.emptyResultImg}>
-                  <Image src={emptyResultImg} alt="empty result" />
+              <RenderWhen condition={isAllDatesHaveNoRestaurants}>
+                <div className={css.emptyResult}>
+                  <div className={css.emptyResultImg}>
+                    <Image src={emptyResultImg} alt="empty result" />
+                  </div>
+                  <div className={css.emptyTitle}>
+                    <p>Không tìm thấy kết quả phù hợp</p>
+                    <p className={css.emptyContent}>
+                      Rất tiếc, hệ thống chúng tôi không tìm thấy kết quả phù
+                      hợp với yêu cầu của bạn. Tuy nhiên, đừng ngần ngại{' '}
+                      <span>
+                        chat với chúng tôi để tìm thấy menu nhanh nhất
+                      </span>{' '}
+                      nhé.
+                    </p>
+                    <Button
+                      className={css.contactUsBtn}
+                      variant="secondary"
+                      onClick={handleChatIconClick}>
+                      Chat với chúng tôi
+                    </Button>
+                  </div>
                 </div>
-                <div className={css.emptyTitle}>
-                  <p>Không tìm thấy kết quả phù hợp</p>
-                  <p className={css.emptyContent}>
-                    Rất tiếc, hệ thống chúng tôi không tìm thấy kết quả phù hợp
-                    với yêu cầu của bạn. Tuy nhiên, đừng ngần ngại{' '}
-                    <span>chat với chúng tôi để tìm thấy menu nhanh nhất</span>{' '}
-                    nhé.
-                  </p>
-                  <Button
-                    className={css.contactUsBtn}
-                    variant="secondary"
-                    onClick={handleChatIconClick}>
-                    Chat với chúng tôi
-                  </Button>
-                </div>
-              </div>
+              </RenderWhen>
+            </div>
+            <RenderWhen condition={walkthroughEnable}>
+              <WelcomeModal
+                isOpen={welcomeModalControl.value}
+                onClose={welcomeModalControl.setFalse}
+              />
             </RenderWhen>
-          </div>
-          <RenderWhen condition={walkthroughEnable}>
-            <WelcomeModal
-              isOpen={welcomeModalControl.value}
-              onClose={welcomeModalControl.setFalse}
+            <ResultDetailModal
+              isOpen={isRestaurantDetailModalOpen}
+              onClose={closeRestaurantDetailModal}
+              restaurantFood={restaurantFood}
+              selectedRestaurantId={selectedRestaurantId}
+              restaurants={restaurants}
+              companyGeoOrigin={companyGeoOrigin}
+              onSearchSubmit={handleSearchRestaurantSubmit}
+              fetchFoodInProgress={fetchRestaurantFoodInProgress}
+              openFromCalendar
+              timestamp={selectedTimestamp}
+              packagePerMember={packagePerMember}
             />
-          </RenderWhen>
-          <ResultDetailModal
-            isOpen={isRestaurantDetailModalOpen}
-            onClose={closeRestaurantDetailModal}
-            restaurantFood={restaurantFood}
-            selectedRestaurantId={selectedRestaurantId}
-            restaurants={restaurants}
-            companyGeoOrigin={companyGeoOrigin}
-            onSearchSubmit={handleSearchRestaurantSubmit}
-            fetchFoodInProgress={fetchRestaurantFoodInProgress}
-            openFromCalendar
-            timestamp={selectedTimestamp}
-            packagePerMember={packagePerMember}
+          </LayoutMain>
+        </Layout>
+        <RenderWhen.False>
+          <ParticipantInvitation
+            onGoBack={handleGoBackFromInvitationView}
+            onPublishOrder={handlePublishDraftOrder}
           />
-        </LayoutMain>
-      </Layout>
+        </RenderWhen.False>
+      </RenderWhen>
     </WalkThroughTourProvider>
   );
 }

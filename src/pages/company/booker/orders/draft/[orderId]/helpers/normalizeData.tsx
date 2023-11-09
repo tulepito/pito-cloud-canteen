@@ -79,7 +79,13 @@ export const normalizePlanDetailsToEvent = (
           id: timestamp,
           daySession:
             daySession ||
-            getDaySessionFromDeliveryTime(deliveryHour.split('-')[0]),
+            getDaySessionFromDeliveryTime(
+              isEmpty(deliveryHour)
+                ? undefined
+                : deliveryHour.includes('-')
+                ? deliveryHour.split('-')[0]
+                : deliveryHour,
+            ),
           isSelectedFood: !isEmpty(restaurantMaybe.id) && !isEmpty(foodList),
           restaurant: restaurantMaybe,
           meal: {

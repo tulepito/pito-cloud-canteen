@@ -1,8 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit';
 
+import { getBookerOrderDataApi } from '@apis/orderApi';
 import { createAsyncThunk } from '@redux/redux.helper';
+import { EOrderType } from '@src/utils/enums';
 import { denormalisedResponseEntities, Listing } from '@utils/data';
-import type { TListing, TUser } from '@utils/types';
+import type { TListing, TObject, TUser } from '@utils/types';
 
 // ================ Initial states ================ //
 type TBookerDraftOrderPageState = {
@@ -10,12 +12,18 @@ type TBookerDraftOrderPageState = {
   fetchCompanyAccountInProgress: boolean;
   fetchCompanyAccountError: any;
   selectedCalendarDate: Date;
+
+  fetchOrderParticipantsInProgress: boolean;
+  participantData: TObject[];
 };
 const initialState: TBookerDraftOrderPageState = {
   companyAccount: null,
   fetchCompanyAccountInProgress: false,
   fetchCompanyAccountError: null,
   selectedCalendarDate: undefined!,
+
+  fetchOrderParticipantsInProgress: false,
+  participantData: [],
 };
 
 // ================ Thunk types ================ //
@@ -40,8 +48,26 @@ const fetchCompanyAccount = createAsyncThunk(
   },
 );
 
+const fetchOrderParticipants = createAsyncThunk(
+  'app/BookerDraftOrderPage/FETCH_ORDER_PARTICIPANTS',
+  async (_, { getState }) => {
+    const { order } = getState().Order;
+    const orderGetter = Listing(order as TListing);
+    const { orderType = EOrderType.normal } = orderGetter.getMetadata();
+
+    if (orderType === EOrderType.group) {
+      const { data } = await getBookerOrderDataApi(orderGetter.getId());
+
+      return data.participantData;
+    }
+
+    return [];
+  },
+);
+
 export const BookerDraftOrderPageThunks = {
   fetchCompanyAccount,
+  fetchOrderParticipants,
 };
 
 // ================ Slice ================ //
@@ -67,6 +93,17 @@ const BookerDraftOrderPageSlice = createSlice({
       .addCase(fetchCompanyAccount.rejected, (state, { payload }) => {
         state.fetchCompanyAccountInProgress = false;
         state.fetchCompanyAccountError = payload;
+      })
+      /* =============== fetchOrderParticipants =============== */
+      .addCase(fetchOrderParticipants.pending, (state) => {
+        state.fetchOrderParticipantsInProgress = true;
+      })
+      .addCase(fetchOrderParticipants.fulfilled, (state, { payload }) => {
+        state.fetchOrderParticipantsInProgress = false;
+        state.participantData = payload;
+      })
+      .addCase(fetchOrderParticipants.rejected, (state) => {
+        state.fetchOrderParticipantsInProgress = false;
       });
   },
 });
