@@ -5,8 +5,8 @@ import { deleteApi, getApi, postApi, putApi } from './configs';
 
 const BASE_URL = '/partner';
 
-export const queryPartnerOrdersApi = (partnerId: string) => {
-  return getApi(`${BASE_URL}/${partnerId}/orders`);
+export const queryPartnerOrdersApi = (partnerId: string, params?: TObject) => {
+  return getApi(`${BASE_URL}/${partnerId}/orders`, params);
 };
 
 export const queryPartnerOrderDetailApi = ({

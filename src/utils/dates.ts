@@ -673,3 +673,20 @@ export const generateWeekDayList = (startDate: number, endDate: number) => {
 
   return weekdays;
 };
+
+export const getYesterday = (date: Date = new Date()) => {
+  return DateTime.fromJSDate(date).minus({ days: 1 }).toJSDate();
+};
+
+/**
+ *
+ * @param givenDate default is today
+ * @param offset the number of days before givenDate
+ * @returns the date before givenDate with offset
+ */
+export const getDayBeforeGivenDayWithOffset = (
+  givenDate: Date = new Date(),
+  offset: number = 7,
+) => {
+  return DateTime.fromJSDate(givenDate).minus({ days: offset }).toJSDate();
+};

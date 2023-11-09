@@ -1,0 +1,47 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.root {
+  border-radius: 12px;
+  border: 1px solid $neutralGray3;
+  background: $neutralGray1;
+  @include flexAlign(center, space-between);
+  padding: 12px;
+  font-size: 14px;
+}
+
+.iconTitleWrapper {
+  @include flexAlign(center);
+  gap: 8px;
+  width: 100%;
+}
+
+.valueWrapper {
+  @include flexAlign(center, space-between);
+  width: 100%;
+
+  .value {
+    font-weight: $fontWeightBold;
+  }
+}
+
+.upIcon {
+  transform: rotate(90deg);
+  width: 20px;
+  height: 20px;
+
+  path {
+    stroke: $sematicGreen2;
+  }
+}
+
+.downIcon {
+  transform: rotate(-90deg);
+  width: 20px;
+  height: 20px;
+
+  path {
+    stroke: $primaryPri2;
+  }
+}

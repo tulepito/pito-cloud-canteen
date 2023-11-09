@@ -428,3 +428,9 @@ export enum QuizStep {
   INVITE_MEMBER = 'invite-member',
   ORDER_CREATING = 'order-creating',
 }
+
+export enum EFluctuationType {
+  INCREASE = 'increase',
+  DECREASE = 'decrease',
+  EQUAL = 'equal',
+}

@@ -1,0 +1,11 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.modalTitle {
+  @include flexAlign(center, space-between);
+
+  span {
+    @include textTemplate(16px, $fontWeightBold, 24px);
+  }
+}
