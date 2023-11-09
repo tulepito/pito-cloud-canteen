@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { resetOrder } from '@redux/slices/Order.slice';
+import { currentUserSelector } from '@redux/slices/user.slice';
 import { CurrentUser } from '@src/utils/data';
 import { QuizStep } from '@src/utils/enums';
 
@@ -36,7 +37,7 @@ const QuizFlow = () => {
   const currentStep = useAppSelector(
     (state) => state.BookerNewOrderPage.currentStep,
   );
-  const currentUser = useAppSelector((state) => state.user.currentUser);
+  const currentUser = useAppSelector(currentUserSelector);
 
   const { hasOrderBefore = false } = CurrentUser(currentUser!).getPrivateData();
 

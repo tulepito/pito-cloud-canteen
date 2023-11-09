@@ -43,7 +43,11 @@ const QuizCreateOrderLoadingModal: React.FC<
     endDate && formatTimestamp(new Date(endDate).getTime(), 'd MMMM');
 
   return (
-    <Modal isOpen handleClose={() => {}} shouldHideIconClose>
+    <Modal
+      isOpen
+      containerClassName={css.modalContainer}
+      handleClose={() => {}}
+      shouldHideIconClose>
       <div className={css.container}>
         {!creatingOrderError && (
           <div className={css.iconWrapper}>
@@ -59,6 +63,7 @@ const QuizCreateOrderLoadingModal: React.FC<
             intl.formatMessage({
               id: 'QuizCreatingOrderPage.initializingOrderDetail',
             })}
+
           {orderTitle &&
             !initialOrderDetailInProgress &&
             intl.formatMessage({

@@ -24,13 +24,12 @@
 }
 
 .iconWrapper {
-  padding-top: 24px;
+  padding-top: 36px;
 }
 
 .initialOrderText {
   @include textTemplate(24px, $fontWeightBold, 32px);
   margin-top: 32px;
-  text-transform: capitalize;
 }
 
 .orderTitle {
@@ -47,6 +46,6 @@
   }
 }
 
-.memberModalContainer.memberModalContainer {
-  flex-basis: 700px;
+.modalContainer.modalContainer {
+  flex-basis: 480px;
 }
