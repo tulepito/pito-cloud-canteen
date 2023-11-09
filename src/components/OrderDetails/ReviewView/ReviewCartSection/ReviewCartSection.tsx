@@ -211,7 +211,7 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
                   </RenderWhen.False>
                 </RenderWhen>
                 <Badge
-                  label={`${vatPercentage * 100}%`}
+                  label={`${Math.abs(vatPercentage * 100)}%`}
                   className={css.VATBadge}
                 />
               </div>

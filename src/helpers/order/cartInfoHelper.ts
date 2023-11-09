@@ -28,7 +28,7 @@ export const vatPercentageBaseOnVatSetting = ({
     case EPartnerVATSetting.direct:
       return 0;
     case EPartnerVATSetting.noExportVat:
-      return 0.04;
+      return -0.04;
     case EPartnerVATSetting.vat:
     default:
       return vatPercentage;
