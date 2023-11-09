@@ -1,0 +1,12 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.root {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  row-gap: 16px;
+  border-radius: 16px;
+  border: 1px solid $neutralGray5;
+  background-color: $neutralGray1;
+}

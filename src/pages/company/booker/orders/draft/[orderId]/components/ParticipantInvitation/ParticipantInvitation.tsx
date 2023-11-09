@@ -13,6 +13,7 @@ import { Listing } from '@src/utils/data';
 
 import type { DeadlineDateTimeFormValues } from './DeadlineDateTimeForm';
 import DeadlineDateTimeForm from './DeadlineDateTimeForm';
+import ParticipantManagement from './ParticipantManagement';
 
 import css from './ParticipantInvitation.module.scss';
 
@@ -53,8 +54,8 @@ const ParticipantInvitation: React.FC<TParticipantInvitationProps> = ({
   };
 
   // * condition to disable publish order
-  const isEmptyParticipantList = isEmpty(participantData);
-  const shouldDisabledSubmitPublishOrder = isEmptyParticipantList;
+  const isParticipantListEmpty = isEmpty(participantData);
+  const shouldDisabledSubmitPublishOrder = isParticipantListEmpty;
 
   // * submit change deadline date & time
   const handleSubmitDeadlineDateTimeForm = (
@@ -94,27 +95,25 @@ const ParticipantInvitation: React.FC<TParticipantInvitationProps> = ({
           </div>
         </div>
         <div className={css.participantInvitationContainer}>
-          <div>
-            <DeadlineDateTimeForm
-              deliveryTime={deliveryTime}
-              initialValues={deadlineDateTimeInitialValues}
-              onSubmit={handleSubmitDeadlineDateTimeForm}
-              shouldDisableSubmit={shouldDisabledSubmitPublishOrder}
-            />
-            <AlertModal
-              childrenClassName={css.confirmModalChildrenContainer}
-              isOpen={confirmPublishOrderControl.value}
-              handleClose={confirmPublishOrderControl.setFalse}
-              title="Xác nhận đơn và gửi lời mời"
-              cancelLabel="Đóng"
-              confirmLabel={'Gửi lời mời'}
-              confirmDisabled={true}
-              onCancel={onGoBack}
-              onConfirm={handleConfirmPublishOrder}>
-              Sau khi gửi, bạn sẽ không thể chỉnh sửa thực đơn của tuần ăn.
-            </AlertModal>
-          </div>
-          <div></div>
+          <DeadlineDateTimeForm
+            deliveryTime={deliveryTime}
+            initialValues={deadlineDateTimeInitialValues}
+            onSubmit={handleSubmitDeadlineDateTimeForm}
+            shouldDisableSubmit={shouldDisabledSubmitPublishOrder}
+          />
+          <AlertModal
+            childrenClassName={css.confirmModalChildrenContainer}
+            isOpen={confirmPublishOrderControl.value}
+            handleClose={confirmPublishOrderControl.setFalse}
+            title="Xác nhận đơn và gửi lời mời"
+            cancelLabel="Đóng"
+            confirmLabel={'Gửi lời mời'}
+            confirmDisabled={true}
+            onCancel={onGoBack}
+            onConfirm={handleConfirmPublishOrder}>
+            Sau khi gửi, bạn sẽ không thể chỉnh sửa thực đơn của tuần ăn.
+          </AlertModal>
+          <ParticipantManagement />
         </div>
       </div>
     </div>
