@@ -20,7 +20,7 @@ type TDashboardProps = {};
 const Dashboard: React.FC<TDashboardProps> = () => {
   const dispatch = useAppDispatch();
 
-  const { startDate, endDate } = useControlTimeRange();
+  const { startDate, endDate, getPreviousTimePeriod } = useControlTimeRange();
   const currentOrderVATPercentage = useAppSelector(
     (state) => state.SystemAttributes.currentOrderVATPercentage,
   );
@@ -28,6 +28,9 @@ const Dashboard: React.FC<TDashboardProps> = () => {
   const currentUserGetter = CurrentUser(currentUser);
   const { restaurantListingId } = currentUserGetter.getMetadata();
   const subOrders = useAppSelector((state) => state.PartnerDashboard.subOrders);
+  const previousSubOrders = useAppSelector(
+    (state) => state.PartnerDashboard.previousSubOrders,
+  );
 
   const overviewInformation = useMemo(
     () =>
@@ -44,11 +47,34 @@ const Dashboard: React.FC<TDashboardProps> = () => {
     totalOrders: overviewInformation.totalOrders,
   };
 
+  const previousOverviewInformation = useMemo(
+    () =>
+      calculateOverviewInformation(
+        previousSubOrders,
+        restaurantListingId,
+        currentOrderVATPercentage,
+      ),
+    [previousSubOrders, restaurantListingId, currentOrderVATPercentage],
+  );
+
+  const previousOverviewData = {
+    totalRevenue: previousOverviewInformation.revenue,
+    totalCustomer: previousOverviewInformation.totalCustomers.length,
+    totalOrders: previousOverviewInformation.totalOrders,
+  };
+
   useEffect(() => {
+    const { previousStartDate, previousEndDate } = getPreviousTimePeriod();
     dispatch(
       PartnerDashboardThunks.fetchSubOrders({
-        startDate: startDate?.getTime(),
-        endDate: endDate?.getTime(),
+        currentSubOrderParams: {
+          startDate: startDate?.getTime(),
+          endDate: endDate?.getTime(),
+        },
+        previousSubOrdersParams: {
+          startDate: previousStartDate?.getTime(),
+          endDate: previousEndDate?.getTime(),
+        },
       }),
     );
   }, [dispatch, endDate, startDate]);
@@ -56,7 +82,7 @@ const Dashboard: React.FC<TDashboardProps> = () => {
   return (
     <div className={css.root}>
       <section className={css.section}>
-        <Overview data={overviewData} />
+        <Overview data={overviewData} previousData={previousOverviewData} />
       </section>
       <section className={css.section}>
         <OrdersAnalytics data={[]} />

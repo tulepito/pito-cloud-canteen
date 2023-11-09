@@ -19,8 +19,11 @@ export const calculateOverviewInformation = (
       const { plan, quotation = {} } = subOrder;
       const orderListing = Listing(subOrder as TListing);
       const planListing = Listing(plan as TListing);
-      const { companyId, serviceFees, vatSettings } =
-        orderListing.getMetadata();
+      const {
+        companyId,
+        serviceFees = {},
+        vatSettings = {},
+      } = orderListing.getMetadata();
 
       const { orderDetail = {} } = planListing.getMetadata();
 

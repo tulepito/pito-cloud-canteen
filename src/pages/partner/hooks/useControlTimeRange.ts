@@ -123,6 +123,87 @@ export const useControlTimeRange = () => {
     setEndDate(yesterday);
   };
 
+  const getPreviousTimePeriod = () => {
+    let previousStartDate = null;
+    let previousEndDate = null;
+    switch (timePeriodOption) {
+      case 'custom':
+        {
+          const daysBetweenStartAndEnd = DateTime.fromJSDate(endDate!)
+            .diff(DateTime.fromJSDate(startDate!), 'days')
+            .toObject().days;
+          previousStartDate = getDayBeforeGivenDayWithOffset(
+            startDate!,
+            daysBetweenStartAndEnd,
+          );
+          previousEndDate = getDayBeforeGivenDayWithOffset(
+            endDate!,
+            daysBetweenStartAndEnd,
+          );
+        }
+        break;
+      case 'today':
+        previousStartDate = yesterday;
+        previousEndDate = yesterday;
+        break;
+      case 'yesterday':
+        previousStartDate = getDayBeforeGivenDayWithOffset(yesterday, 1);
+        previousEndDate = getDayBeforeGivenDayWithOffset(yesterday, 1);
+        break;
+      case 'lastWeek':
+        previousStartDate = DateTime.fromJSDate(startDate!)
+          .minus({ weeks: 1 })
+          .startOf('week')
+          .toJSDate();
+
+        previousEndDate = DateTime.fromJSDate(endDate!)
+          .minus({ weeks: 1 })
+          .endOf('week')
+          .toJSDate();
+        break;
+      case 'lastMonth':
+        previousStartDate = DateTime.fromJSDate(startDate!)
+          .minus({ months: 1 })
+          .startOf('month')
+          .toJSDate();
+
+        previousEndDate = DateTime.fromJSDate(endDate!)
+          .minus({ months: 1 })
+          .endOf('month')
+          .toJSDate();
+        break;
+      case 'last7Days':
+        previousStartDate = DateTime.fromJSDate(startDate!)
+          .minus({ days: 7 })
+          .startOf('day')
+          .toJSDate();
+
+        previousEndDate = DateTime.fromJSDate(endDate!)
+          .minus({ days: 1 })
+          .endOf('day')
+          .toJSDate();
+        break;
+      case 'last30Days':
+        previousStartDate = DateTime.fromJSDate(startDate!)
+          .minus({ days: 30 })
+          .startOf('day')
+          .toJSDate();
+
+        previousEndDate = DateTime.fromJSDate(endDate!)
+          .minus({ days: 1 })
+          .endOf('day')
+          .toJSDate();
+        break;
+      default:
+        break;
+    }
+
+    return {
+      previousStartDate,
+      previousEndDate,
+    };
+  };
+
   return {
     startDate,
     setStartDate,
@@ -132,5 +213,6 @@ export const useControlTimeRange = () => {
     setTimePeriodOption,
     handleTimePeriodChange,
     resetTimePeriod,
+    getPreviousTimePeriod,
   };
 };

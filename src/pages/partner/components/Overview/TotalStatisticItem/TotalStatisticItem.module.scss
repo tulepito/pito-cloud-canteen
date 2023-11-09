@@ -15,6 +15,14 @@
   @include flexAlign(center);
   gap: 8px;
   width: 100%;
+
+  .iconWrapper {
+    width: 24px;
+    height: 24px;
+    @include flexAlign(center, center);
+    border-radius: 50%;
+    background-color: $neutralGray3;
+  }
 }
 
 .valueWrapper {

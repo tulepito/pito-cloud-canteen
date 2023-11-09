@@ -10,7 +10,7 @@ import {
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { handleError } from '@services/sdk';
 import { Listing } from '@src/utils/data';
-import { EListingType } from '@src/utils/enums';
+import { EListingStates, EListingType } from '@src/utils/enums';
 import type { TListing, TObject } from '@src/utils/types';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
@@ -27,6 +27,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         const integrationSdk = getIntegrationSdk();
         const orders = await queryAllListings({
           query: {
+            states: [EListingStates.published],
             meta_partnerIds: `has_any:${partnerId}`,
             meta_listingType: EListingType.order,
             ...(startDate &&

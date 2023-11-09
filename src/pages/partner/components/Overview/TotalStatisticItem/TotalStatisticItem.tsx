@@ -33,7 +33,7 @@ const TotalStatisticItem: React.FC<TTotalStatisticItemProps> = (props) => {
   return (
     <div className={classes}>
       <div className={css.iconTitleWrapper}>
-        {icon}
+        <div className={css.iconWrapper}>{icon}</div>
         <div className={css.title}>{title}</div>
       </div>
       <div className={css.valueWrapper}>

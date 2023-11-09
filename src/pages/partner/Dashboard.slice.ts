@@ -11,6 +11,10 @@ import type { TObject, TPaymentRecord } from '@src/utils/types';
 
 // ================ Initial states ================ //
 type TPartnerDashboardState = {
+  previousSubOrders: TObject[];
+  fetchPreviousSubOrdersInProgress: boolean;
+  fetchPreviousSubOrdersError: any;
+
   subOrders: TObject[];
   fetchSubOrdersInProgress: boolean;
   fetchSubOrdersError: any;
@@ -20,6 +24,10 @@ type TPartnerDashboardState = {
   fetchPartnerFirebasePaymentRecordError: any;
 };
 const initialState: TPartnerDashboardState = {
+  previousSubOrders: [],
+  fetchPreviousSubOrdersInProgress: false,
+  fetchPreviousSubOrdersError: null,
+
   subOrders: [],
   fetchSubOrdersInProgress: false,
   fetchSubOrdersError: null,
@@ -38,21 +46,32 @@ const FETCH_PARTNER_FIREBASE_PAYMENT_RECORD =
 const fetchSubOrders = createAsyncThunk(
   FETCH_SUB_ORDERS,
   async (payload: TObject, { getState }) => {
+    const { currentSubOrderParams, previousSubOrdersParams } = payload;
     const { currentUser } = getState().user;
     const { restaurantListingId } = CurrentUser(currentUser!).getMetadata();
+    const allowedOrderStates = [
+      EOrderStates.inProgress,
+      EOrderStates.completed,
+      EOrderStates.reviewed,
+      EOrderStates.pendingPayment,
+    ];
     const response = await queryPartnerOrdersApi(restaurantListingId, {
-      ...payload,
-      orderStates: [
-        EOrderStates.inProgress,
-        EOrderStates.completed,
-        EOrderStates.reviewed,
-        EOrderStates.pendingPayment,
-      ],
+      ...currentSubOrderParams,
+      orderStates: allowedOrderStates,
+    });
+
+    const previousResponse = await queryPartnerOrdersApi(restaurantListingId, {
+      ...previousSubOrdersParams,
+      orderStates: allowedOrderStates,
     });
 
     const { orders = [] } = response?.data || {};
+    const { orders: previousOrders = [] } = previousResponse?.data || {};
 
-    return orders;
+    return {
+      subOrders: orders,
+      previousSubOrders: previousOrders,
+    };
   },
 );
 
@@ -101,7 +120,8 @@ const PartnerDashboardSlice = createSlice({
       })
       .addCase(fetchSubOrders.fulfilled, (state, action) => {
         state.fetchSubOrdersInProgress = false;
-        state.subOrders = action.payload;
+        state.subOrders = action.payload.subOrders;
+        state.previousSubOrders = action.payload.previousSubOrders;
       })
       .addCase(fetchSubOrders.rejected, (state, action) => {
         state.fetchSubOrdersInProgress = false;

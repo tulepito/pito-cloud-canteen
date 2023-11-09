@@ -1,7 +1,7 @@
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
+import IconGroup from '@components/Icons/IconGroup/IconGroup';
 import IconMoney from '@components/Icons/IconMoney/IconMoney';
 import IconReceipt from '@components/Icons/IconReceipt/IconReceipt';
-import IconUser from '@components/Icons/IconUser/IconUser';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { parseThousandNumber } from '@helpers/format';
 import useBoolean from '@hooks/useBoolean';
@@ -23,11 +23,34 @@ type TOverviewProps = {
     totalCustomer: number;
     totalOrders: number;
   };
+
+  previousData: {
+    totalRevenue: number;
+    totalCustomer: number;
+    totalOrders: number;
+  };
+};
+
+const getFluctuation = (current: number, previous: number) => {
+  if (current > previous) {
+    return EFluctuationType.INCREASE;
+  }
+
+  if (current < previous) {
+    return EFluctuationType.DECREASE;
+  }
+
+  return EFluctuationType.EQUAL;
 };
 
 const Overview: React.FC<TOverviewProps> = (props) => {
-  const { data } = props;
+  const { data, previousData } = props;
   const { totalRevenue, totalCustomer, totalOrders } = data;
+  const {
+    totalRevenue: previousTotalRevenue,
+    totalCustomer: previousTotalCustomer,
+    totalOrders: previousTotalOrders,
+  } = previousData;
   const selectTimePeriodController = useBoolean();
   const { timePeriodOption } = useControlTimeRange();
 
@@ -52,21 +75,21 @@ const Overview: React.FC<TOverviewProps> = (props) => {
         icon={<IconMoney />}
         title="Tổng doanh thu"
         value={`${parseThousandNumber(totalRevenue)}đ`}
-        fluctuation={EFluctuationType.INCREASE}
+        fluctuation={getFluctuation(totalRevenue, previousTotalRevenue)}
       />
       <div className={css.row}>
         <TotalStatisticItem
-          icon={<IconUser variant="multiUser" />}
+          icon={<IconGroup />}
           title="Tổng khách hàng"
           value={totalCustomer}
-          fluctuation={EFluctuationType.INCREASE}
+          fluctuation={getFluctuation(totalCustomer, previousTotalCustomer)}
           className={css.item}
         />
         <TotalStatisticItem
-          icon={<IconReceipt />}
+          icon={<IconReceipt className={css.receiptIcon} />}
           title="Tổng đơn hàng"
           value={totalOrders}
-          fluctuation={EFluctuationType.DECREASE}
+          fluctuation={getFluctuation(totalOrders, previousTotalOrders)}
           className={css.item}
         />
       </div>
