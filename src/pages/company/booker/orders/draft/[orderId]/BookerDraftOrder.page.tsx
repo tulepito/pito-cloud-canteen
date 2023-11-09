@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { shallowEqual } from 'react-redux';
+import { toast } from 'react-toastify';
 import isEmpty from 'lodash/isEmpty';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
@@ -23,6 +24,7 @@ import { QuizActions } from '@redux/slices/Quiz.slice';
 import { currentUserSelector } from '@redux/slices/user.slice';
 import { companyPaths } from '@src/paths';
 import Gleap from '@src/utils/gleap';
+import { successToastOptions } from '@src/utils/toastify';
 import { Listing, User } from '@utils/data';
 import {
   EBookerOrderDraftStates,
@@ -173,6 +175,10 @@ function BookerDraftOrderPage() {
       orderAsyncActions.bookerPublishOrder({ orderId, planId }),
     );
     if (meta.requestStatus !== 'rejected') {
+      if (!isSetupMode) {
+        toast('Đã gửi lời mời đến thành viên', successToastOptions);
+      }
+
       router.push({
         pathname: companyPaths.ManageOrderPicking,
         query: { orderId: orderId as string },
