@@ -47,6 +47,9 @@
 
   strong {
     cursor: pointer;
+    a {
+      color: $neutralGray7;
+    }
   }
 
   .uploadFileButton {
