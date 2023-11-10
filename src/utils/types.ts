@@ -713,3 +713,8 @@ export type TPaymentRecord = {
   totalPrice?: number;
   paymentType?: EPaymentType;
 };
+
+export type TChartPoint = {
+  dataLabel: string;
+  [dataKey: string]: any;
+};

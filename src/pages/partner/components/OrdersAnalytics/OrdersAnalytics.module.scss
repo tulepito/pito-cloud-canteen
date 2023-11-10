@@ -18,6 +18,8 @@
 }
 
 .dataWrapper {
+  margin-top: 16px;
+
   .empty {
     text-align: center;
     padding: 16px 0;
@@ -26,5 +28,32 @@
       @include textTemplate(12px, $fontWeightRegular, 16px);
       color: $neutralGray6;
     }
+  }
+
+  .content {
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid $neutralGray3;
+  }
+
+  .timeFrameWrapper {
+    width: fit-content;
+    margin: 16px auto 0;
+  }
+
+  .totalSubOrdersWrapper {
+    .label {
+      @include textTemplate(14px, 400, 20px);
+      color: $neutralGray6;
+    }
+
+    .value {
+      @include textTemplate(16px, 700, 24px);
+      margin-top: 4px;
+    }
+  }
+
+  .chartWrapper {
+    margin-top: 24px;
   }
 }

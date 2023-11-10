@@ -1,112 +1,144 @@
-import { useState } from 'react';
+import { useEffect } from 'react';
 import { DateTime } from 'luxon';
 
-import { getDayBeforeGivenDayWithOffset, getYesterday } from '@src/utils/dates';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import {
+  getDayBeforeGivenDayWithOffset,
+  getYesterday,
+  VNTimezone,
+} from '@src/utils/dates';
+import { ETimePeriodOption } from '@src/utils/enums';
+
+import { PartnerDashboardActions } from '../Dashboard.slice';
 
 export const timePeriodOptions = [
   {
-    key: 'today',
+    key: ETimePeriodOption.TODAY,
     label: 'Hôm nay',
   },
   {
-    key: 'yesterday',
+    key: ETimePeriodOption.YESTERDAY,
     label: 'Hôm qua',
   },
   {
-    key: 'lastWeek',
+    key: ETimePeriodOption.LAST_WEEK,
     label: 'Tuần trước',
   },
   {
-    key: 'lastMonth',
+    key: ETimePeriodOption.LAST_MONTH,
     label: 'Tháng trước',
   },
   {
-    key: 'last7Days',
+    key: ETimePeriodOption.LAST_7_DAYS,
     label: '7 ngày trước',
   },
   {
-    key: 'last30Days',
+    key: ETimePeriodOption.LAST_30_DAYS,
     label: '30 ngày trước',
   },
 ];
 
 export const useControlTimeRange = () => {
-  const today = new Date();
-  const yesterday = getYesterday();
-  const before7DaysAgo = getDayBeforeGivenDayWithOffset(yesterday, 6);
-  const [startDate, setStartDate] = useState<Date | null>(before7DaysAgo);
-  const [endDate, setEndDate] = useState<Date | null>(yesterday);
-  const [timePeriodOption, setTimePeriodOption] = useState<string>('custom');
+  const dispatch = useAppDispatch();
+  const today = DateTime.now().setZone(VNTimezone).startOf('day').toMillis();
+  const yesterday = getYesterday().getTime();
+  const before7DaysAgo = getDayBeforeGivenDayWithOffset(new Date(yesterday), 6);
 
-  const handleTimePeriodChange = (value: string) => {
+  const startDate = useAppSelector((state) => state.PartnerDashboard.startDate);
+  const endDate = useAppSelector((state) => state.PartnerDashboard.endDate);
+  const timePeriodOption = useAppSelector(
+    (state) => state.PartnerDashboard.timePeriodOption,
+  );
+
+  const setStartDate = (date: number) => {
+    dispatch(PartnerDashboardActions.setStartDate(date));
+  };
+
+  const setEndDate = (date: number) => {
+    dispatch(PartnerDashboardActions.setEndDate(date));
+  };
+
+  const setTimePeriodOption = (option: ETimePeriodOption) => {
+    dispatch(PartnerDashboardActions.setTimePeriodOption(option));
+  };
+
+  const handleTimePeriodChange = (value: ETimePeriodOption) => {
     setTimePeriodOption(value);
     switch (value) {
-      case 'today':
+      case ETimePeriodOption.TODAY:
         setStartDate(today);
         setEndDate(today);
         break;
-      case 'yesterday':
+      case ETimePeriodOption.YESTERDAY:
         setStartDate(yesterday);
         setEndDate(yesterday);
         break;
-      case 'lastWeek':
+      case ETimePeriodOption.LAST_WEEK:
         {
           const startOfLastWeek = DateTime.now()
+            .setZone(VNTimezone)
             .minus({ weeks: 1 })
             .startOf('week')
-            .toJSDate();
+            .startOf('day')
+            .toMillis();
 
           const endOfLastWeek = DateTime.now()
+            .setZone(VNTimezone)
             .minus({ weeks: 1 })
             .endOf('week')
-            .toJSDate();
+            .startOf('day')
+            .toMillis();
           setStartDate(startOfLastWeek);
           setEndDate(endOfLastWeek);
         }
         break;
-      case 'lastMonth':
+      case ETimePeriodOption.LAST_MONTH:
         {
           const startOfLastMonth = DateTime.now()
+            .setZone(VNTimezone)
             .minus({ months: 1 })
             .startOf('month')
-            .toJSDate();
+            .startOf('day')
+            .toMillis();
 
           const endOfLastMonth = DateTime.now()
+            .setZone(VNTimezone)
             .minus({ months: 1 })
             .endOf('month')
-            .toJSDate();
+            .startOf('day')
+            .toMillis();
 
           setStartDate(startOfLastMonth);
           setEndDate(endOfLastMonth);
         }
         break;
-      case 'last7Days':
+      case ETimePeriodOption.LAST_7_DAYS:
         {
           const startOfLast7Days = DateTime.now()
             .minus({ days: 7 })
             .startOf('day')
-            .toJSDate();
+            .toMillis();
 
           const endOfLast7Days = DateTime.now()
             .minus({ days: 1 })
             .endOf('day')
-            .toJSDate();
+            .toMillis();
 
           setStartDate(startOfLast7Days);
           setEndDate(endOfLast7Days);
         }
         break;
-      case 'last30Days':
+      case ETimePeriodOption.LAST_30_DAYS:
         {
           const startOfLast30Days = DateTime.now()
             .minus({ days: 30 })
             .startOf('day')
-            .toJSDate();
+            .toMillis();
 
           const endOfLast30Days = DateTime.now()
             .minus({ days: 1 })
             .endOf('day')
-            .toJSDate();
+            .toMillis();
 
           setStartDate(startOfLast30Days);
           setEndDate(endOfLast30Days);
@@ -118,7 +150,7 @@ export const useControlTimeRange = () => {
   };
 
   const resetTimePeriod = () => {
-    setTimePeriodOption('custom');
+    setTimePeriodOption(ETimePeriodOption.CUSTOM);
     setStartDate(before7DaysAgo);
     setEndDate(yesterday);
   };
@@ -126,18 +158,23 @@ export const useControlTimeRange = () => {
   const getPreviousTimePeriod = () => {
     let previousStartDate = null;
     let previousEndDate = null;
+    if (!startDate || !endDate)
+      return {
+        previousStartDate,
+        previousEndDate,
+      };
     switch (timePeriodOption) {
       case 'custom':
         {
-          const daysBetweenStartAndEnd = DateTime.fromJSDate(endDate!)
-            .diff(DateTime.fromJSDate(startDate!), 'days')
+          const daysBetweenStartAndEnd = DateTime.fromMillis(endDate!)
+            .diff(DateTime.fromMillis(startDate!), 'days')
             .toObject().days;
           previousStartDate = getDayBeforeGivenDayWithOffset(
-            startDate!,
+            new Date(startDate!),
             daysBetweenStartAndEnd,
           );
           previousEndDate = getDayBeforeGivenDayWithOffset(
-            endDate!,
+            new Date(endDate!),
             daysBetweenStartAndEnd,
           );
         }
@@ -147,52 +184,58 @@ export const useControlTimeRange = () => {
         previousEndDate = yesterday;
         break;
       case 'yesterday':
-        previousStartDate = getDayBeforeGivenDayWithOffset(yesterday, 1);
-        previousEndDate = getDayBeforeGivenDayWithOffset(yesterday, 1);
+        previousStartDate = getDayBeforeGivenDayWithOffset(
+          new Date(yesterday),
+          1,
+        );
+        previousEndDate = getDayBeforeGivenDayWithOffset(
+          new Date(yesterday),
+          1,
+        );
         break;
       case 'lastWeek':
-        previousStartDate = DateTime.fromJSDate(startDate!)
+        previousStartDate = DateTime.fromMillis(startDate!)
           .minus({ weeks: 1 })
           .startOf('week')
-          .toJSDate();
+          .toMillis();
 
-        previousEndDate = DateTime.fromJSDate(endDate!)
+        previousEndDate = DateTime.fromMillis(endDate!)
           .minus({ weeks: 1 })
           .endOf('week')
-          .toJSDate();
+          .toMillis();
         break;
       case 'lastMonth':
-        previousStartDate = DateTime.fromJSDate(startDate!)
+        previousStartDate = DateTime.fromMillis(startDate!)
           .minus({ months: 1 })
           .startOf('month')
-          .toJSDate();
+          .toMillis();
 
-        previousEndDate = DateTime.fromJSDate(endDate!)
+        previousEndDate = DateTime.fromMillis(endDate!)
           .minus({ months: 1 })
           .endOf('month')
-          .toJSDate();
+          .toMillis();
         break;
       case 'last7Days':
-        previousStartDate = DateTime.fromJSDate(startDate!)
+        previousStartDate = DateTime.fromMillis(startDate!)
           .minus({ days: 7 })
           .startOf('day')
-          .toJSDate();
+          .toMillis();
 
-        previousEndDate = DateTime.fromJSDate(endDate!)
+        previousEndDate = DateTime.fromMillis(endDate!)
           .minus({ days: 1 })
           .endOf('day')
-          .toJSDate();
+          .toMillis();
         break;
       case 'last30Days':
-        previousStartDate = DateTime.fromJSDate(startDate!)
+        previousStartDate = DateTime.fromMillis(startDate!)
           .minus({ days: 30 })
           .startOf('day')
-          .toJSDate();
+          .toMillis();
 
-        previousEndDate = DateTime.fromJSDate(endDate!)
+        previousEndDate = DateTime.fromMillis(endDate!)
           .minus({ days: 1 })
           .endOf('day')
-          .toJSDate();
+          .toMillis();
         break;
       default:
         break;
@@ -203,6 +246,11 @@ export const useControlTimeRange = () => {
       previousEndDate,
     };
   };
+
+  useEffect(() => {
+    setStartDate(before7DaysAgo);
+    setEndDate(yesterday);
+  }, []);
 
   return {
     startDate,

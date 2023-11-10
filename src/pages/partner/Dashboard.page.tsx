@@ -11,8 +11,10 @@ import Overview from './components/Overview/Overview';
 import RevenueAnalytics from './components/RevenueAnalytics/RevenueAnalytics';
 import {
   calculateOverviewInformation,
+  formatChartData,
   splitSubOrders,
 } from './helpers/dashboardData';
+import { useControlTimeFrame } from './hooks/useControlTimeFrame';
 import { useControlTimeRange } from './hooks/useControlTimeRange';
 import { PartnerDashboardThunks } from './Dashboard.slice';
 
@@ -24,6 +26,8 @@ const Dashboard: React.FC<TDashboardProps> = () => {
   const dispatch = useAppDispatch();
 
   const { startDate, endDate, getPreviousTimePeriod } = useControlTimeRange();
+  const { analyticsOrdersTimeFrame } = useControlTimeFrame();
+
   const currentOrderVATPercentage = useAppSelector(
     (state) => state.SystemAttributes.currentOrderVATPercentage,
   );
@@ -74,21 +78,33 @@ const Dashboard: React.FC<TDashboardProps> = () => {
       splitSubOrders(subOrders, restaurantListingId, currentOrderVATPercentage),
     [currentOrderVATPercentage, restaurantListingId, subOrders],
   );
+  const analyticsOrderChartData = useMemo(
+    () =>
+      formatChartData({
+        subOrders: splittedSubOrders,
+        timeFrame: analyticsOrdersTimeFrame,
+        startDate: new Date(startDate!),
+        endDate: new Date(endDate!),
+      }),
+    [analyticsOrdersTimeFrame, endDate, splittedSubOrders, startDate],
+  );
 
   useEffect(() => {
     const { previousStartDate, previousEndDate } = getPreviousTimePeriod();
-    dispatch(
-      PartnerDashboardThunks.fetchSubOrders({
-        currentSubOrderParams: {
-          startDate: startDate?.getTime(),
-          endDate: endDate?.getTime(),
-        },
-        previousSubOrdersParams: {
-          startDate: previousStartDate?.getTime(),
-          endDate: previousEndDate?.getTime(),
-        },
-      }),
-    );
+    if (startDate && endDate) {
+      dispatch(
+        PartnerDashboardThunks.fetchSubOrders({
+          currentSubOrderParams: {
+            startDate,
+            endDate,
+          },
+          previousSubOrdersParams: {
+            startDate: previousStartDate,
+            endDate: previousEndDate,
+          },
+        }),
+      );
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, endDate, startDate]);
 
@@ -98,13 +114,18 @@ const Dashboard: React.FC<TDashboardProps> = () => {
         <Overview data={overviewData} previousData={previousOverviewData} />
       </section>
       <section className={css.section}>
-        <OrdersAnalytics data={[]} />
+        <OrdersAnalytics
+          data={splittedSubOrders}
+          overviewData={overviewData}
+          chartData={analyticsOrderChartData}
+          inProgress={fetchSubOrdersInProgress}
+        />
       </section>
       <section className={css.section}>
-        <RevenueAnalytics data={[]} />
+        <RevenueAnalytics data={splittedSubOrders} />
       </section>
       <section className={css.section}>
-        <LatestOrders data={splittedSubOrders} />
+        <LatestOrders data={splittedSubOrders.slice(0, 5)} />
       </section>
       <section className={css.section}>
         <OrderCalendar

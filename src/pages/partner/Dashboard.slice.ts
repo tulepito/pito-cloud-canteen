@@ -6,11 +6,17 @@ import {
 } from '@apis/partnerApi';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { CurrentUser } from '@src/utils/data';
-import { EOrderStates } from '@src/utils/enums';
+import { EOrderStates, ETimeFrame, ETimePeriodOption } from '@src/utils/enums';
 import type { TObject, TPaymentRecord } from '@src/utils/types';
 
 // ================ Initial states ================ //
 type TPartnerDashboardState = {
+  startDate: number | null;
+  endDate: number | null;
+  timePeriodOption: ETimePeriodOption;
+  analyticsRevenueTimeFrame: ETimeFrame;
+  analyticsOrdersTimeFrame: ETimeFrame;
+
   previousSubOrders: TObject[];
   fetchPreviousSubOrdersInProgress: boolean;
   fetchPreviousSubOrdersError: any;
@@ -24,6 +30,12 @@ type TPartnerDashboardState = {
   fetchPartnerFirebasePaymentRecordError: any;
 };
 const initialState: TPartnerDashboardState = {
+  startDate: null,
+  endDate: null,
+  timePeriodOption: ETimePeriodOption.CUSTOM,
+  analyticsRevenueTimeFrame: ETimeFrame.MONTH,
+  analyticsOrdersTimeFrame: ETimeFrame.MONTH,
+
   previousSubOrders: [],
   fetchPreviousSubOrdersInProgress: false,
   fetchPreviousSubOrdersError: null,
@@ -98,7 +110,23 @@ export const PartnerDashboardThunks = {
 const PartnerDashboardSlice = createSlice({
   name: 'PartnerDashboard',
   initialState,
-  reducers: {},
+  reducers: {
+    setAnalyticsRevenueTimeFrame(state, action) {
+      state.analyticsRevenueTimeFrame = action.payload;
+    },
+    setAnalyticsOrdersTimeFrame(state, action) {
+      state.analyticsOrdersTimeFrame = action.payload;
+    },
+    setTimePeriodOption(state, action) {
+      state.timePeriodOption = action.payload;
+    },
+    setStartDate(state, action) {
+      state.startDate = action.payload;
+    },
+    setEndDate(state, action) {
+      state.endDate = action.payload;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchPartnerFirebasePaymentRecord.pending, (state) => {

@@ -1,0 +1,27 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.tooltipWrapper {
+  border-radius: 8px;
+  background: $neutralGray7;
+  text-align: center;
+  @include textTemplate(12px, $fontWeightRegular, 16px);
+  color: $neutralGray1;
+  padding: 8px 12px;
+
+  & div:first-child {
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: $neutralGray7;
+  }
+}

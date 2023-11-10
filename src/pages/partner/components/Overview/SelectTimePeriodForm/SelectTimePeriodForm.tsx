@@ -12,6 +12,7 @@ import {
   timePeriodOptions,
   useControlTimeRange,
 } from '@pages/partner/hooks/useControlTimeRange';
+import type { ETimePeriodOption } from '@src/utils/enums';
 
 import css from './SelectTimePeriodForm.module.scss';
 
@@ -52,8 +53,10 @@ const SelectTimePeriodFormComponent: React.FC<
     resetTimePeriod,
   } = useControlTimeRange();
 
-  const [startDateValue, setStartDateValue] = useState<Date | null>(startDate);
-  const [endDateValue, setEndDateValue] = useState<Date | null>(endDate);
+  const [startDateValue, setStartDateValue] = useState<number | null>(
+    startDate,
+  );
+  const [endDateValue, setEndDateValue] = useState<number | null>(endDate);
 
   const onCancel = () => {
     if (shouldShowCustomSelect) {
@@ -68,10 +71,10 @@ const SelectTimePeriodFormComponent: React.FC<
       onBackToTimePeriodSelectClick?.();
     } else {
       if (values.timePeriod === 'custom') {
-        setStartDate(startDateValue);
-        setEndDate(endDateValue);
+        setStartDate(startDateValue!);
+        setEndDate(endDateValue!);
       } else {
-        handleTimePeriodChange(values.timePeriod);
+        handleTimePeriodChange(values.timePeriod! as ETimePeriodOption);
       }
       onCloseModal?.();
     }
@@ -92,8 +95,8 @@ const SelectTimePeriodFormComponent: React.FC<
           name="dateRangeField"
           selected={startDate}
           onChange={(_values: [Date | null, Date | null]) => {
-            setStartDateValue(_values[0]);
-            setEndDateValue(_values[1]);
+            setStartDateValue(_values[0]?.getTime()!);
+            setEndDateValue(_values[1]?.getTime()!);
           }}
           startDate={startDateValue}
           endDate={endDateValue}

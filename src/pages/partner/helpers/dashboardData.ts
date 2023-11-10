@@ -6,8 +6,9 @@ import {
   vatPercentageBaseOnVatSetting,
 } from '@helpers/order/cartInfoHelper';
 import { Listing } from '@src/utils/data';
-import { EOrderType, EPartnerVATSetting } from '@src/utils/enums';
-import type { TListing, TObject } from '@src/utils/types';
+import { formatTimestamp, getTimePeriodBetweenDates } from '@src/utils/dates';
+import { EOrderType, EPartnerVATSetting, ETimeFrame } from '@src/utils/enums';
+import type { TChartPoint, TListing, TObject } from '@src/utils/types';
 
 export const calculateOverviewInformation = (
   subOrders: TObject[],
@@ -139,4 +140,121 @@ export const splitSubOrders = (
   }, []);
 
   return splittedSubOrders;
+};
+
+const generateTimeRange = ({
+  timeFrame,
+  startDate,
+  endDate,
+}: {
+  timeFrame: string;
+  startDate: Date;
+  endDate: Date;
+}) => {
+  switch (timeFrame) {
+    case ETimeFrame.DAY: {
+      const timestampRange = getTimePeriodBetweenDates(
+        startDate,
+        endDate,
+        ETimeFrame.DAY,
+      );
+
+      return timestampRange.map(({ start, end }) => ({
+        timeLabel: formatTimestamp(start.getTime(), 'dd'),
+        timeRange: [start.getTime(), end.getTime()],
+      }));
+    }
+
+    case ETimeFrame.WEEK: {
+      const weeks = getTimePeriodBetweenDates(
+        startDate,
+        endDate,
+        ETimeFrame.WEEK,
+      );
+
+      return weeks.map((week) => {
+        const { start, end } = week;
+
+        return {
+          timeLabel: `${formatTimestamp(
+            start.getTime(),
+            'dd/MM',
+          )} - ${formatTimestamp(end.getTime(), 'dd/MM')}`,
+          timeRange: [start.getTime(), end.getTime()],
+        };
+      });
+    }
+
+    case ETimeFrame.MONTH: {
+      const months = getTimePeriodBetweenDates(
+        startDate,
+        endDate,
+        ETimeFrame.MONTH,
+      );
+
+      return months.map((month) => {
+        const { start, end } = month;
+
+        return {
+          timeLabel: `${formatTimestamp(start.getTime(), 'MM/yy')}`,
+          timeRange: [start.getTime(), end.getTime()],
+        };
+      });
+    }
+
+    default:
+      return [];
+  }
+};
+
+const groupDataByTimeFrame = (
+  subOrders: TObject[],
+  timePoint: {
+    timeLabel: string;
+    timeRange: number[];
+  },
+): TChartPoint => {
+  const { timeLabel, timeRange } = timePoint;
+
+  return subOrders.reduce(
+    (result: any, subOrder) => {
+      const { subOrderDate } = subOrder;
+      if (subOrderDate >= timeRange[0] && subOrderDate <= timeRange[1]) {
+        return {
+          ...result,
+          revenue: result.revenue + subOrder.revenue,
+          orders: result.orders + 1,
+        };
+      }
+
+      return result;
+    },
+    {
+      dateLabel: timeLabel,
+      revenue: 0,
+      orders: 0,
+    },
+  );
+};
+
+export const formatChartData = ({
+  subOrders,
+  timeFrame,
+  startDate,
+  endDate,
+}: {
+  subOrders: TObject[];
+  timeFrame: ETimeFrame;
+  startDate: Date;
+  endDate: Date;
+}) => {
+  const timeRange = generateTimeRange({
+    timeFrame,
+    startDate,
+    endDate,
+  });
+
+  return timeRange.map((timePoint) =>
+    groupDataByTimeFrame(subOrders, timePoint),
+  );
 };
