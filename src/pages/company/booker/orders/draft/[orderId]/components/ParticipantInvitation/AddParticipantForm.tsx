@@ -4,6 +4,7 @@ import { Form as FinalForm } from 'react-final-form';
 import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
+import { emailListFormatValid } from '@src/utils/validators';
 
 import css from './AddParticipantForm.module.scss';
 
@@ -28,6 +29,7 @@ const AddParticipantFormComponent: React.FC<
             id="AddParticipantForm.emails"
             name="emails"
             placeholder="Nhập email để thêm thành viên"
+            validate={emailListFormatValid('Vui lòng nhập đúng định dạng mail')}
           />
         </div>
         <Button>Thêm</Button>

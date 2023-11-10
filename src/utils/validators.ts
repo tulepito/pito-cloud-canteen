@@ -123,6 +123,19 @@ export const emailFormatValid = (message: string) => (value: string) => {
   return value && EMAIL_RE.test(value) ? VALID : message;
 };
 
+export const emailListFormatValid =
+  (message: string, separator = ' ') =>
+  (value: string) => {
+    if (!value) return VALID;
+
+    const normalizeValue = value.trim().replace(/\s+/g, ' ');
+
+    return value &&
+      normalizeValue.split(separator).every((v) => EMAIL_RE.test(v))
+      ? VALID
+      : message;
+  };
+
 export const passwordFormatValid = (message: string) => (value: string) => {
   return value && PWD_RE.test(value) ? VALID : message;
 };
