@@ -189,7 +189,7 @@ const SubOrderCart: React.FC<TSubOrderCartProps> = (props) => {
                 <div className={css.label}>
                   {intl.formatMessage({ id: 'SubOrderCart.VAT' })}
                   <Badge
-                    label={`${Math.round(vatPercentage * 100)}%`}
+                    label={`${Math.round(Math.abs(vatPercentage) * 100)}%`}
                     className={css.VATBadge}
                   />
                 </div>
