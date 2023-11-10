@@ -62,4 +62,8 @@
 
     @include textTemplate(14px, 700, 24px);
   }
+
+  input {
+    display: none;
+  }
 }

@@ -40,3 +40,8 @@
     margin-right: 0;
   }
 }
+
+.errorBody {
+  @extend .body;
+  min-width: 368px;
+}

@@ -29,5 +29,6 @@ export const successToastOptions: ToastOptions = {
 export const errorToastOptions: ToastOptions = {
   ...defaultOptions,
   className: css.errorContainer,
+  bodyClassName: css.errorBody,
   icon: <IconCloseSquare className={css.errorIcon} />,
 };
