@@ -7,7 +7,7 @@
   .contentContainer {
     margin: 16px 16px 32px;
 
-    @include viewportSLarge {
+    @include viewportLargeWithPaddings {
       max-width: 1180px;
       margin: 25px auto 80px;
     }
@@ -55,13 +55,20 @@
 
   .participantInvitationContainer {
     margin-top: 16px;
+    display: flex;
+    flex-direction: column;
+    row-gap: 12px;
 
     @include viewportLarge {
       margin-top: 24px;
+      flex-direction: row-reverse;
+      align-items: flex-start;
+      column-gap: 24px;
     }
 
     @include viewportSLarge {
       margin-top: 28px;
+      column-gap: 40px;
     }
   }
 }

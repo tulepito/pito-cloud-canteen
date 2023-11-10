@@ -23,19 +23,18 @@ const AddParticipantFormComponent: React.FC<
   return (
     <Form className={css.formRoot} onSubmit={handleSubmit}>
       <div className={css.formContainer}>
-        <div>
+        <div className={css.fieldContainer}>
           <FieldTextInput
             id="AddParticipantForm.emails"
             name="emails"
             placeholder="Nhập email để thêm thành viên"
           />
-          <div>
-            *Email được phân cách bằng khoảng trắng. Ví dụ: a1@gmail.com
-            b2@gmail.com
-          </div>
         </div>
-
         <Button>Thêm</Button>
+      </div>
+      <div className={css.hint}>
+        *Email được phân cách bằng khoảng trắng. Ví dụ: a1@gmail.com
+        b2@gmail.com
       </div>
     </Form>
   );

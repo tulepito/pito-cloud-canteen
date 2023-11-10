@@ -58,8 +58,14 @@
     cursor: pointer;
 
     .closeIcon {
-      width: 10px;
-      height: 10px;
+      width: 16px;
+      height: 16px;
+
+      &:hover {
+        * {
+          fill: $primaryPri2;
+        }
+      }
     }
   }
 }

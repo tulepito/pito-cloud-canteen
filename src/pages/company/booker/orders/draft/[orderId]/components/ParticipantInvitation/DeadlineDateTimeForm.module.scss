@@ -1,5 +1,6 @@
 @use '/src/styles/mixins.scss' as *;
 @use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
 
 .formRoot {
   padding: 16px;
@@ -7,6 +8,11 @@
   border-radius: 16px;
   border: 1px solid $neutralGray5;
   background: $neutralGray1;
+
+  @include viewportLarge {
+    flex-basis: 320px;
+    min-width: 320px;
+  }
 
   .formContainer {
     display: flex;

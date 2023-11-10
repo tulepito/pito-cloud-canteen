@@ -20,7 +20,7 @@ const ParticipantManagement: React.FC<TParticipantManagementProps> = () => {
 
   return (
     <div className={css.root}>
-      <div>
+      <div className={css.titleContainer}>
         <div className={css.title}>Danh sách thành viên hiện tại</div>
         <RenderWhen condition={!isParticipantListEmpty}>
           <div className={css.count}>{participantData.length}</div>
