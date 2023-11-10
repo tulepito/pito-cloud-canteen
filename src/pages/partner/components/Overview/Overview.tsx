@@ -5,10 +5,8 @@ import IconReceipt from '@components/Icons/IconReceipt/IconReceipt';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { parseThousandNumber } from '@helpers/format';
 import useBoolean from '@hooks/useBoolean';
-import {
-  timePeriodOptions,
-  useControlTimeRange,
-} from '@pages/partner/hooks/useControlTimeRange';
+import { timePeriodOptions } from '@pages/partner/hooks/useControlTimeRange';
+import type { ETimePeriodOption } from '@src/utils/enums';
 import { EFluctuationType } from '@src/utils/enums';
 import { getLabelByKey } from '@src/utils/options';
 
@@ -29,6 +27,7 @@ type TOverviewProps = {
     totalCustomer: number;
     totalOrders: number;
   };
+  timePeriodOption: ETimePeriodOption;
 };
 
 const getFluctuation = (current: number, previous: number) => {
@@ -44,7 +43,7 @@ const getFluctuation = (current: number, previous: number) => {
 };
 
 const Overview: React.FC<TOverviewProps> = (props) => {
-  const { data, previousData } = props;
+  const { data, previousData, timePeriodOption } = props;
   const { totalRevenue, totalCustomer, totalOrders } = data;
   const {
     totalRevenue: previousTotalRevenue,
@@ -52,7 +51,6 @@ const Overview: React.FC<TOverviewProps> = (props) => {
     totalOrders: previousTotalOrders,
   } = previousData;
   const selectTimePeriodController = useBoolean();
-  const { timePeriodOption } = useControlTimeRange();
 
   return (
     <div className={css.root}>

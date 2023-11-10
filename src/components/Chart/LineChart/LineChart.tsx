@@ -11,8 +11,6 @@ import {
 
 import type { TChartPoint } from '@src/utils/types';
 
-import css from './LineChart.module.scss';
-
 type TLineChartProps = {
   dataKey: string;
   data: TChartPoint[];
@@ -90,17 +88,6 @@ const CustomizeDot = (props: DotProps) => {
   );
 };
 
-const CustomizeTooltip = (props: TooltipProps<any, any>) => {
-  const { payload = [] } = props;
-
-  return (
-    <div className={css.tooltipWrapper}>
-      <div>{`${payload[0]?.value} đơn hàng`}</div>
-      <div>{payload[0]?.payload?.dateLabel}</div>
-    </div>
-  );
-};
-
 const CustomizeXAxisTick = (props: any) => {
   const { payload, x, y } = props;
 
@@ -114,7 +101,7 @@ const CustomizeXAxisTick = (props: any) => {
 };
 
 const LineChart: React.FC<TLineChartProps> = (props) => {
-  const { dataKey, data } = props;
+  const { dataKey, data, customTooltip } = props;
   const yDomain = [
     0,
     Math.ceil(Math.max(...data.map((item: any) => item[dataKey])) / 5) * 5 + 1,
@@ -145,7 +132,7 @@ const LineChart: React.FC<TLineChartProps> = (props) => {
           tick={{ fontSize: 12, color: '#8C8C8C' }}
           tickMargin={10}
         />
-        <Tooltip content={CustomizeTooltip} position={{ y: 10 }} />
+        <Tooltip content={customTooltip} position={{ y: 10 }} />
         <Line
           type="monotone"
           dataKey={dataKey}

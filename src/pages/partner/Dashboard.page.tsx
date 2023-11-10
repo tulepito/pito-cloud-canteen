@@ -25,8 +25,10 @@ type TDashboardProps = {};
 const Dashboard: React.FC<TDashboardProps> = () => {
   const dispatch = useAppDispatch();
 
-  const { startDate, endDate, getPreviousTimePeriod } = useControlTimeRange();
-  const { analyticsOrdersTimeFrame } = useControlTimeFrame();
+  const { startDate, endDate, getPreviousTimePeriod, timePeriodOption } =
+    useControlTimeRange();
+  const { analyticsOrdersTimeFrame, analyticsRevenueTimeFrame } =
+    useControlTimeFrame();
 
   const currentOrderVATPercentage = useAppSelector(
     (state) => state.SystemAttributes.currentOrderVATPercentage,
@@ -89,6 +91,17 @@ const Dashboard: React.FC<TDashboardProps> = () => {
     [analyticsOrdersTimeFrame, endDate, splittedSubOrders, startDate],
   );
 
+  const analyticsRevenueChartData = useMemo(
+    () =>
+      formatChartData({
+        subOrders: splittedSubOrders,
+        timeFrame: analyticsRevenueTimeFrame,
+        startDate: new Date(startDate!),
+        endDate: new Date(endDate!),
+      }),
+    [analyticsRevenueTimeFrame, endDate, splittedSubOrders, startDate],
+  );
+
   useEffect(() => {
     const { previousStartDate, previousEndDate } = getPreviousTimePeriod();
     if (startDate && endDate) {
@@ -111,7 +124,11 @@ const Dashboard: React.FC<TDashboardProps> = () => {
   return (
     <div className={css.root}>
       <section className={css.section}>
-        <Overview data={overviewData} previousData={previousOverviewData} />
+        <Overview
+          data={overviewData}
+          previousData={previousOverviewData}
+          timePeriodOption={timePeriodOption}
+        />
       </section>
       <section className={css.section}>
         <OrdersAnalytics
@@ -119,10 +136,17 @@ const Dashboard: React.FC<TDashboardProps> = () => {
           overviewData={overviewData}
           chartData={analyticsOrderChartData}
           inProgress={fetchSubOrdersInProgress}
+          timePeriodOption={timePeriodOption}
         />
       </section>
       <section className={css.section}>
-        <RevenueAnalytics data={splittedSubOrders} />
+        <RevenueAnalytics
+          data={splittedSubOrders}
+          overviewData={overviewData}
+          chartData={analyticsRevenueChartData}
+          inProgress={fetchSubOrdersInProgress}
+          timePeriodOption={timePeriodOption}
+        />
       </section>
       <section className={css.section}>
         <LatestOrders data={splittedSubOrders.slice(0, 5)} />

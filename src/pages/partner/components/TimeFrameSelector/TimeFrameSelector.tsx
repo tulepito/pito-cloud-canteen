@@ -1,7 +1,6 @@
 import classNames from 'classnames';
 
 import { timeFrameOptions } from '@pages/partner/hooks/useControlTimeFrame';
-import { useControlTimeRange } from '@pages/partner/hooks/useControlTimeRange';
 import { ETimeFrame, ETimePeriodOption } from '@src/utils/enums';
 
 import css from './TimeFrameSelector.module.scss';
@@ -9,6 +8,7 @@ import css from './TimeFrameSelector.module.scss';
 type TTimeFrameSelectorProps = {
   timeFrame: ETimeFrame;
   setTimeFrame: (timeFrame: ETimeFrame) => void;
+  timePeriodOption: ETimePeriodOption;
 };
 
 const getDisabledTimeFrameOptions = (timePeriodOption: ETimePeriodOption) => {
@@ -38,8 +38,7 @@ const getDisabledTimeFrameOptions = (timePeriodOption: ETimePeriodOption) => {
 };
 
 const TimeFrameSelector: React.FC<TTimeFrameSelectorProps> = (props) => {
-  const { timeFrame, setTimeFrame } = props;
-  const { timePeriodOption } = useControlTimeRange();
+  const { timeFrame, setTimeFrame, timePeriodOption } = props;
 
   const disabledTimeFrameOptions =
     getDisabledTimeFrameOptions(timePeriodOption);
