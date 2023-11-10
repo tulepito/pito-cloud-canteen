@@ -104,11 +104,6 @@ const MealDateFormComponent: React.FC<TMealDateFormComponentProps> = (
 
   const handleUsePreviousData = (checked: boolean) => {
     form.change('usePreviousData', checked);
-    dispatch(QuizActions.copyPreviousOrder());
-
-    if (!checked) {
-      dispatch(QuizActions.clearPreviousOrder());
-    }
   };
 
   useEffect(() => {
@@ -123,6 +118,14 @@ const MealDateFormComponent: React.FC<TMealDateFormComponentProps> = (
       (isGroupOrder && !deadlineDateInitialValue);
     setFormInvalid?.(formInvalid);
   }, [invalid, JSON.stringify(values)]);
+
+  useEffect(() => {
+    if (values.usePreviousData) {
+      dispatch(QuizActions.copyPreviousOrder());
+    } else {
+      dispatch(QuizActions.clearPreviousOrder());
+    }
+  }, [values.usePreviousData]);
 
   return (
     <Form onSubmit={handleSubmit}>

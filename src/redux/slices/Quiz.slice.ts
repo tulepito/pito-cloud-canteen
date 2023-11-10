@@ -136,7 +136,6 @@ const QuizSlice = createSlice({
     }),
     clearQuizData: (state) => {
       state.quiz = {};
-      state.previousOrder = null!;
       state.isCopyPreviousOrder = false;
     },
     allowCreateOrder: (state) => {
