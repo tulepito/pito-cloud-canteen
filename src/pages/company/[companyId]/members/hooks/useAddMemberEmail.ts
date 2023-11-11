@@ -9,25 +9,43 @@ import {
 } from '@redux/slices/companyMember.slice';
 import { User } from '@src/utils/data';
 
+export const filterHasAccountUserIds = (loadedResult: any[]) => {
+  return loadedResult
+    .filter((_result) => _result.response.status === 200)
+    .map((_result) => User(_result.response.user).getId());
+};
+
+export const filterNoAccountUserEmail = (loadedResult: any[]) => {
+  return loadedResult
+    .filter((_result) => _result.response.status === 404)
+    .map((_result) => _result.email);
+};
+
 export const useAddMemberEmail = () => {
   const dispatch = useAppDispatch();
   const [emailList, setEmailList] = useState<string[]>([]);
+  const [userIds, setUserIds] = useState<string[]>([]);
+  const [noAccountEmails, setNoAccountEmails] = useState<string[]>([]);
   const [loadedResult, setLoadedResult] = useState<any[]>([]);
 
   const checkedEmailInputChunk = useAppSelector(
     (state) => state.companyMember.checkedEmailInputChunk,
     shallowEqual,
   );
-
   const addMembersInProgress = useAppSelector(
     (state) => state.companyMember.addMembersInProgress,
   );
 
   useEffect(() => {
     if (checkedEmailInputChunk) {
-      setLoadedResult(
-        uniqBy([...loadedResult, ...checkedEmailInputChunk], 'email'),
+      const newLoadedResult = uniqBy(
+        [...loadedResult, ...checkedEmailInputChunk],
+        'email',
       );
+
+      setNoAccountEmails(filterNoAccountUserEmail(newLoadedResult));
+      setUserIds(filterHasAccountUserIds(newLoadedResult));
+      setLoadedResult(newLoadedResult);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [checkedEmailInputChunk]);
@@ -42,12 +60,8 @@ export const useAddMemberEmail = () => {
   };
 
   const onAddMembersSubmit = async () => {
-    const noAccountEmailList = loadedResult
-      .filter((_result) => _result.response.status === 404)
-      .map((_result) => _result.email);
-    const userIdList = loadedResult
-      .filter((_result) => _result.response.status === 200)
-      .map((_result) => User(_result.response.user).getId());
+    const noAccountEmailList = filterNoAccountUserEmail(loadedResult);
+    const userIdList = filterHasAccountUserIds(loadedResult);
     const { meta } = await dispatch(
       companyMemberThunks.addMembers({ noAccountEmailList, userIdList }),
     );
@@ -59,12 +73,8 @@ export const useAddMemberEmail = () => {
   };
 
   const onAddMembersSubmitInQuizFlow = async (_loadedResult: any[]) => {
-    const noAccountEmailList = _loadedResult
-      .filter((_result) => _result.response.status === 404)
-      .map((_result) => _result.email);
-    const userIdList = _loadedResult
-      .filter((_result) => _result.response.status === 200)
-      .map((_result) => User(_result.response.user).getId());
+    const noAccountEmailList = filterNoAccountUserEmail(_loadedResult);
+    const userIdList = filterHasAccountUserIds(_loadedResult);
     const { meta } = await dispatch(
       companyMemberThunks.addMembers({ noAccountEmailList, userIdList }),
     );
@@ -84,6 +94,8 @@ export const useAddMemberEmail = () => {
   };
 
   return {
+    userIds,
+    noAccountEmails,
     emailList,
     setEmailList,
     loadedResult,

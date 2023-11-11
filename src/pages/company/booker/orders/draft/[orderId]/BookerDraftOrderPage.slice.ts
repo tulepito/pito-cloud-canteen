@@ -1,6 +1,9 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-import { getBookerOrderDataApi } from '@apis/orderApi';
+import {
+  addParticipantToOrderApi,
+  getBookerOrderDataApi,
+} from '@apis/orderApi';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { EOrderType } from '@src/utils/enums';
 import { denormalisedResponseEntities, Listing } from '@utils/data';
@@ -15,6 +18,8 @@ type TBookerDraftOrderPageState = {
 
   fetchOrderParticipantsInProgress: boolean;
   participantData: TObject[];
+
+  addOrderParticipantsInProgress: boolean;
 };
 const initialState: TBookerDraftOrderPageState = {
   companyAccount: null,
@@ -24,6 +29,8 @@ const initialState: TBookerDraftOrderPageState = {
 
   fetchOrderParticipantsInProgress: false,
   participantData: [],
+
+  addOrderParticipantsInProgress: false,
 };
 
 // ================ Thunk types ================ //
@@ -65,9 +72,23 @@ const fetchOrderParticipants = createAsyncThunk(
   },
 );
 
+const addOrderParticipants = createAsyncThunk(
+  'app/BookerDraftOrderPage/ADD_ORDER_PARTICIPANTS',
+  async ({ orderId, participants, userIds }: TObject) => {
+    const bodyParams = {
+      orderId,
+      participants,
+      userIds,
+    };
+
+    await addParticipantToOrderApi(orderId, bodyParams);
+  },
+);
+
 export const BookerDraftOrderPageThunks = {
   fetchCompanyAccount,
   fetchOrderParticipants,
+  addOrderParticipants,
 };
 
 // ================ Slice ================ //
@@ -104,6 +125,16 @@ const BookerDraftOrderPageSlice = createSlice({
       })
       .addCase(fetchOrderParticipants.rejected, (state) => {
         state.fetchOrderParticipantsInProgress = false;
+      })
+      /* =============== addOrderParticipants =============== */
+      .addCase(addOrderParticipants.pending, (state) => {
+        state.addOrderParticipantsInProgress = true;
+      })
+      .addCase(addOrderParticipants.fulfilled, (state) => {
+        state.addOrderParticipantsInProgress = false;
+      })
+      .addCase(addOrderParticipants.rejected, (state) => {
+        state.addOrderParticipantsInProgress = false;
       });
   },
 });

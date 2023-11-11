@@ -8,7 +8,7 @@
     margin: 16px 16px 32px;
 
     @include viewportLargeWithPaddings {
-      max-width: 1180px;
+      max-width: min(1180px, 90vw);
       margin: 25px auto 80px;
     }
   }

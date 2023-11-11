@@ -19,8 +19,8 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import useRestaurantDetailModal from '@hooks/useRestaurantDetailModal';
 import { OrderListThunks } from '@pages/participant/orders/OrderList.slice';
+import { addWorkspaceCompanyId } from '@redux/slices/company.slice';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
-import { QuizActions } from '@redux/slices/Quiz.slice';
 import { currentUserSelector } from '@redux/slices/user.slice';
 import { companyPaths } from '@src/paths';
 import Gleap from '@src/utils/gleap';
@@ -134,6 +134,7 @@ function BookerDraftOrderPage() {
     startDate: startDateTimestamp,
     endDate: endDateTimestamp,
     packagePerMember = 0,
+    companyId,
   } = Listing(order as TListing).getMetadata();
   const planId = plans.length > 0 ? plans[0] : undefined;
   const isGroupOrder = orderType === EOrderType.group;
@@ -308,8 +309,8 @@ function BookerDraftOrderPage() {
   }, [dispatch, JSON.stringify(orderDetail)]);
 
   useEffect(() => {
-    dispatch(QuizActions.clearQuizData());
-  }, []);
+    dispatch(addWorkspaceCompanyId(companyId));
+  }, [companyId]);
 
   useEffect(() => {
     if (!isEmpty(orderState)) {
