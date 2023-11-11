@@ -1,6 +1,8 @@
 import isEmpty from 'lodash/isEmpty';
 import omit from 'lodash/omit';
+import { DateTime } from 'luxon';
 
+import type { TDaySession } from '@components/CalendarDashboard/helpers/types';
 import { generateUncountableIdForOrder } from '@helpers/generateUncountableId';
 import { isOrderDetailDatePickedFood } from '@helpers/orderHelper';
 import { getInitMemberOrder } from '@pages/api/orders/[orderId]/plan/memberOrder.helper';
@@ -26,6 +28,7 @@ import {
   EOrderDraftStates,
   EOrderType,
 } from '@src/utils/enums';
+import { INITIAL_DELIVERY_TIME_BASE_ON_DAY_SESSION } from '@src/utils/options';
 import type { TObject, TSubOrderChangeHistoryItem } from '@src/utils/types';
 
 const FIREBASE_SUB_ORDER_CHANGES_HISTORY_COLLECTION_NAME =
@@ -74,7 +77,20 @@ const normalizeOrderMetadata = (metadata: TObject = {}) => {
     deliveryHour,
     daySession,
     mealType,
+    deadlineHour,
   } = metadata;
+
+  const newDaySession =
+    daySession ||
+    getDaySessionFromDeliveryTime(
+      isEmpty(deliveryHour)
+        ? undefined
+        : deliveryHour.includes('-')
+        ? deliveryHour.split('-')[0]
+        : deliveryHour,
+    );
+  const newDeliveryHour =
+    INITIAL_DELIVERY_TIME_BASE_ON_DAY_SESSION[newDaySession as TDaySession];
 
   const newOrderMetadata = {
     companyId,
@@ -98,16 +114,9 @@ const normalizeOrderMetadata = (metadata: TObject = {}) => {
     shipperName,
     staffName,
     vatAllow,
-    deliveryHour,
-    daySession:
-      daySession ||
-      getDaySessionFromDeliveryTime(
-        isEmpty(deliveryHour)
-          ? undefined
-          : deliveryHour.includes('-')
-          ? deliveryHour.split('-')[0]
-          : deliveryHour,
-      ),
+    deliveryHour: newDeliveryHour,
+    daySession: newDaySession,
+    deadlineHour,
     mealType,
   };
 
@@ -183,8 +192,6 @@ const reorder = async ({
   dateParams: {
     startDate: number;
     endDate: number;
-    deadlineDate: number;
-    deadlineHour: number;
   };
 }) => {
   const integrationSdk = getIntegrationSdk();
@@ -200,7 +207,7 @@ const reorder = async ({
     startDate: oldStartDate,
     endDate: oldEndDate,
   } = Listing(oldOrder).getMetadata();
-  const { startDate, endDate, deadlineDate, deadlineHour } = dateParams;
+  const { startDate, endDate } = dateParams;
 
   const companyAccount = await fetchUser(companyId);
   const currentOrderNumber = await getOrderNumber();
@@ -242,8 +249,10 @@ const reorder = async ({
       }),
       startDate,
       endDate,
-      deadlineDate,
-      deadlineHour,
+      deadlineDate: DateTime.fromMillis(startDate)
+        .setZone('Asia/Ho_Chi_Minh')
+        .minus({ day: 2 })
+        .toMillis(),
     },
   });
 

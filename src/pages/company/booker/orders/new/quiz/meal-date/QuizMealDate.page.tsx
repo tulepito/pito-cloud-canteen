@@ -2,18 +2,13 @@ import { useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 
-import {
-  AFTERNOON_SESSION,
-  DINNER_SESSION,
-  EVENING_SESSION,
-  MORNING_SESSION,
-} from '@components/CalendarDashboard/helpers/constant';
 import type { TDaySession } from '@components/CalendarDashboard/helpers/types';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { QuizActions } from '@redux/slices/Quiz.slice';
 import { CurrentUser, User } from '@src/utils/data';
 import { EOrderType, QuizStep } from '@src/utils/enums';
+import { INITIAL_DELIVERY_TIME_BASE_ON_DAY_SESSION } from '@src/utils/options';
 
 import QuizModal from '../components/QuizModal/QuizModal';
 import QuizCreateOrderLoadingModal from '../create-order-loading/QuizCreateOrderLoadingModal';
@@ -24,13 +19,6 @@ import type { TMealDateFormValues } from './MealDateForm/MealDateForm';
 import MealDateForm from './MealDateForm/MealDateForm';
 
 import css from './QuizMealDate.module.scss';
-
-const INITIAL_DELIVERY_TIME_BASE_ON_DAY_SESSION = {
-  [MORNING_SESSION]: '08:00-08:15',
-  [AFTERNOON_SESSION]: '11:00-11:15',
-  [EVENING_SESSION]: '18:00-18:15',
-  [DINNER_SESSION]: '18:00-18:15',
-};
 
 type TQuizMealDateProps = {
   stepInfo?: string;

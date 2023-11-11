@@ -1,4 +1,10 @@
 import { EBadgeType } from '@components/Badge/Badge';
+import {
+  AFTERNOON_SESSION,
+  DINNER_SESSION,
+  EVENING_SESSION,
+  MORNING_SESSION,
+} from '@components/CalendarDashboard/helpers/constant';
 
 import {
   EBookerOrderDraftStates,
@@ -734,3 +740,10 @@ export const COMPANY_NUTRITION_TYPE_OPTIONS = [
     label: 'Không chứa glucoten',
   },
 ];
+
+export const INITIAL_DELIVERY_TIME_BASE_ON_DAY_SESSION = {
+  [MORNING_SESSION]: '08:00-08:15',
+  [AFTERNOON_SESSION]: '11:00-11:15',
+  [EVENING_SESSION]: '18:00-18:15',
+  [DINNER_SESSION]: '18:00-18:15',
+};
