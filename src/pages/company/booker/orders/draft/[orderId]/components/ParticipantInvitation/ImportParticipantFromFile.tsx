@@ -6,9 +6,23 @@ import Button from '@components/Button/Button';
 import IconLightBulb from '@components/Icons/IconLightBulb/IconLightBulb';
 import IconUploadFile from '@components/Icons/IconUploadFile/IconUploadFile';
 import NamedLink from '@components/NamedLink/NamedLink';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import {
+  filterHasAccountUserIds,
+  useAddMemberEmail,
+} from '@pages/company/[companyId]/members/hooks/useAddMemberEmail';
+import { Listing } from '@src/utils/data';
 import { errorToastOptions } from '@src/utils/toastify';
+import type { TObject } from '@src/utils/types';
+
+import { BookerDraftOrderPageThunks } from '../../BookerDraftOrderPage.slice';
+import { convertWorksheetDataToEmailList } from '../../helpers/convertWorksheetDataToEmailList';
 
 import css from './ImportParticipantFromFile.module.scss';
+
+const handleSendUploadErrorToast = () => {
+  toast('Sai định dạng file. Vui lòng tham khảo file mẫu.', errorToastOptions);
+};
 
 type TImportParticipantFromFileProps = {};
 
@@ -16,6 +30,21 @@ const ImportParticipantFromFile: React.FC<
   TImportParticipantFromFileProps
 > = () => {
   const fileRef = useRef<any>(null);
+  const dispatch = useAppDispatch();
+  const addMembersInProgress = useAppSelector(
+    (state) => state.companyMember.addMembersInProgress,
+  );
+  const order = useAppSelector((state) => state.Order.order);
+  const {
+    onAddMembersSubmitInQuizFlow: handleAddMemberToCompany,
+    checkEmailList,
+  } = useAddMemberEmail();
+
+  const orderGetter = Listing(order);
+  const orderId = orderGetter.getId();
+  const { participants = [] } = orderGetter.getMetadata();
+
+  const inProgress = addMembersInProgress;
 
   const handleClickUploadFile = () => {
     if (fileRef) {
@@ -35,14 +64,11 @@ const ImportParticipantFromFile: React.FC<
       e.target.value = '';
 
       const reader = new FileReader();
-      reader.onload = (_e: any) => {
+      reader.onload = async (_e: any) => {
         const workbook = XLSX.read(_e?.target?.result, { type: 'array' });
 
         if (!workbook.SheetNames.includes('Template')) {
-          toast(
-            'Sai định dạng file. Vui lòng tham khảo file mẫu.',
-            errorToastOptions,
-          );
+          handleSendUploadErrorToast();
         }
 
         try {
@@ -53,7 +79,27 @@ const ImportParticipantFromFile: React.FC<
             raw: true,
             header: 1,
           });
-          console.debug('💫 > returnnewPromise > data: ', data);
+
+          const { isFileValid, emailList } =
+            convertWorksheetDataToEmailList(data);
+
+          if (!isFileValid) {
+            handleSendUploadErrorToast();
+          } else {
+            const newLoadedResult = await checkEmailList(emailList);
+            const userIds = filterHasAccountUserIds(
+              newLoadedResult as TObject[],
+            );
+
+            handleAddMemberToCompany(newLoadedResult as TObject[]);
+            await dispatch(
+              BookerDraftOrderPageThunks.addOrderParticipants({
+                orderId,
+                participants,
+                userIds,
+              }),
+            );
+          }
         } catch (error) {
           console.error('error', error);
         }
@@ -85,6 +131,7 @@ const ImportParticipantFromFile: React.FC<
         </div>
       </div>
       <Button
+        disabled={inProgress}
         className={css.uploadFileButton}
         variant="secondary"
         onClick={handleClickUploadFile}>

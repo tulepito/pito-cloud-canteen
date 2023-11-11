@@ -1,5 +1,6 @@
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
+import isEmpty from 'lodash/isEmpty';
 
 import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
@@ -8,7 +9,9 @@ import { emailListFormatValid } from '@src/utils/validators';
 
 import css from './AddParticipantForm.module.scss';
 
-export type TAddParticipantFormValues = {};
+export type TAddParticipantFormValues = {
+  emails: string;
+};
 
 type TExtraProps = {};
 type TAddParticipantFormComponentProps =
@@ -19,7 +22,10 @@ type TAddParticipantFormProps = FormProps<TAddParticipantFormValues> &
 const AddParticipantFormComponent: React.FC<
   TAddParticipantFormComponentProps
 > = (props) => {
-  const { handleSubmit } = props;
+  const { invalid, values, submitting, handleSubmit } = props;
+
+  const isInputEmpty = isEmpty(values.emails);
+  const submitDisable = isInputEmpty || invalid || submitting;
 
   return (
     <Form className={css.formRoot} onSubmit={handleSubmit}>
@@ -32,7 +38,7 @@ const AddParticipantFormComponent: React.FC<
             validate={emailListFormatValid('Vui lòng nhập đúng định dạng mail')}
           />
         </div>
-        <Button>Thêm</Button>
+        <Button disabled={submitDisable}>Thêm</Button>
       </div>
       <div className={css.hint}>
         *Email được phân cách bằng khoảng trắng. Ví dụ: a1@gmail.com
