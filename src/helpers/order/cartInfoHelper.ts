@@ -138,7 +138,7 @@ export const calculateTotalPriceAndDishes = ({
 
 export const calculatePCCFeeByDate = ({
   isGroupOrder,
-  memberOrders,
+  memberOrders = {},
   lineItems,
   hasSpecificPCCFee,
   specificPCCFee,
