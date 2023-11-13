@@ -74,6 +74,7 @@ const Overview: React.FC<TOverviewProps> = (props) => {
         title="Tổng doanh thu"
         value={`${parseThousandNumber(totalRevenue)}đ`}
         fluctuation={getFluctuation(totalRevenue, previousTotalRevenue)}
+        valueWrapperClassName={css.revenueValueWrapper}
       />
       <div className={css.row}>
         <TotalStatisticItem

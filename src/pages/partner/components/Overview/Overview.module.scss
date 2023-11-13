@@ -5,6 +5,10 @@
 .root {
   background-color: $neutralGray1;
   padding: 16px;
+
+  .revenueValueWrapper {
+    @include flexAlign(center, flex-end);
+  }
 }
 
 .titleHeader {

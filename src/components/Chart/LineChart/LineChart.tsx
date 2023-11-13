@@ -11,11 +11,14 @@ import {
 
 import type { TChartPoint } from '@src/utils/types';
 
+import css from './LineChart.module.scss';
+
 type TLineChartProps = {
   dataKey: string;
   data: TChartPoint[];
-  domainRange?: [number, number];
+  domainRange?: number[];
   customTooltip?: React.FC<TooltipProps<any, any>>;
+  onYAxisTickFormattingFc?: (value: number) => string;
 };
 
 const CustomizeDot = (props: DotProps) => {
@@ -91,22 +94,57 @@ const CustomizeDot = (props: DotProps) => {
 const CustomizeXAxisTick = (props: any) => {
   const { payload, x, y } = props;
 
-  return (
-    <g transform={`translate(${x},${y})`}>
-      <text dy={24} textAnchor="middle" fill="#8C8C8C">
-        {payload.value}
+  const XLabel = payload.value.includes(' - ') ? (
+    payload.value.split(' - ').map((date: string, index: number) => (
+      <text
+        key={index}
+        fontSize={12}
+        dy={24 * (index + 1)}
+        textAnchor="middle"
+        fill="#8C8C8C">
+        {date}
       </text>
-    </g>
+    ))
+  ) : (
+    <text dy={24} fontSize={12} textAnchor="middle" fill="#8C8C8C">
+      {payload.value}
+    </text>
+  );
+
+  return <g transform={`translate(${x},${y})`}>{XLabel}</g>;
+};
+
+const CustomizeYAxisTick = (props: any) => {
+  const { payload, formattingFc, ...rest } = props;
+
+  const tickValue = formattingFc ? formattingFc(payload.value) : payload.value;
+
+  return (
+    <text {...rest} fontSize={12} textAnchor="middle" fill="#8C8C8C">
+      <tspan x={rest.x} dy="0.355em">
+        {tickValue}
+      </tspan>
+    </text>
   );
 };
 
 const LineChart: React.FC<TLineChartProps> = (props) => {
-  const { dataKey, data, customTooltip } = props;
+  const { dataKey, data, customTooltip, onYAxisTickFormattingFc, domainRange } =
+    props;
+
+  const dataLength = data.length;
   const yDomain = [
     0,
-    Math.ceil(Math.max(...data.map((item: any) => item[dataKey])) / 5) * 5 + 1,
+    Math.ceil(Math.max(...data.map((item: any) => item[dataKey])) / 5) * 5 +
+      Math.ceil(
+        Math.min(
+          ...data
+            .map((item: any) => item[dataKey])
+            .filter((item) => item !== 0),
+        ) / 5,
+      ),
   ];
-  const chartMargins = { top: 0, right: 10, bottom: 0, left: -30 };
+  const chartMargins = { top: 0, right: 10, bottom: 0, left: -40 };
   const cartesianGridStyles = {
     stroke: '#F0F0F0', // Set the color of the grid lines
     strokeDasharray: '0', // Optional: Set the dash pattern
@@ -114,7 +152,7 @@ const LineChart: React.FC<TLineChartProps> = (props) => {
   };
 
   return (
-    <ResponsiveContainer width={'100%'} height={264}>
+    <ResponsiveContainer width={dataLength > 7 ? 1440 : '100%'} height={264}>
       <RLineChart data={data} margin={chartMargins}>
         <CartesianGrid {...cartesianGridStyles} />
         <XAxis
@@ -122,15 +160,22 @@ const LineChart: React.FC<TLineChartProps> = (props) => {
           tickLine={false}
           axisLine={false}
           interval={0}
-          height={40}
+          height={60}
           tick={<CustomizeXAxisTick />}
+          padding={{ left: 20, right: 20 }}
         />
         <YAxis
+          className={css.yAxis}
           axisLine={false}
-          domain={yDomain}
+          domain={domainRange || yDomain}
           tickLine={false}
-          tick={{ fontSize: 12, color: '#8C8C8C' }}
-          tickMargin={10}
+          tick={(yAxisProps: any) => (
+            <CustomizeYAxisTick
+              {...yAxisProps}
+              formattingFc={onYAxisTickFormattingFc}
+            />
+          )}
+          tickCount={6}
         />
         <Tooltip content={customTooltip} position={{ y: 10 }} />
         <Line
