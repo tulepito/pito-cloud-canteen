@@ -297,6 +297,7 @@ export const findSuitableStartDate = ({
   endDate?: number;
   orderDetail: TObject;
 }) => {
+  console.debug('💫 > orderDetail: ', orderDetail);
   if (selectedDate && selectedDate instanceof Date) {
     return selectedDate;
   }
@@ -348,7 +349,7 @@ type TFoodDataMap = TObject<string, TFoodDataValue>;
 
 export const getFoodDataMap = ({
   foodListOfDate = {},
-  memberOrders,
+  memberOrders = {},
   orderType = EOrderType.group,
   lineItems = [],
 }: any) => {
@@ -425,7 +426,7 @@ export const combineOrderDetailWithPriceInfo = ({
     (result, currentOrderDetailEntry) => {
       const [date, rawOrderDetailOfDate] = currentOrderDetailEntry;
       const {
-        memberOrders,
+        memberOrders = {},
         restaurant = {},
         lineItems = [],
       } = rawOrderDetailOfDate;
@@ -460,7 +461,7 @@ export const calculateSubOrderPrice = ({
   orderType?: EOrderType;
 }) => {
   const isGroupOrder = orderType === EOrderType.group;
-  const { memberOrders, restaurant = {}, lineItems = [] } = data;
+  const { memberOrders = {}, restaurant = {}, lineItems = [] } = data;
   const { foodList: foodListOfDate } = restaurant;
 
   if (isGroupOrder) {
@@ -647,7 +648,7 @@ export const getPickFoodParticipants = (orderDetail: TObject) => {
   const shouldSendNativeNotificationParticipantIdList = Object.entries(
     orderDetail,
   ).reduce<string[]>((acc, [, subOrder]: any) => {
-    const { memberOrders } = subOrder;
+    const { memberOrders = {} } = subOrder;
     const memberHasPickFood = Object.keys(memberOrders).filter(
       (memberId: string) => {
         return memberOrders[memberId].foodId;
