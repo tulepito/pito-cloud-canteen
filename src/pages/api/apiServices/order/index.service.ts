@@ -3,9 +3,12 @@ import omit from 'lodash/omit';
 import { DateTime } from 'luxon';
 
 import type { TDaySession } from '@components/CalendarDashboard/helpers/types';
+import { queryAllPages } from '@helpers/apiHelpers';
 import { generateUncountableIdForOrder } from '@helpers/generateUncountableId';
+import { getMenuQueryInSpecificDay } from '@helpers/listingSearchQuery';
 import { isOrderDetailDatePickedFood } from '@helpers/orderHelper';
 import { getInitMemberOrder } from '@pages/api/orders/[orderId]/plan/memberOrder.helper';
+import { recommendRestaurants } from '@pages/api/orders/[orderId]/restaurants-recommendation/recommendRestaurants.service';
 import { denormalisedResponseEntities } from '@services/data';
 import {
   addCollectionDoc,
@@ -24,12 +27,18 @@ import {
 } from '@src/utils/dates';
 import {
   EBookerOrderDraftStates,
+  EInvalidRestaurantCase,
   EListingStates,
   EOrderDraftStates,
   EOrderType,
+  ERestaurantListingStatus,
 } from '@src/utils/enums';
 import { INITIAL_DELIVERY_TIME_BASE_ON_DAY_SESSION } from '@src/utils/options';
-import type { TObject, TSubOrderChangeHistoryItem } from '@src/utils/types';
+import type {
+  TListing,
+  TObject,
+  TSubOrderChangeHistoryItem,
+} from '@src/utils/types';
 
 const FIREBASE_SUB_ORDER_CHANGES_HISTORY_COLLECTION_NAME =
   process.env.FIREBASE_SUB_ORDER_CHANGES_HISTORY_COLLECTION_NAME || '';
@@ -180,6 +189,82 @@ const getSubOrderHistoryCount = async ({
   return result as number;
 };
 
+const checkRestaurantAvailableStatus = async ({
+  order,
+  orderDetail,
+}: {
+  order: TListing;
+  orderDetail: TObject;
+}) => {
+  const integrationSdk = getIntegrationSdk();
+
+  const availableOrderDetailCheckList = await Promise.all(
+    Object.keys(orderDetail).map(async (timestamp) => {
+      const { restaurant } = orderDetail[timestamp];
+      const { menuId, id: restaurantId } = restaurant;
+      const [restaurantListing] = denormalisedResponseEntities(
+        (await integrationSdk.listings.show({ id: restaurantId })) || [{}],
+      );
+
+      const { status = ERestaurantListingStatus.authorized } =
+        Listing(restaurantListing).getMetadata();
+      const {
+        stopReceiveOrder = false,
+        startStopReceiveOrderDate = 0,
+        endStopReceiveOrderDate = 0,
+      } = Listing(restaurantListing).getPublicData();
+      const isInStopReceiveOrderTime =
+        stopReceiveOrder &&
+        Number(timestamp) >= startStopReceiveOrderDate &&
+        Number(timestamp) <= endStopReceiveOrderDate;
+      if (isInStopReceiveOrderTime) {
+        return {
+          [timestamp]: {
+            isAvailable: false,
+            status: EInvalidRestaurantCase.stopReceiveOrder,
+          },
+        };
+      }
+      if (status !== ERestaurantListingStatus.authorized) {
+        return {
+          [timestamp]: {
+            isAvailable: false,
+            status: EInvalidRestaurantCase.closed,
+          },
+        };
+      }
+      const menuQuery = getMenuQueryInSpecificDay({
+        order,
+        timestamp: +timestamp,
+      });
+      const allMenus = await queryAllPages({
+        sdkModel: integrationSdk.listings,
+        query: menuQuery,
+      });
+
+      const isAnyMenusValid =
+        allMenus.findIndex((menu: TListing) => menu.id.uuid === menuId) !== -1;
+
+      return {
+        [timestamp]: {
+          isAvailable: isAnyMenusValid,
+          ...(isAnyMenusValid
+            ? { status: EInvalidRestaurantCase.noMenusValid }
+            : {}),
+        },
+      };
+    }),
+  );
+
+  return availableOrderDetailCheckList.reduce(
+    (result, item) => ({
+      ...result,
+      ...item,
+    }),
+    {},
+  );
+};
+
 const reorder = async ({
   orderIdToReOrder,
   bookerId,
@@ -229,32 +314,35 @@ const reorder = async ({
     },
   ];
 
-  const newOrderResponse = await integrationSdk.listings.create({
-    authorId: subAccountId,
-    title: generatedOrderTitle,
-    state: EListingStates.published,
-    publicData: {
-      companyName,
-      orderName: `${companyName}_${formatTimestamp(
+  const newOrderResponse = await integrationSdk.listings.create(
+    {
+      authorId: subAccountId,
+      title: generatedOrderTitle,
+      state: EListingStates.published,
+      publicData: {
+        companyName,
+        orderName: `${companyName}_${formatTimestamp(
+          startDate,
+        )} - ${formatTimestamp(endDate)}`,
+      },
+      metadata: {
+        bookerId,
+        orderStateHistory,
+        orderState,
+        companyName,
+        ...normalizeOrderMetadata({
+          ...Listing(oldOrder).getMetadata(),
+        }),
         startDate,
-      )} - ${formatTimestamp(endDate)}`,
+        endDate,
+        deadlineDate: DateTime.fromMillis(startDate)
+          .setZone('Asia/Ho_Chi_Minh')
+          .minus({ day: 2 })
+          .toMillis(),
+      },
     },
-    metadata: {
-      bookerId,
-      orderStateHistory,
-      orderState,
-      companyName,
-      ...normalizeOrderMetadata({
-        ...Listing(oldOrder).getMetadata(),
-      }),
-      startDate,
-      endDate,
-      deadlineDate: DateTime.fromMillis(startDate)
-        .setZone('Asia/Ho_Chi_Minh')
-        .minus({ day: 2 })
-        .toMillis(),
-    },
-  });
+    { expand: true },
+  );
 
   // * new order date list info
   const orderDatesInTimestamp = renderDateRange(startDate, endDate);
@@ -266,6 +354,7 @@ const reorder = async ({
     oldEndDate,
   );
   const [newOrder] = denormalisedResponseEntities(newOrderResponse);
+  const newOrderId = Listing(newOrder).getId();
   const isGroupOrder = orderType === EOrderType.group;
   const initialMemberOrder = getInitMemberOrder({
     companyAccount,
@@ -286,7 +375,7 @@ const reorder = async ({
       ).filter((date) => isOrderDetailDatePickedFood(oldOrderDetail[date]));
       const hasRestaurantDatesCount = hasRestaurantDateListFormOldPlan.length;
 
-      const newOrderDetail = orderDatesInTimestamp.reduce(
+      let newOrderDetail = orderDatesInTimestamp.reduce(
         (result, currentDate, dateIdx) => {
           const weekDayOfDate = orderDatesWeekdayList[dateIdx];
           let dateToCopy: string | number =
@@ -326,6 +415,20 @@ const reorder = async ({
         },
         {},
       );
+      // * check available status
+      const restaurantAvailableMap = await checkRestaurantAvailableStatus({
+        order: newOrder,
+        orderDetail: newOrderDetail,
+      });
+      const isAllDateUnAvailable = Object.keys(restaurantAvailableMap).every(
+        (item) => !restaurantAvailableMap[item].isAvailable,
+      );
+      if (isAllDateUnAvailable) {
+        newOrderDetail = await recommendRestaurants({
+          orderId: newOrderId,
+          shouldCalculateDistance: true,
+        });
+      }
 
       const newPlanResponse = await integrationSdk.listings.create({
         title: `${generatedOrderTitle} - Plan week ${index + 1}`,
@@ -334,7 +437,7 @@ const reorder = async ({
         metadata: {
           ...Listing(oldPlan).getMetadata(),
           viewed: false,
-          orderId: Listing(newOrder).getId(),
+          orderId: newOrderId,
           orderDetail: newOrderDetail,
         },
       });
@@ -346,7 +449,7 @@ const reorder = async ({
 
   const updatedOrder = await integrationSdk.listings.update(
     {
-      id: Listing(newOrder).getId(),
+      id: newOrderId,
       metadata: {
         plans,
       },
