@@ -108,7 +108,7 @@ const ParticipantInvitation: React.FC<TParticipantInvitationProps> = ({
             title="Xác nhận đơn và gửi lời mời"
             cancelLabel="Đóng"
             confirmLabel={'Gửi lời mời'}
-            confirmDisabled={true}
+            confirmDisabled={shouldDisabledSubmitPublishOrder}
             onCancel={onGoBack}
             onConfirm={handleConfirmPublishOrder}>
             Sau khi gửi, bạn sẽ không thể chỉnh sửa thực đơn của tuần ăn.

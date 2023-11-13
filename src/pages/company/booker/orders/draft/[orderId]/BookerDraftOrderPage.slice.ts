@@ -1,9 +1,11 @@
 import { createSlice } from '@reduxjs/toolkit';
+import uniq from 'lodash/uniq';
 
 import {
   addParticipantToOrderApi,
   deleteParticipantFromOrderApi,
   getBookerOrderDataApi,
+  sendRemindEmailToMemberApi,
 } from '@apis/orderApi';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { EOrderType } from '@src/utils/enums';
@@ -104,11 +106,26 @@ const deleteOrderParticipants = createAsyncThunk(
   },
 );
 
+const sendRemindEmailToMembers = createAsyncThunk(
+  'app/OrderManagement/SEND_REMIND_EMAIL_TO_MEMBER',
+  async (params: TObject) => {
+    const { orderId, orderLink, deadline, description, memberIdList } = params;
+
+    await sendRemindEmailToMemberApi(orderId, {
+      orderLink,
+      deadline,
+      description,
+      uniqueMemberIdList: uniq(memberIdList),
+    });
+  },
+);
+
 export const BookerDraftOrderPageThunks = {
   fetchCompanyAccount,
   fetchOrderParticipants,
   addOrderParticipants,
   deleteOrderParticipants,
+  sendRemindEmailToMembers,
 };
 
 // ================ Slice ================ //

@@ -13,6 +13,7 @@ import MealPlanCard from '@components/CalendarDashboard/components/MealPlanCard/
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import {
   findSuitableStartDate,
+  getParticipantPickingLink,
   isEnableSubmitPublishOrder,
 } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
@@ -23,6 +24,7 @@ import { addWorkspaceCompanyId } from '@redux/slices/company.slice';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
 import { currentUserSelector } from '@redux/slices/user.slice';
 import { companyPaths } from '@src/paths';
+import { formatTimestamp } from '@src/utils/dates';
 import Gleap from '@src/utils/gleap';
 import { successToastOptions } from '@src/utils/toastify';
 import { Listing, User } from '@utils/data';
@@ -54,6 +56,7 @@ import {
 } from './restaurants/hooks/calendar';
 import { useGetBoundaryDates } from './restaurants/hooks/dateTime';
 import { useGetOrder } from './restaurants/hooks/orderData';
+import { BookerDraftOrderPageThunks } from './BookerDraftOrderPage.slice';
 
 import css from './BookerDraftOrder.module.scss';
 
@@ -134,7 +137,9 @@ function BookerDraftOrderPage() {
     startDate: startDateTimestamp,
     endDate: endDateTimestamp,
     packagePerMember = 0,
+    participants = [],
     companyId,
+    orderDeadline,
   } = Listing(order as TListing).getMetadata();
   const planId = plans.length > 0 ? plans[0] : undefined;
   const isGroupOrder = orderType === EOrderType.group;
@@ -178,6 +183,15 @@ function BookerDraftOrderPage() {
     if (meta.requestStatus !== 'rejected') {
       if (!isSetupMode) {
         toast('Đã gửi lời mời đến thành viên', successToastOptions);
+
+        dispatch(
+          BookerDraftOrderPageThunks.sendRemindEmailToMembers({
+            orderId: orderId as string,
+            orderLink: getParticipantPickingLink(orderId as string),
+            deadline: formatTimestamp(orderDeadline, 'HH:mm EEE,dd/MM/yyyy'),
+            memberIdList: participants,
+          }),
+        );
       }
 
       router.push({

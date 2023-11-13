@@ -5,6 +5,7 @@ import groupBy from 'lodash/groupBy';
 import isEmpty from 'lodash/isEmpty';
 import omit from 'lodash/omit';
 import set from 'lodash/set';
+import uniq from 'lodash/uniq';
 
 import {
   createSubOrderChangesHistoryDocumentApi,
@@ -487,15 +488,11 @@ const sendRemindEmailToMember = createAsyncThunk(
       [],
     ) as string[];
 
-    const uniqueMemberIdList = memberIdList.filter((item, pos) => {
-      return memberIdList.indexOf(item) === pos;
-    });
-
     await sendRemindEmailToMemberApi(orderId, {
       orderLink,
       deadline,
       description,
-      uniqueMemberIdList,
+      uniqueMemberIdList: uniq(memberIdList),
     });
   },
 );

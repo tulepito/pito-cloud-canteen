@@ -210,7 +210,7 @@ export const usePrepareOrderDetailPageData = ({
       orderPCCFee,
     ],
   );
-  console.debug('💫 > quotationInfo: ', quotationInfo);
+
   const quotationDraftInfor = useMemo(
     () =>
       calculatePriceQuotationInfo({
