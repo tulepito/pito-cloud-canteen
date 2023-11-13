@@ -18,9 +18,11 @@ const CompanyOrderDetailPage: React.FC<TCompanyOrderDetailPageProps> = () => {
   const systemVATPercentage = useAppSelector(
     (state) => state.SystemAttributes.systemVATPercentage,
   );
-  const { orderState, orderVATPercentage } = Listing(
-    orderData as TListing,
-  ).getMetadata();
+  const {
+    orderState,
+    orderVATPercentage,
+    isOrderAutomaticConfirmed = false,
+  } = Listing(orderData as TListing).getMetadata();
   const isPickingOrder = orderState === EOrderStates.picking;
 
   const {
@@ -47,6 +49,7 @@ const CompanyOrderDetailPage: React.FC<TCompanyOrderDetailPageProps> = () => {
         orderTitle={orderTitle}
         canReview={canReview}
         goToReviewPage={goToReviewPage}
+        isOrderAutomaticConfirmed={isOrderAutomaticConfirmed}
       />
       <ReviewView
         className={css.reviewInfoContainer}

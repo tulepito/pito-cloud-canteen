@@ -5,8 +5,11 @@ import { useIntl } from 'react-intl';
 import Skeleton from 'react-loading-skeleton';
 import classNames from 'classnames';
 import isEmpty from 'lodash/isEmpty';
+import { DateTime } from 'luxon';
 import { useRouter } from 'next/router';
 
+import IconNoteBook from '@components/Icons/IconNoteBook/IconNoteBook';
+import IconNoteCheckList from '@components/Icons/IconNoteCheckList/IconNoteCheckList';
 import AlertModal from '@components/Modal/AlertModal';
 import ManageLineItemsSection from '@components/OrderDetails/EditView/ManageOrderDetailSection/ManageLineItemsSection';
 import ManageOrdersSection from '@components/OrderDetails/EditView/ManageOrderDetailSection/ManageOrdersSection';
@@ -30,7 +33,8 @@ import {
   orderManagementThunks,
 } from '@redux/slices/OrderManagement.slice';
 import { companyPaths } from '@src/paths';
-import { diffDays } from '@src/utils/dates';
+import { diffDays, formatTimestamp } from '@src/utils/dates';
+import { FORMATTED_WEEKDAY } from '@src/utils/options';
 import type { TPlan } from '@src/utils/orderTypes';
 import { ETransition } from '@src/utils/transaction';
 import { CurrentUser, Listing } from '@utils/data';
@@ -208,9 +212,21 @@ const OrderDetailPage = () => {
     bookerId,
     orderType = EOrderType.group,
     orderVATPercentage,
+    startDate,
+    deliveryHour,
   } = Listing(orderData as TListing).getMetadata();
-
+  const planId = Listing(planData as TListing).getId();
   const isPickingOrder = orderState === EOrderStates.picking;
+
+  const normalizedDeliveryHour = deliveryHour?.includes('-')
+    ? deliveryHour.split('-')[0]
+    : deliveryHour;
+  const automaticConfirmDate = DateTime.fromMillis(Number(startDate)).minus({
+    days: 1,
+  });
+  const formattedAutomaticConfirmOrder = `${
+    FORMATTED_WEEKDAY[automaticConfirmDate.weekday]
+  }, ${formatTimestamp(automaticConfirmDate.toMillis(), 'dd/MM/yyyy')}`;
 
   const {
     planValidationsInProgressState,
@@ -246,10 +262,6 @@ const OrderDetailPage = () => {
 
   const handleOpenReachMaxAllowedChangesModal = (type: any) =>
     setShowReachMaxAllowedChangesModal(type);
-
-  const plan = Listing(planData as TListing);
-
-  const planId = plan.getId();
 
   const onQuerySubOrderHistoryChanges = useCallback(
     (lastRecordCreatedAt?: number) => {
@@ -435,6 +447,34 @@ const OrderDetailPage = () => {
 
       <RenderWhen condition={!inProgress}>
         <RenderWhen condition={!isNormalOrder}>
+          <div className={css.infoPart}>
+            <div className={css.columnContainer}>
+              <IconNoteCheckList />
+              <div>
+                <div className={css.columnTitle}>Tự động đặt đơn</div>
+                <div>
+                  Đơn sẽ được tự động đặt vào lúc{' '}
+                  <b>
+                    {normalizedDeliveryHour} {formattedAutomaticConfirmOrder}
+                  </b>
+                  . Trường hợp nếu đến hạn mà không đủ số lượng đặt món thì đơn
+                  sẽ bị hủy.
+                </div>
+              </div>
+            </div>
+            <div className={css.columnContainer}>
+              <IconNoteBook />
+              <div>
+                <div className={css.columnTitle}>
+                  Tự động hủy tham gia cho thành viên
+                </div>
+                <div>
+                  Nếu quá thời hạn mà thành viên chưa chọn món thì sẽ được xem
+                  như là không tham gia ngày ăn.
+                </div>
+              </div>
+            </div>
+          </div>
           <div className={css.leftPart}>
             <ManageOrdersSection
               ableToUpdateOrder={ableToUpdateOrder}
