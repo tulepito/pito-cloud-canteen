@@ -13,7 +13,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     switch (apiMethod) {
       case HttpMethod.POST: {
         const { orderId } = req.query;
-        const { startDate, endDate, deadlineDate, deadlineHour } = req.body;
+        const { startDate, endDate } = req.body;
         const { currentUser: booker } = await getCurrentUser(req, res);
         const response = await orderServices.reorder({
           orderIdToReOrder: orderId as string,
@@ -21,8 +21,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           dateParams: {
             startDate,
             endDate,
-            deadlineDate,
-            deadlineHour,
           },
         });
 
