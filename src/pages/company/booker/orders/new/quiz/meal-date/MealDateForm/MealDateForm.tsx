@@ -38,7 +38,7 @@ export type TMealDateFormValues = {
 };
 
 type TExtraProps = {
-  hasOrderBefore?: boolean;
+  hasPreviousOrder?: boolean;
   setFormValues: (values: TMealDateFormValues) => void;
   setFormInvalid: (invalid: boolean) => void;
   onClickOrderDates: () => void;
@@ -56,7 +56,7 @@ const MealDateFormComponent: React.FC<TMealDateFormComponentProps> = (
   const {
     handleSubmit,
     form,
-    hasOrderBefore = false,
+    hasPreviousOrder = false,
     values,
     setFormValues,
     invalid,
@@ -136,7 +136,7 @@ const MealDateFormComponent: React.FC<TMealDateFormComponentProps> = (
           onClick={onClickOrderDates}
           usePreviousData={usePreviousData}
         />
-        <RenderWhen condition={hasOrderBefore && !reorderOpen}>
+        <RenderWhen condition={hasPreviousOrder && !reorderOpen}>
           <Toggle
             id="MealDateForm.usePreviousData"
             name="usePreviousData"

@@ -34,6 +34,8 @@ const QuizMealDate: React.FC<TQuizMealDateProps> = ({ stepInfo }) => {
   const selectedCompany = useAppSelector((state) => state.Quiz.selectedCompany);
   const currentUser = useAppSelector((state) => state.user.currentUser);
   const { hasOrderBefore = false } = CurrentUser(currentUser!).getPrivateData();
+  const previousOrder = useAppSelector((state) => state.Quiz.previousOrder);
+
   const {
     backStep,
     submitCreateOrder,
@@ -47,6 +49,7 @@ const QuizMealDate: React.FC<TQuizMealDateProps> = ({ stepInfo }) => {
     onClickIsGroupOrder,
     onClickDeadlineDate,
   } = useQuizModalScrollControl();
+  const hasPreviousOrder = previousOrder !== null;
 
   const {
     startDate,
@@ -114,7 +117,7 @@ const QuizMealDate: React.FC<TQuizMealDateProps> = ({ stepInfo }) => {
       onBack={hasOrderBefore ? undefined : backStep}>
       <MealDateForm
         onSubmit={() => {}}
-        hasOrderBefore={hasOrderBefore}
+        hasPreviousOrder={hasPreviousOrder}
         setFormValues={setFormValues}
         setFormInvalid={setFormInvalid}
         initialValues={initialValues}
