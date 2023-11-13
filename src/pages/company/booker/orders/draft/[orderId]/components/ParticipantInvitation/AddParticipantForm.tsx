@@ -5,6 +5,7 @@ import isEmpty from 'lodash/isEmpty';
 import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
+import { useAppSelector } from '@hooks/reduxHooks';
 import { emailListFormatValid } from '@src/utils/validators';
 
 import css from './AddParticipantForm.module.scss';
@@ -22,10 +23,37 @@ type TAddParticipantFormProps = FormProps<TAddParticipantFormValues> &
 const AddParticipantFormComponent: React.FC<
   TAddParticipantFormComponentProps
 > = (props) => {
-  const { invalid, values, submitting, handleSubmit } = props;
+  const {
+    invalid,
+    values,
+    submitting,
+    form,
+    handleSubmit: handleSubmitFormProps,
+  } = props;
+  const addOrderParticipantsInProgress = useAppSelector(
+    (state) => state.BookerDraftOrderPage.addOrderParticipantsInProgress,
+  );
 
   const isInputEmpty = isEmpty(values.emails);
+  const submitInProgress = addOrderParticipantsInProgress || submitting;
   const submitDisable = isInputEmpty || invalid || submitting;
+
+  const handleSubmit = async (event: any) => {
+    const errors = await handleSubmitFormProps(event);
+
+    if (isEmpty(errors?.emails)) {
+      form.reset();
+    }
+  };
+
+  const handleFieldEmailsKeyPress = async (event: any) => {
+    if (event.key === 'Enter') {
+      if (submitDisable) {
+        return false;
+      }
+      await handleSubmit(event);
+    }
+  };
 
   return (
     <Form className={css.formRoot} onSubmit={handleSubmit}>
@@ -35,10 +63,13 @@ const AddParticipantFormComponent: React.FC<
             id="AddParticipantForm.emails"
             name="emails"
             placeholder="Nhập email để thêm thành viên"
+            onKeyPress={handleFieldEmailsKeyPress}
             validate={emailListFormatValid('Vui lòng nhập đúng định dạng mail')}
           />
         </div>
-        <Button disabled={submitDisable}>Thêm</Button>
+        <Button inProgress={submitInProgress} disabled={submitDisable}>
+          Thêm
+        </Button>
       </div>
       <div className={css.hint}>
         *Email được phân cách bằng khoảng trắng. Ví dụ: a1@gmail.com

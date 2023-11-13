@@ -6,16 +6,9 @@ import Button from '@components/Button/Button';
 import IconLightBulb from '@components/Icons/IconLightBulb/IconLightBulb';
 import IconUploadFile from '@components/Icons/IconUploadFile/IconUploadFile';
 import NamedLink from '@components/NamedLink/NamedLink';
-import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import {
-  filterHasAccountUserIds,
-  useAddMemberEmail,
-} from '@pages/company/[companyId]/members/hooks/useAddMemberEmail';
-import { Listing } from '@src/utils/data';
+import { useAppSelector } from '@hooks/reduxHooks';
 import { errorToastOptions } from '@src/utils/toastify';
-import type { TObject } from '@src/utils/types';
 
-import { BookerDraftOrderPageThunks } from '../../BookerDraftOrderPage.slice';
 import { convertWorksheetDataToEmailList } from '../../helpers/convertWorksheetDataToEmailList';
 
 import css from './ImportParticipantFromFile.module.scss';
@@ -24,25 +17,17 @@ const handleSendUploadErrorToast = () => {
   toast('Sai định dạng file. Vui lòng tham khảo file mẫu.', errorToastOptions);
 };
 
-type TImportParticipantFromFileProps = {};
+type TImportParticipantFromFileProps = {
+  handleInviteMember: (emailList: string[]) => Promise<void>;
+};
 
-const ImportParticipantFromFile: React.FC<
-  TImportParticipantFromFileProps
-> = () => {
+const ImportParticipantFromFile: React.FC<TImportParticipantFromFileProps> = ({
+  handleInviteMember,
+}) => {
   const fileRef = useRef<any>(null);
-  const dispatch = useAppDispatch();
   const addMembersInProgress = useAppSelector(
     (state) => state.companyMember.addMembersInProgress,
   );
-  const order = useAppSelector((state) => state.Order.order);
-  const {
-    onAddMembersSubmitInQuizFlow: handleAddMemberToCompany,
-    checkEmailList,
-  } = useAddMemberEmail();
-
-  const orderGetter = Listing(order);
-  const orderId = orderGetter.getId();
-  const { participants = [] } = orderGetter.getMetadata();
 
   const inProgress = addMembersInProgress;
 
@@ -86,19 +71,7 @@ const ImportParticipantFromFile: React.FC<
           if (!isFileValid) {
             handleSendUploadErrorToast();
           } else {
-            const newLoadedResult = await checkEmailList(emailList);
-            const userIds = filterHasAccountUserIds(
-              newLoadedResult as TObject[],
-            );
-
-            handleAddMemberToCompany(newLoadedResult as TObject[]);
-            await dispatch(
-              BookerDraftOrderPageThunks.addOrderParticipants({
-                orderId,
-                participants,
-                userIds,
-              }),
-            );
+            await handleInviteMember(emailList);
           }
         } catch (error) {
           console.error('error', error);

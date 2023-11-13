@@ -75,7 +75,7 @@ const fetchOrderParticipants = createAsyncThunk(
 
 const addOrderParticipants = createAsyncThunk(
   'app/BookerDraftOrderPage/ADD_ORDER_PARTICIPANTS',
-  async ({ orderId, participants, userIds }: TObject) => {
+  async ({ orderId, participants, userIds, newUsers }: TObject) => {
     const bodyParams = {
       orderId,
       participants,
@@ -83,6 +83,8 @@ const addOrderParticipants = createAsyncThunk(
     };
 
     await addParticipantToOrderApi(orderId, bodyParams);
+
+    return newUsers;
   },
 );
 
@@ -148,8 +150,9 @@ const BookerDraftOrderPageSlice = createSlice({
       .addCase(addOrderParticipants.pending, (state) => {
         state.addOrderParticipantsInProgress = true;
       })
-      .addCase(addOrderParticipants.fulfilled, (state) => {
+      .addCase(addOrderParticipants.fulfilled, (state, { payload }) => {
         state.addOrderParticipantsInProgress = false;
+        state.participantData = state.participantData.concat(payload);
       })
       .addCase(addOrderParticipants.rejected, (state) => {
         state.addOrderParticipantsInProgress = false;

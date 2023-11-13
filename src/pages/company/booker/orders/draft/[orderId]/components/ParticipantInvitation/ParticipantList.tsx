@@ -18,7 +18,6 @@ const ParticipantList: React.FC<TParticipantListProps> = () => {
   const dispatch = useAppDispatch();
   const deleteParticipantControl = useBoolean();
   const [currentParticipantId, setCurrentParticipantId] = useState<string>();
-  console.debug('💫 > currentParticipantId: ', currentParticipantId);
   const participantData = useAppSelector(
     (state) => state.BookerDraftOrderPage.participantData,
   );

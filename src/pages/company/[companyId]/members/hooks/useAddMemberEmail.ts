@@ -9,6 +9,12 @@ import {
 } from '@redux/slices/companyMember.slice';
 import { User } from '@src/utils/data';
 
+export const filterHasAccountUsers = (loadedResult: any[]) => {
+  return loadedResult
+    .filter((_result) => _result.response.status === 200)
+    .map((_result) => _result.response.user);
+};
+
 export const filterHasAccountUserIds = (loadedResult: any[]) => {
   return loadedResult
     .filter((_result) => _result.response.status === 200)
