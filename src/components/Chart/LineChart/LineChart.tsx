@@ -175,7 +175,6 @@ const LineChart: React.FC<TLineChartProps> = (props) => {
               formattingFc={onYAxisTickFormattingFc}
             />
           )}
-          tickCount={6}
         />
         <Tooltip content={customTooltip} position={{ y: 10 }} />
         <Line

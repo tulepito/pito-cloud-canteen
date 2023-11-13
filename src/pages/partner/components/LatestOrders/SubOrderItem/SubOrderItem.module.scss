@@ -6,6 +6,7 @@
   border-radius: 8px;
   border: 1px solid $neutralGray3;
   background: $neutralGray1;
+  margin-bottom: 12px;
 
   .header {
     @include flexAlign(normal, space-between);
