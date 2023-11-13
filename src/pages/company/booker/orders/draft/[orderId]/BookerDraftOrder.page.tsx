@@ -118,7 +118,7 @@ function BookerDraftOrderPage() {
   const selectedDate = useAppSelector(
     (state) => state.Order.selectedCalendarDate,
   );
-  const { orderDetail = [] } = useGetPlanDetails();
+  const { orderDetail = [], rawOrderDetail } = useGetPlanDetails();
   const { startDate, endDate } = useGetBoundaryDates(order);
   const calendarExtraResources = useGetCalendarExtraResources({
     order,
@@ -137,7 +137,7 @@ function BookerDraftOrderPage() {
       selectedDate,
       startDate: startDateTimestamp,
       endDate: endDateTimestamp,
-      orderDetail,
+      orderDetail: rawOrderDetail,
     });
 
     return temp instanceof Date ? temp : new Date(temp!);

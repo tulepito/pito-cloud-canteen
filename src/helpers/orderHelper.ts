@@ -297,7 +297,6 @@ export const findSuitableStartDate = ({
   endDate?: number;
   orderDetail: TObject;
 }) => {
-  console.debug('💫 > orderDetail: ', orderDetail);
   if (selectedDate && selectedDate instanceof Date) {
     return selectedDate;
   }
@@ -309,7 +308,7 @@ export const findSuitableStartDate = ({
   }
 
   const suitableStartDate = dateRange.find((date) =>
-    isOrderDetailDatePickedFood(orderDetail[date.toString()]),
+    isEmpty(orderDetail[date.toString()]?.restaurant?.foodList),
   );
 
   return suitableStartDate;
