@@ -2,6 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 
 import {
   addParticipantToOrderApi,
+  deleteParticipantFromOrderApi,
   getBookerOrderDataApi,
 } from '@apis/orderApi';
 import { createAsyncThunk } from '@redux/redux.helper';
@@ -85,10 +86,27 @@ const addOrderParticipants = createAsyncThunk(
   },
 );
 
+const deleteOrderParticipants = createAsyncThunk(
+  'app/BookerDraftOrderPage/DELETE_ORDER_PARTICIPANTS',
+  async ({ orderId, participantId, participants }: TObject, { getState }) => {
+    const { participantData } = getState().BookerDraftOrderPage;
+    const bodyParams = {
+      orderId,
+      participants,
+      participantId,
+    };
+
+    await deleteParticipantFromOrderApi(orderId, bodyParams);
+
+    return participantData.filter((p) => p.id.uuid !== participantId);
+  },
+);
+
 export const BookerDraftOrderPageThunks = {
   fetchCompanyAccount,
   fetchOrderParticipants,
   addOrderParticipants,
+  deleteOrderParticipants,
 };
 
 // ================ Slice ================ //
@@ -135,6 +153,16 @@ const BookerDraftOrderPageSlice = createSlice({
       })
       .addCase(addOrderParticipants.rejected, (state) => {
         state.addOrderParticipantsInProgress = false;
+      })
+      /* =============== deleteOrderParticipants =============== */
+      .addCase(deleteOrderParticipants.pending, (state) => {
+        return state;
+      })
+      .addCase(deleteOrderParticipants.fulfilled, (state, { payload }) => {
+        state.participantData = payload;
+      })
+      .addCase(deleteOrderParticipants.rejected, (state) => {
+        return state;
       });
   },
 });
