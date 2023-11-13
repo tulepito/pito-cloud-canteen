@@ -60,7 +60,7 @@ const createSubOrderHistoryRecordToFirestore = async (
   return data;
 };
 
-const normalizeOrderMetadata = (metadata: TObject = {}) => {
+const normalizeOrderMetadata = (metadata: TObject, newData: TObject) => {
   const {
     companyId,
     vatSettings = {},
@@ -87,9 +87,10 @@ const normalizeOrderMetadata = (metadata: TObject = {}) => {
     daySession,
     mealType,
     deadlineHour,
-  } = metadata;
+  } = metadata || {};
+  const { daySession: newDaySession } = newData || {};
 
-  const newDaySession =
+  const oldDaySession =
     daySession ||
     getDaySessionFromDeliveryTime(
       isEmpty(deliveryHour)
@@ -99,7 +100,9 @@ const normalizeOrderMetadata = (metadata: TObject = {}) => {
         : deliveryHour,
     );
   const newDeliveryHour =
-    INITIAL_DELIVERY_TIME_BASE_ON_DAY_SESSION[newDaySession as TDaySession];
+    newDaySession === oldDaySession
+      ? deliveryHour
+      : INITIAL_DELIVERY_TIME_BASE_ON_DAY_SESSION[newDaySession as TDaySession];
 
   const newOrderMetadata = {
     companyId,
@@ -269,14 +272,15 @@ const reorder = async ({
   orderIdToReOrder,
   bookerId,
   isCreatedByAdmin,
-  dateParams,
+  params,
 }: {
   orderIdToReOrder: string;
   bookerId: string;
   isCreatedByAdmin?: boolean;
-  dateParams: {
+  params: {
     startDate: number;
     endDate: number;
+    daySession?: TDaySession;
   };
 }) => {
   const integrationSdk = getIntegrationSdk();
@@ -292,7 +296,7 @@ const reorder = async ({
     startDate: oldStartDate,
     endDate: oldEndDate,
   } = Listing(oldOrder).getMetadata();
-  const { startDate, endDate } = dateParams;
+  const { startDate, endDate, daySession } = params;
 
   const companyAccount = await fetchUser(companyId);
   const currentOrderNumber = await getOrderNumber();
@@ -330,8 +334,8 @@ const reorder = async ({
         orderStateHistory,
         orderState,
         companyName,
-        ...normalizeOrderMetadata({
-          ...Listing(oldOrder).getMetadata(),
+        ...normalizeOrderMetadata(Listing(oldOrder).getMetadata(), {
+          daySession,
         }),
         startDate,
         endDate,

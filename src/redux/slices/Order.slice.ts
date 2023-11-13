@@ -390,8 +390,7 @@ const createOrder = createAsyncThunk(
       ? await reorderApi(Listing(previousOrder!).getId(), {
           startDate: startDateTimestamp,
           endDate: endDateTimestamp,
-          deadlineDate: deadlineDateTimestamp,
-          deadlineHour: `${orderDeadlineHour}:${orderDeadlineMinute}`,
+          daySession,
         })
       : await createBookerOrderApi(newOrderApiBody);
 
