@@ -3,7 +3,7 @@
 import { types as sdkTypes } from '@helpers/sdkLoader';
 import { EListingType } from '@src/utils/enums';
 import { FOOD_TYPE_OPTIONS, MENU_TYPE_OPTIONS } from '@src/utils/options';
-import type { EMenuType } from '@utils/enums';
+import type { EFoodApprovalState, EMenuType } from '@utils/enums';
 import { getSubmitImageId, getUniqueImages } from '@utils/images';
 import { toNonAccentVietnamese } from '@utils/string';
 import type { TImage } from '@utils/types';
@@ -42,6 +42,8 @@ export type TEditPartnerFoodFormValues = {
   restaurantId?: string;
   unit?: string;
   tempValue?: string;
+  adminApproval?: EFoodApprovalState;
+  isDraft?: boolean;
 };
 
 export const getSubmitFoodData = (values: TEditPartnerFoodFormValues) => {
@@ -53,6 +55,8 @@ export const getSubmitFoodData = (values: TEditPartnerFoodFormValues) => {
     addImages,
     tempValue,
     restaurantId,
+    adminApproval,
+    isDraft,
     ...rest
   } = values;
   const priceRemoveComma = price.toString().split('.');
@@ -71,6 +75,8 @@ export const getSubmitFoodData = (values: TEditPartnerFoodFormValues) => {
       restaurantId,
       listingType: EListingType.food,
       isFoodEnable: true,
+      ...(adminApproval ? { adminApproval } : {}),
+      ...(isDraft !== undefined ? { isDraft } : {}),
     },
   };
 };

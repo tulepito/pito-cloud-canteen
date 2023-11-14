@@ -33,7 +33,13 @@ import { isSameDate } from '@src/utils/dates';
 import { EOrderStates, EParticipantOrderStatus } from '@src/utils/enums';
 import { convertStringToNumber } from '@src/utils/number';
 import { CurrentUser, Listing, User } from '@utils/data';
-import type { TCurrentUser, TListing, TTransaction, TUser } from '@utils/types';
+import type {
+  TCurrentUser,
+  TListing,
+  TObject,
+  TTransaction,
+  TUser,
+} from '@utils/types';
 
 import ParticipantToolbar from '../ParticipantToolbar/ParticipantToolbar';
 
@@ -66,7 +72,6 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
   const ensureCompanyUser = User(company).getFullData();
   const orderObj = Listing(order);
   const orderId = orderObj.getId();
-  const { companyName = 'PCC' } = orderObj.getMetadata();
   const orderTitle = orderObj.getAttributes()?.title;
   const orderColor = markColorForOrder(convertStringToNumber(orderTitle || ''));
   const currentUserId = CurrentUser(currentUser).getId();
@@ -86,11 +91,13 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
   } = useSubOrderPicking();
 
   const {
+    companyName = 'PCC',
     deadlineDate,
     deliveryHour,
     startDate,
     endDate,
     orderState,
+    orderStateHistory = [],
     daySession = MORNING_SESSION,
   } = orderObj.getMetadata();
   const isOrderCanceled =
@@ -178,6 +185,10 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
           lastTransition,
           foodName: dishes.find((_dish) => _dish.key === foodSelection?.foodId)
             ?.value,
+          isOrderStarted:
+            orderStateHistory.findIndex(
+              (history: TObject) => history.state === EOrderStates.inProgress,
+            ) !== -1,
         },
         title: orderTitle,
         start: DateTime.fromMillis(+planItemKey).toJSDate(),

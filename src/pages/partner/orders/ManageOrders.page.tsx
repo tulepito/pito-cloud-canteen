@@ -33,6 +33,7 @@ import { currentUserSelector } from '@redux/slices/user.slice';
 import { partnerPaths } from '@src/paths';
 import { CurrentUser } from '@src/utils/data';
 import { formatTimestamp } from '@src/utils/dates';
+import { ETransition } from '@src/utils/transaction';
 import { EOrderDraftStates, EPartnerVATSetting } from '@utils/enums';
 import type { TObject, TTableSortValue } from '@utils/types';
 
@@ -159,6 +160,7 @@ const parseEntitiesToTableData = (
       vatSettings = {},
     } = entity;
     const dayIndex = new Date(Number(date)).getDay();
+    const { id: restaurantId } = restaurant;
 
     let totalPrice = 0;
     if (!isEmpty(quotation)) {
@@ -215,7 +217,10 @@ const parseEntitiesToTableData = (
         endDate: endDate ? formatTimestamp(endDate) : '',
         state: EOrderDraftStates.pendingApproval,
         deliveryHour,
-        lastTransition,
+        lastTransition:
+          _restaurantId !== restaurantId
+            ? ETransition.OPERATOR_CANCEL_PLAN
+            : lastTransition,
         isPaid,
       },
     };
@@ -409,6 +414,10 @@ const ManageOrdersPage = () => {
         );
       });
     }
+
+    return () => {
+      dispatch(PartnerManageOrdersActions.resetStates());
+    };
   }, []);
 
   return (

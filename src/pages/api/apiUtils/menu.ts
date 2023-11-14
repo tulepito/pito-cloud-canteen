@@ -6,7 +6,7 @@ import { getUniqueString, Listing } from '@src/utils/data';
 import type { EMenuMealType } from '@src/utils/enums';
 import type { TListing, TObject } from '@src/utils/types';
 
-export const createMinPriceByDayOfWeek = (foodsByDate: any) => {
+export const createMinPriceByDayOfWeek = (foodsByDate: TObject = {}) => {
   let averagePriceByDayOfWeek = {};
   Object.keys(foodsByDate).forEach((keyAsDayOfWeek) => {
     let minPriceByDate = 0;
@@ -101,7 +101,9 @@ export const createNutritionsByDaysOfWeekField = (
   return newData;
 };
 
-export const createListFoodNutritionByFoodsByDate = (foodsByDate: any) => {
+export const createListFoodNutritionByFoodsByDate = (
+  foodsByDate: TObject = {},
+) => {
   let nutritionsByDayOfWeek = {};
   Object.keys(foodsByDate).forEach((keyAsDayOfWeek) => {
     let nutritionListByDate: string[] = [];
@@ -121,7 +123,7 @@ export const createListFoodNutritionByFoodsByDate = (foodsByDate: any) => {
   return nutritionsByDayOfWeek;
 };
 
-export const createListFoodIdsByFoodsByDate = (foodsByDate: any) => {
+export const createListFoodIdsByFoodsByDate = (foodsByDate: TObject = {}) => {
   let foodIdsByDayOfWeek = {};
   Object.keys(foodsByDate).forEach((keyAsDayOfWeek) => {
     const listFoodIds: string[] = [];

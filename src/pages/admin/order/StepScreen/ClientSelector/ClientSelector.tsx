@@ -21,7 +21,7 @@ import { adminPaths } from '@src/paths';
 import { ECompanyStates } from '@src/utils/enums';
 import { Listing } from '@utils/data';
 
-import ClientTable from '../../create/components/ClientTable/ClientTable';
+import ClientTable from '../../components/ClientTable/ClientTable';
 
 import css from './ClientSelector.module.scss';
 

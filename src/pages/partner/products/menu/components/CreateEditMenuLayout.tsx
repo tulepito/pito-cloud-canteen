@@ -401,7 +401,7 @@ const CreateEditMenuLayout: React.FC<TCreateEditMenuLayoutProps> = () => {
           <RenderWhen condition={isInfoTab}>
             <Button
               inProgress={submitting}
-              disabled={!enableNext}
+              disabled={submitting || !enableNext}
               onClick={handleNavigateToNextStep}>
               Tiếp theo
             </Button>
@@ -409,7 +409,7 @@ const CreateEditMenuLayout: React.FC<TCreateEditMenuLayoutProps> = () => {
             <RenderWhen.False>
               <Button
                 inProgress={submitting}
-                disabled={!enableNext}
+                disabled={submitting || !enableNext}
                 onClick={handleNavigateToNextStep}>
                 {isCreateMenuPath ? 'Hoàn tất' : 'Cập nhật'}
               </Button>

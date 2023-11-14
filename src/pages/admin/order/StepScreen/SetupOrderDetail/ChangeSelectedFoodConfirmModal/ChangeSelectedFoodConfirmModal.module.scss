@@ -1,0 +1,50 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/defaults.scss' as *;
+
+.modalContainer.modalContainer {
+  flex-basis: 343px;
+  padding: 0 24px 24px;
+}
+
+.modalContent {
+  text-align: center;
+}
+
+.content {
+  margin-top: 12px;
+  @include textTemplate(14px, $fontWeightRegular, 20px);
+}
+
+.checkboxInput {
+  @include checkBoxInputStyles;
+  @include flexCenter;
+
+  .label {
+    justify-content: center;
+
+    .checkboxWrapper {
+      margin-right: 0;
+    }
+  }
+}
+
+.checkbox {
+  margin-top: 12px;
+}
+
+.checkboxLabel {
+  margin-top: 12px;
+  @include textTemplate(10px, $fontWeightRegular, 16px);
+}
+.bottomBtns {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  gap: 8px;
+
+  .btn {
+    width: 100%;
+  }
+}

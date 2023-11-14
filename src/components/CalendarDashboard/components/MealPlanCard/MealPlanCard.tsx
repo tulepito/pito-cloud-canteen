@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import type { Event } from 'react-big-calendar';
 import { shallowEqual } from 'react-redux';
+import classNames from 'classnames';
 import clone from 'lodash/clone';
 import omit from 'lodash/omit';
 
@@ -43,6 +44,7 @@ const MealPlanCard: React.FC<TMealPlanCardProps> = ({
     onRecommendRestaurantForSpecificDayInProgress,
     onSearchRestaurant,
     availableOrderDetailCheckList,
+    shouldHideRemoveMealIcon = false,
   } = resources;
 
   const availableStatus =
@@ -72,12 +74,17 @@ const MealPlanCard: React.FC<TMealPlanCardProps> = ({
   );
 
   return (
-    <div className={css.root} data-tour="step-1">
+    <div
+      className={classNames(css.root, {
+        [css.disable]: event.resource.disableEditing,
+      })}
+      data-tour="step-1">
       <MealPlanCardHeader
         event={event}
         removeEventItem={removeEventItem}
         removeInprogress={removeInprogress}
         onSearchRestaurant={onSearchRestaurant}
+        shouldHideRemoveIcon={shouldHideRemoveMealIcon}
       />
       <MealPlanCardContent
         event={event}

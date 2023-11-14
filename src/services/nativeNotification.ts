@@ -144,6 +144,52 @@ export const createNativeNotification = async (
       }
       break;
 
+    case ENativeNotificationType.PartnerTransitOrderToCanceled:
+      {
+        const { order, subOrderDate } = notificationParams;
+        const orderListing = Listing(order!);
+        const orderId = orderListing.getId();
+        const { deliveryHour } = orderListing.getMetadata();
+        const deliveryStartHour = deliveryHour.split('-')[0];
+        const url = `${BASE_URL}/partner/orders/${orderId}_${subOrderDate}`;
+
+        oneSignalUserIds.forEach((oneSignalUserId: string) => {
+          sendNotification({
+            title: '😢 Rất tiếc! Một đơn hàng vừa bi huỷ.',
+            content: `Đơn hàng vào lúc ${deliveryStartHour}, ${formatTimestamp(
+              +subOrderDate!,
+              'dd/MM',
+            )} vừa bị huỷ. Nhấn để xem chi tiết!`,
+            url,
+            oneSignalUserId,
+          });
+        });
+      }
+      break;
+
+    case ENativeNotificationType.PartnerEditSubOrder:
+      {
+        const { order, subOrderDate } = notificationParams;
+        const orderListing = Listing(order!);
+        const orderId = orderListing.getId();
+        const { deliveryHour } = orderListing.getMetadata();
+        const deliveryStartHour = deliveryHour.split('-')[0];
+        const url = `${BASE_URL}/partner/orders/${orderId}_${subOrderDate}`;
+
+        oneSignalUserIds.forEach((oneSignalUserId: string) => {
+          sendNotification({
+            title: 'Đơn hàng có sự thay đổi!',
+            content: `Đơn hàng vào lúc ${deliveryStartHour}, ${formatTimestamp(
+              +subOrderDate!,
+              'dd/MM',
+            )} vừa được chỉnh sửa. Nhấn để xem chi tiết!`,
+            url,
+            oneSignalUserId,
+          });
+        });
+      }
+      break;
+
     default:
       break;
   }

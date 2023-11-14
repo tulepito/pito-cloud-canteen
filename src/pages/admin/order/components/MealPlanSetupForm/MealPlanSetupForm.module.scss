@@ -1,0 +1,33 @@
+@use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.headerLabel {
+  padding: 6px 10px;
+  @include text(14px, 20px);
+  background-color: $neutralGray3;
+  border-radius: 4px;
+}
+
+.fieldSection {
+  padding-bottom: 32px;
+  padding-top: 32px;
+  border-bottom: 1px solid $neutralGray5;
+}
+
+.verticalSpace {
+  margin-top: 32px;
+}
+
+.buttonsWrapper {
+  @include flexAlign(center, space-between);
+  margin-top: 32px;
+
+  .submitBtn {
+    width: 252px;
+  }
+}
+
+.error {
+  color: $primaryPri2;
+}

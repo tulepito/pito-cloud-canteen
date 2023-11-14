@@ -3,9 +3,12 @@ import { useEffect, useMemo, useState } from 'react';
 import { isEmpty } from 'lodash';
 
 import { useAppSelector } from '@hooks/reduxHooks';
-import { ETransition } from '@src/utils/transaction';
+import {
+  ETransition,
+  TRANSITIONS_TO_STATE_CANCELED,
+} from '@src/utils/transaction';
 import { Listing, User } from '@utils/data';
-import { EParticipantOrderStatus } from '@utils/enums';
+import { EOrderStates, EParticipantOrderStatus } from '@utils/enums';
 import type { TListing, TObject, TUser } from '@utils/types';
 
 export const usePrepareManageOrdersSectionData = (
@@ -19,14 +22,28 @@ export const usePrepareManageOrdersSectionData = (
     draftOrderDetail = {},
   } = useAppSelector((state) => state.OrderManagement);
 
-  const { participants = [] } = Listing(orderData as TListing).getMetadata();
+  const { participants = [], orderStateHistory = [] } = Listing(
+    orderData as TListing,
+  ).getMetadata();
+
+  const isOrderAlreadyInProgress =
+    orderStateHistory.findIndex(
+      (_state: { state: string; updatedAt: number }) =>
+        _state.state === EOrderStates.inProgress,
+    ) !== -1;
 
   const dateList = Object.entries(draftOrderDetail)
     .reduce<number[]>((prev, [date, orderOnDate]) => {
       const { restaurant, lastTransition } = orderOnDate as TObject;
+      const isSubOrderNotAbleToEdit = [
+        ETransition.OPERATOR_CANCEL_PLAN,
+        ETransition.START_DELIVERY,
+        ETransition.COMPLETE_DELIVERY,
+      ].includes(lastTransition!);
 
       return !isEmpty(restaurant?.foodList) &&
-        lastTransition !== ETransition.OPERATOR_CANCEL_PLAN
+        !TRANSITIONS_TO_STATE_CANCELED.includes(lastTransition) &&
+        !(isOrderAlreadyInProgress && isSubOrderNotAbleToEdit)
         ? prev.concat(Number(date))
         : prev;
     }, [])
@@ -98,5 +115,6 @@ export const usePrepareManageOrdersSectionData = (
     memberOptions,
     foodOptions,
     currentOrderDetail: draftOrderDetail[currentViewDate] || {},
+    hasSubOrders: !isEmpty(draftOrderDetail),
   };
 };

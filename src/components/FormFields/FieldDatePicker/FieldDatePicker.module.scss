@@ -116,3 +116,14 @@
 .labelRoot {
   @include inputLabelStyles;
 }
+
+.fieldWrapper {
+  position: relative;
+
+  .icon {
+    position: absolute;
+    bottom: 10px;
+    left: 16px;
+    display: flex;
+  }
+}

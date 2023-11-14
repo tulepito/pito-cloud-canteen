@@ -5,10 +5,38 @@
                 :name        :transition/initiate-transaction,
                 :actor       :actor.role/customer,
                 :actions     [{:name :action/create-booking} {:name :action/privileged-update-metadata}
-                              ],
+                              ]
 
                 :to          :state/initiated
                 :privileged? true
+                }
+               {
+                :name    :transition/operator-cancel-plan,
+                :actor   :actor.role/operator,
+                :actions [{:name :action/decline-booking}],
+                :from    :state/initiated
+                :to      :state/canceled
+                }
+               {
+                :name    :transition/partner-reject-sub-order,
+                :actor   :actor.role/operator,
+                :actions [],
+                :from    :state/initiated
+                :to      :state/partner-rejected
+                }
+               {
+                :name    :transition/operator-cancel-after-partner-rejected,
+                :actor   :actor.role/operator,
+                :actions [{:name :action/decline-booking}],
+                :from    :state/partner-rejected
+                :to      :state/canceled
+                }
+               {
+                :name    :transition/operator-cancel-after-partner-confirmed,
+                :actor   :actor.role/operator,
+                :actions [{:name :action/cancel-booking}],
+                :from    :state/partner-confirmed
+                :to      :state/canceled
                 }
                {
                 :name    :transition/expired-start-delivery,
@@ -18,10 +46,17 @@
                 :to      :state/failed-delivery
                 }
                {
-                :name    :transition/start-delivery,
+                :name    :transition/partner-confirm-sub-order,
                 :actor   :actor.role/operator,
                 :actions [{:name :action/accept-booking}],
                 :from    :state/initiated
+                :to      :state/partner-confirmed
+                }
+               {
+                :name    :transition/start-delivery,
+                :actor   :actor.role/operator,
+                :actions [],
+                :from    :state/partner-confirmed
                 :to      :state/delivering
                 }
                {
@@ -31,13 +66,7 @@
                 :from    :state/delivering
                 :to      :state/failed-delivery
                 }
-               {
-                :name    :transition/operator-cancel-plan,
-                :actor   :actor.role/operator,
-                :actions [{:name :action/decline-booking}],
-                :from    :state/initiated
-                :to      :state/canceled
-                }
+               
                {
                 :name    :transition/cancel-delivery,
                 :actor   :actor.role/operator,

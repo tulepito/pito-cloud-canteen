@@ -101,7 +101,7 @@ function BookerDraftOrderPage() {
 
   const companyGeoOrigin = useMemo(
     () => ({
-      ...User(companyAccount as TUser).getPublicData()?.location?.origin,
+      ...User(companyAccount as TUser).getPublicData()?.companyLocation?.origin,
     }),
     [companyAccount],
   );
@@ -118,7 +118,7 @@ function BookerDraftOrderPage() {
   const selectedDate = useAppSelector(
     (state) => state.Order.selectedCalendarDate,
   );
-  const { orderDetail = [] } = useGetPlanDetails();
+  const { orderDetail = [], rawOrderDetail } = useGetPlanDetails();
   const { startDate, endDate } = useGetBoundaryDates(order);
   const calendarExtraResources = useGetCalendarExtraResources({
     order,
@@ -137,7 +137,7 @@ function BookerDraftOrderPage() {
       selectedDate,
       startDate: startDateTimestamp,
       endDate: endDateTimestamp,
-      orderDetail,
+      orderDetail: rawOrderDetail,
     });
 
     return temp instanceof Date ? temp : new Date(temp!);
@@ -193,7 +193,7 @@ function BookerDraftOrderPage() {
 
   useEffect(() => {
     if (!isEmpty(orderDetail)) {
-      dispatch(orderAsyncActions.checkRestaurantStillAvailable());
+      dispatch(orderAsyncActions.checkRestaurantStillAvailable({}));
     }
   }, [dispatch, JSON.stringify(orderDetail)]);
 

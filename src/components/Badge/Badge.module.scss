@@ -31,11 +31,19 @@
   &.darkBlue {
     background-color: $labelDarkBlue;
   }
+  &.strongDefault {
+    color: $neutralGray1;
+    background-color: $neutralGray5;
+  }
   &.strongSuccess {
     background-color: $sematicGreen2;
   }
   &.strongDanger {
     background-color: $sematicRed2;
+  }
+  &.strongWarning {
+    color: $neutralGray1;
+    background-color: $labelOrange2;
   }
   /* ===============  =============== */
 

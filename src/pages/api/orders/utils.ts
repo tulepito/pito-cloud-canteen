@@ -10,7 +10,7 @@ import type { TObject } from '@src/utils/types';
 type TPlanOrderDetail = TPlan['orderDetail'];
 type TOrderOfDate = TPlanOrderDetail[keyof TPlanOrderDetail];
 
-type TNormalizedOrderDetail = {
+export type TNormalizedOrderDetail = {
   params: {
     listingId: string;
     transactionId?: string;
@@ -56,7 +56,13 @@ export const normalizeOrderDetail = ({
         memberOrders: memberOrdersMap,
         lineItems = [],
         transactionId,
+        lastTransition,
       } = orderOfDate;
+
+      if (lastTransition) {
+        return prev;
+      }
+
       const startDate = DateTime.fromMillis(Number(date));
       const bookingStart = startDate.toJSDate();
       const bookingEnd = startDate.plus({ days: 1 }).toJSDate();
@@ -166,6 +172,24 @@ export const prepareNewPlanOrderDetail = (
           lastTransition: ETransition.INITIATE_TRANSACTION,
         },
       };
+    },
+    {},
+  );
+};
+
+export const getSubOrdersWithNoTxId = (planOrderDetail: TPlanOrderDetail) => {
+  return Object.entries(planOrderDetail).reduce<TObject>(
+    (prev, [date, orderOfDate]: [string, TOrderOfDate]) => {
+      const { transactionId } = orderOfDate;
+
+      if (!transactionId) {
+        return {
+          ...prev,
+          [date]: orderOfDate,
+        };
+      }
+
+      return prev;
     },
     {},
   );

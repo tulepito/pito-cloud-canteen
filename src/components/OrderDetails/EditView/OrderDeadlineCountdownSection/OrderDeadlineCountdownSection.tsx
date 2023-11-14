@@ -44,10 +44,10 @@ const OrderDeadlineCountdownSection: React.FC<
   const rootClasses = classNames(rootClassName || css.root, className);
 
   const disabledEditButton = currentTime >= orderDeadline || !ableToUpdateOrder;
-  const formattedDeadline = formatTimestamp(
+  const formattedDeadline = `${deadlineHour}, ${formatTimestamp(
     orderDeadline,
-    "HH:mm, dd 'tháng' MM, yyyy",
-  );
+    "dd 'tháng' MM, yyyy",
+  )}`;
 
   const sectionTitle = intl.formatMessage({
     id: 'OrderDeadlineCountdownSection.title',

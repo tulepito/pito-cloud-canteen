@@ -13,7 +13,7 @@ import type { TSidebarMenu } from '@components/MultiLevelSidebar/MultiLevelSideb
 import MultiLevelSidebar from '@components/MultiLevelSidebar/MultiLevelSidebar';
 import NamedLink from '@components/NamedLink/NamedLink';
 import OutsideClickHandler from '@components/OutsideClickHandler/OutsideClickHandler';
-import { adminRoutes } from '@src/paths';
+import { adminPaths, adminRoutes } from '@src/paths';
 
 import css from './AdminSidebar.module.scss';
 
@@ -36,7 +36,10 @@ const LIST_SIDEBAR_MENU: TSidebarMenu[] = [
         id: 'createOrder',
         label: 'AdminSidebar.createOrderLabel',
         nameLink: adminRoutes.CreateOrder.path,
-        highlightRefLinks: [adminRoutes.UpdateDraftOrder.path],
+        highlightRefLinks: [
+          adminRoutes.UpdateDraftOrder.path,
+          adminPaths.EditOrder,
+        ],
       },
       {
         id: 'manageOrders',

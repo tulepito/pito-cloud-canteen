@@ -1,0 +1,29 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.navigationBtn {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: space-between;
+  align-items: center;
+  margin: 32px 0 24px;
+}
+
+.nextButton {
+  min-width: 252px;
+  height: 48px;
+}
+
+.actionWrapper {
+  display: flex;
+  flex-direction: row;
+  column-gap: 16px;
+}
+
+.nextTabButton {
+  min-width: 110px;
+}
+
+.completeTabBtn {
+  min-width: 110px;
+}

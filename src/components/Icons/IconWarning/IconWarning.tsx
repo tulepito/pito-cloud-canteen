@@ -1,12 +1,18 @@
 import React from 'react';
 
-const IconWarning = () => {
+import type { TIconProps } from '@src/utils/types';
+
+type TIconWarningProps = TIconProps & {};
+
+const IconWarning: React.FC<TIconWarningProps> = ({ className }) => {
   return (
     <svg
       width="28"
       height="28"
       viewBox="0 0 28 28"
       fill="none"
+      className={className}
+      preserveAspectRatio="none"
       xmlns="http://www.w3.org/2000/svg">
       <g clipPath="url(#clip0_922_14326)">
         <path

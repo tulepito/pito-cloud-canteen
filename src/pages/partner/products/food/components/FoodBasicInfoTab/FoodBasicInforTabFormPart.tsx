@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import classNames from 'classnames';
@@ -6,7 +7,8 @@ import { isEmpty, keyBy, mapValues } from 'lodash';
 import Button from '@components/Button/Button';
 import FieldMultiplePhotosMobile from '@components/FormFields/FieldMultiplePhotosMobile/FieldMultiplePhotosMobile';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
-import { useAppSelector } from '@hooks/reduxHooks';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { addImages } from '@redux/slices/uploadImage.slice';
 import { Listing } from '@src/utils/data';
 import { EImageVariants } from '@src/utils/enums';
 import {
@@ -32,6 +34,7 @@ const FoodBasicInforTabFormPart: React.FC<TFoodBasicInforTabFormPartProps> = (
 ) => {
   const { invalid, inProgress } = props;
   const intl = useIntl();
+  const dispatch = useAppDispatch();
   const currentFoodListing = useAppSelector(
     (state) => state.PartnerFood.currentFoodListing,
     shallowEqual,
@@ -53,12 +56,12 @@ const FoodBasicInforTabFormPart: React.FC<TFoodBasicInforTabFormPartProps> = (
     (state) => state.uploadImage.images,
     shallowEqual,
   );
-  const images = {
-    ...uploadedImages,
-    ...formattedCurrentFoodListingImages,
-  };
 
-  const submitDisabled = invalid || isEmpty(images);
+  const submitDisabled = invalid || isEmpty(uploadedImages);
+
+  useEffect(() => {
+    dispatch(addImages(formattedCurrentFoodListingImages));
+  }, [dispatch, JSON.stringify(formattedCurrentFoodListingImages)]);
 
   return (
     <div className={css.root}>
@@ -93,7 +96,7 @@ const FoodBasicInforTabFormPart: React.FC<TFoodBasicInforTabFormPartProps> = (
         )}
       />
       <FieldMultiplePhotosMobile
-        images={images}
+        images={uploadedImages}
         containerClassName={css.field}
         name="images"
         variants={[EImageVariants.squareSmall2x]}

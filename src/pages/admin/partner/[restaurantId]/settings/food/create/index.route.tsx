@@ -7,7 +7,7 @@ import CreatePartnerFoodPage from './CreatePartnerFood.page';
 const AdminCreatePartnerFoodRoute = () => {
   return (
     <MetaWrapper routeName="AdminCreatePartnerFoodRoute">
-      <CreatePartnerFoodPage />;
+      <CreatePartnerFoodPage />
     </MetaWrapper>
   );
 };

@@ -2,13 +2,22 @@ import compact from 'lodash/compact';
 import isEmpty from 'lodash/isEmpty';
 import { DateTime } from 'luxon';
 
-import { Listing } from '@utils/data';
+import type { TDaySession } from '@components/CalendarDashboard/helpers/types';
+import { EOrderStates } from '@src/utils/enums';
+import { ETransition } from '@src/utils/transaction';
 import { getDaySessionFromDeliveryTime } from '@utils/dates';
 
 export const normalizePlanDetailsToEvent = (
   planDetails: any,
-  order: any,
+  order: {
+    plans: string[];
+    deliveryHour: string;
+    daySession: TDaySession;
+    orderState: EOrderStates;
+    orderStateHistory?: any;
+  },
   coverImageList: any,
+  isEditOrder = false,
 ) => {
   const dateList = Object.keys(planDetails);
 
@@ -20,12 +29,25 @@ export const normalizePlanDetailsToEvent = (
     return [];
   }
 
-  const { plans = [], deliveryHour, daySession } = Listing(order).getMetadata();
+  const {
+    plans = [],
+    deliveryHour,
+    daySession,
+    orderStateHistory = [],
+  } = order || {};
   const planId = plans.length > 0 ? plans[0] : undefined;
+
+  const isOrderAlreadyInProgress =
+    orderStateHistory.findIndex(
+      (_state: { state: string; updatedAt: number }) =>
+        _state.state === EOrderStates.inProgress,
+    ) !== -1;
+  const isEditInProgressOrder = isEditOrder && isOrderAlreadyInProgress;
 
   const normalizeData = compact(
     dateList.map((timestamp) => {
       const planData = planDetails[timestamp] || {};
+      const { lastTransition } = planData;
       const foodIds = Object.keys(planData?.restaurant?.foodList || {});
       const foodList = foodIds.map((id) => {
         return {
@@ -34,6 +56,11 @@ export const normalizePlanDetailsToEvent = (
           price: planData?.foodList?.[id]?.foodPrice,
         };
       });
+      const isSubOrderNotAbleToEdit = [
+        ETransition.OPERATOR_CANCEL_PLAN,
+        ETransition.START_DELIVERY,
+        ETransition.COMPLETE_DELIVERY,
+      ].includes(lastTransition);
 
       const restaurantMaybe = {
         id: planData?.restaurant?.id,
@@ -59,6 +86,7 @@ export const normalizePlanDetailsToEvent = (
             dishes: foodList,
           },
           planId,
+          disableEditing: isEditInProgressOrder && isSubOrderNotAbleToEdit,
         },
         start: DateTime.fromMillis(Number(timestamp)).startOf('day').toJSDate(),
         end: DateTime.fromMillis(Number(timestamp)).endOf('day').toJSDate(),

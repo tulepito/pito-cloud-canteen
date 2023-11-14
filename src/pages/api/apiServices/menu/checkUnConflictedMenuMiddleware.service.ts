@@ -48,6 +48,7 @@ const checkUnConflictedMenuMiddleware =
       const listingStatesAsString = [
         EListingStates.published,
         EListingStates.draft,
+        EListingStates.closed,
         EListingMenuStates.pendingRestaurantApproval,
       ].join(',');
       let listings: TIntegrationListing[] = [];
