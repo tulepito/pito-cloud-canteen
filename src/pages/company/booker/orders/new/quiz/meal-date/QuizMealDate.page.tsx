@@ -33,7 +33,6 @@ const QuizMealDate: React.FC<TQuizMealDateProps> = ({ stepInfo }) => {
   const quizData = useAppSelector((state) => state.Quiz.quiz, shallowEqual);
   const selectedCompany = useAppSelector((state) => state.Quiz.selectedCompany);
   const currentUser = useAppSelector((state) => state.user.currentUser);
-  const { hasOrderBefore = false } = CurrentUser(currentUser!).getPrivateData();
   const previousOrder = useAppSelector((state) => state.Quiz.previousOrder);
 
   const {
@@ -49,6 +48,8 @@ const QuizMealDate: React.FC<TQuizMealDateProps> = ({ stepInfo }) => {
     onClickIsGroupOrder,
     onClickDeadlineDate,
   } = useQuizModalScrollControl();
+
+  const { hasOrderBefore = false } = CurrentUser(currentUser!).getPrivateData();
   const hasPreviousOrder = previousOrder !== null;
 
   const {
@@ -67,7 +68,7 @@ const QuizMealDate: React.FC<TQuizMealDateProps> = ({ stepInfo }) => {
 
   const initialValues = useMemo(
     () => ({
-      usePreviousData: hasOrderBefore,
+      usePreviousData: hasPreviousOrder,
       startDate: startDate ? new Date(startDate).getTime() : undefined,
       endDate: endDate ? new Date(endDate).getTime() : undefined,
       dayInWeek: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'],
@@ -80,7 +81,7 @@ const QuizMealDate: React.FC<TQuizMealDateProps> = ({ stepInfo }) => {
         '',
     }),
     [
-      hasOrderBefore,
+      hasPreviousOrder,
       deadlineDate,
       endDate,
       orderDeadlineHour,
