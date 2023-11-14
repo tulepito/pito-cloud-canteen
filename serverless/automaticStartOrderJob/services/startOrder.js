@@ -4,12 +4,10 @@ const {
   User,
 } = require('../utils/data');
 
-const { emailSendingFactory } = require('./notifications/email/sendEmail');
-const {
-  sendNativeNotification,
-} = require('./notifications/native/sendNotification');
-const { NATIVE_NOTIFICATION_TYPE } = require('./notifications/native/config');
-const { EmailTemplateTypes } = require('./notifications/email/config');
+const { emailSendingFactory } = require('./awsSES/sendEmail');
+const { sendNativeNotification } = require('./native/sendNotification');
+const { NATIVE_NOTIFICATION_TYPE } = require('./native/config');
+const { EmailTemplateTypes } = require('./awsSES/config');
 const { getIntegrationSdk } = require('../utils/integrationSdk');
 const { fetchUser } = require('../utils/integrationHelper');
 const { ORDER_STATES } = require('../utils/enums');
@@ -51,12 +49,9 @@ const getSystemAttributes = async () => {
   };
 };
 
-const startOrder = async (orderId, planId) => {
-  const [orderListing] = denormalisedResponseEntities(
-    await integrationSdk.listings.show({
-      id: orderId,
-    }),
-  );
+const startOrder = async (orderListing, planId) => {
+  const listingGetter = Listing(orderListing);
+  const orderId = listingGetter.getId();
   const {
     companyId,
     orderState,
@@ -64,7 +59,7 @@ const startOrder = async (orderId, planId) => {
     partnerIds = [],
     hasSpecificPCCFee: orderHasSpecificPCCFee,
     specificPCCFee: orderSpecificPCCFee,
-  } = Listing(orderListing).getMetadata();
+  } = listingGetter.getMetadata();
 
   if (orderState !== ORDER_STATES.picking) {
     throw new Error(
@@ -90,6 +85,7 @@ const startOrder = async (orderId, planId) => {
       orderState: ORDER_STATES.inProgress,
       orderStateHistory: updateOrderStateHistory,
       orderVATPercentage: systemVATPercentage,
+      isOrderAutomaticConfirmed: true,
       ...(orderHasSpecificPCCFee === undefined &&
         orderSpecificPCCFee === undefined && {
           hasSpecificPCCFee,
@@ -111,8 +107,7 @@ const startOrder = async (orderId, planId) => {
       },
     ),
   );
-  const planListing = Listing(plan);
-  const { orderDetail = {} } = planListing.getMetadata();
+  const { orderDetail = {} } = Listing(plan).getMetadata();
 
   const shouldSendNativeNotificationParticipantIdList =
     getPickFoodParticipants(orderDetail);

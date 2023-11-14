@@ -1,4 +1,4 @@
-const NATIVE_NOTIFICATION_TYPE = {
+const NATIVE_NOTIFICATION_TYPES = {
   BookerTransitOrderStateToPicking: 'BookerTransitOrderStateToPicking',
   BookerTransitOrderStateToInProgress: 'BookerTransitOrderStateToInProgress',
   AdminTransitSubOrderToDelivering: 'AdminTransitSubOrderToDelivering',
@@ -8,4 +8,4 @@ const NATIVE_NOTIFICATION_TYPE = {
   PartnerTransitOrderToCanceled: 'PartnerTransitOrderToCanceled',
   PartnerEditSubOrder: 'PartnerEditSubOrder',
 };
-module.exports = { NATIVE_NOTIFICATION_TYPE };
+module.exports = { NATIVE_NOTIFICATION_TYPES };

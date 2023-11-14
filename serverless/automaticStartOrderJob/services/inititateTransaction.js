@@ -1,12 +1,14 @@
 const uniq = require('lodash/uniq');
 const isEmpty = require('lodash/isEmpty');
+
 const {
   normalizeOrderDetail,
   prepareNewPlanOrderDetail,
+  checkIsOrderHasInProgressState,
 } = require('./helpers/order');
 const {
   createFirebaseDocNotification,
-} = require('./notifications/firebase/createNotification');
+} = require('./firebase/createNotification');
 const { getIntegrationSdk } = require('../utils/integrationSdk');
 const {
   Listing,
@@ -17,28 +19,17 @@ const {
 const { formatTimestamp } = require('./helpers/date');
 const { getSubAccountTrustedSdk } = require('../utils/subAccount');
 const { fetchUser } = require('../utils/integrationHelper');
-
 const {
   TRANSITIONS,
   ORDER_TYPES,
   PARTNER_VAT_SETTINGS,
 } = require('../utils/enums');
-const { NOTIFICATION_TYPES } = require('./notifications/firebase/config');
-
-const getSubOrdersWithNoTxId = (planOrderDetail) => {
-  return Object.entries(planOrderDetail).reduce((prev, [date, orderOfDate]) => {
-    const { transactionId } = orderOfDate;
-
-    if (!transactionId) {
-      return {
-        ...prev,
-        [date]: orderOfDate,
-      };
-    }
-
-    return prev;
-  }, {});
-};
+const { NOTIFICATION_TYPES } = require('./firebase/config');
+const {
+  getSubOrdersWithNoTxId,
+  getEditedSubOrders,
+  getNextTransition,
+} = require('./helpers/transaction');
 
 const initiateTransaction = async ({ orderId, planId }) => {
   // Query order and plan listing
@@ -65,8 +56,12 @@ const initiateTransaction = async ({ orderId, planId }) => {
     serviceFees = {},
     hasSpecificPCCFee = false,
     specificPCCFee = 0,
+    orderStateHistory = [],
+    partnerIds: orderPartnerIds = [],
   } = orderData.getMetadata();
   const isGroupOrder = orderType === ORDER_TYPES.group;
+  const isOrderHasInProgressState =
+    checkIsOrderHasInProgressState(orderStateHistory);
 
   if (plans.length === 0 || !plans.includes(planId)) {
     throw new Error(`Invalid planId, ${planId}`);
@@ -78,8 +73,8 @@ const initiateTransaction = async ({ orderId, planId }) => {
   const subAccountTrustedSdk = await getSubAccountTrustedSdk(companySubAccount);
   const { orderDetail: planOrderDetail = {} } =
     Listing(planListing).getMetadata();
-  const subOrdersWithNoTxId = getSubOrdersWithNoTxId(planOrderDetail);
 
+  const subOrdersWithNoTxId = getSubOrdersWithNoTxId(planOrderDetail);
   // Normalize order detail
   const normalizedOrderDetail = normalizeOrderDetail({
     orderId,
@@ -91,6 +86,36 @@ const initiateTransaction = async ({ orderId, planId }) => {
 
   const transactionMap = {};
   const partnerIds = [];
+
+  const editedSubOrders = getEditedSubOrders(planOrderDetail);
+  if (isOrderHasInProgressState && !isEmpty(editedSubOrders)) {
+    const handleUpdateTxs = Object.keys(editedSubOrders).map(
+      async (subOrderDate) => {
+        const { transactionId, lastTransition } = editedSubOrders[subOrderDate];
+
+        const nextTransition = getNextTransition(lastTransition);
+
+        await integrationSdk.transactions.transition({
+          id: transactionId,
+          transition: nextTransition,
+          params: {},
+        });
+
+        delete editedSubOrders[subOrderDate].transactionId;
+        delete editedSubOrders[subOrderDate].lastTransition;
+      },
+    );
+
+    await Promise.all(handleUpdateTxs);
+  }
+
+  const normalizedEditedOrderDetail = normalizeOrderDetail({
+    orderId,
+    planId,
+    planOrderDetail: editedSubOrders,
+    deliveryHour,
+    isGroupOrder,
+  });
 
   const onCreateTx = async (item, index) => {
     const {
@@ -157,6 +182,7 @@ const initiateTransaction = async ({ orderId, planId }) => {
   };
   // Initiate transaction for each date
   await Promise.all(normalizedOrderDetail.map(onCreateTx));
+  await Promise.all(normalizedEditedOrderDetail.map(onCreateTx));
 
   const updateVatSettings = async (_partnerIds) => {
     const partnerListings = denormalisedResponseEntities(
@@ -195,6 +221,19 @@ const initiateTransaction = async ({ orderId, planId }) => {
       },
     });
     await updateVatSettings(partnerIds);
+  }
+  if (!isEmpty(editedSubOrders)) {
+    await integrationSdk.listings.update({
+      id: planId,
+      metadata: {
+        orderDetail: {
+          ...planOrderDetail,
+          ...prepareNewPlanOrderDetail(editedSubOrders, transactionMap),
+        },
+      },
+    });
+
+    await updateVatSettings(orderPartnerIds);
   }
 };
 

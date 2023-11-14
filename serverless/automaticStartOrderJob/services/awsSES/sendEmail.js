@@ -2,9 +2,9 @@ const {
   bookerOrderSuccess,
   bookerOrderSuccessSubject,
 } = require('./templates/bookerOrderSuccess');
-const { sendIndividualEmail } = require('../awsSES');
-const { fetchListing, fetchUser } = require('../../../utils/integrationHelper');
-const { Listing, User } = require('../../../utils/data');
+const { sendIndividualEmail } = require('./awsSES');
+const { fetchListing, fetchUser } = require('../../utils/integrationHelper');
+const { Listing, User } = require('../../utils/data');
 const { systemSenderEmail, EmailTemplateTypes } = require('./config');
 
 const fetchEmailDataSourceWithOrder = async ({

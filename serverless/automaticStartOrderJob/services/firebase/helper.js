@@ -2,7 +2,9 @@ const { initializeApp } = require('firebase/app');
 const {
   addDoc,
   collection,
+  deleteDoc,
   doc,
+  getCountFromServer,
   getDoc,
   getDocs,
   getFirestore,
@@ -10,8 +12,10 @@ const {
   orderBy,
   query,
   startAfter,
+  updateDoc,
   where,
 } = require('firebase/firestore');
+const pick = require('lodash/pick');
 
 const firebaseConfig = {
   apiKey: process.env.FIREBASE_API_KEY,
@@ -86,6 +90,33 @@ const addCollectionDoc = async (data, collectionName) => {
   return addedDoc.id;
 };
 
+const queryAllCollectionData = async ({
+  collectionName,
+  queryParams,
+  neededDataAttributes,
+}) => {
+  const hasNeededDataAttributes =
+    neededDataAttributes && neededDataAttributes.length > 0;
+  const ref = collection(firestore, collectionName);
+  const queryFuncs = Object.keys(queryParams).map((key) =>
+    where(key, queryParams[key].operator, queryParams[key].value),
+  );
+  const q = query(ref, ...queryFuncs, orderBy('createdAt', 'desc'));
+
+  const snapshot = await (await getDocs(q)).docs;
+
+  const list = [];
+
+  snapshot.forEach((_doc) => {
+    const neededData = !hasNeededDataAttributes
+      ? _doc.data()
+      : pick(_doc.data(), neededDataAttributes);
+    list.push({ ...neededData, id: _doc.id });
+  });
+
+  return list;
+};
+
 const getDocumentById = async (documentId, collectionName) => {
   const docRef = doc(firestore, collectionName, documentId);
   const docSnap = await getDoc(docRef);
@@ -96,11 +127,41 @@ const getDocumentById = async (documentId, collectionName) => {
   return null;
 };
 
+const getCollectionCount = async ({ collectionName, queryParams }) => {
+  const ref = collection(firestore, collectionName);
+  const queryFuncs = Object.keys(queryParams).map((key) =>
+    where(key, queryParams[key].operator, queryParams[key].value),
+  );
+  const q = query(ref, ...queryFuncs, orderBy('createdAt', 'desc'));
+  const count = await getCountFromServer(q);
+
+  return count.data().count;
+};
+
+const updateCollectionDoc = async (
+  documentId,
+  data,
+  path,
+  pathSegments = [],
+) => {
+  const docRef = doc(firestore, path, ...pathSegments, documentId);
+
+  await updateDoc(docRef, data);
+};
+
+const deleteDocument = async (documentId, path, pathSegments = []) => {
+  await deleteDoc(doc(firestore, path, ...pathSegments, documentId));
+};
+
 export {
+  deleteDocument,
+  getCollectionCount,
   addCollectionDoc,
   getCollectionData,
   getDocumentById,
   queryCollectionData,
+  queryAllCollectionData,
+  updateCollectionDoc,
 };
 
 export default firebaseApp;

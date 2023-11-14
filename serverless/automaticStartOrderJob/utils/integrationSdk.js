@@ -7,4 +7,4 @@ const getIntegrationSdk = () => {
   });
 };
 
-export default getIntegrationSdk;
+module.exports = getIntegrationSdk;

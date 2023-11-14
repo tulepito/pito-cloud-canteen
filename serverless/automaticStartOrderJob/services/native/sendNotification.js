@@ -1,5 +1,5 @@
-const { fetchUser } = require('../../../utils/integrationHelper');
-const { User, Listing } = require('../../../utils/data');
+const { fetchUser } = require('../../utils/integrationHelper');
+const { User, Listing } = require('../../utils/data');
 const { sendNotification } = require('./oneSignal');
 const { ENativeNotificationType } = require('./config');
 

@@ -1,6 +1,17 @@
 const { denormalisedResponseEntities } = require('./data');
 const { getIntegrationSdk } = require('./integrationSdk');
 
+const fetchTransaction = async (transactionId, include = []) => {
+  const integrationSdk = getIntegrationSdk();
+
+  const response = await integrationSdk.transactions.show({
+    id: transactionId,
+    include,
+  });
+
+  return denormalisedResponseEntities(response)[0];
+};
+
 const fetchListing = async (listingId, include, imageVariants) => {
   const integrationSdk = getIntegrationSdk();
   const response = await integrationSdk.listings.show({
@@ -38,6 +49,7 @@ const fetchUserByEmail = async (email) => {
 };
 
 module.exports = {
+  fetchTransaction,
   fetchListing,
   fetchUser,
   fetchUserByEmail,

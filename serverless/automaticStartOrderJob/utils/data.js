@@ -131,7 +131,7 @@ const ensureListing = (listing) => {
   return { ...empty, ...listing };
 };
 
-export const User = (user) => {
+const User = (user) => {
   const ensuredUser = ensureUser(user);
   const id = ensuredUser?.id?.uuid;
   const { attributes, profileImage } = ensuredUser;
@@ -169,7 +169,7 @@ export const User = (user) => {
   };
 };
 
-export const Listing = (listing) => {
+const Listing = (listing) => {
   const ensuredListing = ensureListing(listing);
   const id = ensuredListing?.id?.uuid;
   const attributes = ensuredListing?.attributes;
@@ -204,4 +204,59 @@ export const Listing = (listing) => {
   };
 };
 
-module.exports = { denormalisedResponseEntities, ensureListing };
+export const ensureTransaction = (
+  transaction,
+  booking = null,
+  listing = null,
+  provider = null,
+) => {
+  const empty = {
+    id: null,
+    type: 'transaction',
+    attributes: {},
+    booking,
+    listing,
+    provider,
+  };
+
+  return { ...empty, ...transaction };
+};
+
+const Transaction = (transaction) => {
+  const ensuredTransaction = ensureTransaction(transaction);
+  const id = ensuredTransaction?.id?.uuid;
+  const attributes = ensuredTransaction?.attributes;
+  const { privateData, publicData, protectedData, metadata } = attributes || {};
+
+  return {
+    getId: () => {
+      return id;
+    },
+    getFullData: () => {
+      return ensuredTransaction || {};
+    },
+    getAttributes: () => {
+      return attributes || {};
+    },
+    getMetadata: () => {
+      return metadata || {};
+    },
+    getProtectedData: () => {
+      return protectedData || {};
+    },
+    getPrivateData: () => {
+      return privateData || {};
+    },
+    getPublicData: () => {
+      return publicData || {};
+    },
+  };
+};
+
+module.exports = {
+  denormalisedResponseEntities,
+  ensureListing,
+  Transaction,
+  Listing,
+  User,
+};
