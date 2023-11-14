@@ -3,7 +3,7 @@ const { User, Listing } = require('../../../utils/data');
 const { sendNotification } = require('./oneSignal');
 const { ENativeNotificationType } = require('./config');
 
-const BASE_URL = process.CANONICAL_URL;
+const BASE_URL = process.env.CANONICAL_ROOT_URL;
 
 const formatTimestamp = (date) => {
   const jsDate = new Date(Number(date));

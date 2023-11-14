@@ -1,7 +1,7 @@
 const {
   bookerOrderSuccess,
   bookerOrderSuccessSubject,
-} = require('./emailTemplate');
+} = require('./templates/bookerOrderSuccess');
 const { sendIndividualEmail } = require('../awsSES');
 const { fetchListing, fetchUser } = require('../../../utils/integrationHelper');
 const { Listing, User } = require('../../../utils/data');

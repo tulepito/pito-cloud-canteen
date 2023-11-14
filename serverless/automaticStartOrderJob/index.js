@@ -1,7 +1,7 @@
 const isEmpty = require('lodash/isEmpty');
 
-exports.handler = async (_event) => {
-  // const handler = async () => {
+// exports.handler = async (_event) => {
+  const handler = async (_event = {}) => {
   try {
     console.log('Start to run schedule to start order ...');
     console.log('_event: ', _event);
@@ -20,4 +20,4 @@ exports.handler = async (_event) => {
   }
 };
 
-// handler();
+handler();

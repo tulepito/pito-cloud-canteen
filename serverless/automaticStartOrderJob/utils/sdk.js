@@ -1,6 +1,7 @@
-const { createInstance, transit, types, util } = require('sharetribe-flex-sdk');
 const sharetribeSdk = require('sharetribe-flex-sdk');
+const { createInstance, transit, types, util } = require('sharetribe-flex-sdk');
 const Decimal = require('decimal.js');
+
 const config = require('./config');
 
 const baseUrlMaybe = config.sdk.baseUrl ? { baseUrl: config.sdk.baseUrl } : {};
@@ -8,12 +9,13 @@ const baseUrlMaybe = config.sdk.baseUrl ? { baseUrl: config.sdk.baseUrl } : {};
 const CLIENT_ID = process.env.SHARETRIBE_SDK_CLIENT_ID;
 const CLIENT_SECRET = process.env.SHARETRIBE_SDK_CLIENT_SECRET;
 const TRANSIT_VERBOSE = process.env.SHARETRIBE_SDK_TRANSIT_VERBOSE === 'true';
+const USING_SSL = process.env.SHARETRIBE_USING_SSL === 'true';
 
 const createSdkInstance = () =>
   createInstance({
-    clientId: config.sdk.clientId,
-    transitVerbose: config.sdk.transitVerbose,
-    secure: config.usingSSL,
+    clientId: CLIENT_ID,
+    transitVerbose: TRANSIT_VERBOSE,
+    secure: USING_SSL,
     ...baseUrlMaybe,
   });
 
