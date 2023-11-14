@@ -231,8 +231,7 @@ export const recommendRestaurantForSpecificDay = async ({
   if (restaurants.length > 0) {
     const randomNumber = Math.floor(Math.random() * (restaurants.length - 1));
     const otherRandomNumber = Math.abs(randomNumber - restaurants.length + 1);
-
-    const randomRestaurantObjA = restaurants[randomNumber] || {};
+    const randomRestaurantObjA = restaurants[randomNumber];
 
     const randomRestaurantObj =
       randomRestaurantObjA.restaurantInfo?.id?.uuid !==
@@ -240,13 +239,12 @@ export const recommendRestaurantForSpecificDay = async ({
         ? randomRestaurantObjA
         : restaurants[otherRandomNumber];
 
-    const { menu, restaurantInfo: randomRestaurant } =
-      randomRestaurantObj || {};
+    const { menu, restaurantInfo: randomRestaurant } = randomRestaurantObj;
 
-    const randomRestaurantGetter = Listing(randomRestaurant);
-    const randomRestaurantId = randomRestaurantGetter.getId();
+    const restaurantGetter = Listing(randomRestaurant);
+    const randomRestaurantId = restaurantGetter.getId();
     const { minQuantity = 0, maxQuantity = Number.MAX_VALUE } =
-      randomRestaurantGetter.getPublicData();
+      restaurantGetter.getPublicData();
 
     const foodList = await prepareMenuFoodList({
       menu,
@@ -258,10 +256,10 @@ export const recommendRestaurantForSpecificDay = async ({
 
     const newRestaurantData = {
       id: randomRestaurantId,
-      restaurantName: randomRestaurantGetter.getAttributes().title,
+      restaurantName: restaurantGetter.getAttributes().title,
       restaurantOwnerId: randomRestaurant?.author?.id?.uuid,
       foodList,
-      phoneNumber: randomRestaurantGetter.getPublicData().phoneNumber,
+      phoneNumber: restaurantGetter.getPublicData().phoneNumber,
       menuId: menu.id.uuid,
       minQuantity,
       maxQuantity,
