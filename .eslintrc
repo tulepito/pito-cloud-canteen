@@ -7,8 +7,7 @@
     ".next/",
     "coverage/",
     "public/",
-    "next.config.js",
-    "serverless/"
+    "next.config.js"
   ],
   "extends": [
     "airbnb-base",
