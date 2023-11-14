@@ -307,9 +307,14 @@ export const findSuitableStartDate = ({
     return startDate;
   }
 
-  const suitableStartDate = dateRange.find((date) =>
-    isEmpty(orderDetail[date.toString()]?.restaurant?.foodList),
-  );
+  const suitableStartDate =
+    dateRange.find((date) => {
+      const foodIds = Object.keys(
+        orderDetail[date.toString()]?.restaurant?.foodList || {},
+      );
+
+      return isEmpty(foodIds);
+    }) || new Date(startDate);
 
   return suitableStartDate;
 };
