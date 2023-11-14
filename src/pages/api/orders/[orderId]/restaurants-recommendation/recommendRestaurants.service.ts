@@ -1,3 +1,5 @@
+import chunk from 'lodash/chunk';
+import flatten from 'lodash/flatten';
 import isEmpty from 'lodash/isEmpty';
 import uniq from 'lodash/uniq';
 import { DateTime } from 'luxon';
@@ -24,28 +26,87 @@ const maxKilometerFromRestaurantToDeliveryAddressForBooker =
   process.env
     .NEXT_PUBLIC_MAX_KILOMETER_FROM_RESTAURANT_TO_DELIVERY_ADDRESS_FOR_BOOKER;
 
-const prepareMenuFoodList = async ({ restaurant, menu, timestamp }: any) => {
-  // TODO: prepare foodList
+const combineMenusWithRestaurantData = ({
+  menus,
+  restaurants,
+  shouldCalculateDistance,
+  deliveryOrigin,
+}: {
+  menus: TListing[];
+  restaurants: TListing[];
+  shouldCalculateDistance: boolean;
+  deliveryOrigin: TObject;
+}) => {
+  return menus.reduce((result: any, menu: TListing) => {
+    const { restaurantId } = Listing(menu).getMetadata();
+    const restaurantInfo = restaurants.find((restaurant: TListing) => {
+      const restaurantGetter = Listing(restaurant);
+
+      if (shouldCalculateDistance) {
+        const { geolocation: restaurantOrigin } =
+          restaurantGetter.getAttributes();
+
+        const distanceToDeliveryPlace = calculateDistance(
+          deliveryOrigin,
+          restaurantOrigin,
+        );
+        const isValidRestaurant =
+          distanceToDeliveryPlace <=
+          Number(maxKilometerFromRestaurantToDeliveryAddressForBooker);
+
+        return isValidRestaurant && restaurantGetter.getId() === restaurantId;
+      }
+
+      return restaurantGetter.getId() === restaurantId;
+    });
+    if (!restaurantInfo) return result;
+
+    return result.concat({
+      menu,
+      restaurantInfo,
+    });
+  }, []);
+};
+
+const prepareMenuFoodList = async ({
+  restaurant,
+  menu,
+  timestamp,
+  nutritions = [],
+  packagePerMember = 0,
+}: TObject) => {
+  // * prepare params
   const dateTime = DateTime.fromMillis(+timestamp).setZone(VNTimezone);
   const dayOfWeek = convertWeekDay(dateTime.weekday).key;
+  const foodIdList = Listing(menu).getMetadata()[`${dayOfWeek}FoodIdList`];
 
-  const menuListing = Listing(menu);
-  const foodIdList = menuListing.getMetadata()[`${dayOfWeek}FoodIdList`];
+  // * query food list
   const foodListFromSharetribe = await queryAllListings({
     query: {
       ids: foodIdList,
       meta_isDeleted: false,
       meta_isFoodEnable: true,
-      // ...(nutritions.length > 0
-      //   ? { pub_specialDiets: `has_any:${nutritions.join(',')}` }
-      //   : {}),
+      ...(nutritions.length > 0
+        ? { pub_specialDiets: `has_any:${nutritions.join(',')}` }
+        : {}),
     },
   });
+
+  // * find valid food items
+  const suitableFoodList = foodListFromSharetribe.filter(
+    (foodListing: TListing) => {
+      if (packagePerMember <= 0) return true;
+
+      return (
+        Listing(foodListing).getAttributes().price.amount <= packagePerMember
+      );
+    },
+  );
+
+  // * convert food list (array) to food map
   const normalizedFoodList = getSelectedRestaurantAndFoodList({
-    foodList: foodListFromSharetribe,
-    foodIds: foodListFromSharetribe.map(
-      (foodItem: TListing) => foodItem.id.uuid,
-    ),
+    foodList: suitableFoodList,
+    foodIds: suitableFoodList.map((foodItem: TListing) => foodItem.id.uuid),
     currentRestaurant: restaurant,
   }).submitFoodListData;
 
@@ -66,18 +127,23 @@ export const recommendRestaurantForSpecificDay = async ({
   const order = await fetchListing(orderId);
   let deliveryOrigin: any;
   let orderDetail;
-  let memberAmount;
+  let memberAmount: number;
   let menuQuery;
+  let packagePerMember = 0;
+  let nutritions: string[] = [];
   const menuQueryParams = {
     timestamp,
   };
 
+  // * recommend from order data
   if (isEmpty(recommendParams)) {
     const {
       plans = [],
       memberAmount: memberAmountInOrder = 0,
       deliveryAddress = {},
       companyId,
+      nutritions: nutritionFromOrder = [],
+      packagePerMember: packagePerMemberFromOrder,
     } = Listing(order as TListing).getMetadata();
 
     const orderDeliveryOriginMaybe = deliveryAddress?.origin;
@@ -91,85 +157,76 @@ export const recommendRestaurantForSpecificDay = async ({
     orderDetail =
       Listing(planListing as TListing).getMetadata().orderDetail || {};
     memberAmount = memberAmountInOrder;
-
+    nutritions = nutritionFromOrder;
+    packagePerMember = packagePerMemberFromOrder;
     menuQuery = getMenuQuery({ order, params: menuQueryParams });
   } else {
+    // * recommend from draft order data (recommend params)
     const {
       memberAmount: memberAmountFromParams = 0,
       deliveryOrigin: deliveryOriginFromParams,
       orderDetail: orderDetailFromParams,
-      nutritions = [],
+      nutritions: nutritionFormParams = [],
       mealType = [],
-      packagePerMember,
+      packagePerMember: packagePerMemberFromParams,
       daySession,
     } = recommendParams;
     deliveryOrigin = deliveryOriginFromParams;
     orderDetail = orderDetailFromParams;
     memberAmount = memberAmountFromParams;
+    nutritions = nutritionFormParams;
+    packagePerMember = packagePerMemberFromParams;
 
     menuQuery = getMenuQueryWithDraftOrderData({
       orderParams: {
-        nutritions,
+        nutritions: nutritionFormParams,
         mealType,
-        packagePerMember,
+        packagePerMember: packagePerMemberFromParams,
         daySession,
       },
       params: menuQueryParams,
     });
   }
 
+  // * query all menus
   const allMenus = await queryAllListings({
     query: menuQuery,
   });
 
-  const restaurantIdList = uniq<any>(
-    allMenus.map((menu: TListing) => {
-      const { restaurantId } = Listing(menu).getMetadata();
+  // * query all restaurant
+  const restaurantIdList = chunk(
+    uniq<string>(
+      allMenus.map((menu: TListing) => {
+        const { restaurantId } = Listing(menu).getMetadata();
 
-      return restaurantId;
-    }),
-  ).slice(0, 100);
+        return restaurantId;
+      }),
+    ),
+    100,
+  );
+  const restaurantsResponse = flatten(
+    await Promise.all(
+      restaurantIdList.map(async (ids) =>
+        adminQueryListings(
+          getRestaurantQuery({
+            restaurantIds: ids,
+            companyAccount: null,
+            params: {
+              memberAmount,
+            },
+          }),
+        ),
+      ),
+    ),
+  );
 
-  const restaurantsQuery = getRestaurantQuery({
-    restaurantIds: restaurantIdList,
-    companyAccount: null,
-    params: {
-      memberAmount,
-    },
+  // * map restaurant with menu data
+  const restaurants = combineMenusWithRestaurantData({
+    menus: allMenus,
+    restaurants: restaurantsResponse,
+    shouldCalculateDistance,
+    deliveryOrigin,
   });
-
-  const restaurantsResponse = await adminQueryListings(restaurantsQuery);
-
-  const restaurants = allMenus.reduce((result: any, menu: TListing) => {
-    const { restaurantId } = Listing(menu).getMetadata();
-    const restaurantInfo = restaurantsResponse.find((restaurant: TListing) => {
-      const restaurantGetter = Listing(restaurant);
-
-      if (shouldCalculateDistance) {
-        const { geolocation: restaurantOrigin } =
-          restaurantGetter.getAttributes();
-
-        const distanceToDeliveryPlace = calculateDistance(
-          deliveryOrigin,
-          restaurantOrigin,
-        );
-        const isValidRestaurant =
-          distanceToDeliveryPlace <=
-          Number(maxKilometerFromRestaurantToDeliveryAddressForBooker);
-
-        return isValidRestaurant && restaurantGetter.getId() === restaurantId;
-      }
-
-      return restaurantGetter.getId() === restaurantId;
-    });
-
-    if (!restaurantInfo) return result;
-
-    return result.concat({
-      menu,
-      restaurantInfo,
-    });
-  }, []);
 
   if (restaurants.length > 0) {
     const randomNumber = Math.floor(Math.random() * (restaurants.length - 1));
@@ -195,6 +252,8 @@ export const recommendRestaurantForSpecificDay = async ({
       menu,
       restaurant: randomRestaurant,
       timestamp,
+      nutritions,
+      packagePerMember,
     });
 
     const newRestaurantData = {
@@ -219,7 +278,15 @@ export const recommendRestaurantForSpecificDay = async ({
     return newOrderDetail;
   }
 
-  return orderDetail;
+  const newOrderDetail = {
+    ...orderDetail,
+    [timestamp]: {
+      ...orderDetail[timestamp],
+      hasNoRestaurants: true,
+    },
+  };
+
+  return newOrderDetail;
 };
 
 export const recommendRestaurants = async ({
@@ -234,11 +301,14 @@ export const recommendRestaurants = async ({
   let deliveryOrigin: any;
   const orderDetail: TObject = {};
   let memberAmount: any;
+  let nutritions: string[] = [];
+  let packagePerMember = 0;
   let totalDates: number[] = [];
   let isNormalOrder = false;
   let dayInWeek: string[] = [];
   const order = await fetchListing(orderId as string);
 
+  // * recommend from order data
   if (isEmpty(recommendParams)) {
     const {
       dayInWeek: dayInWeekInOrder = [],
@@ -248,6 +318,8 @@ export const recommendRestaurants = async ({
       companyId,
       deliveryAddress = {},
       memberAmount: memberAmountInOrder = 0,
+      packagePerMember: packagePerMemberFromOrder,
+      nutritions: nutritionFormOrder = [],
     } = Listing(order as TListing).getMetadata();
 
     const orderDeliveryOriginMaybe = deliveryAddress?.origin;
@@ -260,7 +332,10 @@ export const recommendRestaurants = async ({
     deliveryOrigin = orderDeliveryOriginMaybe || companyOriginMaybe;
     totalDates = renderDateRange(startDate, endDate);
     dayInWeek = dayInWeekInOrder;
+    nutritions = nutritionFormOrder;
+    packagePerMember = packagePerMemberFromOrder;
   } else {
+    // * recommend from draft order data (recommend params)
     const {
       memberAmount: memberAmountFromParams = 0,
       deliveryOrigin: deliveryOriginFromParams,
@@ -268,16 +343,25 @@ export const recommendRestaurants = async ({
       startDate: startDateFromParams,
       endDate: endDateFromParams,
       isNormalOrder: isNormalOrderFromParams,
+      nutrition: nutritionsFormParams,
+      packagePerMember: packagePerMemberFromParams,
     } = recommendParams;
+    packagePerMember = packagePerMemberFromParams;
 
     isNormalOrder = isNormalOrderFromParams;
     deliveryOrigin = deliveryOriginFromParams;
     memberAmount = memberAmountFromParams;
     dayInWeek = dayInWeekFromParams;
     totalDates = renderDateRange(startDateFromParams, endDateFromParams);
+    nutritions = nutritionsFormParams;
+    packagePerMember = packagePerMemberFromParams;
   }
+
+  const lineItemsMaybe = isNormalOrder ? { lineItems: [] } : {};
+
   await Promise.all(
     totalDates.map(async (timestamp) => {
+      // * query all menus
       const menuQueryParams = {
         timestamp,
       };
@@ -293,57 +377,42 @@ export const recommendRestaurants = async ({
       const allMenus = await queryAllListings({
         query: menuQuery,
       });
-      const restaurantIdList = uniq<any>(
-        allMenus.map((menu: TListing) => {
-          const { restaurantId } = Listing(menu).getMetadata();
 
-          return restaurantId;
-        }),
-      ).slice(0, 100);
+      // * query all restaurant
+      const restaurantIdList = chunk(
+        uniq<string>(
+          allMenus.map((menu: TListing) => {
+            const { restaurantId } = Listing(menu).getMetadata();
 
-      const restaurantsQuery = getRestaurantQuery({
-        restaurantIds: restaurantIdList,
-        companyAccount: null,
-        params: {
-          memberAmount,
-        },
+            return restaurantId;
+          }),
+        ),
+        100,
+      );
+      const restaurantsResponse = flatten(
+        await Promise.all(
+          restaurantIdList.map(async (ids) =>
+            adminQueryListings(
+              getRestaurantQuery({
+                restaurantIds: ids,
+                companyAccount: null,
+                params: {
+                  memberAmount,
+                },
+              }),
+            ),
+          ),
+        ),
+      );
+
+      // * map restaurant with menu data
+      const restaurants = combineMenusWithRestaurantData({
+        menus: allMenus,
+        restaurants: restaurantsResponse,
+        shouldCalculateDistance,
+        deliveryOrigin,
       });
 
-      const listings = await adminQueryListings(restaurantsQuery);
-
-      const restaurants = allMenus.reduce((result: any, menu: TListing) => {
-        const { restaurantId } = Listing(menu).getMetadata();
-        const restaurantInfo = listings.find((restaurant: TListing) => {
-          const restaurantGetter = Listing(restaurant);
-
-          if (shouldCalculateDistance) {
-            const { geolocation: restaurantOrigin } =
-              restaurantGetter.getAttributes();
-
-            const distanceToDeliveryPlace = calculateDistance(
-              deliveryOrigin,
-              restaurantOrigin,
-            );
-            const isValidRestaurant =
-              distanceToDeliveryPlace <=
-              Number(maxKilometerFromRestaurantToDeliveryAddressForBooker);
-
-            return (
-              isValidRestaurant && restaurantGetter.getId() === restaurantId
-            );
-          }
-
-          return restaurantGetter.getId() === restaurantId;
-        });
-        if (!restaurantInfo) return result;
-
-        return result.concat({
-          menu,
-          restaurantInfo,
-        });
-      }, []);
-
-      const lineItemsMaybe = isNormalOrder ? { lineItems: [] } : {};
       if (restaurants.length > 0) {
         const randomRestaurant =
           restaurants[Math.floor(Math.random() * (restaurants.length - 1))];
@@ -362,6 +431,8 @@ export const recommendRestaurants = async ({
             menu: randomRestaurant?.menu,
             restaurant: randomRestaurant?.restaurantInfo,
             timestamp,
+            nutritions,
+            packagePerMember,
           });
 
           orderDetail[timestamp] = {
