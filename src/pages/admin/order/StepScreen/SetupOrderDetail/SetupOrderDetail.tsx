@@ -257,7 +257,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
   const { lastName: clientLastName, firstName: clientFirstName } =
     User(selectedCompany).getProfile();
   const partnerName = `${clientLastName} ${clientFirstName}`;
-  const resourcesForCalender = useMemo(
+  const eventsForCalender = useMemo(
     () =>
       isEditFlow
         ? normalizePlanDetailsToEvent(
@@ -937,7 +937,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
             <div className={css.calendarContainer}>
               <CalendarDashboard
                 anchorDate={suitableStartDate}
-                events={resourcesForCalender}
+                events={eventsForCalender}
                 renderEvent={renderEvent}
                 companyLogo="Company"
                 startDate={new Date(draftStartDate || startDate)}
