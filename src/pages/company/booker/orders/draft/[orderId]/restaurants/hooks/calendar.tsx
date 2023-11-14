@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useCallback, useMemo } from 'react';
 import { shallowEqual } from 'react-redux';
 import { DateTime } from 'luxon';
@@ -11,10 +12,11 @@ import {
 } from '@redux/slices/Order.slice';
 import { convertWeekDay, renderDateRange } from '@src/utils/dates';
 import { Listing } from '@utils/data';
-import type { TListing } from '@utils/types';
+import type { TListing, TObject } from '@utils/types';
 
 import { BookerDraftOrderPageActions } from '../../BookerDraftOrderPage.slice';
 import Toolbar from '../../components/Toolbar/Toolbar';
+import { BookerSelectRestaurantActions } from '../BookerSelectRestaurant.slice';
 
 export const useGetCalendarExtraResources = ({
   order,
@@ -36,11 +38,12 @@ export const useGetCalendarExtraResources = ({
     (state) => state.Order.orderDetail,
     shallowEqual,
   );
-
   const fetchOrderDetailInProgress = useAppSelector(
     (state) => state.Order.fetchOrderDetailInProgress,
   );
-
+  const planDetail = useAppSelector(
+    (state) => state.BookerSelectRestaurant.planDetail,
+  );
   const updatePlanDetailInprogress = useAppSelector(
     (state) => state.Order.updateOrderDetailInProgress,
   );
@@ -100,17 +103,28 @@ export const useGetCalendarExtraResources = ({
   );
 
   const onRecommendRestaurantForSpecificDay = useCallback(
-    (date: number) => {
+    async (date: number) => {
       dispatch(
         BookerDraftOrderPageActions.selectCalendarDate(
           DateTime.fromMillis(date).toJSDate(),
         ),
       );
-      dispatch(
+      const { payload } = await dispatch(
         orderAsyncActions.recommendRestaurantForSpecificDay({ dateTime: date }),
       );
+      const newPlanDetail = {
+        ...planDetail,
+        attributes: {
+          ...planDetail?.attributes,
+          metadata: {
+            ...planDetail?.attributes.metadata,
+            orderDetail: (payload as TObject).orderDetail,
+          },
+        },
+      };
+      dispatch(BookerSelectRestaurantActions.setPlanDetail(newPlanDetail));
     },
-    [dispatch],
+    [dispatch, JSON.stringify(planDetail)],
   );
 
   const onRecommendRestaurantForSpecificDayInProgress = useCallback(

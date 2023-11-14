@@ -13,6 +13,7 @@ import type { TMenuQueryParams } from '@helpers/listingSearchQuery';
 import { getMenuQuery, getRestaurantQuery } from '@helpers/listingSearchQuery';
 import { calculateDistance } from '@helpers/mapHelpers';
 import { createAsyncThunk } from '@redux/redux.helper';
+// eslint-disable-next-line import/no-cycle
 import { orderAsyncActions } from '@redux/slices/Order.slice';
 import { CompanyPermissions } from '@src/types/UserPermission';
 import { denormalisedResponseEntities, Listing } from '@utils/data';
@@ -483,6 +484,9 @@ const BookerSelectRestaurantSlice = createSlice({
     },
     setSelectedRestaurantId: (state, action) => {
       state.selectedRestaurantId = action.payload;
+    },
+    setPlanDetail: (state, { payload }) => {
+      state.planDetail = payload;
     },
   },
   extraReducers: (builder) => {
