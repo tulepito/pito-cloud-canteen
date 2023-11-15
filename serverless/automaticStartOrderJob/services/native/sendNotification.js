@@ -1,7 +1,7 @@
 const { fetchUser } = require('../../utils/integrationHelper');
 const { User, Listing } = require('../../utils/data');
 const { sendNotification } = require('./oneSignal');
-const { ENativeNotificationType } = require('./config');
+const { NATIVE_NOTIFICATION_TYPES } = require('./config');
 
 const BASE_URL = process.env.CANONICAL_ROOT_URL;
 
@@ -21,7 +21,26 @@ const sendNativeNotification = async (notificationType, notificationParams) => {
   if (oneSignalUserIds.length === 0) return;
 
   switch (notificationType) {
-    case ENativeNotificationType.BookerTransitOrderStateToInProgress:
+    case NATIVE_NOTIFICATION_TYPES.AdminTransitSubOrderToCanceled:
+      {
+        const { planId, subOrderDate } = notificationParams;
+        const url = `${BASE_URL}/participant/orders/?planId=${planId}&timestamp=${subOrderDate}&viewMode=week`;
+
+        oneSignalUserIds.forEach((oneSignalUserId) => {
+          sendNotification({
+            title: 'Opps! Ngày ăn bị hủy!',
+            content: `😢 ${firstName} ơi, rất tiếc phải thông báo ngày ăn ${formatTimestamp(
+              +subOrderDate,
+              'dd/MM',
+            )} đã bị hủy`,
+            url,
+            oneSignalUserId,
+          });
+        });
+      }
+      break;
+
+    case NATIVE_NOTIFICATION_TYPES.BookerTransitOrderStateToInProgress:
       {
         const { order } = notificationParams;
         const orderListing = Listing(order);
@@ -35,6 +54,27 @@ const sendNativeNotification = async (notificationType, notificationParams) => {
             content: `Tuần ăn ${formatTimestamp(+startDate)}-${formatTimestamp(
               +endDate,
             )} của ${firstName} được đặt thành công`,
+            url,
+            oneSignalUserId,
+          });
+        });
+      }
+      break;
+
+    case NATIVE_NOTIFICATION_TYPES.TransitOrderStateToCanceled:
+      {
+        const { order, planId } = notificationParams;
+        const orderListing = Listing(order);
+        const { startDate, endDate } = orderListing.getMetadata();
+        const url = `${BASE_URL}/participant/orders/?planId=${planId}&timestamp=${startDate}&viewMode=week`;
+
+        oneSignalUserIds.forEach((oneSignalUserId) => {
+          sendNotification({
+            title: 'Opps! Tuần ăn bị hủy!',
+            content: `😢 ${firstName} ơi, rất tiếc phải thông báo tuần ăn ${formatTimestamp(
+              +startDate,
+              'dd/MM',
+            )}-${formatTimestamp(+endDate, 'dd/MM')} đã bị hủy`,
             url,
             oneSignalUserId,
           });
