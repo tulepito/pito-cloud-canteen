@@ -320,6 +320,7 @@
   "CreateOrderWizard.clientSelectLabel": "Chọn khách hàng",
   "CreateOrderWizard.createMealPlanLabel": "Tạo kế hoạch bữa ăn",
   "CreateOrderWizard.mealPlanSetupLabel": "Thiết lập kế hoạch bữa ăn",
+  "CreateOrderWizard.foodQuantityLabel": "Chọn số lượng món",
   "CreateOrderWizard.reviewLabel": "Review và tạo đơn",
   "CreateOrderWizard.serviceFeeAndNoteLabel": "Phí dịch vụ và dặn dò",
   "CreatePartnerFood.title": "Thêm món ăn",

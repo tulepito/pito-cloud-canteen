@@ -173,8 +173,8 @@ export const useGetCalendarComponentProps = ({
 }) => {
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const bookerPublishOrderInProgress = useAppSelector(
-    (state) => state.Order.bookerPublishOrderInProgress,
+  const publishOrderInProgress = useAppSelector(
+    (state) => state.Order.publishOrderInProgress,
   );
   const onRecommendRestaurantInProgress = useAppSelector(
     (state) => state.Order.onRecommendRestaurantInProgress,
@@ -215,7 +215,7 @@ export const useGetCalendarComponentProps = ({
         startDate={startDate.getTime()}
         endDate={endDate.getTime()}
         finishDisabled={isFinishOrderDisabled}
-        finishInProgress={bookerPublishOrderInProgress}
+        finishInProgress={publishOrderInProgress}
         onFinishOrder={handleFinishOrder}
         onRecommendRestaurantInProgress={onRecommendRestaurantInProgress}
         onRecommendNewRestaurants={onRecommendNewRestaurants}
@@ -226,7 +226,7 @@ export const useGetCalendarComponentProps = ({
       startDate,
       endDate,
       isFinishOrderDisabled,
-      bookerPublishOrderInProgress,
+      publishOrderInProgress,
       onRecommendRestaurantInProgress,
     ],
   );

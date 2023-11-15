@@ -22,8 +22,8 @@ import {
   adminNotifyUserPickingOrderChangesApi,
   bookerCancelPendingApprovalOrderApi,
   bookerDeleteDraftOrderApi,
-  bookerPublishOrderApi,
   createBookerOrderApi,
+  publishOrderApi,
   queryOrdersApi,
   recommendRestaurantApi,
   reorderApi,
@@ -107,8 +107,8 @@ type TOrderInitialState = {
   fetchOrderDetailInProgress: boolean;
   fetchOrderDetailError: any;
 
-  bookerPublishOrderInProgress: boolean;
-  bookerPublishOrderError: any;
+  publishOrderInProgress: boolean;
+  publishOrderError: any;
 
   // Manage Orders Page
   queryParams: TObject;
@@ -142,7 +142,8 @@ type TOrderInitialState = {
   step4SubmitInProgress: boolean;
   currentSelectedMenuId: string;
 
-  canNotGoToStep4: boolean;
+  canNotGoAfterOderDetail: boolean;
+  canNotGoAfterFoodQuantity: boolean;
   onRecommendRestaurantInProgress: boolean;
   onRescommendRestaurantForSpecificDateInProgress: boolean;
   onRescommendRestaurantForSpecificDateError: any;
@@ -218,8 +219,8 @@ const initialState: TOrderInitialState = {
   fetchOrderDetailInProgress: false,
   fetchOrderDetailError: null,
 
-  bookerPublishOrderInProgress: false,
-  bookerPublishOrderError: null,
+  publishOrderInProgress: false,
+  publishOrderError: null,
 
   // Manage Orders
   queryParams: {},
@@ -259,7 +260,8 @@ const initialState: TOrderInitialState = {
   step2SubmitInProgress: false,
   step4SubmitInProgress: false,
   currentSelectedMenuId: '',
-  canNotGoToStep4: false,
+  canNotGoAfterOderDetail: false,
+  canNotGoAfterFoodQuantity: false,
   onRecommendRestaurantInProgress: false,
 
   onRescommendRestaurantForSpecificDateInProgress: false,
@@ -899,10 +901,10 @@ const cancelPendingApprovalOrder = createAsyncThunk(
   },
 );
 
-const bookerPublishOrder = createAsyncThunk(
-  'app/Order/BOOKER_PUBLISH_ORDER',
+const publishOrder = createAsyncThunk(
+  'app/Order/PUBLISH_ORDER',
   async ({ orderId }: TObject) => {
-    await bookerPublishOrderApi(orderId as string);
+    await publishOrderApi(orderId as string);
   },
   {
     serializeError: storableError,
@@ -1169,7 +1171,7 @@ export const orderAsyncActions = {
   queryCompanyOrders,
   fetchPlanDetail,
   updatePlanDetail,
-  bookerPublishOrder,
+  publishOrder,
   cancelPendingApprovalOrder,
   fetchRestaurantCoverImages,
   recommendRestaurants,
@@ -1282,6 +1284,9 @@ const orderSlice = createSlice({
     resetOrder: (state) => {
       state.order = null;
     },
+    setOrderDetail: (state, { payload }) => {
+      state.orderDetail = payload;
+    },
     changeStep2SubmitStatus: (state, { payload }) => ({
       ...state,
       step2SubmitInProgress: payload,
@@ -1309,9 +1314,13 @@ const orderSlice = createSlice({
       ...state,
       currentSelectedMenuId: payload,
     }),
-    setCanNotGoToStep4: (state, { payload }) => ({
+    setCanNotGoAfterOderDetail: (state, { payload }) => ({
       ...state,
-      canNotGoToStep4: payload,
+      canNotGoAfterOderDetail: payload,
+    }),
+    setCanNotGoAfterFoodQuantity: (state, { payload }) => ({
+      ...state,
+      canNotGoAfterFoodQuantity: payload,
     }),
     setOnRecommendRestaurantInProcess: (state, { payload }) => {
       state.onRecommendRestaurantInProgress = payload;
@@ -1513,17 +1522,17 @@ const orderSlice = createSlice({
         updateOrderInProgress: false,
         updateOrderError: error.message,
       }))
-      /* =============== bookerPublishOrder =============== */
-      .addCase(bookerPublishOrder.pending, (state) => {
-        state.bookerPublishOrderError = null;
-        state.bookerPublishOrderInProgress = true;
+      /* =============== publishOrder =============== */
+      .addCase(publishOrder.pending, (state) => {
+        state.publishOrderError = null;
+        state.publishOrderInProgress = true;
       })
-      .addCase(bookerPublishOrder.fulfilled, (state) => {
-        state.bookerPublishOrderInProgress = false;
+      .addCase(publishOrder.fulfilled, (state) => {
+        state.publishOrderInProgress = false;
       })
-      .addCase(bookerPublishOrder.rejected, (state, { payload }) => {
-        state.bookerPublishOrderInProgress = false;
-        state.bookerPublishOrderError = payload;
+      .addCase(publishOrder.rejected, (state, { payload }) => {
+        state.publishOrderInProgress = false;
+        state.publishOrderError = payload;
       })
 
       .addCase(fetchRestaurantCoverImages.pending, (state) => ({
@@ -1742,6 +1751,7 @@ const orderSlice = createSlice({
 });
 
 export const {
+  setOrderDetail,
   addCompanyClient,
   updateDraftMealPlan,
   removeDraftOrder,
@@ -1757,7 +1767,8 @@ export const {
   resetCompanyOrdersStates,
   changeStep4SubmitStatus,
   addCurrentSelectedMenuId,
-  setCanNotGoToStep4,
+  setCanNotGoAfterOderDetail,
+  setCanNotGoAfterFoodQuantity,
   setOnRecommendRestaurantInProcess,
   saveDraftEditOrder,
   clearDraftEditOrder,

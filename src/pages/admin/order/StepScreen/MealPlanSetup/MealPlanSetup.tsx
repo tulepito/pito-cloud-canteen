@@ -17,6 +17,7 @@ import {
   changeStep2SubmitStatus,
   orderAsyncActions,
   saveDraftEditOrder,
+  setCanNotGoAfterOderDetail,
 } from '@redux/slices/Order.slice';
 import { EOrderDraftStates, EOrderStates, EOrderType } from '@src/utils/enums';
 import { Listing, User } from '@utils/data';
@@ -398,6 +399,11 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
       dayInWeek: selectedDayInWeek,
     };
     dispatch(changeStep2SubmitStatus(true));
+
+    if (!isEditFlow) {
+      dispatch(setCanNotGoAfterOderDetail(true));
+    }
+
     const { payload }: { payload: any } = await dispatch(
       orderAsyncActions.updateOrder({ generalInfo }),
     );

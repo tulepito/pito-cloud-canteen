@@ -129,7 +129,7 @@ export const bookerMarkInprogressPlanViewedApi = ({
 };
 
 // Allow picking for order
-export const bookerPublishOrderApi = (orderId: string) => {
+export const publishOrderApi = (orderId: string) => {
   return postApi(`/orders/${orderId}/publish-order`);
 };
 

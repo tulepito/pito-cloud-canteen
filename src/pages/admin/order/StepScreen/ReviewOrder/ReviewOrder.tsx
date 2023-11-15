@@ -558,11 +558,11 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
     notes = {},
     orderType = EOrderType.group,
   } = Listing(order as TListing).getMetadata();
+  const isNormalOrder = orderType === EOrderType.normal;
   const planId = plans.length > 0 ? plans[0] : undefined;
   const isPendingApprovalOrder =
     orderState === EOrderDraftStates.pendingApproval;
   const isPickingOrder = orderState === EOrderStates.picking;
-  const isNormalOrder = orderType === EOrderType.normal;
   const { address } = deliveryAddress || {};
 
   const {
@@ -864,6 +864,14 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
         await dispatch(
           AdminManageOrderThunks.requestApprovalOrder({ orderId }),
         );
+
+        if (isNormalOrder) {
+          await dispatch(
+            orderAsyncActions.publishOrder({
+              orderId,
+            }),
+          );
+        }
       }
 
       const { error } = (await dispatch(

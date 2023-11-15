@@ -151,7 +151,7 @@ function BookerDraftOrderPage() {
 
   const handleFinishOrder = async () => {
     const { meta } = await dispatch(
-      orderAsyncActions.bookerPublishOrder({ orderId, planId }),
+      orderAsyncActions.publishOrder({ orderId, planId }),
     );
 
     if (meta.requestStatus !== 'rejected') {

@@ -62,6 +62,7 @@ import type {
   TUser,
 } from '@utils/types';
 
+import { setOrderDetail } from './Order.slice';
 import { SystemAttributesThunks } from './systemAttributes.slice';
 
 export const QUERY_SUB_ORDER_CHANGES_HISTORY_PER_PAGE = 3;
@@ -971,13 +972,16 @@ const updatePlanOrderDetail = createAsyncThunk(
       planId,
       orderDetail,
     }: { orderId: string; planId: string; orderDetail: TObject },
-    { fulfillWithValue, rejectWithValue },
+    { fulfillWithValue, rejectWithValue, dispatch },
   ) => {
     try {
       updatePlanDetailsApi(orderId, {
         orderDetail,
         planId,
       });
+
+      // sync the order detail to order reducer
+      dispatch(setOrderDetail(orderDetail));
 
       return fulfillWithValue(orderDetail);
     } catch (error) {

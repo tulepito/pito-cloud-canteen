@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import classNames from 'classnames';
@@ -12,6 +12,8 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import {
   orderAsyncActions,
   saveDraftEditOrder,
+  setCanNotGoAfterFoodQuantity,
+  setCanNotGoAfterOderDetail,
 } from '@redux/slices/Order.slice';
 import { Listing, User } from '@src/utils/data';
 import type { TListing } from '@src/utils/types';
@@ -76,6 +78,7 @@ const ServiceFeesAndNotes: React.FC<ServiceFeesAndNotesProps> = (props) => {
   const updateOrderInProgress = useAppSelector(
     (state) => state.Order.updateOrderInProgress,
   );
+
   const currentClient = useAppSelector(
     (state) => state.Order.selectedCompany,
     shallowEqual,
@@ -98,6 +101,7 @@ const ServiceFeesAndNotes: React.FC<ServiceFeesAndNotesProps> = (props) => {
     notes,
     serviceFees,
     memberAmount = 0,
+    plans = [],
     hasSpecificPCCFee: orderHasSpecificPCCFee = false,
     specificPCCFee: orderSpecificPCCFee,
   } = orderListing.getMetadata();
@@ -133,6 +137,16 @@ const ServiceFeesAndNotes: React.FC<ServiceFeesAndNotesProps> = (props) => {
     label: Listing(restaurant).getAttributes().title,
     key: Listing(restaurant).getId(),
   }));
+
+  useEffect(() => {
+    if (isEmpty(orderDetail)) {
+      dispatch(orderAsyncActions.fetchOrderDetail(plans));
+    }
+  }, [JSON.stringify(order), JSON.stringify(orderDetail)]);
+
+  useEffect(() => {
+    dispatch(orderAsyncActions.fetchOrderRestaurants({ isEditFlow: false }));
+  }, [JSON.stringify(orderDetail)]);
 
   const handleNoteFormSubmit = async (values: any) => {
     const newNotes = Object.keys(values).reduce((result, note) => {
@@ -226,6 +240,8 @@ const ServiceFeesAndNotes: React.FC<ServiceFeesAndNotesProps> = (props) => {
   };
 
   const handleNextTabInEditMode = async () => {
+    dispatch(setCanNotGoAfterOderDetail(false));
+    dispatch(setCanNotGoAfterFoodQuantity(false));
     await handleSubmitAllForms();
     nextTab();
   };

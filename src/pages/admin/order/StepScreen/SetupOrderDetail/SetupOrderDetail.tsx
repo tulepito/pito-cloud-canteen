@@ -26,6 +26,7 @@ import {
   findSuitableStartDate,
   getRestaurantListFromOrderDetail,
   getSelectedRestaurantAndFoodList,
+  getUpdateLineItems,
   mergeRecommendOrderDetailWithCurrentOrderDetail,
 } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
@@ -38,7 +39,7 @@ import {
   saveDraftEditOrder,
   selectCalendarDate,
   selectRestaurant,
-  setCanNotGoToStep4,
+  setCanNotGoAfterOderDetail,
   setOnRecommendRestaurantInProcess,
   unSelectRestaurant,
 } from '@redux/slices/Order.slice';
@@ -234,7 +235,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
           orderDetail,
         });
 
-    return temp instanceof Date ? temp : new Date(temp!);
+    return temp instanceof Date ? temp : temp ? new Date(temp) : new Date();
   }, [
     isEditFlow,
     selectedDate,
@@ -297,6 +298,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
 
   const handleSubmitRestaurant = async (values: TObject) => {
     const { restaurant, selectedFoodList } = values;
+    const foodIds = Object.keys(selectedFoodList);
     const subOrderDate = (selectedDate as Date).getTime();
     const restaurantData = {
       restaurant: {
@@ -380,12 +382,15 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
         }),
       );
     } else {
-      dispatch(setCanNotGoToStep4(true));
+      dispatch(setCanNotGoAfterOderDetail(true));
       await dispatch(
         orderAsyncActions.updatePlanDetail({
           orderId,
           orderDetail: {
-            [subOrderDate]: restaurantData,
+            [subOrderDate]: {
+              ...restaurantData,
+              lineItems: getUpdateLineItems(foodList, foodIds),
+            },
           },
           planId,
           updateMode: 'merge',
@@ -535,7 +540,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
 
   // TODO: handle next tab and next to review tab clicks
   const handleNextTabClick = () => {
-    dispatch(setCanNotGoToStep4(false));
+    dispatch(setCanNotGoAfterOderDetail(false));
 
     if (shouldShowConfirmChangedModal) {
       confirmChangeOrderDetailControl.setTrue();
@@ -635,8 +640,9 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
 
   // TODO: handle selecting food from food modal
   const handleSelectFood = async (values: TSelectFoodFormValues) => {
-    dispatch(setCanNotGoToStep4(true));
+    dispatch(setCanNotGoAfterOderDetail(true));
     const { food: foodIds } = values;
+    const updateLineItems = getUpdateLineItems(foodList, foodIds);
 
     const { submitRestaurantData, submitFoodListData } =
       getSelectedRestaurantAndFoodList({
@@ -648,6 +654,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     await handleSubmitRestaurant({
       restaurant: { ...submitRestaurantData, menuId: currentSelectedMenuId },
       selectedFoodList: submitFoodListData,
+      lineItems: updateLineItems,
     });
     closePickFoodModal();
   };
@@ -693,7 +700,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
         }),
       );
     } else {
-      dispatch(setCanNotGoToStep4(true));
+      dispatch(setCanNotGoAfterOderDetail(true));
       dispatch(
         orderAsyncActions.updatePlanDetail({
           orderId,
@@ -787,6 +794,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
             [curr]: {
               ...orderDetailToHandle![curr],
               restaurant: orderDetailToHandle![date]?.restaurant || {},
+              lineItems: orderDetailToHandle![date]?.lineItems || [],
             },
           };
         }
@@ -801,7 +809,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
           }),
         );
       } else {
-        dispatch(setCanNotGoToStep4(true));
+        dispatch(setCanNotGoAfterOderDetail(true));
 
         await dispatch(
           orderAsyncActions.updatePlanDetail({

@@ -665,6 +665,38 @@ export const getPickFoodParticipants = (orderDetail: TObject) => {
   return shouldSendNativeNotificationParticipantIdList;
 };
 
+export const getUpdateLineItems = (foodList: any[], foodIds: string[]) => {
+  const updateFoodList = foodIds.reduce((acc: any, foodId: string) => {
+    const food = foodList?.find((item) => item.id?.uuid === foodId);
+    if (food) {
+      const foodListingGetter = Listing(food).getAttributes();
+
+      acc[foodId] = {
+        foodName: foodListingGetter.title,
+        foodPrice: foodListingGetter.price?.amount || 0,
+        foodUnit: foodListingGetter.publicData?.unit || '',
+      };
+    }
+
+    return acc;
+  }, {});
+
+  const updateLineItems = Object.entries<{
+    foodName: string;
+    foodPrice: number;
+  }>(updateFoodList).map(([foodId, { foodName, foodPrice }]) => {
+    return {
+      id: foodId,
+      name: foodName,
+      unitPrice: foodPrice,
+      price: foodPrice,
+      quantity: 1,
+    };
+  });
+
+  return updateLineItems;
+};
+
 export const preparePickingOrderChangeNotificationData = ({
   oldOrderDetail,
   newOrderDetail,

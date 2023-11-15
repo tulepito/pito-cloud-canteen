@@ -65,8 +65,12 @@ export const usePrepareManageLineItemsSectionData = (
   );
 
   useEffect(() => {
-    if (indexOfTimestamp > -1 && dateList.length > 0) {
-      setCurrentViewDate(dateList[indexOfTimestamp]);
+    if (!isEmpty(dateList)) {
+      if (indexOfTimestamp <= 0) {
+        setCurrentViewDate(dateList[0]);
+      } else {
+        setCurrentViewDate(dateList[indexOfTimestamp]);
+      }
     }
   }, [indexOfTimestamp, JSON.stringify(dateList)]);
 

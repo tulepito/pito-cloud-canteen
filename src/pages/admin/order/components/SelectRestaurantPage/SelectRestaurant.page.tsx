@@ -7,7 +7,10 @@ import { DateTime } from 'luxon';
 import Badge from '@components/Badge/Badge';
 import IconArrowHead from '@components/Icons/IconArrowHead/IconArrowHead';
 import Pagination from '@components/Pagination/Pagination';
-import { getSelectedRestaurantAndFoodList } from '@helpers/orderHelper';
+import {
+  getSelectedRestaurantAndFoodList,
+  getUpdateLineItems,
+} from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { selectRestaurantPageThunks } from '@redux/slices/SelectRestaurantPage.slice';
@@ -152,6 +155,8 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
         currentRestaurant,
       });
 
+    const updateLineItems = getUpdateLineItems(foodList, foodIds);
+
     await onSubmitRestaurant({
       restaurant: {
         ...submitRestaurantData,
@@ -161,6 +166,7 @@ const SelectRestaurantPage: React.FC<TSelectRestaurantPageProps> = ({
         ).menu.id.uuid,
       },
       selectedFoodList: submitFoodListData,
+      lineItems: updateLineItems,
     });
     setModalOpen(false);
   };
