@@ -39,7 +39,7 @@ export const calculateOverviewInformation = (
         vatPercentage: currentOrderVATPercentage,
       });
       const partnerQuotation = calculatePriceQuotationPartner({
-        quotation: quotation[restaurantListingId].quotation,
+        quotation: quotation[restaurantListingId]?.quotation,
         serviceFeePercentage: serviceFees[restaurantListingId],
         currentOrderVATPercentage: vatPercentage,
         shouldSkipVAT: partnerVATSetting === EPartnerVATSetting.direct,
@@ -107,7 +107,7 @@ export const splitSubOrders = (
           vatPercentage: currentOrderVATPercentage,
         });
         const partnerQuotation = calculatePriceQuotationPartner({
-          quotation: quotation[restaurantListingId].quotation,
+          quotation: quotation[restaurantListingId]?.quotation,
           serviceFeePercentage: serviceFees[restaurantListingId],
           currentOrderVATPercentage: vatPercentage,
           shouldSkipVAT: partnerVATSetting === EPartnerVATSetting.direct,
