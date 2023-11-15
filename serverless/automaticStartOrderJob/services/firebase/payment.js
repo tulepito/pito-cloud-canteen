@@ -10,7 +10,7 @@ const {
 
 const { FIREBASE_PAYMENT_RECORD_COLLECTION_NAME } = process.env;
 
-export const createPaymentRecordOnFirebase = async (type, params) => {
+const createPaymentRecordOnFirebase = async (type, params) => {
   const paymentCreatedAt = new Date();
   try {
     const data = {
@@ -38,7 +38,7 @@ export const createPaymentRecordOnFirebase = async (type, params) => {
   }
 };
 
-export const queryPaymentRecordOnFirebase = async (query) => {
+const queryPaymentRecordOnFirebase = async (query) => {
   try {
     const { paymentType, partnerId, orderId, subOrderDate, isHideFromHistory } =
       query;
@@ -83,7 +83,7 @@ export const queryPaymentRecordOnFirebase = async (query) => {
   }
 };
 
-export const queryAllPartnerPaymentRecordsOnFirebase = async (query = {}) => {
+const queryAllPartnerPaymentRecordsOnFirebase = async (query = {}) => {
   try {
     const { partnerId } = query;
     const paymentRecords = await queryAllCollectionData({
@@ -108,7 +108,7 @@ export const queryAllPartnerPaymentRecordsOnFirebase = async (query = {}) => {
   }
 };
 
-export const queryAllCompanyPaymentRecordsOnFirebase = async (query = {}) => {
+const queryAllCompanyPaymentRecordsOnFirebase = async (query = {}) => {
   const { companyId } = query;
 
   return queryAllCollectionData({
@@ -128,7 +128,7 @@ export const queryAllCompanyPaymentRecordsOnFirebase = async (query = {}) => {
   });
 };
 
-export const getTotalRecordsOnFirebase = async (query) => {
+const getTotalRecordsOnFirebase = async (query) => {
   try {
     const totalRecords = await getCollectionCount({
       collectionName: FIREBASE_PAYMENT_RECORD_COLLECTION_NAME,
@@ -141,7 +141,7 @@ export const getTotalRecordsOnFirebase = async (query) => {
   }
 };
 
-export const deletePaymentRecordByIdOnFirebase = async (paymentRecordId) => {
+const deletePaymentRecordByIdOnFirebase = async (paymentRecordId) => {
   try {
     await deleteDocument(
       paymentRecordId,
@@ -152,7 +152,7 @@ export const deletePaymentRecordByIdOnFirebase = async (paymentRecordId) => {
   }
 };
 
-export const queryClientPaymentRecordsOnFirebase = async (query) => {
+const queryClientPaymentRecordsOnFirebase = async (query) => {
   try {
     const { orderIds } = query;
     const paymentQuery = {
@@ -178,10 +178,7 @@ export const queryClientPaymentRecordsOnFirebase = async (query) => {
   }
 };
 
-export const updatePaymentRecordOnFirebase = async (
-  paymentRecordId,
-  params,
-) => {
+const updatePaymentRecordOnFirebase = async (paymentRecordId, params) => {
   await updateCollectionDoc(
     paymentRecordId,
     params,
@@ -197,4 +194,15 @@ export const updatePaymentRecordOnFirebase = async (
     id: paymentRecordId,
     ...paymentRecordData,
   };
+};
+
+module.exports = {
+  createPaymentRecordOnFirebase,
+  queryPaymentRecordOnFirebase,
+  queryAllPartnerPaymentRecordsOnFirebase,
+  updatePaymentRecordOnFirebase,
+  getTotalRecordsOnFirebase,
+  queryAllCompanyPaymentRecordsOnFirebase,
+  queryClientPaymentRecordsOnFirebase,
+  deletePaymentRecordByIdOnFirebase,
 };

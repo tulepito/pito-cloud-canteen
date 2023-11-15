@@ -1,6 +1,5 @@
+const config = require('../../../utils/config');
 const { formatTimestamp } = require('../../helpers/date');
-
-const BASE_URL = process.env.CANONICAL_ROOT_URL;
 
 const partnerSubOrderCanceledSubject = (subOrderDate) =>
   `Ngày ăn ${subOrderDate} bị huỷ`;
@@ -17,7 +16,7 @@ const partnerSubOrderCanceled = ({
   const { companyName } = companyUser.getPublicData();
 
   const formattedSubOrderDate = formatTimestamp(timestamp);
-  const viewOrderDetailUrl = `${BASE_URL}/partner/orders/${orderId}_${timestamp}`;
+  const viewOrderDetailUrl = `${config.canonicalRootURL}/partner/orders/${orderId}_${timestamp}`;
 
   return `
   <!DOCTYPE html

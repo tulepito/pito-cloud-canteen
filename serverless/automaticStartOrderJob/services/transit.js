@@ -22,7 +22,7 @@ const {
 const { transitionOrderStatus } = require('./helpers/transitionOrderStatus');
 const { TRANSITIONS } = require('../utils/enums');
 const { fetchListing } = require('../utils/integrationHelper');
-const { getIntegrationSdk } = require('../utils/integrationSdk');
+const getIntegrationSdk = require('../utils/integrationSdk');
 const { createQuotation } = require('./createQuotation');
 
 const transit = async (txId, transition) => {

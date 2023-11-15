@@ -1,11 +1,7 @@
 const AWS = require('aws-sdk');
+const config = require('../../utils/config');
 
-const SES = new AWS.SES({
-  accessKeyId: `${process.env.AWS_SES_ACCESS_KEY_ID}`,
-  secretAccessKey: `${process.env.AWS_SES_SECRET_ACCESS_KEY}`,
-  region: `${process.env.AWS_SES_REGION}`,
-  apiVersion: '2010-12-01',
-});
+const SES = new AWS.SES(config.ses.config);
 
 const createEmailParams = (receiver, subject, content, sender) => {
   const toAddresses = Array.isArray(receiver) ? receiver : [receiver];

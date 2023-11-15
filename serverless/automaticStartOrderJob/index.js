@@ -1,6 +1,7 @@
 const isEmpty = require('lodash/isEmpty');
 
 const { startOrder } = require('./services/startOrder');
+const { cancelPickingOrder } = require('./services/cancelPickingOrder');
 
 const { denormalisedResponseEntities, Listing } = require('./utils/data');
 const getIntegrationSdk = require('./utils/integrationSdk');
@@ -47,6 +48,7 @@ const handler = async (_event = {}) => {
 
     if (shouldCancelOrder) {
       console.debug('💫 > handler > shouldCancelOrder: ', shouldCancelOrder);
+      await cancelPickingOrder(orderId);
     } else {
       await startOrder(orderListing, planId);
     }
@@ -58,4 +60,7 @@ const handler = async (_event = {}) => {
   }
 };
 
-handler();
+handler({
+  orderId: '65519882-0d40-451e-adb6-ae4f25f68364',
+  planId: '65519884-c5d4-43b4-a631-c875eeee3876',
+});

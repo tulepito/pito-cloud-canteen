@@ -1,4 +1,4 @@
-const BASE_URL = process.env.NEXT_PUBLIC_CANONICAL_URL;
+const config = require('../../../utils/config');
 
 const bookerOrderSuccessSubject = (orderName) =>
   `Đơn hàng ${orderName} vừa đặt thành công`;
@@ -8,7 +8,7 @@ const bookerOrderSuccess = ({ bookerUser, orderListing }) => {
   const orderId = orderListing.getId();
   const { orderName } = orderListing.getPublicData();
 
-  const viewOrderUrl = `${BASE_URL}/company/orders/${orderId}`;
+  const viewOrderUrl = `${config.canonicalRootURL}/company/orders/${orderId}`;
 
   return `
   <!DOCTYPE html

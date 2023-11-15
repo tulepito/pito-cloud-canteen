@@ -1,3 +1,5 @@
+import config from '../utils/config';
+
 const {
   generateUncountableIdForQuotation,
 } = require('../utils/generateUncountableId');
@@ -9,7 +11,7 @@ const {
   User,
 } = require('../utils/data');
 
-const ADMIN_ID = process.env.PITO_ADMIN_ID || '';
+const ADMIN_ID = config.adminId;
 
 const createQuotation = async (params) => {
   const { companyId, orderId } = params;

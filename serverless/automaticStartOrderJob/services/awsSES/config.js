@@ -1,5 +1,3 @@
-const systemSenderEmail = process.env.AWS_SES_SENDER_EMAIL;
-
 const EmailTemplateForBookerTypes = {
   BOOKER_ACCOUNT_CREATED: 'BOOKER_ACCOUNT_CREATED',
   BOOKER_ACCOUNT_SUSPENDED: 'BOOKER_ACCOUNT_SUSPENDED',
@@ -32,7 +30,6 @@ const EmailTemplateTypes = {
 };
 
 module.exports = {
-  systemSenderEmail,
   EmailTemplateForBookerTypes,
   EmailTemplateForParticipantTypes,
   EmailTemplateForPartnerTypes,

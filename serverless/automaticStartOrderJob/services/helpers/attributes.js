@@ -37,6 +37,6 @@ const getSystemAttributes = async () => {
   };
 };
 
-module.export = {
+module.exports = {
   getSystemAttributes,
 };

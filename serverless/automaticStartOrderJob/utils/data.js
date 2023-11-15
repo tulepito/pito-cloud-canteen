@@ -114,7 +114,7 @@ const denormalisedResponseEntities = (sdkResponse) => {
   return denormalisedEntities(entities, resources);
 };
 
-export const ensureUser = (user) => {
+const ensureUser = (user) => {
   const empty = { id: null, type: 'user', attributes: { profile: {} } };
 
   return merge(empty, user);
@@ -201,7 +201,7 @@ const Listing = (listing) => {
   };
 };
 
-export const ensureTransaction = (
+const ensureTransaction = (
   transaction,
   booking = null,
   listing = null,

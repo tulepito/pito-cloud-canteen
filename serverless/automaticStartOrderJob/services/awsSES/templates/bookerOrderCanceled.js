@@ -1,6 +1,5 @@
+const config = require('../../../utils/config');
 const { formatTimestamp } = require('../../helpers/date');
-
-const BASE_URL = process.env.CANONICAL_ROOT_URL;
 
 const bookerOrderCancelledSubject = (orderName) =>
   `Tuần ăn ${orderName} đã bị hủy`;
@@ -12,7 +11,7 @@ const bookerOrderCancelled = ({ bookerUser, orderListing }) => {
     new Date().getTime(),
     'HH:mm dd/MM/yyyy',
   );
-  const createNewOrderUrl = `${BASE_URL}/company/booker/orders/new`;
+  const createNewOrderUrl = `${config.canonicalRootURL}/company/booker/orders/new`;
 
   return `
   <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">

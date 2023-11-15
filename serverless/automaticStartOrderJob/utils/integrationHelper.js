@@ -1,5 +1,5 @@
+const getIntegrationSdk = require('./integrationSdk');
 const { denormalisedResponseEntities } = require('./data');
-const { getIntegrationSdk } = require('./integrationSdk');
 
 const fetchTransaction = async (transactionId, include = []) => {
   const integrationSdk = getIntegrationSdk();

@@ -9,7 +9,7 @@ const {
 const {
   createFirebaseDocNotification,
 } = require('./firebase/createNotification');
-const { getIntegrationSdk } = require('../utils/integrationSdk');
+const getIntegrationSdk = require('../utils/integrationSdk');
 const {
   Listing,
   Transaction,

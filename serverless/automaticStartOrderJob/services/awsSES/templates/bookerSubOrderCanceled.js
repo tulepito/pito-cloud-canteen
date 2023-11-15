@@ -1,11 +1,10 @@
+const config = require('../../../utils/config');
 const { TRANSITIONS_TO_STATE_CANCELED } = require('../../../utils/enums');
 const { formatTimestamp } = require('../../helpers/date');
 const { parseThousandNumber } = require('../../helpers/format');
 const {
   calculatePriceQuotationInfoFromQuotation,
 } = require('../../helpers/order');
-
-const BASE_URL = process.env.CANONICAL_ROOT_URL;
 
 const bookerSubOrderCanceledSubject = (subOrderDate) =>
   `Ngày ăn ${subOrderDate} bị huỷ`;
@@ -53,7 +52,7 @@ const bookerSubOrderCanceled = ({
   const formattedVatFee = `${parseThousandNumber(VATFee)}đ`;
   const formattedTotalPrice = `${parseThousandNumber(totalPrice)}đ`;
   const formattedTotalWithVat = `${parseThousandNumber(totalWithVAT)}đ`;
-  const viewOrderUrl = `${BASE_URL}/company/orders/${orderId}`;
+  const viewOrderUrl = `${config.canonicalRootURL}/company/orders/${orderId}`;
 
   return `
   <!DOCTYPE html

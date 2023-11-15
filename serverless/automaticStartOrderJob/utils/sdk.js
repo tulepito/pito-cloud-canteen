@@ -6,10 +6,10 @@ const config = require('./config');
 
 const baseUrlMaybe = config.sdk.baseUrl ? { baseUrl: config.sdk.baseUrl } : {};
 
-const CLIENT_ID = process.env.SHARETRIBE_SDK_CLIENT_ID;
-const CLIENT_SECRET = process.env.SHARETRIBE_SDK_CLIENT_SECRET;
-const TRANSIT_VERBOSE = process.env.SHARETRIBE_SDK_TRANSIT_VERBOSE === 'true';
-const USING_SSL = process.env.SHARETRIBE_USING_SSL === 'true';
+const CLIENT_ID = config.sdk.clientId;
+const CLIENT_SECRET = config.sdk.clientSecret;
+const TRANSIT_VERBOSE = config.sdk.transitVerbose;
+const USING_SSL = config.usingSSL;
 
 const createSdkInstance = () =>
   createInstance({
@@ -19,11 +19,7 @@ const createSdkInstance = () =>
     ...baseUrlMaybe,
   });
 
-// Application type handlers for JS SDK.
-//
-// NOTE: keep in sync with `typeHandlers` in `src/util/api.js`
 const typeHandlers = [
-  // Use Decimal type instead of SDK's BigDecimal.
   {
     type: sharetribeSdk.types.BigDecimal,
     customType: Decimal,

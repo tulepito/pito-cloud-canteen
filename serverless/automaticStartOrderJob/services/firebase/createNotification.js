@@ -1,7 +1,6 @@
 const { addCollectionDoc } = require('./helper');
 const { NOTIFICATION_TYPES } = require('./config');
-
-const { FIREBASE_NOTIFICATION_COLLECTION_NAME } = process.env;
+const config = require('../../utils/config');
 
 const createFirebaseDocNotification = async (
   notificationType,
@@ -176,7 +175,7 @@ const createFirebaseDocNotification = async (
         break;
     }
 
-    await addCollectionDoc(data, FIREBASE_NOTIFICATION_COLLECTION_NAME);
+    await addCollectionDoc(data, config.firebase.notificationCollectionName);
   } catch (error) {
     console.error('Error notification type: ', notificationType);
     console.error('Error creating notification: ', error);

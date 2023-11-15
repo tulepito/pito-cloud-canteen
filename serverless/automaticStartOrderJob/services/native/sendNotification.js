@@ -2,8 +2,9 @@ const { fetchUser } = require('../../utils/integrationHelper');
 const { User, Listing } = require('../../utils/data');
 const { sendNotification } = require('./oneSignal');
 const { NATIVE_NOTIFICATION_TYPES } = require('./config');
+const config = require('../../utils/config');
 
-const BASE_URL = process.env.CANONICAL_ROOT_URL;
+const BASE_URL = config.canonicalRootURL;
 
 const formatTimestamp = (date) => {
   const jsDate = new Date(Number(date));

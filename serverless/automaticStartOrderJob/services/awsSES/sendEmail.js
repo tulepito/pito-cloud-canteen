@@ -17,13 +17,16 @@ const {
 const { sendIndividualEmail } = require('./awsSES');
 const { fetchListing, fetchUser } = require('../../utils/integrationHelper');
 const { Listing, User } = require('../../utils/data');
-const { systemSenderEmail, EmailTemplateTypes } = require('./config');
+const { EmailTemplateTypes } = require('./config');
 const { formatTimestamp } = require('../helpers/date');
 const { getSystemAttributes } = require('../helpers/attributes');
 const {
   participantSubOrderCanceled,
   participantSubOrderCanceledSubject,
 } = require('./templates/participantSubOrderCanceled');
+const config = require('../../utils/config');
+
+const SENDER_EMAIL = config.ses.senderEmail;
 
 const fetchEmailDataSourceWithOrder = async ({
   receiver,
@@ -134,7 +137,7 @@ const emailSendingFactory = async (emailTemplateType, emailParams = {}) => {
           receiver: [bookerEmail],
           subject: bookerOrderSuccessSubject(orderName),
           content: emailTemplate,
-          sender: systemSenderEmail,
+          sender: SENDER_EMAIL,
         };
         sendIndividualEmail(emailDataParams);
         break;
@@ -155,7 +158,7 @@ const emailSendingFactory = async (emailTemplateType, emailParams = {}) => {
           receiver: [bookerEmail],
           subject: bookerOrderCancelledSubject(orderName),
           content: emailTemplate,
-          sender: systemSenderEmail,
+          sender: SENDER_EMAIL,
         };
         sendIndividualEmail(emailDataParams);
         break;
@@ -182,7 +185,7 @@ const emailSendingFactory = async (emailTemplateType, emailParams = {}) => {
           receiver: [bookerEmail],
           subject: bookerSubOrderCancelledSubject(subOrderDate),
           content: emailTemplate,
-          sender: systemSenderEmail,
+          sender: SENDER_EMAIL,
         };
         sendIndividualEmail(emailDataParams);
         break;
@@ -208,7 +211,7 @@ const emailSendingFactory = async (emailTemplateType, emailParams = {}) => {
           receiver: [participantEmail],
           subject: participantSubOrderCanceledSubject(subOrderDate),
           content: emailTemplate,
-          sender: systemSenderEmail,
+          sender: SENDER_EMAIL,
         };
         sendIndividualEmail(emailDataParams);
         break;
@@ -232,7 +235,7 @@ const emailSendingFactory = async (emailTemplateType, emailParams = {}) => {
           receiver: [partnerEmail],
           subject: partnerSubOrderCanceledSubject(subOrderDate),
           content: emailTemplate,
-          sender: systemSenderEmail,
+          sender: SENDER_EMAIL,
         };
         sendIndividualEmail(emailDataParams);
         break;

@@ -179,17 +179,16 @@ const prepareNewPlanOrderDetail = (planOrderDetail, transactionIdMap) => {
 };
 
 const getPickFoodParticipants = (orderDetail) => {
-  const shouldSendNativeNotificationParticipantIdList =
-    Object.entries(orderDetail).reduce >
-    ((acc, [, subOrder]) => {
-      const { memberOrders = {} } = subOrder;
-      const memberHasPickFood = Object.keys(memberOrders).filter((memberId) => {
-        return memberOrders[memberId].foodId;
-      });
+  const shouldSendNativeNotificationParticipantIdList = Object.entries(
+    orderDetail,
+  ).reduce((acc, [, subOrder]) => {
+    const { memberOrders = {} } = subOrder;
+    const memberHasPickFood = Object.keys(memberOrders).filter((memberId) => {
+      return memberOrders[memberId].foodId;
+    });
 
-      return uniq([...acc, ...memberHasPickFood]);
-    },
-    []);
+    return uniq([...acc, ...memberHasPickFood]);
+  }, []);
 
   return shouldSendNativeNotificationParticipantIdList;
 };

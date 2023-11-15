@@ -1,8 +1,10 @@
 const { Client } = require('onesignal-node');
+const config = require('../../utils/config');
 
-const { ONE_SIGNAL_APP_ID, ONE_SIGNAL_API_KEY } = process.env;
-
-const oneSignalClient = new Client(ONE_SIGNAL_APP_ID, ONE_SIGNAL_API_KEY);
+const oneSignalClient = new Client(
+  config.oneSignal.appId,
+  config.oneSignal.apiKey,
+);
 
 const sendNotification = async ({ title, content, url, oneSignalUserId }) => {
   const notification = {
