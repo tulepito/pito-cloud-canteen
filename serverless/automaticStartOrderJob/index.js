@@ -1,6 +1,11 @@
 const isEmpty = require('lodash/isEmpty');
-const { denormalisedResponseEntities } = require('./utils/data');
+
+const { startOrder } = require('./services/startOrder');
+
+const { denormalisedResponseEntities, Listing } = require('./utils/data');
 const getIntegrationSdk = require('./utils/integrationSdk');
+const { isEnableToCancelOrder } = require('./services/helpers/order');
+const { ORDER_STATES } = require('./utils/enums');
 
 // exports.handler = async (_event) => {
 const handler = async (_event = {}) => {
@@ -22,13 +27,29 @@ const handler = async (_event = {}) => {
         id: orderId,
       }),
     );
-    console.debug('💫 > handler > orderListing: ', orderListing);
+
+    const { orderState } = Listing(orderListing).getMetadata();
+
+    if (orderState !== ORDER_STATES.picking) {
+      console.error('Cannot start non-picking order');
+
+      return;
+    }
+
     const [planListing] = denormalisedResponseEntities(
       await integrationSdk.listings.show({
         id: planId,
       }),
     );
-    console.debug('💫 > handler > planListing: ', planListing);
+    const { orderDetail = {} } = Listing(planListing).getMetadata();
+    // TODO: check condition to cancel order
+    const shouldCancelOrder = isEnableToCancelOrder(orderDetail);
+
+    if (shouldCancelOrder) {
+      console.debug('💫 > handler > shouldCancelOrder: ', shouldCancelOrder);
+    } else {
+      await startOrder(orderListing, planId);
+    }
   } catch (error) {
     console.error(
       'Schedule automatic start order error',
