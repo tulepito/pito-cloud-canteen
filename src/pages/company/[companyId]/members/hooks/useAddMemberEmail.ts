@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { shallowEqual } from 'react-redux';
 import { uniqBy } from 'lodash';
+import compact from 'lodash/compact';
+import isEmpty from 'lodash/isEmpty';
 
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import {
@@ -8,30 +10,48 @@ import {
   companyMemberThunks,
 } from '@redux/slices/companyMember.slice';
 import { User } from '@src/utils/data';
+import type { TUser } from '@src/utils/types';
+
+const isSuccessResponse = (_result: any) => _result.response.status === 200;
+const isBadRequestResponse = (_result: any) => _result.response.status === 400;
+
+const isUserHasCompany = (user: TUser) => {
+  const { company = {} } = User(user).getMetadata();
+
+  return !isEmpty(company);
+};
 
 export const filterHasAccountUsers = (loadedResult: any[]) => {
-  return loadedResult
-    .filter((_result) => _result.response.status === 200)
-    .map((_result) => _result.response.user);
+  return compact(
+    loadedResult.filter(isSuccessResponse).map((_result) => {
+      const { user } = _result.response;
+      if (isUserHasCompany(user)) return user;
+
+      return null;
+    }),
+  );
 };
 
 export const filterHasAccountUserIds = (loadedResult: any[]) => {
-  return loadedResult
-    .filter((_result) => _result.response.status === 200)
-    .map((_result) => User(_result.response.user).getId());
+  return compact(
+    loadedResult.filter(isSuccessResponse).map((_result) => {
+      const { user } = _result.response;
+      if (isUserHasCompany(user)) return user?.id?.uuid;
+
+      return null;
+    }),
+  );
 };
 
 export const filterNoAccountUserEmail = (loadedResult: any[]) => {
   return loadedResult
-    .filter((_result) => _result.response.status === 404)
+    .filter(isBadRequestResponse)
     .map((_result) => _result.email);
 };
 
 export const useAddMemberEmail = () => {
   const dispatch = useAppDispatch();
   const [emailList, setEmailList] = useState<string[]>([]);
-  const [userIds, setUserIds] = useState<string[]>([]);
-  const [noAccountEmails, setNoAccountEmails] = useState<string[]>([]);
   const [loadedResult, setLoadedResult] = useState<any[]>([]);
 
   const checkedEmailInputChunk = useAppSelector(
@@ -49,8 +69,6 @@ export const useAddMemberEmail = () => {
         'email',
       );
 
-      setNoAccountEmails(filterNoAccountUserEmail(newLoadedResult));
-      setUserIds(filterHasAccountUserIds(newLoadedResult));
       setLoadedResult(newLoadedResult);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -71,6 +89,7 @@ export const useAddMemberEmail = () => {
     const { meta } = await dispatch(
       companyMemberThunks.addMembers({ noAccountEmailList, userIdList }),
     );
+
     if (meta.requestStatus === 'fulfilled') {
       setEmailList([]);
       setLoadedResult([]);
@@ -84,6 +103,7 @@ export const useAddMemberEmail = () => {
     const { meta } = await dispatch(
       companyMemberThunks.addMembers({ noAccountEmailList, userIdList }),
     );
+
     if (meta.requestStatus === 'fulfilled') {
       setEmailList([]);
       setLoadedResult([]);
@@ -100,8 +120,6 @@ export const useAddMemberEmail = () => {
   };
 
   return {
-    userIds,
-    noAccountEmails,
     emailList,
     setEmailList,
     loadedResult,
