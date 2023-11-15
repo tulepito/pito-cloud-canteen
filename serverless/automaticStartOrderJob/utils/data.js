@@ -124,7 +124,7 @@ const ensureListing = (listing) => {
   const empty = {
     id: null,
     type: 'listing',
-    attributes: { publicData: {} },
+    attributes: { publicData: {}, metadata: {} },
     images: [],
   };
 
@@ -171,35 +171,32 @@ const User = (user) => {
 
 const Listing = (listing) => {
   const ensuredListing = ensureListing(listing);
-  const id = ensuredListing?.id?.uuid;
-  const attributes = ensuredListing?.attributes;
-  const { privateData, publicData, protectedData, metadata } = attributes || {};
-  const images = ensuredListing?.images;
+  const id = ensuredListing.id?.uuid;
 
   return {
     getId: () => {
       return id;
     },
     getFullData: () => {
-      return ensuredListing || {};
+      return ensuredListing;
     },
     getAttributes: () => {
-      return attributes || {};
+      return ensuredListing.attributes;
     },
     getMetadata: () => {
-      return metadata || {};
+      return ensuredListing.attributes.metadata;
     },
     getProtectedData: () => {
-      return protectedData || {};
+      return ensuredListing.attributes.protectedData;
     },
     getPrivateData: () => {
-      return privateData || {};
+      return ensuredListing.attributes.privateData;
     },
     getPublicData: () => {
-      return publicData || {};
+      return ensuredListing.attributes.publicData;
     },
     getImages: () => {
-      return images || [];
+      return ensuredListing.images;
     },
   };
 };
@@ -233,22 +230,22 @@ const Transaction = (transaction) => {
       return id;
     },
     getFullData: () => {
-      return ensuredTransaction || {};
+      return ensuredTransaction;
     },
     getAttributes: () => {
-      return attributes || {};
+      return attributes;
     },
     getMetadata: () => {
-      return metadata || {};
+      return metadata;
     },
     getProtectedData: () => {
-      return protectedData || {};
+      return protectedData;
     },
     getPrivateData: () => {
-      return privateData || {};
+      return privateData;
     },
     getPublicData: () => {
-      return publicData || {};
+      return publicData;
     },
   };
 };

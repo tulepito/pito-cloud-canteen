@@ -132,7 +132,7 @@ const transit = async (txId, transition) => {
         });
 
         // Function is not ready on production
-        if (process.env.NEXT_PUBLIC_ALLOW_PARTNER_EMAIL_SEND === 'true') {
+        if (process.ALLOW_PARTNER_EMAIL_SEND === 'true') {
           // TODO: send email notifications to partners
           emailSendingFactory(
             EmailTemplateTypes.PARTNER.PARTNER_SUB_ORDER_CANCELED,
