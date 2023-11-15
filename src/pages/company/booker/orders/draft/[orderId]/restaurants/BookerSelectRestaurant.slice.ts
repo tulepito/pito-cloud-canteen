@@ -404,31 +404,23 @@ const fetchRestaurantReviews = createAsyncThunk(
 
     const fetchedReviews = denormalisedResponseEntities(rawResponse);
 
-    const reviewerIdList = fetchedReviews.map(
-      (item: TListing) => Listing(item).getMetadata().reviewerId,
-    );
-
-    const reviewers = denormalisedResponseEntities(
-      await sdk.users.query({
-        meta_id: reviewerIdList,
-      }),
-    );
-
-    const reviewerWithReviewIdList = fetchedReviews.fetchedReviews.map(
-      (review: TListing) => {
+    const reviewerWithReviewIdList = await Promise.all(
+      fetchedReviews.map(async (review: TListing) => {
         const reviewGetter = Listing(review);
         const reviewId = reviewGetter.getId();
         const { reviewerId } = reviewGetter.getMetadata();
 
-        const suitableReviewer = reviewers.find(
-          (reviewer: TUser) => reviewer.id.uuid === reviewerId,
+        const [reviewer] = denormalisedResponseEntities(
+          await sdk.users.show({
+            id: reviewerId,
+          }),
         );
 
         return {
           id: reviewId,
-          value: suitableReviewer,
+          value: reviewer,
         };
-      },
+      }),
     );
 
     return {
