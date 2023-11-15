@@ -2,10 +2,28 @@ const {
   bookerOrderSuccess,
   bookerOrderSuccessSubject,
 } = require('./templates/bookerOrderSuccess');
+const {
+  bookerOrderCancelled,
+  bookerOrderCancelledSubject,
+} = require('./templates/bookerOrderCanceled');
+const {
+  partnerSubOrderCanceled,
+  partnerSubOrderCanceledSubject,
+} = require('./templates/partnerSubOrderCanceled');
+const {
+  bookerSubOrderCancelled,
+  bookerSubOrderCancelledSubject,
+} = require('./templates/bookerSubOrderCanceled');
 const { sendIndividualEmail } = require('./awsSES');
 const { fetchListing, fetchUser } = require('../../utils/integrationHelper');
 const { Listing, User } = require('../../utils/data');
 const { systemSenderEmail, EmailTemplateTypes } = require('./config');
+const { formatTimestamp } = require('../helpers/date');
+const { getSystemAttributes } = require('../helpers/attributes');
+const {
+  participantSubOrderCanceled,
+  participantSubOrderCanceledSubject,
+} = require('./templates/participantSubOrderCanceled');
 
 const fetchEmailDataSourceWithOrder = async ({
   receiver,
@@ -115,6 +133,104 @@ const emailSendingFactory = async (emailTemplateType, emailParams = {}) => {
         const emailDataParams = {
           receiver: [bookerEmail],
           subject: bookerOrderSuccessSubject(orderName),
+          content: emailTemplate,
+          sender: systemSenderEmail,
+        };
+        sendIndividualEmail(emailDataParams);
+        break;
+      }
+
+      case EmailTemplateTypes.BOOKER.BOOKER_ORDER_CANCELLED: {
+        const { orderId } = emailParams;
+        const emailDataSource = await fetchEmailDataSourceWithOrder({
+          receiver: 'booker',
+          orderId,
+        });
+
+        const { bookerUser, orderListing } = emailDataSource;
+        const { orderName } = orderListing.getPublicData();
+        const { email: bookerEmail } = bookerUser?.getAttributes() || {};
+        const emailTemplate = bookerOrderCancelled(emailDataSource);
+        const emailDataParams = {
+          receiver: [bookerEmail],
+          subject: bookerOrderCancelledSubject(orderName),
+          content: emailTemplate,
+          sender: systemSenderEmail,
+        };
+        sendIndividualEmail(emailDataParams);
+        break;
+      }
+
+      case EmailTemplateTypes.BOOKER.BOOKER_SUB_ORDER_CANCELED: {
+        const { orderId, timestamp } = emailParams;
+        const emailDataSource = await fetchEmailDataSourceWithOrder({
+          receiver: 'booker',
+          orderId,
+        });
+
+        const { systemVATPercentage } = await getSystemAttributes();
+
+        const { bookerUser } = emailDataSource;
+        const { email: bookerEmail } = bookerUser?.getAttributes() || {};
+        const emailTemplate = bookerSubOrderCancelled({
+          ...emailDataSource,
+          timestamp,
+          systemVATPercentage,
+        });
+        const subOrderDate = formatTimestamp(timestamp);
+        const emailDataParams = {
+          receiver: [bookerEmail],
+          subject: bookerSubOrderCancelledSubject(subOrderDate),
+          content: emailTemplate,
+          sender: systemSenderEmail,
+        };
+        sendIndividualEmail(emailDataParams);
+        break;
+      }
+
+      case EmailTemplateTypes.PARTICIPANT.PARTICIPANT_SUB_ORDER_CANCELED: {
+        const { participantId, orderId, timestamp } = emailParams;
+        const emailDataSource = await fetchEmailDataSourceWithOrder({
+          receiver: 'participant',
+          participantId,
+          orderId,
+        });
+
+        const { participantUser } = emailDataSource;
+        const { email: participantEmail } =
+          participantUser?.getAttributes() || {};
+        const emailTemplate = participantSubOrderCanceled({
+          ...emailDataSource,
+          timestamp,
+        });
+        const subOrderDate = formatTimestamp(timestamp);
+        const emailDataParams = {
+          receiver: [participantEmail],
+          subject: participantSubOrderCanceledSubject(subOrderDate),
+          content: emailTemplate,
+          sender: systemSenderEmail,
+        };
+        sendIndividualEmail(emailDataParams);
+        break;
+      }
+
+      case EmailTemplateTypes.PARTNER.PARTNER_SUB_ORDER_CANCELED: {
+        const { orderId, restaurantId, timestamp } = emailParams;
+        const emailDataSource = await fetchEmailDataSourceWithOrder({
+          receiver: 'partner',
+          orderId,
+          restaurantId,
+        });
+        const { partnerUser } = emailDataSource;
+        const { email: partnerEmail } = partnerUser?.getAttributes() || {};
+        const emailTemplate = partnerSubOrderCanceled({
+          ...emailDataSource,
+          timestamp,
+        });
+        const subOrderDate = formatTimestamp(timestamp);
+        const emailDataParams = {
+          receiver: [partnerEmail],
+          subject: partnerSubOrderCanceledSubject(subOrderDate),
           content: emailTemplate,
           sender: systemSenderEmail,
         };
