@@ -26,7 +26,7 @@ import {
   EOrderType,
   EParticipantOrderStatus,
 } from '@utils/enums';
-import type { TPlan } from '@utils/orderTypes';
+import type { TFoodList, TPlan } from '@utils/orderTypes';
 import type {
   TListing,
   TObject,
@@ -1002,4 +1002,24 @@ export const mergeRecommendOrderDetailWithCurrentOrderDetail = (
   }
 
   return mergedResult;
+};
+
+export const initLineItemsFromFoodList = (
+  foodList: TFoodList,
+  isNormalOrder = true,
+) => {
+  return isNormalOrder
+    ? Object.entries<{
+        foodName: string;
+        foodPrice: number;
+      }>(foodList).map(([foodId, { foodName, foodPrice }]) => {
+        return {
+          id: foodId,
+          name: foodName,
+          unitPrice: foodPrice,
+          price: foodPrice,
+          quantity: 1,
+        };
+      })
+    : [];
 };

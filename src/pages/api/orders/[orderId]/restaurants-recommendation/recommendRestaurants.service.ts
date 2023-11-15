@@ -11,20 +11,21 @@ import {
   getRestaurantQuery,
 } from '@helpers/listingSearchQuery';
 import { calculateDistance } from '@helpers/mapHelpers';
-import { getSelectedRestaurantAndFoodList } from '@helpers/orderHelper';
+import {
+  getSelectedRestaurantAndFoodList,
+  initLineItemsFromFoodList,
+  mealTypeAdapter,
+} from '@helpers/orderHelper';
 import {
   adminQueryListings,
   fetchListing,
   fetchUser,
 } from '@services/integrationHelper';
+import config from '@src/configs';
 import { Listing, User } from '@src/utils/data';
 import { convertWeekDay, renderDateRange, VNTimezone } from '@src/utils/dates';
 import { EOrderType } from '@src/utils/enums';
 import type { TListing, TObject } from '@src/utils/types';
-
-const maxKilometerFromRestaurantToDeliveryAddressForBooker =
-  process.env
-    .NEXT_PUBLIC_MAX_KILOMETER_FROM_RESTAURANT_TO_DELIVERY_ADDRESS_FOR_BOOKER;
 
 const combineMenusWithRestaurantData = ({
   menus,
@@ -39,8 +40,8 @@ const combineMenusWithRestaurantData = ({
 }) => {
   return menus.reduce((result: any, menu: TListing) => {
     const { restaurantId } = Listing(menu).getMetadata();
-    const restaurantInfo = restaurants.find((restaurant: TListing) => {
-      const restaurantGetter = Listing(restaurant);
+    const restaurant = restaurants.find((r: TListing) => {
+      const restaurantGetter = Listing(r);
 
       if (shouldCalculateDistance) {
         const { geolocation: restaurantOrigin } =
@@ -52,26 +53,49 @@ const combineMenusWithRestaurantData = ({
         );
         const isValidRestaurant =
           distanceToDeliveryPlace <=
-          Number(maxKilometerFromRestaurantToDeliveryAddressForBooker);
+          Number(config.maxKilometerFromRestaurantToDeliveryAddressForBooker);
 
         return isValidRestaurant && restaurantGetter.getId() === restaurantId;
       }
 
       return restaurantGetter.getId() === restaurantId;
     });
-    if (!restaurantInfo) return result;
 
-    return result.concat({
-      menu,
-      restaurantInfo,
-    });
+    return !restaurant
+      ? result
+      : result.concat({
+          menu,
+          restaurant,
+        });
   }, []);
+};
+
+const prepareRestaurantDataForOrderDetail = (
+  restaurant: TListing,
+  menu: TListing,
+  foodList: TObject,
+) => {
+  const restaurantGetter = Listing(restaurant);
+  const { minQuantity = 0, maxQuantity = Number.MAX_VALUE } =
+    restaurantGetter.getPublicData();
+
+  return {
+    id: restaurantGetter.getId(),
+    restaurantName: restaurantGetter.getAttributes().title,
+    restaurantOwnerId: restaurant.author?.id?.uuid,
+    foodList,
+    phoneNumber: restaurantGetter.getPublicData().phoneNumber,
+    menuId: menu.id.uuid,
+    minQuantity,
+    maxQuantity,
+  };
 };
 
 const prepareMenuFoodList = async ({
   restaurant,
   menu,
   timestamp,
+  mealType: foodTypes = [],
   nutritions = [],
   packagePerMember = 0,
 }: TObject) => {
@@ -86,6 +110,13 @@ const prepareMenuFoodList = async ({
       ids: foodIdList,
       meta_isDeleted: false,
       meta_isFoodEnable: true,
+      ...(foodTypes.length > 0
+        ? {
+            pub_foodType: foodTypes.map((item: string) =>
+              mealTypeAdapter(item),
+            ),
+          }
+        : {}),
       ...(nutritions.length > 0
         ? { pub_specialDiets: `has_any:${nutritions.join(',')}` }
         : {}),
@@ -113,6 +144,74 @@ const prepareMenuFoodList = async ({
   return normalizedFoodList;
 };
 
+const prepareParamsFromOrderForSpecificDay = async ({
+  order,
+  menuQueryParams,
+}: TObject) => {
+  const {
+    plans = [],
+    memberAmount = 0,
+    deliveryAddress = {},
+    companyId,
+    nutritions = [],
+    mealType = [],
+    packagePerMember,
+    orderType,
+  } = Listing(order as TListing).getMetadata();
+  const planListing = await fetchListing(plans[0]);
+
+  const company = await fetchUser(companyId);
+  const { companyLocation = {} } = User(company).getPublicData();
+
+  return {
+    isNormalOrder: orderType === EOrderType.normal,
+    deliveryOrigin: deliveryAddress?.origin || companyLocation?.origin,
+    orderDetail:
+      Listing(planListing as TListing).getMetadata().orderDetail || {},
+    memberAmount,
+    nutritions,
+    mealType,
+    packagePerMember,
+    menuQuery: getMenuQuery({ order, params: menuQueryParams }),
+  };
+};
+
+// * recommend from draft order data (recommend params)
+const prepareParamsFromGivenParamsForSpecificDay = ({
+  recommendParams,
+  menuQueryParams,
+}: TObject) => {
+  const {
+    memberAmount = 0,
+    deliveryOrigin,
+    orderDetail,
+    nutritions = [],
+    mealType = [],
+    packagePerMember,
+    daySession,
+    isNormalOrder = true,
+  } = recommendParams;
+
+  return {
+    isNormalOrder,
+    deliveryOrigin,
+    orderDetail,
+    memberAmount,
+    mealType,
+    nutritions,
+    packagePerMember,
+    menuQuery: getMenuQueryWithDraftOrderData({
+      orderParams: {
+        nutritions,
+        mealType,
+        packagePerMember,
+        daySession,
+      },
+      params: menuQueryParams,
+    }),
+  };
+};
+
 export const recommendRestaurantForSpecificDay = async ({
   orderId,
   timestamp,
@@ -125,68 +224,30 @@ export const recommendRestaurantForSpecificDay = async ({
   shouldCalculateDistance: boolean;
 }) => {
   const order = await fetchListing(orderId);
-  let deliveryOrigin: any;
-  let orderDetail;
-  let memberAmount: number;
-  let menuQuery;
-  let packagePerMember = 0;
-  let nutritions: string[] = [];
+
   const menuQueryParams = {
     timestamp,
   };
 
   // * recommend from order data
-  if (isEmpty(recommendParams)) {
-    const {
-      plans = [],
-      memberAmount: memberAmountInOrder = 0,
-      deliveryAddress = {},
-      companyId,
-      nutritions: nutritionFromOrder = [],
-      packagePerMember: packagePerMemberFromOrder,
-    } = Listing(order as TListing).getMetadata();
-
-    const orderDeliveryOriginMaybe = deliveryAddress?.origin;
-    const company = await fetchUser(companyId);
-    const { companyLocation = {} } = User(company).getPublicData();
-    const companyOriginMaybe = companyLocation?.origin;
-
-    const planListing = await fetchListing(plans[0]);
-
-    deliveryOrigin = orderDeliveryOriginMaybe || companyOriginMaybe;
-    orderDetail =
-      Listing(planListing as TListing).getMetadata().orderDetail || {};
-    memberAmount = memberAmountInOrder;
-    nutritions = nutritionFromOrder;
-    packagePerMember = packagePerMemberFromOrder;
-    menuQuery = getMenuQuery({ order, params: menuQueryParams });
-  } else {
-    // * recommend from draft order data (recommend params)
-    const {
-      memberAmount: memberAmountFromParams = 0,
-      deliveryOrigin: deliveryOriginFromParams,
-      orderDetail: orderDetailFromParams,
-      nutritions: nutritionFormParams = [],
-      mealType = [],
-      packagePerMember: packagePerMemberFromParams,
-      daySession,
-    } = recommendParams;
-    deliveryOrigin = deliveryOriginFromParams;
-    orderDetail = orderDetailFromParams;
-    memberAmount = memberAmountFromParams;
-    nutritions = nutritionFormParams;
-    packagePerMember = packagePerMemberFromParams;
-
-    menuQuery = getMenuQueryWithDraftOrderData({
-      orderParams: {
-        nutritions: nutritionFormParams,
-        mealType,
-        packagePerMember: packagePerMemberFromParams,
-        daySession,
-      },
-      params: menuQueryParams,
-    });
-  }
+  const {
+    packagePerMember = 0,
+    nutritions,
+    menuQuery,
+    memberAmount,
+    orderDetail,
+    deliveryOrigin,
+    mealType,
+    isNormalOrder,
+  } = isEmpty(recommendParams)
+    ? await prepareParamsFromOrderForSpecificDay({
+        order,
+        menuQueryParams,
+      })
+    : prepareParamsFromGivenParamsForSpecificDay({
+        recommendParams,
+        menuQueryParams,
+      });
 
   // * query all menus
   const allMenus = await queryAllListings({
@@ -239,52 +300,95 @@ export const recommendRestaurantForSpecificDay = async ({
         ? randomRestaurantObjA
         : restaurants[otherRandomNumber];
 
-    const { menu, restaurantInfo: randomRestaurant } = randomRestaurantObj;
-
-    const restaurantGetter = Listing(randomRestaurant);
-    const randomRestaurantId = restaurantGetter.getId();
-    const { minQuantity = 0, maxQuantity = Number.MAX_VALUE } =
-      restaurantGetter.getPublicData();
+    const { menu, restaurant } = randomRestaurantObj;
 
     const foodList = await prepareMenuFoodList({
       menu,
-      restaurant: randomRestaurant,
+      restaurant,
       timestamp,
       nutritions,
       packagePerMember,
+      mealType,
     });
 
-    const newRestaurantData = {
-      id: randomRestaurantId,
-      restaurantName: restaurantGetter.getAttributes().title,
-      restaurantOwnerId: randomRestaurant?.author?.id?.uuid,
-      foodList,
-      phoneNumber: restaurantGetter.getPublicData().phoneNumber,
-      menuId: menu.id.uuid,
-      minQuantity,
-      maxQuantity,
-    };
-
-    const newOrderDetail = {
+    return {
       ...orderDetail,
+      lineItems: initLineItemsFromFoodList(foodList, isNormalOrder),
       [timestamp]: {
         ...orderDetail[timestamp],
-        restaurant: newRestaurantData,
+        restaurant: prepareRestaurantDataForOrderDetail(
+          restaurant,
+          menu,
+          foodList,
+        ),
       },
     };
-
-    return newOrderDetail;
   }
 
-  const newOrderDetail = {
+  return {
     ...orderDetail,
     [timestamp]: {
       ...orderDetail[timestamp],
       hasNoRestaurants: true,
     },
   };
+};
 
-  return newOrderDetail;
+// * recommend from order data
+const prepareParamsFromOrderForAllDays = async ({ order }: TObject) => {
+  const {
+    dayInWeek = [],
+    startDate,
+    endDate,
+    orderType = EOrderType.group,
+    companyId,
+    deliveryAddress = {},
+    memberAmount = 0,
+    packagePerMember = 0,
+    nutritions = [],
+    mealType = [],
+  } = Listing(order as TListing).getMetadata();
+
+  const company = await fetchUser(companyId);
+  const { companyLocation = {} } = User(company).getPublicData();
+
+  return {
+    nutritions,
+    deliveryOrigin: deliveryAddress?.origin || companyLocation?.origin,
+    packagePerMember,
+    memberAmount,
+    mealType,
+    dayInWeek,
+    totalDates: renderDateRange(startDate, endDate),
+    isNormalOrder: orderType === EOrderType.normal,
+  };
+};
+// * recommend from draft order data (recommend params)
+const prepareParamsFromGivenParamsForAllDays = ({
+  recommendParams,
+}: TObject) => {
+  const {
+    memberAmount = 0,
+    deliveryOrigin,
+    dayInWeek,
+    startDate,
+    endDate,
+    isNormalOrder,
+    nutritions,
+    mealType,
+    packagePerMember,
+  } = recommendParams;
+
+  return {
+    nutritions,
+    deliveryOrigin,
+    packagePerMember,
+    memberAmount,
+    mealType,
+    dayInWeek,
+    totalDates: renderDateRange(startDate, endDate),
+    isNormalOrder,
+  };
 };
 
 export const recommendRestaurants = async ({
@@ -296,64 +400,21 @@ export const recommendRestaurants = async ({
   recommendParams?: TObject;
   shouldCalculateDistance: boolean;
 }) => {
-  let deliveryOrigin: any;
   const orderDetail: TObject = {};
-  let memberAmount: any;
-  let nutritions: string[] = [];
-  let packagePerMember = 0;
-  let totalDates: number[] = [];
-  let isNormalOrder = false;
-  let dayInWeek: string[] = [];
   const order = await fetchListing(orderId as string);
 
-  // * recommend from order data
-  if (isEmpty(recommendParams)) {
-    const {
-      dayInWeek: dayInWeekInOrder = [],
-      startDate,
-      endDate,
-      orderType = EOrderType.group,
-      companyId,
-      deliveryAddress = {},
-      memberAmount: memberAmountInOrder = 0,
-      packagePerMember: packagePerMemberFromOrder,
-      nutritions: nutritionFormOrder = [],
-    } = Listing(order as TListing).getMetadata();
-
-    const orderDeliveryOriginMaybe = deliveryAddress?.origin;
-    const company = await fetchUser(companyId);
-    const { companyLocation = {} } = User(company).getPublicData();
-    const companyOriginMaybe = companyLocation?.origin;
-
-    isNormalOrder = orderType === EOrderType.normal;
-    memberAmount = memberAmountInOrder;
-    deliveryOrigin = orderDeliveryOriginMaybe || companyOriginMaybe;
-    totalDates = renderDateRange(startDate, endDate);
-    dayInWeek = dayInWeekInOrder;
-    nutritions = nutritionFormOrder;
-    packagePerMember = packagePerMemberFromOrder;
-  } else {
-    // * recommend from draft order data (recommend params)
-    const {
-      memberAmount: memberAmountFromParams = 0,
-      deliveryOrigin: deliveryOriginFromParams,
-      dayInWeek: dayInWeekFromParams,
-      startDate: startDateFromParams,
-      endDate: endDateFromParams,
-      isNormalOrder: isNormalOrderFromParams,
-      nutrition: nutritionsFormParams,
-      packagePerMember: packagePerMemberFromParams,
-    } = recommendParams;
-    packagePerMember = packagePerMemberFromParams;
-
-    isNormalOrder = isNormalOrderFromParams;
-    deliveryOrigin = deliveryOriginFromParams;
-    memberAmount = memberAmountFromParams;
-    dayInWeek = dayInWeekFromParams;
-    totalDates = renderDateRange(startDateFromParams, endDateFromParams);
-    nutritions = nutritionsFormParams;
-    packagePerMember = packagePerMemberFromParams;
-  }
+  const {
+    nutritions,
+    deliveryOrigin,
+    packagePerMember,
+    memberAmount,
+    mealType,
+    dayInWeek,
+    totalDates,
+    isNormalOrder,
+  } = isEmpty(recommendParams)
+    ? await prepareParamsFromOrderForAllDays({ order })
+    : prepareParamsFromGivenParamsForAllDays({ recommendParams });
 
   const lineItemsMaybe = isNormalOrder ? { lineItems: [] } : {};
 
@@ -414,9 +475,7 @@ export const recommendRestaurants = async ({
       if (restaurants.length > 0) {
         const randomRestaurant =
           restaurants[Math.floor(Math.random() * (restaurants.length - 1))];
-        const restaurantGetter = Listing(randomRestaurant?.restaurantInfo);
-        const { minQuantity = 0, maxQuantity = 100 } =
-          restaurantGetter.getPublicData();
+        const { menu, restaurant } = randomRestaurant;
 
         if (
           dayInWeek.includes(
@@ -426,29 +485,22 @@ export const recommendRestaurants = async ({
           )
         ) {
           const foodList = await prepareMenuFoodList({
-            menu: randomRestaurant?.menu,
-            restaurant: randomRestaurant?.restaurantInfo,
+            menu,
+            restaurant,
             timestamp,
             nutritions,
+            mealType,
             packagePerMember,
           });
 
           orderDetail[timestamp] = {
             ...orderDetail[timestamp],
-            restaurant: {
-              id: restaurantGetter.getId(),
-              restaurantName: restaurantGetter.getAttributes().title,
+            lineItems: initLineItemsFromFoodList(foodList, isNormalOrder),
+            restaurant: prepareRestaurantDataForOrderDetail(
+              restaurant,
+              menu,
               foodList,
-              menuId: randomRestaurant?.menu.id.uuid,
-              minQuantity,
-              maxQuantity,
-              restaurantOwnerId:
-                randomRestaurant?.restaurantInfo?.author?.id?.uuid,
-              phoneNumber: Listing(
-                randomRestaurant?.restaurantInfo,
-              ).getPublicData()?.phoneNumber,
-            },
-            ...lineItemsMaybe,
+            ),
             hasNoRestaurants: false,
           };
         } else {

@@ -166,6 +166,10 @@ const VATPercentage = 0;
 
 const marketplacePhoneNumber = '1900 252 530';
 
+const maxKilometerFromRestaurantToDeliveryAddressForBooker =
+  process.env
+    .NEXT_PUBLIC_MAX_KILOMETER_FROM_RESTAURANT_TO_DELIVERY_ADDRESS_FOR_BOOKER;
+
 const config = {
   env,
   dev,
@@ -191,6 +195,7 @@ const config = {
   maps,
   VATPercentage,
   marketplacePhoneNumber,
+  maxKilometerFromRestaurantToDeliveryAddressForBooker,
 };
 
 export default config;
