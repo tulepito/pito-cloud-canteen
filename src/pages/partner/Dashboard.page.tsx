@@ -25,8 +25,15 @@ type TDashboardProps = {};
 const Dashboard: React.FC<TDashboardProps> = () => {
   const dispatch = useAppDispatch();
 
-  const { startDate, endDate, getPreviousTimePeriod, timePeriodOption } =
-    useControlTimeRange();
+  const {
+    startDate,
+    endDate,
+    setStartDate,
+    setEndDate,
+    getPreviousTimePeriod,
+    timePeriodOption,
+    handleTimePeriodChange,
+  } = useControlTimeRange();
   const { analyticsOrdersTimeFrame, analyticsRevenueTimeFrame } =
     useControlTimeFrame();
 
@@ -128,6 +135,12 @@ const Dashboard: React.FC<TDashboardProps> = () => {
           data={overviewData}
           previousData={previousOverviewData}
           timePeriodOption={timePeriodOption}
+          inProgress={fetchSubOrdersInProgress}
+          handleTimePeriodChange={handleTimePeriodChange}
+          startDate={startDate!}
+          endDate={endDate!}
+          setStartDate={setStartDate}
+          setEndDate={setEndDate}
         />
       </section>
       <section className={css.section}>
@@ -149,7 +162,10 @@ const Dashboard: React.FC<TDashboardProps> = () => {
         />
       </section>
       <section className={css.section}>
-        <LatestOrders data={splittedSubOrders.slice(0, 5)} />
+        <LatestOrders
+          data={splittedSubOrders.slice(0, 5)}
+          inProgress={fetchSubOrdersInProgress}
+        />
       </section>
       <section className={css.section}>
         <OrderCalendar

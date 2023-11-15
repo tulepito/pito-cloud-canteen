@@ -25,6 +25,7 @@ type FieldDateRangePickerProps = FieldRenderProps<
   label?: string;
   name?: string;
   shouldHideInput?: boolean;
+  fieldWrapperClassName?: string;
 };
 
 const renderCustomHeader = (props: ReactDatePickerCustomHeaderProps) => {
@@ -76,6 +77,7 @@ const FieldDateRangePickerComponent: React.FC<FieldDateRangePickerProps> = (
     startDate: startDateProps,
     endDate: endDateProps,
     shouldHideInput = false,
+    fieldWrapperClassName,
     ...rest
   } = props;
   const { name, onChange, value, onBlur } = input;
@@ -105,6 +107,11 @@ const FieldDateRangePickerComponent: React.FC<FieldDateRangePickerProps> = (
       [css.inputError]: !!customErrorText || !!(invalid && error),
     });
 
+  const fieldWrapperClasses = classNames(
+    css.fieldsWrapper,
+    fieldWrapperClassName,
+  );
+
   const onInputChange = (dates: [Date | null, Date | null]) => {
     const [startDateValue, endDateValue] = dates;
     onChange({
@@ -124,7 +131,7 @@ const FieldDateRangePickerComponent: React.FC<FieldDateRangePickerProps> = (
       )}
       <RenderWhen condition={!shouldHideInput}>
         <>
-          <div className={css.fieldsWrapper}>
+          <div className={fieldWrapperClasses}>
             <div className={inputClasses}>
               {startDate && formatDate(new Date(startDate), 'dd/MM/yyyy')}
             </div>

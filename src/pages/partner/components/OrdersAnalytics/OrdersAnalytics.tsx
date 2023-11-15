@@ -1,3 +1,4 @@
+import Skeleton from 'react-loading-skeleton';
 import type { TooltipProps } from 'recharts';
 
 import LineChart from '@components/Chart/LineChart/LineChart';
@@ -100,6 +101,9 @@ const OrdersAnalytics: React.FC<TOrdersAnalyticsProps> = (props) => {
               </div>
             </RenderWhen.False>
           </RenderWhen>
+          <RenderWhen.False>
+            <Skeleton className={css.loading} />
+          </RenderWhen.False>
         </RenderWhen>
       </div>
     </div>

@@ -13,11 +13,19 @@ type TTotalStatisticItemProps = {
   fluctuation: EFluctuationType;
   className?: string;
   valueWrapperClassName?: string;
+  isDesktop?: boolean;
 };
 
 const TotalStatisticItem: React.FC<TTotalStatisticItemProps> = (props) => {
-  const { icon, title, value, fluctuation, className, valueWrapperClassName } =
-    props;
+  const {
+    icon,
+    title,
+    value,
+    fluctuation,
+    className,
+    valueWrapperClassName,
+    isDesktop,
+  } = props;
 
   const fluctuationIcon = () => {
     switch (fluctuation) {
@@ -31,10 +39,28 @@ const TotalStatisticItem: React.FC<TTotalStatisticItemProps> = (props) => {
   };
 
   const classes = classNames(css.root, className);
+  const desktopClasses = classNames(css.desktopRoot, className);
   const valueWrapperClasses = classNames(
     css.valueWrapper,
     valueWrapperClassName,
   );
+
+  if (isDesktop) {
+    return (
+      <div className={desktopClasses}>
+        <div>
+          <div className={css.title}>{title}</div>
+          <div className={valueWrapperClasses}>
+            <div className={css.value}>{value}</div>
+            {fluctuationIcon()}
+          </div>
+        </div>
+        <div className={css.iconTitleWrapper}>
+          <div className={css.iconWrapper}>{icon}</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={classes}>

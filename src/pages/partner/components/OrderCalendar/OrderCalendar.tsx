@@ -59,6 +59,7 @@ const OrderCalendar: React.FC<TOrderCalendarProps> = (props) => {
           inProgress={inProgress}
           defaultView={Views.WEEK}
           components={{ toolbar: () => <></> }}
+          resources={{ hideEmptySubOrderSection: true }}
         />
         <div className={css.subOrderList}>
           {subOrdersFromSelectedDay.map((item, index) => (

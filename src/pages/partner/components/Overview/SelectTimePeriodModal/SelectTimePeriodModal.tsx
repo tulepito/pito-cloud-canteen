@@ -1,20 +1,40 @@
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
+import OutsideClickHandler from '@components/OutsideClickHandler/OutsideClickHandler';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
 import SlideModal from '@components/SlideModal/SlideModal';
 import useBoolean from '@hooks/useBoolean';
+import { timePeriodOptions } from '@pages/partner/hooks/useControlTimeRange';
+import type { ETimePeriodOption } from '@src/utils/enums';
 
 import SelectTimePeriodForm from '../SelectTimePeriodForm/SelectTimePeriodForm';
+import SelectTimeRangePeriodForm from '../SelectTimeRangePeriodForm/SelectTimeRangePeriodForm';
 
 import css from './SelectTimePeriodModal.module.scss';
 
 type TSelectTimePeriodModalProps = {
   isOpen: boolean;
   onClose: () => void;
+  isMobileLayout: boolean;
+  handleTimePeriodChange: (timePeriod: ETimePeriodOption) => void;
+  startDate: number;
+  endDate: number;
+  setStartDate: (startDate: number) => void;
+  setEndDate: (endDate: number) => void;
 };
 
 const SelectTimePeriodModal: React.FC<TSelectTimePeriodModalProps> = (
   props,
 ) => {
-  const { isOpen, onClose } = props;
+  const {
+    isOpen,
+    onClose,
+    isMobileLayout,
+    handleTimePeriodChange,
+    startDate,
+    endDate,
+    setStartDate,
+    setEndDate,
+  } = props;
   const selectCustomController = useBoolean();
 
   const modalTitle = selectCustomController.value ? (
@@ -28,21 +48,66 @@ const SelectTimePeriodModal: React.FC<TSelectTimePeriodModalProps> = (
 
   const onSubmit = () => {};
 
+  if (isMobileLayout)
+    return (
+      <SlideModal
+        id="SelectTimePeriodModal"
+        isOpen={isOpen}
+        onClose={onClose}
+        modalTitle={modalTitle}
+        containerClassName={css.modalContainer}>
+        <SelectTimePeriodForm
+          onSubmit={onSubmit}
+          shouldShowCustomSelect={selectCustomController.value}
+          onCustomSelectClick={selectCustomController.setTrue}
+          onBackToTimePeriodSelectClick={selectCustomController.setFalse}
+          onCloseModal={onClose}
+        />
+      </SlideModal>
+    );
+
   return (
-    <SlideModal
-      id="SelectTimePeriodModal"
-      isOpen={isOpen}
-      onClose={onClose}
-      modalTitle={modalTitle}
-      containerClassName={css.modalContainer}>
-      <SelectTimePeriodForm
-        onSubmit={onSubmit}
-        shouldShowCustomSelect={selectCustomController.value}
-        onCustomSelectClick={selectCustomController.setTrue}
-        onBackToTimePeriodSelectClick={selectCustomController.setFalse}
-        onCloseModal={onClose}
-      />
-    </SlideModal>
+    <OutsideClickHandler onOutsideClick={onClose}>
+      <div className={css.optionsWrapper}>
+        {timePeriodOptions.map((option) => {
+          const handleSelectTimePeriodClick = (
+            e: React.MouseEvent<HTMLElement>,
+          ) => {
+            e.stopPropagation();
+            handleTimePeriodChange(option.key);
+            onClose();
+          };
+
+          return (
+            <div
+              key={option.key}
+              className={css.option}
+              onClick={handleSelectTimePeriodClick}>
+              {option.label}
+            </div>
+          );
+        })}
+        <div
+          className={css.option}
+          onMouseEnter={selectCustomController.setTrue}>
+          <IconArrow direction="left" />
+          Tuỳ chỉnh
+          <RenderWhen condition={selectCustomController.value}>
+            <div className={css.customTimeModalWrapper}>
+              <SelectTimeRangePeriodForm
+                onSubmit={onSubmit}
+                onCloseModal={onClose}
+                onCloseCustomModal={selectCustomController.setFalse}
+                startDate={startDate}
+                endDate={endDate}
+                setStartDate={setStartDate}
+                setEndDate={setEndDate}
+              />
+            </div>
+          </RenderWhen>
+        </div>
+      </div>
+    </OutsideClickHandler>
   );
 };
 

@@ -53,10 +53,12 @@ const SelectTimePeriodFormComponent: React.FC<
     resetTimePeriod,
   } = useControlTimeRange();
 
-  const [startDateValue, setStartDateValue] = useState<number | null>(
-    startDate,
+  const [startDateValue, setStartDateValue] = useState<Date | null>(
+    new Date(startDate!),
   );
-  const [endDateValue, setEndDateValue] = useState<number | null>(endDate);
+  const [endDateValue, setEndDateValue] = useState<Date | null>(
+    new Date(endDate!),
+  );
 
   const onCancel = () => {
     if (shouldShowCustomSelect) {
@@ -71,8 +73,8 @@ const SelectTimePeriodFormComponent: React.FC<
       onBackToTimePeriodSelectClick?.();
     } else {
       if (values.timePeriod === 'custom') {
-        setStartDate(startDateValue!);
-        setEndDate(endDateValue!);
+        setStartDate(startDateValue?.getTime()!);
+        setEndDate(endDateValue?.getTime()!);
       } else {
         handleTimePeriodChange(values.timePeriod! as ETimePeriodOption);
       }
@@ -93,13 +95,14 @@ const SelectTimePeriodFormComponent: React.FC<
         <FieldDateRangePicker
           id="dateRangeField"
           name="dateRangeField"
-          selected={startDate}
+          selected={new Date(startDate!)}
           onChange={(_values: [Date | null, Date | null]) => {
-            setStartDateValue(_values[0]?.getTime()!);
-            setEndDateValue(_values[1]?.getTime()!);
+            setStartDateValue(_values[0]);
+            setEndDateValue(_values[1]);
           }}
           startDate={startDateValue}
           endDate={endDateValue}
+          fieldWrapperClassName={css.fieldDateInputWrapper}
         />
         <RenderWhen.False>
           <>

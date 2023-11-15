@@ -12,6 +12,9 @@
 
 .customSelectText {
   @include textTemplate(18px, 700, 24px);
+  @include viewportLarge {
+    display: none;
+  }
 }
 
 .bottomButons {
@@ -21,5 +24,11 @@
 
   .button {
     width: 100%;
+  }
+}
+
+.fieldDateInputWrapper {
+  @include viewportLarge {
+    padding: 0 8px;
   }
 }

@@ -1,3 +1,5 @@
+import Skeleton from 'react-loading-skeleton';
+
 import IconNoAnalyticsData from '@components/Icons/IconNoAnalyticsData/IconNoAnalyticsData';
 import NamedLink from '@components/NamedLink/NamedLink';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
@@ -9,10 +11,11 @@ import css from './LatestOrders.module.scss';
 
 type TLatestOrdersProps = {
   data: any[];
+  inProgress?: boolean;
 };
 
 const LatestOrders: React.FC<TLatestOrdersProps> = (props) => {
-  const { data = [] } = props;
+  const { data = [], inProgress } = props;
 
   return (
     <div className={css.root}>
@@ -23,17 +26,22 @@ const LatestOrders: React.FC<TLatestOrdersProps> = (props) => {
         </NamedLink>
       </div>
       <div className={css.dataWrapper}>
-        <RenderWhen condition={data.length === 0}>
-          <div className={css.empty}>
-            <IconNoAnalyticsData />
-            <div className={css.emptyText}>
-              Chưa có dữ liệu báo cáo trong thời gian này
+        <RenderWhen condition={!inProgress}>
+          <RenderWhen condition={data.length === 0}>
+            <div className={css.empty}>
+              <IconNoAnalyticsData />
+              <div className={css.emptyText}>
+                Chưa có dữ liệu báo cáo trong thời gian này
+              </div>
             </div>
-          </div>
+            <RenderWhen.False>
+              {data.map((item: any) => (
+                <SubOrderItem key={item.subOrderId} subOrder={item} />
+              ))}
+            </RenderWhen.False>
+          </RenderWhen>
           <RenderWhen.False>
-            {data.map((item: any) => (
-              <SubOrderItem key={item.subOrderId} subOrder={item} />
-            ))}
+            <Skeleton className={css.loading} />
           </RenderWhen.False>
         </RenderWhen>
       </div>

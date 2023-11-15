@@ -8,6 +8,10 @@
   background: $neutralGray1;
   @include flexAlign(center, space-between);
   padding: 8px;
+
+  @include viewportLarge {
+    flex-direction: column;
+  }
 }
 
 .leftPart {
