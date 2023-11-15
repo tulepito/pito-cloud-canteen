@@ -4,7 +4,6 @@ import uniq from 'lodash/uniq';
 import { EMAIL_RE } from '@src/utils/validators';
 
 export const convertWorksheetDataToEmailList = (data: any[]) => {
-  console.debug('💫 > convertWorksheetDataToEmailList > data: ', data);
   const normalizedEmailList = compact(
     data.map((d) => {
       const rowData = d[0].toString().trim();

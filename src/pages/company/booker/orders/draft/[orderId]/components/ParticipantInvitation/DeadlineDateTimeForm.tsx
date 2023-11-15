@@ -1,44 +1,17 @@
-import { forwardRef } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
-import { format } from 'date-fns';
-import viLocale from 'date-fns/locale/vi';
 import { DateTime } from 'luxon';
 
 import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
 import FieldDatePicker from '@components/FormFields/FieldDatePicker/FieldDatePicker';
 import FieldDropdownSelect from '@components/FormFields/FieldDropdownSelect/FieldDropdownSelect';
-import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import IconCalendar from '@components/Icons/IconCalender/IconCalender';
 import IconClock from '@components/Icons/IconClock/IconClock';
 import { useAppSelector } from '@hooks/reduxHooks';
-import type { TObject } from '@src/utils/types';
 import { TimeOptions } from '@utils/dates';
 
 import css from './DeadlineDateTimeForm.module.scss';
-
-// eslint-disable-next-line react/display-name
-const CustomFieldDateInput = forwardRef((props: TObject, ref) => {
-  return (
-    <FieldTextInput
-      {...props}
-      name={props.name}
-      className={css.customInput}
-      format={(value) => {
-        return value
-          ? format(new Date(value), 'EEE, dd MMMM, yyyy', {
-              locale: viLocale,
-            })
-          : format(new Date(), 'EEE, dd MMMM, yyyy', {
-              locale: viLocale,
-            });
-      }}
-      leftIcon={<IconCalendar />}
-      inputRef={ref}
-    />
-  );
-});
 
 export type DeadlineDateTimeFormValues = {
   deadlineDate: string | number;
@@ -97,7 +70,7 @@ const DeadlineDateTimeFormComponent: React.FC<
           className={css.dateInput}
           autoComplete="off"
           readOnly
-          customInput={<CustomFieldDateInput />}
+          icon={<IconCalendar />}
         />
         <FieldDropdownSelect
           id="DeadlineDateTimeForm.deadlineHour"

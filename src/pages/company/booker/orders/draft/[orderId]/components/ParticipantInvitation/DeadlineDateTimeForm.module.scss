@@ -1,6 +1,7 @@
 @use '/src/styles/mixins.scss' as *;
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/defaults.scss' as *;
 
 .formRoot {
   padding: 16px;
@@ -22,5 +23,13 @@
 
   .formTitle {
     @include textTemplate(18px, 700, 24px);
+  }
+
+  .dateInput {
+    input {
+      @include inputStyles;
+      width: 100%;
+      padding-left: 48px !important;
+    }
   }
 }
