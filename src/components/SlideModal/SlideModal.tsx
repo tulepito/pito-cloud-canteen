@@ -9,7 +9,7 @@ import css from './SlideModal.module.scss';
 type TSlideModalProps = PropsWithChildren & {
   id: string;
   isOpen: boolean;
-  modalTitle?: string | ReactNode;
+  modalTitle?: ReactNode;
   onClose: () => void;
   containerClassName?: string;
 };

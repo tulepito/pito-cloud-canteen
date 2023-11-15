@@ -116,60 +116,55 @@ const Overview: React.FC<TOverviewProps> = (props) => {
         </div>
       </div>
       <RenderWhen condition={!inProgress}>
-        <>
-          <div className={css.desktopItemWrapper}>
-            <TotalStatisticItem
-              icon={<IconMoney />}
-              title="Tổng doanh thu"
-              value={`${parseThousandNumber(totalRevenue)}đ`}
-              fluctuation={getFluctuation(totalRevenue, previousTotalRevenue)}
-              valueWrapperClassName={css.revenueValueWrapper}
-              isDesktop
-            />
+        <div className={css.desktopItemWrapper}>
+          <TotalStatisticItem
+            icon={<IconMoney />}
+            title="Tổng doanh thu"
+            value={`${parseThousandNumber(totalRevenue)}đ`}
+            fluctuation={getFluctuation(totalRevenue, previousTotalRevenue)}
+            valueWrapperClassName={css.revenueValueWrapper}
+            isDesktop
+          />
+          <TotalStatisticItem
+            icon={<IconGroup />}
+            title="Tổng khách hàng"
+            value={totalCustomer}
+            fluctuation={getFluctuation(totalCustomer, previousTotalCustomer)}
+            isDesktop
+          />
+          <TotalStatisticItem
+            icon={<IconReceipt className={css.receiptIcon} />}
+            title="Tổng đơn hàng"
+            value={totalOrders}
+            fluctuation={getFluctuation(totalOrders, previousTotalOrders)}
+            isDesktop
+          />
+        </div>
+        <div className={css.itemWrapper}>
+          <TotalStatisticItem
+            icon={<IconMoney />}
+            title="Tổng doanh thu"
+            value={`${parseThousandNumber(totalRevenue)}đ`}
+            fluctuation={getFluctuation(totalRevenue, previousTotalRevenue)}
+            valueWrapperClassName={css.revenueValueWrapper}
+          />
+          <div className={css.row}>
             <TotalStatisticItem
               icon={<IconGroup />}
               title="Tổng khách hàng"
               value={totalCustomer}
               fluctuation={getFluctuation(totalCustomer, previousTotalCustomer)}
-              isDesktop
+              className={css.item}
             />
             <TotalStatisticItem
               icon={<IconReceipt className={css.receiptIcon} />}
               title="Tổng đơn hàng"
               value={totalOrders}
               fluctuation={getFluctuation(totalOrders, previousTotalOrders)}
-              isDesktop
+              className={css.item}
             />
           </div>
-          <div className={css.itemWrapper}>
-            <TotalStatisticItem
-              icon={<IconMoney />}
-              title="Tổng doanh thu"
-              value={`${parseThousandNumber(totalRevenue)}đ`}
-              fluctuation={getFluctuation(totalRevenue, previousTotalRevenue)}
-              valueWrapperClassName={css.revenueValueWrapper}
-            />
-            <div className={css.row}>
-              <TotalStatisticItem
-                icon={<IconGroup />}
-                title="Tổng khách hàng"
-                value={totalCustomer}
-                fluctuation={getFluctuation(
-                  totalCustomer,
-                  previousTotalCustomer,
-                )}
-                className={css.item}
-              />
-              <TotalStatisticItem
-                icon={<IconReceipt className={css.receiptIcon} />}
-                title="Tổng đơn hàng"
-                value={totalOrders}
-                fluctuation={getFluctuation(totalOrders, previousTotalOrders)}
-                className={css.item}
-              />
-            </div>
-          </div>
-        </>
+        </div>
         <RenderWhen.False>
           <RenderWhen.False>
             <Skeleton className={css.loading} />

@@ -105,23 +105,21 @@ const SelectTimePeriodFormComponent: React.FC<
           fieldWrapperClassName={css.fieldDateInputWrapper}
         />
         <RenderWhen.False>
-          <>
-            {timePeriodOptions.map(({ key, label }) => (
-              <FieldRadioButton
-                key={key}
-                id={`timePeriod-${key}`}
-                name="timePeriod"
-                label={label}
-                value={key}
-              />
-            ))}
-            <div
-              className={css.customSelectWrapper}
-              onClick={onCustomSelectClick}>
-              <div className={css.customSelectText}>Tuỳ chỉnh</div>
-              <IconArrow direction="right" />
-            </div>
-          </>
+          {timePeriodOptions.map(({ key, label }) => (
+            <FieldRadioButton
+              key={key}
+              id={`timePeriod-${key}`}
+              name="timePeriod"
+              label={label}
+              value={key}
+            />
+          ))}
+          <div
+            className={css.customSelectWrapper}
+            onClick={onCustomSelectClick}>
+            <div className={css.customSelectText}>Tuỳ chỉnh</div>
+            <IconArrow direction="right" />
+          </div>
         </RenderWhen.False>
       </RenderWhen>
 

@@ -8,6 +8,8 @@
   background: $neutralGray1;
   @include flexAlign(center, space-between);
   padding: 8px;
+  position: relative;
+  padding-left: 20px;
 
   @include viewportLarge {
     flex-direction: column;
@@ -38,6 +40,10 @@
   border-radius: 2px;
   margin-right: 8px;
   flex-shrink: 0;
+  position: absolute;
+  top: 50%;
+  left: 8px;
+  transform: translateY(-50%);
 }
 
 .title {

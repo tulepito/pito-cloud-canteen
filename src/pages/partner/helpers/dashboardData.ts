@@ -147,18 +147,17 @@ const generateTimeRange = ({
   startDate,
   endDate,
 }: {
-  timeFrame: string;
+  timeFrame: ETimeFrame;
   startDate: Date;
   endDate: Date;
 }) => {
+  const timestampRange = getTimePeriodBetweenDates(
+    startDate,
+    endDate,
+    timeFrame,
+  );
   switch (timeFrame) {
     case ETimeFrame.DAY: {
-      const timestampRange = getTimePeriodBetweenDates(
-        startDate,
-        endDate,
-        ETimeFrame.DAY,
-      );
-
       return timestampRange.map(({ start, end }) => ({
         timeLabel: formatTimestamp(start.getTime(), 'dd'),
         timeRange: [start.getTime(), end.getTime()],
@@ -166,15 +165,7 @@ const generateTimeRange = ({
     }
 
     case ETimeFrame.WEEK: {
-      const weeks = getTimePeriodBetweenDates(
-        startDate,
-        endDate,
-        ETimeFrame.WEEK,
-      );
-
-      return weeks.map((week) => {
-        const { start, end } = week;
-
+      return timestampRange.map(({ start, end }) => {
         return {
           timeLabel: `${formatTimestamp(
             start.getTime(),
@@ -186,15 +177,7 @@ const generateTimeRange = ({
     }
 
     case ETimeFrame.MONTH: {
-      const months = getTimePeriodBetweenDates(
-        startDate,
-        endDate,
-        ETimeFrame.MONTH,
-      );
-
-      return months.map((month) => {
-        const { start, end } = month;
-
+      return timestampRange.map(({ start, end }) => {
         return {
           timeLabel: `${formatTimestamp(start.getTime(), 'MM/yy')}`,
           timeRange: [start.getTime(), end.getTime()],

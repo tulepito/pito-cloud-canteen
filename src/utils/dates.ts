@@ -702,14 +702,14 @@ export const getTimePeriodBetweenDates = (
 
   const timePeriods = [];
 
-  let currentWeek = start.startOf(timePeriod);
+  let currentTimePeriod = start.startOf(timePeriod);
 
-  while (currentWeek <= end) {
+  while (currentTimePeriod <= end) {
     timePeriods.push({
-      start: currentWeek.toJSDate(),
-      end: currentWeek.endOf(timePeriod).toJSDate(),
+      start: currentTimePeriod.toJSDate(),
+      end: currentTimePeriod.endOf(timePeriod).toJSDate(),
     });
-    currentWeek = currentWeek.plus({ [`${timePeriod}s`]: 1 });
+    currentTimePeriod = currentTimePeriod.plus({ [`${timePeriod}s`]: 1 });
   }
 
   return timePeriods;

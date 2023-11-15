@@ -163,8 +163,9 @@ export const useControlTimeRange = () => {
         previousStartDate,
         previousEndDate,
       };
+
     switch (timePeriodOption) {
-      case 'custom':
+      case ETimePeriodOption.CUSTOM:
         {
           const daysBetweenStartAndEnd = DateTime.fromMillis(endDate!)
             .diff(DateTime.fromMillis(startDate!), 'days')
@@ -179,11 +180,11 @@ export const useControlTimeRange = () => {
           );
         }
         break;
-      case 'today':
+      case ETimePeriodOption.TODAY:
         previousStartDate = yesterday;
         previousEndDate = yesterday;
         break;
-      case 'yesterday':
+      case ETimePeriodOption.YESTERDAY:
         previousStartDate = getDayBeforeGivenDayWithOffset(
           new Date(yesterday),
           1,
@@ -193,7 +194,7 @@ export const useControlTimeRange = () => {
           1,
         );
         break;
-      case 'lastWeek':
+      case ETimePeriodOption.LAST_WEEK:
         previousStartDate = DateTime.fromMillis(startDate!)
           .minus({ weeks: 1 })
           .startOf('week')
@@ -204,7 +205,7 @@ export const useControlTimeRange = () => {
           .endOf('week')
           .toMillis();
         break;
-      case 'lastMonth':
+      case ETimePeriodOption.LAST_MONTH:
         previousStartDate = DateTime.fromMillis(startDate!)
           .minus({ months: 1 })
           .startOf('month')
@@ -215,7 +216,7 @@ export const useControlTimeRange = () => {
           .endOf('month')
           .toMillis();
         break;
-      case 'last7Days':
+      case ETimePeriodOption.LAST_7_DAYS:
         previousStartDate = DateTime.fromMillis(startDate!)
           .minus({ days: 7 })
           .startOf('day')
@@ -226,7 +227,7 @@ export const useControlTimeRange = () => {
           .endOf('day')
           .toMillis();
         break;
-      case 'last30Days':
+      case ETimePeriodOption.LAST_30_DAYS:
         previousStartDate = DateTime.fromMillis(startDate!)
           .minus({ days: 30 })
           .startOf('day')

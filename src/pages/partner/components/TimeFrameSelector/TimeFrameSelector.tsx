@@ -13,14 +13,6 @@ type TTimeFrameSelectorProps = {
 
 const getDisabledTimeFrameOptions = (timePeriodOption: ETimePeriodOption) => {
   if (
-    timePeriodOption === ETimePeriodOption.CUSTOM ||
-    timePeriodOption === ETimePeriodOption.LAST_MONTH ||
-    timePeriodOption === ETimePeriodOption.LAST_30_DAYS
-  ) {
-    return [];
-  }
-
-  if (
     timePeriodOption === ETimePeriodOption.LAST_WEEK ||
     timePeriodOption === ETimePeriodOption.LAST_7_DAYS
   ) {

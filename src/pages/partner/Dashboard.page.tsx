@@ -130,7 +130,7 @@ const Dashboard: React.FC<TDashboardProps> = () => {
 
   return (
     <div className={css.root}>
-      <section className={css.section}>
+      <section>
         <Overview
           data={overviewData}
           previousData={previousOverviewData}
@@ -143,7 +143,7 @@ const Dashboard: React.FC<TDashboardProps> = () => {
           setEndDate={setEndDate}
         />
       </section>
-      <section className={css.section}>
+      <section>
         <OrdersAnalytics
           data={splittedSubOrders}
           overviewData={overviewData}
@@ -152,7 +152,7 @@ const Dashboard: React.FC<TDashboardProps> = () => {
           timePeriodOption={timePeriodOption}
         />
       </section>
-      <section className={css.section}>
+      <section>
         <RevenueAnalytics
           data={splittedSubOrders}
           overviewData={overviewData}
@@ -161,13 +161,13 @@ const Dashboard: React.FC<TDashboardProps> = () => {
           timePeriodOption={timePeriodOption}
         />
       </section>
-      <section className={css.section}>
+      <section>
         <LatestOrders
           data={splittedSubOrders.slice(0, 5)}
           inProgress={fetchSubOrdersInProgress}
         />
       </section>
-      <section className={css.section}>
+      <section>
         <OrderCalendar
           data={splittedSubOrders}
           inProgress={fetchSubOrdersInProgress}

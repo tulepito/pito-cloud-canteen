@@ -1,13 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-import {
-  queryAllPartnerPaymentRecordsApi,
-  queryPartnerOrdersApi,
-} from '@apis/partnerApi';
+import { queryPartnerOrdersApi } from '@apis/partnerApi';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { CurrentUser } from '@src/utils/data';
 import { EOrderStates, ETimeFrame, ETimePeriodOption } from '@src/utils/enums';
-import type { TObject, TPaymentRecord } from '@src/utils/types';
+import type { TObject } from '@src/utils/types';
 
 // ================ Initial states ================ //
 type TPartnerDashboardState = {
@@ -24,10 +21,6 @@ type TPartnerDashboardState = {
   subOrders: TObject[];
   fetchSubOrdersInProgress: boolean;
   fetchSubOrdersError: any;
-
-  paymentRecords: TPaymentRecord[];
-  fetchPartnerFirebasePaymentRecordInProgress: boolean;
-  fetchPartnerFirebasePaymentRecordError: any;
 };
 const initialState: TPartnerDashboardState = {
   startDate: null,
@@ -43,16 +36,10 @@ const initialState: TPartnerDashboardState = {
   subOrders: [],
   fetchSubOrdersInProgress: false,
   fetchSubOrdersError: null,
-
-  paymentRecords: [],
-  fetchPartnerFirebasePaymentRecordInProgress: false,
-  fetchPartnerFirebasePaymentRecordError: null,
 };
 
 // ================ Thunk types ================ //
 const FETCH_SUB_ORDERS = 'app/PartnerDashboard/FETCH_SUB_ORDERS';
-const FETCH_PARTNER_FIREBASE_PAYMENT_RECORD =
-  'app/PartnerDashboard/FETCH_PARTNER_FIREBASE_PAYMENT_RECORD';
 
 // ================ Async thunks ================ //
 const fetchSubOrders = createAsyncThunk(
@@ -87,22 +74,7 @@ const fetchSubOrders = createAsyncThunk(
   },
 );
 
-const fetchPartnerFirebasePaymentRecord = createAsyncThunk(
-  FETCH_PARTNER_FIREBASE_PAYMENT_RECORD,
-  async (payload: TObject, { getState }) => {
-    const { currentUser } = getState().user;
-    const { restaurantListingId } = CurrentUser(currentUser!).getMetadata();
-
-    const { data: allPaymentRecords } = await queryAllPartnerPaymentRecordsApi({
-      partnerId: restaurantListingId,
-    });
-
-    return allPaymentRecords;
-  },
-);
-
 export const PartnerDashboardThunks = {
-  fetchPartnerFirebasePaymentRecord,
   fetchSubOrders,
 };
 
@@ -129,18 +101,6 @@ const PartnerDashboardSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchPartnerFirebasePaymentRecord.pending, (state) => {
-        state.fetchPartnerFirebasePaymentRecordInProgress = true;
-        state.fetchPartnerFirebasePaymentRecordError = null;
-      })
-      .addCase(fetchPartnerFirebasePaymentRecord.fulfilled, (state, action) => {
-        state.fetchPartnerFirebasePaymentRecordInProgress = false;
-        state.paymentRecords = action.payload;
-      })
-      .addCase(fetchPartnerFirebasePaymentRecord.rejected, (state, action) => {
-        state.fetchPartnerFirebasePaymentRecordInProgress = false;
-        state.fetchPartnerFirebasePaymentRecordError = action.error;
-      })
 
       .addCase(fetchSubOrders.pending, (state) => {
         state.fetchSubOrdersInProgress = true;
