@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import classNames from 'classnames';
-import { has, pickBy } from 'lodash';
+import { difference, has, omit, pickBy } from 'lodash';
 import isEmpty from 'lodash/isEmpty';
 import isEqual from 'lodash/isEqual';
 import { DateTime } from 'luxon';
@@ -725,10 +725,49 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
           recommendParams,
         }),
       );
-      const updateOrderDetail = mergeRecommendOrderDetailWithCurrentOrderDetail(
-        draftEditOrderDetail!,
-        recommendOrderDetail,
-      );
+
+      let updateOrderDetail = {};
+
+      if (isInProgressOrder) {
+        const originalOrderOfTimestamp: string[] = Object.keys(
+          draftEditOrderDetail!,
+        );
+        const disableEditingTimestamps = eventsForCalender.reduce(
+          (acc, _event) => {
+            if (_event.resource.disableEditing) {
+              return [...acc, _event.resource.id];
+            }
+
+            return acc;
+          },
+          [] as string[],
+        );
+
+        const inOrderUpdateOrderDetail: TObject = {
+          ...omit(recommendOrderDetail, disableEditingTimestamps),
+          ...omit(
+            draftEditOrderDetail,
+            difference(
+              Object.keys(draftEditOrderDetail!),
+              disableEditingTimestamps,
+            ),
+          ),
+        };
+        const mapUpdateOrderDetail = new Map<string, TObject>();
+        originalOrderOfTimestamp.forEach((timestamp) => {
+          mapUpdateOrderDetail.set(
+            timestamp,
+            inOrderUpdateOrderDetail[timestamp],
+          );
+        });
+
+        updateOrderDetail = Object.fromEntries(mapUpdateOrderDetail);
+      } else {
+        updateOrderDetail = mergeRecommendOrderDetailWithCurrentOrderDetail(
+          draftEditOrderDetail!,
+          recommendOrderDetail,
+        );
+      }
 
       dispatch(
         saveDraftEditOrder({
