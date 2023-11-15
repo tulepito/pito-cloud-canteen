@@ -171,6 +171,8 @@ const Dashboard: React.FC<TDashboardProps> = () => {
         <OrderCalendar
           data={splittedSubOrders}
           inProgress={fetchSubOrdersInProgress}
+          startDate={startDate!}
+          endDate={endDate!}
         />
       </section>
     </div>

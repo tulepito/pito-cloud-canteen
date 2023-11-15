@@ -35,4 +35,8 @@
   @include flexAlign(normal);
   flex-direction: column;
   gap: 12px;
+
+  @include viewportLarge {
+    display: none;
+  }
 }

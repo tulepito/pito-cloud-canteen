@@ -7,10 +7,12 @@ import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
 import useSelectDay from '@components/CalendarDashboard/hooks/useSelectDay';
 import NamedLink from '@components/NamedLink/NamedLink';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
+import { useViewport } from '@hooks/useViewport';
 import EmptySubOrder from '@pages/participant/orders/components/EmptySubOrder/EmptySubOrder';
 import { partnerPaths } from '@src/paths';
 import { isSameDate } from '@src/utils/dates';
 
+import PartnerDashboardToolbar from './PartnerDashboardToolbar/PartnerDashboardToolbar';
 import SubOrderEventCard from './SubOrderEventCard/SubOrderEventCard';
 
 import css from './OrderCalendar.module.scss';
@@ -18,11 +20,14 @@ import css from './OrderCalendar.module.scss';
 type TOrderCalendarProps = {
   data: any[];
   inProgress?: boolean;
+  startDate: number;
+  endDate: number;
 };
 
 const OrderCalendar: React.FC<TOrderCalendarProps> = (props) => {
-  const { data = [], inProgress } = props;
+  const { data = [], inProgress, startDate, endDate } = props;
   const { selectedDay } = useSelectDay();
+  const { isMobileLayout } = useViewport();
 
   const events: Event[] = useMemo(() => {
     return data.map((item) => ({
@@ -43,6 +48,16 @@ const OrderCalendar: React.FC<TOrderCalendarProps> = (props) => {
     [events, selectedDay],
   );
 
+  const toolbarComponent = isMobileLayout
+    ? () => <></>
+    : (toolbarProps: any) => (
+        <PartnerDashboardToolbar
+          {...toolbarProps}
+          startDate={new Date(startDate)}
+          endDate={new Date(endDate)}
+        />
+      );
+
   return (
     <div className={css.root}>
       <div className={css.titleHeader}>
@@ -58,7 +73,7 @@ const OrderCalendar: React.FC<TOrderCalendarProps> = (props) => {
           renderEvent={SubOrderEventCard}
           inProgress={inProgress}
           defaultView={Views.WEEK}
-          components={{ toolbar: () => <></> }}
+          components={{ toolbar: toolbarComponent }}
           resources={{ hideEmptySubOrderSection: true }}
         />
         <div className={css.subOrderList}>

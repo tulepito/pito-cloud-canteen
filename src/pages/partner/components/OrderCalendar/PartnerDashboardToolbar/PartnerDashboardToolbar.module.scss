@@ -1,0 +1,145 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.root {
+  display: flex;
+  padding-bottom: 38px;
+  align-items: center;
+  flex-direction: column;
+
+  @include viewportLarge {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+}
+
+.label {
+  @include textTemplate(16px, 700, 24px, '');
+  color: $neutralGray7;
+  margin-bottom: 20px;
+
+  @include viewportLarge {
+    margin-bottom: 0;
+  }
+}
+
+.companyId {
+  @include textTemplate(24px, 700, 32px, '');
+  color: $neutralGray7;
+  margin-bottom: 8px;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+}
+
+.viewModeGroup {
+  padding: 4px;
+  display: flex;
+  background: $neutralGray3;
+  border-radius: 24px;
+
+  @include viewportMedium {
+    margin-right: 20px;
+  }
+}
+.viewMode {
+  height: 32px;
+  min-height: 32px;
+
+  padding: 6px 24px;
+  text-align: center;
+  background: transparent;
+  border-radius: 24px;
+  -webkit-tap-highlight-color: transparent;
+
+  @include textTemplate(12px, 700, 20px, '');
+  color: $neutralGray6;
+
+  &:last-child {
+    border-right: 0px;
+  }
+
+  &:hover {
+    outline: none;
+    background-color: $neutralGray3;
+  }
+
+  &:active,
+  &:focus {
+    background-color: $neutralGray1;
+    color: $neutralGray7;
+    border: none;
+    outline: none;
+  }
+}
+
+.activeViewMode {
+  background-color: $neutralGray1;
+  color: $neutralGray7;
+  box-shadow: 0px 2px 4px -2px rgba(16, 24, 40, 0.06),
+    0px 4px 8px -2px rgba(16, 24, 40, 0.1);
+
+  &:active,
+  &:focus {
+    background-color: $neutralGray1;
+    color: $neutralGray7;
+  }
+}
+
+.todayBtn {
+  width: 80px;
+  height: 36px;
+  min-height: 36px;
+  padding: 8px;
+  margin-right: 28px;
+  text-align: center;
+  border: 1px solid $neutralGray6;
+  background-color: $neutralGray1;
+  @include textTemplate(12px, 700, 36px, '');
+  color: $neutralGray7;
+  border-radius: 40px;
+
+  &:hover {
+    background-color: $neutralGray6;
+  }
+
+  &:active,
+  &:focus {
+    background-color: $neutralGray1;
+  }
+}
+
+.arrowBtn {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  border: unset;
+  outline: none;
+  cursor: pointer;
+  border-radius: 4px;
+
+  &:hover {
+    background-color: $neutralGray5;
+  }
+
+  &.disabled {
+    pointer-events: none;
+    opacity: 0.5;
+  }
+}
+
+.arrowIcon {
+}
+
+.toolbarNavigation {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 160px;
+}
