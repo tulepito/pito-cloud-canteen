@@ -21,22 +21,41 @@ const isUserHasCompany = (user: TUser) => {
   return !isEmpty(company);
 };
 
-export const filterHasAccountUsers = (loadedResult: any[]) => {
+export const filterHasAccountUsers = (
+  loadedResult: any[],
+  skipHasCompanyCheck = true,
+) => {
   return compact(
-    loadedResult.filter(isSuccessResponse).map((_result) => {
-      const { user } = _result.response;
-      if (isUserHasCompany(user)) return user;
+    loadedResult.map((_result) => {
+      if (isSuccessResponse(_result)) {
+        const { user } = _result.response;
+
+        return skipHasCompanyCheck ||
+          (!skipHasCompanyCheck && !isUserHasCompany(user))
+          ? user
+          : null;
+      }
 
       return null;
     }),
   );
 };
 
-export const filterHasAccountUserIds = (loadedResult: any[]) => {
+export const filterHasAccountUserIds = (
+  loadedResult: any[],
+  skipHasCompanyCheck = true,
+) => {
   return compact(
-    loadedResult.filter(isSuccessResponse).map((_result) => {
-      const { user } = _result.response;
-      if (isUserHasCompany(user)) return user?.id?.uuid;
+    loadedResult.map((_result) => {
+      console.debug('💫 > loadedResult.map > _result: ', _result);
+      if (isSuccessResponse(_result)) {
+        const { user } = _result.response;
+
+        return skipHasCompanyCheck ||
+          (!skipHasCompanyCheck && !isUserHasCompany(user))
+          ? user?.id?.uuid
+          : null;
+      }
 
       return null;
     }),
@@ -99,7 +118,7 @@ export const useAddMemberEmail = () => {
 
   const onAddMembersSubmitInQuizFlow = async (_loadedResult: any[]) => {
     const noAccountEmailList = filterNoAccountUserEmail(_loadedResult);
-    const userIdList = filterHasAccountUserIds(_loadedResult);
+    const userIdList = filterHasAccountUserIds(_loadedResult, false);
     const { meta } = await dispatch(
       companyMemberThunks.addMembers({ noAccountEmailList, userIdList }),
     );

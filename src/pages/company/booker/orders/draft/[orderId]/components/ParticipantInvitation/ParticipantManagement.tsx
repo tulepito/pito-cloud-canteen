@@ -52,16 +52,17 @@ const ParticipantManagement: React.FC<TParticipantManagementProps> = () => {
       const newUsers = filterHasAccountUsers(newLoadedResult as TObject[]);
 
       handleAddMemberToCompany(newLoadedResult as TObject[]);
-      await dispatch(
-        BookerDraftOrderPageThunks.addOrderParticipants({
-          orderId,
-          participants,
-          newUserIds,
-          newUsers,
-        }),
-      );
 
       if (!isEmpty(newUserIds)) {
+        await dispatch(
+          BookerDraftOrderPageThunks.addOrderParticipants({
+            orderId,
+            participants,
+            newUserIds,
+            newUsers,
+          }),
+        );
+
         const message = `Đã thêm ${
           newUserIds.length > 1 ? `${newUserIds.length} ` : ' '
         }email vào danh sách`;

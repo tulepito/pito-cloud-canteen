@@ -77,11 +77,11 @@ const fetchOrderParticipants = createAsyncThunk(
 
 const addOrderParticipants = createAsyncThunk(
   'app/BookerDraftOrderPage/ADD_ORDER_PARTICIPANTS',
-  async ({ orderId, participants, userIds, newUsers }: TObject) => {
+  async ({ orderId, participants, newUserIds, newUsers }: TObject) => {
     const bodyParams = {
       orderId,
       participants,
-      userIds,
+      userIds: newUserIds,
     };
 
     await addParticipantToOrderApi(orderId, bodyParams);
