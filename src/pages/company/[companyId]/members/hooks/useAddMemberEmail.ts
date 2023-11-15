@@ -47,7 +47,6 @@ export const filterHasAccountUserIds = (
 ) => {
   return compact(
     loadedResult.map((_result) => {
-      console.debug('💫 > loadedResult.map > _result: ', _result);
       if (isSuccessResponse(_result)) {
         const { user } = _result.response;
 
