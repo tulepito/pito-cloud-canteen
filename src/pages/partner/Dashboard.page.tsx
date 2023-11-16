@@ -51,14 +51,46 @@ const Dashboard: React.FC<TDashboardProps> = () => {
     (state) => state.PartnerDashboard.previousSubOrders,
   );
 
-  const overviewInformation = useMemo(
+  const { previousStartDate, previousEndDate } = getPreviousTimePeriod();
+
+  const splittedSubOrders = useMemo(
     () =>
-      calculateOverviewInformation(
+      splitSubOrders(
         subOrders,
         restaurantListingId,
         currentOrderVATPercentage,
+        startDate!,
+        endDate!,
       ),
-    [subOrders, restaurantListingId, currentOrderVATPercentage],
+    [
+      currentOrderVATPercentage,
+      endDate,
+      restaurantListingId,
+      startDate,
+      subOrders,
+    ],
+  );
+
+  const previousSplittedSubOrders = useMemo(
+    () =>
+      splitSubOrders(
+        previousSubOrders,
+        restaurantListingId,
+        currentOrderVATPercentage,
+        previousStartDate!,
+        previousEndDate!,
+      ),
+    [
+      previousSubOrders,
+      restaurantListingId,
+      currentOrderVATPercentage,
+      previousStartDate,
+      previousEndDate,
+    ],
+  );
+  const overviewInformation = useMemo(
+    () => calculateOverviewInformation(splittedSubOrders),
+    [splittedSubOrders],
   );
   const overviewData = {
     totalRevenue: overviewInformation.revenue,
@@ -67,13 +99,8 @@ const Dashboard: React.FC<TDashboardProps> = () => {
   };
 
   const previousOverviewInformation = useMemo(
-    () =>
-      calculateOverviewInformation(
-        previousSubOrders,
-        restaurantListingId,
-        currentOrderVATPercentage,
-      ),
-    [previousSubOrders, restaurantListingId, currentOrderVATPercentage],
+    () => calculateOverviewInformation(previousSplittedSubOrders),
+    [previousSplittedSubOrders],
   );
 
   const previousOverviewData = {
@@ -81,12 +108,6 @@ const Dashboard: React.FC<TDashboardProps> = () => {
     totalCustomer: previousOverviewInformation.totalCustomers.length,
     totalOrders: previousOverviewInformation.totalOrders,
   };
-
-  const splittedSubOrders = useMemo(
-    () =>
-      splitSubOrders(subOrders, restaurantListingId, currentOrderVATPercentage),
-    [currentOrderVATPercentage, restaurantListingId, subOrders],
-  );
   const analyticsOrderChartData = useMemo(
     () =>
       formatChartData({
@@ -110,7 +131,6 @@ const Dashboard: React.FC<TDashboardProps> = () => {
   );
 
   useEffect(() => {
-    const { previousStartDate, previousEndDate } = getPreviousTimePeriod();
     if (startDate && endDate) {
       dispatch(
         PartnerDashboardThunks.fetchSubOrders({

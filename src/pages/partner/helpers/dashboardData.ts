@@ -10,50 +10,16 @@ import { formatTimestamp, getTimePeriodBetweenDates } from '@src/utils/dates';
 import { EOrderType, EPartnerVATSetting, ETimeFrame } from '@src/utils/enums';
 import type { TChartPoint, TListing, TObject } from '@src/utils/types';
 
-export const calculateOverviewInformation = (
-  subOrders: TObject[],
-  restaurantListingId: string,
-  currentOrderVATPercentage: number,
-) => {
+export const calculateOverviewInformation = (subOrders: TObject[]) => {
   const overviewInformation = subOrders.reduce(
     (result, subOrder) => {
       const { revenue, totalOrders, totalCustomers } = result;
-      const { plan, quotation = {} } = subOrder;
-      const orderListing = Listing(subOrder as TListing);
-      const planListing = Listing(plan as TListing);
-      const {
-        companyId,
-        serviceFees = {},
-        vatSettings = {},
-      } = orderListing.getMetadata();
-
-      const { orderDetail = {} } = planListing.getMetadata();
-
-      const vatSettingFromOrder = vatSettings[restaurantListingId];
-      const partnerVATSetting =
-        vatSettingFromOrder in EPartnerVATSetting
-          ? vatSettingFromOrder
-          : EPartnerVATSetting.vat;
-      const vatPercentage = vatPercentageBaseOnVatSetting({
-        vatSetting: partnerVATSetting,
-        vatPercentage: currentOrderVATPercentage,
-      });
-      const partnerQuotation = calculatePriceQuotationPartner({
-        quotation: quotation[restaurantListingId]?.quotation,
-        serviceFeePercentage: serviceFees[restaurantListingId],
-        currentOrderVATPercentage: vatPercentage,
-        shouldSkipVAT: partnerVATSetting === EPartnerVATSetting.direct,
-      });
-
-      const bulkSubOrders = Object.keys(orderDetail).filter(
-        (subOrderDate: string) =>
-          orderDetail[subOrderDate].restaurant.id === restaurantListingId,
-      );
+      const { revenue: subOrderRevenue, companyName } = subOrder;
 
       return {
-        revenue: revenue + partnerQuotation.totalPrice,
-        totalOrders: totalOrders + bulkSubOrders.length,
-        totalCustomers: uniq([...totalCustomers, companyId]),
+        revenue: revenue + subOrderRevenue,
+        totalOrders: totalOrders + 1,
+        totalCustomers: uniq([...totalCustomers, companyName]),
       };
     },
     {
@@ -70,6 +36,8 @@ export const splitSubOrders = (
   subOrders: TObject[],
   restaurantListingId: string,
   currentOrderVATPercentage: number,
+  startDate: number,
+  endDate: number,
 ) => {
   const splittedSubOrders = subOrders.reduce((result: TObject[], order) => {
     const orderListing = Listing(order as TListing);
@@ -139,7 +107,10 @@ export const splitSubOrders = (
     return [...result, ...bulkSubOrders];
   }, []);
 
-  return splittedSubOrders;
+  return splittedSubOrders.filter(
+    (subOrder) =>
+      subOrder.subOrderDate >= startDate && subOrder.subOrderDate <= endDate,
+  );
 };
 
 const generateTimeRange = ({
