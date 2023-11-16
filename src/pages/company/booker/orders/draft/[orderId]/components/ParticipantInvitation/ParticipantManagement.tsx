@@ -63,9 +63,13 @@ const ParticipantManagement: React.FC<TParticipantManagementProps> = () => {
           }),
         );
 
-        const message = `Đã thêm ${
-          newUserIds.length > 1 ? `${newUserIds.length} ` : ' '
-        }email vào danh sách`;
+        const message = (
+          <span>
+            Đã thêm{' '}
+            {newUserIds.length > 1 ? <b>{newUserIds.length} email</b> : 'email'}{' '}
+            vào danh sách
+          </span>
+        );
 
         toast(message, successToastOptions);
       }

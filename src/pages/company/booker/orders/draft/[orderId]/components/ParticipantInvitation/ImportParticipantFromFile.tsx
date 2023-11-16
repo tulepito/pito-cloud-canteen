@@ -52,12 +52,8 @@ const ImportParticipantFromFile: React.FC<TImportParticipantFromFileProps> = ({
       reader.onload = async (_e: any) => {
         const workbook = XLSX.read(_e?.target?.result, { type: 'array' });
 
-        if (!workbook.SheetNames.includes('Template')) {
-          handleSendUploadErrorToast();
-        }
-
         try {
-          const worksheet = workbook.Sheets.Template;
+          const worksheet = workbook.Sheets[Object.keys(workbook.Sheets)[0]];
 
           const data = XLSX.utils.sheet_to_json(worksheet, {
             blankrows: false,
@@ -114,7 +110,7 @@ const ImportParticipantFromFile: React.FC<TImportParticipantFromFileProps> = ({
 
       <input
         id="AddParticipantForm.file"
-        accept=".xlsx,.xls"
+        accept=".xlsx,.xls,.csv"
         ref={fileRef}
         onChange={handleChangeFile}
         type="file"
