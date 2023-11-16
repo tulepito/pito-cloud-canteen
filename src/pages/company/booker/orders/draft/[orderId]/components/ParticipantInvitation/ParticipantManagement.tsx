@@ -89,7 +89,10 @@ const ParticipantManagement: React.FC<TParticipantManagementProps> = () => {
         </RenderWhen>
       </div>
 
-      <AddParticipantForm onSubmit={handleSubmitAddParticipant} />
+      <AddParticipantForm
+        onSubmit={handleSubmitAddParticipant}
+        restrictEmailList={restrictEmailList}
+      />
       <ImportParticipantFromFile
         handleInviteMember={handleInviteMemberViaEmailList}
       />

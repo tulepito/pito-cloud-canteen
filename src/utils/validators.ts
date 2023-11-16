@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/default-param-last */
 /* eslint-disable no-useless-escape */
 import compact from 'lodash/compact';
 import isEmpty from 'lodash/isEmpty';
@@ -132,6 +133,21 @@ export const emailListFormatValid =
 
     return value &&
       normalizeValue.split(separator).every((v) => EMAIL_RE.test(v))
+      ? VALID
+      : message;
+  };
+export const emailListValid =
+  (message: string, restrictEmailList: string[], separator = ' ') =>
+  (value: string) => {
+    if (!value) return VALID;
+    console.debug('💫 > restrictEmailList: ', restrictEmailList);
+
+    const normalizeValue = value.trim().replace(/\s+/g, ' ');
+
+    return value &&
+      normalizeValue
+        .split(separator)
+        .every((v) => !restrictEmailList.includes(v))
       ? VALID
       : message;
   };

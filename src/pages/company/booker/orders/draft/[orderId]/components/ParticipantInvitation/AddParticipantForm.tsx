@@ -6,7 +6,11 @@ import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import { useAppSelector } from '@hooks/reduxHooks';
-import { emailListFormatValid } from '@src/utils/validators';
+import {
+  composeValidators,
+  emailListFormatValid,
+  emailListValid,
+} from '@src/utils/validators';
 
 import css from './AddParticipantForm.module.scss';
 
@@ -14,7 +18,7 @@ export type TAddParticipantFormValues = {
   emails: string;
 };
 
-type TExtraProps = {};
+type TExtraProps = { restrictEmailList: string[] };
 type TAddParticipantFormComponentProps =
   FormRenderProps<TAddParticipantFormValues> & Partial<TExtraProps>;
 type TAddParticipantFormProps = FormProps<TAddParticipantFormValues> &
@@ -29,6 +33,7 @@ const AddParticipantFormComponent: React.FC<
     submitting,
     form,
     handleSubmit: handleSubmitFormProps,
+    restrictEmailList = [],
   } = props;
   const addOrderParticipantsInProgress = useAppSelector(
     (state) => state.BookerDraftOrderPage.addOrderParticipantsInProgress,
@@ -64,7 +69,13 @@ const AddParticipantFormComponent: React.FC<
             name="emails"
             placeholder="Nhập email để thêm thành viên"
             onKeyPress={handleFieldEmailsKeyPress}
-            validate={emailListFormatValid('Vui lòng nhập đúng định dạng mail')}
+            validate={composeValidators(
+              emailListFormatValid('Vui lòng nhập đúng định dạng mail'),
+              emailListValid(
+                'Đã tồn tại trong danh sách thành viên',
+                restrictEmailList,
+              ),
+            )}
           />
         </div>
         <Button inProgress={submitInProgress} disabled={submitDisable}>
