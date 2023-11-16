@@ -1123,6 +1123,6 @@ const bookerSubOrderCanceled = ({
 };
 
 module.exports = {
-  bookerSubOrderIsCanceled: bookerSubOrderCanceled,
-  bookerSubOrderIsCanceledSubject: bookerSubOrderCanceledSubject,
+  bookerSubOrderCanceled,
+  bookerSubOrderCanceledSubject,
 };

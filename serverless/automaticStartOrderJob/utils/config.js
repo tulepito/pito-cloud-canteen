@@ -15,7 +15,7 @@ const usingSSL = process.env.SHARETRIBE_USING_SSL === 'true';
 
 // Integration
 const integrationSdkClientId = process.env.FLEX_INTEGRATION_CLIENT_ID;
-const integrationSdkClientSecret = process.env.FLEX_INTEGRATION_CLIENT_ID;
+const integrationSdkClientSecret = process.env.FLEX_INTEGRATION_CLIENT_SECRET;
 
 const { FIREBASE_NOTIFICATION_COLLECTION_NAME } = process.env;
 

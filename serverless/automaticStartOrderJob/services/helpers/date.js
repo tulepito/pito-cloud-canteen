@@ -1,4 +1,4 @@
-const DateTime = require('luxon');
+const { DateTime } = require('luxon');
 
 const VNTimezone = 'Asia/Ho_Chi_Minh';
 

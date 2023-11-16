@@ -1,5 +1,4 @@
-import config from '../utils/config';
-
+const config = require('../utils/config');
 const {
   generateUncountableIdForQuotation,
 } = require('../utils/generateUncountableId');
@@ -71,4 +70,4 @@ const createQuotation = async (params) => {
   return quotation;
 };
 
-export default createQuotation;
+module.exports = { createQuotation };

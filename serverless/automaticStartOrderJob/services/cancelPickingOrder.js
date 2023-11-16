@@ -1,29 +1,21 @@
 const { ORDER_STATES } = require('../utils/enums');
 const { fetchListing } = require('../utils/integrationHelper');
-const { denormalisedResponseEntities, Listing } = require('../utils/data');
+const { Listing } = require('../utils/data');
 const getIntegrationSdk = require('../utils/integrationSdk');
 const { emailSendingFactory } = require('./awsSES/sendEmail');
 const { NATIVE_NOTIFICATION_TYPES } = require('./native/config');
 const { sendNativeNotification } = require('./native/sendNotification');
 const { EmailTemplateTypes } = require('./awsSES/config');
 
-const cancelPickingOrder = async (orderId) => {
+const cancelPickingOrder = async (orderId, orderListing) => {
   const integrationSdk = await getIntegrationSdk();
-  const [orderListing] = denormalisedResponseEntities(
-    await integrationSdk.listings.show({ id: orderId }),
-  );
 
   const {
-    orderState,
     orderStateHistory = [],
     plans = [],
     participants = [],
     anonymous = [],
   } = Listing(orderListing).getMetadata();
-
-  if (orderState !== ORDER_STATES.picking) {
-    throw new Error(`Order is not in picking state, orderState: ${orderState}`);
-  }
 
   await integrationSdk.listings.update({
     id: orderId,

@@ -21,18 +21,11 @@ const startOrder = async (orderListing, planId) => {
   const orderId = listingGetter.getId();
   const {
     companyId,
-    orderState,
     orderStateHistory = [],
     partnerIds = [],
     hasSpecificPCCFee: orderHasSpecificPCCFee,
     specificPCCFee: orderSpecificPCCFee,
   } = listingGetter.getMetadata();
-
-  if (orderState !== ORDER_STATES.picking) {
-    throw new Error(
-      'You can start picking order (with orderState is "picking") only',
-    );
-  }
 
   const updateOrderStateHistory = orderStateHistory.concat([
     {

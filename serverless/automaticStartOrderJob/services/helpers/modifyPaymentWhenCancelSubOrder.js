@@ -9,7 +9,7 @@ const { ensureListing, Listing, User } = require('../../utils/data');
 
 const { PITO_ADMIN_ID } = process.env;
 
-const modifyPaymentWhenCancelSubOrderService = async ({
+const modifyPaymentWhenCancelSubOrder = async ({
   order,
   subOrderDate,
   clientQuotation,
@@ -73,4 +73,4 @@ const modifyPaymentWhenCancelSubOrderService = async ({
   }
 };
 
-module.exports = { modifyPaymentWhenCancelSubOrderService };
+module.exports = { modifyPaymentWhenCancelSubOrder };

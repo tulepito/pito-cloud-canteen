@@ -33,10 +33,9 @@ const transit = async (txId, transition) => {
       throw new Error('Missing transaction ID or transition');
     }
 
-    if (!TRANSITIONS[transition]) {
-      throw new Error(`Invalid transition: ${transition}`);
-    }
-
+    console.info(
+      `💫 > transit traction: ${txId} with transition ${transition}`,
+    );
     const txResponse = await integrationSdk.transactions.transition(
       {
         id: txId,
@@ -45,6 +44,7 @@ const transit = async (txId, transition) => {
       },
       { expand: true, include: ['booking', 'listing', 'provider'] },
     );
+    console.info('💫 > transited');
 
     const tx = denormalisedResponseEntities(txResponse)[0];
     const txGetter = Transaction(tx);
@@ -78,23 +78,6 @@ const transit = async (txId, transition) => {
 
     const { orderDetail = {} } = planListing.getMetadata();
     const { memberOrders = {} } = orderDetail[startTimestamp];
-
-    const updatePlanListing = async (lastTransition) => {
-      const newOrderDetail = {
-        ...orderDetail,
-        [startTimestamp]: {
-          ...orderDetail[startTimestamp],
-          lastTransition,
-        },
-      };
-
-      await integrationSdk.listings.update({
-        id: planId,
-        metadata: {
-          orderDetail: newOrderDetail,
-        },
-      });
-    };
 
     switch (transition) {
       case TRANSITIONS.OPERATOR_CANCEL_PLAN:
@@ -153,13 +136,11 @@ const transit = async (txId, transition) => {
 
         // TODO: create new quotation
         const quotation = await fetchListing(quotationId);
-        const quotationListing = Listing(quotation);
-        const { client, partner } = quotationListing.getMetadata();
+        const { client, partner } = Listing(quotation).getMetadata();
         const newClient = {
           ...client,
           quotation: omit(client.quotation, [`${startTimestamp}`]),
         };
-
         const newPartner = {
           ...partner,
           [restaurantId]: {
@@ -169,19 +150,27 @@ const transit = async (txId, transition) => {
             ]),
           },
         };
+
+        console.info(`💫 > deactivate quotation: ${quotationId}`);
         integrationSdk.listings.update({
           id: quotationId,
           metadata: {
             status: 'inactive',
           },
         });
+        console.info(`💫 > deactivated quotation: ${quotationId}`);
+
+        console.info('💫 > create new quotation');
         createQuotation({
           orderId,
           companyId,
           client: newClient,
           partner: newPartner,
         });
+        console.info('💫 > created new quotation');
+
         // TODO: update all payments records
+        console.info('💫 > update all payments records and transit order');
         await Promise.all([
           modifyPaymentWhenCancelSubOrder({
             order,
@@ -191,6 +180,7 @@ const transit = async (txId, transition) => {
           }),
           transitionOrderStatus(order, plan, integrationSdk),
         ]);
+        console.info('💫 > updated and transited');
         break;
       }
 
@@ -198,7 +188,23 @@ const transit = async (txId, transition) => {
         break;
     }
 
-    await updatePlanListing(transition);
+    const newOrderDetail = {
+      ...orderDetail,
+      [startTimestamp]: {
+        ...orderDetail[startTimestamp],
+        lastTransition: transition,
+      },
+    };
+    console.info('💫 > update order detail after transit: ');
+    console.info(newOrderDetail);
+
+    await integrationSdk.listings.update({
+      id: planId,
+      metadata: {
+        orderDetail: newOrderDetail,
+      },
+    });
+    console.info('💫 > updated order detail after transit');
 
     console.info({
       message: 'Successfully transit transaction',

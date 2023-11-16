@@ -1,7 +1,7 @@
 const uniq = require('lodash/uniq');
 const isEmpty = require('lodash/isEmpty');
 const pick = require('lodash/pick');
-const DateTime = require('luxon');
+const { DateTime } = require('luxon');
 
 const { TRANSITIONS } = require('../../utils/enums');
 const { Listing } = require('../../utils/data');
@@ -135,6 +135,8 @@ const isEnableToCancelOrder = (orderDetail) => {
     Object.values(orderDetail).some((orderDetailOnDate) => {
       const { restaurant = {}, memberOrders = {} } = orderDetailOnDate || {};
       const { foodList, id: restaurantId, minQuantity = 1 } = restaurant;
+      console.info('💫 > restaurant: ', restaurant);
+      console.info('💫 > minQuantity: ', minQuantity);
 
       if (isEmpty(foodList) && isEmpty(restaurantId)) {
         return false;
@@ -155,8 +157,9 @@ const isEnableToCancelOrder = (orderDetail) => {
         },
         0,
       );
+      console.info('💫 > pickedFoodCount: ', pickedFoodCount);
 
-      return pickedFoodCount >= minQuantity;
+      return pickedFoodCount === 0 || pickedFoodCount >= minQuantity;
     })
   );
 };

@@ -1,5 +1,3 @@
-import config from '../../utils/config';
-
 const { initializeApp } = require('firebase/app');
 const {
   addDoc,
@@ -18,6 +16,7 @@ const {
   where,
 } = require('firebase/firestore');
 const pick = require('lodash/pick');
+const config = require('../../utils/config');
 
 const firebaseApp = initializeApp(config.firebase.config);
 const firestore = getFirestore(firebaseApp);
@@ -145,7 +144,8 @@ const deleteDocument = async (documentId, path, pathSegments = []) => {
   await deleteDoc(doc(firestore, path, ...pathSegments, documentId));
 };
 
-export {
+module.exports = {
+  firebaseApp,
   deleteDocument,
   getCollectionCount,
   addCollectionDoc,
@@ -155,5 +155,3 @@ export {
   queryAllCollectionData,
   updateCollectionDoc,
 };
-
-export default firebaseApp;
