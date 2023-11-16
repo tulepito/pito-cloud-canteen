@@ -73,7 +73,7 @@ const Overview: React.FC<TOverviewProps> = (props) => {
   const selectTimePeriodController = useBoolean();
   const { isMobileLayout } = useViewport();
 
-  const onTimePeriodHandleClick = (e: any) => {
+  const onTimePeriodHandleClick = (e: React.MouseEvent<HTMLElement>) => {
     e.stopPropagation();
     selectTimePeriodController.setTrue();
   };

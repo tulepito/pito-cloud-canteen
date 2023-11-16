@@ -10,7 +10,7 @@ type TSlideModalProps = PropsWithChildren & {
   id: string;
   isOpen: boolean;
   modalTitle?: ReactNode;
-  onClose: () => void;
+  onClose: (e: React.MouseEvent<HTMLElement>) => void;
   containerClassName?: string;
 };
 

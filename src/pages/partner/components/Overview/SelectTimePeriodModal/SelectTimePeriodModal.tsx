@@ -47,13 +47,17 @@ const SelectTimePeriodModal: React.FC<TSelectTimePeriodModalProps> = (
   );
 
   const onSubmit = () => {};
+  const handleClose = (e: React.MouseEvent<HTMLElement>) => {
+    e.stopPropagation();
+    onClose();
+  };
 
   if (isMobileLayout)
     return (
       <SlideModal
         id="SelectTimePeriodModal"
         isOpen={isOpen}
-        onClose={onClose}
+        onClose={handleClose}
         modalTitle={modalTitle}
         containerClassName={css.modalContainer}>
         <SelectTimePeriodForm
