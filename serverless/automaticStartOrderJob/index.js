@@ -13,8 +13,8 @@ const {
 const { ORDER_STATES } = require('./utils/enums');
 const { getEditedSubOrders } = require('./services/helpers/transaction');
 
-// exports.handler = async (_event) => {
-const handler = async (_event = {}) => {
+exports.handler = async (_event) => {
+  // const handler = async (_event = {}) => {
   try {
     console.log('Start to run schedule to start order ...');
     const { orderId } = _event;
@@ -88,6 +88,6 @@ const handler = async (_event = {}) => {
   }
 };
 
-handler({
-  orderId: '655577c3-0a76-43e7-b13e-b294e5fd1043',
-});
+// handler({
+//   orderId: '655577c3-0a76-43e7-b13e-b294e5fd1043',
+// });
