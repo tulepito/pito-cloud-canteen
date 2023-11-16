@@ -104,7 +104,7 @@ export const checkMinMaxQuantityInPickingState = (
     planValidations = Object.keys(orderDetail).reduce(
       (prev: any, dateAsTimeStamp) => {
         const currentOrderDetails = orderDetail[dateAsTimeStamp] || {};
-        const { memberOrders = {}, restaurant } = currentOrderDetails;
+        const { memberOrders = {}, restaurant = {} } = currentOrderDetails;
         const { minQuantity = 0, maxQuantity = 100 } = restaurant;
         const totalAdded = Object.keys(memberOrders).filter(
           (f) =>

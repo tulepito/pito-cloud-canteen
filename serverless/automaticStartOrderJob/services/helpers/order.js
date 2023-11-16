@@ -29,14 +29,16 @@ const normalizeOrderDetail = ({
 }) => {
   return Object.entries(planOrderDetail).reduce((prev, [date, orderOfDate]) => {
     const {
-      restaurant: { id: restaurantId, foodList = {} },
+      restaurant = {},
       memberOrders: memberOrdersMap,
       lineItems = [],
       transactionId,
       lastTransition,
     } = orderOfDate;
 
-    if (lastTransition) {
+    const { id: restaurantId, foodList = {} } = restaurant;
+
+    if (lastTransition || !restaurantId) {
       return prev;
     }
 
