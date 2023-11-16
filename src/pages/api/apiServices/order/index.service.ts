@@ -1,7 +1,11 @@
+import isEmpty from 'lodash/isEmpty';
 import omit from 'lodash/omit';
+import { DateTime } from 'luxon';
 
+import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
 import { generateUncountableIdForOrder } from '@helpers/generateUncountableId';
 import { getInitMemberOrder } from '@pages/api/orders/[orderId]/plan/memberOrder.helper';
+import { createAutomaticStartOrderScheduler } from '@services/awsEventBrigdeScheduler';
 import { denormalisedResponseEntities } from '@services/data';
 import {
   addCollectionDoc,
@@ -18,6 +22,7 @@ import {
   getDayOfWeek,
   getDaySessionFromDeliveryTime,
   renderDateRange,
+  VNTimezone,
 } from '@src/utils/dates';
 import {
   EBookerOrderDraftStates,
@@ -86,6 +91,12 @@ const normalizeOrderMetadata = (metadata: TObject = {}) => {
     mealType,
   } = metadata;
 
+  const ensuredDeliveryHour = isEmpty(deliveryHour)
+    ? undefined
+    : deliveryHour.includes('-')
+    ? deliveryHour.split('-')[0]
+    : deliveryHour;
+
   const newOrderMetadata = {
     companyId,
     vatSettings,
@@ -110,7 +121,7 @@ const normalizeOrderMetadata = (metadata: TObject = {}) => {
     vatAllow,
     deliveryHour,
     daySession:
-      daySession || getDaySessionFromDeliveryTime(deliveryHour.split('-')[0]),
+      daySession || getDaySessionFromDeliveryTime(ensuredDeliveryHour),
     mealType,
   };
 
@@ -222,6 +233,7 @@ const reorder = async ({
       updatedAt: new Date().getTime(),
     },
   ];
+  const oldMetaData = Listing(oldOrder).getMetadata();
 
   const newOrderResponse = await integrationSdk.listings.create({
     authorId: subAccountId,
@@ -238,9 +250,7 @@ const reorder = async ({
       orderStateHistory,
       orderState,
       companyName,
-      ...normalizeOrderMetadata({
-        ...Listing(oldOrder).getMetadata(),
-      }),
+      ...normalizeOrderMetadata(oldMetaData),
       startDate,
       endDate,
       deadlineDate,
@@ -252,6 +262,7 @@ const reorder = async ({
   const orderDatesWeekdayList = generateWeekDayList(startDate, endDate);
 
   const [newOrder] = denormalisedResponseEntities(newOrderResponse);
+  const newOrderId = Listing(newOrder).getId();
   const isGroupOrder = orderType === EOrderType.group;
   const initialMemberOrder = getInitMemberOrder({
     companyAccount,
@@ -314,7 +325,7 @@ const reorder = async ({
 
   const updatedOrder = await integrationSdk.listings.update(
     {
-      id: Listing(newOrder).getId(),
+      id: newOrderId,
       metadata: {
         plans,
       },
@@ -323,6 +334,32 @@ const reorder = async ({
   );
 
   updateOrderNumber();
+
+  const { deliveryHour } = oldMetaData;
+  if (isGroupOrder && !isCreatedByAdmin && newOrderId) {
+    const ensuredDeliveryHour = isEmpty(deliveryHour)
+      ? undefined
+      : deliveryHour.includes('-')
+      ? deliveryHour.split('-')[0]
+      : deliveryHour;
+
+    createAutomaticStartOrderScheduler({
+      customName: `automaticStartOrder_${newOrderId}`,
+      timeExpression: formatTimestamp(
+        DateTime.fromMillis(startDate)
+          .setZone(VNTimezone)
+          .plus({
+            ...convertHHmmStringToTimeParts(ensuredDeliveryHour),
+          })
+          .minus({ day: 1 })
+          .toMillis(),
+        "yyyy-MM-dd'T'hh:mm:ss",
+      ),
+      params: {
+        orderId: newOrderId,
+      },
+    });
+  }
 
   return denormalisedResponseEntities(updatedOrder)[0];
 };

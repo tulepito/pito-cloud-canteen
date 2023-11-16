@@ -2,8 +2,10 @@ import { isEmpty } from 'lodash';
 import { DateTime } from 'luxon';
 
 import { calculateGroupMembers, getAllCompanyMembers } from '@helpers/company';
+import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
 import { generateUncountableIdForOrder } from '@helpers/generateUncountableId';
 import {
+  createAutomaticStartOrderScheduler,
   createScheduler,
   getScheduler,
   updateScheduler,
@@ -167,6 +169,31 @@ const createOrder = async ({
 
   if (!isNormalOrder && deadlineDate) {
     createDeadlineScheduler({ deadlineDate, orderFlexId });
+  }
+
+  if (!isNormalOrder && !isCreatedByAdmin && orderFlexId) {
+    const ensuredDeliveryHour = isEmpty(deliveryHour)
+      ? undefined
+      : deliveryHour.includes('-')
+      ? deliveryHour.split('-')[0]
+      : deliveryHour;
+
+    createAutomaticStartOrderScheduler({
+      customName: `automaticStartOrder_${orderId}`,
+      timeExpression: formatTimestamp(
+        DateTime.fromMillis(startDate)
+          .setZone(VNTimezone)
+          .plus({
+            ...convertHHmmStringToTimeParts(ensuredDeliveryHour),
+          })
+          .minus({ day: 1 })
+          .toMillis(),
+        "yyyy-MM-dd'T'hh:mm:ss",
+      ),
+      params: {
+        orderId,
+      },
+    });
   }
 
   return orderListing;

@@ -3,6 +3,7 @@ import AWS from 'aws-sdk';
 const LAMBDA_ARN = `${process.env.LAMBDA_ARN}`;
 const ROLE_ARN = `${process.env.ROLE_ARN}`;
 const SEND_FOOD_RATING_NOTIFICATION_LAMBDA_ARN = `${process.env.SEND_FOOD_RATING_NOTIFICATION_LAMBDA_ARN}`;
+const AUTOMATIC_START_ORDER_JOB_LAMBDA_ARN = `${process.env.AUTOMATIC_START_ORDER_JOB_LAMBDA_ARN}`;
 const NEXT_PUBLIC_ENV = `${process.env.NEXT_PUBLIC_ENV}`;
 
 const isProduction = NEXT_PUBLIC_ENV === 'production';
@@ -99,5 +100,35 @@ export const createFoodRatingNotificationScheduler = async ({
     })
     .catch((err) => {
       console.log('Create Food Rating Notification Scheduler Error: ', err);
+    });
+};
+
+export const createAutomaticStartOrderScheduler = async ({
+  params,
+  customName,
+  timeExpression,
+}: CreateSchedulerParams) => {
+  const schedulerParams = {
+    FlexibleTimeWindow: {
+      Mode: 'OFF',
+    },
+    Name: customName,
+    ScheduleExpression: `at(${timeExpression})`,
+    ScheduleExpressionTimezone: 'Asia/Ho_Chi_Minh',
+    ActionAfterCompletion: isProduction ? 'NONE' : 'DELETE',
+    Target: {
+      Arn: AUTOMATIC_START_ORDER_JOB_LAMBDA_ARN,
+      RoleArn: ROLE_ARN,
+      Input: JSON.stringify(params),
+    },
+  };
+
+  Scheduler.createSchedule(schedulerParams)
+    .promise()
+    .then((res) => {
+      console.log('Create Automatic start order Scheduler Success: ', res);
+    })
+    .catch((err) => {
+      console.log('Create Automatic start order Scheduler Error: ', err);
     });
 };
