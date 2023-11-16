@@ -228,7 +228,7 @@ export const isEnableToStartOrder = (
   return isGroupOrder
     ? Object.values(orderDetail).some(
         ({ restaurant, memberOrders, lineItems = [] }) => {
-          const { id, restaurantName, foodList } = restaurant;
+          const { id, restaurantName, foodList } = restaurant || {};
           const isSetupRestaurant =
             !isEmpty(id) && !isEmpty(restaurantName) && !isEmpty(foodList);
 
