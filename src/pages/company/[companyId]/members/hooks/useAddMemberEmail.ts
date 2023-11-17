@@ -13,7 +13,7 @@ import { User } from '@src/utils/data';
 import type { TUser } from '@src/utils/types';
 
 const isSuccessResponse = (_result: any) => _result.response.status === 200;
-const isBadRequestResponse = (_result: any) => _result.response.status === 400;
+const isNotFoundResponse = (_result: any) => _result.response.status === 404;
 
 const isUserHasCompany = (user: TUser) => {
   const { company = {} } = User(user).getMetadata();
@@ -63,7 +63,7 @@ export const filterHasAccountUserIds = (
 
 export const filterNoAccountUserEmail = (loadedResult: any[]) => {
   return loadedResult
-    .filter(isBadRequestResponse)
+    .filter(isNotFoundResponse)
     .map((_result) => _result.email);
 };
 
@@ -104,6 +104,7 @@ export const useAddMemberEmail = () => {
   const onAddMembersSubmit = async () => {
     const noAccountEmailList = filterNoAccountUserEmail(loadedResult);
     const userIdList = filterHasAccountUserIds(loadedResult);
+
     const { meta } = await dispatch(
       companyMemberThunks.addMembers({ noAccountEmailList, userIdList }),
     );
