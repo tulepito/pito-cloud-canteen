@@ -179,7 +179,7 @@ const createOrder = async ({
       : deliveryHour;
 
     createAutomaticStartOrderScheduler({
-      customName: `automaticStartOrder_${orderId}`,
+      customName: `automaticStartOrder_${orderFlexId}`,
       timeExpression: formatTimestamp(
         DateTime.fromMillis(startDate)
           .setZone(VNTimezone)
@@ -191,7 +191,7 @@ const createOrder = async ({
         "yyyy-MM-dd'T'hh:mm:ss",
       ),
       params: {
-        orderId,
+        orderId: orderFlexId,
       },
     });
   }
