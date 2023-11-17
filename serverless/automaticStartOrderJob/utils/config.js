@@ -17,7 +17,10 @@ const usingSSL = process.env.SHARETRIBE_USING_SSL === 'true';
 const integrationSdkClientId = process.env.FLEX_INTEGRATION_CLIENT_ID;
 const integrationSdkClientSecret = process.env.FLEX_INTEGRATION_CLIENT_SECRET;
 
-const { FIREBASE_NOTIFICATION_COLLECTION_NAME } = process.env;
+const {
+  FIREBASE_NOTIFICATION_COLLECTION_NAME,
+  FIREBASE_PAYMENT_RECORD_COLLECTION_NAME,
+} = process.env;
 
 const ADMIN_ID = process.env.PITO_ADMIN_ID || '';
 
@@ -36,6 +39,7 @@ const config = {
   },
   firebase: {
     notificationCollectionName: FIREBASE_NOTIFICATION_COLLECTION_NAME,
+    paymentRecordCollectionName: FIREBASE_PAYMENT_RECORD_COLLECTION_NAME,
     config: {
       apiKey: process.env.FIREBASE_API_KEY,
       authDomain: `${process.env.FIREBASE_PROJECT_ID}.firebaseapp.com`,
@@ -60,7 +64,10 @@ const config = {
     apiKey: process.env.ONE_SIGNAL_API_KEY,
   },
   canonicalRootURL,
+  encryptPasswordSecretKey: process.env.ENCRYPT_PASSWORD_SECRET_KEY,
+  allowPartnerEmailSend: process.env.ALLOW_PARTNER_EMAIL_SEND === 'true',
   usingSSL,
 };
+console.debug('💫 > config: ', config);
 
 module.exports = config;

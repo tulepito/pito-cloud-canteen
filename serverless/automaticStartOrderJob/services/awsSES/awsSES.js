@@ -23,7 +23,7 @@ const createEmailParams = (receiver, subject, content, sender) => {
         Data: subject,
       },
     },
-    Source: sender || process.env.AWS_SENDER_EMAIL,
+    Source: sender || config.ses.senderEmail,
   };
 };
 

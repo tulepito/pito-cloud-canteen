@@ -1,3 +1,5 @@
+const { sendIndividualEmail } = require('./awsSES');
+// Email template
 const {
   bookerOrderSuccess,
   bookerOrderSuccessSubject,
@@ -11,19 +13,20 @@ const {
   partnerSubOrderCanceledSubject,
 } = require('./templates/partnerSubOrderCanceled');
 const {
-  bookerSubOrderCancelled,
-  bookerSubOrderCancelledSubject,
+  bookerSubOrderCanceled,
+  bookerSubOrderCanceledSubject,
 } = require('./templates/bookerSubOrderCanceled');
-const { sendIndividualEmail } = require('./awsSES');
+const {
+  participantSubOrderCanceled,
+  participantSubOrderCanceledSubject,
+} = require('./templates/participantSubOrderCanceled');
+
 const { fetchListing, fetchUser } = require('../../utils/integrationHelper');
 const { Listing, User } = require('../../utils/data');
 const { EmailTemplateTypes } = require('./config');
 const { formatTimestamp } = require('../helpers/date');
 const { getSystemAttributes } = require('../helpers/attributes');
-const {
-  participantSubOrderCanceled,
-  participantSubOrderCanceledSubject,
-} = require('./templates/participantSubOrderCanceled');
+
 const config = require('../../utils/config');
 
 const SENDER_EMAIL = config.ses.senderEmail;
@@ -175,7 +178,7 @@ const emailSendingFactory = async (emailTemplateType, emailParams = {}) => {
 
         const { bookerUser } = emailDataSource;
         const { email: bookerEmail } = bookerUser?.getAttributes() || {};
-        const emailTemplate = bookerSubOrderCancelled({
+        const emailTemplate = bookerSubOrderCanceled({
           ...emailDataSource,
           timestamp,
           systemVATPercentage,
@@ -183,7 +186,7 @@ const emailSendingFactory = async (emailTemplateType, emailParams = {}) => {
         const subOrderDate = formatTimestamp(timestamp);
         const emailDataParams = {
           receiver: [bookerEmail],
-          subject: bookerSubOrderCancelledSubject(subOrderDate),
+          subject: bookerSubOrderCanceledSubject(subOrderDate),
           content: emailTemplate,
           sender: SENDER_EMAIL,
         };

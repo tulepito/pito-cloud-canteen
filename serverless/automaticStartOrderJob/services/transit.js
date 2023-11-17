@@ -24,6 +24,7 @@ const { TRANSITIONS } = require('../utils/enums');
 const { fetchListing } = require('../utils/integrationHelper');
 const getIntegrationSdk = require('../utils/integrationSdk');
 const { createQuotation } = require('./createQuotation');
+const config = require('../utils/config');
 
 const transit = async (txId, transition) => {
   try {
@@ -75,6 +76,7 @@ const transit = async (txId, transition) => {
     const plan = await fetchListing(plans[0]);
     const planListing = Listing(plan);
     const planId = planListing.getId();
+    console.debug('💫 > transit > planId: ', planId);
 
     const { orderDetail = {} } = planListing.getMetadata();
     const { memberOrders = {} } = orderDetail[startTimestamp];
@@ -115,7 +117,7 @@ const transit = async (txId, transition) => {
         });
 
         // Function is not ready on production
-        if (process.ALLOW_PARTNER_EMAIL_SEND === 'true') {
+        if (config.allowPartnerEmailSend) {
           // TODO: send email notifications to partners
           emailSendingFactory(
             EmailTemplateTypes.PARTNER.PARTNER_SUB_ORDER_CANCELED,
@@ -126,7 +128,9 @@ const transit = async (txId, transition) => {
             },
           );
         }
+
         // TODO: create firebase notifications
+        console.info(`💫 > create FirebaseDocNotification`);
         [...participantIds, ...anonymous].map(async (participantId) => {
           createFirebaseDocNotification(NOTIFICATION_TYPES.ORDER_CANCEL, {
             ...generalNotificationData,
@@ -135,6 +139,7 @@ const transit = async (txId, transition) => {
         });
 
         // TODO: create new quotation
+        console.info(`💫 > fetch oldQuotation ${quotationId}`);
         const quotation = await fetchListing(quotationId);
         const { client, partner } = Listing(quotation).getMetadata();
         const newClient = {
@@ -188,27 +193,7 @@ const transit = async (txId, transition) => {
         break;
     }
 
-    const newOrderDetail = {
-      ...orderDetail,
-      [startTimestamp]: {
-        ...orderDetail[startTimestamp],
-        lastTransition: transition,
-      },
-    };
-    console.info('💫 > update order detail after transit: ');
-    console.info(newOrderDetail);
-
-    await integrationSdk.listings.update({
-      id: planId,
-      metadata: {
-        orderDetail: newOrderDetail,
-      },
-    });
-    console.info('💫 > updated order detail after transit');
-
-    console.info({
-      message: 'Successfully transit transaction',
-    });
+    console.info('Successfully transit transaction');
   } catch (error) {
     console.error(error);
 

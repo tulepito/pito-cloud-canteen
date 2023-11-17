@@ -1,3 +1,4 @@
+const config = require('../../utils/config');
 const {
   addCollectionDoc,
   deleteDocument,
@@ -7,8 +8,6 @@ const {
   queryCollectionData,
   updateCollectionDoc,
 } = require('./helper');
-
-const { FIREBASE_PAYMENT_RECORD_COLLECTION_NAME } = process.env;
 
 const createPaymentRecordOnFirebase = async (type, params) => {
   const paymentCreatedAt = new Date();
@@ -21,11 +20,11 @@ const createPaymentRecordOnFirebase = async (type, params) => {
     };
     const paymentRecordId = await addCollectionDoc(
       data,
-      FIREBASE_PAYMENT_RECORD_COLLECTION_NAME,
+      config.firebase.paymentRecordCollectionName,
     );
     const paymentRecordData = await getDocumentById(
       paymentRecordId,
-      FIREBASE_PAYMENT_RECORD_COLLECTION_NAME,
+      config.firebase.paymentRecordCollectionName,
     );
 
     return {
@@ -67,7 +66,7 @@ const queryPaymentRecordOnFirebase = async (query) => {
       }),
     };
     const paymentRecords = await queryCollectionData({
-      collectionName: FIREBASE_PAYMENT_RECORD_COLLECTION_NAME,
+      collectionName: config.firebase.paymentRecordCollectionName,
       queryParams: {
         paymentType: {
           operator: '==',
@@ -87,7 +86,7 @@ const queryAllPartnerPaymentRecordsOnFirebase = async (query = {}) => {
   try {
     const { partnerId } = query;
     const paymentRecords = await queryAllCollectionData({
-      collectionName: FIREBASE_PAYMENT_RECORD_COLLECTION_NAME,
+      collectionName: config.firebase.paymentRecordCollectionName,
       queryParams: {
         paymentType: {
           operator: '==',
@@ -112,7 +111,7 @@ const queryAllCompanyPaymentRecordsOnFirebase = async (query = {}) => {
   const { companyId } = query;
 
   return queryAllCollectionData({
-    collectionName: FIREBASE_PAYMENT_RECORD_COLLECTION_NAME,
+    collectionName: config.firebase.paymentRecordCollectionName,
     queryParams: {
       paymentType: {
         operator: '==',
@@ -131,7 +130,7 @@ const queryAllCompanyPaymentRecordsOnFirebase = async (query = {}) => {
 const getTotalRecordsOnFirebase = async (query) => {
   try {
     const totalRecords = await getCollectionCount({
-      collectionName: FIREBASE_PAYMENT_RECORD_COLLECTION_NAME,
+      collectionName: config.firebase.paymentRecordCollectionName,
       queryParams: query,
     });
 
@@ -145,7 +144,7 @@ const deletePaymentRecordByIdOnFirebase = async (paymentRecordId) => {
   try {
     await deleteDocument(
       paymentRecordId,
-      FIREBASE_PAYMENT_RECORD_COLLECTION_NAME,
+      config.firebase.paymentRecordCollectionName,
     );
   } catch (error) {
     console.error('Error delete payment record: ', error);
@@ -166,7 +165,7 @@ const queryClientPaymentRecordsOnFirebase = async (query) => {
       },
     };
     const paymentRecords = await queryCollectionData({
-      collectionName: FIREBASE_PAYMENT_RECORD_COLLECTION_NAME,
+      collectionName: config.firebase.paymentRecordCollectionName,
       queryParams: {
         ...paymentQuery,
       },
@@ -182,12 +181,12 @@ const updatePaymentRecordOnFirebase = async (paymentRecordId, params) => {
   await updateCollectionDoc(
     paymentRecordId,
     params,
-    FIREBASE_PAYMENT_RECORD_COLLECTION_NAME,
+    config.firebase.paymentRecordCollectionName,
   );
 
   const paymentRecordData = await getDocumentById(
     paymentRecordId,
-    FIREBASE_PAYMENT_RECORD_COLLECTION_NAME,
+    config.firebase.paymentRecordCollectionName,
   );
 
   return {

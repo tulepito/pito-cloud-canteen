@@ -4,6 +4,7 @@ const {
   createSdkInstance,
   getTrustedSdkWithSubAccountToken,
 } = require('./sdk');
+const config = require('./config');
 
 const getSubAccountSdk = async (subAccount) => {
   const newSdk = createSdkInstance();
@@ -14,7 +15,7 @@ const getSubAccountSdk = async (subAccount) => {
 
   const decryptedPassword = CryptoJS.AES.decrypt(
     subAccountPassword,
-    process.env.ENCRYPT_PASSWORD_SECRET_KEY,
+    config.encryptPasswordSecretKey,
   );
   const password = decryptedPassword.toString(CryptoJS.enc.Utf8);
 
@@ -35,7 +36,7 @@ const getSubAccountTrustedSdk = async (subAccount) => {
 
   const decryptedPassword = CryptoJS.AES.decrypt(
     subAccountPassword,
-    process.env.ENCRYPT_PASSWORD_SECRET_KEY,
+    config.encryptPasswordSecretKey,
   );
   const password = decryptedPassword.toString(CryptoJS.enc.Utf8);
 

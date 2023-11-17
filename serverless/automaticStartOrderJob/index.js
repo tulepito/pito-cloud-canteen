@@ -14,11 +14,11 @@ const { ORDER_STATES } = require('./utils/enums');
 const { getEditedSubOrders } = require('./services/helpers/transaction');
 
 exports.handler = async (_event) => {
-  // const handler = async (_event = {}) => {
+  // const handler = async (_event) => {
   try {
-    console.log('Start to run schedule to start order ...');
+    console.info('Start to run schedule to start order ...');
     const { orderId } = _event;
-    console.debug('💫 > orderId: ', orderId);
+    console.info('💫 > orderId: ', orderId);
 
     if (isEmpty(orderId)) {
       console.error('Missing orderId');
@@ -33,6 +33,8 @@ exports.handler = async (_event) => {
         id: orderId,
       }),
     );
+    console.info('💫 > orderListing: ');
+    console.info(orderListing);
 
     const {
       orderState,
@@ -58,36 +60,52 @@ exports.handler = async (_event) => {
         id: planId,
       }),
     );
+    console.info('💫 > planListing: ');
+    console.info(planListing);
     const { orderDetail = {} } = Listing(planListing).getMetadata();
+    console.info('💫 > orderDetail: ');
+    console.info(orderDetail);
+
     // TODO: check condition to cancel order
     const shouldCancelOrder = isEnableToCancelOrder(orderDetail);
+    console.debug('💫 > shouldCancelOrder: ', shouldCancelOrder);
     const editedSubOrders = getEditedSubOrders(orderDetail);
-    console.debug('💫 > editedSubOrders: ', editedSubOrders);
+    console.info('💫 > editedSubOrders: ');
+    console.info(editedSubOrders);
 
     if (shouldCancelOrder) {
       if (
         checkIsOrderHasInProgressState(orderStateHistory) &&
         !isEmpty(editedSubOrders)
       ) {
-        console.debug('💫 > orderStateHistory: ', orderStateHistory);
-        console.debug('💫 > canceling all sub order transactions');
-        await cancelAllSubOrderTxs(orderDetail);
-        console.debug('💫 > canceled all sub order transactions');
+        console.info('💫 > orderStateHistory: ', orderStateHistory);
+        console.info('💫 > canceling all sub order transactions');
+        await cancelAllSubOrderTxs({ planId, orderDetail, integrationSdk });
+        console.info('💫 > canceled all sub order transactions');
       }
 
-      console.debug('💫 > canceling order');
+      console.info('💫 > canceling order');
       await cancelPickingOrder(orderId, orderListing);
-      console.debug('💫 > canceled order');
+      console.info('💫 > canceled order');
     } else {
-      console.debug('💫 > starting order');
+      console.info('💫 > starting order');
       await startOrder(orderListing, planId);
-      console.debug('💫 > started order');
+      console.info('💫 > started order');
     }
   } catch (error) {
-    console.error('Schedule automatic start order error', error);
+    console.error('Schedule automatic start order error');
+
+    if (error.status && error.statusText && error.data) {
+      const { status, statusText, data } = error;
+
+      console.error({
+        name: 'Local API request failed',
+        status,
+        statusText,
+      });
+      console.error(data);
+    } else {
+      console.error(error?.message);
+    }
   }
 };
-
-// handler({
-//   orderId: '655577c3-0a76-43e7-b13e-b294e5fd1043',
-// });

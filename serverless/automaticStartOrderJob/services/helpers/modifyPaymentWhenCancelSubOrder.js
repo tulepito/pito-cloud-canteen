@@ -6,8 +6,7 @@ const {
 } = require('../firebase/payment');
 const { fetchUser } = require('../../utils/integrationHelper');
 const { ensureListing, Listing, User } = require('../../utils/data');
-
-const { PITO_ADMIN_ID } = process.env;
+const config = require('../../utils/config');
 
 const modifyPaymentWhenCancelSubOrder = async ({
   order,
@@ -23,6 +22,10 @@ const modifyPaymentWhenCancelSubOrder = async ({
     hasSpecificPCCFee,
     specificPCCFee,
   } = orderListing.getMetadata();
+
+  console.info(
+    `💫 > query partner payment records for ${orderId} at ${subOrderDate}`,
+  );
   const partnerPaymentRecord = await queryPaymentRecordOnFirebase({
     paymentType: 'partner',
     orderId,
@@ -33,6 +36,9 @@ const modifyPaymentWhenCancelSubOrder = async ({
     await deletePaymentRecordByIdOnFirebase(partnerPaymentRecord[0].id);
   }
 
+  console.info(
+    `💫 > query client payment records for ${orderId} at ${subOrderDate}`,
+  );
   const clientPaymentRecords = await queryPaymentRecordOnFirebase({
     paymentType: 'client',
     orderId,
@@ -41,7 +47,7 @@ const modifyPaymentWhenCancelSubOrder = async ({
     const clientPaymentRecord = clientPaymentRecords[0];
     const { id } = clientPaymentRecord;
 
-    const admin = await fetchUser(PITO_ADMIN_ID);
+    const admin = await fetchUser(config.adminId);
     const adminUser = User(admin);
     const { systemVATPercentage } = adminUser.getPrivateData();
 

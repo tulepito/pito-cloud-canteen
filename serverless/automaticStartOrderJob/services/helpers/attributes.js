@@ -1,13 +1,12 @@
 const getIntegrationSdk = require('../../utils/integrationSdk');
 const { denormalisedResponseEntities, User } = require('../../utils/data');
-
-const ADMIN_ID = process.env.PITO_ADMIN_ID || '';
+const config = require('../../utils/config');
 
 const integrationSdk = getIntegrationSdk();
 
 const getAdminAccount = async () => {
   const [adminAccount] = denormalisedResponseEntities(
-    await integrationSdk.users.show({ id: ADMIN_ID }),
+    await integrationSdk.users.show({ id: config.adminId }),
   );
 
   return adminAccount;
