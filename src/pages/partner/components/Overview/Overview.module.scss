@@ -6,6 +6,10 @@
   background-color: $neutralGray1;
   padding: 16px;
 
+  @include viewportLarge {
+    padding: 0;
+  }
+
   .revenueValueWrapper {
     @include flexAlign(center, flex-end);
 

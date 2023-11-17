@@ -5,11 +5,19 @@
 .root {
   background-color: $neutralGray1;
   padding: 16px;
+
+  @include viewportLarge {
+    padding: 0;
+  }
 }
 
 .titleHeader {
   @include textTemplate(16px, $fontWeightSemiBold, 24px);
   @include flexAlign(center, space-between);
+
+  @include viewportLarge {
+    display: none;
+  }
 
   .link {
     color: $labelBlue2;
@@ -34,11 +42,30 @@
     padding: 12px;
     border-radius: 12px;
     border: 1px solid $neutralGray3;
+
+    @include viewportLarge {
+      padding: 20px;
+    }
   }
 
   .timeFrameWrapper {
     width: fit-content;
     margin: 16px auto 0;
+
+    .title {
+      display: none;
+
+      @include viewportLarge {
+        display: block;
+        @include textTemplate(20px, 700, 32px);
+      }
+    }
+
+    @include viewportLarge {
+      @include flexAlign(center, space-between);
+      width: 100%;
+      margin: 0;
+    }
   }
 
   .totalSubOrdersWrapper {
@@ -58,6 +85,10 @@
     margin-top: 24px;
     overflow-x: scroll;
     overflow-y: hidden;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
   }
 }
 

@@ -100,12 +100,13 @@ const SelectTimePeriodModal: React.FC<TSelectTimePeriodModalProps> = (
             <div className={css.customTimeModalWrapper}>
               <SelectTimeRangePeriodForm
                 onSubmit={onSubmit}
-                onCloseModal={onClose}
+                onCloseModal={handleClose}
                 onCloseCustomModal={selectCustomController.setFalse}
                 startDate={startDate}
                 endDate={endDate}
                 setStartDate={setStartDate}
                 setEndDate={setEndDate}
+                handleTimePeriodChange={handleTimePeriodChange}
               />
             </div>
           </RenderWhen>

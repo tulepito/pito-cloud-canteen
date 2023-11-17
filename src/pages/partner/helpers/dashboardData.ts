@@ -7,7 +7,12 @@ import {
 } from '@helpers/order/cartInfoHelper';
 import { Listing } from '@src/utils/data';
 import { formatTimestamp, getTimePeriodBetweenDates } from '@src/utils/dates';
-import { EOrderType, EPartnerVATSetting, ETimeFrame } from '@src/utils/enums';
+import {
+  EOrderType,
+  EPartnerVATSetting,
+  ETimeFrame,
+  ETimePeriodOption,
+} from '@src/utils/enums';
 import type { TChartPoint, TListing, TObject } from '@src/utils/types';
 
 export const calculateOverviewInformation = (subOrders: TObject[]) => {
@@ -211,4 +216,24 @@ export const formatChartData = ({
   return timeRange.map((timePoint) =>
     groupDataByTimeFrame(subOrders, timePoint),
   );
+};
+
+export const getDisabledTimeFrameOptions = (
+  timePeriodOption: ETimePeriodOption,
+) => {
+  if (
+    timePeriodOption === ETimePeriodOption.LAST_WEEK ||
+    timePeriodOption === ETimePeriodOption.LAST_7_DAYS
+  ) {
+    return [ETimeFrame.MONTH];
+  }
+
+  if (
+    timePeriodOption === ETimePeriodOption.TODAY ||
+    timePeriodOption === ETimePeriodOption.YESTERDAY
+  ) {
+    return [ETimeFrame.MONTH, ETimeFrame.WEEK];
+  }
+
+  return [];
 };

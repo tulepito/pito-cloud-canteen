@@ -1,8 +1,10 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useMemo } from 'react';
 
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { currentUserSelector } from '@redux/slices/user.slice';
 import { CurrentUser } from '@src/utils/data';
+import { ETimeFrame } from '@src/utils/enums';
 
 import LatestOrders from './components/LatestOrders/LatestOrders';
 import OrderCalendar from './components/OrderCalendar/OrderCalendar';
@@ -12,6 +14,7 @@ import RevenueAnalytics from './components/RevenueAnalytics/RevenueAnalytics';
 import {
   calculateOverviewInformation,
   formatChartData,
+  getDisabledTimeFrameOptions,
   splitSubOrders,
 } from './helpers/dashboardData';
 import { useControlTimeFrame } from './hooks/useControlTimeFrame';
@@ -34,8 +37,12 @@ const Dashboard: React.FC<TDashboardProps> = () => {
     timePeriodOption,
     handleTimePeriodChange,
   } = useControlTimeRange();
-  const { analyticsOrdersTimeFrame, analyticsRevenueTimeFrame } =
-    useControlTimeFrame();
+  const {
+    analyticsOrdersTimeFrame,
+    analyticsRevenueTimeFrame,
+    setAnalyticsOrdersTimeFrame,
+    setAnalyticsRevenueTimeFrame,
+  } = useControlTimeFrame();
 
   const currentOrderVATPercentage = useAppSelector(
     (state) => state.SystemAttributes.currentOrderVATPercentage,
@@ -145,8 +152,18 @@ const Dashboard: React.FC<TDashboardProps> = () => {
         }),
       );
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, endDate, startDate]);
+
+  useEffect(() => {
+    const allTimeFrames = Object.values(ETimeFrame);
+    const disabledTimeFrames = getDisabledTimeFrameOptions(timePeriodOption);
+    const enabledTimeFrames = allTimeFrames.filter(
+      (timeFrame) => !disabledTimeFrames.includes(timeFrame as ETimeFrame),
+    );
+
+    setAnalyticsOrdersTimeFrame(enabledTimeFrames[0]);
+    setAnalyticsRevenueTimeFrame(enabledTimeFrames[0]);
+  }, [timePeriodOption]);
 
   return (
     <div className={css.root}>

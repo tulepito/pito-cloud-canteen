@@ -5,15 +5,28 @@
 .root {
   background-color: $neutralGray1;
   padding: 16px;
+
+  @include viewportLarge {
+    border-radius: 12px;
+    border: 1px solid $neutralGray3;
+  }
 }
 
 .titleHeader {
   @include textTemplate(16px, $fontWeightSemiBold, 24px);
   @include flexAlign(center, space-between);
 
+  .title {
+    @include textTemplate(20px, 700, 32px);
+  }
+
   .link {
     color: $labelBlue2;
     font-weight: $fontWeightRegular;
+
+    @include viewportLarge {
+      display: none;
+    }
   }
 }
 

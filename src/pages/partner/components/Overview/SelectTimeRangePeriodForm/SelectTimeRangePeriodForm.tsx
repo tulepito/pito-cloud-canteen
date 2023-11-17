@@ -5,18 +5,20 @@ import { Form as FinalForm } from 'react-final-form';
 import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
 import FieldDateRangePicker from '@components/FormFields/FieldDateRangePicker/FieldDateRangePicker';
+import { ETimePeriodOption } from '@src/utils/enums';
 
 import css from './SelectTimeRangePeriodForm.module.scss';
 
 export type TSelectTimeRangePeriodFormValues = {};
 
 type TExtraProps = {
-  onCloseModal: () => void;
+  onCloseModal: (e: React.MouseEvent<HTMLElement>) => void;
   onCloseCustomModal: () => void;
   startDate: number;
   endDate: number;
   setStartDate: (startDate: number) => void;
   setEndDate: (endDate: number) => void;
+  handleTimePeriodChange: (timePeriod: ETimePeriodOption) => void;
 };
 type TSelectTimeRangePeriodFormComponentProps =
   FormRenderProps<TSelectTimeRangePeriodFormValues> & Partial<TExtraProps>;
@@ -33,6 +35,8 @@ const SelectTimeRangePeriodFormComponent: React.FC<
     endDate,
     setStartDate,
     setEndDate,
+    onCloseModal,
+    handleTimePeriodChange,
   } = props;
 
   const [startDateValue, setStartDateValue] = useState<Date | null>(
@@ -42,10 +46,12 @@ const SelectTimeRangePeriodFormComponent: React.FC<
     new Date(endDate!),
   );
 
-  const onSubmit = () => {
+  const onSubmit = (e: React.MouseEvent<HTMLElement>) => {
     setStartDate?.(startDateValue?.getTime()!);
     setEndDate?.(endDateValue?.getTime()!);
+    handleTimePeriodChange?.(ETimePeriodOption.CUSTOM);
     onCloseCustomModal?.();
+    onCloseModal?.(e);
   };
 
   return (

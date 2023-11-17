@@ -101,7 +101,7 @@ const LatestOrders: React.FC<TLatestOrdersProps> = (props) => {
   return (
     <div className={css.root}>
       <div className={css.titleHeader}>
-        <div>Đơn hàng gần nhất</div>
+        <div className={css.title}>Đơn hàng gần nhất</div>
         <NamedLink path={partnerPaths.ManageOrders} className={css.link}>
           Xem chi tiết
         </NamedLink>

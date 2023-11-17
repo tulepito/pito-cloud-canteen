@@ -11,5 +11,9 @@
 
   section {
     margin-top: 8px;
+
+    @include viewportLarge {
+      margin-top: 24px;
+    }
   }
 }

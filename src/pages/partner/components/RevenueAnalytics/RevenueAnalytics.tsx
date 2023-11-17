@@ -90,6 +90,7 @@ const RevenueAnalytics: React.FC<TRevenueAnalyticsProps> = (props) => {
             <RenderWhen.False>
               <div className={css.content}>
                 <div className={css.timeFrameWrapper}>
+                  <div className={css.title}>Thống kê doanh thu</div>
                   <TimeFrameSelector
                     timePeriodOption={timePeriodOption}
                     timeFrame={analyticsRevenueTimeFrame}

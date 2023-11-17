@@ -80,6 +80,7 @@ const OrdersAnalytics: React.FC<TOrdersAnalyticsProps> = (props) => {
             <RenderWhen.False>
               <div className={css.content}>
                 <div className={css.timeFrameWrapper}>
+                  <div className={css.title}>Thống kê đơn hàng</div>
                   <TimeFrameSelector
                     timePeriodOption={timePeriodOption}
                     timeFrame={analyticsOrdersTimeFrame}

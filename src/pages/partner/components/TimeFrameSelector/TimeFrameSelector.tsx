@@ -1,7 +1,8 @@
 import classNames from 'classnames';
 
+import { getDisabledTimeFrameOptions } from '@pages/partner/helpers/dashboardData';
 import { timeFrameOptions } from '@pages/partner/hooks/useControlTimeFrame';
-import { ETimeFrame, ETimePeriodOption } from '@src/utils/enums';
+import type { ETimeFrame, ETimePeriodOption } from '@src/utils/enums';
 
 import css from './TimeFrameSelector.module.scss';
 
@@ -9,24 +10,6 @@ type TTimeFrameSelectorProps = {
   timeFrame: ETimeFrame;
   setTimeFrame: (timeFrame: ETimeFrame) => void;
   timePeriodOption: ETimePeriodOption;
-};
-
-const getDisabledTimeFrameOptions = (timePeriodOption: ETimePeriodOption) => {
-  if (
-    timePeriodOption === ETimePeriodOption.LAST_WEEK ||
-    timePeriodOption === ETimePeriodOption.LAST_7_DAYS
-  ) {
-    return [ETimeFrame.MONTH];
-  }
-
-  if (
-    timePeriodOption === ETimePeriodOption.TODAY ||
-    timePeriodOption === ETimePeriodOption.YESTERDAY
-  ) {
-    return [ETimeFrame.MONTH, ETimeFrame.WEEK];
-  }
-
-  return [];
 };
 
 const TimeFrameSelector: React.FC<TTimeFrameSelectorProps> = (props) => {
