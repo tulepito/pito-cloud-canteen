@@ -94,6 +94,9 @@ function BookerDraftOrderPage() {
   const fetchOrderParticipantsInProgress = useAppSelector(
     (state) => state.BookerDraftOrderPage.fetchOrderParticipantsInProgress,
   );
+  const participantData = useAppSelector(
+    (state) => state.BookerDraftOrderPage.participantData,
+  );
   const restaurantFood = useAppSelector(
     (state) => state.BookerSelectRestaurant.restaurantFood,
     shallowEqual,
@@ -137,7 +140,6 @@ function BookerDraftOrderPage() {
     startDate: startDateTimestamp,
     endDate: endDateTimestamp,
     packagePerMember = 0,
-    participants = [],
     companyId,
     orderDeadline,
   } = Listing(order as TListing).getMetadata();
@@ -189,7 +191,7 @@ function BookerDraftOrderPage() {
             orderId: orderId as string,
             orderLink: getParticipantPickingLink(orderId as string),
             deadline: formatTimestamp(orderDeadline, 'HH:mm EEE,dd/MM/yyyy'),
-            memberIdList: participants,
+            memberIdList: participantData.map((p) => p.id.uuid),
           }),
         );
       }

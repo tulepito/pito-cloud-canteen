@@ -34,6 +34,9 @@ const DeadlineDateTimeFormComponent: React.FC<
     invalid,
     handleSubmit,
   } = props;
+  const addOrderParticipantsInProgress = useAppSelector(
+    (state) => state.BookerDraftOrderPage.addOrderParticipantsInProgress,
+  );
   const bookerPublishOrderInProgress = useAppSelector(
     (state) => state.Order.bookerPublishOrderInProgress,
   );
@@ -42,7 +45,7 @@ const DeadlineDateTimeFormComponent: React.FC<
 
   const selectedDeadlineDate = deadlineDateFormFormValues
     ? new Date(Number(deadlineDateFormFormValues))
-    : DateTime.fromMillis(Number(Date.now())).plus({ days: 2 }).toJSDate();
+    : DateTime.fromJSDate(new Date()).plus({ days: 2 }).toJSDate();
   const minDeadlineDate = DateTime.fromJSDate(new Date())
     .plus({ days: 1 })
     .toJSDate();
@@ -50,9 +53,10 @@ const DeadlineDateTimeFormComponent: React.FC<
     .minus({ days: 2 })
     .toJSDate();
 
-  const anyActionsInProgress = bookerPublishOrderInProgress;
+  const anyActionsInProgress =
+    bookerPublishOrderInProgress || addOrderParticipantsInProgress;
   const submitDisabled = anyActionsInProgress || shouldDisableSubmit || invalid;
-  const submitInProgress = anyActionsInProgress;
+  const submitInProgress = bookerPublishOrderInProgress;
 
   return (
     <Form className={css.formRoot} onSubmit={handleSubmit}>
