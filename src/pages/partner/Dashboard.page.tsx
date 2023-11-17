@@ -135,12 +135,12 @@ const Dashboard: React.FC<TDashboardProps> = () => {
       dispatch(
         PartnerDashboardThunks.fetchSubOrders({
           currentSubOrderParams: {
-            startDate,
-            endDate,
+            startDate: startDate - 7 * 24 * 60 * 60 * 1000,
+            endDate: endDate + 7 * 24 * 60 * 60 * 1000,
           },
           previousSubOrdersParams: {
-            startDate: previousStartDate,
-            endDate: previousEndDate,
+            startDate: previousStartDate! - 7 * 24 * 60 * 60 * 1000,
+            endDate: previousEndDate! + 7 * 24 * 60 * 60 * 1000,
           },
         }),
       );
