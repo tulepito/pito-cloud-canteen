@@ -985,8 +985,8 @@ const checkRestaurantStillAvailable = createAsyncThunk(
           [timestamp]: {
             isAvailable: isAnyMenusValid,
             ...(isAnyMenusValid
-              ? { status: EInvalidRestaurantCase.noMenusValid }
-              : {}),
+              ? {}
+              : { status: EInvalidRestaurantCase.noMenusValid }),
           },
         };
       }),
