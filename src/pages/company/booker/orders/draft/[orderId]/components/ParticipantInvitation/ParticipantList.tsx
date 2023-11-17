@@ -40,7 +40,7 @@ const ParticipantList: React.FC<TParticipantListProps> = () => {
         BookerDraftOrderPageThunks.deleteOrderParticipants({
           participantId: currentParticipantId,
           orderId: Listing(order).getId(),
-          participantIds: difference(participantIds, [currentParticipantId]),
+          participants: difference(participantIds, [currentParticipantId]),
         }),
       );
     }
