@@ -11,6 +11,7 @@ import Button from '@components/Button/Button';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import IconArrowFull from '@components/Icons/IconArrow/IconArrowFull';
 import ParticipantLayout from '@components/ParticipantLayout/ParticipantLayout';
+import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { UIActions } from '@redux/slices/UI.slice';
@@ -58,19 +59,25 @@ const ParticipantPlan = () => {
     (cartKey) => !!cartList[Number(cartKey)],
   );
 
-  const { deadlineDate = Date.now(), orderType = EOrderType.group } =
-    Listing(order).getMetadata();
+  const {
+    deadlineDate = Date.now(),
+    deadlineHour,
+    orderType = EOrderType.group,
+  } = Listing(order).getMetadata();
   const [diffTime, setDiffTime] = useState<Duration | null>(null);
 
   const isGroupOrder = orderType === EOrderType.group;
 
+  const orderDeadline = DateTime.fromMillis(deadlineDate)
+    .startOf('day')
+    .plus({ ...convertHHmmStringToTimeParts(deadlineHour) })
+    .toMillis();
   const formattedTimeLeft =
     diffTime === null
       ? DateTime.fromMillis(deadlineDate)
           .diffNow()
           .toFormat("d'd':h'h':mm'm':ss's'")
       : (diffTime! as Duration).toFormat("d'd':h'h':mm'm':ss's'");
-
   const formattedDeadlineDate = DateTime.fromMillis(deadlineDate).toFormat(
     "HH:mm, dd 'tháng' MM, yyyy",
   );
@@ -178,7 +185,7 @@ const ParticipantPlan = () => {
           />
         </div>
         <div className={css.rightSection}>
-          <SectionCountdown orderDeadline={deadlineDate} />
+          <SectionCountdown orderDeadline={orderDeadline} />
           <SectionOrderPanel planId={`${planId}`} orderId={orderId} />
         </div>
         <div className={css.summarySection}>
@@ -223,7 +230,7 @@ const ParticipantPlan = () => {
             <IconArrowFull />
             <FormattedMessage id="ParticipantPlan.goBackText" />
           </Button>
-          <SectionCountdown orderDeadline={deadlineDate} />
+          <SectionCountdown orderDeadline={orderDeadline} />
           <SectionOrderPanel planId={`${planId}`} orderId={orderId} />
         </div>
       </div>
