@@ -30,7 +30,8 @@
       "@src/*": ["src/*"],
       "@styles/*": ["src/styles/*"],
       "@translations/*": ["src/translations/*"],
-      "@utils/*": ["src/utils/*"]
+      "@utils/*": ["src/utils/*"],
+      "@apiServices/*": ["src/pages/api/apiServices/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
