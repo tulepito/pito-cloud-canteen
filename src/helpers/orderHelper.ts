@@ -348,7 +348,7 @@ type TFoodDataMap = TObject<string, TFoodDataValue>;
 
 export const getFoodDataMap = ({
   foodListOfDate = {},
-  memberOrders,
+  memberOrders = {},
   orderType = EOrderType.group,
   lineItems = [],
 }: any) => {

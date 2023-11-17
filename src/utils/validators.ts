@@ -140,14 +140,13 @@ export const emailListValid =
   (message: string, restrictEmailList: string[], separator = ' ') =>
   (value: string) => {
     if (!value) return VALID;
-    console.debug('💫 > restrictEmailList: ', restrictEmailList);
 
     const normalizeValue = value.trim().replace(/\s+/g, ' ');
 
     return value &&
       normalizeValue
         .split(separator)
-        .every((v) => !restrictEmailList.includes(v))
+        .some((v) => !restrictEmailList.includes(v))
       ? VALID
       : message;
   };
