@@ -125,11 +125,12 @@ export const prepareMenuFoodList = async ({
   );
 
   // * convert food list (array) to food map
-  const normalizedFoodList = getSelectedRestaurantAndFoodList({
-    foodList: suitableFoodList,
-    foodIds: suitableFoodList.map((foodItem: TListing) => foodItem.id.uuid),
-    currentRestaurant: restaurant,
-  }).submitFoodListData;
+  const { submitFoodListData: normalizedFoodList } =
+    getSelectedRestaurantAndFoodList({
+      foodList: suitableFoodList,
+      foodIds: suitableFoodList.map((foodItem: TListing) => foodItem.id.uuid),
+      currentRestaurant: restaurant,
+    });
 
   return normalizedFoodList;
 };
@@ -148,7 +149,12 @@ export const prepareParamsFromOrderForSpecificDay = async ({
     packagePerMember,
     orderType,
   } = Listing(order as TListing).getMetadata();
-  const planListing = await fetchListing(plans[0]);
+  let orderDetail = {};
+
+  if (plans[0]) {
+    const planListing = await fetchListing(plans[0]);
+    orderDetail = planListing?.attributes?.metadata?.orderDetail || {};
+  }
 
   const company = await fetchUser(companyId);
   const { companyLocation = {} } = User(company).getPublicData();
@@ -156,8 +162,7 @@ export const prepareParamsFromOrderForSpecificDay = async ({
   return {
     isNormalOrder: orderType === EOrderType.normal,
     deliveryOrigin: deliveryAddress?.origin || companyLocation?.origin,
-    orderDetail:
-      Listing(planListing as TListing).getMetadata().orderDetail || {},
+    orderDetail,
     memberAmount,
     nutritions,
     mealType,

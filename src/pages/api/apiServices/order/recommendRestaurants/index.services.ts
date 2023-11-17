@@ -31,18 +31,20 @@ export const recommendRestaurantForSpecificDay = async ({
   timestamp,
   recommendParams = {},
   shouldCalculateDistance,
+  favoriteRestaurantIdList = [],
 }: {
   orderId: string;
   timestamp: number;
   recommendParams?: TObject;
   shouldCalculateDistance: boolean;
+  favoriteRestaurantIdList?: string[];
 }) => {
   const order = await fetchListing(orderId);
 
   const menuQueryParams = {
     timestamp,
+    favoriteRestaurantIdList,
   };
-
   // * recommend from order data
   const {
     packagePerMember = 0,
@@ -62,20 +64,16 @@ export const recommendRestaurantForSpecificDay = async ({
         recommendParams,
         menuQueryParams,
       });
-
   // * query all menus
   const allMenus = await queryAllListings({
     query: menuQuery,
   });
-
   // * query all restaurant
   const restaurantIdList = chunk(
     uniq<string>(
-      allMenus.map((menu: TListing) => {
-        const { restaurantId } = Listing(menu).getMetadata();
-
-        return restaurantId;
-      }),
+      allMenus.map(
+        (menu: TListing) => menu?.attributes?.metadata?.restaurantId,
+      ),
     ),
     100,
   );
@@ -94,7 +92,6 @@ export const recommendRestaurantForSpecificDay = async ({
       ),
     ),
   );
-
   // * map restaurant with menu data
   const restaurants = combineMenusWithRestaurantData({
     menus: allMenus,
@@ -102,7 +99,6 @@ export const recommendRestaurantForSpecificDay = async ({
     shouldCalculateDistance,
     deliveryOrigin,
   });
-
   if (restaurants.length > 0) {
     const randomNumber = Math.floor(Math.random() * (restaurants.length - 1));
     const otherRandomNumber = Math.abs(randomNumber - restaurants.length + 1);
@@ -152,10 +148,12 @@ export const recommendRestaurants = async ({
   orderId,
   recommendParams = {},
   shouldCalculateDistance,
+  favoriteRestaurantIdList = [],
 }: {
   orderId: string;
   recommendParams?: TObject;
   shouldCalculateDistance: boolean;
+  favoriteRestaurantIdList?: string[];
 }) => {
   const orderDetail: TObject = {};
   const order = await fetchListing(orderId as string);
@@ -180,6 +178,7 @@ export const recommendRestaurants = async ({
       // * query all menus
       const menuQueryParams = {
         timestamp,
+        favoriteRestaurantIdList,
       };
       const menuQuery = isEmpty(recommendParams)
         ? getMenuQuery({

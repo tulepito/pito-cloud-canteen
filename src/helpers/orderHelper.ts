@@ -553,7 +553,6 @@ export const getSelectedRestaurantAndFoodList = ({
   foodIds: string[];
   currentRestaurant: TObject;
 }) => {
-  const currRestaurantId = currentRestaurant?.id?.uuid;
   const submitFoodListData = foodIds.reduce((result, foodId) => {
     const item = foodList.find((food) => food?.id?.uuid === foodId);
 
@@ -577,7 +576,7 @@ export const getSelectedRestaurantAndFoodList = ({
   }, {});
 
   const submitRestaurantData = {
-    id: currRestaurantId,
+    id: currentRestaurant?.id?.uuid,
     restaurantName: currentRestaurant?.attributes?.title,
     phoneNumber: currentRestaurant?.attributes?.publicData?.phoneNumber,
     minQuantity: currentRestaurant?.attributes?.publicData?.minQuantity,

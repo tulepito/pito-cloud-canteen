@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HttpMethod } from '@apis/configs';
-import { reorder } from '@pages/api/apiServices/order/reorder.service';
+import { reorder } from '@pages/api/apiServices/order/reorder/index.service';
 import cookies from '@services/cookie';
 import { getCurrentUser, handleError } from '@services/sdk';
 import { User } from '@src/utils/data';
