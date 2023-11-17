@@ -24,6 +24,6 @@ export const ratingOptions = [
 ];
 
 export const mealTypeOptions = [
-  { key: 'vegetarian', label: 'Chay' },
-  { key: 'unVegetarian', label: 'Mặn' },
+  { key: 'vegetarian', label: 'Món chay' },
+  { key: 'unVegetarian', label: 'Món mặn' },
 ];

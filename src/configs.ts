@@ -3,6 +3,8 @@ import defaultLocationSearches from '@helpers/defaultLocationSearches';
 const env = process.env.NEXT_PUBLIC_ENV;
 const dev = process.env.NEXT_PUBLIC_ENV === 'development';
 
+const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+
 // CDN assets for the app. Configurable through Flex Console.
 // Currently, only translation.json is available.
 // Note: the path must match the path defined in Asset Delivery API
@@ -196,6 +198,7 @@ const config = {
   VATPercentage,
   marketplacePhoneNumber,
   maxKilometerFromRestaurantToDeliveryAddressForBooker,
+  googleClientId,
 };
 
 export default config;

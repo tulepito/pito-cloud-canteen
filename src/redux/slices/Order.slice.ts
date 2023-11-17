@@ -349,7 +349,7 @@ const createOrder = createAsyncThunk(
     const {
       startDate,
       endDate,
-      isGroupOrder = [],
+      orderType,
       deadlineDate,
       orderDeadlineHour,
       orderDeadlineMinute,
@@ -360,7 +360,7 @@ const createOrder = createAsyncThunk(
 
     const newIsGroupOrder = isCopyPreviousOrder
       ? Listing(previousOrder).getMetadata().orderType === EOrderType.group
-      : isGroupOrder.length > 0;
+      : orderType === EOrderType.group;
 
     const startDateTimestamp = new Date(startDate).getTime();
     const endDateTimestamp = new Date(endDate).getTime();
@@ -417,8 +417,7 @@ const createOrder = createAsyncThunk(
       ? await reorderApi(Listing(previousOrder!).getId(), {
           startDate: startDateTimestamp,
           endDate: endDateTimestamp,
-          deadlineDate: deadlineDateTimestamp,
-          deadlineHour: `${orderDeadlineHour}:${orderDeadlineMinute}`,
+          daySession,
         })
       : await createBookerOrderApi(newOrderApiBody);
 

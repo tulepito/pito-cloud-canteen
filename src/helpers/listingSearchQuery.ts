@@ -240,7 +240,8 @@ export const getMenuQueryInSpecificDay = ({
     packagePerMember,
     daySession,
   } = Listing(order as TListing).getMetadata();
-  const dateTime = DateTime.fromMillis(timestamp);
+
+  const dateTime = DateTime.fromMillis(timestamp).setZone(VNTimezone);
   const dayOfWeek = convertWeekDay(dateTime.weekday).key;
   const mealType = deliveryDaySessionAdapter(daySession);
   const convertedMealFoodType = mealFoodType.map((item: string) =>

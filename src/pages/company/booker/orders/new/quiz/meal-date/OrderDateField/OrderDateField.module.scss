@@ -32,4 +32,9 @@
   transform: translateX(-50%);
   z-index: 1;
   width: 800px;
+
+  &.shouldDisplayFixed {
+    position: fixed;
+    top: 130px;
+  }
 }

@@ -10,7 +10,6 @@ import { QuizActions } from '@redux/slices/Quiz.slice';
 import { QuizStep } from '@src/utils/enums';
 import type { TKeyValue } from '@src/utils/types';
 
-import useRedirectAfterReloadPage from '../../hooks/useRedirectAfterReloadPage';
 import QuizModal from '../components/QuizModal/QuizModal';
 import { useQuizFlow } from '../hooks/useQuizFlow';
 
@@ -24,7 +23,6 @@ const QuizMealStyles = () => {
   const dispatch = useAppDispatch();
   const submittingControl = useBoolean();
 
-  useRedirectAfterReloadPage();
   const mealStyles = useAppSelector(
     (state) => state.SystemAttributes.categories,
     shallowEqual,

@@ -76,7 +76,7 @@ const CollapsibleRows: React.FC<TCollapsibleRowsProps> = (props) => {
               css.bodyRow,
               css.bodyRowChild,
             )}
-            key={child.key}>
+            key={`${row.key}-${child.key}`}>
             {columns.map((col: TColumn, index: number) => {
               const rowCheckbox = values?.rowCheckbox || [];
               const isChecked = rowCheckbox.includes(child.key);

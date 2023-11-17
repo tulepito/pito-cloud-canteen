@@ -212,10 +212,11 @@ export const isEnableSubmitPublishOrder = (
   );
 };
 
-export const isOrderDetailDatePickedFood = (date: any) => {
-  const { foodList = [] } = date || {};
+export const isOrderDetailDatePickedFood = (orderDetailOnDate: any) => {
+  const { restaurant = {} } = orderDetailOnDate || {};
+  const { foodList = [], id } = restaurant || {};
 
-  return isEmpty(foodList);
+  return !isEmpty(id) && !isEmpty(foodList);
 };
 
 export const isEnableToStartOrder = (
@@ -309,11 +310,7 @@ export const findSuitableStartDate = ({
 
   const suitableStartDate =
     dateRange.find((date) => {
-      const foodIds = Object.keys(
-        orderDetail[date.toString()]?.restaurant?.foodList || {},
-      );
-
-      return isEmpty(foodIds);
+      return isEmpty(orderDetail[date.toString()]?.restaurant?.foodList || {});
     }) || new Date(startDate);
 
   return suitableStartDate;

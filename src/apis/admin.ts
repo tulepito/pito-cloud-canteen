@@ -109,3 +109,7 @@ export const handleDeleteOldDataAfterEditInProgressOrderApi = (
     `/admin/listings/order/${orderId}/handle-delete-old-data-after-edit-in-progress-order`,
     body,
   );
+
+export const verifyEmailApi = (userId: string) => {
+  putApi('/verify-email', { userId });
+};
