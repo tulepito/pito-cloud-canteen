@@ -1,4 +1,9 @@
 import AWS from 'aws-sdk';
+import { isEmpty } from 'lodash';
+import { DateTime } from 'luxon';
+
+import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
+import { formatTimestamp, VNTimezone } from '@src/utils/dates';
 
 const LAMBDA_ARN = `${process.env.LAMBDA_ARN}`;
 const ROLE_ARN = `${process.env.ROLE_ARN}`;
@@ -19,8 +24,10 @@ type CreateSchedulerParams = {
   params?: any;
   customName: string; // less than 64 characters
   timeExpression?: string; // yyyy-mm-ddThh:mm:ss
+  arn?: string;
 };
 export const createScheduler = ({
+  arn,
   params,
   customName,
   timeExpression,
@@ -33,7 +40,7 @@ export const createScheduler = ({
     ScheduleExpression: `at(${timeExpression})`,
     ScheduleExpressionTimezone: 'Asia/Ho_Chi_Minh',
     Target: {
-      Arn: LAMBDA_ARN,
+      Arn: arn || LAMBDA_ARN,
       RoleArn: ROLE_ARN,
       Input: JSON.stringify(params),
     },
@@ -51,6 +58,7 @@ export const getScheduler = (name: string) => {
 };
 
 export const updateScheduler = ({
+  arn,
   params,
   customName,
   timeExpression,
@@ -64,7 +72,7 @@ export const updateScheduler = ({
     ScheduleExpressionTimezone: 'Asia/Ho_Chi_Minh',
     ActionAfterCompletion: isProduction ? 'NONE' : 'DELETE',
     Target: {
-      Arn: LAMBDA_ARN,
+      Arn: arn || LAMBDA_ARN,
       RoleArn: ROLE_ARN,
       Input: JSON.stringify(params),
     },
@@ -103,32 +111,49 @@ export const createFoodRatingNotificationScheduler = async ({
     });
 };
 
-export const createAutomaticStartOrderScheduler = async ({
-  params,
-  customName,
-  timeExpression,
-}: CreateSchedulerParams) => {
-  const schedulerParams = {
-    FlexibleTimeWindow: {
-      Mode: 'OFF',
-    },
-    Name: customName,
-    ScheduleExpression: `at(${timeExpression})`,
-    ScheduleExpressionTimezone: 'Asia/Ho_Chi_Minh',
-    ActionAfterCompletion: isProduction ? 'NONE' : 'DELETE',
-    Target: {
-      Arn: AUTOMATIC_START_ORDER_JOB_LAMBDA_ARN,
-      RoleArn: ROLE_ARN,
-      Input: JSON.stringify(params),
-    },
-  };
+export const createOrUpdateAutomaticStartOrderScheduler = async ({
+  orderId,
+  startDate,
+  deliveryHour,
+}: any) => {
+  const ensuredDeliveryHour = isEmpty(deliveryHour)
+    ? undefined
+    : deliveryHour.includes('-')
+    ? deliveryHour.split('-')[0]
+    : deliveryHour;
+  const customName = `automaticStartOrder_${orderId}`;
+  const timeExpression = formatTimestamp(
+    DateTime.fromMillis(startDate)
+      .setZone(VNTimezone)
+      .plus({
+        ...convertHHmmStringToTimeParts(ensuredDeliveryHour),
+      })
+      .minus({ day: 1 })
+      .toMillis(),
+    "yyyy-MM-dd'T'hh:mm:ss",
+  );
 
-  Scheduler.createSchedule(schedulerParams)
-    .promise()
-    .then((res) => {
-      console.log('Create Automatic start order Scheduler Success: ', res);
-    })
-    .catch((err) => {
-      console.log('Create Automatic start order Scheduler Error: ', err);
+  try {
+    await getScheduler(customName);
+    await updateScheduler({
+      arn: AUTOMATIC_START_ORDER_JOB_LAMBDA_ARN,
+      customName,
+      timeExpression,
     });
+  } catch (error) {
+    createScheduler({
+      arn: AUTOMATIC_START_ORDER_JOB_LAMBDA_ARN,
+      customName,
+      timeExpression,
+      params: {
+        orderId,
+      },
+    })
+      .then((res) => {
+        console.log('Create Automatic start order Scheduler Success: ', res);
+      })
+      .catch((err) => {
+        console.log('Create Automatic start order Scheduler Error: ', err);
+      });
+  }
 };

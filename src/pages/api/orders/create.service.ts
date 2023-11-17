@@ -2,10 +2,9 @@ import { isEmpty } from 'lodash';
 import { DateTime } from 'luxon';
 
 import { calculateGroupMembers, getAllCompanyMembers } from '@helpers/company';
-import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
 import { generateUncountableIdForOrder } from '@helpers/generateUncountableId';
 import {
-  createAutomaticStartOrderScheduler,
+  createOrUpdateAutomaticStartOrderScheduler,
   createScheduler,
   getScheduler,
   updateScheduler,
@@ -82,8 +81,9 @@ const createOrder = async ({
   const { subAccountId } = companyAccount.attributes.profile.privateData;
   const { companyName } = companyAccount.attributes.profile.publicData;
 
-  const orderId = generateUncountableIdForOrder(currentOrderNumber);
-  const generatedOrderId = `PT${orderId}`;
+  const generatedOrderId = `PT${generateUncountableIdForOrder(
+    currentOrderNumber,
+  )}`;
 
   // Prepare order state history
   const orderStateHistory = [
@@ -172,27 +172,10 @@ const createOrder = async ({
   }
 
   if (!isNormalOrder && !isCreatedByAdmin && orderFlexId) {
-    const ensuredDeliveryHour = isEmpty(deliveryHour)
-      ? undefined
-      : deliveryHour.includes('-')
-      ? deliveryHour.split('-')[0]
-      : deliveryHour;
-
-    createAutomaticStartOrderScheduler({
-      customName: `automaticStartOrder_${orderFlexId}`,
-      timeExpression: formatTimestamp(
-        DateTime.fromMillis(startDate)
-          .setZone(VNTimezone)
-          .plus({
-            ...convertHHmmStringToTimeParts(ensuredDeliveryHour),
-          })
-          .minus({ day: 1 })
-          .toMillis(),
-        "yyyy-MM-dd'T'hh:mm:ss",
-      ),
-      params: {
-        orderId: orderFlexId,
-      },
+    createOrUpdateAutomaticStartOrderScheduler({
+      orderId: orderFlexId,
+      startDate,
+      deliveryHour,
     });
   }
 

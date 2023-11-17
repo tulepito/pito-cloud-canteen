@@ -1,11 +1,9 @@
 import isEmpty from 'lodash/isEmpty';
 import omit from 'lodash/omit';
-import { DateTime } from 'luxon';
 
-import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
 import { generateUncountableIdForOrder } from '@helpers/generateUncountableId';
 import { getInitMemberOrder } from '@pages/api/orders/[orderId]/plan/memberOrder.helper';
-import { createAutomaticStartOrderScheduler } from '@services/awsEventBrigdeScheduler';
+import { createOrUpdateAutomaticStartOrderScheduler } from '@services/awsEventBrigdeScheduler';
 import { denormalisedResponseEntities } from '@services/data';
 import {
   addCollectionDoc,
@@ -22,7 +20,6 @@ import {
   getDayOfWeek,
   getDaySessionFromDeliveryTime,
   renderDateRange,
-  VNTimezone,
 } from '@src/utils/dates';
 import {
   EBookerOrderDraftStates,
@@ -337,27 +334,10 @@ const reorder = async ({
 
   const { deliveryHour } = oldMetaData;
   if (isGroupOrder && !isCreatedByAdmin && newOrderId) {
-    const ensuredDeliveryHour = isEmpty(deliveryHour)
-      ? undefined
-      : deliveryHour.includes('-')
-      ? deliveryHour.split('-')[0]
-      : deliveryHour;
-
-    createAutomaticStartOrderScheduler({
-      customName: `automaticStartOrder_${newOrderId}`,
-      timeExpression: formatTimestamp(
-        DateTime.fromMillis(startDate)
-          .setZone(VNTimezone)
-          .plus({
-            ...convertHHmmStringToTimeParts(ensuredDeliveryHour),
-          })
-          .minus({ day: 1 })
-          .toMillis(),
-        "yyyy-MM-dd'T'hh:mm:ss",
-      ),
-      params: {
-        orderId: newOrderId,
-      },
+    createOrUpdateAutomaticStartOrderScheduler({
+      orderId,
+      startDate,
+      deliveryHour,
     });
   }
 
