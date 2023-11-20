@@ -58,11 +58,11 @@ const ParticipantInvitation: React.FC<TParticipantInvitationProps> = ({
   const shouldDisabledSubmitPublishOrder = isParticipantListEmpty;
 
   // * submit change deadline date & time
-  const handleSubmitDeadlineDateTimeForm = (
+  const handleSubmitDeadlineDateTimeForm = async (
     values: DeadlineDateTimeFormValues,
   ) => {
     if (!isEqual(deadlineDateTimeInitialValues, values)) {
-      dispatch(
+      await dispatch(
         orderAsyncActions.updateOrder({
           generalInfo: values,
         }),
