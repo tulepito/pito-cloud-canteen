@@ -15,8 +15,7 @@ type TPartnerDashboardState = {
   analyticsOrdersTimeFrame: ETimeFrame;
 
   previousSubOrders: TObject[];
-  fetchPreviousSubOrdersInProgress: boolean;
-  fetchPreviousSubOrdersError: any;
+  latestSubOrders: TObject[];
 
   subOrders: TObject[];
   fetchSubOrdersInProgress: boolean;
@@ -30,8 +29,7 @@ const initialState: TPartnerDashboardState = {
   analyticsOrdersTimeFrame: ETimeFrame.MONTH,
 
   previousSubOrders: [],
-  fetchPreviousSubOrdersInProgress: false,
-  fetchPreviousSubOrdersError: null,
+  latestSubOrders: [],
 
   subOrders: [],
   fetchSubOrdersInProgress: false,
@@ -63,13 +61,18 @@ const fetchSubOrders = createAsyncThunk(
       ...previousSubOrdersParams,
       orderStates: allowedOrderStates,
     });
+    const latestResponse = await queryPartnerOrdersApi(restaurantListingId, {
+      orderStates: allowedOrderStates,
+    });
 
     const { orders = [] } = response?.data || {};
     const { orders: previousOrders = [] } = previousResponse?.data || {};
+    const { orders: latestOrders = [] } = latestResponse?.data || {};
 
     return {
       subOrders: orders,
       previousSubOrders: previousOrders,
+      latestSubOrders: latestOrders,
     };
   },
 );
@@ -110,6 +113,7 @@ const PartnerDashboardSlice = createSlice({
         state.fetchSubOrdersInProgress = false;
         state.subOrders = action.payload.subOrders;
         state.previousSubOrders = action.payload.previousSubOrders;
+        state.latestSubOrders = action.payload.latestSubOrders;
       })
       .addCase(fetchSubOrders.rejected, (state, action) => {
         state.fetchSubOrdersInProgress = false;

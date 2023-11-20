@@ -57,6 +57,9 @@ const Dashboard: React.FC<TDashboardProps> = () => {
   const previousSubOrders = useAppSelector(
     (state) => state.PartnerDashboard.previousSubOrders,
   );
+  const latestSubOrders = useAppSelector(
+    (state) => state.PartnerDashboard.latestSubOrders,
+  );
 
   const { previousStartDate, previousEndDate } = getPreviousTimePeriod();
 
@@ -95,6 +98,19 @@ const Dashboard: React.FC<TDashboardProps> = () => {
       previousEndDate,
     ],
   );
+
+  const latestSplittedSubOrders = useMemo(
+    () =>
+      splitSubOrders(
+        latestSubOrders,
+        restaurantListingId,
+        currentOrderVATPercentage,
+        undefined,
+        new Date().getTime(),
+      ),
+    [currentOrderVATPercentage, latestSubOrders, restaurantListingId],
+  );
+
   const overviewInformation = useMemo(
     () => calculateOverviewInformation(splittedSubOrders),
     [splittedSubOrders],
@@ -200,7 +216,7 @@ const Dashboard: React.FC<TDashboardProps> = () => {
       </section>
       <section>
         <LatestOrders
-          data={splittedSubOrders.slice(0, 5)}
+          data={latestSplittedSubOrders.slice(0, 5)}
           inProgress={fetchSubOrdersInProgress}
         />
       </section>

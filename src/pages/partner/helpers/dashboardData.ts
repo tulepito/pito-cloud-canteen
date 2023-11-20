@@ -13,16 +13,28 @@ import {
   ETimeFrame,
   ETimePeriodOption,
 } from '@src/utils/enums';
+import { ETransition } from '@src/utils/transaction';
 import type { TChartPoint, TListing, TObject } from '@src/utils/types';
 
 export const calculateOverviewInformation = (subOrders: TObject[]) => {
+  const allowAccumulateRevenueTransitions = [ETransition.COMPLETE_DELIVERY];
   const overviewInformation = subOrders.reduce(
     (result, subOrder) => {
       const { revenue, totalOrders, totalCustomers } = result;
-      const { revenue: subOrderRevenue, companyName } = subOrder;
+      const {
+        revenue: subOrderRevenue,
+        companyName,
+        lastTransition,
+      } = subOrder;
+
+      const newRevenue = allowAccumulateRevenueTransitions.includes(
+        lastTransition,
+      )
+        ? subOrderRevenue
+        : 0;
 
       return {
-        revenue: revenue + subOrderRevenue,
+        revenue: revenue + newRevenue,
         totalOrders: totalOrders + 1,
         totalCustomers: uniq([...totalCustomers, companyName]),
       };
@@ -41,8 +53,8 @@ export const splitSubOrders = (
   subOrders: TObject[],
   restaurantListingId: string,
   currentOrderVATPercentage: number,
-  startDate: number,
-  endDate: number,
+  startDate?: number,
+  endDate?: number,
 ) => {
   const splittedSubOrders = subOrders.reduce((result: TObject[], order) => {
     const orderListing = Listing(order as TListing);
@@ -114,10 +126,20 @@ export const splitSubOrders = (
     return [...result, ...bulkSubOrders];
   }, []);
 
-  return splittedSubOrders.filter(
-    (subOrder) =>
-      subOrder.subOrderDate >= startDate && subOrder.subOrderDate <= endDate,
-  );
+  if (!startDate && !endDate) return splittedSubOrders;
+
+  return splittedSubOrders.filter((subOrder) => {
+    if (startDate && endDate) {
+      return (
+        subOrder.subOrderDate >= startDate && subOrder.subOrderDate <= endDate
+      );
+    }
+    if (startDate) {
+      return subOrder.subOrderDate >= startDate;
+    }
+
+    return subOrder.subOrderDate <= endDate!;
+  });
 };
 
 const generateTimeRange = ({
