@@ -578,8 +578,8 @@ export const Transaction = (transaction: TTransaction) => {
     getProtectedData: (): TObject => {
       return get(attributes, 'protectedData', {});
     },
-    getPrivateData: (): TObject => {
-      return get(attributes, 'privateData', {});
+    getMetadata: (): TObject => {
+      return get(attributes, 'metadata', {});
     },
   };
 };
