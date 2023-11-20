@@ -302,9 +302,7 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
               dayInWeek: generalInfo.dayInWeek,
               deliveryOrigin: generalInfo.deliveryAddress.origin,
               memberAmount: generalInfo.memberAmount,
-              isNormalOrder: generalInfo.pickAllow
-                ? EOrderType.group
-                : EOrderType.normal,
+              isNormalOrder: !generalInfo.pickAllow,
               nutritions: generalInfo.nutritions || [],
               packagePerMember: generalInfo.packagePerMember,
               daySession: generalInfo.daySession,
@@ -333,9 +331,7 @@ const MealPlanSetup: React.FC<MealPlanSetupProps> = (props) => {
           dayInWeek: draftEditOrderData.dayInWeek,
           deliveryOrigin: draftEditOrderData.deliveryAddress.origin,
           memberAmount: draftEditOrderData.memberAmount,
-          isNormalOrder: draftEditOrderData.pickAllow
-            ? EOrderType.group
-            : EOrderType.normal,
+          isNormalOrder: !draftEditOrderData.pickAllow,
           nutritions: draftEditOrderData.nutritions || [],
           packagePerMember: draftEditOrderData.packagePerMember,
           daySession: draftEditOrderData.daySession,
