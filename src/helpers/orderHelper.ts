@@ -10,10 +10,12 @@ import {
   EVENING_SESSION,
   MORNING_SESSION,
 } from '@components/CalendarDashboard/helpers/constant';
+import type { TDaySession } from '@components/CalendarDashboard/helpers/types';
 import { ETransition } from '@src/utils/transaction';
 import { Listing } from '@utils/data';
 import {
   generateTimeRangeItems,
+  getDaySessionFromDeliveryTime,
   renderDateRange,
   weekDayFormatFromDateTime,
 } from '@utils/dates';
@@ -34,6 +36,7 @@ import type {
   TOrderStateHistory,
 } from '@utils/types';
 
+import { convertHHmmStringToTimeParts } from './dateHelpers';
 import { parseThousandNumber } from './format';
 
 export const ORDER_STATES_TO_ENABLE_EDIT_ABILITY = [
@@ -1034,4 +1037,30 @@ export const mergeRecommendOrderDetailWithCurrentOrderDetail = (
   }
 
   return mergedResult;
+};
+
+export const prepareOrderDeadline = (
+  deadlineDate: number,
+  deadlineHour: string,
+) => {
+  return DateTime.fromMillis(deadlineDate)
+    .startOf('day')
+    .plus({ ...convertHHmmStringToTimeParts(deadlineHour) })
+    .toMillis();
+};
+
+export const prepareDaySession = (
+  daySession: TDaySession,
+  deliveryHour?: string,
+) => {
+  return (
+    daySession ||
+    getDaySessionFromDeliveryTime(
+      isEmpty(deliveryHour)
+        ? undefined
+        : deliveryHour?.includes('-')
+        ? deliveryHour?.split('-')[0]
+        : deliveryHour,
+    )
+  );
 };

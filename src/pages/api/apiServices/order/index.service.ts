@@ -1,6 +1,7 @@
 import omit from 'lodash/omit';
 
 import { generateUncountableIdForOrder } from '@helpers/generateUncountableId';
+import { prepareDaySession } from '@helpers/orderHelper';
 import { getInitMemberOrder } from '@pages/api/orders/[orderId]/plan/memberOrder.helper';
 import { denormalisedResponseEntities } from '@services/data';
 import {
@@ -16,7 +17,6 @@ import {
   formatTimestamp,
   generateWeekDayList,
   getDayOfWeek,
-  getDaySessionFromDeliveryTime,
   renderDateRange,
 } from '@src/utils/dates';
 import {
@@ -109,8 +109,7 @@ const normalizeOrderMetadata = (metadata: TObject = {}) => {
     staffName,
     vatAllow,
     deliveryHour,
-    daySession:
-      daySession || getDaySessionFromDeliveryTime(deliveryHour.split('-')[0]),
+    daySession: prepareDaySession(daySession, deliveryHour),
     mealType,
   };
 

@@ -11,7 +11,7 @@ import Button from '@components/Button/Button';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import IconArrowFull from '@components/Icons/IconArrow/IconArrowFull';
 import ParticipantLayout from '@components/ParticipantLayout/ParticipantLayout';
-import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
+import { prepareOrderDeadline } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { UIActions } from '@redux/slices/UI.slice';
@@ -36,6 +36,7 @@ const ParticipantPlan = () => {
   const intl = useIntl();
   const infoSectionController = useBoolean();
   const dispatch = useAppDispatch();
+  const [diffTime, setDiffTime] = useState<Duration | null>(null);
   // Router
   const router = useRouter();
   const isRouterReady = router.isReady;
@@ -64,20 +65,15 @@ const ParticipantPlan = () => {
     deadlineHour,
     orderType = EOrderType.group,
   } = Listing(order).getMetadata();
-  const [diffTime, setDiffTime] = useState<Duration | null>(null);
-
   const isGroupOrder = orderType === EOrderType.group;
 
-  const orderDeadline = DateTime.fromMillis(deadlineDate)
-    .startOf('day')
-    .plus({ ...convertHHmmStringToTimeParts(deadlineHour) })
-    .toMillis();
-  const formattedTimeLeft =
+  const orderDeadline = prepareOrderDeadline(deadlineDate, deadlineHour);
+
+  const formattedTimeLeft = (
     diffTime === null
-      ? DateTime.fromMillis(deadlineDate)
-          .diffNow()
-          .toFormat("d'd':h'h':mm'm':ss's'")
-      : (diffTime! as Duration).toFormat("d'd':h'h':mm'm':ss's'");
+      ? DateTime.fromMillis(deadlineDate).diffNow()
+      : (diffTime! as Duration)
+  ).toFormat("d'd':h'h':mm'm':ss's'");
   const formattedDeadlineDate = DateTime.fromMillis(deadlineDate).toFormat(
     "HH:mm, dd 'tháng' MM, yyyy",
   );
