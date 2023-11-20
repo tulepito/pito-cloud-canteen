@@ -37,12 +37,19 @@ export const historyPushState = (state: string, value: string | number) => {
 export const parseLocationSearchToObject = () => {
   const search = window?.location?.search?.slice(1);
 
-  return search
-    ? JSON.parse(
-        `{"${decodeURI(search)
-          .replace(/"/g, '\\"')
-          .replace(/&/g, '","')
-          .replace(/=/g, '":"')}"}`,
-      )
-    : {};
+  try {
+    const parsedSearchMaybe = JSON.parse(
+      `{"${decodeURI(search)
+        .replace(/"/g, '\\"')
+        .replace(/&/g, '","')
+        .replace(/=/g, '":"')}"}`,
+    );
+
+    return search ? parsedSearchMaybe : {};
+  } catch (error) {
+    console.error('💫 > parseLocationSearchToObject > error: ');
+    console.error(error);
+
+    return {};
+  }
 };
