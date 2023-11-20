@@ -6,10 +6,10 @@ import isEmpty from 'lodash/isEmpty';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import type { TTabsItem } from '@components/Tabs/Tabs';
 import Tabs from '@components/Tabs/Tabs';
+import { historyPushState } from '@helpers/urlHelpers';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { orderDetailsAnyActionsInProgress } from '@redux/slices/OrderManagement.slice';
 import { formatTimestamp } from '@src/utils/dates';
-import { historyPushState } from '@src/utils/history';
 
 import { usePrepareManageLineItemsSectionData } from './hooks/usePrepareManageLineItemsSectionData';
 import LineItemsTable from './LineItemsTable/LineItemsTable';

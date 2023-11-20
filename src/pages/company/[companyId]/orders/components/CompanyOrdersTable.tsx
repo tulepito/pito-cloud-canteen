@@ -10,13 +10,13 @@ import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import { TableForm } from '@components/Table/Table';
 import type { TTabsItem } from '@components/Tabs/Tabs';
 import Tabs from '@components/Tabs/Tabs';
+import { historyPushState } from '@helpers/urlHelpers';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { createDeepEqualSelector } from '@redux/redux.helper';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
 import type { RootState } from '@redux/store';
 import { companyPaths } from '@src/paths';
 import { User } from '@src/utils/data';
-import { historyPushState } from '@src/utils/history';
 import {
   EManageCompanyOrdersTab,
   EOrderStates,

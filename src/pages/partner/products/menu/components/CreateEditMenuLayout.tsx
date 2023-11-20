@@ -17,12 +17,12 @@ import LoadingModal from '@components/LoadingModal/LoadingModal';
 import MobileBottomContainer from '@components/MobileBottomContainer/MobileBottomContainer';
 import AlertModal from '@components/Modal/AlertModal';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
+import { historyPushState } from '@helpers/urlHelpers';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { partnerPaths } from '@src/paths';
 import { Listing } from '@src/utils/data';
 import { EListingStates } from '@src/utils/enums';
-import { historyPushState } from '@src/utils/history';
 import type { TObject } from '@src/utils/types';
 
 import { PartnerManageMenusThunks } from '../PartnerManageMenus.slice';

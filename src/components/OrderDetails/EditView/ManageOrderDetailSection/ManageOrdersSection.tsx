@@ -8,6 +8,7 @@ import { useRouter } from 'next/router';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import type { TTabsItem } from '@components/Tabs/Tabs';
 import Tabs from '@components/Tabs/Tabs';
+import { historyPushState } from '@helpers/urlHelpers';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import {
   orderDetailsAnyActionsInProgress,
@@ -15,7 +16,6 @@ import {
   orderManagementThunks,
 } from '@redux/slices/OrderManagement.slice';
 import { formatTimestamp } from '@src/utils/dates';
-import { historyPushState } from '@src/utils/history';
 import type { TObject } from '@src/utils/types';
 import { EMAIL_RE } from '@src/utils/validators';
 
