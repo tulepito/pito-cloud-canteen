@@ -1027,7 +1027,9 @@ export const mergeRecommendOrderDetailWithCurrentOrderDetail = (
 
       mergedResult[time] = {
         ...currentOrderDetail[time],
-        restaurant,
+        restaurant: isEmpty(restaurant)
+          ? currentOrderDetail[time].restaurant
+          : restaurant,
         hasNoRestaurants,
       };
     });
