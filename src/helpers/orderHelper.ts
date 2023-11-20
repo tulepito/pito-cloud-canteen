@@ -1043,7 +1043,7 @@ export const prepareOrderDeadline = (
   deadlineDate: number,
   deadlineHour: string,
 ) => {
-  return DateTime.fromMillis(deadlineDate)
+  return DateTime.fromMillis(deadlineDate || 0)
     .startOf('day')
     .plus({ ...convertHHmmStringToTimeParts(deadlineHour) })
     .toMillis();
