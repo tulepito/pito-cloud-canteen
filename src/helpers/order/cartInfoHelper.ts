@@ -44,7 +44,7 @@ export const vatPercentageBaseOnVatSetting = ({
   }
 };
 
-const calculateVATFee = ({
+export const calculateVATFee = ({
   vatPercentage,
   vatSetting,
   totalWithoutVAT,

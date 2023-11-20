@@ -1,6 +1,11 @@
 import sumBy from 'lodash/sumBy';
 
 import { parseThousandNumber } from '@helpers/format';
+import {
+  calculateVATFee,
+  ensureVATSetting,
+  vatPercentageBaseOnVatSetting,
+} from '@helpers/order/cartInfoHelper';
 
 import { formatTimestamp } from '../dates';
 
@@ -13,7 +18,6 @@ type PartnerNewOrderAppearParams = {
   quotationListing: any;
   restaurantListing: any;
   promotion: number;
-  systemVATPercentage: number;
 };
 
 export const partnerNewOrderAppearSubject = (orderName: string) =>
@@ -25,19 +29,30 @@ const partnerNewOrderAppear = ({
   quotationListing,
   restaurantListing,
   promotion,
-  systemVATPercentage,
 }: PartnerNewOrderAppearParams) => {
   const restaurantId = restaurantListing.getId();
   const orderId = orderListing.getId();
   const { title: orderTitle } = orderListing.getAttributes();
   const { title: restaurantName } = restaurantListing.getAttributes();
   const { orderName } = orderListing.getPublicData();
-  const { startDate, endDate, deliveryAddress, deliveryHour, staffName } =
-    orderListing.getMetadata();
+  const {
+    startDate,
+    endDate,
+    deliveryAddress,
+    deliveryHour,
+    staffName,
+    vatSettings = {},
+    orderVATPercentage,
+  } = orderListing.getMetadata();
   const { companyName } = companyUser.getPublicData();
 
   const { partner = {} } = quotationListing.getMetadata();
   const partnerQuotation = partner[restaurantId] || {};
+  const vatSetting = ensureVATSetting(vatSettings[restaurantId]);
+  const vatPercentage = vatPercentageBaseOnVatSetting({
+    vatSetting,
+    vatPercentage: orderVATPercentage,
+  });
 
   const totalPrice = Object.keys(partnerQuotation?.quotation).reduce(
     (sum: number, date: string) => {
@@ -54,7 +69,12 @@ const partnerNewOrderAppear = ({
 
   const promotionAmount = Math.floor((totalPrice * promotion) / 100);
   const totalPriceWithoutPromotionAmount = totalPrice - promotionAmount;
-  const vatFee = Math.round(totalPrice * systemVATPercentage);
+  const vatFee = calculateVATFee({
+    vatPercentage,
+    vatSetting,
+    totalWithoutVAT: totalPriceWithoutPromotionAmount,
+    totalPrice,
+  });
   const totalPriceWithVat = totalPriceWithoutPromotionAmount + vatFee;
 
   const partnerOrderDetail = Object.keys(partnerQuotation.quotation).map(
