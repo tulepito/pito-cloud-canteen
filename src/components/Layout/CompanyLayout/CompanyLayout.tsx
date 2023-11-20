@@ -10,7 +10,6 @@ import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import QuizFlow from '@pages/company/booker/orders/new/quiz/QuizFlow';
 import { BookerCompaniesThunks } from '@redux/slices/BookerCompanies.slice';
-import { QuizActions } from '@redux/slices/Quiz.slice';
 import { companyPaths } from '@src/paths';
 import { User } from '@utils/data';
 import type { TUser } from '@utils/types';
@@ -93,8 +92,7 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
           <div className={css.title}>Đặt hàng</div>
         </div>
       ),
-      pathname: companyPaths.CreateNewOrder,
-      extraFunc: () => dispatch(QuizActions.openQuizFlow()),
+      pathname: companyPaths.Home,
     },
     {
       key: 'order',

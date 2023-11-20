@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import classNames from 'classnames';
 import format from 'date-fns/format';
 import viLocale from 'date-fns/locale/vi';
 
@@ -15,13 +16,18 @@ type OrderDateFieldProps = {
   form: any;
   values: Partial<TMealDateFormValues>;
   onClick?: () => void;
+  usePreviousData?: boolean;
 };
 const OrderDateField: React.FC<OrderDateFieldProps> = (props) => {
-  const { form, values, onClick } = props;
+  const { usePreviousData = false, form, values, onClick } = props;
   const [selectedTimeRangeOption, setSelectedTimeRangeOption] =
     useState<string>('custom');
   const orderDateFieldModalController = useBoolean();
   const { startDate, endDate } = values;
+
+  const modalWrapperCLasses = classNames(css.modalWrapper, {
+    [css.shouldDisplayFixed]: usePreviousData,
+  });
 
   const handleOrderDateFieldClick = () => {
     onClick?.();
@@ -53,7 +59,7 @@ const OrderDateField: React.FC<OrderDateFieldProps> = (props) => {
         </RenderWhen>
       </div>
       <RenderWhen condition={orderDateFieldModalController.value}>
-        <div className={css.modalWrapper}>
+        <div className={modalWrapperCLasses}>
           <OrderDateFieldModal
             form={form}
             values={values}

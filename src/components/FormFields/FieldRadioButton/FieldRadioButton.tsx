@@ -29,7 +29,7 @@ export const IconRadioButton: React.FC<TIconRadioButton> = (props) => {
           height={19}
           rx="9.5"
           fill="white"
-          stroke="#BFBFBF"
+          stroke="#262626"
         />
         <g
           className={classNames(
