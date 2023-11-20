@@ -1,13 +1,13 @@
 import {
-  calculatePriceQuotationInfo,
+  calculatePriceQuotationInfoFromOrder,
   calculatePriceQuotationPartner,
-  vatPercentageBaseOnVatSetting,
+  ensureVATSetting,
 } from '@helpers/order/cartInfoHelper';
 import { queryAllCollectionData } from '@services/firebase';
 import { fetchListing } from '@services/integrationHelper';
 import { updatePaymentRecordOnFirebase } from '@services/payment';
 import { Listing } from '@src/utils/data';
-import { EPartnerVATSetting, EPaymentType } from '@src/utils/enums';
+import { EPaymentType } from '@src/utils/enums';
 import type { TPlan } from '@src/utils/orderTypes';
 import type { TListing, TObject } from '@src/utils/types';
 
@@ -27,20 +27,13 @@ const updatePartnerPaymentRecord = async (
         const { restaurant = {} } = subOrderData;
         const { id: restaurantId } = restaurant;
         const vatSettingFromOrder = vatSettings[restaurantId];
-        const partnerVATSetting =
-          vatSettingFromOrder in EPartnerVATSetting
-            ? vatSettingFromOrder
-            : EPartnerVATSetting.vat;
-        const vatPercentage = vatPercentageBaseOnVatSetting({
-          vatSetting: partnerVATSetting,
-          vatPercentage: orderVATPercentage,
-        });
+
         const { totalWithVAT: totalPrice } = calculatePriceQuotationPartner({
           quotation: partner[restaurantId]?.quotation,
           serviceFeePercentage: serviceFees[restaurantId],
-          currentOrderVATPercentage: vatPercentage,
+          orderVATPercentage,
           subOrderDate,
-          shouldSkipVAT: partnerVATSetting === EPartnerVATSetting.direct,
+          vatSetting: ensureVATSetting(vatSettingFromOrder),
         });
 
         const paymentRecords = await queryAllCollectionData({
@@ -82,13 +75,14 @@ const updateClientPaymentRecord = async (
   hasSpecificPCCFee: boolean,
   specificPCCFee: number,
 ) => {
-  const { totalWithVAT: clientTotalPrice } = calculatePriceQuotationInfo({
-    planOrderDetail: orderDetail,
-    order,
-    currentOrderVATPercentage: orderVATPercentage,
-    hasSpecificPCCFee,
-    specificPCCFee,
-  });
+  const { totalWithVAT: clientTotalPrice } =
+    calculatePriceQuotationInfoFromOrder({
+      planOrderDetail: orderDetail,
+      order,
+      orderVATPercentage,
+      hasSpecificPCCFee,
+      specificPCCFee,
+    });
 
   const paymentRecords = await queryAllCollectionData({
     collectionName: FIREBASE_PAYMENT_RECORD_COLLECTION_NAME!,

@@ -1,9 +1,9 @@
 import isEmpty from 'lodash/isEmpty';
 
 import {
-  calculatePriceQuotationInfo,
+  calculatePriceQuotationInfoFromOrder,
   calculatePriceQuotationPartner,
-  vatPercentageBaseOnVatSetting,
+  ensureVATSetting,
 } from '@helpers/order/cartInfoHelper';
 import {
   checkIsOrderHasInProgressState,
@@ -22,7 +22,7 @@ import {
   updatePaymentRecordOnFirebase,
 } from '@services/payment';
 import { Listing, User } from '@src/utils/data';
-import { EPartnerVATSetting, EPaymentType } from '@src/utils/enums';
+import { EPaymentType } from '@src/utils/enums';
 import type { TListing, TObject } from '@src/utils/types';
 
 export const initializePayment = async (
@@ -65,21 +65,13 @@ export const initializePayment = async (
         const { id, restaurantName } = restaurant;
 
         const vatSettingFromOrder = vatSettings[id];
-        const partnerVATSetting =
-          vatSettingFromOrder in EPartnerVATSetting
-            ? vatSettingFromOrder
-            : EPartnerVATSetting.vat;
-        const vatPercentage = vatPercentageBaseOnVatSetting({
-          vatSetting: partnerVATSetting,
-          vatPercentage: orderVATPercentage,
-        });
 
-        const { totalWithVAT: totalPrice } = calculatePriceQuotationPartner({
+        const { totalWithVAT } = calculatePriceQuotationPartner({
           quotation: partner[id].quotation,
           serviceFeePercentage: serviceFees[id],
-          currentOrderVATPercentage: vatPercentage,
+          orderVATPercentage,
           subOrderDate,
-          shouldSkipVAT: partnerVATSetting === EPartnerVATSetting.direct,
+          vatSetting: ensureVATSetting(vatSettingFromOrder),
         });
 
         return {
@@ -92,7 +84,7 @@ export const initializePayment = async (
           subOrderDate,
           companyName,
           orderTitle,
-          totalPrice,
+          totalPrice: totalWithVAT,
           deliveryHour,
           isHideFromHistory: true,
           isAdminConfirmed: false,
@@ -134,13 +126,14 @@ export const initializePayment = async (
   const bookerDisplayName = User(bookerUser).getProfile().displayName;
   const bookerPhoneNumber = User(bookerUser).getProtectedData().phoneNumber;
 
-  const { totalWithVAT: clientTotalPrice } = calculatePriceQuotationInfo({
-    planOrderDetail: orderDetail,
-    order: orderListing,
-    currentOrderVATPercentage: orderVATPercentage,
-    hasSpecificPCCFee,
-    specificPCCFee,
-  });
+  const { totalWithVAT: clientTotalPrice } =
+    calculatePriceQuotationInfoFromOrder({
+      planOrderDetail: orderDetail,
+      order: orderListing,
+      orderVATPercentage,
+      hasSpecificPCCFee,
+      specificPCCFee,
+    });
 
   const clientPaymentData: Partial<PaymentBaseParams> = {
     SKU: generateSKU('CUSTOMER', orderId),

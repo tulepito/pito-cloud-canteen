@@ -211,7 +211,7 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
                   </RenderWhen.False>
                 </RenderWhen>
                 <Badge
-                  label={`${Math.abs(vatPercentage * 100)}%`}
+                  label={`${vatPercentage * 100}%`}
                   className={css.VATBadge}
                 />
               </div>
@@ -228,12 +228,6 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
           <div className={css.totalWithVAT}>
             {parseThousandNumber(totalWithVAT.toString())}đ
           </div>
-          {/* <div className={css.PITOPoints}>
-            {intl.formatMessage(
-              { id: 'ReviewCardSection.PITOPoints' },
-              { PITOPoints },
-            )}
-          </div> */}
           <div className={css.totalDescription}>
             {intl.formatMessage({ id: 'ReviewCardSection.totalDescription' })}
           </div>

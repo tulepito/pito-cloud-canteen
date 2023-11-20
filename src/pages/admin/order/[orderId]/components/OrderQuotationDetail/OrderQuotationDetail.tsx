@@ -8,13 +8,12 @@ import ReviewOrderDetailsSection from '@components/OrderDetails/ReviewView/Revie
 import Tabs from '@components/Tabs/Tabs';
 import {
   calculatePriceQuotationInfoFromQuotation,
+  ensureVATSetting,
   vatPercentageBaseOnVatSetting,
 } from '@helpers/order/cartInfoHelper';
 import { groupFoodOrderByDateFromQuotation } from '@helpers/order/orderDetailHelper';
-import { useAppSelector } from '@hooks/reduxHooks';
 import { useDownloadPriceQuotation } from '@hooks/useDownloadPriceQuotation';
 import { Listing } from '@src/utils/data';
-import { EPartnerVATSetting } from '@src/utils/enums';
 import type { TListing, TObject, TUser } from '@src/utils/types';
 
 import {
@@ -37,8 +36,7 @@ const OrderQuotationDetail: React.FC<OrderQuotationDetailProps> = (props) => {
   const { quotation, target, orderDetail, order, company, booker } = props;
 
   const isPartner = target === 'partner';
-  const quotationGetter = Listing(quotation!);
-  const quotationMetadata = quotationGetter.getMetadata();
+  const quotationMetadata = Listing(quotation!).getMetadata();
 
   const clientQuotation = useMemo(
     () => quotationMetadata.client || {},
@@ -52,12 +50,11 @@ const OrderQuotationDetail: React.FC<OrderQuotationDetailProps> = (props) => {
     () => quotationMetadata[target] || {},
     [JSON.stringify(quotationMetadata), target],
   );
-  const currentOrderVATPercentage = useAppSelector(
-    (state) => state.SystemAttributes.currentOrderVATPercentage,
-  );
+
   const [currentSubOrderDate, setCrrSubOrderDate] = useState<string>(
     Object.keys(clientQuotation)[0],
   );
+
   const {
     serviceFees = {},
     vatSettings = {},
@@ -72,31 +69,28 @@ const OrderQuotationDetail: React.FC<OrderQuotationDetailProps> = (props) => {
     ([, value]) => (value as TObject)?.quotation[currentSubOrderDate],
   ) || [])[0];
   const vatSettingFromOrder = vatSettings[currentPartnerId!];
-  const partnerVATSetting =
-    vatSettingFromOrder in EPartnerVATSetting
-      ? vatSettingFromOrder
-      : EPartnerVATSetting.vat;
+  const partnerVATSetting = ensureVATSetting(vatSettingFromOrder);
 
   const partnerServiceFee = serviceFees[currentPartnerId!] || 0;
-  const vatPercentage = isPartner
-    ? vatPercentageBaseOnVatSetting({
-        vatSetting: partnerVATSetting,
-        vatPercentage: currentOrderVATPercentage,
-      })
-    : orderVATPercentage;
+  const vatPercentage = vatPercentageBaseOnVatSetting({
+    vatSetting: partnerVATSetting,
+    vatPercentage: orderVATPercentage,
+    isPartner,
+  });
 
   const priceQuotation = useMemo(
     () =>
       calculatePriceQuotationInfoFromQuotation({
         quotation: quotation!,
         packagePerMember,
-        currentOrderVATPercentage: vatPercentage,
+        orderVATPercentage,
+        orderServiceFeePercentage: partnerServiceFee / 100,
         date: isPartner ? currentSubOrderDate : undefined,
         partnerId: currentPartnerId,
-        currentOrderServiceFeePercentage: partnerServiceFee / 100,
-        shouldSkipVAT: partnerVATSetting === EPartnerVATSetting.direct,
+        vatSetting: partnerVATSetting,
         hasSpecificPCCFee,
         specificPCCFee,
+        isPartner,
       }),
     [
       isPartner,
@@ -104,9 +98,10 @@ const OrderQuotationDetail: React.FC<OrderQuotationDetailProps> = (props) => {
       specificPCCFee,
       partnerServiceFee,
       partnerVATSetting,
-      vatPercentage,
+      orderVATPercentage,
       JSON.stringify(quotation),
       currentSubOrderDate,
+      isPartner,
     ],
   );
 
@@ -172,7 +167,7 @@ const OrderQuotationDetail: React.FC<OrderQuotationDetailProps> = (props) => {
           company,
           booker,
           priceQuotation,
-          currentOrderVATPercentage,
+          vatPercentage,
           quotation,
         });
   }, [

@@ -1,6 +1,6 @@
 import uniq from 'lodash/uniq';
 
-import { calculatePriceQuotationInfo } from '@helpers/order/cartInfoHelper';
+import { calculatePriceQuotationInfoFromOrder } from '@helpers/order/cartInfoHelper';
 import { combineOrderDetailWithPriceInfo } from '@helpers/orderHelper';
 import { Listing } from '@utils/data';
 import { formatTimestamp } from '@utils/dates';
@@ -13,7 +13,7 @@ export const parseEntitiesToTableData = (
   plans: TListing[],
   queryCompanyPlansByOrderIdsInProgress: boolean,
   page: number,
-  currentOrderVATPercentage: number,
+  orderVATPercentage: number,
   openOrderStateWarningModal?: (e: EOrderStates) => void,
   setSelectedOrderId?: (orderId: string) => void,
 ) => {
@@ -44,10 +44,10 @@ export const parseEntitiesToTableData = (
       ratings,
     } = Listing(entity as TListing).getMetadata();
 
-    const { totalWithVAT } = calculatePriceQuotationInfo({
+    const { totalWithVAT } = calculatePriceQuotationInfoFromOrder({
       order: entity,
       planOrderDetail,
-      currentOrderVATPercentage,
+      orderVATPercentage,
       hasSpecificPCCFee,
       specificPCCFee,
     });

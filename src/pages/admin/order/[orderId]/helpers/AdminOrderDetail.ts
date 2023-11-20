@@ -125,14 +125,14 @@ export const formatPriceQuotationData = ({
   booker,
   order,
   priceQuotation,
-  currentOrderVATPercentage,
+  vatPercentage,
   quotation,
 }: {
   company: TUser;
   booker: TUser;
   order: TListing;
   priceQuotation: TObject;
-  currentOrderVATPercentage: number;
+  vatPercentage: number;
   quotation?: TListing;
 }) => {
   const {
@@ -185,7 +185,7 @@ export const formatPriceQuotationData = ({
       transportFee: `${parseThousandNumber(transportFee)}đ`,
       VATFee: `${parseThousandNumber(VATFee)}đ`,
       PITOFee: `${parseThousandNumber(PITOFee)}đ`,
-      vatPercentage: currentOrderVATPercentage,
+      vatPercentage,
     },
     orderDetailData: {
       foodOrderGroupedByDate: groupFoodOrderByDateFromQuotation({

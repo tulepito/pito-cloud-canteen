@@ -17,13 +17,22 @@ import { TRANSITIONS_TO_STATE_CANCELED } from '@src/utils/transaction';
 import { Listing } from '@utils/data';
 import type { TListing, TObject, TQuotation } from '@utils/types';
 
+export const ensureVATSetting = (vatSetting: EPartnerVATSetting) =>
+  vatSetting in EPartnerVATSetting ? vatSetting : EPartnerVATSetting.vat;
+
 export const vatPercentageBaseOnVatSetting = ({
   vatSetting,
   vatPercentage,
+  isPartner = true,
 }: {
   vatSetting: EPartnerVATSetting;
   vatPercentage: number;
+  isPartner?: boolean;
 }) => {
+  if (!isPartner) {
+    return vatPercentage;
+  }
+
   switch (vatSetting) {
     case EPartnerVATSetting.direct:
       return 0;
@@ -32,6 +41,25 @@ export const vatPercentageBaseOnVatSetting = ({
     case EPartnerVATSetting.vat:
     default:
       return vatPercentage;
+  }
+};
+
+const calculateVATFee = ({
+  vatPercentage,
+  vatSetting,
+  totalWithoutVAT,
+  totalPrice,
+  isPartner = true,
+}: TObject) => {
+  if (!isPartner) {
+    return Math.round(totalWithoutVAT * vatPercentage);
+  }
+
+  switch (vatSetting) {
+    case EPartnerVATSetting.noExportVat:
+      return Math.round(totalPrice * vatPercentage);
+    default:
+      return Math.round(totalWithoutVAT * vatPercentage);
   }
 };
 
@@ -171,24 +199,28 @@ export const calculatePCCFeeByDate = ({
   return PCCFeeOfDate;
 };
 
-export const calculatePriceQuotationInfo = ({
+export const calculatePriceQuotationInfoFromOrder = ({
   planOrderDetail = {},
   order,
-  currentOrderVATPercentage,
-  currentOrderServiceFeePercentage = 0,
+  orderVATPercentage,
+  orderServiceFeePercentage = 0,
   date,
   shouldIncludePITOFee = true,
   hasSpecificPCCFee = false,
   specificPCCFee = 0,
+  isPartner = false,
+  vatSetting = EPartnerVATSetting.vat,
 }: {
   planOrderDetail: TObject;
   order: TObject;
-  currentOrderVATPercentage: number;
+  orderVATPercentage: number;
   date?: number | string;
   shouldIncludePITOFee?: boolean;
-  currentOrderServiceFeePercentage?: number;
+  orderServiceFeePercentage?: number;
   hasSpecificPCCFee?: boolean;
   specificPCCFee?: number;
+  isPartner?: boolean;
+  vatSetting?: EPartnerVATSetting;
 }) => {
   const {
     packagePerMember = 0,
@@ -245,16 +277,28 @@ export const calculatePriceQuotationInfo = ({
   const PITOPoints = Math.floor(totalPrice / 100000);
   const isOverflowPackage = totalDishes * packagePerMember < totalPrice;
   const serviceFee = date
-    ? Math.round(totalPrice * currentOrderServiceFeePercentage)
+    ? Math.round(totalPrice * orderServiceFeePercentage)
     : 0;
   const transportFee = 0;
   const promotion = 0;
 
   const PITOFee = actualPCCFee;
-
   const totalWithoutVAT =
     totalPrice - serviceFee + transportFee + PITOFee - promotion;
-  const VATFee = Math.round(totalWithoutVAT * currentOrderVATPercentage);
+  // * VAT
+  const vatPercentage = vatPercentageBaseOnVatSetting({
+    vatSetting,
+    vatPercentage: orderVATPercentage,
+    isPartner,
+  });
+  const VATFee = calculateVATFee({
+    vatSetting,
+    vatPercentage,
+    totalPrice,
+    totalWithoutVAT,
+    isPartner,
+  });
+
   const totalWithVAT = VATFee + totalWithoutVAT;
   const overflow = isOverflowPackage
     ? totalWithVAT - totalDishes * packagePerMember
@@ -264,7 +308,8 @@ export const calculatePriceQuotationInfo = ({
     totalPrice,
     totalDishes,
     PITOPoints,
-    VATFee,
+    VATFee: Math.abs(VATFee),
+    vatPercentage: Math.abs(vatPercentage),
     totalWithVAT,
     serviceFee,
     transportFee,
@@ -276,72 +321,82 @@ export const calculatePriceQuotationInfo = ({
   };
 };
 
+const calculateTotalPriceCb = (singleDateSum: number, item: any) =>
+  singleDateSum + item.foodPrice * item.frequency;
+
 export const calculatePriceQuotationPartner = ({
   quotation = {},
   serviceFeePercentage = 0,
-  currentOrderVATPercentage,
+  orderVATPercentage,
   subOrderDate,
-  shouldSkipVAT = false,
+  vatSetting = EPartnerVATSetting.vat,
 }: {
   quotation: TQuotation;
   serviceFeePercentage: number;
-  currentOrderVATPercentage: number;
+  orderVATPercentage: number;
   subOrderDate?: string;
   shouldSkipVAT?: boolean;
+  vatSetting: EPartnerVATSetting;
 }) => {
   const promotion = 0;
   const totalPrice = subOrderDate
-    ? quotation[subOrderDate]?.reduce((singleDateSum: number, item: any) => {
-        return singleDateSum + item.foodPrice * item.frequency;
-      }, 0)
+    ? quotation[subOrderDate]?.reduce(calculateTotalPriceCb, 0)
     : Object.keys(quotation).reduce((result: number, orderDate: string) => {
         const totalPriceInDate = quotation[orderDate]?.reduce(
-          (singleDateSum: number, item: any) => {
-            return singleDateSum + item.foodPrice * item.frequency;
-          },
+          calculateTotalPriceCb,
           0,
         );
 
         return result + totalPriceInDate;
       }, 0);
+
   const serviceFee = Math.round((totalPrice * serviceFeePercentage) / 100);
   const totalWithoutVAT = totalPrice - promotion - serviceFee;
-  const VATFee = shouldSkipVAT
-    ? 0
-    : Math.round(totalWithoutVAT * currentOrderVATPercentage);
+  const vatPercentage = vatPercentageBaseOnVatSetting({
+    vatSetting,
+    vatPercentage: orderVATPercentage,
+  });
+  const VATFee = calculateVATFee({
+    vatSetting,
+    vatPercentage,
+    totalPrice,
+    totalWithoutVAT,
+  });
   const totalWithVAT = VATFee + totalWithoutVAT;
 
   return {
     totalPrice,
-    VATFee,
+    VATFee: Math.abs(VATFee),
     serviceFee,
     totalWithoutVAT,
     totalWithVAT,
     promotion,
-    VATPercentage: currentOrderVATPercentage,
+    vatPercentage: Math.abs(vatPercentage),
   };
 };
 
 export const calculatePriceQuotationInfoFromQuotation = ({
   quotation,
   packagePerMember,
-  currentOrderVATPercentage,
-  currentOrderServiceFeePercentage = 0,
+  orderVATPercentage,
+  orderServiceFeePercentage = 0,
   date,
   partnerId,
-  shouldSkipVAT = false,
   hasSpecificPCCFee,
   specificPCCFee = 0,
+  vatSetting = EPartnerVATSetting.vat,
+  isPartner = false,
 }: {
   quotation: TListing;
   packagePerMember: number;
-  currentOrderVATPercentage: number;
-  currentOrderServiceFeePercentage?: number;
+  orderVATPercentage: number;
+  orderServiceFeePercentage?: number;
   date?: number | string;
   partnerId?: string;
-  shouldSkipVAT?: boolean;
   hasSpecificPCCFee: boolean;
   specificPCCFee?: number;
+  vatSetting?: EPartnerVATSetting;
+  isPartner?: boolean;
 }) => {
   const quotationListingGetter = Listing(quotation);
   const { client, partner } = quotationListingGetter.getMetadata();
@@ -402,15 +457,26 @@ export const calculatePriceQuotationInfoFromQuotation = ({
   const PITOPoints = Math.floor(totalPrice / 100000);
   const isOverflowPackage = totalDishes * packagePerMember < totalPrice;
   const serviceFee = isPartnerFlow
-    ? Math.round(currentOrderServiceFeePercentage * totalPrice)
+    ? Math.round(orderServiceFeePercentage * totalPrice)
     : 0;
   const transportFee = 0;
   const promotion = 0;
   const totalWithoutVAT =
     totalPrice - serviceFee + transportFee + PITOFee - promotion;
-  const VATFee = shouldSkipVAT
-    ? 0
-    : Math.round(totalWithoutVAT * currentOrderVATPercentage || 0);
+
+  // * VAT
+  const vatPercentage = vatPercentageBaseOnVatSetting({
+    vatSetting,
+    vatPercentage: orderVATPercentage,
+    isPartner,
+  });
+  const VATFee = calculateVATFee({
+    vatSetting,
+    vatPercentage,
+    totalPrice,
+    totalWithoutVAT,
+    isPartner,
+  });
   const totalWithVAT = VATFee + totalWithoutVAT;
   const overflow = isOverflowPackage
     ? totalWithVAT - totalDishes * packagePerMember
@@ -420,9 +486,9 @@ export const calculatePriceQuotationInfoFromQuotation = ({
     totalPrice,
     totalDishes,
     PITOPoints,
-    VATFee,
+    VATFee: Math.abs(VATFee),
     totalWithVAT,
-    serviceFeePercentage: currentOrderServiceFeePercentage * 100,
+    serviceFeePercentage: orderServiceFeePercentage * 100,
     serviceFee,
     transportFee,
     promotion,
@@ -430,6 +496,6 @@ export const calculatePriceQuotationInfoFromQuotation = ({
     isOverflowPackage,
     totalWithoutVAT,
     PITOFee,
-    vatPercentage: currentOrderVATPercentage,
+    vatPercentage: Math.abs(vatPercentage),
   };
 };

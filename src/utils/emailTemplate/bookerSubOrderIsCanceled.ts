@@ -1,5 +1,5 @@
 import { parseThousandNumber } from '@helpers/format';
-import { calculatePriceQuotationInfo } from '@helpers/order/cartInfoHelper';
+import { calculatePriceQuotationInfoFromOrder } from '@helpers/order/cartInfoHelper';
 
 import { formatTimestamp } from '../dates';
 import { ESubOrderStatus } from '../enums';
@@ -51,10 +51,10 @@ const bookerSubOrderIsCanceled = ({
     };
   }, {});
   const { totalPrice, totalDishes, VATFee, PITOFee, totalWithVAT } =
-    calculatePriceQuotationInfo({
+    calculatePriceQuotationInfoFromOrder({
       planOrderDetail,
       order: orderListing.getFullData(),
-      currentOrderVATPercentage: systemVATPercentage,
+      orderVATPercentage: systemVATPercentage,
     });
   const numberOfSubOrders = Object.keys(currentOrderDetail).length || 0;
   const formatSubOrderDate = formatTimestamp(timestamp);

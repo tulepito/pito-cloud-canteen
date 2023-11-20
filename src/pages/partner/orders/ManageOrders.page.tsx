@@ -23,7 +23,7 @@ import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
 import { parseThousandNumber } from '@helpers/format';
 import {
   calculatePriceQuotationPartner,
-  vatPercentageBaseOnVatSetting,
+  ensureVATSetting,
 } from '@helpers/order/cartInfoHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
@@ -34,7 +34,7 @@ import { partnerPaths } from '@src/paths';
 import { CurrentUser } from '@src/utils/data';
 import { formatTimestamp } from '@src/utils/dates';
 import { ETransition } from '@src/utils/transaction';
-import { EOrderDraftStates, EPartnerVATSetting } from '@utils/enums';
+import { EOrderDraftStates } from '@utils/enums';
 import type { TObject, TTableSortValue } from '@utils/types';
 
 import type { TFilterPartnerOrderFormValues } from './components/FilterPartnerOrderForm';
@@ -166,22 +166,13 @@ const parseEntitiesToTableData = (
     if (!isEmpty(quotation)) {
       if (!isEmpty(quotation[restaurant.id]?.quotation)) {
         const vatSettingFromOrder = vatSettings[restaurant?.id];
-        const partnerVATSetting =
-          vatSettingFromOrder in EPartnerVATSetting
-            ? vatSettingFromOrder
-            : EPartnerVATSetting.vat;
-
-        const vatPercentage = vatPercentageBaseOnVatSetting({
-          vatSetting: partnerVATSetting,
-          vatPercentage: orderVATPercentage,
-        });
 
         const partnerQuotationBySubOrderDate = calculatePriceQuotationPartner({
           quotation: quotation[restaurant.id].quotation,
           serviceFeePercentage: serviceFees[restaurant.id],
-          currentOrderVATPercentage: vatPercentage,
+          orderVATPercentage,
           subOrderDate: date,
-          shouldSkipVAT: partnerVATSetting === EPartnerVATSetting.direct,
+          vatSetting: ensureVATSetting(vatSettingFromOrder),
         });
 
         const { totalWithVAT } = partnerQuotationBySubOrderDate;
