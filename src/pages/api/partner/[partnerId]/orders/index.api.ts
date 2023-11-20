@@ -35,7 +35,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
                 meta_startDate: `${startDate},${endDate + 1}`,
               }),
             ...(orderStates && {
-              meta_orderState: `has_any:${orderStates.join(',')}`,
+              meta_orderState: `${orderStates.join(',')}`,
             }),
           },
         });

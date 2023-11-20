@@ -55,6 +55,7 @@ export const splitSubOrders = (
       companyName,
       deliveryHour,
       orderType = EOrderType.group,
+      orderVATPercentage,
     } = orderListing.getMetadata();
     const isGroupOrder = orderType === EOrderType.group;
     const { title: orderTitle } = orderListing.getAttributes();
@@ -77,13 +78,14 @@ export const splitSubOrders = (
             : EPartnerVATSetting.vat;
         const vatPercentage = vatPercentageBaseOnVatSetting({
           vatSetting: partnerVATSetting,
-          vatPercentage: currentOrderVATPercentage,
+          vatPercentage: orderVATPercentage || currentOrderVATPercentage,
         });
         const partnerQuotation = calculatePriceQuotationPartner({
           quotation: quotation[restaurantListingId]?.quotation,
           serviceFeePercentage: serviceFees[restaurantListingId],
           currentOrderVATPercentage: vatPercentage,
           shouldSkipVAT: partnerVATSetting === EPartnerVATSetting.direct,
+          subOrderDate,
         });
 
         const { totalDishes } = calculateTotalPriceAndDishes({
@@ -100,7 +102,7 @@ export const splitSubOrders = (
             subOrderDate,
             deliveryHour,
             lastTransition,
-            revenue: partnerQuotation.totalPrice,
+            revenue: partnerQuotation.totalWithVAT || 0,
             totalDishes,
             subOrderId: `${orderId}_${subOrderDate}`,
           },
