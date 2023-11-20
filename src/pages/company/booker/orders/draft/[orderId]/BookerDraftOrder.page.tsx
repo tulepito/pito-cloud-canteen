@@ -2,7 +2,6 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { shallowEqual } from 'react-redux';
-import { toast } from 'react-toastify';
 import isEmpty from 'lodash/isEmpty';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
@@ -26,7 +25,6 @@ import { currentUserSelector } from '@redux/slices/user.slice';
 import { companyPaths } from '@src/paths';
 import { formatTimestamp } from '@src/utils/dates';
 import Gleap from '@src/utils/gleap';
-import { successToastOptions } from '@src/utils/toastify';
 import { Listing, User } from '@utils/data';
 import {
   EBookerOrderDraftStates,
@@ -184,9 +182,7 @@ function BookerDraftOrderPage() {
     );
     if (meta.requestStatus !== 'rejected') {
       if (!isSetupMode) {
-        toast('Đã gửi lời mời đến thành viên', successToastOptions);
-
-        dispatch(
+        await dispatch(
           BookerDraftOrderPageThunks.sendRemindEmailToMembers({
             orderId: orderId as string,
             orderLink: getParticipantPickingLink(orderId as string),

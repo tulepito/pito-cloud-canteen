@@ -1,3 +1,4 @@
+import { toast } from 'react-toastify';
 import { createSlice } from '@reduxjs/toolkit';
 import uniq from 'lodash/uniq';
 
@@ -9,6 +10,7 @@ import {
 } from '@apis/orderApi';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { EOrderType } from '@src/utils/enums';
+import { successToastOptions } from '@src/utils/toastify';
 import { denormalisedResponseEntities, Listing } from '@utils/data';
 import type { TListing, TObject, TUser } from '@utils/types';
 
@@ -117,6 +119,8 @@ const sendRemindEmailToMembers = createAsyncThunk(
       description,
       uniqueMemberIdList: uniq(memberIdList),
     });
+
+    toast('Đã gửi lời mời đến thành viên', successToastOptions);
   },
 );
 
