@@ -83,7 +83,7 @@ const FoodDetailModal: React.FC<TFoodDetailModalProps> = ({
             {Listing(food!).getAttributes().title}
           </div>
           <div className={css.price}>{`${addCommas(
-            Listing(food!).getAttributes()?.price?.amount,
+            Listing(food!).getAttributes().price?.amount,
           )} ₫ / Phần`}</div>
         </div>
         <p className={css.description}>

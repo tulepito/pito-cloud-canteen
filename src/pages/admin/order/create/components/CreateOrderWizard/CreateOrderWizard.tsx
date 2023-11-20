@@ -171,7 +171,7 @@ const CreateOrderWizard = () => {
     saveStep(tab);
   };
 
-  const orderType = Listing(order as TListing).getMetadata()?.orderType;
+  const { orderType } = Listing(order as TListing).getMetadata();
   const isNormalOrder = useMemo(
     () => orderType === EOrderType.normal,
     [orderType],

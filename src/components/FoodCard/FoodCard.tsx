@@ -77,7 +77,7 @@ const FoodCard: React.FC<TFoodCardProps> = ({
           />
         </div>
         <div className={css.price}>{`${addCommas(
-          Listing(food!).getAttributes()?.price?.amount,
+          Listing(food!).getAttributes().price?.amount,
         )} ₫ / Phần`}</div>
       </div>
       {!hideSelection && selection}

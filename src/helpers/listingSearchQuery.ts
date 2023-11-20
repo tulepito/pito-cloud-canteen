@@ -187,8 +187,7 @@ export const getRestaurantQuery = ({
     endDate,
   } = params;
 
-  const origin = User(companyAccount as TUser).getPublicData()?.location
-    ?.origin;
+  const origin = User(companyAccount as TUser).getPublicData().location?.origin;
   const bounds = distance ? calculateBounds(origin, distance) : '';
   const query = {
     ids: restaurantIds,

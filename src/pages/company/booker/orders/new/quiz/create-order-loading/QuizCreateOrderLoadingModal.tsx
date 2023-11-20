@@ -34,7 +34,7 @@ const QuizCreateOrderLoadingModal: React.FC<
   const quizData = useAppSelector((state) => state.Quiz.quiz, shallowEqual);
   const order = useAppSelector((state) => state.Order.order, shallowEqual);
   const { startDate, endDate } = quizData;
-  const orderTitle = Listing(order as TListing).getAttributes()?.title;
+  const orderTitle = Listing(order as TListing).getAttributes().title;
   const initialOrderDetailInProgress =
     recommendRestaurantInProgress || updateOrderDetailInProgress;
   const formattedStartDate =

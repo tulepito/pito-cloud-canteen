@@ -95,7 +95,7 @@ export const parseEntitiesToTableData = (
 };
 
 const getCompanyName = (company: TCompany) => {
-  return User(company).getPublicData()?.companyName?.toLowerCase() || '';
+  return User(company).getPublicData().companyName?.toLowerCase() || '';
 };
 
 export const sortCompanies = (

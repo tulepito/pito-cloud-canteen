@@ -204,7 +204,7 @@ const searchRestaurants = createAsyncThunk(
     const allMenus = await queryAllPages({ sdkModel: sdk.listings, query });
 
     const combinedRestaurantMenuData = allMenus.map((menu: TListing) => ({
-      restaurantId: Listing(menu).getMetadata()?.restaurantId,
+      restaurantId: Listing(menu).getMetadata().restaurantId,
       menuId: menu.id.uuid,
     }));
 

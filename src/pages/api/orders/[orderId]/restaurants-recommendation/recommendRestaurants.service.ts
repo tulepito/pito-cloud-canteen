@@ -331,7 +331,7 @@ export const recommendRestaurants = async ({
                 randomRestaurant?.restaurantInfo?.author?.id?.uuid,
               phoneNumber: Listing(
                 randomRestaurant?.restaurantInfo,
-              ).getPublicData()?.phoneNumber,
+              ).getPublicData().phoneNumber,
             },
             ...lineItemsMaybe,
             hasNoRestaurants: false,

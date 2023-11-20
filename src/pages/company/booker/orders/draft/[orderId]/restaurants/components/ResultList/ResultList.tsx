@@ -58,7 +58,7 @@ const ResultList: React.FC<TResultListProps> = ({
 
   const companyGeoOrigin = useMemo(
     () => ({
-      ...User(companyAccount as TUser).getPublicData()?.companyLocation?.origin,
+      ...User(companyAccount as TUser).getPublicData().companyLocation?.origin,
     }),
     [companyAccount],
   );
