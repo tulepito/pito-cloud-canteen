@@ -5,6 +5,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { composeApiCheckers, HttpMethod } from '@apis/configs';
 import { CustomError, EHttpStatusCode } from '@apis/errors';
+import { pushNativeNotificationSubOrderDate } from '@pages/api/helpers/pushNotificationOrderDetailHelper';
 import createQuotation from '@pages/api/orders/[orderId]/quotation/create-quotation.service';
 import { createFoodRatingNotificationScheduler } from '@services/awsEventBrigdeScheduler';
 import { emailSendingFactory, EmailTemplateTypes } from '@services/email';
@@ -233,6 +234,15 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
                   );
                 }
               },
+            );
+
+            // push notification when order from inprogress to cancel
+            await pushNativeNotificationSubOrderDate(
+              restaurantId,
+              String(startTimestamp),
+              order,
+              ENativeNotificationType.AdminTransitSubOrderToCanceled,
+              integrationSdk,
             );
 
             // Function is not ready on production

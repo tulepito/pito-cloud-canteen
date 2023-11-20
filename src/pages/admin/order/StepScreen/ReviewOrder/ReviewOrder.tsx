@@ -776,6 +776,11 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
           planId,
         }),
       );
+      await dispatch(
+        orderAsyncActions.handleSendEditInProgressOrderDetailNotificationToPartner(
+          { orderId, orderDetail: editedSubOrders },
+        ),
+      );
     }
     dispatch(clearDraftEditOrder());
   };

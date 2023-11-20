@@ -3,15 +3,21 @@ import { DateTime } from 'luxon';
 
 import { calculateGroupMembers, getAllCompanyMembers } from '@helpers/company';
 import { sendNotificationToParticipantOnUpdateOrder } from '@pages/api/apiServices/notification';
+import { pushNativeNotificationOrderDetail } from '@pages/api/helpers/pushNotificationOrderDetailHelper';
 import {
   createScheduler,
   getScheduler,
   updateScheduler,
 } from '@services/awsEventBrigdeScheduler';
-import { fetchListing, fetchUser } from '@services/integrationHelper';
+import {
+  adminQueryListings,
+  fetchListing,
+  fetchUser,
+} from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { createNativeNotification } from '@services/nativeNotification';
 import { ENativeNotificationType, EOrderStates } from '@src/utils/enums';
+import type { TListing } from '@src/utils/types';
 import { denormalisedResponseEntities, Listing } from '@utils/data';
 import { formatTimestamp, VNTimezone } from '@utils/dates';
 
@@ -28,6 +34,8 @@ const updateOrder = async ({
   const {
     companyId,
     selectedGroups = [],
+    plans = [],
+    orderState: currentOrderState,
     orderStateHistory = [],
   } = Listing(orderListing).getMetadata();
   const companyAccount = await fetchUser(companyId);
@@ -126,6 +134,20 @@ const updateOrder = async ({
             participantId,
             order: orderListing,
           },
+        );
+      });
+    }
+
+    if (!updatedOrderState && currentOrderState === EOrderStates.inProgress) {
+      const orderUpdated = await fetchListing(orderId);
+      const planListings: [] = await adminQueryListings({ ids: plans });
+      planListings.forEach(async (plan: TListing) => {
+        const { orderDetail: orderDetailUpdated } = Listing(plan).getMetadata();
+        await pushNativeNotificationOrderDetail(
+          orderDetailUpdated,
+          orderUpdated,
+          ENativeNotificationType.AdminUpdateOrder,
+          integrationSdk,
         );
       });
     }

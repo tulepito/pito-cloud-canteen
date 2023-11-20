@@ -10,6 +10,7 @@ import {
   handleDeleteOldDataAfterEditInProgressOrderApi,
   handleSendNotificationParticipantAfterEditInProgressOrderApi,
   handleSendNotificationPartnerAfterEditInProgressOrderApi,
+  handleSendNotificationPartnerAfterEditInProgressOrderDetailApi,
 } from '@apis/admin';
 import {
   companyApi,
@@ -328,6 +329,8 @@ const HANDLE_SEND_EDIT_INPROGRESS_ORDER_NOTIFICATION_TO_PARTICIPANT =
   'app/Order/HANDLE_SEND_EDIT_INPROGRESS_ORDER_NOTIFICATION_TO_PARTICIPANT';
 const HANDLE_SEND_EDIT_INPROGRESS_ORDER_NOTIFICATION_TO_PARTNER =
   'app/Order/HANDLE_SEND_EDIT_INPROGRESS_ORDER_NOTIFICATION_TO_PARTNER';
+const HANDLE_SEND_EDIT_INPROGRESS_ORDER_DETAIL_NOTIFICATION_TO_PARTNER =
+  'app/Order/HANDLE_SEND_EDIT_INPROGRESS_ORDER_DETAIL_NOTIFICATION_TO_PARTNER';
 const HANDLE_DELETE_OLD_DATA_AFTER_EDIT_IN_PROGRESS_ORDER =
   'app/Order/HANDLE_DELETE_OLD_DATA_AFTER_EDIT_IN_PROGRESS_ORDER';
 
@@ -1145,6 +1148,23 @@ const handleSendEditInProgressOrderNotificationToPartner = createAsyncThunk(
   },
 );
 
+const handleSendEditInProgressOrderDetailNotificationToPartner =
+  createAsyncThunk(
+    HANDLE_SEND_EDIT_INPROGRESS_ORDER_DETAIL_NOTIFICATION_TO_PARTNER,
+    async ({ orderId, orderDetail }: TObject) => {
+      const { data: responseData } =
+        await handleSendNotificationPartnerAfterEditInProgressOrderDetailApi(
+          orderId,
+          orderDetail,
+        );
+
+      return responseData.data;
+    },
+    {
+      serializeError: storableAxiosError,
+    },
+  );
+
 const handleDeleteOldDataAfterEditInProgressOrder = createAsyncThunk(
   HANDLE_DELETE_OLD_DATA_AFTER_EDIT_IN_PROGRESS_ORDER,
   async ({ orderId, planId }: TObject) => {
@@ -1189,6 +1209,7 @@ export const orderAsyncActions = {
   notifyUserPickingOrderChanges,
   handleSendEditInProgressOrderNotificationToPartner,
   handleDeleteOldDataAfterEditInProgressOrder,
+  handleSendEditInProgressOrderDetailNotificationToPartner,
 };
 
 const orderSlice = createSlice({

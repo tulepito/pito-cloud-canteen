@@ -1,4 +1,5 @@
 import { getPickFoodParticipants } from '@helpers/orderHelper';
+import { pushNativeNotificationOrderDetail } from '@pages/api/helpers/pushNotificationOrderDetailHelper';
 import { denormalisedResponseEntities } from '@services/data';
 import { emailSendingFactory, EmailTemplateTypes } from '@services/email';
 import getSystemAttributes from '@services/getSystemAttributes';
@@ -91,5 +92,11 @@ export const startOrder = async (orderId: string, planId: string) => {
         },
       );
     },
+  );
+  await pushNativeNotificationOrderDetail(
+    orderDetail,
+    orderListing,
+    ENativeNotificationType.BookerTransitOrderStateToInProgress,
+    integrationSdk,
   );
 };

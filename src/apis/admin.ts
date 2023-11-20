@@ -101,6 +101,15 @@ export const handleSendNotificationPartnerAfterEditInProgressOrderApi = (
     body,
   );
 
+export const handleSendNotificationPartnerAfterEditInProgressOrderDetailApi = (
+  orderId: string,
+  body: TObject,
+) =>
+  putApi(
+    `/admin/listings/order/${orderId}/handle-send-notification-partner-after-edit-in-progress-order-detail`,
+    body,
+  );
+
 export const handleDeleteOldDataAfterEditInProgressOrderApi = (
   orderId: string,
   body: TObject,

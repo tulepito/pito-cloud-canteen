@@ -1,10 +1,12 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HttpMethod } from '@apis/configs';
+import { pushNativeNotificationFood } from '@pages/api/helpers/pushNotificationOrderDetailHelper';
 import cookies from '@services/cookie';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import adminChecker from '@services/permissionChecker/admin';
 import { handleError } from '@services/sdk';
+import { EFoodApprovalState, ENativeNotificationType } from '@src/utils/enums';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
@@ -21,6 +23,17 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
               adminApproval: response,
             },
           });
+          if (
+            response === EFoodApprovalState.ACCEPTED ||
+            response === EFoodApprovalState.DECLINED
+          ) {
+            await pushNativeNotificationFood(
+              foodId,
+              response === EFoodApprovalState.ACCEPTED
+                ? ENativeNotificationType.AdminTransitFoodStateToApprove
+                : ENativeNotificationType.AdminTransitFoodStateToReject,
+            );
+          }
           res.json({ success: true });
         }
         break;
