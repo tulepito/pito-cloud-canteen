@@ -105,10 +105,22 @@ const Dashboard: React.FC<TDashboardProps> = () => {
         latestSubOrders,
         restaurantListingId,
         currentOrderVATPercentage,
-        undefined,
         new Date().getTime(),
-      ),
+        undefined,
+      ).sort((a, b) => a.subOrderDate - b.subOrderDate),
     [currentOrderVATPercentage, latestSubOrders, restaurantListingId],
+  );
+
+  const allSplittedSubOrders = useMemo(
+    () =>
+      splitSubOrders(
+        subOrders,
+        restaurantListingId,
+        currentOrderVATPercentage,
+        undefined,
+        undefined,
+      ),
+    [currentOrderVATPercentage, restaurantListingId, subOrders],
   );
 
   const overviewInformation = useMemo(
@@ -222,7 +234,7 @@ const Dashboard: React.FC<TDashboardProps> = () => {
       </section>
       <section>
         <OrderCalendar
-          data={splittedSubOrders}
+          data={allSplittedSubOrders}
           inProgress={fetchSubOrdersInProgress}
           startDate={startDate!}
           endDate={endDate!}

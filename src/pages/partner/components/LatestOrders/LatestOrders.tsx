@@ -80,14 +80,9 @@ const TABLE_COLUMN: TColumn[] = [
 const LatestOrders: React.FC<TLatestOrdersProps> = (props) => {
   const { data = [], inProgress } = props;
 
-  const sortedData = useMemo(
-    () => data.sort((a, b) => b.subOrderDate - a.subOrderDate),
-    [data],
-  );
-
   const tableData = useMemo(
     () =>
-      sortedData.map((item) => ({
+      data.map((item) => ({
         key: item.subOrderId,
         data: {
           subOrderId: item.subOrderId,
@@ -100,7 +95,7 @@ const LatestOrders: React.FC<TLatestOrdersProps> = (props) => {
           lastTransition: item.lastTransition,
         },
       })),
-    [sortedData],
+    [data],
   );
 
   return (

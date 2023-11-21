@@ -6,7 +6,7 @@ import LineChart from '@components/Chart/LineChart/LineChart';
 import IconNoAnalyticsData from '@components/Icons/IconNoAnalyticsData/IconNoAnalyticsData';
 import NamedLink from '@components/NamedLink/NamedLink';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
-import { calculateLCM, formatAxisTickValue } from '@helpers/chart';
+import { formatAxisTickValue } from '@helpers/chart';
 import { parseThousandNumber } from '@helpers/format';
 import { useControlTimeFrame } from '@pages/partner/hooks/useControlTimeFrame';
 import { partnerPaths } from '@src/paths';
@@ -57,18 +57,16 @@ const RevenueAnalytics: React.FC<TRevenueAnalyticsProps> = (props) => {
 
   const formattedTotalRevenue = `${parseThousandNumber(totalRevenue)}đ`;
 
-  const lcmOfMaxRevenueAnd50k = useMemo(
-    () =>
-      calculateLCM(Math.max(...chartData.map((item) => item.revenue)), 50000),
-    [chartData],
-  );
+  const maxRange = useMemo(() => {
+    const maxValue = Math.max(...chartData.map((item) => item.revenue));
 
-  const domainRange = [
-    0,
-    lcmOfMaxRevenueAnd50k > MIN_OF_MAX_REVENUE_DOMAIN_RANGE
-      ? lcmOfMaxRevenueAnd50k
-      : MIN_OF_MAX_REVENUE_DOMAIN_RANGE,
-  ];
+    return (
+      Math.ceil(maxValue / MIN_OF_MAX_REVENUE_DOMAIN_RANGE) *
+      MIN_OF_MAX_REVENUE_DOMAIN_RANGE
+    );
+  }, [chartData]);
+
+  const domainRange = [0, maxRange];
 
   return (
     <div className={css.root}>
