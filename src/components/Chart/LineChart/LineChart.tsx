@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import type { DotProps, TooltipProps } from 'recharts';
 import {
   CartesianGrid,
@@ -131,7 +132,7 @@ const CustomizeYAxisTick = (props: any) => {
 const LineChart: React.FC<TLineChartProps> = (props) => {
   const { dataKey, data, customTooltip, onYAxisTickFormattingFc, domainRange } =
     props;
-
+  const [activeItem, setActiveItem] = useState<any>(null);
   const dataLength = data.length;
   const yDomain = [
     0,
@@ -151,9 +152,19 @@ const LineChart: React.FC<TLineChartProps> = (props) => {
     vertical: false, // Optional: Only show horizontal grid lines
   };
 
+  const tooltipXPosition =
+    dataLength > 1 &&
+    (activeItem.activeTooltipIndex === 0 ||
+      activeItem.activeTooltipIndex === dataLength - 1)
+      ? undefined
+      : (activeItem?.activeCoordinate?.x || 0) - 70; // tooltip width / 2;
+
   return (
     <ResponsiveContainer width={dataLength > 7 ? 1440 : '100%'} height={264}>
-      <RLineChart data={data} margin={chartMargins}>
+      <RLineChart
+        data={data}
+        margin={chartMargins}
+        onMouseMove={(e) => setActiveItem(e)}>
         <CartesianGrid {...cartesianGridStyles} />
         <XAxis
           dataKey="dateLabel"
@@ -176,7 +187,10 @@ const LineChart: React.FC<TLineChartProps> = (props) => {
             />
           )}
         />
-        <Tooltip content={customTooltip} position={{ y: 10 }} />
+        <Tooltip
+          content={customTooltip}
+          position={{ x: tooltipXPosition, y: 0 }}
+        />
         <Line
           type="monotone"
           dataKey={dataKey}
