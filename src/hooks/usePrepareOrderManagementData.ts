@@ -283,7 +283,7 @@ export const usePrepareOrderDetailPageData = ({
     overflow,
     PITOFee = 0,
     totalWithoutVAT = 0,
-    vatPercentage,
+    vatPercentage = 0,
   } = useMemo(
     () =>
       isOrderIsPicking
