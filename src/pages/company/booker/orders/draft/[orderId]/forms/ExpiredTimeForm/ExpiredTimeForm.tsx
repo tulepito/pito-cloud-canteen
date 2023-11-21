@@ -44,7 +44,7 @@ const ExpiredTimeForm: React.FC<TExpiredTimeFormProps> = ({
   loading,
   deliveryTime,
 }) => {
-  const { form, handleSubmit, submitting, hasValidationErrors, pristine } =
+  const { form, handleSubmit, submitting, hasValidationErrors } =
     useForm<TExpiredTimeFormValues>({
       onSubmit,
       validate,
@@ -56,7 +56,7 @@ const ExpiredTimeForm: React.FC<TExpiredTimeFormProps> = ({
   const deadlineDate = useField('deadlineDate', form);
   const deadlineHour = useField('deadlineHour', form);
   const submitInprogress = loading || submitting;
-  const disabledSubmit = pristine || submitInprogress || hasValidationErrors;
+  const disabledSubmit = submitInprogress || hasValidationErrors;
 
   const selectedDeadlineDate = deadlineDate.input.value
     ? new Date(Number(deadlineDate.input.value))

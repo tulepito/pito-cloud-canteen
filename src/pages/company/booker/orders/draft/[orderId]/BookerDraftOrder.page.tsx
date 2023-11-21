@@ -150,6 +150,7 @@ function BookerDraftOrderPage() {
       order as TListing,
       orderDetail,
       availableOrderDetailCheckList,
+      ['deadlineDate', 'deadlineHour'],
     );
 
   const companyGeoOrigin = useMemo(

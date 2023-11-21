@@ -144,7 +144,7 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
   };
   const deadlineInitValues = {
     deadlineDate: new Date(deadlineDate).getTime() || defaultDeadlineDate,
-    deadlineHour: deadlineHour || '07:00',
+    deadlineHour: deadlineHour || '',
   };
   const numberEmployeesInitValues = {
     memberAmount,

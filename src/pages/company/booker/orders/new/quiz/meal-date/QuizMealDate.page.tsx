@@ -46,20 +46,12 @@ const QuizMealDate: React.FC<TQuizMealDateProps> = ({ stepInfo }) => {
     onClickOrderDates,
     onClickDeliveryHour,
     onClickIsGroupOrder,
-    onClickDeadlineDate,
   } = useQuizModalScrollControl();
 
   const { hasOrderBefore = false } = CurrentUser(currentUser!).getPrivateData();
   const hasPreviousOrder = previousOrder !== null;
 
-  const {
-    startDate,
-    endDate,
-    deadlineDate,
-    orderDeadlineHour,
-    orderDeadlineMinute,
-    daySession,
-  } = quizData;
+  const { startDate, endDate, deadlineDate, daySession } = quizData;
 
   const modalTitle = intl.formatMessage(
     { id: 'QuizMealDate.title' },
@@ -74,21 +66,11 @@ const QuizMealDate: React.FC<TQuizMealDateProps> = ({ stepInfo }) => {
       dayInWeek: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'],
       orderType: EOrderType.normal,
       deadlineDate: deadlineDate ? new Date(deadlineDate).getTime() : undefined,
-      orderDeadlineHour: orderDeadlineHour || '',
-      orderDeadlineMinute: orderDeadlineMinute || '',
       deliveryHour:
         INITIAL_DELIVERY_TIME_BASE_ON_DAY_SESSION[daySession as TDaySession] ||
         '',
     }),
-    [
-      hasPreviousOrder,
-      deadlineDate,
-      endDate,
-      orderDeadlineHour,
-      orderDeadlineMinute,
-      startDate,
-      daySession,
-    ],
+    [hasPreviousOrder, deadlineDate, endDate, startDate, daySession],
   );
 
   const handleSubmitClick = async () => {
@@ -125,7 +107,6 @@ const QuizMealDate: React.FC<TQuizMealDateProps> = ({ stepInfo }) => {
         onClickOrderDates={onClickOrderDates}
         onClickDeliveryHour={onClickDeliveryHour}
         onClickIsGroupOrder={onClickIsGroupOrder}
-        onClickDeadlineDate={onClickDeadlineDate}
       />
     </QuizModal>
   ) : (
