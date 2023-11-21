@@ -50,7 +50,7 @@ const ParticipantInvitation: React.FC<TParticipantInvitationProps> = ({
     .toMillis();
   const deadlineDateTimeInitialValues = {
     deadlineDate: new Date(deadlineDate).getTime() || defaultDeadlineDate,
-    deadlineHour: deadlineHour || '06:30',
+    deadlineHour,
   };
 
   // * condition to disable publish order

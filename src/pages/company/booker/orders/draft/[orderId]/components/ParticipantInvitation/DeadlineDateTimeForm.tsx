@@ -1,5 +1,6 @@
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
+import isEmpty from 'lodash/isEmpty';
 import { DateTime } from 'luxon';
 
 import Button from '@components/Button/Button';
@@ -41,7 +42,10 @@ const DeadlineDateTimeFormComponent: React.FC<
     (state) => state.Order.bookerPublishOrderInProgress,
   );
 
-  const { deadlineDate: deadlineDateFormFormValues } = values;
+  const {
+    deadlineDate: deadlineDateFormFormValues,
+    deadlineHour: deadlineHourFromFormValues,
+  } = values;
 
   const selectedDeadlineDate = deadlineDateFormFormValues
     ? new Date(Number(deadlineDateFormFormValues))
@@ -55,7 +59,11 @@ const DeadlineDateTimeFormComponent: React.FC<
 
   const anyActionsInProgress =
     bookerPublishOrderInProgress || addOrderParticipantsInProgress;
-  const submitDisabled = anyActionsInProgress || shouldDisableSubmit || invalid;
+  const submitDisabled =
+    anyActionsInProgress ||
+    shouldDisableSubmit ||
+    invalid ||
+    isEmpty(deadlineHourFromFormValues);
   const submitInProgress = bookerPublishOrderInProgress;
 
   return (
@@ -79,7 +87,7 @@ const DeadlineDateTimeFormComponent: React.FC<
         <FieldDropdownSelect
           id="DeadlineDateTimeForm.deadlineHour"
           name="deadlineHour"
-          placeholderText="Giờ hết hạn"
+          placeholder="Giờ hết hạn"
           className={css.fieldSelect}
           label={'Chọn giờ hết hạn'}
           leftIcon={<IconClock />}
