@@ -15,7 +15,7 @@ import type { TColumn, TRowData } from '@components/Table/Table';
 import Table from '@components/Table/Table';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
-import IconNoClientsFound from '@src/pages/admin/order/create/components/ClientTable/IconNoClientsFound';
+import IconNoClientsFound from '@src/pages/admin/order/components/ClientTable/IconNoClientsFound';
 import {
   addWorkspaceCompanyId,
   companyThunks,

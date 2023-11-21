@@ -1,7 +1,7 @@
 import { DateTime } from 'luxon';
 
 import { parseThousandNumber } from '@helpers/format';
-import { calculatePriceQuotationInfo } from '@helpers/order/cartInfoHelper';
+import { calculatePriceQuotationInfoFromOrder } from '@helpers/order/cartInfoHelper';
 
 import { VNTimezone } from '../dates';
 import type { TObject } from '../types';
@@ -48,11 +48,11 @@ const partnerOrderDetailsUpdated = ({
   const subOrderTitle = `${orderTitle}-${weekDay}`;
 
   const { totalPrice, totalDishes, VATFee, serviceFee, totalWithVAT } =
-    calculatePriceQuotationInfo({
+    calculatePriceQuotationInfoFromOrder({
       planOrderDetail: planOrderDetail as TObject,
       order: orderListing.getFullData() as TObject,
-      currentOrderVATPercentage: orderVATPercentage,
-      currentOrderServiceFeePercentage: (serviceFees[restaurantId] || 0) / 100,
+      orderVATPercentage,
+      orderServiceFeePercentage: (serviceFees[restaurantId] || 0) / 100,
       date: subOrderDate,
       shouldIncludePITOFee: false,
     });

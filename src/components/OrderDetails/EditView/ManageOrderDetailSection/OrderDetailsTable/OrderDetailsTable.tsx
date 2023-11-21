@@ -6,6 +6,7 @@ import { useRouter } from 'next/router';
 
 import type { TTabsItem } from '@components/Tabs/Tabs';
 import Tabs from '@components/Tabs/Tabs';
+import { historyPushState } from '@helpers/urlHelpers';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import {
@@ -13,7 +14,6 @@ import {
   OrderManagementsAction,
   orderManagementThunks,
 } from '@redux/slices/OrderManagement.slice';
-import { historyPushState } from '@utils/history';
 import type { TListing, TObject } from '@utils/types';
 
 import AlertConfirmDeleteParticipant from '../../ManageParticipantsSection/AlertConfirmDeleteParticipant';

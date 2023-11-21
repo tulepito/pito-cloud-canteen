@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HttpMethod } from '@apis/configs';
+import { pushNotificationOrderDetailChanged } from '@pages/api/helpers/orderDetailHelper';
 import { denormalisedResponseEntities } from '@services/data';
 import { getIntegrationSdk, handleError } from '@services/sdk';
 import { Listing } from '@src/utils/data';
@@ -17,6 +18,13 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         const { planId, orderDetail } = req.body;
         const { orderId } = req.query;
 
+        const [oldPlanListing] = denormalisedResponseEntities(
+          await integrationSdk.listings.show({
+            id: planId,
+          }),
+        );
+        const { orderDetail: oldOrderDetail } =
+          Listing(oldPlanListing).getMetadata();
         const [planListing] = denormalisedResponseEntities(
           await integrationSdk.listings.update({
             id: planId,
@@ -59,6 +67,13 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
               });
             }
           }),
+        );
+
+        await pushNotificationOrderDetailChanged(
+          orderDetail,
+          oldOrderDetail,
+          orderListing,
+          integrationSdk,
         );
 
         res.json({

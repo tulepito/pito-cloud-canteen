@@ -1,0 +1,19 @@
+@use '/src/styles/vars.scss' as *;
+
+.root {
+  .percentageIcon {
+    border-left: 1px solid $neutralGray5;
+    padding: 0 8px;
+    color: $neutralGray5;
+    font-size: 14px;
+    background-color: $neutralGray1;
+  }
+  .input {
+    width: 150px;
+    flex-shrink: 0;
+
+    input {
+      padding: 4px 8px;
+    }
+  }
+}

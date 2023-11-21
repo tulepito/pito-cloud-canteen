@@ -8,9 +8,9 @@ import RenderWhen from '@components/RenderWhen/RenderWhen';
 import Tabs from '@components/Tabs/Tabs';
 import Tooltip from '@components/Tooltip/Tooltip';
 import {
-  calculatePriceQuotationInfo,
+  calculatePriceQuotationInfoFromOrder,
   calculatePriceQuotationPartner,
-  vatPercentageBaseOnVatSetting,
+  ensureVATSetting,
 } from '@helpers/order/cartInfoHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { AdminManageOrderThunks } from '@pages/admin/order/AdminManageOrder.slice';
@@ -18,11 +18,10 @@ import { Listing } from '@src/utils/data';
 import { getDayOfWeek } from '@src/utils/dates';
 import {
   type EOrderStates,
-  EPartnerVATSetting,
   EPaymentType,
   ESubOrderStatus,
 } from '@src/utils/enums';
-import { ETransition } from '@src/utils/transaction';
+import { TRANSITIONS_TO_STATE_CANCELED } from '@src/utils/transaction';
 import type { TListing, TUser } from '@src/utils/types';
 
 import OrderHeaderState from '../../components/OrderHeaderState/OrderHeaderState';
@@ -100,22 +99,15 @@ const OrderPaymentStatusTab: React.FC<OrderPaymentStatusTabProps> = (props) => {
               partner[orderDetail[subOrderDate].restaurant.id]?.quotation,
             ) ||
             orderDetail[subOrderDate].status === ESubOrderStatus.canceled ||
-            orderDetail[subOrderDate].lastTransition ===
-              ETransition.OPERATOR_CANCEL_PLAN ||
+            TRANSITIONS_TO_STATE_CANCELED.includes(
+              orderDetail[subOrderDate].lastTransition,
+            ) ||
             !orderDetail[subOrderDate].transactionId
           ) {
             return null;
           }
           const vatSettingFromOrder =
             vatSettings[orderDetail[subOrderDate].restaurant.id];
-          const partnerVATSetting =
-            vatSettingFromOrder in EPartnerVATSetting
-              ? vatSettingFromOrder
-              : EPartnerVATSetting.vat;
-          const vatPercentage = vatPercentageBaseOnVatSetting({
-            vatSetting: partnerVATSetting,
-            vatPercentage: currentOrderVATPercentage,
-          });
 
           const partnerQuotationBySubOrderDate = calculatePriceQuotationPartner(
             {
@@ -123,9 +115,9 @@ const OrderPaymentStatusTab: React.FC<OrderPaymentStatusTabProps> = (props) => {
                 partner[orderDetail[subOrderDate].restaurant.id]?.quotation,
               serviceFeePercentage:
                 serviceFees[orderDetail[subOrderDate].restaurant.id],
-              currentOrderVATPercentage: vatPercentage,
+              orderVATPercentage: currentOrderVATPercentage,
               subOrderDate,
-              shouldSkipVAT: partnerVATSetting === EPartnerVATSetting.direct,
+              vatSetting: ensureVATSetting(vatSettingFromOrder),
             },
           );
 
@@ -193,13 +185,14 @@ const OrderPaymentStatusTab: React.FC<OrderPaymentStatusTabProps> = (props) => {
 
   const tabItemKeys = partnerTabItems.map(({ key }) => key);
 
-  const { totalWithVAT: clientTotalPrice } = calculatePriceQuotationInfo({
-    planOrderDetail: orderDetail,
-    order,
-    currentOrderVATPercentage,
-    hasSpecificPCCFee,
-    specificPCCFee,
-  });
+  const { totalWithVAT: clientTotalPrice } =
+    calculatePriceQuotationInfoFromOrder({
+      planOrderDetail: orderDetail,
+      order,
+      orderVATPercentage: currentOrderVATPercentage,
+      hasSpecificPCCFee,
+      specificPCCFee,
+    });
 
   const clientPaidAmount =
     calculatePaidAmountBySubOrderDate(clientPaymentRecords);

@@ -6,7 +6,7 @@ import { useRouter } from 'next/router';
 import type { TReviewInfoFormValues } from '@components/OrderDetails/ReviewView/ReviewInfoSection/ReviewInfoForm';
 import { parseThousandNumber } from '@helpers/format';
 import {
-  calculatePriceQuotationInfo,
+  calculatePriceQuotationInfoFromOrder,
   calculatePriceQuotationInfoFromQuotation,
 } from '@helpers/order/cartInfoHelper';
 import {
@@ -18,7 +18,7 @@ import { useAppSelector } from '@hooks/reduxHooks';
 import { currentUserSelector } from '@redux/slices/user.slice';
 import { companyPaths } from '@src/paths';
 import { Listing, User } from '@utils/data';
-import { EOrderStates, EOrderType } from '@utils/enums';
+import { EOrderStates, EOrderType, EPartnerVATSetting } from '@utils/enums';
 import type { TCurrentUser, TListing, TObject, TUser } from '@utils/types';
 
 export const usePrepareOrderDetailPageData = ({
@@ -27,12 +27,16 @@ export const usePrepareOrderDetailPageData = ({
   serviceFeePercentage,
   partnerId,
   isAdminLayout = false,
+  isPartner = false,
+  vatSetting = EPartnerVATSetting.vat,
 }: {
   date?: string | number;
   VATPercentage?: number;
   serviceFeePercentage?: number;
   partnerId?: string;
   isAdminLayout?: boolean;
+  isPartner?: boolean;
+  vatSetting?: EPartnerVATSetting;
 }) => {
   const router = useRouter();
   const [reviewInfoValues, setReviewInfoValues] =
@@ -97,7 +101,7 @@ export const usePrepareOrderDetailPageData = ({
     ratings,
     orderType = EOrderType.group,
     orderNote = '',
-    hasSpecificPCCFee: orderHasSpecificPCCFee = false,
+    hasSpecificPCCFee: orderHasSpecificPCCFee,
     specificPCCFee: orderPCCFee = 0,
   } = Listing(orderData as TListing).getMetadata();
   const isGroupOrder = orderType === EOrderType.group;
@@ -111,7 +115,7 @@ export const usePrepareOrderDetailPageData = ({
   );
   const isOrderIsPicking = orderState === EOrderStates.picking;
   const isOrderIsInProgress = orderState === EOrderStates.inProgress;
-  const vatPercentage = isOrderIsInProgress
+  const initVatPercentage = isOrderIsInProgress
     ? VATPercentage!
       ? VATPercentage!
       : currentOrderVATPercentage
@@ -182,64 +186,89 @@ export const usePrepareOrderDetailPageData = ({
     : isOrderEditing
     ? foodOrderGroupedByDateFromDraftOrderDetail
     : foodOrderGroupedByDateFromQuotation;
-  const quotationInfo = useMemo(
+
+  const quotationInfoFromOrder = useMemo(
     () =>
-      calculatePriceQuotationInfo({
+      calculatePriceQuotationInfoFromOrder({
         planOrderDetail: orderDetail,
         order: orderData as TObject,
-        currentOrderVATPercentage: vatPercentage,
+        orderVATPercentage: initVatPercentage,
         date,
-        currentOrderServiceFeePercentage: serviceFeePercentage,
+        orderServiceFeePercentage: serviceFeePercentage,
         shouldIncludePITOFee: isEmpty(date),
-        hasSpecificPCCFee,
-        specificPCCFee,
+        hasSpecificPCCFee:
+          orderHasSpecificPCCFee !== undefined
+            ? orderHasSpecificPCCFee
+            : hasSpecificPCCFee,
+        specificPCCFee:
+          orderHasSpecificPCCFee !== undefined ? orderPCCFee : specificPCCFee,
+        isPartner,
+        vatSetting,
       }),
     [
       JSON.stringify(orderData),
       JSON.stringify(orderDetail),
-      currentOrderVATPercentage,
+      date,
+      initVatPercentage,
+      serviceFeePercentage,
       hasSpecificPCCFee,
+      orderHasSpecificPCCFee,
       specificPCCFee,
+      orderPCCFee,
+      isPartner,
+      vatSetting,
     ],
   );
-  const quotationDraftInfor = useMemo(
+  const quotationInfoFormDraftEdit = useMemo(
     () =>
-      calculatePriceQuotationInfo({
+      calculatePriceQuotationInfoFromOrder({
         planOrderDetail: draftOrderDetail,
         order: orderData as TObject,
         date,
-        currentOrderVATPercentage: vatPercentage,
-        currentOrderServiceFeePercentage: serviceFeePercentage,
+        orderVATPercentage: initVatPercentage,
+        orderServiceFeePercentage: serviceFeePercentage,
         shouldIncludePITOFee: isEmpty(date),
         hasSpecificPCCFee: orderHasSpecificPCCFee,
         specificPCCFee: orderPCCFee,
+        vatSetting,
       }),
     [
-      JSON.stringify(orderData),
       JSON.stringify(draftOrderDetail),
+      JSON.stringify(orderData),
+      date,
+      orderPCCFee,
       currentOrderVATPercentage,
       orderHasSpecificPCCFee,
-      orderPCCFee,
+      serviceFeePercentage,
+      initVatPercentage,
+      vatSetting,
     ],
   );
-
-  const quotationInfor = useMemo(
+  const quotationInfoFromQuotation = useMemo(
     () =>
       calculatePriceQuotationInfoFromQuotation({
         quotation: quotation as TListing,
         packagePerMember,
-        currentOrderVATPercentage: vatPercentage,
-        currentOrderServiceFeePercentage: serviceFeePercentage,
+        orderVATPercentage: initVatPercentage,
+        orderServiceFeePercentage: serviceFeePercentage,
         date,
         partnerId,
         hasSpecificPCCFee: orderHasSpecificPCCFee,
         specificPCCFee: orderPCCFee,
+        isPartner,
+        vatSetting,
       }),
     [
       packagePerMember,
       JSON.stringify(quotation),
       orderHasSpecificPCCFee,
       orderPCCFee,
+      initVatPercentage,
+      serviceFeePercentage,
+      isPartner,
+      partnerId,
+      date,
+      vatSetting,
     ],
   );
 
@@ -254,11 +283,22 @@ export const usePrepareOrderDetailPageData = ({
     overflow,
     PITOFee = 0,
     totalWithoutVAT = 0,
-  } = isOrderIsPicking
-    ? quotationInfo
-    : isOrderEditing
-    ? quotationDraftInfor
-    : quotationInfor;
+    vatPercentage = 0,
+  } = useMemo(
+    () =>
+      isOrderIsPicking
+        ? quotationInfoFromOrder
+        : isOrderEditing
+        ? quotationInfoFormDraftEdit
+        : quotationInfoFromQuotation,
+    [
+      isOrderIsPicking,
+      isOrderEditing,
+      JSON.stringify(quotationInfoFromOrder),
+      JSON.stringify(quotationInfoFromQuotation),
+      JSON.stringify(quotationInfoFormDraftEdit),
+    ],
+  );
   const reviewInfoData = {
     reviewInfoValues,
     deliveryHour,
@@ -325,9 +365,7 @@ export const usePrepareOrderDetailPageData = ({
       transportFee: `${parseThousandNumber(transportFee)}đ`,
       VATFee: `${parseThousandNumber(VATFee)}đ`,
       PITOFee: `${parseThousandNumber(PITOFee)}đ`,
-      vatPercentage: VATPercentage!
-        ? VATPercentage!
-        : currentOrderVATPercentage,
+      vatPercentage,
     },
     orderDetailData: {
       foodOrderGroupedByDate,

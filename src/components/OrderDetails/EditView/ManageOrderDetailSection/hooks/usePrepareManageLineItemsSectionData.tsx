@@ -3,6 +3,8 @@ import { useEffect, useMemo } from 'react';
 import { isEmpty } from 'lodash';
 
 import { useAppSelector } from '@hooks/reduxHooks';
+import { EOrderStates } from '@src/utils/enums';
+import { ETransition } from '@src/utils/transaction';
 import { Listing } from '@utils/data';
 import type { TListing, TObject } from '@utils/types';
 
@@ -10,15 +12,36 @@ export const usePrepareManageLineItemsSectionData = (
   currentViewDate: number | string,
   setCurrentViewDate: (date: number) => void,
 ) => {
-  const { planData } = useAppSelector((state) => state.OrderManagement);
+  const { planData, orderData } = useAppSelector(
+    (state) => state.OrderManagement,
+  );
+
+  const { orderStateHistory = [] } = Listing(
+    orderData as TListing,
+  ).getMetadata();
+
+  const isOrderAlreadyInProgress =
+    orderStateHistory.findIndex(
+      (_state: { state: string; updatedAt: number }) =>
+        _state.state === EOrderStates.inProgress,
+    ) !== -1;
 
   const { orderDetail = {} } = Listing(planData as TListing).getMetadata();
 
   const dateList = Object.entries(orderDetail)
     .reduce<number[]>((prev, [date, orderOnDate]) => {
-      const { restaurant } = orderOnDate as TObject;
+      const { restaurant, lastTransition } = orderOnDate as TObject;
 
-      return !isEmpty(restaurant?.foodList) ? prev.concat(Number(date)) : prev;
+      const isSubOrderNotAbleToEdit = [
+        ETransition.OPERATOR_CANCEL_PLAN,
+        ETransition.START_DELIVERY,
+        ETransition.COMPLETE_DELIVERY,
+      ].includes(lastTransition!);
+
+      return !isEmpty(restaurant?.foodList) &&
+        !(isOrderAlreadyInProgress && isSubOrderNotAbleToEdit)
+        ? prev.concat(Number(date))
+        : prev;
     }, [])
     .sort((x, y) => x - y);
 
@@ -42,8 +65,12 @@ export const usePrepareManageLineItemsSectionData = (
   );
 
   useEffect(() => {
-    if (indexOfTimestamp > -1 && dateList.length > 0) {
-      setCurrentViewDate(dateList[indexOfTimestamp]);
+    if (!isEmpty(dateList)) {
+      if (indexOfTimestamp <= 0) {
+        setCurrentViewDate(dateList[0]);
+      } else {
+        setCurrentViewDate(dateList[indexOfTimestamp]);
+      }
     }
   }, [indexOfTimestamp, JSON.stringify(dateList)]);
 

@@ -118,7 +118,7 @@ function BookerDraftOrderPage() {
   const selectedDate = useAppSelector(
     (state) => state.Order.selectedCalendarDate,
   );
-  const { orderDetail = [] } = useGetPlanDetails();
+  const { orderDetail = [], rawOrderDetail } = useGetPlanDetails();
   const { startDate, endDate } = useGetBoundaryDates(order);
   const calendarExtraResources = useGetCalendarExtraResources({
     order,
@@ -137,7 +137,7 @@ function BookerDraftOrderPage() {
       selectedDate,
       startDate: startDateTimestamp,
       endDate: endDateTimestamp,
-      orderDetail,
+      orderDetail: rawOrderDetail,
     });
 
     return temp instanceof Date ? temp : new Date(temp!);
@@ -151,7 +151,7 @@ function BookerDraftOrderPage() {
 
   const handleFinishOrder = async () => {
     const { meta } = await dispatch(
-      orderAsyncActions.bookerPublishOrder({ orderId, planId }),
+      orderAsyncActions.publishOrder({ orderId, planId }),
     );
 
     if (meta.requestStatus !== 'rejected') {
@@ -193,7 +193,7 @@ function BookerDraftOrderPage() {
 
   useEffect(() => {
     if (!isEmpty(orderDetail)) {
-      dispatch(orderAsyncActions.checkRestaurantStillAvailable());
+      dispatch(orderAsyncActions.checkRestaurantStillAvailable({}));
     }
   }, [dispatch, JSON.stringify(orderDetail)]);
 

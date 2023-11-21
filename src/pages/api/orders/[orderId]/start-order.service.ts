@@ -1,4 +1,5 @@
 import { getPickFoodParticipants } from '@helpers/orderHelper';
+import { pushNativeNotificationOrderDetail } from '@pages/api/helpers/pushNotificationOrderDetailHelper';
 import { denormalisedResponseEntities } from '@services/data';
 import { emailSendingFactory, EmailTemplateTypes } from '@services/email';
 import getSystemAttributes from '@services/getSystemAttributes';
@@ -21,6 +22,8 @@ export const startOrder = async (orderId: string, planId: string) => {
     orderState,
     orderStateHistory = [],
     partnerIds = [],
+    hasSpecificPCCFee: orderHasSpecificPCCFee,
+    specificPCCFee: orderSpecificPCCFee,
   } = Listing(orderListing).getMetadata();
 
   if (orderState !== EOrderStates.picking) {
@@ -47,8 +50,11 @@ export const startOrder = async (orderId: string, planId: string) => {
       orderState: EOrderStates.inProgress,
       orderStateHistory: updateOrderStateHistory,
       orderVATPercentage: systemVATPercentage,
-      hasSpecificPCCFee,
-      specificPCCFee,
+      ...(orderHasSpecificPCCFee === undefined &&
+        orderSpecificPCCFee === undefined && {
+          hasSpecificPCCFee,
+          specificPCCFee,
+        }),
     },
   });
 
@@ -86,5 +92,11 @@ export const startOrder = async (orderId: string, planId: string) => {
         },
       );
     },
+  );
+  await pushNativeNotificationOrderDetail(
+    orderDetail,
+    orderListing,
+    ENativeNotificationType.BookerTransitOrderStateToInProgress,
+    integrationSdk,
   );
 };

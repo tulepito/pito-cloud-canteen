@@ -3,8 +3,8 @@ import React, { useEffect } from 'react';
 import isEmpty from 'lodash/isEmpty';
 
 import MetaWrapper from '@components/MetaWrapper/MetaWrapper';
+import { parseLocationSearchToObject } from '@helpers/urlHelpers';
 import { useAppDispatch } from '@hooks/reduxHooks';
-import { parseLocationSearchToObject } from '@src/utils/history';
 
 import CreateEditMenuLayout from '../components/CreateEditMenuLayout';
 import {

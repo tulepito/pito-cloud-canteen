@@ -112,7 +112,7 @@ const CartSection: React.FC<TCartSectionProps> = (props) => {
                   {
                     id: 'OrderDetails.PriceQuotation.cartSection.rowLabel.noExportVAT',
                   },
-                  { percent: vatPercentage * 100 },
+                  { percent: Math.abs(vatPercentage * 100) },
                 )}
                 <RenderWhen.False>
                   {intl.formatMessage(

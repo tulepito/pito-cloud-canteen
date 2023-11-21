@@ -228,12 +228,6 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
           <div className={css.totalWithVAT}>
             {parseThousandNumber(totalWithVAT.toString())}đ
           </div>
-          {/* <div className={css.PITOPoints}>
-            {intl.formatMessage(
-              { id: 'ReviewCardSection.PITOPoints' },
-              { PITOPoints },
-            )}
-          </div> */}
           <div className={css.totalDescription}>
             {intl.formatMessage({ id: 'ReviewCardSection.totalDescription' })}
           </div>

@@ -1,4 +1,5 @@
 import { addDays, min, subDays } from 'date-fns';
+import difference from 'lodash/difference';
 import isEmpty from 'lodash/isEmpty';
 import uniq from 'lodash/uniq';
 import { DateTime } from 'luxon';
@@ -9,10 +10,16 @@ import {
   EVENING_SESSION,
   MORNING_SESSION,
 } from '@components/CalendarDashboard/helpers/constant';
+import { ETransition } from '@src/utils/transaction';
 import { Listing } from '@utils/data';
-import { generateTimeRangeItems, renderDateRange } from '@utils/dates';
+import {
+  generateTimeRangeItems,
+  renderDateRange,
+  weekDayFormatFromDateTime,
+} from '@utils/dates';
 import {
   EBookerOrderDraftStates,
+  EEditOrderHistoryType,
   EFoodType,
   EOrderDraftStates,
   EOrderStates,
@@ -20,7 +27,20 @@ import {
   EParticipantOrderStatus,
 } from '@utils/enums';
 import type { TPlan } from '@utils/orderTypes';
-import type { TListing, TObject } from '@utils/types';
+import type {
+  TListing,
+  TObject,
+  TOrderChangeHistoryItem,
+  TOrderStateHistory,
+} from '@utils/types';
+
+import { parseThousandNumber } from './format';
+
+export const ORDER_STATES_TO_ENABLE_EDIT_ABILITY = [
+  EOrderDraftStates.pendingApproval,
+  EOrderStates.picking,
+  EOrderStates.inProgress,
+];
 
 export const getParticipantPickingLink = (orderId: string) =>
   `${process.env.NEXT_PUBLIC_CANONICAL_URL}/participant/order/${orderId}`;
@@ -257,7 +277,7 @@ export const getRestaurantListFromOrderDetail = (
     const { restaurant } = current;
     const { restaurantName } = restaurant || {};
 
-    if (!result[restaurantName as string]) {
+    if (restaurantName && !result[restaurantName as string]) {
       // eslint-disable-next-line no-param-reassign
       result[restaurantName as string] = true;
     }
@@ -287,9 +307,14 @@ export const findSuitableStartDate = ({
     return startDate;
   }
 
-  const suitableStartDate = dateRange.find((date) =>
-    isOrderDetailDatePickedFood(orderDetail[date.toString()]),
-  );
+  const suitableStartDate =
+    dateRange.find((date) => {
+      const foodIds = Object.keys(
+        orderDetail[date.toString()]?.restaurant?.foodList || {},
+      );
+
+      return isEmpty(foodIds);
+    }) || new Date(startDate);
 
   return suitableStartDate;
 };
@@ -328,7 +353,7 @@ type TFoodDataMap = TObject<string, TFoodDataValue>;
 
 export const getFoodDataMap = ({
   foodListOfDate = {},
-  memberOrders,
+  memberOrders = {},
   orderType = EOrderType.group,
   lineItems = [],
 }: any) => {
@@ -405,7 +430,7 @@ export const combineOrderDetailWithPriceInfo = ({
     (result, currentOrderDetailEntry) => {
       const [date, rawOrderDetailOfDate] = currentOrderDetailEntry;
       const {
-        memberOrders,
+        memberOrders = {},
         restaurant = {},
         lineItems = [],
       } = rawOrderDetailOfDate;
@@ -440,7 +465,7 @@ export const calculateSubOrderPrice = ({
   orderType?: EOrderType;
 }) => {
   const isGroupOrder = orderType === EOrderType.group;
-  const { memberOrders, restaurant = {}, lineItems = [] } = data;
+  const { memberOrders = {}, restaurant = {}, lineItems = [] } = data;
   const { foodList: foodListOfDate } = restaurant;
 
   if (isGroupOrder) {
@@ -627,7 +652,7 @@ export const getPickFoodParticipants = (orderDetail: TObject) => {
   const shouldSendNativeNotificationParticipantIdList = Object.entries(
     orderDetail,
   ).reduce<string[]>((acc, [, subOrder]: any) => {
-    const { memberOrders } = subOrder;
+    const { memberOrders = {} } = subOrder;
     const memberHasPickFood = Object.keys(memberOrders).filter(
       (memberId: string) => {
         return memberOrders[memberId].foodId;
@@ -638,4 +663,375 @@ export const getPickFoodParticipants = (orderDetail: TObject) => {
   }, []);
 
   return shouldSendNativeNotificationParticipantIdList;
+};
+
+export const getUpdateLineItems = (foodList: any[], foodIds: string[]) => {
+  const updateFoodList = foodIds.reduce((acc: any, foodId: string) => {
+    const food = foodList?.find((item) => item.id?.uuid === foodId);
+    if (food) {
+      const foodListingGetter = Listing(food).getAttributes();
+
+      acc[foodId] = {
+        foodName: foodListingGetter.title,
+        foodPrice: foodListingGetter.price?.amount || 0,
+        foodUnit: foodListingGetter.publicData?.unit || '',
+      };
+    }
+
+    return acc;
+  }, {});
+
+  const updateLineItems = Object.entries<{
+    foodName: string;
+    foodPrice: number;
+  }>(updateFoodList).map(([foodId, { foodName, foodPrice }]) => {
+    return {
+      id: foodId,
+      name: foodName,
+      unitPrice: foodPrice,
+      price: foodPrice,
+      quantity: 1,
+    };
+  });
+
+  return updateLineItems;
+};
+
+export const preparePickingOrderChangeNotificationData = ({
+  oldOrderDetail,
+  newOrderDetail,
+  order,
+  updateOrderData,
+}: {
+  oldOrderDetail: TPlan['orderDetail'];
+  newOrderDetail: TPlan['orderDetail'];
+  order: TListing;
+  updateOrderData: TObject;
+}) => {
+  const createdAt = new Date().getTime();
+
+  const orderGetter = Listing(order);
+  const orderId = orderGetter.getId();
+  const {
+    staffName,
+    shipperName,
+    specificPCCFee = 0,
+    hasSpecificPCCFee = false,
+    memberAmount = 0,
+    deliveryAddress,
+    detailAddress,
+    deliveryHour,
+  } = orderGetter.getMetadata();
+  const PCCFeeByMemberAmount = getPCCFeeByMemberAmount(memberAmount);
+  const PCCFeePerDate = hasSpecificPCCFee
+    ? specificPCCFee
+    : PCCFeeByMemberAmount;
+
+  const changeHistoryToNotifyBooker: TObject[] = [];
+  const changeHistoryToNotifyBookerByMeal: TObject = {};
+  const emailParamsForParticipantNotification: TObject[] = [];
+  const firebaseChangeHistory: Partial<TOrderChangeHistoryItem>[] = [];
+  const normalizedOrderDetail: TObject = {};
+
+  const sortedNewOrderDetailKeys = Object.keys(newOrderDetail).sort(
+    (t1, t2) => Number(t1) - Number(t2),
+  );
+
+  sortedNewOrderDetailKeys.forEach((timestamp) => {
+    const orderDetailData = newOrderDetail[timestamp] || {};
+    const oldOrderDetailData = oldOrderDetail[timestamp] || {};
+    changeHistoryToNotifyBookerByMeal[timestamp] = [];
+    const formattedWeekDay = `${weekDayFormatFromDateTime(
+      DateTime.fromMillis(Number(timestamp)),
+    )}:`;
+
+    const { restaurant = {}, memberOrders = {} } = orderDetailData;
+    const { id: restaurantId, restaurantName, foodList = {} } = restaurant;
+    const foodIds = Object.keys(foodList);
+    const { restaurant: oldRestaurant = {} } = oldOrderDetailData;
+    const {
+      id: oldRestaurantId,
+      restaurantName: oldRestaurantName,
+      foodList: oldFoodList = {},
+    } = oldRestaurant;
+    const oldFoodIds = Object.keys(oldFoodList);
+    const addedFoodList = difference(foodIds, oldFoodIds);
+    const removedFoodList = difference(oldFoodIds, foodIds);
+
+    changeHistoryToNotifyBookerByMeal[timestamp] = [];
+
+    if (restaurantId && oldRestaurantId) {
+      if (restaurantId !== oldRestaurantId) {
+        // TODO: restaurant change for booker noti
+        changeHistoryToNotifyBookerByMeal[timestamp] = [
+          {
+            oldData: {
+              title: formattedWeekDay,
+              content: `Đối tác - ${oldRestaurantName}`,
+            },
+            newData: {
+              title: formattedWeekDay,
+              content: `Đối tác - ${restaurantName}`,
+            },
+          },
+        ];
+
+        // TODO: firebase change history for restaurant change
+        firebaseChangeHistory.push({
+          orderId,
+          type: EEditOrderHistoryType.changeRestaurant,
+          createdAt,
+          newValue: restaurant,
+          oldValue: oldRestaurant,
+          subOrderDate: timestamp,
+        });
+      } else {
+        if (!isEmpty(removedFoodList)) {
+          // TODO: add food for booker noti
+          removedFoodList.forEach((removedFoodId) => {
+            const { foodName } = oldFoodList[removedFoodId] || {};
+
+            changeHistoryToNotifyBookerByMeal[timestamp] =
+              changeHistoryToNotifyBookerByMeal[timestamp].concat({
+                oldData: {},
+                newData: {
+                  title: formattedWeekDay,
+                  content: `Xoá món "${foodName}"`,
+                },
+              });
+
+            // TODO: firebase change history for removing food
+            firebaseChangeHistory.push({
+              orderId,
+              type: EEditOrderHistoryType.deleteFood,
+              createdAt,
+              newValue: {},
+              oldValue: { ...oldFoodList[removedFoodId] },
+              subOrderDate: timestamp,
+            });
+          });
+        }
+
+        if (!isEmpty(addedFoodList)) {
+          addedFoodList.forEach((addedFoodId) => {
+            const { foodName } = foodList[addedFoodId] || {};
+
+            // TODO: add food for booker noti
+            changeHistoryToNotifyBookerByMeal[timestamp] =
+              changeHistoryToNotifyBookerByMeal[timestamp].concat({
+                oldData: {},
+                newData: {
+                  title: formattedWeekDay,
+                  content: `Thêm món "${foodName}"`,
+                },
+              });
+
+            // TODO: firebase change history for adding food
+            firebaseChangeHistory.push({
+              orderId,
+              type: EEditOrderHistoryType.addFood,
+              createdAt,
+              newValue: { ...foodList[addedFoodId] },
+              oldValue: {},
+              subOrderDate: timestamp,
+            });
+          });
+        }
+      }
+    }
+
+    // TODO: picking changed for participant noti
+    const normalizedMemberOrders = { ...memberOrders };
+    Object.entries(memberOrders).forEach(([memberId, pickingFoodData]) => {
+      const { foodId = '', ...restPickingData } = pickingFoodData || {};
+
+      if (foodId !== '' && isEmpty(foodList[foodId])) {
+        normalizedMemberOrders[memberId] = {
+          ...restPickingData,
+          foodId: '',
+          status: EParticipantOrderStatus.empty,
+        };
+        emailParamsForParticipantNotification.push({
+          orderId,
+          participantId: memberId,
+          timestamp,
+        });
+      }
+    });
+
+    if (!isEmpty(changeHistoryToNotifyBookerByMeal[timestamp])) {
+      changeHistoryToNotifyBooker.push(
+        ...changeHistoryToNotifyBookerByMeal[timestamp],
+      );
+    }
+
+    normalizedOrderDetail[timestamp] = {
+      ...newOrderDetail[timestamp],
+      memberOrders: normalizedMemberOrders,
+    };
+  });
+
+  const {
+    staffName: updateStaffName,
+    shipperName: updateShipperName,
+    specificPCCFee: updateSpecificPCCFee,
+    deliveryAddress: updateDeliveryAddress,
+    detailAddress: updateDetailAddress,
+    deliveryHour: updateDeliveryHour,
+  } = updateOrderData || {};
+  // TODO: change history for other fields
+  if (updateStaffName !== undefined && updateStaffName !== staffName) {
+    changeHistoryToNotifyBooker.push({
+      oldData: {
+        title: 'Nhân viên phụ trách:',
+        content: staffName,
+      },
+      newData: {
+        title: 'Nhân viên phụ trách:',
+        content: updateStaffName,
+      },
+    });
+  }
+  if (updateShipperName !== undefined && updateShipperName !== shipperName) {
+    changeHistoryToNotifyBooker.push({
+      oldData: {
+        title: 'Nhân viên giao hàng:',
+        content: shipperName,
+      },
+      newData: {
+        title: 'Nhân viên giao hàng:',
+        content: updateShipperName,
+      },
+    });
+  }
+  if (
+    updateSpecificPCCFee !== undefined &&
+    PCCFeePerDate !== updateSpecificPCCFee
+  ) {
+    changeHistoryToNotifyBooker.push({
+      oldData: {
+        title: 'Phí PITO Cloud Canteen:',
+        content: `${parseThousandNumber(PCCFeePerDate)}đ`,
+      },
+      newData: {
+        title: 'Phí PITO Cloud Canteen:',
+        content: `${parseThousandNumber(updateSpecificPCCFee)}đ`,
+      },
+    });
+  }
+  if (
+    updateDeliveryAddress !== undefined &&
+    updateDeliveryAddress.address !== deliveryAddress.address
+  ) {
+    changeHistoryToNotifyBooker.push({
+      oldData: {
+        title: 'Địa chỉ giao hàng:',
+        content: deliveryAddress.address,
+      },
+      newData: {
+        title: 'Địa chỉ giao hàng:',
+        content: updateDeliveryAddress.address,
+      },
+    });
+  }
+
+  if (
+    updateDetailAddress !== undefined &&
+    updateDetailAddress !== detailAddress
+  ) {
+    changeHistoryToNotifyBooker.push({
+      oldData: {
+        title: 'Địa chỉ chi tiết:',
+        content: detailAddress,
+      },
+      newData: {
+        title: 'Địa chỉ chi tiết:',
+        content: updateDetailAddress,
+      },
+    });
+  }
+
+  if (updateDeliveryHour !== undefined && updateDeliveryHour !== deliveryHour) {
+    changeHistoryToNotifyBooker.push({
+      oldData: {
+        title: 'Thời gian giao hàng:',
+        content: deliveryHour,
+      },
+      newData: {
+        title: 'Thời gian giao hàng:',
+        content: updateDeliveryHour,
+      },
+    });
+  }
+
+  return {
+    emailParamsForBookerNotification: {
+      changeHistory: changeHistoryToNotifyBooker,
+      orderId,
+    },
+    emailParamsForParticipantNotification,
+    firebaseChangeHistory,
+    normalizedOrderDetail,
+  };
+};
+
+export const getEditedSubOrders = (orderDetail: TObject) => {
+  const editedSubOrders = Object.keys(orderDetail).reduce(
+    (result: any, subOrderDate: string) => {
+      const { oldValues, lastTransition } = orderDetail[subOrderDate];
+      if (
+        isEmpty(oldValues) ||
+        lastTransition !== ETransition.INITIATE_TRANSACTION
+      ) {
+        return result;
+      }
+
+      return {
+        ...result,
+        [subOrderDate]: orderDetail[subOrderDate],
+      };
+    },
+    {},
+  );
+
+  return editedSubOrders;
+};
+
+export const checkIsOrderHasInProgressState = (
+  orderStateHistory: TOrderStateHistory[],
+) => {
+  return orderStateHistory.some(
+    (state: TOrderStateHistory) => state.state === EOrderStates.inProgress,
+  );
+};
+
+export const mergeRecommendOrderDetailWithCurrentOrderDetail = (
+  currentOrderDetail: TObject,
+  recommendOrderDetail: TObject,
+  timestamp?: string,
+) => {
+  let mergedResult: TObject = {};
+
+  if (timestamp) {
+    mergedResult = { ...currentOrderDetail };
+    mergedResult[timestamp] = {
+      ...currentOrderDetail[timestamp],
+      ...recommendOrderDetail[timestamp],
+    };
+  } else {
+    mergedResult = { ...recommendOrderDetail };
+
+    Object.keys(currentOrderDetail).forEach((time) => {
+      const { restaurant = {}, hasNoRestaurants = false } =
+        recommendOrderDetail[time] || {};
+
+      mergedResult[time] = {
+        ...currentOrderDetail[time],
+        restaurant,
+        hasNoRestaurants,
+      };
+    });
+  }
+
+  return mergedResult;
 };

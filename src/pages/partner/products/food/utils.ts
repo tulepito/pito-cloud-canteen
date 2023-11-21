@@ -76,9 +76,9 @@ export const getSubmitFoodData = (values: TEditPartnerFoodFormValues) => {
     },
     metadata: {
       restaurantId,
-      isDraft,
       listingType: EListingType.food,
       isFoodEnable: true,
+      isDraft,
     },
   };
 };

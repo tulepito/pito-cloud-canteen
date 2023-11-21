@@ -83,7 +83,7 @@ export const useQuizFlow = (step: string) => {
           ).getMetadata();
           const planId = plans[0];
           const { payload: recommendOrderDetail }: any = await dispatch(
-            orderAsyncActions.recommendRestaurants(),
+            orderAsyncActions.recommendRestaurants({}),
           );
           await dispatch(
             orderAsyncActions.updatePlanDetail({

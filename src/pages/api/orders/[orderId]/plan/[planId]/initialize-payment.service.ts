@@ -1,8 +1,14 @@
+import isEmpty from 'lodash/isEmpty';
+
 import {
-  calculatePriceQuotationInfo,
+  calculatePriceQuotationInfoFromOrder,
   calculatePriceQuotationPartner,
-  vatPercentageBaseOnVatSetting,
+  ensureVATSetting,
 } from '@helpers/order/cartInfoHelper';
+import {
+  checkIsOrderHasInProgressState,
+  getEditedSubOrders,
+} from '@helpers/orderHelper';
 import { generateSKU } from '@pages/admin/order/[orderId]/helpers/AdminOrderDetail';
 import {
   adminQueryListings,
@@ -10,10 +16,14 @@ import {
   fetchUser,
 } from '@services/integrationHelper';
 import type { PaymentBaseParams } from '@services/payment';
-import { createPaymentRecordOnFirebase } from '@services/payment';
+import {
+  createPaymentRecordOnFirebase,
+  queryPaymentRecordOnFirebase,
+  updatePaymentRecordOnFirebase,
+} from '@services/payment';
 import { Listing, User } from '@src/utils/data';
-import { EPartnerVATSetting, EPaymentType } from '@src/utils/enums';
-import type { TListing } from '@src/utils/types';
+import { EPaymentType } from '@src/utils/enums';
+import type { TListing, TObject } from '@src/utils/types';
 
 export const initializePayment = async (
   orderListing: TListing,
@@ -31,34 +41,37 @@ export const initializePayment = async (
     quotationId,
     serviceFees = {},
     vatSettings,
+    orderStateHistory = [],
   } = orderListingGetter.getMetadata();
+
+  const isOrderHasInProgressState =
+    checkIsOrderHasInProgressState(orderStateHistory);
 
   const quotationListing = await fetchListing(quotationId);
   const { partner = {} } = Listing(quotationListing).getMetadata();
 
   const { orderDetail = {} } = planListingGetter.getMetadata();
-  const partnerPaymentRecordsData: Partial<PaymentBaseParams>[] =
-    Object.entries(orderDetail).map(
+  const editedSubOrders = getEditedSubOrders(orderDetail);
+
+  const isEditInProgressOrder =
+    isOrderHasInProgressState && !isEmpty(editedSubOrders);
+
+  let partnerPaymentRecordsData: Partial<PaymentBaseParams>[] = [];
+
+  const generatePaymentRecordData = (subOrders: TObject) => {
+    return Object.entries(subOrders).map(
       ([subOrderDate, subOrderData]: [string, any]) => {
         const { restaurant = {} } = subOrderData;
         const { id, restaurantName } = restaurant;
 
         const vatSettingFromOrder = vatSettings[id];
-        const partnerVATSetting =
-          vatSettingFromOrder in EPartnerVATSetting
-            ? vatSettingFromOrder
-            : EPartnerVATSetting.vat;
-        const vatPercentage = vatPercentageBaseOnVatSetting({
-          vatSetting: partnerVATSetting,
-          vatPercentage: orderVATPercentage,
-        });
 
-        const { totalWithVAT: totalPrice } = calculatePriceQuotationPartner({
+        const { totalWithVAT } = calculatePriceQuotationPartner({
           quotation: partner[id].quotation,
           serviceFeePercentage: serviceFees[id],
-          currentOrderVATPercentage: vatPercentage,
+          orderVATPercentage,
           subOrderDate,
-          shouldSkipVAT: partnerVATSetting === EPartnerVATSetting.direct,
+          vatSetting: ensureVATSetting(vatSettingFromOrder),
         });
 
         return {
@@ -71,13 +84,16 @@ export const initializePayment = async (
           subOrderDate,
           companyName,
           orderTitle,
-          totalPrice,
+          totalPrice: totalWithVAT,
           deliveryHour,
           isHideFromHistory: true,
           isAdminConfirmed: false,
         };
       },
     );
+  };
+
+  partnerPaymentRecordsData = generatePaymentRecordData(orderDetail);
 
   const {
     startDate,
@@ -110,13 +126,14 @@ export const initializePayment = async (
   const bookerDisplayName = User(bookerUser).getProfile().displayName;
   const bookerPhoneNumber = User(bookerUser).getProtectedData().phoneNumber;
 
-  const { totalWithVAT: clientTotalPrice } = calculatePriceQuotationInfo({
-    planOrderDetail: orderDetail,
-    order: orderListing,
-    currentOrderVATPercentage: orderVATPercentage,
-    hasSpecificPCCFee,
-    specificPCCFee,
-  });
+  const { totalWithVAT: clientTotalPrice } =
+    calculatePriceQuotationInfoFromOrder({
+      planOrderDetail: orderDetail,
+      order: orderListing,
+      orderVATPercentage,
+      hasSpecificPCCFee,
+      specificPCCFee,
+    });
 
   const clientPaymentData: Partial<PaymentBaseParams> = {
     SKU: generateSKU('CUSTOMER', orderId),
@@ -155,5 +172,18 @@ export const initializePayment = async (
     createPaymentRecordOnFirebase(EPaymentType.PARTNER, paymentRecordData);
   });
 
-  createPaymentRecordOnFirebase(EPaymentType.CLIENT, clientPaymentData);
+  if (isEditInProgressOrder) {
+    const paymentRecords = await queryPaymentRecordOnFirebase({
+      paymentType: EPaymentType.CLIENT,
+      orderId,
+    });
+
+    if (!isEmpty(paymentRecords)) {
+      await updatePaymentRecordOnFirebase(paymentRecords?.[0].id, {
+        ...clientPaymentData,
+      });
+    }
+  } else {
+    createPaymentRecordOnFirebase(EPaymentType.CLIENT, clientPaymentData);
+  }
 };

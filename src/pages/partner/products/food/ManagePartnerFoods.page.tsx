@@ -460,7 +460,6 @@ const ManagePartnerFoods = () => {
   };
 
   const handleClearFilter = () => {
-    console.log('foodApprovalActiveTab: ', foodApprovalActiveTab);
     router.push({
       pathname: partnerPaths.ManageFood,
       query: {

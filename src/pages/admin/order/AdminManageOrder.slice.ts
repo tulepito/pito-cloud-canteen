@@ -40,7 +40,10 @@ import {
   EPaymentType,
   ESubOrderTxStatus,
 } from '@src/utils/enums';
-import { ETransition } from '@src/utils/transaction';
+import {
+  ETransition,
+  TRANSITIONS_TO_STATE_CANCELED,
+} from '@src/utils/transaction';
 import type {
   TListing,
   TObject,
@@ -61,6 +64,8 @@ const mapTxTransitionToFirebaseSubOrderStatus = (lastTransition: string) => {
     case ETransition.COMPLETE_DELIVERY:
       return ESubOrderTxStatus.DELIVERED;
     case ETransition.OPERATOR_CANCEL_PLAN:
+    case ETransition.OPERATOR_CANCEL_AFTER_PARTNER_CONFIRMED:
+    case ETransition.OPERATOR_CANCEL_AFTER_PARTNER_REJECTED:
       return ESubOrderTxStatus.CANCELED;
     default:
       return ESubOrderTxStatus.PENDING;
@@ -73,6 +78,8 @@ const mapTxTransitionToNotificationType = (lastTransition: string) => {
     case ETransition.COMPLETE_DELIVERY:
       return ENotificationType.SUB_ORDER_DELIVERED;
     case ETransition.OPERATOR_CANCEL_PLAN:
+    case ETransition.OPERATOR_CANCEL_AFTER_PARTNER_CONFIRMED:
+    case ETransition.OPERATOR_CANCEL_AFTER_PARTNER_REJECTED:
       return ENotificationType.SUB_ORDER_CANCELED;
     default:
       return ENotificationType.SUB_ORDER_INPROGRESS;
@@ -686,7 +693,7 @@ const AdminManageOrderSlice = createSlice({
             [date]: {
               ...currOrderDetail[date],
               lastTransition: transition,
-              ...(transition === ETransition.OPERATOR_CANCEL_PLAN && {
+              ...(TRANSITIONS_TO_STATE_CANCELED.includes(transition) && {
                 status: 'canceled',
               }),
             },

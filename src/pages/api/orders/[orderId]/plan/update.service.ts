@@ -49,8 +49,9 @@ const getNormalizeDetail = ({
       return {
         ...acc,
         [curr]: {
-          ...orderDetail[curr],
+          ...(isNormalOrder && { lineItems: [] }),
           memberOrders: isNormalOrder ? {} : initialMemberOrder,
+          ...orderDetail[curr],
         },
       };
     }
@@ -78,6 +79,7 @@ const updatePlan = async ({
     selectedGroups = [],
     orderState,
     orderType = EOrderType.group,
+    partnerIds = [],
   } = Listing(orderListing).getMetadata();
   const enabledToUpdateRelatedBookingInfo =
     isEnableUpdateBookingInfo(orderState);
@@ -134,6 +136,7 @@ const updatePlan = async ({
         metadata: {
           orderDetail: updatedOrderDetail,
           menuIds: updateMenuIds,
+          partnerIds,
         },
       },
       { expand: true },

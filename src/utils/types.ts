@@ -11,6 +11,7 @@ import type {
   EBookingStates,
   ECompanyDashboardNotificationType,
   EDayOfWeek,
+  EEditOrderHistoryType,
   EEditSubOrderHistoryType,
   EErrorCode,
   EImageVariants,
@@ -680,6 +681,16 @@ export type TNotification = {
   linkProps: any;
   hidden: boolean;
   type: ENotificationPopupType;
+};
+
+export type TOrderChangeHistoryItem = {
+  orderId: string;
+  authorId: string;
+  createdAt?: number;
+  subOrderDate?: string;
+  newValue?: TObject;
+  oldValue?: TObject;
+  type?: EEditOrderHistoryType;
 };
 
 export type TSubOrderChangeHistoryItem = {

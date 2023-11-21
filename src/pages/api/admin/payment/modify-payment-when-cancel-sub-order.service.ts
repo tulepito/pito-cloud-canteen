@@ -65,7 +65,7 @@ export const modifyPaymentWhenCancelSubOrderService = async ({
       calculatePriceQuotationInfoFromQuotation({
         quotation: quotationListing,
         packagePerMember,
-        currentOrderVATPercentage: orderVATPercentage || systemVATPercentage,
+        orderVATPercentage: orderVATPercentage || systemVATPercentage,
         hasSpecificPCCFee,
         specificPCCFee,
       });

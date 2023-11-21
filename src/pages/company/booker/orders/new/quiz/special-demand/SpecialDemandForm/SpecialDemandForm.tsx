@@ -6,8 +6,8 @@ import classNames from 'classnames';
 
 import Form from '@components/Form/Form';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
-import MealTypeField from '@pages/admin/order/create/components/MealTypeField/MealTypeField';
-import NutritionField from '@pages/admin/order/create/components/NutritionField/NutritionField';
+import MealTypeField from '@pages/admin/order/components/MealTypeField/MealTypeField';
+import NutritionField from '@pages/admin/order/components/NutritionField/NutritionField';
 
 import css from './SpecialDemandForm.module.scss';
 

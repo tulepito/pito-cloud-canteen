@@ -23,17 +23,23 @@ const StatusToBadgeTypeMap = {
   [EVENT_STATUS.CANCELED_STATUS]: EBadgeType.danger,
 
   [ETransition.INITIATE_TRANSACTION]: EBadgeType.info,
+  [ETransition.PARTNER_CONFIRM_SUB_ORDER]: EBadgeType.info,
+  [ETransition.PARTNER_REJECT_SUB_ORDER]: EBadgeType.info,
   [ETransition.START_DELIVERY]: EBadgeType.info,
   [ETransition.COMPLETE_DELIVERY]: EBadgeType.success,
   [ETransition.EXPIRED_START_DELIVERY]: EBadgeType.info,
   [ETransition.CANCEL_DELIVERY]: EBadgeType.danger,
   [ETransition.OPERATOR_CANCEL_PLAN]: EBadgeType.danger,
+  [ETransition.OPERATOR_CANCEL_AFTER_PARTNER_CONFIRMED]: EBadgeType.danger,
+  [ETransition.OPERATOR_CANCEL_AFTER_PARTNER_REJECTED]: EBadgeType.danger,
   [ETransition.EXPIRED_REVIEW_TIME]: EBadgeType.success,
 };
 
 const txStateToLabelMapper = (lastTransition: string) => {
   switch (lastTransition) {
     case ETransition.INITIATE_TRANSACTION:
+    case ETransition.PARTNER_CONFIRM_SUB_ORDER:
+    case ETransition.PARTNER_REJECT_SUB_ORDER:
       return 'StateItemToolTip.initialTx';
     case ETransition.START_DELIVERY:
       return 'StateItemToolTip.stateDelivering';
@@ -44,6 +50,8 @@ const txStateToLabelMapper = (lastTransition: string) => {
     case ETransition.CANCEL_DELIVERY:
       return 'StateItemToolTip.stateCanceled';
     case ETransition.OPERATOR_CANCEL_PLAN:
+    case ETransition.OPERATOR_CANCEL_AFTER_PARTNER_CONFIRMED:
+    case ETransition.OPERATOR_CANCEL_AFTER_PARTNER_REJECTED:
       return 'StateItemToolTip.stateSubOrderCanceled';
 
     default:

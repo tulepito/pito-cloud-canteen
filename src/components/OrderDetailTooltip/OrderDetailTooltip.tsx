@@ -20,14 +20,14 @@ const OrderDetailTooltip = ({
           lastTransition,
           transactionId,
           totalPrice = 0,
-        } = orderDetail[key];
+        } = orderDetail[key] || {};
 
         return (
           <div key={key} className={css.orderDetailTooltipItem}>
             <StateItem
               className={css.stateItem}
               data={{
-                tx: {
+                orderData: {
                   lastTransition,
                   transactionId,
                 },

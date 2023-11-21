@@ -129,7 +129,7 @@ export const bookerMarkInprogressPlanViewedApi = ({
 };
 
 // Allow picking for order
-export const bookerPublishOrderApi = (orderId: string) => {
+export const publishOrderApi = (orderId: string) => {
   return postApi(`/orders/${orderId}/publish-order`);
 };
 
@@ -203,12 +203,26 @@ export const initializePaymentApi = (orderId: string, planId: string) =>
 export const updateOrderStateToDraftApi = (orderId: string) =>
   putApi(`/orders/${orderId}/update-order-state-to-draft`);
 
-export const recommendRestaurantApi = (orderId: string, dateTime?: number) =>
+export const recommendRestaurantApi = ({
+  orderId,
+  dateTime,
+  recommendParams,
+}: {
+  orderId: string;
+  dateTime?: number;
+  recommendParams?: TObject;
+}) =>
   getApi(`/orders/${orderId}/restaurants-recommendation`, {
     timestamp: dateTime,
+    recommendParams,
   });
 export const updateOrderDetailFromDraftApi = (orderId: string, body: TObject) =>
   putApi(`/orders/${orderId}/update-order-detail-from-draft`, body);
 
 export const updatePaymentApi = (orderId: string, planId: string) =>
   putApi(`/orders/${orderId}/plan/${planId}/update-payment`);
+
+export const adminNotifyUserPickingOrderChangesApi = (
+  orderId: string,
+  params: TObject,
+) => postApi(`/orders/${orderId}/notify-user-picking-order-changes`, params);

@@ -216,7 +216,7 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
       memberAmount !== +memberAmountValue;
 
     const { payload: newOrderDetail } = await dispatch(
-      orderAsyncActions.recommendRestaurants(),
+      orderAsyncActions.recommendRestaurants({}),
     );
 
     if (!isEqual(orderDetail, newOrderDetail) && changedOrderDetailFactor) {

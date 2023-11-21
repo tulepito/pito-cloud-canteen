@@ -25,10 +25,11 @@ const AddMorePlan: React.FC<TAddMorePlanProps> = ({
   onClick = () => null,
 }) => {
   const dateInNumberType = Number(date);
-  const { startDate, endDate } = resources;
+  const { startDate, endDate, shouldHideAddMorePlan = false } = resources;
   const isValidDate =
     dateInNumberType >= startDate && dateInNumberType <= endDate;
-  const showCondition = !loading && events.length < 1 && isValidDate;
+  const showCondition =
+    !shouldHideAddMorePlan && !loading && events.length < 1 && isValidDate;
 
   const handleClick = () => {
     onClick(date);

@@ -58,11 +58,19 @@ export const useGetPlanDetails = () => {
   );
 
   const dispatch = useAppDispatch();
+  const orderListing = Listing(order as TListing);
+  const { plans, deliveryHour, daySession, orderState } =
+    orderListing.getMetadata();
 
   const normalizeData = useMemo(() => {
     return normalizePlanDetailsToEvent(
       orderDetail,
-      order,
+      {
+        plans,
+        deliveryHour,
+        daySession,
+        orderState,
+      },
       restaurantCoverImageList,
     );
   }, [
@@ -70,7 +78,6 @@ export const useGetPlanDetails = () => {
     JSON.stringify(order),
     JSON.stringify(orderDetail),
   ]);
-  const { plans = [] } = Listing(order as TListing).getMetadata();
 
   useEffect(() => {
     if (order) {
@@ -80,7 +87,7 @@ export const useGetPlanDetails = () => {
 
   useEffect(() => {
     if (normalizeData && normalizeData.length > 0) {
-      dispatch(orderAsyncActions.fetchRestaurantCoverImages());
+      dispatch(orderAsyncActions.fetchRestaurantCoverImages({}));
     }
   }, [dispatch, JSON.stringify(normalizeData)]);
 

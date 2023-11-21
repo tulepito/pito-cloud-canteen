@@ -3,16 +3,11 @@ import uniq from 'lodash/uniq';
 import {
   calculatePriceQuotationPartner,
   calculateTotalPriceAndDishes,
-  vatPercentageBaseOnVatSetting,
+  ensureVATSetting,
 } from '@helpers/order/cartInfoHelper';
 import { Listing } from '@src/utils/data';
 import { formatTimestamp, getTimePeriodBetweenDates } from '@src/utils/dates';
-import {
-  EOrderType,
-  EPartnerVATSetting,
-  ETimeFrame,
-  ETimePeriodOption,
-} from '@src/utils/enums';
+import { EOrderType, ETimeFrame, ETimePeriodOption } from '@src/utils/enums';
 import { ETransition } from '@src/utils/transaction';
 import type { TChartPoint, TListing, TObject } from '@src/utils/types';
 
@@ -83,21 +78,12 @@ export const splitSubOrders = (
         const dayIndex = new Date(Number(subOrderDate)).getDay();
         const subOrderTitle = `${orderTitle}-${dayIndex > 0 ? dayIndex : 7}`;
 
-        const vatSettingFromOrder = vatSettings[restaurantListingId];
-        const partnerVATSetting =
-          vatSettingFromOrder in EPartnerVATSetting
-            ? vatSettingFromOrder
-            : EPartnerVATSetting.vat;
-        const vatPercentage = vatPercentageBaseOnVatSetting({
-          vatSetting: partnerVATSetting,
-          vatPercentage: orderVATPercentage || currentOrderVATPercentage,
-        });
         const partnerQuotation = calculatePriceQuotationPartner({
           quotation: quotation[restaurantListingId]?.quotation,
           serviceFeePercentage: serviceFees[restaurantListingId],
-          currentOrderVATPercentage: vatPercentage,
-          shouldSkipVAT: partnerVATSetting === EPartnerVATSetting.direct,
+          orderVATPercentage: orderVATPercentage || currentOrderVATPercentage,
           subOrderDate,
+          vatSetting: ensureVATSetting(vatSettings[restaurantListingId]),
         });
 
         const { totalDishes } = calculateTotalPriceAndDishes({

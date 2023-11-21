@@ -37,6 +37,8 @@ export enum EBadgeType {
   darkBlue = 'darkBlue',
   strongSuccess = 'strongSuccess',
   strongDanger = 'strongDanger',
+  strongWarning = 'strongWarning',
+  strongDefault = 'strongDefault',
 }
 
 type TBadgeProps = {
@@ -71,6 +73,8 @@ const Badge: React.FC<TBadgeProps> = (props) => {
     [css.darkBlue]: type === EBadgeType.darkBlue,
     [css.strongSuccess]: type === EBadgeType.strongSuccess,
     [css.strongDanger]: type === EBadgeType.strongDanger,
+    [css.strongWarning]: type === EBadgeType.strongWarning,
+    [css.strongDefault]: type === EBadgeType.strongDefault,
   };
 
   const badgeContainerClassName = classNames(

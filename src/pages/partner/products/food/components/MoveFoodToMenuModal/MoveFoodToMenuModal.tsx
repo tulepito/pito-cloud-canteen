@@ -148,6 +148,7 @@ const MoveFoodToMenuModal: React.FC<TMoveFoodToMenuModalProps> = (props) => {
         ...searchValues,
       }),
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(filterValues), JSON.stringify(searchValues)]);
 
   return (

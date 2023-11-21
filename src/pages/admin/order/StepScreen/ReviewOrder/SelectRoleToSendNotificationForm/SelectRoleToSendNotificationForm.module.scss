@@ -1,0 +1,15 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.text {
+  @include textTemplate(14px, $fontWeightRegular, 20px);
+  color: $neutralGray6;
+  margin-top: 28px;
+  margin-bottom: 28px;
+}
+
+.submitButton {
+  width: 100%;
+  margin-top: 28px;
+}

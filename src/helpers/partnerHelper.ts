@@ -1,7 +1,8 @@
 import { DateTime } from 'luxon';
 
+import { CurrentUser } from '@src/utils/data';
 import { getSubmitImageId, getUniqueImages } from '@src/utils/images';
-import type { TOwnListing } from '@src/utils/types';
+import type { TCurrentUser, TObject, TOwnListing } from '@src/utils/types';
 
 export const createSubmitUpdatePartnerValues = (
   values: any,
@@ -78,4 +79,16 @@ export const createSubmitUpdatePartnerValues = (
   };
 
   return submittedValues;
+};
+
+export const checkPartnerWasRemovedFromSubOrder = (
+  partner: TCurrentUser,
+  subOrder: TObject,
+) => {
+  const { restaurant = {} } = subOrder || {};
+  const { id: restaurantId } = restaurant;
+  const partnerUser = CurrentUser(partner);
+  const { restaurantListingId } = partnerUser.getMetadata();
+
+  return restaurantId !== restaurantListingId;
 };

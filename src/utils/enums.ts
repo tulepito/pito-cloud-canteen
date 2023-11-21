@@ -312,6 +312,15 @@ export enum ESubOrderStatus {
   delivering = 'delivering',
 }
 
+export enum EEditOrderHistoryType {
+  addFood = 'ADD_FOOD',
+  deleteFood = 'DELETE_FOOD',
+  changeRestaurant = 'CHANGE_RESTAURANT',
+  changePCCFee = 'CHANGE_PCC_FEE',
+  changeShipperName = 'CHANGE_SHIPPER_NAME',
+  changeStaffName = 'CHANGE_STAFF_NAME',
+}
+
 export enum EEditSubOrderHistoryType {
   MEMBER_FOOD_CHANGED = 'MEMBER_FOOD_CHANGED',
   MEMBER_FOOD_REMOVED = 'MEMBER_FOOD_REMOVED',
@@ -373,6 +382,31 @@ export enum EOrderPaymentStatus {
   isNotPaid = 'isNotPaid',
 }
 
+export const CONFIGS_BASE_ON_PAYMENT_STATUS = {
+  [EOrderPaymentStatus.isPaid]: {
+    label: 'Đã thanh toán',
+    badgeType: EBadgeType.success,
+  },
+  [EOrderPaymentStatus.isNotPaid]: {
+    label: 'Chưa thanh toán',
+    badgeType: EBadgeType.warning,
+  },
+};
+
+export enum ENativeNotificationType {
+  BookerTransitOrderStateToPicking = 'BookerTransitOrderStateToPicking',
+  BookerTransitOrderStateToInProgress = 'BookerTransitOrderStateToInProgress',
+  AdminTransitSubOrderToDelivering = 'AdminTransitSubOrderToDelivering',
+  AdminTransitSubOrderToDelivered = 'AdminTransitSubOrderToDelivered',
+  AdminTransitSubOrderToCanceled = 'AdminTransitSubOrderToCanceled',
+  TransitOrderStateToCanceled = 'TransitOrderStateToCanceled',
+  AdminTransitFoodStateToApprove = 'AdminTransitFoodStateToApprove',
+  AdminTransitFoodStateToReject = 'AdminTransitFoodStateToReject',
+  AdminUpdateOrder = 'AdminUpdateOrder',
+  PartnerTransitOrderToCanceled = 'PartnerTransitOrderToCanceled',
+  PartnerEditSubOrder = 'PartnerEditSubOrder',
+}
+
 export enum EFoodApprovalState {
   PENDING = 'pending',
   ACCEPTED = 'accepted',
@@ -399,26 +433,6 @@ export enum ESlackNotificationType {
   UPDATE_FOOD = 'updateFood',
 }
 
-export const CONFIGS_BASE_ON_PAYMENT_STATUS = {
-  [EOrderPaymentStatus.isPaid]: {
-    label: 'Đã thanh toán',
-    badgeType: EBadgeType.success,
-  },
-  [EOrderPaymentStatus.isNotPaid]: {
-    label: 'Chưa thanh toán',
-    badgeType: EBadgeType.warning,
-  },
-};
-
-export enum ENativeNotificationType {
-  BookerTransitOrderStateToPicking = 'BookerTransitOrderStateToPicking',
-  BookerTransitOrderStateToInProgress = 'BookerTransitOrderStateToInProgress',
-  AdminTransitSubOrderToDelivering = 'AdminTransitSubOrderToDelivering',
-  AdminTransitSubOrderToDelivered = 'AdminTransitSubOrderToDelivered',
-  AdminTransitSubOrderToCanceled = 'AdminTransitSubOrderToCanceled',
-  TransitOrderStateToCanceled = 'TransitOrderStateToCanceled',
-}
-
 export enum QuizStep {
   NEW_ORDER = 'new',
   PACKAGE_PER_MEMBER = 'perpack-member-amount',
@@ -427,6 +441,15 @@ export enum QuizStep {
   MEAL_DATE = 'meal-date',
   INVITE_MEMBER = 'invite-member',
   ORDER_CREATING = 'order-creating',
+}
+
+export enum EOnWheelOrderStatus {
+  idle = 'IDLE',
+  inProcess = 'IN PROCESS',
+  cancelled = 'CANCELLED',
+  completed = 'COMPLETED',
+  accepted = 'ACCEPTED',
+  assigning = 'ASSIGNING',
 }
 
 export enum EFluctuationType {

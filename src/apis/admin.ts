@@ -79,3 +79,42 @@ export const fetchFoodListFromMenuApi = (params: TObject) =>
 
 export const responseApprovalRequestApi = (body: TObject) =>
   postApi('/admin/listings/foods/response-approval-request', body);
+
+export const queryRestaurantListingsApi = (params: TObject) =>
+  getApi('/admin/listings/restaurant/query', params);
+
+export const handleSendNotificationParticipantAfterEditInProgressOrderApi = (
+  orderId: string,
+  body: TObject,
+) =>
+  putApi(
+    `/admin/listings/order/${orderId}/handle-send-notification-participant-after-edit-in-progress-order`,
+    body,
+  );
+
+export const handleSendNotificationPartnerAfterEditInProgressOrderApi = (
+  orderId: string,
+  body: TObject,
+) =>
+  putApi(
+    `/admin/listings/order/${orderId}/handle-send-notification-partner-after-edit-in-progress-order`,
+    body,
+  );
+
+export const handleSendNotificationPartnerAfterEditInProgressOrderDetailApi = (
+  orderId: string,
+  body: TObject,
+) =>
+  putApi(
+    `/admin/listings/order/${orderId}/handle-send-notification-partner-after-edit-in-progress-order-detail`,
+    body,
+  );
+
+export const handleDeleteOldDataAfterEditInProgressOrderApi = (
+  orderId: string,
+  body: TObject,
+) =>
+  putApi(
+    `/admin/listings/order/${orderId}/handle-delete-old-data-after-edit-in-progress-order`,
+    body,
+  );

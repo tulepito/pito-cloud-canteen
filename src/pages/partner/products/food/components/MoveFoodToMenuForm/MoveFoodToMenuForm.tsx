@@ -129,6 +129,7 @@ const MoveFoodToMenuFormComponent: React.FC<
 
   useEffect(() => {
     setFormValues?.(values);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(values)]);
 
   return (

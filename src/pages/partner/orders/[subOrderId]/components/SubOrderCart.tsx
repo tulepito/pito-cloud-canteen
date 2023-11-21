@@ -10,15 +10,14 @@ import Button from '@components/Button/Button';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { parseThousandNumber } from '@helpers/format';
 import {
-  calculatePriceQuotationInfo,
-  vatPercentageBaseOnVatSetting,
+  calculatePriceQuotationInfoFromOrder,
+  ensureVATSetting,
 } from '@helpers/order/cartInfoHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { useDownloadPriceQuotation } from '@hooks/useDownloadPriceQuotation';
 import { usePrepareOrderDetailPageData } from '@hooks/usePrepareOrderManagementData';
 import { orderManagementThunks } from '@redux/slices/OrderManagement.slice';
 import { CurrentUser, Listing } from '@src/utils/data';
-import { EPartnerVATSetting } from '@src/utils/enums';
 import type { TListing } from '@utils/types';
 
 import css from './SubOrderCart.module.scss';
@@ -62,15 +61,7 @@ const SubOrderCart: React.FC<TSubOrderCartProps> = (props) => {
   const { orderDetail: planOrderDetail = {} } = planGetter.getMetadata();
   const serviceFeePercentage =
     serviceFeePercentageMap[restaurantListingId] || 0;
-  const vatSettingFromOrder = vatSettings[restaurantListingId];
-  const vatSetting =
-    vatSettingFromOrder in EPartnerVATSetting
-      ? vatSettingFromOrder
-      : EPartnerVATSetting.vat;
-  const vatPercentage = vatPercentageBaseOnVatSetting({
-    vatSetting,
-    vatPercentage: orderVATPercentage,
-  });
+  const vatSetting = ensureVATSetting(vatSettings[restaurantListingId]);
 
   const {
     promotion = 0,
@@ -79,20 +70,25 @@ const SubOrderCart: React.FC<TSubOrderCartProps> = (props) => {
     totalWithoutVAT = 0,
     totalWithVAT = 0,
     VATFee = 0,
-  } = calculatePriceQuotationInfo({
+    vatPercentage,
+  } = calculatePriceQuotationInfoFromOrder({
     planOrderDetail,
     order,
-    currentOrderVATPercentage: vatPercentage,
-    currentOrderServiceFeePercentage: serviceFeePercentage / 100,
+    orderVATPercentage,
+    orderServiceFeePercentage: serviceFeePercentage / 100,
     date,
     shouldIncludePITOFee: false,
+    vatSetting,
+    isPartner: true,
   });
 
   const { orderTitle, priceQuotationData } = usePrepareOrderDetailPageData({
     date,
     partnerId: restaurantListingId,
-    VATPercentage: vatPercentage,
+    VATPercentage: orderVATPercentage,
     serviceFeePercentage: serviceFeePercentage / 100,
+    isPartner: true,
+    vatSetting,
   });
   const handleDownloadPriceQuotation = useDownloadPriceQuotation({
     orderTitle,

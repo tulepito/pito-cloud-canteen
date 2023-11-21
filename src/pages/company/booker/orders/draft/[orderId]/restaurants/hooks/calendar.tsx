@@ -106,7 +106,9 @@ export const useGetCalendarExtraResources = ({
           DateTime.fromMillis(date).toJSDate(),
         ),
       );
-      dispatch(orderAsyncActions.recommendRestaurantForSpecificDay(date));
+      dispatch(
+        orderAsyncActions.recommendRestaurantForSpecificDay({ dateTime: date }),
+      );
     },
     [dispatch],
   );
@@ -171,8 +173,8 @@ export const useGetCalendarComponentProps = ({
 }) => {
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const bookerPublishOrderInProgress = useAppSelector(
-    (state) => state.Order.bookerPublishOrderInProgress,
+  const publishOrderInProgress = useAppSelector(
+    (state) => state.Order.publishOrderInProgress,
   );
   const onRecommendRestaurantInProgress = useAppSelector(
     (state) => state.Order.onRecommendRestaurantInProgress,
@@ -193,7 +195,7 @@ export const useGetCalendarComponentProps = ({
     if (!onRecommendRestaurantInProgress) {
       dispatch(setOnRecommendRestaurantInProcess(true));
       const { payload: recommendOrderDetail }: any = await dispatch(
-        orderAsyncActions.recommendRestaurants(),
+        orderAsyncActions.recommendRestaurants({}),
       );
       await dispatch(
         orderAsyncActions.updatePlanDetail({
@@ -213,7 +215,7 @@ export const useGetCalendarComponentProps = ({
         startDate={startDate.getTime()}
         endDate={endDate.getTime()}
         finishDisabled={isFinishOrderDisabled}
-        finishInProgress={bookerPublishOrderInProgress}
+        finishInProgress={publishOrderInProgress}
         onFinishOrder={handleFinishOrder}
         onRecommendRestaurantInProgress={onRecommendRestaurantInProgress}
         onRecommendNewRestaurants={onRecommendNewRestaurants}
@@ -224,7 +226,7 @@ export const useGetCalendarComponentProps = ({
       startDate,
       endDate,
       isFinishOrderDisabled,
-      bookerPublishOrderInProgress,
+      publishOrderInProgress,
       onRecommendRestaurantInProgress,
     ],
   );

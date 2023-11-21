@@ -98,6 +98,74 @@ export const getMenuQuery = ({
   return query;
 };
 
+export const getMenuQueryWithDraftOrderData = ({
+  params,
+  orderParams,
+}: any) => {
+  const {
+    timestamp,
+    menuTypes = [],
+    favoriteRestaurantIdList = [],
+    favoriteFoodIdList = [],
+    keywords = '',
+    page,
+    perPage,
+  } = params;
+  const {
+    nutritions = [],
+    mealType: mealFoodType = [],
+    packagePerMember,
+    daySession,
+  } = orderParams;
+  const dateTime = DateTime.fromMillis(timestamp).setZone(VNTimezone);
+  const dayOfWeek = convertWeekDay(dateTime.weekday).key;
+  const mealType = deliveryDaySessionAdapter(daySession);
+  const convertedMealFoodType = mealFoodType.map((item: string) =>
+    mealTypeAdapter(item),
+  );
+
+  const query = {
+    meta_listingState: EListingStates.published,
+    meta_listingType: EListingType.menu,
+    pub_startDate: `,${dateTime.toMillis() + 1}`,
+    pub_endDate: `${dateTime.toMillis()},`,
+    pub_daysOfWeek: `has_any:${dayOfWeek}`,
+    pub_mealType: mealType,
+    meta_isDeleted: false,
+    ...(menuTypes.length > 0 ? { meta_menuType: menuTypes.join(',') } : {}),
+    ...(nutritions.length > 0
+      ? {
+          [`meta_${dayOfWeek}Nutritions`]: `has_any:${nutritions.join(',')}`,
+        }
+      : {}),
+    ...(favoriteRestaurantIdList.length > 0
+      ? {
+          meta_restaurantId: favoriteRestaurantIdList.join(','),
+        }
+      : {}),
+    ...(favoriteFoodIdList.length > 0
+      ? {
+          [`meta_${dayOfWeek}FoodIdList`]: `has_any:${favoriteFoodIdList.join(
+            ',',
+          )}`,
+        }
+      : {}),
+    [`pub_${dayOfWeek}MinFoodPrice`]: `,${packagePerMember + 1}`,
+    ...(mealFoodType.length > 0
+      ? {
+          [`meta_${dayOfWeek}FoodType`]: `has_any:${convertedMealFoodType.join(
+            ',',
+          )}`,
+        }
+      : {}),
+    ...(keywords && { keywords }),
+    ...(page && { page }),
+    ...(perPage && { perPage }),
+  };
+
+  return query;
+};
+
 export const getRestaurantQuery = ({
   restaurantIds,
   companyAccount,

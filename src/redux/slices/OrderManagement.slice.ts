@@ -4,9 +4,10 @@ import { createSlice } from '@reduxjs/toolkit';
 import groupBy from 'lodash/groupBy';
 import isEmpty from 'lodash/isEmpty';
 import omit from 'lodash/omit';
+import set from 'lodash/set';
 
 import {
-  createOrderChangesHistoryDocumentApi,
+  createSubOrderChangesHistoryDocumentApi,
   participantSubOrderAddDocumentApi,
   participantSubOrderGetByIdApi,
   participantSubOrderUpdateDocumentApi,
@@ -31,6 +32,7 @@ import {
   updatePaymentApi,
   updatePlanDetailsApi,
 } from '@apis/orderApi';
+import { fetchTxApi } from '@apis/txApi';
 import { checkUserExistedApi } from '@apis/userApi';
 import { EOrderDetailsTableTab } from '@components/OrderDetails/EditView/ManageOrderDetailSection/OrderDetailsTable/OrderDetailsTable.utils';
 import {
@@ -56,9 +58,11 @@ import type {
   TListing,
   TObject,
   TSubOrderChangeHistoryItem,
+  TTransaction,
   TUser,
 } from '@utils/types';
 
+import { setOrderDetail } from './Order.slice';
 import { SystemAttributesThunks } from './systemAttributes.slice';
 
 export const QUERY_SUB_ORDER_CHANGES_HISTORY_PER_PAGE = 3;
@@ -279,6 +283,9 @@ type TOrderManagementState = {
   //
   addOrUpdateMemberOrderInProgress: boolean;
   addOrUpdateMemberOrderError: any;
+  // transactions
+  queryTransactionsInProgress: boolean;
+  transactionMap: TObject<string, TTransaction>;
 
   isStartOrderInProgress: boolean;
   // Data states
@@ -300,7 +307,7 @@ type TOrderManagementState = {
   draftSubOrderChangesHistory: Record<string, TSubOrderChangeHistoryItem[]>;
 
   updateOrderFromDraftEditInProgress: boolean;
-  updateOrderfromDraftEditError: any;
+  updateOrderFromDraftEditError: any;
 
   draftOrderDetail: TPlan['orderDetail'];
   quotation: TObject;
@@ -336,6 +343,8 @@ const initialState: TOrderManagementState = {
   updateParticipantsError: null,
   addOrUpdateMemberOrderInProgress: false,
   addOrUpdateMemberOrderError: null,
+  queryTransactionsInProgress: false,
+  transactionMap: {},
   isStartOrderInProgress: false,
   companyId: null,
   companyData: null,
@@ -354,7 +363,7 @@ const initialState: TOrderManagementState = {
   subOrderChangesHistoryTotalItems: 0,
   loadMoreSubOrderChangesHistory: false,
   updateOrderFromDraftEditInProgress: false,
-  updateOrderfromDraftEditError: null,
+  updateOrderFromDraftEditError: null,
   draftSubOrderChangesHistory: {},
   orderValidationsInProgressState: null,
   shouldShowUnderError: false,
@@ -369,6 +378,29 @@ const initialState: TOrderManagementState = {
 const FETCH_QUOTATION = 'app/OrderManagement/FETCH_QUOTATION';
 
 // ================ Async thunks ================ //
+const queryTransactions = createAsyncThunk(
+  'app/OrderManagement/QUERY_TRANSACTIONS',
+  async (payload: { orderDetail: TObject }) => {
+    const { orderDetail } = payload;
+    const transactionMap: TObject = {};
+
+    await Promise.all(
+      Object.entries(orderDetail).map(async (entry) => {
+        const [subOrderDate, subOrderDateData] = entry;
+        const { transactionId } = (subOrderDateData as TObject) || {};
+
+        if (transactionId) {
+          const txResponse = await fetchTxApi(transactionId);
+
+          transactionMap[subOrderDate as string] = txResponse.data;
+        }
+      }),
+    );
+
+    return transactionMap;
+  },
+);
+
 const loadData = createAsyncThunk(
   'app/OrderManagement/LOAD_DATA',
   async (payload: { orderId: string; isAdminFlow?: boolean }, { dispatch }) => {
@@ -382,6 +414,7 @@ const loadData = createAsyncThunk(
 
       const { orderDetail = {} } = Listing(planData).getMetadata();
 
+      dispatch(queryTransactions({ orderDetail }));
       dispatch(AdminManageOrderActions.saveOrder(orderData));
       dispatch(AdminManageOrderActions.saveOrderDetail(orderDetail));
     }
@@ -611,9 +644,9 @@ const disallowMember = createAsyncThunk(
       attributes: { metadata },
     } = getState().OrderManagement.planData!;
 
-    const memberOrderDetailOnUpdateDate =
-      metadata?.orderDetail[currentViewDate].memberOrders[memberId];
-    const { status } = memberOrderDetailOnUpdateDate || {};
+    const { memberOrders = {} } = metadata?.orderDetail[currentViewDate] || {};
+    const memberOrderDetailOnUpdateDate = memberOrders?.[memberId];
+    const { status } = memberOrders?.[memberId] || {};
 
     const validStatuses = [
       EParticipantOrderStatus.notJoined,
@@ -696,7 +729,8 @@ const deleteDisAllowedMember = createAsyncThunk(
       attributes: { metadata },
     } = getState().OrderManagement.planData!;
 
-    const oldMemberOrders = metadata.orderDetail[currentViewDate].memberOrders;
+    const { memberOrders: oldMemberOrders = {} } =
+      metadata?.orderDetail[currentViewDate] || {};
     const newMemberOrders = (memberIds as string[]).reduce<TObject>(
       (result, memberId) => {
         return omit(result, memberId);
@@ -938,13 +972,16 @@ const updatePlanOrderDetail = createAsyncThunk(
       planId,
       orderDetail,
     }: { orderId: string; planId: string; orderDetail: TObject },
-    { fulfillWithValue, rejectWithValue },
+    { fulfillWithValue, rejectWithValue, dispatch },
   ) => {
     try {
       updatePlanDetailsApi(orderId, {
         orderDetail,
         planId,
       });
+
+      // sync the order detail to order reducer
+      dispatch(setOrderDetail(orderDetail));
 
       return fulfillWithValue(orderDetail);
     } catch (error) {
@@ -1016,7 +1053,7 @@ const updateOrderFromDraftEdit = createAsyncThunk(
                   newValue,
                   createdAt: new Date(Number(createdAt?.seconds) * 1000),
                 };
-                await createOrderChangesHistoryDocumentApi(
+                await createSubOrderChangesHistoryDocumentApi(
                   orderId,
                   subOrderChangesHistoryParams,
                 );
@@ -1710,6 +1747,17 @@ const OrderManagementSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      /* =============== queryTransactions =============== */
+      .addCase(queryTransactions.pending, (state) => {
+        state.queryTransactionsInProgress = true;
+      })
+      .addCase(queryTransactions.fulfilled, (state, { payload }) => {
+        state.queryTransactionsInProgress = false;
+        state.transactionMap = payload;
+      })
+      .addCase(queryTransactions.rejected, (state) => {
+        state.queryTransactionsInProgress = false;
+      })
       /* =============== loadData =============== */
       .addCase(loadData.pending, (state) => {
         state.fetchOrderInProgress = true;
@@ -1890,10 +1938,8 @@ const OrderManagementSlice = createSlice({
           const { lastRecordCreatedAt } = arg;
           state.querySubOrderChangesHistoryError = null;
 
-          // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-          lastRecordCreatedAt
-            ? (state.loadMoreSubOrderChangesHistory = true)
-            : (state.querySubOrderChangesHistoryInProgress = true);
+          if (lastRecordCreatedAt) state.loadMoreSubOrderChangesHistory = true;
+          else state.querySubOrderChangesHistoryInProgress = true;
         },
       )
       .addCase(
@@ -1901,16 +1947,13 @@ const OrderManagementSlice = createSlice({
         (state, { payload, meta: { arg } }) => {
           const { lastRecordCreatedAt } = arg;
           const { data: items, totalItems } = payload;
-          // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-          lastRecordCreatedAt
-            ? (state.loadMoreSubOrderChangesHistory = false)
-            : (state.querySubOrderChangesHistoryInProgress = false);
+          if (lastRecordCreatedAt) state.loadMoreSubOrderChangesHistory = false;
+          else state.querySubOrderChangesHistoryInProgress = false;
           state.subOrderChangesHistory = lastRecordCreatedAt
-            ? [...state.subOrderChangesHistory, ...items]
+            ? state.subOrderChangesHistory.concat(items)
             : items;
           state.subOrderChangesHistoryTotalItems = totalItems;
           state.lastRecordSubOrderChangesHistoryCreatedAt =
-            // eslint-disable-next-line no-unsafe-optional-chaining
             items?.[items.length - 1]?.createdAt?.seconds;
         },
       )
@@ -1918,23 +1961,21 @@ const OrderManagementSlice = createSlice({
         querySubOrderChangesHistory.rejected,
         (state, { error, meta: { arg } }) => {
           const { lastRecordCreatedAt } = arg;
-          // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-          lastRecordCreatedAt
-            ? (state.loadMoreSubOrderChangesHistory = false)
-            : (state.querySubOrderChangesHistoryInProgress = false);
+          if (lastRecordCreatedAt) state.loadMoreSubOrderChangesHistory = false;
+          else state.querySubOrderChangesHistoryInProgress = false;
           state.querySubOrderChangesHistoryError = error;
         },
       )
       .addCase(updateOrderFromDraftEdit.pending, (state) => {
         state.updateOrderFromDraftEditInProgress = true;
-        state.updateOrderfromDraftEditError = null;
+        state.updateOrderFromDraftEditError = null;
       })
       .addCase(updateOrderFromDraftEdit.fulfilled, (state) => {
         state.updateOrderFromDraftEditInProgress = false;
       })
       .addCase(updateOrderFromDraftEdit.rejected, (state, { error }) => {
         state.updateOrderFromDraftEditInProgress = false;
-        state.updateOrderfromDraftEditError = error;
+        state.updateOrderFromDraftEditError = error;
       })
 
       /* =============== updatePlanOrderDetail =============== */
@@ -1969,101 +2010,47 @@ const OrderManagementSlice = createSlice({
       })
 
       .addCase(disallowMember.fulfilled, (state, { payload }) => {
-        state.planData = {
-          ...state.planData,
-          attributes: {
-            ...state.planData.attributes,
-            metadata: {
-              ...state.planData.attributes.metadata,
-              orderDetail: {
-                ...state.planData.attributes.metadata.orderDetail,
-                [payload?.currentViewDate]: {
-                  ...state.planData.attributes.metadata.orderDetail[
-                    payload?.currentViewDate
-                  ],
-                  memberOrders: {
-                    ...state.planData.attributes.metadata.orderDetail[
-                      payload?.currentViewDate
-                    ].memberOrders,
-                    [payload?.participantId]: {
-                      ...state.planData.attributes.metadata.orderDetail[
-                        payload?.currentViewDate
-                      ].memberOrders[payload?.participantId],
-                      status: EParticipantOrderStatus.notAllowed,
-                    },
-                  },
-                },
-              },
-            },
-          },
-        };
-        state.draftOrderDetail = {
-          ...state.draftOrderDetail,
-          ...state.draftOrderDetail,
-          [payload?.currentViewDate]: {
-            ...state.draftOrderDetail[payload?.currentViewDate],
-            memberOrders: {
-              ...state.draftOrderDetail[payload?.currentViewDate].memberOrders,
-              [payload?.participantId]: {
-                ...state.draftOrderDetail[payload?.currentViewDate]
-                  .memberOrders[payload?.participantId],
-                status: EParticipantOrderStatus.notAllowed,
-              },
-            },
-          },
-        };
+        const { currentViewDate, participantId } = payload || {};
+
+        set(
+          state.planData.attributes.metadata.orderDetail,
+          `${currentViewDate}.memberOrders.${participantId}.status`,
+          EParticipantOrderStatus.notAllowed,
+        );
+
+        set(
+          state.draftOrderDetail,
+          `${currentViewDate}.memberOrders.${participantId}.status`,
+          EParticipantOrderStatus.notAllowed,
+        );
       })
 
       .addCase(restoredDisAllowedMember.fulfilled, (state, { payload }) => {
-        state.planData = {
-          ...state.planData,
-          attributes: {
-            ...state.planData.attributes,
-            metadata: {
-              ...state.planData.attributes.metadata,
-              orderDetail: {
-                ...state.planData.attributes.metadata.orderDetail,
-                [payload?.currentViewDate]: {
-                  ...state.planData.attributes.metadata.orderDetail[
-                    payload?.currentViewDate
-                  ],
-                  memberOrders: {
-                    ...state.planData.attributes.metadata.orderDetail[
-                      payload?.currentViewDate
-                    ].memberOrders,
-                    ...payload.newMembersOrderValues,
-                  },
-                },
-              },
-            },
+        const { currentViewDate, newMembersOrderValues } = payload || {};
+
+        set(
+          state.planData.attributes.metadata.orderDetail,
+          `${currentViewDate}.memberOrders`,
+          {
+            ...state.planData.attributes.metadata.orderDetail[currentViewDate]
+              .memberOrders,
+            ...newMembersOrderValues,
           },
-        };
-        state.draftOrderDetail = {
-          ...state.draftOrderDetail,
-          ...state.draftOrderDetail,
-          [payload?.currentViewDate]: {
-            ...state.draftOrderDetail[payload?.currentViewDate],
-            memberOrders: {
-              ...state.draftOrderDetail[payload?.currentViewDate].memberOrders,
-              ...payload.newMembersOrderValues,
-            },
-          },
-        };
+        );
+
+        set(state.draftOrderDetail, `${currentViewDate}.memberOrders`, {
+          ...state.draftOrderDetail[currentViewDate].memberOrders,
+          ...newMembersOrderValues,
+        });
       })
 
       .addCase(deleteDisAllowedMember.fulfilled, (state, { payload }) => {
-        state.planData = {
-          ...state.planData,
-          attributes: {
-            ...state.planData.attributes,
-            metadata: {
-              ...state.planData.attributes.metadata,
-              orderDetail: {
-                ...payload.orderDetail,
-              },
-            },
-          },
-        };
+        set(
+          state.planData,
+          `attributes.metadata.orderDetail`,
+          payload.orderDetail,
+        );
+
         state.draftOrderDetail = {
           ...state.draftOrderDetail,
           ...payload.orderDetail,

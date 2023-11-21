@@ -23,10 +23,13 @@
     @include viewportLargeWithPaddings {
       display: grid;
       grid-template-columns: 1fr 250px;
+      grid-template-rows: 1fr auto;
       column-gap: 24px;
     }
 
     .leftPart {
+      grid-row: 1;
+      grid-column: 1;
       .mobileSubOrderCartWrapper {
         display: block;
         @include viewportLarge {
@@ -50,9 +53,43 @@
       }
     }
     .rightPart {
+      grid-row: 1;
+      grid-column: 2;
       display: none;
       @include viewportLarge {
         display: block;
+      }
+    }
+
+    .subOrderSummaryActionWrapper {
+      display: none;
+      justify-content: flex-end;
+      column-gap: 16px;
+      margin-top: 20px;
+
+      button {
+        padding: 12px 0;
+        max-width: 170px;
+        min-height: unset;
+        flex-basis: 170px;
+      }
+
+      @include viewportMedium {
+        display: flex;
+      }
+
+      @include viewportLargeWithPaddings {
+        margin-top: 0;
+      }
+    }
+
+    .subOrderSummaryMobileActionWrapper {
+      display: flex;
+      flex-direction: column-reverse;
+      row-gap: 16px;
+
+      @include viewportMedium {
+        display: none;
       }
     }
   }

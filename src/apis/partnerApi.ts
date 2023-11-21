@@ -71,6 +71,7 @@ export const reApprovalFoodApi = (foodId: string) =>
 export const deleteMenusApi = (body: TObject) => {
   return deleteApi(`${BASE_URL}/menus/delete`, body);
 };
+
 export const createDraftMenuApi = (body: TObject) => {
   return postApi(`${BASE_URL}/menus`, body);
 };
@@ -82,4 +83,18 @@ export const publishDraftMenuApi = (body: TObject) => {
 };
 export const getMenuApi = (menuId: string) => {
   return getApi(`${BASE_URL}/menus`, { menuId });
+};
+
+export const transitSubOrderTransactionApi = ({
+  orderId,
+  subOrderDate,
+  transactionId,
+  newTransition,
+  partnerId,
+}: TObject) => {
+  return putApi(`${BASE_URL}/${partnerId}/orders/${orderId}/transit`, {
+    subOrderDate,
+    transactionId,
+    newTransition,
+  });
 };

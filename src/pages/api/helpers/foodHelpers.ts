@@ -566,7 +566,7 @@ export const updateMenuAfterFoodUpdated = async (updatedFoodId: string) => {
           const { orderDetail } = planListing.getMetadata();
           const newOrderDetail = Object.keys(orderDetail).reduce(
             (result, subOrderDate: string) => {
-              const { restaurant } = orderDetail[subOrderDate];
+              const { restaurant = {} } = orderDetail[subOrderDate];
               const { foodList } = restaurant;
 
               const newFoodList = Object.keys(foodList).reduce(

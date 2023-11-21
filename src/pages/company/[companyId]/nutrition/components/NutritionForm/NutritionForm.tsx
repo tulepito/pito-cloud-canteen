@@ -12,7 +12,7 @@ import Table from '@components/Table/Table';
 import { customPristine } from '@helpers/form';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
-import NutritionField from '@pages/admin/order/create/components/NutritionField/NutritionField';
+import NutritionField from '@pages/admin/order/components/NutritionField/NutritionField';
 import { FOOD_CATEGORY_OPTIONS } from '@src/utils/options';
 import { Listing, User } from '@utils/data';
 import type { TUser } from '@utils/types';

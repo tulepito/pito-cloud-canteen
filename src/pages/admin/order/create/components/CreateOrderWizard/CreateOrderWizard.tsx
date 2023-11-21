@@ -1,5 +1,6 @@
+/* eslint-disable import/no-cycle */
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import isEmpty from 'lodash/isEmpty';
@@ -8,22 +9,25 @@ import { useRouter } from 'next/router';
 import FormWizard from '@components/FormWizard/FormWizard';
 import { setItem } from '@helpers/localStorageHelpers';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-// eslint-disable-next-line import/no-cycle
+import ReviewOrder from '@pages/admin/order/StepScreen/ReviewOrder/ReviewOrder';
 import ServiceFeesAndNotes from '@pages/admin/order/StepScreen/ServiceFeesAndNotes/ServiceFeesAndNotes';
+import SetupOrderDetail from '@pages/admin/order/StepScreen/SetupOrderDetail/SetupOrderDetail';
 import { orderAsyncActions, resetStates } from '@redux/slices/Order.slice';
+import { EOrderType } from '@src/utils/enums';
 import { Listing } from '@utils/data';
 import type { TListing } from '@utils/types';
 
 import ClientSelector from '../../../StepScreen/ClientSelector/ClientSelector';
 // eslint-disable-next-line import/no-cycle, import/no-named-as-default
-// eslint-disable-next-line import/no-named-as-default, import/no-cycle
 import MealPlanSetup from '../../../StepScreen/MealPlanSetup/MealPlanSetup';
 // eslint-disable-next-line import/no-cycle
-import ReviewOrder from '../ReviewOrder/ReviewOrder';
-// eslint-disable-next-line import/no-cycle
-import SetupOrderDetail from '../SetupOrderDetail/SetupOrderDetail';
+import FoodQuantitySection from '../FoodQuantitySection/FoodQuantitySection';
 
-import { isGeneralInfoSetupCompleted } from './CreateOrderWizard.helper';
+// eslint-disable-next-line import/no-cycle
+import {
+  checkAllRestaurantsFoodPicked,
+  isGeneralInfoSetupCompleted,
+} from './CreateOrderWizard.helper';
 
 import css from './CreateOrderWizard.module.scss';
 
@@ -31,12 +35,22 @@ export const CLIENT_SELECT_TAB = 'clientSelect';
 export const MEAL_PLAN_SETUP = 'mealPlanSetup';
 export const CREATE_MEAL_PLAN_TAB = 'createMealPlan';
 export const SERVICE_FEE_AND_NOTE_TAB = 'serviceFeeAndNote';
+export const FOOD_QUANTITY_TAB = 'foodQuantity';
 export const REVIEW_TAB = 'review';
 
-export const TABS = [
+export const GROUP_ORDER_TABS = [
   CLIENT_SELECT_TAB,
   MEAL_PLAN_SETUP,
   CREATE_MEAL_PLAN_TAB,
+  SERVICE_FEE_AND_NOTE_TAB,
+  REVIEW_TAB,
+];
+
+export const NORMAL_ORDER_TABS = [
+  CLIENT_SELECT_TAB,
+  MEAL_PLAN_SETUP,
+  CREATE_MEAL_PLAN_TAB,
+  FOOD_QUANTITY_TAB,
   SERVICE_FEE_AND_NOTE_TAB,
   REVIEW_TAB,
 ];
@@ -76,9 +90,11 @@ const tabCompleted = (
         !hasInvalidMealDay
       );
     case SERVICE_FEE_AND_NOTE_TAB:
-      return !isEmpty(notes);
+      return !isEmpty(notes) && isEmpty(missingSelectedFood);
     case REVIEW_TAB:
-      return !!staffName;
+      return !!staffName && isEmpty(missingSelectedFood);
+    case FOOD_QUANTITY_TAB:
+      return isEmpty(missingSelectedFood);
     default:
       return <></>;
   }
@@ -88,14 +104,15 @@ const tabsActive = (
   order: any,
   orderDetail: any,
   availableOrderDetailCheckList: any,
+  tabs: string[],
 ) => {
-  return TABS.reduce((acc, tab) => {
-    const previousTabIndex = TABS.findIndex((t) => t === tab) - 1;
+  return tabs.reduce((acc, tab) => {
+    const previousTabIndex = tabs.findIndex((t) => t === tab) - 1;
     const isActive =
       previousTabIndex < 0 ||
       tabCompleted(
         order,
-        TABS[previousTabIndex],
+        tabs[previousTabIndex],
         orderDetail,
         availableOrderDetailCheckList,
       );
@@ -114,6 +131,8 @@ const CreateOrderTab: React.FC<any> = (props) => {
       return <MealPlanSetup goBack={goBack} nextTab={nextTab} />;
     case CREATE_MEAL_PLAN_TAB:
       return <SetupOrderDetail goBack={goBack} nextTab={nextTab} />;
+    case FOOD_QUANTITY_TAB:
+      return <FoodQuantitySection goBack={goBack} nextTab={nextTab} />;
     case SERVICE_FEE_AND_NOTE_TAB:
       return <ServiceFeesAndNotes goBack={goBack} nextTab={nextTab} />;
     case REVIEW_TAB:
@@ -129,6 +148,7 @@ const CreateOrderWizard = () => {
   const router = useRouter();
   const { orderId } = router.query;
   const [currentStep, setCurrentStep] = useState<string>(CLIENT_SELECT_TAB);
+  const order = useAppSelector((state) => state.Order.order, shallowEqual);
 
   useEffect(() => {
     if (orderId) {
@@ -151,24 +171,32 @@ const CreateOrderWizard = () => {
     saveStep(tab);
   };
 
+  const orderType = Listing(order as TListing).getMetadata()?.orderType;
+  const isNormalOrder = useMemo(
+    () => orderType === EOrderType.normal,
+    [orderType],
+  );
+  const tabsByOrderType = useMemo(
+    () => (isNormalOrder ? NORMAL_ORDER_TABS : GROUP_ORDER_TABS),
+    [orderType],
+  );
+
   const nextTab = (tab: string) => () => {
-    const tabIndex = TABS.indexOf(tab);
-    if (tabIndex < TABS.length - 1) {
-      const backTab = TABS[tabIndex + 1];
-      saveStep(backTab);
+    const tabIndex = tabsByOrderType.indexOf(tab);
+    if (tabIndex < tabsByOrderType.length - 1) {
+      const nextTabValue = tabsByOrderType[tabIndex + 1];
+      saveStep(nextTabValue);
     }
   };
 
   const goBack = (tab: string) => () => {
-    const tabIndex = TABS.indexOf(tab);
+    const tabIndex = tabsByOrderType.indexOf(tab);
     if (tabIndex > 0) {
-      const backTab = TABS[tabIndex - 1];
+      const backTab = tabsByOrderType[tabIndex - 1];
       saveStep(backTab);
     }
   };
 
-  const order = useAppSelector((state) => state.Order.order, shallowEqual);
-  const { staffName, notes = {} } = Listing(order as TListing).getMetadata();
   const step2SubmitInProgress = useAppSelector(
     (state) => state.Order.step2SubmitInProgress,
   );
@@ -179,33 +207,77 @@ const CreateOrderWizard = () => {
     (state) => state.Order.orderDetail,
     shallowEqual,
   );
-  const canNotGoToStep4 = useAppSelector(
-    (state) => state.Order.canNotGoToStep4,
+  const canNotGoAfterOderDetail = useAppSelector(
+    (state) => state.Order.canNotGoAfterOderDetail,
+  );
+  const canNotGoAfterFoodQuantity = useAppSelector(
+    (state) => state.Order.canNotGoAfterFoodQuantity,
+  );
+  const justDeletedMemberOrder = useAppSelector(
+    (state) => state.Order.justDeletedMemberOrder,
   );
   const availableOrderDetailCheckList = useAppSelector(
     (state) => state.Order.availableOrderDetailCheckList,
     shallowEqual,
   );
 
+  const {
+    staffName,
+    notes = {},
+    plans = [],
+  } = Listing(order as TListing).getMetadata();
+
   const tabsStatus = tabsActive(
     order,
     orderDetail,
     availableOrderDetailCheckList,
+    tabsByOrderType,
   ) as any;
 
   useEffect(() => {
     if (order && !step2SubmitInProgress && !step4SubmitInProgress) {
-      if (staffName && !canNotGoToStep4) {
+      const isAllRestaurantsFoodPicked =
+        checkAllRestaurantsFoodPicked(orderDetail);
+      const isCreateMealPlanCompleted = isGeneralInfoSetupCompleted(
+        order as TListing,
+      );
+
+      const canGoToReview =
+        (isNormalOrder &&
+          !canNotGoAfterOderDetail &&
+          !canNotGoAfterFoodQuantity) ||
+        (!isNormalOrder && !canNotGoAfterOderDetail);
+
+      if (
+        staffName &&
+        canGoToReview &&
+        isAllRestaurantsFoodPicked &&
+        isCreateMealPlanCompleted
+      ) {
         setItem(CREATE_ORDER_STEP_LOCAL_STORAGE_NAME, REVIEW_TAB);
 
         return setCurrentStep(REVIEW_TAB);
       }
-      if (!isEmpty(notes) && !canNotGoToStep4) {
+      if (
+        !isEmpty(notes) &&
+        canGoToReview &&
+        isAllRestaurantsFoodPicked &&
+        isCreateMealPlanCompleted
+      ) {
         setItem(CREATE_ORDER_STEP_LOCAL_STORAGE_NAME, SERVICE_FEE_AND_NOTE_TAB);
 
         return setCurrentStep(SERVICE_FEE_AND_NOTE_TAB);
       }
-      if (isGeneralInfoSetupCompleted(order as TListing)) {
+      if (
+        isNormalOrder &&
+        !canNotGoAfterOderDetail &&
+        isAllRestaurantsFoodPicked
+      ) {
+        setItem(CREATE_ORDER_STEP_LOCAL_STORAGE_NAME, FOOD_QUANTITY_TAB);
+
+        return setCurrentStep(FOOD_QUANTITY_TAB);
+      }
+      if (isCreateMealPlanCompleted) {
         setItem(CREATE_ORDER_STEP_LOCAL_STORAGE_NAME, CREATE_MEAL_PLAN_TAB);
 
         return setCurrentStep(CREATE_MEAL_PLAN_TAB);
@@ -219,13 +291,15 @@ const CreateOrderWizard = () => {
     step2SubmitInProgress,
     JSON.stringify(orderDetail),
     step4SubmitInProgress,
+    isNormalOrder,
   ]);
 
   useEffect(() => {
     if (!tabsStatus[currentStep as string]) {
       // If selectedTab is not active, redirect to the beginning of wizard
-      const currentTabIndex = TABS.indexOf(currentStep as string);
-      const nearestActiveTab = TABS.slice(0, currentTabIndex)
+      const currentTabIndex = tabsByOrderType.indexOf(currentStep as string);
+      const nearestActiveTab = tabsByOrderType
+        .slice(0, currentTabIndex)
         .reverse()
         .find((t) => tabsStatus[t]);
 
@@ -234,13 +308,29 @@ const CreateOrderWizard = () => {
     }
   }, [tabsStatus, currentStep]);
 
+  useEffect(() => {
+    if (isEmpty(orderDetail) && !justDeletedMemberOrder && !isEmpty(plans)) {
+      dispatch(orderAsyncActions.fetchOrderDetail(plans));
+    }
+  }, [
+    JSON.stringify(order),
+    JSON.stringify(orderDetail),
+    JSON.stringify(plans),
+  ]);
+
+  useEffect(() => {
+    dispatch(orderAsyncActions.fetchOrderRestaurants({}));
+  }, [JSON.stringify(orderDetail)]);
+
+  if (!isNormalOrder && currentStep === FOOD_QUANTITY_TAB) return null;
+
   return (
     <FormWizard formTabNavClassName={css.formTabNav}>
-      {TABS.map((tab: string, index) => {
+      {tabsByOrderType.map((tab: string, index) => {
         const disabled =
           !tabCompleted(
             order,
-            TABS[index - 1],
+            tabsByOrderType[index - 1],
             orderDetail,
             availableOrderDetailCheckList,
           ) ||

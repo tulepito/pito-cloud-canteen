@@ -16,6 +16,7 @@ export const shouldShowPartnerHeader = (pathName: string) => {
 
 const HIDING_PARTNER_NAV_BAR_PATHNAMES = [
   partnerPaths.CreateMenu,
+  partnerPaths.CreateFood,
   partnerPaths.EditMenu,
 ];
 

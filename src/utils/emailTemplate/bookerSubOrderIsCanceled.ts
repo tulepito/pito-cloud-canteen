@@ -1,9 +1,9 @@
 import { parseThousandNumber } from '@helpers/format';
-import { calculatePriceQuotationInfo } from '@helpers/order/cartInfoHelper';
+import { calculatePriceQuotationInfoFromOrder } from '@helpers/order/cartInfoHelper';
 
 import { formatTimestamp } from '../dates';
 import { ESubOrderStatus } from '../enums';
-import { ETransition } from '../transaction';
+import { TRANSITIONS_TO_STATE_CANCELED } from '../transaction';
 import type { TObject } from '../types';
 
 const BASE_URL = process.env.NEXT_PUBLIC_CANONICAL_URL;
@@ -38,7 +38,7 @@ const bookerSubOrderIsCanceled = ({
     const { status, lastTransition } = rawOrderDetailOfDate;
     if (
       status === ESubOrderStatus.canceled ||
-      lastTransition === ETransition.OPERATOR_CANCEL_PLAN
+      TRANSITIONS_TO_STATE_CANCELED.includes(lastTransition)
     ) {
       return result;
     }
@@ -51,10 +51,10 @@ const bookerSubOrderIsCanceled = ({
     };
   }, {});
   const { totalPrice, totalDishes, VATFee, PITOFee, totalWithVAT } =
-    calculatePriceQuotationInfo({
+    calculatePriceQuotationInfoFromOrder({
       planOrderDetail,
       order: orderListing.getFullData(),
-      currentOrderVATPercentage: systemVATPercentage,
+      orderVATPercentage: systemVATPercentage,
     });
   const numberOfSubOrders = Object.keys(currentOrderDetail).length || 0;
   const formatSubOrderDate = formatTimestamp(timestamp);

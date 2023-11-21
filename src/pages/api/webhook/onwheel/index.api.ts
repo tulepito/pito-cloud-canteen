@@ -1,21 +1,44 @@
 import omit from 'lodash/omit';
+import { DateTime } from 'luxon';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HttpMethod } from '@apis/configs';
 import { transitionOrderStatus } from '@pages/api/admin/plan/transition-order-status.service';
 import createQuotation from '@pages/api/orders/[orderId]/quotation/create-quotation.service';
 import { emailSendingFactory, EmailTemplateTypes } from '@services/email';
-import { fetchListing, fetchUser } from '@services/integrationHelper';
+import {
+  adminQueryListings,
+  fetchListing,
+  fetchUser,
+} from '@services/integrationHelper';
 import { createFirebaseDocNotification } from '@services/notifications';
 import { getIntegrationSdk, handleError } from '@services/sdk';
 import { Listing, User } from '@src/utils/data';
-import { ENotificationType, EQuotationStatus } from '@src/utils/enums';
+import { VNTimezone } from '@src/utils/dates';
+import {
+  EListingType,
+  ENotificationType,
+  EOnWheelOrderStatus,
+  EQuotationStatus,
+} from '@src/utils/enums';
 import { ETransition } from '@src/utils/transaction';
+import type { TObject } from '@src/utils/types';
 
-const fetchData = async (orderId: string) => {
-  const order = await fetchListing(orderId);
-  const orderListing = Listing(order);
-  const { plans = [], companyId } = orderListing.getMetadata();
+const findSubOrderDate = (orderDetail: TObject, subOrderWeekDay: string) => {
+  return Object.keys(orderDetail).find(
+    (k) =>
+      subOrderWeekDay ===
+      DateTime.fromMillis(Number(k)).setZone(VNTimezone).weekday.toString(),
+  );
+};
+
+const fetchData = async (orderTitle: string) => {
+  const [order] = await adminQueryListings({
+    keywords: orderTitle,
+    meta_listingType: EListingType.order,
+  });
+
+  const { plans = [], companyId } = Listing(order).getMetadata();
   const company = await fetchUser(companyId);
   const companyUser = User(company);
   const {
@@ -43,20 +66,28 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         console.log('event', event);
         const { path } = event;
         switch (event.status) {
-          case 'ASSIGNING': {
+          case EOnWheelOrderStatus.assigning: {
             await Promise.all(
               path.map(async (OWSubOrder: any) => {
                 const { tracking_number: trackingNumber, address } = OWSubOrder;
+
                 if (!trackingNumber) return;
 
-                const [orderId, subOrderDate] = trackingNumber.split('_');
-                const { plan, deliveryAddress } = await fetchData(orderId);
+                const [orderTitle, subOrderWeekDay] = trackingNumber.split('_');
+                const { plan, deliveryAddress } = await fetchData(orderTitle);
 
                 if (address !== deliveryAddress) return;
 
                 const planListing = Listing(plan);
                 const planId = planListing.getId();
                 const { orderDetail = {} } = planListing.getMetadata();
+                const subOrderDate = findSubOrderDate(
+                  orderDetail,
+                  subOrderWeekDay,
+                );
+
+                if (!subOrderDate) return;
+
                 const subOrder = orderDetail[subOrderDate];
                 const { isOnWheelOrderCreated = false } = subOrder;
                 if (!isOnWheelOrderCreated) {
@@ -81,7 +112,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             return res.status(200).end();
           }
 
-          case 'IN PROCESS': {
+          case EOnWheelOrderStatus.inProcess: {
             await Promise.all(
               path.map(async (OWSubOrder: any) => {
                 const {
@@ -98,9 +129,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
                     ? ETransition.CANCEL_DELIVERY
                     : ETransition.START_DELIVERY;
 
-                const [orderId, subOrderDate] = trackingNumber.split('_');
-                const { plan, deliveryAddress, order } = await fetchData(
-                  orderId,
+                const [orderTitle, subOrderWeekDay] = trackingNumber.split('_');
+                const { order, plan, deliveryAddress } = await fetchData(
+                  orderTitle,
                 );
 
                 if (address !== deliveryAddress) return;
@@ -108,6 +139,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
                 const planListing = Listing(plan);
                 const planId = planListing.getId();
                 const { orderDetail = {} } = planListing.getMetadata();
+                const subOrderDate = findSubOrderDate(
+                  orderDetail,
+                  subOrderWeekDay,
+                );
+
+                if (!subOrderDate) return;
+
                 const subOrder = orderDetail[subOrderDate];
                 const { transactionId, lastTransition, restaurant } =
                   subOrder || {};
@@ -136,7 +174,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
                 });
 
                 const orderListing = Listing(order);
-                const { title: orderTitle } = orderListing.getAttributes();
+                const orderId = orderListing.getId() as string;
                 const {
                   participantIds = [],
                   anonymous = [],
@@ -147,7 +185,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
                   orderId,
                   orderTitle,
                   planId,
-                  subOrderDate,
+                  subOrderDate: Number(subOrderDate),
                 };
                 if (transition === ETransition.START_DELIVERY) {
                   [participantIds, anonymous].map(
@@ -256,6 +294,52 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
             return res.status(200).end();
           }
+
+          case EOnWheelOrderStatus.cancelled: {
+            await Promise.all(
+              path.map(async (OWSubOrder: any) => {
+                const { tracking_number: trackingNumber, address } = OWSubOrder;
+                if (!trackingNumber) return;
+
+                const [orderTitle, subOrderWeekDay] = trackingNumber.split('_');
+                const { plan, deliveryAddress } = await fetchData(orderTitle);
+
+                if (address !== deliveryAddress) return;
+
+                const planListing = Listing(plan);
+                const planId = planListing.getId();
+                const { orderDetail = {} } = planListing.getMetadata();
+                const subOrderDate = findSubOrderDate(
+                  orderDetail,
+                  subOrderWeekDay,
+                );
+
+                if (!subOrderDate) return;
+
+                const subOrder = orderDetail[subOrderDate];
+                const { isOnWheelOrderCreated = false } = subOrder;
+                if (isOnWheelOrderCreated) {
+                  const newOrderDetail = {
+                    ...orderDetail,
+                    [subOrderDate]: {
+                      ...subOrder,
+                      isOnWheelOrderCreated: false,
+                    },
+                  };
+
+                  await integrationSdk.listings.update({
+                    id: planId,
+                    metadata: {
+                      orderDetail: newOrderDetail,
+                    },
+                  });
+                }
+              }),
+            );
+
+            return res.status(200).end();
+          }
+
           default:
             break;
         }

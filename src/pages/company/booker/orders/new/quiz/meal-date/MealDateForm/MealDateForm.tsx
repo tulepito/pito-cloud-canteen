@@ -9,7 +9,7 @@ import FieldCheckbox from '@components/FormFields/FieldCheckbox/FieldCheckbox';
 import FieldDropdownSelect from '@components/FormFields/FieldDropdownSelect/FieldDropdownSelect';
 import IconClock from '@components/Icons/IconClock/IconClock';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
-import DayInWeekField from '@pages/admin/order/create/components/DayInWeekField/DayInWeekField';
+import DayInWeekField from '@pages/admin/order/components/DayInWeekField/DayInWeekField';
 import { generateTimeRangeItems } from '@src/utils/dates';
 import { required } from '@src/utils/validators';
 

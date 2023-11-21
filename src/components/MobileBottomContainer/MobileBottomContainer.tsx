@@ -5,7 +5,7 @@ import type { TDefaultProps } from '@src/utils/types';
 
 import css from './MobileBottomContainer.module.scss';
 
-type TMobileBottomContainerProps = PropsWithChildren<{} & TDefaultProps>;
+type TMobileBottomContainerProps = PropsWithChildren<TDefaultProps>;
 
 const MobileBottomContainer: React.FC<TMobileBottomContainerProps> = (
   props,

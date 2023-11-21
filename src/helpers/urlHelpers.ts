@@ -1,17 +1,6 @@
 import type { TObject } from '@utils/types';
-/**
- * Serialise given object into a string that can be used in a
- * URL. Encode SDK types into a format that can be parsed with `parse`
- * defined below.
- *
- * @param {Object} params - object with strings/numbers/booleans or
- * SDK types as values
- *
- * @return {String} query string with sorted keys and serialised
- * values, `undefined` and `null` values are removed
- */
 
-export const urlSerialize = (obj: TObject = {}) => {
+const urlSerialize = (obj: TObject = {}) => {
   const str: Array<string> = [];
   Object.keys(obj).forEach((p: any) => {
     str.push(`${encodeURIComponent(p)}=${encodeURIComponent(obj[p])}`);
@@ -37,4 +26,30 @@ export const stringify = (params: {
   );
 
   return urlSerialize(cleaned);
+};
+
+export const historyPushState = (state: string, value: string | number) => {
+  const url = new URL(window.location.href);
+  url.searchParams.set(state.toString(), value.toString());
+  window.history.pushState({}, '', url);
+};
+
+export const parseLocationSearchToObject = () => {
+  const search = window?.location?.search?.slice(1);
+
+  try {
+    const parsedSearchMaybe = JSON.parse(
+      `{"${decodeURI(search)
+        .replace(/"/g, '\\"')
+        .replace(/&/g, '","')
+        .replace(/=/g, '":"')}"}`,
+    );
+
+    return search ? parsedSearchMaybe : {};
+  } catch (error) {
+    console.error('💫 > parseLocationSearchToObject > error: ');
+    console.error(error);
+
+    return {};
+  }
 };

@@ -23,7 +23,7 @@ import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
 import { parseThousandNumber } from '@helpers/format';
 import {
   calculatePriceQuotationPartner,
-  vatPercentageBaseOnVatSetting,
+  ensureVATSetting,
 } from '@helpers/order/cartInfoHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
@@ -33,7 +33,8 @@ import { currentUserSelector } from '@redux/slices/user.slice';
 import { partnerPaths } from '@src/paths';
 import { CurrentUser } from '@src/utils/data';
 import { formatTimestamp } from '@src/utils/dates';
-import { EOrderDraftStates, EPartnerVATSetting } from '@utils/enums';
+import { ETransition } from '@src/utils/transaction';
+import { EOrderDraftStates } from '@utils/enums';
 import type { TObject, TTableSortValue } from '@utils/types';
 
 import type { TFilterPartnerOrderFormValues } from './components/FilterPartnerOrderForm';
@@ -159,27 +160,19 @@ const parseEntitiesToTableData = (
       vatSettings = {},
     } = entity;
     const dayIndex = new Date(Number(date)).getDay();
+    const { id: restaurantId } = restaurant;
 
     let totalPrice = 0;
     if (!isEmpty(quotation)) {
       if (!isEmpty(quotation[restaurant.id]?.quotation)) {
         const vatSettingFromOrder = vatSettings[restaurant?.id];
-        const partnerVATSetting =
-          vatSettingFromOrder in EPartnerVATSetting
-            ? vatSettingFromOrder
-            : EPartnerVATSetting.vat;
-
-        const vatPercentage = vatPercentageBaseOnVatSetting({
-          vatSetting: partnerVATSetting,
-          vatPercentage: orderVATPercentage,
-        });
 
         const partnerQuotationBySubOrderDate = calculatePriceQuotationPartner({
           quotation: quotation[restaurant.id].quotation,
           serviceFeePercentage: serviceFees[restaurant.id],
-          currentOrderVATPercentage: vatPercentage,
+          orderVATPercentage,
           subOrderDate: date,
-          shouldSkipVAT: partnerVATSetting === EPartnerVATSetting.direct,
+          vatSetting: ensureVATSetting(vatSettingFromOrder),
         });
 
         const { totalWithVAT } = partnerQuotationBySubOrderDate;
@@ -215,7 +208,10 @@ const parseEntitiesToTableData = (
         endDate: endDate ? formatTimestamp(endDate) : '',
         state: EOrderDraftStates.pendingApproval,
         deliveryHour,
-        lastTransition,
+        lastTransition:
+          _restaurantId !== restaurantId
+            ? ETransition.OPERATOR_CANCEL_PLAN
+            : lastTransition,
         isPaid,
       },
     };
@@ -409,6 +405,10 @@ const ManageOrdersPage = () => {
         );
       });
     }
+
+    return () => {
+      dispatch(PartnerManageOrdersActions.resetStates());
+    };
   }, []);
 
   return (

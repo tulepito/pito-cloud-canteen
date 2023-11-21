@@ -1,4 +1,7 @@
-import type { TSubOrderChangeHistoryItem } from '@src/utils/types';
+import type {
+  TOrderChangeHistoryItem,
+  TSubOrderChangeHistoryItem,
+} from '@src/utils/types';
 
 import { getApi, postApi, putApi } from './configs';
 
@@ -48,6 +51,11 @@ export const participantUpdateSeenNotificationApi = async (
 ) => postApi('/participants/notifications', { notificationId });
 
 export const createOrderChangesHistoryDocumentApi = async (
+  orderId: string,
+  data: TOrderChangeHistoryItem,
+) => postApi(`/orders/${orderId}/history`, data);
+
+export const createSubOrderChangesHistoryDocumentApi = async (
   orderId: string,
   { planId, ...rest }: TSubOrderChangeHistoryItem,
 ) => postApi(`/orders/${orderId}/plan/${planId}/history`, rest);

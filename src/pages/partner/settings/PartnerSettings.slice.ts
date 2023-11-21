@@ -114,7 +114,7 @@ const loadData = createAsyncThunk(
       sdkModel: sdk.transactions,
       query: {
         listingId: restaurantListingId,
-        lastTransitions: ETransition.INITIATE_TRANSACTION,
+        lastTransitions: ETransition.PARTNER_CONFIRM_SUB_ORDER,
       },
       include: ['booking'],
     });

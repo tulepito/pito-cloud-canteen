@@ -16,6 +16,7 @@ import css from './MealPlanCard.module.scss';
 type TMealPlanCardHeaderProps = {
   event: Event;
   removeInprogress?: boolean;
+  shouldHideRemoveIcon?: boolean;
   removeEventItem?: (resourceId: string) => void;
   onSearchRestaurant?: (date: Date) => void;
 };
@@ -25,6 +26,7 @@ const MealPlanCardHeader: React.FC<TMealPlanCardHeaderProps> = ({
   removeInprogress,
   removeEventItem,
   onSearchRestaurant,
+  shouldHideRemoveIcon = false,
 }) => {
   const {
     isSelectedFood,
@@ -61,11 +63,13 @@ const MealPlanCardHeader: React.FC<TMealPlanCardHeaderProps> = ({
           </RenderWhen>
           <FormattedMessage id={`DayColumn.Session.${session}`} />
         </div>
-        <IconClose
-          className={css.close}
-          onClick={handleOpenDeleteModal}
-          data-tour="step-5"
-        />
+        <RenderWhen condition={!shouldHideRemoveIcon}>
+          <IconClose
+            className={css.close}
+            onClick={handleOpenDeleteModal}
+            data-tour="step-5"
+          />
+        </RenderWhen>
       </div>
       <div className={css.headerActions}>
         <IconFood className={css.foodIcon} />
