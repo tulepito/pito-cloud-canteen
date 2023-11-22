@@ -161,7 +161,7 @@ const isEnableToCancelOrder = (orderDetail) => {
       );
       console.info('💫 > pickedFoodCount: ', pickedFoodCount);
 
-      return pickedFoodCount === 0 || pickedFoodCount >= minQuantity;
+      return pickedFoodCount === 0 || pickedFoodCount < minQuantity;
     })
   );
 };
