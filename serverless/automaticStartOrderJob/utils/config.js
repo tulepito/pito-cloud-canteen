@@ -68,6 +68,5 @@ const config = {
   allowPartnerEmailSend: process.env.ALLOW_PARTNER_EMAIL_SEND === 'true',
   usingSSL,
 };
-console.debug('💫 > config: ', config);
 
 module.exports = config;

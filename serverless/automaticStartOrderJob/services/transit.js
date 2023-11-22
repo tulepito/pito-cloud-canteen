@@ -76,7 +76,7 @@ const transit = async (txId, transition) => {
     const plan = await fetchListing(plans[0]);
     const planListing = Listing(plan);
     const planId = planListing.getId();
-    console.debug('💫 > transit > planId: ', planId);
+    console.info('💫 > transit > plan: ', planId);
 
     const { orderDetail = {} } = planListing.getMetadata();
     const { memberOrders = {} } = orderDetail[startTimestamp];

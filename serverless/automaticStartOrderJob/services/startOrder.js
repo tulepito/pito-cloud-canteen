@@ -6,7 +6,7 @@ const {
 
 const { emailSendingFactory } = require('./awsSES/sendEmail');
 const { sendNativeNotification } = require('./native/sendNotification');
-const { NATIVE_NOTIFICATION_TYPE } = require('./native/config');
+const { NATIVE_NOTIFICATION_TYPES } = require('./native/config');
 const { EmailTemplateTypes } = require('./awsSES/config');
 const getIntegrationSdk = require('../utils/integrationSdk');
 const { fetchUser } = require('../utils/integrationHelper');
@@ -79,7 +79,7 @@ const startOrder = async (orderListing, planId) => {
 
   shouldSendNativeNotificationParticipantIdList.map(async (participantId) => {
     sendNativeNotification(
-      NATIVE_NOTIFICATION_TYPE.BookerTransitOrderStateToInProgress,
+      NATIVE_NOTIFICATION_TYPES.BookerTransitOrderStateToInProgress,
       {
         participantId,
         order: orderListing,

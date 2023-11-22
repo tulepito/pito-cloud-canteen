@@ -68,7 +68,7 @@ exports.handler = async (_event) => {
 
     // TODO: check condition to cancel order
     const shouldCancelOrder = isEnableToCancelOrder(orderDetail);
-    console.debug('💫 > shouldCancelOrder: ', shouldCancelOrder);
+    console.info('💫 > shouldCancelOrder: ', shouldCancelOrder);
     const editedSubOrders = getEditedSubOrders(orderDetail);
     console.info('💫 > editedSubOrders: ');
     console.info(editedSubOrders);
