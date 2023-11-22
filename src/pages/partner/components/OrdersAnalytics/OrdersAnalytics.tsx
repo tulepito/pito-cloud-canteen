@@ -5,6 +5,7 @@ import LineChart from '@components/Chart/LineChart/LineChart';
 import IconNoAnalyticsData from '@components/Icons/IconNoAnalyticsData/IconNoAnalyticsData';
 import NamedLink from '@components/NamedLink/NamedLink';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
+import { useViewport } from '@hooks/useViewport';
 import { useControlTimeFrame } from '@pages/partner/hooks/useControlTimeFrame';
 import { partnerPaths } from '@src/paths';
 import type { ETimePeriodOption } from '@src/utils/enums';
@@ -50,6 +51,7 @@ const OrdersAnalytics: React.FC<TOrdersAnalyticsProps> = (props) => {
   const { totalOrders } = overviewData;
   const { analyticsOrdersTimeFrame, setAnalyticsOrdersTimeFrame } =
     useControlTimeFrame();
+  const { isMobileLayout } = useViewport();
 
   const maxOrderValue = Math.max(...chartData.map((item) => item.orders));
 
@@ -97,6 +99,7 @@ const OrdersAnalytics: React.FC<TOrdersAnalyticsProps> = (props) => {
                     dataKey="orders"
                     customTooltip={CustomizeTooltip}
                     domainRange={domainRange}
+                    isMobile={isMobileLayout}
                   />
                 </div>
               </div>

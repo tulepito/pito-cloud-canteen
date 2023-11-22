@@ -8,6 +8,7 @@ import NamedLink from '@components/NamedLink/NamedLink';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { formatAxisTickValue } from '@helpers/chart';
 import { parseThousandNumber } from '@helpers/format';
+import { useViewport } from '@hooks/useViewport';
 import { useControlTimeFrame } from '@pages/partner/hooks/useControlTimeFrame';
 import { partnerPaths } from '@src/paths';
 import type { ETimePeriodOption } from '@src/utils/enums';
@@ -54,6 +55,7 @@ const RevenueAnalytics: React.FC<TRevenueAnalyticsProps> = (props) => {
   const { totalRevenue } = overviewData;
   const { analyticsRevenueTimeFrame, setAnalyticsRevenueTimeFrame } =
     useControlTimeFrame();
+  const { isMobileLayout } = useViewport();
 
   const formattedTotalRevenue = `${parseThousandNumber(totalRevenue)}đ`;
 
@@ -106,6 +108,7 @@ const RevenueAnalytics: React.FC<TRevenueAnalyticsProps> = (props) => {
                     customTooltip={CustomizeTooltip}
                     onYAxisTickFormattingFc={formatAxisTickValue}
                     domainRange={domainRange}
+                    isMobile={isMobileLayout}
                   />
                 </div>
               </div>

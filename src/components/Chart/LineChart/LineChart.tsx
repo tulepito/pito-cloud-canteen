@@ -20,6 +20,7 @@ type TLineChartProps = {
   domainRange?: number[];
   customTooltip?: React.FC<TooltipProps<any, any>>;
   onYAxisTickFormattingFc?: (value: number) => string;
+  isMobile?: boolean;
 };
 
 const CustomizeDot = (props: DotProps) => {
@@ -130,8 +131,14 @@ const CustomizeYAxisTick = (props: any) => {
 };
 
 const LineChart: React.FC<TLineChartProps> = (props) => {
-  const { dataKey, data, customTooltip, onYAxisTickFormattingFc, domainRange } =
-    props;
+  const {
+    dataKey,
+    data,
+    customTooltip,
+    onYAxisTickFormattingFc,
+    domainRange,
+    isMobile = false,
+  } = props;
   const [activeItem, setActiveItem] = useState<any>(null);
   const dataLength = data.length;
   const yDomain = [
@@ -160,7 +167,9 @@ const LineChart: React.FC<TLineChartProps> = (props) => {
       : (activeItem?.activeCoordinate?.x || 0) - 70; // tooltip width / 2;
 
   const chartWidth =
-    dataLength > 7 ? `${Math.ceil(dataLength / 7) * 50}%` : '100%';
+    dataLength > 7
+      ? `${Math.ceil(dataLength / 7) * (isMobile ? 100 : 50)}%`
+      : '100%';
 
   return (
     <ResponsiveContainer width={chartWidth} height={264}>

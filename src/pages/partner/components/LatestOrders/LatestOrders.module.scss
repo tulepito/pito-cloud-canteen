@@ -63,6 +63,19 @@
       color: $labelBlue2;
       font-weight: 700;
     }
+    .table {
+      margin-bottom: 0;
+    }
+
+    .tableBodyRow {
+      margin-bottom: 0;
+
+      &:last-child {
+        .tableBodyCell {
+          border-bottom: none;
+        }
+      }
+    }
   }
 }
 

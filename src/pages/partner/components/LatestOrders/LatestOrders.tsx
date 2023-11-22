@@ -122,7 +122,13 @@ const LatestOrders: React.FC<TLatestOrdersProps> = (props) => {
                 ))}
               </div>
               <div className={css.desktopWrapper}>
-                <Table columns={TABLE_COLUMN} data={tableData} />
+                <Table
+                  columns={TABLE_COLUMN}
+                  data={tableData}
+                  tableClassName={css.table}
+                  tableBodyRowClassName={css.tableBodyRow}
+                  tableBodyCellClassName={css.tableBodyCell}
+                />
               </div>
             </RenderWhen.False>
           </RenderWhen>
