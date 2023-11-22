@@ -105,7 +105,7 @@ const Dashboard: React.FC<TDashboardProps> = () => {
         latestSubOrders,
         restaurantListingId,
         currentOrderVATPercentage,
-        new Date().getTime(),
+        new Date().setHours(0, 0, 0, 0),
         undefined,
       ).sort((a, b) => a.subOrderDate - b.subOrderDate),
     [currentOrderVATPercentage, latestSubOrders, restaurantListingId],

@@ -154,13 +154,16 @@ const LineChart: React.FC<TLineChartProps> = (props) => {
 
   const tooltipXPosition =
     dataLength > 1 &&
-    (activeItem.activeTooltipIndex === 0 ||
-      activeItem.activeTooltipIndex === dataLength - 1)
+    (activeItem?.activeTooltipIndex === 0 ||
+      activeItem?.activeTooltipIndex === dataLength - 1)
       ? undefined
       : (activeItem?.activeCoordinate?.x || 0) - 70; // tooltip width / 2;
 
+  const chartWidth =
+    dataLength > 7 ? `${Math.ceil(dataLength / 7) * 50}%` : '100%';
+
   return (
-    <ResponsiveContainer width={dataLength > 7 ? 1440 : '100%'} height={264}>
+    <ResponsiveContainer width={chartWidth} height={264}>
       <RLineChart
         data={data}
         margin={chartMargins}
