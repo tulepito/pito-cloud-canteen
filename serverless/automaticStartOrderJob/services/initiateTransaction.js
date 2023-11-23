@@ -31,19 +31,14 @@ const {
   getNextTransition,
 } = require('./helpers/transaction');
 
-const initiateTransaction = async ({ orderId, planId }) => {
+const initiateTransaction = async ({
+  orderId,
+  planId,
+  orderListing,
+  planListing,
+}) => {
   // Query order and plan listing
   const integrationSdk = getIntegrationSdk();
-  const [orderListing] = denormalisedResponseEntities(
-    await integrationSdk.listings.show({
-      id: orderId,
-    }),
-  );
-  const [planListing] = denormalisedResponseEntities(
-    await integrationSdk.listings.show({
-      id: planId,
-    }),
-  );
 
   const orderData = Listing(orderListing);
   const {
@@ -68,9 +63,13 @@ const initiateTransaction = async ({ orderId, planId }) => {
   }
 
   const companyAccount = await fetchUser(companyId);
+  console.debug('💫 > companyId: ', companyId);
   const { subAccountId } = companyAccount.attributes.profile.privateData;
+  console.debug('💫 > subAccountId: ', subAccountId);
   const companySubAccount = await fetchUser(subAccountId);
+  console.debug('💫 > companySubAccount: ', companySubAccount);
   const subAccountTrustedSdk = await getSubAccountTrustedSdk(companySubAccount);
+  console.debug('💫 > subAccountTrustedSdk: ', subAccountTrustedSdk);
   const { orderDetail: planOrderDetail = {} } =
     Listing(planListing).getMetadata();
 
@@ -165,6 +164,7 @@ const initiateTransaction = async ({ orderId, planId }) => {
     const txGetter = Transaction(tx);
 
     const txId = Transaction(tx).getId();
+    console.info('💫 > onCreateTx > txId: ', txId);
     const { provider } = txGetter.getFullData();
 
     createFirebaseDocNotification(NOTIFICATION_TYPES.SUB_ORDER_INPROGRESS, {
@@ -213,6 +213,7 @@ const initiateTransaction = async ({ orderId, planId }) => {
   };
 
   if (!isEmpty(subOrdersWithNoTxId)) {
+    console.info('💫 > initiateTransaction > update orderDetail ');
     // Update new order detail of plan listing
     await integrationSdk.listings.update({
       id: planId,
@@ -220,7 +221,9 @@ const initiateTransaction = async ({ orderId, planId }) => {
         orderDetail: prepareNewPlanOrderDetail(planOrderDetail, transactionMap),
       },
     });
+    console.info('💫 > initiateTransaction > update vatSettings ');
     await updateVatSettings(partnerIds);
+    console.info('💫 > initiateTransaction > updated vatSettings ');
   }
   if (!isEmpty(editedSubOrders)) {
     await integrationSdk.listings.update({

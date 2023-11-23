@@ -3,8 +3,58 @@ const isEmpty = require('lodash/isEmpty');
 const pick = require('lodash/pick');
 const { DateTime } = require('luxon');
 
-const { TRANSITIONS } = require('../../utils/enums');
+const {
+  TRANSITIONS,
+  PARTNER_VAT_SETTINGS,
+  TRANSITIONS_TO_STATE_CANCELED,
+  ORDER_STATES,
+  ORDER_TYPES,
+} = require('../../utils/enums');
 const { Listing } = require('../../utils/data');
+
+const ensureVATSetting = (vatSetting) =>
+  Object.values(PARTNER_VAT_SETTINGS).includes(vatSetting)
+    ? vatSetting
+    : PARTNER_VAT_SETTINGS.vat;
+
+const vatPercentageBaseOnVatSetting = ({
+  vatSetting,
+  vatPercentage,
+  isPartner = true,
+}) => {
+  if (!isPartner) {
+    return vatPercentage;
+  }
+
+  switch (vatSetting) {
+    case PARTNER_VAT_SETTINGS.direct:
+      return 0;
+    case PARTNER_VAT_SETTINGS.noExportVat:
+      return -0.04;
+    case PARTNER_VAT_SETTINGS.vat:
+    default:
+      return vatPercentage;
+  }
+};
+
+const calculateVATFee = ({
+  vatPercentage,
+  vatSetting,
+  totalWithoutVAT,
+  totalPrice,
+  isPartner = true,
+}) => {
+  if (!isPartner) {
+    return Math.round(totalWithoutVAT * vatPercentage);
+  }
+
+  switch (vatSetting) {
+    case PARTNER_VAT_SETTINGS.noExportVat:
+      return Math.round(totalPrice * vatPercentage);
+    default:
+      return Math.round(totalWithoutVAT * vatPercentage);
+  }
+};
 
 const convertHHmmStringToTimeParts = (timeStr = '6:30') => {
   const [hours, minutes] = timeStr.split(':') || ['6', '30'];
@@ -224,16 +274,365 @@ const getPCCFeeByMemberAmount = (memberAmount) => {
   return 500000;
 };
 
+const calculatePCCFeeByDate = ({
+  isGroupOrder,
+  memberOrders = {},
+  lineItems = [],
+  hasSpecificPCCFee,
+  specificPCCFee,
+}) => {
+  const memberAmountOfDate = isGroupOrder
+    ? Object.values(memberOrders).reduce((resultOfDate, currentMemberOrder) => {
+        const { foodId, status } = currentMemberOrder;
+
+        return isJoinedPlan(foodId, status) ? resultOfDate + 1 : resultOfDate;
+      }, 0)
+    : lineItems.reduce((res, item) => {
+        return res + (item?.quantity || 1);
+      }, 0);
+
+  const PCCFeeOfDate = hasSpecificPCCFee
+    ? memberAmountOfDate > 0
+      ? specificPCCFee
+      : 0
+    : getPCCFeeByMemberAmount(memberAmountOfDate);
+
+  return PCCFeeOfDate;
+};
+
+const getFoodDataMap = ({
+  foodListOfDate = {},
+  memberOrders = {},
+  orderType = ORDER_TYPES.group,
+  lineItems = [],
+}) => {
+  if (orderType === ORDER_TYPES.group) {
+    return Object.entries(memberOrders).reduce(
+      (foodFrequencyResult, currentMemberOrderEntry) => {
+        const [, memberOrderData] = currentMemberOrderEntry;
+        const { foodId, status } = memberOrderData;
+        const { foodName, foodPrice } = foodListOfDate[foodId] || {};
+
+        if (isJoinedPlan(foodId, status)) {
+          const data = foodFrequencyResult[foodId];
+          const { frequency } = data || {};
+
+          return {
+            ...foodFrequencyResult,
+            [foodId]: data
+              ? { ...data, frequency: frequency + 1 }
+              : { foodId, foodName, foodPrice, frequency: 1 },
+          };
+        }
+
+        return foodFrequencyResult;
+      },
+      {},
+    );
+  }
+
+  return lineItems.reduce((result, item) => {
+    const { id, name, quantity, unitPrice } = item;
+
+    return {
+      ...result,
+      [id]: {
+        foodId: id,
+        foodName: name,
+        foodPrice: unitPrice,
+        frequency: quantity,
+      },
+    };
+  }, {});
+};
+
+const getTotalInfo = (foodDataList) => {
+  return foodDataList.reduce(
+    (previousResult, current) => {
+      const { totalPrice, totalDishes } = previousResult;
+      const { frequency, foodPrice } = current;
+
+      return {
+        ...previousResult,
+        totalDishes: totalDishes + frequency,
+        totalPrice: totalPrice + foodPrice * frequency,
+      };
+    },
+    {
+      totalDishes: 0,
+      totalPrice: 0,
+    },
+  );
+};
+
+const calculateTotalPriceAndDishes = ({
+  orderDetail = {},
+  isGroupOrder,
+  date,
+}) => {
+  return isGroupOrder
+    ? Object.entries(orderDetail).reduce(
+        (result, currentOrderDetailEntry) => {
+          const [dateKey, rawOrderDetailOfDate] = currentOrderDetailEntry;
+          if (date && date?.toString() !== dateKey) {
+            return result;
+          }
+
+          const {
+            memberOrders,
+            restaurant = {},
+            status,
+            lastTransition,
+          } = rawOrderDetailOfDate;
+          const { foodList: foodListOfDate } = restaurant;
+          if (
+            status === 'canceled' ||
+            TRANSITIONS_TO_STATE_CANCELED.includes(lastTransition)
+          ) {
+            return result;
+          }
+
+          const foodDataMap = getFoodDataMap({ foodListOfDate, memberOrders });
+          const foodDataList = Object.values(foodDataMap);
+          const totalInfo = getTotalInfo(foodDataList);
+
+          return {
+            ...result,
+            totalPrice: result.totalPrice + totalInfo.totalPrice,
+            totalDishes: result.totalDishes + totalInfo.totalDishes,
+            [dateKey]: foodDataList,
+          };
+        },
+        {
+          totalDishes: 0,
+          totalPrice: 0,
+        },
+      )
+    : Object.entries(orderDetail).reduce(
+        (result, currentOrderDetailEntry) => {
+          const [dateKey, rawOrderDetailOfDate] = currentOrderDetailEntry;
+          const {
+            lineItems = [],
+            status,
+            lastTransition,
+          } = rawOrderDetailOfDate;
+
+          if (
+            (date && date?.toString() !== dateKey) ||
+            status === 'canceled' ||
+            TRANSITIONS_TO_STATE_CANCELED.includes(lastTransition)
+          ) {
+            return result;
+          }
+          const totalInfo = lineItems.reduce(
+            (res, item) => {
+              const { quantity = 1, price = 0 } = item || {};
+
+              return {
+                totalPrice: res.totalPrice + price,
+                totalDishes: res.totalDishes + quantity,
+              };
+            },
+            { totalPrice: 0, totalDishes: 0 },
+          );
+          const foodDataList = lineItems.map((item) => {
+            return {
+              foodName: item?.name,
+              frequency: item?.quantity,
+            };
+          });
+
+          return {
+            ...result,
+            totalPrice: result.totalPrice + totalInfo.totalPrice,
+            totalDishes: result.totalDishes + totalInfo.totalDishes,
+            [dateKey]: foodDataList,
+          };
+        },
+        {
+          totalDishes: 0,
+          totalPrice: 0,
+        },
+      );
+};
+
+const calculatePriceQuotationInfoFromOrder = ({
+  planOrderDetail = {},
+  order,
+  orderVATPercentage,
+  orderServiceFeePercentage = 0,
+  date,
+  shouldIncludePITOFee = true,
+  hasSpecificPCCFee = false,
+  specificPCCFee = 0,
+  isPartner = false,
+  vatSetting = PARTNER_VAT_SETTINGS.vat,
+}) => {
+  const {
+    packagePerMember = 0,
+    orderState,
+    orderType = ORDER_TYPES.group,
+  } = Listing(order).getMetadata();
+  const isOrderInProgress = orderState === ORDER_STATES.inProgress;
+  const isGroupOrder = orderType === ORDER_TYPES.group;
+
+  const currentOrderDetail = Object.entries(planOrderDetail).reduce(
+    (result, currentOrderDetailEntry) => {
+      const [subOrderDate, rawOrderDetailOfDate] = currentOrderDetailEntry;
+      const { status, transactionId, lastTransition } = rawOrderDetailOfDate;
+
+      if (
+        status === 'canceled' ||
+        TRANSITIONS_TO_STATE_CANCELED.includes(lastTransition) ||
+        (!transactionId && isOrderInProgress)
+      ) {
+        return result;
+      }
+
+      return {
+        ...result,
+        [subOrderDate]: {
+          ...rawOrderDetailOfDate,
+        },
+      };
+    },
+    {},
+  );
+
+  const PCCFee = Object.values(currentOrderDetail).reduce(
+    (result, currentOrderDetailOfDate) => {
+      const { memberOrders, lineItems = [] } = currentOrderDetailOfDate;
+      const PCCFeeOfDate = calculatePCCFeeByDate({
+        isGroupOrder,
+        memberOrders,
+        lineItems,
+        hasSpecificPCCFee,
+        specificPCCFee,
+      });
+
+      return result + PCCFeeOfDate;
+    },
+    0,
+  );
+  const actualPCCFee = shouldIncludePITOFee ? PCCFee : 0;
+  const { totalPrice = 0, totalDishes = 0 } = calculateTotalPriceAndDishes({
+    orderDetail: planOrderDetail,
+    isGroupOrder,
+    date,
+  });
+  console.debug('💫 > totalPrice: ', totalPrice);
+
+  const PITOPoints = Math.floor(totalPrice / 100000);
+  const isOverflowPackage = totalDishes * packagePerMember < totalPrice;
+  console.debug('💫 > isOverflowPackage: ', isOverflowPackage);
+  const serviceFee = date
+    ? Math.round(totalPrice * orderServiceFeePercentage)
+    : 0;
+  const transportFee = 0;
+  const promotion = 0;
+
+  const PITOFee = actualPCCFee;
+  const totalWithoutVAT =
+    totalPrice - serviceFee + transportFee + PITOFee - promotion;
+  console.debug('💫 > totalWithoutVAT: ', totalWithoutVAT);
+  // * VAT
+  const vatPercentage = vatPercentageBaseOnVatSetting({
+    vatSetting,
+    vatPercentage: orderVATPercentage,
+    isPartner,
+  });
+  console.debug('💫 > orderVATPercentage: ', orderVATPercentage);
+  console.debug('💫 > vatPercentage: ', vatPercentage);
+  const VATFee = calculateVATFee({
+    vatSetting,
+    vatPercentage,
+    totalPrice,
+    totalWithoutVAT,
+    isPartner,
+  });
+  console.debug('💫 > VATFee: ', VATFee);
+
+  const totalWithVAT = VATFee + totalWithoutVAT;
+  console.debug('💫 > totalWithVAT: ', totalWithVAT);
+  const overflow = isOverflowPackage
+    ? totalWithVAT - totalDishes * packagePerMember
+    : 0;
+
+  return {
+    totalPrice,
+    totalDishes,
+    PITOPoints,
+    VATFee: Math.abs(VATFee),
+    vatPercentage: Math.abs(vatPercentage),
+    totalWithVAT,
+    serviceFee,
+    transportFee,
+    promotion,
+    overflow,
+    isOverflowPackage,
+    totalWithoutVAT,
+    PITOFee,
+  };
+};
+
+const calculateTotalPriceCb = (singleDateSum, item) =>
+  singleDateSum + item.foodPrice * item.frequency;
+
+const calculatePriceQuotationPartner = ({
+  quotation = {},
+  serviceFeePercentage = 0,
+  orderVATPercentage,
+  subOrderDate,
+  vatSetting = PARTNER_VAT_SETTINGS.vat,
+}) => {
+  const promotion = 0;
+  const totalPrice = subOrderDate
+    ? quotation[subOrderDate]?.reduce(calculateTotalPriceCb, 0)
+    : Object.keys(quotation).reduce((result, orderDate) => {
+        const totalPriceInDate = quotation[orderDate]?.reduce(
+          calculateTotalPriceCb,
+          0,
+        );
+
+        return result + totalPriceInDate;
+      }, 0);
+
+  const serviceFee = Math.round((totalPrice * serviceFeePercentage) / 100);
+  const totalWithoutVAT = totalPrice - promotion - serviceFee;
+  const vatPercentage = vatPercentageBaseOnVatSetting({
+    vatSetting,
+    vatPercentage: orderVATPercentage,
+  });
+  const VATFee = calculateVATFee({
+    vatSetting,
+    vatPercentage,
+    totalPrice,
+    totalWithoutVAT,
+  });
+  const totalWithVAT = VATFee + totalWithoutVAT;
+
+  return {
+    totalPrice,
+    VATFee: Math.abs(VATFee),
+    serviceFee,
+    totalWithoutVAT,
+    totalWithVAT,
+    promotion,
+    vatPercentage: Math.abs(vatPercentage),
+  };
+};
+
 const calculatePriceQuotationInfoFromQuotation = ({
   quotation,
   packagePerMember,
-  currentOrderVATPercentage,
-  currentOrderServiceFeePercentage = 0,
+  orderVATPercentage,
+  orderServiceFeePercentage = 0,
   date,
   partnerId,
-  shouldSkipVAT = false,
   hasSpecificPCCFee,
   specificPCCFee = 0,
+  vatSetting = PARTNER_VAT_SETTINGS.vat,
+  isPartner = false,
 }) => {
   const quotationListingGetter = Listing(quotation);
   const { client, partner } = quotationListingGetter.getMetadata();
@@ -292,15 +691,26 @@ const calculatePriceQuotationInfoFromQuotation = ({
   const PITOPoints = Math.floor(totalPrice / 100000);
   const isOverflowPackage = totalDishes * packagePerMember < totalPrice;
   const serviceFee = isPartnerFlow
-    ? Math.round(currentOrderServiceFeePercentage * totalPrice)
+    ? Math.round(orderServiceFeePercentage * totalPrice)
     : 0;
   const transportFee = 0;
   const promotion = 0;
   const totalWithoutVAT =
     totalPrice - serviceFee + transportFee + PITOFee - promotion;
-  const VATFee = shouldSkipVAT
-    ? 0
-    : Math.round(totalWithoutVAT * currentOrderVATPercentage || 0);
+
+  // * VAT
+  const vatPercentage = vatPercentageBaseOnVatSetting({
+    vatSetting,
+    vatPercentage: orderVATPercentage,
+    isPartner,
+  });
+  const VATFee = calculateVATFee({
+    vatSetting,
+    vatPercentage,
+    totalPrice,
+    totalWithoutVAT,
+    isPartner,
+  });
   const totalWithVAT = VATFee + totalWithoutVAT;
   const overflow = isOverflowPackage
     ? totalWithVAT - totalDishes * packagePerMember
@@ -310,9 +720,9 @@ const calculatePriceQuotationInfoFromQuotation = ({
     totalPrice,
     totalDishes,
     PITOPoints,
-    VATFee,
+    VATFee: Math.abs(VATFee),
     totalWithVAT,
-    serviceFeePercentage: currentOrderServiceFeePercentage * 100,
+    serviceFeePercentage: orderServiceFeePercentage * 100,
     serviceFee,
     transportFee,
     promotion,
@@ -320,15 +730,186 @@ const calculatePriceQuotationInfoFromQuotation = ({
     isOverflowPackage,
     totalWithoutVAT,
     PITOFee,
-    vatPercentage: currentOrderVATPercentage,
+    vatPercentage: Math.abs(vatPercentage),
   };
 };
 
+const groupFoodForGroupOrder = (orderDetail, date) => {
+  return Object.entries(orderDetail).reduce(
+    (result, currentOrderDetailEntry, index) => {
+      const [d, rawOrderDetailOfDate] = currentOrderDetailEntry;
+
+      const {
+        memberOrders,
+        restaurant = {},
+        status: subOrderStatus,
+        lastTransition,
+      } = rawOrderDetailOfDate;
+      const { id, restaurantName, foodList: foodListOfDate = {} } = restaurant;
+      if (
+        subOrderStatus === 'canceled' ||
+        TRANSITIONS_TO_STATE_CANCELED.includes(lastTransition) ||
+        (date && d !== date.toString())
+      ) {
+        return result;
+      }
+
+      const foodDataMap = Object.entries(memberOrders).reduce(
+        (foodFrequencyResult, currentMemberOrderEntry) => {
+          const [, memberOrderData] = currentMemberOrderEntry;
+          const { foodId, status, requirement = '' } = memberOrderData;
+          const {
+            foodName,
+            foodPrice,
+            foodUnit = '',
+          } = foodListOfDate[foodId] || {};
+
+          if (status === 'joined' && foodId !== '') {
+            const data = foodFrequencyResult[foodId];
+            const { frequency, notes = [] } = data || {};
+
+            if (!isEmpty(requirement)) {
+              notes.push(requirement);
+            }
+
+            return {
+              ...foodFrequencyResult,
+              [foodId]: data
+                ? { ...data, frequency: frequency + 1, notes }
+                : {
+                    foodId,
+                    foodName,
+                    foodUnit,
+                    foodPrice,
+                    notes,
+                    frequency: 1,
+                  },
+            };
+          }
+
+          return foodFrequencyResult;
+        },
+        {},
+      );
+      const foodDataList = Object.values(foodDataMap);
+      const summary = foodDataList.reduce(
+        (previousResult, current) => {
+          const { totalPrice, totalDishes } = previousResult;
+          const { frequency, foodPrice } = current;
+
+          return {
+            ...previousResult,
+            totalDishes: totalDishes + frequency,
+            totalPrice: totalPrice + foodPrice * frequency,
+          };
+        },
+        {
+          totalDishes: 0,
+          totalPrice: 0,
+          restaurantName,
+        },
+      );
+
+      return [
+        ...result,
+        {
+          date: d,
+          index,
+          ...summary,
+          foodDataList,
+          restaurantId: id,
+        },
+      ];
+    },
+    [],
+  );
+};
+
+const groupFoodForNormal = (orderDetail, date) => {
+  return Object.entries(orderDetail).reduce(
+    (result, currentOrderDetailEntry, index) => {
+      const [d, rawOrderDetailOfDate] = currentOrderDetailEntry;
+
+      const {
+        lineItems = [],
+        restaurant = {},
+        status: subOrderStatus,
+        lastTransition,
+      } = rawOrderDetailOfDate;
+      const { id, restaurantName, foodList: foodListOfDate = {} } = restaurant;
+
+      if (
+        subOrderStatus === 'canceled' ||
+        TRANSITIONS_TO_STATE_CANCELED.includes(lastTransition) ||
+        (date && d !== date.toString())
+      ) {
+        return result;
+      }
+
+      const foodDataList = lineItems.map((lineItem) => {
+        const {
+          id: foodId,
+          name: foodName,
+          quantity = 1,
+          unitPrice: foodPrice = 0,
+        } = lineItem;
+        const { foodUnit = '' } = foodListOfDate[foodId] || {};
+
+        return { foodId, foodName, foodUnit, foodPrice, frequency: quantity };
+      });
+
+      const summary = lineItems.reduce(
+        (previousResult, current) => {
+          const { totalPrice, totalDishes } = previousResult;
+          const { quantity = 1, price = 0 } = current;
+
+          return {
+            ...previousResult,
+            totalDishes: totalDishes + quantity,
+            totalPrice: totalPrice + price,
+          };
+        },
+        {
+          totalDishes: 0,
+          totalPrice: 0,
+          restaurantName,
+        },
+      );
+
+      return [
+        ...result,
+        {
+          date: d,
+          index,
+          ...summary,
+          foodDataList,
+          restaurantId: id,
+        },
+      ];
+    },
+    [],
+  );
+};
+
+const groupFoodOrderByDate = ({
+  orderDetail = {},
+  isGroupOrder = true,
+  date,
+}) => {
+  return isGroupOrder
+    ? groupFoodForGroupOrder(orderDetail, date)
+    : groupFoodForNormal(orderDetail, date);
+};
+
 module.exports = {
+  ensureVATSetting,
+  calculatePriceQuotationPartner,
+  calculatePriceQuotationInfoFromOrder,
   calculatePriceQuotationInfoFromQuotation,
   checkIsOrderHasInProgressState,
   isEnableToCancelOrder,
   prepareNewPlanOrderDetail,
   getPickFoodParticipants,
   normalizeOrderDetail,
+  groupFoodOrderByDate,
 };

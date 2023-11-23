@@ -46,10 +46,16 @@ const ORDER_TYPES = {
   group: 'group',
 };
 
+const PAYMENT_TYPES = {
+  client: 'client',
+  partner: 'partner',
+};
+
 module.exports = {
   ORDER_TYPES,
   ORDER_STATES,
   PARTNER_VAT_SETTINGS,
   TRANSITIONS,
   TRANSITIONS_TO_STATE_CANCELED,
+  PAYMENT_TYPES,
 };

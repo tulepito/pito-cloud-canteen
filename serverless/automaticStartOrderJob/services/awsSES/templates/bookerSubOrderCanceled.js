@@ -40,12 +40,17 @@ const bookerSubOrderCanceled = ({
     },
     {},
   );
-  const { totalPrice, totalDishes, VATFee, PITOFee, totalWithVAT } =
-    calculatePriceQuotationInfoFromQuotation({
-      planOrderDetail,
-      order: orderListing.getFullData(),
-      currentOrderVATPercentage: systemVATPercentage,
-    });
+  const {
+    totalPrice = 0,
+    totalDishes = 0,
+    VATFee = 0,
+    PITOFee = 0,
+    totalWithVAT = 0,
+  } = calculatePriceQuotationInfoFromQuotation({
+    planOrderDetail,
+    order: orderListing.getFullData(),
+    orderVATPercentage: systemVATPercentage,
+  });
   const numberOfSubOrders = Object.keys(currentOrderDetail).length || 0;
   const formatSubOrderDate = formatTimestamp(timestamp);
   const formattedPCCFee = `${parseThousandNumber(PITOFee)}đ`;

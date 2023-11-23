@@ -67,7 +67,7 @@ const getTrustedSdkWithSubAccountToken = (userToken) => {
   });
 };
 
-export {
+module.exports = {
   getTrustedSdkWithSubAccountToken,
   createSdkInstance,
   transit,

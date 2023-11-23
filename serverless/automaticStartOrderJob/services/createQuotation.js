@@ -48,6 +48,8 @@ const createQuotation = async (params) => {
   );
 
   const quotation = denormalisedResponseEntities(quotationResponse)[0];
+  console.info('💫 > created');
+  console.info(quotation);
 
   // TODO: inactive old quotation listing
   if (oldQuotationId) {

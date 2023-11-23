@@ -48,9 +48,21 @@ const fetchUserByEmail = async (email) => {
   return denormalisedResponseEntities(response)[0];
 };
 
+const queryListings = async (params, include = [], imageVariants = []) => {
+  const integrationSdk = getIntegrationSdk();
+  const response = await integrationSdk.listings.query({
+    ...params,
+    include,
+    ...(imageVariants && { 'fields.image': imageVariants }),
+  });
+
+  return denormalisedResponseEntities(response);
+};
+
 module.exports = {
   fetchTransaction,
   fetchListing,
   fetchUser,
   fetchUserByEmail,
+  queryListings,
 };
