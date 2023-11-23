@@ -26,7 +26,6 @@ import css from './RevenueAnalytics.module.scss';
 const MIN_OF_MAX_REVENUE_DOMAIN_RANGE = 5000000;
 
 type TRevenueAnalyticsProps = {
-  data: any[];
   inProgress?: boolean;
   overviewData: {
     totalRevenue: number;
@@ -52,13 +51,7 @@ const CustomizeTooltip = (
 };
 
 const RevenueAnalytics: React.FC<TRevenueAnalyticsProps> = (props) => {
-  const {
-    data = [],
-    overviewData,
-    chartData,
-    inProgress,
-    timePeriodOption,
-  } = props;
+  const { overviewData, chartData, inProgress, timePeriodOption } = props;
 
   const { totalRevenue } = overviewData;
   const { analyticsRevenueTimeFrame, setAnalyticsRevenueTimeFrame } =
@@ -92,7 +85,7 @@ const RevenueAnalytics: React.FC<TRevenueAnalyticsProps> = (props) => {
       </div>
       <div className={css.dataWrapper}>
         <RenderWhen condition={!inProgress}>
-          <RenderWhen condition={data.length === 0}>
+          <RenderWhen condition={chartData.length === 0}>
             <div className={css.empty}>
               <IconNoAnalyticsData />
               <div className={css.emptyText}>

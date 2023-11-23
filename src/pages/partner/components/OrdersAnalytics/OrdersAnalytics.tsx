@@ -23,7 +23,6 @@ import css from './OrdersAnalytics.module.scss';
 const MIN_OF_MAX_ORDERS_DOMAIN_RANGE = 60;
 
 type TOrdersAnalyticsProps = {
-  data: any[];
   inProgress?: boolean;
   overviewData: {
     totalRevenue: number;
@@ -49,13 +48,7 @@ const CustomizeTooltip = (
 };
 
 const OrdersAnalytics: React.FC<TOrdersAnalyticsProps> = (props) => {
-  const {
-    data = [],
-    inProgress,
-    overviewData,
-    chartData,
-    timePeriodOption,
-  } = props;
+  const { inProgress, overviewData, chartData, timePeriodOption } = props;
   const { totalOrders } = overviewData;
   const { analyticsOrdersTimeFrame, setAnalyticsOrdersTimeFrame } =
     useControlTimeFrame();
@@ -84,7 +77,7 @@ const OrdersAnalytics: React.FC<TOrdersAnalyticsProps> = (props) => {
       </div>
       <div className={css.dataWrapper}>
         <RenderWhen condition={!inProgress}>
-          <RenderWhen condition={data.length === 0}>
+          <RenderWhen condition={chartData.length === 0}>
             <div className={css.empty}>
               <IconNoAnalyticsData />
               <div className={css.emptyText}>

@@ -5,6 +5,7 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { currentUserSelector } from '@redux/slices/user.slice';
 import { CurrentUser } from '@src/utils/data';
 import { ETimeFrame } from '@src/utils/enums';
+import { ETransition } from '@src/utils/transaction';
 
 import LatestOrders from './components/LatestOrders/LatestOrders';
 import OrderCalendar from './components/OrderCalendar/OrderCalendar';
@@ -157,7 +158,9 @@ const Dashboard: React.FC<TDashboardProps> = () => {
   const analyticsRevenueChartData = useMemo(
     () =>
       formatChartData({
-        subOrders: splittedSubOrders,
+        subOrders: splittedSubOrders.filter(
+          (item) => item.lastTransition === ETransition.COMPLETE_DELIVERY,
+        ),
         timeFrame: analyticsRevenueTimeFrame,
         startDate: new Date(startDate!),
         endDate: new Date(endDate!),
@@ -210,7 +213,6 @@ const Dashboard: React.FC<TDashboardProps> = () => {
       </section>
       <section>
         <OrdersAnalytics
-          data={splittedSubOrders}
           overviewData={overviewData}
           chartData={analyticsOrderChartData}
           inProgress={fetchSubOrdersInProgress}
@@ -219,7 +221,6 @@ const Dashboard: React.FC<TDashboardProps> = () => {
       </section>
       <section>
         <RevenueAnalytics
-          data={splittedSubOrders}
           overviewData={overviewData}
           chartData={analyticsRevenueChartData}
           inProgress={fetchSubOrdersInProgress}
