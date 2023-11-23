@@ -14,6 +14,7 @@ const USING_SSL = config.usingSSL;
 const createSdkInstance = () =>
   createInstance({
     clientId: CLIENT_ID,
+    clientSecret: CLIENT_SECRET,
     transitVerbose: TRANSIT_VERBOSE,
     secure: USING_SSL,
     ...baseUrlMaybe,

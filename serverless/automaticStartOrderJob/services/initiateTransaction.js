@@ -63,13 +63,12 @@ const initiateTransaction = async ({
   }
 
   const companyAccount = await fetchUser(companyId);
-  console.debug('💫 > companyId: ', companyId);
+  console.info('💫 > companyId: ', companyId);
   const { subAccountId } = companyAccount.attributes.profile.privateData;
-  console.debug('💫 > subAccountId: ', subAccountId);
+  console.info('💫 > subAccountId: ', subAccountId);
   const companySubAccount = await fetchUser(subAccountId);
-  console.debug('💫 > companySubAccount: ', companySubAccount);
+  console.info('💫 > companySubAccount: ', companySubAccount);
   const subAccountTrustedSdk = await getSubAccountTrustedSdk(companySubAccount);
-  console.debug('💫 > subAccountTrustedSdk: ', subAccountTrustedSdk);
   const { orderDetail: planOrderDetail = {} } =
     Listing(planListing).getMetadata();
 

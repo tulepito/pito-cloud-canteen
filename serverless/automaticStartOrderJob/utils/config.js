@@ -3,6 +3,7 @@ require('dotenv').config();
 const bookingProcessAlias = 'sub-order-transaction-process/release-2';
 
 const sdkClientId = process.env.SHARETRIBE_SDK_CLIENT_ID || '';
+const sdkClientSecret = process.env.SHARETRIBE_SDK_CLIENT_SECRET || '';
 const sdkBaseUrl = process.env.SHARETRIBE_SDK_BASE_URL || '';
 const sdkAssetCdnBaseUrl = process.env.SHARETRIBE_SDK_ASSET_CDN_BASE_URL || '';
 const sdkTransitVerbose = process.env.SHARETRIBE_SDK_TRANSIT_VERBOSE === 'true';
@@ -29,6 +30,7 @@ const config = {
   adminId: ADMIN_ID,
   sdk: {
     clientId: sdkClientId,
+    clientSecret: sdkClientSecret,
     baseUrl: sdkBaseUrl,
     assetCdnBaseUrl: sdkAssetCdnBaseUrl,
     transitVerbose: sdkTransitVerbose,
