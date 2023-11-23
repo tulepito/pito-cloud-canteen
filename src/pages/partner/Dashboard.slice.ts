@@ -25,8 +25,8 @@ const initialState: TPartnerDashboardState = {
   startDate: null,
   endDate: null,
   timePeriodOption: ETimePeriodOption.CUSTOM,
-  analyticsRevenueTimeFrame: ETimeFrame.MONTH,
-  analyticsOrdersTimeFrame: ETimeFrame.MONTH,
+  analyticsRevenueTimeFrame: ETimeFrame.DAY,
+  analyticsOrdersTimeFrame: ETimeFrame.DAY,
 
   previousSubOrders: [],
   latestSubOrders: [],

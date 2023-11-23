@@ -65,7 +65,7 @@ const SelectTimePeriodModal: React.FC<TSelectTimePeriodModalProps> = (
           shouldShowCustomSelect={selectCustomController.value}
           onCustomSelectClick={selectCustomController.setTrue}
           onBackToTimePeriodSelectClick={selectCustomController.setFalse}
-          onCloseModal={onClose}
+          onCloseModal={handleClose}
         />
       </SlideModal>
     );

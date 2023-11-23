@@ -3,7 +3,6 @@ import type { TooltipProps } from 'recharts';
 
 import LineChart from '@components/Chart/LineChart/LineChart';
 import IconNoAnalyticsData from '@components/Icons/IconNoAnalyticsData/IconNoAnalyticsData';
-import NamedLink from '@components/NamedLink/NamedLink';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import {
   formatPartnerOrderTooltipLabel,
@@ -11,7 +10,6 @@ import {
 } from '@helpers/chart';
 import { useViewport } from '@hooks/useViewport';
 import { useControlTimeFrame } from '@pages/partner/hooks/useControlTimeFrame';
-import { partnerPaths } from '@src/paths';
 import type { ETimeFrame } from '@src/utils/enums';
 import { type ETimePeriodOption } from '@src/utils/enums';
 import type { TChartPoint } from '@src/utils/types';
@@ -71,9 +69,6 @@ const OrdersAnalytics: React.FC<TOrdersAnalyticsProps> = (props) => {
     <div className={css.root}>
       <div className={css.titleHeader}>
         <div>Thống kê đơn hàng</div>
-        <NamedLink path={partnerPaths.ManageOrders} className={css.link}>
-          Xem chi tiết
-        </NamedLink>
       </div>
       <div className={css.dataWrapper}>
         <RenderWhen condition={!inProgress}>

@@ -24,7 +24,7 @@ export type TSelectTimePeriodFormValues = {
 type TExtraProps = {
   shouldShowCustomSelect: boolean;
   onCustomSelectClick: () => void;
-  onCloseModal: () => void;
+  onCloseModal: (e: React.MouseEvent<HTMLElement>) => void;
   onBackToTimePeriodSelectClick: () => void;
 };
 type TSelectTimePeriodFormComponentProps =
@@ -68,7 +68,7 @@ const SelectTimePeriodFormComponent: React.FC<
     }
   };
 
-  const onSubmit = () => {
+  const onSubmit = (e: React.MouseEvent<HTMLElement>) => {
     if (shouldShowCustomSelect) {
       onBackToTimePeriodSelectClick?.();
     } else {
@@ -78,7 +78,7 @@ const SelectTimePeriodFormComponent: React.FC<
       } else {
         handleTimePeriodChange(values.timePeriod! as ETimePeriodOption);
       }
-      onCloseModal?.();
+      onCloseModal?.(e);
     }
   };
 

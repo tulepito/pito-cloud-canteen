@@ -58,6 +58,17 @@ const OrderCalendar: React.FC<TOrderCalendarProps> = (props) => {
         />
       );
 
+  const onSelectDayCallBack = () => {
+    if (isMobileLayout && !selectedDay) {
+      setTimeout(() => {
+        window.scrollBy({
+          top: 500,
+          behavior: 'smooth',
+        });
+      }, 0);
+    }
+  };
+
   return (
     <div className={css.root}>
       <div className={css.titleHeader}>
@@ -74,7 +85,7 @@ const OrderCalendar: React.FC<TOrderCalendarProps> = (props) => {
           inProgress={inProgress}
           defaultView={Views.WEEK}
           components={{ toolbar: toolbarComponent }}
-          resources={{ hideEmptySubOrderSection: true }}
+          resources={{ hideEmptySubOrderSection: true, onSelectDayCallBack }}
         />
         <div className={css.subOrderList}>
           {subOrdersFromSelectedDay.map((item, index) => (

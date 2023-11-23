@@ -4,7 +4,7 @@ import { useEffect, useMemo } from 'react';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { currentUserSelector } from '@redux/slices/user.slice';
 import { CurrentUser } from '@src/utils/data';
-import { ETimeFrame } from '@src/utils/enums';
+import { ETimeFrame, ETimePeriodOption } from '@src/utils/enums';
 import { ETransition } from '@src/utils/transaction';
 
 import LatestOrders from './components/LatestOrders/LatestOrders';
@@ -15,7 +15,6 @@ import RevenueAnalytics from './components/RevenueAnalytics/RevenueAnalytics';
 import {
   calculateOverviewInformation,
   formatChartData,
-  getDisabledTimeFrameOptions,
   sortLatestSubOrders,
   splitSubOrders,
 } from './helpers/dashboardData';
@@ -187,14 +186,22 @@ const Dashboard: React.FC<TDashboardProps> = () => {
   }, [dispatch, endDate, startDate]);
 
   useEffect(() => {
-    const allTimeFrames = Object.values(ETimeFrame);
-    const disabledTimeFrames = getDisabledTimeFrameOptions(timePeriodOption);
-    const enabledTimeFrames = allTimeFrames.filter(
-      (timeFrame) => !disabledTimeFrames.includes(timeFrame as ETimeFrame),
-    );
-
-    setAnalyticsOrdersTimeFrame(enabledTimeFrames[0]);
-    setAnalyticsRevenueTimeFrame(enabledTimeFrames[0]);
+    if (
+      timePeriodOption === ETimePeriodOption.TODAY ||
+      timePeriodOption === ETimePeriodOption.YESTERDAY ||
+      timePeriodOption === ETimePeriodOption.LAST_7_DAYS ||
+      timePeriodOption === ETimePeriodOption.LAST_30_DAYS ||
+      timePeriodOption === ETimePeriodOption.CUSTOM
+    ) {
+      setAnalyticsOrdersTimeFrame(ETimeFrame.DAY);
+      setAnalyticsRevenueTimeFrame(ETimeFrame.DAY);
+    } else if (timePeriodOption === ETimePeriodOption.LAST_WEEK) {
+      setAnalyticsOrdersTimeFrame(ETimeFrame.WEEK);
+      setAnalyticsRevenueTimeFrame(ETimeFrame.WEEK);
+    } else {
+      setAnalyticsOrdersTimeFrame(ETimeFrame.MONTH);
+      setAnalyticsRevenueTimeFrame(ETimeFrame.MONTH);
+    }
   }, [timePeriodOption]);
 
   return (
