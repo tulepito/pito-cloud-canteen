@@ -247,3 +247,20 @@ export const getDisabledTimeFrameOptions = (
 
   return [];
 };
+
+export const sortLatestSubOrders = (a: TObject, b: TObject) => {
+  const statusOrders: { [key: string]: number } = {
+    [ETransition.INITIATE_TRANSACTION]: 1,
+    [ETransition.OPERATOR_CANCEL_AFTER_PARTNER_CONFIRMED]: 2,
+    [ETransition.START_DELIVERY]: 3,
+    [ETransition.COMPLETE_DELIVERY]: 4,
+    [ETransition.OPERATOR_CANCEL_AFTER_PARTNER_REJECTED]: 5,
+    [ETransition.OPERATOR_CANCEL_PLAN]: 6,
+  };
+
+  const dateComparison = b.subOrderDate - a.subOrderDate;
+
+  if (dateComparison !== 0) return dateComparison;
+
+  return statusOrders[a.lastTransition] - statusOrders[b.lastTransition];
+};

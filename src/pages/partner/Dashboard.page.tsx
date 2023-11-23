@@ -16,6 +16,7 @@ import {
   calculateOverviewInformation,
   formatChartData,
   getDisabledTimeFrameOptions,
+  sortLatestSubOrders,
   splitSubOrders,
 } from './helpers/dashboardData';
 import { useControlTimeFrame } from './hooks/useControlTimeFrame';
@@ -108,7 +109,7 @@ const Dashboard: React.FC<TDashboardProps> = () => {
         currentOrderVATPercentage,
         new Date().setHours(0, 0, 0, 0),
         undefined,
-      ).sort((a, b) => a.subOrderDate - b.subOrderDate),
+      ).sort(sortLatestSubOrders),
     [currentOrderVATPercentage, latestSubOrders, restaurantListingId],
   );
 
