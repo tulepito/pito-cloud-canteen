@@ -165,7 +165,7 @@ const generateTimeRange = ({
     case ETimeFrame.MONTH: {
       return timestampRange.map(({ start, end }) => {
         return {
-          timeLabel: `${formatTimestamp(start.getTime(), 'MM/yy')}`,
+          timeLabel: `${(start.getTime(), 'MM/yy')}`,
           timeRange: [start.getTime(), end.getTime()],
         };
       });
@@ -183,7 +183,7 @@ const groupDataByTimeFrame = (
     timeRange: number[];
   },
 ): TChartPoint => {
-  const { timeLabel, timeRange } = timePoint;
+  const { timeRange } = timePoint;
 
   return subOrders.reduce(
     (result: any, subOrder) => {
@@ -199,7 +199,7 @@ const groupDataByTimeFrame = (
       return result;
     },
     {
-      dateLabel: timeLabel,
+      dateLabel: timeRange[0],
       revenue: 0,
       orders: 0,
     },

@@ -19,7 +19,8 @@ type TLineChartProps = {
   data: TChartPoint[];
   domainRange?: number[];
   customTooltip?: React.FC<TooltipProps<any, any>>;
-  onYAxisTickFormattingFc?: (value: number) => string;
+  onYAxisTickFormattingFn?: (value: number) => string;
+  onXAxisTickFormattingFn: (value: number) => string;
   isMobile?: boolean;
 };
 
@@ -94,10 +95,12 @@ const CustomizeDot = (props: DotProps) => {
 };
 
 const CustomizeXAxisTick = (props: any) => {
-  const { payload, x, y } = props;
+  const { payload, x, y, formattingFn } = props;
 
-  const XLabel = payload.value.includes(' - ') ? (
-    payload.value.split(' - ').map((date: string, index: number) => (
+  const tickValue = formattingFn ? formattingFn(payload.value) : payload.value;
+
+  const XLabel = tickValue.includes(' - ') ? (
+    tickValue.split(' - ').map((date: string, index: number) => (
       <text
         key={index}
         fontSize={12}
@@ -109,7 +112,7 @@ const CustomizeXAxisTick = (props: any) => {
     ))
   ) : (
     <text dy={24} fontSize={12} textAnchor="middle" fill="#8C8C8C">
-      {payload.value}
+      {tickValue}
     </text>
   );
 
@@ -117,9 +120,9 @@ const CustomizeXAxisTick = (props: any) => {
 };
 
 const CustomizeYAxisTick = (props: any) => {
-  const { payload, formattingFc, ...rest } = props;
+  const { payload, formattingFn, ...rest } = props;
 
-  const tickValue = formattingFc ? formattingFc(payload.value) : payload.value;
+  const tickValue = formattingFn ? formattingFn(payload.value) : payload.value;
 
   return (
     <text {...rest} fontSize={12} textAnchor="middle" fill="#8C8C8C">
@@ -135,7 +138,8 @@ const LineChart: React.FC<TLineChartProps> = (props) => {
     dataKey,
     data,
     customTooltip,
-    onYAxisTickFormattingFc,
+    onYAxisTickFormattingFn,
+    onXAxisTickFormattingFn,
     domainRange,
     isMobile = false,
   } = props;
@@ -184,7 +188,12 @@ const LineChart: React.FC<TLineChartProps> = (props) => {
           axisLine={false}
           interval={0}
           height={60}
-          tick={<CustomizeXAxisTick />}
+          tick={(xAxisProps) => (
+            <CustomizeXAxisTick
+              {...xAxisProps}
+              formattingFn={onXAxisTickFormattingFn}
+            />
+          )}
           padding={{ left: 20, right: 20 }}
         />
         <YAxis
@@ -195,7 +204,7 @@ const LineChart: React.FC<TLineChartProps> = (props) => {
           tick={(yAxisProps: any) => (
             <CustomizeYAxisTick
               {...yAxisProps}
-              formattingFc={onYAxisTickFormattingFc}
+              formattingFn={onYAxisTickFormattingFn}
             />
           )}
         />

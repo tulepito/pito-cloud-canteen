@@ -5,10 +5,15 @@ import LineChart from '@components/Chart/LineChart/LineChart';
 import IconNoAnalyticsData from '@components/Icons/IconNoAnalyticsData/IconNoAnalyticsData';
 import NamedLink from '@components/NamedLink/NamedLink';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
+import {
+  formatPartnerOrderTooltipLabel,
+  formatPartnerOrderXAxisTickValue,
+} from '@helpers/chart';
 import { useViewport } from '@hooks/useViewport';
 import { useControlTimeFrame } from '@pages/partner/hooks/useControlTimeFrame';
 import { partnerPaths } from '@src/paths';
-import type { ETimePeriodOption } from '@src/utils/enums';
+import type { ETimeFrame } from '@src/utils/enums';
+import { type ETimePeriodOption } from '@src/utils/enums';
 import type { TChartPoint } from '@src/utils/types';
 
 import TimeFrameSelector from '../TimeFrameSelector/TimeFrameSelector';
@@ -29,13 +34,16 @@ type TOrdersAnalyticsProps = {
   timePeriodOption: ETimePeriodOption;
 };
 
-const CustomizeTooltip = (props: TooltipProps<any, any>) => {
-  const { payload = [] } = props;
+const CustomizeTooltip = (
+  props: TooltipProps<any, any> & { timeFrame: ETimeFrame },
+) => {
+  const { payload = [], timeFrame } = props;
+  const dateValue = payload[0]?.payload?.dateLabel;
 
   return (
     <div className={css.tooltipWrapper}>
       <div>{`${payload[0]?.value} đơn hàng`}</div>
-      <div>{payload[0]?.payload?.dateLabel}</div>
+      <div>{formatPartnerOrderTooltipLabel(dateValue, timeFrame)}</div>
     </div>
   );
 };
@@ -61,6 +69,10 @@ const OrdersAnalytics: React.FC<TOrdersAnalyticsProps> = (props) => {
       ? maxOrderValue + 5 - (maxOrderValue % 5)
       : MIN_OF_MAX_ORDERS_DOMAIN_RANGE,
   ];
+
+  const formatXAxisTick = (value: number) => {
+    return formatPartnerOrderXAxisTickValue(value, analyticsOrdersTimeFrame);
+  };
 
   return (
     <div className={css.root}>
@@ -97,9 +109,15 @@ const OrdersAnalytics: React.FC<TOrdersAnalyticsProps> = (props) => {
                   <LineChart
                     data={chartData}
                     dataKey="orders"
-                    customTooltip={CustomizeTooltip}
+                    customTooltip={(_props) => (
+                      <CustomizeTooltip
+                        {..._props}
+                        timeFrame={analyticsOrdersTimeFrame}
+                      />
+                    )}
                     domainRange={domainRange}
                     isMobile={isMobileLayout}
+                    onXAxisTickFormattingFn={formatXAxisTick}
                   />
                 </div>
               </div>

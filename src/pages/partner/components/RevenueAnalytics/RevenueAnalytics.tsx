@@ -6,12 +6,17 @@ import LineChart from '@components/Chart/LineChart/LineChart';
 import IconNoAnalyticsData from '@components/Icons/IconNoAnalyticsData/IconNoAnalyticsData';
 import NamedLink from '@components/NamedLink/NamedLink';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
-import { formatAxisTickValue } from '@helpers/chart';
+import {
+  formatAxisTickValue,
+  formatPartnerOrderTooltipLabel,
+  formatPartnerOrderXAxisTickValue,
+} from '@helpers/chart';
 import { parseThousandNumber } from '@helpers/format';
 import { useViewport } from '@hooks/useViewport';
 import { useControlTimeFrame } from '@pages/partner/hooks/useControlTimeFrame';
 import { partnerPaths } from '@src/paths';
-import type { ETimePeriodOption } from '@src/utils/enums';
+import type { ETimeFrame } from '@src/utils/enums';
+import { type ETimePeriodOption } from '@src/utils/enums';
 import type { TChartPoint } from '@src/utils/types';
 
 import TimeFrameSelector from '../TimeFrameSelector/TimeFrameSelector';
@@ -32,13 +37,16 @@ type TRevenueAnalyticsProps = {
   timePeriodOption: ETimePeriodOption;
 };
 
-const CustomizeTooltip = (props: TooltipProps<any, any>) => {
-  const { payload = [] } = props;
+const CustomizeTooltip = (
+  props: TooltipProps<any, any> & { timeFrame: ETimeFrame },
+) => {
+  const { payload = [], timeFrame } = props;
+  const dateValue = payload[0]?.payload?.dateLabel;
 
   return (
     <div className={css.tooltipWrapper}>
       <div>{`${parseThousandNumber(payload?.[0]?.value)}đ`}</div>
-      <div>{payload[0]?.payload?.dateLabel}</div>
+      <div>{formatPartnerOrderTooltipLabel(dateValue, timeFrame)}</div>
     </div>
   );
 };
@@ -69,6 +77,10 @@ const RevenueAnalytics: React.FC<TRevenueAnalyticsProps> = (props) => {
   }, [chartData]);
 
   const domainRange = [0, maxRange];
+
+  const formatXAxisTick = (value: number) => {
+    return formatPartnerOrderXAxisTickValue(value, analyticsRevenueTimeFrame);
+  };
 
   return (
     <div className={css.root}>
@@ -105,8 +117,14 @@ const RevenueAnalytics: React.FC<TRevenueAnalyticsProps> = (props) => {
                   <LineChart
                     data={chartData}
                     dataKey="revenue"
-                    customTooltip={CustomizeTooltip}
-                    onYAxisTickFormattingFc={formatAxisTickValue}
+                    customTooltip={(_props) => (
+                      <CustomizeTooltip
+                        {..._props}
+                        timeFrame={analyticsRevenueTimeFrame}
+                      />
+                    )}
+                    onYAxisTickFormattingFn={formatAxisTickValue}
+                    onXAxisTickFormattingFn={formatXAxisTick}
                     domainRange={domainRange}
                     isMobile={isMobileLayout}
                   />
