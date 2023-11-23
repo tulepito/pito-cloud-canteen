@@ -30,6 +30,7 @@ const normalizeOrderDetailsData = (
   planDetails: TPlan['orderDetail'],
   participantIds: string[],
   isGroupOrder: boolean,
+  isAdmin: boolean,
 ) => {
   const initMemberOrders: TObject = {};
   participantIds.forEach((participantId: string) => {
@@ -42,7 +43,7 @@ const normalizeOrderDetailsData = (
 
   return Object.entries(planDetails).reduce(
     (prev: TObject, [date, planDataOnDate]) => {
-      const { restaurant, memberOrders = {} } = planDataOnDate || {};
+      const { restaurant } = planDataOnDate || {};
 
       const { id, restaurantName, foodList } = restaurant || {};
       const isSetupRestaurantAndFood =
@@ -51,11 +52,8 @@ const normalizeOrderDetailsData = (
       if (isSetupRestaurantAndFood) {
         prev[date] = planDataOnDate;
 
-        if (isGroupOrder) {
-          prev[date].memberOrders = {
-            ...initMemberOrders,
-            ...memberOrders,
-          };
+        if (isGroupOrder && !isAdmin) {
+          prev[date].memberOrders = initMemberOrders;
         }
       }
 
@@ -65,7 +63,7 @@ const normalizeOrderDetailsData = (
   );
 };
 
-export const publishOrder = async (orderId: string) => {
+export const publishOrder = async (orderId: string, isAdmin = false) => {
   const integrationSdk = getIntegrationSdk();
 
   const [order] = denormalisedResponseEntities(
@@ -105,6 +103,7 @@ export const publishOrder = async (orderId: string) => {
     planOrderDetails,
     participants,
     isGroupOrder,
+    isAdmin,
   );
 
   await integrationSdk.listings.update({

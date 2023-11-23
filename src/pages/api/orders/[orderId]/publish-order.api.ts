@@ -2,13 +2,20 @@ import isEmpty from 'lodash/isEmpty';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HttpMethod } from '@apis/configs';
-import { handleError } from '@services/sdk';
+import cookies from '@services/cookie';
+import { getSdk, handleError } from '@services/sdk';
+import { CurrentUser, denormalisedResponseEntities } from '@src/utils/data';
 
 import { publishOrder } from './publish-order.service';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
     const apiMethod = req.method;
+
+    const sdk = getSdk(req, res);
+    const currentUserResponse = await sdk.currentUser.show();
+    const [currentUser] = denormalisedResponseEntities(currentUserResponse);
+    const { isAdmin = false } = CurrentUser(currentUser).getMetadata();
 
     switch (apiMethod) {
       case HttpMethod.POST:
@@ -21,7 +28,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             return;
           }
 
-          await publishOrder(orderId as string);
+          await publishOrder(orderId as string, isAdmin);
           res.json({ message: `Successfully publish order ${orderId}` });
         }
         break;
@@ -35,4 +42,4 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   }
 }
 
-export default handler;
+export default cookies(handler);
