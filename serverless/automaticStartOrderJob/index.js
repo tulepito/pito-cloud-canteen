@@ -1,6 +1,9 @@
 const isEmpty = require('lodash/isEmpty');
 
 const { startOrder } = require('./services/startOrder');
+const { initiatePayment } = require('./services/initiatePayment');
+const { initiateTransaction } = require('./services/initiateTransaction');
+const { initiateQuotation } = require('./services/initiateQuotation');
 const { cancelAllSubOrderTxs } = require('./services/cancelAllSubOrderTxs');
 const { cancelPickingOrder } = require('./services/cancelPickingOrder');
 
@@ -9,8 +12,9 @@ const getIntegrationSdk = require('./utils/integrationSdk');
 const {
   isEnableToCancelOrder,
   checkIsOrderHasInProgressState,
+  groupFoodOrderByDate,
 } = require('./services/helpers/order');
-const { ORDER_STATES } = require('./utils/enums');
+const { ORDER_STATES, ORDER_TYPES } = require('./utils/enums');
 const { getEditedSubOrders } = require('./services/helpers/transaction');
 
 exports.handler = async (_event) => {
@@ -39,9 +43,12 @@ exports.handler = async (_event) => {
     const {
       orderState,
       orderStateHistory,
+      orderType,
+      companyId,
       plans = [],
     } = Listing(orderListing).getMetadata();
     const planId = plans[0];
+    const isGroupOrder = orderType === ORDER_TYPES.group;
 
     if (isEmpty(planId)) {
       console.error('Missing planId');
@@ -91,6 +98,22 @@ exports.handler = async (_event) => {
       console.info('💫 > starting order');
       await startOrder(orderListing, planId);
       console.info('💫 > started order');
+
+      console.info('💫 > initiate transactions');
+      await initiateTransaction({ orderId, orderListing, planId, planListing });
+      console.info('💫 > initiated transactions');
+
+      console.info('💫 > initiate quotation for order');
+      const quotationListing = await initiateQuotation(
+        orderId,
+        companyId,
+        groupFoodOrderByDate({ orderDetail, isGroupOrder }),
+      );
+      console.info('💫 > initiated quotation');
+
+      console.info('💫 > initiate payments for order');
+      await initiatePayment(orderListing, planListing, quotationListing);
+      console.info('💫 > initiated payments');
     }
   } catch (error) {
     console.error('Schedule automatic start order error');
