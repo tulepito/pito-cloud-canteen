@@ -146,7 +146,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             newOrderDetail = {},
           },
         } = req;
-        console.debug('💫 > handler > participants: ', participants);
 
         await integrationSdk.listings.update({
           id: orderId,
@@ -154,7 +153,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             participants,
           },
         });
-        console.debug('💫 > handler > participants: ', participants);
 
         if (!isEmpty(planId)) {
           await integrationSdk.listings.update({
