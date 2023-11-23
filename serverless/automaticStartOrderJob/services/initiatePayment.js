@@ -146,10 +146,7 @@ const initiatePayment = async (orderListing, planListing, quotationListing) => {
         }
       : {}),
   };
-  console.debug(
-    '💫 > initiatePayment > clientPaymentData: ',
-    clientPaymentData,
-  );
+  console.info('💫 > clientPaymentData: ', clientPaymentData);
 
   if (isEditInProgressOrder) {
     const paymentRecords = await queryPaymentRecordOnFirebase({

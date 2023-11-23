@@ -1,4 +1,5 @@
 const isEmpty = require('lodash/isEmpty');
+const uniq = require('lodash/uniq');
 
 const { startOrder } = require('./services/startOrder');
 const { initiatePayment } = require('./services/initiatePayment');
@@ -6,6 +7,10 @@ const { initiateTransaction } = require('./services/initiateTransaction');
 const { initiateQuotation } = require('./services/initiateQuotation');
 const { cancelAllSubOrderTxs } = require('./services/cancelAllSubOrderTxs');
 const { cancelPickingOrder } = require('./services/cancelPickingOrder');
+const { getEditedSubOrders } = require('./services/helpers/transaction');
+const { getSystemAttributes } = require('./services/helpers/attributes');
+const { emailSendingFactory } = require('./services/awsSES/sendEmail');
+const { EmailTemplateTypes } = require('./services/awsSES/config');
 
 const { denormalisedResponseEntities, Listing } = require('./utils/data');
 const getIntegrationSdk = require('./utils/integrationSdk');
@@ -15,7 +20,6 @@ const {
   groupFoodOrderByDate,
 } = require('./services/helpers/order');
 const { ORDER_STATES, ORDER_TYPES } = require('./utils/enums');
-const { getEditedSubOrders } = require('./services/helpers/transaction');
 
 exports.handler = async (_event) => {
   // const handler = async (_event) => {
@@ -79,6 +83,8 @@ exports.handler = async (_event) => {
     const editedSubOrders = getEditedSubOrders(orderDetail);
     console.info('💫 > editedSubOrders: ');
     console.info(editedSubOrders);
+    const { systemVATPercentage = 0 } = await getSystemAttributes();
+    console.info('💫 > systemVATPercentage: ', systemVATPercentage);
 
     if (shouldCancelOrder) {
       if (
@@ -96,7 +102,7 @@ exports.handler = async (_event) => {
       console.info('💫 > canceled order');
     } else {
       console.info('💫 > starting order');
-      await startOrder(orderListing, planId);
+      await startOrder({ orderListing, orderDetail, systemVATPercentage });
       console.info('💫 > started order');
 
       console.info('💫 > initiate transactions');
@@ -114,6 +120,19 @@ exports.handler = async (_event) => {
       console.info('💫 > initiate payments for order');
       await initiatePayment(orderListing, planListing, quotationListing);
       console.info('💫 > initiated payments');
+
+      const { partner = {} } = Listing(quotationListing).getMetadata();
+      console.info('💫 > notifying partners');
+      uniq(Object.keys(partner)).forEach(async (restaurantId) => {
+        await emailSendingFactory(
+          EmailTemplateTypes.PARTNER.PARTNER_NEW_ORDER_APPEAR,
+          {
+            orderId,
+            restaurantId,
+          },
+        );
+      });
+      console.info('💫 > notified partners');
     }
   } catch (error) {
     console.error('Schedule automatic start order error');

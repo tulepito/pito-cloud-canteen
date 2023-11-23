@@ -20,6 +20,10 @@ const {
   participantSubOrderCanceled,
   participantSubOrderCanceledSubject,
 } = require('./templates/participantSubOrderCanceled');
+const {
+  partnerNewOrderAppear,
+  partnerNewOrderAppearSubject,
+} = require('./templates/partnerNewOrderAppear');
 
 const { fetchListing, fetchUser } = require('../../utils/integrationHelper');
 const { Listing, User } = require('../../utils/data');
@@ -237,6 +241,32 @@ const emailSendingFactory = async (emailTemplateType, emailParams = {}) => {
         const emailDataParams = {
           receiver: [partnerEmail],
           subject: partnerSubOrderCanceledSubject(subOrderDate),
+          content: emailTemplate,
+          sender: SENDER_EMAIL,
+        };
+        sendIndividualEmail(emailDataParams);
+        break;
+      }
+
+      case EmailTemplateTypes.PARTNER.PARTNER_NEW_ORDER_APPEAR: {
+        const { orderId, promotion = 0, restaurantId } = emailParams;
+        const emailDataSource = await fetchEmailDataSourceWithOrder({
+          receiver: 'partner',
+          orderId,
+          restaurantId,
+        });
+        const { partnerUser, orderListing } = emailDataSource;
+        const { orderName } = orderListing.getPublicData();
+        const { systemVATPercentage } = await getSystemAttributes();
+        const { email: partnerEmail } = partnerUser?.getAttributes() || {};
+        const emailTemplate = partnerNewOrderAppear({
+          ...emailDataSource,
+          promotion,
+          systemVATPercentage,
+        });
+        const emailDataParams = {
+          receiver: [partnerEmail],
+          subject: partnerNewOrderAppearSubject(orderName),
           content: emailTemplate,
           sender: SENDER_EMAIL,
         };

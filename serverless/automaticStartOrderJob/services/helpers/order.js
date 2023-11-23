@@ -19,7 +19,7 @@ const ensureVATSetting = (vatSetting) =>
 
 const vatPercentageBaseOnVatSetting = ({
   vatSetting,
-  vatPercentage,
+  vatPercentage = 0,
   isPartner = true,
 }) => {
   if (!isPartner) {
@@ -520,11 +520,11 @@ const calculatePriceQuotationInfoFromOrder = ({
     isGroupOrder,
     date,
   });
-  console.debug('💫 > totalPrice: ', totalPrice);
+  console.info('💫 > totalPrice: ', totalPrice);
 
   const PITOPoints = Math.floor(totalPrice / 100000);
   const isOverflowPackage = totalDishes * packagePerMember < totalPrice;
-  console.debug('💫 > isOverflowPackage: ', isOverflowPackage);
+  console.info('💫 > isOverflowPackage: ', isOverflowPackage);
   const serviceFee = date
     ? Math.round(totalPrice * orderServiceFeePercentage)
     : 0;
@@ -534,15 +534,15 @@ const calculatePriceQuotationInfoFromOrder = ({
   const PITOFee = actualPCCFee;
   const totalWithoutVAT =
     totalPrice - serviceFee + transportFee + PITOFee - promotion;
-  console.debug('💫 > totalWithoutVAT: ', totalWithoutVAT);
+  console.info('💫 > totalWithoutVAT: ', totalWithoutVAT);
   // * VAT
   const vatPercentage = vatPercentageBaseOnVatSetting({
     vatSetting,
     vatPercentage: orderVATPercentage,
     isPartner,
   });
-  console.debug('💫 > orderVATPercentage: ', orderVATPercentage);
-  console.debug('💫 > vatPercentage: ', vatPercentage);
+  console.info('💫 > orderVATPercentage: ', orderVATPercentage);
+  console.info('💫 > vatPercentage: ', vatPercentage);
   const VATFee = calculateVATFee({
     vatSetting,
     vatPercentage,
@@ -550,10 +550,10 @@ const calculatePriceQuotationInfoFromOrder = ({
     totalWithoutVAT,
     isPartner,
   });
-  console.debug('💫 > VATFee: ', VATFee);
+  console.info('💫 > VATFee: ', VATFee);
 
   const totalWithVAT = VATFee + totalWithoutVAT;
-  console.debug('💫 > totalWithVAT: ', totalWithVAT);
+  console.info('💫 > totalWithVAT: ', totalWithVAT);
   const overflow = isOverflowPackage
     ? totalWithVAT - totalDishes * packagePerMember
     : 0;

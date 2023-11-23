@@ -1,8 +1,4 @@
-const {
-  denormalisedResponseEntities,
-  Listing,
-  User,
-} = require('../utils/data');
+const { Listing, User } = require('../utils/data');
 
 const { emailSendingFactory } = require('./awsSES/sendEmail');
 const { sendNativeNotification } = require('./native/sendNotification');
@@ -12,17 +8,19 @@ const getIntegrationSdk = require('../utils/integrationSdk');
 const { fetchUser } = require('../utils/integrationHelper');
 const { ORDER_STATES } = require('../utils/enums');
 const { getPickFoodParticipants } = require('./helpers/order');
-const { getSystemAttributes } = require('./helpers/attributes');
 
 const integrationSdk = getIntegrationSdk();
 
-const startOrder = async (orderListing, planId) => {
+const startOrder = async ({
+  orderListing,
+  orderDetail,
+  systemVATPercentage,
+}) => {
   const listingGetter = Listing(orderListing);
   const orderId = listingGetter.getId();
   const {
     companyId,
     orderStateHistory = [],
-    partnerIds = [],
     hasSpecificPCCFee: orderHasSpecificPCCFee,
     specificPCCFee: orderSpecificPCCFee,
   } = listingGetter.getMetadata();
@@ -33,7 +31,6 @@ const startOrder = async (orderListing, planId) => {
       updatedAt: new Date().getTime(),
     },
   ]);
-  const { systemVATPercentage = 0 } = await getSystemAttributes();
   const companyUser = await fetchUser(companyId);
   const { hasSpecificPCCFee = false, specificPCCFee = 0 } =
     User(companyUser).getMetadata();
@@ -53,21 +50,6 @@ const startOrder = async (orderListing, planId) => {
         }),
     },
   });
-
-  const [plan] = denormalisedResponseEntities(
-    await integrationSdk.listings.update(
-      {
-        id: planId,
-        metadata: {
-          partnerIds,
-        },
-      },
-      {
-        expand: true,
-      },
-    ),
-  );
-  const { orderDetail = {} } = Listing(plan).getMetadata();
 
   const shouldSendNativeNotificationParticipantIdList =
     getPickFoodParticipants(orderDetail);

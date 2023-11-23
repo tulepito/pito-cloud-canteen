@@ -223,6 +223,20 @@ const initiateTransaction = async ({
     console.info('💫 > initiateTransaction > update vatSettings ');
     await updateVatSettings(partnerIds);
     console.info('💫 > initiateTransaction > updated vatSettings ');
+
+    console.info(
+      '💫 > initiateTransaction > update partnerIds in plan Listing',
+    );
+
+    await integrationSdk.listings.update({
+      id: planId,
+      metadata: {
+        partnerIds: uniq(partnerIds),
+      },
+    });
+    console.info(
+      '💫 > initiateTransaction > updated partnerIds in plan Listing',
+    );
   }
   if (!isEmpty(editedSubOrders)) {
     await integrationSdk.listings.update({
@@ -234,8 +248,9 @@ const initiateTransaction = async ({
         },
       },
     });
-
+    console.info('💫 > initiateTransaction > update vatSettings ');
     await updateVatSettings(orderPartnerIds);
+    console.info('💫 > initiateTransaction > updated vatSettings ');
   }
 };
 
