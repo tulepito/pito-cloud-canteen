@@ -9,32 +9,47 @@ import type { TListing, TObject, TUser } from '@src/utils/types';
 
 import { useAppSelector } from './reduxHooks';
 
+type ExportOrderDetailsExtendedField = 'company-name' | 'partner-name';
+type ExportOrderDetailsExtendedFields = ExportOrderDetailsExtendedField[];
+
 const prepareData = ({
   orderDetail = {},
   participantData = {},
+  extendedFields = [],
 }: {
   orderDetail: TObject;
   participantData: TObject;
+  extendedFields?: ExportOrderDetailsExtendedFields;
 }) => {
   return Object.entries<TObject>(orderDetail).reduce<TObject[]>(
     (result, currentOrderDetailEntry) => {
       const [date, rawOrderDetailOfDate] = currentOrderDetailEntry;
 
       const { memberOrders = {}, restaurant = {} } = rawOrderDetailOfDate;
-      const { foodList: foodListOfDate = {} } = restaurant;
+      const { foodList: foodListOfDate = {}, restaurantName } = restaurant;
 
       const orderData = Object.entries<TObject>(memberOrders).reduce<TObject[]>(
         (memberOrderResult, currentMemberOrderEntry) => {
           const [memberId, memberOrderData] = currentMemberOrderEntry;
           const { foodId, status, requirement } = memberOrderData;
 
-          const newItem = {
+          const newItem: any = {
             Ngày: formatTimestamp(Number(date)),
             Tên: participantData[memberId]?.name,
             'Món ăn': foodListOfDate[foodId]?.foodName,
             'Đơn giá': foodListOfDate[foodId]?.foodPrice,
             'Ghi chú': requirement,
           };
+
+          extendedFields.forEach((field) => {
+            if (field === 'company-name') {
+              newItem['Tên công ty'] = participantData[memberId]?.companyName;
+            }
+
+            if (field === 'partner-name') {
+              newItem['Tên đối tác'] = restaurantName;
+            }
+          });
 
           return isJoinedPlan(foodId, status)
             ? memberOrderResult.concat([newItem])
@@ -60,7 +75,10 @@ const prepareData = ({
   );
 };
 
-const useExportOrderDetails = () => {
+const useExportOrderDetails = (options?: {
+  extendedFields?: ExportOrderDetailsExtendedFields;
+}) => {
+  const { extendedFields = [] } = options ?? {};
   const {
     orderData,
     draftOrderDetail,
@@ -71,6 +89,8 @@ const useExportOrderDetails = () => {
   const { participants = [], anonymous = [] } = Listing(
     orderData as TListing,
   ).getMetadata();
+
+  const companyName = Listing(orderData as TListing).getMetadata()?.companyName;
 
   const participantDataList = useMemo(
     () =>
@@ -87,6 +107,7 @@ const useExportOrderDetails = () => {
             id: pid,
             email,
             name: `${lastName} ${firstName}`,
+            companyName,
           };
         })
         .concat(
@@ -102,6 +123,7 @@ const useExportOrderDetails = () => {
               id: pid,
               email,
               name: `${lastName} ${firstName}`,
+              companyName,
             };
           }),
         ),
@@ -125,6 +147,7 @@ const useExportOrderDetails = () => {
     const preparedData = prepareData({
       orderDetail: draftOrderDetail,
       participantData: participantDataMap,
+      extendedFields,
     });
 
     const { title } = Listing(orderData as TListing).getAttributes();
@@ -137,6 +160,7 @@ const useExportOrderDetails = () => {
     JSON.stringify(draftOrderDetail),
     JSON.stringify(participantDataMap),
     JSON.stringify(orderData),
+    JSON.stringify(extendedFields),
   ]);
 
   return { handler };

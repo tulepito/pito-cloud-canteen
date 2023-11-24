@@ -5,7 +5,7 @@ import ManageOrdersPage from './ManageOrders.page';
 const AdminManageOrdersRoute = () => {
   return (
     <MetaWrapper routeName="AdminManageOrdersRoute">
-      <ManageOrdersPage />
+      <ManageOrdersPage showOrderType />
     </MetaWrapper>
   );
 };

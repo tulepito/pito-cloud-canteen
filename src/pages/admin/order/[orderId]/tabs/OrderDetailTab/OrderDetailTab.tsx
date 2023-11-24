@@ -101,7 +101,9 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
   const [isDraftEditing, setIsDraftEditing] = useState<boolean>(false);
   const orderId = Listing(order).getId();
   const isEditMode = viewMode === EPageViewMode.edit;
-  const { handler: onDownloadReviewOrderResults } = useExportOrderDetails();
+  const { handler: onDownloadReviewOrderResults } = useExportOrderDetails({
+    extendedFields: ['company-name', 'partner-name'],
+  });
 
   const { planValidationsInProgressState } =
     orderValidationsInProgressState || {};
