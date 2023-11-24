@@ -7,12 +7,15 @@ import {
   EVENING_SESSION,
   MORNING_SESSION,
 } from '@components/CalendarDashboard/helpers/constant';
-import { useAppDispatch } from '@hooks/reduxHooks';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { useViewport } from '@hooks/useViewport';
 import { BookerNewOrderAction } from '@pages/company/booker/orders/new/BookerNewOrder.slice';
 import { QuizActions } from '@redux/slices/Quiz.slice';
+import { currentUserSelector } from '@redux/slices/user.slice';
+import { CurrentUser } from '@src/utils/data';
 import { getDeliveryTimeFromMealType } from '@src/utils/dates';
 import { EMenuMealType } from '@src/utils/enums';
+import type { TCurrentUser } from '@src/utils/types';
 
 import breadImage from '../../assets/banhmi-min.png';
 import miquangImage from '../../assets/miquang-min.png';
@@ -52,7 +55,10 @@ const HOMEPAGE_MEAL_LINKS = [
 
 const CompanyDashboardHeroSection = () => {
   const { isMobileLayout, isTabletLayout } = useViewport();
+
   const dispatch = useAppDispatch();
+  const currentUser = useAppSelector(currentUserSelector);
+  const { firstName } = CurrentUser(currentUser as TCurrentUser).getProfile();
 
   const isNotDesktop = isTabletLayout || isMobileLayout;
 
@@ -83,7 +89,12 @@ const CompanyDashboardHeroSection = () => {
     <div className={css.root}>
       <div className={css.content}>
         <h1 className={css.title}>
-          <FormattedMessage id="CompanyDashboardHeroSection.heroTitle" />
+          <FormattedMessage
+            id="CompanyDashboardHeroSection.heroTitle"
+            values={{
+              bookerName: ` ${firstName}`,
+            }}
+          />
         </h1>
         <div id="homePageMealLinks" className={css.homePageMealLinks}>
           {HOMEPAGE_MEAL_LINKS.map((item) => (

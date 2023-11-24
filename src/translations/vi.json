@@ -242,7 +242,7 @@
   "ClientTable.loading": "... Đang tải dữ liệu",
   "ClientTable.noClientsFound": "Danh sách khách hàng trống",
   "ClientTable.submit": "Tiếp theo",
-  "CompanyDashboardHeroSection.heroTitle": "Chọn bữa cơm văn phòng",
+  "CompanyDashboardHeroSection.heroTitle": "Xin chào {bookerName}, bạn muốn đặt cơm cho bữa nào?",
   "CompanyGroupDetailRoute.description": "Chi tiết nhóm",
   "CompanyGroupDetailRoute.title": "Chi tiết nhóm",
   "CompanyGroupSettingRoute.description": "Danh sách nhóm",
