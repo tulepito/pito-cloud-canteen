@@ -530,8 +530,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     dayInWeek: isPickingOrder ? draftSelectedFoodDays : suitableDayInWeek,
     deliveryOrigin: draftOrigin || origin,
     memberAmount: draftMemberAmount || memberAmount,
-    isNormalOrder:
-      draftPickAllow || pickAllow ? EOrderType.group : EOrderType.normal,
+    isNormalOrder: !(draftPickAllow || pickAllow),
     nutritions: draftNutritions || nutritions,
     packagePerMember: draftPackagePerMember || packagePerMember,
     daySession: draftDaySession || daySession,

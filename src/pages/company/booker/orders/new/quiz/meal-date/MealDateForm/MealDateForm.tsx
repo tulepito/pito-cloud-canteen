@@ -20,7 +20,6 @@ import { EOrderType } from '@src/utils/enums';
 import { required } from '@src/utils/validators';
 
 import OrderDateField from '../OrderDateField/OrderDateField';
-import OrderDeadlineField from '../OrderDeadlineField/OrderDeadlineField';
 
 import css from './MealDateForm.module.scss';
 
@@ -30,9 +29,9 @@ export type TMealDateFormValues = {
   startDate: number;
   endDate: number;
   usePreviousData?: boolean;
-  deadlineDate: number;
   dayInWeek: string[];
   orderType: EOrderType;
+  deadlineDate?: number;
   orderDeadlineHour?: string;
   orderDeadlineMinute?: string;
 };
@@ -44,7 +43,6 @@ type TExtraProps = {
   onClickOrderDates: () => void;
   onClickDeliveryHour: () => void;
   onClickIsGroupOrder: () => void;
-  onClickDeadlineDate: () => void;
 };
 type TMealDateFormComponentProps = FormRenderProps<TMealDateFormValues> &
   Partial<TExtraProps>;
@@ -64,7 +62,6 @@ const MealDateFormComponent: React.FC<TMealDateFormComponentProps> = (
     onClickOrderDates,
     onClickDeliveryHour,
     onClickIsGroupOrder,
-    onClickDeadlineDate,
   } = props;
   const intl = useIntl();
   const dispatch = useAppDispatch();
@@ -89,12 +86,8 @@ const MealDateFormComponent: React.FC<TMealDateFormComponentProps> = (
   const {
     startDate: startDateInitialValue,
     endDate: endDateInitialValue,
-    deadlineDate: deadlineDateInitialValue,
-    orderType = EOrderType.normal,
     usePreviousData,
   } = values;
-
-  const isGroupOrder = orderType === EOrderType.group;
 
   const handleChangeOrderType = (newValue: string) => {
     if (newValue === EOrderType.group && onClickIsGroupOrder) {
@@ -112,10 +105,7 @@ const MealDateFormComponent: React.FC<TMealDateFormComponentProps> = (
 
   useEffect(() => {
     const formInvalid =
-      invalid ||
-      !startDateInitialValue ||
-      !endDateInitialValue ||
-      (isGroupOrder && !deadlineDateInitialValue);
+      invalid || !startDateInitialValue || !endDateInitialValue;
     setFormInvalid?.(formInvalid);
   }, [invalid, JSON.stringify(values)]);
 
@@ -199,16 +189,6 @@ const MealDateFormComponent: React.FC<TMealDateFormComponentProps> = (
               })}
             />
           </div>
-
-          <RenderWhen condition={isGroupOrder}>
-            <div className={css.fieldContainer}>
-              <OrderDeadlineField
-                form={form}
-                values={values}
-                onClick={onClickDeadlineDate}
-              />
-            </div>
-          </RenderWhen>
         </RenderWhen>
       </div>
     </Form>

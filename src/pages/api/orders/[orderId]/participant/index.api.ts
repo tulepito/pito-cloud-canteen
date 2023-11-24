@@ -1,4 +1,6 @@
+import difference from 'lodash/difference';
 import isEmpty from 'lodash/isEmpty';
+import uniq from 'lodash/uniq';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HttpMethod } from '@apis/configs';
@@ -20,95 +22,114 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           query: { orderId = '' },
           body: {
             email = '',
-            planId = '',
             participants = [],
+            planId = '',
             anonymous = [],
             orderDetail = {},
+            userIds: userIdsFromBody,
           },
         } = req;
 
-        let user;
+        let userIds: string[] = [];
+        if (isEmpty(userIdsFromBody)) {
+          let user;
 
-        try {
-          [user] = denormalisedResponseEntities(
-            await integrationSdk.users.show({
-              email,
-            }),
-          );
-        } catch (errorFetchUser: any) {
-          console.error(errorFetchUser?.data?.errors[0]);
+          try {
+            [user] = denormalisedResponseEntities(
+              await integrationSdk.users.show({
+                email,
+              }),
+            );
+          } catch (errorFetchUser: any) {
+            console.error(errorFetchUser?.data?.errors[0]);
+          }
+
+          if (!user) {
+            res.json({
+              errorCode: 'user_not_found',
+              message: `Email ${email} chưa có tài khoản`,
+            });
+
+            return;
+          }
+
+          userIds.push(user?.id?.uuid);
+
+          if (participants.includes(user?.id?.uuid)) {
+            res.json({
+              errorCode: 'user_already_in_list',
+              message: `Đã tồn tại trong danh sách thành viên`,
+            });
+
+            return;
+          }
+        } else {
+          userIds = userIdsFromBody;
         }
 
-        if (!user) {
-          res.json({
-            errorCode: 'user_not_found',
-            message: `Email ${email} chưa có tài khoản`,
-          });
-
-          return;
-        }
-
-        const userId = user?.id?.uuid;
-
-        if (participants.includes(userId)) {
-          res.json({
-            errorCode: 'user_already_in_list',
-            message: `Đã tồn tại trong danh sách thành viên`,
-          });
-
-          return;
-        }
-
-        const newOrderDetail = Object.entries(orderDetail).reduce(
-          (result, current) => {
-            const [date, orderDetailOnDate] = current;
-            const { memberOrders } = orderDetailOnDate as TObject;
-
-            return {
-              ...result,
-              [date]: {
-                ...(orderDetailOnDate as TObject),
-                memberOrders: {
-                  [userId]: {
-                    foodId: '',
-                    status: EParticipantOrderStatus.empty,
-                  },
-                  ...memberOrders,
-                },
-              },
-            };
-          },
-          {},
-        );
-
-        const updateAnonymousList = anonymous.filter(
-          (id: string) => id !== userId,
-        );
-
+        // TODO: update participant list
         await integrationSdk.listings.update({
           id: orderId,
           metadata: {
-            participants: [...participants, userId],
-            anonymous: updateAnonymousList,
+            participants: uniq(participants.concat(userIds)),
+            ...(isEmpty(anonymous)
+              ? {}
+              : { anonymous: difference(anonymous, userIds) }),
           },
         });
 
-        await integrationSdk.listings.update({
-          id: planId,
-          metadata: {
-            orderDetail: newOrderDetail,
-          },
-        });
-        emailSendingFactory(
-          EmailTemplateTypes.PARTICIPANT.PARTICIPANT_ORDER_PICKING,
-          {
-            orderId,
-            participantId: userId,
-          },
-        );
+        if (!isEmpty(planId)) {
+          const newOrderDetail = Object.entries(orderDetail).reduce(
+            (result, current) => {
+              const [date, orderDetailOnDate] = current;
+              const { memberOrders } = orderDetailOnDate as TObject;
+
+              const newMemberOrders = userIds.reduce(
+                (memberOrderRes, userId) => {
+                  return {
+                    [userId]: {
+                      foodId: '',
+                      status: EParticipantOrderStatus.empty,
+                    },
+                    ...memberOrderRes,
+                  };
+                },
+                memberOrders,
+              );
+
+              return {
+                ...result,
+                [date]: {
+                  ...(orderDetailOnDate as TObject),
+                  memberOrders: newMemberOrders,
+                },
+              };
+            },
+            {},
+          );
+
+          await integrationSdk.listings.update({
+            id: planId,
+            metadata: {
+              orderDetail: newOrderDetail,
+            },
+          });
+
+          userIds.forEach(async (userId: string) =>
+            emailSendingFactory(
+              EmailTemplateTypes.PARTICIPANT.PARTICIPANT_ORDER_PICKING,
+              {
+                orderId,
+                participantId: userId,
+              },
+            ),
+          );
+        }
 
         res.status(200).json({
-          message: `Successfully add participant, email: ${email}`,
+          message: `Successfully add participant, email: ${email} and ids: [${userIds.join(
+            ', ',
+          )}]`,
         });
       } catch (error) {
         handleError(res, error);
@@ -126,14 +147,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           },
         } = req;
 
-        if (!isEmpty(participants)) {
-          await integrationSdk.listings.update({
-            id: orderId,
-            metadata: {
-              participants,
-            },
-          });
-        }
+        await integrationSdk.listings.update({
+          id: orderId,
+          metadata: {
+            participants,
+          },
+        });
 
         if (!isEmpty(planId)) {
           await integrationSdk.listings.update({

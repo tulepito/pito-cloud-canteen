@@ -1,0 +1,24 @@
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.participantContainer {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  column-gap: 12px;
+
+  & > * {
+    flex-basis: calc(50% - 6px);
+
+    @include viewportLarge {
+      flex-basis: calc(100% / 2 - 12px / 2);
+    }
+
+    @include viewportLarge {
+      flex-basis: calc(100% / 3 - 12px * 2 / 3);
+    }
+
+    @include viewportLarge {
+      flex-basis: calc(100% / 2 - 12px / 2);
+    }
+  }
+}

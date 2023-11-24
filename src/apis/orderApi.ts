@@ -115,19 +115,6 @@ export const bookerStartOrderApi = ({
   return putApi(`/orders/${orderId}/plan/${planId}/start-order`);
 };
 
-// Mark order viewed
-export const bookerMarkInprogressPlanViewedApi = ({
-  orderId,
-  planId,
-}: {
-  orderId: string;
-  planId: string;
-}) => {
-  return putApi(
-    `/orders/${orderId}/plan/${planId}/mark-inprogress-plan-viewed`,
-  );
-};
-
 // Allow picking for order
 export const publishOrderApi = (orderId: string) => {
   return postApi(`/orders/${orderId}/publish-order`);

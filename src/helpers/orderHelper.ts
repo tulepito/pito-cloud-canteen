@@ -149,7 +149,10 @@ export const isEnableUpdateBookingInfo = (
   ].includes(orderState);
 };
 
-export const orderDataCheckers = (order: TListing) => {
+export const orderDataCheckers = (
+  order: TListing,
+  skipValidateKeys: string[],
+) => {
   const {
     plans = [],
     startDate,
@@ -169,6 +172,7 @@ export const orderDataCheckers = (order: TListing) => {
 
   const checkers = {
     isDeadlineDateValid:
+      skipValidateKeys.includes('deadlineDate') ||
       isNormalOrder ||
       (Number.isInteger(deadlineDate) &&
         minDeadlineTimeStamp <= (deadlineDate || 0)),
@@ -179,7 +183,10 @@ export const orderDataCheckers = (order: TListing) => {
     isEndDateValid:
       Number.isInteger(endDate) && (endDate || 0) >= (startDate || 0),
     isDeliveryHourValid: timeRangeOptionsValues.includes(deliveryHour),
-    isDeadlineHourValid: isNormalOrder || !!deadlineHour,
+    isDeadlineHourValid:
+      skipValidateKeys.includes('deadlineHour') ||
+      isNormalOrder ||
+      !!deadlineHour,
     isPackagePerMemberValid: Number.isInteger(packagePerMember),
     haveAnyPlans: !isEmpty(plans),
   };
@@ -192,8 +199,9 @@ export const isEnableSubmitPublishOrder = (
   order: TListing,
   orderDetail: any[],
   availableOrderDetailCheckList: TObject,
+  skipValidateKeys: string[] = [],
 ) => {
-  const isOrderValid = orderDataCheckers(order).isAllValid;
+  const isOrderValid = orderDataCheckers(order, skipValidateKeys).isAllValid;
   const isOrderDetailHasData = !isEmpty(orderDetail);
   const isOrderDetailSetupCompleted = orderDetail.every(({ resource }) => {
     const { isSelectedFood = false } = resource || {};

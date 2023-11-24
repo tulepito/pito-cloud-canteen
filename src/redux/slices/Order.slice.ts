@@ -355,9 +355,6 @@ const createOrder = createAsyncThunk(
       startDate,
       endDate,
       orderType,
-      deadlineDate,
-      orderDeadlineHour,
-      orderDeadlineMinute,
       dayInWeek,
       daySession,
       deliveryHour,
@@ -369,25 +366,12 @@ const createOrder = createAsyncThunk(
 
     const startDateTimestamp = new Date(startDate).getTime();
     const endDateTimestamp = new Date(endDate).getTime();
-    const deadlineDateTimestamp = new Date(deadlineDate).getTime();
 
     const selectedDays = getSelectedDaysOfWeek(
       startDateTimestamp,
       endDateTimestamp,
       dayInWeek,
     );
-
-    const deadlineInfoMaybe = newIsGroupOrder
-      ? {
-          deadlineDate: DateTime.fromISO(deadlineDate)
-            .plus({
-              hours: orderDeadlineHour,
-              minutes: orderDeadlineMinute,
-            })
-            .toMillis(),
-          deadlineHour: `${orderDeadlineHour}:${orderDeadlineMinute}`,
-        }
-      : {};
 
     const newOrderApiBody = {
       companyId: clientId || User(selectedCompany).getId(),
@@ -400,7 +384,6 @@ const createOrder = createAsyncThunk(
           : newIsGroupOrder
           ? EOrderType.group
           : EOrderType.normal,
-        ...deadlineInfoMaybe,
         deliveryAddress:
           User(selectedCompany).getPublicData().companyLocation || {},
         dayInWeek: selectedDays,
@@ -408,13 +391,6 @@ const createOrder = createAsyncThunk(
         endDate: endDateTimestamp,
         daySession,
         deliveryHour,
-        ...(newIsGroupOrder && {
-          deadlineDate: deadlineDateTimestamp,
-          deadlineHour: `${orderDeadlineHour.padStart(
-            2,
-            '0',
-          )}:${orderDeadlineMinute.padStart(2, '0')}`,
-        }),
       },
     };
 
@@ -437,21 +413,18 @@ const updateOrder = createAsyncThunk(
     const { generalInfo } = params;
     const { deadlineDate, deadlineHour } = generalInfo || {};
     const orderId = Listing(order as TListing).getId();
-    const parsedDeadlineDate = isNumber(deadlineDate)
-      ? DateTime.fromMillis(deadlineDate)
-          .startOf('day')
-          .plus({
-            ...convertHHmmStringToTimeParts(deadlineHour),
-          })
-          .toMillis()
-      : isString(deadlineDate)
-      ? DateTime.fromISO(deadlineDate)
-          .startOf('day')
-          .plus({
-            ...convertHHmmStringToTimeParts(deadlineHour),
-          })
-          .toMillis()
-      : undefined;
+    const parsedDeadlineDate =
+      isNumber(deadlineDate) || isString(deadlineDate)
+        ? (isNumber(deadlineDate)
+            ? DateTime.fromMillis(deadlineDate)
+            : DateTime.fromISO(deadlineDate)
+          )
+            .startOf('day')
+            .plus({
+              ...convertHHmmStringToTimeParts(deadlineHour),
+            })
+            .toMillis()
+        : undefined;
 
     const apiBody: TUpdateOrderApiBody = {
       generalInfo: {

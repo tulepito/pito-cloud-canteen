@@ -1,0 +1,47 @@
+@use '/src/styles/vars.scss' as *;
+
+.icon {
+  width: 24px;
+  height: 24px;
+}
+
+.errorIcon {
+  @extend .icon;
+  path {
+    fill: $primaryPri2;
+  }
+}
+
+.container {
+  padding: 16px 24px;
+  border-radius: 12px;
+  min-height: unset;
+}
+
+.successContainer {
+  @extend .container;
+  background-color: $sematicGreen1;
+}
+.errorContainer {
+  @extend .container;
+  background-color: $primaryPri1;
+}
+
+.body {
+  margin: 0;
+  padding: 0;
+  margin-right: 74px;
+  column-gap: 8px;
+  color: $neutralGray7;
+  min-width: 280px;
+
+  & > div:first-child {
+    flex-basis: 24px;
+    margin-right: 0;
+  }
+}
+
+.errorBody {
+  @extend .body;
+  min-width: 368px;
+}

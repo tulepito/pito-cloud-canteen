@@ -42,47 +42,49 @@ const updateOrder = async ({
 
   let updatedOrderListing;
   const isOrderHasInProgressState = orderStateHistory.some(
-    (state: { state: string; createdAt: number }) =>
-      state.state === EOrderStates.inProgress,
+    ({ state }: { state: string }) => state === EOrderStates.inProgress,
   );
 
   if (!isEmpty(generalInfo)) {
-    const newSelectedGroup = generalInfo.selectedGroups || selectedGroups;
-
-    const participants: string[] = isEmpty(newSelectedGroup)
-      ? getAllCompanyMembers(companyAccount)
-      : calculateGroupMembers(companyAccount, newSelectedGroup);
     const {
       startDate,
       endDate,
       deadlineDate,
       orderState: updatedOrderState,
+      selectedGroups: updateSelectedGroups,
     } = generalInfo;
 
+    const shouldUpdateParticipantList =
+      typeof updateSelectedGroups !== 'undefined';
+    const participants: string[] = isEmpty(
+      updateSelectedGroups || selectedGroups,
+    )
+      ? getAllCompanyMembers(companyAccount)
+      : calculateGroupMembers(companyAccount, updateSelectedGroups);
+
     if (deadlineDate) {
+      const schedulerName = `sendRemindPOE_${orderId}`;
       const reminderTime = DateTime.fromMillis(deadlineDate)
         .setZone(VNTimezone)
         .minus({
           minutes: 30,
         })
         .toMillis();
+      const timeExpression = formatTimestamp(
+        reminderTime,
+        "yyyy-MM-dd'T'hh:mm:ss",
+      );
       try {
-        await getScheduler(`sendRemindPOE_${orderId}`);
+        await getScheduler(schedulerName);
         await updateScheduler({
-          customName: `sendRemindPOE_${orderId}`,
-          timeExpression: formatTimestamp(
-            reminderTime,
-            "yyyy-MM-dd'T'hh:mm:ss",
-          ),
+          customName: schedulerName,
+          timeExpression,
         });
       } catch (error) {
-        console.log('create scheduler in update order');
+        console.info('create scheduler in update order');
         await createScheduler({
-          customName: `sendRemindPOE_${orderId}`,
-          timeExpression: formatTimestamp(
-            reminderTime,
-            "yyyy-MM-dd'T'hh:mm:ss",
-          ),
+          customName: schedulerName,
+          timeExpression,
           params: {
             orderId,
           },
@@ -116,8 +118,12 @@ const updateOrder = async ({
             : {}),
           metadata: {
             ...generalInfo,
+            ...(shouldUpdateParticipantList
+              ? {
+                  participants,
+                }
+              : {}),
             orderStateHistory: newOrderStateHistory,
-            participants,
           },
         },
         { expand: true },
