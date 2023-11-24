@@ -1,9 +1,13 @@
 import { useState } from 'react';
+import { DateTime } from 'luxon';
 
+import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
 import { isOrderOverDeadline } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { totalFoodPickedWithParticipant } from '@pages/participant/helpers';
 import { shoppingCartThunks } from '@redux/slices/shoppingCart.slice';
 import type { RootState } from '@redux/store';
+import { Listing } from '@src/utils/data';
 
 import { ParticipantPlanThunks } from '../../plans/[planId]/ParticipantPlanPage.slice';
 
@@ -45,6 +49,12 @@ const SectionOrderPanel: React.FC<TSectionOrderPanelProps> = ({
   );
 
   const isOrderDeadlineOver = isOrderOverDeadline(order);
+  const { deadlineDate = Date.now(), deadlineHour } =
+    Listing(order).getMetadata();
+  const orderDeadline = DateTime.fromMillis(deadlineDate)
+    .startOf('day')
+    .plus({ ...convertHHmmStringToTimeParts(deadlineHour) })
+    .toMillis();
 
   // Local state
   const [isOpenConfirmDeleteAll, setIsOpenConfirmDeleteAll] = useState(false);
@@ -84,10 +94,12 @@ const SectionOrderPanel: React.FC<TSectionOrderPanelProps> = ({
     dispatch(ParticipantPlanThunks.recommendFoodSubOrders());
   };
 
+  const orderDetailIds = Object.keys(plan ?? {});
+
   return (
     <div className={css.root}>
       <OrderPanelHeader
-        selectedDays={cartListKeys.length}
+        selectedDays={totalFoodPickedWithParticipant(orderDetailIds, cartList)}
         sumDays={orderDays.length}
       />
       <OrderPanelBody
@@ -101,6 +113,8 @@ const SectionOrderPanel: React.FC<TSectionOrderPanelProps> = ({
       <OrderPanelFooter
         submitDataInprogress={submitDataInprogress}
         cartListKeys={cartListKeys}
+        cartList={cartList}
+        orderDetailIds={orderDetailIds}
         isOrderDeadlineOver={isOrderDeadlineOver}
         handleSubmit={handleSubmit}
         handleRemoveAllItem={handleRemoveAllItem}
@@ -111,10 +125,13 @@ const SectionOrderPanel: React.FC<TSectionOrderPanelProps> = ({
         onCancel={handleCloseConfirmDeleteAll}
         onConfirm={handleConfirmDeleteAll}
       />
-      <SuccessModal
-        isOpen={isSubmitSuccess}
-        handleClose={handleCloseSuccessModal}
-      />
+      {deadlineDate && (
+        <SuccessModal
+          isOpen={isSubmitSuccess}
+          orderDeadline={orderDeadline}
+          handleClose={handleCloseSuccessModal}
+        />
+      )}
     </div>
   );
 };

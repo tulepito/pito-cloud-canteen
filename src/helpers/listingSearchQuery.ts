@@ -302,22 +302,22 @@ export const getParticipantOrdersQueries = ({
 }: {
   userId: string;
   startDate: number;
-  endDate: number;
+  endDate?: number;
 }) => {
-  const queries = [
-    {
+  const queries = {
+    queryParticipants: {
       meta_listingType: EListingType.order,
       meta_participants: `has_any:${userId}`,
       meta_orderState: Object.values(EOrderStates).join(','),
-      meta_startDate: `${startDate},${endDate + 1}`,
+      meta_startDate: `${startDate},${endDate ? endDate + 1 : ''}`,
     },
-    {
+    queryAnonymous: {
       meta_listingType: EListingType.order,
       meta_anonymous: `has_any:${userId}`,
       meta_orderState: Object.values(EOrderStates).join(','),
-      meta_startDate: `${startDate},${endDate + 1}`,
+      meta_startDate: `${startDate},${endDate ? endDate + 1 : ''}`,
     },
-  ];
+  };
 
   return queries;
 };

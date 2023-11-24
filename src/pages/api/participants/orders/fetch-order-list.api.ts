@@ -5,6 +5,10 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { HttpMethod } from '@apis/configs';
 import { fetchListingsByChunkedIds } from '@helpers/apiHelpers';
 import { getParticipantOrdersQueries } from '@helpers/listingSearchQuery';
+import {
+  confirmFirstTimeParticipant,
+  sortCreateAtListing,
+} from '@helpers/orderHelper';
 import cookies from '@services/cookie';
 import { fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
@@ -37,21 +41,48 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           startDate: new Date(startDate).getTime(),
           endDate: new Date(endDate).getTime(),
         });
-
-        const responses = await Promise.all(
-          ordersQueries.map(async (query) => {
-            const response = await integrationSdk.listings.query(query);
-
-            return denormalisedResponseEntities(response);
-          }),
+        const orderPaticipants = integrationSdk.listings.query(
+          ordersQueries.queryParticipants,
         );
-        const orders = flatten(responses);
+        const orderAnonymous = integrationSdk.listings.query(
+          ordersQueries.queryAnonymous,
+        );
 
-        const allPlansIdList = orders.map((order: TListing) => {
-          const orderListing = Listing(order);
-          const { plans = [] } = orderListing.getMetadata();
+        const ordersQueriesOutOfScopeDate = getParticipantOrdersQueries({
+          userId: currentUser.id.uuid,
+          startDate: new Date(endDate).getTime() + 1,
+        });
+        const orderOutOfScopeDatePaticipants = integrationSdk.listings.query(
+          ordersQueriesOutOfScopeDate.queryParticipants,
+        );
+        const orderOutOfScopeDateorderAnonymous = integrationSdk.listings.query(
+          ordersQueriesOutOfScopeDate.queryAnonymous,
+        );
 
-          return plans[0];
+        const responses = await Promise.all([
+          orderPaticipants,
+          orderAnonymous,
+          orderOutOfScopeDatePaticipants,
+          orderOutOfScopeDateorderAnonymous,
+        ]).then((result) => result.map((r) => denormalisedResponseEntities(r)));
+
+        const orders = [...responses[0], ...responses[1]];
+
+        const allPlansIdList: any[] = [];
+        const ordersNotConfirmFirstTime: TListing[] = [];
+        orders.forEach(async (order: TListing) => {
+          const { plans = [] } = Listing(order).getMetadata();
+
+          if (!confirmFirstTimeParticipant(order, currentUser.id.uuid)) {
+            ordersNotConfirmFirstTime.push(order);
+          }
+          allPlansIdList.push(plans[0]);
+        });
+
+        [...responses[2], ...responses[3]].forEach(async (order: TListing) => {
+          if (!confirmFirstTimeParticipant(order, currentUser.id.uuid)) {
+            ordersNotConfirmFirstTime.push(order);
+          }
         });
         const allPlanListings = await fetchListingsByChunkedIds(
           allPlansIdList,
@@ -153,6 +184,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           restaurants: allRelatedRestaurants,
           mappingSubOrderToOrder,
           company,
+          ordersNotConfirmFirstTime: sortCreateAtListing(
+            ordersNotConfirmFirstTime,
+            'desc',
+          ),
           foodsInPlans,
         });
       }
