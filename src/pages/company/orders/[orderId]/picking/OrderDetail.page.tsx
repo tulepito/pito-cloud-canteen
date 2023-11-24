@@ -22,6 +22,7 @@ import PriceQuotation from '@components/OrderDetails/PriceQuotation/PriceQuotati
 import type { TReviewInfoFormValues } from '@components/OrderDetails/ReviewView/ReviewInfoSection/ReviewInfoForm';
 import ReviewView from '@components/OrderDetails/ReviewView/ReviewView';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
+import { isOrderCreatedByBooker } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { useDownloadPriceQuotation } from '@hooks/useDownloadPriceQuotation';
@@ -214,6 +215,7 @@ const OrderDetailPage = () => {
     orderVATPercentage,
     startDate,
     deliveryHour,
+    orderStateHistory = [],
   } = Listing(orderData as TListing).getMetadata();
   const planId = Listing(planData as TListing).getId();
   const isPickingOrder = orderState === EOrderStates.picking;
@@ -332,6 +334,7 @@ const OrderDetailPage = () => {
   const isNormalOrder = orderType === EOrderType.normal;
   const isPicking = orderState === EOrderStates.picking;
   const isDraftEditing = orderState === EOrderStates.inProgress;
+  const isCreatedByBooker = isOrderCreatedByBooker(orderStateHistory);
 
   const editViewClasses = classNames(css.editViewRoot, {
     [css.editNormalOrderView]: isNormalOrder,
@@ -446,7 +449,7 @@ const OrderDetailPage = () => {
       />
 
       <RenderWhen condition={!inProgress}>
-        <RenderWhen condition={!isNormalOrder}>
+        <RenderWhen condition={!isNormalOrder && isCreatedByBooker}>
           <div className={css.infoPart}>
             <div className={css.columnContainer}>
               <IconNoteCheckList />
