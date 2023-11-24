@@ -20,7 +20,6 @@
       "@apis/*": ["src/apis/*"],
       "@components/*": ["src/components/*"],
       "@configs/*": ["src/configs/*"],
-      "@forms/*": ["src/forms/*"],
       "@helpers/*": ["src/helpers/*"],
       "@hooks/*": ["src/hooks/*"],
       "@pages/*": ["src/pages/*"],
@@ -31,6 +30,7 @@
       "@styles/*": ["src/styles/*"],
       "@translations/*": ["src/translations/*"],
       "@utils/*": ["src/utils/*"],
+      "@apiServices/*": ["src/pages/api/apiServices/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],

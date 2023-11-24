@@ -1,6 +1,14 @@
 import type { EParticipantOrderStatus } from './enums';
 import type { ETransition } from './transaction';
 
+export type TFoodList = {
+  [foodId: string]: {
+    foodName: string;
+    foodPrice: number;
+    foodUnit?: string;
+  };
+};
+
 export type TPlan = {
   meal: string;
   orderDetail: {
@@ -14,13 +22,7 @@ export type TPlan = {
         minQuantity?: number;
         maxQuantity?: number;
         restaurantName?: string;
-        foodList?: {
-          [foodId: string]: {
-            foodName: string;
-            foodPrice: number;
-            foodUnit?: string;
-          };
-        };
+        foodList?: TFoodList;
       };
       memberOrders: {
         [participant: string]: {

@@ -67,6 +67,9 @@ import type {
   TPagination,
 } from '@utils/types';
 
+// eslint-disable-next-line import/no-cycle
+import { BookerSelectRestaurantActions } from '../../pages/company/booker/orders/draft/[orderId]/restaurants/BookerSelectRestaurant.slice';
+
 import { SystemAttributesThunks } from './systemAttributes.slice';
 
 export const MANAGE_ORDER_PAGE_SIZE = 10;
@@ -864,14 +867,16 @@ const fetchPlanDetail = createAsyncThunk(
 
 const updatePlanDetail = createAsyncThunk(
   UPDATE_PLAN_DETAIL,
-  async ({ orderId, planId, orderDetail, updateMode }: any, _) => {
-    const { data: orderListing } = await updatePlanDetailsApi(orderId, {
+  async ({ orderId, planId, orderDetail, updateMode }: any, { dispatch }) => {
+    const { data: planListing } = await updatePlanDetailsApi(orderId, {
       orderDetail,
       planId,
       updateMode,
     });
 
-    return orderListing;
+    dispatch(BookerSelectRestaurantActions.setPlanDetail(planListing));
+
+    return planListing;
   },
 );
 
@@ -984,8 +989,8 @@ const checkRestaurantStillAvailable = createAsyncThunk(
           [timestamp]: {
             isAvailable: isAnyMenusValid,
             ...(isAnyMenusValid
-              ? { status: EInvalidRestaurantCase.noMenusValid }
-              : {}),
+              ? {}
+              : { status: EInvalidRestaurantCase.noMenusValid }),
           },
         };
       }),

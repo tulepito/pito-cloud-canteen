@@ -26,7 +26,7 @@ import {
   EOrderType,
   EParticipantOrderStatus,
 } from '@utils/enums';
-import type { TPlan } from '@utils/orderTypes';
+import type { TFoodList, TPlan } from '@utils/orderTypes';
 import type {
   TListing,
   TObject,
@@ -310,11 +310,7 @@ export const findSuitableStartDate = ({
 
   const suitableStartDate =
     dateRange.find((date) => {
-      const foodIds = Object.keys(
-        orderDetail[date.toString()]?.restaurant?.foodList || {},
-      );
-
-      return isEmpty(foodIds);
+      return isEmpty(orderDetail[date.toString()]?.restaurant?.foodList || {});
     }) || new Date(startDate);
 
   return suitableStartDate;
@@ -557,7 +553,6 @@ export const getSelectedRestaurantAndFoodList = ({
   foodIds: string[];
   currentRestaurant: TObject;
 }) => {
-  const currRestaurantId = currentRestaurant?.id?.uuid;
   const submitFoodListData = foodIds.reduce((result, foodId) => {
     const item = foodList.find((food) => food?.id?.uuid === foodId);
 
@@ -581,7 +576,7 @@ export const getSelectedRestaurantAndFoodList = ({
   }, {});
 
   const submitRestaurantData = {
-    id: currRestaurantId,
+    id: currentRestaurant?.id?.uuid,
     restaurantName: currentRestaurant?.attributes?.title,
     phoneNumber: currentRestaurant?.attributes?.publicData?.phoneNumber,
     minQuantity: currentRestaurant?.attributes?.publicData?.minQuantity,
@@ -1035,4 +1030,24 @@ export const mergeRecommendOrderDetailWithCurrentOrderDetail = (
   }
 
   return mergedResult;
+};
+
+export const initLineItemsFromFoodList = (
+  foodList: TFoodList,
+  isNormalOrder = true,
+) => {
+  return isNormalOrder
+    ? Object.entries<{
+        foodName: string;
+        foodPrice: number;
+      }>(foodList).map(([foodId, { foodName, foodPrice }]) => {
+        return {
+          id: foodId,
+          name: foodName,
+          unitPrice: foodPrice,
+          price: foodPrice,
+          quantity: 1,
+        };
+      })
+    : [];
 };

@@ -61,7 +61,7 @@ const ResultDetailFilters: React.FC<TResultDetailFiltersProps> = ({
     ) {
       form.change('selectAll', false);
     }
-  }, [selectedFoodIds, originFoodIdList]);
+  }, [JSON.stringify(selectedFoodIds), JSON.stringify(originFoodIdList)]);
 
   return (
     <form onSubmit={handleSubmit} className={css.filters}>
