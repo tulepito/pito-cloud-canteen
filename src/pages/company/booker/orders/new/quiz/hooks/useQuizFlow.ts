@@ -15,20 +15,14 @@ import type { TListing } from '@src/utils/types';
 import { BookerNewOrderAction } from '../../BookerNewOrder.slice';
 
 const quizSteps = [
-  QuizStep.NEW_ORDER,
   QuizStep.PACKAGE_PER_MEMBER,
   QuizStep.SPECIAL_DEMAND,
-  QuizStep.MEAL_STYLES,
   QuizStep.MEAL_DATE,
   QuizStep.INVITE_MEMBER,
   QuizStep.ORDER_CREATING,
 ];
 
-const secondQuizSteps = [
-  QuizStep.NEW_ORDER,
-  QuizStep.MEAL_DATE,
-  QuizStep.ORDER_CREATING,
-];
+const secondQuizSteps = [QuizStep.MEAL_DATE, QuizStep.ORDER_CREATING];
 
 export const useQuizFlow = (step: string) => {
   const dispatch = useAppDispatch();
@@ -77,6 +71,7 @@ export const useQuizFlow = (step: string) => {
             }),
           );
         const orderId = Listing(orderListing as TListing).getId();
+
         if (!isCopyPreviousOrder && !reorderOpen) {
           const { plans = [] } = Listing(
             orderListing as TListing,

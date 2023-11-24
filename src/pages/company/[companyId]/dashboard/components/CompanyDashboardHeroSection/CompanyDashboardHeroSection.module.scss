@@ -82,6 +82,10 @@
           height: 164px;
         }
 
+        &.homePageLinkDisabled {
+          cursor: not-allowed;
+        }
+
         .image {
           width: 100%;
           position: relative !important;

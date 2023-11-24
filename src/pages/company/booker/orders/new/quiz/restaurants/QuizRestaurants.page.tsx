@@ -14,7 +14,6 @@ import { User } from '@utils/data';
 import type { TUser } from '@utils/types';
 
 import EmptyList from '../../../draft/[orderId]/restaurants/components/ResultList/EmptyList';
-import useRedirectAfterReloadPage from '../../hooks/useRedirectAfterReloadPage';
 import QuizModal from '../components/QuizModal/QuizModal';
 
 import css from './QuizRestaurants.module.scss';
@@ -23,7 +22,6 @@ const QuizRestaurants = () => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
   const router = useRouter();
-  useRedirectAfterReloadPage();
   const isLoading = false;
   const [selectedRestaurant, setSelectedRestaurant] = useState<string>('');
   const restaurants = useAppSelector(
