@@ -38,11 +38,9 @@
   margin-right: 8px;
 }
 
-.navigation {
-}
-
 .navItem {
   padding: 20px 0 18px;
+  max-width: 232px;
 
   @include textTemplate(16px, 700, 24px);
   color: $neutralGray7;
@@ -57,9 +55,18 @@
     align-items: center;
   }
 
+  .subText {
+    @include textTemplate(12px, 400, 24px);
+    color: $neutralGray7;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin: 0;
+  }
+
   &:hover {
     background-color: $neutralGray2;
-    text-indent: 12px;
+    padding-left: 12px;
   }
 
   .errorMessage {

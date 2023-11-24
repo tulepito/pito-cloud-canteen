@@ -7,7 +7,7 @@ import { updateFirstTimeViewOrderApi } from '@apis/participantApi';
 import { fetchTxApi } from '@apis/txApi';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { denormalisedResponseEntities, Listing } from '@src/utils/data';
-import { EImageVariants } from '@src/utils/enums';
+import { EImageVariants, EParticipantOrderStatus } from '@src/utils/enums';
 import { storableError } from '@utils/errors';
 import type { TListing, TObject, TTransaction, TUser } from '@utils/types';
 
@@ -20,6 +20,7 @@ type TParticipantOrderManagementState = {
   company: TUser | {};
   order: TListing | {};
   plans: TListing[];
+  pickedFoods: TListing[];
   subOrders: any[];
   loadDataInProgress: boolean;
   loadDataError: any;
@@ -38,6 +39,7 @@ const initialState: TParticipantOrderManagementState = {
   order: {},
   plans: [],
   subOrders: [],
+  pickedFoods: [],
   loadDataInProgress: false,
   loadDataError: null,
 
@@ -71,23 +73,43 @@ const loadData = createAsyncThunk(
       }),
     )[0];
 
-    const { orderDetail = {} } = Listing(plan).getMetadata();
+    const { orderDetail: subOrders } = Listing(plan).getMetadata();
     const allRelatedRestaurantsIdList = uniq(
       compact(
-        Object.values(orderDetail).map(
+        Object.values(subOrders).map(
           (subOrder: any) => subOrder?.restaurant?.id,
         ),
       ),
     );
+
+    const pickedFoodIds: any[] = [];
+    Object.keys(subOrders).forEach((key) => {
+      const subOrderDate = subOrders[key];
+      const memberOrder = subOrderDate?.memberOrders[currentUserId];
+      if (memberOrder) {
+        const { foodId, status } = memberOrder;
+
+        if (foodId && status === EParticipantOrderStatus.joined) {
+          pickedFoodIds.push(foodId);
+        }
+      }
+    });
+
+    const pickedFoods = denormalisedResponseEntities(
+      await sdk.listings.query({
+        ids: pickedFoodIds,
+        include: ['images'],
+        'fields.image': [`variants.${EImageVariants.default}`],
+      }),
+    );
+
     const allRelatedRestaurants = denormalisedResponseEntities(
       await sdk.listings.query({
         ids: allRelatedRestaurantsIdList,
       }),
     );
     const txIds = compact(
-      Object.values(orderDetail).map(
-        (subOrder: any) => subOrder?.transactionId,
-      ),
+      Object.values(subOrders).map((subOrder: any) => subOrder?.transactionId),
     );
 
     const subOrderTxs = await Promise.all(
@@ -101,6 +123,7 @@ const loadData = createAsyncThunk(
     returnValues = {
       order,
       plans: [plan],
+      pickedFoods,
       restaurants: allRelatedRestaurants,
       subOrderTxs,
       shouldShowFirstTimeOrderModal:

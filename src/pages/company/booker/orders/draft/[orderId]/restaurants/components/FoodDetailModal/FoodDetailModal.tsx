@@ -1,10 +1,12 @@
 import React from 'react';
 import { useIntl } from 'react-intl';
+import Skeleton from 'react-loading-skeleton';
 
 import Button from '@components/Button/Button';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import IconClose from '@components/Icons/IconClose/IconClose';
 import Modal from '@components/Modal/Modal';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
 import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
 import { addCommas } from '@helpers/format';
 import { FOOD_SIDE_DISH_OPTIONS } from '@src/utils/options';
@@ -19,13 +21,15 @@ type TFoodDetailModalProps = {
   food?: TListing;
   onClose?: () => void;
   onSelect?: (foodId: string) => void;
+  isLoading?: boolean;
 };
 
 const FoodDetailModal: React.FC<TFoodDetailModalProps> = ({
   isOpen = false,
   food,
   onClose = () => null,
-  onSelect = () => null,
+  onSelect,
+  isLoading,
 }) => {
   const intl = useIntl();
 
@@ -41,7 +45,7 @@ const FoodDetailModal: React.FC<TFoodDetailModalProps> = ({
     ),
   );
   const handleSelectFood = () => {
-    onSelect(food?.id?.uuid);
+    onSelect?.(food?.id?.uuid);
   };
 
   if (!isOpen) {
@@ -70,41 +74,50 @@ const FoodDetailModal: React.FC<TFoodDetailModalProps> = ({
           </span>
         </span>
       </div>
-      <div className={css.scrollContainer}>
-        <div className={css.coverImage}>
-          <ResponsiveImage
-            alt={Listing(food!).getAttributes().title}
-            image={Listing(food!).getImages()[0]}
-            variants={[EImageVariants.default]}
-          />
-        </div>
-        <div className={css.topContent}>
-          <div className={css.foodTitle}>
-            {Listing(food!).getAttributes().title}
+      <RenderWhen condition={!isLoading}>
+        <div className={css.scrollContainer}>
+          <div className={css.coverImage}>
+            <ResponsiveImage
+              alt={Listing(food!).getAttributes().title}
+              image={Listing(food!).getImages()[0]}
+              variants={[EImageVariants.default]}
+            />
           </div>
-          <div className={css.price}>{`${addCommas(
-            Listing(food!).getAttributes()?.price?.amount,
-          )} ₫ / Phần`}</div>
+          <div className={css.topContent}>
+            <div className={css.foodTitle}>
+              {Listing(food!).getAttributes().title}
+            </div>
+            <div className={css.price}>{`${addCommas(
+              Listing(food!).getAttributes()?.price?.amount,
+            )} ₫ / Phần`}</div>
+          </div>
+          <p className={css.description}>
+            {Listing(food!).getAttributes().description || 'Không có mô tả'}
+          </p>
         </div>
-        <p className={css.description}>
-          {Listing(food!).getAttributes().description || 'Không có mô tả'}
-        </p>
-      </div>
-      <div className={css.sideDishesWrapper}>
-        <div className={css.sideDishesTitle}>
-          {intl.formatMessage({
-            id: 'booker.orders.draft.foodDetailModal.sideDishesTitle',
-          })}
+        <div className={css.sideDishesWrapper}>
+          <div className={css.sideDishesTitle}>
+            {intl.formatMessage({
+              id: 'booker.orders.draft.foodDetailModal.sideDishesTitle',
+            })}
+          </div>
+          {renderedSideDishes}
         </div>
-        {renderedSideDishes}
-      </div>
-      <div className={css.footer}>
-        <Button className={css.submitBtn} onClick={handleSelectFood}>
-          {intl.formatMessage({
-            id: 'booker.orders.draft.foodDetailModal.addDish',
-          })}
-        </Button>
-      </div>
+        <RenderWhen.False>
+          <Skeleton className={css.loading} />
+          <Skeleton className={css.loadingTitle} />
+          <Skeleton className={css.loadingContent} />
+        </RenderWhen.False>
+      </RenderWhen>
+      {onSelect && (
+        <div className={css.footer}>
+          <Button className={css.submitBtn} onClick={handleSelectFood}>
+            {intl.formatMessage({
+              id: 'booker.orders.draft.foodDetailModal.addDish',
+            })}
+          </Button>
+        </div>
+      )}
     </Modal>
   );
 };

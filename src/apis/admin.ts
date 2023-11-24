@@ -74,6 +74,9 @@ export const disapprovePartnerPaymentApi = ({
     subOrderDate,
   });
 
+export const searchRestaurantListFromMenuApi = (params: TObject) =>
+  getApi('/admin/listings/order/search-retaurant', params);
+
 export const fetchFoodListFromMenuApi = (params: TObject) =>
   getApi('/admin/listings/order/fetch-food-from-menu', params);
 

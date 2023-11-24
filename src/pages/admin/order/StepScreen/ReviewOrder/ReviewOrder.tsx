@@ -211,7 +211,12 @@ export const ReviewContent: React.FC<any> = (props) => {
 
   const orderId = Listing(order as TListing).getId();
   const { restaurantName, phoneNumber, foodList = {} } = restaurant || {};
-  const isInProgressOrder = orderState === EOrderStates.inProgress;
+  const resultSectionShowed = [
+    EOrderStates.inProgress,
+    EOrderStates.completed,
+    EOrderStates.pendingPayment,
+    EOrderStates.reviewed,
+  ].includes(orderState);
   const shouldShowTrackingLink =
     orderStateHistory.findIndex(
       (h: TObject) => h.state === EOrderStates.inProgress,
@@ -277,7 +282,7 @@ export const ReviewContent: React.FC<any> = (props) => {
 
   return (
     <div>
-      <RenderWhen condition={isInProgressOrder}>
+      <RenderWhen condition={resultSectionShowed}>
         <ReviewOrdersResultSection
           className={css.reviewOrderResult}
           data={{

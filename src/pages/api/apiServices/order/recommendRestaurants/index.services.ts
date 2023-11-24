@@ -18,6 +18,7 @@ import type { TListing, TObject } from '@src/utils/types';
 
 import {
   combineMenusWithRestaurantData,
+  filterMenusHavePackagePerMember,
   prepareMenuFoodList,
   prepareParamsFromGivenParamsForAllDays,
   prepareParamsFromGivenParamsForSpecificDay,
@@ -68,10 +69,18 @@ export const recommendRestaurantForSpecificDay = async ({
   const allMenus = await queryAllListings({
     query: menuQuery,
   });
+
+  // filter all menus having publicData.foodsBydate[dayOfWeek]'s values.price === packagePerMember
+  const filteredMenus = filterMenusHavePackagePerMember(
+    allMenus,
+    timestamp,
+    packagePerMember,
+  );
+
   // * query all restaurant
   const restaurantIdList = chunk(
     uniq<string>(
-      allMenus.map(
+      filteredMenus.map(
         (menu: TListing) => menu?.attributes?.metadata?.restaurantId,
       ),
     ),
@@ -94,7 +103,7 @@ export const recommendRestaurantForSpecificDay = async ({
   );
   // * map restaurant with menu data
   const restaurants = combineMenusWithRestaurantData({
-    menus: allMenus,
+    menus: filteredMenus,
     restaurants: restaurantsResponse,
     shouldCalculateDistance,
     deliveryOrigin,
@@ -193,10 +202,17 @@ export const recommendRestaurants = async ({
         query: menuQuery,
       });
 
+      // filter all menus having publicData.foodsBydate[dayOfWeek]'s values.price === packagePerMember
+      const filteredMenus = filterMenusHavePackagePerMember(
+        allMenus,
+        timestamp,
+        packagePerMember,
+      );
+
       // * query all restaurant
       const restaurantIdList = chunk(
         uniq<string>(
-          allMenus.map((menu: TListing) => {
+          filteredMenus.map((menu: TListing) => {
             const { restaurantId } = Listing(menu).getMetadata();
 
             return restaurantId;
@@ -222,7 +238,7 @@ export const recommendRestaurants = async ({
 
       // * map restaurant with menu data
       const restaurants = combineMenusWithRestaurantData({
-        menus: allMenus,
+        menus: filteredMenus,
         restaurants: restaurantsResponse,
         shouldCalculateDistance,
         deliveryOrigin,

@@ -279,6 +279,18 @@ const TABLE_COLUMN: TColumn[] = [
     },
   },
   {
+    key: 'orderType',
+    label: 'Loại',
+    render: ({ orderType }: any) => {
+      return (
+        <div className={css.orderName}>
+          {orderType === EOrderType.normal && 'Thường'}
+          {orderType === EOrderType.group && 'Nhóm'}
+        </div>
+      );
+    },
+  },
+  {
     key: 'address',
     label: 'Địa điểm giao hàng',
     render: (data: any) => {
@@ -411,6 +423,14 @@ const TABLE_COLUMN: TColumn[] = [
     },
   },
 ];
+
+function getDisplayedColumn(
+  showOrderType: boolean | undefined,
+): string[] | (() => string[]) {
+  return TABLE_COLUMN.map((column) => column.key).filter(
+    (column) => showOrderType || (!showOrderType && column !== 'orderType'),
+  );
+}
 
 const filterOrder = (subOrders: any[], filterList: TObject) => {
   const { startDate, endDate } = filterList;
@@ -591,6 +611,7 @@ const parseEntitiesToTableData = (
         restaurants,
         subOrders: newSubOrders,
         orderName: entity.attributes.publicData.orderName,
+        orderType,
         deliveryHour,
         isParent: true,
         isHide: shouldHideOrderRow,
@@ -642,7 +663,7 @@ const sortOrders = ({ columnName, type }: TTableSortValue, data: any) => {
   });
 };
 
-const ManageOrdersPage = () => {
+const ManageOrdersPage = ({ showOrderType }: { showOrderType?: boolean }) => {
   const dispatch = useAppDispatch();
   const router = useRouter();
   // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -658,7 +679,7 @@ const ManageOrdersPage = () => {
   const { isReady } = router;
   const [sortValue, setSortValue] = useState<TTableSortValue>();
   const [displayedColumns, setDisplayedColumns] = useState<string[]>(
-    TABLE_COLUMN.map((column) => column.key),
+    getDisplayedColumn(showOrderType),
   );
 
   const shouldHideOrder = showMode === 'subOrder';

@@ -185,6 +185,10 @@ type TOrderInitialState = {
   queryCompanyPlansByOrderIdsError: any;
   plansByOrderIds: TListing[];
   currentQueryPlansByOrderIdsRequestId: string | null;
+
+  menuListings: TListing[];
+  fetchMenuListingsInProgress: boolean;
+  fetchMenuListingsError: any;
 };
 
 const initialState: TOrderInitialState = {
@@ -301,6 +305,10 @@ const initialState: TOrderInitialState = {
   queryCompanyPlansByOrderIdsError: null,
   plansByOrderIds: [],
   currentQueryPlansByOrderIdsRequestId: null,
+
+  menuListings: [],
+  fetchMenuListingsInProgress: false,
+  fetchMenuListingsError: null,
 };
 
 const CREATE_ORDER = 'app/Order/CREATE_ORDER';
@@ -318,6 +326,7 @@ const RECOMMEND_RESTAURANT_FOR_SPECIFIC_DAY =
 const CHECK_RESTAURANT_STILL_AVAILABLE =
   'app/Order/CHECK_RESTAURANT_STILL_AVAILABLE';
 const FETCH_ORDER_RESTAURANTS = 'app/Order/FETCH_ORDER_RESTAURANTS';
+const FETCH_MENU_BY_IDS = 'app/Order/FETCH_ORDER_MENU_FOOD_QUANTITY';
 
 const GET_COMPANY_ORDER_NOTIFICATIONS =
   'app/Order/GET_COMPANY_ORDER_NOTIFICATIONS';
@@ -1012,6 +1021,26 @@ const fetchOrderRestaurants = createAsyncThunk(
   },
 );
 
+const fetchMenuListingsByIds = createAsyncThunk(
+  FETCH_MENU_BY_IDS,
+  async (
+    {
+      menuListingIds,
+    }: {
+      menuListingIds: string[];
+    },
+    { extra: sdk },
+  ) => {
+    const menuListings = denormalisedResponseEntities(
+      await sdk.listings.query({
+        ids: menuListingIds,
+      }),
+    );
+
+    return menuListings;
+  },
+);
+
 const getCompanyOrderNotification = createAsyncThunk(
   GET_COMPANY_ORDER_NOTIFICATIONS,
   async (companyId: string) => {
@@ -1186,6 +1215,7 @@ export const orderAsyncActions = {
   notifyUserPickingOrderChanges,
   handleSendEditInProgressOrderNotificationToPartner,
   handleDeleteOldDataAfterEditInProgressOrder,
+  fetchMenuListingsByIds,
   handleSendEditInProgressOrderDetailNotificationToPartner,
 };
 
@@ -1623,6 +1653,21 @@ const orderSlice = createSlice({
         ...state,
         fetchOrderRestaurantListInProgress: false,
         fetchOrderRestaurantListError: error.message,
+      }))
+      .addCase(fetchMenuListingsByIds.pending, (state) => ({
+        ...state,
+        fetchMenuListingsInProgress: true,
+        fetchMenuListingsError: null,
+      }))
+      .addCase(fetchMenuListingsByIds.fulfilled, (state, { payload }) => ({
+        ...state,
+        fetchMenuListingsInProgress: false,
+        menuListings: payload,
+      }))
+      .addCase(fetchMenuListingsByIds.rejected, (state, { error }) => ({
+        ...state,
+        fetchMenuListingsInProgress: false,
+        fetchMenuListingsError: error.message,
       }))
       .addCase(getCompanyOrderNotification.pending, (state) => ({
         ...state,

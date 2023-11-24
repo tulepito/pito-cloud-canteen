@@ -13,7 +13,15 @@
   }
 }
 
-.header {
+.copyingIcon {
+  width: 16px;
+  height: 16px;
+  margin-right: 4px;
+  vertical-align: middle;
+
+  path {
+    fill: $neutralGray7;
+  }
 }
 
 .planTitle {
@@ -126,7 +134,7 @@
   .actionButton {
     width: 100%;
     min-height: 36px;
-    padding: 6px;
+    padding: 2px;
     text-align: center;
     border-radius: 8px;
     background-color: $neutralGray1;
@@ -143,8 +151,57 @@
 }
 
 .applyForOtherDays {
-  @include textTemplate(12px, 700, 16px);
+  @include textTemplate(12px, 600, 18px);
   color: $neutralGray7;
   text-align: center;
   cursor: pointer;
+}
+
+.foodList {
+  @include textTemplate(12px, 400, 16px);
+  padding: 0;
+  color: $neutralGray7;
+
+  .foodListItem {
+    cursor: pointer;
+    margin-bottom: 8px;
+
+    @include lineClamp(1, 12px);
+  }
+}
+
+.viewAll {
+  text-align: center;
+  text-decoration: underline;
+  display: block;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+
+  &.disabled {
+    cursor: progress;
+    pointer-events: none;
+    opacity: 0.8;
+  }
+}
+
+.metaSection {
+  @include flexAlign(flex-start, center);
+  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 8px;
+
+  .metaItem {
+    @include flexAlign(center, center);
+    @include textTemplate(12px, 400, 16px);
+    gap: 4px;
+  }
+
+  .metaItemIcon {
+    width: 16px;
+    height: 16px;
+
+    path {
+      fill: $neutralGray7;
+    }
+  }
 }

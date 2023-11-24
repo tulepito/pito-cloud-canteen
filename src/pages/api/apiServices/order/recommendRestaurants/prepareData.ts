@@ -119,7 +119,7 @@ export const prepareMenuFoodList = async ({
       if (packagePerMember <= 0) return true;
 
       return (
-        Listing(foodListing).getAttributes().price.amount <= packagePerMember
+        Listing(foodListing).getAttributes().price.amount === packagePerMember
       );
     },
   );
@@ -263,3 +263,22 @@ export const prepareParamsFromGivenParamsForAllDays = ({
     isNormalOrder,
   };
 };
+
+export function filterMenusHavePackagePerMember(
+  allMenus: any,
+  timestamp: number,
+  packagePerMember: any,
+) {
+  const dateTime = DateTime.fromMillis(timestamp).setZone(VNTimezone);
+  const dayOfWeek = convertWeekDay(dateTime.weekday).key;
+
+  return allMenus.filter((menu: TListing) => {
+    const { foodsByDate } = Listing(menu).getPublicData();
+    const foodByIds = foodsByDate[dayOfWeek];
+    const foodIds = Object.keys(foodByIds);
+
+    return foodIds.some(
+      (foodId) => foodByIds[foodId].price === packagePerMember,
+    );
+  });
+}

@@ -4,6 +4,7 @@ import { FormattedMessage } from 'react-intl';
 import { DateTime } from 'luxon';
 
 import Button from '@components/Button/Button';
+import IconCopy from '@components/Icons/IconCopy/IconCopy';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { convertWeekDay } from '@src/utils/dates';
 import { EInvalidRestaurantCase } from '@src/utils/enums';
@@ -67,7 +68,7 @@ const MealPlanCardFooter: React.FC<TMealPlanCardFooterProps> = ({
           variant="secondary"
           className={css.actionButton}
           onClick={handleEditFood}
-          data-tour="step-4"
+          data-tour="step-5"
           inProgress={editFoodInprogress}>
           {isSelectedFood ? (
             <FormattedMessage id="MealPlanCard.footer.modify" />
@@ -78,6 +79,7 @@ const MealPlanCardFooter: React.FC<TMealPlanCardFooterProps> = ({
         <div
           className={css.applyForOtherDays}
           onClick={handleOpenApplyOtherDaysModal}>
+          <IconCopy className={css.copyingIcon} />
           <FormattedMessage id="MealPlanCard.footer.applyForOtherDays" />
         </div>
 

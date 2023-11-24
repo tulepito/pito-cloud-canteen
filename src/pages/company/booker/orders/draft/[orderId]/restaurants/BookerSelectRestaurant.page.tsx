@@ -1,11 +1,12 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import isEmpty from 'lodash/isEmpty';
 import { useRouter } from 'next/router';
 
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import { companyPaths } from '@src/paths';
-import { Listing } from '@src/utils/data';
+import { Listing, User } from '@src/utils/data';
 import { EBookerOrderDraftStates, EOrderDraftStates } from '@src/utils/enums';
+import type { TUser } from '@src/utils/types';
 
 import FilterLabelsSection from './components/FilterLabels/FilterLabelsSection';
 import FilterSidebar from './components/FilterSidebar/FilterSidebar';
@@ -16,7 +17,6 @@ import LayoutMain from './components/Layout/LayoutMain';
 import LayoutSidebar from './components/Layout/LayoutSidebar';
 import LayoutTop from './components/Layout/LayoutTop';
 import ResultList from './components/ResultList/ResultList';
-import SortingSection from './components/SortingSection/SortingSection';
 import { useGetCompanyAccount } from './hooks/company';
 import { useGetOrder } from './hooks/orderData';
 import { useSearchRestaurants } from './hooks/restaurants';
@@ -36,6 +36,14 @@ function BookerSelectRestaurant() {
   const orderListing = Listing(order!);
   const { orderState } = orderListing.getMetadata();
   const { companyAccount } = useGetCompanyAccount();
+
+  const companyGeoOrigin = useMemo(
+    () => ({
+      ...User(companyAccount as TUser).getPublicData()?.companyLocation?.origin,
+    }),
+    [companyAccount],
+  );
+
   useEffect(() => {
     if (!isEmpty(orderState)) {
       if (orderState === EOrderDraftStates.draft) {
@@ -48,8 +56,26 @@ function BookerSelectRestaurant() {
       }
     }
   }, [orderId, orderState, router]);
-  const { restaurants, searchInProgress, totalResultItems } =
-    useSearchRestaurants();
+  const {
+    restaurants,
+    searchInProgress,
+    totalResultItems,
+    combinedRestaurantInFoods,
+  } = useSearchRestaurants();
+
+  const groupRestaurantInFoods = combinedRestaurantInFoods.reduce(
+    (acc, combinedRestaurantInFood) => {
+      const { restaurantId } = combinedRestaurantInFood;
+      if (acc.has(restaurantId)) {
+        acc.get(restaurantId)?.push(combinedRestaurantInFood);
+      } else {
+        acc.set(restaurantId, [combinedRestaurantInFood]);
+      }
+
+      return acc;
+    },
+    new Map<string, typeof combinedRestaurantInFoods>(),
+  );
 
   const handleGoBack = () => {
     router.push({
@@ -77,7 +103,6 @@ function BookerSelectRestaurant() {
           <div className={css.resultHeaderWrapper}>
             <div className={css.searchAndSort}>
               <KeywordSearchSection />
-              <SortingSection />
             </div>
             <FilterLabelsSection totalResultItems={totalResultItems} />
           </div>
@@ -85,8 +110,9 @@ function BookerSelectRestaurant() {
             order={order}
             className={css.resultList}
             restaurants={restaurants}
+            groupRestaurantInFoods={groupRestaurantInFoods}
             isLoading={searchInProgress}
-            companyAccount={companyAccount}
+            companyGeoOrigin={companyGeoOrigin}
           />
         </LayoutContent>
       </LayoutMain>

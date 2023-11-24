@@ -76,6 +76,7 @@
     "shelljs": "^0.8.5",
     "slick-carousel": "^1.8.1",
     "styled-components": "^5.3.10",
+    "unidecode": "^0.1.8",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {

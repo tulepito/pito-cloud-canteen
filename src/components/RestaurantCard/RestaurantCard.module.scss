@@ -7,7 +7,7 @@
   padding: 16px;
   border-radius: 12px;
   border: 1px solid $neutralGray3;
-  @include flexAlign(normal, space-between);
+  @include flexAlign(normal);
   flex-direction: column;
 }
 
@@ -49,7 +49,6 @@
   @include textTemplate(16px, 700, 24px);
   @include lineClamp(1, 24px);
   color: $neutralGray7;
-  margin-right: 20px;
   margin: 0 20px 0 0;
   cursor: pointer;
 }
@@ -68,8 +67,18 @@
 }
 
 .nutritions {
-  display: flex;
-  margin-bottom: 16px;
+  position: absolute;
+  top: 8px;
+  right: 8px;
+
+  max-width: 50%;
+  padding: 2px 8px;
+  background-color: $neutralGray1;
+  border-radius: 12px;
+  text-align: center;
+
+  @include textTemplate(12px, 500, 20px);
+  @include lineClamp(1, 20px);
 }
 
 .badge {
@@ -103,6 +112,7 @@
 }
 
 .littleStarIcon,
+.footerIconTerm,
 .footerItemIcon {
   width: 16px;
   height: 16px;
@@ -121,4 +131,60 @@
   width: 100%;
   min-height: 36px;
   height: 36px;
+}
+
+.inlineTextButtonRoot {
+  display: inline;
+  margin: 0;
+  padding: 0;
+  border: none;
+  color: $labelBlue2;
+  background-color: transparent;
+  text-decoration: none;
+
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.tableFood {
+  margin-top: 5px;
+  empty-cells: show;
+}
+
+.footerFood {
+  flex-grow: 1;
+  display: flex;
+  align-items: first baseline;
+  @include textTemplate(14px, 400, 20px);
+  max-width: 100px;
+}
+
+.footerFoodEmpty {
+  height: 20px !important; /* overwrites any other rules */
+  background-color: #ffffff;
+}
+
+.footerFoodAlignRight {
+  justify-content: flex-end;
+}
+
+.footerFoodIcon {
+  width: 20px;
+  height: 20px;
+  margin-left: 5px;
+}
+
+.footerRowItem {
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  padding-right: 10px;
+  margin-top: 5px;
+  margin-right: 10px;
+  @include textTemplate(14px, 400, 20px);
+}
+
+.highlightTitle {
+  background-color: #ffe6c0;
 }

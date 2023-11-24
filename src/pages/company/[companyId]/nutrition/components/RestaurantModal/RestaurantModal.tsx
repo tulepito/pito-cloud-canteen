@@ -43,9 +43,11 @@ const RestaurantModal: React.FC<TRestaurantModalProps> = (props) => {
   const { totalRating = 0, totalRatingNumber = 0 } = Listing(
     currentRestaurant!,
   ).getMetadata();
-  const { avatarImageId, coverImageId } = Listing(
-    currentRestaurant!,
-  ).getPublicData();
+  const {
+    avatarImageId,
+    coverImageId,
+    minQuantity = 0,
+  } = Listing(currentRestaurant!).getPublicData();
   const restaurantAvatar = getListingImageById(
     avatarImageId,
     Listing(currentRestaurant!).getImages(),
@@ -98,6 +100,7 @@ const RestaurantModal: React.FC<TRestaurantModalProps> = (props) => {
             ratingNumber={totalRating}
             rating={`${totalRating} (${totalRatingNumber})`}
             distance={`${distance}km`}
+            minQuantity={minQuantity}
           />
           <div className={css.searchFormWrapper}>
             <KeywordSearchForm

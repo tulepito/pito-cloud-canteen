@@ -1,16 +1,11 @@
 import type { Event } from 'react-big-calendar';
 import { useIntl } from 'react-intl';
 
+import OrderEventCardContentItems from '@components/CalendarDashboard/components/OrderEventCard/OrderEventCardContentItems';
 import OrderEventCardStatus from '@components/CalendarDashboard/components/OrderEventCard/OrderEventCardStatus';
 import { EVENT_STATUS } from '@components/CalendarDashboard/helpers/constant';
-import IconBanned from '@components/Icons/IconBanned/IconBanned';
-import IconDeadline from '@components/Icons/IconDeadline/IconDeadline';
-import IconFood from '@components/Icons/IconFood/IconFood';
-import IconLocation from '@components/Icons/IconLocation/IconLocation';
-import IconShop from '@components/Icons/IconShop/IconShop';
-import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { isOver } from '@helpers/orderHelper';
-import { calculateRemainTime } from '@src/utils/dates';
+import { EParticipantOrderStatus } from '@src/utils/enums';
 
 import css from './SubOrderCard.module.scss';
 
@@ -23,21 +18,9 @@ type TSubOrderCardProps = {
 const SubOrderCard: React.FC<TSubOrderCardProps> = (props) => {
   const { event, setSelectedEvent, openSubOrderDetailModal } = props;
   const intl = useIntl();
-  const {
-    daySession,
-    deliveryHour,
-    restaurantAddress,
-    restaurant,
-    status,
-    deadlineDate,
-    meal,
-    dishSelection,
-    orderColor,
-    lastTransition,
-    isOrderStarted = false,
-  } = event?.resource || {};
+  const { daySession, deliveryHour, status, orderColor, lastTransition } =
+    event?.resource || {};
 
-  const { name: restaurantName } = restaurant;
   const orderTitle = event?.title || '';
   const isFoodPicked = !!event.resource?.dishSelection?.dishSelection;
   const isNotJoined = status === EVENT_STATUS.NOT_JOINED_STATUS;
@@ -46,16 +29,6 @@ const SubOrderCard: React.FC<TSubOrderCardProps> = (props) => {
   const headerStyles = {
     backgroundColor: isExpiredToPickFood ? '#8C8C8C' : orderColor,
   };
-  const remainTime = calculateRemainTime(deadlineDate);
-  const selectionFoodName = meal?.dishes.find(
-    (item: any) => item.key === dishSelection?.dishSelection,
-  )?.value;
-
-  const shouldShowRejectButton = [EVENT_STATUS.NOT_JOINED_STATUS].includes(
-    status,
-  );
-  const shouldShowCountdown = !isOrderStarted && !isExpired;
-
   const onCardClick = () => {
     setSelectedEvent(event);
     openSubOrderDetailModal();
@@ -80,43 +53,12 @@ const SubOrderCard: React.FC<TSubOrderCardProps> = (props) => {
             lastTransition={lastTransition}
           />
         </div>
-        <RenderWhen condition={!!selectionFoodName}>
-          <div className={css.row}>
-            <div className={css.selectedFood}>
-              <IconFood />
-              <span>{selectionFoodName}</span>
-            </div>
-          </div>
-        </RenderWhen>
-        <RenderWhen condition={shouldShowRejectButton}>
-          <div className={css.row}>
-            <div className={css.noPickThisDay}>
-              <IconBanned />
-              <span>Bỏ chọn ngày này</span>
-            </div>
-          </div>
-        </RenderWhen>
         <div className={css.orderInfo}>
-          <RenderWhen condition={shouldShowCountdown}>
-            <div className={css.row}>
-              <div className={css.orderDeadline}>
-                <IconDeadline />
-                <span>Còn {remainTime} để chọn</span>
-              </div>
-            </div>
-          </RenderWhen>
-          <div className={css.row}>
-            <div className={css.deliveryAddress}>
-              <IconLocation />
-              <span>{restaurantAddress}</span>
-            </div>
-          </div>
-          <div className={css.row}>
-            <div className={css.restaurantName}>
-              <IconShop />
-              <span>{restaurantName}</span>
-            </div>
-          </div>
+          <OrderEventCardContentItems
+            event={event}
+            classNameCoverImage={css.coverImage}
+            isFirstHighlight={status === EParticipantOrderStatus.empty}
+          />
         </div>
       </div>
     </div>

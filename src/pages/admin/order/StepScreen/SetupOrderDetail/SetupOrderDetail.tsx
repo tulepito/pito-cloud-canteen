@@ -119,6 +119,10 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     (state) => state.Order.selectedCompany,
     shallowEqual,
   );
+
+  const companyGeoOrigin =
+    User(selectedCompany).getPublicData().companyLocation?.origin || {};
+
   const selectedDate = useAppSelector(
     (state) => state.Order.selectedCalendarDate,
   );
@@ -499,6 +503,17 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
   const onApplyOtherDaysInProgress = updateOrderDetailInProgress;
 
   useEffect(() => {
+    const menuListingIds = Object.values(orderDetail)?.map(
+      (date: any) => date.restaurant?.menuId,
+    );
+    dispatch(
+      orderAsyncActions.fetchMenuListingsByIds({
+        menuListingIds,
+      }),
+    );
+  }, [JSON.stringify(orderDetail)]);
+
+  useEffect(() => {
     if (isEmpty(orderDetail) && !justDeletedMemberOrder && !isEmpty(plans)) {
       dispatch(orderAsyncActions.fetchOrderDetail(plans));
     }
@@ -855,6 +870,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     availableOrderDetailCheckList,
     shouldHideAddMorePlan,
     shouldHideRemoveMealIcon,
+    companyGeoOrigin,
   };
   const addMorePlanExtraProps = {
     onClick: handleAddMorePlanClick,

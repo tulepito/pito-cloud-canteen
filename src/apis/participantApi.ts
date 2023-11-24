@@ -30,7 +30,8 @@ export const recommendFoodForSubOrdersApi = (body: {
 }) => putApi('/participants/plans/recommend-food-for-sub-orders', body);
 
 export type TFetchOrdersApiParams = {
-  selectedMonth: Date;
+  startDate: Date;
+  endDate: Date;
 };
 
 export const fetchOrdersApi = (params: TFetchOrdersApiParams) =>

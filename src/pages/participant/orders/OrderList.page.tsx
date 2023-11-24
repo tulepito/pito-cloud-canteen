@@ -28,8 +28,13 @@ import { CalendarActions } from '@redux/slices/Calendar.slice';
 import { CurrentUser, Listing, User } from '@src/utils/data';
 import {
   getDaySessionFromDeliveryTime,
+  getEndDayOfWeek,
+  getEndOfMonth,
   getNextMonth,
+  getNextWeek,
   getPrevMonth,
+  getPrevWeek,
+  getStartDayOfWeek,
   getStartOfMonth,
   isSameDate,
 } from '@src/utils/dates';
@@ -66,24 +71,27 @@ const OrderListPage = () => {
     localStorageView as View,
   );
 
-  const [defaultCalendarView, setDefaultCalendarView] = useState<View>(
-    viewMode
-      ? viewMode
-      : isValidLocalStorageView
-      ? localStorageView
-      : Views.WEEK,
-  );
+  const currentView = viewMode
+    ? viewMode
+    : isValidLocalStorageView
+    ? localStorageView
+    : Views.WEEK;
+
+  const [defaultCalendarView, setDefaultCalendarView] =
+    useState<View>(currentView);
+
   const updateProfileModalControl = useBoolean();
   const onBoardingModal = useBoolean();
   const tourControl = useBoolean();
   const ratingSubOrderModalControl = useBoolean();
   const { selectedDay, handleSelectDay } = useSelectDay();
+
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
-  const [selectedMonth, setSelectedMonth] = useState<Date>(
-    getStartOfMonth(selectedDay || new Date()),
+  const [selectedDayOfMonth, setSelectedDayOfMonth] = useState<Date>(
+    selectedDay || new Date(),
   );
   const [maxSelectedMonth, setMaxSelectedMonth] = useState<Date>(
-    getStartOfMonth(new Date()),
+    getEndOfMonth(new Date()),
   );
   const [minSelectedMonth, setMinSelectedMonth] = useState<Date>(
     getStartOfMonth(new Date()),
@@ -135,6 +143,9 @@ const OrderListPage = () => {
       state.ParticipantOrderList
         .fetchParticipantFirebaseNotificationsInProgress,
   );
+  const foodsInPlans = useAppSelector(
+    (state) => state.ParticipantOrderList.foodsInPlans,
+  );
   const fetchSubOrderTxInProgress = useAppSelector(
     (state) => state.ParticipantOrderList.fetchSubOrderTxInProgress,
   );
@@ -173,7 +184,19 @@ const OrderListPage = () => {
   const numberOfUnseenNotifications = unseenNotifications.length;
 
   const allPlansIdList = plans?.map((plan) => Listing(plan).getId()) || [];
+
+  const mapPlanIdInFoods = foodsInPlans.reduce((acc, currentFoodsInPlan) => {
+    const { planId } = currentFoodsInPlan;
+    if (!acc[planId]) {
+      acc[planId] = currentFoodsInPlan;
+    }
+
+    return acc;
+  }, {});
+
   const events = allPlansIdList.map((planId: string) => {
+    const foodsInPlan = mapPlanIdInFoods[planId];
+
     const currentPlan = plans?.find(
       (plan) => Listing(plan).getId() === planId,
     ) as TListing;
@@ -209,7 +232,6 @@ const OrderListPage = () => {
         key: foodId,
         value: foodList[foodId].foodName,
       }));
-
       const foodSelection =
         currentPlanListing.getMetadata().orderDetail[planItemKey].memberOrders[
           currentUserId
@@ -238,6 +260,10 @@ const OrderListPage = () => {
           (_state: { state: string; updatedAt: number }) =>
             _state.state === EOrderStates.inProgress,
         ) !== -1;
+
+      const pickedFoodDetail = alreadyPickFood
+        ? foodsInPlan?.foodListings[foodSelection?.foodId]
+        : {};
 
       const event = {
         resource: {
@@ -280,6 +306,7 @@ const OrderListPage = () => {
             ?.value,
           disableSelectFood:
             isOrderAlreadyInProgress && isSubOrderNotAbleToEdit,
+          pickedFoodDetail,
         },
         title: orderTitle,
         start: DateTime.fromMillis(+planItemKey).toJSDate(),
@@ -330,21 +357,49 @@ const OrderListPage = () => {
 
   const handleChangeTimePeriod = (action: string) => {
     if (action === 'NEXT') {
-      const nextMonth = getNextMonth(selectedMonth!);
-      setSelectedMonth(nextMonth);
+      if (currentView === Views.MONTH) {
+        const nextDayOfMonth = getNextMonth(selectedDayOfMonth!);
+        setSelectedDayOfMonth(nextDayOfMonth);
 
-      if (nextMonth.getTime() > maxSelectedMonth.getTime()!) {
-        setMaxSelectedMonth(nextMonth);
+        if (nextDayOfMonth.getMonth() > maxSelectedMonth.getMonth()) {
+          setMaxSelectedMonth(getEndOfMonth(nextDayOfMonth));
+          isFirstTimeReachMinOrMaxMonthControl.setTrue();
+
+          return;
+        }
+      } else {
+        const nextDayOfMonth = getNextWeek(selectedDayOfMonth!);
+        setSelectedDayOfMonth(nextDayOfMonth);
+        const endDayOfWeek = getEndDayOfWeek(nextDayOfMonth);
+        const startDayOfWeek = getStartDayOfWeek(nextDayOfMonth);
+
+        if (endDayOfWeek.getMonth() !== startDayOfWeek.getMonth()) {
+          setMaxSelectedMonth(getEndOfMonth(endDayOfWeek));
+          setMinSelectedMonth(getStartOfMonth(startDayOfWeek));
+          isFirstTimeReachMinOrMaxMonthControl.setTrue();
+
+          return;
+        }
+      }
+    } else if (currentView === Views.MONTH) {
+      const prevMonth = getPrevMonth(selectedDayOfMonth!);
+      setSelectedDayOfMonth(prevMonth);
+
+      if (minSelectedMonth.getMonth() > prevMonth.getMonth()) {
+        setMinSelectedMonth(prevMonth);
         isFirstTimeReachMinOrMaxMonthControl.setTrue();
 
         return;
       }
     } else {
-      const prevMonth = getPrevMonth(selectedMonth!);
-      setSelectedMonth(prevMonth);
+      const prevDayOfMonth = getPrevWeek(selectedDayOfMonth!);
+      setSelectedDayOfMonth(prevDayOfMonth);
+      const endDayOfWeek = getEndDayOfWeek(prevDayOfMonth);
+      const startDayOfWeek = getStartDayOfWeek(prevDayOfMonth);
 
-      if (minSelectedMonth.getTime() > prevMonth.getTime()) {
-        setMinSelectedMonth(prevMonth);
+      if (endDayOfWeek.getMonth() !== startDayOfWeek.getMonth()) {
+        setMaxSelectedMonth(getEndOfMonth(endDayOfWeek));
+        setMinSelectedMonth(getStartOfMonth(startDayOfWeek));
         isFirstTimeReachMinOrMaxMonthControl.setTrue();
 
         return;
@@ -416,23 +471,19 @@ const OrderListPage = () => {
 
   useEffect(() => {
     (async () => {
-      const isOutOfMinMaxSelectedMonthRange =
-        selectedMonth?.getTime()! >= maxSelectedMonth.getTime()! ||
-        minSelectedMonth.getTime() >= selectedMonth?.getTime()!;
-
-      if (
-        isOutOfMinMaxSelectedMonthRange &&
-        isFirstTimeReachMinOrMaxMonthControl.value
-      ) {
+      if (isFirstTimeReachMinOrMaxMonthControl.value) {
         await dispatch(
-          OrderListThunks.fetchOrders({ userId: currentUserId, selectedMonth }),
+          OrderListThunks.fetchOrders({
+            userId: currentUserId,
+            startDate: minSelectedMonth,
+            endDate: maxSelectedMonth,
+          }),
         );
         dispatch(OrderListActions.markColorToOrder());
       }
     })();
   }, [
     currentUserId,
-    selectedMonth,
     minSelectedMonth,
     maxSelectedMonth,
     isFirstTimeReachMinOrMaxMonthControl.value,
@@ -452,17 +503,15 @@ const OrderListPage = () => {
         setSelectedEvent(event);
         subOrderDetailModalControl.setTrue();
       } else {
-        const monthInQuery = getStartOfMonth(
-          DateTime.fromMillis(+timestamp).toJSDate(),
-        );
-        setSelectedMonth(getStartOfMonth(monthInQuery));
+        const monthInQuery = DateTime.fromMillis(+timestamp).toJSDate();
+        setSelectedDayOfMonth(monthInQuery);
 
-        if (monthInQuery.getTime() > maxSelectedMonth?.getTime()!) {
-          setMaxSelectedMonth(monthInQuery);
+        if (monthInQuery.getMonth() > maxSelectedMonth.getMonth()) {
+          setMaxSelectedMonth(getEndOfMonth(monthInQuery));
         }
 
-        if (minSelectedMonth.getTime() > monthInQuery.getTime()) {
-          setMinSelectedMonth(monthInQuery);
+        if (minSelectedMonth.getMonth() > monthInQuery.getMonth()) {
+          setMinSelectedMonth(getStartOfMonth(monthInQuery));
         }
       }
     }

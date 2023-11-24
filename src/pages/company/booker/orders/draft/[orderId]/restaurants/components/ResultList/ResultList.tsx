@@ -1,15 +1,17 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { shallowEqual } from 'react-redux';
 import classNames from 'classnames';
 import { useRouter } from 'next/router';
 
 import RestaurantCard from '@components/RestaurantCard/RestaurantCard';
+import type { TGeoOrigin } from '@helpers/listingSearchQuery';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
-import { Listing, User } from '@utils/data';
-import type { TListing, TUser } from '@utils/types';
+import type { TFoodInRestaurant } from '@src/types/bookerSelectRestaurant';
+import { Listing } from '@utils/data';
+import type { TListing } from '@utils/types';
 
 import {
   BookerSelectRestaurantActions,
@@ -24,8 +26,9 @@ import css from './ResultList.module.scss';
 type TResultListProps = {
   className?: string;
   restaurants?: any[];
+  groupRestaurantInFoods?: Map<string, TFoodInRestaurant[]> | null;
   isLoading?: boolean;
-  companyAccount: TUser | null;
+  companyGeoOrigin: TGeoOrigin;
   order?: TListing | null;
 };
 
@@ -33,8 +36,9 @@ const ResultList: React.FC<TResultListProps> = ({
   className,
   restaurants = [],
   isLoading,
-  companyAccount,
+  companyGeoOrigin,
   order,
+  groupRestaurantInFoods,
 }) => {
   const router = useRouter();
   const { timestamp: queryTs, restaurantId, orderId, menuId } = router.query;
@@ -52,15 +56,9 @@ const ResultList: React.FC<TResultListProps> = ({
     (state) => state.BookerSelectRestaurant.restaurantFood,
     shallowEqual,
   );
+
   const fetchRestaurantFoodInProgress = useAppSelector(
     (state) => state.BookerSelectRestaurant.fetchRestaurantFoodInProgress,
-  );
-
-  const companyGeoOrigin = useMemo(
-    () => ({
-      ...User(companyAccount as TUser).getPublicData()?.companyLocation?.origin,
-    }),
-    [companyAccount],
   );
 
   const dispatch = useAppDispatch();
@@ -125,15 +123,20 @@ const ResultList: React.FC<TResultListProps> = ({
         )}
         {!isLoading && restaurants.length === 0 && <EmptyList />}
         {!isLoading &&
-          restaurants.map((restaurant) => (
-            <RestaurantCard
-              onClick={onRestaurantClick}
-              key={restaurant?.id.uuid}
-              className={css.card}
-              restaurant={restaurant}
-              companyGeoOrigin={companyGeoOrigin}
-            />
-          ))}
+          restaurants.map((restaurant) => {
+            const foods = groupRestaurantInFoods?.get(restaurant?.id.uuid);
+
+            return (
+              <RestaurantCard
+                onClick={onRestaurantClick}
+                key={restaurant?.id.uuid}
+                className={css.card}
+                restaurant={restaurant}
+                companyGeoOrigin={companyGeoOrigin}
+                foods={foods ?? []}
+              />
+            );
+          })}
       </div>
       <ResultDetailModal
         isOpen={detailModal.value}

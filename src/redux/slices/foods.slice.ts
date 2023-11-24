@@ -63,6 +63,10 @@ type TFoodSliceState = {
   publishOrCloseFoodIdError: any;
   responseApprovalRequestInProgress: boolean;
   responseApprovalRequestError: any;
+
+  fetchFoodDetailInProgress: boolean;
+  fetchFoodDetailError: any;
+  foodDetail: TListing | null;
 };
 
 const initialState: TFoodSliceState = {
@@ -108,6 +112,11 @@ const initialState: TFoodSliceState = {
   publishOrCloseFoodIdError: null,
   responseApprovalRequestInProgress: false,
   responseApprovalRequestError: null,
+
+  // fetch food detail
+  fetchFoodDetailInProgress: false,
+  fetchFoodDetailError: null,
+  foodDetail: null,
 };
 
 // ================ Thunk types ================ //
@@ -126,6 +135,7 @@ const REMOVE_PARTNER_FOOD_LISTING =
   'app/ManageFoodsPage/REMOVE_PARTNER_FOOD_LISTING';
 
 const SHOW_DUPLICATE_FOOD = 'app/ManageFoodsPage/SHOW_DUPLICATE_FOOD';
+const FETCH_FOOD_DETAIL = 'app/ManageFoodsPage/FETCH_FOOD_DETAIL';
 const DUPLICATE_FOOD = 'app/ManageFoodsPage/DUPLICATE_FOOD';
 
 const CREATE_FOOD_FROM_FILE = 'app/ManageFoodsPage/CREATE_FOOD_FROM_FILE';
@@ -504,6 +514,22 @@ const showDuplicateFood = createAsyncThunk(
   },
 );
 
+const fetchFoodDetail = createAsyncThunk(
+  FETCH_FOOD_DETAIL,
+  async (id: any, { extra: sdk }) => {
+    const response = await sdk.listings.show({
+      id,
+      include: ['images'],
+      'fields.image': [`variants.${EImageVariants.default}`],
+      expand: true,
+    });
+
+    const [food] = denormalisedResponseEntities(response);
+
+    return food;
+  },
+);
+
 export const publishOrCloseFood = createAsyncThunk(
   PUBLISH_OR_CLOSE_FOOD,
   async (payload: any) => {
@@ -557,6 +583,7 @@ export const foodSliceThunks = {
   queryMenuPickedFoods,
   publishOrCloseFood,
   responseApprovalRequest,
+  fetchFoodDetail,
 };
 
 // ================ Slice ================ //
@@ -814,6 +841,21 @@ const foodSlice = createSlice({
         ...state,
         responseApprovalRequestInProgress: false,
         responseApprovalRequestError: payload,
+      }))
+      .addCase(fetchFoodDetail.pending, (state) => ({
+        ...state,
+        fetchFoodDetailInProgress: true,
+        fetchFoodDetailError: null,
+      }))
+      .addCase(fetchFoodDetail.fulfilled, (state, { payload }) => ({
+        ...state,
+        fetchFoodDetailInProgress: false,
+        foodDetail: payload,
+      }))
+      .addCase(fetchFoodDetail.rejected, (state, { payload }) => ({
+        ...state,
+        fetchFoodDetailInProgress: false,
+        fetchFoodDetailError: payload,
       }));
   },
 });

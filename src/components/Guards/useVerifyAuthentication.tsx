@@ -2,9 +2,13 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 
 import { useAppSelector } from '@hooks/reduxHooks';
-import { generalPaths } from '@src/paths';
+import { generalPaths, participantPaths } from '@src/paths';
 
 import { usePathChecker } from './Guards.helper';
+
+const PATHS_REDIRECT_TO_SIGN_UP_IF_UNAUTHENTICATED = [
+  participantPaths.Invitation,
+];
 
 const useVerifyAuthentication = (homePageNavigateCondition: boolean) => {
   const router = useRouter();
@@ -31,10 +35,17 @@ const useVerifyAuthentication = (homePageNavigateCondition: boolean) => {
         router.push(fromUrl ? (fromUrl as string) : generalPaths.Home);
       }
     } else if (!isAuthenticated) {
-      router.push({
-        pathname: generalPaths.SignIn,
-        query: { from: fullPath },
-      });
+      if (PATHS_REDIRECT_TO_SIGN_UP_IF_UNAUTHENTICATED.includes(pathname)) {
+        router.replace({
+          pathname: generalPaths.SignUp,
+          query: { from: fullPath },
+        });
+      } else {
+        router.push({
+          pathname: generalPaths.SignIn,
+          query: { from: fullPath },
+        });
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [

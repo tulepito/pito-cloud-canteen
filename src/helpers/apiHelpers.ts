@@ -4,7 +4,11 @@ import flatten from 'lodash/flatten';
 import { getIntegrationSdk } from '@services/sdk';
 import type { TListing, TObject } from '@src/utils/types';
 import { denormalisedResponseEntities, Listing } from '@utils/data';
-import { type EMenuMealType, EParticipantOrderStatus } from '@utils/enums';
+import {
+  type EMenuMealType,
+  EImageVariants,
+  EParticipantOrderStatus,
+} from '@utils/enums';
 
 // query all page
 const calculateRemainPages = (meta: any) => {
@@ -142,4 +146,17 @@ export const fetchUserByChunkedIds = async (ids: string[], sdk: any) => {
   );
 
   return flatten(usersResponse);
+};
+
+export const queryAllFoodIdList = (foodIdList: [] | any, nutritions: []) => {
+  return {
+    ids: foodIdList,
+    ...(nutritions.length > 0
+      ? { pub_specialDiets: `has_any:${nutritions.join(',')}` }
+      : {}),
+    meta_isFoodEnable: true,
+    meta_isFoodDeleted: false,
+    include: ['images'],
+    'fields.image': [`variants.${EImageVariants.default}`],
+  };
 };

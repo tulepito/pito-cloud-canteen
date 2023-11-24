@@ -1,0 +1,31 @@
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/vars.scss' as *;
+
+.container {
+  @include flexCenter;
+  padding: 6px 16px;
+  gap: 10px;
+
+  background: $neutralGray1;
+  border: 1px solid;
+  border-color: $neutralGray4;
+  border-radius: 50px;
+
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+
+  &:hover {
+    background: $neutralGray2;
+    border-color: $neutralGray5;
+  }
+
+  &.selected {
+    background: $neutralGray3;
+    border-color: $neutralGray7;
+  }
+
+  .label {
+    @include textTemplate(14px, 600, 20px);
+    color: $neutralGray7;
+  }
+}

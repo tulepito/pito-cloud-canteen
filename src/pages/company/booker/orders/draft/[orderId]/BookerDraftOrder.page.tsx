@@ -290,6 +290,7 @@ function BookerDraftOrderPage() {
       editFoodInprogress: isEditFoodInProgress,
       availableOrderDetailCheckList,
       hideEmptySubOrderSection: true,
+      companyGeoOrigin,
     },
     components: componentsProps,
   };
@@ -317,7 +318,17 @@ function BookerDraftOrderPage() {
 
   useEffect(() => {
     if (!isEmpty(orderDetail)) {
+      const menuListingIds = orderDetail?.map(
+        (order) => order.resource.restaurant?.menuId,
+      );
+
       dispatch(orderAsyncActions.checkRestaurantStillAvailable({}));
+      dispatch(orderAsyncActions.fetchOrderRestaurants({}));
+      dispatch(
+        orderAsyncActions.fetchMenuListingsByIds({
+          menuListingIds,
+        }),
+      );
     }
   }, [dispatch, JSON.stringify(orderDetail)]);
 

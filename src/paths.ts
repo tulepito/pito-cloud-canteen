@@ -263,6 +263,7 @@ export const participantPaths = {
   AccountChangePassword: '/participant/account/change-password',
   AccountSpecialDemand: '/participant/account/special-demand',
   PlanDetail: '/participant/plans/[planId]',
+  Invitation: '/participant/invitation/[companyId]',
 };
 
 export const partnerPaths = {

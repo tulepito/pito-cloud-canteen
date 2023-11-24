@@ -113,6 +113,10 @@
   margin-bottom: 8px;
 }
 
+.orderEventCardContentItems {
+  margin-top: 8px;
+}
+
 .emptyStatus {
   background-color: $labelOrange1;
   color: $labelOrange2;
@@ -140,7 +144,7 @@
 }
 
 .eventContentItemText {
-  @include textTemplate(12px, 600, 20px, '');
+  @include textTemplate(12px, $fontWeightRegular, 20px, '');
   color: $neutralGray7;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -190,5 +194,26 @@
 .highLightIcon {
   & path {
     fill: $primaryPri2;
+  }
+}
+
+.coverImage {
+  height: 72px;
+  border-radius: 4px;
+
+  overflow: hidden;
+  position: relative;
+
+  & > img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+@media only screen and (max-width: 575px) {
+  .eventContentItemIcon {
+    width: 16px;
+    height: 16px;
   }
 }

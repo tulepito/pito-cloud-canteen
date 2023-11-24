@@ -311,6 +311,7 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
               ratingNumber={totalRating}
               distance={`${distance}km`}
               onOpenReviewModal={onOpenReviewModal}
+              minQuantity={minQuantity}
             />
             <ResultDetailFilters
               onSelectAllFood={handleSelectFoods}

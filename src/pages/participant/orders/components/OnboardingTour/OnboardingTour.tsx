@@ -32,9 +32,9 @@ const tourConfig = [
     content: ({ step }: any) => (
       <div>
         <div className={css.step}>{`${step}/3`}</div>
-        <div className={css.stepTitle}>Bỏ chọn ngày này</div>
+        <div className={css.stepTitle}>Gợi ý chọn món</div>
         <div className={css.stepContent}>
-          Nếu không ăn ngày này, bạn chọn &ldquo;Không tham gia&rdquo;.
+          Bạn không biết chọn món gì, hãy để PITO chọn giúp bạn.
         </div>
       </div>
     ),
@@ -47,9 +47,9 @@ const tourConfig = [
     content: ({ step }: any) => (
       <div>
         <div className={css.step}>{`${step}/3`}</div>
-        <div className={css.stepTitle}>Xem chi tiết</div>
+        <div className={css.stepTitle}>Không tham gia</div>
         <div className={css.stepContent}>
-          Bạn đã chọn món gì, xem lại thực đơn nhé!
+          Nếu không ăn ngày này, bạn có thể chọn &ldquo;Không tham gia&rdquo;.
         </div>
       </div>
     ),

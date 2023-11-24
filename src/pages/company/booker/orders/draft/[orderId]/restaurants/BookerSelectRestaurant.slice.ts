@@ -1,20 +1,24 @@
 import { createSlice } from '@reduxjs/toolkit';
-import chunk from 'lodash/chunk';
-import flatten from 'lodash/flatten';
+import { uniq } from 'lodash';
 import keyBy from 'lodash/keyBy';
 import mapValue from 'lodash/mapValues';
-import uniq from 'lodash/uniq';
 import uniqBy from 'lodash/uniqBy';
 
-import { fetchFoodListFromMenuApi } from '@apis/admin';
+import {
+  fetchFoodListFromMenuApi,
+  searchRestaurantListFromMenuApi,
+} from '@apis/admin';
 import { updatePlanDetailsApi } from '@apis/orderApi';
-import { queryAllPages } from '@helpers/apiHelpers';
+import {
+  deleteRecentKeywordApi,
+  fetchRecommendedKeywordsApi,
+} from '@apis/restaurant';
 import type { TMenuQueryParams } from '@helpers/listingSearchQuery';
-import { getMenuQuery, getRestaurantQuery } from '@helpers/listingSearchQuery';
-import { calculateDistance } from '@helpers/mapHelpers';
+import { sortRestaurants } from '@helpers/sort';
 import { createAsyncThunk } from '@redux/redux.helper';
 // eslint-disable-next-line import/no-cycle
 import { orderAsyncActions } from '@redux/slices/Order.slice';
+import type { TFoodInRestaurant } from '@src/types/bookerSelectRestaurant';
 import { CompanyPermissions } from '@src/types/UserPermission';
 import { denormalisedResponseEntities, Listing } from '@utils/data';
 import { ECompanyPermission, EImageVariants, EListingType } from '@utils/enums';
@@ -33,6 +37,7 @@ type TOrderInitialState = {
     restaurantId: string;
     menuId: string;
   }[];
+  combinedRestaurantInFoods: TFoodInRestaurant[];
 
   searchInProgress: boolean;
 
@@ -70,6 +75,11 @@ type TOrderInitialState = {
 
   fetchRestaurantReviewInProgress: boolean;
   fetchRestaurantReviewError: any;
+
+  fetchRecommendedKeywordsInProgress: boolean;
+  fetchRecommendedKeywordsError: any;
+  popularKeywords: string[];
+  recentKeywords: string[];
 };
 
 const initialState: TOrderInitialState = {
@@ -79,6 +89,7 @@ const initialState: TOrderInitialState = {
   searchResult: [],
   totalItems: 0,
   combinedRestaurantMenuData: [],
+  combinedRestaurantInFoods: [],
 
   searchInProgress: false,
 
@@ -115,10 +126,19 @@ const initialState: TOrderInitialState = {
   fetchRestaurantReviewError: null,
 
   selectedRestaurantId: '',
+
+  fetchRecommendedKeywordsInProgress: false,
+  fetchRecommendedKeywordsError: null,
+  popularKeywords: [],
+  recentKeywords: [],
 };
 
 // ================ Thunk types ================ //
 const FETCH_RESTAURANT = 'app/BookerSelectRestaurant/FETCH_RESTAURANT';
+const FETCH_RECOMMENDED_KEYWORDS =
+  'app/BookerSelectRestaurant/FETCH_RECOMMENDED_KEYWORDS';
+const DELETE_RECENT_KEYWORD =
+  'app/BookerSelectRestaurant/DELETE_RECENT_KEYWORD';
 const SEARCH_RESTAURANT = 'app/BookerSelectRestaurant/SEARCH_RESTAURANT';
 const FETCH_FOOD_LIST_FROM_RESTAURANT =
   'app/BookerSelectRestaurant/FETCH_FOOD_LIST_FROM_RESTAURANT';
@@ -184,106 +204,66 @@ const fetchRestaurant = createAsyncThunk(
 
 const searchRestaurants = createAsyncThunk(
   SEARCH_RESTAURANT,
-  async (params: TMenuQueryParams, { extra: sdk, getState, dispatch }) => {
-    const { orderId, timestamp } = params;
+  async (params: TMenuQueryParams, { getState, dispatch }) => {
+    const { orderId } = params;
 
     await dispatch(orderAsyncActions.fetchOrder(orderId!));
     const { order } = getState().Order;
-    const { companyAccount } = getState().BookerSelectRestaurant;
 
-    // eslint-disable-next-line unused-imports/no-unused-vars
-    const { keywords, ...queryWithoutKeywords } = params;
-    const query = getMenuQuery({ order, params: queryWithoutKeywords });
     const orderListing = Listing(order);
-    const {
-      memberAmount = 0,
-      startDate,
-      endDate,
-      deliveryAddress = {},
-    } = orderListing.getMetadata();
-
-    const allMenus = await queryAllPages({ sdkModel: sdk.listings, query });
-
-    const combinedRestaurantMenuData = allMenus.map((menu: TListing) => ({
-      restaurantId: Listing(menu).getMetadata()?.restaurantId,
-      menuId: menu.id.uuid,
-    }));
-
-    const newRestaurantIds = uniqBy<{ restaurantId: string; menuId: string }>(
-      combinedRestaurantMenuData,
-      'restaurantId',
-    ).map((item) => item.restaurantId);
-    const totalRestaurantIds = uniq([...newRestaurantIds]);
-    const slicedRestaurantIdsBy100 = chunk(totalRestaurantIds, 100);
-
-    const restaurantQueries = slicedRestaurantIdsBy100.map((restaurantIds) =>
-      getRestaurantQuery({
-        restaurantIds,
-        companyAccount,
-        params: {
-          ...params,
-          memberAmount,
-          startDate,
-          endDate,
-        },
-      }),
+    const { deliveryAddress = {} } = orderListing.getMetadata();
+    if (!deliveryAddress || !deliveryAddress.origin) {
+      return {
+        restaurantIdList: [],
+        searchResult: [],
+        combinedRestaurantMenuData: [],
+        totalItems: 0,
+        combinedRestaurantInFoods: [],
+      };
+    }
+    const { data: restaurantData } = await searchRestaurantListFromMenuApi(
+      params,
     );
-
-    const restaurantsResponse = await Promise.all(
-      restaurantQueries.map(async (restaurantQuery) => {
-        const response = await sdk.listings.query(restaurantQuery);
-        const { meta: chunkRestaurantResponseMeta } = response.data;
-
-        return {
-          chunkRestaurantsResponse: denormalisedResponseEntities(response),
-          chunkRestaurantResponseMeta,
-        };
-      }),
-    );
-
-    const searchResult = flatten(
-      restaurantsResponse.map(
-        ({ chunkRestaurantsResponse }) => chunkRestaurantsResponse,
-      ),
-    ).filter((r: TListing) => {
-      const restaurantGetter = Listing(r);
-
-      const {
-        stopReceiveOrder = false,
-        startStopReceiveOrderDate = 0,
-        endStopReceiveOrderDate = 0,
-      } = Listing(r).getPublicData();
-      const isInStopReceiveOrderTime =
-        stopReceiveOrder &&
-        Number(timestamp) >= startStopReceiveOrderDate &&
-        Number(timestamp) <= endStopReceiveOrderDate;
-
-      const { geolocation: restaurantOrigin } =
-        restaurantGetter.getAttributes();
-
-      const distanceToDeliveryPlace = calculateDistance(
-        deliveryAddress?.origin,
-        restaurantOrigin,
-      );
-      const isValidRestaurant =
-        !isInStopReceiveOrderTime &&
-        distanceToDeliveryPlace <=
-          Number(
-            process.env
-              .NEXT_PUBLIC_MAX_KILOMETER_FROM_RESTAURANT_TO_DELIVERY_ADDRESS_FOR_BOOKER,
-          );
-
-      return isValidRestaurant;
-    });
 
     return {
-      ...(newRestaurantIds.length > 0 && {
-        restaurantIdList: newRestaurantIds,
-      }),
-      searchResult,
-      combinedRestaurantMenuData,
-      totalItems: searchResult.length,
+      restaurantIdList: restaurantData.restaurantIdList ?? [],
+      searchResult:
+        restaurantData.searchResult.sort((first: TListing, second: TListing) =>
+          sortRestaurants(deliveryAddress.origin, first, second),
+        ) ?? [],
+      combinedRestaurantMenuData:
+        restaurantData.combinedRestaurantMenuData ?? [],
+      totalItems: restaurantData.totalItems ?? 0,
+      combinedRestaurantInFoods: restaurantData.combinedRestaurantInFoods ?? [],
+      keywords: params.keywords,
     };
+  },
+);
+
+const fetchRecommendedKeywords = createAsyncThunk(
+  FETCH_RECOMMENDED_KEYWORDS,
+  async () => {
+    const {
+      data: { previousKeywords, popularKeywords },
+    } = await fetchRecommendedKeywordsApi();
+
+    return {
+      previousKeywords,
+      popularKeywords,
+    };
+  },
+);
+
+const deleteRecentKeyword = createAsyncThunk(
+  DELETE_RECENT_KEYWORD,
+  async ({ keyword }: { keyword: string }, { dispatch }) => {
+    deleteRecentKeywordApi({
+      keyword,
+    }).catch(() => {
+      dispatch(fetchRecommendedKeywords());
+    });
+
+    return keyword;
   },
 );
 
@@ -473,6 +453,8 @@ export const BookerSelectRestaurantThunks = {
   updatePlanDetail,
   fetchCompanyAccount,
   fetchRestaurantReviews,
+  fetchRecommendedKeywords,
+  deleteRecentKeyword,
 };
 
 const BookerSelectRestaurantSlice = createSlice({
@@ -499,8 +481,19 @@ const BookerSelectRestaurantSlice = createSlice({
         state.restaurantIdList = action.payload.restaurantIdList ?? [];
         state.searchResult = action.payload.searchResult ?? [];
         state.totalItems = action.payload.totalItems ?? 0;
+        state.combinedRestaurantInFoods =
+          action.payload.combinedRestaurantInFoods ?? [];
         state.combinedRestaurantMenuData =
           action.payload.combinedRestaurantMenuData ?? [];
+
+        // add keywork to recentKeywords
+        const { keywords } = action.payload;
+        if (keywords) {
+          state.recentKeywords = uniq([
+            keywords,
+            ...(state.recentKeywords || []),
+          ]).slice(0, 4);
+        }
       })
       .addCase(searchRestaurants.rejected, (state) => {
         state.searchInProgress = false;
@@ -594,6 +587,37 @@ const BookerSelectRestaurantSlice = createSlice({
         ...state,
         fetchRestaurantInProgress: false,
         fetchRestaurantError: error,
+      }))
+      .addCase(fetchRecommendedKeywords.pending, (state) => ({
+        ...state,
+        fetchRecommendedKeywordsInProgress: true,
+        fetchRecommendedKeywordsError: null,
+      }))
+      .addCase(fetchRecommendedKeywords.fulfilled, (state, { payload }) => ({
+        ...state,
+        fetchRecommendedKeywordsInProgress: false,
+        popularKeywords: payload?.popularKeywords,
+        recentKeywords: payload?.previousKeywords,
+      }))
+      .addCase(fetchRecommendedKeywords.rejected, (state, { error }) => ({
+        ...state,
+        fetchRecommendedKeywordsInProgress: false,
+        fetchRecommendedKeywordsError: error,
+      }))
+      .addCase(deleteRecentKeyword.pending, (state) => ({
+        ...state,
+        deleteRecentKeywordInProgress: true,
+      }))
+      .addCase(deleteRecentKeyword.fulfilled, (state, { payload }) => ({
+        ...state,
+        recentKeywords: state.recentKeywords.filter(
+          (_keyword) => _keyword !== payload,
+        ),
+        deleteRecentKeywordInProgress: false,
+      }))
+      .addCase(deleteRecentKeyword.rejected, (state) => ({
+        ...state,
+        deleteRecentKeywordInProgress: false,
       }))
 
       .addCase(fetchRestaurantReviews.pending, (state) => ({

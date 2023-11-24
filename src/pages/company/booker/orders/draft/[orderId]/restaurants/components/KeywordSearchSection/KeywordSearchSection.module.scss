@@ -1,0 +1,26 @@
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.keywordSearchForm {
+  width: 100%;
+}
+
+.tooltipOverlay {
+  opacity: 1;
+
+  :global(.rc-tooltip-inner) {
+    box-shadow: 0px 8px 8px -4px rgba(16, 24, 40, 0.04),
+      0px 20px 24px -4px rgba(16, 24, 40, 0.1);
+    border: 1px solid $neutralGray3;
+    border-radius: 8px;
+    overflow: hidden;
+    padding: 0;
+    color: $neutralGray7;
+    background-color: $neutralGray1;
+  }
+
+  :global(.rc-tooltip-content) {
+    border-radius: 8px;
+  }
+}

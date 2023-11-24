@@ -21,7 +21,7 @@
 }
 
 .stepTitle {
-  @include textTemplate(18px, $fontWeightBold, 24px);
+  @include textTemplate(16px, $fontWeightBold, 20px);
   margin-top: 8px;
 }
 
@@ -29,6 +29,7 @@
   margin-top: 8px;
   padding-bottom: 24px;
   border-bottom: 1px solid $neutralGray5;
+  @include textTemplate(14px, 400, 18px);
 }
 
 .nextBtn {

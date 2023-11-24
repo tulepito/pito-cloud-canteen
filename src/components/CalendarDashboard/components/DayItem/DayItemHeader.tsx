@@ -9,7 +9,6 @@ import css from './DayItem.module.scss';
 
 const DayColumnHeader: React.FC<TDayColumnHeaderProps> = ({
   isCurrentDay,
-  isSelectedDay,
   date,
   className,
   shouldHideDate = false,
@@ -22,7 +21,7 @@ const DayColumnHeader: React.FC<TDayColumnHeaderProps> = ({
       className={classNames(
         css.dayHeader,
         {
-          [css.activeHeader]: isCurrentDay || isSelectedDay,
+          [css.activeHeader]: isCurrentDay,
         },
         className,
       )}>

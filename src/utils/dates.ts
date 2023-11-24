@@ -525,6 +525,25 @@ export const getDayOfWeek = (timestamp: number) => {
   return DateTime.fromMillis(timestamp).setZone(VNTimezone).weekday;
 };
 
+export const getStartDayOfWeek = (currentDate: Date, startDay: number = 1) => {
+  const dayOfWeek = currentDate.getDay();
+  const diff = (dayOfWeek - startDay + 7) % 7;
+  const startOfWeek = new Date(currentDate);
+  startOfWeek.setDate(currentDate.getDate() - diff);
+  startOfWeek.setHours(0, 0, 0, 0);
+
+  return startOfWeek;
+};
+
+export const getEndDayOfWeek = (currentDate: Date, startDay: number = 1) => {
+  const startOfWeek = getStartDayOfWeek(currentDate, startDay);
+  const endOfWeek = new Date(startOfWeek);
+  endOfWeek.setDate(startOfWeek.getDate() - startDay + 7);
+  endOfWeek.setHours(0, 0, 0, 0);
+
+  return endOfWeek;
+};
+
 export const getNextMonth = (date: Date) => {
   return DateTime.fromJSDate(date)
     .plus({ months: 1 })
@@ -646,6 +665,14 @@ export const TimeRangeItems = generateTimeRangeItems({});
 export const getNextWeek = (date: Date) => {
   return DateTime.fromJSDate(date)
     .plus({ weeks: 1 })
+    .startOf('week')
+    .startOf('day')
+    .toJSDate();
+};
+
+export const getPrevWeek = (date: Date) => {
+  return DateTime.fromJSDate(date)
+    .minus({ weeks: 1 })
     .startOf('week')
     .startOf('day')
     .toJSDate();

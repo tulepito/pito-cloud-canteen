@@ -8,6 +8,8 @@ export const EVENTS_MOCKUP: Event[] = [
       daySession: 'MORNING_SESSION',
       status: 'empty',
       type: 'dailyMeal',
+      restaurantAddress:
+        'East-West Highway, 264, Đ. Mai Chí Thọ, An Phú, Thành Phố Thủ Đức, Thành phố Hồ Chí Minh 800000, Việt Nam',
       deliveryAddress: {
         address:
           'East-West Highway, 264, Đ. Mai Chí Thọ, An Phú, Thành Phố Thủ Đức, Thành phố Hồ Chí Minh 800000, Việt Nam',
@@ -40,6 +42,9 @@ export const EVENTS_MOCKUP: Event[] = [
       daySession: 'MORNING_SESSION',
       status: 'joined',
       type: 'dailyMeal',
+      foodName: 'Gà nướng',
+      restaurantAddress:
+        'East-West Highway, 264, Đ. Mai Chí Thọ, An Phú, Thành Phố Thủ Đức, Thành phố Hồ Chí Minh 800000, Việt Nam',
       deliveryAddress: {},
       restaurant: {
         id: '12',
@@ -66,6 +71,8 @@ export const EVENTS_MOCKUP: Event[] = [
       daySession: 'EVENING_SESSION',
       status: 'empty',
       type: 'dailyMeal',
+      restaurantAddress:
+        'East-West Highway, 264, Đ. Mai Chí Thọ, An Phú, Thành Phố Thủ Đức, Thành phố Hồ Chí Minh 800000, Việt Nam',
       deliveryAddress: {
         address:
           'East-West Highway, 264, Đ. Mai Chí Thọ, An Phú, Thành Phố Thủ Đức, Thành phố Hồ Chí Minh 800000, Việt Nam',
@@ -99,6 +106,8 @@ export const EVENTS_MOCKUP: Event[] = [
       daySession: 'AFTERNOON_SESSION',
       status: 'empty',
       type: 'dailyMeal',
+      restaurantAddress:
+        'East-West Highway, 264, Đ. Mai Chí Thọ, An Phú, Thành Phố Thủ Đức, Thành phố Hồ Chí Minh 800000, Việt Nam',
       deliveryAddress: {
         address:
           'East-West Highway, 264, Đ. Mai Chí Thọ, An Phú, Thành Phố Thủ Đức, Thành phố Hồ Chí Minh 800000, Việt Nam',
@@ -132,6 +141,9 @@ export const EVENTS_MOCKUP: Event[] = [
       daySession: 'AFTERNOON_SESSION',
       status: 'joined',
       type: 'dailyMeal',
+      foodName: 'Bún bò',
+      restaurantAddress:
+        'East-West Highway, 264, Đ. Mai Chí Thọ, An Phú, Thành Phố Thủ Đức, Thành phố Hồ Chí Minh 800000, Việt Nam',
       deliveryAddress: {
         address:
           'East-West Highway, 264, Đ. Mai Chí Thọ, An Phú, Thành Phố Thủ Đức, Thành phố Hồ Chí Minh 800000, Việt Nam',
@@ -164,6 +176,8 @@ export const EVENTS_MOCKUP: Event[] = [
       daySession: 'MORNING_SESSION',
       status: 'empty',
       type: 'dailyMeal',
+      restaurantAddress:
+        'East-West Highway, 264, Đ. Mai Chí Thọ, An Phú, Thành Phố Thủ Đức, Thành phố Hồ Chí Minh 800000, Việt Nam',
       deliveryAddress: {
         address:
           'East-West Highway, 264, Đ. Mai Chí Thọ, An Phú, Thành Phố Thủ Đức, Thành phố Hồ Chí Minh 800000, Việt Nam',
@@ -196,6 +210,8 @@ export const EVENTS_MOCKUP: Event[] = [
       daySession: 'MORNING_SESSION',
       status: 'empty',
       type: 'dailyMeal',
+      restaurantAddress:
+        'East-West Highway, 264, Đ. Mai Chí Thọ, An Phú, Thành Phố Thủ Đức, Thành phố Hồ Chí Minh 800000, Việt Nam',
       deliveryAddress: {
         address:
           'East-West Highway, 264, Đ. Mai Chí Thọ, An Phú, Thành Phố Thủ Đức, Thành phố Hồ Chí Minh 800000, Việt Nam',

@@ -114,3 +114,23 @@
 .loading {
   text-align: center;
 }
+
+.coverImage {
+  height: 72px;
+  border-radius: 4px;
+
+  overflow: hidden;
+  position: relative;
+
+  & > img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+@media only screen and (max-width: 575px) {
+  .coverImage {
+    height: 120px;
+  }
+}

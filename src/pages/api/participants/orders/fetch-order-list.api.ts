@@ -15,7 +15,7 @@ import {
   denormalisedResponseEntities,
   Listing,
 } from '@src/utils/data';
-import { getEndOfMonth } from '@src/utils/dates';
+import { EImageVariants } from '@src/utils/enums';
 import type { TListing } from '@src/utils/types';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
@@ -27,15 +27,15 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     switch (apiMethod) {
       case HttpMethod.GET: {
         const { JSONParams } = req.query;
-        const { selectedMonth } = JSON.parse(JSONParams as string);
         const currentUser = denormalisedResponseEntities(
           await sdk.currentUser.show(),
         )[0];
 
+        const { startDate, endDate } = JSON.parse(JSONParams as string);
         const ordersQueries = getParticipantOrdersQueries({
           userId: currentUser.id.uuid,
-          startDate: new Date(selectedMonth).getTime(),
-          endDate: getEndOfMonth(new Date(selectedMonth)).getTime(),
+          startDate: new Date(startDate).getTime(),
+          endDate: new Date(endDate).getTime(),
         });
 
         const responses = await Promise.all(
@@ -53,13 +53,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
           return plans[0];
         });
-        const allPlans = await fetchListingsByChunkedIds(
+        const allPlanListings = await fetchListingsByChunkedIds(
           allPlansIdList,
           integrationSdk,
         );
 
         const allRelatedRestaurantsIdList = uniq(
-          allPlans.map((plan: TListing) => {
+          allPlanListings.map((plan: TListing) => {
             const planListing = Listing(plan);
             const { orderDetail = {} } = planListing.getMetadata();
 
@@ -105,13 +105,55 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         if (companyId) {
           company = await fetchUser(companyId);
         }
+        const allPlans = flatten(allPlanListings);
+
+        const foodsInPlans = await Promise.all(
+          allPlans.map(async (plan: TListing) => {
+            const planListing = Listing(plan);
+            const { orderDetail: subOrders } = planListing.getMetadata();
+
+            const pickedFoodIds: any[] = [];
+            Object.keys(subOrders).forEach((key) => {
+              const { memberOrders } = subOrders[key];
+              if (memberOrders) {
+                const foodId = memberOrders[currentUser.id.uuid]?.foodId;
+                if (foodId) {
+                  pickedFoodIds.push(foodId);
+                }
+              }
+            });
+
+            const pickedFoods: any[] = denormalisedResponseEntities(
+              await sdk.listings.query({
+                ids: pickedFoodIds,
+                include: ['images'],
+                'fields.image': [`variants.${EImageVariants.default}`],
+              }),
+            );
+
+            const mapedFoodIds = pickedFoods.reduce((acc, foodListing) => {
+              const id = Listing(foodListing).getId();
+              if (!acc[id]) {
+                acc[id] = foodListing;
+              }
+
+              return acc;
+            }, {});
+
+            return {
+              planId: planListing.getId(),
+              foodListings: mapedFoodIds,
+            };
+          }),
+        );
 
         return res.status(200).json({
           orders,
-          allPlans: flatten(allPlans),
+          allPlans,
           restaurants: allRelatedRestaurants,
           mappingSubOrderToOrder,
           company,
+          foodsInPlans,
         });
       }
       default:
