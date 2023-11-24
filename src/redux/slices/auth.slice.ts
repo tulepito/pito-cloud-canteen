@@ -111,6 +111,9 @@ const signUp = createAsyncThunk(
           protectedData: {
             ...rest,
           },
+          privateData: {
+            verifyEmail: { send: true },
+          },
         };
 
     // We must login the user if signup succeeds since the API doesn't

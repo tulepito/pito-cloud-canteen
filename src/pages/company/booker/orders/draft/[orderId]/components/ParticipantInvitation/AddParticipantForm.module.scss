@@ -1,0 +1,33 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+.formRoot {
+  display: flex;
+  flex-direction: column;
+  row-gap: 8px;
+
+  .formContainer {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    column-gap: 16px;
+
+    .fieldContainer {
+      flex-basis: 70%;
+
+      @include viewportSLarge {
+        flex-basis: 685px;
+      }
+    }
+
+    button {
+      min-height: unset;
+      flex-grow: 1;
+    }
+  }
+
+  .hint {
+    @include textTemplate(12px, 400, 20px);
+    color: $neutralGray6;
+  }
+}

@@ -299,6 +299,7 @@ export const createSubmitCreatePartnerValues = (values: any) => {
     },
     privateData: {
       bankAccounts: createSubmitBankAccount(bankAccounts),
+      verifyEmail: { send: true },
     },
   };
 

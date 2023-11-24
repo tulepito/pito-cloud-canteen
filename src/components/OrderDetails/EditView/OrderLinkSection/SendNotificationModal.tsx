@@ -4,7 +4,6 @@ import { useIntl } from 'react-intl';
 import ButtonIcon from '@components/ButtonIcon/ButtonIcon';
 import IconCopy from '@components/Icons/IconCopy/IconCopy';
 import Modal from '@components/Modal/Modal';
-import RenderWhen from '@components/RenderWhen/RenderWhen';
 import Tooltip from '@components/Tooltip/Tooltip';
 import { formatTimestamp } from '@utils/dates';
 
@@ -15,7 +14,6 @@ import css from './SendNotificationModal.module.scss';
 
 type SendNotificationModalProps = {
   isOpen: boolean;
-  isFirstTimeShow: boolean;
   data: { orderLink: string; orderDeadline: number; companyName: string };
   onClose: () => void;
   onSubmit: (values: TSendNotificationFormValues) => void;
@@ -26,8 +24,7 @@ const SendNotificationModal: React.FC<SendNotificationModalProps> = (props) => {
   const {
     onClose,
     isOpen,
-    isFirstTimeShow,
-    data: { orderDeadline, orderLink, companyName },
+    data: { orderDeadline, orderLink },
     onSubmit,
   } = props;
 
@@ -43,11 +40,7 @@ const SendNotificationModal: React.FC<SendNotificationModalProps> = (props) => {
 
   const sendNotificationModalTitle = (
     <span className={css.title}>
-      {isFirstTimeShow
-        ? intl.formatMessage({
-            id: 'SendNotificationModal.firstTimeTitle',
-          })
-        : intl.formatMessage({ id: 'SendNotificationModal.title' })}
+      {intl.formatMessage({ id: 'SendNotificationModal.title' })}
     </span>
   );
   const sendNotificationModalAlert = intl.formatMessage(
@@ -58,13 +51,9 @@ const SendNotificationModal: React.FC<SendNotificationModalProps> = (props) => {
       dateTime: formatTimestamp(orderDeadline, 'dd/MM/yyyy  HH:mm'),
     },
   );
-  const sendNotificationModalLinkLabel = isFirstTimeShow
-    ? intl.formatMessage({
-        id: 'SendNotificationModal.firstTimeLinkLabel',
-      })
-    : intl.formatMessage({
-        id: 'SendNotificationModal.linkLabel',
-      });
+  const sendNotificationModalLinkLabel = intl.formatMessage({
+    id: 'SendNotificationModal.linkLabel',
+  });
   const sendNotificationModalDescriptionLabel = intl.formatMessage({
     id: 'SendNotificationModal.descriptionLabel',
   });
@@ -80,22 +69,8 @@ const SendNotificationModal: React.FC<SendNotificationModalProps> = (props) => {
       title={sendNotificationModalTitle}
       handleClose={onClose}>
       <div>
-        <RenderWhen condition={isFirstTimeShow}>
-          <div className={css.infoContainer}>
-            <div className={css.infoRow}>
-              <div>
-                {intl.formatMessage({
-                  id: 'SendNotificationModal.info.companyTitle',
-                })}
-              </div>
-              <div title={companyName}>{companyName}</div>
-            </div>
-          </div>
-        </RenderWhen>
         <div className={css.alertContainer}>{sendNotificationModalAlert}</div>
-        <RenderWhen condition={isFirstTimeShow}>
-          <div className={css.divider} />
-        </RenderWhen>
+
         <div>
           <div className={css.linkLabel}>{sendNotificationModalLinkLabel}</div>
           <div className={css.linkContainer}>
@@ -113,10 +88,7 @@ const SendNotificationModal: React.FC<SendNotificationModalProps> = (props) => {
             {sendNotificationModalDescriptionLabel}
           </div>
         </div>
-        <SendNotificationForm
-          isFirstTimeShow={isFirstTimeShow}
-          onSubmit={onSubmit}
-        />
+        <SendNotificationForm onSubmit={onSubmit} />
       </div>
     </Modal>
   );

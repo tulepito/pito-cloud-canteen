@@ -28,6 +28,7 @@ export const useLoadData = ({ orderId }: { orderId: string }) => {
     (async () => {
       await dispatch(orderAsyncActions.fetchOrder(orderId));
       await dispatch(BookerDraftOrderPageThunks.fetchCompanyAccount());
+      dispatch(BookerDraftOrderPageThunks.fetchOrderParticipants());
     })();
   }, [dispatch, orderId]);
 

@@ -16,7 +16,7 @@
 .dayItem {
   @include flexAlign(center, center);
   padding: 8px 16px;
-  color: $neutralGray5;
+  color: $neutralGray6;
   outline: 1px solid $neutralGray5;
   outline-offset: -1px;
   border-radius: 20px;
@@ -30,7 +30,7 @@
 
   &.disabled {
     cursor: not-allowed;
-    color: $neutralGray6;
+    color: $neutralGray5;
     outline: 1px solid $neutralGray5;
     opacity: 0.5;
     pointer-events: none;

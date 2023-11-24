@@ -144,7 +144,7 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
   };
   const deadlineInitValues = {
     deadlineDate: new Date(deadlineDate).getTime() || defaultDeadlineDate,
-    deadlineHour: deadlineHour || '07:00',
+    deadlineHour: deadlineHour || '',
   };
   const numberEmployeesInitValues = {
     memberAmount,
@@ -174,7 +174,7 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
 
   const handleSubmit = async (values: any) => {
     const {
-      packagePerMember: packagePerMemberValue,
+      packagePerMember: packagePerMemberValue = '',
       startDate: startDateValue,
       endDate: endDateValue,
       deliveryHour: deliveryHourValue,
@@ -200,9 +200,7 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
       }),
     );
     const { plans = [] } = Listing(order as TListing).getMetadata();
-    const finalPackagePerMember = packagePerMemberValue
-      ? parseInt(packagePerMemberValue?.replace(/,/g, '') || 0, 10)
-      : packagePerMember;
+    const finalPackagePerMember = packagePerMemberValue || packagePerMember;
 
     const finalDeliveryHour = deliveryHourValue || deliveryHour;
     const finalNutritions = nutritionsValue || nutritions;

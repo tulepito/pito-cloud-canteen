@@ -464,6 +464,9 @@ export const CurrentUser = (user: TCurrentUser) => {
     getAttributes: (): TObject => {
       return attributes || {};
     },
+    getProfileImage: () => {
+      return ensuredUser?.profileImage || null;
+    },
   };
 };
 

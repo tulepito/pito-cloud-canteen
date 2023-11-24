@@ -66,20 +66,23 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
   const router = useRouter();
   const { timestamp } = router.query;
 
+  const restaurantReviewModalControl = useBoolean();
   const [selectedFoods, setSelectedFoods] = useState<string[]>([]);
   const foodModal = useBoolean(false);
   const [selectedFood, setSelectedFood] = useState<TListing | null>(null);
-
+  const updatePlanDetailInProgress = useAppSelector(
+    (state) => state.BookerSelectRestaurant.updatePlanDetailInProgress,
+  );
+  const currentMenuId = useAppSelector(
+    (state) => state.BookerSelectRestaurant.currentMenuId,
+  );
   const { restaurant: preselectedRestaurant } = useGetRestaurant();
-
   const { orderId, planId, planDetail, orderType } = useGetPlanDetails();
   const { orderDetail } = Listing(planDetail).getMetadata();
-  const restaurantReviewModalControl = useBoolean();
-  const initFoodList = useMemo(() => {
+  const initialFoodIds = useMemo(() => {
     const detail =
       orderDetail?.[`${openFromCalendar ? propTimestamp : timestamp}`];
     const savedRestaurantId = detail?.restaurant?.id;
-
     if (selectedRestaurantId === savedRestaurantId) {
       const foodListObj = detail?.restaurant?.foodList || {};
 
@@ -87,18 +90,15 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
     }
 
     return [];
-  }, [planDetail, timestamp, isOpen, propTimestamp]);
-
+  }, [
+    isOpen,
+    timestamp?.toString(),
+    propTimestamp?.toString(),
+    JSON.stringify(orderDetail),
+  ]);
   useEffect(() => {
-    setSelectedFoods(initFoodList);
-  }, [initFoodList]);
-
-  const updatePlanDetailInProgress = useAppSelector(
-    (state) => state.BookerSelectRestaurant.updatePlanDetailInProgress,
-  );
-  const currentMenuId = useAppSelector(
-    (state) => state.BookerSelectRestaurant.currentMenuId,
-  );
+    setSelectedFoods(initialFoodIds);
+  }, [initialFoodIds]);
 
   const currentRestaurant = useMemo(
     () =>
@@ -112,27 +112,25 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
 
   const isNormalOrder = orderType === EOrderType.normal;
 
-  const { geolocation: restaurantOrigin } = Listing(
-    currentRestaurant!,
-  ).getAttributes();
-  const { totalRating = 0, totalRatingNumber = 0 } = Listing(
-    currentRestaurant!,
-  ).getMetadata();
-  const restaurantName = Listing(currentRestaurant!).getAttributes().title;
+  const restaurantGetter = Listing(currentRestaurant!);
+  const { geolocation: restaurantOrigin } = restaurantGetter.getAttributes();
+  const { totalRating = 0, totalRatingNumber = 0 } =
+    restaurantGetter.getMetadata();
+  const restaurantName = restaurantGetter.getAttributes().title;
   const {
     avatarImageId,
     coverImageId,
     minQuantity = 0,
     maxQuantity = 100,
     phoneNumber,
-  } = Listing(currentRestaurant!).getPublicData();
+  } = restaurantGetter.getPublicData();
   const restaurantAvatar = getListingImageById(
     avatarImageId,
-    Listing(currentRestaurant!).getImages(),
+    restaurantGetter.getImages(),
   );
   const restaurantCover = getListingImageById(
     coverImageId,
-    Listing(currentRestaurant!).getImages(),
+    restaurantGetter.getImages(),
   );
 
   const distance = useMemo(

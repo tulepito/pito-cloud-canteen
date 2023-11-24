@@ -18,7 +18,6 @@ import {
   required,
 } from '@utils/validators';
 
-import useRedirectAfterReloadPage from '../../hooks/useRedirectAfterReloadPage';
 import QuizModal from '../components/QuizModal/QuizModal';
 import { useQuizFlow } from '../hooks/useQuizFlow';
 
@@ -37,15 +36,19 @@ const Amount = () => {
   return <div className={css.label}>người</div>;
 };
 
-const QuizPerPackMemberAmountPage = () => {
+type TQuizPerPackMemberAmountPageProps = {
+  stepInfo?: string;
+};
+const QuizPerPackMemberAmountPage: React.FC<
+  TQuizPerPackMemberAmountPageProps
+> = ({ stepInfo }) => {
   const intl = useIntl();
   const router = useRouter();
   const submittingControl = useBoolean();
   const dispatch = useAppDispatch();
 
-  useRedirectAfterReloadPage();
   const quizData = useAppSelector((state) => state.Quiz.quiz, shallowEqual);
-  const { nextStep, backStep } = useQuizFlow(QuizStep.PACKAGE_PER_MEMBER);
+  const { nextStep } = useQuizFlow(QuizStep.PACKAGE_PER_MEMBER);
 
   const onSubmit = async (values: any) => {
     const {
@@ -161,7 +164,7 @@ const QuizPerPackMemberAmountPage = () => {
       submitDisabled={hasValidationErrors}
       submitInProgress={submittingControl.value}
       onSubmit={onFormSubmitClick}
-      onBack={backStep}>
+      stepInfo={stepInfo}>
       <form className={css.formContainer}>
         <FieldTextInputComponent
           id="packagePerMember"

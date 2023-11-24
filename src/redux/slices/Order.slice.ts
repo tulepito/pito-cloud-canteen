@@ -67,6 +67,9 @@ import type {
   TPagination,
 } from '@utils/types';
 
+// eslint-disable-next-line import/no-cycle
+import { BookerSelectRestaurantActions } from '../../pages/company/booker/orders/draft/[orderId]/restaurants/BookerSelectRestaurant.slice';
+
 import { SystemAttributesThunks } from './systemAttributes.slice';
 
 export const MANAGE_ORDER_PAGE_SIZE = 10;
@@ -351,10 +354,7 @@ const createOrder = createAsyncThunk(
     const {
       startDate,
       endDate,
-      isGroupOrder = [],
-      deadlineDate,
-      orderDeadlineHour,
-      orderDeadlineMinute,
+      orderType,
       dayInWeek,
       daySession,
       deliveryHour,
@@ -362,29 +362,16 @@ const createOrder = createAsyncThunk(
 
     const newIsGroupOrder = isCopyPreviousOrder
       ? Listing(previousOrder).getMetadata().orderType === EOrderType.group
-      : isGroupOrder.length > 0;
+      : orderType === EOrderType.group;
 
     const startDateTimestamp = new Date(startDate).getTime();
     const endDateTimestamp = new Date(endDate).getTime();
-    const deadlineDateTimestamp = new Date(deadlineDate).getTime();
 
     const selectedDays = getSelectedDaysOfWeek(
       startDateTimestamp,
       endDateTimestamp,
       dayInWeek,
     );
-
-    const deadlineInfoMaybe = newIsGroupOrder
-      ? {
-          deadlineDate: DateTime.fromISO(deadlineDate)
-            .plus({
-              hours: orderDeadlineHour,
-              minutes: orderDeadlineMinute,
-            })
-            .toMillis(),
-          deadlineHour: `${orderDeadlineHour}:${orderDeadlineMinute}`,
-        }
-      : {};
 
     const newOrderApiBody = {
       companyId: clientId || User(selectedCompany).getId(),
@@ -397,7 +384,6 @@ const createOrder = createAsyncThunk(
           : newIsGroupOrder
           ? EOrderType.group
           : EOrderType.normal,
-        ...deadlineInfoMaybe,
         deliveryAddress:
           User(selectedCompany).getPublicData().companyLocation || {},
         dayInWeek: selectedDays,
@@ -405,13 +391,6 @@ const createOrder = createAsyncThunk(
         endDate: endDateTimestamp,
         daySession,
         deliveryHour,
-        ...(newIsGroupOrder && {
-          deadlineDate: deadlineDateTimestamp,
-          deadlineHour: `${orderDeadlineHour.padStart(
-            2,
-            '0',
-          )}:${orderDeadlineMinute.padStart(2, '0')}`,
-        }),
       },
     };
 
@@ -419,8 +398,7 @@ const createOrder = createAsyncThunk(
       ? await reorderApi(Listing(previousOrder!).getId(), {
           startDate: startDateTimestamp,
           endDate: endDateTimestamp,
-          deadlineDate: deadlineDateTimestamp,
-          deadlineHour: `${orderDeadlineHour}:${orderDeadlineMinute}`,
+          daySession,
         })
       : await createBookerOrderApi(newOrderApiBody);
 
@@ -435,21 +413,18 @@ const updateOrder = createAsyncThunk(
     const { generalInfo } = params;
     const { deadlineDate, deadlineHour } = generalInfo || {};
     const orderId = Listing(order as TListing).getId();
-    const parsedDeadlineDate = isNumber(deadlineDate)
-      ? DateTime.fromMillis(deadlineDate)
-          .startOf('day')
-          .plus({
-            ...convertHHmmStringToTimeParts(deadlineHour),
-          })
-          .toMillis()
-      : isString(deadlineDate)
-      ? DateTime.fromISO(deadlineDate)
-          .startOf('day')
-          .plus({
-            ...convertHHmmStringToTimeParts(deadlineHour),
-          })
-          .toMillis()
-      : undefined;
+    const parsedDeadlineDate =
+      isNumber(deadlineDate) || isString(deadlineDate)
+        ? (isNumber(deadlineDate)
+            ? DateTime.fromMillis(deadlineDate)
+            : DateTime.fromISO(deadlineDate)
+          )
+            .startOf('day')
+            .plus({
+              ...convertHHmmStringToTimeParts(deadlineHour),
+            })
+            .toMillis()
+        : undefined;
 
     const apiBody: TUpdateOrderApiBody = {
       generalInfo: {
@@ -865,14 +840,16 @@ const fetchPlanDetail = createAsyncThunk(
 
 const updatePlanDetail = createAsyncThunk(
   UPDATE_PLAN_DETAIL,
-  async ({ orderId, planId, orderDetail, updateMode }: any, _) => {
-    const { data: orderListing } = await updatePlanDetailsApi(orderId, {
+  async ({ orderId, planId, orderDetail, updateMode }: any, { dispatch }) => {
+    const { data: planListing } = await updatePlanDetailsApi(orderId, {
       orderDetail,
       planId,
       updateMode,
     });
 
-    return orderListing;
+    dispatch(BookerSelectRestaurantActions.setPlanDetail(planListing));
+
+    return planListing;
   },
 );
 
@@ -985,8 +962,8 @@ const checkRestaurantStillAvailable = createAsyncThunk(
           [timestamp]: {
             isAvailable: isAnyMenusValid,
             ...(isAnyMenusValid
-              ? { status: EInvalidRestaurantCase.noMenusValid }
-              : {}),
+              ? {}
+              : { status: EInvalidRestaurantCase.noMenusValid }),
           },
         };
       }),

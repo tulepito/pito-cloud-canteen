@@ -1,5 +1,7 @@
 import React, { useEffect } from 'react';
 import { FormattedMessage } from 'react-intl';
+import classNames from 'classnames';
+import isEmpty from 'lodash/isEmpty';
 import Image from 'next/image';
 
 import {
@@ -7,12 +9,15 @@ import {
   EVENING_SESSION,
   MORNING_SESSION,
 } from '@components/CalendarDashboard/helpers/constant';
-import { useAppDispatch } from '@hooks/reduxHooks';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { useViewport } from '@hooks/useViewport';
 import { BookerNewOrderAction } from '@pages/company/booker/orders/new/BookerNewOrder.slice';
 import { QuizActions } from '@redux/slices/Quiz.slice';
+import { currentUserSelector } from '@redux/slices/user.slice';
+import { CurrentUser } from '@src/utils/data';
 import { getDeliveryTimeFromMealType } from '@src/utils/dates';
 import { EMenuMealType } from '@src/utils/enums';
+import type { TCurrentUser } from '@src/utils/types';
 
 import breadImage from '../../assets/banhmi-min.png';
 import miquangImage from '../../assets/miquang-min.png';
@@ -52,9 +57,19 @@ const HOMEPAGE_MEAL_LINKS = [
 
 const CompanyDashboardHeroSection = () => {
   const { isMobileLayout, isTabletLayout } = useViewport();
+
   const dispatch = useAppDispatch();
+  const selectedCompany = useAppSelector((state) => state.Quiz.selectedCompany);
+  const currentUser = useAppSelector(currentUserSelector);
+  const { firstName } = CurrentUser(currentUser as TCurrentUser).getProfile();
 
   const isNotDesktop = isTabletLayout || isMobileLayout;
+  const isSelectedCompanyEmpty =
+    selectedCompany === null || isEmpty(selectedCompany);
+
+  const homePageLinkClasses = classNames(css.homePageLink, {
+    [css.homePageLinkDisabled]: isSelectedCompanyEmpty,
+  });
 
   useEffect(() => {
     const container = document.querySelector(
@@ -69,6 +84,9 @@ const CompanyDashboardHeroSection = () => {
   }, [isNotDesktop]);
 
   const handleMealClick = (daySession: string) => () => {
+    if (isSelectedCompanyEmpty) {
+      return;
+    }
     dispatch(QuizActions.clearQuizData());
     dispatch(QuizActions.openQuizFlow());
     dispatch(BookerNewOrderAction.setCurrentStep(0));
@@ -83,13 +101,18 @@ const CompanyDashboardHeroSection = () => {
     <div className={css.root}>
       <div className={css.content}>
         <h1 className={css.title}>
-          <FormattedMessage id="CompanyDashboardHeroSection.heroTitle" />
+          <FormattedMessage
+            id="CompanyDashboardHeroSection.heroTitle"
+            values={{
+              bookerName: ` ${firstName}`,
+            }}
+          />
         </h1>
         <div id="homePageMealLinks" className={css.homePageMealLinks}>
           {HOMEPAGE_MEAL_LINKS.map((item) => (
             <div
               key={item.key}
-              className={css.homePageLink}
+              className={homePageLinkClasses}
               onClick={handleMealClick(item.daySession)}>
               <Image
                 src={item.image}

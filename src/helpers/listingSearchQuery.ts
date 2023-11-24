@@ -15,7 +15,7 @@ import {
   EOrderStates,
   ERestaurantListingStatus,
 } from '@utils/enums';
-import type { TListing, TUser } from '@utils/types';
+import type { TListing, TObject, TUser } from '@utils/types';
 
 export type TMenuQueryParams = {
   timestamp: number;
@@ -173,7 +173,7 @@ export const getRestaurantQuery = ({
 }: {
   restaurantIds: string[];
   companyAccount: TUser | null;
-  params: any;
+  params: TObject;
 }) => {
   const {
     rating = '',
@@ -240,7 +240,8 @@ export const getMenuQueryInSpecificDay = ({
     packagePerMember,
     daySession,
   } = Listing(order as TListing).getMetadata();
-  const dateTime = DateTime.fromMillis(timestamp);
+
+  const dateTime = DateTime.fromMillis(timestamp).setZone(VNTimezone);
   const dayOfWeek = convertWeekDay(dateTime.weekday).key;
   const mealType = deliveryDaySessionAdapter(daySession);
   const convertedMealFoodType = mealFoodType.map((item: string) =>

@@ -738,21 +738,19 @@ const ManageOrdersPage = () => {
     content = <ErrorMessage message={queryOrderError.message} />;
   } else if (orders.length > 0) {
     content = (
-      <>
-        <TableForm
-          columns={shouldShowTableColums}
-          data={sortedData}
-          pagination={manageOrdersPagination}
-          paginationPath={adminRoutes.ManageOrders.path}
-          tableBodyCellClassName={css.bodyCell}
-          handleSort={handleSort}
-          sortValue={sortValue}
-          tableWrapperClassName={css.tableWrapper}
-          tableClassName={css.table}
-          tableBodyClassName={css.tableBody}
-          paginationProps={shouldHideOrder ? { showInfo: false } : {}}
-        />
-      </>
+      <TableForm
+        columns={shouldShowTableColums}
+        data={sortedData}
+        pagination={manageOrdersPagination}
+        paginationPath={adminRoutes.ManageOrders.path}
+        tableBodyCellClassName={css.bodyCell}
+        handleSort={handleSort}
+        sortValue={sortValue}
+        tableWrapperClassName={css.tableWrapper}
+        tableClassName={css.table}
+        tableBodyClassName={css.tableBody}
+        paginationProps={shouldHideOrder ? { showInfo: false } : {}}
+      />
     );
   } else {
     content = (

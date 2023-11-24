@@ -1,3 +1,7 @@
+import {
+  recommendRestaurantForSpecificDay,
+  recommendRestaurants,
+} from '@apiServices/order/recommendRestaurants/index.services';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HttpMethod } from '@apis/configs';
@@ -5,11 +9,6 @@ import cookies from '@services/cookie';
 import { denormalisedResponseEntities } from '@services/data';
 import { getSdk, handleError } from '@services/sdk';
 import { CurrentUser } from '@src/utils/data';
-
-import {
-  recommendRestaurantForSpecificDay,
-  recommendRestaurants,
-} from './recommendRestaurants.service';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {

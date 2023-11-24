@@ -14,7 +14,7 @@ export type TSendNotificationFormValues = {
   description: string;
 };
 
-type TExtraProps = { isFirstTimeShow: boolean };
+type TExtraProps = {};
 type TSendNotificationFormComponentProps =
   FormRenderProps<TSendNotificationFormValues> & Partial<TExtraProps>;
 type TSendNotificationFormProps = FormProps<TSendNotificationFormValues> &
@@ -24,7 +24,7 @@ const SendNotificationFormComponent: React.FC<
   TSendNotificationFormComponentProps
 > = (props) => {
   const intl = useIntl();
-  const { handleSubmit, submitting, isFirstTimeShow } = props;
+  const { handleSubmit, submitting } = props;
   const isSendingRemindEmail = useAppSelector(
     (state) => state.OrderManagement.isSendingRemindEmail,
   );
@@ -49,13 +49,9 @@ const SendNotificationFormComponent: React.FC<
           loadingMode="extend"
           inProgress={inProgress}
           disabled={submitDisabled}>
-          {isFirstTimeShow
-            ? intl.formatMessage({
-                id: 'SendNotificationForm.firstTimeSubmitButtonText',
-              })
-            : intl.formatMessage({
-                id: 'SendNotificationForm.submitButtonText',
-              })}
+          {intl.formatMessage({
+            id: 'SendNotificationForm.submitButtonText',
+          })}
         </Button>
       </div>
     </Form>

@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { shallowEqual } from 'react-redux';
 import { uniqBy } from 'lodash';
+import compact from 'lodash/compact';
+import isEmpty from 'lodash/isEmpty';
 
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import {
@@ -8,6 +10,62 @@ import {
   companyMemberThunks,
 } from '@redux/slices/companyMember.slice';
 import { User } from '@src/utils/data';
+import type { TUser } from '@src/utils/types';
+
+const isSuccessResponse = (_result: any) => _result.response.status === 200;
+const isNotFoundResponse = (_result: any) => _result.response.status === 404;
+
+const isUserHasCompany = (user: TUser) => {
+  const { company = {} } = User(user).getMetadata();
+
+  return !isEmpty(company);
+};
+
+export const filterHasAccountUsers = (
+  loadedResult: any[],
+  skipHasCompanyCheck = true,
+) => {
+  return compact(
+    loadedResult.map((_result) => {
+      if (isSuccessResponse(_result)) {
+        const { user } = _result.response;
+
+        return skipHasCompanyCheck ||
+          (!skipHasCompanyCheck && !isUserHasCompany(user))
+          ? user
+          : null;
+      }
+
+      return null;
+    }),
+  );
+};
+
+export const filterHasAccountUserIds = (
+  loadedResult: any[],
+  skipHasCompanyCheck = true,
+) => {
+  return compact(
+    loadedResult.map((_result) => {
+      if (isSuccessResponse(_result)) {
+        const { user } = _result.response;
+
+        return skipHasCompanyCheck ||
+          (!skipHasCompanyCheck && !isUserHasCompany(user))
+          ? user?.id?.uuid
+          : null;
+      }
+
+      return null;
+    }),
+  );
+};
+
+export const filterNoAccountUserEmail = (loadedResult: any[]) => {
+  return loadedResult
+    .filter(isNotFoundResponse)
+    .map((_result) => _result.email);
+};
 
 export const useAddMemberEmail = () => {
   const dispatch = useAppDispatch();
@@ -18,16 +76,18 @@ export const useAddMemberEmail = () => {
     (state) => state.companyMember.checkedEmailInputChunk,
     shallowEqual,
   );
-
   const addMembersInProgress = useAppSelector(
     (state) => state.companyMember.addMembersInProgress,
   );
 
   useEffect(() => {
     if (checkedEmailInputChunk) {
-      setLoadedResult(
-        uniqBy([...loadedResult, ...checkedEmailInputChunk], 'email'),
+      const newLoadedResult = uniqBy(
+        [...loadedResult, ...checkedEmailInputChunk],
+        'email',
       );
+
+      setLoadedResult(newLoadedResult);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [checkedEmailInputChunk]);
@@ -42,15 +102,13 @@ export const useAddMemberEmail = () => {
   };
 
   const onAddMembersSubmit = async () => {
-    const noAccountEmailList = loadedResult
-      .filter((_result) => _result.response.status === 404)
-      .map((_result) => _result.email);
-    const userIdList = loadedResult
-      .filter((_result) => _result.response.status === 200)
-      .map((_result) => User(_result.response.user).getId());
+    const noAccountEmailList = filterNoAccountUserEmail(loadedResult);
+    const userIdList = filterHasAccountUserIds(loadedResult);
+
     const { meta } = await dispatch(
       companyMemberThunks.addMembers({ noAccountEmailList, userIdList }),
     );
+
     if (meta.requestStatus === 'fulfilled') {
       setEmailList([]);
       setLoadedResult([]);
@@ -59,15 +117,12 @@ export const useAddMemberEmail = () => {
   };
 
   const onAddMembersSubmitInQuizFlow = async (_loadedResult: any[]) => {
-    const noAccountEmailList = _loadedResult
-      .filter((_result) => _result.response.status === 404)
-      .map((_result) => _result.email);
-    const userIdList = _loadedResult
-      .filter((_result) => _result.response.status === 200)
-      .map((_result) => User(_result.response.user).getId());
+    const noAccountEmailList = filterNoAccountUserEmail(_loadedResult);
+    const userIdList = filterHasAccountUserIds(_loadedResult, false);
     const { meta } = await dispatch(
       companyMemberThunks.addMembers({ noAccountEmailList, userIdList }),
     );
+
     if (meta.requestStatus === 'fulfilled') {
       setEmailList([]);
       setLoadedResult([]);

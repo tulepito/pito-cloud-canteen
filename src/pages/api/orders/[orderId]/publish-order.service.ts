@@ -7,6 +7,7 @@ import { getIntegrationSdk } from '@services/integrationSdk';
 import { createNativeNotification } from '@services/nativeNotification';
 import { createFirebaseDocNotification } from '@services/notifications';
 import type { TPlan } from '@src/utils/orderTypes';
+import type { TObject } from '@src/utils/types';
 import { Listing, User } from '@utils/data';
 import {
   EBookerOrderDraftStates,
@@ -14,6 +15,8 @@ import {
   ENotificationType,
   EOrderDraftStates,
   EOrderStates,
+  EOrderType,
+  EParticipantOrderStatus,
 } from '@utils/enums';
 
 const ADMIN_FLEX_ID = process.env.PITO_ADMIN_ID;
@@ -23,26 +26,44 @@ const enableToPublishOrderStates = [
   EBookerOrderDraftStates.bookerDraft,
 ];
 
-const normalizePlanDetailsData = (planDetails: TPlan['orderDetail']) => {
-  return Object.entries(planDetails).reduce((prev, [date, planDataOnDate]) => {
-    const { restaurant } = planDataOnDate || {};
+const normalizeOrderDetailsData = (
+  planDetails: TPlan['orderDetail'],
+  participantIds: string[],
+  isGroupOrder: boolean,
+  isAdmin: boolean,
+) => {
+  const initMemberOrders: TObject = {};
+  participantIds.forEach((participantId: string) => {
+    initMemberOrders[participantId] = {
+      foodId: '',
+      requirement: '',
+      status: EParticipantOrderStatus.empty,
+    };
+  });
 
-    const { id, restaurantName, foodList } = restaurant || {};
-    const isSetupRestaurantAndFood =
-      !isEmpty(id) && !isEmpty(restaurantName) && !isEmpty(foodList);
+  return Object.entries(planDetails).reduce(
+    (prev: TObject, [date, planDataOnDate]) => {
+      const { restaurant } = planDataOnDate || {};
 
-    if (isSetupRestaurantAndFood) {
-      return {
-        ...prev,
-        [date]: planDataOnDate,
-      };
-    }
+      const { id, restaurantName, foodList } = restaurant || {};
+      const isSetupRestaurantAndFood =
+        !isEmpty(id) && !isEmpty(restaurantName) && !isEmpty(foodList);
 
-    return prev;
-  }, {});
+      if (isSetupRestaurantAndFood) {
+        prev[date] = planDataOnDate;
+
+        if (isGroupOrder && !isAdmin) {
+          prev[date].memberOrders = initMemberOrders;
+        }
+      }
+
+      return prev;
+    },
+    {},
+  );
 };
 
-export const publishOrder = async (orderId: string) => {
+export const publishOrder = async (orderId: string, isAdmin = false) => {
   const integrationSdk = getIntegrationSdk();
 
   const [order] = denormalisedResponseEntities(
@@ -58,8 +79,10 @@ export const publishOrder = async (orderId: string) => {
     participants = [],
     serviceFees = {},
     anonymous = [],
+    orderType = EOrderType.group,
   } = orderListing.getMetadata();
   const { title: orderTitle } = orderListing.getAttributes();
+  const isGroupOrder = orderType === EOrderType.group;
 
   if (!enableToPublishOrderStates.includes(orderState)) {
     throw new Error(`Invalid orderState, ${orderState}`);
@@ -76,7 +99,12 @@ export const publishOrder = async (orderId: string) => {
   const { orderDetail: planOrderDetails = {} } =
     Listing(planListing).getMetadata();
 
-  const normalizedOrderDetail = normalizePlanDetailsData(planOrderDetails);
+  const normalizedOrderDetail = normalizeOrderDetailsData(
+    planOrderDetails,
+    participants,
+    isGroupOrder,
+    isAdmin,
+  );
 
   await integrationSdk.listings.update({
     id: planId,
@@ -145,7 +173,7 @@ export const publishOrder = async (orderId: string) => {
   });
 
   // create order picking notification for all participants
-  [...participants, ...anonymous].forEach((participantId: string) => {
+  participants.concat(anonymous).forEach((participantId: string) => {
     createFirebaseDocNotification(ENotificationType.ORDER_PICKING, {
       orderId,
       orderTitle,

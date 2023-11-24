@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useIntl } from 'react-intl';
 import classNames from 'classnames';
 
@@ -37,31 +37,18 @@ const OrderLinkSection: React.FC<TOrderLinkSectionProps> = (props) => {
     rootClassName,
     className,
     data: { orderDeadline, companyName },
-    isAminLayout = false,
     ableToUpdateOrder,
   } = props;
   const intl = useIntl();
   const dispatch = useAppDispatch();
   const orderData = useAppSelector((state) => state.OrderManagement.orderData);
-  const planData = useAppSelector((state) => state.OrderManagement.planData);
-  const planViewed = useAppSelector(
-    (state) => state.OrderManagement.planViewed,
-  );
   const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
   const [isSendNotificationModalOpen, setIsSendNotificationModalOpen] =
     useState(false);
 
-  const plan = Listing(planData as TListing);
-  const order = Listing(orderData as TListing);
-  const { orderState } = order.getMetadata();
-
-  const { viewed } = plan.getMetadata();
-  const orderId = order.getId();
-  const planId = plan.getId();
+  const { orderState } = Listing(orderData as TListing).getMetadata();
 
   const isPicking = orderState === EOrderStates.picking;
-  const isFirstTimeAccess =
-    !isAminLayout && !(inProgress || viewed || planViewed);
 
   const orderLink = getParticipantPickingLink(orderData?.id?.uuid);
   const formattedOrderDeadline = formatTimestamp(
@@ -94,25 +81,7 @@ const OrderLinkSection: React.FC<TOrderLinkSectionProps> = (props) => {
   };
   const handleCloseSendNotificationModal = () => {
     setIsSendNotificationModalOpen(false);
-
-    if (!viewed && planId && orderId) {
-      dispatch(
-        orderManagementThunks.bookerMarkInprogressPlanViewed({
-          planId,
-          orderId,
-        }),
-      );
-    }
   };
-
-  useEffect(() => {
-    if (isFirstTimeAccess) {
-      const i = setTimeout(() => {
-        setIsSendNotificationModalOpen(true);
-        clearTimeout(i);
-      }, 1000);
-    }
-  }, [isFirstTimeAccess]);
 
   const handleSubmitSendNotification = async (
     values: TSendNotificationFormValues,
@@ -157,7 +126,6 @@ const OrderLinkSection: React.FC<TOrderLinkSectionProps> = (props) => {
       <SendNotificationModal
         onSubmit={handleSubmitSendNotification}
         data={{ orderLink, orderDeadline, companyName }}
-        isFirstTimeShow={isFirstTimeAccess}
         isOpen={shouldShowSendNotificationModal}
         onClose={handleCloseSendNotificationModal}
       />

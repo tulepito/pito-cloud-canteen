@@ -1,8 +1,13 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/mixins.scss' as *;
 
+.formTitle {
+  @include textTemplate(24px, $fontWeightBold, 32px);
+  margin-top: 32px;
+}
+
 .formContainer {
-  margin: 32px auto;
+  margin: 24px auto;
   max-height: 40vh;
 }
 

@@ -5,6 +5,7 @@ import groupBy from 'lodash/groupBy';
 import isEmpty from 'lodash/isEmpty';
 import omit from 'lodash/omit';
 import set from 'lodash/set';
+import uniq from 'lodash/uniq';
 
 import {
   createSubOrderChangesHistoryDocumentApi,
@@ -17,7 +18,6 @@ import { createNotificationApi } from '@apis/notificationApi';
 import {
   addParticipantToOrderApi,
   addUpdateMemberOrder,
-  bookerMarkInprogressPlanViewedApi,
   bookerStartOrderApi,
   cancelPickingOrderApi,
   createQuotationApi,
@@ -293,7 +293,6 @@ type TOrderManagementState = {
   companyData: TCompany | null;
   orderData: TObject | null;
   planData: TObject;
-  planViewed: boolean;
   bookerData: TUser | null;
   participantData: Array<TUser>;
   anonymousParticipantData: Array<TUser>;
@@ -351,7 +350,6 @@ const initialState: TOrderManagementState = {
   orderData: {},
   planData: {},
   draftOrderDetail: {},
-  planViewed: false,
   bookerData: null,
   participantData: [],
   anonymousParticipantData: [],
@@ -488,15 +486,11 @@ const sendRemindEmailToMember = createAsyncThunk(
       [],
     ) as string[];
 
-    const uniqueMemberIdList = memberIdList.filter((item, pos) => {
-      return memberIdList.indexOf(item) === pos;
-    });
-
     await sendRemindEmailToMemberApi(orderId, {
       orderLink,
       deadline,
       description,
-      uniqueMemberIdList,
+      uniqueMemberIdList: uniq(memberIdList),
     });
   },
 );
@@ -932,13 +926,6 @@ const cancelPickingOrder = createAsyncThunk(
   },
 );
 
-const bookerMarkInprogressPlanViewed = createAsyncThunk(
-  'app/OrderManagement/BOOKER_MARK_INPROGRESS_PLAN_VIEWED',
-  async ({ orderId, planId }: { orderId: string; planId: string }) => {
-    await bookerMarkInprogressPlanViewedApi({ orderId, planId });
-  },
-);
-
 const querySubOrderChangesHistory = createAsyncThunk(
   'app/OrderManagement/QUERY_SUB_ORDER_CHANGES_HISTORY',
   async ({
@@ -1169,7 +1156,6 @@ export const orderManagementThunks = {
   deleteParticipant,
   bookerStartOrder,
   cancelPickingOrder,
-  bookerMarkInprogressPlanViewed,
   querySubOrderChangesHistory,
   updatePlanOrderDetail,
   fetchQuotation,
@@ -1921,16 +1907,6 @@ const OrderManagementSlice = createSlice({
       .addCase(addOrUpdateMemberOrder.rejected, (state, { payload }) => {
         state.addOrUpdateMemberOrderInProgress = false;
         state.addOrUpdateMemberOrderError = payload;
-      })
-      /* =============== bookerMarkInprogressPlanViewed =============== */
-      .addCase(bookerMarkInprogressPlanViewed.pending, (state) => {
-        return state;
-      })
-      .addCase(bookerMarkInprogressPlanViewed.fulfilled, (state) => {
-        state.planViewed = true;
-      })
-      .addCase(bookerMarkInprogressPlanViewed.rejected, (state) => {
-        return state;
       })
       .addCase(
         querySubOrderChangesHistory.pending,
