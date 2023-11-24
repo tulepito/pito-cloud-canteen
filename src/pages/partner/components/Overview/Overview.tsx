@@ -38,6 +38,7 @@ type TOverviewProps = {
   endDate: number;
   setStartDate: (startDate: number) => void;
   setEndDate: (endDate: number) => void;
+  resetTimePeriod: () => void;
 };
 
 const getFluctuation = (current: number, previous: number) => {
@@ -63,6 +64,7 @@ const Overview: React.FC<TOverviewProps> = (props) => {
     endDate,
     setStartDate,
     setEndDate,
+    resetTimePeriod,
   } = props;
   const { totalRevenue, totalCustomer, totalOrders } = data;
   const {
@@ -110,6 +112,7 @@ const Overview: React.FC<TOverviewProps> = (props) => {
                 endDate={endDate}
                 setStartDate={setStartDate}
                 setEndDate={setEndDate}
+                resetTimePeriod={resetTimePeriod}
               />
             </div>
           </RenderWhen>

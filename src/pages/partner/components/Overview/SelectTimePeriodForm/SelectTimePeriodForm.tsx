@@ -8,10 +8,7 @@ import FieldDateRangePicker from '@components/FormFields/FieldDateRangePicker/Fi
 import FieldRadioButton from '@components/FormFields/FieldRadioButton/FieldRadioButton';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
-import {
-  timePeriodOptions,
-  useControlTimeRange,
-} from '@pages/partner/hooks/useControlTimeRange';
+import { timePeriodOptions } from '@pages/partner/hooks/useControlTimeRange';
 import { ETimePeriodOption } from '@src/utils/enums';
 
 import css from './SelectTimePeriodForm.module.scss';
@@ -26,6 +23,12 @@ type TExtraProps = {
   onCustomSelectClick: () => void;
   onCloseModal: (e: React.MouseEvent<HTMLElement>) => void;
   onBackToTimePeriodSelectClick: () => void;
+  startDate: number;
+  endDate: number;
+  setStartDate: (startDate: number) => void;
+  setEndDate: (endDate: number) => void;
+  handleTimePeriodChange: (timePeriod: ETimePeriodOption) => void;
+  resetTimePeriod: () => void;
 };
 type TSelectTimePeriodFormComponentProps =
   FormRenderProps<TSelectTimePeriodFormValues> & Partial<TExtraProps>;
@@ -43,15 +46,13 @@ const SelectTimePeriodFormComponent: React.FC<
     onCloseModal,
     onBackToTimePeriodSelectClick,
     form,
-  } = props;
-  const {
     startDate,
     endDate,
     setStartDate,
     setEndDate,
     handleTimePeriodChange,
     resetTimePeriod,
-  } = useControlTimeRange();
+  } = props;
 
   const [startDateValue, setStartDateValue] = useState<Date | null>(
     new Date(startDate!),
@@ -60,11 +61,12 @@ const SelectTimePeriodFormComponent: React.FC<
     new Date(endDate!),
   );
 
-  const onCancel = () => {
+  const onCancel = (e: React.MouseEvent<HTMLElement>) => {
     if (shouldShowCustomSelect) {
       onBackToTimePeriodSelectClick?.();
     } else {
-      resetTimePeriod();
+      resetTimePeriod?.();
+      onCloseModal?.(e);
     }
   };
 
@@ -73,10 +75,10 @@ const SelectTimePeriodFormComponent: React.FC<
       onBackToTimePeriodSelectClick?.();
     } else {
       if (values.timePeriod === ETimePeriodOption.CUSTOM) {
-        setStartDate(startDateValue?.getTime()!);
-        setEndDate(endDateValue?.getTime()!);
+        setStartDate?.(startDateValue?.getTime()!);
+        setEndDate?.(endDateValue?.getTime()!);
       }
-      handleTimePeriodChange(values.timePeriod! as ETimePeriodOption);
+      handleTimePeriodChange?.(values.timePeriod! as ETimePeriodOption);
       onCloseModal?.(e);
     }
   };

@@ -20,6 +20,7 @@ type TSelectTimePeriodModalProps = {
   endDate: number;
   setStartDate: (startDate: number) => void;
   setEndDate: (endDate: number) => void;
+  resetTimePeriod: () => void;
 };
 
 const SelectTimePeriodModal: React.FC<TSelectTimePeriodModalProps> = (
@@ -34,6 +35,7 @@ const SelectTimePeriodModal: React.FC<TSelectTimePeriodModalProps> = (
     endDate,
     setStartDate,
     setEndDate,
+    resetTimePeriod,
   } = props;
   const selectCustomController = useBoolean();
 
@@ -66,6 +68,12 @@ const SelectTimePeriodModal: React.FC<TSelectTimePeriodModalProps> = (
           onCustomSelectClick={selectCustomController.setTrue}
           onBackToTimePeriodSelectClick={selectCustomController.setFalse}
           onCloseModal={handleClose}
+          startDate={startDate}
+          endDate={endDate}
+          setStartDate={setStartDate}
+          setEndDate={setEndDate}
+          handleTimePeriodChange={handleTimePeriodChange}
+          resetTimePeriod={resetTimePeriod}
         />
       </SlideModal>
     );

@@ -35,11 +35,11 @@ const CustomizeTooltip = (
   props: TooltipProps<any, any> & { timeFrame: ETimeFrame },
 ) => {
   const { payload = [], timeFrame } = props;
-  const dateValue = payload[0]?.payload?.dateLabel;
+  const dateValue = payload?.[0]?.payload?.dateLabel;
 
   return (
     <div className={css.tooltipWrapper}>
-      <div>{`${payload[0]?.value} đơn hàng`}</div>
+      <div>{`${payload?.[0]?.value} đơn hàng`}</div>
       <div>{formatPartnerOrderTooltipLabel(dateValue, timeFrame)}</div>
     </div>
   );

@@ -37,6 +37,7 @@ const Dashboard: React.FC<TDashboardProps> = () => {
     getPreviousTimePeriod,
     timePeriodOption,
     handleTimePeriodChange,
+    resetTimePeriod,
   } = useControlTimeRange();
   const {
     analyticsOrdersTimeFrame,
@@ -217,6 +218,7 @@ const Dashboard: React.FC<TDashboardProps> = () => {
           endDate={endDate!}
           setStartDate={setStartDate}
           setEndDate={setEndDate}
+          resetTimePeriod={resetTimePeriod}
         />
       </section>
       <section>
