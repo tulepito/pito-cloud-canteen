@@ -49,6 +49,7 @@ type TOrderCalendarViewProps = {
   company: TUser;
   order: TListing;
   plans?: TListing[];
+  pickedFoods?: TListing[];
   currentUser: TCurrentUser;
   loadDataInProgress?: boolean;
   restaurants: TListing[];
@@ -63,11 +64,19 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
     currentUser,
     plans,
     loadDataInProgress,
+    pickedFoods = [],
   } = props;
   const dispatch = useAppDispatch();
   const router = useRouter();
   const { openRatingModal, subOrderDate, viewMode } = router.query;
+  const pickedFoodsMapById = pickedFoods.reduce((acc, currentFood) => {
+    const id = Listing(currentFood).getId();
+    if (!acc.has(id)) {
+      acc.set(id, currentFood);
+    }
 
+    return acc;
+  }, new Map<string, TListing>());
   const companyTitle = User(company).getPublicData().displayName;
   const ensureCompanyUser = User(company).getFullData();
   const orderObj = Listing(order);
@@ -136,6 +145,7 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
         orderDetail[planItemKey].memberOrders[currentUserId] || {};
 
       const alreadyPickFood = !!foodSelection?.foodId;
+      const pickedFoodDetail = pickedFoodsMapById.get(foodSelection?.foodId);
 
       const expiredTime = deadlineDate
         ? DateTime.fromMillis(+deadlineDate)
@@ -174,6 +184,7 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
           meal: {
             dishes,
           },
+          pickedFoodDetail,
           deadlineDate,
           expiredTime: expiredTime.toMillis(),
           deliveryHour,

@@ -1,13 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useMemo } from 'react';
 import type { Event } from 'react-big-calendar';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import last from 'lodash/last';
 import { useRouter } from 'next/router';
 
-import Button, { InlineTextButton } from '@components/Button/Button';
-import type { TDishSelectionFormValues } from '@components/CalendarDashboard/components/OrderEventCard/DishSelectionForm';
+import Button from '@components/Button/Button';
 import DishSelectionForm from '@components/CalendarDashboard/components/OrderEventCard/DishSelectionForm';
 import OrderEventCardContentItems from '@components/CalendarDashboard/components/OrderEventCard/OrderEventCardContentItems';
 import OrderEventCardStatus from '@components/CalendarDashboard/components/OrderEventCard/OrderEventCardStatus';
@@ -20,7 +18,7 @@ import { participantOrderManagementThunks } from '@redux/slices/ParticipantOrder
 import { currentUserSelector } from '@redux/slices/user.slice';
 import { participantPaths } from '@src/paths';
 import { CurrentUser } from '@src/utils/data';
-import { EOrderStates, EParticipantOrderStatus } from '@src/utils/enums';
+import { EOrderStates } from '@src/utils/enums';
 import { ETransition } from '@src/utils/transaction';
 
 import { OrderListThunks } from '../../OrderList.slice';
@@ -59,7 +57,6 @@ const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
     orderId,
     subOrderId: planId,
     id: orderDay,
-    dishSelection,
     status,
     expiredTime,
     daySession,
@@ -67,7 +64,6 @@ const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
     orderState,
     lastTransition,
   } = event.resource;
-  const dishes: any[] = event.resource?.meal?.dishes || [];
   const user = useAppSelector(currentUserSelector);
 
   const fetchSubOrderTxInProgress = useAppSelector(
@@ -87,11 +83,6 @@ const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
   const shouldShowPickFoodSection =
     !isExpired && orderState === EOrderStates.picking;
 
-  const dishSelectionFormInitialValues = useMemo(
-    () => dishSelection,
-    [JSON.stringify(dishSelection)],
-  );
-
   const { reviewId } = subOrderDocument;
 
   const onNavigateToOrderDetail = () => {
@@ -102,7 +93,7 @@ const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
   };
 
   const onPickForMe = () => {
-    if (status !== EParticipantOrderStatus.empty) return;
+    if (status !== EVENT_STATUS.EMPTY_STATUS) return;
     recommendFoodForSpecificSubOrder({
       planId,
       orderId,
@@ -110,10 +101,7 @@ const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
     });
   };
 
-  const onSelectDish = async (
-    values: TDishSelectionFormValues,
-    reject?: boolean,
-  ) => {
+  const onRejectDish = async () => {
     const currentUserId = CurrentUser(user).getId();
     const payload = {
       updateValues: {
@@ -122,10 +110,8 @@ const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
         planId,
         memberOrders: {
           [currentUserId]: {
-            status: reject
-              ? EVENT_STATUS.NOT_JOINED_STATUS
-              : EVENT_STATUS.JOINED_STATUS,
-            foodId: reject ? '' : values?.dishSelection,
+            status: EVENT_STATUS.NOT_JOINED_STATUS,
+            foodId: '',
           },
         },
       },
@@ -170,7 +156,11 @@ const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
         </div>
         <div className={css.eventTime}>{startTime}</div>
         <div className={css.divider} />
-        <OrderEventCardContentItems event={event} isFirstHighlight />
+        <OrderEventCardContentItems
+          event={event}
+          isFirstHighlight
+          classNameCoverImage={css.coverImage}
+        />
         <RenderWhen condition={shouldShowPickFoodSection}>
           <RenderWhen
             condition={
@@ -180,23 +170,12 @@ const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
             <RenderWhen.False>
               <div className={css.divider} />
               <div className={css.selectFoodForm}>
-                <div className={css.selectFoodHeader}>
-                  <div className={css.formTitle}>
-                    <FormattedMessage id="EventCard.form.selectFood" />
-                  </div>
-                  <InlineTextButton
-                    className={css.viewDetail}
-                    onClick={onNavigateToOrderDetail}>
-                    <FormattedMessage id="EventCard.form.viewDetail" />
-                  </InlineTextButton>
-                </div>
                 <div className={css.selectDishContent}>
                   <DishSelectionForm
+                    onNavigateToOrderDetail={onNavigateToOrderDetail}
                     actionsDisabled={isExpired}
-                    dishes={dishes}
-                    onSubmit={onSelectDish}
+                    onReject={onRejectDish}
                     subOrderStatus={status}
-                    initialValues={dishSelectionFormInitialValues}
                     onPickForMe={onPickForMe}
                     pickForMeInProgress={pickFoodForSpecificSubOrderInProgress}
                   />

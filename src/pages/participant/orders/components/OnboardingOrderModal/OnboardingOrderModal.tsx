@@ -4,7 +4,6 @@ import classNames from 'classnames';
 
 import Badge, { EBadgeType } from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
-import IconClose from '@components/Icons/IconClose/IconClose';
 import IconDeadline from '@components/Icons/IconDeadline/IconDeadline';
 import IconLocation from '@components/Icons/IconLocation/IconLocation';
 import IconShop from '@components/Icons/IconShop/IconShop';
@@ -24,36 +23,6 @@ const OnboardingOrderModal: React.FC<TOnboardingOrderModalProps> = (props) => {
   const walkthroughCurrentStep = useAppSelector(
     (state) => state.ParticipantOrderList.walkthroughCurrentStep,
   );
-  const fakeFoodList = [
-    {
-      key: '0',
-      label: 'Cơm rang bò',
-    },
-    {
-      key: '1',
-      label: 'Hủ tiếu',
-    },
-    {
-      key: '2',
-      label: 'Cơm tôm',
-    },
-    {
-      key: '3',
-      label: 'Phở bò',
-    },
-    {
-      key: '4',
-      label: 'Cơm gà cay',
-    },
-    {
-      key: '5',
-      label: 'Phở gà',
-    },
-    {
-      key: '6',
-      label: 'Miến lươn',
-    },
-  ];
 
   const step1Ref = useRef<any>(null);
   const step2Ref = useRef<any>(null);
@@ -109,24 +78,17 @@ const OnboardingOrderModal: React.FC<TOnboardingOrderModalProps> = (props) => {
       id="OnboardingOrderModal"
       isOpen={isOpen}
       handleClose={onClose}
-      customHeader={
-        <div className={css.modalHeader}>
-          <div className={css.title}>Chi tiết đơn hàng</div>
-          <IconClose className={css.closeIcon} onClick={onClose} />
-        </div>
-      }
+      customHeader={<div></div>}
       containerClassName={css.slideModalContainer}>
       <div className={css.modalContent}>
-        <div className={css.sectionWrapper}>
-          <div className={css.row}>
-            <div className={css.daySession}>Bữa trưa</div>
-            <div className={css.orderStatus}>
-              <Badge
-                className={css.badge}
-                type={EBadgeType.warning}
-                label="Chưa chọn món"
-              />
-            </div>
+        <div className={classNames(css.sectionWrapper, css.topSection)}>
+          <div className={css.daySession}>Bữa trưa</div>
+          <div className={css.orderStatus}>
+            <Badge
+              className={css.badge}
+              type={EBadgeType.warning}
+              label="Chưa chọn món"
+            />
           </div>
           <div className={css.row}>
             <div className={css.orderTitle}>
@@ -160,54 +122,26 @@ const OnboardingOrderModal: React.FC<TOnboardingOrderModalProps> = (props) => {
         </div>
         <div className={css.horizontalLine}></div>
         <div className={css.sectionWrapper}>
-          <div className={css.row}>
-            <div data-tour="step-1" className={css.pickingTitle} ref={step1Ref}>
-              Chọn món
-              {isDuringTour && walkthroughCurrentStep === 0 && redDot}
-            </div>
-            <div className={css.viewDetail} data-tour="step-3" ref={step3Ref}>
-              Xem chi tiết
-              {isDuringTour && walkthroughCurrentStep === 2 && redDot}
-            </div>
-          </div>
-          <div className={css.row}>
-            <div className={css.fieldGroup}>
-              {fakeFoodList.map(({ key, label }) => (
-                <div key={key} className={css.checkboxItem}>
-                  <input
-                    className={css.radioInput}
-                    id={`food-${key}`}
-                    name="food"
-                    type="radio"
-                    value={key}
-                  />
-                  <label htmlFor={`food-${key}`}>{label}</label>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-        <div className={css.sectionWrapper}>
-          <div className={css.row}>
-            <Button
-              className={classNames(css.btn, css.pickForMeBtn)}
-              variant="secondary">
-              Chọn giúp tôi
-            </Button>
-            <Button className={classNames(css.btn, css.confirmBtn)}>
-              Xác nhận chọn món
-            </Button>
-          </div>
-          <div className={css.row}>
-            <Button
-              className={classNames(css.btn, css.lastBtn)}
-              variant="inline">
-              <span data-tour="step-2" ref={step2Ref}>
-                Không tham gia
-                {isDuringTour && walkthroughCurrentStep === 1 && redDot}
-              </span>
-            </Button>
-          </div>
+          <Button
+            data-tour="step-1"
+            className={classNames(css.btn, css.confirmBtn)}>
+            Chọn món
+          </Button>
+          <Button
+            className={classNames(css.btn, css.pickForMeBtn)}
+            variant="secondary"
+            data-tour="step-2">
+            Chọn giúp tôi
+          </Button>
+          <Button
+            data-tour="step-3"
+            className={classNames(css.btn, css.lastBtn)}
+            variant="inline">
+            <span ref={step2Ref}>
+              Không tham gia
+              {isDuringTour && walkthroughCurrentStep === 1 && redDot}
+            </span>
+          </Button>
         </div>
       </div>
     </PopupModal>

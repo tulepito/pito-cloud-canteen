@@ -46,6 +46,7 @@ type TOrderListState = {
   disableWalkthroughInProgress: boolean;
   disableWalkthroughError: any;
 
+  foodsInPlans: any[];
   orders: any[];
   allSubOrders: any[];
   allPlans: any[];
@@ -93,6 +94,7 @@ const initialState: TOrderListState = {
   disableWalkthroughInProgress: false,
   disableWalkthroughError: null,
 
+  foodsInPlans: [],
   orders: [],
   allSubOrders: [],
   allPlans: [],
@@ -298,13 +300,20 @@ const disableWalkthrough = createAsyncThunk(
 
 const fetchOrders = createAsyncThunk(
   FETCH_ORDERS,
-  async ({ selectedMonth }: TObject) => {
+  async ({ startDate, endDate }: TObject) => {
     const { data } = await fetchOrdersApi({
-      selectedMonth,
+      startDate,
+      endDate,
     });
 
-    const { orders, allPlans, restaurants, mappingSubOrderToOrder, company } =
-      data;
+    const {
+      orders,
+      allPlans,
+      restaurants,
+      mappingSubOrderToOrder,
+      company,
+      foodsInPlans,
+    } = data;
 
     return {
       orders,
@@ -312,6 +321,7 @@ const fetchOrders = createAsyncThunk(
       restaurants,
       mappingSubOrderToOrder,
       company,
+      foodsInPlans,
     };
   },
 );
@@ -754,6 +764,7 @@ const OrderListSlice = createSlice({
           ...payload.mappingSubOrderToOrder,
         };
         state.company = payload.company;
+        state.foodsInPlans = payload.foodsInPlans;
       })
       .addCase(fetchOrders.rejected, (state, { error }) => {
         state.fetchOrdersInProgress = false;

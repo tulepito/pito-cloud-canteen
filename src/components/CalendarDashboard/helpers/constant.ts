@@ -16,6 +16,7 @@ export const JOINED_STATUS = 'joined';
 export const NOT_JOINED_STATUS = 'notJoined';
 export const EXPIRED_STATUS = 'expired';
 export const CANCELED_STATUS = 'canceled';
+
 export const EVENT_STATUS = {
   EMPTY_STATUS,
   JOINED_STATUS,

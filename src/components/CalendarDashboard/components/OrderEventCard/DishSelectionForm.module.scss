@@ -2,12 +2,10 @@
 @use '/src/styles/mixins.scss' as *;
 @use '/src/styles/customMediaQueries.scss' as *;
 
-.root {
-}
-
 .fieldGroup {
   display: grid;
   grid-template-columns: 1fr 1fr;
+  margin-bottom: 16px;
 }
 
 .radioLabel {
@@ -38,13 +36,13 @@
 }
 
 .sectionWrapper {
-  margin-top: 16px;
-}
-
-.row {
   @include flexAlign(center, space-between);
+  flex-direction: row;
+  flex-wrap: wrap;
   gap: 8px;
 }
+
+.btnReject,
 .btn {
   @include textTemplate(14px, $fontWeightBold, 24px);
   width: 100%;
@@ -57,10 +55,13 @@
   }
 }
 
-.lastBtn {
-  margin-top: 12px;
+.btnReject {
+  margin-top: 8px;
+}
 
-  span {
-    width: 100%;
+@media only screen and (max-width: 575px) {
+  .sectionWrapper {
+    flex-direction: row-reverse;
+    flex-wrap: nowrap;
   }
 }

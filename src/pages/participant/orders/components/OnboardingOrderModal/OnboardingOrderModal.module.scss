@@ -31,7 +31,7 @@
   border-radius: 16px 16px 0px 0px;
   background-color: #ffffff;
   width: 100%;
-  padding: 20px 16px 40px;
+  padding: 16px;
 
   @include viewportLarge {
     width: 300px;
@@ -67,7 +67,7 @@
 }
 
 .modalHeader {
-  @include textTemplate(20px, $fontWeightBold, 32px);
+  @include textTemplate(18px, 600, 28px);
   @include flexAlign(center, space-between);
   .closeIcon {
     width: 12px;
@@ -82,8 +82,13 @@
   .horizontalLine {
     border-bottom: 1px solid $neutralGray5;
   }
+
   .sectionWrapper {
     padding: 16px 0;
+
+    &.topSection {
+      padding-top: 0;
+    }
 
     @include viewportLarge {
       padding: 12px 0;
@@ -107,7 +112,11 @@
     }
 
     .daySession {
-      @include textTemplate(16px, $fontWeightBold, 24px);
+      @include textTemplate(16px, $fontWeightSemiBold, 22px);
+    }
+
+    .orderStatus {
+      margin: 4px 0;
     }
 
     .greyText {
@@ -173,10 +182,7 @@
       padding: 6px 12px;
 
       &.pickForMeBtn {
-        @include viewportLarge {
-          width: 120px;
-          flex-shrink: 0;
-        }
+        margin-top: 12px;
       }
       &.confirmBtn {
         @include viewportLarge {

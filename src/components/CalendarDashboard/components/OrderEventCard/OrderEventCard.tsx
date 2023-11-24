@@ -127,7 +127,13 @@ const OrderEventCard: React.FC<TOrderEventCardProps> = ({
               status={status}
               lastTransition={lastTransition}
             />
-            <OrderEventCardContentItems event={event} />
+            <div className={css.orderEventCardContentItems}>
+              <OrderEventCardContentItems
+                event={event}
+                classNameCoverImage={css.coverImage}
+                isFirstHighlight={status === EParticipantOrderStatus.empty}
+              />
+            </div>
           </div>
         </div>
         <div className={css.dot} style={dotStyles}></div>

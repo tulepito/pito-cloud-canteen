@@ -2,10 +2,10 @@ import React from 'react';
 import { useIntl } from 'react-intl';
 
 import Badge, { EBadgeType } from '@components/Badge/Badge';
+import type { TEventStatus } from '@components/CalendarDashboard/helpers/types';
 import { ETransition } from '@src/utils/transaction';
 
 import { EVENT_STATUS } from '../../helpers/constant';
-import type { TEventStatus } from '../../helpers/types';
 
 import css from './OrderEventCard.module.scss';
 
@@ -17,7 +17,7 @@ type TOrderEventCardStatusProps = {
 
 const StatusToBadgeTypeMap = {
   [EVENT_STATUS.EMPTY_STATUS]: EBadgeType.warning,
-  [EVENT_STATUS.JOINED_STATUS]: EBadgeType.info,
+  [EVENT_STATUS.JOINED_STATUS]: EBadgeType.success,
   [EVENT_STATUS.NOT_JOINED_STATUS]: EBadgeType.info,
   [EVENT_STATUS.EXPIRED_STATUS]: EBadgeType.info,
   [EVENT_STATUS.CANCELED_STATUS]: EBadgeType.danger,
