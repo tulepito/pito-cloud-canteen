@@ -17,7 +17,7 @@ import {
   EOrderDraftStates,
   EOrderStates,
 } from '@utils/enums';
-import type { TListing, TObject, TOrderStateHistory } from '@utils/types';
+import type { TListing, TObject, TOrderStateHistoryItem } from '@utils/types';
 
 import css from './ReviewOrderProcessSection.module.scss';
 
@@ -27,7 +27,7 @@ const findCurrentActiveIndex = (orderStateHistory = []) => {
   }
   const latestHistory = orderStateHistory[
     orderStateHistory.length - 1
-  ] as TOrderStateHistory;
+  ] as TOrderStateHistoryItem;
 
   switch (latestHistory.state) {
     case EOrderDraftStates.draft:
@@ -44,7 +44,7 @@ const findCurrentActiveIndex = (orderStateHistory = []) => {
   }
 };
 
-const prepareItemData = (orderStateHistory: TOrderStateHistory[] = []) => {
+const prepareItemData = (orderStateHistory: TOrderStateHistoryItem[] = []) => {
   let parsedCreateOrderTime = '';
   let parsedStartPickingTime = '';
   let parsedStartOrderTime = '';

@@ -2,9 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HttpMethod } from '@apis/configs';
 import cookies from '@services/cookie';
-import { denormalisedResponseEntities } from '@services/data';
-import { getSdk, handleError } from '@services/sdk';
-import { CurrentUser } from '@src/utils/data';
+import { handleError } from '@services/sdk';
 
 import getOrder from './get.service';
 import updateOrder from './update.service';
@@ -29,17 +27,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         const orderId = req.query.orderId as string;
         const { generalInfo } = req.body;
 
-        const sdk = getSdk(req, res);
-        const [currentUser] = denormalisedResponseEntities(
-          await sdk.currentUser.show(),
-        );
-        const { isAdmin = false } = CurrentUser(currentUser).getMetadata();
-
         // Update order and return values
         const updatedOrderListing = await updateOrder({
           orderId,
           generalInfo,
-          isAdminFlow: isAdmin,
         });
 
         return res.json(updatedOrderListing);

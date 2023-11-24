@@ -31,7 +31,7 @@ import type {
   TListing,
   TObject,
   TOrderChangeHistoryItem,
-  TOrderStateHistory,
+  TOrderStateHistoryItem,
 } from '@utils/types';
 
 import { parseThousandNumber } from './format';
@@ -46,6 +46,14 @@ export const getParticipantPickingLink = (orderId: string) =>
   `${process.env.NEXT_PUBLIC_CANONICAL_URL}/participant/order/${orderId}`;
 export const getTrackingLink = (orderId: string, timestamp: string | number) =>
   `${process.env.NEXT_PUBLIC_CANONICAL_URL}/tracking/${orderId}_${timestamp}`;
+
+export const isOrderCreatedByBooker = (
+  orderStateHistory: TOrderStateHistoryItem[],
+) => {
+  return orderStateHistory.some(
+    ({ state }) => state === EBookerOrderDraftStates.bookerDraft,
+  );
+};
 
 export const isJoinedPlan = (
   foodId: string,
@@ -961,10 +969,10 @@ export const getEditedSubOrders = (orderDetail: TObject) => {
 };
 
 export const checkIsOrderHasInProgressState = (
-  orderStateHistory: TOrderStateHistory[],
+  orderStateHistory: TOrderStateHistoryItem[],
 ) => {
   return orderStateHistory.some(
-    (state: TOrderStateHistory) => state.state === EOrderStates.inProgress,
+    (state: TOrderStateHistoryItem) => state.state === EOrderStates.inProgress,
   );
 };
 

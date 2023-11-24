@@ -21,14 +21,14 @@ import type { TObject } from '@src/utils/types';
 import { denormalisedResponseEntities, Listing } from '@utils/data';
 import { formatTimestamp, VNTimezone } from '@utils/dates';
 
+import { isOrderCreatedByBooker } from '../../../../helpers/orderHelper';
+
 const updateOrder = async ({
   orderId,
   generalInfo,
-  isAdminFlow,
 }: {
   orderId: string;
   generalInfo: TObject;
-  isAdminFlow?: boolean;
 }) => {
   const integrationSdk = getIntegrationSdk();
 
@@ -48,6 +48,7 @@ const updateOrder = async ({
     (state: { state: string; createdAt: number }) =>
       state.state === EOrderStates.inProgress,
   );
+  const isCreatedByBooker = isOrderCreatedByBooker(orderStateHistory);
   const isGroupOrder = orderType === EOrderType.group;
 
   if (!isEmpty(generalInfo)) {
@@ -132,7 +133,7 @@ const updateOrder = async ({
 
     // * update AutomaticStartOrderScheduler
     if (updateStartDate || updateDeliveryHour) {
-      if (!isAdminFlow && isGroupOrder)
+      if (isCreatedByBooker && isGroupOrder)
         createOrUpdateAutomaticStartOrderScheduler({
           orderId,
           startDate: updateStartDate || startDate,
