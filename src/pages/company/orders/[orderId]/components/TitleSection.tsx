@@ -63,13 +63,13 @@ const TitleSection: React.FC<TTitleSectionProps> = ({
   const subtitle = isOrderAutomaticConfirmed
     ? intl.formatMessage(
         {
-          id: 'CompanyOrderDetailPage.titleSection.subtitle',
+          id: 'CompanyOrderDetailPage.titleSection.subtitleWhenAutomaticConfirmed',
         },
         { contactNumber, chatLink },
       )
     : intl.formatMessage(
         {
-          id: 'CompanyOrderDetailPage.titleSection.subtitleWhenAutomaticConfirmed',
+          id: 'CompanyOrderDetailPage.titleSection.subtitle',
         },
         { contactNumber, chatLink },
       );
