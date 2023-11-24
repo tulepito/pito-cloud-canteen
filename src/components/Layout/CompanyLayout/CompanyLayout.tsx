@@ -165,6 +165,8 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
     // },
   ];
 
+  const shouldHideHeaderPathnames = [companyPaths.CreateNewOrder];
+
   const shouldShowCompanyNavBar = [
     companyPaths.Home,
     companyPaths.ManageOrders,
@@ -211,12 +213,14 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
 
   return (
     <>
-      <CompanyHeaderWrapper
-        companyId={(selectedAccount?.value as string) || 'personal'}
-        showFeatureHeader={showFeatureHeader}
-        featureHeaderData={featureHeaderData}
-        companyHeaderLinkData={companyHeaderLinkData}
-      />
+      <RenderWhen condition={!shouldHideHeaderPathnames.includes(pathname)}>
+        <CompanyHeaderWrapper
+          companyId={(selectedAccount?.value as string) || 'personal'}
+          showFeatureHeader={showFeatureHeader}
+          featureHeaderData={featureHeaderData}
+          companyHeaderLinkData={companyHeaderLinkData}
+        />
+      </RenderWhen>
       {showSidebar && <CompanySidebar companyName={companyName!} />}
       <CompanyMainContent
         hasHeader={showFeatureHeader}

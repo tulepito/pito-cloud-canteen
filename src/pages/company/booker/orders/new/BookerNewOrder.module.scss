@@ -5,75 +5,58 @@
 .root {
 }
 
-.title {
-  text-align: center;
-  @include textTemplate(24px, $fontWeightBold, 32px);
-}
-
-.formContainer {
-  margin-top: 32px;
-}
-
-.openModal .modalContainer {
-  flex-basis: 480px;
-
-  &::-webkit-scrollbar {
-    display: none;
-  }
-
-  &.largeContainer {
-    flex-basis: 900px;
-  }
-}
-
-.openModal .modalScrollLayer {
-  align-items: center;
-
-  @include viewportMedium {
-    align-items: center;
-  }
-}
-
-.modalContent {
-  width: calc(100% - 48px);
-  // max-height: 500px;
-  // overflow-y: auto;
-  margin: auto;
-
-  &::-webkit-scrollbar {
-    display: none;
-  }
-
-  @include viewportMedium {
-    padding: 25px 0 0;
-    width: 100%;
-    max-width: 468px;
-  }
-}
-
-.input {
-  margin-bottom: 24px;
-}
-
-.toggle {
-  display: flex;
-  justify-content: space-between;
-  & > div {
-    @include textTemplate(16px, 400, 24px);
-  }
-}
-
-.submitBtn {
-  margin: 32px auto 16px;
-  width: 100%;
-}
-
-.cancelBtn {
-  width: 100%;
-  color: $neutralGray7;
+.header {
   @include textTemplate(16px, 700, 24px);
+  padding: 16px;
+  border-bottom: 1px solid $neutralGray3;
 }
 
-.fieldContainer {
-  margin: 24px auto 0;
+.content {
+  padding: 16px 16px 0;
+
+  .welcome {
+    @include textTemplate(18px, 700, 24px);
+  }
+
+  .mealsWrapper {
+    @include flexAlign(normal, center);
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 16px;
+
+    .mealItem {
+      @include flexAlign(center, space-between);
+      padding: 16px 12px;
+      gap: 16px;
+      border: 1px solid $neutralGray3;
+      background: $neutralGray1;
+      border-radius: 12px;
+      box-shadow: 0px 1px 2px 0px rgba(16, 24, 40, 0.05);
+
+      &:hover {
+        cursor: pointer;
+        border-color: $primaryPri2;
+        background: $sematicRed1;
+      }
+
+      .labelWrapper {
+        .label {
+          @include textTemplate(14px, 600, 20px);
+        }
+
+        .subLabel {
+          @include textTemplate(12px, 400, 16px);
+          color: $neutralGray6;
+          margin-top: 8px;
+        }
+      }
+
+      .image {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 8px;
+      }
+    }
+  }
 }
