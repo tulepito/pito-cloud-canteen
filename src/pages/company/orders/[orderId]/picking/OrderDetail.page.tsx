@@ -341,6 +341,12 @@ const OrderDetailPage = () => {
     [css.editNormalOrderViewWithHistorySection]:
       isNormalOrder && isDraftEditing,
   });
+  const leftPartClasses = classNames(css.leftPart, {
+    [css.leftPartWithInfo]: isCreatedByBooker,
+  });
+  const rightPartClasses = classNames(css.rightPart, {
+    [css.rightPartWithInfo]: isCreatedByBooker,
+  });
 
   const handleConfirmOrder = async () => {
     setViewMode(EPageViewMode.review);
@@ -449,36 +455,38 @@ const OrderDetailPage = () => {
       />
 
       <RenderWhen condition={!inProgress}>
-        <RenderWhen condition={!isNormalOrder && isCreatedByBooker}>
-          <div className={css.infoPart}>
-            <div className={css.columnContainer}>
-              <IconNoteCheckList />
-              <div>
-                <div className={css.columnTitle}>Tự động đặt đơn</div>
+        <RenderWhen condition={!isNormalOrder}>
+          <RenderWhen condition={isCreatedByBooker}>
+            <div className={css.infoPart}>
+              <div className={css.columnContainer}>
+                <IconNoteCheckList />
                 <div>
-                  Đơn sẽ được tự động đặt vào lúc{' '}
-                  <b>
-                    {normalizedDeliveryHour} {formattedAutomaticConfirmOrder}
-                  </b>
-                  . Trường hợp nếu đến hạn mà không đủ số lượng đặt món thì đơn
-                  sẽ bị hủy.
+                  <div className={css.columnTitle}>Tự động đặt đơn</div>
+                  <div>
+                    Đơn sẽ được tự động đặt vào lúc{' '}
+                    <b>
+                      {normalizedDeliveryHour} {formattedAutomaticConfirmOrder}
+                    </b>
+                    . Trường hợp nếu đến hạn mà không đủ số lượng đặt món thì
+                    đơn sẽ bị hủy.
+                  </div>
+                </div>
+              </div>
+              <div className={css.columnContainer}>
+                <IconNoteBook />
+                <div>
+                  <div className={css.columnTitle}>
+                    Tự động hủy tham gia cho thành viên
+                  </div>
+                  <div>
+                    Nếu quá thời hạn mà thành viên chưa chọn món thì sẽ được xem
+                    như là không tham gia ngày ăn.
+                  </div>
                 </div>
               </div>
             </div>
-            <div className={css.columnContainer}>
-              <IconNoteBook />
-              <div>
-                <div className={css.columnTitle}>
-                  Tự động hủy tham gia cho thành viên
-                </div>
-                <div>
-                  Nếu quá thời hạn mà thành viên chưa chọn món thì sẽ được xem
-                  như là không tham gia ngày ăn.
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className={css.leftPart}>
+          </RenderWhen>
+          <div className={leftPartClasses}>
             <ManageOrdersSection
               ableToUpdateOrder={ableToUpdateOrder}
               setCurrentViewDate={handleSetCurrentViewDate}
@@ -498,7 +506,7 @@ const OrderDetailPage = () => {
               }
             />
           </div>
-          <div className={css.rightPart}>
+          <div className={rightPartClasses}>
             <OrderDeadlineCountdownSection
               className={css.container}
               data={editViewData.countdownSectionData}
