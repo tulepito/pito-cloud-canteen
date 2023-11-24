@@ -52,8 +52,9 @@ export const normalizePlanDetailsToEvent = (
       const foodList = foodIds.map((id) => {
         return {
           key: id,
-          value: planData?.foodList?.[id]?.foodName,
-          price: planData?.foodList?.[id]?.foodPrice,
+          value: planData?.restaurant?.foodList?.[id]?.foodName,
+          price: planData?.restaurant?.foodList?.[id]?.foodPrice,
+          name: planData?.restaurant?.foodList?.[id]?.foodName,
         };
       });
       const isSubOrderNotAbleToEdit = [

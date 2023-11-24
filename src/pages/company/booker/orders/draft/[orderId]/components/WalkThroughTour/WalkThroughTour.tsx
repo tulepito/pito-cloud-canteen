@@ -13,9 +13,11 @@ const tourConfig = [
     content: ({ currentStep }: any) => (
       <div>
         <div className={css.step}>{`${currentStep + 1}/5`}</div>
-        <div className={css.stepTitle}>Đây là nhà hàng gợi ý cho bạn</div>
+        <div className={css.stepTitle}>
+          Đây là menu được tạo từ yêu cầu của bạn.
+        </div>
         <div className={css.stepContent}>
-          Nhà hàng được đề xuất dựa theo nhu cầu của bạn và đánh giá tích cực từ
+          Menu được đề xuất dựa theo nhu cầu của bạn và đánh giá tích cực từ
           khách hàng
         </div>
       </div>
@@ -38,10 +40,9 @@ const tourConfig = [
     content: ({ currentStep }: any) => (
       <div>
         <div className={css.step}>{`${currentStep + 1}/5`}</div>
-        <div className={css.stepTitle}>Tự động Gợi ý nhà hàng khác</div>
+        <div className={css.stepTitle}>Tự động đổi menu khác</div>
         <div className={css.stepContent}>
-          Nếu chưa phù hợp, bạn có thể thay đổi ngẫu nhiên với 300+ nhà hàng
-          khác
+          Khi bạn bấm nút này, 1 menu mới sẽ được tạo dựa theo nhu cầu của bạn.
         </div>
       </div>
     ),
@@ -66,7 +67,8 @@ const tourConfig = [
         <div className={css.step}>{`${currentStep + 1}/5`}</div>
         <div className={css.stepTitle}>Tìm kiếm nhà hàng </div>
         <div className={css.stepContent}>
-          Hoặc bạn thử tìm tên một nhà hàng mà bạn muốn đặt món nhé!
+          Bạn có thể tự tìm kiếm một nhà hàng khác với gợi ý của PITO Cloud
+          Canteen.
         </div>
       </div>
     ),
@@ -88,33 +90,10 @@ const tourConfig = [
     content: ({ currentStep }: any) => (
       <div>
         <div className={css.step}>{`${currentStep + 1}/5`}</div>
-        <div className={css.stepTitle}>Chọn các món ăn trong menu</div>
+        <div className={css.stepTitle}>Xoá menu này</div>
         <div className={css.stepContent}>
-          &ldquo;Hôm nay ăn gì?&rdquo; Bạn xem ở đây nhé!
-        </div>
-      </div>
-    ),
-    styles: {
-      popover: (base: any) => ({
-        ...base,
-        borderRadius: 8,
-        left: '20px',
-      }),
-      maskArea: (base: any) => ({
-        ...base,
-        rx: 8,
-      }),
-    },
-    position: 'right',
-  },
-  {
-    selector: '[data-tour="step-5"]',
-    content: ({ currentStep }: any) => (
-      <div>
-        <div className={css.step}>{`${currentStep + 1}/5`}</div>
-        <div className={css.stepTitle}>Xoá bữa ăn này</div>
-        <div className={css.stepContent}>
-          Bạn có thể xoá nhà hàng đã chọn trong trường hợp muốn thay đổi ngày ăn
+          Bạn có thể xoá menu đã chọn cho ngày ăn. Bạn vẫn có thể thêm lại sau
+          nếu muốn.
         </div>
       </div>
     ),
@@ -131,6 +110,30 @@ const tourConfig = [
     },
     position: 'right',
     padding: 10,
+  },
+  {
+    selector: '[data-tour="step-5"]',
+    content: ({ currentStep }: any) => (
+      <div>
+        <div className={css.step}>{`${currentStep + 1}/5`}</div>
+        <div className={css.stepTitle}>Tùy chọn các món ăn</div>
+        <div className={css.stepContent}>
+          Bạn có thể thêm bớt món ăn trong menu.
+        </div>
+      </div>
+    ),
+    styles: {
+      popover: (base: any) => ({
+        ...base,
+        borderRadius: 8,
+        left: '20px',
+      }),
+      maskArea: (base: any) => ({
+        ...base,
+        rx: 8,
+      }),
+    },
+    position: 'right',
   },
 ];
 

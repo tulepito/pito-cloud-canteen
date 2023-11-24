@@ -1,13 +1,16 @@
 import { useState } from 'react';
 import type { Event } from 'react-big-calendar';
 import { FormattedMessage } from 'react-intl';
+import { shallowEqual } from 'react-redux';
+import { DateTime } from 'luxon';
 
 import IconClose from '@components/Icons/IconClose/IconClose';
-import IconFood from '@components/Icons/IconFood/IconFood';
 import IconMagnifier from '@components/Icons/IconMagnifier/IconMagnifier';
 import IconTickWithBackground from '@components/Icons/IconTickWithBackground/IconTickWithBackground';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
-import { formatTimestamp } from '@utils/dates';
+import { useAppSelector } from '@hooks/reduxHooks';
+import { Listing } from '@src/utils/data';
+import { convertWeekDay, formatTimestamp, VNTimezone } from '@utils/dates';
 
 import DeleteMealModal from './components/DeleteMealModal';
 
@@ -38,7 +41,20 @@ const MealPlanCardHeader: React.FC<TMealPlanCardHeaderProps> = ({
   const handleDelete = () => {
     removeEventItem?.(resourceId);
   };
-  // const suitableAmount = event.resource?.suitableAmount;
+
+  const menuListings = useAppSelector(
+    (state) => state.Order.menuListings,
+    shallowEqual,
+  );
+
+  const dateTime = DateTime.fromMillis(+resourceId).setZone(VNTimezone);
+  const dayOfWeek = convertWeekDay(dateTime.weekday).key;
+
+  const foundMenuListing: any = menuListings?.find(
+    (menu) => menu.id.uuid === event.resource.restaurant.menuId,
+  );
+  const menuListing = Listing(foundMenuListing);
+  const foodIdList = menuListing.getMetadata()[`${dayOfWeek}FoodIdList`];
 
   const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
 
@@ -67,13 +83,17 @@ const MealPlanCardHeader: React.FC<TMealPlanCardHeaderProps> = ({
           <IconClose
             className={css.close}
             onClick={handleOpenDeleteModal}
-            data-tour="step-5"
+            data-tour="step-4"
           />
         </RenderWhen>
       </div>
       <div className={css.headerActions}>
-        <IconFood className={css.foodIcon} />
-        <div className={css.dishes}>{dishes.length}</div>
+        <div className={css.dishes}>
+          {`${dishes.length}${
+            foodIdList?.length ? `/${foodIdList?.length}` : ''
+          }`}{' '}
+          món
+        </div>
         <div className={css.verticalDivider} />
         <IconMagnifier
           className={css.searchIcon}

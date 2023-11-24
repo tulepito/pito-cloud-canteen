@@ -73,6 +73,14 @@ const ResultDetailFilters: React.FC<TResultDetailFiltersProps> = ({
             type="checkbox"
             {...selectAllField.input}
             checked={selectAllField.input.value}
+            onChange={(e) => {
+              const isChecked = e.target.checked;
+              if (isChecked) {
+                onSelectAllFood(originFoodIdList);
+              } else {
+                onSelectAllFood([]);
+              }
+            }}
           />
           <label className={css.label} htmlFor={'selectAll'}>
             <span className={css.checkboxWrapper}>

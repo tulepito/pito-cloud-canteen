@@ -58,18 +58,6 @@
   }
 }
 
-.weekDay:hover {
-  .dayHeader {
-    background-color: $primaryPri1;
-  }
-  &:hover {
-    .dateNumber,
-    .dayText {
-      color: $primaryPri2;
-    }
-  }
-}
-
 .activeHeader {
   background-color: $primaryPri2;
   color: $neutralGray1;

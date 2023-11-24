@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import classNames from 'classnames';
+import format from 'date-fns/format';
 import difference from 'lodash/difference';
 import isEqual from 'lodash/isEqual';
 import { DateTime } from 'luxon';
@@ -9,9 +10,9 @@ import { DateTime } from 'luxon';
 import Badge, { EBadgeType } from '@components/Badge/Badge';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
+import { parseThousandNumber } from '@helpers/format';
 import { getInitialLocationValues } from '@helpers/mapHelpers';
 import {
-  findMinDeadlineDate,
   findMinStartDate,
   mealTypeAdapter,
   mealTypeReverseAdapter,
@@ -19,6 +20,8 @@ import {
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
 import { EOrderType } from '@src/utils/enums';
+import { FOOD_TYPE_OPTIONS, getLabelByKey } from '@src/utils/options';
+import { upperCaseFirstLetter } from '@src/utils/validators';
 import { Listing, User } from '@utils/data';
 import { getDaySessionFromDeliveryTime } from '@utils/dates';
 import type { TListing, TUser } from '@utils/types';
@@ -43,12 +46,14 @@ type TNavigationItemProps = {
   messageId?: string;
   onOpen?: (id: string | boolean) => void;
   errorMessage?: string;
+  subText?: string | React.ReactNode;
 };
 
 const NavigationItem: React.FC<TNavigationItemProps> = ({
   messageId,
   onOpen = () => null,
   errorMessage = '',
+  subText,
 }) => {
   const handleOpenDetails = () => {
     onOpen(messageId || false);
@@ -60,6 +65,7 @@ const NavigationItem: React.FC<TNavigationItemProps> = ({
         <FormattedMessage id={`SidebarContent.nav.settings.${messageId}`} />
         <IconArrow direction="right" />
       </div>
+      {subText && <p className={css.subText}>{subText}</p>}
 
       <RenderWhen condition={!!errorMessage}>
         <div className={css.errorMessage}>{errorMessage}</div>
@@ -67,6 +73,59 @@ const NavigationItem: React.FC<TNavigationItemProps> = ({
     </div>
   );
 };
+
+function createNutritionText(
+  nutritionsOptions: { key: string; label: string }[],
+  selectedNutritions: string[],
+  selectedMealTypes: string[],
+) {
+  if (!nutritionsOptions) {
+    nutritionsOptions = [];
+  }
+
+  const mealTypeText = selectedMealTypes
+    .map((type) => upperCaseFirstLetter(getLabelByKey(FOOD_TYPE_OPTIONS, type)))
+    .join(', ');
+  const nutritionText = selectedNutritions
+    .map((nutrition) =>
+      upperCaseFirstLetter(getLabelByKey(nutritionsOptions, nutrition)),
+    )
+    .join(', ');
+
+  const result = [];
+  if (mealTypeText) {
+    result.push(mealTypeText);
+  }
+  if (nutritionText) {
+    result.push(nutritionText);
+  }
+
+  return result.join(',');
+}
+
+function createAccessText(
+  selectedGroups: string[],
+  finalizeGroupList: { id: string; name: string }[],
+) {
+  if (!selectedGroups) {
+    return '';
+  }
+  const selectedGroupsText = selectedGroups
+    .map((group: string) => {
+      const groupItem = finalizeGroupList.find((item) => item.id === group);
+
+      return groupItem?.name;
+    })
+    .join(', ');
+
+  return selectedGroupsText;
+}
+
+function parseDateString(date: any) {
+  return `${
+    new Date(date).getDay() === 0 ? 'CN' : `T${new Date(date).getDay() + 1}`
+  }, ${format(new Date(date), 'dd/MM/yyyy')}`;
+}
 
 const SidebarContent: React.FC<TSidebarContentProps> = ({
   className,
@@ -89,6 +148,9 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
 
   const recommendRestaurantInProgress = useAppSelector(
     (state) => state.Order.recommendRestaurantInProgress,
+  );
+  const nutritionsOptions = useAppSelector(
+    (state) => state.SystemAttributes.nutritions,
   );
   const orderData = Listing(order);
   const companyData = User(companyAccount!);
@@ -115,7 +177,6 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
   };
   const isGroupOrder = orderType === EOrderType.group;
   const isStartDateInValid = startDate < findMinStartDate().getTime();
-  const isDeadlineDateInValid = deadlineDate < findMinDeadlineDate().getTime();
   const sidebarFormSubmitInProgress =
     updateOrderInProgress ||
     updateOrderDetailInProgress ||
@@ -149,12 +210,26 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
   const numberEmployeesInitValues = {
     memberAmount,
   };
-  const nutritionsInitValues = {
-    nutritions: nutritions || [],
-    mealType: mealType
-      ? mealType.map((_type: string) => mealTypeAdapter(_type))
-      : [],
-  };
+
+  const nutritionsInitValues = useMemo(() => {
+    return {
+      nutritions: nutritions || [],
+      mealType: mealType
+        ? mealType.map((_type: string) => mealTypeAdapter(_type))
+        : [],
+    };
+  }, [nutritions, mealType]);
+
+  const finalizeGroupList = useMemo(() => {
+    return [
+      {
+        id: 'allMembers',
+        name: 'Tất cả nhóm',
+      },
+      ...(groupList || []),
+    ];
+  }, [groupList]);
+
   const selectedGroupsInitValues = {
     selectedGroups,
   };
@@ -295,6 +370,29 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
     }
   };
 
+  const subTexts = {
+    location: deliveryAddress?.address || '',
+    deliveryTime: (
+      <>
+        {`${parseDateString(deliveryInitValues.startDate)} - ${parseDateString(
+          deliveryInitValues.endDate,
+        )}`}
+        <br />
+        {deliveryInitValues.deliveryHour}
+      </>
+    ),
+    numberEmployees: `${memberAmount || 0} người`,
+    nutrition: createNutritionText(
+      nutritionsOptions,
+      nutritionsInitValues.nutritions,
+      nutritionsInitValues.mealType,
+    ),
+    access: isGroupOrder
+      ? createAccessText(selectedGroups, finalizeGroupList)
+      : '',
+    unitBudget: `0 - ${parseThousandNumber(packagePerMember)}đ`,
+  };
+
   return (
     <div className={classes}>
       <div
@@ -310,31 +408,40 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
           />
         </div>
         <nav className={css.navigation}>
-          <NavigationItem onOpen={handleOpenDetails} messageId="location" />
+          <NavigationItem
+            onOpen={handleOpenDetails}
+            messageId="location"
+            subText={subTexts.location}
+          />
           <NavigationItem
             onOpen={handleOpenDetails}
             messageId="deliveryTime"
             errorMessage={isStartDateInValid ? 'Thời gian không hợp lệ' : ''}
+            subText={subTexts.deliveryTime}
+          />
+          <NavigationItem
+            onOpen={handleOpenDetails}
+            messageId="numberEmployees"
+            subText={subTexts.numberEmployees}
+          />
+          <NavigationItem
+            onOpen={handleOpenDetails}
+            messageId="nutrition"
+            subText={subTexts.nutrition}
           />
           <RenderWhen condition={isGroupOrder}>
             <NavigationItem
               onOpen={handleOpenDetails}
-              messageId="expiredTime"
-              errorMessage={
-                isDeadlineDateInValid ? 'Thời gian không hợp lệ' : ''
-              }
+              messageId="access"
+              subText={subTexts.access}
             />
           </RenderWhen>
+
           <NavigationItem
             onOpen={handleOpenDetails}
-            messageId="numberEmployees"
+            messageId="unitBudget"
+            subText={subTexts.unitBudget}
           />
-          <NavigationItem onOpen={handleOpenDetails} messageId="nutrition" />
-          <RenderWhen condition={isGroupOrder}>
-            <NavigationItem onOpen={handleOpenDetails} messageId="access" />
-          </RenderWhen>
-
-          <NavigationItem onOpen={handleOpenDetails} messageId="unitBudget" />
         </nav>
       </div>
 

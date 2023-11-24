@@ -45,6 +45,7 @@ const MealPlanCard: React.FC<TMealPlanCardProps> = ({
     onSearchRestaurant,
     availableOrderDetailCheckList,
     shouldHideRemoveMealIcon = false,
+    companyGeoOrigin,
   } = resources;
 
   const availableStatus =
@@ -91,6 +92,9 @@ const MealPlanCard: React.FC<TMealPlanCardProps> = ({
         onRecommendMeal={onRecommendRestaurantForSpecificDay}
         onRecommendMealInProgress={onRecommendMealInProgress}
         restaurantAvailable={availableStatus?.isAvailable}
+        onViewAllFood={onEditFood}
+        editFoodInprogress={onEditFoodInProgress}
+        companyGeoOrigin={companyGeoOrigin}
       />
       <MealPlanCardFooter
         event={event}
