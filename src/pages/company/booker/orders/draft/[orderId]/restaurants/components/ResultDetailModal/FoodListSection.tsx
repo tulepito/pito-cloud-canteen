@@ -31,39 +31,39 @@ const FoodListSection: React.FC<TFoodsListSectionProps> = ({
 }) => {
   const intl = useIntl();
   const groupedFoodList = foodList.reduce<{
-    lessOrEqualPriceList: TListing[];
-    greaterPriceList: TListing[];
+    equalPriceFoodList: TListing[];
+    notEqualPriceFoodList: TListing[];
   }>(
     (result: any, foodItem: TListing) => {
       const foodListing = Listing(foodItem);
       const { price } = foodListing.getAttributes();
-      const { lessOrEqualPriceList, greaterPriceList } = result;
+      const { equalPriceFoodList, notEqualPriceFoodList } = result;
 
-      if (price.amount > packagePerMember) {
-        greaterPriceList.push(foodItem);
+      if (price.amount !== packagePerMember) {
+        notEqualPriceFoodList.push(foodItem);
       } else {
-        lessOrEqualPriceList.push(foodItem);
+        equalPriceFoodList.push(foodItem);
       }
 
       return {
-        lessOrEqualPriceList,
-        greaterPriceList,
+        equalPriceFoodList,
+        notEqualPriceFoodList,
       };
     },
     {
-      lessOrEqualPriceList: [],
-      greaterPriceList: [],
+      equalPriceFoodList: [],
+      notEqualPriceFoodList: [],
     },
   );
 
-  const sortesFoodList = groupedFoodList.lessOrEqualPriceList.sort((a, b) => {
+  const sortesFoodList = groupedFoodList.equalPriceFoodList.sort((a, b) => {
     const aPrice = Listing(a).getAttributes().price.amount;
     const bPrice = Listing(b).getAttributes().price.amount;
 
     return aPrice - bPrice;
   });
 
-  const sortesGreaterFoodList = groupedFoodList.greaterPriceList.sort(
+  const sortesGreaterFoodList = groupedFoodList.notEqualPriceFoodList.sort(
     (a, b) => {
       const aPrice = Listing(a).getAttributes().price.amount;
       const bPrice = Listing(b).getAttributes().price.amount;

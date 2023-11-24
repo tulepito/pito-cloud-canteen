@@ -390,7 +390,7 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
     access: isGroupOrder
       ? createAccessText(selectedGroups, finalizeGroupList)
       : '',
-    unitBudget: `0 - ${parseThousandNumber(packagePerMember)}đ`,
+    unitBudget: `${parseThousandNumber(packagePerMember || 0)}đ`,
   };
 
   return (

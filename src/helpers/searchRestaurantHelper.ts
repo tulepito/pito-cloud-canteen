@@ -74,7 +74,7 @@ export function parseFoodsFromMenu(
     if (foodMenu && food) {
       const foodListing = Listing(food);
       const { price, title } = foodListing.getAttributes();
-      if (price.amount <= packagePerMember)
+      if (price.amount === packagePerMember)
         result.push({
           restaurantId,
           foodId: key,
