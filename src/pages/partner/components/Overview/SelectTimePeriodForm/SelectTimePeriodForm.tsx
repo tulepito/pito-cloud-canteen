@@ -12,7 +12,7 @@ import {
   timePeriodOptions,
   useControlTimeRange,
 } from '@pages/partner/hooks/useControlTimeRange';
-import type { ETimePeriodOption } from '@src/utils/enums';
+import { ETimePeriodOption } from '@src/utils/enums';
 
 import css from './SelectTimePeriodForm.module.scss';
 
@@ -72,19 +72,18 @@ const SelectTimePeriodFormComponent: React.FC<
     if (shouldShowCustomSelect) {
       onBackToTimePeriodSelectClick?.();
     } else {
-      if (values.timePeriod === 'custom') {
+      if (values.timePeriod === ETimePeriodOption.CUSTOM) {
         setStartDate(startDateValue?.getTime()!);
         setEndDate(endDateValue?.getTime()!);
-      } else {
-        handleTimePeriodChange(values.timePeriod! as ETimePeriodOption);
       }
+      handleTimePeriodChange(values.timePeriod! as ETimePeriodOption);
       onCloseModal?.(e);
     }
   };
 
   useEffect(() => {
     if (shouldShowCustomSelect) {
-      form.change('timePeriod', 'custom');
+      form.change('timePeriod', ETimePeriodOption.CUSTOM);
     }
   }, [form, shouldShowCustomSelect, values.timePeriod]);
 

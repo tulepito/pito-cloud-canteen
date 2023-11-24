@@ -258,7 +258,7 @@ export const sortLatestSubOrders = (a: TObject, b: TObject) => {
     [ETransition.OPERATOR_CANCEL_PLAN]: 6,
   };
 
-  const dateComparison = b.subOrderDate - a.subOrderDate;
+  const dateComparison = a.subOrderDate - b.subOrderDate;
 
   if (dateComparison !== 0) return dateComparison;
 

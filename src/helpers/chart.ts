@@ -26,7 +26,7 @@ export const formatPartnerOrderXAxisTickValue = (
       return formatTimestamp(value, isStartOfMonth ? 'dd/MM' : 'dd');
     }
     case ETimeFrame.WEEK: {
-      const next7DayTimestamp = value + 7 * 24 * 60 * 60 * 1000;
+      const next7DayTimestamp = value + 6 * 24 * 60 * 60 * 1000;
 
       return `${formatTimestamp(value, 'dd/MM')} - ${formatTimestamp(
         next7DayTimestamp,
@@ -51,7 +51,7 @@ export const formatPartnerOrderTooltipLabel = (
       return formatTimestamp(value, 'dd/MM/yyyy');
     }
     case ETimeFrame.WEEK: {
-      const next7DayTimestamp = value + 7 * 24 * 60 * 60 * 1000;
+      const next7DayTimestamp = value + 6 * 24 * 60 * 60 * 1000;
 
       return `${formatTimestamp(value, 'dd/MM')} - ${formatTimestamp(
         next7DayTimestamp,
