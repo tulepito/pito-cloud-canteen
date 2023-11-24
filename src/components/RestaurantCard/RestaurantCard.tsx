@@ -1,17 +1,23 @@
 import React, { useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import classNames from 'classnames';
+import { useRouter } from 'next/router';
 
-import Badge from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
+import FoodRow from '@components/FoodRow/FoodRow';
 import IconBox from '@components/Icons/IconBox/IconBox';
 import IconHeart from '@components/Icons/IconHeart/IconHeart';
+import IconMoneyReceive from '@components/Icons/IconMoneyReceive/IconMoneyReceive';
 import IconStar from '@components/Icons/IconStar/IconStar';
+import IconTerm from '@components/Icons/IconTerm/IconTerm';
 import IconTruck from '@components/Icons/IconTruck/IconTruck';
 import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
+import { sortFoodsInRestaurant } from '@helpers/food';
 import { calculateDistance } from '@helpers/mapHelpers';
+import { searchKeywords } from '@helpers/titleHelper';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { getListingImageById } from '@pages/company/booker/orders/draft/[orderId]/restaurants/helpers';
+import type { TFoodInRestaurant } from '@src/types/bookerSelectRestaurant';
 import { BadgeTypeBaseOnCategory } from '@src/utils/attributes';
 import type { TKeyValue } from '@src/utils/types';
 import { Listing } from '@utils/data';
@@ -31,6 +37,7 @@ type TRestaurantCardProps = {
   favoriteFunc?: (restaurantId: string) => void;
   favoriteInProgress?: boolean;
   alreadyFavorite?: boolean;
+  foods?: TFoodInRestaurant[];
 };
 
 const RestaurantCard: React.FC<TRestaurantCardProps> = ({
@@ -42,31 +49,68 @@ const RestaurantCard: React.FC<TRestaurantCardProps> = ({
   favoriteFunc,
   favoriteInProgress,
   alreadyFavorite,
+  foods = [],
 }) => {
   const intl = useIntl();
   const classes = classNames(css.root, className);
   const categoryOptions = useAppSelector(
     (state) => state.SystemAttributes.categories,
   );
+
+  const router = useRouter();
+  const { keywords } = router.query;
+
   const packagingOptions = useAppSelector(
     (state) => state.SystemAttributes.packaging,
   );
-  const restaurantId = Listing(restaurant).getId();
-  const { geolocation: origin } = Listing(restaurant).getAttributes();
+  const restaurantListing = Listing(restaurant);
+  const restaurantId = restaurantListing.getId();
+  const { geolocation: origin } = restaurantListing.getAttributes();
+
   const {
     categories = [],
     packaging = [],
     coverImageId,
-  } = Listing(restaurant).getPublicData();
+    minQuantity,
+  } = restaurantListing.getPublicData();
   const { totalRating = 0, totalRatingNumber = 0 } =
-    Listing(restaurant).getMetadata();
-  const restaurantImages = Listing(restaurant).getImages();
+    restaurantListing.getMetadata();
+  const restaurantImages = restaurantListing.getImages();
 
   const restaurantCoverImage = getListingImageById(
     coverImageId,
     restaurantImages,
   );
-  const restaurantName = Listing(restaurant).getAttributes().title;
+  const restaurantName = restaurantListing.getAttributes().title;
+
+  const restaurantNameHighlight = useMemo<
+    | string
+    | {
+        text: string;
+        isMatchKeywords: boolean;
+      }[]
+  >(
+    () =>
+      keywords ? searchKeywords(restaurantName, keywords) : restaurantName,
+    [keywords, restaurantName],
+  );
+
+  const restaurantPackaging = packagingOptions.find(
+    (item: TKeyValue) => item.key === packaging[0],
+  )?.label;
+
+  const handleClickCard = () => {
+    onClick(restaurantId);
+  };
+
+  const handleFavoriteClick = () => {
+    if (typeof favoriteFunc === 'function') favoriteFunc(restaurantId);
+  };
+
+  const sortedFoods = sortFoodsInRestaurant(keywords, foods);
+
+  const hasMoreThan5Foods = sortedFoods.length > 5;
+  const first5Foods = sortedFoods.slice(0, 5);
 
   const mealStyles = useMemo(
     () =>
@@ -81,17 +125,10 @@ const RestaurantCard: React.FC<TRestaurantCardProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [JSON.stringify(categories), JSON.stringify(categoryOptions)],
   );
-  const restaurantPackaging = packagingOptions.find(
-    (item: TKeyValue) => item.key === packaging[0],
-  )?.label;
 
-  const handleClickCard = () => {
-    onClick(restaurantId);
-  };
-
-  const handleFavoriteClick = () => {
-    if (typeof favoriteFunc === 'function') favoriteFunc(restaurantId);
-  };
+  const nutrionText = mealStyles
+    .map((style: { label: string }) => style.label)
+    .join(', ');
 
   return (
     <div className={classes}>
@@ -102,26 +139,26 @@ const RestaurantCard: React.FC<TRestaurantCardProps> = ({
             image={restaurantCoverImage}
             variants={[EImageVariants.default]}
           />
+          {mealStyles.length > 0 && (
+            <div className={css.nutritions}>{nutrionText}</div>
+          )}
         </div>
         <div className={css.header}>
           <p
             className={css.restaurantName}
             onClick={handleClickCard}
             title={restaurantName}>
-            {restaurantName}
+            {Array.isArray(restaurantNameHighlight)
+              ? restaurantNameHighlight.map((k) => (
+                  <span
+                    key={k.text}
+                    className={k.isMatchKeywords ? css.highlightTitle : ''}>
+                    {k.text}{' '}
+                  </span>
+                ))
+              : restaurantNameHighlight}
           </p>
           {!hideFavoriteIcon && <IconHeart className={css.favoriteIcon} />}
-        </div>
-        <div className={css.nutritions}>
-          {mealStyles.map((style: any) => (
-            <Badge
-              key={style?.key}
-              className={css.badge}
-              label={style?.label}
-              type={style?.badgeType}
-              labelClassName={css.badgeLabel}
-            />
-          ))}
         </div>
       </div>
 
@@ -131,15 +168,67 @@ const RestaurantCard: React.FC<TRestaurantCardProps> = ({
           <span>{`${calculateDistance(companyGeoOrigin, origin)}km`}</span>
         </div>
         <div className={css.footerItem}>
+          <IconTerm className={css.footerIconTerm} />
+          <span>
+            {intl.formatMessage({
+              id: 'RestaurantCard.safeAndCleanCertification',
+            })}
+          </span>
+        </div>
+        <div className={css.footerItem}>
           <IconStar className={css.littleStarIcon} />
           <span>{`${totalRating} (${totalRatingNumber})`}</span>
         </div>
-        <div className={css.footerItem}>
+      </div>
+
+      <div className={css.footer}>
+        <div className={css.footerRowItem}>
           <IconBox className={css.footerItemIcon} />
           <span>{restaurantPackaging}</span>
         </div>
       </div>
 
+      <div className={css.footer}>
+        <div className={css.footerRowItem}>
+          <IconMoneyReceive className={css.footerItemIcon} />
+          <span>
+            {intl.formatMessage(
+              {
+                id: 'RestaurantCard.minQuantityValuePerOrder',
+              },
+              { minQuantity },
+            )}
+          </span>
+        </div>
+      </div>
+
+      <table className={css.tableFood}>
+        <tbody>
+          {first5Foods.map((food, index) => (
+            <FoodRow
+              key={index}
+              foodName={food.foodName}
+              price={food.price}
+              minQuantity={food.minQuantity}
+              keywords={keywords}
+              highLightClass={css.highlightTitle}
+            />
+          ))}
+          {hasMoreThan5Foods && (
+            <tr>
+              <td colSpan={3}>
+                <button
+                  className={css.inlineTextButtonRoot}
+                  onClick={handleClickCard}>
+                  {intl.formatMessage({
+                    id: 'RestaurantCard.viewDetailText',
+                  })}
+                </button>
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
       {favoriteFunc && (
         <Button
           className={css.favoriteBtn}

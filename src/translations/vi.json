@@ -1606,6 +1606,9 @@
   "SelectRestaurantPage.goBack": "Quay lại",
   "SelectRestaurantPage.subtitle": "Cho ngày {date} ({hour})- tại {address}",
   "SelectRestaurantPage.title": "Danh sách Nhà hàng",
+  "SelectRestaurantPage.ScopeFoodTitle": "Món ăn nằm trong mức giá bạn chọn",
+  "SelectRestaurantPage.OutOfScopeFoodTitle": "Lựa Chọn Khác",
+  "SelectRestaurantPage.EmptyFood": "Không có món ăn nào",
   "SelectSingleFilter.popupClear": "Clear",
   "SendNotificationForm.submitButtonText": "Gửi email",
   "SendNotificationModal.alert": "Vui lòng hoàn tất chọn món trước ngày {dateTime}",
@@ -1798,5 +1801,8 @@
   "UserPermission.accountant": "Kế toán viên",
   "UserPermission.booker": "Booker",
   "UserPermission.owner": "Quản trị viên",
-  "UserPermission.participant": "Thành viên"
+  "UserPermission.participant": "Thành viên",
+  "RestaurantCard.minQuantityValuePerOrder": "Đặt tối thiểu: {minQuantity} suất",
+  "RestaurantCard.safeAndCleanCertification": "VSATTP",
+  "RestaurantCard.viewDetailText": "Xem thêm"
 }

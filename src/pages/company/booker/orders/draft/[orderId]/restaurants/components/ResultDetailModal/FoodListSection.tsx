@@ -1,4 +1,5 @@
 import React from 'react';
+import { useIntl } from 'react-intl';
 
 import FoodCard from '@components/FoodCard/FoodCard';
 import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
@@ -28,58 +29,58 @@ const FoodListSection: React.FC<TFoodsListSectionProps> = ({
   fetchFoodInProgress = false,
   packagePerMember = 0,
 }) => {
+  const intl = useIntl();
   const groupedFoodList = foodList.reduce<{
-    equalPriceList: TListing[];
-    lessPriceList: TListing[];
+    lessOrEqualPriceList: TListing[];
     greaterPriceList: TListing[];
   }>(
     (result: any, foodItem: TListing) => {
       const foodListing = Listing(foodItem);
       const { price } = foodListing.getAttributes();
-      const { equalPriceList, lessPriceList, greaterPriceList } = result;
+      const { lessOrEqualPriceList, greaterPriceList } = result;
 
-      if (price.amount === packagePerMember) {
-        equalPriceList.push(foodItem);
-      } else if (price.amount < packagePerMember) {
-        lessPriceList.push(foodItem);
-      } else {
+      if (price.amount > packagePerMember) {
         greaterPriceList.push(foodItem);
+      } else {
+        lessOrEqualPriceList.push(foodItem);
       }
 
       return {
-        equalPriceList,
-        lessPriceList,
+        lessOrEqualPriceList,
         greaterPriceList,
       };
     },
     {
-      equalPriceList: [],
-      lessPriceList: [],
+      lessOrEqualPriceList: [],
       greaterPriceList: [],
     },
   );
 
-  const sortesFoodList = [
-    ...groupedFoodList.equalPriceList,
-    ...groupedFoodList.lessPriceList.sort((a, b) => {
+  const sortesFoodList = groupedFoodList.lessOrEqualPriceList.sort((a, b) => {
+    const aPrice = Listing(a).getAttributes().price.amount;
+    const bPrice = Listing(b).getAttributes().price.amount;
+
+    return aPrice - bPrice;
+  });
+
+  const sortesGreaterFoodList = groupedFoodList.greaterPriceList.sort(
+    (a, b) => {
       const aPrice = Listing(a).getAttributes().price.amount;
       const bPrice = Listing(b).getAttributes().price.amount;
 
       return aPrice - bPrice;
-    }),
-    ...groupedFoodList.greaterPriceList.sort((a, b) => {
-      const aPrice = Listing(a).getAttributes().price.amount;
-      const bPrice = Listing(b).getAttributes().price.amount;
-
-      return aPrice - bPrice;
-    }),
-  ];
+    },
+  );
 
   return (
     <section className={css.foodSection}>
       <div className={css.categories}>
         <div className={css.category}>
-          <h3 className={css.categoryTitle}>Món ăn</h3>
+          <h3 className={css.categoryTitle}>
+            {intl.formatMessage({
+              id: 'SelectRestaurantPage.ScopeFoodTitle',
+            })}
+          </h3>
           {fetchFoodInProgress ? (
             <div className={css.loading}>
               <IconSpinner />
@@ -99,12 +100,47 @@ const FoodListSection: React.FC<TFoodsListSectionProps> = ({
                 />
               ))}
               {foodList.length === 0 && (
-                <div className={css.emptyFoodList}>Không có món ăn nào</div>
+                <div className={css.emptyFoodList}>
+                  {intl.formatMessage({
+                    id: 'SelectRestaurantPage.EmptyFood',
+                  })}
+                </div>
               )}
             </div>
           )}
         </div>
       </div>
+      {sortesGreaterFoodList.length > 0 && (
+        <div className={css.categories}>
+          <div className={css.category}>
+            <h3 className={css.categoryTitle}>
+              {intl.formatMessage({
+                id: 'SelectRestaurantPage.OutOfScopeFoodTitle',
+              })}
+            </h3>
+            {fetchFoodInProgress ? (
+              <div className={css.loading}>
+                <IconSpinner />
+              </div>
+            ) : (
+              <div className={css.foodList}>
+                {sortesGreaterFoodList.map((item) => (
+                  <FoodCard
+                    key={`${item?.id.uuid}`}
+                    food={item}
+                    isSelected={selectedFoodIds?.includes(`${item?.id.uuid}`)}
+                    onSelect={onSelectFood}
+                    onRemove={onRemoveFood}
+                    onClick={onClickFood}
+                    className={css.foodItem}
+                    hideSelection={hideSelection}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </section>
   );
 };

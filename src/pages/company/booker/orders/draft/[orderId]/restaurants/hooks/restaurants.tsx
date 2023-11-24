@@ -37,6 +37,10 @@ export const useSearchRestaurants = () => {
     (state) => state.BookerSelectRestaurant.totalItems,
   );
 
+  const combinedRestaurantInFoods = useAppSelector(
+    (state) => state.BookerSelectRestaurant.combinedRestaurantInFoods,
+  );
+
   useEffect(() => {
     dispatch(
       selectCalendarDate(DateTime.fromMillis(Number(timestamp)).toJSDate()),
@@ -80,6 +84,7 @@ export const useSearchRestaurants = () => {
     restaurants,
     searchInProgress,
     totalResultItems,
+    combinedRestaurantInFoods,
   };
 };
 

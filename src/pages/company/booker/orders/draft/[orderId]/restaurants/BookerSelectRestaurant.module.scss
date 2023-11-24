@@ -1,5 +1,6 @@
 @use '/src/styles/mixins.scss' as *;
 @use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
 
 .pageTilte {
   @include textTemplate(24px, $fontWeightBold, 32px);
@@ -21,7 +22,16 @@
     z-index: 10;
     .searchAndSort {
       @include flexAlign(center, space-between);
+
+      @include viewportMedium {
+        max-width: 500px;
+      }
     }
+
+    .searchAndSort > div:first-child {
+      width: 100%;
+    }
+
     .filterLabelWrapper {
       margin-top: 28px;
       @include flexAlign(baseline, flex-start);

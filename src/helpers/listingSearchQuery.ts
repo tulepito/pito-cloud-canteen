@@ -27,6 +27,12 @@ export type TMenuQueryParams = {
   perPage?: number;
   orderId?: string;
 };
+
+export type TGeoOrigin = {
+  lat: number;
+  lng: number;
+};
+
 export const getMenuQuery = ({
   order,
   params,
@@ -82,7 +88,7 @@ export const getMenuQuery = ({
           )}`,
         }
       : {}),
-    [`pub_${dayOfWeek}MinFoodPrice`]: `,${packagePerMember + 1}`,
+    [`pub_${dayOfWeek}MinFoodPrice`]: `-1,${packagePerMember + 1}`,
     ...(mealFoodType.length > 0
       ? {
           [`meta_${dayOfWeek}FoodType`]: `has_any:${convertedMealFoodType.join(

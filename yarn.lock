@@ -6153,6 +6153,11 @@ uncontrollable@^7.2.1:
     invariant "^2.2.4"
     react-lifecycles-compat "^3.0.4"
 
+unidecode@^0.1.8:
+  version "0.1.8"
+  resolved "https://registry.yarnpkg.com/unidecode/-/unidecode-0.1.8.tgz#efbb301538bc45246a9ac8c559d72f015305053e"
+  integrity sha512-SdoZNxCWpN2tXTCrGkPF/0rL2HEq+i2gwRG1ReBvx8/0yTzC3enHfugOf8A9JBShVwwrRIkLX0YcDUGbzjbVCA==
+
 update-browserslist-db@^1.0.9:
   version "1.0.10"
   resolved "https://registry.yarnpkg.com/update-browserslist-db/-/update-browserslist-db-1.0.10.tgz#0f54b876545726f17d00cd9a2561e6dade943ff3"

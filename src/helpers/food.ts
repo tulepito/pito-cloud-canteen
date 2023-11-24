@@ -1,3 +1,4 @@
+import type { TFoodInRestaurant } from '@src/types/bookerSelectRestaurant';
 import {
   FOOD_SIDE_DISH_OPTIONS,
   FOOD_SPECIAL_DIET_OPTIONS,
@@ -6,6 +7,8 @@ import {
   MENU_TYPE_OPTIONS,
 } from '@src/utils/options';
 import type { TIntegrationListing } from '@src/utils/types';
+
+import { searchTitle } from './searchRestaurantHelper';
 
 export const parseEntitiesToTableData = (
   foods: TIntegrationListing[],
@@ -100,3 +103,27 @@ export const parseEntitiesToExportCsv = (
 
   return foodsToExport;
 };
+
+export function sortFoodsInRestaurant(
+  keywords: string | string[] | undefined,
+  foods: TFoodInRestaurant[],
+) {
+  return foods
+    ? foods.sort((first, second) => {
+        if (keywords) {
+          const strKeywords = Array.isArray(keywords)
+            ? keywords.join(' ')
+            : keywords;
+          const firstFoundKeywords = searchTitle(first.foodName, strKeywords);
+          const secondFoundKeywords = searchTitle(second.foodName, strKeywords);
+          if (firstFoundKeywords !== secondFoundKeywords) {
+            return firstFoundKeywords ? -1 : 1;
+          }
+        }
+        if (first.price === second.price) return 0;
+        if (first.price < second.price) return -1;
+
+        return 1;
+      })
+    : [];
+}
