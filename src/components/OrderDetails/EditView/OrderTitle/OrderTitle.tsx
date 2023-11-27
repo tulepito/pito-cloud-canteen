@@ -22,6 +22,7 @@ type TOrderTitleProps = TDefaultProps & {
   onCancelOrder: () => void;
   confirmButtonMessage?: string;
   cancelButtonMessage?: string;
+  cancelDisabled?: boolean;
   confirmDisabled?: boolean;
   confirmInProgress?: boolean;
   isDraftEditing: boolean;
@@ -36,19 +37,18 @@ const OrderTitle: React.FC<TOrderTitleProps> = (props) => {
     onCancelOrder,
     confirmButtonMessage,
     cancelButtonMessage,
+    cancelDisabled = false,
     confirmDisabled,
     confirmInProgress,
     isDraftEditing,
   } = props;
   const intl = useIntl();
   const { isMobileLayout } = useViewport();
-
   const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
 
   const submitDisabled =
     (!isDraftEditing && !canStartOrder) || inProgress || confirmDisabled;
-
-  const cancelOrderDisabled = inProgress;
+  const cancelOrderDisabled = cancelDisabled || inProgress;
 
   const rootClasses = classNames(rootClassName || css.root, className);
 
