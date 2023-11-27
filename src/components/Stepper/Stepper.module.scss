@@ -1,8 +1,12 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
 
 .root {
   padding: 16px 24px 18px;
+  @include viewportMedium {
+    display: none;
+  }
 
   .stepContainer {
     padding: 0 32px;
