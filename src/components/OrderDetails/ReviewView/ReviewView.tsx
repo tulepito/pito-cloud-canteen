@@ -90,7 +90,6 @@ const ReviewView: React.FC<TReviewViewProps> = (props) => {
         <ReviewInfoSection
           startSubmitReviewInfoForm
           canEdit={canEditInfo}
-          className={css.infoRoot}
           data={reviewViewData?.reviewInfoData || {}}
           onSubmit={onSubmitEdit}
         />

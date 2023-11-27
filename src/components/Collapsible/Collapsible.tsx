@@ -11,6 +11,7 @@ import css from './Collapsible.module.scss';
 
 type TCollapsibleProps = PropsWithChildren<
   TDefaultProps & {
+    openClassName?: string;
     label: ReactNode;
     labelSectionClassName?: string;
     labelClassName?: string;
@@ -22,6 +23,7 @@ const Collapsible: React.FC<TCollapsibleProps> = (props) => {
   const {
     className,
     rootClassName,
+    openClassName,
     label,
     labelClassName,
     labelSectionClassName,
@@ -36,11 +38,12 @@ const Collapsible: React.FC<TCollapsibleProps> = (props) => {
     {
       [css.isOpen]: isOpen,
     },
+    openClassName ? { [openClassName]: isOpen } : {},
     className,
   );
   const labelSectionClasses = classNames(
-    labelSectionClassName,
     css.labelSection,
+    labelSectionClassName,
   );
   const labelClasses = classNames(labelClassName, css.label);
 
