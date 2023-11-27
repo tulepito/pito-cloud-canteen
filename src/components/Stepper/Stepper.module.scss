@@ -7,61 +7,61 @@
   @include viewportMedium {
     display: none;
   }
+}
 
-  .stepContainer {
-    padding: 0 32px;
-    display: flex;
-    justify-content: space-between;
-    z-index: 2;
+.stepContainer {
+  padding: 0 32px;
+  display: flex;
+  justify-content: space-between;
+  z-index: 2;
+}
 
-    .stepItem {
-      position: relative;
-      background-color: $neutralGray2;
-      border: 1px solid $neutralGray5;
-      color: $neutralGray5;
-      min-width: 16px;
-      padding: 4px;
-      height: 16px;
-      border-radius: 16px;
-      @include flexCenter;
-      @include textTemplate(10px, 600);
+.stepItem {
+  position: relative;
+  background-color: $neutralGray2;
+  border: 1px solid $neutralGray5;
+  color: $neutralGray5;
+  min-width: 16px;
+  padding: 4px;
+  height: 16px;
+  border-radius: 16px;
+  @include flexCenter;
+  @include textTemplate(10px, 600);
 
-      &::before {
-        position: absolute;
-        content: attr(title);
-        bottom: -20px;
-        height: fit-content;
-        min-width: 85px;
-        text-align: center;
-        @include textTemplate(10px, 400);
-        color: $neutralGray5;
-      }
+  &::before {
+    position: absolute;
+    content: attr(title);
+    bottom: -20px;
+    height: fit-content;
+    min-width: 85px;
+    text-align: center;
+    @include textTemplate(10px, 400);
+    color: $neutralGray5;
+  }
 
-      &:not(:first-child) {
-        &::after {
-          content: '';
-          z-index: -1;
-          position: absolute;
-          top: 50%;
-          left: calc(-100vw / 3 + 50%);
-          height: 1px;
-          width: calc(100vw / 3);
-          background-color: $neutralGray5;
-        }
-      }
+  &:not(:first-child) {
+    &::after {
+      content: '';
+      z-index: -1;
+      position: absolute;
+      top: 50%;
+      left: calc(-100vw / 3 + 50%);
+      height: 1px;
+      width: calc(100vw / 3);
+      background-color: $neutralGray5;
+    }
+  }
 
-      &.stepItemActive {
-        background-color: $neutralGray7;
-        color: $neutralGray1;
-        border: none;
+  &.stepItemActive {
+    background-color: $neutralGray7;
+    color: $neutralGray1;
+    border: none;
 
-        &::after {
-          background-color: $neutralGray7;
-        }
-        &::before {
-          color: $neutralGray7;
-        }
-      }
+    &::after {
+      background-color: $neutralGray7;
+    }
+    &::before {
+      color: $neutralGray7;
     }
   }
 }
