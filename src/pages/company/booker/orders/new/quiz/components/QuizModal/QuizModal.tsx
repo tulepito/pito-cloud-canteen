@@ -55,13 +55,12 @@ const QuizModal: React.FC<QuizModalProps> = (props) => {
     modalContainerClassName,
   );
 
-  const totalSteps = Number(stepInfo?.split('/')[1]) || 0;
-  const currentStep = Number(stepInfo?.split('/')[0]) || 0;
+  const [currentStep, totalSteps] = stepInfo?.split('/').map(Number) ?? [1, 1];
   const stepList = Array.from({ length: totalSteps }).map(
     (_, index) => index + 1,
   );
 
-  const isFirstStep = stepInfo === '1/3';
+  const isFirstStep = currentStep === 1;
 
   const handleCancel = () => {
     dispatch(QuizActions.closeQuizFlow());
