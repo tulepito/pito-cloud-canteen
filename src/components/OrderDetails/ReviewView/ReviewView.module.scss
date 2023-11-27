@@ -3,21 +3,44 @@
 @use '/src/styles/mixins.scss' as *;
 
 .root {
-  padding: 16px 8px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
 
+  @include viewportMedium {
+    width: fit-content;
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    column-gap: 40px;
+    row-gap: 28px;
+    padding: 24px;
+    margin: 40px auto;
+  }
+
+  @include viewportLarge {
+    padding: 40px 36px;
+  }
+
+  @include viewportSLarge {
+    padding: 40px 130px;
+    max-width: calc(1180px + 130px * 2);
+    margin: 40px calc(50vw - $sl/2);
+  }
+
   .titlePart {
-    padding: 8px 16px;
     grid-column: 1 / span 2;
     order: 1;
+
+    @include viewportMedium {
+      padding: 8px 16px;
+    }
   }
 
   .leftPart,
   .rightPart {
     display: flex;
     flex-direction: column;
-    row-gap: 16px;
+    row-gap: 20px;
 
     @include viewportMedium {
       gap: 32px 24px;
@@ -28,7 +51,7 @@
     order: 2;
     $maxWidthWithPadding: calc(100vw - 320px - 40px);
 
-    margin-top: 24px;
+    margin-top: 20px;
 
     @include viewportMedium {
       order: 1;
@@ -64,29 +87,5 @@
         @include textTemplate(18px, 700, 4/3);
       }
     }
-  }
-
-  @include viewportSmall {
-    padding: 24px 16px;
-  }
-
-  @include viewportMedium {
-    width: fit-content;
-    display: grid;
-    grid-template-columns: 1fr 320px;
-    column-gap: 40px;
-    row-gap: 28px;
-    padding: 24px;
-    margin: 40px auto;
-  }
-
-  @include viewportLarge {
-    padding: 40px 36px;
-  }
-
-  @include viewportSLarge {
-    padding: 40px 130px;
-    max-width: calc(1180px + 130px * 2);
-    margin: 40px calc(50vw - $sl/2);
   }
 }

@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 import classNames from 'classnames';
+import { DateTime } from 'luxon';
 
 import Collapsible from '@components/Collapsible/Collapsible';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { parseThousandNumber } from '@helpers/format';
-import { formatTimestamp } from '@utils/dates';
+import { formatTimestamp, weekDayFormatFromDateTime } from '@utils/dates';
 import type { TObject } from '@utils/types';
 
 import css from './ReviewOrderDetailsSection.module.scss';
@@ -19,7 +21,11 @@ type TReviewOrderDetailsSectionProps = {
 const ReviewOrderDetailsSection: React.FC<TReviewOrderDetailsSectionProps> = (
   props,
 ) => {
-  const { className, foodOrderGroupedByDate, outsideCollapsible } = props;
+  const {
+    className,
+    foodOrderGroupedByDate,
+    outsideCollapsible = false,
+  } = props;
   const groupedFoodListLength = foodOrderGroupedByDate?.length;
   const initialCollapseStates = Array.from({
     length: groupedFoodListLength,
@@ -28,6 +34,7 @@ const ReviewOrderDetailsSection: React.FC<TReviewOrderDetailsSectionProps> = (
   const intl = useIntl();
   const [isCollapsed, setIsCollapsed] = useState(initialCollapseStates);
 
+  const currentYear = new Date().getFullYear();
   const rootClasses = classNames(css.root, className);
 
   const handleClickGroupTitle = (index: number) => () => {
@@ -91,7 +98,15 @@ const ReviewOrderDetailsSection: React.FC<TReviewOrderDetailsSectionProps> = (
             restaurantName = '',
             index,
           } = dateData;
-          const formattedDate = formatTimestamp(date, 'EEE, dd/MM/yyyy');
+          const isCurrentYear =
+            new Date(Number(date)).getFullYear() === currentYear;
+          const formattedWeekDay = weekDayFormatFromDateTime(
+            DateTime.fromMillis(Number(date)),
+          );
+          const formattedDate = `${formattedWeekDay}, ${formatTimestamp(
+            date,
+            isCurrentYear ? 'dd/MM' : 'dd/MM/yyyy',
+          )}`;
 
           const groupTitleClasses = classNames(css.groupTitle, {
             [css.collapsed]: isCollapsed[index],
@@ -149,16 +164,21 @@ const ReviewOrderDetailsSection: React.FC<TReviewOrderDetailsSectionProps> = (
     </div>
   );
 
-  return !outsideCollapsible ? (
-    <Collapsible
-      className={rootClasses}
-      label={intl.formatMessage({
-        id: 'ReviewOrderDetailsSection.title',
-      })}>
+  return (
+    <RenderWhen condition={outsideCollapsible}>
       {dataTable}
-    </Collapsible>
-  ) : (
-    dataTable
+      <RenderWhen.False>
+        <Collapsible
+          openClassName={css.rootOpen}
+          labelClassName={css.rootLabel}
+          className={rootClasses}
+          label={intl.formatMessage({
+            id: 'ReviewOrderDetailsSection.title',
+          })}>
+          {dataTable}
+        </Collapsible>
+      </RenderWhen.False>
+    </RenderWhen>
   );
 };
 

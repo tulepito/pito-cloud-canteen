@@ -102,7 +102,6 @@ const ReviewView: React.FC<TReviewViewProps> = (props) => {
         </RenderWhen>
 
         <ReviewOrderDetailsSection
-          className={css.detailRoot}
           foodOrderGroupedByDate={reviewViewData.foodOrderGroupedByDate}
         />
         {isGroupOrder && (

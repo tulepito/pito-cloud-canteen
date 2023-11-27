@@ -1551,7 +1551,7 @@
   "ReviewOrderDetailsSection.tableHead.price": "ĐƠN GIÁ",
   "ReviewOrderDetailsSection.tableHead.quantity": "SL",
   "ReviewOrderDetailsSection.tableHead.unit": "ĐVT",
-  "ReviewOrderDetailsSection.title": "CHI TIẾT ĐƠN HÀNG",
+  "ReviewOrderDetailsSection.title": "Chi tiết đặt hàng",
   "ReviewOrderProcessSection.title": "Theo dõi đơn hàng",
   "ReviewOrdersResultModal.dateTitle": "Ngày {date}",
   "ReviewOrdersResultModal.downloadFile": "Tải danh sách",
