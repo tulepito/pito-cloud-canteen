@@ -624,6 +624,7 @@ const OrderDetailPage = () => {
   const mobileTopContainerProps = {
     title: isEditViewMode ? 'Quản lý chọn món' : 'Xem lại thông tin đơn hàng',
     hasGoBackButton: !isEditViewMode,
+    onGoBack: handleGoBackFromReviewMode,
     actionPart: isEditViewMode ? (
       <GoHomeIcon control={confirmGoHomeControl} />
     ) : null,

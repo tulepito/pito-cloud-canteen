@@ -7,6 +7,7 @@ import Collapsible from '@components/Collapsible/Collapsible';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { parseThousandNumber } from '@helpers/format';
+import { useViewport } from '@hooks/useViewport';
 import { formatTimestamp, weekDayFormatFromDateTime } from '@utils/dates';
 import type { TObject } from '@utils/types';
 
@@ -26,6 +27,8 @@ const ReviewOrderDetailsSection: React.FC<TReviewOrderDetailsSectionProps> = (
     foodOrderGroupedByDate,
     outsideCollapsible = false,
   } = props;
+  const { isMobileLayout } = useViewport();
+
   const groupedFoodListLength = foodOrderGroupedByDate?.length;
   const initialCollapseStates = Array.from({
     length: groupedFoodListLength,
@@ -108,14 +111,15 @@ const ReviewOrderDetailsSection: React.FC<TReviewOrderDetailsSectionProps> = (
             isCurrentYear ? 'dd/MM' : 'dd/MM/yyyy',
           )}`;
 
+          const collapseStatus = isCollapsed[index];
           const groupTitleClasses = classNames(css.groupTitle, {
-            [css.collapsed]: isCollapsed[index],
+            [css.collapsed]: collapseStatus,
           });
           const rowsClasses = classNames(css.rows, {
-            [css.collapsed]: isCollapsed[index],
+            [css.collapsed]: collapseStatus,
           });
           const iconClasses = classNames({
-            [css.reversed]: isCollapsed[index],
+            [css.reversed]: collapseStatus,
           });
 
           return (
@@ -136,7 +140,7 @@ const ReviewOrderDetailsSection: React.FC<TReviewOrderDetailsSectionProps> = (
                 </div>
               </div>
               <div className={rowsClasses}>
-                {foodDataList.map((foodData: TObject) => {
+                {foodDataList.map((foodData: TObject, foodIndex: number) => {
                   const {
                     foodId,
                     foodPrice,
@@ -144,14 +148,25 @@ const ReviewOrderDetailsSection: React.FC<TReviewOrderDetailsSectionProps> = (
                     foodName,
                     frequency,
                   } = foodData;
+                  const formattedFoodPrice = `${parseThousandNumber(
+                    foodPrice || 0,
+                  )}đ`;
 
                   return (
                     <div className={css.row} key={foodId}>
-                      <div></div>
+                      <div>
+                        {index + 1}.{foodIndex + 1}
+                      </div>
                       <div>{foodName}</div>
                       <div>{foodUnit}</div>
-                      <div>{frequency}</div>
-                      <div>{parseThousandNumber(foodPrice || 0)}đ</div>
+                      <div>
+                        <RenderWhen condition={isMobileLayout}>
+                          <span>{frequency}</span> x{' '}
+                          <span>{formattedFoodPrice}</span>
+                          <RenderWhen.False>{frequency}</RenderWhen.False>
+                        </RenderWhen>
+                      </div>
+                      <div>{formattedFoodPrice}</div>
                       <div>{''}</div>
                     </div>
                   );
