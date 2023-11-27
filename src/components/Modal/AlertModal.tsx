@@ -25,6 +25,7 @@ type TAlertModal = {
   cancelInProgress?: boolean;
   containerClassName?: string;
   actionsClassName?: string;
+  headerClassName?: string;
   cancelClassName?: string;
   confirmClassName?: string;
   childrenClassName?: string;
@@ -46,6 +47,7 @@ const AlertModal: React.FC<PropsWithChildren<TAlertModal>> = ({
   confirmDisabled = false,
   cancelDisabled = false,
   containerClassName,
+  headerClassName,
   actionsClassName,
   cancelClassName,
   confirmClassName,
@@ -79,6 +81,7 @@ const AlertModal: React.FC<PropsWithChildren<TAlertModal>> = ({
       handleClose={handleClose}
       shouldHideIconClose={shouldHideIconClose}
       containerClassName={classNames(css.container, containerClassName)}
+      headerClassName={headerClassName}
       shouldFullScreenInMobile={shouldFullScreenInMobile}>
       <div className={childrenClasses}>{children}</div>
       <div className={classNames(css.actions, actionsClassName)}>
