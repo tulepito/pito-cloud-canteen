@@ -5,14 +5,18 @@
 .editViewRoot {
   $maxWidthWithPadding: calc(100vw - 320px - 40px);
 
-  padding: 16px 8px;
+  padding: 16px 8px 140px;
   display: flex;
   flex-direction: column;
 
   .titlePart {
-    padding: 8px 0;
     grid-column: 1 / span 2;
     order: 1;
+    margin-bottom: 8px;
+
+    @include viewportMedium {
+      padding-top: 8px;
+    }
   }
 
   .leftPart,
@@ -30,10 +34,6 @@
     @include viewportLarge {
       order: 1;
       margin-top: 0;
-      width: min(820px, calc($maxWidthWithPadding - 48px));
-    }
-
-    @include viewportLarge {
       width: min(820px, calc($maxWidthWithPadding - 72px));
     }
 
@@ -75,7 +75,7 @@
     }
   }
 
-  @include viewportSmall {
+  @include viewportMedium {
     padding: 24px 16px;
   }
 
@@ -87,10 +87,6 @@
     row-gap: 28px;
     padding: 24px;
     margin: 40px auto;
-  }
-
-  @include viewportLarge {
-    padding: 40px 36px;
   }
 
   @include viewportSLarge {
@@ -222,28 +218,23 @@
   }
 }
 
-.container {
+.confirmCancelOrderModalContainer.confirmCancelOrderModalContainer {
   padding: 16px;
-  border-radius: 16px;
+  width: calc(100vw - 32px);
 
-  background-color: $neutralGray1;
-  outline: 1px solid $neutralGray5;
-  outline-offset: -1px;
-
-  & > div:first-of-type {
-    @include textTemplate(18px, 700, 4/3);
+  @include viewportMedium {
+    padding: 24px;
   }
 }
 
-.container {
-  padding: 16px;
-  border-radius: 16px;
+.confirmCancelOrderModalHeader.confirmCancelOrderModalHeader {
+  padding-top: 0;
+}
 
-  background-color: $neutralGray1;
-  outline: 1px solid $neutralGray5;
-  outline-offset: -1px;
+.confirmCancelOrderModalChildren {
+  padding-top: 12px;
 
-  & > div:first-of-type {
-    @include textTemplate(18px, 700, 4/3);
+  @include viewportMedium {
+    padding-top: 40px;
   }
 }

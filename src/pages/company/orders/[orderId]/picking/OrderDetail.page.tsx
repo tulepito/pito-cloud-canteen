@@ -7,6 +7,7 @@ import classNames from 'classnames';
 import isEmpty from 'lodash/isEmpty';
 import { useRouter } from 'next/router';
 
+import MobileTopContainer from '@components/MobileTopContainer/MobileTopContainer';
 import AlertModal from '@components/Modal/AlertModal';
 import ManageLineItemsSection from '@components/OrderDetails/EditView/ManageOrderDetailSection/ManageLineItemsSection';
 import ManageOrdersSection from '@components/OrderDetails/EditView/ManageOrderDetailSection/ManageOrdersSection';
@@ -15,10 +16,10 @@ import OrderDeadlineCountdownSection from '@components/OrderDetails/EditView/Ord
 import OrderLinkSection from '@components/OrderDetails/EditView/OrderLinkSection/OrderLinkSection';
 import OrderTitle from '@components/OrderDetails/EditView/OrderTitle/OrderTitle';
 import SubOrderChangesHistorySection from '@components/OrderDetails/EditView/SubOrderChangesHistorySection/SubOrderChangesHistorySection';
-import PriceQuotation from '@components/OrderDetails/PriceQuotation/PriceQuotation';
 import type { TReviewInfoFormValues } from '@components/OrderDetails/ReviewView/ReviewInfoSection/ReviewInfoForm';
 import ReviewView from '@components/OrderDetails/ReviewView/ReviewView';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
+import Stepper from '@components/Stepper/Stepper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { useDownloadPriceQuotation } from '@hooks/useDownloadPriceQuotation';
@@ -29,6 +30,7 @@ import {
   OrderManagementsAction,
   orderManagementThunks,
 } from '@redux/slices/OrderManagement.slice';
+import { BOOKER_CREATE_GROUP_ORDER_STEPS } from '@src/constants/stepperSteps';
 import { companyPaths } from '@src/paths';
 import { diffDays } from '@src/utils/dates';
 import type { TPlan } from '@src/utils/orderTypes';
@@ -567,6 +569,10 @@ const OrderDetailPage = () => {
         onCancel={handleDisagreeCancelOrder}
         confirmInProgress={cancelPickingOrderInProgress}
         cancelDisabled={cancelPickingOrderInProgress}
+        shouldFullScreenInMobile={false}
+        containerClassName={css.confirmCancelOrderModalContainer}
+        headerClassName={css.confirmCancelOrderModalHeader}
+        childrenClassName={css.confirmCancelOrderModalChildren}
       />
       <ModalReachMaxAllowedChanges
         id="OrderDetailPage.ModalReachMaxAllowedChanges"
@@ -643,16 +649,28 @@ const OrderDetailPage = () => {
       }
     }
   }, [isRouterReady, orderState]);
-
+  let content = null;
   switch (viewMode) {
-    case EPageViewMode.priceQuotation:
-      return <PriceQuotation data={priceQuotationData} />;
-    case EPageViewMode.review:
-      return ReviewViewComponent;
     case EPageViewMode.edit:
+      content = EditViewComponent;
+      break;
+    case EPageViewMode.review:
     default:
-      return EditViewComponent;
+      content = ReviewViewComponent;
+      break;
   }
+
+  return (
+    <>
+      <MobileTopContainer
+        title="fff"
+        hasGoBackButton
+        actionPart={<div>fff</div>}
+      />
+      <Stepper steps={BOOKER_CREATE_GROUP_ORDER_STEPS} currentStep={2} />
+      {content}
+    </>
+  );
 };
 
 export default OrderDetailPage;
