@@ -1,0 +1,42 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.root {
+  background-color: $neutralGray1;
+  padding: 16px;
+}
+
+.titleHeader {
+  @include textTemplate(16px, $fontWeightSemiBold, 24px);
+  @include flexAlign(center, space-between);
+
+  .link {
+    color: $labelBlue2;
+    font-weight: $fontWeightRegular;
+  }
+}
+
+.dataWrapper {
+  margin-top: 12px;
+  .empty {
+    text-align: center;
+    padding: 16px 0;
+
+    .emptyText {
+      @include textTemplate(12px, $fontWeightRegular, 16px);
+      color: $neutralGray6;
+    }
+  }
+}
+
+.subOrderList {
+  margin-top: 12px;
+  @include flexAlign(normal);
+  flex-direction: column;
+  gap: 12px;
+
+  @include viewportLarge {
+    display: none;
+  }
+}

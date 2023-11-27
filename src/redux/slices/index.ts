@@ -38,6 +38,7 @@ export { default as OrderRating } from '@pages/company/orders/[orderId]/rating/O
 export { default as ParticipantOrderList } from '@pages/participant/orders/OrderList.slice';
 export { default as ParticipantPlanPage } from '@pages/participant/plans/[planId]/ParticipantPlanPage.slice';
 export { default as ParticipantSubOrderList } from '@pages/participant/sub-orders/SubOrders.slice';
+export { default as PartnerDashboard } from '@pages/partner/Dashboard.slice';
 export { default as PartnerSubOrderDetail } from '@pages/partner/orders/[subOrderId]/PartnerSubOrderDetail.slice';
 export { default as PartnerManageOrders } from '@pages/partner/orders/ManageOrders.slice';
 export { default as PartnerManagePayments } from '@pages/partner/payments/PartnerManagePayments.slice';

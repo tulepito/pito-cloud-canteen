@@ -37,6 +37,7 @@ const WDayItem: React.FC<TWDayItemProps> = ({
   eventExtraProps,
 }) => {
   const { isMobileLayout } = useViewport();
+  const { onSelectDayCallBack } = resources || ({} as any);
   const { selectedDay, handleSelectDay } = useSelectDay();
   const currentDate = DateTime.fromJSDate(new Date()).startOf('day');
   const dateItem = DateTime.fromJSDate(date).startOf('day');
@@ -53,6 +54,7 @@ const WDayItem: React.FC<TWDayItemProps> = ({
 
   const onClick = useCallback(() => {
     handleSelectDay?.(date);
+    onSelectDayCallBack?.();
   }, [date, handleSelectDay]);
 
   return (

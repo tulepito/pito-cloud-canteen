@@ -1,0 +1,120 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.root {
+  background-color: $neutralGray1;
+  padding: 16px;
+
+  @include viewportLarge {
+    padding: 0;
+  }
+}
+
+.titleHeader {
+  @include textTemplate(16px, $fontWeightSemiBold, 24px);
+  @include flexAlign(center, space-between);
+
+  @include viewportLarge {
+    display: none;
+  }
+
+  .link {
+    color: $labelBlue2;
+    font-weight: $fontWeightRegular;
+  }
+}
+
+.dataWrapper {
+  margin-top: 16px;
+
+  .empty {
+    text-align: center;
+    padding: 16px 0;
+
+    .emptyText {
+      @include textTemplate(12px, $fontWeightRegular, 16px);
+      color: $neutralGray6;
+    }
+  }
+
+  .content {
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid $neutralGray3;
+
+    @include viewportLarge {
+      padding: 20px;
+    }
+  }
+
+  .timeFrameWrapper {
+    width: fit-content;
+    margin: 16px auto 0;
+
+    .title {
+      display: none;
+
+      @include viewportLarge {
+        display: block;
+        @include textTemplate(20px, 700, 32px);
+      }
+    }
+
+    @include viewportLarge {
+      @include flexAlign(center, space-between);
+      width: 100%;
+      margin: 0;
+    }
+  }
+
+  .totalSubOrdersWrapper {
+    margin-top: 16px;
+
+    .label {
+      @include textTemplate(14px, 400, 20px);
+      color: $neutralGray6;
+    }
+
+    .value {
+      @include textTemplate(16px, 700, 24px);
+      margin-top: 4px;
+    }
+  }
+
+  .chartWrapper {
+    margin-top: 24px;
+    overflow-x: scroll;
+    overflow-y: hidden;
+  }
+}
+
+.tooltipWrapper {
+  border-radius: 8px;
+  background: $neutralGray7;
+  text-align: center;
+  @include textTemplate(12px, $fontWeightRegular, 16px);
+  color: $neutralGray1;
+  padding: 8px 12px;
+  width: 140px;
+
+  & div:first-child {
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: $neutralGray7;
+  }
+}
+
+.loading {
+  width: 100%;
+  height: 300px;
+}

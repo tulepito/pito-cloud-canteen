@@ -1,0 +1,70 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.root {
+  border-radius: 8px;
+  border: 1px solid $neutralGray3;
+  background: $neutralGray1;
+  margin-bottom: 12px;
+
+  .header {
+    @include flexAlign(normal, space-between);
+    flex-direction: column;
+    gap: 4px;
+    background: $neutralGray3;
+    padding: 8px 12px;
+
+    .companyName {
+      @include textTemplate(14px, 600, 24px);
+    }
+
+    .subOrderDate {
+      @include textTemplate(14px, 600, 20px);
+    }
+
+    .subOrderTitle {
+      @include textTemplate(12px, 400, 16px);
+    }
+  }
+
+  .content {
+    padding: 0 12px;
+    margin-top: 8px;
+    @include flexAlign(normal);
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .footer {
+    padding: 8px 12px;
+    @include flexAlign(center, space-between);
+
+    .actions {
+      .link {
+        @include textTemplate(12px, 600, 16px);
+        color: $neutralGray7;
+      }
+    }
+  }
+}
+
+.row {
+  @include flexAlign(center, space-between);
+  gap: 8px;
+
+  .label {
+    @include textTemplate(14px, 400, 20px);
+    color: $neutralGray6;
+    flex-basis: 60%;
+  }
+
+  .value {
+    @include textTemplate(14px, 400, 20px);
+    flex-basis: 40%;
+
+    &.boldText {
+      font-weight: 700;
+    }
+  }
+}

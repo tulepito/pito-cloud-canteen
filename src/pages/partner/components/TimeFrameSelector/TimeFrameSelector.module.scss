@@ -1,0 +1,34 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.root {
+  border-radius: 28px;
+  background: $neutralGray3;
+  @include flexCenter;
+  padding: 4px;
+  width: 238px;
+}
+
+.timeFrame {
+  @include textTemplate(14px, 500, 24px);
+  color: $neutralGray6;
+  padding: 4px 18px;
+  border-radius: 24px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+
+  &.active {
+    color: $neutralGray7;
+    font-weight: 700;
+    background: $neutralGray1;
+
+    /* Shadown/MD */
+    box-shadow: 0px 4px 8px -2px rgba(16, 24, 40, 0.1),
+      0px 2px 4px -2px rgba(16, 24, 40, 0.06);
+  }
+
+  &.disabled {
+    cursor: not-allowed;
+  }
+}
