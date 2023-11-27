@@ -31,14 +31,14 @@ const {
   getNextTransition,
 } = require('./helpers/transaction');
 
-const initiateTransaction = async ({
-  orderId,
-  planId,
-  orderListing,
-  planListing,
-}) => {
+const initiateTransaction = async ({ orderId, planId, planListing }) => {
   // Query order and plan listing
   const integrationSdk = getIntegrationSdk();
+  const [orderListing] = denormalisedResponseEntities(
+    await integrationSdk.listings.show({
+      id: orderId,
+    }),
+  );
 
   const orderData = Listing(orderListing);
   const {

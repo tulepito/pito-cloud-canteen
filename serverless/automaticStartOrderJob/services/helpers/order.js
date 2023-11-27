@@ -515,6 +515,7 @@ const calculatePriceQuotationInfoFromOrder = ({
     0,
   );
   const actualPCCFee = shouldIncludePITOFee ? PCCFee : 0;
+  console.info('💫 > actualPCCFee: ', actualPCCFee);
   const { totalPrice = 0, totalDishes = 0 } = calculateTotalPriceAndDishes({
     orderDetail: planOrderDetail,
     isGroupOrder,

@@ -109,6 +109,13 @@ exports.handler = async (_event) => {
       await initiateTransaction({ orderId, orderListing, planId, planListing });
       console.info('💫 > initiated transactions');
 
+      const [newOrderListing] = denormalisedResponseEntities(
+        await integrationSdk.listings.show({
+          id: orderId,
+        }),
+      );
+      console.info('💫 > new orderListing: ', newOrderListing);
+
       console.info('💫 > initiate quotation for order');
       const quotationListing = await initiateQuotation(
         orderId,
@@ -119,7 +126,7 @@ exports.handler = async (_event) => {
 
       console.info('💫 > initiate payments for order');
       await initiatePayment({
-        orderListing,
+        orderListing: newOrderListing,
         planListing,
         quotationListing,
         systemVATPercentage,
