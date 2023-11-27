@@ -14,112 +14,159 @@
     top: 85px;
   }
 
-  .title {
-    @include textTemplate(20px, 700, 32px);
-    text-transform: capitalize;
+  &.isViewCartDetailMode {
+    box-shadow: none;
+    border-radius: 0;
+    padding: 0;
 
-    &.adminTitle {
-      font-size: 18px;
-      text-transform: none;
+    .makePaymentButton {
+      display: none;
     }
   }
+}
 
-  .feeContainer {
-    .feeItem {
-      position: relative;
+.title {
+  @include textTemplate(20px, 700, 32px);
+  text-transform: capitalize;
+
+  &.adminTitle {
+    font-size: 18px;
+    text-transform: none;
+  }
+
+  &.hideTitle {
+    display: none;
+  }
+}
+
+.feeContainer {
+  .feeItem {
+    position: relative;
+    padding: 12px 0 8px;
+    &:first-of-type {
+      padding-top: 0;
+    }
+
+    @include viewportMedium {
       padding: 24px 0 8px;
+    }
 
-      &::after {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        height: 1px;
+    &::after {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 1px;
 
-        content: '';
-        background-color: $neutralGray3;
-      }
+      content: '';
+      background-color: $neutralGray3;
+    }
 
-      .feeItemContainer {
+    .feeItemContainer {
+      display: flex;
+      justify-content: space-between;
+
+      .label {
+        @include textTemplate(12px, 600, 16px);
         display: flex;
-        justify-content: space-between;
+        align-items: center;
+        column-gap: 8px;
 
-        .label {
-          @include textTemplate(12px, 600, 16px);
-          display: flex;
-          align-items: center;
-          column-gap: 8px;
-
-          .VATBadge {
-            span {
-              color: $neutralGray6;
-            }
+        .VATBadge {
+          div {
+            color: $neutralGray6;
           }
         }
-
-        .totalWithoutVATLabel,
-        .fee {
-          @include textTemplate(14px, 700, 20px);
-        }
-
-        &.VATItemContainer {
-          color: $neutralGray6;
-        }
       }
 
-      .totalWithVATLabel {
-        text-align: right;
-        @include textTemplate(14px, 700, 20px);
-        margin-bottom: 4px;
-      }
-
-      .totalWithVAT {
-        text-align: right;
-        @include textTemplate(24px, 700, 32px);
-      }
-
-      .PITOPoints {
-        text-align: right;
-        color: $primaryPri2;
+      .totalWithoutVATLabel,
+      .fee {
         @include textTemplate(14px, 700, 20px);
       }
 
-      .totalDescription {
-        margin-top: 4px;
-        text-align: right;
+      &.VATItemContainer {
         color: $neutralGray6;
-        @include textTemplate(12px, 600, 16px);
       }
     }
-  }
 
-  .downloadPriceQuotation {
-    cursor: pointer;
-    display: block;
-    margin-top: 20px;
-    padding: 0;
-    width: 100%;
-    min-height: unset;
-    text-align: right;
-    color: $labelBlue2;
-    @include textTemplate(14px, 700, 24px);
-
-    &:hover {
-      background-color: transparent;
+    .totalWithVATLabel {
+      text-align: right;
+      @include textTemplate(14px, 700, 20px);
+      margin-bottom: 4px;
     }
 
-    &.downloadingPriceQuotation {
-      cursor: not-allowed;
+    .totalWithVAT {
+      text-align: right;
+      @include textTemplate(24px, 700, 32px);
+    }
+
+    .totalDescription {
+      margin-top: 4px;
+      text-align: right;
+      color: $neutralGray6;
+      @include textTemplate(12px, 600, 16px);
     }
   }
+}
 
-  .makePaymentButton {
-    width: 100%;
+.downloadPriceQuotation.downloadPriceQuotation {
+  cursor: pointer;
+  display: block;
+  margin-top: 20px;
+  padding: 0;
+  width: 100%;
+  min-height: unset;
+  text-align: right;
+  color: $labelBlue2;
+  @include textTemplate(14px, 700, 24px);
+
+  &:hover {
+    background-color: transparent;
+  }
+
+  &.downloadingPriceQuotation {
+    cursor: not-allowed;
+  }
+}
+
+.makePaymentButton {
+  width: 100%;
+
+  @include viewportMedium {
     margin: 16px 0;
   }
+}
 
-  .overflowPackageInfo {
-    color: $sematicRed2;
-    @include textTemplate(12px, 600, 16px);
+.overflowPackageInfo {
+  color: $sematicRed2;
+  @include textTemplate(12px, 600, 16px);
+}
+
+.mobileBottomContainer {
+  display: flex;
+  flex-direction: column;
+  row-gap: 14px;
+
+  .totalInfo,
+  .viewCartDetail {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  .totalInfo {
+    @include textTemplate(14px, 700, 20px);
+    color: $neutralGray6;
+    align-items: baseline;
+
+    .totalWithVAT {
+      @include textTemplate(20px, 700, 32px);
+      color: $neutralGray7;
+    }
+  }
+
+  .viewCartDetail {
+    @include textTemplate(14px, 400, 20px);
+    align-items: center;
   }
 }

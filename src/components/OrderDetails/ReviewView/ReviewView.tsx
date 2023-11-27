@@ -23,6 +23,7 @@ import css from './ReviewView.module.scss';
 type TReviewViewProps = TDefaultProps & {
   canEditInfo?: boolean;
   canGoBackEditMode?: boolean;
+  isViewCartDetailMode?: boolean;
   showStartPickingOrderButton?: boolean;
   isAdminLayout?: boolean;
   reviewViewData: ReturnType<
@@ -34,6 +35,7 @@ type TReviewViewProps = TDefaultProps & {
   onDownloadPriceQuotation: () => Promise<void>;
   onSaveOrderNote?: (value: string) => void;
   onDownloadReviewOrderResults: () => void;
+  onViewCartDetail?: () => void;
 };
 
 const ReviewView: React.FC<TReviewViewProps> = (props) => {
@@ -42,6 +44,7 @@ const ReviewView: React.FC<TReviewViewProps> = (props) => {
     rootClassName,
     canEditInfo = true,
     canGoBackEditMode = false,
+    isViewCartDetailMode = false,
     isAdminLayout = false,
     showStartPickingOrderButton = false,
     reviewViewData,
@@ -50,67 +53,71 @@ const ReviewView: React.FC<TReviewViewProps> = (props) => {
     onDownloadPriceQuotation,
     classes = {},
     onSaveOrderNote,
+    onViewCartDetail,
     onDownloadReviewOrderResults,
     orderData,
   } = props;
   const dispatch = useAppDispatch();
   const { leftClassName, rightClassName } = classes;
-  const orderListingGetter = Listing(orderData!);
-  const { quotationId } = orderListingGetter.getMetadata();
-  useEffect(() => {
-    if (quotationId) {
-      dispatch(orderManagementThunks.fetchQuotation(quotationId));
-    }
-  }, [dispatch, quotationId]);
+
+  const { quotationId } = Listing(orderData!).getMetadata();
 
   const isGroupOrder = reviewViewData?.isGroupOrder;
   const rootClasses = classNames(rootClassName || css.root, className);
   const leftPartClasses = classNames(css.leftPart, leftClassName);
   const rightPartClasses = classNames(css.rightPart, rightClassName);
 
+  useEffect(() => {
+    if (quotationId) {
+      dispatch(orderManagementThunks.fetchQuotation(quotationId));
+    }
+  }, [dispatch, quotationId]);
+
   return (
     <div className={rootClasses}>
-      {canGoBackEditMode && onGoBackToEditOrderPage && (
-        <ReviewTitleSection
-          className={css.titlePart}
-          orderTitle={reviewViewData?.orderTitle}
-          onGoBack={onGoBackToEditOrderPage}
-        />
-      )}
-      <div className={leftPartClasses}>
-        <RenderWhen condition={!canGoBackEditMode}>
-          <ReviewOrderStatesSection
-            data={{
-              orderDetail: reviewViewData?.reviewResultData?.orderDetail,
-              isCanceledOrder: reviewViewData?.isCanceledOrder || false,
-            }}
-          />
-        </RenderWhen>
-
-        <ReviewInfoSection
-          startSubmitReviewInfoForm
-          canEdit={canEditInfo}
-          data={reviewViewData?.reviewInfoData || {}}
-          onSubmit={onSubmitEdit}
-        />
-        <RenderWhen condition={isGroupOrder}>
-          <ReviewOrdersResultSection
-            className={css.resultRoot}
-            data={reviewViewData.reviewResultData}
-            onDownloadReviewOrderResults={onDownloadReviewOrderResults}
-          />
-        </RenderWhen>
-
-        <ReviewOrderDetailsSection
-          foodOrderGroupedByDate={reviewViewData.foodOrderGroupedByDate}
-        />
-        {isGroupOrder && (
-          <ReviewNoteSection
-            onSaveOrderNote={onSaveOrderNote}
-            data={reviewViewData.orderNoteData}
+      <RenderWhen condition={!isViewCartDetailMode}>
+        {canGoBackEditMode && onGoBackToEditOrderPage && (
+          <ReviewTitleSection
+            className={css.titlePart}
+            orderTitle={reviewViewData?.orderTitle}
+            onGoBack={onGoBackToEditOrderPage}
           />
         )}
-      </div>
+        <div className={leftPartClasses}>
+          <RenderWhen condition={!canGoBackEditMode}>
+            <ReviewOrderStatesSection
+              data={{
+                orderDetail: reviewViewData?.reviewResultData?.orderDetail,
+                isCanceledOrder: reviewViewData?.isCanceledOrder || false,
+              }}
+            />
+          </RenderWhen>
+
+          <ReviewInfoSection
+            startSubmitReviewInfoForm
+            canEdit={canEditInfo}
+            data={reviewViewData?.reviewInfoData || {}}
+            onSubmit={onSubmitEdit}
+          />
+          <RenderWhen condition={isGroupOrder}>
+            <ReviewOrdersResultSection
+              className={css.resultRoot}
+              data={reviewViewData.reviewResultData}
+              onDownloadReviewOrderResults={onDownloadReviewOrderResults}
+            />
+          </RenderWhen>
+
+          <ReviewOrderDetailsSection
+            foodOrderGroupedByDate={reviewViewData.foodOrderGroupedByDate}
+          />
+          {isGroupOrder && (
+            <ReviewNoteSection
+              onSaveOrderNote={onSaveOrderNote}
+              data={reviewViewData.orderNoteData}
+            />
+          )}
+        </div>
+      </RenderWhen>
       <div className={rightPartClasses}>
         <RenderWhen condition={!canGoBackEditMode}>
           <ReviewOrderProcessSection />
@@ -122,6 +129,8 @@ const ReviewView: React.FC<TReviewViewProps> = (props) => {
           foodOrderGroupedByDate={reviewViewData.foodOrderGroupedByDate}
           target="client"
           isAdminLayout={isAdminLayout}
+          isViewCartDetailMode={isViewCartDetailMode}
+          onViewCartDetail={onViewCartDetail}
         />
       </div>
     </div>

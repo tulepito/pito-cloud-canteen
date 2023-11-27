@@ -26,6 +26,7 @@ import useBoolean from '@hooks/useBoolean';
 import { useDownloadPriceQuotation } from '@hooks/useDownloadPriceQuotation';
 import useExportOrderDetails from '@hooks/useExportOrderDetails';
 import { usePrepareOrderDetailPageData } from '@hooks/usePrepareOrderManagementData';
+import { useViewport } from '@hooks/useViewport';
 import {
   orderDetailsAnyActionsInProgress,
   OrderManagementsAction,
@@ -150,6 +151,7 @@ enum EPageViewMode {
   edit = 'edit',
   review = 'review',
   priceQuotation = 'priceQuotation',
+  cartDetail = 'cartDetail',
 }
 
 const BookerAccessibleOrderStates = [
@@ -169,8 +171,9 @@ const OrderDetailPage = () => {
   const [viewMode, setViewMode] = useState<EPageViewMode>(EPageViewMode.edit);
   const intl = useIntl();
   const router = useRouter();
-  const confirmCancelOrderActions = useBoolean(false);
   const dispatch = useAppDispatch();
+  const { isMobileLayout } = useViewport();
+  const confirmCancelOrderActions = useBoolean(false);
   const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
   const {
     query: { orderId, timestamp },
@@ -217,6 +220,7 @@ const OrderDetailPage = () => {
   const isPickingOrder = orderState === EOrderStates.picking;
   const isDraftEditing = orderState === EOrderStates.inProgress;
   const isEditViewMode = viewMode === EPageViewMode.edit;
+  const isViewCartDetailMode = viewMode === EPageViewMode.cartDetail;
   const {
     planValidationsInProgressState,
     orderReachMaxCanModify: orderReachMaxCanModifyInProgressState,
@@ -327,9 +331,14 @@ const OrderDetailPage = () => {
   const handleConfirmOrder = async () => {
     setViewMode(EPageViewMode.review);
   };
-
   const handleGoBackFromReviewMode = () => {
     setViewMode(EPageViewMode.edit);
+  };
+  const handleGoBackFromViewCartDetailMode = () => {
+    setViewMode(EPageViewMode.review);
+  };
+  const handleViewCartDetail = () => {
+    setViewMode(EPageViewMode.cartDetail);
   };
 
   const handleSubmitReviewInfoForm = (_values: TReviewInfoFormValues) => {
@@ -523,11 +532,13 @@ const OrderDetailPage = () => {
 
   const ReviewViewComponent = (
     <ReviewView
+      isViewCartDetailMode={isViewCartDetailMode}
       canGoBackEditMode
       reviewViewData={reviewViewData}
       onSubmitEdit={handleSubmitReviewInfoForm}
       onDownloadPriceQuotation={handleDownloadPriceQuotation}
       onGoBackToEditOrderPage={handleGoBackFromReviewMode}
+      onViewCartDetail={handleViewCartDetail}
       showStartPickingOrderButton
       onSaveOrderNote={onSaveOrderNote}
       onDownloadReviewOrderResults={onDownloadReviewOrderResults}
@@ -616,15 +627,27 @@ const OrderDetailPage = () => {
     }
   }, [isRouterReady, orderState]);
 
+  useEffect(() => {
+    if (isViewCartDetailMode && !isMobileLayout) {
+      setViewMode(EPageViewMode.review);
+    }
+  }, [isMobileLayout, isViewCartDetailMode]);
+
   let content = null;
   const stepperProps = {
     steps: BOOKER_CREATE_GROUP_ORDER_STEPS,
     currentStep: 3,
   };
   const mobileTopContainerProps = {
-    title: isEditViewMode ? 'Quản lý chọn món' : 'Xem lại thông tin đơn hàng',
-    hasGoBackButton: !isEditViewMode,
-    onGoBack: handleGoBackFromReviewMode,
+    title: isEditViewMode
+      ? 'Quản lý chọn món'
+      : isViewCartDetailMode
+      ? 'Giỏ hàng của bạn'
+      : 'Xem lại thông tin đơn hàng',
+    hasGoBackButton: !isEditViewMode || isViewCartDetailMode,
+    onGoBack: isViewCartDetailMode
+      ? handleGoBackFromViewCartDetailMode
+      : handleGoBackFromReviewMode,
     actionPart: isEditViewMode ? (
       <GoHomeIcon control={confirmGoHomeControl} />
     ) : null,
