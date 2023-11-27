@@ -13,6 +13,7 @@ import MobileBottomContainer from '@components/MobileBottomContainer/MobileBotto
 import PopupModal from '@components/PopupModal/PopupModal';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { groupFoodOrderByDate } from '@helpers/order/orderDetailHelper';
+import { checkPartnerWasRemovedFromSubOrder } from '@helpers/partnerHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { useViewport } from '@hooks/useViewport';
@@ -20,6 +21,7 @@ import {
   NotificationActions,
   NotificationThunks,
 } from '@redux/slices/notification.slice';
+import { currentUserSelector } from '@redux/slices/user.slice';
 import { partnerPaths } from '@src/paths';
 import { Listing, Transaction } from '@src/utils/data';
 import { formatTimestamp } from '@src/utils/dates';
@@ -71,6 +73,7 @@ const PartnerSubOrderDetailPage: React.FC<
   const isFetchingOrderDetails = useAppSelector(
     (state) => state.OrderManagement.fetchOrderInProgress,
   );
+  const currentUser = useAppSelector((state) => currentUserSelector(state));
 
   const updateOrderModalContainer = useBoolean();
   const dispatch = useAppDispatch();
@@ -102,11 +105,19 @@ const PartnerSubOrderDetailPage: React.FC<
   const isNewStructureTxVersion =
     processVersion >= CHANGE_STRUCTURE_TX_PROCESS_VERSION;
 
+  const subOrder = orderDetail?.[date];
+
+  const isPartnerWasRemovedFromSubOrder = checkPartnerWasRemovedFromSubOrder(
+    currentUser,
+    subOrder,
+  );
+
   const shouldShowActionWrapper =
     !fetchOrderInProgress &&
     !queryTransactionInProgress &&
     isNewStructureTxVersion &&
-    lastTransition === ETransition.INITIATE_TRANSACTION;
+    lastTransition === ETransition.INITIATE_TRANSACTION &&
+    !isPartnerWasRemovedFromSubOrder;
   //
 
   const isSummaryViewMode =
