@@ -136,11 +136,17 @@ export const useQuizFlow = (step: string) => {
     ],
   );
 
+  const handleCloseQuizFlow = useCallback(async () => {
+    dispatch(QuizActions.closeQuizFlow());
+    dispatch(BookerNewOrderAction.setCurrentStep(0));
+  }, [dispatch]);
+
   return {
     nextStep,
     backStep,
     submitCreateOrder,
     creatingOrderInProgress: creatingOrderModalControl.value,
     creatingOrderError: submittingErrorControl.value,
+    handleCloseQuizFlow,
   };
 };
