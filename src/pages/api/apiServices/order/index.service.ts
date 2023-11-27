@@ -335,7 +335,7 @@ const reorder = async ({
   const { deliveryHour } = oldMetaData;
   if (isGroupOrder && !isCreatedByAdmin && newOrderId) {
     createOrUpdateAutomaticStartOrderScheduler({
-      orderId,
+      orderId: newOrderId,
       startDate,
       deliveryHour,
     });
