@@ -19,6 +19,7 @@ import { generateTimeRangeItems } from '@src/utils/dates';
 import { EOrderType } from '@src/utils/enums';
 import { required } from '@src/utils/validators';
 
+import DeliveryHourFieldMobile from '../DeliveryHourFieldMobile/DeliveryHourFieldMobile';
 import OrderDateField from '../OrderDateField/OrderDateField';
 
 import css from './MealDateForm.module.scss';
@@ -34,6 +35,7 @@ export type TMealDateFormValues = {
   deadlineDate?: number;
   orderDeadlineHour?: string;
   orderDeadlineMinute?: string;
+  deliveryHour?: string;
 };
 
 type TExtraProps = {
@@ -149,7 +151,9 @@ const MealDateFormComponent: React.FC<TMealDateFormComponentProps> = (
             })}
           />
 
-          <div onClick={onClickDeliveryHour}>
+          <div
+            className={css.deliveryHourFieldDesktop}
+            onClick={onClickDeliveryHour}>
             <FieldDropdownSelect
               id="deliveryHour"
               name="deliveryHour"
@@ -165,6 +169,7 @@ const MealDateFormComponent: React.FC<TMealDateFormComponentProps> = (
               options={parsedDeliveryHourOptions}
             />
           </div>
+          <DeliveryHourFieldMobile values={values} form={form} />
 
           <div className={css.orderTypeContainer}>
             <OnChange name="orderType">{handleChangeOrderType}</OnChange>

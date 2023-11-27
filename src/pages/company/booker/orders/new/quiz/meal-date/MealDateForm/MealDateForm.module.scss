@@ -4,6 +4,10 @@
 
 .container {
   padding-bottom: 104px;
+
+  @include viewportLarge {
+    padding-bottom: 0;
+  }
 }
 .fieldContainer {
   margin: 24px auto 0;
@@ -73,5 +77,13 @@
 
   .orderTypeLabel {
     @include textTemplate(14px, 400, 20px);
+  }
+}
+
+.deliveryHourFieldDesktop {
+  display: none;
+
+  @include viewportLarge {
+    display: block;
   }
 }

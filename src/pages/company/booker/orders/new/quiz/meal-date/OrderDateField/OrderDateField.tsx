@@ -9,6 +9,7 @@ import useBoolean from '@hooks/useBoolean';
 
 import type { TMealDateFormValues } from '../MealDateForm/MealDateForm';
 import OrderDateFieldModal from '../OrderDateFieldModal/OrderDateFieldModal';
+import OrderDateFieldModalMobile from '../OrderDateFieldModalMobile/OrderDateFieldModalMobile';
 
 import css from './OrderDateField.module.scss';
 
@@ -23,9 +24,10 @@ const OrderDateField: React.FC<OrderDateFieldProps> = (props) => {
   const [selectedTimeRangeOption, setSelectedTimeRangeOption] =
     useState<string>('custom');
   const orderDateFieldModalController = useBoolean();
+  const orderDateFieldModalMobileController = useBoolean();
   const { startDate, endDate } = values;
 
-  const modalWrapperCLasses = classNames(css.modalWrapper, {
+  const modalWrapperClasses = classNames(css.modalWrapper, {
     [css.shouldDisplayFixed]: usePreviousData,
   });
 
@@ -58,8 +60,46 @@ const OrderDateField: React.FC<OrderDateFieldProps> = (props) => {
           </RenderWhen.False>
         </RenderWhen>
       </div>
+      <div className={css.orderDateFieldInputMobile}>
+        <div className={css.label}>Chọn ngày bắt đầu</div>
+        <div
+          className={css.fieldInput}
+          onClick={orderDateFieldModalMobileController.setTrue}>
+          <IconCalendar />
+          <RenderWhen condition={!!startDate}>
+            <span>
+              {!!startDate &&
+                format(startDate!, 'EEE, dd MMMM, yyyy', {
+                  locale: viLocale,
+                })}
+            </span>
+            <RenderWhen.False>
+              <span className={css.placeholder}>Chọn ngày bắt đầu</span>
+            </RenderWhen.False>
+          </RenderWhen>
+        </div>
+      </div>
+      <div className={css.orderDateFieldInputMobile}>
+        <div className={css.label}>Chọn ngày kết thúc</div>
+        <div
+          className={css.fieldInput}
+          onClick={orderDateFieldModalMobileController.setTrue}>
+          <IconCalendar />
+          <RenderWhen condition={!!endDate}>
+            <span>
+              {!!endDate &&
+                format(endDate!, 'EEE, dd MMMM, yyyy', {
+                  locale: viLocale,
+                })}
+            </span>
+            <RenderWhen.False>
+              <span className={css.placeholder}>Chọn ngày kết thúc</span>
+            </RenderWhen.False>
+          </RenderWhen>
+        </div>
+      </div>
       <RenderWhen condition={orderDateFieldModalController.value}>
-        <div className={modalWrapperCLasses}>
+        <div className={modalWrapperClasses}>
           <OrderDateFieldModal
             form={form}
             values={values}
@@ -68,6 +108,15 @@ const OrderDateField: React.FC<OrderDateFieldProps> = (props) => {
             setSelectedTimeRangeOption={setSelectedTimeRangeOption}
           />
         </div>
+      </RenderWhen>
+      <RenderWhen condition={orderDateFieldModalMobileController.value}>
+        <OrderDateFieldModalMobile
+          isOpen={orderDateFieldModalMobileController.value}
+          onClose={orderDateFieldModalMobileController.setFalse}
+          form={form}
+          values={values}
+          selectedTimeRangeOption={selectedTimeRangeOption}
+        />
       </RenderWhen>
     </div>
   );
