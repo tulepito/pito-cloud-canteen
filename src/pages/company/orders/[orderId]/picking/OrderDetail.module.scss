@@ -231,10 +231,10 @@
   padding-top: 0;
 }
 
-.confirmCancelOrderModalChildren {
-  padding-top: 12px;
+.confirmCancelOrderModalChildren.confirmCancelOrderModalChildren {
+  padding-bottom: 12px;
 
   @include viewportMedium {
-    padding-top: 40px;
+    padding-bottom: 40px;
   }
 }
