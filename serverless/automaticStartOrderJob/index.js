@@ -118,7 +118,12 @@ exports.handler = async (_event) => {
       console.info('💫 > initiated quotation');
 
       console.info('💫 > initiate payments for order');
-      await initiatePayment(orderListing, planListing, quotationListing);
+      await initiatePayment({
+        orderListing,
+        planListing,
+        quotationListing,
+        systemVATPercentage,
+      });
       console.info('💫 > initiated payments');
 
       const { partner = {} } = Listing(quotationListing).getMetadata();

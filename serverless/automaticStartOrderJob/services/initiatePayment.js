@@ -21,7 +21,12 @@ const generateSKU = (role, orderTitle) => {
   return `${random4DigitsNumber}-${role}-${orderTitle}`;
 };
 
-const initiatePayment = async (orderListing, planListing, quotationListing) => {
+const initiatePayment = async ({
+  orderListing,
+  planListing,
+  quotationListing,
+  systemVATPercentage,
+}) => {
   const orderListingGetter = Listing(orderListing);
   const planListingGetter = Listing(planListing);
 
@@ -30,7 +35,7 @@ const initiatePayment = async (orderListing, planListing, quotationListing) => {
   const {
     companyName,
     deliveryHour,
-    orderVATPercentage,
+    orderVATPercentage = 0,
     serviceFees = {},
     vatSettings = {},
     orderStateHistory = [],
@@ -44,6 +49,9 @@ const initiatePayment = async (orderListing, planListing, quotationListing) => {
   } = orderListingGetter.getMetadata();
   const { partner = {} } = Listing(quotationListing).getMetadata();
   const { orderDetail = {} } = planListingGetter.getMetadata();
+
+  const vatPercentage =
+    orderVATPercentage !== 0 ? orderVATPercentage : systemVATPercentage;
 
   const isOrderHasInProgressState =
     checkIsOrderHasInProgressState(orderStateHistory);
@@ -61,7 +69,7 @@ const initiatePayment = async (orderListing, planListing, quotationListing) => {
       const { totalWithVAT } = calculatePriceQuotationPartner({
         quotation: partner[id]?.quotation,
         serviceFeePercentage: serviceFees[id],
-        orderVATPercentage,
+        orderVATPercentage: vatPercentage,
         subOrderDate,
         vatSetting: ensureVATSetting(vatSettingFromOrder),
       });
@@ -109,7 +117,7 @@ const initiatePayment = async (orderListing, planListing, quotationListing) => {
     calculatePriceQuotationInfoFromOrder({
       planOrderDetail: orderDetail,
       order: orderListing,
-      orderVATPercentage,
+      orderVATPercentage: vatPercentage,
       hasSpecificPCCFee,
       specificPCCFee,
     });
