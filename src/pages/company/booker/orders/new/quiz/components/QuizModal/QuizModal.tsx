@@ -5,6 +5,7 @@ import Button from '@components/Button/Button';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import IconCloseV2 from '@components/Icons/IconCloseV2/IconCloseV2';
 import Modal from '@components/Modal/Modal';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useAppDispatch } from '@hooks/reduxHooks';
 import { QuizActions } from '@redux/slices/Quiz.slice';
 
@@ -21,6 +22,7 @@ type QuizModalProps = {
   modalContainerClassName?: string;
   submitInProgress?: boolean;
   modalContentRef?: React.RefObject<HTMLDivElement>;
+  firstTimeOrder?: boolean;
   handleClose?: () => void;
   onSubmit?: () => void;
   onCancel?: () => void;
@@ -43,6 +45,7 @@ const QuizModal: React.FC<QuizModalProps> = (props) => {
     onBack,
     children,
     modalContentRef,
+    firstTimeOrder,
   } = props;
 
   const dispatch = useAppDispatch();
@@ -51,6 +54,14 @@ const QuizModal: React.FC<QuizModalProps> = (props) => {
     css.modalContainer,
     modalContainerClassName,
   );
+
+  const totalSteps = Number(stepInfo?.split('/')[1]) || 0;
+  const currentStep = Number(stepInfo?.split('/')[0]) || 0;
+  const stepList = Array.from({ length: totalSteps }).map(
+    (_, index) => index + 1,
+  );
+
+  const isFirstStep = stepInfo === '1/3';
 
   const handleCancel = () => {
     dispatch(QuizActions.closeQuizFlow());
@@ -69,19 +80,35 @@ const QuizModal: React.FC<QuizModalProps> = (props) => {
           <div className={css.closeBtn} onClick={handleCancel}>
             <IconCloseV2 className={css.closeIcon} />
           </div>
-          {stepInfo && (
+          <RenderWhen condition={firstTimeOrder}>
+            <div className={css.mobileHeader}>
+              {stepList.map((step) => (
+                <div
+                  key={step}
+                  className={classNames(
+                    css.progressStep,
+                    step <= currentStep && css.active,
+                  )}></div>
+              ))}
+            </div>
             <div
               className={classNames(css.stepInfo, {
                 [css.stepInfoWithBackBtn]: !!onBack,
               })}>
               {stepInfo}
             </div>
-          )}
+          </RenderWhen>
           {onBack && (
             <div className={css.backBtn} onClick={onBack}>
               <IconArrow direction="left" />
             </div>
           )}
+        </div>
+
+        <div
+          className={css.backBtnMobile}
+          onClick={isFirstStep ? handleCancel : onBack}>
+          <IconArrow direction="left" />
         </div>
         <div className={css.modalHeader}>{modalTitle}</div>
         <div ref={modalContentRef!} className={css.modalContent}>

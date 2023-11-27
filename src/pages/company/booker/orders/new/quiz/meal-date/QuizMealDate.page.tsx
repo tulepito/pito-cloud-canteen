@@ -22,9 +22,13 @@ import css from './QuizMealDate.module.scss';
 
 type TQuizMealDateProps = {
   stepInfo?: string;
+  firstTimeOrder?: boolean;
 };
 
-const QuizMealDate: React.FC<TQuizMealDateProps> = ({ stepInfo }) => {
+const QuizMealDate: React.FC<TQuizMealDateProps> = ({
+  stepInfo,
+  firstTimeOrder,
+}) => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
   const creatingOrderModalControl = useBoolean();
@@ -97,7 +101,8 @@ const QuizMealDate: React.FC<TQuizMealDateProps> = ({ stepInfo }) => {
       modalContainerClassName={css.modalContainer}
       modalContentRef={modalContentRef}
       stepInfo={stepInfo}
-      onBack={hasOrderBefore ? undefined : backStep}>
+      onBack={hasOrderBefore ? undefined : backStep}
+      firstTimeOrder={firstTimeOrder}>
       <MealDateForm
         onSubmit={() => {}}
         hasPreviousOrder={hasPreviousOrder}

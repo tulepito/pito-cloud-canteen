@@ -118,7 +118,7 @@ const MealDateFormComponent: React.FC<TMealDateFormComponentProps> = (
   }, [values.usePreviousData]);
 
   return (
-    <Form onSubmit={handleSubmit}>
+    <Form onSubmit={handleSubmit} className={css.container}>
       <div className={css.datePickersWrapper}>
         <OrderDateField
           form={form}

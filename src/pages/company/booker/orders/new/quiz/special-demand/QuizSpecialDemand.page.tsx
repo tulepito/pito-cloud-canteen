@@ -20,9 +20,13 @@ import css from './QuizSpecialDemand.module.scss';
 
 type TQuizSpecialDemandProps = {
   stepInfo?: string;
+  firstTimeOrder?: boolean;
 };
 
-const QuizSpecialDemand: React.FC<TQuizSpecialDemandProps> = ({ stepInfo }) => {
+const QuizSpecialDemand: React.FC<TQuizSpecialDemandProps> = ({
+  stepInfo,
+  firstTimeOrder,
+}) => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
 
@@ -94,7 +98,8 @@ const QuizSpecialDemand: React.FC<TQuizSpecialDemandProps> = ({ stepInfo }) => {
       onSubmit={handleFormSubmitClick}
       submitDisabled={submitDisabled}
       onBack={backStep}
-      stepInfo={stepInfo}>
+      stepInfo={stepInfo}
+      firstTimeOrder={firstTimeOrder}>
       <div className={css.formContainer}>
         {fetchAttributesInProgress ? (
           <div className={css.loading}>

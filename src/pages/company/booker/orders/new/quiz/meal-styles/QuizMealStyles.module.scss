@@ -1,5 +1,6 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
 
 .formTitle {
   @include textTemplate(24px, $fontWeightBold, 32px);
@@ -12,9 +13,13 @@
 }
 
 .form {
-  @include flexAlign(center, center);
+  @include flexAlign(center);
   gap: 12px;
   flex-wrap: wrap;
+
+  @include viewportLarge {
+    justify-content: center;
+  }
 }
 
 .loading {

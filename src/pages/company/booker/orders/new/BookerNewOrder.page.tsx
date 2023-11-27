@@ -6,13 +6,18 @@ import Image from 'next/image';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { HOMEPAGE_MEAL_LINKS } from '@pages/company/helpers/companyMeals';
 import { useCompanyMealSelect } from '@pages/company/hooks/useCompanyMealSelect';
+import { currentUserSelector } from '@redux/slices/user.slice';
+import { CurrentUser } from '@src/utils/data';
+import type { TCurrentUser } from '@src/utils/types';
 
 import css from './BookerNewOrder.module.scss';
 
 const BookerNewOrderPage: React.FC = () => {
   const intl = useIntl();
-  const bookerName = 'CHuong';
+  const currentUser = useAppSelector(currentUserSelector);
   const selectedCompany = useAppSelector((state) => state.Quiz.selectedCompany);
+
+  const { firstName } = CurrentUser(currentUser as TCurrentUser).getProfile();
   const { handleMealClick } = useCompanyMealSelect();
 
   const isSelectedCompanyEmpty =
@@ -38,7 +43,7 @@ const BookerNewOrderPage: React.FC = () => {
           {intl.formatMessage(
             { id: 'BookerNewOrder.welcome' },
             {
-              bookerName,
+              bookerName: firstName,
             },
           )}
         </div>

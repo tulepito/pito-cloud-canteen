@@ -38,10 +38,11 @@ const Amount = () => {
 
 type TQuizPerPackMemberAmountPageProps = {
   stepInfo?: string;
+  firstTimeOrder?: boolean;
 };
 const QuizPerPackMemberAmountPage: React.FC<
   TQuizPerPackMemberAmountPageProps
-> = ({ stepInfo }) => {
+> = ({ stepInfo, firstTimeOrder }) => {
   const intl = useIntl();
   const router = useRouter();
   const submittingControl = useBoolean();
@@ -164,7 +165,8 @@ const QuizPerPackMemberAmountPage: React.FC<
       submitDisabled={hasValidationErrors}
       submitInProgress={submittingControl.value}
       onSubmit={onFormSubmitClick}
-      stepInfo={stepInfo}>
+      stepInfo={stepInfo}
+      firstTimeOrder={firstTimeOrder}>
       <form className={css.formContainer}>
         <FieldTextInputComponent
           id="packagePerMember"
