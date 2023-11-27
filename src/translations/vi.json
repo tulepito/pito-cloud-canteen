@@ -1566,6 +1566,7 @@
   "ReviewOrdersResultSection.viewResultText": "Xem kết quả chọn",
   "ReviewTitleSection.goBackText": "Quay lại",
   "ReviewTitleSection.title": "Xem lại thông tin đơn hàng {orderTitle}",
+  "ReviewTitleSection.mobileTitle": "Đơn hàng #{orderTitle}",
   "SearchFilter.menu.cycle-menu": "Menu chu kỳ",
   "SearchFilter.menu.fixed-menu": "Menu cố định",
   "SearchOrderForm.keywordsField.placeholder": "Tìm đơn hàng",
