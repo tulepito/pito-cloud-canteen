@@ -25,6 +25,7 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { useViewport } from '@hooks/useViewport';
 import { CalendarActions } from '@redux/slices/Calendar.slice';
+import { participantPaths } from '@src/paths';
 import { CurrentUser, Listing, User } from '@src/utils/data';
 import {
   getDaySessionFromDeliveryTime,
@@ -91,10 +92,10 @@ const OrderListPage = () => {
     selectedDay || new Date(),
   );
   const [maxSelectedMonth, setMaxSelectedMonth] = useState<Date>(
-    getEndOfMonth(new Date()),
+    getEndOfMonth(getEndDayOfWeek(selectedDayOfMonth)),
   );
   const [minSelectedMonth, setMinSelectedMonth] = useState<Date>(
-    getStartOfMonth(new Date()),
+    getStartOfMonth(getStartDayOfWeek(selectedDayOfMonth)),
   );
   const isFirstTimeReachMinOrMaxMonthControl = useBoolean(true);
 
@@ -107,6 +108,11 @@ const OrderListPage = () => {
     (state) => state.ParticipantOrderList.orders,
     shallowEqual,
   );
+  const ordersNotConfirmFirstTime = useAppSelector(
+    (state) => state.ParticipantOrderList.ordersNotConfirmFirstTime,
+    shallowEqual,
+  );
+
   const fetchOrdersInProgress = useAppSelector(
     (state) => state.ParticipantOrderList.fetchOrdersInProgress,
   );
@@ -469,6 +475,8 @@ const OrderListPage = () => {
     }
   }, [selectedEvent]);
 
+  const [isReadyLatestOrders, setReadyLatestOrders] = useState(false);
+
   useEffect(() => {
     (async () => {
       if (isFirstTimeReachMinOrMaxMonthControl.value) {
@@ -479,6 +487,7 @@ const OrderListPage = () => {
             endDate: maxSelectedMonth,
           }),
         );
+        setReadyLatestOrders(true);
         dispatch(OrderListActions.markColorToOrder());
       }
     })();
@@ -519,8 +528,24 @@ const OrderListPage = () => {
 
   useEffect(() => {
     dispatch(OrderListThunks.fetchParticipantFirebaseNotifications());
-    dispatch(CalendarActions.setSelectedDay(null));
+    dispatch(CalendarActions.setSelectedDay(selectedDay));
   }, []);
+
+  useEffect(() => {
+    if (
+      ordersNotConfirmFirstTime &&
+      ordersNotConfirmFirstTime.length &&
+      isReadyLatestOrders
+    ) {
+      const firstOrderNotConfirmFirstTime = Listing(
+        ordersNotConfirmFirstTime[0],
+      );
+      router.push({
+        pathname: participantPaths.Order,
+        query: { orderId: firstOrderNotConfirmFirstTime.getId() },
+      });
+    }
+  }, [ordersNotConfirmFirstTime, isReadyLatestOrders]);
 
   const orderListPageContent = (
     <>

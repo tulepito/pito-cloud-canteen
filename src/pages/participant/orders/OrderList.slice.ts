@@ -46,6 +46,7 @@ type TOrderListState = {
   disableWalkthroughInProgress: boolean;
   disableWalkthroughError: any;
 
+  ordersNotConfirmFirstTime: any[];
   foodsInPlans: any[];
   orders: any[];
   allSubOrders: any[];
@@ -93,7 +94,7 @@ const initialState: TOrderListState = {
   walkthroughCurrentStep: 0,
   disableWalkthroughInProgress: false,
   disableWalkthroughError: null,
-
+  ordersNotConfirmFirstTime: [],
   foodsInPlans: [],
   orders: [],
   allSubOrders: [],
@@ -313,6 +314,7 @@ const fetchOrders = createAsyncThunk(
       mappingSubOrderToOrder,
       company,
       foodsInPlans,
+      ordersNotConfirmFirstTime,
     } = data;
 
     return {
@@ -321,6 +323,7 @@ const fetchOrders = createAsyncThunk(
       restaurants,
       mappingSubOrderToOrder,
       company,
+      ordersNotConfirmFirstTime,
       foodsInPlans,
     };
   },
@@ -753,7 +756,7 @@ const OrderListSlice = createSlice({
       .addCase(fetchOrders.fulfilled, (state, { payload }) => {
         state.fetchOrdersInProgress = false;
         state.orders = uniqBy([...state.orders, ...payload.orders], 'id.uuid');
-
+        state.ordersNotConfirmFirstTime = payload.ordersNotConfirmFirstTime;
         state.restaurants = payload.restaurants;
         state.allPlans = uniqBy(
           [...payload.allPlans, ...state.allPlans],

@@ -201,10 +201,25 @@ const ParticipantOrderManagement = () => {
         orderId as string,
       ),
     );
+    const from =
+      router.pathname === participantPaths.OrderList
+        ? 'orderList'
+        : 'orderDetail';
+
+    const plan = Listing(plans[0]);
+    const planId = plan.getId();
+    const { orderDetail } = plan.getMetadata();
+    const [timestamp] = Object.keys(orderDetail);
+    const routerQuery = {
+      pathname: participantPaths.PlanDetail,
+      query: { orderDay: Number(timestamp), planId, from },
+    };
 
     if (meta.requestStatus === 'fulfilled') {
       pickingOrderModalControl.setFalse();
     }
+
+    router.push(routerQuery);
   };
 
   const showModalMaybe =

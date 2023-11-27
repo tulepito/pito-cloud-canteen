@@ -110,6 +110,7 @@
     font-weight: $fontWeightBold;
     font-size: 20px;
     line-height: 32px;
+    margin-top: 32px;
   }
 
   .successModalImage {
@@ -118,20 +119,49 @@
   }
 
   .successModalDescription {
-    margin: 32px 0;
     text-align: center;
+    font-weight: bold;
+    margin-bottom: 30px;
   }
 
-  .successModalConfirmBtn {
-    margin: auto;
+  .actionWrapper {
+    flex-wrap: wrap;
     width: 100%;
+    max-width: 610px;
+    margin: auto;
 
-    @include viewportSmall {
-      width: calc(100% - 80px);
-    }
+    @include flexCenter;
 
     &:last-child {
       margin-top: 8px;
     }
+
+    .closeModal {
+      width: 76px;
+      margin-right: 28px;
+    }
+
+    .goToHomePage {
+      width: 228px;
+    }
   }
+
+  @media only screen and (max-width: 575px) {
+    .actionWrapper {
+      flex-direction: column-reverse;
+      gap: 12px;
+
+      .closeModal {
+        margin-right: 0px;
+      }
+
+      .goToHomePage {
+        width: 303px;
+      }
+    }
+  }
+}
+
+.orderEndAtLabel {
+  font-weight: normal;
 }

@@ -1059,3 +1059,47 @@ export const initLineItemsFromFoodList = (
       })
     : [];
 };
+
+export const sortCreateAtListing = (
+  listings: TListing[],
+  sortBy: 'asc' | 'desc',
+) => {
+  return listings.sort((previous: TListing, current: TListing) => {
+    const { createdAt: previousCreatedAt } = Listing(previous).getAttributes();
+    const { createdAt: currentCreatedAt } = Listing(current).getAttributes();
+    const timestampPrevious: number = Date.parse(previousCreatedAt);
+    const timestampCurrent: number = Date.parse(currentCreatedAt);
+    if (timestampPrevious < timestampCurrent) {
+      return sortBy === 'asc' ? -1 : 1;
+    }
+    if (timestampPrevious > timestampCurrent) {
+      return sortBy === 'asc' ? 1 : -1;
+    }
+
+    return 0;
+  });
+};
+
+export const confirmFirstTimeParticipant = (
+  order: TListing,
+  participantId: string,
+) => {
+  const { orderState, deadlineDate, ...restMetadata } =
+    Listing(order).getMetadata();
+  if (orderState === EOrderStates.picking) {
+    const expiredTime = deadlineDate
+      ? DateTime.fromMillis(+deadlineDate)
+      : null;
+    const isParticipantViewedOrderFirstTime =
+      restMetadata?.[`hideFirstTimeOrderModal_${participantId}`];
+    if (
+      expiredTime &&
+      !isOver(expiredTime.toMillis()) &&
+      !isParticipantViewedOrderFirstTime
+    ) {
+      return false;
+    }
+  }
+
+  return true;
+};

@@ -8,6 +8,7 @@ import FeatureIcons from '@components/FeatureIcons/FeatureIcons';
 import IconArrowHead from '@components/Icons/IconArrowHead/IconArrowHead';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { useViewport } from '@hooks/useViewport';
 import QuizFlow from '@pages/company/booker/orders/new/quiz/QuizFlow';
 import { BookerCompaniesThunks } from '@redux/slices/BookerCompanies.slice';
 import { companyPaths } from '@src/paths';
@@ -19,6 +20,7 @@ import CompanyHeaderWrapper from './CompanyHeaderWrapper/CompanyHeaderWrapper';
 import CompanyMainContent from './CompanyMainContent/CompanyMainContent';
 import CompanySidebar from './CompanySidebar/CompanySidebar';
 import {
+  shouldHideCompanyFooter,
   shouldShowFeatureHeader,
   shouldShowSidebar,
 } from './companyLayout.helpers';
@@ -36,17 +38,23 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
   const { children } = props;
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const { companyId } = router.query;
-  const { pathname } = router;
-  const showFeatureHeader = shouldShowFeatureHeader(router.pathname);
-  const showSidebar = shouldShowSidebar(pathname);
 
   const quizFlowOpen = useAppSelector((state) => state.Quiz.quizFlowOpen);
-
   const companyList = useAppSelector(
     (state) => state.BookerCompanies.companies,
     shallowEqual,
   );
+  const { isMobileLayout, isTabletLayout } = useViewport();
+  const {
+    query: { companyId },
+    pathname,
+  } = router;
+
+  const showFeatureHeader = shouldShowFeatureHeader(pathname);
+  const showSidebar = shouldShowSidebar(pathname);
+  const shouldHideFooter =
+    isMobileLayout || isTabletLayout || shouldHideCompanyFooter(pathname);
+
   const assignedCompanies = companyList.reduce((result: any[], cur: TUser) => {
     return [
       ...result,
@@ -141,28 +149,7 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
     },
   ];
 
-  const companyHeaderLinkData: any[] = [
-    // {
-    //   key: 'partner',
-    //   path: router.pathname,
-    //   label: 'Nhà hàng',
-    // },
-    // {
-    //   key: 'story',
-    //   path: router.pathname,
-    //   label: 'Câu chuyện',
-    // },
-    // {
-    //   key: 'pricing',
-    //   path: router.pathname,
-    //   label: 'Bảng giá',
-    // },
-    // {
-    //   key: 'aboutUs',
-    //   path: router.pathname,
-    //   label: 'Về chúng tôi',
-    // },
-  ];
+  const companyHeaderLinkData: any[] = [];
 
   useEffect(() => {
     dispatch(BookerCompaniesThunks.fetchBookerCompanies());
@@ -215,7 +202,7 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
         hasSideBar={showSidebar}>
         {children}
       </CompanyMainContent>
-      <CompanyFooter />
+      {!shouldHideFooter && <CompanyFooter />}
       <RenderWhen condition={quizFlowOpen}>
         <QuizFlow />
       </RenderWhen>
