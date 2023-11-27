@@ -7,7 +7,6 @@ const {
   TRANSITIONS,
   PARTNER_VAT_SETTINGS,
   TRANSITIONS_TO_STATE_CANCELED,
-  ORDER_STATES,
   ORDER_TYPES,
 } = require('../../utils/enums');
 const { Listing } = require('../../utils/data');
@@ -468,23 +467,18 @@ const calculatePriceQuotationInfoFromOrder = ({
   isPartner = false,
   vatSetting = PARTNER_VAT_SETTINGS.vat,
 }) => {
-  const {
-    packagePerMember = 0,
-    orderState,
-    orderType = ORDER_TYPES.group,
-  } = Listing(order).getMetadata();
-  const isOrderInProgress = orderState === ORDER_STATES.inProgress;
+  const { packagePerMember = 0, orderType = ORDER_TYPES.group } =
+    Listing(order).getMetadata();
   const isGroupOrder = orderType === ORDER_TYPES.group;
 
   const currentOrderDetail = Object.entries(planOrderDetail).reduce(
     (result, currentOrderDetailEntry) => {
       const [subOrderDate, rawOrderDetailOfDate] = currentOrderDetailEntry;
-      const { status, transactionId, lastTransition } = rawOrderDetailOfDate;
+      const { status, lastTransition } = rawOrderDetailOfDate;
 
       if (
         status === 'canceled' ||
-        TRANSITIONS_TO_STATE_CANCELED.includes(lastTransition) ||
-        (!transactionId && isOrderInProgress)
+        TRANSITIONS_TO_STATE_CANCELED.includes(lastTransition)
       ) {
         return result;
       }
@@ -509,12 +503,14 @@ const calculatePriceQuotationInfoFromOrder = ({
         hasSpecificPCCFee,
         specificPCCFee,
       });
+      console.info('💫 > PCCFeeOfDate: ', PCCFeeOfDate);
 
       return result + PCCFeeOfDate;
     },
     0,
   );
   const actualPCCFee = shouldIncludePITOFee ? PCCFee : 0;
+  console.info('💫 > shouldIncludePITOFee: ', shouldIncludePITOFee);
   console.info('💫 > actualPCCFee: ', actualPCCFee);
   const { totalPrice = 0, totalDishes = 0 } = calculateTotalPriceAndDishes({
     orderDetail: planOrderDetail,
