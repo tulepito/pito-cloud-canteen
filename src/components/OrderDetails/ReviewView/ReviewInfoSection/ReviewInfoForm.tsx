@@ -68,7 +68,7 @@ const ReviewInfoFormComponent: React.FC<TReviewInfoFormComponentProps> = (
     <Form onSubmit={handleSubmit} className={css.formContainer}>
       <div className={css.fieldContainer}>
         <label className={css.fieldLabel} htmlFor="ReviewInfoForm.companyName">
-          1. {companyNameField?.label} *
+          {companyNameField?.label}
         </label>
         <FieldTextInput
           disabled
@@ -81,7 +81,7 @@ const ReviewInfoFormComponent: React.FC<TReviewInfoFormComponentProps> = (
         <label
           className={css.fieldLabel}
           htmlFor="ReviewInfoForm.deliveryAddress">
-          2. {deliveryAddressField?.label} *
+          {deliveryAddressField?.label}
         </label>
         <FieldTextInput
           disabled
@@ -94,7 +94,7 @@ const ReviewInfoFormComponent: React.FC<TReviewInfoFormComponentProps> = (
         <label
           className={css.fieldLabel}
           htmlFor="ReviewInfoForm.contactPeopleName">
-          3. {contactPeopleNameField?.label} *
+          {contactPeopleNameField?.label}
         </label>
         <FieldTextInput
           className={css.fieldInput}
@@ -109,7 +109,7 @@ const ReviewInfoFormComponent: React.FC<TReviewInfoFormComponentProps> = (
         <label
           className={css.fieldLabel}
           htmlFor="ReviewInfoForm.contactPhoneNumber">
-          4. {contactPhoneNumberField?.label} *
+          {contactPhoneNumberField?.label}
         </label>
         <FieldTextInput
           className={css.fieldInput}
