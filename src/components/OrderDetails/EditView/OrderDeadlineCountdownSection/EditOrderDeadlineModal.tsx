@@ -2,6 +2,9 @@ import { useIntl } from 'react-intl';
 import { DateTime } from 'luxon';
 
 import Modal from '@components/Modal/Modal';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
+import SlideModal from '@components/SlideModal/SlideModal';
+import { useViewport } from '@hooks/useViewport';
 
 import type { TEditOrderDeadlineFormValues } from './EditOrderDeadlineForm';
 import EditOrderDeadlineForm from './EditOrderDeadlineForm';
@@ -29,6 +32,7 @@ const EditOrderDeadlineModal: React.FC<TEditOrderDeadlineModalProps> = (
     data: { orderStartDate, orderDeadline, orderDeadlineHour },
   } = props;
   const intl = useIntl();
+  const { isMobileLayout } = useViewport();
 
   const formInitialValues: TEditOrderDeadlineFormValues = {
     deadlineDate:
@@ -37,25 +41,44 @@ const EditOrderDeadlineModal: React.FC<TEditOrderDeadlineModalProps> = (
     deadlineHour: orderDeadlineHour || '',
   };
 
+  const formComponent = (
+    <EditOrderDeadlineForm
+      onSubmit={onSubmit}
+      startDate={orderStartDate}
+      initialValues={formInitialValues}
+    />
+  );
+
   return (
-    <Modal
-      className={css.root}
-      containerClassName={css.modalContainer}
-      handleClose={onClose}
-      isOpen={isOpen}
-      title={
-        <span className={css.title}>
-          {intl.formatMessage({
-            id: 'EditOrderDeadlineModal.title',
-          })}
-        </span>
-      }>
-      <EditOrderDeadlineForm
-        onSubmit={onSubmit}
-        startDate={orderStartDate}
-        initialValues={formInitialValues}
-      />
-    </Modal>
+    <RenderWhen condition={isMobileLayout}>
+      <SlideModal
+        id="EditOrderDeadlineModal.modal"
+        containerClassName={css.mobileModalContainer}
+        onClose={onClose}
+        isOpen={isOpen}
+        modalTitle={intl.formatMessage({
+          id: 'EditOrderDeadlineModal.title',
+        })}>
+        {formComponent}
+      </SlideModal>
+
+      <RenderWhen.False>
+        <Modal
+          className={css.modalRoot}
+          containerClassName={css.modalContainer}
+          handleClose={onClose}
+          isOpen={isOpen}
+          title={
+            <span className={css.title}>
+              {intl.formatMessage({
+                id: 'EditOrderDeadlineModal.title',
+              })}
+            </span>
+          }>
+          {formComponent}
+        </Modal>
+      </RenderWhen.False>
+    </RenderWhen>
   );
 };
 

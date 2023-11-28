@@ -79,6 +79,7 @@ const EditOrderDeadlineFormComponent: React.FC<
           id: 'EditOrderDeadlineForm.deadlineHour.label',
         })}
         className={css.fieldSelect}
+        dropdownWrapperClassName={css.dropdownWrapper}
         leftIcon={<IconClock className={css.clockIcon} />}
         options={parsedDeliveryHourOptions}
       />

@@ -1,35 +1,54 @@
 @use '/src/styles/defaults.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
 
-.root {
-  .fieldDatePickerContainer {
-    position: relative;
+.fieldDatePickerContainer {
+  position: relative;
 
-    .customInput {
-      input {
-        @include inputStyles;
-        width: 100%;
-        padding-left: 52px;
-      }
-    }
-
-    .calendarIcon {
-      position: absolute;
-      bottom: 12px;
-      left: 16px;
-    }
-
-    :global(.react-datepicker-popper) {
-      z-index: 2;
+  .customInput {
+    input {
+      @include inputStyles;
+      width: 100%;
+      padding-left: 52px;
     }
   }
 
-  .fieldSelect {
-    margin-top: 24px;
+  .calendarIcon {
+    position: absolute;
+    bottom: 12px;
+    left: 16px;
   }
 
-  .actions {
-    margin-top: 24px;
-    display: flex;
+  :global(.react-datepicker-popper) {
+    z-index: 2;
+  }
+}
+
+.fieldSelect {
+  margin-top: 24px;
+}
+
+.dropdownWrapper {
+  height: 88px;
+  overflow: hidden auto;
+
+  @include viewportMedium {
+    height: unset;
+  }
+}
+
+.actions {
+  display: flex;
+  margin-top: 24px;
+
+  @include viewportMedium {
     justify-content: flex-end;
+  }
+
+  button {
+    width: 100%;
+
+    @include viewportMedium {
+      width: unset;
+    }
   }
 }
