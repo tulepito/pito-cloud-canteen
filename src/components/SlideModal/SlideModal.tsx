@@ -12,16 +12,29 @@ type TSlideModalProps = PropsWithChildren & {
   modalTitle?: string;
   onClose: () => void;
   containerClassName?: string;
+  openClassName?: string;
+  className?: string;
+  shouldShowOverlay?: boolean;
 };
 
 const SlideModal: React.FC<TSlideModalProps> = (props) => {
-  const { isOpen, onClose, id, children, modalTitle, containerClassName } =
-    props;
+  const {
+    isOpen,
+    onClose,
+    id,
+    children,
+    modalTitle,
+    className,
+    containerClassName,
+    openClassName,
+    shouldShowOverlay = false,
+  } = props;
 
   const containerClasses = classNames(
     css.slideModalContainer,
     containerClassName,
   );
+  const openClasses = classNames(css.slideModalOpen, openClassName);
 
   return (
     <PopupModal
@@ -29,8 +42,9 @@ const SlideModal: React.FC<TSlideModalProps> = (props) => {
       isOpen={isOpen}
       handleClose={onClose}
       closeClassName={css.slideModalClose}
-      openClassName={css.slideModalOpen}
+      openClassName={openClasses}
       scrollLayerClassName={css.slideModalScrollLayer}
+      shouldShowOverlay={shouldShowOverlay}
       customHeader={
         <div className={css.modalHeader}>
           <IconClose className={css.closeIcon} onClick={onClose} />
@@ -38,6 +52,7 @@ const SlideModal: React.FC<TSlideModalProps> = (props) => {
         </div>
       }
       containerClassName={containerClasses}
+      className={className}
       contentClassName={css.slideModalContent}>
       {children}
     </PopupModal>
