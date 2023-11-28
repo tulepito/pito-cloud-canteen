@@ -212,7 +212,7 @@ const OrderDetailPage = () => {
   const {
     orderState,
     bookerId,
-    orderType = EOrderType.group,
+    orderType = EOrderType.normal,
     orderVATPercentage,
   } = Listing(orderData as TListing).getMetadata();
 
@@ -403,29 +403,28 @@ const OrderDetailPage = () => {
 
   const EditViewComponent = (
     <div className={editViewClasses}>
-      <OrderTitle
-        className={css.titlePart}
-        data={editViewData.titleSectionData}
-        onConfirmOrder={handleConfirmOrder}
-        onCancelOrder={confirmCancelOrderActions.setTrue}
-        confirmButtonMessage={confirmButtonMessage}
-        cancelButtonMessage={
-          isPickingOrder
-            ? intl.formatMessage({
-                id: 'EditView.OrderTitle.cancelOrderButtonText',
-              })
-            : ''
-        }
-        cancelDisabled={confirmGoHomeControl.value}
-        confirmDisabled={
-          confirmGoHomeControl.value ||
-          disabledSubmit ||
-          (!isPickingOrder && orderDetailsNotChanged)
-        }
-        isDraftEditing={isDraftEditing}
-      />
-
       <RenderWhen condition={!inProgress}>
+        <OrderTitle
+          className={css.titlePart}
+          data={editViewData.titleSectionData}
+          onConfirmOrder={handleConfirmOrder}
+          onCancelOrder={confirmCancelOrderActions.setTrue}
+          confirmButtonMessage={confirmButtonMessage}
+          cancelButtonMessage={
+            isPickingOrder
+              ? intl.formatMessage({
+                  id: 'EditView.OrderTitle.cancelOrderButtonText',
+                })
+              : ''
+          }
+          cancelDisabled={confirmGoHomeControl.value}
+          confirmDisabled={
+            confirmGoHomeControl.value ||
+            disabledSubmit ||
+            (!isPickingOrder && orderDetailsNotChanged)
+          }
+          isDraftEditing={isDraftEditing}
+        />
         <RenderWhen condition={!isNormalOrder}>
           <div className={css.leftPart}>
             <ManageOrdersSection
@@ -658,7 +657,9 @@ const OrderDetailPage = () => {
     case EPageViewMode.edit:
       content = (
         <>
-          <Stepper {...stepperProps} />
+          <RenderWhen condition={!isNormalOrder}>
+            <Stepper {...stepperProps} />
+          </RenderWhen>
           {EditViewComponent}
         </>
       );

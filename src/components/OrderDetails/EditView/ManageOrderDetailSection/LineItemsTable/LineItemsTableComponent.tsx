@@ -13,6 +13,7 @@ import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { parseThousandNumber } from '@helpers/format';
 import { useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
+import { useViewport } from '@hooks/useViewport';
 import { orderDetailsAnyActionsInProgress } from '@redux/slices/OrderManagement.slice';
 import { Listing } from '@src/utils/data';
 import type { TListing, TObject } from '@src/utils/types';
@@ -44,7 +45,7 @@ export const LineItemsTableComponent: React.FC<
   const intl = useIntl();
   const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
   const orderData = useAppSelector((state) => state.OrderManagement.orderData);
-
+  const { isMobileLayout } = useViewport();
   const alertController = useBoolean();
 
   const orderDataGetter = Listing(orderData as TListing);
@@ -104,7 +105,14 @@ export const LineItemsTableComponent: React.FC<
         return (
           <tr key={foodId}>
             <td title={name}>
-              <div className={css.foodName}> {name}</div>
+              <div className={css.foodName}>
+                <RenderWhen condition={isMobileLayout}>
+                  <div className={css.name}> {name}</div>
+                  <div className={css.foodUnit}> {formattedFoodUnitPrice}</div>
+
+                  <RenderWhen.False>{name}</RenderWhen.False>
+                </RenderWhen>
+              </div>
             </td>
             <td>
               <div className={css.quantityContainer}>
