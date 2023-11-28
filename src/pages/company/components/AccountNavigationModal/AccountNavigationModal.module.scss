@@ -41,20 +41,6 @@
 }
 
 .headerTitle {
-  // display: flex;
-  // align-items: center;
-  // justify-content: space-between;
-  // gap: 13px;
-  // line-height: 24px;
-
-  // svg {
-  //   min-width: 24px;
-  // }
-
-  // .title {
-  //   @include lineClamp(1, 24px);
-  // }
-
   @include flexAlign(center);
   gap: 16px;
 

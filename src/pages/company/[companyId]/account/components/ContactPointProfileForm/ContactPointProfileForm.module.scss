@@ -3,11 +3,11 @@
 
 .container {
   @include flexAlign(flex-start);
+  gap: 88px;
 
   .avatar {
-    width: 128px;
+    // width: 128px;
     height: 128px;
-    margin-right: 88px;
 
     .uploadAvatarWrapper {
       .label {
@@ -37,7 +37,7 @@
     }
 
     .avatarPlaceholder {
-      width: 128px;
+      // width: 128px;
       height: 128px;
       border-radius: 100%;
       position: relative;
@@ -114,4 +114,20 @@
 .avatarImg {
   width: 128px;
   height: 128px;
+}
+
+@media only screen and (max-width: 600px) {
+  .container {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 16px;
+
+    .profile {
+      width: 100%;
+      flex-wrap: wrap;
+      .fieldInput {
+        width: 100%;
+      }
+    }
+  }
 }

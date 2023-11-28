@@ -3,14 +3,18 @@ import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import take from 'lodash/take';
 import takeRight from 'lodash/takeRight';
+import { useRouter } from 'next/router';
 
 import Button from '@components/Button/Button';
 import ConfirmationModal from '@components/ConfirmationModal/ConfirmationModal';
+import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import useFetchCompanyInfo from '@hooks/useFetchCompanyInfo';
+import { useViewport } from '@hooks/useViewport';
 import { companyThunks } from '@redux/slices/company.slice';
 import { resetImage } from '@redux/slices/uploadImage.slice';
+import { personalPaths } from '@src/paths';
 import { User } from '@utils/data';
 import type { TCurrentUser, TUser } from '@utils/types';
 
@@ -22,6 +26,7 @@ import css from './Account.module.scss';
 const AccountPage = () => {
   const dispatch = useAppDispatch();
   const intl = useIntl();
+  const router = useRouter();
 
   const formSubmitInputRef = useRef<any>();
   const [formDisabled, setFormDisabled] = useState<boolean>(true);
@@ -30,6 +35,8 @@ const AccountPage = () => {
     setTrue: openConfirmationModal,
     setFalse: closeConfirmationModal,
   } = useBoolean();
+
+  const { isMobileLayout, isTabletLayout } = useViewport();
   const currentUser = useAppSelector(
     (state) => state.user.currentUser,
     shallowEqual,
@@ -108,11 +115,28 @@ const AccountPage = () => {
       formSubmitInputRef.current(e);
   };
 
+  const navigateAccountPersonalPage = () => {
+    router.push({
+      pathname: personalPaths.Account,
+      query: { companyId: 'personal' },
+    });
+  };
+
   return (
     <div className={css.container}>
-      <div className={css.header}>
-        {intl.formatMessage({ id: 'AccountPage.account' })}
-      </div>
+      {isMobileLayout || isTabletLayout ? (
+        <div className={css.header}>
+          <IconArrow direction="left" onClick={navigateAccountPersonalPage} />
+          <span>
+            {intl.formatMessage({ id: 'AdminSidebar.accountSettingLabel' })}
+          </span>
+        </div>
+      ) : (
+        <div className={css.header}>
+          <span>{intl.formatMessage({ id: 'AccountPage.account' })}</span>
+        </div>
+      )}
+
       <div className={css.contactPointSection}>
         <div className={css.sectionTitle}>
           {intl.formatMessage({ id: 'AccountPage.contactPoint' })}

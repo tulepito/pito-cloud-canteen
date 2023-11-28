@@ -1,14 +1,13 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/mixins.scss' as *;
 
-.container {
-}
-
 .header {
-  @include text(24px, 32px);
-  font-weight: $fontWeightBold;
-  padding: 32px 24px;
   border-bottom: 1px solid $neutralGray5;
+  padding: 32px 24px;
+  span {
+    @include text(24px, 32px);
+    font-weight: $fontWeightBold;
+  }
 }
 
 .sectionTitle {
@@ -62,5 +61,44 @@
 
   .btn {
     width: 200px;
+  }
+}
+
+@media only screen and (max-width: 600px) {
+  .header {
+    border-bottom: 1px solid $neutralGray3;
+    padding: 8px 16px;
+    height: 56px;
+    @include flexAlign(center);
+    gap: 8px;
+    span {
+      @include text(16px, 24px);
+      font-weight: $fontWeightBold;
+    }
+  }
+
+  .contactPointSection,
+  .companyInfoSection {
+    display: flow-root;
+    gap: 28px;
+    padding: 24px 16px 0px 16px;
+  }
+
+  .companyInfoSection {
+    .row {
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+  }
+
+  .submitBtn {
+    @include flexAlign(center);
+    border-top: none;
+    padding: 24px 16px 0px 16px;
+    margin-top: 0px;
+
+    .btn {
+      width: 100%;
+    }
   }
 }
