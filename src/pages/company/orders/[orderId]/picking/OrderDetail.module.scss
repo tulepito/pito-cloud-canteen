@@ -12,10 +12,11 @@
   .titlePart {
     grid-column: 1 / span 2;
     order: 1;
-    margin-bottom: 8px;
+    margin-bottom: 20px;
 
     @include viewportMedium {
       padding-top: 8px;
+      margin-bottom: 8px;
     }
   }
 

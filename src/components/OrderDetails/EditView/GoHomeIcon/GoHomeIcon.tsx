@@ -19,7 +19,7 @@ const GoHomeIcon: React.FC<TGoHomeIconProps> = ({ control }) => {
 
   return (
     <div className={css.root}>
-      <IconHome onClick={control.setTrue} />
+      <IconHome onClick={control.setTrue} className={css.iconHome} />
 
       <AlertModal
         isOpen={control.value}

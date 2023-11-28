@@ -1,4 +1,14 @@
 @use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.root {
+  @include flexCenter;
+}
+
+.iconHome {
+  width: 21px;
+  height: 21px;
+}
 
 .confirmGoHomeModalContainer.confirmGoHomeModalContainer {
   padding: 16px;

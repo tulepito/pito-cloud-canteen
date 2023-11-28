@@ -131,10 +131,6 @@ export const createNewPlanFromOldPlans = async ({
       let newOrderDetail: TObject = {};
 
       orderDatesInTimestamp.forEach((currentDate: number, dateIdx: number) => {
-        console.debug(
-          '💫 > orderDatesInTimestamp.forEach > currentDate: ',
-          currentDate,
-        );
         const weekDayOfDate = orderDatesWeekdayList[dateIdx];
         let dateToCopy: string | number =
           oldOrderDatesInTimestamp[
