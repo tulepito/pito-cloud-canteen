@@ -4,8 +4,7 @@
 
 .editViewRoot {
   $maxWidthWithPadding: calc(100vw - 320px - 40px);
-
-  padding: 16px 8px 140px;
+  padding: 16px 8px 205px;
   display: flex;
   flex-direction: column;
 
@@ -97,15 +96,9 @@
   }
 
   &.editNormalOrderView {
-    @include viewportLarge {
-      grid-template-columns: 1fr 820px;
-    }
-
+    padding-bottom: 140px;
     @include viewportLarge {
       grid-template-columns: 1fr 820px 1fr;
-    }
-
-    @include viewportLarge {
       padding: 0 36px;
       row-gap: 40px;
     }

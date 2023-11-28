@@ -4,15 +4,17 @@
 
 .root {
   @include textTemplate(14px, 400, 24px);
+  display: none;
+
+  @include viewportMedium {
+    display: block;
+  }
 
   .titleContainer {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 16px;
-
-    .title {
-    }
 
     .editDeadlineButton {
       padding: 0;

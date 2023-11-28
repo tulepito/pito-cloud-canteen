@@ -20,6 +20,7 @@
 
   :global(.react-datepicker-popper) {
     z-index: 2;
+    transform: translate3d(0px, -56px, 0px) !important;
   }
 }
 

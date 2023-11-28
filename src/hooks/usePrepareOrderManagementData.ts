@@ -130,6 +130,7 @@ export const usePrepareOrderDetailPageData = ({
     isGroupOrder,
     deadlineDate,
     deadlineHour,
+    startDate,
   };
   const countdownSectionData = {
     deadlineHour,

@@ -31,7 +31,7 @@ type TEditOrderDeadlineFormProps = FormProps<TEditOrderDeadlineFormValues> &
 const EditOrderDeadlineFormComponent: React.FC<
   TEditOrderDeadlineFormComponentProps
 > = (props) => {
-  const { handleSubmit, startDate, values, form } = props;
+  const { handleSubmit, startDate, values, form, pristine } = props;
   const intl = useIntl();
 
   const today = new Date();
@@ -39,6 +39,7 @@ const EditOrderDeadlineFormComponent: React.FC<
     .minus({ day: 2 })
     .toJSDate();
   const buttonDisabled = today.getTime() >= values.deadlineDate;
+  const submitDisabled = pristine;
 
   const handleDeadlineDateChange = (date: number) => {
     form.change('deadlineDate', date);
@@ -85,7 +86,7 @@ const EditOrderDeadlineFormComponent: React.FC<
       />
 
       <div className={css.actions}>
-        <Button disabled={buttonDisabled}>
+        <Button disabled={submitDisabled || buttonDisabled}>
           {intl.formatMessage({ id: 'EditOrderDeadlineForm.submitButtonText' })}
         </Button>
       </div>

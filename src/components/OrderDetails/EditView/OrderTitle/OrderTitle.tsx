@@ -10,10 +10,19 @@ import Button from '@components/Button/Button';
 import IconEdit from '@components/Icons/IconEdit/IconEdit';
 import MobileBottomContainer from '@components/MobileBottomContainer/MobileBottomContainer';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
-import { useAppSelector } from '@hooks/reduxHooks';
+import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
+import { isOver } from '@helpers/orderHelper';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import useBoolean from '@hooks/useBoolean';
 import { useViewport } from '@hooks/useViewport';
-import { orderDetailsAnyActionsInProgress } from '@redux/slices/OrderManagement.slice';
+import {
+  orderDetailsAnyActionsInProgress,
+  orderManagementThunks,
+} from '@redux/slices/OrderManagement.slice';
 import type { TDefaultProps, TObject } from '@utils/types';
+
+import type { TEditOrderDeadlineFormValues } from '../OrderDeadlineCountdownSection/EditOrderDeadlineForm';
+import EditOrderDeadlineModal from '../OrderDeadlineCountdownSection/EditOrderDeadlineModal';
 
 import css from './OrderTitle.module.scss';
 
@@ -27,6 +36,7 @@ type TOrderTitleProps = TDefaultProps & {
     isGroupOrder: boolean;
     deadlineHour: string;
     deadlineDate: number;
+    startDate: number;
   };
   onConfirmOrder: () => void;
   onCancelOrder: () => void;
@@ -49,6 +59,7 @@ const OrderTitle: React.FC<TOrderTitleProps> = (props) => {
       deadlineDate,
       deadlineHour,
       isGroupOrder = false,
+      startDate,
     },
     onConfirmOrder,
     onCancelOrder,
@@ -60,6 +71,8 @@ const OrderTitle: React.FC<TOrderTitleProps> = (props) => {
     isDraftEditing,
   } = props;
   const intl = useIntl();
+  const dispatch = useAppDispatch();
+  const editDeadlineModalControl = useBoolean();
   const { isMobileLayout } = useViewport();
   const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
 
@@ -75,7 +88,7 @@ const OrderTitle: React.FC<TOrderTitleProps> = (props) => {
   const submitDisabled =
     (!isDraftEditing && !canStartOrder) || inProgress || confirmDisabled;
   const cancelOrderDisabled = cancelDisabled || inProgress;
-
+  const isOverDeadline = isOver(deadlineDate);
   const rootClasses = classNames(rootClassName || css.root, className);
 
   const deliveryInfo = intl.formatMessage(
@@ -104,6 +117,29 @@ const OrderTitle: React.FC<TOrderTitleProps> = (props) => {
   const formattedDeadlineDate = DateTime.fromMillis(deadlineDate).toFormat(
     "HH:mm, dd 'tháng' MM, yyyy",
   );
+
+  const handleSubmitEditDeadline = (values: TEditOrderDeadlineFormValues) => {
+    const {
+      deadlineDate: deadlineDateFromSubmission,
+      deadlineHour: deadlineHourFromSubmission,
+    } = values;
+    const parsedDeadlineDate = DateTime.fromMillis(deadlineDateFromSubmission)
+      .startOf('day')
+      .plus({ ...convertHHmmStringToTimeParts(deadlineHourFromSubmission) })
+      .toMillis();
+
+    const updateData = {
+      deadlineDate: parsedDeadlineDate,
+      deadlineHour: deadlineHourFromSubmission,
+    };
+
+    dispatch(orderManagementThunks.updateOrderGeneralInfo(updateData));
+    editDeadlineModalControl.setFalse();
+  };
+
+  const handleOpenEditDeadlineModal = () => {
+    editDeadlineModalControl.setTrue();
+  };
 
   const actionButtons = (
     <div className={css.actions}>
@@ -185,8 +221,21 @@ const OrderTitle: React.FC<TOrderTitleProps> = (props) => {
                   },
                 )}
               </div>
-              <IconEdit />
+              <RenderWhen condition={!isOverDeadline}>
+                <IconEdit onClick={handleOpenEditDeadlineModal} />
+              </RenderWhen>
             </div>
+
+            <EditOrderDeadlineModal
+              data={{
+                orderDeadline: deadlineDate,
+                orderStartDate: startDate,
+                orderDeadlineHour: deadlineHour,
+              }}
+              isOpen={editDeadlineModalControl.value}
+              onClose={editDeadlineModalControl.setFalse}
+              onSubmit={handleSubmitEditDeadline}
+            />
           </RenderWhen>
           {actionButtons}
         </MobileBottomContainer>
