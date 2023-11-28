@@ -46,6 +46,7 @@ type TOrderTitleProps = TDefaultProps & {
   confirmDisabled?: boolean;
   confirmInProgress?: boolean;
   isDraftEditing: boolean;
+  shouldHideBottomContainer?: boolean;
 };
 
 const OrderTitle: React.FC<TOrderTitleProps> = (props) => {
@@ -69,6 +70,7 @@ const OrderTitle: React.FC<TOrderTitleProps> = (props) => {
     confirmDisabled,
     confirmInProgress,
     isDraftEditing,
+    shouldHideBottomContainer = false,
   } = props;
   const intl = useIntl();
   const dispatch = useAppDispatch();
@@ -205,40 +207,42 @@ const OrderTitle: React.FC<TOrderTitleProps> = (props) => {
         <Badge label={deliveryInfo} />
       </div>
       <RenderWhen condition={isMobileLayout}>
-        <MobileBottomContainer className={css.mobileActionContainer}>
-          <RenderWhen condition={isGroupOrder}>
-            <div className={css.timeLeft}>{timeLeftText}</div>
-            <div className={css.orderEndAt}>
-              <div>
-                {intl.formatMessage(
-                  { id: 'EditView.OrderTitle.orderEndAt' },
-                  {
-                    deadline: (
-                      <span className={css.orderEndAtTime}>
-                        {formattedDeadlineDate}
-                      </span>
-                    ),
-                  },
-                )}
+        <RenderWhen condition={!shouldHideBottomContainer}>
+          <MobileBottomContainer className={css.mobileActionContainer}>
+            <RenderWhen condition={isGroupOrder}>
+              <div className={css.timeLeft}>{timeLeftText}</div>
+              <div className={css.orderEndAt}>
+                <div>
+                  {intl.formatMessage(
+                    { id: 'EditView.OrderTitle.orderEndAt' },
+                    {
+                      deadline: (
+                        <span className={css.orderEndAtTime}>
+                          {formattedDeadlineDate}
+                        </span>
+                      ),
+                    },
+                  )}
+                </div>
+                <RenderWhen condition={!isOverDeadline}>
+                  <IconEdit onClick={handleOpenEditDeadlineModal} />
+                </RenderWhen>
               </div>
-              <RenderWhen condition={!isOverDeadline}>
-                <IconEdit onClick={handleOpenEditDeadlineModal} />
-              </RenderWhen>
-            </div>
 
-            <EditOrderDeadlineModal
-              data={{
-                orderDeadline: deadlineDate,
-                orderStartDate: startDate,
-                orderDeadlineHour: deadlineHour,
-              }}
-              isOpen={editDeadlineModalControl.value}
-              onClose={editDeadlineModalControl.setFalse}
-              onSubmit={handleSubmitEditDeadline}
-            />
-          </RenderWhen>
-          {actionButtons}
-        </MobileBottomContainer>
+              <EditOrderDeadlineModal
+                data={{
+                  orderDeadline: deadlineDate,
+                  orderStartDate: startDate,
+                  orderDeadlineHour: deadlineHour,
+                }}
+                isOpen={editDeadlineModalControl.value}
+                onClose={editDeadlineModalControl.setFalse}
+                onSubmit={handleSubmitEditDeadline}
+              />
+            </RenderWhen>
+            {actionButtons}
+          </MobileBottomContainer>
+        </RenderWhen>
 
         <RenderWhen.False>{actionButtons}</RenderWhen.False>
       </RenderWhen>

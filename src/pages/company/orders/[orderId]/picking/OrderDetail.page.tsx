@@ -13,6 +13,7 @@ import GoHomeIcon from '@components/OrderDetails/EditView/GoHomeIcon/GoHomeIcon'
 import ManageLineItemsSection from '@components/OrderDetails/EditView/ManageOrderDetailSection/ManageLineItemsSection';
 import ManageOrdersSection from '@components/OrderDetails/EditView/ManageOrderDetailSection/ManageOrdersSection';
 import ManageParticipantsSection from '@components/OrderDetails/EditView/ManageParticipantsSection/ManageParticipantsSection';
+import MoreOptionsIcon from '@components/OrderDetails/EditView/MoreOptionsIcon/MoreOptionsIcon';
 import OrderDeadlineCountdownSection from '@components/OrderDetails/EditView/OrderDeadlineCountdownSection/OrderDeadlineCountdownSection';
 import OrderLinkSection from '@components/OrderDetails/EditView/OrderLinkSection/OrderLinkSection';
 import OrderTitle from '@components/OrderDetails/EditView/OrderTitle/OrderTitle';
@@ -185,6 +186,7 @@ const OrderDetailPage = () => {
   const [showReachMaxAllowedChangesModal, setShowReachMaxAllowedChangesModal] =
     useState<'reach_max' | 'reach_min' | null>(null);
   const confirmGoHomeControl = useBoolean();
+  const moreOptionsModalControl = useBoolean();
   const { handler: onDownloadReviewOrderResults } = useExportOrderDetails();
   const currentUser = useAppSelector((state) => state.user.currentUser);
   const cancelPickingOrderInProgress = useAppSelector(
@@ -216,6 +218,7 @@ const OrderDetailPage = () => {
     orderVATPercentage,
   } = Listing(orderData as TListing).getMetadata();
 
+  const isAnyMobileModalOpening = moreOptionsModalControl.value;
   const isNormalOrder = orderType === EOrderType.normal;
   const isPickingOrder = orderState === EOrderStates.picking;
   const isDraftEditing = orderState === EOrderStates.inProgress;
@@ -437,6 +440,7 @@ const OrderDetailPage = () => {
             (!isPickingOrder && orderDetailsNotChanged)
           }
           isDraftEditing={isDraftEditing}
+          shouldHideBottomContainer={isAnyMobileModalOpening}
         />
         <RenderWhen condition={!isNormalOrder}>
           <div className={css.leftPart}>
@@ -647,6 +651,17 @@ const OrderDetailPage = () => {
     }
   }, [isMobileLayout, isViewCartDetailMode]);
 
+  const goHomeIcon = <GoHomeIcon control={confirmGoHomeControl} />;
+  const moreOptionsIcon = (
+    <MoreOptionsIcon
+      control={moreOptionsModalControl}
+      options={[
+        { content: 'Danh sách thành viên', onClick: () => {} },
+        { content: 'Chia sẻ liên kết đặt hàng', onClick: () => {} },
+        { content: 'Kết quả chọn món', onClick: () => {} },
+      ]}
+    />
+  );
   let content = null;
   const stepperProps = {
     steps: BOOKER_CREATE_GROUP_ORDER_STEPS,
@@ -663,7 +678,10 @@ const OrderDetailPage = () => {
       ? handleGoBackFromViewCartDetailMode
       : handleGoBackFromReviewMode,
     actionPart: isEditViewMode ? (
-      <GoHomeIcon control={confirmGoHomeControl} />
+      <div className={css.mobileTopActionPart}>
+        {goHomeIcon}
+        <RenderWhen condition={!isNormalOrder}>{moreOptionsIcon}</RenderWhen>
+      </div>
     ) : null,
   };
 
@@ -687,6 +705,7 @@ const OrderDetailPage = () => {
   return (
     <>
       <MobileTopContainer {...mobileTopContainerProps} />
+
       {content}
     </>
   );
