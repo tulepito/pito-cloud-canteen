@@ -6,6 +6,7 @@ import Badge from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import AlertModal from '@components/Modal/AlertModal';
+import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
@@ -62,9 +63,19 @@ const ParticipantInvitation: React.FC<TParticipantInvitationProps> = ({
     values: DeadlineDateTimeFormValues,
   ) => {
     if (!isEqual(deadlineDateTimeInitialValues, values)) {
+      // eslint-disable-next-line @typescript-eslint/no-shadow
+      const { deadlineDate, deadlineHour } = values;
       await dispatch(
         orderAsyncActions.updateOrder({
-          generalInfo: values,
+          generalInfo: {
+            deadlineDate: DateTime.fromMillis(Number(deadlineDate))
+              .startOf('day')
+              .plus({
+                ...convertHHmmStringToTimeParts(deadlineHour),
+              })
+              .toMillis(),
+            deadlineHour,
+          },
         }),
       );
     }
