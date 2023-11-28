@@ -1,6 +1,11 @@
 @use '/src/styles/mixins.scss' as *;
 @use '/src/styles/defaults.scss' as *;
 @use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.root {
+  @include bookerSidebarFormRoot;
+}
 
 .fieldGroups {
   margin-bottom: 18px;

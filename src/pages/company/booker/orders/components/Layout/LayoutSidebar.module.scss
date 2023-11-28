@@ -25,11 +25,11 @@
 .collapse {
   display: flex;
   flex-direction: column;
-  flex-basis: 280px;
+  flex-basis: 100vw;
   left: 0;
   border-right: 1px solid $neutralGray5;
   background-color: $neutralGray1;
-  height: calc(100vh - 65px);
+  height: 100vh;
 
   @include viewportLargeWithPaddings {
     height: auto;
@@ -39,11 +39,11 @@
 }
 
 .header {
-  display: flex;
-  justify-content: space-between;
-  padding: 28px 18px 0;
+  display: none;
 
   @include viewportLargeWithPaddings {
+    display: flex;
+    justify-content: space-between;
     padding: 28px 28px 0;
   }
 }
@@ -57,9 +57,14 @@
 }
 
 .menuIcon {
-  cursor: pointer;
-  width: 24px;
-  height: 24px;
+  display: none;
+
+  @include viewportLarge {
+    display: block;
+    cursor: pointer;
+    width: 24px;
+    height: 24px;
+  }
 }
 
 .logo {
@@ -105,11 +110,12 @@
   left: 0px;
   transition: linear 0.2s;
   width: 100%;
-  width: 280px;
+  width: 100vw;
   left: -280px;
 
-  @include viewportLargeWithPaddings {
+  @include viewportLarge {
     left: 0px;
+    width: 279px; // 280px - 1px border
   }
 }
 

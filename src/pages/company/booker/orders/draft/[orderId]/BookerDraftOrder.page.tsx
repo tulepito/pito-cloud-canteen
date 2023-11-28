@@ -237,6 +237,11 @@ function BookerDraftOrderPage() {
     setCollapse(!collapse);
   }, [collapse]);
 
+  const handleCloseSideBar = useCallback(() => {
+    console.log('zz');
+    setCollapse(false);
+  }, [collapse]);
+
   const handleRemoveMeal = useCallback(
     (id: string) => (resourceId: string) => {
       dispatch(
@@ -384,11 +389,14 @@ function BookerDraftOrderPage() {
       <RenderWhen condition={isSetupMode}>
         <Layout className={css.root}>
           <LayoutSidebar
-            className={css.sideBarContainer}
             logo={<span></span>}
             collapse={collapse}
             onCollapse={handleCollapse}>
-            <SidebarContent order={order} companyAccount={companyAccount} />
+            <SidebarContent
+              order={order}
+              companyAccount={companyAccount}
+              onCloseSideBar={handleCloseSideBar}
+            />
           </LayoutSidebar>
           <LayoutMain className={css.mainContainer}>
             <div className={css.header}>
@@ -398,7 +406,9 @@ function BookerDraftOrderPage() {
                   className={css.actionIcon}
                   onClick={homeReturnModalController.setTrue}
                 />
-                <IconSetting variant="black" className={css.actionIcon} />
+                <div className={css.actionIcon} onClick={handleCollapse}>
+                  <IconSetting variant="black" />
+                </div>
               </div>
             </div>
             <Stepper steps={BOOKER_CREATE_GROUP_ORDER_STEPS} currentStep={1} />

@@ -1,9 +1,21 @@
+@use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
 .submitBtn {
   margin: 32px auto 16px;
-  width: 400px;
+  width: 100%;
+
+  @include viewportLarge {
+    width: 400px;
+  }
 }
 
 .cancelBtn {
   margin: 0 auto;
-  width: 400px;
+  display: none;
+
+  @include viewportLarge {
+    width: 400px;
+  }
 }

@@ -2,6 +2,10 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/defaults.scss' as *;
 
+.root {
+  @include bookerSidebarFormRoot;
+}
+
 .fieldGroups {
   margin-bottom: 24px;
 }

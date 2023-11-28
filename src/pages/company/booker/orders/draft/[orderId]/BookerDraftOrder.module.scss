@@ -3,16 +3,9 @@
 @use '/src/styles/vars.scss' as *;
 
 .root {
-  .sideBarContainer {
-    display: none;
-
-    @include viewportLarge {
-      display: block;
-    }
-  }
-
   .mainContainer {
     width: 100%;
+    padding-bottom: 104px;
   }
 
   .header {

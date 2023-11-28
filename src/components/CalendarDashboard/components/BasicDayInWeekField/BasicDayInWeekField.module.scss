@@ -8,9 +8,15 @@
 }
 
 .fieldGroups {
-  @include flexAlign(center);
+  @include flexAlign(center, center);
   gap: 12px;
-  margin-top: 16px;
+  margin: 16px auto 0;
+  width: 80%;
+  flex-wrap: wrap;
+
+  @include viewportLarge {
+    flex-wrap: nowrap;
+  }
 }
 
 .dayItem {
