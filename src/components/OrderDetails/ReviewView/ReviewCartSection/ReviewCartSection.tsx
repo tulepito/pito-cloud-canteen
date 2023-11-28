@@ -199,7 +199,7 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
           </div>
         </Button>
       </RenderWhen>
-      <RenderWhen condition={shouldShowGoHomeButton}>
+      <RenderWhen condition={shouldShowGoHomeButton && !isViewCartDetailMode}>
         <Button className={css.goHomeButton} onClick={handleGoHome}>
           <div>Về trang chủ</div>
         </Button>

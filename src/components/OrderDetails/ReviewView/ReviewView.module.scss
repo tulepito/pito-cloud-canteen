@@ -69,10 +69,10 @@
   }
 
   .rightPart {
-    order: 3;
-
+    order: 2;
+    height: 0;
     @include viewportMedium {
-      order: 2;
+      height: fit-content;
     }
 
     .container {
