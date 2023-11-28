@@ -6,10 +6,14 @@ import isEmpty from 'lodash/isEmpty';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 
+import Badge, { EBadgeType } from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
 import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
 import MealPlanCard from '@components/CalendarDashboard/components/MealPlanCard/MealPlanCard';
+import IconHome from '@components/Icons/IconHome/IconHome';
+import IconSetting from '@components/Icons/IconSetting/IconSetting';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
+import Stepper from '@components/Stepper/Stepper';
 import {
   findSuitableStartDate,
   getParticipantPickingLink,
@@ -18,10 +22,12 @@ import {
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import useRestaurantDetailModal from '@hooks/useRestaurantDetailModal';
+import { useViewport } from '@hooks/useViewport';
 import { OrderListThunks } from '@pages/participant/orders/OrderList.slice';
 import { addWorkspaceCompanyId } from '@redux/slices/company.slice';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
 import { currentUserSelector } from '@redux/slices/user.slice';
+import { BOOKER_CREATE_GROUP_ORDER_STEPS } from '@src/constants/stepperSteps';
 import { companyPaths } from '@src/paths';
 import { formatTimestamp } from '@src/utils/dates';
 import Gleap from '@src/utils/gleap';
@@ -77,6 +83,7 @@ function BookerDraftOrderPage() {
   const [currentViewMode, setCurrViewMode] =
     useState<EBookerDraftOrderViewMode>(EBookerDraftOrderViewMode.setup);
   const dispatch = useAppDispatch();
+  const { isTabletLayoutOrLarger } = useViewport();
   const currentUser = useAppSelector(currentUserSelector);
   // * Walkthrough
   const currentUserGetter = User(currentUser);
@@ -131,6 +138,7 @@ function BookerDraftOrderPage() {
   } = useRestaurantDetailModal();
 
   const isSetupMode = currentViewMode === EBookerDraftOrderViewMode.setup;
+  const orderListing = Listing(order as TListing);
   const {
     orderState,
     plans = [],
@@ -140,7 +148,8 @@ function BookerDraftOrderPage() {
     packagePerMember = 0,
     companyId,
     orderDeadline,
-  } = Listing(order as TListing).getMetadata();
+  } = orderListing.getMetadata();
+  const { title: orderTitle } = orderListing.getAttributes();
   const planId = plans.length > 0 ? plans[0] : undefined;
   const isGroupOrder = orderType === EOrderType.group;
 
@@ -239,6 +248,7 @@ function BookerDraftOrderPage() {
     handleFinishOrder: handleFinishOrderClick,
     order,
     shouldHideDayItems: isAllDatesHaveNoRestaurants,
+    shouldHideExtraActionBtn: !isTabletLayoutOrLarger,
   });
 
   const onOpenPickFoodModal = async (
@@ -359,7 +369,24 @@ function BookerDraftOrderPage() {
             onCollapse={handleCollapse}>
             <SidebarContent order={order} companyAccount={companyAccount} />
           </LayoutSidebar>
-          <LayoutMain>
+          <LayoutMain className={css.mainContainer}>
+            <div className={css.header}>
+              <div className={css.title}>Thiết lập menu</div>
+              <div className={css.headerActions}>
+                <IconHome className={css.actionIcon} />
+                <IconSetting variant="black" className={css.actionIcon} />
+              </div>
+            </div>
+            <Stepper steps={BOOKER_CREATE_GROUP_ORDER_STEPS} currentStep={1} />
+            <div className={css.orderTitleWrapper}>
+              <div className={css.title}>Đơn hàng #{orderTitle}</div>
+              <Badge
+                label="Đơn hàng tuần"
+                type={EBadgeType.info}
+                className={css.badge}
+              />
+            </div>
+
             <div className={css.main}>
               <CalendarDashboard
                 className={css.calendar}

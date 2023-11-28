@@ -177,6 +177,7 @@ export const useGetCalendarComponentProps = ({
   handleFinishOrder,
   order,
   shouldHideDayItems = false,
+  shouldHideExtraActionBtn = false,
 }: {
   startDate: Date;
   endDate: Date;
@@ -184,6 +185,7 @@ export const useGetCalendarComponentProps = ({
   handleFinishOrder: () => Promise<void>;
   order: TListing | null;
   shouldHideDayItems: boolean;
+  shouldHideExtraActionBtn?: boolean;
 }) => {
   const router = useRouter();
   const dispatch = useAppDispatch();
@@ -233,6 +235,7 @@ export const useGetCalendarComponentProps = ({
         onFinishOrder={handleFinishOrder}
         onRecommendRestaurantInProgress={onRecommendRestaurantInProgress}
         onRecommendNewRestaurants={onRecommendNewRestaurants}
+        shouldHideExtraActionBtn={shouldHideExtraActionBtn}
       />
     ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
