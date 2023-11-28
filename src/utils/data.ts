@@ -1,3 +1,4 @@
+import get from 'lodash/get';
 import merge from 'lodash/merge';
 import reduce from 'lodash/reduce';
 import uniq from 'lodash/uniq';
@@ -240,7 +241,7 @@ export const ensureOwnListing = (listing: any) => {
   const empty = {
     id: null,
     type: 'ownListing',
-    attributes: { publicData: {} },
+    attributes: { publicData: {}, metadata: {} },
     images: [],
   };
 
@@ -434,35 +435,32 @@ export const entityRefs = (entities: any) =>
 
 export const CurrentUser = (user: TCurrentUser) => {
   const ensuredUser = ensureCurrentUser(user);
-  const id = ensuredUser?.id?.uuid;
-  const attributes = ensuredUser?.attributes;
-  const profile = attributes?.profile || {};
-  const { privateData, publicData, protectedData, metadata } = profile;
+  const { attributes } = ensuredUser;
 
   return {
     getId: () => {
-      return id;
+      return ensuredUser.id?.uuid;
     },
     getFullData: () => {
-      return ensuredUser || {};
+      return ensuredUser;
+    },
+    getAttributes: () => {
+      return attributes;
     },
     getProfile: () => {
-      return profile || {};
+      return attributes.profile;
     },
     getMetadata: (): TObject => {
-      return metadata || {};
+      return get(attributes.profile, 'metadata', {});
     },
     getProtectedData: (): TObject => {
-      return protectedData || {};
+      return get(attributes.profile, 'protectedData', {});
     },
     getPrivateData: (): TObject => {
-      return privateData || {};
+      return get(attributes.profile, 'privateData', {});
     },
     getPublicData: (): TObject => {
-      return publicData || {};
-    },
-    getAttributes: (): TObject => {
-      return attributes || {};
+      return get(attributes.profile, 'publicData', {});
     },
     getProfileImage: () => {
       return ensuredUser?.profileImage || null;
@@ -472,15 +470,11 @@ export const CurrentUser = (user: TCurrentUser) => {
 
 export const User = (user: TUser | TCurrentUser | TCompany) => {
   const ensuredUser = ensureUser(user);
-  const id = ensuredUser?.id?.uuid;
-  const { attributes, profileImage } = ensuredUser;
-  const { profile } = attributes;
-  const { privateData, publicData, protectedData, metadata } =
-    profile as TObject;
+  const { attributes } = ensuredUser;
 
   return {
     getId: () => {
-      return id;
+      return ensuredUser.id?.uuid;
     },
     getFullData: () => {
       return ensuredUser || {};
@@ -489,51 +483,51 @@ export const User = (user: TUser | TCurrentUser | TCompany) => {
       return attributes || {};
     },
     getProfile: () => {
-      return profile || {};
+      return attributes.profile;
     },
     getMetadata: (): TObject => {
-      return metadata || {};
+      return get(attributes.profile, 'metadata', {});
     },
     getProtectedData: (): TObject => {
-      return protectedData || {};
+      return get(attributes.profile, 'protectedData', {});
     },
     getPrivateData: (): TObject => {
-      return privateData || {};
+      return get(attributes.profile, 'privateData', {});
     },
     getPublicData: (): TObject => {
-      return publicData || {};
+      return get(attributes.profile, 'publicData', {});
     },
     getProfileImage: () => {
-      return profileImage || null;
+      return ensuredUser.profileImage || null;
     },
   };
 };
 
 export const Listing = (listing: TListing | null) => {
   const ensuredListing = ensureListing(listing);
-  const id = ensuredListing.id?.uuid;
+  const { attributes } = ensuredListing;
 
   return {
     getId: () => {
-      return id;
+      return ensuredListing.id?.uuid;
     },
     getFullData: () => {
       return ensuredListing;
     },
     getAttributes: () => {
-      return ensuredListing.attributes;
-    },
-    getMetadata: (): TObject => {
-      return ensuredListing.attributes.metadata;
-    },
-    getProtectedData: (): TObject => {
-      return ensuredListing.attributes.protectedData;
-    },
-    getPrivateData: (): TObject => {
-      return ensuredListing.attributes.privateData;
+      return attributes;
     },
     getPublicData: (): TObject => {
-      return ensuredListing.attributes.publicData;
+      return get(attributes, 'publicData');
+    },
+    getMetadata: (): TObject => {
+      return get(attributes, 'metadata');
+    },
+    getProtectedData: (): TObject => {
+      return get(attributes, 'protectedData', {});
+    },
+    getPrivateData: (): TObject => {
+      return get(attributes, 'privateData', {});
     },
     getImages: () => {
       return ensuredListing.images;
@@ -543,62 +537,52 @@ export const Listing = (listing: TListing | null) => {
 
 export const OwnListing = (listing: TOwnListing) => {
   const ensuredListing = ensureOwnListing(listing);
-  const id = ensuredListing?.id?.uuid;
-  const attributes = ensuredListing?.attributes;
-  const { privateData, publicData, protectedData, metadata } = attributes;
+  const { attributes } = ensuredListing;
 
   return {
     getId: () => {
-      return id;
+      return ensuredListing.id?.uuid;
     },
     getFullData: () => {
-      return ensuredListing || {};
+      return ensuredListing;
     },
     getAttributes: () => {
-      return attributes || {};
-    },
-    getMetadata: (): TObject => {
-      return metadata || {};
-    },
-    getProtectedData: (): TObject => {
-      return protectedData || {};
-    },
-    getPrivateData: (): TObject => {
-      return privateData || {};
+      return attributes;
     },
     getPublicData: (): TObject => {
-      return publicData || {};
+      return get(attributes, 'publicData');
+    },
+    getMetadata: (): TObject => {
+      return get(attributes, 'metadata');
+    },
+    getProtectedData: (): TObject => {
+      return get(attributes, 'protectedData', {});
+    },
+    getPrivateData: (): TObject => {
+      return get(attributes, 'privateData', {});
     },
   };
 };
 
 export const Transaction = (transaction: TTransaction) => {
   const ensuredTransaction = ensureTransaction(transaction);
-  const id = ensuredTransaction?.id?.uuid;
-  const attributes = ensuredTransaction?.attributes;
-  const { privateData, publicData, protectedData, metadata } = attributes || {};
+  const { attributes } = ensuredTransaction;
 
   return {
     getId: () => {
-      return id;
+      return ensuredTransaction.id?.uuid;
     },
     getFullData: () => {
-      return ensuredTransaction || {};
+      return ensuredTransaction;
     },
     getAttributes: () => {
-      return attributes || {};
-    },
-    getMetadata: (): TObject => {
-      return metadata || {};
+      return attributes;
     },
     getProtectedData: (): TObject => {
-      return protectedData || {};
+      return get(attributes, 'protectedData', {});
     },
-    getPrivateData: (): TObject => {
-      return privateData || {};
-    },
-    getPublicData: (): TObject => {
-      return publicData || {};
+    getMetadata: (): TObject => {
+      return get(attributes, 'metadata', {});
     },
   };
 };
@@ -643,31 +627,29 @@ export const IntegrationListing = (
   listing: TIntegrationListing | undefined | null,
 ) => {
   const ensuredListing = ensureListing(listing);
-  const id = ensuredListing?.id?.uuid;
-  const attributes = ensuredListing?.attributes;
-  const { privateData, publicData, protectedData, metadata } = attributes || {};
+  const { attributes } = ensuredListing;
 
   return {
     getId: () => {
-      return id;
+      return ensuredListing.id?.uuid;
     },
     getFullData: () => {
-      return ensuredListing || {};
+      return ensuredListing;
     },
     getAttributes: () => {
-      return attributes || {};
+      return attributes;
     },
-    getMetadata: () => {
-      return metadata || {};
+    getPublicData: (): TObject => {
+      return get(attributes, 'publicData');
     },
-    getProtectedData: () => {
-      return protectedData || {};
+    getMetadata: (): TObject => {
+      return get(attributes, 'metadata');
     },
-    getPrivateData: () => {
-      return privateData || {};
+    getProtectedData: (): TObject => {
+      return get(attributes, 'protectedData', {});
     },
-    getPublicData: () => {
-      return publicData || {};
+    getPrivateData: (): TObject => {
+      return get(attributes, 'privateData', {});
     },
   };
 };
@@ -676,8 +658,8 @@ export const IntegrationMenuListing = (
   listing: TIntegrationListing | undefined | null,
 ) => {
   const ensuredListing = ensureListing(listing);
-  const attributes = ensuredListing?.attributes;
-  const { metadata = {} } = attributes || {};
+  const { attributes } = ensuredListing;
+  const { metadata } = attributes;
 
   const {
     monFoodIdList = [],

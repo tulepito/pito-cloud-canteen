@@ -106,8 +106,8 @@ const GroupDetailPage = () => {
               name: `${member.attributes.profile?.lastName || ''} ${
                 member.attributes.profile?.firstName || ''
               }`,
-              email: User(member).getAttributes()?.email,
-              group: getGroupNames(User(member).getMetadata()?.groupList || []),
+              email: User(member).getAttributes().email,
+              group: getGroupNames(User(member).getMetadata().groupList || []),
               allergy: User(member)
                 .getPublicData()
                 ?.allergies?.map((allergy: string) =>

@@ -210,8 +210,8 @@ const searchRestaurants = createAsyncThunk(
     await dispatch(orderAsyncActions.fetchOrder(orderId!));
     const { order } = getState().Order;
 
-    const orderListing = Listing(order);
-    const { deliveryAddress = {} } = orderListing.getMetadata();
+    const { deliveryAddress = {} } = Listing(order).getMetadata();
+
     if (!deliveryAddress || !deliveryAddress.origin) {
       return {
         restaurantIdList: [],

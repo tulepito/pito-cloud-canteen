@@ -11,6 +11,7 @@ import Button from '@components/Button/Button';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import IconArrowFull from '@components/Icons/IconArrow/IconArrowFull';
 import ParticipantLayout from '@components/ParticipantLayout/ParticipantLayout';
+import { prepareOrderDeadline } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { UIActions } from '@redux/slices/UI.slice';
@@ -35,6 +36,7 @@ const ParticipantPlan = () => {
   const intl = useIntl();
   const infoSectionController = useBoolean();
   const dispatch = useAppDispatch();
+  const [diffTime, setDiffTime] = useState<Duration | null>(null);
   // Router
   const router = useRouter();
   const isRouterReady = router.isReady;
@@ -58,19 +60,20 @@ const ParticipantPlan = () => {
     (cartKey) => !!cartList[Number(cartKey)],
   );
 
-  const { deadlineDate = Date.now(), orderType = EOrderType.group } =
-    Listing(order).getMetadata();
-  const [diffTime, setDiffTime] = useState<Duration | null>(null);
-
+  const {
+    deadlineDate = Date.now(),
+    deadlineHour,
+    orderType = EOrderType.group,
+  } = Listing(order).getMetadata();
   const isGroupOrder = orderType === EOrderType.group;
 
-  const formattedTimeLeft =
-    diffTime === null
-      ? DateTime.fromMillis(deadlineDate)
-          .diffNow()
-          .toFormat("d'd':h'h':mm'm':ss's'")
-      : (diffTime! as Duration).toFormat("d'd':h'h':mm'm':ss's'");
+  const orderDeadline = prepareOrderDeadline(deadlineDate, deadlineHour);
 
+  const formattedTimeLeft = (
+    diffTime === null
+      ? DateTime.fromMillis(deadlineDate).diffNow()
+      : (diffTime! as Duration)
+  ).toFormat("d'd':h'h':mm'm':ss's'");
   const formattedDeadlineDate = DateTime.fromMillis(deadlineDate).toFormat(
     "HH:mm, dd 'tháng' MM, yyyy",
   );
@@ -178,7 +181,7 @@ const ParticipantPlan = () => {
           />
         </div>
         <div className={css.rightSection}>
-          <SectionCountdown orderDeadline={deadlineDate} />
+          <SectionCountdown orderDeadline={orderDeadline} />
           <SectionOrderPanel planId={`${planId}`} orderId={orderId} />
         </div>
         <div className={css.summarySection}>
@@ -223,7 +226,7 @@ const ParticipantPlan = () => {
             <IconArrowFull />
             <FormattedMessage id="ParticipantPlan.goBackText" />
           </Button>
-          <SectionCountdown orderDeadline={deadlineDate} />
+          <SectionCountdown orderDeadline={orderDeadline} />
           <SectionOrderPanel planId={`${planId}`} orderId={orderId} />
         </div>
       </div>

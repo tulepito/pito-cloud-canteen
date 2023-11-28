@@ -41,27 +41,23 @@ const ResultList: React.FC<TResultListProps> = ({
   groupRestaurantInFoods,
 }) => {
   const router = useRouter();
+  const dispatch = useAppDispatch();
   const { timestamp: queryTs, restaurantId, orderId, menuId } = router.query;
   const timestamp = +`${queryTs}`;
 
-  const orderListing = Listing(order!);
-  const { packagePerMember = 0 } = orderListing.getMetadata();
+  const { packagePerMember = 0 } = Listing(order!).getMetadata();
 
   const [selectedRestaurantId, setSelectedRestaurantId] = useState<
     string | undefined
   >(`${restaurantId}`);
   const detailModal = useBoolean(!!restaurantId);
-
   const restaurantFood = useAppSelector(
     (state) => state.BookerSelectRestaurant.restaurantFood,
     shallowEqual,
   );
-
   const fetchRestaurantFoodInProgress = useAppSelector(
     (state) => state.BookerSelectRestaurant.fetchRestaurantFoodInProgress,
   );
-
-  const dispatch = useAppDispatch();
 
   const onRestaurantClick = (id: string) => {
     detailModal.setTrue();

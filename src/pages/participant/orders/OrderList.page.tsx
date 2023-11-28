@@ -20,7 +20,7 @@ import ParticipantLayout from '@components/ParticipantLayout/ParticipantLayout';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import Tabs from '@components/Tabs/Tabs';
 import { getItem, setItem } from '@helpers/localStorageHelpers';
-import { isOver } from '@helpers/orderHelper';
+import { isOver, prepareDaySession } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { useViewport } from '@hooks/useViewport';
@@ -28,7 +28,6 @@ import { CalendarActions } from '@redux/slices/Calendar.slice';
 import { participantPaths } from '@src/paths';
 import { CurrentUser, Listing, User } from '@src/utils/data';
 import {
-  getDaySessionFromDeliveryTime,
   getEndDayOfWeek,
   getEndOfMonth,
   getNextMonth,
@@ -40,8 +39,11 @@ import {
   isSameDate,
 } from '@src/utils/dates';
 import { EOrderStates, EParticipantOrderStatus } from '@src/utils/enums';
-import { ETransition } from '@src/utils/transaction';
-import type { TListing, TObject, TUser } from '@src/utils/types';
+import {
+  ETransition,
+  TRANSITIONS_TO_STATE_CANCELED,
+} from '@src/utils/transaction';
+import type { TListing, TUser } from '@src/utils/types';
 
 import ParticipantToolbar from '../components/ParticipantToolbar/ParticipantToolbar';
 
@@ -208,7 +210,7 @@ const OrderListPage = () => {
     ) as TListing;
     const orderId = mappingSubOrderToOrder[planId];
     const order = orders?.find((_order) => Listing(_order).getId() === orderId);
-    const orderListing = Listing(order);
+    const orderGetter = Listing(order);
     const {
       deliveryHour,
       deadlineDate,
@@ -216,32 +218,32 @@ const OrderListPage = () => {
       orderState,
       companyName = 'PCC',
       daySession,
-    } = orderListing.getMetadata();
-    const { title: orderTitle } = orderListing.getAttributes();
+    } = orderGetter.getMetadata();
+    const { title: orderTitle } = orderGetter.getAttributes();
     const isOrderCanceled =
       orderState === EOrderStates.canceled ||
       orderState === EOrderStates.canceledByBooker;
-    const currentPlanListing = Listing(currentPlan);
 
-    const { orderDetail = {} } = currentPlanListing.getMetadata();
+    const { orderDetail = {} } = Listing(currentPlan).getMetadata();
     const listEvent: Event[] = [];
 
     Object.keys(orderDetail).forEach((planItemKey: string) => {
-      const planItem = orderDetail[planItemKey];
-      const { lastTransition } = planItem;
-      const { foodList = {}, restaurantName, id } = planItem.restaurant;
-      const restaurant = restaurants?.find(
+      const {
+        lastTransition,
+        memberOrders = {},
+        restaurant = {},
+      } = orderDetail[planItemKey] || {};
+      const { foodList = {}, restaurantName, id } = restaurant;
+      const restaurantListing = restaurants?.find(
         (_restaurant) => Listing(_restaurant).getId() === id,
       );
-      const restaurantListing = Listing(restaurant!);
+      const restaurantGetter = Listing(restaurantListing!);
       const dishes = Object.keys(foodList).map((foodId: string) => ({
         key: foodId,
         value: foodList[foodId].foodName,
       }));
-      const foodSelection =
-        currentPlanListing.getMetadata().orderDetail[planItemKey].memberOrders[
-          currentUserId
-        ] || {};
+
+      const foodSelection = memberOrders[currentUserId] || {};
       const expiredTime = deadlineDate
         ? DateTime.fromMillis(+deadlineDate)
         : DateTime.fromMillis(+planItemKey).minus({ day: 2 });
@@ -256,15 +258,14 @@ const OrderListPage = () => {
         : foodSelection?.status;
 
       const isSubOrderNotAbleToEdit = [
-        ETransition.OPERATOR_CANCEL_PLAN,
+        ...TRANSITIONS_TO_STATE_CANCELED,
         ETransition.START_DELIVERY,
         ETransition.COMPLETE_DELIVERY,
       ].includes(lastTransition);
 
       const isOrderAlreadyInProgress =
         orderStateHistory.findIndex(
-          (_state: { state: string; updatedAt: number }) =>
-            _state.state === EOrderStates.inProgress,
+          ({ state }: { state: string }) => state === EOrderStates.inProgress,
         ) !== -1;
 
       const pickedFoodDetail = alreadyPickFood
@@ -278,17 +279,10 @@ const OrderListPage = () => {
           subOrderId: planId,
           orderId,
           planId,
-          daySession:
-            daySession ||
-            getDaySessionFromDeliveryTime(
-              deliveryHour.includes('-')
-                ? deliveryHour.split('-')[0]
-                : deliveryHour,
-            ),
+          daySession: prepareDaySession(daySession, deliveryHour),
           status: pickFoodStatus,
           type: 'dailyMeal',
-          restaurantAddress:
-            restaurantListing.getPublicData().location?.address,
+          restaurantAddress: restaurantGetter.getPublicData().location?.address,
           restaurant: {
             name: restaurantName,
             id,
@@ -298,10 +292,7 @@ const OrderListPage = () => {
           },
           deadlineDate,
           companyName,
-          isOrderStarted:
-            orderStateHistory.findIndex(
-              (history: TObject) => history.state === EOrderStates.inProgress,
-            ) !== -1,
+          isOrderStarted: isOrderAlreadyInProgress,
           orderColor: colorOrderMap[orderId],
           expiredTime: expiredTime.toMillis(),
           deliveryHour,
@@ -589,29 +580,27 @@ const OrderListPage = () => {
         ))}
       </div>
       <RenderWhen condition={walkthroughEnable}>
-        <>
-          <WelcomeModal
-            isOpen={welcomeModalControl.value}
-            onClose={welcomeModalControl.setFalse}
-            openUpdateProfileModal={openUpdateProfileModal}
-          />
-          <UpdateProfileModal
-            isOpen={updateProfileModalControl.value}
-            onClose={() => {}}
-            currentUser={currentUser!}
-            handleCloseWalkThrough={handleCloseWalkThrough}
-            handleOnBoardingModalOpen={handleOnBoardingModalOpen}
-          />
-          <OnboardingOrderModal
-            isOpen={onBoardingModal.value}
-            onClose={onBoardingModal.setFalse}
-            isDuringTour={tourControl.value}
-          />
-          <OnboardingTour
-            isTourOpen={tourControl.value}
-            closeTour={handleCloseWalkThrough}
-          />
-        </>
+        <WelcomeModal
+          isOpen={welcomeModalControl.value}
+          onClose={welcomeModalControl.setFalse}
+          openUpdateProfileModal={openUpdateProfileModal}
+        />
+        <UpdateProfileModal
+          isOpen={updateProfileModalControl.value}
+          onClose={() => {}}
+          currentUser={currentUser!}
+          handleCloseWalkThrough={handleCloseWalkThrough}
+          handleOnBoardingModalOpen={handleOnBoardingModalOpen}
+        />
+        <OnboardingOrderModal
+          isOpen={onBoardingModal.value}
+          onClose={onBoardingModal.setFalse}
+          isDuringTour={tourControl.value}
+        />
+        <OnboardingTour
+          isTourOpen={tourControl.value}
+          closeTour={handleCloseWalkThrough}
+        />
       </RenderWhen>
       <RenderWhen condition={!!selectedEvent}>
         <div className={css.subOrderDetailModal}>
@@ -665,7 +654,7 @@ const OrderListPage = () => {
             user={company as TUser}
             disableProfileLink
           />
-          <span>{User(company as TUser).getPublicData()?.companyName}</span>
+          <span>{User(company as TUser).getPublicData().companyName}</span>
         </div>
       ),
       childrenFn: () => orderListPageContent,

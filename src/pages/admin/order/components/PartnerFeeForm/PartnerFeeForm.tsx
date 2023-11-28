@@ -56,7 +56,7 @@ const PartnerFeeFormComponent: React.FC<TPartnerFeeFormComponentProps> = (
         return (
           <div className={css.feeRow} key={Listing(restaurant).getId()}>
             <div className={css.feeLabel}>
-              {Listing(restaurant).getAttributes()?.title}
+              {Listing(restaurant).getAttributes().title}
             </div>
             <FieldTextInput
               id={`partnerFee-${restaurantListing.getId()}`}
