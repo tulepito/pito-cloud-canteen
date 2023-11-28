@@ -177,6 +177,7 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
           items={items}
           onChange={handleDateTabChange}
           showNavigation
+          shouldShowNavigatorBorder
           middleLabel
           defaultActiveKey={`${
             (defaultActiveKey < 0 ? 0 : defaultActiveKey) + 1
