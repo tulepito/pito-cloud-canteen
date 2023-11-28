@@ -48,6 +48,7 @@
 }
 
 .subtitle {
+  font-size: 12px;
   margin-top: 8px;
 
   @include viewportMedium {
@@ -56,8 +57,11 @@
 
   .contactNumber,
   .chatLink {
-    font-weight: 700;
     color: $labelBlue2;
+
+    @include viewportMedium {
+      font-weight: 700;
+    }
   }
 }
 

@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 import MobileTopContainer from '@components/MobileTopContainer/MobileTopContainer';
 import ReviewView from '@components/OrderDetails/ReviewView/ReviewView';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { useDownloadPriceQuotation } from '@hooks/useDownloadPriceQuotation';
 import useExportOrderDetails from '@hooks/useExportOrderDetails';
@@ -70,12 +71,14 @@ const CompanyOrderDetailPage: React.FC<TCompanyOrderDetailPageProps> = () => {
     <>
       <MobileTopContainer {...mobileTopContainerProps} />
       <div className={css.root}>
-        <TitleSection
-          className={css.titleSection}
-          orderTitle={orderTitle}
-          canReview={canReview}
-          goToReviewPage={goToReviewPage}
-        />
+        <RenderWhen condition={!isViewCartDetailMode}>
+          <TitleSection
+            className={css.titleSection}
+            orderTitle={orderTitle}
+            canReview={canReview}
+            goToReviewPage={goToReviewPage}
+          />
+        </RenderWhen>
         <ReviewView
           className={css.reviewInfoContainer}
           onDownloadPriceQuotation={handleDownloadPriceQuotation}

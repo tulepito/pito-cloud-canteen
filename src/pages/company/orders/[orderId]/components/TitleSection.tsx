@@ -44,11 +44,11 @@ const TitleSection: React.FC<TTitleSectionProps> = ({
   );
 
   const contactNumber = (
-    <b className={css.contactNumber}>
+    <span className={css.contactNumber}>
       {intl.formatMessage({
         id: 'CompanyOrderDetailPage.titleSection.contactNumber',
       })}
-    </b>
+    </span>
   );
   const chatLink = (
     <span className={css.chatLink}>
