@@ -5,11 +5,14 @@
 @mixin tableColumnsLayout {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: baseline;
   flex-direction: row;
   column-gap: 2%;
   flex-wrap: nowrap;
-  padding: 12px;
+  padding: 8px 12px;
+  @include viewportMedium {
+    padding: 12px;
+  }
 
   & > div {
     word-break: break-word;
@@ -91,7 +94,7 @@
   .tableHead {
     color: $neutralGray7;
     background-color: $neutralGray4;
-    @include textTemplate(14px, 700, 20px);
+    @include textTemplate(14px, 600, 20px);
     @include tableColumnsLayout;
 
     @include viewportMedium {
@@ -145,6 +148,7 @@
           cursor: pointer;
           display: flex;
           justify-content: flex-end;
+          align-self: flex-start;
 
           svg {
             rotate: 0deg;
