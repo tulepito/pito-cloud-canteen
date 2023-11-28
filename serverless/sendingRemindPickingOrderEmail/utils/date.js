@@ -29,6 +29,7 @@ const formatTimestamp = (
 };
 
 module.exports = {
+  VNTimezone,
   calculateRemainTime,
   formatTimestamp,
 };

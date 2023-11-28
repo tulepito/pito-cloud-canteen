@@ -530,7 +530,7 @@ export type TTableSortValue = {
   type: 'asc' | 'desc';
 };
 
-export type TOrderStateHistory = {
+export type TOrderStateHistoryItem = {
   state: EOrderStates | EOrderDraftStates | EBookerOrderDraftStates;
   updatedAt: number;
 };

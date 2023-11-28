@@ -79,9 +79,7 @@ const PaymentRecordTable: React.FC<PaymentRecordTableProps> = (props) => {
 
   const formattedTableData = tableData.map((record) => ({
     key: record.id,
-    data: {
-      ...record,
-    },
+    data: record,
   }));
 
   const handleDeletePaymentRecord = async () => {

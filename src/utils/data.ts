@@ -224,7 +224,7 @@ export const ensureListing = (listing: any) => {
   const empty = {
     id: null,
     type: 'listing',
-    attributes: { publicData: {} },
+    attributes: { publicData: {}, metadata: {} },
     images: [],
   };
 
@@ -511,35 +511,32 @@ export const User = (user: TUser | TCurrentUser | TCompany) => {
 
 export const Listing = (listing: TListing | null) => {
   const ensuredListing = ensureListing(listing);
-  const id = ensuredListing?.id?.uuid;
-  const attributes = ensuredListing?.attributes;
-  const { privateData, publicData, protectedData, metadata } = attributes || {};
-  const images = ensuredListing?.images;
+  const id = ensuredListing.id?.uuid;
 
   return {
     getId: () => {
       return id;
     },
     getFullData: () => {
-      return ensuredListing || {};
+      return ensuredListing;
     },
     getAttributes: () => {
-      return attributes || {};
+      return ensuredListing.attributes;
     },
     getMetadata: (): TObject => {
-      return metadata || {};
+      return ensuredListing.attributes.metadata;
     },
     getProtectedData: (): TObject => {
-      return protectedData || {};
+      return ensuredListing.attributes.protectedData;
     },
     getPrivateData: (): TObject => {
-      return privateData || {};
+      return ensuredListing.attributes.privateData;
     },
     getPublicData: (): TObject => {
-      return publicData || {};
+      return ensuredListing.attributes.publicData;
     },
     getImages: () => {
-      return images || [];
+      return ensuredListing.images;
     },
   };
 };

@@ -762,3 +762,13 @@ export const INITIAL_DELIVERY_TIME_BASE_ON_DAY_SESSION = {
   [EVENING_SESSION]: '18:00-18:15',
   [DINNER_SESSION]: '18:00-18:15',
 };
+
+export const FORMATTED_WEEKDAY = {
+  1: 'Thứ hai',
+  2: 'Thứ ba',
+  3: 'Thứ tư',
+  4: 'Thứ năm',
+  5: 'Thứ sáu',
+  6: 'Thứ bảy',
+  7: 'Chủ nhật',
+};
