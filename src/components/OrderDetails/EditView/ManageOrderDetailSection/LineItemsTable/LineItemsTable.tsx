@@ -1,7 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useField, useForm } from 'react-final-form-hooks';
 import { useIntl } from 'react-intl';
+import { debounce } from 'lodash';
 import difference from 'lodash/difference';
 import isEmpty from 'lodash/isEmpty';
 
@@ -9,7 +10,10 @@ import Button from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import { FieldDropdownSelectComponent } from '@components/FormFields/FieldDropdownSelect/FieldDropdownSelect';
 import { FieldTextAreaComponent } from '@components/FormFields/FieldTextArea/FieldTextArea';
+import IconAdd from '@components/Icons/IconAdd/IconAdd';
+import SlideModal from '@components/SlideModal/SlideModal';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import useBoolean from '@hooks/useBoolean';
 import { saveDraftEditOrder } from '@redux/slices/Order.slice';
 import {
   orderDetailsAnyActionsInProgress,
@@ -24,6 +28,8 @@ import type { TListing, TObject } from '@src/utils/types';
 import { LineItemsTableComponent } from './LineItemsTableComponent';
 
 import css from './LineItemsTable.module.scss';
+
+const DEBOUNCE_TIME = 500;
 
 type TLineItemsTableProps = {
   currentViewDate: number;
@@ -46,8 +52,8 @@ const LineItemsTable: React.FC<TLineItemsTableProps> = (props) => {
     isAdminFlow = false,
   } = props;
   const intl = useIntl();
-
   const dispatch = useAppDispatch();
+  const addFoodModalControl = useBoolean();
   const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
   const planData = useAppSelector((state) => state.OrderManagement.planData);
   const draftOrderDetail = useAppSelector(
@@ -57,13 +63,9 @@ const LineItemsTable: React.FC<TLineItemsTableProps> = (props) => {
     (state) => state.Order.draftEditOrderData,
   );
   const order = useAppSelector((state) => state.Order.order);
-
-  const orderGetter = Listing(order);
-
-  const { orderState } = orderGetter.getMetadata();
-
+  const [updateValues, setUpdateValues] = useState<any>();
+  const { orderState } = Listing(order).getMetadata();
   const { orderDetail: draftOrderDetailFromOrder = {} } = draftEditOrderData;
-
   const isOrderInProgressState = orderState === EOrderStates.inProgress;
 
   const currentDraftOrderDetail = isOrderInProgressState
@@ -149,13 +151,15 @@ const LineItemsTable: React.FC<TLineItemsTableProps> = (props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(foodList), JSON.stringify(lineItems)]);
 
+  const parsedFoodOptions = foodOptions?.map((f) => ({
+    label: shortenString(f.name, 18),
+    key: f.id,
+  }));
+
   const disabledSelectFood =
     inProgress || isEmpty(foodOptions) || !ableToUpdateOrder;
   const disabledAddLineItem =
-    inProgress ||
-    isEmpty(foodOptions) ||
-    isEmpty(foodField.input.value) ||
-    !ableToUpdateOrder;
+    disabledSelectFood || isEmpty(foodField.input.value);
 
   const handleModifyQuantity =
     (foodId: string, quantity: number = 1) =>
@@ -207,29 +211,44 @@ const LineItemsTable: React.FC<TLineItemsTableProps> = (props) => {
         );
       }
       if (isDraftEditing) {
-        dispatch(
-          OrderManagementsAction.setDraftOrderDetailsAndSubOrderChangeHistory({
-            newOrderDetail: updateOrderDetail,
-            updateValues: {
-              currentViewDate,
-              foodName,
-              foodPrice,
-              quantity,
-              foodId,
-            },
-            isAdminFlow,
-          }),
-        );
+        setUpdateValues({
+          newOrderDetail: updateOrderDetail,
+          updateValues: {
+            currentViewDate,
+            foodName,
+            foodPrice,
+            quantity,
+            foodId,
+          },
+          isAdminFlow,
+        });
       } else {
-        dispatch(
-          orderManagementThunks.updatePlanOrderDetail({
-            orderId,
-            planId,
-            orderDetail: updateOrderDetail,
-          }),
-        );
+        setUpdateValues({
+          orderId,
+          planId,
+          orderDetail: updateOrderDetail,
+        });
       }
     };
+
+  const updateDataWithDebounce = useCallback(
+    debounce((_updateValues: any) => {
+      if (_updateValues) {
+        if (isDraftEditing) {
+          dispatch(
+            OrderManagementsAction.setDraftOrderDetailsAndSubOrderChangeHistory(
+              _updateValues,
+            ),
+          );
+        } else {
+          dispatch(orderManagementThunks.updatePlanOrderDetail(_updateValues));
+        }
+
+        setUpdateValues(undefined);
+      }
+    }, DEBOUNCE_TIME),
+    [isDraftEditing],
+  );
 
   const handleAddNewLineItem = () => {
     const foodId = foodField?.input?.value;
@@ -243,14 +262,37 @@ const LineItemsTable: React.FC<TLineItemsTableProps> = (props) => {
     }
   };
 
+  const addFoodField = (
+    <div className={css.fieldRow}>
+      <FieldDropdownSelectComponent
+        id={`food`}
+        name={`food`}
+        className={css.fieldSelect}
+        dropdownWrapperClassName={css.dropdownWrapper}
+        options={parsedFoodOptions}
+        disabled={disabledSelectFood}
+        placeholder={intl.formatMessage({
+          id: 'LineItemsTable.addFoodField.placeholder',
+        })}
+        meta={foodField.meta}
+        input={foodField.input}
+      />
+
+      <Button onClick={handleAddNewLineItem} disabled={disabledAddLineItem}>
+        {intl.formatMessage({
+          id: 'LineItemsTable.addFoodField.buttonText',
+        })}
+      </Button>
+    </div>
+  );
+
   useEffect(() => {
     form.reset();
   }, [currentViewDate]);
 
-  const parsedFoodOptions = foodOptions?.map((f) => ({
-    label: shortenString(f.name, 18),
-    key: f.id,
-  }));
+  useEffect(() => {
+    updateDataWithDebounce(updateValues);
+  }, [JSON.stringify(updateValues)]);
 
   return (
     <div className={css.root}>
@@ -260,47 +302,26 @@ const LineItemsTable: React.FC<TLineItemsTableProps> = (props) => {
         ableToUpdateOrder={ableToUpdateOrder}
         isAdminFlow={isAdminFlow}
       />
+
       <form onSubmit={handleSubmit}>
         <div className={css.fieldContainer}>
           <label className={css.fieldLabel}>
             {intl.formatMessage({ id: 'LineItemsTable.addFoodField.label' })}
           </label>
-
-          <div className={css.fieldRow}>
-            <FieldDropdownSelectComponent
-              id={`food`}
-              name={`food`}
-              className={css.fieldSelect}
-              options={parsedFoodOptions}
-              disabled={disabledSelectFood}
-              placeholder={intl.formatMessage({
-                id: 'LineItemsTable.addFoodField.placeholder',
-              })}
-              meta={foodField.meta}
-              input={foodField.input}
-            />
-
-            <Button
-              onClick={handleAddNewLineItem}
-              disabled={disabledAddLineItem}>
-              {intl.formatMessage({
-                id: 'LineItemsTable.addFoodField.buttonText',
-              })}
-            </Button>
-          </div>
-          {shouldShowOverflowError && (
-            <ErrorMessage
-              className={css.error}
-              message={`Bạn đã vượt quá phần ăn tối đa của đối tác`}
-            />
-          )}
-          {shouldShowUnderError && (
-            <ErrorMessage
-              className={css.error}
-              message={`Cần đặt tối thiểu ${minQuantity} phần`}
-            />
-          )}
+          {addFoodField}
         </div>
+        {shouldShowOverflowError && (
+          <ErrorMessage
+            className={css.error}
+            message={`Bạn đã vượt quá phần ăn tối đa của đối tác`}
+          />
+        )}
+        {shouldShowUnderError && (
+          <ErrorMessage
+            className={css.error}
+            message={`Cần đặt tối thiểu ${minQuantity} phần`}
+          />
+        )}
 
         <div className={css.fieldContainer}>
           <label className={css.fieldLabel} htmlFor="LineItemsTable.note">
@@ -318,7 +339,24 @@ const LineItemsTable: React.FC<TLineItemsTableProps> = (props) => {
             input={noteInput}
           />
         </div>
+        <SlideModal
+          id="LineItemsTable.AddFoodSlideModal"
+          modalTitle="Thêm món ăn"
+          isOpen={addFoodModalControl.value}
+          onClose={addFoodModalControl.setFalse}
+          containerClassName={css.addFoodModalContainer}>
+          {addFoodField}
+        </SlideModal>
       </form>
+
+      <Button
+        className={css.addFoodButton}
+        variant="inline"
+        disabled={disabledSelectFood}
+        onClick={addFoodModalControl.setTrue}>
+        <IconAdd />
+        <span>Thêm món ăn</span>
+      </Button>
     </div>
   );
 };
