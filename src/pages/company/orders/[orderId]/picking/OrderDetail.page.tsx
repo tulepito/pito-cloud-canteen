@@ -267,6 +267,7 @@ const OrderDetailPage = () => {
     editViewData,
     reviewViewData,
     priceQuotationData,
+    reviewInfoValues,
     setReviewInfoValues,
   } = usePrepareOrderDetailPageData({
     VATPercentage: isPickingOrder ? systemVATPercentage : orderVATPercentage,
@@ -341,8 +342,20 @@ const OrderDetailPage = () => {
     setViewMode(EPageViewMode.cartDetail);
   };
 
-  const handleSubmitReviewInfoForm = (_values: TReviewInfoFormValues) => {
-    setReviewInfoValues(_values);
+  const handleEditReviewInfoForm = (
+    {
+      contactPeopleName = '',
+      contactPhoneNumber = '',
+      ...restValues
+    }: TReviewInfoFormValues,
+    invalid: boolean,
+  ) => {
+    setReviewInfoValues({
+      contactPeopleName,
+      contactPhoneNumber,
+      ...restValues,
+      invalid,
+    });
   };
 
   const onSaveOrderNote = (orderNote: string) => {
@@ -534,7 +547,7 @@ const OrderDetailPage = () => {
       isViewCartDetailMode={isViewCartDetailMode}
       canGoBackEditMode
       reviewViewData={reviewViewData}
-      onSubmitEdit={handleSubmitReviewInfoForm}
+      setInfoFormValues={handleEditReviewInfoForm}
       onDownloadPriceQuotation={handleDownloadPriceQuotation}
       onGoBackToEditOrderPage={handleGoBackFromReviewMode}
       onViewCartDetail={handleViewCartDetail}
@@ -543,6 +556,7 @@ const OrderDetailPage = () => {
       onDownloadReviewOrderResults={onDownloadReviewOrderResults}
       orderData={orderData as TListing}
       priceQuotationData={priceQuotationData}
+      reviewInfoValues={reviewInfoValues}
     />
   );
 

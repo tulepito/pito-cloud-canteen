@@ -33,8 +33,10 @@ type TReviewViewProps = TDefaultProps & {
     typeof usePrepareOrderDetailPageData
   >['priceQuotationData'];
   orderData?: TListing;
+  reviewInfoValues?: TReviewInfoFormValues;
+  setInfoFormValues?: (values: TReviewInfoFormValues, invalid: any) => void;
+
   onGoBackToEditOrderPage?: () => void;
-  onSubmitEdit?: (values: TReviewInfoFormValues) => void;
   onDownloadPriceQuotation: () => Promise<void>;
   onSaveOrderNote?: (value: string) => void;
   onDownloadReviewOrderResults: () => void;
@@ -53,13 +55,14 @@ const ReviewView: React.FC<TReviewViewProps> = (props) => {
     reviewViewData,
     priceQuotationData = {},
     onGoBackToEditOrderPage,
-    onSubmitEdit,
     onDownloadPriceQuotation,
     classes = {},
     onSaveOrderNote,
     onViewCartDetail,
     onDownloadReviewOrderResults,
     orderData,
+    reviewInfoValues,
+    setInfoFormValues,
   } = props;
   const dispatch = useAppDispatch();
   const { leftClassName, rightClassName } = classes;
@@ -98,10 +101,9 @@ const ReviewView: React.FC<TReviewViewProps> = (props) => {
           </RenderWhen>
 
           <ReviewInfoSection
-            startSubmitReviewInfoForm
             canEdit={canEditInfo}
             data={reviewViewData?.reviewInfoData || {}}
-            onSubmit={onSubmitEdit}
+            setFormValues={setInfoFormValues}
           />
           <RenderWhen condition={isGroupOrder}>
             <ReviewOrdersResultSection
@@ -136,6 +138,7 @@ const ReviewView: React.FC<TReviewViewProps> = (props) => {
           isAdminLayout={isAdminLayout}
           isViewCartDetailMode={isViewCartDetailMode}
           onViewCartDetail={onViewCartDetail}
+          reviewInfoValues={reviewInfoValues}
         />
       </div>
     </div>

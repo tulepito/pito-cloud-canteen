@@ -22,7 +22,7 @@ export type TReviewInfoFormValues = {
 };
 
 type TExtraProps = {
-  startSubmit: boolean;
+  setFormValues?: (values: TReviewInfoFormValues, invalid: any) => void;
   fieldTextContent: {
     companyNameField: TObject;
     staffNameField: TObject;
@@ -40,9 +40,9 @@ const ReviewInfoFormComponent: React.FC<TReviewInfoFormComponentProps> = (
 ) => {
   const {
     handleSubmit,
-    form,
-    startSubmit,
-    modifiedSinceLastSubmit,
+    invalid,
+    setFormValues,
+    values,
     fieldTextContent: {
       companyNameField,
       staffNameField,
@@ -54,11 +54,11 @@ const ReviewInfoFormComponent: React.FC<TReviewInfoFormComponentProps> = (
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    if (isMounted && (modifiedSinceLastSubmit || startSubmit)) {
-      form.submit();
+    if (isMounted && setFormValues) {
+      setFormValues(values, invalid);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [startSubmit, modifiedSinceLastSubmit, isMounted]);
+  }, [isMounted, JSON.stringify(values), invalid]);
 
   useEffect(() => {
     setIsMounted(true);

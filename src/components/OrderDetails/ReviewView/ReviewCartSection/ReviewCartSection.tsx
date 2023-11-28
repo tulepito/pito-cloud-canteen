@@ -22,6 +22,8 @@ import { EOrderStates, EOrderType, EPartnerVATSetting } from '@src/utils/enums';
 import { Listing } from '@utils/data';
 import type { TListing, TObject } from '@utils/types';
 
+import type { TReviewInfoFormValues } from '../ReviewInfoSection/ReviewInfoForm';
+
 import css from './ReviewCartSection.module.scss';
 
 type TReviewCartSectionProps = {
@@ -30,6 +32,7 @@ type TReviewCartSectionProps = {
   priceQuotationData?: ReturnType<
     typeof usePrepareOrderDetailPageData
   >['priceQuotationData'];
+  reviewInfoValues?: TReviewInfoFormValues;
   showStartPickingOrderButton: boolean;
   isViewCartDetailMode?: boolean;
   showGoHomeButton?: boolean;
@@ -59,6 +62,7 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
     priceQuotationData,
     showStartPickingOrderButton,
     // showGoHomeButton = false,
+    reviewInfoValues = {},
     onClickDownloadPriceQuotation,
     foodOrderGroupedByDate,
     title,
@@ -107,17 +111,31 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
   const { orderType = EOrderType.group, orderState } = Listing(
     orderData as TListing,
   ).getMetadata();
-  const isStartOrderDisabled = !isEnableToStartOrder(
-    orderDetail,
-    orderType === EOrderType.group,
-    isAdminLayout,
-  );
+  const {
+    invalid = false,
+    contactPeopleName,
+    contactPhoneNumber,
+  } = reviewInfoValues as TObject;
+  const isStartOrderDisabled =
+    invalid ||
+    !isEnableToStartOrder(
+      orderDetail,
+      orderType === EOrderType.group,
+      isAdminLayout,
+    );
 
   const isDraftEditing = orderState === EOrderStates.inProgress;
 
   const isPartner = target === 'partner';
 
   const handleStartPickingOrder = async () => {
+    await dispatch(
+      orderManagementThunks.updateOrderGeneralInfo({
+        contactPeopleName,
+        contactPhoneNumber,
+      }),
+    );
+
     let response;
     if (isDraftEditing) {
       response = await dispatch(

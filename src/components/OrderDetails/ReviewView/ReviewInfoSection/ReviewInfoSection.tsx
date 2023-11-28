@@ -22,9 +22,7 @@ type TReviewInfoSectionProps = {
     reviewInfoValues?: TReviewInfoFormValues;
   };
   canEdit: boolean;
-  onSubmit?: (values: TReviewInfoFormValues) => void;
-
-  startSubmitReviewInfoForm: boolean;
+  setFormValues?: (values: TReviewInfoFormValues, invalid: any) => void;
 };
 
 const ReviewInfoSection: React.FC<TReviewInfoSectionProps> = (props) => {
@@ -39,8 +37,7 @@ const ReviewInfoSection: React.FC<TReviewInfoSectionProps> = (props) => {
       reviewInfoValues = {},
     },
     canEdit,
-    onSubmit,
-    startSubmitReviewInfoForm,
+    setFormValues,
   } = props;
   const intl = useIntl();
 
@@ -120,8 +117,7 @@ const ReviewInfoSection: React.FC<TReviewInfoSectionProps> = (props) => {
       openClassName={css.rootOpen}>
       <RenderWhen condition={canEdit}>
         <ReviewInfoForm
-          startSubmit={startSubmitReviewInfoForm}
-          onSubmit={onSubmit || defaultSubmitFn}
+          onSubmit={defaultSubmitFn}
           initialValues={formInitialValues}
           fieldTextContent={{
             companyNameField,
@@ -130,6 +126,7 @@ const ReviewInfoSection: React.FC<TReviewInfoSectionProps> = (props) => {
             contactPeopleNameField,
             deliveryAddressField,
           }}
+          setFormValues={setFormValues}
         />
         <RenderWhen.False>
           <div className={css.contentContainer}>
