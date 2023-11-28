@@ -99,6 +99,7 @@ const ManageLineItemsSection: React.FC<TManageLineItemsSectionProps> = (
           items={items}
           onChange={handleDateTabChange}
           showNavigation
+          shouldShowNavigatorBorder
           middleLabel
           defaultActiveKey={`${
             (defaultActiveKey < 0 ? 0 : defaultActiveKey) + 1
