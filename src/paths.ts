@@ -21,6 +21,7 @@ export const enGeneralPaths = {
 
 export const personalPaths = {
   Account: '/company/personal/account',
+  info: '/company/personal/account/info',
   Nutrition: '/company/personal/nutrition',
 };
 

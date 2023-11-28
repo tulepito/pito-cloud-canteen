@@ -51,7 +51,8 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
   } = router;
 
   const showFeatureHeader = shouldShowFeatureHeader(pathname);
-  const showSidebar = shouldShowSidebar(pathname);
+  const showSidebar =
+    !isMobileLayout && !isTabletLayout && shouldShowSidebar(pathname);
   const shouldHideFooter =
     isMobileLayout || isTabletLayout || shouldHideCompanyFooter(pathname);
 

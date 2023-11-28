@@ -1,0 +1,69 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.modalHeader.modalHeader {
+  display: none;
+}
+.modalContainer.modalContainer {
+  padding: 0;
+}
+
+.heading {
+  @include textTemplate(16px, 700, 24px);
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  column-gap: 8px;
+  padding: 14px 16px;
+  border-bottom: 1px solid $neutralGray3;
+  cursor: pointer;
+}
+
+.itemRow {
+  @include textTemplate(14px, 600, 20px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-direction: row;
+  column-gap: 8px;
+  margin: 0 16px;
+  padding: 12px 0;
+  cursor: pointer;
+
+  &:first-of-type {
+    padding-top: 16px;
+  }
+
+  &:not(:last-of-type) {
+    border-bottom: 1px solid $neutralGray3;
+  }
+}
+
+.headerTitle {
+  // display: flex;
+  // align-items: center;
+  // justify-content: space-between;
+  // gap: 13px;
+  // line-height: 24px;
+
+  // svg {
+  //   min-width: 24px;
+  // }
+
+  // .title {
+  //   @include lineClamp(1, 24px);
+  // }
+
+  @include flexAlign(center);
+  gap: 16px;
+
+  svg {
+    path {
+      fill: $neutralGray6;
+    }
+  }
+  span {
+    @include textTemplate(16px, $fontWeightSemiBold, 24px);
+  }
+}
