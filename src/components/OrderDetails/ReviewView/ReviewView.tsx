@@ -29,6 +29,9 @@ type TReviewViewProps = TDefaultProps & {
   reviewViewData: ReturnType<
     typeof usePrepareOrderDetailPageData
   >['reviewViewData'];
+  priceQuotationData?: ReturnType<
+    typeof usePrepareOrderDetailPageData
+  >['priceQuotationData'];
   orderData?: TListing;
   onGoBackToEditOrderPage?: () => void;
   onSubmitEdit?: (values: TReviewInfoFormValues) => void;
@@ -48,6 +51,7 @@ const ReviewView: React.FC<TReviewViewProps> = (props) => {
     isAdminLayout = false,
     showStartPickingOrderButton = false,
     reviewViewData,
+    priceQuotationData = {},
     onGoBackToEditOrderPage,
     onSubmitEdit,
     onDownloadPriceQuotation,
@@ -124,6 +128,7 @@ const ReviewView: React.FC<TReviewViewProps> = (props) => {
         </RenderWhen>
         <ReviewCartSection
           data={reviewViewData.reviewCartData}
+          priceQuotationData={priceQuotationData}
           showStartPickingOrderButton={showStartPickingOrderButton}
           onClickDownloadPriceQuotation={onDownloadPriceQuotation}
           foodOrderGroupedByDate={reviewViewData.foodOrderGroupedByDate}

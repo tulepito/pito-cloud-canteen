@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useIntl } from 'react-intl';
 import classNames from 'classnames';
 import { useRouter } from 'next/router';
@@ -7,10 +7,15 @@ import Badge from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import MobileBottomContainer from '@components/MobileBottomContainer/MobileBottomContainer';
+import PriceQuotation from '@components/OrderDetails/PriceQuotation/PriceQuotation';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
+import SlideModal from '@components/SlideModal/SlideModal';
 import { parseThousandNumber } from '@helpers/format';
 import { isEnableToStartOrder } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import useBoolean from '@hooks/useBoolean';
+import type { usePrepareOrderDetailPageData } from '@hooks/usePrepareOrderManagementData';
+import { useViewport } from '@hooks/useViewport';
 import { orderManagementThunks } from '@redux/slices/OrderManagement.slice';
 import { companyPaths } from '@src/paths';
 import { EOrderStates, EOrderType, EPartnerVATSetting } from '@src/utils/enums';
@@ -22,6 +27,9 @@ import css from './ReviewCartSection.module.scss';
 type TReviewCartSectionProps = {
   className?: string;
   data: TObject;
+  priceQuotationData?: ReturnType<
+    typeof usePrepareOrderDetailPageData
+  >['priceQuotationData'];
   showStartPickingOrderButton: boolean;
   isViewCartDetailMode?: boolean;
   showGoHomeButton?: boolean;
@@ -48,6 +56,7 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
       PITOFee = 0,
       vatPercentage = 0,
     } = {},
+    priceQuotationData,
     showStartPickingOrderButton,
     // showGoHomeButton = false,
     onClickDownloadPriceQuotation,
@@ -62,7 +71,8 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
   const router = useRouter();
-
+  const { isMobileLayout } = useViewport();
+  const previewPriceQuotationControl = useBoolean();
   const isDownloadingPriceQuotation = useAppSelector(
     (state) => state.priceQuotation.isDownloading,
   );
@@ -132,6 +142,19 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
         });
       }
     }
+  };
+
+  const handleDownloadPriceQuotationClick = () => {
+    if (isViewCartDetailMode) {
+      previewPriceQuotationControl.setTrue();
+    } else {
+      onClickDownloadPriceQuotation();
+    }
+  };
+
+  const handleDownloadPriceQuotationAndCloseModal = () => {
+    previewPriceQuotationControl.setFalse();
+    onClickDownloadPriceQuotation();
   };
 
   const bottomActionSection = (
@@ -247,25 +270,30 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
     </div>
   );
 
+  useEffect(() => {
+    if (!isViewCartDetailMode) {
+      previewPriceQuotationControl.setFalse();
+    }
+  }, [isViewCartDetailMode]);
+
   return (
     <div className={rootClasses}>
-      <div className={titleClasses}>
-        {title || intl.formatMessage({ id: 'ReviewCardSection.title' })}
-      </div>
-
-      {feeSection}
-
-      <Button
-        variant="inline"
-        className={downloadPriceQuotationClasses}
-        disabled={isDownloadingPriceQuotation}
-        onClick={onClickDownloadPriceQuotation}>
-        {intl.formatMessage({
-          id: 'ReviewCardSection.downloadPriceQuotation',
-        })}
-      </Button>
-
-      {bottomActionSection}
+      <RenderWhen condition={!isMobileLayout || isViewCartDetailMode}>
+        <div className={titleClasses}>
+          {title || intl.formatMessage({ id: 'ReviewCardSection.title' })}R
+        </div>
+        {feeSection}
+        <Button
+          variant="inline"
+          className={downloadPriceQuotationClasses}
+          disabled={isDownloadingPriceQuotation}
+          onClick={handleDownloadPriceQuotationClick}>
+          {intl.formatMessage({
+            id: 'ReviewCardSection.downloadPriceQuotation',
+          })}
+        </Button>
+        {bottomActionSection}
+      </RenderWhen>
 
       <RenderWhen condition={!isViewCartDetailMode}>
         <MobileBottomContainer>
@@ -284,6 +312,32 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
           </div>
         </MobileBottomContainer>
       </RenderWhen>
+
+      {previewPriceQuotationControl.value && isViewCartDetailMode && (
+        <SlideModal
+          id="ReviewCartSection.previewPriceQuotation"
+          isOpen={previewPriceQuotationControl.value}
+          onClose={previewPriceQuotationControl.setFalse}
+          modalTitle="Báo giá"
+          className={css.priceQuotationModal}
+          openClassName={css.priceQuotationModalOpen}
+          containerClassName={css.priceQuotationModalContainer}
+          shouldShowOverlay>
+          <div className={css.scrollContainer}>
+            <div className={css.topBorder} />
+            <PriceQuotation
+              className={css.priceQuotation}
+              data={priceQuotationData as any}
+            />
+          </div>
+          <Button
+            onClick={handleDownloadPriceQuotationAndCloseModal}
+            className={css.downloadPriceQuotationButton}
+            disabled={isDownloadingPriceQuotation}>
+            Tải báo giá
+          </Button>
+        </SlideModal>
+      )}
     </div>
   );
 };
