@@ -6,11 +6,12 @@ import type { TIconProps } from '@utils/types';
 import css from './IconHome.module.scss';
 
 const IconHome: React.FC<TIconProps> = (props) => {
-  const { rootClassName, className } = props;
+  const { rootClassName, className, onClick } = props;
   const classes = classNames(rootClassName || css.root, className);
 
   return (
     <svg
+      onClick={onClick}
       preserveAspectRatio="none"
       className={classes}
       viewBox="0 0 18 19"

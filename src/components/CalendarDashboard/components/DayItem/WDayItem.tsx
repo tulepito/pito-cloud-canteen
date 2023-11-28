@@ -37,7 +37,12 @@ const WDayItem: React.FC<TWDayItemProps> = ({
   eventExtraProps,
 }) => {
   const { isMobileLayout } = useViewport();
-  const { onSelectDayCallBack } = resources || ({} as any);
+  const {
+    onSelectDayCallBack,
+    startDate,
+    endDate,
+    availableOrderDetailCheckList,
+  } = resources || ({} as any);
   const { selectedDay, handleSelectDay } = useSelectDay();
   const currentDate = DateTime.fromJSDate(new Date()).startOf('day');
   const dateItem = DateTime.fromJSDate(date).startOf('day');
@@ -52,7 +57,23 @@ const WDayItem: React.FC<TWDayItemProps> = ({
       .diff(currentDate, ['day', 'hour'])
       .get('day') === 0;
 
+  const startDateTimestamp = startDate?.getTime();
+  const endDateTimestamp = endDate?.getTime();
+  const dateTimestamp = date.getTime();
+
+  const isDisabled =
+    startDate &&
+    endDate &&
+    (dateTimestamp < startDateTimestamp || dateTimestamp > endDateTimestamp);
+
+  const indicator = !isMobileLayout
+    ? undefined
+    : availableOrderDetailCheckList?.[date.getTime()];
+
   const onClick = useCallback(() => {
+    if (isDisabled) {
+      return;
+    }
     handleSelectDay?.(date);
     onSelectDayCallBack?.();
   }, [date, handleSelectDay]);
@@ -73,6 +94,8 @@ const WDayItem: React.FC<TWDayItemProps> = ({
           resources={resources}
           isCurrentDay={isCurrentDay}
           isSelectedDay={isSelectedDay}
+          isDisabled={isDisabled}
+          indicator={indicator}
         />
       )}
       {!isMobileLayout && (

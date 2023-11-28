@@ -3,6 +3,14 @@
 @use '/src/styles/vars.scss' as *;
 
 .root {
+  .sideBarContainer {
+    display: none;
+
+    @include viewportLarge {
+      display: block;
+    }
+  }
+
   .mainContainer {
     width: 100%;
   }
@@ -47,7 +55,6 @@
   }
 
   .main {
-    height: 100%;
     display: flex;
     position: relative;
     // width: fit-content;
@@ -57,6 +64,7 @@
     @include viewportLarge {
       padding: 50px 24px;
       width: unset;
+      height: 100%;
     }
   }
 
@@ -65,6 +73,44 @@
 
     @include viewportLargeWithPaddings {
       width: 100%;
+    }
+  }
+
+  .subOrderDate {
+    padding: 20px 16px 0;
+    @include viewportLarge {
+      display: none;
+    }
+  }
+
+  .addMealWrapper {
+    padding: 16px;
+    @include flexCenter;
+    flex-direction: column;
+    gap: 12px;
+
+    .emptyText {
+      color: $neutralGray6;
+      @include textTemplate(12px, 400, 16px);
+    }
+  }
+
+  .addMeal {
+    padding: 10px 20px;
+    border: 1px solid $neutralGray4;
+    border-radius: 8px;
+    @include flexAlign(center);
+    gap: 8px;
+
+    .plusIcon {
+      margin-right: 10px;
+      & path {
+        fill: $neutralGray7;
+      }
+    }
+
+    span {
+      @include textTemplate(14px, 700, 24px);
     }
   }
 }

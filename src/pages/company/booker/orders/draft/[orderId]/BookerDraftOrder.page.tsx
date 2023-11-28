@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-shadow */
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import type { Event } from 'react-big-calendar';
 import { shallowEqual } from 'react-redux';
 import isEmpty from 'lodash/isEmpty';
 import Image from 'next/image';
@@ -10,7 +11,10 @@ import Badge, { EBadgeType } from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
 import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
 import MealPlanCard from '@components/CalendarDashboard/components/MealPlanCard/MealPlanCard';
+import useSelectDay from '@components/CalendarDashboard/hooks/useSelectDay';
+import IconEmpty from '@components/Icons/IconEmpty/IconEmpty';
 import IconHome from '@components/Icons/IconHome/IconHome';
+import IconPlus from '@components/Icons/IconPlus/IconPlus';
 import IconSetting from '@components/Icons/IconSetting/IconSetting';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import Stepper from '@components/Stepper/Stepper';
@@ -44,6 +48,7 @@ import Layout from '../../components/Layout/Layout';
 import LayoutMain from '../../components/Layout/LayoutMain';
 import LayoutSidebar from '../../components/Layout/LayoutSidebar';
 
+import HomeReturnModal from './components/HomeReturnModal/HomeReturnModal';
 import ParticipantInvitation from './components/ParticipantInvitation/ParticipantInvitation';
 import SidebarContent from './components/SidebarContent/SidebarContent';
 import WalkThroughTourProvider from './components/WalkThroughTour/WalkThroughTour';
@@ -84,6 +89,10 @@ function BookerDraftOrderPage() {
     useState<EBookerDraftOrderViewMode>(EBookerDraftOrderViewMode.setup);
   const dispatch = useAppDispatch();
   const { isTabletLayoutOrLarger } = useViewport();
+  const { selectedDay } = useSelectDay();
+
+  const homeReturnModalController = useBoolean();
+
   const currentUser = useAppSelector(currentUserSelector);
   // * Walkthrough
   const currentUserGetter = User(currentUser);
@@ -118,9 +127,6 @@ function BookerDraftOrderPage() {
   const availableOrderDetailCheckList = useAppSelector(
     (state) => state.Order.availableOrderDetailCheckList,
     shallowEqual,
-  );
-  const selectedDate = useAppSelector(
-    (state) => state.Order.selectedCalendarDate,
   );
   const { orderDetail = [], rawOrderDetail } = useGetPlanDetails();
   const { startDate, endDate } = useGetBoundaryDates(order);
@@ -169,9 +175,15 @@ function BookerDraftOrderPage() {
     [JSON.stringify(companyAccount)],
   );
 
+  const selectedEvent = useMemo(() => {
+    return orderDetail.find(
+      (event) => Number(event.start) === Number(selectedDay),
+    );
+  }, [JSON.stringify(orderDetail), selectedDay]);
+
   const suitableStartDate = useMemo(() => {
     const temp = findSuitableStartDate({
-      selectedDate,
+      selectedDate: selectedDay,
       startDate: startDateTimestamp,
       endDate: endDateTimestamp,
       orderDetail: rawOrderDetail,
@@ -180,7 +192,7 @@ function BookerDraftOrderPage() {
     return temp instanceof Date ? temp : new Date(temp!);
     // eslint-disable-next-line prettier/prettier
   }, [
-    selectedDate,
+    selectedDay,
     startDateTimestamp,
     endDateTimestamp,
     JSON.stringify(orderDetail),
@@ -326,6 +338,14 @@ function BookerDraftOrderPage() {
     Gleap.openChat();
   };
 
+  const handleAddMealClick = () => {
+    router.push(
+      `/company/booker/orders/draft/${orderId}/restaurants?timestamp=${Number(
+        selectedDay,
+      )}`,
+    );
+  };
+
   useEffect(() => {
     if (!isEmpty(orderDetail)) {
       const menuListingIds = orderDetail?.map(
@@ -364,6 +384,7 @@ function BookerDraftOrderPage() {
       <RenderWhen condition={isSetupMode}>
         <Layout className={css.root}>
           <LayoutSidebar
+            className={css.sideBarContainer}
             logo={<span></span>}
             collapse={collapse}
             onCollapse={handleCollapse}>
@@ -373,7 +394,10 @@ function BookerDraftOrderPage() {
             <div className={css.header}>
               <div className={css.title}>Thiết lập menu</div>
               <div className={css.headerActions}>
-                <IconHome className={css.actionIcon} />
+                <IconHome
+                  className={css.actionIcon}
+                  onClick={homeReturnModalController.setTrue}
+                />
                 <IconSetting variant="black" className={css.actionIcon} />
               </div>
             </div>
@@ -424,6 +448,28 @@ function BookerDraftOrderPage() {
                 </div>
               </RenderWhen>
             </div>
+            <RenderWhen condition={!!selectedEvent}>
+              <div className={css.subOrderDate}>
+                <MealPlanCard
+                  event={selectedEvent as Event}
+                  index={0}
+                  resources={{}}
+                  removeInprogress={false}
+                />
+              </div>
+              <RenderWhen.False>
+                <RenderWhen condition={!isTabletLayoutOrLarger}>
+                  <div className={css.addMealWrapper}>
+                    <IconEmpty variant="food" />
+                    <div className={css.emptyText}>Chưa có bữa ăn</div>
+                    <div className={css.addMeal} onClick={handleAddMealClick}>
+                      <IconPlus className={css.plusIcon} />
+                      <span>Thêm bữa ăn</span>
+                    </div>
+                  </div>
+                </RenderWhen>
+              </RenderWhen.False>
+            </RenderWhen>
             <RenderWhen condition={walkthroughEnable}>
               <WelcomeModal
                 isOpen={welcomeModalControl.value}
@@ -442,6 +488,10 @@ function BookerDraftOrderPage() {
               openFromCalendar
               timestamp={selectedTimestamp}
               packagePerMember={packagePerMember}
+            />
+            <HomeReturnModal
+              isOpen={homeReturnModalController.value}
+              onClose={homeReturnModalController.setFalse}
             />
           </LayoutMain>
         </Layout>
