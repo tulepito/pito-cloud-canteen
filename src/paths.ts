@@ -23,6 +23,7 @@ export const personalPaths = {
   Account: '/company/personal/account',
   info: '/company/personal/account/info',
   Nutrition: '/company/personal/nutrition',
+  changePassword: '/company/personal/account/change-password',
 };
 
 export const NonRequireAuthenticationRoutes = [

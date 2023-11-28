@@ -257,45 +257,49 @@ const NutritionFormComponent: React.FC<TNutritionFormComponentProps> = (
   return (
     <>
       <Form className={css.container} onSubmit={handleSubmit}>
-        <div className={css.fieldSection}>
-          <NutritionField
-            title={intl.formatMessage({ id: 'NutritionForm.nutrition.title' })}
-            titleClassName={css.customTitle}
-            fieldClassName={css.customField}
-            options={nutritionsOptions}
-          />
-        </div>
-        <div className={css.fieldSection}>
-          <div className={css.fieldLabel}>
-            {intl.formatMessage({
-              id: 'NutritionForm.favoriteRestaurant.title',
-            })}
+        <div className={css.fieldsContainer}>
+          <div className={css.fieldSection}>
+            <NutritionField
+              title={intl.formatMessage({
+                id: 'NutritionForm.nutrition.title',
+              })}
+              titleClassName={css.customTitle}
+              fieldClassName={css.customField}
+              options={nutritionsOptions}
+            />
           </div>
-          <Table
-            columns={favoriteRestaurantColumns}
-            data={favoriteRestaurantTableData}
-            tableClassName={css.tableRoot}
-            tableHeadClassName={css.tableHead}
-            tableHeadCellClassName={css.tableHeadCell}
-            tableBodyClassName={css.tableBody}
-            tableBodyRowClassName={css.tableBodyRow}
-            tableBodyCellClassName={css.tableBodyCell}
-          />
-        </div>
-        <div className={css.fieldSection}>
-          <div className={css.fieldLabel}>
-            {intl.formatMessage({ id: 'NutritionForm.favoriteFood.title' })}
+          <div className={css.fieldSection}>
+            <div className={css.fieldLabel}>
+              {intl.formatMessage({
+                id: 'NutritionForm.favoriteRestaurant.title',
+              })}
+            </div>
+            <Table
+              columns={favoriteRestaurantColumns}
+              data={favoriteRestaurantTableData}
+              tableClassName={css.tableRoot}
+              tableHeadClassName={css.tableHead}
+              tableHeadCellClassName={css.tableHeadCell}
+              tableBodyClassName={css.tableBody}
+              tableBodyRowClassName={css.tableBodyRow}
+              tableBodyCellClassName={css.tableBodyCell}
+            />
           </div>
-          <Table
-            columns={favoriteFoodColumns}
-            data={favoriteFoodTableData}
-            tableClassName={css.tableRoot}
-            tableHeadClassName={css.tableHead}
-            tableHeadCellClassName={css.tableHeadCell}
-            tableBodyClassName={css.tableBody}
-            tableBodyRowClassName={css.tableBodyRow}
-            tableBodyCellClassName={css.tableBodyCell}
-          />
+          <div className={css.fieldSection}>
+            <div className={css.fieldLabel}>
+              {intl.formatMessage({ id: 'NutritionForm.favoriteFood.title' })}
+            </div>
+            <Table
+              columns={favoriteFoodColumns}
+              data={favoriteFoodTableData}
+              tableClassName={css.tableRoot}
+              tableHeadClassName={css.tableHead}
+              tableHeadCellClassName={css.tableHeadCell}
+              tableBodyClassName={css.tableBody}
+              tableBodyRowClassName={css.tableBodyRow}
+              tableBodyCellClassName={css.tableBodyCell}
+            />
+          </div>
         </div>
         <div className={css.submitChangeBtn}>
           <Button
