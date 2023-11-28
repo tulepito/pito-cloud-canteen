@@ -1,5 +1,6 @@
 @use '/src/styles/customMediaQueries.scss' as *;
 @use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
 
 .formContainer {
   display: flex;
@@ -35,7 +36,11 @@
     .fieldLabel {
       display: inline-block;
       margin-bottom: 8px;
+      @include textTemplate(14px, 400, 20px);
 
+      @include viewportMedium {
+        font-size: 16px;
+      }
       @include viewportLarge {
         padding-top: 10px;
       }

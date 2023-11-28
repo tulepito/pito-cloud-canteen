@@ -123,7 +123,7 @@ const ReviewInfoFormComponent: React.FC<TReviewInfoFormComponentProps> = (
       </div>
       <div className={css.fieldContainer}>
         <label className={css.fieldLabel} htmlFor="ReviewInfoForm.staffName">
-          5. {staffNameField?.label}
+          {staffNameField?.label}
         </label>
         <FieldTextInput
           className={css.fieldInput}
