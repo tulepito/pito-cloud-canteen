@@ -35,6 +35,7 @@ type TReviewCartSectionProps = {
   reviewInfoValues?: TReviewInfoFormValues;
   showStartPickingOrderButton: boolean;
   isViewCartDetailMode?: boolean;
+  shouldShowGoHomeButton?: boolean;
   showGoHomeButton?: boolean;
   onViewCartDetail?: () => void;
   onClickDownloadPriceQuotation: () => void;
@@ -71,6 +72,7 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
     isViewCartDetailMode = false,
     onViewCartDetail = () => {},
     vatSetting = EPartnerVATSetting.vat,
+    shouldShowGoHomeButton = false,
   } = props;
   const intl = useIntl();
   const dispatch = useAppDispatch();
@@ -162,6 +164,10 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
     }
   };
 
+  const handleGoHome = () => {
+    router.push(companyPaths.Home);
+  };
+
   const handleDownloadPriceQuotationClick = () => {
     if (isViewCartDetailMode) {
       previewPriceQuotationControl.setTrue();
@@ -191,6 +197,11 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
               id: 'ReviewCardSection.makePayment',
             })}
           </div>
+        </Button>
+      </RenderWhen>
+      <RenderWhen condition={shouldShowGoHomeButton}>
+        <Button className={css.goHomeButton} onClick={handleGoHome}>
+          <div>Về trang chủ</div>
         </Button>
       </RenderWhen>
 

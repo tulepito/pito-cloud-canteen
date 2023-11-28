@@ -140,6 +140,11 @@
     margin: 16px 0;
   }
 }
+.goHomeButton {
+  @include viewportMedium {
+    display: none;
+  }
+}
 
 .overflowPackageInfo {
   color: $sematicRed2;

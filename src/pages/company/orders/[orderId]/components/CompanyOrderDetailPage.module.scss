@@ -1,7 +1,7 @@
 @use '/src/styles/customMediaQueries.scss' as *;
 
 .root {
-  padding-top: 16px;
+  padding: 16px 16px 210px;
 
   @include viewportMedium {
     padding-top: 24px;
@@ -12,12 +12,6 @@
   }
 
   .titleSection {
-    padding: 0 8px;
-
-    @include viewportSmall {
-      padding: 0 16px;
-    }
-
     @include viewportMedium {
       padding: 0 24px;
       margin: 0 auto;
@@ -36,11 +30,7 @@
   }
 
   .reviewInfoContainer {
-    padding: 16px 8px;
-
-    @include viewportSmall {
-      padding: 24px 16px;
-    }
+    padding: 0;
 
     @include viewportMedium {
       padding: 24px;
