@@ -292,6 +292,7 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
     if (!isViewCartDetailMode) {
       previewPriceQuotationControl.setFalse();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isViewCartDetailMode]);
 
   return (
@@ -314,8 +315,8 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
       </RenderWhen>
 
       <RenderWhen condition={!isViewCartDetailMode}>
-        <MobileBottomContainer>
-          <div className={css.mobileBottomContainer}>
+        <MobileBottomContainer className={css.mobileBottomContainer}>
+          <div className={css.mobileBottomContentContainer}>
             <div className={css.totalInfo}>
               <span>TỔNG TIỀN</span>
               <span className={css.totalWithVAT}>
