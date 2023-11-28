@@ -451,7 +451,6 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
             }}
             canGoBackEditMode
             reviewViewData={reviewViewData}
-            onSubmitEdit={() => {}}
             onDownloadPriceQuotation={handleDownloadPriceQuotation}
             onGoBackToEditOrderPage={handleGoBackFromReviewMode}
             onDownloadReviewOrderResults={onDownloadReviewOrderResults}
