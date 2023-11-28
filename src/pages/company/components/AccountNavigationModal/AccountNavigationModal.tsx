@@ -27,7 +27,7 @@ const AccountNavigationModal: React.FC<TAccountNavigationModalProps> = () => {
   return (
     <div className={css.root}>
       <div className={css.heading}>
-        <div>{intl.formatMessage({ id: 'CompanySidebar.account' })}</div>
+        <span>{intl.formatMessage({ id: 'CompanySidebar.account' })}</span>
       </div>
 
       <div>

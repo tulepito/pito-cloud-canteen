@@ -33,7 +33,7 @@ type TExtraProps = {
   nutritionsOptions: { key: string; label: string }[];
 };
 type TNutritionFormComponentProps = FormRenderProps<TNutritionFormValues> &
-  Partial<TExtraProps>;
+  Partial<TExtraProps> & { visibileFavoriteRestaurantAndFood?: boolean };
 type TNutritionFormProps = FormProps<TNutritionFormValues> & TExtraProps;
 
 const NutritionFormComponent: React.FC<TNutritionFormComponentProps> = (
@@ -46,6 +46,7 @@ const NutritionFormComponent: React.FC<TNutritionFormComponentProps> = (
     isPersonal,
     initialValues,
     nutritionsOptions,
+    visibileFavoriteRestaurantAndFood,
   } = props;
   const intl = useIntl();
   const dispatch = useAppDispatch();
@@ -265,38 +266,42 @@ const NutritionFormComponent: React.FC<TNutritionFormComponentProps> = (
             options={nutritionsOptions}
           />
         </div>
-        <div className={css.fieldSection}>
-          <div className={css.fieldLabel}>
-            {intl.formatMessage({
-              id: 'NutritionForm.favoriteRestaurant.title',
-            })}
-          </div>
-          <Table
-            columns={favoriteRestaurantColumns}
-            data={favoriteRestaurantTableData}
-            tableClassName={css.tableRoot}
-            tableHeadClassName={css.tableHead}
-            tableHeadCellClassName={css.tableHeadCell}
-            tableBodyClassName={css.tableBody}
-            tableBodyRowClassName={css.tableBodyRow}
-            tableBodyCellClassName={css.tableBodyCell}
-          />
-        </div>
-        <div className={css.fieldSection}>
-          <div className={css.fieldLabel}>
-            {intl.formatMessage({ id: 'NutritionForm.favoriteFood.title' })}
-          </div>
-          <Table
-            columns={favoriteFoodColumns}
-            data={favoriteFoodTableData}
-            tableClassName={css.tableRoot}
-            tableHeadClassName={css.tableHead}
-            tableHeadCellClassName={css.tableHeadCell}
-            tableBodyClassName={css.tableBody}
-            tableBodyRowClassName={css.tableBodyRow}
-            tableBodyCellClassName={css.tableBodyCell}
-          />
-        </div>
+        {visibileFavoriteRestaurantAndFood && (
+          <>
+            <div className={css.fieldSection}>
+              <div className={css.fieldLabel}>
+                {intl.formatMessage({
+                  id: 'NutritionForm.favoriteRestaurant.title',
+                })}
+              </div>
+              <Table
+                columns={favoriteRestaurantColumns}
+                data={favoriteRestaurantTableData}
+                tableClassName={css.tableRoot}
+                tableHeadClassName={css.tableHead}
+                tableHeadCellClassName={css.tableHeadCell}
+                tableBodyClassName={css.tableBody}
+                tableBodyRowClassName={css.tableBodyRow}
+                tableBodyCellClassName={css.tableBodyCell}
+              />
+            </div>
+            <div className={css.fieldSection}>
+              <div className={css.fieldLabel}>
+                {intl.formatMessage({ id: 'NutritionForm.favoriteFood.title' })}
+              </div>
+              <Table
+                columns={favoriteFoodColumns}
+                data={favoriteFoodTableData}
+                tableClassName={css.tableRoot}
+                tableHeadClassName={css.tableHead}
+                tableHeadCellClassName={css.tableHeadCell}
+                tableBodyClassName={css.tableBody}
+                tableBodyRowClassName={css.tableBodyRow}
+                tableBodyCellClassName={css.tableBodyCell}
+              />
+            </div>
+          </>
+        )}
         <div className={css.submitChangeBtn}>
           <Button
             type="submit"

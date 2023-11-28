@@ -12,3 +12,17 @@
   @include flexAlign(center, center);
   margin-top: 40px;
 }
+
+@media only screen and (max-width: 600px) {
+  .header {
+    border-bottom: 1px solid $neutralGray3;
+    padding: 8px 16px;
+    height: 56px;
+    @include flexAlign(center);
+    gap: 8px;
+    span {
+      @include text(16px, 24px);
+      font-weight: $fontWeightBold;
+    }
+  }
+}

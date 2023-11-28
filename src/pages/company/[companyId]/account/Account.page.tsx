@@ -27,6 +27,7 @@ const AccountPage = () => {
   const dispatch = useAppDispatch();
   const intl = useIntl();
   const router = useRouter();
+  const { isMobileLayout, isTabletLayout } = useViewport();
 
   const formSubmitInputRef = useRef<any>();
   const [formDisabled, setFormDisabled] = useState<boolean>(true);
@@ -36,7 +37,6 @@ const AccountPage = () => {
     setFalse: closeConfirmationModal,
   } = useBoolean();
 
-  const { isMobileLayout, isTabletLayout } = useViewport();
   const currentUser = useAppSelector(
     (state) => state.user.currentUser,
     shallowEqual,

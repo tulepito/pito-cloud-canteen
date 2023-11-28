@@ -9,14 +9,30 @@
   padding: 0;
 }
 
+.root {
+  display: flow-root;
+  gap: 16px;
+}
+
 .heading {
-  @include textTemplate(16px, 700, 24px);
-  display: flex;
-  align-items: center;
-  flex-direction: row;
-  column-gap: 8px;
-  padding: 14px 16px;
+  // @include textTemplate(16px, 700, 24px);
+  // display: flex;
+  // align-items: center;
+  // flex-direction: row;
+  // column-gap: 8px;
+  // padding: 14px 16px;
+  // border-bottom: 1px solid $neutralGray3;
+  // cursor: pointer;
+
   border-bottom: 1px solid $neutralGray3;
+  padding: 8px 16px;
+  height: 56px;
+  @include flexAlign(center);
+  gap: 8px;
+  span {
+    @include text(16px, 24px);
+    font-weight: $fontWeightBold;
+  }
   cursor: pointer;
 }
 
