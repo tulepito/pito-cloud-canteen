@@ -12,48 +12,63 @@
   @include viewportMedium {
     flex-direction: row;
   }
+}
 
-  .breadCrumb {
-    padding: 0 16px;
+.breadCrumb {
+  padding: 0 16px;
+  column-gap: 8px;
+  align-items: center;
+  display: none;
+  @include textTemplate(14px, 400, 20px);
+
+  @include viewportMedium {
     display: flex;
-    column-gap: 8px;
-    align-items: center;
-    @include textTemplate(14px, 400, 20px);
-
-    .arrowIcon {
-      width: 16px;
-      height: 16px;
-    }
-
-    .orderName {
-      font-weight: 700;
-    }
-
-    .orderNameSkeleton {
-      width: 160px;
-    }
   }
 
-  .subtitle {
-    margin-top: 8px;
+  .arrowIcon {
+    width: 16px;
+    height: 16px;
+  }
+
+  .orderName {
+    font-weight: 700;
+  }
+
+  .orderNameSkeleton {
+    width: 160px;
+  }
+}
+
+.mobileOrderTitle {
+  @include textTemplate(18px, 700, 24px);
+
+  @include viewportMedium {
+    display: none;
+  }
+}
+
+.subtitle {
+  margin-top: 8px;
+
+  @include viewportMedium {
     padding: 0 16px;
-
-    .contactNumber,
-    .chatLink {
-      font-weight: 700;
-      color: $labelBlue2;
-    }
   }
 
-  .reviewButton {
-    padding: 12px 30px;
-    margin: 0 16px;
-    min-width: 132px;
-    height: 50px;
-    @include textTemplate(16px, 700, 24px);
+  .contactNumber,
+  .chatLink {
+    font-weight: 700;
+    color: $labelBlue2;
+  }
+}
 
-    @include viewportMedium {
-      margin: 0;
-    }
+.reviewButton {
+  padding: 12px 30px;
+  margin: 0 16px;
+  min-width: 132px;
+  height: 50px;
+  @include textTemplate(16px, 700, 24px);
+
+  @include viewportMedium {
+    margin: 0;
   }
 }
