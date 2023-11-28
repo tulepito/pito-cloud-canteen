@@ -280,7 +280,7 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
     <div className={rootClasses}>
       <RenderWhen condition={!isMobileLayout || isViewCartDetailMode}>
         <div className={titleClasses}>
-          {title || intl.formatMessage({ id: 'ReviewCardSection.title' })}R
+          {title || intl.formatMessage({ id: 'ReviewCardSection.title' })}
         </div>
         {feeSection}
         <Button

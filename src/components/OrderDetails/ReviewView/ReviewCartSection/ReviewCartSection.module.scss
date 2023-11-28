@@ -27,7 +27,6 @@
 
 .title {
   @include textTemplate(20px, 700, 32px);
-  text-transform: capitalize;
   display: none;
 
   @include viewportMedium {
