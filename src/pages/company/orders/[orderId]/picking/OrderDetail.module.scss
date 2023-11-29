@@ -229,10 +229,18 @@
   & > div:first-of-type {
     @include textTemplate(18px, 700, 4/3);
   }
-  display: none;
+}
 
+.mobileContainer {
   @include viewportMedium {
-    display: block;
+    padding: 16px;
+    border-radius: 16px;
+    background-color: $neutralGray1;
+    outline: 1px solid $neutralGray5;
+    outline-offset: -1px;
+    & > div:first-of-type {
+      @include textTemplate(18px, 700, 4/3);
+    }
   }
 }
 

@@ -177,6 +177,7 @@ const OrderDetailPage = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { isMobileLayout } = useViewport();
+  const manageParticipantModalControl = useBoolean();
   const autoPickingControl = useBoolean();
   const automaticConfirmOrderMobileControl = useBoolean();
   const confirmCancelOrderActions = useBoolean();
@@ -497,9 +498,11 @@ const OrderDetailPage = () => {
               ableToUpdateOrder={ableToUpdateOrder}
             />
             <ManageParticipantsSection
-              className={css.container}
+              className={css.mobileContainer}
               data={editViewData.manageParticipantData}
               ableToUpdateOrder={ableToUpdateOrder}
+              shouldHideOnMobileView
+              mobileModalControl={manageParticipantModalControl}
             />
             {isDraftEditing && (
               <SubOrderChangesHistorySection
@@ -699,7 +702,10 @@ const OrderDetailPage = () => {
     <MoreOptionsIcon
       control={moreOptionsModalControl}
       options={[
-        { content: 'Danh sách thành viên', onClick: () => {} },
+        {
+          content: 'Danh sách thành viên',
+          onClick: manageParticipantModalControl.setTrue,
+        },
         { content: 'Chia sẻ liên kết đặt hàng', onClick: () => {} },
         { content: 'Kết quả chọn món', onClick: () => {} },
       ]}
