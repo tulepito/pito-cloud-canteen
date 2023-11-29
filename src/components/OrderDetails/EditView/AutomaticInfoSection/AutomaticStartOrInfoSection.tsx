@@ -20,7 +20,7 @@ import css from './AutomaticStartOrInfoSection.module.scss';
 type TAutomaticStartOrInfoSectionProps = TDefaultProps & {
   startDate: number;
   deliveryHour: string;
-  handleAutoPickingChange?: () => {};
+  handleAutoPickingChange?: () => void;
   mobileModalControl: TUseBooleanReturns;
   autoPickingFormInitialValues?: TAutomaticPickingFormValues;
 };

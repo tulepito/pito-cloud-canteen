@@ -177,8 +177,9 @@ const OrderDetailPage = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { isMobileLayout } = useViewport();
-  const automaticConfirmOrderMobileControl = useBoolean(false);
-  const confirmCancelOrderActions = useBoolean(false);
+  const autoPickingControl = useBoolean();
+  const automaticConfirmOrderMobileControl = useBoolean();
+  const confirmCancelOrderActions = useBoolean();
   const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
   const {
     query: { orderId, timestamp },
@@ -460,10 +461,14 @@ const OrderDetailPage = () => {
         <RenderWhen condition={!isNormalOrder}>
           <RenderWhen condition={isCreatedByBooker}>
             <AutomaticStartOrInfoSection
-              mobileModalControl={automaticConfirmOrderMobileControl}
               className={css.infoPart}
               startDate={startDate}
               deliveryHour={deliveryHour}
+              mobileModalControl={automaticConfirmOrderMobileControl}
+              autoPickingFormInitialValues={{
+                autoPicking: autoPickingControl.value,
+              }}
+              handleAutoPickingChange={autoPickingControl.toggle}
             />
           </RenderWhen>
           <div className={leftPartClasses}>
@@ -505,7 +510,11 @@ const OrderDetailPage = () => {
           </div>
           <RenderWhen condition={isCreatedByBooker}>
             <div className={css.autoPickingPart}>
-              <AutomaticPickingForm onSubmit={() => {}} />
+              <AutomaticPickingForm
+                initialValues={{ autoPicking: autoPickingControl.value }}
+                handleFieldChange={autoPickingControl.toggle}
+                onSubmit={() => {}}
+              />
             </div>
           </RenderWhen>
           <RenderWhen.False>

@@ -49,7 +49,7 @@ const AutomaticPickingFormComponent: React.FC<
       <OnChange name={'autoPicking'}>{handleFieldChange}</OnChange>
       <div className={css.fieldContainer}>
         {titleComponent}
-        <Field id="pickAllow" name="autoPicking">
+        <Field id="AutomaticPickingForm.toggle" name="autoPicking">
           {({ id, input }) => {
             return (
               <Toggle
@@ -57,7 +57,7 @@ const AutomaticPickingFormComponent: React.FC<
                 name={input.name}
                 status={input.value ? 'on' : 'off'}
                 onClick={(value) => {
-                  input.onChange(value);
+                  handleFieldChange(value);
                 }}
               />
             );
