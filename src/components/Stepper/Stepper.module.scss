@@ -4,6 +4,7 @@
 
 .root {
   padding: 16px 24px 18px;
+
   @include viewportMedium {
     display: none;
   }
@@ -45,9 +46,9 @@
       z-index: -1;
       position: absolute;
       top: 50%;
-      left: calc(-100vw / 3 + 50%);
+      left: calc((-100vw + 56px * 2) / 2 + 50%);
       height: 1px;
-      width: calc(100vw / 3);
+      width: calc((100vw - 56px * 2) / 2);
       background-color: $neutralGray5;
     }
   }
