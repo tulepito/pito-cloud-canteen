@@ -57,14 +57,16 @@ const WDayItem: React.FC<TWDayItemProps> = ({
       .diff(currentDate, ['day', 'hour'])
       .get('day') === 0;
 
-  const startDateTimestamp = startDate?.getTime();
-  const endDateTimestamp = endDate?.getTime();
+  const startDateTimestamp =
+    startDate instanceof Date ? startDate?.getTime() : undefined;
+  const endDateTimestamp =
+    endDate instanceof Date ? endDate?.getTime() : undefined;
   const dateTimestamp = date.getTime();
 
   const isDisabled =
-    startDate &&
-    endDate &&
-    (dateTimestamp < startDateTimestamp || dateTimestamp > endDateTimestamp);
+    startDateTimestamp && endDateTimestamp
+      ? dateTimestamp < startDateTimestamp || dateTimestamp > endDateTimestamp
+      : false;
 
   const indicator = !isMobileLayout
     ? undefined
