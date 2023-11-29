@@ -68,6 +68,7 @@
   "AddOrderForm.submitButtonText": "Thêm",
   "AddParticipantForm.email.invalid": "Vui lòng nhập đúng định dạng Email",
   "AddParticipantForm.email.placeholder": "Nhập email để thêm thành viên",
+  "AddParticipantForm.mobile.email.placeholder": "Nhập email",
   "AddParticipantForm.submitButtonText": "Thêm",
   "AdminAccountSetting.submitPasswordSuccess": "Cập nhật mật khẩu thành công",
   "AdminAccountSetting.submitSuccess": "Cập nhật tài khoản thành công",

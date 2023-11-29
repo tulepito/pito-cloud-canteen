@@ -5,6 +5,7 @@ import classNames from 'classnames';
 import Button from '@components/Button/Button';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import useBoolean from '@hooks/useBoolean';
 import {
   orderDetailsAnyActionsInProgress,
   orderManagementThunks,
@@ -64,8 +65,7 @@ const ManageParticipantsSection: React.FC<TManageParticipantsSectionProps> = (
   const [currentParticipantId, setCurrentParticipantId] = useState<string>();
   const [isDeleteParticipantModalOpen, setIsDeleteParticipantModalOpen] =
     useState(false);
-  const [isManageParticipantsModalOpen, setIsManageParticipantsModalOpen] =
-    useState(false);
+  const manageParticipantsModalControl = useBoolean();
   const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
   const updateParticipantsInProgress = useAppSelector(
     (state) => state.OrderManagement.updateParticipantsInProgress,
@@ -103,13 +103,6 @@ const ManageParticipantsSection: React.FC<TManageParticipantsSectionProps> = (
   };
   const handleCancelDeleteParticipant = () => {
     setIsDeleteParticipantModalOpen(false);
-  };
-
-  const handleClickViewMoreParticipants = () => {
-    setIsManageParticipantsModalOpen(true);
-  };
-  const handleCloseManageParticipantModal = () => {
-    setIsManageParticipantsModalOpen(false);
   };
 
   const handleSubmitAddParticipant = async ({
@@ -153,7 +146,7 @@ const ManageParticipantsSection: React.FC<TManageParticipantsSectionProps> = (
       <Button
         variant="inline"
         className={css.viewDetailBtn}
-        onClick={handleClickViewMoreParticipants}>
+        onClick={manageParticipantsModalControl.setTrue}>
         {viewDetailText}
       </Button>
 
@@ -167,9 +160,9 @@ const ManageParticipantsSection: React.FC<TManageParticipantsSectionProps> = (
       />
 
       <ManageParticipantsModal
-        isOpen={isManageParticipantsModalOpen}
-        onClose={handleCloseManageParticipantModal}
         data={data}
+        isOpen={manageParticipantsModalControl.value}
+        onClose={manageParticipantsModalControl.setFalse}
         handleClickDeleteParticipant={handleClickDeleteParticipant}
         onSubmitAddParticipant={handleSubmitAddParticipant}
         ableToUpdateOrder={ableToUpdateOrder}
