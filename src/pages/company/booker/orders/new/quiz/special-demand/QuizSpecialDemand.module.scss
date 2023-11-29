@@ -15,13 +15,21 @@
   text-align: center;
 }
 
+.modalHeader {
+  justify-content: flex-start;
+}
+
 .headerContainer {
-  @include flexAlign(center, center);
+  @include flexAlign(normal);
   flex-direction: column;
 
   .main {
-    @include textTemplate(24px, $fontWeightBold, 32px);
-    margin-top: 20px;
+    @include textTemplate(18px, $fontWeightBold, 24px);
+
+    @include viewportLarge {
+      @include textTemplate(24px, $fontWeightBold, 32px);
+      margin-top: 20px;
+    }
   }
 
   .semi {

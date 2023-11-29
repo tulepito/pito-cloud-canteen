@@ -23,6 +23,7 @@ type QuizModalProps = {
   submitInProgress?: boolean;
   modalContentRef?: React.RefObject<HTMLDivElement>;
   firstTimeOrder?: boolean;
+  modalHeaderClassName?: string;
   handleClose?: () => void;
   onSubmit?: () => void;
   onCancel?: () => void;
@@ -46,6 +47,7 @@ const QuizModal: React.FC<QuizModalProps> = (props) => {
     children,
     modalContentRef,
     firstTimeOrder,
+    modalHeaderClassName,
   } = props;
 
   const dispatch = useAppDispatch();
@@ -54,6 +56,7 @@ const QuizModal: React.FC<QuizModalProps> = (props) => {
     css.modalContainer,
     modalContainerClassName,
   );
+  const modalHeaderClasses = classNames(css.modalHeader, modalHeaderClassName);
 
   const [currentStep, totalSteps] = stepInfo?.split('/').map(Number) ?? [1, 1];
   const stepList = Array.from({ length: totalSteps }).map(
@@ -109,7 +112,7 @@ const QuizModal: React.FC<QuizModalProps> = (props) => {
           onClick={isFirstStep ? handleCancel : onBack}>
           <IconArrow direction="left" />
         </div>
-        <div className={css.modalHeader}>{modalTitle}</div>
+        <div className={modalHeaderClasses}>{modalTitle}</div>
         <div ref={modalContentRef!} className={css.modalContent}>
           {children}
         </div>

@@ -54,7 +54,7 @@ const BookerNewOrderPage: React.FC = () => {
               className={homePageLinkClasses}
               onClick={onMealClick(item.daySession)}>
               <div className={css.labelWrapper}>
-                <div>{item.label}</div>
+                <div className={css.label}>{item.label}</div>
                 <div className={css.subLabel}>{item.subLabel}</div>
               </div>
               <Image src={item.image} className={css.image} alt={item.key} />

@@ -92,6 +92,7 @@ const QuizSpecialDemand: React.FC<TQuizSpecialDemandProps> = ({
           </div>
         </div>
       }
+      modalHeaderClassName={css.modalHeader}
       submitText="Tiếp tục"
       cancelText="Tôi chưa chắc"
       onCancel={handleSkipStep}
