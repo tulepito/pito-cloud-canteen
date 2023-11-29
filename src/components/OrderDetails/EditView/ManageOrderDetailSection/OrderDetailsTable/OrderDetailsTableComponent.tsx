@@ -105,7 +105,7 @@ export const OrderDetailsTableComponent: React.FC<
     if (!isEmpty(missingIds)) {
       const updateObject = missingIds.reduce((result: any, id: string) => {
         if (typeof result[id] === 'undefined') {
-          result[id] = true;
+          result[id] = false;
         }
 
         return result;

@@ -247,8 +247,10 @@
     }
 
     & .scrollContainer {
-      max-height: calc(36px * 6);
-      overflow-x: auto;
+      @include viewportMedium {
+        max-height: calc(36px * 6);
+        overflow-x: auto;
+      }
 
       & > table {
         width: 100%;

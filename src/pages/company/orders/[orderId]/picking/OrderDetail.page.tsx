@@ -489,13 +489,13 @@ const OrderDetailPage = () => {
               planReachMinRestaurantQuantity={planReachMinRestaurantQuantity}
             />
           </div>
+          <ReviewOrdersResultModal
+            isOpen={managePickingResultModalControl.value}
+            onClose={managePickingResultModalControl.setFalse}
+            data={reviewViewData.reviewResultData}
+            onDownloadReviewOrderResults={handleDownloadPriceQuotation}
+          />
           <div className={rightPartClasses}>
-            <ReviewOrdersResultModal
-              isOpen={managePickingResultModalControl.value}
-              onClose={managePickingResultModalControl.setFalse}
-              data={reviewViewData.reviewResultData}
-              onDownloadReviewOrderResults={handleDownloadPriceQuotation}
-            />
             <OrderDeadlineCountdownSection
               className={css.container}
               data={editViewData.countdownSectionData}

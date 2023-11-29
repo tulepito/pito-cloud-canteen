@@ -1293,7 +1293,7 @@
   "OrderDetailsTable.head.other": "KHÁC",
   "OrderDetailsTable.head.price": "ĐƠN GIÁ",
   "OrderDetailsTable.head.selectedFood": "MÓN ĐÃ CHỌN",
-  "OrderDetailsTable.noChoices": "Chưa có người tham gia chọn món.\nVui lòng cập nhật lại sau khi chia sẻ đường dẫn chọn món nhé",
+  "OrderDetailsTable.noChoices": "Bạn chưa có người tham gia chọn món.\nVui lòng cập nhật lại sau khi chia sẻ đường dẫn chọn món nhé",
   "OrderDetailsTable.tab.chose": "Đã chọn",
   "OrderDetailsTable.tab.notChoose": "Chưa chọn",
   "OrderDetailsTable.tab.notJoin": "Không chọn",

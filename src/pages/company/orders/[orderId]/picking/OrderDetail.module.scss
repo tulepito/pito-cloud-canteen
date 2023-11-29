@@ -64,8 +64,10 @@
 
   .rightPart {
     order: 2;
+    height: 0;
 
     @include viewportMedium {
+      height: fit-content;
       display: grid;
       width: 100%;
       grid-template-columns: repeat(2, calc(50% - 12px));
