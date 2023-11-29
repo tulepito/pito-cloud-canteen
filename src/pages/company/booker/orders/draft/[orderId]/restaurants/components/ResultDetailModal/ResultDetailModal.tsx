@@ -8,9 +8,11 @@ import IconClose from '@components/Icons/IconClose/IconClose';
 import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
 import Modal from '@components/Modal/Modal';
 import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
+import SlideModal from '@components/SlideModal/SlideModal';
 import { calculateDistance } from '@helpers/mapHelpers';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
+import { useViewport } from '@hooks/useViewport';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
 import { Listing } from '@utils/data';
 import { EImageVariants, EOrderType } from '@utils/enums';
@@ -65,6 +67,7 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
   const intl = useIntl();
   const router = useRouter();
   const { timestamp } = router.query;
+  const { isTabletLayoutOrLarger } = useViewport();
 
   const restaurantReviewModalControl = useBoolean();
   const [selectedFoods, setSelectedFoods] = useState<string[]>([]);
@@ -274,17 +277,31 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
     return null;
   }
 
+  const ModalComponent = !isTabletLayoutOrLarger ? SlideModal : Modal;
+
   return (
     <>
-      <Modal
+      <ModalComponent
         id="ResultDetailModal"
         scrollLayerClassName={css.scrollLayer}
         containerClassName={css.modalContainer}
         isOpen={isOpen}
         handleClose={onClose}
+        onClose={onClose}
         customHeader={
           <div className={css.modalHeader}>
             <IconClose className={css.iconClose} onClick={onClose} />
+            <div className={css.coverImage}>
+              <ResponsiveImage
+                className={css.restaurantCover}
+                alt={restaurantName}
+                image={restaurantCover}
+                variants={[
+                  EImageVariants.default,
+                  EImageVariants.landscapeCrop,
+                ]}
+              />
+            </div>
           </div>
         }>
         <ResultDetailHeader
@@ -312,6 +329,7 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
               distance={`${distance}km`}
               onOpenReviewModal={onOpenReviewModal}
               minQuantity={minQuantity}
+              hideInforInMobile={!isTabletLayoutOrLarger}
             />
             <ResultDetailFilters
               onSelectAllFood={handleSelectFoods}
@@ -350,12 +368,13 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
             )}
           </Button>
         </div>
-      </Modal>
+      </ModalComponent>
       <FoodDetailModal
         isOpen={foodModal.value}
         food={selectedFood!}
         onClose={foodModal.setFalse}
         onSelect={handleSelectFood}
+        isMobileLayout={!isTabletLayoutOrLarger}
       />
       <RestaurantReviewModal
         isOpen={restaurantReviewModalControl.value}

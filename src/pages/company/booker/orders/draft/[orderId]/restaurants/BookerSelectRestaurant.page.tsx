@@ -87,13 +87,16 @@ function BookerSelectRestaurant() {
   };
 
   return (
-    <Layout>
-      <LayoutTop>
+    <Layout className={css.container}>
+      <LayoutTop className={css.topContainer}>
         <div className={css.goBackBtn} onClick={handleGoBack}>
           <IconArrow direction="left" />
           Quay lại
         </div>
-        <div className={css.pageTilte}>danh sách nhà hàng</div>
+        <div className={css.pageTilte}>
+          <IconArrow className={css.icon} direction="left" />
+          <div className={css.title}>danh sách nhà hàng</div>
+        </div>
       </LayoutTop>
       <LayoutMain>
         <LayoutSidebar>
