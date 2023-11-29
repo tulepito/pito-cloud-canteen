@@ -9,6 +9,7 @@ import { useRouter } from 'next/router';
 
 import MobileTopContainer from '@components/MobileTopContainer/MobileTopContainer';
 import AlertModal from '@components/Modal/AlertModal';
+import AutomaticPickingForm from '@components/OrderDetails/EditView/AutomaticInfoSection/AutomaticPickingForm';
 import AutomaticStartOrInfoSection from '@components/OrderDetails/EditView/AutomaticInfoSection/AutomaticStartOrInfo';
 import GoHomeIcon from '@components/OrderDetails/EditView/GoHomeIcon/GoHomeIcon';
 import ManageLineItemsSection from '@components/OrderDetails/EditView/ManageOrderDetailSection/ManageLineItemsSection';
@@ -500,6 +501,11 @@ const OrderDetailPage = () => {
               />
             )}
           </div>
+          <RenderWhen condition={isCreatedByBooker}>
+            <div className={css.autoPickingPart}>
+              <AutomaticPickingForm onSubmit={() => {}} />
+            </div>
+          </RenderWhen>
           <RenderWhen.False>
             <div
               className={
