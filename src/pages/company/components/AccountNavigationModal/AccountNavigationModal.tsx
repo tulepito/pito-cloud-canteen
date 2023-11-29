@@ -33,7 +33,7 @@ const AccountNavigationModal: React.FC<TAccountNavigationModalProps> = () => {
       <div>
         <div
           className={css.itemRow}
-          onClick={() => handleNavigatePage(personalPaths.info)}>
+          onClick={() => handleNavigatePage(personalPaths.Info)}>
           <div className={css.headerTitle}>
             <FeatureIcons.User />
             <span>
