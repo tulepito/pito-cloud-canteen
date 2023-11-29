@@ -91,7 +91,7 @@ export const updateMenuAfterFoodDeletedByListId = async (foodIds: string[]) => {
               ] || 0;
 
             const foodsByDate =
-              IntegrationListing(details).getPublicData()?.foodsByDate || {};
+              IntegrationListing(details).getPublicData().foodsByDate || {};
 
             const foodsByDay = foodsByDate?.[day];
 
@@ -322,7 +322,7 @@ export const updateMenuAfterFoodDeleted = async (deletedFoodId: string) => {
             const currentMinFoodPrice =
               menuListing.getPublicData()[`${day}MinFoodPrice`] || 0;
 
-            const foodsByDate = menuListing.getPublicData()?.foodsByDate;
+            const { foodsByDate } = menuListing.getPublicData();
 
             const foodsByDay = foodsByDate?.[day];
 

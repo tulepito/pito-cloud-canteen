@@ -5,6 +5,7 @@ import { calculateGroupMembers, getAllCompanyMembers } from '@helpers/company';
 import { sendNotificationToParticipantOnUpdateOrder } from '@pages/api/apiServices/notification';
 import { pushNativeNotificationOrderDetail } from '@pages/api/helpers/pushNotificationOrderDetailHelper';
 import {
+  createOrUpdateAutomaticStartOrderScheduler,
   createScheduler,
   getScheduler,
   updateScheduler,
@@ -16,17 +17,23 @@ import {
 } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { createNativeNotification } from '@services/nativeNotification';
-import { ENativeNotificationType, EOrderStates } from '@src/utils/enums';
-import type { TListing } from '@src/utils/types';
+import {
+  ENativeNotificationType,
+  EOrderStates,
+  EOrderType,
+} from '@src/utils/enums';
+import type { TListing, TObject } from '@src/utils/types';
 import { denormalisedResponseEntities, Listing } from '@utils/data';
 import { formatTimestamp, VNTimezone } from '@utils/dates';
+
+import { isOrderCreatedByBooker } from '../../../../helpers/orderHelper';
 
 const updateOrder = async ({
   orderId,
   generalInfo,
 }: {
   orderId: string;
-  generalInfo: any;
+  generalInfo: TObject;
 }) => {
   const integrationSdk = getIntegrationSdk();
 
@@ -37,6 +44,9 @@ const updateOrder = async ({
     plans = [],
     orderState: currentOrderState,
     orderStateHistory = [],
+    startDate,
+    deliveryHour,
+    orderType = EOrderType.group,
   } = Listing(orderListing).getMetadata();
   const companyAccount = await fetchUser(companyId);
 
@@ -44,14 +54,17 @@ const updateOrder = async ({
   const isOrderHasInProgressState = orderStateHistory.some(
     ({ state }: { state: string }) => state === EOrderStates.inProgress,
   );
+  const isCreatedByBooker = isOrderCreatedByBooker(orderStateHistory);
+  const isGroupOrder = orderType === EOrderType.group;
 
   if (!isEmpty(generalInfo)) {
     const {
-      startDate,
-      endDate,
+      startDate: updateStartDate,
+      endDate: updateEndDate,
       deadlineDate,
       orderState: updatedOrderState,
       selectedGroups: updateSelectedGroups,
+      deliveryHour: updateDeliveryHour,
     } = generalInfo;
 
     const shouldUpdateParticipantList =
@@ -94,15 +107,16 @@ const updateOrder = async ({
 
     const { companyName } = companyAccount.attributes.profile.publicData;
 
-    const shouldUpdateOrderName = companyName && startDate && endDate;
-    const newOrderStateHistory = updatedOrderState
+    const shouldUpdateOrderName =
+      companyName && updateStartDate && updateEndDate;
+    const newOrderStateHistoryMaybe = updatedOrderState
       ? orderStateHistory.concat({
           state: updatedOrderState,
           updatedAt: Date.now(),
         })
       : orderStateHistory;
-    // eslint-disable-next-line prefer-destructuring
-    updatedOrderListing = denormalisedResponseEntities(
+
+    [updatedOrderListing] = denormalisedResponseEntities(
       await integrationSdk.listings.update(
         {
           id: orderId,
@@ -111,8 +125,8 @@ const updateOrder = async ({
                 publicData: {
                   companyName,
                   orderName: `${companyName}_${formatTimestamp(
-                    generalInfo.startDate,
-                  )} - ${formatTimestamp(generalInfo.endDate)}`,
+                    updateStartDate,
+                  )} - ${formatTimestamp(updateEndDate)}`,
                 },
               }
             : {}),
@@ -123,16 +137,28 @@ const updateOrder = async ({
                   participants,
                 }
               : {}),
-            orderStateHistory: newOrderStateHistory,
+            orderStateHistory: newOrderStateHistoryMaybe,
           },
         },
         { expand: true },
       ),
-    )[0];
+    );
 
-    const { orderState } = generalInfo || {};
+    // * update AutomaticStartOrderScheduler
+    if (updateStartDate || updateDeliveryHour) {
+      if (isCreatedByBooker && isGroupOrder)
+        createOrUpdateAutomaticStartOrderScheduler({
+          orderId,
+          startDate: updateStartDate || startDate,
+          deliveryHour: updateDeliveryHour || deliveryHour,
+        });
+    }
 
-    if (orderState === EOrderStates.picking && !isOrderHasInProgressState) {
+    if (
+      updatedOrderState === EOrderStates.picking &&
+      !isOrderHasInProgressState
+    ) {
+      // * send notification when transit from inprogress back to picking state
       participants.forEach((participantId) => {
         createNativeNotification(
           ENativeNotificationType.BookerTransitOrderStateToPicking,

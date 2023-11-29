@@ -1,7 +1,10 @@
 import { isEmpty, omit } from 'lodash';
 
 import type { TDaySession } from '@components/CalendarDashboard/helpers/types';
-import { isOrderDetailDatePickedFood } from '@helpers/orderHelper';
+import {
+  isOrderDetailDatePickedFood,
+  prepareDaySession,
+} from '@helpers/orderHelper';
 import { denormalisedResponseEntities } from '@services/data';
 import { fetchListing } from '@services/integrationHelper';
 import { Listing } from '@src/utils/data';
@@ -84,7 +87,7 @@ export const normalizeOrderMetadata = (metadata: TObject, newData: TObject) => {
     staffName,
     vatAllow,
     deliveryHour: newDeliveryHour,
-    daySession: newDaySession,
+    daySession: prepareDaySession(daySession, deliveryHour),
     deadlineHour,
     mealType,
   };

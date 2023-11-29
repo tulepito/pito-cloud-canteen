@@ -60,7 +60,7 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
       ...result,
       {
         value: User(cur).getId(),
-        label: User(cur).getPublicData()?.companyName,
+        label: User(cur).getPublicData().companyName,
         logo: User(cur).getProfileImage(),
       },
     ];
@@ -162,7 +162,7 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
       );
       setSelectedAccount({
         value: User(currentCompany!).getId(),
-        label: User(currentCompany!).getPublicData()?.companyName,
+        label: User(currentCompany!).getPublicData().companyName,
       });
     }
   }, [companyId, companyList]);
@@ -173,7 +173,7 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
           companyList.find(
             (_company) => User(_company!).getId() === companyId,
           )!,
-        ).getPublicData()?.companyName
+        ).getPublicData().companyName
       : 'Tài khoản cá nhân';
 
   useEffect(() => {

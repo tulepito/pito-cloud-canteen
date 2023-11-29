@@ -5,6 +5,8 @@
 
 .root {
   background-color: #f2f2f7;
+  height: 100vh;
+  overflow: hidden auto;
 
   @include viewportLarge {
     background-color: $neutralGray1;
@@ -28,6 +30,9 @@
   padding: 12px 16px;
   border-bottom: 1px solid $neutralGray3;
   background-color: $neutralGray1;
+  position: sticky;
+  top: 0;
+  z-index: 2;
 
   @include viewportLarge {
     display: none;
@@ -54,7 +59,7 @@
 .mobileFormWrapper {
   margin-top: 8px;
   background-color: $neutralGray1;
-  padding-bottom: 104px;
+  padding-bottom: 160px;
   @include viewportLarge {
     display: none;
   }
@@ -64,6 +69,9 @@
   padding: 16px;
   box-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.08);
   background-color: $neutralGray1;
+  position: sticky;
+  top: 49px;
+  z-index: 2;
 
   @include viewportLarge {
     display: none;

@@ -530,7 +530,7 @@ export type TTableSortValue = {
   type: 'asc' | 'desc';
 };
 
-export type TOrderStateHistory = {
+export type TOrderStateHistoryItem = {
   state: EOrderStates | EOrderDraftStates | EBookerOrderDraftStates;
   updatedAt: number;
 };
@@ -723,4 +723,9 @@ export type TPaymentRecord = {
   isHideFromHistory?: boolean;
   totalPrice?: number;
   paymentType?: EPaymentType;
+};
+
+export type TChartPoint = {
+  dataLabel: string;
+  [dataKey: string]: any;
 };

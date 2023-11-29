@@ -5,8 +5,11 @@ import { useIntl } from 'react-intl';
 import Skeleton from 'react-loading-skeleton';
 import classNames from 'classnames';
 import isEmpty from 'lodash/isEmpty';
+import { DateTime } from 'luxon';
 import { useRouter } from 'next/router';
 
+import IconNoteBook from '@components/Icons/IconNoteBook/IconNoteBook';
+import IconNoteCheckList from '@components/Icons/IconNoteCheckList/IconNoteCheckList';
 import MobileTopContainer from '@components/MobileTopContainer/MobileTopContainer';
 import AlertModal from '@components/Modal/AlertModal';
 import GoHomeIcon from '@components/OrderDetails/EditView/GoHomeIcon/GoHomeIcon';
@@ -22,6 +25,7 @@ import type { TReviewInfoFormValues } from '@components/OrderDetails/ReviewView/
 import ReviewView from '@components/OrderDetails/ReviewView/ReviewView';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import Stepper from '@components/Stepper/Stepper';
+import { isOrderCreatedByBooker } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { useDownloadPriceQuotation } from '@hooks/useDownloadPriceQuotation';
@@ -35,7 +39,8 @@ import {
 } from '@redux/slices/OrderManagement.slice';
 import { BOOKER_CREATE_GROUP_ORDER_STEPS } from '@src/constants/stepperSteps';
 import { companyPaths } from '@src/paths';
-import { diffDays } from '@src/utils/dates';
+import { diffDays, formatTimestamp } from '@src/utils/dates';
+import { FORMATTED_WEEKDAY } from '@src/utils/options';
 import type { TPlan } from '@src/utils/orderTypes';
 import { ETransition } from '@src/utils/transaction';
 import { CurrentUser, Listing } from '@utils/data';
@@ -105,7 +110,7 @@ export const checkMinMaxQuantityInPickingState = (
     planValidations = Object.keys(orderDetail).reduce(
       (prev: any, dateAsTimeStamp) => {
         const currentOrderDetails = orderDetail[dateAsTimeStamp] || {};
-        const { memberOrders = {}, restaurant } = currentOrderDetails;
+        const { memberOrders = {}, restaurant = {} } = currentOrderDetails;
         const { minQuantity = 0, maxQuantity = 100 } = restaurant;
         const totalAdded = Object.keys(memberOrders).filter(
           (f) =>
@@ -216,6 +221,9 @@ const OrderDetailPage = () => {
     bookerId,
     orderType = EOrderType.normal,
     orderVATPercentage,
+    startDate,
+    deliveryHour,
+    orderStateHistory = [],
   } = Listing(orderData as TListing).getMetadata();
 
   const isAnyMobileModalOpening = moreOptionsModalControl.value;
@@ -224,6 +232,20 @@ const OrderDetailPage = () => {
   const isDraftEditing = orderState === EOrderStates.inProgress;
   const isEditViewMode = viewMode === EPageViewMode.edit;
   const isViewCartDetailMode = viewMode === EPageViewMode.cartDetail;
+  const isCreatedByBooker = isOrderCreatedByBooker(orderStateHistory);
+
+  const planId = Listing(planData as TListing).getId();
+
+  const normalizedDeliveryHour = deliveryHour?.includes('-')
+    ? deliveryHour.split('-')[0]
+    : deliveryHour;
+  const automaticConfirmDate = DateTime.fromMillis(Number(startDate)).minus({
+    days: 1,
+  });
+  const formattedAutomaticConfirmOrder = `${
+    FORMATTED_WEEKDAY[automaticConfirmDate.weekday]
+  }, ${formatTimestamp(automaticConfirmDate.toMillis(), 'dd/MM/yyyy')}`;
+
   const {
     planValidationsInProgressState,
     orderReachMaxCanModify: orderReachMaxCanModifyInProgressState,
@@ -276,14 +298,18 @@ const OrderDetailPage = () => {
     VATPercentage: isPickingOrder ? systemVATPercentage : orderVATPercentage,
   });
 
-  const plan = Listing(planData as TListing);
-  const planId = plan.getId();
   const userId = CurrentUser(currentUser!).getId();
 
   const editViewClasses = classNames(css.editViewRoot, {
     [css.editNormalOrderView]: isNormalOrder,
     [css.editNormalOrderViewWithHistorySection]:
       isNormalOrder && isDraftEditing,
+  });
+  const leftPartClasses = classNames(css.leftPart, {
+    [css.leftPartWithInfo]: isCreatedByBooker,
+  });
+  const rightPartClasses = classNames(css.rightPart, {
+    [css.rightPartWithInfo]: isCreatedByBooker,
   });
 
   const confirmButtonMessage = isPickingOrder
@@ -443,7 +469,37 @@ const OrderDetailPage = () => {
           shouldHideBottomContainer={isAnyMobileModalOpening}
         />
         <RenderWhen condition={!isNormalOrder}>
-          <div className={css.leftPart}>
+          <RenderWhen condition={isCreatedByBooker}>
+            <div className={css.infoPart}>
+              <div className={css.columnContainer}>
+                <IconNoteCheckList />
+                <div>
+                  <div className={css.columnTitle}>Tự động đặt đơn</div>
+                  <div>
+                    Đơn sẽ được tự động đặt vào lúc{' '}
+                    <b>
+                      {normalizedDeliveryHour} {formattedAutomaticConfirmOrder}
+                    </b>
+                    . Trường hợp nếu đến hạn mà không đủ số lượng đặt món thì
+                    đơn sẽ bị hủy.
+                  </div>
+                </div>
+              </div>
+              <div className={css.columnContainer}>
+                <IconNoteBook />
+                <div>
+                  <div className={css.columnTitle}>
+                    Tự động hủy tham gia cho thành viên
+                  </div>
+                  <div>
+                    Nếu quá thời hạn mà thành viên chưa chọn món thì sẽ được xem
+                    như là không tham gia ngày ăn.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </RenderWhen>
+          <div className={leftPartClasses}>
             <ManageOrdersSection
               ableToUpdateOrder={ableToUpdateOrder}
               setCurrentViewDate={handleSetCurrentViewDate}
@@ -457,7 +513,7 @@ const OrderDetailPage = () => {
               planReachMinRestaurantQuantity={planReachMinRestaurantQuantity}
             />
           </div>
-          <div className={css.rightPart}>
+          <div className={rightPartClasses}>
             <OrderDeadlineCountdownSection
               className={css.container}
               data={editViewData.countdownSectionData}

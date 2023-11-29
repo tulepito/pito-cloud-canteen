@@ -3,6 +3,7 @@ import Skeleton from 'react-loading-skeleton';
 import classNames from 'classnames';
 import isEmpty from 'lodash/isEmpty';
 
+import Badge from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import NamedLink from '@components/NamedLink/NamedLink';
@@ -13,6 +14,7 @@ import type { TDefaultProps } from '@utils/types';
 import css from './TitleSection.module.scss';
 
 type TTitleSectionProps = TDefaultProps & {
+  isOrderAutomaticConfirmed?: boolean;
   orderTitle: string;
   canReview: boolean;
   goToReviewPage: () => void;
@@ -22,6 +24,7 @@ const TitleSection: React.FC<TTitleSectionProps> = ({
   rootClassName,
   className,
   orderTitle,
+  isOrderAutomaticConfirmed = false,
   canReview,
   goToReviewPage,
 }) => {
@@ -57,12 +60,19 @@ const TitleSection: React.FC<TTitleSectionProps> = ({
       })}
     </span>
   );
-  const subtitle = intl.formatMessage(
-    {
-      id: 'CompanyOrderDetailPage.titleSection.subtitle',
-    },
-    { contactNumber },
-  );
+  const subtitle = isOrderAutomaticConfirmed
+    ? intl.formatMessage(
+        {
+          id: 'CompanyOrderDetailPage.titleSection.subtitleWhenAutomaticConfirmed',
+        },
+        { contactNumber },
+      )
+    : intl.formatMessage(
+        {
+          id: 'CompanyOrderDetailPage.titleSection.subtitle',
+        },
+        { contactNumber },
+      );
 
   const reviewText = intl.formatMessage(
     {
@@ -74,6 +84,12 @@ const TitleSection: React.FC<TTitleSectionProps> = ({
   const orderNameComponent = (
     <RenderWhen condition={!isEmpty(orderTitle)}>
       <div className={css.orderName}>{orderName}</div>
+      <RenderWhen condition={isOrderAutomaticConfirmed}>
+        <Badge label="Tự động xác nhận" />
+      </RenderWhen>
+      <RenderWhen.False>
+        <Skeleton containerClassName={css.orderNameSkeleton} />
+      </RenderWhen.False>
       <RenderWhen.False>
         <Skeleton containerClassName={css.orderNameSkeleton} />
       </RenderWhen.False>

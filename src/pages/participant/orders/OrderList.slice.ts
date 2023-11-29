@@ -214,13 +214,10 @@ export const recommendFood = ({
     foodListToFilter[Math.floor(Math.random() * foodListToFilter.length)];
 
   const mostSuitableFood = !isAllFoodHaveNoRating
-    ? maxBy(
-        foodListToFilter,
-        (food) => Listing(food).getMetadata()?.rating || 0,
-      )
+    ? maxBy(foodListToFilter, (food) => Listing(food).getMetadata().rating || 0)
     : maxBy(
         foodListToFilter,
-        (food) => Listing(food).getMetadata()?.pickingTime || 0,
+        (food) => Listing(food).getMetadata().pickingTime || 0,
       );
 
   return random() === 1 ? randomFood : mostSuitableFood;

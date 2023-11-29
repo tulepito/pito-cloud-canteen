@@ -262,8 +262,7 @@ const transit = createAsyncThunk(
       transition,
     });
 
-    const { tx } = response;
-    const txGetter = Transaction(tx as TTransaction);
+    const txGetter = Transaction(response.tx as TTransaction);
     const { booking, provider } = txGetter.getFullData();
     const { displayStart } = booking.attributes;
     const { lastTransition } = txGetter.getAttributes();

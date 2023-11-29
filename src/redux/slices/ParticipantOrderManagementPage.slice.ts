@@ -127,9 +127,7 @@ const loadData = createAsyncThunk(
       restaurants: allRelatedRestaurants,
       subOrderTxs,
       shouldShowFirstTimeOrderModal:
-        !orderListing.getMetadata()?.[
-          `hideFirstTimeOrderModal_${currentUserId}`
-        ],
+        !orderListing.getMetadata()[`hideFirstTimeOrderModal_${currentUserId}`],
     };
 
     if (companyId) {

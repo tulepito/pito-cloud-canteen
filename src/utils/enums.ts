@@ -451,3 +451,25 @@ export enum EOnWheelOrderStatus {
   accepted = 'ACCEPTED',
   assigning = 'ASSIGNING',
 }
+
+export enum EFluctuationType {
+  INCREASE = 'increase',
+  DECREASE = 'decrease',
+  EQUAL = 'equal',
+}
+
+export enum ETimeFrame {
+  MONTH = 'month',
+  WEEK = 'week',
+  DAY = 'day',
+}
+
+export enum ETimePeriodOption {
+  TODAY = 'today',
+  YESTERDAY = 'yesterday',
+  LAST_WEEK = 'lastWeek',
+  LAST_MONTH = 'lastMonth',
+  LAST_7_DAYS = 'last7Days',
+  LAST_30_DAYS = 'last30Days',
+  CUSTOM = 'custom',
+}

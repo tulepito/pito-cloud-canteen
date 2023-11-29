@@ -22,7 +22,7 @@ export type TModalProps = PropsWithChildren<{
   title?: ReactNode | string;
   shouldHideIconClose?: boolean;
   closeButton?: ReactNode;
-  handleClose: () => void;
+  handleClose: (e: React.MouseEvent<HTMLElement>) => void;
   modalHeaderClassName?: string;
   scrollLayerClassName?: string;
   customHeader?: ReactNode;

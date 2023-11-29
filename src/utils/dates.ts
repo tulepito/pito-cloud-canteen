@@ -13,6 +13,7 @@ import {
 } from '@components/CalendarDashboard/helpers/constant';
 
 import { getUniqueString } from './data';
+import type { ETimeFrame } from './enums';
 import { EDayOfWeek, EMenuMealType } from './enums';
 import type { TKeyValue } from './types';
 
@@ -699,4 +700,44 @@ export const generateWeekDayList = (startDate: number, endDate: number) => {
   }
 
   return weekdays;
+};
+
+export const getYesterday = (date: Date = new Date()) => {
+  return DateTime.fromJSDate(date).minus({ days: 1 }).startOf('day').toJSDate();
+};
+
+/**
+ *
+ * @param givenDate default is today
+ * @param offset the number of days before givenDate
+ * @returns the date before givenDate with offset
+ */
+export const getDayBeforeGivenDayWithOffset = (
+  givenDate: Date = new Date(),
+  offset: number = 7,
+) => {
+  return DateTime.fromJSDate(givenDate).minus({ days: offset }).toMillis();
+};
+
+export const getTimePeriodBetweenDates = (
+  startDate: Date,
+  endDate: Date,
+  timePeriod: ETimeFrame,
+) => {
+  const start = DateTime.fromJSDate(startDate).setZone(VNTimezone);
+  const end = DateTime.fromJSDate(endDate).setZone(VNTimezone);
+
+  const timePeriods = [];
+
+  let currentTimePeriod = start.startOf(timePeriod);
+
+  while (currentTimePeriod <= end) {
+    timePeriods.push({
+      start: currentTimePeriod.toJSDate(),
+      end: currentTimePeriod.endOf(timePeriod).toJSDate(),
+    });
+    currentTimePeriod = currentTimePeriod.plus({ [`${timePeriod}s`]: 1 });
+  }
+
+  return timePeriods;
 };

@@ -10,10 +10,12 @@ import {
   EVENING_SESSION,
   MORNING_SESSION,
 } from '@components/CalendarDashboard/helpers/constant';
+import type { TDaySession } from '@components/CalendarDashboard/helpers/types';
 import { ETransition } from '@src/utils/transaction';
 import { Listing } from '@utils/data';
 import {
   generateTimeRangeItems,
+  getDaySessionFromDeliveryTime,
   renderDateRange,
   weekDayFormatFromDateTime,
 } from '@utils/dates';
@@ -31,9 +33,10 @@ import type {
   TListing,
   TObject,
   TOrderChangeHistoryItem,
-  TOrderStateHistory,
+  TOrderStateHistoryItem,
 } from '@utils/types';
 
+import { convertHHmmStringToTimeParts } from './dateHelpers';
 import { parseThousandNumber } from './format';
 
 export const ORDER_STATES_TO_ENABLE_EDIT_ABILITY = [
@@ -46,6 +49,14 @@ export const getParticipantPickingLink = (orderId: string) =>
   `${process.env.NEXT_PUBLIC_CANONICAL_URL}/participant/order/${orderId}`;
 export const getTrackingLink = (orderId: string, timestamp: string | number) =>
   `${process.env.NEXT_PUBLIC_CANONICAL_URL}/tracking/${orderId}_${timestamp}`;
+
+export const isOrderCreatedByBooker = (
+  orderStateHistory: TOrderStateHistoryItem[],
+) => {
+  return orderStateHistory.some(
+    ({ state }) => state === EBookerOrderDraftStates.bookerDraft,
+  );
+};
 
 export const isJoinedPlan = (
   foodId: string,
@@ -237,7 +248,7 @@ export const isEnableToStartOrder = (
   return isGroupOrder
     ? Object.values(orderDetail).some(
         ({ restaurant, memberOrders, lineItems = [] }) => {
-          const { id, restaurantName, foodList } = restaurant;
+          const { id, restaurantName, foodList } = restaurant || {};
           const isSetupRestaurant =
             !isEmpty(id) && !isEmpty(restaurantName) && !isEmpty(foodList);
 
@@ -1002,10 +1013,10 @@ export const getEditedSubOrders = (orderDetail: TObject) => {
 };
 
 export const checkIsOrderHasInProgressState = (
-  orderStateHistory: TOrderStateHistory[],
+  orderStateHistory: TOrderStateHistoryItem[],
 ) => {
   return orderStateHistory.some(
-    (state: TOrderStateHistory) => state.state === EOrderStates.inProgress,
+    (state: TOrderStateHistoryItem) => state.state === EOrderStates.inProgress,
   );
 };
 
@@ -1102,4 +1113,30 @@ export const confirmFirstTimeParticipant = (
   }
 
   return true;
+};
+
+export const prepareOrderDeadline = (
+  deadlineDate: number,
+  deadlineHour: string,
+) => {
+  return DateTime.fromMillis(deadlineDate || 0)
+    .startOf('day')
+    .plus({ ...convertHHmmStringToTimeParts(deadlineHour) })
+    .toMillis();
+};
+
+export const prepareDaySession = (
+  daySession: TDaySession,
+  deliveryHour?: string,
+) => {
+  return (
+    daySession ||
+    getDaySessionFromDeliveryTime(
+      isEmpty(deliveryHour)
+        ? undefined
+        : deliveryHour?.includes('-')
+        ? deliveryHour?.split('-')[0]
+        : deliveryHour,
+    )
+  );
 };

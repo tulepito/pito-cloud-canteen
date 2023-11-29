@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { shallowEqual } from 'react-redux';
 
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
@@ -56,7 +56,7 @@ const useRestaurantReview = (
     [seachResult, selectedRestaurantId],
   );
 
-  const fetchingReview = useCallback(() => {
+  useEffect(() => {
     dispatch(
       BookerSelectRestaurantThunks.fetchRestaurantReviews({
         reviewRole: activeTab,
@@ -65,10 +65,6 @@ const useRestaurantReview = (
       }),
     );
   }, [activeTab, dispatch, isViewAll, page]);
-
-  useEffect(() => {
-    fetchingReview();
-  }, [fetchingReview]);
 
   return {
     restaurantBookerReviews,
@@ -79,7 +75,6 @@ const useRestaurantReview = (
     fetchRestaurantReviewInProgress,
     bookerReviewPagination,
     participantReviewPagination,
-    fetchingReview,
   };
 };
 
