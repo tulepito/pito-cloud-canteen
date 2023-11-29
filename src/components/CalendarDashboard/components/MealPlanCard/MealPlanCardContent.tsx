@@ -43,6 +43,10 @@ const MealPlanCardContent: React.FC<TMealPlanCardContentProps> = ({
     shallowEqual,
   );
 
+  const walkthroughStep = useAppSelector(
+    (state) => state.BookerDraftOrderPage.walkthroughStep,
+  );
+
   const restaurantListing: any = restaurantList.find(
     (restaurant) => restaurant.id.uuid === event.resource?.restaurant?.id,
   );
@@ -100,7 +104,10 @@ const MealPlanCardContent: React.FC<TMealPlanCardContentProps> = ({
           ]}
         />
       </div>
-      <div className={css.restaurant}>
+      <div
+        className={classNames(css.restaurant, {
+          [css.walkthrough]: walkthroughStep === 1,
+        })}>
         <span title={restaurantName}>{restaurantName}</span>
         <IconRefreshing
           className={css.recommendRestaurant}

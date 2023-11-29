@@ -7,16 +7,20 @@
   position: relative;
 
   &::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: -36px;
-    transform: matrix(1, 0, 0, -1, 0, 0) rotate(45deg);
-    border-width: 8px;
-    border-style: solid;
-    border-color: $neutralGray1;
-    border-top-color: transparent;
-    border-right-color: transparent;
+    display: none;
+    @include viewportLarge {
+      display: block;
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: -36px;
+      transform: matrix(1, 0, 0, -1, 0, 0) rotate(45deg);
+      border-width: 8px;
+      border-style: solid;
+      border-color: $neutralGray1;
+      border-top-color: transparent;
+      border-right-color: transparent;
+    }
   }
 }
 

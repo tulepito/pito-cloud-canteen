@@ -89,7 +89,7 @@ function BookerDraftOrderPage() {
     useState<EBookerDraftOrderViewMode>(EBookerDraftOrderViewMode.setup);
   const dispatch = useAppDispatch();
   const { isTabletLayoutOrLarger } = useViewport();
-  const { selectedDay } = useSelectDay();
+  const { selectedDay, handleSelectDay } = useSelectDay();
 
   const homeReturnModalController = useBoolean();
 
@@ -384,8 +384,14 @@ function BookerDraftOrderPage() {
     }
   }, [orderId, orderState]);
 
+  useEffect(() => {
+    handleSelectDay(orderDetail[0]?.start);
+  }, [JSON.stringify(orderDetail)]);
+
   return (
-    <WalkThroughTourProvider onCloseTour={handleCloseWalkThrough}>
+    <WalkThroughTourProvider
+      onCloseTour={handleCloseWalkThrough}
+      isMobileLayout={!isTabletLayoutOrLarger}>
       <RenderWhen condition={isSetupMode}>
         <Layout className={css.root}>
           <LayoutSidebar

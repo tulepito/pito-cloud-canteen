@@ -5,23 +5,66 @@ import IconCloseSquare from '@components/Icons/IconCloseSquare/IconCloseSquare';
 import { useAppDispatch } from '@hooks/reduxHooks';
 import { UIActions } from '@redux/slices/UI.slice';
 
+import { BookerDraftOrderPageActions } from '../../BookerDraftOrderPage.slice';
+
 import css from './WalkThroughTour.module.scss';
 
+const tourContent = [
+  ({ currentStep }: any) => (
+    <div>
+      <div className={css.step}>{`${currentStep + 1}/5`}</div>
+      <div className={css.stepTitle}>
+        Đây là menu được tạo từ yêu cầu của bạn.
+      </div>
+      <div className={css.stepContent}>
+        Menu được đề xuất dựa theo nhu cầu của bạn và đánh giá tích cực từ khách
+        hàng
+      </div>
+    </div>
+  ),
+  ({ currentStep }: any) => (
+    <div>
+      <div className={css.step}>{`${currentStep + 1}/5`}</div>
+      <div className={css.stepTitle}>Tự động đổi menu khác</div>
+      <div className={css.stepContent}>
+        Khi bạn bấm nút này, 1 menu mới sẽ được tạo dựa theo nhu cầu của bạn.
+      </div>
+    </div>
+  ),
+  ({ currentStep }: any) => (
+    <div>
+      <div className={css.step}>{`${currentStep + 1}/5`}</div>
+      <div className={css.stepTitle}>Tìm kiếm nhà hàng </div>
+      <div className={css.stepContent}>
+        Bạn có thể tự tìm kiếm một nhà hàng khác với gợi ý của PITO Cloud
+        Canteen.
+      </div>
+    </div>
+  ),
+  ({ currentStep }: any) => (
+    <div>
+      <div className={css.step}>{`${currentStep + 1}/5`}</div>
+      <div className={css.stepTitle}>Xoá menu này</div>
+      <div className={css.stepContent}>
+        Bạn có thể xoá menu đã chọn cho ngày ăn. Bạn vẫn có thể thêm lại sau nếu
+        muốn.
+      </div>
+    </div>
+  ),
+  ({ currentStep }: any) => (
+    <div>
+      <div className={css.step}>{`${currentStep + 1}/5`}</div>
+      <div className={css.stepTitle}>Tùy chọn các món ăn</div>
+      <div className={css.stepContent}>
+        Bạn có thể thêm bớt món ăn trong menu.
+      </div>
+    </div>
+  ),
+];
 const tourConfig = [
   {
     selector: '[data-tour="step-1"]',
-    content: ({ currentStep }: any) => (
-      <div>
-        <div className={css.step}>{`${currentStep + 1}/5`}</div>
-        <div className={css.stepTitle}>
-          Đây là menu được tạo từ yêu cầu của bạn.
-        </div>
-        <div className={css.stepContent}>
-          Menu được đề xuất dựa theo nhu cầu của bạn và đánh giá tích cực từ
-          khách hàng
-        </div>
-      </div>
-    ),
+    content: tourContent[0],
     styles: {
       popover: (base: any) => ({
         ...base,
@@ -37,15 +80,7 @@ const tourConfig = [
   },
   {
     selector: '[data-tour="step-2"]',
-    content: ({ currentStep }: any) => (
-      <div>
-        <div className={css.step}>{`${currentStep + 1}/5`}</div>
-        <div className={css.stepTitle}>Tự động đổi menu khác</div>
-        <div className={css.stepContent}>
-          Khi bạn bấm nút này, 1 menu mới sẽ được tạo dựa theo nhu cầu của bạn.
-        </div>
-      </div>
-    ),
+    content: tourContent[1],
     styles: {
       popover: (base: any) => ({
         ...base,
@@ -62,16 +97,7 @@ const tourConfig = [
   },
   {
     selector: '[data-tour="step-3"]',
-    content: ({ currentStep }: any) => (
-      <div>
-        <div className={css.step}>{`${currentStep + 1}/5`}</div>
-        <div className={css.stepTitle}>Tìm kiếm nhà hàng </div>
-        <div className={css.stepContent}>
-          Bạn có thể tự tìm kiếm một nhà hàng khác với gợi ý của PITO Cloud
-          Canteen.
-        </div>
-      </div>
-    ),
+    content: tourContent[2],
     styles: {
       popover: (base: any) => ({
         ...base,
@@ -87,16 +113,7 @@ const tourConfig = [
   },
   {
     selector: '[data-tour="step-4"]',
-    content: ({ currentStep }: any) => (
-      <div>
-        <div className={css.step}>{`${currentStep + 1}/5`}</div>
-        <div className={css.stepTitle}>Xoá menu này</div>
-        <div className={css.stepContent}>
-          Bạn có thể xoá menu đã chọn cho ngày ăn. Bạn vẫn có thể thêm lại sau
-          nếu muốn.
-        </div>
-      </div>
-    ),
+    content: tourContent[3],
     styles: {
       popover: (base: any) => ({
         ...base,
@@ -113,15 +130,7 @@ const tourConfig = [
   },
   {
     selector: '[data-tour="step-5"]',
-    content: ({ currentStep }: any) => (
-      <div>
-        <div className={css.step}>{`${currentStep + 1}/5`}</div>
-        <div className={css.stepTitle}>Tùy chọn các món ăn</div>
-        <div className={css.stepContent}>
-          Bạn có thể thêm bớt món ăn trong menu.
-        </div>
-      </div>
-    ),
+    content: tourContent[4],
     styles: {
       popover: (base: any) => ({
         ...base,
@@ -137,12 +146,106 @@ const tourConfig = [
   },
 ];
 
+const mobileTourConfig = [
+  {
+    selector: '[data-tour="step-1"]',
+    content: tourContent[0],
+    styles: {
+      popover: (base: any) => ({
+        ...base,
+        borderRadius: 8,
+        left: 0,
+        top: '-11px',
+        maxWidth: '304px',
+      }),
+      maskArea: (base: any) => ({
+        ...base,
+        rx: 8,
+      }),
+    },
+    position: 'top',
+  },
+  {
+    selector: '[data-tour="step-2"]',
+    content: tourContent[1],
+    styles: {
+      popover: (base: any) => ({
+        ...base,
+        borderRadius: 8,
+        left: 0,
+        maxWidth: '304px',
+      }),
+      maskArea: (base: any) => ({
+        ...base,
+        rx: '100%',
+      }),
+    },
+    position: 'top',
+    padding: 10,
+  },
+  {
+    selector: '[data-tour="step-3"]',
+    content: tourContent[2],
+    styles: {
+      popover: (base: any) => ({
+        ...base,
+        borderRadius: 8,
+        left: 0,
+        maxWidth: '304px',
+      }),
+      maskArea: (base: any) => ({
+        ...base,
+        rx: '100%',
+      }),
+    },
+    position: 'top',
+    padding: 10,
+  },
+  {
+    selector: '[data-tour="step-4"]',
+    content: tourContent[3],
+    styles: {
+      popover: (base: any) => ({
+        ...base,
+        borderRadius: 8,
+        left: 0,
+        maxWidth: '304px',
+      }),
+      maskArea: (base: any) => ({
+        ...base,
+        rx: '100%',
+      }),
+    },
+    position: 'top',
+    padding: 10,
+  },
+  {
+    selector: '[data-tour="step-5"]',
+    content: tourContent[4],
+    styles: {
+      popover: (base: any) => ({
+        ...base,
+        borderRadius: 8,
+        left: 0,
+        top: '-12px',
+        maxWidth: '304px',
+      }),
+      maskArea: (base: any) => ({
+        ...base,
+        rx: 8,
+      }),
+    },
+    position: 'top',
+  },
+];
+
 type TWalkThroughTourProps = PropsWithChildren & {
   onCloseTour: () => void;
+  isMobileLayout?: boolean;
 };
 
 const WalkThroughTourProvider: React.FC<TWalkThroughTourProps> = (props) => {
-  const { onCloseTour } = props;
+  const { onCloseTour, isMobileLayout } = props;
   const dispatch = useAppDispatch();
   const disableBody = () => {
     dispatch(UIActions.disableScrollRequest('walkthrough'));
@@ -164,6 +267,9 @@ const WalkThroughTourProvider: React.FC<TWalkThroughTourProps> = (props) => {
         onCloseTour();
       } else {
         setCurrentStep(currentStep + 1);
+        dispatch(
+          BookerDraftOrderPageActions.setWalkthroughStep(currentStep + 1),
+        );
       }
     };
 
@@ -197,7 +303,7 @@ const WalkThroughTourProvider: React.FC<TWalkThroughTourProps> = (props) => {
       maskClassName={css.mask}
       showDots={false}
       showBadge={false}
-      steps={tourConfig as any}>
+      steps={isMobileLayout ? (mobileTourConfig as any) : (tourConfig as any)}>
       {props.children}
     </TourProvider>
   );
