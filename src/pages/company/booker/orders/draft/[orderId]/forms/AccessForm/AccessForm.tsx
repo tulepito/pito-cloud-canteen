@@ -6,6 +6,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import Button from '@components/Button/Button';
 import { IconCheckbox } from '@components/FormFields/FieldCheckbox/FieldCheckbox';
 import NamedLink from '@components/NamedLink/NamedLink';
+import { companyPaths } from '@src/paths';
 
 import css from './AccessForm.module.scss';
 
@@ -125,7 +126,8 @@ const AccessForm: React.FC<TAccessFormProps> = ({
 
         <NamedLink
           className={css.groupsSettings}
-          path={`/company/${companyId}/group-setting`}
+          path={companyPaths.GroupSetting}
+          params={{ companyId: companyId! }}
           target="_blank">
           {intl.formatMessage({
             id: 'Booker.CreateOrder.Form.field.groupsSettings',
