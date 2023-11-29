@@ -63,7 +63,7 @@ export const OrderDetailsTableComponent: React.FC<
 }) => {
   const intl = useIntl();
   const { isMobileLayout } = useViewport();
-  const [isExpandingStatus, setIsExpanding] = useState<any>({});
+  const [expandingStatusMap, setExpandingStatusMap] = useState<any>({});
   const [isManageDeletedModalOpen, setIsManageDeletedModalOpen] =
     useState(false);
   const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
@@ -73,7 +73,7 @@ export const OrderDetailsTableComponent: React.FC<
   );
   const missingIds = difference(
     allParticipantIds,
-    Object.keys(isExpandingStatus || {}),
+    Object.keys(expandingStatusMap),
   );
   const actionDisabled = inProgress;
   const isDataEmpty = deletedTabData?.length === 0;
@@ -95,19 +95,24 @@ export const OrderDetailsTableComponent: React.FC<
   const doNothing = () => {};
 
   const toggleCollapseStatus = (id: string) => () => {
-    setIsExpanding({ ...isExpandingStatus, [id]: !isExpandingStatus[id] });
+    setExpandingStatusMap({
+      ...expandingStatusMap,
+      [id]: !expandingStatusMap[id],
+    });
   };
 
   useEffect(() => {
     if (!isEmpty(missingIds)) {
-      setIsExpanding(
-        missingIds.reduce((result: any, id: string) => {
+      const updateObject = missingIds.reduce((result: any, id: string) => {
+        if (typeof result[id] === 'undefined') {
           result[id] = true;
+        }
 
-          return result;
-        }, {}),
-      );
+        return result;
+      }, expandingStatusMap);
+      setExpandingStatusMap(updateObject);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(missingIds)]);
 
   return (
@@ -151,7 +156,7 @@ export const OrderDetailsTableComponent: React.FC<
                         foodPrice,
                       )}đ`;
 
-                      const isExpanding = isExpandingStatus[memberId];
+                      const isExpanding = expandingStatusMap[memberId];
 
                       const rowClasses = classNames({
                         [css.notAllowed]:
