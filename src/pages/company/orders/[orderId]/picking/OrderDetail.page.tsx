@@ -10,7 +10,7 @@ import { useRouter } from 'next/router';
 import MobileTopContainer from '@components/MobileTopContainer/MobileTopContainer';
 import AlertModal from '@components/Modal/AlertModal';
 import AutomaticPickingForm from '@components/OrderDetails/EditView/AutomaticInfoSection/AutomaticPickingForm';
-import AutomaticStartOrInfoSection from '@components/OrderDetails/EditView/AutomaticInfoSection/AutomaticStartOrInfo';
+import AutomaticStartOrInfoSection from '@components/OrderDetails/EditView/AutomaticInfoSection/AutomaticStartOrInfoSection';
 import GoHomeIcon from '@components/OrderDetails/EditView/GoHomeIcon/GoHomeIcon';
 import ManageLineItemsSection from '@components/OrderDetails/EditView/ManageOrderDetailSection/ManageLineItemsSection';
 import ManageOrdersSection from '@components/OrderDetails/EditView/ManageOrderDetailSection/ManageOrdersSection';
@@ -177,6 +177,7 @@ const OrderDetailPage = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { isMobileLayout } = useViewport();
+  const automaticConfirmOrderMobileControl = useBoolean(false);
   const confirmCancelOrderActions = useBoolean(false);
   const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
   const {
@@ -459,6 +460,7 @@ const OrderDetailPage = () => {
         <RenderWhen condition={!isNormalOrder}>
           <RenderWhen condition={isCreatedByBooker}>
             <AutomaticStartOrInfoSection
+              mobileModalControl={automaticConfirmOrderMobileControl}
               className={css.infoPart}
               startDate={startDate}
               deliveryHour={deliveryHour}
@@ -676,6 +678,12 @@ const OrderDetailPage = () => {
       setViewMode(EPageViewMode.review);
     }
   }, [isMobileLayout, isViewCartDetailMode]);
+
+  useEffect(() => {
+    if (isCreatedByBooker && !isNormalOrder) {
+      automaticConfirmOrderMobileControl.setTrue();
+    }
+  }, []);
 
   const goHomeIcon = <GoHomeIcon control={confirmGoHomeControl} />;
   const moreOptionsIcon = (

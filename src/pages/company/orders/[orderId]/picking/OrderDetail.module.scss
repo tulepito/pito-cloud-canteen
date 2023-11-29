@@ -20,11 +20,8 @@
   }
 
   .infoPart {
-    order: 1;
-    display: none;
-
     @include viewportMedium {
-      display: flex;
+      order: 1;
     }
   }
 

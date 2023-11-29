@@ -8,7 +8,9 @@ import Toggle from '@components/Toggle/Toggle';
 
 import css from './AutomaticPickingForm.module.scss';
 
-export type TAutomaticPickingFormValues = {};
+export type TAutomaticPickingFormValues = {
+  autoPicking: boolean;
+};
 
 type TExtraProps = {
   handleFieldChange?: () => void;
