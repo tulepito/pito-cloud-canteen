@@ -48,7 +48,7 @@ type TOrderDetailsTableComponentProps = {
   ableToUpdateOrder: boolean;
 };
 
-export const OrderDetailsTableComponent: React.FC<
+const OrderDetailsTableComponent: React.FC<
   TOrderDetailsTableComponentProps
 > = ({
   tab,
@@ -313,3 +313,5 @@ export const OrderDetailsTableComponent: React.FC<
     </>
   );
 };
+
+export default OrderDetailsTableComponent;

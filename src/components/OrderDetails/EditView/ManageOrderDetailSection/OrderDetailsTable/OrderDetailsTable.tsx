@@ -28,8 +28,6 @@ import {
 } from './OrderDetailsTable.utils';
 import { usePrepareTabItems } from './usePrepareTabItems';
 
-import css from './OrderDetailsTable.module.scss';
-
 const tableTabList = Object.values(TABLE_TABS);
 
 const findTabByValueOrId = (tabId: string) => {
@@ -237,7 +235,7 @@ const OrderDetailsTable: React.FC<TOrderDetailsTableProps> = (props) => {
   }, [JSON.stringify(tabId)]);
 
   return (
-    <div className={css.root}>
+    <>
       <Tabs
         disabled={inProgress}
         items={tabItems}
@@ -258,7 +256,7 @@ const OrderDetailsTable: React.FC<TOrderDetailsTableProps> = (props) => {
         packagePerMember={packagePerMember}
         currentMemberOrderData={currentMemberOrderData}
       />
-    </div>
+    </>
   );
 };
 
