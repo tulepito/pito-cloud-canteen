@@ -5,13 +5,11 @@ import { useIntl } from 'react-intl';
 import Skeleton from 'react-loading-skeleton';
 import classNames from 'classnames';
 import isEmpty from 'lodash/isEmpty';
-import { DateTime } from 'luxon';
 import { useRouter } from 'next/router';
 
-import IconNoteBook from '@components/Icons/IconNoteBook/IconNoteBook';
-import IconNoteCheckList from '@components/Icons/IconNoteCheckList/IconNoteCheckList';
 import MobileTopContainer from '@components/MobileTopContainer/MobileTopContainer';
 import AlertModal from '@components/Modal/AlertModal';
+import AutomaticStartOrInfoSection from '@components/OrderDetails/EditView/AutomaticInfoSection/AutomaticStartOrInfo';
 import GoHomeIcon from '@components/OrderDetails/EditView/GoHomeIcon/GoHomeIcon';
 import ManageLineItemsSection from '@components/OrderDetails/EditView/ManageOrderDetailSection/ManageLineItemsSection';
 import ManageOrdersSection from '@components/OrderDetails/EditView/ManageOrderDetailSection/ManageOrdersSection';
@@ -39,8 +37,7 @@ import {
 } from '@redux/slices/OrderManagement.slice';
 import { BOOKER_CREATE_GROUP_ORDER_STEPS } from '@src/constants/stepperSteps';
 import { companyPaths } from '@src/paths';
-import { diffDays, formatTimestamp } from '@src/utils/dates';
-import { FORMATTED_WEEKDAY } from '@src/utils/options';
+import { diffDays } from '@src/utils/dates';
 import type { TPlan } from '@src/utils/orderTypes';
 import { ETransition } from '@src/utils/transaction';
 import { CurrentUser, Listing } from '@utils/data';
@@ -235,16 +232,6 @@ const OrderDetailPage = () => {
   const isCreatedByBooker = isOrderCreatedByBooker(orderStateHistory);
 
   const planId = Listing(planData as TListing).getId();
-
-  const normalizedDeliveryHour = deliveryHour?.includes('-')
-    ? deliveryHour.split('-')[0]
-    : deliveryHour;
-  const automaticConfirmDate = DateTime.fromMillis(Number(startDate)).minus({
-    days: 1,
-  });
-  const formattedAutomaticConfirmOrder = `${
-    FORMATTED_WEEKDAY[automaticConfirmDate.weekday]
-  }, ${formatTimestamp(automaticConfirmDate.toMillis(), 'dd/MM/yyyy')}`;
 
   const {
     planValidationsInProgressState,
@@ -470,34 +457,11 @@ const OrderDetailPage = () => {
         />
         <RenderWhen condition={!isNormalOrder}>
           <RenderWhen condition={isCreatedByBooker}>
-            <div className={css.infoPart}>
-              <div className={css.columnContainer}>
-                <IconNoteCheckList />
-                <div>
-                  <div className={css.columnTitle}>Tự động đặt đơn</div>
-                  <div>
-                    Đơn sẽ được tự động đặt vào lúc{' '}
-                    <b>
-                      {normalizedDeliveryHour} {formattedAutomaticConfirmOrder}
-                    </b>
-                    . Trường hợp nếu đến hạn mà không đủ số lượng đặt món thì
-                    đơn sẽ bị hủy.
-                  </div>
-                </div>
-              </div>
-              <div className={css.columnContainer}>
-                <IconNoteBook />
-                <div>
-                  <div className={css.columnTitle}>
-                    Tự động hủy tham gia cho thành viên
-                  </div>
-                  <div>
-                    Nếu quá thời hạn mà thành viên chưa chọn món thì sẽ được xem
-                    như là không tham gia ngày ăn.
-                  </div>
-                </div>
-              </div>
-            </div>
+            <AutomaticStartOrInfoSection
+              className={css.infoPart}
+              startDate={startDate}
+              deliveryHour={deliveryHour}
+            />
           </RenderWhen>
           <div className={leftPartClasses}>
             <ManageOrdersSection
