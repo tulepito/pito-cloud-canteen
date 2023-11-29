@@ -21,6 +21,7 @@ import OrderLinkSection from '@components/OrderDetails/EditView/OrderLinkSection
 import OrderTitle from '@components/OrderDetails/EditView/OrderTitle/OrderTitle';
 import SubOrderChangesHistorySection from '@components/OrderDetails/EditView/SubOrderChangesHistorySection/SubOrderChangesHistorySection';
 import type { TReviewInfoFormValues } from '@components/OrderDetails/ReviewView/ReviewInfoSection/ReviewInfoForm';
+import ReviewOrdersResultModal from '@components/OrderDetails/ReviewView/ReviewOrdersResultSection/ReviewOrdersResultModal';
 import ReviewView from '@components/OrderDetails/ReviewView/ReviewView';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import Stepper from '@components/Stepper/Stepper';
@@ -179,6 +180,7 @@ const OrderDetailPage = () => {
   const { isMobileLayout } = useViewport();
   const sendNotificationModalControl = useBoolean();
   const manageParticipantModalControl = useBoolean();
+  const managePickingResultModalControl = useBoolean();
   const autoPickingControl = useBoolean();
   const automaticConfirmOrderMobileControl = useBoolean();
   const confirmCancelOrderActions = useBoolean();
@@ -488,6 +490,12 @@ const OrderDetailPage = () => {
             />
           </div>
           <div className={rightPartClasses}>
+            <ReviewOrdersResultModal
+              isOpen={managePickingResultModalControl.value}
+              onClose={managePickingResultModalControl.setFalse}
+              data={reviewViewData.reviewResultData}
+              onDownloadReviewOrderResults={handleDownloadPriceQuotation}
+            />
             <OrderDeadlineCountdownSection
               className={css.container}
               data={editViewData.countdownSectionData}
@@ -713,7 +721,10 @@ const OrderDetailPage = () => {
           content: 'Chia sẻ liên kết đặt hàng',
           onClick: sendNotificationModalControl.setTrue,
         },
-        { content: 'Kết quả chọn món', onClick: () => {} },
+        {
+          content: 'Kết quả chọn món',
+          onClick: managePickingResultModalControl.setTrue,
+        },
       ]}
     />
   );

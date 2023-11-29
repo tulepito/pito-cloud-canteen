@@ -1857,7 +1857,7 @@ const OrderManagementSlice = createSlice({
       .addCase(deleteParticipant.fulfilled, (state, { payload }) => {
         state.isDeletingParticipant = false;
         state.participantData = state.participantData.filter(
-          (p) => p.id.uuid !== payload,
+          (p) => p.id.uuid !== payload.participantId,
         );
         state.orderData = {
           ...state.orderData,
