@@ -177,6 +177,7 @@ const OrderDetailPage = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { isMobileLayout } = useViewport();
+  const sendNotificationModalControl = useBoolean();
   const manageParticipantModalControl = useBoolean();
   const autoPickingControl = useBoolean();
   const automaticConfirmOrderMobileControl = useBoolean();
@@ -493,9 +494,11 @@ const OrderDetailPage = () => {
               ableToUpdateOrder={ableToUpdateOrder}
             />
             <OrderLinkSection
-              className={css.container}
+              className={css.mobileContainer}
               data={editViewData.linkSectionData}
               ableToUpdateOrder={ableToUpdateOrder}
+              shouldHideOnMobileView
+              mobileModalControl={sendNotificationModalControl}
             />
             <ManageParticipantsSection
               className={css.mobileContainer}
@@ -706,7 +709,10 @@ const OrderDetailPage = () => {
           content: 'Danh sách thành viên',
           onClick: manageParticipantModalControl.setTrue,
         },
-        { content: 'Chia sẻ liên kết đặt hàng', onClick: () => {} },
+        {
+          content: 'Chia sẻ liên kết đặt hàng',
+          onClick: sendNotificationModalControl.setTrue,
+        },
         { content: 'Kết quả chọn món', onClick: () => {} },
       ]}
     />

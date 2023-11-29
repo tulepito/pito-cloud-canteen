@@ -4,7 +4,11 @@
 
 .linkLabel {
   color: $neutralGray6;
-  @include textTemplate(16px, 400, 24px);
+  @include textTemplate(16px, 600, 24px);
+
+  @include viewportMedium {
+    font-weight: 600;
+  }
 }
 
 .infoContainer {
@@ -33,10 +37,16 @@
 }
 
 .alertContainer {
-  padding: 6px 10px 10px;
+  padding: 6px 10px;
   background-color: $primaryPri1;
   margin-bottom: 16px;
   @include textTemplate(14px, 400, 20px);
+  margin-top: 12px;
+
+  @include viewportMedium {
+    margin-top: 0;
+    padding-bottom: 10px;
+  }
 }
 
 .divider {
@@ -56,12 +66,15 @@
     display: inline-block;
     @include textTemplate(16px, 400, 1.5);
     color: $labelBlue2;
-
     padding: 10px 16px;
     outline: 1px solid $neutralGray5;
     outline-offset: -1px;
-    border-radius: 16px;
+    border-radius: 8px;
     flex-grow: 1;
+
+    @include viewportMedium {
+      border-radius: 16px;
+    }
   }
 
   button {
@@ -85,7 +98,11 @@
   }
 
   .descriptionLabel {
-    @include textTemplate(12px, 400, 24px);
-    color: $neutralGray6;
+    @include textTemplate(12px, 600, 16px);
+
+    @include viewportMedium {
+      color: $neutralGray6;
+      @include textTemplate(12px, 400, 24px);
+    }
   }
 }

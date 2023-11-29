@@ -1626,7 +1626,7 @@
   "SendNotificationModal.copyToClipboardTooltip.copied": "Đã sao chép",
   "SendNotificationModal.copyToClipboardTooltip.default": "Sao chép vào bộ nhớ tạm",
   "SendNotificationModal.descriptionLabel": "Thêm mô tả để giải thích thêm về đơn hàng này",
-  "SendNotificationModal.descriptionPlaceholder": "Mô tả để giải thích thêm về đơn hàng này",
+  "SendNotificationModal.descriptionPlaceholder": "Mô tả để giải thích về đơn hàng này",
   "SendNotificationModal.info.companyTitle": "Công ty:",
   "SendNotificationModal.linkLabel": "Gửi email đường dẫn này đến nhóm của bạn để chọn món",
   "SendNotificationModal.title": "Chia sẻ liên kết đặt hàng",
