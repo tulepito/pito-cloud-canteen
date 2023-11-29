@@ -1,4 +1,5 @@
 import { useField, useForm } from 'react-final-form-hooks';
+import { useIntl } from 'react-intl';
 import { useRouter } from 'next/router';
 
 import Button from '@components/Button/Button';
@@ -27,6 +28,7 @@ type TChangePasswordFormProps = {
 
 const validate = (values: TChangePasswordFormValues) => {
   const errors: any = {};
+
   if (!values.password) {
     errors.password = 'Vui lòng nhập mật khẩu.';
   }
@@ -58,6 +60,7 @@ const ChangePasswordForm: React.FC<TChangePasswordFormProps> = ({
   onSubmit,
   inProgress = false,
 }) => {
+  const intl = useIntl();
   const router = useRouter();
   const { isMobileLayout, isTabletLayout } = useViewport();
   const dispatch = useAppDispatch();
@@ -111,28 +114,42 @@ const ChangePasswordForm: React.FC<TChangePasswordFormProps> = ({
     <Form onSubmit={handleSubmit} className={css.root}>
       {!(isMobileLayout || isTabletLayout) && (
         <div className={css.header}>
-          <span>Cài đặt</span>
+          <span>
+            {intl.formatMessage({
+              id: 'AdminSidebar.settingLabel',
+            })}
+          </span>
         </div>
       )}
       <div className={css.formContainer}>
         <div className={css.changePasswordSection}>
           {!(isMobileLayout || isTabletLayout) && (
-            <div className={css.sectionTitle}>Cài đặt mật khẩu</div>
+            <div className={css.sectionTitle}>
+              {intl.formatMessage({
+                id: 'CompanySidebar.passwordSetting',
+              })}
+            </div>
           )}
           <div className={css.fieldsContainer}>
             <div className={css.fieldWrapper}>
               <FieldPasswordInputComponent
                 id={`password`}
                 name="password"
-                label="Mật khẩu hiện tại"
+                label={intl.formatMessage({
+                  id: 'AccountPage.currentPassword',
+                })}
                 input={passwordInput}
                 meta={password.meta}
-                placeholder="Nhập mật khẩu hiện tại"
+                placeholder={intl.formatMessage({
+                  id: 'AccountPage.currentPassword',
+                })}
                 className={css.fieldInput}
               />
               <div className={css.forgotPassword}>
                 <span onClick={navigateToPasswordRecoverPage}>
-                  Quên mật khẩu?
+                  {intl.formatMessage({
+                    id: 'SignInForm.forgotPassword',
+                  })}
                 </span>
               </div>
             </div>
@@ -140,10 +157,14 @@ const ChangePasswordForm: React.FC<TChangePasswordFormProps> = ({
               <FieldPasswordInputComponent
                 id={`newPassword`}
                 name="newPassword"
-                label="Mật khẩu mới"
+                label={intl.formatMessage({
+                  id: 'AccountPage.newPassword',
+                })}
                 input={newPasswordInput}
                 meta={newPassword.meta}
-                placeholder="Nhập mật khẩu mới"
+                placeholder={intl.formatMessage({
+                  id: 'AccountPage.inputNewPassword',
+                })}
                 className={css.fieldInput}
               />
             </div>
@@ -151,16 +172,24 @@ const ChangePasswordForm: React.FC<TChangePasswordFormProps> = ({
               <FieldPasswordInputComponent
                 id={`confirmPassword`}
                 name="confirmPassword"
-                label="Xác nhận mật khẩu mới"
+                label={intl.formatMessage({
+                  id: 'AccountPage.confirmNewPassword',
+                })}
                 input={confirmPasswordInput}
                 meta={confirmPassword.meta}
-                placeholder="Xác nhận mật khẩu mới"
+                placeholder={intl.formatMessage({
+                  id: 'AccountPage.confirmNewPassword',
+                })}
                 className={css.fieldInput}
               />
             </div>
 
             <RenderWhen condition={changePasswordError !== null}>
-              <ErrorMessage message="Mật khẩu hiện tại chưa đúng" />
+              <ErrorMessage
+                message={intl.formatMessage({
+                  id: 'AccountPage.wrongPassword',
+                })}
+              />
             </RenderWhen>
           </div>
         </div>
@@ -170,7 +199,7 @@ const ChangePasswordForm: React.FC<TChangePasswordFormProps> = ({
             disabled={disabledSubmit}
             inProgress={inProgress}
             className={css.submitBtn}>
-            Lưu thay đổi
+            {intl.formatMessage({ id: 'AccountPage.submitBtn' })}
           </Button>
         </div>
       </div>
