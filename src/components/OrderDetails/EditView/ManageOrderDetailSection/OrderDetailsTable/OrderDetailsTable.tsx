@@ -238,28 +238,26 @@ const OrderDetailsTable: React.FC<TOrderDetailsTableProps> = (props) => {
 
   return (
     <div className={css.root}>
-      <div>
-        <Tabs
-          disabled={inProgress}
-          items={tabItems}
-          onChange={handleTabChange}
-          defaultActiveKey={defaultActiveKey.toString()}
-        />
-        <AlertConfirmDeleteParticipant
-          isOpen={isDeleteParticipantModalOpen}
-          onClose={turnOffDeleteParticipantModalOpen}
-          onCancel={handleCancelDeleteOrderItem}
-          onConfirm={handleConfirmDeleteOrderItem}
-        />
-        <EditOrderRowModal
-          isOpen={isEditSelectionModalOpen}
-          onClose={handleCloseEditSelectionModal}
-          onSubmit={handleSubmitEditSelectionModal}
-          foodOptions={foodOptions}
-          packagePerMember={packagePerMember}
-          currentMemberOrderData={currentMemberOrderData}
-        />
-      </div>
+      <Tabs
+        disabled={inProgress}
+        items={tabItems}
+        onChange={handleTabChange}
+        defaultActiveKey={defaultActiveKey.toString()}
+      />
+      <AlertConfirmDeleteParticipant
+        isOpen={isDeleteParticipantModalOpen}
+        onClose={turnOffDeleteParticipantModalOpen}
+        onCancel={handleCancelDeleteOrderItem}
+        onConfirm={handleConfirmDeleteOrderItem}
+      />
+      <EditOrderRowModal
+        isOpen={isEditSelectionModalOpen}
+        onClose={handleCloseEditSelectionModal}
+        onSubmit={handleSubmitEditSelectionModal}
+        foodOptions={foodOptions}
+        packagePerMember={packagePerMember}
+        currentMemberOrderData={currentMemberOrderData}
+      />
     </div>
   );
 };
