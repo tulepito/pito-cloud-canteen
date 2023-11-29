@@ -38,7 +38,8 @@
       margin-top: 20px;
     }
     .info {
-      flex-basis: 306px;
+      display: grid;
+      flex-basis: 410px;
 
       .title {
         @include textTemplate(14px, 400, 20px);
@@ -48,6 +49,9 @@
       .content {
         @include textTemplate(14px, 400, 20px);
         margin-top: 8px;
+        overflow: hidden;
+        white-space: normal;
+        word-wrap: break-word;
       }
     }
   }
@@ -65,43 +69,48 @@
 }
 
 @media only screen and (max-width: 600px) {
-  .header {
-    border-bottom: 1px solid $neutralGray3;
-    padding: 8px 16px;
-    height: 56px;
-    @include flexAlign(center);
-    gap: 8px;
-    span {
-      @include text(16px, 24px);
-      font-weight: $fontWeightBold;
+  .container {
+    padding: 0 0 150px;
+    .header {
+      border-bottom: 1px solid $neutralGray3;
+      padding: 8px 16px;
+      height: 56px;
+      @include flexAlign(center);
+      gap: 8px;
+      span {
+        @include text(16px, 24px);
+        font-weight: $fontWeightBold;
+      }
     }
-  }
 
-  .contactPointSection,
-  .companyInfoSection {
-    display: flow-root;
-    padding: 24px 16px 0px 16px;
-    min-height: 370px;
-  }
-
-  .companyInfoSection {
-    .row {
-      flex-wrap: wrap;
-      gap: 20px;
+    .contactPointSection,
+    .companyInfoSection {
+      display: flow-root;
+      padding: 24px 16px 0px 16px;
     }
-  }
 
-  .submitBtn {
-    border-top: 0px;
-    position: fixed;
-    bottom: 0;
-    width: 100vw;
-    padding: 24px;
-    left: 0;
-    background-color: #fff;
+    .companyInfoSection {
+      .row {
+        flex-wrap: wrap;
+        gap: 20px;
 
-    .btn {
-      width: 100%;
+        .info {
+          flex-basis: 600px;
+        }
+      }
+    }
+
+    .submitBtn {
+      border-top: 0px;
+      background-color: $neutralGray1;
+      z-index: 1;
+      position: fixed;
+      bottom: 0;
+      width: 100vw;
+
+      .btn {
+        width: 100%;
+      }
     }
   }
 }
