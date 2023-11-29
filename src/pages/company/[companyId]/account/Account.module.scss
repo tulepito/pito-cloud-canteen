@@ -1,57 +1,104 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/mixins.scss' as *;
-
-.header {
-  border-bottom: 1px solid $neutralGray5;
-  padding: 32px 24px;
-  span {
-    @include text(24px, 32px);
-    font-weight: $fontWeightBold;
+@use '/src/styles/customMediaQueries.scss' as *;
+.container {
+  padding: 0 0 90px;
+  @include viewportSmall {
+    padding: 0;
   }
-}
-
-.sectionTitle {
-  @include text(18px, 24px);
-  font-weight: $fontWeightBold;
-}
-
-.loading {
-  text-align: center;
-}
-
-.contactPointSection {
-  padding: 32px 24px 0;
-
-  .formWrapper {
-    margin-top: 40px;
-  }
-}
-.companyInfoSection {
-  padding: 64px 24px 0;
-
-  .row {
-    @include flexAlign(flex-start);
-    gap: 24px;
-    margin-top: 28px;
-
-    &:last-child {
-      margin-top: 20px;
+  .header {
+    border-bottom: 1px solid $neutralGray3;
+    padding: 8px 16px;
+    height: 56px;
+    @include flexAlign(center);
+    gap: 8px;
+    @include viewportSmall {
+      border-bottom: 1px solid $neutralGray5;
+      padding: 32px 24px;
     }
-    .info {
-      display: grid;
-      flex-basis: 410px;
 
-      .title {
-        @include textTemplate(14px, 400, 20px);
-        color: $neutralGray6;
+    span {
+      @include text(16px, 24px);
+      font-weight: $fontWeightBold;
+
+      @include viewportSmall {
+        @include text(24px, 32px);
+        font-weight: $fontWeightBold;
+      }
+    }
+  }
+
+  .sectionTitle {
+    @include text(18px, 24px);
+    font-weight: $fontWeightBold;
+    padding-bottom: 28px;
+
+    @include viewportSmall {
+      padding-bottom: 0px;
+    }
+  }
+
+  .loading {
+    text-align: center;
+  }
+
+  .contactPointSection {
+    display: flow-root;
+    padding: 24px 16px 0px 16px;
+    flex-wrap: wrap;
+
+    @include viewportSmall {
+      display: block;
+      padding: 32px 24px 0;
+    }
+
+    .formWrapper {
+      margin-top: 40px;
+    }
+  }
+
+  .companyInfoSection {
+    display: flow-root;
+    padding: 24px 16px 0px 16px;
+
+    @include viewportSmall {
+      border-bottom: 1px solid $neutralGray5;
+      padding: 64px 24px 40px;
+    }
+
+    .row {
+      @include flexAlign(flex-start);
+      flex-wrap: wrap;
+      gap: 20px;
+
+      @include viewportSmall {
+        gap: 24px;
+        margin-top: 28px;
+        flex-wrap: nowrap;
       }
 
-      .content {
-        @include textTemplate(14px, 400, 20px);
-        margin-top: 8px;
-        overflow: hidden;
-        white-space: normal;
-        word-wrap: break-word;
+      &:last-child {
+        margin-top: 20px;
+      }
+      .info {
+        display: grid;
+        flex-basis: 600px;
+        @include viewportSmall {
+          flex-basis: 410px;
+        }
+
+        .title {
+          @include textTemplate(14px, 400, 20px);
+          color: $neutralGray6;
+        }
+
+        .content {
+          @include textTemplate(14px, 400, 20px);
+          margin-top: 8px;
+          overflow: hidden;
+          white-space: normal;
+          word-wrap: break-word;
+        }
       }
     }
   }
@@ -59,58 +106,23 @@
 
 .submitBtn {
   @include flexAlign(center, flex-end);
-  padding: 40px 24px;
-  border-top: 1px solid $neutralGray5;
-  margin-top: 40px;
+  position: fixed;
+  padding: 16px;
+  z-index: 2;
+  width: 100vw;
+  bottom: 0;
+  background-color: $neutralGray1;
+
+  @include viewportSmall {
+    position: relative;
+    padding: 40px 24px 0px 24px;
+    width: auto;
+  }
 
   .btn {
-    width: 200px;
-  }
-}
-
-@media only screen and (max-width: 600px) {
-  .container {
-    padding: 0 0 150px;
-    .header {
-      border-bottom: 1px solid $neutralGray3;
-      padding: 8px 16px;
-      height: 56px;
-      @include flexAlign(center);
-      gap: 8px;
-      span {
-        @include text(16px, 24px);
-        font-weight: $fontWeightBold;
-      }
-    }
-
-    .contactPointSection,
-    .companyInfoSection {
-      display: flow-root;
-      padding: 24px 16px 0px 16px;
-    }
-
-    .companyInfoSection {
-      .row {
-        flex-wrap: wrap;
-        gap: 20px;
-
-        .info {
-          flex-basis: 600px;
-        }
-      }
-    }
-
-    .submitBtn {
-      border-top: 0px;
-      background-color: $neutralGray1;
-      z-index: 1;
-      position: fixed;
-      bottom: 0;
-      width: 100vw;
-
-      .btn {
-        width: 100%;
-      }
+    width: 100%;
+    @include viewportSmall {
+      width: 200px;
     }
   }
 }

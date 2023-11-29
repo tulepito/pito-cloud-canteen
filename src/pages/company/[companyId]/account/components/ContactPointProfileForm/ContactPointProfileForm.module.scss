@@ -1,9 +1,17 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
 
 .container {
-  @include flexAlign(flex-start);
-  gap: 88px;
+  @include flexAlign(flex-start, center);
+  flex-wrap: wrap;
+  gap: 16px;
+
+  @include viewportSmall {
+    @include flexAlign(flex-start);
+    gap: 88px;
+    flex-wrap: nowrap;
+  }
 
   .avatar {
     // width: 128px;
@@ -94,12 +102,20 @@
 
   .profile {
     @include flexAlign(flex-start);
-    gap: 32px;
     flex-wrap: wrap;
-    width: 632px;
+    width: 100%;
+    gap: 16px;
+
+    @include viewportSmall {
+      gap: 32px;
+      width: 632px;
+    }
 
     .fieldInput {
-      width: 300px;
+      width: 100%;
+      @include viewportSmall {
+        width: 300px;
+      }
       input {
         @include textTemplate(14px, $fontWeightMedium, 24px);
       }
@@ -114,20 +130,4 @@
 .avatarImg {
   width: 128px;
   height: 128px;
-}
-
-@media only screen and (max-width: 600px) {
-  .container {
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 16px;
-
-    .profile {
-      width: 100%;
-      flex-wrap: wrap;
-      .fieldInput {
-        width: 100%;
-      }
-    }
-  }
 }

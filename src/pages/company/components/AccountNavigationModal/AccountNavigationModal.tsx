@@ -53,7 +53,9 @@ const AccountNavigationModal: React.FC<TAccountNavigationModalProps> = () => {
           </div>
           <IconArrow direction="right" />
         </div>
-        <div className={css.itemRow} onClick={() => handleNavigatePage('')}>
+        <div
+          className={css.itemRow}
+          onClick={() => handleNavigatePage(personalPaths.Members)}>
           <div className={css.headerTitle}>
             <IconUser variant="multiUserNoBackground" />
             <span>{intl.formatMessage({ id: 'CompanySidebar.members' })}</span>

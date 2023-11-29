@@ -16,9 +16,6 @@ const PersonalAccountPage = () => {
   return (
     <RenderWhen condition={isMobileLayout || isTabletLayout}>
       <AccountNavigationModal />
-      <RenderWhen.False>
-        <div></div>
-      </RenderWhen.False>
     </RenderWhen>
   );
 };
