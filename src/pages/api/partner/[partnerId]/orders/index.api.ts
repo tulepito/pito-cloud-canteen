@@ -10,23 +10,33 @@ import {
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { handleError } from '@services/sdk';
 import { Listing } from '@src/utils/data';
-import { EListingType } from '@src/utils/enums';
+import { EListingStates, EListingType } from '@src/utils/enums';
 import type { TListing, TObject } from '@src/utils/types';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
     const {
       method: apiMethod,
-      query: { partnerId },
+      query: { partnerId, JSONParams },
     } = req;
+    const { startDate, endDate, orderStates } =
+      JSON.parse(JSONParams as string) || {};
 
     switch (apiMethod) {
       case HttpMethod.GET: {
         const integrationSdk = getIntegrationSdk();
         const orders = await queryAllListings({
           query: {
+            states: [EListingStates.published],
             meta_partnerIds: `has_any:${partnerId}`,
             meta_listingType: EListingType.order,
+            ...(startDate &&
+              endDate && {
+                meta_startDate: `${startDate},${endDate + 1}`,
+              }),
+            ...(orderStates && {
+              meta_orderState: `${orderStates.join(',')}`,
+            }),
           },
         });
 

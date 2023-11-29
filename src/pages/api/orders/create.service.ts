@@ -4,6 +4,7 @@ import { DateTime } from 'luxon';
 import { calculateGroupMembers, getAllCompanyMembers } from '@helpers/company';
 import { generateUncountableIdForOrder } from '@helpers/generateUncountableId';
 import {
+  createOrUpdateAutomaticStartOrderScheduler,
   createScheduler,
   getScheduler,
   updateScheduler,
@@ -80,8 +81,9 @@ const createOrder = async ({
   const { subAccountId } = companyAccount.attributes.profile.privateData;
   const { companyName } = companyAccount.attributes.profile.publicData;
 
-  const orderId = generateUncountableIdForOrder(currentOrderNumber);
-  const generatedOrderId = `PT${orderId}`;
+  const generatedOrderId = `PT${generateUncountableIdForOrder(
+    currentOrderNumber,
+  )}`;
 
   // Prepare order state history
   const orderStateHistory = [
@@ -167,6 +169,14 @@ const createOrder = async ({
 
   if (!isNormalOrder && deadlineDate) {
     createDeadlineScheduler({ deadlineDate, orderFlexId });
+  }
+
+  if (!isNormalOrder && !isCreatedByAdmin && orderFlexId) {
+    createOrUpdateAutomaticStartOrderScheduler({
+      orderId: orderFlexId,
+      startDate,
+      deliveryHour,
+    });
   }
 
   return orderListing;

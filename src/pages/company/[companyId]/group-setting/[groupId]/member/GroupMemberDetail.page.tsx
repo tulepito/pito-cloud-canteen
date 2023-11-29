@@ -124,7 +124,7 @@ const GroupMemberDetailPage: React.FC<GroupMemberDetailPageProps> = () => {
           </span>
           <span className={css.content}>
             {getGroupNames(
-              User(companyMember!).getMetadata()?.groupList || [],
+              User(companyMember!).getMetadata().groupList || [],
               groupList,
             )}
           </span>

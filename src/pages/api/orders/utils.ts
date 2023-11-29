@@ -52,14 +52,16 @@ export const normalizeOrderDetail = ({
   return Object.entries(planOrderDetail).reduce<TNormalizedOrderDetail[]>(
     (prev, [date, orderOfDate]: [string, TOrderOfDate]) => {
       const {
-        restaurant: { id: restaurantId, foodList = {} },
+        restaurant = {},
         memberOrders: memberOrdersMap,
         lineItems = [],
         transactionId,
         lastTransition,
       } = orderOfDate;
 
-      if (lastTransition) {
+      const { id: restaurantId, foodList = {} } = restaurant;
+
+      if (lastTransition || !restaurantId) {
         return prev;
       }
 

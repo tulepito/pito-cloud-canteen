@@ -1,4 +1,4 @@
-import type { PropsWithChildren } from 'react';
+import type { PropsWithChildren, ReactNode } from 'react';
 import classNames from 'classnames';
 
 import IconClose from '@components/Icons/IconClose/IconClose';
@@ -9,8 +9,8 @@ import css from './SlideModal.module.scss';
 type TSlideModalProps = PropsWithChildren & {
   id: string;
   isOpen: boolean;
-  modalTitle?: string;
-  onClose: () => void;
+  modalTitle?: ReactNode;
+  onClose: (e: React.MouseEvent<HTMLElement>) => void;
   containerClassName?: string;
 };
 

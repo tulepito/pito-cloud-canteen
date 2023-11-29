@@ -3,6 +3,7 @@ import { DateTime } from 'luxon';
 import type { TDaySession } from '@components/CalendarDashboard/helpers/types';
 import { generateUncountableIdForOrder } from '@helpers/generateUncountableId';
 import { getInitMemberOrder } from '@pages/api/orders/[orderId]/plan/memberOrder.helper';
+import { createOrUpdateAutomaticStartOrderScheduler } from '@services/awsEventBrigdeScheduler';
 import { denormalisedResponseEntities } from '@services/data';
 import { getOrderNumber, updateOrderNumber } from '@services/getAdminAccount';
 import { fetchUser } from '@services/integrationHelper';
@@ -151,6 +152,15 @@ export const reorder = async ({
   );
 
   updateOrderNumber();
+
+  const { deliveryHour } = oldOrderMetadata;
+  if (isGroupOrder && !isCreatedByAdmin && newOrderId) {
+    createOrUpdateAutomaticStartOrderScheduler({
+      orderId: newOrderId,
+      startDate,
+      deliveryHour,
+    });
+  }
 
   return denormalisedResponseEntities(updatedOrder)[0];
 };

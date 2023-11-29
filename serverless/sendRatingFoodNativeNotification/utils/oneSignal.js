@@ -1,4 +1,3 @@
-// import * as OneSignal from '@onesignal/node-onesignal';
 const { Client } = require('onesignal-node');
 
 const { ONE_SIGNAL_APP_ID, ONE_SIGNAL_API_KEY } = process.env;

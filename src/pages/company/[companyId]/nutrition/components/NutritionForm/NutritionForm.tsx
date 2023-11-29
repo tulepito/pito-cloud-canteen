@@ -94,7 +94,7 @@ const NutritionFormComponent: React.FC<TNutritionFormComponentProps> = (
 
   const companyGeoOrigin = useMemo(
     () => ({
-      ...User(companyAccount as TUser).getPublicData()?.location?.origin,
+      ...User(companyAccount as TUser).getPublicData().location?.origin,
     }),
     [companyAccount],
   );
@@ -112,7 +112,7 @@ const NutritionFormComponent: React.FC<TNutritionFormComponentProps> = (
                   key: Listing(restaurant).getId(),
                   data: {
                     id: Listing(restaurant).getId(),
-                    title: Listing(restaurant).getAttributes()?.title,
+                    title: Listing(restaurant).getAttributes().title,
                     category: Listing(restaurant)
                       .getPublicData()
                       ?.categories?.slice(0, 3)
@@ -148,7 +148,7 @@ const NutritionFormComponent: React.FC<TNutritionFormComponentProps> = (
                   key: Listing(food).getId(),
                   data: {
                     id: Listing(food).getId(),
-                    title: Listing(food).getAttributes()?.title,
+                    title: Listing(food).getAttributes().title,
                   },
                 },
               ];

@@ -33,7 +33,14 @@ const FoodDetailModal: React.FC<TFoodDetailModalProps> = ({
 }) => {
   const intl = useIntl();
 
-  const { sideDishes = [] } = Listing(food!).getPublicData();
+  const foodGetter = Listing(food!);
+  const { sideDishes = [] } = foodGetter.getPublicData();
+  const {
+    title,
+    price,
+    description = 'Không có mô tả',
+  } = foodGetter.getAttributes();
+
   const renderedSideDishes = sideDishes?.map(
     (sideDish: string, index: number) => (
       <div className={css.sideDish} key={`${index}-${sideDish}`}>
@@ -44,6 +51,7 @@ const FoodDetailModal: React.FC<TFoodDetailModalProps> = ({
       </div>
     ),
   );
+
   const handleSelectFood = () => {
     onSelect?.(food?.id?.uuid);
   };
@@ -78,22 +86,18 @@ const FoodDetailModal: React.FC<TFoodDetailModalProps> = ({
         <div className={css.scrollContainer}>
           <div className={css.coverImage}>
             <ResponsiveImage
-              alt={Listing(food!).getAttributes().title}
-              image={Listing(food!).getImages()[0]}
+              alt={title}
+              image={foodGetter.getImages()[0]}
               variants={[EImageVariants.default]}
             />
           </div>
           <div className={css.topContent}>
-            <div className={css.foodTitle}>
-              {Listing(food!).getAttributes().title}
-            </div>
+            <div className={css.foodTitle}>{title}</div>
             <div className={css.price}>{`${addCommas(
-              Listing(food!).getAttributes()?.price?.amount,
+              price?.amount,
             )} ₫ / Phần`}</div>
           </div>
-          <p className={css.description}>
-            {Listing(food!).getAttributes().description || 'Không có mô tả'}
-          </p>
+          <p className={css.description}>{description}</p>
         </div>
         <div className={css.sideDishesWrapper}>
           <div className={css.sideDishesTitle}>

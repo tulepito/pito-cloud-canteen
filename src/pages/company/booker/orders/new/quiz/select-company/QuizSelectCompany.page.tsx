@@ -49,7 +49,7 @@ const QuizSelectCompany = () => {
           ...result,
           {
             id: User(cur).getId(),
-            name: User(cur).getPublicData()?.companyName,
+            name: User(cur).getPublicData().companyName,
           },
         ];
       }, []),

@@ -13,7 +13,10 @@ import LoadingModal from '@components/LoadingModal/LoadingModal';
 import ParticipantLayout from '@components/ParticipantLayout/ParticipantLayout';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import Tabs from '@components/Tabs/Tabs';
-import { isOrderOverDeadline } from '@helpers/orderHelper';
+import {
+  isOrderOverDeadline,
+  prepareOrderDeadline,
+} from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import CoverBox from '@pages/participant/components/CoverBox/CoverBox';
@@ -38,7 +41,7 @@ const ParticipantOrderManagement = () => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
 
-  const { isReady, query } = router;
+  const { query } = router;
   const { orderId } = query;
   const isOwnerControl = useBoolean();
 
@@ -84,6 +87,7 @@ const ParticipantOrderManagement = () => {
   const {
     selectedGroups = [],
     deadlineDate,
+    deadlineHour,
     orderState,
     startDate,
   } = orderListing.getMetadata();
@@ -103,6 +107,7 @@ const ParticipantOrderManagement = () => {
       : selectedGroups.map((groupId: string) => {
           return groups.find((group: any) => group.id === groupId)?.name;
         });
+  const orderDeadline = prepareOrderDeadline(deadlineDate, deadlineHour);
 
   const rowInformation = [
     {
@@ -115,7 +120,7 @@ const ParticipantOrderManagement = () => {
     },
     {
       label: 'Hạn chọn món:',
-      value: formatTimestamp(deadlineDate, 'dd/MM/yyyy, HH:mm'),
+      value: formatTimestamp(orderDeadline, 'dd/MM/yyyy, HH:mm'),
     },
     {
       label: 'Người đại diện:',
@@ -135,11 +140,10 @@ const ParticipantOrderManagement = () => {
     shouldShowMissingPickingOrderModal,
   );
   useEffect(() => {
-    if (isReady) {
+    if (orderId) {
       dispatch(participantOrderManagementThunks.loadData(orderId as string));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isReady]);
+  }, [orderId]);
 
   // const onTabChange = (tabItem: any) => {
   //   if (tabItem.id === 'personal') {
@@ -174,7 +178,7 @@ const ParticipantOrderManagement = () => {
             user={company as TUser}
             disableProfileLink
           />
-          <span>{User(company as TUser).getPublicData()?.companyName}</span>
+          <span>{User(company as TUser).getPublicData().companyName}</span>
         </div>
       ),
       childrenFn: (props: any) => <OrderCalendarView {...props} />,

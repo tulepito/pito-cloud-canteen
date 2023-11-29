@@ -59,9 +59,9 @@ const Dropdown: React.FC<TDropdownProps> = (props) => {
       );
       setSelectedValue({
         value: User(currentCompany!).getId(),
-        label: User(currentCompany!).getPublicData()?.companyName,
+        label: User(currentCompany!).getPublicData().companyName,
       });
-      setTitle(User(currentCompany!).getPublicData()?.companyName);
+      setTitle(User(currentCompany!).getPublicData().companyName);
     }
   }, [companyId, companyList, setSelectedValue]);
 

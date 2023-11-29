@@ -41,7 +41,7 @@ const QuizRestaurants = () => {
 
   const companyGeoOrigin = useMemo(
     () => ({
-      ...User(selectedCompany as TUser).getPublicData()?.location?.origin,
+      ...User(selectedCompany as TUser).getPublicData().location?.origin,
     }),
     [JSON.stringify(selectedCompany)],
   );

@@ -1,0 +1,41 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.modalTitle {
+  @include flexAlign(center, space-between);
+
+  span {
+    @include textTemplate(16px, $fontWeightBold, 24px);
+  }
+}
+
+.optionsWrapper {
+  width: 100%;
+
+  .option {
+    padding: 12px 16px;
+    @include flexAlign(center);
+    gap: 12px;
+    cursor: pointer;
+    position: relative;
+
+    &:hover {
+      background-color: $neutralGray2;
+    }
+  }
+}
+
+.customTimeModalWrapper {
+  position: absolute;
+  top: -300px;
+  left: -318px;
+  background-color: $neutralGray1;
+  z-index: 1;
+  border-radius: 8px;
+  border: 1px solid $neutralGray4;
+
+  /* Shadown/LG */
+  box-shadow: 0px 20px 24px -4px rgba(16, 24, 40, 0.1),
+    0px 8px 8px -4px rgba(16, 24, 40, 0.04);
+}

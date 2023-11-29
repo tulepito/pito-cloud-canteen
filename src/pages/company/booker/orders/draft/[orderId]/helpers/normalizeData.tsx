@@ -3,9 +3,9 @@ import isEmpty from 'lodash/isEmpty';
 import { DateTime } from 'luxon';
 
 import type { TDaySession } from '@components/CalendarDashboard/helpers/types';
+import { prepareDaySession } from '@helpers/orderHelper';
 import { EOrderStates } from '@src/utils/enums';
 import { ETransition } from '@src/utils/transaction';
-import { getDaySessionFromDeliveryTime } from '@utils/dates';
 
 export const normalizePlanDetailsToEvent = (
   planDetails: any,
@@ -78,15 +78,7 @@ export const normalizePlanDetailsToEvent = (
       return {
         resource: {
           id: timestamp,
-          daySession:
-            daySession ||
-            getDaySessionFromDeliveryTime(
-              isEmpty(deliveryHour)
-                ? undefined
-                : deliveryHour.includes('-')
-                ? deliveryHour.split('-')[0]
-                : deliveryHour,
-            ),
+          daySession: prepareDaySession(daySession, deliveryHour),
           isSelectedFood: !isEmpty(restaurantMaybe.id) && !isEmpty(foodList),
           restaurant: restaurantMaybe,
           meal: {

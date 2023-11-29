@@ -66,7 +66,7 @@ const fetchOrder = createAsyncThunk(
       }),
     )[0];
 
-    const planId = Listing(response).getMetadata()?.plans[0];
+    const planId = Listing(response).getMetadata().plans[0];
 
     const plan = denormalisedResponseEntities(
       await sdk.listings.show({

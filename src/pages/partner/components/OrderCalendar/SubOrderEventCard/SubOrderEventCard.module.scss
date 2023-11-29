@@ -1,0 +1,55 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.root {
+  border-radius: 4px;
+  border: 1px solid $neutralGray3;
+  background: $neutralGray1;
+  @include flexAlign(center, space-between);
+  padding: 8px;
+  position: relative;
+  padding-left: 20px;
+
+  @include viewportLarge {
+    flex-direction: column;
+    margin-bottom: 8px;
+
+    /* Shadown/SM */
+    box-shadow: 0px 1px 2px 0px rgba(16, 24, 40, 0.06),
+      0px 1px 3px 0px rgba(16, 24, 40, 0.1);
+  }
+}
+
+.leftPart {
+  @include flexAlign(center, flex-start);
+}
+
+.rightPart {
+  @include viewportLarge {
+    align-self: flex-start;
+    padding-left: 12px;
+    margin-top: 4px;
+  }
+}
+
+.greenMark {
+  width: 4px;
+  height: 24px;
+  background: $sematicGreen2;
+  border-radius: 2px;
+  margin-right: 8px;
+  flex-shrink: 0;
+  position: absolute;
+  top: 50%;
+  left: 8px;
+  transform: translateY(-50%);
+}
+
+.title {
+  @include textTemplate(14px, 600, 20px);
+}
+
+.deliveryHour {
+  @include textTemplate(14px, 400, 20px);
+}

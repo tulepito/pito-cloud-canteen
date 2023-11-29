@@ -61,8 +61,8 @@ function BookerNewOrderPage() {
 
   const normalizedCompanies = myCompanies.map((company) => ({
     id: company?.id?.uuid,
-    name: User(company).getPublicData()?.companyName,
-    location: User(company).getPublicData()?.location,
+    name: User(company).getPublicData().companyName,
+    location: User(company).getPublicData().location,
   }));
 
   const handleCancel = () => {

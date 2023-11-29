@@ -1,0 +1,19 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.root {
+  background: #f2f2f7;
+
+  @include viewportMedium {
+    background: $neutralGray1;
+  }
+
+  section {
+    margin-top: 8px;
+
+    @include viewportLarge {
+      margin-top: 24px;
+    }
+  }
+}
