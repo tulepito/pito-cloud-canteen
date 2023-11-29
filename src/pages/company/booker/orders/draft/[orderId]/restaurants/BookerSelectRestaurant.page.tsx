@@ -94,7 +94,11 @@ function BookerSelectRestaurant() {
           Quay lại
         </div>
         <div className={css.pageTilte}>
-          <IconArrow className={css.icon} direction="left" />
+          <IconArrow
+            className={css.icon}
+            direction="left"
+            onClick={handleGoBack}
+          />
           <div className={css.title}>danh sách nhà hàng</div>
         </div>
       </LayoutTop>
