@@ -65,14 +65,16 @@ const EditOrderRowModal: React.FC<TEditOrderRowModalProps> = (props) => {
 
   return (
     <RenderWhen condition={isMobileLayout}>
-      <SlideModal
-        id="ManageParticipantsMobileModal"
-        contentClassName={css.mobileModalContent}
-        modalTitle={modalTitle}
-        onClose={onClose}
-        isOpen={isOpen}>
-        {content}
-      </SlideModal>
+      {isOpen && (
+        <SlideModal
+          id="EditOrderRowMobileModal"
+          contentClassName={css.mobileModalContent}
+          modalTitle={modalTitle}
+          onClose={onClose}
+          isOpen={isOpen}>
+          {content}
+        </SlideModal>
+      )}
 
       <RenderWhen.False>
         <Modal

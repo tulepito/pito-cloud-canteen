@@ -73,7 +73,7 @@ const ManageDeletedListModal: React.FC<TManageDeletedListModalProps> = (
   return (
     <RenderWhen condition={isMobileLayout}>
       <SlideModal
-        id="ManageParticipantsMobileModal"
+        id="ManageDeletedMobileModal"
         modalTitle={title}
         onClose={onClose}
         isOpen={isOpen}>

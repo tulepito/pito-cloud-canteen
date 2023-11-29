@@ -26,7 +26,7 @@ const MoreOptionsIcon: React.FC<TMoreOptionsIconProps> = ({
       <IconMoreCircle onClick={control.setTrue} className={css.icon} />
 
       <SlideModal
-        id="MoreOptionIcon.modal"
+        id="MoreOptionsIcon.modal"
         isOpen={control.value}
         onClose={control.setFalse}
         modalTitle={modalTitle}
