@@ -47,7 +47,9 @@
   .leftPart {
     order: 3;
 
-    margin-top: 24px;
+    @include viewportMedium {
+      margin-top: 24px;
+    }
 
     @include viewportLarge {
       order: 2;
@@ -221,13 +223,16 @@
 .container {
   padding: 16px;
   border-radius: 16px;
-
   background-color: $neutralGray1;
   outline: 1px solid $neutralGray5;
   outline-offset: -1px;
-
   & > div:first-of-type {
     @include textTemplate(18px, 700, 4/3);
+  }
+  display: none;
+
+  @include viewportMedium {
+    display: block;
   }
 }
 
