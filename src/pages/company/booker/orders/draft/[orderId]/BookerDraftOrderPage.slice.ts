@@ -9,6 +9,7 @@ import {
   sendRemindEmailToMemberApi,
 } from '@apis/orderApi';
 import { createAsyncThunk } from '@redux/redux.helper';
+import { setNonAccountEmails } from '@redux/slices/Order.slice';
 import { EOrderType } from '@src/utils/enums';
 import { successToastOptions } from '@src/utils/toastify';
 import { denormalisedResponseEntities, Listing } from '@utils/data';
@@ -79,16 +80,22 @@ const fetchOrderParticipants = createAsyncThunk(
 
 const addOrderParticipants = createAsyncThunk(
   'app/BookerDraftOrderPage/ADD_ORDER_PARTICIPANTS',
-  async ({ orderId, participants, newUserIds, newUsers }: TObject) => {
+  async (
+    { orderId, participants, newUserIds, newUsers, nonAccountEmails }: TObject,
+    { dispatch },
+  ) => {
     const bodyParams = {
       orderId,
       participants,
+      nonAccountEmails,
       userIds: newUserIds,
     };
 
     await addParticipantToOrderApi(orderId, bodyParams);
 
-    return newUsers;
+    dispatch(setNonAccountEmails(nonAccountEmails));
+
+    return { newUsers, nonAccountEmails };
   },
 );
 
@@ -173,7 +180,7 @@ const BookerDraftOrderPageSlice = createSlice({
       })
       .addCase(addOrderParticipants.fulfilled, (state, { payload }) => {
         state.addOrderParticipantsInProgress = false;
-        state.participantData = state.participantData.concat(payload);
+        state.participantData = state.participantData.concat(payload.newUsers);
       })
       .addCase(addOrderParticipants.rejected, (state) => {
         state.addOrderParticipantsInProgress = false;

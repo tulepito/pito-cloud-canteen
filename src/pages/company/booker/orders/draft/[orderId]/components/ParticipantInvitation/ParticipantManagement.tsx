@@ -9,6 +9,7 @@ import { useViewport } from '@hooks/useViewport';
 import {
   filterHasAccountUserIds,
   filterHasAccountUsers,
+  filterNoAccountUserEmail,
   useAddMemberEmail,
 } from '@pages/company/[companyId]/members/hooks/useAddMemberEmail';
 import { Listing } from '@src/utils/data';
@@ -40,35 +41,56 @@ const ParticipantManagement: React.FC<TParticipantManagementProps> = () => {
 
   const orderGetter = Listing(order as TListing);
   const orderId = orderGetter.getId();
+  const { nonAccountEmails = [] } = orderGetter.getMetadata();
 
   const isParticipantListEmpty = isEmpty(participantData);
   const restrictEmailList = participantData.map((p) => p.attributes.email);
   const restrictParticipantIds = participantData.map((p) => p.id.uuid);
 
   const handleInviteMemberViaEmailList = async (emailList: string[]) => {
-    const needInviteEmailList = difference(emailList, restrictEmailList);
+    const needInviteEmailList = difference(
+      emailList,
+      restrictEmailList.concat(nonAccountEmails),
+    );
 
     if (!isEmpty(needInviteEmailList)) {
-      const newLoadedResult = await checkEmailList(needInviteEmailList);
-      const newUserIds = filterHasAccountUserIds(newLoadedResult as TObject[]);
-      const newUsers = filterHasAccountUsers(newLoadedResult as TObject[]);
+      const newLoadedResult = (await checkEmailList(
+        needInviteEmailList,
+      )) as TObject[];
+      const newNonAccountEmails = filterNoAccountUserEmail(newLoadedResult);
+      const newUserIds = filterHasAccountUserIds(newLoadedResult);
+      const newUsers = filterHasAccountUsers(newLoadedResult);
 
       handleAddMemberToCompany(newLoadedResult as TObject[]);
 
-      if (!isEmpty(newUserIds)) {
+      const needHandleItems = newUserIds.concat(newNonAccountEmails);
+
+      if (!isEmpty(needHandleItems)) {
+        const nonAccountEmailsParamMaybe = isEmpty(newNonAccountEmails)
+          ? {}
+          : {
+              nonAccountEmails: nonAccountEmails.concat(newNonAccountEmails),
+            };
+
         await dispatch(
           BookerDraftOrderPageThunks.addOrderParticipants({
             orderId,
             participants: restrictParticipantIds,
+            nonAccountEmails,
             newUserIds,
             newUsers,
+            ...nonAccountEmailsParamMaybe,
           }),
         );
 
         const message = (
           <span>
             Đã thêm{' '}
-            {newUserIds.length > 1 ? <b>{newUserIds.length} email</b> : 'email'}{' '}
+            {needHandleItems.length > 1 ? (
+              <b>{needHandleItems.length} email</b>
+            ) : (
+              'email'
+            )}{' '}
             vào danh sách
           </span>
         );

@@ -24,6 +24,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             email = '',
             participants = [],
             planId = '',
+            nonAccountEmails,
             anonymous = [],
             orderDetail = {},
             userIds: userIdsFromBody,
@@ -75,6 +76,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             ...(isEmpty(anonymous)
               ? {}
               : { anonymous: difference(anonymous, userIds) }),
+            ...(typeof nonAccountEmails === 'undefined'
+              ? {}
+              : { nonAccountEmails }),
           },
         });
 

@@ -1380,6 +1380,9 @@ const orderSlice = createSlice({
         generalInfo: {},
       };
     },
+    setNonAccountEmails: (state, { payload }) => {
+      state.order!!.attributes.metadata.nonAccountEmails = payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -1815,6 +1818,7 @@ export const {
   setOnRecommendRestaurantInProcess,
   saveDraftEditOrder,
   clearDraftEditOrder,
+  setNonAccountEmails,
 } = orderSlice.actions;
 
 export default orderSlice.reducer;
