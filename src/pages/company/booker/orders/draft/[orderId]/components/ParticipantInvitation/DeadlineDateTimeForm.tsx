@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import isEmpty from 'lodash/isEmpty';
@@ -9,8 +10,15 @@ import FieldDatePicker from '@components/FormFields/FieldDatePicker/FieldDatePic
 import FieldDropdownSelect from '@components/FormFields/FieldDropdownSelect/FieldDropdownSelect';
 import IconCalendar from '@components/Icons/IconCalender/IconCalender';
 import IconClock from '@components/Icons/IconClock/IconClock';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
+import SlideModal from '@components/SlideModal/SlideModal';
+import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
 import { useAppSelector } from '@hooks/reduxHooks';
+import useBoolean from '@hooks/useBoolean';
+import { useViewport } from '@hooks/useViewport';
 import { TimeOptions } from '@utils/dates';
+
+import MobileEditDeadlineDateField from './MobileEditDeadlineDateField';
 
 import css from './DeadlineDateTimeForm.module.scss';
 
@@ -29,12 +37,17 @@ const DeadlineDateTimeFormComponent: React.FC<
   DeadlineDateTimeFormComponentProps
 > = (props) => {
   const {
+    form,
     deliveryTime,
     shouldDisableSubmit = false,
     values,
     invalid,
+    pristine,
     handleSubmit,
   } = props;
+  const mobileDeadlineModalControl = useBoolean();
+  const { isMobileLayout } = useViewport();
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const addOrderParticipantsInProgress = useAppSelector(
     (state) => state.BookerDraftOrderPage.addOrderParticipantsInProgress,
   );
@@ -57,50 +70,115 @@ const DeadlineDateTimeFormComponent: React.FC<
     .minus({ days: 2 })
     .toJSDate();
 
+  const isDeadlineHourEmpty = isEmpty(deadlineHourFromFormValues);
   const anyActionsInProgress =
     bookerPublishOrderInProgress || addOrderParticipantsInProgress;
   const submitDisabled =
     anyActionsInProgress ||
     shouldDisableSubmit ||
     invalid ||
-    isEmpty(deadlineHourFromFormValues);
+    isDeadlineHourEmpty;
   const submitInProgress = bookerPublishOrderInProgress;
+  const saveInfoButtonDisabled = pristine || invalid || isDeadlineHourEmpty;
 
-  return (
+  const formattedDeadlineDate = DateTime.fromMillis(
+    Number(deadlineDateFormFormValues),
+  )
+    .startOf('day')
+    .plus({ ...convertHHmmStringToTimeParts(deadlineHourFromFormValues) })
+    .toFormat("HH:mm, dd 'tháng' MM, yyyy");
+
+  const handleMobileModalClose = () => {
+    mobileDeadlineModalControl.setFalse();
+    form.reset();
+  };
+
+  const sendNotificationButton = (
+    <Button
+      variant="cta"
+      disabled={submitDisabled}
+      // onClick={mobileDeadlineModalControl.setTrue}
+      inProgress={submitInProgress}
+      className={css.sendNotificationButton}>
+      Gửi lời mời qua email
+    </Button>
+  );
+  const saveInfoButton = (
+    <Button
+      disabled={saveInfoButtonDisabled}
+      inProgress={submitInProgress}
+      onClick={mobileDeadlineModalControl.setFalse}>
+      Lưu thay đổi
+    </Button>
+  );
+  const formContentComponent = (
     <Form className={css.formRoot} onSubmit={handleSubmit}>
       <div className={css.formContainer}>
         <div className={css.formTitle}>Thời hạn kết thúc chọn món</div>
-        <FieldDatePicker
-          id="DeadlineDateTimeForm.deadlineDate"
-          name="deadlineDate"
-          selected={selectedDeadlineDate}
-          label="Chọn ngày hết hạn"
-          minDate={minDeadlineDate}
-          maxDate={maxDeadlineDate}
-          dateFormat={'EEE, dd MMMM, yyyy'}
-          placeholderText={'Ngày hết hạn'}
-          className={css.dateInput}
-          autoComplete="off"
-          readOnly
-          icon={<IconCalendar />}
-        />
+        <RenderWhen condition={isMobileLayout}>
+          <MobileEditDeadlineDateField
+            minDate={minDeadlineDate}
+            maxDate={maxDeadlineDate}
+            initialDeadlineDate={selectedDeadlineDate}
+            selectedDate={selectedDate}
+            setSelectedDate={setSelectedDate}
+          />
+
+          <RenderWhen.False>
+            <FieldDatePicker
+              id="DeadlineDateTimeForm.deadlineDate"
+              name="deadlineDate"
+              selected={selectedDeadlineDate}
+              label={isMobileLayout ? 'Ngày kết thúc' : 'Chọn ngày hết hạn'}
+              placeholderText={
+                isMobileLayout ? 'Chọn hạn chọn món' : 'Ngày hết hạn'
+              }
+              minDate={minDeadlineDate}
+              maxDate={maxDeadlineDate}
+              dateFormat={'EEE, dd MMMM, yyyy'}
+              className={css.dateInput}
+              autoComplete="off"
+              readOnly
+              icon={<IconCalendar />}
+            />
+          </RenderWhen.False>
+        </RenderWhen>
+
         <FieldDropdownSelect
           id="DeadlineDateTimeForm.deadlineHour"
           name="deadlineHour"
-          placeholder="Giờ hết hạn"
-          className={css.fieldSelect}
-          label={'Chọn giờ hết hạn'}
+          label={isMobileLayout ? 'Giờ kết thúc' : 'Chọn giờ hết hạn'}
+          placeholder={isMobileLayout ? 'Chọn hạn chọn món' : 'Giờ hết hạn'}
           leftIcon={<IconClock />}
           options={TimeOptions}
         />
-        <Button
-          variant="cta"
-          disabled={submitDisabled}
-          inProgress={submitInProgress}>
-          Gửi lời mời qua email
-        </Button>
+        {isMobileLayout ? saveInfoButton : sendNotificationButton}
       </div>
     </Form>
+  );
+
+  return (
+    <RenderWhen condition={isMobileLayout}>
+      <div>Thời hạn chọn món của thành viên</div>
+      <div
+        className={css.mobileDeadlineInfo}
+        onClick={mobileDeadlineModalControl.setTrue}>
+        <IconClock />
+        <div>{formattedDeadlineDate}</div>
+      </div>
+      {sendNotificationButton}
+
+      <SlideModal
+        id="DeadlineDateTimeForm.mobileModal"
+        modalTitle={'Thời hạn chọn món'}
+        isOpen={mobileDeadlineModalControl.value}
+        onClose={handleMobileModalClose}
+        containerClassName={css.mobileModalContainer}>
+        {formContentComponent}
+      </SlideModal>
+
+      <RenderWhen.False>{formContentComponent}</RenderWhen.False>
+    </RenderWhen>
   );
 };
 
