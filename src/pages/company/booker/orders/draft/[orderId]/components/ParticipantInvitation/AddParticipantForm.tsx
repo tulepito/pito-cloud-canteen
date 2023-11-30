@@ -5,7 +5,9 @@ import isEmpty from 'lodash/isEmpty';
 import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
+import IconLightBulb from '@components/Icons/IconLightBulb/IconLightBulb';
 import { useAppSelector } from '@hooks/reduxHooks';
+import { useViewport } from '@hooks/useViewport';
 import {
   composeValidators,
   emailListFormatValid,
@@ -35,6 +37,7 @@ const AddParticipantFormComponent: React.FC<
     handleSubmit: handleSubmitFormProps,
     restrictEmailList = [],
   } = props;
+  const { isMobileLayout } = useViewport();
   const addOrderParticipantsInProgress = useAppSelector(
     (state) => state.BookerDraftOrderPage.addOrderParticipantsInProgress,
   );
@@ -67,7 +70,9 @@ const AddParticipantFormComponent: React.FC<
           <FieldTextInput
             id="AddParticipantForm.emails"
             name="emails"
-            placeholder="Nhập email để thêm thành viên"
+            placeholder={
+              isMobileLayout ? 'Nhập email' : 'Nhập email để thêm thành viên'
+            }
             onKeyPress={handleFieldEmailsKeyPress}
             validate={composeValidators(
               emailListFormatValid('Vui lòng nhập đúng định dạng mail'),
@@ -82,9 +87,17 @@ const AddParticipantFormComponent: React.FC<
           Thêm
         </Button>
       </div>
-      <div className={css.hint}>
-        *Email được phân cách bằng khoảng trắng. Ví dụ: a1@gmail.com
-        b2@gmail.com
+      <div className={css.hintText}>
+        *Email được phân cách bằng khoảng trắng.
+        {!isMobileLayout && ' Ví dụ: a1@gmail.comb2@gmail.com'}
+      </div>
+
+      <div className={css.hintContainer}>
+        <IconLightBulb className={css.mobileLightIcon} />
+        <div>
+          Bạn có thể thêm hàng loạt email bằng cách copy danh sách email và dán
+          vào ô nhập email.
+        </div>
       </div>
     </Form>
   );
