@@ -18,6 +18,12 @@ import {
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import useRestaurantDetailModal from '@hooks/useRestaurantDetailModal';
+import {
+  filterHasAccountUserIds,
+  filterHasAccountUsers,
+  filterNoAccountUserEmail,
+  useAddMemberEmail,
+} from '@pages/company/[companyId]/members/hooks/useAddMemberEmail';
 import { OrderListThunks } from '@pages/participant/orders/OrderList.slice';
 import { addWorkspaceCompanyId } from '@redux/slices/company.slice';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
@@ -31,7 +37,7 @@ import {
   EOrderDraftStates,
   EOrderType,
 } from '@utils/enums';
-import type { TListing, TUser } from '@utils/types';
+import type { TListing, TObject, TUser } from '@utils/types';
 
 import emptyResultImg from '../../../../../../assets/emptyResult.png';
 import Layout from '../../components/Layout/Layout';
@@ -83,7 +89,7 @@ function BookerDraftOrderPage() {
   const currentUserId = currentUserGetter.getId();
   const { walkthroughEnable = true } = currentUserGetter.getMetadata();
   const welcomeModalControl = useBoolean(walkthroughEnable);
-
+  const { checkEmailList } = useAddMemberEmail();
   const { order, companyAccount } = useLoadData({
     orderId: orderId as string,
   });
@@ -140,6 +146,8 @@ function BookerDraftOrderPage() {
     packagePerMember = 0,
     companyId,
     orderDeadline,
+    participants = [],
+    nonAccountEmails = [],
   } = Listing(order as TListing).getMetadata();
   const planId = plans.length > 0 ? plans[0] : undefined;
   const isGroupOrder = orderType === EOrderType.group;
@@ -295,6 +303,28 @@ function BookerDraftOrderPage() {
     components: componentsProps,
   };
 
+  const checkAndInviteNonAccountEmails = async () => {
+    const newLoadedResult = (await checkEmailList(
+      nonAccountEmails,
+    )) as TObject[];
+
+    const newNonAccountEmails = filterNoAccountUserEmail(newLoadedResult);
+    const newUserIds = filterHasAccountUserIds(newLoadedResult);
+    const newUsers = filterHasAccountUsers(newLoadedResult);
+
+    if (!isEmpty(newUserIds)) {
+      dispatch(
+        BookerDraftOrderPageThunks.addOrderParticipants({
+          orderId,
+          participants,
+          newUserIds,
+          newUsers,
+          nonAccountEmails: newNonAccountEmails,
+        }),
+      );
+    }
+  };
+
   const handleSearchRestaurantSubmit = (
     keywords: string,
     _restaurantId: string,
@@ -335,6 +365,12 @@ function BookerDraftOrderPage() {
   useEffect(() => {
     dispatch(addWorkspaceCompanyId(companyId));
   }, [companyId]);
+
+  useEffect(() => {
+    if (!isEmpty(nonAccountEmails)) {
+      checkAndInviteNonAccountEmails();
+    }
+  }, [JSON.stringify(nonAccountEmails)]);
 
   useEffect(() => {
     if (!isEmpty(orderState)) {
