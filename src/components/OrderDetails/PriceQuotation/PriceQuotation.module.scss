@@ -2,10 +2,17 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/customMediaQueries.scss' as *;
 .root {
-  padding: 0 48px;
+  $maxWidth: min(calc(100vw - 96px), 424px);
   margin: 0 auto;
-  max-width: 595px;
-  min-width: 595px;
+  width: 100%;
+  max-width: $maxWidth;
+  padding: 0 48px;
+
+  @include viewportMedium {
+    max-width: 595px;
+    min-width: 595px;
+    margin-left: 0;
+  }
 
   .titleContainer {
     display: flex;

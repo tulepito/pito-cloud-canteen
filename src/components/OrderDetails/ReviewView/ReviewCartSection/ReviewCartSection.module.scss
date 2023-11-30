@@ -199,7 +199,7 @@
 
 .topBorder {
   border-top: 5px solid $neutralGray7;
-  max-width: calc(100vw - 40px);
+  max-width: min(calc(100vw - 40px), 424px);
   margin: 0 auto;
 }
 .priceQuotation {
@@ -207,7 +207,8 @@
   border: 1px solid $neutralGray4;
   border-top: none;
   min-width: unset;
-  max-width: calc(100vw - 40px);
+  max-width: min(calc(100vw - 40px), 424px);
+  margin-left: auto;
 }
 
 .downloadPriceQuotationButton {
