@@ -17,7 +17,7 @@ import { orderAsyncActions } from '@redux/slices/Order.slice';
 import { BOOKER_CREATE_GROUP_ORDER_STEPS } from '@src/constants/stepperSteps';
 import { Listing } from '@src/utils/data';
 
-import type { DeadlineDateTimeFormValues } from './DeadlineDateTimeForm';
+import type { TDeadlineDateTimeFormValues } from './DeadlineDateTimeForm';
 import DeadlineDateTimeForm from './DeadlineDateTimeForm';
 import ParticipantManagement from './ParticipantManagement';
 
@@ -65,16 +65,22 @@ const ParticipantInvitation: React.FC<TParticipantInvitationProps> = ({
   const isParticipantListEmpty = isEmpty(participantData);
   const shouldDisabledSubmitPublishOrder = isParticipantListEmpty;
 
-  // * submit change deadline date & time
-  const handleSubmitDeadlineDateTimeForm = async (
-    values: DeadlineDateTimeFormValues,
-  ) => {
+  const handleUpdateOrderInfo = async (values: TDeadlineDateTimeFormValues) => {
     if (!isEqual(deadlineDateTimeInitialValues, values)) {
       await dispatch(
         orderAsyncActions.updateOrder({
           generalInfo: values,
         }),
       );
+    }
+  };
+
+  // * submit change deadline date & time
+  const handleSubmitDeadlineDateTimeForm = async (
+    values: TDeadlineDateTimeFormValues,
+  ) => {
+    if (!isMobileLayout) {
+      handleUpdateOrderInfo(values);
     }
     confirmPublishOrderControl.setTrue();
   };
@@ -92,6 +98,7 @@ const ParticipantInvitation: React.FC<TParticipantInvitationProps> = ({
       initialValues={deadlineDateTimeInitialValues}
       onSubmit={handleSubmitDeadlineDateTimeForm}
       shouldDisableSubmit={shouldDisabledSubmitPublishOrder}
+      onUpdateOrderInfo={handleUpdateOrderInfo}
     />
   );
 
@@ -127,11 +134,13 @@ const ParticipantInvitation: React.FC<TParticipantInvitationProps> = ({
             </RenderWhen>
             <AlertModal
               childrenClassName={css.confirmModalChildrenContainer}
+              containerClassName={css.confirmModalContainer}
               isOpen={confirmPublishOrderControl.value}
               handleClose={confirmPublishOrderControl.setFalse}
               title="Xác nhận đơn và gửi lời mời"
               cancelLabel="Đóng"
               confirmLabel={'Gửi lời mời'}
+              shouldFullScreenInMobile={false}
               confirmDisabled={shouldDisabledSubmitPublishOrder}
               onCancel={onGoBack}
               onConfirm={handleConfirmPublishOrder}>

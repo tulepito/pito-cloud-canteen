@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import isEmpty from 'lodash/isEmpty';
@@ -23,16 +23,20 @@ import MobileEditDeadlineHourField from './MobileEditDeadlineHourField';
 
 import css from './DeadlineDateTimeForm.module.scss';
 
-export type DeadlineDateTimeFormValues = {
+export type TDeadlineDateTimeFormValues = {
   deadlineDate: string | number;
   deadlineHour: string;
   draftDeadlineHour?: string;
 };
 
-type TExtraProps = { deliveryTime: Date; shouldDisableSubmit?: boolean };
+type TExtraProps = {
+  deliveryTime: Date;
+  shouldDisableSubmit?: boolean;
+  onUpdateOrderInfo: (values: TDeadlineDateTimeFormValues) => void;
+};
 type DeadlineDateTimeFormComponentProps =
-  FormRenderProps<DeadlineDateTimeFormValues> & Partial<TExtraProps>;
-type DeadlineDateTimeFormProps = FormProps<DeadlineDateTimeFormValues> &
+  FormRenderProps<TDeadlineDateTimeFormValues> & Partial<TExtraProps>;
+type DeadlineDateTimeFormProps = FormProps<TDeadlineDateTimeFormValues> &
   TExtraProps;
 
 const DeadlineDateTimeFormComponent: React.FC<
@@ -40,13 +44,15 @@ const DeadlineDateTimeFormComponent: React.FC<
 > = (props) => {
   const {
     form,
+    initialValues,
     deliveryTime,
     shouldDisableSubmit = false,
     values,
     invalid,
-    pristine,
     handleSubmit,
+    onUpdateOrderInfo,
   } = props;
+  const formRef = useRef<any>(null);
   const mobileDeadlineModalControl = useBoolean();
   const { isMobileLayout } = useViewport();
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -56,6 +62,8 @@ const DeadlineDateTimeFormComponent: React.FC<
   const bookerPublishOrderInProgress = useAppSelector(
     (state) => state.Order.publishOrderInProgress,
   );
+
+  formRef.current = form;
 
   const {
     deadlineDate: deadlineDateFormFormValues,
@@ -82,7 +90,11 @@ const DeadlineDateTimeFormComponent: React.FC<
     invalid ||
     isDeadlineHourEmpty;
   const submitInProgress = bookerPublishOrderInProgress;
-  const saveInfoButtonDisabled = pristine || invalid || isDeadlineHourEmpty;
+  const isAnyFieldsChanged =
+    initialValues.deadlineHour !== deadlineHourFromFormValues ||
+    initialValues.deadlineDate !== deadlineDateFormFormValues;
+  const saveInfoButtonDisabled =
+    !isAnyFieldsChanged || invalid || isDeadlineHourEmpty;
 
   const formattedDeadlineDate = DateTime.fromMillis(
     Number(deadlineDateFormFormValues),
@@ -93,18 +105,37 @@ const DeadlineDateTimeFormComponent: React.FC<
 
   const handleMobileModalClose = () => {
     mobileDeadlineModalControl.setFalse();
-    form.reset();
+
+    if (isAnyFieldsChanged) {
+      form.reset();
+    }
   };
 
   const handleSubmitSelectedHour = () => {
-    form.change('deadlineHour', draftDeadlineHour);
+    form.batch(() => {
+      form.change('deadlineHour', draftDeadlineHour);
+    });
+  };
+
+  const handleSubmitMobileChanges = () => {
+    if (onUpdateOrderInfo) {
+      onUpdateOrderInfo(values);
+    }
+    mobileDeadlineModalControl.setFalse();
+  };
+
+  const handleSubmitOutSideForm = () => {
+    if (formRef.current) {
+      (formRef.current as any).submit();
+    }
   };
 
   const sendNotificationButton = (
     <Button
       variant="cta"
       disabled={submitDisabled}
-      // onClick={mobileDeadlineModalControl.setTrue}
+      type="submit"
+      onClick={handleSubmitOutSideForm}
       inProgress={submitInProgress}
       className={css.sendNotificationButton}>
       Gửi lời mời qua email
@@ -112,9 +143,10 @@ const DeadlineDateTimeFormComponent: React.FC<
   );
   const saveInfoButton = (
     <Button
+      type="button"
       disabled={saveInfoButtonDisabled}
       inProgress={submitInProgress}
-      onClick={mobileDeadlineModalControl.setFalse}>
+      onClick={handleSubmitMobileChanges}>
       Lưu thay đổi
     </Button>
   );

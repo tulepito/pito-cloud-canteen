@@ -69,9 +69,17 @@
   }
 }
 
+.confirmModalContainer.confirmModalContainer {
+  width: calc(100vw - 32px);
+}
+
 .confirmModalChildrenContainer.confirmModalChildrenContainer {
-  padding: 20px 0 28px;
+  padding: 12px 0;
   font-weight: 400;
+
+  @include viewportMedium {
+    padding: 20px 0 28px;
+  }
 }
 
 .participantInvitationContainer {
