@@ -195,6 +195,20 @@
       .stranger {
         @include textTemplate(12px, 600, 16px);
         color: $neutralGray6;
+        border-radius: 360px;
+        background-color: $neutralGray3;
+        padding: 4px;
+        display: flex;
+        justify-content: center;
+        width: fit-content;
+        margin-top: 4px;
+
+        @include viewportMedium {
+          padding: 0;
+          border-radius: 0;
+          background-color: unset;
+          margin-top: 0;
+        }
       }
 
       &:nth-child(2) > td {
@@ -294,8 +308,8 @@
 }
 
 .memberName {
-  @include textTemplate(14px, 700, 20px);
   @include lineClamp(2);
+  @include textTemplate(14px, 700, 20px);
   min-height: 32px;
 
   @include viewportMedium {
@@ -306,6 +320,7 @@
 .memberNameWithAnonymous {
   @extend .memberName;
   @include lineClamp(1);
+  line-height: 20px;
   min-height: unset;
 }
 
@@ -313,6 +328,17 @@
   @include textTemplate(14px, 400, 20px);
   @include lineClamp(2);
   min-height: 32px;
+  @include viewportMedium {
+    min-height: unset;
+  }
+
+  &.foodNameWithAnonymous {
+    min-height: 44px;
+
+    @include viewportMedium {
+      min-height: unset;
+    }
+  }
 }
 
 .foodNameWithAction {
@@ -326,6 +352,7 @@
 
 .memberEmail {
   @include lineClamp(1);
+  line-height: 20px;
 }
 
 .iconsContainer {

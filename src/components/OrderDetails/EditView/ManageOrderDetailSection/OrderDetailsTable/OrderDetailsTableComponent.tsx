@@ -182,8 +182,11 @@ const OrderDetailsTableComponent: React.FC<
                         </RenderWhen>
                       );
 
+                      const foodNameClasses = classNames(css.foodName, {
+                        [css.foodNameWithAnonymous]: isAnonymous,
+                      });
                       const foodNameComponent = (
-                        <div className={css.foodName}>{foodName}</div>
+                        <div className={foodNameClasses}>{foodName}</div>
                       );
 
                       const iconEditComponent = (
