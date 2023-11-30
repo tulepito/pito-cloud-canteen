@@ -5,6 +5,7 @@ import { DateTime } from 'luxon';
 
 import useSelectDay from '@components/CalendarDashboard/hooks/useSelectDay';
 import { useViewport } from '@hooks/useViewport';
+import { EInvalidRestaurantCase } from '@src/utils/enums';
 import type { TObject } from '@utils/types';
 
 import type {
@@ -68,9 +69,13 @@ const WDayItem: React.FC<TWDayItemProps> = ({
       ? dateTimestamp < startDateTimestamp || dateTimestamp > endDateTimestamp
       : false;
 
-  const indicator = !isMobileLayout
-    ? undefined
-    : availableOrderDetailCheckList?.[date.getTime()];
+  const indicator =
+    !isMobileLayout ||
+    (availableOrderDetailCheckList?.[date.getTime()]?.isAvailable &&
+      availableOrderDetailCheckList?.[date.getTime()]?.status ===
+        EInvalidRestaurantCase.noMenusValid)
+      ? undefined
+      : availableOrderDetailCheckList?.[date.getTime()]?.isAvailable;
 
   const onClick = useCallback(() => {
     if (isDisabled) {

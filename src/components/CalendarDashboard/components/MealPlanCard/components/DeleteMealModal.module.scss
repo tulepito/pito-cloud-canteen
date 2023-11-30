@@ -20,9 +20,9 @@
 
 .modalContent {
   width: calc(100% - 48px);
-  margin: auto;
 
   @include viewportMedium {
+    margin: auto;
     padding: 25px 0 0;
     width: 100%;
     max-width: 400px;

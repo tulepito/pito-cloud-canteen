@@ -238,7 +238,6 @@ function BookerDraftOrderPage() {
   }, [collapse]);
 
   const handleCloseSideBar = useCallback(() => {
-    console.log('zz');
     setCollapse(false);
   }, [collapse]);
 
@@ -469,7 +468,7 @@ function BookerDraftOrderPage() {
                 <MealPlanCard
                   event={selectedEvent as Event}
                   index={0}
-                  resources={{}}
+                  resources={{ ...calendarProps.resources }}
                   removeInprogress={false}
                 />
               </div>
