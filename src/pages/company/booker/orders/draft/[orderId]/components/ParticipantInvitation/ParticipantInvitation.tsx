@@ -5,10 +5,16 @@ import { DateTime } from 'luxon';
 import Badge from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
+import MobileBottomContainer from '@components/MobileBottomContainer/MobileBottomContainer';
+import MobileTopContainer from '@components/MobileTopContainer/MobileTopContainer';
 import AlertModal from '@components/Modal/AlertModal';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
+import Stepper from '@components/Stepper/Stepper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
+import { useViewport } from '@hooks/useViewport';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
+import { BOOKER_CREATE_GROUP_ORDER_STEPS } from '@src/constants/stepperSteps';
 import { Listing } from '@src/utils/data';
 
 import type { DeadlineDateTimeFormValues } from './DeadlineDateTimeForm';
@@ -28,6 +34,7 @@ const ParticipantInvitation: React.FC<TParticipantInvitationProps> = ({
 }) => {
   const confirmPublishOrderControl = useBoolean();
   const dispatch = useAppDispatch();
+  const { isMobileLayout } = useViewport();
   const order = useAppSelector((state) => state.Order.order);
   const participantData = useAppSelector(
     (state) => state.BookerDraftOrderPage.participantData,
@@ -78,45 +85,62 @@ const ParticipantInvitation: React.FC<TParticipantInvitationProps> = ({
     onPublishOrder();
   };
 
+  const deadlineFormComponent = (
+    <DeadlineDateTimeForm
+      deliveryTime={deliveryTime}
+      initialValues={deadlineDateTimeInitialValues}
+      onSubmit={handleSubmitDeadlineDateTimeForm}
+      shouldDisableSubmit={shouldDisabledSubmitPublishOrder}
+    />
+  );
+
   return (
-    <div className={css.root}>
-      <div className={css.contentContainer}>
-        <div className={css.titleContainer}>
-          <Button
-            variant="inline"
-            className={css.goBackContainer}
-            onClick={onGoBack}>
-            <IconArrow direction="left" />
-            <span className={css.goBackText}>Quay lại</span>
-          </Button>
-          <div className={css.title}>
-            <div>Mời thành viên tham gia nhóm</div>
-            <Badge label="Các thành viên được mời sẽ nhận thông báo chọn món ngay sau khi gửi lời mời" />
+    <>
+      <MobileTopContainer
+        title="Mời tham gia nhóm"
+        hasGoBackButton
+        onGoBack={onGoBack}
+      />
+      <Stepper steps={BOOKER_CREATE_GROUP_ORDER_STEPS} currentStep={2} />
+      <div className={css.root}>
+        <div className={css.contentContainer}>
+          <div className={css.titleContainer}>
+            <Button
+              variant="inline"
+              className={css.goBackButtonContainer}
+              onClick={onGoBack}>
+              <IconArrow direction="left" />
+              <span className={css.goBackText}>Quay lại</span>
+            </Button>
+            <div className={css.title}>
+              <div>Mời thành viên tham gia nhóm</div>
+              <Badge label="Các thành viên được mời sẽ nhận thông báo chọn món ngay sau khi gửi lời mời" />
+            </div>
+          </div>
+          <div className={css.participantInvitationContainer}>
+            <MobileBottomContainer className={css.mobileDeadlineFormContainer}>
+              {deadlineFormComponent}
+            </MobileBottomContainer>
+            <RenderWhen condition={!isMobileLayout}>
+              {deadlineFormComponent}
+            </RenderWhen>
+            <AlertModal
+              childrenClassName={css.confirmModalChildrenContainer}
+              isOpen={confirmPublishOrderControl.value}
+              handleClose={confirmPublishOrderControl.setFalse}
+              title="Xác nhận đơn và gửi lời mời"
+              cancelLabel="Đóng"
+              confirmLabel={'Gửi lời mời'}
+              confirmDisabled={shouldDisabledSubmitPublishOrder}
+              onCancel={onGoBack}
+              onConfirm={handleConfirmPublishOrder}>
+              Sau khi gửi, bạn sẽ không thể chỉnh sửa thực đơn của tuần ăn.
+            </AlertModal>
+            <ParticipantManagement />
           </div>
         </div>
-        <div className={css.participantInvitationContainer}>
-          <DeadlineDateTimeForm
-            deliveryTime={deliveryTime}
-            initialValues={deadlineDateTimeInitialValues}
-            onSubmit={handleSubmitDeadlineDateTimeForm}
-            shouldDisableSubmit={shouldDisabledSubmitPublishOrder}
-          />
-          <AlertModal
-            childrenClassName={css.confirmModalChildrenContainer}
-            isOpen={confirmPublishOrderControl.value}
-            handleClose={confirmPublishOrderControl.setFalse}
-            title="Xác nhận đơn và gửi lời mời"
-            cancelLabel="Đóng"
-            confirmLabel={'Gửi lời mời'}
-            confirmDisabled={shouldDisabledSubmitPublishOrder}
-            onCancel={onGoBack}
-            onConfirm={handleConfirmPublishOrder}>
-            Sau khi gửi, bạn sẽ không thể chỉnh sửa thực đơn của tuần ăn.
-          </AlertModal>
-          <ParticipantManagement />
-        </div>
       </div>
-    </div>
+    </>
   );
 };
 
