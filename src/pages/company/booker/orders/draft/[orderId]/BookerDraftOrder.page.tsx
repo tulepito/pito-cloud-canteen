@@ -89,7 +89,8 @@ function BookerDraftOrderPage() {
     useState<EBookerDraftOrderViewMode>(EBookerDraftOrderViewMode.setup);
   const dispatch = useAppDispatch();
   const { isTabletLayoutOrLarger } = useViewport();
-  const { selectedDay, handleSelectDay } = useSelectDay();
+  const { selectedDay } = useSelectDay();
+  const [sampleSubOrder, setSampleSubOrder] = useState<any>({});
 
   const homeReturnModalController = useBoolean();
 
@@ -384,7 +385,7 @@ function BookerDraftOrderPage() {
   }, [orderId, orderState]);
 
   useEffect(() => {
-    handleSelectDay(orderDetail[0]?.start);
+    setSampleSubOrder(orderDetail[0]);
   }, [JSON.stringify(orderDetail)]);
 
   return (
@@ -463,17 +464,31 @@ function BookerDraftOrderPage() {
                 </div>
               </RenderWhen>
             </div>
-            <RenderWhen condition={!!selectedEvent}>
+            <RenderWhen condition={!!selectedEvent || walkthroughEnable}>
               <div className={css.subOrderDate}>
-                <MealPlanCard
-                  event={selectedEvent as Event}
-                  index={0}
-                  resources={{ ...calendarProps.resources }}
-                  removeInprogress={false}
-                />
+                <RenderWhen condition={walkthroughEnable}>
+                  <MealPlanCard
+                    event={sampleSubOrder as Event}
+                    index={0}
+                    resources={{}}
+                    removeInprogress={false}
+                  />
+                  <RenderWhen.False>
+                    <MealPlanCard
+                      event={selectedEvent as Event}
+                      index={0}
+                      resources={{ ...calendarProps.resources }}
+                      removeInprogress={
+                        calendarProps?.resources?.updatePlanDetailInprogress
+                      }
+                      onRemove={handleRemoveMeal(planId)}
+                    />
+                  </RenderWhen.False>
+                </RenderWhen>
               </div>
               <RenderWhen.False>
-                <RenderWhen condition={!isTabletLayoutOrLarger}>
+                <RenderWhen
+                  condition={!isTabletLayoutOrLarger && !!selectedDay}>
                   <div className={css.addMealWrapper}>
                     <IconEmpty variant="food" />
                     <div className={css.emptyText}>Chưa có bữa ăn</div>

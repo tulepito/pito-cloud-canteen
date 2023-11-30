@@ -1,5 +1,6 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
 
 @mixin walkthroughArrow {
   content: '';
@@ -155,8 +156,11 @@
 
   span {
     display: block;
-    width: 95px;
     @include lineClamp(3);
+
+    @include viewportLarge {
+      width: 95px;
+    }
   }
 }
 

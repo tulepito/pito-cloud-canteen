@@ -101,14 +101,23 @@
 }
 
 .emptyResult {
-  margin: 120px auto;
+  margin-top: 32px;
+
+  @include viewportLarge {
+    margin: 120px auto;
+  }
 }
 
 .emptyResultImg {
   position: relative;
-  width: 245px;
-  height: 200px;
+  width: 186px;
+  height: 100px;
   margin: 0 auto 32px;
+
+  @include viewportLarge {
+    width: 245px;
+    height: 200px;
+  }
 
   img {
     width: 100%;
