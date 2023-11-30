@@ -9,6 +9,7 @@ const LAMBDA_ARN = `${process.env.LAMBDA_ARN}`;
 const ROLE_ARN = `${process.env.ROLE_ARN}`;
 const SEND_FOOD_RATING_NOTIFICATION_LAMBDA_ARN = `${process.env.SEND_FOOD_RATING_NOTIFICATION_LAMBDA_ARN}`;
 const AUTOMATIC_START_ORDER_JOB_LAMBDA_ARN = `${process.env.AUTOMATIC_START_ORDER_JOB_LAMBDA_ARN}`;
+const PICK_FOOD_FOR_EMPTY_MEMBER_ARN = `${process.env.PICK_FOOD_FOR_EMPTY_MEMBER_ARN}`;
 const NEXT_PUBLIC_ENV = `${process.env.NEXT_PUBLIC_ENV}`;
 
 const isProduction = NEXT_PUBLIC_ENV === 'production';
@@ -143,6 +144,53 @@ export const createOrUpdateAutomaticStartOrderScheduler = async ({
   } catch (error) {
     createScheduler({
       arn: AUTOMATIC_START_ORDER_JOB_LAMBDA_ARN,
+      customName,
+      timeExpression,
+      params: {
+        orderId,
+      },
+    })
+      .then((res) => {
+        console.log('Create Automatic start order Scheduler Success: ', res);
+      })
+      .catch((err) => {
+        console.log('Create Automatic start order Scheduler Error: ', err);
+      });
+  }
+};
+
+export const createPickFoodForEmptyMembersScheduler = async ({
+  orderId,
+  startDate,
+  deliveryHour,
+}: any) => {
+  const ensuredDeliveryHour = isEmpty(deliveryHour)
+    ? undefined
+    : deliveryHour.includes('-')
+    ? deliveryHour.split('-')[0]
+    : deliveryHour;
+  const customName = `PFFEM_${orderId}`; // PFFEM: Pick Food For Empty Members
+  const timeExpression = formatTimestamp(
+    DateTime.fromMillis(startDate)
+      .setZone(VNTimezone)
+      .plus({
+        ...convertHHmmStringToTimeParts(ensuredDeliveryHour),
+      })
+      .minus({ day: 1, hour: 1 })
+      .toMillis(),
+    "yyyy-MM-dd'T'hh:mm:ss",
+  );
+
+  try {
+    await getScheduler(customName);
+    await updateScheduler({
+      arn: PICK_FOOD_FOR_EMPTY_MEMBER_ARN,
+      customName,
+      timeExpression,
+    });
+  } catch (error) {
+    createScheduler({
+      arn: PICK_FOOD_FOR_EMPTY_MEMBER_ARN,
       customName,
       timeExpression,
       params: {
