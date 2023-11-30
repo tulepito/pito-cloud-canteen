@@ -7,17 +7,9 @@
   column-gap: 12px;
 
   & > * {
-    flex-basis: calc(50% - 6px);
+    flex-basis: 100%;
 
-    @include viewportLarge {
-      flex-basis: calc(100% / 2 - 12px / 2);
-    }
-
-    @include viewportLarge {
-      flex-basis: calc(100% / 3 - 12px * 2 / 3);
-    }
-
-    @include viewportLarge {
+    @include viewportMedium {
       flex-basis: calc(100% / 2 - 12px / 2);
     }
   }
