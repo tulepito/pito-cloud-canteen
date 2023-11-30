@@ -30,8 +30,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             userIds: userIdsFromBody,
           },
         } = req;
+        const needUpdateNoAccountEmails =
+          typeof nonAccountEmails !== 'undefined';
 
         let userIds: string[] = [];
+
         if (isEmpty(userIdsFromBody)) {
           let user;
 
@@ -46,6 +49,16 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           }
 
           if (!user) {
+            if (needUpdateNoAccountEmails) {
+              // TODO: update participant list
+              await integrationSdk.listings.update({
+                id: orderId,
+                metadata: {
+                  nonAccountEmails,
+                },
+              });
+            }
+
             res.json({
               errorCode: 'user_not_found',
               message: `Email ${email} chưa có tài khoản`,
@@ -76,9 +89,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             ...(isEmpty(anonymous)
               ? {}
               : { anonymous: difference(anonymous, userIds) }),
-            ...(typeof nonAccountEmails === 'undefined'
-              ? {}
-              : { nonAccountEmails }),
+            ...(needUpdateNoAccountEmails ? { nonAccountEmails } : {}),
           },
         });
 
