@@ -1,14 +1,20 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
 
 .root {
-  padding: 16px;
+  padding: 20px 12px;
   display: flex;
   flex-direction: column;
   row-gap: 16px;
   border-radius: 16px;
-  border: 1px solid $neutralGray5;
+  border: 1px solid $neutralGray3;
   background-color: $neutralGray1;
+
+  @include viewportMedium {
+    padding: 16px;
+    border-color: $neutralGray5;
+  }
 
   .titleContainer {
     display: flex;

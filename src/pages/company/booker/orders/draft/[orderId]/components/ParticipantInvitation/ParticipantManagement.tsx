@@ -5,6 +5,7 @@ import uniq from 'lodash/uniq';
 
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { useViewport } from '@hooks/useViewport';
 import {
   filterHasAccountUserIds,
   filterHasAccountUsers,
@@ -27,6 +28,7 @@ type TParticipantManagementProps = {};
 
 const ParticipantManagement: React.FC<TParticipantManagementProps> = () => {
   const dispatch = useAppDispatch();
+  const { isMobileLayout } = useViewport();
   const order = useAppSelector((state) => state.Order.order);
   const participantData = useAppSelector(
     (state) => state.BookerDraftOrderPage.participantData,
@@ -87,7 +89,11 @@ const ParticipantManagement: React.FC<TParticipantManagementProps> = () => {
   return (
     <div className={css.root}>
       <div className={css.titleContainer}>
-        <div className={css.title}>Danh sách thành viên hiện tại</div>
+        <div className={css.title}>
+          {isMobileLayout
+            ? 'Danh sách thành viên'
+            : 'Danh sách thành viên hiện tại'}
+        </div>
         <RenderWhen condition={!isParticipantListEmpty}>
           <div className={css.count}>{participantData.length}</div>
         </RenderWhen>
@@ -97,9 +103,13 @@ const ParticipantManagement: React.FC<TParticipantManagementProps> = () => {
         onSubmit={handleSubmitAddParticipant}
         restrictEmailList={restrictEmailList}
       />
-      <ImportParticipantFromFile
-        handleInviteMember={handleInviteMemberViaEmailList}
-      />
+      <RenderWhen condition={isMobileLayout}>
+        <RenderWhen.False>
+          <ImportParticipantFromFile
+            handleInviteMember={handleInviteMemberViaEmailList}
+          />
+        </RenderWhen.False>
+      </RenderWhen>
       <ParticipantList />
     </div>
   );
