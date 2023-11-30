@@ -19,12 +19,14 @@ import { useViewport } from '@hooks/useViewport';
 import { TimeOptions } from '@utils/dates';
 
 import MobileEditDeadlineDateField from './MobileEditDeadlineDateField';
+import MobileEditDeadlineHourField from './MobileEditDeadlineHourField';
 
 import css from './DeadlineDateTimeForm.module.scss';
 
 export type DeadlineDateTimeFormValues = {
   deadlineDate: string | number;
   deadlineHour: string;
+  draftDeadlineHour?: string;
 };
 
 type TExtraProps = { deliveryTime: Date; shouldDisableSubmit?: boolean };
@@ -58,6 +60,7 @@ const DeadlineDateTimeFormComponent: React.FC<
   const {
     deadlineDate: deadlineDateFormFormValues,
     deadlineHour: deadlineHourFromFormValues,
+    draftDeadlineHour,
   } = values;
 
   const selectedDeadlineDate = deadlineDateFormFormValues
@@ -91,6 +94,10 @@ const DeadlineDateTimeFormComponent: React.FC<
   const handleMobileModalClose = () => {
     mobileDeadlineModalControl.setFalse();
     form.reset();
+  };
+
+  const handleSubmitSelectedHour = () => {
+    form.change('deadlineHour', draftDeadlineHour);
   };
 
   const sendNotificationButton = (
@@ -143,15 +150,24 @@ const DeadlineDateTimeFormComponent: React.FC<
             />
           </RenderWhen.False>
         </RenderWhen>
+        <RenderWhen condition={isMobileLayout}>
+          <MobileEditDeadlineHourField
+            initialDeadlineHour={deadlineHourFromFormValues}
+            draftDeadlineHour={draftDeadlineHour}
+            onSubmitSelectedHour={handleSubmitSelectedHour}
+          />
 
-        <FieldDropdownSelect
-          id="DeadlineDateTimeForm.deadlineHour"
-          name="deadlineHour"
-          label={isMobileLayout ? 'Giờ kết thúc' : 'Chọn giờ hết hạn'}
-          placeholder={isMobileLayout ? 'Chọn hạn chọn món' : 'Giờ hết hạn'}
-          leftIcon={<IconClock />}
-          options={TimeOptions}
-        />
+          <RenderWhen.False>
+            <FieldDropdownSelect
+              id="DeadlineDateTimeForm.deadlineHour"
+              name="deadlineHour"
+              label={isMobileLayout ? 'Giờ kết thúc' : 'Chọn giờ hết hạn'}
+              placeholder={isMobileLayout ? 'Chọn hạn chọn món' : 'Giờ hết hạn'}
+              leftIcon={<IconClock />}
+              options={TimeOptions}
+            />
+          </RenderWhen.False>
+        </RenderWhen>
         {isMobileLayout ? saveInfoButton : sendNotificationButton}
       </div>
     </Form>

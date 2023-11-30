@@ -42,7 +42,7 @@ const MobileEditDeadlineDateField: React.FC<
   useEffect(() => {
     setSelectedDate(initialDeadlineDate);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialDeadlineDate]);
+  }, [JSON.stringify(initialDeadlineDate)]);
 
   return (
     <>

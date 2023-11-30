@@ -58,6 +58,7 @@ const ParticipantInvitation: React.FC<TParticipantInvitationProps> = ({
   const deadlineDateTimeInitialValues = {
     deadlineDate: new Date(deadlineDate).getTime() || defaultDeadlineDate,
     deadlineHour,
+    draftDeadlineHour: deadlineHour,
   };
 
   // * condition to disable publish order
