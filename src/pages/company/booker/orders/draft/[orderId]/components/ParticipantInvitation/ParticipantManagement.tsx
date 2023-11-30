@@ -1,10 +1,13 @@
+import { useState } from 'react';
 import { toast } from 'react-toastify';
 import difference from 'lodash/difference';
 import isEmpty from 'lodash/isEmpty';
 import uniq from 'lodash/uniq';
 
+import Alert, { EAlertPosition, EAlertType } from '@components/Alert/Alert';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import useBoolean from '@hooks/useBoolean';
 import { useViewport } from '@hooks/useViewport';
 import {
   filterHasAccountUserIds,
@@ -28,7 +31,9 @@ import css from './ParticipantManagement.module.scss';
 type TParticipantManagementProps = {};
 
 const ParticipantManagement: React.FC<TParticipantManagementProps> = () => {
+  const [message, setMessage] = useState<any>('');
   const dispatch = useAppDispatch();
+  const mobileAlertControl = useBoolean();
   const { isMobileLayout } = useViewport();
   const order = useAppSelector((state) => state.Order.order);
   const participantData = useAppSelector(
@@ -83,7 +88,7 @@ const ParticipantManagement: React.FC<TParticipantManagementProps> = () => {
           }),
         );
 
-        const message = (
+        setMessage(
           <span>
             Đã thêm{' '}
             {needHandleItems.length > 1 ? (
@@ -92,10 +97,14 @@ const ParticipantManagement: React.FC<TParticipantManagementProps> = () => {
               'email'
             )}{' '}
             vào danh sách
-          </span>
+          </span>,
         );
 
-        toast(message, successToastOptions);
+        if (isMobileLayout) {
+          mobileAlertControl.setTrue();
+        } else {
+          toast(message, successToastOptions);
+        }
       }
     }
   };
@@ -133,6 +142,19 @@ const ParticipantManagement: React.FC<TParticipantManagementProps> = () => {
         </RenderWhen.False>
       </RenderWhen>
       <ParticipantList />
+
+      <Alert
+        className={css.mobileAlert}
+        position={EAlertPosition.bottom}
+        onClose={mobileAlertControl.setFalse}
+        autoClose
+        timeToClose={3000}
+        isOpen={mobileAlertControl.value}
+        hasCloseButton={false}
+        type={EAlertType.success}
+        message={message}
+        messageClassName={css.mobileAlertMessage}
+      />
     </div>
   );
 };
