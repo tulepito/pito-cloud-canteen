@@ -47,8 +47,12 @@
     @include viewportMedium {
       font-size: 12px;
     }
-    & > div span:first-of-type {
-      font-weight: 600;
+    & > div span {
+      word-break: break-word;
+
+      &:first-of-type {
+        font-weight: 600;
+      }
     }
   }
 }

@@ -1,8 +1,9 @@
 @use '/src/styles/mixins.scss' as *;
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/customMediaQueries.scss' as *;
+
 .root {
-  $maxWidth: min(calc(100vw - 96px), 424px);
+  $maxWidth: min(calc(100vw), 424px);
   margin: 0 auto;
   width: 100%;
   max-width: $maxWidth;
