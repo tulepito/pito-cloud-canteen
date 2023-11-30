@@ -3,6 +3,7 @@ import classNames from 'classnames';
 
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useAppDispatch } from '@hooks/reduxHooks';
+import { useViewport } from '@hooks/useViewport';
 import type { usePrepareOrderDetailPageData } from '@pages/company/orders/[orderId]/picking/hooks/usePrepareData';
 import { orderManagementThunks } from '@redux/slices/OrderManagement.slice';
 import { Listing } from '@src/utils/data';
@@ -67,6 +68,7 @@ const ReviewView: React.FC<TReviewViewProps> = (props) => {
     shouldShowGoHomeButtonOnMobileCart = false,
   } = props;
   const dispatch = useAppDispatch();
+  const { isMobileLayout } = useViewport();
   const { leftClassName, rightClassName } = classes;
 
   const { quotationId } = Listing(orderData!).getMetadata();
@@ -118,12 +120,15 @@ const ReviewView: React.FC<TReviewViewProps> = (props) => {
           <ReviewOrderDetailsSection
             foodOrderGroupedByDate={reviewViewData.foodOrderGroupedByDate}
           />
-          {isGroupOrder && (
-            <ReviewNoteSection
-              onSaveOrderNote={onSaveOrderNote}
-              data={reviewViewData.orderNoteData}
-            />
-          )}
+
+          <RenderWhen condition={!isMobileLayout}>
+            {isGroupOrder && (
+              <ReviewNoteSection
+                onSaveOrderNote={onSaveOrderNote}
+                data={reviewViewData.orderNoteData}
+              />
+            )}
+          </RenderWhen>
         </div>
       </RenderWhen>
       <div className={rightPartClasses}>
