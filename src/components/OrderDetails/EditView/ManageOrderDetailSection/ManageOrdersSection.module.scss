@@ -1,26 +1,53 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
 
-.root {
-  .manageOrdersContainer {
+.manageOrdersContainer {
+  padding: 24px 12px;
+  border: 1px solid $neutralGray3;
+  box-shadow: 0px 2px 4px -2px rgba(16, 24, 40, 0.06),
+    0px 4px 8px -2px rgba(16, 24, 40, 0.1);
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  @include viewportMedium {
     padding: 24px 20px;
+  }
 
-    border: 1px solid $neutralGray3;
-    box-shadow: 0px 2px 4px -2px rgba(16, 24, 40, 0.06),
-      0px 4px 8px -2px rgba(16, 24, 40, 0.1);
-    border-radius: 16px;
+  .title {
+    @include textTemplate(18px, 700, 24px);
+  }
 
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-
-    .title {
-      @include textTemplate(18px, 700, 24px);
+  .addOrder {
+    .addOrderTitle {
+      @include textTemplate(16px, 700, 24px);
     }
 
-    .addOrder {
-      .addOrderTitle {
+    .mobileSection {
+      @include viewportMedium {
+        display: none;
+      }
+
+      .error {
+        font-weight: $fontWeightRegular;
+        font-size: 12px;
+      }
+
+      .addOrderButton {
+        display: flex;
+        column-gap: 12px;
+        padding: 12px 0;
         @include textTemplate(16px, 700, 24px);
+      }
+    }
+
+    .desktopSection {
+      display: none;
+
+      @include viewportMedium {
+        display: block;
       }
     }
   }
@@ -29,5 +56,8 @@
 .rootSkeleton {
   width: 100%;
   height: 600px;
-  // display: none;
+}
+
+.mobileModalContainer.mobileModalContainer {
+  padding: 20px 16px;
 }

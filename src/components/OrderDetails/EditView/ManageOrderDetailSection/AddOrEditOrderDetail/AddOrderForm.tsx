@@ -219,6 +219,7 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
         <div className={css.fieldContainer}>
           <FieldDropdownSelect
             className={css.fieldSelect}
+            dropdownWrapperClassName={css.fieldSelectDropdownWrapper}
             options={parsedFoodOptions}
             disabled={fieldSelectFoodDisable}
             id={'addOrder.foodId'}
@@ -262,7 +263,8 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
           type="button"
           variant="inline"
           disabled={fieldSelectFoodDisable}
-          onClick={handleToggleShowHideRequirementField}>
+          onClick={handleToggleShowHideRequirementField}
+          className={css.toggleRequirementBtn}>
           <div className={css.buttonContent}>
             <RenderWhen condition={isRequirementInputShow}>
               <IconMinus />
@@ -289,6 +291,15 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
           </div>
         )}
       </div>
+
+      <Button
+        disabled={submitDisabled}
+        inProgress={addOrUpdateMemberOrderInProgress}
+        className={css.mobileSubmitButton}>
+        {intl.formatMessage({
+          id: 'AddOrderForm.submitButtonText',
+        })}
+      </Button>
     </Form>
   );
 };
