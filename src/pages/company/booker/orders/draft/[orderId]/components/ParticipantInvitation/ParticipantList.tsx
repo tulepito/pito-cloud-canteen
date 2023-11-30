@@ -78,11 +78,14 @@ const ParticipantList: React.FC<TParticipantListProps> = () => {
 
       <AlertModal
         title="Xoá thành viên"
+        containerClassName={css.confirmDeleteModalContainer}
+        childrenClassName={css.confirmDeleteModalChildrenContainer}
         isOpen={deleteParticipantControl.value}
         cancelLabel="Huỷ"
         confirmLabel="Xoá thành viên"
         handleClose={handleCancelDeleteParticipant}
         onCancel={handleCancelDeleteParticipant}
+        shouldFullScreenInMobile={false}
         onConfirm={handleConfirmDeleteParticipant}>
         Bạn có chắc chắn muốn xoá thành viên này không?
       </AlertModal>
