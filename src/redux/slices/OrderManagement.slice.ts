@@ -428,20 +428,26 @@ const updateOrderGeneralInfo = createAsyncThunk(
     const {
       id: { uuid: orderId },
     } = orderData;
+    const { skipFetchData = false, ...restParams } = params;
 
     const updateParams = {
       generalInfo: {
-        ...params,
+        ...restParams,
       },
     };
 
     await updateOrderApi(orderId, updateParams);
+    if (skipFetchData) {
+      return restParams;
+    }
     await dispatch(
       loadData({
         orderId,
         isAdminFlow: getState().OrderManagement.isAdminFlow,
       }),
     );
+
+    return {};
   },
 );
 
@@ -1797,8 +1803,15 @@ const OrderManagementSlice = createSlice({
       .addCase(updateOrderGeneralInfo.pending, (state) => {
         state.isUpdatingOrderDetails = true;
       })
-      .addCase(updateOrderGeneralInfo.fulfilled, (state) => {
+      .addCase(updateOrderGeneralInfo.fulfilled, (state, { payload }) => {
         state.isUpdatingOrderDetails = false;
+
+        if (!isEmpty(payload)) {
+          set(state.orderData, `attributes.metadata`, {
+            ...state.orderData.attributes.metadata,
+            ...payload,
+          });
+        }
       })
       .addCase(updateOrderGeneralInfo.rejected, (state) => {
         state.isUpdatingOrderDetails = false;

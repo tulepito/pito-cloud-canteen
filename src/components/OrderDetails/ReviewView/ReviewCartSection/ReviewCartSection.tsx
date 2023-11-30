@@ -135,6 +135,7 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
       orderManagementThunks.updateOrderGeneralInfo({
         contactPeopleName,
         contactPhoneNumber,
+        skipFetchData: true,
       }),
     );
 
