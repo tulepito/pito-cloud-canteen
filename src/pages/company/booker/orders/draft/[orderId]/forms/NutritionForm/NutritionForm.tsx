@@ -67,7 +67,7 @@ const NutritionForm: React.FC<TNutritionFormProps> = ({
 
   return (
     <form className={css.root} onSubmit={handleSubmit}>
-      <div>
+      <div className={css.scrollContent}>
         <div className={css.fieldGroups}>
           <div className={css.groupLabel}>
             <span>

@@ -30,6 +30,7 @@
   border-right: 1px solid $neutralGray5;
   background-color: $neutralGray1;
   height: 100vh;
+  z-index: 2;
 
   @include viewportLargeWithPaddings {
     height: auto;

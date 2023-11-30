@@ -7,6 +7,10 @@
   @include bookerSidebarFormRoot;
 }
 
+.scrollContent {
+  overflow-y: auto;
+}
+
 .fieldGroups {
   margin-bottom: 18px;
   max-height: calc(100vh - 100px - 200px - 130px);

@@ -6,6 +6,10 @@
   @include bookerSidebarFormRoot;
 }
 
+.scrollContent {
+  overflow-y: auto;
+}
+
 .fieldGroups {
   margin-bottom: 24px;
 }

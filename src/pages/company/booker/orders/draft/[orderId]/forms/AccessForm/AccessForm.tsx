@@ -84,7 +84,7 @@ const AccessForm: React.FC<TAccessFormProps> = ({
 
   return (
     <form className={css.root} onSubmit={handleSubmit}>
-      <div>
+      <div className={css.scrollContent}>
         <div className={css.note}>
           {intl.formatMessage({
             id: 'Booker.CreateOrder.Form.group.scrollDownNote',
