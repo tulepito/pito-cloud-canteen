@@ -156,13 +156,16 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
 
   useEffect(() => {
     if (!isEmpty(preparedData)) {
-      const updateObject = preparedData.reduce((result: any, { date }: any) => {
-        if (typeof result[date] === 'undefined') {
-          result[date] = true;
-        }
+      const updateObject = preparedData.reduce(
+        (result: any, { date, orderData }: any) => {
+          if (typeof result[date] === 'undefined') {
+            if (!isEmpty(orderData)) result[date] = true;
+          }
 
-        return result;
-      }, expandingStatusMap);
+          return result;
+        },
+        expandingStatusMap,
+      );
       setExpandingStatusMap(updateObject);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -196,6 +199,7 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
 
         {preparedData.map(({ date, orderData }) => {
           const isExpanding = expandingStatusMap[date];
+          const isEmptyOrderData = isEmpty(orderData);
 
           return (
             <div className={css.dateContainer} key={date}>
@@ -210,10 +214,12 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
                     },
                   )}
                 </div>
-                <IconArrow
-                  direction={isExpanding ? 'up' : 'down'}
-                  onClick={toggleCollapseStatus(date)}
-                />
+                <RenderWhen condition={!isEmptyOrderData}>
+                  <IconArrow
+                    direction={isExpanding ? 'up' : 'down'}
+                    onClick={toggleCollapseStatus(date)}
+                  />
+                </RenderWhen>
               </div>
               <RenderWhen condition={isExpanding}>
                 <div className={css.contentContainer}>

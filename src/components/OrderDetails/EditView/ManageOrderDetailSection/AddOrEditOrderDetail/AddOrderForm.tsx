@@ -207,6 +207,8 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
                 { value },
               )
             }
+            maxMenuHeight={isMobileLayout ? 200 : undefined}
+            menuClassName={css.fieldSelectMenu}
             formError={submitErrors?.participantId}
             validate={validateMemberField}
             validateErrorClassName={css.fieldParticipantIdError}

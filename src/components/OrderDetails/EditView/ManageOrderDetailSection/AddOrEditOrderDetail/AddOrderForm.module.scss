@@ -32,6 +32,10 @@
       display: inline-block;
       width: 100%;
 
+      .fieldSelectMenu {
+        max-height: 200px;
+      }
+
       @include viewportMedium {
         width: 240px;
       }
