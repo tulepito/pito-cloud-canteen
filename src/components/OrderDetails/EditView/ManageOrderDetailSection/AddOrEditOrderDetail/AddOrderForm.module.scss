@@ -51,13 +51,13 @@
   }
 
   .submitButton {
-    display: inline-block;
     min-height: unset;
     height: 44px;
     flex: 1 1 100%;
     display: none;
 
     @include viewportMedium {
+      display: inline-block;
       flex: unset;
       flex-basis: 80px;
     }
