@@ -9,6 +9,6 @@
 }
 
 .loading {
-  @include flexAlign(center, center);
+  @include flexCenter;
   margin-top: 40px;
 }

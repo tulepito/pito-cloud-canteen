@@ -191,7 +191,7 @@
   gap: 8px;
 
   .metaItem {
-    @include flexAlign(center, center);
+    @include flexCenter;
     @include textTemplate(12px, 400, 16px);
     gap: 4px;
   }

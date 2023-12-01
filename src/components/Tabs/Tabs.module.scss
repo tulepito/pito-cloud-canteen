@@ -86,7 +86,7 @@
     @include textTemplate(8px, $fontWeightBold, 8px);
     width: 16px;
     height: 16px;
-    @include flexAlign(center, center);
+    @include flexCenter;
   }
 
   &::after {

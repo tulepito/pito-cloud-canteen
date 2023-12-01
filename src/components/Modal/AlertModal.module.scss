@@ -7,7 +7,7 @@
 
 .modalRoot {
   &.isOpen {
-    z-index: 202;
+    z-index: $zIndexAlertModal;
   }
 
   .container {

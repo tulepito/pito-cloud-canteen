@@ -6,7 +6,7 @@
   height: 160px;
   border: 1px solid $neutralGray5;
   border-radius: 8px;
-  @include flexAlign(center, center);
+  @include flexCenter;
   flex-direction: column;
 
   .selectImageBtn {
