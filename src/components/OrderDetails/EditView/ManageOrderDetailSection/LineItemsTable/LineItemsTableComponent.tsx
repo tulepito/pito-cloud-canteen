@@ -27,6 +27,13 @@ const TABLE_HEAD_IDS = [
   'LineItemsTableComponent.head.price',
 ];
 
+const MOBILE_TABLE_HEAD_IDS = [
+  'LineItemsTableComponent.head.foodName',
+  'LineItemsTableComponent.head.mobileQuantity',
+  'LineItemsTableComponent.head.unitPrice',
+  'LineItemsTableComponent.head.price',
+];
+
 type TLineItemsTableComponentProps = {
   data: TObject;
   onModifyQuantity: (id: string, quantity: number) => () => void;
@@ -52,6 +59,8 @@ export const LineItemsTableComponent: React.FC<
   const { memberAmount = 1 } = orderDataGetter.getMetadata();
 
   const { lineItems = [] } = data;
+
+  const tableHeadIds = isMobileLayout ? MOBILE_TABLE_HEAD_IDS : TABLE_HEAD_IDS;
 
   const { totalPrice, totalQuantity, formInitialValues } = useMemo(
     () =>
@@ -143,6 +152,7 @@ export const LineItemsTableComponent: React.FC<
                           name={foodId}
                           id={`${foodId}.quantity`}
                           type="number"
+                          disabled={actionDisabled}
                           className={css.quantityField}
                           inputClassName={css.quantityInput}
                           customOnBlur={handleBlurFoodQuantity}
@@ -211,7 +221,7 @@ export const LineItemsTableComponent: React.FC<
       <table className={css.tableRoot}>
         <thead>
           <tr>
-            {TABLE_HEAD_IDS.map((headId: string, index: number) => (
+            {tableHeadIds.map((headId: string, index: number) => (
               <th key={index} colSpan={index === 3 ? 2 : 1}>
                 {intl.formatMessage({ id: headId })}
               </th>
