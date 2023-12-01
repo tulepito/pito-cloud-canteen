@@ -81,11 +81,14 @@
   }
 
   .overFlowAlert {
+    .overFlowAlertContainer {
+      align-items: flex-start;
+    }
+
     &:not(.isAdminLayout) {
       @include viewportSLarge {
         top: 124px;
       }
-      transition: all 0.5s linear;
 
       &.isOpen {
         right: 40px;
@@ -94,6 +97,20 @@
           right: 130px;
           top: 124px;
         }
+      }
+    }
+  }
+
+  .mobileOverFlowAlert {
+    $width: min(calc(100vw - 54px), 350px);
+    width: $width;
+
+    &:not(.isAdminLayout) {
+      bottom: 140px;
+      right: -100vw;
+
+      &.isOpen {
+        right: calc(50vw - $width/2);
       }
     }
   }
@@ -371,10 +388,12 @@
 
   .fieldSelect {
     flex-basis: 50%;
+    margin-bottom: 196px;
 
     @include viewportMedium {
       flex-direction: row;
       max-width: 350px;
+      margin-bottom: unset;
     }
   }
 
@@ -386,11 +405,6 @@
     @include viewportMedium {
       flex-basis: unset;
     }
-  }
-
-  .dropdownWrapper {
-    height: 88px;
-    overflow: hidden auto;
   }
 }
 

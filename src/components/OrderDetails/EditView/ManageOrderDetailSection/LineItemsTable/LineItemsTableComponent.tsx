@@ -3,12 +3,13 @@ import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
 import classNames from 'classnames';
 
-import Alert from '@components/Alert/Alert';
+import Alert, { EAlertPosition, EAlertType } from '@components/Alert/Alert';
 import Form from '@components/Form/Form';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import IconDelete from '@components/Icons/IconDelete/IconDelete';
 import IconMinus from '@components/Icons/IconMinus/IconMinus';
 import IconPlus from '@components/Icons/IconPlus/IconPlus';
+import IconWarning from '@components/Icons/IconWarning/IconWarning';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { parseThousandNumber } from '@helpers/format';
 import { useAppSelector } from '@hooks/reduxHooks';
@@ -212,11 +213,18 @@ export const LineItemsTableComponent: React.FC<
       <Alert
         className={classNames(css.overFlowAlert, {
           [css.isAdminLayout]: isAdminFlow,
+          [css.mobileOverFlowAlert]: isMobileLayout,
         })}
         openClassName={css.isOpen}
         message={overFlowMemberAmountMessage}
+        position={isMobileLayout ? EAlertPosition.bottom : undefined}
+        type={isMobileLayout ? EAlertType.success : undefined}
+        hasCloseButton={!isMobileLayout}
+        autoClose={isMobileLayout}
+        containerClassName={css.overFlowAlertContainer}
         isOpen={alertController.value}
-        onClose={() => alertController.setFalse()}
+        customIcon={isMobileLayout ? <IconWarning /> : undefined}
+        onClose={alertController.setFalse}
       />
       <table className={css.tableRoot}>
         <thead>

@@ -7,20 +7,23 @@
   z-index: 999;
   padding: 16px 24px 16px 24px;
   border-radius: 12px;
-
-  display: flex;
+  @include flexAlign(center, space-between);
   flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
   width: min(90vw, 500px);
-
   transition: all 0.25s linear;
+  /* Shadown/MD */
+  box-shadow: 0px 4px 8px -2px rgba(16, 24, 40, 0.1),
+    0px 2px 4px -2px rgba(16, 24, 40, 0.06);
 }
 
 .container {
   display: flex;
   flex-direction: row;
   column-gap: 16px;
+
+  & > :first-child {
+    flex-shrink: 0;
+  }
 }
 
 .rightSide {
@@ -66,7 +69,14 @@
 }
 
 .message {
-  @include textTemplate(16px, 400, 24px);
+  @include textTemplate(14px, 700, 20px);
+  text-align: center;
+  word-break: break-word;
+
+  @include viewportMedium {
+    @include textTemplate(16px, 400, 24px);
+    text-align: left;
+  }
 }
 
 .icon {

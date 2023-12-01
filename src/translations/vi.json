@@ -956,7 +956,7 @@
   "LineItemsTable.addFoodField.placeholder": "Chọn Món có sẵn trong nhà hàng",
   "LineItemsTable.addNoteField.label": "Thêm ghi chú",
   "LineItemsTable.addNoteField.placeholder": "Thêm ghi chú cho ngày ăn",
-  "LineItemsTable.overFlowMemberAmount": "Bạn đã vượt số lượng phần ăn dự kiến {amount} phần.",
+  "LineItemsTable.overFlowMemberAmount": "Bạn đã vượt số lượng phần ăn dự kiến {amount} phần",
   "LineItemsTableComponent.head.foodName": "TÊN MÓN",
   "LineItemsTableComponent.head.mobileQuantity": "SL",
   "LineItemsTableComponent.head.price": "Thành tiền",
