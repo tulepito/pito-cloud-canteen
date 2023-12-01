@@ -42,6 +42,13 @@ type TLineItemsTableComponentProps = {
   isAdminFlow?: boolean;
 };
 
+// To prevent form submit when user press enter key
+const onKeyDown = (event: any) => {
+  if (event.key === 'Enter') {
+    event.preventDefault();
+  }
+};
+
 export const LineItemsTableComponent: React.FC<
   TLineItemsTableComponentProps
 > = ({
@@ -137,13 +144,10 @@ export const LineItemsTableComponent: React.FC<
                   onSubmit={doNothing}
                   render={({ values }) => {
                     const handleBlurFoodQuantity = () => {
-                      if (Number(values[foodId] || 1) !== Number(quantity)) {
-                        if (actionDisabled) doNothing();
-                        else
-                          onModifyQuantity(
-                            foodId,
-                            Number(values[foodId] || 1),
-                          )();
+                      const newQuantity = Number(values[foodId] || 1);
+
+                      if (newQuantity !== Number(quantity) && !actionDisabled) {
+                        onModifyQuantity(foodId, newQuantity)();
                       }
                     };
 
@@ -157,6 +161,7 @@ export const LineItemsTableComponent: React.FC<
                           className={css.quantityField}
                           inputClassName={css.quantityInput}
                           customOnBlur={handleBlurFoodQuantity}
+                          onKeyDown={onKeyDown}
                         />
                       </Form>
                     );
