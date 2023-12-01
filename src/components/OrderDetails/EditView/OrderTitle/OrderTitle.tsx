@@ -11,7 +11,6 @@ import IconEdit from '@components/Icons/IconEdit/IconEdit';
 import MobileBottomContainer from '@components/MobileBottomContainer/MobileBottomContainer';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
-import { isOver } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { useViewport } from '@hooks/useViewport';
@@ -19,6 +18,7 @@ import {
   orderDetailsAnyActionsInProgress,
   orderManagementThunks,
 } from '@redux/slices/OrderManagement.slice';
+import { isOver } from '@src/utils/dates';
 import type { TDefaultProps, TObject } from '@utils/types';
 
 import type { TEditOrderDeadlineFormValues } from '../OrderDeadlineCountdownSection/EditOrderDeadlineForm';

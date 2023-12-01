@@ -15,13 +15,13 @@ import ReviewView from '@components/OrderDetails/ReviewView/ReviewView';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import Tabs from '@components/Tabs/Tabs';
 import { groupFoodOrderByDate } from '@helpers/order/orderDetailHelper';
+import { checkMinMaxQuantityInPickingState } from '@helpers/order/orderPickingHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { useDownloadPriceQuotation } from '@hooks/useDownloadPriceQuotation';
 import useExportOrderDetails from '@hooks/useExportOrderDetails';
 import { usePrepareOrderDetailPageData } from '@hooks/usePrepareOrderManagementData';
 import { AdminManageOrderThunks } from '@pages/admin/order/AdminManageOrder.slice';
 import { ReviewContent } from '@pages/admin/order/StepScreen/ReviewOrder/ReviewOrder';
-import { checkMinMaxQuantityInPickingState } from '@pages/company/orders/[orderId]/picking/OrderDetail.page';
 import {
   OrderManagementsAction,
   orderManagementThunks,
@@ -451,7 +451,6 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
             }}
             canGoBackEditMode
             reviewViewData={reviewViewData}
-            onSubmitEdit={() => {}}
             onDownloadPriceQuotation={handleDownloadPriceQuotation}
             onGoBackToEditOrderPage={handleGoBackFromReviewMode}
             onDownloadReviewOrderResults={onDownloadReviewOrderResults}

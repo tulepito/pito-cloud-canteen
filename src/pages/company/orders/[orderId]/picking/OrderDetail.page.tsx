@@ -25,6 +25,8 @@ import ReviewOrdersResultModal from '@components/OrderDetails/ReviewView/ReviewO
 import ReviewView from '@components/OrderDetails/ReviewView/ReviewView';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import Stepper from '@components/Stepper/Stepper';
+import { checkMinMaxQuantityInPickingState } from '@helpers/order/orderPickingHelper';
+import { checkOrderDetailHasChanged } from '@helpers/order/subOrderChangeAfterStartHelper';
 import { isOrderCreatedByBooker } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
@@ -40,117 +42,14 @@ import {
 import { BOOKER_CREATE_GROUP_ORDER_STEPS } from '@src/constants/stepperSteps';
 import { companyPaths } from '@src/paths';
 import { diffDays } from '@src/utils/dates';
-import type { TPlan } from '@src/utils/orderTypes';
 import { ETransition } from '@src/utils/transaction';
 import { CurrentUser, Listing } from '@utils/data';
-import {
-  EOrderDraftStates,
-  EOrderStates,
-  EOrderType,
-  EParticipantOrderStatus,
-} from '@utils/enums';
-import type {
-  TListing,
-  TObject,
-  TSubOrderChangeHistoryItem,
-} from '@utils/types';
+import { EOrderDraftStates, EOrderStates, EOrderType } from '@utils/enums';
+import type { TListing } from '@utils/types';
 
 import ModalReachMaxAllowedChanges from '../components/ModalReachMaxAllowedChanges/ModalReachMaxAllowedChanges';
 
 import css from './OrderDetail.module.scss';
-
-const checkOrderDetailHasChanged = (
-  draftSubOrderChangesHistory: Record<string, TSubOrderChangeHistoryItem[]>,
-) => {
-  return Object.keys(draftSubOrderChangesHistory).some((dateAsTimeStamp) => {
-    return draftSubOrderChangesHistory[dateAsTimeStamp].length > 0;
-  });
-};
-
-export const checkMinMaxQuantityInPickingState = (
-  isNormalOrder: boolean,
-  isPicking: boolean,
-  orderDetail: TPlan['orderDetail'] = {},
-) => {
-  if (!isPicking) {
-    return {
-      planValidations: {},
-      orderReachMaxRestaurantQuantity: false,
-      orderReachMinRestaurantQuantity: false,
-    };
-  }
-  let planValidations = {};
-  if (isNormalOrder) {
-    planValidations = Object.keys(orderDetail).reduce(
-      (prev: any, dateAsTimeStamp) => {
-        const currentOrderDetails = orderDetail[dateAsTimeStamp];
-        const { lineItems = [], restaurant = {} } = currentOrderDetails || {};
-        const { maxQuantity = 100, minQuantity = 1 } = restaurant || {};
-        const totalAdded = lineItems.reduce(
-          (result: number, lineItem: TObject) => {
-            result += lineItem?.quantity || 1;
-
-            return result;
-          },
-          0,
-        );
-
-        return {
-          ...prev,
-          [dateAsTimeStamp]: {
-            planReachMinRestaurantQuantity: totalAdded < minQuantity,
-            planReachMaxRestaurantQuantity: totalAdded > maxQuantity,
-          },
-        };
-      },
-      {},
-    );
-  } else {
-    planValidations = Object.keys(orderDetail).reduce(
-      (prev: any, dateAsTimeStamp) => {
-        const currentOrderDetails = orderDetail[dateAsTimeStamp] || {};
-        const { memberOrders = {}, restaurant = {} } = currentOrderDetails;
-        const { minQuantity = 0, maxQuantity = 100 } = restaurant;
-        const totalAdded = Object.keys(memberOrders).filter(
-          (f) =>
-            !!memberOrders[f].foodId &&
-            memberOrders[f].status === EParticipantOrderStatus.joined,
-        ).length;
-
-        return {
-          ...prev,
-          [dateAsTimeStamp]: {
-            planReachMinRestaurantQuantity: totalAdded < minQuantity,
-            planReachMaxRestaurantQuantity: totalAdded > maxQuantity,
-          },
-        };
-      },
-      {},
-    );
-  }
-  const orderReachMinRestaurantQuantity = Object.keys(planValidations).some(
-    (dateAsTimeStamp) => {
-      const { planReachMinRestaurantQuantity } =
-        planValidations[dateAsTimeStamp as keyof typeof planValidations] || {};
-
-      return planReachMinRestaurantQuantity;
-    },
-  );
-  const orderReachMaxRestaurantQuantity = Object.keys(planValidations).some(
-    (dateAsTimeStamp) => {
-      const { planReachMaxRestaurantQuantity } =
-        planValidations[dateAsTimeStamp as keyof typeof planValidations];
-
-      return planReachMaxRestaurantQuantity;
-    },
-  );
-
-  return {
-    planValidations,
-    orderReachMaxRestaurantQuantity,
-    orderReachMinRestaurantQuantity,
-  };
-};
 
 enum EPageViewMode {
   edit = 'edit',
@@ -515,12 +414,12 @@ const OrderDetailPage = () => {
               shouldHideOnMobileView
               mobileModalControl={manageParticipantModalControl}
             />
-            {isDraftEditing && (
+            <RenderWhen condition={!isMobileLayout && isDraftEditing}>
               <SubOrderChangesHistorySection
                 className={css.container}
                 {...subOrderChangesHistorySectionProps}
               />
-            )}
+            </RenderWhen>
           </div>
           <RenderWhen condition={isCreatedByBooker}>
             <div className={css.autoPickingPart}>
@@ -547,7 +446,8 @@ const OrderDetailPage = () => {
                 currentViewDate={currentViewDate}
                 minQuantity={minQuantity}
               />
-              {isDraftEditing && (
+
+              <RenderWhen condition={!isMobileLayout && isDraftEditing}>
                 <SubOrderChangesHistorySection
                   className={classNames(
                     css.container,
@@ -555,7 +455,7 @@ const OrderDetailPage = () => {
                   )}
                   {...subOrderChangesHistorySectionProps}
                 />
-              )}
+              </RenderWhen>
             </div>
           </RenderWhen.False>
         </RenderWhen>
@@ -771,7 +671,6 @@ const OrderDetailPage = () => {
   return (
     <>
       <MobileTopContainer {...mobileTopContainerProps} />
-
       {content}
     </>
   );

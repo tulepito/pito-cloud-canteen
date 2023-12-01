@@ -90,9 +90,6 @@ const TitleSection: React.FC<TTitleSectionProps> = ({
       <RenderWhen.False>
         <Skeleton containerClassName={css.orderNameSkeleton} />
       </RenderWhen.False>
-      <RenderWhen.False>
-        <Skeleton containerClassName={css.orderNameSkeleton} />
-      </RenderWhen.False>
     </RenderWhen>
   );
 

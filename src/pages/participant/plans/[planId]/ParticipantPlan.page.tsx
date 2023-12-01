@@ -11,7 +11,7 @@ import Button from '@components/Button/Button';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import IconArrowFull from '@components/Icons/IconArrow/IconArrowFull';
 import ParticipantLayout from '@components/ParticipantLayout/ParticipantLayout';
-import { prepareOrderDeadline } from '@helpers/orderHelper';
+import { prepareOrderDeadline } from '@helpers/order/prepareDataHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { UIActions } from '@redux/slices/UI.slice';

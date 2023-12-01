@@ -8,8 +8,8 @@ import Modal from '@components/Modal/Modal';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import type { TUseBooleanReturns } from '@hooks/useBoolean';
 import { useViewport } from '@hooks/useViewport';
+import { FORMATTED_WEEKDAY } from '@src/utils/constants';
 import { formatTimestamp } from '@src/utils/dates';
-import { FORMATTED_WEEKDAY } from '@src/utils/options';
 import type { TDefaultProps } from '@src/utils/types';
 
 import type { TAutomaticPickingFormValues } from './AutomaticPickingForm';

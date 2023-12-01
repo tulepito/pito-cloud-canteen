@@ -1,7 +1,6 @@
 import type { ReactNode } from 'react';
 import React, { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
-// import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import isEmpty from 'lodash/isEmpty';
 import { useRouter } from 'next/router';
@@ -13,10 +12,8 @@ import LoadingModal from '@components/LoadingModal/LoadingModal';
 import ParticipantLayout from '@components/ParticipantLayout/ParticipantLayout';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import Tabs from '@components/Tabs/Tabs';
-import {
-  isOrderOverDeadline,
-  prepareOrderDeadline,
-} from '@helpers/orderHelper';
+import { prepareOrderDeadline } from '@helpers/order/prepareDataHelper';
+import { isOrderOverDeadline } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import CoverBox from '@pages/participant/components/CoverBox/CoverBox';
@@ -143,32 +140,10 @@ const ParticipantOrderManagement = () => {
     if (orderId) {
       dispatch(participantOrderManagementThunks.loadData(orderId as string));
     }
-  }, [orderId]);
-
-  // const onTabChange = (tabItem: any) => {
-  //   if (tabItem.id === 'personal') {
-  //     isOwnerControl.setTrue();
-  //   } else {
-  //     isOwnerControl.setFalse();
-  //   }
-  // };
+  }, [dispatch, orderId]);
 
   const loadingInProgress = loadDataInProgress;
   const tabOptions = [
-    // {
-    //   id: 'personal',
-    //   label: (
-    //     <div className={css.companyTab}>
-    //       <div className={css.fakeAvatar}></div>
-    //       <span>
-    //         {intl.formatMessage({
-    //           id: 'ParticipantOrderManagement.tab.personal',
-    //         })}
-    //       </span>
-    //     </div>
-    //   ),
-    //   childrenFn: () => <div></div>,
-    // },
     {
       id: 'company',
       label: (

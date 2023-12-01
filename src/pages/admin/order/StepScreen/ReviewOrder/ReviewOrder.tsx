@@ -29,10 +29,8 @@ import Table from '@components/Table/Table';
 import Tabs from '@components/Tabs/Tabs';
 import Tooltip from '@components/Tooltip/Tooltip';
 import { addCommas, parseThousandNumber } from '@helpers/format';
-import {
-  getTrackingLink,
-  preparePickingOrderChangeNotificationData,
-} from '@helpers/orderHelper';
+import { preparePickingOrderChangeNotificationData } from '@helpers/order/orderChangeByAdminHelper';
+import { getTrackingLink } from '@helpers/order/prepareDataHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { AdminManageOrderThunks } from '@pages/admin/order/AdminManageOrder.slice';

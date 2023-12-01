@@ -3,7 +3,7 @@ import { useState } from 'react';
 import Button from '@components/Button/Button';
 import FieldDatePicker from '@components/FormFields/FieldDatePicker/FieldDatePicker';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
-import { findValidRangeForDeadlineDate } from '@helpers/orderHelper';
+import { findValidRangeForDeadlineDate } from '@helpers/order/prepareDataHelper';
 
 import type { TMealDateFormValues } from '../MealDateForm/MealDateForm';
 

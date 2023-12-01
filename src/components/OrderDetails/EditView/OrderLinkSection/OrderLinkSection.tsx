@@ -8,7 +8,7 @@ import IconCopy from '@components/Icons/IconCopy/IconCopy';
 import IconShare from '@components/Icons/IconShare/IconShare';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import Tooltip from '@components/Tooltip/Tooltip';
-import { getParticipantPickingLink } from '@helpers/orderHelper';
+import { getParticipantPickingLink } from '@helpers/order/prepareDataHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import type { TUseBooleanReturns } from '@hooks/useBoolean';
 import useBoolean from '@hooks/useBoolean';
@@ -54,11 +54,12 @@ const OrderLinkSection: React.FC<TOrderLinkSectionProps> = (props) => {
   const orderData = useAppSelector((state) => state.OrderManagement.orderData);
   const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
 
-  const { orderState } = Listing(orderData as TListing).getMetadata();
-
-  const isPicking = orderState === EOrderStates.picking;
+  const isPicking =
+    Listing(orderData as TListing).getMetadata().orderState ===
+    EOrderStates.picking;
 
   const orderLink = getParticipantPickingLink(orderData?.id?.uuid);
+
   const formattedOrderDeadline = formatTimestamp(
     orderDeadline,
     'HH:mm EEE,dd/MM/yyyy',

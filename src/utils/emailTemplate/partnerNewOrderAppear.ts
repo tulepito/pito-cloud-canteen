@@ -1,11 +1,11 @@
 import sumBy from 'lodash/sumBy';
 
 import { parseThousandNumber } from '@helpers/format';
+import { calculateVATFee } from '@helpers/order/cartInfoHelper';
 import {
-  calculateVATFee,
   ensureVATSetting,
   vatPercentageBaseOnVatSetting,
-} from '@helpers/order/cartInfoHelper';
+} from '@helpers/order/prepareDataHelper';
 
 import { formatTimestamp } from '../dates';
 

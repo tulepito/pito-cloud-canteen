@@ -10,7 +10,7 @@ import RenderWhen from '@components/RenderWhen/RenderWhen';
 import SlideModal from '@components/SlideModal/SlideModal';
 import Tooltip from '@components/Tooltip/Tooltip';
 import { parseThousandNumber } from '@helpers/format';
-import { isJoinedPlan } from '@helpers/orderHelper';
+import { isJoinedPlan } from '@helpers/order/orderPickingHelper';
 import { useViewport } from '@hooks/useViewport';
 import type { TObject, TUser } from '@utils/types';
 

@@ -2,7 +2,7 @@
 import { useCallback, useMemo } from 'react';
 import * as XLSX from 'xlsx';
 
-import { isJoinedPlan } from '@helpers/orderHelper';
+import { isJoinedPlan } from '@helpers/order/orderPickingHelper';
 import { Listing } from '@src/utils/data';
 import { formatTimestamp } from '@src/utils/dates';
 import type { TListing, TObject, TUser } from '@src/utils/types';

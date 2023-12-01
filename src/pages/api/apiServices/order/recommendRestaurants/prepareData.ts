@@ -6,10 +6,8 @@ import {
   getMenuQueryWithDraftOrderData,
 } from '@helpers/listingSearchQuery';
 import { calculateDistance } from '@helpers/mapHelpers';
-import {
-  getSelectedRestaurantAndFoodList,
-  mealTypeAdapter,
-} from '@helpers/orderHelper';
+import { mealTypeAdapter } from '@helpers/order/adapterHelper';
+import { getSelectedRestaurantAndFoodList } from '@helpers/orderHelper';
 import { fetchListing, fetchUser } from '@services/integrationHelper';
 import config from '@src/configs';
 import { Listing, User } from '@src/utils/data';
@@ -94,22 +92,25 @@ export const prepareMenuFoodList = async ({
   const dayOfWeek = convertWeekDay(dateTime.weekday).key;
   const foodIdList = Listing(menu).getMetadata()[`${dayOfWeek}FoodIdList`];
 
+  const foodTypeParamMaybe =
+    foodTypes.length > 0
+      ? {
+          pub_foodType: foodTypes.map((item: string) => mealTypeAdapter(item)),
+        }
+      : {};
+  const specialDietParamMaybe =
+    nutritions.length > 0
+      ? { pub_specialDiets: `has_any:${nutritions.join(',')}` }
+      : {};
+
   // * query food list
   const foodListFromSharetribe = await queryAllListings({
     query: {
       ids: foodIdList,
       meta_isDeleted: false,
       meta_isFoodEnable: true,
-      ...(foodTypes.length > 0
-        ? {
-            pub_foodType: foodTypes.map((item: string) =>
-              mealTypeAdapter(item),
-            ),
-          }
-        : {}),
-      ...(nutritions.length > 0
-        ? { pub_specialDiets: `has_any:${nutritions.join(',')}` }
-        : {}),
+      ...foodTypeParamMaybe,
+      ...specialDietParamMaybe,
     },
   });
 
@@ -118,9 +119,7 @@ export const prepareMenuFoodList = async ({
     (foodListing: TListing) => {
       if (packagePerMember <= 0) return true;
 
-      return (
-        Listing(foodListing).getAttributes().price.amount === packagePerMember
-      );
+      return foodListing.attributes.price.amount === packagePerMember;
     },
   );
 

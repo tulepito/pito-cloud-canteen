@@ -7,7 +7,7 @@ import Button from '@components/Button/Button';
 import { FieldDatePickerComponent } from '@components/FormFields/FieldDatePicker/FieldDatePicker';
 import { FieldDropdownSelectComponent } from '@components/FormFields/FieldDropdownSelect/FieldDropdownSelect';
 import IconClock from '@components/Icons/IconClock/IconClock';
-import { findMinStartDate } from '@helpers/orderHelper';
+import { findMinStartDate } from '@helpers/order/prepareDataHelper';
 import { TimeRangeItems } from '@utils/dates';
 
 import css from './DeliveryTimeForm.module.scss';

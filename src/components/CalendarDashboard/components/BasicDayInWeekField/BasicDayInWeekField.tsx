@@ -2,17 +2,9 @@ import { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 import classNames from 'classnames';
 
-import css from './BasicDayInWeekField.module.scss';
+import { DAY_IN_WEEK } from '@src/utils/constants';
 
-const DAY_IN_WEEK = [
-  { key: 'mon', label: 'DayInWeekField.mon' },
-  { key: 'tue', label: 'DayInWeekField.tue' },
-  { key: 'wed', label: 'DayInWeekField.wed' },
-  { key: 'thu', label: 'DayInWeekField.thu' },
-  { key: 'fri', label: 'DayInWeekField.fri' },
-  { key: 'sat', label: 'DayInWeekField.sat' },
-  { key: 'sun', label: 'DayInWeekField.sun' },
-];
+import css from './BasicDayInWeekField.module.scss';
 
 type TBasicDayInWeekFieldProps = {
   form: any;
