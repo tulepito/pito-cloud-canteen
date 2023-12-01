@@ -41,6 +41,10 @@
     padding: 0 16px;
     margin-top: 16px;
 
+    @include viewportLarge {
+      display: none;
+    }
+
     .badge {
       color: $labelBlue2;
       flex-shrink: 0;

@@ -1,11 +1,5 @@
 @use '/src/styles/customMediaQueries.scss' as *;
 
-.openModal .modalContainer {
-  top: 0;
-  max-width: 700px;
-  flex-basis: 700px;
-}
-
 .openModal .modalScrollLayer {
   align-items: center;
 

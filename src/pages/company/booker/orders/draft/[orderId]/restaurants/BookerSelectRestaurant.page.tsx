@@ -30,7 +30,7 @@ const EnableToAccessPageOrderStates = [
 
 function BookerSelectRestaurant() {
   const router = useRouter();
-  const { orderId } = router.query;
+  const { orderId, timestamp } = router.query;
 
   const { order } = useGetOrder({ orderId: orderId as string });
   const orderListing = Listing(order!);
@@ -82,6 +82,7 @@ function BookerSelectRestaurant() {
       pathname: companyPaths.EditDraftOrder,
       query: {
         orderId,
+        subOrderDate: timestamp,
       },
     });
   };

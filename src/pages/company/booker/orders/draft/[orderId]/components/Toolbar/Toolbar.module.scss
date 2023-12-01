@@ -16,10 +16,11 @@
 }
 
 .actions {
-  @include flexAlign(center, space-between);
-  width: 100%;
+  display: none;
 
   @include viewportLarge {
+    @include flexAlign(center, space-between);
+    width: 100%;
     width: unset;
   }
 

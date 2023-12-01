@@ -81,7 +81,7 @@ export enum EBookerDraftOrderViewMode {
 
 function BookerDraftOrderPage() {
   const router = useRouter();
-  const { orderId } = router.query;
+  const { orderId, subOrderDate: subOrderDateQuery } = router.query;
   const [collapse, setCollapse] = useState(false);
   const [selectedRestaurantId, setSelectedRestaurantId] = useState<string>('');
   const [selectedTimestamp, setSelectedTimestamp] = useState<number>(0);
@@ -89,7 +89,7 @@ function BookerDraftOrderPage() {
     useState<EBookerDraftOrderViewMode>(EBookerDraftOrderViewMode.setup);
   const dispatch = useAppDispatch();
   const { isTabletLayoutOrLarger } = useViewport();
-  const { selectedDay } = useSelectDay();
+  const { selectedDay, handleSelectDay } = useSelectDay();
   const [sampleSubOrder, setSampleSubOrder] = useState<any>({});
 
   const homeReturnModalController = useBoolean();
@@ -265,7 +265,6 @@ function BookerDraftOrderPage() {
     handleFinishOrder: handleFinishOrderClick,
     order,
     shouldHideDayItems: isAllDatesHaveNoRestaurants,
-    shouldHideExtraActionBtn: !isTabletLayoutOrLarger,
   });
 
   const onOpenPickFoodModal = async (
@@ -387,6 +386,17 @@ function BookerDraftOrderPage() {
   useEffect(() => {
     setSampleSubOrder(orderDetail[0]);
   }, [JSON.stringify(orderDetail)]);
+
+  useEffect(() => {
+    handleSelectDay(startDate);
+  }, [startDate]);
+
+  useEffect(() => {
+    if (subOrderDateQuery) {
+      const subOrderDate = new Date(+subOrderDateQuery);
+      handleSelectDay(subOrderDate);
+    }
+  }, [subOrderDateQuery]);
 
   return (
     <WalkThroughTourProvider

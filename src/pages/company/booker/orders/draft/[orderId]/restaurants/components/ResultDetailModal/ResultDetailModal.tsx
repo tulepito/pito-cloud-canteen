@@ -249,7 +249,9 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
 
     if (!openFromCalendar) {
       onClose();
-      router.push(`/company/booker/orders/draft/${orderId}`);
+      router.push(
+        `/company/booker/orders/draft/${orderId}?subOrderDate=${timestamp}`,
+      );
     } else {
       await dispatch(orderAsyncActions.fetchOrderDetail([planId]));
       onClose();
