@@ -172,3 +172,9 @@
 .contactUsBtn {
   margin: auto;
 }
+
+.subOrderMobileWrapper {
+  @include viewportLarge {
+    display: none;
+  }
+}

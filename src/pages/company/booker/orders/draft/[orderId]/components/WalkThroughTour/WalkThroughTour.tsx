@@ -1,8 +1,9 @@
-import type { PropsWithChildren } from 'react';
+import { type PropsWithChildren } from 'react';
 import { TourProvider } from '@reactour/tour';
 
 import IconCloseSquare from '@components/Icons/IconCloseSquare/IconCloseSquare';
 import { useAppDispatch } from '@hooks/reduxHooks';
+import { useViewport } from '@hooks/useViewport';
 import { UIActions } from '@redux/slices/UI.slice';
 
 import { BookerDraftOrderPageActions } from '../../BookerDraftOrderPage.slice';
@@ -156,7 +157,7 @@ const mobileTourConfig = [
         borderRadius: 8,
         left: 0,
         top: '-11px',
-        maxWidth: '304px',
+        maxWidth: '337px',
       }),
       maskArea: (base: any) => ({
         ...base,
@@ -245,7 +246,9 @@ type TWalkThroughTourProps = PropsWithChildren & {
 };
 
 const WalkThroughTourProvider: React.FC<TWalkThroughTourProps> = (props) => {
-  const { onCloseTour, isMobileLayout } = props;
+  const { onCloseTour } = props;
+  const { isMobileLayout, isTabletLayout } = useViewport();
+
   const dispatch = useAppDispatch();
   const disableBody = () => {
     dispatch(UIActions.disableScrollRequest('walkthrough'));
@@ -265,6 +268,7 @@ const WalkThroughTourProvider: React.FC<TWalkThroughTourProps> = (props) => {
       if (lastStep) {
         setIsOpen(false);
         onCloseTour();
+        dispatch(BookerDraftOrderPageActions.setWalkthroughStep(-1));
       } else {
         setCurrentStep(currentStep + 1);
         dispatch(
@@ -283,6 +287,7 @@ const WalkThroughTourProvider: React.FC<TWalkThroughTourProps> = (props) => {
     const handleClick = () => {
       setIsOpen(false);
       onCloseTour();
+      dispatch(BookerDraftOrderPageActions.setWalkthroughStep(-1));
     };
 
     return (
@@ -292,6 +297,23 @@ const WalkThroughTourProvider: React.FC<TWalkThroughTourProps> = (props) => {
       </div>
     );
   };
+
+  if (isMobileLayout || isTabletLayout) {
+    return (
+      <TourProvider
+        nextButton={(nextBtnProps: any) => <NextButton {...nextBtnProps} />}
+        prevButton={(prevBtnProps: any) => <SkipButton {...prevBtnProps} />}
+        padding={0}
+        afterOpen={disableBody}
+        beforeClose={enableBody}
+        maskClassName={css.mask}
+        showDots={false}
+        showBadge={false}
+        steps={mobileTourConfig as any}>
+        {props.children}
+      </TourProvider>
+    );
+  }
 
   return (
     <TourProvider
@@ -303,7 +325,7 @@ const WalkThroughTourProvider: React.FC<TWalkThroughTourProps> = (props) => {
       maskClassName={css.mask}
       showDots={false}
       showBadge={false}
-      steps={isMobileLayout ? (mobileTourConfig as any) : (tourConfig as any)}>
+      steps={tourConfig as any}>
       {props.children}
     </TourProvider>
   );

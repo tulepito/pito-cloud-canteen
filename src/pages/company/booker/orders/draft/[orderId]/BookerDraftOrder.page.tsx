@@ -11,6 +11,7 @@ import Badge, { EBadgeType } from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
 import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
 import MealPlanCard from '@components/CalendarDashboard/components/MealPlanCard/MealPlanCard';
+import { getBookerMockupSubOrder } from '@components/CalendarDashboard/helpers/mockupData';
 import useSelectDay from '@components/CalendarDashboard/hooks/useSelectDay';
 import IconEmpty from '@components/Icons/IconEmpty/IconEmpty';
 import IconHome from '@components/Icons/IconHome/IconHome';
@@ -90,7 +91,7 @@ function BookerDraftOrderPage() {
   const dispatch = useAppDispatch();
   const { isTabletLayoutOrLarger } = useViewport();
   const { selectedDay, handleSelectDay } = useSelectDay();
-  const [sampleSubOrder, setSampleSubOrder] = useState<any>({});
+  const [sampleSubOrder, setSampleSubOrder] = useState<any>(undefined);
 
   const homeReturnModalController = useBoolean();
 
@@ -130,6 +131,10 @@ function BookerDraftOrderPage() {
     shallowEqual,
   );
   const { orderDetail = [], rawOrderDetail } = useGetPlanDetails();
+  const calendarEvents =
+    walkthroughEnable && !isEmpty(sampleSubOrder)
+      ? [sampleSubOrder]
+      : orderDetail;
   const { startDate, endDate } = useGetBoundaryDates(order);
   const calendarExtraResources = useGetCalendarExtraResources({
     order,
@@ -384,8 +389,9 @@ function BookerDraftOrderPage() {
   }, [orderId, orderState]);
 
   useEffect(() => {
-    setSampleSubOrder(orderDetail[0]);
-  }, [JSON.stringify(orderDetail)]);
+    const mockupSubOrder = getBookerMockupSubOrder(startDate);
+    setSampleSubOrder(mockupSubOrder);
+  }, [startDate]);
 
   useEffect(() => {
     handleSelectDay(startDate);
@@ -443,7 +449,7 @@ function BookerDraftOrderPage() {
                 anchorDate={suitableStartDate}
                 startDate={startDate}
                 endDate={endDate}
-                events={orderDetail}
+                events={calendarEvents}
                 companyLogo="Company"
                 hideMonthView
                 {...calendarProps}
@@ -474,42 +480,46 @@ function BookerDraftOrderPage() {
                 </div>
               </RenderWhen>
             </div>
-            <RenderWhen condition={!!selectedEvent || walkthroughEnable}>
-              <div className={css.subOrderDate}>
-                <RenderWhen condition={walkthroughEnable}>
-                  <MealPlanCard
-                    event={sampleSubOrder as Event}
-                    index={0}
-                    resources={{}}
-                    removeInprogress={false}
-                  />
-                  <RenderWhen.False>
+            <div className={css.subOrderMobileWrapper}>
+              <RenderWhen condition={walkthroughEnable}>
+                <div className={css.subOrderDate}>
+                  <RenderWhen condition={!!sampleSubOrder}>
+                    <MealPlanCard
+                      event={sampleSubOrder as Event}
+                      index={123}
+                      resources={{}}
+                      removeInprogress={false}
+                    />
+                  </RenderWhen>
+                </div>
+                <RenderWhen.False>
+                  <RenderWhen condition={!!selectedEvent}>
                     <MealPlanCard
                       event={selectedEvent as Event}
-                      index={0}
+                      index={999}
                       resources={{ ...calendarProps.resources }}
                       removeInprogress={
                         calendarProps?.resources?.updatePlanDetailInprogress
                       }
                       onRemove={handleRemoveMeal(planId)}
                     />
-                  </RenderWhen.False>
-                </RenderWhen>
-              </div>
-              <RenderWhen.False>
-                <RenderWhen
-                  condition={!isTabletLayoutOrLarger && !!selectedDay}>
-                  <div className={css.addMealWrapper}>
-                    <IconEmpty variant="food" />
-                    <div className={css.emptyText}>Chưa có bữa ăn</div>
-                    <div className={css.addMeal} onClick={handleAddMealClick}>
-                      <IconPlus className={css.plusIcon} />
-                      <span>Thêm bữa ăn</span>
-                    </div>
-                  </div>
-                </RenderWhen>
-              </RenderWhen.False>
-            </RenderWhen>
+                    <RenderWhen.False>
+                      <div className={css.addMealWrapper}>
+                        <IconEmpty variant="food" />
+                        <div className={css.emptyText}>Chưa có bữa ăn</div>
+                        <div
+                          className={css.addMeal}
+                          onClick={handleAddMealClick}>
+                          <IconPlus className={css.plusIcon} />
+                          <span>Thêm bữa ăn</span>
+                        </div>
+                      </div>
+                    </RenderWhen.False>
+                  </RenderWhen>
+                </RenderWhen.False>
+              </RenderWhen>
+            </div>
+
             <RenderWhen condition={walkthroughEnable}>
               <WelcomeModal
                 isOpen={welcomeModalControl.value}

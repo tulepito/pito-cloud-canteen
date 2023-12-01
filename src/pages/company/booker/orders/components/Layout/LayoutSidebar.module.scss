@@ -112,7 +112,7 @@
   transition: linear 0.2s;
   width: 100%;
   width: 100vw;
-  left: -280px;
+  left: -100vw;
 
   @include viewportLarge {
     left: 0px;
