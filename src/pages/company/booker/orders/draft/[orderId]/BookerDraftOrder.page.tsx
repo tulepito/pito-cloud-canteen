@@ -98,6 +98,9 @@ function BookerDraftOrderPage() {
   const fetchOrderParticipantsInProgress = useAppSelector(
     (state) => state.BookerDraftOrderPage.fetchOrderParticipantsInProgress,
   );
+  const addOrderParticipantsInProgress = useAppSelector(
+    (state) => state.BookerDraftOrderPage.addOrderParticipantsInProgress,
+  );
   const participantData = useAppSelector(
     (state) => state.BookerDraftOrderPage.participantData,
   );
@@ -153,6 +156,7 @@ function BookerDraftOrderPage() {
   const isGroupOrder = orderType === EOrderType.group;
 
   const isFinishOrderDisabled =
+    addOrderParticipantsInProgress ||
     (isGroupOrder && fetchOrderParticipantsInProgress) ||
     !isEnableSubmitPublishOrder(
       order as TListing,
