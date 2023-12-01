@@ -1,0 +1,139 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/defaults.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.container {
+  padding-top: 16px;
+}
+.tableContainer {
+  width: 100%;
+  border-collapse: collapse;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  .headRow {
+    background-color: $neutralGray6;
+    height: 48px;
+    .headCell {
+      padding-left: 10px;
+      span {
+        font-family: 'Manrope';
+        font-style: normal;
+        font-weight: $fontWeightSemiBold;
+        font-size: 14px;
+        line-height: 20px;
+        color: $neutralGray1;
+      }
+    }
+  }
+
+  .bodyRowSpecial,
+  .bodyRow {
+    .bodyCell {
+      padding: 12px;
+      vertical-align: top;
+
+      .columnContainer {
+        @include flexAlign(flex-start);
+        flex-direction: column;
+        gap: 12px;
+      }
+    }
+  }
+
+  .emptyCell,
+  .bodyRow {
+    border: 1px solid $neutralGray4;
+    border-bottom: 0px;
+  }
+
+  .emptyCell {
+    text-align: center;
+  }
+
+  .bodyRowDeleteAction,
+  .bodyRowSpecial {
+    border: 1px solid $neutralGray4;
+    border-bottom: 0px;
+    border-top: 0px;
+  }
+
+  .bodyRowDeleteAction {
+    .bodyDeleteCell {
+      text-align: right;
+
+      .iconDelete {
+        padding: 12px;
+      }
+    }
+  }
+}
+
+.emailClassName {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  justify-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.cellValue {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 24px;
+  color: $neutralGray7;
+}
+
+.cellLabelValue {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  color: $neutralGray6;
+}
+
+.cellNameValue {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 800;
+  font-size: 16px;
+  line-height: 24px;
+  color: $neutralGray7;
+}
+
+.buttonPlusContainer {
+  padding: 20px 16px;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+  border: 1px solid $neutralGray4;
+
+  .iconPlus {
+    width: 24px;
+    height: 24px;
+  }
+
+  .btnPlusMember {
+    span {
+      padding-left: 12px;
+      font-family: 'Manrope';
+      font-style: normal;
+      font-weight: $fontWeightBold;
+      font-size: 16px;
+      line-height: 24px;
+      color: #262626;
+    }
+  }
+}
+
+.iconArrow {
+  transition: transform 0.3s ease-in-out;
+
+  &.rotate {
+    transform: rotate(180deg);
+  }
+}

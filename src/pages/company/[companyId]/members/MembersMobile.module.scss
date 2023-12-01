@@ -1,0 +1,31 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.header {
+  border-bottom: 1px solid $neutralGray3;
+  padding: 8px 16px, 16px;
+  height: 56px;
+  @include flexAlign(center);
+  gap: 8px;
+
+  span {
+    @include text(16px, 24px);
+    font-weight: $fontWeightBold;
+  }
+}
+.tabContainer {
+  padding: 16px 12px 10px 12px;
+}
+
+.headerWrapperClassName {
+  gap: 8px;
+}
+
+.headerClassName {
+  padding: 6px 16px 0px 16px;
+}
+
+.iconPlus {
+  width: 48px;
+  height: 48px;
+}
