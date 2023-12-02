@@ -991,6 +991,7 @@
   "ManageCompanyGroupsTable.groupRemoveModal": "Xóa nhóm",
   "ManageCompanyGroupsTable.removeGroupContent": "Bạn có muốn xóa nhóm {name} không ? ",
   "ManageCompanyMembersTable.bookerIsBookerInOrderProgress": "Booker đang có đơn hàng đang triển khai",
+  "ManageCompanyMembersTable.confirmDeleteMember": "Bạn có chắc chắn muốn xóa thành viên này không?",
   "ManageCompanyMembersTable.deleteMemberError": "Không thể xóa thành viên",
   "ManageCompanyMembersTable.memberRemoveCancel": "Hủy",
   "ManageCompanyMembersTable.memberRemoveConfirm": "Xóa",

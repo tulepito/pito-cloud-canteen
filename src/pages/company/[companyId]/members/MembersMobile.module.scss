@@ -3,7 +3,7 @@
 
 .header {
   border-bottom: 1px solid $neutralGray3;
-  padding: 8px 16px, 16px;
+  padding: 8px 16px;
   height: 56px;
   @include flexAlign(center);
   gap: 8px;
@@ -13,6 +13,7 @@
     font-weight: $fontWeightBold;
   }
 }
+
 .tabContainer {
   padding: 16px 12px 10px 12px;
 }

@@ -11,13 +11,24 @@ type TCompanyCollapsibleRowsProps = {
   row: TRowData;
   columns: TColumn[];
   columnsControl: TColumn[];
+  bookerMemberEmails: any[];
+  onDeleteMember: (email: string) => void;
 };
 const CompanyCollapsibleRows: React.FC<TCompanyCollapsibleRowsProps> = ({
   row,
   columns,
   columnsControl,
+  onDeleteMember,
+  bookerMemberEmails,
 }) => {
   const showRowsController = useBoolean(false);
+  const { email } = row.data;
+  const handleDeleteMember = () => {
+    onDeleteMember(email);
+  };
+
+  const showDeleteBtn =
+    bookerMemberEmails.length > 0 && !bookerMemberEmails.includes(email);
 
   return (
     <>
@@ -31,38 +42,36 @@ const CompanyCollapsibleRows: React.FC<TCompanyCollapsibleRowsProps> = ({
         })}
       </tr>
       <RenderWhen condition={showRowsController.value}>
-        <>
-          {columnsControl.map((columnControl) => {
-            return (
-              <tr
-                className={css.bodyRowSpecial}
-                key={`${row.key}_${columnControl.key}`}>
-                <td className={css.bodyCell} key="name">
-                  <span className={css.cellLabelValue}>
-                    {columnControl.label}
-                  </span>
-                </td>
-                <td className={css.bodyCell} key="email">
-                  <span className={css.cellValue}>
-                    {row.data[columnControl.key]}
-                  </span>
-                </td>
-              </tr>
-            );
-          })}
-          <tr
-            className={css.bodyRowDeleteAction}
-            key={`${row.key}_deleteAction`}>
-            <td
-              colSpan={columns.length}
-              className={classNames(css.bodyCell, css.bodyDeleteCell)}
-              key="email">
-              <div className={classNames(css.columnContainer, css.iconDelete)}>
-                <IconDelete />
-              </div>
-            </td>
-          </tr>
-        </>
+        {columnsControl.map((columnControl) => {
+          return (
+            <tr
+              className={css.bodyRowSpecial}
+              key={`${row.key}_${columnControl.key}`}>
+              <td className={css.bodyCell} key="name">
+                <span className={css.cellLabelValue}>
+                  {columnControl.label}
+                </span>
+              </td>
+              <td className={css.bodyCell} key="email">
+                <span className={css.cellValue}>
+                  {row.data[columnControl.key]}
+                </span>
+              </td>
+            </tr>
+          );
+        })}
+      </RenderWhen>
+      <RenderWhen condition={showDeleteBtn && showRowsController.value}>
+        <tr className={css.bodyRowDeleteAction} key={`${row.key}_deleteAction`}>
+          <td
+            colSpan={columns.length}
+            className={classNames(css.bodyCell, css.bodyDeleteCell)}
+            key="email">
+            <div className={classNames(css.columnContainer, css.iconDelete)}>
+              <IconDelete onClick={handleDeleteMember} />
+            </div>
+          </td>
+        </tr>
       </RenderWhen>
     </>
   );

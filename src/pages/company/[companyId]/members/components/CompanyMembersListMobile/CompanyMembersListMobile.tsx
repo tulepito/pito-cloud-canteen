@@ -1,25 +1,35 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import classNames from 'classnames';
 import { useRouter } from 'next/router';
 
 import Button from '@components/Button/Button';
+import ConfirmationModal from '@components/ConfirmationModal/ConfirmationModal';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import IconPlusBlackFill from '@components/Icons/IconPlusBlackFill/IconPlusBlackFill';
 import type { TColumn, TRowData } from '@components/Table/Table';
 import { getCompanyIdFromBookerUser, getGroupNames } from '@helpers/company';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import useBoolean from '@hooks/useBoolean';
 import {
   addWorkspaceCompanyId,
   companyThunks,
 } from '@redux/slices/company.slice';
-import { companyMemberActions } from '@redux/slices/companyMember.slice';
+import {
+  companyMemberActions,
+  companyMemberThunks,
+} from '@redux/slices/companyMember.slice';
+import {
+  CompanyPermissions,
+  UserInviteStatus,
+} from '@src/types/UserPermission';
 import { ALLERGIES_OPTIONS, getLabelByKey } from '@src/utils/options';
 import { ensureUser, User } from '@utils/data';
 import type { TObject, TUser } from '@utils/types';
 
+import AddCompanyMembersSlideModal from './AddCompanyMembersSlideModal/AddCompanyMembersSlideModal';
 import CompanyCollapsibleRows from './CompanyCollapsibleRows/CompanyCollapsibleRows';
 
 import css from './CompanyMembersListMobile.module.scss';
@@ -32,11 +42,29 @@ const CompanyMembersListMobile: React.FC<
   const dispatch = useAppDispatch();
   const router = useRouter();
   const { companyId } = router.query;
+  const addNewMembersController = useBoolean();
+
+  const handleCloseNewMembersModal = () => addNewMembersController.setFalse();
+  const handleOpenNewMembersModal = () => addNewMembersController.setTrue();
 
   const currentUser = useAppSelector(
     (state) => state.user.currentUser,
     shallowEqual,
   );
+  const { deleteMemberInProgress, deleteMemberError } = useAppSelector(
+    (state) => state.companyMember,
+  );
+  const [deletingMemberEmail, setDeletingMemberEmail] = useState<string>();
+  const {
+    value: isDeleteMemberConfirmationModalOpen,
+    setFalse: onDeleteMemberConfirmationModalClose,
+    setTrue: openDeleteMemberConfirmationModal,
+  } = useBoolean();
+
+  const onDeleteMember = (email: string) => {
+    setDeletingMemberEmail(email);
+    openDeleteMemberConfirmationModal();
+  };
 
   const companyMembers = useAppSelector(
     (state) => state.company.companyMembers,
@@ -229,60 +257,117 @@ const CompanyMembersListMobile: React.FC<
     if (companyId) fetchData();
   }, [companyId, currentUser]);
 
+  const handleConfirmDeleteMember = useCallback(() => {
+    dispatch(
+      companyMemberThunks.deleteMember(deletingMemberEmail as string),
+    ).then(async ({ error }: any) => {
+      if (!error) {
+        onDeleteMemberConfirmationModalClose();
+        await dispatch(companyThunks.companyInfo());
+      }
+    });
+  }, [deletingMemberEmail, onDeleteMemberConfirmationModalClose]);
+
+  const bookerMemberEmails = Object.values(originCompanyMembers).reduce(
+    (result, _member) => {
+      if (
+        CompanyPermissions.includes(_member.permission) &&
+        _member.inviteStatus === UserInviteStatus.ACCEPTED
+      ) {
+        return [...result, _member.email];
+      }
+
+      return result;
+    },
+    [],
+  );
+
   return (
-    <div className={css.container}>
-      <table className={css.tableContainer}>
-        <thead>
-          <tr className={css.headRow}>
-            {columns.map((col: TColumn) => (
-              <td className={css.headCell} key={col.key}>
-                <span>{col.label}</span>
-              </td>
-            ))}
-          </tr>
-        </thead>
-        {fetchCompanyInfoInProgress ? (
-          <tbody>
-            <tr>
-              <td colSpan={columns.length} className={css.emptyCell}>
-                Loading...
-              </td>
+    <>
+      <div className={css.container}>
+        <table className={css.tableContainer}>
+          <thead>
+            <tr className={css.headRow}>
+              {columns.map((col: TColumn) => (
+                <td className={css.headCell} key={col.key}>
+                  <span>{col.label}</span>
+                </td>
+              ))}
             </tr>
-          </tbody>
-        ) : formattedCompanyMembers.length === 0 ? (
-          <tbody>
-            <tr>
-              <td colSpan={columns.length} className={css.emptyCell}>
-                <FormattedMessage id="Table.noResults" />
-              </td>
-            </tr>
-          </tbody>
-        ) : (
-          <tbody>
-            {formattedCompanyMembers.map((row: TRowData) => {
-              return (
-                // eslint-disable-next-line react/jsx-key
-                <CompanyCollapsibleRows
-                  row={row}
-                  columns={columns}
-                  columnsControl={columnsControl}
-                />
-              );
-            })}
-          </tbody>
-        )}
-      </table>
-      <div className={css.buttonPlusContainer}>
-        <Button
-          variant="inline"
-          type="button"
-          size="large"
-          className={css.btnPlusMember}>
-          <IconPlusBlackFill className={css.iconPlus} />
-          <FormattedMessage id="AddMorePlan.addMore" />
-        </Button>
+          </thead>
+          {fetchCompanyInfoInProgress ? (
+            <tbody>
+              <tr>
+                <td colSpan={columns.length} className={css.emptyCell}>
+                  Loading...
+                </td>
+              </tr>
+            </tbody>
+          ) : formattedCompanyMembers.length === 0 ? (
+            <tbody>
+              <tr>
+                <td colSpan={columns.length} className={css.emptyCell}>
+                  <FormattedMessage id="Table.noResults" />
+                </td>
+              </tr>
+            </tbody>
+          ) : (
+            <tbody>
+              {formattedCompanyMembers.map((row: TRowData) => {
+                return (
+                  // eslint-disable-next-line react/jsx-key
+                  <CompanyCollapsibleRows
+                    bookerMemberEmails={bookerMemberEmails}
+                    onDeleteMember={onDeleteMember}
+                    row={row}
+                    columns={columns}
+                    columnsControl={columnsControl}
+                  />
+                );
+              })}
+            </tbody>
+          )}
+        </table>
+        <div className={css.buttonPlusContainer}>
+          <Button
+            variant="inline"
+            type="button"
+            size="large"
+            onClick={handleOpenNewMembersModal}
+            className={css.btnPlusMember}>
+            <IconPlusBlackFill className={css.iconPlus} />
+            <FormattedMessage id="AddMorePlan.addMore" />
+          </Button>
+        </div>
       </div>
-    </div>
+
+      <AddCompanyMembersSlideModal
+        isOpen={addNewMembersController.value}
+        onClose={handleCloseNewMembersModal}></AddCompanyMembersSlideModal>
+
+      <ConfirmationModal
+        isPopup={true}
+        id="DeleteMemberConfirmationModal"
+        isOpen={isDeleteMemberConfirmationModalOpen}
+        onClose={onDeleteMemberConfirmationModalClose}
+        confirmText={intl.formatMessage({
+          id: 'MembersPage.confirmDeleteMemberText',
+        })}
+        cancelText={intl.formatMessage({
+          id: 'MembersPage.cancelDeleteMemberText',
+        })}
+        title={intl.formatMessage({
+          id: 'ManageCompanyMembersTable.memberRemoveTitle',
+        })}
+        description={intl.formatMessage({
+          id: 'ManageCompanyMembersTable.confirmDeleteMember',
+        })}
+        isConfirmButtonLoading={deleteMemberInProgress}
+        onConfirm={handleConfirmDeleteMember}
+        onCancel={onDeleteMemberConfirmationModalClose}
+        hasError={deleteMemberError}
+      />
+    </>
   );
 };
 

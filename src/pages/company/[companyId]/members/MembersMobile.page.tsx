@@ -20,7 +20,6 @@ const MEMBERS_MOBILE_TAB_KEYS = {
 const MembersMobilePage = () => {
   const intl = useIntl();
   const router = useRouter();
-
   const [currentTab, setCurrentTab] = useState(MEMBERS_MOBILE_TAB_KEYS.members);
 
   const handleTabChanged = (params: TTabsItem) => {
