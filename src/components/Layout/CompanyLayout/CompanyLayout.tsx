@@ -45,14 +45,14 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
     shallowEqual,
   );
   const { isMobileLayout, isTabletLayout } = useViewport();
+  const isDesktopLayout = !(isMobileLayout || isTabletLayout);
   const {
     query: { companyId },
     pathname,
   } = router;
 
   const showFeatureHeader = shouldShowFeatureHeader(pathname);
-  const showSidebar =
-    !isMobileLayout && !isTabletLayout && shouldShowSidebar(pathname);
+  const showSidebar = isDesktopLayout && shouldShowSidebar(pathname);
   const shouldHideFooter =
     isMobileLayout || isTabletLayout || shouldHideCompanyFooter(pathname);
 

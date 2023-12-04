@@ -64,7 +64,7 @@ const AccountNavigationModal: React.FC<TAccountNavigationModalProps> = () => {
         </div>
         <div
           className={css.itemRow}
-          onClick={() => handleNavigatePage(personalPaths.changePassword)}>
+          onClick={() => handleNavigatePage(personalPaths.ChangePassword)}>
           <div className={css.headerTitle}>
             <IconLock />
             <span>
