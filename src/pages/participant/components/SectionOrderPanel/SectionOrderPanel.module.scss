@@ -136,10 +136,8 @@
     }
 
     .closeModal {
-      @include viewportSmall {
-        width: 76px;
-        margin-right: 28px;
-      }
+      width: 76px;
+      margin-right: 28px;
     }
 
     .goToHomePage {
