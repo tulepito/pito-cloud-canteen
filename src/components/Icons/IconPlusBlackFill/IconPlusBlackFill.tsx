@@ -17,16 +17,16 @@ const IconPlusBlackFill: React.FC<IconOutlinePlusProps> = ({
       <path
         d="M6 12H18"
         stroke="#262626"
-        stroke-width="1.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
       <path
         d="M12 6V18"
         stroke="#262626"
-        stroke-width="1.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   );

@@ -28,6 +28,7 @@ const AddCompanyMembersSlideModal: React.FC<CreateGroupSlideModalProps> = (
     removeEmailValue,
     onAddMembersSubmit,
     checkEmailList,
+    setLoadedResult,
   } = useAddMemberEmail();
 
   const checkEmailExistedInProgress = useAppSelector(
@@ -48,6 +49,8 @@ const AddCompanyMembersSlideModal: React.FC<CreateGroupSlideModalProps> = (
 
   const handleSubmit = async () => {
     await onAddMembersSubmit();
+    setLoadedResult([]);
+    setEmailList([]);
     onClose();
   };
 
