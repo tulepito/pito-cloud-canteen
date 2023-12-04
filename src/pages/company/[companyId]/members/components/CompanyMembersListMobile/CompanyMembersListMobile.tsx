@@ -134,7 +134,6 @@ const CompanyMembersListMobile: React.FC<
             <div className={css.emailClassName}>
               <span className={css.cellValue}>{email}</span>
               <div className={css.iconArrow}>
-                {/* <IconArrow direction={isRowExpand ? 'up' : 'down'} /> */}
                 <IconArrow
                   direction="down"
                   onClick={collapseRowController?.toggle}
