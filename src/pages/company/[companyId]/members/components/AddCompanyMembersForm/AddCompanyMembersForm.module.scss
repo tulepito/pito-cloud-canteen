@@ -1,5 +1,6 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
 
 .submitBtn {
   margin: 40px auto 0;
@@ -15,14 +16,24 @@
 }
 
 .loadedResult {
+  flex-direction: column;
+  @include viewportSmall {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
   @include flexAlign(flex-start);
-  flex-wrap: wrap;
-  gap: 24px;
+  gap: 20px;
+  @include viewportSmall {
+    gap: 24px;
+  }
   margin-top: 16px;
 }
 
 .memberItem {
-  width: 300px;
+  width: 100%;
+  @include viewportSmall {
+    width: 300px;
+  }
   @include flexAlign(center, space-between);
 
   .memberWrapper {
@@ -67,8 +78,13 @@
     @include flexAlign(center);
 
     .closeIcon {
-      width: 9px;
-      height: 9px;
+      width: 16px;
+      height: 16px;
+
+      @include viewportSmall {
+        width: 9px;
+        height: 9px;
+      }
       cursor: pointer;
     }
   }
