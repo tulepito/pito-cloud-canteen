@@ -228,7 +228,7 @@
     border: 1px solid $neutralGray4;
     padding: 10px 20px;
     border-radius: 8px;
-    @include flexAlign(center, center);
+    @include flexCenter;
     color: $neutralGray6;
     font-weight: $fontWeightBold;
     font-size: 14px;
@@ -401,7 +401,7 @@
 }
 
 .emptyList {
-  @include flexAlign(center, center);
+  @include flexCenter;
   flex-direction: column;
   gap: 16px;
   margin-top: 80px;

@@ -13,10 +13,10 @@ import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { parseThousandNumber } from '@helpers/format';
 import { getInitialLocationValues } from '@helpers/mapHelpers';
 import {
-  findMinStartDate,
   mealTypeAdapter,
   mealTypeReverseAdapter,
-} from '@helpers/orderHelper';
+} from '@helpers/order/adapterHelper';
+import { findMinStartDate } from '@helpers/order/prepareDataHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
 import { EOrderType } from '@src/utils/enums';

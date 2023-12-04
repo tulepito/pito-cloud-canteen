@@ -121,9 +121,7 @@ const Modal: React.FC<TModalProps> = (props) => {
             <RenderWhen.False>{customHeader}</RenderWhen.False>
           </RenderWhen>
 
-          <div className={classNames(contentClassName || css.content)}>
-            {children}
-          </div>
+          <div className={contentClassName}>{children}</div>
         </div>
       </div>
     </div>

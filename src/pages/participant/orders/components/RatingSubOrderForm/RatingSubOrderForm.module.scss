@@ -51,7 +51,7 @@
   }
 
   .detailRatingField {
-    @include flexAlign(center, center);
+    @include flexCenter;
     gap: 24px;
     margin-top: 8px;
 

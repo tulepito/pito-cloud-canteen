@@ -3,6 +3,8 @@ import { useIntl } from 'react-intl';
 
 import AlertModal from '@components/Modal/AlertModal';
 
+import css from './AlertConfirmDeleteParticipant.module.scss';
+
 type TAlertConfirmDeleteParticipantProps = {
   cancelDisabled?: boolean;
   confirmDisabled?: boolean;
@@ -47,6 +49,9 @@ const AlertConfirmDeleteParticipant: React.FC<
 
   return (
     <AlertModal
+      id="AlertConfirmDeleteParticipant.Modal"
+      containerClassName={css.confirmDeleteContainer}
+      shouldFullScreenInMobile={false}
       cancelDisabled={cancelDisabled}
       confirmDisabled={confirmDisabled}
       title={title || deleteParticipantPopupTitle}

@@ -724,6 +724,7 @@ const ManagePartnerFoods = () => {
         partnerFoodSliceThunks.fetchApprovalFoods(EFoodApprovalState.DECLINED),
       );
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, foodApprovalActiveTab, JSON.stringify(foodToRemove)]);
 
   useEffect(() => {

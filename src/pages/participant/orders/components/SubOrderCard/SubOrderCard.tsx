@@ -4,7 +4,7 @@ import { useIntl } from 'react-intl';
 import OrderEventCardContentItems from '@components/CalendarDashboard/components/OrderEventCard/OrderEventCardContentItems';
 import OrderEventCardStatus from '@components/CalendarDashboard/components/OrderEventCard/OrderEventCardStatus';
 import { EVENT_STATUS } from '@components/CalendarDashboard/helpers/constant';
-import { isOver } from '@helpers/orderHelper';
+import { isOver } from '@src/utils/dates';
 import { EParticipantOrderStatus } from '@src/utils/enums';
 
 import css from './SubOrderCard.module.scss';

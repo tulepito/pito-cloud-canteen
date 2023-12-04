@@ -3,7 +3,7 @@
 @use '/src/styles/mixins.scss' as *;
 
 .headerContainer {
-  @include flexAlign(center, center);
+  @include flexCenter;
   flex-direction: column;
 
   .main {

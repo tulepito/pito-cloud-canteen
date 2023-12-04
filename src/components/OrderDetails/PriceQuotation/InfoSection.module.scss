@@ -1,20 +1,26 @@
 @use '/src/styles/mixins.scss' as *;
 @use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
 
 .infoContainer {
   position: relative;
-  padding: 24px 0;
-
+  padding: 14px 0 10px;
   display: flex;
   flex-direction: row;
   column-gap: 10%;
 
+  @include viewportMedium {
+    padding: 24px 0;
+  }
+
   & > div {
     flex-basis: 45%;
+    width: 45%;
   }
 
   &.partnerQuotation > div {
     flex-basis: unset;
+    width: unset;
   }
 
   &::after {
@@ -26,13 +32,21 @@
   }
 
   .sectionTitle {
-    @include textTemplate(12px, 700, 1.5);
-    margin-bottom: 8px;
+    @include textTemplate(9px, 700, 1.5);
+    margin-bottom: 5px;
+
+    @include viewportMedium {
+      font-size: 12px;
+      margin-bottom: 8px;
+    }
   }
 
   .sectionContent {
-    @include textTemplate(12px, 300, 1.5);
+    @include textTemplate(9px, 300, 1.5);
 
+    @include viewportMedium {
+      font-size: 12px;
+    }
     & > div span:first-of-type {
       font-weight: 600;
     }

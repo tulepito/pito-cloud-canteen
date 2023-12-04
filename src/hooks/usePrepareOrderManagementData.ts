@@ -3,7 +3,6 @@ import { useMemo, useState } from 'react';
 import isEmpty from 'lodash/isEmpty';
 import { useRouter } from 'next/router';
 
-import type { TReviewInfoFormValues } from '@components/OrderDetails/ReviewView/ReviewInfoSection/ReviewInfoForm';
 import { parseThousandNumber } from '@helpers/format';
 import {
   calculatePriceQuotationInfoFromOrder,
@@ -39,8 +38,7 @@ export const usePrepareOrderDetailPageData = ({
   vatSetting?: EPartnerVATSetting;
 }) => {
   const router = useRouter();
-  const [reviewInfoValues, setReviewInfoValues] =
-    useState<TReviewInfoFormValues>();
+  const [reviewInfoValues, setReviewInfoValues] = useState<any>();
 
   const {
     orderData,
@@ -103,6 +101,8 @@ export const usePrepareOrderDetailPageData = ({
     orderNote = '',
     hasSpecificPCCFee: orderHasSpecificPCCFee,
     specificPCCFee: orderPCCFee = 0,
+    contactPeopleName: contactPeopleNameFromOrder,
+    contactPhoneNumber: contactPhoneNumberFromOrder,
   } = Listing(orderData as TListing).getMetadata();
   const isGroupOrder = orderType === EOrderType.group;
   const isCanceledOrder = [
@@ -127,6 +127,10 @@ export const usePrepareOrderDetailPageData = ({
     deliveryHour,
     deliveryAddress,
     canStartOrder,
+    isGroupOrder,
+    deadlineDate,
+    deadlineHour,
+    startDate,
   };
   const countdownSectionData = {
     deadlineHour,
@@ -305,9 +309,12 @@ export const usePrepareOrderDetailPageData = ({
     deliveryAddress: deliveryAddress?.address || '',
     staffName,
     companyName,
-    contactPeopleName,
+    contactPeopleName: contactPeopleNameFromOrder || contactPeopleName,
     contactPeopleEmail: bookerEmail,
-    contactPhoneNumber: protectedContactPhoneNumber || publicContactPhoneNumber,
+    contactPhoneNumber:
+      contactPhoneNumberFromOrder ||
+      protectedContactPhoneNumber ||
+      publicContactPhoneNumber,
   };
 
   const reviewResultData = {
@@ -386,6 +393,7 @@ export const usePrepareOrderDetailPageData = ({
     editViewData,
     reviewViewData,
     priceQuotationData,
+    reviewInfoValues,
     setReviewInfoValues,
     orderData,
   };

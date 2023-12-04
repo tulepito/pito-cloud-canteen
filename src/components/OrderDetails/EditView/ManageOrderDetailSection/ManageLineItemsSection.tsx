@@ -8,6 +8,7 @@ import type { TTabsItem } from '@components/Tabs/Tabs';
 import Tabs from '@components/Tabs/Tabs';
 import { historyPushState } from '@helpers/urlHelpers';
 import { useAppSelector } from '@hooks/reduxHooks';
+import { useViewport } from '@hooks/useViewport';
 import { orderDetailsAnyActionsInProgress } from '@redux/slices/OrderManagement.slice';
 import { formatTimestamp } from '@src/utils/dates';
 
@@ -44,11 +45,12 @@ const ManageLineItemsSection: React.FC<TManageLineItemsSectionProps> = (
   } = props;
 
   const intl = useIntl();
+  const { isMobileLayout } = useViewport();
   const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
-  const {
-    dateList = [],
-    // foodOptions,
-  } = usePrepareManageLineItemsSectionData(currentViewDate, setCurrentViewDate);
+  const { dateList = [] } = usePrepareManageLineItemsSectionData(
+    currentViewDate,
+    setCurrentViewDate,
+  );
 
   const items = dateList.map((date) => {
     const formattedDate = formatTimestamp(date, 'EEE, dd/MM');
@@ -99,6 +101,7 @@ const ManageLineItemsSection: React.FC<TManageLineItemsSectionProps> = (
           items={items}
           onChange={handleDateTabChange}
           showNavigation
+          shouldShowNavigatorBorder={isMobileLayout}
           middleLabel
           defaultActiveKey={`${
             (defaultActiveKey < 0 ? 0 : defaultActiveKey) + 1

@@ -5,10 +5,14 @@
 @mixin tableColumnsLayout {
   display: flex;
   justify-content: space-between;
+  align-items: baseline;
   flex-direction: row;
   column-gap: 2%;
   flex-wrap: nowrap;
-  padding: 12px;
+  padding: 8px 12px;
+  @include viewportMedium {
+    padding: 12px;
+  }
 
   & > div {
     word-break: break-word;
@@ -16,10 +20,12 @@
 
   & > div:nth-of-type(1) {
     flex-basis: 30px;
+    flex-shrink: 0;
   }
   & > div:nth-of-type(2) {
-    max-width: 200px;
+    width: 120px;
     flex-grow: 1;
+    flex-shrink: 0;
 
     @include viewportLargeWithPaddings {
       max-width: 250px;
@@ -31,13 +37,18 @@
   }
   & > div:nth-of-type(3) {
     flex-basis: 50px;
+    display: none;
+
+    @include viewportMedium {
+      display: block;
+    }
   }
   & > div:nth-of-type(4) {
-    text-align: right;
-    flex-basis: 30px;
+    text-align: left;
+    flex-basis: 40px;
   }
   & > div:nth-of-type(5) {
-    text-align: right;
+    text-align: left;
     flex-basis: 140px;
   }
   & > div:nth-of-type(6) {
@@ -46,87 +57,33 @@
 }
 
 .root {
-  border: 1px solid $neutralGray3;
-  border-radius: 16px;
   margin: 0;
+  border: none;
+  padding: 0;
+  &.rootOpen {
+    padding-bottom: 0;
+  }
 
   & > button {
     min-height: unset;
   }
 
-  .tableContainer {
-    border-radius: 8px;
-    overflow: hidden;
+  @include viewportMedium {
+    padding: 16px 16px 0;
+    border: 1px solid $neutralGray3;
+    border-radius: 16px;
 
-    .tableHead {
-      color: $neutralGray1;
-      background-color: $neutralGray6;
-      @include textTemplate(14px, 700, 20px);
-      @include tableColumnsLayout;
+    &.rootOpen {
+      padding-bottom: 16px;
     }
+  }
+}
 
-    .tableBody {
-      .tableRowGroup {
-        border: 1px solid $neutralGray3;
+.rootLabel {
+  text-transform: unset;
 
-        &:last-of-type {
-          border-radius: 0 0 8px 8px;
-        }
-
-        .groupTitle,
-        .row {
-          @include tableColumnsLayout;
-        }
-
-        .groupTitle {
-          background-color: $neutralGray3;
-          @include textTemplate(16px, 700, 24px);
-
-          &.collapsed + .rows .row {
-            height: 0;
-            padding: 0 12px;
-            opacity: 0;
-          }
-
-          .restaurantName {
-            @include textTemplate(14px, 400, 20px);
-            color: $neutralGray6;
-            max-width: 100%;
-            @include lineClamp(1);
-          }
-
-          .actionCell {
-            cursor: pointer;
-            display: flex;
-            justify-content: flex-end;
-
-            svg {
-              rotate: 0deg;
-              transition: rotate 0.2s linear;
-            }
-
-            .reversed {
-              rotate: x 180deg;
-            }
-          }
-        }
-
-        .rows {
-          & > .row {
-            @include textTemplate(16px, 400, 24px);
-            transition: 0.25s linear;
-
-            &:not(:last-of-type) {
-              border-bottom: 1px solid $neutralGray3;
-            }
-          }
-
-          &.collapsed > .row {
-            border: none;
-          }
-        }
-      }
-    }
+  @include viewportMedium {
+    text-transform: uppercase;
   }
 }
 
@@ -135,15 +92,21 @@
   overflow: hidden;
 
   .tableHead {
-    color: $neutralGray1;
-    background-color: $neutralGray6;
-    @include textTemplate(14px, 700, 20px);
+    color: $neutralGray7;
+    background-color: $neutralGray4;
+    @include textTemplate(14px, 600, 20px);
     @include tableColumnsLayout;
+
+    @include viewportMedium {
+      color: $neutralGray1;
+      background-color: $neutralGray6;
+    }
   }
 
   .tableBody {
     .tableRowGroup {
       border: 1px solid $neutralGray3;
+      border-top: none;
 
       &:last-of-type {
         border-radius: 0 0 8px 8px;
@@ -155,8 +118,15 @@
       }
 
       .groupTitle {
-        background-color: $neutralGray3;
-        @include textTemplate(16px, 700, 24px);
+        background-color: $neutralGray2;
+        @include textTemplate(14px, 700, 24px);
+        @include viewportMedium {
+          @include textTemplate(16px, 400, 24px);
+        }
+
+        & > div:nth-of-type(2) {
+          font-weight: 600;
+        }
 
         &.collapsed + .rows .row {
           height: 0;
@@ -165,7 +135,11 @@
         }
 
         .restaurantName {
-          @include textTemplate(14px, 400, 20px);
+          @include textTemplate(12px, 400, 16px);
+
+          @include viewportMedium {
+            @include textTemplate(14px, 400, 20px);
+          }
           color: $neutralGray6;
           max-width: 100%;
           @include lineClamp(1);
@@ -175,6 +149,7 @@
           cursor: pointer;
           display: flex;
           justify-content: flex-end;
+          align-self: flex-start;
 
           svg {
             rotate: 0deg;
@@ -189,11 +164,42 @@
 
       .rows {
         & > .row {
-          @include textTemplate(16px, 400, 24px);
+          @include textTemplate(12px, 400, 16px);
+          @include viewportMedium {
+            @include textTemplate(16px, 400, 24px);
+          }
           transition: 0.25s linear;
 
           &:not(:last-of-type) {
             border-bottom: 1px solid $neutralGray3;
+          }
+
+          & > div:nth-of-type(4) {
+            flex-basis: calc(180px + 2%);
+            display: flex;
+            column-gap: 8px;
+            align-items: flex-end;
+            @include textTemplate(14px, 400, 20px);
+            color: $neutralGray6;
+
+            span {
+              font-weight: 700;
+              color: $neutralGray7;
+            }
+
+            @include viewportMedium {
+              color: $neutralGray7;
+              @include textTemplate(16px, 400, 24px);
+              flex-basis: 40px;
+              display: block;
+            }
+          }
+          & > div:nth-of-type(5) {
+            display: none;
+
+            @include viewportMedium {
+              display: block;
+            }
           }
         }
 

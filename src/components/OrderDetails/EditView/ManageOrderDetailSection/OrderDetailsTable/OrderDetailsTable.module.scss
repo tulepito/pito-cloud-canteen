@@ -1,5 +1,6 @@
 @use '/src/styles/mixins.scss' as *;
 @use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
 
 @mixin tableBodyLayout {
   height: fit-content;
@@ -24,29 +25,55 @@
   }
 
   &:nth-child(1) {
-    width: 20%;
-    max-width: 20%;
+    padding-left: 12px;
+    width: 50%;
+    max-width: 50%;
+    vertical-align: top;
 
-    padding-left: 16px;
+    @include viewportMedium {
+      vertical-align: center;
+      padding-left: 16px;
+      width: 20%;
+      max-width: 20%;
+    }
   }
   &:nth-child(2) {
     width: 25%;
     max-width: 25%;
+    display: none;
+
+    @include viewportMedium {
+      display: table-cell;
+    }
   }
   &:nth-child(3) {
-    width: 25%;
-    max-width: 25%;
+    width: 50%;
+    max-width: 50%;
+
+    @include viewportMedium {
+      width: 25%;
+      max-width: 25%;
+    }
   }
   &:nth-child(4) {
     width: 15%;
     max-width: 15%;
+    display: none;
+
+    @include viewportMedium {
+      display: table-cell;
+    }
   }
   &:nth-child(5) {
     width: 15%;
     max-width: 15%;
-
     padding-right: 16px;
     text-align: right;
+    display: none;
+
+    @include viewportMedium {
+      display: table-cell;
+    }
   }
 
   & .actionCell {
@@ -54,158 +81,294 @@
   }
 }
 
-.root {
-  .tabItemContainer {
-    display: flex;
-    flex-direction: row;
+.tabItemContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+
+  .number {
+    @include textTemplate(8px, 700, 1);
+    min-width: 16px;
+    display: inline-flex;
     justify-content: center;
     align-items: center;
-    gap: 8px;
+    border-radius: 8px;
+    padding: 0 6px;
+    height: 16px;
+    color: $neutralGray6;
+    background-color: $neutralGray3;
+    line-height: 24px;
 
-    .number {
-      @include textTemplate(8px, 700, 1);
-      min-width: 16px;
-      display: inline-flex;
-      justify-content: center;
-      align-items: center;
-      border-radius: 8px;
-      padding: 0 6px;
-      height: 16px;
-      color: $neutralGray6;
-      background-color: $neutralGray3;
-      line-height: 24px;
+    &.numberActive {
+      color: $neutralGray1;
+      background-color: $neutralGray7;
+    }
+  }
+}
 
-      &.numberActive {
-        color: $neutralGray1;
-        background-color: $neutralGray7;
+.tableRoot {
+  border: 1px solid $neutralGray5;
+  border-radius: 8px;
+  width: 100%;
+  border-spacing: 0;
+
+  @include viewportMedium {
+    border-color: $neutralGray3;
+  }
+
+  thead {
+    justify-content: space-between;
+    background-color: $neutralGray2;
+    color: $neutralGray6;
+
+    span {
+      @include textTemplate(14px, 400, 20px);
+
+      @include viewportMedium {
+        @include textTemplate(12px, 600, 16px);
+      }
+    }
+
+    tr {
+      th {
+        height: fit-content;
+        padding: 8px 0;
+        text-align: left;
+      }
+
+      th:nth-child(1) {
+        padding-left: 12px;
+        width: 50%;
+        max-width: 50%;
+
+        @include viewportMedium {
+          padding-left: 16px;
+          width: 20%;
+          max-width: 20%;
+        }
+      }
+      th:nth-child(2) {
+        width: 25%;
+        max-width: 25%;
+        display: none;
+
+        @include viewportMedium {
+          display: table-cell;
+        }
+      }
+      th:nth-child(3) {
+        width: 50%;
+        max-width: 50%;
+
+        @include viewportMedium {
+          width: 25%;
+          max-width: 25%;
+        }
+      }
+      th:nth-child(4) {
+        width: 35%;
+        max-width: 35%;
+        padding-right: 16px;
+        display: none;
+
+        @include viewportMedium {
+          display: table-cell;
+        }
+      }
+      th:nth-child(5) {
+        width: 15%;
+        max-width: 15%;
+        text-align: right;
+        display: none;
+
+        @include viewportMedium {
+          display: table-cell;
+        }
       }
     }
   }
 
-  .tableRoot {
-    border: 1px solid $neutralGray3;
-    border-radius: 8px;
-    width: 100%;
-    border-spacing: 0;
+  & > tbody {
+    & > tr {
+      .stranger {
+        @include textTemplate(12px, 600, 16px);
+        color: $neutralGray6;
+        border-radius: 360px;
+        background-color: $neutralGray3;
+        padding: 4px;
+        display: flex;
+        justify-content: center;
+        width: fit-content;
+        margin-top: 4px;
 
-    thead {
-      justify-content: space-between;
-      background-color: $neutralGray2;
-      color: $neutralGray6;
-      @include textTemplate(12px, 600, 16px);
+        @include viewportMedium {
+          padding: 0;
+          border-radius: 0;
+          background-color: unset;
+          margin-top: 0;
+        }
+      }
 
-      tr {
-        th {
-          height: fit-content;
-          padding: 8px 0;
-          text-align: left;
-        }
+      &:nth-child(2) > td {
+        border: none;
+        @include tableBodyLayout;
+      }
 
-        th:nth-child(1) {
-          width: 20%;
-          max-width: 20%;
-          padding-left: 16px;
-        }
-        th:nth-child(2) {
-          width: 25%;
-          max-width: 25%;
-        }
-        th:nth-child(3) {
-          width: 25%;
-          max-width: 25%;
-        }
-        th:nth-child(4) {
-          width: 35%;
-          max-width: 35%;
-          padding-right: 16px;
-        }
-        th:nth-child(5) {
-          width: 15%;
-          max-width: 15%;
+      &.totalRow {
+        & > td {
+          @include textTemplate(14px, 700, 20px);
 
-          text-align: right;
+          &:first-of-type {
+            display: none;
+
+            @include viewportMedium {
+              display: table-cell;
+            }
+          }
+
+          .totalText {
+            padding-right: 8px;
+          }
+
+          &.actionTd {
+            text-decoration: underline;
+            padding-right: 16px;
+            padding-left: 12px;
+            cursor: pointer;
+
+            @include viewportMedium {
+              text-align: right;
+              padding-left: 0;
+            }
+          }
+
+          &.actionTdDisabled {
+            cursor: not-allowed;
+          }
+        }
+      }
+      &.notAllowed {
+        position: relative;
+
+        &::after {
+          position: absolute;
+          content: '';
+          width: calc(100% - 32px);
+          top: 50%;
+          left: 16px;
+          height: 1px;
+          background-color: $neutralGray6;
         }
       }
     }
 
-    & > tbody {
-      & > tr {
-        .stranger {
-          @include textTemplate(12px, 600, 16px);
-          color: $neutralGray6;
-        }
+    & .scrollContainer {
+      @include viewportMedium {
+        max-height: calc(36px * 6);
+        overflow-x: auto;
+      }
 
-        &:nth-child(2) > td {
-          border: none;
-          @include tableBodyLayout;
-        }
+      & > table {
+        width: 100%;
+        border-spacing: 0;
 
-        &.totalRow {
-          & > td {
-            @include textTemplate(14px, 700, 20px);
-
-            .totalText {
-              padding-right: 8px;
-            }
-
-            &.actionTd {
-              text-align: right;
-              text-decoration: underline;
-              padding-right: 16px;
-              cursor: pointer;
-            }
-
-            &.actionTdDisabled {
-              cursor: not-allowed;
-            }
-          }
-        }
-        &.notAllowed {
+        tr {
           position: relative;
 
           &::after {
-            position: absolute;
-            content: '';
-            width: calc(100% - 32px);
-            top: 50%;
-            left: 16px;
-            height: 1px;
-            background-color: $neutralGray6;
+            @include absolute(100%, 1px);
+            bottom: 0;
+            left: 0;
+            background-color: $neutralGray3;
           }
-        }
-      }
 
-      & .scrollContainer {
-        max-height: calc(36px * 6);
-        overflow-x: auto;
-
-        & > table {
-          width: 100%;
-          border-spacing: 0;
-
-          tr {
-            position: relative;
-
-            &::after {
-              @include absolute(100%, 1px);
-              bottom: 0;
-              left: 0;
-              background-color: $neutralGray3;
-            }
-
-            & > td {
-              @include tableBodyLayout;
-            }
+          & > td {
+            @include tableBodyLayout;
           }
         }
       }
     }
   }
+}
 
-  .noChoices {
-    width: 100%;
-    @include textTemplate(14px, 400, 24px);
-    white-space: pre-line;
-    color: $neutralGray6;
+.noChoices {
+  width: 100%;
+  @include textTemplate(14px, 400, 24px);
+  white-space: pre-line;
+  color: $neutralGray6;
+}
+
+.mobileNameContainer {
+  display: flex;
+  flex-direction: column;
+  row-gap: 8px;
+  justify-content: flex-start;
+}
+
+.memberName {
+  @include lineClamp(2);
+  @include textTemplate(14px, 700, 20px);
+  min-height: 32px;
+
+  @include viewportMedium {
+    min-height: unset;
+  }
+}
+
+.memberNameWithAnonymous {
+  @extend .memberName;
+  @include lineClamp(1);
+  line-height: 20px;
+  min-height: unset;
+}
+
+.foodName {
+  @include textTemplate(14px, 400, 20px);
+  @include lineClamp(2);
+  min-height: 32px;
+  @include viewportMedium {
+    min-height: unset;
+  }
+
+  &.foodNameWithAnonymous {
+    min-height: 44px;
+
+    @include viewportMedium {
+      min-height: unset;
+    }
+  }
+}
+
+.foodNameWithAction {
+  display: flex;
+  justify-content: space-between;
+}
+
+.grayLabel {
+  color: $neutralGray6;
+}
+
+.memberEmail {
+  @include lineClamp(1);
+  line-height: 20px;
+}
+
+.iconsContainer {
+  display: flex;
+  justify-content: flex-end;
+  column-gap: 12px;
+
+  .iconContainer {
+    width: 32px;
+    height: 32px;
+    @include flexCenter;
+    border-radius: 100px;
+    background-color: $neutralGray3;
+
+    & > svg {
+      margin-left: 0 !important;
+    }
   }
 }

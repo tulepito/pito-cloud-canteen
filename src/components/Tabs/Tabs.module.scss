@@ -16,7 +16,15 @@
 
 .navigateBtnStart {
   &.middleLabel {
-    margin-right: 28px;
+    margin-right: 12px;
+
+    @include viewportMedium {
+      margin-right: 28px;
+    }
+  }
+
+  &.hasBorder {
+    border-right: 1px solid $neutralGray3;
   }
 }
 
@@ -25,7 +33,15 @@
   gap: 20px;
 
   &.middleLabel {
-    margin-left: 28px;
+    margin-left: 12px;
+
+    @include viewportMedium {
+      margin-left: 28px;
+    }
+  }
+
+  &.hasBorder {
+    border-left: 1px solid $neutralGray3;
   }
 }
 
@@ -53,7 +69,12 @@
 
 .tabHeaderItem {
   position: relative;
-  padding: 4px 0 8px;
+  padding: 4px 0;
+
+  @include viewportMedium {
+    padding-bottom: 8px;
+  }
+
   -webkit-tap-highlight-color: transparent;
   cursor: pointer;
 
@@ -65,7 +86,7 @@
     @include textTemplate(8px, $fontWeightBold, 8px);
     width: 16px;
     height: 16px;
-    @include flexAlign(center, center);
+    @include flexCenter;
   }
 
   &::after {
@@ -153,5 +174,6 @@
 .navigateBtn {
   padding: 0;
   margin-top: 4px;
+  margin-bottom: 4px;
   min-height: unset;
 }

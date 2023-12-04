@@ -7,7 +7,7 @@
   min-height: 132px;
   background-color: $neutralGray2;
   padding: 24px 16px;
-  @include flexAlign(center, center);
+  @include flexCenter;
   .container {
     width: 100%;
 

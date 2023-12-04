@@ -22,8 +22,8 @@ import { calculateGroupMembersAmount } from '@helpers/company';
 import { parseDateFromTimestampAndHourString } from '@helpers/dateHelpers';
 import { addCommas } from '@helpers/format';
 import { getItem } from '@helpers/localStorageHelpers';
+import { findSuitableAnchorDate } from '@helpers/order/prepareDataHelper';
 import {
-  findSuitableStartDate,
   getRestaurantListFromOrderDetail,
   getSelectedRestaurantAndFoodList,
   getUpdateLineItems,
@@ -224,15 +224,15 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     (time) => convertWeekDay(DateTime.fromMillis(Number(time)).weekday).key,
   );
 
-  const suitableStartDate = useMemo(() => {
+  const suitableAnchorDate = useMemo(() => {
     const temp = isEditFlow
-      ? findSuitableStartDate({
+      ? findSuitableAnchorDate({
           selectedDate,
           startDate: draftStartDate || startDate,
           endDate: draftEndDate || endDate,
           orderDetail: draftEditOrderDetail || orderDetail,
         })
-      : findSuitableStartDate({
+      : findSuitableAnchorDate({
           selectedDate,
           startDate,
           endDate,
@@ -959,7 +959,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
             </div>
             <div className={css.calendarContainer}>
               <CalendarDashboard
-                anchorDate={suitableStartDate}
+                anchorDate={suitableAnchorDate}
                 events={eventsForCalender}
                 renderEvent={renderEvent}
                 companyLogo="Company"

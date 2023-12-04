@@ -5,7 +5,7 @@ import RenderWhen from '@components/RenderWhen/RenderWhen';
 
 import type { TAllTabData, TItemData } from './OrderDetailsTable.utils';
 import { EOrderDetailsTableTab, TABLE_TABS } from './OrderDetailsTable.utils';
-import { OrderDetailsTableComponent } from './OrderDetailsTableComponent';
+import OrderDetailsTableComponent from './OrderDetailsTableComponent';
 
 import css from './OrderDetailsTable.module.scss';
 

@@ -1,12 +1,17 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 import classNames from 'classnames';
+import compact from 'lodash/compact';
+import difference from 'lodash/difference';
+import isEmpty from 'lodash/isEmpty';
 
+import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import IconDelete from '@components/Icons/IconDelete/IconDelete';
 import IconEdit from '@components/Icons/IconEdit/IconEdit';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { parseThousandNumber } from '@helpers/format';
 import { useAppSelector } from '@hooks/reduxHooks';
+import { useViewport } from '@hooks/useViewport';
 import { orderDetailsAnyActionsInProgress } from '@redux/slices/OrderManagement.slice';
 import { shortenString } from '@src/utils/string';
 import { EParticipantOrderStatus } from '@utils/enums';
@@ -19,7 +24,6 @@ import { EOrderDetailsTableTab } from './OrderDetailsTable.utils';
 
 import css from './OrderDetailsTable.module.scss';
 
-const MAX_LENGTH_NAME = 15;
 const MAX_LENGTH_EMAIL = 20;
 
 const totalTabIdByTabName: TObject<
@@ -44,7 +48,7 @@ type TOrderDetailsTableComponentProps = {
   ableToUpdateOrder: boolean;
 };
 
-export const OrderDetailsTableComponent: React.FC<
+const OrderDetailsTableComponent: React.FC<
   TOrderDetailsTableComponentProps
 > = ({
   tab,
@@ -58,10 +62,19 @@ export const OrderDetailsTableComponent: React.FC<
   ableToUpdateOrder,
 }) => {
   const intl = useIntl();
+  const { isMobileLayout } = useViewport();
+  const [expandingStatusMap, setExpandingStatusMap] = useState<any>({});
   const [isManageDeletedModalOpen, setIsManageDeletedModalOpen] =
     useState(false);
   const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
 
+  const allParticipantIds = compact(
+    data.concat(deletedTabData as any).map(({ memberData }) => memberData?.id),
+  );
+  const missingIds = difference(
+    allParticipantIds,
+    Object.keys(expandingStatusMap),
+  );
   const actionDisabled = inProgress;
   const isDataEmpty = deletedTabData?.length === 0;
   const actionTdClasses = classNames(css.actionTd, {
@@ -81,6 +94,27 @@ export const OrderDetailsTableComponent: React.FC<
 
   const doNothing = () => {};
 
+  const toggleCollapseStatus = (id: string) => () => {
+    setExpandingStatusMap({
+      ...expandingStatusMap,
+      [id]: !expandingStatusMap[id],
+    });
+  };
+
+  useEffect(() => {
+    if (!isEmpty(missingIds)) {
+      const updateObject = missingIds.reduce((result: any, id: string) => {
+        if (typeof result[id] === 'undefined') {
+          result[id] = false;
+        }
+
+        return result;
+      }, expandingStatusMap);
+      setExpandingStatusMap(updateObject);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [JSON.stringify(missingIds)]);
+
   return (
     <>
       <ManageDeletedListModal
@@ -96,7 +130,7 @@ export const OrderDetailsTableComponent: React.FC<
           <tr>
             {tableHeads.map((head: string, index: number) => (
               <th key={index} colSpan={index === 3 ? 2 : 1}>
-                {head}
+                <span>{head} </span>
               </th>
             ))}
           </tr>
@@ -117,60 +151,142 @@ export const OrderDetailsTableComponent: React.FC<
                         name: memberName,
                         email: memberEmail,
                       } = memberData || {};
+                      const hasFoodPrice = Number(foodPrice) > 0;
                       const formattedFoodPrice = `${parseThousandNumber(
                         foodPrice,
                       )}đ`;
+
+                      const isExpanding = expandingStatusMap[memberId];
 
                       const rowClasses = classNames({
                         [css.notAllowed]:
                           status === EParticipantOrderStatus.notAllowed,
                       });
 
-                      return (
-                        <tr key={memberId} className={rowClasses}>
-                          <td title={memberName}>
+                      const memberNameComponent = (
+                        <RenderWhen condition={!isAnonymous}>
+                          <div className={css.memberName}>{memberName}</div>
+
+                          <RenderWhen.False>
                             <div>
-                              {shortenString(memberName, MAX_LENGTH_NAME)}
-                            </div>
-                            {/* <div>Người dùng</div> */}
-                            {isAnonymous && (
+                              <div className={css.memberNameWithAnonymous}>
+                                {memberName}
+                              </div>
                               <div className={css.stranger}>
                                 {intl.formatMessage({
                                   id: 'OrderDetailsTableComponent.strangerText',
                                 })}
                               </div>
-                            )}
+                            </div>
+                          </RenderWhen.False>
+                        </RenderWhen>
+                      );
+
+                      const foodNameClasses = classNames(css.foodName, {
+                        [css.foodNameWithAnonymous]: isAnonymous,
+                      });
+                      const foodNameComponent = (
+                        <div className={foodNameClasses}>{foodName}</div>
+                      );
+
+                      const iconEditComponent = (
+                        <IconEdit
+                          className={css.icon}
+                          onClick={
+                            actionDisabled
+                              ? doNothing
+                              : onClickEditOrderItem(tab, memberId)
+                          }
+                        />
+                      );
+                      const iconDeleteComponent = (
+                        <IconDelete
+                          className={css.icon}
+                          onClick={
+                            actionDisabled
+                              ? doNothing
+                              : onClickDeleteOrderItem(memberId)
+                          }
+                        />
+                      );
+                      const actionIconComponents = isMobileLayout ? (
+                        <div className={css.iconsContainer}>
+                          <div className={css.iconContainer}>
+                            {iconEditComponent}
+                          </div>
+                          <div className={css.iconContainer}>
+                            {iconDeleteComponent}
+                          </div>
+                        </div>
+                      ) : (
+                        <>
+                          {iconEditComponent}
+                          {iconDeleteComponent}
+                        </>
+                      );
+
+                      return (
+                        <tr key={memberId} className={rowClasses}>
+                          <td title={memberName}>
+                            <RenderWhen condition={isMobileLayout}>
+                              <div className={css.mobileNameContainer}>
+                                {memberNameComponent}
+
+                                <RenderWhen condition={isExpanding}>
+                                  <div className={css.grayLabel}>Email</div>
+                                  <RenderWhen condition={hasFoodPrice}>
+                                    <div className={css.grayLabel}>Đơn giá</div>
+                                  </RenderWhen>
+                                </RenderWhen>
+                              </div>
+
+                              <RenderWhen.False>
+                                {memberNameComponent}
+                              </RenderWhen.False>
+                            </RenderWhen>
                           </td>
                           <td title={memberEmail}>
                             {shortenString(memberEmail, MAX_LENGTH_EMAIL)}
                           </td>
-                          <td title={foodName}>{foodName}</td>
-                          <td>
-                            <RenderWhen condition={Number(foodPrice) > 0}>
-                              <>{formattedFoodPrice}</>
+                          <td title={foodName}>
+                            <RenderWhen condition={isMobileLayout}>
+                              <div className={css.mobileNameContainer}>
+                                <div className={css.foodNameWithAction}>
+                                  {foodNameComponent}
+                                  <IconArrow
+                                    onClick={toggleCollapseStatus(memberId)}
+                                    direction={isExpanding ? 'up' : 'down'}
+                                  />
+                                </div>
+                                <RenderWhen condition={isExpanding}>
+                                  <div className={css.memberEmail}>
+                                    {memberEmail}
+                                  </div>
+                                  <RenderWhen condition={hasFoodPrice}>
+                                    <div>{formattedFoodPrice}</div>
+                                  </RenderWhen>
+                                  <RenderWhen condition={ableToUpdateOrder}>
+                                    {actionIconComponents}
+                                  </RenderWhen>
+                                </RenderWhen>
+                              </div>
+
+                              <RenderWhen.False>
+                                {foodNameComponent}
+                              </RenderWhen.False>
                             </RenderWhen>
                           </td>
                           <td>
-                            {ableToUpdateOrder && (
+                            <RenderWhen condition={Number(foodPrice) > 0}>
+                              {formattedFoodPrice}
+                            </RenderWhen>
+                          </td>
+                          <td>
+                            <RenderWhen condition={ableToUpdateOrder}>
                               <div className={css.actionCell}>
-                                <IconEdit
-                                  className={css.icon}
-                                  onClick={
-                                    actionDisabled
-                                      ? doNothing
-                                      : onClickEditOrderItem(tab, memberId)
-                                  }
-                                />
-                                <IconDelete
-                                  className={css.icon}
-                                  onClick={
-                                    actionDisabled
-                                      ? doNothing
-                                      : onClickDeleteOrderItem(memberId)
-                                  }
-                                />
+                                {actionIconComponents}
                               </div>
-                            )}
+                            </RenderWhen>
                           </td>
                         </tr>
                       );
@@ -200,3 +316,5 @@ export const OrderDetailsTableComponent: React.FC<
     </>
   );
 };
+
+export default OrderDetailsTableComponent;

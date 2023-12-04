@@ -10,7 +10,7 @@
   background-position: center;
   padding-bottom: 40%;
   overflow: hidden;
-  @include flexAlign(center, center);
+  @include flexCenter;
 
   @include viewportMedium {
     padding-bottom: 20%;

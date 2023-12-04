@@ -1,5 +1,6 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/mixins.scss' as *;
 
 .root {
   border: 1px solid $neutralGray3;
@@ -7,10 +8,6 @@
   overflow: hidden;
   padding: 16px 16px 0 16px;
   margin-bottom: 24px;
-
-  .arrowIcon {
-    transition: rotate 0.25s;
-  }
 
   &.isOpen {
     padding-bottom: 16px;
@@ -20,27 +17,30 @@
       rotate: 180deg;
     }
   }
+}
 
-  .labelSection {
-    min-height: unset;
-    display: flex;
-    align-items: center;
-    margin-bottom: 16px;
-    justify-content: space-between;
-    width: 100%;
-    .label {
-      color: $neutralGray7;
-      font-size: 16px;
-      font-weight: $fontWeightBold;
-      text-transform: uppercase;
-    }
-  }
+.arrowIcon {
+  transition: rotate 0.25s;
+}
 
-  .content {
-    height: fit-content;
+.labelSection {
+  @include flexAlign(center, space-between);
+  min-height: unset;
+  margin-bottom: 16px;
+  width: 100%;
+}
 
-    &.isClose {
-      height: 0;
-    }
+.label {
+  color: $neutralGray7;
+  font-size: 16px;
+  font-weight: $fontWeightBold;
+  text-transform: uppercase;
+}
+
+.content {
+  height: fit-content;
+
+  &.isClose {
+    height: 0;
   }
 }

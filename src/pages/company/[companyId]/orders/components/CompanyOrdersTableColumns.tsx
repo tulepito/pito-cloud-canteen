@@ -16,7 +16,7 @@ import RenderWhen from '@components/RenderWhen/RenderWhen';
 import type { TColumn } from '@components/Table/Table';
 import Tooltip from '@components/Tooltip/Tooltip';
 import { parseThousandNumber } from '@helpers/format';
-import { getParticipantPickingLink } from '@helpers/orderHelper';
+import { getParticipantPickingLink } from '@helpers/order/prepareDataHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { BookerNewOrderAction } from '@pages/company/booker/orders/new/BookerNewOrder.slice';
@@ -79,11 +79,9 @@ const CompanyOrdersActionColumn = ({
   const deleteDraftOrderInProgress = useAppSelector(
     (state) => state.Order.deleteDraftOrderInProgress,
   );
-
   const reorderInProgressId = useAppSelector(
     (state) => state.Order.reorderInProgressId,
   );
-
   const company = useAppSelector((state) => state.company.company);
   const orders = useAppSelector((state) => state.Order.orders);
 

@@ -1,11 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import { ORDER_STATE_TRANSIT_FLOW } from '@helpers/orderHelper';
 import updateOrder from '@pages/api/orders/[orderId]/update.service';
 import cookies from '@services/cookie';
 import { fetchListing } from '@services/integrationHelper';
 import adminChecker from '@services/permissionChecker/admin';
 import { handleError } from '@services/sdk';
+import { ORDER_STATE_TRANSIT_FLOW } from '@src/utils/constants';
 import { Listing } from '@src/utils/data';
 import type { TTransitionOrderState } from '@src/utils/types';
 

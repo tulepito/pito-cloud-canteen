@@ -61,6 +61,7 @@ const FoodBasicInforTabFormPart: React.FC<TFoodBasicInforTabFormPartProps> = (
 
   useEffect(() => {
     dispatch(addImages(formattedCurrentFoodListingImages));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, JSON.stringify(formattedCurrentFoodListingImages)]);
 
   return (

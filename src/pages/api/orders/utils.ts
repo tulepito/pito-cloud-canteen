@@ -2,7 +2,7 @@ import { isEmpty } from 'lodash';
 import { DateTime } from 'luxon';
 
 import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
-import { isJoinedPlan } from '@helpers/orderHelper';
+import { isJoinedPlan } from '@helpers/order/orderPickingHelper';
 import type { TPlan } from '@src/utils/orderTypes';
 import { ETransition } from '@src/utils/transaction';
 import type { TObject } from '@src/utils/types';

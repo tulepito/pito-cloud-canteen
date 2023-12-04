@@ -3,6 +3,7 @@ import { useIntl } from 'react-intl';
 import classNames from 'classnames';
 
 import Collapsible from '@components/Collapsible/Collapsible';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
 
 import type { TReviewInfoFormValues } from './ReviewInfoForm';
 import ReviewInfoForm from './ReviewInfoForm';
@@ -10,7 +11,6 @@ import ReviewInfoForm from './ReviewInfoForm';
 import css from './ReviewInfoSection.module.scss';
 
 type TReviewInfoSectionProps = {
-  className?: string;
   data: {
     deliveryHour: string;
     deliveryAddress: string;
@@ -22,16 +22,12 @@ type TReviewInfoSectionProps = {
     reviewInfoValues?: TReviewInfoFormValues;
   };
   canEdit: boolean;
-  onSubmit?: (values: TReviewInfoFormValues) => void;
-
-  startSubmitReviewInfoForm: boolean;
+  setFormValues?: (values: TReviewInfoFormValues, invalid: any) => void;
 };
 
 const ReviewInfoSection: React.FC<TReviewInfoSectionProps> = (props) => {
   const {
-    className,
     data: {
-      deliveryHour,
       deliveryAddress,
       staffName,
       companyName,
@@ -41,16 +37,11 @@ const ReviewInfoSection: React.FC<TReviewInfoSectionProps> = (props) => {
       reviewInfoValues = {},
     },
     canEdit,
-    onSubmit,
-    startSubmitReviewInfoForm,
+    setFormValues,
   } = props;
   const intl = useIntl();
 
-  const rootClasses = classNames(
-    css.root,
-    { [css.isCollapsible]: canEdit, [css.hasPadding]: !canEdit },
-    className,
-  );
+  const rootClasses = classNames(css.root);
   const sectionTitle = intl.formatMessage({ id: 'ReviewInfoSection.title' });
 
   const companyNameField = {
@@ -62,12 +53,6 @@ const ReviewInfoSection: React.FC<TReviewInfoSectionProps> = (props) => {
   const deliveryAddressField = {
     label: `${intl.formatMessage({
       id: 'ReviewInfoSection.deliveryAddressField.label',
-    })}`,
-  };
-
-  const deliveryHourField = {
-    label: `${intl.formatMessage({
-      id: 'ReviewInfoSection.deliveryHourField.label',
     })}`,
   };
 
@@ -108,10 +93,6 @@ const ReviewInfoSection: React.FC<TReviewInfoSectionProps> = (props) => {
     staffName,
     companyName,
     deliveryAddress,
-    // deliveryAddress: {
-    //   search: address,
-    //   selectedPlace: { address, origin },
-    // },
     contactPeopleName,
     contactPhoneNumber,
     ...reviewInfoValues,
@@ -120,7 +101,6 @@ const ReviewInfoSection: React.FC<TReviewInfoSectionProps> = (props) => {
   const infoItemList = [
     [companyNameField.label, companyName],
     [deliveryAddressField.label, deliveryAddress],
-    [deliveryHourField.label, deliveryHour],
     [contactPeopleNameField.label, contactPeopleName],
     [contactPeopleEmailField.label, contactPeopleEmail],
     [contactPhoneNumberField.label, contactPhoneNumber],
@@ -130,40 +110,40 @@ const ReviewInfoSection: React.FC<TReviewInfoSectionProps> = (props) => {
   const defaultSubmitFn = (_values: TReviewInfoFormValues) => {};
 
   return (
-    <>
-      {canEdit ? (
-        <Collapsible label={sectionTitle} className={rootClasses}>
-          <ReviewInfoForm
-            startSubmit={startSubmitReviewInfoForm}
-            onSubmit={onSubmit || defaultSubmitFn}
-            initialValues={formInitialValues}
-            fieldTextContent={{
-              companyNameField,
-              staffNameField,
-              contactPhoneNumberField,
-              contactPeopleNameField,
-              deliveryAddressField,
-            }}
-          />
-        </Collapsible>
-      ) : (
-        <div className={rootClasses}>
-          <div className={css.title}>{sectionTitle}</div>
-          <div className={css.infoContainer}>
-            {infoItemList.map(([label, value], index) => {
-              return (
-                <div key={index} className={css.infoItem}>
-                  <div className={css.label}>
-                    {index + 1}. {label}
+    <Collapsible
+      label={sectionTitle}
+      labelClassName={css.rootLabel}
+      className={rootClasses}
+      openClassName={css.rootOpen}>
+      <RenderWhen condition={canEdit}>
+        <ReviewInfoForm
+          onSubmit={defaultSubmitFn}
+          initialValues={formInitialValues}
+          fieldTextContent={{
+            companyNameField,
+            staffNameField,
+            contactPhoneNumberField,
+            contactPeopleNameField,
+            deliveryAddressField,
+          }}
+          setFormValues={setFormValues}
+        />
+        <RenderWhen.False>
+          <div className={css.contentContainer}>
+            <div className={css.infoContainer}>
+              {infoItemList.map(([label, value], index) => {
+                return (
+                  <div key={index} className={css.infoItem}>
+                    <div className={css.label}>{label}</div>
+                    <div className={css.value}>{value}</div>
                   </div>
-                  <div className={css.value}>{value}</div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
-        </div>
-      )}
-    </>
+        </RenderWhen.False>
+      </RenderWhen>
+    </Collapsible>
   );
 };
 

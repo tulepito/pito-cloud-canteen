@@ -19,7 +19,7 @@ import {
 import LoadingModal from '@components/LoadingModal/LoadingModal';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { getItem } from '@helpers/localStorageHelpers';
-import { isOver, markColorForOrder } from '@helpers/orderHelper';
+import { markColorForOrder } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import useSubOrderPicking from '@pages/participant/hooks/useSubOrderPicking';
@@ -29,7 +29,7 @@ import SubOrderDetailModal from '@pages/participant/orders/components/SubOrderDe
 import SuccessRatingModal from '@pages/participant/orders/components/SuccessRatingModal/SuccessRatingModal';
 import { OrderListThunks } from '@pages/participant/orders/OrderList.slice';
 import { CalendarActions } from '@redux/slices/Calendar.slice';
-import { isSameDate } from '@src/utils/dates';
+import { isOver, isSameDate } from '@src/utils/dates';
 import { EOrderStates, EParticipantOrderStatus } from '@src/utils/enums';
 import { convertStringToNumber } from '@src/utils/number';
 import { CurrentUser, Listing, User } from '@utils/data';

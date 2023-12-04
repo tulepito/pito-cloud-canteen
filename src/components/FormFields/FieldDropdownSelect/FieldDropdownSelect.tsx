@@ -19,6 +19,7 @@ type TFieldDropdownSelect = FieldRenderProps<string, any> & {
   options?: TKeyValue[];
   initialFieldValue?: string;
   labelClassName?: string;
+  dropdownWrapperClassName?: string;
 };
 export const FieldDropdownSelectComponent: React.FC<TFieldDropdownSelect> = (
   props,
@@ -37,6 +38,7 @@ export const FieldDropdownSelectComponent: React.FC<TFieldDropdownSelect> = (
     fieldWrapperClassName,
     disabled,
     labelWrapperClassName,
+    dropdownWrapperClassName,
     customOnChange,
     leftIcon,
     ...rest
@@ -81,9 +83,13 @@ export const FieldDropdownSelectComponent: React.FC<TFieldDropdownSelect> = (
     [css.paddingWithLeftIcon]: !!leftIcon,
   });
 
-  const placholderClasses = classNames(css.placeholder, {
+  const placeholderClasses = classNames(css.placeholder, {
     [css.paddingWithLeftIcon]: !!leftIcon,
   });
+  const dropdownWrapperClasses = classNames(
+    css.dropdownWrapper,
+    dropdownWrapperClassName,
+  );
 
   return (
     <OutsideClickHandler
@@ -109,7 +115,7 @@ export const FieldDropdownSelectComponent: React.FC<TFieldDropdownSelect> = (
         />
         <RenderWhen condition={!value}>
           {placeholder && (
-            <span className={placholderClasses}>{placeholder}</span>
+            <span className={placeholderClasses}>{placeholder}</span>
           )}
           <RenderWhen.False>
             <span className={valueClasses}>
@@ -119,7 +125,7 @@ export const FieldDropdownSelectComponent: React.FC<TFieldDropdownSelect> = (
         </RenderWhen>
       </div>
       <RenderWhen condition={dropdownController.value}>
-        <div className={css.dropdownWrapper}>
+        <div className={dropdownWrapperClasses}>
           {options.map((option: { key: string; label: string }) => (
             <div
               key={option.key}

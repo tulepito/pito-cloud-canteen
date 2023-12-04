@@ -11,7 +11,7 @@
   flex-direction: row-reverse;
 
   .backBtn {
-    @include flexAlign(center, center);
+    @include flexCenter;
     cursor: pointer;
 
     span {
@@ -40,7 +40,7 @@
 }
 
 .modalHeader {
-  @include flexAlign(center, center);
+  @include flexCenter;
   @include textTemplate(24px, $fontWeightBold, 32px);
   margin-top: 20px;
   text-align: center;
@@ -59,7 +59,7 @@
 
 .modalFooter {
   margin-top: 40px;
-  @include flexAlign(center, center);
+  @include flexCenter;
   flex-direction: column;
 
   .submitBtn {

@@ -10,7 +10,7 @@ import FieldDatePicker from '@components/FormFields/FieldDatePicker/FieldDatePic
 import FieldDropdownSelect from '@components/FormFields/FieldDropdownSelect/FieldDropdownSelect';
 import IconCalendar from '@components/Icons/IconCalender/IconCalender';
 import IconClock from '@components/Icons/IconClock/IconClock';
-import { findMinStartDate } from '@helpers/orderHelper';
+import { findMinStartDate } from '@helpers/order/prepareDataHelper';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { EUserSystemPermission } from '@src/utils/enums';
 import { generateTimeRangeItems } from '@utils/dates';

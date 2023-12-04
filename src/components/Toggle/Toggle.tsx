@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import React, { useEffect } from 'react';
 import classNames from 'classnames';
 
@@ -10,7 +11,7 @@ type TToggleProps = {
   status?: 'on' | 'off';
   onClick?: (value: boolean) => void;
   className?: string;
-  label?: string;
+  label?: ReactNode;
   id?: string;
   name?: string;
 };

@@ -13,7 +13,7 @@ import FieldDropdownSelect from '@components/FormFields/FieldDropdownSelect/Fiel
 import IconCalendar from '@components/Icons/IconCalender/IconCalender';
 import IconClock from '@components/Icons/IconClock/IconClock';
 import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
-import { findValidRangeForDeadlineDate } from '@helpers/orderHelper';
+import { findValidRangeForDeadlineDate } from '@helpers/order/prepareDataHelper';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { EUserSystemPermission } from '@src/utils/enums';
 import { renderListTimeOptions, TimeOptions } from '@utils/dates';

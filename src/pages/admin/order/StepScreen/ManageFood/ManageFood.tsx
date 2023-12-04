@@ -5,9 +5,9 @@ import { useRouter } from 'next/router';
 
 import Badge, { EBadgeType } from '@components/Badge/Badge';
 import ManageLineItemsSection from '@components/OrderDetails/EditView/ManageOrderDetailSection/ManageLineItemsSection';
+import { checkMinMaxQuantityInPickingState } from '@helpers/order/orderPickingHelper';
 import { checkIsOrderHasInProgressState } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { checkMinMaxQuantityInPickingState } from '@pages/company/orders/[orderId]/picking/OrderDetail.page';
 import { orderManagementThunks } from '@redux/slices/OrderManagement.slice';
 import { Listing } from '@src/utils/data';
 import { EOrderStates, EOrderType } from '@src/utils/enums';
@@ -30,7 +30,7 @@ const ManageFood: React.FC<TManageFoodProps> = (props) => {
   const intl = useIntl();
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const [isDraftEditing /* setIsDraftEditing */] = useState<boolean>(false);
+  const [isDraftEditing] = useState<boolean>(false);
   const {
     query: { timestamp },
     isReady: isRouterReady,

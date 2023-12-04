@@ -1,8 +1,8 @@
 import {
   calculatePriceQuotationInfoFromOrder,
   calculatePriceQuotationPartner,
-  ensureVATSetting,
 } from '@helpers/order/cartInfoHelper';
+import { ensureVATSetting } from '@helpers/order/prepareDataHelper';
 import { queryAllCollectionData } from '@services/firebase';
 import { fetchListing } from '@services/integrationHelper';
 import { updatePaymentRecordOnFirebase } from '@services/payment';

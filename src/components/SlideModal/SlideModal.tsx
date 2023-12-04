@@ -9,19 +9,35 @@ import css from './SlideModal.module.scss';
 type TSlideModalProps = PropsWithChildren & {
   id: string;
   isOpen: boolean;
+  contentClassName?: string;
   modalTitle?: ReactNode;
-  onClose: (e: React.MouseEvent<HTMLElement>) => void;
+  onClose: ((e: React.MouseEvent<HTMLElement>) => void) | (() => void);
   containerClassName?: string;
+  openClassName?: string;
+  className?: string;
+  shouldShowOverlay?: boolean;
 };
 
 const SlideModal: React.FC<TSlideModalProps> = (props) => {
-  const { isOpen, onClose, id, children, modalTitle, containerClassName } =
-    props;
+  const {
+    isOpen,
+    onClose,
+    id,
+    children,
+    modalTitle,
+    className,
+    contentClassName,
+    containerClassName,
+    openClassName,
+    shouldShowOverlay = false,
+  } = props;
 
   const containerClasses = classNames(
     css.slideModalContainer,
     containerClassName,
   );
+  const openClasses = classNames(css.slideModalOpen, openClassName);
+  const contentClasses = classNames(css.slideModalContent, contentClassName);
 
   return (
     <PopupModal
@@ -29,8 +45,9 @@ const SlideModal: React.FC<TSlideModalProps> = (props) => {
       isOpen={isOpen}
       handleClose={onClose}
       closeClassName={css.slideModalClose}
-      openClassName={css.slideModalOpen}
+      openClassName={openClasses}
       scrollLayerClassName={css.slideModalScrollLayer}
+      shouldShowOverlay={shouldShowOverlay}
       customHeader={
         <div className={css.modalHeader}>
           <IconClose className={css.closeIcon} onClick={onClose} />
@@ -38,7 +55,8 @@ const SlideModal: React.FC<TSlideModalProps> = (props) => {
         </div>
       }
       containerClassName={containerClasses}
-      contentClassName={css.slideModalContent}>
+      className={className}
+      contentClassName={contentClasses}>
       {children}
     </PopupModal>
   );

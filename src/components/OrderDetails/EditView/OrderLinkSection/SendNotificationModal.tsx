@@ -4,7 +4,10 @@ import { useIntl } from 'react-intl';
 import ButtonIcon from '@components/ButtonIcon/ButtonIcon';
 import IconCopy from '@components/Icons/IconCopy/IconCopy';
 import Modal from '@components/Modal/Modal';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
+import SlideModal from '@components/SlideModal/SlideModal';
 import Tooltip from '@components/Tooltip/Tooltip';
+import { useViewport } from '@hooks/useViewport';
 import { formatTimestamp } from '@utils/dates';
 
 import type { TSendNotificationFormValues } from './SendNotificationForm';
@@ -27,6 +30,7 @@ const SendNotificationModal: React.FC<SendNotificationModalProps> = (props) => {
     data: { orderDeadline, orderLink },
     onSubmit,
   } = props;
+  const { isMobileLayout } = useViewport();
 
   const defaultCopyText = intl.formatMessage({
     id: 'SendNotificationModal.copyToClipboardTooltip.default',
@@ -38,7 +42,7 @@ const SendNotificationModal: React.FC<SendNotificationModalProps> = (props) => {
   const [copyToClipboardTooltip, setCopyToClipboardTooltip] =
     useState(defaultCopyText);
 
-  const sendNotificationModalTitle = (
+  const modalTitle = (
     <span className={css.title}>
       {intl.formatMessage({ id: 'SendNotificationModal.title' })}
     </span>
@@ -63,34 +67,46 @@ const SendNotificationModal: React.FC<SendNotificationModalProps> = (props) => {
     setCopyToClipboardTooltip(copiedCopyText);
   };
 
-  return (
-    <Modal
-      isOpen={isOpen}
-      title={sendNotificationModalTitle}
-      handleClose={onClose}>
+  const content = (
+    <>
+      <div className={css.alertContainer}>{sendNotificationModalAlert}</div>
       <div>
-        <div className={css.alertContainer}>{sendNotificationModalAlert}</div>
-
-        <div>
-          <div className={css.linkLabel}>{sendNotificationModalLinkLabel}</div>
-          <div className={css.linkContainer}>
-            <span>{orderLink}</span>
-            <Tooltip tooltipContent={copyToClipboardTooltip} placement="bottom">
-              <ButtonIcon onClick={handleCopyLink}>
-                <IconCopy />
-              </ButtonIcon>
-            </Tooltip>
-          </div>
+        <div className={css.linkLabel}>{sendNotificationModalLinkLabel}</div>
+        <div className={css.linkContainer}>
+          <span>{orderLink}</span>
+          <Tooltip tooltipContent={copyToClipboardTooltip} placement="bottom">
+            <ButtonIcon onClick={handleCopyLink}>
+              <IconCopy />
+            </ButtonIcon>
+          </Tooltip>
         </div>
-        <div className={css.descriptionContainer}>
-          <div className={css.prefix} />
-          <div className={css.descriptionLabel}>
-            {sendNotificationModalDescriptionLabel}
-          </div>
-        </div>
-        <SendNotificationForm onSubmit={onSubmit} />
       </div>
-    </Modal>
+      <div className={css.descriptionContainer}>
+        <div className={css.prefix} />
+        <div className={css.descriptionLabel}>
+          {sendNotificationModalDescriptionLabel}
+        </div>
+      </div>
+      <SendNotificationForm onSubmit={onSubmit} />
+    </>
+  );
+
+  return (
+    <RenderWhen condition={isMobileLayout}>
+      <SlideModal
+        id="SendNotificationModal"
+        modalTitle={modalTitle}
+        onClose={onClose}
+        isOpen={isOpen}>
+        {content}
+      </SlideModal>
+
+      <RenderWhen.False>
+        <Modal isOpen={isOpen} title={modalTitle} handleClose={onClose}>
+          {content}
+        </Modal>
+      </RenderWhen.False>
+    </RenderWhen>
   );
 };
 

@@ -1,5 +1,15 @@
+@use '/src/styles/customMediaQueries.scss' as *;
+
 .actions {
+  margin-top: 24px;
   display: flex;
   justify-content: flex-end;
-  margin-top: 16px;
+
+  button {
+    width: 100%;
+
+    @include viewportMedium {
+      width: unset;
+    }
+  }
 }

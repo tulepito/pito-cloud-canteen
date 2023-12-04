@@ -2,63 +2,65 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/mixins.scss' as *;
 
-.root {
-  .modalContainer {
-    overflow: unset;
-    @include viewportMedium {
-      flex-basis: 700px !important;
-    }
+.subTitle {
+  @include textTemplate(14px, 400, 20px);
+  color: $neutralGray6;
+  margin-bottom: 8px;
 
-    .subTitle {
-      @include textTemplate(16px, 400, 24px);
-      color: $neutralGray6;
-      margin-bottom: 8px;
-    }
+  @include viewportMedium {
+    @include textTemplate(16px, 400, 24px);
+  }
+}
 
-    .participantsContainer {
-      max-height: 436px;
-      overflow: hidden auto;
+.modalContainer {
+  overflow: unset;
+  @include viewportMedium {
+    flex-basis: 700px !important;
+  }
 
-      .rawParticipants {
-        display: flex;
-        flex-wrap: wrap;
-        flex-direction: row;
-        justify-content: space-between;
-        gap: 12px;
+  .participantsContainer {
+    max-height: 436px;
+    overflow: hidden auto;
 
-        .cardWrapper {
-          flex-basis: calc(50% - 6px);
-        }
-      }
+    .rawParticipants {
+      display: flex;
+      flex-wrap: wrap;
+      flex-direction: row;
+      justify-content: space-between;
+      gap: 12px;
 
-      .groupContainer {
-        display: flex;
-        flex-direction: column;
-        border: none;
-        padding: 0;
-        margin: 4px 0 20px;
-        gap: 20px;
-        height: fit-content;
-
-        button {
-          min-height: unset;
-          margin: 0;
-        }
-
-        .groupName {
-          @include textTemplate(14px, 500, 24px);
-          letter-spacing: 0.02;
-
-          .name {
-            @include textTemplate(14px, 700, 20px);
-            letter-spacing: 0;
-          }
-        }
-      }
-
-      .participantCard {
+      .cardWrapper {
         flex-basis: calc(50% - 6px);
       }
+    }
+
+    .groupContainer {
+      display: flex;
+      flex-direction: column;
+      border: none;
+      padding: 0;
+      margin: 4px 0 20px;
+      gap: 20px;
+      height: fit-content;
+
+      button {
+        min-height: unset;
+        margin: 0;
+      }
+
+      .groupName {
+        @include textTemplate(14px, 500, 24px);
+        letter-spacing: 0.02;
+
+        .name {
+          @include textTemplate(14px, 700, 20px);
+          letter-spacing: 0;
+        }
+      }
+    }
+
+    .participantCard {
+      flex-basis: calc(50% - 6px);
     }
   }
 }

@@ -1,20 +1,25 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
 
-.root {
-  .title {
-    text-transform: capitalize;
+.subTitle {
+  @include textTemplate(14px, 400, 20px);
+  color: $neutralGray6;
+  display: none;
+
+  @include viewportMedium {
+    display: block;
   }
 
-  .subTitle {
-    @include textTemplate(14px, 400, 20px);
-    color: $neutralGray6;
+  b {
+    color: $neutralGray7;
+  }
+}
 
-    b {
-      color: $neutralGray7;
-    }
-  }
-  .modalContainer {
-    height: 360px;
-  }
+.modalContainer {
+  height: 360px;
+}
+
+.mobileModalContent.mobileModalContent {
+  padding-top: 24px;
 }

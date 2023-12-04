@@ -316,3 +316,8 @@ $buttonBorderRadius: 8px;
   width: $width;
   height: $height;
 }
+
+@mixin focusContainer() {
+  border: 1px solid $neutralGray3;
+  box-shadow: $boxShadowFocus;
+}

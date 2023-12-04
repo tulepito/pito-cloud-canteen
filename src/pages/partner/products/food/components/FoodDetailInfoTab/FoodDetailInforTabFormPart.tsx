@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';

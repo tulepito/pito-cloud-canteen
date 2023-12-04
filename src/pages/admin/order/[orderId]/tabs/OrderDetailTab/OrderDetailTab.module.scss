@@ -3,7 +3,7 @@
 @use '/src/styles/mixins.scss' as *;
 
 .header {
-  @include flexAlign(center, center);
+  @include flexCenter;
   flex-direction: column;
   gap: 16px;
 
@@ -13,7 +13,7 @@
   }
 }
 .orderTitle {
-  @include flexAlign(center, center);
+  @include flexCenter;
   gap: 12px;
 
   .titleLabel {
