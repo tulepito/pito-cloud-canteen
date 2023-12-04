@@ -29,7 +29,9 @@ const NutritionPage = () => {
     (state) => state.company.company,
     shallowEqual,
   );
-  const { nutritions = [] } = User(company as TUser).getPublicData();
+  const { nutritions = [], mealType = [] } = User(
+    company as TUser,
+  ).getPublicData();
   const favoriteRestaurants = useAppSelector(
     (state) => state.company.favoriteRestaurants,
     shallowEqual,
@@ -57,9 +59,13 @@ const NutritionPage = () => {
     (state) => state.SystemAttributes.nutritions,
     shallowEqual,
   );
-  const { nutritions: personalNutritions = [] } = CurrentUser(
-    currentUser!,
-  ).getPublicData();
+  const menuTypesOptions = useAppSelector(
+    (state) => state.SystemAttributes.menuTypes,
+  );
+  const {
+    nutritions: personalNutritions = [],
+    mealTypes: personalMealType = [],
+  } = CurrentUser(currentUser!).getPublicData();
   const isPersonal = companyId === 'personal';
 
   const initialValues = useMemo(
@@ -67,6 +73,7 @@ const NutritionPage = () => {
       isPersonal
         ? {
             nutritions: personalNutritions,
+            mealType: personalMealType,
             favoriteRestaurantList: personalFavoriteRestaurants.map(
               (restaurant) => Listing(restaurant).getId(),
             ),
@@ -76,6 +83,7 @@ const NutritionPage = () => {
           }
         : {
             nutritions,
+            mealType,
             favoriteRestaurantList: favoriteRestaurants.map((restaurant) =>
               Listing(restaurant).getId(),
             ),
@@ -86,9 +94,11 @@ const NutritionPage = () => {
       favoriteRestaurants,
       isPersonal,
       nutritions,
+      mealType,
       personalFavoriteFood,
       personalFavoriteRestaurants,
       personalNutritions,
+      personalMealType,
     ],
   );
 
@@ -124,6 +134,7 @@ const NutritionPage = () => {
             onSubmit={handleSubmit}
             isPersonal={isPersonal}
             nutritionsOptions={nutritionsOptions}
+            mealTypeOptions={menuTypesOptions}
           />
         </div>
       )}
