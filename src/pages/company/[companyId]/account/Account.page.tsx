@@ -202,6 +202,7 @@ const AccountPage = () => {
         </Button>
       </div>
       <ConfirmationModal
+        isPopup={isMobileLayout}
         id="UpdateBookerConfirmationModal"
         isOpen={isConfirmationModalOpen}
         onClose={closeConfirmationModal}
