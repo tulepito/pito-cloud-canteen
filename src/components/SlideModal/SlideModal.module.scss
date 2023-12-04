@@ -46,8 +46,8 @@
   @include flexAlign(center, space-between);
   flex-direction: row-reverse;
   .closeIcon {
-    width: 24px;
-    height: 24px;
+    width: 12px;
+    height: 12px;
   }
   .secondRow {
     color: $primaryPri2;
