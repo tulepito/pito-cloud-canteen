@@ -31,7 +31,6 @@ export type TNutritionFormValues = {
 };
 
 type TExtraProps = {
-  isPersonal: boolean;
   nutritionsOptions: { key: string; label: string }[];
   mealTypeOptions: { key: string; label: string }[];
 };
@@ -46,7 +45,6 @@ const NutritionFormComponent: React.FC<TNutritionFormComponentProps> = (
     handleSubmit,
     form,
     values,
-    isPersonal,
     initialValues,
     nutritionsOptions,
     showFavoriteRestaurantAndFood,
@@ -70,14 +68,6 @@ const NutritionFormComponent: React.FC<TNutritionFormComponentProps> = (
   );
   const favoriteFood = useAppSelector(
     (state) => state.company.favoriteFood,
-    shallowEqual,
-  );
-  const personalFavoriteRestaurants = useAppSelector(
-    (state) => state.user.favoriteRestaurants,
-    shallowEqual,
-  );
-  const personalFavoriteFood = useAppSelector(
-    (state) => state.user.favoriteFood,
     shallowEqual,
   );
 
@@ -106,62 +96,51 @@ const NutritionFormComponent: React.FC<TNutritionFormComponentProps> = (
   );
   const favoriteRestaurantTableData = useMemo<TRowData[]>(
     () =>
-      (isPersonal ? personalFavoriteRestaurants : favoriteRestaurants).reduce(
-        (result, restaurant) => {
-          return removedFavoriteRestaurantIds.includes(
-            Listing(restaurant).getId(),
-          )
-            ? result
-            : [
-                ...result,
-                {
-                  key: Listing(restaurant).getId(),
-                  data: {
-                    id: Listing(restaurant).getId(),
-                    title: Listing(restaurant).getAttributes().title,
-                    category: Listing(restaurant)
-                      .getPublicData()
-                      ?.categories?.slice(0, 3)
-                      .map(
-                        (category: string) =>
-                          FOOD_CATEGORY_OPTIONS.find(
-                            (item) => item.key === category,
-                          )?.label,
-                      )
-                      .join(', '),
-                  },
+      favoriteRestaurants.reduce((result, restaurant) => {
+        return removedFavoriteRestaurantIds.includes(
+          Listing(restaurant).getId(),
+        )
+          ? result
+          : [
+              ...result,
+              {
+                key: Listing(restaurant).getId(),
+                data: {
+                  id: Listing(restaurant).getId(),
+                  title: Listing(restaurant).getAttributes().title,
+                  category: Listing(restaurant)
+                    .getPublicData()
+                    ?.categories?.slice(0, 3)
+                    .map(
+                      (category: string) =>
+                        FOOD_CATEGORY_OPTIONS.find(
+                          (item) => item.key === category,
+                        )?.label,
+                    )
+                    .join(', '),
                 },
-              ];
-        },
-        [],
-      ),
-    [
-      favoriteRestaurants,
-      isPersonal,
-      personalFavoriteRestaurants,
-      removedFavoriteRestaurantIds,
-    ],
+              },
+            ];
+      }, []),
+    [favoriteRestaurants, removedFavoriteRestaurantIds],
   );
   const favoriteFoodTableData = useMemo<TRowData[]>(
     () =>
-      (isPersonal ? personalFavoriteFood : favoriteFood).reduce(
-        (result, food) => {
-          return removedFavoriteFoodIds.includes(Listing(food).getId())
-            ? result
-            : [
-                ...result,
-                {
-                  key: Listing(food).getId(),
-                  data: {
-                    id: Listing(food).getId(),
-                    title: Listing(food).getAttributes().title,
-                  },
+      favoriteFood.reduce((result, food) => {
+        return removedFavoriteFoodIds.includes(Listing(food).getId())
+          ? result
+          : [
+              ...result,
+              {
+                key: Listing(food).getId(),
+                data: {
+                  id: Listing(food).getId(),
+                  title: Listing(food).getAttributes().title,
                 },
-              ];
-        },
-        [],
-      ),
-    [favoriteFood, isPersonal, personalFavoriteFood, removedFavoriteFoodIds],
+              },
+            ];
+      }, []),
+    [favoriteFood, removedFavoriteFoodIds],
   );
   const formPristine = customPristine(initialValues, values);
   const submitDisabled = formPristine || updateCompanyAccountInProgress;

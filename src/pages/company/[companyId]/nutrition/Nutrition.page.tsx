@@ -6,10 +6,11 @@ import { useRouter } from 'next/router';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useFetchCompanyInfo from '@hooks/useFetchCompanyInfo';
+import useFetchCompanyInfoCurrentUser from '@hooks/useFetchCompanyInfoCurrentUser';
 import { useViewport } from '@hooks/useViewport';
 import { companyThunks } from '@redux/slices/company.slice';
 import { personalPaths } from '@src/paths';
-import { CurrentUser, Listing, User } from '@utils/data';
+import { Listing, User } from '@utils/data';
 import type { TUser } from '@utils/types';
 
 import type { TNutritionFormValues } from './components/NutritionForm/NutritionForm';
@@ -22,8 +23,14 @@ const NutritionPage = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const { isMobileLayout, isTabletLayout } = useViewport();
-  const { companyId } = router.query;
-  useFetchCompanyInfo();
+  const { companyId = '' } = router.query;
+  if (companyId === 'personal') {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    useFetchCompanyInfoCurrentUser();
+  } else {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    useFetchCompanyInfo();
+  }
 
   const company = useAppSelector(
     (state) => state.company.company,
@@ -40,18 +47,7 @@ const NutritionPage = () => {
     (state) => state.company.favoriteFood,
     shallowEqual,
   );
-  const currentUser = useAppSelector(
-    (state) => state.user.currentUser,
-    shallowEqual,
-  );
-  const personalFavoriteRestaurants = useAppSelector(
-    (state) => state.user.favoriteRestaurants,
-    shallowEqual,
-  );
-  const personalFavoriteFood = useAppSelector(
-    (state) => state.user.favoriteFood,
-    shallowEqual,
-  );
+
   const fetchCompanyInfoInProgress = useAppSelector(
     (state) => state.company.fetchCompanyInfoInProgress,
   );
@@ -59,48 +55,20 @@ const NutritionPage = () => {
     (state) => state.SystemAttributes.nutritions,
     shallowEqual,
   );
-  const menuTypesOptions = useAppSelector(
-    (state) => state.SystemAttributes.menuTypes,
+  const mealTypesOptions = useAppSelector(
+    (state) => state.SystemAttributes.mealTypes,
   );
-  const {
-    nutritions: personalNutritions = [],
-    mealTypes: personalMealType = [],
-  } = CurrentUser(currentUser!).getPublicData();
-  const isPersonal = companyId === 'personal';
 
-  const initialValues = useMemo(
-    () =>
-      isPersonal
-        ? {
-            nutritions: personalNutritions,
-            mealType: personalMealType,
-            favoriteRestaurantList: personalFavoriteRestaurants.map(
-              (restaurant) => Listing(restaurant).getId(),
-            ),
-            favoriteFoodList: personalFavoriteFood.map((food) =>
-              Listing(food).getId(),
-            ),
-          }
-        : {
-            nutritions,
-            mealType,
-            favoriteRestaurantList: favoriteRestaurants.map((restaurant) =>
-              Listing(restaurant).getId(),
-            ),
-            favoriteFoodList: favoriteFood.map((food) => Listing(food).getId()),
-          },
-    [
-      favoriteFood,
-      favoriteRestaurants,
-      isPersonal,
+  const initialValues = useMemo(() => {
+    return {
       nutritions,
       mealType,
-      personalFavoriteFood,
-      personalFavoriteRestaurants,
-      personalNutritions,
-      personalMealType,
-    ],
-  );
+      favoriteRestaurantList: favoriteRestaurants.map((restaurant) =>
+        Listing(restaurant).getId(),
+      ),
+      favoriteFoodList: favoriteFood.map((food) => Listing(food).getId()),
+    };
+  }, [favoriteFood, favoriteRestaurants, nutritions, mealType]);
 
   const handleSubmit = (values: TNutritionFormValues) => {
     const publicData = {
@@ -132,9 +100,8 @@ const NutritionPage = () => {
           <NutritionForm
             initialValues={initialValues}
             onSubmit={handleSubmit}
-            isPersonal={isPersonal}
             nutritionsOptions={nutritionsOptions}
-            mealTypeOptions={menuTypesOptions}
+            mealTypeOptions={mealTypesOptions}
           />
         </div>
       )}
