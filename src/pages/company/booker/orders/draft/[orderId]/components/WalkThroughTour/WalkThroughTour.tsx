@@ -301,6 +301,7 @@ const WalkThroughTourProvider: React.FC<TWalkThroughTourProps> = (props) => {
   if (isMobileLayout || isTabletLayout) {
     return (
       <TourProvider
+        key="mobile-tour"
         nextButton={(nextBtnProps: any) => <NextButton {...nextBtnProps} />}
         prevButton={(prevBtnProps: any) => <SkipButton {...prevBtnProps} />}
         padding={0}
@@ -309,6 +310,7 @@ const WalkThroughTourProvider: React.FC<TWalkThroughTourProps> = (props) => {
         maskClassName={css.mask}
         showDots={false}
         showBadge={false}
+        onClickMask={() => {}}
         steps={mobileTourConfig as any}>
         {props.children}
       </TourProvider>
@@ -317,6 +319,7 @@ const WalkThroughTourProvider: React.FC<TWalkThroughTourProps> = (props) => {
 
   return (
     <TourProvider
+      key="desktop-tour"
       nextButton={(nextBtnProps: any) => <NextButton {...nextBtnProps} />}
       prevButton={(prevBtnProps: any) => <SkipButton {...prevBtnProps} />}
       padding={0}
@@ -325,6 +328,7 @@ const WalkThroughTourProvider: React.FC<TWalkThroughTourProps> = (props) => {
       maskClassName={css.mask}
       showDots={false}
       showBadge={false}
+      onClickMask={() => {}}
       steps={tourConfig as any}>
       {props.children}
     </TourProvider>
