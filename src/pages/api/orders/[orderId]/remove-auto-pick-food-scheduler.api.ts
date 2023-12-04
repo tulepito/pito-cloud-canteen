@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HttpMethod } from '@apis/configs';
 import {
-  createPickFoodForEmptyMembersScheduler,
+  createOrUpdatePickFoodForEmptyMembersScheduler,
   getScheduler,
 } from '@services/awsEventBrigdeScheduler';
 import cookies from '@services/cookie';
@@ -33,7 +33,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
             return res.status(200).json({ success: true });
           }
-          await createPickFoodForEmptyMembersScheduler({
+          await createOrUpdatePickFoodForEmptyMembersScheduler({
             orderId,
             startDate,
             deliveryHour,

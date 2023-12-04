@@ -159,7 +159,7 @@ export const createOrUpdateAutomaticStartOrderScheduler = async ({
   }
 };
 
-export const createPickFoodForEmptyMembersScheduler = async ({
+export const createOrUpdatePickFoodForEmptyMembersScheduler = async ({
   orderId,
   startDate,
   deliveryHour,
@@ -201,10 +201,10 @@ export const createPickFoodForEmptyMembersScheduler = async ({
       },
     })
       .then((res) => {
-        console.log('Create Automatic start order Scheduler Success: ', res);
+        console.log('Create Automatic picking food Scheduler Success: ', res);
       })
       .catch((err) => {
-        console.log('Create Automatic start order Scheduler Error: ', err);
+        console.log('Create Automatic picking food Scheduler Error: ', err);
       });
   }
 };

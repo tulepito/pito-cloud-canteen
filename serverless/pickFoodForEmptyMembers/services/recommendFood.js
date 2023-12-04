@@ -41,12 +41,12 @@ exports.recommendFood = (foodList, subOrderFoodIds, allergies) => {
   const randomFood =
     foodListToFilter[Math.floor(Math.random() * foodListToFilter.length)];
 
-  const mostSuitableFood = !isAllFoodHaveNoRating
+  const mostSuitableFood = isAllFoodHaveNoRating
     ? maxBy(foodListToFilter, (food) =>
-      get(food, 'attributes.metadata.rating', 0),
+      get(food, 'attributes.metadata.pickingTime', 0),
     )
     : maxBy(foodListToFilter, (food) =>
-      get(food, 'attributes.metadata.pickingTime', 0),
+      get(food, 'attributes.metadata.rating', 0),
     );
 
   return random() === 1 ? randomFood : mostSuitableFood;

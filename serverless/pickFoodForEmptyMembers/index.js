@@ -146,10 +146,7 @@ exports.handler = async (_event) => {
             if (
               memberOrders[memberId].status !== EParticipantOrderStatus.empty
             ) {
-              return {
-                ...newMemberOrderResult,
-                [memberId]: memberOrders[memberId],
-              };
+              newMemberOrderResult[memberId] = memberOrders[memberId];
             }
 
             const memberResponse = memberResponses.find(
@@ -166,24 +163,23 @@ exports.handler = async (_event) => {
               allergies,
             );
 
-            return {
-              ...newMemberOrderResult,
-              [memberId]: {
-                foodId: suitableFood.id.uuid,
-                status: EParticipantOrderStatus.joined,
-              },
+            newMemberOrderResult[memberId] = {
+              ...newMemberOrderResult[memberId],
+              foodId: suitableFood.id.uuid,
+              status: EParticipantOrderStatus.joined,
             };
+
+            return newMemberOrderResult;
           },
           {},
         );
 
-        return {
-          ...result,
-          [subOrderDate]: {
-            ...subOrder,
-            memberOrders: newMemberOrder,
-          },
+        result[subOrderDate] = {
+          ...subOrder,
+          memberOrders: newMemberOrder,
         };
+
+        return result;
       },
       {},
     );

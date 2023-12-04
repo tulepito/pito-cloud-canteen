@@ -1,6 +1,6 @@
 import { getPickFoodParticipants } from '@helpers/orderHelper';
 import { pushNativeNotificationOrderDetail } from '@pages/api/helpers/pushNotificationOrderDetailHelper';
-import { createPickFoodForEmptyMembersScheduler } from '@services/awsEventBrigdeScheduler';
+import { createOrUpdatePickFoodForEmptyMembersScheduler } from '@services/awsEventBrigdeScheduler';
 import { denormalisedResponseEntities } from '@services/data';
 import { emailSendingFactory, EmailTemplateTypes } from '@services/email';
 import getSystemAttributes from '@services/getSystemAttributes';
@@ -108,7 +108,7 @@ export const startOrder = async (orderId: string, planId: string) => {
   );
 
   if (isAutoPickFood) {
-    await createPickFoodForEmptyMembersScheduler({
+    await createOrUpdatePickFoodForEmptyMembersScheduler({
       orderId,
       startDate,
       deliveryHour,
