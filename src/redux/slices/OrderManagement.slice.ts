@@ -20,10 +20,12 @@ import {
   addUpdateMemberOrder,
   bookerStartOrderApi,
   cancelPickingOrderApi,
+  createAutoPickFoodSchedulerApi,
   createQuotationApi,
   deleteParticipantFromOrderApi,
   getBookerOrderDataApi,
   initializePaymentApi,
+  removeAutoPickFoodSchedulerApi,
   sendOrderDetailUpdatedEmailApi,
   sendPartnerNewOrderAppearEmailApi,
   sendRemindEmailToMemberApi,
@@ -203,6 +205,9 @@ type TOrderManagementState = {
     orderReachMaxCanModify: boolean;
   } | null;
   isAdminFlow: boolean;
+
+  toggleAutoPickFoodInProgress: boolean;
+  toggleAutoPickFoodError: any;
 };
 
 const initialState: TOrderManagementState = {
@@ -244,10 +249,15 @@ const initialState: TOrderManagementState = {
   fetchQuotationInProgress: false,
   fetchQuotationError: null,
   isAdminFlow: false,
+
+  toggleAutoPickFoodInProgress: false,
+  toggleAutoPickFoodError: null,
 };
 
 // ================ Thunk types ================ //
 const FETCH_QUOTATION = 'app/OrderManagement/FETCH_QUOTATION';
+const HANDLE_AUTO_PICK_FOOD_TOGGLE =
+  'app/OrderManagement/HANDLE_AUTO_PICK_FOOD_TOGGLE';
 
 // ================ Async thunks ================ //
 const queryTransactions = createAsyncThunk(
@@ -1018,6 +1028,19 @@ const fetchQuotation = createAsyncThunk(
   },
 );
 
+const handleAutoPickFoodToggle = createAsyncThunk(
+  HANDLE_AUTO_PICK_FOOD_TOGGLE,
+  async (autoPickFood: boolean, { getState }) => {
+    const { orderData } = getState().OrderManagement;
+    const orderId = orderData.id.uuid;
+    if (!autoPickFood) {
+      await createAutoPickFoodSchedulerApi(orderId);
+    } else {
+      await removeAutoPickFoodSchedulerApi(orderId);
+    }
+  },
+);
+
 export const orderManagementThunks = {
   loadData,
   updateOrderGeneralInfo,
@@ -1034,6 +1057,7 @@ export const orderManagementThunks = {
   updatePlanOrderDetail,
   fetchQuotation,
   updateOrderFromDraftEdit,
+  handleAutoPickFoodToggle,
 };
 
 // ================ Slice ================ //
@@ -1891,6 +1915,18 @@ const OrderManagementSlice = createSlice({
           ...state.draftOrderDetail,
           ...payload.orderDetail,
         };
+      })
+
+      .addCase(handleAutoPickFoodToggle.pending, (state) => {
+        state.toggleAutoPickFoodInProgress = true;
+        state.toggleAutoPickFoodError = null;
+      })
+      .addCase(handleAutoPickFoodToggle.fulfilled, (state) => {
+        state.toggleAutoPickFoodInProgress = false;
+      })
+      .addCase(handleAutoPickFoodToggle.rejected, (state, { error }) => {
+        state.toggleAutoPickFoodInProgress = false;
+        state.toggleAutoPickFoodError = error;
       });
   },
 });

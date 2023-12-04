@@ -1,5 +1,6 @@
 import { getPickFoodParticipants } from '@helpers/orderHelper';
 import { pushNativeNotificationOrderDetail } from '@pages/api/helpers/pushNotificationOrderDetailHelper';
+import { createPickFoodForEmptyMembersScheduler } from '@services/awsEventBrigdeScheduler';
 import { denormalisedResponseEntities } from '@services/data';
 import { emailSendingFactory, EmailTemplateTypes } from '@services/email';
 import getSystemAttributes from '@services/getSystemAttributes';
@@ -19,11 +20,14 @@ export const startOrder = async (orderId: string, planId: string) => {
   );
   const {
     companyId,
+    bookerId,
     orderState,
     orderStateHistory = [],
     partnerIds = [],
     hasSpecificPCCFee: orderHasSpecificPCCFee,
     specificPCCFee: orderSpecificPCCFee,
+    startDate,
+    deliveryHour,
   } = Listing(orderListing).getMetadata();
 
   if (orderState !== EOrderStates.picking) {
@@ -31,6 +35,9 @@ export const startOrder = async (orderId: string, planId: string) => {
       'You can start picking order (with orderState is "picking") only',
     );
   }
+  const booker = await fetchUser(bookerId);
+  const bookerUser = User(booker);
+  const { isAutoPickFood } = bookerUser.getPublicData();
 
   const updateOrderStateHistory = orderStateHistory.concat([
     {
@@ -99,4 +106,12 @@ export const startOrder = async (orderId: string, planId: string) => {
     ENativeNotificationType.BookerTransitOrderStateToInProgress,
     integrationSdk,
   );
+
+  if (isAutoPickFood) {
+    await createPickFoodForEmptyMembersScheduler({
+      orderId,
+      startDate,
+      deliveryHour,
+    });
+  }
 };

@@ -187,6 +187,9 @@ export const createPickFoodForEmptyMembersScheduler = async ({
       arn: PICK_FOOD_FOR_EMPTY_MEMBER_ARN,
       customName,
       timeExpression,
+      params: {
+        orderId: null,
+      },
     });
   } catch (error) {
     createScheduler({

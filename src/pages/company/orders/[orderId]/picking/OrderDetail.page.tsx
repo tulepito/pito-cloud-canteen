@@ -48,6 +48,7 @@ import { EOrderDraftStates, EOrderStates, EOrderType } from '@utils/enums';
 import type { TListing } from '@utils/types';
 
 import ModalReachMaxAllowedChanges from '../components/ModalReachMaxAllowedChanges/ModalReachMaxAllowedChanges';
+import { useAutoPickFood } from '../hooks/useAutoPickFood';
 
 import css from './OrderDetail.module.scss';
 
@@ -80,9 +81,10 @@ const OrderDetailPage = () => {
   const sendNotificationModalControl = useBoolean();
   const manageParticipantModalControl = useBoolean();
   const managePickingResultModalControl = useBoolean();
-  const autoPickingControl = useBoolean();
   const automaticConfirmOrderMobileControl = useBoolean();
   const confirmCancelOrderActions = useBoolean();
+
+  const { isAutoPickFood, toggleAutoPickFood } = useAutoPickFood();
   const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
   const {
     query: { orderId, timestamp },
@@ -369,9 +371,9 @@ const OrderDetailPage = () => {
               deliveryHour={deliveryHour}
               mobileModalControl={automaticConfirmOrderMobileControl}
               autoPickingFormInitialValues={{
-                autoPicking: autoPickingControl.value,
+                autoPicking: isAutoPickFood,
               }}
-              handleAutoPickingChange={autoPickingControl.toggle}
+              handleAutoPickingChange={toggleAutoPickFood}
             />
           </RenderWhen>
           <div className={leftPartClasses}>
@@ -424,8 +426,8 @@ const OrderDetailPage = () => {
           <RenderWhen condition={isCreatedByBooker}>
             <div className={css.autoPickingPart}>
               <AutomaticPickingForm
-                initialValues={{ autoPicking: autoPickingControl.value }}
-                handleFieldChange={autoPickingControl.toggle}
+                initialValues={{ autoPicking: isAutoPickFood }}
+                handleFieldChange={toggleAutoPickFood}
                 onSubmit={() => {}}
               />
             </div>
