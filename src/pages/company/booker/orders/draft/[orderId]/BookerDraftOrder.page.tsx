@@ -361,7 +361,6 @@ function BookerDraftOrderPage() {
         (order) => order.resource.restaurant?.menuId,
       );
 
-      dispatch(orderAsyncActions.checkRestaurantStillAvailable({}));
       dispatch(orderAsyncActions.fetchOrderRestaurants({}));
       dispatch(
         orderAsyncActions.fetchMenuListingsByIds({
@@ -369,6 +368,7 @@ function BookerDraftOrderPage() {
         }),
       );
     }
+    dispatch(orderAsyncActions.checkRestaurantStillAvailable({}));
   }, [dispatch, JSON.stringify(orderDetail)]);
 
   useEffect(() => {
