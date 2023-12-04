@@ -33,7 +33,7 @@ const CompanySidebar: React.FC<CompanySidebarProps> = ({ companyName }) => {
           {
             id: 'changePassword',
             label: 'CompanySidebar.passwordSetting',
-            nameLink: personalPaths.changePassword,
+            nameLink: personalPaths.ChangePassword,
             isFirstLevel: true,
           },
         ]
