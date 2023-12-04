@@ -125,38 +125,27 @@
   }
 
   .actionWrapper {
-    flex-wrap: wrap;
-    width: 100%;
-    max-width: 610px;
-    margin: auto;
-
     @include flexCenter;
+    flex-direction: column-reverse;
+    gap: 8px;
 
-    &:last-child {
-      margin-top: 8px;
+    @include viewportSmall {
+      flex-wrap: wrap;
+      flex-direction: row;
+      gap: 28px;
     }
 
     .closeModal {
-      width: 76px;
-      margin-right: 28px;
+      @include viewportSmall {
+        width: 76px;
+        margin-right: 28px;
+      }
     }
 
     .goToHomePage {
-      width: 228px;
-    }
-  }
-
-  @media only screen and (max-width: 575px) {
-    .actionWrapper {
-      flex-direction: column-reverse;
-      gap: 12px;
-
-      .closeModal {
-        margin-right: 0px;
-      }
-
-      .goToHomePage {
-        width: 303px;
+      width: 100%;
+      @include viewportSmall {
+        width: 228px;
       }
     }
   }
