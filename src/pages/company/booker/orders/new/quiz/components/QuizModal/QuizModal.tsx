@@ -82,7 +82,7 @@ const QuizModal: React.FC<QuizModalProps> = (props) => {
           <div className={css.closeBtn} onClick={handleCancel}>
             <IconCloseV2 className={css.closeIcon} />
           </div>
-          <RenderWhen condition={firstTimeOrder}>
+          <RenderWhen condition={!!firstTimeOrder}>
             <div className={css.mobileHeader}>
               {stepList.map((step) => (
                 <div
