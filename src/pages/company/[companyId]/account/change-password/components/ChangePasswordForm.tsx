@@ -109,10 +109,11 @@ const ChangePasswordForm: React.FC<TChangePasswordFormProps> = ({
   const navigateToPasswordRecoverPage = () => {
     router.push(generalPaths.RecoveryPassword);
   };
+  const isDesktopLayout = !(isMobileLayout || isTabletLayout);
 
   return (
     <Form onSubmit={handleSubmit} className={css.root}>
-      {!(isMobileLayout || isTabletLayout) && (
+      {isDesktopLayout && (
         <div className={css.header}>
           <span>
             {intl.formatMessage({
@@ -123,7 +124,7 @@ const ChangePasswordForm: React.FC<TChangePasswordFormProps> = ({
       )}
       <div className={css.formContainer}>
         <div className={css.changePasswordSection}>
-          {!(isMobileLayout || isTabletLayout) && (
+          {isDesktopLayout && (
             <div className={css.sectionTitle}>
               {intl.formatMessage({
                 id: 'CompanySidebar.passwordSetting',
