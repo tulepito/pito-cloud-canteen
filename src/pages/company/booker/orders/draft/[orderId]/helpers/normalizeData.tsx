@@ -62,6 +62,7 @@ export const normalizePlanDetailsToEvent = (
         ETransition.START_DELIVERY,
         ETransition.COMPLETE_DELIVERY,
         ETransition.OPERATOR_CANCEL_AFTER_PARTNER_REJECTED,
+        ETransition.OPERATOR_CANCEL_AFTER_PARTNER_CONFIRMED,
         ETransition.CANCEL_DELIVERY,
         ETransition.REVIEW_RESTAURANT,
       ].includes(lastTransition);
