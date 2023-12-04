@@ -42,21 +42,20 @@ const CompanyCollapsibleRows: React.FC<TCompanyCollapsibleRowsProps> = ({
         })}
       </tr>
       <RenderWhen condition={showRowsController.value}>
-        {columnsControl.map((columnControl) => {
+        {columnsControl.map((columnControl, index) => {
+          const rowKey = `${row.key}_ControllerRow_${index}_${columnControl.key}`;
+
           return (
-            <tr
-              className={css.bodyRowSpecial}
-              key={`${row.key}_${columnControl.key}`}>
-              <td className={css.bodyCell} key="name">
-                <span className={css.cellLabelValue}>
-                  {columnControl.label}
-                </span>
-              </td>
-              <td className={css.bodyCell} key="email">
-                <span className={css.cellValue}>
-                  {row.data[columnControl.key]}
-                </span>
-              </td>
+            <tr className={css.bodyRowSpecial} key={rowKey}>
+              {columns.map((col: TColumn) => {
+                return (
+                  <td className={css.bodyCell} key={col.key}>
+                    {columnControl.render(row.data, false, {
+                      colKey: col.key,
+                    })}
+                  </td>
+                );
+              })}
             </tr>
           );
         })}
@@ -66,7 +65,7 @@ const CompanyCollapsibleRows: React.FC<TCompanyCollapsibleRowsProps> = ({
           <td
             colSpan={columns.length}
             className={classNames(css.bodyCell, css.bodyDeleteCell)}
-            key="email">
+            key={columns[columns.length - 1].key}>
             <div className={classNames(css.columnContainer, css.iconDelete)}>
               <IconDelete onClick={handleDeleteMember} />
             </div>

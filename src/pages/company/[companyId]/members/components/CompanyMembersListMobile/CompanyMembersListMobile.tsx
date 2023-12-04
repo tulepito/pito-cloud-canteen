@@ -155,22 +155,46 @@ const CompanyMembersListMobile: React.FC<
     {
       key: 'group',
       label: intl.formatMessage({ id: 'MembersPage.columnLabel.group' }),
-      render: (data: any) => {
-        return <span>{data.group || '-'}</span>;
+      render: (data: any, _, collapseRowController) => {
+        const { colKey } = collapseRowController ?? {};
+
+        return colKey && colKey === 'name' ? (
+          <span className={css.cellLabelValue}>
+            {intl.formatMessage({ id: 'MembersPage.columnLabel.group' })}
+          </span>
+        ) : (
+          <span className={css.cellValue}>{data.group}</span>
+        );
       },
     },
     {
       key: 'allergy',
       label: intl.formatMessage({ id: 'MembersPage.columnLabel.allergy' }),
-      render: (data: any) => {
-        return <span>{data.allergy || '-'}</span>;
+      render: (data: any, _, collapseRowController) => {
+        const { colKey } = collapseRowController ?? {};
+
+        return colKey && colKey === 'name' ? (
+          <span className={css.cellLabelValue}>
+            {intl.formatMessage({ id: 'MembersPage.columnLabel.allergy' })}
+          </span>
+        ) : (
+          <span className={css.cellValue}>{data.allergy}</span>
+        );
       },
     },
     {
       key: 'nutrition',
       label: intl.formatMessage({ id: 'MembersPage.columnLabel.nutrition' }),
-      render: (data: any) => {
-        return <span>{data.nutrition || '-'}</span>;
+      render: (data: any, _, collapseRowController) => {
+        const { colKey } = collapseRowController ?? {};
+
+        return colKey && colKey === 'name' ? (
+          <span className={css.cellLabelValue}>
+            {intl.formatMessage({ id: 'MembersPage.columnLabel.nutrition' })}
+          </span>
+        ) : (
+          <span className={css.cellValue}>{data.nutrition}</span>
+        );
       },
     },
   ];
@@ -336,7 +360,7 @@ const CompanyMembersListMobile: React.FC<
             onClick={handleOpenNewMembersModal}
             className={css.btnPlusMember}>
             <IconPlusBlackFill className={css.iconPlus} />
-            <FormattedMessage id="AddMorePlan.addMore" />
+            <FormattedMessage id="AddNewMembersModal.modalTitle" />
           </Button>
         </div>
       </div>

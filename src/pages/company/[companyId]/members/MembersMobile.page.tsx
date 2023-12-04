@@ -12,25 +12,23 @@ import CompanyMembersListMobile from './components/CompanyMembersListMobile/Comp
 
 import css from './MembersMobile.module.scss';
 
-const MEMBERS_MOBILE_TAB_KEYS = {
-  members: 'MemberList',
-  groups: 'groupList',
-};
+const MEMBERS_MOBILE_TAB_MEMBER_KEYS = 'MemberList';
+const MEMBERS_MOBILE_TAB_GROUPS_LIST = 'groupList';
 
 const MembersMobilePage = () => {
   const intl = useIntl();
   const router = useRouter();
-  const [currentTab, setCurrentTab] = useState(MEMBERS_MOBILE_TAB_KEYS.members);
+  const [currentTab, setCurrentTab] = useState(MEMBERS_MOBILE_TAB_MEMBER_KEYS);
 
   const handleTabChanged = (params: TTabsItem) => {
-    const { id = MEMBERS_MOBILE_TAB_KEYS.members } = params || {};
+    const { id = MEMBERS_MOBILE_TAB_MEMBER_KEYS } = params || {};
 
     setCurrentTab(id.toString());
   };
 
   const tabItems = [
     {
-      key: MEMBERS_MOBILE_TAB_KEYS.members,
+      key: MEMBERS_MOBILE_TAB_MEMBER_KEYS,
       label: (
         <div className={css.tabLabel}>
           <span>
@@ -45,7 +43,7 @@ const MembersMobilePage = () => {
       },
     },
     {
-      key: MEMBERS_MOBILE_TAB_KEYS.groups,
+      key: MEMBERS_MOBILE_TAB_GROUPS_LIST,
       label: (
         <div className={css.tabLabel}>
           <span>
@@ -81,7 +79,7 @@ const MembersMobilePage = () => {
           items={tabItems as any}
           onChange={handleTabChanged}
           defaultActiveKey={`${
-            currentTab === MEMBERS_MOBILE_TAB_KEYS.members ? 1 : 2
+            currentTab === MEMBERS_MOBILE_TAB_MEMBER_KEYS ? 1 : 2
           }`}
         />
       </div>
