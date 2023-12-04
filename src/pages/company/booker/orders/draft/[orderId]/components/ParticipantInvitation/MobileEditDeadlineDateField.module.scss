@@ -4,6 +4,9 @@
 .label {
   @include textTemplate(14px, 400, 20px);
 }
+.placeholder {
+  color: $neutralGray5;
+}
 
 .mobileDeadlineDateInfo {
   display: flex;

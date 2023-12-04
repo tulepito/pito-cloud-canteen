@@ -52,11 +52,8 @@ const ParticipantInvitation: React.FC<TParticipantInvitationProps> = ({
   const deliveryTime = new Date(startDate || nextStartWeek);
 
   // * prepare deadline date time form initial
-  const defaultDeadlineDate = DateTime.fromMillis(startDate || nextStartWeek)
-    .minus({ days: 2 })
-    .toMillis();
   const deadlineDateTimeInitialValues = {
-    deadlineDate: new Date(deadlineDate).getTime() || defaultDeadlineDate,
+    deadlineDate,
     deadlineHour,
     draftDeadlineHour: deadlineHour,
   };

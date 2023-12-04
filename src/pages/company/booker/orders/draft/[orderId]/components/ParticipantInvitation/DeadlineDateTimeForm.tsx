@@ -73,7 +73,7 @@ const DeadlineDateTimeFormComponent: React.FC<
 
   const selectedDeadlineDate = deadlineDateFormFormValues
     ? new Date(Number(deadlineDateFormFormValues))
-    : DateTime.fromJSDate(new Date()).plus({ days: 2 }).toJSDate();
+    : null;
   const minDeadlineDate = DateTime.fromJSDate(new Date())
     .plus({ days: 1 })
     .toJSDate();
@@ -96,12 +96,12 @@ const DeadlineDateTimeFormComponent: React.FC<
   const saveInfoButtonDisabled =
     !isAnyFieldsChanged || invalid || isDeadlineHourEmpty;
 
-  const formattedDeadlineDate = DateTime.fromMillis(
-    Number(deadlineDateFormFormValues),
-  )
-    .startOf('day')
-    .plus({ ...convertHHmmStringToTimeParts(deadlineHourFromFormValues) })
-    .toFormat("HH:mm, dd 'tháng' MM, yyyy");
+  const formattedDeadlineDate = deadlineDateFormFormValues
+    ? DateTime.fromMillis(Number(deadlineDateFormFormValues))
+        .startOf('day')
+        .plus({ ...convertHHmmStringToTimeParts(deadlineHourFromFormValues) })
+        .toFormat("HH:mm, dd 'tháng' MM, yyyy")
+    : 'Vui lòng chọn thời hạn';
 
   const handleMobileModalClose = () => {
     mobileDeadlineModalControl.setFalse();
@@ -212,7 +212,9 @@ const DeadlineDateTimeFormComponent: React.FC<
         className={css.mobileDeadlineInfo}
         onClick={mobileDeadlineModalControl.setTrue}>
         <IconClock />
-        <div>{formattedDeadlineDate}</div>
+        <div className={deadlineDateFormFormValues ? '' : css.placeholder}>
+          {formattedDeadlineDate}
+        </div>
       </div>
       {sendNotificationButton}
 

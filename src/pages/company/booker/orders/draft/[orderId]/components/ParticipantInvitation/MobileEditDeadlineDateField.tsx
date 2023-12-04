@@ -29,10 +29,10 @@ const MobileEditDeadlineDateField: React.FC<
 }) => {
   const control = useBoolean();
 
-  const formattedDeadlineDate = formatTimestamp(
-    selectedDate?.getTime(),
-    'EEE, dd MMMM, yyyy',
-  );
+  const formattedDeadlineDate =
+    selectedDate !== null
+      ? formatTimestamp(selectedDate?.getTime(), 'EEE, dd MMMM, yyyy')
+      : 'Chọn hạn chọn món';
 
   const handleSubmitDate = () => {
     setSelectedDate(selectedDate);
@@ -50,7 +50,9 @@ const MobileEditDeadlineDateField: React.FC<
         <div className={css.label}>{'Ngày kết thúc'}</div>
         <div className={css.mobileDeadlineDateInfo}>
           <IconCalendar />
-          <div>{formattedDeadlineDate}</div>
+          <div className={initialDeadlineDate !== null ? '' : css.placeholder}>
+            {formattedDeadlineDate}
+          </div>
         </div>
       </div>
 

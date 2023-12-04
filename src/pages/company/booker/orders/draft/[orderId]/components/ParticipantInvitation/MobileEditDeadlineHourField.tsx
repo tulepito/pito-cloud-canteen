@@ -22,7 +22,9 @@ const MobileEditDeadlineHourField: React.FC<
 > = ({ draftDeadlineHour, initialDeadlineHour, onSubmitSelectedHour }) => {
   const control = useBoolean();
 
-  const formattedDeadlineHour = getLabelByKey(TimeOptions, initialDeadlineHour);
+  const formattedDeadlineHour = initialDeadlineHour
+    ? getLabelByKey(TimeOptions, initialDeadlineHour)
+    : 'Chọn hạn chọn món';
 
   const handleSubmitChanges = () => {
     onSubmitSelectedHour();
@@ -35,7 +37,9 @@ const MobileEditDeadlineHourField: React.FC<
         <div className={css.label}>{'Ngày kết thúc'}</div>
         <div className={css.mobileDeadlineHourInfo}>
           <IconCalendar />
-          <div>{formattedDeadlineHour}</div>
+          <div className={initialDeadlineHour ? '' : css.placeholder}>
+            {formattedDeadlineHour}
+          </div>
         </div>
       </div>
 
