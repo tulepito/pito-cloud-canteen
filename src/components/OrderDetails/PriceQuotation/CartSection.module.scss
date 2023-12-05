@@ -3,16 +3,12 @@
 @use '/src/styles/customMediaQueries.scss' as *;
 
 @mixin cartColumnsLayout {
-  padding: 4px 8px;
+  padding: 8px 16px;
   display: flex;
   flex-wrap: nowrap;
   justify-content: space-between;
   flex-direction: row;
   column-gap: 2%;
-
-  @include viewportMedium {
-    padding: 8px 16px;
-  }
 
   & > div {
     word-break: break-word;
@@ -32,6 +28,10 @@
 }
 
 .cartSection {
+  padding-top: 20px;
+}
+
+.mobileLayout {
   padding-top: 11px;
   @include viewportMedium {
     padding-top: 20px;
@@ -48,39 +48,61 @@
   }
 
   .sectionContentContainer {
-    border: 1px solid $neutralGray3;
-    border-radius: 8px;
-    overflow: hidden;
-
     .tableHead {
       @include cartColumnsLayout;
-      background-color: $neutralGray6;
+      padding: 4px 8px;
       @include textTemplate(8px, 700, 1.6);
-      border-bottom: 1px solid $neutralGray5;
-      color: $neutralGray1;
-
       @include viewportMedium {
         font-size: 10px;
+        padding: 8px 16px;
       }
     }
 
     .tableRow {
       @include cartColumnsLayout;
+      padding: 4px 8px;
       @include textTemplate(7px, 400, 1.5);
-      border-bottom: 1px solid $neutralGray3;
-
       @include viewportMedium {
+        padding: 8px 16px;
         font-size: 12px;
       }
 
       &:last-of-type {
-        border-bottom: none;
         @include textTemplate(8px, 700, 10/7);
-
         @include viewportMedium {
           font-size: 14px;
         }
       }
+    }
+  }
+}
+
+.sectionTitle {
+  @include textTemplate(12px, 700, 1.5);
+  margin-bottom: 16px;
+}
+
+.sectionContentContainer {
+  border: 1px solid $neutralGray3;
+  border-radius: 8px;
+  overflow: hidden;
+
+  .tableHead {
+    @include cartColumnsLayout;
+    background-color: $neutralGray6;
+    @include textTemplate(10px, 700, 1.6);
+    border-bottom: 1px solid $neutralGray5;
+    color: $neutralGray1;
+  }
+
+  .tableRow {
+    @include cartColumnsLayout;
+    @include textTemplate(12px, 400, 1.5);
+    border-bottom: 1px solid $neutralGray3;
+
+    &:last-of-type {
+      border-bottom: none;
+      @include textTemplate(14px, 700, 10/7);
     }
   }
 }

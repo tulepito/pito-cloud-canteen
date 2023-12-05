@@ -345,6 +345,7 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
           <div className={css.scrollContainer}>
             <div className={css.topBorder} />
             <PriceQuotation
+              shouldResponsive
               className={css.priceQuotation}
               data={priceQuotationData as any}
             />

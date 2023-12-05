@@ -19,6 +19,7 @@ type TPriceQuotationProps = TDefaultProps & {
   isPartnerQuotation?: boolean;
   vatSetting?: EPartnerVATSetting;
   shouldSkipVAT?: boolean;
+  shouldResponsive?: boolean;
   data: {
     customerData: Partial<TReviewInfoFormValues> & {
       email: string;
@@ -52,6 +53,7 @@ const PriceQuotation: React.FC<TPriceQuotationProps> = ({
   data,
   vatSetting = EPartnerVATSetting.vat,
   className,
+  shouldResponsive = false,
 }) => {
   const {
     customerData,
@@ -61,7 +63,11 @@ const PriceQuotation: React.FC<TPriceQuotationProps> = ({
   } = data;
   const intl = useIntl();
 
-  const classes = classNames(css.root, className);
+  const classes = classNames(
+    css.root,
+    { [css.mobileLayout]: shouldResponsive },
+    className,
+  );
 
   const formattedStartDate = formatTimestamp(startDate, 'dd/MM/yyyy');
   const formattedEndDate = formatTimestamp(endDate, 'dd/MM/yyyy');
@@ -74,12 +80,14 @@ const PriceQuotation: React.FC<TPriceQuotationProps> = ({
     subOrderDate,
     isPartnerQuotation,
     deliveryHour,
+    shouldResponsive,
   };
 
   const cartProps = {
     ...cartData,
     isPartnerQuotation,
     vatSetting,
+    shouldResponsive,
   };
 
   const subOrderDayIndex = subOrderDate
@@ -108,6 +116,7 @@ const PriceQuotation: React.FC<TPriceQuotationProps> = ({
         <OrderDetailSection
           itemId="quoteItem"
           subOrderDate={subOrderDate}
+          shouldResponsive={shouldResponsive}
           {...orderDetailData}
         />
       </div>

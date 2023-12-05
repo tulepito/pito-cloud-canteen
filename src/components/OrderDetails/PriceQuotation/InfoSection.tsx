@@ -17,6 +17,7 @@ type TInfoSectionProps = {
   isPartnerQuotation?: boolean;
   subOrderDate?: number | string;
   deliveryHour?: string;
+  shouldResponsive?: boolean;
 };
 
 const InfoSection: React.FC<TInfoSectionProps> = (props) => {
@@ -30,6 +31,7 @@ const InfoSection: React.FC<TInfoSectionProps> = (props) => {
     startDate,
     endDate,
     isPartnerQuotation = false,
+    shouldResponsive = false,
     subOrderDate,
     deliveryHour,
   } = props;
@@ -39,6 +41,7 @@ const InfoSection: React.FC<TInfoSectionProps> = (props) => {
     <div
       className={classNames(css.infoContainer, {
         [css.partnerQuotation]: isPartnerQuotation,
+        [css.mobileLayout]: shouldResponsive,
       })}
       id={id}>
       {!isPartnerQuotation && (
