@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { Event } from 'react-big-calendar';
 import { shallowEqual } from 'react-redux';
+import classNames from 'classnames';
 import isEmpty from 'lodash/isEmpty';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
@@ -487,7 +488,11 @@ function BookerDraftOrderPage() {
             </div>
             <div className={css.subOrderMobileWrapper}>
               <RenderWhen condition={walkthroughEnable}>
-                <div className={css.subOrderDate}>
+                <div
+                  className={classNames(
+                    css.subOrderDate,
+                    !isGroupOrder && css.largePadding,
+                  )}>
                   <RenderWhen condition={!!sampleSubOrder}>
                     <MealPlanCard
                       event={sampleSubOrder as Event}

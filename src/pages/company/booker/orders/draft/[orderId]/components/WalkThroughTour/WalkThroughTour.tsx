@@ -298,6 +298,12 @@ const WalkThroughTourProvider: React.FC<TWalkThroughTourProps> = (props) => {
     );
   };
 
+  const handleClickClose = ({ setIsOpen }: any) => {
+    setIsOpen(false);
+    // onCloseTour();
+    dispatch(BookerDraftOrderPageActions.setWalkthroughStep(-1));
+  };
+
   if (isMobileLayout || isTabletLayout) {
     return (
       <TourProvider
@@ -311,6 +317,7 @@ const WalkThroughTourProvider: React.FC<TWalkThroughTourProps> = (props) => {
         showDots={false}
         showBadge={false}
         onClickMask={() => {}}
+        onClickClose={handleClickClose}
         steps={mobileTourConfig as any}>
         {props.children}
       </TourProvider>
@@ -329,6 +336,7 @@ const WalkThroughTourProvider: React.FC<TWalkThroughTourProps> = (props) => {
       showDots={false}
       showBadge={false}
       onClickMask={() => {}}
+      onClickClose={handleClickClose}
       steps={tourConfig as any}>
       {props.children}
     </TourProvider>

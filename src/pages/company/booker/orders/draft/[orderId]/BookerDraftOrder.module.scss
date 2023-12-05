@@ -82,6 +82,10 @@
     @include viewportLarge {
       display: none;
     }
+
+    &.largePadding {
+      padding-top: 64px;
+    }
   }
 
   .addMealWrapper {
