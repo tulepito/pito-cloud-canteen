@@ -5,6 +5,12 @@
 .fieldContainer {
   display: flex;
   column-gap: 12px;
+
+  @include viewportMedium {
+    & > div:nth-child(1) {
+      min-width: 240px;
+    }
+  }
 }
 
 .titleContainer {

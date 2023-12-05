@@ -27,14 +27,14 @@
 
   .autoPickingPart {
     margin-top: 20px;
-    padding: 20px;
+    padding: 20px 16px;
     border-radius: 16px;
     border: 1px solid $neutralGray3;
 
     @include viewportMedium {
+      padding: 16px;
       margin-top: 0;
       border-color: $neutralGray5;
-      padding: 20px;
     }
   }
 
