@@ -433,7 +433,12 @@ function BookerDraftOrderPage() {
                 </div>
               </div>
             </div>
-            <Stepper steps={BOOKER_CREATE_GROUP_ORDER_STEPS} currentStep={1} />
+            <RenderWhen condition={isGroupOrder}>
+              <Stepper
+                steps={BOOKER_CREATE_GROUP_ORDER_STEPS}
+                currentStep={1}
+              />
+            </RenderWhen>
             <div className={css.orderTitleWrapper}>
               <div className={css.title}>Đơn hàng #{orderTitle}</div>
               <Badge

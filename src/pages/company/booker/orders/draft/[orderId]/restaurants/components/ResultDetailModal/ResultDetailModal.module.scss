@@ -22,6 +22,9 @@
 
 .modalHeader {
   position: relative;
+  @include flexAlign(flex-end, flex-start);
+  flex-direction: column;
+  gap: 12px;
 
   @include viewportLarge {
     position: absolute;
@@ -43,23 +46,12 @@
   }
 
   .iconClose {
-    position: absolute;
-    top: 8px;
-    right: 8px;
+    position: relative;
     width: 24px;
     height: 24px;
-    z-index: 1;
 
     path {
-      fill: $neutralGray1;
-    }
-
-    @include viewportLarge {
-      position: relative;
-
-      path {
-        fill: $neutralGray7;
-      }
+      fill: $neutralGray7;
     }
   }
 }
@@ -103,7 +95,7 @@
 
 .contentScroll {
   overflow-y: overlay;
-  max-height: 36vh;
+  max-height: 56vh;
 
   @include viewportMedium {
     padding: 0 18px;
