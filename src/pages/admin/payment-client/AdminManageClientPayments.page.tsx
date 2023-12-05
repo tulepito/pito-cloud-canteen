@@ -211,8 +211,9 @@ const AdminManageClientPaymentsPage = () => {
 
   const companyBookers = companyMembers.filter(
     (member) =>
-      member.permission === ECompanyPermission.owner ||
-      member.permission === ECompanyPermission.booker,
+      !!member.id &&
+      (member.permission === ECompanyPermission.owner ||
+        member.permission === ECompanyPermission.booker),
   );
 
   const title = intl.formatMessage({
