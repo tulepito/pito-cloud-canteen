@@ -11,13 +11,14 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { useViewport } from '@hooks/useViewport';
 import QuizFlow from '@pages/company/booker/orders/new/quiz/QuizFlow';
 import { BookerCompaniesThunks } from '@redux/slices/BookerCompanies.slice';
-import { companyPaths } from '@src/paths';
+import { companyPaths, personalPaths } from '@src/paths';
 import { User } from '@utils/data';
 import type { TUser } from '@utils/types';
 
 import CompanyFooter from './CompanyFooter/CompanyFooter';
 import CompanyHeaderWrapper from './CompanyHeaderWrapper/CompanyHeaderWrapper';
 import CompanyMainContent from './CompanyMainContent/CompanyMainContent';
+import CompanyNavBar from './CompanyNavBar/CompanyNavBar';
 import CompanySidebar from './CompanySidebar/CompanySidebar';
 import {
   shouldHideCompanyFooter,
@@ -152,6 +153,13 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
 
   const companyHeaderLinkData: any[] = [];
 
+  const shouldShowCompanyNavBar = [
+    companyPaths.Home,
+    companyPaths.ManageOrders,
+    companyPaths.CreateNewOrder,
+    personalPaths.Account,
+  ];
+
   useEffect(() => {
     dispatch(BookerCompaniesThunks.fetchBookerCompanies());
   }, [dispatch]);
@@ -206,6 +214,9 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
       {!shouldHideFooter && <CompanyFooter />}
       <RenderWhen condition={quizFlowOpen}>
         <QuizFlow />
+      </RenderWhen>
+      <RenderWhen condition={shouldShowCompanyNavBar.includes(pathname)}>
+        <CompanyNavBar />
       </RenderWhen>
     </>
   );
