@@ -114,11 +114,7 @@ const CompanyMembersListMobile: React.FC<
         .formatMessage({ id: 'MembersPage.columnLabel.name' })
         .toUpperCase(),
       render: (data: any) => {
-        return (
-          <div className={css.columnContainer}>
-            <span className={css.cellNameValue}>{data.name}</span>
-          </div>
-        );
+        return <span className={css.cellNameValue}>{data.name}</span>;
       },
     },
     {
@@ -129,18 +125,16 @@ const CompanyMembersListMobile: React.FC<
       render: ({ email }, _, collapseRowController) => {
         return (
           <div className={css.columnContainer}>
-            <div className={css.emailClassName}>
-              <span className={css.cellValue}>{email}</span>
-              <div className={css.iconArrow}>
-                <IconArrow
-                  direction="down"
-                  onClick={collapseRowController?.toggle}
-                  className={classNames(
-                    css.iconArrow,
-                    collapseRowController?.value && css.rotate,
-                  )}
-                />
-              </div>
+            <span className={classNames(css.cellValue)}>{email}</span>
+            <div className={css.iconArrow}>
+              <IconArrow
+                direction="down"
+                onClick={collapseRowController?.toggle}
+                className={classNames(
+                  css.iconArrow,
+                  collapseRowController?.value && css.rotate,
+                )}
+              />
             </div>
           </div>
         );
@@ -318,25 +312,21 @@ const CompanyMembersListMobile: React.FC<
               ))}
             </tr>
           </thead>
-          {fetchCompanyInfoInProgress ? (
-            <tbody>
+          <tbody>
+            {fetchCompanyInfoInProgress ? (
               <tr>
                 <td colSpan={columns.length} className={css.emptyCell}>
                   Loading...
                 </td>
               </tr>
-            </tbody>
-          ) : formattedCompanyMembers.length === 0 ? (
-            <tbody>
+            ) : formattedCompanyMembers.length === 0 ? (
               <tr>
                 <td colSpan={columns.length} className={css.emptyCell}>
                   <FormattedMessage id="Table.noResults" />
                 </td>
               </tr>
-            </tbody>
-          ) : (
-            <tbody>
-              {formattedCompanyMembers.map((row: TRowData) => {
+            ) : (
+              formattedCompanyMembers.map((row: TRowData) => {
                 return (
                   <CompanyCollapsibleRows
                     key={row.key}
@@ -347,21 +337,23 @@ const CompanyMembersListMobile: React.FC<
                     columnsControl={columnsControl}
                   />
                 );
-              })}
-            </tbody>
-          )}
+              })
+            )}
+            <tr>
+              <td colSpan={columns.length} className={css.bodyRowAddNewMembers}>
+                <Button
+                  variant="inline"
+                  type="button"
+                  size="large"
+                  onClick={handleOpenNewMembersModal}
+                  className={css.btnPlusMember}>
+                  <IconPlusBlackFill className={css.iconPlus} />
+                  <FormattedMessage id="AddNewMembersModal.modalTitle" />
+                </Button>
+              </td>
+            </tr>
+          </tbody>
         </table>
-        <div className={css.buttonPlusContainer}>
-          <Button
-            variant="inline"
-            type="button"
-            size="large"
-            onClick={handleOpenNewMembersModal}
-            className={css.btnPlusMember}>
-            <IconPlusBlackFill className={css.iconPlus} />
-            <FormattedMessage id="AddNewMembersModal.modalTitle" />
-          </Button>
-        </div>
       </div>
 
       <AddCompanyMembersSlideModal

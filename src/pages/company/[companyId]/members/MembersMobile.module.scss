@@ -1,5 +1,6 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
 
 .header {
   border-bottom: 1px solid $neutralGray3;
@@ -15,7 +16,9 @@
 }
 
 .tabContainer {
-  padding: 16px 12px 10px 12px;
+  @include viewportXSmall {
+    padding: 16px 12px 10px 12px;
+  }
 }
 
 .headerWrapperClassName {
