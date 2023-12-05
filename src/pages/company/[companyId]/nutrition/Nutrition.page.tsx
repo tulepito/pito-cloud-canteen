@@ -47,7 +47,6 @@ const NutritionPage = () => {
     (state) => state.company.favoriteFood,
     shallowEqual,
   );
-
   const fetchCompanyInfoInProgress = useAppSelector(
     (state) => state.company.fetchCompanyInfoInProgress,
   );
@@ -70,17 +69,21 @@ const NutritionPage = () => {
     };
   }, [favoriteFood, favoriteRestaurants, nutritions, mealType]);
 
-  const handleSubmit = (values: TNutritionFormValues) => {
-    const publicData = {
-      ...values,
-    };
-    dispatch(companyThunks.updateCompanyAccount({ publicData }));
-  };
   const navigateAccountPersonalPage = () => {
     router.push({
       pathname: personalPaths.Account,
       query: { companyId: 'personal' },
     });
+  };
+
+  const handleSubmit = async (values: TNutritionFormValues) => {
+    const publicData = {
+      ...values,
+    };
+    await dispatch(companyThunks.updateCompanyAccount({ publicData }));
+    if (isMobileLayout || isTabletLayout) {
+      navigateAccountPersonalPage();
+    }
   };
 
   return (
