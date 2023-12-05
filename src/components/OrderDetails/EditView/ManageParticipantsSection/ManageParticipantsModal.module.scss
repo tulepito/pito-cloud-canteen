@@ -17,53 +17,56 @@
   @include viewportMedium {
     flex-basis: 700px !important;
   }
+}
 
-  .participantsContainer {
-    max-height: 220px;
-    overflow: hidden auto;
+.participantsContainer {
+  max-height: 220px;
+  overflow: hidden auto;
 
+  @include viewportMedium {
+    max-height: 436px;
+  }
+
+  .rawParticipants {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 12px;
+
+    .cardWrapper {
+      flex-basis: calc(50% - 6px);
+    }
+  }
+
+  .groupContainer {
+    display: flex;
+    flex-direction: column;
+    border: none;
+    padding: 0;
+    margin: 4px 0 20px;
+    gap: 20px;
+    height: fit-content;
+
+    button {
+      min-height: unset;
+      margin: 0;
+    }
+
+    .groupName {
+      @include textTemplate(14px, 500, 24px);
+      letter-spacing: 0.02;
+
+      .name {
+        @include textTemplate(14px, 700, 20px);
+        letter-spacing: 0;
+      }
+    }
+  }
+
+  .participantCard {
+    flex-basis: 100%;
     @include viewportMedium {
-      max-height: 436px;
-    }
-
-    .rawParticipants {
-      display: flex;
-      flex-wrap: wrap;
-      flex-direction: row;
-      justify-content: space-between;
-      gap: 12px;
-
-      .cardWrapper {
-        flex-basis: calc(50% - 6px);
-      }
-    }
-
-    .groupContainer {
-      display: flex;
-      flex-direction: column;
-      border: none;
-      padding: 0;
-      margin: 4px 0 20px;
-      gap: 20px;
-      height: fit-content;
-
-      button {
-        min-height: unset;
-        margin: 0;
-      }
-
-      .groupName {
-        @include textTemplate(14px, 500, 24px);
-        letter-spacing: 0.02;
-
-        .name {
-          @include textTemplate(14px, 700, 20px);
-          letter-spacing: 0;
-        }
-      }
-    }
-
-    .participantCard {
       flex-basis: calc(50% - 6px);
     }
   }
