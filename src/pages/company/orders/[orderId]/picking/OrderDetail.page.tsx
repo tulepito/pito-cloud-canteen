@@ -392,7 +392,7 @@ const OrderDetailPage = () => {
             isOpen={managePickingResultModalControl.value}
             onClose={managePickingResultModalControl.setFalse}
             data={reviewViewData.reviewResultData}
-            onDownloadReviewOrderResults={handleDownloadPriceQuotation}
+            onDownloadReviewOrderResults={onDownloadReviewOrderResults}
           />
           <div className={rightPartClasses}>
             <OrderDeadlineCountdownSection
@@ -606,7 +606,7 @@ const OrderDetailPage = () => {
     if (isCreatedByBooker && !isNormalOrder) {
       automaticConfirmOrderMobileControl.setTrue();
     }
-  }, []);
+  }, [isCreatedByBooker, isNormalOrder]);
 
   const goHomeIcon = <GoHomeIcon control={confirmGoHomeControl} />;
   const moreOptionsIcon = (
