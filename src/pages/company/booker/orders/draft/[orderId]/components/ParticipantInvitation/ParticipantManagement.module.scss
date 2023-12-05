@@ -47,6 +47,10 @@
   width: fit-content;
   bottom: 180px;
 
+  @include viewportMedium {
+    display: none;
+  }
+
   .mobileAlertMessage {
     @include textTemplate(14px, 700, 20px);
   }
