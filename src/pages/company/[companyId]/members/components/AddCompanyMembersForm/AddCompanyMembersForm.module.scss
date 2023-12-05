@@ -4,9 +4,13 @@
 
 .submitBtn {
   margin: 40px auto 0;
-  width: 400px;
   height: 48px;
   @include text(16px);
+  width: 100%;
+
+  @include viewportSmall {
+    width: 400px;
+  }
 }
 
 .skeletonWrapper {

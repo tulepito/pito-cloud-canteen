@@ -270,9 +270,6 @@ const MembersPage = () => {
           <h2 className={css.title}>
             {intl.formatMessage({ id: 'MembersPage.membersTitle' })}
           </h2>
-          {/* <p className={css.description}>
-            {intl.formatMessage({ id: 'MembersPage.membersDescription' })}
-          </p> */}
         </div>
         <div className={css.rightHeader}>
           <Button className={css.addMemberBtn} onClick={onAddMembersModalOpen}>

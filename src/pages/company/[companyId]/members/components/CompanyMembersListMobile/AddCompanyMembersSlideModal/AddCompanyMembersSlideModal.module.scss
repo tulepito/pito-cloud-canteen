@@ -1,5 +1,6 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
 
 .modalContainer.modalContainer {
   flex-basis: 700px;
@@ -20,7 +21,11 @@
 
 .modalFooter {
   .cancelBtn {
+    width: 100%;
     margin: 16px auto 0;
-    width: 400px;
+
+    @include viewportSmall {
+      width: 400px;
+    }
   }
 }
