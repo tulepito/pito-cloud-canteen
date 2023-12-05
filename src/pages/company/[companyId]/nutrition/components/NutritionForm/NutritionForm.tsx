@@ -97,48 +97,54 @@ const NutritionFormComponent: React.FC<TNutritionFormComponentProps> = (
   const favoriteRestaurantTableData = useMemo<TRowData[]>(
     () =>
       favoriteRestaurants.reduce((result, restaurant) => {
-        return removedFavoriteRestaurantIds.includes(
-          Listing(restaurant).getId(),
-        )
-          ? result
-          : [
-              ...result,
-              {
-                key: Listing(restaurant).getId(),
-                data: {
-                  id: Listing(restaurant).getId(),
-                  title: Listing(restaurant).getAttributes().title,
-                  category: Listing(restaurant)
-                    .getPublicData()
-                    ?.categories?.slice(0, 3)
-                    .map(
-                      (category: string) =>
-                        FOOD_CATEGORY_OPTIONS.find(
-                          (item) => item.key === category,
-                        )?.label,
-                    )
-                    .join(', '),
-                },
-              },
-            ];
+        const restaurantListing = Listing(restaurant);
+        const restaurantId = restaurantListing.getId();
+        if (removedFavoriteRestaurantIds.includes(restaurantId)) {
+          return result;
+        }
+        const categoryValue = restaurantListing
+          .getPublicData()
+          ?.categories?.slice(0, 3)
+          .map(
+            (category: string) =>
+              FOOD_CATEGORY_OPTIONS.find((item) => item.key === category)
+                ?.label,
+          )
+          .join(', ');
+
+        return [
+          ...result,
+          {
+            key: restaurantId,
+            data: {
+              id: restaurantId,
+              title: restaurantListing.getAttributes().title,
+              category: categoryValue,
+            },
+          },
+        ];
       }, []),
     [favoriteRestaurants, removedFavoriteRestaurantIds],
   );
   const favoriteFoodTableData = useMemo<TRowData[]>(
     () =>
       favoriteFood.reduce((result, food) => {
-        return removedFavoriteFoodIds.includes(Listing(food).getId())
-          ? result
-          : [
-              ...result,
-              {
-                key: Listing(food).getId(),
-                data: {
-                  id: Listing(food).getId(),
-                  title: Listing(food).getAttributes().title,
-                },
-              },
-            ];
+        const foodListing = Listing(food);
+        const foodId = foodListing.getId();
+        if (removedFavoriteFoodIds.includes(foodId)) {
+          return result;
+        }
+
+        return [
+          ...result,
+          {
+            key: foodId,
+            data: {
+              id: foodId,
+              title: foodListing.getAttributes().title,
+            },
+          },
+        ];
       }, []),
     [favoriteFood, removedFavoriteFoodIds],
   );
