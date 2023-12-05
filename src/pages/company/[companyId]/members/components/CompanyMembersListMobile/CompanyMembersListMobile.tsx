@@ -206,19 +206,18 @@ const CompanyMembersListMobile: React.FC<
         const memberGroupIds = groupList.reduce(
           (groupIds: string[], curr: TObject) => {
             const { members = [], id: groupId } = curr || {};
+            const memberResult = typeof members.find(
+              ({
+                id: memberIdFromGroup,
+                email: memberEmailFromGroup,
+              }: TObject) => {
+                return (
+                  memberIdFromGroup === id || memberEmailFromGroup === email
+                );
+              },
+            );
 
-            if (
-              typeof members.find(
-                ({
-                  id: memberIdFromGroup,
-                  email: memberEmailFromGroup,
-                }: TObject) => {
-                  return (
-                    memberIdFromGroup === id || memberEmailFromGroup === email
-                  );
-                },
-              ) !== 'undefined'
-            ) {
+            if (typeof memberResult !== 'undefined') {
               return [...groupIds, groupId];
             }
 
@@ -231,6 +230,21 @@ const CompanyMembersListMobile: React.FC<
           member.attributes.profile?.firstName || ''
         }`;
 
+        const allergyValue =
+          User(member)
+            .getPublicData()
+            ?.allergies?.map((allergy: string) =>
+              getLabelByKey(ALLERGIES_OPTIONS, allergy),
+            )
+            .join(', ') || [];
+        const nutritionValue =
+          User(member)
+            .getPublicData()
+            ?.nutritions?.map((nutrition: string) =>
+              getLabelByKey(nutritions, nutrition),
+            )
+            ?.join(', ') || [];
+
         return [
           ...result,
           {
@@ -241,20 +255,8 @@ const CompanyMembersListMobile: React.FC<
               email,
               isParent: true,
               group: getGroupNames(memberGroupIds, groupList),
-              allergy:
-                User(member)
-                  .getPublicData()
-                  ?.allergies?.map((allergy: string) =>
-                    getLabelByKey(ALLERGIES_OPTIONS, allergy),
-                  )
-                  .join(', ') || [],
-              nutrition:
-                User(member)
-                  .getPublicData()
-                  ?.nutritions?.map((nutrition: string) =>
-                    getLabelByKey(nutritions, nutrition),
-                  )
-                  ?.join(', ') || [],
+              allergy: allergyValue,
+              nutrition: nutritionValue,
             },
           },
         ];
@@ -338,8 +340,8 @@ const CompanyMembersListMobile: React.FC<
             <tbody>
               {formattedCompanyMembers.map((row: TRowData) => {
                 return (
-                  // eslint-disable-next-line react/jsx-key
                   <CompanyCollapsibleRows
+                    key={row.key}
                     bookerMemberEmails={bookerMemberEmails}
                     onDeleteMember={onDeleteMember}
                     row={row}
