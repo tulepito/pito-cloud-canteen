@@ -19,8 +19,12 @@
   }
 
   .participantsContainer {
-    max-height: 436px;
+    max-height: 220px;
     overflow: hidden auto;
+
+    @include viewportMedium {
+      max-height: 436px;
+    }
 
     .rawParticipants {
       display: flex;
