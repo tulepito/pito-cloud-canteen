@@ -116,9 +116,7 @@ const CompanyMembersListMobile: React.FC<
       render: (data: any) => {
         return (
           <div className={css.columnContainer}>
-            <div>
-              <span className={css.cellNameValue}>{data.name}</span>
-            </div>
+            <span className={css.cellNameValue}>{data.name}</span>
           </div>
         );
       },
