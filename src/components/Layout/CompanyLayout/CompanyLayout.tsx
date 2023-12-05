@@ -11,7 +11,7 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { useViewport } from '@hooks/useViewport';
 import QuizFlow from '@pages/company/booker/orders/new/quiz/QuizFlow';
 import { BookerCompaniesThunks } from '@redux/slices/BookerCompanies.slice';
-import { companyPaths } from '@src/paths';
+import { companyPaths, personalPaths } from '@src/paths';
 import { User } from '@utils/data';
 import type { TUser } from '@utils/types';
 
@@ -157,7 +157,7 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
     companyPaths.Home,
     companyPaths.ManageOrders,
     companyPaths.CreateNewOrder,
-    companyPaths.Account,
+    personalPaths.Account,
   ];
 
   useEffect(() => {
