@@ -293,6 +293,14 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
         customHeader={
           <div className={css.modalHeader}>
             <IconClose className={css.iconClose} onClick={onClose} />
+          </div>
+        }>
+        <ResultDetailHeader
+          restaurant={currentRestaurant!}
+          numberSelectedDish={selectedFoods.length}
+        />
+        <div className={css.contentScroll}>
+          <div className={css.coverImageWrapper}>
             <div className={css.coverImage}>
               <ResponsiveImage
                 className={css.restaurantCover}
@@ -305,12 +313,6 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
               />
             </div>
           </div>
-        }>
-        <ResultDetailHeader
-          restaurant={currentRestaurant!}
-          numberSelectedDish={selectedFoods.length}
-        />
-        <div className={css.contentScroll}>
           <div className={css.content}>
             <div className={css.coverImage}>
               <ResponsiveImage
