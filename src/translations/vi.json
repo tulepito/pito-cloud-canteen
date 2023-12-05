@@ -1598,7 +1598,7 @@
   "SectionOrderPanel.sectionTitle": "Thực đơn của bạn",
   "SectionOrderPanel.successModal.confirmBtn": "Tiếp tục chọn món",
   "SectionOrderPanel.successModal.description": "Bạn vẫn có thể chọn lại món trước",
-  "SectionOrderPanel.successModal.goToHomePage": "Về Lịch của tôi",
+  "SectionOrderPanel.successModal.goToHomePage": "Về lịch của tôi",
   "SectionOrderPanel.successModal.title": "Đặt món thành công",
   "SectionRestaurantHero.orderDayMessage": "Thứ {weekDay}, {fullDay}",
   "SelectFoodForm.findFoodByName": "Tìm kiếm món ăn",
