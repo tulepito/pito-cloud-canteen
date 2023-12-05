@@ -402,6 +402,15 @@ const OrderDetailPage = () => {
               data={editViewData.countdownSectionData}
               ableToUpdateOrder={ableToUpdateOrder}
             />
+            <RenderWhen condition={isCreatedByBooker}>
+              <div className={css.autoPickingPart}>
+                <AutomaticPickingForm
+                  initialValues={{ autoPicking: isAutoPickFood }}
+                  handleFieldChange={toggleAutoPickFood}
+                  onSubmit={() => {}}
+                />
+              </div>
+            </RenderWhen>
             <OrderLinkSection
               className={css.mobileContainer}
               data={editViewData.linkSectionData}
@@ -423,15 +432,7 @@ const OrderDetailPage = () => {
               />
             </RenderWhen>
           </div>
-          <RenderWhen condition={isCreatedByBooker}>
-            <div className={css.autoPickingPart}>
-              <AutomaticPickingForm
-                initialValues={{ autoPicking: isAutoPickFood }}
-                handleFieldChange={toggleAutoPickFood}
-                onSubmit={() => {}}
-              />
-            </div>
-          </RenderWhen>
+
           <RenderWhen.False>
             <div
               className={
