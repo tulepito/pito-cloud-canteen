@@ -14,10 +14,12 @@
   }
 
   .avatar {
-    height: 128px;
     @include flexAlign(center, center);
     flex-direction: column;
     gap: 16px;
+    @include viewportSmall {
+      height: 128px;
+    }
 
     .uploadAvatarWrapper {
       .label {
