@@ -88,7 +88,7 @@ const ParticipantManagement: React.FC<TParticipantManagementProps> = () => {
           }),
         );
 
-        setMessage(
+        const newMessage = (
           <span>
             Đã thêm{' '}
             {needHandleItems.length > 1 ? (
@@ -97,13 +97,15 @@ const ParticipantManagement: React.FC<TParticipantManagementProps> = () => {
               'email'
             )}{' '}
             vào danh sách
-          </span>,
+          </span>
         );
+
+        setMessage(newMessage);
 
         if (isMobileLayout) {
           mobileAlertControl.setTrue();
         } else {
-          toast(message, successToastOptions);
+          toast(newMessage, successToastOptions);
         }
       }
     }
