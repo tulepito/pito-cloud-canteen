@@ -2,7 +2,7 @@ import classNames from 'classnames';
 
 import Button from '@components/Button/Button';
 import FieldRadioButton from '@components/FormFields/FieldRadioButton/FieldRadioButton';
-import IconCalendar from '@components/Icons/IconCalender/IconCalender';
+import IconClock from '@components/Icons/IconClock/IconClock';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import SlideModal from '@components/SlideModal/SlideModal';
 import useBoolean from '@hooks/useBoolean';
@@ -34,9 +34,9 @@ const MobileEditDeadlineHourField: React.FC<
   return (
     <>
       <div className={css.mobileInfoContainer} onClick={control.setTrue}>
-        <div className={css.label}>{'Ngày kết thúc'}</div>
+        <div className={css.label}>{'Giờ kết thúc'}</div>
         <div className={css.mobileDeadlineHourInfo}>
-          <IconCalendar />
+          <IconClock />
           <div className={initialDeadlineHour ? '' : css.placeholder}>
             {formattedDeadlineHour}
           </div>
