@@ -185,21 +185,24 @@ const ContactPointProfileFormComponent: React.FC<
             }
 
             return (
-              <div className={css.uploadAvatarWrapper}>
-                <label ref={imageLabelRef} className={css.label} htmlFor={id}>
-                  {label}
-                </label>
-                <input
-                  accept={accept}
-                  id={id}
-                  name={name}
-                  className={css.uploadAvatarInput}
-                  disabled={disabled}
-                  onChange={onChange}
-                  type={type}
-                />
+              <>
+                <div className={css.uploadAvatarWrapper}>
+                  <label ref={imageLabelRef} className={css.label} htmlFor={id}>
+                    {label}
+                  </label>
+                  <input
+                    accept={accept}
+                    id={id}
+                    name={name}
+                    className={css.uploadAvatarInput}
+                    disabled={disabled}
+                    onChange={onChange}
+                    type={type}
+                  />
+                </div>
+
                 {error}
-              </div>
+              </>
             );
           }}
         </Field>

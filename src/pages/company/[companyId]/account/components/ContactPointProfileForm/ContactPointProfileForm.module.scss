@@ -15,6 +15,9 @@
 
   .avatar {
     height: 128px;
+    @include flexAlign(center, center);
+    flex-direction: column;
+    gap: 16px;
 
     .uploadAvatarWrapper {
       .label {
@@ -44,7 +47,6 @@
     }
 
     .avatarPlaceholder {
-      // width: 128px;
       height: 128px;
       border-radius: 100%;
       position: relative;
