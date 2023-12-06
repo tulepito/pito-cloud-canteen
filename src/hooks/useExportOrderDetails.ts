@@ -155,7 +155,7 @@ const useExportOrderDetails = (options?: {
     const ws = XLSX.utils.json_to_sheet(preparedData);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'SheetJS');
-    XLSX.writeFile(wb, `${title}.xlsx`);
+    XLSX.writeFileXLSX(wb, `${title}.xlsx`, { type: 'binary' });
   }, [
     JSON.stringify(draftOrderDetail),
     JSON.stringify(participantDataMap),
