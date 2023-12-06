@@ -198,7 +198,7 @@ const CompanyMembersListMobile: React.FC<
         const memberGroupIds = groupList.reduce(
           (groupIds: string[], curr: TObject) => {
             const { members = [], id: groupId } = curr || {};
-            const memberResult = typeof members.find(
+            const memberResult = members.find(
               ({
                 id: memberIdFromGroup,
                 email: memberEmailFromGroup,
