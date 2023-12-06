@@ -776,17 +776,17 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
       );
 
       await dispatch(
-        orderAsyncActions.handleDeleteOldDataAfterEditInProgressOrder({
-          orderId,
-          planId,
-        }),
-      );
-      await dispatch(
         orderAsyncActions.handleSendEditInProgressOrderDetailNotificationToPartner(
           { orderId, orderDetail: editedSubOrders },
         ),
       );
     }
+    await dispatch(
+      orderAsyncActions.handleDeleteOldDataAfterEditInProgressOrder({
+        orderId,
+        planId,
+      }),
+    );
     dispatch(clearDraftEditOrder());
   };
 
