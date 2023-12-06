@@ -300,7 +300,7 @@ const WalkThroughTourProvider: React.FC<TWalkThroughTourProps> = (props) => {
 
   const handleClickClose = ({ setIsOpen }: any) => {
     setIsOpen(false);
-    // onCloseTour();
+    onCloseTour();
     dispatch(BookerDraftOrderPageActions.setWalkthroughStep(-1));
   };
 
