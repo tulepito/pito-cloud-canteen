@@ -114,7 +114,11 @@ const CompanyMembersListMobile: React.FC<
         .formatMessage({ id: 'MembersPage.columnLabel.name' })
         .toUpperCase(),
       render: (data: any) => {
-        return <span className={css.cellNameValue}>{data.name}</span>;
+        return (
+          <div className={css.columnContainer}>
+            <span className={css.cellNameValue}>{data.name}</span>
+          </div>
+        );
       },
     },
     {
@@ -125,7 +129,9 @@ const CompanyMembersListMobile: React.FC<
       render: ({ email }, _, collapseRowController) => {
         return (
           <div className={css.columnContainer}>
-            <span className={classNames(css.cellValue)}>{email}</span>
+            <div className={css.cellValue}>
+              <span>{email}</span>
+            </div>
             <div className={css.iconArrow}>
               <IconArrow
                 direction="down"
@@ -150,11 +156,15 @@ const CompanyMembersListMobile: React.FC<
         const { colKey } = collapseRowController ?? {};
 
         return colKey && colKey === 'name' ? (
-          <span className={css.cellLabelValue}>
-            {intl.formatMessage({ id: 'MembersPage.columnLabel.group' })}
-          </span>
+          <div className={css.cellLabelValue}>
+            <span>
+              {intl.formatMessage({ id: 'MembersPage.columnLabel.group' })}
+            </span>
+          </div>
         ) : (
-          <span className={css.cellValue}>{data.group}</span>
+          <div className={css.cellValue}>
+            <span>{data.group}</span>
+          </div>
         );
       },
     },
@@ -165,11 +175,15 @@ const CompanyMembersListMobile: React.FC<
         const { colKey } = collapseRowController ?? {};
 
         return colKey && colKey === 'name' ? (
-          <span className={css.cellLabelValue}>
-            {intl.formatMessage({ id: 'MembersPage.columnLabel.allergy' })}
-          </span>
+          <div className={css.cellLabelValue}>
+            <span>
+              {intl.formatMessage({ id: 'MembersPage.columnLabel.allergy' })}
+            </span>
+          </div>
         ) : (
-          <span className={css.cellValue}>{data.allergy}</span>
+          <div className={css.cellValue}>
+            <span className={css.cellValue}>{data.allergy}</span>
+          </div>
         );
       },
     },
@@ -180,11 +194,15 @@ const CompanyMembersListMobile: React.FC<
         const { colKey } = collapseRowController ?? {};
 
         return colKey && colKey === 'name' ? (
-          <span className={css.cellLabelValue}>
-            {intl.formatMessage({ id: 'MembersPage.columnLabel.nutrition' })}
-          </span>
+          <div className={css.cellLabelValue}>
+            <span>
+              {intl.formatMessage({ id: 'MembersPage.columnLabel.nutrition' })}
+            </span>
+          </div>
         ) : (
-          <span className={css.cellValue}>{data.nutrition}</span>
+          <div className={css.cellValue}>
+            <span className={css.cellValue}>{data.nutrition}</span>
+          </div>
         );
       },
     },

@@ -33,7 +33,8 @@
         @include flexAlign(flex-start, space-between);
 
         .iconArrow {
-          align-self: flex-end;
+          align-self: center;
+          justify-self: center;
         }
       }
     }
@@ -107,4 +108,10 @@
 .cellNameValue {
   @include textTemplate(16px, 800, 24px);
   color: $neutralGray7;
+}
+
+.cellValue,
+.cellNameValue {
+  max-width: 138px;
+  word-wrap: break-word;
 }

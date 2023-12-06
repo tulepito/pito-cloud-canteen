@@ -16,9 +16,7 @@
 }
 
 .tabContainer {
-  @include viewportXSmall {
-    padding: 16px 12px 10px 12px;
-  }
+  padding: 16px 12px 10px 12px;
 }
 
 .headerWrapperClassName {
