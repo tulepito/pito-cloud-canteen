@@ -89,10 +89,10 @@ export type TCheckUnConflictedParams = {
 };
 
 export const prepareNewOrderDetailPlan = ({
-  newMemberId,
+  newMemberIds,
   planListing,
 }: {
-  newMemberId: string;
+  newMemberIds: string[];
   planListing: TListing;
 }) => {
   const { orderDetail = {} } = Listing(planListing).getMetadata();
@@ -100,21 +100,19 @@ export const prepareNewOrderDetailPlan = ({
     (result, [date, orderDetailByDate]) => {
       const { memberOrders = {} } = (orderDetailByDate as TObject) || {};
 
-      return {
-        ...result,
-        [date]: {
-          ...(orderDetailByDate as TObject),
-          memberOrders: {
-            [newMemberId]: {
-              foodId: '',
-              status: EParticipantOrderStatus.empty,
-            },
-            ...memberOrders,
-          },
-        },
-      };
+      result[date].memberOrders = newMemberIds.reduce((res, memberId) => {
+        res[memberId] = {
+          foodId: '',
+          status: EParticipantOrderStatus.empty,
+          ...res[memberId],
+        };
+
+        return res;
+      }, memberOrders);
+
+      return result;
     },
-    {},
+    orderDetail,
   );
 
   return newOrderDetail;

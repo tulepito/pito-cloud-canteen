@@ -27,7 +27,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             nonAccountEmails,
             anonymous = [],
             orderDetail = {},
-            userIds: userIdsFromBody,
+            userIds: userIdsFromBody = [],
           },
         } = req;
         const needUpdateNoAccountEmails =
@@ -35,7 +35,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
         let userIds: string[] = [];
 
-        if (isEmpty(userIdsFromBody)) {
+        if (isEmpty(userIdsFromBody) && !isEmpty(email)) {
           let user;
 
           try {
@@ -82,16 +82,22 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         }
 
         // TODO: update participant list
-        await integrationSdk.listings.update({
-          id: orderId,
-          metadata: {
-            participants: uniq(participants.concat(userIds)),
-            ...(isEmpty(anonymous)
-              ? {}
-              : { anonymous: difference(anonymous, userIds) }),
-            ...(needUpdateNoAccountEmails ? { nonAccountEmails } : {}),
-          },
-        });
+        if (!isEmpty(userIds) || needUpdateNoAccountEmails) {
+          await integrationSdk.listings.update({
+            id: orderId,
+            metadata: {
+              ...(!isEmpty(userIds)
+                ? {
+                    participants: uniq(participants.concat(userIds)),
+                    ...(isEmpty(anonymous)
+                      ? {}
+                      : { anonymous: difference(anonymous, userIds) }),
+                  }
+                : {}),
+              ...(needUpdateNoAccountEmails ? { nonAccountEmails } : {}),
+            },
+          });
+        }
 
         if (!isEmpty(planId)) {
           const newOrderDetail = Object.entries(orderDetail).reduce(
@@ -142,9 +148,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         }
 
         res.status(200).json({
-          message: `Successfully add participant, email: ${email} and ids: [${userIds.join(
-            ', ',
-          )}]`,
+          message: `Successfully add participant, email: ${email} and ids: ${userIds}`,
         });
       } catch (error) {
         handleError(res, error);

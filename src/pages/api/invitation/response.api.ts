@@ -189,7 +189,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
         const newOrderDetail = prepareNewOrderDetailPlan({
           planListing: planListing!,
-          newMemberId: userId,
+          newMemberIds: [userId],
         });
         await integrationSdk.listings.update({
           id: planId,
