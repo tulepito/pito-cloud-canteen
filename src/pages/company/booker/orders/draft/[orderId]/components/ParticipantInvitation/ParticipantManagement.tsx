@@ -64,6 +64,11 @@ const ParticipantManagement: React.FC<TParticipantManagementProps> = () => {
       )) as TObject[];
       const newNonAccountEmails = filterNoAccountUserEmail(newLoadedResult);
       const newUserIds = filterHasAccountUserIds(newLoadedResult);
+      const newHasCompanyUserIds = filterHasAccountUserIds(
+        newLoadedResult,
+        false,
+        true,
+      );
       const newUsers = filterHasAccountUsers(newLoadedResult);
 
       handleAddMemberToCompany(newLoadedResult as TObject[]);
@@ -82,8 +87,8 @@ const ParticipantManagement: React.FC<TParticipantManagementProps> = () => {
             orderId,
             participants: restrictParticipantIds,
             nonAccountEmails,
-            newUserIds,
             newUsers,
+            newUserIds: newHasCompanyUserIds,
             ...nonAccountEmailsParamMaybe,
           }),
         );

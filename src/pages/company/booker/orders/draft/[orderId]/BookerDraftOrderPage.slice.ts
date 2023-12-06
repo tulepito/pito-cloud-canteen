@@ -91,6 +91,7 @@ const addOrderParticipants = createAsyncThunk(
       userIds: newUserIds,
     };
 
+    // todo: add only has company user into order, has no companies users are handled in addCompanyMember flow
     await addParticipantToOrderApi(orderId, bodyParams);
 
     dispatch(setNonAccountEmails(nonAccountEmails));

@@ -15,23 +15,21 @@ import type { TUser } from '@src/utils/types';
 const isSuccessResponse = (_result: any) => _result.response.status === 200;
 const isNotFoundResponse = (_result: any) => _result.response.status === 404;
 
-const isUserHasCompany = (user: TUser) => {
-  const { company = {} } = User(user).getMetadata();
-
-  return !isEmpty(company);
-};
+const isUserHasCompany = (user: TUser) =>
+  !isEmpty(User(user).getMetadata().company);
 
 export const filterHasAccountUsers = (
   loadedResult: any[],
   skipHasCompanyCheck = true,
+  needUsersHaveCompany = false,
 ) => {
   return compact(
     loadedResult.map((_result) => {
       if (isSuccessResponse(_result)) {
         const { user } = _result.response;
+        const isValid = needUsersHaveCompany === isUserHasCompany(user);
 
-        return skipHasCompanyCheck ||
-          (!skipHasCompanyCheck && !isUserHasCompany(user))
+        return skipHasCompanyCheck || (!skipHasCompanyCheck && isValid)
           ? user
           : null;
       }
@@ -44,22 +42,15 @@ export const filterHasAccountUsers = (
 export const filterHasAccountUserIds = (
   loadedResult: any[],
   skipHasCompanyCheck = true,
-) => {
-  return compact(
-    loadedResult.map((_result) => {
-      if (isSuccessResponse(_result)) {
-        const { user } = _result.response;
-
-        return skipHasCompanyCheck ||
-          (!skipHasCompanyCheck && !isUserHasCompany(user))
-          ? user?.id?.uuid
-          : null;
-      }
-
-      return null;
-    }),
+  needUsersHaveCompany = false,
+) =>
+  compact(
+    filterHasAccountUsers(
+      loadedResult,
+      skipHasCompanyCheck,
+      needUsersHaveCompany,
+    ).map((u) => u?.id?.uuid),
   );
-};
 
 export const filterNoAccountUserEmail = (loadedResult: any[]) => {
   return loadedResult
