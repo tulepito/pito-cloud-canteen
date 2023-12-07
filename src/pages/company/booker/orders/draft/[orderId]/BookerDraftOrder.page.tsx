@@ -514,16 +514,18 @@ function BookerDraftOrderPage() {
                       onRemove={handleRemoveMeal(planId)}
                     />
                     <RenderWhen.False>
-                      <div className={css.addMealWrapper}>
-                        <IconEmpty variant="food" />
-                        <div className={css.emptyText}>Chưa có bữa ăn</div>
-                        <div
-                          className={css.addMeal}
-                          onClick={handleAddMealClick}>
-                          <IconPlus className={css.plusIcon} />
-                          <span>Thêm bữa ăn</span>
+                      <RenderWhen condition={!isAllDatesHaveNoRestaurants}>
+                        <div className={css.addMealWrapper}>
+                          <IconEmpty variant="food" />
+                          <div className={css.emptyText}>Chưa có bữa ăn</div>
+                          <div
+                            className={css.addMeal}
+                            onClick={handleAddMealClick}>
+                            <IconPlus className={css.plusIcon} />
+                            <span>Thêm bữa ăn</span>
+                          </div>
                         </div>
-                      </div>
+                      </RenderWhen>
                     </RenderWhen.False>
                   </RenderWhen>
                 </RenderWhen.False>

@@ -92,7 +92,7 @@ const Toolbar: React.FC<TToolbarProps> = (props) => {
           </div>
         </div>
       </div>
-      <div className={css.actions}>
+      <div className={classNames(css.actions, css.extra)}>
         <Button
           variant="secondary"
           className={css.secondaryBtn}

@@ -122,10 +122,11 @@
 
 .emptyResult {
   position: absolute;
-  top: 360px;
+  top: 160px;
   left: calc(50% - 150px);
 
   @include viewportLarge {
+    top: 360px;
     left: calc(50% - 540px / 2);
   }
 }

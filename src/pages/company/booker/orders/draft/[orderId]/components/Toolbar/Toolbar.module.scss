@@ -16,11 +16,10 @@
 }
 
 .actions {
-  display: none;
+  width: 100%;
 
   @include viewportLarge {
     @include flexAlign(center, space-between);
-    width: 100%;
     width: unset;
   }
 
@@ -28,6 +27,14 @@
     width: 18px;
     height: 18px;
     margin: 0 0 0 8px;
+  }
+
+  &.extra {
+    display: none;
+
+    @include viewportLarge {
+      display: flex;
+    }
   }
 }
 
