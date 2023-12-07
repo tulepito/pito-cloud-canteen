@@ -20,17 +20,20 @@
 }
 
 .loadedResult {
-  flex-direction: column;
-  @include viewportSmall {
-    flex-direction: row;
-    flex-wrap: wrap;
-  }
   @include flexAlign(flex-start);
+  flex-direction: column;
+  max-height: 300px;
+  overflow-y: auto;
   gap: 20px;
+  margin-top: 16px;
+
   @include viewportSmall {
     gap: 24px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    max-height: none;
+    overflow-y: hidden;
   }
-  margin-top: 16px;
 }
 
 .memberItem {
