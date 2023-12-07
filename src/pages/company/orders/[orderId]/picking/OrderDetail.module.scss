@@ -242,8 +242,6 @@
 }
 
 .mobileContainer {
-  display: none;
-
   @include viewportMedium {
     display: block;
     padding: 16px;
