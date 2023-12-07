@@ -23,6 +23,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           const orderListing = Listing(order);
           const { startDate, deliveryHour, bookerId } =
             orderListing.getMetadata();
+          await integrationSdk.users.updateProfile({
+            id: bookerId,
+            publicData: {
+              isAutoPickFood: false,
+            },
+          });
           const schedulerName = `PFFEM_${orderId}`;
           try {
             await getScheduler(schedulerName);
@@ -37,13 +43,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             orderId,
             startDate,
             deliveryHour,
-          });
-
-          await integrationSdk.users.updateProfile({
-            id: bookerId,
-            publicData: {
-              isAutoPickFood: false,
-            },
           });
         }
         break;
