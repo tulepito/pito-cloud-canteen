@@ -3,14 +3,12 @@
 @use '/src/styles/customMediaQueries.scss' as *;
 
 .container {
-  @include flexAlign(flex-start, center);
-  flex-wrap: wrap;
-  gap: 16px;
+  display: inline-block;
+  width: 100%;
 
   @include viewportSmall {
     @include flexAlign(flex-start);
     gap: 88px;
-    flex-wrap: nowrap;
   }
 
   .avatar {
