@@ -118,9 +118,7 @@
       @include viewportMedium {
         width: 300px;
       }
-      input {
-        @include textTemplate(14px, $fontWeightMedium, 24px);
-      }
+      @include textTemplate(14px, $fontWeightMedium, 24px);
 
       .label {
         @include textTemplate(14px, $fontWeightMedium, 24px);
