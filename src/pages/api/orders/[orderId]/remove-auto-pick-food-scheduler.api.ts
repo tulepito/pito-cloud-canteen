@@ -23,12 +23,21 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           const orderListing = Listing(order);
           const { startDate, deliveryHour, bookerId } =
             orderListing.getMetadata();
-          await integrationSdk.users.updateProfile({
+
+          const updateOrderPromise = integrationSdk.listings.update({
+            id: orderId as string,
+            metadata: {
+              isAutoPickFood: false,
+            },
+          });
+          const updateBookerPromise = integrationSdk.users.updateProfile({
             id: bookerId,
             publicData: {
               isAutoPickFood: false,
             },
           });
+          await Promise.all([updateOrderPromise, updateBookerPromise]);
+
           const schedulerName = `PFFEM_${orderId}`;
           try {
             await getScheduler(schedulerName);

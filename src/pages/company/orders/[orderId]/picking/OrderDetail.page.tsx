@@ -84,7 +84,6 @@ const OrderDetailPage = () => {
   const automaticConfirmOrderMobileControl = useBoolean();
   const confirmCancelOrderActions = useBoolean();
 
-  const { isAutoPickFood, toggleAutoPickFood } = useAutoPickFood();
   const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
   const {
     query: { orderId, timestamp },
@@ -129,7 +128,12 @@ const OrderDetailPage = () => {
     startDate,
     deliveryHour,
     orderStateHistory = [],
+    isAutoPickFood: isAutoPickFoodFromOrderData,
   } = Listing(orderData as TListing).getMetadata();
+
+  const { isAutoPickFood, toggleAutoPickFood } = useAutoPickFood(
+    isAutoPickFoodFromOrderData,
+  );
 
   const isAnyMobileModalOpening = moreOptionsModalControl.value;
   const isNormalOrder = orderType === EOrderType.normal;

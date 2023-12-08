@@ -1,6 +1,5 @@
 import { getPickFoodParticipants } from '@helpers/orderHelper';
 import { pushNativeNotificationOrderDetail } from '@pages/api/helpers/pushNotificationOrderDetailHelper';
-import { createOrUpdatePickFoodForEmptyMembersScheduler } from '@services/awsEventBrigdeScheduler';
 import { denormalisedResponseEntities } from '@services/data';
 import { emailSendingFactory, EmailTemplateTypes } from '@services/email';
 import getSystemAttributes from '@services/getSystemAttributes';
@@ -26,8 +25,6 @@ export const startOrder = async (orderId: string, planId: string) => {
     partnerIds = [],
     hasSpecificPCCFee: orderHasSpecificPCCFee,
     specificPCCFee: orderSpecificPCCFee,
-    startDate,
-    deliveryHour,
   } = Listing(orderListing).getMetadata();
 
   if (orderState !== EOrderStates.picking) {
@@ -57,6 +54,7 @@ export const startOrder = async (orderId: string, planId: string) => {
       orderState: EOrderStates.inProgress,
       orderStateHistory: updateOrderStateHistory,
       orderVATPercentage: systemVATPercentage,
+      isAutoPickFood,
       ...(orderHasSpecificPCCFee === undefined &&
         orderSpecificPCCFee === undefined && {
           hasSpecificPCCFee,
@@ -106,12 +104,4 @@ export const startOrder = async (orderId: string, planId: string) => {
     ENativeNotificationType.BookerTransitOrderStateToInProgress,
     integrationSdk,
   );
-
-  if (isAutoPickFood) {
-    await createOrUpdatePickFoodForEmptyMembersScheduler({
-      orderId,
-      startDate,
-      deliveryHour,
-    });
-  }
 };

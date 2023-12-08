@@ -1,32 +1,35 @@
-import { useState } from 'react';
+import { useEffect } from 'react';
 
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import useBoolean from '@hooks/useBoolean';
 import { orderManagementThunks } from '@redux/slices/OrderManagement.slice';
-import { CurrentUser } from '@src/utils/data';
 
-export const useAutoPickFood = () => {
-  const currentUser = useAppSelector((state) => state.user.currentUser);
+export const useAutoPickFood = (isAutoPickFood: boolean) => {
   const toggleAutoPickFoodInProgress = useAppSelector(
     (state) => state.OrderManagement.toggleAutoPickFoodInProgress,
   );
-  const currentUserGetter = CurrentUser(currentUser!);
 
   const dispatch = useAppDispatch();
-
-  const { isAutoPickFood = false } = currentUserGetter.getPublicData();
-  const [autoPickFood, setAutoPickFood] = useState<boolean>(isAutoPickFood);
+  const autoPickFoodController = useBoolean(isAutoPickFood);
 
   const toggleAutoPickFood = async () => {
     if (toggleAutoPickFoodInProgress) return;
-    setAutoPickFood((prevValue) => !prevValue);
+    autoPickFoodController.toggle();
 
     await dispatch(
-      orderManagementThunks.handleAutoPickFoodToggle(autoPickFood),
+      orderManagementThunks.handleAutoPickFoodToggle(
+        autoPickFoodController.value,
+      ),
     );
   };
 
+  useEffect(() => {
+    autoPickFoodController.setValue(isAutoPickFood);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAutoPickFood]);
+
   return {
-    isAutoPickFood: autoPickFood,
+    isAutoPickFood: autoPickFoodController.value,
     toggleAutoPickFood,
   };
 };

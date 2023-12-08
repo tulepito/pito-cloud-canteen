@@ -1,6 +1,5 @@
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Field, Form as FinalForm } from 'react-final-form';
-import { OnChange } from 'react-final-form-listeners';
 
 import Form from '@components/Form/Form';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
@@ -46,7 +45,6 @@ const AutomaticPickingFormComponent: React.FC<
 
   return (
     <Form onSubmit={handleSubmit}>
-      <OnChange name={'autoPicking'}>{handleFieldChange}</OnChange>
       <div className={css.fieldContainer}>
         {titleComponent}
         <Field id="AutomaticPickingForm.toggle" name="autoPicking">

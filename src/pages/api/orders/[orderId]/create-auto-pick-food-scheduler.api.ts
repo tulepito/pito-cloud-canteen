@@ -23,18 +23,32 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           const { startDate, deliveryHour, bookerId } =
             orderListing.getMetadata();
 
-          await createOrUpdatePickFoodForEmptyMembersScheduler({
-            orderId: orderId as string,
-            startDate,
-            deliveryHour,
+          const createOrUpdatePickFoodForEmptyMembersSchedulerPromise =
+            createOrUpdatePickFoodForEmptyMembersScheduler({
+              orderId: orderId as string,
+              startDate,
+              deliveryHour,
+            });
+
+          const updateOrderPromise = integrationSdk.listings.update({
+            id: orderId as string,
+            metadata: {
+              isAutoPickFood: true,
+            },
           });
 
-          await integrationSdk.users.updateProfile({
+          const updateBookerPromise = integrationSdk.users.updateProfile({
             id: bookerId,
             publicData: {
               isAutoPickFood: true,
             },
           });
+
+          await Promise.all([
+            createOrUpdatePickFoodForEmptyMembersSchedulerPromise,
+            updateOrderPromise,
+            updateBookerPromise,
+          ]);
         }
         break;
       default:

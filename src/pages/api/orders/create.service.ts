@@ -5,6 +5,7 @@ import { calculateGroupMembers, getAllCompanyMembers } from '@helpers/company';
 import { generateUncountableIdForOrder } from '@helpers/generateUncountableId';
 import {
   createOrUpdateAutomaticStartOrderScheduler,
+  createOrUpdatePickFoodForEmptyMembersScheduler,
   createScheduler,
   getScheduler,
   updateScheduler,
@@ -13,7 +14,7 @@ import getAdminAccount, { updateOrderNumber } from '@services/getAdminAccount';
 import { fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { formatTimestamp, VNTimezone } from '@src/utils/dates';
-import { denormalisedResponseEntities } from '@utils/data';
+import { denormalisedResponseEntities, User } from '@utils/data';
 import {
   EBookerOrderDraftStates,
   EListingStates,
@@ -123,6 +124,10 @@ const createOrder = async ({
     ? {}
     : { participants, selectedGroups, deadlineDate, deadlineHour };
 
+  const booker = await fetchUser(bookerId);
+  const bookerUser = User(booker);
+  const { isAutoPickFood } = bookerUser.getPublicData();
+
   // Call api to create order listing
   const orderListingResponse = await integrationSdk.listings.create(
     {
@@ -150,6 +155,7 @@ const createOrder = async ({
         mealType,
         companyName,
         daySession,
+        isAutoPickFood,
       },
       ...(shouldUpdateOrderName
         ? {
@@ -173,6 +179,14 @@ const createOrder = async ({
 
   if (!isNormalOrder && !isCreatedByAdmin && orderFlexId) {
     createOrUpdateAutomaticStartOrderScheduler({
+      orderId: orderFlexId,
+      startDate,
+      deliveryHour,
+    });
+  }
+
+  if (isAutoPickFood && !isNormalOrder && orderFlexId) {
+    await createOrUpdatePickFoodForEmptyMembersScheduler({
       orderId: orderFlexId,
       startDate,
       deliveryHour,
