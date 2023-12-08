@@ -204,15 +204,13 @@ const AccountPage = () => {
         )}
       </div>
       <div className={css.submitBtn}>
-        <div>
-          <Button
-            className={css.btn}
-            onClick={onSubmitButtonClick}
-            disabled={formDisabled}
-            inProgress={updateBookerInProgress}>
-            {intl.formatMessage({ id: 'AccountPage.submitBtn' })}
-          </Button>
-        </div>
+        <Button
+          className={css.btn}
+          onClick={onSubmitButtonClick}
+          disabled={formDisabled}
+          inProgress={updateBookerInProgress}>
+          {intl.formatMessage({ id: 'AccountPage.submitBtn' })}
+        </Button>
       </div>
       <ConfirmationModal
         isPopup={isMobileLayout}
