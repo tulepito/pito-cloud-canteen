@@ -3,8 +3,11 @@
 @use '/src/styles/customMediaQueries.scss' as *;
 .container {
   padding: 0 0 90px;
+  @include flexAlign(flex-start);
+  flex-direction: column;
   @include viewportSmall {
     padding: 0;
+    display: block;
   }
   .header {
     border-bottom: 1px solid $neutralGray3;
@@ -46,6 +49,7 @@
     padding: 24px 16px 0px 16px;
     @include flexAlign(flex-start);
     flex-direction: column;
+    width: 100%;
 
     @include viewportSmall {
       display: block;
