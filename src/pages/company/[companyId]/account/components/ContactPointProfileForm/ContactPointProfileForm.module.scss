@@ -105,13 +105,15 @@
 
   .profile {
     @include flexAlign(flex-start);
-    flex-wrap: wrap;
+    flex-direction: column;
     width: 100%;
     gap: 16px;
 
     @include viewportSmall {
       gap: 32px;
       width: 632px;
+      flex-direction: row;
+      flex-wrap: wrap;
     }
 
     .fieldInput {
