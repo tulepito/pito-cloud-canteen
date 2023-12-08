@@ -43,9 +43,9 @@
   }
 
   .contactPointSection {
-    display: flow-root;
     padding: 24px 16px 0px 16px;
-    flex-wrap: wrap;
+    @include flexAlign(flex-start);
+    flex-direction: column;
 
     @include viewportSmall {
       display: block;
