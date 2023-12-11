@@ -1,6 +1,6 @@
 /* eslint-disable no-restricted-syntax */
 import { createSlice } from '@reduxjs/toolkit';
-import { groupBy } from 'lodash';
+import { groupBy, uniqBy } from 'lodash';
 import uniq from 'lodash/uniq';
 
 import {
@@ -21,32 +21,47 @@ const ADMIN_CREATE_CLIENT_PAYMENT =
   'app/AdminManageClientPayments/ADMIN_CREATE_CLIENT_PAYMENT';
 
 type TAdminManageClientPaymentsState = {
+  rawClientPaymentRecords: TObject[];
   clientPaymentsMap: TObject;
   fetchClientPaymentsInProgress: boolean;
   fetchClientPaymentsError: any;
 
   createClientPaymentsInProgress: boolean;
   createClientPaymentsRecordsError: any;
+
+  lastPaymentRecord: number;
 };
 const initialState: TAdminManageClientPaymentsState = {
+  rawClientPaymentRecords: [],
   clientPaymentsMap: {},
   fetchClientPaymentsInProgress: false,
   fetchClientPaymentsError: null,
 
   createClientPaymentsInProgress: false,
   createClientPaymentsRecordsError: null,
+
+  lastPaymentRecord: 0,
 };
 
 // ================ Thunk types ================ //
 
 // ================ Async thunks ================ //
-const fetchPartnerPaymentRecords = createAsyncThunk(
+const fetchClientPaymentRecords = createAsyncThunk(
   ADMIN_FETCH_CLIENT_PAYMENT,
-  async () => {
-    const { data: allPaymentRecords } = await adminQueryAllClientPaymentsApi();
+  async (_, { getState }) => {
+    const { lastPaymentRecord, rawClientPaymentRecords } =
+      getState().AdminManageClientPayments;
+    const { data: allPaymentRecords } = await adminQueryAllClientPaymentsApi(
+      lastPaymentRecord,
+    );
+
+    const newRawClientPaymentRecords = uniqBy(
+      [...rawClientPaymentRecords, ...allPaymentRecords],
+      'id',
+    );
 
     const paymentRecordsGroupedByOrderId = groupBy(
-      allPaymentRecords,
+      newRawClientPaymentRecords,
       'orderId',
     );
 
@@ -59,7 +74,14 @@ const fetchPartnerPaymentRecords = createAsyncThunk(
       };
     }, {});
 
-    return sortedRecordsGroupedByOrderId;
+    const newLastPaymentRecord =
+      allPaymentRecords[allPaymentRecords.length - 1]?.createdAt?.seconds;
+
+    return {
+      sortedRecordsGroupedByOrderId,
+      lastPaymentRecord: newLastPaymentRecord,
+      rawClientPaymentRecords: newRawClientPaymentRecords,
+    };
   },
 );
 
@@ -115,7 +137,7 @@ const adminCreateClientPayment = createAsyncThunk(
 );
 
 export const AdminManageClientPaymentsThunks = {
-  fetchPartnerPaymentRecords,
+  fetchClientPaymentRecords,
   adminCreateClientPayment,
 };
 
@@ -126,15 +148,17 @@ const AdminManageClientPaymentsSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(fetchPartnerPaymentRecords.pending, (state) => {
+      .addCase(fetchClientPaymentRecords.pending, (state) => {
         state.fetchClientPaymentsInProgress = true;
         state.fetchClientPaymentsError = null;
       })
-      .addCase(fetchPartnerPaymentRecords.fulfilled, (state, { payload }) => {
+      .addCase(fetchClientPaymentRecords.fulfilled, (state, { payload }) => {
         state.fetchClientPaymentsInProgress = false;
-        state.clientPaymentsMap = payload;
+        state.clientPaymentsMap = payload.sortedRecordsGroupedByOrderId;
+        state.lastPaymentRecord = payload.lastPaymentRecord;
+        state.rawClientPaymentRecords = payload.rawClientPaymentRecords;
       })
-      .addCase(fetchPartnerPaymentRecords.rejected, (state, { error }) => {
+      .addCase(fetchClientPaymentRecords.rejected, (state, { error }) => {
         state.fetchClientPaymentsInProgress = false;
         state.fetchClientPaymentsError = error;
       })

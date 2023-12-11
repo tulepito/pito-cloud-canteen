@@ -257,17 +257,20 @@ const PaymentPartnerPage = () => {
     () => filteredTableData.slice((page - 1) * 10, page * 10),
     [filteredTableData, page],
   );
+  const totalPages = Math.ceil(filteredTableData.length / 10);
 
   const pagination: TPagination = {
     page,
     perPage: 10,
     totalItems: filteredTableData.length,
-    totalPages: Math.ceil(filteredTableData.length / 10),
+    totalPages,
   };
 
   useEffect(() => {
-    dispatch(PaymentPartnerThunks.fetchPartnerPaymentRecords());
-  }, [dispatch]);
+    if (page === 1 || page === totalPages) {
+      dispatch(PaymentPartnerThunks.fetchPartnerPaymentRecords());
+    }
+  }, [dispatch, page]);
 
   const onClearFilters = () => {
     setFilters({});

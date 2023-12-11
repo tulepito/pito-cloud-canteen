@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
+import { uniqBy } from 'lodash';
 import groupBy from 'lodash/groupBy';
 import uniq from 'lodash/uniq';
 
@@ -12,20 +13,26 @@ import type { TObject } from '@src/utils/types';
 
 // ================ Initial states ================ //
 type TPaymentPartnerState = {
+  rawPartnerPaymentRecords: TObject[];
   paymentPartnerRecords: TObject;
   fetchPaymentPartnerRecordsInProgress: boolean;
   fetchPaymentPartnerRecordsError: any;
 
   createPaymentPartnerRecordsInProgress: boolean;
   createPaymentPartnerRecordsError: any;
+
+  lastPaymentRecord: number;
 };
 const initialState: TPaymentPartnerState = {
+  rawPartnerPaymentRecords: [],
   paymentPartnerRecords: {},
   fetchPaymentPartnerRecordsInProgress: false,
   fetchPaymentPartnerRecordsError: null,
 
   createPaymentPartnerRecordsInProgress: false,
   createPaymentPartnerRecordsError: null,
+
+  lastPaymentRecord: 0,
 };
 
 // ================ Thunk types ================ //
@@ -37,11 +44,20 @@ const CREATE_PARTNER_PAYMENT_RECORDS =
 
 const fetchPartnerPaymentRecords = createAsyncThunk(
   FETCH_PARTNER_PAYMENT_RECORDS,
-  async () => {
-    const { data: allPaymentRecords } = await getPartnerPaymentRecordsApi();
+  async (_, { getState }) => {
+    const { lastPaymentRecord, rawPartnerPaymentRecords } =
+      getState().PaymentPartner;
+    const { data: allPaymentRecords } = await getPartnerPaymentRecordsApi(
+      lastPaymentRecord,
+    );
+
+    const newRawPartnerPaymentRecords = uniqBy(
+      [...rawPartnerPaymentRecords, ...allPaymentRecords],
+      'id',
+    );
 
     const paymentRecordsGrouppedByOrderId = groupBy(
-      allPaymentRecords,
+      newRawPartnerPaymentRecords,
       'orderId',
     );
 
@@ -53,15 +69,22 @@ const fetchPartnerPaymentRecords = createAsyncThunk(
         'subOrderDate',
       );
 
-      return {
-        ...result,
-        [orderId]: {
-          ...paymentRecordsGrouppedBySubOrderDate,
-        },
+      result[orderId] = {
+        ...paymentRecordsGrouppedBySubOrderDate,
       };
+
+      return result;
     }, {});
 
-    return paymentRecordBySubOrder;
+    const newLastPaymentRecord =
+      newRawPartnerPaymentRecords[newRawPartnerPaymentRecords.length - 1]
+        ?.createdAt?.seconds;
+
+    return {
+      paymentRecordBySubOrder,
+      lastPaymentRecord: newLastPaymentRecord,
+      rawPartnerPaymentRecords: newRawPartnerPaymentRecords,
+    };
   },
 );
 
@@ -143,7 +166,9 @@ const PaymentPartnerSlice = createSlice({
       fetchPartnerPaymentRecords.fulfilled,
       (state, { payload }) => {
         state.fetchPaymentPartnerRecordsInProgress = false;
-        state.paymentPartnerRecords = payload;
+        state.rawPartnerPaymentRecords = payload.rawPartnerPaymentRecords;
+        state.paymentPartnerRecords = payload.paymentRecordBySubOrder;
+        state.lastPaymentRecord = payload.lastPaymentRecord;
       },
     );
     builder.addCase(fetchPartnerPaymentRecords.rejected, (state, action) => {

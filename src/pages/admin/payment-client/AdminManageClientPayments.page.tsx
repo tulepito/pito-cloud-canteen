@@ -319,11 +319,13 @@ const AdminManageClientPaymentsPage = () => {
     [filteredTableData, page],
   );
 
+  const totalPages = Math.ceil(filteredTableData.length / 10);
+
   const pagination: TPagination = {
     page,
     perPage: 10,
     totalItems: filteredTableData.length,
-    totalPages: Math.ceil(filteredTableData.length / 10),
+    totalPages,
   };
 
   const handleClearFilters = () => {
@@ -426,8 +428,10 @@ const AdminManageClientPaymentsPage = () => {
   });
 
   useEffect(() => {
-    dispatch(AdminManageClientPaymentsThunks.fetchPartnerPaymentRecords());
-  }, [dispatch]);
+    if (page === 1 || page === totalPages) {
+      dispatch(AdminManageClientPaymentsThunks.fetchClientPaymentRecords());
+    }
+  }, [dispatch, page]);
 
   return (
     <div className={css.root}>

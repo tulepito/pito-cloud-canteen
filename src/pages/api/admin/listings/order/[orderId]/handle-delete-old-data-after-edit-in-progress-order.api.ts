@@ -39,7 +39,19 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
               orderId,
             })) || [];
 
+          const clientPaymentRecords =
+            (await queryPaymentRecordOnFirebase({
+              paymentType: EPaymentType.CLIENT,
+              orderId,
+            })) || [];
+
           const handlePartnerDeletePaymentRecord = paymentRecords.map(
+            async (paymentRecord) => {
+              await deletePaymentRecordByIdOnFirebase(paymentRecord.id);
+            },
+          );
+
+          const handleClientDeletePaymentRecord = clientPaymentRecords.map(
             async (paymentRecord) => {
               await deletePaymentRecordByIdOnFirebase(paymentRecord.id);
             },
@@ -75,8 +87,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             await Promise.all(deleleSubOrderFromFirebaseAndSendNotification);
           });
 
-          await Promise.all(handlePartnerDeletePaymentRecord);
-          await Promise.all(handleParticipantDeleteSubOrders);
+          await Promise.allSettled([
+            handlePartnerDeletePaymentRecord,
+            handleParticipantDeleteSubOrders,
+            handleClientDeletePaymentRecord,
+          ]);
 
           res.end();
         }

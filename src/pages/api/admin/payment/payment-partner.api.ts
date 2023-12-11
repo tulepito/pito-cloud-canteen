@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HttpMethod } from '@apis/configs';
 import cookies from '@services/cookie';
-import { queryAllPartnerPaymentRecordsOnFirebase } from '@services/payment';
+import { queryPartnerPaymentRecordOnFirebase } from '@services/payment';
 import { handleError } from '@services/sdk';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
@@ -11,8 +11,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     switch (apiMethod) {
       case HttpMethod.GET:
         {
-          const paymentRecords =
-            await queryAllPartnerPaymentRecordsOnFirebase();
+          const { JSONParams } = req.query;
+          const { lastPaymentRecord } = JSON.parse(JSONParams as string);
+          const paymentRecords = await queryPartnerPaymentRecordOnFirebase({
+            limitRecords: 100,
+            lastRecord: lastPaymentRecord,
+          });
 
           res.json(paymentRecords);
         }

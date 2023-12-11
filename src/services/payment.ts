@@ -135,6 +135,41 @@ export const queryAllPartnerPaymentRecordsOnFirebase = async (query = {}) => {
   }
 };
 
+export const queryPartnerPaymentRecordOnFirebase = async ({
+  query = {},
+  limitRecords = 20,
+  lastRecord,
+}: any) => {
+  try {
+    const { partnerId } = query as TObject;
+    const paymentQuery = {
+      paymentType: {
+        operator: '==',
+        value: EPaymentType.PARTNER,
+      },
+      ...(partnerId && {
+        partnerId: {
+          operator: '==',
+          value: partnerId,
+        },
+      }),
+    };
+
+    const paymentRecords = await queryCollectionData({
+      collectionName: FIREBASE_PAYMENT_RECORD_COLLECTION_NAME!,
+      queryParams: {
+        ...paymentQuery,
+      },
+      limitRecords,
+      lastRecord,
+    });
+
+    return paymentRecords;
+  } catch (error) {
+    console.error('Error query partner payment record: ', error);
+  }
+};
+
 export const queryAllCompanyPaymentRecordsOnFirebase = async (query = {}) => {
   const { companyId } = query as TObject;
 
@@ -153,6 +188,41 @@ export const queryAllCompanyPaymentRecordsOnFirebase = async (query = {}) => {
       }),
     },
   });
+};
+
+export const queryCompanyPaymentRecordOnFirebase = async ({
+  query = {},
+  limitRecords = 20,
+  lastRecord,
+}: any) => {
+  try {
+    const { companyId } = query as TObject;
+    const paymentQuery = {
+      paymentType: {
+        operator: '==',
+        value: EPaymentType.CLIENT,
+      },
+      ...(companyId && {
+        partnerId: {
+          operator: '==',
+          value: companyId,
+        },
+      }),
+    };
+
+    const paymentRecords = await queryCollectionData({
+      collectionName: FIREBASE_PAYMENT_RECORD_COLLECTION_NAME!,
+      queryParams: {
+        ...paymentQuery,
+      },
+      limitRecords,
+      lastRecord,
+    });
+
+    return paymentRecords;
+  } catch (error) {
+    console.error('Error query company payment record: ', error);
+  }
 };
 
 export const getTotalRecordsOnFirebase = async (query: any) => {

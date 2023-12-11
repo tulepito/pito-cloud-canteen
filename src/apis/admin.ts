@@ -30,8 +30,8 @@ export const createPaymentRecordApi = (body: TObject) =>
 export const deletePaymentRecordApi = (body: TObject) =>
   deleteApi('/admin/payment', body);
 
-export const getPartnerPaymentRecordsApi = () =>
-  getApi('/admin/payment/payment-partner');
+export const getPartnerPaymentRecordsApi = (lastPaymentRecord: number) =>
+  getApi('/admin/payment/payment-partner', { lastPaymentRecord });
 
 export const transitionOrderPaymentStatusApi = (
   orderId: string,
