@@ -24,6 +24,7 @@ export const personalPaths = {
   Info: '/company/personal/account/info',
   Nutrition: '/company/personal/nutrition',
   Members: '/company/personal/members',
+  GroupList: '/company/personal/group-setting',
   ChangePassword: '/company/personal/account/change-password',
 };
 
