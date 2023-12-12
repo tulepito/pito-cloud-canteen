@@ -1,0 +1,33 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.modal.open {
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 100;
+
+  &.open {
+    .overlay {
+      background-color: rgba($neutralGray7, 0.5);
+
+      width: 100%;
+      height: 100vh;
+    }
+  }
+}
+
+.modalContainer.modalContainer {
+  flex-basis: 700px;
+}
+
+.modalFooter {
+  .cancelBtn {
+    margin: 16px auto 0;
+    width: 400px;
+  }
+}
