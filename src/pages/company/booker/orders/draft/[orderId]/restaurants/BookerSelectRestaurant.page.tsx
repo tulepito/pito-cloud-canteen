@@ -30,7 +30,7 @@ const EnableToAccessPageOrderStates = [
 
 function BookerSelectRestaurant() {
   const router = useRouter();
-  const { orderId } = router.query;
+  const { orderId, timestamp } = router.query;
 
   const { order } = useGetOrder({ orderId: orderId as string });
   const orderListing = Listing(order!);
@@ -82,18 +82,26 @@ function BookerSelectRestaurant() {
       pathname: companyPaths.EditDraftOrder,
       query: {
         orderId,
+        subOrderDate: timestamp,
       },
     });
   };
 
   return (
-    <Layout>
-      <LayoutTop>
+    <Layout className={css.container}>
+      <LayoutTop className={css.topContainer}>
         <div className={css.goBackBtn} onClick={handleGoBack}>
           <IconArrow direction="left" />
           Quay lại
         </div>
-        <div className={css.pageTilte}>danh sách nhà hàng</div>
+        <div className={css.pageTilte}>
+          <IconArrow
+            className={css.icon}
+            direction="left"
+            onClick={handleGoBack}
+          />
+          <div className={css.title}>danh sách nhà hàng</div>
+        </div>
       </LayoutTop>
       <LayoutMain>
         <LayoutSidebar>

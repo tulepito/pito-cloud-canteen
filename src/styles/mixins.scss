@@ -316,3 +316,14 @@ $buttonBorderRadius: 8px;
   width: $width;
   height: $height;
 }
+
+@mixin bookerSidebarFormRoot {
+  @include flexAlign(normal, space-between);
+  flex-direction: column;
+  height: 80vh;
+
+  @include viewportLarge {
+    display: block;
+    height: auto;
+  }
+}

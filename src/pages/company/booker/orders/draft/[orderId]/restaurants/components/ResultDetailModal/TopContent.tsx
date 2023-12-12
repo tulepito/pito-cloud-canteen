@@ -6,6 +6,7 @@ import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import IconHeart from '@components/Icons/IconHeart/IconHeart';
 import IconStar from '@components/Icons/IconStar/IconStar';
 import IconTruck from '@components/Icons/IconTruck/IconTruck';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
 import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
 import { EImageVariants } from '@utils/enums';
 
@@ -19,6 +20,7 @@ type TopContentProps = {
   ratingNumber: number;
   minQuantity: number;
   onOpenReviewModal?: () => void;
+  hideInforInMobile?: boolean;
 };
 const TopContent: React.FC<TopContentProps> = (props) => {
   const {
@@ -28,6 +30,7 @@ const TopContent: React.FC<TopContentProps> = (props) => {
     distance,
     onOpenReviewModal,
     minQuantity = 0,
+    hideInforInMobile,
   } = props;
 
   const intl = useIntl();
@@ -58,17 +61,19 @@ const TopContent: React.FC<TopContentProps> = (props) => {
             <div className={css.moreInfoItem}>
               <IconStar className={css.ratingStar} />
               {rating}
-              <IconArrow direction="right" />
+              <IconArrow className={css.arrowIcon} direction="right" />
             </div>
           </div>
 
-          <div className={css.moreInfoItem}>
-            <span>
-              {`${intl.formatMessage({
-                id: 'EditPartnerFoodForm.minQuantityPerOrderLabel',
-              })}: ${minQuantity}`}
-            </span>
-          </div>
+          <RenderWhen condition={!hideInforInMobile}>
+            <div className={css.moreInfoItem}>
+              <span>
+                {`${intl.formatMessage({
+                  id: 'EditPartnerFoodForm.minQuantityPerOrderLabel',
+                })}: ${minQuantity}`}
+              </span>
+            </div>
+          </RenderWhen>
         </div>
       </div>
     </div>

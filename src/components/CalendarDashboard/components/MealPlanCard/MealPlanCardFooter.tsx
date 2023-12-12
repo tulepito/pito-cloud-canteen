@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import type { Event } from 'react-big-calendar';
 import { FormattedMessage } from 'react-intl';
+import classNames from 'classnames';
 import { DateTime } from 'luxon';
 
 import Button from '@components/Button/Button';
 import IconCopy from '@components/Icons/IconCopy/IconCopy';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
+import { useAppSelector } from '@hooks/reduxHooks';
 import { convertWeekDay } from '@src/utils/dates';
 import { EInvalidRestaurantCase } from '@src/utils/enums';
 import type { TObject } from '@src/utils/types';
@@ -41,6 +43,9 @@ const MealPlanCardFooter: React.FC<TMealPlanCardFooterProps> = ({
   const { status, isAvailable = true } = availableStatus || {};
   const [isOpenApplyOtherDaysModal, setIsOpenApplyOtherDaysModal] =
     useState<boolean>(false);
+  const walkthroughStep = useAppSelector(
+    (state) => state.BookerDraftOrderPage.walkthroughStep,
+  );
 
   const currentDayInWeek = convertWeekDay(
     DateTime.fromMillis(Number(event?.start?.getTime())).weekday,
@@ -66,7 +71,9 @@ const MealPlanCardFooter: React.FC<TMealPlanCardFooterProps> = ({
       <RenderWhen condition={isAvailable}>
         <Button
           variant="secondary"
-          className={css.actionButton}
+          className={classNames(css.actionButton, {
+            [css.walkthrough]: walkthroughStep === 4,
+          })}
           onClick={handleEditFood}
           data-tour="step-5"
           inProgress={editFoodInprogress}>

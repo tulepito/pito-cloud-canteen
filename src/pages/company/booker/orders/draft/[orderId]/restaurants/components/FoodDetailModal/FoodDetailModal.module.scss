@@ -32,9 +32,8 @@
 
 .header {
   display: flex;
-  padding-top: 40px;
   margin-bottom: 24px;
-  padding: 0 18px;
+
   flex-direction: column;
   align-items: flex-start;
 
@@ -42,6 +41,7 @@
     padding-top: 0;
     flex-direction: row;
     align-items: unset;
+    padding: 0 18px;
   }
 
   .goBack {
@@ -62,16 +62,23 @@
 .scrollContainer {
   max-height: 70vh;
   overflow-y: overlay;
-  padding: 0 18px;
+
+  @include viewportMedium {
+    padding: 0 18px;
+  }
 }
 
 .coverImage {
   position: relative;
   width: 100%;
-  padding-bottom: 38%;
   margin-bottom: 24px;
   overflow: hidden;
   border-radius: 16px;
+  height: 160px;
+
+  @include viewportLarge {
+    height: 240px;
+  }
 
   & img {
     position: absolute;
@@ -86,6 +93,11 @@
   justify-content: space-between;
   margin-bottom: 20px;
   color: $neutralGray7;
+  flex-direction: column;
+
+  @include viewportLarge {
+    flex-direction: row;
+  }
 
   .foodTitle {
     @include textTemplate(20px, 700, 32px);
@@ -122,8 +134,6 @@
 }
 
 .sideDishesWrapper {
-  padding: 0 18px;
-
   .sideDish {
     margin-top: 16px;
     @include textTemplate(14px, $fontWeightRegular, 24px);
@@ -147,9 +157,18 @@
 }
 
 .footer {
-  padding: 8px 18px 0;
+  padding: 20px 0 0;
+
+  @include viewportMedium {
+    padding: 8px 18px 0;
+  }
   .submitBtn {
     margin-left: auto;
+    width: 100%;
+
+    @include viewportMedium {
+      width: auto;
+    }
   }
 }
 

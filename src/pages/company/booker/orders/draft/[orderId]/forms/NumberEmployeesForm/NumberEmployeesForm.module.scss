@@ -1,4 +1,9 @@
 @use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.root {
+  @include bookerSidebarFormRoot;
+}
 
 .inputWrapper {
   margin-bottom: 24px;

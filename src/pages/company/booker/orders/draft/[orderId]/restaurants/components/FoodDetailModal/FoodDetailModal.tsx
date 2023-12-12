@@ -4,10 +4,10 @@ import Skeleton from 'react-loading-skeleton';
 
 import Button from '@components/Button/Button';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
-import IconClose from '@components/Icons/IconClose/IconClose';
 import Modal from '@components/Modal/Modal';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
+import SlideModal from '@components/SlideModal/SlideModal';
 import { addCommas } from '@helpers/format';
 import { FOOD_SIDE_DISH_OPTIONS } from '@src/utils/options';
 import { Listing } from '@utils/data';
@@ -22,6 +22,7 @@ type TFoodDetailModalProps = {
   onClose?: () => void;
   onSelect?: (foodId: string) => void;
   isLoading?: boolean;
+  isMobileLayout?: boolean;
 };
 
 const FoodDetailModal: React.FC<TFoodDetailModalProps> = ({
@@ -30,16 +31,13 @@ const FoodDetailModal: React.FC<TFoodDetailModalProps> = ({
   onClose = () => null,
   onSelect,
   isLoading,
+  isMobileLayout,
 }) => {
   const intl = useIntl();
 
   const foodGetter = Listing(food!);
   const { sideDishes = [] } = foodGetter.getPublicData();
-  const {
-    title,
-    price,
-    description = 'Không có mô tả',
-  } = foodGetter.getAttributes();
+  const { title, price } = foodGetter.getAttributes();
 
   const renderedSideDishes = sideDishes?.map(
     (sideDish: string, index: number) => (
@@ -60,18 +58,17 @@ const FoodDetailModal: React.FC<TFoodDetailModalProps> = ({
     return null;
   }
 
+  const ModalComponent = isMobileLayout ? SlideModal : Modal;
+
   return (
-    <Modal
+    <ModalComponent
       id="FoodDetailModal"
       scrollLayerClassName={css.scrollLayer}
       containerClassName={css.modalContainer}
       isOpen={isOpen}
       handleClose={onClose}
-      customHeader={
-        <div className={css.modalHeader}>
-          <IconClose className={css.iconClose} onClick={onClose} />
-        </div>
-      }>
+      onClose={onClose}
+      customHeader={<div></div>}>
       <div className={css.header}>
         <span className={css.goBack} onClick={onClose}>
           <IconArrow className={css.iconBack} direction="left" />
@@ -97,16 +94,19 @@ const FoodDetailModal: React.FC<TFoodDetailModalProps> = ({
               price?.amount,
             )} ₫ / Phần`}</div>
           </div>
-          <p className={css.description}>{description}</p>
-        </div>
-        <div className={css.sideDishesWrapper}>
-          <div className={css.sideDishesTitle}>
-            {intl.formatMessage({
-              id: 'booker.orders.draft.foodDetailModal.sideDishesTitle',
-            })}
+          <p className={css.description}>
+            {Listing(food!).getAttributes().description || 'Không có mô tả'}
+          </p>
+          <div className={css.sideDishesWrapper}>
+            <div className={css.sideDishesTitle}>
+              {intl.formatMessage({
+                id: 'booker.orders.draft.foodDetailModal.sideDishesTitle',
+              })}
+            </div>
+            {renderedSideDishes}
           </div>
-          {renderedSideDishes}
         </div>
+
         <RenderWhen.False>
           <Skeleton className={css.loading} />
           <Skeleton className={css.loadingTitle} />
@@ -122,7 +122,7 @@ const FoodDetailModal: React.FC<TFoodDetailModalProps> = ({
           </Button>
         </div>
       )}
-    </Modal>
+    </ModalComponent>
   );
 };
 

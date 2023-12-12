@@ -25,6 +25,7 @@ type TBookerDraftOrderPageState = {
   participantData: TObject[];
 
   addOrderParticipantsInProgress: boolean;
+  walkthroughStep: number;
 };
 const initialState: TBookerDraftOrderPageState = {
   companyAccount: null,
@@ -36,6 +37,7 @@ const initialState: TBookerDraftOrderPageState = {
   participantData: [],
 
   addOrderParticipantsInProgress: false,
+  walkthroughStep: -1,
 };
 
 // ================ Thunk types ================ //
@@ -140,6 +142,10 @@ const BookerDraftOrderPageSlice = createSlice({
     selectCalendarDate: (state, { payload }) => ({
       ...state,
       selectedCalendarDate: payload,
+    }),
+    setWalkthroughStep: (state, { payload }) => ({
+      ...state,
+      walkthroughStep: payload,
     }),
   },
   extraReducers: (builder) => {

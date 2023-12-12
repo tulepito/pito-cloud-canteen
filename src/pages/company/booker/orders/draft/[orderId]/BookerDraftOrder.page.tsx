@@ -1,15 +1,25 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-shadow */
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import type { Event } from 'react-big-calendar';
 import { shallowEqual } from 'react-redux';
+import classNames from 'classnames';
 import isEmpty from 'lodash/isEmpty';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 
+import Badge, { EBadgeType } from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
 import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
 import MealPlanCard from '@components/CalendarDashboard/components/MealPlanCard/MealPlanCard';
+import { getBookerMockupSubOrder } from '@components/CalendarDashboard/helpers/mockupData';
+import useSelectDay from '@components/CalendarDashboard/hooks/useSelectDay';
+import IconEmpty from '@components/Icons/IconEmpty/IconEmpty';
+import IconHome from '@components/Icons/IconHome/IconHome';
+import IconPlus from '@components/Icons/IconPlus/IconPlus';
+import IconSetting from '@components/Icons/IconSetting/IconSetting';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
+import Stepper from '@components/Stepper/Stepper';
 import {
   findSuitableStartDate,
   getParticipantPickingLink,
@@ -18,10 +28,12 @@ import {
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import useRestaurantDetailModal from '@hooks/useRestaurantDetailModal';
+import { useViewport } from '@hooks/useViewport';
 import { OrderListThunks } from '@pages/participant/orders/OrderList.slice';
 import { addWorkspaceCompanyId } from '@redux/slices/company.slice';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
 import { currentUserSelector } from '@redux/slices/user.slice';
+import { BOOKER_CREATE_GROUP_ORDER_STEPS } from '@src/constants/stepperSteps';
 import { companyPaths } from '@src/paths';
 import { formatTimestamp } from '@src/utils/dates';
 import Gleap from '@src/utils/gleap';
@@ -38,6 +50,7 @@ import Layout from '../../components/Layout/Layout';
 import LayoutMain from '../../components/Layout/LayoutMain';
 import LayoutSidebar from '../../components/Layout/LayoutSidebar';
 
+import HomeReturnModal from './components/HomeReturnModal/HomeReturnModal';
 import ParticipantInvitation from './components/ParticipantInvitation/ParticipantInvitation';
 import SidebarContent from './components/SidebarContent/SidebarContent';
 import WalkThroughTourProvider from './components/WalkThroughTour/WalkThroughTour';
@@ -70,13 +83,19 @@ export enum EBookerDraftOrderViewMode {
 
 function BookerDraftOrderPage() {
   const router = useRouter();
-  const { orderId } = router.query;
+  const { orderId, subOrderDate: subOrderDateQuery } = router.query;
   const [collapse, setCollapse] = useState(false);
   const [selectedRestaurantId, setSelectedRestaurantId] = useState<string>('');
   const [selectedTimestamp, setSelectedTimestamp] = useState<number>(0);
   const [currentViewMode, setCurrViewMode] =
     useState<EBookerDraftOrderViewMode>(EBookerDraftOrderViewMode.setup);
   const dispatch = useAppDispatch();
+  const { isTabletLayoutOrLarger } = useViewport();
+  const { selectedDay, handleSelectDay } = useSelectDay();
+  const [sampleSubOrder, setSampleSubOrder] = useState<any>(undefined);
+
+  const homeReturnModalController = useBoolean();
+
   const currentUser = useAppSelector(currentUserSelector);
   // * Walkthrough
   const currentUserGetter = User(currentUser);
@@ -112,10 +131,11 @@ function BookerDraftOrderPage() {
     (state) => state.Order.availableOrderDetailCheckList,
     shallowEqual,
   );
-  const selectedDate = useAppSelector(
-    (state) => state.Order.selectedCalendarDate,
-  );
   const { orderDetail = [], rawOrderDetail } = useGetPlanDetails();
+  const calendarEvents =
+    walkthroughEnable && !isEmpty(sampleSubOrder)
+      ? [sampleSubOrder]
+      : orderDetail;
   const { startDate, endDate } = useGetBoundaryDates(order);
   const calendarExtraResources = useGetCalendarExtraResources({
     order,
@@ -131,6 +151,7 @@ function BookerDraftOrderPage() {
   } = useRestaurantDetailModal();
 
   const isSetupMode = currentViewMode === EBookerDraftOrderViewMode.setup;
+  const orderListing = Listing(order as TListing);
   const {
     orderState,
     plans = [],
@@ -140,7 +161,8 @@ function BookerDraftOrderPage() {
     packagePerMember = 0,
     companyId,
     orderDeadline,
-  } = Listing(order as TListing).getMetadata();
+  } = orderListing.getMetadata();
+  const { title: orderTitle } = orderListing.getAttributes();
   const planId = plans.length > 0 ? plans[0] : undefined;
   const isGroupOrder = orderType === EOrderType.group;
 
@@ -160,9 +182,15 @@ function BookerDraftOrderPage() {
     [JSON.stringify(companyAccount)],
   );
 
+  const selectedEvent = useMemo(() => {
+    return orderDetail.find(
+      (event) => Number(event.start) === Number(selectedDay),
+    );
+  }, [JSON.stringify(orderDetail), selectedDay]);
+
   const suitableStartDate = useMemo(() => {
     const temp = findSuitableStartDate({
-      selectedDate,
+      selectedDate: selectedDay,
       startDate: startDateTimestamp,
       endDate: endDateTimestamp,
       orderDetail: rawOrderDetail,
@@ -171,7 +199,7 @@ function BookerDraftOrderPage() {
     return temp instanceof Date ? temp : new Date(temp!);
     // eslint-disable-next-line prettier/prettier
   }, [
-    selectedDate,
+    selectedDay,
     startDateTimestamp,
     endDateTimestamp,
     JSON.stringify(orderDetail),
@@ -214,6 +242,10 @@ function BookerDraftOrderPage() {
 
   const handleCollapse = useCallback(() => {
     setCollapse(!collapse);
+  }, [collapse]);
+
+  const handleCloseSideBar = useCallback(() => {
+    setCollapse(false);
   }, [collapse]);
 
   const handleRemoveMeal = useCallback(
@@ -316,13 +348,20 @@ function BookerDraftOrderPage() {
     Gleap.openChat();
   };
 
+  const handleAddMealClick = () => {
+    router.push(
+      `/company/booker/orders/draft/${orderId}/restaurants?timestamp=${Number(
+        selectedDay,
+      )}`,
+    );
+  };
+
   useEffect(() => {
     if (!isEmpty(orderDetail)) {
       const menuListingIds = orderDetail?.map(
         (order) => order.resource.restaurant?.menuId,
       );
 
-      dispatch(orderAsyncActions.checkRestaurantStillAvailable({}));
       dispatch(orderAsyncActions.fetchOrderRestaurants({}));
       dispatch(
         orderAsyncActions.fetchMenuListingsByIds({
@@ -330,6 +369,7 @@ function BookerDraftOrderPage() {
         }),
       );
     }
+    dispatch(orderAsyncActions.checkRestaurantStillAvailable({}));
   }, [dispatch, JSON.stringify(orderDetail)]);
 
   useEffect(() => {
@@ -349,24 +389,73 @@ function BookerDraftOrderPage() {
     }
   }, [orderId, orderState]);
 
+  useEffect(() => {
+    const mockupSubOrder = getBookerMockupSubOrder(startDate);
+    setSampleSubOrder(mockupSubOrder);
+  }, [startDate]);
+
+  useEffect(() => {
+    handleSelectDay(startDate);
+  }, [startDate]);
+
+  useEffect(() => {
+    if (subOrderDateQuery) {
+      const subOrderDate = new Date(+subOrderDateQuery);
+      handleSelectDay(subOrderDate);
+    }
+  }, [subOrderDateQuery]);
+
   return (
-    <WalkThroughTourProvider onCloseTour={handleCloseWalkThrough}>
+    <WalkThroughTourProvider
+      onCloseTour={handleCloseWalkThrough}
+      isMobileLayout={!isTabletLayoutOrLarger}>
       <RenderWhen condition={isSetupMode}>
         <Layout className={css.root}>
           <LayoutSidebar
             logo={<span></span>}
             collapse={collapse}
             onCollapse={handleCollapse}>
-            <SidebarContent order={order} companyAccount={companyAccount} />
+            <SidebarContent
+              order={order}
+              companyAccount={companyAccount}
+              onCloseSideBar={handleCloseSideBar}
+            />
           </LayoutSidebar>
-          <LayoutMain>
+          <LayoutMain className={css.mainContainer}>
+            <div className={css.header}>
+              <div className={css.title}>Thiết lập menu</div>
+              <div className={css.headerActions}>
+                <IconHome
+                  className={css.actionIcon}
+                  onClick={homeReturnModalController.setTrue}
+                />
+                <div className={css.actionIcon} onClick={handleCollapse}>
+                  <IconSetting variant="black" />
+                </div>
+              </div>
+            </div>
+            <RenderWhen condition={isGroupOrder}>
+              <Stepper
+                steps={BOOKER_CREATE_GROUP_ORDER_STEPS}
+                currentStep={1}
+              />
+            </RenderWhen>
+            <div className={css.orderTitleWrapper}>
+              <div className={css.title}>Đơn hàng #{orderTitle}</div>
+              <Badge
+                label="Đơn hàng tuần"
+                type={EBadgeType.info}
+                className={css.badge}
+              />
+            </div>
+
             <div className={css.main}>
               <CalendarDashboard
                 className={css.calendar}
                 anchorDate={suitableStartDate}
                 startDate={startDate}
                 endDate={endDate}
-                events={orderDetail}
+                events={calendarEvents}
                 companyLogo="Company"
                 hideMonthView
                 {...calendarProps}
@@ -397,6 +486,52 @@ function BookerDraftOrderPage() {
                 </div>
               </RenderWhen>
             </div>
+            <div className={css.subOrderMobileWrapper}>
+              <RenderWhen condition={walkthroughEnable}>
+                <div
+                  className={classNames(
+                    css.subOrderDate,
+                    !isGroupOrder && css.largePadding,
+                  )}>
+                  <RenderWhen condition={!!sampleSubOrder}>
+                    <MealPlanCard
+                      event={sampleSubOrder as Event}
+                      index={123}
+                      resources={{}}
+                      removeInprogress={false}
+                    />
+                  </RenderWhen>
+                </div>
+                <RenderWhen.False>
+                  <RenderWhen condition={!!selectedEvent}>
+                    <MealPlanCard
+                      event={selectedEvent as Event}
+                      index={999}
+                      resources={{ ...calendarProps.resources }}
+                      removeInprogress={
+                        calendarProps?.resources?.updatePlanDetailInprogress
+                      }
+                      onRemove={handleRemoveMeal(planId)}
+                    />
+                    <RenderWhen.False>
+                      <RenderWhen condition={!isAllDatesHaveNoRestaurants}>
+                        <div className={css.addMealWrapper}>
+                          <IconEmpty variant="food" />
+                          <div className={css.emptyText}>Chưa có bữa ăn</div>
+                          <div
+                            className={css.addMeal}
+                            onClick={handleAddMealClick}>
+                            <IconPlus className={css.plusIcon} />
+                            <span>Thêm bữa ăn</span>
+                          </div>
+                        </div>
+                      </RenderWhen>
+                    </RenderWhen.False>
+                  </RenderWhen>
+                </RenderWhen.False>
+              </RenderWhen>
+            </div>
+
             <RenderWhen condition={walkthroughEnable}>
               <WelcomeModal
                 isOpen={welcomeModalControl.value}
@@ -415,6 +550,10 @@ function BookerDraftOrderPage() {
               openFromCalendar
               timestamp={selectedTimestamp}
               packagePerMember={packagePerMember}
+            />
+            <HomeReturnModal
+              isOpen={homeReturnModalController.value}
+              onClose={homeReturnModalController.setFalse}
             />
           </LayoutMain>
         </Layout>

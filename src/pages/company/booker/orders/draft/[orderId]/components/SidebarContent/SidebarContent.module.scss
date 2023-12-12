@@ -1,18 +1,38 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
 
 .root {
   position: relative;
   padding-top: 10px;
 
   .header {
-    display: flex;
-    align-items: center;
-    margin: 10px 0;
+    display: none;
+
+    @include viewportLarge {
+      display: flex;
+      align-items: center;
+      margin: 10px 0;
+    }
 
     .badge {
       color: $labelBlue2;
       flex-shrink: 0;
+    }
+  }
+
+  .mobileHeader {
+    @include flexAlign(center);
+    gap: 8px;
+    padding: 16px;
+    border-bottom: 1px solid $neutralGray3;
+
+    @include viewportLarge {
+      display: none;
+    }
+
+    .title {
+      @include textTemplate(16px, 700, 24px);
     }
   }
 }
@@ -20,15 +40,30 @@
 .main {
   position: relative;
   left: 0;
-  transition: 0.3s linear;
+  transition: opacity 0.3s ease-in-out, left 0.3s ease-in-out;
   opacity: 1;
-  padding: 0 24px 28px;
+  z-index: 1;
+  height: 100vh;
+  background-color: $neutralGray1;
+
+  @include viewportLarge {
+    padding: 0 24px 28px;
+  }
+}
+
+.navigation {
+  padding: 0 16px;
+
+  @include viewportLarge {
+    padding: 0;
+  }
 }
 
 .hideMain {
-  position: absolute;
+  position: fixed;
   left: -240px;
   opacity: 0;
+  z-index: 0;
 }
 
 .title {
@@ -40,7 +75,7 @@
 
 .navItem {
   padding: 20px 0 18px;
-  max-width: 232px;
+  // max-width: 232px;
 
   @include textTemplate(16px, 700, 24px);
   color: $neutralGray7;
@@ -48,6 +83,10 @@
   word-break: break-all;
   border-bottom: 1px solid $neutralGray3;
   transition: 0.3s linear;
+
+  @include viewportLarge {
+    max-width: 232px;
+  }
 
   .itemContainer {
     display: flex;
@@ -84,7 +123,18 @@
   width: 100%;
   opacity: 0;
   transition: 0.3s linear;
-  padding: 0 28px 28px;
+
+  @include viewportLarge {
+    padding: 0 28px 28px;
+  }
+}
+
+.detailsForm {
+  padding: 0 16px;
+
+  @include viewportLarge {
+    padding: 0;
+  }
 }
 
 .showDetailContent {
@@ -95,8 +145,12 @@
 }
 
 .goBack {
-  display: flex;
-  margin-bottom: 16px;
+  display: none;
+
+  @include viewportLarge {
+    display: flex;
+    margin-bottom: 16px;
+  }
 }
 
 .goBackClickArea {
@@ -111,7 +165,21 @@
 }
 
 .detailsTitle {
+  @include flexAlign(center);
   @include textTemplate(20px, 700, 32px);
   margin-bottom: 24px;
   text-transform: capitalize;
+  padding: 16px;
+  border-bottom: 1px solid $neutralGray3;
+
+  @include viewportLarge {
+    padding: 0;
+    border: none;
+  }
+
+  .iconBack {
+    @include viewportLarge {
+      display: none;
+    }
+  }
 }

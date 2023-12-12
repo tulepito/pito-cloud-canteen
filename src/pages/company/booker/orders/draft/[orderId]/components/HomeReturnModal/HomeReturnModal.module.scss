@@ -1,0 +1,22 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.modalContainer.modalContainer {
+  flex-basis: calc(100% - 32px);
+}
+
+.modalContent {
+  @include textTemplate(14px, 400, 20px);
+  color: $neutralGray6;
+}
+
+.btns {
+  @include flexAlign(center);
+  gap: 8px;
+  margin-top: 12px;
+
+  > * {
+    width: 100%;
+  }
+}

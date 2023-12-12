@@ -46,5 +46,10 @@
 
 .calendarTitle {
   color: $neutralGray7;
-  @include textTemplate(14px, 400, 24px, '');
+  @include textTemplate(14px, 700, 24px, '');
+}
+
+.calendarIcon {
+  width: 20px;
+  height: 20px;
 }

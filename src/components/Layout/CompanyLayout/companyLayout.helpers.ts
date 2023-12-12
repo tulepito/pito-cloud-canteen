@@ -37,3 +37,18 @@ export const shouldShowCompanyNavBar = [
 export const shouldShowSidebar = (pathName: string) => {
   return !HIDING_COMPANY_SIDE_BAR_PATHNAMES.includes(pathName);
 };
+
+const HIDING_COMPANY_FOOTER_PATHNAMES = [
+  companyPaths.ManageOrderDetail,
+  companyPaths.ManageOrderPicking,
+];
+
+export const shouldHideCompanyFooter = (pathName: string) => {
+  return HIDING_COMPANY_FOOTER_PATHNAMES.includes(pathName);
+};
+
+const SHOW_COMPANY_MOBILE_HEADER_PATHNAMES = [companyPaths.Home];
+
+export const shouldShowMobileCompanyHeader = (pathName: string) => {
+  return SHOW_COMPANY_MOBILE_HEADER_PATHNAMES.includes(pathName);
+};

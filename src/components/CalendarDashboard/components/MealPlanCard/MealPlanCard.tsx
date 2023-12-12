@@ -33,6 +33,9 @@ const MealPlanCard: React.FC<TMealPlanCardProps> = ({
     (state) => state.Order.orderDetail,
     shallowEqual,
   );
+  const walkthroughStep = useAppSelector(
+    (state) => state.BookerDraftOrderPage.walkthroughStep,
+  );
   const {
     startDate,
     endDate,
@@ -78,6 +81,7 @@ const MealPlanCard: React.FC<TMealPlanCardProps> = ({
     <div
       className={classNames(css.root, {
         [css.disable]: event.resource.disableEditing,
+        [css.walkthrough]: walkthroughStep === 0,
       })}
       data-tour="step-1">
       <MealPlanCardHeader
