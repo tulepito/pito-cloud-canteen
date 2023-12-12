@@ -5,7 +5,7 @@ import BookerNewOrderPage from './BookerNewOrder.page';
 function BookerCreateOrderRoute() {
   return (
     <MetaWrapper routeName="BookerCreateOrderRoute">
-      <BookerNewOrderPage />;
+      <BookerNewOrderPage />
     </MetaWrapper>
   );
 }

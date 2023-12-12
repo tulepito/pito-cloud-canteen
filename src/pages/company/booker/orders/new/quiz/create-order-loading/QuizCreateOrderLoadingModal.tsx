@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 
@@ -17,10 +18,18 @@ type QuizCreateOrderLoadingModalProps = {
   creatingOrderError: boolean;
 };
 
+const middleLoadingSteps = [
+  'QuizCreatingOrderPage.menuIncoming',
+  'QuizCreatingOrderPage.waitingAlitteBit',
+  'QuizCreatingOrderPage.redirectToCalendarPage',
+];
+
 const QuizCreateOrderLoadingModal: React.FC<
   QuizCreateOrderLoadingModalProps
 > = ({ creatingOrderError }) => {
   const intl = useIntl();
+  const [loadingText, setLoadingText] = useState<string>(middleLoadingSteps[0]);
+  const loadingTextIndex = useRef<number>(0);
   const createOrderInProcess = useAppSelector(
     (state) => state.Order.createOrderInProcess,
   );
@@ -42,16 +51,29 @@ const QuizCreateOrderLoadingModal: React.FC<
   const formattedEndDate =
     endDate && formatTimestamp(new Date(endDate).getTime(), 'd MMMM');
 
+  useEffect(() => {
+    if (initialOrderDetailInProgress) {
+      const intervalId = setInterval(() => {
+        if (loadingTextIndex.current < middleLoadingSteps.length) {
+          setLoadingText(middleLoadingSteps[loadingTextIndex.current++]);
+        } else {
+          clearInterval(intervalId);
+        }
+      }, 1000);
+    }
+  }, [initialOrderDetailInProgress]);
+
   return (
     <Modal
       isOpen
       containerClassName={css.modalContainer}
+      shouldFullScreenInMobile={false}
       handleClose={() => {}}
       shouldHideIconClose>
       <div className={css.container}>
         {!creatingOrderError && (
           <div className={css.iconWrapper}>
-            <Spinner />
+            <Spinner className={css.loadingIcon} />
           </div>
         )}
         <div className={css.initialOrderText}>
@@ -61,7 +83,7 @@ const QuizCreateOrderLoadingModal: React.FC<
             })}
           {initialOrderDetailInProgress &&
             intl.formatMessage({
-              id: 'QuizCreatingOrderPage.initializingOrderDetail',
+              id: loadingText,
             })}
 
           {orderTitle &&

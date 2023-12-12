@@ -3,21 +3,33 @@
 @use '/src/styles/mixins.scss' as *;
 
 .formContainer {
-  width: 400px;
   margin: 0 auto;
+  width: 100%;
+
+  @include viewportLarge {
+    width: 400px;
+  }
 }
 
 .loading {
   text-align: center;
 }
 
+.modalHeader {
+  justify-content: flex-start;
+}
+
 .headerContainer {
-  @include flexAlign(center, center);
+  @include flexAlign(normal);
   flex-direction: column;
 
   .main {
-    @include textTemplate(24px, $fontWeightBold, 32px);
-    margin-top: 20px;
+    @include textTemplate(18px, $fontWeightBold, 24px);
+
+    @include viewportLarge {
+      @include textTemplate(24px, $fontWeightBold, 32px);
+      margin-top: 20px;
+    }
   }
 
   .semi {
@@ -25,6 +37,11 @@
     margin-top: 8px;
     color: $neutralGray5;
     text-transform: lowercase;
+    width: 100%;
+
+    @include viewportLarge {
+      width: auto;
+    }
 
     &::first-letter {
       text-transform: uppercase;

@@ -25,6 +25,15 @@ const HIDING_COMPANY_SIDE_BAR_PATHNAMES = [
   ...Object.values(quizPaths),
 ];
 
+export const shouldHideHeaderPathnames = [companyPaths.CreateNewOrder];
+
+export const shouldShowCompanyNavBar = [
+  companyPaths.Home,
+  companyPaths.ManageOrders,
+  companyPaths.CreateNewOrder,
+  companyPaths.Account,
+];
+
 export const shouldShowSidebar = (pathName: string) => {
   return !HIDING_COMPANY_SIDE_BAR_PATHNAMES.includes(pathName);
 };

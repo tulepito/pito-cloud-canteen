@@ -1,0 +1,10 @@
+.bottomBtns {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  gap: 8px;
+
+  .btn {
+    width: 100%;
+  }
+}
