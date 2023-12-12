@@ -5,6 +5,7 @@ import { useViewport } from '@hooks/useViewport';
 import MembersMobilePage, { MembersTab } from '../members/MembersMobile.page';
 
 import GroupSettingPage from './GroupSetting.page';
+import GroupSettingMobile from './GroupSettingMobile';
 
 function CompanyGroupSettingRoute() {
   const { isMobileLayout } = useViewport();
@@ -13,7 +14,7 @@ function CompanyGroupSettingRoute() {
     <MetaWrapper routeName="CompanyGroupSettingRoute">
       <RenderWhen condition={isMobileLayout}>
         <MembersMobilePage currentPage={MembersTab.GroupList}>
-          <h2>Group Setting</h2>
+          <GroupSettingMobile />
         </MembersMobilePage>
         <RenderWhen.False>
           <GroupSettingPage />
