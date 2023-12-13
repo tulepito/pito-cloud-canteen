@@ -19,6 +19,7 @@
 .container {
   display: flex;
   flex-direction: row;
+  align-items: center;
   column-gap: 16px;
 
   & > :first-child {
@@ -53,6 +54,11 @@
 
 .centerSide {
   margin: 0 auto;
+  right: -100vw;
+
+  &.isOpen {
+    right: unset;
+  }
 }
 
 .warning {

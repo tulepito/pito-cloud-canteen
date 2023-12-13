@@ -1,33 +1,33 @@
 @use '/src/styles/vars.scss' as *;
 
-.icon {
+.icon.icon {
   width: 24px;
   height: 24px;
 }
 
-.errorIcon {
+.errorIcon.errorIcon {
   @extend .icon;
   path {
     fill: $primaryPri2;
   }
 }
 
-.container {
+.container.container {
   padding: 16px 24px;
   border-radius: 12px;
   min-height: unset;
 }
 
-.successContainer {
+.successContainer.successContainer {
   @extend .container;
   background-color: $sematicGreen1;
 }
-.errorContainer {
+.errorContainer.errorContainer {
   @extend .container;
   background-color: $primaryPri1;
 }
 
-.body {
+.body.body {
   margin: 0;
   padding: 0;
   margin-right: 74px;
@@ -41,7 +41,7 @@
   }
 }
 
-.errorBody {
+.errorBody.errorBody {
   @extend .body;
   min-width: 368px;
 }

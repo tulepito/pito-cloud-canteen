@@ -4,71 +4,103 @@
 
 .root {
   height: 100%;
-  .contentContainer {
+  padding: 16px 16px 190px;
+
+  @include viewportMedium {
+    padding: 0;
+  }
+}
+
+.contentContainer {
+  @include viewportMedium {
     margin: 16px 16px 32px;
+  }
 
-    @include viewportLargeWithPaddings {
-      max-width: min(1180px, 90vw);
-      margin: 25px auto 80px;
+  @include viewportLargeWithPaddings {
+    max-width: min(1180px, 90vw);
+    margin: 25px auto 80px;
+  }
+}
+
+.titleContainer {
+  display: flex;
+  flex-direction: column;
+  row-gap: 24px;
+
+  .goBackButtonContainer {
+    display: none;
+    column-gap: 8px;
+    width: fit-content;
+    min-height: unset;
+    padding: 2px 4px;
+
+    @include viewportMedium {
+      display: flex;
+    }
+
+    &:hover {
+      transform: translateX(-2px);
+      padding: 2px 6px 2px 2px;
+      transition: all 0.2s linear;
+    }
+
+    .goBackText {
+      @include textTemplate(16px, 700, 24px);
     }
   }
 
-  .titleContainer {
+  .title {
     display: flex;
     flex-direction: column;
-    row-gap: 24px;
+    row-gap: 8px;
+    width: fit-content;
 
-    .goBackContainer {
-      display: flex;
-      column-gap: 8px;
-      width: fit-content;
-      min-height: unset;
-      padding: 2px 4px;
+    & > div {
+      @include textTemplate(24px, 700, 32px);
 
-      &:hover {
-        transform: translateX(-2px);
-        padding: 2px 6px 2px 2px;
-        transition: all 0.2s linear;
-      }
+      &:first-of-type {
+        display: none;
 
-      .goBackText {
-        @include textTemplate(16px, 700, 24px);
-      }
-    }
-
-    .title {
-      display: flex;
-      flex-direction: column;
-      row-gap: 8px;
-      width: fit-content;
-
-      & > div {
-        @include textTemplate(24px, 700, 32px);
+        @include viewportMedium {
+          display: block;
+        }
       }
     }
   }
+}
 
-  .confirmModalChildrenContainer.confirmModalChildrenContainer {
+.confirmModalContainer.confirmModalContainer {
+  width: calc(100vw - 32px);
+}
+
+.confirmModalChildrenContainer.confirmModalChildrenContainer {
+  padding: 12px 0;
+  font-weight: 400;
+
+  @include viewportMedium {
     padding: 20px 0 28px;
-    font-weight: 400;
+  }
+}
+
+.participantInvitationContainer {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  row-gap: 12px;
+
+  @include viewportLarge {
+    margin-top: 24px;
+    flex-direction: row-reverse;
+    align-items: flex-start;
+    column-gap: 24px;
   }
 
-  .participantInvitationContainer {
-    margin-top: 16px;
-    display: flex;
-    flex-direction: column;
-    row-gap: 12px;
-
-    @include viewportLarge {
-      margin-top: 24px;
-      flex-direction: row-reverse;
-      align-items: flex-start;
-      column-gap: 24px;
-    }
-
-    @include viewportSLarge {
-      margin-top: 28px;
-      column-gap: 40px;
-    }
+  @include viewportSLarge {
+    margin-top: 28px;
+    column-gap: 40px;
   }
+}
+
+.mobileDeadlineFormContainer {
+  padding: 10px 16px 20px;
 }

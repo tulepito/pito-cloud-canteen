@@ -22,7 +22,11 @@ const ParticipantList: React.FC<TParticipantListProps> = () => {
     (state) => state.BookerDraftOrderPage.participantData,
   );
   const order = useAppSelector((state) => state.Order.order);
+
+  const orderGetter = Listing(order);
   const participantIds = participantData.map((p) => User(p as TUser).getId());
+
+  const { nonAccountEmails = [] } = orderGetter.getMetadata();
 
   const handleDeleteParticipant = (userId: string) => () => {
     setCurrentParticipantId(userId);
@@ -39,7 +43,7 @@ const ParticipantList: React.FC<TParticipantListProps> = () => {
       dispatch(
         BookerDraftOrderPageThunks.deleteOrderParticipants({
           participantId: currentParticipantId,
-          orderId: Listing(order).getId(),
+          orderId: orderGetter.getId(),
           participants: difference(participantIds, [currentParticipantId]),
         }),
       );
@@ -50,6 +54,9 @@ const ParticipantList: React.FC<TParticipantListProps> = () => {
   return (
     <div className={css.root}>
       <div className={css.participantContainer}>
+        {nonAccountEmails.map((email: string) => {
+          return <ParticipantCard key={email} email={email} />;
+        })}
         {participantData.map((p: TObject) => {
           const participantGetter = User(p as TUser);
           const participantId = participantGetter.getId();
@@ -71,11 +78,14 @@ const ParticipantList: React.FC<TParticipantListProps> = () => {
 
       <AlertModal
         title="Xoá thành viên"
+        containerClassName={css.confirmDeleteModalContainer}
+        childrenClassName={css.confirmDeleteModalChildrenContainer}
         isOpen={deleteParticipantControl.value}
         cancelLabel="Huỷ"
         confirmLabel="Xoá thành viên"
         handleClose={handleCancelDeleteParticipant}
         onCancel={handleCancelDeleteParticipant}
+        shouldFullScreenInMobile={false}
         onConfirm={handleConfirmDeleteParticipant}>
         Bạn có chắc chắn muốn xoá thành viên này không?
       </AlertModal>
