@@ -67,7 +67,7 @@ const FoodBasicInfoTabComponent: React.FC<TFoodBasicInfoTabComponentProps> = (
     ...formattedCurrentFoodListingImages,
   };
 
-  const submitDisabled = invalid || isEmpty(images) || inProgress;
+  const submitDisabled = invalid || inProgress;
 
   return (
     <Form onSubmit={handleSubmit} className={css.root}>
@@ -103,9 +103,13 @@ const FoodBasicInfoTabComponent: React.FC<TFoodBasicInfoTabComponentProps> = (
       />
       <FieldMultiplePhotosMobile
         images={images}
-        containerClassName={css.field}
+        labelClassName={css.field}
         name="images"
         variants={[EImageVariants.squareSmall2x]}
+        label={intl.formatMessage({
+          id: 'EditPartnerFoodForm.foodImagesLabel',
+        })}
+        hintShowed={isEmpty(images)}
       />
       <FieldTextInput
         className={css.field}

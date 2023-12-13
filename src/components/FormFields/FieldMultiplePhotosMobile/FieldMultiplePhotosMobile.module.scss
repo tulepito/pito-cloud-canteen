@@ -1,9 +1,9 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/customMediaQueries.scss' as *;
 @use '/src/styles/mixins.scss' as *;
+@use '/src/styles/defaults.scss' as *;
 
 .container {
-  margin-top: 12px;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 12px;
@@ -128,4 +128,27 @@
   overflow: hidden;
   background-color: $neutralGray1; /* Loading BG color */
   padding-bottom: 100px;
+}
+
+.labelRoot {
+  @include inputLabelStyles;
+}
+
+.hintSection {
+  margin-top: 8px;
+  padding: 12px 8px;
+  border-radius: 8px;
+  gap: 8px;
+  background-color: $labelBlue1;
+
+  @include flexAlign(center);
+
+  .hintIcon {
+    min-width: 24px;
+    min-height: 24px;
+  }
+
+  .hintContent {
+    @include textTemplate(12px, $fontWeightRegular, 20px);
+  }
 }
