@@ -6,12 +6,13 @@ import type { TIconProps } from '@utils/types';
 import css from './IconBell.module.scss';
 
 const IconBell: React.FC<TIconProps> = (props) => {
-  const { className } = props;
+  const { className, onClick } = props;
   const classes = classNames(css.root, className);
 
   return (
     <svg
       className={classes}
+      onClick={onClick}
       width="24"
       height="24"
       viewBox="0 0 24 24"

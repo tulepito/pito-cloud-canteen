@@ -27,6 +27,10 @@ const adminChecker =
         });
       }
 
+      req.previewData = {
+        currentUser,
+      };
+
       return handler(req, res);
     } catch (error) {
       console.error('error', error);

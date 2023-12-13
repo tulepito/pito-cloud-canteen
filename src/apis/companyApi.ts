@@ -236,3 +236,6 @@ export const queryAllClientPaymentRecordsApi = (
 export const adminQueryAllClientPaymentsApi = (lastPaymentRecord: number) => {
   return getApi(`/admin/payment/client`, { lastPaymentRecord });
 };
+
+export const fetchBookerNotificationsApi = () =>
+  getApi(`/company/notifications`);

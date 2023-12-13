@@ -1,8 +1,9 @@
 import compact from 'lodash/compact';
 
 import { fetchTransaction } from '@services/integrationHelper';
+import { createFirebaseDocNotification } from '@services/notifications';
 import { Listing, Transaction } from '@src/utils/data';
-import { EOrderStates } from '@src/utils/enums';
+import { ENotificationType, EOrderStates } from '@src/utils/enums';
 import {
   ETransition,
   TRANSITIONS_TO_STATE_CANCELED,
@@ -22,6 +23,9 @@ export const transitionOrderStatus = async (
     isClientSufficientPaid,
     isPartnerSufficientPaid,
     orderStateHistory = [],
+    bookerId,
+    startDate,
+    endDate,
   } = orderListing.getMetadata();
   const { orderDetail = {} } = planListing.getMetadata();
 
@@ -84,6 +88,13 @@ export const transitionOrderStatus = async (
           },
         ],
       },
+    });
+
+    createFirebaseDocNotification(ENotificationType.BOOKER_RATE_ORDER, {
+      userId: bookerId,
+      orderId,
+      startDate,
+      endDate,
     });
   }
 };

@@ -13,7 +13,11 @@
   }
 
   &.isNew {
-    background-color: $neutralGray3;
+    color: $neutralGray7;
+
+    .content {
+      color: $neutralGray7;
+    }
   }
 }
 
@@ -24,7 +28,7 @@
 
 .contentWrapper {
   .content {
-    color: $neutralGray7;
+    color: $neutralGray6;
     @include textTemplate(14px, $fontWeightRegular, 20px);
   }
 
@@ -37,4 +41,5 @@
 
 .boldText {
   font-weight: $fontWeightBold;
+  color: $neutralGray7;
 }

@@ -4,9 +4,12 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { composeApiCheckers, HttpMethod } from '@apis/configs';
 import orderServices from '@pages/api/apiServices/order/index.service';
 import { emailSendingFactory, EmailTemplateTypes } from '@services/email';
+import { fetchListing } from '@services/integrationHelper';
+import { createFirebaseDocNotification } from '@services/notifications';
 import adminChecker from '@services/permissionChecker/admin';
-import { getCurrentUser, handleError } from '@services/sdk';
+import { handleError } from '@services/sdk';
 import { CurrentUser } from '@src/utils/data';
+import { ENotificationType } from '@src/utils/enums';
 import type { TObject, TOrderChangeHistoryItem } from '@src/utils/types';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
@@ -18,7 +21,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       emailParamsForBookerNotification,
       firebaseChangeHistory,
     } = req.body;
-    const { currentUser } = await getCurrentUser(req, res);
+    const { currentUser } = req.previewData as any;
 
     switch (apiMethod) {
       case HttpMethod.POST: {
@@ -26,6 +29,22 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           emailSendingFactory(
             EmailTemplateTypes.BOOKER.BOOKER_PICKING_ORDER_CHANGED,
             emailParamsForBookerNotification,
+          );
+
+          const order = await fetchListing(
+            emailParamsForBookerNotification.orderId,
+          );
+
+          const { startDate, endDate } = order.attributes.metadata || {};
+
+          createFirebaseDocNotification(
+            ENotificationType.BOOKER_ORDER_CHANGED,
+            {
+              userId: CurrentUser(currentUser).getId(),
+              orderId: emailParamsForBookerNotification.orderId,
+              startDate,
+              endDate,
+            },
           );
         }
 

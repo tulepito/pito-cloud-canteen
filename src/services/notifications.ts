@@ -25,6 +25,8 @@ type NotificationParams = {
   orderId: string;
   planId: string;
   seen: boolean;
+  startDate: number;
+  endDate: number;
 };
 
 export type NotificationInvitationParams = TObject &
@@ -215,6 +217,82 @@ export const createFirebaseDocNotification = async (
           orderId,
           companyName,
           relatedLink: `/partner/orders/${orderId}_${subOrderDate}`,
+        };
+
+        break;
+      }
+
+      case ENotificationType.BOOKER_NEW_ORDER_CREATED: {
+        const { orderId, startDate, endDate } = notificationParams;
+        data = {
+          ...data,
+          orderId,
+          startDate,
+          endDate,
+          relatedLink: `/company/booker/orders/draft/${orderId}`,
+        };
+
+        break;
+      }
+
+      case ENotificationType.BOOKER_ORDER_CHANGED: {
+        const { orderId, startDate, endDate } = notificationParams;
+        data = {
+          ...data,
+          orderId,
+          startDate,
+          endDate,
+          relatedLink: `/company/booker/orders/${orderId}/picking`,
+        };
+
+        break;
+      }
+
+      case ENotificationType.BOOKER_RATE_ORDER: {
+        const { orderId, startDate, endDate } = notificationParams;
+        data = {
+          ...data,
+          orderId,
+          startDate,
+          endDate,
+          relatedLink: `/company/orders/${orderId}/rating`,
+        };
+
+        break;
+      }
+
+      case ENotificationType.BOOKER_SUB_ORDER_COMPLETED: {
+        const { orderId, subOrderDate } = notificationParams;
+        data = {
+          ...data,
+          orderId,
+          subOrderDate,
+          relatedLink: `/company/orders/${orderId}`,
+        };
+
+        break;
+      }
+
+      case ENotificationType.BOOKER_SUB_ORDER_CANCELLED: {
+        const { orderId, subOrderDate } = notificationParams;
+        data = {
+          ...data,
+          orderId,
+          subOrderDate,
+          relatedLink: `/company/orders/${orderId}`,
+        };
+
+        break;
+      }
+
+      case ENotificationType.BOOKER_PICKING_ORDER: {
+        const { orderId, startDate, endDate } = notificationParams;
+        data = {
+          ...data,
+          orderId,
+          startDate,
+          endDate,
+          relatedLink: `/company/booker/orders/${orderId}/picking`,
         };
 
         break;

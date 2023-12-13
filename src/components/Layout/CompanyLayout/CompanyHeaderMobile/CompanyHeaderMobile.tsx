@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 
 import Avatar from '@components/Avatar/Avatar';
+import BookerNotificationModal from '@components/BookerNotificationModal/BookerNotificationModal';
 import { InlineTextButton } from '@components/Button/Button';
 import HamburgerMenuButton from '@components/HamburgerMenuButton/HamburgerMenuButton';
 import IconBell from '@components/Icons/IconBell/IconBell';
@@ -53,6 +54,7 @@ const CompanyHeaderMobile: React.FC<CompanyHeaderMobileProps> = (props) => {
   const currentUser = useAppSelector(currentUserSelector);
   const dispatch = useAppDispatch();
   const handleLogoutFn = useLogout();
+  const bookerNotificationModalController = useBoolean();
 
   const currentUserGetter = CurrentUser(currentUser);
   const { lastName = '', firstName = '' } = currentUserGetter.getProfile();
@@ -94,7 +96,12 @@ const CompanyHeaderMobile: React.FC<CompanyHeaderMobileProps> = (props) => {
 
   const renderRightIcon = () => {
     if (isMobileLayout) {
-      return <IconBell className={css.iconBell} />;
+      return (
+        <IconBell
+          className={css.iconBell}
+          onClick={bookerNotificationModalController.setTrue}
+        />
+      );
     }
 
     return !isOpen ? (
@@ -173,6 +180,11 @@ const CompanyHeaderMobile: React.FC<CompanyHeaderMobileProps> = (props) => {
           </div>
         </div>
       )}
+
+      <BookerNotificationModal
+        isOpen={bookerNotificationModalController.value}
+        onClose={bookerNotificationModalController.setFalse}
+      />
     </div>
   );
 };
