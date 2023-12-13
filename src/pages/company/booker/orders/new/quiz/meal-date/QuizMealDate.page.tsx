@@ -3,8 +3,10 @@ import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 
 import type { TDaySession } from '@components/CalendarDashboard/helpers/types';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
+import { useViewport } from '@hooks/useViewport';
 import { QuizActions } from '@redux/slices/Quiz.slice';
 import { CurrentUser, User } from '@src/utils/data';
 import { EOrderType, QuizStep } from '@src/utils/enums';
@@ -22,9 +24,13 @@ import css from './QuizMealDate.module.scss';
 
 type TQuizMealDateProps = {
   stepInfo?: string;
+  firstTimeOrder?: boolean;
 };
 
-const QuizMealDate: React.FC<TQuizMealDateProps> = ({ stepInfo }) => {
+const QuizMealDate: React.FC<TQuizMealDateProps> = ({
+  stepInfo,
+  firstTimeOrder,
+}) => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
   const creatingOrderModalControl = useBoolean();
@@ -40,6 +46,7 @@ const QuizMealDate: React.FC<TQuizMealDateProps> = ({ stepInfo }) => {
     submitCreateOrder,
     creatingOrderInProgress,
     creatingOrderError,
+    handleCloseQuizFlow,
   } = useQuizFlow(QuizStep.MEAL_DATE);
   const {
     modalContentRef,
@@ -47,6 +54,7 @@ const QuizMealDate: React.FC<TQuizMealDateProps> = ({ stepInfo }) => {
     onClickDeliveryHour,
     onClickIsGroupOrder,
   } = useQuizModalScrollControl();
+  const { isMobileLayout } = useViewport();
 
   const { hasOrderBefore = false } = CurrentUser(currentUser!).getPrivateData();
   const hasPreviousOrder = previousOrder !== null;
@@ -86,7 +94,13 @@ const QuizMealDate: React.FC<TQuizMealDateProps> = ({ stepInfo }) => {
     submitCreateOrder(normalizedFormValues);
   };
 
-  return !creatingOrderInProgress ? (
+  if (!isMobileLayout && creatingOrderInProgress) {
+    return (
+      <QuizCreateOrderLoadingModal creatingOrderError={creatingOrderError} />
+    );
+  }
+
+  return (
     <QuizModal
       id="QuizMealDateModal"
       isOpen={!creatingOrderModalControl.value}
@@ -97,7 +111,8 @@ const QuizMealDate: React.FC<TQuizMealDateProps> = ({ stepInfo }) => {
       modalContainerClassName={css.modalContainer}
       modalContentRef={modalContentRef}
       stepInfo={stepInfo}
-      onBack={hasOrderBefore ? undefined : backStep}>
+      onBack={hasOrderBefore ? handleCloseQuizFlow : backStep}
+      firstTimeOrder={firstTimeOrder}>
       <MealDateForm
         onSubmit={() => {}}
         hasPreviousOrder={hasPreviousOrder}
@@ -108,9 +123,10 @@ const QuizMealDate: React.FC<TQuizMealDateProps> = ({ stepInfo }) => {
         onClickDeliveryHour={onClickDeliveryHour}
         onClickIsGroupOrder={onClickIsGroupOrder}
       />
+      <RenderWhen condition={creatingOrderInProgress}>
+        <QuizCreateOrderLoadingModal creatingOrderError={creatingOrderError} />
+      </RenderWhen>
     </QuizModal>
-  ) : (
-    <QuizCreateOrderLoadingModal creatingOrderError={creatingOrderError} />
   );
 };
 

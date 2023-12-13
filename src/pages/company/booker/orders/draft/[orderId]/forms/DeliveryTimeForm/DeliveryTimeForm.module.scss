@@ -1,7 +1,16 @@
 @use '/src/styles/defaults.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
 
 .root {
-  padding-bottom: 150px;
+  @include flexAlign(normal, space-between);
+  flex-direction: column;
+  height: 80vh;
+
+  @include viewportLarge {
+    display: block;
+    height: auto;
+  }
 }
 
 .inputWrapper {

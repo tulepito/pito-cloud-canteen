@@ -1,11 +1,5 @@
 @use '/src/styles/customMediaQueries.scss' as *;
 
-.openModal .modalContainer {
-  top: 0;
-  max-width: 700px;
-  flex-basis: 700px;
-}
-
 .openModal .modalScrollLayer {
   align-items: center;
 
@@ -15,9 +9,6 @@
 }
 
 .modalContent {
-  width: calc(100% - 48px);
-  margin: auto;
-
   @include viewportMedium {
     padding: 25px 0 0;
     width: 100%;

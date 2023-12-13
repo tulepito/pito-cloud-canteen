@@ -336,3 +336,38 @@ export const MEAL_PLANS_MOCKUP = [
     end: new Date(2023, 1, 7, 20, 0, 0),
   },
 ];
+
+export const getBookerMockupSubOrder = (startDate: Date) => {
+  return {
+    resource: {
+      id: Number(startDate),
+      daySession: 'MORNING_SESSION',
+      isSelectedFood: true,
+      restaurant: {
+        id: '1',
+        name: 'Vua hải sản',
+        menuId: '1',
+        coverImage: undefined,
+      },
+      meal: {
+        dishes: [
+          {
+            key: '1',
+            name: 'Tôm hùm Alaska',
+          },
+          {
+            key: '2',
+            name: 'Bạch tuột Caribe',
+          },
+          {
+            key: '3',
+            name: 'Gỏi hải sản thập cẩm',
+          },
+        ],
+      },
+      planId: '1',
+    },
+    start: DateTime.fromMillis(Number(startDate)).startOf('day').toJSDate(),
+    end: DateTime.fromMillis(Number(startDate)).endOf('day').toJSDate(),
+  };
+};

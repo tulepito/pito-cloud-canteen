@@ -10,13 +10,21 @@ type TSlideModalProps = PropsWithChildren & {
   id: string;
   isOpen: boolean;
   modalTitle?: ReactNode;
+  customHeader?: ReactNode;
   onClose: (e: React.MouseEvent<HTMLElement>) => void;
   containerClassName?: string;
 };
 
 const SlideModal: React.FC<TSlideModalProps> = (props) => {
-  const { isOpen, onClose, id, children, modalTitle, containerClassName } =
-    props;
+  const {
+    isOpen,
+    onClose,
+    id,
+    children,
+    modalTitle,
+    containerClassName,
+    customHeader,
+  } = props;
 
   const containerClasses = classNames(
     css.slideModalContainer,
@@ -32,10 +40,12 @@ const SlideModal: React.FC<TSlideModalProps> = (props) => {
       openClassName={css.slideModalOpen}
       scrollLayerClassName={css.slideModalScrollLayer}
       customHeader={
-        <div className={css.modalHeader}>
-          <IconClose className={css.closeIcon} onClick={onClose} />
-          {modalTitle && <div className={css.title}>{modalTitle}</div>}
-        </div>
+        customHeader || (
+          <div className={css.modalHeader}>
+            <IconClose className={css.closeIcon} onClick={onClose} />
+            {modalTitle && <div className={css.title}>{modalTitle}</div>}
+          </div>
+        )
       }
       containerClassName={containerClasses}
       contentClassName={css.slideModalContent}>

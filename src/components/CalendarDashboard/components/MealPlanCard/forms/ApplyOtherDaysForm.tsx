@@ -72,6 +72,7 @@ const ApplyOtherDaysForm: React.FC<TApplyOtherDaysFormProps> = ({
         form={form}
         values={values}
         disabledDates={disabledDates}
+        title="Chọn ngày"
       />
 
       <Button

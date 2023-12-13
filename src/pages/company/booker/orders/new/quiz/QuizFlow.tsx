@@ -13,15 +13,15 @@ import QuizSpecialDemandPage from './special-demand/QuizSpecialDemand.page';
 export const firstTimeQuizSteps = [
   {
     key: QuizStep.PACKAGE_PER_MEMBER,
-    component: <QuizPerPackMemberAmountPage stepInfo="1/3" />,
+    component: <QuizPerPackMemberAmountPage stepInfo="1/3" firstTimeOrder />,
   },
   {
     key: QuizStep.SPECIAL_DEMAND,
-    component: <QuizSpecialDemandPage stepInfo="2/3" />,
+    component: <QuizSpecialDemandPage stepInfo="2/3" firstTimeOrder />,
   },
   {
     key: QuizStep.MEAL_DATE,
-    component: <QuizMealDatePage stepInfo="3/3" />,
+    component: <QuizMealDatePage stepInfo="3/3" firstTimeOrder />,
   },
 ];
 

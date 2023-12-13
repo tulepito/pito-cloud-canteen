@@ -11,7 +11,7 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { useViewport } from '@hooks/useViewport';
 import QuizFlow from '@pages/company/booker/orders/new/quiz/QuizFlow';
 import { BookerCompaniesThunks } from '@redux/slices/BookerCompanies.slice';
-import { companyPaths, personalPaths } from '@src/paths';
+import { companyPaths } from '@src/paths';
 import { User } from '@utils/data';
 import type { TUser } from '@utils/types';
 
@@ -22,6 +22,8 @@ import CompanyNavBar from './CompanyNavBar/CompanyNavBar';
 import CompanySidebar from './CompanySidebar/CompanySidebar';
 import {
   shouldHideCompanyFooter,
+  shouldHideHeaderPathnames,
+  shouldShowCompanyNavBar,
   shouldShowFeatureHeader,
   shouldShowSidebar,
 } from './companyLayout.helpers';
@@ -153,13 +155,6 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
 
   const companyHeaderLinkData: any[] = [];
 
-  const shouldShowCompanyNavBar = [
-    companyPaths.Home,
-    companyPaths.ManageOrders,
-    companyPaths.CreateNewOrder,
-    personalPaths.Account,
-  ];
-
   useEffect(() => {
     dispatch(BookerCompaniesThunks.fetchBookerCompanies());
   }, [dispatch]);
@@ -199,12 +194,14 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
 
   return (
     <>
-      <CompanyHeaderWrapper
-        companyId={(selectedAccount?.value as string) || 'personal'}
-        showFeatureHeader={showFeatureHeader}
-        featureHeaderData={featureHeaderData}
-        companyHeaderLinkData={companyHeaderLinkData}
-      />
+      <RenderWhen condition={!shouldHideHeaderPathnames.includes(pathname)}>
+        <CompanyHeaderWrapper
+          companyId={(selectedAccount?.value as string) || 'personal'}
+          showFeatureHeader={showFeatureHeader}
+          featureHeaderData={featureHeaderData}
+          companyHeaderLinkData={companyHeaderLinkData}
+        />
+      </RenderWhen>
       {showSidebar && <CompanySidebar companyName={companyName!} />}
       <CompanyMainContent
         hasHeader={showFeatureHeader}

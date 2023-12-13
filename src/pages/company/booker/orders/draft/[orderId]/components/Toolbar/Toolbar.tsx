@@ -29,6 +29,7 @@ export type TToolbarProps = {
   onFinishOrder: () => void;
   onRecommendRestaurantInProgress: boolean;
   onRecommendNewRestaurants: () => void;
+  shouldHideExtraActionBtn?: boolean;
 };
 
 const Toolbar: React.FC<TToolbarProps> = (props) => {
@@ -44,6 +45,7 @@ const Toolbar: React.FC<TToolbarProps> = (props) => {
     onRecommendRestaurantInProgress,
     onRecommendNewRestaurants,
   } = props;
+
   const intl = useIntl();
   const startDateDateTime = useMemo(
     () => DateTime.fromMillis(startDate),
@@ -90,7 +92,7 @@ const Toolbar: React.FC<TToolbarProps> = (props) => {
           </div>
         </div>
       </div>
-      <div className={css.actions}>
+      <div className={classNames(css.actions, css.extra)}>
         <Button
           variant="secondary"
           className={css.secondaryBtn}
@@ -102,6 +104,29 @@ const Toolbar: React.FC<TToolbarProps> = (props) => {
         </Button>
         <Button
           variant="cta"
+          onClick={onFinishOrder}
+          disabled={finishDisabled}
+          loadingMode="extend"
+          inProgress={finishInProgress}>
+          {intl.formatMessage({ id: 'Booker.CreateOrder.Toolbar.finish' })}
+        </Button>
+      </div>
+      <div className={css.bottomBtns}>
+        <Button
+          variant="secondary"
+          className={css.secondaryBtn}
+          onClick={onRecommendNewRestaurants}>
+          <IconRefreshing
+            className={css.refreshIcon}
+            inProgress={onRecommendRestaurantInProgress}
+          />
+          {intl.formatMessage({
+            id: 'Booker.CreateOrder.Toolbar.suggestNewRestaurant',
+          })}
+        </Button>
+        <Button
+          variant="cta"
+          className={css.ctaBtn}
           onClick={onFinishOrder}
           disabled={finishDisabled}
           loadingMode="extend"

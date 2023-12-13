@@ -4,24 +4,37 @@
 
 .root {
   display: flex;
-  padding-bottom: 44px;
+  padding-bottom: 16px;
   align-items: center;
   flex-direction: column;
 
   @include viewportLarge {
     flex-direction: row;
     justify-content: space-between;
+    padding-bottom: 44px;
   }
 }
 
 .actions {
-  display: flex;
-  align-items: center;
+  width: 100%;
+
+  @include viewportLarge {
+    @include flexAlign(center, space-between);
+    width: unset;
+  }
 
   .loadingIcon {
     width: 18px;
     height: 18px;
     margin: 0 0 0 8px;
+  }
+
+  &.extra {
+    display: none;
+
+    @include viewportLarge {
+      display: flex;
+    }
   }
 }
 
@@ -51,10 +64,13 @@
 }
 
 .toolbarNavigation {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  @include flexAlign(center, space-between);
   min-width: 160px;
+  width: 100%;
+
+  @include viewportLarge {
+    width: unset;
+  }
 }
 
 .actions button {
@@ -71,10 +87,46 @@
 }
 
 .secondaryBtn {
+  @include textTemplate(14px, 700, 24px);
+
+  @include viewportLarge {
+    @include textTemplate(16px, 700, 24px);
+  }
+
+  .refreshIcon {
+    margin-right: 8px;
+  }
   &:hover,
   &:focus {
     & svg path {
       fill: $neutralGray1;
     }
+  }
+}
+
+.bottomBtns {
+  @include flexAlign(center, space-between);
+  gap: 8px;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 12px 16px 20px;
+  background: $neutralGray1;
+  box-shadow: 0px -4px 8px -2px rgba(16, 24, 40, 0.1),
+    0px -2px 4px -2px rgba(16, 24, 40, 0.06);
+  z-index: 1;
+
+  @include viewportLarge {
+    display: none;
+  }
+
+  .secondaryBtn {
+    width: 100%;
+  }
+
+  .ctaBtn {
+    flex-basis: 48%;
+    width: 100%;
   }
 }

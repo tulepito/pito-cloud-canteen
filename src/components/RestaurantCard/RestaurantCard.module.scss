@@ -1,14 +1,19 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
 
 .root {
   position: relative;
-  width: 295px;
+  width: 100%;
   padding: 16px;
   border-radius: 12px;
   border: 1px solid $neutralGray3;
   @include flexAlign(normal);
   flex-direction: column;
+
+  @include viewportMedium {
+    width: 295px;
+  }
 }
 
 .bonusBadge {

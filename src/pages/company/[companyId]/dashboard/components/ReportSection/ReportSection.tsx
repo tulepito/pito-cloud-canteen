@@ -32,7 +32,12 @@ const ReportSection: React.FC<TReportSectionProps> = (props) => {
           <div className={css.reportItem}>
             <div className={css.content}>
               <p className={css.label}>
-                <FormattedMessage id="ReportSection.label.totalDishes" />
+                <span className={css.icon}>
+                  <IconDish />
+                </span>
+                <span>
+                  <FormattedMessage id="ReportSection.label.totalDishes" />
+                </span>
               </p>
               <h5 className={css.count}>{totalOrderDishes}</h5>
             </div>
@@ -43,6 +48,9 @@ const ReportSection: React.FC<TReportSectionProps> = (props) => {
           <div className={css.reportItem}>
             <div className={css.content}>
               <p className={css.label}>
+                <span className={css.icon}>
+                  <IconDollar />
+                </span>
                 <FormattedMessage id="ReportSection.label.totalCost" />
               </p>
               <h5 className={css.count}>{numberWithDots(totalOrderCost)}đ</h5>

@@ -16,6 +16,7 @@ type TOrderStateWarningModal = {
   confirmInProgress?: boolean;
   cancelText?: string;
   cancelInProgress?: boolean;
+  shouldFullScreenInMobile?: boolean;
 };
 
 const OrderStateWarningModal: React.FC<TOrderStateWarningModal> = (props) => {
@@ -26,6 +27,7 @@ const OrderStateWarningModal: React.FC<TOrderStateWarningModal> = (props) => {
     confirmInProgress,
     cancelText,
     cancelInProgress,
+    shouldFullScreenInMobile,
     ...rest
   } = props;
 
@@ -36,6 +38,7 @@ const OrderStateWarningModal: React.FC<TOrderStateWarningModal> = (props) => {
       cancelLabel={cancelText || 'Thoát'}
       confirmInProgress={confirmInProgress}
       cancelInProgress={cancelInProgress}
+      shouldFullScreenInMobile={shouldFullScreenInMobile}
       confirmLabel={confirmText}>
       <div className={css.content}>{content}</div>
     </AlertModal>

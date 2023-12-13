@@ -4,6 +4,7 @@ import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
+import { toast } from 'react-toastify';
 import classNames from 'classnames';
 import type { FormApi } from 'final-form';
 import arrayMutators from 'final-form-arrays';
@@ -21,6 +22,7 @@ import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput
 import FieldTextInputWithBottomBox from '@components/FormFields/FieldTextInputWithBottomBox/FieldTextInputWithBottomBox';
 import PopupModal from '@components/PopupModal/PopupModal';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
+import FileHelpers from '@helpers/fileHelpers';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { foodSliceAction, foodSliceThunks } from '@redux/slices/foods.slice';
@@ -106,10 +108,20 @@ const EditPartnerFoodFormComponent: React.FC<
     removedImageIds,
   );
 
-  const onImageUpload = (params: { id: string; file: File }) => {
-    return dispatch(
-      foodSliceThunks.requestUploadFoodImages(params),
-    ) as Promise<{ payload: any }>;
+  const onImageUpload = async (params: { id: string; file: File }) => {
+    try {
+      const { file } = params;
+      const compressedFile = (await FileHelpers.compressImage(file)) as File;
+      params.file = compressedFile;
+
+      return await (dispatch(
+        foodSliceThunks.requestUploadFoodImages(params),
+      ) as Promise<{
+        payload: any;
+      }>);
+    } catch (error) {
+      toast.error('Có lỗi xảy ra khi tải ảnh lên');
+    }
   };
 
   const onRemoveImage = (id: string) => {

@@ -1,8 +1,17 @@
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.root {
+  @include bookerSidebarFormRoot;
+}
 .inputWrapper {
   margin-bottom: 24px;
 }
 
 .submitBtn {
   width: 100%;
-  margin-bottom: 400px;
+
+  @include viewportLarge {
+    margin-bottom: 400px;
+  }
 }

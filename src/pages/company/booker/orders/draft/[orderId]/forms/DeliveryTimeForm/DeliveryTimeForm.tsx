@@ -108,52 +108,54 @@ const DeliveryTimeForm: React.FC<TDeliveryTimeFormProps> = ({
 
   return (
     <form className={css.root} onSubmit={handleSubmit}>
-      <FieldDatePickerComponent
-        id="startDate"
-        name="startDate"
-        input={startDate.input}
-        meta={startDate.meta}
-        selected={selectedStartDate}
-        label={intl.formatMessage({
-          id: 'Booker.CreateOrder.Form.field.orderStartDate',
-        })}
-        minDate={minStartDate}
-        dateFormat={'EEE, dd MMMM, yyyy'}
-        placeholderText={intl.formatMessage({
-          id: 'Booker.CreateOrder.Form.field.datePlaceholder',
-        })}
-        className={css.dateInput}
-        autoComplete="off"
-      />
-      <FieldDatePickerComponent
-        id="endDate"
-        name="endDate"
-        input={endDate.input}
-        meta={endDate.meta}
-        label={intl.formatMessage({
-          id: 'Booker.CreateOrder.Form.field.orderEndDate',
-        })}
-        minDate={minEndDate}
-        maxDate={maxEndDate}
-        dateFormat={'EEE, dd MMMM, yyyy'}
-        placeholderText={intl.formatMessage({
-          id: 'Booker.CreateOrder.Form.field.datePlaceholder',
-        })}
-        className={css.dateInput}
-        autoComplete="off"
-      />
-      <FieldDropdownSelectComponent
-        id="deliveryHour"
-        name="deliveryHour"
-        className={css.fieldSelect}
-        label={intl.formatMessage({
-          id: 'Booker.CreateOrder.Form.field.deliveryHour',
-        })}
-        leftIcon={<IconClock />}
-        meta={deliveryHour.meta}
-        input={deliveryHour.input}
-        options={parsedDeliveryHourOptions}
-      />
+      <div>
+        <FieldDatePickerComponent
+          id="startDate"
+          name="startDate"
+          input={startDate.input}
+          meta={startDate.meta}
+          selected={selectedStartDate}
+          label={intl.formatMessage({
+            id: 'Booker.CreateOrder.Form.field.orderStartDate',
+          })}
+          minDate={minStartDate}
+          dateFormat={'EEE, dd MMMM, yyyy'}
+          placeholderText={intl.formatMessage({
+            id: 'Booker.CreateOrder.Form.field.datePlaceholder',
+          })}
+          className={css.dateInput}
+          autoComplete="off"
+        />
+        <FieldDatePickerComponent
+          id="endDate"
+          name="endDate"
+          input={endDate.input}
+          meta={endDate.meta}
+          label={intl.formatMessage({
+            id: 'Booker.CreateOrder.Form.field.orderEndDate',
+          })}
+          minDate={minEndDate}
+          maxDate={maxEndDate}
+          dateFormat={'EEE, dd MMMM, yyyy'}
+          placeholderText={intl.formatMessage({
+            id: 'Booker.CreateOrder.Form.field.datePlaceholder',
+          })}
+          className={css.dateInput}
+          autoComplete="off"
+        />
+        <FieldDropdownSelectComponent
+          id="deliveryHour"
+          name="deliveryHour"
+          className={css.fieldSelect}
+          label={intl.formatMessage({
+            id: 'Booker.CreateOrder.Form.field.deliveryHour',
+          })}
+          leftIcon={<IconClock />}
+          meta={deliveryHour.meta}
+          input={deliveryHour.input}
+          options={parsedDeliveryHourOptions}
+        />
+      </div>
       <Button
         className={css.submitBtn}
         inProgress={submitInprogress}

@@ -3,11 +3,14 @@
 @use '/src/styles/customMediaQueries.scss' as *;
 
 .root {
+  display: none;
   margin-top: 40px;
   min-height: 132px;
   background-color: $neutralGray2;
   padding: 24px 16px;
-  @include flexAlign(center, center);
+  @include viewportLarge {
+    @include flexAlign(center, center);
+  }
   .container {
     width: 100%;
 

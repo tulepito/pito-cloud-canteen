@@ -1,17 +1,21 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-hooks/rules-of-hooks */
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import Skeleton from 'react-loading-skeleton';
 import classNames from 'classnames';
 import { useRouter } from 'next/router';
 
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { TableForm } from '@components/Table/Table';
 import type { TTabsItem } from '@components/Tabs/Tabs';
 import Tabs from '@components/Tabs/Tabs';
 import { historyPushState } from '@helpers/urlHelpers';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { useBottomScroll } from '@hooks/useBottomScroll';
+import { useViewport } from '@hooks/useViewport';
+import EmptySubOrder from '@pages/participant/orders/components/EmptySubOrder/EmptySubOrder';
 import { createDeepEqualSelector } from '@redux/redux.helper';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
 import type { RootState } from '@redux/store';
@@ -28,6 +32,7 @@ import { parseEntitiesToTableData } from '../helpers/parseEntitiesToTableData';
 
 import OrderStateWarningModal from './OrderStateWarningModal/OrderStateWarningModal';
 import { CompanyOrdersTableColumns } from './CompanyOrdersTableColumns';
+import { CompanySubOrderMobileSection } from './CompanySubOrderMobileSection';
 import type { TSearchOrderFormValues } from './SearchOrderForm';
 import SearchOrderForm from './SearchOrderForm';
 
@@ -36,6 +41,7 @@ import css from './CompanyOrdersTable.module.scss';
 const DEBOUNCE_TIME = 300;
 
 const tabLabelMap = {
+  [EManageCompanyOrdersTab.ALL]: 'ManageCompanyOrdersPage.tabSection.allLabel',
   [EManageCompanyOrdersTab.SCHEDULED]:
     'ManageCompanyOrdersPage.tabSection.scheduledLabel',
   [EManageCompanyOrdersTab.COMPLETED]:
@@ -44,20 +50,19 @@ const tabLabelMap = {
     'ManageCompanyOrdersPage.tabSection.draftLabel',
   [EManageCompanyOrdersTab.CANCELED]:
     'ManageCompanyOrdersPage.tabSection.canceledLabel',
-  [EManageCompanyOrdersTab.ALL]: 'ManageCompanyOrdersPage.tabSection.allLabel',
 };
 
 const findTabIndexById = (tabId: EManageCompanyOrdersTab) => {
   switch (tabId) {
-    case EManageCompanyOrdersTab.SCHEDULED:
-      return 1;
-    case EManageCompanyOrdersTab.COMPLETED:
-      return 2;
-    case EManageCompanyOrdersTab.DRAFT:
-      return 3;
-    case EManageCompanyOrdersTab.CANCELED:
-      return 4;
     case EManageCompanyOrdersTab.ALL:
+      return 1;
+    case EManageCompanyOrdersTab.SCHEDULED:
+      return 2;
+    case EManageCompanyOrdersTab.COMPLETED:
+      return 3;
+    case EManageCompanyOrdersTab.DRAFT:
+      return 4;
+    case EManageCompanyOrdersTab.CANCELED:
       return 5;
     default:
       return 5;
@@ -69,22 +74,30 @@ const statesSelector = createDeepEqualSelector(
   ({
     queryOrderError,
     queryOrderInProgress,
+    queryMoreOrderInProgress,
     orders = [],
     manageOrdersPagination,
     totalItemMap = {},
   }) => ({
     queryOrderError,
     queryOrderInProgress,
+    queryMoreOrderInProgress,
     orders,
     manageOrdersPagination,
     totalItemMap,
   }),
 );
 
-const prepareTabItems = ({ intl, currentTab, tableData }: any) => {
+const prepareTabItems = ({
+  intl,
+  currentTab,
+  tableData,
+  isMobileLayout,
+}: any) => {
   const {
     queryOrderError,
     queryOrderInProgress,
+    queryMoreOrderInProgress,
     orders,
     manageOrdersPagination,
     totalItemMap,
@@ -107,7 +120,7 @@ const prepareTabItems = ({ intl, currentTab, tableData }: any) => {
     );
 
     let content;
-    if (queryOrderInProgress) {
+    if (queryOrderInProgress && !queryMoreOrderInProgress) {
       content = (
         <div className={css.loading}>
           <Skeleton height="100%" />
@@ -116,7 +129,9 @@ const prepareTabItems = ({ intl, currentTab, tableData }: any) => {
     } else if (queryOrderError) {
       content = <ErrorMessage message={queryOrderError.message} />;
     } else if (orders.length > 0) {
-      content = (
+      content = isMobileLayout ? (
+        <CompanySubOrderMobileSection tableData={tableData} />
+      ) : (
         <TableForm
           columns={CompanyOrdersTableColumns}
           data={tableData}
@@ -128,9 +143,13 @@ const prepareTabItems = ({ intl, currentTab, tableData }: any) => {
       );
     } else {
       content = (
-        <p>
-          <FormattedMessage id="ManageOrders.noResults" />
-        </p>
+        <RenderWhen.False>
+          <div className={css.empty}>
+            <EmptySubOrder
+              title={<FormattedMessage id="ManageOrders.noResults" />}
+            />
+          </div>
+        </RenderWhen.False>
       );
     }
 
@@ -150,6 +169,8 @@ const CompanyOrdersTable: React.FC<TCompanyOrdersTableProps> = () => {
 
   const { query, isReady, replace } = useRouter();
   const dispatch = useAppDispatch();
+  const [mobilePage, setMobilePage] = useState(1);
+  const { isMobileLayout, viewport } = useViewport();
   const orders = useAppSelector((state) => state.Order.orders) || [];
   const currentUser = useAppSelector((state) => state.user.currentUser);
   const bookerCompanies = useAppSelector(
@@ -163,6 +184,9 @@ const CompanyOrdersTable: React.FC<TCompanyOrdersTableProps> = () => {
   );
   const queryOrderInProgress = useAppSelector(
     (state) => state.Order.queryOrderInProgress,
+  );
+  const queryMoreOrderInProgress = useAppSelector(
+    (state) => state.Order.queryMoreOrderInProgress,
   );
   const { totalPages = 1 } = useAppSelector(
     (state) => state.Order.manageOrdersPagination,
@@ -261,6 +285,7 @@ const CompanyOrdersTable: React.FC<TCompanyOrdersTableProps> = () => {
     intl,
     currentTab,
     tableData,
+    isMobileLayout,
   });
 
   const handleTabChange = ({ id: newTab }: TTabsItem) => {
@@ -272,7 +297,7 @@ const CompanyOrdersTable: React.FC<TCompanyOrdersTableProps> = () => {
       newQuery = { ...router.query, currentTab: newTab.toString() };
     }
 
-    router.push({
+    router.replace({
       pathname: router.pathname,
       query: newQuery,
     });
@@ -304,50 +329,54 @@ const CompanyOrdersTable: React.FC<TCompanyOrdersTableProps> = () => {
 
   const currentUserId = currentUser?.id?.uuid;
 
-  useEffect(() => {
-    (async () => {
-      if (
-        !currentTab ||
-        !isReady ||
-        !companyId ||
-        companyId === '[companyId]' ||
-        !currentUserId
-      )
-        return;
+  const fetchOrders = useCallback(async () => {
+    if (
+      !currentTab ||
+      !isReady ||
+      !companyId ||
+      companyId === '[companyId]' ||
+      !currentUserId
+    )
+      return;
 
-      let params: TObject = {
-        page,
-        keywords,
-        companyId,
-        bookerId: currentUserId,
-      };
+    const paramsBasedOnLayout =
+      isMobileLayout && viewport.width > 0
+        ? { page: mobilePage, mode: 'append' }
+        : { page: +page, mode: 'replace' };
 
-      const parsedOrderState =
-        MANAGE_COMPANY_ORDERS_TAB_MAP[
-          currentTab as keyof typeof MANAGE_COMPANY_ORDERS_TAB_MAP
-        ].join(',');
+    let params: TObject = {
+      ...paramsBasedOnLayout,
+      keywords,
+      companyId,
+      bookerId: currentUserId,
+    };
 
-      const companyUser = bookerCompanies.find(
-        (c: TUser) => c.id.uuid === companyId,
-      );
-      const { subAccountId: subAccountIdMaybe } = User(
-        companyUser!,
-      ).getPrivateData();
-      const authorIdMaybe =
-        typeof subAccountIdMaybe !== 'undefined'
-          ? { authorId: subAccountIdMaybe }
-          : {};
+    const parsedOrderState =
+      MANAGE_COMPANY_ORDERS_TAB_MAP[
+        currentTab as keyof typeof MANAGE_COMPANY_ORDERS_TAB_MAP
+      ].join(',');
 
-      params = {
-        ...params,
-        ...authorIdMaybe,
-        meta_orderState: parsedOrderState,
-        currentTab,
-      };
-      if (typeof subAccountIdMaybe !== 'undefined') {
-        await dispatch(orderAsyncActions.queryCompanyOrders(params));
-      }
-    })();
+    const companyUser = bookerCompanies.find(
+      (c: TUser) => c.id.uuid === companyId,
+    );
+    const { subAccountId: subAccountIdMaybe } = User(
+      companyUser!,
+    ).getPrivateData();
+    const authorIdMaybe =
+      typeof subAccountIdMaybe !== 'undefined'
+        ? { authorId: subAccountIdMaybe }
+        : {};
+
+    params = {
+      ...params,
+      ...authorIdMaybe,
+      meta_orderState: parsedOrderState,
+      currentTab,
+    };
+
+    if (typeof subAccountIdMaybe !== 'undefined') {
+      await dispatch(orderAsyncActions.queryCompanyOrders(params));
+    }
   }, [
     companyId,
     currentTab,
@@ -356,8 +385,26 @@ const CompanyOrdersTable: React.FC<TCompanyOrdersTableProps> = () => {
     keywords,
     page,
     currentUserId,
+    mobilePage,
     JSON.stringify(bookerCompanies),
   ]);
+
+  useBottomScroll(() => {
+    const canLoadMore = mobilePage < totalPages;
+    const notLoading = !queryMoreOrderInProgress && !queryOrderInProgress;
+
+    function increasePage() {
+      setMobilePage(mobilePage + 1);
+    }
+
+    if (isMobileLayout && canLoadMore && notLoading) {
+      increasePage();
+    }
+  });
+
+  useEffect(() => {
+    fetchOrders();
+  }, [fetchOrders]);
 
   const currentTabIndex = findTabIndexById(
     currentTab as EManageCompanyOrdersTab,
@@ -373,6 +420,8 @@ const CompanyOrdersTable: React.FC<TCompanyOrdersTableProps> = () => {
         className={css.tabContainer}
         headerClassName={css.tabHeader}
         headerWrapperClassName={css.headerWrapper}
+        enableTabScroll
+        tabScrollBehavior="auto"
         actionsClassName={css.searchForm}
         actionsComponent={
           <SearchOrderForm
@@ -395,6 +444,7 @@ const CompanyOrdersTable: React.FC<TCompanyOrdersTableProps> = () => {
           orderWarningState === EOrderStates.expiredStart ? 'Xóa đơn' : 'Thoát'
         }
         cancelInProgress={bookerDeleteOrderInProgress}
+        shouldFullScreenInMobile={false}
       />
     </div>
   );

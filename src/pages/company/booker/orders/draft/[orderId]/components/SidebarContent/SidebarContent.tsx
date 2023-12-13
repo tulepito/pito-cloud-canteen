@@ -40,6 +40,7 @@ type TSidebarContentProps = {
   className?: string;
   order?: any;
   companyAccount: TUser | null;
+  onCloseSideBar?: () => void;
 };
 
 type TNavigationItemProps = {
@@ -131,6 +132,7 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
   className,
   order,
   companyAccount,
+  onCloseSideBar,
 }) => {
   const classes = classNames(css.root, className);
 
@@ -407,6 +409,10 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
             className={css.badge}
           />
         </div>
+        <div className={css.mobileHeader}>
+          <IconArrow direction="left" onClick={onCloseSideBar} />
+          <div className={css.title}>Cài đặt bữa ăn</div>
+        </div>
         <nav className={css.navigation}>
           <NavigationItem
             onOpen={handleOpenDetails}
@@ -455,7 +461,8 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
             <FormattedMessage id="SidebarContent.details.goBack" />
           </span>
         </div>
-        <div className={css.detailsTitle}>
+        <div className={css.detailsTitle} onClick={handleCloseDetails}>
+          <IconArrow className={css.iconBack} direction="left" />
           {isOpenDetails && (
             <FormattedMessage
               id={`SidebarContent.nav.settings.${isOpenDetails}`}

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { Event } from 'react-big-calendar';
 import { FormattedMessage } from 'react-intl';
 import { shallowEqual } from 'react-redux';
+import classNames from 'classnames';
 import { DateTime } from 'luxon';
 
 import IconClose from '@components/Icons/IconClose/IconClose';
@@ -46,6 +47,9 @@ const MealPlanCardHeader: React.FC<TMealPlanCardHeaderProps> = ({
     (state) => state.Order.menuListings,
     shallowEqual,
   );
+  const walkthroughStep = useAppSelector(
+    (state) => state.BookerDraftOrderPage.walkthroughStep,
+  );
 
   const dateTime = DateTime.fromMillis(+resourceId).setZone(VNTimezone);
   const dayOfWeek = convertWeekDay(dateTime.weekday).key;
@@ -80,11 +84,16 @@ const MealPlanCardHeader: React.FC<TMealPlanCardHeaderProps> = ({
           <FormattedMessage id={`DayColumn.Session.${session}`} />
         </div>
         <RenderWhen condition={!shouldHideRemoveIcon}>
-          <IconClose
-            className={css.close}
-            onClick={handleOpenDeleteModal}
-            data-tour="step-4"
-          />
+          <div
+            className={classNames(css.iconCloseWrapper, {
+              [css.walkthrough]: walkthroughStep === 3,
+            })}>
+            <IconClose
+              className={css.close}
+              onClick={handleOpenDeleteModal}
+              data-tour="step-4"
+            />
+          </div>
         </RenderWhen>
       </div>
       <div className={css.headerActions}>
@@ -95,11 +104,16 @@ const MealPlanCardHeader: React.FC<TMealPlanCardHeaderProps> = ({
           món
         </div>
         <div className={css.verticalDivider} />
-        <IconMagnifier
-          className={css.searchIcon}
-          onClick={handleSearchRestaurant}
-          data-tour="step-3"
-        />
+        <div
+          className={classNames(css.searchIconWrapper, {
+            [css.walkthrough]: walkthroughStep === 2,
+          })}>
+          <IconMagnifier
+            className={css.searchIcon}
+            onClick={handleSearchRestaurant}
+            data-tour="step-3"
+          />
+        </div>
       </div>
       <DeleteMealModal
         id="DeleteMealModal"

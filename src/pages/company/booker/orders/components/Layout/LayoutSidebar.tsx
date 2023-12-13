@@ -1,7 +1,9 @@
-import type { PropsWithChildren, ReactNode } from 'react';
+import { type PropsWithChildren, type ReactNode, useEffect } from 'react';
 import classNames from 'classnames';
 
 import IconSidebarMenu from '@components/Icons/IconMenu/IconSidebarMenu';
+import { useAppDispatch } from '@hooks/reduxHooks';
+import { UIActions } from '@redux/slices/UI.slice';
 
 import css from './LayoutSidebar.module.scss';
 
@@ -19,9 +21,18 @@ const LayoutSidebar: React.FC<TLayoutSidebarProps> = ({
   logo,
   onCollapse,
 }) => {
+  const dispatch = useAppDispatch();
   const classes = classNames(css.root, className, {
     [css.collapse]: collapse,
   });
+
+  useEffect(() => {
+    if (collapse) {
+      dispatch(UIActions.disableScrollRequest('sidebar'));
+    } else {
+      dispatch(UIActions.disableScrollRemove('sidebar'));
+    }
+  }, [collapse, dispatch]);
 
   return (
     <div className={classes}>

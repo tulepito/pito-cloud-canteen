@@ -1,9 +1,14 @@
 @use '/src/styles/mixins.scss' as *;
 @use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
 
 .root {
-  margin-top: 28px;
+  margin-top: 20px;
   @include flexAlign(baseline, flex-start);
+
+  @include viewportMedium {
+    margin-top: 28px;
+  }
 
   .resultNumber {
     margin-right: 32px;

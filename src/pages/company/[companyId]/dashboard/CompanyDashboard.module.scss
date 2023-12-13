@@ -1,5 +1,11 @@
 @use '/src/styles/customMediaQueries.scss' as *;
 .root {
+  padding-bottom: 92px;
+
+  @include viewportMedium {
+    padding-bottom: 0;
+  }
+
   .container {
     padding: 16px;
     gap: 40px;
@@ -16,6 +22,7 @@
   .groupSections {
     display: grid;
     max-width: 1203px;
+    width: 100%;
 
     gap: 32px;
     grid-template-columns: repeat(1, 1fr);

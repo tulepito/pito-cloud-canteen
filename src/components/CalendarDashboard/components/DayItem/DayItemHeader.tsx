@@ -9,10 +9,13 @@ import css from './DayItem.module.scss';
 
 const DayColumnHeader: React.FC<TDayColumnHeaderProps> = ({
   isCurrentDay,
+  isSelectedDay,
   date,
   className,
   shouldHideDate = false,
   shouldHideDateText = false,
+  indicator,
+  isDisabled = false,
 }) => {
   const { isMobileLayout } = useViewport();
 
@@ -21,10 +24,18 @@ const DayColumnHeader: React.FC<TDayColumnHeaderProps> = ({
       className={classNames(
         css.dayHeader,
         {
-          [css.activeHeader]: isCurrentDay,
+          [css.disabledHeader]: isDisabled,
+          [css.activeHeader]: isCurrentDay || isSelectedDay,
         },
         className,
       )}>
+      <RenderWhen condition={indicator !== undefined}>
+        <div
+          className={classNames(
+            css.indicator,
+            indicator ? css.valid : css.invalid,
+          )}></div>
+      </RenderWhen>
       <RenderWhen condition={!shouldHideDate}>
         <div className={css.dateNumber}>{date.getDate()}</div>
       </RenderWhen>
