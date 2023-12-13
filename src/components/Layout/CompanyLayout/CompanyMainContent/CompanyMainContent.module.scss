@@ -3,9 +3,12 @@
 @use '/src/styles/customMediaQueries.scss' as *;
 
 .root {
-  min-height: 80vh;
   &.hasSideBar {
     margin-left: 292px;
     width: calc(100% - 292px);
+  }
+
+  @include viewportMedium {
+    min-height: 80vh;
   }
 }

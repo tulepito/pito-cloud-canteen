@@ -58,6 +58,7 @@ const CompanyOrderDetailPage: React.FC<TCompanyOrderDetailPageProps> = () => {
         reviewViewData={reviewViewData}
         onDownloadReviewOrderResults={onDownloadReviewOrderResults}
         orderData={orderData as TListing}
+        priceQuotationData={priceQuotationData}
       />
     </div>
   );

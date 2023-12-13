@@ -11,17 +11,23 @@ type TOrderDetailSectionProps = {
   foodOrderGroupedByDate: TObject[];
   itemId: string;
   subOrderDate?: number | string;
+  shouldResponsive?: boolean;
 };
 
 const OrderDetailSection: React.FC<TOrderDetailSectionProps> = ({
   foodOrderGroupedByDate,
   itemId,
   subOrderDate,
+  shouldResponsive = false,
 }) => {
   const intl = useIntl();
 
+  const sectionClasses = classNames(css.orderDetailSection, {
+    [css.mobileLayout]: shouldResponsive,
+  });
+
   return (
-    <div className={css.orderDetailSection}>
+    <div className={sectionClasses}>
       <div className={css.sectionTitle}>
         {intl.formatMessage({
           id: 'OrderDetails.PriceQuotation.orderDetailSection.title',

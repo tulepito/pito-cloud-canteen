@@ -5,12 +5,15 @@ import classNames from 'classnames';
 import Button from '@components/Button/Button';
 import IconClose from '@components/Icons/IconClose/IconClose';
 import type { TModalProps } from '@components/Modal/Modal';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useAppDispatch } from '@hooks/reduxHooks';
 import { UIActions } from '@redux/slices/UI.slice';
 
 import css from './PopupModal.module.scss';
 
-type PopupModalProps = TModalProps & {};
+type PopupModalProps = TModalProps & {
+  shouldShowOverlay?: boolean;
+};
 
 const PopupModal: React.FC<PopupModalProps> = (props) => {
   const {
@@ -28,6 +31,7 @@ const PopupModal: React.FC<PopupModalProps> = (props) => {
     customHeader,
     closeClassName,
     headerClassName,
+    shouldShowOverlay = false,
   } = props;
   const intl = useIntl();
   const dispatch = useAppDispatch();
@@ -66,6 +70,9 @@ const PopupModal: React.FC<PopupModalProps> = (props) => {
 
   return (
     <div id={id} className={classes}>
+      <RenderWhen condition={shouldShowOverlay}>
+        <div className={css.overlay} />
+      </RenderWhen>
       <div className={scrollLayerClasses}>
         <div className={containerClasses}>
           {!hasCustomHeader && (

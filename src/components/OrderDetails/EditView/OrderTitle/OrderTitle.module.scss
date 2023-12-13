@@ -7,19 +7,24 @@
   justify-content: space-between;
   column-gap: 16px;
   background-color: $neutralGray1;
-  position: sticky;
-  top: 72px;
-  z-index: 2;
 
   @include viewportMedium {
     position: static;
   }
 
   .titleText {
+    display: none;
     padding-bottom: 7px;
     color: $neutralGray7;
-    text-transform: capitalize;
     @include textTemplate(24px, 700, 4/3);
+
+    @include viewportMedium {
+      display: block;
+    }
+  }
+
+  .mobileActionContainer {
+    padding-bottom: 16px;
   }
 
   .actions {
@@ -30,7 +35,7 @@
 
     .makeOrderBtn,
     .cancelOrderBtn {
-      width: 100px;
+      width: 100%;
       min-width: 48px;
       align-self: center;
       padding: 0;

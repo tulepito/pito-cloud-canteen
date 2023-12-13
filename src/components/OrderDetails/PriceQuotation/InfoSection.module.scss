@@ -1,39 +1,64 @@
 @use '/src/styles/mixins.scss' as *;
 @use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
 
 .infoContainer {
-  position: relative;
   padding: 24px 0;
-
   display: flex;
   flex-direction: row;
   column-gap: 10%;
 
   & > div {
     flex-basis: 45%;
+    width: 45%;
   }
 
   &.partnerQuotation > div {
     flex-basis: unset;
+    width: unset;
   }
 
-  &::after {
-    @include absolute(100%, 1px);
-    bottom: 0;
-    left: 0;
+  border-bottom: 1px solid $neutralGray6;
+}
 
-    background-color: $neutralGray6;
+.mobileLayout {
+  padding: 14px 0 10px;
+
+  @include viewportMedium {
+    padding: 24px 0;
   }
 
   .sectionTitle {
-    @include textTemplate(12px, 700, 1.5);
-    margin-bottom: 8px;
+    @include textTemplate(9px, 700, 1.5);
+    margin-bottom: 5px;
+
+    @include viewportMedium {
+      font-size: 12px;
+      margin-bottom: 8px;
+    }
   }
 
   .sectionContent {
-    @include textTemplate(12px, 300, 1.5);
+    @include textTemplate(9px, 300, 1.5);
 
-    & > div span:first-of-type {
+    @include viewportMedium {
+      font-size: 12px;
+    }
+  }
+}
+
+.sectionTitle {
+  @include textTemplate(12px, 700, 1.5);
+  margin-bottom: 8px;
+}
+
+.sectionContent {
+  @include textTemplate(12px, 300, 1.5);
+
+  & > div span {
+    word-break: break-word;
+
+    &:first-of-type {
       font-weight: 600;
     }
   }

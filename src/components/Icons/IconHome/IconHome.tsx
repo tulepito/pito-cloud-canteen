@@ -11,11 +11,11 @@ const IconHome: React.FC<TIconProps> = (props) => {
 
   return (
     <svg
-      onClick={onClick}
       preserveAspectRatio="none"
       className={classes}
       viewBox="0 0 18 19"
       fill="none"
+      onClick={onClick}
       xmlns="http://www.w3.org/2000/svg">
       <path
         fillRule="evenodd"

@@ -1,0 +1,32 @@
+@use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.root {
+  @include flexCenter;
+}
+
+.iconHome {
+  width: 21px;
+  height: 21px;
+}
+
+.confirmGoHomeModalContainer.confirmGoHomeModalContainer {
+  padding: 16px;
+  width: calc(100vw - 32px);
+
+  @include viewportMedium {
+    padding: 24px;
+  }
+}
+
+.confirmGoHomeModalHeader.confirmGoHomeModalHeader {
+  padding-top: 0;
+}
+
+.confirmGoHomeModalChildren.confirmGoHomeModalChildren {
+  padding-bottom: 12px;
+
+  @include viewportMedium {
+    padding-bottom: 40px;
+  }
+}

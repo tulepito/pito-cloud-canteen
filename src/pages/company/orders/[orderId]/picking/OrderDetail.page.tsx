@@ -10,7 +10,9 @@ import { useRouter } from 'next/router';
 
 import IconNoteBook from '@components/Icons/IconNoteBook/IconNoteBook';
 import IconNoteCheckList from '@components/Icons/IconNoteCheckList/IconNoteCheckList';
+import MobileTopContainer from '@components/MobileTopContainer/MobileTopContainer';
 import AlertModal from '@components/Modal/AlertModal';
+import GoHomeIcon from '@components/OrderDetails/EditView/GoHomeIcon/GoHomeIcon';
 import ManageLineItemsSection from '@components/OrderDetails/EditView/ManageOrderDetailSection/ManageLineItemsSection';
 import ManageOrdersSection from '@components/OrderDetails/EditView/ManageOrderDetailSection/ManageOrdersSection';
 import ManageParticipantsSection from '@components/OrderDetails/EditView/ManageParticipantsSection/ManageParticipantsSection';
@@ -18,21 +20,23 @@ import OrderDeadlineCountdownSection from '@components/OrderDetails/EditView/Ord
 import OrderLinkSection from '@components/OrderDetails/EditView/OrderLinkSection/OrderLinkSection';
 import OrderTitle from '@components/OrderDetails/EditView/OrderTitle/OrderTitle';
 import SubOrderChangesHistorySection from '@components/OrderDetails/EditView/SubOrderChangesHistorySection/SubOrderChangesHistorySection';
-import PriceQuotation from '@components/OrderDetails/PriceQuotation/PriceQuotation';
 import type { TReviewInfoFormValues } from '@components/OrderDetails/ReviewView/ReviewInfoSection/ReviewInfoForm';
 import ReviewView from '@components/OrderDetails/ReviewView/ReviewView';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
+import Stepper from '@components/Stepper/Stepper';
 import { isOrderCreatedByBooker } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { useDownloadPriceQuotation } from '@hooks/useDownloadPriceQuotation';
 import useExportOrderDetails from '@hooks/useExportOrderDetails';
 import { usePrepareOrderDetailPageData } from '@hooks/usePrepareOrderManagementData';
+import { useViewport } from '@hooks/useViewport';
 import {
   orderDetailsAnyActionsInProgress,
   OrderManagementsAction,
   orderManagementThunks,
 } from '@redux/slices/OrderManagement.slice';
+import { BOOKER_CREATE_GROUP_ORDER_STEPS } from '@src/constants/stepperSteps';
 import { companyPaths } from '@src/paths';
 import { diffDays, formatTimestamp } from '@src/utils/dates';
 import { FORMATTED_WEEKDAY } from '@src/utils/options';
@@ -152,6 +156,7 @@ enum EPageViewMode {
   edit = 'edit',
   review = 'review',
   priceQuotation = 'priceQuotation',
+  cartDetail = 'cartDetail',
 }
 
 const BookerAccessibleOrderStates = [
@@ -171,8 +176,9 @@ const OrderDetailPage = () => {
   const [viewMode, setViewMode] = useState<EPageViewMode>(EPageViewMode.edit);
   const intl = useIntl();
   const router = useRouter();
-  const confirmCancelOrderActions = useBoolean(false);
   const dispatch = useAppDispatch();
+  const { isMobileLayout } = useViewport();
+  const confirmCancelOrderActions = useBoolean(false);
   const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
   const {
     query: { orderId, timestamp },
@@ -181,10 +187,10 @@ const OrderDetailPage = () => {
   const [currentViewDate, setCurrentViewDate] = useState<number>(
     Number(timestamp),
   );
-
   const [showReachMaxAllowedChangesModal, setShowReachMaxAllowedChangesModal] =
     useState<'reach_max' | 'reach_min' | null>(null);
-
+  const confirmGoHomeControl = useBoolean();
+  const { handler: onDownloadReviewOrderResults } = useExportOrderDetails();
   const currentUser = useAppSelector((state) => state.user.currentUser);
   const cancelPickingOrderInProgress = useAppSelector(
     (state) => state.OrderManagement.cancelPickingOrderInProgress,
@@ -211,14 +217,20 @@ const OrderDetailPage = () => {
   const {
     orderState,
     bookerId,
-    orderType = EOrderType.group,
+    orderType = EOrderType.normal,
     orderVATPercentage,
     startDate,
     deliveryHour,
     orderStateHistory = [],
   } = Listing(orderData as TListing).getMetadata();
   const planId = Listing(planData as TListing).getId();
+  const userId = CurrentUser(currentUser!).getId();
+  const isCreatedByBooker = isOrderCreatedByBooker(orderStateHistory);
+  const isNormalOrder = orderType === EOrderType.normal;
   const isPickingOrder = orderState === EOrderStates.picking;
+  const isDraftEditing = orderState === EOrderStates.inProgress;
+  const isEditViewMode = viewMode === EPageViewMode.edit;
+  const isViewCartDetailMode = viewMode === EPageViewMode.cartDetail;
 
   const normalizedDeliveryHour = deliveryHour?.includes('-')
     ? deliveryHour.split('-')[0]
@@ -239,26 +251,69 @@ const OrderDetailPage = () => {
       orderReachMinRestaurantQuantityInProgressState,
   } = orderValidationsInProgressState || {};
 
-  const planReachMaxRestaurantQuantityInProgressState =
-    planValidationsInProgressState?.[currentViewDate]
-      ?.planReachMaxRestaurantQuantity;
+  const {
+    planReachMaxRestaurantQuantity:
+      planReachMaxRestaurantQuantityInProgressState,
+    planReachMinRestaurantQuantity:
+      planReachMinRestaurantQuantityInProgressState,
+    planReachMaxCanModify: planReachMaxCanModifyInProgressState,
+  } = planValidationsInProgressState?.[currentViewDate] || {};
 
-  const planReachMinRestaurantQuantityInProgressState =
-    planValidationsInProgressState?.[currentViewDate]
-      ?.planReachMinRestaurantQuantity;
+  const {
+    planValidations,
+    orderReachMaxRestaurantQuantity,
+    orderReachMinRestaurantQuantity,
+  } = checkMinMaxQuantityInPickingState(
+    isNormalOrder,
+    isPickingOrder,
+    draftOrderDetail,
+  );
 
-  const planReachMaxCanModifyInProgressState =
-    planValidationsInProgressState?.[currentViewDate]?.planReachMaxCanModify;
+  const {
+    planReachMaxRestaurantQuantity:
+      planReachMaxRestaurantQuantityInPickingState,
+    planReachMinRestaurantQuantity:
+      planReachMinRestaurantQuantityInPickingState,
+  } = planValidations[currentViewDate as keyof typeof planValidations] || {};
+
+  const planReachMaxRestaurantQuantity =
+    planReachMaxRestaurantQuantityInProgressState ||
+    planReachMaxRestaurantQuantityInPickingState;
+  const planReachMinRestaurantQuantity =
+    planReachMinRestaurantQuantityInProgressState ||
+    planReachMinRestaurantQuantityInPickingState;
 
   const {
     orderTitle,
     editViewData,
     reviewViewData,
     priceQuotationData,
+    reviewInfoValues,
     setReviewInfoValues,
   } = usePrepareOrderDetailPageData({
     VATPercentage: isPickingOrder ? systemVATPercentage : orderVATPercentage,
   });
+
+  const editViewClasses = classNames(css.editViewRoot, {
+    [css.editNormalOrderView]: isNormalOrder,
+    [css.editNormalOrderViewWithHistorySection]:
+      isNormalOrder && isDraftEditing,
+  });
+  const leftPartClasses = classNames(css.leftPart, {
+    [css.leftPartWithInfo]: isCreatedByBooker,
+  });
+  const rightPartClasses = classNames(css.rightPart, {
+    [css.rightPartWithInfo]: isCreatedByBooker,
+  });
+
+  const confirmButtonMessage = isPickingOrder
+    ? intl.formatMessage({
+        id: 'EditView.OrderTitle.makeOrderButtonText',
+      })
+    : intl.formatMessage({
+        id: 'EditView.OrderTitle.updateOrderButtonText',
+      });
+
   const handleCloseReachMaxAllowedChangesModal = () =>
     setShowReachMaxAllowedChangesModal(null);
 
@@ -292,72 +347,39 @@ const OrderDetailPage = () => {
     setCurrentViewDate(date);
   };
 
-  useEffect(() => {
-    if (
-      planReachMaxRestaurantQuantityInProgressState ||
-      planReachMinRestaurantQuantityInProgressState ||
-      planReachMaxCanModifyInProgressState
-    ) {
-      const i = setTimeout(() => {
-        dispatch(OrderManagementsAction.resetOrderDetailValidation());
-        clearTimeout(i);
-      }, 4000);
-    }
-  }, [
-    planReachMaxRestaurantQuantityInProgressState,
-    planReachMinRestaurantQuantityInProgressState,
-    planReachMaxCanModifyInProgressState,
-  ]);
-
-  useEffect(() => {
-    onQuerySubOrderHistoryChanges();
-  }, [onQuerySubOrderHistoryChanges]);
-
-  useEffect(() => {
-    if (draftOrderDetail) {
-      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-      () => {
-        dispatch(OrderManagementsAction.resetDraftSubOrderChangeHistory());
-
-        return dispatch(OrderManagementsAction.resetDraftOrderDetails());
-      };
-    }
-  }, []);
-
   const handleDownloadPriceQuotation = useDownloadPriceQuotation({
     orderTitle,
     priceQuotationData,
   });
 
-  const userId = CurrentUser(currentUser!).getId();
-
-  const isNormalOrder = orderType === EOrderType.normal;
-  const isPicking = orderState === EOrderStates.picking;
-  const isDraftEditing = orderState === EOrderStates.inProgress;
-  const isCreatedByBooker = isOrderCreatedByBooker(orderStateHistory);
-
-  const editViewClasses = classNames(css.editViewRoot, {
-    [css.editNormalOrderView]: isNormalOrder,
-    [css.editNormalOrderViewWithHistorySection]:
-      isNormalOrder && isDraftEditing,
-  });
-  const leftPartClasses = classNames(css.leftPart, {
-    [css.leftPartWithInfo]: isCreatedByBooker,
-  });
-  const rightPartClasses = classNames(css.rightPart, {
-    [css.rightPartWithInfo]: isCreatedByBooker,
-  });
-
-  const handleConfirmOrder = async () => {
-    setViewMode(EPageViewMode.review);
-  };
-
   const handleGoBackFromReviewMode = () => {
     setViewMode(EPageViewMode.edit);
   };
+  const handleGoBackFromViewCartDetailMode = () => {
+    setViewMode(EPageViewMode.review);
+  };
+  const handleViewCartDetail = () => {
+    setViewMode(EPageViewMode.cartDetail);
+  };
 
-  const handleSubmitReviewInfoForm = (_values: TReviewInfoFormValues) => {
-    setReviewInfoValues(_values);
+  const handleEditReviewInfoForm = (
+    {
+      contactPeopleName = '',
+      contactPhoneNumber = '',
+      ...restValues
+    }: TReviewInfoFormValues,
+    invalid: boolean,
+  ) => {
+    setReviewInfoValues({
+      contactPeopleName,
+      contactPhoneNumber,
+      ...restValues,
+      invalid,
+    });
+  };
+
+  const handleConfirmOrder = async () => {
+    setViewMode(EPageViewMode.review);
   };
 
   const onSaveOrderNote = (orderNote: string) => {
@@ -367,8 +389,6 @@ const OrderDetailPage = () => {
       }),
     );
   };
-
-  const { handler: onDownloadReviewOrderResults } = useExportOrderDetails();
 
   const handleAgreeCancelOrder = async () => {
     await dispatch(orderManagementThunks.cancelPickingOrder(orderId as string));
@@ -383,16 +403,21 @@ const OrderDetailPage = () => {
     confirmCancelOrderActions.setFalse();
   };
 
-  const confirmButtonMessage = isPicking
-    ? intl.formatMessage({
-        id: 'EditView.OrderTitle.makeOrderButtonText',
-      })
-    : intl.formatMessage({
-        id: 'EditView.OrderTitle.updateOrderButtonText',
-      });
+  const subOrderChangesHistorySectionProps = {
+    querySubOrderChangesHistoryInProgress,
+    subOrderChangesHistory,
+    draftSubOrderChangesHistory:
+      draftSubOrderChangesHistory[
+        currentViewDate as unknown as keyof typeof draftSubOrderChangesHistory
+      ],
+    onQueryMoreSubOrderChangesHistory,
+    subOrderChangesHistoryTotalItems,
+    loadMoreSubOrderChangesHistory,
+  };
 
-  const { lastTransition = ETransition.INITIATE_TRANSACTION } =
+  const { lastTransition = ETransition.INITIATE_TRANSACTION, restaurant = {} } =
     draftOrderDetail?.[currentViewDate] || {};
+  const { minQuantity = 1 } = restaurant;
 
   const ableToUpdateOrder =
     !isFetchingOrderDetails &&
@@ -400,28 +425,11 @@ const OrderDetailPage = () => {
     ((lastTransition === ETransition.INITIATE_TRANSACTION &&
       isDraftEditing &&
       Number(diffDays(currentViewDate, NOW, 'day').days) > ONE_DAY) ||
-      isPicking);
+      isPickingOrder);
 
   const orderDetailsNotChanged = !checkOrderDetailHasChanged(
     draftSubOrderChangesHistory,
   );
-
-  const {
-    planValidations,
-    orderReachMaxRestaurantQuantity,
-    orderReachMinRestaurantQuantity,
-  } = checkMinMaxQuantityInPickingState(
-    isNormalOrder,
-    isPicking,
-    draftOrderDetail,
-  );
-
-  const {
-    planReachMaxRestaurantQuantity:
-      planReachMaxRestaurantQuantityInPickingState,
-    planReachMinRestaurantQuantity:
-      planReachMinRestaurantQuantityInPickingState,
-  } = planValidations[currentViewDate as keyof typeof planValidations] || {};
 
   const disabledSubmit =
     orderReachMaxCanModifyInProgressState ||
@@ -430,31 +438,30 @@ const OrderDetailPage = () => {
     orderReachMaxRestaurantQuantityInProgressState ||
     orderReachMinRestaurantQuantityInProgressState;
 
-  const { minQuantity = 1 } =
-    draftOrderDetail?.[currentViewDate]?.restaurant || {};
-
   const EditViewComponent = (
     <div className={editViewClasses}>
-      <OrderTitle
-        className={css.titlePart}
-        data={editViewData.titleSectionData}
-        onConfirmOrder={handleConfirmOrder}
-        onCancelOrder={confirmCancelOrderActions.setTrue}
-        confirmButtonMessage={confirmButtonMessage}
-        cancelButtonMessage={
-          isPicking
-            ? intl.formatMessage({
-                id: 'EditView.OrderTitle.cancelOrderButtonText',
-              })
-            : ''
-        }
-        confirmDisabled={
-          disabledSubmit || (!isPicking && orderDetailsNotChanged)
-        }
-        isDraftEditing={isDraftEditing}
-      />
-
       <RenderWhen condition={!inProgress}>
+        <OrderTitle
+          className={css.titlePart}
+          data={editViewData.titleSectionData}
+          onConfirmOrder={handleConfirmOrder}
+          onCancelOrder={confirmCancelOrderActions.setTrue}
+          confirmButtonMessage={confirmButtonMessage}
+          cancelButtonMessage={
+            isPickingOrder
+              ? intl.formatMessage({
+                  id: 'EditView.OrderTitle.cancelOrderButtonText',
+                })
+              : ''
+          }
+          cancelDisabled={confirmGoHomeControl.value}
+          confirmDisabled={
+            confirmGoHomeControl.value ||
+            disabledSubmit ||
+            (!isPickingOrder && orderDetailsNotChanged)
+          }
+          isDraftEditing={isDraftEditing}
+        />
         <RenderWhen condition={!isNormalOrder}>
           <RenderWhen condition={isCreatedByBooker}>
             <div className={css.infoPart}>
@@ -496,14 +503,8 @@ const OrderDetailPage = () => {
                 handleOpenReachMaxAllowedChangesModal
               }
               planReachMaxCanModify={planReachMaxCanModifyInProgressState}
-              planReachMaxRestaurantQuantity={
-                planReachMaxRestaurantQuantityInPickingState ||
-                planReachMaxRestaurantQuantityInProgressState
-              }
-              planReachMinRestaurantQuantity={
-                planReachMinRestaurantQuantityInPickingState ||
-                planReachMinRestaurantQuantityInProgressState
-              }
+              planReachMaxRestaurantQuantity={planReachMaxRestaurantQuantity}
+              planReachMinRestaurantQuantity={planReachMinRestaurantQuantity}
             />
           </div>
           <div className={rightPartClasses}>
@@ -525,22 +526,7 @@ const OrderDetailPage = () => {
             {isDraftEditing && (
               <SubOrderChangesHistorySection
                 className={css.container}
-                querySubOrderChangesHistoryInProgress={
-                  querySubOrderChangesHistoryInProgress
-                }
-                subOrderChangesHistory={subOrderChangesHistory}
-                draftSubOrderChangesHistory={
-                  draftSubOrderChangesHistory[
-                    currentViewDate as unknown as keyof typeof draftSubOrderChangesHistory
-                  ]
-                }
-                onQueryMoreSubOrderChangesHistory={
-                  onQueryMoreSubOrderChangesHistory
-                }
-                subOrderChangesHistoryTotalItems={
-                  subOrderChangesHistoryTotalItems
-                }
-                loadMoreSubOrderChangesHistory={loadMoreSubOrderChangesHistory}
+                {...subOrderChangesHistorySectionProps}
               />
             )}
           </div>
@@ -554,14 +540,8 @@ const OrderDetailPage = () => {
               <ManageLineItemsSection
                 isDraftEditing={isDraftEditing}
                 ableToUpdateOrder={ableToUpdateOrder}
-                shouldShowOverflowError={
-                  planReachMaxRestaurantQuantityInProgressState ||
-                  planReachMaxRestaurantQuantityInPickingState
-                }
-                shouldShowUnderError={
-                  planReachMinRestaurantQuantityInProgressState ||
-                  planReachMinRestaurantQuantityInPickingState
-                }
+                shouldShowOverflowError={planReachMaxRestaurantQuantity}
+                shouldShowUnderError={planReachMinRestaurantQuantity}
                 setCurrentViewDate={handleSetCurrentViewDate}
                 currentViewDate={currentViewDate}
                 minQuantity={minQuantity}
@@ -572,24 +552,7 @@ const OrderDetailPage = () => {
                     css.container,
                     css.normalOrderSubOrderSection,
                   )}
-                  querySubOrderChangesHistoryInProgress={
-                    querySubOrderChangesHistoryInProgress
-                  }
-                  subOrderChangesHistory={subOrderChangesHistory}
-                  draftSubOrderChangesHistory={
-                    draftSubOrderChangesHistory[
-                      currentViewDate as unknown as keyof typeof draftSubOrderChangesHistory
-                    ]
-                  }
-                  onQueryMoreSubOrderChangesHistory={
-                    onQueryMoreSubOrderChangesHistory
-                  }
-                  subOrderChangesHistoryTotalItems={
-                    subOrderChangesHistoryTotalItems
-                  }
-                  loadMoreSubOrderChangesHistory={
-                    loadMoreSubOrderChangesHistory
-                  }
+                  {...subOrderChangesHistorySectionProps}
                 />
               )}
             </div>
@@ -618,6 +581,10 @@ const OrderDetailPage = () => {
         onCancel={handleDisagreeCancelOrder}
         confirmInProgress={cancelPickingOrderInProgress}
         cancelDisabled={cancelPickingOrderInProgress}
+        shouldFullScreenInMobile={false}
+        containerClassName={css.confirmCancelOrderModalContainer}
+        headerClassName={css.confirmCancelOrderModalHeader}
+        childrenClassName={css.confirmCancelOrderModalChildren}
       />
       <ModalReachMaxAllowedChanges
         id="OrderDetailPage.ModalReachMaxAllowedChanges"
@@ -631,17 +598,53 @@ const OrderDetailPage = () => {
 
   const ReviewViewComponent = (
     <ReviewView
+      isViewCartDetailMode={isViewCartDetailMode}
       canGoBackEditMode
       reviewViewData={reviewViewData}
-      onSubmitEdit={handleSubmitReviewInfoForm}
+      setInfoFormValues={handleEditReviewInfoForm}
       onDownloadPriceQuotation={handleDownloadPriceQuotation}
       onGoBackToEditOrderPage={handleGoBackFromReviewMode}
+      onViewCartDetail={handleViewCartDetail}
       showStartPickingOrderButton
       onSaveOrderNote={onSaveOrderNote}
       onDownloadReviewOrderResults={onDownloadReviewOrderResults}
       orderData={orderData as TListing}
+      priceQuotationData={priceQuotationData}
+      reviewInfoValues={reviewInfoValues}
     />
   );
+
+  useEffect(() => {
+    if (
+      planReachMaxRestaurantQuantityInProgressState ||
+      planReachMinRestaurantQuantityInProgressState ||
+      planReachMaxCanModifyInProgressState
+    ) {
+      const i = setTimeout(() => {
+        dispatch(OrderManagementsAction.resetOrderDetailValidation());
+        clearTimeout(i);
+      }, 4000);
+    }
+  }, [
+    planReachMaxRestaurantQuantityInProgressState,
+    planReachMinRestaurantQuantityInProgressState,
+    planReachMaxCanModifyInProgressState,
+  ]);
+
+  useEffect(() => {
+    onQuerySubOrderHistoryChanges();
+  }, [onQuerySubOrderHistoryChanges]);
+
+  useEffect(() => {
+    if (draftOrderDetail) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      () => {
+        dispatch(OrderManagementsAction.resetDraftSubOrderChangeHistory());
+
+        return dispatch(OrderManagementsAction.resetDraftOrderDetails());
+      };
+    }
+  }, []);
 
   useEffect(() => {
     if (
@@ -662,20 +665,17 @@ const OrderDetailPage = () => {
       setViewMode(
         ViewByOrderStates[orderState as keyof typeof ViewByOrderStates],
       );
-    }
-  }, [orderState]);
 
-  useEffect(() => {
-    if (
-      !isEmpty(orderState) &&
-      isRouterReady &&
-      orderId &&
-      !BookerAccessibleOrderStates.includes(orderState)
-    ) {
-      router.push({
-        pathname: companyPaths.ManageOrderDetail,
-        query: { orderId },
-      });
+      if (
+        isRouterReady &&
+        orderId &&
+        !BookerAccessibleOrderStates.includes(orderState)
+      ) {
+        router.push({
+          pathname: companyPaths.ManageOrderDetail,
+          query: { orderId },
+        });
+      }
     }
   }, [isRouterReady, orderState, orderId]);
 
@@ -695,15 +695,55 @@ const OrderDetailPage = () => {
     }
   }, [isRouterReady, orderState]);
 
+  useEffect(() => {
+    if (isViewCartDetailMode && !isMobileLayout) {
+      setViewMode(EPageViewMode.review);
+    }
+  }, [isMobileLayout, isViewCartDetailMode]);
+
+  let content = null;
+  const stepperProps = {
+    steps: BOOKER_CREATE_GROUP_ORDER_STEPS,
+    currentStep: 3,
+  };
+  const mobileTopContainerProps = {
+    title: isEditViewMode
+      ? 'Quản lý chọn món'
+      : isViewCartDetailMode
+      ? 'Giỏ hàng của bạn'
+      : 'Xem lại thông tin đơn hàng',
+    hasGoBackButton: !isEditViewMode || isViewCartDetailMode,
+    onGoBack: isViewCartDetailMode
+      ? handleGoBackFromViewCartDetailMode
+      : handleGoBackFromReviewMode,
+    actionPart: isEditViewMode ? (
+      <GoHomeIcon control={confirmGoHomeControl} />
+    ) : null,
+  };
+
   switch (viewMode) {
-    case EPageViewMode.priceQuotation:
-      return <PriceQuotation data={priceQuotationData} />;
-    case EPageViewMode.review:
-      return ReviewViewComponent;
     case EPageViewMode.edit:
+      content = (
+        <>
+          <RenderWhen condition={!isNormalOrder}>
+            <Stepper {...stepperProps} />
+          </RenderWhen>
+          {EditViewComponent}
+        </>
+      );
+      break;
+    case EPageViewMode.review:
     default:
-      return EditViewComponent;
+      content = ReviewViewComponent;
+      break;
   }
+
+  return (
+    <>
+      <MobileTopContainer {...mobileTopContainerProps} />
+      {content}
+    </>
+  );
 };
 
 export default OrderDetailPage;

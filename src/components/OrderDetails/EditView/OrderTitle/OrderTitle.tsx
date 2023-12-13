@@ -3,7 +3,10 @@ import classNames from 'classnames';
 
 import Badge from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
+import MobileBottomContainer from '@components/MobileBottomContainer/MobileBottomContainer';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useAppSelector } from '@hooks/reduxHooks';
+import { useViewport } from '@hooks/useViewport';
 import { orderDetailsAnyActionsInProgress } from '@redux/slices/OrderManagement.slice';
 import type { TDefaultProps, TObject } from '@utils/types';
 
@@ -19,13 +22,13 @@ type TOrderTitleProps = TDefaultProps & {
   onCancelOrder: () => void;
   confirmButtonMessage?: string;
   cancelButtonMessage?: string;
+  cancelDisabled?: boolean;
   confirmDisabled?: boolean;
   confirmInProgress?: boolean;
   isDraftEditing: boolean;
 };
 
 const OrderTitle: React.FC<TOrderTitleProps> = (props) => {
-  const intl = useIntl();
   const {
     rootClassName,
     className,
@@ -34,17 +37,18 @@ const OrderTitle: React.FC<TOrderTitleProps> = (props) => {
     onCancelOrder,
     confirmButtonMessage,
     cancelButtonMessage,
+    cancelDisabled = false,
     confirmDisabled,
     confirmInProgress,
     isDraftEditing,
   } = props;
-
+  const intl = useIntl();
+  const { isMobileLayout } = useViewport();
   const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
 
   const submitDisabled =
     (!isDraftEditing && !canStartOrder) || inProgress || confirmDisabled;
-
-  const cancelOrderDisabled = inProgress;
+  const cancelOrderDisabled = cancelDisabled || inProgress;
 
   const rootClasses = classNames(rootClassName || css.root, className);
 
@@ -63,6 +67,32 @@ const OrderTitle: React.FC<TOrderTitleProps> = (props) => {
     },
   ) as string;
 
+  const actionButtons = (
+    <div className={css.actions}>
+      {!!confirmButtonMessage && (
+        <Button
+          disabled={submitDisabled}
+          type="button"
+          variant="cta"
+          className={css.makeOrderBtn}
+          inProgress={confirmInProgress}
+          onClick={onConfirmOrder}>
+          {confirmButtonMessage}
+        </Button>
+      )}
+      {!!cancelButtonMessage && (
+        <Button
+          disabled={cancelOrderDisabled}
+          type="button"
+          variant="secondary"
+          className={css.cancelOrderBtn}
+          onClick={onCancelOrder}>
+          {cancelButtonMessage}
+        </Button>
+      )}
+    </div>
+  );
+
   return (
     <div className={rootClasses}>
       <div>
@@ -71,29 +101,13 @@ const OrderTitle: React.FC<TOrderTitleProps> = (props) => {
         </div>
         <Badge label={deliveryInfo} />
       </div>
-      <div className={css.actions}>
-        {!!confirmButtonMessage && (
-          <Button
-            disabled={submitDisabled}
-            type="button"
-            variant="cta"
-            className={css.makeOrderBtn}
-            inProgress={confirmInProgress}
-            onClick={onConfirmOrder}>
-            {confirmButtonMessage}
-          </Button>
-        )}
-        {!!cancelButtonMessage && (
-          <Button
-            disabled={cancelOrderDisabled}
-            type="button"
-            variant="secondary"
-            className={css.cancelOrderBtn}
-            onClick={onCancelOrder}>
-            {cancelButtonMessage}
-          </Button>
-        )}
-      </div>
+      <RenderWhen condition={isMobileLayout}>
+        <MobileBottomContainer className={css.mobileActionContainer}>
+          {actionButtons}
+        </MobileBottomContainer>
+
+        <RenderWhen.False>{actionButtons}</RenderWhen.False>
+      </RenderWhen>
     </div>
   );
 };

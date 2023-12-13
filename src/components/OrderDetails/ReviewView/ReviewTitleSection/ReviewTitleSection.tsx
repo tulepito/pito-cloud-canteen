@@ -27,6 +27,12 @@ const ReviewTitleSection: React.FC<TReviewTitleSectionProps> = (props) => {
       <div className={css.title}>
         {intl.formatMessage({ id: 'ReviewTitleSection.title' }, { orderTitle })}
       </div>
+      <div className={css.mobileTitle}>
+        {intl.formatMessage(
+          { id: 'ReviewTitleSection.mobileTitle' },
+          { orderTitle },
+        )}
+      </div>
     </div>
   );
 };

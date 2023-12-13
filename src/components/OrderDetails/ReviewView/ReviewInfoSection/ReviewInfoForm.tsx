@@ -22,7 +22,7 @@ export type TReviewInfoFormValues = {
 };
 
 type TExtraProps = {
-  startSubmit: boolean;
+  setFormValues?: (values: TReviewInfoFormValues, invalid: any) => void;
   fieldTextContent: {
     companyNameField: TObject;
     staffNameField: TObject;
@@ -40,9 +40,9 @@ const ReviewInfoFormComponent: React.FC<TReviewInfoFormComponentProps> = (
 ) => {
   const {
     handleSubmit,
-    form,
-    startSubmit,
-    modifiedSinceLastSubmit,
+    invalid,
+    setFormValues,
+    values,
     fieldTextContent: {
       companyNameField,
       staffNameField,
@@ -54,11 +54,11 @@ const ReviewInfoFormComponent: React.FC<TReviewInfoFormComponentProps> = (
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    if (isMounted && (modifiedSinceLastSubmit || startSubmit)) {
-      form.submit();
+    if (isMounted && setFormValues) {
+      setFormValues(values, invalid);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [startSubmit, modifiedSinceLastSubmit, isMounted]);
+  }, [isMounted, JSON.stringify(values), invalid]);
 
   useEffect(() => {
     setIsMounted(true);
@@ -68,7 +68,7 @@ const ReviewInfoFormComponent: React.FC<TReviewInfoFormComponentProps> = (
     <Form onSubmit={handleSubmit} className={css.formContainer}>
       <div className={css.fieldContainer}>
         <label className={css.fieldLabel} htmlFor="ReviewInfoForm.companyName">
-          1. {companyNameField?.label} *
+          {companyNameField?.label}
         </label>
         <FieldTextInput
           disabled
@@ -81,7 +81,7 @@ const ReviewInfoFormComponent: React.FC<TReviewInfoFormComponentProps> = (
         <label
           className={css.fieldLabel}
           htmlFor="ReviewInfoForm.deliveryAddress">
-          2. {deliveryAddressField?.label} *
+          {deliveryAddressField?.label}
         </label>
         <FieldTextInput
           disabled
@@ -94,7 +94,7 @@ const ReviewInfoFormComponent: React.FC<TReviewInfoFormComponentProps> = (
         <label
           className={css.fieldLabel}
           htmlFor="ReviewInfoForm.contactPeopleName">
-          3. {contactPeopleNameField?.label} *
+          {contactPeopleNameField?.label}
         </label>
         <FieldTextInput
           className={css.fieldInput}
@@ -109,7 +109,7 @@ const ReviewInfoFormComponent: React.FC<TReviewInfoFormComponentProps> = (
         <label
           className={css.fieldLabel}
           htmlFor="ReviewInfoForm.contactPhoneNumber">
-          4. {contactPhoneNumberField?.label} *
+          {contactPhoneNumberField?.label}
         </label>
         <FieldTextInput
           className={css.fieldInput}
@@ -123,7 +123,7 @@ const ReviewInfoFormComponent: React.FC<TReviewInfoFormComponentProps> = (
       </div>
       <div className={css.fieldContainer}>
         <label className={css.fieldLabel} htmlFor="ReviewInfoForm.staffName">
-          5. {staffNameField?.label}
+          {staffNameField?.label}
         </label>
         <FieldTextInput
           className={css.fieldInput}
