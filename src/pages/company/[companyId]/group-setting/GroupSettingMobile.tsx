@@ -11,9 +11,11 @@ import IconEdit from '@components/Icons/IconEdit/IconEdit';
 import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import type { TColumn, TRowData } from '@components/Table/Table';
+import { getCompanyIdFromBookerUser } from '@helpers/company';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import IconNoClientsFound from '@src/pages/admin/order/components/ClientTable/IconNoClientsFound';
+import { companyPaths, personalPaths } from '@src/paths';
 import {
   addWorkspaceCompanyId,
   companyThunks,
@@ -26,7 +28,18 @@ import css from './GroupSettingMobile.module.scss';
 const GroupSettingMobile = () => {
   const intl = useIntl();
   const router = useRouter();
-  const { companyId = '' } = router.query;
+
+  const currentUser = useAppSelector(
+    (state) => state.user.currentUser,
+    shallowEqual,
+  );
+  let { companyId } = router.query;
+  let editGroupByIdPath = companyPaths.GroupDetail;
+  if (companyId === 'personal') {
+    companyId = getCompanyIdFromBookerUser(currentUser!);
+    editGroupByIdPath = personalPaths.GroupList;
+  }
+
   const dispatch = useAppDispatch();
   const {
     value: isCreateGroupModalOpen,
@@ -59,7 +72,7 @@ const GroupSettingMobile = () => {
 
   const onEditGroupById = (id: string) => {
     router.push({
-      pathname: `/company/[companyId]/group-setting/${id}`,
+      pathname: `${editGroupByIdPath}/${id}`,
       query: router.query,
     });
   };

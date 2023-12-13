@@ -12,7 +12,7 @@ import type { TRowData } from '@components/Table/Table';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import useFetchCompanyInfo from '@hooks/useFetchCompanyInfo';
-import { companyPaths } from '@src/paths';
+import { companyPaths, personalPaths } from '@src/paths';
 import { companyThunks } from '@src/redux/slices/company.slice';
 import { ALLERGIES_OPTIONS, getLabelByKey } from '@src/utils/options';
 import { User } from '@utils/data';
@@ -29,6 +29,7 @@ const GroupDetailMobilePage = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { groupId = '', companyId = '' } = router.query;
+
   const {
     value: isEditing,
     setTrue: onEditing,
@@ -178,12 +179,20 @@ const GroupDetailMobilePage = () => {
       ({ error }: any) => {
         if (!error) {
           onDeleteGroupConfirmationModalClose();
-          router.push({
-            pathname: companyPaths.GroupSetting,
-            query: {
-              companyId,
-            },
-          });
+          if (companyId === 'personal')
+            router.push({
+              pathname: personalPaths.GroupList,
+              query: {
+                companyId,
+              },
+            });
+          else
+            router.push({
+              pathname: companyPaths.GroupSetting,
+              query: {
+                companyId,
+              },
+            });
         }
       },
     );
