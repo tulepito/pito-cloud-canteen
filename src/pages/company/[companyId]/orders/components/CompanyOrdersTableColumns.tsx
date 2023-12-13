@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable react-hooks/rules-of-hooks */
-import { type ReactNode } from 'react';
+import React, { type ReactNode } from 'react';
 import { useIntl } from 'react-intl';
 import Skeleton from 'react-loading-skeleton';
 import classNames from 'classnames';
@@ -8,13 +8,10 @@ import { useRouter } from 'next/router';
 
 import Badge, { EBadgeType } from '@components/Badge/Badge';
 import type { TButtonVariant } from '@components/Button/Button';
-import Button, { InlineTextButton } from '@components/Button/Button';
+import Button from '@components/Button/Button';
 import AlertModal from '@components/Modal/AlertModal';
-import NamedLink from '@components/NamedLink/NamedLink';
-import OrderDetailTooltip from '@components/OrderDetailTooltip/OrderDetailTooltip';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import type { TColumn } from '@components/Table/Table';
-import Tooltip from '@components/Tooltip/Tooltip';
 import { parseThousandNumber } from '@helpers/format';
 import { getParticipantPickingLink } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
@@ -30,22 +27,12 @@ import {
   EOrderDraftStates,
   EOrderStates,
 } from '@utils/enums';
-import type { TIntegrationListing, TObject } from '@utils/types';
+import type { TObject } from '@utils/types';
+
+import { BADGE_TYPE_BASE_ON_ORDER_STATE } from '../helpers/constants';
+import { getCompanyOrderRenderData } from '../helpers/getCompanyOrderRenderData';
 
 import css from './CompanyOrdersTable.module.scss';
-
-const BADGE_TYPE_BASE_ON_ORDER_STATE = {
-  [EBookerOrderDraftStates.bookerDraft]: EBadgeType.caution,
-  [EOrderDraftStates.pendingApproval]: EBadgeType.caution,
-  [EOrderStates.canceled]: EBadgeType.default,
-  [EOrderStates.canceledByBooker]: EBadgeType.default,
-  [EOrderStates.picking]: EBadgeType.warning,
-  [EOrderStates.inProgress]: EBadgeType.info,
-  [EOrderStates.pendingPayment]: EBadgeType.danger,
-  [EOrderStates.completed]: EBadgeType.success,
-  [EOrderStates.reviewed]: EBadgeType.success,
-  [EOrderStates.expiredStart]: EBadgeType.default,
-};
 
 const BADGE_CLASS_NAME_BASE_ON_ORDER_STATE = {
   [EBookerOrderDraftStates.bookerDraft]: css.badgeDefault,
@@ -335,112 +322,12 @@ export const CompanyOrdersTableColumns: TColumn[] = [
     key: 'title',
     label: 'Đơn hàng',
     render: (data: TObject) => {
-      const {
-        id,
-        isCreatedByPitoAdmin,
-        title,
-        state,
-        plan,
-        openOrderStateWarningModal,
-        startDateTimestamp,
-        orderId,
-        setSelectedOrderId,
-        queryCompanyPlansByOrderIdsInProgress,
-      } = data;
-      const titleContent = (
-        <div className={css.title}>
-          #{title}
-          {isCreatedByPitoAdmin && (
-            <div className={css.createdByAmin}>{'Tạo bởi PITO'}</div>
-          )}
-        </div>
-      );
-      let returnComponent;
+      const companyOrderRenderData = getCompanyOrderRenderData(data);
 
-      if ([EOrderDraftStates.draft].includes(state)) {
-        return titleContent;
-      }
+      if (React.isValidElement(companyOrderRenderData))
+        return companyOrderRenderData;
 
-      const isPitoOrderCancelled = state === EOrderStates.canceled;
-
-      const openOrderStateWarningModalFn = () => {
-        openOrderStateWarningModal(state);
-        setSelectedOrderId(orderId);
-      };
-
-      if (isPitoOrderCancelled || state === EOrderStates.expiredStart) {
-        return (
-          <InlineTextButton onClick={openOrderStateWarningModalFn}>
-            {titleContent}
-          </InlineTextButton>
-        );
-      }
-
-      if (
-        [
-          EOrderDraftStates.pendingApproval,
-          EBookerOrderDraftStates.bookerDraft,
-        ].includes(state)
-      ) {
-        return (
-          <NamedLink
-            path={companyPaths.EditDraftOrder}
-            params={{ orderId: id }}>
-            {titleContent}
-          </NamedLink>
-        );
-      }
-
-      if ([EOrderStates.picking].includes(state)) {
-        const today = new Date().getTime();
-        const isTodayAfterStartDate =
-          Number(diffDays(startDateTimestamp, today, 'day').days) < 0;
-        if (isTodayAfterStartDate) {
-          return (
-            <InlineTextButton
-              onClick={() => {
-                openOrderStateWarningModal('expireStartOrder');
-                setSelectedOrderId(orderId);
-              }}>
-              {titleContent}
-            </InlineTextButton>
-          );
-        }
-        returnComponent = (
-          <NamedLink
-            path={companyPaths.ManageOrderPicking}
-            params={{ orderId: id }}>
-            {titleContent}
-          </NamedLink>
-        );
-      } else {
-        returnComponent = (
-          <NamedLink
-            path={companyPaths.ManageOrderDetail}
-            params={{ orderId: id }}>
-            {titleContent}
-          </NamedLink>
-        );
-      }
-
-      const subOrders = [].concat(plan) as TIntegrationListing[];
-
-      return (
-        <Tooltip
-          overlayClassName={css.orderDetailTooltip}
-          overlayInnerStyle={{ backgroundColor: '#ffffff' }}
-          showArrow={false}
-          tooltipContent={
-            queryCompanyPlansByOrderIdsInProgress ? (
-              <Skeleton />
-            ) : (
-              <OrderDetailTooltip subOrders={subOrders} />
-            )
-          }
-          placement="bottomLeft">
-          <div>{returnComponent}</div>
-        </Tooltip>
-      );
+      return <div></div>;
     },
   },
   {

@@ -3,12 +3,14 @@ import { useEffect } from 'react';
 import { useIntl } from 'react-intl';
 import { useRouter } from 'next/router';
 
+import MobileTopContainer from '@components/MobileTopContainer/MobileTopContainer';
 import { getCompanyIdFromBookerUser } from '@helpers/company';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useFetchCompanyInfo from '@hooks/useFetchCompanyInfo';
 import { resetCompanyOrdersStates } from '@redux/slices/Order.slice';
 import { currentUserSelector } from '@redux/slices/user.slice';
 import { companyPaths } from '@src/paths';
+import { upperCaseFirstLetter } from '@src/utils/validators';
 
 import CompanyOrdersTable from './components/CompanyOrdersTable';
 
@@ -28,9 +30,14 @@ const ManageCompanyOrdersPage: React.FC<TManageCompanyOrdersPageProps> = () => {
     query: { companyId: companyIdFormQuery },
   } = router;
   useFetchCompanyInfo();
-  const sectionTitle = intl.formatMessage({
-    id: 'ManageCompanyOrdersPage.titleSection.title',
-  });
+  const sectionTitle = upperCaseFirstLetter(
+    intl
+      .formatMessage({
+        id: 'ManageCompanyOrdersPage.titleSection.title',
+      })
+      .toLowerCase(),
+  );
+
   const sectionTitlePITOPhoneNumber = (
     <span className={css.phoneNumber}>
       {intl.formatMessage({
@@ -68,14 +75,20 @@ const ManageCompanyOrdersPage: React.FC<TManageCompanyOrdersPageProps> = () => {
   }, []);
 
   return (
-    <div className={css.root}>
-      <section className={css.titleSection}>
-        <div className={css.title}>{sectionTitle}</div>
-        <div className={css.subtitle}>{sectionTitleSubtitle}</div>
-      </section>
+    <>
+      <MobileTopContainer
+        title={sectionTitle}
+        className={css.mobileTopContainer}
+      />
+      <div className={css.root}>
+        <section className={css.titleSection}>
+          <div className={css.title}>{sectionTitle}</div>
+          <div className={css.subtitle}>{sectionTitleSubtitle}</div>
+        </section>
 
-      <CompanyOrdersTable />
-    </div>
+        <CompanyOrdersTable />
+      </div>
+    </>
   );
 };
 

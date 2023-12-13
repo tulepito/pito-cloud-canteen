@@ -275,6 +275,8 @@
   "CompanySidebar.memberList": "Danh sách thành viên",
   "CompanySidebar.members": "Thành viên",
   "CompanySidebar.nutrition": "Chế độ bữa ăn",
+  "CompanySubOrderCard.order": "Đơn hàng",
+  "CompanySubOrderCard.createdByPITO": "Tạo bởi PITO",
   "ConfirmClientModal.cancel": "Huỷ bỏ",
   "ConfirmClientModal.confirm": "Xác nhận",
   "ConfirmClientModal.title": "Xác nhận chọn công ty này",
