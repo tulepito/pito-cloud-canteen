@@ -132,16 +132,14 @@ const CompanyMembersListMobile: React.FC<
             <div className={css.cellValue}>
               <span>{email}</span>
             </div>
-            <div className={css.iconArrow}>
-              <IconArrow
-                direction="down"
-                onClick={collapseRowController?.toggle}
-                className={classNames(
-                  css.iconArrow,
-                  collapseRowController?.value && css.rotate,
-                )}
-              />
-            </div>
+            <IconArrow
+              direction="down"
+              onClick={collapseRowController?.toggle}
+              className={classNames(
+                css.iconArrow,
+                collapseRowController?.value && css.rotate,
+              )}
+            />
           </div>
         );
       },
@@ -358,7 +356,12 @@ const CompanyMembersListMobile: React.FC<
               })
             )}
             <tr>
-              <td colSpan={columns.length} className={css.bodyRowAddNewMembers}>
+              <td
+                colSpan={columns.length}
+                className={classNames(
+                  css.bodyRowAddNewMembers,
+                  css.bodyCellBorder,
+                )}>
                 <Button
                   variant="inline"
                   type="button"

@@ -35,7 +35,10 @@ const CompanyCollapsibleRows: React.FC<TCompanyCollapsibleRowsProps> = ({
       <tr className={css.bodyRow} key={row.key}>
         {columns.map((col: TColumn) => {
           return (
-            <td className={css.bodyCell} data-label={col.label} key={col.key}>
+            <td
+              className={classNames(css.bodyCell, css.bodyCellBorder)}
+              data-label={col.label}
+              key={col.key}>
               {col.render(row.data, false, showRowsController)}
             </td>
           );
@@ -46,7 +49,7 @@ const CompanyCollapsibleRows: React.FC<TCompanyCollapsibleRowsProps> = ({
           const rowKey = `${row.key}_ControllerRow_${index}_${columnControl.key}`;
 
           return (
-            <tr className={css.bodyRowSpecial} key={rowKey}>
+            <tr className={css.bodyRow} key={rowKey}>
               {columns.map((col: TColumn) => {
                 return (
                   <td className={css.bodyCell} key={col.key}>
