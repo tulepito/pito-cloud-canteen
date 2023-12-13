@@ -1,4 +1,4 @@
-import { companyPaths, quizPaths } from '@src/paths';
+import { companyPaths, personalPaths, quizPaths } from '@src/paths';
 
 const HIDING_COMPANY_FEATURE_HEADER_PATHNAMES = [
   companyPaths.CreateNewOrder,
@@ -31,7 +31,7 @@ export const shouldShowCompanyNavBar = [
   companyPaths.Home,
   companyPaths.ManageOrders,
   companyPaths.CreateNewOrder,
-  companyPaths.Account,
+  personalPaths.Account,
 ];
 
 export const shouldShowSidebar = (pathName: string) => {

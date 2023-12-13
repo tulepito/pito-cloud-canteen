@@ -19,26 +19,21 @@ const CompanySidebar: React.FC<CompanySidebarProps> = ({ companyName }) => {
     companyId && companyId !== 'personal'
       ? [
           {
-            id: 'user',
-            label: 'CompanySidebar.members',
-            isFirstLevel: true,
-            childrenMenus: [
-              {
-                id: 'memberList',
-                label: 'CompanySidebar.memberList',
-                nameLink: companyPaths.Members,
-              },
-              {
-                id: 'groupList',
-                label: 'CompanySidebar.groupList',
-                nameLink: companyPaths.GroupSetting,
-              },
-            ],
-          },
-          {
             id: 'logo',
             label: 'CompanySidebar.logo',
             nameLink: companyPaths.Logo,
+            isFirstLevel: true,
+          },
+        ]
+      : [];
+
+  const userMenuOptions =
+    companyId === 'personal'
+      ? [
+          {
+            id: 'changePassword',
+            label: 'CompanySidebar.passwordSetting',
+            nameLink: personalPaths.ChangePassword,
             isFirstLevel: true,
           },
         ]
@@ -57,6 +52,25 @@ const CompanySidebar: React.FC<CompanySidebarProps> = ({ companyName }) => {
       nameLink: companyId ? companyPaths.Nutrition : personalPaths.Nutrition,
       isFirstLevel: true,
     },
+
+    {
+      id: 'user',
+      label: 'CompanySidebar.members',
+      isFirstLevel: true,
+      childrenMenus: [
+        {
+          id: 'memberList',
+          label: 'CompanySidebar.memberList',
+          nameLink: companyPaths.Members,
+        },
+        {
+          id: 'groupList',
+          label: 'CompanySidebar.groupList',
+          nameLink: companyPaths.GroupSetting,
+        },
+      ],
+    },
+    ...userMenuOptions,
   ];
 
   return (

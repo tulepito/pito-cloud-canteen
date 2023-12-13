@@ -3,14 +3,19 @@ import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import take from 'lodash/take';
 import takeRight from 'lodash/takeRight';
+import { useRouter } from 'next/router';
 
 import Button from '@components/Button/Button';
 import ConfirmationModal from '@components/ConfirmationModal/ConfirmationModal';
+import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import useFetchCompanyInfo from '@hooks/useFetchCompanyInfo';
+import useFetchCompanyInfoCurrentUser from '@hooks/useFetchCompanyInfoCurrentUser';
+import { useViewport } from '@hooks/useViewport';
 import { companyThunks } from '@redux/slices/company.slice';
 import { resetImage } from '@redux/slices/uploadImage.slice';
+import { personalPaths } from '@src/paths';
 import { User } from '@utils/data';
 import type { TCurrentUser, TUser } from '@utils/types';
 
@@ -22,6 +27,11 @@ import css from './Account.module.scss';
 const AccountPage = () => {
   const dispatch = useAppDispatch();
   const intl = useIntl();
+  const router = useRouter();
+  const { query } = router;
+  const { companyId } = query;
+
+  const { isMobileLayout, isTabletLayout } = useViewport();
 
   const formSubmitInputRef = useRef<any>();
   const [formDisabled, setFormDisabled] = useState<boolean>(true);
@@ -30,6 +40,7 @@ const AccountPage = () => {
     setTrue: openConfirmationModal,
     setFalse: closeConfirmationModal,
   } = useBoolean();
+
   const currentUser = useAppSelector(
     (state) => state.user.currentUser,
     shallowEqual,
@@ -53,12 +64,12 @@ const AccountPage = () => {
   const fetchCompanyInfoInProgress = useAppSelector(
     (state) => state.company.fetchCompanyInfoInProgress,
   );
-  const { companyName = '', companyLocation = {} } = User(
-    company as TUser,
-  ).getPublicData();
-  const { email = '' } = User(company as TUser).getAttributes();
+  const companyUser = User(company as TUser);
+  const { companyName = '', companyLocation = {} } =
+    companyUser.getPublicData();
+  const { email = '' } = companyUser.getAttributes();
   const { address = '' } = companyLocation;
-  const { tax } = User(company as TUser).getPrivateData();
+  const { tax } = companyUser.getPrivateData();
 
   const { email: bookerEmail = '' } = User(currentUser!).getAttributes();
   const { displayName: bookerDisplayName = '' } = User(
@@ -79,7 +90,14 @@ const AccountPage = () => {
   useEffect(() => {
     dispatch(resetImage());
   }, [dispatch]);
-  useFetchCompanyInfo();
+
+  if (companyId === 'personal') {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    useFetchCompanyInfoCurrentUser();
+  } else {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    useFetchCompanyInfo();
+  }
 
   const onSubmit = async (values: TContactPointProfileFormValues) => {
     const { displayName, phoneNumber } = values;
@@ -108,11 +126,28 @@ const AccountPage = () => {
       formSubmitInputRef.current(e);
   };
 
+  const navigateAccountPersonalPage = () => {
+    router.push({
+      pathname: personalPaths.Account,
+      query: { companyId: 'personal' },
+    });
+  };
+
   return (
     <div className={css.container}>
-      <div className={css.header}>
-        {intl.formatMessage({ id: 'AccountPage.account' })}
-      </div>
+      {isMobileLayout || isTabletLayout ? (
+        <div className={css.header}>
+          <IconArrow direction="left" onClick={navigateAccountPersonalPage} />
+          <span>
+            {intl.formatMessage({ id: 'AdminSidebar.accountSettingLabel' })}
+          </span>
+        </div>
+      ) : (
+        <div className={css.header}>
+          <span>{intl.formatMessage({ id: 'AccountPage.account' })}</span>
+        </div>
+      )}
+
       <div className={css.contactPointSection}>
         <div className={css.sectionTitle}>
           {intl.formatMessage({ id: 'AccountPage.contactPoint' })}
@@ -178,6 +213,7 @@ const AccountPage = () => {
         </Button>
       </div>
       <ConfirmationModal
+        isPopup={isMobileLayout}
         id="UpdateBookerConfirmationModal"
         isOpen={isConfirmationModalOpen}
         onClose={closeConfirmationModal}

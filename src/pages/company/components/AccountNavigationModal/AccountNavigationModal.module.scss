@@ -1,0 +1,62 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.modalHeader.modalHeader {
+  display: none;
+}
+.modalContainer.modalContainer {
+  padding: 0;
+}
+
+.root {
+  display: flow-root;
+  gap: 16px;
+}
+
+.heading {
+  border-bottom: 1px solid $neutralGray3;
+  padding: 8px 16px;
+  height: 56px;
+  @include flexAlign(center);
+  gap: 8px;
+  span {
+    @include text(16px, 24px);
+    font-weight: $fontWeightBold;
+  }
+  cursor: pointer;
+}
+
+.itemRow {
+  @include textTemplate(14px, 600, 20px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-direction: row;
+  column-gap: 8px;
+  margin: 0 16px;
+  padding: 12px 0;
+  cursor: pointer;
+
+  &:first-of-type {
+    padding-top: 16px;
+  }
+
+  &:not(:last-of-type) {
+    border-bottom: 1px solid $neutralGray3;
+  }
+}
+
+.headerTitle {
+  @include flexAlign(center);
+  gap: 16px;
+
+  svg {
+    path {
+      fill: $neutralGray6;
+    }
+  }
+  span {
+    @include textTemplate(16px, $fontWeightSemiBold, 24px);
+  }
+}

@@ -3,9 +3,12 @@ import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import { useRouter } from 'next/router';
 
+import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useFetchCompanyInfo from '@hooks/useFetchCompanyInfo';
+import { useViewport } from '@hooks/useViewport';
 import { companyThunks } from '@redux/slices/company.slice';
+import { personalPaths } from '@src/paths';
 import { CurrentUser, Listing, User } from '@utils/data';
 import type { TUser } from '@utils/types';
 
@@ -18,6 +21,7 @@ const NutritionPage = () => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
   const router = useRouter();
+  const { isMobileLayout, isTabletLayout } = useViewport();
   const { companyId } = router.query;
   useFetchCompanyInfo();
 
@@ -94,11 +98,20 @@ const NutritionPage = () => {
     };
     dispatch(companyThunks.updateCompanyAccount({ publicData }));
   };
+  const navigateAccountPersonalPage = () => {
+    router.push({
+      pathname: personalPaths.Account,
+      query: { companyId: 'personal' },
+    });
+  };
 
   return (
     <div className={css.container}>
       <div className={css.header}>
-        {intl.formatMessage({ id: 'NutritionPage.nutrition' })}
+        {(isMobileLayout || isTabletLayout) && (
+          <IconArrow direction="left" onClick={navigateAccountPersonalPage} />
+        )}
+        <span>{intl.formatMessage({ id: 'NutritionPage.nutrition' })}</span>
       </div>
       {fetchCompanyInfoInProgress ? (
         <div className={css.loading}>

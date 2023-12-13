@@ -21,7 +21,10 @@ export const enGeneralPaths = {
 
 export const personalPaths = {
   Account: '/company/personal/account',
+  Info: '/company/personal/account/info',
   Nutrition: '/company/personal/nutrition',
+  Members: '/company/personal/members',
+  ChangePassword: '/company/personal/account/change-password',
 };
 
 export const NonRequireAuthenticationRoutes = [

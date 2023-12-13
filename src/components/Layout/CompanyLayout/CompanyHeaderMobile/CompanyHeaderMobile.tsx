@@ -21,7 +21,7 @@ import { useViewport } from '@hooks/useViewport';
 import { UIActions } from '@redux/slices/UI.slice';
 import { currentUserSelector } from '@redux/slices/user.slice';
 import config from '@src/configs';
-import { generalPaths } from '@src/paths';
+import { generalPaths, personalPaths } from '@src/paths';
 import { CurrentUser } from '@src/utils/data';
 import type { TCurrentUser, TObject } from '@src/utils/types';
 
@@ -146,10 +146,18 @@ const CompanyHeaderMobile: React.FC<CompanyHeaderMobileProps> = (props) => {
           </div>
           <div className={css.separator}></div>
           <div className={css.headerBottoms}>
-            <div className={css.headerBottomItem}>
-              <Avatar user={currentUser as TCurrentUser} />
-              <div className={css.userDisplayName}>{currentUserFullName}</div>
-            </div>
+            <Link
+              key="profile"
+              onClick={handleRedirect(personalPaths.Account)}
+              href={personalPaths.Account}>
+              <div className={css.headerBottomItem}>
+                <Avatar
+                  user={currentUser as TCurrentUser}
+                  disableProfileLink={true}
+                />
+                <div className={css.userDisplayName}>{currentUserFullName}</div>
+              </div>
+            </Link>
             <div className={css.headerBottomItem}>
               <IconPhone variant="secondary" className={css.phoneIcon} />
               <div className={css.phoneNumber}>

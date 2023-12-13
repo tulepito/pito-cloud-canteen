@@ -1,13 +1,23 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
 
 .container {
-  @include flexAlign(flex-start);
+  display: inline-block;
+  width: 100%;
+
+  @include viewportSmall {
+    @include flexAlign(flex-start);
+    gap: 88px;
+  }
 
   .avatar {
-    width: 128px;
-    height: 128px;
-    margin-right: 88px;
+    @include flexAlign(center, center);
+    flex-direction: column;
+    gap: 16px;
+    @include viewportSmall {
+      height: 128px;
+    }
 
     .uploadAvatarWrapper {
       .label {
@@ -37,7 +47,6 @@
     }
 
     .avatarPlaceholder {
-      width: 128px;
       height: 128px;
       border-radius: 100%;
       position: relative;
@@ -94,15 +103,22 @@
 
   .profile {
     @include flexAlign(flex-start);
-    gap: 32px;
-    flex-wrap: wrap;
-    width: 632px;
+    flex-direction: column;
+    width: 100%;
+    gap: 16px;
+
+    @include viewportMedium {
+      gap: 32px;
+      flex-direction: row;
+      flex-wrap: wrap;
+    }
 
     .fieldInput {
-      width: 300px;
-      input {
-        @include textTemplate(14px, $fontWeightMedium, 24px);
+      width: 100%;
+      @include viewportMedium {
+        width: 300px;
       }
+      @include textTemplate(14px, $fontWeightMedium, 24px);
 
       .label {
         @include textTemplate(14px, $fontWeightMedium, 24px);
