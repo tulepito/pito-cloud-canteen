@@ -1,0 +1,31 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.modalContainer.modalContainer {
+  flex-basis: 700px;
+
+  .modalHeader {
+    @include flexAlign(center, space-between);
+
+    .modalTitle {
+      @include text(20px, 32px);
+      font-weight: 700;
+    }
+  }
+}
+
+.modalContent {
+  margin-top: 16px;
+}
+
+.modalFooter {
+  .cancelBtn {
+    width: 100%;
+    margin: 16px auto 0;
+
+    @include viewportSmall {
+      width: 400px;
+    }
+  }
+}

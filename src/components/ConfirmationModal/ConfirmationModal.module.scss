@@ -10,15 +10,27 @@
   }
 }
 .modalFooter {
-  @include flexAlign(center, flex-end);
+  @include flexAlign(center, center);
+  gap: 16px;
+
+  @include viewportSmall {
+    @include flexAlign(center, flex-end);
+  }
 
   .cancelBtn {
-    margin-right: 16px;
-    width: 100px;
+    flex: 1;
+    @include viewportSmall {
+      width: 100px;
+      flex: none;
+    }
   }
 
   .confirmBtn {
-    min-width: 100px;
+    flex: 1;
+    @include viewportSmall {
+      min-width: 100px;
+      flex: none;
+    }
   }
 }
 
