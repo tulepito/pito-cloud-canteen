@@ -25,6 +25,7 @@ type TReviewViewProps = TDefaultProps & {
   canGoBackEditMode?: boolean;
   isViewCartDetailMode?: boolean;
   showStartPickingOrderButton?: boolean;
+  shouldShowGoHomeButtonOnMobileCart?: boolean;
   isAdminLayout?: boolean;
   reviewViewData: ReturnType<
     typeof usePrepareOrderDetailPageData
@@ -63,6 +64,7 @@ const ReviewView: React.FC<TReviewViewProps> = (props) => {
     orderData,
     reviewInfoValues,
     setInfoFormValues,
+    shouldShowGoHomeButtonOnMobileCart = false,
   } = props;
   const dispatch = useAppDispatch();
   const { leftClassName, rightClassName } = classes;
@@ -139,6 +141,7 @@ const ReviewView: React.FC<TReviewViewProps> = (props) => {
           isViewCartDetailMode={isViewCartDetailMode}
           onViewCartDetail={onViewCartDetail}
           reviewInfoValues={reviewInfoValues}
+          shouldShowGoHomeButton={shouldShowGoHomeButtonOnMobileCart}
         />
       </div>
     </div>

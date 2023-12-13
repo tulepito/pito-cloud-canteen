@@ -47,11 +47,11 @@ const TitleSection: React.FC<TTitleSectionProps> = ({
   );
 
   const contactNumber = (
-    <b className={css.contactNumber}>
+    <span className={css.contactNumber}>
       {intl.formatMessage({
         id: 'CompanyOrderDetailPage.titleSection.contactNumber',
       })}
-    </b>
+    </span>
   );
   const chatLink = (
     <span className={css.chatLink}>
@@ -71,7 +71,7 @@ const TitleSection: React.FC<TTitleSectionProps> = ({
         {
           id: 'CompanyOrderDetailPage.titleSection.subtitle',
         },
-        { contactNumber, chatLink },
+        { contactNumber },
       );
 
   const reviewText = intl.formatMessage(
@@ -81,23 +81,27 @@ const TitleSection: React.FC<TTitleSectionProps> = ({
     { contactNumber, chatLink },
   );
 
+  const orderNameComponent = (
+    <RenderWhen condition={!isEmpty(orderTitle)}>
+      <div className={css.orderName}>{orderName}</div>
+      <RenderWhen condition={isOrderAutomaticConfirmed}>
+        <Badge label="Tự động xác nhận" />
+      </RenderWhen>
+      <RenderWhen.False>
+        <Skeleton containerClassName={css.orderNameSkeleton} />
+      </RenderWhen.False>
+    </RenderWhen>
+  );
+
   return (
     <div className={rootClasses}>
       <div>
         <div className={css.breadCrumb}>
           <div>{orderText}</div>
           <IconArrow direction="right" className={css.arrowIcon} />
-          <RenderWhen condition={!isEmpty(orderTitle)}>
-            <div className={css.orderName}>{orderName}</div>
-
-            <RenderWhen condition={isOrderAutomaticConfirmed}>
-              <Badge label="Tự động xác nhận" />
-            </RenderWhen>
-            <RenderWhen.False>
-              <Skeleton containerClassName={css.orderNameSkeleton} />
-            </RenderWhen.False>
-          </RenderWhen>
+          {orderNameComponent}
         </div>
+        <div className={css.mobileOrderTitle}>{orderNameComponent}</div>
         <div className={css.subtitle}>{subtitle}</div>
       </div>
       <RenderWhen condition={canReview}>

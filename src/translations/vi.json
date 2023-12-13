@@ -272,7 +272,7 @@
   "CompanyOrderDetailPage.titleSection.orderName": "ĐƠN HÀNG #{orderName}",
   "CompanyOrderDetailPage.titleSection.orders": "ĐƠN HÀNG",
   "CompanyOrderDetailPage.titleSection.reviewButtonText": "Đánh giá",
-  "CompanyOrderDetailPage.titleSection.subtitle": "Đơn hàng này đã được gửi đến đơn vị phục vụ. Nếu bạn có yêu cầu thay đổi nào, vui lòng liên hệ {contactNumber} hoặc {chatLink} với PITO nhé.",
+  "CompanyOrderDetailPage.titleSection.subtitle": "Nếu có bất cứ thay đổi hoặc yêu cầu liên quan đến đơn hàng, vui lòng liên hệ hotline {contactNumber}.",
   "CompanyOrderDetailPage.titleSection.subtitleWhenAutomaticConfirmed": "Đơn hàng này đã được tự động xác nhận và gửi đến đơn vị phục vụ. Nếu bạn có yêu cầu thay đổi nào, vui lòng liên hệ {contactNumber} hoặc {chatLink} với PITO nhé.",
   "CompanyOrderDetailRoute.description": "Chi tiết đơn hàng",
   "CompanyOrderDetailRoute.title": "Chi tiết đơn hàng",

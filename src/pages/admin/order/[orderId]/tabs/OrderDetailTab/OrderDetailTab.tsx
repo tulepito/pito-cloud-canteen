@@ -96,7 +96,6 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
   const [currentViewDate, setCurrentViewDate] = useState<number>(
     Number(timestamp),
   );
-
   const [viewMode, setViewMode] = useState<EPageViewMode>(EPageViewMode.edit);
   const [isDraftEditing, setIsDraftEditing] = useState<boolean>(false);
   const orderId = Listing(order).getId();
@@ -108,16 +107,13 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
   const { planValidationsInProgressState } =
     orderValidationsInProgressState || {};
 
-  const planReachMaxRestaurantQuantityInProgressState =
-    planValidationsInProgressState?.[currentViewDate]
-      ?.planReachMaxRestaurantQuantity;
-
-  const planReachMinRestaurantQuantityInProgressState =
-    planValidationsInProgressState?.[currentViewDate]
-      ?.planReachMinRestaurantQuantity;
-
-  const planReachMaxCanModifyInProgressState =
-    planValidationsInProgressState?.[currentViewDate]?.planReachMaxCanModify;
+  const {
+    planReachMaxRestaurantQuantity:
+      planReachMaxRestaurantQuantityInProgressState,
+    planReachMinRestaurantQuantity:
+      planReachMinRestaurantQuantityInProgressState,
+    planReachMaxCanModify: planReachMaxCanModifyInProgressState,
+  } = planValidationsInProgressState?.[currentViewDate] || {};
 
   const {
     notes,
@@ -154,6 +150,31 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
     orderTitle,
     priceQuotationData,
   });
+
+  const isNormalOrder = orderType === EOrderType.normal;
+
+  const { planValidations } = checkMinMaxQuantityInPickingState(
+    isNormalOrder,
+    isPickingState,
+    draftOrderDetail,
+  );
+
+  const {
+    planReachMaxRestaurantQuantity:
+      planReachMaxRestaurantQuantityInPickingState,
+    planReachMinRestaurantQuantity:
+      planReachMinRestaurantQuantityInPickingState,
+  } = planValidations[currentViewDate as keyof typeof planValidations] || {};
+
+  const planReachMaxRestaurantQuantity =
+    planReachMaxRestaurantQuantityInProgressState ||
+    planReachMaxRestaurantQuantityInPickingState;
+  const planReachMinRestaurantQuantity =
+    planReachMinRestaurantQuantityInProgressState ||
+    planReachMinRestaurantQuantityInPickingState;
+
+  const { minQuantity = 1 } =
+    draftOrderDetail?.[currentViewDate]?.restaurant || {};
 
   const onQuerySubOrderHistoryChanges = useCallback(
     (lastRecordCreatedAt?: number) => {
@@ -246,6 +267,17 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
         lastRecordSubOrderChangesHistoryCreatedAt,
       );
   };
+  const subOrderChangesHistorySectionProps = {
+    querySubOrderChangesHistoryInProgress,
+    subOrderChangesHistory,
+    draftSubOrderChangesHistory:
+      draftSubOrderChangesHistory[
+        currentViewDate as unknown as keyof typeof draftSubOrderChangesHistory
+      ],
+    onQueryMoreSubOrderChangesHistory,
+    subOrderChangesHistoryTotalItems,
+    loadMoreSubOrderChangesHistory,
+  };
 
   useEffect(() => {
     onQuerySubOrderHistoryChanges();
@@ -261,24 +293,6 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
       };
     }
   }, []);
-
-  const isNormalOrder = orderType === EOrderType.normal;
-
-  const { planValidations } = checkMinMaxQuantityInPickingState(
-    isNormalOrder,
-    isPickingState,
-    draftOrderDetail,
-  );
-
-  const {
-    planReachMaxRestaurantQuantity:
-      planReachMaxRestaurantQuantityInPickingState,
-    planReachMinRestaurantQuantity:
-      planReachMinRestaurantQuantityInPickingState,
-  } = planValidations[currentViewDate as keyof typeof planValidations] || {};
-
-  const { minQuantity = 1 } =
-    draftOrderDetail?.[currentViewDate]?.restaurant || {};
 
   return (
     <div className={css.container}>
@@ -319,18 +333,16 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
               <div className={css.editViewRoot}>
                 <div className={css.leftPart}>
                   <ManageOrdersSection
-                    setCurrentViewDate={(date) => setCurrentViewDate(date)}
+                    setCurrentViewDate={setCurrentViewDate}
                     currentViewDate={currentViewDate}
                     isDraftEditing={isDraftEditing}
                     ableToUpdateOrder={ableToUpdateOrder}
                     planReachMaxCanModify={planReachMaxCanModifyInProgressState}
                     planReachMaxRestaurantQuantity={
-                      planReachMaxRestaurantQuantityInPickingState ||
-                      planReachMaxRestaurantQuantityInProgressState
+                      planReachMaxRestaurantQuantity
                     }
                     planReachMinRestaurantQuantity={
-                      planReachMinRestaurantQuantityInPickingState ||
-                      planReachMinRestaurantQuantityInProgressState
+                      planReachMinRestaurantQuantity
                     }
                     isAdminFlow
                   />
@@ -355,24 +367,7 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
                   <RenderWhen condition={isDraftEditing}>
                     <SubOrderChangesHistorySection
                       className={css.container}
-                      querySubOrderChangesHistoryInProgress={
-                        querySubOrderChangesHistoryInProgress
-                      }
-                      subOrderChangesHistory={subOrderChangesHistory}
-                      draftSubOrderChangesHistory={
-                        draftSubOrderChangesHistory[
-                          currentViewDate as unknown as keyof typeof draftSubOrderChangesHistory
-                        ]
-                      }
-                      onQueryMoreSubOrderChangesHistory={
-                        onQueryMoreSubOrderChangesHistory
-                      }
-                      subOrderChangesHistoryTotalItems={
-                        subOrderChangesHistoryTotalItems
-                      }
-                      loadMoreSubOrderChangesHistory={
-                        loadMoreSubOrderChangesHistory
-                      }
+                      {...subOrderChangesHistorySectionProps}
                     />
                   </RenderWhen>
                 </div>
@@ -388,14 +383,8 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
                   <ManageLineItemsSection
                     isDraftEditing={isDraftEditing}
                     ableToUpdateOrder={ableToUpdateOrder}
-                    shouldShowOverflowError={
-                      planReachMaxRestaurantQuantityInProgressState ||
-                      planReachMaxRestaurantQuantityInPickingState
-                    }
-                    shouldShowUnderError={
-                      planReachMinRestaurantQuantityInProgressState ||
-                      planReachMinRestaurantQuantityInPickingState
-                    }
+                    shouldShowOverflowError={planReachMaxRestaurantQuantity}
+                    shouldShowUnderError={planReachMinRestaurantQuantity}
                     setCurrentViewDate={handleSetCurrentViewDate}
                     currentViewDate={currentViewDate}
                     minQuantity={minQuantity}
@@ -407,24 +396,7 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
                         css.historyContainer,
                         css.normalOrderSubOrderSection,
                       )}
-                      querySubOrderChangesHistoryInProgress={
-                        querySubOrderChangesHistoryInProgress
-                      }
-                      subOrderChangesHistory={subOrderChangesHistory}
-                      draftSubOrderChangesHistory={
-                        draftSubOrderChangesHistory[
-                          currentViewDate as unknown as keyof typeof draftSubOrderChangesHistory
-                        ]
-                      }
-                      onQueryMoreSubOrderChangesHistory={
-                        onQueryMoreSubOrderChangesHistory
-                      }
-                      subOrderChangesHistoryTotalItems={
-                        subOrderChangesHistoryTotalItems
-                      }
-                      loadMoreSubOrderChangesHistory={
-                        loadMoreSubOrderChangesHistory
-                      }
+                      {...subOrderChangesHistorySectionProps}
                     />
                   </RenderWhen>
                 </div>
