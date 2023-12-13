@@ -1,9 +1,18 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
 
 .modalContainer.modalContainer {
-  padding: 36px 36px 40px;
+  padding: 36px 16px 40px;
   flex-basis: 480px;
+
+  @include viewportLarge {
+    padding: 36px 36px 40px;
+  }
+}
+
+.container {
+  position: relative;
 }
 
 .modalTop {
@@ -11,8 +20,12 @@
   flex-direction: row-reverse;
 
   .backBtn {
-    @include flexAlign(center, center);
-    cursor: pointer;
+    display: none;
+
+    @include viewportLarge {
+      @include flexAlign(center, center);
+      cursor: pointer;
+    }
 
     span {
       @include textTemplate(16px, $fontWeightBold, 24px);
@@ -25,6 +38,11 @@
     @include textTemplate(14px, 400, 20px);
     text-align: right;
     color: $neutralGray6;
+    display: none;
+
+    @include viewportLarge {
+      display: block;
+    }
 
     &.stepInfoWithBackBtn {
       flex-basis: unset;
@@ -36,21 +54,64 @@
 
   .closeBtn {
     cursor: pointer;
+    display: none;
+
+    @include viewportLarge {
+      display: block;
+    }
+  }
+
+  .mobileHeader {
+    @include flexAlign(center);
+    gap: 4px;
+    width: 100%;
+
+    @include viewportLarge {
+      display: none;
+    }
+
+    .progressStep {
+      flex-basis: calc(100% / 3);
+      background-color: $neutralGray3;
+      height: 3px;
+      border-radius: 100px;
+
+      &.active {
+        background-color: $neutralGray7;
+      }
+    }
+  }
+}
+
+.backBtnMobile {
+  margin-top: 16px;
+
+  @include viewportLarge {
+    display: none;
   }
 }
 
 .modalHeader {
   @include flexAlign(center, center);
-  @include textTemplate(24px, $fontWeightBold, 32px);
-  margin-top: 20px;
-  text-align: center;
+  @include textTemplate(18px, $fontWeightBold, 24px);
+  margin-top: 12px;
+
+  @include viewportLarge {
+    margin-top: 20px;
+    text-align: center;
+    @include textTemplate(24px, $fontWeightBold, 32px);
+  }
 }
 
 .modalContent {
-  margin-top: 32px;
-  max-height: 500px;
-  overflow-y: auto;
+  margin-top: 16px;
   padding-bottom: 4px;
+
+  @include viewportLarge {
+    max-height: 500px;
+    overflow-y: auto;
+    margin-top: 32px;
+  }
 
   &::-webkit-scrollbar {
     display: none;
@@ -61,9 +122,23 @@
   margin-top: 40px;
   @include flexAlign(center, center);
   flex-direction: column;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  background-color: $neutralGray1;
+  padding: 0 16px 24px;
+  width: 100%;
+
+  @include viewportLarge {
+    position: relative;
+  }
 
   .submitBtn {
-    width: 400px;
+    width: 100%;
+
+    @include viewportLarge {
+      width: 400px;
+    }
   }
 
   .cancelBtn {

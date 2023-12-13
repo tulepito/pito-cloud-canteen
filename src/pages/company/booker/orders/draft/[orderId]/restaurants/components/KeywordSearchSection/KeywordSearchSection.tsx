@@ -14,7 +14,7 @@ import css from './KeywordSearchSection.module.scss';
 
 function KeywordSearchSection() {
   const [isInputFocused, setIsInputFocused] = useState(false);
-  const [isPopoverHovered, setIsisPopoverHovered] = useState(false);
+  const [isPopoverHovered, setIsPopoverHovered] = useState(false);
   const router = useRouter();
   const { keywords } = router.query;
   const dispatch = useAppDispatch();
@@ -74,8 +74,8 @@ function KeywordSearchSection() {
     <Tooltip
       overlay={
         <KeywordSearchPopoverContent
-          onMouseEnter={() => setIsisPopoverHovered(true)}
-          onMouseLeave={() => setIsisPopoverHovered(false)}
+          onMouseEnter={() => setIsPopoverHovered(true)}
+          onMouseLeave={() => setIsPopoverHovered(false)}
           popularKeywords={popularKeywords}
           recentKeywords={recentKeywords}
           onKeyWordsChange={onKeyWordsChange}

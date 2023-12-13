@@ -38,6 +38,7 @@ type ITabsProps = {
   tabActiveItemClassName?: string;
   disabled?: boolean;
   enableTabScroll?: boolean;
+  tabScrollBehavior?: 'auto' | 'smooth';
 };
 
 const Tabs: React.FC<ITabsProps> = (props) => {
@@ -59,6 +60,7 @@ const Tabs: React.FC<ITabsProps> = (props) => {
     tabActiveItemClassName,
     disabled = false,
     enableTabScroll = false,
+    tabScrollBehavior = 'smooth',
   } = props;
   const [activeTabKey, setActiveTabKey] = useState(defaultActiveKey || 1);
 
@@ -71,15 +73,17 @@ const Tabs: React.FC<ITabsProps> = (props) => {
 
     if (!enableTabScroll) return;
 
-    const activeTab = document.querySelector(`.${classNames(css.tabActive)}`);
+    const activeTab = document.querySelector(
+      `.${classNames(css.tabActive)}`,
+    ) as HTMLElement | null;
+
     if (activeTab) {
       const tabHeaderParent = activeTab.parentElement;
-      if (tabKey !== 1) {
-        tabHeaderParent?.scroll({
-          left: activeTab.clientWidth * (tabKey - 1) + 20,
-          behavior: 'smooth',
-        });
-      }
+
+      tabHeaderParent?.scroll({
+        left: activeTab.offsetLeft,
+        behavior: tabScrollBehavior,
+      });
     }
   };
 

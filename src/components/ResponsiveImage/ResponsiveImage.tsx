@@ -38,6 +38,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import classNames from 'classnames';
 import Image from 'next/image';
 
+import defaultFoodThumbail from '@src/assets/defaultFoodThumbnail.png';
 import type { TDefaultProps, TImage, TImageVariant } from '@utils/types';
 
 import NoImageIcon from './NoImageIcon';
@@ -54,6 +55,7 @@ type TResponsiveImageProps = TDefaultProps & {
   image: TImage | null;
   variants?: TImageVariant[];
   sizes?: string;
+  emptyType?: 'food';
 };
 
 const ResponsiveImage: React.FC<TResponsiveImageProps> = (props) => {
@@ -63,6 +65,7 @@ const ResponsiveImage: React.FC<TResponsiveImageProps> = (props) => {
     alt,
     image,
     variants = [],
+    emptyType,
     ...rest
   } = props;
 
@@ -92,6 +95,16 @@ const ResponsiveImage: React.FC<TResponsiveImageProps> = (props) => {
       css.noImageContainer,
       className,
     );
+
+    if (emptyType === 'food') {
+      return (
+        <>
+          <Image src={defaultFoodThumbail} fill alt="Ảnh minh họa" />
+          <div className={css.overlay} />
+          <p className={css.overlayText}>Ảnh minh họa</p>
+        </>
+      );
+    }
 
     return (
       <div className={noImageClasses} ref={noImageContainerRef}>

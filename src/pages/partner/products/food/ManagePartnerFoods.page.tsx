@@ -186,7 +186,7 @@ const ManagePartnerFoods = () => {
   const cannotRemoveFoodModalController = useBoolean();
   const addFoodSlideModalController = useBoolean();
   const moveFoodToMenuSlideModalController = useBoolean();
-  const { isMobileLayout } = useViewport();
+  const { isMobileLayout, isTabletLayout } = useViewport();
 
   const categoryOptions = useAppSelector(
     (state) => state.SystemAttributes.categories,
@@ -676,12 +676,21 @@ const ManagePartnerFoods = () => {
   };
 
   const handleAddFood = () => {
-    router.push({
-      pathname: partnerPaths.EditFood.replace('[foodId]', NEW_FOOD_ID),
-      query: {
-        fromTab: foodApprovalActiveTab,
-      },
-    });
+    if (isMobileLayout || isTabletLayout) {
+      router.push({
+        pathname: partnerPaths.EditFood.replace('[foodId]', NEW_FOOD_ID),
+        query: {
+          fromTab: foodApprovalActiveTab,
+        },
+      });
+    } else {
+      router.push({
+        pathname: partnerPaths.CreateFood,
+        query: {
+          fromTab: foodApprovalActiveTab,
+        },
+      });
+    }
   };
 
   useEffect(() => {
@@ -736,6 +745,7 @@ const ManagePartnerFoods = () => {
       shouldHideAddProductButton={false}
       handleAddProduct={handleAddFood}>
       <div className={css.root}>
+        aaaaa
         <div className={css.tableActions}>
           <div className={css.ctaViewTypeWrapper}>
             <div className={css.viewTypeWrapper}>
@@ -1026,7 +1036,6 @@ const ManagePartnerFoods = () => {
             />
           </p>
         </AlertModal>
-
         <PopupModal
           id="CannotRemoveFoodModal"
           isOpen={cannotRemoveFoodModalController.value}
@@ -1050,7 +1059,6 @@ const ManagePartnerFoods = () => {
             </Button>
           </>
         </PopupModal>
-
         <SlideModal
           id="FilterFoodModal"
           isOpen={filterFoodSlideModalController.value}
@@ -1114,7 +1122,6 @@ const ManagePartnerFoods = () => {
             </div>
           </div>
         </SlideModal>
-
         <MoveFoodToMenuModal
           isOpen={moveFoodToMenuSlideModalController.value}
           onClose={moveFoodToMenuSlideModalController.setFalse}

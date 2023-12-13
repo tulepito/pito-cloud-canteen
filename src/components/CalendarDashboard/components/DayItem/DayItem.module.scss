@@ -50,31 +50,70 @@
   justify-content: center;
   padding: 8px 0;
   border-radius: 8px;
-  margin: 0 8px 16px;
-  background-color: $neutralGray2;
+  position: relative;
+
+  @include viewportMedium {
+    margin: 0 8px 16px;
+    background-color: $neutralGray2;
+  }
 
   &.hover {
     background-color: $primaryPri1;
   }
 }
 
+.indicator {
+  position: absolute;
+  top: 3px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 12px;
+  height: 4px;
+  border-radius: 8px;
+
+  &.valid {
+    background-color: $sematicGreen2;
+  }
+
+  &.invalid {
+    background-color: $primaryPri2;
+  }
+}
+
 .activeHeader {
-  background-color: $primaryPri2;
-  color: $neutralGray1;
+  color: $primaryPri2;
+  background-color: rgba($primaryPri2, 0.1);
 
   .dateNumber,
   .dayText {
-    color: $neutralGray1;
+    color: $primaryPri2;
+  }
+}
+
+.disabledHeader {
+  pointer-events: none;
+  cursor: not-allowed;
+  .dateNumber,
+  .dayText {
+    color: $neutralGray5;
   }
 }
 
 .dateNumber {
-  @include textTemplate(18px, 700, 28px, '');
+  @include textTemplate(16px, 600, 24px);
+
+  @include viewportLarge {
+    @include textTemplate(18px, 700, 28px, '');
+  }
 }
 
 .dayText {
-  transition: all 0.25s linear;
-  @include textTemplate(12px, 400, 20px, '');
+  @include textTemplate(12px, 400, 16px, '');
+
+  @include viewportLarge {
+    transition: all 0.25s linear;
+    line-height: 20px;
+  }
 }
 
 .dayContent {

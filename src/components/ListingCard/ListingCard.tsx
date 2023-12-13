@@ -103,6 +103,7 @@ const ListingCard: React.FC<TListCardProps> = ({
             image={listingImage}
             alt={title}
             variants={[EImageVariants.landscapeCrop]}
+            emptyType="food"
           />
         </div>
         <div className={css.listingCardContent}>

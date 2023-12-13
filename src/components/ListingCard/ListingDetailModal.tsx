@@ -143,13 +143,16 @@ const ListingDetailModal: React.FC<TListingDetailModalProps> = (props) => {
                       EImageVariants.landscapeCrop6x,
                       EImageVariants.landscapeCrop4x,
                     ]}
+                    emptyType="food"
                   />
                 );
               })}
             </Slider>
 
             <RenderWhen.False>
-              <ResponsiveImage image={null} alt={title} />
+              <div className={css.imageWrapper}>
+                <ResponsiveImage image={null} emptyType="food" alt={title} />
+              </div>
             </RenderWhen.False>
           </RenderWhen>
         </div>

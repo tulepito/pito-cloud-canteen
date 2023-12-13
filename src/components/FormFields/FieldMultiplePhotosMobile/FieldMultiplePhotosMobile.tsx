@@ -2,9 +2,9 @@ import { useEffect } from 'react';
 import { Field } from 'react-final-form';
 import { FormattedMessage } from 'react-intl';
 import classNames from 'classnames';
-import { isEmpty } from 'lodash';
 
 import IconClose from '@components/Icons/IconClose/IconClose';
+import IconLightBulb from '@components/Icons/IconLightBulb/IconLightBulb';
 import IconPlusWithoutBorder from '@components/Icons/IconPlusWithoutBorder/IconPlusWithoutBorder';
 import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
 import ImageFromFile from '@components/ImageFromFile/ImageFromFile';
@@ -30,8 +30,11 @@ const MAX_FILES = 5;
 type TFieldMultiplePhotosMobileProps = {
   images: TObject;
   containerClassName?: string;
+  labelClassName?: string;
   name: string;
   variants: EImageVariants[];
+  label?: string;
+  hintShowed?: boolean;
 };
 
 const HiddenField = (hiddenProps: any) => {
@@ -73,7 +76,15 @@ const UploadImageError = (image: any) => {
 const FieldMultiplePhotosMobile: React.FC<TFieldMultiplePhotosMobileProps> = (
   props,
 ) => {
-  const { images, containerClassName, name: fieldName, variants } = props;
+  const {
+    images,
+    containerClassName,
+    labelClassName,
+    name: fieldName,
+    variants,
+    label,
+    hintShowed,
+  } = props;
 
   const dispatch = useAppDispatch();
   const imageUploadRequestControl = useBoolean();
@@ -84,6 +95,7 @@ const FieldMultiplePhotosMobile: React.FC<TFieldMultiplePhotosMobileProps> = (
   const uploadedImagesLength = allImages.length;
   const maxImages = Object.keys(images).length === MAX_FILES;
   const containerClasses = classNames(css.container, containerClassName);
+  const labelClassses = classNames(css.labelRoot, labelClassName);
 
   const uploadImageInProgress = useAppSelector(
     (state) => state.uploadImage.uploadImageInProgress,
@@ -126,6 +138,12 @@ const FieldMultiplePhotosMobile: React.FC<TFieldMultiplePhotosMobileProps> = (
 
   return (
     <div className={css.root}>
+      {label && (
+        <label className={labelClassses} htmlFor={'addImage'}>
+          {label}
+        </label>
+      )}
+
       <Field
         id="addImage"
         name="addImage"
@@ -163,63 +181,59 @@ const FieldMultiplePhotosMobile: React.FC<TFieldMultiplePhotosMobileProps> = (
                   key={new Date().getTime()}
                 />
               )}
-              {
-                <div
-                  className={containerClasses}
-                  onDrop={handleDrop}
-                  onDragOver={handleDrag}
-                  onDragEnter={handleDrag}>
-                  <label htmlFor={name}>
-                    <div className={css.uploadImageLabel}>
-                      <IconPlusWithoutBorder className={css.iconPlus} />
-                      <div className={css.firstText}>Chọn ảnh</div>
-                      <RenderWhen condition={isEmpty(images)}>
-                        <div className={css.secondText}>Bắt buộc*</div>
-                      </RenderWhen>
-                    </div>
-                  </label>
-                  <>
-                    {allImages.map((image: any) => {
-                      return (
+
+              <div
+                className={containerClasses}
+                onDrop={handleDrop}
+                onDragOver={handleDrag}
+                onDragEnter={handleDrag}>
+                <label htmlFor={name}>
+                  <div className={css.uploadImageLabel}>
+                    <IconPlusWithoutBorder className={css.iconPlus} />
+                    <div className={css.firstText}>Chọn ảnh</div>
+                  </div>
+                </label>
+                <>
+                  {allImages.map((image: any) => {
+                    return (
+                      <div
+                        key={image.id || image.imageId.uuid}
+                        className={css.imageWrapper}>
                         <div
-                          key={image.id || image.imageId.uuid}
-                          className={css.imageWrapper}>
-                          <div
-                            className={css.deleteImageBtn}
-                            onClick={onDeleteImage(
-                              image.id || image.imageId.uuid,
-                            )}>
-                            <IconClose className={css.deleteIcon} />
-                          </div>
-                          <RenderWhen
-                            condition={uploadImageInProgress && !image.imageId}>
-                            <div className={css.loadingUpload}>
-                              <IconSpinner />
-                            </div>
-                          </RenderWhen>
-                          <RenderWhen condition={!!image.file}>
-                            <ImageFromFile
-                              id={image.id}
-                              file={image.file}
-                              className={css.image}></ImageFromFile>
-                            <RenderWhen.False>
-                              <div className={css.img}>
-                                <ResponsiveImage
-                                  rootClassName={css.image}
-                                  image={image.uploadedImage}
-                                  alt={''}
-                                  variants={variants}
-                                />
-                              </div>
-                            </RenderWhen.False>
-                          </RenderWhen>
-                          <UploadImageError {...image} />
+                          className={css.deleteImageBtn}
+                          onClick={onDeleteImage(
+                            image.id || image.imageId.uuid,
+                          )}>
+                          <IconClose className={css.deleteIcon} />
                         </div>
-                      );
-                    })}
-                  </>
-                </div>
-              }
+                        <RenderWhen
+                          condition={uploadImageInProgress && !image.imageId}>
+                          <div className={css.loadingUpload}>
+                            <IconSpinner />
+                          </div>
+                        </RenderWhen>
+                        <RenderWhen condition={!!image.file}>
+                          <ImageFromFile
+                            id={image.id}
+                            file={image.file}
+                            className={css.image}></ImageFromFile>
+                          <RenderWhen.False>
+                            <div className={css.img}>
+                              <ResponsiveImage
+                                rootClassName={css.image}
+                                image={image.uploadedImage}
+                                alt={''}
+                                variants={variants}
+                              />
+                            </div>
+                          </RenderWhen.False>
+                        </RenderWhen>
+                        <UploadImageError {...image} />
+                      </div>
+                    );
+                  })}
+                </>
+              </div>
             </>
           );
         }}
@@ -230,6 +244,17 @@ const FieldMultiplePhotosMobile: React.FC<TFieldMultiplePhotosMobileProps> = (
         images={allUploadedImages}
         type="hidden"
       />
+
+      {hintShowed && (
+        <div className={css.hintSection}>
+          <IconLightBulb className={css.hintIcon} />
+
+          <div className={css.hintContent}>
+            Đăng tải hình ảnh cho món sẽ giúp nhà hàng của bạn nổi bật và thu
+            hút khách hàng đặt đơn hơn.
+          </div>
+        </div>
+      )}
     </div>
   );
 };

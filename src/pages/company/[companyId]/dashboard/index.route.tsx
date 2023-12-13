@@ -7,7 +7,7 @@ import CompanyDashboardPage from './CompanyDashboard.page';
 const CompanyDashboardRoute = () => {
   return (
     <MetaWrapper>
-      <CompanyDashboardPage />;
+      <CompanyDashboardPage />
     </MetaWrapper>
   );
 };

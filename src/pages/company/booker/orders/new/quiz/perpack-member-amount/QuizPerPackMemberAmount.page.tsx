@@ -5,6 +5,7 @@ import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import { useRouter } from 'next/router';
 
+import FieldPackagePerMemer from '@components/FieldPackagePerMemer/FieldPackagePerMemer';
 import { FieldTextInputComponent } from '@components/FormFields/FieldTextInput/FieldTextInput';
 import { parseThousandNumber } from '@helpers/format';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
@@ -28,20 +29,17 @@ type TQuizPerPackMemberAmountFormValues = {
   memberAmount: string;
 };
 
-const VNDIcon = () => {
-  return <div className={css.vndIcon}>đ</div>;
-};
-
 const Amount = () => {
   return <div className={css.label}>người</div>;
 };
 
 type TQuizPerPackMemberAmountPageProps = {
   stepInfo?: string;
+  firstTimeOrder?: boolean;
 };
 const QuizPerPackMemberAmountPage: React.FC<
   TQuizPerPackMemberAmountPageProps
-> = ({ stepInfo }) => {
+> = ({ stepInfo, firstTimeOrder }) => {
   const intl = useIntl();
   const router = useRouter();
   const submittingControl = useBoolean();
@@ -164,22 +162,20 @@ const QuizPerPackMemberAmountPage: React.FC<
       submitDisabled={hasValidationErrors}
       submitInProgress={submittingControl.value}
       onSubmit={onFormSubmitClick}
-      stepInfo={stepInfo}>
+      stepInfo={stepInfo}
+      firstTimeOrder={firstTimeOrder}>
       <form className={css.formContainer}>
-        <FieldTextInputComponent
+        <FieldPackagePerMemer
+          form={form}
+          tooltipOverlayClassName={css.tooltipOverlay}
           id="packagePerMember"
           name="packagePerMember"
-          input={packagePerMember.input}
-          meta={packagePerMember.meta}
           label={intl.formatMessage({
             id: 'QuizPerPackMemberAmountPage.packagePerMember.label',
           })}
           placeholder={intl.formatMessage({
             id: 'QuizPerPackMemberAmountPage.packagePerMember.placeholder',
           })}
-          type="text"
-          className={css.numberInput}
-          rightIcon={<VNDIcon />}
         />
         <FieldTextInputComponent
           className={css.inputWrapper}

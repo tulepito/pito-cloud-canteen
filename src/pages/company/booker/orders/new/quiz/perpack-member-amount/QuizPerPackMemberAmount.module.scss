@@ -1,9 +1,14 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
 
 .formContainer {
-  width: 400px;
   margin: 0 auto;
+  width: 100%;
+
+  @include viewportLarge {
+    width: 400px;
+  }
 
   .amountLabel {
     position: absolute;
@@ -25,4 +30,10 @@
   border-left: 1px solid $neutralGray5;
   padding-left: 12px;
   color: $neutralGray5;
+}
+
+.tooltipOverlay {
+  :global(.rc-tooltip-content) {
+    width: 400px;
+  }
 }

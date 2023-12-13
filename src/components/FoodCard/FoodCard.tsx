@@ -61,6 +61,7 @@ const FoodCard: React.FC<TFoodCardProps> = ({
           alt="food"
           image={Listing(food!).getImages()[0]}
           variants={[EImageVariants.default]}
+          emptyType="food"
         />
       </div>
       <div className={css.contentContainer}>

@@ -2,28 +2,65 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/customMediaQueries.scss' as *;
 
+.container {
+  padding: 0;
+}
+
+.topContainer {
+  margin: 0;
+
+  @include viewportLarge {
+    margin-top: 41px;
+  }
+}
+
 .pageTilte {
-  @include textTemplate(24px, $fontWeightBold, 32px);
+  @include textTemplate(16px, $fontWeightBold, 24px);
   text-transform: capitalize;
   margin-top: 22px;
+  @include flexAlign(center);
+  gap: 8px;
+  padding: 16px;
+  border-bottom: 1px solid $neutralGray3;
+
+  @include viewportMedium {
+    @include textTemplate(24px, $fontWeightBold, 32px);
+    padding: 0;
+    border: none;
+  }
+
+  .icon {
+    @include viewportLarge {
+      display: none;
+    }
+  }
 }
 
 .goBackBtn {
-  @include flexAlign(center, flex-start);
-  gap: 12px;
-  width: 94px;
-  cursor: pointer;
-  @include textTemplate(16px, $fontWeightBold, 24px);
+  display: none;
+
+  @include viewportLarge {
+    @include flexAlign(center, flex-start);
+    gap: 12px;
+    width: 94px;
+    cursor: pointer;
+    @include textTemplate(16px, $fontWeightBold, 24px);
+  }
 }
 
 .result {
+  padding: 0 16px;
+
+  @include viewportLarge {
+    padding: 0;
+  }
   .resultHeaderWrapper {
     position: relative;
     z-index: 10;
     .searchAndSort {
       @include flexAlign(center, space-between);
 
-      @include viewportMedium {
+      @include viewportLarge {
         max-width: 500px;
       }
     }

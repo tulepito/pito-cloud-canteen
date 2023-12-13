@@ -134,7 +134,11 @@ WeekView.title = (date: Date, { localizer }: { localizer: any }) => {
 
   return (
     <div className={css.calendarTitleWrapper}>
-      <IconCalendarToolbar />
+      <IconCalendarToolbar
+        width={20}
+        height={20}
+        className={css.calendarIcon}
+      />
       <span className={css.calendarTitle}>
         {start.getDate()}/{start.getMonth() + 1} - {end.getDate()}/
         {end.getMonth() + 1}

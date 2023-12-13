@@ -6,6 +6,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import Button from '@components/Button/Button';
 import { IconCheckbox } from '@components/FormFields/FieldCheckbox/FieldCheckbox';
 import NamedLink from '@components/NamedLink/NamedLink';
+import { companyPaths } from '@src/paths';
 
 import css from './AccessForm.module.scss';
 
@@ -83,51 +84,56 @@ const AccessForm: React.FC<TAccessFormProps> = ({
 
   return (
     <form className={css.root} onSubmit={handleSubmit}>
-      <div className={css.note}>
-        {intl.formatMessage({
-          id: 'Booker.CreateOrder.Form.group.scrollDownNote',
-        })}
-      </div>
-      <div className={css.fieldGroups}>
-        {finalizeGroupList.length === 0 && (
-          <div className={css.emptyGroups}>
-            {intl.formatMessage({
-              id: 'Booker.CreateOrder.Form.field.emptyGroup',
-            })}
-          </div>
-        )}
-        {finalizeGroupList.map((data: any) => (
-          <div className={css.checkboxItem} key={data.id}>
-            <input
-              className={css.input}
-              id={`selectedGroups-${data.id}`}
-              {...selectedGroups.input}
-              onChange={handleChangeCheckboxGroup(data)}
-              checked={(selectedGroups.input.value || []).includes(data.id)}
-              type="checkbox"
-              value={data.id}
-            />
-            <label className={css.label} htmlFor={`selectedGroups-${data.id}`}>
-              <span className={css.checkboxWrapper}>
-                <IconCheckbox
-                  checkedClassName={css.checked}
-                  boxClassName={css.box}
-                />
-              </span>
-              <span className={css.labelText}>{data.name}</span>
-            </label>
-          </div>
-        ))}
-      </div>
+      <div className={css.scrollContent}>
+        <div className={css.note}>
+          {intl.formatMessage({
+            id: 'Booker.CreateOrder.Form.group.scrollDownNote',
+          })}
+        </div>
+        <div className={css.fieldGroups}>
+          {finalizeGroupList.length === 0 && (
+            <div className={css.emptyGroups}>
+              {intl.formatMessage({
+                id: 'Booker.CreateOrder.Form.field.emptyGroup',
+              })}
+            </div>
+          )}
+          {finalizeGroupList.map((data: any) => (
+            <div className={css.checkboxItem} key={data.id}>
+              <input
+                className={css.input}
+                id={`selectedGroups-${data.id}`}
+                {...selectedGroups.input}
+                onChange={handleChangeCheckboxGroup(data)}
+                checked={(selectedGroups.input.value || []).includes(data.id)}
+                type="checkbox"
+                value={data.id}
+              />
+              <label
+                className={css.label}
+                htmlFor={`selectedGroups-${data.id}`}>
+                <span className={css.checkboxWrapper}>
+                  <IconCheckbox
+                    checkedClassName={css.checked}
+                    boxClassName={css.box}
+                  />
+                </span>
+                <span className={css.labelText}>{data.name}</span>
+              </label>
+            </div>
+          ))}
+        </div>
 
-      <NamedLink
-        className={css.groupsSettings}
-        path={`/company/${companyId}/group-setting`}
-        target="_blank">
-        {intl.formatMessage({
-          id: 'Booker.CreateOrder.Form.field.groupsSettings',
-        })}
-      </NamedLink>
+        <NamedLink
+          className={css.groupsSettings}
+          path={companyPaths.GroupSetting}
+          params={{ companyId: companyId! }}
+          target="_blank">
+          {intl.formatMessage({
+            id: 'Booker.CreateOrder.Form.field.groupsSettings',
+          })}
+        </NamedLink>
+      </div>
 
       <Button
         className={css.submitBtn}

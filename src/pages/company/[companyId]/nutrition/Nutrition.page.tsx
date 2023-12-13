@@ -6,10 +6,11 @@ import { useRouter } from 'next/router';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useFetchCompanyInfo from '@hooks/useFetchCompanyInfo';
+import useFetchCompanyInfoCurrentUser from '@hooks/useFetchCompanyInfoCurrentUser';
 import { useViewport } from '@hooks/useViewport';
 import { companyThunks } from '@redux/slices/company.slice';
 import { personalPaths } from '@src/paths';
-import { CurrentUser, Listing, User } from '@utils/data';
+import { Listing, User } from '@utils/data';
 import type { TUser } from '@utils/types';
 
 import type { TNutritionFormValues } from './components/NutritionForm/NutritionForm';
@@ -22,32 +23,28 @@ const NutritionPage = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const { isMobileLayout, isTabletLayout } = useViewport();
-  const { companyId } = router.query;
-  useFetchCompanyInfo();
+  const { companyId = '' } = router.query;
+  if (companyId === 'personal') {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    useFetchCompanyInfoCurrentUser();
+  } else {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    useFetchCompanyInfo();
+  }
 
   const company = useAppSelector(
     (state) => state.company.company,
     shallowEqual,
   );
-  const { nutritions = [] } = User(company as TUser).getPublicData();
+  const { nutritions = [], mealType = [] } = User(
+    company as TUser,
+  ).getPublicData();
   const favoriteRestaurants = useAppSelector(
     (state) => state.company.favoriteRestaurants,
     shallowEqual,
   );
   const favoriteFood = useAppSelector(
     (state) => state.company.favoriteFood,
-    shallowEqual,
-  );
-  const currentUser = useAppSelector(
-    (state) => state.user.currentUser,
-    shallowEqual,
-  );
-  const personalFavoriteRestaurants = useAppSelector(
-    (state) => state.user.favoriteRestaurants,
-    shallowEqual,
-  );
-  const personalFavoriteFood = useAppSelector(
-    (state) => state.user.favoriteFood,
     shallowEqual,
   );
   const fetchCompanyInfoInProgress = useAppSelector(
@@ -57,52 +54,36 @@ const NutritionPage = () => {
     (state) => state.SystemAttributes.nutritions,
     shallowEqual,
   );
-  const { nutritions: personalNutritions = [] } = CurrentUser(
-    currentUser!,
-  ).getPublicData();
-  const isPersonal = companyId === 'personal';
-
-  const initialValues = useMemo(
-    () =>
-      isPersonal
-        ? {
-            nutritions: personalNutritions,
-            favoriteRestaurantList: personalFavoriteRestaurants.map(
-              (restaurant) => Listing(restaurant).getId(),
-            ),
-            favoriteFoodList: personalFavoriteFood.map((food) =>
-              Listing(food).getId(),
-            ),
-          }
-        : {
-            nutritions,
-            favoriteRestaurantList: favoriteRestaurants.map((restaurant) =>
-              Listing(restaurant).getId(),
-            ),
-            favoriteFoodList: favoriteFood.map((food) => Listing(food).getId()),
-          },
-    [
-      favoriteFood,
-      favoriteRestaurants,
-      isPersonal,
-      nutritions,
-      personalFavoriteFood,
-      personalFavoriteRestaurants,
-      personalNutritions,
-    ],
+  const mealTypesOptions = useAppSelector(
+    (state) => state.SystemAttributes.mealTypes,
   );
 
-  const handleSubmit = (values: TNutritionFormValues) => {
-    const publicData = {
-      ...values,
+  const initialValues = useMemo(() => {
+    return {
+      nutritions,
+      mealType,
+      favoriteRestaurantList: favoriteRestaurants.map((restaurant) =>
+        Listing(restaurant).getId(),
+      ),
+      favoriteFoodList: favoriteFood.map((food) => Listing(food).getId()),
     };
-    dispatch(companyThunks.updateCompanyAccount({ publicData }));
-  };
+  }, [favoriteFood, favoriteRestaurants, nutritions, mealType]);
+
   const navigateAccountPersonalPage = () => {
     router.push({
       pathname: personalPaths.Account,
       query: { companyId: 'personal' },
     });
+  };
+
+  const handleSubmit = async (values: TNutritionFormValues) => {
+    const publicData = {
+      ...values,
+    };
+    await dispatch(companyThunks.updateCompanyAccount({ publicData }));
+    if (isMobileLayout || isTabletLayout) {
+      navigateAccountPersonalPage();
+    }
   };
 
   return (
@@ -122,8 +103,8 @@ const NutritionPage = () => {
           <NutritionForm
             initialValues={initialValues}
             onSubmit={handleSubmit}
-            isPersonal={isPersonal}
             nutritionsOptions={nutritionsOptions}
+            mealTypeOptions={mealTypesOptions}
           />
         </div>
       )}

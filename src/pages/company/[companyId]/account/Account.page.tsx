@@ -11,6 +11,7 @@ import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import useFetchCompanyInfo from '@hooks/useFetchCompanyInfo';
+import useFetchCompanyInfoCurrentUser from '@hooks/useFetchCompanyInfoCurrentUser';
 import { useViewport } from '@hooks/useViewport';
 import { companyThunks } from '@redux/slices/company.slice';
 import { resetImage } from '@redux/slices/uploadImage.slice';
@@ -27,6 +28,9 @@ const AccountPage = () => {
   const dispatch = useAppDispatch();
   const intl = useIntl();
   const router = useRouter();
+  const { query } = router;
+  const { companyId } = query;
+
   const { isMobileLayout, isTabletLayout } = useViewport();
 
   const formSubmitInputRef = useRef<any>();
@@ -60,12 +64,12 @@ const AccountPage = () => {
   const fetchCompanyInfoInProgress = useAppSelector(
     (state) => state.company.fetchCompanyInfoInProgress,
   );
-  const { companyName = '', companyLocation = {} } = User(
-    company as TUser,
-  ).getPublicData();
-  const { email = '' } = User(company as TUser).getAttributes();
+  const companyUser = User(company as TUser);
+  const { companyName = '', companyLocation = {} } =
+    companyUser.getPublicData();
+  const { email = '' } = companyUser.getAttributes();
   const { address = '' } = companyLocation;
-  const { tax } = User(company as TUser).getPrivateData();
+  const { tax } = companyUser.getPrivateData();
 
   const { email: bookerEmail = '' } = User(currentUser!).getAttributes();
   const { displayName: bookerDisplayName = '' } = User(
@@ -86,7 +90,14 @@ const AccountPage = () => {
   useEffect(() => {
     dispatch(resetImage());
   }, [dispatch]);
-  useFetchCompanyInfo();
+
+  if (companyId === 'personal') {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    useFetchCompanyInfoCurrentUser();
+  } else {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    useFetchCompanyInfo();
+  }
 
   const onSubmit = async (values: TContactPointProfileFormValues) => {
     const { displayName, phoneNumber } = values;

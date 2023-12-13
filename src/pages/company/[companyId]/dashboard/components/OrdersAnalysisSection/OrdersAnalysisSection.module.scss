@@ -3,6 +3,7 @@
 @use '/src/styles/customMediaQueries.scss' as *;
 
 .root {
+  width: 100%;
   .title {
     font-size: 18px;
     text-transform: capitalize;
@@ -13,14 +14,41 @@
   }
 
   .loadingContainer {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
     gap: 16px;
     width: 100%;
-    flex-wrap: wrap;
+
+    @include viewportLarge {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
     .loading {
       > span {
-        height: 168px;
-        width: 180px;
+        height: 108px;
+        width: 100%;
+      }
+
+      &.first {
+        > span {
+          height: 72px;
+        }
+
+        grid-column: 1 / -1;
+      }
+
+      @include viewportMedium {
+        > span {
+          height: 168px;
+        }
+
+        &.first {
+          > span {
+            height: 168px;
+          }
+
+          grid-column: 1 / 2;
+        }
       }
     }
   }
@@ -30,52 +58,163 @@
     grid-template-columns: repeat(2, 1fr);
     gap: 16px;
     max-width: 100%;
-    @include viewportMedium {
+
+    @include viewportLarge {
       grid-template-columns: repeat(3, 1fr);
     }
 
     .orderDetails {
-      border-radius: 8px;
-      min-height: 168px;
-      @include flexAlign(center, space-between);
-      flex-direction: column;
-      padding: 20px 25px 12px 25px;
-      text-align: center;
-      gap: 10px;
-      .orderCount {
-        line-height: 48px;
-        margin: 0;
-        font-size: 28px;
-        font-weight: $fontWeightBold;
+      border: 1px solid $neutralGray3;
+      padding: 12px;
+      border-radius: 12px;
+      background-color: $neutralGray1;
+      align-items: flex-end;
+      display: flex;
+      justify-content: space-between;
+
+      &.first {
+        grid-column: 1 / -1;
+        align-items: center;
       }
-      .orderLabel {
-        font-weight: $fontWeightBold;
-        font-size: 16px;
-        margin: 0;
+
+      .icon {
+        display: block;
+        width: 32px;
+        height: 32px;
+        @include flexAlign(center, center);
+        padding: 4px;
+        border-radius: 8px;
+        gap: 8px;
+
+        svg {
+          width: 24px;
+          height: 24px;
+        }
+
         &.completedOrders {
-          color: #20851f;
+          background-color: #ebffd6;
+          svg {
+            stroke: #65db63;
+            fill: transparent;
+          }
         }
         &.inProgressOrders {
-          color: #0e2995;
+          background-color: #fff4db;
+          svg {
+            stroke: #ffb13d;
+          }
         }
         &.draftOrders {
-          color: #bea504;
+          background-color: #f0f5ff;
+          svg {
+            stroke: #2f54eb;
+          }
+        }
+
+        @include viewportMedium {
+          display: none;
         }
       }
-      .orderLink {
-        font-weight: $fontWeightBold;
-        font-size: 14px;
+
+      .orderMobileLabel {
+        display: block;
+        @include textTemplate(14px, 600, 20px);
+        @include lineClamp(1);
+        color: $neutralGray6;
+        margin: 8px 0 2px 0;
+      }
+
+      .orderLabel {
+        display: none;
+      }
+
+      .orderCount {
+        @include textTemplate(16px, 700, 24px);
         color: $neutralGray7;
+        margin: 0;
+      }
+
+      .metaSection {
         @include flexAlign(center);
+        gap: 12px;
+
+        .orderMobileLabel {
+          margin-top: 0;
+        }
       }
-      &.completedOrders {
-        background-color: $sematicGreen1;
+
+      .linkText {
+        display: none;
       }
-      &.inProgressOrders {
-        background-color: $labelBlue1;
+
+      .unit {
+        display: inline;
+
+        @include viewportMedium {
+          display: none;
+        }
       }
-      &.draftOrders {
-        background-color: $labelYellow1;
+
+      @include viewportMedium {
+        &.first {
+          grid-column: 1 / 2;
+        }
+
+        border: none;
+        border-radius: 8px;
+        min-height: 168px;
+        @include flexAlign(center, space-between);
+        flex-direction: column;
+        padding: 20px 25px 12px 25px;
+        text-align: center;
+        gap: 10px;
+
+        .orderCount {
+          line-height: 48px;
+          margin: 0;
+          font-size: 28px;
+          font-weight: $fontWeightBold;
+        }
+
+        .orderMobileLabel {
+          display: none;
+        }
+
+        .orderLabel {
+          display: block;
+          font-weight: $fontWeightBold;
+          font-size: 16px;
+          margin: 0;
+          &.completedOrders {
+            color: #20851f;
+          }
+          &.inProgressOrders {
+            color: #0e2995;
+          }
+          &.draftOrders {
+            color: #bea504;
+          }
+        }
+
+        .orderLink {
+          font-weight: $fontWeightBold;
+          font-size: 14px;
+          color: $neutralGray7;
+          @include flexAlign(center);
+
+          .linkText {
+            display: inline;
+          }
+        }
+        &.completedOrders {
+          background-color: $sematicGreen1;
+        }
+        &.inProgressOrders {
+          background-color: $labelBlue1;
+        }
+        &.draftOrders {
+          background-color: $labelYellow1;
+        }
       }
     }
   }

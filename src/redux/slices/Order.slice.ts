@@ -118,6 +118,7 @@ type TOrderInitialState = {
   queryParams: TObject;
   orders: TListing[];
   queryOrderInProgress: boolean;
+  queryMoreOrderInProgress: boolean;
   queryOrderError: any;
   deleteDraftOrderInProgress: boolean;
   deleteDraftOrderError: any;
@@ -234,6 +235,7 @@ const initialState: TOrderInitialState = {
   queryParams: {},
   orders: [],
   queryOrderInProgress: false,
+  queryMoreOrderInProgress: false,
   queryOrderError: null,
   deleteDraftOrderInProgress: false,
   deleteDraftOrderError: null,
@@ -651,11 +653,13 @@ const queryTotalOrderCountByTab = createAsyncThunk(
 const queryCompanyOrders = createAsyncThunk(
   'app/Orders/COMPANY_QUERY_ORDERS',
   async (payload: TObject, { rejectWithValue, dispatch, getState }) => {
+    const { orders: prevOrders } = getState().Order;
     const {
       companyId = '',
       bookerId,
       authorId,
       currentTab,
+      mode = 'replace',
       ...restPayload
     } = payload;
 
@@ -675,11 +679,21 @@ const queryCompanyOrders = createAsyncThunk(
       },
       queryParams: {},
     };
+
+    if (mode === 'append' && payload.page > 1) {
+      // eslint-disable-next-line @typescript-eslint/no-use-before-define
+      dispatch(setQueryMoreOrderInProgress(true));
+    }
+
     const { data: response } = await companyApi.queryOrdersApi(
       companyId,
       params,
     );
-    const orders = denormalisedResponseEntities(response);
+    let orders = denormalisedResponseEntities(response);
+    if (mode === 'append' && payload.page > 1) {
+      orders = prevOrders.concat(orders);
+    }
+
     const orderIds = orders.map((order: TListing) => Listing(order).getId());
     const pagination = response.data.meta;
 
@@ -1380,6 +1394,9 @@ const orderSlice = createSlice({
         generalInfo: {},
       };
     },
+    setQueryMoreOrderInProgress: (state, { payload }) => {
+      state.queryMoreOrderInProgress = payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -1488,7 +1505,6 @@ const orderSlice = createSlice({
       }))
       /* =============== queryCompanyOrders =============== */
       .addCase(queryCompanyOrders.pending, (state) => {
-        state.orders = [];
         state.queryOrderInProgress = true;
         state.queryOrderError = null;
       })
@@ -1498,12 +1514,14 @@ const orderSlice = createSlice({
           ...state,
           queryParams,
           queryOrderInProgress: false,
+          queryMoreOrderInProgress: false,
           orders,
           manageOrdersPagination: pagination,
         }),
       )
       .addCase(queryCompanyOrders.rejected, (state, { payload }) => {
         state.queryOrderInProgress = false;
+        state.queryMoreOrderInProgress = false;
         state.queryOrderError = payload;
       })
       /* =============== bookerDeleteDraftOrder =============== */
@@ -1815,6 +1833,7 @@ export const {
   setOnRecommendRestaurantInProcess,
   saveDraftEditOrder,
   clearDraftEditOrder,
+  setQueryMoreOrderInProgress,
 } = orderSlice.actions;
 
 export default orderSlice.reducer;

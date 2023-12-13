@@ -31,4 +31,6 @@ export type TDayColumnHeaderProps = {
   className?: string;
   shouldHideDate?: boolean;
   shouldHideDateText?: boolean;
+  indicator?: boolean;
+  isDisabled?: boolean;
 };

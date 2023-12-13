@@ -3,18 +3,21 @@
 @use '/src/styles/customMediaQueries.scss' as *;
 
 .container {
-  @include flexAlign(flex-start, center);
-  flex-wrap: wrap;
-  gap: 16px;
+  display: inline-block;
+  width: 100%;
 
   @include viewportSmall {
     @include flexAlign(flex-start);
     gap: 88px;
-    flex-wrap: nowrap;
   }
 
   .avatar {
-    height: 128px;
+    @include flexAlign(center, center);
+    flex-direction: column;
+    gap: 16px;
+    @include viewportSmall {
+      height: 128px;
+    }
 
     .uploadAvatarWrapper {
       .label {
@@ -44,7 +47,6 @@
     }
 
     .avatarPlaceholder {
-      // width: 128px;
       height: 128px;
       border-radius: 100%;
       position: relative;
@@ -101,23 +103,22 @@
 
   .profile {
     @include flexAlign(flex-start);
-    flex-wrap: wrap;
+    flex-direction: column;
     width: 100%;
     gap: 16px;
 
-    @include viewportSmall {
+    @include viewportMedium {
       gap: 32px;
-      width: 632px;
+      flex-direction: row;
+      flex-wrap: wrap;
     }
 
     .fieldInput {
       width: 100%;
-      @include viewportSmall {
+      @include viewportMedium {
         width: 300px;
       }
-      input {
-        @include textTemplate(14px, $fontWeightMedium, 24px);
-      }
+      @include textTemplate(14px, $fontWeightMedium, 24px);
 
       .label {
         @include textTemplate(14px, $fontWeightMedium, 24px);

@@ -166,3 +166,16 @@
     opacity: 1 !important;
   }
 }
+
+.subOrderCardList {
+  @include flexAlign(stretch);
+  gap: 12px;
+  flex-direction: column;
+}
+
+.empty {
+  margin: 12px 0;
+  @include flexAlign(center, center);
+  min-height: 280px;
+  width: 100%;
+}

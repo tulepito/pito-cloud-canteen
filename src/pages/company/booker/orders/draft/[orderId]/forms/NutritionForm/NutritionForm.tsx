@@ -67,59 +67,27 @@ const NutritionForm: React.FC<TNutritionFormProps> = ({
 
   return (
     <form className={css.root} onSubmit={handleSubmit}>
-      <div className={css.fieldGroups}>
-        <div className={css.groupLabel}>
-          <span>
-            {intl.formatMessage({
-              id: 'Booker.CreateOrder.Form.field.mealType',
-            })}
-          </span>
-        </div>
-        {FOOD_TYPE_OPTIONS.map((data: any) => (
-          <div className={css.checkboxItem} key={data.key}>
-            <input
-              className={css.input}
-              id={`mealType-${data.key}`}
-              {...mealType.input}
-              type="checkbox"
-              onChange={handleChangeCheckboxGroup(data, mealType)}
-              checked={(mealType.input.value || []).includes(data.key)}
-              value={data.key}
-            />
-            <label className={css.label} htmlFor={`mealType-${data.key}`}>
-              <span className={css.checkboxWrapper}>
-                <IconCheckbox
-                  checkedClassName={css.checked}
-                  boxClassName={css.box}
-                />
-              </span>
-              <span className={css.labelText}>{data.label}</span>
-            </label>
-          </div>
-        ))}
-      </div>
-
-      <RenderWhen condition={nutritionsOptions.length > 0}>
+      <div className={css.scrollContent}>
         <div className={css.fieldGroups}>
           <div className={css.groupLabel}>
             <span>
               {intl.formatMessage({
-                id: 'Booker.CreateOrder.Form.field.nutritions',
+                id: 'Booker.CreateOrder.Form.field.mealType',
               })}
             </span>
           </div>
-          {nutritionsOptions.map((data: any) => (
+          {FOOD_TYPE_OPTIONS.map((data: any) => (
             <div className={css.checkboxItem} key={data.key}>
               <input
                 className={css.input}
-                id={`nutritions-${data.key}`}
-                {...nutritions.input}
-                onChange={handleChangeCheckboxGroup(data, nutritions)}
-                checked={(nutritions.input.value || []).includes(data.key)}
+                id={`mealType-${data.key}`}
+                {...mealType.input}
                 type="checkbox"
+                onChange={handleChangeCheckboxGroup(data, mealType)}
+                checked={(mealType.input.value || []).includes(data.key)}
                 value={data.key}
               />
-              <label className={css.label} htmlFor={`nutritions-${data.key}`}>
+              <label className={css.label} htmlFor={`mealType-${data.key}`}>
                 <span className={css.checkboxWrapper}>
                   <IconCheckbox
                     checkedClassName={css.checked}
@@ -131,7 +99,41 @@ const NutritionForm: React.FC<TNutritionFormProps> = ({
             </div>
           ))}
         </div>
-      </RenderWhen>
+
+        <RenderWhen condition={nutritionsOptions.length > 0}>
+          <div className={css.fieldGroups}>
+            <div className={css.groupLabel}>
+              <span>
+                {intl.formatMessage({
+                  id: 'Booker.CreateOrder.Form.field.nutritions',
+                })}
+              </span>
+            </div>
+            {nutritionsOptions.map((data: any) => (
+              <div className={css.checkboxItem} key={data.key}>
+                <input
+                  className={css.input}
+                  id={`nutritions-${data.key}`}
+                  {...nutritions.input}
+                  onChange={handleChangeCheckboxGroup(data, nutritions)}
+                  checked={(nutritions.input.value || []).includes(data.key)}
+                  type="checkbox"
+                  value={data.key}
+                />
+                <label className={css.label} htmlFor={`nutritions-${data.key}`}>
+                  <span className={css.checkboxWrapper}>
+                    <IconCheckbox
+                      checkedClassName={css.checked}
+                      boxClassName={css.box}
+                    />
+                  </span>
+                  <span className={css.labelText}>{data.label}</span>
+                </label>
+              </div>
+            ))}
+          </div>
+        </RenderWhen>
+      </div>
 
       <Button
         className={css.submitBtn}

@@ -9,6 +9,7 @@ import { useRouter } from 'next/router';
 import Avatar from '@components/Avatar/Avatar';
 import { InlineTextButton } from '@components/Button/Button';
 import HamburgerMenuButton from '@components/HamburgerMenuButton/HamburgerMenuButton';
+import IconBell from '@components/Icons/IconBell/IconBell';
 import IconClose from '@components/Icons/IconClose/IconClose';
 import IconLogout from '@components/Icons/IconLogout/IconLogout';
 import IconPhone from '@components/Icons/IconPhone/IconPhone';
@@ -16,6 +17,7 @@ import PitoLogo from '@components/PitoLogo/PitoLogo';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { useLogout } from '@hooks/useLogout';
+import { useViewport } from '@hooks/useViewport';
 import { UIActions } from '@redux/slices/UI.slice';
 import { currentUserSelector } from '@redux/slices/user.slice';
 import config from '@src/configs';
@@ -45,6 +47,7 @@ const CompanyHeaderMobile: React.FC<CompanyHeaderMobileProps> = (props) => {
   const { className, companyHeaderLinkData, headerData } = props;
 
   const { value: isOpen, toggle: onToggle } = useBoolean(false);
+  const { isMobileLayout } = useViewport();
 
   const { pathname: routerPathName, push } = useRouter();
   const currentUser = useAppSelector(currentUserSelector);
@@ -89,17 +92,26 @@ const CompanyHeaderMobile: React.FC<CompanyHeaderMobileProps> = (props) => {
     push(generalPaths.Home);
   };
 
+  const renderRightIcon = () => {
+    if (isMobileLayout) {
+      return <IconBell className={css.iconBell} />;
+    }
+
+    return !isOpen ? (
+      <HamburgerMenuButton onClick={onToggle} />
+    ) : (
+      <InlineTextButton type="button" onClick={onToggle}>
+        <IconClose className={css.iconClose} />
+      </InlineTextButton>
+    );
+  };
+
   return (
     <div className={classes}>
       <PitoLogo variant="secondary" />
-      {!isOpen ? (
-        <HamburgerMenuButton onClick={onToggle} />
-      ) : (
-        <InlineTextButton type="button" onClick={onToggle}>
-          <IconClose className={css.iconClose} />
-        </InlineTextButton>
-      )}
-      {isOpen && (
+
+      {renderRightIcon()}
+      {isOpen && !isMobileLayout && (
         <div className={css.mobileMenuWrapper}>
           <div className={css.companyHeaderLinks}>
             {companyHeaderLinkData.map((item) => (

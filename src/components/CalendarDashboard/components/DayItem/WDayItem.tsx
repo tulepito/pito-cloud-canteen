@@ -5,6 +5,7 @@ import { DateTime } from 'luxon';
 
 import useSelectDay from '@components/CalendarDashboard/hooks/useSelectDay';
 import { useViewport } from '@hooks/useViewport';
+import { EInvalidRestaurantCase } from '@src/utils/enums';
 import type { TObject } from '@utils/types';
 
 import type {
@@ -37,7 +38,12 @@ const WDayItem: React.FC<TWDayItemProps> = ({
   eventExtraProps,
 }) => {
   const { isMobileLayout } = useViewport();
-  const { onSelectDayCallBack } = resources || ({} as any);
+  const {
+    onSelectDayCallBack,
+    startDate,
+    endDate,
+    availableOrderDetailCheckList,
+  } = resources || ({} as any);
   const { selectedDay, handleSelectDay } = useSelectDay();
   const currentDate = DateTime.fromJSDate(new Date()).startOf('day');
   const dateItem = DateTime.fromJSDate(date).startOf('day');
@@ -52,7 +58,29 @@ const WDayItem: React.FC<TWDayItemProps> = ({
       .diff(currentDate, ['day', 'hour'])
       .get('day') === 0;
 
+  const startDateTimestamp =
+    startDate instanceof Date ? startDate?.getTime() : undefined;
+  const endDateTimestamp =
+    endDate instanceof Date ? endDate?.getTime() : undefined;
+  const dateTimestamp = date.getTime();
+
+  const isDisabled =
+    startDateTimestamp && endDateTimestamp
+      ? dateTimestamp < startDateTimestamp || dateTimestamp > endDateTimestamp
+      : false;
+
+  const indicator =
+    !isMobileLayout ||
+    (availableOrderDetailCheckList?.[date.getTime()]?.isAvailable &&
+      availableOrderDetailCheckList?.[date.getTime()]?.status ===
+        EInvalidRestaurantCase.noMenusValid)
+      ? undefined
+      : availableOrderDetailCheckList?.[date.getTime()]?.isAvailable;
+
   const onClick = useCallback(() => {
+    if (isDisabled) {
+      return;
+    }
     handleSelectDay?.(date);
     onSelectDayCallBack?.();
   }, [date, handleSelectDay]);
@@ -73,6 +101,8 @@ const WDayItem: React.FC<TWDayItemProps> = ({
           resources={resources}
           isCurrentDay={isCurrentDay}
           isSelectedDay={isSelectedDay}
+          isDisabled={isDisabled}
+          indicator={indicator}
         />
       )}
       {!isMobileLayout && (

@@ -1,8 +1,11 @@
 import React from 'react';
 
-const Spinner = () => {
+import type { TIconProps } from '@utils/types';
+
+const Spinner: React.FC<TIconProps> = ({ className }) => {
   return (
     <svg
+      className={className}
       width="80"
       height="81"
       viewBox="0 0 80 81"

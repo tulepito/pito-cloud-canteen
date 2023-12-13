@@ -1,11 +1,9 @@
-import { useState } from 'react';
 import classNames from 'classnames';
-import { DateTime } from 'luxon';
 
 import Button from '@components/Button/Button';
 import FieldDateRangePicker from '@components/FormFields/FieldDateRangePicker/FieldDateRangePicker';
-import { diffDays, getNextWeek } from '@src/utils/dates';
 
+import { useOrderDateSelect } from '../hooks/useOrderDateSelect';
 import type { TMealDateFormValues } from '../MealDateForm/MealDateForm';
 
 import css from './OrderDateFieldModal.module.scss';
@@ -41,64 +39,21 @@ const OrderDateFieldModal: React.FC<TOrderDateFieldModalProps> = (props) => {
     selectedTimeRangeOption,
     setSelectedTimeRangeOption,
   } = props;
-  const { startDate: startDateInitialValue, endDate: endDateInitialValue } =
-    values;
-  const initialStartDate = startDateInitialValue
-    ? new Date(startDateInitialValue)
-    : null;
-  const initialEndDate = endDateInitialValue
-    ? new Date(endDateInitialValue)
-    : null;
-  const [startDate, setStartDate] = useState<Date | null>(initialStartDate!);
-  const [endDate, setEndDate] = useState<Date | null>(initialEndDate!);
 
-  const minDate =
-    selectedTimeRangeOption === 'custom'
-      ? DateTime.now().plus({ days: 3 }).toJSDate()
-      : startDate;
-  const maxDate =
-    selectedTimeRangeOption !== 'custom'
-      ? endDate
-      : selectedTimeRangeOption === 'custom' && !!startDate && !endDate
-      ? DateTime.fromJSDate(startDate!).plus({ days: 6 }).toJSDate()
-      : undefined;
-
-  const handleTimeRangeSelect = (key: string) => {
-    switch (key) {
-      case 'next7Days':
-        setStartDate(
-          DateTime.now().plus({ days: 3 }).startOf('day').toJSDate(),
-        );
-        setEndDate(DateTime.now().plus({ days: 9 }).startOf('day').toJSDate());
-        break;
-
-      case 'nextWeek':
-        setStartDate(getNextWeek(new Date()));
-        setEndDate(
-          DateTime.fromJSDate(getNextWeek(new Date()))
-            .plus({ days: 6 })
-            .startOf('day')
-            .toJSDate(),
-        );
-        break;
-
-      case 'custom':
-        setStartDate(null);
-        setEndDate(null);
-        break;
-
-      default:
-        break;
-    }
-  };
-
-  const handleUpdateDateRange = () => {
-    form.batch(() => {
-      form.change('startDate', startDate);
-      form.change('endDate', endDate);
-    });
-    onClose();
-  };
+  const {
+    startDate,
+    endDate,
+    minDate,
+    maxDate,
+    handleUpdateDateRange,
+    handleOrderDateRangeChange,
+    handleTimeRangeSelect,
+  } = useOrderDateSelect({
+    form,
+    values,
+    modalCallback: onClose,
+    selectedTimeRangeOption,
+  });
 
   return (
     <div className={css.container}>
@@ -126,19 +81,7 @@ const OrderDateFieldModal: React.FC<TOrderDateFieldModalProps> = (props) => {
           id="dateRangeField"
           name="dateRangeField"
           selected={startDate}
-          onChange={(_values: [Date | null, Date | null]) => {
-            setStartDate(_values[0]);
-            if (
-              _values[1] &&
-              diffDays(_values[1].getTime(), _values[0]?.getTime()).days > 6
-            ) {
-              setEndDate(
-                DateTime.fromJSDate(_values[0]!).plus({ days: 6 }).toJSDate(),
-              );
-            } else {
-              setEndDate(_values[1]);
-            }
-          }}
+          onChange={handleOrderDateRangeChange}
           startDate={startDate}
           endDate={endDate}
           shouldHideInput

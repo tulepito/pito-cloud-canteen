@@ -7,7 +7,7 @@ const EmptySubOrder = ({
   title = 'Hiện chưa có ngày ăn được tạo',
 }: {
   className?: string;
-  title?: string;
+  title?: string | React.ReactNode;
 }) => {
   return (
     <div className={classNames(css.container, className)}>

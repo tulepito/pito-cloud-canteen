@@ -57,10 +57,11 @@ const FoodBasicInforTabFormPart: React.FC<TFoodBasicInforTabFormPartProps> = (
     shallowEqual,
   );
 
-  const submitDisabled = invalid || isEmpty(uploadedImages);
+  const submitDisabled = invalid;
 
   useEffect(() => {
     dispatch(addImages(formattedCurrentFoodListingImages));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, JSON.stringify(formattedCurrentFoodListingImages)]);
 
   return (
@@ -97,9 +98,13 @@ const FoodBasicInforTabFormPart: React.FC<TFoodBasicInforTabFormPartProps> = (
       />
       <FieldMultiplePhotosMobile
         images={uploadedImages}
-        containerClassName={css.field}
+        labelClassName={css.field}
         name="images"
+        label={intl.formatMessage({
+          id: 'EditPartnerFoodForm.foodImagesLabel',
+        })}
         variants={[EImageVariants.squareSmall2x]}
+        hintShowed={isEmpty(uploadedImages)}
       />
       <FieldTextInput
         className={css.field}

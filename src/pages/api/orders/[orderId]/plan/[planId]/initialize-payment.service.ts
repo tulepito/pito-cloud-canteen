@@ -1,3 +1,4 @@
+import compact from 'lodash/compact';
 import isEmpty from 'lodash/isEmpty';
 
 import {
@@ -23,6 +24,7 @@ import {
 } from '@services/payment';
 import { Listing, User } from '@src/utils/data';
 import { EPaymentType } from '@src/utils/enums';
+import { ETransition } from '@src/utils/transaction';
 import type { TListing, TObject } from '@src/utils/types';
 
 export const initializePayment = async (
@@ -61,8 +63,17 @@ export const initializePayment = async (
   const generatePaymentRecordData = (subOrders: TObject) => {
     return Object.entries(subOrders).map(
       ([subOrderDate, subOrderData]: [string, any]) => {
-        const { restaurant = {} } = subOrderData;
+        const { restaurant = {}, lastTransition } = subOrderData;
         const { id, restaurantName } = restaurant;
+        if (
+          [
+            ETransition.OPERATOR_CANCEL_PLAN,
+            ETransition.OPERATOR_CANCEL_AFTER_PARTNER_CONFIRMED,
+            ETransition.OPERATOR_CANCEL_AFTER_PARTNER_REJECTED,
+          ].includes(lastTransition)
+        ) {
+          return;
+        }
 
         const vatSettingFromOrder = vatSettings[id];
 
@@ -93,7 +104,7 @@ export const initializePayment = async (
     );
   };
 
-  partnerPaymentRecordsData = generatePaymentRecordData(orderDetail);
+  partnerPaymentRecordsData = compact(generatePaymentRecordData(orderDetail));
 
   const {
     startDate,

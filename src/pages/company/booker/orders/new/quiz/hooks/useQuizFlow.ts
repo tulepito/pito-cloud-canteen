@@ -12,6 +12,7 @@ import { CurrentUser, Listing } from '@src/utils/data';
 import { QuizStep } from '@src/utils/enums';
 import type { TListing } from '@src/utils/types';
 
+import { BookerDraftOrderPageActions } from '../../../draft/[orderId]/BookerDraftOrderPage.slice';
 import { BookerNewOrderAction } from '../../BookerNewOrder.slice';
 
 const quizSteps = [
@@ -111,6 +112,12 @@ export const useQuizFlow = (step: string) => {
           }
           dispatch(QuizActions.closeQuizFlow());
           dispatch(BookerNewOrderAction.setCurrentStep(0));
+          dispatch(
+            BookerDraftOrderPageActions.setToastShowedAfterSuccessfullyCreatingOrder(
+              true,
+            ),
+          );
+
           await router.push({
             pathname: `/company/booker/orders/draft/${orderId}`,
             query: { ...router.query },
@@ -136,11 +143,17 @@ export const useQuizFlow = (step: string) => {
     ],
   );
 
+  const handleCloseQuizFlow = useCallback(async () => {
+    dispatch(QuizActions.closeQuizFlow());
+    dispatch(BookerNewOrderAction.setCurrentStep(0));
+  }, [dispatch]);
+
   return {
     nextStep,
     backStep,
     submitCreateOrder,
     creatingOrderInProgress: creatingOrderModalControl.value,
     creatingOrderError: submittingErrorControl.value,
+    handleCloseQuizFlow,
   };
 };

@@ -116,6 +116,7 @@ const SubOrderCard: React.FC<SubOrderCardProps> = (props) => {
             alt={foodName}
             image={foodImage}
             className={css.image}
+            emptyType="food"
           />
         </div>
       </div>

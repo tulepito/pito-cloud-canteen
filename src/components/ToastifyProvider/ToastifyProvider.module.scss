@@ -1,4 +1,19 @@
+@use '/src/styles/customMediaQueries.scss' as *;
+
 .container {
   top: 110px;
   width: fit-content;
+}
+
+#bottomCenterToast {
+  :global .Toastify__toast-container {
+    width: unset;
+
+    .Toastify__toast {
+      min-width: unset;
+      @include viewportSmall {
+        min-width: 400px;
+      }
+    }
+  }
 }

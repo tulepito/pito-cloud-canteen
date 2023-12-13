@@ -1,6 +1,5 @@
 import type { Event } from 'react-big-calendar';
 import { FormattedMessage } from 'react-intl';
-import isEmpty from 'lodash/isEmpty';
 
 import { EVENT_STATUS } from '@components/CalendarDashboard/helpers/constant';
 import IconBanned from '@components/Icons/IconBanned/IconBanned';
@@ -45,11 +44,9 @@ const EventCardContent: React.FC<TEventCardContentProps> = ({
     status,
   );
 
-  const imageUrl = Listing(pickedFoodDetail).getImages()[0];
-  const hasImage = !isEmpty(imageUrl);
+  const image = Listing(pickedFoodDetail).getImages()[0];
 
-  const showCoverImage =
-    [EParticipantOrderStatus.joined].includes(status) && hasImage;
+  const showCoverImage = [EParticipantOrderStatus.joined].includes(status);
 
   return (
     <>
@@ -57,8 +54,9 @@ const EventCardContent: React.FC<TEventCardContentProps> = ({
         <div className={classNameCoverImage}>
           <ResponsiveImage
             alt="foodPicked"
-            image={imageUrl}
+            image={image}
             variants={[EImageVariants.default]}
+            emptyType="food"
           />
         </div>
       </RenderWhen>

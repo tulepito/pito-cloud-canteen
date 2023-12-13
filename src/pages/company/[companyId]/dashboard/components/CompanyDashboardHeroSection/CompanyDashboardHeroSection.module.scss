@@ -4,16 +4,18 @@
 
 .root {
   position: relative;
-  background-image: url('../../assets/companyHeroBackground.png');
-  min-height: 476px;
+  background-image: url('../../../../assets/companyHeroBackground.png');
   background-size: cover;
   background-position: center;
-  padding-bottom: 40%;
-  overflow: hidden;
+  margin-bottom: 72px;
   @include flexAlign(center, center);
 
   @include viewportMedium {
     padding-bottom: 20%;
+    min-height: 476px;
+    max-height: unset;
+    overflow: hidden;
+    margin-bottom: 0;
   }
 
   &::after {
@@ -28,15 +30,23 @@
   }
 
   .content {
-    position: absolute;
-    top: 50%;
+    top: unset;
+    bottom: -84px;
     z-index: 1;
-    left: 50%;
-    transform: translateY(-50%) translateX(-50%);
-    overflow: hidden;
+    left: 0;
     width: 100vw;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     @include viewportMedium {
+      position: absolute;
       width: initial;
+      top: 50%;
+      bottom: unset;
+      left: 50%;
+      transform: translateY(-50%) translateX(-50%);
+      overflow: hidden;
     }
 
     .title {
@@ -44,52 +54,84 @@
       width: max-content;
       max-width: min(1200px, 90vw);
       text-align: center;
-      margin: 0 0 40px 0;
+      margin: 24px 0 16px 0;
       color: $neutralGray1;
       height: 100%;
-      @include textTemplate(34px, 700, 56px);
+      @include textTemplate(18px, 700, 32px);
       @include viewportMedium {
-        font-size: 48px;
+        margin: 0 0 40px 0;
+        @include textTemplate(48px, 700, 56px);
+      }
+
+      .whatMeal {
+        display: none;
+
+        @include viewportMedium {
+          display: inline;
+        }
       }
     }
+
     .homePageMealLinks {
       display: flex;
       height: 100%;
-      gap: 20px;
+      width: 100%;
+      gap: 8px;
       overflow: auto;
-      padding: 0 24px;
+      padding: 0 16px 24px;
+      justify-content: space-between;
+      margin-bottom: -80px;
 
       @include viewportMedium {
+        width: unset;
         justify-content: center;
-        width: 100%;
         padding: 0;
+        gap: 20px;
+        margin-bottom: 0;
       }
 
       .homePageLink {
         background-color: $neutralGray1;
-        padding: 16px;
 
         border-radius: 12px;
         @include flexAlign(center, space-between);
         flex-direction: column;
-        flex-shrink: 0;
-        width: 320px;
-        height: 224px;
+        flex: 1;
+        aspect-ratio: 1 / 1;
         cursor: pointer;
+        padding: 6px;
+        gap: 8px;
+        box-shadow: 0px 16px 20px -4px #1018281a;
+        max-height: 128px;
 
         @include viewportMedium {
-          width: 200px;
+          min-width: 200px;
+          max-width: 200px;
           height: 164px;
+          flex-grow: 0;
+          padding: 16px;
+          aspect-ratio: unset;
+          box-shadow: none;
+          max-width: unset;
+          max-height: unset;
         }
 
         &.homePageLinkDisabled {
           cursor: not-allowed;
         }
 
-        .image {
+        .imageWrapper {
+          position: relative;
           width: 100%;
-          position: relative !important;
-          max-height: 160px;
+          height: calc(100% - 28px);
+          min-height: calc(100% - 28px);
+          max-height: calc(100% - 28px);
+          border-radius: 8px;
+          overflow: hidden;
+        }
+
+        .image {
+          object-fit: cover;
 
           @include viewportMedium {
             max-height: 100px;

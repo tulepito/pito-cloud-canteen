@@ -18,9 +18,12 @@ import type { TUser } from '@utils/types';
 import CompanyFooter from './CompanyFooter/CompanyFooter';
 import CompanyHeaderWrapper from './CompanyHeaderWrapper/CompanyHeaderWrapper';
 import CompanyMainContent from './CompanyMainContent/CompanyMainContent';
+import CompanyNavBar from './CompanyNavBar/CompanyNavBar';
 import CompanySidebar from './CompanySidebar/CompanySidebar';
 import {
   shouldHideCompanyFooter,
+  shouldHideHeaderPathnames,
+  shouldShowCompanyNavBar,
   shouldShowFeatureHeader,
   shouldShowSidebar,
 } from './companyLayout.helpers';
@@ -191,12 +194,14 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
 
   return (
     <>
-      <CompanyHeaderWrapper
-        companyId={(selectedAccount?.value as string) || 'personal'}
-        showFeatureHeader={showFeatureHeader}
-        featureHeaderData={featureHeaderData}
-        companyHeaderLinkData={companyHeaderLinkData}
-      />
+      <RenderWhen condition={!shouldHideHeaderPathnames.includes(pathname)}>
+        <CompanyHeaderWrapper
+          companyId={(selectedAccount?.value as string) || 'personal'}
+          showFeatureHeader={showFeatureHeader}
+          featureHeaderData={featureHeaderData}
+          companyHeaderLinkData={companyHeaderLinkData}
+        />
+      </RenderWhen>
       {showSidebar && <CompanySidebar companyName={companyName!} />}
       <CompanyMainContent
         hasHeader={showFeatureHeader}
@@ -206,6 +211,9 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
       {!shouldHideFooter && <CompanyFooter />}
       <RenderWhen condition={quizFlowOpen}>
         <QuizFlow />
+      </RenderWhen>
+      <RenderWhen condition={shouldShowCompanyNavBar.includes(pathname)}>
+        <CompanyNavBar />
       </RenderWhen>
     </>
   );

@@ -3,10 +3,13 @@
 @use '/src/styles/customMediaQueries.scss' as *;
 .container {
   padding: 0 0 90px;
+  @include flexAlign(flex-start);
+  flex-direction: column;
   @include viewportSmall {
     padding: 0;
   }
   .header {
+    width: 100%;
     border-bottom: 1px solid $neutralGray3;
     padding: 8px 16px;
     height: 56px;
@@ -29,6 +32,7 @@
   }
 
   .sectionTitle {
+    width: 100%;
     @include text(18px, 24px);
     font-weight: $fontWeightBold;
     padding-bottom: 28px;
@@ -43,17 +47,18 @@
   }
 
   .contactPointSection {
-    display: flow-root;
     padding: 24px 16px 0px 16px;
-    flex-wrap: wrap;
+    @include flexAlign(flex-start);
+    flex-direction: column;
+    width: 100%;
 
     @include viewportSmall {
-      display: block;
       padding: 32px 24px 0;
     }
 
     .formWrapper {
       margin-top: 40px;
+      width: 100%;
     }
   }
 
@@ -62,7 +67,6 @@
     padding: 24px 16px 0px 16px;
 
     @include viewportSmall {
-      border-bottom: 1px solid $neutralGray5;
       padding: 64px 24px 40px;
     }
 
@@ -105,18 +109,19 @@
 }
 
 .submitBtn {
-  @include flexAlign(center, flex-end);
   position: fixed;
   padding: 16px;
   z-index: 2;
-  width: 100vw;
+  width: 100%;
   bottom: 0;
   background-color: $neutralGray1;
+  border-top: 1px solid $neutralGray5;
+  align-self: flex-end;
 
   @include viewportSmall {
+    @include flexAlign(flex-start, flex-end);
     position: relative;
     padding: 40px 24px 0px 24px;
-    width: auto;
   }
 
   .btn {

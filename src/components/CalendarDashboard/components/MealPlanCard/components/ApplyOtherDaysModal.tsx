@@ -2,6 +2,8 @@ import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
 
 import Modal from '@components/Modal/Modal';
+import SlideModal from '@components/SlideModal/SlideModal';
+import { useViewport } from '@hooks/useViewport';
 
 import ApplyOtherDaysForm from '../forms/ApplyOtherDaysForm';
 
@@ -30,6 +32,8 @@ const ApplyOtherDaysModal: React.FC<TApplyOtherDaysModalProps> = ({
 }) => {
   const intl = useIntl();
 
+  const { isTabletLayoutOrLarger } = useViewport();
+
   const initialValues = useMemo(
     () => ({
       selectedDays: [currentDayInWeek],
@@ -49,15 +53,21 @@ const ApplyOtherDaysModal: React.FC<TApplyOtherDaysModalProps> = ({
     return null;
   }
 
+  const ModalComponent = !isTabletLayoutOrLarger ? SlideModal : Modal;
+
   return (
     <div className={css.root}>
-      <Modal
+      <ModalComponent
         id="ApplyOtherDaysModal"
         isOpen={isOpen}
         handleClose={handleClose}
+        onClose={handleClose}
         containerClassName={css.modalContainer}
         scrollLayerClassName={css.modalScrollLayer}
         openClassName={css.openModal}
+        modalTitle={intl.formatMessage({
+          id: 'ApplyOtherDaysModal.title',
+        })}
         title={intl.formatMessage({
           id: 'ApplyOtherDaysModal.title',
         })}>
@@ -72,7 +82,7 @@ const ApplyOtherDaysModal: React.FC<TApplyOtherDaysModalProps> = ({
             endDate={endDate}
           />
         </div>
-      </Modal>
+      </ModalComponent>
     </div>
   );
 };

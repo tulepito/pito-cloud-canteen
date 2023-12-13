@@ -2,16 +2,20 @@ import type { Event } from 'react-big-calendar';
 import { FormattedMessage } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import classNames from 'classnames';
+import { isEmpty } from 'lodash';
 import isNaN from 'lodash/isNaN';
+import Image from 'next/image';
 
 import IconRefreshing from '@components/Icons/IconRefreshing/IconRefreshing';
 import IconStar from '@components/Icons/IconStar/IconStar';
 import IconTruck from '@components/Icons/IconTruck/IconTruck';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
 import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
 import { calculateDistance } from '@helpers/mapHelpers';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import FoodDetailModal from '@pages/company/booker/orders/draft/[orderId]/restaurants/components/FoodDetailModal/FoodDetailModal';
+import fallbackImage from '@pages/company/booker/orders/draft/[orderId]/restaurants/components/ResultDetailModal/cover.png';
 import { foodSliceThunks } from '@redux/slices/foods.slice';
 import type { RootState } from '@redux/store';
 import { Listing } from '@src/utils/data';
@@ -41,6 +45,10 @@ const MealPlanCardContent: React.FC<TMealPlanCardContentProps> = ({
   const restaurantList = useAppSelector(
     (state) => state.Order.orderRestaurantList,
     shallowEqual,
+  );
+
+  const walkthroughStep = useAppSelector(
+    (state) => state.BookerDraftOrderPage.walkthroughStep,
   );
 
   const restaurantListing: any = restaurantList.find(
@@ -91,16 +99,28 @@ const MealPlanCardContent: React.FC<TMealPlanCardContentProps> = ({
     <div
       className={classNames(css.content, !restaurantAvailable && css.disable)}>
       <div className={css.coverImg}>
-        <ResponsiveImage
-          alt={`${restaurantName}`}
-          image={restaurantCoverImage}
-          variants={[
-            EImageVariants.landscapeCrop,
-            EImageVariants.landscapeCrop2x,
-          ]}
-        />
+        <RenderWhen condition={!isEmpty(restaurantCoverImage)}>
+          <ResponsiveImage
+            alt={`${restaurantName}`}
+            image={restaurantCoverImage}
+            variants={[
+              EImageVariants.landscapeCrop,
+              EImageVariants.landscapeCrop2x,
+            ]}
+          />
+          <RenderWhen.False>
+            <Image
+              className={css.fallbackImage}
+              src={fallbackImage}
+              alt="fallback"
+            />
+          </RenderWhen.False>
+        </RenderWhen>
       </div>
-      <div className={css.restaurant}>
+      <div
+        className={classNames(css.restaurant, {
+          [css.walkthrough]: walkthroughStep === 1,
+        })}>
         <span title={restaurantName}>{restaurantName}</span>
         <IconRefreshing
           className={css.recommendRestaurant}
@@ -127,6 +147,7 @@ const MealPlanCardContent: React.FC<TMealPlanCardContentProps> = ({
                 key={food.key}
                 className={css.foodListItem}
                 role="button"
+                title={food.name}
                 onClick={() => handleOpenFoodDetail(food.key)}>
                 • {food.name}
               </li>

@@ -1,14 +1,7 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/mixins.scss' as *;
-
-.numberInput {
-  margin-bottom: 24px;
-}
-
-.vndIcon {
-  color: $neutralGray5;
-  border-left: 1px solid $neutralGray5;
-  padding: 0 16px;
+.root {
+  @include bookerSidebarFormRoot;
 }
 
 .minPriceNote {
@@ -24,4 +17,10 @@
 
 .submitBtn {
   width: 100%;
+}
+
+.tooltipOverlay {
+  :global(.rc-tooltip-content) {
+    width: 224px;
+  }
 }

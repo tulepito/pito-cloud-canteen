@@ -1,11 +1,38 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+@mixin walkthroughArrow {
+  content: '';
+  position: absolute;
+  top: -24px;
+  left: 8px;
+  transform: matrix(1, 0, 0, -1, 0, 0) rotate(45deg);
+  border-width: 8px;
+  border-style: solid;
+  border-color: $neutralGray1;
+  border-bottom-color: transparent;
+  border-right-color: transparent;
+  z-index: 100000;
+
+  @include viewportLarge {
+    display: none;
+  }
+}
 
 .root {
   padding: 12px;
   border-radius: 8px;
   margin-bottom: 12px;
   border: 1px solid $neutralGray3;
+  min-height: 412px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+
+  &.walkthrough[data-tour='step-1']::before {
+    @include walkthroughArrow;
+  }
 
   &.disable {
     opacity: 0.5;
@@ -47,9 +74,18 @@
 }
 
 .root .close {
-  width: 10px;
-  height: 10px;
+  width: 16px;
+  height: 16px;
   cursor: pointer;
+}
+
+.iconCloseWrapper {
+  position: relative;
+  &.walkthrough::before {
+    @include walkthroughArrow;
+    right: 0;
+    left: unset;
+  }
 }
 
 .headerActions {
@@ -74,6 +110,15 @@
   @include verticalDivider($neutralGray5, 1px, 12px);
 }
 
+.searchIconWrapper {
+  position: relative;
+  &.walkthrough::before {
+    @include walkthroughArrow;
+    top: -30px;
+    left: 12px;
+  }
+}
+
 .searchIcon {
   width: 16px;
   height: 16px;
@@ -83,6 +128,7 @@
 
 .content {
   margin-bottom: 12px;
+  flex: 1;
 
   &.disable {
     opacity: 0.5;
@@ -107,11 +153,22 @@
   align-items: center;
   @include textTemplate(12px, 600, 16px, '');
   margin-bottom: 4px;
+  position: relative;
+
+  &.walkthrough::before {
+    @include walkthroughArrow;
+    top: -30px;
+    right: 0;
+    left: unset;
+  }
 
   span {
     display: block;
-    width: 95px;
     @include lineClamp(3);
+
+    @include viewportLarge {
+      @include lineClamp(1);
+    }
   }
 }
 
@@ -122,6 +179,8 @@
 .recommendRestaurant {
   cursor: pointer;
   flex-basis: 18px;
+  min-width: 18px;
+  position: relative;
 }
 
 .viewMenu {
@@ -142,6 +201,14 @@
     @include textTemplate(14px, 700, 20px, '');
     color: $neutralGray7;
     margin-bottom: 12px;
+
+    position: relative;
+
+    &.walkthrough::before {
+      @include walkthroughArrow;
+      right: 80px;
+      left: unset;
+    }
   }
 
   .editNotAvailable {
@@ -185,15 +252,15 @@
 }
 
 .metaSection {
-  @include flexAlign(flex-start, center);
-  flex-wrap: wrap;
-  flex-direction: column;
+  @include flexAlign(flex-start);
+  flex-wrap: nowrap;
   gap: 8px;
 
   .metaItem {
     @include flexAlign(center, center);
     @include textTemplate(12px, 400, 16px);
     gap: 4px;
+    white-space: nowrap;
   }
 
   .metaItemIcon {
@@ -204,4 +271,10 @@
       fill: $neutralGray7;
     }
   }
+}
+
+.fallbackImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }

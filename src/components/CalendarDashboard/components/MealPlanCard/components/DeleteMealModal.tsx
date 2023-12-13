@@ -42,6 +42,7 @@ const DeleteMealModal: React.FC<TDeleteMealModalProps> = ({
       <AlertModal
         id={id}
         isOpen={isOpen}
+        containerClassName={css.container}
         confirmLabel={
           <div className={css.confirmBtnWrapper}>
             <span>
@@ -56,6 +57,7 @@ const DeleteMealModal: React.FC<TDeleteMealModalProps> = ({
           id: 'MealPlanCard.DeleteMealModal.cancel',
         })}
         handleClose={handleClose}
+        shouldFullScreenInMobile={false}
         onCancel={handleClose}
         onConfirm={handleDeletePlan}
         title={intl.formatMessage({

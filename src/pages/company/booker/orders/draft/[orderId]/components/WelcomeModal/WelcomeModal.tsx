@@ -2,6 +2,9 @@ import { useTour } from '@reactour/tour';
 
 import Button from '@components/Button/Button';
 import PopupModal from '@components/PopupModal/PopupModal';
+import { useAppDispatch } from '@hooks/reduxHooks';
+
+import { BookerDraftOrderPageActions } from '../../BookerDraftOrderPage.slice';
 
 import css from './WelcomeModal.module.scss';
 
@@ -12,10 +15,12 @@ type WelcomeModalProps = {
 
 const WelcomeModal: React.FC<WelcomeModalProps> = (props) => {
   const { isOpen, onClose } = props;
+  const dispatch = useAppDispatch();
   const { setIsOpen } = useTour();
   const onStartBtnClick = () => {
     onClose();
     setIsOpen(true);
+    dispatch(BookerDraftOrderPageActions.setWalkthroughStep(0));
   };
 
   return (

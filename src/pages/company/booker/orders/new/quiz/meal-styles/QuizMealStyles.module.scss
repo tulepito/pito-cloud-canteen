@@ -1,9 +1,15 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
 
 .formTitle {
-  @include textTemplate(24px, $fontWeightBold, 32px);
-  margin-top: 32px;
+  @include textTemplate(18px, $fontWeightBold, 24px);
+  margin-top: 16px;
+
+  @include viewportLarge {
+    @include textTemplate(24px, $fontWeightBold, 32px);
+    margin-top: 32px;
+  }
 }
 
 .formContainer {
@@ -12,9 +18,15 @@
 }
 
 .form {
-  @include flexAlign(center, center);
+  @include flexAlign(center);
   gap: 12px;
   flex-wrap: wrap;
+  padding-bottom: 200px;
+
+  @include viewportLarge {
+    justify-content: center;
+    padding-bottom: 0;
+  }
 }
 
 .loading {
