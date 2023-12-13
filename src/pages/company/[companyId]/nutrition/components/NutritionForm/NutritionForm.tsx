@@ -12,6 +12,7 @@ import Table from '@components/Table/Table';
 import { customPristine } from '@helpers/form';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
+import MealTypeField from '@pages/admin/order/components/MealTypeField/MealTypeField';
 import NutritionField from '@pages/admin/order/components/NutritionField/NutritionField';
 import { FOOD_CATEGORY_OPTIONS } from '@src/utils/options';
 import { Listing, User } from '@utils/data';
@@ -26,14 +27,15 @@ export type TNutritionFormValues = {
   favoriteRestaurantList: string[];
   favoriteFoodList: string[];
   nutritions: string[];
+  mealType: string[];
 };
 
 type TExtraProps = {
-  isPersonal: boolean;
   nutritionsOptions: { key: string; label: string }[];
+  mealTypeOptions: { key: string; label: string }[];
 };
 type TNutritionFormComponentProps = FormRenderProps<TNutritionFormValues> &
-  Partial<TExtraProps>;
+  Partial<TExtraProps> & { showFavoriteRestaurantAndFood?: boolean };
 type TNutritionFormProps = FormProps<TNutritionFormValues> & TExtraProps;
 
 const NutritionFormComponent: React.FC<TNutritionFormComponentProps> = (
@@ -43,10 +45,12 @@ const NutritionFormComponent: React.FC<TNutritionFormComponentProps> = (
     handleSubmit,
     form,
     values,
-    isPersonal,
     initialValues,
     nutritionsOptions,
+    showFavoriteRestaurantAndFood,
+    mealTypeOptions,
   } = props;
+
   const intl = useIntl();
   const dispatch = useAppDispatch();
   const [removedFavoriteRestaurantIds, setRemovedFavoriteRestaurantIds] =
@@ -64,14 +68,6 @@ const NutritionFormComponent: React.FC<TNutritionFormComponentProps> = (
   );
   const favoriteFood = useAppSelector(
     (state) => state.company.favoriteFood,
-    shallowEqual,
-  );
-  const personalFavoriteRestaurants = useAppSelector(
-    (state) => state.user.favoriteRestaurants,
-    shallowEqual,
-  );
-  const personalFavoriteFood = useAppSelector(
-    (state) => state.user.favoriteFood,
     shallowEqual,
   );
 
@@ -100,62 +96,57 @@ const NutritionFormComponent: React.FC<TNutritionFormComponentProps> = (
   );
   const favoriteRestaurantTableData = useMemo<TRowData[]>(
     () =>
-      (isPersonal ? personalFavoriteRestaurants : favoriteRestaurants).reduce(
-        (result, restaurant) => {
-          return removedFavoriteRestaurantIds.includes(
-            Listing(restaurant).getId(),
+      favoriteRestaurants.reduce((result, restaurant) => {
+        const restaurantListing = Listing(restaurant);
+        const restaurantId = restaurantListing.getId();
+        if (removedFavoriteRestaurantIds.includes(restaurantId)) {
+          return result;
+        }
+        const categoryValue = restaurantListing
+          .getPublicData()
+          ?.categories?.slice(0, 3)
+          .map(
+            (category: string) =>
+              FOOD_CATEGORY_OPTIONS.find((item) => item.key === category)
+                ?.label,
           )
-            ? result
-            : [
-                ...result,
-                {
-                  key: Listing(restaurant).getId(),
-                  data: {
-                    id: Listing(restaurant).getId(),
-                    title: Listing(restaurant).getAttributes().title,
-                    category: Listing(restaurant)
-                      .getPublicData()
-                      ?.categories?.slice(0, 3)
-                      .map(
-                        (category: string) =>
-                          FOOD_CATEGORY_OPTIONS.find(
-                            (item) => item.key === category,
-                          )?.label,
-                      )
-                      .join(', '),
-                  },
-                },
-              ];
-        },
-        [],
-      ),
-    [
-      favoriteRestaurants,
-      isPersonal,
-      personalFavoriteRestaurants,
-      removedFavoriteRestaurantIds,
-    ],
+          .join(', ');
+
+        return [
+          ...result,
+          {
+            key: restaurantId,
+            data: {
+              id: restaurantId,
+              title: restaurantListing.getAttributes().title,
+              category: categoryValue,
+            },
+          },
+        ];
+      }, []),
+    [favoriteRestaurants, removedFavoriteRestaurantIds],
   );
   const favoriteFoodTableData = useMemo<TRowData[]>(
     () =>
-      (isPersonal ? personalFavoriteFood : favoriteFood).reduce(
-        (result, food) => {
-          return removedFavoriteFoodIds.includes(Listing(food).getId())
-            ? result
-            : [
-                ...result,
-                {
-                  key: Listing(food).getId(),
-                  data: {
-                    id: Listing(food).getId(),
-                    title: Listing(food).getAttributes().title,
-                  },
-                },
-              ];
-        },
-        [],
-      ),
-    [favoriteFood, isPersonal, personalFavoriteFood, removedFavoriteFoodIds],
+      favoriteFood.reduce((result, food) => {
+        const foodListing = Listing(food);
+        const foodId = foodListing.getId();
+        if (removedFavoriteFoodIds.includes(foodId)) {
+          return result;
+        }
+
+        return [
+          ...result,
+          {
+            key: foodId,
+            data: {
+              id: foodId,
+              title: foodListing.getAttributes().title,
+            },
+          },
+        ];
+      }, []),
+    [favoriteFood, removedFavoriteFoodIds],
   );
   const formPristine = customPristine(initialValues, values);
   const submitDisabled = formPristine || updateCompanyAccountInProgress;
@@ -259,6 +250,16 @@ const NutritionFormComponent: React.FC<TNutritionFormComponentProps> = (
       <Form className={css.container} onSubmit={handleSubmit}>
         <div className={css.fieldsContainer}>
           <div className={css.fieldSection}>
+            <MealTypeField
+              title={intl.formatMessage({
+                id: 'MealTypeField.title',
+              })}
+              titleClassName={css.customTitle}
+              fieldClassName={css.customField}
+              options={mealTypeOptions}
+            />
+          </div>
+          <div className={css.fieldSection}>
             <NutritionField
               title={intl.formatMessage({
                 id: 'NutritionForm.nutrition.title',
@@ -268,38 +269,44 @@ const NutritionFormComponent: React.FC<TNutritionFormComponentProps> = (
               options={nutritionsOptions}
             />
           </div>
-          <div className={css.fieldSection}>
-            <div className={css.fieldLabel}>
-              {intl.formatMessage({
-                id: 'NutritionForm.favoriteRestaurant.title',
-              })}
-            </div>
-            <Table
-              columns={favoriteRestaurantColumns}
-              data={favoriteRestaurantTableData}
-              tableClassName={css.tableRoot}
-              tableHeadClassName={css.tableHead}
-              tableHeadCellClassName={css.tableHeadCell}
-              tableBodyClassName={css.tableBody}
-              tableBodyRowClassName={css.tableBodyRow}
-              tableBodyCellClassName={css.tableBodyCell}
-            />
-          </div>
-          <div className={css.fieldSection}>
-            <div className={css.fieldLabel}>
-              {intl.formatMessage({ id: 'NutritionForm.favoriteFood.title' })}
-            </div>
-            <Table
-              columns={favoriteFoodColumns}
-              data={favoriteFoodTableData}
-              tableClassName={css.tableRoot}
-              tableHeadClassName={css.tableHead}
-              tableHeadCellClassName={css.tableHeadCell}
-              tableBodyClassName={css.tableBody}
-              tableBodyRowClassName={css.tableBodyRow}
-              tableBodyCellClassName={css.tableBodyCell}
-            />
-          </div>
+          {showFavoriteRestaurantAndFood && (
+            <>
+              <div className={css.fieldSection}>
+                <div className={css.fieldLabel}>
+                  {intl.formatMessage({
+                    id: 'NutritionForm.favoriteRestaurant.title',
+                  })}
+                </div>
+                <Table
+                  columns={favoriteRestaurantColumns}
+                  data={favoriteRestaurantTableData}
+                  tableClassName={css.tableRoot}
+                  tableHeadClassName={css.tableHead}
+                  tableHeadCellClassName={css.tableHeadCell}
+                  tableBodyClassName={css.tableBody}
+                  tableBodyRowClassName={css.tableBodyRow}
+                  tableBodyCellClassName={css.tableBodyCell}
+                />
+              </div>
+              <div className={css.fieldSection}>
+                <div className={css.fieldLabel}>
+                  {intl.formatMessage({
+                    id: 'NutritionForm.favoriteFood.title',
+                  })}
+                </div>
+                <Table
+                  columns={favoriteFoodColumns}
+                  data={favoriteFoodTableData}
+                  tableClassName={css.tableRoot}
+                  tableHeadClassName={css.tableHead}
+                  tableHeadCellClassName={css.tableHeadCell}
+                  tableBodyClassName={css.tableBody}
+                  tableBodyRowClassName={css.tableBodyRow}
+                  tableBodyCellClassName={css.tableBodyCell}
+                />
+              </div>
+            </>
+          )}
         </div>
         <div className={css.submitChangeBtn}>
           <Button
