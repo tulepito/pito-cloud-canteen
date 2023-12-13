@@ -1,7 +1,14 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/mixins.scss' as *;
 @use '/src/styles/customMediaQueries.scss' as *;
+
 .root {
+  display: none;
+
+  @include viewportMedium {
+    display: block;
+  }
+
   .titleWrapper {
     display: flex;
     margin: 0 0 14px 0;

@@ -1,10 +1,14 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import { FormattedMessage } from 'react-intl';
 import Skeleton from 'react-loading-skeleton';
 import classNames from 'classnames';
 import { useRouter } from 'next/router';
 
+import IconCheck from '@components/Icons/IconCheck/IconCheck';
+import IconFood from '@components/Icons/IconFood/IconFood';
+import IconNote from '@components/Icons/IconNote/IconNote';
 import NamedLink from '@components/NamedLink/NamedLink';
+import { useViewport } from '@hooks/useViewport';
 import { EManageCompanyOrdersTab } from '@src/utils/enums';
 import type { TOrderStateCountMap } from '@src/utils/types';
 
@@ -35,6 +39,10 @@ const ORDER_ANALYSIS_DATA = [
     key: EManageCompanyOrdersTab.COMPLETED,
     orderCount: 0,
     orderLabel: <FormattedMessage id="OrdersAnalysisSection.completedOrders" />,
+    orderMobileLabel: (
+      <FormattedMessage id="OrdersAnalysisSection.mobileCompletedOrders" />
+    ),
+    icon: <IconCheck />,
     orderPath: (companyId: string) =>
       `/company/${companyId}/orders/?currentTab=${EManageCompanyOrdersTab.COMPLETED}`,
   },
@@ -44,6 +52,10 @@ const ORDER_ANALYSIS_DATA = [
     orderLabel: (
       <FormattedMessage id="OrdersAnalysisSection.inProgressOrders" />
     ),
+    orderMobileLabel: (
+      <FormattedMessage id="OrdersAnalysisSection.mobileInProgressOrders" />
+    ),
+    icon: <IconFood />,
     orderPath: (companyId: string) =>
       `/company/${companyId}/orders/?currentTab=${EManageCompanyOrdersTab.SCHEDULED}`,
   },
@@ -51,6 +63,10 @@ const ORDER_ANALYSIS_DATA = [
     key: EManageCompanyOrdersTab.DRAFT,
     orderCount: 0,
     orderLabel: <FormattedMessage id="OrdersAnalysisSection.draftOrders" />,
+    orderMobileLabel: (
+      <FormattedMessage id="OrdersAnalysisSection.mobileDraftOrders" />
+    ),
+    icon: <IconNote />,
     orderPath: (companyId: string) =>
       `/company/${companyId}/orders/?currentTab=${EManageCompanyOrdersTab.DRAFT}`,
   },
@@ -80,6 +96,7 @@ const OrdersAnalysisSection: React.FC<TOrdersAnalysisSection> = (props) => {
   const { totalItemMap, inProgress } = props;
   const { companyId } = useRouter().query;
   const orderAnalysisData = mapTotalItemMapToOrderAnalysisData(totalItemMap);
+  const { isMobileLayout } = useViewport();
 
   return (
     <div className={css.root}>
@@ -88,13 +105,13 @@ const OrdersAnalysisSection: React.FC<TOrdersAnalysisSection> = (props) => {
       </h3>
       {inProgress ? (
         <div className={css.loadingContainer}>
-          <Skeleton containerClassName={css.loading} />
+          <Skeleton containerClassName={classNames(css.loading, css.first)} />
           <Skeleton containerClassName={css.loading} />
           <Skeleton containerClassName={css.loading} />
         </div>
       ) : (
         <div className={css.content}>
-          {orderAnalysisData.map((orderData) => {
+          {orderAnalysisData.map((orderData, index) => {
             const orderDetailsClass = classNames(css.orderDetails, {
               [css.completedOrders]:
                 orderData.key === EManageCompanyOrdersTab.COMPLETED,
@@ -102,6 +119,7 @@ const OrdersAnalysisSection: React.FC<TOrdersAnalysisSection> = (props) => {
                 orderData.key === EManageCompanyOrdersTab.SCHEDULED,
               [css.draftOrders]:
                 orderData.key === EManageCompanyOrdersTab.DRAFT,
+              [css.first]: index === 0,
             });
 
             const orderLabelClasses = classNames(css.orderLabel, {
@@ -113,17 +131,65 @@ const OrdersAnalysisSection: React.FC<TOrdersAnalysisSection> = (props) => {
                 orderData.key === EManageCompanyOrdersTab.DRAFT,
             });
 
+            const iconClasses = classNames(css.icon, {
+              [css.completedOrders]:
+                orderData.key === EManageCompanyOrdersTab.COMPLETED,
+              [css.inProgressOrders]:
+                orderData.key === EManageCompanyOrdersTab.SCHEDULED,
+              [css.draftOrders]:
+                orderData.key === EManageCompanyOrdersTab.DRAFT,
+            });
+
+            const metaSectionClasses = classNames({
+              [css.metaSection]: index === 0,
+            });
+
+            const CardLinkComponent = !isMobileLayout ? 'div' : NamedLink;
+            const cardLinkComponentProps = !isMobileLayout
+              ? {}
+              : {
+                  path: orderData.orderPath(companyId as string),
+                };
+
+            const OrderLinkComponent = isMobileLayout ? 'div' : NamedLink;
+            const orderLinkComponentProps = isMobileLayout
+              ? {}
+              : {
+                  path: orderData.orderPath(companyId as string),
+                };
+
             return (
-              <div key={orderData.key} className={orderDetailsClass}>
-                <p className={css.orderCount}>{orderData.orderCount}</p>
-                <p className={orderLabelClasses}>{orderData.orderLabel}</p>
-                <NamedLink
-                  path={orderData.orderPath(companyId as string)}
-                  className={css.orderLink}>
-                  <FormattedMessage id="OrdersAnalysisSection.details" />
-                  <IconArrow />
-                </NamedLink>
-              </div>
+              <Fragment key={orderData.key}>
+                <CardLinkComponent
+                  {...cardLinkComponentProps}
+                  className={orderDetailsClass}>
+                  <div className={metaSectionClasses}>
+                    <span className={iconClasses}>{orderData.icon}</span>
+                    <div>
+                      <p className={css.orderMobileLabel}>
+                        {orderData.orderMobileLabel}
+                      </p>
+                      <p className={css.orderCount}>
+                        {orderData.orderCount}{' '}
+                        <span className={css.unit}>
+                          <FormattedMessage id="OrdersAnalysisSection.unit" />
+                        </span>
+                      </p>
+                      <p className={orderLabelClasses}>
+                        {orderData.orderLabel}
+                      </p>
+                    </div>
+                  </div>
+                  <OrderLinkComponent
+                    {...orderLinkComponentProps}
+                    className={css.orderLink}>
+                    <span className={css.linkText}>
+                      <FormattedMessage id="OrdersAnalysisSection.details" />
+                    </span>
+                    <IconArrow />
+                  </OrderLinkComponent>
+                </CardLinkComponent>
+              </Fragment>
             );
           })}
         </div>

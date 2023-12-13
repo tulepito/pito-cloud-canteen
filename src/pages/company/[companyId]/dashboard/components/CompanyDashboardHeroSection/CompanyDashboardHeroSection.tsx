@@ -60,6 +60,11 @@ const CompanyDashboardHeroSection = () => {
               bookerName: ` ${firstName}`,
             }}
           />
+          <span className={css.whatMeal}>
+            &nbsp;
+            <FormattedMessage id="CompanyDashboardHeroSection.whatMeal" />
+          </span>
+          ?
         </h1>
         <div id="homePageMealLinks" className={css.homePageMealLinks}>
           {HOMEPAGE_MEAL_LINKS.map((item) => (
@@ -67,12 +72,14 @@ const CompanyDashboardHeroSection = () => {
               key={item.key}
               className={homePageLinkClasses}
               onClick={onMealClick(item.daySession)}>
-              <Image
-                src={item.image}
-                className={css.image}
-                alt={item.key}
-                fill
-              />
+              <div className={css.imageWrapper}>
+                <Image
+                  src={item.image}
+                  className={css.image}
+                  alt={item.key}
+                  fill
+                />
+              </div>
               <p className={css.label}>{item.label}</p>
             </div>
           ))}
