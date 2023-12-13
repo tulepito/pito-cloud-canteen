@@ -80,6 +80,9 @@ export const publishOrder = async (orderId: string, isAdmin = false) => {
     serviceFees = {},
     anonymous = [],
     orderType = EOrderType.group,
+    bookerId,
+    startDate,
+    endDate,
   } = orderListing.getMetadata();
   const { title: orderTitle } = orderListing.getAttributes();
   const isGroupOrder = orderType === EOrderType.group;
@@ -187,5 +190,12 @@ export const publishOrder = async (orderId: string, isAdmin = false) => {
         order,
       },
     );
+
+    createFirebaseDocNotification(ENotificationType.BOOKER_PICKING_ORDER, {
+      userId: bookerId,
+      orderId,
+      startDate,
+      endDate,
+    });
   });
 };

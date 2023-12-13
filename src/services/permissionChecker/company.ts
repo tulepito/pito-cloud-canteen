@@ -14,20 +14,22 @@ const companyChecker =
       const apiMethod = req.method as string;
       const { companyId: companyIdFromQuery } = req.query;
       const { companyId: companyIdFromBody } = req.body;
-      const companyId = companyIdFromQuery || companyIdFromBody;
 
       const sdk = getSdk(req, res);
       const currentUserResponse = await sdk.currentUser.show();
       const [currentUser] = denormalisedResponseEntities(currentUserResponse);
+
+      const { company = {}, companyList = [] } =
+        currentUser.attributes.profile.metadata;
+      const companyId =
+        companyIdFromQuery || companyIdFromBody || companyList[0];
+      const userPermission = company[companyId]?.permission;
 
       if (!companyId && needCheckingRequestBodyMethod.includes(apiMethod)) {
         return res.status(EHttpStatusCode.Forbidden).json({
           message: 'Missing required key',
         });
       }
-
-      const { company = {} } = currentUser.attributes.profile.metadata;
-      const userPermission = company[companyId]?.permission;
 
       if (
         !userPermission ||
@@ -37,6 +39,10 @@ const companyChecker =
           message: "You don't have permission to access this api!",
         });
       }
+
+      req.previewData = {
+        currentUser,
+      };
 
       return handler(req, res);
     } catch (error) {

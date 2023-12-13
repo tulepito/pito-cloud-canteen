@@ -3,6 +3,10 @@ import { useRouter } from 'next/router';
 
 import { useAppDispatch } from '@hooks/reduxHooks';
 import {
+  BookerCompaniesActions,
+  BookerCompaniesThunks,
+} from '@redux/slices/BookerCompanies.slice';
+import {
   NotificationActions,
   NotificationThunks,
 } from '@redux/slices/notification.slice';
@@ -31,6 +35,9 @@ const NotificationItem: React.FC<NotificationItemProps> = (props) => {
     if (notificationType !== ENotificationType.SUB_ORDER_UPDATED) {
       dispatch(NotificationThunks.markNotificationsSeen([id]));
       dispatch(NotificationActions.markNotificationsSeen([id]));
+
+      dispatch(BookerCompaniesThunks.markNotificationSeen([id]));
+      dispatch(BookerCompaniesActions.markNotificationsSeen([id]));
     }
 
     if (relatedLink) {

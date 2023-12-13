@@ -180,6 +180,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
                   anonymous = [],
                   quotationId,
                   companyId,
+                  bookerId,
                 } = orderListing.getMetadata();
                 const generalNotificationData = {
                   orderId,
@@ -210,6 +211,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
                           userId: participantId,
                         },
                       );
+                    },
+                  );
+                  createFirebaseDocNotification(
+                    ENotificationType.BOOKER_SUB_ORDER_COMPLETED,
+                    {
+                      userId: bookerId,
+                      orderId,
+                      subOrderDate: Number(subOrderDate),
                     },
                   );
                   await transitionOrderStatus(order, plan, integrationSdk);
@@ -287,6 +296,16 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
                     client: newClient,
                     partner: newPartner,
                   });
+
+                  createFirebaseDocNotification(
+                    ENotificationType.BOOKER_SUB_ORDER_CANCELLED,
+                    {
+                      userId: bookerId,
+                      orderId,
+                      subOrderDate: Number(subOrderDate),
+                    },
+                  );
+
                   await transitionOrderStatus(order, plan, integrationSdk);
                 }
               }),
