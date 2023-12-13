@@ -27,6 +27,38 @@
     padding-bottom: 16px;
   }
 
+  .timeLeft {
+    @include textTemplate(14px, 400, 20px);
+    margin-bottom: 4px;
+    display: flex;
+    align-items: baseline;
+    column-gap: 13px;
+
+    .timeLeftTime {
+      color: $labelBlue2;
+      @include textTemplate(16px, 700, 24px);
+    }
+  }
+
+  .orderEndAt {
+    margin-bottom: 8px;
+    @include textTemplate(14px, 400, 20px);
+    color: $neutralGray6;
+    display: flex;
+    justify-content: space-between;
+
+    .orderEndAtTime {
+      @include textTemplate(14px, 600, 24px);
+      color: $neutralGray7;
+    }
+
+    svg {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+    }
+  }
+
   .actions {
     display: flex;
     flex-direction: column;

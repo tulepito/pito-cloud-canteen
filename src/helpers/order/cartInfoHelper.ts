@@ -5,7 +5,6 @@ import {
   getFoodDataMap,
   getPCCFeeByMemberAmount,
   getTotalInfo,
-  isJoinedPlan,
 } from '@helpers/orderHelper';
 import {
   EOrderStates,
@@ -17,32 +16,8 @@ import { TRANSITIONS_TO_STATE_CANCELED } from '@src/utils/transaction';
 import { Listing } from '@utils/data';
 import type { TListing, TObject, TQuotation } from '@utils/types';
 
-export const ensureVATSetting = (vatSetting: EPartnerVATSetting) =>
-  vatSetting in EPartnerVATSetting ? vatSetting : EPartnerVATSetting.vat;
-
-export const vatPercentageBaseOnVatSetting = ({
-  vatSetting,
-  vatPercentage,
-  isPartner = true,
-}: {
-  vatSetting: EPartnerVATSetting;
-  vatPercentage: number;
-  isPartner?: boolean;
-}) => {
-  if (!isPartner) {
-    return vatPercentage;
-  }
-
-  switch (vatSetting) {
-    case EPartnerVATSetting.direct:
-      return 0;
-    case EPartnerVATSetting.noExportVat:
-      return -0.04;
-    case EPartnerVATSetting.vat:
-    default:
-      return vatPercentage;
-  }
-};
+import { isJoinedPlan } from './orderPickingHelper';
+import { vatPercentageBaseOnVatSetting } from './prepareDataHelper';
 
 export const calculateVATFee = ({
   vatPercentage,

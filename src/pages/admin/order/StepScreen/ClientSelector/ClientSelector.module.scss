@@ -21,7 +21,7 @@
     height: 32px;
     background-color: $neutralGray3;
     border-radius: 4px;
-    @include flexAlign(center, center);
+    @include flexCenter;
   }
 }
 

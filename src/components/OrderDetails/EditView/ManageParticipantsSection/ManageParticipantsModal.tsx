@@ -1,7 +1,10 @@
 import { useIntl } from 'react-intl';
 
 import Modal from '@components/Modal/Modal';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
+import SlideModal from '@components/SlideModal/SlideModal';
 import { isCompletePickFood } from '@helpers/orderHelper';
+import { useViewport } from '@hooks/useViewport';
 import { Listing } from '@src/utils/data';
 import type { TListing, TObject, TUser } from '@utils/types';
 
@@ -27,7 +30,6 @@ type ManageParticipantsModalProps = {
 const ManageParticipantsModal: React.FC<ManageParticipantsModalProps> = (
   props,
 ) => {
-  const intl = useIntl();
   const {
     isOpen,
     onClose,
@@ -36,6 +38,8 @@ const ManageParticipantsModal: React.FC<ManageParticipantsModalProps> = (
     data,
     ableToUpdateOrder,
   } = props;
+  const intl = useIntl();
+  const { isMobileLayout } = useViewport();
 
   const { participants = [] } = data;
   const { orderDetail = {} } = Listing(data.planData as TListing).getMetadata();
@@ -63,13 +67,8 @@ const ManageParticipantsModal: React.FC<ManageParticipantsModalProps> = (
           id: 'ManageParticipantModal.subTitle.noChoices',
         });
 
-  return (
-    <Modal
-      className={css.root}
-      isOpen={isOpen}
-      handleClose={onClose}
-      containerClassName={css.modalContainer}
-      title={modalTitle}>
+  const content = (
+    <>
       <div className={css.subTitle}>{modalSubTitle}</div>
       <AddParticipantForm
         id="ManageParticipantsModal.AddParticipantForm"
@@ -82,9 +81,31 @@ const ManageParticipantsModal: React.FC<ManageParticipantsModalProps> = (
           data={data}
           handleClickDeleteParticipant={handleClickDeleteParticipant}
         />
-        {/* <GroupedParticipants groupedParticipants={groupedMockupData} /> */}
       </div>
-    </Modal>
+    </>
+  );
+
+  return (
+    <RenderWhen condition={isMobileLayout}>
+      <SlideModal
+        id="ManageParticipantsMobileModal"
+        modalTitle={modalTitle}
+        onClose={onClose}
+        isOpen={isOpen}>
+        {content}
+      </SlideModal>
+
+      <RenderWhen.False>
+        <Modal
+          className={css.root}
+          isOpen={isOpen}
+          handleClose={onClose}
+          containerClassName={css.modalContainer}
+          title={modalTitle}>
+          {content}
+        </Modal>
+      </RenderWhen.False>
+    </RenderWhen>
   );
 };
 

@@ -21,7 +21,7 @@
     flex-basis: calc(100% / 3);
   }
   .item {
-    @include flexAlign(center, center);
+    @include flexCenter;
     flex-direction: column;
     gap: 8px;
     height: 60px;

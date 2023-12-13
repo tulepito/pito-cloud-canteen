@@ -10,8 +10,8 @@ import Tooltip from '@components/Tooltip/Tooltip';
 import {
   calculatePriceQuotationInfoFromOrder,
   calculatePriceQuotationPartner,
-  ensureVATSetting,
 } from '@helpers/order/cartInfoHelper';
+import { ensureVATSetting } from '@helpers/order/prepareDataHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { AdminManageOrderThunks } from '@pages/admin/order/AdminManageOrder.slice';
 import { Listing } from '@src/utils/data';

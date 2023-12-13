@@ -1,12 +1,17 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
+import isEmpty from 'lodash/isEmpty';
 import { DateTime } from 'luxon';
 
 import Button from '@components/Button/Button';
+import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import Modal from '@components/Modal/Modal';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
+import SlideModal from '@components/SlideModal/SlideModal';
 import Tooltip from '@components/Tooltip/Tooltip';
 import { parseThousandNumber } from '@helpers/format';
-import { isJoinedPlan } from '@helpers/orderHelper';
+import { isJoinedPlan } from '@helpers/order/orderPickingHelper';
+import { useViewport } from '@hooks/useViewport';
 import type { TObject, TUser } from '@utils/types';
 
 import css from './ReviewOrdersResultModal.module.scss';
@@ -69,6 +74,8 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
 ) => {
   const { isOpen, onClose, onDownloadReviewOrderResults, data } = props;
   const intl = useIntl();
+  const { isMobileLayout } = useViewport();
+  const [expandingStatusMap, setExpandingStatusMap] = useState<any>({});
 
   const {
     orderDetail,
@@ -77,6 +84,14 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
     anonymous = [],
     anonymousParticipantData: anonymousParticipantDataFromProps = [],
   } = data || {};
+
+  const modalTitle = (
+    <span className={css.modalTitle}>
+      {intl.formatMessage({
+        id: 'ReviewOrdersResultModal.title',
+      })}
+    </span>
+  );
 
   const participantDataList = useMemo(
     () =>
@@ -132,94 +147,159 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
     participantData: participantDataMap,
   });
 
-  return (
-    <Modal
-      title={
-        <span className={css.modalTitle}>
-          {intl.formatMessage({
-            id: 'ReviewOrdersResultModal.title',
-          })}
-        </span>
-      }
-      isOpen={isOpen}
-      handleClose={onClose}
-      className={css.modalRoot}
-      contentClassName={css.modalContentContainer}>
-      <div className={css.contentContainer}>
-        {preparedData.map((dateItem) => {
-          const { date, orderData } = dateItem;
+  const toggleCollapseStatus = (date: string) => () => {
+    setExpandingStatusMap({
+      ...expandingStatusMap,
+      [date]: !expandingStatusMap[date],
+    });
+  };
+
+  useEffect(() => {
+    if (!isEmpty(preparedData)) {
+      const updateObject = preparedData.reduce(
+        (result: any, { date, orderData }: any) => {
+          if (typeof result[date] === 'undefined') {
+            if (!isEmpty(orderData)) result[date] = true;
+          }
+
+          return result;
+        },
+        expandingStatusMap,
+      );
+      setExpandingStatusMap(updateObject);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [JSON.stringify(preparedData)]);
+
+  const content = (
+    <>
+      <div className={css.tableContainer}>
+        <div className={css.headRow}>
+          <div className={css.head}>
+            {intl.formatMessage({
+              id: 'ReviewOrdersResultModal.tableHead.name',
+            })}
+          </div>
+          <div className={css.head}>
+            {intl.formatMessage({
+              id: 'ReviewOrdersResultModal.tableHead.foodName',
+            })}
+          </div>
+          <div className={css.head}>
+            {intl.formatMessage({
+              id: 'ReviewOrdersResultModal.tableHead.price',
+            })}
+          </div>
+          <div className={css.head}>
+            {intl.formatMessage({
+              id: 'ReviewOrdersResultModal.tableHead.requirement',
+            })}
+          </div>
+        </div>
+
+        {preparedData.map(({ date, orderData }) => {
+          const isExpanding = expandingStatusMap[date];
+          const isEmptyOrderData = isEmpty(orderData);
 
           return (
             <div className={css.dateContainer} key={date}>
               <div className={css.dateTitle}>
-                {intl.formatMessage(
-                  { id: 'ReviewOrdersResultModal.dateTitle' },
-                  {
-                    date: DateTime.fromMillis(Number(date)).toFormat(
-                      'dd/MM/yyyy',
-                    ),
-                  },
-                )}
-              </div>
-              <div className={css.contentContainer}>
-                <div className={css.row}>
-                  <div className={css.head}>
-                    {intl.formatMessage({
-                      id: 'ReviewOrdersResultModal.tableHead.name',
-                    })}
-                  </div>
-                  <div className={css.head}>
-                    {intl.formatMessage({
-                      id: 'ReviewOrdersResultModal.tableHead.foodName',
-                    })}
-                  </div>
-                  <div className={css.head}>
-                    {intl.formatMessage({
-                      id: 'ReviewOrdersResultModal.tableHead.price',
-                    })}
-                  </div>
-                  <div className={css.head}>
-                    {intl.formatMessage({
-                      id: 'ReviewOrdersResultModal.tableHead.requirement',
-                    })}
-                  </div>
+                <div>
+                  {intl.formatMessage(
+                    { id: 'ReviewOrdersResultModal.dateTitle' },
+                    {
+                      date: DateTime.fromMillis(Number(date)).toFormat(
+                        'dd/MM/yyyy',
+                      ),
+                    },
+                  )}
                 </div>
-                {orderData.map((row: TObject) => {
-                  const {
-                    memberData,
-                    foodData: { foodName, foodPrice = 0, requirement },
-                  } = row;
-                  const { name: memberName, id: memberId } = memberData || {};
-
-                  return (
-                    <div className={css.row} key={memberId}>
-                      <div>{memberName}</div>
-                      <div>{foodName}</div>
-                      <div>{`${parseThousandNumber(foodPrice)}đ`}</div>
-                      {requirement ? (
-                        <Tooltip
-                          overlayClassName={css.requirementTooltip}
-                          tooltipContent={requirement}
-                          placement="bottomLeft">
-                          <div>{requirement}</div>
-                        </Tooltip>
-                      ) : (
-                        <div>-</div>
-                      )}
-                    </div>
-                  );
-                })}
+                <RenderWhen condition={!isEmptyOrderData}>
+                  <IconArrow
+                    direction={isExpanding ? 'up' : 'down'}
+                    onClick={toggleCollapseStatus(date)}
+                  />
+                </RenderWhen>
               </div>
+              <RenderWhen condition={isExpanding}>
+                <div className={css.contentContainer}>
+                  {orderData.map((row: TObject) => {
+                    const {
+                      memberData,
+                      foodData: { foodName, foodPrice = 0, requirement },
+                    } = row;
+                    const { name: memberName, id: memberId } = memberData || {};
+
+                    return (
+                      <div key={memberId} className={css.rowContainer}>
+                        <div className={css.row}>
+                          <div className={css.memberName}>{memberName}</div>
+                          <div>{foodName}</div>
+                          <div
+                            className={css.foodPrice}>{`${parseThousandNumber(
+                            foodPrice,
+                          )}đ`}</div>
+                          {requirement ? (
+                            <Tooltip
+                              overlayClassName={css.requirementTooltip}
+                              tooltipContent={requirement}
+                              placement="bottomLeft">
+                              <div>{requirement}</div>
+                            </Tooltip>
+                          ) : (
+                            <div>-</div>
+                          )}
+                        </div>
+                        <RenderWhen condition={!!requirement}>
+                          <div className={css.mobileRequirement}>
+                            <div />
+                            <div> {requirement}</div>
+                          </div>
+                        </RenderWhen>
+                      </div>
+                    );
+                  })}
+                </div>
+              </RenderWhen>
             </div>
           );
         })}
       </div>
-      <Button
-        className={css.goBackButton}
-        onClick={onDownloadReviewOrderResults}>
-        {intl.formatMessage({ id: 'ReviewOrdersResultModal.downloadFile' })}
+      <Button className={css.button} onClick={onDownloadReviewOrderResults}>
+        {isMobileLayout
+          ? intl.formatMessage({
+              id: 'ReviewOrdersResultModal.mobileDownloadFileText',
+            })
+          : intl.formatMessage({
+              id: 'ReviewOrdersResultModal.downloadFileText',
+            })}
       </Button>
-    </Modal>
+    </>
+  );
+
+  return (
+    <RenderWhen condition={isMobileLayout}>
+      <SlideModal
+        id="ReviewOrdersResultModal"
+        modalTitle={modalTitle}
+        onClose={onClose}
+        isOpen={isOpen}
+        containerClassName={css.mobileModalContainer}
+        contentClassName={css.mobileModalContent}>
+        {content}
+      </SlideModal>
+
+      <RenderWhen.False>
+        <Modal
+          title={modalTitle}
+          isOpen={isOpen}
+          handleClose={onClose}
+          className={css.modalRoot}
+          contentClassName={css.modalContentContainer}>
+          {content}
+        </Modal>
+      </RenderWhen.False>
+    </RenderWhen>
   );
 };
 

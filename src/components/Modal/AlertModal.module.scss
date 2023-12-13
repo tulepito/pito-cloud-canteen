@@ -7,7 +7,7 @@
 
 .modalRoot {
   &.isOpen {
-    z-index: 201;
+    z-index: $zIndexAlertModal;
   }
 
   .container {
@@ -21,7 +21,11 @@
   color: $neutralGray6;
 
   &.hasActionSection {
-    padding-bottom: 40px;
+    padding-bottom: 12px;
+
+    @include viewportMedium {
+      padding-bottom: 40px;
+    }
   }
 }
 

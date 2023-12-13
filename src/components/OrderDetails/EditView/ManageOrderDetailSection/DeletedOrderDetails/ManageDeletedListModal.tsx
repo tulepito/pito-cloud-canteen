@@ -2,6 +2,9 @@ import { useState } from 'react';
 import { useIntl } from 'react-intl';
 
 import Modal from '@components/Modal/Modal';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
+import SlideModal from '@components/SlideModal/SlideModal';
+import { useViewport } from '@hooks/useViewport';
 import type { TObject } from '@utils/types';
 
 import type { TManageDeletedListFormValues } from './ManageDeletedListForm';
@@ -33,6 +36,7 @@ const ManageDeletedListModal: React.FC<TManageDeletedListModalProps> = (
     disabled,
   } = props;
   const intl = useIntl();
+  const { isMobileLayout } = useViewport();
   const [action, setAction] = useState<ManageDeletedListFormAction>(
     ManageDeletedListFormAction.RESTORE,
   );
@@ -57,25 +61,39 @@ const ManageDeletedListModal: React.FC<TManageDeletedListModalProps> = (
     onClose();
   };
 
+  const content = (
+    <ManageDeletedListForm
+      setAction={handleChangeAction}
+      deletedTabData={deletedTabData}
+      onSubmit={handleSubmit}
+      disabled={disabled}
+    />
+  );
+
   return (
-    <>
-      {isOpen && (
-        <Modal
-          title={title}
-          className={css.root}
-          isOpen={isOpen}
-          handleClose={onClose}
-          containerClassName={css.modalContainer}
-          contentClassName={css.modalContentContainer}>
-          <ManageDeletedListForm
-            setAction={handleChangeAction}
-            deletedTabData={deletedTabData}
-            onSubmit={handleSubmit}
-            disabled={disabled}
-          />
-        </Modal>
-      )}
-    </>
+    <RenderWhen condition={isMobileLayout}>
+      <SlideModal
+        id="ManageDeletedMobileModal"
+        modalTitle={title}
+        onClose={onClose}
+        isOpen={isOpen}>
+        {content}
+      </SlideModal>
+
+      <RenderWhen.False>
+        {isOpen && (
+          <Modal
+            title={title}
+            className={css.root}
+            isOpen={isOpen}
+            handleClose={onClose}
+            containerClassName={css.modalContainer}
+            contentClassName={css.modalContentContainer}>
+            {content}
+          </Modal>
+        )}
+      </RenderWhen.False>
+    </RenderWhen>
   );
 };
 

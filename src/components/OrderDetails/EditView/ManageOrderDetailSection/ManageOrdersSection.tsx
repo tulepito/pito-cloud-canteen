@@ -5,11 +5,16 @@ import Skeleton from 'react-loading-skeleton';
 import isEmpty from 'lodash/isEmpty';
 import { useRouter } from 'next/router';
 
+import Button from '@components/Button/Button';
+import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
+import IconAdd from '@components/Icons/IconAdd/IconAdd';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
+import SlideModal from '@components/SlideModal/SlideModal';
 import type { TTabsItem } from '@components/Tabs/Tabs';
 import Tabs from '@components/Tabs/Tabs';
 import { historyPushState } from '@helpers/urlHelpers';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import useBoolean from '@hooks/useBoolean';
 import {
   orderDetailsAnyActionsInProgress,
   OrderManagementsAction,
@@ -57,8 +62,8 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
     query: { timestamp },
   } = useRouter();
   const intl = useIntl();
+  const addOrderRowModalControl = useBoolean();
   const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
-
   const {
     dateList = [],
     memberOptions,
@@ -69,6 +74,7 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
 
   const { restaurant = {} } = currentOrderDetail;
   const { maxQuantity, minQuantity } = restaurant;
+
   const handleSubmitAddSelection = async (values: TAddOrderFormValues) => {
     const { participantId, requirement = '', foodId } = values;
     const selectParticipantValue = participantId.key;
@@ -78,17 +84,19 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
       (m: TObject) => m.memberId === selectParticipantValue,
     );
 
+    const memberInfo = isUsingEmail
+      ? { memberEmail: selectParticipantValue }
+      : {
+          memberId: selectParticipantValue,
+          memberEmail: member?.memberEmail,
+        };
+
     const updateValues = {
       foodId,
       requirement,
       currentViewDate,
-      ...(isUsingEmail
-        ? { memberEmail: selectParticipantValue }
-        : {
-            memberId: selectParticipantValue,
-            memberEmail: member?.memberEmail,
-          }),
       isAdminFlow,
+      ...memberInfo,
     };
 
     if (isDraftEditing) {
@@ -98,6 +106,25 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
     }
     await dispatch(orderManagementThunks.addOrUpdateMemberOrder(updateValues));
   };
+
+  const addOrderRowTitle = intl.formatMessage({
+    id: 'ManageOrdersSection.addOrder.title',
+  });
+  const addOrderRowFormComponent = (
+    <AddOrderForm
+      onSubmit={handleSubmitAddSelection}
+      foodOptions={foodOptions}
+      memberOptions={memberOptions}
+      ableToUpdateOrder={ableToUpdateOrder}
+      isDraftEditing={isDraftEditing}
+      planReachMaxRestaurantQuantity={planReachMaxRestaurantQuantity}
+      planReachMinRestaurantQuantity={planReachMinRestaurantQuantity}
+      planReachMaxCanModify={planReachMaxCanModify}
+      maxQuantity={maxQuantity}
+      minQuantity={minQuantity}
+      currentViewDate={currentViewDate}
+    />
+  );
 
   const items = dateList.map((date) => {
     const formattedDate = formatTimestamp(date, 'EEE, dd/MM');
@@ -111,41 +138,65 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
               id: 'ManageOrdersSection.manageOrdersContainer.title',
             })}
           </div>
-          <div className={css.orderDetails}>
-            <OrderDetailsTable
-              currentViewDate={currentViewDate}
-              foodOptions={foodOptions}
-              ableToUpdateOrder={ableToUpdateOrder}
-              isDraftEditing={isDraftEditing}
-              handleOpenReachMaxAllowedChangesModal={
-                handleOpenReachMaxAllowedChangesModal
-              }
-              shouldShowOverflowError={
-                planReachMaxRestaurantQuantity || planReachMaxCanModify
-              }
-              minQuantity={minQuantity}
-              maxQuantity={maxQuantity}
-              isAdminFlow={isAdminFlow}
-            />
-          </div>
+          <OrderDetailsTable
+            currentViewDate={currentViewDate}
+            foodOptions={foodOptions}
+            ableToUpdateOrder={ableToUpdateOrder}
+            isDraftEditing={isDraftEditing}
+            handleOpenReachMaxAllowedChangesModal={
+              handleOpenReachMaxAllowedChangesModal
+            }
+            shouldShowOverflowError={
+              planReachMaxRestaurantQuantity || planReachMaxCanModify
+            }
+            minQuantity={minQuantity}
+            maxQuantity={maxQuantity}
+            isAdminFlow={isAdminFlow}
+          />
           <div className={css.addOrder}>
-            <div className={css.addOrderTitle}>
-              {intl.formatMessage({
-                id: 'ManageOrdersSection.addOrder.title',
-              })}
-              <AddOrderForm
-                onSubmit={handleSubmitAddSelection}
-                foodOptions={foodOptions}
-                memberOptions={memberOptions}
-                ableToUpdateOrder={ableToUpdateOrder}
-                isDraftEditing={isDraftEditing}
-                planReachMaxRestaurantQuantity={planReachMaxRestaurantQuantity}
-                planReachMinRestaurantQuantity={planReachMinRestaurantQuantity}
-                planReachMaxCanModify={planReachMaxCanModify}
-                maxQuantity={maxQuantity}
-                minQuantity={minQuantity}
-                currentViewDate={currentViewDate}
-              />
+            <div className={css.mobileSection}>
+              {planReachMaxCanModify && (
+                <ErrorMessage
+                  className={css.error}
+                  message={`Bạn đã thay đổi vượt mức quy định (tối đa 10% số lượng người tham gia)`}
+                />
+              )}
+              {planReachMaxRestaurantQuantity && (
+                <ErrorMessage
+                  className={css.error}
+                  message={`Bạn đã đặt vượt mức tối đa (${maxQuantity} phần)`}
+                />
+              )}
+              {planReachMinRestaurantQuantity && (
+                <ErrorMessage
+                  className={css.error}
+                  message={`Cần đặt tối thiểu ${minQuantity} phần`}
+                />
+              )}
+
+              <Button
+                variant="inline"
+                className={css.addOrderButton}
+                onClick={addOrderRowModalControl.setTrue}>
+                <IconAdd variant="large" />
+
+                <div>Thêm phần ăn</div>
+              </Button>
+
+              <SlideModal
+                id="ManageOrdersSection.AddOrderMobileModal"
+                containerClassName={css.mobileModalContainer}
+                modalTitle={addOrderRowTitle}
+                isOpen={addOrderRowModalControl.value}
+                onClose={addOrderRowModalControl.setFalse}>
+                {addOrderRowFormComponent}
+              </SlideModal>
+            </div>
+            <div className={css.desktopSection}>
+              <div className={css.addOrderTitle}>
+                {addOrderRowTitle}
+                {addOrderRowFormComponent}
+              </div>
             </div>
           </div>
         </div>
@@ -171,18 +222,17 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
 
   return (
     <RenderWhen condition={!isEmpty(dateList)}>
-      <div className={css.root}>
-        <Tabs
-          disabled={inProgress}
-          items={items}
-          onChange={handleDateTabChange}
-          showNavigation
-          middleLabel
-          defaultActiveKey={`${
-            (defaultActiveKey < 0 ? 0 : defaultActiveKey) + 1
-          }`}
-        />
-      </div>
+      <Tabs
+        disabled={inProgress}
+        items={items}
+        onChange={handleDateTabChange}
+        showNavigation
+        shouldShowNavigatorBorder
+        middleLabel
+        defaultActiveKey={`${
+          (defaultActiveKey < 0 ? 0 : defaultActiveKey) + 1
+        }`}
+      />
 
       <RenderWhen.False>
         <RenderWhen condition={!hasSubOrders}>

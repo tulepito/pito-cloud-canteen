@@ -12,6 +12,7 @@ import {
   MORNING_SESSION,
 } from '@components/CalendarDashboard/helpers/constant';
 
+import { DAY_IN_WEEK } from './constants';
 import { getUniqueString } from './data';
 import type { ETimeFrame } from './enums';
 import { EDayOfWeek, EMenuMealType } from './enums';
@@ -19,15 +20,9 @@ import type { TKeyValue } from './types';
 
 export const VNTimezone = 'Asia/Ho_Chi_Minh';
 
-export const DAY_IN_WEEK = [
-  { key: 'mon', label: 'DayInWeekField.mon' },
-  { key: 'tue', label: 'DayInWeekField.tue' },
-  { key: 'wed', label: 'DayInWeekField.wed' },
-  { key: 'thu', label: 'DayInWeekField.thu' },
-  { key: 'fri', label: 'DayInWeekField.fri' },
-  { key: 'sat', label: 'DayInWeekField.sat' },
-  { key: 'sun', label: 'DayInWeekField.sun' },
-];
+export const isOver = (deadline: number = 0) => {
+  return new Date().getTime() > deadline;
+};
 
 /**
  * Check if the browser's DateTimeFormat API supports time zones.

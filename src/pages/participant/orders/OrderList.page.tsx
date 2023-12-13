@@ -20,7 +20,7 @@ import ParticipantLayout from '@components/ParticipantLayout/ParticipantLayout';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import Tabs from '@components/Tabs/Tabs';
 import { getItem, setItem } from '@helpers/localStorageHelpers';
-import { isOver, prepareDaySession } from '@helpers/orderHelper';
+import { prepareDaySession } from '@helpers/order/prepareDataHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { useViewport } from '@hooks/useViewport';
@@ -36,6 +36,7 @@ import {
   getPrevWeek,
   getStartDayOfWeek,
   getStartOfMonth,
+  isOver,
   isSameDate,
 } from '@src/utils/dates';
 import { EOrderStates, EParticipantOrderStatus } from '@src/utils/enums';

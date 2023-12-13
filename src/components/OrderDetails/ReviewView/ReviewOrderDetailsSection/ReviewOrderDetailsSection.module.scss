@@ -106,6 +106,7 @@
   .tableBody {
     .tableRowGroup {
       border: 1px solid $neutralGray3;
+      border-top: none;
 
       &:last-of-type {
         border-radius: 0 0 8px 8px;

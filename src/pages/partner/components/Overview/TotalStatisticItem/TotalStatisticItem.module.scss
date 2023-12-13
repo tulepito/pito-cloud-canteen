@@ -42,7 +42,7 @@
 .iconWrapper {
   width: 24px;
   height: 24px;
-  @include flexAlign(center, center);
+  @include flexCenter;
   border-radius: 50%;
   background-color: $neutralGray3;
 

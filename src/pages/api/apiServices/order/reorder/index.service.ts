@@ -1,6 +1,8 @@
+import { isEmpty } from 'lodash';
 import { DateTime } from 'luxon';
 
 import type { TDaySession } from '@components/CalendarDashboard/helpers/types';
+import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
 import { generateUncountableIdForOrder } from '@helpers/generateUncountableId';
 import { getInitMemberOrder } from '@pages/api/orders/[orderId]/plan/memberOrder.helper';
 import { createOrUpdateAutomaticStartOrderScheduler } from '@services/awsEventBrigdeScheduler';
@@ -78,6 +80,23 @@ export const reorder = async ({
     },
   ];
 
+  const orderName = `${companyName}_${formatTimestamp(
+    startDate,
+  )} - ${formatTimestamp(endDate)}`;
+  const normalizedOrderMetadata = normalizeOrderMetadata(oldOrderMetadata, {
+    daySession,
+  });
+  const { deliveryHour, deadlineHour } = normalizedOrderMetadata;
+  const initialDeadlineDate = DateTime.fromMillis(startDate)
+    .setZone('Asia/Ho_Chi_Minh')
+    .plus({
+      ...convertHHmmStringToTimeParts(
+        isEmpty(deadlineHour) ? undefined : deadlineHour,
+      ),
+    })
+    .minus({ day: 2 })
+    .toMillis();
+
   const newOrderResponse = await integrationSdk.listings.create(
     {
       authorId: subAccountId,
@@ -85,24 +104,17 @@ export const reorder = async ({
       state: EListingStates.published,
       publicData: {
         companyName,
-        orderName: `${companyName}_${formatTimestamp(
-          startDate,
-        )} - ${formatTimestamp(endDate)}`,
+        orderName,
       },
       metadata: {
         bookerId,
         orderStateHistory,
         orderState,
         companyName,
-        ...normalizeOrderMetadata(oldOrderMetadata, {
-          daySession,
-        }),
+        ...normalizedOrderMetadata,
         startDate,
         endDate,
-        deadlineDate: DateTime.fromMillis(startDate)
-          .setZone('Asia/Ho_Chi_Minh')
-          .minus({ day: 2 })
-          .toMillis(),
+        deadlineDate: initialDeadlineDate,
       },
     },
     { expand: true },
@@ -153,7 +165,6 @@ export const reorder = async ({
 
   updateOrderNumber();
 
-  const { deliveryHour } = oldOrderMetadata;
   if (isGroupOrder && !isCreatedByAdmin && newOrderId) {
     createOrUpdateAutomaticStartOrderScheduler({
       orderId: newOrderId,

@@ -3,7 +3,7 @@ import isEmpty from 'lodash/isEmpty';
 import { DateTime } from 'luxon';
 
 import type { TDaySession } from '@components/CalendarDashboard/helpers/types';
-import { prepareDaySession } from '@helpers/orderHelper';
+import { prepareDaySession } from '@helpers/order/prepareDataHelper';
 import { EOrderStates } from '@src/utils/enums';
 import { ETransition } from '@src/utils/transaction';
 

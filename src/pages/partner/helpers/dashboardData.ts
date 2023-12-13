@@ -3,8 +3,8 @@ import uniq from 'lodash/uniq';
 import {
   calculatePriceQuotationPartner,
   calculateTotalPriceAndDishes,
-  ensureVATSetting,
 } from '@helpers/order/cartInfoHelper';
+import { ensureVATSetting } from '@helpers/order/prepareDataHelper';
 import { Listing } from '@src/utils/data';
 import { formatTimestamp, getTimePeriodBetweenDates } from '@src/utils/dates';
 import { EOrderType, ETimeFrame, ETimePeriodOption } from '@src/utils/enums';

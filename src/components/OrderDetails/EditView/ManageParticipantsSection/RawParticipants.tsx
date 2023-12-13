@@ -53,6 +53,7 @@ export const RawParticipants: React.FC<TRawParticipantsProps> = ({
             key={uuid}
             participant={item}
             hasCheckIcon={isSelectedFood}
+            ableToRemove
           />
         );
 

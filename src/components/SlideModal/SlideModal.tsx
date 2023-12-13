@@ -9,9 +9,10 @@ import css from './SlideModal.module.scss';
 type TSlideModalProps = PropsWithChildren & {
   id: string;
   isOpen: boolean;
+  contentClassName?: string;
   modalTitle?: ReactNode;
   customHeader?: ReactNode;
-  onClose: (e: React.MouseEvent<HTMLElement>) => void;
+  onClose: ((e: React.MouseEvent<HTMLElement>) => void) | (() => void);
   containerClassName?: string;
   openClassName?: string;
   className?: string;
@@ -27,6 +28,7 @@ const SlideModal: React.FC<TSlideModalProps> = (props) => {
     modalTitle,
     customHeader,
     className,
+    contentClassName,
     containerClassName,
     openClassName,
     shouldShowOverlay = false,
@@ -37,6 +39,7 @@ const SlideModal: React.FC<TSlideModalProps> = (props) => {
     containerClassName,
   );
   const openClasses = classNames(css.slideModalOpen, openClassName);
+  const contentClasses = classNames(css.slideModalContent, contentClassName);
 
   return (
     <PopupModal
@@ -57,7 +60,7 @@ const SlideModal: React.FC<TSlideModalProps> = (props) => {
       }
       containerClassName={containerClasses}
       className={className}
-      contentClassName={css.slideModalContent}>
+      contentClassName={contentClasses}>
       {children}
     </PopupModal>
   );

@@ -251,6 +251,7 @@ export const useControlTimeRange = () => {
   useEffect(() => {
     setStartDate(before7DaysAgo);
     setEndDate(yesterday);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return {

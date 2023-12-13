@@ -12,7 +12,7 @@
 }
 
 .headerContainer {
-  @include flexAlign(center, center);
+  @include flexCenter;
   flex-direction: column;
 
   .main {

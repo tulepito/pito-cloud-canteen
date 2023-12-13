@@ -1,10 +1,8 @@
 import { isEmpty, omit } from 'lodash';
 
 import type { TDaySession } from '@components/CalendarDashboard/helpers/types';
-import {
-  isOrderDetailDatePickedFood,
-  prepareDaySession,
-} from '@helpers/orderHelper';
+import { prepareDaySession } from '@helpers/order/prepareDataHelper';
+import { isOrderDetailDatePickedFood } from '@helpers/orderHelper';
 import { denormalisedResponseEntities } from '@services/data';
 import { fetchListing } from '@services/integrationHelper';
 import { Listing } from '@src/utils/data';

@@ -9,10 +9,8 @@ import Badge from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { parseThousandNumber } from '@helpers/format';
-import {
-  calculatePriceQuotationInfoFromOrder,
-  ensureVATSetting,
-} from '@helpers/order/cartInfoHelper';
+import { calculatePriceQuotationInfoFromOrder } from '@helpers/order/cartInfoHelper';
+import { ensureVATSetting } from '@helpers/order/prepareDataHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { useDownloadPriceQuotation } from '@hooks/useDownloadPriceQuotation';
 import { usePrepareOrderDetailPageData } from '@hooks/usePrepareOrderManagementData';

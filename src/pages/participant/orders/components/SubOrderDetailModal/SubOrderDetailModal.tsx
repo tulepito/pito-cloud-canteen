@@ -12,12 +12,12 @@ import OrderEventCardStatus from '@components/CalendarDashboard/components/Order
 import { EVENT_STATUS } from '@components/CalendarDashboard/helpers/constant';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import SlideModal from '@components/SlideModal/SlideModal';
-import { isOver } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { participantOrderManagementThunks } from '@redux/slices/ParticipantOrderManagementPage.slice';
 import { currentUserSelector } from '@redux/slices/user.slice';
 import { participantPaths } from '@src/paths';
 import { CurrentUser } from '@src/utils/data';
+import { isOver } from '@src/utils/dates';
 import { EOrderStates } from '@src/utils/enums';
 import { ETransition } from '@src/utils/transaction';
 

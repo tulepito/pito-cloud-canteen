@@ -3,6 +3,7 @@ import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
 import arrayMutators from 'final-form-arrays';
+import isEmpty from 'lodash/isEmpty';
 
 import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
@@ -43,7 +44,7 @@ const ManageDeletedListFormComponent: React.FC<
   } = props;
   const intl = useIntl();
 
-  const disabledButton = !memberIds || memberIds?.length === 0 || disabled;
+  const disabledButton = isEmpty(memberIds) || disabled;
 
   const deletePermanentlyText = intl.formatMessage({
     id: 'ManageDeletedListForm.deletePermanently',
@@ -69,27 +70,24 @@ const ManageDeletedListFormComponent: React.FC<
         name="memberIds"
         options={memberOptions}
       />
-      {deletedTabData.length > 0 && (
-        <div className={css.actions}>
-          <Button
-            variant="secondary"
-            size="medium"
-            onClick={setAction && setAction(ManageDeletedListFormAction.DELETE)}
-            disabled={disabledButton}
-            type="submit">
-            {deletePermanentlyText}
-          </Button>
-          <Button
-            size="medium"
-            onClick={
-              setAction && setAction(ManageDeletedListFormAction.RESTORE)
-            }
-            disabled={disabledButton}
-            type="submit">
-            {restoreText}
-          </Button>
-        </div>
-      )}
+
+      <div className={css.actions}>
+        <Button
+          variant="secondary"
+          size="medium"
+          onClick={setAction && setAction(ManageDeletedListFormAction.DELETE)}
+          disabled={disabledButton}
+          type="submit">
+          {deletePermanentlyText}
+        </Button>
+        <Button
+          size="medium"
+          onClick={setAction && setAction(ManageDeletedListFormAction.RESTORE)}
+          disabled={disabledButton}
+          type="submit">
+          {restoreText}
+        </Button>
+      </div>
     </Form>
   );
 };

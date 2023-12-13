@@ -17,12 +17,29 @@ const IconAdd: React.FC<TIconAddProps> = (props) => {
       preserveAspectRatio="none"
       width="12"
       height="12"
-      viewBox="0 0 12 12"
       className={classes}
+      viewBox="0 0 12 12"
       xmlns="http://www.w3.org/2000/svg">
       <path
         d="M6.89 10.4V6.888h3.509a.889.889 0 1 0 0-1.779H6.89V1.6a.89.89 0 0 0-1.778 0v3.511h-3.51a.888.888 0 1 0 0 1.778h3.51v3.51a.889.889 0 1 0 1.778 0"
         fillRule="evenodd"
+      />
+    </svg>
+  ) : variant === 'large' ? (
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      className={classes}
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg">
+      <path
+        d="M11 5V19C11 19.5523 11.4477 20 12 20C12.5523 20 13 19.5523 13 19V5C13 4.44772 12.5523 4 12 4C11.4477 4 11 4.44772 11 5Z"
+        fill="#262626"
+      />
+      <path
+        d="M5 13H19C19.5523 13 20 12.5523 20 12C20 11.4477 19.5523 11 19 11H5C4.44772 11 4 11.4477 4 12C4 12.5523 4.44772 13 5 13Z"
+        fill="#262626"
       />
     </svg>
   ) : (

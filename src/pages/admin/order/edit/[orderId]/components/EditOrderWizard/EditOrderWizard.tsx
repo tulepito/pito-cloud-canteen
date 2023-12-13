@@ -6,7 +6,6 @@ import isEmpty from 'lodash/isEmpty';
 import { useRouter } from 'next/router';
 
 import FormWizard from '@components/FormWizard/FormWizard';
-import { ORDER_STATES_TO_ENABLE_EDIT_ABILITY } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { EFlowType } from '@pages/admin/order/components/NavigateButtons/NavigateButtons';
 import ClientView from '@pages/admin/order/StepScreen/ClientView/ClientView';
@@ -20,6 +19,7 @@ import {
   saveDraftEditOrder,
 } from '@redux/slices/Order.slice';
 import { adminPaths } from '@src/paths';
+import { ORDER_STATES_TO_ENABLE_EDIT_ABILITY } from '@src/utils/constants';
 import { Listing } from '@src/utils/data';
 import { EOrderStates, EOrderType } from '@src/utils/enums';
 

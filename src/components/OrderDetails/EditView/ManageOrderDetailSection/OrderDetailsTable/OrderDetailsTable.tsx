@@ -28,8 +28,6 @@ import {
 } from './OrderDetailsTable.utils';
 import { usePrepareTabItems } from './usePrepareTabItems';
 
-import css from './OrderDetailsTable.module.scss';
-
 const tableTabList = Object.values(TABLE_TABS);
 
 const findTabByValueOrId = (tabId: string) => {
@@ -237,30 +235,28 @@ const OrderDetailsTable: React.FC<TOrderDetailsTableProps> = (props) => {
   }, [JSON.stringify(tabId)]);
 
   return (
-    <div className={css.root}>
-      <div>
-        <Tabs
-          disabled={inProgress}
-          items={tabItems}
-          onChange={handleTabChange}
-          defaultActiveKey={defaultActiveKey.toString()}
-        />
-        <AlertConfirmDeleteParticipant
-          isOpen={isDeleteParticipantModalOpen}
-          onClose={turnOffDeleteParticipantModalOpen}
-          onCancel={handleCancelDeleteOrderItem}
-          onConfirm={handleConfirmDeleteOrderItem}
-        />
-        <EditOrderRowModal
-          isOpen={isEditSelectionModalOpen}
-          onClose={handleCloseEditSelectionModal}
-          onSubmit={handleSubmitEditSelectionModal}
-          foodOptions={foodOptions}
-          packagePerMember={packagePerMember}
-          currentMemberOrderData={currentMemberOrderData}
-        />
-      </div>
-    </div>
+    <>
+      <Tabs
+        disabled={inProgress}
+        items={tabItems}
+        onChange={handleTabChange}
+        defaultActiveKey={defaultActiveKey.toString()}
+      />
+      <AlertConfirmDeleteParticipant
+        isOpen={isDeleteParticipantModalOpen}
+        onClose={turnOffDeleteParticipantModalOpen}
+        onCancel={handleCancelDeleteOrderItem}
+        onConfirm={handleConfirmDeleteOrderItem}
+      />
+      <EditOrderRowModal
+        isOpen={isEditSelectionModalOpen}
+        onClose={handleCloseEditSelectionModal}
+        onSubmit={handleSubmitEditSelectionModal}
+        foodOptions={foodOptions}
+        packagePerMember={packagePerMember}
+        currentMemberOrderData={currentMemberOrderData}
+      />
+    </>
   );
 };
 

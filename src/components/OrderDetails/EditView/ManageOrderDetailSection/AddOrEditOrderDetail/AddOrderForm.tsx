@@ -16,6 +16,7 @@ import IconMinus from '@components/Icons/IconMinus/IconMinus';
 import IconPlusWithoutBorder from '@components/Icons/IconPlusWithoutBorder/IconPlusWithoutBorder';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { useViewport } from '@hooks/useViewport';
 import {
   orderDetailsAnyActionsInProgress,
   OrderManagementsAction,
@@ -59,6 +60,7 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
 ) => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
+  const { isMobileLayout } = useViewport();
   const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
   const addOrUpdateMemberOrderInProgress = useAppSelector(
     (state) => state.OrderManagement.addOrUpdateMemberOrderInProgress,
@@ -205,6 +207,8 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
                 { value },
               )
             }
+            maxMenuHeight={isMobileLayout ? 200 : undefined}
+            menuClassName={css.fieldSelectMenu}
             formError={submitErrors?.participantId}
             validate={validateMemberField}
             validateErrorClassName={css.fieldParticipantIdError}
@@ -219,6 +223,7 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
         <div className={css.fieldContainer}>
           <FieldDropdownSelect
             className={css.fieldSelect}
+            dropdownWrapperClassName={css.fieldSelectDropdownWrapper}
             options={parsedFoodOptions}
             disabled={fieldSelectFoodDisable}
             id={'addOrder.foodId'}
@@ -238,31 +243,35 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
           })}
         </Button>
       </div>
-      {planReachMaxCanModify && (
-        <ErrorMessage
-          className={css.error}
-          message={`Bạn đã thay đổi vượt mức quy định (tối đa 10% số lượng người tham gia)`}
-        />
-      )}
-      {planReachMaxRestaurantQuantity && (
-        <ErrorMessage
-          className={css.error}
-          message={`Bạn đã đặt vượt mức tối đa (${maxQuantity} phần)`}
-        />
-      )}
-      {planReachMinRestaurantQuantity && (
-        <ErrorMessage
-          className={css.error}
-          message={`Cần đặt tối thiểu ${minQuantity} phần`}
-        />
-      )}
+
+      <RenderWhen condition={!isMobileLayout}>
+        {planReachMaxCanModify && (
+          <ErrorMessage
+            className={css.error}
+            message={`Bạn đã thay đổi vượt mức quy định (tối đa 10% số lượng người tham gia)`}
+          />
+        )}
+        {planReachMaxRestaurantQuantity && (
+          <ErrorMessage
+            className={css.error}
+            message={`Bạn đã đặt vượt mức tối đa (${maxQuantity} phần)`}
+          />
+        )}
+        {planReachMinRestaurantQuantity && (
+          <ErrorMessage
+            className={css.error}
+            message={`Cần đặt tối thiểu ${minQuantity} phần`}
+          />
+        )}
+      </RenderWhen>
 
       <div className={css.addRequirementContainer}>
         <Button
           type="button"
           variant="inline"
           disabled={fieldSelectFoodDisable}
-          onClick={handleToggleShowHideRequirementField}>
+          onClick={handleToggleShowHideRequirementField}
+          className={css.toggleRequirementBtn}>
           <div className={css.buttonContent}>
             <RenderWhen condition={isRequirementInputShow}>
               <IconMinus />
@@ -289,6 +298,15 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
           </div>
         )}
       </div>
+
+      <Button
+        disabled={submitDisabled}
+        inProgress={addOrUpdateMemberOrderInProgress}
+        className={css.mobileSubmitButton}>
+        {intl.formatMessage({
+          id: 'AddOrderForm.submitButtonText',
+        })}
+      </Button>
     </Form>
   );
 };

@@ -98,7 +98,7 @@ const parseEntitiesToTableData = (paymentRecords: TObject[]) => {
         time: DateTime.fromMillis(Number(subOrderDate || 0))
           .startOf('day')
           .plus({
-            ...convertHHmmStringToTimeParts(deliveryHour.split(' - ')[0]),
+            ...convertHHmmStringToTimeParts(deliveryHour.split('-')[0]),
           })
           .toMillis(),
         state: EOrderDraftStates.pendingApproval,

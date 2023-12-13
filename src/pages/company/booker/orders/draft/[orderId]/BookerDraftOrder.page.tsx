@@ -24,10 +24,10 @@ import RenderWhen from '@components/RenderWhen/RenderWhen';
 import Stepper from '@components/Stepper/Stepper';
 import { BOTTOM_CENTER_TOAST_ID } from '@components/ToastifyProvider/ToastifyProvider';
 import {
-  findSuitableStartDate,
+  findSuitableAnchorDate,
   getParticipantPickingLink,
-  isEnableSubmitPublishOrder,
-} from '@helpers/orderHelper';
+} from '@helpers/order/prepareDataHelper';
+import { isEnableSubmitPublishOrder } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import useRestaurantDetailModal from '@hooks/useRestaurantDetailModal';
@@ -198,8 +198,8 @@ function BookerDraftOrderPage() {
     );
   }, [JSON.stringify(orderDetail), selectedDay]);
 
-  const suitableStartDate = useMemo(() => {
-    const temp = findSuitableStartDate({
+  const suitableAnchorDate = useMemo(() => {
+    const temp = findSuitableAnchorDate({
       selectedDate: selectedDay,
       startDate: startDateTimestamp,
       endDate: endDateTimestamp,
@@ -488,7 +488,7 @@ function BookerDraftOrderPage() {
             <div className={css.main}>
               <CalendarDashboard
                 className={css.calendar}
-                anchorDate={suitableStartDate}
+                anchorDate={suitableAnchorDate}
                 startDate={startDate}
                 endDate={endDate}
                 events={calendarEvents}

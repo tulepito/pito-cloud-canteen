@@ -127,6 +127,10 @@ export const usePrepareOrderDetailPageData = ({
     deliveryHour,
     deliveryAddress,
     canStartOrder,
+    isGroupOrder,
+    deadlineDate,
+    deadlineHour,
+    startDate,
   };
   const countdownSectionData = {
     deadlineHour,

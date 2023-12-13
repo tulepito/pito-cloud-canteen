@@ -9,9 +9,8 @@ import IconLocation from '@components/Icons/IconLocation/IconLocation';
 import IconShop from '@components/Icons/IconShop/IconShop';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
-import { isOver } from '@helpers/orderHelper';
 import { Listing } from '@src/utils/data';
-import { calculateRemainTime } from '@src/utils/dates';
+import { calculateRemainTime, isOver } from '@src/utils/dates';
 import { EImageVariants, EParticipantOrderStatus } from '@src/utils/enums';
 
 import OrderEventCardContentItem from './OrderEventCardContentItem';

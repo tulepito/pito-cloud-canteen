@@ -3,10 +3,10 @@ import { shallowEqual } from 'react-redux';
 import { useRouter } from 'next/router';
 
 import ManageLineItemsSection from '@components/OrderDetails/EditView/ManageOrderDetailSection/ManageLineItemsSection';
+import { checkMinMaxQuantityInPickingState } from '@helpers/order/orderPickingHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 // eslint-disable-next-line import/no-cycle
 import NavigateButtons from '@pages/admin/order/components/NavigateButtons/NavigateButtons';
-import { checkMinMaxQuantityInPickingState } from '@pages/company/orders/[orderId]/picking/OrderDetail.page';
 import {
   setCanNotGoAfterFoodQuantity,
   setCanNotGoAfterOderDetail,

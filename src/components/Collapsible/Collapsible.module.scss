@@ -1,5 +1,6 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/mixins.scss' as *;
 
 .root {
   border: 1px solid $neutralGray3;
@@ -23,11 +24,9 @@
 }
 
 .labelSection {
+  @include flexAlign(center, space-between);
   min-height: unset;
-  display: flex;
-  align-items: center;
   margin-bottom: 16px;
-  justify-content: space-between;
   width: 100%;
 }
 

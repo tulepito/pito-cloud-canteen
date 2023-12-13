@@ -4,8 +4,8 @@ import isEmpty from 'lodash/isEmpty';
 import {
   calculatePriceQuotationInfoFromOrder,
   calculatePriceQuotationPartner,
-  ensureVATSetting,
 } from '@helpers/order/cartInfoHelper';
+import { ensureVATSetting } from '@helpers/order/prepareDataHelper';
 import {
   checkIsOrderHasInProgressState,
   getEditedSubOrders,

@@ -5,25 +5,28 @@ import { useIntl } from 'react-intl';
 import Skeleton from 'react-loading-skeleton';
 import classNames from 'classnames';
 import isEmpty from 'lodash/isEmpty';
-import { DateTime } from 'luxon';
 import { useRouter } from 'next/router';
 
-import IconNoteBook from '@components/Icons/IconNoteBook/IconNoteBook';
-import IconNoteCheckList from '@components/Icons/IconNoteCheckList/IconNoteCheckList';
 import MobileTopContainer from '@components/MobileTopContainer/MobileTopContainer';
 import AlertModal from '@components/Modal/AlertModal';
+import AutomaticPickingForm from '@components/OrderDetails/EditView/AutomaticInfoSection/AutomaticPickingForm';
+import AutomaticStartOrInfoSection from '@components/OrderDetails/EditView/AutomaticInfoSection/AutomaticStartOrInfoSection';
 import GoHomeIcon from '@components/OrderDetails/EditView/GoHomeIcon/GoHomeIcon';
 import ManageLineItemsSection from '@components/OrderDetails/EditView/ManageOrderDetailSection/ManageLineItemsSection';
 import ManageOrdersSection from '@components/OrderDetails/EditView/ManageOrderDetailSection/ManageOrdersSection';
 import ManageParticipantsSection from '@components/OrderDetails/EditView/ManageParticipantsSection/ManageParticipantsSection';
+import MoreOptionsIcon from '@components/OrderDetails/EditView/MoreOptionsIcon/MoreOptionsIcon';
 import OrderDeadlineCountdownSection from '@components/OrderDetails/EditView/OrderDeadlineCountdownSection/OrderDeadlineCountdownSection';
 import OrderLinkSection from '@components/OrderDetails/EditView/OrderLinkSection/OrderLinkSection';
 import OrderTitle from '@components/OrderDetails/EditView/OrderTitle/OrderTitle';
 import SubOrderChangesHistorySection from '@components/OrderDetails/EditView/SubOrderChangesHistorySection/SubOrderChangesHistorySection';
 import type { TReviewInfoFormValues } from '@components/OrderDetails/ReviewView/ReviewInfoSection/ReviewInfoForm';
+import ReviewOrdersResultModal from '@components/OrderDetails/ReviewView/ReviewOrdersResultSection/ReviewOrdersResultModal';
 import ReviewView from '@components/OrderDetails/ReviewView/ReviewView';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import Stepper from '@components/Stepper/Stepper';
+import { checkMinMaxQuantityInPickingState } from '@helpers/order/orderPickingHelper';
+import { checkOrderDetailHasChanged } from '@helpers/order/subOrderChangeAfterStartHelper';
 import { isOrderCreatedByBooker } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
@@ -38,119 +41,15 @@ import {
 } from '@redux/slices/OrderManagement.slice';
 import { BOOKER_CREATE_GROUP_ORDER_STEPS } from '@src/constants/stepperSteps';
 import { companyPaths } from '@src/paths';
-import { diffDays, formatTimestamp } from '@src/utils/dates';
-import { FORMATTED_WEEKDAY } from '@src/utils/options';
-import type { TPlan } from '@src/utils/orderTypes';
+import { diffDays } from '@src/utils/dates';
 import { ETransition } from '@src/utils/transaction';
 import { CurrentUser, Listing } from '@utils/data';
-import {
-  EOrderDraftStates,
-  EOrderStates,
-  EOrderType,
-  EParticipantOrderStatus,
-} from '@utils/enums';
-import type {
-  TListing,
-  TObject,
-  TSubOrderChangeHistoryItem,
-} from '@utils/types';
+import { EOrderDraftStates, EOrderStates, EOrderType } from '@utils/enums';
+import type { TListing } from '@utils/types';
 
 import ModalReachMaxAllowedChanges from '../components/ModalReachMaxAllowedChanges/ModalReachMaxAllowedChanges';
 
 import css from './OrderDetail.module.scss';
-
-const checkOrderDetailHasChanged = (
-  draftSubOrderChangesHistory: Record<string, TSubOrderChangeHistoryItem[]>,
-) => {
-  return Object.keys(draftSubOrderChangesHistory).some((dateAsTimeStamp) => {
-    return draftSubOrderChangesHistory[dateAsTimeStamp].length > 0;
-  });
-};
-
-export const checkMinMaxQuantityInPickingState = (
-  isNormalOrder: boolean,
-  isPicking: boolean,
-  orderDetail: TPlan['orderDetail'] = {},
-) => {
-  if (!isPicking) {
-    return {
-      planValidations: {},
-      orderReachMaxRestaurantQuantity: false,
-      orderReachMinRestaurantQuantity: false,
-    };
-  }
-  let planValidations = {};
-  if (isNormalOrder) {
-    planValidations = Object.keys(orderDetail).reduce(
-      (prev: any, dateAsTimeStamp) => {
-        const currentOrderDetails = orderDetail[dateAsTimeStamp];
-        const { lineItems = [], restaurant = {} } = currentOrderDetails || {};
-        const { maxQuantity = 100, minQuantity = 1 } = restaurant || {};
-        const totalAdded = lineItems.reduce(
-          (result: number, lineItem: TObject) => {
-            result += lineItem?.quantity || 1;
-
-            return result;
-          },
-          0,
-        );
-
-        return {
-          ...prev,
-          [dateAsTimeStamp]: {
-            planReachMinRestaurantQuantity: totalAdded < minQuantity,
-            planReachMaxRestaurantQuantity: totalAdded > maxQuantity,
-          },
-        };
-      },
-      {},
-    );
-  } else {
-    planValidations = Object.keys(orderDetail).reduce(
-      (prev: any, dateAsTimeStamp) => {
-        const currentOrderDetails = orderDetail[dateAsTimeStamp] || {};
-        const { memberOrders = {}, restaurant = {} } = currentOrderDetails;
-        const { minQuantity = 0, maxQuantity = 100 } = restaurant;
-        const totalAdded = Object.keys(memberOrders).filter(
-          (f) =>
-            !!memberOrders[f].foodId &&
-            memberOrders[f].status === EParticipantOrderStatus.joined,
-        ).length;
-
-        return {
-          ...prev,
-          [dateAsTimeStamp]: {
-            planReachMinRestaurantQuantity: totalAdded < minQuantity,
-            planReachMaxRestaurantQuantity: totalAdded > maxQuantity,
-          },
-        };
-      },
-      {},
-    );
-  }
-  const orderReachMinRestaurantQuantity = Object.keys(planValidations).some(
-    (dateAsTimeStamp) => {
-      const { planReachMinRestaurantQuantity } =
-        planValidations[dateAsTimeStamp as keyof typeof planValidations] || {};
-
-      return planReachMinRestaurantQuantity;
-    },
-  );
-  const orderReachMaxRestaurantQuantity = Object.keys(planValidations).some(
-    (dateAsTimeStamp) => {
-      const { planReachMaxRestaurantQuantity } =
-        planValidations[dateAsTimeStamp as keyof typeof planValidations];
-
-      return planReachMaxRestaurantQuantity;
-    },
-  );
-
-  return {
-    planValidations,
-    orderReachMaxRestaurantQuantity,
-    orderReachMinRestaurantQuantity,
-  };
-};
 
 enum EPageViewMode {
   edit = 'edit',
@@ -178,7 +77,12 @@ const OrderDetailPage = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { isMobileLayout } = useViewport();
-  const confirmCancelOrderActions = useBoolean(false);
+  const sendNotificationModalControl = useBoolean();
+  const manageParticipantModalControl = useBoolean();
+  const managePickingResultModalControl = useBoolean();
+  const autoPickingControl = useBoolean();
+  const automaticConfirmOrderMobileControl = useBoolean();
+  const confirmCancelOrderActions = useBoolean();
   const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
   const {
     query: { orderId, timestamp },
@@ -190,6 +94,7 @@ const OrderDetailPage = () => {
   const [showReachMaxAllowedChangesModal, setShowReachMaxAllowedChangesModal] =
     useState<'reach_max' | 'reach_min' | null>(null);
   const confirmGoHomeControl = useBoolean();
+  const moreOptionsModalControl = useBoolean();
   const { handler: onDownloadReviewOrderResults } = useExportOrderDetails();
   const currentUser = useAppSelector((state) => state.user.currentUser);
   const cancelPickingOrderInProgress = useAppSelector(
@@ -226,21 +131,13 @@ const OrderDetailPage = () => {
   const planId = Listing(planData as TListing).getId();
   const userId = CurrentUser(currentUser!).getId();
   const isCreatedByBooker = isOrderCreatedByBooker(orderStateHistory);
+
+  const isAnyMobileModalOpening = moreOptionsModalControl.value;
   const isNormalOrder = orderType === EOrderType.normal;
   const isPickingOrder = orderState === EOrderStates.picking;
   const isDraftEditing = orderState === EOrderStates.inProgress;
   const isEditViewMode = viewMode === EPageViewMode.edit;
   const isViewCartDetailMode = viewMode === EPageViewMode.cartDetail;
-
-  const normalizedDeliveryHour = deliveryHour?.includes('-')
-    ? deliveryHour.split('-')[0]
-    : deliveryHour;
-  const automaticConfirmDate = DateTime.fromMillis(Number(startDate)).minus({
-    days: 1,
-  });
-  const formattedAutomaticConfirmOrder = `${
-    FORMATTED_WEEKDAY[automaticConfirmDate.weekday]
-  }, ${formatTimestamp(automaticConfirmDate.toMillis(), 'dd/MM/yyyy')}`;
 
   const {
     planValidationsInProgressState,
@@ -461,37 +358,20 @@ const OrderDetailPage = () => {
             (!isPickingOrder && orderDetailsNotChanged)
           }
           isDraftEditing={isDraftEditing}
+          shouldHideBottomContainer={isAnyMobileModalOpening}
         />
         <RenderWhen condition={!isNormalOrder}>
           <RenderWhen condition={isCreatedByBooker}>
-            <div className={css.infoPart}>
-              <div className={css.columnContainer}>
-                <IconNoteCheckList />
-                <div>
-                  <div className={css.columnTitle}>Tự động đặt đơn</div>
-                  <div>
-                    Đơn sẽ được tự động đặt vào lúc{' '}
-                    <b>
-                      {normalizedDeliveryHour} {formattedAutomaticConfirmOrder}
-                    </b>
-                    . Trường hợp nếu đến hạn mà không đủ số lượng đặt món thì
-                    đơn sẽ bị hủy.
-                  </div>
-                </div>
-              </div>
-              <div className={css.columnContainer}>
-                <IconNoteBook />
-                <div>
-                  <div className={css.columnTitle}>
-                    Tự động hủy tham gia cho thành viên
-                  </div>
-                  <div>
-                    Nếu quá thời hạn mà thành viên chưa chọn món thì sẽ được xem
-                    như là không tham gia ngày ăn.
-                  </div>
-                </div>
-              </div>
-            </div>
+            <AutomaticStartOrInfoSection
+              className={css.infoPart}
+              startDate={startDate}
+              deliveryHour={deliveryHour}
+              mobileModalControl={automaticConfirmOrderMobileControl}
+              autoPickingFormInitialValues={{
+                autoPicking: autoPickingControl.value,
+              }}
+              handleAutoPickingChange={autoPickingControl.toggle}
+            />
           </RenderWhen>
           <div className={leftPartClasses}>
             <ManageOrdersSection
@@ -507,6 +387,12 @@ const OrderDetailPage = () => {
               planReachMinRestaurantQuantity={planReachMinRestaurantQuantity}
             />
           </div>
+          <ReviewOrdersResultModal
+            isOpen={managePickingResultModalControl.value}
+            onClose={managePickingResultModalControl.setFalse}
+            data={reviewViewData.reviewResultData}
+            onDownloadReviewOrderResults={onDownloadReviewOrderResults}
+          />
           <div className={rightPartClasses}>
             <OrderDeadlineCountdownSection
               className={css.container}
@@ -514,22 +400,35 @@ const OrderDetailPage = () => {
               ableToUpdateOrder={ableToUpdateOrder}
             />
             <OrderLinkSection
-              className={css.container}
+              className={css.mobileContainer}
               data={editViewData.linkSectionData}
               ableToUpdateOrder={ableToUpdateOrder}
+              shouldHideOnMobileView
+              mobileModalControl={sendNotificationModalControl}
             />
             <ManageParticipantsSection
-              className={css.container}
+              className={css.mobileContainer}
               data={editViewData.manageParticipantData}
               ableToUpdateOrder={ableToUpdateOrder}
+              shouldHideOnMobileView
+              mobileModalControl={manageParticipantModalControl}
             />
-            {isDraftEditing && (
+            <RenderWhen condition={!isMobileLayout && isDraftEditing}>
               <SubOrderChangesHistorySection
                 className={css.container}
                 {...subOrderChangesHistorySectionProps}
               />
-            )}
+            </RenderWhen>
           </div>
+          <RenderWhen condition={isCreatedByBooker}>
+            <div className={css.autoPickingPart}>
+              <AutomaticPickingForm
+                initialValues={{ autoPicking: autoPickingControl.value }}
+                handleFieldChange={autoPickingControl.toggle}
+                onSubmit={() => {}}
+              />
+            </div>
+          </RenderWhen>
           <RenderWhen.False>
             <div
               className={
@@ -546,7 +445,8 @@ const OrderDetailPage = () => {
                 currentViewDate={currentViewDate}
                 minQuantity={minQuantity}
               />
-              {isDraftEditing && (
+
+              <RenderWhen condition={!isMobileLayout && isDraftEditing}>
                 <SubOrderChangesHistorySection
                   className={classNames(
                     css.container,
@@ -554,7 +454,7 @@ const OrderDetailPage = () => {
                   )}
                   {...subOrderChangesHistorySectionProps}
                 />
-              )}
+              </RenderWhen>
             </div>
           </RenderWhen.False>
         </RenderWhen>
@@ -701,6 +601,32 @@ const OrderDetailPage = () => {
     }
   }, [isMobileLayout, isViewCartDetailMode]);
 
+  useEffect(() => {
+    if (isCreatedByBooker && !isNormalOrder) {
+      automaticConfirmOrderMobileControl.setTrue();
+    }
+  }, [isCreatedByBooker, isNormalOrder]);
+
+  const goHomeIcon = <GoHomeIcon control={confirmGoHomeControl} />;
+  const moreOptionsIcon = (
+    <MoreOptionsIcon
+      control={moreOptionsModalControl}
+      options={[
+        {
+          content: 'Danh sách thành viên',
+          onClick: manageParticipantModalControl.setTrue,
+        },
+        {
+          content: 'Chia sẻ liên kết đặt hàng',
+          onClick: sendNotificationModalControl.setTrue,
+        },
+        {
+          content: 'Kết quả chọn món',
+          onClick: managePickingResultModalControl.setTrue,
+        },
+      ]}
+    />
+  );
   let content = null;
   const stepperProps = {
     steps: BOOKER_CREATE_GROUP_ORDER_STEPS,
@@ -717,7 +643,10 @@ const OrderDetailPage = () => {
       ? handleGoBackFromViewCartDetailMode
       : handleGoBackFromReviewMode,
     actionPart: isEditViewMode ? (
-      <GoHomeIcon control={confirmGoHomeControl} />
+      <div className={css.mobileTopActionPart}>
+        {goHomeIcon}
+        <RenderWhen condition={!isNormalOrder}>{moreOptionsIcon}</RenderWhen>
+      </div>
     ) : null,
   };
 
