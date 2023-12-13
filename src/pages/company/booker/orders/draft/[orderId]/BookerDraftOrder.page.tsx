@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { Event } from 'react-big-calendar';
 import { shallowEqual } from 'react-redux';
+import { toast } from 'react-toastify';
 import classNames from 'classnames';
 import isEmpty from 'lodash/isEmpty';
 import Image from 'next/image';
@@ -16,10 +17,12 @@ import { getBookerMockupSubOrder } from '@components/CalendarDashboard/helpers/m
 import useSelectDay from '@components/CalendarDashboard/hooks/useSelectDay';
 import IconEmpty from '@components/Icons/IconEmpty/IconEmpty';
 import IconHome from '@components/Icons/IconHome/IconHome';
+import IconMagicWand from '@components/Icons/IconMagicWand/IconMagicWand';
 import IconPlus from '@components/Icons/IconPlus/IconPlus';
 import IconSetting from '@components/Icons/IconSetting/IconSetting';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import Stepper from '@components/Stepper/Stepper';
+import { BOTTOM_CENTER_TOAST_ID } from '@components/ToastifyProvider/ToastifyProvider';
 import {
   findSuitableStartDate,
   getParticipantPickingLink,
@@ -67,7 +70,10 @@ import {
 } from './restaurants/hooks/calendar';
 import { useGetBoundaryDates } from './restaurants/hooks/dateTime';
 import { useGetOrder } from './restaurants/hooks/orderData';
-import { BookerDraftOrderPageThunks } from './BookerDraftOrderPage.slice';
+import {
+  BookerDraftOrderPageActions,
+  BookerDraftOrderPageThunks,
+} from './BookerDraftOrderPage.slice';
 
 import css from './BookerDraftOrder.module.scss';
 
@@ -113,6 +119,10 @@ function BookerDraftOrderPage() {
   );
   const participantData = useAppSelector(
     (state) => state.BookerDraftOrderPage.participantData,
+  );
+  const toastShowedAfterSuccessfullyCreatingOrder = useAppSelector(
+    (state) =>
+      state.BookerDraftOrderPage.toastShowedAfterSuccessfullyCreatingOrder,
   );
   const restaurantFood = useAppSelector(
     (state) => state.BookerSelectRestaurant.restaurantFood,
@@ -388,6 +398,32 @@ function BookerDraftOrderPage() {
       }
     }
   }, [orderId, orderState]);
+
+  const toastOrderSuccessfullyCreated = () => {
+    dispatch(
+      BookerDraftOrderPageActions.setToastShowedAfterSuccessfullyCreatingOrder(
+        false,
+      ),
+    );
+    toast.info(
+      'PITO đã gợi ý một menu phù hợp dựa trên ngân sách và các yêu cầu của bạn.',
+      {
+        closeButton: false,
+        autoClose: 5000,
+        hideProgressBar: true,
+        containerId: BOTTOM_CENTER_TOAST_ID,
+        toastId: 'BookerDraftOrderPage.OrderSuccessfullyCreated',
+        icon: <IconMagicWand className={css.toastIcon} />,
+        className: css.toastContainer,
+      },
+    );
+  };
+
+  useEffect(() => {
+    if (toastShowedAfterSuccessfullyCreatingOrder) {
+      toastOrderSuccessfullyCreated();
+    }
+  }, [toastShowedAfterSuccessfullyCreatingOrder]);
 
   useEffect(() => {
     const mockupSubOrder = getBookerMockupSubOrder(startDate);

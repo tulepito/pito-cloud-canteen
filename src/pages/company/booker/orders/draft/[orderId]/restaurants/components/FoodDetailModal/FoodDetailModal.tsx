@@ -86,6 +86,7 @@ const FoodDetailModal: React.FC<TFoodDetailModalProps> = ({
               alt={title}
               image={foodGetter.getImages()[0]}
               variants={[EImageVariants.default]}
+              emptyType="food"
             />
           </div>
           <div className={css.topContent}>

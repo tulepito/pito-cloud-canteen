@@ -25,6 +25,9 @@
   border-radius: 8px;
   margin-bottom: 12px;
   border: 1px solid $neutralGray3;
+  min-height: 412px;
+  display: flex;
+  flex-direction: column;
   position: relative;
 
   &.walkthrough[data-tour='step-1']::before {
@@ -125,6 +128,7 @@
 
 .content {
   margin-bottom: 12px;
+  flex: 1;
 
   &.disable {
     opacity: 0.5;
@@ -163,7 +167,7 @@
     @include lineClamp(3);
 
     @include viewportLarge {
-      width: 95px;
+      @include lineClamp(1);
     }
   }
 }
@@ -175,6 +179,7 @@
 .recommendRestaurant {
   cursor: pointer;
   flex-basis: 18px;
+  min-width: 18px;
   position: relative;
 }
 
@@ -247,15 +252,15 @@
 }
 
 .metaSection {
-  @include flexAlign(flex-start, center);
-  flex-wrap: wrap;
-  flex-direction: column;
+  @include flexAlign(flex-start);
+  flex-wrap: nowrap;
   gap: 8px;
 
   .metaItem {
     @include flexAlign(center, center);
     @include textTemplate(12px, 400, 16px);
     gap: 4px;
+    white-space: nowrap;
   }
 
   .metaItemIcon {

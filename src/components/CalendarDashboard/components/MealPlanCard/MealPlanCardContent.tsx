@@ -147,6 +147,7 @@ const MealPlanCardContent: React.FC<TMealPlanCardContentProps> = ({
                 key={food.key}
                 className={css.foodListItem}
                 role="button"
+                title={food.name}
                 onClick={() => handleOpenFoodDetail(food.key)}>
                 • {food.name}
               </li>

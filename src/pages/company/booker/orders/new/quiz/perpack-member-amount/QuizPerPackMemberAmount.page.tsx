@@ -5,6 +5,7 @@ import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import { useRouter } from 'next/router';
 
+import FieldPackagePerMemer from '@components/FieldPackagePerMemer/FieldPackagePerMemer';
 import { FieldTextInputComponent } from '@components/FormFields/FieldTextInput/FieldTextInput';
 import { parseThousandNumber } from '@helpers/format';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
@@ -26,10 +27,6 @@ import css from './QuizPerPackMemberAmount.module.scss';
 type TQuizPerPackMemberAmountFormValues = {
   packagePerMember: string;
   memberAmount: string;
-};
-
-const VNDIcon = () => {
-  return <div className={css.vndIcon}>đ</div>;
 };
 
 const Amount = () => {
@@ -168,20 +165,17 @@ const QuizPerPackMemberAmountPage: React.FC<
       stepInfo={stepInfo}
       firstTimeOrder={firstTimeOrder}>
       <form className={css.formContainer}>
-        <FieldTextInputComponent
+        <FieldPackagePerMemer
+          form={form}
+          tooltipOverlayClassName={css.tooltipOverlay}
           id="packagePerMember"
           name="packagePerMember"
-          input={packagePerMember.input}
-          meta={packagePerMember.meta}
           label={intl.formatMessage({
             id: 'QuizPerPackMemberAmountPage.packagePerMember.label',
           })}
           placeholder={intl.formatMessage({
             id: 'QuizPerPackMemberAmountPage.packagePerMember.placeholder',
           })}
-          type="text"
-          className={css.numberInput}
-          rightIcon={<VNDIcon />}
         />
         <FieldTextInputComponent
           className={css.inputWrapper}

@@ -25,6 +25,7 @@ type TBookerDraftOrderPageState = {
   participantData: TObject[];
 
   addOrderParticipantsInProgress: boolean;
+  toastShowedAfterSuccessfullyCreatingOrder: boolean;
   walkthroughStep: number;
 };
 const initialState: TBookerDraftOrderPageState = {
@@ -37,6 +38,7 @@ const initialState: TBookerDraftOrderPageState = {
   participantData: [],
 
   addOrderParticipantsInProgress: false,
+  toastShowedAfterSuccessfullyCreatingOrder: false,
   walkthroughStep: -1,
 };
 
@@ -142,6 +144,10 @@ const BookerDraftOrderPageSlice = createSlice({
     selectCalendarDate: (state, { payload }) => ({
       ...state,
       selectedCalendarDate: payload,
+    }),
+    setToastShowedAfterSuccessfullyCreatingOrder: (state, { payload }) => ({
+      ...state,
+      toastShowedAfterSuccessfullyCreatingOrder: payload,
     }),
     setWalkthroughStep: (state, { payload }) => ({
       ...state,
