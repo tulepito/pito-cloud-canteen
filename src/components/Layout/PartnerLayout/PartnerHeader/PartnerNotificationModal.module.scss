@@ -1,5 +1,6 @@
 @use '/src/styles/mixins.scss' as *;
 @use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
 
 .root {
   button {
@@ -34,9 +35,11 @@
     }
   }
   .container {
-    width: 440px;
-    height: min(50vh, 690px);
-    overflow: hidden auto;
+    @include viewportLarge {
+      overflow: hidden auto;
+      width: 440px;
+      height: min(50vh, 690px);
+    }
   }
 
   .bottom {
@@ -49,5 +52,18 @@
     .markAllViewedBtn {
       padding: 4px;
     }
+  }
+}
+
+.modalContainer.modalContainer {
+  padding: 0;
+}
+
+.header {
+  @include flexAlign(center, space-between);
+  padding: 16px 16px;
+
+  .title {
+    @include textTemplate(18px, 700, 24px);
   }
 }

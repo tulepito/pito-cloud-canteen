@@ -298,6 +298,54 @@ export const createFirebaseDocNotification = async (
         break;
       }
 
+      case ENotificationType.PARTNER_FOOD_ACCEPTED_BY_ADMIN: {
+        const { foodName, foodId } = notificationParams;
+        data = {
+          ...data,
+          foodName,
+          foodId,
+          relatedLink: `/partner/products/food`,
+        };
+
+        break;
+      }
+
+      case ENotificationType.PARTNER_FOOD_REJECTED_BY_ADMIN: {
+        const { foodName, foodId } = notificationParams;
+        data = {
+          ...data,
+          foodName,
+          foodId,
+          relatedLink: `/partner/products/food`,
+        };
+
+        break;
+      }
+
+      case ENotificationType.PARTNER_PROFILE_UPDATED_BY_ADMIN: {
+        const { partnerName } = notificationParams;
+        data = {
+          ...data,
+          partnerName,
+          relatedLink: `/partner/settings/account`,
+        };
+
+        break;
+      }
+
+      case ENotificationType.PARTNER_SUB_ORDER_CHANGED: {
+        const { orderId, subOrderDate, companyName } = notificationParams;
+        data = {
+          ...data,
+          orderId,
+          subOrderDate,
+          companyName,
+          relatedLink: `/partner/orders/${orderId}_${subOrderDate}`,
+        };
+
+        break;
+      }
+
       default:
         break;
     }
