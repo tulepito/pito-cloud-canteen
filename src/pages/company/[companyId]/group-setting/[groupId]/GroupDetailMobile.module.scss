@@ -40,6 +40,8 @@
 .actionMoreItem {
   height: 40px;
   margin-bottom: 16px;
+  margin-top: 24px;
+
   span {
     @include textTemplate(16px, $fontWeightBold, 24px);
   }
