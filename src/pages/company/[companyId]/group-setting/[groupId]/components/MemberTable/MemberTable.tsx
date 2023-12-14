@@ -49,14 +49,16 @@ const MemberTable: React.FC<TMemberTableProps> = ({
             <div className={css.cellValue}>
               <span>{email}</span>
             </div>
-            <IconArrow
-              direction="down"
-              onClick={collapseRowController?.toggle}
-              className={classNames(
-                css.iconArrow,
-                collapseRowController?.value && css.rotate,
-              )}
-            />
+            <div className={css.iconArrowContainer}>
+              <IconArrow
+                direction="down"
+                onClick={collapseRowController?.toggle}
+                className={classNames(
+                  css.iconArrow,
+                  collapseRowController?.value && css.rotate,
+                )}
+              />
+            </div>
           </div>
         );
       },
