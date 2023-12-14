@@ -27,6 +27,7 @@
   }
 
   .addGroup {
+    width: 100%;
     padding: 12px 20px;
     @include viewportXSmall {
       width: 240px;

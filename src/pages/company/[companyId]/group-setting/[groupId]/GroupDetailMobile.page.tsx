@@ -202,6 +202,11 @@ const GroupDetailMobilePage = () => {
     router.back();
   };
 
+  const handleEditing = () => {
+    onEditing();
+    onCloseMoreSlideModal();
+  };
+
   const onDeleteMember = (id: string, email: string) => {
     setDeletingMemberInfo({ id, email });
     openDeleteMemberConfirmationModal();
@@ -280,7 +285,7 @@ const GroupDetailMobilePage = () => {
         modalTitle={intl.formatMessage({
           id: 'GroupDetail.actionOther',
         })}>
-        <div onClick={onEditing} className={css.actionMoreItem}>
+        <div onClick={handleEditing} className={css.actionMoreItem}>
           <span>
             {intl.formatMessage({ id: 'GroupDetail.changeGroupName' })}
           </span>

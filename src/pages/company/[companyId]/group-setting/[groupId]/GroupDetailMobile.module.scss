@@ -39,10 +39,7 @@
 
 .actionMoreItem {
   height: 40px;
-
-  &:first-child {
-    padding-bottom: 16px;
-  }
+  margin-bottom: 16px;
   span {
     @include textTemplate(16px, $fontWeightBold, 24px);
   }
