@@ -150,6 +150,8 @@ exports.handler = async (_event) => {
               ].includes(memberOrders[memberId].status)
             ) {
               newMemberOrderResult[memberId] = memberOrders[memberId];
+
+              return newMemberOrderResult;
             }
 
             const memberResponse = memberResponses.find(
