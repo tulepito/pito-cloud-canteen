@@ -7,11 +7,12 @@ import {
 } from '@pages/api/apiServices/company/rating.service';
 import cookies from '@services/cookie';
 import { fetchListing } from '@services/integrationHelper';
+import { createNativeNotificationToPartner } from '@services/nativeNotification';
 import { createFirebaseDocNotification } from '@services/notifications';
 import participantChecker from '@services/permissionChecker/participant';
 import { handleError } from '@services/sdk';
 import { Listing } from '@src/utils/data';
-import { ENotificationType } from '@src/utils/enums';
+import { ENativeNotificationType, ENotificationType } from '@src/utils/enums';
 
 import { updateFirebaseDocument } from '../document/document.service';
 
@@ -27,13 +28,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           imageIdList,
           planId,
         } = req.body;
-        const { reviewerId, timestamp } = rating;
+        const { reviewerId, timestamp, generalRating, detailRating } = rating;
         const plan = await fetchListing(planId);
         const planListing = Listing(plan);
         const { orderDetail = {} } = planListing.getMetadata();
         const { foodId } =
           orderDetail[timestamp]?.memberOrders?.[reviewerId] || {};
-        const food = await fetchListing(foodId);
+        const food = await fetchListing(foodId, ['author']);
         const foodListing = Listing(food);
         const { title: foodName } = foodListing.getAttributes();
 
@@ -59,6 +60,20 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           foodName,
         });
 
+        if (
+          generalRating <= 2 ||
+          (detailRating?.food.rating && detailRating?.food.rating <= 2) ||
+          (detailRating?.packaging.rating &&
+            detailRating?.packaging.rating <= 2)
+        ) {
+          createNativeNotificationToPartner(
+            ENativeNotificationType.PartnerSubOrderNegativeRating,
+            {
+              partner: food.author,
+              subOrderDate: timestamp,
+            },
+          );
+        }
         res.status(200).json({ success: true });
       } catch (error) {
         handleError(res, error);

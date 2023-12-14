@@ -328,6 +328,41 @@ export const createNativeNotificationToPartner = async (
         await Promise.allSettled(oneSingals);
       }
       break;
+    case ENativeNotificationType.AdminChangePartnerInformation:
+      {
+        const { partnerName } = notificationParams;
+
+        const url = `${BASE_URL}partner/settings/account/info`;
+
+        oneSignalUserIds.forEach((oneSignalUserId: string) => {
+          sendNotification({
+            title: `Thông tin ${partnerName} đã được chỉnh sửa`,
+            content: `Thông tin thương hiệu của bạn đã được chỉnh sửa. Nhấn để xem chi tiết.`,
+            url,
+            oneSignalUserId,
+          });
+        });
+      }
+      break;
+
+    case ENativeNotificationType.PartnerSubOrderNegativeRating:
+      {
+        const { subOrderDate } = notificationParams;
+        const url = `${BASE_URL}/partner/reviews?type=bad,very_bad`;
+
+        oneSignalUserIds.forEach((oneSignalUserId: string) => {
+          sendNotification({
+            title: '😢 Bạn vừa nhận được một đánh giá tiêu cực',
+            content: `Đơn hàng ngày ${formatTimestamp(
+              +subOrderDate!,
+              'dd/MM/yyyy',
+            )} vừa nhận được một đánh giá tiêu cực từ khách hàng. Nhấn để xem chi tiết!`,
+            url,
+            oneSignalUserId,
+          });
+        });
+      }
+      break;
 
     default:
       break;

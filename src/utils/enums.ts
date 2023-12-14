@@ -403,8 +403,10 @@ export enum ENativeNotificationType {
   AdminTransitFoodStateToApprove = 'AdminTransitFoodStateToApprove',
   AdminTransitFoodStateToReject = 'AdminTransitFoodStateToReject',
   AdminUpdateOrder = 'AdminUpdateOrder',
+  AdminChangePartnerInformation = 'AdminChangePartnerInformation',
   PartnerTransitOrderToCanceled = 'PartnerTransitOrderToCanceled',
   PartnerEditSubOrder = 'PartnerEditSubOrder',
+  PartnerSubOrderNegativeRating = 'PartnerSubOrderNegativeRating',
 }
 
 export enum EFoodApprovalState {
