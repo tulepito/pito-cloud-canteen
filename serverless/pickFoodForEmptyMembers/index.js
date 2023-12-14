@@ -144,7 +144,10 @@ exports.handler = async (_event) => {
         const newMemberOrder = Object.keys(memberOrders).reduce(
           (newMemberOrderResult, memberId) => {
             if (
-              memberOrders[memberId].status !== EParticipantOrderStatus.empty
+              ![
+                EParticipantOrderStatus.empty,
+                EParticipantOrderStatus.notJoined,
+              ].includes(memberOrders[memberId].status)
             ) {
               newMemberOrderResult[memberId] = memberOrders[memberId];
             }
