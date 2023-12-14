@@ -1,5 +1,6 @@
 @use '/src/styles/mixins.scss' as *;
 @use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
 
 @mixin orderDetailColumnsLayout {
   padding: 8px 16px;
@@ -12,7 +13,6 @@
   & > div {
     word-break: break-word;
   }
-
   & > div:nth-of-type(1) {
     flex-basis: 30px;
     text-align: center;
@@ -32,54 +32,111 @@
 
 .orderDetailSection {
   padding-top: 20px;
+}
 
+.mobileLayout {
   .sectionTitle {
-    @include textTemplate(12px, 700, 16px);
-    margin-bottom: 16px;
+    @include textTemplate(9px, 700, 1.5);
+    margin-bottom: 9px;
+
+    @include viewportMedium {
+      margin-bottom: 16px;
+      font-size: 12px;
+    }
   }
 
   .sectionContentContainer {
-    border: 1px solid $neutralGray3;
-    border-radius: 8px;
-    overflow: hidden;
-
     .tableHead {
       @include orderDetailColumnsLayout;
-      background-color: $neutralGray6;
-      @include textTemplate(10px, 700, 16px);
-      border-bottom: 1px solid $neutralGray5;
-      color: $neutralGray1;
+      padding: 4px 8px;
+      @include textTemplate(8px, 700, 16px);
+      @include viewportMedium {
+        font-size: 10px;
+        padding: 8px 16px;
+      }
     }
 
     .tableRowGroup {
-      &:last-of-type {
-        border-radius: 0 0 8px 8px;
-
-        .row:last-of-type {
-          border-bottom: none;
-        }
-      }
-
       .groupTitle,
       .row {
         @include orderDetailColumnsLayout;
+        padding: 4px 8px;
+        @include viewportMedium {
+          padding: 8px 16px;
+        }
       }
 
       .groupTitle {
-        background-color: $neutralGray3;
-        @include textTemplate(12px, 700, 16px);
+        @include textTemplate(7px, 700, 16px);
+        @include viewportMedium {
+          font-size: 12px;
+        }
 
         .restaurantName {
-          @include textTemplate(10px, 400, 16px);
+          @include textTemplate(6px, 400, 16px);
           color: $neutralGray6;
+          @include viewportMedium {
+            font-size: 10px;
+          }
         }
       }
 
       .row {
-        @include textTemplate(12px, 400, 16px);
-        transition: 0.25s linear;
-        border-bottom: 1px solid $neutralGray3;
+        @include textTemplate(7px, 400, 16px);
+        @include viewportMedium {
+          font-size: 12px;
+        }
       }
+    }
+  }
+}
+
+.sectionTitle {
+  @include textTemplate(12px, 700, 16px);
+  margin-bottom: 16px;
+}
+
+.sectionContentContainer {
+  border: 1px solid $neutralGray3;
+  border-radius: 8px;
+  overflow: hidden;
+
+  .tableHead {
+    @include orderDetailColumnsLayout;
+    background-color: $neutralGray6;
+    @include textTemplate(10px, 700, 16px);
+    border-bottom: 1px solid $neutralGray5;
+    color: $neutralGray1;
+  }
+
+  .tableRowGroup {
+    &:last-of-type {
+      border-radius: 0 0 8px 8px;
+
+      .row:last-of-type {
+        border-bottom: none;
+      }
+    }
+
+    .groupTitle,
+    .row {
+      @include orderDetailColumnsLayout;
+    }
+
+    .groupTitle {
+      background-color: $neutralGray3;
+      @include textTemplate(12px, 700, 16px);
+
+      .restaurantName {
+        @include textTemplate(10px, 400, 16px);
+        color: $neutralGray6;
+      }
+    }
+
+    .row {
+      @include textTemplate(12px, 400, 16px);
+      transition: 0.25s linear;
+      border-bottom: 1px solid $neutralGray3;
     }
   }
 }

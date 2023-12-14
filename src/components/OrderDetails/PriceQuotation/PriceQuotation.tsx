@@ -1,9 +1,10 @@
 import { useIntl } from 'react-intl';
+import classNames from 'classnames';
 
 import PitoLogo from '@components/PitoLogo/PitoLogo';
 import { EPartnerVATSetting } from '@src/utils/enums';
 import { formatTimestamp } from '@utils/dates';
-import type { TObject } from '@utils/types';
+import type { TDefaultProps, TObject } from '@utils/types';
 
 import type { TReviewInfoFormValues } from '../ReviewView/ReviewInfoSection/ReviewInfoForm';
 
@@ -13,11 +14,12 @@ import OrderDetailSection from './OrderDetailSection';
 
 import css from './PriceQuotation.module.scss';
 
-type TPriceQuotationProps = {
+type TPriceQuotationProps = TDefaultProps & {
   subOrderDate?: number | string;
   isPartnerQuotation?: boolean;
   vatSetting?: EPartnerVATSetting;
   shouldSkipVAT?: boolean;
+  shouldResponsive?: boolean;
   data: {
     customerData: Partial<TReviewInfoFormValues> & {
       email: string;
@@ -50,6 +52,8 @@ const PriceQuotation: React.FC<TPriceQuotationProps> = ({
   isPartnerQuotation = false,
   data,
   vatSetting = EPartnerVATSetting.vat,
+  className,
+  shouldResponsive = false,
 }) => {
   const {
     customerData,
@@ -58,6 +62,12 @@ const PriceQuotation: React.FC<TPriceQuotationProps> = ({
     orderDetailData,
   } = data;
   const intl = useIntl();
+
+  const classes = classNames(
+    css.root,
+    { [css.mobileLayout]: shouldResponsive },
+    className,
+  );
 
   const formattedStartDate = formatTimestamp(startDate, 'dd/MM/yyyy');
   const formattedEndDate = formatTimestamp(endDate, 'dd/MM/yyyy');
@@ -70,12 +80,14 @@ const PriceQuotation: React.FC<TPriceQuotationProps> = ({
     subOrderDate,
     isPartnerQuotation,
     deliveryHour,
+    shouldResponsive,
   };
 
   const cartProps = {
     ...cartData,
     isPartnerQuotation,
     vatSetting,
+    shouldResponsive,
   };
 
   const subOrderDayIndex = subOrderDate
@@ -88,7 +100,7 @@ const PriceQuotation: React.FC<TPriceQuotationProps> = ({
       : orderTitle;
 
   return (
-    <div className={css.root} id="priceQuotation">
+    <div className={classes} id="priceQuotation">
       <div className={css.titleContainer} id="header">
         <div>
           {intl.formatMessage(
@@ -104,6 +116,7 @@ const PriceQuotation: React.FC<TPriceQuotationProps> = ({
         <OrderDetailSection
           itemId="quoteItem"
           subOrderDate={subOrderDate}
+          shouldResponsive={shouldResponsive}
           {...orderDetailData}
         />
       </div>

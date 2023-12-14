@@ -34,7 +34,7 @@
 }
 
 .item {
-  @include flexAlign(center, center);
+  @include flexCenter;
   padding: 8px 16px;
   color: $neutralGray6;
   outline: 1px solid $neutralGray5;

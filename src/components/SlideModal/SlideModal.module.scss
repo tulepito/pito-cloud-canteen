@@ -42,9 +42,13 @@
 }
 
 .modalHeader {
-  @include textTemplate(20px, $fontWeightBold, 32px);
+  @include textTemplate(18px, $fontWeightBold, 24px);
   @include flexAlign(center, space-between);
   flex-direction: row-reverse;
+
+  @include viewportMedium {
+    @include textTemplate(20px, $fontWeightBold, 32px);
+  }
   .closeIcon {
     width: 24px;
     height: 24px;

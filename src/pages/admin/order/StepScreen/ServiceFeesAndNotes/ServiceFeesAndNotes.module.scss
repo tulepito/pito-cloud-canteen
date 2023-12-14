@@ -4,7 +4,7 @@
 
 .container {
   .loading {
-    @include flexAlign(center, center);
+    @include flexCenter;
   }
   .mainLayout {
     @include flexAlign(flex-start);

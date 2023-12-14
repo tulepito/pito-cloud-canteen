@@ -1,4 +1,5 @@
 @use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
 
 .root {
   width: 100%;
@@ -9,20 +10,27 @@
     flex-basis: calc(100% - 24px * 2);
     display: flex;
     padding: 0 24px;
-    column-gap: 20px;
-
+    column-gap: 12px;
     overflow: auto hidden;
     scroll-behavior: smooth;
+
+    @include viewportMedium {
+      column-gap: 20px;
+    }
 
     &.centerItems {
       justify-content: center;
     }
 
     .connectionLine {
-      min-width: 32px;
+      min-width: 23.5px;
       height: 2px;
       margin-top: 20px;
       background-color: $neutralGray5;
+
+      @include viewportMedium {
+        min-width: 32px;
+      }
     }
 
     &::-webkit-scrollbar {
@@ -31,16 +39,25 @@
   }
 
   .navigatorBtn {
-    flex-basis: 24px;
+    flex-basis: 17.6px;
     background-color: transparent;
     border: none;
     width: fit-content;
     min-width: unset;
     padding: 0;
 
+    @include viewportMedium {
+      flex-basis: 24px;
+    }
+
     .navigatorIcon {
-      width: 24px;
-      height: 24px;
+      width: 17.6px;
+      height: 17.6px;
+
+      @include viewportMedium {
+        width: 24px;
+        height: 24px;
+      }
     }
   }
 }

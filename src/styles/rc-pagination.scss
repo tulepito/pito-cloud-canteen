@@ -213,7 +213,7 @@
   }
 }
 .rc-pagination-options-size-changer.rc-select {
-  @include flexAlign(center, center);
+  @include flexCenter;
   min-width: 92px;
   margin-right: 8px;
   border: 1px solid $neutralGray3;
@@ -393,7 +393,7 @@
   &:not(.rc-select-customize-input) {
     .rc-select-selector {
       height: 28px;
-      @include flexAlign(center, center);
+      @include flexCenter;
       .rc-select-selection-search-input {
         border: none;
         outline: none;

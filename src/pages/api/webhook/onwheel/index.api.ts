@@ -73,7 +73,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
                 if (!trackingNumber) return;
 
-                const [orderTitle, subOrderWeekDay] = trackingNumber.split('_');
+                const [orderTitle, subOrderWeekDay] =
+                  trackingNumber.split(/[_-]/);
                 const { plan, deliveryAddress } = await fetchData(orderTitle);
 
                 if (address !== deliveryAddress) return;
@@ -129,7 +130,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
                     ? ETransition.CANCEL_DELIVERY
                     : ETransition.START_DELIVERY;
 
-                const [orderTitle, subOrderWeekDay] = trackingNumber.split('_');
+                const [orderTitle, subOrderWeekDay] =
+                  trackingNumber.split(/[_-]/);
                 const { order, plan, deliveryAddress } = await fetchData(
                   orderTitle,
                 );
@@ -301,7 +303,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
                 const { tracking_number: trackingNumber, address } = OWSubOrder;
                 if (!trackingNumber) return;
 
-                const [orderTitle, subOrderWeekDay] = trackingNumber.split('_');
+                const [orderTitle, subOrderWeekDay] =
+                  trackingNumber.split(/[_-]/);
                 const { plan, deliveryAddress } = await fetchData(orderTitle);
 
                 if (address !== deliveryAddress) return;

@@ -2,7 +2,7 @@
 import { useCallback, useMemo } from 'react';
 import * as XLSX from 'xlsx';
 
-import { isJoinedPlan } from '@helpers/orderHelper';
+import { isJoinedPlan } from '@helpers/order/orderPickingHelper';
 import { Listing } from '@src/utils/data';
 import { formatTimestamp } from '@src/utils/dates';
 import type { TListing, TObject, TUser } from '@src/utils/types';
@@ -155,7 +155,7 @@ const useExportOrderDetails = (options?: {
     const ws = XLSX.utils.json_to_sheet(preparedData);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'SheetJS');
-    XLSX.writeFile(wb, `${title}.xlsx`);
+    XLSX.writeFileXLSX(wb, `${title}.xlsx`, { type: 'binary' });
   }, [
     JSON.stringify(draftOrderDetail),
     JSON.stringify(participantDataMap),

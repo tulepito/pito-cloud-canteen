@@ -5,6 +5,9 @@ import classNames from 'classnames';
 import Button from '@components/Button/Button';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import type { TUseBooleanReturns } from '@hooks/useBoolean';
+import useBoolean from '@hooks/useBoolean';
+import { useViewport } from '@hooks/useViewport';
 import {
   orderDetailsAnyActionsInProgress,
   orderManagementThunks,
@@ -53,19 +56,28 @@ type TManageParticipantsSectionProps = TDefaultProps & {
     planData: TObject;
   };
   ableToUpdateOrder: boolean;
+  shouldHideOnMobileView?: boolean;
+  mobileModalControl?: TUseBooleanReturns;
 };
 
 const ManageParticipantsSection: React.FC<TManageParticipantsSectionProps> = (
   props,
 ) => {
-  const { rootClassName, className, data, ableToUpdateOrder } = props;
+  const {
+    rootClassName,
+    className,
+    data,
+    ableToUpdateOrder,
+    shouldHideOnMobileView = false,
+    mobileModalControl,
+  } = props;
   const intl = useIntl();
   const dispatch = useAppDispatch();
+  const { isMobileLayout } = useViewport();
   const [currentParticipantId, setCurrentParticipantId] = useState<string>();
   const [isDeleteParticipantModalOpen, setIsDeleteParticipantModalOpen] =
     useState(false);
-  const [isManageParticipantsModalOpen, setIsManageParticipantsModalOpen] =
-    useState(false);
+  const manageParticipantsModalControl = useBoolean();
   const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
   const updateParticipantsInProgress = useAppSelector(
     (state) => state.OrderManagement.updateParticipantsInProgress,
@@ -79,10 +91,14 @@ const ManageParticipantsSection: React.FC<TManageParticipantsSectionProps> = (
   const sectionTitle = intl.formatMessage({
     id: 'ManageParticipantsSection.title',
   });
-
   const viewDetailText = intl.formatMessage({
     id: 'ManageParticipantsSection.viewDetailText',
   });
+
+  const manageModalControl =
+    mobileModalControl && isMobileLayout
+      ? mobileModalControl
+      : manageParticipantsModalControl;
 
   const handleClickDeleteParticipant = (participantId: string) => () => {
     setCurrentParticipantId(participantId);
@@ -105,13 +121,6 @@ const ManageParticipantsSection: React.FC<TManageParticipantsSectionProps> = (
     setIsDeleteParticipantModalOpen(false);
   };
 
-  const handleClickViewMoreParticipants = () => {
-    setIsManageParticipantsModalOpen(true);
-  };
-  const handleCloseManageParticipantModal = () => {
-    setIsManageParticipantsModalOpen(false);
-  };
-
   const handleSubmitAddParticipant = async ({
     email,
   }: TAddParticipantFormValues) => {
@@ -130,32 +139,35 @@ const ManageParticipantsSection: React.FC<TManageParticipantsSectionProps> = (
 
   return (
     <div className={rootClasses}>
-      <div className={css.titleContainer}>
-        {sectionTitle}
+      <RenderWhen condition={!(shouldHideOnMobileView && isMobileLayout)}>
+        <div className={css.titleContainer}>
+          {sectionTitle}
+          <RenderWhen condition={participantData.length > 0}>
+            <span className={css.participantCount}>
+              {participantData.length}
+            </span>
+          </RenderWhen>
+        </div>
 
-        <RenderWhen condition={participantData.length > 0}>
-          <span className={css.participantCount}>{participantData.length}</span>
-        </RenderWhen>
-      </div>
-
-      <AddParticipantForm
-        id="ManageParticipantsSection.AddParticipantForm"
-        onSubmit={handleSubmitAddParticipant}
-        ableToUpdateOrder={ableToUpdateOrder}
-      />
-      <div className={css.participantContainer}>
-        {renderParticipantCards(
-          participantData.slice(0, 4),
-          handleClickDeleteParticipant,
-          ableToUpdateOrder,
-        )}
-      </div>
-      <Button
-        variant="inline"
-        className={css.viewDetailBtn}
-        onClick={handleClickViewMoreParticipants}>
-        {viewDetailText}
-      </Button>
+        <AddParticipantForm
+          id="ManageParticipantsSection.AddParticipantForm"
+          onSubmit={handleSubmitAddParticipant}
+          ableToUpdateOrder={ableToUpdateOrder}
+        />
+        <div className={css.participantContainer}>
+          {renderParticipantCards(
+            participantData.slice(0, 4),
+            handleClickDeleteParticipant,
+            ableToUpdateOrder,
+          )}
+        </div>
+        <Button
+          variant="inline"
+          className={css.viewDetailBtn}
+          onClick={manageParticipantsModalControl.setTrue}>
+          {viewDetailText}
+        </Button>
+      </RenderWhen>
 
       <AlertConfirmDeleteParticipant
         cancelDisabled={disableButton}
@@ -167,9 +179,9 @@ const ManageParticipantsSection: React.FC<TManageParticipantsSectionProps> = (
       />
 
       <ManageParticipantsModal
-        isOpen={isManageParticipantsModalOpen}
-        onClose={handleCloseManageParticipantModal}
         data={data}
+        isOpen={manageModalControl.value}
+        onClose={manageModalControl.setFalse}
         handleClickDeleteParticipant={handleClickDeleteParticipant}
         onSubmitAddParticipant={handleSubmitAddParticipant}
         ableToUpdateOrder={ableToUpdateOrder}

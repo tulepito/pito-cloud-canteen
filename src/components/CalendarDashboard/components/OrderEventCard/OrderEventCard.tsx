@@ -3,10 +3,10 @@ import { shallowEqual } from 'react-redux';
 import classNames from 'classnames';
 
 import Tooltip from '@components/Tooltip/Tooltip';
-import { isOver } from '@helpers/orderHelper';
 import { useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { useViewport } from '@hooks/useViewport';
+import { isOver } from '@src/utils/dates';
 import { EParticipantOrderStatus } from '@src/utils/enums';
 
 import OrderEventCardContentItems from './OrderEventCardContentItems';

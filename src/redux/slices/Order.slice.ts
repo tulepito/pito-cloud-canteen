@@ -1397,6 +1397,9 @@ const orderSlice = createSlice({
     setQueryMoreOrderInProgress: (state, { payload }) => {
       state.queryMoreOrderInProgress = payload;
     },
+    setNonAccountEmails: (state, { payload }) => {
+      state.order!!.attributes.metadata.nonAccountEmails = payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -1834,6 +1837,7 @@ export const {
   saveDraftEditOrder,
   clearDraftEditOrder,
   setQueryMoreOrderInProgress,
+  setNonAccountEmails,
 } = orderSlice.actions;
 
 export default orderSlice.reducer;

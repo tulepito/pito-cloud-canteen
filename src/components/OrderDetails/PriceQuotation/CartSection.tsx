@@ -1,4 +1,5 @@
 import { useIntl } from 'react-intl';
+import classNames from 'classnames';
 
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { EPartnerVATSetting } from '@src/utils/enums';
@@ -15,6 +16,7 @@ type TCartSectionProps = {
   PITOFee?: string;
   VATFee: string;
   isPartnerQuotation?: boolean;
+  shouldResponsive?: boolean;
   vatPercentage: number;
   vatSetting: EPartnerVATSetting;
 };
@@ -23,14 +25,13 @@ const CartSection: React.FC<TCartSectionProps> = (props) => {
   const {
     id,
     serviceFee,
-
     totalPrice,
     promotion,
     totalWithVAT,
     PITOFee,
-    // transportFee,
     VATFee,
     isPartnerQuotation = false,
+    shouldResponsive = false,
     vatPercentage,
     vatSetting = EPartnerVATSetting.vat,
   } = props;
@@ -38,8 +39,12 @@ const CartSection: React.FC<TCartSectionProps> = (props) => {
 
   const shouldSkipVAT = vatSetting === EPartnerVATSetting.direct;
 
+  const sectionClasses = classNames(css.cartSection, {
+    [css.mobileLayout]: shouldResponsive,
+  });
+
   return (
-    <div className={css.cartSection} id={id}>
+    <div className={sectionClasses} id={id}>
       <div className={css.sectionTitle}>
         {intl.formatMessage({
           id: 'OrderDetails.PriceQuotation.cartSection.title',

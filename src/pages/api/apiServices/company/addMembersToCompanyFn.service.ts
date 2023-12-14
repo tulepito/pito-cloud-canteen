@@ -95,6 +95,67 @@ const addMembersToCompanyFn = async (params: TAddMembersToCompanyParams) => {
 
   // * Step update data for existed user
   const newParticipantIds = difference(userIdList, membersIdList);
+
+  // Step 2. Create update function
+  const updateOrderAndPlanDataFn = async (order: TListing) => {
+    const orderId = Listing(order).getId();
+    const {
+      participants = [],
+      anonymous = [],
+      plans = [],
+    } = Listing(order).getMetadata();
+
+    const participantIdDiffs = difference(newParticipantIds, participants);
+
+    // todo: if users already in participant list, stop update process
+    if (isEmpty(participantIdDiffs)) {
+      console.info(
+        `💫 > all new members are already participant in order ${orderId}`,
+      );
+      console.info(`💫 > skipped updating order's participant list`);
+
+      return;
+    }
+    // todo: update order participant & anonymous data
+    await integrationSdk.listings.update({
+      id: orderId,
+      metadata: {
+        participants: uniq(participants.concat(participantIdDiffs)),
+        anonymous: difference(anonymous, newParticipantIds),
+      },
+    });
+    // todo: if user already in anonymous list, stop update process
+    const anonymousIdDiffs = difference(newParticipantIds, anonymous);
+    if (isEmpty(anonymousIdDiffs)) {
+      console.info(
+        `💫 > all new members are already anonymous in order ${orderId}`,
+      );
+      console.info(`💫 > skipped updating plan's order detail`);
+
+      return;
+    }
+
+    const planId = plans[0];
+    if (!isEmpty(planId)) {
+      const planListing = allNeedUpdatePlans.find(
+        (p: TListing) => p.id.uuid === planId,
+      );
+
+      const newOrderDetail = prepareNewOrderDetailPlan({
+        planListing: planListing!,
+        newMemberIds: anonymousIdDiffs,
+      });
+      await integrationSdk.listings.update({
+        id: planId,
+        metadata: {
+          orderDetail: newOrderDetail,
+        },
+      });
+    }
+  };
+  // Step 3. Call function update data
+  mapLimit(allNeedOrders, 10, updateOrderAndPlanDataFn);
+
   const newParticipantMembers = await Promise.all(
     newParticipantIds.map(async (userId: string) => {
       const userAccount = await fetchUser(userId);
@@ -103,7 +164,7 @@ const addMembersToCompanyFn = async (params: TAddMembersToCompanyParams) => {
       await integrationSdk.users.updateProfile({
         id: userId,
         metadata: {
-          companyList: Array.from(new Set([...userCompanyList, companyId])),
+          companyList: uniq(userCompanyList.concat(companyId)),
           company: {
             [companyId]: {
               permission: ECompanyPermission.participant,
@@ -112,54 +173,6 @@ const addMembersToCompanyFn = async (params: TAddMembersToCompanyParams) => {
         },
       });
       const { email: userEmail } = User(userAccount).getAttributes();
-
-      // Step 2. Create update function
-      const updateFn = async (order: TListing) => {
-        const orderId = Listing(order).getId();
-        const {
-          participants = [],
-          anonymous = [],
-          plans = [],
-        } = Listing(order).getMetadata();
-
-        // todo: if user already in participant list, stop update process
-        if (participants.includes(userId)) {
-          return;
-        }
-
-        await integrationSdk.listings.update({
-          id: orderId,
-          metadata: {
-            participants: uniq(participants.concat(userId)),
-            anonymous: anonymous.filter((id: string) => id !== userId),
-          },
-        });
-
-        // todo: if user already in anonymous list, stop update process
-        if (anonymous.includes(userId)) {
-          return;
-        }
-
-        const planId = plans[0];
-        if (!isEmpty(planId)) {
-          const planListing = allNeedUpdatePlans.find(
-            (p: TListing) => p.id.uuid === planId,
-          );
-
-          const newOrderDetail = prepareNewOrderDetailPlan({
-            planListing: planListing!,
-            newMemberId: userId,
-          });
-          await integrationSdk.listings.update({
-            id: planId,
-            metadata: {
-              orderDetail: newOrderDetail,
-            },
-          });
-        }
-      };
-      // Step 3. Call function update data
-      mapLimit(allNeedOrders, 10, updateFn);
 
       return {
         [userEmail]: {
@@ -228,12 +241,10 @@ const addMembersToCompanyFn = async (params: TAddMembersToCompanyParams) => {
     updatedCompanyAccountResponse,
   );
 
-  const participantMemberIds = difference(userIdList, membersIdList);
-
   // Step handle send email for new participant members
-  if (Object.keys(newParticipantMembersObj).length > 0) {
-    await Promise.all(
-      participantMemberIds.map(async (userId: string) => {
+  if (isEmpty(newParticipantIds)) {
+    await Promise.allSettled(
+      newParticipantIds.map(async (userId: string) => {
         await emailSendingFactory(
           EmailTemplateTypes.PARTICIPANT.PARTICIPANT_COMPANY_INVITATION,
           {
@@ -244,7 +255,7 @@ const addMembersToCompanyFn = async (params: TAddMembersToCompanyParams) => {
       }),
     );
 
-    participantMemberIds.map(async (participantId: string) => {
+    newParticipantIds.map(async (participantId: string) => {
       createFirebaseDocNotification(ENotificationType.INVITATION, {
         userId: participantId,
         companyName,

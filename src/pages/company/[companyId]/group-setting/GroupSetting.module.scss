@@ -109,7 +109,7 @@
 }
 
 .noGroupFound {
-  @include flexAlign(center, center);
+  @include flexCenter;
   flex-direction: column;
   margin-top: 40px;
 }

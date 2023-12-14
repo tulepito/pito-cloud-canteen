@@ -4,11 +4,14 @@
 @use '/src/styles/defaults.scss' as *;
 
 .formRoot {
-  padding: 16px;
-  max-width: 320px;
-  border-radius: 16px;
-  border: 1px solid $neutralGray5;
   background: $neutralGray1;
+
+  @include viewportMedium {
+    padding: 16px;
+    max-width: 320px;
+    border-radius: 16px;
+    border: 1px solid $neutralGray5;
+  }
 
   @include viewportLarge {
     flex-basis: 320px;
@@ -22,7 +25,12 @@
   }
 
   .formTitle {
+    display: none;
     @include textTemplate(18px, 700, 24px);
+
+    @include viewportMedium {
+      display: block;
+    }
   }
 
   .dateInput {
@@ -32,4 +40,29 @@
       padding-left: 48px !important;
     }
   }
+}
+
+.mobileModalContainer.mobileModalContainer {
+  padding-bottom: 32px;
+}
+
+.mobileDeadlineInfo {
+  display: flex;
+  width: 100%;
+  padding: 8px 16px;
+  column-gap: 8px;
+  border-radius: 8px;
+  border: 1px solid $neutralGray5;
+  background-color: $neutralGray1;
+  margin-bottom: 24px;
+  margin-top: 8px;
+  @include textTemplate(16px, 400, 1.5);
+}
+
+.placeholder {
+  color: $neutralGray5;
+}
+
+.sendNotificationButton {
+  width: 100%;
 }

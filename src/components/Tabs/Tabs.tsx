@@ -37,6 +37,7 @@ type ITabsProps = {
   tabItemClassName?: string;
   tabActiveItemClassName?: string;
   disabled?: boolean;
+  shouldShowNavigatorBorder?: boolean;
   enableTabScroll?: boolean;
   tabScrollBehavior?: 'auto' | 'smooth';
 };
@@ -59,6 +60,7 @@ const Tabs: React.FC<ITabsProps> = (props) => {
     tabItemClassName,
     tabActiveItemClassName,
     disabled = false,
+    shouldShowNavigatorBorder = false,
     enableTabScroll = false,
     tabScrollBehavior = 'smooth',
   } = props;
@@ -166,6 +168,7 @@ const Tabs: React.FC<ITabsProps> = (props) => {
     css.navigateBtnStart,
     {
       [css.middleLabel]: middleLabel,
+      [css.hasBorder]: shouldShowNavigatorBorder,
     },
     navigationStartClassName,
   );
@@ -173,6 +176,7 @@ const Tabs: React.FC<ITabsProps> = (props) => {
     css.navigateBtnEnd,
     {
       [css.middleLabel]: middleLabel,
+      [css.hasBorder]: shouldShowNavigatorBorder,
     },
     navigationEndClassName,
   );

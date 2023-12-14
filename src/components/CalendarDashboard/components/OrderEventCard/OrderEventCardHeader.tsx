@@ -2,7 +2,7 @@ import type { Event } from 'react-big-calendar';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { MORNING_SESSION } from '@components/CalendarDashboard/helpers/constant';
-import { isOver } from '@helpers/orderHelper';
+import { isOver } from '@src/utils/dates';
 import { EParticipantOrderStatus } from '@src/utils/enums';
 
 import css from './OrderEventCard.module.scss';

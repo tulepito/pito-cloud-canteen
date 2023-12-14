@@ -2,95 +2,159 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/mixins.scss' as *;
 
-.modalRoot {
-  .modalTitle {
-    text-transform: capitalize;
+@mixin tableLayout {
+  display: flex;
+  justify-content: space-between;
+  @include textTemplate(14px, 400, 20px);
+  $unitWidth: calc((100% - 24px) / 7);
+
+  & > div {
+    padding-right: 10px;
+    @include lineClamp(2);
+    line-height: 20px;
   }
-
-  .modalContentContainer {
-    & > .contentContainer {
-      margin-bottom: 24px;
-      max-height: 70vh;
-      overflow: hidden auto;
-
-      @include viewportMedium {
-        margin-bottom: 56px;
-        max-height: min(600px, 50vh);
-        padding-right: 18px;
-      }
-
-      .dateContainer {
-        padding-top: 12px;
-        position: relative;
-
-        &::after {
-          position: absolute;
-          content: '';
-          bottom: 0;
-          left: 0;
-          width: 100%;
-          height: 1px;
-          background-color: $neutralGray3;
-        }
-
-        .dateTitle {
-          @include textTemplate(14px, 700, 20px);
-        }
-
-        .contentContainer {
-          padding: 12px 0;
-          display: flex;
-          flex-direction: column;
-          row-gap: 8px;
-          .row {
-            display: flex;
-            justify-content: space-between;
-            @include textTemplate(14px, 400, 20px);
-
-            & > div {
-              padding-right: 10px;
-            }
-
-            & > div:nth-of-type(1) {
-              flex-basis: 25%;
-            }
-            & > div:nth-of-type(2) {
-              flex-basis: 25%;
-            }
-            & > div:nth-of-type(3) {
-              flex-basis: 15%;
-            }
-            & > div:nth-of-type(4) {
-              flex-basis: 30%;
-              cursor: pointer;
-              @include lineClamp(2);
-            }
-            & > div:nth-of-type(4) {
-              flex-basis: 30%;
-              cursor: pointer;
-              @include lineClamp(2);
-            }
-
-            .head {
-              color: $neutralGray6;
-              @include textTemplate(12px, 400, 16px);
-            }
-          }
-        }
-      }
-    }
-  }
-
-  .goBackButton {
-    width: 100%;
-    margin: 0 auto;
+  & > div:nth-of-type(1) {
+    flex-basis: calc($unitWidth * 3);
 
     @include viewportMedium {
-      width: 50%;
+      flex-basis: 25%;
     }
+  }
+  & > div:nth-of-type(2) {
+    flex-basis: calc($unitWidth * 2);
+
+    @include viewportMedium {
+      flex-basis: 25%;
+    }
+  }
+  & > div:nth-of-type(3) {
+    flex-basis: calc($unitWidth * 2);
+
+    @include viewportMedium {
+      flex-basis: 15%;
+    }
+  }
+  & > div:nth-of-type(4) {
+    flex-basis: 30%;
+    cursor: pointer;
+    @include lineClamp(2);
+    display: none;
+
+    @include viewportMedium {
+      display: block;
+    }
+  }
+}
+
+.modalRoot {
+  .modalTitle {
+    @include viewportMedium {
+      text-transform: capitalize;
+    }
+  }
+}
+
+.tableContainer {
+  max-height: 70vh;
+  overflow: hidden auto;
+  margin-bottom: 24px;
+
+  @include viewportMedium {
+    margin-bottom: 32px;
+    max-height: min(600px, 50vh);
+    padding-right: 18px;
+  }
+}
+
+.dateContainer {
+  .dateTitle {
+    @include textTemplate(14px, 600, 20px);
+    border-bottom: 1px solid $neutralGray3;
+    background-color: $neutralGray2;
+    padding: 12px;
+    display: flex;
+    justify-content: space-between;
+
+    @include viewportMedium {
+      font-weight: 700;
+    }
+  }
+}
+
+.contentContainer {
+  display: flex;
+  flex-direction: column;
+
+  .rowContainer {
+    display: flex;
+    flex-direction: column;
+    row-gap: 12px;
+    padding: 8px 12px;
+    border-bottom: 1px solid $neutralGray3;
+  }
+
+  .mobileRequirement {
+    @include textTemplate(12px, 400, 16px);
+    color: $neutralGray6;
+    display: flex;
+    column-gap: 8px;
+
+    & div:first-child {
+      border-radius: 20px;
+      width: 4px;
+      background-color: $neutralGray4;
+    }
+    & div {
+      @include lineClamp(2);
+    }
+  }
+
+  .row {
+    @include tableLayout;
+  }
+}
+
+.headRow {
+  @include tableLayout;
+  border-radius: 8px 8px 0px 0px;
+  padding: 10px 12px;
+  background-color: $neutralGray4;
+  position: sticky;
+  top: 0;
+
+  .head {
+    color: $neutralGray7;
+    @include textTemplate(14px, 600, 20px);
+
+    @include viewportMedium {
+      text-transform: uppercase;
+    }
+  }
+}
+
+.memberName {
+  @include textTemplate(12px, 600, 16px);
+}
+.foodPrice {
+  @include textTemplate(14px, 700, 20px);
+}
+
+.button {
+  width: 100%;
+  margin: 0 auto;
+
+  @include viewportMedium {
+    width: 50%;
   }
 }
 
 .requirementTooltip {
   max-width: 400px;
+}
+
+.mobileModalContent.mobileModalContent {
+  padding-top: 24px;
+}
+.mobileModalContainer.mobileModalContainer {
+  padding-bottom: 32px;
 }

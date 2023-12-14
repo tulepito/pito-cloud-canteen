@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { useEffect } from 'react';
 import classNames from 'classnames';
 
@@ -35,6 +36,8 @@ type TAlertProps = TDefaultProps & {
   timeToClose?: number;
   isOpen: boolean;
   openClassName?: string;
+  containerClassName?: string;
+  customIcon?: ReactNode;
 };
 
 const Alert: React.FC<TAlertProps> = (props) => {
@@ -44,12 +47,14 @@ const Alert: React.FC<TAlertProps> = (props) => {
     message,
     messageClassName,
     className,
+    containerClassName,
     position = EAlertPosition.topRight,
     type = EAlertType.warning,
     hasCloseButton = true,
     onClose,
     autoClose = true,
     timeToClose = DEFAULT_CLOSE_TIME,
+    customIcon,
   } = props;
 
   const rootClasses = classNames(
@@ -77,6 +82,7 @@ const Alert: React.FC<TAlertProps> = (props) => {
   );
 
   const messageClasses = classNames(css.message, messageClassName);
+  const containerClasses = classNames(css.container, containerClassName);
 
   useEffect(() => {
     if (isOpen && autoClose) {
@@ -89,12 +95,12 @@ const Alert: React.FC<TAlertProps> = (props) => {
 
   return (
     <div className={rootClasses}>
-      <div className={css.container}>
+      <div className={containerClasses}>
         <RenderWhen condition={type === EAlertType.warning}>
-          <IconWarningWithTriangle />
+          {customIcon || <IconWarningWithTriangle />}
         </RenderWhen>
         <RenderWhen condition={type === EAlertType.success}>
-          <IconTickWithBackground className={css.icon} />
+          {customIcon || <IconTickWithBackground className={css.icon} />}
         </RenderWhen>
         <div className={messageClasses}>{message}</div>
       </div>

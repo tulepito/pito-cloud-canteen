@@ -24,14 +24,20 @@ import RenderWhen from '@components/RenderWhen/RenderWhen';
 import Stepper from '@components/Stepper/Stepper';
 import { BOTTOM_CENTER_TOAST_ID } from '@components/ToastifyProvider/ToastifyProvider';
 import {
-  findSuitableStartDate,
+  findSuitableAnchorDate,
   getParticipantPickingLink,
-  isEnableSubmitPublishOrder,
-} from '@helpers/orderHelper';
+} from '@helpers/order/prepareDataHelper';
+import { isEnableSubmitPublishOrder } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import useRestaurantDetailModal from '@hooks/useRestaurantDetailModal';
 import { useViewport } from '@hooks/useViewport';
+import {
+  filterHasAccountUserIds,
+  filterHasAccountUsers,
+  filterNoAccountUserEmail,
+  useAddMemberEmail,
+} from '@pages/company/[companyId]/members/hooks/useAddMemberEmail';
 import { OrderListThunks } from '@pages/participant/orders/OrderList.slice';
 import { addWorkspaceCompanyId } from '@redux/slices/company.slice';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
@@ -46,7 +52,7 @@ import {
   EOrderDraftStates,
   EOrderType,
 } from '@utils/enums';
-import type { TListing, TUser } from '@utils/types';
+import type { TListing, TObject, TUser } from '@utils/types';
 
 import emptyResultImg from '../../../../../../assets/emptyResult.png';
 import Layout from '../../components/Layout/Layout';
@@ -108,7 +114,7 @@ function BookerDraftOrderPage() {
   const currentUserId = currentUserGetter.getId();
   const { walkthroughEnable = true } = currentUserGetter.getMetadata();
   const welcomeModalControl = useBoolean(walkthroughEnable);
-
+  const { checkEmailList } = useAddMemberEmail();
   const { order, companyAccount } = useLoadData({
     orderId: orderId as string,
   });
@@ -116,6 +122,9 @@ function BookerDraftOrderPage() {
 
   const fetchOrderParticipantsInProgress = useAppSelector(
     (state) => state.BookerDraftOrderPage.fetchOrderParticipantsInProgress,
+  );
+  const addOrderParticipantsInProgress = useAppSelector(
+    (state) => state.BookerDraftOrderPage.addOrderParticipantsInProgress,
   );
   const participantData = useAppSelector(
     (state) => state.BookerDraftOrderPage.participantData,
@@ -171,12 +180,15 @@ function BookerDraftOrderPage() {
     packagePerMember = 0,
     companyId,
     orderDeadline,
+    participants = [],
+    nonAccountEmails = [],
   } = orderListing.getMetadata();
   const { title: orderTitle } = orderListing.getAttributes();
   const planId = plans.length > 0 ? plans[0] : undefined;
   const isGroupOrder = orderType === EOrderType.group;
 
   const isFinishOrderDisabled =
+    addOrderParticipantsInProgress ||
     (isGroupOrder && fetchOrderParticipantsInProgress) ||
     !isEnableSubmitPublishOrder(
       order as TListing,
@@ -198,8 +210,8 @@ function BookerDraftOrderPage() {
     );
   }, [JSON.stringify(orderDetail), selectedDay]);
 
-  const suitableStartDate = useMemo(() => {
-    const temp = findSuitableStartDate({
+  const suitableAnchorDate = useMemo(() => {
+    const temp = findSuitableAnchorDate({
       selectedDate: selectedDay,
       startDate: startDateTimestamp,
       endDate: endDateTimestamp,
@@ -337,6 +349,28 @@ function BookerDraftOrderPage() {
     components: componentsProps,
   };
 
+  const checkAndInviteNonAccountEmails = async () => {
+    const newLoadedResult = (await checkEmailList(
+      nonAccountEmails,
+    )) as TObject[];
+
+    const newNonAccountEmails = filterNoAccountUserEmail(newLoadedResult);
+    const newUserIds = filterHasAccountUserIds(newLoadedResult);
+    const newUsers = filterHasAccountUsers(newLoadedResult);
+
+    if (!isEmpty(newUserIds)) {
+      dispatch(
+        BookerDraftOrderPageThunks.addOrderParticipants({
+          orderId,
+          participants,
+          newUserIds,
+          newUsers,
+          nonAccountEmails: newNonAccountEmails,
+        }),
+      );
+    }
+  };
+
   const handleSearchRestaurantSubmit = (
     keywords: string,
     _restaurantId: string,
@@ -385,6 +419,12 @@ function BookerDraftOrderPage() {
   useEffect(() => {
     dispatch(addWorkspaceCompanyId(companyId));
   }, [companyId]);
+
+  useEffect(() => {
+    if (!isEmpty(nonAccountEmails)) {
+      checkAndInviteNonAccountEmails();
+    }
+  }, [JSON.stringify(nonAccountEmails)]);
 
   useEffect(() => {
     if (!isEmpty(orderState)) {
@@ -488,7 +528,7 @@ function BookerDraftOrderPage() {
             <div className={css.main}>
               <CalendarDashboard
                 className={css.calendar}
-                anchorDate={suitableStartDate}
+                anchorDate={suitableAnchorDate}
                 startDate={startDate}
                 endDate={endDate}
                 events={calendarEvents}

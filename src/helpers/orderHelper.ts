@@ -1,54 +1,24 @@
-import { addDays, min, subDays } from 'date-fns';
-import difference from 'lodash/difference';
 import isEmpty from 'lodash/isEmpty';
 import uniq from 'lodash/uniq';
 import { DateTime } from 'luxon';
 
-import {
-  AFTERNOON_SESSION,
-  DINNER_SESSION,
-  EVENING_SESSION,
-  MORNING_SESSION,
-} from '@components/CalendarDashboard/helpers/constant';
-import type { TDaySession } from '@components/CalendarDashboard/helpers/types';
 import { ETransition } from '@src/utils/transaction';
 import { Listing } from '@utils/data';
-import {
-  generateTimeRangeItems,
-  getDaySessionFromDeliveryTime,
-  renderDateRange,
-  weekDayFormatFromDateTime,
-} from '@utils/dates';
+import { generateTimeRangeItems, isOver, renderDateRange } from '@utils/dates';
 import {
   EBookerOrderDraftStates,
-  EEditOrderHistoryType,
-  EFoodType,
   EOrderDraftStates,
   EOrderStates,
   EOrderType,
-  EParticipantOrderStatus,
 } from '@utils/enums';
 import type { TFoodList, TPlan } from '@utils/orderTypes';
-import type {
-  TListing,
-  TObject,
-  TOrderChangeHistoryItem,
-  TOrderStateHistoryItem,
-} from '@utils/types';
+import type { TListing, TObject, TOrderStateHistoryItem } from '@utils/types';
 
-import { convertHHmmStringToTimeParts } from './dateHelpers';
-import { parseThousandNumber } from './format';
-
-export const ORDER_STATES_TO_ENABLE_EDIT_ABILITY = [
-  EOrderDraftStates.pendingApproval,
-  EOrderStates.picking,
-  EOrderStates.inProgress,
-];
-
-export const getParticipantPickingLink = (orderId: string) =>
-  `${process.env.NEXT_PUBLIC_CANONICAL_URL}/participant/order/${orderId}`;
-export const getTrackingLink = (orderId: string, timestamp: string | number) =>
-  `${process.env.NEXT_PUBLIC_CANONICAL_URL}/tracking/${orderId}_${timestamp}`;
+import { isJoinedPlan } from './order/orderPickingHelper';
+import {
+  findMinDeadlineDate,
+  findMinStartDate,
+} from './order/prepareDataHelper';
 
 export const isOrderCreatedByBooker = (
   orderStateHistory: TOrderStateHistoryItem[],
@@ -56,13 +26,6 @@ export const isOrderCreatedByBooker = (
   return orderStateHistory.some(
     ({ state }) => state === EBookerOrderDraftStates.bookerDraft,
   );
-};
-
-export const isJoinedPlan = (
-  foodId: string,
-  status: EParticipantOrderStatus,
-) => {
-  return foodId !== '' && status === EParticipantOrderStatus.joined;
 };
 
 export const isCompletePickFood = ({
@@ -85,67 +48,10 @@ export const isCompletePickFood = ({
   return completedDates === totalDates;
 };
 
-export const isOver = (deadline: number = 0) => {
-  return new Date().getTime() > deadline;
-};
-
 export const isOrderOverDeadline = (order: TListing) => {
   const { deadlineDate } = Listing(order).getMetadata();
 
   return isOver(deadlineDate);
-};
-
-export const findMinDeadlineDate = () => {
-  return DateTime.fromJSDate(new Date())
-    .plus({ days: 1 })
-    .startOf('day')
-    .toJSDate();
-};
-
-export const findMinStartDate = () => {
-  const initMinStartDate = DateTime.fromJSDate(new Date())
-    .startOf('day')
-    .plus({ days: 3 });
-  const { weekday } = initMinStartDate;
-
-  const minStartDate =
-    weekday === 6 || weekday === 7
-      ? initMinStartDate.plus({ days: 7 - weekday + 1 })
-      : initMinStartDate;
-
-  return minStartDate.toJSDate();
-};
-
-export const findValidRangeForDeadlineDate = (
-  startDateInitialValue?: Date | number,
-) => {
-  const today = new Date();
-  const initMinSelectedDate = addDays(today, 1);
-
-  const maxSelectedDate = startDateInitialValue
-    ? subDays(startDateInitialValue, 2)
-    : undefined;
-  const minSelectedDate = min([
-    maxSelectedDate || initMinSelectedDate,
-    initMinSelectedDate,
-  ]);
-
-  return { minSelectedDate, maxSelectedDate };
-};
-
-export const deliveryDaySessionAdapter = (daySession: string) => {
-  switch (daySession) {
-    case MORNING_SESSION:
-      return 'breakfast';
-    case DINNER_SESSION:
-    case EVENING_SESSION:
-      return 'dinner';
-    case AFTERNOON_SESSION:
-      return 'lunch';
-
-    default:
-      break;
-  }
 };
 
 export const isEnableUpdateBookingInfo = (
@@ -304,35 +210,6 @@ export const getRestaurantListFromOrderDetail = (
 
     return result;
   }, {});
-};
-
-export const findSuitableStartDate = ({
-  selectedDate,
-  startDate = new Date().getTime(),
-  endDate = new Date().getTime(),
-  orderDetail = {},
-}: {
-  selectedDate?: Date;
-  startDate?: number;
-  endDate?: number;
-  orderDetail: TObject;
-}) => {
-  if (selectedDate && selectedDate instanceof Date) {
-    return selectedDate;
-  }
-
-  const dateRange = renderDateRange(startDate, endDate);
-
-  if (isEmpty(orderDetail)) {
-    return startDate;
-  }
-
-  const suitableStartDate =
-    dateRange.find((date) => {
-      return isEmpty(orderDetail[date.toString()]?.restaurant?.foodList || {});
-    }) || new Date(startDate);
-
-  return suitableStartDate;
 };
 
 export const isOrderDetailFullDatePickingRestaurant = ({
@@ -540,23 +417,6 @@ export const getPCCFeeByMemberAmount = (memberAmount: number) => {
   return 500000;
 };
 
-export const ORDER_STATE_TRANSIT_FLOW = {
-  [EOrderDraftStates.draft]: [
-    EOrderDraftStates.pendingApproval,
-    EOrderStates.canceled,
-  ],
-  [EBookerOrderDraftStates.bookerDraft]: [EOrderStates.canceled],
-  [EOrderDraftStates.pendingApproval]: [
-    EOrderStates.picking,
-    EOrderStates.canceledByBooker,
-    EOrderStates.canceled,
-  ],
-  [EOrderStates.picking]: [EOrderStates.inProgress, EOrderStates.canceled],
-  [EOrderStates.inProgress]: [EOrderStates.pendingPayment],
-  [EOrderStates.pendingPayment]: [EOrderStates.completed],
-  [EOrderStates.completed]: [EOrderStates.reviewed],
-};
-
 export const markColorForOrder = (orderNumber: number) => {
   const colorList = ['#65DB63', '#CF1332', '#FFB13D', '#2F54EB', '#171760'];
 
@@ -608,61 +468,6 @@ export const getSelectedRestaurantAndFoodList = ({
   };
 };
 
-export const mealTypeAdapter = (mealType: string) => {
-  switch (mealType) {
-    case 'vegetarian':
-      return EFoodType.vegetarianDish;
-    case 'unVegetarian':
-      return EFoodType.savoryDish;
-    default:
-      return '';
-  }
-};
-
-export const mealTypeReverseAdapter = (mealType: string) => {
-  switch (mealType) {
-    case EFoodType.vegetarianDish:
-      return 'vegetarian';
-    case EFoodType.savoryDish:
-      return 'unVegetarian';
-    default:
-      return '';
-  }
-};
-
-export const calculateClientQuotation = (foodOrderGroupedByDate: any[]) => {
-  return {
-    quotation: foodOrderGroupedByDate.reduce((result: any, item: any) => {
-      return {
-        ...result,
-        [item.date]: item.foodDataList,
-      };
-    }, {}),
-  };
-};
-
-export const calculatePartnerQuotation = (
-  groupByRestaurantQuotationData: TObject,
-) => {
-  return Object.keys(groupByRestaurantQuotationData).reduce((result, item) => {
-    return {
-      ...result,
-      [item]: {
-        name: groupByRestaurantQuotationData[item][0].restaurantName,
-        quotation: groupByRestaurantQuotationData[item].reduce(
-          (quotationArrayResult: any, quotationItem: any) => {
-            return {
-              ...quotationArrayResult,
-              [quotationItem.date]: quotationItem.foodDataList,
-            };
-          },
-          {},
-        ),
-      },
-    };
-  }, {});
-};
-
 export const getPickFoodParticipants = (orderDetail: TObject) => {
   const shouldSendNativeNotificationParticipantIdList = Object.entries(
     orderDetail,
@@ -710,284 +515,6 @@ export const getUpdateLineItems = (foodList: any[], foodIds: string[]) => {
   });
 
   return updateLineItems;
-};
-
-export const preparePickingOrderChangeNotificationData = ({
-  oldOrderDetail,
-  newOrderDetail,
-  order,
-  updateOrderData,
-}: {
-  oldOrderDetail: TPlan['orderDetail'];
-  newOrderDetail: TPlan['orderDetail'];
-  order: TListing;
-  updateOrderData: TObject;
-}) => {
-  const createdAt = new Date().getTime();
-
-  const orderGetter = Listing(order);
-  const orderId = orderGetter.getId();
-  const {
-    staffName,
-    shipperName,
-    specificPCCFee = 0,
-    hasSpecificPCCFee = false,
-    memberAmount = 0,
-    deliveryAddress,
-    detailAddress,
-    deliveryHour,
-  } = orderGetter.getMetadata();
-  const PCCFeeByMemberAmount = getPCCFeeByMemberAmount(memberAmount);
-  const PCCFeePerDate = hasSpecificPCCFee
-    ? specificPCCFee
-    : PCCFeeByMemberAmount;
-
-  const changeHistoryToNotifyBooker: TObject[] = [];
-  const changeHistoryToNotifyBookerByMeal: TObject = {};
-  const emailParamsForParticipantNotification: TObject[] = [];
-  const firebaseChangeHistory: Partial<TOrderChangeHistoryItem>[] = [];
-  const normalizedOrderDetail: TObject = {};
-
-  const sortedNewOrderDetailKeys = Object.keys(newOrderDetail).sort(
-    (t1, t2) => Number(t1) - Number(t2),
-  );
-
-  sortedNewOrderDetailKeys.forEach((timestamp) => {
-    const orderDetailData = newOrderDetail[timestamp] || {};
-    const oldOrderDetailData = oldOrderDetail[timestamp] || {};
-    changeHistoryToNotifyBookerByMeal[timestamp] = [];
-    const formattedWeekDay = `${weekDayFormatFromDateTime(
-      DateTime.fromMillis(Number(timestamp)),
-    )}:`;
-
-    const { restaurant = {}, memberOrders = {} } = orderDetailData;
-    const { id: restaurantId, restaurantName, foodList = {} } = restaurant;
-    const foodIds = Object.keys(foodList);
-    const { restaurant: oldRestaurant = {} } = oldOrderDetailData;
-    const {
-      id: oldRestaurantId,
-      restaurantName: oldRestaurantName,
-      foodList: oldFoodList = {},
-    } = oldRestaurant;
-    const oldFoodIds = Object.keys(oldFoodList);
-    const addedFoodList = difference(foodIds, oldFoodIds);
-    const removedFoodList = difference(oldFoodIds, foodIds);
-
-    changeHistoryToNotifyBookerByMeal[timestamp] = [];
-
-    if (restaurantId && oldRestaurantId) {
-      if (restaurantId !== oldRestaurantId) {
-        // TODO: restaurant change for booker noti
-        changeHistoryToNotifyBookerByMeal[timestamp] = [
-          {
-            oldData: {
-              title: formattedWeekDay,
-              content: `Đối tác - ${oldRestaurantName}`,
-            },
-            newData: {
-              title: formattedWeekDay,
-              content: `Đối tác - ${restaurantName}`,
-            },
-          },
-        ];
-
-        // TODO: firebase change history for restaurant change
-        firebaseChangeHistory.push({
-          orderId,
-          type: EEditOrderHistoryType.changeRestaurant,
-          createdAt,
-          newValue: restaurant,
-          oldValue: oldRestaurant,
-          subOrderDate: timestamp,
-        });
-      } else {
-        if (!isEmpty(removedFoodList)) {
-          // TODO: add food for booker noti
-          removedFoodList.forEach((removedFoodId) => {
-            const { foodName } = oldFoodList[removedFoodId] || {};
-
-            changeHistoryToNotifyBookerByMeal[timestamp] =
-              changeHistoryToNotifyBookerByMeal[timestamp].concat({
-                oldData: {},
-                newData: {
-                  title: formattedWeekDay,
-                  content: `Xoá món "${foodName}"`,
-                },
-              });
-
-            // TODO: firebase change history for removing food
-            firebaseChangeHistory.push({
-              orderId,
-              type: EEditOrderHistoryType.deleteFood,
-              createdAt,
-              newValue: {},
-              oldValue: { ...oldFoodList[removedFoodId] },
-              subOrderDate: timestamp,
-            });
-          });
-        }
-
-        if (!isEmpty(addedFoodList)) {
-          addedFoodList.forEach((addedFoodId) => {
-            const { foodName } = foodList[addedFoodId] || {};
-
-            // TODO: add food for booker noti
-            changeHistoryToNotifyBookerByMeal[timestamp] =
-              changeHistoryToNotifyBookerByMeal[timestamp].concat({
-                oldData: {},
-                newData: {
-                  title: formattedWeekDay,
-                  content: `Thêm món "${foodName}"`,
-                },
-              });
-
-            // TODO: firebase change history for adding food
-            firebaseChangeHistory.push({
-              orderId,
-              type: EEditOrderHistoryType.addFood,
-              createdAt,
-              newValue: { ...foodList[addedFoodId] },
-              oldValue: {},
-              subOrderDate: timestamp,
-            });
-          });
-        }
-      }
-    }
-
-    // TODO: picking changed for participant noti
-    const normalizedMemberOrders = { ...memberOrders };
-    Object.entries(memberOrders).forEach(([memberId, pickingFoodData]) => {
-      const { foodId = '', ...restPickingData } = pickingFoodData || {};
-
-      if (foodId !== '' && isEmpty(foodList[foodId])) {
-        normalizedMemberOrders[memberId] = {
-          ...restPickingData,
-          foodId: '',
-          status: EParticipantOrderStatus.empty,
-        };
-        emailParamsForParticipantNotification.push({
-          orderId,
-          participantId: memberId,
-          timestamp,
-        });
-      }
-    });
-
-    if (!isEmpty(changeHistoryToNotifyBookerByMeal[timestamp])) {
-      changeHistoryToNotifyBooker.push(
-        ...changeHistoryToNotifyBookerByMeal[timestamp],
-      );
-    }
-
-    normalizedOrderDetail[timestamp] = {
-      ...newOrderDetail[timestamp],
-      memberOrders: normalizedMemberOrders,
-    };
-  });
-
-  const {
-    staffName: updateStaffName,
-    shipperName: updateShipperName,
-    specificPCCFee: updateSpecificPCCFee,
-    deliveryAddress: updateDeliveryAddress,
-    detailAddress: updateDetailAddress,
-    deliveryHour: updateDeliveryHour,
-  } = updateOrderData || {};
-  // TODO: change history for other fields
-  if (updateStaffName !== undefined && updateStaffName !== staffName) {
-    changeHistoryToNotifyBooker.push({
-      oldData: {
-        title: 'Nhân viên phụ trách:',
-        content: staffName,
-      },
-      newData: {
-        title: 'Nhân viên phụ trách:',
-        content: updateStaffName,
-      },
-    });
-  }
-  if (updateShipperName !== undefined && updateShipperName !== shipperName) {
-    changeHistoryToNotifyBooker.push({
-      oldData: {
-        title: 'Nhân viên giao hàng:',
-        content: shipperName,
-      },
-      newData: {
-        title: 'Nhân viên giao hàng:',
-        content: updateShipperName,
-      },
-    });
-  }
-  if (
-    updateSpecificPCCFee !== undefined &&
-    PCCFeePerDate !== updateSpecificPCCFee
-  ) {
-    changeHistoryToNotifyBooker.push({
-      oldData: {
-        title: 'Phí PITO Cloud Canteen:',
-        content: `${parseThousandNumber(PCCFeePerDate)}đ`,
-      },
-      newData: {
-        title: 'Phí PITO Cloud Canteen:',
-        content: `${parseThousandNumber(updateSpecificPCCFee)}đ`,
-      },
-    });
-  }
-  if (
-    updateDeliveryAddress !== undefined &&
-    updateDeliveryAddress.address !== deliveryAddress.address
-  ) {
-    changeHistoryToNotifyBooker.push({
-      oldData: {
-        title: 'Địa chỉ giao hàng:',
-        content: deliveryAddress.address,
-      },
-      newData: {
-        title: 'Địa chỉ giao hàng:',
-        content: updateDeliveryAddress.address,
-      },
-    });
-  }
-
-  if (
-    updateDetailAddress !== undefined &&
-    updateDetailAddress !== detailAddress
-  ) {
-    changeHistoryToNotifyBooker.push({
-      oldData: {
-        title: 'Địa chỉ chi tiết:',
-        content: detailAddress,
-      },
-      newData: {
-        title: 'Địa chỉ chi tiết:',
-        content: updateDetailAddress,
-      },
-    });
-  }
-
-  if (updateDeliveryHour !== undefined && updateDeliveryHour !== deliveryHour) {
-    changeHistoryToNotifyBooker.push({
-      oldData: {
-        title: 'Thời gian giao hàng:',
-        content: deliveryHour,
-      },
-      newData: {
-        title: 'Thời gian giao hàng:',
-        content: updateDeliveryHour,
-      },
-    });
-  }
-
-  return {
-    emailParamsForBookerNotification: {
-      changeHistory: changeHistoryToNotifyBooker,
-      orderId,
-    },
-    emailParamsForParticipantNotification,
-    firebaseChangeHistory,
-    normalizedOrderDetail,
-  };
 };
 
 export const getEditedSubOrders = (orderDetail: TObject) => {
@@ -1115,30 +642,4 @@ export const confirmFirstTimeParticipant = (
   }
 
   return true;
-};
-
-export const prepareOrderDeadline = (
-  deadlineDate: number,
-  deadlineHour: string,
-) => {
-  return DateTime.fromMillis(deadlineDate || 0)
-    .startOf('day')
-    .plus({ ...convertHHmmStringToTimeParts(deadlineHour) })
-    .toMillis();
-};
-
-export const prepareDaySession = (
-  daySession: TDaySession,
-  deliveryHour?: string,
-) => {
-  return (
-    daySession ||
-    getDaySessionFromDeliveryTime(
-      isEmpty(deliveryHour)
-        ? undefined
-        : deliveryHour?.includes('-')
-        ? deliveryHour?.split('-')[0]
-        : deliveryHour,
-    )
-  );
 };

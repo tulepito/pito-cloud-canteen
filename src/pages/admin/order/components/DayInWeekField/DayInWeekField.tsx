@@ -4,20 +4,11 @@ import classNames from 'classnames';
 import differenceBy from 'lodash/differenceBy';
 
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
+import { DAY_IN_WEEK } from '@src/utils/constants';
 import { convertWeekDay, getDayInWeekFromPeriod } from '@utils/dates';
 import type { TObject } from '@utils/types';
 
 import css from './DayInWeekField.module.scss';
-
-const DAY_IN_WEEK = [
-  { key: 'mon', label: 'DayInWeekField.mon' },
-  { key: 'tue', label: 'DayInWeekField.tue' },
-  { key: 'wed', label: 'DayInWeekField.wed' },
-  { key: 'thu', label: 'DayInWeekField.thu' },
-  { key: 'fri', label: 'DayInWeekField.fri' },
-  { key: 'sat', label: 'DayInWeekField.sat' },
-  { key: 'sun', label: 'DayInWeekField.sun' },
-];
 
 type TDayInWeekFieldProps = {
   form: any;

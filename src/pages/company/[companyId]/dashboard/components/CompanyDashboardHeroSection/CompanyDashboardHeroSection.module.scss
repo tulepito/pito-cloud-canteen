@@ -8,7 +8,7 @@
   background-size: cover;
   background-position: center;
   margin-bottom: 72px;
-  @include flexAlign(center, center);
+  @include flexCenter;
 
   @include viewportMedium {
     padding-bottom: 20%;

@@ -3,16 +3,18 @@ import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
 import classNames from 'classnames';
 
-import Alert from '@components/Alert/Alert';
+import Alert, { EAlertPosition, EAlertType } from '@components/Alert/Alert';
 import Form from '@components/Form/Form';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import IconDelete from '@components/Icons/IconDelete/IconDelete';
 import IconMinus from '@components/Icons/IconMinus/IconMinus';
 import IconPlus from '@components/Icons/IconPlus/IconPlus';
+import IconWarning from '@components/Icons/IconWarning/IconWarning';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { parseThousandNumber } from '@helpers/format';
 import { useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
+import { useViewport } from '@hooks/useViewport';
 import { orderDetailsAnyActionsInProgress } from '@redux/slices/OrderManagement.slice';
 import { Listing } from '@src/utils/data';
 import type { TListing, TObject } from '@src/utils/types';
@@ -26,11 +28,25 @@ const TABLE_HEAD_IDS = [
   'LineItemsTableComponent.head.price',
 ];
 
+const MOBILE_TABLE_HEAD_IDS = [
+  'LineItemsTableComponent.head.foodName',
+  'LineItemsTableComponent.head.mobileQuantity',
+  'LineItemsTableComponent.head.unitPrice',
+  'LineItemsTableComponent.head.price',
+];
+
 type TLineItemsTableComponentProps = {
   data: TObject;
   onModifyQuantity: (id: string, quantity: number) => () => void;
   ableToUpdateOrder: boolean;
   isAdminFlow?: boolean;
+};
+
+// To prevent form submit when user press enter key
+const onKeyDown = (event: any) => {
+  if (event.key === 'Enter') {
+    event.preventDefault();
+  }
 };
 
 export const LineItemsTableComponent: React.FC<
@@ -44,13 +60,15 @@ export const LineItemsTableComponent: React.FC<
   const intl = useIntl();
   const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
   const orderData = useAppSelector((state) => state.OrderManagement.orderData);
-
+  const { isMobileLayout } = useViewport();
   const alertController = useBoolean();
 
   const orderDataGetter = Listing(orderData as TListing);
   const { memberAmount = 1 } = orderDataGetter.getMetadata();
 
   const { lineItems = [] } = data;
+
+  const tableHeadIds = isMobileLayout ? MOBILE_TABLE_HEAD_IDS : TABLE_HEAD_IDS;
 
   const { totalPrice, totalQuantity, formInitialValues } = useMemo(
     () =>
@@ -104,7 +122,14 @@ export const LineItemsTableComponent: React.FC<
         return (
           <tr key={foodId}>
             <td title={name}>
-              <div className={css.foodName}> {name}</div>
+              <div className={css.foodName}>
+                <RenderWhen condition={isMobileLayout}>
+                  <div className={css.name}> {name}</div>
+                  <div className={css.foodUnit}> {formattedFoodUnitPrice}</div>
+
+                  <RenderWhen.False>{name}</RenderWhen.False>
+                </RenderWhen>
+              </div>
             </td>
             <td>
               <div className={css.quantityContainer}>
@@ -119,13 +144,10 @@ export const LineItemsTableComponent: React.FC<
                   onSubmit={doNothing}
                   render={({ values }) => {
                     const handleBlurFoodQuantity = () => {
-                      if (Number(values[foodId] || 1) !== Number(quantity)) {
-                        if (actionDisabled) doNothing();
-                        else
-                          onModifyQuantity(
-                            foodId,
-                            Number(values[foodId] || 1),
-                          )();
+                      const newQuantity = Number(values[foodId] || 1);
+
+                      if (newQuantity !== Number(quantity) && !actionDisabled) {
+                        onModifyQuantity(foodId, newQuantity)();
                       }
                     };
 
@@ -135,9 +157,11 @@ export const LineItemsTableComponent: React.FC<
                           name={foodId}
                           id={`${foodId}.quantity`}
                           type="number"
+                          disabled={actionDisabled}
                           className={css.quantityField}
                           inputClassName={css.quantityInput}
                           customOnBlur={handleBlurFoodQuantity}
+                          onKeyDown={onKeyDown}
                         />
                       </Form>
                     );
@@ -194,16 +218,23 @@ export const LineItemsTableComponent: React.FC<
       <Alert
         className={classNames(css.overFlowAlert, {
           [css.isAdminLayout]: isAdminFlow,
+          [css.mobileOverFlowAlert]: isMobileLayout,
         })}
         openClassName={css.isOpen}
         message={overFlowMemberAmountMessage}
+        position={isMobileLayout ? EAlertPosition.bottom : undefined}
+        type={isMobileLayout ? EAlertType.success : undefined}
+        hasCloseButton={!isMobileLayout}
+        autoClose={isMobileLayout}
+        containerClassName={css.overFlowAlertContainer}
         isOpen={alertController.value}
-        onClose={() => alertController.setFalse()}
+        customIcon={isMobileLayout ? <IconWarning /> : undefined}
+        onClose={alertController.setFalse}
       />
       <table className={css.tableRoot}>
         <thead>
           <tr>
-            {TABLE_HEAD_IDS.map((headId: string, index: number) => (
+            {tableHeadIds.map((headId: string, index: number) => (
               <th key={index} colSpan={index === 3 ? 2 : 1}>
                 {intl.formatMessage({ id: headId })}
               </th>

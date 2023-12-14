@@ -4,19 +4,23 @@
 
 .root {
   margin: 0;
-  border-bottom: 1px solid $neutralGray5;
-
-  &.hasPadding {
-    padding: 16px;
-  }
-
-  &.isCollapsible {
-    border: 1px solid $neutralGray3;
-    border-radius: 16px;
+  border: none;
+  padding: 0;
+  &.rootOpen {
+    padding-bottom: 0;
   }
 
   & > button {
     min-height: unset;
+  }
+
+  @include viewportMedium {
+    padding: 16px 16px 0;
+    border: 1px solid $neutralGray3;
+
+    &.rootOpen {
+      padding-bottom: 16px;
+    }
   }
 
   .title {
@@ -24,36 +28,54 @@
   }
 
   .infoContainer {
-    padding-top: 20px;
     display: flex;
     flex-direction: column;
     row-gap: 16px;
+    border: 1px solid $neutralGray3;
+    border-radius: 16px;
+    padding: 16px;
+
+    @include viewportMedium {
+      border: none;
+      padding: 0;
+    }
 
     .infoItem {
       display: flex;
-      column-gap: 32px;
+      gap: 8px 32px;
       flex-wrap: wrap;
-      @include textTemplate(16px, 400, 24px);
+      flex-direction: column;
+      @include textTemplate(14px, 400, 20px);
+
+      @include viewportMedium {
+        @include textTemplate(16px, 400, 24px);
+      }
 
       .label,
       .value {
         display: inline;
       }
 
-      .label {
-        flex-basis: 170px;
-      }
       .value {
         font-weight: 600;
-        text-align: right;
         flex: 1 1 auto;
       }
 
       @include viewportMedium {
-        .value {
-          text-align: left;
+        flex-direction: row;
+
+        .label {
+          flex-basis: 170px;
         }
       }
     }
+  }
+}
+
+.rootLabel {
+  text-transform: unset;
+
+  @include viewportMedium {
+    text-transform: uppercase;
   }
 }

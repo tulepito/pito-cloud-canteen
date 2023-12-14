@@ -9,6 +9,7 @@ import Form from '@components/Form/Form';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useAppSelector } from '@hooks/reduxHooks';
+import { useViewport } from '@hooks/useViewport';
 import { emailFormatValid } from '@utils/validators';
 
 import css from './AddParticipantForm.module.scss';
@@ -40,7 +41,7 @@ const AddParticipantFormComponent: React.FC<
     form,
     ableToUpdateOrder,
   } = props;
-
+  const { isMobileLayout } = useViewport();
   const updateParticipantsInProgress = useAppSelector(
     (state) => state.OrderManagement.updateParticipantsInProgress,
   );
@@ -48,6 +49,20 @@ const AddParticipantFormComponent: React.FC<
   const formClasses = classNames(css.formContainer, {
     [css.withSubmitButton]: hasSubmitButton,
   });
+
+  const fieldProps = {
+    disabled: updateParticipantsInProgress || !ableToUpdateOrder,
+    placeholder: isMobileLayout
+      ? intl.formatMessage({
+          id: 'AddParticipantForm.mobile.email.placeholder',
+        })
+      : intl.formatMessage({
+          id: 'AddParticipantForm.email.placeholder',
+        }),
+    validate: emailFormatValid(
+      intl.formatMessage({ id: 'AddParticipantForm.email.invalid' }),
+    ),
+  };
 
   const customHandleSubmit = async (event: any) => {
     const errors = await handleSubmit(event);
@@ -63,13 +78,7 @@ const AddParticipantFormComponent: React.FC<
         <FieldTextInput
           className={css.emailField}
           name="email"
-          disabled={updateParticipantsInProgress || !ableToUpdateOrder}
-          placeholder={intl.formatMessage({
-            id: 'AddParticipantForm.email.placeholder',
-          })}
-          validate={emailFormatValid(
-            intl.formatMessage({ id: 'AddParticipantForm.email.invalid' }),
-          )}
+          {...fieldProps}
         />
         {hasSubmitButton && (
           <Button disabled={!ableToUpdateOrder} className={css.submitButton}>

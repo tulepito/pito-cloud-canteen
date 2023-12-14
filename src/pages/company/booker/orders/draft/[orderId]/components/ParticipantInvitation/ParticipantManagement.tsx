@@ -1,13 +1,18 @@
+import { useState } from 'react';
 import { toast } from 'react-toastify';
 import difference from 'lodash/difference';
 import isEmpty from 'lodash/isEmpty';
 import uniq from 'lodash/uniq';
 
+import Alert, { EAlertPosition, EAlertType } from '@components/Alert/Alert';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import useBoolean from '@hooks/useBoolean';
+import { useViewport } from '@hooks/useViewport';
 import {
   filterHasAccountUserIds,
   filterHasAccountUsers,
+  filterNoAccountUserEmail,
   useAddMemberEmail,
 } from '@pages/company/[companyId]/members/hooks/useAddMemberEmail';
 import { Listing } from '@src/utils/data';
@@ -26,7 +31,10 @@ import css from './ParticipantManagement.module.scss';
 type TParticipantManagementProps = {};
 
 const ParticipantManagement: React.FC<TParticipantManagementProps> = () => {
+  const [message, setMessage] = useState<any>('');
   const dispatch = useAppDispatch();
+  const mobileAlertControl = useBoolean();
+  const { isMobileLayout } = useViewport();
   const order = useAppSelector((state) => state.Order.order);
   const participantData = useAppSelector(
     (state) => state.BookerDraftOrderPage.participantData,
@@ -38,40 +46,72 @@ const ParticipantManagement: React.FC<TParticipantManagementProps> = () => {
 
   const orderGetter = Listing(order as TListing);
   const orderId = orderGetter.getId();
+  const { nonAccountEmails = [] } = orderGetter.getMetadata();
 
   const isParticipantListEmpty = isEmpty(participantData);
   const restrictEmailList = participantData.map((p) => p.attributes.email);
   const restrictParticipantIds = participantData.map((p) => p.id.uuid);
 
   const handleInviteMemberViaEmailList = async (emailList: string[]) => {
-    const needInviteEmailList = difference(emailList, restrictEmailList);
+    const needInviteEmailList = difference(
+      emailList,
+      restrictEmailList.concat(nonAccountEmails),
+    );
 
     if (!isEmpty(needInviteEmailList)) {
-      const newLoadedResult = await checkEmailList(needInviteEmailList);
-      const newUserIds = filterHasAccountUserIds(newLoadedResult as TObject[]);
-      const newUsers = filterHasAccountUsers(newLoadedResult as TObject[]);
+      const newLoadedResult = (await checkEmailList(
+        needInviteEmailList,
+      )) as TObject[];
+      const newNonAccountEmails = filterNoAccountUserEmail(newLoadedResult);
+      const newUserIds = filterHasAccountUserIds(newLoadedResult);
+      const newHasCompanyUserIds = filterHasAccountUserIds(
+        newLoadedResult,
+        false,
+        true,
+      );
+      const newUsers = filterHasAccountUsers(newLoadedResult);
 
       handleAddMemberToCompany(newLoadedResult as TObject[]);
 
-      if (!isEmpty(newUserIds)) {
+      const needHandleItems = newUserIds.concat(newNonAccountEmails);
+
+      if (!isEmpty(needHandleItems)) {
+        const nonAccountEmailsParamMaybe = isEmpty(newNonAccountEmails)
+          ? {}
+          : {
+              nonAccountEmails: nonAccountEmails.concat(newNonAccountEmails),
+            };
+
         await dispatch(
           BookerDraftOrderPageThunks.addOrderParticipants({
             orderId,
             participants: restrictParticipantIds,
-            newUserIds,
+            nonAccountEmails,
             newUsers,
+            newUserIds: newHasCompanyUserIds,
+            ...nonAccountEmailsParamMaybe,
           }),
         );
 
-        const message = (
+        const newMessage = (
           <span>
             Đã thêm{' '}
-            {newUserIds.length > 1 ? <b>{newUserIds.length} email</b> : 'email'}{' '}
+            {needHandleItems.length > 1 ? (
+              <b>{needHandleItems.length} email</b>
+            ) : (
+              'email'
+            )}{' '}
             vào danh sách
           </span>
         );
 
-        toast(message, successToastOptions);
+        setMessage(newMessage);
+
+        if (isMobileLayout) {
+          mobileAlertControl.setTrue();
+        } else {
+          toast(newMessage, successToastOptions);
+        }
       }
     }
   };
@@ -87,7 +127,11 @@ const ParticipantManagement: React.FC<TParticipantManagementProps> = () => {
   return (
     <div className={css.root}>
       <div className={css.titleContainer}>
-        <div className={css.title}>Danh sách thành viên hiện tại</div>
+        <div className={css.title}>
+          {isMobileLayout
+            ? 'Danh sách thành viên'
+            : 'Danh sách thành viên hiện tại'}
+        </div>
         <RenderWhen condition={!isParticipantListEmpty}>
           <div className={css.count}>{participantData.length}</div>
         </RenderWhen>
@@ -97,10 +141,27 @@ const ParticipantManagement: React.FC<TParticipantManagementProps> = () => {
         onSubmit={handleSubmitAddParticipant}
         restrictEmailList={restrictEmailList}
       />
-      <ImportParticipantFromFile
-        handleInviteMember={handleInviteMemberViaEmailList}
-      />
+      <RenderWhen condition={isMobileLayout}>
+        <RenderWhen.False>
+          <ImportParticipantFromFile
+            handleInviteMember={handleInviteMemberViaEmailList}
+          />
+        </RenderWhen.False>
+      </RenderWhen>
       <ParticipantList />
+
+      <Alert
+        className={css.mobileAlert}
+        position={EAlertPosition.bottom}
+        onClose={mobileAlertControl.setFalse}
+        autoClose
+        timeToClose={3000}
+        isOpen={mobileAlertControl.value}
+        hasCloseButton={false}
+        type={EAlertType.success}
+        message={message}
+        messageClassName={css.mobileAlertMessage}
+      />
     </div>
   );
 };

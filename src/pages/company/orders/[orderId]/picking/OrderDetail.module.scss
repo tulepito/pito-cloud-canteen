@@ -4,62 +4,36 @@
 
 .editViewRoot {
   $maxWidthWithPadding: calc(100vw - 320px - 40px);
-
-  padding: 16px 8px;
+  padding: 16px 16px 205px;
   display: flex;
   flex-direction: column;
 
   .titlePart {
-    padding: 8px 0;
     grid-column: 1 / span 2;
     order: 1;
+    margin-bottom: 20px;
+
+    @include viewportMedium {
+      padding-top: 8px;
+      margin-bottom: 8px;
+    }
   }
 
   .infoPart {
-    order: 1;
+    @include viewportMedium {
+      order: 1;
+    }
+  }
+
+  .autoPickingPart {
+    margin-top: 20px;
+    padding: 20px;
     border-radius: 16px;
-    background: $labelBlue1;
-    display: flex;
-    flex-direction: column;
-    padding: 16px;
-    gap: 24px;
-    margin-bottom: 8px;
+    border: 1px solid $neutralGray3;
+    order: 4;
 
-    .columnContainer {
-      display: flex;
-      flex-direction: row;
-      column-gap: 16px;
-      align-items: center;
-
-      @include textTemplate(14px, 400, 1.2);
-
-      & > :first-child {
-        flex-basis: 40px;
-        flex-shrink: 0;
-        width: 40px;
-        height: auto;
-      }
-
-      .columnTitle {
-        @include textTemplate(16px, 700, 1.2);
-      }
-
-      @include viewportLarge {
-        flex-basis: calc((100% - 36px) / 2);
-      }
-      @include viewportSLarge {
-        flex-basis: calc((100% - 48px) / 2);
-      }
-    }
-
-    @include viewportLarge {
-      grid-column: span 2;
-      flex-direction: row;
-      gap: 36px;
-    }
-
-    @include viewportSLarge {
-      gap: 48px;
+    @include viewportMedium {
+      display: none;
     }
   }
 
@@ -73,15 +47,13 @@
   .leftPart {
     order: 3;
 
-    margin-top: 24px;
+    @include viewportMedium {
+      margin-top: 24px;
+    }
 
     @include viewportLarge {
       order: 2;
       margin-top: 0;
-      width: min(820px, calc($maxWidthWithPadding - 48px));
-    }
-
-    @include viewportLarge {
       width: min(820px, calc($maxWidthWithPadding - 72px));
     }
 
@@ -92,8 +64,10 @@
 
   .rightPart {
     order: 2;
+    height: 0;
 
     @include viewportMedium {
+      height: fit-content;
       display: grid;
       width: 100%;
       grid-template-columns: repeat(2, calc(50% - 12px));
@@ -124,7 +98,7 @@
     }
   }
 
-  @include viewportSmall {
+  @include viewportMedium {
     padding: 24px 16px;
   }
 
@@ -138,10 +112,6 @@
     margin: 40px auto;
   }
 
-  @include viewportLarge {
-    padding: 40px 36px;
-  }
-
   @include viewportSLarge {
     padding: 40px 130px;
     max-width: calc(1180px + 130px * 2);
@@ -149,15 +119,9 @@
   }
 
   &.editNormalOrderView {
-    @include viewportLarge {
-      grid-template-columns: 1fr 820px;
-    }
-
+    padding-bottom: 140px;
     @include viewportLarge {
       grid-template-columns: 1fr 820px 1fr;
-    }
-
-    @include viewportLarge {
       padding: 0 36px;
       row-gap: 40px;
     }
@@ -261,38 +225,50 @@
 .container {
   padding: 16px;
   border-radius: 16px;
-
   background-color: $neutralGray1;
   outline: 1px solid $neutralGray5;
   outline-offset: -1px;
-
   & > div:first-of-type {
     @include textTemplate(18px, 700, 4/3);
   }
 }
 
-.container {
-  padding: 16px;
-  border-radius: 16px;
-
-  background-color: $neutralGray1;
-  outline: 1px solid $neutralGray5;
-  outline-offset: -1px;
-
-  & > div:first-of-type {
-    @include textTemplate(18px, 700, 4/3);
+.mobileContainer {
+  @include viewportMedium {
+    padding: 16px;
+    border-radius: 16px;
+    background-color: $neutralGray1;
+    outline: 1px solid $neutralGray5;
+    outline-offset: -1px;
+    & > div:first-of-type {
+      @include textTemplate(18px, 700, 4/3);
+    }
   }
 }
 
-.container {
+.confirmCancelOrderModalContainer.confirmCancelOrderModalContainer {
   padding: 16px;
-  border-radius: 16px;
+  width: calc(100vw - 32px);
 
-  background-color: $neutralGray1;
-  outline: 1px solid $neutralGray5;
-  outline-offset: -1px;
-
-  & > div:first-of-type {
-    @include textTemplate(18px, 700, 4/3);
+  @include viewportMedium {
+    padding: 24px;
   }
+}
+
+.confirmCancelOrderModalHeader.confirmCancelOrderModalHeader {
+  padding-top: 0;
+}
+
+.confirmCancelOrderModalChildren.confirmCancelOrderModalChildren {
+  padding-bottom: 12px;
+
+  @include viewportMedium {
+    padding-bottom: 40px;
+  }
+}
+
+.mobileTopActionPart {
+  display: flex;
+  column-gap: 16px;
+  justify-content: center;
 }

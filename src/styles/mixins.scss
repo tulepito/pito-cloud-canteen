@@ -327,3 +327,8 @@ $buttonBorderRadius: 8px;
     height: auto;
   }
 }
+
+@mixin focusContainer() {
+  border: 1px solid $neutralGray3;
+  box-shadow: $boxShadowFocus;
+}

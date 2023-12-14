@@ -83,6 +83,7 @@ const WDayItem: React.FC<TWDayItemProps> = ({
     }
     handleSelectDay?.(date);
     onSelectDayCallBack?.();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [date, handleSelectDay]);
 
   return (

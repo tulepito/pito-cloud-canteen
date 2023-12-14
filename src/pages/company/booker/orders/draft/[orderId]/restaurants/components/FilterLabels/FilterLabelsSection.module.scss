@@ -23,7 +23,7 @@
   flex-wrap: wrap;
 
   .filterLabel {
-    @include flexAlign(center, center);
+    @include flexCenter;
     gap: 12px;
     border: 1px solid $neutralGray7;
     border-radius: 20px;

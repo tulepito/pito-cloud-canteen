@@ -4,72 +4,99 @@
 .root {
   margin-top: 8px;
   order: 4;
+}
 
-  .fieldsContainer {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 16px 12px;
-    align-items: center;
+.fieldsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 12px;
+  align-items: center;
+
+  @include viewportMedium {
+    align-items: flex-start;
+  }
+
+  .fieldParticipantIdError {
+    margin-bottom: 0;
+  }
+
+  .fieldContainer {
+    display: inline-block;
+    flex: 1 1 100%;
 
     @include viewportMedium {
-      align-items: flex-start;
+      flex: unset;
     }
 
-    .fieldParticipantIdError {
-      margin-bottom: 0;
-    }
-
-    .fieldContainer {
+    .fieldSelect {
       display: inline-block;
-      flex: 1 1 100%;
+      width: 100%;
 
-      @include viewportMedium {
-        flex: unset;
+      .fieldSelectMenu {
+        max-height: 200px;
       }
 
-      .fieldSelect {
-        display: inline-block;
-        width: 100%;
+      @include viewportMedium {
+        width: 240px;
+      }
+
+      .fieldSelectDropdownWrapper {
+        max-height: calc(44px * 3);
 
         @include viewportMedium {
-          width: 240px;
+          max-height: 200px;
         }
-      }
-    }
-
-    .submitButton {
-      display: inline-block;
-      min-height: unset;
-      height: 44px;
-      flex: 1 1 100%;
-
-      @include viewportMedium {
-        flex: unset;
-        flex-basis: 80px;
-      }
-    }
-
-    .formError {
-      margin-top: 6px;
-      margin-bottom: 12px;
-      color: $sematicRed2;
-      overflow: hidden;
-      font-size: 12px;
-      font-weight: $fontWeightRegular;
-
-      @include viewportMedium {
-        margin-top: 6px;
-        margin-bottom: 10px;
       }
     }
   }
 
-  .addRequirementContainer {
-    .buttonContent {
-      display: flex;
-      column-gap: 8px;
-      align-items: center;
+  .submitButton {
+    min-height: unset;
+    height: 44px;
+    flex: 1 1 100%;
+    display: none;
+
+    @include viewportMedium {
+      display: inline-block;
+      flex: unset;
+      flex-basis: 80px;
     }
+  }
+
+  .formError {
+    margin-top: 6px;
+    margin-bottom: 12px;
+    color: $sematicRed2;
+    overflow: hidden;
+    font-size: 12px;
+    font-weight: $fontWeightRegular;
+
+    @include viewportMedium {
+      margin-top: 6px;
+      margin-bottom: 10px;
+    }
+  }
+}
+
+.mobileSubmitButton {
+  width: 100%;
+  margin-top: 24px;
+
+  @include viewportMedium {
+    display: none;
+  }
+}
+
+.addRequirementContainer {
+  .toggleRequirementBtn {
+    margin-top: 8px;
+    padding: 12px 0;
+  }
+
+  .buttonContent {
+    display: flex;
+    column-gap: 8px;
+    align-items: center;
   }
 }
 

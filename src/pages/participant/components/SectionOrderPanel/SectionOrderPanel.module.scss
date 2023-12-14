@@ -115,7 +115,7 @@
 
   .successModalImage {
     margin: 32px auto 0;
-    @include flexAlign(center, center);
+    @include flexCenter;
   }
 
   .successModalDescription {

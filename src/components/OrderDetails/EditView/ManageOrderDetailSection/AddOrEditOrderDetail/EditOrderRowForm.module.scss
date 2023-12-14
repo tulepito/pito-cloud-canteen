@@ -1,48 +1,59 @@
 @use '/src/styles/customMediaQueries.scss' as *;
 
 .root {
-  padding-top: 24px;
+  @include viewportMedium {
+    padding-top: 24px;
+  }
+}
 
-  .fieldOnRow {
+.fieldOnRow {
+  display: flex;
+  flex-direction: row;
+  gap: 12px 16px;
+  flex-wrap: wrap;
+
+  .input {
+    width: 100%;
+
+    @include viewportMedium {
+      width: 240px;
+    }
+  }
+}
+
+.buttonContainer {
+  margin-top: 8px;
+  padding-left: 0px;
+
+  .buttonContent {
     display: flex;
     flex-direction: row;
-    gap: 12px 16px;
-    flex-wrap: wrap;
-
-    .input {
-      width: 100%;
-
-      @include viewportMedium {
-        width: 240px;
-      }
-    }
+    column-gap: 16px;
   }
+}
 
-  .buttonContainer {
-    margin-top: 8px;
-    padding-left: 0px;
+.fieldRequirementContainer {
+  margin-top: 24px;
 
-    .buttonContent {
-      display: flex;
-      flex-direction: row;
-      column-gap: 16px;
-    }
+  textarea {
+    resize: vertical;
   }
+}
 
-  .fieldRequirementContainer {
-    margin-top: 24px;
+.submitButtonContainer {
+  margin-top: 24px;
+  display: flex;
+  justify-content: flex-end;
 
-    textarea {
-      resize: vertical;
-    }
-  }
-
-  .submitButtonContainer {
+  @include viewportMedium {
     margin-top: 45px;
-    display: flex;
-    justify-content: flex-end;
+  }
 
-    .submitButton {
+  .submitButton {
+    width: 100%;
+
+    @include viewportMedium {
+      width: unset;
       min-width: 134px;
     }
   }

@@ -35,10 +35,11 @@ import {
 import { fetchTxApi } from '@apis/txApi';
 import { checkUserExistedApi } from '@apis/userApi';
 import { EOrderDetailsTableTab } from '@components/OrderDetails/EditView/ManageOrderDetailSection/OrderDetailsTable/OrderDetailsTable.utils';
+import { checkMinMaxQuantityInProgressState } from '@helpers/order/orderInProgressHelper';
 import {
   calculateClientQuotation,
   calculatePartnerQuotation,
-} from '@helpers/orderHelper';
+} from '@helpers/order/quotationHelper';
 import { AdminManageOrderActions } from '@pages/admin/order/AdminManageOrder.slice';
 import { createAsyncThunk } from '@redux/redux.helper';
 import type { RootState } from '@redux/store';
@@ -48,8 +49,6 @@ import { denormalisedResponseEntities, Listing, User } from '@utils/data';
 import {
   EEditSubOrderHistoryType,
   ENotificationType,
-  EOrderStates,
-  EOrderType,
   EParticipantOrderStatus,
 } from '@utils/enums';
 import { EHttpStatusCode, storableError } from '@utils/errors';
@@ -66,131 +65,6 @@ import { setOrderDetail } from './Order.slice';
 import { SystemAttributesThunks } from './systemAttributes.slice';
 
 export const QUERY_SUB_ORDER_CHANGES_HISTORY_PER_PAGE = 3;
-
-export const checkMinMaxQuantityInProgressState = (
-  orderData: TObject | null,
-  orderDetail: TPlan['orderDetail'] = {},
-  oldOrderDetail: TPlan['orderDetail'] = {},
-  isAdminFlow = false,
-) => {
-  let planValidationsInProgressState = {};
-  const { orderState, orderType } = Listing(
-    orderData as TListing,
-  ).getMetadata();
-  const isInProgress = orderState === EOrderStates.inProgress;
-  const isNormalOrder = orderType === EOrderType.normal;
-  if (!isInProgress) {
-    return {
-      planValidationsInProgressState,
-      orderReachMaxRestaurantQuantity: false,
-      orderReachMinRestaurantQuantity: false,
-      orderReachMaxCanModify: false,
-    };
-  }
-  if (isNormalOrder) {
-    planValidationsInProgressState = Object.keys(orderDetail).reduce(
-      (prev: any, dateAsTimeStamp) => {
-        const currentOrderDetails = orderDetail[dateAsTimeStamp];
-        const { lineItems = [], restaurant = {} } = currentOrderDetails || {};
-        const { maxQuantity = 100, minQuantity = 1 } = restaurant || {};
-
-        const totalAdded = lineItems.reduce(
-          (result: number, lineItem: TObject) => {
-            result += lineItem?.quantity || 1;
-
-            return result;
-          },
-          0,
-        );
-
-        return {
-          ...prev,
-          [dateAsTimeStamp]: {
-            planReachMinRestaurantQuantity: totalAdded < minQuantity,
-            planReachMaxRestaurantQuantity: totalAdded > maxQuantity,
-            planReachMaxCanModify: false,
-          },
-        };
-      },
-      {},
-    );
-  } else {
-    planValidationsInProgressState = Object.keys(orderDetail).reduce(
-      (prev: any, dateAsTimeStamp) => {
-        const currentOrderDetails = orderDetail[dateAsTimeStamp] || {};
-        const { memberOrders = {}, restaurant } = currentOrderDetails;
-        const { maxQuantity = 100, minQuantity = 1 } = restaurant || {};
-
-        const { memberOrders: oldMemberOrders = {} } =
-          oldOrderDetail?.[dateAsTimeStamp] || {};
-        const oldTotalQuantity = Object.keys(oldMemberOrders).filter(
-          (f) =>
-            !!oldMemberOrders[f].foodId &&
-            oldMemberOrders[f].status === EParticipantOrderStatus.joined,
-        ).length;
-        const totalQuantity = Object.keys(memberOrders).filter(
-          (f) =>
-            !!memberOrders[f].foodId &&
-            memberOrders[f].status === EParticipantOrderStatus.joined,
-        ).length;
-
-        const totalTimeCanChange = (totalQuantity * 10) / 100;
-        const totalAdded = totalQuantity - oldTotalQuantity;
-        const planReachMaxCanModify = totalAdded > totalTimeCanChange;
-
-        return {
-          ...prev,
-          [dateAsTimeStamp]: {
-            planReachMinRestaurantQuantity: totalQuantity < minQuantity,
-            planReachMaxRestaurantQuantity:
-              isAdminFlow && totalQuantity > maxQuantity,
-            planReachMaxCanModify: !isAdminFlow && planReachMaxCanModify,
-          },
-        };
-      },
-      {},
-    );
-  }
-  const orderReachMinRestaurantQuantity = Object.keys(
-    planValidationsInProgressState,
-  ).some((dateAsTimeStamp) => {
-    const { planReachMinRestaurantQuantity } =
-      planValidationsInProgressState[
-        dateAsTimeStamp as keyof typeof planValidationsInProgressState
-      ] || {};
-
-    return planReachMinRestaurantQuantity;
-  });
-
-  const orderReachMaxRestaurantQuantity = Object.keys(
-    planValidationsInProgressState,
-  ).some((dateAsTimeStamp) => {
-    const { planReachMaxRestaurantQuantity } =
-      planValidationsInProgressState[
-        dateAsTimeStamp as keyof typeof planValidationsInProgressState
-      ];
-
-    return planReachMaxRestaurantQuantity;
-  });
-
-  const orderReachMaxCanModify = Object.keys(
-    planValidationsInProgressState,
-  ).some((dateAsTimeStamp) => {
-    const { planReachMaxCanModify } =
-      planValidationsInProgressState[
-        dateAsTimeStamp as keyof typeof planValidationsInProgressState
-      ];
-
-    return planReachMaxCanModify;
-  });
-
-  return {
-    planValidationsInProgressState,
-    orderReachMaxRestaurantQuantity,
-    orderReachMinRestaurantQuantity,
-    orderReachMaxCanModify,
-  };
-};
 
 const addNewMemberToOrderDetail = (
   orderDetail: TPlan['orderDetail'],
@@ -428,20 +302,26 @@ const updateOrderGeneralInfo = createAsyncThunk(
     const {
       id: { uuid: orderId },
     } = orderData;
+    const { skipFetchData = false, ...restParams } = params;
 
     const updateParams = {
       generalInfo: {
-        ...params,
+        ...restParams,
       },
     };
 
     await updateOrderApi(orderId, updateParams);
+    if (skipFetchData) {
+      return restParams;
+    }
     await dispatch(
       loadData({
         orderId,
         isAdminFlow: getState().OrderManagement.isAdminFlow,
       }),
     );
+
+    return {};
   },
 );
 
@@ -1797,8 +1677,15 @@ const OrderManagementSlice = createSlice({
       .addCase(updateOrderGeneralInfo.pending, (state) => {
         state.isUpdatingOrderDetails = true;
       })
-      .addCase(updateOrderGeneralInfo.fulfilled, (state) => {
+      .addCase(updateOrderGeneralInfo.fulfilled, (state, { payload }) => {
         state.isUpdatingOrderDetails = false;
+
+        if (!isEmpty(payload)) {
+          set(state.orderData, `attributes.metadata`, {
+            ...state.orderData.attributes.metadata,
+            ...payload,
+          });
+        }
       })
       .addCase(updateOrderGeneralInfo.rejected, (state) => {
         state.isUpdatingOrderDetails = false;
@@ -1857,33 +1744,19 @@ const OrderManagementSlice = createSlice({
       .addCase(deleteParticipant.fulfilled, (state, { payload }) => {
         state.isDeletingParticipant = false;
         state.participantData = state.participantData.filter(
-          (p) => p.id.uuid !== payload,
+          (p) => p.id.uuid !== payload.participantId,
         );
-        state.orderData = {
-          ...state.orderData,
-          attributes: {
-            ...(state.orderData?.attributes || {}),
-            metadata: {
-              ...(state.orderData?.attributes?.metadata || {}),
-              participants: payload.participants,
-            },
-          },
-        };
-        state.planData = {
-          ...state.planData,
-          attributes: {
-            ...state.planData.attributes,
-            metadata: {
-              ...state.planData.attributes.metadata,
-              orderDetail: {
-                ...payload.newOrderDetail,
-              },
-            },
-          },
-        };
-        state.draftOrderDetail = {
-          ...payload.newOrderDetail,
-        };
+        set(
+          state.orderData,
+          'attributes.metadata.participants',
+          payload.participants,
+        );
+        set(
+          state.planData,
+          'attributes.metadata.orderDetail',
+          payload.newOrderDetail,
+        );
+        state.draftOrderDetail = payload.newOrderDetail;
       })
       .addCase(deleteParticipant.rejected, (state) => {
         state.isDeletingParticipant = false;

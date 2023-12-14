@@ -9,7 +9,7 @@ import type { TDefaultProps, TUser } from '@utils/types';
 
 import css from './ParticipantCard.module.scss';
 
-const DEFAULT_AVATAR_PATH = '/images/default_avatar.png';
+const DEFAULT_AVATAR_PATH = '/images/defaultAvatar_small.png';
 const MAXLENGTH_NAME = 26;
 const MAXLENGTH_EMAIL = 26;
 
@@ -29,8 +29,8 @@ const ParticipantCard: React.FC<TParticipantCardProps> = (props) => {
     rootClassName,
     className,
     avatar = DEFAULT_AVATAR_PATH,
-    name = 'Demo participant',
-    email = 'xyzasd1234@gmail.com',
+    name = 'Chờ xác thực',
+    email = 'email@pito.com',
     onClickDeleteIcon,
     hasDeleteIcon = true,
     hasCheckIcon,
