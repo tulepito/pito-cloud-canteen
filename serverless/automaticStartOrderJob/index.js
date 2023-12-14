@@ -20,6 +20,9 @@ const {
   groupFoodOrderByDate,
 } = require('./services/helpers/order');
 const { ORDER_STATES, ORDER_TYPES } = require('./utils/enums');
+const {
+  sendStartOrderNativeNotification,
+} = require('./services/sendStartOrderNativeNotification');
 
 exports.handler = async (_event) => {
   // const handler = async (_event) => {
@@ -50,6 +53,7 @@ exports.handler = async (_event) => {
       orderType,
       companyId,
       plans = [],
+      bookerId,
     } = Listing(orderListing).getMetadata();
     const planId = plans[0];
     const isGroupOrder = orderType === ORDER_TYPES.group;
@@ -146,6 +150,13 @@ exports.handler = async (_event) => {
       });
       console.info('💫 > notified partners');
     }
+
+    const booker = await integrationSdk.users.show({ id: bookerId });
+    console.info('💫 > booker: ', booker);
+    sendStartOrderNativeNotification({
+      booker,
+      order: orderListing,
+    });
   } catch (error) {
     console.error('Schedule automatic start order error');
 
