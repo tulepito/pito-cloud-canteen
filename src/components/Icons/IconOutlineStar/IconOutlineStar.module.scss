@@ -1,0 +1,9 @@
+@use '/src/styles/vars.scss' as *;
+
+.root {
+  fill: $neutralGray6;
+  path {
+    width: 100%;
+    height: 100%;
+  }
+}

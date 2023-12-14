@@ -1,0 +1,46 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/defaults.scss' as *;
+
+.root {
+  .overviewClass {
+    padding-top: 52px;
+  }
+}
+
+.detailRatingRow {
+  display: grid;
+  grid-template-columns: 2fr 4fr 1fr;
+  align-items: center;
+
+  margin-top: 8px;
+}
+
+.scenarioLabel {
+  grid-column: 1 / span 1;
+  @include textTemplate(14px, $fontWeightSemiBold, 20px);
+  color: $neutralGray6;
+}
+.ratingBar {
+  grid-column: 2 / span 1;
+  height: 6px;
+  background-color: $neutralGray3;
+  position: relative;
+  border-radius: 100px;
+}
+
+.activeBar {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  background-color: $neutralGray7;
+  border-radius: 100px;
+}
+
+.ratingPoint {
+  grid-column: 3 / span 1;
+  text-align: center;
+  @include textTemplate(14px, $fontWeightSemiBold, 20px);
+}

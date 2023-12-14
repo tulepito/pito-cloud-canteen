@@ -6,6 +6,7 @@ import { useRouter } from 'next/router';
 import IconCategory from '@components/Icons/IconCategory/IconCategory';
 import IconHome from '@components/Icons/IconHome/IconHome';
 import IconOrderManagement from '@components/Icons/IconOrderManagement/IconOrderManagement';
+import IconOutlineStar from '@components/Icons/IconOutlineStar/IconOutlineStar';
 import IconSetting from '@components/Icons/IconSetting/IconSetting';
 import IconWallet from '@components/Icons/IconWallet/IconWallet';
 import type { TSidebarMenu } from '@components/MultiLevelSidebar/MultiLevelSidebar';
@@ -59,6 +60,13 @@ const LIST_SIDEBAR_MENU: TSidebarMenu[] = [
     Icon: IconWallet,
     nameLink: partnerPaths.ManagePayments,
     label: 'PartnerSidebar.paymentLabel',
+    isFirstLevel: true,
+  },
+  {
+    id: 'review',
+    Icon: IconOutlineStar,
+    nameLink: partnerPaths.ManageReviews,
+    label: 'PartnerSidebar.reviews',
     isFirstLevel: true,
   },
   {
