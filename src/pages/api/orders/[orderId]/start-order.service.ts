@@ -7,7 +7,13 @@ import { fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { createNativeNotification } from '@services/nativeNotification';
 import { Listing, User } from '@utils/data';
-import { ENativeNotificationType, EOrderStates } from '@utils/enums';
+import {
+  EBookerNativeNotificationType,
+  ENativeNotificationType,
+  EOrderStates,
+} from '@utils/enums';
+
+import { sendBookerNativeNotification } from './send-booker-native-notification.service';
 
 export const startOrder = async (orderId: string, planId: string) => {
   const integrationSdk = getIntegrationSdk();
@@ -98,5 +104,10 @@ export const startOrder = async (orderId: string, planId: string) => {
     orderListing,
     ENativeNotificationType.BookerTransitOrderStateToInProgress,
     integrationSdk,
+  );
+
+  sendBookerNativeNotification(
+    orderListing,
+    EBookerNativeNotificationType.AdminStartOrder,
   );
 };

@@ -1,8 +1,9 @@
 import compact from 'lodash/compact';
 
-import { fetchTransaction } from '@services/integrationHelper';
+import { fetchTransaction, fetchUser } from '@services/integrationHelper';
+import { createNativeNotificationToBooker } from '@services/nativeNotification';
 import { Listing, Transaction } from '@src/utils/data';
-import { EOrderStates } from '@src/utils/enums';
+import { EBookerNativeNotificationType, EOrderStates } from '@src/utils/enums';
 import {
   ETransition,
   TRANSITIONS_TO_STATE_CANCELED,
@@ -22,6 +23,7 @@ export const transitionOrderStatus = async (
     isClientSufficientPaid,
     isPartnerSufficientPaid,
     orderStateHistory = [],
+    bookerId,
   } = orderListing.getMetadata();
   const { orderDetail = {} } = planListing.getMetadata();
 
@@ -85,5 +87,13 @@ export const transitionOrderStatus = async (
         ],
       },
     });
+    const booker = await fetchUser(bookerId);
+    createNativeNotificationToBooker(
+      EBookerNativeNotificationType.SubOrderDelivering,
+      {
+        booker,
+        order,
+      },
+    );
   }
 };

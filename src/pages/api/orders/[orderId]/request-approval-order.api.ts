@@ -8,7 +8,9 @@ import { getIntegrationSdk } from '@services/integrationSdk';
 import adminChecker from '@services/permissionChecker/admin';
 import { handleError } from '@services/sdk';
 import { Listing } from '@utils/data';
-import { EOrderDraftStates } from '@utils/enums';
+import { EBookerNativeNotificationType, EOrderDraftStates } from '@utils/enums';
+
+import { sendBookerNativeNotification } from './send-booker-native-notification.service';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
@@ -62,10 +64,17 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
               { expand: true },
             ),
           );
-          await emailSendingFactory(
-            EmailTemplateTypes.BOOKER.BOOKER_ORDER_CREATED,
-            { orderId },
-          );
+
+          await Promise.allSettled([
+            emailSendingFactory(
+              EmailTemplateTypes.BOOKER.BOOKER_ORDER_CREATED,
+              { orderId },
+            ),
+            sendBookerNativeNotification(
+              updatedOrderListing,
+              EBookerNativeNotificationType.AdminCreateNewOrder,
+            ),
+          ]);
 
           res.status(200).json(updatedOrderListing);
         }

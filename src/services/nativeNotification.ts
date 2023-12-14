@@ -1,8 +1,12 @@
 import type { TNativeNotificationPartnerParams } from '@src/types/nativeNotificationParams';
 import { Listing, User } from '@src/utils/data';
 import { formatTimestamp } from '@src/utils/dates';
-import { ENativeNotificationType } from '@src/utils/enums';
-import type { TListing } from '@src/utils/types';
+import {
+  EBookerNativeNotificationType,
+  ECompanyPermission,
+  ENativeNotificationType,
+} from '@src/utils/enums';
+import type { TListing, TUser } from '@src/utils/types';
 
 import { fetchUser } from './integrationHelper';
 import { sendNotification } from './oneSignal';
@@ -326,6 +330,169 @@ export const createNativeNotificationToPartner = async (
           );
         });
         await Promise.allSettled(oneSingals);
+      }
+      break;
+
+    default:
+      break;
+  }
+};
+
+type NativeNotificationBookerParams = {
+  booker: TUser;
+  order?: TListing;
+  subOrderDate?: string;
+};
+
+export const createNativeNotificationToBooker = async (
+  notificationType: EBookerNativeNotificationType,
+  notificationParams: NativeNotificationBookerParams,
+) => {
+  const { booker } = notificationParams;
+  const bookerUser = User(booker);
+  const { isCompany, company } = bookerUser.getMetadata();
+  const { firstName, lastName } = bookerUser.getProfile();
+  const bookerName = `${lastName} ${firstName}`;
+  const isBooker = Object.values(company).some(({ permission }: any) => {
+    return permission === ECompanyPermission.booker;
+  });
+
+  if (!isCompany && !isBooker) return;
+
+  const { oneSignalUserIds = [] } = bookerUser.getPrivateData();
+
+  if (oneSignalUserIds.length === 0) return;
+
+  switch (notificationType) {
+    case EBookerNativeNotificationType.AdminCreateNewOrder:
+      {
+        const { order } = notificationParams;
+        const orderListing = Listing(order!);
+        const orderId = orderListing.getId();
+
+        const url = `${BASE_URL}/company/booker/orders/draft/${orderId}`;
+
+        oneSignalUserIds.forEach((oneSignalUserId: string) => {
+          sendNotification({
+            title: `Có đơn hàng mới ✨`,
+            content:
+              'Ting ting! Bạn vừa nhận được một đơn hàng mới tạo bởi PITO',
+            url,
+            oneSignalUserId,
+          });
+        });
+      }
+      break;
+
+    case EBookerNativeNotificationType.AdminStartOrder:
+      {
+        const { order } = notificationParams;
+        const orderListing = Listing(order!);
+        const orderId = orderListing.getId();
+        const { startDate, endDate } = orderListing.getMetadata();
+
+        const url = `${BASE_URL}/company/orders/${orderId}`;
+
+        oneSignalUserIds.forEach((oneSignalUserId: string) => {
+          sendNotification({
+            title: `Tuần ăn đã đặt 🌟`,
+            content: `Tuần ăn ${formatTimestamp(
+              startDate,
+              'dd/MM',
+            )} -${formatTimestamp(endDate, 'dd/MM')} đã được đặt thành công.`,
+            url,
+            oneSignalUserId,
+          });
+        });
+      }
+      break;
+
+    case EBookerNativeNotificationType.SubOrderCancelled:
+      {
+        const { order, subOrderDate } = notificationParams;
+        const orderListing = Listing(order!);
+        const orderId = orderListing.getId();
+
+        const url = `${BASE_URL}/company/orders/${orderId}`;
+
+        oneSignalUserIds.forEach((oneSignalUserId: string) => {
+          sendNotification({
+            title: `Opps! Ngày ăn bị hủy! 😢`,
+            content: `${bookerName} ơi, rất tiếc phải thông báo ngày ăn ${formatTimestamp(
+              +subOrderDate!,
+              'dd/MM',
+            )} đã bị hủy`,
+            url,
+            oneSignalUserId,
+          });
+        });
+      }
+      break;
+
+    case EBookerNativeNotificationType.SubOrderDelivering:
+      {
+        const { order, subOrderDate } = notificationParams;
+        const orderListing = Listing(order!);
+        const orderId = orderListing.getId();
+
+        const url = `${BASE_URL}/company/orders/${orderId}`;
+
+        oneSignalUserIds.forEach((oneSignalUserId: string) => {
+          sendNotification({
+            title: `Cơm sắp đến 🚚`,
+            content: `Ngày ăn ${formatTimestamp(
+              +subOrderDate!,
+              'dd/MM',
+            )} sắp đến rồi. Chuẩn bị ăn thôi!!`,
+            url,
+            oneSignalUserId,
+          });
+        });
+      }
+      break;
+
+    case EBookerNativeNotificationType.SubOrderDelivered:
+      {
+        const { order, subOrderDate } = notificationParams;
+        const orderListing = Listing(order!);
+        const orderId = orderListing.getId();
+
+        const url = `${BASE_URL}/company/orders/${orderId}`;
+
+        oneSignalUserIds.forEach((oneSignalUserId: string) => {
+          sendNotification({
+            title: `Đã có cơm 😍`,
+            content: `Ngày ăn ${formatTimestamp(
+              +subOrderDate!,
+              'dd/MM',
+            )} đã được giao đến bạn. Chúc ${bookerName} và đồng nghiệp có một bữa ăn ngon miệng.`,
+            url,
+            oneSignalUserId,
+          });
+        });
+      }
+      break;
+
+    case EBookerNativeNotificationType.OrderIsPendingPayment:
+      {
+        const { order } = notificationParams;
+        const orderListing = Listing(order!);
+        const orderId = orderListing.getId();
+        const { startDate, endDate } = orderListing.getMetadata();
+
+        const url = `${BASE_URL}/company/orders/${orderId}`;
+
+        oneSignalUserIds.forEach((oneSignalUserId: string) => {
+          sendNotification({
+            title: `Đánh giá tuần ăn 🌟`,
+            content: `${bookerName} ơi, bạn đánh giá tuần ăn ${formatTimestamp(
+              startDate,
+              'dd/MM',
+            )} -${formatTimestamp(endDate, 'dd/MM')} mấy điểm?`,
+            url,
+            oneSignalUserId,
+          });
+        });
       }
       break;
 

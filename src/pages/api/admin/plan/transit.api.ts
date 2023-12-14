@@ -9,8 +9,11 @@ import { pushNativeNotificationSubOrderDate } from '@pages/api/helpers/pushNotif
 import createQuotation from '@pages/api/orders/[orderId]/quotation/create-quotation.service';
 import { createFoodRatingNotificationScheduler } from '@services/awsEventBrigdeScheduler';
 import { emailSendingFactory, EmailTemplateTypes } from '@services/email';
-import { fetchListing } from '@services/integrationHelper';
-import { createNativeNotification } from '@services/nativeNotification';
+import { fetchListing, fetchUser } from '@services/integrationHelper';
+import {
+  createNativeNotification,
+  createNativeNotificationToBooker,
+} from '@services/nativeNotification';
 import { createFirebaseDocNotification } from '@services/notifications';
 import adminChecker from '@services/permissionChecker/admin';
 import { getIntegrationSdk, handleError } from '@services/sdk';
@@ -21,6 +24,7 @@ import {
 } from '@src/utils/data';
 import { formatTimestamp, VNTimezone } from '@src/utils/dates';
 import {
+  EBookerNativeNotificationType,
   ENativeNotificationType,
   ENotificationType,
   EQuotationStatus,
@@ -95,6 +99,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           plans = [],
           quotationId,
           companyId,
+          bookerId,
         } = orderListing.getMetadata();
         const { title: orderTitle } = orderListing.getAttributes();
         const generalNotificationData = {
@@ -106,6 +111,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         const plan = await fetchListing(plans[0]);
         const planListing = Listing(plan);
         const planId = planListing.getId();
+
+        const booker = await fetchUser(bookerId);
 
         const { orderDetail = {} } = planListing.getMetadata();
         const { memberOrders = {}, restaurant = {} } =
@@ -157,6 +164,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
                 }
               },
             );
+            createNativeNotificationToBooker(
+              EBookerNativeNotificationType.SubOrderDelivering,
+              {
+                booker,
+                order,
+                subOrderDate: `${startTimestamp}`,
+              },
+            );
             break;
           }
           case ETransition.COMPLETE_DELIVERY: {
@@ -196,6 +211,16 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
                 planId,
               },
             });
+
+            createNativeNotificationToBooker(
+              EBookerNativeNotificationType.SubOrderDelivered,
+              {
+                booker,
+                order,
+                subOrderDate: `${startTimestamp}`,
+              },
+            );
+
             await transitionOrderStatus(order, plan, integrationSdk);
             break;
           }
@@ -298,7 +323,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
               partner: newPartner,
             });
             // TODO: update all payments records
-            await Promise.all([
+            await Promise.allSettled([
               modifyPaymentWhenCancelSubOrderService({
                 order,
                 subOrderDate: startTimestamp,
@@ -306,6 +331,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
                 partnerQuotation: newPartner,
               }),
               transitionOrderStatus(order, plan, integrationSdk),
+              createNativeNotificationToBooker(
+                EBookerNativeNotificationType.SubOrderCancelled,
+                {
+                  booker,
+                  order,
+                  subOrderDate: `${startTimestamp}`,
+                },
+              ),
             ]);
             break;
           }
