@@ -1,0 +1,81 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/defaults.scss' as *;
+
+.summarizeContainer {
+  @include flexAlign(flex-start);
+  gap: 24px;
+  margin-top: 30px;
+  align-items: stretch;
+  flex-wrap: wrap;
+
+  .summarizeItemContainer {
+    border: 1px solid $neutralGray3;
+    border-radius: 12px;
+  }
+
+  .summarizeValueContainer {
+    height: inherit;
+    padding: 24px;
+    @include flexAlign(flex-start);
+    gap: 12px;
+    flex-direction: column;
+    .summarizeValue {
+      @include textTemplate(24px, $fontWeightBold, 34px);
+    }
+    .summarizeLable {
+      @include flexAlign(flex-start);
+      gap: 8px;
+    }
+  }
+
+  .detailRatingContainer {
+    padding: 12px;
+    height: inherit;
+    @include flexAlign(center, center);
+    gap: 8px;
+    flex-direction: column;
+  }
+}
+
+.detailRatingRow {
+  display: grid;
+  grid-template-columns: 2fr 4fr 1fr;
+  align-items: center;
+  gap: 8px;
+}
+
+.scenarioLabel {
+  grid-column: 1 / span 1;
+  color: $neutralGray6;
+}
+.ratingBar {
+  grid-column: 2 / span 1;
+  height: 6px;
+  background-color: $neutralGray3;
+  position: relative;
+  border-radius: 100px;
+}
+
+.activeBar {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  background-color: $neutralGray7;
+  border-radius: 100px;
+}
+
+.ratingPoint {
+  grid-column: 3 / span 1;
+  text-align: center;
+}
+
+.rattingText {
+  @include textTemplate(14px, $fontWeightSemiBold, 20px);
+}
+
+.normalText {
+  @include textTemplate(14px, $fontWeightRegular, 20px);
+}

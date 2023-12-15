@@ -1,0 +1,79 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/defaults.scss' as *;
+
+.reviewCardContainer {
+  @include flexAlign(flex-start);
+  flex-direction: row;
+  flex-wrap: nowrap;
+  gap: 9px;
+  .reviewCardContainerAvartar {
+    padding-top: 8px;
+  }
+
+  .reviewCardContainerItem {
+    @include flexAlign(flex-start);
+    gap: 8px;
+    flex-direction: column;
+    .nameRatingContainer {
+      @include flexAlign(flex-start);
+      gap: 4px;
+      flex-direction: column;
+
+      .nameValue {
+        color: $neutralGray6;
+      }
+      .ratingValue {
+        color: $neutralGray7;
+      }
+    }
+
+    .foodRatingContainer {
+      @include flexAlign(flex-start);
+      gap: 8px;
+      flex-direction: column;
+      padding-bottom: 12px;
+      .foodRatingContainerItem {
+        @include flexAlign(center, flex-start);
+        gap: 7px;
+        flex-direction: row;
+        flex-wrap: nowrap;
+
+        .foodRatingContainerItemLabel {
+          color: $neutralGray6;
+        }
+
+        .foodRatingContainerItemValue {
+          color: $neutralGray7;
+        }
+      }
+    }
+  }
+}
+
+.rattingText {
+  @include textTemplate(14px, $fontWeightSemiBold, 20px);
+}
+
+.normalText {
+  @include textTemplate(14px, $fontWeightRegular, 20px);
+}
+
+.nameText {
+  @include textTemplate(12px, $fontWeightRegular, 16px);
+}
+
+.foodNameText {
+  @include textTemplate(12px, $fontWeightSemiBold, 16px);
+}
+
+.iconRatingFace {
+  width: 16px;
+  height: 16px;
+}
+
+.avatar {
+  width: 24px;
+  height: 24px;
+}
