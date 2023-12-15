@@ -36,10 +36,6 @@
   }
 }
 
-.calendarContainer {
-  margin-top: -50px;
-}
-
 .subOrderContainer {
   @include flexAlign(unset);
   flex-direction: column;
@@ -88,4 +84,14 @@
     width: 0px;
     height: 20px;
   }
+}
+
+.tabHeaderPosition {
+  position: relative;
+}
+
+.headerWrapperClassName {
+  position: absolute;
+  top: 0;
+  width: auto;
 }
