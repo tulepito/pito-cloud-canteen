@@ -79,6 +79,8 @@
       .subText {
         @include textTemplate(12px, 400, 16px);
         color: $neutralGray6;
+        text-overflow: ellipsis;
+        overflow: hidden;
       }
 
       .logout {
@@ -96,7 +98,7 @@
 
     .logoutIcon {
       path {
-        fill: $sematicRed2;
+        stroke: $sematicRed2;
       }
     }
 

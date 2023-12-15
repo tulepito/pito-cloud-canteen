@@ -4,7 +4,6 @@ import classNames from 'classnames';
 import { useRouter } from 'next/router';
 
 import Avatar from '@components/Avatar/Avatar';
-import { InlineTextButton } from '@components/Button/Button';
 import IconLogout from '@components/Icons/IconLogout/IconLogout';
 import IconSwap from '@components/Icons/IconSwap/IconSwap';
 import IconUser from '@components/Icons/IconUser2/IconUser2';
@@ -98,14 +97,12 @@ const CompanyHeader: React.FC<CompanyHeaderProps> = ({
               <div className={css.text}>Đổi vai trò</div>
             </ProfileMenuItem>
 
-            <ProfileMenuItem key="Logout" className={css.menuItem}>
+            <ProfileMenuItem
+              key="Logout"
+              className={css.menuItem}
+              onClick={handleLogout}>
               <IconLogout className={css.logoutIcon} />
-              <InlineTextButton
-                type="button"
-                onClick={handleLogout}
-                className={css.logout}>
-                <p>Đăng xuất</p>
-              </InlineTextButton>
+              <div className={css.logout}>Đăng xuất</div>
             </ProfileMenuItem>
           </ProfileMenuContent>
         </ProfileMenu>
