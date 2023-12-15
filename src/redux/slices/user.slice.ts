@@ -211,6 +211,8 @@ const userSlice = createSlice({
         userPermission: EUserSystemPermission.normal,
         sendVerificationEmailInProgress: false,
         sendVerificationEmailError: null,
+        currentRole: null!,
+        roles: [],
       };
     },
     setRole: (state, action) => {
