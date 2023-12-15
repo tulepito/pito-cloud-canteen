@@ -1,11 +1,11 @@
 import React from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import classNames from 'classnames';
-import { DateTime } from 'luxon';
 
 import Button from '@components/Button/Button';
 import IconFilter from '@components/Icons/IconFilter/IconFilter';
 import IconReviewEmpty from '@components/Icons/IconReviewEmpty/IconReviewEmpty';
+import { useViewport } from '@hooks/useViewport';
 
 import ReviewDetailCard from './components/ReviewDetailCard/ReviewDetailCard';
 import SummarizeReview from './components/SummarizeReview/SummarizeReview';
@@ -20,13 +20,15 @@ export type TReviewContent = {
   eatingUtensilRating: number;
   description: string;
   foodName: string;
-  orderDate: DateTime;
+  orderDate: Date;
   avatar: string;
 };
 
 const ManageReviewsPage = () => {
   const intl = useIntl();
+  const { isMobileLayout } = useViewport();
 
+  // #TODO FAKE Data to Test
   const food = 4.2;
   const packaging = 4.2;
   const pointRating = 4.8;
@@ -41,25 +43,101 @@ const ManageReviewsPage = () => {
       description:
         'Lorem ipsum dolor sit amet consectetur. Sagittis auctor sit vulputate pulvinar proin at ut amet.',
       eatingUtensilRating: 3,
-      orderDate: DateTime.now(),
+      orderDate: new Date(),
+      avatar: 'avatar',
+    },
+    {
+      id: 1,
+      name: 'vy',
+      rating: 3,
+      foodName: 'Hàu nướng phô mai',
+      foodRating: 3,
+      description:
+        'Lorem ipsum dolor sit amet consectetur. Sagittis auctor sit vulputate pulvinar proin at ut amet.',
+      eatingUtensilRating: 3,
+      orderDate: new Date(),
+      avatar: 'avatar',
+    },
+    {
+      id: 1,
+      name: 'vy',
+      rating: 3,
+      foodName: 'Hàu nướng phô mai',
+      foodRating: 3,
+      description:
+        'Lorem ipsum dolor sit amet consectetur. Sagittis auctor sit vulputate pulvinar proin at ut amet.',
+      eatingUtensilRating: 3,
+      orderDate: new Date(),
+      avatar: 'avatar',
+    },
+    {
+      id: 1,
+      name: 'vy',
+      rating: 3,
+      foodName: 'Hàu nướng phô mai',
+      foodRating: 3,
+      description:
+        'Lorem ipsum dolor sit amet consectetur. Sagittis auctor sit vulputate pulvinar proin at ut amet.',
+      eatingUtensilRating: 3,
+      orderDate: new Date(),
+      avatar: 'avatar',
+    },
+    {
+      id: 1,
+      name: 'vy',
+      rating: 3,
+      foodName: 'Hàu nướng phô mai',
+      foodRating: 3,
+      description:
+        'Lorem ipsum dolor sit amet consectetur. Sagittis auctor sit vulputate pulvinar proin at ut amet.',
+      eatingUtensilRating: 3,
+      orderDate: new Date(),
+      avatar: 'avatar',
+    },
+    {
+      id: 1,
+      name: 'vy',
+      rating: 3,
+      foodName: 'Hàu nướng phô mai',
+      foodRating: 3,
+      description:
+        'Lorem ipsum dolor sit amet consectetur. Sagittis auctor sit vulputate pulvinar proin at ut amet.',
+      eatingUtensilRating: 3,
+      orderDate: new Date(),
+      avatar: 'avatar',
+    },
+    {
+      id: 1,
+      name: 'vy',
+      rating: 3,
+      foodName: 'Hàu nướng phô mai',
+      foodRating: 3,
+      description:
+        'Lorem ipsum dolor sit amet consectetur. Sagittis auctor sit vulputate pulvinar proin at ut amet.',
+      eatingUtensilRating: 3,
+      orderDate: new Date(),
       avatar: 'avatar',
     },
   ];
+  // #END TODO FAKE Data to Test
 
   return (
     <div className={css.root}>
       <div className={css.headerPage}>
-        {intl.formatMessage({ id: 'PartnerSidebar.reviews' })}
+        <span>{intl.formatMessage({ id: 'PartnerSidebar.reviews' })}</span>
       </div>
-      <div className={classNames(css.overviewClass, css.titleText)}>
-        {intl.formatMessage({ id: 'ManagePartnerReviewsPage.overView' })}
+      <div className={css.SummarizeContainer}>
+        <div className={classNames(css.titleText)}>
+          {intl.formatMessage({ id: 'ManagePartnerReviewsPage.overView' })}
+        </div>
+        <SummarizeReview
+          foodRating={food}
+          packagingRating={packaging}
+          pointRating={pointRating}
+          totalRating={totalRating}
+        />
       </div>
-      <SummarizeReview
-        foodRating={food}
-        packagingRating={packaging}
-        pointRating={pointRating}
-        totalRating={totalRating}
-      />
+
       <div className={css.reviewTable}>
         <div className={css.tableTitleContainer}>
           <span className={css.titleText}>
@@ -75,21 +153,33 @@ const ManageReviewsPage = () => {
             <FormattedMessage id="IntegrationFilterModal.filterMessage" />
           </Button>
         </div>
-
-        {reviewsData.length === 0 ? (
-          <div className={css.dataEmtpy}>
-            <IconReviewEmpty />
-            <span className={classNames(css.dataEmptyTitle, css.normalText)}>
-              {intl.formatMessage({
-                id: 'ManagePartnerReviewsPage.emptyReviewDetailTitle',
-              })}
-            </span>
-          </div>
-        ) : (
-          reviewsData.map((r) => {
-            return <ReviewDetailCard key={r.id} data={r} />;
-          })
-        )}
+        <div className={css.reviewTableContent}>
+          {reviewsData.length === 0 ? (
+            <div className={css.dataEmtpy}>
+              <IconReviewEmpty />
+              <span className={classNames(css.dataEmptyTitle, css.normalText)}>
+                {intl.formatMessage({
+                  id: 'ManagePartnerReviewsPage.emptyReviewDetailTitle',
+                })}
+              </span>
+            </div>
+          ) : isMobileLayout ? (
+            reviewsData.map((r) => {
+              return (
+                <ReviewDetailCard
+                  rootClassName={css.reviewCartContainer}
+                  key={r.id}
+                  data={r}
+                />
+              );
+            })
+          ) : (
+            // this Set Table
+            reviewsData.map((r) => {
+              return <ReviewDetailCard key={r.id} data={r} />;
+            })
+          )}
+        </div>
       </div>
     </div>
   );

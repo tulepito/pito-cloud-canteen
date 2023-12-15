@@ -21,8 +21,18 @@
     @include flexAlign(flex-start);
     gap: 12px;
     flex-direction: column;
+
+    .summarizeTitle {
+      @include textTemplate(14px, $fontWeightRegular, 20px);
+      @include viewportSmall {
+        @include textTemplate(14px, $fontWeightRegular, 20px);
+      }
+    }
     .summarizeValue {
-      @include textTemplate(24px, $fontWeightBold, 34px);
+      @include textTemplate(14px, $fontWeightBold, 20px);
+      @include viewportSmall {
+        @include textTemplate(24px, $fontWeightBold, 34px);
+      }
     }
     .summarizeLable {
       @include flexAlign(flex-start);
@@ -74,8 +84,4 @@
 
 .rattingText {
   @include textTemplate(14px, $fontWeightSemiBold, 20px);
-}
-
-.normalText {
-  @include textTemplate(14px, $fontWeightRegular, 20px);
 }

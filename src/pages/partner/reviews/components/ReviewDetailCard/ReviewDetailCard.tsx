@@ -2,6 +2,7 @@ import { useIntl } from 'react-intl';
 import classNames from 'classnames';
 
 import IconRatingFace from '@components/Icons/IconRatingFace/IconRatingFace';
+import { formatDate } from '@src/utils/dates';
 
 import type { TReviewContent } from '../../ManageReviews.page';
 
@@ -9,13 +10,17 @@ import css from './ReviewDetailCard.module.scss';
 
 type TReviewDetailCardProps = {
   data: TReviewContent;
+  rootClassName?: string;
 };
 
-const ReviewDetailCard: React.FC<TReviewDetailCardProps> = ({ data }) => {
+const ReviewDetailCard: React.FC<TReviewDetailCardProps> = ({
+  data,
+  rootClassName,
+}) => {
   const intl = useIntl();
 
   return (
-    <div key={data.id} className={css.reviewCardContainer}>
+    <div className={classNames(css.reviewCardContainer, rootClassName)}>
       <div className={css.reviewCardContainerAvartar}>
         <IconRatingFace className={css.avatar} rating={5} />
       </div>
@@ -84,18 +89,18 @@ const ReviewDetailCard: React.FC<TReviewDetailCardProps> = ({ data }) => {
         </div>
         <span className={css.normalText}>{data.description}</span>
         <div>
-          <span className={classNames(css.nameText, css.foodTitleAndDate)}>
+          <span className={classNames(css.nameText, css.orderedFoodInfo)}>
             {intl.formatMessage({
               id: 'ManagePartnerReviewsPage.orderedFood',
             })}
             :
           </span>
-          <span className={classNames(css.foodNameText)}>
+          <span className={classNames(css.foodNameText, css.orderedFoodInfo)}>
             {` ${data.foodName} • `}
           </span>
 
-          <span className={classNames(css.nameText, css.foodTitleAndDate)}>
-            {data.orderDate.toString()}
+          <span className={classNames(css.nameText, css.orderedFoodInfo)}>
+            {formatDate(data.orderDate, 'dd/MM/yyyy')}
           </span>
         </div>
       </div>

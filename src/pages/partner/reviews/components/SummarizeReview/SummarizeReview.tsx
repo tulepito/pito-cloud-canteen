@@ -34,7 +34,7 @@ const SummarizeReview: React.FC<TSummarizeReviewProps> = ({
         )}>
         <div className={css.summarizeLable}>
           <IconUser variant="multiUser" />
-          <span className={css.normalText}>
+          <span className={css.summarizeTitle}>
             {intl.formatMessage({ id: 'ManagePartnerReviewsPage.totalReview' })}
           </span>
         </div>

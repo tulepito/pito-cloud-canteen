@@ -8,6 +8,15 @@
   flex-direction: row;
   flex-wrap: nowrap;
   gap: 9px;
+  border: 1px solid $neutralGray4;
+  border-radius: 8px;
+  padding: 12px;
+
+  @include viewportSmall {
+    border: 0;
+    padding: 0;
+  }
+
   .reviewCardContainerAvartar {
     padding-top: 8px;
   }
@@ -49,6 +58,10 @@
         }
       }
     }
+
+    .orderedFoodInfo {
+      color: $neutralGray6;
+    }
   }
 }
 
@@ -76,4 +89,9 @@
 .avatar {
   width: 24px;
   height: 24px;
+}
+
+.reviewCartContainer {
+  border: 1px solid $neutralGray4;
+  border-radius: 8px;
 }

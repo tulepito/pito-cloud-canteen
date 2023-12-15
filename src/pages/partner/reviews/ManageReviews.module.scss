@@ -4,17 +4,60 @@
 @use '/src/styles/defaults.scss' as *;
 
 .root {
-  .headerPage {
-    @include textTemplate(24px, $fontWeightBold, 32px);
+  @include flexAlign(flex-start);
+  gap: 8px;
+  flex-direction: column;
+  background-color: $neutralGray4;
+  @include viewportSmall {
+    background-color: $neutralGray1;
   }
-  .overviewClass {
-    padding-top: 52px;
+
+  .headerPage {
+    background-color: $neutralGray1;
+    width: 100%;
+    padding: 16px;
+    @include flexAlign(center, flex-start);
+    span {
+      @include textTemplate(16px, $fontWeightBold, 24px);
+      @include viewportSmall {
+        @include textTemplate(24px, $fontWeightBold, 32px);
+      }
+    }
+    @include viewportSmall {
+      padding: 16px 0;
+    }
+  }
+
+  .SummarizeContainer {
+    background-color: $neutralGray1;
+    padding: 16px;
+    @include viewportSmall {
+      padding: 16px 0 0 0;
+    }
   }
 
   .reviewTable {
-    margin-top: 50px;
+    width: 100%;
+    background-color: $neutralGray1;
+    padding: 16px;
+    @include flexAlign(flex-start);
+    gap: 16px;
+    flex-direction: column;
+    @include viewportSmall {
+      padding: 16px 0 0 0;
+    }
+
+    .reviewTableContent {
+      @include flexAlign(flex-start);
+      gap: 16px;
+      flex-direction: column;
+      @include viewportSmall {
+        display: block;
+      }
+    }
+
     .tableTitleContainer {
-      margin-bottom: 30px;
+      width: 100%;
       @include flexAlign(center, space-between);
     }
 
@@ -32,7 +75,10 @@
 }
 
 .titleText {
-  @include textTemplate(20px, $fontWeightBold, 32px);
+  @include textTemplate(16px, $fontWeightSemiBold, 24px);
+  @include viewportSmall {
+    @include textTemplate(20px, $fontWeightBold, 32px);
+  }
 }
 .normalText {
   @include textTemplate(14px, $fontWeightRegular, 20px);
