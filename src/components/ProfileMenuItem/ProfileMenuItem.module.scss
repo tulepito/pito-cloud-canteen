@@ -1,6 +1,15 @@
+@use '/src/styles/vars.scss' as *;
+
 .root {
   height: 100%;
   width: 100%;
   margin: 0;
   list-style: none;
+  padding: 16px 0 10px 16px;
+  border-bottom: 1px solid $neutralGray3;
+  cursor: pointer;
+
+  &:last-child {
+    border-bottom: none;
+  }
 }

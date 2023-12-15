@@ -63,6 +63,10 @@
     span {
       @include textTemplate(16px, $fontWeightSemiBold, 24px);
     }
+
+    .iconSwap {
+      transform: rotate(90deg);
+    }
   }
 }
 

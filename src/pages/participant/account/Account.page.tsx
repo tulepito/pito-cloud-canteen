@@ -7,9 +7,11 @@ import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import IconFood from '@components/Icons/IconFood/IconFood';
 import IconLock from '@components/Icons/IconLock/IconLock';
 import IconLogout from '@components/Icons/IconLogout/IconLogout';
+import IconSwap from '@components/Icons/IconSwap/IconSwap';
 import IconUser from '@components/Icons/IconUser2/IconUser2';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { useLogout } from '@hooks/useLogout';
+import { useRoleSelectModalController } from '@hooks/useRoleSelectModalController';
 import { useViewport } from '@hooks/useViewport';
 import { currentUserSelector } from '@redux/slices/user.slice';
 import { participantPaths } from '@src/paths';
@@ -23,6 +25,11 @@ const AccountPage = () => {
   const handleLogout = useLogout();
   const { isMobileLayout } = useViewport();
   const currentUser = useAppSelector(currentUserSelector);
+  const { onOpenRoleSelectModal } = useRoleSelectModalController();
+
+  const roles = useAppSelector((state) => state.user.roles);
+
+  const shouldShowChangeRoleOption = roles.length > 1;
 
   useEffect(() => {
     if (!isMobileLayout) {
@@ -74,6 +81,15 @@ const AccountPage = () => {
           </div>
           <IconArrow direction="right" />
         </div>
+        {shouldShowChangeRoleOption && (
+          <div className={css.navigationItem} onClick={onOpenRoleSelectModal}>
+            <div className={css.iconGroup}>
+              <IconSwap className={css.iconSwap} />
+              <span>Đổi vai trò</span>
+            </div>
+            <IconArrow direction="right" />
+          </div>
+        )}
         <div className={css.navigationItem} onClick={handleLogout}>
           <div className={css.iconGroup}>
             <IconLogout />

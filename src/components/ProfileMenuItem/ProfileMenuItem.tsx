@@ -14,15 +14,19 @@ import type { TDefaultProps } from '@utils/types';
 
 import css from './ProfileMenuItem.module.scss';
 
-type TMenuItemProps = PropsWithChildren<TDefaultProps & {}>;
+type TMenuItemProps = PropsWithChildren<
+  TDefaultProps & {
+    onClick?: (e: React.MouseEvent<HTMLElement>) => void;
+  }
+>;
 
 const ProfileMenuItem: React.FC<TMenuItemProps> = (props) => {
-  const { children, className, rootClassName } = props;
+  const { children, className, rootClassName, onClick } = props;
   const rootClass = rootClassName || css.root;
   const classes = classNames(rootClass, className);
 
   return (
-    <li className={classes} role="menuitem">
+    <li className={classes} role="menuitem" onClick={onClick}>
       {children}
     </li>
   );

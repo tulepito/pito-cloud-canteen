@@ -13,6 +13,7 @@ import {
 import {
   ECompanyPermission,
   EImageVariants,
+  EUserRole,
   EUserSystemPermission,
 } from '@utils/enums';
 import { storableError } from '@utils/errors';
@@ -67,6 +68,25 @@ const detectUserPermission = (currentUser: TCurrentUser) => {
   return EUserSystemPermission.normal;
 };
 
+const getRoles = (currentUser: TCurrentUser) => {
+  const {
+    isAdmin = false,
+    isPartner = false,
+    isCompany = false,
+    company,
+  } = CurrentUser(currentUser).getMetadata();
+
+  const isBooker = Object.values(company).some(({ permission }: any) => {
+    return permission === ECompanyPermission.booker;
+  });
+
+  if (isAdmin) return [EUserRole.admin];
+  if (isPartner) return [EUserRole.partner];
+  if (isCompany || isBooker) return [EUserRole.booker, EUserRole.participant];
+
+  return [EUserRole.participant];
+};
+
 type TUserState = {
   currentUser: TCurrentUser | null;
   currentUserShowError: any;
@@ -78,6 +98,10 @@ type TUserState = {
 
   updateProfileInProgress: boolean;
   updateProfileError: any;
+
+  roles: EUserRole[];
+  currentRole: EUserRole;
+  isRoleSelectModalOpen: boolean;
 };
 
 const initialState: TUserState = {
@@ -91,6 +115,10 @@ const initialState: TUserState = {
 
   updateProfileInProgress: false,
   updateProfileError: null,
+
+  roles: [],
+  currentRole: null!,
+  isRoleSelectModalOpen: false,
 };
 
 // ================ Thunks ================ //
@@ -185,6 +213,24 @@ const userSlice = createSlice({
         sendVerificationEmailError: null,
       };
     },
+    setRole: (state, action) => {
+      return {
+        ...state,
+        currentRole: action.payload,
+      };
+    },
+    setUserPermission: (state, action) => {
+      return {
+        ...state,
+        userPermission: action.payload,
+      };
+    },
+    setIsRoleSelectModalOpen: (state, action) => {
+      return {
+        ...state,
+        isRoleSelectModalOpen: action.payload,
+      };
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -197,6 +243,7 @@ const userSlice = createSlice({
 
         state.currentUser = mergeCurrentUser(state.currentUser, currentUser);
         state.userPermission = detectUserPermission(currentUser);
+        state.roles = getRoles(currentUser);
         state.favoriteRestaurants = favoriteRestaurants;
         state.favoriteFood = favoriteFood;
       })

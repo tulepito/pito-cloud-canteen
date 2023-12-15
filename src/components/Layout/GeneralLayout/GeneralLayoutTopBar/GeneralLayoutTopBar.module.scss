@@ -60,12 +60,27 @@
     }
 
     .profileMenuContent {
-      width: 200px;
+      width: 268px;
       border-radius: 10px;
+
+      .menuItem {
+        @include flexAlign(center);
+        gap: 8px;
+      }
+
+      .logout {
+        color: $sematicRed2;
+      }
     }
 
     .iconBell {
       margin-right: 15px;
+    }
+
+    .logoutIcon {
+      path {
+        fill: $sematicRed2;
+      }
     }
 
     .profileMenuWrapper {

@@ -6,8 +6,10 @@ import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import IconFood from '@components/Icons/IconFood/IconFood';
 import IconLock from '@components/Icons/IconLock/IconLock';
 import IconLogout from '@components/Icons/IconLogout/IconLogout';
+import IconSwap from '@components/Icons/IconSwap/IconSwap';
 import IconUser from '@components/Icons/IconUser/IconUser';
 import { useLogout } from '@hooks/useLogout';
+import { useRoleSelectModalController } from '@hooks/useRoleSelectModalController';
 import { personalPaths } from '@src/paths';
 
 import css from './AccountNavigationModal.module.scss';
@@ -17,6 +19,8 @@ type TAccountNavigationModalProps = {};
 const AccountNavigationModal: React.FC<TAccountNavigationModalProps> = () => {
   const router = useRouter();
   const intl = useIntl();
+
+  const { onOpenRoleSelectModal } = useRoleSelectModalController();
 
   const handleNavigatePage = (url: string) => {
     router.push(url);
@@ -69,6 +73,15 @@ const AccountNavigationModal: React.FC<TAccountNavigationModalProps> = () => {
             <IconLock />
             <span>
               {intl.formatMessage({ id: 'CompanySidebar.passwordSetting' })}
+            </span>
+          </div>
+          <IconArrow direction="right" />
+        </div>
+        <div className={css.itemRow} onClick={onOpenRoleSelectModal}>
+          <div className={css.headerTitle}>
+            <IconSwap className={css.iconSwap} />
+            <span>
+              {intl.formatMessage({ id: 'CompanyHeaderMobile.changeRole' })}
             </span>
           </div>
           <IconArrow direction="right" />

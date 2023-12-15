@@ -150,6 +150,14 @@ export enum EUserSystemPermission {
   partner = 'partner',
 }
 
+export enum EUserRole {
+  admin = 'admin',
+  company = 'company',
+  partner = 'partner',
+  booker = 'booker',
+  participant = 'participant',
+}
+
 export enum ECompanyPermission {
   owner = 'owner',
   booker = 'booker',
