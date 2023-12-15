@@ -45,38 +45,43 @@ const handleCreatePartnerNotification = async ({
 
   Object.keys(groupedChangesBySubOrderDate).forEach(
     async (subOrderDate: string) => {
-      const subOrder = orderDetail[subOrderDate];
-      const restaurantId = subOrder?.restaurant?.id;
-      const restaurant = await fetchListing(restaurantId, ['author']);
-      const userId = restaurant?.author?.id.uuid;
+      try {
+        const subOrder = orderDetail[subOrderDate];
+        const restaurantId = subOrder?.restaurant?.id;
+        const restaurant = await fetchListing(restaurantId, ['author']);
+        const userId = restaurant?.author?.id.uuid;
 
-      const changeItem = groupedChangesBySubOrderDate[subOrderDate][0];
-      // if only 1 change, this change is change restaurant
-      if (groupedChangesBySubOrderDate[subOrderDate].length === 1) {
-        const oldRestaurantId = changeItem.oldValue?.restaurant?.id;
-        const oldRestaurant = await fetchListing(oldRestaurantId, ['author']);
-        const oldUserId = oldRestaurant?.author?.id.uuid;
+        const changeItem = groupedChangesBySubOrderDate[subOrderDate][0];
+
+        // if only 1 change, this change is change restaurant
+        if (groupedChangesBySubOrderDate[subOrderDate].length === 1) {
+          const oldRestaurantId = changeItem.oldValue?.id;
+          const oldRestaurant = await fetchListing(oldRestaurantId, ['author']);
+          const oldUserId = oldRestaurant?.author?.id.uuid;
+
+          createFirebaseDocNotification(
+            ENotificationType.PARTNER_SUB_ORDER_CHANGED,
+            {
+              userId: oldUserId,
+              orderId: changeItem.orderId,
+              companyName,
+              subOrderDate: Number(changeItem.subOrderDate),
+            },
+          );
+        }
 
         createFirebaseDocNotification(
           ENotificationType.PARTNER_SUB_ORDER_CHANGED,
           {
-            userId: oldUserId,
+            userId,
             orderId: changeItem.orderId,
             companyName,
             subOrderDate: Number(changeItem.subOrderDate),
           },
         );
+      } catch (error: any) {
+        console.error('[ERROR] handleCreatePartnerNotification', error?.data);
       }
-
-      createFirebaseDocNotification(
-        ENotificationType.PARTNER_SUB_ORDER_CHANGED,
-        {
-          userId,
-          orderId: changeItem.orderId,
-          companyName,
-          subOrderDate: Number(changeItem.subOrderDate),
-        },
-      );
     },
   );
 };
@@ -140,10 +145,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
           firebaseChangeHistory.forEach(
             async (data: Partial<TOrderChangeHistoryItem>) => {
-              await orderServices.createOrderHistoryRecordToFirestore({
-                authorId: CurrentUser(currentUser).getId(),
-                ...data,
-              } as TOrderChangeHistoryItem);
+              try {
+                await orderServices.createOrderHistoryRecordToFirestore({
+                  authorId: CurrentUser(currentUser).getId(),
+                  ...data,
+                } as TOrderChangeHistoryItem);
+              } catch (error: any) {
+                throw new Error(error);
+              }
             },
           );
         }
