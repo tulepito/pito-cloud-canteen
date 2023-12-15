@@ -5,6 +5,7 @@ import Modal from '@components/Modal/Modal';
 import NotificationItem from '@components/NotificationItem/NotificationItem';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { BookerCompaniesThunks } from '@redux/slices/BookerCompanies.slice';
+import type { TFBNotification } from '@src/utils/types';
 
 import css from './BookerNotificationModal.module.scss';
 
@@ -12,6 +13,9 @@ type TBookerNotificationModalProps = {
   isOpen: boolean;
   onClose: () => void;
 };
+
+type NotifcationItem = Required<Pick<TFBNotification, 'id'>> &
+  Partial<TFBNotification>;
 
 const BookerNotificationModal: React.FC<TBookerNotificationModalProps> = (
   props,
@@ -40,7 +44,7 @@ const BookerNotificationModal: React.FC<TBookerNotificationModalProps> = (
         </div>
       }>
       <div className={css.content}>
-        {bookerNotifications.map((notificationItem: any) => (
+        {bookerNotifications.map((notificationItem: NotifcationItem) => (
           <NotificationItem
             key={notificationItem.id}
             notificationItem={notificationItem}

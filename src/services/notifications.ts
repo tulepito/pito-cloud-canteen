@@ -1,3 +1,4 @@
+import { companyPaths, partnerPaths } from '@src/paths';
 import { ENotificationType } from '@src/utils/enums';
 import type { TObject } from '@src/utils/types';
 
@@ -242,7 +243,10 @@ export const createFirebaseDocNotification = async (
           orderId,
           startDate,
           endDate,
-          relatedLink: `/company/booker/orders/${orderId}/picking`,
+          relatedLink: companyPaths.ManageOrderPicking.replace(
+            '[orderId]',
+            orderId!,
+          ),
         };
 
         break;
@@ -255,7 +259,7 @@ export const createFirebaseDocNotification = async (
           orderId,
           startDate,
           endDate,
-          relatedLink: `/company/orders/${orderId}/rating`,
+          relatedLink: companyPaths.OrderRating.replace('[orderId]', orderId!),
         };
 
         break;
@@ -267,7 +271,10 @@ export const createFirebaseDocNotification = async (
           ...data,
           orderId,
           subOrderDate,
-          relatedLink: `/company/orders/${orderId}`,
+          relatedLink: companyPaths.ManageOrderDetail.replace(
+            '[orderId]',
+            orderId!,
+          ),
         };
 
         break;
@@ -279,7 +286,10 @@ export const createFirebaseDocNotification = async (
           ...data,
           orderId,
           subOrderDate,
-          relatedLink: `/company/orders/${orderId}`,
+          relatedLink: companyPaths.ManageOrderDetail.replace(
+            '[orderId]',
+            orderId!,
+          ),
         };
 
         break;
@@ -292,7 +302,10 @@ export const createFirebaseDocNotification = async (
           orderId,
           startDate,
           endDate,
-          relatedLink: `/company/booker/orders/${orderId}/picking`,
+          relatedLink: companyPaths.ManageOrderPicking.replace(
+            '[orderId]',
+            orderId!,
+          ),
         };
 
         break;
@@ -304,7 +317,7 @@ export const createFirebaseDocNotification = async (
           ...data,
           foodName,
           foodId,
-          relatedLink: `/partner/products/food`,
+          relatedLink: partnerPaths.ManageFood,
         };
 
         break;
@@ -316,7 +329,7 @@ export const createFirebaseDocNotification = async (
           ...data,
           foodName,
           foodId,
-          relatedLink: `/partner/products/food`,
+          relatedLink: partnerPaths.ManageFood,
         };
 
         break;
@@ -327,7 +340,7 @@ export const createFirebaseDocNotification = async (
         data = {
           ...data,
           partnerName,
-          relatedLink: `/partner/settings/account`,
+          relatedLink: partnerPaths.AccountSettings,
         };
 
         break;
@@ -340,7 +353,10 @@ export const createFirebaseDocNotification = async (
           orderId,
           subOrderDate,
           companyName,
-          relatedLink: `/partner/orders/${orderId}_${subOrderDate}`,
+          relatedLink: partnerPaths.SubOrderDetail.replace(
+            '[subOrderId]',
+            `${orderId}_${subOrderDate}`,
+          ),
         };
 
         break;
