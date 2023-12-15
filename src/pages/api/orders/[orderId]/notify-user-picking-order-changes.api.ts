@@ -115,16 +115,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             EmailTemplateTypes.BOOKER.BOOKER_PICKING_ORDER_CHANGED,
             emailParamsForBookerNotification,
           );
-
-          createFirebaseDocNotification(
-            ENotificationType.BOOKER_ORDER_CHANGED,
-            {
-              userId: CurrentUser(currentUser).getId(),
-              orderId: emailParamsForBookerNotification.orderId,
-              startDate,
-              endDate,
-            },
-          );
         }
 
         if (userRoles.includes('participant')) {
@@ -135,6 +125,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             ),
           );
         }
+
+        createFirebaseDocNotification(ENotificationType.BOOKER_ORDER_CHANGED, {
+          userId: CurrentUser(currentUser).getId(),
+          orderId: emailParamsForBookerNotification.orderId,
+          startDate,
+          endDate,
+        });
 
         if (!isEmpty(firebaseChangeHistory)) {
           await handleCreatePartnerNotification({

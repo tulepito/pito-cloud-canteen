@@ -15,6 +15,7 @@ import IconClose from '@components/Icons/IconClose/IconClose';
 import IconLogout from '@components/Icons/IconLogout/IconLogout';
 import IconPhone from '@components/Icons/IconPhone/IconPhone';
 import PitoLogo from '@components/PitoLogo/PitoLogo';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { useLogout } from '@hooks/useLogout';
@@ -55,6 +56,15 @@ const CompanyHeaderMobile: React.FC<CompanyHeaderMobileProps> = (props) => {
   const dispatch = useAppDispatch();
   const handleLogoutFn = useLogout();
   const bookerNotificationModalController = useBoolean();
+  const notifications = useAppSelector(
+    (state) => state.BookerCompanies.notifications,
+  );
+
+  const newNotificationIds = notifications.reduce(
+    (ids, noti) => (noti?.isNew === true ? ids.concat(noti?.id) : ids),
+    [],
+  );
+  const newNotificationIdsCount = newNotificationIds.length;
 
   const currentUserGetter = CurrentUser(currentUser);
   const { lastName = '', firstName = '' } = currentUserGetter.getProfile();
@@ -97,10 +107,15 @@ const CompanyHeaderMobile: React.FC<CompanyHeaderMobileProps> = (props) => {
   const renderRightIcon = () => {
     if (isMobileLayout) {
       return (
-        <IconBell
-          className={css.iconBell}
-          onClick={bookerNotificationModalController.setTrue}
-        />
+        <div className={css.notifications}>
+          <IconBell
+            className={css.iconBell}
+            onClick={bookerNotificationModalController.setTrue}
+          />
+          <RenderWhen condition={newNotificationIdsCount > 0}>
+            <div className={css.notiDot}>{newNotificationIdsCount}</div>
+          </RenderWhen>
+        </div>
       );
     }
 

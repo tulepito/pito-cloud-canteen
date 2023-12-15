@@ -190,12 +190,12 @@ export const publishOrder = async (orderId: string, isAdmin = false) => {
         order,
       },
     );
+  });
 
-    createFirebaseDocNotification(ENotificationType.BOOKER_PICKING_ORDER, {
-      userId: bookerId,
-      orderId,
-      startDate,
-      endDate,
-    });
+  createFirebaseDocNotification(ENotificationType.BOOKER_PICKING_ORDER, {
+    userId: bookerId,
+    orderId,
+    startDate,
+    endDate,
   });
 };

@@ -58,7 +58,7 @@ const NotificationItemIcon: React.FC<NotificationItemIconProps> = (props) => {
       break;
 
     case ENotificationType.BOOKER_PICKING_ORDER:
-      icon = <IconSharing />;
+      icon = <IconSharing className={css.iconSharing} />;
       break;
 
     default:
