@@ -44,5 +44,6 @@ export { default as PartnerManageOrders } from '@pages/partner/orders/ManageOrde
 export { default as PartnerManagePayments } from '@pages/partner/payments/PartnerManagePayments.slice';
 export { default as PartnerFood } from '@pages/partner/products/food/PartnerFood.slice';
 export { default as PartnerManageMenus } from '@pages/partner/products/menu/PartnerManageMenus.slice';
+export { default as ManageReviews } from '@pages/partner/reviews/ManageReviews.slice';
 export { default as PartnerSettingsPage } from '@pages/partner/settings/PartnerSettings.slice';
 export { default as TrackingPage } from '@pages/tracking/[subOrderId]/TrackingPage.slice';

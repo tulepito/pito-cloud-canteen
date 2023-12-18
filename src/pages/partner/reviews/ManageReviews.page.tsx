@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import classNames from 'classnames';
 import { uniq } from 'lodash';
@@ -11,6 +11,7 @@ import Pagination from '@components/Pagination/Pagination';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import SlideModal from '@components/SlideModal/SlideModal';
 import Tooltip from '@components/Tooltip/Tooltip';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { useViewport } from '@hooks/useViewport';
 import { partnerPaths } from '@src/paths';
@@ -19,27 +20,16 @@ import type { TPartnerReviewsFilterFormValues } from './components/PartnerReview
 import PartnerReviewsFilterForm from './components/PartnerReviewsFilterForm/PartnerReviewsFilterForm';
 import ReviewDetailCard from './components/ReviewDetailCard/ReviewDetailCard';
 import SummarizeReview from './components/SummarizeReview/SummarizeReview';
+import { ManageReviewsThunks } from './ManageReviews.slice';
 
 import css from './ManageReviews.module.scss';
 
-export type TReviewContent = {
-  id: number;
-  name: string;
-  rating: number;
-  foodRating: number;
-  eatingUtensilRating: number;
-  description: string;
-  foodName: string;
-  orderDate: Date;
-  avatar: string;
-};
-
 const ManageReviewsPage = () => {
+  const dispatch = useAppDispatch();
   const intl = useIntl();
   const router = useRouter();
   const {
     query: { page: queryPage = 1, rating: queryRating },
-    // isReady,
   } = router;
 
   const { isMobileLayout } = useViewport();
@@ -49,145 +39,39 @@ const ManageReviewsPage = () => {
   );
   const filterPartnerFilterModalController = useBoolean();
 
+  const ratingDetail = useAppSelector(
+    (state) => state.ManageReviews.ratingDetail,
+  );
+  const reviewsData = useAppSelector(
+    (state) => state.ManageReviews.reviewDetailData,
+  );
+  const foodRating = useAppSelector((state) => state.ManageReviews.foodRating);
+  const packagingRating = useAppSelector(
+    (state) => state.ManageReviews.packagingRating,
+  );
+  const pointRating = useAppSelector(
+    (state) => state.ManageReviews.pointRating,
+  );
+  const isFirstLoad = useAppSelector(
+    (state) => state.ManageReviews.isFirstLoad,
+  );
+  const totalRating = useAppSelector(
+    (state) => state.ManageReviews.totalRating,
+  );
+  const totalReviewDetailData = useAppSelector(
+    (state) => state.ManageReviews.totalReviewDetailData,
+  );
+
+  const fetchReviewDetailDatasInProgress = useAppSelector(
+    (state) => state.ManageReviews.fetchReviewDetailDatasInProgress,
+  );
+
   // #TODO FAKE Data to Test
-  const food = 4.2;
-  const packaging = 4.2;
-  const pointRating = 4.8;
-  const totalRating = 800;
-  const reviewsData: TReviewContent[] = [
-    {
-      id: 1,
-      name: 'vy',
-      rating: 3,
-      foodName: 'Hàu nướng phô mai',
-      foodRating: 3,
-      description:
-        'Lorem ipsum dolor sit amet consectetur. Sagittis auctor sit vulputate pulvinar proin at ut amet.Lorem ipsum dolor sit amet consectetur. Sagittis auctor sit vulputate pulvinar proin at ut amet.Lorem ipsum dolor sit amet consectetur. Sagittis auctor sit vulputate pulvinar proin at ut amet.Lorem ipsum dolor sit amet consectetur. Sagittis auctor sit vulputate pulvinar proin at ut amet.',
-      eatingUtensilRating: 3,
-      orderDate: new Date(),
-      avatar: 'avatar',
-    },
-    {
-      id: 2,
-      name: 'vy',
-      rating: 3,
-      foodName: 'Hàu nướng phô mai',
-      foodRating: 3,
-      description:
-        'Lorem ipsum dolor sit amet consectetur. Sagittis auctor sit vulputate pulvinar proin at ut amet.',
-      eatingUtensilRating: 3,
-      orderDate: new Date(),
-      avatar: 'avatar',
-    },
-    {
-      id: 3,
-      name: 'vy',
-      rating: 3,
-      foodName: 'Hàu nướng phô mai',
-      foodRating: 3,
-      description:
-        'Lorem ipsum dolor sit amet consectetur. Sagittis auctor sit vulputate pulvinar proin at ut amet.',
-      eatingUtensilRating: 3,
-      orderDate: new Date(),
-      avatar: 'avatar',
-    },
-    {
-      id: 4,
-      name: 'vy',
-      rating: 3,
-      foodName: 'Hàu nướng phô mai',
-      foodRating: 3,
-      description:
-        'Lorem ipsum dolor sit amet consectetur. Sagittis auctor sit vulputate pulvinar proin at ut amet.',
-      eatingUtensilRating: 3,
-      orderDate: new Date(),
-      avatar: 'avatar',
-    },
-    {
-      id: 1,
-      name: 'vy',
-      rating: 3,
-      foodName: 'Hàu nướng phô mai',
-      foodRating: 3,
-      description:
-        'Lorem ipsum dolor sit amet consectetur. Sagittis auctor sit vulputate pulvinar proin at ut amet.',
-      eatingUtensilRating: 3,
-      orderDate: new Date(),
-      avatar: 'avatar',
-    },
-    {
-      id: 1,
-      name: 'vy',
-      rating: 3,
-      foodName: 'Hàu nướng phô mai',
-      foodRating: 3,
-      description:
-        'Lorem ipsum dolor sit amet consectetur. Sagittis auctor sit vulputate pulvinar proin at ut amet.',
-      eatingUtensilRating: 3,
-      orderDate: new Date(),
-      avatar: 'avatar',
-    },
-    {
-      id: 1,
-      name: 'vy',
-      rating: 3,
-      foodName: 'Hàu nướng phô mai',
-      foodRating: 3,
-      description:
-        'Lorem ipsum dolor sit amet consectetur. Sagittis auctor sit vulputate pulvinar proin at ut amet.',
-      eatingUtensilRating: 3,
-      orderDate: new Date(),
-      avatar: 'avatar',
-    },
-    {
-      id: 1,
-      name: 'vy',
-      rating: 3,
-      foodName: 'Hàu nướng phô mai',
-      foodRating: 3,
-      description:
-        'Lorem ipsum dolor sit amet consectetur. Sagittis auctor sit vulputate pulvinar proin at ut amet.',
-      eatingUtensilRating: 3,
-      orderDate: new Date(),
-      avatar: 'avatar',
-    },
-    {
-      id: 1,
-      name: 'vy',
-      rating: 3,
-      foodName: 'Hàu nướng phô mai',
-      foodRating: 3,
-      description:
-        'Lorem ipsum dolor sit amet consectetur. Sagittis auctor sit vulputate pulvinar proin at ut amet.',
-      eatingUtensilRating: 3,
-      orderDate: new Date(),
-      avatar: 'avatar',
-    },
-    {
-      id: 1,
-      name: 'vy',
-      rating: 3,
-      foodName: 'Hàu nướng phô mai',
-      foodRating: 3,
-      description:
-        'Lorem ipsum dolor sit amet consectetur. Sagittis auctor sit vulputate pulvinar proin at ut amet.',
-      eatingUtensilRating: 3,
-      orderDate: new Date(),
-      avatar: 'avatar',
-    },
-  ];
   const paginationProps = {
-    total: reviewsData.length,
+    total: totalReviewDetailData,
     current: page,
     pageSize: perPage,
   };
-  const ratingScore = [
-    { score: 1, total: 0 },
-    { score: 2, total: 100 },
-    { score: 3, total: 20 },
-    { score: 4, total: 8 },
-    { score: 5, total: 19 },
-  ];
   // #END TODO FAKE Data to Test
 
   const handlePageChange = (pageValue: number) => {
@@ -214,7 +98,7 @@ const ManageReviewsPage = () => {
     });
   };
 
-  const convertRattingToNumber = (rating: string) => {
+  const convertRatingToNumber = (rating: string) => {
     const result: number[] = [];
     rating.split(',').forEach((rate) => {
       result.push(Number(rate));
@@ -229,10 +113,10 @@ const ManageReviewsPage = () => {
     if (queryRating) {
       if (Array.isArray(queryRating)) {
         queryRating.forEach((rating) => {
-          ratings.push(...convertRattingToNumber(rating));
+          ratings.push(...convertRatingToNumber(rating));
         });
       } else {
-        ratings.push(...convertRattingToNumber(queryRating));
+        ratings.push(...convertRatingToNumber(queryRating));
       }
     }
 
@@ -243,10 +127,21 @@ const ManageReviewsPage = () => {
     <PartnerReviewsFilterForm
       onSubmit={handleFilterChange}
       onClearFilter={handleClearFilter}
-      ratingScore={ratingScore}
+      ratingDetail={ratingDetail}
       initialValues={initialFilterFormValues}
     />
   );
+
+  useEffect(() => {
+    dispatch(
+      ManageReviewsThunks.loadData({
+        rating: initialFilterFormValues,
+        page,
+        pageSize: perPage,
+      }),
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isFirstLoad, perPage, page, queryRating]);
 
   return (
     <div className={css.root}>
@@ -258,8 +153,8 @@ const ManageReviewsPage = () => {
           {intl.formatMessage({ id: 'ManagePartnerReviewsPage.overView' })}
         </span>
         <SummarizeReview
-          foodRating={food}
-          packagingRating={packaging}
+          foodRating={foodRating}
+          packagingRating={packagingRating}
           pointRating={pointRating}
           totalRating={totalRating}
         />
@@ -308,6 +203,8 @@ const ManageReviewsPage = () => {
                 })}
               </span>
             </div>
+          ) : fetchReviewDetailDatasInProgress ? (
+            <div className={css.loading}>Loading...</div>
           ) : (
             reviewsData.map((r, i) => {
               return (
@@ -319,14 +216,16 @@ const ManageReviewsPage = () => {
               );
             })
           )}
-          {!isMobileLayout && (
-            <Pagination
-              showSizeChanger
-              {...paginationProps}
-              onChange={handlePageChange}
-              onShowSizeChange={handlePerPageChange}
-            />
-          )}
+          {!isMobileLayout &&
+            !fetchReviewDetailDatasInProgress &&
+            reviewsData.length > 0 && (
+              <Pagination
+                showSizeChanger
+                {...paginationProps}
+                onChange={handlePageChange}
+                onShowSizeChange={handlePerPageChange}
+              />
+            )}
         </div>
       </div>
 

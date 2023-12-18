@@ -98,3 +98,11 @@ export const transitSubOrderTransactionApi = ({
     newTransition,
   });
 };
+
+export const fetchReviewDetailApi = (
+  page: number = 1,
+  pageSize: number = 4,
+  rating?: number[],
+) => {
+  return getApi(`${BASE_URL}/reviews`, { page, pageSize, rating });
+};

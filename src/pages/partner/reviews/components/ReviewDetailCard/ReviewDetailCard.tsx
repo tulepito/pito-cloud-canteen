@@ -2,14 +2,13 @@ import { useIntl } from 'react-intl';
 import classNames from 'classnames';
 
 import IconRatingFace from '@components/Icons/IconRatingFace/IconRatingFace';
+import type { TReviewDetail } from '@src/types/partnerReviews';
 import { formatDate } from '@src/utils/dates';
-
-import type { TReviewContent } from '../../ManageReviews.page';
 
 import css from './ReviewDetailCard.module.scss';
 
 type TReviewDetailCardProps = {
-  data: TReviewContent;
+  data: TReviewDetail;
   rootClassName?: string;
 };
 

@@ -57,6 +57,12 @@
       @include viewportSmall {
         display: block;
       }
+
+      .loading {
+        margin-top: 40px;
+        text-align: center;
+        width: 100%;
+      }
     }
 
     .tableTitleContainer {

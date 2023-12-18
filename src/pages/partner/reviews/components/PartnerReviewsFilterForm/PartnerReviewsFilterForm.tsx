@@ -6,13 +6,9 @@ import arrayMutators from 'final-form-arrays';
 import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
 import FieldCheckboxGroup from '@components/FormFields/FieldCheckboxGroup/FieldCheckboxGroup';
+import type { TTotalRating } from '@src/types/partnerReviews';
 
 import css from './PartnerReviewsFilterForm.module.scss';
-
-export type TRatingScore = {
-  score: number;
-  total: number;
-};
 
 export type TPartnerReviewsFilterFormValues = {
   ratings: number[];
@@ -20,7 +16,7 @@ export type TPartnerReviewsFilterFormValues = {
 
 type TExtraProps = {
   onClearFilter: () => void;
-  ratingScore: TRatingScore[];
+  ratingDetail: TTotalRating[];
 };
 type TPartnerReviewsFilterFormComponentProps =
   FormRenderProps<TPartnerReviewsFilterFormValues> & Partial<TExtraProps>;
@@ -30,17 +26,17 @@ type TFilterPartnerReviewFilterFormProps =
 
 const PartnerReviewsFilterFormComponent: React.FC<
   TPartnerReviewsFilterFormComponentProps
-> = ({ ratingScore = [], handleSubmit, onClearFilter, pristine }) => {
+> = ({ ratingDetail = [], handleSubmit, onClearFilter, pristine }) => {
   const intl = useIntl();
 
   const generateScoresOptions = () => {
-    return ratingScore.map((option) => {
+    return ratingDetail.map((detail) => {
       const label = `${intl.formatMessage({
-        id: `FieldRating.label.${option.score}`,
-      })} (${option.total})`;
+        id: `FieldRating.label.${detail.rating}`,
+      })} (${detail.total})`;
 
       return {
-        key: option.score,
+        key: detail.rating,
         label,
       };
     });
