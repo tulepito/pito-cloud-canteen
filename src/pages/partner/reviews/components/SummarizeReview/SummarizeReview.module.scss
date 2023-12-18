@@ -5,48 +5,62 @@
 
 .summarizeContainer {
   @include flexAlign(flex-start);
-  gap: 24px;
-  margin-top: 30px;
+  margin-top: 12px;
   align-items: stretch;
   flex-wrap: wrap;
-
-  .summarizeItemContainer {
-    border: 1px solid $neutralGray3;
-    border-radius: 12px;
+  flex-direction: column;
+  gap: 12px;
+  @include viewportSmall {
+    flex-direction: row;
+    gap: 24px;
+    margin-top: 30px;
   }
+}
 
-  .summarizeValueContainer {
-    height: inherit;
-    padding: 24px;
-    @include flexAlign(flex-start);
-    gap: 12px;
-    flex-direction: column;
+.summarizeScoreContainer {
+  @include flexAlign(flex-start, space-between);
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  gap: 24px;
+}
 
-    .summarizeTitle {
+.summarizeItemContainer {
+  border: 1px solid $neutralGray3;
+  border-radius: 12px;
+}
+
+.summarizeValueContainer {
+  height: inherit;
+  padding: 24px;
+  @include flexAlign(flex-start);
+  gap: 12px;
+  flex-direction: column;
+
+  .summarizeTitle {
+    @include textTemplate(14px, $fontWeightRegular, 20px);
+    @include viewportSmall {
       @include textTemplate(14px, $fontWeightRegular, 20px);
-      @include viewportSmall {
-        @include textTemplate(14px, $fontWeightRegular, 20px);
-      }
-    }
-    .summarizeValue {
-      @include textTemplate(14px, $fontWeightBold, 20px);
-      @include viewportSmall {
-        @include textTemplate(24px, $fontWeightBold, 34px);
-      }
-    }
-    .summarizeLable {
-      @include flexAlign(flex-start);
-      gap: 8px;
     }
   }
-
-  .detailRatingContainer {
-    padding: 12px;
-    height: inherit;
-    @include flexAlign(center, center);
+  .summarizeValue {
+    @include textTemplate(14px, $fontWeightBold, 20px);
+    @include viewportSmall {
+      @include textTemplate(24px, $fontWeightBold, 34px);
+    }
+  }
+  .summarizeLable {
+    @include flexAlign(flex-start);
     gap: 8px;
-    flex-direction: column;
   }
+}
+
+.detailRatingContainer {
+  padding: 12px;
+  height: inherit;
+  @include flexAlign(center, center);
+  gap: 8px;
+  flex-direction: column;
 }
 
 .detailRatingRow {

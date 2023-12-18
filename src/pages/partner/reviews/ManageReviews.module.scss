@@ -30,9 +30,11 @@
 
   .SummarizeContainer {
     background-color: $neutralGray1;
+    width: 100%;
     padding: 16px;
     @include viewportSmall {
       padding: 16px 0 0 0;
+      width: auto;
     }
   }
 

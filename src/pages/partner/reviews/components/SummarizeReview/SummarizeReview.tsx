@@ -27,31 +27,37 @@ const SummarizeReview: React.FC<TSummarizeReviewProps> = ({
 
   return (
     <div className={css.summarizeContainer}>
-      <div
-        className={classNames(
-          css.summarizeItemContainer,
-          css.summarizeValueContainer,
-        )}>
-        <div className={css.summarizeLable}>
-          <IconUser variant="multiUser" />
-          <span className={css.summarizeTitle}>
-            {intl.formatMessage({ id: 'ManagePartnerReviewsPage.totalReview' })}
-          </span>
+      <div className={css.summarizeScoreContainer}>
+        <div
+          className={classNames(
+            css.summarizeItemContainer,
+            css.summarizeValueContainer,
+          )}>
+          <div className={css.summarizeLable}>
+            <IconUser variant="multiUser" />
+            <span className={css.summarizeTitle}>
+              {intl.formatMessage({
+                id: 'ManagePartnerReviewsPage.totalReview',
+              })}
+            </span>
+          </div>
+          <div className={css.summarizeValue}>{totalRating}</div>
         </div>
-        <div className={css.summarizeValue}>{totalRating}</div>
-      </div>
-      <div
-        className={classNames(
-          css.summarizeItemContainer,
-          css.summarizeValueContainer,
-        )}>
-        <div className={css.summarizeLable}>
-          <IconCricleStar />
-          <span>
-            {intl.formatMessage({ id: 'ManagePartnerReviewsPage.totalPoint' })}
-          </span>
+        <div
+          className={classNames(
+            css.summarizeItemContainer,
+            css.summarizeValueContainer,
+          )}>
+          <div className={css.summarizeLable}>
+            <IconCricleStar />
+            <span>
+              {intl.formatMessage({
+                id: 'ManagePartnerReviewsPage.totalPoint',
+              })}
+            </span>
+          </div>
+          <div className={css.summarizeValue}>{pointRating}</div>
         </div>
-        <div className={css.summarizeValue}>{pointRating}</div>
       </div>
       <div
         className={classNames(
