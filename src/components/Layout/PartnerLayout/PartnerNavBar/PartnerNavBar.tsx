@@ -23,6 +23,7 @@ const PartnerNavBar = () => {
   const isMoreItemActive = [
     partnerPaths.Settings,
     partnerPaths.ManagePayments,
+    partnerPaths.ManageReviews,
   ].includes(pathname);
 
   const isProduceItemActive = [
@@ -95,10 +96,12 @@ const PartnerNavBar = () => {
             </div>
           </span>
           <span onClick={handleCloseMoreItemsModal}>
-            <div className={css.itemRow}>
+            <NamedLink
+              path={partnerPaths.ManageReviews}
+              className={css.itemRow}>
               <IconBorderStar className={css.itemIcon} />
               <div>Đánh giá</div>
-            </div>
+            </NamedLink>
           </span>
           <span onClick={handleCloseMoreItemsModal}>
             <NamedLink path={partnerPaths.Settings} className={css.itemRow}>
