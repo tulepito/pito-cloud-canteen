@@ -26,6 +26,8 @@ const NotificationItemInfo: React.FC<NotificationItemInfoProps> = (props) => {
     subOrderName: subOrderNameFromData,
     startDate,
     endDate,
+    partnerName,
+    subOrderName: partnerSubOrderName,
   } = notificationItem;
   const { seconds } = createdAt;
   const formattedDate = formatTimestamp(date || subOrderDate);
@@ -359,6 +361,78 @@ const NotificationItemInfo: React.FC<NotificationItemInfoProps> = (props) => {
               {
                 span: (msg: any) => <span className={css.boldText}>{msg}</span>,
                 orderDates,
+              },
+            )}
+          </div>
+          <div className={css.pastTime}>{pastTime}</div>
+        </div>
+      );
+
+    case ENotificationType.PARTNER_FOOD_ACCEPTED_BY_ADMIN:
+      return (
+        <div className={css.contentWrapper}>
+          <div className={css.content}>
+            {intl.formatMessage(
+              {
+                id: 'NotificationItemInfo.title.partnerFoodAcceptedByAdmin',
+              },
+              {
+                span: (msg: any) => <span className={css.boldText}>{msg}</span>,
+                foodName,
+              },
+            )}
+          </div>
+          <div className={css.pastTime}>{pastTime}</div>
+        </div>
+      );
+
+    case ENotificationType.PARTNER_FOOD_REJECTED_BY_ADMIN:
+      return (
+        <div className={css.contentWrapper}>
+          <div className={css.content}>
+            {intl.formatMessage(
+              {
+                id: 'NotificationItemInfo.title.partnerFoodRejectedByAdmin',
+              },
+              {
+                span: (msg: any) => <span className={css.boldText}>{msg}</span>,
+                foodName,
+              },
+            )}
+          </div>
+          <div className={css.pastTime}>{pastTime}</div>
+        </div>
+      );
+
+    case ENotificationType.PARTNER_PROFILE_UPDATED_BY_ADMIN:
+      return (
+        <div className={css.contentWrapper}>
+          <div className={css.content}>
+            {intl.formatMessage(
+              {
+                id: 'NotificationItemInfo.title.partnerProfileUpdatedByAdmin',
+              },
+              {
+                span: (msg: any) => <span className={css.boldText}>{msg}</span>,
+                partnerName,
+              },
+            )}
+          </div>
+          <div className={css.pastTime}>{pastTime}</div>
+        </div>
+      );
+
+    case ENotificationType.PARTNER_SUB_ORDER_CHANGED:
+      return (
+        <div className={css.contentWrapper}>
+          <div className={css.content}>
+            {intl.formatMessage(
+              {
+                id: 'NotificationItemInfo.title.partnerSubOrderChanged',
+              },
+              {
+                span: (msg: any) => <span className={css.boldText}>{msg}</span>,
+                subOrderName: partnerSubOrderName,
               },
             )}
           </div>

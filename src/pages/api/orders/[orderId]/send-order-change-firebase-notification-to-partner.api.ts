@@ -14,10 +14,12 @@ const handleCreatePartnerNotification = async ({
   plans,
   firebaseChangeHistory,
   companyName,
+  orderTitle,
 }: {
   plans: string[];
   firebaseChangeHistory: TOrderChangeHistoryItem[];
   companyName: string;
+  orderTitle: string;
 }) => {
   const plan = await fetchListing(plans[0]);
   const { orderDetail = {} } = plan.attributes.metadata || {};
@@ -74,6 +76,7 @@ const handleCreatePartnerNotification = async ({
             orderId: changeItem.orderId,
             companyName,
             subOrderDate: Number(changeItem.subOrderDate),
+            orderTitle,
           },
         );
       } catch (error: any) {
@@ -93,6 +96,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       case HttpMethod.POST:
         {
           const order = await fetchListing(orderId as string);
+          const { orderTitle } = order.attributes || {};
           const { companyName, plans = [] } = order.attributes.metadata || {};
 
           if (!isEmpty(firebaseChangeHistory)) {
@@ -100,6 +104,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
               plans,
               firebaseChangeHistory,
               companyName,
+              orderTitle,
             });
           }
         }

@@ -1,4 +1,5 @@
 import { companyPaths, partnerPaths } from '@src/paths';
+import { getDayOfWeek } from '@src/utils/dates';
 import { ENotificationType } from '@src/utils/enums';
 import type { TObject } from '@src/utils/types';
 
@@ -347,12 +348,14 @@ export const createFirebaseDocNotification = async (
       }
 
       case ENotificationType.PARTNER_SUB_ORDER_CHANGED: {
-        const { orderId, subOrderDate, companyName } = notificationParams;
+        const { orderId, subOrderDate, companyName, orderTitle } =
+          notificationParams;
         data = {
           ...data,
           orderId,
           subOrderDate,
           companyName,
+          subOrderName: `${orderTitle}-${getDayOfWeek(subOrderDate!)}`,
           relatedLink: partnerPaths.SubOrderDetail.replace(
             '[subOrderId]',
             `${orderId}_${subOrderDate}`,
