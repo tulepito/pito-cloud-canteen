@@ -19,7 +19,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       ENotificationType.PARTNER_PROFILE_UPDATED_BY_ADMIN,
       {
         userId: dataParams.id,
-        partnerName: dataParams.metadata.companyName,
+        partnerName: dataParams.publicData.companyName,
       },
     );
     res.json(response);
