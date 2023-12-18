@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import classNames from 'classnames';
 
 import Button from '@components/Button/Button';
 import IconFilter from '@components/Icons/IconFilter/IconFilter';
 import IconReviewEmpty from '@components/Icons/IconReviewEmpty/IconReviewEmpty';
+import Pagination from '@components/Pagination/Pagination';
 import { useViewport } from '@hooks/useViewport';
 
 import ReviewDetailCard from './components/ReviewDetailCard/ReviewDetailCard';
@@ -27,6 +28,8 @@ export type TReviewContent = {
 const ManageReviewsPage = () => {
   const intl = useIntl();
   const { isMobileLayout } = useViewport();
+  const [perPage, setPerPage] = useState(10);
+  const [page, setPage] = useState(1);
 
   // #TODO FAKE Data to Test
   const food = 4.2;
@@ -36,6 +39,42 @@ const ManageReviewsPage = () => {
   const reviewsData: TReviewContent[] = [
     {
       id: 1,
+      name: 'vy',
+      rating: 3,
+      foodName: 'Hàu nướng phô mai',
+      foodRating: 3,
+      description:
+        'Lorem ipsum dolor sit amet consectetur. Sagittis auctor sit vulputate pulvinar proin at ut amet.Lorem ipsum dolor sit amet consectetur. Sagittis auctor sit vulputate pulvinar proin at ut amet.Lorem ipsum dolor sit amet consectetur. Sagittis auctor sit vulputate pulvinar proin at ut amet.Lorem ipsum dolor sit amet consectetur. Sagittis auctor sit vulputate pulvinar proin at ut amet.',
+      eatingUtensilRating: 3,
+      orderDate: new Date(),
+      avatar: 'avatar',
+    },
+    {
+      id: 2,
+      name: 'vy',
+      rating: 3,
+      foodName: 'Hàu nướng phô mai',
+      foodRating: 3,
+      description:
+        'Lorem ipsum dolor sit amet consectetur. Sagittis auctor sit vulputate pulvinar proin at ut amet.',
+      eatingUtensilRating: 3,
+      orderDate: new Date(),
+      avatar: 'avatar',
+    },
+    {
+      id: 3,
+      name: 'vy',
+      rating: 3,
+      foodName: 'Hàu nướng phô mai',
+      foodRating: 3,
+      description:
+        'Lorem ipsum dolor sit amet consectetur. Sagittis auctor sit vulputate pulvinar proin at ut amet.',
+      eatingUtensilRating: 3,
+      orderDate: new Date(),
+      avatar: 'avatar',
+    },
+    {
+      id: 4,
       name: 'vy',
       rating: 3,
       foodName: 'Hàu nướng phô mai',
@@ -119,7 +158,20 @@ const ManageReviewsPage = () => {
       avatar: 'avatar',
     },
   ];
+  const paginationProps = {
+    total: reviewsData.length,
+    current: page,
+    pageSize: perPage,
+  };
   // #END TODO FAKE Data to Test
+
+  const handlePageChange = (pageValue: number) => {
+    setPage(pageValue);
+  };
+
+  const handlePerPageChange = (pageValue: number, perPageValue: number) => {
+    setPerPage(perPageValue);
+  };
 
   return (
     <div className={css.root}>
@@ -163,21 +215,18 @@ const ManageReviewsPage = () => {
                 })}
               </span>
             </div>
-          ) : isMobileLayout ? (
-            reviewsData.map((r) => {
-              return (
-                <ReviewDetailCard
-                  rootClassName={css.reviewCartContainer}
-                  key={r.id}
-                  data={r}
-                />
-              );
-            })
           ) : (
-            // this Set Table
-            reviewsData.map((r) => {
-              return <ReviewDetailCard key={r.id} data={r} />;
+            reviewsData.map((r, i) => {
+              return <ReviewDetailCard key={i} data={r} />;
             })
+          )}
+          {!isMobileLayout && (
+            <Pagination
+              showSizeChanger
+              {...paginationProps}
+              onChange={handlePageChange}
+              onShowSizeChange={handlePerPageChange}
+            />
           )}
         </div>
       </div>

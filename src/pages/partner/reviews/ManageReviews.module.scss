@@ -51,6 +51,7 @@
       @include flexAlign(flex-start);
       gap: 16px;
       flex-direction: column;
+      width: 100%;
       @include viewportSmall {
         display: block;
       }
