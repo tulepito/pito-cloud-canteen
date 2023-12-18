@@ -34,34 +34,11 @@ export type TReviewContent = {
   avatar: string;
 };
 
-const RATTING_OPTIONS = [
-  {
-    key: 'very_bad',
-    value: 1,
-  },
-  {
-    key: 'bad',
-    value: 2,
-  },
-  {
-    key: 'normal',
-    value: 3,
-  },
-  {
-    key: 'good',
-    value: 4,
-  },
-  {
-    key: 'excellent',
-    value: 5,
-  },
-];
-
 const ManageReviewsPage = () => {
   const intl = useIntl();
   const router = useRouter();
   const {
-    query: { page: queryPage = 1, type: queryRatting },
+    query: { page: queryPage = 1, rating: queryRating },
     // isReady,
   } = router;
 
@@ -222,19 +199,10 @@ const ManageReviewsPage = () => {
   };
 
   const handleFilterChange = ({ ratings }: TPartnerReviewsFilterFormValues) => {
-    const ratingConverted: string[] = [];
-    ratings.forEach((filterRatting) => {
-      const ratingOption = RATTING_OPTIONS.find((option) => {
-        return option.value === filterRatting;
-      });
-      if (ratingOption) {
-        ratingConverted.push(ratingOption.key);
-      }
-    });
     router.replace({
       pathname: partnerPaths.ManageReviews,
       query: {
-        ...(ratingConverted.length ? { type: ratingConverted.join(',') } : {}),
+        ...(ratings.length ? { rating: ratings.join(',') } : {}),
       },
     });
   };
@@ -249,12 +217,7 @@ const ManageReviewsPage = () => {
   const convertRattingToNumber = (rating: string) => {
     const result: number[] = [];
     rating.split(',').forEach((rate) => {
-      const ratingOption = RATTING_OPTIONS.find((option) => {
-        return option.key === rate;
-      });
-      if (ratingOption) {
-        result.push(ratingOption.value);
-      }
+      result.push(Number(rate));
     });
 
     return result;
@@ -263,18 +226,18 @@ const ManageReviewsPage = () => {
   const initialFilterFormValues = useMemo(() => {
     const ratings = [];
 
-    if (queryRatting) {
-      if (Array.isArray(queryRatting)) {
-        queryRatting.forEach((rating) => {
+    if (queryRating) {
+      if (Array.isArray(queryRating)) {
+        queryRating.forEach((rating) => {
           ratings.push(...convertRattingToNumber(rating));
         });
       } else {
-        ratings.push(...convertRattingToNumber(queryRatting));
+        ratings.push(...convertRattingToNumber(queryRating));
       }
     }
 
     return { ratings: uniq(ratings) };
-  }, [queryRatting]);
+  }, [queryRating]);
 
   const filterForm = (
     <PartnerReviewsFilterForm
