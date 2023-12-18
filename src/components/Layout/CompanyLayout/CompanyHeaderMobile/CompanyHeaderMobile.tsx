@@ -61,7 +61,7 @@ const CompanyHeaderMobile: React.FC<CompanyHeaderMobileProps> = (props) => {
   );
 
   const newNotificationIds = notifications.reduce(
-    (ids, noti) => (noti?.isNew === true ? ids.concat(noti?.id) : ids),
+    (ids, noti) => (!noti?.seen ? ids.concat(noti?.id) : ids),
     [],
   );
   const newNotificationIdsCount = newNotificationIds.length;

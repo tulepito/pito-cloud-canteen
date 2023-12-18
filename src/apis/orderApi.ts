@@ -213,3 +213,19 @@ export const adminNotifyUserPickingOrderChangesApi = (
   orderId: string,
   params: TObject,
 ) => postApi(`/orders/${orderId}/notify-user-picking-order-changes`, params);
+
+export const sendOrderChangeFirebaseNotificationToBokerApi = (
+  orderId: string,
+) =>
+  postApi(
+    `/orders/${orderId}/send-order-change-firebase-notification-to-booker`,
+  );
+
+export const sendOrderChangeFirebaseNotificationToPartnerApi = (
+  orderId: string,
+  params: TObject,
+) =>
+  postApi(
+    `/orders/${orderId}/send-order-change-firebase-notification-to-partner`,
+    params,
+  );
