@@ -15,7 +15,7 @@ export type TRatingScore = {
 };
 
 export type TPartnerReviewsFilterFormValues = {
-  rattings: number[];
+  ratings: number[];
 };
 
 type TExtraProps = {
@@ -52,9 +52,9 @@ const PartnerReviewsFilterFormComponent: React.FC<
       <div className={css.fieldCheckboxContainer}>
         <FieldCheckboxGroup
           itemClassName={css.checkboxGroup}
-          id="rattings"
+          id="ratings"
           options={generateScoresOptions()}
-          name="rattings"
+          name="ratings"
         />
       </div>
       <div className={css.buttonContainer} onClick={onClearFilter}>

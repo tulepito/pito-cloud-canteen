@@ -221,24 +221,20 @@ const ManageReviewsPage = () => {
     setPerPage(perPageValue);
   };
 
-  const handleFilterChange = ({
-    rattings,
-  }: TPartnerReviewsFilterFormValues) => {
-    const rattingConverted: string[] = [];
-    rattings.forEach((filterRatting) => {
+  const handleFilterChange = ({ ratings }: TPartnerReviewsFilterFormValues) => {
+    const ratingConverted: string[] = [];
+    ratings.forEach((filterRatting) => {
       const ratingOption = RATTING_OPTIONS.find((option) => {
         return option.value === filterRatting;
       });
       if (ratingOption) {
-        rattingConverted.push(ratingOption.key);
+        ratingConverted.push(ratingOption.key);
       }
     });
     router.replace({
       pathname: partnerPaths.ManageReviews,
       query: {
-        ...(rattingConverted.length
-          ? { type: rattingConverted.join(',') }
-          : {}),
+        ...(ratingConverted.length ? { type: ratingConverted.join(',') } : {}),
       },
     });
   };
@@ -250,9 +246,9 @@ const ManageReviewsPage = () => {
     });
   };
 
-  const convertRattingToNumber = (ratting: string) => {
+  const convertRattingToNumber = (rating: string) => {
     const result: number[] = [];
-    ratting.split(',').forEach((rate) => {
+    rating.split(',').forEach((rate) => {
       const ratingOption = RATTING_OPTIONS.find((option) => {
         return option.key === rate;
       });
@@ -265,19 +261,19 @@ const ManageReviewsPage = () => {
   };
 
   const initialFilterFormValues = useMemo(() => {
-    const rattings = [];
+    const ratings = [];
 
     if (queryRatting) {
       if (Array.isArray(queryRatting)) {
-        queryRatting.forEach((ratting) => {
-          rattings.push(...convertRattingToNumber(ratting));
+        queryRatting.forEach((rating) => {
+          ratings.push(...convertRattingToNumber(rating));
         });
       } else {
-        rattings.push(...convertRattingToNumber(queryRatting));
+        ratings.push(...convertRattingToNumber(queryRatting));
       }
     }
 
-    return { rattings: uniq(rattings) };
+    return { ratings: uniq(ratings) };
   }, [queryRatting]);
 
   const filterForm = (

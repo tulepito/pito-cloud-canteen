@@ -29,7 +29,7 @@ const ReviewDetailCard: React.FC<TReviewDetailCardProps> = ({
           <span className={classNames(css.nameValue, css.foodNameText)}>
             {data.name}
           </span>
-          <span className={classNames(css.ratingValue, css.rattingText)}>
+          <span className={classNames(css.ratingValue, css.ratingText)}>
             {intl.formatMessage({
               id: `FieldRating.label.${data.rating}`,
             })}

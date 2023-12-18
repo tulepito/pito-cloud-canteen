@@ -65,7 +65,7 @@ const SummarizeReview: React.FC<TSummarizeReviewProps> = ({
           css.detailRatingContainer,
         )}>
         <div className={css.detailRatingRow}>
-          <span className={classNames(css.scenarioLabel, css.rattingText)}>
+          <span className={classNames(css.scenarioLabel, css.ratingText)}>
             {intl.formatMessage({ id: 'ManagePartnerReviewsPage.foodTitle' })}:
           </span>
           <div className={css.ratingBar}>
@@ -73,12 +73,12 @@ const SummarizeReview: React.FC<TSummarizeReviewProps> = ({
               style={{ width: calculateRatingPercent(foodRating || 0) }}
               className={css.activeBar}></div>
           </div>
-          <span className={classNames(css.ratingPoint, css.rattingText)}>{`${
+          <span className={classNames(css.ratingPoint, css.ratingText)}>{`${
             foodRating || 0
           }/5`}</span>
         </div>
         <div className={css.detailRatingRow}>
-          <span className={classNames(css.scenarioLabel, css.rattingText)}>
+          <span className={classNames(css.scenarioLabel, css.ratingText)}>
             {intl.formatMessage({
               id: 'ManagePartnerReviewsPage.packageTitle',
             })}
@@ -91,7 +91,7 @@ const SummarizeReview: React.FC<TSummarizeReviewProps> = ({
               }}
               className={css.activeBar}></div>
           </div>
-          <span className={classNames(css.ratingPoint, css.rattingText)}>{`${
+          <span className={classNames(css.ratingPoint, css.ratingText)}>{`${
             packagingRating || 0
           }/5`}</span>
         </div>
