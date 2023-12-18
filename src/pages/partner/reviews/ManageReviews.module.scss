@@ -46,7 +46,7 @@
     gap: 16px;
     flex-direction: column;
     @include viewportSmall {
-      padding: 16px 0 0 0;
+      padding: 0;
     }
 
     .reviewTableContent {
@@ -74,6 +74,12 @@
         color: $neutralGray6;
       }
     }
+  }
+}
+
+.partnerDetailCardContainer {
+  @include viewportSmall {
+    padding-top: 20px;
   }
 }
 

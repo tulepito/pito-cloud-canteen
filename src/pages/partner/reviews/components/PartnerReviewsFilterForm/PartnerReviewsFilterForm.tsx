@@ -30,8 +30,7 @@ type TFilterPartnerReviewFilterFormProps =
 
 const PartnerReviewsFilterFormComponent: React.FC<
   TPartnerReviewsFilterFormComponentProps
-> = (props) => {
-  const { ratingScore = [], handleSubmit, onClearFilter } = props;
+> = ({ ratingScore = [], handleSubmit, onClearFilter, pristine }) => {
   const intl = useIntl();
 
   const generateScoresOptions = () => {
@@ -46,6 +45,7 @@ const PartnerReviewsFilterFormComponent: React.FC<
       };
     });
   };
+  const submitDisabled = pristine;
 
   return (
     <Form onSubmit={handleSubmit} className={css.scoreCheckboxContainer}>
@@ -63,7 +63,7 @@ const PartnerReviewsFilterFormComponent: React.FC<
             id: 'IntegrationFilterModal.clearBtn',
           })}
         </Button>
-        <Button className={css.btnItem}>
+        <Button className={css.btnItem} disabled={submitDisabled}>
           {intl.formatMessage({
             id: 'FilterPartnerOrderForm.submitButtonText',
           })}

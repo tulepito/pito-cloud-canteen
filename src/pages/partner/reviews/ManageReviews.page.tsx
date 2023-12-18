@@ -43,7 +43,7 @@ const ManageReviewsPage = () => {
   } = router;
 
   const { isMobileLayout } = useViewport();
-  const [perPage, setPerPage] = useState(10);
+  const [perPage, setPerPage] = useState(4);
   const [page, setPage] = useState(
     Number(Array.isArray(queryPage) ? 1 : queryPage),
   );
@@ -310,7 +310,13 @@ const ManageReviewsPage = () => {
             </div>
           ) : (
             reviewsData.map((r, i) => {
-              return <ReviewDetailCard key={i} data={r} />;
+              return (
+                <ReviewDetailCard
+                  rootClassName={css.partnerDetailCardContainer}
+                  key={i}
+                  data={r}
+                />
+              );
             })
           )}
           {!isMobileLayout && (
