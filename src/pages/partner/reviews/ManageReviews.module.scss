@@ -109,11 +109,27 @@
     width: 16px;
     height: 14px;
   }
+}
 
-  &:hover,
-  &:focus {
-    .filterIcon * {
-      fill: $neutralGray1;
-    }
+.filterBtnTooltipOverlay {
+  opacity: 1;
+  padding: 0;
+  @include viewportMedium {
+    padding: 0 25px 0 0;
+  }
+
+  :global(.rc-tooltip-inner) {
+    border-radius: 8px;
+    padding: 20px;
+    background: $neutralGray1;
+    width: 290px;
+
+    /* Shadown/XL */
+    box-shadow: 0px 20px 24px 4px rgba(16, 24, 40, 0.1),
+      0px 8px 8px -4px rgba(16, 24, 40, 0.04);
+  }
+
+  :global(.rc-tooltip-arrow) {
+    display: none;
   }
 }
