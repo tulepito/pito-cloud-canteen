@@ -61,14 +61,6 @@
   }
 }
 
-.tabHeader {
-  margin-bottom: 48px;
-
-  @include viewportMedium {
-    margin-bottom: 0;
-  }
-}
-
 .companyTab {
   @include flexAlign(center, space-between);
 
@@ -91,7 +83,9 @@
 }
 
 .headerWrapperClassName {
-  position: absolute;
-  top: 0;
   width: auto;
+  @include viewportMedium {
+    position: absolute;
+    top: 0;
+  }
 }
