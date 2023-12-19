@@ -291,11 +291,17 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           offset,
           offset + sliceLength,
         );
+        const pagination = {
+          totalItems: totalReviewDetailData,
+          totalPages: 2,
+          page,
+          perPage: pageSize,
+        };
         // #END TODO FAKE Data to Test
 
         return res.status(200).json({
           reviewDetailData: paginationData,
-          totalReviewDetailData,
+          pagination,
         });
       }
 

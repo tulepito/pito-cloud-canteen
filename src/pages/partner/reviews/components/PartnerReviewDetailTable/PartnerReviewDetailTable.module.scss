@@ -1,0 +1,41 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/defaults.scss' as *;
+
+.reviewTableContent {
+  @include flexAlign(flex-start);
+  gap: 16px;
+  flex-direction: column;
+  width: 100%;
+  @include viewportSmall {
+    display: block;
+  }
+
+  .loading {
+    margin-top: 40px;
+    text-align: center;
+    width: 100%;
+  }
+}
+
+.dataEmtpy {
+  @include flexAlign(center, center);
+  gap: 16px;
+  padding: 12px 0px;
+  flex-direction: column;
+  margin-top: 50px;
+  .dataEmptyTitle {
+    color: $neutralGray6;
+  }
+}
+
+.partnerDetailCardContainer {
+  @include viewportSmall {
+    padding-top: 20px;
+  }
+}
+
+.normalText {
+  @include textTemplate(14px, $fontWeightRegular, 20px);
+}

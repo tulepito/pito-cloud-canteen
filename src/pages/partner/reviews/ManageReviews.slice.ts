@@ -3,14 +3,15 @@ import { createSlice } from '@reduxjs/toolkit';
 import { fetchReviewApi, fetchReviewDetailApi } from '@apis/partnerApi';
 import { createAsyncThunk } from '@redux/redux.helper';
 import type { TReviewDetail, TTotalRating } from '@src/types/partnerReviews';
-import type { TObject } from '@src/utils/types';
+import type { TObject, TPagination } from '@src/utils/types';
 
 // ================ Initial states ================ //
 type TManageReviewsState = {
   isFirstLoad: boolean;
-  fetchReviewDetailDatasInProgress: boolean;
-  fetchReviewDetailDatasError: any;
-  totalReviewDetailData: number;
+  fetchReviewDetailDataMoreInProgress: boolean;
+  fetchReviewDetailDataInProgress: boolean;
+  fetchReviewDetailDataError: any;
+  managePartnerReviewsPagination: TPagination;
 
   fetchReviewSummarizeDataInProgress: boolean;
   fetchReviewSummarizeDataError: any;
@@ -23,9 +24,15 @@ type TManageReviewsState = {
 };
 const initialState: TManageReviewsState = {
   isFirstLoad: true,
-  fetchReviewDetailDatasInProgress: false,
-  fetchReviewDetailDatasError: null,
-  totalReviewDetailData: 0,
+  fetchReviewDetailDataMoreInProgress: false,
+  fetchReviewDetailDataInProgress: false,
+  fetchReviewDetailDataError: null,
+  managePartnerReviewsPagination: {
+    totalItems: 0,
+    totalPages: 1,
+    page: 1,
+    perPage: 12,
+  },
 
   fetchReviewSummarizeDataInProgress: false,
   fetchReviewSummarizeDataError: null,
@@ -42,14 +49,25 @@ const initialState: TManageReviewsState = {
 // ================ Async thunks ================ //
 const loadData = createAsyncThunk(
   'app/ManageReviews/LOAD_DATA',
-  async ({ page, pageSize, rating }: TObject) => {
+  async (
+    { page, pageSize, rating, mode = 'replace' }: TObject,
+    { getState, dispatch },
+  ) => {
+    const prevReviewDetailData = getState().ManageReviews.reviewDetailData;
+    if (mode === 'append' && page > 1) {
+      // eslint-disable-next-line @typescript-eslint/no-use-before-define
+      dispatch(setFetchReviewDetailDataMoreInProgress(true));
+    }
     const response = await fetchReviewDetailApi(page, pageSize, rating);
 
-    const { reviewDetailData, totalReviewDetailData } = response.data;
+    const { reviewDetailData, pagination } = response.data;
 
     return {
-      reviewDetailData,
-      totalReviewDetailData,
+      reviewDetailData:
+        mode === 'append' && page > 1
+          ? prevReviewDetailData.concat(reviewDetailData)
+          : reviewDetailData,
+      pagination,
     };
   },
 );
@@ -89,33 +107,27 @@ const ManageReviewsSlice = createSlice({
   name: 'ManageReviews',
   initialState,
   reducers: {
-    clearLoadedReviewSummarizeData: (state) => {
-      state.averageFoodRating = 0;
-      state.averagePackagingRating = 0;
-      state.averageTotalRating = 0;
-      state.totalNumberOfReivews = 0;
-      state.ratingDetail = [];
-    },
-    clearLoadedReviewDetailData: (state) => {
-      state.reviewDetailData = [];
-      state.totalReviewDetailData = 0;
+    setFetchReviewDetailDataMoreInProgress: (state, { payload }) => {
+      state.fetchReviewDetailDataMoreInProgress = payload;
     },
   },
   extraReducers: (builder) => {
     builder
       /* =============== loadData =============== */
       .addCase(loadData.pending, (state) => {
-        state.fetchReviewDetailDatasInProgress = true;
-        state.fetchReviewDetailDatasError = null;
+        state.fetchReviewDetailDataInProgress = true;
+        state.fetchReviewDetailDataError = null;
       })
       .addCase(loadData.fulfilled, (state, { payload }) => {
-        state.fetchReviewDetailDatasInProgress = false;
+        state.fetchReviewDetailDataInProgress = false;
+        state.fetchReviewDetailDataMoreInProgress = false;
         state.reviewDetailData = payload.reviewDetailData;
-        state.totalReviewDetailData = payload.totalReviewDetailData;
+        state.managePartnerReviewsPagination = payload.pagination;
       })
       .addCase(loadData.rejected, (state, { error }) => {
-        state.fetchReviewDetailDatasInProgress = false;
-        state.fetchReviewDetailDatasError = error.message;
+        state.fetchReviewDetailDataInProgress = false;
+        state.fetchReviewDetailDataMoreInProgress = false;
+        state.fetchReviewDetailDataError = error.message;
       })
       .addCase(loadReviewSummarizeData.pending, (state) => {
         state.fetchReviewSummarizeDataInProgress = true;
@@ -139,7 +151,8 @@ const ManageReviewsSlice = createSlice({
 });
 
 // ================ Actions ================ //
-export const ManageReviewsActions = ManageReviewsSlice.actions;
+export const { setFetchReviewDetailDataMoreInProgress } =
+  ManageReviewsSlice.actions;
 export default ManageReviewsSlice.reducer;
 
 // ================ Selectors ================ //

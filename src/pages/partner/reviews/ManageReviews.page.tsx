@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import classNames from 'classnames';
 import { uniq } from 'lodash';
@@ -6,8 +6,6 @@ import { useRouter } from 'next/router';
 
 import Button from '@components/Button/Button';
 import IconFilter from '@components/Icons/IconFilter/IconFilter';
-import IconReviewEmpty from '@components/Icons/IconReviewEmpty/IconReviewEmpty';
-import Pagination from '@components/Pagination/Pagination';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import SlideModal from '@components/SlideModal/SlideModal';
 import Tooltip from '@components/Tooltip/Tooltip';
@@ -16,9 +14,9 @@ import useBoolean from '@hooks/useBoolean';
 import { useViewport } from '@hooks/useViewport';
 import { partnerPaths } from '@src/paths';
 
+import PartnerReviewDetailTable from './components/PartnerReviewDetailTable/PartnerReviewDetailTable';
 import type { TPartnerReviewsFilterFormValues } from './components/PartnerReviewsFilterForm/PartnerReviewsFilterForm';
 import PartnerReviewsFilterForm from './components/PartnerReviewsFilterForm/PartnerReviewsFilterForm';
-import ReviewDetailCard from './components/ReviewDetailCard/ReviewDetailCard';
 import SummarizeReview from './components/SummarizeReview/SummarizeReview';
 import { ManageReviewsThunks } from './ManageReviews.slice';
 
@@ -29,21 +27,14 @@ const ManageReviewsPage = () => {
   const intl = useIntl();
   const router = useRouter();
   const {
-    query: { page: queryPage = 1, rating: queryRating },
+    query: { rating: queryRating },
   } = router;
 
   const { isMobileLayout } = useViewport();
-  const [perPage, setPerPage] = useState(12);
   const filterPartnerFilterModalController = useBoolean();
-  const [page, setPage] = useState(
-    Number(Array.isArray(queryPage) ? 1 : queryPage),
-  );
 
   const ratingDetail = useAppSelector(
     (state) => state.ManageReviews.ratingDetail,
-  );
-  const reviewsData = useAppSelector(
-    (state) => state.ManageReviews.reviewDetailData,
   );
   const averageFoodRating = useAppSelector(
     (state) => state.ManageReviews.averageFoodRating,
@@ -60,29 +51,6 @@ const ManageReviewsPage = () => {
   const totalNumberOfReivews = useAppSelector(
     (state) => state.ManageReviews.totalNumberOfReivews,
   );
-  const totalReviewDetailData = useAppSelector(
-    (state) => state.ManageReviews.totalReviewDetailData,
-  );
-
-  const fetchReviewDetailDatasInProgress = useAppSelector(
-    (state) => state.ManageReviews.fetchReviewDetailDatasInProgress,
-  );
-
-  // #TODO FAKE Data to Test
-  const paginationProps = {
-    total: totalReviewDetailData,
-    current: page,
-    pageSize: perPage,
-  };
-  // #END TODO FAKE Data to Test
-
-  const handlePageChange = (pageValue: number) => {
-    setPage(pageValue);
-  };
-
-  const handlePerPageChange = (pageValue: number, perPageValue: number) => {
-    setPerPage(perPageValue);
-  };
 
   const handleFilterChange = ({ ratings }: TPartnerReviewsFilterFormValues) => {
     router.replace({
@@ -136,15 +104,7 @@ const ManageReviewsPage = () => {
 
   useEffect(() => {
     if (isFirstLoad) dispatch(ManageReviewsThunks.loadReviewSummarizeData());
-
-    dispatch(
-      ManageReviewsThunks.loadData({
-        rating: ratings,
-        page,
-        pageSize: perPage,
-      }),
-    );
-  }, [isFirstLoad, perPage, page, ratings, dispatch]);
+  }, [isFirstLoad, dispatch]);
 
   return (
     <div className={css.root}>
@@ -196,40 +156,7 @@ const ManageReviewsPage = () => {
             </RenderWhen.False>
           </RenderWhen>
         </div>
-        <div className={css.reviewTableContent}>
-          {reviewsData.length === 0 ? (
-            <div className={css.dataEmtpy}>
-              <IconReviewEmpty />
-              <span className={classNames(css.dataEmptyTitle, css.normalText)}>
-                {intl.formatMessage({
-                  id: 'ManagePartnerReviewsPage.emptyReviewDetailTitle',
-                })}
-              </span>
-            </div>
-          ) : fetchReviewDetailDatasInProgress ? (
-            <div className={css.loading}>Loading...</div>
-          ) : (
-            reviewsData.map((r, i) => {
-              return (
-                <ReviewDetailCard
-                  rootClassName={css.partnerDetailCardContainer}
-                  key={i}
-                  data={r}
-                />
-              );
-            })
-          )}
-          {!isMobileLayout &&
-            !fetchReviewDetailDatasInProgress &&
-            reviewsData.length > 0 && (
-              <Pagination
-                showSizeChanger
-                {...paginationProps}
-                onChange={handlePageChange}
-                onShowSizeChange={handlePerPageChange}
-              />
-            )}
-        </div>
+        <PartnerReviewDetailTable ratings={ratings} />
       </div>
 
       <RenderWhen condition={isMobileLayout}>
