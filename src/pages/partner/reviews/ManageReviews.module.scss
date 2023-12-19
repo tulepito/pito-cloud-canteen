@@ -49,43 +49,10 @@
       padding: 0;
     }
 
-    .reviewTableContent {
-      @include flexAlign(flex-start);
-      gap: 16px;
-      flex-direction: column;
-      width: 100%;
-      @include viewportSmall {
-        display: block;
-      }
-
-      .loading {
-        margin-top: 40px;
-        text-align: center;
-        width: 100%;
-      }
-    }
-
     .tableTitleContainer {
       width: 100%;
       @include flexAlign(center, space-between);
     }
-
-    .dataEmtpy {
-      @include flexAlign(center, center);
-      gap: 16px;
-      padding: 12px 0px;
-      flex-direction: column;
-      margin-top: 50px;
-      .dataEmptyTitle {
-        color: $neutralGray6;
-      }
-    }
-  }
-}
-
-.partnerDetailCardContainer {
-  @include viewportSmall {
-    padding-top: 20px;
   }
 }
 
@@ -94,17 +61,6 @@
   @include viewportSmall {
     @include textTemplate(20px, $fontWeightBold, 32px);
   }
-}
-.normalText {
-  @include textTemplate(14px, $fontWeightRegular, 20px);
-}
-
-.nameText {
-  @include textTemplate(12px, $fontWeightRegular, 16px);
-}
-
-.foodNameText {
-  @include textTemplate(12px, $fontWeightSemiBold, 16px);
 }
 
 .filterIcon {
