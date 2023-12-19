@@ -36,10 +36,6 @@
   }
 }
 
-.calendarContainer {
-  margin-top: -50px;
-}
-
 .subOrderContainer {
   @include flexAlign(unset);
   flex-direction: column;
@@ -65,14 +61,6 @@
   }
 }
 
-.tabHeader {
-  margin-bottom: 48px;
-
-  @include viewportMedium {
-    margin-bottom: 0;
-  }
-}
-
 .companyTab {
   @include flexAlign(center, space-between);
 
@@ -87,5 +75,17 @@
   .fakeAvatar {
     width: 0px;
     height: 20px;
+  }
+}
+
+.tabHeaderPosition {
+  position: relative;
+}
+
+.headerWrapperClassName {
+  width: auto;
+  @include viewportMedium {
+    position: absolute;
+    top: 0;
   }
 }

@@ -669,7 +669,12 @@ const OrderListPage = () => {
         openNotificationModal={notificationModalControl.setTrue}
         numberOfUnseenNotifications={numberOfUnseenNotifications}
       />
-      <Tabs items={tabOptions as any} headerClassName={css.tabHeader} />
+      <Tabs
+        items={tabOptions as any}
+        className={css.tabHeaderPosition}
+        headerWrapperClassName={css.headerWrapperClassName}
+        headerClassName={css.tabHeader}
+      />
 
       <BottomNavigationBar />
       <LoadingModal isOpen={showLoadingModal} />
