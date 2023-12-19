@@ -192,9 +192,11 @@ export const publishOrder = async (orderId: string, isAdmin = false) => {
     );
   });
 
-  sendRemindPickingNativeNotificationToBookerScheduler({
-    orderId,
-    deadlineDate,
-    deadlineHour,
-  });
+  if (isGroupOrder) {
+    sendRemindPickingNativeNotificationToBookerScheduler({
+      orderId,
+      deadlineDate,
+      deadlineHour,
+    });
+  }
 };
