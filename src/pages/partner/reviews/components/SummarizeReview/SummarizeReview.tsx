@@ -7,17 +7,17 @@ import IconUser from '@components/Icons/IconUser/IconUser';
 import css from './SummarizeReview.module.scss';
 
 type TSummarizeReviewProps = {
-  foodRating: number;
-  packagingRating: number;
-  totalRating: number;
-  pointRating: number;
+  averageFoodRating: number;
+  averagePackagingRating: number;
+  totalNumberOfReivews: number;
+  averageTotalRating: number;
 };
 
 const SummarizeReview: React.FC<TSummarizeReviewProps> = ({
-  foodRating,
-  packagingRating,
-  totalRating,
-  pointRating,
+  averageFoodRating,
+  averagePackagingRating,
+  totalNumberOfReivews,
+  averageTotalRating,
 }) => {
   const intl = useIntl();
 
@@ -41,7 +41,7 @@ const SummarizeReview: React.FC<TSummarizeReviewProps> = ({
               })}
             </span>
           </div>
-          <div className={css.summarizeValue}>{totalRating}</div>
+          <div className={css.summarizeValue}>{totalNumberOfReivews}</div>
         </div>
         <div
           className={classNames(
@@ -56,7 +56,7 @@ const SummarizeReview: React.FC<TSummarizeReviewProps> = ({
               })}
             </span>
           </div>
-          <div className={css.summarizeValue}>{pointRating}</div>
+          <div className={css.summarizeValue}>{averageTotalRating}</div>
         </div>
       </div>
       <div
@@ -70,11 +70,11 @@ const SummarizeReview: React.FC<TSummarizeReviewProps> = ({
           </span>
           <div className={css.ratingBar}>
             <div
-              style={{ width: calculateRatingPercent(foodRating || 0) }}
+              style={{ width: calculateRatingPercent(averageFoodRating || 0) }}
               className={css.activeBar}></div>
           </div>
           <span className={classNames(css.ratingPoint, css.ratingText)}>{`${
-            foodRating || 0
+            averageFoodRating || 0
           }/5`}</span>
         </div>
         <div className={css.detailRatingRow}>
@@ -87,12 +87,12 @@ const SummarizeReview: React.FC<TSummarizeReviewProps> = ({
           <div className={css.ratingBar}>
             <div
               style={{
-                width: calculateRatingPercent(packagingRating || 0),
+                width: calculateRatingPercent(averagePackagingRating || 0),
               }}
               className={css.activeBar}></div>
           </div>
           <span className={classNames(css.ratingPoint, css.ratingText)}>{`${
-            packagingRating || 0
+            averagePackagingRating || 0
           }/5`}</span>
         </div>
       </div>

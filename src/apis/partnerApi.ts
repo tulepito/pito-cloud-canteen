@@ -99,10 +99,14 @@ export const transitSubOrderTransactionApi = ({
   });
 };
 
+export const fetchReviewApi = () => {
+  return getApi(`${BASE_URL}/reviews`);
+};
+
 export const fetchReviewDetailApi = (
   page: number = 1,
   pageSize: number = 4,
   rating?: number[],
 ) => {
-  return getApi(`${BASE_URL}/reviews`, { page, pageSize, rating });
+  return getApi(`${BASE_URL}/reviews/detail`, { page, pageSize, rating });
 };

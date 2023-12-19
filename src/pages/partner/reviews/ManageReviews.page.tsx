@@ -33,11 +33,11 @@ const ManageReviewsPage = () => {
   } = router;
 
   const { isMobileLayout } = useViewport();
-  const [perPage, setPerPage] = useState(4);
+  const [perPage, setPerPage] = useState(12);
+  const filterPartnerFilterModalController = useBoolean();
   const [page, setPage] = useState(
     Number(Array.isArray(queryPage) ? 1 : queryPage),
   );
-  const filterPartnerFilterModalController = useBoolean();
 
   const ratingDetail = useAppSelector(
     (state) => state.ManageReviews.ratingDetail,
@@ -45,18 +45,20 @@ const ManageReviewsPage = () => {
   const reviewsData = useAppSelector(
     (state) => state.ManageReviews.reviewDetailData,
   );
-  const foodRating = useAppSelector((state) => state.ManageReviews.foodRating);
-  const packagingRating = useAppSelector(
-    (state) => state.ManageReviews.packagingRating,
+  const averageFoodRating = useAppSelector(
+    (state) => state.ManageReviews.averageFoodRating,
   );
-  const pointRating = useAppSelector(
-    (state) => state.ManageReviews.pointRating,
+  const averagePackagingRating = useAppSelector(
+    (state) => state.ManageReviews.averagePackagingRating,
   );
   const isFirstLoad = useAppSelector(
     (state) => state.ManageReviews.isFirstLoad,
   );
-  const totalRating = useAppSelector(
-    (state) => state.ManageReviews.totalRating,
+  const averageTotalRating = useAppSelector(
+    (state) => state.ManageReviews.averageTotalRating,
+  );
+  const totalNumberOfReivews = useAppSelector(
+    (state) => state.ManageReviews.totalNumberOfReivews,
   );
   const totalReviewDetailData = useAppSelector(
     (state) => state.ManageReviews.totalReviewDetailData,
@@ -107,20 +109,20 @@ const ManageReviewsPage = () => {
     return result;
   };
 
-  const initialFilterFormValues = useMemo(() => {
-    const ratings = [];
+  const ratings = useMemo(() => {
+    const result = [];
 
     if (queryRating) {
       if (Array.isArray(queryRating)) {
         queryRating.forEach((rating) => {
-          ratings.push(...convertRatingToNumber(rating));
+          result.push(...convertRatingToNumber(rating));
         });
       } else {
-        ratings.push(...convertRatingToNumber(queryRating));
+        result.push(...convertRatingToNumber(queryRating));
       }
     }
 
-    return { ratings: uniq(ratings) };
+    return uniq(result);
   }, [queryRating]);
 
   const filterForm = (
@@ -128,20 +130,21 @@ const ManageReviewsPage = () => {
       onSubmit={handleFilterChange}
       onClearFilter={handleClearFilter}
       ratingDetail={ratingDetail}
-      initialValues={initialFilterFormValues}
+      initialValues={{ ratings: uniq(ratings) }}
     />
   );
 
   useEffect(() => {
+    if (isFirstLoad) dispatch(ManageReviewsThunks.loadReviewSummarizeData());
+
     dispatch(
       ManageReviewsThunks.loadData({
-        rating: initialFilterFormValues,
+        rating: ratings,
         page,
         pageSize: perPage,
       }),
     );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isFirstLoad, perPage, page, queryRating]);
+  }, [isFirstLoad, perPage, page, ratings, dispatch]);
 
   return (
     <div className={css.root}>
@@ -153,10 +156,10 @@ const ManageReviewsPage = () => {
           {intl.formatMessage({ id: 'ManagePartnerReviewsPage.overView' })}
         </span>
         <SummarizeReview
-          foodRating={foodRating}
-          packagingRating={packagingRating}
-          pointRating={pointRating}
-          totalRating={totalRating}
+          averageFoodRating={averageFoodRating}
+          averagePackagingRating={averagePackagingRating}
+          averageTotalRating={averageTotalRating}
+          totalNumberOfReivews={totalNumberOfReivews}
         />
       </div>
 

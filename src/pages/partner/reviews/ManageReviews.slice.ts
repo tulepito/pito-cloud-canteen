@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-import { fetchReviewDetailApi } from '@apis/partnerApi';
+import { fetchReviewApi, fetchReviewDetailApi } from '@apis/partnerApi';
 import { createAsyncThunk } from '@redux/redux.helper';
 import type { TReviewDetail, TTotalRating } from '@src/types/partnerReviews';
 import type { TObject } from '@src/utils/types';
@@ -10,25 +10,31 @@ type TManageReviewsState = {
   isFirstLoad: boolean;
   fetchReviewDetailDatasInProgress: boolean;
   fetchReviewDetailDatasError: any;
+  totalReviewDetailData: number;
+
+  fetchReviewSummarizeDataInProgress: boolean;
+  fetchReviewSummarizeDataError: any;
   ratingDetail: TTotalRating[];
   reviewDetailData: TReviewDetail[];
-  totalReviewDetailData: number;
-  foodRating: number;
-  packagingRating: number;
-  pointRating: number;
-  totalRating: number;
+  averageFoodRating: number;
+  averagePackagingRating: number;
+  averageTotalRating: number;
+  totalNumberOfReivews: number;
 };
 const initialState: TManageReviewsState = {
   isFirstLoad: true,
   fetchReviewDetailDatasInProgress: false,
   fetchReviewDetailDatasError: null,
+  totalReviewDetailData: 0,
+
+  fetchReviewSummarizeDataInProgress: false,
+  fetchReviewSummarizeDataError: null,
   reviewDetailData: [],
   ratingDetail: [],
-  totalReviewDetailData: 0,
-  foodRating: 0,
-  packagingRating: 0,
-  pointRating: 0,
-  totalRating: 0,
+  averageFoodRating: 0,
+  averagePackagingRating: 0,
+  averageTotalRating: 0,
+  totalNumberOfReivews: 0,
 };
 
 // ================ Thunk types ================ //
@@ -39,34 +45,43 @@ const loadData = createAsyncThunk(
   async ({ page, pageSize, rating }: TObject) => {
     const response = await fetchReviewDetailApi(page, pageSize, rating);
 
-    const {
-      totalRatingDetail,
+    const { reviewDetailData, totalReviewDetailData } = response.data;
+
+    return {
       reviewDetailData,
       totalReviewDetailData,
-      ratingDetail,
+    };
+  },
+);
+const loadReviewSummarizeData = createAsyncThunk(
+  'app/ManageReviews/LOAD_REVIEW_SUMMARIZE_DATA',
+  async () => {
+    const response = await fetchReviewApi();
 
-      foodRating,
-      packagingRating,
-      pointRating,
-      totalRating,
+    const {
+      totalNumberOfReivewsDetail,
+      ratingDetail,
+      averageFoodRating,
+      averagePackagingRating,
+      averageTotalRating,
+      totalNumberOfReivews,
     } = response.data;
 
     return {
-      totalRatingDetail,
-      reviewDetailData,
-      totalReviewDetailData,
+      totalNumberOfReivewsDetail,
       ratingDetail,
 
-      foodRating,
-      packagingRating,
-      pointRating,
-      totalRating,
+      averageFoodRating,
+      averagePackagingRating,
+      averageTotalRating,
+      totalNumberOfReivews,
     };
   },
 );
 
 export const ManageReviewsThunks = {
   loadData,
+  loadReviewSummarizeData,
 };
 
 // ================ Slice ================ //
@@ -74,15 +89,16 @@ const ManageReviewsSlice = createSlice({
   name: 'ManageReviews',
   initialState,
   reducers: {
+    clearLoadedReviewSummarizeData: (state) => {
+      state.averageFoodRating = 0;
+      state.averagePackagingRating = 0;
+      state.averageTotalRating = 0;
+      state.totalNumberOfReivews = 0;
+      state.ratingDetail = [];
+    },
     clearLoadedReviewDetailData: (state) => {
-      state.ratingDetail = [];
-      state.ratingDetail = [];
+      state.reviewDetailData = [];
       state.totalReviewDetailData = 0;
-
-      state.foodRating = 0;
-      state.packagingRating = 0;
-      state.pointRating = 0;
-      state.totalRating = 0;
     },
   },
   extraReducers: (builder) => {
@@ -94,19 +110,30 @@ const ManageReviewsSlice = createSlice({
       })
       .addCase(loadData.fulfilled, (state, { payload }) => {
         state.fetchReviewDetailDatasInProgress = false;
-        state.isFirstLoad = false;
         state.reviewDetailData = payload.reviewDetailData;
-        state.ratingDetail = payload.reviewDetailData;
         state.totalReviewDetailData = payload.totalReviewDetailData;
-
-        state.foodRating = payload.foodRating;
-        state.packagingRating = payload.packagingRating;
-        state.pointRating = payload.pointRating;
-        state.totalRating = payload.totalRating;
       })
       .addCase(loadData.rejected, (state, { error }) => {
         state.fetchReviewDetailDatasInProgress = false;
         state.fetchReviewDetailDatasError = error.message;
+      })
+      .addCase(loadReviewSummarizeData.pending, (state) => {
+        state.fetchReviewSummarizeDataInProgress = true;
+        state.fetchReviewSummarizeDataError = null;
+      })
+
+      .addCase(loadReviewSummarizeData.fulfilled, (state, { payload }) => {
+        state.fetchReviewSummarizeDataInProgress = false;
+        state.isFirstLoad = false;
+        state.ratingDetail = payload.ratingDetail;
+        state.averageFoodRating = payload.averageFoodRating;
+        state.averagePackagingRating = payload.averagePackagingRating;
+        state.averageTotalRating = payload.averageTotalRating;
+        state.totalNumberOfReivews = payload.totalNumberOfReivews;
+      })
+      .addCase(loadReviewSummarizeData.rejected, (state, { error }) => {
+        state.fetchReviewSummarizeDataInProgress = false;
+        state.fetchReviewSummarizeDataError = error.message;
       });
   },
 });
