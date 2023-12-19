@@ -185,7 +185,7 @@ const createOrder = async ({
     });
   }
 
-  if (isAutoPickFood && !isNormalOrder && orderFlexId) {
+  if (isAutoPickFood && !isNormalOrder && orderFlexId && !isCreatedByAdmin) {
     await createOrUpdatePickFoodForEmptyMembersScheduler({
       orderId: orderFlexId,
       startDate,
