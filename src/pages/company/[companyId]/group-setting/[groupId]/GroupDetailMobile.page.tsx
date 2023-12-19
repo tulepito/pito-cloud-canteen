@@ -226,7 +226,7 @@ const GroupDetailMobilePage = () => {
       <div className={css.tableContainer}>
         <MemberTable
           onDeleteMember={onDeleteMember}
-          MemberData={formattedGroupMembers}
+          memberData={formattedGroupMembers}
           isLoading={fetchGroupDetailInProgress}
           handleAddNewMember={openAddNewMembersModal}
           pagination={groupMembersPagination}

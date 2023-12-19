@@ -13,7 +13,7 @@ import MemberRow from '../MemberRow/MemberRow';
 import css from './MemberTable.module.scss';
 
 type TMemberTableProps = {
-  MemberData: TRowData[];
+  memberData: TRowData[];
   handleAddNewMember: () => void;
   onDeleteMember: (id: string, email: string) => void;
   isLoading: boolean;
@@ -21,7 +21,7 @@ type TMemberTableProps = {
 };
 
 const MemberTable: React.FC<TMemberTableProps> = ({
-  MemberData,
+  memberData,
   handleAddNewMember,
   isLoading,
   onDeleteMember,
@@ -143,14 +143,14 @@ const MemberTable: React.FC<TMemberTableProps> = ({
               Loading...
             </td>
           </tr>
-        ) : MemberData.length === 0 ? (
+        ) : memberData.length === 0 ? (
           <tr>
             <td colSpan={columns.length} className={css.emptyCell}>
               <FormattedMessage id="Table.noResults" />
             </td>
           </tr>
         ) : (
-          MemberData.map((row: TRowData) => {
+          memberData.map((row: TRowData) => {
             return (
               <MemberRow
                 key={row.key}

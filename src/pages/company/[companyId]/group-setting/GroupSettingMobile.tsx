@@ -136,6 +136,8 @@ const GroupSettingMobile = () => {
             <div className={css.memberNumberActionContainer}>
               <IconEdit
                 variant="outline"
+                width={32}
+                height={32}
                 className={css.editBtn}
                 onClick={onEditGroup}
               />
@@ -144,6 +146,8 @@ const GroupSettingMobile = () => {
               ) : (
                 <IconDelete
                   variant="outline"
+                  width={32}
+                  height={32}
                   className={css.deleteBtn}
                   onClick={onDeleteGroup}
                 />
