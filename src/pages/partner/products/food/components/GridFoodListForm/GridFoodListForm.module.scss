@@ -26,5 +26,10 @@
 }
 
 .pagination {
-  margin-top: 40px;
+  display: none;
+
+  @include viewportLarge {
+    margin-top: 40px;
+    display: block;
+  }
 }
