@@ -332,7 +332,7 @@ export const createNativeNotificationToPartner = async (
       {
         const { partnerName } = notificationParams;
 
-        const url = `${BASE_URL}partner/settings/account/info`;
+        const url = `${BASE_URL}/partner/settings/account/info`;
 
         oneSignalUserIds.forEach((oneSignalUserId: string) => {
           sendNotification({
@@ -348,7 +348,7 @@ export const createNativeNotificationToPartner = async (
     case ENativeNotificationType.PartnerSubOrderNegativeRating:
       {
         const { subOrderDate } = notificationParams;
-        const url = `${BASE_URL}/partner/reviews?type=bad,very_bad`;
+        const url = `${BASE_URL}/partner/reviews?rating=1,2`;
 
         oneSignalUserIds.forEach((oneSignalUserId: string) => {
           sendNotification({
