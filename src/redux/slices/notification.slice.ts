@@ -5,6 +5,8 @@ import {
   updateNotificationsApi,
 } from '@apis/notificationApi';
 import { createAsyncThunk } from '@redux/redux.helper';
+import { ENotificationType } from '@src/utils/enums';
+import type { TObject } from '@src/utils/types';
 
 // ================ Initial states ================ //
 type TNotificationState = {
@@ -25,8 +27,15 @@ const fetchNotifications = createAsyncThunk(
   'app/Notification/FETCH_NOTIFICATIONS',
   async () => {
     const { data: response = [] } = await fetchNotificationsApi();
+    const filteredResponse = response.filter(
+      (notification: TObject) =>
+        notification.notificationType !==
+          ENotificationType.SUB_ORDER_REVIEWED_BY_PARTICIPANT &&
+        notification.notificationType !==
+          ENotificationType.SUB_ORDER_REVIEWED_BY_BOOKER,
+    );
 
-    return response;
+    return filteredResponse;
   },
 );
 

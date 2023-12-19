@@ -439,6 +439,24 @@ const NotificationItemInfo: React.FC<NotificationItemInfoProps> = (props) => {
           <div className={css.pastTime}>{pastTime}</div>
         </div>
       );
+
+    case ENotificationType.SUB_ORDER_REVIEWED_BY_PARTICIPANT:
+      return (
+        <div className={css.contentWrapper}>
+          <div className={css.content}>
+            {intl.formatMessage(
+              {
+                id: 'NotificationItemInfo.title.subOrderReviewedByParticipant',
+              },
+              {
+                span: (msg: any) => <span className={css.boldText}>{msg}</span>,
+                subOrderName,
+              },
+            )}
+          </div>
+          <div className={css.pastTime}>{pastTime}</div>
+        </div>
+      );
     default:
       return <div></div>;
   }

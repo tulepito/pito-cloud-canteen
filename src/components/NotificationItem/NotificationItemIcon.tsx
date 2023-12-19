@@ -4,6 +4,7 @@ import IconEdit from '@components/Icons/IconEdit/IconEdit';
 import IconFood from '@components/Icons/IconFood/IconFood';
 import IconRatingStar from '@components/Icons/IconRatingStar/IconRatingStar';
 import IconSharing from '@components/Icons/IconSharing/IconSharing';
+import IconStar from '@components/Icons/IconStar/IconStar';
 import IconTickWithBackground from '@components/Icons/IconTickWithBackground/IconTickWithBackground';
 import IconTruck from '@components/Icons/IconTruck/IconTruck';
 import IconUser from '@components/Icons/IconUser/IconUser';
@@ -61,6 +62,10 @@ const NotificationItemIcon: React.FC<NotificationItemIconProps> = (props) => {
 
     case ENotificationType.BOOKER_PICKING_ORDER:
       icon = <IconSharing className={css.iconSharing} />;
+      break;
+    case ENotificationType.SUB_ORDER_REVIEWED_BY_PARTICIPANT:
+    case ENotificationType.SUB_ORDER_REVIEWED_BY_BOOKER:
+      icon = <IconStar />;
       break;
 
     default:

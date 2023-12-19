@@ -1243,6 +1243,7 @@
   "NotificationItemInfo.title.subOrderDelivering": "Đơn hàng <span> {subOrderName}</span> đang chuẩn bị giao",
   "NotificationItemInfo.title.subOrderInprogress": "Đơn hàng <span> {subOrderName}</span> đang được triển khai",
   "NotificationItemInfo.title.subOrderReviewedByBooker": "Đơn hàng <span> {subOrderName}</span> vừa được đánh giá",
+  "NotificationItemInfo.title.subOrderReviewedByParticipant": "Đơn hàng <span> {subOrderName}</span> vừa được đánh giá",
   "NotificationItemInfo.title.subOrderUpdated": "Đơn hàng <span> {subOrderName}</span> đã được chỉnh sửa",
   "NotificationSection.label.completedOrder": "Đánh giá đơn hàng {orderId}",
   "NotificationSection.label.deadlineDueOrder": "Đơn hàng {orderId} sắp đến hạn chọn món",
