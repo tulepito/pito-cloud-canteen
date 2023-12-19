@@ -27,7 +27,6 @@ const NotificationItemInfo: React.FC<NotificationItemInfoProps> = (props) => {
     startDate,
     endDate,
     partnerName,
-    subOrderName: partnerSubOrderName,
   } = notificationItem;
   const { seconds } = createdAt;
   const formattedDate = formatTimestamp(date || subOrderDate);
@@ -432,7 +431,7 @@ const NotificationItemInfo: React.FC<NotificationItemInfoProps> = (props) => {
               },
               {
                 span: (msg: any) => <span className={css.boldText}>{msg}</span>,
-                subOrderName: partnerSubOrderName,
+                subOrderName: subOrderNameFromData,
               },
             )}
           </div>

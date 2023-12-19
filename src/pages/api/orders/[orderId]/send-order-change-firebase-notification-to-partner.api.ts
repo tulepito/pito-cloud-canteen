@@ -96,7 +96,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       case HttpMethod.POST:
         {
           const order = await fetchListing(orderId as string);
-          const { orderTitle } = order.attributes || {};
+          const { title: orderTitle } = order.attributes || {};
           const { companyName, plans = [] } = order.attributes.metadata || {};
 
           if (!isEmpty(firebaseChangeHistory)) {
