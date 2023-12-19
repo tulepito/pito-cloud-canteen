@@ -73,7 +73,7 @@ const getRoles = (currentUser: TCurrentUser) => {
     isAdmin = false,
     isPartner = false,
     isCompany = false,
-    company,
+    company = {},
   } = CurrentUser(currentUser).getMetadata();
 
   const isBooker = Object.values(company).some(({ permission }: any) => {
