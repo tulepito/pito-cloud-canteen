@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-shadow */
-
 import _ from 'lodash';
 
 import { queryAllListings } from '@helpers/apiHelpers';
