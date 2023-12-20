@@ -5,9 +5,8 @@ import { HttpMethod } from '@apis/configs';
 import { queryAllListings } from '@helpers/apiHelpers';
 import { getOrderAndPlan } from '@pages/api/orders/[orderId]/get.service';
 import cookies from '@services/cookie';
-import { fetchUser } from '@services/integrationHelper';
 import partnerChecker from '@services/permissionChecker/partner';
-import { getSdk, handleError } from '@services/sdk';
+import { getIntegrationSdk, getSdk, handleError } from '@services/sdk';
 import {
   CurrentUser,
   denormalisedResponseEntities,
@@ -22,6 +21,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     const apiMethod = req.method;
     const { JSONParams = '' } = req.query;
     const sdk = getSdk(req, res);
+    const integrationSdk = getIntegrationSdk();
 
     switch (apiMethod) {
       case HttpMethod.GET: {
@@ -44,9 +44,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           },
         });
 
-        // const userReview: Promise<any>;
-        // const mapOrders = new Map<string, any>();
-        // const mapUsers = new Map<string, any>();
         const userIds: string[] = [];
         const orderIds: string[] = [];
 
@@ -80,11 +77,16 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           };
         });
 
-        const fetchUsers = await Promise.all(
-          uniq(userIds).map((userId) => fetchUser(userId)),
-        );
+        const fetchData = await Promise.all([
+          integrationSdk.users.query({
+            meta_id: userIds,
+          }),
+          getOrderAndPlan(uniq(orderIds)),
+        ]);
+        const [fetchUsers, fetchOrders] = fetchData;
+        const users: [] = denormalisedResponseEntities(fetchUsers);
 
-        const mapUserById = fetchUsers.reduce((acc, user) => {
+        const mapUserById = users.reduce((acc, user) => {
           const id = User(user).getId();
           if (!acc.has(id)) {
             acc.set(id, user);
@@ -92,10 +94,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
           return acc;
         }, new Map<string, any>());
-
-        const fetchOrders = await Promise.all(
-          uniq(orderIds).map((orderId: string) => getOrderAndPlan({ orderId })),
-        );
 
         const mapOrderById = fetchOrders.reduce((acc, order) => {
           const id = order.orderListing.id.uuid;
@@ -135,19 +133,16 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             foodName = lineItems.length ? lineItems[0].name : '';
           }
 
-          const avatar = 'avatar';
-
           return {
             id,
             rating,
             foodRating,
             packagingRating,
             createdAt,
-
             description,
             name,
             foodName,
-            avatar,
+            user,
           };
         });
 

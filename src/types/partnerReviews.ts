@@ -1,3 +1,5 @@
+import type { TUser } from '@src/utils/types';
+
 export type TReviewDetail = {
   id: number;
   name: string;
@@ -7,7 +9,7 @@ export type TReviewDetail = {
   description: string;
   foodName: string;
   createdAt: string;
-  avatar: string;
+  user: TUser;
 };
 
 export type TTotalRating = {

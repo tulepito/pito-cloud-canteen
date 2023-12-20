@@ -1,6 +1,7 @@
 import { useIntl } from 'react-intl';
 import classNames from 'classnames';
 
+import Avatar from '@components/Avatar/Avatar';
 import IconRatingFace from '@components/Icons/IconRatingFace/IconRatingFace';
 import type { TReviewDetail } from '@src/types/partnerReviews';
 import { formatDate } from '@src/utils/dates';
@@ -21,11 +22,12 @@ const ReviewDetailCard: React.FC<TReviewDetailCardProps> = ({
     typeof data.createdAt === 'string'
       ? new Date(data.createdAt)
       : data.createdAt;
+  console.log(data.user);
 
   return (
     <div className={classNames(css.reviewCardContainer, rootClassName)}>
       <div className={css.reviewCardContainerAvartar}>
-        <IconRatingFace className={css.avatar} rating={5} />
+        <Avatar disableProfileLink className={css.avatar} user={data.user} />
       </div>
       <div className={css.reviewCardContainerItem}>
         <div className={css.nameRatingContainer}>

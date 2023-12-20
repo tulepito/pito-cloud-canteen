@@ -3,12 +3,13 @@ import chunk from 'lodash/chunk';
 import flatten from 'lodash/flatten';
 import isEmpty from 'lodash/isEmpty';
 
+import { queryAllListings } from '@helpers/apiHelpers';
 import { fetchListing, fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { EImageVariants } from '@src/utils/enums';
 import { denormalisedResponseEntities, Listing } from '@utils/data';
 import type { TPlan } from '@utils/orderTypes';
-import type { TObject } from '@utils/types';
+import type { TListing, TObject } from '@utils/types';
 
 const getOrder = async ({ orderId }: { orderId: string }) => {
   const integrationSdk = getIntegrationSdk();
@@ -100,24 +101,62 @@ const getOrder = async ({ orderId }: { orderId: string }) => {
   return data;
 };
 
-export const getOrderAndPlan = async ({ orderId }: { orderId: string }) => {
-  const integrationSdk = getIntegrationSdk();
-
-  const orderResponse = await integrationSdk.listings.show({
-    id: orderId,
+export const getOrderAndPlan = async (orderIds: string[]) => {
+  const orders: [] = await queryAllListings({
+    query: {
+      ids: orderIds,
+    },
   });
-  const [orderListing] = denormalisedResponseEntities(orderResponse);
-  const { plans = [] } = Listing(orderListing).getMetadata();
+  const plainIds: string[] = [];
+  orders.forEach((order: TListing) => {
+    const { plans = [] } = Listing(order).getMetadata();
 
-  let data: TObject = { orderListing };
+    if (plans?.length > 0) {
+      const planId = plans[0];
+      plainIds.push(planId);
+    }
+  });
+  const plans: [] = await queryAllListings({
+    query: {
+      ids: plainIds,
+    },
+  });
 
-  if (plans?.length > 0) {
-    const planId = plans[0];
-    const planListing = await fetchListing(planId);
+  const mapPlanByOrderId = plans.reduce((acc, plan: TListing) => {
+    const { orderId } = Listing(plan).getMetadata();
+    if (!acc.has(orderId)) {
+      acc.set(orderId, plan);
+    }
 
-    data = { ...data, planListing };
-  }
+    return acc;
+  }, new Map<string, any>());
 
-  return data;
+  return orders.map((order: TListing) => {
+    const orderId = Listing(order).getId();
+
+    return {
+      orderListing: order,
+      planListing: mapPlanByOrderId.get(orderId),
+    };
+  });
+
+  // const integrationSdk = getIntegrationSdk();
+
+  // const orderResponse = await integrationSdk.listings.show({
+  //   id: orderId,
+  // });
+  // const [orderListing] = denormalisedResponseEntities(orderResponse);
+  // const { plans = [] } = Listing(orderListing).getMetadata();
+
+  // let data: TObject = { orderListing };
+
+  // if (plans?.length > 0) {
+  //   const planId = plans[0];
+  //   const planListing = await fetchListing(planId);
+
+  //   data = { ...data, planListing };
+  // }
+
+  // return data;
 };
 export default getOrder;

@@ -37,67 +37,11 @@
       width: auto;
     }
   }
-
-  .reviewTable {
-    width: 100%;
-    background-color: $neutralGray1;
-    padding: 16px;
-    @include flexAlign(flex-start);
-    gap: 16px;
-    flex-direction: column;
-    @include viewportSmall {
-      padding: 0;
-    }
-
-    .tableTitleContainer {
-      width: 100%;
-      @include flexAlign(center, space-between);
-    }
-  }
 }
 
 .titleText {
   @include textTemplate(16px, $fontWeightSemiBold, 24px);
   @include viewportSmall {
     @include textTemplate(20px, $fontWeightBold, 32px);
-  }
-}
-
-.filterIcon {
-  margin-right: 10px;
-  fill: $neutralGray7;
-}
-
-.filterButton {
-  padding: 10px 20px 10px 20px;
-  span {
-    @include textTemplate(14px, $fontWeightBold, 24px);
-  }
-  .filterIcon {
-    width: 16px;
-    height: 14px;
-  }
-}
-
-.filterBtnTooltipOverlay {
-  opacity: 1;
-  padding: 0;
-  @include viewportMedium {
-    padding: 0 25px 0 0;
-  }
-
-  :global(.rc-tooltip-inner) {
-    border-radius: 8px;
-    padding: 20px;
-    background: $neutralGray1;
-    width: 290px;
-
-    /* Shadown/XL */
-    box-shadow: 0px 20px 24px 4px rgba(16, 24, 40, 0.1),
-      0px 8px 8px -4px rgba(16, 24, 40, 0.04);
-  }
-
-  :global(.rc-tooltip-arrow) {
-    display: none;
   }
 }
