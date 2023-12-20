@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import classNames from 'classnames';
-import { uniq } from 'lodash';
-import { useRouter } from 'next/router';
 
 import Button from '@components/Button/Button';
 import IconFilter from '@components/Icons/IconFilter/IconFilter';
@@ -15,34 +13,28 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { useBottomScroll } from '@hooks/useBottomScroll';
 import { useViewport } from '@hooks/useViewport';
-import { partnerPaths } from '@src/paths';
 
 import { ManageReviewsThunks } from '../../ManageReviews.slice';
-import type { TPartnerReviewsFilterFormValues } from '../PartnerReviewsFilterForm/PartnerReviewsFilterForm';
-import PartnerReviewsFilterForm from '../PartnerReviewsFilterForm/PartnerReviewsFilterForm';
 import ReviewDetailCard from '../ReviewDetailCard/ReviewDetailCard';
 
 import css from './PartnerReviewDetailTable.module.scss';
 
 type TPartnerReviewDetailTableProps = {
   ratings: number[];
+  filterForm: any;
 };
 
 const PartnerReviewDetailTable: React.FC<TPartnerReviewDetailTableProps> = ({
   ratings,
+  filterForm,
 }) => {
   const dispatch = useAppDispatch();
   const intl = useIntl();
-  const router = useRouter();
 
   const { isMobileLayout } = useViewport();
   const [perPage, setPerPage] = useState(12);
   const [page, setPage] = useState(Number(1));
   const filterPartnerFilterModalController = useBoolean();
-
-  const ratingDetail = useAppSelector(
-    (state) => state.ManageReviews.ratingDetail,
-  );
 
   const reviewsData = useAppSelector(
     (state) => state.ManageReviews.reviewDetailData,
@@ -100,35 +92,6 @@ const PartnerReviewDetailTable: React.FC<TPartnerReviewDetailTableProps> = ({
       increasePage();
     }
   });
-
-  const handleFilterChange = ({
-    ratings: ratingFormValue,
-  }: TPartnerReviewsFilterFormValues) => {
-    router.replace({
-      pathname: partnerPaths.ManageReviews,
-      query: {
-        ...(ratingFormValue.length
-          ? { rating: ratingFormValue.join(',') }
-          : {}),
-      },
-    });
-  };
-
-  const handleClearFilter = () => {
-    router.replace({
-      pathname: partnerPaths.ManageReviews,
-      query: {},
-    });
-  };
-
-  const filterForm = (
-    <PartnerReviewsFilterForm
-      onSubmit={handleFilterChange}
-      onClearFilter={handleClearFilter}
-      ratingDetail={ratingDetail}
-      initialValues={{ ratings: uniq(ratings) }}
-    />
-  );
 
   return (
     <div className={css.reviewTable}>

@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HttpMethod } from '@apis/configs';
+import { queryAllListings } from '@helpers/apiHelpers';
 import cookies from '@services/cookie';
 import { fetchListing } from '@services/integrationHelper';
 import partnerChecker from '@services/permissionChecker/partner';
@@ -10,6 +11,8 @@ import {
   denormalisedResponseEntities,
   Listing,
 } from '@src/utils/data';
+import { EListingType } from '@src/utils/enums';
+import type { TListing } from '@src/utils/types';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
@@ -31,18 +34,32 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         const { food: averageFoodRating, packaging: averagePackagingRating } =
           detailRating ?? {};
 
-        // #TODO FAKE Data to Test
-        const ratingDetail = [
-          { rating: 1, total: 0 },
-          { rating: 2, total: 100 },
-          { rating: 3, total: 20 },
-          { rating: 4, total: 8 },
-          { rating: 5, total: 19 },
-        ];
-        // #END TODO FAKE Data to Test
+        const query = {
+          meta_listingType: EListingType.rating,
+          meta_restaurantId: restaurantId,
+        };
+        const reviews = await queryAllListings({
+          query,
+        });
+        const mapRatingDetail = new Map<number, number>([
+          [1, 0],
+          [2, 0],
+          [3, 0],
+          [4, 0],
+          [5, 0],
+        ]);
+
+        reviews.forEach((review: TListing) => {
+          const { generalRating: rating } = Listing(review).getMetadata();
+          const ratingTotal: number = (mapRatingDetail.get(rating) ?? 0) + 1;
+          mapRatingDetail.set(rating, ratingTotal);
+        });
 
         return res.status(200).json({
-          ratingDetail,
+          ratingDetail: Array.from(mapRatingDetail.keys()).map((key) => ({
+            rating: key,
+            total: mapRatingDetail.get(key),
+          })),
           averageFoodRating,
           averagePackagingRating,
           averageTotalRating,

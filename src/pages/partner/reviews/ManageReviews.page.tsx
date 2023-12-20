@@ -5,8 +5,11 @@ import { uniq } from 'lodash';
 import { useRouter } from 'next/router';
 
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { partnerPaths } from '@src/paths';
 
 import PartnerReviewDetailTable from './components/PartnerReviewDetailTable/PartnerReviewDetailTable';
+import type { TPartnerReviewsFilterFormValues } from './components/PartnerReviewsFilterForm/PartnerReviewsFilterForm';
+import PartnerReviewsFilterForm from './components/PartnerReviewsFilterForm/PartnerReviewsFilterForm';
 import SummarizeReview from './components/SummarizeReview/SummarizeReview';
 import { ManageReviewsThunks } from './ManageReviews.slice';
 
@@ -34,6 +37,9 @@ const ManageReviewsPage = () => {
   );
   const totalNumberOfReivews = useAppSelector(
     (state) => state.ManageReviews.totalNumberOfReivews,
+  );
+  const ratingDetail = useAppSelector(
+    (state) => state.ManageReviews.ratingDetail,
   );
 
   const convertRatingToNumber = (rating: string) => {
@@ -65,6 +71,35 @@ const ManageReviewsPage = () => {
     if (isFirstLoad) dispatch(ManageReviewsThunks.loadReviewSummarizeData());
   }, [isFirstLoad, dispatch]);
 
+  const handleFilterChange = ({
+    ratings: ratingFormValue,
+  }: TPartnerReviewsFilterFormValues) => {
+    router.replace({
+      pathname: partnerPaths.ManageReviews,
+      query: {
+        ...(ratingFormValue.length
+          ? { rating: ratingFormValue.join(',') }
+          : {}),
+      },
+    });
+  };
+
+  const handleClearFilter = () => {
+    router.replace({
+      pathname: partnerPaths.ManageReviews,
+      query: {},
+    });
+  };
+
+  const filterForm = (
+    <PartnerReviewsFilterForm
+      onSubmit={handleFilterChange}
+      onClearFilter={handleClearFilter}
+      ratingDetail={ratingDetail}
+      initialValues={{ ratings: uniq(ratings) }}
+    />
+  );
+
   return (
     <div className={css.root}>
       <div className={css.headerPage}>
@@ -81,7 +116,7 @@ const ManageReviewsPage = () => {
           totalNumberOfReivews={totalNumberOfReivews}
         />
       </div>
-      <PartnerReviewDetailTable ratings={ratings} />
+      <PartnerReviewDetailTable ratings={ratings} filterForm={filterForm} />
     </div>
   );
 };
