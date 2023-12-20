@@ -165,7 +165,9 @@ const PartnerReviewDetailTable: React.FC<TPartnerReviewDetailTableProps> = ({
         </RenderWhen>
       </div>
       <div className={css.reviewTableContent}>
-        {reviewsData.length === 0 ? (
+        {fetchReviewDetailDataInProgress && !isMobileLayout ? (
+          <div className={css.loading}>Loading...</div>
+        ) : reviewsData.length === 0 ? (
           <div className={css.dataEmtpy}>
             <IconReviewEmpty />
             <span className={classNames(css.dataEmptyTitle, css.normalText)}>
@@ -174,9 +176,6 @@ const PartnerReviewDetailTable: React.FC<TPartnerReviewDetailTableProps> = ({
               })}
             </span>
           </div>
-        ) : fetchReviewDetailDataInProgress &&
-          !fetchReviewDetailDataMoreInProgress ? (
-          <div className={css.loading}>Loading...</div>
         ) : (
           reviewsData.map((r, i) => {
             return (

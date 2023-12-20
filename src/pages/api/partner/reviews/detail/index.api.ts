@@ -13,7 +13,7 @@ import {
   Listing,
   User,
 } from '@src/utils/data';
-import { EListingType } from '@src/utils/enums';
+import { EImageVariants, EListingType } from '@src/utils/enums';
 import type { TListing } from '@src/utils/types';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
@@ -30,18 +30,18 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           page,
           pageSize,
         } = JSON.parse(JSONParams as string);
-        console.log('rating', ratings);
 
         const currentUserRes = await sdk.currentUser.show();
         const [companyAccount] = denormalisedResponseEntities(currentUserRes);
         const { restaurantListingId: restaurantId } =
           CurrentUser(companyAccount).getMetadata();
-
+        const query = {
+          meta_listingType: EListingType.rating,
+          meta_restaurantId: restaurantId,
+          ...(ratings.length ? { meta_generalRating: ratings.join(',') } : {}),
+        };
         const reviews = await queryAllListings({
-          query: {
-            meta_listingType: EListingType.rating,
-            meta_restaurantId: restaurantId,
-          },
+          query,
         });
 
         const userIds: string[] = [];
@@ -80,6 +80,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         const fetchData = await Promise.all([
           integrationSdk.users.query({
             meta_id: userIds,
+            include: ['profileImage'],
+            'fields.image': [
+              `variants.${EImageVariants.squareSmall}`,
+              `variants.${EImageVariants.squareSmall2x}`,
+            ],
           }),
           getOrderAndPlan(uniq(orderIds)),
         ]);
