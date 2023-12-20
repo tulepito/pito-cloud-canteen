@@ -65,7 +65,11 @@
 
 .detailRatingRow {
   display: grid;
+
   grid-template-columns: 2fr 4fr 1fr;
+  @include viewportXSmall {
+    grid-template-columns: 60px 182px 35px;
+  }
   align-items: center;
   gap: 8px;
 }
