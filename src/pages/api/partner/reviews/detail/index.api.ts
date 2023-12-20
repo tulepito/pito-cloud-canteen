@@ -2,7 +2,6 @@ import { uniq } from 'lodash';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HttpMethod } from '@apis/configs';
-import { queryAllListings } from '@helpers/apiHelpers';
 import { getOrderAndPlan } from '@pages/api/orders/[orderId]/get.service';
 import cookies from '@services/cookie';
 import partnerChecker from '@services/permissionChecker/partner';
@@ -13,8 +12,10 @@ import {
   Listing,
   User,
 } from '@src/utils/data';
-import { EImageVariants, EListingType } from '@src/utils/enums';
+import { EImageVariants } from '@src/utils/enums';
 import type { TListing } from '@src/utils/types';
+
+import getReviews from './get.service';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
@@ -28,21 +29,21 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         const {
           rating: ratings = [],
           page,
-          pageSize,
+          pageSize: perPage,
         } = JSON.parse(JSONParams as string);
 
         const currentUserRes = await sdk.currentUser.show();
         const [companyAccount] = denormalisedResponseEntities(currentUserRes);
         const { restaurantListingId: restaurantId } =
           CurrentUser(companyAccount).getMetadata();
-        const query = {
-          meta_listingType: EListingType.rating,
-          meta_restaurantId: restaurantId,
-          ...(ratings.length ? { meta_generalRating: ratings.join(',') } : {}),
-        };
-        const reviews = await queryAllListings({
-          query,
-        });
+        const response = await getReviews(
+          restaurantId,
+          page,
+          perPage,
+          ratings,
+          integrationSdk,
+        );
+        const { pagination, data: reviews } = response;
 
         const userIds: string[] = [];
         const orderIds: string[] = [];
@@ -150,14 +151,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             user,
           };
         });
-
-        const totalReviewDetailData = reviewDetailData.length;
-        const pagination = {
-          totalItems: totalReviewDetailData,
-          totalPages: Math.ceil(totalReviewDetailData / pageSize),
-          page,
-          perPage: pageSize,
-        };
 
         return res.status(200).json({
           reviewDetailData,

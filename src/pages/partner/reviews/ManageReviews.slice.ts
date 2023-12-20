@@ -60,13 +60,15 @@ const loadData = createAsyncThunk(
     }
     const response = await fetchReviewDetailApi(page, pageSize, rating);
 
-    const { reviewDetailData, pagination } = response.data;
+    const { reviewDetailData: reviewDetailDataResponse, pagination } =
+      response.data;
+    const reviewDetailData =
+      mode === 'append' && page > 1
+        ? prevReviewDetailData.concat(reviewDetailDataResponse)
+        : reviewDetailDataResponse;
 
     return {
-      reviewDetailData:
-        mode === 'append' && page > 1
-          ? prevReviewDetailData.concat(reviewDetailData)
-          : reviewDetailData,
+      reviewDetailData,
       pagination,
     };
   },

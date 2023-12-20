@@ -22,7 +22,6 @@ const ReviewDetailCard: React.FC<TReviewDetailCardProps> = ({
     typeof data.createdAt === 'string'
       ? new Date(data.createdAt)
       : data.createdAt;
-  console.log(data.user);
 
   return (
     <div className={classNames(css.reviewCardContainer, rootClassName)}>

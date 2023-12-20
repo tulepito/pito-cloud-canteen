@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import classNames from 'classnames';
 
@@ -49,12 +49,14 @@ const PartnerReviewDetailTable: React.FC<TPartnerReviewDetailTableProps> = ({
     (state) => state.ManageReviews.fetchReviewDetailDataInProgress,
   );
 
-  const paginationProps = {
-    total: pagination.totalItems,
-    current: pagination.page,
-    pageSize: pagination.perPage,
-  };
-  // #END TODO FAKE Data to Test
+  const paginationProps = useMemo(
+    () => ({
+      total: pagination.totalItems,
+      current: pagination.page,
+      pageSize: pagination.perPage,
+    }),
+    [pagination],
+  );
 
   const handlePageChange = (pageValue: number) => {
     setPage(pageValue);
