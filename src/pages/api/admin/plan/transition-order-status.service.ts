@@ -89,7 +89,7 @@ export const transitionOrderStatus = async (
     });
     const booker = await fetchUser(bookerId);
     createNativeNotificationToBooker(
-      EBookerNativeNotificationType.SubOrderDelivering,
+      EBookerNativeNotificationType.OrderIsPendingPayment,
       {
         booker,
         order,

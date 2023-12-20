@@ -8,6 +8,7 @@ import {
   createOrUpdateAutomaticStartOrderScheduler,
   createScheduler,
   getScheduler,
+  sendRemindPickingNativeNotificationToBookerScheduler,
   updateScheduler,
 } from '@services/awsEventBrigdeScheduler';
 import {
@@ -65,6 +66,7 @@ const updateOrder = async ({
       orderState: updatedOrderState,
       selectedGroups: updateSelectedGroups,
       deliveryHour: updateDeliveryHour,
+      deadlineHour,
     } = generalInfo;
 
     const shouldUpdateParticipantList =
@@ -181,6 +183,14 @@ const updateOrder = async ({
           ENativeNotificationType.AdminUpdateOrder,
           integrationSdk,
         );
+      });
+    }
+
+    if (isGroupOrder && deadlineDate && deadlineHour) {
+      sendRemindPickingNativeNotificationToBookerScheduler({
+        orderId,
+        deadlineDate,
+        deadlineHour,
       });
     }
   }

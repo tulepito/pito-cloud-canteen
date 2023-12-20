@@ -40,6 +40,7 @@ export const createScheduler = ({
     Name: customName,
     ScheduleExpression: `at(${timeExpression})`,
     ScheduleExpressionTimezone: 'Asia/Ho_Chi_Minh',
+    ActionAfterCompletion: isProduction ? 'NONE' : 'DELETE',
     Target: {
       Arn: arn || LAMBDA_ARN,
       RoleArn: ROLE_ARN,
@@ -168,7 +169,7 @@ export const sendRemindPickingNativeNotificationToBookerScheduler = async ({
   deadlineDate: number;
   deadlineHour: string;
 }) => {
-  const customName = `automaticStartOrder_${orderId}`;
+  const customName = `send_RPNNTB_${orderId}`; // send remind picking native notification to booker
   const timeExpression = formatTimestamp(
     DateTime.fromMillis(deadlineDate)
       .setZone(VNTimezone)
