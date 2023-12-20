@@ -28,6 +28,8 @@
       display: none;
     }
     .avatarContainer {
+      width: 128px;
+      height: 128px;
       border-radius: 100%;
       position: relative;
 
@@ -46,6 +48,7 @@
     }
 
     .avatarPlaceholder {
+      width: 128px;
       height: 128px;
       border-radius: 100%;
       position: relative;
@@ -107,8 +110,19 @@
 
     @include viewportMedium {
       gap: 32px;
-      flex-direction: row;
-      flex-wrap: wrap;
+    }
+
+    .nameAndEmail {
+      @include flexAlign(flex-start);
+      flex-direction: column;
+      width: 100%;
+      gap: 16px;
+
+      @include viewportMedium {
+        gap: 32px;
+        flex-direction: row;
+        flex-wrap: wrap;
+      }
     }
 
     .fieldInput {
@@ -126,6 +140,6 @@
 }
 
 .avatarImg {
-  width: 128px;
-  height: 128px;
+  width: 100%;
+  height: 100%;
 }
