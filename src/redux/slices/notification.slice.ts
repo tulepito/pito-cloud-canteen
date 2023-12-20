@@ -30,9 +30,7 @@ const fetchNotifications = createAsyncThunk(
     const filteredResponse = response.filter(
       (notification: TObject) =>
         notification.notificationType !==
-          ENotificationType.SUB_ORDER_REVIEWED_BY_PARTICIPANT &&
-        notification.notificationType !==
-          ENotificationType.SUB_ORDER_REVIEWED_BY_BOOKER,
+        ENotificationType.SUB_ORDER_REVIEWED_BY_PARTICIPANT,
     );
 
     return filteredResponse;

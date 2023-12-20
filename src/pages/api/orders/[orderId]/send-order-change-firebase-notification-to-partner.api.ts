@@ -65,6 +65,7 @@ const handleCreatePartnerNotification = async ({
               orderId: changeItem.orderId,
               companyName,
               subOrderDate: Number(changeItem.subOrderDate),
+              orderTitle,
             },
           );
         }

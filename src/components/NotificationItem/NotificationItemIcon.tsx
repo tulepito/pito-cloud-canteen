@@ -57,6 +57,7 @@ const NotificationItemIcon: React.FC<NotificationItemIconProps> = (props) => {
     case ENotificationType.PARTNER_PROFILE_UPDATED_BY_ADMIN:
     case ENotificationType.SUB_ORDER_UPDATED:
     case ENotificationType.BOOKER_ORDER_CHANGED:
+    case ENotificationType.PARTNER_SUB_ORDER_CHANGED:
       icon = <IconEdit className={css.editIcon} />;
       break;
 
@@ -65,7 +66,7 @@ const NotificationItemIcon: React.FC<NotificationItemIconProps> = (props) => {
       break;
     case ENotificationType.SUB_ORDER_REVIEWED_BY_PARTICIPANT:
     case ENotificationType.SUB_ORDER_REVIEWED_BY_BOOKER:
-      icon = <IconStar />;
+      icon = <IconStar className={css.iconStar} />;
       break;
 
     default:
