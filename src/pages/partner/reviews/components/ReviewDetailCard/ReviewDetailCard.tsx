@@ -17,6 +17,10 @@ const ReviewDetailCard: React.FC<TReviewDetailCardProps> = ({
   rootClassName,
 }) => {
   const intl = useIntl();
+  const createdAt =
+    typeof data.createdAt === 'string'
+      ? new Date(data.createdAt)
+      : data.createdAt;
 
   return (
     <div className={classNames(css.reviewCardContainer, rootClassName)}>
@@ -63,7 +67,7 @@ const ReviewDetailCard: React.FC<TReviewDetailCardProps> = ({
           <div className={css.foodRatingContainerItem}>
             <IconRatingFace
               className={css.iconRatingFace}
-              rating={data.eatingUtensilRating}
+              rating={data.packagingRating}
             />{' '}
             <span
               className={classNames(
@@ -81,7 +85,7 @@ const ReviewDetailCard: React.FC<TReviewDetailCardProps> = ({
                 css.normalText,
               )}>
               {intl.formatMessage({
-                id: `FieldRating.label.${data.eatingUtensilRating}`,
+                id: `FieldRating.label.${data.packagingRating}`,
               })}
             </span>
           </div>
@@ -99,7 +103,7 @@ const ReviewDetailCard: React.FC<TReviewDetailCardProps> = ({
           </span>
 
           <span className={classNames(css.nameText, css.orderedFoodInfo)}>
-            {formatDate(data.orderDate, 'dd/MM/yyyy')}
+            {formatDate(createdAt, 'dd/MM/yyyy')}
           </span>
         </div>
       </div>

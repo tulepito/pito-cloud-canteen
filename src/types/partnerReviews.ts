@@ -3,10 +3,10 @@ export type TReviewDetail = {
   name: string;
   rating: number;
   foodRating: number;
-  eatingUtensilRating: number;
+  packagingRating: number;
   description: string;
   foodName: string;
-  orderDate: Date;
+  createdAt: string;
   avatar: string;
 };
 

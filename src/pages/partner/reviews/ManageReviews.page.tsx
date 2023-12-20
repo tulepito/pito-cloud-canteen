@@ -157,19 +157,19 @@ const ManageReviewsPage = () => {
           </RenderWhen>
         </div>
         <PartnerReviewDetailTable ratings={ratings} />
-      </div>
 
-      <RenderWhen condition={isMobileLayout}>
-        <SlideModal
-          id="FilterPartnerReviewModal"
-          modalTitle={intl.formatMessage({
-            id: 'ManagePartnerReviewsPage.filterButtonText',
-          })}
-          isOpen={filterPartnerFilterModalController.value}
-          onClose={filterPartnerFilterModalController.setFalse}>
-          {filterForm}
-        </SlideModal>
-      </RenderWhen>
+        <RenderWhen condition={isMobileLayout}>
+          <SlideModal
+            id="FilterPartnerReviewModal"
+            modalTitle={intl.formatMessage({
+              id: 'ManagePartnerReviewsPage.filterButtonText',
+            })}
+            isOpen={filterPartnerFilterModalController.value}
+            onClose={filterPartnerFilterModalController.setFalse}>
+            {filterForm}
+          </SlideModal>
+        </RenderWhen>
+      </div>
     </div>
   );
 };

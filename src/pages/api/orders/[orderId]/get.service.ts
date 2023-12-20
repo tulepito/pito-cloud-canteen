@@ -100,4 +100,24 @@ const getOrder = async ({ orderId }: { orderId: string }) => {
   return data;
 };
 
+export const getOrderAndPlan = async ({ orderId }: { orderId: string }) => {
+  const integrationSdk = getIntegrationSdk();
+
+  const orderResponse = await integrationSdk.listings.show({
+    id: orderId,
+  });
+  const [orderListing] = denormalisedResponseEntities(orderResponse);
+  const { plans = [] } = Listing(orderListing).getMetadata();
+
+  let data: TObject = { orderListing };
+
+  if (plans?.length > 0) {
+    const planId = plans[0];
+    const planListing = await fetchListing(planId);
+
+    data = { ...data, planListing };
+  }
+
+  return data;
+};
 export default getOrder;

@@ -11,6 +11,7 @@
   border: 1px solid $neutralGray4;
   border-radius: 8px;
   padding: 12px;
+  width: 100%;
 
   @include viewportSmall {
     border: 0;
