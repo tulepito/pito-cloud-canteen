@@ -3,6 +3,7 @@ import { useIntl } from 'react-intl';
 
 import { InlineTextButton } from '@components/Button/Button';
 import Modal from '@components/Modal/Modal';
+import { setItem } from '@helpers/localStorageHelpers';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { useLogout } from '@hooks/useLogout';
 import { companyThunks } from '@redux/slices/company.slice';
@@ -57,6 +58,12 @@ const RoleSelectModal: React.FC<TRoleSelectModalProps> = (props) => {
   const handleChangeRole = (role: EUserRole) => () => {
     dispatch(userActions.setRole(role));
     dispatch(userActions.setUserPermission(mapUserPermissionByRole(role)));
+    setItem('userRole', role);
+    handleClose();
+  };
+
+  const handleLogout = () => {
+    handleLogoutFn();
     handleClose();
   };
 
@@ -90,9 +97,7 @@ const RoleSelectModal: React.FC<TRoleSelectModalProps> = (props) => {
             />
           ))}
         </div>
-        <InlineTextButton
-          className={css.changeAccount}
-          onClick={handleLogoutFn}>
+        <InlineTextButton className={css.changeAccount} onClick={handleLogout}>
           Đăng nhập tài khoản khác
         </InlineTextButton>
       </div>

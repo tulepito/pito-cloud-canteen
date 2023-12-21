@@ -4,6 +4,7 @@ import React, { useEffect } from 'react';
 import { useRouter } from 'next/router';
 
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
+import { getItem } from '@helpers/localStorageHelpers';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { authThunks } from '@redux/slices/auth.slice';
 import { emailVerificationActions } from '@redux/slices/emailVerification.slice';
@@ -71,7 +72,8 @@ const AuthGuard: React.FC<TAuthGuardProps> = ({ children }) => {
   // TODO: fetch current user if authenticated
   useEffect(() => {
     if (isAuthenticated) {
-      dispatch(userThunks.fetchCurrentUser());
+      const userRole = getItem('userRole');
+      dispatch(userThunks.fetchCurrentUser({ userRole }));
       dispatch(
         emailVerificationActions.updateVerificationState(isUserEmailVerified),
       );

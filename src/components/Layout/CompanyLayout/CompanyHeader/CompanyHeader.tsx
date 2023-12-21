@@ -52,6 +52,10 @@ const CompanyHeader: React.FC<CompanyHeaderProps> = ({
     router.push('/');
   };
 
+  const handleGoToAccountSettingPage = () => {
+    router.push(companyPaths.Account);
+  };
+
   const classes = classNames(css.root, showBottomLine && css.bottomLine);
 
   return (
@@ -85,7 +89,10 @@ const CompanyHeader: React.FC<CompanyHeaderProps> = ({
               <div className={css.text}>{fullName}</div>
               <div className={css.subText}>{email}</div>
             </ProfileMenuItem>
-            <ProfileMenuItem key="AccountSettingPage" className={css.menuItem}>
+            <ProfileMenuItem
+              key="AccountSettingPage"
+              className={css.menuItem}
+              onClick={handleGoToAccountSettingPage}>
               <IconUser />
               <div className={css.text}>Tài khoản</div>
             </ProfileMenuItem>
