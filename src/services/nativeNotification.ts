@@ -1,7 +1,7 @@
 import type { TNativeNotificationPartnerParams } from '@src/types/nativeNotificationParams';
 import { Listing, User } from '@src/utils/data';
 import { formatTimestamp } from '@src/utils/dates';
-import { ENativeNotificationType } from '@src/utils/enums';
+import { ECompanyPermission, ENativeNotificationType } from '@src/utils/enums';
 import type { TListing } from '@src/utils/types';
 
 import { fetchUser } from './integrationHelper';
@@ -25,6 +25,15 @@ export const createNativeNotification = async (
   const participantUser = User(participant);
   const { firstName } = participantUser.getProfile();
   const { oneSignalUserIds = [] } = participantUser.getPrivateData();
+  const { company, isCompany } = participantUser.getMetadata();
+
+  const isBooker = Object.values(company).some(({ permission }: any) => {
+    return permission === ECompanyPermission.booker;
+  });
+
+  const notSendParticipantNotification = isCompany || isBooker;
+
+  if (notSendParticipantNotification) return;
 
   if (oneSignalUserIds.length === 0) return;
 
@@ -138,52 +147,6 @@ export const createNativeNotification = async (
               +startDate!,
               'dd/MM',
             )}-${formatTimestamp(+endDate!, 'dd/MM')} đã bị hủy`,
-            url,
-            oneSignalUserId,
-          });
-        });
-      }
-      break;
-
-    case ENativeNotificationType.PartnerTransitOrderToCanceled:
-      {
-        const { order, subOrderDate } = notificationParams;
-        const orderListing = Listing(order!);
-        const orderId = orderListing.getId();
-        const { deliveryHour } = orderListing.getMetadata();
-        const deliveryStartHour = deliveryHour.split('-')[0];
-        const url = `${BASE_URL}/partner/orders/${orderId}_${subOrderDate}`;
-
-        oneSignalUserIds.forEach((oneSignalUserId: string) => {
-          sendNotification({
-            title: '😢 Rất tiếc! Một đơn hàng vừa bi huỷ.',
-            content: `Đơn hàng vào lúc ${deliveryStartHour}, ${formatTimestamp(
-              +subOrderDate!,
-              'dd/MM',
-            )} vừa bị huỷ. Nhấn để xem chi tiết!`,
-            url,
-            oneSignalUserId,
-          });
-        });
-      }
-      break;
-
-    case ENativeNotificationType.PartnerEditSubOrder:
-      {
-        const { order, subOrderDate } = notificationParams;
-        const orderListing = Listing(order!);
-        const orderId = orderListing.getId();
-        const { deliveryHour } = orderListing.getMetadata();
-        const deliveryStartHour = deliveryHour.split('-')[0];
-        const url = `${BASE_URL}/partner/orders/${orderId}_${subOrderDate}`;
-
-        oneSignalUserIds.forEach((oneSignalUserId: string) => {
-          sendNotification({
-            title: 'Đơn hàng có sự thay đổi!',
-            content: `Đơn hàng vào lúc ${deliveryStartHour}, ${formatTimestamp(
-              +subOrderDate!,
-              'dd/MM',
-            )} vừa được chỉnh sửa. Nhấn để xem chi tiết!`,
             url,
             oneSignalUserId,
           });

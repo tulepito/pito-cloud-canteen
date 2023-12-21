@@ -26,11 +26,12 @@ const AuthGuard: React.FC<TAuthGuardProps> = ({ children }) => {
   );
   const currentUser = useAppSelector(currentUserSelector);
 
-  const { pathname } = router;
+  const { pathname, query, isReady } = router;
   const {
     id: userId,
     attributes: { emailVerified: isUserEmailVerified },
   } = currentUser;
+  const { userRole: userRoleFromQuery } = query;
 
   const { isIgnoredAuthCheckRoute, isNonRequireAuthenticationRoute } =
     usePathChecker(pathname);
@@ -71,14 +72,18 @@ const AuthGuard: React.FC<TAuthGuardProps> = ({ children }) => {
 
   // TODO: fetch current user if authenticated
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && isReady) {
       const userRole = getItem('userRole');
-      dispatch(userThunks.fetchCurrentUser({ userRole }));
+      dispatch(
+        userThunks.fetchCurrentUser({
+          userRole: userRoleFromQuery || userRole,
+        }),
+      );
       dispatch(
         emailVerificationActions.updateVerificationState(isUserEmailVerified),
       );
     }
-  }, [isAuthenticated, isUserEmailVerified]);
+  }, [isAuthenticated, isUserEmailVerified, isReady]);
 
   useEffect(() => {
     if (isAuthenticated) {

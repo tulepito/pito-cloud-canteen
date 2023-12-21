@@ -7,6 +7,7 @@ import RoleSelectModal from '@components/RoleSelectModal/RoleSelectModal';
 import { useRoleSelectModalController } from '@hooks/useRoleSelectModalController';
 
 import { getLayoutBaseOnPermission } from './Guards.helper';
+import { useAccessRouteBaseOnRoles } from './useAccessRouteBaseOnRoles';
 import useActiveCompany from './useActiveCompany';
 import useVerifyPermission from './useVerifyPermission';
 
@@ -14,6 +15,7 @@ type TPermissionGuardGuardProps = PropsWithChildren<{}>;
 
 const PermissionGuard: React.FC<TPermissionGuardGuardProps> = (props) => {
   const { children } = props;
+  useAccessRouteBaseOnRoles();
   const { isIgnoredPermissionCheck, userPermission, isMatchedPermission } =
     useVerifyPermission();
   const { isInactiveCompany } = useActiveCompany();
