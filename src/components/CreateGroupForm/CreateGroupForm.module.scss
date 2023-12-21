@@ -36,9 +36,14 @@
 
 .flexWrap {
   @include flexAlign(flex-start);
-  flex-wrap: wrap;
   max-height: 380px;
   overflow: auto;
+  flex-direction: column;
+
+  @include viewportSmall {
+    flex-wrap: wrap;
+    flex-direction: row;
+  }
 }
 
 .memberItem {
