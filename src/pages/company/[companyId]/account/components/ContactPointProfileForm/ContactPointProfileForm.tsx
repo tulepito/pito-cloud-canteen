@@ -208,41 +208,43 @@ const ContactPointProfileFormComponent: React.FC<
         </Field>
       </div>
       <div className={css.profile}>
-        <FieldTextInput
-          id="displayName"
-          name="displayName"
-          className={css.fieldInput}
-          label={intl.formatMessage({
-            id: 'ContactPointProfileForm.displayName.label',
-          })}
-          labelClassName={css.label}
-          placeholder={intl.formatMessage({
-            id: 'ContactPointProfileForm.displayName.placeholder',
-          })}
-          validate={required(
-            intl.formatMessage({
-              id: 'ContactPointProfileForm.displayName.required',
-            }),
-          )}
-        />
-        <FieldTextInput
-          id="email"
-          name="email"
-          className={css.fieldInput}
-          label={intl.formatMessage({
-            id: 'ContactPointProfileForm.email.label',
-          })}
-          labelClassName={css.label}
-          disabled
-          placeholder={intl.formatMessage({
-            id: 'ContactPointProfileForm.email.placeholder',
-          })}
-          validate={required(
-            intl.formatMessage({
-              id: 'ContactPointProfileForm.email.required',
-            }),
-          )}
-        />
+        <div className={css.nameAndEmail}>
+          <FieldTextInput
+            id="displayName"
+            name="displayName"
+            className={css.fieldInput}
+            label={intl.formatMessage({
+              id: 'ContactPointProfileForm.displayName.label',
+            })}
+            labelClassName={css.label}
+            placeholder={intl.formatMessage({
+              id: 'ContactPointProfileForm.displayName.placeholder',
+            })}
+            validate={required(
+              intl.formatMessage({
+                id: 'ContactPointProfileForm.displayName.required',
+              }),
+            )}
+          />
+          <FieldTextInput
+            id="email"
+            name="email"
+            className={css.fieldInput}
+            label={intl.formatMessage({
+              id: 'ContactPointProfileForm.email.label',
+            })}
+            labelClassName={css.label}
+            disabled
+            placeholder={intl.formatMessage({
+              id: 'ContactPointProfileForm.email.placeholder',
+            })}
+            validate={required(
+              intl.formatMessage({
+                id: 'ContactPointProfileForm.email.required',
+              }),
+            )}
+          />
+        </div>
         <FieldTextInput
           id="phoneNumber"
           name="phoneNumber"
