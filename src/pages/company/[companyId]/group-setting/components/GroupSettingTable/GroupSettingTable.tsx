@@ -71,7 +71,7 @@ const GroupSettingTable = (props: TGroupSettingTableProps) => {
                 onClick={handleOpenCreateGroupModal}
                 className={css.btnGroup}>
                 <IconPlusBlackFill className={css.iconPlus} />
-                <FormattedMessage id="GroupSetting.pageTitle" />
+                <FormattedMessage id="GroupSetting.addGroup" />
               </Button>
             </td>
           </tr>

@@ -91,7 +91,7 @@ const MembersMobilePage: React.FC<TMembersMobilePageProps> = ({
     <div className={css.container}>
       <div className={css.header}>
         <IconArrow direction="left" onClick={navigateAccountPersonalPage} />
-        <span>{intl.formatMessage({ id: 'MembersPage.membersTitle' })}</span>
+        <span>{intl.formatMessage({ id: 'CompanySidebar.members' })}</span>
       </div>
       <div className={css.tabContainer}>
         <Tabs
