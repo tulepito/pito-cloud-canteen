@@ -20,7 +20,7 @@
 
 .flexWrap {
   @include flexAlign(flex-start);
-  max-height: 380px;
+  max-height: 300px;
   overflow: auto;
   flex-direction: column;
   gap: 20px;
