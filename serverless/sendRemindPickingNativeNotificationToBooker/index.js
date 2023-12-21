@@ -42,7 +42,12 @@ exports.handler = async (_event) => {
       }),
     )[0];
     const orderListing = Listing(order);
-    const { bookerId } = orderListing.getMetadata();
+    const { bookerId, orderState } = orderListing.getMetadata();
+    if (orderState !== 'picking') {
+      console.log('Order state is not picking, skip to send notification');
+
+      return;
+    }
     await createNativeNotification({
       notificationParams: {
         bookerId,
