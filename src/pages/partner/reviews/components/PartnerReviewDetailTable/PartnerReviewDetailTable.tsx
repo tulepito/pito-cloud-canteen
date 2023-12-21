@@ -130,7 +130,8 @@ const PartnerReviewDetailTable: React.FC<TPartnerReviewDetailTableProps> = ({
         </RenderWhen>
       </div>
       <div className={css.reviewTableContent}>
-        {fetchReviewDetailDataInProgress && !isMobileLayout ? (
+        {fetchReviewDetailDataInProgress &&
+        !fetchReviewDetailDataMoreInProgress ? (
           <div className={css.loading}>Loading...</div>
         ) : reviewsData.length === 0 ? (
           <div className={css.dataEmtpy}>
@@ -142,26 +143,26 @@ const PartnerReviewDetailTable: React.FC<TPartnerReviewDetailTableProps> = ({
             </span>
           </div>
         ) : (
-          reviewsData.map((r, i) => {
-            return (
-              <ReviewDetailCard
-                rootClassName={css.partnerDetailCardContainer}
-                key={i}
-                data={r}
+          <>
+            {reviewsData.map((r, i) => {
+              return (
+                <ReviewDetailCard
+                  rootClassName={css.partnerDetailCardContainer}
+                  key={i}
+                  data={r}
+                />
+              );
+            })}
+            {!isMobileLayout && (
+              <Pagination
+                showSizeChanger
+                {...paginationProps}
+                onChange={handlePageChange}
+                onShowSizeChange={handlePerPageChange}
               />
-            );
-          })
+            )}
+          </>
         )}
-        {!isMobileLayout &&
-          !fetchReviewDetailDataInProgress &&
-          reviewsData.length > 0 && (
-            <Pagination
-              showSizeChanger
-              {...paginationProps}
-              onChange={handlePageChange}
-              onShowSizeChange={handlePerPageChange}
-            />
-          )}
       </div>
 
       <RenderWhen condition={isMobileLayout}>

@@ -20,7 +20,7 @@
     @include flexAlign(center, space-between);
   }
   .reviewTableContent {
-    @include flexAlign(flex-start);
+    @include flexAlign(center, center);
     gap: 16px;
     flex-direction: column;
     width: 100%;
