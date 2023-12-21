@@ -29,7 +29,6 @@ const GroupDetailMobilePage = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { groupId = '', companyId = '' } = router.query;
-
   const {
     value: isEditing,
     setTrue: onEditing,
@@ -195,7 +194,20 @@ const GroupDetailMobilePage = () => {
   };
 
   const handleGoBack = () => {
-    router.back();
+    if (companyId === 'personal')
+      router.push({
+        pathname: personalPaths.GroupList,
+        query: {
+          companyId,
+        },
+      });
+    else
+      router.push({
+        pathname: companyPaths.GroupSetting,
+        query: {
+          companyId,
+        },
+      });
   };
 
   const handleEditing = () => {
