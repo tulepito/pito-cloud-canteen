@@ -480,7 +480,7 @@ export const createNativeNotificationToBooker = async (
         const orderId = orderListing.getId();
         const { startDate, endDate } = orderListing.getMetadata();
 
-        const url = `${BASE_URL}/company/orders/${orderId}`;
+        const url = `${BASE_URL}/company/orders/${orderId}/rating`;
 
         oneSignalUserIds.forEach((oneSignalUserId: string) => {
           sendNotification({
