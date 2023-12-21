@@ -342,6 +342,6 @@ export const partnerRoutes = {
   },
   Reviews: {
     path: partnerPaths.ManageReviews,
-    label: '---',
+    label: 'Đánh giá',
   },
 };

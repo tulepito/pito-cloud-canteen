@@ -1,10 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import classNames from 'classnames';
+import Image from 'next/image';
 
 import Button from '@components/Button/Button';
 import IconFilter from '@components/Icons/IconFilter/IconFilter';
-import IconReviewEmpty from '@components/Icons/IconReviewEmpty/IconReviewEmpty';
 import Pagination from '@components/Pagination/Pagination';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import SlideModal from '@components/SlideModal/SlideModal';
@@ -16,6 +16,8 @@ import { useViewport } from '@hooks/useViewport';
 
 import { ManageReviewsThunks } from '../../ManageReviews.slice';
 import ReviewDetailCard from '../ReviewDetailCard/ReviewDetailCard';
+
+import emptyResultImg from './assets/emptyResult.svg';
 
 import css from './PartnerReviewDetailTable.module.scss';
 
@@ -135,7 +137,7 @@ const PartnerReviewDetailTable: React.FC<TPartnerReviewDetailTableProps> = ({
           <div className={css.loading}>Loading...</div>
         ) : reviewsData.length === 0 ? (
           <div className={css.dataEmtpy}>
-            <IconReviewEmpty />
+            <Image src={emptyResultImg} alt="empty result" />
             <span className={classNames(css.dataEmptyTitle, css.normalText)}>
               {intl.formatMessage({
                 id: 'ManagePartnerReviewsPage.emptyReviewDetailTitle',
