@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
-import filter from 'lodash/filter';
 import { useRouter } from 'next/router';
 
 import ConfirmationModal from '@components/ConfirmationModal/ConfirmationModal';
@@ -9,6 +8,7 @@ import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import IconMoreCircle from '@components/Icons/IconMoreCircle/IconMoreCircle';
 import SlideModal from '@components/SlideModal/SlideModal';
 import type { TRowData } from '@components/Table/Table';
+import { getGroupListNames } from '@helpers/company';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import useFetchCompanyInfo from '@hooks/useFetchCompanyInfo';
@@ -97,15 +97,12 @@ const GroupDetailMobilePage = () => {
     updateGroupError,
   } = useAppSelector((state) => state.company);
 
-  const getGroupNames = (groupIds: string[]) => {
-    return filter(groupList, (group: any) => groupIds?.includes(group.id))
-      .map((group: any) => group.name)
-      .join(', ');
-  };
   const formattedGroupMembers = useMemo<TRowData[]>(
     () =>
-      groupMembers.reduce(
-        (result: any, member: any) => [
+      groupMembers.reduce((result: any, member: any) => {
+        const groupNames = getGroupListNames(member, groupList ?? []);
+
+        return [
           ...result,
           {
             key: User(member).getId(),
@@ -115,7 +112,7 @@ const GroupDetailMobilePage = () => {
                 member.attributes.profile?.firstName || ''
               }`,
               email: User(member).getAttributes().email,
-              group: getGroupNames(User(member).getMetadata().groupList || []),
+              group: groupNames,
               allergy: User(member)
                 .getPublicData()
                 ?.allergies?.map((allergy: string) =>
@@ -130,9 +127,8 @@ const GroupDetailMobilePage = () => {
                 ?.join(', '),
             },
           },
-        ],
-        [],
-      ),
+        ];
+      }, []),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [JSON.stringify(groupMembers)],
   );
