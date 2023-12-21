@@ -105,7 +105,7 @@ const ManageReviewsPage = () => {
       <div className={css.headerPage}>
         <span>{intl.formatMessage({ id: 'PartnerSidebar.reviews' })}</span>
       </div>
-      <div className={css.SummarizeContainer}>
+      <div className={css.summarizeContainer}>
         <span className={classNames(css.titleText)}>
           {intl.formatMessage({ id: 'ManagePartnerReviewsPage.overView' })}
         </span>
