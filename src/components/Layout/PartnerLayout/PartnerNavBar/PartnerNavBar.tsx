@@ -3,7 +3,6 @@ import { useRouter } from 'next/router';
 
 import IconBorderStar from '@components/Icons/IconBorderStar/IconBorderStar';
 import IconCategory from '@components/Icons/IconCategory/IconCategory';
-import IconGraph from '@components/Icons/IconGraph/IconGraph';
 import IconHome from '@components/Icons/IconHome/IconHome';
 import IconMoreSquare from '@components/Icons/IconMoreSquare/IconMoreSquare';
 import IconOrderManagement from '@components/Icons/IconOrderManagement/IconOrderManagement';
@@ -89,12 +88,12 @@ const PartnerNavBar = () => {
               <div>Thanh toán</div>
             </NamedLink>
           </span>
-          <span onClick={handleCloseMoreItemsModal}>
+          {/* <span onClick={handleCloseMoreItemsModal}>
             <div className={css.itemRow}>
               <IconGraph className={css.itemIcon} />
               <div>Phân tích bán hàng</div>
             </div>
-          </span>
+          </span> */}
           <span onClick={handleCloseMoreItemsModal}>
             <NamedLink
               path={partnerPaths.ManageReviews}

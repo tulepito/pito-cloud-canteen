@@ -4,7 +4,6 @@ import classNames from 'classnames';
 import Avatar from '@components/Avatar/Avatar';
 import IconRatingFace from '@components/Icons/IconRatingFace/IconRatingFace';
 import type { TReviewDetail } from '@src/types/partnerReviews';
-import { formatDate } from '@src/utils/dates';
 
 import css from './ReviewDetailCard.module.scss';
 
@@ -18,10 +17,6 @@ const ReviewDetailCard: React.FC<TReviewDetailCardProps> = ({
   rootClassName,
 }) => {
   const intl = useIntl();
-  const createdAt =
-    typeof data.createdAt === 'string'
-      ? new Date(data.createdAt)
-      : data.createdAt;
 
   return (
     <div className={classNames(css.reviewCardContainer, rootClassName)}>
@@ -51,7 +46,7 @@ const ReviewDetailCard: React.FC<TReviewDetailCardProps> = ({
                 css.normalText,
               )}>
               {intl.formatMessage({
-                id: 'ManagePartnerReviewsPage.foodLabel',
+                id: 'ManagePartnerReviewsPage.foodTitle',
               })}
               :
             </span>
@@ -104,7 +99,7 @@ const ReviewDetailCard: React.FC<TReviewDetailCardProps> = ({
           </span>
 
           <span className={classNames(css.nameText, css.orderedFoodInfo)}>
-            {formatDate(createdAt, 'dd/MM/yyyy')}
+            {data.orderAt}
           </span>
         </div>
       </div>

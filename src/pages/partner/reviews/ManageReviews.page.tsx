@@ -5,6 +5,7 @@ import { uniq } from 'lodash';
 import { useRouter } from 'next/router';
 
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { useViewport } from '@hooks/useViewport';
 import { partnerPaths } from '@src/paths';
 
 import PartnerReviewDetailTable from './components/PartnerReviewDetailTable/PartnerReviewDetailTable';
@@ -19,6 +20,7 @@ const ManageReviewsPage = () => {
   const dispatch = useAppDispatch();
   const intl = useIntl();
   const router = useRouter();
+  const { isMobileLayout } = useViewport();
   const {
     query: { rating: queryRating },
   } = router;
@@ -102,8 +104,12 @@ const ManageReviewsPage = () => {
 
   return (
     <div className={css.root}>
-      <div className={css.headerPage}>
-        <span>{intl.formatMessage({ id: 'PartnerSidebar.reviews' })}</span>
+      <div
+        className={classNames(
+          css.headerPage,
+          isMobileLayout ? css.headerMobliePage : '',
+        )}>
+        {intl.formatMessage({ id: 'PartnerSidebar.reviews' })}
       </div>
       <div className={css.summarizeContainer}>
         <span className={classNames(css.titleText)}>

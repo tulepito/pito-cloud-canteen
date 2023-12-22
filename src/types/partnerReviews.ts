@@ -8,7 +8,7 @@ export type TReviewDetail = {
   packagingRating: number;
   description: string;
   foodName: string;
-  createdAt: string;
+  orderAt: string;
   user: TUser;
 };
 

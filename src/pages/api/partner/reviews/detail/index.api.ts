@@ -12,6 +12,7 @@ import {
   Listing,
   User,
 } from '@src/utils/data';
+import { formatTimestamp } from '@src/utils/dates';
 import { EImageVariants } from '@src/utils/enums';
 import type { TListing } from '@src/utils/types';
 
@@ -64,14 +65,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
           const { rating: foodRating } = detailRating.food;
           const { rating: packagingRating } = detailRating.packaging;
-          const { createdAt } = reviewListing.getAttributes();
 
           return {
             id,
             rating,
             foodRating,
             packagingRating,
-            createdAt,
             timestamp,
             orderId,
             reviewerId,
@@ -116,7 +115,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             rating,
             foodRating,
             packagingRating,
-            createdAt,
             timestamp,
             orderId,
             reviewerId,
@@ -125,7 +123,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           let name = '';
           const user = mapUserById.get(reviewerId);
           if (user) {
-            name = User(user).getAttributes().profile.displayName;
+            const { firstName, lastName } = User(user).getAttributes().profile;
+            name = `${firstName} ${lastName}`;
           }
 
           let description = '';
@@ -144,7 +143,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             rating,
             foodRating,
             packagingRating,
-            createdAt,
+            orderAt: formatTimestamp(timestamp),
             description,
             name,
             foodName,

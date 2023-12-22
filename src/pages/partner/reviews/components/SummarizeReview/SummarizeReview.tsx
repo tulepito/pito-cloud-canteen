@@ -70,7 +70,9 @@ const SummarizeReview: React.FC<TSummarizeReviewProps> = ({
           </span>
           <div className={css.ratingBar}>
             <div
-              style={{ width: calculateRatingPercent(averageFoodRating || 0) }}
+              style={{
+                width: calculateRatingPercent(averageFoodRating || 0),
+              }}
               className={css.activeBar}></div>
           </div>
           <span className={classNames(css.ratingPoint, css.ratingText)}>{`${

@@ -64,26 +64,32 @@
 }
 
 .detailRatingRow {
-  display: grid;
-
-  grid-template-columns: 2fr 4fr 1fr;
-  @include viewportXSmall {
-    grid-template-columns: 60px 182px 35px;
+  @include flexAlign(flex-start);
+  flex-direction: row;
+  flex-wrap: nowrap;
+  width: 100%;
+  @include viewportSmall {
+    width: 300px;
   }
   align-items: center;
   gap: 8px;
 }
 
 .scenarioLabel {
-  grid-column: 1 / span 1;
+  width: 80px;
   color: $neutralGray6;
 }
 .ratingBar {
-  grid-column: 2 / span 1;
+  flex: 1;
   height: 6px;
   background-color: $neutralGray3;
   position: relative;
   border-radius: 100px;
+}
+
+.ratingPoint {
+  width: 40px;
+  text-align: center;
 }
 
 .activeBar {
@@ -93,11 +99,6 @@
   left: 0;
   background-color: $neutralGray7;
   border-radius: 100px;
-}
-
-.ratingPoint {
-  grid-column: 3 / span 1;
-  text-align: center;
 }
 
 .ratingText {

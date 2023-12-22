@@ -17,18 +17,25 @@
     width: 100%;
     padding: 16px;
     @include flexAlign(center, flex-start);
-    span {
-      @include textTemplate(16px, $fontWeightBold, 24px);
-      @include viewportSmall {
-        @include textTemplate(24px, $fontWeightBold, 32px);
-      }
+    @include textTemplate(16px, $fontWeightBold, 24px);
+    @include viewportSmall {
+      @include textTemplate(24px, $fontWeightBold, 32px);
     }
+
     @include viewportSmall {
       padding: 16px 0;
     }
   }
 
+  .headerMobliePage {
+    position: fixed;
+    top: 0;
+    z-index: 1;
+    border-bottom: 1px solid $neutralGray4;
+  }
+
   .summarizeContainer {
+    margin-top: 16px;
     background-color: $neutralGray1;
     width: 100%;
     padding: 16px;
