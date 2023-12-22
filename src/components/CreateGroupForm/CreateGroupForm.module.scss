@@ -46,7 +46,7 @@
 
 .flexWrap {
   @include flexAlign(flex-start);
-  max-height: 120px;
+  max-height: 140px;
   overflow: auto;
   flex-direction: column;
   @include viewportSmall {
