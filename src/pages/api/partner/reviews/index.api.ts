@@ -60,10 +60,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             rating: key,
             total: mapRatingDetail.get(key),
           })),
-          averageFoodRating: averageFoodRating ?? 0,
-          averagePackagingRating: averagePackagingRating ?? 0,
-          averageTotalRating: averageTotalRating ?? 0,
-          totalNumberOfReivews: totalNumberOfReivews ?? 0,
+          averageFoodRating,
+          averagePackagingRating,
+          averageTotalRating,
+          totalNumberOfReivews,
         });
       }
 

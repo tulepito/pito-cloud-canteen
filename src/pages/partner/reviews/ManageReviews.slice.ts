@@ -17,10 +17,10 @@ type TManageReviewsState = {
   fetchReviewSummarizeDataError: any;
   ratingDetail: TTotalRating[];
   reviewDetailData: TReviewDetail[];
-  averageFoodRating: number;
-  averagePackagingRating: number;
-  averageTotalRating: number;
-  totalNumberOfReivews: number;
+  averageFoodRating?: number;
+  averagePackagingRating?: number;
+  averageTotalRating?: number;
+  totalNumberOfReivews?: number;
 };
 const initialState: TManageReviewsState = {
   isFirstLoad: true,
@@ -38,10 +38,6 @@ const initialState: TManageReviewsState = {
   fetchReviewSummarizeDataError: null,
   reviewDetailData: [],
   ratingDetail: [],
-  averageFoodRating: 0,
-  averagePackagingRating: 0,
-  averageTotalRating: 0,
-  totalNumberOfReivews: 0,
 };
 
 // ================ Thunk types ================ //

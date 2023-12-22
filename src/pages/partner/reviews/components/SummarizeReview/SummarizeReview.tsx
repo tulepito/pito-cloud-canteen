@@ -7,10 +7,10 @@ import IconUser from '@components/Icons/IconUser/IconUser';
 import css from './SummarizeReview.module.scss';
 
 type TSummarizeReviewProps = {
-  averageFoodRating: number;
-  averagePackagingRating: number;
-  totalNumberOfReivews: number;
-  averageTotalRating: number;
+  averageFoodRating?: number;
+  averagePackagingRating?: number;
+  totalNumberOfReivews?: number;
+  averageTotalRating?: number;
 };
 
 const SummarizeReview: React.FC<TSummarizeReviewProps> = ({
@@ -41,7 +41,7 @@ const SummarizeReview: React.FC<TSummarizeReviewProps> = ({
               })}
             </span>
           </div>
-          <div className={css.summarizeValue}>{totalNumberOfReivews}</div>
+          <div className={css.summarizeValue}>{totalNumberOfReivews ?? 0}</div>
         </div>
         <div
           className={classNames(
@@ -56,7 +56,7 @@ const SummarizeReview: React.FC<TSummarizeReviewProps> = ({
               })}
             </span>
           </div>
-          <div className={css.summarizeValue}>{averageTotalRating}</div>
+          <div className={css.summarizeValue}>{averageTotalRating ?? '-'}</div>
         </div>
       </div>
       <div
@@ -76,7 +76,7 @@ const SummarizeReview: React.FC<TSummarizeReviewProps> = ({
               className={css.activeBar}></div>
           </div>
           <span className={classNames(css.ratingPoint, css.ratingText)}>{`${
-            averageFoodRating || 0
+            averageFoodRating ?? '-'
           }/5`}</span>
         </div>
         <div className={css.detailRatingRow}>
@@ -94,7 +94,7 @@ const SummarizeReview: React.FC<TSummarizeReviewProps> = ({
               className={css.activeBar}></div>
           </div>
           <span className={classNames(css.ratingPoint, css.ratingText)}>{`${
-            averagePackagingRating || 0
+            averagePackagingRating ?? '-'
           }/5`}</span>
         </div>
       </div>
