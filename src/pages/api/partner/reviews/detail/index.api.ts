@@ -133,7 +133,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           const user = mapUserById.get(reviewerId);
           if (user) {
             const { firstName, lastName } = User(user).getAttributes().profile;
-            name = `${firstName} ${lastName}`;
+            name = `${lastName} ${firstName}`;
           }
 
           let description: string = '';
