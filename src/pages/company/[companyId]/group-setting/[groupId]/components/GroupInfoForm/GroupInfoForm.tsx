@@ -50,6 +50,7 @@ const GroupInfoForm: React.FC<GroupInfoFormProps> = (props) => {
                 id="GroupInfo-GroupName"
                 name="name"
                 label={intl.formatMessage({ id: 'GroupInfoForm.name' })}
+                placeholder={intl.formatMessage({ id: 'GroupInfoForm.name' })}
                 labelClassName={css.label}
                 className={css.groupField}
               />
@@ -57,6 +58,9 @@ const GroupInfoForm: React.FC<GroupInfoFormProps> = (props) => {
                 id="GroupInfo-GroupDescription"
                 name="description"
                 label={intl.formatMessage({ id: 'GroupInfoForm.description' })}
+                placeholder={intl.formatMessage({
+                  id: 'GroupInfoForm.description',
+                })}
                 labelClassName={css.label}
                 className={classNames(css.descriptionField, css.groupField)}
               />

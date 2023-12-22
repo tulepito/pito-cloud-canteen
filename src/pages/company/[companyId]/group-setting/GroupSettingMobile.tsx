@@ -103,7 +103,9 @@ const GroupSettingMobile = () => {
   const TABLE_COLUMN: TColumn[] = [
     {
       key: 'groupName',
-      label: intl.formatMessage({ id: 'GroupSetting.columnLabel.groupName' }),
+      label: intl
+        .formatMessage({ id: 'GroupSetting.columnLabel.groupName' })
+        .toUpperCase(),
       render: (data: any) => {
         return (
           <div className={css.groupName}>
@@ -114,9 +116,11 @@ const GroupSettingMobile = () => {
     },
     {
       key: 'memberNumber',
-      label: intl.formatMessage({
-        id: 'GroupSetting.columnLabel.memberNumber',
-      }),
+      label: intl
+        .formatMessage({
+          id: 'GroupSetting.columnLabel.memberNumber',
+        })
+        .toUpperCase(),
       render: (data: any) => {
         const { id } = data;
         const showLoadingIcon = deleteGroupInProgress && id === deletingGroupId;

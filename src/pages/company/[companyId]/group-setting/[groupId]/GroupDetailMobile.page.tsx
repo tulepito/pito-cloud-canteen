@@ -224,11 +224,14 @@ const GroupDetailMobilePage = () => {
     <div className={css.container}>
       <div className={css.headerContainer}>
         <div className={css.leftHeaderContainer} onClick={handleGoBack}>
-          <IconArrow direction="left" />
-
+          <div>
+            <IconArrow direction="left" />
+          </div>
           <span>{name || '---'}</span>
         </div>
-        <IconMoreCircle onClick={onOpenMoreSlideModal} />
+        <div>
+          <IconMoreCircle onClick={onOpenMoreSlideModal} />
+        </div>
       </div>
       <div className={css.descriptionContainer}>{description}</div>
       <div className={css.tableContainer}>
