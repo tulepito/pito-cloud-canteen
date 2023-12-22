@@ -13,7 +13,7 @@ import {
   User,
 } from '@src/utils/data';
 import { formatTimestamp } from '@src/utils/dates';
-import { EImageVariants } from '@src/utils/enums';
+import { ECompanyPermission, EImageVariants } from '@src/utils/enums';
 import type { TListing } from '@src/utils/types';
 
 import getReviews from './get.service';
@@ -58,10 +58,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             reviewerId,
             timestamp,
             orderId,
+            detailTextRating,
+            foodName,
+            reviewRole,
           } = reviewListing.getMetadata();
 
           userIds.push(reviewerId);
-          orderIds.push(orderId);
+          if (reviewRole === ECompanyPermission.booker) orderIds.push(orderId);
 
           const { rating: foodRating } = detailRating.food;
           const { rating: packagingRating } = detailRating.packaging;
@@ -74,6 +77,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             timestamp,
             orderId,
             reviewerId,
+            detailTextRating,
+            foodName,
+            reviewRole,
           };
         });
 
@@ -118,6 +124,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             timestamp,
             orderId,
             reviewerId,
+            detailTextRating,
+            foodName,
+            reviewRole,
           } = rawData;
 
           let name = '';
@@ -127,15 +136,21 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             name = `${firstName} ${lastName}`;
           }
 
-          let description = '';
-          let foodName = '';
-          const order = mapOrderById.get(orderId);
-          if (order) {
+          let description: string = '';
+          let foodNameValue: string = '';
+          if (
+            reviewRole === ECompanyPermission.booker &&
+            mapOrderById.has(orderId)
+          ) {
+            const order = mapOrderById.get(orderId) ?? {};
             description = Listing(order.orderListing).getMetadata()
               .detailTextRating;
             const { orderDetail } = Listing(order.planListing).getMetadata();
             const { lineItems = [] } = orderDetail[String(timestamp)];
-            foodName = lineItems.length ? lineItems[0].name : '';
+            foodNameValue = lineItems.length ? lineItems[0].name : '';
+          } else if (reviewRole === ECompanyPermission.participant) {
+            description = detailTextRating;
+            foodNameValue = foodName;
           }
 
           return {
@@ -146,7 +161,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             orderAt: formatTimestamp(timestamp),
             description,
             name,
-            foodName,
+            foodName: foodNameValue,
             user,
           };
         });
