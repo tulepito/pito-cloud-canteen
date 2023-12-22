@@ -27,7 +27,7 @@ const CreateGroupSlideModal: React.FC<TCreateGroupSlideModalProps> = (
       id="CreateNewGroupSlideModal"
       isOpen={isOpen}
       onClose={onClose}
-      containerClassName={css.modalContainer}
+      containerClassName={css.slideModalContainer}
       modalTitle={intl.formatMessage({ id: 'CreateGroupModal.modalTitle' })}>
       <OutsideClickHandler onOutsideClick={onClose}>
         <div className={css.modalContainer}>
@@ -40,7 +40,7 @@ const CreateGroupSlideModal: React.FC<TCreateGroupSlideModalProps> = (
           </div>
           <div className={css.modalFooter}>
             <Button
-              variant="secondary"
+              variant="inline"
               className={css.cancelBtn}
               onClick={onClose}>
               {intl.formatMessage({ id: 'CreateGroupModal.cancel' })}

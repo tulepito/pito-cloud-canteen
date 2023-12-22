@@ -40,7 +40,7 @@ const AddNewMembersSlideModal: React.FC<TAddNewMembersSlideModalProps> = (
           </div>
           <div className={css.modalFooter}>
             <Button
-              variant="secondary"
+              variant="inline"
               className={css.cancelBtn}
               onClick={onClose}>
               {intl.formatMessage({ id: 'AddNewMembersModal.cancel' })}

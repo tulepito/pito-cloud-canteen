@@ -28,10 +28,10 @@
 
 .modalFooter {
   .cancelBtn {
-    margin: 16px auto 0;
     width: 100%;
     @include viewportSmall {
       width: 400px;
+      margin: 16px auto 0;
     }
   }
 }

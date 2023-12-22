@@ -223,9 +223,9 @@ const GroupDetailMobilePage = () => {
   return (
     <div className={css.container}>
       <div className={css.headerContainer}>
-        <div className={css.leftHeaderContainer} onClick={handleGoBack}>
+        <div className={css.leftHeaderContainer}>
           <div>
-            <IconArrow direction="left" />
+            <IconArrow direction="left" onClick={handleGoBack} />
           </div>
           <span>{name || '---'}</span>
         </div>
