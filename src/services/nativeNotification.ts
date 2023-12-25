@@ -370,7 +370,7 @@ export const createNativeNotificationToBooker = async (
         const orderListing = Listing(order!);
         const orderId = orderListing.getId();
 
-        const url = `${BASE_URL}/company/booker/orders/draft/${orderId}`;
+        const url = `${BASE_URL}/company/booker/orders/draft/${orderId}?userRole=booker`;
 
         oneSignalUserIds.forEach((oneSignalUserId: string) => {
           sendNotification({
@@ -391,7 +391,7 @@ export const createNativeNotificationToBooker = async (
         const orderId = orderListing.getId();
         const { startDate, endDate } = orderListing.getMetadata();
 
-        const url = `${BASE_URL}/company/orders/${orderId}`;
+        const url = `${BASE_URL}/company/orders/${orderId}?userRole=booker`;
 
         oneSignalUserIds.forEach((oneSignalUserId: string) => {
           sendNotification({
@@ -413,7 +413,7 @@ export const createNativeNotificationToBooker = async (
         const orderListing = Listing(order!);
         const orderId = orderListing.getId();
 
-        const url = `${BASE_URL}/company/orders/${orderId}`;
+        const url = `${BASE_URL}/company/orders/${orderId}?userRole=booker`;
 
         oneSignalUserIds.forEach((oneSignalUserId: string) => {
           sendNotification({
@@ -435,7 +435,7 @@ export const createNativeNotificationToBooker = async (
         const orderListing = Listing(order!);
         const orderId = orderListing.getId();
 
-        const url = `${BASE_URL}/company/orders/${orderId}/picking`;
+        const url = `${BASE_URL}/company/orders/${orderId}/picking?userRole=booker`;
 
         oneSignalUserIds.forEach((oneSignalUserId: string) => {
           sendNotification({
@@ -457,7 +457,7 @@ export const createNativeNotificationToBooker = async (
         const orderListing = Listing(order!);
         const orderId = orderListing.getId();
 
-        const url = `${BASE_URL}/company/orders/${orderId}`;
+        const url = `${BASE_URL}/company/orders/${orderId}?userRole=booker`;
 
         oneSignalUserIds.forEach((oneSignalUserId: string) => {
           sendNotification({
@@ -480,7 +480,7 @@ export const createNativeNotificationToBooker = async (
         const orderId = orderListing.getId();
         const { startDate, endDate } = orderListing.getMetadata();
 
-        const url = `${BASE_URL}/company/orders/${orderId}/rating`;
+        const url = `${BASE_URL}/company/orders/${orderId}/rating?userRole=booker`;
 
         oneSignalUserIds.forEach((oneSignalUserId: string) => {
           sendNotification({
