@@ -82,7 +82,6 @@ export const publishOrder = async (orderId: string, isAdmin = false) => {
     anonymous = [],
     orderType = EOrderType.group,
     deadlineDate,
-    deadlineHour,
   } = orderListing.getMetadata();
   const { title: orderTitle } = orderListing.getAttributes();
   const isGroupOrder = orderType === EOrderType.group;
@@ -196,7 +195,6 @@ export const publishOrder = async (orderId: string, isAdmin = false) => {
     sendRemindPickingNativeNotificationToBookerScheduler({
       orderId,
       deadlineDate,
-      deadlineHour,
     });
   }
 };

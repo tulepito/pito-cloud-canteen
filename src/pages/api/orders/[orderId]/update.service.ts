@@ -66,7 +66,6 @@ const updateOrder = async ({
       orderState: updatedOrderState,
       selectedGroups: updateSelectedGroups,
       deliveryHour: updateDeliveryHour,
-      deadlineHour,
     } = generalInfo;
 
     const shouldUpdateParticipantList =
@@ -186,11 +185,10 @@ const updateOrder = async ({
       });
     }
 
-    if (isGroupOrder && deadlineDate && deadlineHour) {
+    if (isGroupOrder && deadlineDate) {
       sendRemindPickingNativeNotificationToBookerScheduler({
         orderId,
         deadlineDate,
-        deadlineHour,
       });
     }
   }

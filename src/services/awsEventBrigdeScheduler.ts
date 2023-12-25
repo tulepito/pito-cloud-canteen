@@ -163,20 +163,15 @@ export const createOrUpdateAutomaticStartOrderScheduler = async ({
 export const sendRemindPickingNativeNotificationToBookerScheduler = async ({
   orderId,
   deadlineDate,
-  deadlineHour,
 }: {
   orderId: string;
   deadlineDate: number;
-  deadlineHour: string;
 }) => {
   const customName = `send_RPNNTB_${orderId}`; // send remind picking native notification to booker
   const timeExpression = formatTimestamp(
     DateTime.fromMillis(deadlineDate)
       .setZone(VNTimezone)
-      .plus({
-        ...convertHHmmStringToTimeParts(deadlineHour),
-      })
-      .minus({ day: 1 })
+      .minus({ hours: 3 })
       .toMillis(),
     "yyyy-MM-dd'T'hh:mm:ss",
   );
