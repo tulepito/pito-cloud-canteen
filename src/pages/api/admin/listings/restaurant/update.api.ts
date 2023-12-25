@@ -18,11 +18,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
     const restaurant = await fetchListing(dataParams.id, ['author']);
     const author = restaurant?.author;
+    const { title: partnerName } = restaurant.attributes || {};
     createNativeNotificationToPartner(
       ENativeNotificationType.AdminChangePartnerInformation,
       {
         partner: author,
-        partnerName: dataParams.title,
+        partnerName,
       },
     );
     res.json(response);
