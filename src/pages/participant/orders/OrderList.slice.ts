@@ -7,10 +7,8 @@ import uniqBy from 'lodash/uniqBy';
 
 import type { ParticipantSubOrderAddDocumentApiBody } from '@apis/firebaseApi';
 import {
-  participantGetNotificationsApi,
   participantSubOrderAddDocumentApi,
   participantSubOrderGetByIdApi,
-  participantUpdateSeenNotificationApi,
 } from '@apis/firebaseApi';
 import { updateParticipantOrderApi } from '@apis/index';
 import {
@@ -74,9 +72,6 @@ type TOrderListState = {
   fetchSubOrderDocumentInProgress: boolean;
   fetchSubOrderDocumentError: any;
 
-  participantFirebaseNotifications: any[];
-  fetchParticipantFirebaseNotificationsInProgress: boolean;
-  fetchParticipantFirebaseNotificationsError: any;
   restaurants: TListing[];
 
   pickFoodForSubOrdersInProgress: boolean;
@@ -121,10 +116,6 @@ const initialState: TOrderListState = {
   subOrderDocument: {},
   fetchSubOrderDocumentInProgress: false,
   fetchSubOrderDocumentError: null,
-
-  participantFirebaseNotifications: [],
-  fetchParticipantFirebaseNotificationsInProgress: false,
-  fetchParticipantFirebaseNotificationsError: null,
 
   restaurants: [],
 
@@ -277,10 +268,6 @@ const ADD_SUB_ORDER_DOCUMENT_TO_FIREBASE =
   'app/ParticipantOrderList/ADD_SUB_ORDER_DOCUMENT_TO_FIREBASE';
 const FETCH_SUB_ORDERS_FROM_FIREBASE =
   'app/ParticipantOrderList/FETCH_SUB_ORDERS_FROM_FIREBASE';
-const FETCH_PARTICIPANT_FIREBASE_NOTIFICATIONS =
-  'app/ParticipantOrderList/FETCH_PARTICIPANT_FIREBASE_NOTIFICATIONS';
-const UPDATE_SEEN_NOTIFICATION_STATUS_TO_FIREBASE =
-  'app/ParticipantOrderList/UPDATE_SEEN_NOTIFICATION_STATUS_TO_FIREBASE';
 const PICK_FOOD_FOR_SUB_ORDERS =
   'app/ParticipantOrderList/PICK_FOOD_FOR_SUB_ORDERS';
 const PICK_FOOD_FOR_SPECIFIC_SUB_ORDER =
@@ -389,21 +376,6 @@ const fetchSubOrdersFromFirebase = createAsyncThunk(
     const { data: response } = await participantSubOrderGetByIdApi(subOrderId);
 
     return response || {};
-  },
-);
-const fetchParticipantFirebaseNotifications = createAsyncThunk(
-  FETCH_PARTICIPANT_FIREBASE_NOTIFICATIONS,
-  async () => {
-    const { data: response } = await participantGetNotificationsApi();
-
-    return response || [];
-  },
-);
-
-const updateSeenNotificationStatusToFirebase = createAsyncThunk(
-  UPDATE_SEEN_NOTIFICATION_STATUS_TO_FIREBASE,
-  async (notificationId: string) => {
-    await participantUpdateSeenNotificationApi(notificationId);
   },
 );
 
@@ -662,8 +634,6 @@ export const OrderListThunks = {
   addSubOrderDocumentToFirebase,
   updateSubOrder,
   fetchSubOrdersFromFirebase,
-  fetchParticipantFirebaseNotifications,
-  updateSeenNotificationStatusToFirebase,
   pickFoodForSubOrders,
   pickFoodForSpecificSubOrder,
 };
@@ -693,27 +663,6 @@ const OrderListSlice = createSlice({
       return {
         ...state,
         colorOrderMap,
-      };
-    },
-    seenNotification: (state, action) => {
-      const notificationId = action.payload;
-      const { participantFirebaseNotifications } = state;
-      const newNotifications = participantFirebaseNotifications.map(
-        (notification) => {
-          if (notification.id === notificationId) {
-            return {
-              ...notification,
-              seen: true,
-            };
-          }
-
-          return notification;
-        },
-      );
-
-      return {
-        ...state,
-        participantFirebaseNotifications: newNotifications,
       };
     },
     updatePlanDetail: (state, action) => {
@@ -821,24 +770,6 @@ const OrderListSlice = createSlice({
         state.fetchSubOrderDocumentInProgress = false;
         state.fetchSubOrderDocumentError = error.message;
       })
-      .addCase(fetchParticipantFirebaseNotifications.pending, (state) => {
-        state.fetchParticipantFirebaseNotificationsInProgress = true;
-        state.fetchParticipantFirebaseNotificationsError = false;
-      })
-      .addCase(
-        fetchParticipantFirebaseNotifications.fulfilled,
-        (state, { payload }) => {
-          state.fetchParticipantFirebaseNotificationsInProgress = false;
-          state.participantFirebaseNotifications = payload;
-        },
-      )
-      .addCase(
-        fetchParticipantFirebaseNotifications.rejected,
-        (state, { error }) => {
-          state.fetchParticipantFirebaseNotificationsInProgress = false;
-          state.fetchParticipantFirebaseNotificationsError = error.message;
-        },
-      )
 
       .addCase(pickFoodForSubOrders.pending, (state) => {
         state.pickFoodForSubOrdersInProgress = true;

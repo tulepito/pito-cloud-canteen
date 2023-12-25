@@ -5,7 +5,7 @@ import {
   updateNotificationsApi,
 } from '@apis/notificationApi';
 import { createAsyncThunk } from '@redux/redux.helper';
-import { ENotificationType } from '@src/utils/enums';
+import { ENotificationType, EUserSystemPermission } from '@src/utils/enums';
 import type { TObject } from '@src/utils/types';
 
 // ================ Initial states ================ //
@@ -25,12 +25,31 @@ const initialState: TNotificationState = {
 // ================ Async thunks ================ //
 const fetchNotifications = createAsyncThunk(
   'app/Notification/FETCH_NOTIFICATIONS',
-  async () => {
+  async (_, { getState }) => {
+    const { userPermission } = getState().user;
+
+    const getExcludedNotificationTypes = () => {
+      switch (userPermission) {
+        case EUserSystemPermission.normal:
+          return [
+            ENotificationType.BOOKER_NEW_ORDER_CREATED,
+            ENotificationType.BOOKER_SUB_ORDER_COMPLETED,
+            ENotificationType.BOOKER_SUB_ORDER_CANCELLED,
+            ENotificationType.BOOKER_RATE_ORDER,
+            ENotificationType.BOOKER_PICKING_ORDER,
+          ];
+        case EUserSystemPermission.company:
+          return [ENotificationType.SUB_ORDER_REVIEWED_BY_PARTICIPANT];
+        default:
+          break;
+      }
+    };
+
+    const excludedNotificationTypes = getExcludedNotificationTypes();
     const { data: response = [] } = await fetchNotificationsApi();
     const filteredResponse = response.filter(
       (notification: TObject) =>
-        notification.notificationType !==
-        ENotificationType.SUB_ORDER_REVIEWED_BY_PARTICIPANT,
+        !excludedNotificationTypes?.includes(notification.notificationType),
     );
 
     return filteredResponse;

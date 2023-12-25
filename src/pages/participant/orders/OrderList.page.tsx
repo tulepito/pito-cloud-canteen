@@ -144,12 +144,7 @@ const OrderListPage = () => {
     (state) => state.ParticipantOrderList.participantPostRatingInProgress,
   );
   const notifications = useAppSelector(
-    (state) => state.ParticipantOrderList.participantFirebaseNotifications,
-  );
-  const fetchParticipantFirebaseNotificationsInProgress = useAppSelector(
-    (state) =>
-      state.ParticipantOrderList
-        .fetchParticipantFirebaseNotificationsInProgress,
+    (state) => state.Notification.notifications,
   );
   const foodsInPlans = useAppSelector(
     (state) => state.ParticipantOrderList.foodsInPlans,
@@ -182,7 +177,6 @@ const OrderListPage = () => {
       updateSubOrderInProgress ||
       addSubOrderDocumentToFirebaseInProgress ||
       participantPostRatingInProgress ||
-      fetchParticipantFirebaseNotificationsInProgress ||
       fetchSubOrderTxInProgress) &&
     !walkthroughEnable;
 
@@ -518,7 +512,6 @@ const OrderListPage = () => {
   }, [planIdFromQuery, timestampFromQuery, JSON.stringify(flattenEvents)]);
 
   useEffect(() => {
-    dispatch(OrderListThunks.fetchParticipantFirebaseNotifications());
     dispatch(CalendarActions.setSelectedDay(selectedDay));
   }, []);
 
