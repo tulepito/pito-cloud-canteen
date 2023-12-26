@@ -435,7 +435,7 @@ export const createNativeNotificationToBooker = async (
         const orderListing = Listing(order!);
         const orderId = orderListing.getId();
 
-        const url = `${BASE_URL}/company/orders/${orderId}/picking?userRole=booker`;
+        const url = `${BASE_URL}/company/orders/${orderId}?userRole=booker`;
 
         oneSignalUserIds.forEach((oneSignalUserId: string) => {
           sendNotification({

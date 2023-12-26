@@ -15,7 +15,7 @@ const createNativeNotification = async ({ notificationParams, sdk }) => {
   const { firstName, lastName } = bookerUser.getProfile();
   const bookerName = `${lastName} ${firstName}`;
   const { oneSignalUserIds = [] } = bookerUser.getPrivateData();
-  const url = `${BASE_URL}/company/orders/${orderId}?userRole=booker`;
+  const url = `${BASE_URL}/company/orders/${orderId}/picking?userRole=booker`;
 
   await Promise.all(
     oneSignalUserIds.map(async (oneSignalUserId) => {
