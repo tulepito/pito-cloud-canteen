@@ -98,7 +98,7 @@ const PartnerNavBar = () => {
             <NamedLink
               path={partnerPaths.ManageReviews}
               className={css.itemRow}>
-              <IconBorderStar className={css.itemIcon} />
+              <IconBorderStar className={css.itemIcon} strokeColor="#000" />
               <div>Đánh giá</div>
             </NamedLink>
           </span>
