@@ -322,6 +322,7 @@ const OrderListPage = () => {
     tourControl.setFalse();
     onBoardingModal.setFalse();
     dispatch(OrderListThunks.disableWalkthrough(currentUserId));
+    updateProfileModalControl.setFalse();
   };
 
   const handleOnBoardingModalOpen = () => {
