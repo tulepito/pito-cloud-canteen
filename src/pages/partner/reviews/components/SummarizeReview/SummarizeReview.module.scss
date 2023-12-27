@@ -1,0 +1,106 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/defaults.scss' as *;
+
+.summarizeContainer {
+  @include flexAlign(flex-start);
+  margin-top: 12px;
+  align-items: stretch;
+  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 12px;
+  @include viewportSmall {
+    flex-direction: row;
+    gap: 24px;
+    margin-top: 30px;
+  }
+}
+
+.summarizeScoreContainer {
+  @include flexAlign(flex-start, space-between);
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  gap: 24px;
+}
+
+.summarizeItemContainer {
+  border: 1px solid $neutralGray3;
+  border-radius: 12px;
+}
+
+.summarizeValueContainer {
+  height: inherit;
+  padding: 24px;
+  @include flexAlign(flex-start);
+  gap: 12px;
+  flex-direction: column;
+
+  .summarizeTitle {
+    @include textTemplate(14px, $fontWeightRegular, 20px);
+    @include viewportSmall {
+      @include textTemplate(14px, $fontWeightRegular, 20px);
+    }
+  }
+  .summarizeValue {
+    @include textTemplate(14px, $fontWeightBold, 20px);
+    @include viewportSmall {
+      @include textTemplate(24px, $fontWeightBold, 34px);
+    }
+  }
+  .summarizeLable {
+    @include flexAlign(flex-start);
+    gap: 8px;
+  }
+}
+
+.detailRatingContainer {
+  padding: 12px;
+  height: inherit;
+  @include flexAlign(center, center);
+  gap: 8px;
+  flex-direction: column;
+}
+
+.detailRatingRow {
+  @include flexAlign(flex-start);
+  flex-direction: row;
+  flex-wrap: nowrap;
+  width: 100%;
+  @include viewportSmall {
+    width: 300px;
+  }
+  align-items: center;
+  gap: 8px;
+}
+
+.scenarioLabel {
+  width: 80px;
+  color: $neutralGray6;
+}
+.ratingBar {
+  flex: 1;
+  height: 6px;
+  background-color: $neutralGray3;
+  position: relative;
+  border-radius: 100px;
+}
+
+.ratingPoint {
+  width: 40px;
+  text-align: center;
+}
+
+.activeBar {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  background-color: $neutralGray7;
+  border-radius: 100px;
+}
+
+.ratingText {
+  @include textTemplate(14px, $fontWeightSemiBold, 20px);
+}

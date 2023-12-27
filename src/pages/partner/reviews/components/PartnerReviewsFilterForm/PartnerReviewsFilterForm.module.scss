@@ -1,0 +1,21 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/defaults.scss' as *;
+
+.scoreCheckboxContainer {
+  @include flexAlign(flex-start);
+  flex-direction: column;
+  gap: 20px;
+}
+
+.buttonContainer {
+  width: 100%;
+  @include flexAlign(flex-start);
+  gap: 16px;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  .btnItem {
+    width: 100%;
+  }
+}

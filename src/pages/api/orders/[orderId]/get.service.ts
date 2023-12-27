@@ -3,12 +3,13 @@ import chunk from 'lodash/chunk';
 import flatten from 'lodash/flatten';
 import isEmpty from 'lodash/isEmpty';
 
+import { queryAllListings } from '@helpers/apiHelpers';
 import { fetchListing, fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { EImageVariants } from '@src/utils/enums';
 import { denormalisedResponseEntities, Listing } from '@utils/data';
 import type { TPlan } from '@utils/orderTypes';
-import type { TObject } from '@utils/types';
+import type { TListing, TObject } from '@utils/types';
 
 const getOrder = async ({ orderId }: { orderId: string }) => {
   const integrationSdk = getIntegrationSdk();
@@ -100,4 +101,43 @@ const getOrder = async ({ orderId }: { orderId: string }) => {
   return data;
 };
 
+export const getOrderAndPlan = async (orderIds: string[]) => {
+  const orders: [] = await queryAllListings({
+    query: {
+      ids: orderIds,
+    },
+  });
+  const plainIds: string[] = [];
+  orders.forEach((order: TListing) => {
+    const { plans = [] } = Listing(order).getMetadata();
+
+    if (plans?.length > 0) {
+      const planId = plans[0];
+      plainIds.push(planId);
+    }
+  });
+  const plans: [] = await queryAllListings({
+    query: {
+      ids: plainIds,
+    },
+  });
+
+  const mapPlanByOrderId = plans.reduce((acc, plan: TListing) => {
+    const { orderId } = Listing(plan).getMetadata();
+    if (!acc.has(orderId)) {
+      acc.set(orderId, plan);
+    }
+
+    return acc;
+  }, new Map<string, any>());
+
+  return orders.map((order: TListing) => {
+    const orderId = Listing(order).getId();
+
+    return {
+      orderListing: order,
+      planListing: mapPlanByOrderId.get(orderId),
+    };
+  });
+};
 export default getOrder;

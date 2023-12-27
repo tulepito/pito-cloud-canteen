@@ -288,6 +288,7 @@ export const partnerPaths = {
   ManageMenus: '/partner/products/menu',
   CreateMenu: '/partner/products/menu/create',
   EditMenu: '/partner/products/menu/[menuId]',
+  ManageReviews: '/partner/reviews',
 };
 
 export const partnerRoutes = {
@@ -338,5 +339,9 @@ export const partnerRoutes = {
   EditFood: {
     path: partnerPaths.EditFood,
     label: 'Chỉnh sửa món ăn',
+  },
+  Reviews: {
+    path: partnerPaths.ManageReviews,
+    label: 'Đánh giá',
   },
 };

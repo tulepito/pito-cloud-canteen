@@ -1,0 +1,104 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/defaults.scss' as *;
+
+.reviewTable {
+  width: 100%;
+  background-color: $neutralGray1;
+  padding: 16px;
+  @include flexAlign(flex-start);
+  gap: 16px;
+  flex-direction: column;
+  @include viewportSmall {
+    padding: 0;
+    margin-top: 20px;
+  }
+
+  .tableTitleContainer {
+    width: 100%;
+    @include flexAlign(center, space-between);
+  }
+  .reviewTableContent {
+    @include flexAlign(center, center);
+    gap: 16px;
+    flex-direction: column;
+    width: 100%;
+    @include viewportSmall {
+      display: block;
+    }
+
+    .loading {
+      margin-top: 40px;
+      text-align: center;
+      width: 100%;
+    }
+  }
+}
+
+.dataEmtpy {
+  @include flexAlign(center, center);
+  gap: 16px;
+  padding: 12px 0px;
+  flex-direction: column;
+  margin-top: 50px;
+  .dataEmptyTitle {
+    color: $neutralGray6;
+  }
+}
+
+.partnerDetailCardContainer {
+  @include viewportSmall {
+    padding-bottom: 20px;
+  }
+}
+
+.normalText {
+  @include textTemplate(14px, $fontWeightRegular, 20px);
+}
+
+.titleText {
+  @include textTemplate(16px, $fontWeightSemiBold, 24px);
+  @include viewportSmall {
+    @include textTemplate(20px, $fontWeightBold, 32px);
+  }
+}
+
+.filterIcon {
+  margin-right: 10px;
+  fill: $neutralGray7;
+}
+
+.filterButton {
+  padding: 10px 20px 10px 20px;
+  span {
+    @include textTemplate(14px, $fontWeightBold, 24px);
+  }
+  .filterIcon {
+    width: 16px;
+    height: 14px;
+  }
+}
+
+.filterBtnTooltipOverlay {
+  opacity: 1;
+  padding: 0;
+  @include viewportMedium {
+    padding: 0 25px 0 0;
+  }
+
+  :global(.rc-tooltip-inner) {
+    border-radius: 8px;
+    padding: 20px;
+    background: $neutralGray1;
+    width: 290px;
+
+    /* Shadown/XL */
+    box-shadow: 0px 20px 24px 4px rgba(16, 24, 40, 0.1),
+      0px 8px 8px -4px rgba(16, 24, 40, 0.04);
+  }
+
+  :global(.rc-tooltip-arrow) {
+    display: none;
+  }
+}

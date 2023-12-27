@@ -1,0 +1,130 @@
+import React, { useEffect, useMemo } from 'react';
+import { useIntl } from 'react-intl';
+import classNames from 'classnames';
+import { uniq } from 'lodash';
+import { useRouter } from 'next/router';
+
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { useViewport } from '@hooks/useViewport';
+import { partnerPaths } from '@src/paths';
+
+import PartnerReviewDetailTable from './components/PartnerReviewDetailTable/PartnerReviewDetailTable';
+import type { TPartnerReviewsFilterFormValues } from './components/PartnerReviewsFilterForm/PartnerReviewsFilterForm';
+import PartnerReviewsFilterForm from './components/PartnerReviewsFilterForm/PartnerReviewsFilterForm';
+import SummarizeReview from './components/SummarizeReview/SummarizeReview';
+import { ManageReviewsThunks } from './ManageReviews.slice';
+
+import css from './ManageReviews.module.scss';
+
+const ManageReviewsPage = () => {
+  const dispatch = useAppDispatch();
+  const intl = useIntl();
+  const router = useRouter();
+  const { isMobileLayout } = useViewport();
+  const {
+    query: { rating: queryRating },
+  } = router;
+
+  const averageFoodRating = useAppSelector(
+    (state) => state.ManageReviews.averageFoodRating,
+  );
+  const averagePackagingRating = useAppSelector(
+    (state) => state.ManageReviews.averagePackagingRating,
+  );
+  const isFirstLoad = useAppSelector(
+    (state) => state.ManageReviews.isFirstLoad,
+  );
+  const averageTotalRating = useAppSelector(
+    (state) => state.ManageReviews.averageTotalRating,
+  );
+  const totalNumberOfReivews = useAppSelector(
+    (state) => state.ManageReviews.totalNumberOfReivews,
+  );
+  const ratingDetail = useAppSelector(
+    (state) => state.ManageReviews.ratingDetail,
+  );
+
+  const convertRatingToNumber = (rating: string) => {
+    const result: number[] = [];
+    rating.split(',').forEach((rate) => {
+      result.push(Number(rate));
+    });
+
+    return result;
+  };
+
+  const ratings = useMemo(() => {
+    const result = [];
+
+    if (queryRating) {
+      if (Array.isArray(queryRating)) {
+        queryRating.forEach((rating) => {
+          result.push(...convertRatingToNumber(rating));
+        });
+      } else {
+        result.push(...convertRatingToNumber(queryRating));
+      }
+    }
+
+    return uniq(result);
+  }, [queryRating]);
+
+  useEffect(() => {
+    if (isFirstLoad) dispatch(ManageReviewsThunks.loadReviewSummarizeData());
+  }, [isFirstLoad, dispatch]);
+
+  const handleFilterChange = ({
+    ratings: ratingFormValue,
+  }: TPartnerReviewsFilterFormValues) => {
+    router.replace({
+      pathname: partnerPaths.ManageReviews,
+      query: {
+        ...(ratingFormValue.length
+          ? { rating: ratingFormValue.join(',') }
+          : {}),
+      },
+    });
+  };
+
+  const handleClearFilter = () => {
+    router.replace({
+      pathname: partnerPaths.ManageReviews,
+      query: {},
+    });
+  };
+
+  const filterForm = (
+    <PartnerReviewsFilterForm
+      onSubmit={handleFilterChange}
+      onClearFilter={handleClearFilter}
+      ratingDetail={ratingDetail}
+      initialValues={{ ratings: uniq(ratings) }}
+    />
+  );
+
+  return (
+    <div className={css.root}>
+      <div
+        className={classNames(
+          css.headerPage,
+          isMobileLayout ? css.headerMobliePage : '',
+        )}>
+        {intl.formatMessage({ id: 'PartnerSidebar.reviews' })}
+      </div>
+      <div className={css.summarizeContainer}>
+        <span className={classNames(css.titleText)}>
+          {intl.formatMessage({ id: 'ManagePartnerReviewsPage.overView' })}
+        </span>
+        <SummarizeReview
+          averageFoodRating={averageFoodRating}
+          averagePackagingRating={averagePackagingRating}
+          averageTotalRating={averageTotalRating}
+          totalNumberOfReivews={totalNumberOfReivews}
+        />
+      </div>
+      <PartnerReviewDetailTable ratings={ratings} filterForm={filterForm} />
+    </div>
+  );
+};
+
+export default ManageReviewsPage;

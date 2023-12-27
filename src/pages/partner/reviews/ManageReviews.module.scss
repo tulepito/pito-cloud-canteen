@@ -1,0 +1,55 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/defaults.scss' as *;
+
+.root {
+  @include flexAlign(flex-start);
+  gap: 8px;
+  flex-direction: column;
+  background-color: $neutralGray4;
+  @include viewportSmall {
+    background-color: $neutralGray1;
+  }
+
+  .headerPage {
+    background-color: $neutralGray1;
+    width: 100%;
+    padding: 16px;
+    @include flexAlign(center, flex-start);
+    @include textTemplate(16px, $fontWeightBold, 24px);
+    @include viewportSmall {
+      @include textTemplate(24px, $fontWeightBold, 32px);
+    }
+
+    @include viewportSmall {
+      padding: 16px 0;
+    }
+  }
+
+  .headerMobliePage {
+    position: fixed;
+    top: 0;
+    z-index: 1;
+    border-bottom: 1px solid $neutralGray4;
+  }
+
+  .summarizeContainer {
+    margin-top: 55px;
+    background-color: $neutralGray1;
+    width: 100%;
+    padding: 16px;
+    @include viewportSmall {
+      padding: 16px 0 0 0;
+      width: auto;
+      margin-top: 16px;
+    }
+  }
+}
+
+.titleText {
+  @include textTemplate(16px, $fontWeightSemiBold, 24px);
+  @include viewportSmall {
+    @include textTemplate(20px, $fontWeightBold, 32px);
+  }
+}
