@@ -2,6 +2,10 @@
 @use '/src/styles/mixins.scss' as *;
 @use '/src/styles/customMediaQueries.scss' as *;
 
+.container {
+  padding-top: 16px;
+}
+
 .containerNoGroupFoud {
   margin: 0;
   display: flex;
