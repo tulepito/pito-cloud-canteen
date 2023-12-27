@@ -86,11 +86,11 @@ const AuthGuard: React.FC<TAuthGuardProps> = ({ children }) => {
   }, [isAuthenticated, isUserEmailVerified, isReady]);
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && isReady) {
       dispatch(SystemAttributesThunks.fetchAttributes());
       dispatch(NotificationThunks.fetchNotifications());
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, isReady]);
 
   // TODO: verify authentication
   useVerifyAuthentication(homePageNavigateCondition);
