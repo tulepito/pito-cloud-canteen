@@ -132,7 +132,7 @@ const CompanyMembersListMobile: React.FC<
             <div className={css.cellValue}>
               <span>{email}</span>
             </div>
-            <div className={css.iconArrow}>
+            <div className={css.iconArrowContainer}>
               <IconArrow
                 direction="down"
                 onClick={collapseRowController?.toggle}
@@ -280,6 +280,7 @@ const CompanyMembersListMobile: React.FC<
 
   useEffect(() => {
     const currentUserCompany = getCompanyIdFromBookerUser(currentUser!);
+    console.log(currentUserCompany);
     const fetchData = async () => {
       dispatch(companyMemberActions.resetError());
       dispatch(
@@ -358,7 +359,12 @@ const CompanyMembersListMobile: React.FC<
               })
             )}
             <tr>
-              <td colSpan={columns.length} className={css.bodyRowAddNewMembers}>
+              <td
+                colSpan={columns.length}
+                className={classNames(
+                  css.bodyRowAddNewMembers,
+                  css.bodyCellBorder,
+                )}>
                 <Button
                   variant="inline"
                   type="button"

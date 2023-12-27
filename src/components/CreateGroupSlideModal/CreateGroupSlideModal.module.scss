@@ -1,0 +1,33 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.slideModalContainer {
+  padding: 24px 16px 10px 16px !important;
+  .modalContainer {
+    @include viewportMedium {
+      flex-basis: 700px;
+    }
+  }
+}
+
+.modalHeader {
+  @include flexAlign(center, space-between);
+
+  .modalTitle {
+    @include text(20px, 32px);
+    font-weight: 700;
+  }
+}
+
+.modalFooter {
+  .cancelBtn {
+    @include viewportSmall {
+      margin: 16px auto 0;
+    }
+    width: 100%;
+    @include viewportSmall {
+      width: 400px;
+    }
+  }
+}

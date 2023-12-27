@@ -1,32 +1,72 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
 
 .formContainer {
   width: 100%;
   @include flexAlign(flex-end, space-between);
-  height: 108px;
+  flex-direction: column;
+  gap: 8px;
+  @include viewportSmall {
+    height: 108px;
+    flex-direction: row;
+  }
 }
 
 .label {
-  font-weight: 700;
-  width: 100px;
-  font-size: 16px;
-  margin: 0;
+  @include viewportSmall {
+    width: 100px;
+    font-weight: 700;
+    font-size: 16px;
+    margin: 0;
+  }
 }
 
-.groupNameField {
-  @include flexAlign(center);
+.groupField {
+  width: 100%;
+  gap: 8px;
+  @include viewportSmall {
+    @include flexAlign(center);
+    flex-direction: row;
+    width: auto;
+  }
+}
+
+.fieldWrapper {
+  @include flexAlign(flex-start);
+  flex-direction: column;
+  padding-bottom: 16px;
+  width: 100%;
+  @include viewportSmall {
+    padding-bottom: 0px;
+    display: block;
+    width: auto;
+  }
 }
 
 .descriptionField {
   margin-top: 16px;
-  @include flexAlign(center);
 }
 
 .buttonsWrapper {
+  width: 100%;
   @include flexAlign(center);
+  flex-direction: column-reverse;
+  gap: 8px;
+  @include viewportSmall {
+    flex-direction: row;
+    width: auto;
+  }
+  .itemBtn {
+    width: 100%;
+    @include viewportSmall {
+      width: auto;
+    }
+  }
 
   .cancelBtn {
-    margin-right: 16px;
+    @include viewportSmall {
+      margin-right: 16px;
+    }
   }
 }

@@ -1,5 +1,7 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
 .fieldInput {
   margin-top: 24px;
 
@@ -10,19 +12,28 @@
 
 .itemWrapper {
   @include flexAlign(center);
-  max-width: 308px;
-  margin-bottom: 20px;
+  @include viewportSmall {
+    max-width: 308px;
+    margin-bottom: 20px;
+  }
 }
 
 .flexWrap {
   @include flexAlign(flex-start);
-  flex-wrap: wrap;
-  max-height: 380px;
+  max-height: 250px;
   overflow: auto;
+  flex-direction: column;
+  gap: 20px;
+  @include viewportSmall {
+    flex-direction: row;
+    gap: unset;
+  }
 }
 
 .memberItem {
-  width: 300px;
+  @include viewportSmall {
+    width: 300px;
+  }
   @include flexAlign(center, space-between);
 
   .memberWrapper {
@@ -68,7 +79,10 @@
 
 .submitBtn {
   margin: 40px auto 0;
-  width: 400px;
-  height: 48px;
   @include text(16px);
+  height: 48px;
+  width: 100%;
+  @include viewportSmall {
+    width: 400px;
+  }
 }

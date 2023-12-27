@@ -5,33 +5,41 @@ import { useRouter } from 'next/router';
 
 import Button from '@components/Button/Button';
 import ConfirmationModal from '@components/ConfirmationModal/ConfirmationModal';
-import CreateGroupModal from '@components/CreateGroupModal/CreateGroupModal';
+import CreateGroupSlideModal from '@components/CreateGroupSlideModal/CreateGroupSlideModal';
 import IconDelete from '@components/Icons/IconDelete/IconDelete';
 import IconEdit from '@components/Icons/IconEdit/IconEdit';
-import IconOutlinePlus from '@components/Icons/IconOutlinePlus/IconOutlinePlus';
 import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import type { TColumn, TRowData } from '@components/Table/Table';
-import Table from '@components/Table/Table';
+import { getCompanyIdFromBookerUser } from '@helpers/company';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import IconNoClientsFound from '@src/pages/admin/order/components/ClientTable/IconNoClientsFound';
+import { companyPaths, personalPaths } from '@src/paths';
 import {
   addWorkspaceCompanyId,
   companyThunks,
 } from '@src/redux/slices/company.slice';
 
-import css from './GroupSetting.module.scss';
+import GroupSettingTable from './components/GroupSettingTable/GroupSettingTable';
 
-export type TGroupItem = {
-  id: string;
-  groupName: string;
-  memberNumber: string;
-};
-const GroupSettingPage = () => {
+import css from './GroupSettingMobile.module.scss';
+
+const GroupSettingMobile = () => {
   const intl = useIntl();
   const router = useRouter();
-  const { companyId = '' } = router.query;
+
+  const currentUser = useAppSelector(
+    (state) => state.user.currentUser,
+    shallowEqual,
+  );
+  let { companyId } = router.query;
+  let editGroupByIdPath = companyPaths.GroupDetail;
+  if (companyId === 'personal') {
+    companyId = getCompanyIdFromBookerUser(currentUser!);
+    editGroupByIdPath = personalPaths.GroupList;
+  }
+
   const dispatch = useAppDispatch();
   const {
     value: isCreateGroupModalOpen,
@@ -62,6 +70,17 @@ const GroupSettingPage = () => {
     shallowEqual,
   );
 
+  const onEditGroupById = (id: string) => {
+    router.push({
+      pathname: `${editGroupByIdPath}/${id}`,
+      query: router.query,
+    });
+  };
+  const onDeleteGroupById = (id: string) => {
+    setSelectingDeleteGroupId(id);
+    handleOpenDeleteGroupConfirmationModal();
+  };
+
   const formattedGroupList = useMemo<TRowData[]>(
     () =>
       groupList.reduce(
@@ -84,45 +103,61 @@ const GroupSettingPage = () => {
   const TABLE_COLUMN: TColumn[] = [
     {
       key: 'groupName',
-      label: intl.formatMessage({ id: 'GroupSetting.columnLabel.groupName' }),
+      label: intl
+        .formatMessage({ id: 'GroupSetting.columnLabel.groupName' })
+        .toUpperCase(),
       render: (data: any) => {
-        return <span>{data.groupName}</span>;
+        return (
+          <div className={css.groupName}>
+            <span>{data.groupName}</span>
+          </div>
+        );
       },
     },
     {
       key: 'memberNumber',
-      label: intl.formatMessage({
-        id: 'GroupSetting.columnLabel.memberNumber',
-      }),
+      label: intl
+        .formatMessage({
+          id: 'GroupSetting.columnLabel.memberNumber',
+        })
+        .toUpperCase(),
       render: (data: any) => {
-        return <span>{data.memberNumber}</span>;
-      },
-    },
-    {
-      key: 'actions',
-      label: '',
-      render: ({ id }: TGroupItem) => {
+        const { id } = data;
         const showLoadingIcon = deleteGroupInProgress && id === deletingGroupId;
-        const onEditGroup = () => {
-          router.push({
-            pathname: `/company/[companyId]/group-setting/${id}`,
-            query: router.query,
-          });
-        };
         const onDeleteGroup = () => {
-          setSelectingDeleteGroupId(id);
-          handleOpenDeleteGroupConfirmationModal();
+          onDeleteGroupById(id);
+        };
+
+        const onEditGroup = () => {
+          onEditGroupById(id);
         };
 
         return (
-          <>
-            <IconEdit className={css.editBtn} onClick={onEditGroup} />
-            {showLoadingIcon ? (
-              <IconSpinner className={css.loading} />
-            ) : (
-              <IconDelete className={css.deleteBtn} onClick={onDeleteGroup} />
-            )}
-          </>
+          <div className={css.memberNumberContainer}>
+            <div className={css.memberNumberValue}>
+              <span>{data.memberNumber}</span>
+            </div>
+            <div className={css.memberNumberActionContainer}>
+              <IconEdit
+                variant="outline"
+                width={32}
+                height={32}
+                className={css.editBtn}
+                onClick={onEditGroup}
+              />
+              {showLoadingIcon ? (
+                <IconSpinner className={css.loading} />
+              ) : (
+                <IconDelete
+                  variant="outline"
+                  width={32}
+                  height={32}
+                  className={css.deleteBtn}
+                  onClick={onDeleteGroup}
+                />
+              )}
+            </div>
+          </div>
         );
       },
     },
@@ -145,48 +180,40 @@ const GroupSettingPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [companyId]);
 
-  const noGroupFound = (
-    <div className={css.noGroupFound}>
-      <IconNoClientsFound />
-      <div>
-        <FormattedMessage id="GroupSetting.noGroupFound" />
-      </div>
-    </div>
-  );
-
   return (
     <div className={css.container}>
-      <div className={css.header}>
-        <div className={css.titleWrapper}>
-          <h2>{intl.formatMessage({ id: 'GroupSetting.pageTitle' })}</h2>
-        </div>
-        <Button
-          className={css.createGroupBtn}
-          onClick={handleOpenCreateGroupModal}>
-          <IconOutlinePlus />
-          {intl.formatMessage({ id: 'GroupSetting.addGroup' })}
-        </Button>
-      </div>
-      <div className={css.tableContainer}>
-        <RenderWhen
-          condition={
-            formattedGroupList?.length > 0 || fetchCompanyInfoInProgress
-          }>
-          <Table
+      <RenderWhen
+        condition={
+          formattedGroupList?.length > 0 || fetchCompanyInfoInProgress
+        }>
+        <div className={css.tableContainer}>
+          <GroupSettingTable
             columns={TABLE_COLUMN}
             data={formattedGroupList}
             isLoading={fetchCompanyInfoInProgress}
-            tableClassName={css.tableRoot}
-            tableHeadClassName={css.tableHead}
-            tableHeadCellClassName={css.tableHeadCell}
-            tableBodyClassName={css.tableBody}
-            tableBodyRowClassName={css.tableBodyRow}
-            tableBodyCellClassName={css.tableBodyCell}
+            handleOpenCreateGroupModal={handleOpenCreateGroupModal}
           />
-          <RenderWhen.False>{noGroupFound}</RenderWhen.False>
-        </RenderWhen>
-      </div>
-      <CreateGroupModal
+        </div>
+        <RenderWhen.False>
+          <div className={css.containerNoGroupFoud}>
+            <div className={css.noGroupFound}>
+              <IconNoClientsFound />
+              <FormattedMessage id="GroupSetting.noGroupFound" />
+            </div>
+            <Button
+              variant="primary"
+              size="large"
+              className={css.addGroup}
+              onClick={handleOpenCreateGroupModal}>
+              {intl.formatMessage({
+                id: 'GroupSetting.addGroup',
+              })}
+            </Button>
+          </div>
+        </RenderWhen.False>
+      </RenderWhen>
+
+      <CreateGroupSlideModal
         isOpen={isCreateGroupModalOpen}
         onClose={handleCloseCreateGroupModal}
         companyMembers={companyMembers}
@@ -194,6 +221,7 @@ const GroupSettingPage = () => {
       />
       <ConfirmationModal
         id="DeleteGroupModal"
+        isPopup={true}
         isOpen={isDeleteGroupConfirmationModalOpen}
         onClose={handleCloseDeleteGroupConfirmationModal}
         confirmText={intl.formatMessage({ id: 'GroupSetting.confirmText' })}
@@ -207,4 +235,4 @@ const GroupSettingPage = () => {
   );
 };
 
-export default GroupSettingPage;
+export default GroupSettingMobile;

@@ -5,15 +5,74 @@ import type { TIconProps } from '@utils/types';
 
 import css from './IconEdit.module.scss';
 
-const IconEdit: React.FC<TIconProps> = (props) => {
-  const { rootClassName, className, onClick } = props;
+export type TEditVariant = 'default' | 'outline';
+type TIconEditProps = TIconProps & {
+  variant?: TEditVariant;
+};
+
+const IconEdit: React.FC<TIconEditProps> = (props) => {
+  const {
+    rootClassName,
+    className,
+    onClick,
+    variant = 'default',
+    width = 24,
+    height = 24,
+  } = props;
   const classes = classNames(rootClassName || css.root, className);
+
+  if (variant === 'outline')
+    return (
+      <svg
+        width={width}
+        height={height}
+        viewBox="0 0 32 32"
+        onClick={onClick}
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg">
+        <rect width="32" height="32" rx="16" fill="#F0F0F0" />
+        <path
+          fillRule="evenodd"
+          clipRule="evenodd"
+          d="M23.2925 24.2846H17.2483C16.9033 24.2846 16.6233 24.0046 16.6233 23.6596C16.6233 23.3146 16.9033 23.0346 17.2483 23.0346H23.2925C23.6375 23.0346 23.9175 23.3146 23.9175 23.6596C23.9175 24.0046 23.6375 24.2846 23.2925 24.2846Z"
+          fill="#262626"
+        />
+        <mask
+          id="mask0_1246_31930"
+          maskUnits="userSpaceOnUse"
+          x="7"
+          y="8"
+          width="15"
+          height="17">
+          <path
+            fillRule="evenodd"
+            clipRule="evenodd"
+            d="M7.66699 8.50012H21.9841V24.2831H7.66699V8.50012Z"
+            fill="white"
+          />
+        </mask>
+        <g mask="url(#mask0_1246_31930)">
+          <path
+            fillRule="evenodd"
+            clipRule="evenodd"
+            d="M16.9255 10.1793L9.07962 19.9918C8.93712 20.1701 8.88462 20.4001 8.93712 20.6209L9.50462 23.0251L12.0371 22.9934C12.278 22.9909 12.5005 22.8834 12.648 22.7001C15.3288 19.3459 20.4396 12.9509 20.5846 12.7634C20.7213 12.5418 20.7746 12.2284 20.703 11.9268C20.6296 11.6176 20.4371 11.3551 20.1596 11.1876C20.1005 11.1468 18.6963 10.0568 18.653 10.0226C18.1246 9.59927 17.3538 9.6726 16.9255 10.1793ZM9.01139 24.2832C8.72222 24.2832 8.47055 24.0848 8.40305 23.8023L7.72055 20.9098C7.57972 20.3107 7.71972 19.6923 8.10389 19.2123L15.9539 9.39399C15.9572 9.39066 15.9597 9.38649 15.9631 9.38316C16.8239 8.35399 18.3806 8.20232 19.4306 9.04482C19.4722 9.07732 20.8664 10.1607 20.8664 10.1607C21.3731 10.4623 21.7689 11.0015 21.9189 11.6398C22.0681 12.2715 21.9597 12.9232 21.6122 13.474C21.5864 13.5148 21.5639 13.5498 13.6239 23.4832C13.2414 23.9598 12.6681 24.2373 12.0522 24.2448L9.01972 24.2832H9.01139Z"
+            fill="#262626"
+          />
+        </g>
+        <path
+          fillRule="evenodd"
+          clipRule="evenodd"
+          d="M19.5196 15.7363C19.3863 15.7363 19.2529 15.6938 19.1388 15.6071L14.5954 12.1171C14.3221 11.9071 14.2704 11.5155 14.4804 11.2405C14.6913 10.9671 15.0829 10.9163 15.3571 11.1263L19.9013 14.6155C20.1746 14.8255 20.2263 15.218 20.0154 15.4921C19.8929 15.6521 19.7071 15.7363 19.5196 15.7363Z"
+          fill="#262626"
+        />
+      </svg>
+    );
 
   return (
     <svg
       preserveAspectRatio="none"
-      width="24"
-      height="24"
+      width={width}
+      height={height}
       viewBox="0 0 24 24"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"

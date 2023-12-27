@@ -63,6 +63,31 @@ export const getGroupNames = (groupIds: string[], groupList: any) => {
     .join(', ');
 };
 
+export const getGroupListNames = (member: any, groupList: any) => {
+  const id = member?.id?.uuid;
+  const email = member?.attributes?.email;
+  const memberGroupIds = groupList.reduce(
+    (groupIds: string[], curr: TObject) => {
+      const { members = [], id: groupId } = curr || {};
+
+      if (
+        typeof members.find(
+          ({ id: memberIdFromGroup, email: memberEmailFromGroup }: TObject) => {
+            return memberIdFromGroup === id || memberEmailFromGroup === email;
+          },
+        ) !== 'undefined'
+      ) {
+        return [...groupIds, groupId];
+      }
+
+      return groupIds;
+    },
+    [],
+  );
+
+  return getGroupNames(memberGroupIds, groupList);
+};
+
 export const checkMemberBelongToCompany = (
   memberEmail: string,
   companyAccount: TUser,

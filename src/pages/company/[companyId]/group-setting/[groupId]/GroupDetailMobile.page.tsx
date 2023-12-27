@@ -1,34 +1,30 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
-import isEmpty from 'lodash/isEmpty';
 import { useRouter } from 'next/router';
 
-import Button from '@components/Button/Button';
 import ConfirmationModal from '@components/ConfirmationModal/ConfirmationModal';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
-import IconDelete from '@components/Icons/IconDelete/IconDelete';
-import IconPlus from '@components/Icons/IconPlus/IconPlus';
-import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
-import type { TColumn, TRowData } from '@components/Table/Table';
-import Table from '@components/Table/Table';
+import IconMoreCircle from '@components/Icons/IconMoreCircle/IconMoreCircle';
+import SlideModal from '@components/SlideModal/SlideModal';
+import type { TRowData } from '@components/Table/Table';
 import { getGroupListNames } from '@helpers/company';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import useFetchCompanyInfo from '@hooks/useFetchCompanyInfo';
-import { companyPaths } from '@src/paths';
+import { companyPaths, personalPaths } from '@src/paths';
 import { companyThunks } from '@src/redux/slices/company.slice';
 import { ALLERGIES_OPTIONS, getLabelByKey } from '@src/utils/options';
 import { User } from '@utils/data';
 import type { TObject } from '@utils/types';
 
-import AddNewMembersModal from './components/AddNewMembersModal/AddNewMembersModal';
+import AddNewMembersSlideModal from './components/AddNewMembersSlideModal/AddNewMembersSlideModal';
 import GroupInfoForm from './components/GroupInfoForm/GroupInfoForm';
+import MemberTable from './components/MemberTable/MemberTable';
 
-import css from './GroupDetail.module.scss';
+import css from './GroupDetailMobile.module.scss';
 
-const GroupDetailPage = () => {
+const GroupDetailMobilePage = () => {
   const intl = useIntl();
   const router = useRouter();
   const dispatch = useAppDispatch();
@@ -48,11 +44,22 @@ const GroupDetailPage = () => {
     setTrue: openDeleteMemberConfirmationModal,
     setFalse: closeDeleteMemberConfirmationModal,
   } = useBoolean();
+
+  const {
+    value: isOpenMoreSlideModal,
+    setTrue: onOpenMoreSlideModal,
+    setFalse: onCloseMoreSlideModal,
+  } = useBoolean();
   const {
     value: isDeleteGroupConfirmationModalOpen,
     setFalse: onDeleteGroupConfirmationModalClose,
     setTrue: openDeleteGroupConfirmationModal,
   } = useBoolean();
+
+  const handleDeleteGroupConfirmationModal = () => {
+    openDeleteGroupConfirmationModal();
+    onCloseMoreSlideModal();
+  };
 
   const [deletingMemberInfo, setDeletingMemberInfo] = useState<TObject>();
 
@@ -92,7 +99,7 @@ const GroupDetailPage = () => {
   const formattedGroupMembers = useMemo<TRowData[]>(
     () =>
       groupMembers.reduce((result: any, member: any) => {
-        const groupName = getGroupListNames(member, groupList ?? []);
+        const groupNames = getGroupListNames(member, groupList ?? []);
 
         return [
           ...result,
@@ -104,7 +111,7 @@ const GroupDetailPage = () => {
                 member.attributes.profile?.firstName || ''
               }`,
               email: User(member).getAttributes().email,
-              group: groupName,
+              group: groupNames,
               allergy: User(member)
                 .getPublicData()
                 ?.allergies?.map((allergy: string) =>
@@ -125,78 +132,8 @@ const GroupDetailPage = () => {
     [JSON.stringify(groupMembers)],
   );
 
-  const goToGroupMemberDetailPage = (memberId: string) => () => {
-    router.push({
-      pathname: companyPaths.GroupMemberDetail,
-      query: {
-        companyId,
-        groupId,
-        memberId,
-      },
-    });
-  };
-
-  const TABLE_COLUMN: TColumn[] = [
-    {
-      key: 'name',
-      label: intl.formatMessage({ id: 'GroupDetail.columnLabel.name' }),
-      render: (data: any) => {
-        return <span>{data.name}</span>;
-      },
-    },
-    {
-      key: 'email',
-      label: intl.formatMessage({ id: 'GroupDetail.columnLabel.email' }),
-      render: ({ id, email }: TObject) => {
-        return (
-          <span
-            className={css.clickable}
-            onClick={goToGroupMemberDetailPage(id)}>
-            {email}
-          </span>
-        );
-      },
-    },
-    {
-      key: 'group',
-      label: intl.formatMessage({ id: 'GroupDetail.columnLabel.group' }),
-      render: (data: any) => {
-        return <span>{data.group}</span>;
-      },
-    },
-    {
-      key: 'allergy',
-      label: intl.formatMessage({ id: 'GroupDetail.columnLabel.allergy' }),
-      render: (data: any) => {
-        return <span>{isEmpty(data.allergy) ? '-' : data.allergy}</span>;
-      },
-    },
-    {
-      key: 'nutrition',
-      label: intl.formatMessage({ id: 'GroupDetail.columnLabel.nutrition' }),
-      render: (data: any) => {
-        return <span>{isEmpty(data.nutrition) ? '-' : data.nutrition}</span>;
-      },
-    },
-    {
-      key: 'action',
-      label: '',
-      render: ({ id, email }: any) => {
-        const onDeleteMember = () => {
-          setDeletingMemberInfo({ id, email });
-          openDeleteMemberConfirmationModal();
-        };
-
-        return updateGroupInProgress ? (
-          <IconSpinner className={css.loading} />
-        ) : (
-          <IconDelete className={css.deleteBtn} onClick={onDeleteMember} />
-        );
-      },
-    },
-  ];
-
   useFetchCompanyInfo();
+
   useEffect(() => {
     dispatch(companyThunks.groupInfo());
     dispatch(
@@ -204,6 +141,7 @@ const GroupDetailPage = () => {
         groupId: groupId as string,
       }),
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [groupId]);
 
   const groupInfoFormInitialValues = useMemo(
@@ -236,75 +174,76 @@ const GroupDetailPage = () => {
       ({ error }: any) => {
         if (!error) {
           onDeleteGroupConfirmationModalClose();
-          router.push({
-            pathname: companyPaths.GroupSetting,
-            query: {
-              companyId,
-            },
-          });
+          if (companyId === 'personal')
+            router.push({
+              pathname: personalPaths.GroupList,
+              query: {
+                companyId,
+              },
+            });
+          else
+            router.push({
+              pathname: companyPaths.GroupSetting,
+              query: {
+                companyId,
+              },
+            });
         }
       },
     );
   };
 
   const handleGoBack = () => {
-    router.back();
+    if (companyId === 'personal')
+      router.push({
+        pathname: personalPaths.GroupList,
+        query: {
+          companyId,
+        },
+      });
+    else
+      router.push({
+        pathname: companyPaths.GroupSetting,
+        query: {
+          companyId,
+        },
+      });
+  };
+
+  const handleEditing = () => {
+    onEditing();
+    onCloseMoreSlideModal();
+  };
+
+  const onDeleteMember = (id: string, email: string) => {
+    setDeletingMemberInfo({ id, email });
+    openDeleteMemberConfirmationModal();
   };
 
   return (
     <div className={css.container}>
-      <div className={css.backBtn} onClick={handleGoBack}>
-        <IconArrow direction="left" />
-        {intl.formatMessage({ id: 'GroupDetail.backButton' })}
+      <div className={css.headerContainer}>
+        <div className={css.leftHeaderContainer}>
+          <div>
+            <IconArrow direction="left" onClick={handleGoBack} />
+          </div>
+          <span>{name || '---'}</span>
+        </div>
+        <div>
+          <IconMoreCircle onClick={onOpenMoreSlideModal} />
+        </div>
       </div>
-      <div className={css.header}>
-        {isEditing ? (
-          <GroupInfoForm
-            groupId={groupId as string}
-            onCallback={closeEditing}
-            initialValues={groupInfoFormInitialValues}
-          />
-        ) : (
-          <>
-            <div className={css.titleWrapper}>
-              <h2>{name || '---'}</h2>
-              <div className={css.descriptionContainer}>{description}</div>
-            </div>
-            <div className={css.actionBtns}>
-              <Button onClick={onEditing} className={css.changeNameBtn}>
-                {intl.formatMessage({ id: 'GroupDetail.changeGroupName' })}
-              </Button>
-              <Button
-                onClick={openDeleteGroupConfirmationModal}
-                className={css.deleteGroupBtn}>
-                {intl.formatMessage({ id: 'GroupDetail.deleteGroup' })}
-              </Button>
-            </div>
-          </>
-        )}
-      </div>
+      <div className={css.descriptionContainer}>{description}</div>
       <div className={css.tableContainer}>
-        <Table
-          columns={TABLE_COLUMN}
-          data={formattedGroupMembers}
+        <MemberTable
+          onDeleteMember={onDeleteMember}
+          memberData={formattedGroupMembers}
           isLoading={fetchGroupDetailInProgress}
-          tableClassName={css.tableRoot}
-          tableHeadClassName={css.tableHead}
-          tableHeadCellClassName={css.tableHeadCell}
-          tableHeadCellLabelClassName={css.tableHeadCellLabel}
-          tableBodyClassName={css.tableBody}
-          tableBodyRowClassName={css.tableBodyRow}
-          tableBodyCellClassName={css.tableBodyCell}
+          handleAddNewMember={openAddNewMembersModal}
           pagination={groupMembersPagination}
-          extraRows={
-            <td className={css.addMemberBtn} onClick={openAddNewMembersModal}>
-              <IconPlus className={css.plusIcon} />
-              {intl.formatMessage({ id: 'GroupDetail.addGroupMember' })}
-            </td>
-          }
         />
       </div>
-      <AddNewMembersModal
+      <AddNewMembersSlideModal
         isOpen={isAddNewMembersModalOpen}
         onClose={closeAddNewMembersModal}
         companyMembers={companyMembers}
@@ -313,6 +252,7 @@ const GroupDetailPage = () => {
       />
       <ConfirmationModal
         id="DeleteMemberModal"
+        isPopup={true}
         isOpen={isDeleteMemberConfirmationModalOpen}
         onClose={closeDeleteMemberConfirmationModal}
         confirmText={intl.formatMessage({
@@ -332,6 +272,7 @@ const GroupDetailPage = () => {
       <ConfirmationModal
         id="DeleteGroupModal"
         isOpen={isDeleteGroupConfirmationModalOpen}
+        isPopup={true}
         onClose={onDeleteGroupConfirmationModalClose}
         confirmText={intl.formatMessage({
           id: 'GroupDetail.confirmDeleteGroupText',
@@ -347,8 +288,41 @@ const GroupDetailPage = () => {
         onCancel={onDeleteGroupConfirmationModalClose}
         hasError={deleteGroupError}
       />
+
+      <SlideModal
+        id="MoreActionSlideModal"
+        isOpen={isOpenMoreSlideModal}
+        onClose={onCloseMoreSlideModal}
+        modalTitle={intl.formatMessage({
+          id: 'GroupDetail.actionOther',
+        })}>
+        <div onClick={handleEditing} className={css.actionMoreItem}>
+          <span>
+            {intl.formatMessage({ id: 'GroupDetail.changeGroupName' })}
+          </span>
+        </div>
+        <div
+          onClick={handleDeleteGroupConfirmationModal}
+          className={css.actionMoreItem}>
+          <span>{intl.formatMessage({ id: 'GroupDetail.deleteGroup' })}</span>
+        </div>
+      </SlideModal>
+
+      <SlideModal
+        id="EditGroupDetailInfoSlideModal"
+        isOpen={isEditing}
+        onClose={closeEditing}
+        modalTitle={intl.formatMessage({
+          id: 'GroupDetail.renameGroup',
+        })}>
+        <GroupInfoForm
+          groupId={groupId as string}
+          onCallback={closeEditing}
+          initialValues={groupInfoFormInitialValues}
+        />
+      </SlideModal>
     </div>
   );
 };
 
-export default GroupDetailPage;
+export default GroupDetailMobilePage;

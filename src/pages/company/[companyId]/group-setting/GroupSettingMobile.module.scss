@@ -1,0 +1,65 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.container {
+  padding-top: 16px;
+}
+
+.containerNoGroupFoud {
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 12px;
+  height: 70vh;
+
+  .noGroupFound {
+    @include flexAlign(center, center);
+    flex-direction: column;
+    gap: 16px;
+
+    svg {
+      width: 98.59px;
+      height: 98.59px;
+    }
+
+    span {
+      @include textTemplate(14px, $fontWeightRegular, 20px);
+    }
+  }
+
+  .addGroup {
+    width: 100%;
+    padding: 12px 20px;
+    @include viewportXSmall {
+      width: 240px;
+    }
+  }
+}
+
+.memberNumberContainer {
+  @include flexAlign(center, space-between);
+  flex-wrap: nowrap;
+
+  .memberNumberValue {
+    width: 80px;
+    @include flexAlign(center, center);
+    span {
+      @include textTemplate(16px, $fontWeightRegular, 24px);
+    }
+  }
+  .memberNumberActionContainer {
+    @include flexAlign(flex-end, flex-end);
+    gap: 10px;
+    flex-wrap: nowrap;
+  }
+}
+
+.groupName {
+  @include flexAlign(center, flex-start);
+  span {
+    @include textTemplate(16px, $fontWeightBold, 24px);
+  }
+}

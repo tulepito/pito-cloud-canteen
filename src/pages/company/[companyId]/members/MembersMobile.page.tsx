@@ -1,5 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useState } from 'react';
+import type { PropsWithChildren } from 'react';
+import { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { useRouter } from 'next/router';
 
@@ -8,19 +9,24 @@ import type { TTabsItem } from '@components/Tabs/Tabs';
 import Tabs from '@components/Tabs/Tabs';
 import { personalPaths } from '@src/paths';
 
-import CompanyMembersListMobile from './components/CompanyMembersListMobile/CompanyMembersListMobile';
-
 import css from './MembersMobile.module.scss';
 
-const MembersTab = {
+type TMembersMobilePageProps = PropsWithChildren<{
+  currentPage: string;
+}>;
+
+export const MembersTab = {
   MembersList: 'MemberList',
   GroupList: 'groupList',
 };
 
-const MembersMobilePage = () => {
+const MembersMobilePage: React.FC<TMembersMobilePageProps> = ({
+  currentPage = MembersTab.MembersList,
+  children,
+}) => {
   const intl = useIntl();
   const router = useRouter();
-  const [currentTab, setCurrentTab] = useState<string>(MembersTab.MembersList);
+  const [currentTab, setCurrentTab] = useState<string>(currentPage);
 
   const handleTabChanged = (params: TTabsItem) => {
     const { id = MembersTab.MembersList } = params || {};
@@ -30,7 +36,7 @@ const MembersMobilePage = () => {
 
   const tabItems = [
     {
-      key: MembersTab.MembersList,
+      id: MembersTab.MembersList,
       label: (
         <div className={css.tabLabel}>
           <span>
@@ -41,11 +47,11 @@ const MembersMobilePage = () => {
         </div>
       ),
       childrenFn: () => {
-        return <CompanyMembersListMobile />;
+        return <></>;
       },
     },
     {
-      key: MembersTab.GroupList,
+      id: MembersTab.GroupList,
       label: (
         <div className={css.tabLabel}>
           <span>
@@ -56,7 +62,7 @@ const MembersMobilePage = () => {
         </div>
       ),
       childrenFn: () => {
-        return <h1>Group List</h1>;
+        return <></>;
       },
     },
   ];
@@ -68,14 +74,24 @@ const MembersMobilePage = () => {
   };
 
   const defaultActiveKey = tabItems.findIndex(
-    (item: any) => item.key === currentTab,
+    (item: any) => item.id === currentTab,
   );
+
+  useEffect(() => {
+    if (currentTab !== currentPage) {
+      if (currentTab === MembersTab.MembersList) {
+        router.push(personalPaths.Members);
+      } else if (currentTab === MembersTab.GroupList) {
+        router.push(personalPaths.GroupList);
+      }
+    }
+  }, [currentTab]);
 
   return (
     <div className={css.container}>
       <div className={css.header}>
         <IconArrow direction="left" onClick={navigateAccountPersonalPage} />
-        <span>{intl.formatMessage({ id: 'MembersPage.membersTitle' })}</span>
+        <span>{intl.formatMessage({ id: 'CompanySidebar.members' })}</span>
       </div>
       <div className={css.tabContainer}>
         <Tabs
@@ -88,6 +104,7 @@ const MembersMobilePage = () => {
             (defaultActiveKey < 0 ? 0 : defaultActiveKey) + 1
           }`}
         />
+        <>{children}</>
       </div>
     </div>
   );

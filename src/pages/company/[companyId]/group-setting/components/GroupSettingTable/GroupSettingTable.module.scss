@@ -1,0 +1,50 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.table {
+  word-break: break-word;
+  width: 100%;
+  border: 1px solid $neutralGray4;
+  border-radius: 8px;
+  border-spacing: 0;
+
+  .headRow {
+    .headCell {
+      background-color: $neutralGray6;
+      padding: 10px 12px;
+      span {
+        color: $neutralGray1;
+        @include textTemplate(14px, $fontWeightSemiBold, 20px);
+      }
+    }
+  }
+
+  .bodyRow {
+    .bodyCell {
+      padding: 10px 12px;
+      border-bottom: 1px solid $neutralGray3;
+    }
+  }
+}
+.emptyCell {
+  text-align: center;
+  padding: 50px 0;
+  .loading {
+    width: 24px;
+    height: 24px;
+
+    circle {
+      stroke: $neutralGray7;
+    }
+  }
+}
+
+.btnGroup {
+  span {
+    padding-left: 12px;
+
+    @include textTemplate(16px, $fontWeightBold, 24px);
+    color: $neutralGray7;
+  }
+}

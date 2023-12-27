@@ -5,30 +5,25 @@ import RenderWhen from '@components/RenderWhen/RenderWhen';
 import type { TColumn, TRowData } from '@components/Table/Table';
 import useBoolean from '@hooks/useBoolean';
 
-import css from '../CompanyMembersListMobile.module.scss';
+import css from '../MemberTable/MemberTable.module.scss';
 
-type TCompanyCollapsibleRowsProps = {
+type TMemberRowsProps = {
   row: TRowData;
   columns: TColumn[];
   columnsControl: TColumn[];
-  bookerMemberEmails: any[];
-  onDeleteMember: (email: string) => void;
+  onDeleteMember: (id: string, email: string) => void;
 };
-const CompanyCollapsibleRows: React.FC<TCompanyCollapsibleRowsProps> = ({
+const MemberRow: React.FC<TMemberRowsProps> = ({
   row,
   columns,
   columnsControl,
   onDeleteMember,
-  bookerMemberEmails,
 }) => {
   const showRowsController = useBoolean(false);
-  const { email } = row.data;
+  const { id, email } = row.data;
   const handleDeleteMember = () => {
-    onDeleteMember(email);
+    onDeleteMember(id, email);
   };
-
-  const showDeleteBtn =
-    bookerMemberEmails.length > 0 && !bookerMemberEmails.includes(email);
 
   return (
     <>
@@ -63,15 +58,16 @@ const CompanyCollapsibleRows: React.FC<TCompanyCollapsibleRowsProps> = ({
           );
         })}
       </RenderWhen>
-      <RenderWhen condition={showDeleteBtn && showRowsController.value}>
-        <tr className={css.bodyRowDeleteAction} key={`${row.key}_deleteAction`}>
+      <RenderWhen condition={showRowsController.value}>
+        <tr className={css.bodyRow} key={`${row.key}_deleteAction`}>
           <td
             colSpan={columns.length}
-            className={classNames(css.bodyCell, css.bodyDeleteCell)}
+            className={css.bodyCell}
             key={columns[columns.length - 1].key}>
-            <div className={classNames(css.columnContainer, css.iconDelete)}>
-              <IconDelete onClick={handleDeleteMember} />
-            </div>
+            <IconDelete
+              className={css.iconDelete}
+              onClick={handleDeleteMember}
+            />
           </td>
         </tr>
       </RenderWhen>
@@ -79,4 +75,4 @@ const CompanyCollapsibleRows: React.FC<TCompanyCollapsibleRowsProps> = ({
   );
 };
 
-export default CompanyCollapsibleRows;
+export default MemberRow;

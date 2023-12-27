@@ -1,0 +1,48 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.container {
+  @include flexAlign(flex-start);
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+
+  .headerContainer {
+    padding: 0px 16px;
+    @include flexAlign(center, space-between);
+    flex-wrap: nowrap;
+    width: 100%;
+    height: 56px;
+    border-bottom: 1px solid $neutralGray3;
+    .leftHeaderContainer {
+      @include flexAlign(center, flex-start);
+      gap: 8px;
+      flex-wrap: nowrap;
+      span {
+        @include textTemplate(16px, $fontWeightBold, 24px);
+      }
+    }
+  }
+
+  .descriptionContainer {
+    padding: 0px 16px;
+    @include textTemplate(16px, $fontWeightRegular, 24px);
+    word-wrap: break-word;
+    width: inherit;
+  }
+
+  .tableContainer {
+    padding: 0px 16px;
+    width: 100%;
+  }
+}
+
+.actionMoreItem {
+  height: 40px;
+  margin-bottom: 16px;
+  margin-top: 24px;
+
+  span {
+    @include textTemplate(16px, $fontWeightBold, 24px);
+  }
+}

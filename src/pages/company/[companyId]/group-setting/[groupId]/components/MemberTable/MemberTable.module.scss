@@ -3,9 +3,6 @@
 @use '/src/styles/defaults.scss' as *;
 @use '/src/styles/mixins.scss' as *;
 
-.container {
-  padding-top: 16px;
-}
 .tableContainer {
   word-break: break-word;
   width: 100%;
@@ -24,16 +21,17 @@
     }
   }
 
-  .bodyCellBorder {
-    border-top: 1px solid $neutralGray4;
-  }
-
   .bodyRow {
-    .bodyCell {
-      padding: 12px;
-      vertical-align: top;
+    .bodyCellBorder {
+      border-top: 1px solid $neutralGray3;
 
-      .columnContainer {
+      &.firstChildCell {
+        border-top: 0px;
+      }
+    }
+    .bodyCell {
+      padding: 10px;
+      .emailContainer {
         @include flexAlign(flex-start, space-between);
         flex-wrap: nowrap;
         gap: 12px;
@@ -45,23 +43,13 @@
       }
     }
   }
-
   .emptyCell {
-    padding: 40px 0;
     text-align: center;
-  }
-
-  .bodyRowDeleteAction {
-    .bodyDeleteCell {
-      text-align: right;
-
-      .iconDelete {
-        padding: 12px;
-      }
-    }
+    padding: 40px 0;
   }
 
   .bodyRowAddNewMembers {
+    border-top: 1px solid $neutralGray3;
     padding: 10px;
 
     .iconPlus {
@@ -78,6 +66,10 @@
       }
     }
   }
+}
+
+.iconDelete {
+  float: right;
 }
 
 .iconArrow {
