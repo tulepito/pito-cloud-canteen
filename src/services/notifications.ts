@@ -341,7 +341,7 @@ export const createFirebaseDocNotification = async (
         data = {
           ...data,
           partnerName,
-          relatedLink: partnerPaths.AccountSettings,
+          relatedLink: partnerPaths.AccountSettingsDetail,
         };
 
         break;
