@@ -213,3 +213,9 @@ export const adminNotifyUserPickingOrderChangesApi = (
   orderId: string,
   params: TObject,
 ) => postApi(`/orders/${orderId}/notify-user-picking-order-changes`, params);
+
+export const createAutoPickFoodSchedulerApi = (orderId: string) =>
+  putApi(`/orders/${orderId}/create-auto-pick-food-scheduler`);
+
+export const removeAutoPickFoodSchedulerApi = (orderId: string) =>
+  putApi(`/orders/${orderId}/remove-auto-pick-food-scheduler`);

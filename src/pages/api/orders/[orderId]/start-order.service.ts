@@ -19,6 +19,7 @@ export const startOrder = async (orderId: string, planId: string) => {
   );
   const {
     companyId,
+    bookerId,
     orderState,
     orderStateHistory = [],
     partnerIds = [],
@@ -31,6 +32,9 @@ export const startOrder = async (orderId: string, planId: string) => {
       'You can start picking order (with orderState is "picking") only',
     );
   }
+  const booker = await fetchUser(bookerId);
+  const bookerUser = User(booker);
+  const { isAutoPickFood } = bookerUser.getPublicData();
 
   const updateOrderStateHistory = orderStateHistory.concat([
     {
@@ -50,6 +54,7 @@ export const startOrder = async (orderId: string, planId: string) => {
       orderState: EOrderStates.inProgress,
       orderStateHistory: updateOrderStateHistory,
       orderVATPercentage: systemVATPercentage,
+      isAutoPickFood,
       ...(orderHasSpecificPCCFee === undefined &&
         orderSpecificPCCFee === undefined && {
           hasSpecificPCCFee,

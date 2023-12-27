@@ -65,6 +65,7 @@ export const addFirebaseDocument = async ({
     txStatus: 'pending',
     deliveryHour,
     createdAt: new Date(),
+    foodId,
   };
 
   if (status !== EParticipantOrderStatus.notJoined && foodId) {
