@@ -24,11 +24,18 @@ const NotificationItemInfo: React.FC<NotificationItemInfoProps> = (props) => {
     subOrderDate = 0,
     foodName,
     subOrderName: subOrderNameFromData,
+    startDate,
+    endDate,
+    partnerName,
   } = notificationItem;
   const { seconds } = createdAt;
   const formattedDate = formatTimestamp(date || subOrderDate);
   const subOrderName =
     subOrderNameFromData || `${companyName}_${formattedDate}`;
+  const orderDates = `${formatTimestamp(
+    startDate,
+    'dd/MM',
+  )} - ${formatTimestamp(endDate, 'dd/MM')}`;
 
   const pastTime = calcPastTime(seconds * 1000);
 
@@ -247,6 +254,198 @@ const NotificationItemInfo: React.FC<NotificationItemInfoProps> = (props) => {
             {intl.formatMessage(
               {
                 id: 'NotificationItemInfo.title.subOrderReviewedByBooker',
+              },
+              {
+                span: (msg: any) => <span className={css.boldText}>{msg}</span>,
+                subOrderName,
+              },
+            )}
+          </div>
+          <div className={css.pastTime}>{pastTime}</div>
+        </div>
+      );
+    case ENotificationType.BOOKER_NEW_ORDER_CREATED:
+      return (
+        <div className={css.contentWrapper}>
+          <div className={css.content}>
+            {intl.formatMessage(
+              {
+                id: 'NotificationItemInfo.title.bookerNewOrderCreated',
+              },
+              {
+                span: (msg: any) => <span className={css.boldText}>{msg}</span>,
+                orderDates,
+              },
+            )}
+          </div>
+          <div className={css.pastTime}>{pastTime}</div>
+        </div>
+      );
+    case ENotificationType.BOOKER_SUB_ORDER_COMPLETED:
+      return (
+        <div className={css.contentWrapper}>
+          <div className={css.content}>
+            {intl.formatMessage(
+              {
+                id: 'NotificationItemInfo.title.bookerSubOrderCompleted',
+              },
+              {
+                span: (msg: any) => <span className={css.boldText}>{msg}</span>,
+                subOrderDate: formattedDate,
+              },
+            )}
+          </div>
+          <div className={css.pastTime}>{pastTime}</div>
+        </div>
+      );
+    case ENotificationType.BOOKER_SUB_ORDER_CANCELLED:
+      return (
+        <div className={css.contentWrapper}>
+          <div className={css.content}>
+            {intl.formatMessage(
+              {
+                id: 'NotificationItemInfo.title.bookerSubOrderCancelled',
+              },
+              {
+                span: (msg: any) => <span className={css.boldText}>{msg}</span>,
+                subOrderDate: formattedDate,
+              },
+            )}
+          </div>
+          <div className={css.pastTime}>{pastTime}</div>
+        </div>
+      );
+    case ENotificationType.BOOKER_ORDER_CHANGED:
+      return (
+        <div className={css.contentWrapper}>
+          <div className={css.content}>
+            {intl.formatMessage(
+              {
+                id: 'NotificationItemInfo.title.bookerOrderChanged',
+              },
+              {
+                span: (msg: any) => <span className={css.boldText}>{msg}</span>,
+                orderDates,
+              },
+            )}
+          </div>
+          <div className={css.pastTime}>{pastTime}</div>
+        </div>
+      );
+    case ENotificationType.BOOKER_RATE_ORDER:
+      return (
+        <div className={css.contentWrapper}>
+          <div className={css.content}>
+            {intl.formatMessage(
+              {
+                id: 'NotificationItemInfo.title.bookerRateOrder',
+              },
+              {
+                span: (msg: any) => <span className={css.boldText}>{msg}</span>,
+                orderDates,
+              },
+            )}
+          </div>
+          <div className={css.pastTime}>{pastTime}</div>
+        </div>
+      );
+    case ENotificationType.BOOKER_PICKING_ORDER:
+      return (
+        <div className={css.contentWrapper}>
+          <div className={css.content}>
+            {intl.formatMessage(
+              {
+                id: 'NotificationItemInfo.title.bookerPickingOrder',
+              },
+              {
+                span: (msg: any) => <span className={css.boldText}>{msg}</span>,
+                orderDates,
+              },
+            )}
+          </div>
+          <div className={css.pastTime}>{pastTime}</div>
+        </div>
+      );
+
+    case ENotificationType.PARTNER_FOOD_ACCEPTED_BY_ADMIN:
+      return (
+        <div className={css.contentWrapper}>
+          <div className={css.content}>
+            {intl.formatMessage(
+              {
+                id: 'NotificationItemInfo.title.partnerFoodAcceptedByAdmin',
+              },
+              {
+                span: (msg: any) => <span className={css.boldText}>{msg}</span>,
+                foodName,
+              },
+            )}
+          </div>
+          <div className={css.pastTime}>{pastTime}</div>
+        </div>
+      );
+
+    case ENotificationType.PARTNER_FOOD_REJECTED_BY_ADMIN:
+      return (
+        <div className={css.contentWrapper}>
+          <div className={css.content}>
+            {intl.formatMessage(
+              {
+                id: 'NotificationItemInfo.title.partnerFoodRejectedByAdmin',
+              },
+              {
+                span: (msg: any) => <span className={css.boldText}>{msg}</span>,
+                foodName,
+              },
+            )}
+          </div>
+          <div className={css.pastTime}>{pastTime}</div>
+        </div>
+      );
+
+    case ENotificationType.PARTNER_PROFILE_UPDATED_BY_ADMIN:
+      return (
+        <div className={css.contentWrapper}>
+          <div className={css.content}>
+            {intl.formatMessage(
+              {
+                id: 'NotificationItemInfo.title.partnerProfileUpdatedByAdmin',
+              },
+              {
+                span: (msg: any) => <span className={css.boldText}>{msg}</span>,
+                partnerName,
+              },
+            )}
+          </div>
+          <div className={css.pastTime}>{pastTime}</div>
+        </div>
+      );
+
+    case ENotificationType.PARTNER_SUB_ORDER_CHANGED:
+      return (
+        <div className={css.contentWrapper}>
+          <div className={css.content}>
+            {intl.formatMessage(
+              {
+                id: 'NotificationItemInfo.title.partnerSubOrderChanged',
+              },
+              {
+                span: (msg: any) => <span className={css.boldText}>{msg}</span>,
+                subOrderName: subOrderNameFromData,
+              },
+            )}
+          </div>
+          <div className={css.pastTime}>{pastTime}</div>
+        </div>
+      );
+
+    case ENotificationType.SUB_ORDER_REVIEWED_BY_PARTICIPANT:
+      return (
+        <div className={css.contentWrapper}>
+          <div className={css.content}>
+            {intl.formatMessage(
+              {
+                id: 'NotificationItemInfo.title.subOrderReviewedByParticipant',
               },
               {
                 span: (msg: any) => <span className={css.boldText}>{msg}</span>,

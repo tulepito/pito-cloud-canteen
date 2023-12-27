@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 
 import Avatar from '@components/Avatar/Avatar';
+import BookerNotificationModal from '@components/BookerNotificationModal/BookerNotificationModal';
 import { InlineTextButton } from '@components/Button/Button';
 import HamburgerMenuButton from '@components/HamburgerMenuButton/HamburgerMenuButton';
 import IconBell from '@components/Icons/IconBell/IconBell';
@@ -14,6 +15,7 @@ import IconClose from '@components/Icons/IconClose/IconClose';
 import IconLogout from '@components/Icons/IconLogout/IconLogout';
 import IconPhone from '@components/Icons/IconPhone/IconPhone';
 import PitoLogo from '@components/PitoLogo/PitoLogo';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { useLogout } from '@hooks/useLogout';
@@ -53,6 +55,16 @@ const CompanyHeaderMobile: React.FC<CompanyHeaderMobileProps> = (props) => {
   const currentUser = useAppSelector(currentUserSelector);
   const dispatch = useAppDispatch();
   const handleLogoutFn = useLogout();
+  const bookerNotificationModalController = useBoolean();
+  const notifications = useAppSelector(
+    (state) => state.BookerCompanies.notifications,
+  );
+
+  const newNotificationIds = notifications.reduce(
+    (ids, noti) => (!noti?.seen ? ids.concat(noti?.id) : ids),
+    [],
+  );
+  const newNotificationIdsCount = newNotificationIds.length;
 
   const currentUserGetter = CurrentUser(currentUser);
   const { lastName = '', firstName = '' } = currentUserGetter.getProfile();
@@ -94,7 +106,17 @@ const CompanyHeaderMobile: React.FC<CompanyHeaderMobileProps> = (props) => {
 
   const renderRightIcon = () => {
     if (isMobileLayout) {
-      return <IconBell className={css.iconBell} />;
+      return (
+        <div className={css.notifications}>
+          <IconBell
+            className={css.iconBell}
+            onClick={bookerNotificationModalController.setTrue}
+          />
+          <RenderWhen condition={newNotificationIdsCount > 0}>
+            <div className={css.notiDot}>{newNotificationIdsCount}</div>
+          </RenderWhen>
+        </div>
+      );
     }
 
     return !isOpen ? (
@@ -173,6 +195,11 @@ const CompanyHeaderMobile: React.FC<CompanyHeaderMobileProps> = (props) => {
           </div>
         </div>
       )}
+
+      <BookerNotificationModal
+        isOpen={bookerNotificationModalController.value}
+        onClose={bookerNotificationModalController.setFalse}
+      />
     </div>
   );
 };

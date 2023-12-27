@@ -10,8 +10,23 @@
   background-color: $neutralGray3;
   overflow: hidden;
   min-width: 24px;
+
+  &:has(.iconStar) {
+    background-color: transparent;
+  }
 }
 
 .editIcon {
   @include size(18px, 18px);
+}
+
+.iconSharing {
+  path {
+    fill: $neutralGray7;
+  }
+}
+
+.iconStar {
+  width: 24px;
+  height: 24px;
 }

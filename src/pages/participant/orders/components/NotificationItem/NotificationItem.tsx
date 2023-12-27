@@ -2,8 +2,10 @@ import { useRouter } from 'next/router';
 
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useAppDispatch } from '@hooks/reduxHooks';
-
-import { OrderListActions, OrderListThunks } from '../../OrderList.slice';
+import {
+  NotificationActions,
+  NotificationThunks,
+} from '@redux/slices/notification.slice';
 
 import NotificationItemIcon from './NotificationItemIcon';
 import NotificationItemInfo from './NotificationItemInfo';
@@ -20,8 +22,8 @@ const NotificationItem: React.FC<NotificationItemProps> = (props) => {
   const dispatch = useAppDispatch();
   const { notificationType, id, seen, relatedLink, ...rest } = notificationItem;
   const handleNotificationItemClick = () => {
-    dispatch(OrderListThunks.updateSeenNotificationStatusToFirebase(id));
-    dispatch(OrderListActions.seenNotification(id));
+    dispatch(NotificationThunks.markNotificationsSeen([id]));
+    dispatch(NotificationActions.markNotificationsSeen([id]));
     if (relatedLink) {
       router.push(relatedLink);
     }

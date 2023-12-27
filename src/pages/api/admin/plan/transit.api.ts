@@ -95,6 +95,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           plans = [],
           quotationId,
           companyId,
+          bookerId,
         } = orderListing.getMetadata();
         const { title: orderTitle } = orderListing.getAttributes();
         const generalNotificationData = {
@@ -196,6 +197,15 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
                 planId,
               },
             });
+
+            createFirebaseDocNotification(
+              ENotificationType.BOOKER_SUB_ORDER_COMPLETED,
+              {
+                userId: bookerId,
+                orderId,
+                subOrderDate: startTimestamp,
+              },
+            );
             await transitionOrderStatus(order, plan, integrationSdk);
             break;
           }
@@ -297,6 +307,15 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
               client: newClient,
               partner: newPartner,
             });
+            console.log('run here');
+            createFirebaseDocNotification(
+              ENotificationType.BOOKER_SUB_ORDER_CANCELLED,
+              {
+                userId: bookerId,
+                orderId,
+                subOrderDate: startTimestamp,
+              },
+            );
             // TODO: update all payments records
             await Promise.all([
               modifyPaymentWhenCancelSubOrderService({

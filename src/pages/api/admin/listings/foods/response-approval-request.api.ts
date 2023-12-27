@@ -3,10 +3,16 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { HttpMethod } from '@apis/configs';
 import { pushNativeNotificationFood } from '@pages/api/helpers/pushNotificationOrderDetailHelper';
 import cookies from '@services/cookie';
+import { fetchListing } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
+import { createFirebaseDocNotification } from '@services/notifications';
 import adminChecker from '@services/permissionChecker/admin';
 import { handleError } from '@services/sdk';
-import { EFoodApprovalState, ENativeNotificationType } from '@src/utils/enums';
+import {
+  EFoodApprovalState,
+  ENativeNotificationType,
+  ENotificationType,
+} from '@src/utils/enums';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
@@ -34,6 +40,21 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
                 : ENativeNotificationType.AdminTransitFoodStateToReject,
             );
           }
+
+          const notificationType =
+            response === EFoodApprovalState.ACCEPTED
+              ? ENotificationType.PARTNER_FOOD_ACCEPTED_BY_ADMIN
+              : ENotificationType.PARTNER_FOOD_REJECTED_BY_ADMIN;
+
+          const food = await fetchListing(foodId, ['author']);
+          const authorId = food.author.id.uuid;
+          const foodName = food.attributes.title;
+
+          createFirebaseDocNotification(notificationType, {
+            userId: authorId,
+            foodName,
+            foodId,
+          });
           res.json({ success: true });
         }
         break;

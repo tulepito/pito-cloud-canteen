@@ -14,7 +14,7 @@ type NotificationModalProps = {
 
 export const NotificationList = () => {
   const notifications = useAppSelector(
-    (state) => state.ParticipantOrderList.participantFirebaseNotifications,
+    (state) => state.Notification.notifications,
     shallowEqual,
   );
 
@@ -33,7 +33,7 @@ const NotificationModal: React.FC<NotificationModalProps> = (props) => {
   const { isOpen, onClose } = props;
 
   const notifications = useAppSelector(
-    (state) => state.ParticipantOrderList.participantFirebaseNotifications,
+    (state) => state.Notification.notifications,
     shallowEqual,
   );
 

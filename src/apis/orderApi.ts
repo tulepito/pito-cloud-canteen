@@ -219,3 +219,19 @@ export const createAutoPickFoodSchedulerApi = (orderId: string) =>
 
 export const removeAutoPickFoodSchedulerApi = (orderId: string) =>
   putApi(`/orders/${orderId}/remove-auto-pick-food-scheduler`);
+
+export const sendOrderChangeFirebaseNotificationToBokerApi = (
+  orderId: string,
+) =>
+  postApi(
+    `/orders/${orderId}/send-order-change-firebase-notification-to-booker`,
+  );
+
+export const sendOrderChangeFirebaseNotificationToPartnerApi = (
+  orderId: string,
+  params: TObject,
+) =>
+  postApi(
+    `/orders/${orderId}/send-order-change-firebase-notification-to-partner`,
+    params,
+  );

@@ -5,10 +5,11 @@ import { composeApiCheckers, HttpMethod } from '@apis/configs';
 import { denormalisedResponseEntities } from '@services/data';
 import { emailSendingFactory, EmailTemplateTypes } from '@services/email';
 import { getIntegrationSdk } from '@services/integrationSdk';
+import { createFirebaseDocNotification } from '@services/notifications';
 import adminChecker from '@services/permissionChecker/admin';
 import { handleError } from '@services/sdk';
 import { Listing } from '@utils/data';
-import { EOrderDraftStates } from '@utils/enums';
+import { ENotificationType, EOrderDraftStates } from '@utils/enums';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
@@ -24,8 +25,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
               id: orderId,
             }),
           );
-          const { orderState, orderStateHistory = [] } =
-            Listing(orderListing).getMetadata();
+          const {
+            orderState,
+            orderStateHistory = [],
+            bookerId,
+            startDate,
+            endDate,
+          } = Listing(orderListing).getMetadata();
 
           if (orderState !== EOrderDraftStates.draft) {
             throw new Error(
@@ -65,6 +71,16 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           await emailSendingFactory(
             EmailTemplateTypes.BOOKER.BOOKER_ORDER_CREATED,
             { orderId },
+          );
+
+          createFirebaseDocNotification(
+            ENotificationType.BOOKER_NEW_ORDER_CREATED,
+            {
+              userId: bookerId,
+              orderId,
+              startDate,
+              endDate,
+            },
           );
 
           res.status(200).json(updatedOrderListing);

@@ -851,7 +851,17 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
         },
       }),
     );
-
+    dispatch(
+      orderAsyncActions.sendOrderChangeFirebaseNotificationToBooker(orderId),
+    );
+    dispatch(
+      orderAsyncActions.sendOrderChangeFirebaseNotificationToPartner({
+        orderId,
+        params: {
+          firebaseChangeHistory: notificationData.firebaseChangeHistory,
+        },
+      }),
+    );
     handleEditFlowSubmit();
     confirmNotifyUserModalControl.setFalse();
     setUserRolesToNotify([]);
@@ -985,6 +995,17 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
         );
       }
     });
+    dispatch(
+      orderAsyncActions.sendOrderChangeFirebaseNotificationToBooker(orderId),
+    );
+    dispatch(
+      orderAsyncActions.sendOrderChangeFirebaseNotificationToPartner({
+        orderId,
+        params: {
+          firebaseChangeHistory: notificationData.firebaseChangeHistory,
+        },
+      }),
+    );
     editConfirmModalController.setFalse();
   };
 

@@ -15,7 +15,6 @@ import ProfileMenuContent from '@components/ProfileMenuContent/ProfileMenuConten
 import ProfileMenuItem from '@components/ProfileMenuItem/ProfileMenuItem';
 import ProfileMenuLabel from '@components/ProfileMenuLabel/ProfileMenuLabel';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
-import Tooltip from '@components/Tooltip/Tooltip';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { useLogout } from '@hooks/useLogout';
@@ -44,7 +43,7 @@ const PartnerHeader: React.FC<TPartnerHeaderProps> = () => {
   );
   const router = useRouter();
   const handleLogoutFn = useLogout();
-  const tooltipController = useBoolean();
+  const partnerNotificationModalController = useBoolean();
   const { isMobileLayout } = useViewport();
 
   const currentUserGetter = CurrentUser(currentUser);
@@ -63,12 +62,11 @@ const PartnerHeader: React.FC<TPartnerHeaderProps> = () => {
     router.push('/');
   };
 
-  const handleCloseTooltip = () => {
-    tooltipController.setFalse();
-  };
-
   useEffect(() => {
-    if (tooltipController.value && newNotificationIds.length > 0) {
+    if (
+      partnerNotificationModalController.value &&
+      newNotificationIds.length > 0
+    ) {
       dispatch(
         NotificationThunks.markAllNotificationsAreOld(newNotificationIds),
       );
@@ -77,7 +75,7 @@ const PartnerHeader: React.FC<TPartnerHeaderProps> = () => {
       );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tooltipController.value]);
+  }, [partnerNotificationModalController.value]);
 
   return (
     <div className={css.root}>
@@ -95,30 +93,26 @@ const PartnerHeader: React.FC<TPartnerHeaderProps> = () => {
       </NamedLink>
       <div className={css.headerLeft}>
         <div className={css.actionContainer}>
-          <Tooltip
-            overlayClassName={classNames(css.tooltipOverlay)}
-            placement="bottom"
-            showArrow={false}
-            trigger={'click'}
-            visible={tooltipController.value}
-            popupVisible={tooltipController.value}
-            tooltipContent={
-              <OutsideClickHandler onOutsideClick={handleCloseTooltip}>
-                <PartnerNotificationModal
-                  handleCloseTooltip={handleCloseTooltip}
-                />
-              </OutsideClickHandler>
-            }>
-            <InlineTextButton
-              type="button"
-              className={css.notiIcon}
-              onClick={() => tooltipController.setTrue()}>
-              <IconBell className={css.iconBell} />
-              <RenderWhen condition={newNotificationIdsCount > 0}>
-                <div className={css.notiDot}>{newNotificationIdsCount}</div>
-              </RenderWhen>
-            </InlineTextButton>
-          </Tooltip>
+          <InlineTextButton
+            type="button"
+            className={css.notiIcon}
+            onClick={() => partnerNotificationModalController.setTrue()}>
+            <IconBell className={css.iconBell} />
+            <RenderWhen condition={newNotificationIdsCount > 0}>
+              <div className={css.notiDot}>{newNotificationIdsCount}</div>
+            </RenderWhen>
+          </InlineTextButton>
+          <OutsideClickHandler
+            onOutsideClick={partnerNotificationModalController.setFalse}>
+            <PartnerNotificationModal
+              handleClose={partnerNotificationModalController.setFalse}
+              isOpen={partnerNotificationModalController.value}
+              desktopClassName={classNames(
+                css.notificationModal,
+                partnerNotificationModalController.value && css.isOpen,
+              )}
+            />
+          </OutsideClickHandler>
         </div>
         <div className={css.line}></div>
 

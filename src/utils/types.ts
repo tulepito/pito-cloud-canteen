@@ -729,3 +729,18 @@ export type TChartPoint = {
   dataLabel: string;
   [dataKey: string]: any;
 };
+
+export type TFBNotification = {
+  bookerName: string;
+  companyName: string;
+  orderTitle: string;
+  subOrderDate: number;
+  foodName: string;
+  companyId: string;
+  orderId: string;
+  planId: string;
+  seen: boolean;
+  startDate: number;
+  endDate: number;
+  id: string;
+};

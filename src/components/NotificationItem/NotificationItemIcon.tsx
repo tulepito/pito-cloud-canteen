@@ -3,6 +3,8 @@ import IconClock from '@components/Icons/IconClock/IconClock';
 import IconEdit from '@components/Icons/IconEdit/IconEdit';
 import IconFood from '@components/Icons/IconFood/IconFood';
 import IconRatingStar from '@components/Icons/IconRatingStar/IconRatingStar';
+import IconSharing from '@components/Icons/IconSharing/IconSharing';
+import IconStar from '@components/Icons/IconStar/IconStar';
 import IconTickWithBackground from '@components/Icons/IconTickWithBackground/IconTickWithBackground';
 import IconTruck from '@components/Icons/IconTruck/IconTruck';
 import IconUser from '@components/Icons/IconUser/IconUser';
@@ -26,10 +28,12 @@ const NotificationItemIcon: React.FC<NotificationItemIconProps> = (props) => {
       break;
     case ENotificationType.SUB_ORDER_DELIVERED:
     case ENotificationType.ORDER_SUCCESS:
+    case ENotificationType.BOOKER_SUB_ORDER_COMPLETED:
       icon = <IconTickWithBackground />;
       break;
     case ENotificationType.SUB_ORDER_CANCELED:
     case ENotificationType.ORDER_CANCEL:
+    case ENotificationType.BOOKER_SUB_ORDER_CANCELLED:
       icon = <IconCancel />;
       break;
     case ENotificationType.SUB_ORDER_DELIVERING:
@@ -38,17 +42,31 @@ const NotificationItemIcon: React.FC<NotificationItemIconProps> = (props) => {
       break;
     case ENotificationType.ORDER_PICKING:
     case ENotificationType.SUB_ORDER_INPROGRESS:
+    case ENotificationType.BOOKER_NEW_ORDER_CREATED:
       icon = <IconClock variant="withBackground" />;
       break;
     case ENotificationType.ORDER_RATING:
+    case ENotificationType.BOOKER_RATE_ORDER:
       icon = <IconRatingStar />;
       break;
     case ENotificationType.PARTNER_FOOD_CREATED_BY_ADMIN:
+    case ENotificationType.PARTNER_FOOD_ACCEPTED_BY_ADMIN:
+    case ENotificationType.PARTNER_FOOD_REJECTED_BY_ADMIN:
       icon = <IconFood />;
       break;
     case ENotificationType.PARTNER_PROFILE_UPDATED_BY_ADMIN:
     case ENotificationType.SUB_ORDER_UPDATED:
+    case ENotificationType.BOOKER_ORDER_CHANGED:
+    case ENotificationType.PARTNER_SUB_ORDER_CHANGED:
       icon = <IconEdit className={css.editIcon} />;
+      break;
+
+    case ENotificationType.BOOKER_PICKING_ORDER:
+      icon = <IconSharing className={css.iconSharing} />;
+      break;
+    case ENotificationType.SUB_ORDER_REVIEWED_BY_PARTICIPANT:
+    case ENotificationType.SUB_ORDER_REVIEWED_BY_BOOKER:
+      icon = <IconStar className={css.iconStar} />;
       break;
 
     default:

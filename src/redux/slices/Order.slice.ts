@@ -28,6 +28,8 @@ import {
   queryOrdersApi,
   recommendRestaurantApi,
   reorderApi,
+  sendOrderChangeFirebaseNotificationToBokerApi,
+  sendOrderChangeFirebaseNotificationToPartnerApi,
   updateOrderApi,
   updateOrderStateToDraftApi,
   updatePlanDetailsApi,
@@ -347,6 +349,11 @@ const HANDLE_SEND_EDIT_INPROGRESS_ORDER_DETAIL_NOTIFICATION_TO_PARTNER =
   'app/Order/HANDLE_SEND_EDIT_INPROGRESS_ORDER_DETAIL_NOTIFICATION_TO_PARTNER';
 const HANDLE_DELETE_OLD_DATA_AFTER_EDIT_IN_PROGRESS_ORDER =
   'app/Order/HANDLE_DELETE_OLD_DATA_AFTER_EDIT_IN_PROGRESS_ORDER';
+
+const SEND_ORDER_CHANGE_FIREBASE_NOTIFICATION_TO_BOOKER =
+  'app/Order/SEND_ORDER_CHANGE_FIREBASE_NOTIFICATION_TO_BOOKER';
+const SEND_ORDER_CHANGE_FIREBASE_NOTIFICATION_TO_PARTNER =
+  'app/Order/SEND_ORDER_CHANGE_FIREBASE_NOTIFICATION_TO_PARTNER';
 
 const createOrder = createAsyncThunk(
   CREATE_ORDER,
@@ -1200,6 +1207,26 @@ const handleDeleteOldDataAfterEditInProgressOrder = createAsyncThunk(
   },
 );
 
+const sendOrderChangeFirebaseNotificationToBooker = createAsyncThunk(
+  SEND_ORDER_CHANGE_FIREBASE_NOTIFICATION_TO_BOOKER,
+  async (orderId: string) => {
+    await sendOrderChangeFirebaseNotificationToBokerApi(orderId);
+  },
+  {
+    serializeError: storableAxiosError,
+  },
+);
+
+const sendOrderChangeFirebaseNotificationToPartner = createAsyncThunk(
+  SEND_ORDER_CHANGE_FIREBASE_NOTIFICATION_TO_PARTNER,
+  async ({ orderId, params }: TObject) => {
+    await sendOrderChangeFirebaseNotificationToPartnerApi(orderId, params);
+  },
+  {
+    serializeError: storableAxiosError,
+  },
+);
+
 export const orderAsyncActions = {
   createOrder,
   updateOrder,
@@ -1231,6 +1258,8 @@ export const orderAsyncActions = {
   handleDeleteOldDataAfterEditInProgressOrder,
   fetchMenuListingsByIds,
   handleSendEditInProgressOrderDetailNotificationToPartner,
+  sendOrderChangeFirebaseNotificationToBooker,
+  sendOrderChangeFirebaseNotificationToPartner,
 };
 
 const orderSlice = createSlice({

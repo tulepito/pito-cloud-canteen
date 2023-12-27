@@ -1,3 +1,5 @@
+import { companyPaths, partnerPaths } from '@src/paths';
+import { getDayOfWeek } from '@src/utils/dates';
 import { ENotificationType } from '@src/utils/enums';
 import type { TObject } from '@src/utils/types';
 
@@ -25,6 +27,8 @@ type NotificationParams = {
   orderId: string;
   planId: string;
   seen: boolean;
+  startDate: number;
+  endDate: number;
 };
 
 export type NotificationInvitationParams = TObject &
@@ -215,6 +219,147 @@ export const createFirebaseDocNotification = async (
           orderId,
           companyName,
           relatedLink: `/partner/orders/${orderId}_${subOrderDate}`,
+        };
+
+        break;
+      }
+
+      case ENotificationType.BOOKER_NEW_ORDER_CREATED: {
+        const { orderId, startDate, endDate } = notificationParams;
+        data = {
+          ...data,
+          orderId,
+          startDate,
+          endDate,
+          relatedLink: `/company/booker/orders/draft/${orderId}`,
+        };
+
+        break;
+      }
+
+      case ENotificationType.BOOKER_ORDER_CHANGED: {
+        const { orderId, startDate, endDate } = notificationParams;
+        data = {
+          ...data,
+          orderId,
+          startDate,
+          endDate,
+          relatedLink: companyPaths.ManageOrderPicking.replace(
+            '[orderId]',
+            orderId!,
+          ),
+        };
+
+        break;
+      }
+
+      case ENotificationType.BOOKER_RATE_ORDER: {
+        const { orderId, startDate, endDate } = notificationParams;
+        data = {
+          ...data,
+          orderId,
+          startDate,
+          endDate,
+          relatedLink: companyPaths.OrderRating.replace('[orderId]', orderId!),
+        };
+
+        break;
+      }
+
+      case ENotificationType.BOOKER_SUB_ORDER_COMPLETED: {
+        const { orderId, subOrderDate } = notificationParams;
+        data = {
+          ...data,
+          orderId,
+          subOrderDate,
+          relatedLink: companyPaths.ManageOrderDetail.replace(
+            '[orderId]',
+            orderId!,
+          ),
+        };
+
+        break;
+      }
+
+      case ENotificationType.BOOKER_SUB_ORDER_CANCELLED: {
+        const { orderId, subOrderDate } = notificationParams;
+        data = {
+          ...data,
+          orderId,
+          subOrderDate,
+          relatedLink: companyPaths.ManageOrderDetail.replace(
+            '[orderId]',
+            orderId!,
+          ),
+        };
+
+        break;
+      }
+
+      case ENotificationType.BOOKER_PICKING_ORDER: {
+        const { orderId, startDate, endDate } = notificationParams;
+        data = {
+          ...data,
+          orderId,
+          startDate,
+          endDate,
+          relatedLink: companyPaths.ManageOrderPicking.replace(
+            '[orderId]',
+            orderId!,
+          ),
+        };
+
+        break;
+      }
+
+      case ENotificationType.PARTNER_FOOD_ACCEPTED_BY_ADMIN: {
+        const { foodName, foodId } = notificationParams;
+        data = {
+          ...data,
+          foodName,
+          foodId,
+          relatedLink: partnerPaths.ManageFood,
+        };
+
+        break;
+      }
+
+      case ENotificationType.PARTNER_FOOD_REJECTED_BY_ADMIN: {
+        const { foodName, foodId } = notificationParams;
+        data = {
+          ...data,
+          foodName,
+          foodId,
+          relatedLink: partnerPaths.ManageFood,
+        };
+
+        break;
+      }
+
+      case ENotificationType.PARTNER_PROFILE_UPDATED_BY_ADMIN: {
+        const { partnerName } = notificationParams;
+        data = {
+          ...data,
+          partnerName,
+          relatedLink: partnerPaths.AccountSettingsDetail,
+        };
+
+        break;
+      }
+
+      case ENotificationType.PARTNER_SUB_ORDER_CHANGED: {
+        const { orderId, subOrderDate, companyName, orderTitle } =
+          notificationParams;
+        data = {
+          ...data,
+          orderId,
+          subOrderDate,
+          companyName,
+          subOrderName: `${orderTitle}-${getDayOfWeek(subOrderDate!)}`,
+          relatedLink: partnerPaths.SubOrderDetail.replace(
+            '[subOrderId]',
+            `${orderId}_${subOrderDate}`,
+          ),
         };
 
         break;

@@ -86,3 +86,24 @@
     }
   }
 }
+
+.notifications {
+  position: relative;
+
+  .notiDot {
+    position: absolute;
+    top: -6px;
+    left: 50%;
+    @include flexCenter;
+
+    min-width: 16px;
+    color: $neutralGray1;
+    padding: 1px 2px;
+    height: 16px;
+    border-radius: 8px;
+    background-color: $primaryPri2;
+    border: 1px solid $neutralGray1;
+
+    @include textTemplate(10px, 400, 1);
+  }
+}
