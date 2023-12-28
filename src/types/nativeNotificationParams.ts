@@ -6,4 +6,5 @@ export type TNativeNotificationPartnerParams = {
   foodName?: string;
   foodId?: string;
   subOrderDate?: string;
+  partnerName?: string;
 };
