@@ -419,6 +419,16 @@ export enum ENativeNotificationType {
   PartnerSubOrderNegativeRating = 'PartnerSubOrderNegativeRating',
 }
 
+export enum EBookerNativeNotificationType {
+  AdminCreateNewOrder = 'AdminCreateNewOrder',
+  AdminStartOrder = 'AdminStartOrder',
+  RemindBeforeDeadline = 'RemindBeforeDeadline',
+  SubOrderCancelled = 'SubOrderCancelled',
+  SubOrderDelivered = 'SubOrderDelivered',
+  SubOrderDelivering = 'SubOrderDelivering',
+  OrderIsPendingPayment = 'OrderIsPendingPayment',
+}
+
 export enum EFoodApprovalState {
   PENDING = 'pending',
   ACCEPTED = 'accepted',

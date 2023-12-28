@@ -83,6 +83,29 @@ const sendNativeNotification = async (notificationType, notificationParams) => {
       }
       break;
 
+    case NATIVE_NOTIFICATION_TYPES.AdminStartOrder:
+      {
+        const { order } = notificationParams;
+        const orderListing = Listing(order);
+        const orderId = orderListing.getId();
+        const { startDate, endDate } = orderListing.getMetadata();
+
+        const url = `${BASE_URL}/company/orders/${orderId}`;
+
+        oneSignalUserIds.forEach((oneSignalUserId) => {
+          sendNotification({
+            title: `Tuần ăn đã đặt 🌟`,
+            content: `Tuần ăn ${formatTimestamp(
+              startDate,
+              'dd/MM',
+            )} -${formatTimestamp(endDate, 'dd/MM')} đã được đặt thành công.`,
+            url,
+            oneSignalUserId,
+          });
+        });
+      }
+      break;
+
     default:
       break;
   }

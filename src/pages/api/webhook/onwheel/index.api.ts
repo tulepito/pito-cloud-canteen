@@ -11,11 +11,13 @@ import {
   fetchListing,
   fetchUser,
 } from '@services/integrationHelper';
+import { createNativeNotificationToBooker } from '@services/nativeNotification';
 import { createFirebaseDocNotification } from '@services/notifications';
 import { getIntegrationSdk, handleError } from '@services/sdk';
 import { Listing, User } from '@src/utils/data';
 import { VNTimezone } from '@src/utils/dates';
 import {
+  EBookerNativeNotificationType,
   EListingType,
   ENotificationType,
   EOnWheelOrderStatus,
@@ -38,8 +40,9 @@ const fetchData = async (orderTitle: string) => {
     meta_listingType: EListingType.order,
   });
 
-  const { plans = [], companyId } = Listing(order).getMetadata();
+  const { plans = [], companyId, bookerId } = Listing(order).getMetadata();
   const company = await fetchUser(companyId);
+  const booker = await fetchUser(bookerId);
   const companyUser = User(company);
   const {
     companyLocation: { address: deliveryAddress },
@@ -51,6 +54,7 @@ const fetchData = async (orderTitle: string) => {
     order,
     plan,
     deliveryAddress,
+    booker,
   };
 };
 
@@ -132,9 +136,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
                 const [orderTitle, subOrderWeekDay] =
                   trackingNumber.split(/[_-]/);
-                const { order, plan, deliveryAddress } = await fetchData(
-                  orderTitle,
-                );
+                const { order, plan, deliveryAddress, booker } =
+                  await fetchData(orderTitle);
 
                 if (address !== deliveryAddress) return;
 
@@ -202,6 +205,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
                       );
                     },
                   );
+                  createNativeNotificationToBooker(
+                    EBookerNativeNotificationType.SubOrderDelivering,
+                    {
+                      booker,
+                      order,
+                      subOrderDate,
+                    },
+                  );
                 }
                 if (transition === ETransition.COMPLETE_DELIVERY) {
                   [participantIds, anonymous].map(
@@ -221,6 +232,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
                       userId: bookerId,
                       orderId,
                       subOrderDate: Number(subOrderDate),
+                    },
+                  );
+                  createNativeNotificationToBooker(
+                    EBookerNativeNotificationType.SubOrderDelivered,
+                    {
+                      booker,
+                      order,
+                      subOrderDate,
                     },
                   );
                   await transitionOrderStatus(order, plan, integrationSdk);
@@ -308,6 +327,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
                     },
                   );
 
+                  createNativeNotificationToBooker(
+                    EBookerNativeNotificationType.SubOrderCancelled,
+                    {
+                      booker,
+                      order,
+                      subOrderDate,
+                    },
+                  );
                   await transitionOrderStatus(order, plan, integrationSdk);
                 }
               }),

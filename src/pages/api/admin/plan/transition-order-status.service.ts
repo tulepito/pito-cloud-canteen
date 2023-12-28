@@ -1,9 +1,14 @@
 import compact from 'lodash/compact';
 
-import { fetchTransaction } from '@services/integrationHelper';
+import { fetchTransaction, fetchUser } from '@services/integrationHelper';
+import { createNativeNotificationToBooker } from '@services/nativeNotification';
 import { createFirebaseDocNotification } from '@services/notifications';
 import { Listing, Transaction } from '@src/utils/data';
-import { ENotificationType, EOrderStates } from '@src/utils/enums';
+import {
+  EBookerNativeNotificationType,
+  ENotificationType,
+  EOrderStates,
+} from '@src/utils/enums';
 import {
   ETransition,
   TRANSITIONS_TO_STATE_CANCELED,
@@ -96,5 +101,14 @@ export const transitionOrderStatus = async (
       startDate,
       endDate,
     });
+
+    const booker = await fetchUser(bookerId);
+    createNativeNotificationToBooker(
+      EBookerNativeNotificationType.OrderIsPendingPayment,
+      {
+        booker,
+        order,
+      },
+    );
   }
 };

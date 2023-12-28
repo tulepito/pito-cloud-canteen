@@ -7,5 +7,6 @@ const NATIVE_NOTIFICATION_TYPES = {
   TransitOrderStateToCanceled: 'TransitOrderStateToCanceled',
   PartnerTransitOrderToCanceled: 'PartnerTransitOrderToCanceled',
   PartnerEditSubOrder: 'PartnerEditSubOrder',
+  AdminStartOrder: 'AdminStartOrder',
 };
 module.exports = { NATIVE_NOTIFICATION_TYPES };

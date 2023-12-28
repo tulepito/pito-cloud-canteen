@@ -10,6 +10,7 @@ const ROLE_ARN = `${process.env.ROLE_ARN}`;
 const SEND_FOOD_RATING_NOTIFICATION_LAMBDA_ARN = `${process.env.SEND_FOOD_RATING_NOTIFICATION_LAMBDA_ARN}`;
 const AUTOMATIC_START_ORDER_JOB_LAMBDA_ARN = `${process.env.AUTOMATIC_START_ORDER_JOB_LAMBDA_ARN}`;
 const PICK_FOOD_FOR_EMPTY_MEMBER_LAMBDA_ARN = `${process.env.PICK_FOOD_FOR_EMPTY_MEMBER_LAMBDA_ARN}`;
+const SEND_REMIND_PICKING_NATIVE_NOTIFICATION_TO_BOOKER_LAMBDA_ARN = `${process.env.SEND_REMIND_PICKING_NATIVE_NOTIFICATION_TO_BOOKER_LAMBDA_ARN}`;
 const NEXT_PUBLIC_ENV = `${process.env.NEXT_PUBLIC_ENV}`;
 
 const isProduction = NEXT_PUBLIC_ENV === 'production';
@@ -40,6 +41,7 @@ export const createScheduler = ({
     Name: customName,
     ScheduleExpression: `at(${timeExpression})`,
     ScheduleExpressionTimezone: 'Asia/Ho_Chi_Minh',
+    ActionAfterCompletion: isProduction ? 'NONE' : 'DELETE',
     Target: {
       Arn: arn || LAMBDA_ARN,
       RoleArn: ROLE_ARN,
@@ -205,6 +207,53 @@ export const createOrUpdatePickFoodForEmptyMembersScheduler = async ({
       })
       .catch((err) => {
         console.log('Create Automatic picking food Scheduler Error: ', err);
+      });
+  }
+};
+
+export const sendRemindPickingNativeNotificationToBookerScheduler = async ({
+  orderId,
+  deadlineDate,
+}: {
+  orderId: string;
+  deadlineDate: number;
+}) => {
+  const customName = `send_RPNNTB_${orderId}`; // send remind picking native notification to booker
+  const timeExpression = formatTimestamp(
+    DateTime.fromMillis(deadlineDate)
+      .setZone(VNTimezone)
+      .minus({ hours: 3 })
+      .toMillis(),
+    "yyyy-MM-dd'T'hh:mm:ss",
+  );
+
+  try {
+    await getScheduler(customName);
+    await updateScheduler({
+      arn: SEND_REMIND_PICKING_NATIVE_NOTIFICATION_TO_BOOKER_LAMBDA_ARN,
+      customName,
+      timeExpression,
+    });
+  } catch (error) {
+    createScheduler({
+      arn: SEND_REMIND_PICKING_NATIVE_NOTIFICATION_TO_BOOKER_LAMBDA_ARN,
+      customName,
+      timeExpression,
+      params: {
+        orderId,
+      },
+    })
+      .then((res) => {
+        console.log(
+          'Send remind picking native notification to booker Success: ',
+          res,
+        );
+      })
+      .catch((err) => {
+        console.log(
+          'Send remind picking native notification to booker Error: ',
+          err,
+        );
       });
   }
 };
