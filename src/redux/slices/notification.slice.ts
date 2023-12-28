@@ -25,9 +25,7 @@ const initialState: TNotificationState = {
 // ================ Async thunks ================ //
 const fetchNotifications = createAsyncThunk(
   'app/Notification/FETCH_NOTIFICATIONS',
-  async (_, { getState }) => {
-    const { userPermission } = getState().user;
-
+  async (userPermission: EUserSystemPermission) => {
     const getExcludedNotificationTypes = () => {
       switch (userPermission) {
         case EUserSystemPermission.normal:
@@ -41,7 +39,7 @@ const fetchNotifications = createAsyncThunk(
         case EUserSystemPermission.company:
           return [ENotificationType.SUB_ORDER_REVIEWED_BY_PARTICIPANT];
         default:
-          break;
+          return [];
       }
     };
 

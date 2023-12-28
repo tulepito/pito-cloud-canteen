@@ -24,6 +24,7 @@ const AuthGuard: React.FC<TAuthGuardProps> = ({ children }) => {
     (state) => state.auth,
   );
   const currentUser = useAppSelector(currentUserSelector);
+  const userPermission = useAppSelector((state) => state.user.userPermission);
 
   const { pathname } = router;
   const {
@@ -81,9 +82,9 @@ const AuthGuard: React.FC<TAuthGuardProps> = ({ children }) => {
   useEffect(() => {
     if (isAuthenticated) {
       dispatch(SystemAttributesThunks.fetchAttributes());
-      dispatch(NotificationThunks.fetchNotifications());
+      dispatch(NotificationThunks.fetchNotifications(userPermission));
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, userPermission]);
 
   // TODO: verify authentication
   useVerifyAuthentication(homePageNavigateCondition);
