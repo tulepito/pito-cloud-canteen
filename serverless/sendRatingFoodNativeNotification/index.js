@@ -14,6 +14,18 @@ const createNativeNotification = async ({ notificationParams, sdk }) => {
   const participantUser = User(participant);
   const { firstName } = participantUser.getProfile();
   const { oneSignalUserIds = [] } = participantUser.getPrivateData();
+  const { company = {}, isCompany } = participantUser.getMetadata();
+
+  const isBooker = Object.values(company).some(({ permission }) => {
+    return permission === 'booker';
+  });
+
+  const notSendParticipantNotification = isCompany || isBooker;
+
+  if (notSendParticipantNotification) return;
+
+  if (oneSignalUserIds.length === 0) return;
+
   const url = `${BASE_URL}/participant/order/${orderId}/?subOrderDate=${subOrderDate}&openRatingModal=true`;
 
   await Promise.all(

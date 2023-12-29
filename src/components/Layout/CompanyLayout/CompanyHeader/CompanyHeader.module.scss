@@ -65,12 +65,41 @@
     }
 
     .profileMenuContent {
-      width: 200px;
+      width: 268px;
       border-radius: 10px;
+
+      .menuItem {
+        @include flexAlign(center);
+        gap: 8px;
+      }
+
+      .text {
+        @include textTemplate(14px, 400, 24px);
+      }
+      .subText {
+        @include textTemplate(12px, 400, 16px);
+        color: $neutralGray6;
+        text-overflow: ellipsis;
+        overflow: hidden;
+      }
+
+      .logout {
+        color: $sematicRed2;
+      }
     }
 
     .iconBell {
       margin-right: 15px;
+    }
+
+    .iconSwap {
+      transform: rotate(90deg);
+    }
+
+    .logoutIcon {
+      path {
+        fill: $sematicRed2;
+      }
     }
 
     .profileMenuWrapper {

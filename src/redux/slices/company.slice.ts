@@ -119,6 +119,10 @@ type TCompanyState = {
 
   adminUpdateCompanyStateInProgress: boolean;
   adminUpdateCompanyStateError: any;
+
+  bookerCompany: TUser;
+  fetchBookerCompanyInProgress: boolean;
+  fetchBookerCompanyError: any;
 };
 
 // ================ Thunk types ================ //
@@ -143,6 +147,8 @@ const ADMIN_TRANSFER_COMPANY_OWNER = 'app/Company/ADMIN_TRANSFER_COMPANY_OWNER';
 const ADMIN_QUERY_COMPANIES = 'app/ManageCompanies/ADMIN_QUERY_COMPANIES';
 const ADMIN_UPDATE_COMPANY_STATE =
   'app/ManageCompanies/ADMIN_UPDATE_COMPANY_STATE';
+
+const BOOKER_FETCH_COMPANY = 'app/ManageCompanies/BOOKER_FETCH_COMPANY';
 
 const initialState: TCompanyState = {
   groupList: [],
@@ -193,6 +199,10 @@ const initialState: TCompanyState = {
   adminUpdateCompanyStateInProgress: false,
   adminUpdateCompanyStateError: undefined,
   totalItems: 0,
+
+  bookerCompany: null!,
+  fetchBookerCompanyInProgress: false,
+  fetchBookerCompanyError: null,
 };
 
 const requestUploadCompanyLogo = createAsyncThunk(
@@ -623,6 +633,19 @@ const adminUpdateCompanyState = createAsyncThunk(
   },
 );
 
+const bookerFetchCompany = createAsyncThunk(
+  BOOKER_FETCH_COMPANY,
+  async (companyId: string, { extra: sdk }) => {
+    const company = denormalisedResponseEntities(
+      await sdk.users.show({
+        id: companyId,
+      }),
+    )[0];
+
+    return company;
+  },
+);
+
 export const companyThunks = {
   companyInfo,
   groupInfo,
@@ -642,6 +665,7 @@ export const companyThunks = {
   adminTransferCompanyOwner,
   adminQueryCompanies,
   adminUpdateCompanyState,
+  bookerFetchCompany,
 };
 
 export const companySlice = createSlice({
@@ -1080,6 +1104,22 @@ export const companySlice = createSlice({
         ...state,
         queryCompaniesError: action.payload,
         queryCompaniesInProgress: false,
+      }))
+
+      .addCase(bookerFetchCompany.pending, (state) => ({
+        ...state,
+        fetchBookerCompanyInProgress: true,
+        fetchBookerCompanyError: null,
+      }))
+      .addCase(bookerFetchCompany.fulfilled, (state, { payload }) => ({
+        ...state,
+        bookerCompany: payload,
+        fetchBookerCompanyInProgress: false,
+      }))
+      .addCase(bookerFetchCompany.rejected, (state, { error }) => ({
+        ...state,
+        fetchBookerCompanyInProgress: false,
+        fetchBookerCompanyError: error,
       }));
   },
 });

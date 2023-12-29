@@ -1,4 +1,5 @@
 import { useCallback, useEffect } from 'react';
+import isEmpty from 'lodash/isEmpty';
 import type { NextRouter } from 'next/router';
 import { useRouter } from 'next/router';
 
@@ -36,10 +37,16 @@ const verifyPermissionFn = ({
 const useVerifyPermission = () => {
   const router = useRouter();
   const { pathname: pathName } = router;
-  const { userPermission, currentUser } = useAppSelector((state) => state.user);
-  const isMatchedPermission = currentUser
+  const { userPermission, currentUser, roles } = useAppSelector(
+    (state) => state.user,
+  );
+
+  const isMatchedPermission = isEmpty(roles)
+    ? null
+    : currentUser
     ? isPathMatchedPermission(pathName, userPermission)
     : null;
+
   const isIgnoredPermissionCheck =
     IgnoredPermissionCheckRoutes.includes(pathName);
 

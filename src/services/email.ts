@@ -142,12 +142,15 @@ export const fetchEmailDataSourceWithOrder = async ({
       const companyUser = User(company);
       const bookerUser = User(booker);
       const participantUser = User(participant);
+      const notSendEmailInCaseParticipantIsBooker =
+        participantId === bookerId || participantId === companyId;
 
       return {
         companyUser,
         bookerUser,
         orderListing,
         participantUser,
+        notSendEmailInCaseParticipantIsBooker,
       };
     }
 
@@ -421,6 +424,9 @@ export const emailSendingFactory = async (
           participantId,
         });
 
+        const { notSendEmailInCaseParticipantIsBooker } = emailDataSource;
+        if (notSendEmailInCaseParticipantIsBooker) return;
+
         const { participantUser, orderListing } = emailDataSource;
         const { orderName } = orderListing.getPublicData();
         const { email: participantEmail } =
@@ -468,6 +474,9 @@ export const emailSendingFactory = async (
           orderId,
         });
 
+        const { notSendEmailInCaseParticipantIsBooker } = emailDataSource;
+        if (notSendEmailInCaseParticipantIsBooker) return;
+
         const { participantUser } = emailDataSource;
         const { email: participantEmail } =
           participantUser?.getAttributes() || {};
@@ -492,6 +501,9 @@ export const emailSendingFactory = async (
           participantId,
           orderId,
         });
+
+        const { notSendEmailInCaseParticipantIsBooker } = emailDataSource;
+        if (notSendEmailInCaseParticipantIsBooker) return;
 
         const { participantUser, orderListing } = emailDataSource;
         const { email: participantEmail } =

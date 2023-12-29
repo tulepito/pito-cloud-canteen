@@ -3,8 +3,11 @@ import React from 'react';
 
 import InActiveUserScreen from '@components/InActiveUserScreen/InActiveUserScreen';
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
+import RoleSelectModal from '@components/RoleSelectModal/RoleSelectModal';
+import { useRoleSelectModalController } from '@hooks/useRoleSelectModalController';
 
 import { getLayoutBaseOnPermission } from './Guards.helper';
+import { useAccessRouteBaseOnRoles } from './useAccessRouteBaseOnRoles';
 import useActiveCompany from './useActiveCompany';
 import useVerifyPermission from './useVerifyPermission';
 
@@ -12,9 +15,12 @@ type TPermissionGuardGuardProps = PropsWithChildren<{}>;
 
 const PermissionGuard: React.FC<TPermissionGuardGuardProps> = (props) => {
   const { children } = props;
+  useAccessRouteBaseOnRoles();
   const { isIgnoredPermissionCheck, userPermission, isMatchedPermission } =
     useVerifyPermission();
   const { isInactiveCompany } = useActiveCompany();
+  const { isRoleSelectModalOpen, onCloseRoleSelectModal } =
+    useRoleSelectModalController();
 
   const renderComponent = () => {
     if (isIgnoredPermissionCheck) {
@@ -34,7 +40,15 @@ const PermissionGuard: React.FC<TPermissionGuardGuardProps> = (props) => {
     );
   };
 
-  return <>{renderComponent()}</>;
+  return (
+    <>
+      {renderComponent()}
+      <RoleSelectModal
+        isOpen={isRoleSelectModalOpen}
+        handleClose={onCloseRoleSelectModal}
+      />
+    </>
+  );
 };
 
 export default PermissionGuard;

@@ -3,6 +3,8 @@ import { useRouter } from 'next/router';
 
 import Avatar from '@components/Avatar/Avatar';
 import { InlineTextButton } from '@components/Button/Button';
+import IconLogout from '@components/Icons/IconLogout/IconLogout';
+import IconSwap from '@components/Icons/IconSwap/IconSwap';
 import NamedLink from '@components/NamedLink/NamedLink';
 import PitoLogo from '@components/PitoLogo/PitoLogo';
 import ProfileMenu from '@components/ProfileMenu/ProfileMenu';
@@ -11,6 +13,7 @@ import ProfileMenuItem from '@components/ProfileMenuItem/ProfileMenuItem';
 import ProfileMenuLabel from '@components/ProfileMenuLabel/ProfileMenuLabel';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { useLogout } from '@hooks/useLogout';
+import { useRoleSelectModalController } from '@hooks/useRoleSelectModalController';
 import { currentUserSelector } from '@redux/slices/user.slice';
 import { participantPaths } from '@src/paths';
 
@@ -21,6 +24,10 @@ const GeneralLayoutTopBar = () => {
   const intl = useIntl();
   const handleLogoutFn = useLogout();
   const currentUser = useAppSelector(currentUserSelector);
+  const { onOpenRoleSelectModal } = useRoleSelectModalController();
+  const roles = useAppSelector((state) => state.user.roles);
+
+  const shouldShowChangeRoleOption = roles.length > 1;
 
   const handleLogout = async () => {
     await handleLogoutFn();
@@ -65,8 +72,21 @@ const GeneralLayoutTopBar = () => {
             </div>
           </ProfileMenuLabel>
           <ProfileMenuContent className={css.profileMenuContent}>
-            <ProfileMenuItem key="AccountSettingsPage">
-              <InlineTextButton type="button" onClick={handleLogout}>
+            {shouldShowChangeRoleOption && (
+              <ProfileMenuItem
+                key="ChangeRole"
+                className={css.menuItem}
+                onClick={onOpenRoleSelectModal}>
+                <IconSwap />
+                <div className={css.text}>Đổi vai trò</div>
+              </ProfileMenuItem>
+            )}
+            <ProfileMenuItem key="Logout" className={css.menuItem}>
+              <IconLogout className={css.logoutIcon} />
+              <InlineTextButton
+                type="button"
+                onClick={handleLogout}
+                className={css.logout}>
                 <p>Đăng xuất</p>
               </InlineTextButton>
             </ProfileMenuItem>

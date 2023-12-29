@@ -3,6 +3,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import chunk from 'lodash/chunk';
 import flatten from 'lodash/flatten';
 
+import { mapUserPermissionByRole } from '@components/RoleSelectModal/helpers/mapUserPermissionByRole';
 import { createAsyncThunk, createDeepEqualSelector } from '@redux/redux.helper';
 import type { RootState } from '@redux/store';
 import {
@@ -13,6 +14,7 @@ import {
 import {
   ECompanyPermission,
   EImageVariants,
+  EUserRole,
   EUserSystemPermission,
 } from '@utils/enums';
 import { storableError } from '@utils/errors';
@@ -67,6 +69,25 @@ const detectUserPermission = (currentUser: TCurrentUser) => {
   return EUserSystemPermission.normal;
 };
 
+const getRoles = (currentUser: TCurrentUser) => {
+  const {
+    isAdmin = false,
+    isPartner = false,
+    isCompany = false,
+    company = {},
+  } = CurrentUser(currentUser).getMetadata();
+
+  const isBooker = Object.values(company).some(({ permission }: any) => {
+    return permission === ECompanyPermission.booker;
+  });
+
+  if (isAdmin) return [EUserRole.admin];
+  if (isPartner) return [EUserRole.partner];
+  if (isCompany || isBooker) return [EUserRole.booker, EUserRole.participant];
+
+  return [EUserRole.participant];
+};
+
 type TUserState = {
   currentUser: TCurrentUser | null;
   currentUserShowError: any;
@@ -78,6 +99,10 @@ type TUserState = {
 
   updateProfileInProgress: boolean;
   updateProfileError: any;
+
+  roles: EUserRole[];
+  currentRole: EUserRole;
+  isRoleSelectModalOpen: boolean;
 };
 
 const initialState: TUserState = {
@@ -91,12 +116,17 @@ const initialState: TUserState = {
 
   updateProfileInProgress: false,
   updateProfileError: null,
+
+  roles: [],
+  currentRole: null!,
+  isRoleSelectModalOpen: false,
 };
 
 // ================ Thunks ================ //
 const fetchCurrentUser = createAsyncThunk(
   'app/user/FETCH_CURRENT_USER',
   async (params: TObject | undefined, { extra: sdk, rejectWithValue }) => {
+    const { userRole } = params || {};
     const parameters = params || {
       include: ['profileImage'],
       'fields.image': [
@@ -139,7 +169,15 @@ const fetchCurrentUser = createAsyncThunk(
       ),
     );
 
-    return { currentUser, favoriteRestaurants, favoriteFood };
+    const userPermission = userRole ? mapUserPermissionByRole(userRole) : null;
+
+    return {
+      currentUser,
+      favoriteRestaurants,
+      favoriteFood,
+      userRole,
+      userPermission,
+    };
   },
   {
     serializeError: storableError,
@@ -158,10 +196,12 @@ const sendVerificationEmail = createAsyncThunk(
 
 const updateProfile = createAsyncThunk(
   'app/user/UPDATE_PROFILE',
-  async (payload: TObject, { extra: sdk, dispatch }) => {
-    await sdk.currentUser.updateProfile(payload);
+  async (payload: TObject, { extra: sdk }) => {
+    const currentUserResponse = await sdk.currentUser.updateProfile(payload, {
+      expand: true,
+    });
 
-    await dispatch(fetchCurrentUser());
+    return denormalisedResponseEntities(currentUserResponse)[0];
   },
 );
 
@@ -183,6 +223,26 @@ const userSlice = createSlice({
         userPermission: EUserSystemPermission.normal,
         sendVerificationEmailInProgress: false,
         sendVerificationEmailError: null,
+        currentRole: null!,
+        roles: [],
+      };
+    },
+    setRole: (state, action) => {
+      return {
+        ...state,
+        currentRole: action.payload,
+      };
+    },
+    setUserPermission: (state, action) => {
+      return {
+        ...state,
+        userPermission: action.payload,
+      };
+    },
+    setIsRoleSelectModalOpen: (state, action) => {
+      return {
+        ...state,
+        isRoleSelectModalOpen: action.payload,
       };
     },
   },
@@ -192,11 +252,17 @@ const userSlice = createSlice({
         state.currentUserShowError = null;
       })
       .addCase(fetchCurrentUser.fulfilled, (state, action) => {
-        const { currentUser, favoriteRestaurants, favoriteFood } =
-          action.payload;
+        const {
+          currentUser,
+          favoriteRestaurants,
+          favoriteFood,
+          userPermission,
+        } = action.payload;
 
         state.currentUser = mergeCurrentUser(state.currentUser, currentUser);
-        state.userPermission = detectUserPermission(currentUser);
+        state.userPermission =
+          userPermission || detectUserPermission(currentUser);
+        state.roles = getRoles(currentUser);
         state.favoriteRestaurants = favoriteRestaurants;
         state.favoriteFood = favoriteFood;
       })
@@ -222,8 +288,9 @@ const userSlice = createSlice({
         state.updateProfileInProgress = true;
         state.updateProfileError = false;
       })
-      .addCase(updateProfile.fulfilled, (state) => {
+      .addCase(updateProfile.fulfilled, (state, { payload }) => {
         state.updateProfileInProgress = false;
+        state.currentUser = payload;
       })
       .addCase(updateProfile.rejected, (state) => {
         state.updateProfileInProgress = false;
