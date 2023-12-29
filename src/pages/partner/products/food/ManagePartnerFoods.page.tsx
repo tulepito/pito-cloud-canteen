@@ -259,8 +259,30 @@ const ManagePartnerFoods = () => {
     totalDeclinedFoods,
     totalDraftFoods,
     editableFoodMap,
+    acceptedFoods,
+    pendingFoods,
+    declinedFoods,
+    draftFoods,
     menus,
   } = useAppSelector((state) => state.PartnerFood, shallowEqual);
+
+  const getFoods = () => {
+    if (!isMobileLayout && !isTabletLayout) {
+      return foods;
+    }
+    switch (foodApprovalActiveTab) {
+      case EFoodApprovalState.ACCEPTED:
+        return acceptedFoods;
+      case EFoodApprovalState.PENDING:
+        return pendingFoods;
+      case EFoodApprovalState.DECLINED:
+        return declinedFoods;
+      case 'draft' as EFoodApprovalState:
+        return draftFoods;
+      default:
+        return foods;
+    }
+  };
 
   const getExposeValues = ({ values }: any) => {
     const { rowCheckbox = [] } = values || {};
@@ -365,7 +387,7 @@ const ManagePartnerFoods = () => {
   const parsedFoods = useMemo(
     () =>
       parseEntitiesToTableData(
-        foods,
+        getFoods(),
         {
           onSetFoodToRemove,
         },
@@ -473,32 +495,13 @@ const ManagePartnerFoods = () => {
   useEffect(() => {
     onQueryPartnerFood({
       page,
-      perPage: isMobileLayout ? 100 : undefined,
       ...(foodType ? { foodType } : {}),
       ...(createAtStart ? { createAtStart } : {}),
       ...(createAtEnd ? { createAtEnd } : {}),
       ...(keywords ? { keywords } : {}),
-      ...(isMobileLayout && {
-        ...(Object.values(EFoodApprovalState).includes(foodApprovalActiveTab)
-          ? {
-              adminApproval: foodApprovalActiveTab,
-              isDraft: false,
-            }
-          : {
-              isDraft: true,
-            }),
-      }),
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    page,
-    keywords,
-    foodType,
-    createAtStart,
-    createAtEnd,
-    foodApprovalActiveTab,
-    isMobileLayout,
-  ]);
+  }, [page, keywords, foodType, createAtStart, createAtEnd]);
 
   const onImportFoodFromCsv = async () => {
     const hasValue = importType === IMPORT_FILE ? file : googleSheetUrl;
@@ -596,7 +599,7 @@ const ManagePartnerFoods = () => {
       <GridFoodListForm
         onSubmit={() => {}}
         getGridFoodListFormValues={getGridFoodListFormValues}
-        foodList={foods}
+        foodList={getFoods()}
         pagination={managePartnerFoodPagination}
         onPageChange={onPageChangeInGridFoodListForm}
         setFoodToRemove={setFoodToRemove}
@@ -612,7 +615,7 @@ const ManagePartnerFoods = () => {
           <RowFoodListForm
             onSubmit={() => {}}
             getGridFoodListFormValues={getGridFoodListFormValues}
-            foodList={foods}
+            foodList={getFoods()}
             pagination={managePartnerFoodPagination}
             onPageChange={onPageChangeInGridFoodListForm}
             setFoodToRemove={setFoodToRemove}
@@ -746,7 +749,6 @@ const ManagePartnerFoods = () => {
       shouldHideAddProductButton={false}
       handleAddProduct={handleAddFood}>
       <div className={css.root}>
-        aaaaa
         <div className={css.tableActions}>
           <div className={css.ctaViewTypeWrapper}>
             <div className={css.viewTypeWrapper}>
