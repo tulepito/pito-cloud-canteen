@@ -8,7 +8,9 @@ export const updateAttributesApi = (body: TObject) =>
   putApi('/admin/filters', body);
 export const deleteAttributesApi = (body: TObject) =>
   deleteApi('/admin/filters', body);
-
+export const changeMenuEndDateInBulkApi = () => {
+  return putApi(`/admin/listings/menus/change-end-date-in-bulk`);
+};
 export const transitPlanApi = ({
   transactionId,
   transition,

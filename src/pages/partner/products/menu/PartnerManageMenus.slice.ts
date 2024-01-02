@@ -3,6 +3,7 @@ import { uniqBy } from 'lodash';
 import differenceBy from 'lodash/differenceBy';
 import isEqual from 'lodash/isEqual';
 
+import { changeMenuEndDateInBulkApi } from '@apis/admin';
 import { closePartnerMenuApi, publishPartnerMenuApi } from '@apis/menuApi';
 import {
   createDraftMenuApi,
@@ -242,6 +243,17 @@ const createDraftMenu = createAsyncThunk(
   },
 );
 
+const changeMenuEndDateInBulk = createAsyncThunk(
+  'app/PartnerManageMenus/CHANGE_MENU_END_DATE_IN_BULK',
+  async (_: TObject | undefined) => {
+    try {
+      await changeMenuEndDateInBulkApi();
+    } catch (error) {
+      console.error(`CREATE_DRAFT_MENU error: `, error);
+    }
+  },
+);
+
 const updateDraftMenu = createAsyncThunk(
   'app/PartnerManageMenus/UPDATE_DRAFT_MENU',
   async (
@@ -358,6 +370,7 @@ export const PartnerManageMenusThunks = {
   preDeleteMenus,
   deleteMenus,
   createDraftMenu,
+  changeMenuEndDateInBulk,
   updateDraftMenu,
   loadMenuData,
   publishDraftMenu,
