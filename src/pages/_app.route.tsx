@@ -1,5 +1,6 @@
 import { Provider } from 'react-redux';
 import type { AppProps } from 'next/app';
+import Head from 'next/head';
 import { Router } from 'next/router';
 import Script from 'next/script';
 import nProgress from 'nprogress';
@@ -43,6 +44,14 @@ const MyApp = ({
             <PermissionGuard>
               <ToastifyProvider>
                 <GoNativeProvider>
+                  {/* common app head tag */}
+                  <Head>
+                    <meta
+                      name="viewport"
+                      content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi"
+                    />
+                  </Head>
+
                   <Component {...restProps.pageProps} key={router.asPath} />
                 </GoNativeProvider>
               </ToastifyProvider>
