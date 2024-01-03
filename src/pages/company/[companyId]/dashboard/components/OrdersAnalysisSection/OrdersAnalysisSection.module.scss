@@ -92,22 +92,22 @@
         }
 
         &.completedOrders {
-          background-color: #ebffd6;
+          background-color: $sematicGreen1;
           svg {
-            stroke: #65db63;
+            stroke: $sematicGreen2;
             fill: transparent;
           }
         }
         &.inProgressOrders {
-          background-color: #fff4db;
+          background-color: $labelOrange1;
           svg {
-            stroke: #ffb13d;
+            stroke: $labelOrange2;
           }
         }
         &.draftOrders {
-          background-color: #f0f5ff;
+          background-color: $labelBlue1;
           svg {
-            stroke: #2f54eb;
+            stroke: $labelBlue2;
           }
         }
 

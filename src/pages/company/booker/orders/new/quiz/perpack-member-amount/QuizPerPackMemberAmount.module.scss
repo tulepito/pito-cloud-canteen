@@ -34,6 +34,10 @@
 
 .tooltipOverlay {
   :global(.rc-tooltip-content) {
-    width: 400px;
+    width: calc(100vw - 32px);
+
+    @include viewportMedium {
+      width: 400px;
+    }
   }
 }

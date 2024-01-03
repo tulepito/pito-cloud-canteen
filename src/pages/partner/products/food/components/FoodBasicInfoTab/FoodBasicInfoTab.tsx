@@ -1,6 +1,6 @@
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
-import { useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import classNames from 'classnames';
 import arrayMutators from 'final-form-arrays';
@@ -10,6 +10,7 @@ import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
 import FieldMultiplePhotosMobile from '@components/FormFields/FieldMultiplePhotosMobile/FieldMultiplePhotosMobile';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
+import HighlightBox from '@components/HighlightBox/HighlightBox';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { Listing } from '@src/utils/data';
 import { EImageVariants } from '@src/utils/enums';
@@ -190,6 +191,9 @@ const FoodBasicInfoTabComponent: React.FC<TFoodBasicInfoTabComponentProps> = (
         )}
         parse={parsePrice}
       />
+      <HighlightBox>
+        <FormattedMessage id="FoodBasicInforTabFormPart.hint" />
+      </HighlightBox>
       <FieldTextInput
         name="unit"
         className={css.field}

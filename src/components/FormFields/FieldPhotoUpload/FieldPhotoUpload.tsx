@@ -2,6 +2,7 @@ import type { ChangeEvent } from 'react';
 import React, { useRef, useState } from 'react';
 import { Field } from 'react-final-form';
 import { useIntl } from 'react-intl';
+import { toast } from 'react-toastify';
 import classNames from 'classnames';
 
 import { InlineTextButton } from '@components/Button/Button';
@@ -12,7 +13,9 @@ import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
 import ImageFromFile from '@components/ImageFromFile/ImageFromFile';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
+import { BOTTOM_CENTER_TOAST_ID } from '@components/ToastifyProvider/ToastifyProvider';
 import useBoolean from '@hooks/useBoolean';
+import { IS_PARTNER_PROFILE_EDITABLE } from '@pages/partner/settings/account/helpers/constants';
 import { isUploadImageOverLimitError } from '@utils/errors';
 import type {
   TDefaultProps,
@@ -142,15 +145,44 @@ export type TFieldPhotoUpload = {
   name: string;
   id: string;
   validate?: any;
+  filesChangeDisabledByToast?: boolean;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
-const FieldPhotoUpload: React.FC<TFieldPhotoUpload> = (props) => {
+const FieldPhotoUpload: React.FC<TFieldPhotoUpload> = ({
+  filesChangeDisabledByToast,
+  ...props
+}) => {
   const intl = useIntl();
   const [triggerFlag, setTriggerFlag] = useState<string>('');
   const [shouldRemoveImgId, setShouldRemoveImgId] = useState<string>('');
   const shouldRemoveImgControl = useBoolean(false);
   const inputRef = useRef(null);
+
+  const toastPreventChangingFiles = () => {
+    toast.info(
+      intl.formatMessage({ id: 'AccountSettingsModal.announcement' }),
+      {
+        closeButton: false,
+        autoClose: 5000,
+        hideProgressBar: true,
+        containerId: BOTTOM_CENTER_TOAST_ID,
+        toastId: 'toastPreventChangingFiles',
+        icon: false,
+        className: css.toast,
+      },
+    );
+  };
+
+  const makeFnWithDisabled =
+    (fn: any) =>
+    (...args: any) => {
+      if (filesChangeDisabledByToast && !IS_PARTNER_PROFILE_EDITABLE) {
+        toastPreventChangingFiles();
+      } else {
+        fn(...args);
+      }
+    };
 
   return (
     <>
@@ -175,6 +207,7 @@ const FieldPhotoUpload: React.FC<TFieldPhotoUpload> = (props) => {
             shouldShowUploadBtnWithImg = false,
             uploadBtnWithImgClassName,
           } = fieldRenderProps;
+
           const onChange = async (e: ChangeEvent<HTMLInputElement>) => {
             const { files } = e.target;
             const file = files && files[0];
@@ -249,7 +282,9 @@ const FieldPhotoUpload: React.FC<TFieldPhotoUpload> = (props) => {
                 className={classNames(css.root, className, {
                   [css.error]: hasError,
                 })}>
-                <input {...inputProps} className={css.addImageInput} />
+                {!filesChangeDisabledByToast && (
+                  <input {...inputProps} className={css.addImageInput} />
+                )}
                 {image && !uploadImageFailed ? (
                   <PhotoWithOverlay
                     id={image.id}
@@ -257,14 +292,21 @@ const FieldPhotoUpload: React.FC<TFieldPhotoUpload> = (props) => {
                     image={image}
                     savedImageAltText={`${input.name} asset`}
                     variants={variants}
-                    onRemoveImage={removeFn}
+                    onRemoveImage={makeFnWithDisabled(removeFn)}
                     shouldShowClearBtn={shouldShowClearBtn}
                     shouldShowUploadBtn={shouldShowUploadBtnWithImg}
-                    onUploadImage={handleClickUploadImage(image.id)}
+                    onUploadImage={makeFnWithDisabled(
+                      handleClickUploadImage(image.id),
+                    )}
                     uploadBtnWithImgClassName={uploadBtnWithImgClassName}
                   />
                 ) : (
-                  <label htmlFor={input.name} className={classNames(css.label)}>
+                  <label
+                    htmlFor={input.name}
+                    onClick={makeFnWithDisabled(() => {})}
+                    className={classNames({
+                      [css.label]: !filesChangeDisabledByToast,
+                    })}>
                     <div
                       className={classNames(
                         css.iconUpload,

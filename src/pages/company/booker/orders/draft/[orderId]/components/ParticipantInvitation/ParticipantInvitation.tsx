@@ -117,7 +117,12 @@ const ParticipantInvitation: React.FC<TParticipantInvitationProps> = ({
         hasGoBackButton
         onGoBack={onGoBack}
       />
-      <Stepper steps={BOOKER_CREATE_GROUP_ORDER_STEPS} currentStep={2} />
+      <Stepper
+        className={css.stepperContainerMobile}
+        steps={BOOKER_CREATE_GROUP_ORDER_STEPS}
+        currentStep={2}
+      />
+
       <div className={css.root}>
         <div className={css.contentContainer}>
           <div className={css.titleContainer}>

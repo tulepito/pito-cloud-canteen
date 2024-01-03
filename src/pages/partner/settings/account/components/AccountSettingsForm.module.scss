@@ -41,6 +41,10 @@
       width: 100%;
     }
 
+    &.hidden {
+      display: none;
+    }
+
     @include viewportMedium {
       position: static;
       width: 100%;

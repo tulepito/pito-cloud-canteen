@@ -117,13 +117,13 @@
     column-gap: 40px;
     row-gap: 28px;
     padding: 24px;
-    margin: 40px auto;
+    margin: 0 auto 40px;
   }
 
   @include viewportSLarge {
     padding: 40px 130px;
     max-width: calc(1180px + 130px * 2);
-    margin: 40px calc(50vw - $sl/2);
+    margin: 0 calc(50vw - $sl/2) 40px;
   }
 
   &.editNormalOrderView {
@@ -280,4 +280,10 @@
   display: flex;
   column-gap: 16px;
   justify-content: center;
+}
+
+.stepper {
+  @include viewportMedium {
+    width: 630px;
+  }
 }

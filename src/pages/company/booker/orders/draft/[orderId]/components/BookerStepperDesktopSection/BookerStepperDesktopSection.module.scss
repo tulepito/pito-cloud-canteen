@@ -1,0 +1,13 @@
+@use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/vars.scss' as *;
+
+.root {
+  @include viewportMedium {
+    @include flexCenter;
+    padding: 16px;
+    padding-top: 0;
+
+    box-shadow: 0px 2px 8px 0px #00000014;
+  }
+}

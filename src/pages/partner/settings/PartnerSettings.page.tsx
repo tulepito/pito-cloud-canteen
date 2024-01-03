@@ -13,6 +13,7 @@ import { currentUserSelector } from '@redux/slices/user.slice';
 import { partnerPaths } from '@src/paths';
 import { OwnListing } from '@src/utils/data';
 
+import { IS_PARTNER_PROFILE_EDITABLE } from './account/helpers/constants';
 import MediaForm from './components/MediaForm';
 import { PartnerSettingsThunks } from './PartnerSettings.slice';
 
@@ -50,7 +51,7 @@ const PartnerSettingsPage = () => {
 
   return (
     <div className={css.container}>
-      <MediaForm />
+      <MediaForm disabled={!IS_PARTNER_PROFILE_EDITABLE} />
       <div className={css.title}>{title}</div>
       <div className={css.navigationWrapper}>
         <div

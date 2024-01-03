@@ -1,0 +1,22 @@
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.root {
+  margin-top: 8px;
+  margin-bottom: 8px;
+  padding: 12px 8px;
+  border-radius: 8px;
+  gap: 8px;
+  background-color: $labelBlue1;
+
+  @include flexAlign(center);
+
+  .content {
+    @include textTemplate(12px, $fontWeightRegular, 20px);
+
+    @include viewportMedium {
+      @include textTemplate(14px, $fontWeightRegular, 20px);
+    }
+  }
+}

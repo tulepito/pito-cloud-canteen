@@ -133,22 +133,3 @@
 .labelRoot {
   @include inputLabelStyles;
 }
-
-.hintSection {
-  margin-top: 8px;
-  padding: 12px 8px;
-  border-radius: 8px;
-  gap: 8px;
-  background-color: $labelBlue1;
-
-  @include flexAlign(center);
-
-  .hintIcon {
-    min-width: 24px;
-    min-height: 24px;
-  }
-
-  .hintContent {
-    @include textTemplate(12px, $fontWeightRegular, 20px);
-  }
-}

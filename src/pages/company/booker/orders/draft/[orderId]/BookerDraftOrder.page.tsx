@@ -59,6 +59,7 @@ import Layout from '../../components/Layout/Layout';
 import LayoutMain from '../../components/Layout/LayoutMain';
 import LayoutSidebar from '../../components/Layout/LayoutSidebar';
 
+import BookerStepperDesktopSection from './components/BookerStepperDesktopSection/BookerStepperDesktopSection';
 import HomeReturnModal from './components/HomeReturnModal/HomeReturnModal';
 import ParticipantInvitation from './components/ParticipantInvitation/ParticipantInvitation';
 import SidebarContent from './components/SidebarContent/SidebarContent';
@@ -482,165 +483,178 @@ function BookerDraftOrderPage() {
   }, [subOrderDateQuery]);
 
   return (
-    <WalkThroughTourProvider
-      onCloseTour={handleCloseWalkThrough}
-      isMobileLayout={!isTabletLayoutOrLarger}>
-      <RenderWhen condition={isSetupMode}>
-        <Layout className={css.root}>
-          <LayoutSidebar
-            logo={<span></span>}
-            collapse={collapse}
-            onCollapse={handleCollapse}>
-            <SidebarContent
-              order={order}
-              companyAccount={companyAccount}
-              onCloseSideBar={handleCloseSideBar}
-            />
-          </LayoutSidebar>
-          <LayoutMain className={css.mainContainer}>
-            <div className={css.header}>
-              <div className={css.title}>Thiết lập menu</div>
-              <div className={css.headerActions}>
-                <IconHome
-                  className={css.actionIcon}
-                  onClick={homeReturnModalController.setTrue}
-                />
-                <div className={css.actionIcon} onClick={handleCollapse}>
-                  <IconSetting variant="black" />
+    <>
+      <RenderWhen condition={isGroupOrder}>
+        <BookerStepperDesktopSection>
+          <Stepper
+            className={css.stepperContainerDesktop}
+            steps={BOOKER_CREATE_GROUP_ORDER_STEPS}
+            currentStep={isSetupMode ? 1 : 2}
+          />
+        </BookerStepperDesktopSection>
+      </RenderWhen>
+      <WalkThroughTourProvider
+        onCloseTour={handleCloseWalkThrough}
+        isMobileLayout={!isTabletLayoutOrLarger}>
+        <RenderWhen condition={isSetupMode}>
+          <Layout className={css.root}>
+            <LayoutSidebar
+              logo={<span></span>}
+              collapse={collapse}
+              onCollapse={handleCollapse}>
+              <SidebarContent
+                order={order}
+                companyAccount={companyAccount}
+                onCloseSideBar={handleCloseSideBar}
+              />
+            </LayoutSidebar>
+            <LayoutMain className={css.mainContainer}>
+              <div className={css.header}>
+                <div className={css.title}>Thiết lập menu</div>
+                <div className={css.headerActions}>
+                  <IconHome
+                    className={css.actionIcon}
+                    onClick={homeReturnModalController.setTrue}
+                  />
+                  <div className={css.actionIcon} onClick={handleCollapse}>
+                    <IconSetting variant="black" />
+                  </div>
                 </div>
               </div>
-            </div>
-            <RenderWhen condition={isGroupOrder}>
-              <Stepper
-                steps={BOOKER_CREATE_GROUP_ORDER_STEPS}
-                currentStep={1}
-              />
-            </RenderWhen>
-            <div className={css.orderTitleWrapper}>
-              <div className={css.title}>Đơn hàng #{orderTitle}</div>
-              <Badge
-                label="Đơn hàng tuần"
-                type={EBadgeType.info}
-                className={css.badge}
-              />
-            </div>
-
-            <div className={css.main}>
-              <CalendarDashboard
-                className={css.calendar}
-                anchorDate={suitableAnchorDate}
-                startDate={startDate}
-                endDate={endDate}
-                events={calendarEvents}
-                companyLogo="Company"
-                hideMonthView
-                {...calendarProps}
-              />
-
-              <RenderWhen condition={isAllDatesHaveNoRestaurants}>
-                <div className={css.emptyResult}>
-                  <div className={css.emptyResultImg}>
-                    <Image src={emptyResultImg} alt="empty result" />
-                  </div>
-                  <div className={css.emptyTitle}>
-                    <p>Không tìm thấy kết quả phù hợp</p>
-                    <p className={css.emptyContent}>
-                      Rất tiếc, hệ thống chúng tôi không tìm thấy kết quả phù
-                      hợp với yêu cầu của bạn. Tuy nhiên, đừng ngần ngại{' '}
-                      <span>
-                        chat với chúng tôi để tìm thấy menu nhanh nhất
-                      </span>{' '}
-                      nhé.
-                    </p>
-                    <Button
-                      className={css.contactUsBtn}
-                      variant="secondary"
-                      onClick={handleChatIconClick}>
-                      Chat với chúng tôi
-                    </Button>
-                  </div>
+              <RenderWhen condition={isGroupOrder}>
+                <div className={css.stepperContainerMobile}>
+                  <Stepper
+                    steps={BOOKER_CREATE_GROUP_ORDER_STEPS}
+                    currentStep={1}
+                  />
                 </div>
               </RenderWhen>
-            </div>
-            <div className={css.subOrderMobileWrapper}>
-              <RenderWhen condition={walkthroughEnable}>
-                <div
-                  className={classNames(
-                    css.subOrderDate,
-                    !isGroupOrder && css.largePadding,
-                  )}>
-                  <RenderWhen condition={!!sampleSubOrder}>
-                    <MealPlanCard
-                      event={sampleSubOrder as Event}
-                      index={123}
-                      resources={{}}
-                      removeInprogress={false}
-                    />
-                  </RenderWhen>
-                </div>
-                <RenderWhen.False>
-                  <RenderWhen condition={!!selectedEvent}>
-                    <MealPlanCard
-                      event={selectedEvent as Event}
-                      index={999}
-                      resources={{ ...calendarProps.resources }}
-                      removeInprogress={
-                        calendarProps?.resources?.updatePlanDetailInprogress
-                      }
-                      onRemove={handleRemoveMeal(planId)}
-                    />
-                    <RenderWhen.False>
-                      <RenderWhen condition={!isAllDatesHaveNoRestaurants}>
-                        <div className={css.addMealWrapper}>
-                          <IconEmpty variant="food" />
-                          <div className={css.emptyText}>Chưa có bữa ăn</div>
-                          <div
-                            className={css.addMeal}
-                            onClick={handleAddMealClick}>
-                            <IconPlus className={css.plusIcon} />
-                            <span>Thêm bữa ăn</span>
+              <div className={css.orderTitleWrapper}>
+                <div className={css.title}>Đơn hàng #{orderTitle}</div>
+                <Badge
+                  label="Đơn hàng tuần"
+                  type={EBadgeType.info}
+                  className={css.badge}
+                />
+              </div>
+
+              <div className={css.main}>
+                <CalendarDashboard
+                  className={css.calendar}
+                  anchorDate={suitableAnchorDate}
+                  startDate={startDate}
+                  endDate={endDate}
+                  events={calendarEvents}
+                  companyLogo="Company"
+                  hideMonthView
+                  {...calendarProps}
+                />
+
+                <RenderWhen condition={isAllDatesHaveNoRestaurants}>
+                  <div className={css.emptyResult}>
+                    <div className={css.emptyResultImg}>
+                      <Image src={emptyResultImg} alt="empty result" />
+                    </div>
+                    <div className={css.emptyTitle}>
+                      <p>Không tìm thấy kết quả phù hợp</p>
+                      <p className={css.emptyContent}>
+                        Rất tiếc, hệ thống chúng tôi không tìm thấy kết quả phù
+                        hợp với yêu cầu của bạn. Tuy nhiên, đừng ngần ngại{' '}
+                        <span>
+                          chat với chúng tôi để tìm thấy menu nhanh nhất
+                        </span>{' '}
+                        nhé.
+                      </p>
+                      <Button
+                        className={css.contactUsBtn}
+                        variant="secondary"
+                        onClick={handleChatIconClick}>
+                        Chat với chúng tôi
+                      </Button>
+                    </div>
+                  </div>
+                </RenderWhen>
+              </div>
+              <div className={css.subOrderMobileWrapper}>
+                <RenderWhen condition={walkthroughEnable}>
+                  <div
+                    className={classNames(
+                      css.subOrderDate,
+                      !isGroupOrder && css.largePadding,
+                    )}>
+                    <RenderWhen condition={!!sampleSubOrder}>
+                      <MealPlanCard
+                        event={sampleSubOrder as Event}
+                        index={123}
+                        resources={{}}
+                        removeInprogress={false}
+                      />
+                    </RenderWhen>
+                  </div>
+                  <RenderWhen.False>
+                    <RenderWhen condition={!!selectedEvent}>
+                      <MealPlanCard
+                        event={selectedEvent as Event}
+                        index={999}
+                        resources={{ ...calendarProps.resources }}
+                        removeInprogress={
+                          calendarProps?.resources?.updatePlanDetailInprogress
+                        }
+                        onRemove={handleRemoveMeal(planId)}
+                      />
+                      <RenderWhen.False>
+                        <RenderWhen condition={!isAllDatesHaveNoRestaurants}>
+                          <div className={css.addMealWrapper}>
+                            <IconEmpty variant="food" />
+                            <div className={css.emptyText}>Chưa có bữa ăn</div>
+                            <div
+                              className={css.addMeal}
+                              onClick={handleAddMealClick}>
+                              <IconPlus className={css.plusIcon} />
+                              <span>Thêm bữa ăn</span>
+                            </div>
                           </div>
-                        </div>
-                      </RenderWhen>
-                    </RenderWhen.False>
-                  </RenderWhen>
-                </RenderWhen.False>
-              </RenderWhen>
-            </div>
+                        </RenderWhen>
+                      </RenderWhen.False>
+                    </RenderWhen>
+                  </RenderWhen.False>
+                </RenderWhen>
+              </div>
 
-            <RenderWhen condition={walkthroughEnable}>
-              <WelcomeModal
-                isOpen={welcomeModalControl.value}
-                onClose={welcomeModalControl.setFalse}
+              <RenderWhen condition={walkthroughEnable}>
+                <WelcomeModal
+                  isOpen={welcomeModalControl.value}
+                  onClose={welcomeModalControl.setFalse}
+                />
+              </RenderWhen>
+              <ResultDetailModal
+                isOpen={isRestaurantDetailModalOpen}
+                onClose={closeRestaurantDetailModal}
+                restaurantFood={restaurantFood}
+                selectedRestaurantId={selectedRestaurantId}
+                restaurants={restaurants}
+                companyGeoOrigin={companyGeoOrigin}
+                onSearchSubmit={handleSearchRestaurantSubmit}
+                fetchFoodInProgress={fetchRestaurantFoodInProgress}
+                openFromCalendar
+                timestamp={selectedTimestamp}
+                packagePerMember={packagePerMember}
               />
-            </RenderWhen>
-            <ResultDetailModal
-              isOpen={isRestaurantDetailModalOpen}
-              onClose={closeRestaurantDetailModal}
-              restaurantFood={restaurantFood}
-              selectedRestaurantId={selectedRestaurantId}
-              restaurants={restaurants}
-              companyGeoOrigin={companyGeoOrigin}
-              onSearchSubmit={handleSearchRestaurantSubmit}
-              fetchFoodInProgress={fetchRestaurantFoodInProgress}
-              openFromCalendar
-              timestamp={selectedTimestamp}
-              packagePerMember={packagePerMember}
+              <HomeReturnModal
+                isOpen={homeReturnModalController.value}
+                onClose={homeReturnModalController.setFalse}
+              />
+            </LayoutMain>
+          </Layout>
+          <RenderWhen.False>
+            <ParticipantInvitation
+              onGoBack={handleGoBackFromInvitationView}
+              onPublishOrder={handlePublishDraftOrder}
             />
-            <HomeReturnModal
-              isOpen={homeReturnModalController.value}
-              onClose={homeReturnModalController.setFalse}
-            />
-          </LayoutMain>
-        </Layout>
-        <RenderWhen.False>
-          <ParticipantInvitation
-            onGoBack={handleGoBackFromInvitationView}
-            onPublishOrder={handlePublishDraftOrder}
-          />
-        </RenderWhen.False>
-      </RenderWhen>
-    </WalkThroughTourProvider>
+          </RenderWhen.False>
+        </RenderWhen>
+      </WalkThroughTourProvider>
+    </>
   );
 }
 

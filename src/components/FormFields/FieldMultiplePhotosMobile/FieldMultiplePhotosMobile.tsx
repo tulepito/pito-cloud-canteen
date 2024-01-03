@@ -3,8 +3,8 @@ import { Field } from 'react-final-form';
 import { FormattedMessage } from 'react-intl';
 import classNames from 'classnames';
 
+import HighlightBox from '@components/HighlightBox/HighlightBox';
 import IconClose from '@components/Icons/IconClose/IconClose';
-import IconLightBulb from '@components/Icons/IconLightBulb/IconLightBulb';
 import IconPlusWithoutBorder from '@components/Icons/IconPlusWithoutBorder/IconPlusWithoutBorder';
 import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
 import ImageFromFile from '@components/ImageFromFile/ImageFromFile';
@@ -246,14 +246,9 @@ const FieldMultiplePhotosMobile: React.FC<TFieldMultiplePhotosMobileProps> = (
       />
 
       {hintShowed && (
-        <div className={css.hintSection}>
-          <IconLightBulb className={css.hintIcon} />
-
-          <div className={css.hintContent}>
-            Đăng tải hình ảnh cho món sẽ giúp nhà hàng của bạn nổi bật và thu
-            hút khách hàng đặt đơn hơn.
-          </div>
-        </div>
+        <HighlightBox>
+          <FormattedMessage id="FieldMultiplePhotosMobile.hint" />
+        </HighlightBox>
       )}
     </div>
   );

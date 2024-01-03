@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
+import classNames from 'classnames';
 
 import Alert, { EAlertPosition, EAlertType } from '@components/Alert/Alert';
 import Button from '@components/Button/Button';
@@ -31,6 +32,7 @@ export type TAccountSettingsFormValues = {
 };
 
 type TExtraProps = {
+  disabled?: boolean;
   isSubmitted?: boolean;
   setSubmitted?: (value: boolean) => void;
   onFormChange?: (values: TAccountSettingsFormValues) => void;
@@ -51,6 +53,7 @@ const AccountSettingsFormComponent: React.FC<
     submitting,
     values,
     onFormChange,
+    disabled,
   } = props;
   const intl = useIntl();
   const successAlertControl = useBoolean();
@@ -79,6 +82,7 @@ const AccountSettingsFormComponent: React.FC<
         id: 'AccountSettingsForm.contactorNameRequired',
       }),
     ),
+    disabled,
   };
   const fieldEmail = {
     label: 'Email',
@@ -102,6 +106,7 @@ const AccountSettingsFormComponent: React.FC<
         }),
       ),
     ),
+    disabled,
   };
   const fieldAddress = {
     label: 'Địa chỉ',
@@ -110,6 +115,7 @@ const AccountSettingsFormComponent: React.FC<
     className: css.fieldLocation,
     inputClassName: css.fieldLocationInput,
     isMultipleLines: true,
+    disabled,
   };
   const fieldWebsite = {
     label: 'Website',
@@ -121,6 +127,7 @@ const AccountSettingsFormComponent: React.FC<
         id: 'AccountSettingsForm.websiteInvalid',
       }),
     ),
+    disabled,
   };
   const fieldFacebookLink = {
     label: 'Trang Facebook',
@@ -132,6 +139,7 @@ const AccountSettingsFormComponent: React.FC<
         id: 'AccountSettingsForm.facebookUrlValid',
       }),
     ),
+    disabled,
   };
 
   useEffect(() => {
@@ -167,7 +175,11 @@ const AccountSettingsFormComponent: React.FC<
         <LocationAutocompleteInputField {...fieldAddress} />
         <FieldTextInput {...fieldWebsite} />
         <FieldTextInput {...fieldFacebookLink} />
-        <div className={css.actionContainer}>
+        <div
+          className={classNames(css.actionContainer, {
+            // if form is disable, submit button will be hidden
+            [css.hidden]: disabled,
+          })}>
           <Button disabled={submitDisabled} inProgress={submitting}>
             Lưu thay đổi
           </Button>

@@ -112,6 +112,7 @@
   @include textTemplate(14px, 400, 24px);
   color: $neutralGray6;
   margin: 0 0 24px;
+  white-space: pre-wrap;
 }
 
 .optionSection {

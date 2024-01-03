@@ -2,7 +2,7 @@
 import { useMemo, useState } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
-import { useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import { toast } from 'react-toastify';
 import classNames from 'classnames';
@@ -21,6 +21,7 @@ import FieldRadioButton from '@components/FormFields/FieldRadioButton/FieldRadio
 import FieldTextArea from '@components/FormFields/FieldTextArea/FieldTextArea';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import FieldTextInputWithBottomBox from '@components/FormFields/FieldTextInputWithBottomBox/FieldTextInputWithBottomBox';
+import HighlightBox from '@components/HighlightBox/HighlightBox';
 import FileHelpers from '@helpers/fileHelpers';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { partnerPaths } from '@src/paths';
@@ -151,6 +152,9 @@ const EditPartnerFoodFormComponent: React.FC<
 
   return (
     <Form className={css.root}>
+      <HighlightBox>
+        <FormattedMessage id="FieldMultiplePhotosMobile.hint" />
+      </HighlightBox>
       <div className={css.fieldPhotos}>
         <FieldMutiplePhotos
           name="images"
@@ -332,6 +336,9 @@ const EditPartnerFoodFormComponent: React.FC<
               ),
             )}
             parse={parsePrice}
+            helperText={intl.formatMessage({
+              id: 'FoodBasicInforTabFormPart.hint',
+            })}
           />
           <FieldDropdownSelect
             className={css.field}

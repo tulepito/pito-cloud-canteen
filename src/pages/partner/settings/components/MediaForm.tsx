@@ -22,9 +22,11 @@ const ACCEPT_IMAGES = 'image/png, image/gif, image/jpeg';
 const COVER_VARIANTS = [EImageVariants.scaledXLarge];
 const AVATAR_VARIANTS = [EImageVariants.squareSmall2x];
 
-type TMediaFormProps = {};
+type TMediaFormProps = {
+  disabled?: boolean;
+};
 
-const MediaForm: React.FC<TMediaFormProps> = () => {
+const MediaForm: React.FC<TMediaFormProps> = ({ disabled }) => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
 
@@ -97,6 +99,7 @@ const MediaForm: React.FC<TMediaFormProps> = () => {
                 <div className={css.mediaFieldGroup}>
                   <FieldPhotoUpload
                     name="cover"
+                    filesChangeDisabledByToast={disabled}
                     accept={ACCEPT_IMAGES}
                     id="cover"
                     className={css.fieldCover}
@@ -111,6 +114,7 @@ const MediaForm: React.FC<TMediaFormProps> = () => {
                   />
                   <FieldPhotoUpload
                     name="avatar"
+                    filesChangeDisabledByToast={disabled}
                     image={uploadedAvatarImages?.[0]}
                     accept={ACCEPT_IMAGES}
                     id="avatar"

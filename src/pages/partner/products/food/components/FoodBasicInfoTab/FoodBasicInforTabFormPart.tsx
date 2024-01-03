@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import classNames from 'classnames';
 import { isEmpty, keyBy, mapValues } from 'lodash';
@@ -7,6 +7,7 @@ import { isEmpty, keyBy, mapValues } from 'lodash';
 import Button from '@components/Button/Button';
 import FieldMultiplePhotosMobile from '@components/FormFields/FieldMultiplePhotosMobile/FieldMultiplePhotosMobile';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
+import HighlightBox from '@components/HighlightBox/HighlightBox';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { addImages } from '@redux/slices/uploadImage.slice';
 import { Listing } from '@src/utils/data';
@@ -185,6 +186,9 @@ const FoodBasicInforTabFormPart: React.FC<TFoodBasicInforTabFormPartProps> = (
         )}
         parse={parsePrice}
       />
+      <HighlightBox>
+        <FormattedMessage id="FoodBasicInforTabFormPart.hint" />
+      </HighlightBox>
       <FieldTextInput
         name="unit"
         className={css.field}

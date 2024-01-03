@@ -1,5 +1,7 @@
 import { useMemo } from 'react';
+import { FormattedMessage } from 'react-intl';
 
+import HighlightBox from '@components/HighlightBox/HighlightBox';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import Modal from '@components/Modal/Modal';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
@@ -12,6 +14,7 @@ import {
 } from '@src/utils/data';
 
 import { PartnerSettingsThunks } from '../../PartnerSettings.slice';
+import { IS_PARTNER_PROFILE_EDITABLE } from '../helpers/constants';
 
 import type { TAccountSettingsFormValues } from './AccountSettingsForm';
 import AccountSettingsForm from './AccountSettingsForm';
@@ -88,11 +91,18 @@ const AccountSettingsModal: React.FC<TNavigationModalProps> = (props) => {
           <div>Thông tin tài khoản</div>
         </div>
 
+        {!IS_PARTNER_PROFILE_EDITABLE && (
+          <HighlightBox className={css.announcement}>
+            <FormattedMessage id="AccountSettingsModal.announcement" />
+          </HighlightBox>
+        )}
+
         <AccountSettingsForm
           initialValues={initialValues}
           onSubmit={handleSubmitAccountSettingForm}
           isSubmitted={submittedControl.value}
           setSubmitted={submittedControl.setValue}
+          disabled={!IS_PARTNER_PROFILE_EDITABLE}
         />
       </div>
     </Modal>

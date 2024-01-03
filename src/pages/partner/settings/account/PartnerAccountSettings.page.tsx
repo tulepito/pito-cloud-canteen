@@ -1,9 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useMemo, useState } from 'react';
+import { FormattedMessage } from 'react-intl';
 import isEqual from 'lodash/isEqual';
 import { useRouter } from 'next/router';
 
 import Button from '@components/Button/Button';
+import HighlightBox from '@components/HighlightBox/HighlightBox';
 import IconEdit from '@components/Icons/IconEdit/IconEdit';
 import Modal from '@components/Modal/Modal';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
@@ -27,6 +29,7 @@ import MenuInfo from './components/MenuInfo';
 import type { TMenuSettingsFormValues } from './components/MenuSettingsForm';
 import MenuSettingsForm from './components/MenuSettingsForm';
 import NavigationModal from './components/NavigationModal';
+import { IS_PARTNER_PROFILE_EDITABLE } from './helpers/constants';
 
 import css from './PartnerAccountSettingsPage.module.scss';
 
@@ -142,12 +145,20 @@ const PartnerAccountSettingsPage: React.FC<
 
           <div className={css.accountSettingsContainer}>
             <div className={css.menuSettingsTitle}>Thông tin tài khoản</div>
-            <MediaForm />
+
+            {!IS_PARTNER_PROFILE_EDITABLE && (
+              <HighlightBox className={css.announcement}>
+                <FormattedMessage id="AccountSettingsModal.announcement" />
+              </HighlightBox>
+            )}
+
+            <MediaForm disabled={!IS_PARTNER_PROFILE_EDITABLE} />
 
             <AccountSettingsForm
               initialValues={accountFormInitialValues}
               onSubmit={() => {}}
               onFormChange={setPageFormValues}
+              disabled={!IS_PARTNER_PROFILE_EDITABLE}
             />
           </div>
 

@@ -104,3 +104,10 @@
 .mobileDeadlineFormContainer {
   padding: 10px 16px 20px;
 }
+
+.stepperContainerMobile {
+  display: block;
+  @include viewportMedium {
+    display: none;
+  }
+}

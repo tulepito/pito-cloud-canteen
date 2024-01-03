@@ -210,3 +210,19 @@
     display: none;
   }
 }
+
+.stepperContainerMobile {
+  display: block;
+  @include viewportMedium {
+    display: none;
+  }
+}
+
+.stepperContainerDesktop {
+  display: none;
+  @include viewportMedium {
+    display: block;
+    width: 630px;
+    margin: 0 auto;
+  }
+}

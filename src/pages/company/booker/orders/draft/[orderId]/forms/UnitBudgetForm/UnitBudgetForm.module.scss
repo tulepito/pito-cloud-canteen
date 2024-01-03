@@ -1,5 +1,6 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
 .root {
   @include bookerSidebarFormRoot;
 }
@@ -21,6 +22,10 @@
 
 .tooltipOverlay {
   :global(.rc-tooltip-content) {
-    width: 224px;
+    width: calc(100vw - 32px);
+
+    @include viewportMedium {
+      width: 224px;
+    }
   }
 }

@@ -14,6 +14,7 @@ const ToastifyProvider: React.FC<ToastifyProviderProps> = ({ children }) => {
       <ToastContainer enableMultiContainer className={css.container} />
       <ToastContainer
         enableMultiContainer
+        className={css.bottomCenterContainer}
         containerId={css.bottomCenterToast}
         position={toast.POSITION.BOTTOM_CENTER}
       />

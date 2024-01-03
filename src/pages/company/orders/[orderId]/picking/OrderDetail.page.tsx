@@ -34,6 +34,7 @@ import { useDownloadPriceQuotation } from '@hooks/useDownloadPriceQuotation';
 import useExportOrderDetails from '@hooks/useExportOrderDetails';
 import { usePrepareOrderDetailPageData } from '@hooks/usePrepareOrderManagementData';
 import { useViewport } from '@hooks/useViewport';
+import BookerStepperDesktopSection from '@pages/company/booker/orders/draft/[orderId]/components/BookerStepperDesktopSection/BookerStepperDesktopSection';
 import {
   orderDetailsAnyActionsInProgress,
   OrderManagementsAction,
@@ -662,7 +663,9 @@ const OrderDetailPage = () => {
       content = (
         <>
           <RenderWhen condition={!isNormalOrder}>
-            <Stepper {...stepperProps} />
+            <BookerStepperDesktopSection>
+              <Stepper className={css.stepper} {...stepperProps} />
+            </BookerStepperDesktopSection>
           </RenderWhen>
           {EditViewComponent}
         </>

@@ -184,7 +184,7 @@ const ListingDetailModal: React.FC<TListingDetailModalProps> = (props) => {
         <RenderWhen condition={hasDescription || hasAllergicIngredients}>
           <div className={css.section}>
             <RenderWhen condition={hasDescription}>
-              <div>{description}</div>
+              <div className={css.description}>{description}</div>
             </RenderWhen>
 
             <RenderWhen condition={hasAllergicIngredients}>

@@ -50,7 +50,7 @@ const PartnerHeader: React.FC<TPartnerHeaderProps> = () => {
   const { lastName = '', firstName = '' } = currentUserGetter.getProfile();
   const currentUserFullName = `${lastName} ${firstName}`;
 
-  const newNotificationIds = notifications.reduce(
+  const newNotificationIds = (notifications || []).reduce(
     (ids, noti) => (noti?.isNew === true ? ids.concat(noti?.id) : ids),
     [],
   );
