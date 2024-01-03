@@ -127,7 +127,8 @@ const fetchCurrentUser = createAsyncThunk(
   'app/user/FETCH_CURRENT_USER',
   async (params: TObject | undefined, { extra: sdk, rejectWithValue }) => {
     const { userRole } = params || {};
-    const parameters = params || {
+    const parameters = {
+      ...params,
       include: ['profileImage'],
       'fields.image': [
         `variants.${EImageVariants.squareSmall}`,
