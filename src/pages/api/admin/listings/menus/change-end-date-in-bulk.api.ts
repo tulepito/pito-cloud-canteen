@@ -36,7 +36,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           sdkModel: integrationSdk.listings,
           query: {
             meta_listingType: EListingType.menu,
-            pub_menuType: EMenuType.fixedMenu,
+            meta_menuType: EMenuType.fixedMenu,
             pub_endDate: oldEndDate,
           },
         });
