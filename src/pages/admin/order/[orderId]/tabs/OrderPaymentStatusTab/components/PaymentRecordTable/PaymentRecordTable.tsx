@@ -33,7 +33,7 @@ const PaymentRecordTable: React.FC<PaymentRecordTableProps> = (props) => {
       key: 'amount',
       label: 'Số tiền',
       render: ({ amount = 0 }: any) => (
-        <div>{parseThousandNumber(amount.toString())}đ</div>
+        <div>{parseThousandNumber((amount || 0).toString())}đ</div>
       ),
     },
     {
