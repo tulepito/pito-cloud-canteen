@@ -18,6 +18,47 @@ import {
 } from '../recommendRestaurants/index.services';
 import { prepareMenuFoodList } from '../recommendRestaurants/prepareData';
 
+async function removeUnavailabelFoods(newOrderDetail: TObject) {
+  const foodIds: string[] = Object.values(newOrderDetail).reduce(
+    (acc, { restaurant }) => {
+      const { foodList } = restaurant || {};
+      const foodIdsInRestaurant = Object.keys(foodList || {});
+
+      return [...acc, ...foodIdsInRestaurant];
+    },
+    [],
+  );
+
+  const foodIdList = Array.from(new Set(foodIds));
+  const notAvailableFoodIdList: string[] = [];
+
+  await Promise.all(
+    foodIdList.map(async (foodId: string) => {
+      const foodListing = await fetchListing(foodId);
+
+      const { isAvailable } = Listing(foodListing).getMetadata();
+
+      if (!isAvailable) {
+        notAvailableFoodIdList.push(foodId);
+      }
+    }),
+  );
+
+  // remove not available food from order detail
+  if (notAvailableFoodIdList.length !== 0) {
+    Object.keys(newOrderDetail).forEach((timestamp) => {
+      const { restaurant } = newOrderDetail[timestamp] || {};
+      const { foodList } = restaurant || {};
+
+      if (foodList) {
+        notAvailableFoodIdList.forEach((foodId) => {
+          delete foodList[foodId];
+        });
+      }
+    });
+  }
+}
+
 export const normalizeOrderMetadata = (metadata: TObject, newData: TObject) => {
   const {
     companyId,
@@ -161,6 +202,9 @@ export const createNewPlanFromOldPlans = async ({
           memberOrders: isGroupOrder ? {} : initialMemberOrder,
         };
       });
+
+      // check and remove unavailable foods by modifying new order detail directly
+      await removeUnavailabelFoods(newOrderDetail);
 
       // * check available status
       const restaurantAvailableMap = await checkRestaurantAvailableStatus(

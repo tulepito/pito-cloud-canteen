@@ -18,10 +18,16 @@ export const checkRestaurantAvailableStatus = async (
   await Promise.all(
     Object.keys(orderDetail).map(async (timestamp) => {
       const { restaurant } = orderDetail[timestamp] || {};
-      const { menuId, id: restaurantId } = restaurant || {};
+      const { menuId, id: restaurantId, foodList } = restaurant || {};
 
       if (isEmpty(restaurantId)) {
         orderDetailAvailableStatus[timestamp] = true;
+      }
+
+      if (isEmpty(foodList)) {
+        orderDetailAvailableStatus[timestamp] = false;
+
+        return;
       }
 
       const [restaurantListing] = denormalisedResponseEntities(
