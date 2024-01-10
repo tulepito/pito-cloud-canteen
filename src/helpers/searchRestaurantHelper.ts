@@ -1,6 +1,7 @@
 import * as unidecode from 'unidecode';
 
 import { calculateDistance } from '@helpers/mapHelpers';
+import config from '@src/configs';
 import type { TFoodInRestaurant } from '@src/types/bookerSelectRestaurant';
 import { Listing } from '@src/utils/data';
 import type { TListing } from '@src/utils/types';
@@ -50,10 +51,7 @@ export function filterRestaurant(
   const isValidRestaurant =
     !isInStopReceiveOrderTime &&
     distanceToDeliveryPlace <=
-      Number(
-        process.env
-          .NEXT_PUBLIC_MAX_KILOMETER_FROM_RESTAURANT_TO_DELIVERY_ADDRESS_FOR_BOOKER,
-      );
+      Number(config.maxKilometerFromRestaurantToDeliveryAddressForBooker);
 
   return isValidRestaurant;
 }

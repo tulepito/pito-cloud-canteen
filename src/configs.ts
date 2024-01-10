@@ -168,9 +168,8 @@ const VATPercentage = 0;
 
 const marketplacePhoneNumber = '1900 252 530';
 
-const maxKilometerFromRestaurantToDeliveryAddressForBooker =
-  process.env
-    .NEXT_PUBLIC_MAX_KILOMETER_FROM_RESTAURANT_TO_DELIVERY_ADDRESS_FOR_BOOKER;
+// TODO: change this value to 5 when we have enough restaurants
+const maxKilometerFromRestaurantToDeliveryAddressForBooker = 10;
 
 const config = {
   env,
