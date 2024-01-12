@@ -166,6 +166,7 @@ export const recommendRestaurants = async ({
 }) => {
   const orderDetail: TObject = {};
   const order = await fetchListing(orderId as string);
+  console.log('🚀 ~ order:', order);
 
   const {
     nutritions,
@@ -249,13 +250,11 @@ export const recommendRestaurants = async ({
           restaurants[Math.floor(Math.random() * (restaurants.length - 1))];
         const { menu, restaurant } = randomRestaurant;
 
-        if (
-          dayInWeek.includes(
-            convertWeekDay(
-              DateTime.fromMillis(timestamp).setZone(VNTimezone).weekday,
-            ).key,
-          )
-        ) {
+        const timestampWeekDay = convertWeekDay(
+          DateTime.fromMillis(timestamp).setZone(VNTimezone).weekday,
+        ).key;
+
+        if (dayInWeek.includes(timestampWeekDay)) {
           const foodList = await prepareMenuFoodList({
             menu,
             restaurant,

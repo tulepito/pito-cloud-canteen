@@ -12,8 +12,10 @@ import { fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { Listing, User } from '@src/utils/data';
 import {
+  convertWeekDay,
   formatTimestamp,
   generateWeekDayList,
+  getDayInWeekFromPeriod,
   renderDateRange,
 } from '@src/utils/dates';
 import {
@@ -97,6 +99,9 @@ export const reorder = async ({
     .minus({ day: 2 })
     .toMillis();
 
+  const timestampWeekDays = getDayInWeekFromPeriod(startDate, endDate).map(
+    (day) => convertWeekDay(day).key,
+  );
   const newOrderResponse = await integrationSdk.listings.create(
     {
       authorId: subAccountId,
@@ -115,6 +120,7 @@ export const reorder = async ({
         startDate,
         endDate,
         deadlineDate: initialDeadlineDate,
+        dayInWeek: timestampWeekDays,
       },
     },
     { expand: true },
