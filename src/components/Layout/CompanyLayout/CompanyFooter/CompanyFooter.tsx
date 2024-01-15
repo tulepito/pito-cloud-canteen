@@ -28,7 +28,7 @@ const CompanyFooter = () => {
           </Link>
         </div>
         <div className={css.sloganWrapper}>
-          <p className={css.slogan}>Ⓒ 2023 PITO Cloud Canteen</p>
+          <p className={css.slogan}>Ⓒ 2024 PITO Cloud Canteen</p>
           <p className={css.slogan}>
             <span className={css.minus}>{' - '}</span> A New Way To Order Lunch
             At Work. All rights reserved

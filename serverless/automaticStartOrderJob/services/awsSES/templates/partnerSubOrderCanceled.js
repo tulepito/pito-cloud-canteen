@@ -759,7 +759,7 @@ const partnerSubOrderCanceled = ({
                                 <td align="left" style="padding:0;Margin:0;padding-bottom:35px">
                                   <p
                                     style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:18px;color:#8c8c8c;font-size:12px">
-                                    Ⓒ 2023 PITO Cloud Canteen<br>A New Way To Order Lunch At Work. All rights reserved
+                                    Ⓒ 2024 PITO Cloud Canteen<br>A New Way To Order Lunch At Work. All rights reserved
                                   </p>
                                 </td>
                               </tr>

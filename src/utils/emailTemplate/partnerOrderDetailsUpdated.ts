@@ -2203,7 +2203,7 @@ const partnerOrderDetailsUpdated = ({
                                         color: #8c8c8c;
                                         font-size: 12px;
                                       ">
-                                      Ⓒ 2023 PITO Cloud Canteen<br />A New Way
+                                      Ⓒ 2024 PITO Cloud Canteen<br />A New Way
                                       To Order Lunch At Work. All rights
                                       reserved
                                     </p>
