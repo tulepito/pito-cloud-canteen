@@ -14,6 +14,7 @@ import css from './OrderRatingForm.module.scss';
 type TFoodRatingProps = {
   values: any;
   restaurantsByDay: any;
+  isShowTitle?: boolean;
 };
 
 const OPTIONAL_FOOD_RESTAURANT_SATISFACTED =
@@ -23,7 +24,7 @@ const OPTIONAL_FOOD_RESTAURANT_UNSATISFACTED =
 
 const FoodRating: React.FC<TFoodRatingProps> = (props) => {
   const dispatch = useAppDispatch();
-  const { values, restaurantsByDay } = props;
+  const { values, restaurantsByDay, isShowTitle } = props;
 
   const fetchFoodListByRestaurant = useAppSelector(
     (state) => state.OrderRating.fetchFoodListByRestaurantInProgress,
@@ -161,6 +162,7 @@ const FoodRating: React.FC<TFoodRatingProps> = (props) => {
           name="food"
           containerClassName={css.fieldContainer}
           iconClassName={css.faceIcon}
+          titleShowed={isShowTitle}
         />
       </div>
       {isFoodSelected && (

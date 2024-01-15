@@ -1,5 +1,5 @@
 import { Field } from 'react-final-form';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import classNames from 'classnames';
 
 import IconClose from '@components/Icons/IconClose/IconClose';
@@ -9,6 +9,7 @@ import ImageFromFile from '@components/ImageFromFile/ImageFromFile';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useAppDispatch } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
+import { useViewport } from '@hooks/useViewport';
 import type { TImageActionPayload } from '@redux/slices/uploadImage.slice';
 import {
   removeImage,
@@ -54,6 +55,8 @@ const RatingImagesUploadField: React.FC<TRatingImagesUploadFieldProps> = ({
 }) => {
   const dispatch = useAppDispatch();
   const imageUploadRequestControl = useBoolean();
+  const { isMobileLayout } = useViewport();
+  const intl = useIntl();
 
   const allImages = Object.values(images);
 
@@ -144,10 +147,17 @@ const RatingImagesUploadField: React.FC<TRatingImagesUploadFieldProps> = ({
                     <div className={css.uploadImageLabel}>
                       <IconImage />
                       <div className={css.firstText}>
-                        <b>Chọn</b> hoặc <b>Kéo</b> thả ảnh của bạn vào đây
+                        <RenderWhen condition={isMobileLayout}>
+                          <b>Chọn</b> ảnh/video của bạn
+                          <RenderWhen.False>
+                            <b>Chọn</b> hoặc <b>Kéo</b> thả ảnh của bạn vào đây
+                          </RenderWhen.False>
+                        </RenderWhen>
                       </div>
                       <div className={css.secondText}>
-                        Hỗ trợ định dạng png, jpeg.
+                        {intl.formatMessage({
+                          id: 'OrderRatingForm.imageTypeSupport',
+                        })}
                       </div>
                     </div>
                   </label>

@@ -44,6 +44,8 @@ type TReviewCartSectionProps = {
   target: 'client' | 'partner';
   isAdminLayout?: boolean;
   vatSetting?: EPartnerVATSetting;
+  goToReviewPage?: () => void;
+  canReview?: boolean;
 };
 
 const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
@@ -73,6 +75,8 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
     onViewCartDetail = () => {},
     vatSetting = EPartnerVATSetting.vat,
     shouldShowGoHomeButton = false,
+    goToReviewPage,
+    canReview,
   } = props;
   const intl = useIntl();
   const dispatch = useAppDispatch();
@@ -182,6 +186,28 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
     onClickDownloadPriceQuotation();
   };
 
+  const contactNumber = (
+    <span className={css.contactNumber}>
+      {intl.formatMessage({
+        id: 'CompanyOrderDetailPage.titleSection.contactNumber',
+      })}
+    </span>
+  );
+  const chatLink = (
+    <span className={css.chatLink}>
+      {intl.formatMessage({
+        id: 'CompanyOrderDetailPage.titleSection.chatLinkText',
+      })}
+    </span>
+  );
+
+  const reviewText = intl.formatMessage(
+    {
+      id: 'CompanyOrderDetailPage.titleSection.reviewButtonText',
+    },
+    { contactNumber, chatLink },
+  );
+
   const bottomActionSection = (
     <>
       <RenderWhen condition={showStartPickingOrderButton}>
@@ -200,11 +226,24 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
           </div>
         </Button>
       </RenderWhen>
-      <RenderWhen condition={shouldShowGoHomeButton && !isViewCartDetailMode}>
-        <Button className={css.goHomeButton} onClick={handleGoHome}>
-          <div>Về trang chủ</div>
-        </Button>
-      </RenderWhen>
+      <div className={css.row}>
+        <RenderWhen condition={shouldShowGoHomeButton && !isViewCartDetailMode}>
+          <Button
+            className={css.goHomeButton}
+            variant={isMobileLayout ? 'secondary' : 'primary'}
+            onClick={handleGoHome}>
+            <div>{isMobileLayout ? 'Trang chủ' : 'Về trang chủ'}</div>
+          </Button>
+        </RenderWhen>
+        <RenderWhen condition={canReview}>
+          <Button
+            variant="primary"
+            className={css.reviewButton}
+            onClick={goToReviewPage}>
+            {reviewText}
+          </Button>
+        </RenderWhen>
+      </div>
 
       <RenderWhen condition={overflow > 0}>
         <div className={css.overflowPackageInfo}>

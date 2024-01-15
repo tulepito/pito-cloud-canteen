@@ -10,4 +10,8 @@
   padding: 16px 0;
   height: calc(100vh - 40px - 24px - 72px);
   background-color: $neutralGray1;
+
+  @include viewportMedium {
+    min-width: 295px;
+  }
 }

@@ -6,10 +6,11 @@ import css from './OrderRatingForm.module.scss';
 
 type TServiceRatingProps = {
   values: any;
+  isShowTitle?: boolean;
 };
 
 const ServiceRating: React.FC<TServiceRatingProps> = (props) => {
-  const { values } = props;
+  const { values, isShowTitle } = props;
   const isServiceSelected = values?.service;
   const isServiceSatifactedSelected = values?.service && values?.service >= 3;
   const isOptionalOtherServiceRatingSelected =
@@ -100,6 +101,7 @@ const ServiceRating: React.FC<TServiceRatingProps> = (props) => {
           name="service"
           containerClassName={css.fieldContainer}
           iconClassName={css.faceIcon}
+          titleShowed={isShowTitle}
         />
       </div>
       {isServiceSelected && (

@@ -3,8 +3,10 @@
 @use '/src/styles/mixins.scss' as *;
 
 .container {
-  width: 364px;
   margin-top: 12px;
+  @include viewportSmall {
+    width: 364px;
+  }
 
   label {
     cursor: pointer;

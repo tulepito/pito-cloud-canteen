@@ -5,9 +5,10 @@ import css from './OrderRatingForm.module.scss';
 
 type TStaffRatingProps = {
   values: any;
+  isShowTitle?: boolean;
 };
 const StaffRating: React.FC<TStaffRatingProps> = (props) => {
-  const { values } = props;
+  const { values, isShowTitle } = props;
   const isStaffSelected = values?.staff;
   const isStaffSatifactedSelected = values?.staff && values?.staff >= 3;
 
@@ -54,6 +55,7 @@ const StaffRating: React.FC<TStaffRatingProps> = (props) => {
       <div className={css.detailRatingMainField}>
         <div className={css.detailRatingTitle}>Nhân viên</div>
         <FieldRating
+          titleShowed={isShowTitle}
           name="staff"
           containerClassName={css.fieldContainer}
           iconClassName={css.faceIcon}

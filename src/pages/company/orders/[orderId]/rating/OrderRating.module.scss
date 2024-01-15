@@ -2,8 +2,7 @@
 @use '/src/styles/customMediaQueries.scss' as *;
 @use '/src/styles/mixins.scss' as *;
 
-.container {
-  padding: 24px 24px;
+.root {
   @include viewportLarge {
     width: 1180px;
     margin: 0 auto;
@@ -11,10 +10,25 @@
   }
 
   .header {
+    padding: 8px 16px;
+    border-bottom: 1px solid $neutralGray3;
+    width: 100%;
+    @include viewportSmall {
+      padding: 24px;
+    }
     .pageTitle {
       @include textTemplate(24px, $fontWeightBold, 32px);
       text-transform: capitalize;
       margin-top: 20px;
+    }
+  }
+  .ratingContent {
+    margin-top: 20px;
+    margin-bottom: 100px;
+    @include viewportSmall {
+      padding: 24px;
+      margin-top: auto;
+      margin-bottom: auto;
     }
   }
 }
@@ -22,7 +36,18 @@
 .goBackBtn {
   @include flexAlign(center, flex-start);
   gap: 12px;
-  width: 94px;
   cursor: pointer;
   @include textTemplate(16px, $fontWeightBold, 24px);
+  @include viewportSmall {
+    width: 94px;
+  }
+}
+
+.submitBtn {
+  width: 100%;
+}
+
+.mobileTopContainer {
+  height: 56px;
+  align-items: center;
 }

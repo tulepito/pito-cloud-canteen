@@ -394,6 +394,8 @@ const fetchRestaurantReviews = createAsyncThunk(
         const [reviewer] = denormalisedResponseEntities(
           await sdk.users.show({
             id: reviewerId,
+            include: ['profileImage'],
+            'fields.image': [`variants.${EImageVariants.squareSmall2x}`],
           }),
         );
 

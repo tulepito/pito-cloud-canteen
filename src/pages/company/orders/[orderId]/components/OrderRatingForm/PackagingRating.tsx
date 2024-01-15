@@ -11,6 +11,7 @@ import css from './OrderRatingForm.module.scss';
 type TPackagingRatingProps = {
   values: any;
   restaurantsByDay: any;
+  isShowTitle?: boolean;
 };
 
 const OPTIONAL_PACKAGING_RESTAURANT_SATISFACTED =
@@ -18,7 +19,7 @@ const OPTIONAL_PACKAGING_RESTAURANT_SATISFACTED =
 const OPTIONAL_PACKAGING_RESTAURANT_UNSATISFACTED =
   'optionalPackaging-restaurant-unsatifacted';
 const PackagingRating: React.FC<TPackagingRatingProps> = (props) => {
-  const { values, restaurantsByDay } = props;
+  const { values, restaurantsByDay, isShowTitle } = props;
   const isPackagingSelected = values?.packaging;
   const isPackagingSatifactedSelected =
     values?.packaging && values?.packaging >= 3;
@@ -191,6 +192,7 @@ const PackagingRating: React.FC<TPackagingRatingProps> = (props) => {
           name="packaging"
           containerClassName={css.fieldContainer}
           iconClassName={css.faceIcon}
+          titleShowed={isShowTitle}
         />
       </div>
       {isPackagingSelected && (

@@ -166,7 +166,6 @@ export const recommendRestaurants = async ({
 }) => {
   const orderDetail: TObject = {};
   const order = await fetchListing(orderId as string);
-  console.log('🚀 ~ order:', order);
 
   const {
     nutritions,

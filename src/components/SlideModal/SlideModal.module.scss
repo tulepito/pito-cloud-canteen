@@ -19,11 +19,17 @@
 }
 
 .slideModalOpen {
+  position: fixed;
+  z-index: 201;
+
   .slideModalScrollLayer {
     transition: opacity 0.3s ease-in-out;
   }
 }
 .slideModalClose {
+  position: fixed;
+  z-index: 201;
+
   .slideModalScrollLayer {
     transition: opacity 0.3s ease-in-out;
     opacity: 0;

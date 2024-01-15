@@ -93,6 +93,8 @@ const CompanyOrderDetailPage: React.FC<TCompanyOrderDetailPageProps> = () => {
           isViewCartDetailMode={isViewCartDetailMode}
           onViewCartDetail={handleViewCartDetail}
           shouldShowGoHomeButtonOnMobileCart
+          goToReviewPage={goToReviewPage}
+          canReview={canReview}
         />
       </div>
     </>

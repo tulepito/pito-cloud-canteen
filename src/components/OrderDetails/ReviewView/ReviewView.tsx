@@ -43,6 +43,8 @@ type TReviewViewProps = TDefaultProps & {
   onSaveOrderNote?: (value: string) => void;
   onDownloadReviewOrderResults: () => void;
   onViewCartDetail?: () => void;
+  goToReviewPage?: () => void;
+  canReview?: boolean;
 };
 
 const ReviewView: React.FC<TReviewViewProps> = (props) => {
@@ -66,6 +68,8 @@ const ReviewView: React.FC<TReviewViewProps> = (props) => {
     reviewInfoValues,
     setInfoFormValues,
     shouldShowGoHomeButtonOnMobileCart = false,
+    goToReviewPage,
+    canReview,
   } = props;
   const dispatch = useAppDispatch();
   const { isMobileLayout } = useViewport();
@@ -147,6 +151,8 @@ const ReviewView: React.FC<TReviewViewProps> = (props) => {
           onViewCartDetail={onViewCartDetail}
           reviewInfoValues={reviewInfoValues}
           shouldShowGoHomeButton={shouldShowGoHomeButtonOnMobileCart}
+          goToReviewPage={goToReviewPage}
+          canReview={canReview}
         />
       </div>
     </div>

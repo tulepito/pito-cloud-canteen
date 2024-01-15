@@ -1,9 +1,12 @@
 import { useCallback, useMemo, useState } from 'react';
+import { useIntl } from 'react-intl';
 
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import Modal from '@components/Modal/Modal';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
+import SlideModal from '@components/SlideModal/SlideModal';
 import Tabs from '@components/Tabs/Tabs';
-import useBoolean from '@hooks/useBoolean';
+import { useViewport } from '@hooks/useViewport';
 import { Listing } from '@src/utils/data';
 import type { TListing } from '@src/utils/types';
 
@@ -25,6 +28,7 @@ const ReviewItemList = ({
   totalReview,
   onFetching,
 }: any) => {
+  const intl = useIntl();
   const noReview = reviewList.length === 0;
   const isShowAllReviews = reviewList.length === totalReview;
 
@@ -34,7 +38,11 @@ const ReviewItemList = ({
   return (
     <div className={css.reviewList}>
       {noReview && !inProgress && (
-        <div className={css.noReview}>Chưa có đánh giá</div>
+        <div className={css.noReview}>
+          {intl.formatMessage({
+            id: 'OrderRatingForm.noReview',
+          })}
+        </div>
       )}
       {reviewList.map((review: any) => {
         const reviewListing = Listing(review);
@@ -64,7 +72,9 @@ const ReviewItemList = ({
       {inProgress && <div className={css.loading}>Đang tải...</div>}
       {shouldShowLoadMore && (
         <div className={css.loadMore} onClick={onFetching}>
-          Xem thêm
+          {intl.formatMessage({
+            id: 'RestaurantCard.viewDetailText',
+          })}
         </div>
       )}
     </div>
@@ -73,7 +83,8 @@ const ReviewItemList = ({
 
 const RestaurantReviewModal: React.FC<RestaurantReviewModalProps> = (props) => {
   const { isOpen, onClose } = props;
-  const viewAllReviewControl = useBoolean();
+  const intl = useIntl();
+  const { isMobileLayout } = useViewport();
   const [reviewPage, setReviewPage] = useState(1);
   const [activeTab, setActiveTab] = useState<'booker' | 'participant'>(
     'booker',
@@ -87,7 +98,7 @@ const RestaurantReviewModal: React.FC<RestaurantReviewModalProps> = (props) => {
     fetchRestaurantReviewInProgress,
     bookerReviewPagination,
     participantReviewPagination,
-  } = useRestaurantReview(activeTab, viewAllReviewControl.value, reviewPage);
+  } = useRestaurantReview(activeTab, true, reviewPage);
   const selectedRestaurantListing = useMemo(
     () => Listing(selectedRestaurant as TListing),
     [selectedRestaurant],
@@ -104,7 +115,11 @@ const RestaurantReviewModal: React.FC<RestaurantReviewModalProps> = (props) => {
       key: 'booker',
       label: (
         <div className={css.tabLabel}>
-          <span>Từ người đặt nhóm</span>
+          <span>
+            {intl.formatMessage({
+              id: 'OrderRatingForm.BookerReviewTab',
+            })}
+          </span>
           <div data-number className={css.commentNumber}>
             {!fetchRestaurantReviewInProgress ? bookerReviewNumber : 0}
           </div>
@@ -112,7 +127,7 @@ const RestaurantReviewModal: React.FC<RestaurantReviewModalProps> = (props) => {
       ),
       childrenFn: (childProps: any) => <ReviewItemList {...childProps} />,
       childrenProps: {
-        isSeeAll: viewAllReviewControl.value,
+        isSeeAll: true,
         reviewList: restaurantBookerReviews,
         reviewerList: restaurantBookerReviewers,
         inProgress: fetchRestaurantReviewInProgress,
@@ -124,7 +139,11 @@ const RestaurantReviewModal: React.FC<RestaurantReviewModalProps> = (props) => {
       key: 'participant',
       label: (
         <div className={css.tabLabel}>
-          <span>Từ người tham gia</span>
+          <span>
+            {intl.formatMessage({
+              id: 'OrderRatingForm.ParticipantReviewTab',
+            })}
+          </span>
           <div data-number className={css.commentNumber}>
             {!fetchRestaurantReviewInProgress ? participantReviewNumber : 0}
           </div>
@@ -132,7 +151,7 @@ const RestaurantReviewModal: React.FC<RestaurantReviewModalProps> = (props) => {
       ),
       childrenFn: (childProps: any) => <ReviewItemList {...childProps} />,
       childrenProps: {
-        isSeeAll: viewAllReviewControl.value,
+        isSeeAll: true,
         reviewList: restaurantParticipantReviews,
         reviewerList: restaurantParticipantReviewers,
         inProgress: fetchRestaurantReviewInProgress,
@@ -150,28 +169,17 @@ const RestaurantReviewModal: React.FC<RestaurantReviewModalProps> = (props) => {
     setActiveTab(tab?.key as any);
   }, []);
 
-  const onViewAllReview = () => {
-    viewAllReviewControl.setTrue();
-  };
-
-  const handleGoBack = () => {
-    viewAllReviewControl.setFalse();
-    setReviewPage(1);
-  };
-
-  const goBackModalTitle = (
-    <div className={css.goBack} onClick={handleGoBack}>
-      <IconArrow direction="left" />
-      <span>Quay lại</span>
-    </div>
-  );
-
   const generalView = (
     <>
       <div className={css.modalHeader}>
         <div className={css.detailRatingContainer}>
           <div className={css.detailRatingRow}>
-            <span className={css.scenarioLabel}>Món ăn:</span>
+            <span className={css.scenarioLabel}>
+              {intl.formatMessage({
+                id: 'AddOrderForm.foodIdField.placeholder',
+              })}
+              :
+            </span>
             <div className={css.ratingBar}>
               <div
                 style={{ width: calculateRatingPercent(food || 0) }}
@@ -180,7 +188,12 @@ const RestaurantReviewModal: React.FC<RestaurantReviewModalProps> = (props) => {
             <span className={css.ratingPoint}>{`${food || 0}/5`}</span>
           </div>
           <div className={css.detailRatingRow}>
-            <span className={css.scenarioLabel}>Dụng cụ:</span>
+            <span className={css.scenarioLabel}>
+              {intl.formatMessage({
+                id: 'ManagePartnerReviewsPage.packageTitle',
+              })}
+              :
+            </span>
             <div className={css.ratingBar}>
               <div
                 style={{
@@ -197,10 +210,6 @@ const RestaurantReviewModal: React.FC<RestaurantReviewModalProps> = (props) => {
           <div className={css.totalComment}>
             {`Bình luận (${totalComments})`}
           </div>
-          <div className={css.seeAll} onClick={onViewAllReview}>
-            <span>Xem tất cả</span>
-            <IconArrow direction="right" />
-          </div>
         </div>
       </div>
     </>
@@ -215,18 +224,44 @@ const RestaurantReviewModal: React.FC<RestaurantReviewModalProps> = (props) => {
   );
 
   return (
-    <Modal
-      id="RestaurantReviewModal"
-      isOpen={isOpen}
-      handleClose={onClose}
-      containerClassName={css.modalContainer}
-      scrollLayerClassName={css.scrollLayer}
-      title={viewAllReviewControl.value ? goBackModalTitle : 'Đánh giá'}>
-      {viewAllReviewControl.value ? detailView : generalView}
-      <div className={css.content}>
-        <Tabs items={tabItems as any} onChange={onTabChange} />
-      </div>
-    </Modal>
+    <RenderWhen condition={isMobileLayout}>
+      <SlideModal
+        id="RestaurantReviewModal"
+        isOpen={isOpen}
+        onClose={onClose}
+        containerClassName={css.modalContainer}
+        modalTitle={
+          <div className={css.titleSlideModal}>
+            <IconArrow direction="left" onClick={onClose} />
+            <span>
+              {intl.formatMessage({
+                id: 'MemberDetailPage.backButton',
+              })}
+            </span>
+          </div>
+        }>
+        {generalView}
+        <div className={css.content}>
+          <Tabs items={tabItems as any} onChange={onTabChange} />
+        </div>
+      </SlideModal>
+      <RenderWhen.False>
+        <Modal
+          id="RestaurantReviewModal"
+          isOpen={isOpen}
+          handleClose={onClose}
+          containerClassName={css.modalContainer}
+          scrollLayerClassName={css.scrollLayer}
+          title={intl.formatMessage({
+            id: 'ManageCompanyOrdersPage.actionBtn.reviewOrder',
+          })}>
+          {detailView}
+          <div className={css.content}>
+            <Tabs items={tabItems as any} onChange={onTabChange} />
+          </div>
+        </Modal>
+      </RenderWhen.False>
+    </RenderWhen>
   );
 };
 

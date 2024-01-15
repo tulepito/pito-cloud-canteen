@@ -3,8 +3,11 @@
 @use '/src/styles/mixins.scss' as *;
 
 .generalRatingWrapper {
-  padding-bottom: 20px;
+  padding-bottom: 16px;
   border-bottom: 1px solid $neutralGray5;
+  @include viewportSmall {
+    padding-bottom: 20px;
+  }
 
   .generalRatingTitle {
     @include textTemplate(16px, $fontWeightBold, 24px);
@@ -12,64 +15,81 @@
   }
 
   .generalRatingField {
-    width: 455px;
+    @include viewportSmall {
+      width: 455px;
+    }
     margin: 20px auto 0;
   }
 }
 
 .detailRatingWrapper {
-  @include flexAlign(flex-start, space-between);
+  @include flexAlign(flex-start, center);
   flex-direction: column;
   flex-wrap: wrap;
-
-  .detailRatingTitle {
-    @include textTemplate(16px, $fontWeightBold, 24px);
+  padding-left: 16px;
+  width: 100%;
+  @include viewportSmall {
+    width: unset;
   }
+}
 
-  .detailRatingFieldWrapper {
-    width: 100%;
+.detailRatingFieldWrapper {
+  width: 100%;
+  padding-bottom: 8px;
+  @include textTemplate(16px, $fontWeightBold, 24px);
+  @include viewportSmall {
     margin-bottom: 24px;
-    @include textTemplate(16px, $fontWeightBold, 24px);
-
-    .fieldContainer {
-      height: 84px;
-    }
-    .faceIcon {
-      width: 28px;
-      height: 28px;
-    }
   }
 
-  .detailRatingOptionalField {
-    margin-top: 16px;
+  .fieldContainer {
+    margin-top: 20px;
+    margin-left: -16px;
+  }
+  .faceIcon {
+    width: 28px;
+    height: 28px;
+  }
+}
 
-    .optionalFieldTitle {
-      @include textTemplate(14px, $fontWeightSemiBold, 20px);
-      margin-bottom: 12px;
-    }
+.detailRatingOptionalField {
+  margin-top: 16px;
+  margin-left: -16px;
 
-    .optionalFieldContainer {
-      margin-top: 8px;
-    }
-
-    .optionalSelectField {
-      width: 346px;
-    }
+  .optionalFieldTitle {
+    @include textTemplate(14px, $fontWeightSemiBold, 20px);
+    margin-bottom: 12px;
   }
 
-  .optionalOtherField {
+  .optionalFieldContainer {
     margin-top: 8px;
+  }
 
-    textarea {
-      resize: none;
+  .optionalSelectField {
+    @include viewportSmall {
+      width: 346px;
     }
   }
 }
 
+.optionalOtherField {
+  margin-top: 8px;
+
+  textarea {
+    resize: none;
+  }
+}
+
+.detailRatingTitle {
+  @include textTemplate(16px, $fontWeightBold, 24px);
+}
+
 .detailTextRatingWrapper {
-  margin-top: 28px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid $neutralGray5;
+  padding-bottom: 16px;
+  @include viewportSmall {
+    border-bottom: 1px solid $neutralGray5;
+    margin-top: 28px;
+    padding-bottom: 20px;
+  }
 
   .detailTextRatingLabel {
     @include textTemplate(18px, $fontWeightBold, 24px);
@@ -83,9 +103,12 @@
 }
 
 .imagesRatingWrapper {
-  margin-top: 28px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid $neutralGray5;
+  padding-bottom: 16px;
+  @include viewportSmall {
+    border-bottom: 1px solid $neutralGray5;
+    margin-top: 28px;
+    padding-bottom: 20px;
+  }
 
   .imagesRatingTitle {
     @include textTemplate(18px, $fontWeightBold, 24px);
@@ -95,27 +118,76 @@
 .submitBtnWrapper {
   padding: 28px 0 100px;
   @include flexAlign(center, flex-end);
-  .submitBtn {
+}
+
+.detailRatingContainer {
+  gap: 16px;
+  padding-left: 16px;
+
+  @include viewportMedium {
+    @include flexAlign(flex-start, space-between);
+  }
+
+  @include viewportSmall {
+    border-bottom: 1px solid $neutralGray5;
+    padding-bottom: 20px;
+    margin-top: 20px;
+    gap: 64px;
+  }
+}
+
+.ratingSectionTitle {
+  @include textTemplate(18px, $fontWeightBold, 24px);
+}
+
+.pitoRating {
+  flex-basis: 50%;
+}
+
+.partnerRating {
+  flex-basis: 50%;
+}
+
+.fieldContainer {
+  padding: 0;
+}
+
+.formContainter {
+  padding: 8px 16px;
+  @include viewportSmall {
+    padding: 0;
+  }
+}
+
+.mobileBottonContainer {
+  background: $neutralGray1;
+
+  box-shadow: 0px -4px 8px -2px $neutralGray6;
+  box-shadow: 0px -2px 4px -2px $neutralGray6;
+}
+.submitBtn {
+  width: 100%;
+  @include viewportMedium {
     width: 160px;
   }
 }
 
-.detailRatingContainer {
-  @include flexAlign(flex-start, space-between);
-  gap: 64px;
-  padding-bottom: 20px;
-  margin-top: 20px;
-  border-bottom: 1px solid $neutralGray5;
+.generalRatingIcon {
+  width: 28px;
+  height: 28px;
 
-  .ratingSectionTitle {
-    @include textTemplate(18px, $fontWeightBold, 24px);
+  @include viewportSmall {
+    width: 40px;
+    height: 40px;
   }
+}
 
-  .pitoRating {
-    flex-basis: 50%;
-  }
+.generalRatingOption {
+  min-width: unset;
+}
 
-  .partnerRating {
-    flex-basis: 50%;
+.generalRatingLabel {
+  span {
+    white-space: nowrap;
   }
 }

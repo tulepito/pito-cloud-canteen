@@ -6,8 +6,10 @@ import isEmpty from 'lodash/isEmpty';
 import { useRouter } from 'next/router';
 
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
+import MobileTopContainer from '@components/MobileTopContainer/MobileTopContainer';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
+import { useViewport } from '@hooks/useViewport';
 import { resetImage } from '@redux/slices/uploadImage.slice';
 import { Listing } from '@src/utils/data';
 import { EOrderStates } from '@src/utils/enums';
@@ -24,6 +26,7 @@ const OrderRatingPage = () => {
   const dispatch = useAppDispatch();
   const intl = useIntl();
   const ratingSuccessModalControl = useBoolean();
+  const { isMobileLayout } = useViewport();
   const { orderId } = router.query;
   const currentUser = useAppSelector(
     (state) => state.user.currentUser,
@@ -215,26 +218,46 @@ const OrderRatingPage = () => {
   };
 
   return (
-    <div className={css.container}>
-      <div className={css.header}>
-        <div className={css.goBackBtn} onClick={handleGoBack}>
-          <IconArrow direction="left" />
-          Quay lại
+    <>
+      {isMobileLayout && (
+        <MobileTopContainer
+          className={css.mobileTopContainer}
+          onGoBack={handleGoBack}
+          hasGoBackButton
+          title={intl.formatMessage({
+            id: 'OrderRatingPage.mobilePageTitle',
+          })}
+        />
+      )}
+      <div className={css.root}>
+        {!isMobileLayout && (
+          <div className={css.header}>
+            <div className={css.goBackBtn} onClick={handleGoBack}>
+              <IconArrow direction="left" />
+              {intl.formatMessage({
+                id: 'NavigateButtons.goBack',
+              })}
+            </div>
+            <div className={css.pageTitle}>{pageTitle}</div>
+          </div>
+        )}
+        <div className={css.ratingContent}>
+          <OrderRatingForm
+            onSubmit={onSubmit}
+            inProgress={postRatingInProgress}
+            restaurantsByDay={restaurantsByDay}
+            images={images}
+            order={order}
+          />
         </div>
-        <div className={css.pageTitle}>{pageTitle}</div>
+        <RatingSuccessModal
+          isPopup={!!isMobileLayout}
+          isOpen={ratingSuccessModalControl.value}
+          onClose={ratingSuccessModalControl.setFalse}
+          goToHome={handleGoToHome}
+        />
       </div>
-      <OrderRatingForm
-        onSubmit={onSubmit}
-        inProgress={postRatingInProgress}
-        restaurantsByDay={restaurantsByDay}
-        images={images}
-      />
-      <RatingSuccessModal
-        isOpen={ratingSuccessModalControl.value}
-        onClose={ratingSuccessModalControl.setFalse}
-        goToHome={handleGoToHome}
-      />
-    </div>
+    </>
   );
 };
 

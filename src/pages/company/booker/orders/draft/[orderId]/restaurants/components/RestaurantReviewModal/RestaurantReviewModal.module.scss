@@ -55,7 +55,9 @@
 }
 
 .modalContent {
-  margin-top: 20px;
+  @include viewportSmall {
+    margin-top: 20px;
+  }
 
   .contentHeader {
     @include flexAlign(center, space-between);
@@ -91,18 +93,30 @@
 }
 
 .noReview {
-  margin-top: 20px;
+  margin-top: 200px;
+  margin-bottom: 200px;
   text-align: center;
+  @include viewportSmall {
+    margin-top: 20px;
+  }
 }
 
 .reviewList {
-  max-height: 50vh;
+  height: 55vh;
   overflow-y: auto;
+  @include viewportSmall {
+    max-height: 55vh;
+    height: unset;
+  }
 }
 
 .loading {
-  margin-top: 20px;
+  margin-top: 200px;
+  margin-bottom: 200px;
   text-align: center;
+  @include viewportSmall {
+    margin-top: 20px;
+  }
 }
 
 .loadMore {
@@ -112,5 +126,15 @@
 
   &:hover {
     text-decoration: underline;
+  }
+}
+
+.titleSlideModal {
+  @include flexAlign(center, flex-start);
+  flex-direction: row;
+  flex-wrap: nowrap;
+  gap: 4px;
+  span {
+    @include textTemplate(16px, $fontWeightBold, 24px);
   }
 }
