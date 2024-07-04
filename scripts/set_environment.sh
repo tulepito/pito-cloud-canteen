@@ -36,7 +36,7 @@ if [ "$ENV" == "production" ] || [ "$CIRCLE_BRANCH" == "production" ]; then
   export ENV_FILE_PATH='.env.prod'
   export ENV_NAME='PRODUCTION'
   # Remember to fill manually
-  export AWS_ENV_SECRET_NAME='pito/web/prod/Y0dsMGIzQnliMlE'
+  export AWS_ENV_SECRET_NAME='pito/web/prod/Y0dsMGIzQnliMlF'
   
 else
   echo -e "${COLOR}:::::::::::::Setting environment for TEST::::::::::::::${NC}"
