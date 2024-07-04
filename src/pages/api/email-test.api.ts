@@ -1,6 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import cookies from '@services/cookie';
 import { emailSendingFactory, EmailTemplateTypes } from '@services/email';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
@@ -13,4 +12,4 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   });
 }
 
-export default cookies(handler);
+export default handler;
