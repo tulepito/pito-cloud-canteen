@@ -59,6 +59,7 @@ export const getSubmitFoodData = (values: TEditPartnerFoodFormValues) => {
     restaurantId,
     isDraft,
     state,
+    adminApproval,
     ...rest
   } = values;
   const priceRemoveComma = price.toString().split('.');
@@ -75,6 +76,7 @@ export const getSubmitFoodData = (values: TEditPartnerFoodFormValues) => {
       ...rest,
     },
     metadata: {
+      adminApproval,
       restaurantId,
       listingType: EListingType.food,
       isFoodEnable: true,

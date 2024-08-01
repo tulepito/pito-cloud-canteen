@@ -50,7 +50,7 @@ const getApprovalStateType = (approvalState: EFoodApprovalState) => {
     case EFoodApprovalState.DECLINED:
       return EBadgeType.danger;
     default:
-      return EBadgeType.success;
+      return EBadgeType.default;
   }
 };
 
@@ -131,10 +131,12 @@ const FoodCard: React.FC<TFoodCardProps> = (props) => {
                 <div>
                   <Badge
                     type={getApprovalStateType(adminApproval)}
-                    label={getLabelByKey(
-                      FOOD_APPROVAL_STATE_OPTIONS,
-                      adminApproval,
-                    )}
+                    label={
+                      getLabelByKey(
+                        FOOD_APPROVAL_STATE_OPTIONS,
+                        adminApproval,
+                      ) || 'Nháp'
+                    }
                   />
                 </div>
               </RenderWhen>
@@ -184,7 +186,7 @@ const FoodCard: React.FC<TFoodCardProps> = (props) => {
       dispatch(partnerFoodSliceThunks.fetchEditableFood(foodId));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [foodId, dispatch, JSON.stringify(editableFoodMap)]);
+  }, [foodId, dispatch]);
 
   return (
     <div className={css.cardWrapper}>

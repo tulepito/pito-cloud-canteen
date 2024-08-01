@@ -11,7 +11,7 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { resetImage } from '@redux/slices/uploadImage.slice';
 import { partnerPaths } from '@src/paths';
 import { CurrentUser, IntegrationListing } from '@utils/data';
-import { EFoodType, EMenuType } from '@utils/enums';
+import { EFoodApprovalState, EFoodType, EMenuType } from '@utils/enums';
 import { getInitialAddImages } from '@utils/images';
 import type { TKeyValue, TObject } from '@utils/types';
 
@@ -133,7 +133,8 @@ const CreatePartnerFoodPage = () => {
           getSubmitFoodData({
             ...values,
             restaurantId: restaurantListingId,
-            isDraft: currentTab !== FOOD_ADDITIONAL_INFO_TAB,
+            adminApproval: EFoodApprovalState.PENDING,
+            isDraft: false,
           }),
         ),
       );

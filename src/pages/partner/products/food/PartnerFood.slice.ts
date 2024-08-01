@@ -1046,7 +1046,15 @@ const partnerFoodSlice = createSlice({
         ...state,
         updateFoodInProgress: false,
         foods: state.foods.map((food: any) =>
-          food.id.uuid === payload.id.uuid ? payload : food,
+          food.id.uuid === payload.id.uuid
+            ? {
+                ...food,
+                attributes: {
+                  ...food.attributes,
+                  enabled: payload.attributes.enabled,
+                },
+              }
+            : food,
         ),
       }))
       .addCase(toggleFoodEnabled.rejected, (state, { error }) => ({

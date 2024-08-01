@@ -71,6 +71,7 @@ const CreatePartnerFoodPage = () => {
           ...values,
           restaurantId: restaurantId as string,
           adminApproval: EFoodApprovalState.ACCEPTED,
+          isDraft: false,
         }),
       ),
     );
