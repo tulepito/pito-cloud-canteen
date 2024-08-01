@@ -135,11 +135,15 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
   const { lastTransition = ETransition.INITIATE_TRANSACTION } =
     draftOrderDetail?.[currentViewDate] || {};
 
+  const lastTransitionPartnerConfirmSubOrder =
+    lastTransition === ETransition.PARTNER_CONFIRM_SUB_ORDER;
+
   const ableToUpdateOrder =
     !fetchOrderInProgress &&
     isRouterReady &&
     ((lastTransition === ETransition.INITIATE_TRANSACTION && isDraftEditing) ||
-      isPickingState);
+      isPickingState ||
+      lastTransitionPartnerConfirmSubOrder);
 
   const { orderTitle, priceQuotationData, editViewData, reviewViewData } =
     usePrepareOrderDetailPageData({

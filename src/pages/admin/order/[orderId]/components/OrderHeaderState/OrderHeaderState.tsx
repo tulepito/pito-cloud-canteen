@@ -95,8 +95,17 @@ const OrderHeaderState: React.FC<OrderHeaderStateProps> = (props) => {
   ).some(({ lastTransition = ETransition.INITIATE_TRANSACTION }: TObject) => {
     return lastTransition === ETransition.INITIATE_TRANSACTION;
   });
+
+  const hasAnyPartnerConfirmSubOrdersMaybe = (
+    Object.values(orderDetail) as TObject[]
+  ).some(({ lastTransition = ETransition.INITIATE_TRANSACTION }: TObject) => {
+    return lastTransition === ETransition.PARTNER_CONFIRM_SUB_ORDER;
+  });
+
   const shouldManagePickingBtn =
-    orderState === EOrderStates.inProgress && hasAnyInProgressSubOrdersMaybe;
+    orderState === EOrderStates.inProgress &&
+    (hasAnyInProgressSubOrdersMaybe || hasAnyPartnerConfirmSubOrdersMaybe);
+
   const canCancelOrder = ORDER_STATE_TRANSIT_FLOW[
     orderState as TTransitionOrderState
   ]?.includes(EOrderStates.canceled);
