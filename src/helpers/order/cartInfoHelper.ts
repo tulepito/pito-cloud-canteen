@@ -21,21 +21,12 @@ import { vatPercentageBaseOnVatSetting } from './prepareDataHelper';
 
 export const calculateVATFee = ({
   vatPercentage,
-  vatSetting,
   totalWithoutVAT,
-  totalPrice,
-  isPartner = true,
-}: TObject) => {
-  if (!isPartner) {
-    return Math.round(totalWithoutVAT * vatPercentage);
-  }
-
-  switch (vatSetting) {
-    case EPartnerVATSetting.noExportVat:
-      return Math.round(totalPrice * vatPercentage);
-    default:
-      return Math.round(totalWithoutVAT * vatPercentage);
-  }
+}: {
+  vatPercentage: number;
+  totalWithoutVAT: number;
+}) => {
+  return Math.round(totalWithoutVAT * vatPercentage);
 };
 
 export const calculateTotalPriceAndDishes = ({
@@ -267,11 +258,8 @@ export const calculatePriceQuotationInfoFromOrder = ({
     isPartner,
   });
   const VATFee = calculateVATFee({
-    vatSetting,
     vatPercentage,
-    totalPrice,
     totalWithoutVAT,
-    isPartner,
   });
 
   const totalWithVAT = VATFee + totalWithoutVAT;
@@ -332,9 +320,7 @@ export const calculatePriceQuotationPartner = ({
     vatPercentage: orderVATPercentage,
   });
   const VATFee = calculateVATFee({
-    vatSetting,
     vatPercentage,
-    totalPrice,
     totalWithoutVAT,
   });
   const totalWithVAT = VATFee + totalWithoutVAT;
@@ -446,11 +432,8 @@ export const calculatePriceQuotationInfoFromQuotation = ({
     isPartner,
   });
   const VATFee = calculateVATFee({
-    vatSetting,
     vatPercentage,
-    totalPrice,
     totalWithoutVAT,
-    isPartner,
   });
   const totalWithVAT = VATFee + totalWithoutVAT;
   const overflow = isOverflowPackage
