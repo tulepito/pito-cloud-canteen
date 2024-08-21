@@ -28,6 +28,10 @@ export const createEmailParams = (
     },
   };
 
+  const emailSender = sender || process.env.AWS_SENDER_EMAIL!;
+  const senderName = 'PITO Cloud Canteen';
+  const source = `${senderName} <${emailSender}>`;
+
   return {
     Destination: {
       ToAddresses: toAddresses,
@@ -39,8 +43,8 @@ export const createEmailParams = (
         Data: subject,
       },
     },
-    Source: sender || process.env.AWS_SENDER_EMAIL,
-  } as SendEmailRequest;
+    Source: source,
+  } satisfies SendEmailRequest;
 };
 
 export const sendEmail = (params: SendEmailRequest) => {
