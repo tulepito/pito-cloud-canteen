@@ -31,7 +31,7 @@ export const createNativeNotification = async (
   const { oneSignalUserIds = [] } = participantUser.getPrivateData();
   const { company, isCompany } = participantUser.getMetadata();
 
-  const isBooker = Object.values(company).some(({ permission }: any) => {
+  const isBooker = Object.values(company || {}).some(({ permission }: any) => {
     return permission === ECompanyPermission.booker;
   });
 
