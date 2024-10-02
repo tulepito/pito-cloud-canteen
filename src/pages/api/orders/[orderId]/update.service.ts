@@ -96,13 +96,17 @@ const updateOrder = async ({
         });
       } catch (error) {
         console.info('create scheduler in update order');
-        await createScheduler({
-          customName: schedulerName,
-          timeExpression,
-          params: {
-            orderId,
-          },
-        });
+        try {
+          await createScheduler({
+            customName: schedulerName,
+            timeExpression,
+            params: {
+              orderId,
+            },
+          });
+        } catch {
+          // ignore error
+        }
       }
     }
 
