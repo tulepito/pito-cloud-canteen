@@ -70,6 +70,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         console.log('event', event);
         const { path } = event;
         switch (event.status) {
+          case EOnWheelOrderStatus.idle:
           case EOnWheelOrderStatus.assigning: {
             await Promise.all(
               path.map(async (OWSubOrder: any) => {
@@ -117,6 +118,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             return res.status(200).end();
           }
 
+          case EOnWheelOrderStatus.completed:
           case EOnWheelOrderStatus.inProcess: {
             await Promise.all(
               path.map(async (OWSubOrder: any) => {
@@ -126,6 +128,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
                   address,
                 } = OWSubOrder;
                 if (!trackingNumber) return;
+
+                if (event.status === EOnWheelOrderStatus.completed) {
+                  if (status !== 'COMPLETED' || status !== 'CANCELED') return;
+                }
 
                 const transition =
                   status === 'COMPLETED'
