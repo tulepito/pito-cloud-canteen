@@ -72,17 +72,31 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         switch (event.status) {
           case EOnWheelOrderStatus.idle:
           case EOnWheelOrderStatus.assigning: {
+            const distinctTrackingNumberPaths = path.reduce(
+              (acc: any[], OWSubOrder: any) => {
+                const { tracking_number: trackingNumber } = OWSubOrder;
+                if (!trackingNumber) return acc;
+
+                if (
+                  !acc.find((item) => item.tracking_number === trackingNumber)
+                ) {
+                  acc.push(OWSubOrder);
+                }
+
+                return acc;
+              },
+              [],
+            );
+
             await Promise.all(
-              path.map(async (OWSubOrder: any) => {
-                const { tracking_number: trackingNumber, address } = OWSubOrder;
+              distinctTrackingNumberPaths.map(async (OWSubOrder: any) => {
+                const { tracking_number: trackingNumber } = OWSubOrder;
 
                 if (!trackingNumber) return;
 
                 const [orderTitle, subOrderWeekDay] =
                   trackingNumber.split(/[_-]/);
-                const { plan, deliveryAddress } = await fetchData(orderTitle);
-
-                if (address !== deliveryAddress) return;
+                const { plan } = await fetchData(orderTitle);
 
                 const planListing = Listing(plan);
                 const planId = planListing.getId();
@@ -120,32 +134,61 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
           case EOnWheelOrderStatus.completed:
           case EOnWheelOrderStatus.inProcess: {
-            await Promise.all(
-              path.map(async (OWSubOrder: any) => {
-                const {
-                  tracking_number: trackingNumber,
-                  status,
-                  address,
-                } = OWSubOrder;
-                if (!trackingNumber) return;
+            const distinctTrackingNumberPaths = path.reduce(
+              (acc: any[], OWSubOrder: any) => {
+                const { tracking_number: trackingNumber } = OWSubOrder;
+                if (!trackingNumber) return acc;
 
-                if (event.status === EOnWheelOrderStatus.completed) {
-                  if (status !== 'COMPLETED' || status !== 'CANCELED') return;
+                /**
+                 * If the order is in process, get all tracking numbers and update the status
+                 */
+                if (event.status === EOnWheelOrderStatus.inProcess) {
+                  if (
+                    !acc.find((item) => item.tracking_number === trackingNumber)
+                  ) {
+                    acc.push(OWSubOrder);
+                  }
                 }
 
-                const transition =
-                  status === 'COMPLETED'
-                    ? ETransition.COMPLETE_DELIVERY
-                    : status === 'CANCELED'
-                    ? ETransition.CANCEL_DELIVERY
-                    : ETransition.START_DELIVERY;
+                /**
+                 * If the order is completed, only get the tracking number of the path having status COMPLETED
+                 */
+                if (event.status === EOnWheelOrderStatus.completed) {
+                  if (
+                    !acc.find(
+                      (item) => item.tracking_number === trackingNumber,
+                    ) &&
+                    OWSubOrder.status === 'COMPLETED'
+                  ) {
+                    acc.push(OWSubOrder);
+                  }
+                }
+
+                return acc;
+              },
+              [],
+            );
+
+            await Promise.all(
+              distinctTrackingNumberPaths.map(async (OWSubOrder: any) => {
+                const { tracking_number: trackingNumber } = OWSubOrder;
+                if (!trackingNumber) return;
+
+                let transition;
+
+                if (event.status === EOnWheelOrderStatus.completed) {
+                  transition = ETransition.COMPLETE_DELIVERY;
+                }
+
+                if (event.status === EOnWheelOrderStatus.inProcess) {
+                  transition = ETransition.START_DELIVERY;
+                }
+
+                if (!transition) return;
 
                 const [orderTitle, subOrderWeekDay] =
                   trackingNumber.split(/[_-]/);
-                const { order, plan, deliveryAddress, booker } =
-                  await fetchData(orderTitle);
-
-                if (address !== deliveryAddress) return;
+                const { order, plan, booker } = await fetchData(orderTitle);
 
                 const planListing = Listing(plan);
                 const planId = planListing.getId();
@@ -350,16 +393,30 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           }
 
           case EOnWheelOrderStatus.cancelled: {
+            const distinctTrackingNumberPaths = path.reduce(
+              (acc: any[], OWSubOrder: any) => {
+                const { tracking_number: trackingNumber } = OWSubOrder;
+                if (!trackingNumber) return acc;
+
+                if (
+                  !acc.find((item) => item.tracking_number === trackingNumber)
+                ) {
+                  acc.push(OWSubOrder);
+                }
+
+                return acc;
+              },
+              [],
+            );
+
             await Promise.all(
-              path.map(async (OWSubOrder: any) => {
-                const { tracking_number: trackingNumber, address } = OWSubOrder;
+              distinctTrackingNumberPaths.map(async (OWSubOrder: any) => {
+                const { tracking_number: trackingNumber } = OWSubOrder;
                 if (!trackingNumber) return;
 
                 const [orderTitle, subOrderWeekDay] =
                   trackingNumber.split(/[_-]/);
-                const { plan, deliveryAddress } = await fetchData(orderTitle);
-
-                if (address !== deliveryAddress) return;
+                const { plan } = await fetchData(orderTitle);
 
                 const planListing = Listing(plan);
                 const planId = planListing.getId();
