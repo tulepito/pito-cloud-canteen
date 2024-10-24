@@ -4,6 +4,7 @@ import chunk from 'lodash/chunk';
 import flatten from 'lodash/flatten';
 
 import { mapUserPermissionByRole } from '@components/RoleSelectModal/helpers/mapUserPermissionByRole';
+import Tracker from '@helpers/tracker';
 import { createAsyncThunk, createDeepEqualSelector } from '@redux/redux.helper';
 import type { RootState } from '@redux/store';
 import {
@@ -146,6 +147,12 @@ const fetchCurrentUser = createAsyncThunk(
     }
 
     const currentUser = entities[0];
+    Tracker.setUser({
+      id: currentUser.id.uuid,
+      name: currentUser.attributes.profile.firstName,
+      email: currentUser.attributes.email,
+    });
+    Tracker.track('Login');
 
     const { favoriteRestaurantList = [], favoriteFoodList = [] } =
       CurrentUser(currentUser).getPublicData();

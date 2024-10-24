@@ -2,6 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import isEmpty from 'lodash/isEmpty';
 
 import { postSignUpApi } from '@apis/userApi';
+import Tracker from '@helpers/tracker';
 import { createAsyncThunk } from '@redux/redux.helper';
 import type { RootState } from '@redux/store';
 import { CurrentUser } from '@src/utils/data';
@@ -87,6 +88,7 @@ const logout = createAsyncThunk(
         },
       });
     }
+    Tracker.removeUser();
     await sdk.logout();
   },
   {
