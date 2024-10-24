@@ -21,6 +21,7 @@ import { getFoodQuery } from '@helpers/listingSearchQuery';
 import { markColorForOrder } from '@helpers/orderHelper';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { ParticipantOrderManagementActions } from '@redux/slices/ParticipantOrderManagementPage.slice';
+import { userThunks } from '@redux/slices/user.slice';
 import {
   CurrentUser,
   denormalisedResponseEntities,
@@ -276,8 +277,9 @@ const PICK_FOOD_FOR_SPECIFIC_SUB_ORDER =
 
 const disableWalkthrough = createAsyncThunk(
   DISABLE_WALKTHROUGH,
-  async (userId: string) => {
+  async (userId: string, { dispatch }) => {
     await disableWalkthroughApi(userId);
+    await dispatch(userThunks.fetchCurrentUser());
   },
 );
 
