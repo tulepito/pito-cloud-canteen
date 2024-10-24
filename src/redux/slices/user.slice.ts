@@ -152,7 +152,6 @@ const fetchCurrentUser = createAsyncThunk(
       name: currentUser.attributes.profile.firstName,
       email: currentUser.attributes.email,
     });
-    Tracker.track('Login');
 
     const { favoriteRestaurantList = [], favoriteFoodList = [] } =
       CurrentUser(currentUser).getPublicData();
