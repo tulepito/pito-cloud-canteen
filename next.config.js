@@ -1,4 +1,6 @@
 /** @type {import('next').NextConfig} */
+const { withEnvsAssurance } = require('./next.config.env.js');
+
 const nextConfig = {
   eslint: { dirs: ['.'] },
   reactStrictMode: true,
@@ -25,4 +27,4 @@ const nextConfig = {
   },
 };
 
-module.exports = nextConfig;
+module.exports = withEnvsAssurance(nextConfig);
