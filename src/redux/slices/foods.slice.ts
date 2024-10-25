@@ -356,7 +356,9 @@ const createPartnerFoodFromCsv = createAsyncThunk(
             if (sheet === 'Template') {
               try {
                 const worksheet = workbook.Sheets[sheet];
-                const data = XLSX.utils.sheet_to_json(worksheet);
+                const data = XLSX.utils.sheet_to_json(worksheet, {
+                  defval: '',
+                });
 
                 const response = [];
                 const clonedData = data; // resolve ts error
