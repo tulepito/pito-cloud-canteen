@@ -1,0 +1,12 @@
+name: Staging Deployment
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  Deploy-Staging:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run vercel webhook
+        run: curl -X POST ${{ secrets.VERCEL_WEBHOOK_URL_STAGING_DEPLOYMENT }}
