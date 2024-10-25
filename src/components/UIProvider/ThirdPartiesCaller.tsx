@@ -4,7 +4,7 @@ import Tracker from '@helpers/tracker';
 
 const ThirdPartiesCaller = () => {
   /**
-   * Initialize Hotjar
+   * Initialize tracker
    */
   useEffect(() => {
     Tracker.init();
