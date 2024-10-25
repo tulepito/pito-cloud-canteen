@@ -409,6 +409,9 @@ const ManagePartnerFoods = () => {
       if (!error) {
         closeImportModal();
         setFile(null);
+
+        // reload screen
+        window.location.reload();
       }
     }
   };
