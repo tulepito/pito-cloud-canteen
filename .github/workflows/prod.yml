@@ -11,5 +11,3 @@ jobs:
       - uses: actions/checkout@v3
       - name: Push to Production
         run: git push origin HEAD:production --force
-      - name: Run vercel webhook
-        run: curl -X POST ${{ secrets.VERCEL_WEBHOOK_URL_PRODUCTION_DEPLOYMENT }}
