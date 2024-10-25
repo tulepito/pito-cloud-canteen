@@ -9,6 +9,7 @@ import * as XLSX from 'xlsx';
 import { responseApprovalRequestApi } from '@apis/admin';
 import { partnerFoodApi } from '@apis/foodApi';
 import { queryAllPages } from '@helpers/apiHelpers';
+import { sleep } from '@helpers/index';
 import { getImportDataFromCsv } from '@pages/admin/partner/[restaurantId]/settings/food/utils';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { denormalisedResponseEntities } from '@utils/data';
@@ -355,34 +356,38 @@ const createPartnerFoodFromCsv = createAsyncThunk(
             if (sheet === 'Template') {
               try {
                 const worksheet = workbook.Sheets[sheet];
-
                 const data = XLSX.utils.sheet_to_json(worksheet);
 
-                const isProduction =
-                  process.env.NEXT_PUBLIC_ENV === 'production';
-                const dataLengthToImport = isProduction ? data.length : 3;
-                const response = await Promise.all(
-                  data
-                    .slice(0, dataLengthToImport)
-                    .map(async (foodData: any) => {
-                      const dataParams = getImportDataFromCsv({
-                        ...foodData,
-                        restaurantId,
-                      });
+                const response = [];
+                const clonedData = data; // resolve ts error
+                const dataLengthToImport = data.length;
 
-                      const queryParams = {
-                        expand: true,
-                      };
-                      const { data } = await partnerFoodApi.createFood({
-                        dataParams,
-                        queryParams,
-                      });
+                for (let i = 0; i < dataLengthToImport; i++) {
+                  const foodData = clonedData[i] as any;
+                  const dataParams = getImportDataFromCsv({
+                    ...foodData,
+                    restaurantId,
+                  });
 
-                      const [food] = denormalisedResponseEntities(data);
+                  const queryParams = {
+                    expand: true,
+                  };
 
-                      return food;
-                    }),
-                );
+                  // eslint-disable-next-line no-await-in-loop
+                  const { data } = await partnerFoodApi.createFood({
+                    dataParams,
+                    queryParams,
+                  });
+
+                  // Throttle the requests to avoid rate limiting
+                  // eslint-disable-next-line no-await-in-loop
+                  await sleep(500);
+
+                  const [food] = denormalisedResponseEntities(data);
+
+                  response.push(food);
+                }
+
                 resolve(response as any);
               } catch (error) {
                 console.error('error', error);
@@ -401,33 +406,41 @@ const createPartnerFoodFromCsv = createAsyncThunk(
         header: true,
         skipEmptyLines: true,
         async complete({ data = [] }: { data: any[] }) {
-          const isProduction = process.env.NEXT_PUBLIC_ENV === 'production';
-          const dataLengthToImport = isProduction ? data.length : 3;
           const packagingOptions = getState().SystemAttributes.packaging;
-          const response = await Promise.all(
-            data.slice(0, dataLengthToImport).map(async (foodData: any) => {
-              const dataParams = getImportDataFromCsv(
-                {
-                  ...foodData,
-                  restaurantId,
-                },
-                packagingOptions,
-              );
 
-              const queryParams = {
-                expand: true,
-              };
+          const response = [];
+          const clonedData = data; // resolve ts error
+          const dataLengthToImport = data.length;
 
-              const { data } = await partnerFoodApi.createFood({
-                dataParams,
-                queryParams,
-              });
+          for (let i = 0; i < dataLengthToImport; i++) {
+            const foodData = clonedData[i];
+            const dataParams = getImportDataFromCsv(
+              {
+                ...foodData,
+                restaurantId,
+              },
+              packagingOptions,
+            );
 
-              const [food] = denormalisedResponseEntities(data);
+            const queryParams = {
+              expand: true,
+            };
 
-              return food;
-            }),
-          );
+            // eslint-disable-next-line no-await-in-loop
+            const { data } = await partnerFoodApi.createFood({
+              dataParams,
+              queryParams,
+            });
+
+            // Throttle the requests to avoid rate limiting
+            // eslint-disable-next-line no-await-in-loop
+            await sleep(500);
+
+            const [food] = denormalisedResponseEntities(data);
+
+            response.push(food);
+          }
+
           resolve(response as any);
         },
         error(err: any) {
