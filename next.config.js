@@ -1,6 +1,7 @@
-/** @type {import('next').NextConfig} */
 const { withEnvsAssurance } = require('./next.config.env.js');
+const { withSentryConfig } = require('@sentry/nextjs');
 
+/** @type {import('next').NextConfig} */
 const nextConfig = {
   eslint: { dirs: ['.'] },
   reactStrictMode: true,
@@ -27,4 +28,17 @@ const nextConfig = {
   },
 };
 
-module.exports = withEnvsAssurance(nextConfig);
+module.exports = withSentryConfig(withEnvsAssurance(nextConfig), {
+  org: 'pito-w7',
+  project: 'pito-cloud-canteen',
+
+  // An auth token is required for uploading source maps.
+  authToken: process.env.SENTRY_AUTH_TOKEN,
+  debug: false,
+  sourcemaps: {
+    disable: process.env.SENTRY_SOURCE_MAPS_ENABLED !== 'true',
+  },
+  telemetry: false,
+
+  silent: false, // Can be used to suppress logs
+});

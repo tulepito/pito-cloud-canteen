@@ -17,6 +17,7 @@ export const enGeneralPaths = {
   EmailVerification: '/verify-email',
   Home: '/',
   Tracking: '/tracking/[subOrderId]',
+  SentryExamplePage: '/sentry-example-page',
 };
 
 export const personalPaths = {
@@ -37,6 +38,7 @@ export const NonRequireAuthenticationRoutes = [
   enGeneralPaths.ResetPassword,
   enGeneralPaths.SignIn,
   enGeneralPaths.SignUp,
+  enGeneralPaths.SentryExamplePage,
 ];
 
 export const IgnoredAuthCheckRoutes = [
@@ -46,6 +48,7 @@ export const IgnoredAuthCheckRoutes = [
   generalPaths.ResetPassword,
   enGeneralPaths.ResetPassword,
   enGeneralPaths.Tracking,
+  enGeneralPaths.SentryExamplePage,
 ];
 export const IgnoredPermissionCheckRoutes = [
   generalPaths.SignIn,
@@ -60,6 +63,7 @@ export const IgnoredPermissionCheckRoutes = [
   generalPaths.EmailVerification,
   enGeneralPaths.EmailVerification,
   enGeneralPaths.Tracking,
+  enGeneralPaths.SentryExamplePage,
 ];
 
 export const adminPaths = {

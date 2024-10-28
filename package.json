@@ -21,6 +21,7 @@
     "@next/font": "^13.1.1",
     "@reactour/tour": "^3.3.0",
     "@reduxjs/toolkit": "^1.9.1",
+    "@sentry/nextjs": "^8.35.0",
     "async": "^3.2.4",
     "autosize": "^5.0.2",
     "aws-sdk": "^2.1455.0",
