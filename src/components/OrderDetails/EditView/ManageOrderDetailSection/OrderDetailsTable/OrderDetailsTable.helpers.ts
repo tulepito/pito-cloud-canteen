@@ -54,6 +54,10 @@ export const prepareDataForTabs = ({
       const anonymousDataMaybe = anonymousMemberInfoMap[memberId];
       const memberData = memberDataMaybe || anonymousDataMaybe || {};
 
+      if (isEmpty(memberData)) {
+        return result;
+      }
+
       const itemData: TItemData = {
         isAnonymous: isEmpty(memberDataMaybe),
         memberData,

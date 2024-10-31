@@ -35,7 +35,6 @@ export const adminQueryListings = async (
 
 export const fetchUser = async (userId: string) => {
   const integrationSdk = getIntegrationSdk();
-  console.log(`[API-UTIL]: fetchUser`, userId);
   const response = await integrationSdk.users.show({
     id: userId,
     include: ['profileImage'],
@@ -51,7 +50,6 @@ export const fetchUser = async (userId: string) => {
 
 export const fetchUserByEmail = async (email: string) => {
   const integrationSdk = getIntegrationSdk();
-  console.log(`[API-UTIL]: fetchUserByEmail`, email);
   const response = await integrationSdk.users.show({
     email,
     include: ['profileImage'],

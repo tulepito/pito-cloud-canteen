@@ -1,5 +1,6 @@
-// import * as OneSignal from '@onesignal/node-onesignal';
 import { Client } from 'onesignal-node';
+
+import logger from '@helpers/logger';
 
 const { ONE_SIGNAL_APP_ID, ONE_SIGNAL_API_KEY } = process.env;
 
@@ -30,9 +31,17 @@ export const sendNotification = async ({
   };
 
   try {
-    const response = await oneSignalClient.createNotification(notification);
-    console.log('Notification: ', response.body);
+    logger.info(
+      'Sending notification to OneSignal',
+      `for user: ${oneSignalUserId}`,
+    );
+
+    await oneSignalClient.createNotification(notification);
+    logger.success(
+      'Notification sent successfully',
+      `for user: ${oneSignalUserId}`,
+    );
   } catch (e) {
-    console.log('Notification failed', e);
+    logger.error('Error in sendNotification', String(e));
   }
 };

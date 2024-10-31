@@ -82,10 +82,14 @@ export const usePrepareManageOrdersSectionData = (
 
   const memberOptions = useMemo(
     () =>
-      availableMemberIds.map((memberId: string) => {
+      availableMemberIds.reduce((accMemberOptions: any[], memberId: string) => {
         const participant = participantData.find(
           (p: TUser) => p.id.uuid === memberId,
         );
+
+        if (!participant) {
+          return accMemberOptions;
+        }
 
         const participantGetter = User(participant!);
         const { email } = participantGetter.getAttributes();
@@ -93,12 +97,12 @@ export const usePrepareManageOrdersSectionData = (
 
         const memberName = `${`${lastName} ${firstName}`} (${email})`;
 
-        return {
+        return accMemberOptions.concat({
           memberId,
           memberName,
           memberEmail: participant?.attributes?.email,
-        };
-      }),
+        });
+      }, []),
     [JSON.stringify(availableMemberIds)],
   );
 

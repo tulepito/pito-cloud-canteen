@@ -5,6 +5,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { composeApiCheckers, HttpMethod } from '@apis/configs';
 import { CustomError, EHttpStatusCode } from '@apis/errors';
+import logger from '@helpers/logger';
 import { pushNativeNotificationSubOrderDate } from '@pages/api/helpers/pushNotificationOrderDetailHelper';
 import createQuotation from '@pages/api/orders/[orderId]/quotation/create-quotation.service';
 import { createFoodRatingNotificationScheduler } from '@services/awsEventBrigdeScheduler';
@@ -136,6 +137,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           });
         };
 
+        logger.info('Transition', transition);
+
         switch (transition) {
           case ETransition.START_DELIVERY: {
             [...participantIds, ...anonymous].forEach(
@@ -235,6 +238,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           case ETransition.OPERATOR_CANCEL_PLAN:
           case ETransition.OPERATOR_CANCEL_AFTER_PARTNER_CONFIRMED:
           case ETransition.OPERATOR_CANCEL_AFTER_PARTNER_REJECTED: {
+            logger.info('Operator cancel plan', String(participantIds));
             // TODO:  send email notification to booker
             emailSendingFactory(
               EmailTemplateTypes.BOOKER.BOOKER_SUB_ORDER_CANCELED,
@@ -375,7 +379,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         break;
     }
   } catch (error) {
-    console.error(error);
+    logger.error('Error in admin/plan/transit.api.ts', String(error));
 
     if (isTransactionsTransitionInvalidTransition(error as TError)) {
       handleError(

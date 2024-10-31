@@ -1,3 +1,4 @@
+import logger from '@helpers/logger';
 import { companyPaths, partnerPaths } from '@src/paths';
 import { getDayOfWeek } from '@src/utils/dates';
 import { ENotificationType } from '@src/utils/enums';
@@ -375,8 +376,10 @@ export const createFirebaseDocNotification = async (
         FIREBASE_NOTIFICATION_COLLECTION_NAME!,
     );
   } catch (error) {
-    console.error('Error notification type: ', notificationType);
-    console.error('Error creating notification: ', error);
+    logger.error(
+      `Error creating notification type ${notificationType}`,
+      String(error),
+    );
   }
 };
 
