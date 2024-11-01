@@ -1,3 +1,5 @@
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable @typescript-eslint/naming-convention */
 import isEmpty from 'lodash/isEmpty';
 import omit from 'lodash/omit';
 import { DateTime } from 'luxon';
@@ -23,7 +25,7 @@ import {
   Listing,
   Transaction,
 } from '@src/utils/data';
-import { formatTimestamp, VNTimezone } from '@src/utils/dates';
+import { VNTimezone } from '@src/utils/dates';
 import {
   EBookerNativeNotificationType,
   ENativeNotificationType,
@@ -38,8 +40,15 @@ import { modifyPaymentWhenCancelSubOrderService } from '../payment/modify-paymen
 
 import { transitionOrderStatus } from './transition-order-status.service';
 
-const TIME_TO_SEND_FOOD_RATING_NOTIFICATION =
-  process.env.TIME_TO_SEND_FOOD_RATING_NOTIFICATION || '30';
+const { TIME_TO_SEND_FOOD_RATING_NOTIFICATION } = process.env;
+
+const _convertDateToVNTimezone = (date: Date) => {
+  const dateInVNTimezone = DateTime.fromJSDate(date, {
+    zone: VNTimezone,
+  });
+
+  return dateInVNTimezone.toISO().split('.')[0];
+};
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
@@ -200,13 +209,24 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
                 }
               },
             );
+
+            const now = new Date();
+            const numberOfMinutesDeferToSentFoodRatingNotification = Number(
+              TIME_TO_SEND_FOOD_RATING_NOTIFICATION,
+            );
+
+            const _timeExpression = _convertDateToVNTimezone(
+              new Date(
+                now.setMinutes(
+                  now.getMinutes() +
+                    numberOfMinutesDeferToSentFoodRatingNotification,
+                ),
+              ),
+            );
+
             createFoodRatingNotificationScheduler({
               customName: `sendFRN_${orderId}_${startTimestamp}`,
-              timeExpression: formatTimestamp(
-                DateTime.now().setZone(VNTimezone).toMillis() +
-                  +TIME_TO_SEND_FOOD_RATING_NOTIFICATION * 60 * 1000,
-                "yyyy-MM-dd'T'hh:mm:ss",
-              ),
+              timeExpression: _timeExpression,
               params: {
                 orderId,
                 participantIds,

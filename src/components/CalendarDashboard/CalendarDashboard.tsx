@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import type { ReactNode } from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import type { Event, View, ViewsProps } from 'react-big-calendar';
+import type { Event, ViewsProps } from 'react-big-calendar';
 import { Calendar, luxonLocalizer, Views } from 'react-big-calendar';
 import classNames from 'classnames';
 import { DateTime } from 'luxon';
@@ -37,7 +37,7 @@ type TCalendarDashboardProps = TDefaultProps & {
   eventExtraProps?: TObject;
   resources?: any;
   exposeAnchorDate?: (date?: Date) => void;
-  defaultView?: View;
+  defaultView?: 'month' | 'week' | 'work_week' | 'day' | 'agenda';
   toolbarLabel?: ReactNode;
   hidePrevToolbarNavButton?: boolean;
   hideNextToolbarNavButton?: boolean;

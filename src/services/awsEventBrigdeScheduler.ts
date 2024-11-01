@@ -3,11 +3,12 @@ import { isEmpty } from 'lodash';
 import { DateTime } from 'luxon';
 
 import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
+import logger from '@helpers/logger';
 import { formatTimestamp, VNTimezone } from '@src/utils/dates';
 
 const LAMBDA_ARN = `${process.env.LAMBDA_ARN}`;
 const ROLE_ARN = `${process.env.ROLE_ARN}`;
-const SEND_FOOD_RATING_NOTIFICATION_LAMBDA_ARN = `${process.env.SEND_FOOD_RATING_NOTIFICATION_LAMBDA_ARN}`;
+const { SEND_FOOD_RATING_NOTIFICATION_LAMBDA_ARN } = process.env;
 const AUTOMATIC_START_ORDER_JOB_LAMBDA_ARN = `${process.env.AUTOMATIC_START_ORDER_JOB_LAMBDA_ARN}`;
 const PICK_FOOD_FOR_EMPTY_MEMBER_LAMBDA_ARN = `${process.env.PICK_FOOD_FOR_EMPTY_MEMBER_LAMBDA_ARN}`;
 const SEND_REMIND_PICKING_NATIVE_NOTIFICATION_TO_BOOKER_LAMBDA_ARN = `${process.env.SEND_REMIND_PICKING_NATIVE_NOTIFICATION_TO_BOOKER_LAMBDA_ARN}`;
@@ -34,7 +35,7 @@ export const createScheduler = ({
   customName,
   timeExpression,
 }: CreateSchedulerParams) => {
-  const schedulerParams = {
+  return Scheduler.createSchedule({
     FlexibleTimeWindow: {
       Mode: 'OFF',
     },
@@ -47,9 +48,20 @@ export const createScheduler = ({
       RoleArn: ROLE_ARN,
       Input: JSON.stringify(params),
     },
-  };
-
-  return Scheduler.createSchedule(schedulerParams).promise();
+  })
+    .promise()
+    .then(() => {
+      logger.success(
+        `Create scheduler ${arn} at ${timeExpression} success`,
+        JSON.stringify({ customName, timeExpression, arn, params }),
+      );
+    })
+    .catch((error) => {
+      logger.error(
+        `Create scheduler ${arn} at ${timeExpression} failed`,
+        String(error),
+      );
+    });
 };
 
 export const getScheduler = (name: string) => {
@@ -81,7 +93,20 @@ export const updateScheduler = ({
     },
   };
 
-  return Scheduler.updateSchedule(schedulerParams).promise();
+  return Scheduler.updateSchedule(schedulerParams)
+    .promise()
+    .then(() => {
+      logger.warn(
+        'Update scheduler success',
+        JSON.stringify({ customName, timeExpression, arn, params }),
+      );
+    })
+    .catch((error) => {
+      logger.error(
+        'Update scheduler failed',
+        JSON.stringify({ customName, timeExpression, arn, params, error }),
+      );
+    });
 };
 
 export const createFoodRatingNotificationScheduler = async ({
@@ -89,29 +114,12 @@ export const createFoodRatingNotificationScheduler = async ({
   customName,
   timeExpression,
 }: CreateSchedulerParams) => {
-  const schedulerParams = {
-    FlexibleTimeWindow: {
-      Mode: 'OFF',
-    },
-    Name: customName,
-    ScheduleExpression: `at(${timeExpression})`,
-    ScheduleExpressionTimezone: 'Asia/Ho_Chi_Minh',
-    ActionAfterCompletion: isProduction ? 'NONE' : 'DELETE',
-    Target: {
-      Arn: SEND_FOOD_RATING_NOTIFICATION_LAMBDA_ARN,
-      RoleArn: ROLE_ARN,
-      Input: JSON.stringify(params),
-    },
-  };
-
-  Scheduler.createSchedule(schedulerParams)
-    .promise()
-    .then((res) => {
-      console.log('Create Food Rating Notification Scheduler Success: ', res);
-    })
-    .catch((err) => {
-      console.log('Create Food Rating Notification Scheduler Error: ', err);
-    });
+  createScheduler({
+    arn: SEND_FOOD_RATING_NOTIFICATION_LAMBDA_ARN,
+    customName,
+    timeExpression,
+    params,
+  });
 };
 
 export const createOrUpdateAutomaticStartOrderScheduler = async ({
@@ -151,13 +159,7 @@ export const createOrUpdateAutomaticStartOrderScheduler = async ({
       params: {
         orderId,
       },
-    })
-      .then((res) => {
-        console.log('Create Automatic start order Scheduler Success: ', res);
-      })
-      .catch((err) => {
-        console.log('Create Automatic start order Scheduler Error: ', err);
-      });
+    });
   }
 };
 
@@ -201,13 +203,7 @@ export const createOrUpdatePickFoodForEmptyMembersScheduler = async ({
       params: {
         orderId,
       },
-    })
-      .then((res) => {
-        console.log('Create Automatic picking food Scheduler Success: ', res);
-      })
-      .catch((err) => {
-        console.log('Create Automatic picking food Scheduler Error: ', err);
-      });
+    });
   }
 };
 
@@ -242,18 +238,6 @@ export const sendRemindPickingNativeNotificationToBookerScheduler = async ({
       params: {
         orderId,
       },
-    })
-      .then((res) => {
-        console.log(
-          'Send remind picking native notification to booker Success: ',
-          res,
-        );
-      })
-      .catch((err) => {
-        console.log(
-          'Send remind picking native notification to booker Error: ',
-          err,
-        );
-      });
+    });
   }
 };
