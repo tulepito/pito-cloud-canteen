@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 import classNames from 'classnames';
 import { useRouter } from 'next/router';
@@ -49,6 +49,8 @@ type TReviewCartSectionProps = {
 };
 
 const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  const [_isPickingOrderStarting, _setIsPickingOrderStarting] = useState(false);
   const {
     className,
     data: {
@@ -215,10 +217,24 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
           variant="cta"
           className={css.makePaymentButton}
           inProgress={
-            isStartOrderInProgress || updateOrderFromDraftEditInProgress
+            _isPickingOrderStarting ||
+            isStartOrderInProgress ||
+            updateOrderFromDraftEditInProgress
           }
-          disabled={isStartOrderDisabled || updateOrderFromDraftEditInProgress}
-          onClick={handleStartPickingOrder}>
+          disabled={
+            _isPickingOrderStarting ||
+            isStartOrderInProgress ||
+            isStartOrderDisabled ||
+            updateOrderFromDraftEditInProgress
+          }
+          onClick={async () => {
+            try {
+              _setIsPickingOrderStarting(true);
+              await handleStartPickingOrder();
+            } finally {
+              _setIsPickingOrderStarting(false);
+            }
+          }}>
           <div>
             {intl.formatMessage({
               id: 'ReviewCardSection.makePayment',

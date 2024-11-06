@@ -107,9 +107,15 @@ const Button: React.FC<TButtonProps> = (props) => {
   // prevents e.g. being able to submit forms to the backend before
   // the client side is handling the submit.
   const buttonDisabled = mounted ? disabled : true;
+  // eslint-disable-next-line @typescript-eslint/naming-convention, no-underscore-dangle
+  const _onClick = buttonDisabled ? () => {} : props.onClick;
 
   return (
-    <button className={classes} {...rest} disabled={buttonDisabled}>
+    <button
+      className={classes}
+      {...rest}
+      disabled={buttonDisabled}
+      onClick={_onClick}>
       {content}
     </button>
   );
