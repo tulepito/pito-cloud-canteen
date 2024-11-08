@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HttpMethod } from '@apis/configs';
+import logger from '@helpers/logger';
 import cookies from '@services/cookie';
 import { handleError } from '@services/sdk';
 
@@ -35,8 +36,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
         return res.json(updatedOrderListing);
       } catch (error) {
-        // Return error
-        console.error('update order error : ', error);
+        logger.error(`Order ${req.query.orderId} update failed`, String(error));
         handleError(res, error);
       }
       break;

@@ -1,3 +1,4 @@
+import logger from '@helpers/logger';
 import type { TObject } from '@src/utils/types';
 import { denormalisedResponseEntities } from '@utils/data';
 
@@ -35,15 +36,21 @@ export const adminQueryListings = async (
 
 export const fetchUser = async (userId: string) => {
   const integrationSdk = getIntegrationSdk();
-  const response = await integrationSdk.users.show({
-    id: userId,
-    include: ['profileImage'],
-    'fields.image': [
-      'variants.square-small',
-      'variants.square-small2x',
-      'variants.default',
-    ],
-  });
+  const response = await integrationSdk.users
+    .show({
+      id: userId,
+      include: ['profileImage'],
+      'fields.image': [
+        'variants.square-small',
+        'variants.square-small2x',
+        'variants.default',
+      ],
+    })
+    .catch((error: any) => {
+      logger.error(`Error fetching user ${userId}`, String(error));
+    });
+
+  if (!response) return null;
 
   return denormalisedResponseEntities(response)[0];
 };

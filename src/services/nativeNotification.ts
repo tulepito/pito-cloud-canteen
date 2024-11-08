@@ -25,9 +25,10 @@ export const createNativeNotification = async (
   notificationParams: NativeNotificationParams,
 ) => {
   const { participantId } = notificationParams;
+
   const participant = await fetchUser(participantId);
   const participantUser = User(participant);
-  const { firstName } = participantUser.getProfile();
+  const { displayName } = participantUser.getProfile();
   const { oneSignalUserIds = [] } = participantUser.getPrivateData();
   const { company, isCompany } = participantUser.getMetadata();
 
@@ -58,7 +59,7 @@ export const createNativeNotification = async (
             )}-${formatTimestamp(
               +endDate,
               'dd/MM',
-            )} đã sẵn sàng, mời ${firstName} chọn món nhé!`,
+            )} đã sẵn sàng, mời ${displayName} chọn món nhé!`,
             url,
             oneSignalUserId,
           });
@@ -82,7 +83,7 @@ export const createNativeNotification = async (
             )}-${formatTimestamp(
               +endDate,
               'dd/MM',
-            )} của ${firstName} được đặt thành công`,
+            )} của ${displayName} được đặt thành công`,
             url,
             oneSignalUserId,
           });
@@ -112,7 +113,7 @@ export const createNativeNotification = async (
         oneSignalUserIds.forEach((oneSignalUserId: string) => {
           sendNotification({
             title: 'Đã có cơm 😍 😍 😍',
-            content: `${foodName} đã được giao đến bạn. Chúc ${firstName} ngon miệng.`,
+            content: `${foodName} đã được giao đến bạn. Chúc ${displayName} ngon miệng.`,
             url,
             oneSignalUserId,
           });
@@ -127,7 +128,7 @@ export const createNativeNotification = async (
         oneSignalUserIds.forEach((oneSignalUserId: string) => {
           sendNotification({
             title: 'Opps! Ngày ăn bị hủy!',
-            content: `😢 ${firstName} ơi, rất tiếc phải thông báo ngày ăn ${formatTimestamp(
+            content: `😢 ${displayName} ơi, rất tiếc phải thông báo ngày ăn ${formatTimestamp(
               +subOrderDate!,
               'dd/MM',
             )} đã bị hủy`,
@@ -147,7 +148,7 @@ export const createNativeNotification = async (
         oneSignalUserIds.forEach((oneSignalUserId: string) => {
           sendNotification({
             title: 'Opps! Tuần ăn bị hủy!',
-            content: `😢 ${firstName} ơi, rất tiếc phải thông báo tuần ăn ${formatTimestamp(
+            content: `😢 ${displayName} ơi, rất tiếc phải thông báo tuần ăn ${formatTimestamp(
               +startDate!,
               'dd/MM',
             )}-${formatTimestamp(+endDate!, 'dd/MM')} đã bị hủy`,
@@ -349,8 +350,8 @@ export const createNativeNotificationToBooker = async (
   const { booker } = notificationParams;
   const bookerUser = User(booker);
   const { isCompany, company } = bookerUser.getMetadata();
-  const { firstName, lastName } = bookerUser.getProfile();
-  const bookerName = `${lastName} ${firstName}`;
+  const { displayName } = bookerUser.getProfile();
+
   const isBooker = Object.values(company).some(({ permission }: any) => {
     return permission === ECompanyPermission.booker;
   });
@@ -416,7 +417,7 @@ export const createNativeNotificationToBooker = async (
         oneSignalUserIds.forEach((oneSignalUserId: string) => {
           sendNotification({
             title: `Opps! Ngày ăn bị hủy! 😢`,
-            content: `${bookerName} ơi, rất tiếc phải thông báo ngày ăn ${formatTimestamp(
+            content: `${displayName} ơi, rất tiếc phải thông báo ngày ăn ${formatTimestamp(
               +subOrderDate!,
               'dd/MM',
             )} đã bị hủy`,
@@ -463,7 +464,7 @@ export const createNativeNotificationToBooker = async (
             content: `Ngày ăn ${formatTimestamp(
               +subOrderDate!,
               'dd/MM',
-            )} đã được giao đến bạn. Chúc ${bookerName} và đồng nghiệp có một bữa ăn ngon miệng.`,
+            )} đã được giao đến bạn. Chúc ${displayName} và đồng nghiệp có một bữa ăn ngon miệng.`,
             url,
             oneSignalUserId,
           });
@@ -483,7 +484,7 @@ export const createNativeNotificationToBooker = async (
         oneSignalUserIds.forEach((oneSignalUserId: string) => {
           sendNotification({
             title: `Đánh giá tuần ăn 🌟`,
-            content: `${bookerName} ơi, bạn đánh giá tuần ăn ${formatTimestamp(
+            content: `${displayName} ơi, bạn đánh giá tuần ăn ${formatTimestamp(
               startDate,
               'dd/MM',
             )} -${formatTimestamp(endDate, 'dd/MM')} mấy điểm?`,

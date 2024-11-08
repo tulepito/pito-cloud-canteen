@@ -12,7 +12,7 @@ const createNativeNotification = async ({ notificationParams, sdk }) => {
     }),
   )[0];
   const participantUser = User(participant);
-  const { firstName } = participantUser.getProfile();
+  const { displayName } = participantUser.getProfile();
   const { oneSignalUserIds = [] } = participantUser.getPrivateData();
   const { company = {}, isCompany } = participantUser.getMetadata();
 
@@ -32,7 +32,7 @@ const createNativeNotification = async ({ notificationParams, sdk }) => {
     oneSignalUserIds.map(async (oneSignalUserId) => {
       await sendNotification({
         title: 'Đánh giá ngày ăn',
-        content: `🌟 ${firstName} ơi, chấm ${foodName} hôm nay mấy điểm?`,
+        content: `🌟 ${displayName} ơi, chấm ${foodName} hôm nay mấy điểm?`,
         url,
         oneSignalUserId,
       });

@@ -12,8 +12,7 @@ const createNativeNotification = async ({ notificationParams, sdk }) => {
     }),
   )[0];
   const bookerUser = User(booker);
-  const { firstName, lastName } = bookerUser.getProfile();
-  const bookerName = `${lastName} ${firstName}`;
+  const { displayName } = bookerUser.getProfile();
   const { oneSignalUserIds = [] } = bookerUser.getPrivateData();
   const url = `${BASE_URL}/company/orders/${orderId}/picking?userRole=booker`;
 
@@ -21,7 +20,7 @@ const createNativeNotification = async ({ notificationParams, sdk }) => {
     oneSignalUserIds.map(async (oneSignalUserId) => {
       await sendNotification({
         title: 'Sắp hết hạn chọn món ⏰',
-        content: `${bookerName} ơi, sắp hết hạn chọn món. Hãy nhắc thành viên tham gia đặt cơm ngay nhé.`,
+        content: `${displayName} ơi, sắp hết hạn chọn món. Hãy nhắc thành viên tham gia đặt cơm ngay nhé.`,
         url,
         oneSignalUserId,
       });

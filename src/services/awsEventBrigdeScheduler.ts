@@ -69,7 +69,20 @@ export const getScheduler = (name: string) => {
     Name: name,
   };
 
-  return Scheduler.getSchedule(schedulerParams).promise();
+  return Scheduler.getSchedule(schedulerParams)
+    .promise()
+    .then(() => {
+      logger.info(
+        `Scheduler ${name} is existed`,
+        JSON.stringify(schedulerParams),
+      );
+    })
+    .catch(() => {
+      logger.info(
+        `Scheduler ${name} is not existed`,
+        JSON.stringify(schedulerParams),
+      );
+    });
 };
 
 export const updateScheduler = ({
@@ -106,6 +119,7 @@ export const updateScheduler = ({
         'Update scheduler failed',
         JSON.stringify({ customName, timeExpression, arn, params, error }),
       );
+      throw error; // enable to catch error in the caller function to trigger createScheduler
     });
 };
 
@@ -217,7 +231,7 @@ export const sendRemindPickingNativeNotificationToBookerScheduler = async ({
   orderId: string;
   deadlineDate: number;
 }) => {
-  const customName = `send_RPNNTB_${orderId}`; // send remind picking native notification to booker
+  const customName = `sendRPNNTB_${orderId}`; // send remind picking native notification to booker
   const timeExpression = formatTimestamp(
     DateTime.fromMillis(deadlineDate)
       .setZone(VNTimezone)
@@ -232,6 +246,9 @@ export const sendRemindPickingNativeNotificationToBookerScheduler = async ({
       arn: SEND_REMIND_PICKING_NATIVE_NOTIFICATION_TO_BOOKER_LAMBDA_ARN,
       customName,
       timeExpression,
+      params: {
+        orderId,
+      },
     });
   } catch (error) {
     createScheduler({

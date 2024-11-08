@@ -1,5 +1,15 @@
 declare namespace NodeJS {
   export interface ProcessEnv {
+    NEXT_PUBLIC_ENV: 'development' | 'staging' | 'production';
+    PORT: string;
+
+    NEXT_PUBLIC_SHARETRIBE_SDK_CLIENT_ID: string;
+    SHARETRIBE_SDK_CLIENT_SECRET: string;
+    FLEX_INTEGRATION_CLIENT_ID: string;
+    FLEX_INTEGRATION_CLIENT_SECRET: string;
+
+    NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: string;
+
     ONE_SIGNAL_APP_ID: string;
     ONE_SIGNAL_API_KEY: string;
 
@@ -16,6 +26,7 @@ declare namespace NodeJS {
 
     SEND_FOOD_RATING_NOTIFICATION_LAMBDA_ARN: string;
     TIME_TO_SEND_FOOD_RATING_NOTIFICATION: string;
+    SEND_REMIND_PICKING_NATIVE_NOTIFICATION_TO_BOOKER_LAMBDA_ARN: string;
 
     AWS_SES_ACCESS_KEY_ID: string;
     AWS_SES_SECRET_ACCESS_KEY: string;
