@@ -150,6 +150,9 @@ export const createOrUpdateAutomaticStartOrderScheduler = async ({
       arn: AUTOMATIC_START_ORDER_JOB_LAMBDA_ARN,
       customName,
       timeExpression,
+      params: {
+        orderId,
+      },
     });
   } catch (error) {
     createScheduler({

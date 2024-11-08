@@ -38,21 +38,26 @@ const vatPercentageBaseOnVatSetting = ({
 
 const calculateVATFee = ({
   vatPercentage,
-  vatSetting,
-  totalWithoutVAT,
-  totalPrice,
-  isPartner = true,
+  partnerVATSetting,
+  orderProvisionalPrice,
+  orderMenuPrice,
+  target = 'partner',
 }) => {
-  if (!isPartner) {
-    return Math.round(totalWithoutVAT * vatPercentage);
+  if (!(target === 'partner')) {
+    return Math.round(orderProvisionalPrice * vatPercentage);
   }
 
-  switch (vatSetting) {
-    case PARTNER_VAT_SETTINGS.noExportVat:
-      return Math.round(totalPrice * vatPercentage);
-    default:
-      return Math.round(totalWithoutVAT * vatPercentage);
+  if (target === 'partner') {
+    switch (partnerVATSetting) {
+      case PARTNER_VAT_SETTINGS.noExportVat:
+        return Math.round(orderMenuPrice * vatPercentage);
+      default:
+        return Math.round(orderProvisionalPrice * vatPercentage);
+    }
   }
+
+  // Safe return - Never reach here
+  return 0;
 };
 
 const convertHHmmStringToTimeParts = (timeStr = '6:30') => {
@@ -541,11 +546,11 @@ const calculatePriceQuotationInfoFromOrder = ({
   console.info('💫 > orderVATPercentage: ', orderVATPercentage);
   console.info('💫 > vatPercentage: ', vatPercentage);
   const VATFee = calculateVATFee({
-    vatSetting,
     vatPercentage,
-    totalPrice,
-    totalWithoutVAT,
-    isPartner,
+    orderProvisionalPrice: totalWithoutVAT,
+    orderMenuPrice: totalPrice,
+    partnerVATSetting: vatSetting,
+    target: isPartner ? 'partner' : 'customer',
   });
   console.info('💫 > VATFee: ', VATFee);
 
@@ -601,10 +606,11 @@ const calculatePriceQuotationPartner = ({
     vatPercentage: orderVATPercentage,
   });
   const VATFee = calculateVATFee({
-    vatSetting,
     vatPercentage,
-    totalPrice,
-    totalWithoutVAT,
+    orderProvisionalPrice: totalWithoutVAT,
+    orderMenuPrice: totalPrice,
+    partnerVATSetting: vatSetting,
+    target: 'partner',
   });
   const totalWithVAT = VATFee + totalWithoutVAT;
 
@@ -702,11 +708,11 @@ const calculatePriceQuotationInfoFromQuotation = ({
     isPartner,
   });
   const VATFee = calculateVATFee({
-    vatSetting,
     vatPercentage,
-    totalPrice,
-    totalWithoutVAT,
-    isPartner,
+    orderProvisionalPrice: totalWithoutVAT,
+    orderMenuPrice: totalPrice,
+    partnerVATSetting: vatSetting,
+    target: isPartner ? 'partner' : 'customer',
   });
   const totalWithVAT = VATFee + totalWithoutVAT;
   const overflow = isOverflowPackage

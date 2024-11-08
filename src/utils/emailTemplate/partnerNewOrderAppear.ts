@@ -71,7 +71,10 @@ const partnerNewOrderAppear = ({
   const totalPriceWithoutPromotionAmount = totalPrice - promotionAmount;
   const vatFee = calculateVATFee({
     vatPercentage,
-    totalWithoutVAT: totalPriceWithoutPromotionAmount,
+    orderProvisionalPrice: totalPriceWithoutPromotionAmount,
+    orderMenuPrice: totalPrice,
+    partnerVATSetting: vatSetting,
+    target: 'partner',
   });
   const totalPriceWithVat = totalPriceWithoutPromotionAmount + vatFee;
 

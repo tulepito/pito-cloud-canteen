@@ -19,14 +19,38 @@ import type { TListing, TObject, TQuotation } from '@utils/types';
 import { isJoinedPlan } from './orderPickingHelper';
 import { vatPercentageBaseOnVatSetting } from './prepareDataHelper';
 
+/**
+ * Calculate VAT based on VAT setting and user type: partner or customer
+ * @param vatPercentage VAT percentage from 0 to 1
+ */
 export const calculateVATFee = ({
   vatPercentage,
-  totalWithoutVAT,
+  partnerVATSetting,
+  orderProvisionalPrice,
+  orderMenuPrice,
+  target = 'partner',
 }: {
   vatPercentage: number;
-  totalWithoutVAT: number;
+  partnerVATSetting: EPartnerVATSetting;
+  orderProvisionalPrice: number;
+  orderMenuPrice: number;
+  target: 'partner' | 'customer';
 }) => {
-  return Math.round(totalWithoutVAT * vatPercentage);
+  if (!(target === 'partner')) {
+    return Math.round(orderProvisionalPrice * vatPercentage);
+  }
+
+  if (target === 'partner') {
+    switch (partnerVATSetting) {
+      case EPartnerVATSetting.noExportVat:
+        return Math.round(orderMenuPrice * vatPercentage);
+      default:
+        return Math.round(orderProvisionalPrice * vatPercentage);
+    }
+  }
+
+  // Safe return - Never reach here
+  return 0;
 };
 
 export const calculateTotalPriceAndDishes = ({
@@ -259,7 +283,10 @@ export const calculatePriceQuotationInfoFromOrder = ({
   });
   const VATFee = calculateVATFee({
     vatPercentage,
-    totalWithoutVAT,
+    orderProvisionalPrice: totalWithoutVAT,
+    orderMenuPrice: totalPrice,
+    partnerVATSetting: vatSetting,
+    target: isPartner ? 'partner' : 'customer',
   });
 
   const totalWithVAT = VATFee + totalWithoutVAT;
@@ -321,7 +348,10 @@ export const calculatePriceQuotationPartner = ({
   });
   const VATFee = calculateVATFee({
     vatPercentage,
-    totalWithoutVAT,
+    orderProvisionalPrice: totalWithoutVAT,
+    orderMenuPrice: totalPrice,
+    partnerVATSetting: vatSetting,
+    target: 'partner',
   });
   const totalWithVAT = VATFee + totalWithoutVAT;
 
@@ -433,7 +463,10 @@ export const calculatePriceQuotationInfoFromQuotation = ({
   });
   const VATFee = calculateVATFee({
     vatPercentage,
-    totalWithoutVAT,
+    orderProvisionalPrice: totalWithoutVAT,
+    orderMenuPrice: totalPrice,
+    partnerVATSetting: vatSetting,
+    target: isPartner ? 'partner' : 'customer',
   });
   const totalWithVAT = VATFee + totalWithoutVAT;
   const overflow = isOverflowPackage
