@@ -1,5 +1,7 @@
 import { DateTime } from 'luxon';
 
+import { VNTimezone } from '@src/utils/dates';
+
 export const parseDateFromTimestampAndHourString = (
   timestamp: number,
   hourStr: string,
@@ -20,4 +22,12 @@ export const convertHHmmStringToTimeParts = (timeStr = '6:30') => {
   const [hours, minutes] = timeStr.split(':') || ['6', '30'];
 
   return { hours: parseInt(hours, 10), minutes: parseInt(minutes, 10) };
+};
+
+export const convertDateToVNTimezone = (date: Date) => {
+  const dateInVNTimezone = DateTime.fromJSDate(date, {
+    zone: VNTimezone,
+  });
+
+  return dateInVNTimezone.toISO().split('.')[0];
 };

@@ -24,7 +24,6 @@ const { TRANSITIONS } = require('../utils/enums');
 const { fetchListing } = require('../utils/integrationHelper');
 const getIntegrationSdk = require('../utils/integrationSdk');
 const { createQuotation } = require('./createQuotation');
-const config = require('../utils/config');
 
 const transit = async (txId, transition) => {
   try {
@@ -116,18 +115,14 @@ const transit = async (txId, transition) => {
           }
         });
 
-        // Function is not ready on production
-        if (config.allowPartnerEmailSend) {
-          // TODO: send email notifications to partners
-          emailSendingFactory(
-            EmailTemplateTypes.PARTNER.PARTNER_SUB_ORDER_CANCELED,
-            {
-              orderId,
-              timestamp,
-              restaurantId,
-            },
-          );
-        }
+        emailSendingFactory(
+          EmailTemplateTypes.PARTNER.PARTNER_SUB_ORDER_CANCELED,
+          {
+            orderId,
+            timestamp,
+            restaurantId,
+          },
+        );
 
         // TODO: create firebase notifications
         console.info(`💫 > create FirebaseDocNotification`);

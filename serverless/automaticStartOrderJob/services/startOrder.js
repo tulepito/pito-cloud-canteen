@@ -8,6 +8,9 @@ const getIntegrationSdk = require('../utils/integrationSdk');
 const { fetchUser } = require('../utils/integrationHelper');
 const { ORDER_STATES } = require('../utils/enums');
 const { getPickFoodParticipants } = require('./helpers/order');
+const { createSlackNotification } = require('./slackNotification');
+const { SLACK_NOTIFICATION_TYPE } = require('../utils/enums');
+const { convertDateToVNTimezone } = require('./helpers/date');
 
 const integrationSdk = getIntegrationSdk();
 
@@ -54,7 +57,6 @@ const startOrder = async ({
   const shouldSendNativeNotificationParticipantIdList =
     getPickFoodParticipants(orderDetail);
 
-  // TODO: send noti email
   emailSendingFactory(EmailTemplateTypes.BOOKER.BOOKER_ORDER_SUCCESS, {
     orderId,
   });
@@ -68,6 +70,24 @@ const startOrder = async ({
       },
     );
   });
+
+  createSlackNotification(
+    SLACK_NOTIFICATION_TYPE.ORDER_STATUS_CHANGES_TO_IN_PROGRESS,
+    {
+      orderStatusChangesToInProgressData: {
+        orderCode: orderListing.attributes.title,
+        orderLink: `${process.env.CANONICAL_ROOT_URL}/admin/order/${orderId}`,
+        orderName: orderListing.attributes.publicData.orderName,
+        companyName: orderListing.attributes.metadata.companyName,
+        startDate: convertDateToVNTimezone(
+          new Date(orderListing.attributes.metadata.startDate),
+        ).split('T')[0],
+        deliveryHour: orderListing.attributes.metadata.deliveryHour,
+        deliveryAddress:
+          orderListing.attributes.metadata.deliveryAddress.address,
+      },
+    },
+  );
 };
 
 module.exports = { startOrder };

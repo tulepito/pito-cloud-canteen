@@ -314,18 +314,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
                     );
                   });
 
-                  if (
-                    process.env.NEXT_APP_ALLOW_PARTNER_EMAIL_SEND === 'true'
-                  ) {
-                    emailSendingFactory(
-                      EmailTemplateTypes.PARTNER.PARTNER_SUB_ORDER_CANCELED,
-                      {
-                        orderId,
-                        timestamp: subOrderDate,
-                        restaurantId: restaurant.id,
-                      },
-                    );
-                  }
+                  emailSendingFactory(
+                    EmailTemplateTypes.PARTNER.PARTNER_SUB_ORDER_CANCELED,
+                    {
+                      orderId,
+                      timestamp: subOrderDate,
+                      restaurantId: restaurant.id,
+                    },
+                  );
 
                   participantIds.map(async (participantId: string) => {
                     createFirebaseDocNotification(

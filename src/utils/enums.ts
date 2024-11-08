@@ -461,6 +461,7 @@ export const FOOD_APPROVAL_STATE_OPTIONS = [
 export enum ESlackNotificationType {
   CREATE_NEW_FOOD = 'createNewFood',
   UPDATE_FOOD = 'updateFood',
+  ORDER_STATUS_CHANGES_TO_IN_PROGRESS = 'orderStatusChangesToInProgress',
 }
 
 export enum QuizStep {

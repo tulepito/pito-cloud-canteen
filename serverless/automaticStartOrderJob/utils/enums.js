@@ -51,6 +51,12 @@ const PAYMENT_TYPES = {
   partner: 'partner',
 };
 
+const SLACK_NOTIFICATION_TYPE = {
+  CREATE_NEW_FOOD: 'createNewFood',
+  UPDATE_FOOD: 'updateFood',
+  ORDER_STATUS_CHANGES_TO_IN_PROGRESS: 'orderStatusChangesToInProgress',
+};
+
 module.exports = {
   ORDER_TYPES,
   ORDER_STATES,
@@ -58,4 +64,5 @@ module.exports = {
   TRANSITIONS,
   TRANSITIONS_TO_STATE_CANCELED,
   PAYMENT_TYPES,
+  SLACK_NOTIFICATION_TYPE,
 };

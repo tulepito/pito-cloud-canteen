@@ -67,7 +67,6 @@ const config = {
   },
   canonicalRootURL,
   encryptPasswordSecretKey: process.env.ENCRYPT_PASSWORD_SECRET_KEY,
-  allowPartnerEmailSend: process.env.ALLOW_PARTNER_EMAIL_SEND === 'true',
   usingSSL,
 };
 

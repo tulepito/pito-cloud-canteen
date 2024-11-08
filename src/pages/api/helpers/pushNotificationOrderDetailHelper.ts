@@ -14,6 +14,10 @@ function groupRestaurantIdInOrderDetails(
       return accumulator;
     }
 
+    if (!item.restaurant) {
+      return accumulator;
+    }
+
     const { id = '' } = item.restaurant;
     if (id) {
       if (!accumulator[id]) {

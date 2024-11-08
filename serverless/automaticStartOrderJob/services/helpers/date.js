@@ -16,6 +16,15 @@ const formatTimestamp = (
     });
 };
 
+const convertDateToVNTimezone = (date) => {
+  const dateInVNTimezone = DateTime.fromJSDate(date, {
+    zone: VNTimezone,
+  });
+
+  return dateInVNTimezone.toISO().split('.')[0];
+};
+
 module.exports = {
   formatTimestamp,
+  convertDateToVNTimezone,
 };

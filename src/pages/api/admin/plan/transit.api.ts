@@ -7,6 +7,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { composeApiCheckers, HttpMethod } from '@apis/configs';
 import { CustomError, EHttpStatusCode } from '@apis/errors';
+import { convertDateToVNTimezone } from '@helpers/dateHelpers';
 import logger from '@helpers/logger';
 import { pushNativeNotificationSubOrderDate } from '@pages/api/helpers/pushNotificationOrderDetailHelper';
 import createQuotation from '@pages/api/orders/[orderId]/quotation/create-quotation.service';
@@ -41,14 +42,6 @@ import { modifyPaymentWhenCancelSubOrderService } from '../payment/modify-paymen
 import { transitionOrderStatus } from './transition-order-status.service';
 
 const { TIME_TO_SEND_FOOD_RATING_NOTIFICATION } = process.env;
-
-const _convertDateToVNTimezone = (date: Date) => {
-  const dateInVNTimezone = DateTime.fromJSDate(date, {
-    zone: VNTimezone,
-  });
-
-  return dateInVNTimezone.toISO().split('.')[0];
-};
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
@@ -215,7 +208,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
               TIME_TO_SEND_FOOD_RATING_NOTIFICATION,
             );
 
-            const _timeExpression = _convertDateToVNTimezone(
+            const _timeExpression = convertDateToVNTimezone(
               new Date(
                 now.setMinutes(
                   now.getMinutes() +
@@ -302,19 +295,15 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
               integrationSdk,
             );
 
-            // Function is not ready on production
-            if (process.env.NEXT_PUBLIC_ALLOW_PARTNER_EMAIL_SEND === 'true') {
-              // TODO: send email notifications to partners
-              emailSendingFactory(
-                EmailTemplateTypes.PARTNER.PARTNER_SUB_ORDER_CANCELED,
-                {
-                  orderId,
-                  timestamp,
-                  restaurantId,
-                },
-              );
-            }
-            // TODO: create firebase notifications
+            emailSendingFactory(
+              EmailTemplateTypes.PARTNER.PARTNER_SUB_ORDER_CANCELED,
+              {
+                orderId,
+                timestamp,
+                restaurantId,
+              },
+            );
+
             [...participantIds, ...anonymous].map(
               async (participantId: string) => {
                 createFirebaseDocNotification(ENotificationType.ORDER_CANCEL, {

@@ -1,3 +1,4 @@
+import { convertDateToVNTimezone } from '@helpers/dateHelpers';
 import { getPickFoodParticipants } from '@helpers/orderHelper';
 import { pushNativeNotificationOrderDetail } from '@pages/api/helpers/pushNotificationOrderDetailHelper';
 import { denormalisedResponseEntities } from '@services/data';
@@ -6,11 +7,13 @@ import getSystemAttributes from '@services/getSystemAttributes';
 import { fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { createNativeNotification } from '@services/nativeNotification';
+import { createSlackNotification } from '@services/slackNotification';
 import { Listing, User } from '@utils/data';
 import {
   EBookerNativeNotificationType,
   ENativeNotificationType,
   EOrderStates,
+  ESlackNotificationType,
 } from '@utils/enums';
 
 import { sendBookerNativeNotification } from './send-booker-native-notification.service';
@@ -104,6 +107,25 @@ export const startOrder = async (orderId: string, planId: string) => {
       );
     },
   );
+
+  createSlackNotification(
+    ESlackNotificationType.ORDER_STATUS_CHANGES_TO_IN_PROGRESS,
+    {
+      orderStatusChangesToInProgressData: {
+        orderCode: orderListing.attributes.title,
+        orderLink: `${process.env.NEXT_PUBLIC_CANONICAL_URL}/admin/order/${orderId}`,
+        orderName: orderListing.attributes.publicData.orderName,
+        companyName: orderListing.attributes.metadata.companyName,
+        startDate: convertDateToVNTimezone(
+          new Date(orderListing.attributes.metadata.startDate),
+        ).split('T')[0],
+        deliveryHour: orderListing.attributes.metadata.deliveryHour,
+        deliveryAddress:
+          orderListing.attributes.metadata.deliveryAddress.address,
+      },
+    },
+  );
+
   await pushNativeNotificationOrderDetail(
     orderDetail,
     orderListing,
