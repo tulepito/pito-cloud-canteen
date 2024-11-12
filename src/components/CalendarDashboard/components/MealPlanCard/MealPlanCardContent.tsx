@@ -30,7 +30,6 @@ type TMealPlanCardContentProps = {
   restaurantAvailable?: boolean;
   onViewAllFood?: (id: string, restaurantId: string, menuId: string) => void;
   editFoodInprogress?: boolean;
-  companyGeoOrigin: any;
 };
 
 const MealPlanCardContent: React.FC<TMealPlanCardContentProps> = ({
@@ -40,7 +39,6 @@ const MealPlanCardContent: React.FC<TMealPlanCardContentProps> = ({
   restaurantAvailable = true,
   onViewAllFood,
   editFoodInprogress,
-  companyGeoOrigin,
 }) => {
   const restaurantList = useAppSelector(
     (state) => state.Order.orderRestaurantList,
@@ -54,7 +52,8 @@ const MealPlanCardContent: React.FC<TMealPlanCardContentProps> = ({
   const restaurantListing: any = restaurantList.find(
     (restaurant) => restaurant.id.uuid === event.resource?.restaurant?.id,
   );
-  const { geolocation: origin } = Listing(restaurantListing).getAttributes();
+  const { geolocation: restaurantLocation } =
+    Listing(restaurantListing).getAttributes();
 
   const { totalRating = 0, totalRatingNumber = 0 } =
     Listing(restaurantListing).getMetadata();
@@ -93,7 +92,12 @@ const MealPlanCardContent: React.FC<TMealPlanCardContentProps> = ({
     dispatch(foodSliceThunks.fetchFoodDetail(foodId));
   };
 
-  const distance = calculateDistance(companyGeoOrigin, origin);
+  const orderDetails = useAppSelector((state) => state.Order.order);
+
+  const orderLocation =
+    orderDetails?.attributes?.metadata?.deliveryAddress?.origin;
+
+  const distance = calculateDistance(restaurantLocation, orderLocation);
 
   return (
     <div
