@@ -15,7 +15,7 @@ import Toggle from '@components/Toggle/Toggle';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import DayInWeekField from '@pages/admin/order/components/DayInWeekField/DayInWeekField';
 import { QuizActions } from '@redux/slices/Quiz.slice';
-import { generateTimeRangeItems } from '@src/utils/dates';
+import { filterValidDeliveryHours } from '@src/utils/dates';
 import { EOrderType } from '@src/utils/enums';
 import { required } from '@src/utils/validators';
 
@@ -23,8 +23,6 @@ import DeliveryHourFieldMobile from '../DeliveryHourFieldMobile/DeliveryHourFiel
 import OrderDateField from '../OrderDateField/OrderDateField';
 
 import css from './MealDateForm.module.scss';
-
-const TIME_OPTIONS = generateTimeRangeItems({});
 
 export type TMealDateFormValues = {
   startDate: number;
@@ -76,20 +74,16 @@ const MealDateFormComponent: React.FC<TMealDateFormComponentProps> = (
     id: 'MealPlanDateField.deliveryHourRequired',
   });
 
-  const parsedDeliveryHourOptions = useMemo(
-    () =>
-      TIME_OPTIONS.map((option) => ({
-        label: option.label,
-        key: option.key,
-      })),
-    [],
-  );
-
   const {
     startDate: startDateInitialValue,
     endDate: endDateInitialValue,
     usePreviousData,
   } = values;
+
+  const parsedDeliveryHourOptions = useMemo(
+    () => filterValidDeliveryHours(startDateInitialValue),
+    [startDateInitialValue],
+  );
 
   const handleChangeOrderType = (newValue: string) => {
     if (newValue === EOrderType.group && onClickIsGroupOrder) {
@@ -169,6 +163,7 @@ const MealDateFormComponent: React.FC<TMealDateFormComponentProps> = (
               options={parsedDeliveryHourOptions}
             />
           </div>
+
           <DeliveryHourFieldMobile values={values} form={form} />
 
           <div className={css.orderTypeContainer}>

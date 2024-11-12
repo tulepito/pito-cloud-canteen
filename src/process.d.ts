@@ -55,5 +55,9 @@ declare namespace NodeJS {
     SENTRY_AUTH_TOKEN: string;
     NEXT_PUBLIC_SENTRY_ENVIRONMENT: 'development' | 'staging' | 'production';
     NEXT_PUBLIC_SENTRY_ENABLED: 'true' | 'false';
+
+    NEXT_PUBLIC_ORDER_MINIMUM_TIME: string;
+    NEXT_PUBLIC_PARTICIPANT_MINIMUM_SELECTION_TIME: string;
+    NEXT_PUBLIC_ORDER_AUTO_START_TIME_TO_DELIVERY_TIME_OFFSET_IN_HOUR: string;
   }
 }

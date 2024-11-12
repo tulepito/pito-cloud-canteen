@@ -658,6 +658,39 @@ export const generateTimeRangeItems = ({
 export const TimeOptions = renderListTimeOptions({});
 export const TimeRangeItems = generateTimeRangeItems({});
 
+/**
+ * Get the next available delivery hours in (HH:mm) format, based on the current date and minimum delay hours
+ * @example filterValidDeliveryHours(new Date(), 15) => [{ label: '06:30 - 07:00', key: '06:30-07:00' }, ...]
+ */
+export const filterValidDeliveryHours = (
+  startDate: number | string | Date,
+  minDelayHours = 15,
+) => {
+  const timeRangeItems = generateTimeRangeItems({});
+
+  // Tính thời gian tối thiểu (currentDate + 15 giờ)
+  const minimumTime = new Date();
+  minimumTime.setHours(minimumTime.getHours() + minDelayHours);
+
+  return timeRangeItems
+    .filter((option) => {
+      // Tách giờ và phút từ option key (dạng "HH:mm-HH:mm")
+      const [startTime] = option.key.split('-');
+      const [hours, minutes] = startTime.split(':').map(Number);
+
+      // Tạo một đối tượng Date với cùng ngày của startDate
+      const optionDate = new Date(startDate);
+      optionDate.setHours(hours, minutes, 0, 0);
+
+      // So sánh để chỉ giữ lại các giờ hợp lệ
+      return optionDate >= minimumTime;
+    })
+    .map((option) => ({
+      label: option.label,
+      key: option.key,
+    }));
+};
+
 export const getNextWeek = (date: Date) => {
   return DateTime.fromJSDate(date)
     .plus({ weeks: 1 })

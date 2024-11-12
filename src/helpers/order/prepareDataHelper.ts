@@ -107,17 +107,36 @@ export const findMinDeadlineDate = () => {
 };
 
 export const findMinStartDate = () => {
-  const initMinStartDate = DateTime.fromJSDate(new Date())
-    .startOf('day')
-    .plus({ days: 3 });
-  const { weekday } = initMinStartDate;
+  const now = DateTime.now();
 
-  const minStartDate =
-    weekday === 6 || weekday === 7
-      ? initMinStartDate.plus({ days: 7 - weekday + 1 })
-      : initMinStartDate;
+  const minStartDate = now
+    .plus({ hours: +process.env.NEXT_PUBLIC_ORDER_MINIMUM_TIME })
+    .startOf('minute'); // Cộng thêm 15 tiếng từ giờ hiện tại và lấy phút đầu tiên của giờ
 
   return minStartDate.toJSDate();
+};
+
+/**
+ * Get delivery date from start date and delivery hour
+ * @example findDeliveryDate(1629936000000, '10:00-11:00') => 1629961200000
+ */
+export const findDeliveryDate = (
+  startDateParameter?: number,
+  deliveryHourParameter?: string,
+) => {
+  if (!startDateParameter || !deliveryHourParameter) {
+    return undefined;
+  }
+
+  const date = new Date(startDateParameter);
+
+  const [startTime] = deliveryHourParameter.split('-');
+  const [hour, minute] = startTime.split(':');
+
+  date.setHours(date.getHours() + parseInt(hour, 10));
+  date.setMinutes(date.getMinutes() + parseInt(minute, 10));
+
+  return date.getTime();
 };
 
 export const findValidRangeForDeadlineDate = (

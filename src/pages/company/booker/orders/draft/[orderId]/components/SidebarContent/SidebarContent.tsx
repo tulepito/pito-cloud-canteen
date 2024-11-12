@@ -16,7 +16,10 @@ import {
   mealTypeAdapter,
   mealTypeReverseAdapter,
 } from '@helpers/order/adapterHelper';
-import { findMinStartDate } from '@helpers/order/prepareDataHelper';
+import {
+  findDeliveryDate,
+  findMinStartDate,
+} from '@helpers/order/prepareDataHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
 import { EOrderType } from '@src/utils/enums';
@@ -177,8 +180,13 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
       deliveryAddress?.address !== null ? deliveryAddress : {},
     ),
   };
+
+  const newStartDate = findDeliveryDate(startDate, deliveryHour);
+
   const isGroupOrder = orderType === EOrderType.group;
-  const isStartDateInValid = startDate < findMinStartDate().getTime();
+  const isStartDateInValid =
+    (newStartDate || Infinity) < findMinStartDate().getTime();
+
   const sidebarFormSubmitInProgress =
     updateOrderInProgress ||
     updateOrderDetailInProgress ||

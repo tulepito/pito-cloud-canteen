@@ -13,10 +13,11 @@ import IconClock from '@components/Icons/IconClock/IconClock';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import SlideModal from '@components/SlideModal/SlideModal';
 import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
+import { findDeliveryDate } from '@helpers/order/prepareDataHelper';
 import { useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { useViewport } from '@hooks/useViewport';
-import { TimeOptions } from '@utils/dates';
+import { generateTimeRangeItems } from '@utils/dates';
 
 import MobileEditDeadlineDateField from './MobileEditDeadlineDateField';
 import MobileEditDeadlineHourField from './MobileEditDeadlineHourField';
@@ -31,6 +32,7 @@ export type TDeadlineDateTimeFormValues = {
 
 type TExtraProps = {
   deliveryTime: Date;
+  deliveryHour: string;
   shouldDisableSubmit?: boolean;
   onUpdateOrderInfo: (values: TDeadlineDateTimeFormValues) => void;
 };
@@ -46,12 +48,14 @@ const DeadlineDateTimeFormComponent: React.FC<
     form,
     initialValues,
     deliveryTime,
+    deliveryHour,
     shouldDisableSubmit = false,
     values,
     invalid,
     handleSubmit,
     onUpdateOrderInfo,
   } = props;
+
   const formRef = useRef<any>(null);
   const mobileDeadlineModalControl = useBoolean();
   const { isMobileLayout } = useViewport();
@@ -74,21 +78,33 @@ const DeadlineDateTimeFormComponent: React.FC<
   const selectedDeadlineDate = deadlineDateFormFormValues
     ? new Date(Number(deadlineDateFormFormValues))
     : null;
-  const minDeadlineDate = DateTime.fromJSDate(new Date())
-    .plus({ days: 1 })
-    .toJSDate();
-  const maxDeadlineDate = DateTime.fromJSDate(deliveryTime!)
-    .minus({ days: 2 })
+
+  const newDeliveryDate = new Date(
+    findDeliveryDate(deliveryTime?.getTime(), deliveryHour) ?? 0,
+  );
+
+  const currentDate = DateTime.fromJSDate(new Date());
+  const deliveryDate = DateTime.fromJSDate(newDeliveryDate!);
+
+  const minDeadlineDate = currentDate.toJSDate();
+  const maxDeadlineDate = deliveryDate
+    .minus({
+      hours: +process.env.NEXT_PUBLIC_PARTICIPANT_MINIMUM_SELECTION_TIME,
+    })
     .toJSDate();
 
   const isDeadlineHourEmpty = isEmpty(deadlineHourFromFormValues);
+
   const anyActionsInProgress =
     bookerPublishOrderInProgress || addOrderParticipantsInProgress;
+
   const submitDisabled =
     anyActionsInProgress ||
     shouldDisableSubmit ||
     invalid ||
-    isDeadlineHourEmpty;
+    isDeadlineHourEmpty ||
+    !selectedDeadlineDate;
+
   const submitInProgress = bookerPublishOrderInProgress;
   const isAnyFieldsChanged =
     initialValues.deadlineHour !== deadlineHourFromFormValues ||
@@ -150,6 +166,41 @@ const DeadlineDateTimeFormComponent: React.FC<
       Lưu thay đổi
     </Button>
   );
+
+  const filterTimeOptions = (
+    selectedDeadlineDateP: Date | null,
+    maxDeadlineDateP: Date,
+  ) => {
+    const timeRangeItems = generateTimeRangeItems({});
+    const currentTime = new Date();
+
+    const isToday =
+      selectedDeadlineDateP?.toDateString() === currentTime.toDateString();
+
+    return timeRangeItems.filter((option) => {
+      const [hour, minute] = option.key.split(':');
+
+      if (!selectedDeadlineDateP) return false;
+
+      const optionTime = new Date(selectedDeadlineDateP);
+      optionTime.setHours(parseInt(hour, 10), parseInt(minute, 10), 0, 0);
+
+      if (isToday) {
+        return (
+          optionTime.getTime() > currentTime.getTime() &&
+          optionTime.getTime() <= maxDeadlineDateP.getTime()
+        );
+      }
+
+      return optionTime.getTime() <= maxDeadlineDateP.getTime();
+    });
+  };
+
+  const filteredTimeOptions = filterTimeOptions(
+    selectedDeadlineDate,
+    maxDeadlineDate,
+  );
+
   const formContentComponent = (
     <Form className={css.formRoot} onSubmit={handleSubmit}>
       <div className={css.formContainer}>
@@ -196,7 +247,8 @@ const DeadlineDateTimeFormComponent: React.FC<
               label={isMobileLayout ? 'Giờ kết thúc' : 'Chọn giờ hết hạn'}
               placeholder={isMobileLayout ? 'Chọn hạn chọn món' : 'Giờ hết hạn'}
               leftIcon={<IconClock />}
-              options={TimeOptions}
+              disabled={!selectedDeadlineDate}
+              options={filteredTimeOptions}
             />
           </RenderWhen.False>
         </RenderWhen>

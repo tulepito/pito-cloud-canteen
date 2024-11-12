@@ -119,11 +119,13 @@ export const FieldDropdownSelectComponent: React.FC<TFieldDropdownSelect> = (
           )}
           <RenderWhen.False>
             <span className={valueClasses}>
-              {find(options, (_option: any) => _option.key === value)?.label}
+              {find(options, (_option: any) => _option.key === value)?.label ||
+                options[0]?.label}
             </span>
           </RenderWhen.False>
         </RenderWhen>
       </div>
+
       <RenderWhen condition={dropdownController.value}>
         <div className={dropdownWrapperClasses}>
           {options.map((option: { key: string; label: string }) => (
@@ -139,6 +141,7 @@ export const FieldDropdownSelectComponent: React.FC<TFieldDropdownSelect> = (
           ))}
         </div>
       </RenderWhen>
+
       <input type="hidden" {...inputProps} />
 
       <ValidationError fieldMeta={meta} />

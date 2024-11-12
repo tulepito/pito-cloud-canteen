@@ -16,6 +16,7 @@ import type { TListing, TObject, TOrderStateHistoryItem } from '@utils/types';
 
 import { isJoinedPlan } from './order/orderPickingHelper';
 import {
+  findDeliveryDate,
   findMinDeadlineDate,
   findMinStartDate,
 } from './order/prepareDataHelper';
@@ -86,6 +87,7 @@ export const orderDataCheckers = (
   const minDeadlineTimeStamp = findMinDeadlineDate().getTime();
   const isNormalOrder = orderType === EOrderType.normal;
   const timeRangeOptionsValues = timeRangeOptions.map(({ key }) => key);
+  const newStartDate = findDeliveryDate(startDate, deliveryHour);
 
   const checkers = {
     isDeadlineDateValid:
@@ -96,7 +98,8 @@ export const orderDataCheckers = (
     isDeliveryAddressValid:
       !isEmpty(deliveryAddress?.address) && !isEmpty(deliveryAddress?.origin),
     isStartDateValid:
-      Number.isInteger(startDate) && minStartTimeStamp <= (startDate || 0),
+      Number.isInteger(newStartDate) &&
+      minStartTimeStamp <= (newStartDate || 0),
     isEndDateValid:
       Number.isInteger(endDate) && (endDate || 0) >= (startDate || 0),
     isDeliveryHourValid: timeRangeOptionsValues.includes(deliveryHour),

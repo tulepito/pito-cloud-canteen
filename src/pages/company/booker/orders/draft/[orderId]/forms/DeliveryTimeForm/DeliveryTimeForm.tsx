@@ -8,7 +8,7 @@ import { FieldDatePickerComponent } from '@components/FormFields/FieldDatePicker
 import { FieldDropdownSelectComponent } from '@components/FormFields/FieldDropdownSelect/FieldDropdownSelect';
 import IconClock from '@components/Icons/IconClock/IconClock';
 import { findMinStartDate } from '@helpers/order/prepareDataHelper';
-import { TimeRangeItems } from '@utils/dates';
+import { filterValidDeliveryHours } from '@utils/dates';
 
 import css from './DeliveryTimeForm.module.scss';
 
@@ -66,9 +66,12 @@ const DeliveryTimeForm: React.FC<TDeliveryTimeFormProps> = ({
   const disabledSubmit = pristine || submitInprogress || hasValidationErrors;
 
   const minStartDate = findMinStartDate();
-  const selectedStartDate = startDate.input.value
-    ? new Date(Number(startDate.input.value))
-    : minStartDate;
+
+  const selectedStartDate = useMemo(() => {
+    return startDate.input.value
+      ? new Date(Number(startDate.input.value))
+      : minStartDate;
+  }, [startDate.input.value, minStartDate]);
 
   const minEndDate = DateTime.fromJSDate(selectedStartDate)
     .plus({ days: 1 })
@@ -98,12 +101,8 @@ const DeliveryTimeForm: React.FC<TDeliveryTimeFormProps> = ({
   }, [form.getFieldState('startDate')?.pristine, startDate.input.value]);
 
   const parsedDeliveryHourOptions = useMemo(
-    () =>
-      TimeRangeItems.map((option) => ({
-        label: option.label,
-        key: option.key,
-      })),
-    [],
+    () => filterValidDeliveryHours(selectedStartDate),
+    [selectedStartDate],
   );
 
   return (

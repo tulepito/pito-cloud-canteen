@@ -41,7 +41,7 @@ const ParticipantInvitation: React.FC<TParticipantInvitationProps> = ({
     (state) => state.BookerDraftOrderPage.participantData,
   );
 
-  const { startDate, deadlineDate, deadlineHour } =
+  const { startDate, deadlineHour, deliveryHour } =
     Listing(order).getMetadata();
 
   // * calculate start delivery time
@@ -54,8 +54,8 @@ const ParticipantInvitation: React.FC<TParticipantInvitationProps> = ({
 
   // * prepare deadline date time form initial
   const deadlineDateTimeInitialValues = {
-    deadlineDate,
-    deadlineHour,
+    deadlineDate: undefined,
+    deadlineHour: undefined,
     draftDeadlineHour: deadlineHour,
   };
 
@@ -103,6 +103,7 @@ const ParticipantInvitation: React.FC<TParticipantInvitationProps> = ({
   const deadlineFormComponent = (
     <DeadlineDateTimeForm
       deliveryTime={deliveryTime}
+      deliveryHour={deliveryHour}
       initialValues={deadlineDateTimeInitialValues}
       onSubmit={handleSubmitDeadlineDateTimeForm}
       shouldDisableSubmit={shouldDisabledSubmitPublishOrder}

@@ -6,6 +6,7 @@ import IconNoteBook from '@components/Icons/IconNoteBook/IconNoteBook';
 import IconNoteCheckList from '@components/Icons/IconNoteCheckList/IconNoteCheckList';
 import Modal from '@components/Modal/Modal';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
+import { findDeliveryDate } from '@helpers/order/prepareDataHelper';
 import type { TUseBooleanReturns } from '@hooks/useBoolean';
 import { useViewport } from '@hooks/useViewport';
 import { FORMATTED_WEEKDAY } from '@src/utils/constants';
@@ -38,15 +39,21 @@ const AutomaticStartOrInfoSection: React.FC<
   const classes = classNames(css.container, className);
   const { isMobileLayout } = useViewport();
 
-  const normalizedDeliveryHour = deliveryHour?.includes('-')
-    ? deliveryHour.split('-')[0]
-    : deliveryHour;
-  const automaticConfirmDate = DateTime.fromMillis(Number(startDate)).minus({
-    days: 1,
+  const deliveryDate = findDeliveryDate(startDate, deliveryHour);
+
+  const automaticConfirmDate = DateTime.fromMillis(Number(deliveryDate)).minus({
+    hours:
+      +process.env
+        .NEXT_PUBLIC_ORDER_AUTO_START_TIME_TO_DELIVERY_TIME_OFFSET_IN_HOUR,
   });
-  const formattedAutomaticConfirmOrder = `${
-    FORMATTED_WEEKDAY[automaticConfirmDate.weekday]
-  }, ${formatTimestamp(automaticConfirmDate.toMillis(), 'dd/MM/yyyy')}`;
+
+  const formattedAutomaticConfirmOrder = `${formatTimestamp(
+    automaticConfirmDate.toMillis(),
+    'HH:mm',
+  )} ${FORMATTED_WEEKDAY[automaticConfirmDate.weekday]}, ${formatTimestamp(
+    automaticConfirmDate.toMillis(),
+    'dd/MM/yyyy',
+  )}`;
 
   const contentComponent = (
     <div className={classes}>
@@ -56,11 +63,8 @@ const AutomaticStartOrInfoSection: React.FC<
           <div className={css.columnTitle}>Tự động đặt đơn</div>
           <div>
             Đơn sẽ được tự động đặt vào lúc{' '}
-            <b>
-              {normalizedDeliveryHour} {formattedAutomaticConfirmOrder}
-            </b>
-            . Trường hợp nếu đến hạn mà không đủ số lượng đặt món thì đơn sẽ bị
-            hủy.
+            <b>{formattedAutomaticConfirmOrder}</b>. Trường hợp nếu đến hạn mà
+            không đủ số lượng đặt món thì đơn sẽ bị hủy.
           </div>
         </div>
       </div>

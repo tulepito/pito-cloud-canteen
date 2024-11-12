@@ -24,6 +24,7 @@ const DeliveryHourFieldMobile: React.FC<TDeliveryHourFieldMobileProps> = ({
   return (
     <div className={css.deliveryHourField}>
       <div className={css.label}>Chọn giờ giao hàng</div>
+
       <div
         className={css.fieldInput}
         onClick={deliveryHourModalController.setTrue}>
@@ -39,6 +40,7 @@ const DeliveryHourFieldMobile: React.FC<TDeliveryHourFieldMobileProps> = ({
           </RenderWhen.False>
         </RenderWhen>
       </div>
+
       <DeliveryHourMobileModal
         isOpen={deliveryHourModalController.value}
         onClose={deliveryHourModalController.setFalse}

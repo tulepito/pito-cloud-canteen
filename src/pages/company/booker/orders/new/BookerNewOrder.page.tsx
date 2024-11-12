@@ -26,6 +26,7 @@ const BookerNewOrderPage: React.FC = () => {
   const homePageLinkClasses = classNames(css.mealItem, {
     [css.disabled]: isSelectedCompanyEmpty,
   });
+
   const onMealClick = (daySession: string) => () => {
     if (isSelectedCompanyEmpty) {
       return;

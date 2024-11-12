@@ -30,7 +30,9 @@ export const useOrderDateSelect = ({
 
   const minDate =
     selectedTimeRangeOption === 'custom'
-      ? DateTime.now().plus({ days: 3 }).toJSDate()
+      ? DateTime.now()
+          .plus({ hours: +process.env.NEXT_PUBLIC_ORDER_MINIMUM_TIME })
+          .toJSDate()
       : startDate;
   const maxDate =
     selectedTimeRangeOption !== 'custom'
@@ -43,9 +45,16 @@ export const useOrderDateSelect = ({
     switch (key) {
       case 'next7Days':
         setStartDate(
-          DateTime.now().plus({ days: 3 }).startOf('day').toJSDate(),
+          DateTime.now()
+            .plus({ hours: +process.env.NEXT_PUBLIC_ORDER_MINIMUM_TIME })
+            .toJSDate(),
         );
-        setEndDate(DateTime.now().plus({ days: 9 }).startOf('day').toJSDate());
+        setEndDate(
+          DateTime.now()
+            .plus({ hours: +process.env.NEXT_PUBLIC_ORDER_MINIMUM_TIME })
+            .plus({ days: 6 })
+            .toJSDate(),
+        );
         break;
 
       case 'nextWeek':

@@ -66,8 +66,8 @@
   & :global(.react-datepicker__day--selected),
   & :global(.react-datepicker__day--keyboard-selected) {
     background-color: $neutralGray1;
-    color: $neutralGray6;
-    border-radius: 16px;
+    color: #000;
+    outline-color: $neutralGray4;
   }
 
   & :global(.react-datepicker__day--today) {

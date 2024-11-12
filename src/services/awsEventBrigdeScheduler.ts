@@ -153,7 +153,11 @@ export const createOrUpdateAutomaticStartOrderScheduler = async ({
       .plus({
         ...convertHHmmStringToTimeParts(ensuredDeliveryHour),
       })
-      .minus({ day: 1 })
+      .minus({
+        hours:
+          +process.env
+            .NEXT_PUBLIC_ORDER_AUTO_START_TIME_TO_DELIVERY_TIME_OFFSET_IN_HOUR,
+      })
       .toMillis(),
     "yyyy-MM-dd'T'hh:mm:ss",
   );
