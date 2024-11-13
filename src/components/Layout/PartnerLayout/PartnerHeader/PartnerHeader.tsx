@@ -24,7 +24,7 @@ import {
   NotificationThunks,
 } from '@redux/slices/notification.slice';
 import { currentUserSelector } from '@redux/slices/user.slice';
-import { partnerPaths } from '@src/paths';
+import { enGeneralPaths, partnerPaths } from '@src/paths';
 import { CurrentUser } from '@src/utils/data';
 
 import PartnerNotificationModal from './PartnerNotificationModal';
@@ -58,8 +58,7 @@ const PartnerHeader: React.FC<TPartnerHeaderProps> = () => {
 
   const onLogout = async () => {
     await handleLogoutFn();
-
-    router.push('/');
+    router.push(enGeneralPaths.Auth);
   };
 
   useEffect(() => {

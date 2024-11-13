@@ -15,7 +15,7 @@ export const enGeneralPaths = {
   ResetPassword: '/reset-password',
   StyleGuide: '/style-guide',
   EmailVerification: '/verify-email',
-  Home: '/',
+  Auth: '/auth',
   Tracking: '/tracking/[subOrderId]',
   SentryExamplePage: '/sentry-example-page',
 };
@@ -49,6 +49,7 @@ export const IgnoredAuthCheckRoutes = [
   enGeneralPaths.ResetPassword,
   enGeneralPaths.Tracking,
   enGeneralPaths.SentryExamplePage,
+  generalPaths.Home,
 ];
 export const IgnoredPermissionCheckRoutes = [
   generalPaths.SignIn,

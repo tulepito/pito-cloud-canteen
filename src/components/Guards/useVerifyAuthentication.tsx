@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 
 import { useAppSelector } from '@hooks/reduxHooks';
-import { generalPaths, participantPaths } from '@src/paths';
+import { enGeneralPaths, generalPaths, participantPaths } from '@src/paths';
 
 import { usePathChecker } from './Guards.helper';
 
@@ -22,6 +22,7 @@ const useVerifyAuthentication = (homePageNavigateCondition: boolean) => {
     query: { from: fromUrl },
     isReady: isRouterReady,
   } = router;
+
   const { isIgnoredAuthCheckRoute, isNonRequireAuthenticationRoute } =
     usePathChecker(pathname);
 
@@ -32,7 +33,7 @@ const useVerifyAuthentication = (homePageNavigateCondition: boolean) => {
 
     if (isNonRequireAuthenticationRoute) {
       if (homePageNavigateCondition && isRouterReady) {
-        router.push(fromUrl ? (fromUrl as string) : generalPaths.Home);
+        router.push(fromUrl ? (fromUrl as string) : enGeneralPaths.Auth);
       }
     } else if (!isAuthenticated) {
       if (PATHS_REDIRECT_TO_SIGN_UP_IF_UNAUTHENTICATED.includes(pathname)) {

@@ -34,7 +34,7 @@ const AuthGuard: React.FC<TAuthGuardProps> = ({ children }) => {
   } = currentUser;
   const { userRole: userRoleFromQuery } = query;
 
-  const { isIgnoredAuthCheckRoute, isNonRequireAuthenticationRoute } =
+  const { isNonRequireAuthenticationRoute, isIgnoredAuthCheckRoute } =
     usePathChecker(pathname);
 
   // TODO: check sign up path and consider showing verification email form or not
@@ -49,22 +49,6 @@ const AuthGuard: React.FC<TAuthGuardProps> = ({ children }) => {
     isAuthenticated &&
     isNonRequireAuthenticationRoute &&
     (!isSignUpPath || shouldNavigateInSignUpFlow);
-  const renderComponent = () => {
-    if (isIgnoredAuthCheckRoute) {
-      return children;
-    }
-
-    const loadingCondition =
-      !authInfoLoaded ||
-      homePageNavigateCondition ||
-      (!isNonRequireAuthenticationRoute && !isAuthenticated);
-
-    if (loadingCondition) {
-      return <LoadingContainer />;
-    }
-
-    return children;
-  };
 
   // TODO: load authentication info
   useEffect(() => {
@@ -92,6 +76,23 @@ const AuthGuard: React.FC<TAuthGuardProps> = ({ children }) => {
       dispatch(NotificationThunks.fetchNotifications(userPermission));
     }
   }, [isAuthenticated, isReady, userPermission]);
+
+  const renderComponent = () => {
+    if (isIgnoredAuthCheckRoute) {
+      return children;
+    }
+
+    const loadingCondition =
+      !authInfoLoaded ||
+      homePageNavigateCondition ||
+      (!isNonRequireAuthenticationRoute && !isAuthenticated);
+
+    if (loadingCondition) {
+      return <LoadingContainer />;
+    }
+
+    return children;
+  };
 
   // TODO: verify authentication
   useVerifyAuthentication(homePageNavigateCondition);

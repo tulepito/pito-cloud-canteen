@@ -6,7 +6,7 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { useRoleSelectModalController } from '@hooks/useRoleSelectModalController';
 import { authenticationInProgress, authThunks } from '@redux/slices/auth.slice';
 import { userThunks } from '@redux/slices/user.slice';
-import { generalPaths } from '@src/paths';
+import { enGeneralPaths } from '@src/paths';
 import { EUserSystemPermission } from '@src/utils/enums';
 
 import type { TSignInFormValues } from './SignInForm';
@@ -48,7 +48,7 @@ const SignInPage = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
-      router.push(generalPaths.Home);
+      router.push(enGeneralPaths.Auth);
     }
   }, [isAuthenticated, router]);
 

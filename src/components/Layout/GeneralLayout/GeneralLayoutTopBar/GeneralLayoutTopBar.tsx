@@ -15,7 +15,7 @@ import { useAppSelector } from '@hooks/reduxHooks';
 import { useLogout } from '@hooks/useLogout';
 import { useRoleSelectModalController } from '@hooks/useRoleSelectModalController';
 import { currentUserSelector } from '@redux/slices/user.slice';
-import { participantPaths } from '@src/paths';
+import { enGeneralPaths, participantPaths } from '@src/paths';
 
 import css from './GeneralLayoutTopBar.module.scss';
 
@@ -31,7 +31,7 @@ const GeneralLayoutTopBar = () => {
 
   const handleLogout = async () => {
     await handleLogoutFn();
-    router.push('/');
+    router.push(enGeneralPaths.Auth);
   };
 
   return (

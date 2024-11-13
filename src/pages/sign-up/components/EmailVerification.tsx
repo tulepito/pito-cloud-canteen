@@ -8,7 +8,7 @@ import PitoLogoV2 from '@components/PitoLogoV2/PitoLogoV2';
 import { companyInvitationThunks } from '@redux/slices/companyInvitation.slice';
 import { userThunks } from '@redux/slices/user.slice';
 import type { AppDispatch } from '@redux/store';
-import { generalPaths } from '@src/paths';
+import { enGeneralPaths } from '@src/paths';
 import { isTooManyEmailVerificationRequestsError } from '@utils/errors';
 
 import css from './EmailVerification.module.scss';
@@ -34,7 +34,7 @@ const EmailVerification: React.FC<TEmailVerificationProps> = (props) => {
   };
 
   const navigateToHomePageMaybe = () => {
-    router.push(fromUrl ? (fromUrl as string) : generalPaths.Home);
+    router.push(fromUrl ? (fromUrl as string) : enGeneralPaths.Auth);
   };
 
   const resendEmailLink = (

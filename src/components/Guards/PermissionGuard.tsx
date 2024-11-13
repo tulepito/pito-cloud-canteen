@@ -4,6 +4,7 @@ import React from 'react';
 import InActiveUserScreen from '@components/InActiveUserScreen/InActiveUserScreen';
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import RoleSelectModal from '@components/RoleSelectModal/RoleSelectModal';
+import { useAppSelector } from '@hooks/reduxHooks';
 import { useRoleSelectModalController } from '@hooks/useRoleSelectModalController';
 
 import { getLayoutBaseOnPermission } from './Guards.helper';
@@ -18,6 +19,9 @@ const PermissionGuard: React.FC<TPermissionGuardGuardProps> = (props) => {
   useAccessRouteBaseOnRoles();
   const { isIgnoredPermissionCheck, userPermission, isMatchedPermission } =
     useVerifyPermission();
+  const { isAuthenticated, authInfoLoaded } = useAppSelector(
+    (state) => state.auth,
+  );
   const { isInactiveCompany } = useActiveCompany();
   const { isRoleSelectModalOpen, onCloseRoleSelectModal } =
     useRoleSelectModalController();
@@ -33,10 +37,12 @@ const PermissionGuard: React.FC<TPermissionGuardGuardProps> = (props) => {
 
     const LayoutWrapper = getLayoutBaseOnPermission(userPermission);
 
-    return !!isMatchedPermission && isMatchedPermission ? (
+    return !authInfoLoaded ? (
+      <LoadingContainer />
+    ) : isMatchedPermission && isAuthenticated ? (
       <LayoutWrapper>{children}</LayoutWrapper>
     ) : (
-      <LoadingContainer />
+      children
     );
   };
 

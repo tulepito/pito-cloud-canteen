@@ -1737,7 +1737,7 @@
   "SignInForm.toSignUp": "Đăng ký ngay",
   "SignInPage.loginFailedText1": "Có lỗi xảy ra!",
   "SignInPage.loginFailedText2": "Kiểm tra thông tin đăng nhập và thử lại!",
-  "SignInRoute.desciption": "Đăng nhập",
+  "SignInRoute.description": "Đăng nhập",
   "SignInRoute.title": "Đăng nhập",
   "SignUpForm.confirmPassword.invalid": "Mật khẩu phải từ 8-16 kí tự, bao gồm chữ cái in hoa, chữ cái in thường, ký tự đặc biệt và chữ số.",
   "SignUpForm.confirmPassword.label": "Xác nhận mật khẩu",
@@ -1885,5 +1885,7 @@
   "UserPermission.accountant": "Kế toán viên",
   "UserPermission.booker": "Booker",
   "UserPermission.owner": "Quản trị viên",
-  "UserPermission.participant": "Thành viên"
+  "UserPermission.participant": "Thành viên",
+  "HomeRoute.desciption": "Trang chủ",
+  "HomeRoute.title": "Trang chủ"
 }

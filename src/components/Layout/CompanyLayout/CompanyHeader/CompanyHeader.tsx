@@ -18,7 +18,7 @@ import { useLogout } from '@hooks/useLogout';
 import { useRoleSelectModalController } from '@hooks/useRoleSelectModalController';
 import { currentUserSelector } from '@redux/slices/user.slice';
 import config from '@src/configs';
-import { companyPaths } from '@src/paths';
+import { companyPaths, enGeneralPaths } from '@src/paths';
 import { CurrentUser } from '@src/utils/data';
 
 import css from './CompanyHeader.module.scss';
@@ -49,7 +49,7 @@ const CompanyHeader: React.FC<CompanyHeaderProps> = ({
 
   const handleLogout = async () => {
     await handleLogoutFn();
-    router.push('/');
+    router.push(enGeneralPaths.Auth);
   };
 
   const handleGoToAccountSettingPage = () => {

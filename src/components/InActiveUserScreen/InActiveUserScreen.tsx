@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import Button from '@components/Button/Button';
 import PitoLogo from '@components/PitoLogo/PitoLogo';
 import { useLogout } from '@hooks/useLogout';
-import { generalPaths } from '@src/paths';
+import { enGeneralPaths } from '@src/paths';
 
 import css from './InActiveUserScreen.module.scss';
 
@@ -14,7 +14,7 @@ const UnActiveUserScreen = () => {
 
   const handleLogout = async () => {
     await handleLogoutFn();
-    router.push(generalPaths.Home);
+    router.push(enGeneralPaths.Auth);
   };
 
   return (

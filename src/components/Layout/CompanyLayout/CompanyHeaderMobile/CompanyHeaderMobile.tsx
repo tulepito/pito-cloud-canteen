@@ -23,7 +23,7 @@ import { useViewport } from '@hooks/useViewport';
 import { UIActions } from '@redux/slices/UI.slice';
 import { currentUserSelector } from '@redux/slices/user.slice';
 import config from '@src/configs';
-import { generalPaths, personalPaths } from '@src/paths';
+import { enGeneralPaths, personalPaths } from '@src/paths';
 import { CurrentUser } from '@src/utils/data';
 import type { TCurrentUser, TObject } from '@src/utils/types';
 
@@ -101,7 +101,7 @@ const CompanyHeaderMobile: React.FC<CompanyHeaderMobileProps> = (props) => {
 
   const handleLogout = async () => {
     await handleLogoutFn();
-    push(generalPaths.Home);
+    push(enGeneralPaths.Auth);
   };
 
   const renderRightIcon = () => {

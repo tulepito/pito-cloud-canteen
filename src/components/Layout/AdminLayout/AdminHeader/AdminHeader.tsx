@@ -14,6 +14,7 @@ import ProfileMenuLabel from '@components/ProfileMenuLabel/ProfileMenuLabel';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { useLogout } from '@hooks/useLogout';
 import { currentUserSelector } from '@redux/slices/user.slice';
+import { enGeneralPaths } from '@src/paths';
 import { CurrentUser } from '@src/utils/data';
 
 import css from './AdminHeader.module.scss';
@@ -33,8 +34,7 @@ const AdminHeader: React.FC<TAdminHeaderProps> = () => {
 
   const onLogout = async () => {
     await handleLogoutFn();
-
-    router.push('/');
+    router.push(enGeneralPaths.Auth);
   };
 
   return (
