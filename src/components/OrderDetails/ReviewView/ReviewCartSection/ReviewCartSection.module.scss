@@ -115,12 +115,12 @@
 
 .downloadPriceQuotation.downloadPriceQuotation {
   cursor: pointer;
-  display: block;
-  margin-top: 20px;
+  display: flex;
+  align-items: center;
   padding: 0;
-  width: 100%;
-  min-height: unset;
-  text-align: right;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 20px;
   color: $labelBlue2;
   @include textTemplate(14px, 700, 24px);
 
@@ -130,6 +130,10 @@
 
   &.downloadingPriceQuotation {
     cursor: not-allowed;
+  }
+
+  button {
+    margin-top: 0px;
   }
 }
 
@@ -243,4 +247,8 @@
     flex-basis: 100px;
     flex-shrink: 0;
   }
+}
+
+.iconInfoWrapper {
+  @include flexAlign(center);
 }

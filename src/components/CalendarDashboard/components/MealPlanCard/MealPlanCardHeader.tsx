@@ -9,6 +9,7 @@ import IconClose from '@components/Icons/IconClose/IconClose';
 import IconMagnifier from '@components/Icons/IconMagnifier/IconMagnifier';
 import IconTickWithBackground from '@components/Icons/IconTickWithBackground/IconTickWithBackground';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
+import Tooltip from '@components/Tooltip/Tooltip';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { Listing } from '@src/utils/data';
 import { convertWeekDay, formatTimestamp, VNTimezone } from '@utils/dates';
@@ -84,16 +85,32 @@ const MealPlanCardHeader: React.FC<TMealPlanCardHeaderProps> = ({
           <FormattedMessage id={`DayColumn.Session.${session}`} />
         </div>
         <RenderWhen condition={!shouldHideRemoveIcon}>
-          <div
-            className={classNames(css.iconCloseWrapper, {
-              [css.walkthrough]: walkthroughStep === 3,
-            })}>
-            <IconClose
-              className={css.close}
-              onClick={handleOpenDeleteModal}
-              data-tour="step-4"
-            />
-          </div>
+          <Tooltip
+            placement="top"
+            overlayInnerStyle={{
+              padding: '8px 12px',
+              maxWidth: 250,
+            }}
+            tooltipContent={
+              <div>
+                <div className={css.stepTitle}>Xoá menu này</div>
+                <div className={css.stepContent}>
+                  Bấm để <b>xoá thực đơn đã chọn</b>. Bạn có thể thêm lại sau
+                  đó.
+                </div>
+              </div>
+            }>
+            <div
+              className={classNames(css.iconCloseWrapper, {
+                [css.walkthrough]: walkthroughStep === 3,
+              })}>
+              <IconClose
+                className={css.close}
+                onClick={handleOpenDeleteModal}
+                data-tour="step-4"
+              />
+            </div>
+          </Tooltip>
         </RenderWhen>
       </div>
       <div className={css.headerActions}>
@@ -104,16 +121,31 @@ const MealPlanCardHeader: React.FC<TMealPlanCardHeaderProps> = ({
           món
         </div>
         <div className={css.verticalDivider} />
-        <div
-          className={classNames(css.searchIconWrapper, {
-            [css.walkthrough]: walkthroughStep === 2,
-          })}>
-          <IconMagnifier
-            className={css.searchIcon}
-            onClick={handleSearchRestaurant}
-            data-tour="step-3"
-          />
-        </div>
+        <Tooltip
+          placement="top"
+          overlayInnerStyle={{
+            padding: '8px 12px',
+            maxWidth: 250,
+          }}
+          tooltipContent={
+            <div>
+              <div className={css.stepTitle}>Tìm kiếm nhà hàng</div>
+              <div className={css.stepContent}>
+                Bấm để <b>xem nhà hàng khác </b>{' '}
+              </div>
+            </div>
+          }>
+          <div
+            className={classNames(css.searchIconWrapper, {
+              [css.walkthrough]: walkthroughStep === 2,
+            })}>
+            <IconMagnifier
+              className={css.searchIcon}
+              onClick={handleSearchRestaurant}
+              data-tour="step-3"
+            />
+          </div>
+        </Tooltip>
       </div>
       <DeleteMealModal
         id="DeleteMealModal"

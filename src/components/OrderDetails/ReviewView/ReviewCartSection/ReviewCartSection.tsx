@@ -6,10 +6,12 @@ import { useRouter } from 'next/router';
 import Badge from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
+import IconInfoCircle from '@components/Icons/IconInfoCircle/IconInfoCircle';
 import MobileBottomContainer from '@components/MobileBottomContainer/MobileBottomContainer';
 import PriceQuotation from '@components/OrderDetails/PriceQuotation/PriceQuotation';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import SlideModal from '@components/SlideModal/SlideModal';
+import Tooltip from '@components/Tooltip/Tooltip';
 import { parseThousandNumber } from '@helpers/format';
 import { isEnableToStartOrder } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
@@ -369,15 +371,34 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
           {title || intl.formatMessage({ id: 'ReviewCardSection.title' })}
         </div>
         {feeSection}
-        <Button
-          variant="inline"
-          className={downloadPriceQuotationClasses}
-          disabled={isDownloadingPriceQuotation}
-          onClick={handleDownloadPriceQuotationClick}>
-          {intl.formatMessage({
-            id: 'ReviewCardSection.downloadPriceQuotation',
-          })}
-        </Button>
+        <div className={css.downloadPriceQuotation}>
+          <Tooltip
+            placement="top"
+            overlayInnerStyle={{
+              padding: '8px 12px',
+              maxWidth: 250,
+            }}
+            tooltipContent={
+              <div className={css.stepContent}>
+                Tải xuống báo giá để xem lại chi tiết đơn hàng trước khi bạn xác
+                nhận.
+              </div>
+            }>
+            <div className={css.iconInfoWrapper}>
+              <IconInfoCircle />
+            </div>
+          </Tooltip>
+          <Button
+            variant="inline"
+            className={downloadPriceQuotationClasses}
+            disabled={isDownloadingPriceQuotation}
+            onClick={handleDownloadPriceQuotationClick}>
+            {intl.formatMessage({
+              id: 'ReviewCardSection.downloadPriceQuotation',
+            })}
+          </Button>
+        </div>
+
         {bottomActionSection}
       </RenderWhen>
 

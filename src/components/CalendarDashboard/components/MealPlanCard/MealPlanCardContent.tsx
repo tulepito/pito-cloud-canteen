@@ -11,6 +11,7 @@ import IconStar from '@components/Icons/IconStar/IconStar';
 import IconTruck from '@components/Icons/IconTruck/IconTruck';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
+import Tooltip from '@components/Tooltip/Tooltip';
 import { calculateDistance } from '@helpers/mapHelpers';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
@@ -126,12 +127,27 @@ const MealPlanCardContent: React.FC<TMealPlanCardContentProps> = ({
           [css.walkthrough]: walkthroughStep === 1,
         })}>
         <span title={restaurantName}>{restaurantName}</span>
-        <IconRefreshing
-          className={css.recommendRestaurant}
-          onClick={handleRefreshIconClick}
-          inProgress={onRecommendMealInProgress}
-          data-tour="step-2"
-        />
+        <Tooltip
+          placement="top"
+          overlayInnerStyle={{
+            padding: '8px 12px',
+            maxWidth: 250,
+          }}
+          tooltipContent={
+            <div>
+              <div className={css.stepTitle}>Tự động đổi menu khác</div>
+              <div className={css.stepContent}>
+                Bấm để <b>đổi thực đơn</b> khác
+              </div>
+            </div>
+          }>
+          <IconRefreshing
+            className={css.recommendRestaurant}
+            onClick={handleRefreshIconClick}
+            inProgress={onRecommendMealInProgress}
+            data-tour="step-2"
+          />
+        </Tooltip>
       </div>
       <div className={css.metaSection}>
         <div className={css.metaItem}>

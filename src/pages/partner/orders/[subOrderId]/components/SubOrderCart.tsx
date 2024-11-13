@@ -7,7 +7,9 @@ import { useRouter } from 'next/router';
 
 import Badge from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
+import IconInfoCircle from '@components/Icons/IconInfoCircle/IconInfoCircle';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
+import Tooltip from '@components/Tooltip/Tooltip';
 import { parseThousandNumber } from '@helpers/format';
 import { calculatePriceQuotationInfoFromOrder } from '@helpers/order/cartInfoHelper';
 import { ensureVATSetting } from '@helpers/order/prepareDataHelper';
@@ -208,15 +210,33 @@ const SubOrderCart: React.FC<TSubOrderCartProps> = (props) => {
             </div>
           </div>
 
-          <Button
-            variant="inline"
-            className={downloadPriceQuotationClasses}
-            disabled={isDownloadingPriceQuotation}
-            onClick={handleDownloadPriceQuotation}>
-            {intl.formatMessage({
-              id: 'SubOrderCart.downloadPriceQuotation',
-            })}
-          </Button>
+          <div className={css.downloadPriceQuotation}>
+            <Tooltip
+              placement="top"
+              overlayInnerStyle={{
+                padding: '8px 12px',
+                maxWidth: 250,
+              }}
+              tooltipContent={
+                <div className={css.stepContent}>
+                  Tải xuống báo giá để xem lại chi tiết đơn hàng trước khi bạn
+                  xác nhận.
+                </div>
+              }>
+              <div className={css.iconInfoWrapper}>
+                <IconInfoCircle />
+              </div>
+            </Tooltip>
+            <Button
+              variant="inline"
+              className={downloadPriceQuotationClasses}
+              disabled={isDownloadingPriceQuotation}
+              onClick={handleDownloadPriceQuotation}>
+              {intl.formatMessage({
+                id: 'SubOrderCart.downloadPriceQuotation',
+              })}
+            </Button>
+          </div>
         </div>
         <RenderWhen.False>
           <Skeleton className={css.loading} />
