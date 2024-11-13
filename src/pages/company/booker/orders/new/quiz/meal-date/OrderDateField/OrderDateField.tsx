@@ -38,7 +38,7 @@ const OrderDateField: React.FC<OrderDateFieldProps> = (props) => {
 
   return (
     <div className={css.orderDateFieldWrapper}>
-      <div className={css.orderDateFieldLabel}>Chọn thời gian đặt</div>
+      <div className={css.orderDateFieldLabel}>Chọn khung thời gian đặt</div>
       <div
         className={css.orderDateFieldInput}
         onClick={handleOrderDateFieldClick}>
