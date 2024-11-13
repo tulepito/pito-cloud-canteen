@@ -1,9 +1,106 @@
 @use '/src/styles/customMediaQueries.scss' as *;
 @use '/src/styles/vars.scss' as *;
 
-.container {
-  top: 110px;
-  width: fit-content;
+$toast-error-bg: #fcedef;
+$toast-error-icon-fill: #ef4d61;
+$toast-error-progress-bar: #ef4d61;
+
+$toast-success-bg: #ebfbf4;
+$toast-success-icon-fill: #34d39d;
+$toast-success-progress-bar: #34d39d;
+
+$toast-info-bg: #e5f9fc;
+$toast-info-icon-fill: #00d0e9;
+$toast-info-progress-bar: #00d0e9;
+
+$toast-text-color: #1f1e1e;
+$toast-font-family: 'Manrope', Helvetica, Arial, sans-serif;
+$toast-box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1),
+  0 2px 4px -2px rgb(0 0 0 / 0.1);
+
+.defaultToastContainer {
+  width: 420px;
+  max-width: 100%;
+
+  :global .Toastify__toast--error {
+    font-size: 14px;
+    line-height: 20px;
+    background-color: $toast-error-bg;
+    font-family: $toast-font-family;
+    color: $toast-text-color;
+    box-shadow: $toast-box-shadow;
+
+    .Toastify__toast-icon {
+      svg {
+        fill: $toast-error-icon-fill;
+      }
+    }
+
+    .Toastify__close-button {
+      align-self: center;
+    }
+
+    .Toastify__progress-bar--error {
+      top: 0;
+      height: 4px;
+      background-color: $toast-error-progress-bar;
+    }
+  }
+
+  :global .Toastify__toast--success {
+    font-size: 14px;
+    line-height: 20px;
+    background-color: $toast-success-bg;
+    font-family: $toast-font-family;
+    color: $toast-text-color;
+    box-shadow: $toast-box-shadow;
+
+    .Toastify__toast-icon {
+      svg {
+        fill: $toast-success-icon-fill;
+      }
+    }
+
+    .Toastify__close-button {
+      align-self: center;
+    }
+
+    .Toastify__progress-bar--success {
+      top: 0;
+      height: 4px;
+      background-color: $toast-success-progress-bar;
+    }
+  }
+
+  :global .Toastify__toast--info {
+    font-size: 14px;
+    line-height: 20px;
+    background-color: $toast-info-bg;
+    font-family: $toast-font-family;
+    color: $toast-text-color;
+    box-shadow: $toast-box-shadow;
+
+    .Toastify__toast-icon {
+      svg {
+        fill: $toast-info-icon-fill;
+      }
+    }
+
+    .Toastify__close-button {
+      align-self: center;
+    }
+
+    .Toastify__progress-bar--info {
+      top: 0;
+      height: 4px;
+      background-color: $toast-info-progress-bar;
+    }
+  }
+
+  :global .Toastify__toast-icon {
+    margin-inline-end: 8px;
+    width: 16px;
+  }
 }
 
 #bottomCenterToast {

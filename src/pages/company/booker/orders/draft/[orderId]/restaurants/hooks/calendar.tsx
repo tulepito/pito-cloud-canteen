@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { shallowEqual } from 'react-redux';
+import { toast } from 'react-toastify';
 import { DateTime } from 'luxon';
 import { useRouter } from 'next/router';
 
@@ -10,13 +11,17 @@ import {
   orderAsyncActions,
   setOnRecommendRestaurantInProcess,
 } from '@redux/slices/Order.slice';
+import type { TFoodInRestaurant } from '@src/types/bookerSelectRestaurant';
 import { convertWeekDay, renderDateRange } from '@src/utils/dates';
 import { Listing } from '@utils/data';
 import type { TListing, TObject } from '@utils/types';
 
 import { BookerDraftOrderPageActions } from '../../BookerDraftOrderPage.slice';
 import Toolbar from '../../components/Toolbar/Toolbar';
-import { BookerSelectRestaurantActions } from '../BookerSelectRestaurant.slice';
+import {
+  BookerSelectRestaurantActions,
+  BookerSelectRestaurantThunks,
+} from '../BookerSelectRestaurant.slice';
 
 export const useGetCalendarExtraResources = ({
   order,
@@ -30,6 +35,8 @@ export const useGetCalendarExtraResources = ({
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { orderId } = router.query;
+
+  const [isApplyingOtherDays, setIsApplyingOtherDays] = useState(false);
 
   const fetchOrderInProgress = useAppSelector(
     (state) => state.Order.fetchOrderInProgress,
@@ -53,14 +60,10 @@ export const useGetCalendarExtraResources = ({
   const onRescommendRestaurantForSpecificDateInProgress = useAppSelector(
     (state) => state.Order.onRescommendRestaurantForSpecificDateInProgress,
   );
-  const updateOrderDetailInProgress = useAppSelector(
-    (state) => state.Order.updateOrderDetailInProgress,
-  );
 
   const orderData = Listing(order as TListing);
   const planId = orderData.getMetadata().plans?.[0];
   const { dayInWeek = [] } = orderData.getMetadata();
-  const onApplyOtherDaysInProgress = updateOrderDetailInProgress;
 
   const onSearchRestaurant = useCallback(
     (date: Date) => {
@@ -73,31 +76,104 @@ export const useGetCalendarExtraResources = ({
 
   const onApplyOtherDays = useCallback(
     async (date: string, selectedDates: string[]) => {
-      const totalDates = renderDateRange(
-        startDate.getTime(),
-        endDate.getTime(),
-      );
-      const newOrderDetail = totalDates.reduce((result, curr) => {
-        if (
+      if (selectedDates.length === 0) {
+        return;
+      }
+
+      setIsApplyingOtherDays(true);
+
+      try {
+        const totalDates = renderDateRange(
+          startDate.getTime(),
+          endDate.getTime(),
+        );
+
+        const timestampsToFetch = totalDates.filter((curr) =>
           selectedDates.includes(
             convertWeekDay(DateTime.fromMillis(curr).weekday).key,
-          )
-        ) {
-          return {
-            ...result,
-            [curr]: { ...orderDetail?.[date] },
-          };
-        }
+          ),
+        );
 
-        return result;
-      }, orderDetail);
-      await dispatch(
-        orderAsyncActions.updatePlanDetail({
-          orderId,
-          planId,
-          orderDetail: newOrderDetail,
-        }),
-      );
+        const newOrderId = Array.isArray(orderId) ? orderId[0] : orderId;
+
+        const fetchedData = await Promise.all(
+          timestampsToFetch.map((timestamp) =>
+            dispatch(
+              BookerSelectRestaurantThunks.fetchFoodsByRestaurantAndTimestamp({
+                restaurantId: orderDetail?.[date]?.restaurant?.id,
+                timestamp,
+                orderId: newOrderId ?? '',
+              }),
+            ),
+          ),
+        );
+
+        const newOrderDetail = totalDates.reduce((result, curr) => {
+          if (
+            selectedDates.includes(
+              convertWeekDay(DateTime.fromMillis(curr).weekday).key,
+            )
+          ) {
+            const fetchedDataForTimestamp = fetchedData.find(
+              (data) => data.meta.arg.timestamp === curr,
+            );
+
+            if (fetchedDataForTimestamp) {
+              const combinedFoods = (fetchedDataForTimestamp?.payload as any)
+                ?.foodsByRestaurantAndTimestamp;
+
+              const foodList = combinedFoods?.reduce(
+                (
+                  foodResult: {
+                    [foodId: string]: {
+                      foodName: string;
+                      foodPrice: number;
+                      foodUnit: string;
+                    };
+                  },
+                  food: TFoodInRestaurant,
+                ) => {
+                  foodResult[food.foodId] = {
+                    foodName: food.foodName,
+                    foodPrice: food.price,
+                    foodUnit: food.foodUnit,
+                  };
+
+                  return foodResult;
+                },
+                {},
+              );
+
+              return {
+                ...result,
+                [curr]: {
+                  ...orderDetail?.[date],
+                  restaurant: {
+                    ...orderDetail?.[date]?.restaurant,
+                    foodList,
+                  },
+                },
+              };
+            }
+          }
+
+          return result;
+        }, orderDetail);
+
+        await dispatch(
+          orderAsyncActions.updatePlanDetail({
+            orderId,
+            planId,
+            orderDetail: newOrderDetail,
+          }),
+        );
+      } catch (error) {
+        toast.error(
+          'Xin lỗi, đã có sự cố. Vui lòng thử tải lại trang hoặc liên hệ với chúng tôi để được hỗ trợ.',
+        );
+      } finally {
+        setIsApplyingOtherDays(false);
+      }
     },
     [startDate, endDate, orderDetail, dispatch, orderId, planId],
   );
@@ -150,7 +226,7 @@ export const useGetCalendarExtraResources = ({
       onApplyOtherDays,
       onRecommendRestaurantForSpecificDay,
       onRecommendRestaurantForSpecificDayInProgress,
-      onApplyOtherDaysInProgress,
+      onApplyOtherDaysInProgress: isApplyingOtherDays,
     };
   }, [
     planId,
@@ -164,7 +240,7 @@ export const useGetCalendarExtraResources = ({
     onApplyOtherDays,
     onRecommendRestaurantForSpecificDay,
     onRecommendRestaurantForSpecificDayInProgress,
-    onApplyOtherDaysInProgress,
+    isApplyingOtherDays,
   ]);
 
   return calendarExtraResources;

@@ -79,6 +79,9 @@ export const disapprovePartnerPaymentApi = ({
 export const searchRestaurantListFromMenuApi = (params: TObject) =>
   getApi('/admin/listings/order/search-retaurant', params);
 
+export const getRestaurantFoodsApi = (params: TObject) =>
+  getApi('/admin/listings/order/get-restaurant-foods', params);
+
 export const fetchFoodListFromMenuApi = (params: TObject) =>
   getApi('/admin/listings/order/fetch-food-from-menu', params);
 

@@ -6,6 +6,7 @@ import uniqBy from 'lodash/uniqBy';
 
 import {
   fetchFoodListFromMenuApi,
+  getRestaurantFoodsApi,
   searchRestaurantListFromMenuApi,
 } from '@apis/admin';
 import { updatePlanDetailsApi } from '@apis/orderApi';
@@ -38,6 +39,7 @@ type TOrderInitialState = {
     menuId: string;
   }[];
   combinedRestaurantInFoods: TFoodInRestaurant[];
+  foodsByRestaurantAndTimestamp: TFoodInRestaurant[];
 
   searchInProgress: boolean;
 
@@ -90,6 +92,7 @@ const initialState: TOrderInitialState = {
   totalItems: 0,
   combinedRestaurantMenuData: [],
   combinedRestaurantInFoods: [],
+  foodsByRestaurantAndTimestamp: [],
 
   searchInProgress: false,
 
@@ -140,6 +143,8 @@ const FETCH_RECOMMENDED_KEYWORDS =
 const DELETE_RECENT_KEYWORD =
   'app/BookerSelectRestaurant/DELETE_RECENT_KEYWORD';
 const SEARCH_RESTAURANT = 'app/BookerSelectRestaurant/SEARCH_RESTAURANT';
+const FETCH_FOODS_BY_RESTAURANT_AND_TIMESTAMPS =
+  'app/BookerSelectRestaurant/FETCH_FOODS_BY_RESTAURANT_AND_TIMESTAMPS';
 const FETCH_FOOD_LIST_FROM_RESTAURANT =
   'app/BookerSelectRestaurant/FETCH_FOOD_LIST_FROM_RESTAURANT';
 const FETCH_ORDER = 'app/BookerSelectRestaurant/FETCH_ORDER';
@@ -221,6 +226,7 @@ const searchRestaurants = createAsyncThunk(
         combinedRestaurantInFoods: [],
       };
     }
+
     const { data: restaurantData } = await searchRestaurantListFromMenuApi(
       params,
     );
@@ -236,6 +242,44 @@ const searchRestaurants = createAsyncThunk(
       totalItems: restaurantData.totalItems ?? 0,
       combinedRestaurantInFoods: restaurantData.combinedRestaurantInFoods ?? [],
       keywords: params.keywords,
+    };
+  },
+);
+
+const fetchFoodsByRestaurantAndTimestamp = createAsyncThunk(
+  FETCH_FOODS_BY_RESTAURANT_AND_TIMESTAMPS,
+  async (
+    {
+      timestamp,
+      orderId,
+      restaurantId,
+    }: {
+      timestamp: number;
+      orderId: string;
+      restaurantId: string;
+    },
+    { getState, dispatch },
+  ) => {
+    await dispatch(orderAsyncActions.fetchOrder(orderId!));
+    const { order } = getState().Order;
+
+    const { deliveryAddress = {} } = Listing(order).getMetadata();
+
+    if (!deliveryAddress || !deliveryAddress.origin) {
+      return {
+        foodsByRestaurantAndTimestamp: [],
+      };
+    }
+
+    const { data: restaurantData } = await getRestaurantFoodsApi({
+      timestamp,
+      orderId,
+      restaurantIdParam: restaurantId,
+    });
+
+    return {
+      foodsByRestaurantAndTimestamp:
+        restaurantData.foodsByRestaurantAndTimestamp ?? [],
     };
   },
 );
@@ -444,6 +488,7 @@ export const BookerSelectRestaurantThunks = {
   fetchFoodListFromRestaurant,
   fetchOrder,
   fetchPlanDetail,
+  fetchFoodsByRestaurantAndTimestamp,
   updatePlanDetail,
   fetchCompanyAccount,
   fetchRestaurantReviews,
@@ -492,6 +537,17 @@ const BookerSelectRestaurantSlice = createSlice({
       .addCase(searchRestaurants.rejected, (state) => {
         state.searchInProgress = false;
       })
+
+      .addCase(fetchFoodsByRestaurantAndTimestamp.pending, () => {})
+      .addCase(
+        fetchFoodsByRestaurantAndTimestamp.fulfilled,
+        (state, action) => {
+          state.foodsByRestaurantAndTimestamp =
+            action.payload.foodsByRestaurantAndTimestamp ?? [];
+        },
+      )
+      .addCase(fetchFoodsByRestaurantAndTimestamp.rejected, () => {})
+
       .addCase(fetchOrder.pending, (state) => ({
         ...state,
         fetchOrderInProgress: true,

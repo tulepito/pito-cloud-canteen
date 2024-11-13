@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
+import { toast } from 'react-toastify';
 import classNames from 'classnames';
 import { has, omit, pickBy } from 'lodash';
 import isEmpty from 'lodash/isEmpty';
@@ -32,6 +33,7 @@ import {
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { normalizePlanDetailsToEvent } from '@pages/company/booker/orders/draft/[orderId]/helpers/normalizeData';
+import { BookerSelectRestaurantThunks } from '@pages/company/booker/orders/draft/[orderId]/restaurants/BookerSelectRestaurant.slice';
 import { useGetCalendarExtraResources } from '@pages/company/booker/orders/draft/[orderId]/restaurants/hooks/calendar';
 import {
   addCurrentSelectedMenuId,
@@ -44,6 +46,7 @@ import {
   unSelectRestaurant,
 } from '@redux/slices/Order.slice';
 import { selectRestaurantPageThunks } from '@redux/slices/SelectRestaurantPage.slice';
+import type { TFoodInRestaurant } from '@src/types/bookerSelectRestaurant';
 import { convertWeekDay, renderDateRange } from '@src/utils/dates';
 import { EOrderStates, EOrderType } from '@src/utils/enums';
 import { Listing, User } from '@utils/data';
@@ -94,6 +97,8 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
   const shouldNextTabControl = useBoolean();
   const [onNextClick, setOnNextClick] = useState<() => void>(() => () => {});
   const changedRestaurantController = useBoolean();
+
+  const [isApplyingOtherDays, setIsApplyingOtherDays] = useState(false);
 
   const draftEditOrderDetail = useAppSelector(
     (state) => state.Order.draftEditOrderData.orderDetail,
@@ -500,8 +505,6 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     ? currentOrderDetail[selectedDate?.getTime()]?.restaurant?.foodList
     : {};
 
-  const onApplyOtherDaysInProgress = updateOrderDetailInProgress;
-
   useEffect(() => {
     const menuListingIds = Object.values(orderDetail)?.map(
       (date: any) => date.restaurant?.menuId,
@@ -806,57 +809,126 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
   // TODO: handle apply meal for other days
   const onApplyOtherDays = useCallback(
     async (date: string, selectedDates: string[]) => {
-      const totalDates = renderDateRange(
-        draftStartDate || startDate,
-        draftEndDate || endDate,
-      );
-      const orderDetailToHandle = isEditFlow
-        ? draftEditOrderDetail
-        : orderDetail;
+      if (selectedDates.length === 0) {
+        return;
+      }
 
-      const newOrderDetail = totalDates.reduce((result, curr) => {
-        const currWeekday = convertWeekDay(
-          DateTime.fromMillis(curr).weekday,
-        ).key;
+      setIsApplyingOtherDays(true);
 
-        if (selectedDates.includes(currWeekday) && curr.toString() !== date) {
-          if (
-            isPickingOrder &&
-            isEditFlow &&
-            !draftSelectedFoodDays.includes(currWeekday)
-          ) {
-            return result;
+      try {
+        const totalDates = renderDateRange(
+          draftStartDate || startDate,
+          draftEndDate || endDate,
+        );
+
+        const timestampsToFetch = totalDates.filter((curr) =>
+          selectedDates.includes(
+            convertWeekDay(DateTime.fromMillis(curr).weekday).key,
+          ),
+        );
+
+        const newOrderId = Array.isArray(orderId) ? orderId[0] : orderId;
+
+        const orderDetailToHandle = isEditFlow
+          ? draftEditOrderDetail
+          : orderDetail;
+
+        const fetchedData = await Promise.all(
+          timestampsToFetch.map((timestamp) =>
+            dispatch(
+              BookerSelectRestaurantThunks.fetchFoodsByRestaurantAndTimestamp({
+                restaurantId: orderDetailToHandle?.[date]?.restaurant?.id,
+                timestamp,
+                orderId: newOrderId ?? '',
+              }),
+            ),
+          ),
+        );
+
+        const newOrderDetail = totalDates.reduce((result, curr) => {
+          const currWeekday = convertWeekDay(
+            DateTime.fromMillis(curr).weekday,
+          ).key;
+
+          if (selectedDates.includes(currWeekday) && curr.toString() !== date) {
+            if (
+              isPickingOrder &&
+              isEditFlow &&
+              !draftSelectedFoodDays.includes(currWeekday)
+            ) {
+              return result;
+            }
+
+            const fetchedDataForTimestamp = fetchedData.find(
+              (data) => data.meta.arg.timestamp === curr,
+            );
+
+            if (fetchedDataForTimestamp) {
+              const combinedFoods = (fetchedDataForTimestamp?.payload as any)
+                ?.foodsByRestaurantAndTimestamp;
+
+              const newFoodList = combinedFoods?.reduce(
+                (
+                  foodResult: {
+                    [foodId: string]: {
+                      foodName: string;
+                      foodPrice: number;
+                      foodUnit: string;
+                    };
+                  },
+                  food: TFoodInRestaurant,
+                ) => {
+                  foodResult[food.foodId] = {
+                    foodName: food.foodName,
+                    foodPrice: food.price,
+                    foodUnit: food.foodUnit,
+                  };
+
+                  return foodResult;
+                },
+                {},
+              );
+
+              return {
+                ...result,
+                [curr]: {
+                  ...orderDetailToHandle![curr],
+                  lineItems: orderDetailToHandle![date]?.lineItems || [],
+                  restaurant: {
+                    ...orderDetailToHandle?.[date]?.restaurant,
+                    foodList: newFoodList,
+                  },
+                },
+              };
+            }
           }
 
-          return {
-            ...result,
-            [curr]: {
-              ...orderDetailToHandle![curr],
-              restaurant: orderDetailToHandle![date]?.restaurant || {},
-              lineItems: orderDetailToHandle![date]?.lineItems || [],
-            },
-          };
+          return result;
+        }, orderDetailToHandle);
+
+        if (isEditFlow) {
+          dispatch(
+            saveDraftEditOrder({
+              orderDetail: newOrderDetail,
+            }),
+          );
+        } else {
+          dispatch(setCanNotGoAfterOderDetail(true));
+
+          await dispatch(
+            orderAsyncActions.updatePlanDetail({
+              orderId,
+              planId,
+              orderDetail: newOrderDetail,
+            }),
+          );
         }
-
-        return result;
-      }, orderDetailToHandle);
-
-      if (isEditFlow) {
-        dispatch(
-          saveDraftEditOrder({
-            orderDetail: newOrderDetail,
-          }),
+      } catch (error) {
+        toast.error(
+          'Xin lỗi, đã có sự cố. Vui lòng thử tải lại trang hoặc liên hệ với chúng tôi để được hỗ trợ.',
         );
-      } else {
-        dispatch(setCanNotGoAfterOderDetail(true));
-
-        await dispatch(
-          orderAsyncActions.updatePlanDetail({
-            orderId,
-            planId,
-            orderDetail: newOrderDetail,
-          }),
-        );
+      } finally {
+        setIsApplyingOtherDays(false);
       }
     },
     [
@@ -889,7 +961,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     onEditFoodInProgress,
     dayInWeek: suitableDayInWeek,
     onApplyOtherDays,
-    onApplyOtherDaysInProgress,
+    onApplyOtherDaysInProgress: isApplyingOtherDays,
     onRecommendRestaurantForSpecificDay,
     onRecommendRestaurantForSpecificDayInProgress,
     availableOrderDetailCheckList,

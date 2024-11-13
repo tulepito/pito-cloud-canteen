@@ -71,7 +71,8 @@ export function parseFoodsFromMenu(
     const food = mapfoods.get(key);
     if (foodMenu && food) {
       const foodListing = Listing(food);
-      const { price, title } = foodListing.getAttributes();
+
+      const { price, title, publicData } = foodListing.getAttributes();
       if (price.amount === packagePerMember)
         result.push({
           restaurantId,
@@ -79,6 +80,7 @@ export function parseFoodsFromMenu(
           foodName: title,
           minQuantity: foodListing.getPublicData().minQuantity ?? 0,
           price: price.amount,
+          foodUnit: publicData?.unit ?? '',
         });
     }
   });

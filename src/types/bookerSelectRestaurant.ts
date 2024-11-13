@@ -13,4 +13,5 @@ export type TFoodInRestaurant = {
   price: number;
   minQuantity: number;
   foodName: string;
+  foodUnit: string;
 };

@@ -56,6 +56,7 @@ function BookerSelectRestaurant() {
       }
     }
   }, [orderId, orderState, router]);
+
   const {
     restaurants,
     searchInProgress,
