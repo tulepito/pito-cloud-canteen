@@ -27,6 +27,7 @@ const QuizMealStyles = () => {
     (state) => state.SystemAttributes.categories,
     shallowEqual,
   );
+  const quizFlowOpen = useAppSelector((state) => state.Quiz.quizFlowOpen);
   const fetchMealStylesInProgress = useAppSelector(
     (state) => state.SystemAttributes.fetchAttributesInProgress,
   );
@@ -93,7 +94,7 @@ const QuizMealStyles = () => {
   return (
     <QuizModal
       id="QuizMealStyles"
-      isOpen
+      isOpen={quizFlowOpen}
       modalTitle={intl.formatMessage({ id: 'QuizMealStyles.title' })}
       submitText="Tiếp tục"
       cancelText="Bỏ qua"

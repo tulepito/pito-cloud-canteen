@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import { useCallback } from 'react';
 import { shallowEqual } from 'react-redux';
 import router from 'next/router';
@@ -64,6 +63,8 @@ export const useQuizFlow = (step: string) => {
   const submitCreateOrder = useCallback(
     async (submitQuizData?: any) => {
       creatingOrderModalControl.setTrue();
+      submittingErrorControl.setFalse();
+
       try {
         const { meta, payload: orderListing }: { meta: any; payload: any } =
           await dispatch(
@@ -124,22 +125,22 @@ export const useQuizFlow = (step: string) => {
           });
         }
       } catch (error) {
-        console.error('error: ', error);
+        submittingErrorControl.setTrue();
       } finally {
-        submittingErrorControl.setFalse();
+        creatingOrderModalControl.setFalse();
       }
     },
     [
-      JSON.stringify(bookerQuizData),
       creatingOrderModalControl,
-      currentUser?.id?.uuid,
-      dispatch,
+      submittingErrorControl,
       hasOrderBefore,
       isCopyPreviousOrder,
+      reorderOpen,
+      quizData,
+      JSON.stringify(bookerQuizData),
       JSON.stringify(previousOrder),
-      JSON.stringify(quizData),
       JSON.stringify(selectedCompany),
-      submittingErrorControl,
+      dispatch,
     ],
   );
 
@@ -149,11 +150,11 @@ export const useQuizFlow = (step: string) => {
   }, [dispatch]);
 
   return {
+    creatingOrderInProgress: creatingOrderModalControl.value,
+    creatingOrderError: submittingErrorControl.value,
     nextStep,
     backStep,
     submitCreateOrder,
-    creatingOrderInProgress: creatingOrderModalControl.value,
-    creatingOrderError: submittingErrorControl.value,
     handleCloseQuizFlow,
   };
 };

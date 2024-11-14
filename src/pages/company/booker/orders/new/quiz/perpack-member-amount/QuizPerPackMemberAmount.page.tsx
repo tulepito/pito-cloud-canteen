@@ -46,6 +46,7 @@ const QuizPerPackMemberAmountPage: React.FC<
   const dispatch = useAppDispatch();
 
   const quizData = useAppSelector((state) => state.Quiz.quiz, shallowEqual);
+  const quizFlowOpen = useAppSelector((state) => state.Quiz.quizFlowOpen);
   const { nextStep } = useQuizFlow(QuizStep.PACKAGE_PER_MEMBER);
 
   const onSubmit = async (values: any) => {
@@ -153,7 +154,7 @@ const QuizPerPackMemberAmountPage: React.FC<
   return (
     <QuizModal
       id="QuizPerPackMemberAmountModal"
-      isOpen
+      isOpen={quizFlowOpen}
       handleClose={handleCancel}
       modalTitle={intl.formatMessage({
         id: 'QuizPerPackMemberAmountPage.title',

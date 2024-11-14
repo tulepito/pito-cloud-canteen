@@ -52,6 +52,7 @@ const QuizInviteMember = () => {
   const { members: originCompanyMembers = {} } = companyUser.getMetadata();
   const { email: companyEmail } = companyUser.getAttributes();
   const { email: currentUserEmail } = currentUserGetter.getAttributes();
+  const quizFlowOpen = useAppSelector((state) => state.Quiz.quizFlowOpen);
 
   const restrictEmailList = [
     ...Object.keys(originCompanyMembers),
@@ -107,7 +108,7 @@ const QuizInviteMember = () => {
     <>
       <QuizModal
         id="QuizInviteMember"
-        isOpen
+        isOpen={quizFlowOpen}
         modalTitle={
           <div className={css.headerContainer}>
             <div className={css.main}>
@@ -134,6 +135,7 @@ const QuizInviteMember = () => {
           />
         </div>
       </QuizModal>
+
       <PopupModal
         id="MemberEmailModal"
         isOpen={memberEmailModalController.value}

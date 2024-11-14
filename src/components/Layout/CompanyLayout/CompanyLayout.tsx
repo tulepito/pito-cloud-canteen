@@ -42,7 +42,6 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
   const router = useRouter();
   const dispatch = useAppDispatch();
 
-  const quizFlowOpen = useAppSelector((state) => state.Quiz.quizFlowOpen);
   const companyList = useAppSelector(
     (state) => state.BookerCompanies.companies,
     shallowEqual,
@@ -202,16 +201,19 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
           companyHeaderLinkData={companyHeaderLinkData}
         />
       </RenderWhen>
+
       {showSidebar && <CompanySidebar companyName={companyName!} />}
+
       <CompanyMainContent
         hasHeader={showFeatureHeader}
         hasSideBar={showSidebar}>
         {children}
       </CompanyMainContent>
+
       {!shouldHideFooter && <CompanyFooter />}
-      <RenderWhen condition={quizFlowOpen}>
-        <QuizFlow />
-      </RenderWhen>
+
+      <QuizFlow />
+
       <RenderWhen condition={shouldShowCompanyNavBar.includes(pathname)}>
         <CompanyNavBar />
       </RenderWhen>

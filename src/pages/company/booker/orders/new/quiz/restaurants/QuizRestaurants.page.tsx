@@ -28,6 +28,8 @@ const QuizRestaurants = () => {
     (state) => state.Quiz.restaurants,
     shallowEqual,
   );
+
+  const quizFlowOpen = useAppSelector((state) => state.Quiz.quizFlowOpen);
   const selectedCompany = useAppSelector((state) => state.Quiz.selectedCompany);
 
   const favoriteRestaurantInProgress = useAppSelector(
@@ -75,7 +77,7 @@ const QuizRestaurants = () => {
   return (
     <QuizModal
       id="QuizRestaurantsModal"
-      isOpen
+      isOpen={quizFlowOpen}
       handleClose={() => {}}
       modalTitle={intl.formatMessage({
         id: 'QuizRestaurants.title',

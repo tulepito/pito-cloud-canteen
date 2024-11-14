@@ -39,6 +39,8 @@ const QuizSpecialDemand: React.FC<TQuizSpecialDemandProps> = ({
     (state) => state.SystemAttributes.fetchAttributesInProgress,
   );
 
+  const quizFlowOpen = useAppSelector((state) => state.Quiz.quizFlowOpen);
+
   const submitDisabled = useMemo(() => {
     const { mealType, mealStyles = [] } = formValues;
 
@@ -79,7 +81,7 @@ const QuizSpecialDemand: React.FC<TQuizSpecialDemandProps> = ({
   return (
     <QuizModal
       id="QuizSpecialDemand"
-      isOpen
+      isOpen={quizFlowOpen}
       modalTitle={
         <div className={css.headerContainer}>
           <div className={css.main}>

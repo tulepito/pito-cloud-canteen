@@ -36,6 +36,8 @@ const QuizSelectCompany = () => {
     (state) => state.Quiz.fetchSelectedCompanyInProgress,
   );
 
+  const quizFlowOpen = useAppSelector((state) => state.Quiz.quizFlowOpen);
+
   const { companyList: bookerCompanyIdList = [] } = User(
     currentUser as TCurrentUser,
   ).getMetadata();
@@ -104,7 +106,7 @@ const QuizSelectCompany = () => {
   return (
     <QuizModal
       id="QuizSelectCompanyModal"
-      isOpen
+      isOpen={quizFlowOpen}
       handleClose={() => {}}
       modalTitle={intl.formatMessage({
         id: 'QuizSelectCompany.title',

@@ -5,7 +5,6 @@ import { shallowEqual } from 'react-redux';
 import type { TDaySession } from '@components/CalendarDashboard/helpers/types';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import useBoolean from '@hooks/useBoolean';
 import { useViewport } from '@hooks/useViewport';
 import { QuizActions } from '@redux/slices/Quiz.slice';
 import { CurrentUser, User } from '@src/utils/data';
@@ -33,7 +32,6 @@ const QuizMealDate: React.FC<TQuizMealDateProps> = ({
 }) => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
-  const creatingOrderModalControl = useBoolean();
   const [formValues, setFormValues] = useState<TMealDateFormValues>(null!);
   const [formInvalid, setFormInvalid] = useState<boolean>(false);
   const quizData = useAppSelector((state) => state.Quiz.quiz, shallowEqual);
@@ -59,6 +57,7 @@ const QuizMealDate: React.FC<TQuizMealDateProps> = ({
   const { hasOrderBefore = false } = CurrentUser(currentUser!).getPrivateData();
   const hasPreviousOrder = previousOrder !== null;
 
+  const quizFlowOpen = useAppSelector((state) => state.Quiz.quizFlowOpen);
   const { startDate, endDate, deadlineDate, daySession } = quizData;
 
   const modalTitle = intl.formatMessage(
@@ -103,7 +102,7 @@ const QuizMealDate: React.FC<TQuizMealDateProps> = ({
   return (
     <QuizModal
       id="QuizMealDateModal"
-      isOpen={!creatingOrderModalControl.value}
+      isOpen={quizFlowOpen}
       modalTitle={modalTitle}
       submitText={'Tìm nhà hàng'}
       onSubmit={handleSubmitClick}
