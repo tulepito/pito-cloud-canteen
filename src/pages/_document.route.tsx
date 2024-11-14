@@ -8,37 +8,24 @@ export default function Document() {
     <Html>
       <Head>
         <link
+          rel="icon"
+          type="image/png"
+          href="/static/icons/favicon-96x96.png"
+          sizes="96x96"
+        />
+        <link
+          rel="icon"
+          type="image/svg+xml"
+          href="/static/icons/favicon.svg"
+        />
+        <link rel="shortcut icon" href="/static/icons/favicon.ico" />
+        <link
           rel="apple-touch-icon"
           sizes="180x180"
           href="/static/icons/apple-touch-icon.png"
         />
-        <link
-          rel="icon"
-          type="image/png"
-          sizes="32x32"
-          href="/static/icons/favicon-32x32.png"
-        />
-        <link
-          rel="icon"
-          type="image/png"
-          sizes="16x16"
-          href="/static/icons/favicon-16x16.png"
-        />
+        <meta name="apple-mobile-web-app-title" content="PITO Cloud Canteen" />
         <link rel="manifest" href="/static/icons/site.webmanifest" />
-        <link
-          rel="mask-icon"
-          href="/static/icons/safari-pinned-tab.svg"
-          color="#EF3D2A"
-        />
-        <link rel="shortcut icon" href="/static/icons/favicon.ico" />
-        <meta name="msapplication-TileColor" content="#fff" />
-        <meta
-          name="msapplication-TileImage"
-          content="/static/icons/mstile-144x144.png"
-        />
-        <meta
-          name="msapplication-config"
-          content="/static/icons/browserconfig.xml"></meta>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
           rel="preconnect"
