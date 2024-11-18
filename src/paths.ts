@@ -49,7 +49,6 @@ export const IgnoredAuthCheckRoutes = [
   enGeneralPaths.ResetPassword,
   enGeneralPaths.Tracking,
   enGeneralPaths.SentryExamplePage,
-  generalPaths.Home,
 ];
 export const IgnoredPermissionCheckRoutes = [
   generalPaths.SignIn,
