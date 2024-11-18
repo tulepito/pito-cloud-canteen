@@ -75,21 +75,23 @@ const ApplyOtherDaysForm: React.FC<TApplyOtherDaysFormProps> = ({
         title="Chọn ngày"
       />
 
-      <Button
-        className={css.submitBtn}
-        type="submit"
-        disabled={disabledSubmit}
-        inProgress={inProgress}
-        spinnerClassName={css.spinnerClassName}>
-        <FormattedMessage id="ApplyOtherDaysForm.submit" />
-      </Button>
-      <Button
-        onClick={onCancel}
-        className={css.cancelBtn}
-        variant="inline"
-        spinnerClassName={css.spinnerClassName}>
-        <FormattedMessage id="ApplyOtherDaysForm.cancel" />
-      </Button>
+      <div className={css.btnWrapper}>
+        <Button
+          className={css.submitBtn}
+          type="submit"
+          disabled={disabledSubmit}
+          inProgress={inProgress}
+          spinnerClassName={css.spinnerClassName}>
+          <FormattedMessage id="ApplyOtherDaysForm.submit" />
+        </Button>
+        <Button
+          onClick={onCancel}
+          className={css.cancelBtn}
+          variant="secondary"
+          spinnerClassName={css.spinnerClassName}>
+          <FormattedMessage id="ApplyOtherDaysForm.cancel" />
+        </Button>
+      </div>
     </form>
   );
 };

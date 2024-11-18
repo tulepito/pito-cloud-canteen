@@ -2,7 +2,11 @@ import { addDays, min, subDays } from 'date-fns';
 import { isEmpty } from 'lodash';
 import { DateTime } from 'luxon';
 
-import type { TDaySession } from '@components/CalendarDashboard/helpers/types';
+import { SESSION_TIMES } from '@components/CalendarDashboard/helpers/constant';
+import type {
+  EDaySession,
+  TDaySession,
+} from '@components/CalendarDashboard/helpers/types';
 import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
 import {
   getDaySessionFromDeliveryTime,
@@ -114,6 +118,36 @@ export const findMinStartDate = () => {
     .startOf('minute'); // Cộng thêm 15 tiếng từ giờ hiện tại và lấy phút đầu tiên của giờ
 
   return minStartDate.toJSDate();
+};
+
+export const adjustMinDateWithDaySession = ({
+  minDate,
+  session,
+}: {
+  minDate?: Date | null;
+  session?: EDaySession;
+}) => {
+  const minDateOrigin = minDate || findMinStartDate();
+
+  if (!session) {
+    return minDateOrigin;
+  }
+
+  let minDateTime = DateTime.fromJSDate(minDateOrigin);
+
+  const sessionStartTime = SESSION_TIMES[session].START;
+
+  const startSession = minDateTime.set({
+    hour: parseInt(sessionStartTime.split(':')[0], 10),
+    minute: parseInt(sessionStartTime.split(':')[1], 10),
+  });
+
+  if (minDateTime > startSession) {
+    //  Add 1 day and set to 00:00 of the next day
+    minDateTime = minDateTime.plus({ days: 1 }).startOf('day');
+  }
+
+  return minDateTime.toJSDate();
 };
 
 /**

@@ -8,6 +8,12 @@
   }
 }
 
+.modalContainer.modalContainer {
+  @include viewportMedium {
+    flex-basis: max-content;
+  }
+}
+
 .modalContent {
   @include viewportMedium {
     padding: 25px 0 0;

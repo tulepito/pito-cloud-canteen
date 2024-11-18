@@ -173,8 +173,10 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
     selectedGroups,
     packagePerMember,
     vatAllow,
+    daySession,
     orderType = EOrderType.group,
   } = orderData.getMetadata();
+
   const locationInitValues = {
     deliveryAddress: getInitialLocationValues(
       deliveryAddress?.address !== null ? deliveryAddress : {},
@@ -327,9 +329,10 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
       case 'deliveryTime':
         return (
           <DeliveryTimeForm
+            daySession={daySession}
             initialValues={deliveryInitValues}
-            onSubmit={handleSubmit}
             loading={sidebarFormSubmitInProgress}
+            onSubmit={handleSubmit}
           />
         );
       case 'expiredTime':

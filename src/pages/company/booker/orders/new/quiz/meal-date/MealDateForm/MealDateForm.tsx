@@ -6,6 +6,7 @@ import { OnChange } from 'react-final-form-listeners';
 import { useIntl } from 'react-intl';
 import classNames from 'classnames';
 
+import type { EDaySession } from '@components/CalendarDashboard/helpers/types';
 import Form from '@components/Form/Form';
 import FieldDropdownSelect from '@components/FormFields/FieldDropdownSelect/FieldDropdownSelect';
 import FieldRadioButton from '@components/FormFields/FieldRadioButton/FieldRadioButton';
@@ -38,6 +39,7 @@ export type TMealDateFormValues = {
 
 type TExtraProps = {
   hasPreviousOrder?: boolean;
+  daySession?: EDaySession;
   setFormValues: (values: TMealDateFormValues) => void;
   setFormInvalid: (invalid: boolean) => void;
   onClickOrderDates: () => void;
@@ -56,6 +58,7 @@ const MealDateFormComponent: React.FC<TMealDateFormComponentProps> = (
     form,
     hasPreviousOrder = false,
     values,
+    daySession,
     setFormValues,
     invalid,
     setFormInvalid,
@@ -63,6 +66,7 @@ const MealDateFormComponent: React.FC<TMealDateFormComponentProps> = (
     onClickDeliveryHour,
     onClickIsGroupOrder,
   } = props;
+
   const intl = useIntl();
   const dispatch = useAppDispatch();
   const reorderOpen = useAppSelector((state) => state.Quiz.reorderOpen);
@@ -81,8 +85,12 @@ const MealDateFormComponent: React.FC<TMealDateFormComponentProps> = (
   } = values;
 
   const parsedDeliveryHourOptions = useMemo(
-    () => filterValidDeliveryHours(startDateInitialValue),
-    [startDateInitialValue],
+    () =>
+      filterValidDeliveryHours({
+        startDate: startDateInitialValue,
+        daySession,
+      }),
+    [startDateInitialValue, daySession],
   );
 
   const handleChangeOrderType = (newValue: string) => {
@@ -172,18 +180,25 @@ const MealDateFormComponent: React.FC<TMealDateFormComponentProps> = (
             <div className={css.orderTypeLabel}>
               {intl.formatMessage({ id: 'MealDateForm.fieldOrderType.label' })}
             </div>
+
             <FieldRadioButton
               name="orderType"
               id="MealDateForm.orderType.normal"
               value={EOrderType.normal}
+              svgClassName={css.mealDateFormRadioIcon}
               label={intl.formatMessage({
                 id: 'MealDateForm.fieldOrderType.normalLabel',
               })}
+              radioLabelClassName={css.mealDateFormRadioLabel}
+              className={css.mealDateFormRadioButton}
             />
             <FieldRadioButton
               name="orderType"
               id="MealDateForm.orderType.group"
               value={EOrderType.group}
+              svgClassName={css.mealDateFormRadioIcon}
+              radioLabelClassName={css.mealDateFormRadioLabel}
+              className={css.mealDateFormRadioButton}
               label={intl.formatMessage({
                 id: 'MealDateForm.fieldOrderType.groupLabel',
               })}

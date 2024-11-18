@@ -2,6 +2,8 @@ import classNames from 'classnames';
 
 import Button from '@components/Button/Button';
 import FieldDateRangePicker from '@components/FormFields/FieldDateRangePicker/FieldDateRangePicker';
+import { adjustMinDateWithDaySession } from '@helpers/order/prepareDataHelper';
+import { useAppSelector } from '@hooks/reduxHooks';
 
 import { useOrderDateSelect } from '../hooks/useOrderDateSelect';
 import type { TMealDateFormValues } from '../MealDateForm/MealDateForm';
@@ -11,8 +13,8 @@ import css from './OrderDateFieldModal.module.scss';
 type TOrderDateFieldModalProps = {
   form: any;
   values: Partial<TMealDateFormValues>;
-  onClose: () => void;
   selectedTimeRangeOption: string;
+  onClose: () => void;
   setSelectedTimeRangeOption: (key: string) => void;
 };
 
@@ -51,8 +53,14 @@ const OrderDateFieldModal: React.FC<TOrderDateFieldModalProps> = (props) => {
   } = useOrderDateSelect({
     form,
     values,
-    modalCallback: onClose,
     selectedTimeRangeOption,
+    modalCallback: onClose,
+  });
+
+  const daySession = useAppSelector((state) => state.Quiz.quiz?.daySession);
+  const newMinDate = adjustMinDateWithDaySession({
+    minDate,
+    session: daySession,
   });
 
   return (
@@ -86,7 +94,7 @@ const OrderDateFieldModal: React.FC<TOrderDateFieldModalProps> = (props) => {
           endDate={endDate}
           shouldHideInput
           monthsShown={2}
-          minDate={minDate || new Date()}
+          minDate={newMinDate || new Date()}
           maxDate={maxDate}
         />
         <div className={css.bottomBtns}>

@@ -6,6 +6,13 @@ export type TDaySession =
   | 'EVENING_SESSION'
   | 'DINNER_SESSION';
 
+export enum EDaySession {
+  MORNING_SESSION = 'MORNING_SESSION',
+  AFTERNOON_SESSION = 'AFTERNOON_SESSION',
+  EVENING_SESSION = 'EVENING_SESSION',
+  DINNER_SESSION = 'DINNER_SESSION',
+}
+
 export type TEventStatus = 'empty' | 'joined' | 'expired' | 'notJoined';
 
 export type TDayInWeek =

@@ -1,6 +1,8 @@
 import Button from '@components/Button/Button';
 import FieldDateRangePicker from '@components/FormFields/FieldDateRangePicker/FieldDateRangePicker';
 import SlideModal from '@components/SlideModal/SlideModal';
+import { adjustMinDateWithDaySession } from '@helpers/order/prepareDataHelper';
+import { useAppSelector } from '@hooks/reduxHooks';
 
 import { useOrderDateSelect } from '../hooks/useOrderDateSelect';
 import type { TMealDateFormValues } from '../MealDateForm/MealDateForm';
@@ -33,6 +35,12 @@ const OrderDateFieldModalMobile: React.FC<TOrderDateFieldModalMobileProps> = (
     selectedTimeRangeOption,
   });
 
+  const daySession = useAppSelector((state) => state.Quiz.quiz?.daySession);
+  const newMinDate = adjustMinDateWithDaySession({
+    minDate,
+    session: daySession,
+  });
+
   const onSubmitOrderDate = () => {
     handleUpdateDateRange();
   };
@@ -46,7 +54,7 @@ const OrderDateFieldModalMobile: React.FC<TOrderDateFieldModalMobileProps> = (
       <FieldDateRangePicker
         id="dateRangeFieldMobile"
         name="dateRangeFieldMobile"
-        minDate={minDate || new Date()}
+        minDate={newMinDate || new Date()}
         maxDate={maxDate}
         className={css.dateRangePicker}
         onChange={handleOrderDateRangeChange}

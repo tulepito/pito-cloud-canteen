@@ -2,21 +2,27 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/mixins.scss' as *;
 
+.btnWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin-top: 24px;
+  gap: 12px;
+}
+
 .submitBtn {
-  margin: 32px auto 16px;
   width: 100%;
 
   @include viewportLarge {
-    width: 400px;
+    width: 300px;
   }
 }
 
 .cancelBtn {
-  margin: 0 auto;
   display: none;
 
   @include viewportLarge {
-    width: 400px;
+    width: 300px;
     display: block;
   }
 }

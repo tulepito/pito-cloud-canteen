@@ -4,16 +4,18 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { DateTime } from 'luxon';
 
 import Button from '@components/Button/Button';
+import type { EDaySession } from '@components/CalendarDashboard/helpers/types';
 import { FieldDatePickerComponent } from '@components/FormFields/FieldDatePicker/FieldDatePicker';
 import { FieldDropdownSelectComponent } from '@components/FormFields/FieldDropdownSelect/FieldDropdownSelect';
 import IconClock from '@components/Icons/IconClock/IconClock';
-import { findMinStartDate } from '@helpers/order/prepareDataHelper';
+import { adjustMinDateWithDaySession } from '@helpers/order/prepareDataHelper';
 import { filterValidDeliveryHours } from '@utils/dates';
 
 import css from './DeliveryTimeForm.module.scss';
 
 type TDeliveryTimeFormProps = {
   onSubmit: (values: TDeliveryTimeFormValues) => void;
+  daySession?: EDaySession;
   initialValues?: TDeliveryTimeFormValues;
   loading?: boolean;
   onCustomStartDateChange?: (date: number) => void;
@@ -44,9 +46,10 @@ const validate = (values: TDeliveryTimeFormValues) => {
 };
 
 const DeliveryTimeForm: React.FC<TDeliveryTimeFormProps> = ({
-  onSubmit,
-  initialValues,
   loading,
+  daySession,
+  initialValues,
+  onSubmit,
 }) => {
   const { form, handleSubmit, submitting, hasValidationErrors, pristine } =
     useForm<TDeliveryTimeFormValues>({
@@ -65,7 +68,9 @@ const DeliveryTimeForm: React.FC<TDeliveryTimeFormProps> = ({
   const submitInprogress = loading || submitting;
   const disabledSubmit = pristine || submitInprogress || hasValidationErrors;
 
-  const minStartDate = findMinStartDate();
+  const minStartDate = adjustMinDateWithDaySession({
+    session: daySession,
+  });
 
   const selectedStartDate = useMemo(() => {
     return startDate.input.value
@@ -101,8 +106,9 @@ const DeliveryTimeForm: React.FC<TDeliveryTimeFormProps> = ({
   }, [form.getFieldState('startDate')?.pristine, startDate.input.value]);
 
   const parsedDeliveryHourOptions = useMemo(
-    () => filterValidDeliveryHours(selectedStartDate),
-    [selectedStartDate],
+    () =>
+      filterValidDeliveryHours({ startDate: selectedStartDate, daySession }),
+    [selectedStartDate, daySession],
   );
 
   return (

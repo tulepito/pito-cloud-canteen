@@ -118,6 +118,7 @@ const QuizMealDate: React.FC<TQuizMealDateProps> = ({
         setFormValues={setFormValues}
         setFormInvalid={setFormInvalid}
         initialValues={initialValues}
+        daySession={daySession}
         onClickOrderDates={onClickOrderDates}
         onClickDeliveryHour={onClickDeliveryHour}
         onClickIsGroupOrder={onClickIsGroupOrder}

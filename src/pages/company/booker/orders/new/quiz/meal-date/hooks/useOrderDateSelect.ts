@@ -11,6 +11,7 @@ type TUseOrderDateSelect = {
   selectedTimeRangeOption: string;
   modalCallback?: () => void;
 };
+
 export const useOrderDateSelect = ({
   form,
   values,
@@ -34,6 +35,7 @@ export const useOrderDateSelect = ({
           .plus({ hours: +process.env.NEXT_PUBLIC_ORDER_MINIMUM_TIME })
           .toJSDate()
       : startDate;
+
   const maxDate =
     selectedTimeRangeOption !== 'custom'
       ? endDate
@@ -76,6 +78,7 @@ export const useOrderDateSelect = ({
         break;
     }
   };
+
   const handleUpdateDateRange = () => {
     form.batch(() => {
       form.change('startDate', startDate);
@@ -99,10 +102,10 @@ export const useOrderDateSelect = ({
   return {
     startDate,
     endDate,
-    setStartDate,
-    setEndDate,
     minDate,
     maxDate,
+    setStartDate,
+    setEndDate,
     handleUpdateDateRange,
     handleOrderDateRangeChange,
     handleTimeRangeSelect,

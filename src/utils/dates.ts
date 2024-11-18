@@ -11,6 +11,7 @@ import {
   EVENING_SESSION,
   MORNING_SESSION,
 } from '@components/CalendarDashboard/helpers/constant';
+import { EDaySession } from '@components/CalendarDashboard/helpers/types';
 
 import { DAY_IN_WEEK } from './constants';
 import { getUniqueString } from './data';
@@ -618,12 +619,39 @@ export const generateTimeRangeItems = ({
   startTime = '06:30',
   endTime = '23:00',
   interval = 1,
+  daySession,
 }: {
   startTime?: string;
   endTime?: string;
   interval?: number;
+  daySession?: EDaySession;
 }): TKeyValue[] => {
   const timeRangeItems: TKeyValue[] = [];
+
+  // Set default start and end times based on the selected session
+  if (daySession) {
+    switch (daySession) {
+      case EDaySession.MORNING_SESSION:
+        startTime = '06:30';
+        endTime = '10:00';
+        break;
+      case EDaySession.AFTERNOON_SESSION:
+        startTime = '10:00';
+        endTime = '15:00';
+        break;
+      case EDaySession.EVENING_SESSION:
+      case EDaySession.DINNER_SESSION:
+        startTime = '15:00';
+        endTime = '21:00';
+        break;
+      default:
+        startTime = startTime || '06:30';
+        endTime = endTime || '23:00';
+    }
+  } else {
+    startTime = startTime || '06:30';
+    endTime = endTime || '23:00';
+  }
 
   // Convert start and end times to Date objects for easier manipulation
   const startDate = new Date(`2023-01-01T${startTime}`);
@@ -662,27 +690,35 @@ export const TimeRangeItems = generateTimeRangeItems({});
  * Get the next available delivery hours in (HH:mm) format, based on the current date and minimum delay hours
  * @example filterValidDeliveryHours(new Date(), 15) => [{ label: '06:30 - 07:00', key: '06:30-07:00' }, ...]
  */
-export const filterValidDeliveryHours = (
-  startDate: number | string | Date,
-  minDelayHours = 15,
-) => {
-  const timeRangeItems = generateTimeRangeItems({});
+export const filterValidDeliveryHours = ({
+  startDate,
+  minDelayHours = +process.env.NEXT_PUBLIC_ORDER_MINIMUM_TIME || 15,
+  daySession,
+}: {
+  startDate: number | string | Date;
+  minDelayHours?: number;
+  daySession?: EDaySession;
+}) => {
+  const timeRangeItems = generateTimeRangeItems({ daySession });
 
-  // Tính thời gian tối thiểu (currentDate + 15 giờ)
+  // Calculate the minimum allowed delivery time
   const minimumTime = new Date();
   minimumTime.setHours(minimumTime.getHours() + minDelayHours);
 
+  // If startDate is undefined, return all time range items
+  if (!startDate) {
+    return timeRangeItems.map(({ label, key }) => ({ label, key }));
+  }
+
   return timeRangeItems
     .filter((option) => {
-      // Tách giờ và phút từ option key (dạng "HH:mm-HH:mm")
+      // Extract hour and minute from the option's start time
       const [startTime] = option.key.split('-');
       const [hours, minutes] = startTime.split(':').map(Number);
-
-      // Tạo một đối tượng Date với cùng ngày của startDate
       const optionDate = new Date(startDate);
       optionDate.setHours(hours, minutes, 0, 0);
 
-      // So sánh để chỉ giữ lại các giờ hợp lệ
+      // Only include options where the optionDate is >= minimumTime
       return optionDate >= minimumTime;
     })
     .map((option) => ({
