@@ -231,9 +231,9 @@
 
   .foodListItem {
     cursor: pointer;
-    margin-bottom: 8px;
+    margin-bottom: 4px;
 
-    @include lineClamp(1, 12px);
+    @include lineClamp(1, 16px);
   }
 }
 

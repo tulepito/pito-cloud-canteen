@@ -121,7 +121,7 @@ export function sortFoodsInRestaurant(
           }
         }
         if (first.price === second.price) return 0;
-        if (first.price < second.price) return -1;
+        if (first.price > second.price) return -1;
 
         return 1;
       })

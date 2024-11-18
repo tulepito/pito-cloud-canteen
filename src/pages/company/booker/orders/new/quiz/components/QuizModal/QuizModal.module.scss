@@ -103,6 +103,12 @@
   }
 }
 
+.modalSubTitle {
+  @include flexCenter;
+  @include textTemplate(14px, $fontWeightRegular, 20px);
+  color: rgba($neutralGray7, 0.8);
+}
+
 .modalContent {
   margin-top: 16px;
   padding-bottom: 4px;

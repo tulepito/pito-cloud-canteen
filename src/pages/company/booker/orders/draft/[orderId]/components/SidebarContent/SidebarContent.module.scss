@@ -95,7 +95,7 @@
   }
 
   .subText {
-    @include textTemplate(12px, 400, 24px);
+    @include textTemplate(14px, 400, 20px);
     color: $neutralGray7;
     overflow: hidden;
     text-overflow: ellipsis;

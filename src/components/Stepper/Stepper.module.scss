@@ -38,9 +38,9 @@
     content: attr(title);
     bottom: -20px;
     height: fit-content;
-    min-width: 85px;
+    min-width: 112px;
     text-align: center;
-    @include textTemplate(10px, 400);
+    @include textTemplate(12px, 400, 16px);
     color: $neutralGray5;
   }
 

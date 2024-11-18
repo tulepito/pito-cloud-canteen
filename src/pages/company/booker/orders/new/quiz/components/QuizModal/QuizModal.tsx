@@ -16,6 +16,7 @@ type QuizModalProps = {
   isOpen: boolean;
   stepInfo?: string;
   modalTitle: string | React.ReactNode;
+  modalSubTitle?: string;
   submitText?: string;
   cancelText?: string;
   submitDisabled?: boolean;
@@ -36,6 +37,7 @@ const QuizModal: React.FC<QuizModalProps> = (props) => {
     isOpen,
     stepInfo,
     modalTitle,
+    modalSubTitle,
     submitText,
     cancelText,
     submitDisabled,
@@ -112,7 +114,10 @@ const QuizModal: React.FC<QuizModalProps> = (props) => {
           onClick={isFirstStep ? handleCancel : onBack}>
           <IconArrow direction="left" />
         </div>
+
         <div className={modalHeaderClasses}>{modalTitle}</div>
+        <p className={css.modalSubTitle}>{modalSubTitle}</p>
+
         <div ref={modalContentRef!} className={css.modalContent}>
           {children}
         </div>

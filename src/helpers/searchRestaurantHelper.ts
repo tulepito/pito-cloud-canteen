@@ -71,9 +71,9 @@ export function parseFoodsFromMenu(
     const food = mapfoods.get(key);
     if (foodMenu && food) {
       const foodListing = Listing(food);
-
       const { price, title, publicData } = foodListing.getAttributes();
-      if (price.amount === packagePerMember)
+
+      if (price.amount <= packagePerMember)
         result.push({
           restaurantId,
           foodId: key,

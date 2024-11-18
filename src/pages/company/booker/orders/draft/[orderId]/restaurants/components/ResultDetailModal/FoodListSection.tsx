@@ -39,7 +39,7 @@ const FoodListSection: React.FC<TFoodsListSectionProps> = ({
       const { price } = foodListing.getAttributes();
       const { equalPriceFoodList, notEqualPriceFoodList } = result;
 
-      if (price.amount !== packagePerMember) {
+      if (price.amount > packagePerMember) {
         notEqualPriceFoodList.push(foodItem);
       } else {
         equalPriceFoodList.push(foodItem);
@@ -60,7 +60,7 @@ const FoodListSection: React.FC<TFoodsListSectionProps> = ({
     const aPrice = Listing(a).getAttributes().price.amount;
     const bPrice = Listing(b).getAttributes().price.amount;
 
-    return aPrice - bPrice;
+    return bPrice - aPrice;
   });
 
   const sortesGreaterFoodList = groupedFoodList.notEqualPriceFoodList.sort(
@@ -68,7 +68,7 @@ const FoodListSection: React.FC<TFoodsListSectionProps> = ({
       const aPrice = Listing(a).getAttributes().price.amount;
       const bPrice = Listing(b).getAttributes().price.amount;
 
-      return aPrice - bPrice;
+      return bPrice - aPrice;
     },
   );
 

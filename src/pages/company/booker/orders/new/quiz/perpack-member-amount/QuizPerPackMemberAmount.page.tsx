@@ -159,6 +159,9 @@ const QuizPerPackMemberAmountPage: React.FC<
       modalTitle={intl.formatMessage({
         id: 'QuizPerPackMemberAmountPage.title',
       })}
+      modalSubTitle={intl.formatMessage({
+        id: 'QuizPerPackMemberAmountPage.subTitle',
+      })}
       submitText="Tiếp tục"
       submitDisabled={hasValidationErrors}
       submitInProgress={submittingControl.value}
