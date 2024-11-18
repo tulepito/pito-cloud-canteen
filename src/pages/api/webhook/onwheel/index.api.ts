@@ -76,6 +76,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
               (acc: any[], OWSubOrder: any) => {
                 const { tracking_number: trackingNumber } = OWSubOrder;
                 if (!trackingNumber) return acc;
+                if (!trackingNumber.includes('-')) return acc; // Make sure it's a PCC sub order
 
                 if (
                   !acc.find((item) => item.tracking_number === trackingNumber)
@@ -138,6 +139,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
               (acc: any[], OWSubOrder: any) => {
                 const { tracking_number: trackingNumber } = OWSubOrder;
                 if (!trackingNumber) return acc;
+                if (!trackingNumber.includes('-')) return acc; // Make sure it's a PCC sub order
 
                 /**
                  * If the order is in process, get all tracking numbers and update the status
@@ -393,6 +395,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
               (acc: any[], OWSubOrder: any) => {
                 const { tracking_number: trackingNumber } = OWSubOrder;
                 if (!trackingNumber) return acc;
+                if (!trackingNumber.includes('-')) return acc; // Make sure it's a PCC sub order
 
                 if (
                   !acc.find((item) => item.tracking_number === trackingNumber)
