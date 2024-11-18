@@ -13,6 +13,29 @@ type ParticipantOrderPickingParams = {
 export const participantOrderPickingSubject = (orderName: string) =>
   `Chọn món cho Tuần ăn ${orderName}`;
 
+const buildFullName = (
+  firstName?: string,
+  lastName?: string,
+  options?: {
+    compareToGetLongerWith?: string;
+  },
+) => {
+  if (!firstName || !lastName) return firstName || lastName || '';
+
+  const fullName = `${lastName} ${firstName}`;
+  if (!options) return fullName;
+
+  const { compareToGetLongerWith } = options;
+
+  if (!compareToGetLongerWith) return fullName;
+
+  if (fullName.length < compareToGetLongerWith.length) {
+    return compareToGetLongerWith;
+  }
+
+  return fullName;
+};
+
 const participantOrderPicking = ({
   bookerUser,
   companyUser,
@@ -21,7 +44,11 @@ const participantOrderPicking = ({
   bookerNote,
 }: ParticipantOrderPickingParams) => {
   const { displayName: bookerName } = bookerUser.getProfile();
-  const { displayName: participantName } = participantUser.getProfile();
+  const {
+    displayName: participantName,
+    firstName: participantFirstName,
+    lastName: participantLastName,
+  } = participantUser.getProfile();
   const orderId = orderListing.getId();
   const { orderName } = orderListing.getPublicData();
   const { startDate, endDate, deliveryHour, deadlineHour, deadlineDate } =
@@ -35,6 +62,14 @@ const participantOrderPicking = ({
   const formattedOrderDeadline = `${deadlineHour}, ${formatTimestamp(
     deadlineDate,
   )}`;
+
+  const participantFullName = buildFullName(
+    participantFirstName,
+    participantLastName,
+    {
+      compareToGetLongerWith: participantName,
+    },
+  );
 
   const bookerNoteSection = bookerNote
     ? `
@@ -636,14 +671,14 @@ const participantOrderPicking = ({
                                 <td align="left" style="padding:0;Margin:0">
                                   <p
                                     style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#262626;font-size:14px">
-                                    Xin chào, <strong>${participantName}</strong></p>
+                                    Xin chào, <strong>${participantFullName}</strong></p>
                                 </td>
                               </tr>
                               <tr>
                                 <td align="left" style="padding:0;Margin:0;padding-top:10px">
                                   <p
                                     style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#262626;font-size:14px">
-                                    Tuần ăn <strong>${orderName}</strong> đã sẵn sàng, mời bạn ${participantName} tiến
+                                    Tuần ăn <strong>${orderName}</strong> đã sẵn sàng, mời bạn ${participantFullName} tiến
                                     hành chọn món để thưởng thức những bữa cơm văn phòng ngon miệng và chất lượng.&nbsp;
                                   </p>
                                 </td>
