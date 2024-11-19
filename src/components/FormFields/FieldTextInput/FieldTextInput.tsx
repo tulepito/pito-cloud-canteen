@@ -60,6 +60,7 @@ export const FieldTextInputComponent: React.FC<InputComponentProps> = (
     inputClassName,
     customOnBlur,
     onChange: onCustomChange,
+    trim,
     ...rest
   } = props;
 
@@ -104,6 +105,10 @@ export const FieldTextInputComponent: React.FC<InputComponentProps> = (
     });
 
   const onInputChange = (event: any) => {
+    if (trim) {
+      event.target.value = event.target.value.trim();
+    }
+
     if (typeof onCustomChange === 'function') {
       onCustomChange(event);
     } else if (type === 'number') {

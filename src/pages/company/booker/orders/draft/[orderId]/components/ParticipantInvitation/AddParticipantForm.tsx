@@ -89,7 +89,7 @@ const AddParticipantFormComponent: React.FC<
       </div>
       <div className={css.hintText}>
         *Email được phân cách bằng khoảng trắng.
-        {!isMobileLayout && ' Ví dụ: a1@gmail.comb2@gmail.com'}
+        {!isMobileLayout && ' Ví dụ: a1@gmail.com b2@gmail.com'}
       </div>
 
       <div className={css.hintContainer}>

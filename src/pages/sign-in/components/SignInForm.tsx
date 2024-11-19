@@ -138,7 +138,7 @@ const SignInFormComponent: React.FC<TSignInFormComponentProps> = (props) => {
               </span>
             </div>
           </div>
-          <FieldTextInput {...fieldEmailProps} />
+          <FieldTextInput trim {...fieldEmailProps} />
           <FieldPasswordInput {...fieldPasswordProps} />
 
           <div className={css.forgotPassword}>
