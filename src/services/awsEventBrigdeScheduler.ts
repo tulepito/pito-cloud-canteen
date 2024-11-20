@@ -27,7 +27,7 @@ type CreateSchedulerParams = {
   params?: any;
   customName: string; // less than 64 characters
   timeExpression?: string; // yyyy-mm-ddThh:mm:ss
-  arn?: string;
+  arn: string;
 };
 export const createScheduler = ({
   arn,
@@ -44,7 +44,7 @@ export const createScheduler = ({
     ScheduleExpressionTimezone: 'Asia/Ho_Chi_Minh',
     ActionAfterCompletion: isProduction ? 'NONE' : 'DELETE',
     Target: {
-      Arn: arn || LAMBDA_ARN,
+      Arn: arn,
       RoleArn: ROLE_ARN,
       Input: JSON.stringify(params),
     },
@@ -77,11 +77,13 @@ export const getScheduler = (name: string) => {
         JSON.stringify(schedulerParams),
       );
     })
-    .catch(() => {
+    .catch((error) => {
       logger.info(
         `Scheduler ${name} is not existed`,
         JSON.stringify(schedulerParams),
       );
+
+      throw error; // enable to catch error in the caller function to trigger createScheduler
     });
 };
 
@@ -127,7 +129,7 @@ export const createFoodRatingNotificationScheduler = async ({
   params,
   customName,
   timeExpression,
-}: CreateSchedulerParams) => {
+}: Omit<CreateSchedulerParams, 'arn'>) => {
   createScheduler({
     arn: SEND_FOOD_RATING_NOTIFICATION_LAMBDA_ARN,
     customName,
@@ -136,11 +138,17 @@ export const createFoodRatingNotificationScheduler = async ({
   });
 };
 
-export const createOrUpdateAutomaticStartOrderScheduler = async ({
+export const upsertAutomaticStartOrderScheduler = async ({
   orderId,
   startDate,
   deliveryHour,
-}: any) => {
+}: {
+  orderId: string;
+  startDate: number;
+  deliveryHour: string;
+}) => {
+  if (!orderId || !startDate || !deliveryHour) return;
+
   const ensuredDeliveryHour = isEmpty(deliveryHour)
     ? undefined
     : deliveryHour.includes('-')
@@ -159,7 +167,7 @@ export const createOrUpdateAutomaticStartOrderScheduler = async ({
             .NEXT_PUBLIC_ORDER_AUTO_START_TIME_TO_DELIVERY_TIME_OFFSET_IN_HOUR,
       })
       .toMillis(),
-    "yyyy-MM-dd'T'hh:mm:ss",
+    "yyyy-MM-dd'T'HH:mm:ss",
   );
 
   try {
@@ -184,26 +192,23 @@ export const createOrUpdateAutomaticStartOrderScheduler = async ({
   }
 };
 
-export const createOrUpdatePickFoodForEmptyMembersScheduler = async ({
+export const upsertPickFoodForEmptyMembersScheduler = async ({
   orderId,
-  startDate,
-  deliveryHour,
-}: any) => {
-  const ensuredDeliveryHour = isEmpty(deliveryHour)
-    ? undefined
-    : deliveryHour.includes('-')
-    ? deliveryHour.split('-')[0]
-    : deliveryHour;
-  const customName = `PFFEM_${orderId}`; // PFFEM: Pick Food For Empty Members
+  deadlineDate,
+  params,
+}: {
+  orderId: string | null; // null for cancelling the scheduler
+  deadlineDate: number;
+  params: {
+    orderId: string | null;
+  };
+}) => {
+  if (!deadlineDate) return;
+
+  const customName = `PFFEM_${orderId}`;
   const timeExpression = formatTimestamp(
-    DateTime.fromMillis(startDate)
-      .setZone(VNTimezone)
-      .plus({
-        ...convertHHmmStringToTimeParts(ensuredDeliveryHour),
-      })
-      .minus({ day: 1, hour: 1 })
-      .toMillis(),
-    "yyyy-MM-dd'T'hh:mm:ss",
+    DateTime.fromMillis(deadlineDate).setZone(VNTimezone).toMillis(),
+    "yyyy-MM-dd'T'HH:mm:ss",
   );
 
   try {
@@ -212,18 +217,14 @@ export const createOrUpdatePickFoodForEmptyMembersScheduler = async ({
       arn: PICK_FOOD_FOR_EMPTY_MEMBER_LAMBDA_ARN,
       customName,
       timeExpression,
-      params: {
-        orderId: null,
-      },
+      params,
     });
   } catch (error) {
     createScheduler({
       arn: PICK_FOOD_FOR_EMPTY_MEMBER_LAMBDA_ARN,
       customName,
       timeExpression,
-      params: {
-        orderId,
-      },
+      params,
     });
   }
 };
@@ -239,9 +240,13 @@ export const sendRemindPickingNativeNotificationToBookerScheduler = async ({
   const timeExpression = formatTimestamp(
     DateTime.fromMillis(deadlineDate)
       .setZone(VNTimezone)
-      .minus({ hours: 3 })
+      .minus({
+        minutes:
+          +process.env
+            .NEXT_PUBLIC_REMIND_PICKING_NATIVE_NOTIFICATION_TO_BOOKER_TIME_TO_DEADLINE_IN_MINUTES,
+      })
       .toMillis(),
-    "yyyy-MM-dd'T'hh:mm:ss",
+    "yyyy-MM-dd'T'HH:mm:ss",
   );
 
   try {

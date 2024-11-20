@@ -86,7 +86,7 @@ const updatePlan = async ({
   const companyAccount = await fetchUser(companyId);
   const isNormalOrder = orderType === EOrderType.normal;
 
-  const initialMemberOrder = getInitMemberOrder({
+  const initialMemberOrder = await getInitMemberOrder({
     companyAccount,
     selectedGroups,
   });

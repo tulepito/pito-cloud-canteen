@@ -7,6 +7,8 @@ import type {
   SendEmailRequest,
 } from 'aws-sdk/clients/ses';
 
+import logger from '@helpers/logger';
+
 const SES = new AWS.SES({
   accessKeyId: `${process.env.AWS_SES_ACCESS_KEY_ID}`,
   secretAccessKey: `${process.env.AWS_SES_SECRET_ACCESS_KEY}`,
@@ -48,7 +50,20 @@ export const createEmailParams = (
 };
 
 export const sendEmail = (params: SendEmailRequest) => {
-  return SES.sendEmail(params).promise();
+  return SES.sendEmail(params)
+    .promise()
+    .then(() => {
+      logger.success(
+        `Send email to ${params.Destination.ToAddresses} success`,
+        params.Message.Subject.Data,
+      );
+    })
+    .catch((error) => {
+      logger.error(
+        `Send email to ${params.Destination.ToAddresses} failed`,
+        String(error),
+      );
+    });
 };
 
 export const sendIndividualEmail = ({

@@ -1,15 +1,21 @@
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable @typescript-eslint/naming-convention */
 import isEmpty from 'lodash/isEmpty';
 import { DateTime } from 'luxon';
 
-import { calculateGroupMembers, getAllCompanyMembers } from '@helpers/company';
+import {
+  calculateGroupMembers,
+  ensureActiveUserIds,
+  getAllCompanyMembers,
+} from '@helpers/company';
 import { sendNotificationToParticipantOnUpdateOrder } from '@pages/api/apiServices/notification';
 import { pushNativeNotificationOrderDetail } from '@pages/api/helpers/pushNotificationOrderDetailHelper';
 import {
-  createOrUpdateAutomaticStartOrderScheduler,
   createScheduler,
   getScheduler,
   sendRemindPickingNativeNotificationToBookerScheduler,
   updateScheduler,
+  upsertAutomaticStartOrderScheduler,
 } from '@services/awsEventBrigdeScheduler';
 import {
   adminQueryListings,
@@ -26,8 +32,6 @@ import {
 import type { TListing, TObject } from '@src/utils/types';
 import { denormalisedResponseEntities, Listing } from '@utils/data';
 import { formatTimestamp, VNTimezone } from '@utils/dates';
-
-import { isOrderCreatedByBooker } from '../../../../helpers/orderHelper';
 
 const updateOrder = async ({
   orderId,
@@ -55,14 +59,13 @@ const updateOrder = async ({
   const isOrderHasInProgressState = orderStateHistory.some(
     ({ state }: { state: string }) => state === EOrderStates.inProgress,
   );
-  const isCreatedByBooker = isOrderCreatedByBooker(orderStateHistory);
   const isGroupOrder = orderType === EOrderType.group;
 
   if (!isEmpty(generalInfo)) {
     const {
       startDate: updateStartDate,
       endDate: updateEndDate,
-      deadlineDate,
+      deadlineDate: updateDeadlineDate,
       orderState: updatedOrderState,
       selectedGroups: updateSelectedGroups,
       deliveryHour: updateDeliveryHour,
@@ -70,15 +73,18 @@ const updateOrder = async ({
 
     const shouldUpdateParticipantList =
       typeof updateSelectedGroups !== 'undefined';
-    const participants: string[] = isEmpty(
+
+    const activeParticipantIds: string[] = isEmpty(
       updateSelectedGroups || selectedGroups,
     )
-      ? getAllCompanyMembers(companyAccount)
-      : calculateGroupMembers(companyAccount, updateSelectedGroups);
+      ? await ensureActiveUserIds(getAllCompanyMembers(companyAccount))
+      : await ensureActiveUserIds(
+          calculateGroupMembers(companyAccount, updateSelectedGroups),
+        );
 
-    if (deadlineDate) {
-      const schedulerName = `sendRemindPOE_${orderId}`;
-      const reminderTime = DateTime.fromMillis(deadlineDate)
+    if (updateDeadlineDate) {
+      const schedulerName = `sendRemindPOE${orderId}`;
+      const reminderTime = DateTime.fromMillis(updateDeadlineDate)
         .setZone(VNTimezone)
         .minus({
           minutes: 30,
@@ -93,6 +99,7 @@ const updateOrder = async ({
         await updateScheduler({
           customName: schedulerName,
           timeExpression,
+          arn: process.env.LAMBDA_ARN,
         });
       } catch (error) {
         console.info('create scheduler in update order');
@@ -100,6 +107,7 @@ const updateOrder = async ({
           await createScheduler({
             customName: schedulerName,
             timeExpression,
+            arn: process.env.LAMBDA_ARN,
             params: {
               orderId,
             },
@@ -139,7 +147,7 @@ const updateOrder = async ({
             ...generalInfo,
             ...(shouldUpdateParticipantList
               ? {
-                  participants,
+                  participants: activeParticipantIds,
                 }
               : {}),
             orderStateHistory: newOrderStateHistoryMaybe,
@@ -149,14 +157,14 @@ const updateOrder = async ({
       ),
     );
 
-    // * update AutomaticStartOrderScheduler
-    if (updateStartDate || updateDeliveryHour) {
-      if (isCreatedByBooker && isGroupOrder)
-        createOrUpdateAutomaticStartOrderScheduler({
+    if (isGroupOrder) {
+      if (updateStartDate || updateDeliveryHour) {
+        upsertAutomaticStartOrderScheduler({
           orderId,
           startDate: updateStartDate || startDate,
           deliveryHour: updateDeliveryHour || deliveryHour,
         });
+      }
     }
 
     if (
@@ -164,7 +172,7 @@ const updateOrder = async ({
       !isOrderHasInProgressState
     ) {
       // * send notification when transit from inprogress back to picking state
-      participants.forEach((participantId) => {
+      activeParticipantIds.forEach((participantId) => {
         createNativeNotification(
           ENativeNotificationType.BookerTransitOrderStateToPicking,
           {
@@ -189,10 +197,10 @@ const updateOrder = async ({
       });
     }
 
-    if (isGroupOrder && deadlineDate) {
+    if (isGroupOrder && updateDeadlineDate) {
       sendRemindPickingNativeNotificationToBookerScheduler({
         orderId,
-        deadlineDate,
+        deadlineDate: updateDeadlineDate,
       });
     }
   }

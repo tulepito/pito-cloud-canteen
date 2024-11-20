@@ -5,7 +5,7 @@ import type { TDaySession } from '@components/CalendarDashboard/helpers/types';
 import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
 import { generateUncountableIdForOrder } from '@helpers/generateUncountableId';
 import { getInitMemberOrder } from '@pages/api/orders/[orderId]/plan/memberOrder.helper';
-import { createOrUpdateAutomaticStartOrderScheduler } from '@services/awsEventBrigdeScheduler';
+import { upsertAutomaticStartOrderScheduler } from '@services/awsEventBrigdeScheduler';
 import { denormalisedResponseEntities } from '@services/data';
 import { getOrderNumber, updateOrderNumber } from '@services/getAdminAccount';
 import { fetchUser } from '@services/integrationHelper';
@@ -137,7 +137,7 @@ export const reorder = async ({
   );
   const [newOrder] = denormalisedResponseEntities(newOrderResponse);
   const newOrderId = newOrder?.id?.uuid;
-  const initialMemberOrder = getInitMemberOrder({
+  const initialMemberOrder = await getInitMemberOrder({
     companyAccount,
     selectedGroups,
   });
@@ -172,7 +172,7 @@ export const reorder = async ({
   updateOrderNumber();
 
   if (isGroupOrder && !isCreatedByAdmin && newOrderId) {
-    createOrUpdateAutomaticStartOrderScheduler({
+    upsertAutomaticStartOrderScheduler({
       orderId: newOrderId,
       startDate,
       deliveryHour,

@@ -1032,13 +1032,11 @@ const fetchQuotation = createAsyncThunk(
 
 const handleAutoPickFoodToggle = createAsyncThunk(
   HANDLE_AUTO_PICK_FOOD_TOGGLE,
-  async (autoPickFood: boolean, { getState }) => {
-    const { orderData } = getState().OrderManagement;
-    const orderId = orderData.id.uuid;
-    if (!autoPickFood) {
-      await createAutoPickFoodSchedulerApi(orderId);
+  async (payload: { autoPickFood: boolean; orderId: string }) => {
+    if (!payload.autoPickFood) {
+      await createAutoPickFoodSchedulerApi(payload.orderId);
     } else {
-      await removeAutoPickFoodSchedulerApi(orderId);
+      await removeAutoPickFoodSchedulerApi(payload.orderId);
     }
   },
 );

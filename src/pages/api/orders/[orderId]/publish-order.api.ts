@@ -2,6 +2,7 @@ import isEmpty from 'lodash/isEmpty';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HttpMethod } from '@apis/configs';
+import logger from '@helpers/logger';
 import cookies from '@services/cookie';
 import { getSdk, handleError } from '@services/sdk';
 import { CurrentUser, denormalisedResponseEntities } from '@src/utils/data';
@@ -37,7 +38,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         break;
     }
   } catch (error) {
-    console.error(error);
+    logger.error(`Order publish failed`, String(error));
     handleError(res, error);
   }
 }

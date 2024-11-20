@@ -2,8 +2,8 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HttpMethod } from '@apis/configs';
 import {
-  createOrUpdatePickFoodForEmptyMembersScheduler,
   getScheduler,
+  upsertPickFoodForEmptyMembersScheduler,
 } from '@services/awsEventBrigdeScheduler';
 import cookies from '@services/cookie';
 import { fetchListing } from '@services/integrationHelper';
@@ -21,8 +21,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           const { orderId } = req.query;
           const order = await fetchListing(orderId as string);
           const orderListing = Listing(order);
-          const { startDate, deliveryHour, bookerId } =
-            orderListing.getMetadata();
+          const { bookerId, deadlineDate } = orderListing.getMetadata();
 
           const updateOrderPromise = integrationSdk.listings.update({
             id: orderId as string,
@@ -48,10 +47,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
             return res.status(200).json({ success: true });
           }
-          await createOrUpdatePickFoodForEmptyMembersScheduler({
-            orderId,
-            startDate,
-            deliveryHour,
+          await upsertPickFoodForEmptyMembersScheduler({
+            orderId: String(orderId),
+            deadlineDate,
+            params: {
+              orderId: null,
+            },
           });
         }
         break;

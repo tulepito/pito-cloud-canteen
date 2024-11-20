@@ -4,6 +4,7 @@ import classNames from 'classnames';
 import isEqual from 'lodash/isEqual';
 import { useRouter } from 'next/router';
 
+import AutomaticPickingForm from '@components/OrderDetails/EditView/AutomaticInfoSection/AutomaticPickingForm';
 import ManageLineItemsSection from '@components/OrderDetails/EditView/ManageOrderDetailSection/ManageLineItemsSection';
 import ManageOrdersSection from '@components/OrderDetails/EditView/ManageOrderDetailSection/ManageOrdersSection';
 import ManageParticipantsSection from '@components/OrderDetails/EditView/ManageParticipantsSection/ManageParticipantsSection';
@@ -22,6 +23,7 @@ import useExportOrderDetails from '@hooks/useExportOrderDetails';
 import { usePrepareOrderDetailPageData } from '@hooks/usePrepareOrderManagementData';
 import { AdminManageOrderThunks } from '@pages/admin/order/AdminManageOrder.slice';
 import { ReviewContent } from '@pages/admin/order/StepScreen/ReviewOrder/ReviewOrder';
+import { useAutoPickFood } from '@pages/company/orders/[orderId]/hooks/useAutoPickFood';
 import {
   OrderManagementsAction,
   orderManagementThunks,
@@ -121,7 +123,12 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
     plans = [],
     orderState,
     orderType = EOrderType.group,
+    isAutoPickFood,
   } = Listing(order).getMetadata();
+
+  const { autoPickingAllowed, toggleFoodAutoPicking, isToggleingAutoPickFood } =
+    useAutoPickFood(isAutoPickFood, orderId);
+
   const isGroupOrder = orderType === EOrderType.group;
   const isPickingState = orderState === EOrderStates.picking;
   const planId = plans.length > 0 ? plans[0] : undefined;
@@ -357,6 +364,27 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
                     data={editViewData.countdownSectionData}
                     ableToUpdateOrder={ableToUpdateOrder}
                   />
+
+                  <div className={css.container}>
+                    <AutomaticPickingForm
+                      disabled={isToggleingAutoPickFood}
+                      initialValues={{ autoPicking: autoPickingAllowed }}
+                      handleFieldChange={toggleFoodAutoPicking}
+                      onSubmit={() => {}}
+                    />
+                    <i
+                      style={{
+                        fontSize: 13,
+                        paddingTop: 8,
+                        display: 'inline-block',
+                        color: 'cornflowerblue',
+                      }}>
+                      <u>Lưu ý:</u> Cài đặt này sẽ tự động chọn món cho thành
+                      viên chưa chọn món ngay khi <b>Thời hạn chọn món</b> kết
+                      thúc
+                    </i>
+                  </div>
+
                   <OrderLinkSection
                     className={css.container}
                     data={editViewData.linkSectionData}

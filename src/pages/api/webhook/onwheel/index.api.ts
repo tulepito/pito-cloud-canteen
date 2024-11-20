@@ -3,6 +3,7 @@ import { DateTime } from 'luxon';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HttpMethod } from '@apis/configs';
+import logger from '@helpers/logger';
 import { transitionOrderStatus } from '@pages/api/admin/plan/transition-order-status.service';
 import createQuotation from '@pages/api/orders/[orderId]/quotation/create-quotation.service';
 import { emailSendingFactory, EmailTemplateTypes } from '@services/email';
@@ -67,7 +68,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       case HttpMethod.POST: {
         const event = req.body;
 
-        console.log('event', event);
+        logger.info('OnWheel webhook recieved:', JSON.stringify(event));
         const { path } = event;
         switch (event.status) {
           case EOnWheelOrderStatus.idle:

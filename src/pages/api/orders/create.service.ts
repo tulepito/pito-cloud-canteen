@@ -1,14 +1,18 @@
 import { isEmpty } from 'lodash';
 import { DateTime } from 'luxon';
 
-import { calculateGroupMembers, getAllCompanyMembers } from '@helpers/company';
+import {
+  calculateGroupMembers,
+  ensureActiveUserIds,
+  getAllCompanyMembers,
+} from '@helpers/company';
 import { generateUncountableIdForOrder } from '@helpers/generateUncountableId';
 import {
-  createOrUpdateAutomaticStartOrderScheduler,
-  createOrUpdatePickFoodForEmptyMembersScheduler,
   createScheduler,
   getScheduler,
   updateScheduler,
+  upsertAutomaticStartOrderScheduler,
+  upsertPickFoodForEmptyMembersScheduler,
 } from '@services/awsEventBrigdeScheduler';
 import getAdminAccount, { updateOrderNumber } from '@services/getAdminAccount';
 import { fetchUser } from '@services/integrationHelper';
@@ -34,20 +38,24 @@ const createDeadlineScheduler = async ({
   const reminderTime = DateTime.fromMillis(deadlineDate)
     .setZone(VNTimezone)
     .minus({
-      minutes: 30,
+      minutes:
+        +process.env
+          .NEXT_PUBLIC_SEND_REMIND_PICKING_ORDER_TIME_TO_DEADLINE_IN_MINUTES,
     })
     .toMillis();
   try {
-    await getScheduler(`sendRemindPOE_${orderFlexId}`);
+    await getScheduler(`sendRemindPOE${orderFlexId}`);
     await updateScheduler({
-      customName: `sendRemindPOE_${orderFlexId}`,
+      customName: `sendRemindPOE${orderFlexId}`,
       timeExpression: formatTimestamp(reminderTime, "yyyy-MM-dd'T'hh:mm:ss"),
+      arn: process.env.LAMBDA_ARN,
     });
   } catch (error) {
     console.error('create scheduler in create order');
     await createScheduler({
-      customName: `sendRemindPOE_${orderFlexId}`,
+      customName: `sendRemindPOE${orderFlexId}`,
       timeExpression: formatTimestamp(reminderTime, "yyyy-MM-dd'T'hh:mm:ss"),
+      arn: process.env.LAMBDA_ARN,
       params: {
         orderId: orderFlexId,
       },
@@ -118,8 +126,10 @@ const createOrder = async ({
   const shouldUpdateOrderName = startDate && endDate;
 
   const participants: string[] = isEmpty(selectedGroups)
-    ? getAllCompanyMembers(companyAccount)
-    : calculateGroupMembers(companyAccount, selectedGroups);
+    ? await ensureActiveUserIds(getAllCompanyMembers(companyAccount))
+    : await ensureActiveUserIds(
+        calculateGroupMembers(companyAccount, selectedGroups),
+      );
   const groupOrderInfoMaybe = isNormalOrder
     ? {}
     : { participants, selectedGroups, deadlineDate, deadlineHour };
@@ -177,19 +187,21 @@ const createOrder = async ({
     createDeadlineScheduler({ deadlineDate, orderFlexId });
   }
 
-  if (!isNormalOrder && !isCreatedByAdmin && orderFlexId) {
-    createOrUpdateAutomaticStartOrderScheduler({
+  if (!isNormalOrder && orderFlexId) {
+    upsertAutomaticStartOrderScheduler({
       orderId: orderFlexId,
       startDate,
       deliveryHour,
     });
   }
 
-  if (isAutoPickFood && !isNormalOrder && orderFlexId && !isCreatedByAdmin) {
-    await createOrUpdatePickFoodForEmptyMembersScheduler({
+  if (isAutoPickFood && !isNormalOrder && orderFlexId) {
+    await upsertPickFoodForEmptyMembersScheduler({
       orderId: orderFlexId,
-      startDate,
-      deliveryHour,
+      deadlineDate,
+      params: {
+        orderId: orderFlexId,
+      },
     });
   }
 

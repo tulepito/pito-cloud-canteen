@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HttpMethod } from '@apis/configs';
+import logger from '@helpers/logger';
 import { reorder } from '@pages/api/apiServices/order/reorder/index.service';
 import cookies from '@services/cookie';
 import { getCurrentUser, handleError } from '@services/sdk';
@@ -32,7 +33,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         return res.status(200).json('Method is not allowed');
     }
   } catch (error) {
-    console.error(error);
+    logger.error('Error in reorder order', String(error));
     handleError(res, error);
   }
 }

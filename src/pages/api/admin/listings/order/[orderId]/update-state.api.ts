@@ -25,6 +25,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       ].includes(newOrderState)
     ) {
       const generalInfo = {
+        isAutoPickFood: false,
         orderState: newOrderState,
         orderStateHistory: orderStateHistory.concat({
           state: newOrderState,

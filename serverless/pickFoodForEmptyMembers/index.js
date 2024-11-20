@@ -1,8 +1,12 @@
 const isEmpty = require('lodash/isEmpty');
 const get = require('lodash/get');
 const uniq = require('lodash/uniq');
-const { denormalisedResponseEntities } = require('./utils/data');
-const { EOrderType, EParticipantOrderStatus } = require('./utils/enums');
+const { denormalisedResponseEntities, Listing } = require('./utils/data');
+const {
+  EOrderType,
+  EParticipantOrderStatus,
+  ORDER_STATES,
+} = require('./utils/enums');
 const {
   fetchListingsByChunkedIds,
   fetchUserByChunkedIds,
@@ -36,14 +40,19 @@ exports.handler = async (_event) => {
       }),
     )[0];
 
-    const orderType = get(
-      orderResponse,
-      'attributes.metadata.orderType',
-      EOrderType.group,
-    );
+    console.info('💫 > orderListing: ');
+    console.info(orderResponse);
+
+    const { orderState, orderType } = Listing(orderResponse).getMetadata();
 
     if (orderType !== EOrderType.group) {
       console.error('Cannot pick food for non-group order');
+
+      return;
+    }
+
+    if (orderState !== ORDER_STATES.picking) {
+      console.error('💫 > Cannot pick for non-picking order');
 
       return;
     }

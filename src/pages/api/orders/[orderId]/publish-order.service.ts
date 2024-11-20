@@ -2,7 +2,10 @@ import { difference } from 'lodash';
 import isEmpty from 'lodash/isEmpty';
 import uniq from 'lodash/uniq';
 
-import { sendRemindPickingNativeNotificationToBookerScheduler } from '@services/awsEventBrigdeScheduler';
+import {
+  sendRemindPickingNativeNotificationToBookerScheduler,
+  upsertPickFoodForEmptyMembersScheduler,
+} from '@services/awsEventBrigdeScheduler';
 import { denormalisedResponseEntities } from '@services/data';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { createNativeNotification } from '@services/nativeNotification';
@@ -85,6 +88,7 @@ export const publishOrder = async (orderId: string, isAdmin = false) => {
     startDate,
     endDate,
     deadlineDate,
+    isAutoPickFood,
   } = orderListing.getMetadata();
   const { title: orderTitle } = orderListing.getAttributes();
   const isGroupOrder = orderType === EOrderType.group;
@@ -200,10 +204,21 @@ export const publishOrder = async (orderId: string, isAdmin = false) => {
     startDate,
     endDate,
   });
+
   if (isGroupOrder) {
     sendRemindPickingNativeNotificationToBookerScheduler({
       orderId,
       deadlineDate,
     });
+
+    if (isAutoPickFood) {
+      upsertPickFoodForEmptyMembersScheduler({
+        orderId,
+        deadlineDate,
+        params: {
+          orderId,
+        },
+      });
+    }
   }
 };

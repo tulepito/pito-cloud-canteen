@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HttpMethod } from '@apis/configs';
+import logger from '@helpers/logger';
 import cookies from '@services/cookie';
 import { handleError } from '@services/sdk';
 import {
@@ -71,7 +72,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         return res.status(405).end();
     }
   } catch (error) {
-    console.error(error);
+    logger.error('Error in company plans', String(error));
     handleError(res, error);
   }
 }

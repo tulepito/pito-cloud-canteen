@@ -21,14 +21,6 @@ import {
   findMinStartDate,
 } from './order/prepareDataHelper';
 
-export const isOrderCreatedByBooker = (
-  orderStateHistory: TOrderStateHistoryItem[],
-) => {
-  return orderStateHistory.some(
-    ({ state }) => state === EBookerOrderDraftStates.bookerDraft,
-  );
-};
-
 export const isCompletePickFood = ({
   participantId,
   orderDetail,

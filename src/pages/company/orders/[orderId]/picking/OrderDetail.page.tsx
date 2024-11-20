@@ -27,7 +27,6 @@ import RenderWhen from '@components/RenderWhen/RenderWhen';
 import Stepper from '@components/Stepper/Stepper';
 import { checkMinMaxQuantityInPickingState } from '@helpers/order/orderPickingHelper';
 import { checkOrderDetailHasChanged } from '@helpers/order/subOrderChangeAfterStartHelper';
-import { isOrderCreatedByBooker } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { useDownloadPriceQuotation } from '@hooks/useDownloadPriceQuotation';
@@ -128,16 +127,13 @@ const OrderDetailPage = () => {
     orderVATPercentage,
     startDate,
     deliveryHour,
-    orderStateHistory = [],
-    isAutoPickFood: isAutoPickFoodFromOrderData,
+    isAutoPickFood,
   } = Listing(orderData as TListing).getMetadata();
   const planId = Listing(planData as TListing).getId();
   const userId = CurrentUser(currentUser!).getId();
-  const isCreatedByBooker = isOrderCreatedByBooker(orderStateHistory);
 
-  const { isAutoPickFood, toggleAutoPickFood } = useAutoPickFood(
-    isAutoPickFoodFromOrderData,
-  );
+  const { autoPickingAllowed, toggleFoodAutoPicking, isToggleingAutoPickFood } =
+    useAutoPickFood(isAutoPickFood, String(orderId));
 
   const isAnyMobileModalOpening = moreOptionsModalControl.value;
   const isNormalOrder = orderType === EOrderType.normal;
@@ -202,12 +198,6 @@ const OrderDetailPage = () => {
     [css.editNormalOrderView]: isNormalOrder,
     [css.editNormalOrderViewWithHistorySection]:
       isNormalOrder && isDraftEditing,
-  });
-  const leftPartClasses = classNames(css.leftPart, {
-    [css.leftPartWithInfo]: isCreatedByBooker,
-  });
-  const rightPartClasses = classNames(css.rightPart, {
-    [css.rightPartWithInfo]: isCreatedByBooker,
   });
 
   const confirmButtonMessage = isPickingOrder
@@ -368,19 +358,18 @@ const OrderDetailPage = () => {
           shouldHideBottomContainer={isAnyMobileModalOpening}
         />
         <RenderWhen condition={!isNormalOrder}>
-          <RenderWhen condition={isCreatedByBooker}>
-            <AutomaticStartOrInfoSection
-              className={css.infoPart}
-              startDate={startDate}
-              deliveryHour={deliveryHour}
-              mobileModalControl={automaticConfirmOrderMobileControl}
-              autoPickingFormInitialValues={{
-                autoPicking: isAutoPickFood,
-              }}
-              handleAutoPickingChange={toggleAutoPickFood}
-            />
-          </RenderWhen>
-          <div className={leftPartClasses}>
+          <AutomaticStartOrInfoSection
+            className={css.infoPart}
+            startDate={startDate}
+            deliveryHour={deliveryHour}
+            mobileModalControl={automaticConfirmOrderMobileControl}
+            autoPickingFormInitialValues={{
+              autoPicking: autoPickingAllowed,
+            }}
+            disabled={isToggleingAutoPickFood}
+            handleAutoPickingChange={toggleFoodAutoPicking}
+          />
+          <div className={css.leftPart}>
             <ManageOrdersSection
               ableToUpdateOrder={ableToUpdateOrder}
               setCurrentViewDate={handleSetCurrentViewDate}
@@ -400,21 +389,19 @@ const OrderDetailPage = () => {
             data={reviewViewData.reviewResultData}
             onDownloadReviewOrderResults={onDownloadReviewOrderResults}
           />
-          <div className={rightPartClasses}>
+          <div className={css.rightPart}>
             <OrderDeadlineCountdownSection
               className={css.container}
               data={editViewData.countdownSectionData}
               ableToUpdateOrder={ableToUpdateOrder}
             />
-            <RenderWhen condition={isCreatedByBooker}>
-              <div className={css.autoPickingPart}>
-                <AutomaticPickingForm
-                  initialValues={{ autoPicking: isAutoPickFood }}
-                  handleFieldChange={toggleAutoPickFood}
-                  onSubmit={() => {}}
-                />
-              </div>
-            </RenderWhen>
+            <div className={css.autoPickingPart}>
+              <AutomaticPickingForm
+                initialValues={{ autoPicking: autoPickingAllowed }}
+                handleFieldChange={toggleFoodAutoPicking}
+                onSubmit={() => {}}
+              />
+            </div>
             <OrderLinkSection
               className={css.mobileContainer}
               data={editViewData.linkSectionData}
@@ -610,10 +597,10 @@ const OrderDetailPage = () => {
   }, [isMobileLayout, isViewCartDetailMode]);
 
   useEffect(() => {
-    if (isCreatedByBooker && !isNormalOrder) {
+    if (!isNormalOrder) {
       automaticConfirmOrderMobileControl.setTrue();
     }
-  }, [isCreatedByBooker, isNormalOrder]);
+  }, [isNormalOrder]);
 
   const goHomeIcon = <GoHomeIcon control={confirmGoHomeControl} />;
   const moreOptionsIcon = (

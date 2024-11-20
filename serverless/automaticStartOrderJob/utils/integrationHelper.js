@@ -25,15 +25,21 @@ const fetchListing = async (listingId, include, imageVariants) => {
 
 const fetchUser = async (userId) => {
   const integrationSdk = getIntegrationSdk();
-  const response = await integrationSdk.users.show({
-    id: userId,
-    include: ['profileImage'],
-    'fields.image': [
-      'variants.square-small',
-      'variants.square-small2x',
-      'variants.default',
-    ],
-  });
+  const response = await integrationSdk.users
+    .show({
+      id: userId,
+      include: ['profileImage'],
+      'fields.image': [
+        'variants.square-small',
+        'variants.square-small2x',
+        'variants.default',
+      ],
+    })
+    .catch((error) => {
+      console.error(`Error fetching user ${userId}`, String(error));
+    });
+
+  if (!response) return null;
 
   return denormalisedResponseEntities(response)[0];
 };

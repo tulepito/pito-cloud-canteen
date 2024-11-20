@@ -34,8 +34,20 @@ const ALLERGIES_OPTIONS = [
   },
 ];
 
+const ORDER_STATES = {
+  canceled: 'canceled',
+  canceledByBooker: 'canceledByBooker',
+  picking: 'picking',
+  inProgress: 'inProgress',
+  pendingPayment: 'pendingPayment',
+  completed: 'completed',
+  reviewed: 'reviewed',
+  expiredStart: 'expiredStart',
+};
+
 module.exports = {
   EOrderType,
   EParticipantOrderStatus,
   ALLERGIES_OPTIONS,
+  ORDER_STATES,
 };

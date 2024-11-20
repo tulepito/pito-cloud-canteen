@@ -12,6 +12,10 @@ const createEmailParams = (receiver, subject, content, sender) => {
     },
   };
 
+  const emailSender = sender || config.ses.senderEmail;
+  const senderName = 'PITO Cloud Canteen';
+  const source = `${senderName} <${emailSender}>`;
+
   return {
     Destination: {
       ToAddresses: toAddresses,
@@ -23,7 +27,7 @@ const createEmailParams = (receiver, subject, content, sender) => {
         Data: subject,
       },
     },
-    Source: sender || config.ses.senderEmail,
+    Source: source,
   };
 };
 

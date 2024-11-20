@@ -28,7 +28,7 @@ const createPlan = async ({
 
   const { subAccountId } = companyAccount.attributes.profile.privateData;
 
-  const initialMemberOrder = getInitMemberOrder({
+  const initialMemberOrder = await getInitMemberOrder({
     companyAccount,
     selectedGroups,
   });

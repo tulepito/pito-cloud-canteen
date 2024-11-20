@@ -14,6 +14,7 @@ export type TAutomaticPickingFormValues = {
 type TExtraProps = {
   handleFieldChange?: () => void;
   shouldShowMainTitle?: boolean;
+  disabled?: boolean;
 };
 type TAutomaticPickingFormComponentProps =
   FormRenderProps<TAutomaticPickingFormValues> & Partial<TExtraProps>;
@@ -27,6 +28,7 @@ const AutomaticPickingFormComponent: React.FC<
     handleFieldChange = console.info,
     shouldShowMainTitle = true,
     handleSubmit,
+    disabled,
   } = props;
 
   const subTitle =
@@ -52,6 +54,7 @@ const AutomaticPickingFormComponent: React.FC<
             return (
               <Toggle
                 id={id}
+                disabled={disabled}
                 name={input.name}
                 status={input.value ? 'on' : 'off'}
                 onClick={(value) => {

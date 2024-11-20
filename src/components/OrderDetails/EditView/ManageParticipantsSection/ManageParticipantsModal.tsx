@@ -49,10 +49,7 @@ const ManageParticipantsModal: React.FC<ManageParticipantsModalProps> = (
 
   const modalTitle = (
     <span className={css.modalTitle}>
-      {intl.formatMessage(
-        { id: 'ManageParticipantModal.title' },
-        { count: participants.length },
-      )}
+      {intl.formatMessage({ id: 'ManageParticipantModal.title' })}
     </span>
   );
   const modalSubTitle =

@@ -24,6 +24,7 @@ type TAutomaticStartOrInfoSectionProps = TDefaultProps & {
   handleAutoPickingChange?: () => void;
   mobileModalControl: TUseBooleanReturns;
   autoPickingFormInitialValues?: TAutomaticPickingFormValues;
+  disabled?: boolean;
 };
 
 const AutomaticStartOrInfoSection: React.FC<
@@ -35,6 +36,7 @@ const AutomaticStartOrInfoSection: React.FC<
   handleAutoPickingChange = console.info,
   mobileModalControl,
   autoPickingFormInitialValues = {},
+  disabled,
 }) => {
   const classes = classNames(css.container, className);
   const { isMobileLayout } = useViewport();
@@ -96,6 +98,7 @@ const AutomaticStartOrInfoSection: React.FC<
         <AutomaticPickingForm
           initialValues={autoPickingFormInitialValues}
           onSubmit={() => {}}
+          disabled={disabled}
           handleFieldChange={handleAutoPickingChange}
         />
         <Button onClick={mobileModalControl.setFalse}>Tôi đã hiểu</Button>

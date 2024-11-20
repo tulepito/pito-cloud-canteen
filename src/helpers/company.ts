@@ -3,9 +3,36 @@ import flatten from 'lodash/flatten';
 import isEmpty from 'lodash/isEmpty';
 import uniq from 'lodash/uniq';
 
+import { getIntegrationSdk } from '@services/sdk';
 import { ECompanyPermission } from '@src/utils/enums';
-import { User } from '@utils/data';
+import { denormalisedResponseEntities, User } from '@utils/data';
 import type { TCurrentUser, TObject, TUser } from '@utils/types';
+
+import logger from './logger';
+
+export const ensureActiveUserIds = async (
+  userIds: string[],
+): Promise<string[]> => {
+  const integrationSdk = getIntegrationSdk();
+  const activeUserIds = denormalisedResponseEntities(
+    await integrationSdk.users.query({
+      meta_id: userIds,
+    }),
+  ).map(
+    (participant: {
+      id: {
+        uuid: string;
+      };
+    }) => participant.id.uuid,
+  );
+
+  logger.info(
+    'ensureActiveUserIds',
+    JSON.stringify({ userIds, activeUserIds }),
+  );
+
+  return activeUserIds;
+};
 
 export const getAllCompanyMembers = (companyAccount: TUser) => {
   const { members = {} } = User(companyAccount).getMetadata();
@@ -41,13 +68,13 @@ export const calculateGroupMembers = (
     return getAllCompanyMembers(companyAccount);
   }
 
-  const allGroupMembers = groupList.map<string>((groupId: string) => {
+  const allGroupMemberIds = groupList.map<string>((groupId: string) => {
     const currentGroup = groups.find((_group: any) => _group.id === groupId);
 
     return currentGroup?.members.map((member: any) => member.id);
   });
 
-  return uniq(flatten(allGroupMembers)) as string[];
+  return uniq(flatten(allGroupMemberIds)) as string[];
 };
 
 export const calculateGroupMembersAmount = (

@@ -1,35 +1,60 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { orderManagementThunks } from '@redux/slices/OrderManagement.slice';
 
-export const useAutoPickFood = (isAutoPickFood: boolean) => {
+export const useAutoPickFood = (value: boolean, orderId: string) => {
   const toggleAutoPickFoodInProgress = useAppSelector(
     (state) => state.OrderManagement.toggleAutoPickFoodInProgress,
   );
+  const [isToggleingAutoPickFood, setIsToggleingAutoPickFood] = useState(false);
 
   const dispatch = useAppDispatch();
-  const autoPickFoodController = useBoolean(isAutoPickFood);
+  const autoPickFoodController = useBoolean(value);
 
-  const toggleAutoPickFood = async () => {
-    if (toggleAutoPickFoodInProgress) return;
+  const toggleFoodAutoPicking = async () => {
+    if (toggleAutoPickFoodInProgress || isToggleingAutoPickFood) {
+      return;
+    }
+
     autoPickFoodController.toggle();
 
-    await dispatch(
-      orderManagementThunks.handleAutoPickFoodToggle(
-        autoPickFoodController.value,
-      ),
-    );
+    try {
+      setIsToggleingAutoPickFood(true);
+      await dispatch(
+        orderManagementThunks.handleAutoPickFoodToggle({
+          autoPickFood: autoPickFoodController.value,
+          orderId,
+        }),
+      ).unwrap();
+
+      if (!autoPickFoodController.value) {
+        toast.success(
+          'Đơn hàng này sẽ tự động chọn món cho những thành viên chưa xác nhận đặt đơn',
+        );
+      } else {
+        toast.success(
+          'Đơn hàng này sẽ không tự động chọn món cho những thành viên chưa xác nhận đặt đơn',
+        );
+      }
+    } catch (error) {
+      autoPickFoodController.toggle();
+      toast.error('Có lỗi xảy ra, vui lòng thử lại sau');
+    } finally {
+      setIsToggleingAutoPickFood(false);
+    }
   };
 
   useEffect(() => {
-    autoPickFoodController.setValue(isAutoPickFood);
+    autoPickFoodController.setValue(value);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAutoPickFood]);
+  }, [value]);
 
   return {
-    isAutoPickFood: autoPickFoodController.value,
-    toggleAutoPickFood,
+    autoPickingAllowed: autoPickFoodController.value,
+    toggleFoodAutoPicking,
+    isToggleingAutoPickFood,
   };
 };
