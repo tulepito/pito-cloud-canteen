@@ -556,20 +556,19 @@ function BookerDraftOrderPage() {
                       <Image src={emptyResultImg} alt="empty result" />
                     </div>
                     <div className={css.emptyTitle}>
-                      <p>Không tìm thấy kết quả phù hợp</p>
+                      <p style={{ margin: '4px 0' }}>
+                        Rất tiếc, không tìm thấy nhà hàng hay thực đơn phù hợp
+                        với yêu cầu của bạn
+                      </p>
                       <p className={css.emptyContent}>
-                        Rất tiếc, hệ thống chúng tôi không tìm thấy kết quả phù
-                        hợp với yêu cầu của bạn. Tuy nhiên, đừng ngần ngại{' '}
-                        <span>
-                          chat với chúng tôi để tìm thấy menu nhanh nhất
-                        </span>{' '}
-                        nhé.
+                        Bạn hãy thử thay đổi địa chỉ giao hàng, số người hoặc
+                        ngân sách nhé.
                       </p>
                       <Button
                         className={css.contactUsBtn}
-                        variant="secondary"
+                        variant="primary"
                         onClick={handleChatIconClick}>
-                        Chat với chúng tôi
+                        Liên hệ với chúng tôi
                       </Button>
                     </div>
                   </div>

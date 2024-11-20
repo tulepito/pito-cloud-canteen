@@ -63,8 +63,7 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
       ...result,
       {
         value: User(cur).getId(),
-        label: User(cur).getPublicData().companyName,
-        logo: User(cur).getProfileImage(),
+        label: 'Công ty',
       },
     ];
   }, []);
@@ -74,7 +73,7 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
     label?: string;
   }>({});
   const accountOptions = [
-    { value: '', label: 'Tài khoản' },
+    { value: '', label: 'Cá nhân' },
     ...assignedCompanies,
   ];
 
@@ -130,7 +129,7 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
               <div className={css.headerTitle}>
                 <FeatureIcons.User />
                 <div className={css.title} title={title}>
-                  {title}
+                  Tài khoản
                 </div>
               </div>
               {isMobile && (

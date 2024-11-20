@@ -13,8 +13,7 @@
 
 .modalHeader {
   text-align: center;
-  @include textTemplate(24px, $fontWeightBold, 32px);
-  text-transform: capitalize;
+  @include textTemplate(28px, $fontWeightBold, 32px);
   .secondRow {
     color: $primaryPri2;
   }
@@ -32,5 +31,7 @@
 
   .startBtn {
     width: 100%;
+    max-width: 380px;
+    margin: 0 auto;
   }
 }

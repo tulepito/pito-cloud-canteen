@@ -31,16 +31,16 @@ const WelcomeModal: React.FC<WelcomeModalProps> = (props) => {
       shouldHideIconClose
       containerClassName={css.modalContainer}>
       <div className={css.modalHeader}>
-        <div className={css.firstRow}>Chào Mừng bạn đến với</div>
-        <div className={css.secondRow}>PITO Cloud Canteen</div>
+        <div className={css.firstRow}>Thực đơn của bạn đã sẵn sàng!</div>
       </div>
       <div className={css.modalContent}>
-        Khám phá các nhà hàng và lựa chọn món ăn theo sở thích nhé. <br />
-        Chúc bạn có những trải nghiệm ẩm thực trọn vẹn!
+        Thực đơn được gợi ý tự động theo yêu cầu của bạn
+        <br />
+        Bạn có thể xem và tùy chỉnh nhé
       </div>
       <div className={css.modalFooter}>
         <Button onClick={onStartBtnClick} className={css.startBtn}>
-          Bắt đầu
+          Xem và tùy chỉnh
         </Button>
       </div>
     </PopupModal>

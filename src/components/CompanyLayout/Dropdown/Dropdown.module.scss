@@ -8,14 +8,15 @@
 
 .dropdown {
   position: absolute;
-  top: 32px;
-  left: -64px;
+  top: 40px;
+  left: -20px;
   box-shadow: $boxShadow;
-  width: 200px;
+  width: 180px;
   z-index: 1;
   color: $neutralGray7;
   background-color: $neutralGray1;
   border-radius: 8px;
+  padding: 4px;
 
   &.isNotDesktop {
     position: relative;
@@ -29,19 +30,16 @@
     padding: 8px 16px;
     @include flexAlign(center);
     gap: 12px;
+    transition: all 0.2s ease-in-out;
 
     &:hover {
       @include viewportMedium {
         background-color: $neutralGray2;
       }
-
-      .label {
-        font-weight: 600;
-      }
     }
 
     .label {
-      @include lineClamp(2);
+      @include lineClamp(2, 1.5rem);
       font-weight: 400;
     }
 

@@ -2,24 +2,15 @@ import type { ReactNode } from 'react';
 import { useEffect, useState } from 'react';
 import { shallowEqual } from 'react-redux';
 import classNames from 'classnames';
-import capitalize from 'lodash/capitalize';
 import { useRouter } from 'next/router';
 
-import Avatar from '@components/Avatar/Avatar';
 import OutsideClickHandler from '@components/OutsideClickHandler/OutsideClickHandler';
 import { useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { useViewport } from '@hooks/useViewport';
 import { User } from '@utils/data';
-import type { TUser } from '@utils/types';
 
 import css from './Dropdown.module.scss';
-
-const getAbbreviatedName = (fullName: string) =>
-  fullName
-    .split(' ')
-    .map((name) => capitalize(name[0]))
-    .join('');
 
 type TDropdownProps = {
   options: {
@@ -91,19 +82,13 @@ const Dropdown: React.FC<TDropdownProps> = (props) => {
           className={classNames(css.dropdown, {
             [css.isNotDesktop]: isNotDesktop,
           })}>
-          {options.map(({ label, value, logo }) => {
+          {options.map(({ label, value }) => {
             const handleMouseEnter = () => {
               setSelectedValue({ value, label });
             };
             const handleMouseClick = () => {
               setTitle(label);
               onDropdowClose();
-            };
-            const ensuredUser = {
-              profileImage: logo,
-              attributes: {
-                profile: { abbreviatedName: getAbbreviatedName(label) },
-              },
             };
 
             return (
@@ -112,11 +97,6 @@ const Dropdown: React.FC<TDropdownProps> = (props) => {
                 key={value}
                 onMouseEnter={handleMouseEnter}
                 onClick={handleMouseClick}>
-                <Avatar
-                  user={ensuredUser as TUser}
-                  disableProfileLink
-                  className={css.logo}
-                />
                 <div className={css.label} title={label}>
                   {label}
                 </div>
