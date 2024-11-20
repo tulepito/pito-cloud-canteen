@@ -149,7 +149,7 @@ const OrderTitle: React.FC<TOrderTitleProps> = (props) => {
         <Button
           disabled={submitDisabled}
           type="button"
-          variant="cta"
+          variant="primary"
           className={css.makeOrderBtn}
           inProgress={confirmInProgress}
           onClick={onConfirmOrder}>

@@ -124,7 +124,7 @@ const ManageParticipantsSection: React.FC<TManageParticipantsSectionProps> = (
   const handleSubmitAddParticipant = async ({
     email,
   }: TAddParticipantFormValues) => {
-    if (updateParticipantsInProgress) {
+    if (updateParticipantsInProgress || !email) {
       return;
     }
 

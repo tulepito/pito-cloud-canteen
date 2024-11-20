@@ -76,7 +76,12 @@ const CompanyHeader: React.FC<CompanyHeaderProps> = ({
         </div>
       </div>
       <div className={css.headerRight}>
-        <p className={css.headerPhoneNumber}>{config.marketplacePhoneNumber}</p>
+        <a href="tel:1900252530" className={css.headerPhoneNumber}>
+          <span className={css.staticText}>
+            {config.marketplacePhoneNumber}
+          </span>
+          <span className={css.hoverText}>{config.marketplacePhoneNumber}</span>
+        </a>
         <div className={css.separator}></div>
         <ProfileMenu>
           <ProfileMenuLabel className={css.profileMenuWrapper}>

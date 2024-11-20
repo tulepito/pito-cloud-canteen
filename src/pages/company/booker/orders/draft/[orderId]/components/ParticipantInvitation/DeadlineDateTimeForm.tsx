@@ -148,7 +148,7 @@ const DeadlineDateTimeFormComponent: React.FC<
 
   const sendNotificationButton = (
     <Button
-      variant="cta"
+      variant="primary"
       disabled={submitDisabled}
       type="submit"
       onClick={handleSubmitOutSideForm}

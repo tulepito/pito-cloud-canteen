@@ -51,7 +51,7 @@ const OrderPanelFooter: React.FC<TOrderPanelFooter> = ({
       <Button
         fullWidth
         onClick={handleSubmit}
-        variant="cta"
+        variant="primary"
         disabled={submitDisabled}
         inProgress={submitDataInprogress}>
         {completeOrderButtonLabel}

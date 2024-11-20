@@ -61,6 +61,7 @@
       display: flex;
       justify-content: center;
       flex-direction: column;
+      gap: 8px;
 
       & > button:first-child {
         @include buttonColorSecondary;
@@ -118,7 +119,7 @@
           @include textTemplate(14px, 700, 24px);
           min-width: 100px;
           min-height: unset;
-          padding: 6px 0;
+          padding: 6px 12px;
           background-color: transparent;
 
           &:hover {

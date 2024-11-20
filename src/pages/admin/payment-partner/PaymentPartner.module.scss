@@ -34,14 +34,7 @@
   .filterIcon {
     width: 16px;
     height: 14px;
-    margin-right: 8px;
-  }
-
-  &:hover,
-  &:focus {
-    .filterIcon * {
-      fill: $neutralGray1;
-    }
+    margin-right: 10px;
   }
 }
 

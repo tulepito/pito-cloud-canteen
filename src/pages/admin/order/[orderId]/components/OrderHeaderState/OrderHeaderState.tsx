@@ -197,7 +197,7 @@ const OrderHeaderState: React.FC<OrderHeaderStateProps> = (props) => {
       </div>
       <RenderWhen condition={shouldShowUpdateOrderStateBtn}>
         <Button
-          variant="cta"
+          variant="primary"
           className={css.stateBtn}
           onClick={handleUpdateOrderState(EOrderStates.picking)}
           inProgress={updateOrderStateInProgress}>
@@ -206,7 +206,7 @@ const OrderHeaderState: React.FC<OrderHeaderStateProps> = (props) => {
       </RenderWhen>
       <RenderWhen condition={shouldShowStartOrderBtn}>
         <Button
-          variant="cta"
+          variant="primary"
           className={css.stateBtn}
           onClick={onConfirmOrder}
           inProgress={updateOrderStateInProgress}
@@ -216,7 +216,7 @@ const OrderHeaderState: React.FC<OrderHeaderStateProps> = (props) => {
       </RenderWhen>
       <RenderWhen condition={isDraftEditing}>
         <Button
-          variant="cta"
+          variant="primary"
           className={css.stateBtn}
           disabled={confirmUpdateDisabled}
           onClick={onConfirmOrder}>

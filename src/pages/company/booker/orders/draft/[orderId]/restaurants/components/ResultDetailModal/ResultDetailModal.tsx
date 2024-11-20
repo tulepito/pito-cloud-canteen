@@ -5,7 +5,6 @@ import { useRouter } from 'next/router';
 
 import Button from '@components/Button/Button';
 import IconClose from '@components/Icons/IconClose/IconClose';
-import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
 import Modal from '@components/Modal/Modal';
 import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
 import SlideModal from '@components/SlideModal/SlideModal';
@@ -356,7 +355,9 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
           <Button
             className={css.submitBtn}
             onClick={handleConfirmFoodList}
-            disabled={submitFoodListDisabled}>
+            disabled={submitFoodListDisabled}
+            loadingMode="extend"
+            inProgress={updatePlanDetailInProgress}>
             <span>
               {intl.formatMessage(
                 {
@@ -367,9 +368,6 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
                 },
               )}
             </span>
-            {updatePlanDetailInProgress && (
-              <IconSpinner className={css.spinner} />
-            )}
           </Button>
         </div>
       </ModalComponent>

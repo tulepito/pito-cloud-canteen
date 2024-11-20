@@ -1,8 +1,8 @@
 import type { PropsWithChildren } from 'react';
 import React from 'react';
 
+import FullScreenPageLoading from '@components/FullScreenPageLoading/FullScreenPageLoading';
 import InActiveUserScreen from '@components/InActiveUserScreen/InActiveUserScreen';
-import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import RoleSelectModal from '@components/RoleSelectModal/RoleSelectModal';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { useRoleSelectModalController } from '@hooks/useRoleSelectModalController';
@@ -38,7 +38,7 @@ const PermissionGuard: React.FC<TPermissionGuardGuardProps> = (props) => {
     const LayoutWrapper = getLayoutBaseOnPermission(userPermission);
 
     return !authInfoLoaded ? (
-      <LoadingContainer />
+      <FullScreenPageLoading />
     ) : isMatchedPermission && isAuthenticated ? (
       <LayoutWrapper>{children}</LayoutWrapper>
     ) : (

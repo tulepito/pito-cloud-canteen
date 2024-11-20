@@ -1,9 +1,9 @@
 import React from 'react';
 
-import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
+import FullScreenPageLoading from '@components/FullScreenPageLoading/FullScreenPageLoading';
 
 function AuthRoute() {
-  return <LoadingContainer />;
+  return <FullScreenPageLoading />;
 }
 
 export default AuthRoute;

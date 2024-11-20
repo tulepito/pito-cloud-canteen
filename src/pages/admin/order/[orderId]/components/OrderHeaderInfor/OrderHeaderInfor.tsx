@@ -141,7 +141,7 @@ const OrderHeaderInfor: React.FC<OrderHeaderInforProps> = (props) => {
                     />
                     <Button
                       onClick={onSaveStaffName}
-                      variant="cta"
+                      variant="primary"
                       inProgress={updateOrderStaffNameInProgress}
                       disabled={pristine || isCanceledOrder}>
                       Lưu

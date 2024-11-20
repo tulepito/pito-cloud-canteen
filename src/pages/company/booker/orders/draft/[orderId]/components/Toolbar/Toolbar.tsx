@@ -97,13 +97,17 @@ const Toolbar: React.FC<TToolbarProps> = (props) => {
           variant="secondary"
           className={css.secondaryBtn}
           onClick={onRecommendNewRestaurants}>
-          <IconRefreshing inProgress={onRecommendRestaurantInProgress} />
+          <IconRefreshing
+            inProgress={onRecommendRestaurantInProgress}
+            className={css.refreshIcon}
+          />
           {intl.formatMessage({
             id: 'Booker.CreateOrder.Toolbar.suggestNewRestaurant',
           })}
         </Button>
+
         <Button
-          variant="cta"
+          variant="primary"
           onClick={onFinishOrder}
           disabled={finishDisabled}
           loadingMode="extend"
@@ -125,7 +129,7 @@ const Toolbar: React.FC<TToolbarProps> = (props) => {
           })}
         </Button>
         <Button
-          variant="cta"
+          variant="primary"
           className={css.ctaBtn}
           onClick={onFinishOrder}
           disabled={finishDisabled}

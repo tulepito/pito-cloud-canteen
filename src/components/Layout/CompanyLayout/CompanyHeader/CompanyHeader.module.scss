@@ -55,6 +55,36 @@
       font-size: 16px;
       font-weight: $fontWeightBold;
       color: $neutralGray7;
+      position: relative;
+      overflow: hidden;
+      display: inline-flex;
+      align-items: center;
+      cursor: pointer;
+
+      span {
+        display: inline-flex;
+        align-items: center;
+        transition: transform 0.3s ease-in-out;
+      }
+
+      .staticText {
+        transform: translateY(0);
+      }
+
+      .hoverText {
+        position: absolute;
+        left: 0;
+        transform: translateY(100%);
+      }
+
+      &:hover {
+        .staticText {
+          transform: translateY(-100%);
+        }
+        .hoverText {
+          transform: translateY(0);
+        }
+      }
     }
 
     .separator {

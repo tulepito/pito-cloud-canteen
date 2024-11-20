@@ -48,7 +48,7 @@ $buttonBorderRadius: 8px;
 }
 
 @mixin buttonColorPrimary {
-  background: $neutralGray7;
+  background-color: $neutralGray7;
   color: $neutralGray1;
 
   .spinner {
@@ -59,21 +59,47 @@ $buttonBorderRadius: 8px;
   }
 
   &:hover {
-    background: $neutralGray1;
-    border-color: $neutralGray7;
-    color: $neutralGray7;
+    background-color: rgba($neutralGray7, 0.95);
+    border-color: rgba($neutralGray7, 0.95);
+    color: $neutralGray1;
 
     .spinner,
     svg {
-      stroke: $neutralGray7;
+      stroke: inherit;
     }
+
+    // path {
+    //   fill: $neutralGray1;
+    // }
   }
 
   &:disabled {
-    background: $neutralGray2;
-    color: $neutralGray5;
-    border-color: $neutralGray5;
+    background-color: $neutralGray6;
+    color: $neutralGray1;
+    border-color: $neutralGray6;
     cursor: not-allowed;
+  }
+
+  &.inProgress {
+    background-color: $neutralGray7;
+    border-color: $neutralGray7;
+    color: $neutralGray1;
+    cursor: progress;
+
+    .spinner {
+      stroke: $neutralGray1;
+    }
+
+    &:hover {
+      background-color: $neutralGray7;
+      border-color: $neutralGray7;
+      color: $neutralGray1;
+
+      .spinner,
+      svg {
+        stroke: $neutralGray1;
+      }
+    }
   }
 }
 
@@ -87,19 +113,19 @@ $buttonBorderRadius: 8px;
   }
 
   &:hover {
-    background-color: $neutralGray7;
-    color: $neutralGray1;
-    border-color: $neutralGray1;
+    background-color: $neutralGray2;
+    color: $neutralGray7;
+    border-color: $neutralGray5;
 
     svg {
-      stroke: $neutralGray1;
+      stroke: inherit;
 
       path {
-        stroke: $neutralGray1;
+        stroke: inherit;
       }
     }
     .spinner {
-      stroke: $neutralGray1;
+      stroke: $neutralGray7;
     }
   }
 
@@ -107,6 +133,25 @@ $buttonBorderRadius: 8px;
     background-color: $neutralGray2;
     color: $neutralGray5;
     border-color: $neutralGray5;
+
+    svg {
+      opacity: 0.4;
+    }
+  }
+
+  &.inProgress {
+    cursor: progress;
+
+    &:hover {
+      background-color: $neutralGray1;
+      border-color: $neutralGray5;
+      color: $neutralGray7;
+
+      .spinner,
+      svg {
+        stroke: $neutralGray7;
+      }
+    }
   }
 }
 
@@ -118,37 +163,68 @@ $buttonBorderRadius: 8px;
 
   &:hover {
     background-color: $neutralGray2;
+    color: $neutralGray7;
   }
 
   &:disabled {
     color: $neutralGray5;
     background-color: $neutralGray1;
+
+    svg {
+      opacity: 0.4;
+    }
   }
 }
 
 @mixin buttonColorCTA {
   background-color: $primaryPri2;
   color: $neutralGray1;
-  outline: none;
 
   .spinner {
+    width: 24px;
+    height: 24px;
     stroke: $neutralGray1;
+    stroke-width: 3px;
   }
 
   &:hover {
-    background-color: $buttonCTAHoverColor;
+    background-color: rgba($primaryPri2, 0.95);
+    border-color: rgba($primaryPri2, 0.95);
     color: $neutralGray1;
-    border-color: transparent;
 
-    .spinner {
-      stroke: $primaryPri2;
+    .spinner,
+    svg {
+      stroke: inherit;
     }
   }
 
   &:disabled {
-    background: $neutralGray2;
-    color: $neutralGray5;
-    border: 1px solid $neutralGray5;
+    background-color: $buttonCTAHoverColor;
+    color: $neutralGray1;
+    border-color: $buttonCTAHoverColor;
+    cursor: not-allowed;
+  }
+
+  &.inProgress {
+    background-color: $primaryPri2;
+    border-color: $primaryPri2;
+    color: $neutralGray1;
+    cursor: progress;
+
+    .spinner {
+      stroke: $neutralGray1;
+    }
+
+    &:hover {
+      background-color: $primaryPri2;
+      border-color: $primaryPri2;
+      color: $neutralGray1;
+
+      .spinner,
+      svg {
+        stroke: $neutralGray1;
+      }
+    }
   }
 }
 

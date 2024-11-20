@@ -17,16 +17,26 @@ const CompanyFooter = () => {
           <PitoLogo variant="secondary" />
         </div>
         <div className={css.socials}>
-          <Link href={config.siteFacebookPage} target="_blank">
+          <Link
+            href={config.siteFacebookPage}
+            target="_blank"
+            className={css.facebook}>
             <IconFacebook />
           </Link>
-          <Link href={config.siteInstagramPage} target="_blank">
+          <Link
+            href={config.siteInstagramPage}
+            target="_blank"
+            className={css.instagram}>
             <IconInstagram />
           </Link>
-          <Link href={config.siteLinkedInPage} target="_blank">
+          <Link
+            href={config.siteLinkedInPage}
+            target="_blank"
+            className={css.linkedin}>
             <IconLinkedIn />
           </Link>
         </div>
+
         <div className={css.sloganWrapper}>
           <p className={css.slogan}>Ⓒ 2024 PITO Cloud Canteen</p>
           <p className={css.slogan}>

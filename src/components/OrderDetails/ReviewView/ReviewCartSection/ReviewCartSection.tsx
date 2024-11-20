@@ -216,7 +216,7 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
     <>
       <RenderWhen condition={showStartPickingOrderButton}>
         <Button
-          variant="cta"
+          variant="primary"
           className={css.makePaymentButton}
           inProgress={
             _isPickingOrderStarting ||
@@ -254,12 +254,14 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
           </Button>
         </RenderWhen>
         <RenderWhen condition={canReview}>
-          <Button
-            variant="primary"
-            className={css.reviewButton}
-            onClick={goToReviewPage}>
-            {reviewText}
-          </Button>
+          {goToReviewPage && (
+            <Button
+              variant="secondary"
+              className={css.reviewButton}
+              onClick={goToReviewPage}>
+              {reviewText}
+            </Button>
+          )}
         </RenderWhen>
       </div>
 

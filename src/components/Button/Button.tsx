@@ -108,7 +108,7 @@ const Button: React.FC<TButtonProps> = (props) => {
   // the client side is handling the submit.
   const buttonDisabled = mounted ? disabled : true;
   // eslint-disable-next-line @typescript-eslint/naming-convention, no-underscore-dangle
-  const _onClick = buttonDisabled ? () => {} : props.onClick;
+  const _onClick = buttonDisabled || inProgress ? () => {} : props.onClick;
 
   return (
     <button

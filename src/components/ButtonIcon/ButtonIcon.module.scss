@@ -6,13 +6,8 @@
   @include buttonFont;
   @include buttonText;
   @include buttonBorders;
-  @include buttonColorPrimary;
   @include flexCenter;
   padding: 0;
-
-  &:hover path {
-    fill: $neutralGray7;
-  }
 }
 
 .smallButton {

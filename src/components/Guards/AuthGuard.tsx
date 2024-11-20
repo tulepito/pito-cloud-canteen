@@ -3,7 +3,7 @@ import type { PropsWithChildren } from 'react';
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/router';
 
-import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
+import FullScreenPageLoading from '@components/FullScreenPageLoading/FullScreenPageLoading';
 import { getItem } from '@helpers/localStorageHelpers';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { authThunks } from '@redux/slices/auth.slice';
@@ -88,7 +88,7 @@ const AuthGuard: React.FC<TAuthGuardProps> = ({ children }) => {
       (!isNonRequireAuthenticationRoute && !isAuthenticated);
 
     if (loadingCondition) {
-      return <LoadingContainer />;
+      return <FullScreenPageLoading />;
     }
 
     return children;

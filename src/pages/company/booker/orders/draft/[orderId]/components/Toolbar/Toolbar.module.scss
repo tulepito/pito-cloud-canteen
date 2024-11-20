@@ -80,10 +80,6 @@
   &:last-child {
     margin-right: 0;
   }
-
-  & svg {
-    margin-right: 10px;
-  }
 }
 
 .secondaryBtn {
@@ -95,12 +91,7 @@
 
   .refreshIcon {
     margin-right: 8px;
-  }
-  &:hover,
-  &:focus {
-    & svg path {
-      fill: $neutralGray1;
-    }
+    margin-top: 1px;
   }
 }
 

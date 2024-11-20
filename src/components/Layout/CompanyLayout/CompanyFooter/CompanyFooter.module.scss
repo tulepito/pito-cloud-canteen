@@ -28,6 +28,7 @@
         display: block;
       }
     }
+
     .socials {
       @include flexAlign(center);
       gap: 20px;
@@ -35,7 +36,47 @@
       @include viewportMedium {
         order: 3;
       }
+
+      a {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.3s ease, fill 0.3s ease;
+
+        svg path {
+          transition: fill 0.3s ease;
+        }
+
+        &:hover {
+          transform: scale(1.1);
+        }
+      }
+
+      .facebook {
+        &:hover {
+          path {
+            fill: #1877f2;
+          }
+        }
+      }
+
+      .instagram {
+        &:hover {
+          path {
+            fill: #e4405f;
+          }
+        }
+      }
+
+      .linkedin {
+        &:hover {
+          path {
+            fill: #0077b5;
+          }
+        }
+      }
     }
+
     .sloganWrapper {
       @include viewportLarge {
         order: 2;

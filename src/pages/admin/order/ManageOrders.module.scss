@@ -225,7 +225,6 @@
 
 .filterIcon {
   margin-right: 10px;
-  fill: $neutralGray7;
 }
 
 .filterBtn {
@@ -241,12 +240,5 @@
   .filterIcon {
     width: 16px;
     height: 14px;
-  }
-
-  &:hover,
-  &:focus {
-    .filterIcon * {
-      fill: $neutralGray1;
-    }
   }
 }
