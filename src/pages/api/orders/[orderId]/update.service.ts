@@ -92,7 +92,7 @@ const updateOrder = async ({
         .toMillis();
       const timeExpression = formatTimestamp(
         reminderTime,
-        "yyyy-MM-dd'T'hh:mm:ss",
+        "yyyy-MM-dd'T'HH:mm:ss",
       );
       try {
         await getScheduler(schedulerName);

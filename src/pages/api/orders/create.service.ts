@@ -47,14 +47,14 @@ const createDeadlineScheduler = async ({
     await getScheduler(`sendRemindPOE${orderFlexId}`);
     await updateScheduler({
       customName: `sendRemindPOE${orderFlexId}`,
-      timeExpression: formatTimestamp(reminderTime, "yyyy-MM-dd'T'hh:mm:ss"),
+      timeExpression: formatTimestamp(reminderTime, "yyyy-MM-dd'T'HH:mm:ss"),
       arn: process.env.LAMBDA_ARN,
     });
   } catch (error) {
     console.error('create scheduler in create order');
     await createScheduler({
       customName: `sendRemindPOE${orderFlexId}`,
-      timeExpression: formatTimestamp(reminderTime, "yyyy-MM-dd'T'hh:mm:ss"),
+      timeExpression: formatTimestamp(reminderTime, "yyyy-MM-dd'T'HH:mm:ss"),
       arn: process.env.LAMBDA_ARN,
       params: {
         orderId: orderFlexId,

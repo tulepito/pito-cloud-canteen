@@ -132,9 +132,9 @@ export const recommendRestaurantForSpecificDay = async ({
 
     return {
       ...orderDetail,
-      lineItems: initLineItemsFromFoodList(foodList, isNormalOrder),
       [timestamp]: {
         ...orderDetail[timestamp],
+        lineItems: initLineItemsFromFoodList(foodList, isNormalOrder),
         restaurant: prepareRestaurantDataForOrderDetail(
           restaurant,
           menu,
