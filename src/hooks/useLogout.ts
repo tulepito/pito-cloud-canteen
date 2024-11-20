@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import { removeItem } from '@helpers/localStorageHelpers';
 import { authThunks } from '@redux/slices/auth.slice';
 import { userActions } from '@redux/slices/user.slice';
-import { generalPaths } from '@src/paths';
+import { enGeneralPaths, generalPaths } from '@src/paths';
 
 import { useAppDispatch } from './reduxHooks';
 
@@ -17,7 +17,10 @@ export const useLogout = () => {
     await dispatch(authThunks.logout(oneSignalInfo!));
     dispatch(userActions.clearCurrentUser());
     removeItem('userRole');
-    router.push(generalPaths.SignIn);
+    router.push({
+      pathname: generalPaths.SignIn,
+      query: { from: enGeneralPaths.Auth },
+    });
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
