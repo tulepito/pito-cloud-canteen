@@ -28,9 +28,14 @@
   }
   .heroInfo {
     position: absolute;
-    bottom: 24px;
-    left: 32px;
+    bottom: 16px;
+    left: 16px;
     z-index: 1;
+
+    @include viewportMedium {
+      bottom: 24px;
+      left: 24px;
+    }
     width: calc(100% - 32px);
 
     .heroOrderDay {
@@ -40,17 +45,14 @@
     }
     .heroTitle {
       margin: 0;
-      @include textTemplate(24px, 700, 32px);
+      @include textTemplate(18px, 600, 1);
+      @include lineClamp(3, 1.2);
 
       @include viewportMedium {
-        @include textTemplate(34px, 700, 44px);
+        @include textTemplate(24px, 600, 1);
+        @include lineClamp(3, 1.2);
       }
       color: $neutralGray1;
-      text-transform: capitalize;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-      overflow: hidden;
-      width: calc(100% - 40px);
     }
   }
 }

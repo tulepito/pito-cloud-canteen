@@ -12,7 +12,6 @@ import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput
 import IconMinus from '@components/Icons/IconMinus/IconMinus';
 import IconPlusWithoutBorder from '@components/Icons/IconPlusWithoutBorder/IconPlusWithoutBorder';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
-import { shortenString } from '@utils/string';
 
 import css from './EditOrderRowForm.module.scss';
 
@@ -62,7 +61,16 @@ const EditOrderRowFormComponent: React.FC<TEditOrderRowFormComponentProps> = (
     () =>
       foodOptions?.map((f) => ({
         key: f.foodId,
-        label: shortenString(f.foodName, 16),
+        label: (
+          <p
+            style={{
+              lineHeight: 1.4,
+              margin: 0,
+            }}
+            title={f.foodName}>
+            {f.foodName}
+          </p>
+        ),
       })),
 
     [JSON.stringify(foodOptions)],

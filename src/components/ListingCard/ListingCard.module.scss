@@ -6,6 +6,8 @@
   border-radius: 10px;
   overflow: hidden;
   border: 1px solid $neutralGray3;
+  display: flex;
+  flex-direction: column;
 
   @include viewportMedium {
     min-width: 280px;
@@ -18,7 +20,9 @@
   width: 100%;
   .listingCardContent {
     padding: 12px;
-    height: 180px;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
     position: relative;
   }
 }
@@ -39,18 +43,14 @@
 
 .listingCardInfo {
   cursor: pointer;
+  flex: 1;
   margin-bottom: 12px;
   padding-bottom: 8px;
 
   .title {
-    @include textTemplate(16px, 700, 24px, '');
+    @include textTemplate(14px, 600, 18px, '');
     color: $neutralGray7;
     margin: 0 0 4px 0;
-    text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-line-clamp: 1; /* number of lines to show */
-    -webkit-box-orient: vertical;
-    overflow: hidden;
   }
 
   .categories {
@@ -77,11 +77,6 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  bottom: 0;
-  width: calc(100% - 24px);
   padding: 12px 0;
   border-top: 1px solid $neutralGray3;
 

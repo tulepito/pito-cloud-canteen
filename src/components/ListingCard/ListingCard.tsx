@@ -97,47 +97,43 @@ const ListingCard: React.FC<TListCardProps> = ({
 
   return (
     <div className={classes}>
-      <div>
-        <div className={css.listingImage} onClick={viewListingDetail}>
-          <ResponsiveImage
-            image={listingImage}
-            alt={title}
-            variants={[EImageVariants.landscapeCrop]}
-            emptyType="food"
-          />
+      <div className={css.listingImage} onClick={viewListingDetail}>
+        <ResponsiveImage
+          image={listingImage}
+          alt={title}
+          variants={[EImageVariants.landscapeCrop]}
+          emptyType="food"
+        />
+      </div>
+      <div className={css.listingCardContent}>
+        <div className={css.listingCardInfo} onClick={viewListingDetail}>
+          <h6 className={css.title}>{title}</h6>
+          <div className={css.categories} style={{ marginTop: '8px' }}>
+            <Badge
+              className={css.badge}
+              label={getLabelByKey(FOOD_TYPE_OPTIONS, foodType)}
+              type={EBadgeType.success}
+            />
+          </div>
+          <p className={css.description}>{description}</p>
         </div>
-        <div className={css.listingCardContent}>
-          <div className={css.listingCardInfo} onClick={viewListingDetail}>
-            <h6 className={css.title}>{title}</h6>
-            <div className={css.categories}>
-              <Badge
-                className={css.badge}
-                label={getLabelByKey(FOOD_TYPE_OPTIONS, foodType)}
-                type={EBadgeType.success}
-              />
-            </div>
-            <p className={css.description}>{description}</p>
-          </div>
-          <div className={css.listingCardFooter}>
-            <p className={css.allergiesLabel}>
-              {allergicIngredients
-                .map((item: string) => `Có ${item}`)
-                .join(', ')}
-            </p>
-            {isSelected ? (
-              <span className={css.removeDish} onClick={handleRemoveFromCard}>
-                <IconCheckmarkWithCircle />
-              </span>
-            ) : (
-              <span
-                className={classNames(css.addDish, {
-                  [css.selectDisabled]: selectDisabled,
-                })}
-                onClick={handleAddToCard}>
-                <IconPlusDish />
-              </span>
-            )}
-          </div>
+        <div className={css.listingCardFooter}>
+          <p className={css.allergiesLabel}>
+            {allergicIngredients.map((item: string) => `Có ${item}`).join(', ')}
+          </p>
+          {isSelected ? (
+            <span className={css.removeDish} onClick={handleRemoveFromCard}>
+              <IconCheckmarkWithCircle />
+            </span>
+          ) : (
+            <span
+              className={classNames(css.addDish, {
+                [css.selectDisabled]: selectDisabled,
+              })}
+              onClick={handleAddToCard}>
+              <IconPlusDish />
+            </span>
+          )}
         </div>
       </div>
       <ListingDetailModal

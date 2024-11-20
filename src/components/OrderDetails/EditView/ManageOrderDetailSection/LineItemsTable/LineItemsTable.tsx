@@ -22,7 +22,6 @@ import {
 } from '@redux/slices/OrderManagement.slice';
 import { Listing } from '@src/utils/data';
 import { EOrderStates } from '@src/utils/enums';
-import { shortenString } from '@src/utils/string';
 import type { TListing, TObject } from '@src/utils/types';
 
 import { LineItemsTableComponent } from './LineItemsTableComponent';
@@ -152,7 +151,7 @@ const LineItemsTable: React.FC<TLineItemsTableProps> = (props) => {
   }, [JSON.stringify(foodList), JSON.stringify(lineItems)]);
 
   const parsedFoodOptions = foodOptions?.map((f) => ({
-    label: shortenString(f.name, 18),
+    label: f.name,
     key: f.id,
   }));
 

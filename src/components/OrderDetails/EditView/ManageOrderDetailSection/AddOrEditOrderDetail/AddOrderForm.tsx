@@ -23,7 +23,6 @@ import {
 } from '@redux/slices/OrderManagement.slice';
 import type { TObject } from '@src/utils/types';
 import { EMAIL_RE, VALID } from '@src/utils/validators';
-import { shortenString } from '@utils/string';
 
 import css from './AddOrderForm.module.scss';
 
@@ -142,7 +141,16 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
   );
 
   const parsedFoodOptions = foodOptions?.map((f) => ({
-    label: shortenString(f.foodName, 18),
+    label: (
+      <p
+        style={{
+          lineHeight: 1.4,
+          margin: 0,
+        }}
+        title={f.foodName}>
+        {f.foodName}
+      </p>
+    ),
     key: f.foodId,
   }));
 

@@ -4,14 +4,11 @@ import classNames from 'classnames';
 import Avatar from '@components/Avatar/Avatar';
 import IconCheckWithBackground from '@components/Icons/IconCheckWithBackground/IconCheckWithBackground';
 import IconClose from '@components/Icons/IconClose/IconClose';
-import { shortenString } from '@utils/string';
 import type { TDefaultProps, TUser } from '@utils/types';
 
 import css from './ParticipantCard.module.scss';
 
 const DEFAULT_AVATAR_PATH = '/images/defaultAvatar_small.png';
-const MAXLENGTH_NAME = 26;
-const MAXLENGTH_EMAIL = 26;
 
 type TParticipantCardProps = TDefaultProps & {
   avatar?: any;
@@ -39,9 +36,6 @@ const ParticipantCard: React.FC<TParticipantCardProps> = (props) => {
   } = props;
   const rootClasses = classNames(rootClassName || css.root, className);
 
-  const formattedName = shortenString(name, MAXLENGTH_NAME);
-  const formattedEmail = shortenString(email, MAXLENGTH_EMAIL);
-
   return (
     <div className={rootClasses}>
       <div className={css.avatarContainer}>
@@ -58,8 +52,8 @@ const ParticipantCard: React.FC<TParticipantCardProps> = (props) => {
         {hasCheckIcon && <IconCheckWithBackground className={css.checkIcon} />}
       </div>
       <div className={css.infoContainer}>
-        <div title={name}>{formattedName}</div>
-        <div title={email}>{formattedEmail}</div>
+        <div title={name}>{name}</div>
+        <div title={email}>{email}</div>
       </div>
       {hasDeleteIcon && ableToRemove && (
         <div className={css.closeIconContainer} onClick={onClickDeleteIcon}>

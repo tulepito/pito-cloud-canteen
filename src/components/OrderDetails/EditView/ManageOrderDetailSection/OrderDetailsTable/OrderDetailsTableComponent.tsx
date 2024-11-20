@@ -13,7 +13,6 @@ import { parseThousandNumber } from '@helpers/format';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { useViewport } from '@hooks/useViewport';
 import { orderDetailsAnyActionsInProgress } from '@redux/slices/OrderManagement.slice';
-import { shortenString } from '@src/utils/string';
 import { EParticipantOrderStatus } from '@utils/enums';
 import type { TObject } from '@utils/types';
 
@@ -23,8 +22,6 @@ import type { TItemData } from './OrderDetailsTable.utils';
 import { EOrderDetailsTableTab } from './OrderDetailsTable.utils';
 
 import css from './OrderDetailsTable.module.scss';
-
-const MAX_LENGTH_EMAIL = 20;
 
 const totalTabIdByTabName: TObject<
   Exclude<EOrderDetailsTableTab, EOrderDetailsTableTab.deleted>,
@@ -245,9 +242,7 @@ const OrderDetailsTableComponent: React.FC<
                               </RenderWhen.False>
                             </RenderWhen>
                           </td>
-                          <td title={memberEmail}>
-                            {shortenString(memberEmail, MAX_LENGTH_EMAIL)}
-                          </td>
+                          <td title={memberEmail}>{memberEmail}</td>
                           <td title={foodName}>
                             <RenderWhen condition={isMobileLayout}>
                               <div className={css.mobileNameContainer}>

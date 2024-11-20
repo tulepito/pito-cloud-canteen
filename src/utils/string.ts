@@ -11,26 +11,6 @@ export const splitNameFormFullName = (fullName: string) => {
   };
 };
 
-export const shortenString = (
-  str: string,
-  maxLength: number,
-  position: 'end' | 'center' = 'center',
-) => {
-  const stringLength = str?.length;
-
-  if (stringLength <= maxLength) {
-    return str;
-  }
-
-  if (position === 'end') {
-    return `${str?.slice(0, maxLength)}...`;
-  }
-
-  return `${str?.slice(0, maxLength / 2)}...${str?.slice(
-    stringLength - maxLength / 2,
-  )}`;
-};
-
 export const removeAccents = (str: string) => {
   return str ? str.normalize('NFD').replace(/[\u0300-\u036f]/g, '') : '';
 };

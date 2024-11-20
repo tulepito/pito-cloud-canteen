@@ -118,7 +118,9 @@ export const FieldDropdownSelectComponent: React.FC<TFieldDropdownSelect> = (
             <span className={placeholderClasses}>{placeholder}</span>
           )}
           <RenderWhen.False>
-            <span className={valueClasses}>
+            <span
+              className={classNames(valueClasses, 'one-line-text')}
+              style={{ width: 'calc(100% - 20px)' }}>
               {find(options, (_option: any) => _option.key === value)?.label ||
                 options[0]?.label}
             </span>
@@ -136,7 +138,7 @@ export const FieldDropdownSelectComponent: React.FC<TFieldDropdownSelect> = (
                 css.dropdownItem,
                 value === option.key && css.selected,
               )}>
-              {option.label}
+              <div className="three-line-text">{option.label}</div>
             </div>
           ))}
         </div>

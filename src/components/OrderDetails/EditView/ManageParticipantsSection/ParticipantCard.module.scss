@@ -4,8 +4,9 @@
 .root {
   display: flex;
   align-items: center;
-  padding: 4px 12px;
+  padding: 8px 12px;
   border-radius: 8px;
+  transition: all ease-in-out 0.2s;
 
   &:hover {
     background-color: $neutralGray3;

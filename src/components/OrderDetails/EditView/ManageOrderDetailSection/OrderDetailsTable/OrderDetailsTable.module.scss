@@ -324,7 +324,6 @@
 
 .foodName {
   @include textTemplate(14px, 400, 20px);
-  @include lineClamp(2);
   min-height: 32px;
   @include viewportMedium {
     min-height: unset;
