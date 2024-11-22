@@ -7,6 +7,7 @@ import Link from 'next/link';
 import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
 import PitoLogoV2 from '@components/PitoLogoV2/PitoLogoV2';
+import { enGeneralPaths } from '@src/paths';
 
 import css from './EmailVerificationForm.module.scss';
 
@@ -93,7 +94,7 @@ const EmailVerificationFormComponent: React.FC<
         </p>
         <div className={css.divider}></div>
         <Button>
-          <Link className={css.submitButton} href="/">
+          <Link className={css.submitButton} href={enGeneralPaths.Auth}>
             <FormattedMessage id="EmailVerificationForm.successButtonText" />
           </Link>
         </Button>
@@ -117,7 +118,7 @@ const EmailVerificationFormComponent: React.FC<
         </p>
         <div className={css.divider}></div>
         <Button>
-          <Link className={css.submitButton} href="/">
+          <Link className={css.submitButton} href={enGeneralPaths.Auth}>
             <FormattedMessage id="EmailVerificationForm.successButtonText" />
           </Link>
         </Button>
