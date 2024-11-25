@@ -1,16 +1,19 @@
 import { useEffect, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
+import type { StaticImageData } from 'next/image';
 
 import Modal from '@components/Modal/Modal';
 import NamedLink from '@components/NamedLink/NamedLink';
 import { useAppSelector } from '@hooks/reduxHooks';
+import initializingOrder from '@src/assets/initializingOrder.webp';
+import menuIncoming from '@src/assets/menuIncoming.webp';
+import redirectToCalendarPage from '@src/assets/redirectToCalendarPage.webp';
+import waitingAlitteBit from '@src/assets/waitingAlitteBit.webp';
 import { companyPaths } from '@src/paths';
 import { Listing } from '@src/utils/data';
 import { formatTimestamp } from '@src/utils/dates';
 import type { TListing } from '@src/utils/types';
-
-import Spinner from '../meal-date/Spinner';
 
 import css from './QuizCreateOrderLoadingModal.module.scss';
 
@@ -30,6 +33,7 @@ const QuizCreateOrderLoadingModal: React.FC<
   const intl = useIntl();
   const [loadingText, setLoadingText] = useState<string>(middleLoadingSteps[0]);
   const loadingTextIndex = useRef<number>(0);
+
   const createOrderInProcess = useAppSelector(
     (state) => state.Order.createOrderInProcess,
   );
@@ -63,6 +67,76 @@ const QuizCreateOrderLoadingModal: React.FC<
     }
   }, [initialOrderDetailInProgress]);
 
+  const message = createOrderInProcess
+    ? intl.formatMessage({
+        id: 'QuizCreatingOrderPage.initializingOrder',
+      })
+    : initialOrderDetailInProgress
+    ? intl.formatMessage({
+        id: loadingText,
+      })
+    : orderTitle && !initialOrderDetailInProgress
+    ? intl.formatMessage({
+        id: 'QuizCreatingOrderPage.redirectToCalendarPage',
+      })
+    : creatingOrderError
+    ? intl.formatMessage({
+        id: 'QuizCreatingOrderPage.initializeOrderError',
+      })
+    : '';
+
+  const messageMap: Record<string, StaticImageData> = {
+    initializingOrder,
+    menuIncoming,
+    waitingAlitteBit,
+    redirectToCalendarPage,
+  };
+
+  const imageStyles: Record<
+    string,
+    { backgroundSize: string; backgroundPosition: string }
+  > = {
+    initializingOrder: {
+      backgroundSize: '125%',
+      backgroundPosition: '45% 38%',
+    },
+    menuIncoming: {
+      backgroundSize: '120%',
+      backgroundPosition: '45% 53%',
+    },
+    waitingAlitteBit: {
+      backgroundSize: '132%',
+      backgroundPosition: '57% 12%',
+    },
+    redirectToCalendarPage: {
+      backgroundSize: '130%',
+      backgroundPosition: '43% 49%',
+    },
+  };
+
+  const renderLoadingImage = (
+    messageKey: string,
+    imageSrc: StaticImageData,
+  ) => {
+    const { backgroundSize, backgroundPosition } =
+      imageStyles[messageKey] || {};
+
+    return (
+      <div
+        className={`${css.loadingImage} ${
+          message ===
+          intl.formatMessage({ id: `QuizCreatingOrderPage.${messageKey}` })
+            ? css.visible
+            : css.hidden
+        }`}
+        style={{
+          backgroundImage: `url(${imageSrc.src})`,
+          backgroundSize: backgroundSize || '125%',
+          backgroundPosition: backgroundPosition || '43% 49%',
+        }}></div>
+    );
+  };
+
   return (
     <Modal
       isOpen
@@ -72,30 +146,15 @@ const QuizCreateOrderLoadingModal: React.FC<
       shouldHideIconClose>
       <div className={css.container}>
         {!creatingOrderError && (
-          <div className={css.iconWrapper}>
-            <Spinner className={css.loadingIcon} />
+          <div className={css.loadingImageWrapper}>
+            {Object.keys(messageMap).map((key) =>
+              renderLoadingImage(key, messageMap[key]),
+            )}
           </div>
         )}
-        <div className={css.initialOrderText}>
-          {createOrderInProcess &&
-            intl.formatMessage({
-              id: 'QuizCreatingOrderPage.initializingOrder',
-            })}
-          {initialOrderDetailInProgress &&
-            intl.formatMessage({
-              id: loadingText,
-            })}
 
-          {orderTitle &&
-            !initialOrderDetailInProgress &&
-            intl.formatMessage({
-              id: 'QuizCreatingOrderPage.redirectToCalendarPage',
-            })}
-          {creatingOrderError &&
-            intl.formatMessage({
-              id: 'QuizCreatingOrderPage.initializeOrderError',
-            })}
-        </div>
+        <div className={css.initialOrderText}>{message}</div>
+
         {creatingOrderError && (
           <div className={css.error}>
             <NamedLink
@@ -104,6 +163,7 @@ const QuizCreateOrderLoadingModal: React.FC<
             />
           </div>
         )}
+
         {orderTitle && !creatingOrderError && (
           <div className={css.orderTitle}>{`#${orderTitle}`}</div>
         )}

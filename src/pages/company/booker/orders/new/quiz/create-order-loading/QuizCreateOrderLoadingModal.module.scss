@@ -43,7 +43,7 @@
 
 .initialOrderText {
   @include textTemplate(16px, $fontWeightBold, 24px);
-  margin-top: 12px;
+  margin-top: 24px;
 
   @include viewportLarge {
     @include textTemplate(24px, $fontWeightBold, 32px);
@@ -78,7 +78,68 @@
 .modalContainer.modalContainer {
   flex-basis: calc(100vw - 32px);
 
-  @include viewportLarge {
+  @include viewportMedium {
     flex-basis: 480px;
+  }
+}
+
+.loadingImageWrapper {
+  margin: 24px auto 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  width: 246px;
+  height: 240px;
+
+  @include viewportLarge {
+    margin: 40px auto 0;
+  }
+}
+
+.loadingImage {
+  width: 246px;
+  height: 240px;
+  border-radius: 1000px;
+
+  position: absolute;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.5s ease, visibility 0.5s ease;
+
+  &.visible {
+    opacity: 1;
+    visibility: visible;
+    animation: shake 0.5s ease-out;
+  }
+
+  &.hidden {
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  img {
+    width: 246px;
+    height: 240px;
+    border-radius: 1000px;
+    object-fit: cover;
+  }
+}
+
+@keyframes shake {
+  0% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  50% {
+    transform: translateX(5px);
+  }
+  75% {
+    transform: translateX(-5px);
+  }
+  100% {
+    transform: translateX(0);
   }
 }
