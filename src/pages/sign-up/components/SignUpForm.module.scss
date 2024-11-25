@@ -3,17 +3,11 @@
 @use '/src/styles/mixins.scss' as *;
 
 .root {
-  padding: 32px 16px 16px;
   width: 100%;
-  min-height: 100vh;
-  min-height: 100dvh;
-  display: flex;
-  flex-direction: column;
-  row-gap: 55px;
-  justify-content: space-between;
+  padding: 0;
 
   @include viewportMedium {
-    padding-top: 48px;
+    padding: 20px 0;
   }
 }
 
@@ -23,62 +17,78 @@
   display: flex;
   justify-content: center;
   flex-direction: column;
+  border-radius: 16px;
+  padding: 20px;
 
   @include viewportMedium {
-    max-width: 375px;
+    padding: 28px 32px;
+    width: 480px;
+    background-color: white;
+    box-shadow: 4px 4px 35.1px -4px rgba(16, 24, 40, 0.1);
   }
 }
 
 .formTitle {
   color: $neutralGray7;
   @include textTemplate(24px, $fontWeightBold, 32px);
-  text-transform: capitalize;
+  text-align: center;
+  margin-bottom: 10px;
 
   @include viewportMedium {
-    font-size: 32px;
+    @include textTemplate(28px, $fontWeightBold, 36px);
   }
 }
 
 .policyText {
   @include textTemplate(14px, $fontWeightRegular, 20px);
-  color: $neutralGray6;
+  color: $neutralGray7;
 }
 
 .privacyPolicyText {
   cursor: pointer;
+  font-weight: 700;
+  color: #039ee1;
+  text-decoration: underline;
+
+  &:hover {
+    opacity: 0.8;
+  }
 }
 
 .haveAccountContainer {
-  margin-bottom: 24px;
+  margin: 8px 0px 12px;
+  @include textTemplate(14px, 400, 20px);
+  text-align: center;
+
+  .toSignIn {
+    color: $neutralGray7;
+    cursor: pointer;
+    text-decoration: underline;
+    font-weight: 700;
+
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+
+  @include viewportMedium {
+    margin: 6px 0px 12px;
+  }
 }
 
 .errorSignUp {
-  margin-top: 35px;
-  margin-bottom: 20px;
-  font-size: 14px;
+  @include textTemplate(14px, 400, 20px);
+  margin-top: 4px;
   text-align: left;
   color: $sematicRed2;
 }
 
 .submitButton {
-  background-color: $primaryPri2;
-  color: $neutralGray1;
-  font-size: 16px;
-  cursor: pointer;
-  padding: 8px 0;
-  border-radius: 8px;
+  margin-top: 28px;
+  width: 100%;
 
   @include viewportMedium {
-    width: 100%;
-  }
-}
-
-.desktopView {
-  display: none;
-
-  @include viewportMedium {
-    margin-top: 40px;
-    display: block;
+    margin-top: 24px;
   }
 }
 
@@ -89,7 +99,8 @@
     display: none;
   }
 }
-.toSignIn {
-  color: $primaryPri2;
-  cursor: pointer;
+
+.errorClass {
+  margin-bottom: 0;
+  margin-top: 8px;
 }

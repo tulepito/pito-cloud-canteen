@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { type ReactNode } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
@@ -10,10 +10,6 @@ import Form from '@components/Form/Form';
 import FieldCheckbox from '@components/FormFields/FieldCheckbox/FieldCheckbox';
 import FieldPasswordInput from '@components/FormFields/FieldPasswordInput/FieldPasswordInput';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
-import IconLock from '@components/Icons/IconLock/IconLock';
-import IconMail from '@components/Icons/IconMail/IconMail';
-import IconPhone2 from '@components/Icons/IconPhone2/IconPhone2';
-import IconUser2 from '@components/Icons/IconUser2/IconUser2';
 import { generalPaths } from '@src/paths';
 import type { TDefaultProps } from '@utils/types';
 import {
@@ -153,23 +149,27 @@ const SignUpFormComponent: React.FC<TSignUpFormComponentProps> = (props) => {
   return (
     <Form className={classes} onSubmit={handleSubmit}>
       <div className={css.formContainer}>
-        <div className={css.formTitle}>{formTitle}</div>
-        <div className={css.haveAccountContainer}>
-          <div>
-            {haveAnAccountText}{' '}
-            <span className={css.toSignIn} onClick={navigateToSignInPage}>
-              {' '}
-              {toSignIn}
-            </span>
+        <div className="">
+          <div className={css.formTitle}>{formTitle}</div>
+          <div className={css.haveAccountContainer}>
+            <div>
+              {haveAnAccountText}{' '}
+              <span className={css.toSignIn} onClick={navigateToSignInPage}>
+                {' '}
+                {toSignIn}
+              </span>
+            </div>
           </div>
         </div>
+
         <FieldTextInput
           id={formId ? `${formId}.name` : 'name'}
           name="name"
           placeholder={namePlaceholder}
           validate={nameValidators}
           label={nameLabel}
-          leftIcon={<IconUser2 />}
+          errorClass={css.errorClass}
+          // leftIcon={<IconUser2 />}
         />
 
         <FieldTextInput
@@ -178,7 +178,8 @@ const SignUpFormComponent: React.FC<TSignUpFormComponentProps> = (props) => {
           placeholder={emailPlaceholder}
           validate={emailValidators}
           label={emailLabel}
-          leftIcon={<IconMail />}
+          errorClass={css.errorClass}
+          // leftIcon={<IconMail />}
         />
 
         <FieldPasswordInput
@@ -187,7 +188,8 @@ const SignUpFormComponent: React.FC<TSignUpFormComponentProps> = (props) => {
           placeholder={passwordPlaceholder}
           validate={passwordValidators}
           label={passwordLabel}
-          leftIcon={<IconLock />}
+          errorClass={css.errorClass}
+          // leftIcon={<IconLock />}
         />
 
         <FieldPasswordInput
@@ -196,7 +198,8 @@ const SignUpFormComponent: React.FC<TSignUpFormComponentProps> = (props) => {
           placeholder={confirmPasswordPlaceholder}
           validate={confirmPasswordValidators}
           label={confirmPasswordLabel}
-          leftIcon={<IconLock />}
+          errorClass={css.errorClass}
+          // leftIcon={<IconLock />}
         />
 
         <FieldTextInput
@@ -205,22 +208,37 @@ const SignUpFormComponent: React.FC<TSignUpFormComponentProps> = (props) => {
           placeholder={phoneNumberPlaceholder}
           validate={phoneNumberValidators}
           label={phoneNumberLabel}
-          leftIcon={<IconPhone2 />}
+          errorClass={css.errorClass}
+          // leftIcon={<IconPhone2 />}
         />
 
-        <FieldCheckbox
-          id={formId ? `${formId}.privacyAndPolicy` : 'privacyAndPolicy'}
-          name="privacyAndPolicy"
-          label={
-            <div className={css.policyText}>
-              {privacyPolicyPartA}
-              <u className={css.privacyPolicyText}>{privacyPolicyPartB}</u>
-            </div>
-          }
-        />
+        <div
+          style={{
+            marginTop: '-8px',
+          }}>
+          <FieldCheckbox
+            id={formId ? `${formId}.privacyAndPolicy` : 'privacyAndPolicy'}
+            name="privacyAndPolicy"
+            label={
+              <div className={css.policyText}>
+                {privacyPolicyPartA}
+                <a
+                  href="https://pito.vn/cam-nang/dieu-khoan-chinh-sach/"
+                  target="_blank"
+                  rel="noreferrer"
+                  className={css.privacyPolicyText}>
+                  {privacyPolicyPartB}
+                </a>
+              </div>
+            }
+          />
 
-        <div className={css.desktopView}>
+          {errorMessage && (
+            <div className={css.errorSignUp}>{errorMessage}</div>
+          )}
+
           <Button
+            variant="primary"
             inProgress={inProgress}
             className={css.submitButton}
             type="submit"
@@ -228,16 +246,7 @@ const SignUpFormComponent: React.FC<TSignUpFormComponentProps> = (props) => {
             {submitButtonText}
           </Button>
         </div>
-
-        {errorMessage && <div className={css.errorSignUp}>{errorMessage}</div>}
       </div>
-      <Button
-        inProgress={inProgress}
-        className={classNames(css.submitButton, css.mobileView)}
-        type="submit"
-        disabled={submitDisable}>
-        {submitButtonText}
-      </Button>
     </Form>
   );
 };

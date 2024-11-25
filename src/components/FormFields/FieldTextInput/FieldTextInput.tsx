@@ -17,6 +17,7 @@ type InputComponentProps = FieldRenderProps<string, any> &
     disabled?: boolean;
     labelClassName?: string;
     customErrorText?: string;
+    errorClass?: string;
     helperText?: React.ReactNode | string;
     isUncontrolled?: boolean;
     input: any;
@@ -45,6 +46,7 @@ export const FieldTextInputComponent: React.FC<InputComponentProps> = (
     disabled,
     labelClassName,
     customErrorText,
+    errorClass,
     helperText,
     isUncontrolled = false,
     fullWidth = true,
@@ -200,7 +202,7 @@ export const FieldTextInputComponent: React.FC<InputComponentProps> = (
       {shouldShowHelperText && (
         <div className={css.helperText}>{helperText}</div>
       )}
-      <ValidationError fieldMeta={fieldMeta} />
+      <ValidationError fieldMeta={fieldMeta} className={errorClass} />
     </div>
   );
 };

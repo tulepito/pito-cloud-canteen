@@ -22,6 +22,7 @@ type InputComponentProps = FieldRenderProps<string, HTMLInputElement> &
     disabled?: boolean;
     labelClassName?: string;
     customErrorText?: string;
+    errorClass?: string;
     isUncontrolled?: boolean;
     inputRef?: any;
     leftIcon?: TIconComponent;
@@ -42,6 +43,7 @@ export const FieldPasswordInputComponent: React.FC<InputComponentProps> = (
     inputRootClass,
     disabled,
     labelClassName,
+    errorClass,
     customErrorText,
     isUncontrolled = false,
     fullWidth = true,
@@ -144,7 +146,7 @@ export const FieldPasswordInputComponent: React.FC<InputComponentProps> = (
           <div className={css.rightIconContainer}>{rightIconElement}</div>
         )}
       </div>
-      <ValidationError fieldMeta={fieldMeta} />
+      <ValidationError fieldMeta={fieldMeta} className={errorClass} />
     </div>
   );
 };

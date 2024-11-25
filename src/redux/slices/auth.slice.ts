@@ -30,6 +30,8 @@ type TAuthState = {
   authStatus: EAuthState;
   // login
   signInError: any;
+
+  tempEmail: string;
   // logout
   logoutError: any;
   // signup
@@ -42,6 +44,7 @@ const initialState: TAuthState = {
   authInfoLoaded: false,
   authStatus: EAuthState.idle,
   signInError: null,
+  tempEmail: '',
   logoutError: null,
   signUpError: null,
 };
@@ -172,13 +175,14 @@ const authSlice = createSlice({
         };
       })
 
-      .addCase(login.pending, (state) => {
+      .addCase(login.pending, (state, action) => {
         return {
           ...state,
           authStatus: EAuthState.isSigningIn,
           signInError: null,
           logoutError: null,
           signUpError: null,
+          tempEmail: action.meta.arg.email,
         };
       })
       .addCase(login.fulfilled, (state) => {

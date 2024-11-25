@@ -3,39 +3,99 @@
 @use '/src/styles/mixins.scss' as *;
 
 .root {
-  padding: 32px 16px 0;
   width: 100%;
-  height: 100vh;
-  height: 100dvh;
 }
+
 .formContainer {
-  margin: 0 auto;
   row-gap: 16px;
   display: flex;
   justify-content: space-between;
   flex-direction: column;
-  height: calc(100vh - 32px);
-  height: calc(100dvh - 32px);
+  border-radius: 16px;
+  padding: 20px;
 
   @include viewportMedium {
-    max-width: 375px;
+    padding: 28px 32px;
+    width: 480px;
+    background-color: white;
+    box-shadow: 4px 4px 35.1px -4px rgba(16, 24, 40, 0.1);
   }
 }
 
 .formTitle {
   color: $neutralGray7;
+  text-align: center;
+  margin: 0 0 24px 0;
   @include textTemplate(24px, $fontWeightBold, 32px);
-  text-transform: capitalize;
 
   @include viewportMedium {
-    font-size: 32px;
+    @include textTemplate(28px, $fontWeightBold, 36px);
+    margin: 0 0 28px 0;
+  }
+}
+
+.inputWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  @include viewportMedium {
+    gap: 20px;
+  }
+}
+
+.secureWrapper {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 12px 0 16px 0;
+
+  svg {
+    flex-shrink: 0;
+  }
+
+  .secureText {
+    @include textTemplate(12px, 400, 24px);
+    color: $neutralGray7;
+    letter-spacing: 0.024px;
+    margin: 0;
+  }
+
+  @include viewportMedium {
+    margin: 12px 0 20px 0;
+  }
+}
+
+.termsCenter {
+  max-width: 398px;
+  margin: 0 auto 24px;
+
+  .termsWrapper {
+    color: $neutralGray7;
+    @include textTemplate(14px, 400, 20px);
+    margin: 0;
+
+    .terms {
+      color: #039ee1;
+      text-decoration: underline;
+      font-weight: 700;
+      cursor: pointer;
+
+      &:hover {
+        opacity: 0.8;
+      }
+    }
   }
 }
 
 .forgotPassword {
+  margin-top: 16px;
   text-align: right;
-  font-size: 14px;
-  color: $neutralGray6;
+  color: $neutralGray7;
+  @include textTemplate(14px, 600, 20px);
+
+  &:hover {
+    opacity: 0.8;
+  }
 
   & > span {
     cursor: pointer;
@@ -96,30 +156,30 @@
 }
 
 .doNotHaveAnAccount {
-  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  justify-self: center;
+  color: #595959;
+  @include textTemplate(14px, 400, 20px);
 
   .toSignUp {
-    color: $primaryPri2;
+    color: $neutralGray7;
     cursor: pointer;
+    text-decoration: underline;
+    font-weight: 700;
+
+    &:hover {
+      opacity: 0.8;
+    }
   }
 }
 
 .submitButton {
-  border-radius: 8px;
   width: 100%;
-  margin: 0 auto;
+  margin: 16px auto 0;
 
   @include viewportMedium {
-    width: 100%;
-  }
-}
-
-.desktopView {
-  display: none;
-
-  @include viewportMedium {
-    margin-top: 40px;
-    display: block;
+    margin: 20px auto 0;
   }
 }
 
@@ -130,5 +190,22 @@
   padding-bottom: 32px;
   @include viewportMedium {
     display: none;
+  }
+}
+
+.errorClass {
+  margin-bottom: 0;
+  margin-top: 8px;
+}
+
+.signInFormWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0px;
+  padding: 20px 0;
+
+  @include viewportMedium {
+    gap: 28px;
   }
 }

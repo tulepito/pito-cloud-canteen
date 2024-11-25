@@ -1,3 +1,4 @@
+import AuthenticationLayout from '@components/Layout/AuthenticationLayout/AuthenticationLayout';
 import MetaWrapper from '@components/MetaWrapper/MetaWrapper';
 
 import PasswordRecoveryPage from './components/PasswordRecovery.page';
@@ -5,7 +6,9 @@ import PasswordRecoveryPage from './components/PasswordRecovery.page';
 const PasswordRecoveryRoute = () => {
   return (
     <MetaWrapper>
-      <PasswordRecoveryPage />;
+      <AuthenticationLayout>
+        <PasswordRecoveryPage />
+      </AuthenticationLayout>
     </MetaWrapper>
   );
 };

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useIntl } from 'react-intl';
 import { useDispatch } from 'react-redux';
 
 import { useAppSelector } from '@hooks/reduxHooks';
@@ -10,8 +11,9 @@ import type { TObject } from '@utils/types';
 import PasswordRecoveryForm from './PasswordRecoveryForm';
 
 const PasswordRecoverPage = () => {
-  const { initialEmail } = useAppSelector((state) => state.password);
+  const initialEmail = useAppSelector((state) => state.auth.tempEmail);
   const { value: isLoading, setValue: setIsLoading } = useBoolean();
+  const { value: firstTimeSent, setValue: setFirstTimeSent } = useBoolean();
   const [timeLeft, setTimeLeft] = useState(0);
   const dispatch = useDispatch<AppDispatch>();
   const interval = useRef<any>(null);
@@ -19,6 +21,7 @@ const PasswordRecoverPage = () => {
   useEffect(() => {
     if (timeLeft === 0) {
       setIsLoading(false);
+
       clearInterval(interval.current);
     }
   }, [setIsLoading, timeLeft]);
@@ -30,15 +33,27 @@ const PasswordRecoverPage = () => {
       setTimeLeft((prev) => prev - 1);
     }, 1000);
 
+    setFirstTimeSent(true);
     dispatch(passwordThunks.recoverPassword(values));
   };
 
+  const intl = useIntl();
+
   return (
     <PasswordRecoveryForm
-      initialValues={{ email: initialEmail as string }}
+      initialValues={{ email: initialEmail ?? '' }}
       timeLeft={timeLeft}
       onSubmit={handleSubmitRecoverPasswordForm}
       inProgress={isLoading}
+      submitButtonText={
+        firstTimeSent
+          ? intl.formatMessage({
+              id: 'PasswordRecoveryForm.resubmitButtonText',
+            })
+          : intl.formatMessage({
+              id: 'PasswordRecoveryForm.submitButtonText',
+            })
+      }
     />
   );
 };

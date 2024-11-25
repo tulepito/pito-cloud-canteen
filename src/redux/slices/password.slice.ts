@@ -140,8 +140,8 @@ const passwordSlice = createSlice({
         const { status } = payload?.error || {};
         const recoveryError =
           status === EHttpStatusCode.Conflict
-            ? 'Email không tôn tại, vui lòng thử lại'
-            : 'Có lỗi khi reset mật khẩu, vui lòng thử lại';
+            ? 'Email không tồn tại trong hệ thống. Vui lòng kiểm tra và thử lại.'
+            : 'Đã xảy ra lỗi trong quá trình đặt lại mật khẩu. Vui lòng thử lại sau.';
 
         return {
           ...state,

@@ -5,11 +5,9 @@ import classNames from 'classnames';
 import { useRouter } from 'next/router';
 
 import Button from '@components/Button/Button';
-import FixedBottomButtons from '@components/FixedBottomButtons/FixedBottomButtons';
 import Form from '@components/Form/Form';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import IconArrowHead from '@components/Icons/IconArrowHead/IconArrowHead';
-import IconMail from '@components/Icons/IconMail/IconMail';
 import { useAppSelector } from '@hooks/reduxHooks';
 import type { TDefaultProps } from '@utils/types';
 import {
@@ -28,6 +26,7 @@ type TExtraProps = TDefaultProps & {
   formId?: string;
   timeLeft: number;
   inProgress: boolean;
+  submitButtonText: string;
 };
 type TPasswordRecoveryFormComponentProps =
   FormRenderProps<TPasswordRecoveryFormValues> & Partial<TExtraProps>;
@@ -37,13 +36,25 @@ type TPasswordRecoveryFormProps = FormProps<TPasswordRecoveryFormValues> &
 const PasswordRecoveryFormComponent: React.FC<
   TPasswordRecoveryFormComponentProps
 > = (props) => {
-  const { inProgress, timeLeft } = props;
+  const { inProgress, timeLeft, submitButtonText } = props;
+
   const intl = useIntl();
   const router = useRouter();
   const recoveryError = useAppSelector((state) => state.password.recoveryError);
+  const passwordRequested = useAppSelector(
+    (state) => state.password.passwordRequested,
+  );
 
   const formTitle = intl.formatMessage({
     id: 'PasswordRecoveryForm.title',
+  });
+
+  const successMessageLineOne = intl.formatMessage({
+    id: 'PasswordRecoveryForm.successMessageLineOne',
+  });
+
+  const successMessageLineTwo = intl.formatMessage({
+    id: 'PasswordRecoveryForm.successMessageLineTwo',
   });
 
   const formDescription = intl.formatMessage({
@@ -57,9 +68,6 @@ const PasswordRecoveryFormComponent: React.FC<
     id: 'PasswordRecoveryForm.email.label',
   });
 
-  const submitButtonText = intl.formatMessage({
-    id: 'PasswordRecoveryForm.submitButtonText',
-  });
   const submitButtonLoadingText = intl.formatMessage({
     id: 'PasswordRecoveryForm.submitButtonLoadingText',
   });
@@ -85,30 +93,56 @@ const PasswordRecoveryFormComponent: React.FC<
   const classes = classNames(rootClassName || css.root, className);
 
   return (
-    <Form className={classes} onSubmit={handleSubmit}>
-      <div className={css.formContainer}>
-        <div className={css.goBackContainer} onClick={navigateToSignInPage}>
-          <IconArrowHead direction="left" />
-          <span className={css.goBack}></span>
-          {goBackText}
-        </div>
-        <div className={css.formTitleContainer}>
-          <div className={css.formTitle}>{formTitle}</div>
-          <div className={css.formDescription}>{formDescription}</div>
-        </div>
+    <div className={css.wrapper}>
+      <div className={css.goBackContainer} onClick={navigateToSignInPage}>
+        <IconArrowHead direction="left" />
+        <span className={css.goBack}></span>
+        {goBackText}
+      </div>
 
-        <FieldTextInput
-          id={formId ? `${formId}.email` : 'email'}
-          name="email"
-          placeholder={emailPlaceholder}
-          validate={emailValidators}
-          label={emailLabel}
-          leftIcon={<IconMail />}
-        />
+      <Form className={classes} onSubmit={handleSubmit}>
+        <div className={css.formContainer}>
+          <div className={css.formTitleContainer}>
+            <div className={css.formTitle}>{formTitle}</div>
 
-        {recoveryError && <div className={css.error}>{recoveryError}</div>}
-        <div className={css.desktopView}>
+            {passwordRequested && timeLeft === 0 ? (
+              <div
+                className={css.formDescription}
+                style={{
+                  textAlign: 'center',
+                }}>
+                <span
+                  style={{
+                    display: 'inline-block',
+                  }}>
+                  {successMessageLineOne}
+                </span>
+                <span
+                  style={{
+                    display: 'inline-block',
+                  }}>
+                  {successMessageLineTwo}
+                </span>
+              </div>
+            ) : (
+              <div className={css.formDescription}>{formDescription}</div>
+            )}
+          </div>
+
+          <FieldTextInput
+            id={formId ? `${formId}.email` : 'email'}
+            name="email"
+            placeholder={emailPlaceholder}
+            validate={emailValidators}
+            label={emailLabel}
+            errorClass={css.errorClass}
+          />
+
+          {recoveryError && <div className={css.error}>{recoveryError}</div>}
+
+          {/* <div className={css.desktopView}> */}
           <Button
+            variant="primary"
             className={css.submitButton}
             type="submit"
             disabled={submitDisable}>
@@ -121,26 +155,28 @@ const PasswordRecoveryFormComponent: React.FC<
               <> {submitButtonText}</>
             )}
           </Button>
+          {/* </div> */}
+
+          {/* <FixedBottomButtons
+            FirstButton={
+              <Button
+                className={css.submitButton}
+                type="submit"
+                disabled={submitDisable}>
+                {inProgress ? (
+                  <>
+                    {submitButtonLoadingText}
+                    {timeLeft}
+                  </>
+                ) : (
+                  <> {submitButtonText}</>
+                )}
+              </Button>
+            }
+          /> */}
         </div>
-        <FixedBottomButtons
-          FirstButton={
-            <Button
-              className={css.submitButton}
-              type="submit"
-              disabled={submitDisable}>
-              {inProgress ? (
-                <>
-                  {submitButtonLoadingText}
-                  {timeLeft}
-                </>
-              ) : (
-                <> {submitButtonText}</>
-              )}
-            </Button>
-          }
-        />
-      </div>
-    </Form>
+      </Form>
+    </div>
   );
 };
 

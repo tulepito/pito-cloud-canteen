@@ -1,6 +1,7 @@
 import { FormattedMessage } from 'react-intl';
 import last from 'lodash/last';
 
+import PitoLogoV2 from '@components/PitoLogoV2/PitoLogoV2';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { authenticationInProgress, authThunks } from '@redux/slices/auth.slice';
 import { currentUserSelector, userThunks } from '@redux/slices/user.slice';
@@ -46,7 +47,17 @@ const SignUpPage = () => {
   };
 
   return (
-    <div>
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        gap: '1rem',
+        paddingTop: '40px',
+      }}>
+      <PitoLogoV2 />
+
       {showEmailVerification ? (
         <EmailVerification
           name={name}

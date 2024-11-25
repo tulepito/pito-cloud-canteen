@@ -11,8 +11,8 @@ import Form from '@components/Form/Form';
 import FieldPasswordInput from '@components/FormFields/FieldPasswordInput/FieldPasswordInput';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import IconGoogle from '@components/Icons/IconGoogle/IconGoogle';
-import IconLock from '@components/Icons/IconLock/IconLock';
-import IconMail from '@components/Icons/IconMail/IconMail';
+import IconSecure from '@components/Icons/IconSecure/IconSecure';
+import PitoLogoV2 from '@components/PitoLogoV2/PitoLogoV2';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { generalPaths } from '@src/paths';
 import type { TDefaultProps } from '@utils/types';
@@ -96,7 +96,7 @@ const SignInFormComponent: React.FC<TSignInFormComponentProps> = (props) => {
       required(intl.formatMessage({ id: 'SignInForm.email.required' })),
       emailFormatValid(intl.formatMessage({ id: 'SignInForm.email.invalid' })),
     ),
-    leftIcon: <IconMail />,
+    // leftIcon: <IconMail />,
   };
   const fieldPasswordProps = {
     id: 'SignInForm.password',
@@ -113,7 +113,7 @@ const SignInFormComponent: React.FC<TSignInFormComponentProps> = (props) => {
         intl.formatMessage({ id: 'SignInForm.password.invalid' }),
       ),
     ),
-    leftIcon: <IconLock />,
+    // leftIcon: <IconLock />,
   };
 
   const navigateToSignUpPage = () => {
@@ -125,40 +125,45 @@ const SignInFormComponent: React.FC<TSignInFormComponentProps> = (props) => {
   };
 
   return (
-    <Form className={classes} onSubmit={handleSubmit}>
-      <div className={css.formContainer}>
-        <div className={css.formContent}>
-          <div className={css.formTitle}>{formTitle}</div>
-          <div className={css.doNotHaveAnAccount}>
-            <div>
-              {doNotHaveAnAccountText}{' '}
-              <span className={css.toSignUp} onClick={navigateToSignUpPage}>
-                {' '}
-                {toSignUp}
+    <div className={css.signInFormWrapper}>
+      <PitoLogoV2 />
+
+      <Form className={classes} onSubmit={handleSubmit}>
+        <div className={css.formContainer}>
+          <div className={css.formContent}>
+            <h2 className={css.formTitle}>{formTitle}</h2>
+
+            <div className={css.inputWrapper}>
+              <FieldTextInput
+                trim
+                {...fieldEmailProps}
+                errorClass={css.errorClass}
+              />
+              <FieldPasswordInput
+                {...fieldPasswordProps}
+                errorClass={css.errorClass}
+              />
+            </div>
+
+            <div className={css.forgotPassword}>
+              <span onClick={navigateToPasswordRecoverPage}>
+                {forgotPasswordText}
               </span>
             </div>
-          </div>
-          <FieldTextInput trim {...fieldEmailProps} />
-          <FieldPasswordInput {...fieldPasswordProps} />
 
-          <div className={css.forgotPassword}>
-            <span onClick={navigateToPasswordRecoverPage}>
-              {forgotPasswordText}
-            </span>
-          </div>
+            {errorMessage && (
+              <div className={css.errorSignIn}>{errorMessage}</div>
+            )}
 
-          {errorMessage && (
-            <div className={css.errorSignIn}>{errorMessage}</div>
-          )}
-          <div className={css.desktopView}>
             <Button
-              variant="cta"
+              variant="primary"
               className={css.submitButton}
               type="submit"
               disabled={submitDisable}
               inProgress={submitInprogress}>
               {submitButtonText}
             </Button>
+
             <RenderWhen condition={shouldShowSocialLoginSection}>
               <div className={css.orText}>
                 <span>{orText}</span>
@@ -173,30 +178,41 @@ const SignInFormComponent: React.FC<TSignInFormComponentProps> = (props) => {
                 </Button>
               </RenderWhen>
             </RenderWhen>
+
+            <div className={css.secureWrapper}>
+              <IconSecure />
+              <p className={css.secureText}>
+                Đăng nhập an toàn - Thông tin của bạn được bảo mật HTTPS
+              </p>
+            </div>
+
+            <div className={css.termsCenter}>
+              <p className={css.termsWrapper}>
+                Bằng cách tham gia, bạn đã đọc và đồng ý{' '}
+                <a
+                  className={css.terms}
+                  href="https://pito.vn/cam-nang/dieu-khoan-chinh-sach/"
+                  target="_blank"
+                  rel="noreferrer">
+                  Điều khoản dịch vụ và điều kiện sử dụng
+                </a>{' '}
+                của PITO.
+              </p>
+            </div>
+
+            <div className={css.doNotHaveAnAccount}>
+              <div>
+                {doNotHaveAnAccountText}{' '}
+                <span className={css.toSignUp} onClick={navigateToSignUpPage}>
+                  {' '}
+                  {toSignUp}
+                </span>
+              </div>
+            </div>
           </div>
         </div>
-
-        <div className={css.bottomButtonsWrapper}>
-          <Button
-            variant="cta"
-            className={css.submitButton}
-            type="submit"
-            disabled={submitDisable}
-            inProgress={submitInprogress}>
-            {submitButtonText}
-          </Button>
-          <RenderWhen condition={shouldShowSocialLoginSection}>
-            <div>hoặc</div>
-            <RenderWhen condition={shouldShowGoogleSignInBtn}>
-              <Button className={css.googleLoginButton} type="button">
-                <IconGoogle className={css.googleIcon} />
-                <span>{googleLoginText}</span>
-              </Button>
-            </RenderWhen>
-          </RenderWhen>
-        </div>
-      </div>
-    </Form>
+      </Form>
+    </div>
   );
 };
 
