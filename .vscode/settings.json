@@ -11,5 +11,6 @@
     "source.fixAll": "explicit"
   },
   "i18n-ally.localesPaths": [],
-  "deno.enable": false
+  "deno.enable": false,
+  "typescript.tsdk": "node_modules/typescript/lib"
 }

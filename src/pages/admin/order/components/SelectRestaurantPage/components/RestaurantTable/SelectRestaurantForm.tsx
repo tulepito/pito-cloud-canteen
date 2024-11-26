@@ -18,7 +18,8 @@ type TExtraProps = {
   ) => void;
 };
 type TSelectRestaurantFormComponentProps =
-  FormRenderProps<TSelectRestaurantFormValues> & Partial<TExtraProps>;
+  FormRenderProps<TSelectRestaurantFormValues> &
+    Partial<TExtraProps> & { children?: any };
 type TSelectRestaurantFormProps = PropsWithChildren<
   FormProps<TSelectRestaurantFormValues> & TExtraProps
 >;
