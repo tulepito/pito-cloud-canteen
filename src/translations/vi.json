@@ -195,7 +195,7 @@
   "Booker.CreateOrder.Form.field.price.vat": "Bao gồm VAT",
   "Booker.CreateOrder.Form.group.scrollDownNote": "Nếu danh sách dài hãy cuộn xuống để xem thêm",
   "Booker.CreateOrder.Form.saveChange": "Lưu thay đổi",
-  "Booker.CreateOrder.Toolbar.finish": "Hoàn tất",
+  "Booker.CreateOrder.Toolbar.finish": "Tiếp tục",
   "Booker.CreateOrder.Toolbar.suggestNewRestaurant": "Gợi ý nhà hàng mới",
   "booker.orders.draft.foodDetailModal.addDish": "Chọn món này",
   "booker.orders.draft.foodDetailModal.back": "Quay lại",

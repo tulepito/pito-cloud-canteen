@@ -60,9 +60,6 @@
   opacity: 0.5;
 }
 
-.arrowIcon {
-}
-
 .toolbarNavigation {
   @include flexAlign(center, space-between);
   min-width: 160px;
@@ -73,12 +70,36 @@
   }
 }
 
-.actions button {
-  margin-right: 16px;
-  font-size: 14px;
+.actions {
+  .secondaryBtn {
+    margin-right: 24px;
+  }
 
-  &:last-child {
+  .ctaBtn {
     margin-right: 0;
+    position: relative;
+    padding: 0.5em 2.5em;
+    display: flex;
+    cursor: pointer;
+    border-radius: 8px;
+    border: none;
+    color: #fff;
+    background-color: #000;
+    animation: btnEffect 1.5s infinite;
+  }
+
+  .ctaBtn::after {
+    content: '';
+    display: flex;
+    height: 100%;
+    width: 100%;
+    border-radius: 8px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    background-color: #000;
+    animation: btnAfterEffect 1.5s infinite;
   }
 }
 
@@ -97,7 +118,7 @@
 
 .bottomBtns {
   @include flexAlign(center, space-between);
-  gap: 8px;
+  gap: 18px;
   position: fixed;
   bottom: 0;
   left: 0;
@@ -119,5 +140,48 @@
   .ctaBtn {
     flex-basis: 48%;
     width: 100%;
+    position: relative;
+    cursor: pointer;
+    border-radius: 8px;
+    border: none;
+    color: #fff;
+    background-color: #000;
+    animation: btnEffect 1.5s infinite;
+    white-space: nowrap;
+  }
+
+  .ctaBtn::after {
+    content: '';
+    display: flex;
+    height: 100%;
+    width: 100%;
+    border-radius: 8px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    background-color: #000;
+    animation: btnAfterEffect 1.5s infinite;
+  }
+}
+
+@keyframes btnEffect {
+  0%,
+  100% {
+    box-shadow: none;
+  }
+  50% {
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  }
+}
+
+@keyframes btnAfterEffect {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scaleX(1.2) scaleY(1.4);
+    opacity: 0;
   }
 }

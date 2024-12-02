@@ -109,6 +109,9 @@ const Toolbar: React.FC<TToolbarProps> = (props) => {
         <Button
           variant="primary"
           onClick={onFinishOrder}
+          className={classNames({
+            [css.ctaBtn]: finishDisabled,
+          })}
           disabled={finishDisabled}
           loadingMode="extend"
           inProgress={finishInProgress}>
@@ -130,7 +133,9 @@ const Toolbar: React.FC<TToolbarProps> = (props) => {
         </Button>
         <Button
           variant="primary"
-          className={css.ctaBtn}
+          className={classNames({
+            [css.ctaBtn]: finishDisabled,
+          })}
           onClick={onFinishOrder}
           disabled={finishDisabled}
           loadingMode="extend"
