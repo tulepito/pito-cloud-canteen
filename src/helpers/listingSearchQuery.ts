@@ -176,10 +176,17 @@ export const getRestaurantQuery = ({
   restaurantIds,
   companyAccount,
   params,
+  deliveryLatLng,
+  isRestrictDistance = false,
 }: {
   restaurantIds: string[];
   companyAccount: TUser | null;
   params: TObject;
+  deliveryLatLng?: {
+    lat: number;
+    lng: number;
+  };
+  isRestrictDistance?: boolean;
 }) => {
   const {
     rating = '',
@@ -192,15 +199,30 @@ export const getRestaurantQuery = ({
     startDate,
     endDate,
   } = params;
-
+  const newDistance = Array.isArray(distance)
+    ? distance.length === 0
+      ? undefined
+      : Math.max(...distance.map(Number))
+    : typeof distance === 'number'
+    ? distance
+    : undefined;
   const origin = User(companyAccount as TUser).getPublicData().location?.origin;
-  const bounds = distance ? calculateBounds(origin, distance) : '';
+
+  const makeCorrectDistance = isRestrictDistance
+    ? +process.env.NEXT_PUBLIC_DISTANCE_LIMIT_KILOMETERS
+    : newDistance;
+  const makeCorrectLatLng = isRestrictDistance ? deliveryLatLng : origin;
+
+  const bounds = makeCorrectDistance
+    ? calculateBounds(makeCorrectLatLng, makeCorrectDistance)
+    : '';
+
   const query = {
     ids: restaurantIds,
     keywords,
     page,
     ...(rating && { meta_rating: `${rating},` }),
-    ...(distance ? { bounds } : {}),
+    ...(makeCorrectDistance ? { bounds } : {}),
     ...(categories.length > 0
       ? { pub_categories: `has_all:${categories.join(',')}` }
       : {}),

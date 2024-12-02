@@ -93,6 +93,13 @@ export const recommendRestaurantForSpecificDay = async ({
           getRestaurantQuery({
             restaurantIds: ids,
             companyAccount: null,
+            deliveryLatLng: {
+              lat:
+                order?.attributes?.metadata?.deliveryAddress?.origin?.lat ?? 0,
+              lng:
+                order?.attributes?.metadata?.deliveryAddress?.origin?.lng ?? 0,
+            },
+            isRestrictDistance: true,
             params: {
               memberAmount,
             },
@@ -227,6 +234,15 @@ export const recommendRestaurants = async ({
               getRestaurantQuery({
                 restaurantIds: ids,
                 companyAccount: null,
+                deliveryLatLng: {
+                  lat:
+                    order?.attributes?.metadata?.deliveryAddress?.origin?.lat ??
+                    0,
+                  lng:
+                    order?.attributes?.metadata?.deliveryAddress?.origin?.lng ??
+                    0,
+                },
+                isRestrictDistance: true,
                 params: {
                   memberAmount,
                 },
