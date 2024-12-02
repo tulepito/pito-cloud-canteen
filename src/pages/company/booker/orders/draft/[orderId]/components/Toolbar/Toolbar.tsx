@@ -71,6 +71,34 @@ const Toolbar: React.FC<TToolbarProps> = (props) => {
     [onNavigate],
   );
 
+  const actions = (
+    <>
+      <Button
+        variant="secondary"
+        className={css.secondaryBtn}
+        onClick={onRecommendNewRestaurants}>
+        <IconRefreshing
+          className={css.refreshIcon}
+          inProgress={onRecommendRestaurantInProgress}
+        />
+        {intl.formatMessage({
+          id: 'Booker.CreateOrder.Toolbar.suggestNewRestaurant',
+        })}
+      </Button>
+      <Button
+        variant="primary"
+        className={classNames({
+          [css.ctaBtn]: !finishDisabled,
+        })}
+        onClick={onFinishOrder}
+        disabled={finishDisabled}
+        loadingMode="extend"
+        inProgress={finishInProgress}>
+        {intl.formatMessage({ id: 'Booker.CreateOrder.Toolbar.finish' })}
+      </Button>
+    </>
+  );
+
   return (
     <div className={css.root}>
       <div className={css.actions}>
@@ -92,57 +120,8 @@ const Toolbar: React.FC<TToolbarProps> = (props) => {
           </div>
         </div>
       </div>
-      <div className={classNames(css.actions, css.extra)}>
-        <Button
-          variant="secondary"
-          className={css.secondaryBtn}
-          onClick={onRecommendNewRestaurants}>
-          <IconRefreshing
-            inProgress={onRecommendRestaurantInProgress}
-            className={css.refreshIcon}
-          />
-          {intl.formatMessage({
-            id: 'Booker.CreateOrder.Toolbar.suggestNewRestaurant',
-          })}
-        </Button>
-
-        <Button
-          variant="primary"
-          onClick={onFinishOrder}
-          className={classNames({
-            [css.ctaBtn]: finishDisabled,
-          })}
-          disabled={finishDisabled}
-          loadingMode="extend"
-          inProgress={finishInProgress}>
-          {intl.formatMessage({ id: 'Booker.CreateOrder.Toolbar.finish' })}
-        </Button>
-      </div>
-      <div className={css.bottomBtns}>
-        <Button
-          variant="secondary"
-          className={css.secondaryBtn}
-          onClick={onRecommendNewRestaurants}>
-          <IconRefreshing
-            className={css.refreshIcon}
-            inProgress={onRecommendRestaurantInProgress}
-          />
-          {intl.formatMessage({
-            id: 'Booker.CreateOrder.Toolbar.suggestNewRestaurant',
-          })}
-        </Button>
-        <Button
-          variant="primary"
-          className={classNames({
-            [css.ctaBtn]: finishDisabled,
-          })}
-          onClick={onFinishOrder}
-          disabled={finishDisabled}
-          loadingMode="extend"
-          inProgress={finishInProgress}>
-          {intl.formatMessage({ id: 'Booker.CreateOrder.Toolbar.finish' })}
-        </Button>
-      </div>
+      <div className={classNames(css.actions, css.extra)}>{actions}</div>
+      <div className={css.bottomBtns}>{actions}</div>
     </div>
   );
 };

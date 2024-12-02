@@ -10,7 +10,7 @@
 
   @include viewportMedium {
     border-radius: 16px;
-    background: $labelBlue1;
+    background: $sematicGreen1;
     padding: 16px;
   }
 
@@ -50,11 +50,16 @@
 
   .columnTitle {
     @include textTemplate(14px, 600);
+    margin-bottom: 4px;
 
     @include viewportMedium {
       flex-basis: calc((100% - 36px) / 2);
-      @include textTemplate(16px, 700, 1.2);
+      @include textTemplate(14px, 700, 1.4);
     }
+  }
+
+  .columnDescription {
+    @include textTemplate(13px, 400, 1.2);
   }
 }
 
@@ -62,6 +67,7 @@
   width: calc(100vw - 32px);
   padding: 24px 16px;
 }
+
 .mobileModalContent.mobileModalContent {
   display: flex;
   flex-direction: column;

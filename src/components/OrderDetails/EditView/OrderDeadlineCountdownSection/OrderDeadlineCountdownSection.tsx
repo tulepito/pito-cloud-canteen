@@ -24,6 +24,7 @@ type TOrderDeadlineCountdownSectionProps = TDefaultProps & {
     orderDeadline: number;
   };
   ableToUpdateOrder: boolean;
+  children?: React.ReactNode;
 };
 
 const OrderDeadlineCountdownSection: React.FC<
@@ -102,6 +103,8 @@ const OrderDeadlineCountdownSection: React.FC<
 
       <CountdownTimer deadline={orderDeadline} stopAt={0} />
       <div className={css.orderEndAtMessage}>{orderEndAtMessage}</div>
+
+      {props?.children}
       <EditOrderDeadlineModal
         data={{
           orderDeadline,

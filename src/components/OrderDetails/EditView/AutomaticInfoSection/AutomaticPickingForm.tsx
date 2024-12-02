@@ -15,6 +15,8 @@ type TExtraProps = {
   handleFieldChange?: () => void;
   shouldShowMainTitle?: boolean;
   disabled?: boolean;
+  subTitle?: string;
+  mainTitle?: string;
 };
 type TAutomaticPickingFormComponentProps =
   FormRenderProps<TAutomaticPickingFormValues> & Partial<TExtraProps>;
@@ -29,12 +31,9 @@ const AutomaticPickingFormComponent: React.FC<
     shouldShowMainTitle = true,
     handleSubmit,
     disabled,
+    subTitle = 'Cho phép PITO Cloud Canteen tự chọn món cho những thành viên không xác nhận đặt đơn.',
+    mainTitle = 'Tự động chọn món cho thành viên',
   } = props;
-
-  const subTitle =
-    'Cho phép PITO Cloud Canteen tự chọn món cho những thành viên không xác nhận đặt đơn.';
-
-  const mainTitle = 'Tự động chọn món cho thành viên';
 
   const titleComponent = (
     <div className={css.titleContainer}>

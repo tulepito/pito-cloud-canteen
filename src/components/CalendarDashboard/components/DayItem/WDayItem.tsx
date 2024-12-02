@@ -1,7 +1,6 @@
 import type { ReactNode } from 'react';
 import { useCallback } from 'react';
 import type { Event } from 'react-big-calendar';
-import { DateTime } from 'luxon';
 
 import useSelectDay from '@components/CalendarDashboard/hooks/useSelectDay';
 import { useViewport } from '@hooks/useViewport';
@@ -44,19 +43,7 @@ const WDayItem: React.FC<TWDayItemProps> = ({
     endDate,
     availableOrderDetailCheckList,
   } = resources || ({} as any);
-  const { selectedDay, handleSelectDay } = useSelectDay();
-  const currentDate = DateTime.fromJSDate(new Date()).startOf('day');
-  const dateItem = DateTime.fromJSDate(date).startOf('day');
-  const isSelectedDay =
-    DateTime.fromJSDate(selectedDay!)
-      .startOf('day')
-      .diff(dateItem, ['day', 'hour'])
-      .get('day') === 0;
-  const isCurrentDay =
-    DateTime.fromJSDate(date)
-      .startOf('day')
-      .diff(currentDate, ['day', 'hour'])
-      .get('day') === 0;
+  const { handleSelectDay } = useSelectDay();
 
   const startDateTimestamp =
     startDate instanceof Date ? startDate?.getTime() : undefined;
@@ -94,14 +81,11 @@ const WDayItem: React.FC<TWDayItemProps> = ({
       {customHeader ? (
         customHeader({
           date,
-          isCurrentDay,
         })
       ) : (
         <DayItemHeader
           date={date}
           resources={resources}
-          isCurrentDay={isCurrentDay}
-          isSelectedDay={isSelectedDay}
           isDisabled={isDisabled}
           indicator={indicator}
         />

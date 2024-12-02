@@ -201,9 +201,11 @@ const OrderDetailPage = () => {
   });
 
   const confirmButtonMessage = isPickingOrder
-    ? intl.formatMessage({
-        id: 'EditView.OrderTitle.makeOrderButtonText',
-      })
+    ? editViewData.countdownSectionData.orderDeadline > 0
+      ? 'Đặt đơn trước hạn'
+      : intl.formatMessage({
+          id: 'EditView.OrderTitle.makeOrderButtonText',
+        })
     : intl.formatMessage({
         id: 'EditView.OrderTitle.updateOrderButtonText',
       });
@@ -393,15 +395,18 @@ const OrderDetailPage = () => {
             <OrderDeadlineCountdownSection
               className={css.container}
               data={editViewData.countdownSectionData}
-              ableToUpdateOrder={ableToUpdateOrder}
-            />
-            <div className={css.autoPickingPart}>
-              <AutomaticPickingForm
-                initialValues={{ autoPicking: autoPickingAllowed }}
-                handleFieldChange={toggleFoodAutoPicking}
-                onSubmit={() => {}}
-              />
-            </div>
+              ableToUpdateOrder={ableToUpdateOrder}>
+              <div className={css.autoPickingPart}>
+                <AutomaticPickingForm
+                  initialValues={{ autoPicking: autoPickingAllowed }}
+                  handleFieldChange={toggleFoodAutoPicking}
+                  onSubmit={() => {}}
+                  subTitle=""
+                  mainTitle="Tự động chọn món"
+                />
+              </div>
+            </OrderDeadlineCountdownSection>
+
             <OrderLinkSection
               className={css.mobileContainer}
               data={editViewData.linkSectionData}
@@ -492,21 +497,28 @@ const OrderDetailPage = () => {
   );
 
   const ReviewViewComponent = (
-    <ReviewView
-      isViewCartDetailMode={isViewCartDetailMode}
-      canGoBackEditMode
-      reviewViewData={reviewViewData}
-      setInfoFormValues={handleEditReviewInfoForm}
-      onDownloadPriceQuotation={handleDownloadPriceQuotation}
-      onGoBackToEditOrderPage={handleGoBackFromReviewMode}
-      onViewCartDetail={handleViewCartDetail}
-      showStartPickingOrderButton
-      onSaveOrderNote={onSaveOrderNote}
-      onDownloadReviewOrderResults={onDownloadReviewOrderResults}
-      orderData={orderData as TListing}
-      priceQuotationData={priceQuotationData}
-      reviewInfoValues={reviewInfoValues}
-    />
+    <>
+      <BookerStepperDesktopSection>
+        <div className={css.stepperContainerDesktop}>
+          <Stepper steps={BOOKER_CREATE_GROUP_ORDER_STEPS} currentStep={4} />
+        </div>
+      </BookerStepperDesktopSection>
+      <ReviewView
+        isViewCartDetailMode={isViewCartDetailMode}
+        canGoBackEditMode
+        reviewViewData={reviewViewData}
+        setInfoFormValues={handleEditReviewInfoForm}
+        onDownloadPriceQuotation={handleDownloadPriceQuotation}
+        onGoBackToEditOrderPage={handleGoBackFromReviewMode}
+        onViewCartDetail={handleViewCartDetail}
+        showStartPickingOrderButton
+        onSaveOrderNote={onSaveOrderNote}
+        onDownloadReviewOrderResults={onDownloadReviewOrderResults}
+        orderData={orderData as TListing}
+        priceQuotationData={priceQuotationData}
+        reviewInfoValues={reviewInfoValues}
+      />
+    </>
   );
 
   useEffect(() => {

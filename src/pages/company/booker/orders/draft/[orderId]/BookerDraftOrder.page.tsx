@@ -83,6 +83,8 @@ import {
 } from './BookerDraftOrderPage.slice';
 
 import css from './BookerDraftOrder.module.scss';
+import IconCheckWithBackground from '@components/Icons/IconCheckWithBackground/IconCheckWithBackground';
+import logger from '@helpers/logger';
 
 const ENABLE_TO_ACCESS_PAGE_ORDER_STATES = [
   EOrderDraftStates.pendingApproval,
@@ -452,15 +454,21 @@ function BookerDraftOrderPage() {
         false,
       ),
     );
-    toast.info(
-      'PITO đã gợi ý một menu phù hợp dựa trên ngân sách và các yêu cầu của bạn.',
+    toast.success(
+      <p>
+        Thực đơn cho tuần ăn{' '}
+        {<b>{formatTimestamp(startDate.valueOf(), 'dd')}</b>} đến{' '}
+        {<b>{formatTimestamp(endDate.valueOf(), 'dd')}</b>} tháng{' '}
+        {<b>{formatTimestamp(endDate.valueOf(), 'MM')}</b>} đã được gợi ý.
+        <br />
+        <span style={{ fontSize: 12 }}>
+          Bạn có thể bấm <b>Tiếp tục</b> hoặc tuỳ chỉnh thực đơn cho từng ngày.
+        </span>
+      </p>,
       {
-        closeButton: false,
         autoClose: 5000,
         hideProgressBar: true,
-        containerId: BOTTOM_CENTER_TOAST_ID,
-        toastId: 'BookerDraftOrderPage.OrderSuccessfullyCreated',
-        icon: <IconMagicWand className={css.toastIcon} />,
+        icon: <IconCheckWithBackground className={css.toastIcon} />,
         className: css.toastContainer,
       },
     );
@@ -468,9 +476,12 @@ function BookerDraftOrderPage() {
 
   useEffect(() => {
     if (toastShowedAfterSuccessfullyCreatingOrder) {
+      logger.info('toastOrderSuccessfullyCreated', {
+        toastShowedAfterSuccessfullyCreatingOrder,
+      });
       toastOrderSuccessfullyCreated();
     }
-  }, [toastShowedAfterSuccessfullyCreatingOrder]);
+  }, []);
 
   useEffect(() => {
     const mockupSubOrder = getBookerMockupSubOrder(startDate);

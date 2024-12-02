@@ -27,15 +27,6 @@
 
   .autoPickingPart {
     margin-top: 20px;
-    padding: 20px 16px;
-    border-radius: 16px;
-    border: 1px solid $neutralGray3;
-
-    @include viewportMedium {
-      padding: 16px;
-      margin-top: 0;
-      border-color: $neutralGray5;
-    }
   }
 
   .leftPart,
@@ -285,5 +276,14 @@
 .stepper {
   @include viewportMedium {
     width: 630px;
+  }
+}
+
+.stepperContainerDesktop {
+  display: none;
+  @include viewportMedium {
+    display: block;
+    width: 630px;
+    margin: 0 auto;
   }
 }

@@ -3,7 +3,7 @@
 @use '/src/styles/mixins.scss' as *;
 
 .root {
-  padding: 16px 16px 210px;
+  padding: 0 16px 210px;
   display: flex;
   flex-direction: column;
 
@@ -13,7 +13,7 @@
     grid-template-columns: 1fr 320px;
     column-gap: 40px;
     row-gap: 28px;
-    padding: 24px;
+    padding: 0 24px 24px;
     margin: 0 auto 40px;
   }
 
@@ -22,7 +22,7 @@
   }
 
   @include viewportSLarge {
-    padding: 40px 130px;
+    padding: 0 130px 40px;
     max-width: calc(1180px + 130px * 2);
     margin: 40px calc(50vw - $sl/2);
   }

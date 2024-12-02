@@ -31,8 +31,6 @@ export type TCalendarItemCardComponents = {
 };
 
 export type TDayColumnHeaderProps = {
-  isCurrentDay: boolean;
-  isSelectedDay?: boolean;
   date: Date;
   resources?: any;
   className?: string;

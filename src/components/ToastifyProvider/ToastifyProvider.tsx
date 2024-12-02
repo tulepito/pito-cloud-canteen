@@ -24,14 +24,14 @@ const ToastifyProvider: React.FC<ToastifyProviderProps> = ({ children }) => {
         pauseOnFocusLoss
         draggable
         pauseOnHover
-        position={toast.POSITION.BOTTOM_CENTER}
+        position={toast.POSITION.BOTTOM_RIGHT}
       />
 
       <ToastContainer
         enableMultiContainer
         className={css.bottomCenterContainer}
         containerId={css.bottomCenterToast}
-        position={toast.POSITION.BOTTOM_CENTER}
+        position={toast.POSITION.BOTTOM_RIGHT}
       />
     </>
   );

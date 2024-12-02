@@ -202,7 +202,19 @@ const DeadlineDateTimeFormComponent: React.FC<
   );
 
   const formContentComponent = (
-    <Form className={css.formRoot} onSubmit={handleSubmit}>
+    <Form
+      className={css.formRoot}
+      style={{ position: 'relative' }}
+      onSubmit={handleSubmit}>
+      <div
+        style={{
+          position: 'absolute',
+          top: '-80px',
+          width: 'fit-content',
+          right: 0,
+        }}>
+        {sendNotificationButton}
+      </div>
       <div className={css.formContainer}>
         <div className={css.formTitle}>Thời hạn kết thúc chọn món</div>
         <RenderWhen condition={isMobileLayout}>
@@ -252,7 +264,7 @@ const DeadlineDateTimeFormComponent: React.FC<
             />
           </RenderWhen.False>
         </RenderWhen>
-        {isMobileLayout ? saveInfoButton : sendNotificationButton}
+        {isMobileLayout ? saveInfoButton : null}
       </div>
     </Form>
   );

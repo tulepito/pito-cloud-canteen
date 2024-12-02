@@ -80,16 +80,6 @@
   }
 }
 
-.activeHeader {
-  color: $primaryPri2;
-  background-color: rgba($primaryPri2, 0.1);
-
-  .dateNumber,
-  .dayText {
-    color: $primaryPri2;
-  }
-}
-
 .disabledHeader {
   pointer-events: none;
   cursor: not-allowed;

@@ -11,13 +11,13 @@ const IconCheckWithBackground: React.FC<TIconProps> = (props) => {
   return (
     <svg
       preserveAspectRatio="none"
-      width="15"
+      width="14"
       height="14"
-      viewBox="0 0 15 14"
+      viewBox="0 0 14 14"
       fill="none"
       className={classes}
       xmlns="http://www.w3.org/2000/svg">
-      <rect x="0.517578" width="14" height="14" rx="7" fill="#73D13D" />
+      <rect x="0" width="14" height="14" rx="7" fill="#73D13D" />
       <path
         fillRule="evenodd"
         clipRule="evenodd"
