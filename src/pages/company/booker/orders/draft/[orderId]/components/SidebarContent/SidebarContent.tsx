@@ -314,6 +314,8 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
         }),
       );
     }
+
+    setIsOpenDetails(false);
   };
 
   const renderForm = () => {
