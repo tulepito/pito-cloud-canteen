@@ -346,11 +346,6 @@ const EditPartnerFoodFormComponent: React.FC<
             label={intl.formatMessage({
               id: 'EditPartnerFoodForm.unitLabel',
             })}
-            validate={composeValidators(
-              required(
-                intl.formatMessage({ id: 'EditPartnerFoodForm.unitRequired' }),
-              ),
-            )}
           />
         </div>
         <div
@@ -390,11 +385,6 @@ const EditPartnerFoodFormComponent: React.FC<
             label={intl.formatMessage({
               id: 'EditPartnerFoodForm.packagingLabel',
             })}
-            validate={required(
-              intl.formatMessage({
-                id: 'EditPartnerFoodForm.packagingRequired',
-              }),
-            )}
             placeholder={intl.formatMessage({
               id: 'EditPartnerFoodForm.packagingPlaceholder',
             })}
@@ -438,11 +428,6 @@ const EditPartnerFoodFormComponent: React.FC<
             label={intl.formatMessage({
               id: 'EditPartnerFoodForm.foodCategoryLabel',
             })}
-            validate={required(
-              intl.formatMessage({
-                id: 'EditPartnerFoodForm.categoryRequired',
-              }),
-            )}
             placeholder={intl.formatMessage({
               id: 'EditPartnerFoodForm.categoryPlaceholder',
             })}
@@ -483,19 +468,6 @@ const EditPartnerFoodFormComponent: React.FC<
           inputClassName={css.inputWithSuffix}
           rightIconContainerClassName={css.inputSuffixed}
           rightIcon={<div>món</div>}
-          validate={composeValidators(
-            required(
-              intl.formatMessage({
-                id: 'EditPartnerFoodForm.numberOfMainDishesRequired',
-              }),
-            ),
-            numberMinLength(
-              intl.formatMessage({
-                id: 'EditPartnerFoodForm.numberOfMainDishesInvalid',
-              }),
-              1,
-            ),
-          )}
         />
       </div>
       <div className={fieldClasses}>
