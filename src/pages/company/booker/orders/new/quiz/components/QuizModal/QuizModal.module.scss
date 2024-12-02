@@ -114,8 +114,6 @@
   padding-bottom: 4px;
 
   @include viewportLarge {
-    max-height: 500px;
-    overflow-y: auto;
     margin-top: 32px;
   }
 

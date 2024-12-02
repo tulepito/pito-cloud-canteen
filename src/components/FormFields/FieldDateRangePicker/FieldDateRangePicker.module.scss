@@ -40,9 +40,13 @@
   & :global(.react-datepicker__header) {
     background-color: $neutralGray1 !important;
     border-bottom: none;
-    padding-bottom: 16px;
-  }
+    padding-bottom: 12px;
+    padding-top: 0px;
 
+    > div:first-child {
+      padding: 12px 16px;
+    }
+  }
   & :global(.react-datepicker__day) {
     display: inline-flex;
     align-items: center;
@@ -90,20 +94,20 @@
 
   & :global(.react-datepicker__day--range-start) {
     &:not(.react-datepicker__day--in-range) {
-      background: $labelDarkBlue;
+      background: #262626;
       border-radius: 16px 0px 0px 16px;
-      color: $neutralGray1;
+      color: white;
     }
   }
 
   & :global(.react-datepicker__day--range-end) {
     &:not(.react-datepicker__day--in-range) {
-      background: $labelDarkBlue;
+      background: #262626;
       border-top-left-radius: current;
       border-top-right-radius: 16px;
       border-bottom-right-radius: 16px;
       border-bottom-left-radius: current;
-      color: $neutralGray1;
+      color: white;
     }
   }
 
@@ -115,23 +119,23 @@
 
   & :global(.react-datepicker__day--in-selecting-range-start) {
     &:not(.react-datepicker__day--in-selecting-range) {
-      background: $labelDarkBlue;
+      background: #262626;
       border-radius: 16px 0px 0px 16px;
-      color: $neutralGray1;
+      color: white;
     }
   }
 
   & :global(.react-datepicker__day--in-selecting-range-end) {
     &:not(.react-datepicker__day--in-selecting-range) {
-      background: $labelDarkBlue;
+      background: #262626;
       border-radius: 0px 16px 16px 0px;
-      color: $neutralGray1;
+      color: white;
     }
   }
 
   & :global(.react-datepicker__day--in-selecting-range) {
-    background: $labelBlue1;
-    color: $neutralGray7;
+    background: #262626;
+    color: white;
     border-radius: 0;
   }
 

@@ -68,10 +68,11 @@
   left: 50%;
   transform: translateX(-50%);
   z-index: 1;
-  width: 800px;
+  width: fit-content;
 
   &.shouldDisplayFixed {
     position: fixed;
-    top: 130px;
+    top: unset;
+    margin-top: 4px;
   }
 }

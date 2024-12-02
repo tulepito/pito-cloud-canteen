@@ -93,7 +93,6 @@ const OrderDateFieldModal: React.FC<TOrderDateFieldModalProps> = (props) => {
           startDate={startDate}
           endDate={endDate}
           shouldHideInput
-          monthsShown={2}
           minDate={newMinDate || new Date()}
           maxDate={maxDate}
         />
