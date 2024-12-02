@@ -28,6 +28,9 @@ type TBookerDraftOrderPageState = {
   addOrderParticipantsInProgress: boolean;
   toastShowedAfterSuccessfullyCreatingOrder: boolean;
   walkthroughStep: number;
+
+  fetchOrderRestaurantsInProgress: boolean;
+  restaurantData: TObject[];
 };
 const initialState: TBookerDraftOrderPageState = {
   companyAccount: null,
@@ -41,6 +44,8 @@ const initialState: TBookerDraftOrderPageState = {
   addOrderParticipantsInProgress: false,
   toastShowedAfterSuccessfullyCreatingOrder: false,
   walkthroughStep: -1,
+  fetchOrderRestaurantsInProgress: false,
+  restaurantData: [],
 };
 
 // ================ Thunk types ================ //
@@ -76,6 +81,23 @@ const fetchOrderParticipants = createAsyncThunk(
       const { data } = await getBookerOrderDataApi(orderGetter.getId());
 
       return data.participantData;
+    }
+
+    return [];
+  },
+);
+
+const fetchOrderRestaurants = createAsyncThunk(
+  'app/BookerDraftOrderPage/FETCH_ORDER_RESTAURANTS',
+  async (_, { getState }) => {
+    const { order } = getState().Order;
+    const orderGetter = Listing(order as TListing);
+    const { orderType = EOrderType.normal } = orderGetter.getMetadata();
+
+    if (orderType === EOrderType.group) {
+      const { data } = await getBookerOrderDataApi(orderGetter.getId());
+
+      return data.restaurantData;
     }
 
     return [];
@@ -139,6 +161,7 @@ const sendRemindEmailToMembers = createAsyncThunk(
 export const BookerDraftOrderPageThunks = {
   fetchCompanyAccount,
   fetchOrderParticipants,
+  fetchOrderRestaurants,
   addOrderParticipants,
   deleteOrderParticipants,
   sendRemindEmailToMembers,
@@ -186,6 +209,17 @@ const BookerDraftOrderPageSlice = createSlice({
       })
       .addCase(fetchOrderParticipants.rejected, (state) => {
         state.fetchOrderParticipantsInProgress = false;
+      })
+      /* =============== fetchOrderRestaurants =============== */
+      .addCase(fetchOrderRestaurants.pending, (state) => {
+        state.fetchOrderRestaurantsInProgress = true;
+      })
+      .addCase(fetchOrderRestaurants.fulfilled, (state, { payload }) => {
+        state.fetchOrderRestaurantsInProgress = false;
+        state.restaurantData = payload;
+      })
+      .addCase(fetchOrderRestaurants.rejected, (state) => {
+        state.fetchOrderRestaurantsInProgress = false;
       })
       /* =============== addOrderParticipants =============== */
       .addCase(addOrderParticipants.pending, (state) => {

@@ -76,6 +76,11 @@ const MealPlanCard: React.FC<TMealPlanCardProps> = ({
     [editFoodInprogress, event?.start],
   );
 
+  const availabilityPlanDayOfWeek = useMemo(
+    () => event?.resource?.restaurant?.availabilityPlan?.entries,
+    [event?.resource?.restaurant?.availabilityPlan?.entries],
+  );
+
   return (
     <div
       className={classNames(css.root, {
@@ -107,6 +112,7 @@ const MealPlanCard: React.FC<TMealPlanCardProps> = ({
         endDate={endDate}
         onApplyOtherDaysInProgress={onApplyOtherDaysInProgress}
         availableStatus={availableStatus}
+        availabilityPlanDayOfWeek={availabilityPlanDayOfWeek}
       />
     </div>
   );

@@ -198,11 +198,12 @@ export const recommendRestaurantApi = ({
   orderId: string;
   dateTime?: number;
   recommendParams?: TObject;
-}) =>
-  getApi(`/orders/${orderId}/restaurants-recommendation`, {
+}) => {
+  return getApi(`/orders/${orderId}/restaurants-recommendation`, {
     timestamp: dateTime,
     recommendParams,
   });
+};
 export const updateOrderDetailFromDraftApi = (orderId: string, body: TObject) =>
   putApi(`/orders/${orderId}/update-order-detail-from-draft`, body);
 

@@ -10,7 +10,7 @@ import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { convertWeekDay } from '@src/utils/dates';
 import { EInvalidRestaurantCase } from '@src/utils/enums';
-import type { TObject } from '@src/utils/types';
+import type { TAvailabilityPlanEntries, TObject } from '@src/utils/types';
 
 import ApplyOtherDaysModal from './components/ApplyOtherDaysModal';
 
@@ -26,6 +26,7 @@ type TMealPlanCardFooterProps = {
   startDate?: Date | number;
   endDate?: Date | number;
   availableStatus?: TObject;
+  availabilityPlanDayOfWeek?: TAvailabilityPlanEntries[];
 };
 
 const MealPlanCardFooter: React.FC<TMealPlanCardFooterProps> = ({
@@ -38,6 +39,7 @@ const MealPlanCardFooter: React.FC<TMealPlanCardFooterProps> = ({
   startDate,
   endDate,
   availableStatus,
+  availabilityPlanDayOfWeek,
 }) => {
   const { id, isSelectedFood, restaurant = {} } = event.resource || {};
   const { status, isAvailable = true } = availableStatus || {};
@@ -50,6 +52,7 @@ const MealPlanCardFooter: React.FC<TMealPlanCardFooterProps> = ({
   const currentDayInWeek = convertWeekDay(
     DateTime.fromMillis(Number(event?.start?.getTime())).weekday,
   ).key;
+
   const handleOpenApplyOtherDaysModal = () => {
     setIsOpenApplyOtherDaysModal(true);
   };
@@ -111,6 +114,7 @@ const MealPlanCardFooter: React.FC<TMealPlanCardFooterProps> = ({
         inProgress={onApplyOtherDaysInProgress}
         startDate={startDate}
         endDate={endDate}
+        availabilityPlanDayOfWeek={availabilityPlanDayOfWeek}
       />
     </div>
   );

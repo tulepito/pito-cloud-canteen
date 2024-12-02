@@ -63,12 +63,12 @@ export const useGetCalendarExtraResources = ({
 
   const orderData = Listing(order as TListing);
   const planId = orderData.getMetadata().plans?.[0];
-  const { dayInWeek = [] } = orderData.getMetadata();
+  const { dayInWeek = [], deliveryHour } = orderData.getMetadata();
 
   const onSearchRestaurant = useCallback(
     (date: Date) => {
       router.push(
-        `/company/booker/orders/draft/${orderId}/restaurants?timestamp=${date.getTime()}`,
+        `/company/booker/orders/draft/${orderId}/restaurants?timestamp=${date.getTime()}&deliveryHour=${deliveryHour}`,
       );
     },
     [orderId, router],
@@ -186,7 +186,9 @@ export const useGetCalendarExtraResources = ({
         ),
       );
       const { payload } = await dispatch(
-        orderAsyncActions.recommendRestaurantForSpecificDay({ dateTime: date }),
+        orderAsyncActions.recommendRestaurantForSpecificDay({
+          dateTime: date,
+        }),
       );
       const newPlanDetail = {
         ...planDetail,
@@ -262,6 +264,7 @@ export const useGetCalendarComponentProps = ({
   order: TListing | null;
   shouldHideDayItems: boolean;
   shouldHideExtraActionBtn?: boolean;
+  deliveryHour?: string;
 }) => {
   const router = useRouter();
   const dispatch = useAppDispatch();
@@ -340,7 +343,7 @@ export const useGetCalendarComponentProps = ({
   const componentsProps = useMemo(() => {
     return {
       toolbar: toolbarComponent,
-      contentEnd: shouldHideDayItems ? () => null : contentEndComponent,
+      contentEnd: false ? () => null : contentEndComponent,
     };
   }, [shouldHideDayItems, toolbarComponent, contentEndComponent]);
 

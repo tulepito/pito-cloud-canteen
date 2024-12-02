@@ -71,6 +71,7 @@ export const normalizePlanDetailsToEvent = (
         id: planData?.restaurant?.id,
         name: planData?.restaurant?.restaurantName,
         menuId: planData?.restaurant?.menuId,
+        availabilityPlan: planData?.restaurant?.availabilityPlan,
         coverImage: coverImageList[planData?.restaurant?.id],
       };
       const isRestaurantEmpty = isEmpty(planData?.restaurant?.id);

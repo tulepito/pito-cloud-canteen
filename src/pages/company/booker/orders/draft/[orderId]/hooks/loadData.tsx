@@ -29,6 +29,7 @@ export const useLoadData = ({ orderId }: { orderId: string }) => {
       await dispatch(orderAsyncActions.fetchOrder(orderId));
       await dispatch(BookerDraftOrderPageThunks.fetchCompanyAccount());
       dispatch(BookerDraftOrderPageThunks.fetchOrderParticipants());
+      dispatch(BookerDraftOrderPageThunks.fetchOrderRestaurants());
     })();
   }, [dispatch, orderId]);
 
@@ -53,6 +54,10 @@ export const useGetPlanDetails = () => {
     (state) => state.Order.fetchOrderDetailError,
   );
 
+  const restaurantData = useAppSelector(
+    (state) => state.BookerDraftOrderPage.restaurantData,
+  );
+
   const restaurantCoverImageList = useAppSelector(
     (state) => state.Order.restaurantCoverImageList,
     shallowEqual,
@@ -63,9 +68,35 @@ export const useGetPlanDetails = () => {
   const { plans, deliveryHour, daySession, orderState } =
     orderListing.getMetadata();
 
+  const plansDetails = Object.fromEntries(
+    Object.entries(orderDetail).map(([key, orderValue]: [string, any]) => {
+      const restaurantField = orderValue?.restaurant;
+
+      const matchingRestaurant = restaurantData.find(
+        (restaurant) => restaurantField?.id === restaurant?.id?.uuid,
+      );
+
+      if (matchingRestaurant) {
+        return [
+          key,
+          {
+            ...orderValue,
+            restaurant: {
+              ...orderValue.restaurant,
+              availabilityPlan:
+                matchingRestaurant?.attributes?.availabilityPlan,
+            },
+          },
+        ];
+      }
+
+      return [key, orderValue];
+    }),
+  );
+
   const normalizeData = useMemo(() => {
     return normalizePlanDetailsToEvent(
-      orderDetail,
+      plansDetails,
       {
         plans,
         deliveryHour,
@@ -77,7 +108,7 @@ export const useGetPlanDetails = () => {
   }, [
     JSON.stringify(restaurantCoverImageList),
     JSON.stringify(order),
-    JSON.stringify(orderDetail),
+    JSON.stringify(plansDetails),
   ]);
 
   useEffect(() => {

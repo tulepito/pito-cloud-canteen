@@ -1,3 +1,4 @@
+import { isValid, isWithinInterval, parse } from 'date-fns';
 import get from 'lodash/get';
 import merge from 'lodash/merge';
 import reduce from 'lodash/reduce';
@@ -789,4 +790,91 @@ export const getLocationInitialValues = (partnerListing: any) => {
         selectedPlace: { address, origin: geolocation },
       }
     : {};
+};
+
+export const isTimeRangeWithinInterval = (
+  startTime?: string,
+  endTime?: string,
+  rangeStart?: string,
+  rangeEnd?: string,
+): boolean => {
+  const parseTime = (time?: string) => {
+    if (!time) return null;
+    const parsedTime = parse(time, 'HH:mm', new Date());
+
+    return isValid(parsedTime) ? parsedTime : null;
+  };
+
+  const startInterval = parseTime(startTime);
+  const endInterval = parseTime(endTime);
+  const rangeStartTime = parseTime(rangeStart);
+  const rangeEndTime = parseTime(rangeEnd);
+
+  if (!startInterval || !endInterval || !rangeStartTime || !rangeEndTime) {
+    return false;
+  }
+
+  return (
+    isWithinInterval(rangeStartTime, {
+      start: startInterval,
+      end: endInterval,
+    }) &&
+    isWithinInterval(rangeEndTime, { start: startInterval, end: endInterval })
+  );
+};
+
+export const filterRestaurantsByOpenDayAndTime = (
+  restaurants: TListing[],
+  options: {
+    dayOfWeek?: string;
+    dayInWeek?: string[];
+    rangeStart?: string;
+    rangeEnd?: string;
+  },
+) => {
+  const { dayOfWeek, dayInWeek, rangeStart, rangeEnd } = options;
+
+  const parseTime = (time?: string) => {
+    if (!time) return null;
+    const parsedTime = parse(time, 'HH:mm', new Date());
+
+    return isValid(parsedTime) ? parsedTime : null;
+  };
+
+  const rangeStartTime = parseTime(rangeStart);
+  const rangeEndTime = parseTime(rangeEnd);
+
+  return restaurants.filter((restaurant: any) =>
+    restaurant?.attributes?.availabilityPlan?.entries?.some((entry: any) => {
+      const isDayMatch =
+        (dayOfWeek && entry?.dayOfWeek === dayOfWeek) ||
+        (dayInWeek && dayInWeek.includes(entry?.dayOfWeek));
+
+      if (
+        rangeStartTime &&
+        rangeEndTime &&
+        entry?.startTime &&
+        entry?.endTime
+      ) {
+        const entryStartTime = parseTime(entry.startTime);
+        const entryEndTime = parseTime(entry.endTime);
+
+        if (!entryStartTime || !entryEndTime) return false;
+
+        const isTimeMatch =
+          isWithinInterval(rangeStartTime, {
+            start: entryStartTime,
+            end: entryEndTime,
+          }) &&
+          isWithinInterval(rangeEndTime, {
+            start: entryStartTime,
+            end: entryEndTime,
+          });
+
+        return isDayMatch && isTimeMatch;
+      }
+
+      return isDayMatch;
+    }),
+  );
 };

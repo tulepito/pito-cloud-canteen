@@ -233,6 +233,7 @@ export type TListingAttributes = {
   price?: typeof Money;
   publicData: TObject;
   metadata: TObject;
+  availabilityPlan?: TAvailabilityPlan;
 };
 
 export type TDayOfWeek = EDayOfWeek;

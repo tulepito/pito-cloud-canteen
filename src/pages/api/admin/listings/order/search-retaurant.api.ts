@@ -18,6 +18,7 @@ import type { TFoodInRestaurant } from '@src/types/bookerSelectRestaurant';
 import {
   CurrentUser,
   denormalisedResponseEntities,
+  filterRestaurantsByOpenDayAndTime,
   Listing,
 } from '@src/utils/data';
 import { convertWeekDay, VNTimezone } from '@src/utils/dates';
@@ -51,6 +52,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           deliveryAddress = {},
           packagePerMember = 0,
           nutritions = [],
+          deliveryHour,
         } = orderListing.getMetadata();
         const allMenus: TListing[] = await queryAllPages({
           sdkModel: integrationSdk.listings,
@@ -139,10 +141,18 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         }, new Map<string, TListing>());
         const searchResult: TListing[] = [];
         const combinedRestaurantInFoods: TFoodInRestaurant[] = [];
-        flatten(
-          restaurantsResponse.map(
-            ({ chunkRestaurantsResponse }) => chunkRestaurantsResponse,
+
+        filterRestaurantsByOpenDayAndTime(
+          flatten(
+            restaurantsResponse.map(
+              ({ chunkRestaurantsResponse }) => chunkRestaurantsResponse,
+            ),
           ),
+          {
+            dayOfWeek,
+            rangeStart: deliveryHour?.split('-')[0],
+            rangeEnd: deliveryHour?.split('-')[1],
+          },
         ).forEach((restaurant: TListing) => {
           const restaurantListing = Listing(restaurant);
           const restaurantId = restaurantListing.getId();
@@ -193,6 +203,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
               restaurantId,
               menuId: menuFound.id.uuid as string,
             });
+
             searchResult.push(restaurant);
             restaurantIdList.push(restaurantId);
             combinedRestaurantInFoods.push(...foodsFound);

@@ -1162,7 +1162,7 @@
   "MealPlanCard.footer.applyForOtherDays": "Áp dụng cho ngày khác",
   "MealPlanCard.footer.modify": "Tuỳ chọn thực đơn",
   "MealPlanCard.footer.restaurantClosed": "Nhà hàng không còn phục vụ",
-  "MealPlanCard.footer.restaurantHasNoValidMenus": "Nhà hàng tạm ngưng nhận đơn",
+  "MealPlanCard.footer.restaurantHasNoValidMenus": "Nhà hàng không có thực đơn hợp lệ",
   "MealPlanCard.footer.selectDish": "Chọn món",
   "MealPlanDateField.deliveryHourLabel": "Chọn khung giờ giao hàng",
   "MealPlanDateField.deliveryHourRequired": "Vui lòng chọn giờ giao hàng",

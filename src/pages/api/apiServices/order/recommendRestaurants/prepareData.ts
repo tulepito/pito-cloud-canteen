@@ -147,6 +147,7 @@ export const prepareParamsFromOrderForSpecificDay = async ({
     mealType = [],
     packagePerMember,
     orderType,
+    deliveryHour,
   } = Listing(order as TListing).getMetadata();
   let orderDetail = {};
 
@@ -167,6 +168,7 @@ export const prepareParamsFromOrderForSpecificDay = async ({
     mealType,
     packagePerMember,
     menuQuery: getMenuQuery({ order, params: menuQueryParams }),
+    deliveryHour,
   };
 };
 
@@ -184,6 +186,7 @@ export const prepareParamsFromGivenParamsForSpecificDay = ({
     packagePerMember,
     daySession,
     isNormalOrder = true,
+    deliveryHour,
   } = recommendParams;
 
   return {
@@ -203,6 +206,7 @@ export const prepareParamsFromGivenParamsForSpecificDay = ({
       },
       params: menuQueryParams,
     }),
+    deliveryHour,
   };
 };
 
@@ -219,6 +223,7 @@ export const prepareParamsFromOrderForAllDays = async ({ order }: TObject) => {
     packagePerMember = 0,
     nutritions = [],
     mealType = [],
+    deliveryHour,
   } = Listing(order as TListing).getMetadata();
 
   const company = await fetchUser(companyId);
@@ -233,6 +238,7 @@ export const prepareParamsFromOrderForAllDays = async ({ order }: TObject) => {
     dayInWeek,
     totalDates: renderDateRange(startDate, endDate),
     isNormalOrder: orderType === EOrderType.normal,
+    deliveryHour,
   };
 };
 // * recommend from draft order data (recommend params)
@@ -249,6 +255,7 @@ export const prepareParamsFromGivenParamsForAllDays = ({
     nutritions,
     mealType,
     packagePerMember,
+    deliveryHour,
   } = recommendParams;
 
   return {
@@ -260,6 +267,7 @@ export const prepareParamsFromGivenParamsForAllDays = ({
     dayInWeek,
     totalDates: renderDateRange(startDate, endDate),
     isNormalOrder,
+    deliveryHour,
   };
 };
 

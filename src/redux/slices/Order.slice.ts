@@ -461,8 +461,11 @@ const updateOrder = createAsyncThunk(
 const recommendRestaurants = createAsyncThunk(
   RECOMMEND_RESTAURANT,
   async (
-    // eslint-disable-next-line unused-imports/no-unused-vars
-    { shouldUpdatePlanOrderOrderDetail = true, recommendParams = {} }: TObject,
+    {
+      // eslint-disable-next-line unused-imports/no-unused-vars
+      shouldUpdatePlanOrderOrderDetail = true,
+      recommendParams = {},
+    }: TObject,
     { getState },
   ) => {
     const { order } = getState().Order;

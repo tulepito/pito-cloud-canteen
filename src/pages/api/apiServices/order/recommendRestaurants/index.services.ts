@@ -12,9 +12,13 @@ import {
 } from '@helpers/listingSearchQuery';
 import { initLineItemsFromFoodList } from '@helpers/orderHelper';
 import { adminQueryListings, fetchListing } from '@services/integrationHelper';
-import { Listing } from '@src/utils/data';
+import {
+  filterRestaurantsByOpenDayAndTime,
+  isTimeRangeWithinInterval,
+  Listing,
+} from '@src/utils/data';
 import { convertWeekDay, VNTimezone } from '@src/utils/dates';
-import type { TListing, TObject } from '@src/utils/types';
+import type { TDayOfWeek, TListing, TObject } from '@src/utils/types';
 
 import {
   combineMenusWithRestaurantData,
@@ -26,6 +30,13 @@ import {
   prepareParamsFromOrderForSpecificDay,
   prepareRestaurantDataForOrderDetail,
 } from './prepareData';
+
+type TAvailabilityPlanEntries = {
+  dayOfWeek: TDayOfWeek;
+  seats: number;
+  startTime?: string;
+  endTime?: string;
+};
 
 export const recommendRestaurantForSpecificDay = async ({
   orderId,
@@ -56,6 +67,7 @@ export const recommendRestaurantForSpecificDay = async ({
     deliveryOrigin,
     mealType,
     isNormalOrder,
+    deliveryHour,
   } = isEmpty(recommendParams)
     ? await prepareParamsFromOrderForSpecificDay({
         order,
@@ -108,6 +120,7 @@ export const recommendRestaurantForSpecificDay = async ({
       ),
     ),
   );
+
   // * map restaurant with menu data
   const restaurants = combineMenusWithRestaurantData({
     menus: filteredMenus,
@@ -115,16 +128,33 @@ export const recommendRestaurantForSpecificDay = async ({
     shouldCalculateDistance,
     deliveryOrigin,
   });
-  if (restaurants.length > 0) {
-    const randomNumber = Math.floor(Math.random() * (restaurants.length - 1));
-    const otherRandomNumber = Math.abs(randomNumber - restaurants.length + 1);
-    const randomRestaurantObjA = restaurants[randomNumber];
+  let restaurantsFiltered = restaurants;
+
+  const dateTime = DateTime.fromMillis(timestamp).setZone(VNTimezone);
+  const dayOfWeek = convertWeekDay(dateTime.weekday).key;
+
+  if (dayOfWeek) {
+    restaurantsFiltered = filterRestaurantsByOpenDayAndTime(restaurants, {
+      dayOfWeek,
+      rangeStart: deliveryHour?.split('-')[0],
+      rangeEnd: deliveryHour?.split('-')[1],
+    });
+  }
+
+  if (restaurantsFiltered.length > 0) {
+    const randomNumber = Math.floor(
+      Math.random() * (restaurantsFiltered.length - 1),
+    );
+    const otherRandomNumber = Math.abs(
+      randomNumber - restaurantsFiltered.length + 1,
+    );
+    const randomRestaurantObjA = restaurantsFiltered[randomNumber];
 
     const randomRestaurantObj =
       randomRestaurantObjA.restaurantInfo?.id?.uuid !==
       orderDetail[timestamp]?.restaurant?.id
         ? randomRestaurantObjA
-        : restaurants[otherRandomNumber];
+        : restaurantsFiltered[otherRandomNumber];
 
     const { menu, restaurant } = randomRestaurantObj;
 
@@ -183,6 +213,7 @@ export const recommendRestaurants = async ({
     dayInWeek,
     totalDates,
     isNormalOrder,
+    deliveryHour,
   } = isEmpty(recommendParams)
     ? await prepareParamsFromOrderForAllDays({ order })
     : prepareParamsFromGivenParamsForAllDays({ recommendParams });
@@ -260,9 +291,33 @@ export const recommendRestaurants = async ({
         deliveryOrigin,
       });
 
-      if (restaurants.length > 0) {
+      const restaurantsFiltered = restaurants?.filter((item: any) =>
+        item?.restaurant?.attributes?.availabilityPlan?.entries?.some(
+          (entry: TAvailabilityPlanEntries) => {
+            const isDayMatch = dayInWeek?.includes(entry?.dayOfWeek);
+
+            if (deliveryHour) {
+              const [rangeStart, rangeEnd] = deliveryHour.split('-');
+              const isTimeMatch = isTimeRangeWithinInterval(
+                entry?.startTime,
+                entry?.endTime,
+                rangeStart,
+                rangeEnd,
+              );
+
+              return isDayMatch && isTimeMatch;
+            }
+
+            return isDayMatch;
+          },
+        ),
+      );
+
+      if (restaurantsFiltered.length > 0) {
         const randomRestaurant =
-          restaurants[Math.floor(Math.random() * (restaurants.length - 1))];
+          restaurantsFiltered[
+            Math.floor(Math.random() * (restaurantsFiltered.length - 1))
+          ];
         const { menu, restaurant } = randomRestaurant;
 
         const timestampWeekDay = convertWeekDay(

@@ -130,6 +130,7 @@ function BookerDraftOrderPage() {
   const participantData = useAppSelector(
     (state) => state.BookerDraftOrderPage.participantData,
   );
+
   const toastShowedAfterSuccessfullyCreatingOrder = useAppSelector(
     (state) =>
       state.BookerDraftOrderPage.toastShowedAfterSuccessfullyCreatingOrder,
@@ -138,12 +139,14 @@ function BookerDraftOrderPage() {
     (state) => state.BookerSelectRestaurant.restaurantFood,
     shallowEqual,
   );
+
   const fetchRestaurantFoodInProgress = useAppSelector(
     (state) => state.BookerSelectRestaurant.fetchRestaurantFoodInProgress,
   );
   const isAllDatesHaveNoRestaurants = useAppSelector(
     (state) => state.Order.isAllDatesHaveNoRestaurants,
   );
+
   const searchInProgress = useAppSelector(
     (state) => state.BookerSelectRestaurant.searchInProgress,
   );
@@ -162,6 +165,7 @@ function BookerDraftOrderPage() {
     startDate,
     endDate,
   });
+
   const {
     isRestaurantDetailModalOpen,
     openRestaurantDetailModal,
@@ -332,13 +336,15 @@ function BookerDraftOrderPage() {
   };
 
   const calendarProps = {
-    renderEvent: (props: any) => (
-      <MealPlanCard
-        {...props}
-        removeInprogress={props?.resources?.updatePlanDetailInprogress}
-        onRemove={handleRemoveMeal(props?.resources?.planId)}
-      />
-    ),
+    renderEvent: (props: any) => {
+      return (
+        <MealPlanCard
+          {...props}
+          removeInprogress={props?.resources?.updatePlanDetailInprogress}
+          onRemove={handleRemoveMeal(props?.resources?.planId)}
+        />
+      );
+    },
     resources: {
       ...calendarExtraResources,
       onEditFood: onOpenPickFoodModal,

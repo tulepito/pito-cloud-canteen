@@ -1,11 +1,12 @@
 import { useMemo } from 'react';
 import { useForm } from 'react-final-form-hooks';
 import { FormattedMessage } from 'react-intl';
-import difference from 'lodash/difference';
+import { difference } from 'lodash';
 import { DateTime } from 'luxon';
 
 import Button from '@components/Button/Button';
 import { convertWeekDay, renderDateRange } from '@src/utils/dates';
+import type { TAvailabilityPlanEntries } from '@src/utils/types';
 
 import BasicDayInWeekField from '../../BasicDayInWeekField/BasicDayInWeekField';
 
@@ -19,6 +20,7 @@ type TApplyOtherDaysFormProps = {
   inProgress?: boolean;
   startDate?: Date | number;
   endDate?: Date | number;
+  availabilityPlanDayOfWeek?: TAvailabilityPlanEntries[];
 };
 
 export type TApplyOtherDaysFormValues = {
@@ -41,6 +43,7 @@ const ApplyOtherDaysForm: React.FC<TApplyOtherDaysFormProps> = ({
   inProgress,
   startDate,
   endDate,
+  availabilityPlanDayOfWeek,
 }) => {
   const { form, handleSubmit, submitting, hasValidationErrors, values } =
     useForm<TApplyOtherDaysFormValues>({
@@ -69,10 +72,11 @@ const ApplyOtherDaysForm: React.FC<TApplyOtherDaysFormProps> = ({
   return (
     <form className={css.root} onSubmit={handleSubmit}>
       <BasicDayInWeekField
+        title="Chọn ngày"
         form={form}
         values={values}
         disabledDates={disabledDates}
-        title="Chọn ngày"
+        availabilityPlanDayOfWeek={availabilityPlanDayOfWeek}
       />
 
       <div className={css.btnWrapper}>
