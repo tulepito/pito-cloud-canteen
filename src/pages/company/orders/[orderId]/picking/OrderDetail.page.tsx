@@ -406,14 +406,6 @@ const OrderDetailPage = () => {
                 />
               </div>
             </OrderDeadlineCountdownSection>
-
-            <OrderLinkSection
-              className={css.mobileContainer}
-              data={editViewData.linkSectionData}
-              ableToUpdateOrder={ableToUpdateOrder}
-              shouldHideOnMobileView
-              mobileModalControl={sendNotificationModalControl}
-            />
             <ManageParticipantsSection
               className={css.mobileContainer}
               data={editViewData.manageParticipantData}
