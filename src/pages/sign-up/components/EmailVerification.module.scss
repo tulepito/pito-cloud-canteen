@@ -3,11 +3,11 @@
 @use '/src/styles/mixins.scss' as *;
 
 .root {
-  padding: 40px;
+  padding: 0 20px 20px;
   width: 100%;
 
-  @include viewportLarge {
-    padding-top: 48px;
+  @include viewportMedium {
+    padding: 0;
   }
 }
 
@@ -15,7 +15,7 @@
   @include flexCenter;
   flex-direction: column;
   max-width: 516px;
-  margin: 48px auto;
+  margin: 0 auto;
 }
 
 .name {
@@ -55,6 +55,12 @@
 .resendEmailLink {
   color: $labelBlue2;
   cursor: pointer;
+  margin-top: 12px;
+
+  &:hover {
+    text-decoration: underline;
+    opacity: 0.8;
+  }
 }
 
 .toHomePageLink {
@@ -69,11 +75,16 @@
 
 .modalTitle {
   text-align: center;
-  @include textTemplate(32px, $fontWeightBold, 48px);
+  @include textTemplate(24px, $fontWeightBold, 32px);
+
+  @include viewportMedium {
+    @include textTemplate(28px, $fontWeightBold, 36px);
+  }
 }
 
 .modalMessage {
   text-align: center;
+  @include textTemplate(14px, $fontWeightRegular, 20px);
 }
 
 .divider {

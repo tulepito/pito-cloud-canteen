@@ -46,3 +46,7 @@ export const DAY_IN_WEEK = [
   { key: 'sat', label: 'DayInWeekField.sat' },
   { key: 'sun', label: 'DayInWeekField.sun' },
 ];
+
+export const LOCAL_STORAGE_KEYS = {
+  INVITATION_COMPANY_ID: 'invitation-company-id',
+};

@@ -88,7 +88,7 @@ const CompanyInvitationPage = () => {
     const { meta } = await dispatch(userThunks.fetchCurrentUser());
 
     if (meta.requestStatus === 'fulfilled') {
-      router.push('/');
+      router.push(participantPaths.OrderList);
     }
   };
 

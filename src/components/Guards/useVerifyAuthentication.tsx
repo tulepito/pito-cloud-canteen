@@ -1,8 +1,10 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 
+import { setItem } from '@helpers/localStorageHelpers';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { enGeneralPaths, generalPaths, participantPaths } from '@src/paths';
+import { LOCAL_STORAGE_KEYS } from '@src/utils/constants';
 
 import { usePathChecker } from './Guards.helper';
 
@@ -37,6 +39,14 @@ const useVerifyAuthentication = (homePageNavigateCondition: boolean) => {
       }
     } else if (!isAuthenticated) {
       if (PATHS_REDIRECT_TO_SIGN_UP_IF_UNAUTHENTICATED.includes(pathname)) {
+        if (!router.isReady) return;
+
+        const companyId = Array.isArray(router.query.companyId)
+          ? router?.query?.companyId?.[0]
+          : router?.query?.companyId;
+
+        setItem(LOCAL_STORAGE_KEYS.INVITATION_COMPANY_ID, companyId ?? '');
+
         router.replace({
           pathname: generalPaths.SignUp,
           query: { from: fullPath },

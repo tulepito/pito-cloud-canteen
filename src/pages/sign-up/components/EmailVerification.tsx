@@ -4,11 +4,12 @@ import { useDispatch } from 'react-redux';
 import { useRouter } from 'next/router';
 
 import Button from '@components/Button/Button';
-import PitoLogoV2 from '@components/PitoLogoV2/PitoLogoV2';
+import { getItem } from '@helpers/localStorageHelpers';
 import { companyInvitationThunks } from '@redux/slices/companyInvitation.slice';
 import { userThunks } from '@redux/slices/user.slice';
 import type { AppDispatch } from '@redux/store';
 import { enGeneralPaths } from '@src/paths';
+import { LOCAL_STORAGE_KEYS } from '@src/utils/constants';
 import { isTooManyEmailVerificationRequestsError } from '@utils/errors';
 
 import css from './EmailVerification.module.scss';
@@ -34,7 +35,12 @@ const EmailVerification: React.FC<TEmailVerificationProps> = (props) => {
   };
 
   const navigateToHomePageMaybe = () => {
-    router.push(fromUrl ? (fromUrl as string) : enGeneralPaths.Auth);
+    const companyId = getItem(LOCAL_STORAGE_KEYS.INVITATION_COMPANY_ID);
+    if (companyId) {
+      router.push(`/participant/invitation/${companyId}`);
+    } else {
+      router.push(enGeneralPaths.Auth);
+    }
   };
 
   const resendEmailLink = (
@@ -73,7 +79,6 @@ const EmailVerification: React.FC<TEmailVerificationProps> = (props) => {
   return (
     <div className={css.root}>
       <div className={css.content}>
-        <PitoLogoV2 />
         <h2 className={css.modalTitle}>
           <FormattedMessage id="EmailVerification.verifyEmailTitle" />
         </h2>
