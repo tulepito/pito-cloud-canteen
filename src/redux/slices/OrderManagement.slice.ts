@@ -648,26 +648,12 @@ const addParticipant = createAsyncThunk(
 
     const {
       id: { uuid: orderId },
-      attributes: {
-        metadata: { participants = [], anonymous = [] },
-      },
     } = getState().OrderManagement.orderData!;
     const {
       id: { uuid: planId },
-      attributes: {
-        metadata: { orderDetail = {} },
-      },
     } = getState().OrderManagement.planData!;
 
-    const bodyParams = {
-      email,
-      companyId,
-      orderId,
-      planId,
-      anonymous,
-      participants,
-      orderDetail,
-    };
+    const bodyParams = { email, companyId, orderId, planId };
 
     const response = await addParticipantToOrderApi(orderId, bodyParams);
     const { data } = response || {};

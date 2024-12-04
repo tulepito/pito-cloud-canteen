@@ -15,14 +15,14 @@ import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
 import MealPlanCard from '@components/CalendarDashboard/components/MealPlanCard/MealPlanCard';
 import { getBookerMockupSubOrder } from '@components/CalendarDashboard/helpers/mockupData';
 import useSelectDay from '@components/CalendarDashboard/hooks/useSelectDay';
+import IconCheckWithBackground from '@components/Icons/IconCheckWithBackground/IconCheckWithBackground';
 import IconEmpty from '@components/Icons/IconEmpty/IconEmpty';
 import IconHome from '@components/Icons/IconHome/IconHome';
-import IconMagicWand from '@components/Icons/IconMagicWand/IconMagicWand';
 import IconPlus from '@components/Icons/IconPlus/IconPlus';
 import IconSetting from '@components/Icons/IconSetting/IconSetting';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import Stepper from '@components/Stepper/Stepper';
-import { BOTTOM_CENTER_TOAST_ID } from '@components/ToastifyProvider/ToastifyProvider';
+import logger from '@helpers/logger';
 import {
   findSuitableAnchorDate,
   getParticipantPickingLink,
@@ -83,8 +83,6 @@ import {
 } from './BookerDraftOrderPage.slice';
 
 import css from './BookerDraftOrder.module.scss';
-import IconCheckWithBackground from '@components/Icons/IconCheckWithBackground/IconCheckWithBackground';
-import logger from '@helpers/logger';
 
 const ENABLE_TO_ACCESS_PAGE_ORDER_STATES = [
   EOrderDraftStates.pendingApproval,
@@ -187,7 +185,6 @@ function BookerDraftOrderPage() {
     packagePerMember = 0,
     companyId,
     orderDeadline,
-    participants = [],
     nonAccountEmails = [],
   } = orderListing.getMetadata();
   const { title: orderTitle } = orderListing.getAttributes();
@@ -370,8 +367,7 @@ function BookerDraftOrderPage() {
     if (!isEmpty(newUserIds)) {
       dispatch(
         BookerDraftOrderPageThunks.addOrderParticipants({
-          orderId,
-          participants,
+          orderId: String(orderId),
           newUserIds,
           newUsers,
           nonAccountEmails: newNonAccountEmails,
@@ -468,6 +464,7 @@ function BookerDraftOrderPage() {
       {
         autoClose: 5000,
         hideProgressBar: true,
+        toastId: 'BookerDraftOrderPage.OrderSuccessfullyCreated',
         icon: <IconCheckWithBackground className={css.toastIcon} />,
         className: css.toastContainer,
       },

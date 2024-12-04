@@ -2,8 +2,6 @@ import classNames from 'classnames';
 import { DateTime } from 'luxon';
 
 import Button from '@components/Button/Button';
-import IconNoteBook from '@components/Icons/IconNoteBook/IconNoteBook';
-import IconNoteCheckList from '@components/Icons/IconNoteCheckList/IconNoteCheckList';
 import Modal from '@components/Modal/Modal';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { findDeliveryDate } from '@helpers/order/prepareDataHelper';

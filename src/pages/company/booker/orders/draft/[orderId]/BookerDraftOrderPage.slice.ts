@@ -107,17 +107,25 @@ const fetchOrderRestaurants = createAsyncThunk(
 const addOrderParticipants = createAsyncThunk(
   'app/BookerDraftOrderPage/ADD_ORDER_PARTICIPANTS',
   async (
-    { orderId, participants, newUserIds, newUsers, nonAccountEmails }: TObject,
+    {
+      orderId,
+      newUserIds,
+      newUsers,
+      nonAccountEmails,
+    }: {
+      orderId: string;
+      newUserIds: string[];
+      newUsers: TObject[];
+      nonAccountEmails: string[];
+    },
     { dispatch },
   ) => {
     const bodyParams = {
       orderId,
-      participants,
       nonAccountEmails,
       userIds: newUserIds,
     };
 
-    // todo: add only has company user into order, has no companies users are handled in addCompanyMember flow
     await addParticipantToOrderApi(orderId, bodyParams);
 
     dispatch(setNonAccountEmails(nonAccountEmails));

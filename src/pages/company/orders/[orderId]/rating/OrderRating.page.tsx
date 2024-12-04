@@ -11,6 +11,7 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { useViewport } from '@hooks/useViewport';
 import { resetImage } from '@redux/slices/uploadImage.slice';
+import { enGeneralPaths } from '@src/paths';
 import { Listing } from '@src/utils/data';
 import { EOrderStates } from '@src/utils/enums';
 
@@ -214,7 +215,7 @@ const OrderRatingPage = () => {
     router.back();
   };
   const handleGoToHome = () => {
-    router.push('/');
+    router.push(enGeneralPaths.Auth);
   };
 
   return (

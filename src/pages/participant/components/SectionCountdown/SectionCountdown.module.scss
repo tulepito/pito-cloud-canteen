@@ -28,8 +28,6 @@
   .orderEndAtMessage {
     color: $neutralGray7;
     margin: 16px 0 16px;
-    padding-bottom: 16px;
-    border-bottom: 1px solid $neutralGray6;
     @include textTemplate(14px, 400, 24px, '');
     .orderEndAtLabel {
       color: $neutralGray6;

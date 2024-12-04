@@ -4,10 +4,11 @@ import uniq from 'lodash/uniq';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HttpMethod } from '@apis/configs';
+import logger from '@helpers/logger';
 import cookies from '@services/cookie';
 import { emailSendingFactory, EmailTemplateTypes } from '@services/email';
 import { getIntegrationSdk, handleError } from '@services/sdk';
-import { denormalisedResponseEntities } from '@utils/data';
+import { denormalisedResponseEntities, Listing } from '@utils/data';
 import { EParticipantOrderStatus } from '@utils/enums';
 import type { TObject } from '@utils/types';
 
@@ -22,14 +23,20 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           query: { orderId = '' },
           body: {
             email = '',
-            participants = [],
             planId = '',
             nonAccountEmails,
-            anonymous = [],
-            orderDetail = {},
             userIds: userIdsFromBody = [],
           },
         } = req;
+
+        const [orderListing] = denormalisedResponseEntities(
+          await integrationSdk.listings.show({
+            id: orderId,
+          }),
+        );
+        const { participants = [], anonymous = [] } =
+          Listing(orderListing).getMetadata();
+
         const needUpdateNoAccountEmails =
           typeof nonAccountEmails !== 'undefined';
 
@@ -45,7 +52,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
               }),
             );
           } catch (errorFetchUser: any) {
-            console.error(errorFetchUser?.data?.errors[0]);
+            logger.error(
+              'Fetch user error in path: /api/orders/[orderId]/participant',
+              String(errorFetchUser),
+            );
           }
 
           if (!user) {
@@ -100,6 +110,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         }
 
         if (!isEmpty(planId)) {
+          const [planListing] = denormalisedResponseEntities(
+            await integrationSdk.listings.show({
+              id: planId,
+            }),
+          );
+          const { orderDetail } = Listing(planListing).getMetadata();
+
           const newOrderDetail = Object.entries(orderDetail).reduce(
             (result, current) => {
               const [date, orderDetailOnDate] = current;
@@ -151,6 +168,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           message: `Successfully add participant, email: ${email} and ids: ${userIds}`,
         });
       } catch (error) {
+        logger.error(
+          'Error in path: /api/orders/[orderId]/participant',
+          String(error),
+        );
         handleError(res, error);
       }
       break;

@@ -3,11 +3,6 @@ import { useIntl } from 'react-intl';
 import { DateTime } from 'luxon';
 
 import CountdownTimer from '@components/CountdownTimer/CountdownTimer';
-import Toggle from '@components/Toggle/Toggle';
-import useBoolean from '@hooks/useBoolean';
-
-import type { TNotificationSelectionFormValues } from '../NotificationSelectionForm/NotificationSelectionForm';
-import NotificationSelectionForm from '../NotificationSelectionForm/NotificationSelectionForm';
 
 import css from './SectionCountdown.module.scss';
 
@@ -18,22 +13,8 @@ type TSectionCountDownProps = {
 const SectionCountdown: React.FC<TSectionCountDownProps> = ({
   orderDeadline,
 }) => {
-  // State
-  const receiveNotificationControl = useBoolean(false);
   const intl = useIntl();
 
-  // Functions
-
-  const onReceiveNotification = (value: boolean) => {
-    // TODO: logic notification later
-    receiveNotificationControl.setValue(value);
-  };
-
-  const onSubmitNotificationForm = (
-    _values: TNotificationSelectionFormValues,
-  ) => {};
-
-  // Renderers
   const sectionTitle = intl.formatMessage({
     id: 'SectionCountDown.sectionTitle',
   });
@@ -53,27 +34,12 @@ const SectionCountdown: React.FC<TSectionCountDownProps> = ({
       year: deadlineDateObj.get('year'),
     },
   );
-  const toggleNotificationTitle = intl.formatMessage({
-    id: 'SectionCountdown.toggleNotificationLabel',
-  });
 
   return (
     <div className={css.root}>
       <p className={css.title}>{sectionTitle}</p>
       <CountdownTimer deadline={orderDeadline} stopAt={0} />
       <p className={css.orderEndAtMessage}>{orderEndAtMessage}</p>
-      <div className={css.toggleNotification}>
-        <span>
-          <Toggle
-            status={receiveNotificationControl.value ? 'on' : 'off'}
-            label={toggleNotificationTitle}
-            onClick={onReceiveNotification}
-          />
-        </span>
-      </div>
-      {receiveNotificationControl.value && (
-        <NotificationSelectionForm onSubmit={onSubmitNotificationForm} />
-      )}
     </div>
   );
 };

@@ -8,8 +8,6 @@ import { ECompanyPermission } from '@src/utils/enums';
 import { denormalisedResponseEntities, User } from '@utils/data';
 import type { TCurrentUser, TObject, TUser } from '@utils/types';
 
-import logger from './logger';
-
 export const ensureActiveUserIds = async (
   userIds: string[],
 ): Promise<string[]> => {
@@ -24,11 +22,6 @@ export const ensureActiveUserIds = async (
         uuid: string;
       };
     }) => participant.id.uuid,
-  );
-
-  logger.info(
-    'ensureActiveUserIds',
-    JSON.stringify({ userIds, activeUserIds }),
   );
 
   return activeUserIds;

@@ -24,12 +24,10 @@ export const sendNotificationToParticipantOnUpdateOrder = async (
             }),
           ),
         );
-
-        return;
       }
 
+      // eslint-disable-next-line no-fallthrough
       default:
-        return;
     }
   } catch (error) {
     console.error(

@@ -50,7 +50,6 @@ const ParticipantManagement: React.FC<TParticipantManagementProps> = () => {
 
   const isParticipantListEmpty = isEmpty(participantData);
   const restrictEmailList = participantData.map((p) => p.attributes.email);
-  const restrictParticipantIds = participantData.map((p) => p.id.uuid);
 
   const handleInviteMemberViaEmailList = async (emailList: string[]) => {
     const needInviteEmailList = difference(
@@ -85,7 +84,6 @@ const ParticipantManagement: React.FC<TParticipantManagementProps> = () => {
         await dispatch(
           BookerDraftOrderPageThunks.addOrderParticipants({
             orderId,
-            participants: restrictParticipantIds,
             nonAccountEmails,
             newUsers,
             newUserIds: newHasCompanyUserIds,
