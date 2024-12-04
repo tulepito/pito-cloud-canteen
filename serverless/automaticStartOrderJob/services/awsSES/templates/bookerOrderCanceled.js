@@ -132,13 +132,13 @@ mso-hide:all;
 <td align="center" valign="top" style="padding:0;Margin:0;width:560px">
 <table cellpadding="0" cellspacing="0" width="100%" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
 <tr>
-<td align="center" class="es-m-txt-c" style="padding:0;Margin:0"><!--[if mso]><a href="https://cloudcanteen.pito.vn/" target="_blank" hidden>
-<v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" esdevVmlButton href="https://cloudcanteen.pito.vn/"
+<td align="center" class="es-m-txt-c" style="padding:0;Margin:0"><!--[if mso]><a href="https://cloudcanteen.pito.vn/auth" target="_blank" hidden>
+<v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" esdevVmlButton href="https://cloudcanteen.pito.vn/auth"
 style="height:43px; v-text-anchor:middle; width:283px" arcsize="19%" stroke="f" fillcolor="#ef3d2a">
 <w:anchorlock></w:anchorlock>
 <center style='color:#ffffff; font-family:Manrope; font-size:15px; font-weight:400; line-height:15px; mso-text-raise:1px'>Đặt lại tuần ăn</center>
 </v:roundrect></a>
-<![endif]--><!--[if !mso]><!-- --><span class="msohide es-button-border" style="border-style:solid;border-color:#2CB543;background:#ef3d2a;border-width:0px;display:inline-block;border-radius:8px;width:auto;mso-hide:all"><a href="https://cloudcanteen.pito.vn/" class="es-button msohide es-button-1681787532151" target="_blank" style="mso-style-priority:100 !important;text-decoration:none;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;color:#FFFFFF;font-size:16px;padding:12px 80px;display:inline-block;background:#ef3d2a;border-radius:8px;font-family:Manrope;font-weight:normal;font-style:normal;line-height:19px;width:auto;text-align:center;mso-padding-alt:0;mso-border-alt:10px solid #ef3d2a;mso-hide:all">Đặt lại tuần ăn</a></span><!--<![endif]--></td>
+<![endif]--><!--[if !mso]><!-- --><span class="msohide es-button-border" style="border-style:solid;border-color:#2CB543;background:#ef3d2a;border-width:0px;display:inline-block;border-radius:8px;width:auto;mso-hide:all"><a href="https://cloudcanteen.pito.vn/auth" class="es-button msohide es-button-1681787532151" target="_blank" style="mso-style-priority:100 !important;text-decoration:none;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;color:#FFFFFF;font-size:16px;padding:12px 80px;display:inline-block;background:#ef3d2a;border-radius:8px;font-family:Manrope;font-weight:normal;font-style:normal;line-height:19px;width:auto;text-align:center;mso-padding-alt:0;mso-border-alt:10px solid #ef3d2a;mso-hide:all">Đặt lại tuần ăn</a></span><!--<![endif]--></td>
 </tr>
 </table></td>
 </tr>
