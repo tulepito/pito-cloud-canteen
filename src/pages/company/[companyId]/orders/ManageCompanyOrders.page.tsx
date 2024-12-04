@@ -60,7 +60,9 @@ const ManageCompanyOrdersPage: React.FC<TManageCompanyOrdersPageProps> = () => {
         companyIdFormQuery === 'personal')
     ) {
       const companyId = getCompanyIdFromBookerUser(currentUser);
-      replace({ pathname: companyPaths.ManageOrders, query: { companyId } });
+      if (companyId?.length > 0) {
+        replace({ pathname: companyPaths.ManageOrders, query: { companyId } });
+      }
     }
   }, [
     isReady,

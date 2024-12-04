@@ -293,14 +293,12 @@ const CompanyOrdersTable: React.FC<TCompanyOrdersTableProps> = () => {
 
     if (newTab.toString() !== currentTab.toString()) {
       newQuery = { companyId: companyId as string, currentTab: newTab };
-    } else {
-      newQuery = { ...router.query, currentTab: newTab.toString() };
-    }
 
-    router.replace({
-      pathname: router.pathname,
-      query: newQuery,
-    });
+      router.replace({
+        pathname: router.pathname,
+        query: newQuery,
+      });
+    }
   };
 
   const handleSubmitSearch = ({
