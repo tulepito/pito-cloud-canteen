@@ -135,6 +135,7 @@ exports.handler = async (_event) => {
         'fields.image': ['variants.square-small2x'],
       },
     );
+    console.log('foodResponses: ', JSON.stringify(foodResponses));
     const restaurantResponses = await fetchListingsByChunkedIds(
       allRestaurantIds,
       integrationSdk,
@@ -179,6 +180,8 @@ exports.handler = async (_event) => {
               foodId: suitableFood.id.uuid,
               status: EParticipantOrderStatus.joined,
             };
+
+            console.log(`Pick food for user`, memberId, suitableFood.id.uuid);
 
             return newMemberOrderResult;
           },
