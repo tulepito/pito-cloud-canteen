@@ -14,17 +14,14 @@ const participantAutoPickFood = ({
     'attributes.profile',
     {},
   );
-  const { startDate, endDate, deadlineHour, deadlineDate } = get(
-    order,
-    'attributes.metadata',
-    {},
-  );
+  // deadlineHour, deadlineDate
+  const { startDate, endDate } = get(order, 'attributes.metadata', {});
   const orderId = order.id.uuid;
   const viewOrderUrl = `${config.canonicalRootURL}/participant/order/${orderId}`;
   const participantName = `${lastName} ${firstName}`;
   const formattedStartDate = formatTimestamp(startDate);
   const formattedEndDate = formatTimestamp(endDate);
-  const formattedDeadlineDate = formatTimestamp(deadlineDate);
+  // const formattedDeadlineDate = formatTimestamp(deadlineDate);
 
   const pickedFoodList = subOrderDateFoodList.map(
     ({ subOrderDate, foodName }) => {
@@ -134,7 +131,7 @@ a[x-apple-data-detectors] {
                       <td align="left" style="padding:0;Margin:0"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#333333;font-size:14px"><strong>${participantName}</strong> ơi</p></td>
                      </tr>
                      <tr>
-                      <td align="left" style="padding:0;Margin:0;padding-top:10px"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#333333;font-size:14px">Hình như bạn đã quên chọn món cho tuần ăn <strong>${formattedStartDate} - ${formattedEndDate}</strong>.<br>Để không bị bỏ lỡ bữa ăn, PITO đã giúp bạn chọn món, bạn vẫn có thể chọn lại món trước <strong>${deadlineHour}, ${formattedDeadlineDate}</strong>.<br><br>Bạn có thể nhấp chọn nút <strong>“Xem chi tiết đơn hàng”</strong> để xem và chỉnh sửa thực đơn mà PITO đã chọn cho bạn nhé:</p></td>
+                      <td align="left" style="padding:0;Margin:0;padding-top:10px"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#333333;font-size:14px">Đã quá thời gian chọn món cho tuần ăn <strong>${formattedStartDate} - ${formattedEndDate}</strong> nhưng bạn vẫn chưa chọn món.<br><br>Để không bị bỏ lỡ bữa ăn, PITO đã giúp bạn chọn món phù hợp cho từng ngày. PITO chúc bạn sẽ có những bữa ăn ngon miệng cùng cộng sự.<br><br>Bạn có thể nhấp vào nút <strong>“Xem chi tiết đơn hàng”</strong> để xem món mà PITO đã chọn cho bạn nhé!</p></td>
                      </tr>
                    </table></td>
                  </tr>
