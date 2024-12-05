@@ -3,6 +3,7 @@ const { User, Listing } = require('../../utils/data');
 const { sendNotification } = require('./oneSignal');
 const { NATIVE_NOTIFICATION_TYPES } = require('./config');
 const config = require('../../utils/config');
+const { getFullName } = require('../../utils/string');
 
 const BASE_URL = config.canonicalRootURL;
 
@@ -16,7 +17,9 @@ const sendNativeNotification = async (notificationType, notificationParams) => {
   const { participantId } = notificationParams;
   const participant = await fetchUser(participantId);
   const participantUser = User(participant);
-  const { firstName } = participantUser.getProfile();
+  const profile = participantUser.getProfile();
+
+  const fullName = getFullName(profile);
   const { oneSignalUserIds = [] } = participantUser.getPrivateData();
 
   if (oneSignalUserIds.length === 0) return;
@@ -30,7 +33,7 @@ const sendNativeNotification = async (notificationType, notificationParams) => {
         oneSignalUserIds.forEach((oneSignalUserId) => {
           sendNotification({
             title: 'Opps! Ngày ăn bị hủy!',
-            content: `😢 ${firstName} ơi, rất tiếc phải thông báo ngày ăn ${formatTimestamp(
+            content: `😢 ${fullName} ơi, rất tiếc phải thông báo ngày ăn ${formatTimestamp(
               +subOrderDate,
               'dd/MM',
             )} đã bị hủy`,
@@ -54,7 +57,7 @@ const sendNativeNotification = async (notificationType, notificationParams) => {
             title: 'Tuần ăn đã đặt',
             content: `Tuần ăn ${formatTimestamp(+startDate)}-${formatTimestamp(
               +endDate,
-            )} của ${firstName} được đặt thành công`,
+            )} của ${fullName} được đặt thành công`,
             url,
             oneSignalUserId,
           });
@@ -72,7 +75,7 @@ const sendNativeNotification = async (notificationType, notificationParams) => {
         oneSignalUserIds.forEach((oneSignalUserId) => {
           sendNotification({
             title: 'Opps! Tuần ăn bị hủy!',
-            content: `😢 ${firstName} ơi, rất tiếc phải thông báo tuần ăn ${formatTimestamp(
+            content: `😢 ${fullName} ơi, rất tiếc phải thông báo tuần ăn ${formatTimestamp(
               +startDate,
               'dd/MM',
             )}-${formatTimestamp(+endDate, 'dd/MM')} đã bị hủy`,

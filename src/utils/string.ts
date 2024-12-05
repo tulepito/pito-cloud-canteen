@@ -1,3 +1,5 @@
+import type { TProfile } from '@src/utils/types';
+
 export const splitNameFormFullName = (fullName: string) => {
   const firstSpaceIndx = fullName.split('').findIndex((ch) => ch === ' ');
 
@@ -78,4 +80,19 @@ export const toNonAccentVietnamese = (
   });
 
   return text;
+};
+
+export const getFullName = (profile?: TProfile) => {
+  if (!profile) return 'Anh/Chị';
+
+  const { firstName, lastName } = profile;
+
+  const formatName = (name: unknown) =>
+    typeof name === 'string' ? name.trim() : '';
+
+  const fullName = [formatName(lastName), formatName(firstName)]
+    .join(' ')
+    .trim();
+
+  return fullName || 'Anh/Chị';
 };

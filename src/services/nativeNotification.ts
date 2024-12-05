@@ -6,6 +6,7 @@ import {
   ECompanyPermission,
   ENativeNotificationType,
 } from '@src/utils/enums';
+import { getFullName } from '@src/utils/string';
 import type { TListing, TUser } from '@src/utils/types';
 
 import { fetchUser } from './integrationHelper';
@@ -28,7 +29,10 @@ export const createNativeNotification = async (
 
   const participant = await fetchUser(participantId);
   const participantUser = User(participant);
-  const { displayName } = participantUser.getProfile();
+  const profile = participantUser.getProfile();
+
+  const fullName = getFullName(profile);
+
   const { oneSignalUserIds = [] } = participantUser.getPrivateData();
   const { company, isCompany } = participantUser.getMetadata();
 
@@ -59,7 +63,7 @@ export const createNativeNotification = async (
             )}-${formatTimestamp(
               +endDate,
               'dd/MM',
-            )} đã sẵn sàng, mời ${displayName} chọn món nhé!`,
+            )} đã sẵn sàng, mời ${fullName} chọn món nhé!`,
             url,
             oneSignalUserId,
           });
@@ -83,7 +87,7 @@ export const createNativeNotification = async (
             )}-${formatTimestamp(
               +endDate,
               'dd/MM',
-            )} của ${displayName} được đặt thành công`,
+            )} của ${fullName} được đặt thành công`,
             url,
             oneSignalUserId,
           });
@@ -113,7 +117,7 @@ export const createNativeNotification = async (
         oneSignalUserIds.forEach((oneSignalUserId: string) => {
           sendNotification({
             title: 'Đã có cơm 😍 😍 😍',
-            content: `${foodName} đã được giao đến bạn. Chúc ${displayName} ngon miệng.`,
+            content: `${foodName} đã được giao đến bạn. Chúc ${fullName} ngon miệng.`,
             url,
             oneSignalUserId,
           });
@@ -128,7 +132,7 @@ export const createNativeNotification = async (
         oneSignalUserIds.forEach((oneSignalUserId: string) => {
           sendNotification({
             title: 'Opps! Ngày ăn bị hủy!',
-            content: `😢 ${displayName} ơi, rất tiếc phải thông báo ngày ăn ${formatTimestamp(
+            content: `😢 ${fullName} ơi, rất tiếc phải thông báo ngày ăn ${formatTimestamp(
               +subOrderDate!,
               'dd/MM',
             )} đã bị hủy`,
@@ -148,7 +152,7 @@ export const createNativeNotification = async (
         oneSignalUserIds.forEach((oneSignalUserId: string) => {
           sendNotification({
             title: 'Opps! Tuần ăn bị hủy!',
-            content: `😢 ${displayName} ơi, rất tiếc phải thông báo tuần ăn ${formatTimestamp(
+            content: `😢 ${fullName} ơi, rất tiếc phải thông báo tuần ăn ${formatTimestamp(
               +startDate!,
               'dd/MM',
             )}-${formatTimestamp(+endDate!, 'dd/MM')} đã bị hủy`,
