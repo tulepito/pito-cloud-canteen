@@ -17,6 +17,7 @@ import ManageOrdersSection from '@components/OrderDetails/EditView/ManageOrderDe
 import ManageParticipantsSection from '@components/OrderDetails/EditView/ManageParticipantsSection/ManageParticipantsSection';
 import MoreOptionsIcon from '@components/OrderDetails/EditView/MoreOptionsIcon/MoreOptionsIcon';
 import OrderDeadlineCountdownSection from '@components/OrderDetails/EditView/OrderDeadlineCountdownSection/OrderDeadlineCountdownSection';
+import OrderLinkSection from '@components/OrderDetails/EditView/OrderLinkSection/OrderLinkSection';
 import OrderTitle from '@components/OrderDetails/EditView/OrderTitle/OrderTitle';
 import SubOrderChangesHistorySection from '@components/OrderDetails/EditView/SubOrderChangesHistorySection/SubOrderChangesHistorySection';
 import type { TReviewInfoFormValues } from '@components/OrderDetails/ReviewView/ReviewInfoSection/ReviewInfoForm';
@@ -405,6 +406,15 @@ const OrderDetailPage = () => {
                 />
               </div>
             </OrderDeadlineCountdownSection>
+
+            <OrderLinkSection
+              className={css.mobileContainer}
+              data={editViewData.linkSectionData}
+              ableToUpdateOrder={ableToUpdateOrder}
+              shouldHideOnMobileView
+              mobileModalControl={sendNotificationModalControl}
+            />
+
             <ManageParticipantsSection
               className={css.mobileContainer}
               data={editViewData.manageParticipantData}
