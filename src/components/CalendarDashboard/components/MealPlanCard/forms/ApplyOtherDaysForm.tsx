@@ -6,7 +6,6 @@ import { DateTime } from 'luxon';
 
 import Button from '@components/Button/Button';
 import { convertWeekDay, renderDateRange } from '@src/utils/dates';
-import type { TAvailabilityPlanEntries } from '@src/utils/types';
 
 import BasicDayInWeekField from '../../BasicDayInWeekField/BasicDayInWeekField';
 
@@ -20,7 +19,7 @@ type TApplyOtherDaysFormProps = {
   inProgress?: boolean;
   startDate?: Date | number;
   endDate?: Date | number;
-  availabilityPlanDayOfWeek?: TAvailabilityPlanEntries[];
+  availabilityPlanDayOfWeek?: string[];
 };
 
 export type TApplyOtherDaysFormValues = {

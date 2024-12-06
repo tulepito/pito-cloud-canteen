@@ -824,7 +824,10 @@ export const isTimeRangeWithinInterval = (
 };
 
 export const filterRestaurantsByOpenDayAndTime = (
-  restaurants: TListing[],
+  restaurants: {
+    menu?: TListing;
+    restaurant: TListing;
+  }[],
   options: {
     dayOfWeek?: string;
     dayInWeek?: string[];
@@ -844,37 +847,39 @@ export const filterRestaurantsByOpenDayAndTime = (
   const rangeStartTime = parseTime(rangeStart);
   const rangeEndTime = parseTime(rangeEnd);
 
-  return restaurants.filter((restaurant: any) =>
-    restaurant?.attributes?.availabilityPlan?.entries?.some((entry: any) => {
-      const isDayMatch =
-        (dayOfWeek && entry?.dayOfWeek === dayOfWeek) ||
-        (dayInWeek && dayInWeek.includes(entry?.dayOfWeek));
+  return restaurants.filter((item: any) =>
+    item?.restaurant?.attributes?.availabilityPlan?.entries?.some(
+      (entry: any) => {
+        const isDayMatch =
+          (dayOfWeek && entry?.dayOfWeek === dayOfWeek) ||
+          (dayInWeek && dayInWeek.includes(entry?.dayOfWeek));
 
-      if (
-        rangeStartTime &&
-        rangeEndTime &&
-        entry?.startTime &&
-        entry?.endTime
-      ) {
-        const entryStartTime = parseTime(entry.startTime);
-        const entryEndTime = parseTime(entry.endTime);
+        if (
+          rangeStartTime &&
+          rangeEndTime &&
+          entry?.startTime &&
+          entry?.endTime
+        ) {
+          const entryStartTime = parseTime(entry.startTime);
+          const entryEndTime = parseTime(entry.endTime);
 
-        if (!entryStartTime || !entryEndTime) return false;
+          if (!entryStartTime || !entryEndTime) return false;
 
-        const isTimeMatch =
-          isWithinInterval(rangeStartTime, {
-            start: entryStartTime,
-            end: entryEndTime,
-          }) &&
-          isWithinInterval(rangeEndTime, {
-            start: entryStartTime,
-            end: entryEndTime,
-          });
+          const isTimeMatch =
+            isWithinInterval(rangeStartTime, {
+              start: entryStartTime,
+              end: entryEndTime,
+            }) &&
+            isWithinInterval(rangeEndTime, {
+              start: entryStartTime,
+              end: entryEndTime,
+            });
 
-        return isDayMatch && isTimeMatch;
-      }
+          return isDayMatch && isTimeMatch;
+        }
 
-      return isDayMatch;
-    }),
+        return isDayMatch;
+      },
+    ),
   );
 };

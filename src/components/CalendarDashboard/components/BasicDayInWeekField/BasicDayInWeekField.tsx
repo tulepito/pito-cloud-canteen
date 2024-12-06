@@ -4,7 +4,6 @@ import classNames from 'classnames';
 
 import Tooltip from '@components/Tooltip/Tooltip';
 import { DAY_IN_WEEK } from '@src/utils/constants';
-import type { TAvailabilityPlanEntries } from '@src/utils/types';
 
 import css from './BasicDayInWeekField.module.scss';
 
@@ -14,7 +13,7 @@ type TBasicDayInWeekFieldProps = {
   title?: string;
   containerClassName?: string;
   disabledDates?: string[];
-  availabilityPlanDayOfWeek?: TAvailabilityPlanEntries[];
+  availabilityPlanDayOfWeek?: string[];
 };
 
 const BasicDayInWeekField: React.FC<TBasicDayInWeekFieldProps> = (props) => {
@@ -41,7 +40,7 @@ const BasicDayInWeekField: React.FC<TBasicDayInWeekFieldProps> = (props) => {
   const dayInWeek = useMemo(() => {
     return DAY_IN_WEEK.map((day) => {
       const isAvailable = availabilityPlanDayOfWeek?.some(
-        (planDay) => planDay?.dayOfWeek === day.key,
+        (planDay) => planDay === day.key,
       );
 
       if (isAvailable) {

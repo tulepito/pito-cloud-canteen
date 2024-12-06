@@ -145,13 +145,15 @@ export const recommendRestaurantForSpecificDay = async ({
     const randomNumber = Math.floor(
       Math.random() * (restaurantsFiltered.length - 1),
     );
+
     const otherRandomNumber = Math.abs(
       randomNumber - restaurantsFiltered.length + 1,
     );
+
     const randomRestaurantObjA = restaurantsFiltered[randomNumber];
 
     const randomRestaurantObj =
-      randomRestaurantObjA.restaurantInfo?.id?.uuid !==
+      randomRestaurantObjA?.restaurant?.id?.uuid !==
       orderDetail[timestamp]?.restaurant?.id
         ? randomRestaurantObjA
         : restaurantsFiltered[otherRandomNumber];

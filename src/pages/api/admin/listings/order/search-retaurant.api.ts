@@ -147,13 +147,17 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             restaurantsResponse.map(
               ({ chunkRestaurantsResponse }) => chunkRestaurantsResponse,
             ),
-          ),
+          ).map((restaurant) => {
+            return {
+              restaurant,
+            };
+          }),
           {
             dayOfWeek,
             rangeStart: deliveryHour?.split('-')[0],
             rangeEnd: deliveryHour?.split('-')[1],
           },
-        ).forEach((restaurant: TListing) => {
+        ).forEach(({ restaurant }: { restaurant: TListing }) => {
           const restaurantListing = Listing(restaurant);
           const restaurantId = restaurantListing.getId();
           const { title } = restaurantListing.getAttributes();

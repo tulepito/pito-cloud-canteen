@@ -10,7 +10,7 @@ import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { convertWeekDay } from '@src/utils/dates';
 import { EInvalidRestaurantCase } from '@src/utils/enums';
-import type { TAvailabilityPlanEntries, TObject } from '@src/utils/types';
+import type { TObject } from '@src/utils/types';
 
 import ApplyOtherDaysModal from './components/ApplyOtherDaysModal';
 
@@ -26,7 +26,7 @@ type TMealPlanCardFooterProps = {
   startDate?: Date | number;
   endDate?: Date | number;
   availableStatus?: TObject;
-  availabilityPlanDayOfWeek?: TAvailabilityPlanEntries[];
+  availabilityPlanDayOfWeek?: string[];
 };
 
 const MealPlanCardFooter: React.FC<TMealPlanCardFooterProps> = ({

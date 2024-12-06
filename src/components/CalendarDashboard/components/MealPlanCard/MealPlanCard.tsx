@@ -48,6 +48,7 @@ const MealPlanCard: React.FC<TMealPlanCardProps> = ({
     onSearchRestaurant,
     availableOrderDetailCheckList,
     shouldHideRemoveMealIcon = false,
+    dayInWeek,
   } = resources;
 
   const availableStatus =
@@ -76,10 +77,7 @@ const MealPlanCard: React.FC<TMealPlanCardProps> = ({
     [editFoodInprogress, event?.start],
   );
 
-  const availabilityPlanDayOfWeek = useMemo(
-    () => event?.resource?.restaurant?.availabilityPlan?.entries,
-    [event?.resource?.restaurant?.availabilityPlan?.entries],
-  );
+  const availabilityPlanDayOfWeek = useMemo(() => dayInWeek, [dayInWeek]);
 
   return (
     <div

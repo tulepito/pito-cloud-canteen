@@ -196,7 +196,7 @@ export const useGetCalendarExtraResources = ({
           ...planDetail?.attributes,
           metadata: {
             ...planDetail?.attributes.metadata,
-            orderDetail: (payload as TObject).orderDetail,
+            orderDetail: (payload as TObject)?.orderDetail,
           },
         },
       };
