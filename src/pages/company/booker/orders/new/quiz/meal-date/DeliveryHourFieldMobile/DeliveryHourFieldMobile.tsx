@@ -12,11 +12,13 @@ import css from './DeliveryHourFieldMobile.module.scss';
 type TDeliveryHourFieldMobileProps = {
   values: TMealDateFormValues;
   form: any;
+  hourOptions: Array<{ label: string; key: string }>;
 };
 
 const DeliveryHourFieldMobile: React.FC<TDeliveryHourFieldMobileProps> = ({
   values,
   form,
+  hourOptions,
 }) => {
   const intl = useIntl();
   const deliveryHourModalController = useBoolean();
@@ -45,6 +47,7 @@ const DeliveryHourFieldMobile: React.FC<TDeliveryHourFieldMobileProps> = ({
         isOpen={deliveryHourModalController.value}
         onClose={deliveryHourModalController.setFalse}
         form={form}
+        hourOptions={hourOptions}
       />
     </div>
   );

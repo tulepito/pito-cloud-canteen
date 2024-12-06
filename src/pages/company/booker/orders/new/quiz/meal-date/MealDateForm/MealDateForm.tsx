@@ -172,7 +172,11 @@ const MealDateFormComponent: React.FC<TMealDateFormComponentProps> = (
             />
           </div>
 
-          <DeliveryHourFieldMobile values={values} form={form} />
+          <DeliveryHourFieldMobile
+            values={values}
+            form={form}
+            hourOptions={parsedDeliveryHourOptions}
+          />
 
           <div className={css.orderTypeContainer}>
             <OnChange name="orderType">{handleChangeOrderType}</OnChange>
