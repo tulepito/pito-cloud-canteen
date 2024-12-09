@@ -35,9 +35,9 @@
     border-right: 0px solid transparent;
   }
 
-  @include viewportLarge {
-    min-height: 256px;
-  }
+  // @include viewportLarge {
+  //   min-height: 256px;
+  // }
 }
 
 .dayHeader {

@@ -533,6 +533,23 @@ const OrderListPage = () => {
     }
   }, [ordersNotConfirmFirstTime, isReadyLatestOrders]);
 
+  useEffect(() => {
+    if (selectedDay) {
+      const dayEvents = flattenEvents.filter((_event: any) =>
+        isSameDate(_event.start, selectedDay),
+      );
+
+      if (dayEvents.length > 0 && isMobileLayout) {
+        window.scrollTo({
+          top: (
+            document.querySelector(`.${css.subOrderContainer}`) as HTMLElement
+          )?.offsetTop,
+          behavior: 'smooth',
+        });
+      }
+    }
+  }, [selectedDay]);
+
   const orderListPageContent = (
     <>
       <div className={css.calendarContainer}>

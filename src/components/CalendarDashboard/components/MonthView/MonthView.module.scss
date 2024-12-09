@@ -57,9 +57,9 @@
   border-right: 1px solid $neutralGray3;
   min-height: 76px;
 
-  @include viewportLarge {
-    min-height: 256px;
-  }
+  // @include viewportLarge {
+  //   min-height: 256px;
+  // }
 }
 
 .calendarTitleWrapper {
