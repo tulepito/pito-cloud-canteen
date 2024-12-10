@@ -43,6 +43,8 @@ const TabActions: React.FC<TTabActionsProps> = ({
         mealId: 'notJoined',
       }),
     );
+    const nextDate = getNextSubOrderDay(orderDay);
+    onSelectTab({ id: nextDate });
   };
 
   return (
@@ -53,15 +55,21 @@ const TabActions: React.FC<TTabActionsProps> = ({
         onClick={handleAutoSelect}
         className={css.autoSelect}>
         <IconRefreshing className={css.iconRefresh} />
-        <FormattedMessage id="SectionOrderListing.selectForMeBtn" />
+        <p className="one-line-text">
+          &nbsp;&nbsp;
+          <FormattedMessage id="SectionOrderListing.selectForMeBtn" />
+        </p>
       </Button>
       <Button
-        variant="inline"
+        variant="secondary"
         disabled={isOrderDeadlineOver}
         onClick={handleNotJoinDay}
         className={css.notJoinThisDay}>
         <IconBanned className={css.iconNotJoined} />
-        <FormattedMessage id="SectionOrderListing.notJoinThisDay" />
+        <p className="one-line-text">
+          &nbsp;&nbsp;
+          <FormattedMessage id="SectionOrderListing.notJoinThisDay" />
+        </p>
       </Button>
     </div>
   );
