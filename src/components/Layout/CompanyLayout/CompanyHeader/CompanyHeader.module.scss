@@ -27,7 +27,7 @@
   .headerLeft {
     display: flex;
     align-items: center;
-    gap: 40px;
+    gap: 28px;
     .logo {
       width: 68.14px;
       height: 36px;
@@ -42,6 +42,58 @@
         position: relative;
         padding: 10px 0;
         @include linkHover;
+      }
+    }
+
+    .container {
+      .navWrapper {
+        @include flexAlign(center);
+        margin: 0;
+        list-style-type: none;
+        gap: 24px;
+        padding-left: 0px !important;
+
+        .headerItem {
+          @include flexAlign(center);
+          color: $neutralGray6;
+          height: 64px;
+          padding: 20px 12px;
+          position: relative;
+          max-width: 240px;
+          cursor: pointer;
+
+          &.active {
+            position: relative;
+            color: $neutralGray7;
+            font-weight: 700;
+
+            svg {
+              path {
+                fill: $neutralGray7;
+              }
+            }
+          }
+
+          &:hover {
+            color: $neutralGray7;
+
+            svg {
+              path {
+                fill: $neutralGray7;
+              }
+            }
+          }
+
+          svg {
+            path {
+              fill: $neutralGray6;
+            }
+          }
+
+          .title {
+            height: 24px;
+          }
+        }
       }
     }
   }
@@ -154,4 +206,10 @@
       }
     }
   }
+}
+
+.container {
+  z-index: 2;
+  width: 100%;
+  background-color: $neutralGray1;
 }

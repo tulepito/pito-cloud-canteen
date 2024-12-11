@@ -108,7 +108,7 @@
     column-gap: 40px;
     row-gap: 28px;
     padding: 24px;
-    margin: 0 auto 40px;
+    margin: 40px auto;
   }
 
   @include viewportSLarge {
@@ -267,15 +267,33 @@
   }
 }
 
+.mobileTopActions {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
 .mobileTopActionPart {
   display: flex;
   column-gap: 16px;
   justify-content: center;
 }
 
+.actionIcon {
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+
+  fill: $neutralGray7;
+}
+
 .stepper {
   @include viewportMedium {
-    width: 630px;
+    width: 60%;
+  }
+
+  @include viewportLarge {
+    width: 60%;
   }
 }
 
@@ -283,7 +301,7 @@
   display: none;
   @include viewportMedium {
     display: block;
-    width: 630px;
+    width: 60%;
     margin: 0 auto;
   }
 }

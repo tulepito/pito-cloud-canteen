@@ -3,11 +3,12 @@
 @use '/src/styles/vars.scss' as *;
 
 .root {
+  position: relative;
+
   @include viewportMedium {
     @include flexCenter;
-    padding: 16px;
-    padding-top: 0;
-
+    padding: 24px;
+    padding-bottom: 0;
     box-shadow: 0px 2px 8px 0px #00000014;
   }
 }

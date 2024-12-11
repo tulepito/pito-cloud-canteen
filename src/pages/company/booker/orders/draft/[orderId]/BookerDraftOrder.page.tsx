@@ -18,9 +18,11 @@ import useSelectDay from '@components/CalendarDashboard/hooks/useSelectDay';
 import IconCheckWithBackground from '@components/Icons/IconCheckWithBackground/IconCheckWithBackground';
 import IconEmpty from '@components/Icons/IconEmpty/IconEmpty';
 import IconHome from '@components/Icons/IconHome/IconHome';
+import IconNavbar from '@components/Icons/IconNavbar/IconNavbar';
 import IconPlus from '@components/Icons/IconPlus/IconPlus';
 import IconSetting from '@components/Icons/IconSetting/IconSetting';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
+import SidebarFeaturesHeader from '@components/SidebarFeaturesHeader/SidebarFeaturesHeader';
 import Stepper from '@components/Stepper/Stepper';
 import logger from '@helpers/logger';
 import {
@@ -42,7 +44,7 @@ import { OrderListThunks } from '@pages/participant/orders/OrderList.slice';
 import { addWorkspaceCompanyId } from '@redux/slices/company.slice';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
 import { currentUserSelector } from '@redux/slices/user.slice';
-import { BOOKER_CREATE_GROUP_ORDER_STEPS } from '@src/constants/stepperSteps';
+import { getStepsByOrderType } from '@src/constants/stepperSteps';
 import { companyPaths } from '@src/paths';
 import { formatTimestamp } from '@src/utils/dates';
 import Gleap from '@src/utils/gleap';
@@ -98,6 +100,7 @@ function BookerDraftOrderPage() {
   const router = useRouter();
   const { orderId, subOrderDate: subOrderDateQuery } = router.query;
   const [collapse, setCollapse] = useState(false);
+  const [collapseNavbar, setCollapseNavbar] = useState(false);
   const [selectedRestaurantId, setSelectedRestaurantId] = useState<string>('');
   const [selectedTimestamp, setSelectedTimestamp] = useState<number>(0);
   const [currentViewMode, setCurrViewMode] =
@@ -273,6 +276,14 @@ function BookerDraftOrderPage() {
   const handleCloseSideBar = useCallback(() => {
     setCollapse(false);
   }, [collapse]);
+
+  const handleCollapseNavbar = useCallback(() => {
+    setCollapseNavbar(!collapseNavbar);
+  }, [collapseNavbar]);
+
+  const handleCloseNavbar = useCallback(() => {
+    setCollapseNavbar(false);
+  }, [collapseNavbar]);
 
   const handleRemoveMeal = useCallback(
     (id: string) => (resourceId: string) => {
@@ -496,17 +507,17 @@ function BookerDraftOrderPage() {
     }
   }, [subOrderDateQuery]);
 
+  const _steps = getStepsByOrderType(orderType);
+
   return (
     <>
-      <RenderWhen condition={isGroupOrder}>
-        <BookerStepperDesktopSection>
-          <Stepper
-            className={css.stepperContainerDesktop}
-            steps={BOOKER_CREATE_GROUP_ORDER_STEPS}
-            currentStep={isSetupMode ? 1 : 2}
-          />
-        </BookerStepperDesktopSection>
-      </RenderWhen>
+      <BookerStepperDesktopSection>
+        <Stepper
+          className={css.stepperContainerDesktop}
+          steps={_steps}
+          currentStep={isSetupMode ? 1 : 2}
+        />
+      </BookerStepperDesktopSection>
       <WalkThroughTourProvider
         onCloseTour={handleCloseWalkThrough}
         isMobileLayout={!isTabletLayoutOrLarger}>
@@ -522,6 +533,12 @@ function BookerDraftOrderPage() {
                 onCloseSideBar={handleCloseSideBar}
               />
             </LayoutSidebar>
+
+            <SidebarFeaturesHeader
+              collapseNavbar={collapseNavbar}
+              handleCloseNavbar={handleCloseNavbar}
+              companyId={companyId}
+            />
             <LayoutMain className={css.mainContainer}>
               <div className={css.header}>
                 <div className={css.title}>Thiết lập menu</div>
@@ -533,14 +550,23 @@ function BookerDraftOrderPage() {
                   <div className={css.actionIcon} onClick={handleCollapse}>
                     <IconSetting variant="black" />
                   </div>
+                  <div
+                    className={css.actionIcon}
+                    onClick={handleCollapseNavbar}>
+                    <IconNavbar />
+                  </div>
                 </div>
               </div>
+              {/* <RenderWhen condition={isNormalOrder}>
+                <Stepper
+                  className={css.stepperContainerNormalOrder}
+                  steps={_steps}
+                  currentStep={isSetupMode ? 1 : 2}
+                />
+              </RenderWhen> */}
               <RenderWhen condition={isGroupOrder}>
                 <div className={css.stepperContainerMobile}>
-                  <Stepper
-                    steps={BOOKER_CREATE_GROUP_ORDER_STEPS}
-                    currentStep={1}
-                  />
+                  <Stepper steps={_steps} currentStep={1} />
                 </div>
               </RenderWhen>
               <div className={css.orderTitleWrapper}>
@@ -551,7 +577,6 @@ function BookerDraftOrderPage() {
                   className={css.badge}
                 />
               </div>
-
               <div className={css.main}>
                 <CalendarDashboard
                   className={css.calendar}

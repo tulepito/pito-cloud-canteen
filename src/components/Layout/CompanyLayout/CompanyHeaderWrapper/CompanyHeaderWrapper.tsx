@@ -2,7 +2,6 @@ import type { ReactNode } from 'react';
 import React from 'react';
 import { useRouter } from 'next/router';
 
-import FeaturesHeader from '@components/FeaturesHeader/FeaturesHeader';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useViewport } from '@hooks/useViewport';
 import type { TObject } from '@src/utils/types';
@@ -58,10 +57,8 @@ const CompanyHeaderWrapper: React.FC<TCompanyHeaderWrapperProps> = (props) => {
               companyId={companyId}
               showBottomLine={!showFeatureHeader}
               companyHeaderLinkData={companyHeaderLinkData}
+              featureHeaderData={featureHeaderData}
             />
-            {showFeatureHeader && (
-              <FeaturesHeader headerData={featureHeaderData} />
-            )}
           </div>
         </RenderWhen.False>
       </RenderWhen>

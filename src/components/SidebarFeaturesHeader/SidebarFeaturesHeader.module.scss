@@ -1,0 +1,97 @@
+@use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/vars.scss' as *;
+
+.featuresHeaderNavbarMobile {
+  position: relative;
+  z-index: 99;
+  .featuresHeaderMobile {
+    display: flex;
+    flex-direction: column;
+    padding-top: 10px;
+    .featuresHeaderMobileTitle {
+      display: flex;
+      flex-direction: row;
+      gap: 16px;
+      padding: 16px;
+      border-bottom: 1px solid $neutralGray3;
+    }
+    .navWrapper {
+      @include flexAlign(center);
+      flex-direction: column;
+      margin: 0;
+      list-style-type: none;
+      padding: 0 16px;
+      .headerItem {
+        @include flexAlign(center);
+        color: $neutralGray6;
+        position: relative;
+        width: 100%;
+        cursor: pointer;
+        padding: 16px 0;
+        border-bottom: 1px solid $neutralGray3;
+        color: #262626;
+        font-weight: 700;
+
+        .collapsibleTitle {
+          overflow: hidden;
+          width: 100%;
+
+          > button {
+            margin-bottom: 0px;
+          }
+          &.isOpen {
+            overflow: visible;
+
+            .arrowIcon {
+              rotate: 180deg;
+            }
+          }
+          .collapsibleContent {
+            padding-left: 40px;
+            div {
+              padding: 16px 0;
+              color: $neutralGray7;
+              font-weight: 500;
+            }
+
+            div:first-child {
+              padding-top: 24px;
+              border-bottom: 1px solid $neutralGray3;
+            }
+
+            div:last-child {
+              padding-bottom: 0;
+            }
+          }
+        }
+
+        .headerTitleWrapper {
+          display: flex;
+          flex-direction: row;
+          justify-content: space-between;
+          align-items: center;
+        }
+
+        .headerNavbarItem {
+          display: flex;
+          flex-direction: row;
+          gap: 16px;
+          align-items: center;
+          text-transform: initial;
+        }
+
+        svg {
+          min-width: fit-content;
+          path {
+            fill: #262626;
+          }
+        }
+      }
+    }
+  }
+
+  @include viewportLarge {
+    display: none;
+  }
+}

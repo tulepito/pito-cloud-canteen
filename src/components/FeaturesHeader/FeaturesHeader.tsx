@@ -6,7 +6,7 @@ import { useRouter } from 'next/router';
 
 import type { TObject } from '@utils/types';
 
-import css from './FeaturesHeader.module.scss';
+import cssDefault from './FeaturesHeader.module.scss';
 
 export type FeaturesHeaderProps = {
   headerData: {
@@ -17,10 +17,13 @@ export type FeaturesHeaderProps = {
     shouldActivePathname?: string[];
     extraFunc?: () => void;
   }[];
+  cssCustom?: {
+    readonly [key: string]: string;
+  };
 };
 
 const FeaturesHeader: React.FC<FeaturesHeaderProps> = (props) => {
-  const { headerData } = props;
+  const { headerData, cssCustom } = props;
   const { pathname: routerPathName } = useRouter();
 
   const { key: activeKey } =
@@ -30,6 +33,8 @@ const FeaturesHeader: React.FC<FeaturesHeaderProps> = (props) => {
         : routerPathName.includes(pathname) ||
           shouldActivePathname?.includes(routerPathName),
     ) || {};
+
+  const css = cssCustom || cssDefault;
 
   return (
     <nav className={css.container}>

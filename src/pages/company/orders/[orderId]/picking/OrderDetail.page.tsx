@@ -7,6 +7,7 @@ import classNames from 'classnames';
 import isEmpty from 'lodash/isEmpty';
 import { useRouter } from 'next/router';
 
+import IconNavbar from '@components/Icons/IconNavbar/IconNavbar';
 import MobileTopContainer from '@components/MobileTopContainer/MobileTopContainer';
 import AlertModal from '@components/Modal/AlertModal';
 import AutomaticPickingForm from '@components/OrderDetails/EditView/AutomaticInfoSection/AutomaticPickingForm';
@@ -24,6 +25,7 @@ import type { TReviewInfoFormValues } from '@components/OrderDetails/ReviewView/
 import ReviewOrdersResultModal from '@components/OrderDetails/ReviewView/ReviewOrdersResultSection/ReviewOrdersResultModal';
 import ReviewView from '@components/OrderDetails/ReviewView/ReviewView';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
+import SidebarFeaturesHeader from '@components/SidebarFeaturesHeader/SidebarFeaturesHeader';
 import Stepper from '@components/Stepper/Stepper';
 import { checkMinMaxQuantityInPickingState } from '@helpers/order/orderPickingHelper';
 import { checkOrderDetailHasChanged } from '@helpers/order/subOrderChangeAfterStartHelper';
@@ -39,7 +41,7 @@ import {
   OrderManagementsAction,
   orderManagementThunks,
 } from '@redux/slices/OrderManagement.slice';
-import { BOOKER_CREATE_GROUP_ORDER_STEPS } from '@src/constants/stepperSteps';
+import { getStepsByOrderType } from '@src/constants/stepperSteps';
 import { companyPaths } from '@src/paths';
 import { diffDays } from '@src/utils/dates';
 import { ETransition } from '@src/utils/transaction';
@@ -92,6 +94,7 @@ const OrderDetailPage = () => {
   const [currentViewDate, setCurrentViewDate] = useState<number>(
     Number(timestamp),
   );
+
   const [showReachMaxAllowedChangesModal, setShowReachMaxAllowedChangesModal] =
     useState<'reach_max' | 'reach_min' | null>(null);
   const confirmGoHomeControl = useBoolean();
@@ -299,6 +302,16 @@ const OrderDetailPage = () => {
     confirmCancelOrderActions.setFalse();
   };
 
+  const [collapseNavbar, setCollapseNavbar] = useState(false);
+
+  const handleCollapseNavbar = useCallback(() => {
+    setCollapseNavbar(!collapseNavbar);
+  }, [collapseNavbar]);
+
+  const handleCloseNavbar = useCallback(() => {
+    setCollapseNavbar(false);
+  }, [collapseNavbar]);
+
   const subOrderChangesHistorySectionProps = {
     querySubOrderChangesHistoryInProgress,
     subOrderChangesHistory,
@@ -497,11 +510,13 @@ const OrderDetailPage = () => {
     </div>
   );
 
+  const _steps = getStepsByOrderType(orderType);
+
   const ReviewViewComponent = (
     <>
       <BookerStepperDesktopSection>
         <div className={css.stepperContainerDesktop}>
-          <Stepper steps={BOOKER_CREATE_GROUP_ORDER_STEPS} currentStep={4} />
+          <Stepper steps={_steps} currentStep={4} />
         </div>
       </BookerStepperDesktopSection>
       <ReviewView
@@ -637,9 +652,10 @@ const OrderDetailPage = () => {
   );
   let content = null;
   const stepperProps = {
-    steps: BOOKER_CREATE_GROUP_ORDER_STEPS,
-    currentStep: 3,
+    steps: _steps,
+    currentStep: orderType === EOrderType.group ? 3 : 2,
   };
+
   const mobileTopContainerProps = {
     title: isEditViewMode
       ? 'Quản lý chọn món'
@@ -651,9 +667,18 @@ const OrderDetailPage = () => {
       ? handleGoBackFromViewCartDetailMode
       : handleGoBackFromReviewMode,
     actionPart: isEditViewMode ? (
-      <div className={css.mobileTopActionPart}>
-        {goHomeIcon}
-        <RenderWhen condition={!isNormalOrder}>{moreOptionsIcon}</RenderWhen>
+      <div className={css.mobileTopActions}>
+        <div className={css.mobileTopActionPart}>
+          {goHomeIcon}
+          <RenderWhen condition={!isNormalOrder}>{moreOptionsIcon}</RenderWhen>
+        </div>
+        <div className={css.actionIcon} onClick={handleCollapseNavbar}>
+          <IconNavbar />
+        </div>
+      </div>
+    ) : !isViewCartDetailMode ? (
+      <div className={css.actionIcon} onClick={handleCollapseNavbar}>
+        <IconNavbar />
       </div>
     ) : null,
   };
@@ -662,11 +687,9 @@ const OrderDetailPage = () => {
     case EPageViewMode.edit:
       content = (
         <>
-          <RenderWhen condition={!isNormalOrder}>
-            <BookerStepperDesktopSection>
-              <Stepper className={css.stepper} {...stepperProps} />
-            </BookerStepperDesktopSection>
-          </RenderWhen>
+          <BookerStepperDesktopSection>
+            <Stepper className={css.stepper} {...stepperProps} />
+          </BookerStepperDesktopSection>
           {EditViewComponent}
         </>
       );
@@ -679,6 +702,11 @@ const OrderDetailPage = () => {
 
   return (
     <>
+      <SidebarFeaturesHeader
+        collapseNavbar={collapseNavbar}
+        handleCloseNavbar={handleCloseNavbar}
+        companyId={router.query.companyId as string}
+      />
       <MobileTopContainer {...mobileTopContainerProps} />
       {content}
     </>

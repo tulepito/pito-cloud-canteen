@@ -31,24 +31,20 @@ const Stepper: React.FC<TStepperProps> = ({
 
     const rootWidth = rootElem.offsetWidth;
 
-    const rootPaddingLeft = parseFloat(getComputedStyle(rootElem).paddingLeft);
+    const rootPaddingLeft = parseFloat(
+      getComputedStyle(rootElem.children[0]).getPropertyValue('padding-left'),
+    );
     const rootPaddingRight = parseFloat(
-      getComputedStyle(rootElem).paddingRight,
+      getComputedStyle(rootElem.children[0]).getPropertyValue('padding-right'),
     );
 
     const containerChild = rootElem.children[0] as HTMLElement;
 
-    const containerChildPaddingLeft = parseFloat(
-      getComputedStyle(containerChild).paddingLeft,
-    );
-    const containerChildPaddingRight = parseFloat(
-      getComputedStyle(containerChild).paddingRight,
+    const containerChildWidth = parseFloat(
+      getComputedStyle(containerChild.children[0]).getPropertyValue('width'),
     );
 
-    const stepItems = rootElem.querySelectorAll(`.${css.stepItem}`);
     const stepConnectors = rootElem.querySelectorAll(`.${css.stepConnector}`);
-
-    const stepItemWidth = (stepItems[0] as HTMLElement).offsetWidth;
 
     for (let idx = 0; idx < stepConnectors.length; idx++) {
       // Ignore the last step connector
@@ -56,23 +52,16 @@ const Stepper: React.FC<TStepperProps> = ({
 
       const stepConnector = stepConnectors[idx] as HTMLElement;
 
-      const remainingWidth =
-        rootWidth -
-        rootPaddingRight -
-        rootPaddingLeft -
-        containerChildPaddingLeft -
-        containerChildPaddingRight;
+      const remainingWidth = rootWidth - rootPaddingRight - rootPaddingLeft - 4;
 
       const w =
-        (remainingWidth - stepItemWidth * steps.length) / (steps.length - 1);
+        (remainingWidth - containerChildWidth * steps.length) /
+        (steps.length - 1);
 
       stepConnector.style.width = `${w}px`;
 
       const left =
-        rootPaddingLeft +
-        containerChildPaddingLeft +
-        idx * w +
-        (idx + 1) * stepItemWidth;
+        idx * (w + 4) + (idx + 1) * containerChildWidth + rootPaddingLeft;
 
       stepConnector.style.left = `${left}px`;
     }
@@ -93,13 +82,20 @@ const Stepper: React.FC<TStepperProps> = ({
         {steps.map(({ label, onClick }, index) => {
           const currIndex = index + 1;
 
-          const stepClasses = classNames(
-            css.stepItem,
+          const stepHeadClasses = classNames(
+            css.stepItemHead,
             {
-              [css.stepItemActive]: currentStep >= currIndex,
+              [css.stepItemHeadActive]: currentStep >= currIndex,
             },
             stepItemClassName,
           );
+
+          const stepLabelClasses = classNames(css.stepItemLabel, {
+            [css.stepItemLabelActive]: currentStep >= currIndex,
+            [css.stepItemLabelShowMobile]: currentStep === currIndex,
+            [css.stepItemLabelShowMobileLeft]: currentStep === 1,
+            [css.stepItemLabelShowMobileRight]: currentStep === steps.length,
+          });
 
           const handleStepClick = () => {
             if (onClick) {
@@ -109,12 +105,13 @@ const Stepper: React.FC<TStepperProps> = ({
 
           return (
             <Fragment key={currIndex}>
-              <div
-                title={label}
-                className={stepClasses}
-                onClick={handleStepClick}>
-                {currIndex}
+              <div className={css.stepItem}>
+                <div className={stepHeadClasses} onClick={handleStepClick}>
+                  {currIndex}
+                </div>
+                <span className={stepLabelClasses}>{label}</span>
               </div>
+
               {currIndex !== 0 && <div className={css.stepConnector}></div>}
             </Fragment>
           );

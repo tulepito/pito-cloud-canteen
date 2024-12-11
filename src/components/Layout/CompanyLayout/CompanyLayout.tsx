@@ -30,13 +30,14 @@ import {
 
 import css from './CompanyLayout.module.scss';
 
-const companySettingPaths = [
+export const companySettingPaths = [
   companyPaths.Account,
   companyPaths.Members,
   companyPaths.GroupSetting,
   companyPaths.Logo,
   companyPaths.Nutrition,
 ];
+
 const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
   const { children } = props;
   const router = useRouter();

@@ -4,6 +4,7 @@ import classNames from 'classnames';
 import { useRouter } from 'next/router';
 
 import Avatar from '@components/Avatar/Avatar';
+import FeaturesHeader from '@components/FeaturesHeader/FeaturesHeader';
 import IconLogout from '@components/Icons/IconLogout/IconLogout';
 import IconSwap from '@components/Icons/IconSwap/IconSwap';
 import IconUser from '@components/Icons/IconUser2/IconUser2';
@@ -20,6 +21,7 @@ import { currentUserSelector } from '@redux/slices/user.slice';
 import config from '@src/configs';
 import { companyPaths, enGeneralPaths } from '@src/paths';
 import { CurrentUser } from '@src/utils/data';
+import type { TObject } from '@src/utils/types';
 
 import css from './CompanyHeader.module.scss';
 
@@ -31,12 +33,19 @@ type CompanyHeaderProps = {
     label: string | ReactNode;
   }[];
   companyId: string;
+  featureHeaderData: {
+    key: string;
+    title: ReactNode;
+    pathname: string;
+    query?: TObject;
+  }[];
 };
 
 const CompanyHeader: React.FC<CompanyHeaderProps> = ({
   showBottomLine,
   companyHeaderLinkData,
   companyId,
+  featureHeaderData,
 }) => {
   const router = useRouter();
   const handleLogoutFn = useLogout();
@@ -74,6 +83,7 @@ const CompanyHeader: React.FC<CompanyHeaderProps> = ({
             </NamedLink>
           ))}
         </div>
+        <FeaturesHeader headerData={featureHeaderData} cssCustom={css} />
       </div>
       <div className={css.headerRight}>
         <a href="tel:1900252530" className={css.headerPhoneNumber}>

@@ -58,12 +58,10 @@
   .main {
     display: flex;
     position: relative;
-    // width: fit-content;
-    padding: 0 16px;
-    margin-top: 20px;
+    padding: 16px 16px 0;
 
     @include viewportLarge {
-      padding: 50px 24px;
+      padding: 24px;
       width: unset;
       height: 100%;
     }
@@ -215,11 +213,20 @@
   }
 }
 
+.stepperContainerNormalOrder {
+  display: block;
+  width: 100%;
+  margin: 0 auto;
+  @include viewportMedium {
+    width: 60%;
+  }
+}
+
 .stepperContainerDesktop {
   display: none;
   @include viewportMedium {
     display: block;
-    width: 630px;
+    width: 60%;
     margin: 0 auto;
   }
 }
