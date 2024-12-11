@@ -2,12 +2,14 @@ import React from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Field, Form as FinalForm } from 'react-final-form';
 import { FormattedMessage } from 'react-intl';
-import Link from 'next/link';
+import { useRouter } from 'next/router';
 
 import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
 import PitoLogoV2 from '@components/PitoLogoV2/PitoLogoV2';
-import { enGeneralPaths } from '@src/paths';
+import { getItem } from '@helpers/localStorageHelpers';
+import { participantPaths } from '@src/paths';
+import { LOCAL_STORAGE_KEYS, QUERY_REFS } from '@src/utils/constants';
 
 import css from './EmailVerificationForm.module.scss';
 
@@ -32,6 +34,7 @@ const EmailVerificationFormComponent: React.FC<
   const { email, emailVerified, pendingEmail } = currentUser.attributes;
   const { firstName, lastName } = currentUser.attributes.profile;
   const emailToVerify = <strong>{pendingEmail || email}</strong>;
+  const router = useRouter();
 
   const errorMessage = (
     <div className={css.error}>
@@ -41,6 +44,35 @@ const EmailVerificationFormComponent: React.FC<
 
   const submitInProgress = inProgress;
   const submitDisabled = submitInProgress;
+
+  const navigateToHomePageMaybe = () => {
+    const _url = new URL(
+      window.location.href,
+      process.env.NEXT_PUBLIC_CANONICAL_URL,
+    );
+    const searchParamsRef = _url.searchParams.get('ref');
+
+    if (searchParamsRef === QUERY_REFS.INVITATION_LINK) {
+      const companyId = _url.searchParams.get('companyId');
+
+      if (!companyId) return;
+
+      router.push(participantPaths.getInvitationPath(companyId));
+
+      return;
+    }
+
+    const companyId = getItem(LOCAL_STORAGE_KEYS.INVITATION_COMPANY_ID);
+    const tempCompanyId = getItem(LOCAL_STORAGE_KEYS.TEMP_COMPANY_ID);
+
+    const targetCompanyId = companyId || tempCompanyId;
+
+    if (targetCompanyId) {
+      router.push(participantPaths.getInvitationPath(targetCompanyId));
+    } else {
+      router.push(participantPaths.OrderList);
+    }
+  };
 
   const verifyEmail = (
     <div className={css.root}>
@@ -78,30 +110,6 @@ const EmailVerificationFormComponent: React.FC<
     </div>
   );
 
-  const alreadyVerified = (
-    <div className={css.root}>
-      <div className={css.content}>
-        <PitoLogoV2 />
-        <h2 className={css.modalTitle}>
-          <FormattedMessage id="EmailVerificationForm.noPendingTitle" />
-        </h2>
-
-        <p className={css.modalMessage}>
-          <FormattedMessage
-            id="EmailVerificationForm.noPendingText"
-            values={{ name: `${lastName} ${firstName}` }}
-          />
-        </p>
-        <div className={css.divider}></div>
-        <Button>
-          <Link className={css.submitButton} href={enGeneralPaths.Auth}>
-            <FormattedMessage id="EmailVerificationForm.successButtonText" />
-          </Link>
-        </Button>
-      </div>
-    </div>
-  );
-
   const alreadyVerifiedButErrorReturned = (
     <div className={css.root}>
       <div className={css.content}>
@@ -117,10 +125,8 @@ const EmailVerificationFormComponent: React.FC<
           />
         </p>
         <div className={css.divider}></div>
-        <Button>
-          <Link className={css.submitButton} href={enGeneralPaths.Auth}>
-            <FormattedMessage id="EmailVerificationForm.successButtonText" />
-          </Link>
+        <Button onClick={navigateToHomePageMaybe}>
+          <FormattedMessage id="EmailVerificationForm.successButtonText" />
         </Button>
       </div>
     </div>
@@ -132,14 +138,12 @@ const EmailVerificationFormComponent: React.FC<
   return anyPendingEmailHasBeenVerifiedForCurrentUser && verificationError
     ? alreadyVerifiedButErrorReturned
     : anyPendingEmailHasBeenVerifiedForCurrentUser
-    ? alreadyVerified
+    ? alreadyVerifiedButErrorReturned
     : verifyEmail;
 };
-
 const EmailVerificationForm: React.FC<TEmailVerificationFormProps> = (
   props,
 ) => {
   return <FinalForm {...props} component={EmailVerificationFormComponent} />;
 };
-
 export default EmailVerificationForm;

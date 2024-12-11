@@ -137,7 +137,11 @@ export const usePrepareOrderDetailPageData = ({
     orderDeadline: deadlineDate,
     startDate,
   };
-  const linkSectionData = { orderDeadline: deadlineDate, companyName };
+  const linkSectionData = {
+    orderDeadline: deadlineDate,
+    companyName,
+    companyId: companyData?.id?.uuid,
+  };
   const manageParticipantData = {
     planData,
     participants,

@@ -72,7 +72,10 @@ const CompanyOrdersActionColumn = ({
   const company = useAppSelector((state) => state.company.company);
   const orders = useAppSelector((state) => state.Order.orders);
 
-  const orderLink = getParticipantPickingLink(orderId);
+  const orderLink = getParticipantPickingLink({
+    orderId,
+    companyId,
+  });
 
   const shouldShowReviewButton =
     (state === EOrderStates.pendingPayment && !hasRating) ||

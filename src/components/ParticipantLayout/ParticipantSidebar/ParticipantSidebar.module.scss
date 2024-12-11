@@ -27,6 +27,4 @@
   @include textTemplate(24px, $fontWeightBold, 32px);
   color: $neutralGray7;
   padding: 32px 24px 0;
-
-  @include lineClamp(2);
 }

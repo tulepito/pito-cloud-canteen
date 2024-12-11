@@ -33,7 +33,7 @@ const OrderPanelBody: React.FC<TOrderPanelBody> = ({
         [css.sectionBodyEmpty]: cartListKeys.length === 0,
       })}>
       <Button
-        variant="inline"
+        variant="secondary"
         onClick={onAutoSelect}
         className={css.autoSelect}>
         <IconRefreshing className={css.iconRefresh} />

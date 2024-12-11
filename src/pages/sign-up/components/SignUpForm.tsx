@@ -1,4 +1,4 @@
-import { type ReactNode } from 'react';
+import { type ReactNode, useEffect, useState } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
@@ -54,10 +54,21 @@ const SignUpFormComponent: React.FC<TSignUpFormComponentProps> = (props) => {
     handleSubmit,
     invalid,
     values: { privacyAndPolicy },
+    initialValues,
   } = props;
   const classes = classNames(rootClassName || css.root, className);
   const haveAgreed = privacyAndPolicy === true;
   const submitDisable = !haveAgreed || invalid || inProgress;
+
+  const [email, setEmail] = useState<string>(initialValues.email || '');
+
+  const [isEmailEditable, setIsEmailEditable] = useState<boolean>(
+    !initialValues.email,
+  );
+
+  useEffect(() => {
+    setIsEmailEditable(!initialValues?.email);
+  }, [initialValues?.email]);
 
   const formTitle = intl.formatMessage({
     id: 'SignUpForm.title',
@@ -143,7 +154,12 @@ const SignUpFormComponent: React.FC<TSignUpFormComponentProps> = (props) => {
   );
 
   const navigateToSignInPage = () => {
-    router.push(generalPaths.SignIn);
+    router.push({ query: router.query, pathname: generalPaths.SignIn });
+  };
+
+  const handleUseDifferentEmail = () => {
+    setEmail('');
+    setIsEmailEditable(true);
   };
 
   return (
@@ -169,7 +185,6 @@ const SignUpFormComponent: React.FC<TSignUpFormComponentProps> = (props) => {
           validate={nameValidators}
           label={nameLabel}
           errorClass={css.errorClass}
-          // leftIcon={<IconUser2 />}
         />
 
         <FieldTextInput
@@ -179,8 +194,20 @@ const SignUpFormComponent: React.FC<TSignUpFormComponentProps> = (props) => {
           validate={emailValidators}
           label={emailLabel}
           errorClass={css.errorClass}
-          // leftIcon={<IconMail />}
+          disabled={!isEmailEditable}
+          initialValue={email}
         />
+
+        {initialValues.email && !isEmailEditable && (
+          <div className={css.invitationText}>
+            Email này được mời bởi người tạo đơn nhóm.{' '}
+            <span
+              className={css.changeEmailLink}
+              onClick={handleUseDifferentEmail}>
+              Thay đổi email
+            </span>
+          </div>
+        )}
 
         <FieldPasswordInput
           id={formId ? `${formId}.password` : 'password'}
@@ -189,7 +216,6 @@ const SignUpFormComponent: React.FC<TSignUpFormComponentProps> = (props) => {
           validate={passwordValidators}
           label={passwordLabel}
           errorClass={css.errorClass}
-          // leftIcon={<IconLock />}
         />
 
         <FieldPasswordInput
@@ -199,7 +225,6 @@ const SignUpFormComponent: React.FC<TSignUpFormComponentProps> = (props) => {
           validate={confirmPasswordValidators}
           label={confirmPasswordLabel}
           errorClass={css.errorClass}
-          // leftIcon={<IconLock />}
         />
 
         <FieldTextInput
@@ -209,7 +234,6 @@ const SignUpFormComponent: React.FC<TSignUpFormComponentProps> = (props) => {
           validate={phoneNumberValidators}
           label={phoneNumberLabel}
           errorClass={css.errorClass}
-          // leftIcon={<IconPhone2 />}
         />
 
         <div

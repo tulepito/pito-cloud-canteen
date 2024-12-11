@@ -18,6 +18,7 @@ export const enGeneralPaths = {
   Auth: '/auth',
   Tracking: '/tracking/[subOrderId]',
   SentryExamplePage: '/sentry-example-page',
+  getInvitationPath: (orderId: string) => `/invitation/${orderId}`,
 };
 
 export const personalPaths = {
@@ -64,6 +65,7 @@ export const IgnoredPermissionCheckRoutes = [
   enGeneralPaths.EmailVerification,
   enGeneralPaths.Tracking,
   enGeneralPaths.SentryExamplePage,
+  enGeneralPaths.getInvitationPath('[orderId]'),
 ];
 
 export const adminPaths = {
@@ -272,6 +274,8 @@ export const participantPaths = {
   AccountSpecialDemand: '/participant/account/special-demand',
   PlanDetail: '/participant/plans/[planId]',
   Invitation: '/participant/invitation/[companyId]',
+  getInvitationPath: (companyId: string) =>
+    `/participant/invitation/${companyId}`,
 };
 
 export const partnerPaths = {

@@ -12,6 +12,7 @@ import {
   prepareNewOrderDetailPlan,
   queryAllListings,
 } from '@helpers/apiHelpers';
+import logger from '@helpers/logger';
 import cookies from '@services/cookie';
 import { fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
@@ -29,11 +30,28 @@ import {
 import type { TListing } from '@src/utils/types';
 import { denormalisedResponseEntities, Listing, User } from '@utils/data';
 
+type InviteStatus = 'accepted' | 'declined';
+type InviteResponse = 'accept' | 'decline';
+type InviteSource = 'invitation-link';
+export interface ResponseToInvitationBody {
+  response: InviteResponse;
+  companyId: string;
+  source?: InviteSource;
+}
+
+interface Member {
+  email: string;
+  groups: string[];
+  id: string;
+  inviteStatus: InviteStatus;
+  permission: ECompanyPermission;
+}
+
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   const sdk = getSdk(req, res);
   const integrationSdk = getIntegrationSdk();
   try {
-    const { companyId = '' } = req.body;
+    const { companyId = '', source } = req.body as ResponseToInvitationBody;
 
     const currentUser = denormalisedResponseEntities(
       await sdk.currentUser.show(),
@@ -45,20 +63,53 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       currentUserGetter.getMetadata();
     const userId = currentUserGetter.getId();
 
+    if (currentUser?.attributes?.profile?.metadata?.isPartner) {
+      return res.status(EHttpStatusCode.BadRequest).json({
+        statusCode: EHttpStatusCode.BadRequest,
+        message: 'Tài khoản này là đối tác, không thể tham gia công ty',
+      });
+    }
+
     const companyAccount = await fetchUser(companyId);
     const companyUserGetter = User(companyAccount);
     const { companyName } = companyUserGetter.getPublicData();
     const { members = {} } = companyUserGetter.getMetadata();
-    const userMember = members[userEmail] || {};
+    let userMember: Member = members[userEmail] || {};
+
+    if (source === 'invitation-link' && isEmpty(userMember)) {
+      userMember = {
+        email: userEmail,
+        groups: [],
+        id: userId,
+        inviteStatus: 'accepted',
+        permission: ECompanyPermission.participant,
+      };
+    }
 
     if (!isEmpty(userCompany)) {
+      const currentCompanyId = Object.keys(userCompany)[0];
+
       if (
-        userCompany[companyId] &&
-        userCompany[companyId].permission in ECompanyPermission
+        userCompany[currentCompanyId] &&
+        userCompany[currentCompanyId].permission in ECompanyPermission
       ) {
-        return res.json({
+        if (currentCompanyId === companyId) {
+          return res.status(EHttpStatusCode.Ok).json({
+            message: 'Người dùng đã nằm trong công ty',
+            userType: userCompany[currentCompanyId].permission,
+          });
+        }
+
+        return res.status(EHttpStatusCode.BadRequest).json({
           statusCode: EHttpStatusCode.BadRequest,
-          message: 'User is already in company',
+          message: 'Tài khoản này đã thuộc một công ty khác',
+        });
+      }
+
+      if (currentCompanyId !== companyId) {
+        return res.status(EHttpStatusCode.BadRequest).json({
+          statusCode: EHttpStatusCode.BadRequest,
+          message: 'Tài khoản này đã thuộc một công ty khác',
         });
       }
 
@@ -70,8 +121,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       });
 
       return res.json({
-        statusCode: EHttpStatusCode.BadRequest,
-        error: `User already has company`,
+        message: 'User has been successfully added to the company',
       });
     }
 
@@ -191,6 +241,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           planListing: planListing!,
           newMemberIds: [userId],
         });
+
         await integrationSdk.listings.update({
           id: planId,
           metadata: {
@@ -206,6 +257,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       message: 'userAccept',
     });
   } catch (error) {
+    logger.info('Error responseToInvitation', String(error));
     handleError(res, error);
   }
 }

@@ -1,3 +1,5 @@
+import type { ResponseToInvitationBody } from '@pages/api/invitation/response.api';
+
 import { postApi } from './configs';
 
 export type CheckInvitationApiBody = {
@@ -6,9 +8,5 @@ export type CheckInvitationApiBody = {
 export const checkInvitationApi = (body: CheckInvitationApiBody) =>
   postApi('/invitation/check-invitation', body);
 
-export type ResponseToInvitationApiBody = {
-  response: 'accept' | 'decline';
-  companyId: string;
-};
-export const responseToInvitationApi = (body: ResponseToInvitationApiBody) =>
+export const responseToInvitationApi = (body: ResponseToInvitationBody) =>
   postApi('/invitation/response', body);

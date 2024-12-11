@@ -72,12 +72,14 @@ export const sendIndividualEmail = ({
   content,
   sender,
 }: {
-  receiver: AddressList;
+  receiver: AddressList | string;
   subject: MessageData;
   content: MessageData;
   sender: Address;
 }) => {
-  receiver.forEach((email) => {
+  const receivers = Array.isArray(receiver) ? receiver : [receiver];
+
+  receivers.forEach((email) => {
     const params = createEmailParams([email], subject, content, sender);
     sendEmail(params);
   });

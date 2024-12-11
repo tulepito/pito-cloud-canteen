@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { useDispatch } from 'react-redux';
+import { toast } from 'react-toastify';
 import { useRouter } from 'next/router';
 
 import Button from '@components/Button/Button';
@@ -8,8 +9,8 @@ import { getItem } from '@helpers/localStorageHelpers';
 import { companyInvitationThunks } from '@redux/slices/companyInvitation.slice';
 import { userThunks } from '@redux/slices/user.slice';
 import type { AppDispatch } from '@redux/store';
-import { enGeneralPaths } from '@src/paths';
-import { LOCAL_STORAGE_KEYS } from '@src/utils/constants';
+import { enGeneralPaths, participantPaths } from '@src/paths';
+import { LOCAL_STORAGE_KEYS, QUERY_REFS } from '@src/utils/constants';
 import { isTooManyEmailVerificationRequestsError } from '@utils/errors';
 
 import css from './EmailVerification.module.scss';
@@ -36,10 +37,14 @@ const EmailVerification: React.FC<TEmailVerificationProps> = (props) => {
 
   const navigateToHomePageMaybe = () => {
     const companyId = getItem(LOCAL_STORAGE_KEYS.INVITATION_COMPANY_ID);
-    if (companyId) {
-      router.push(`/participant/invitation/${companyId}`);
+    const tempCompanyId = getItem(LOCAL_STORAGE_KEYS.TEMP_COMPANY_ID);
+
+    const targetCompanyId = companyId || tempCompanyId;
+
+    if (targetCompanyId) {
+      router.push(participantPaths.getInvitationPath(targetCompanyId));
     } else {
-      router.push(enGeneralPaths.Auth);
+      router.push(participantPaths.OrderList);
     }
   };
 
@@ -64,17 +69,44 @@ const EmailVerification: React.FC<TEmailVerificationProps> = (props) => {
   useEffect(() => {
     const fromUrlExtracted = (fromUrl as string)?.split('/') || [];
     const isCompanyInvitation = fromUrlExtracted.includes('invitation');
+
+    const _fromUrl = new URL(
+      fromUrl as string,
+      process.env.NEXT_PUBLIC_CANONICAL_URL,
+    );
+    const searchParamsRef = _fromUrl.searchParams.get('ref');
+    if (searchParamsRef === QUERY_REFS.INVITATION_LINK) {
+      router.push(fromUrl as string);
+
+      return;
+    }
+
     if (isCompanyInvitation) {
-      const invitationIndex = fromUrlExtracted.indexOf('invitation');
-      const companyId = fromUrlExtracted[invitationIndex + 1];
+      let companyId = null;
+
+      if (isCompanyInvitation) {
+        const invitationIndex = fromUrlExtracted.indexOf('invitation');
+        companyId = fromUrlExtracted[invitationIndex + 1];
+      }
+
       dispatch(
         companyInvitationThunks.responseToInvitation({
           companyId: companyId as string,
           response: 'accept',
+          source: 'invitation-link',
         }),
-      );
+      )
+        .unwrap()
+        .then(() => {
+          router.push(enGeneralPaths.Auth);
+        })
+        .catch((error) => {
+          toast.error(
+            `Có lỗi xảy ra trong quá trình xác nhận: ${String(error)}`,
+          );
+        });
     }
-  }, [dispatch, fromUrl]);
+  }, [dispatch, fromUrl, router]);
 
   return (
     <div className={css.root}>

@@ -971,7 +971,7 @@
   "InvitationCard.decline": "Từ chối",
   "InvitationCard.invitation": "Bạn được mời tham gia công ty <span>{companyName}</span>. Nhấn vào nút phía dưới để tham gia và bắt đầu chọn món ăn của bạn.",
   "InvitationCard.title": "Bạn nhận được một lời mời tham gia công ty - Pito Cloud Canteen",
-  "InvitationModal.description": "{participantName} <span>công ty {companyName}</span> mời bạn tham gia PITO Cloud Canteen - Đặt bữa ăn hàng ngày. Cùng tham gia để bắt đầu chọn món cho tuần ăn của bạn nhé.",
+  "InvitationModal.description": "<span>{participantName}</span> ơi, bạn đã nhận được lời mời từ <span>{companyName}</span> tham gia PITO Cloud Canteen - Nơi bạn có thể dễ dàng đặt bữa ăn mỗi ngày. Tham gia ngay để cùng chọn món cho tuần ăn thật ngon miệng nhé!",
   "InvitationModal.title": "Bạn nhận được lời mời tham gia PITO Cloud Canteen",
   "InvitationNotiModal.button": "Quay về trang chủ",
   "InvitationNotiModal.title.decline": "Bạn đã từ chối lời mời này.",
@@ -1772,7 +1772,7 @@
   "SignUpPage.signUpFailed": "Lỗi đăng ký. Vui lòng kiểm tra thông tin đăng ký và thử lại!",
   "SignUpPage.signUpFailedEmailAlreadyTaken": "Email đã được sử dụng cho tài khoản khác. Thử lại hoặc thử đăng nhập!",
   "SignUpPage.Title": "Đăng ký",
-  "SignUpRoute.desciption": "Đăng ký",
+  "SignUpRoute.description": "Đăng ký",
   "SignUpRoute.title": "Đăng ký",
   "SpecialDemandRoute.description": "Tạo đơn | Yêu cầu đặc biệt",
   "SpecialDemandRoute.title": "Tạo đơn | Yêu cầu đặc biệt",
@@ -1890,6 +1890,6 @@
   "UserPermission.booker": "Booker",
   "UserPermission.owner": "Quản trị viên",
   "UserPermission.participant": "Thành viên",
-  "HomeRoute.desciption": "Trang chủ",
+  "HomeRoute.description": "Trang chủ",
   "HomeRoute.title": "Trang chủ"
 }

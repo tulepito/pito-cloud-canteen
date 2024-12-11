@@ -80,7 +80,9 @@
           {
             "argsIgnorePattern": "^_"
           }
-        ]
+        ],
+        "no-underscore-dangle": "off",
+        "@typescript-eslint/naming-convention": "off"
       }
     }
   ]

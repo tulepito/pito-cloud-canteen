@@ -3,6 +3,7 @@ const BASE_URL = process.env.NEXT_PUBLIC_CANONICAL_URL;
 type ParticipantCompanyInvitationParams = {
   companyUser: any;
   participantUser?: any;
+  recipientEmail?: string;
 };
 
 export const participantCompanyInvitationSubject = (companyName: string) =>
@@ -10,6 +11,7 @@ export const participantCompanyInvitationSubject = (companyName: string) =>
 
 const participantCompanyInvitation = ({
   companyUser,
+  recipientEmail,
 }: ParticipantCompanyInvitationParams) => {
   const { displayName: bookerName } = companyUser.getProfile();
   const { email: bookerEmail } = companyUser.getAttributes();
@@ -17,7 +19,9 @@ const participantCompanyInvitation = ({
 
   const companyId = companyUser.getId();
 
-  const invitationUrl = `${BASE_URL}/participant/invitation/${companyId}`;
+  const invitationUrl = `${BASE_URL}/participant/invitation/${companyId}${
+    recipientEmail ? `?email=${encodeURIComponent(recipientEmail)}` : ''
+  }`;
 
   return `
   <!DOCTYPE html

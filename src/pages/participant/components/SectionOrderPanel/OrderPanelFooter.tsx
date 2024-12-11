@@ -1,6 +1,6 @@
 import { useIntl } from 'react-intl';
 
-import Button, { InlineTextButton } from '@components/Button/Button';
+import Button from '@components/Button/Button';
 import { verifyAllFoodPickedWithParticipant } from '@pages/participant/helpers';
 
 import css from './SectionOrderPanel.module.scss';
@@ -56,12 +56,13 @@ const OrderPanelFooter: React.FC<TOrderPanelFooter> = ({
         inProgress={submitDataInprogress}>
         {completeOrderButtonLabel}
       </Button>
-      <InlineTextButton
+      <Button
+        variant="inline"
         disabled={removeAllDisabled}
         className={css.removeCartLabel}
         onClick={handleRemoveAllItem}>
         {removeAllOrderCartLabel}
-      </InlineTextButton>
+      </Button>
     </div>
   );
 };

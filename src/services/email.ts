@@ -456,7 +456,10 @@ export const emailSendingFactory = async (
         const { companyName } = companyUser?.getPublicData() || {};
         const { email: participantEmail } =
           participantUser?.getAttributes() || {};
-        const emailTemplate = participantCompanyInvitation(emailDataSource);
+        const emailTemplate = participantCompanyInvitation({
+          ...emailDataSource,
+          recipientEmail: participantEmail,
+        });
         const emailDataParams = {
           receiver: [participantEmail],
           subject: participantCompanyInvitationSubject(companyName),

@@ -49,6 +49,7 @@
   font-weight: 700;
   color: #039ee1;
   text-decoration: underline;
+  transition: opacity 0.3s ease;
 
   &:hover {
     opacity: 0.8;
@@ -103,4 +104,22 @@
 .errorClass {
   margin-bottom: 0;
   margin-top: 8px;
+}
+
+.invitationText {
+  @include textTemplate(12px, 400, 16px);
+  color: $neutralGray7;
+  margin-top: -8px;
+
+  .changeEmailLink {
+    cursor: pointer;
+    font-weight: 600;
+    color: #039ee1;
+    text-decoration: underline;
+    transition: opacity 0.3s ease;
+
+    &:hover {
+      opacity: 0.8;
+    }
+  }
 }

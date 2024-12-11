@@ -2,19 +2,6 @@
 @use '/src/styles/mixins.scss' as *;
 @use '/src/styles/customMediaQueries.scss' as *;
 
-.foodBackground {
-  max-width: 1440px;
-  margin: 0 auto;
-  padding: 0 16px 0;
-  margin-top: 20px;
-
-  @include viewportMedium {
-    background-color: $neutralGray2;
-    height: calc(100vh - 82px);
-    overflow: hidden auto;
-  }
-}
-
 .isOpen.isOpen.isOpen {
   position: relative;
   z-index: 12;

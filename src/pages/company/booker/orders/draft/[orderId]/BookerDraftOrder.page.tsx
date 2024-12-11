@@ -245,7 +245,10 @@ function BookerDraftOrderPage() {
         await dispatch(
           BookerDraftOrderPageThunks.sendRemindEmailToMembers({
             orderId: orderId as string,
-            orderLink: getParticipantPickingLink(orderId as string),
+            orderLink: getParticipantPickingLink({
+              orderId: orderId as string,
+              companyId,
+            }),
             deadline: formatTimestamp(orderDeadline, 'HH:mm EEE,dd/MM/yyyy'),
             memberIdList: participantData.map((p) => p.id.uuid),
           }),

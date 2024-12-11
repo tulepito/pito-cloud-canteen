@@ -31,6 +31,7 @@ type TOrderLinkSectionProps = TDefaultProps & {
   data: {
     orderDeadline: number;
     companyName: string;
+    companyId: string;
   };
   isAminLayout?: boolean;
   ableToUpdateOrder: boolean;
@@ -42,7 +43,7 @@ const OrderLinkSection: React.FC<TOrderLinkSectionProps> = (props) => {
   const {
     rootClassName,
     className,
-    data: { orderDeadline, companyName },
+    data: { orderDeadline, companyName, companyId },
     ableToUpdateOrder,
     shouldHideOnMobileView = false,
     mobileModalControl,
@@ -58,7 +59,10 @@ const OrderLinkSection: React.FC<TOrderLinkSectionProps> = (props) => {
     Listing(orderData as TListing).getMetadata().orderState ===
     EOrderStates.picking;
 
-  const orderLink = getParticipantPickingLink(orderData?.id?.uuid);
+  const orderLink = getParticipantPickingLink({
+    orderId: orderData?.id?.uuid,
+    companyId,
+  });
 
   const formattedOrderDeadline = formatTimestamp(
     orderDeadline,

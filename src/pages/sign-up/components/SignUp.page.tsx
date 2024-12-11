@@ -1,5 +1,6 @@
 import { FormattedMessage } from 'react-intl';
 import last from 'lodash/last';
+import { useRouter } from 'next/router';
 
 import PitoLogoV2 from '@components/PitoLogoV2/PitoLogoV2';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
@@ -12,6 +13,8 @@ import EmailVerification from './EmailVerification';
 import type { TSignUpFormValues } from './SignUpForm';
 import SignUpForm from './SignUpForm';
 
+const BASE_URL = process.env.NEXT_PUBLIC_CANONICAL_URL;
+
 const SignUpPage = () => {
   const {
     user: { sendVerificationEmailError, sendVerificationEmailInProgress },
@@ -20,6 +23,13 @@ const SignUpPage = () => {
   const user = useAppSelector(currentUserSelector);
   const authInprogress = useAppSelector(authenticationInProgress);
   const dispatch = useAppDispatch();
+
+  // Extract the email from the invitation link
+  const router = useRouter();
+  const fullUrl = router.query.from
+    ? new URL(`${BASE_URL}${router.query.from}`)
+    : null;
+  const emailFromIntivation = fullUrl?.searchParams.get('email') ?? '';
 
   const currentUserLoaded = !!user.id;
   const name =
@@ -67,6 +77,7 @@ const SignUpPage = () => {
         />
       ) : (
         <SignUpForm
+          initialValues={{ email: emailFromIntivation ?? '' }}
           onSubmit={handleSubmitSignUp}
           inProgress={authInprogress}
           errorMessage={signUpError ? signUpErrorMessage : undefined}

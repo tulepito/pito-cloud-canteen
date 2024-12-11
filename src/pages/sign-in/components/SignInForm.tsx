@@ -113,7 +113,6 @@ const SignInFormComponent: React.FC<TSignInFormComponentProps> = (props) => {
         intl.formatMessage({ id: 'SignInForm.password.invalid' }),
       ),
     ),
-    // leftIcon: <IconLock />,
   };
 
   const navigateToSignUpPage = () => {

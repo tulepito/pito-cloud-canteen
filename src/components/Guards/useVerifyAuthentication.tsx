@@ -52,6 +52,14 @@ const useVerifyAuthentication = (homePageNavigateCondition: boolean) => {
           query: { from: fullPath },
         });
       } else {
+        if (!router.isReady) return;
+
+        const companyId = Array.isArray(router.query.companyId)
+          ? router?.query?.companyId?.[0]
+          : router?.query?.companyId;
+
+        setItem(LOCAL_STORAGE_KEYS.TEMP_COMPANY_ID, companyId ?? '');
+
         router.push({
           pathname: generalPaths.SignIn,
           query: { from: fullPath },

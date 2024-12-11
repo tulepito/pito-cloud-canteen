@@ -8,6 +8,7 @@ import type {
   TDaySession,
 } from '@components/CalendarDashboard/helpers/types';
 import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
+import { QUERY_REFS } from '@src/utils/constants';
 import {
   getDaySessionFromDeliveryTime,
   renderDateRange,
@@ -15,8 +16,28 @@ import {
 import { EPartnerVATSetting } from '@src/utils/enums';
 import type { TObject } from '@src/utils/types';
 
-export const getParticipantPickingLink = (orderId: string) =>
-  `${process.env.NEXT_PUBLIC_CANONICAL_URL}/participant/order/${orderId}`;
+export const getParticipantPickingLink = ({
+  orderId,
+  companyId,
+}: {
+  orderId: string;
+  companyId?: string;
+}) => {
+  const baseUrl = `${process.env.NEXT_PUBLIC_CANONICAL_URL}/invitation/${orderId}`;
+
+  const searchString = new URLSearchParams();
+  searchString.append('ref', QUERY_REFS.INVITATION_LINK);
+  if (companyId) {
+    searchString.append('companyId', companyId);
+  }
+
+  const query = searchString.toString();
+
+  const url = new URL(baseUrl);
+  url.search = query;
+
+  return url.toString();
+};
 
 export const getTrackingLink = (orderId: string, timestamp: string | number) =>
   `${process.env.NEXT_PUBLIC_CANONICAL_URL}/tracking/${orderId}_${timestamp}`;

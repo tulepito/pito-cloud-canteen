@@ -8,7 +8,7 @@ import { enGeneralPaths, generalPaths } from '@src/paths';
 
 import { useAppDispatch } from './reduxHooks';
 
-export const useLogout = () => {
+export const useLogout = (options?: { from?: string }) => {
   const dispatch = useAppDispatch();
   const router = useRouter();
 
@@ -19,11 +19,9 @@ export const useLogout = () => {
     removeItem('userRole');
     router.push({
       pathname: generalPaths.SignIn,
-      query: { from: enGeneralPaths.Auth },
+      query: { from: options?.from || enGeneralPaths.Auth },
     });
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [dispatch, options?.from, router]);
 
   return logoutFn;
 };

@@ -46,17 +46,11 @@
     padding: 6px 14px;
     display: inline-flex;
     align-items: center;
-    min-height: 38px;
-    height: 38px;
-    border: 1px solid $neutralGray6;
-    border-radius: 8px;
+    min-height: 40px;
+    height: 40px;
     color: $neutralGray7;
     margin-left: 16px;
     margin-bottom: 18px;
-
-    &:not(:disabled):hover {
-      background-color: $neutralGray5;
-    }
   }
 
   .iconRefresh {
@@ -78,10 +72,10 @@
     padding: 18px 18px 0;
 
     .removeCartLabel {
+      margin-top: 8px;
       width: 100%;
       color: $neutralGray7;
       @include textTemplate(16px, 600, 24px);
-      margin: 0;
 
       &:disabled {
         color: $neutralGray6;
@@ -127,28 +121,21 @@
   .actionWrapper {
     @include flexCenter;
     flex-direction: column-reverse;
-    gap: 8px;
+    gap: 12px;
 
-    @include viewportSmall {
+    @include viewportMedium {
       flex-wrap: wrap;
       flex-direction: row;
-      gap: 28px;
     }
 
     .closeModal {
-      width: 76px;
-      margin-right: 0;
-
-      @include viewportSmall {
-        margin-right: 28px;
-      }
+      width: 100%;
+      flex: 1;
     }
 
     .goToHomePage {
+      flex: 1;
       width: 100%;
-      @include viewportSmall {
-        width: 228px;
-      }
     }
   }
 }

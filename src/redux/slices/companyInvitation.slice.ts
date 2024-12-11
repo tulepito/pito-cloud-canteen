@@ -1,10 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-import type { ResponseToInvitationApiBody } from '@apis/companyInvitationApi';
 import {
   checkInvitationApi,
   responseToInvitationApi,
 } from '@apis/companyInvitationApi';
+import type { ResponseToInvitationBody } from '@pages/api/invitation/response.api';
 import { createAsyncThunk } from '@redux/redux.helper';
 import type { TUser } from '@src/utils/types';
 import { denormalisedResponseEntities } from '@utils/data';
@@ -59,7 +59,7 @@ const checkInvitation = createAsyncThunk(
 
 const responseToInvitation = createAsyncThunk(
   RESPONSE_TO_INVITATION,
-  async (params: ResponseToInvitationApiBody) => {
+  async (params: ResponseToInvitationBody) => {
     const { data: response }: { data: ResponseToInvitationResult } =
       await responseToInvitationApi(params);
 

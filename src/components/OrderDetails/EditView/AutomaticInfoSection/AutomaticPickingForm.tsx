@@ -4,6 +4,7 @@ import { Field, Form as FinalForm } from 'react-final-form';
 import Form from '@components/Form/Form';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import Toggle from '@components/Toggle/Toggle';
+import Tooltip from '@components/Tooltip/Tooltip';
 
 import css from './AutomaticPickingForm.module.scss';
 
@@ -48,21 +49,32 @@ const AutomaticPickingFormComponent: React.FC<
     <Form onSubmit={handleSubmit}>
       <div className={css.fieldContainer}>
         {titleComponent}
-        <Field id="AutomaticPickingForm.toggle" name="autoPicking">
-          {({ id, input }) => {
-            return (
-              <Toggle
-                id={id}
-                disabled={disabled}
-                name={input.name}
-                status={input.value ? 'on' : 'off'}
-                onClick={(value) => {
-                  handleFieldChange(value);
-                }}
-              />
-            );
-          }}
-        </Field>
+        <Tooltip
+          tooltipContent={
+            <span>
+              Khi hết thời hạn, hệ thống tự động chọn món cho nhũng thành viên
+              chưa chọn.
+            </span>
+          }
+          placement="bottom">
+          <div>
+            <Field id="AutomaticPickingForm.toggle" name="autoPicking">
+              {({ id, input }) => {
+                return (
+                  <Toggle
+                    id={id}
+                    disabled={disabled}
+                    name={input.name}
+                    status={input.value ? 'on' : 'off'}
+                    onClick={(value) => {
+                      handleFieldChange(value);
+                    }}
+                  />
+                );
+              }}
+            </Field>
+          </div>
+        </Tooltip>
       </div>
     </Form>
   );

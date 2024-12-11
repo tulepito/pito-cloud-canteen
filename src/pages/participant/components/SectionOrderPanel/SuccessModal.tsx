@@ -76,7 +76,7 @@ const SuccessModal: React.FC<TSuccessModal> = ({
         <div className={css.actionWrapper}>
           <Button
             className={css.closeModal}
-            variant="inline"
+            variant="secondary"
             onClick={handleClose}>
             {intl.formatMessage({
               id: 'Modal.closeModal',

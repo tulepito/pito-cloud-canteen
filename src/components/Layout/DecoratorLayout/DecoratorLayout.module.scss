@@ -1,0 +1,72 @@
+@use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.wrapper {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  min-height: 100vh;
+  z-index: 2;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+
+  @include viewportMedium {
+    align-items: center;
+  }
+
+  .yellow {
+    position: absolute;
+    z-index: -2;
+    top: 0;
+    right: 0;
+
+    width: 50%;
+    height: auto;
+
+    @include viewportMedium {
+      width: initial;
+      height: initial;
+    }
+  }
+
+  .pink {
+    position: absolute;
+    z-index: -2;
+    bottom: 0;
+    right: 0;
+    display: none;
+
+    @include viewportMedium {
+      display: block;
+    }
+  }
+
+  .blue {
+    position: absolute;
+    z-index: -2;
+    bottom: 0;
+    left: 0;
+
+    width: 80%;
+    height: auto;
+
+    @include viewportMedium {
+      width: initial;
+      height: initial;
+    }
+  }
+
+  .green {
+    position: absolute;
+    z-index: -2;
+    top: 100px;
+    left: 0;
+    display: none;
+
+    @include viewportMedium {
+      display: block;
+    }
+  }
+}

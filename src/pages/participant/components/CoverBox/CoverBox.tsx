@@ -34,7 +34,14 @@ const CoverBox: React.FC<TCoverBoxProps> = (props) => {
         <div className={css.coverWrapper}>
           <Image className={css.cover} src={coverSrc} alt="cover" />
         </div>
-        <div className={css.title}>{modalTitle}</div>
+        <div
+          className={css.title}
+          style={{
+            lineHeight: '1.4',
+            fontSize: '20px',
+          }}>
+          {modalTitle}
+        </div>
         <RenderWhen condition={!contentInProgress}>
           <>
             <div className={css.description}>{modalDescription}</div>

@@ -1,0 +1,77 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.modal.open {
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 100;
+
+  &.open {
+    .overlay {
+      width: 100%;
+      height: 100vh;
+    }
+  }
+
+  .modalContainer {
+    width: 700px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: $neutralGray1;
+    border-radius: 20px;
+    padding: 24px 36px;
+    box-shadow: 0px 8px 8px -4px rgba(16, 24, 40, 0.04),
+      0px 20px 24px -4px rgba(16, 24, 40, 0.1);
+
+    .modalHeader {
+      @include flexAlign(center, space-between);
+
+      .modalTitle {
+        @include text(20px, 32px);
+        font-weight: 700;
+      }
+    }
+
+    .modalContent {
+      margin-top: 24px;
+      .infoRow {
+        @include flexAlign(center);
+
+        .title {
+          width: 140px;
+        }
+
+        .content {
+          font-weight: $fontWeightBold;
+        }
+      }
+    }
+
+    .modalFooter {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid $neutralGray5;
+      @include flexAlign(center, flex-end);
+      gap: 24px;
+
+      .declineBtn {
+        width: 200px;
+      }
+
+      .acceptBtn {
+        width: 200px;
+      }
+    }
+  }
+}
+
+.boldText {
+  font-weight: $fontWeightBold;
+}

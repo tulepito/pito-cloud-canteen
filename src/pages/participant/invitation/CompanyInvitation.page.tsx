@@ -1,16 +1,17 @@
 import type { ReactNode } from 'react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import { useRouter } from 'next/router';
 
 import Button from '@components/Button/Button';
-import LoadingModal from '@components/LoadingModal/LoadingModal';
+import FullScreenPageLoading from '@components/FullScreenPageLoading/FullScreenPageLoading';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { useLogout } from '@hooks/useLogout';
 import { companyInvitationThunks } from '@redux/slices/companyInvitation.slice';
 import { currentUserSelector, userThunks } from '@redux/slices/user.slice';
 import invitationCover from '@src/assets/invitationCover.png';
-import { participantPaths } from '@src/paths';
+import { enGeneralPaths, participantPaths } from '@src/paths';
 import { User } from '@utils/data';
 import type { TUser } from '@utils/types';
 
@@ -29,24 +30,27 @@ const CompanyInvitationPage = () => {
     (state) => state.companyInvitation.company,
     shallowEqual,
   );
-  const fetchCompanyInfoInProgress = useAppSelector(
-    (state) => state.companyInvitation.fetchCompanyInfoInProgress,
-  );
   const companyUser = User(company as TUser);
   const user = User(currentUser as TUser);
   const { companyName } = companyUser.getPublicData();
 
   const { lastName: userLastName, firstName: userFistName } = user.getProfile();
   const { displayName: bookerName } = companyUser.getProfile();
-  const { responseToInvitationInProgress, responseToInvitationResult } =
-    useAppSelector((state) => state.companyInvitation);
+  const { responseToInvitationResult } = useAppSelector(
+    (state) => state.companyInvitation,
+  );
+
+  const [error, setError] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const invalidInvitation = responseToInvitationResult === 'invalidInvitaion';
 
-  const isLoading =
-    responseToInvitationInProgress ||
-    fetchCompanyInfoInProgress ||
-    invalidInvitation;
+  const handleLogoutFn = useLogout();
+
+  const handleLogout = async () => {
+    await handleLogoutFn();
+    router.push(enGeneralPaths.Auth);
+  };
 
   const rowInformation = [
     {
@@ -67,15 +71,16 @@ const CompanyInvitationPage = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      await dispatch(
-        companyInvitationThunks.fetchCompanyInfo(companyId as string),
-      );
-      await dispatch(
-        companyInvitationThunks.responseToInvitation({
-          companyId: companyId as string,
-          response: 'accept',
-        }),
-      );
+      setIsLoading(true);
+      try {
+        await dispatch(
+          companyInvitationThunks.fetchCompanyInfo(companyId as string),
+        ).unwrap();
+      } catch (catchError) {
+        setError(true);
+      } finally {
+        setIsLoading(false);
+      }
     };
     if (isReady) {
       if (currentUser) {
@@ -84,39 +89,73 @@ const CompanyInvitationPage = () => {
     }
   }, [companyId, currentUser, dispatch, isReady]);
 
-  const goToHomePage = async () => {
-    const { meta } = await dispatch(userThunks.fetchCurrentUser());
+  const goToHomePage = () => {
+    router.push(participantPaths.OrderList);
+  };
 
-    if (meta.requestStatus === 'fulfilled') {
-      router.push(participantPaths.OrderList);
+  const acceptInvitaiton = async () => {
+    setIsLoading(true);
+    try {
+      await dispatch(
+        companyInvitationThunks.responseToInvitation({
+          companyId: companyId as string,
+          response: 'accept',
+        }),
+      ).unwrap();
+
+      await dispatch(userThunks.fetchCurrentUser()).unwrap();
+      goToHomePage();
+    } catch {
+      setError(true);
+    } finally {
+      setIsLoading(false);
     }
   };
 
+  if (error) {
+    return (
+      <div className={css.errorPage}>
+        <h2>Không thể tham gia</h2>
+        <p>
+          Xin lỗi, bạn không thể tham gia đơn này. Hãy đăng xuất và quay lại
+          sau.
+        </p>
+        <Button onClick={handleLogout}>Đăng xuất</Button>
+      </div>
+    );
+  }
+
   return (
     <div className={css.foodBackground}>
-      <CoverBox
-        coverSrc={invitationCover}
-        modalTitle={intl.formatMessage({ id: 'InvitationModal.title' })}
-        modalDescription={intl.formatMessage(
-          { id: 'InvitationModal.description' },
-          {
-            span: (msg: ReactNode) => (
-              <span className={css.boldText}>{msg}</span>
-            ),
-            participantName: `${userLastName} ${userFistName}`,
-            companyName,
-          },
-        )}
-        rowInformation={rowInformation}
-        buttonWrapper={
-          <>
-            <Button className={css.btn} onClick={goToHomePage}>
-              Bắt đầu
-            </Button>
-          </>
-        }
-      />
-      <LoadingModal isOpen={isLoading} />
+      {isLoading ? (
+        <FullScreenPageLoading />
+      ) : (
+        <CoverBox
+          coverSrc={invitationCover}
+          modalTitle={intl.formatMessage({ id: 'InvitationModal.title' })}
+          modalDescription={intl.formatMessage(
+            { id: 'InvitationModal.description' },
+            {
+              span: (msg: ReactNode) => (
+                <span className={css.boldText}>{msg}</span>
+              ),
+              participantName: `${userLastName} ${userFistName}`,
+              companyName,
+            },
+          )}
+          rowInformation={rowInformation}
+          buttonWrapper={
+            <>
+              <Button
+                disabled={isLoading}
+                className={css.btn}
+                onClick={acceptInvitaiton}>
+                Bắt đầu
+              </Button>
+            </>
+          }
+        />
+      )}
     </div>
   );
 };

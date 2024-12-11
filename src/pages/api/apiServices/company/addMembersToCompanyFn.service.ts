@@ -265,19 +265,21 @@ const addMembersToCompanyFn = async (params: TAddMembersToCompanyParams) => {
     });
   }
   // Step handle send email for new no account members
-  const emailTemplate = participantCompanyInvitation({
-    companyUser,
-  });
+  newNoAccountMemberEmailList.map(async (email: string) => {
+    const emailTemplate = participantCompanyInvitation({
+      companyUser,
+      recipientEmail: email,
+    });
 
-  const noFlexAccountEmailParamsData = {
-    receiver: newNoAccountMemberEmailList,
-    subject: participantCompanyInvitationSubject(companyName),
-    content: emailTemplate as string,
-    sender: systemSenderEmail as string,
-  };
-  if (newNoAccountMemberEmailList.length > 0) {
+    const noFlexAccountEmailParamsData = {
+      receiver: email,
+      subject: participantCompanyInvitationSubject(companyName),
+      content: emailTemplate as string,
+      sender: systemSenderEmail as string,
+    };
+
     sendIndividualEmail(noFlexAccountEmailParamsData);
-  }
+  });
 
   return updatedCompanyAccount;
 };
