@@ -5,7 +5,8 @@ $toast-error-bg: #fcedef;
 $toast-error-icon-fill: #ef4d61;
 $toast-error-progress-bar: #ef4d61;
 
-$toast-success-bg: #ebfbf4;
+// $toast-success-bg: #ebfbf4;
+$toast-success-bg: #ebffd6;
 $toast-success-icon-fill: #34d39d;
 $toast-success-progress-bar: #34d39d;
 
@@ -19,8 +20,17 @@ $toast-box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1),
   0 2px 4px -2px rgb(0 0 0 / 0.1);
 
 .defaultToastContainer {
-  width: auto;
-  min-width: 420px;
+  z-index: 2147483631;
+
+  @include viewportMedium {
+    width: auto;
+    min-width: 420px;
+  }
+
+  @include viewportLarge {
+    width: auto;
+    min-width: 420px;
+  }
 
   :global .Toastify__toast--error {
     font-size: 14px;

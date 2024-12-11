@@ -177,6 +177,8 @@ function BookerDraftOrderPage() {
     restaurants,
   } = useRestaurantDetailModal();
 
+  const { isMobileLayout, viewport } = useViewport();
+
   const isSetupMode = currentViewMode === EBookerDraftOrderViewMode.setup;
   const orderListing = Listing(order as TListing);
   const {
@@ -461,35 +463,46 @@ function BookerDraftOrderPage() {
         false,
       ),
     );
+
+    const toastOptions = {
+      autoClose: 5000,
+      hideProgressBar: true,
+      icon: <IconCheckWithBackground className={css.toastIcon} />,
+      toastId: 'BookerDraftOrderPage.OrderSuccessfullyCreated',
+      className: css.toastContainer,
+      ...(isMobileLayout
+        ? {
+            position: toast.POSITION.BOTTOM_CENTER,
+            style: { bottom: '80px' },
+          }
+        : {}),
+    };
+
     toast.success(
       <p>
-        Thực đơn cho tuần ăn{' '}
-        {<b>{formatTimestamp(startDate.valueOf(), 'dd')}</b>} đến{' '}
-        {<b>{formatTimestamp(endDate.valueOf(), 'dd')}</b>} tháng{' '}
-        {<b>{formatTimestamp(endDate.valueOf(), 'MM')}</b>} đã được gợi ý.
+        <b>Thực đơn cho tuần ăn đã được gợi ý.</b>
         <br />
         <span style={{ fontSize: 12 }}>
           Bạn có thể bấm <b>Tiếp tục</b> hoặc tuỳ chỉnh thực đơn cho từng ngày.
         </span>
       </p>,
-      {
-        autoClose: 5000,
-        hideProgressBar: true,
-        toastId: 'BookerDraftOrderPage.OrderSuccessfullyCreated',
-        icon: <IconCheckWithBackground className={css.toastIcon} />,
-        className: css.toastContainer,
-      },
+      toastOptions,
     );
   };
 
   useEffect(() => {
-    if (toastShowedAfterSuccessfullyCreatingOrder) {
-      logger.info('toastOrderSuccessfullyCreated', {
-        toastShowedAfterSuccessfullyCreatingOrder,
-      });
-      toastOrderSuccessfullyCreated();
+    if (viewport.width) {
+      if (
+        toastShowedAfterSuccessfullyCreatingOrder &&
+        !isAllDatesHaveNoRestaurants
+      ) {
+        logger.info('toastOrderSuccessfullyCreated', {
+          toastShowedAfterSuccessfullyCreatingOrder,
+        });
+        toastOrderSuccessfullyCreated();
+      }
     }
-  }, []);
+  }, [viewport]);
 
   useEffect(() => {
     const mockupSubOrder = getBookerMockupSubOrder(startDate);

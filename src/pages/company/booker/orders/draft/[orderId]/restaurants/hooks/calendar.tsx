@@ -6,7 +6,9 @@ import { DateTime } from 'luxon';
 import { useRouter } from 'next/router';
 
 import AddMorePlan from '@components/CalendarDashboard/components/MealPlanCard/components/AddMorePlan';
+import IconCheckWithBackground from '@components/Icons/IconCheckWithBackground/IconCheckWithBackground';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { useViewport } from '@hooks/useViewport';
 import {
   orderAsyncActions,
   setOnRecommendRestaurantInProcess,
@@ -22,6 +24,8 @@ import {
   BookerSelectRestaurantActions,
   BookerSelectRestaurantThunks,
 } from '../BookerSelectRestaurant.slice';
+
+import css from '../BookerSelectRestaurant.module.scss';
 
 export const useGetCalendarExtraResources = ({
   order,
@@ -274,6 +278,11 @@ export const useGetCalendarComponentProps = ({
   const onRecommendRestaurantInProgress = useAppSelector(
     (state) => state.Order.onRecommendRestaurantInProgress,
   );
+  const isAllDatesHaveNoRestaurantsCurrentOrder = useAppSelector(
+    (state) => state.Order.isAllDatesHaveNoRestaurants,
+  );
+
+  const { isMobileLayout } = useViewport();
 
   const { orderId } = router.query;
   const { plans = [] } = Listing(order).getMetadata();
@@ -286,12 +295,51 @@ export const useGetCalendarComponentProps = ({
     [orderId, router],
   );
 
+  const toastOrderSuccessfullyCreated = () => {
+    dispatch(
+      BookerDraftOrderPageActions.setToastShowedAfterSuccessfullyCreatingOrder(
+        false,
+      ),
+    );
+
+    const toastOptions = {
+      autoClose: 5000,
+      hideProgressBar: true,
+      icon: <IconCheckWithBackground className={css.toastIcon} />,
+      className: css.toastContainer,
+    } as any;
+
+    if (isMobileLayout) {
+      toastOptions.position = toast.POSITION.BOTTOM_CENTER;
+      toastOptions.style = { bottom: '80px' };
+    }
+
+    toast.success(
+      <p>
+        <b>Thực đơn cho tuần ăn đã được gợi ý.</b>
+        <br />
+        <span style={{ fontSize: 12 }}>
+          Bạn có thể bấm <b>Tiếp tục</b> hoặc tuỳ chỉnh thực đơn cho từng ngày.
+        </span>
+      </p>,
+      toastOptions,
+    );
+  };
+
   const onRecommendNewRestaurants = useCallback(async () => {
     if (!onRecommendRestaurantInProgress) {
       dispatch(setOnRecommendRestaurantInProcess(true));
       const { payload: recommendOrderDetail }: any = await dispatch(
         orderAsyncActions.recommendRestaurants({}),
       );
+
+      const isAllDatesHaveNoRestaurants = Object.values(
+        recommendOrderDetail,
+      ).every(({ hasNoRestaurants = false }: any) => hasNoRestaurants);
+
+      const isShowToastAfterSuccessfullyCreatingOrder =
+        isAllDatesHaveNoRestaurantsCurrentOrder && !isAllDatesHaveNoRestaurants;
+
       await dispatch(
         orderAsyncActions.updatePlanDetail({
           orderId,
@@ -300,6 +348,10 @@ export const useGetCalendarComponentProps = ({
         }),
       );
       dispatch(setOnRecommendRestaurantInProcess(false));
+
+      if (isShowToastAfterSuccessfullyCreatingOrder) {
+        toastOrderSuccessfullyCreated();
+      }
     }
   }, [dispatch, onRecommendRestaurantInProgress, orderId, plans]);
 

@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { shallowEqual } from 'react-redux';
+import { toast } from 'react-toastify';
 import classNames from 'classnames';
 import format from 'date-fns/format';
 import difference from 'lodash/difference';
@@ -9,6 +10,7 @@ import { DateTime } from 'luxon';
 
 import Badge, { EBadgeType } from '@components/Badge/Badge';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
+import IconCheckWithBackground from '@components/Icons/IconCheckWithBackground/IconCheckWithBackground';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { parseThousandNumber } from '@helpers/format';
 import { getInitialLocationValues } from '@helpers/mapHelpers';
@@ -29,6 +31,7 @@ import { Listing, User } from '@utils/data';
 import { getDaySessionFromDeliveryTime } from '@utils/dates';
 import type { TListing, TUser } from '@utils/types';
 
+import { BookerDraftOrderPageActions } from '../../BookerDraftOrderPage.slice';
 import AccessForm from '../../forms/AccessForm/AccessForm';
 import DeliveryTimeForm from '../../forms/DeliveryTimeForm/DeliveryTimeForm';
 import ExpiredTimeForm from '../../forms/ExpiredTimeForm/ExpiredTimeForm';
@@ -259,6 +262,29 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
     setIsOpenDetails(false);
   };
 
+  const toastOrderSuccessfullyCreated = () => {
+    dispatch(
+      BookerDraftOrderPageActions.setToastShowedAfterSuccessfullyCreatingOrder(
+        false,
+      ),
+    );
+    toast.success(
+      <p>
+        <b>Thực đơn cho tuần ăn đã được gợi ý.</b>
+        <br />
+        <span style={{ fontSize: 12 }}>
+          Bạn có thể bấm <b>Tiếp tục</b> hoặc tuỳ chỉnh thực đơn cho từng ngày.
+        </span>
+      </p>,
+      {
+        autoClose: 5000,
+        hideProgressBar: true,
+        icon: <IconCheckWithBackground className={css.toastIcon} />,
+        className: css.toastContainer,
+      },
+    );
+  };
+
   const handleSubmit = async (values: any) => {
     const {
       packagePerMember: packagePerMemberValue = '',
@@ -305,6 +331,10 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
     );
 
     if (!isEqual(orderDetail, newOrderDetail) && changedOrderDetailFactor) {
+      const isAllDatesHaveNoRestaurantsCurrentOrder = Object.values(
+        orderDetail,
+      ).every(({ hasNoRestaurants = false }: any) => hasNoRestaurants);
+
       const planId = plans[0];
       await dispatch(
         orderAsyncActions.updatePlanDetail({
@@ -313,6 +343,17 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
           planId,
         }),
       );
+
+      const isAllDatesHaveNoRestaurants = Object.values(newOrderDetail).every(
+        ({ hasNoRestaurants = false }: any) => hasNoRestaurants,
+      );
+
+      if (
+        isAllDatesHaveNoRestaurantsCurrentOrder &&
+        !isAllDatesHaveNoRestaurants
+      ) {
+        toastOrderSuccessfullyCreated();
+      }
     }
 
     setIsOpenDetails(false);
