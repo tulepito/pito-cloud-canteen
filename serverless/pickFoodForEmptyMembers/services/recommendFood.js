@@ -1,8 +1,6 @@
 /* eslint-disable prettier/prettier */
 const get = require('lodash/get');
 const intersection = require('lodash/intersection');
-const maxBy = require('lodash/maxBy');
-const random = require('lodash/random');
 const { toNonAccentVietnamese } = require('../utils/string');
 const { ALLERGIES_OPTIONS } = require('../utils/enums');
 
@@ -13,41 +11,24 @@ const getLabelByKey = (options, key) => {
 };
 
 exports.recommendFood = (foodList, subOrderFoodIds, allergies) => {
-  const subOrderFoodList = foodList.filter((food) =>
-    subOrderFoodIds.includes(food.id.uuid),
+  const subOrderFoodList = foodList.filter(
+    (food) => food.id?.uuid && subOrderFoodIds.includes(food.id.uuid),
   );
 
-  const filteredFoodListByAllergies = subOrderFoodList.filter(
-    (food) =>
-      intersection(
-        get(food, 'attributes.publicData.allergicIngredients', []).map(
-          (_foodAllergy) => toNonAccentVietnamese(_foodAllergy),
-        ),
-        allergies.map((allergy) =>
-          toNonAccentVietnamese(getLabelByKey(ALLERGIES_OPTIONS, allergy)),
-        ),
-      ).length === 0,
-  );
-  const isAllFoodHaveAllergies = filteredFoodListByAllergies.length === 0;
-
-  const foodListToFilter = isAllFoodHaveAllergies
-    ? subOrderFoodList
-    : filteredFoodListByAllergies;
-
-  const isAllFoodHaveNoRating = foodListToFilter.every(
-    (food) => !get(food, 'attributes.metadata.rating'),
-  );
-
-  const randomFood =
-    foodListToFilter[Math.floor(Math.random() * foodListToFilter.length)];
-
-  const mostSuitableFood = isAllFoodHaveNoRating
-    ? maxBy(foodListToFilter, (food) =>
-      get(food, 'attributes.metadata.pickingTime', 0),
-    )
-    : maxBy(foodListToFilter, (food) =>
-      get(food, 'attributes.metadata.rating', 0),
+  const filteredFoodListByAllergies = subOrderFoodList.filter((food) => {
+    const parsedFoodAllergies =
+      food.attributes?.publicData?.allergicIngredients?.map(
+        (_foodAllergy) => _foodAllergy && toNonAccentVietnamese(_foodAllergy),
+      );
+    const parsedAllergies = allergies.map((allergy) =>
+      toNonAccentVietnamese(getLabelByKey(ALLERGIES_OPTIONS, allergy)),
     );
+    const overlapAllergies = intersection(parsedFoodAllergies, parsedAllergies);
 
-  return random() === 1 ? randomFood : mostSuitableFood;
+    return !overlapAllergies.length;
+  });
+
+  return filteredFoodListByAllergies[
+    Math.floor(Math.random() * filteredFoodListByAllergies.length)
+  ];
 };

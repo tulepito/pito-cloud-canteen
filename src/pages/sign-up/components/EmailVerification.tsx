@@ -42,7 +42,9 @@ const EmailVerification: React.FC<TEmailVerificationProps> = (props) => {
     const targetCompanyId = companyId || tempCompanyId;
 
     if (targetCompanyId) {
-      router.push(participantPaths.getInvitationPath(targetCompanyId));
+      router.push(
+        participantPaths.invitation['[companyId]'].index(targetCompanyId),
+      );
     } else {
       router.push(participantPaths.OrderList);
     }

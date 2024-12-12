@@ -40,8 +40,7 @@ exports.handler = async (_event) => {
       }),
     )[0];
 
-    console.info('💫 > orderListing: ');
-    console.info(orderResponse);
+    console.log('LOG ~ exports.handler= ~ orderResponse:', orderResponse);
 
     const { orderState, orderType } = Listing(orderResponse).getMetadata();
 
@@ -135,7 +134,8 @@ exports.handler = async (_event) => {
         'fields.image': ['variants.square-small2x'],
       },
     );
-    console.log('foodResponses: ', JSON.stringify(foodResponses));
+    console.log('LOG ~ exports.handler= ~ foodResponses:', foodResponses);
+
     const restaurantResponses = await fetchListingsByChunkedIds(
       allRestaurantIds,
       integrationSdk,
@@ -181,7 +181,15 @@ exports.handler = async (_event) => {
               status: EParticipantOrderStatus.joined,
             };
 
-            console.log(`Pick food for user`, memberId, suitableFood.id.uuid);
+            console.log(
+              `LOG ~ Pick food for user`,
+              memberId,
+              suitableFood.id.uuid,
+              'at',
+              new Date(subOrderDate).toLocaleString('en-US', {
+                timeZone: 'Asia/Ho_Chi_Minh',
+              }),
+            );
 
             return newMemberOrderResult;
           },

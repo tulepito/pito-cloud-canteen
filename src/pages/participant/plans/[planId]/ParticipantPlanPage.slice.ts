@@ -50,7 +50,7 @@ const recommendFoodForShoppingCart = ({
       Listing(food).getAttributes().price.amount <= packagePerMember,
   );
 
-  let mostSuitableFood = recommendFood({
+  let mostSuitableFood: any = recommendFood({
     foodList: suitablePriceFoodList,
     subOrderFoodIds: suitablePriceFoodList.map((food: TListing) =>
       Listing(food).getId(),

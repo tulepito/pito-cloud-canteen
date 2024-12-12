@@ -274,8 +274,21 @@ export const participantPaths = {
   AccountSpecialDemand: '/participant/account/special-demand',
   PlanDetail: '/participant/plans/[planId]',
   Invitation: '/participant/invitation/[companyId]',
-  getInvitationPath: (companyId: string) =>
-    `/participant/invitation/${companyId}`,
+  order: {
+    '[orderId]': {
+      index: (orderId: string) => `/participant/order/${orderId}`,
+    },
+  },
+  invitation: {
+    '[companyId]': {
+      index: (companyId: string) => `/participant/invitation/${companyId}`,
+    },
+  },
+  plans: {
+    '[planId]': {
+      index: (planId: string) => `/participant/plans/${planId}`,
+    },
+  },
 };
 
 export const partnerPaths = {

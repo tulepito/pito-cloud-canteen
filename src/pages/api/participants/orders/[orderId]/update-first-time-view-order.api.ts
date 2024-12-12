@@ -1,3 +1,4 @@
+import { uniq } from 'lodash';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HttpMethod } from '@apis/configs';
@@ -5,6 +6,7 @@ import cookies from '@services/cookie';
 import { fetchListing } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { getSdk, handleError } from '@services/sdk';
+import type { PlanListing } from '@src/types';
 import {
   CurrentUser,
   denormalisedResponseEntities,
@@ -39,8 +41,53 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
               id: orderId,
               metadata: {
                 [`hideFirstTimeOrderModal_${currentUserId}`]: true,
+                participants: uniq(
+                  (order.attributes?.metadata?.participants || []).concat(
+                    currentUserId,
+                  ),
+                ),
               },
             });
+
+            const planId = order.attributes?.metadata?.plans?.[0];
+            if (planId) {
+              const planResponse = await integrationSdk.listings.show({
+                id: planId,
+              });
+
+              const plan: PlanListing = planResponse.data.data;
+
+              const orderDetail = Object.entries(
+                plan.attributes?.metadata?.orderDetail || {},
+              )
+                .map(([subOrderDate, subOrderDateValue]) => {
+                  return {
+                    [subOrderDate]: {
+                      ...subOrderDateValue,
+                      memberOrders: {
+                        ...subOrderDateValue?.memberOrders,
+                        [currentUserId]: {
+                          foodId: '',
+                          requirement: '',
+                          status: 'empty',
+                          ...subOrderDateValue?.memberOrders?.[currentUserId],
+                        },
+                      },
+                    },
+                  };
+                })
+                .reduce((_newOrderDetail, subOrderDateData) => {
+                  return {
+                    ..._newOrderDetail,
+                    ...subOrderDateData,
+                  };
+                }, {});
+
+              await integrationSdk.listings.update({
+                id: planId,
+                metadata: { orderDetail },
+              });
+            }
           }
 
           res.status(200).json({

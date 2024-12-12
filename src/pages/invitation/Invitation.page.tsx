@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
 
 import { responseToInvitationApi } from '@apis/companyInvitationApi';
@@ -7,11 +7,13 @@ import Button from '@components/Button/Button';
 import FullScreenPageLoading from '@components/FullScreenPageLoading/FullScreenPageLoading';
 import DecoratorLayout from '@components/Layout/DecoratorLayout/DecoratorLayout';
 import { isUserABookerOrOwner } from '@helpers/user';
-import { useAppSelector } from '@hooks/reduxHooks';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { useLogout } from '@hooks/useLogout';
 import { useRoleSelectModalController } from '@hooks/useRoleSelectModalController';
+import { BookerSelectRestaurantThunks } from '@pages/company/booker/orders/draft/[orderId]/restaurants/BookerSelectRestaurant.slice';
 import { currentUserSelector } from '@redux/slices/user.slice';
-import { enGeneralPaths, participantPaths } from '@src/paths';
+import { participantPaths } from '@src/paths';
+import type { OrderListing, PlanListing } from '@src/types';
 import { ECompanyPermission, EUserRole } from '@src/utils/enums';
 
 function EmptyView({
@@ -69,8 +71,10 @@ function EmptyView({
 
 const InvitationPage = () => {
   const router = useRouter();
-  const { companyId = '' } = router.query;
+  const dispatch = useAppDispatch();
+  const { companyId = '', orderId } = router.query;
   const currentRole = useAppSelector((state) => state.user.currentRole);
+  const planRef = useRef<PlanListing | null>(null);
 
   const currentUser = useAppSelector(currentUserSelector);
 
@@ -101,9 +105,17 @@ const InvitationPage = () => {
     }
   }, [invalidInvitation, router]);
 
+  const routeToPlan = useCallback(() => {
+    if (!planRef.current?.id?.uuid) return;
+
+    router.push({
+      pathname: participantPaths.order['[orderId]'].index(String(orderId)),
+    });
+  }, [router]);
+
   useEffect(() => {
     if (currentRole === EUserRole.participant) {
-      router.push(enGeneralPaths.Auth);
+      routeToPlan();
     }
   }, [currentRole, router]);
 
@@ -121,7 +133,7 @@ const InvitationPage = () => {
       )
         return;
 
-      router.push(enGeneralPaths.Auth);
+      routeToPlan();
     } catch (_error: any) {
       setError(_error?.response?.data?.message || String(_error));
     }
@@ -130,6 +142,30 @@ const InvitationPage = () => {
   useEffect(() => {
     acceptInvitaiton();
   }, [acceptInvitaiton]);
+
+  useEffect(() => {
+    if (orderId) {
+      (async () => {
+        const orderResponse = await dispatch(
+          BookerSelectRestaurantThunks.fetchOrder(orderId as string),
+        );
+
+        const order = orderResponse.payload as OrderListing;
+
+        if (!order.attributes?.metadata?.plans?.[0]) return;
+
+        const planResponse = await dispatch(
+          BookerSelectRestaurantThunks.fetchPlanDetail(
+            order.attributes?.metadata?.plans[0],
+          ),
+        );
+
+        const plan = planResponse.payload as PlanListing;
+
+        planRef.current = plan;
+      })();
+    }
+  }, [orderId]);
 
   return (
     <DecoratorLayout>

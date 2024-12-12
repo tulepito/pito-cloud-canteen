@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { intersection, maxBy, random } from 'lodash';
+import { intersection } from 'lodash';
 import chunk from 'lodash/chunk';
 import flatten from 'lodash/flatten';
 import uniq from 'lodash/uniq';
@@ -22,6 +22,7 @@ import { markColorForOrder } from '@helpers/orderHelper';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { ParticipantOrderManagementActions } from '@redux/slices/ParticipantOrderManagementPage.slice';
 import { userThunks } from '@redux/slices/user.slice';
+import type { FoodListing } from '@src/types';
 import {
   CurrentUser,
   denormalisedResponseEntities,
@@ -170,48 +171,30 @@ export const recommendFood = ({
   subOrderFoodIds,
   allergies,
 }: {
-  foodList: TListing[];
+  foodList: FoodListing[];
   subOrderFoodIds: string[];
   allergies: string[];
 }) => {
-  const subOrderFoodList = foodList.filter((food) =>
-    subOrderFoodIds.includes(food.id.uuid),
+  const subOrderFoodList = foodList.filter(
+    (food) => food.id?.uuid && subOrderFoodIds.includes(food.id.uuid),
   );
 
-  const filteredFoodListByAllergies = subOrderFoodList.filter(
-    (food) =>
-      intersection(
-        Listing(food)
-          .getPublicData()
-          .allergicIngredients?.map((_foodAllergy: string) =>
-            toNonAccentVietnamese(_foodAllergy),
-          ),
-        allergies.map((allergy: string) =>
-          toNonAccentVietnamese(getLabelByKey(ALLERGIES_OPTIONS, allergy)),
-        ),
-      ).length === 0,
-  );
-  const isAllFoodHaveAllergies = filteredFoodListByAllergies.length === 0;
-
-  const foodListToFilter = isAllFoodHaveAllergies
-    ? subOrderFoodList
-    : filteredFoodListByAllergies;
-
-  const isAllFoodHaveNoRating = foodListToFilter.every(
-    (food) => !Listing(food).getMetadata().rating,
-  );
-
-  const randomFood =
-    foodListToFilter[Math.floor(Math.random() * foodListToFilter.length)];
-
-  const mostSuitableFood = !isAllFoodHaveNoRating
-    ? maxBy(foodListToFilter, (food) => Listing(food).getMetadata().rating || 0)
-    : maxBy(
-        foodListToFilter,
-        (food) => Listing(food).getMetadata().pickingTime || 0,
+  const filteredFoodListByAllergies = subOrderFoodList.filter((food) => {
+    const parsedFoodAllergies =
+      food.attributes?.publicData?.allergicIngredients?.map(
+        (_foodAllergy) => _foodAllergy && toNonAccentVietnamese(_foodAllergy),
       );
+    const parsedAllergies = allergies.map((allergy) =>
+      toNonAccentVietnamese(getLabelByKey(ALLERGIES_OPTIONS, allergy)),
+    );
+    const overlapAllergies = intersection(parsedFoodAllergies, parsedAllergies);
 
-  return random() === 1 ? randomFood : mostSuitableFood;
+    return !overlapAllergies.length;
+  });
+
+  return filteredFoodListByAllergies[
+    Math.floor(Math.random() * filteredFoodListByAllergies.length)
+  ];
 };
 
 const updateRecommendFoodToOrderDetail = ({

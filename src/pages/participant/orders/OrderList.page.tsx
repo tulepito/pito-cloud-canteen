@@ -559,7 +559,6 @@ const OrderListPage = () => {
           renderEvent={OrderEventCard}
           inProgress={fetchOrdersInProgress}
           defaultView={defaultCalendarView}
-          // exposeAnchorDate={handleAnchorDateChange}
           components={{
             toolbar: (toolBarProps: any) => (
               <ParticipantToolbar

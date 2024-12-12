@@ -57,7 +57,7 @@ const EmailVerificationFormComponent: React.FC<
 
       if (!companyId) return;
 
-      router.push(participantPaths.getInvitationPath(companyId));
+      router.push(participantPaths.invitation['[companyId]'].index(companyId));
 
       return;
     }
@@ -68,7 +68,9 @@ const EmailVerificationFormComponent: React.FC<
     const targetCompanyId = companyId || tempCompanyId;
 
     if (targetCompanyId) {
-      router.push(participantPaths.getInvitationPath(targetCompanyId));
+      router.push(
+        participantPaths.invitation['[companyId]'].index(targetCompanyId),
+      );
     } else {
       router.push(participantPaths.OrderList);
     }
