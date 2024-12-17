@@ -445,7 +445,7 @@ export const emailSendingFactory = async (
         break;
       }
       case EmailTemplateTypes.PARTICIPANT.PARTICIPANT_COMPANY_INVITATION: {
-        const { participantId, companyId } = emailParams;
+        const { participantId, companyId, orderId } = emailParams;
         const emailDataSource: any = await fetchEmailDataSourceWithCompany({
           receiver: 'participant',
           participantId,
@@ -459,6 +459,7 @@ export const emailSendingFactory = async (
         const emailTemplate = participantCompanyInvitation({
           ...emailDataSource,
           recipientEmail: participantEmail,
+          orderId,
         });
         const emailDataParams = {
           receiver: [participantEmail],

@@ -14,6 +14,7 @@ import {
   queryCompanyMembersApi,
 } from '@apis/index';
 import { checkUserExistedApi } from '@apis/userApi';
+import type { POSTAddMembersBody } from '@pages/api/company/members/add-members.api';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { storableAxiosError } from '@utils/errors';
 import type { TObject, TUser } from '@utils/types';
@@ -115,7 +116,10 @@ const checkEmailExisted = createAsyncThunk(
 
 const addMembers = createAsyncThunk(
   ADD_MEMBERS,
-  async (params: any, { getState, dispatch }) => {
+  async (
+    params: Omit<POSTAddMembersBody, 'companyId'>,
+    { getState, dispatch },
+  ) => {
     const { workspaceCompanyId } = getState().company;
     const { data: addMembersResponse } = await addMembersApi({
       ...params,

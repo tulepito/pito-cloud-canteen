@@ -24,7 +24,6 @@ import IconSetting from '@components/Icons/IconSetting/IconSetting';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import SidebarFeaturesHeader from '@components/SidebarFeaturesHeader/SidebarFeaturesHeader';
 import Stepper from '@components/Stepper/Stepper';
-import logger from '@helpers/logger';
 import {
   findSuitableAnchorDate,
   getParticipantPickingLink,
@@ -452,10 +451,6 @@ function BookerDraftOrderPage() {
       if (orderState === EOrderDraftStates.draft) {
         router.push({ pathname: companyPaths.CreateNewOrder });
       } else if (!ENABLE_TO_ACCESS_PAGE_ORDER_STATES.includes(orderState)) {
-        console.log(
-          '🚀 ~ useEffect ~ ENABLE_TO_ACCESS_PAGE_ORDER_STATES:',
-          ENABLE_TO_ACCESS_PAGE_ORDER_STATES,
-        );
         router.push({
           pathname: companyPaths.ManageOrderPicking,
           query: { orderId: orderId as string },
@@ -503,9 +498,6 @@ function BookerDraftOrderPage() {
         toastShowedAfterSuccessfullyCreatingOrder &&
         !isAllDatesHaveNoRestaurants
       ) {
-        logger.info('toastOrderSuccessfullyCreated', {
-          toastShowedAfterSuccessfullyCreatingOrder,
-        });
         toastOrderSuccessfullyCreated();
       }
     }

@@ -42,7 +42,7 @@ const ParticipantManagement: React.FC<TParticipantManagementProps> = () => {
   const {
     onAddMembersSubmitInQuizFlow: handleAddMemberToCompany,
     checkEmailList,
-  } = useAddMemberEmail();
+  } = useAddMemberEmail({ orderId: order?.id?.uuid });
 
   const orderGetter = Listing(order as TListing);
   const orderId = orderGetter.getId();

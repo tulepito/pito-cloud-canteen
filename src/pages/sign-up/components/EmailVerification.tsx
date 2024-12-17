@@ -96,6 +96,7 @@ const EmailVerification: React.FC<TEmailVerificationProps> = (props) => {
           companyId: companyId as string,
           response: 'accept',
           source: 'invitation-link',
+          type: 'response',
         }),
       )
         .unwrap()

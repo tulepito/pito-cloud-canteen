@@ -156,18 +156,6 @@ const SidebarFeaturesHeader = ({
   ];
 
   useEffect(() => {
-    if (!companyId || companyId === '[companyId]') {
-      router.replace({
-        pathname: router.pathname,
-        query: {
-          ...router.query,
-          companyId: 'personal',
-        },
-      });
-    }
-  }, [companyId, router]);
-
-  useEffect(() => {
     if (companyId && companyId !== 'personal') {
       const currentCompany = companyList.find(
         (_company) => User(_company).getId() === companyId,

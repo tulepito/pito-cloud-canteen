@@ -1,4 +1,5 @@
 import logger from '@helpers/logger';
+import type { UserListing, WithFlexSDKData } from '@src/types';
 import type { TObject } from '@src/utils/types';
 import { denormalisedResponseEntities } from '@utils/data';
 
@@ -53,6 +54,26 @@ export const fetchUser = async (userId: string) => {
   if (!response) return null;
 
   return denormalisedResponseEntities(response)[0];
+};
+
+export const fetchUserListing = async (
+  userId: string,
+): Promise<UserListing | null> => {
+  const integrationSdk = getIntegrationSdk();
+  const response: WithFlexSDKData<UserListing> =
+    await integrationSdk.users.show({
+      id: userId,
+      include: ['profileImage'],
+      'fields.image': [
+        'variants.square-small',
+        'variants.square-small2x',
+        'variants.default',
+      ],
+    });
+
+  if (!response) return null;
+
+  return response.data.data;
 };
 
 export const fetchUserByEmail = async (email: string) => {

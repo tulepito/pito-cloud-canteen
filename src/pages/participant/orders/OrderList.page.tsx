@@ -8,7 +8,6 @@ import flatten from 'lodash/flatten';
 import { DateTime } from 'luxon';
 import { useRouter } from 'next/router';
 
-import Avatar from '@components/Avatar/Avatar';
 import BottomNavigationBar from '@components/BottomNavigationBar/BottomNavigationBar';
 import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
 import OrderEventCard from '@components/CalendarDashboard/components/OrderEventCard/OrderEventCard';
@@ -26,7 +25,7 @@ import useBoolean from '@hooks/useBoolean';
 import { useViewport } from '@hooks/useViewport';
 import { CalendarActions } from '@redux/slices/Calendar.slice';
 import { participantPaths } from '@src/paths';
-import { CurrentUser, Listing, User } from '@src/utils/data';
+import { CurrentUser, Listing } from '@src/utils/data';
 import {
   getEndDayOfWeek,
   getEndOfMonth,
@@ -44,7 +43,7 @@ import {
   ETransition,
   TRANSITIONS_TO_STATE_CANCELED,
 } from '@src/utils/transaction';
-import type { TListing, TUser } from '@src/utils/types';
+import type { TListing } from '@src/utils/types';
 
 import ParticipantToolbar from '../components/ParticipantToolbar/ParticipantToolbar';
 
@@ -159,14 +158,10 @@ const OrderListPage = () => {
   const pickFoodForSpecificSubOrderInProgress = useAppSelector(
     (state) => state.ParticipantOrderList.pickFoodForSpecificSubOrderInProgress,
   );
-  const company = useAppSelector(
-    (state) => state.ParticipantOrderList.company,
-    shallowEqual,
-  );
 
   const currentUserGetter = CurrentUser(currentUser!);
   const currentUserId = currentUserGetter.getId();
-  const { walkthroughEnable = true } = currentUserGetter.getMetadata();
+  const walkthroughEnable = false;
   const welcomeModalControl = useBoolean(walkthroughEnable);
 
   const showLoadingModal =
@@ -658,16 +653,7 @@ const OrderListPage = () => {
   const tabOptions = [
     {
       id: 'company',
-      label: (
-        <div className={css.companyTab}>
-          <Avatar
-            className={css.companyAvatar}
-            user={company as TUser}
-            disableProfileLink
-          />
-          <span>{User(company as TUser).getPublicData().companyName}</span>
-        </div>
-      ),
+      label: ' ',
       childrenFn: () => orderListPageContent,
       childrenProps: {},
     },

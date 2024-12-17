@@ -1,83 +1,95 @@
-import { mapLimit } from 'async';
-import chunk from 'lodash/chunk';
-import compact from 'lodash/compact';
-import flatten from 'lodash/flatten';
 import isEmpty from 'lodash/isEmpty';
-import omit from 'lodash/omit';
-import uniq from 'lodash/uniq';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { EHttpStatusCode } from '@apis/errors';
-import {
-  prepareNewOrderDetailPlan,
-  queryAllListings,
-} from '@helpers/apiHelpers';
 import logger from '@helpers/logger';
 import cookies from '@services/cookie';
-import { fetchUser } from '@services/integrationHelper';
+import { fetchUserListing } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { createFirebaseDocNotification } from '@services/notifications';
 import { getSdk, handleError } from '@services/sdk';
-import {
-  EBookerOrderDraftStates,
-  ECompanyPermission,
-  EListingType,
-  ENotificationType,
-  EOrderDraftStates,
-  EOrderStates,
-  EOrderType,
-} from '@src/utils/enums';
-import type { TListing } from '@src/utils/types';
-import { denormalisedResponseEntities, Listing, User } from '@utils/data';
+import type { UserListing, WithFlexSDKData } from '@src/types';
+import { ECompanyPermission, ENotificationType } from '@src/utils/enums';
 
-type InviteStatus = 'accepted' | 'declined';
 type InviteResponse = 'accept' | 'decline';
 type InviteSource = 'invitation-link';
-export interface ResponseToInvitationBody {
-  response: InviteResponse;
+export interface POSTResponseBody {
+  response?: InviteResponse;
   companyId: string;
   source?: InviteSource;
+  type: 'check' | 'response';
 }
 
-interface Member {
-  email: string;
-  groups: string[];
-  id: string;
-  inviteStatus: InviteStatus;
-  permission: ECompanyPermission;
+export interface ResponseApiResponse {
+  message: string;
+  statusCode: EHttpStatusCode;
+  nextAction?: 'keep' | 'redirect';
 }
 
-async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
+async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse<ResponseApiResponse>,
+) {
   const sdk = getSdk(req, res);
   const integrationSdk = getIntegrationSdk();
   try {
-    const { companyId = '', source } = req.body as ResponseToInvitationBody;
+    const { companyId, source, response, type } = req.body as POSTResponseBody;
 
-    const currentUser = denormalisedResponseEntities(
-      await sdk.currentUser.show(),
-    )[0];
+    const currentUser: WithFlexSDKData<UserListing> =
+      await sdk.currentUser.show();
 
-    const currentUserGetter = User(currentUser);
-    const { email: userEmail } = currentUserGetter.getAttributes();
-    const { company: userCompany = {}, companyList = [] } =
-      currentUserGetter.getMetadata();
-    const userId = currentUserGetter.getId();
+    const userEmail = currentUser.data.data.attributes?.email;
+    const companyOfCurrentUser =
+      currentUser.data.data.attributes?.profile?.metadata?.company;
+    const companyListOfCurrentUser =
+      currentUser.data.data.attributes?.profile?.metadata?.companyList;
+    const userId = currentUser.data.data.id?.uuid;
 
-    if (currentUser?.attributes?.profile?.metadata?.isPartner) {
+    if (response === 'decline') {
+      return res.status(EHttpStatusCode.BadRequest).json({
+        statusCode: EHttpStatusCode.BadRequest,
+        message: 'Từ chối tham gia công ty',
+      });
+    }
+
+    if (currentUser.data.data.attributes?.profile?.metadata?.isPartner) {
       return res.status(EHttpStatusCode.BadRequest).json({
         statusCode: EHttpStatusCode.BadRequest,
         message: 'Tài khoản này là đối tác, không thể tham gia công ty',
       });
     }
 
-    const companyAccount = await fetchUser(companyId);
-    const companyUserGetter = User(companyAccount);
-    const { companyName } = companyUserGetter.getPublicData();
-    const { members = {} } = companyUserGetter.getMetadata();
-    let userMember: Member = members[userEmail] || {};
+    const companyAccount = await fetchUserListing(companyId);
 
-    if (source === 'invitation-link' && isEmpty(userMember)) {
-      userMember = {
+    if (!companyAccount) {
+      return res.status(EHttpStatusCode.BadRequest).json({
+        statusCode: EHttpStatusCode.BadRequest,
+        message: 'Không tìm thấy công ty',
+      });
+    }
+
+    if (!userEmail) {
+      return res.status(EHttpStatusCode.BadRequest).json({
+        statusCode: EHttpStatusCode.BadRequest,
+        message: 'Không tìm thấy email người dùng',
+      });
+    }
+
+    if (!userId) {
+      return res.status(EHttpStatusCode.BadRequest).json({
+        statusCode: EHttpStatusCode.BadRequest,
+        message: 'Không tìm thấy id người dùng',
+      });
+    }
+
+    const companyName =
+      companyAccount?.attributes?.profile?.publicData?.companyName;
+    const membersOfCompany =
+      companyAccount?.attributes?.profile?.metadata?.members;
+    let memberOfCompany = membersOfCompany?.[userEmail];
+
+    if (source === 'invitation-link' && isEmpty(memberOfCompany)) {
+      memberOfCompany = {
         email: userEmail,
         groups: [],
         id: userId,
@@ -86,75 +98,52 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       };
     }
 
-    if (!isEmpty(userCompany)) {
-      const currentCompanyId = Object.keys(userCompany)[0];
+    if (type === 'check') {
+      if (companyListOfCurrentUser?.includes(companyId)) {
+        const isUserABookerOrOwner =
+          !!companyOfCurrentUser &&
+          !!Object.values(companyOfCurrentUser).find(
+            (companyOfCurrentUserData) =>
+              companyOfCurrentUserData?.permission === 'booker' ||
+              companyOfCurrentUserData?.permission === 'owner',
+          );
 
-      if (
-        userCompany[currentCompanyId] &&
-        userCompany[currentCompanyId].permission in ECompanyPermission
-      ) {
-        if (currentCompanyId === companyId) {
-          return res.status(EHttpStatusCode.Ok).json({
-            message: 'Người dùng đã nằm trong công ty',
-            userType: userCompany[currentCompanyId].permission,
-          });
-        }
-
-        return res.status(EHttpStatusCode.BadRequest).json({
-          statusCode: EHttpStatusCode.BadRequest,
-          message: 'Tài khoản này đã thuộc một công ty khác',
+        return res.status(EHttpStatusCode.Ok).json({
+          statusCode: EHttpStatusCode.Ok,
+          message: 'Người dùng đã tham gia công ty này',
+          nextAction: isUserABookerOrOwner ? 'keep' : 'redirect',
         });
       }
 
-      if (currentCompanyId !== companyId) {
-        return res.status(EHttpStatusCode.BadRequest).json({
-          statusCode: EHttpStatusCode.BadRequest,
-          message: 'Tài khoản này đã thuộc một công ty khác',
-        });
-      }
-
-      await integrationSdk.users.updateProfile({
-        id: companyId,
-        metadata: {
-          members: omit(members, [userEmail]),
-        },
-      });
-
-      return res.json({
-        message: 'User has been successfully added to the company',
+      return res.status(EHttpStatusCode.Ok).json({
+        statusCode: EHttpStatusCode.Ok,
+        message: 'Có thể tham gia công ty',
       });
     }
-
-    if (isEmpty(userMember)) {
-      return res.json({
-        message: 'invalidInvitation',
-      });
-    }
-
-    const newMembers = {
-      ...members,
-      [userEmail]: {
-        ...userMember,
-        id: userId,
-      },
-    };
 
     await integrationSdk.users.updateProfile({
       id: companyId,
       metadata: {
-        members: newMembers,
+        members: {
+          ...membersOfCompany,
+          [userEmail]: {
+            ...memberOfCompany,
+            id: userId,
+          },
+        },
       },
     });
-    if (!companyList.includes(companyId)) {
+
+    if (!companyListOfCurrentUser?.includes(companyId)) {
       await integrationSdk.users.updateProfile({
         id: userId,
         metadata: {
-          companyList: [...companyList, companyId],
+          companyList: [...(companyListOfCurrentUser || []), companyId],
           company: {
-            ...userCompany,
+            ...companyOfCurrentUser,
             [companyId]: {
               permission:
-                userMember.permission || ECompanyPermission.participant,
+                memberOfCompany?.permission || ECompanyPermission.participant,
             },
           },
         },
@@ -166,95 +155,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       companyName,
     });
 
-    // TODO: update picking for new member
-    // Step 1: query picking order
-    const allNeedOrders = await queryAllListings({
-      query: {
-        meta_listingType: EListingType.order,
-        meta_orderType: EOrderType.group,
-        meta_orderState: `${[
-          EOrderStates.picking,
-          EOrderDraftStates.draft,
-          EOrderDraftStates.pendingApproval,
-          EBookerOrderDraftStates.bookerDraft,
-        ].join(',')}`,
-        meta_companyId: companyId,
-        meta_selectedGroups: 'has_any:allMembers',
-      },
-    });
-    const allNeedUpdatePlanIds: string[] = uniq(
-      compact(
-        allNeedOrders.map((order: TListing) => {
-          const { plans = [] } = Listing(order).getMetadata();
-
-          return plans[0];
-        }),
-      ),
-    );
-
-    const allNeedUpdatePlans: TListing[] = flatten(
-      await Promise.all(
-        chunk<string>(allNeedUpdatePlanIds, 100).map(async (ids) => {
-          return denormalisedResponseEntities(
-            await integrationSdk.listings.query({
-              ids,
-            }),
-          );
-        }),
-      ),
-    );
-
-    // Step 2. Create update function
-    const updateFn = async (order: TListing) => {
-      const orderId = Listing(order).getId();
-      const {
-        participants = [],
-        anonymous = [],
-        plans = [],
-      } = Listing(order).getMetadata();
-
-      // todo: if user already in participant list, stop update process
-      if (participants.includes(userId)) {
-        return;
-      }
-
-      await integrationSdk.listings.update({
-        id: orderId,
-        metadata: {
-          participants: uniq(participants.concat(userId)),
-          anonymous: anonymous.filter((id: string) => id !== userId),
-        },
-      });
-
-      // todo: if user already in anonymous list, stop update process
-      if (anonymous.includes(userId)) {
-        return;
-      }
-
-      const planId = plans[0];
-      if (!isEmpty(planId)) {
-        const planListing = allNeedUpdatePlans.find(
-          (p: TListing) => p.id.uuid === planId,
-        );
-
-        const newOrderDetail = prepareNewOrderDetailPlan({
-          planListing: planListing!,
-          newMemberIds: [userId],
-        });
-
-        await integrationSdk.listings.update({
-          id: planId,
-          metadata: {
-            orderDetail: newOrderDetail,
-          },
-        });
-      }
-    };
-    // Step 3. Call function update data
-    mapLimit(allNeedOrders, 10, updateFn);
-
-    return res.json({
-      message: 'userAccept',
+    return res.status(EHttpStatusCode.Ok).json({
+      statusCode: EHttpStatusCode.Ok,
+      message: 'Tham gia công ty thành công',
     });
   } catch (error) {
     logger.info('Error responseToInvitation', String(error));

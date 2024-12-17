@@ -18,9 +18,15 @@ const DaySession: React.FC<TDaySessionProps> = ({ session, groupEvents }) => {
       <div className={css.daySessionTitle}>
         <FormattedMessage id={`DayColumn.Session.${session}`} />
       </div>
-      {groupEvents.map((event: Event, index: number) => (
-        <OrderEventCard key={event.resource?.id} event={event} index={index} />
-      ))}
+      {groupEvents.map((event: Event, index: number) => {
+        return (
+          <OrderEventCard
+            key={event.resource?.id}
+            event={event}
+            index={index}
+          />
+        );
+      })}
     </div>
   );
 };

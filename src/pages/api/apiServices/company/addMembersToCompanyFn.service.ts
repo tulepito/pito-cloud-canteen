@@ -38,10 +38,12 @@ type TAddMembersToCompanyParams = {
   noAccountEmailList: string[];
   companyId: string;
   bookerName?: string;
+  orderId?: string;
 };
 
 const addMembersToCompanyFn = async (params: TAddMembersToCompanyParams) => {
-  const { userIdList, noAccountEmailList, companyId, bookerName } = params;
+  const { userIdList, noAccountEmailList, companyId, bookerName, orderId } =
+    params;
   const integrationSdk = getIntegrationSdk();
   const companyAccount = await fetchUser(companyId);
   const companyUser = User(companyAccount);
@@ -98,7 +100,7 @@ const addMembersToCompanyFn = async (params: TAddMembersToCompanyParams) => {
 
   // Step 2. Create update function
   const updateOrderAndPlanDataFn = async (order: TListing) => {
-    const orderId = Listing(order).getId();
+    const _orderId = Listing(order).getId();
     const {
       participants = [],
       anonymous = [],
@@ -110,7 +112,7 @@ const addMembersToCompanyFn = async (params: TAddMembersToCompanyParams) => {
     // todo: if users already in participant list, stop update process
     if (isEmpty(participantIdDiffs)) {
       console.info(
-        `💫 > all new members are already participant in order ${orderId}`,
+        `💫 > all new members are already participant in order ${_orderId}`,
       );
       console.info(`💫 > skipped updating order's participant list`);
 
@@ -118,7 +120,7 @@ const addMembersToCompanyFn = async (params: TAddMembersToCompanyParams) => {
     }
     // todo: update order participant & anonymous data
     await integrationSdk.listings.update({
-      id: orderId,
+      id: _orderId,
       metadata: {
         participants: uniq(participants.concat(participantIdDiffs)),
         anonymous: difference(anonymous, newParticipantIds),
@@ -128,7 +130,7 @@ const addMembersToCompanyFn = async (params: TAddMembersToCompanyParams) => {
     const anonymousIdDiffs = difference(newParticipantIds, anonymous);
     if (isEmpty(anonymousIdDiffs)) {
       console.info(
-        `💫 > all new members are already anonymous in order ${orderId}`,
+        `💫 > all new members are already anonymous in order ${_orderId}`,
       );
       console.info(`💫 > skipped updating plan's order detail`);
 
@@ -250,6 +252,7 @@ const addMembersToCompanyFn = async (params: TAddMembersToCompanyParams) => {
           {
             participantId: userId,
             companyId,
+            orderId,
           },
         );
       }),
@@ -269,6 +272,7 @@ const addMembersToCompanyFn = async (params: TAddMembersToCompanyParams) => {
     const emailTemplate = participantCompanyInvitation({
       companyUser,
       recipientEmail: email,
+      orderId,
     });
 
     const noFlexAccountEmailParamsData = {

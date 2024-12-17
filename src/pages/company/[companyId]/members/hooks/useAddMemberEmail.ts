@@ -58,7 +58,7 @@ export const filterNoAccountUserEmail = (loadedResult: any[]) => {
     .map((_result) => _result.email);
 };
 
-export const useAddMemberEmail = () => {
+export const useAddMemberEmail = (options?: { orderId?: string }) => {
   const dispatch = useAppDispatch();
   const [emailList, setEmailList] = useState<string[]>([]);
   const [loadedResult, setLoadedResult] = useState<any[]>([]);
@@ -97,7 +97,11 @@ export const useAddMemberEmail = () => {
     const userIdList = filterHasAccountUserIds(loadedResult);
 
     const { meta } = await dispatch(
-      companyMemberThunks.addMembers({ noAccountEmailList, userIdList }),
+      companyMemberThunks.addMembers({
+        noAccountEmailList,
+        userIdList,
+        orderId: options?.orderId,
+      }),
     );
 
     if (meta.requestStatus === 'fulfilled') {
@@ -111,7 +115,11 @@ export const useAddMemberEmail = () => {
     const noAccountEmailList = filterNoAccountUserEmail(_loadedResult);
     const userIdList = filterHasAccountUserIds(_loadedResult, false);
     const { meta } = await dispatch(
-      companyMemberThunks.addMembers({ noAccountEmailList, userIdList }),
+      companyMemberThunks.addMembers({
+        noAccountEmailList,
+        userIdList,
+        orderId: options?.orderId,
+      }),
     );
 
     if (meta.requestStatus === 'fulfilled') {

@@ -159,7 +159,7 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
         ? EParticipantOrderStatus.notJoined
         : isOver(expiredTime.toMillis())
         ? EParticipantOrderStatus.expired
-        : foodSelection?.status;
+        : foodSelection?.status || EParticipantOrderStatus.empty;
 
       if (!pickFoodStatus && !anchorTime && !isAnchorTimeChanged) {
         isAnchorTimeChanged = true;

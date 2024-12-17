@@ -1,9 +1,12 @@
+import { QUERY_REFS } from '../constants';
+
 const BASE_URL = process.env.NEXT_PUBLIC_CANONICAL_URL;
 
 type ParticipantCompanyInvitationParams = {
   companyUser: any;
   participantUser?: any;
   recipientEmail?: string;
+  orderId?: string;
 };
 
 export const participantCompanyInvitationSubject = (companyName: string) =>
@@ -12,6 +15,7 @@ export const participantCompanyInvitationSubject = (companyName: string) =>
 const participantCompanyInvitation = ({
   companyUser,
   recipientEmail,
+  orderId,
 }: ParticipantCompanyInvitationParams) => {
   const { displayName: bookerName } = companyUser.getProfile();
   const { email: bookerEmail } = companyUser.getAttributes();
@@ -19,9 +23,21 @@ const participantCompanyInvitation = ({
 
   const companyId = companyUser.getId();
 
-  const invitationUrl = `${BASE_URL}/participant/invitation/${companyId}${
-    recipientEmail ? `?email=${encodeURIComponent(recipientEmail)}` : ''
-  }`;
+  let baseUrl = null;
+  const searchParams = new URLSearchParams();
+  if (orderId) {
+    baseUrl = new URL(`/invitation/${orderId}`, BASE_URL);
+    searchParams.set('ref', QUERY_REFS.INVITATION_LINK);
+    searchParams.set('companyId', companyId);
+  } else {
+    baseUrl = new URL(`/participant/invitation/${companyId}`, BASE_URL);
+  }
+
+  if (recipientEmail) {
+    searchParams.set('email', recipientEmail);
+  }
+
+  const invitationUrl = `${baseUrl}?${searchParams.toString()}`;
 
   return `
   <!DOCTYPE html

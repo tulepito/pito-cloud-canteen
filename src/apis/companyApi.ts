@@ -1,13 +1,9 @@
+import type { POSTAddMembersBody } from '@pages/api/company/members/add-members.api';
 import type { TObject, TRestaurantRating, TScenarioRating } from '@utils/types';
 
 import { deleteApi, getApi, postApi, putApi } from './configs';
 
-export type AddMembersApiBody = {
-  userIdList: string[];
-  noAccountEmailList: string[];
-  companyId: string;
-};
-export const addMembersApi = (body: AddMembersApiBody) =>
+export const addMembersApi = (body: POSTAddMembersBody) =>
   postApi('/company/members/add-members', body);
 
 export type DeleteMemberApiBody = {

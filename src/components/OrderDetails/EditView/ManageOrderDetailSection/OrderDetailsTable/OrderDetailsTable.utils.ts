@@ -28,7 +28,6 @@ export const SELECTED_TABLE_HEAD_IDS = [
   'OrderDetailsTable.head.email',
   'OrderDetailsTable.head.selectedFood',
   'OrderDetailsTable.head.price',
-  // 'OrderDetailsTable.head.other',
 ];
 
 export type TItemData = {

@@ -1,4 +1,4 @@
-import type { Image, ListingBuilder } from './utils';
+import type { DeepPartial, Image, ListingBuilder } from './utils';
 
 export type FoodListing = ListingBuilder<
   {},
@@ -114,3 +114,105 @@ export type PlanListing = ListingBuilder<
   {},
   {}
 >;
+
+export type UserListing = DeepPartial<{
+  id: {
+    _sdkType: string;
+    uuid: string;
+  };
+  type: string;
+  attributes: {
+    deleted: boolean;
+    banned: boolean;
+    email: string;
+    createdAt: string;
+    state: string;
+    identityProviders: unknown[];
+    pendingEmail: unknown;
+    emailVerified: boolean;
+    profile: {
+      displayName: string;
+      firstName: string;
+      privateData: {
+        hasOrderBefore: boolean;
+        oneSignalUserIds: string[];
+        quizData: {
+          daySession: string;
+          deliveryHour: string;
+          mealStyles: unknown[];
+          mealType: unknown[];
+          memberAmount: number;
+          nutritions: unknown[];
+          packagePerMember: number;
+        };
+        subAccountId: string;
+        tax: string;
+      };
+      protectedData: {};
+      bio: unknown;
+      abbreviatedName: string;
+      lastName: string;
+      publicData: {
+        companyEmail: string;
+        companyLocation: {
+          address: string;
+          origin: {
+            lat: number;
+            lng: number;
+          };
+        };
+        companyName: string;
+        isAutoPickFood: boolean;
+        location: {
+          address: string;
+          origin: {
+            lat: number;
+            lng: number;
+          };
+        };
+        phoneNumber: string;
+      };
+      metadata: {
+        company: {
+          [key: string]: {
+            permission: 'booker' | 'participant' | 'owner';
+          };
+        };
+        isPartner: boolean;
+        companyList: string[];
+        groups: {
+          id: string;
+          members: {
+            email: string;
+            id: string;
+          }[];
+          name: string;
+        }[];
+        hasSpecificPCCFee: boolean;
+        id: string;
+        isCompany: boolean;
+        isOnBoardingEmailSent: boolean;
+        members: {
+          [key: string]: {
+            email: string;
+            groups: string[];
+            id: string;
+            inviteStatus: 'accepted' | 'declined';
+            permission: 'booker' | 'participant' | 'owner';
+          };
+        };
+        previousKeywords: string[];
+        userState: string;
+        walkthroughEnable: boolean;
+      };
+    };
+  };
+}>;
+
+export type WithFlexSDKData<T> = {
+  status: number;
+  statusText: string;
+  data: {
+    data: T;
+  };
+};

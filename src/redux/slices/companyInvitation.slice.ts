@@ -1,17 +1,11 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-import {
-  checkInvitationApi,
-  responseToInvitationApi,
-} from '@apis/companyInvitationApi';
-import type { ResponseToInvitationBody } from '@pages/api/invitation/response.api';
+import { responseToInvitationApi } from '@apis/companyInvitationApi';
+import type { POSTResponseBody } from '@pages/api/invitation/response.api';
 import { createAsyncThunk } from '@redux/redux.helper';
 import type { TUser } from '@src/utils/types';
 import { denormalisedResponseEntities } from '@utils/data';
 
-type CheckInvitationResponse = {
-  message: string;
-};
 type ResponseToInvitationResult = {
   message: string;
 };
@@ -40,26 +34,14 @@ const initialState: TCompanyInvitationState = {
 };
 
 // ================ Thunk types ================ //
-const CHECK_INVITATION = 'app/companyInvitation/CHECK_INVITATION';
 const RESPONSE_TO_INVITATION = 'app/companyInvitation/RESPONSE_TO_INVITATION';
 const FETCH_COMPANY_INFO = 'app/companyInvitation/FETCH_COMPANY_INFO';
 
 // ================ Async thunks ================ //
-const checkInvitation = createAsyncThunk(
-  CHECK_INVITATION,
-  async (companyId: string) => {
-    const { data: checkInvitationResponse }: { data: CheckInvitationResponse } =
-      await checkInvitationApi({
-        companyId,
-      });
-
-    return checkInvitationResponse;
-  },
-);
 
 const responseToInvitation = createAsyncThunk(
   RESPONSE_TO_INVITATION,
-  async (params: ResponseToInvitationBody) => {
+  async (params: POSTResponseBody) => {
     const { data: response }: { data: ResponseToInvitationResult } =
       await responseToInvitationApi(params);
 
@@ -81,7 +63,6 @@ const fetchCompanyInfo = createAsyncThunk(
 );
 
 export const companyInvitationThunks = {
-  checkInvitation,
   responseToInvitation,
   fetchCompanyInfo,
 };
@@ -93,18 +74,6 @@ const companyInvitationSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(checkInvitation.pending, (state) => {
-        state.checkInvitationInProgress = true;
-        state.checkInvitationError = null;
-      })
-      .addCase(checkInvitation.fulfilled, (state, { payload }) => {
-        state.checkInvitationInProgress = false;
-        state.checkInvitationResult = payload.message;
-      })
-      .addCase(checkInvitation.rejected, (state, { error }) => {
-        state.checkInvitationInProgress = false;
-        state.checkInvitationError = error.message;
-      })
 
       .addCase(responseToInvitation.pending, (state) => {
         state.responseToInvitationInProgress = true;

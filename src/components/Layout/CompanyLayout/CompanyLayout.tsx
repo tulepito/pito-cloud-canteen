@@ -179,18 +179,6 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
         ).getPublicData().companyName
       : 'Tài khoản cá nhân';
 
-  useEffect(() => {
-    if (!companyId || companyId === '[companyId]') {
-      router.replace({
-        pathname: router.pathname,
-        query: {
-          ...router.query,
-          companyId: 'personal',
-        },
-      });
-    }
-  }, [companyId, router]);
-
   return (
     <>
       <RenderWhen condition={!shouldHideHeaderPathnames.includes(pathname)}>

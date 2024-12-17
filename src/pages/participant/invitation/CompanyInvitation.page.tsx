@@ -100,6 +100,7 @@ const CompanyInvitationPage = () => {
         companyInvitationThunks.responseToInvitation({
           companyId: companyId as string,
           response: 'accept',
+          type: 'response',
         }),
       ).unwrap();
 
