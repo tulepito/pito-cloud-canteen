@@ -74,7 +74,7 @@ const CompanyDashboardHeroSection = () => {
               onClick={onMealClick(item.daySession)}>
               <div className={css.imageWrapper}>
                 <Image
-                  src={item.image}
+                  src={item.imageSrc}
                   className={css.image}
                   alt={item.key}
                   fill

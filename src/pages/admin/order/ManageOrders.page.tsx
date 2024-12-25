@@ -673,9 +673,9 @@ const ManageOrdersPage = ({ showOrderType }: { showOrderType?: boolean }) => {
     showMode = 'order',
   } = router.query;
 
-  const startDateOnQuery = String(meta_startDate);
-  const endDateOnQuery = String(meta_endDate);
-  const stateOnQuery = String(meta_state);
+  const startDateOnQuery = meta_startDate as string | undefined;
+  const endDateOnQuery = meta_endDate as string | undefined;
+  const stateOnQuery = meta_state as string | undefined;
 
   const { isReady } = router;
   const [sortValue, setSortValue] = useState<TTableSortValue>();
@@ -725,7 +725,7 @@ const ManageOrdersPage = ({ showOrderType }: { showOrderType?: boolean }) => {
                     .toMillis()},`,
                 }
               : {}),
-            ...(endDateOnQuery
+            ...(endDateOnQuery && startDateOnQuery
               ? {
                   meta_endDate: `,${
                     DateTime.fromISO(startDateOnQuery)

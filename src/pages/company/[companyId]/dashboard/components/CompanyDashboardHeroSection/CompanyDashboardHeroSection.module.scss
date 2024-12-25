@@ -104,10 +104,11 @@
         box-shadow: 0px 16px 20px -4px #1018281a;
         max-height: 128px;
 
+        &:hover .image {
+          transform: scale(1.05);
+        }
+
         @include viewportMedium {
-          min-width: 200px;
-          max-width: 200px;
-          height: 164px;
           flex-grow: 0;
           padding: 16px;
           aspect-ratio: unset;
@@ -122,27 +123,43 @@
 
         .imageWrapper {
           position: relative;
-          width: 100%;
-          height: calc(100% - 28px);
-          min-height: calc(100% - 28px);
-          max-height: calc(100% - 28px);
-          border-radius: 8px;
+          border-radius: 10px;
           overflow: hidden;
+          min-width: 100%;
+          max-width: 100%;
+          min-height: calc(100% - 24px);
+          max-height: calc(100% - 24px);
+
+          @include viewportMedium {
+            min-width: 200px;
+            max-width: 200px;
+            min-height: 124px;
+            max-height: 124px;
+          }
+
+          @include viewportLarge {
+            min-width: 256px;
+            max-width: 256px;
+            min-height: 168px;
+            max-height: 168px;
+          }
         }
 
         .image {
           object-fit: cover;
-
-          @include viewportMedium {
-            max-height: 100px;
-          }
+          transition: transform 0.2s ease-in-out;
         }
+
         .label {
           text-align: center;
           color: $neutralGray7;
           font-weight: $fontWeightBold;
           margin: 0;
-          font-size: 14px;
+          @include textTemplate(13px, 600, 1.1);
+
+          @include viewportMedium {
+            @include textTemplate(14px, 700, 16px);
+          }
         }
       }
     }

@@ -58,7 +58,7 @@ const BookerNewOrderPage: React.FC = () => {
                 <div className={css.label}>{item.label}</div>
                 <div className={css.subLabel}>{item.subLabel}</div>
               </div>
-              <Image src={item.image} className={css.image} alt={item.key} />
+              <Image src={item.imageSrc} className={css.image} alt={item.key} />
             </div>
           ))}
         </div>

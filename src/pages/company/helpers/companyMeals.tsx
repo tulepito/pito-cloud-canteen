@@ -8,10 +8,6 @@ import {
 import { getDeliveryTimeFromMealType } from '@src/utils/dates';
 import { EMenuMealType } from '@src/utils/enums';
 
-import breadImage from '../assets/banhmi-min.png';
-import miquangImage from '../assets/miquang-min.png';
-import xoixeoImage from '../assets/xoixeo.png';
-
 export const HOMEPAGE_MEAL_LINKS = [
   {
     key: EMenuMealType.breakfast,
@@ -19,7 +15,7 @@ export const HOMEPAGE_MEAL_LINKS = [
     path: `/company/booker/orders/new/?deliveryHour=${getDeliveryTimeFromMealType(
       EMenuMealType.breakfast,
     )}`,
-    image: breadImage,
+    imageSrc: '/images/meal-breakfast.png',
     daySession: MORNING_SESSION,
     subLabel: <FormattedMessage id="MenuMealType.subLabel.breakfast" />,
   },
@@ -29,7 +25,7 @@ export const HOMEPAGE_MEAL_LINKS = [
     path: `/company/booker/orders/new/?deliveryHour=${getDeliveryTimeFromMealType(
       EMenuMealType.lunch,
     )}`,
-    image: miquangImage,
+    imageSrc: '/images/meal-lunch.png',
     daySession: AFTERNOON_SESSION,
     subLabel: <FormattedMessage id="MenuMealType.subLabel.lunch" />,
   },
@@ -39,7 +35,7 @@ export const HOMEPAGE_MEAL_LINKS = [
     path: `/company/booker/orders/new/?deliveryHour=${getDeliveryTimeFromMealType(
       EMenuMealType.dinner,
     )}`,
-    image: xoixeoImage,
+    imageSrc: '/images/meal-dinner.png',
     daySession: EVENING_SESSION,
     subLabel: <FormattedMessage id="MenuMealType.subLabel.dinner" />,
   },

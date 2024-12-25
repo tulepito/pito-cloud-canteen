@@ -113,7 +113,6 @@ const CompanyDashboardPage = () => {
             inProgress={getCompanyOrderSummaryInProgress}
             companyOrderSummary={companyOrderSummary}
           />
-          {/* <NewsSection /> */}
         </div>
       </div>
     </div>
