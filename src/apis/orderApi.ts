@@ -1,3 +1,7 @@
+import type {
+  POSTUpdateStateBody,
+  UpdateStateParams,
+} from '@pages/api/admin/listings/order/[orderId]/update-state.api';
 import type { TObject } from '@utils/types';
 
 import type { TBodyParams } from './configs';
@@ -128,10 +132,12 @@ export const cancelPickingOrderApi = (orderId: string) => {
 export const adminUpdateOrderStateApi = ({
   orderId,
   orderState,
-}: {
-  orderId: string;
-  orderState: string;
-}) => putApi(`/admin/listings/order/${orderId}/update-state`, { orderState });
+  options,
+}: POSTUpdateStateBody & UpdateStateParams) =>
+  putApi(`/admin/listings/order/${orderId}/update-state`, {
+    orderState,
+    options,
+  });
 
 export type TCreateQuotationApiBody = {
   orderId: string;

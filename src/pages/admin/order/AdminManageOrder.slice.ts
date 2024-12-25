@@ -242,10 +242,11 @@ const requestApprovalOrder = createAsyncThunk(
 
 const updateOrderState = createAsyncThunk(
   UPDATE_ORDER_STATE,
-  async (payload: { orderId: string; orderState: string }) => {
+  async (payload: Parameters<typeof adminUpdateOrderStateApi>[0]) => {
     const { data: orderListing } = await adminUpdateOrderStateApi({
       orderId: payload.orderId,
       orderState: payload.orderState,
+      options: payload.options,
     });
 
     return orderListing;

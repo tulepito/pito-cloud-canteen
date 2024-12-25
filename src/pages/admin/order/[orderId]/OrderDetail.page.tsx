@@ -90,11 +90,16 @@ const OrderDetailPage = () => {
     [orderId],
   );
 
-  const handleUpdateOrderState = async (newOrderState: string) => {
+  const handleUpdateOrderState = async (newOrderState: EOrderStates) => {
+    if (typeof orderId !== 'string') return;
+
     await dispatch(
       AdminManageOrderThunks.updateOrderState({
-        orderId: orderId as string,
+        orderId,
         orderState: newOrderState,
+        options: {
+          triggerRemindingPickingEmail: true,
+        },
       }),
     );
 
