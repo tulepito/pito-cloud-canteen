@@ -1,11 +1,7 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @typescript-eslint/naming-convention */
-/* eslint-disable @typescript-eslint/no-shadow */
 import React, { useEffect, useMemo, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import classNames from 'classnames';
-import addDays from 'date-fns/addDays';
 import { flatten } from 'lodash';
 import compact from 'lodash/compact';
 import { DateTime } from 'luxon';
@@ -676,13 +672,18 @@ const ManageOrdersPage = ({ showOrderType }: { showOrderType?: boolean }) => {
     meta_orderState,
     showMode = 'order',
   } = router.query;
+
+  const startDateOnQuery = String(meta_startDate);
+  const endDateOnQuery = String(meta_endDate);
+  const stateOnQuery = String(meta_state);
+
   const { isReady } = router;
   const [sortValue, setSortValue] = useState<TTableSortValue>();
   const [displayedColumns, setDisplayedColumns] = useState<string[]>(
     getDisplayedColumn(showOrderType),
   );
 
-  const shouldHideOrder = showMode === 'subOrder';
+  const isSubOrderMode = showMode === 'subOrder';
   const shouldShowTableColums = TABLE_COLUMN.filter((column) => {
     return displayedColumns.includes(column.key);
   });
@@ -703,34 +704,64 @@ const ManageOrdersPage = ({ showOrderType }: { showOrderType?: boolean }) => {
     systemVATPercentage,
     showMode as string,
   );
-  const filteredTableData = shouldHideOrder
+  const filteredTableData = isSubOrderMode
     ? filterOrder(dataTable, {
-        endDate: meta_endDate,
-        startDate: meta_startDate,
+        endDate: endDateOnQuery,
+        startDate: startDateOnQuery,
       })
     : dataTable;
   const sortedData = sortValue
     ? sortOrders(sortValue, filteredTableData)
     : filteredTableData;
 
+  const metaStartEndDateByMode = useMemo(
+    () =>
+      isSubOrderMode
+        ? {
+            ...(startDateOnQuery
+              ? {
+                  meta_startDate: `${DateTime.fromISO(startDateOnQuery)
+                    .minus({ days: 7 })
+                    .toMillis()},`,
+                }
+              : {}),
+            ...(endDateOnQuery
+              ? {
+                  meta_endDate: `,${
+                    DateTime.fromISO(startDateOnQuery)
+                      .plus({ days: 14 })
+                      .toMillis() + 1
+                  }`,
+                }
+              : {}),
+          }
+        : {
+            ...(startDateOnQuery
+              ? {
+                  meta_startDate: `${
+                    startDateOnQuery ? new Date(startDateOnQuery).getTime() : ''
+                  },`,
+                }
+              : {}),
+            ...(endDateOnQuery
+              ? {
+                  meta_endDate: `,${
+                    endDateOnQuery ? new Date(endDateOnQuery).getTime() + 1 : ''
+                  }`,
+                }
+              : {}),
+          },
+    [isSubOrderMode, startDateOnQuery, endDateOnQuery],
+  );
+
   const handleDownloadOrderList = async (
     values: TDownloadColumnListFormValues,
   ) => {
-    const endDateWithOneMoreDay = addDays(new Date(meta_endDate as string), 1);
     const { meta, payload } = await dispatch(
       orderAsyncActions.queryAllOrders({
         keywords,
         meta_orderState,
-        ...(meta_endDate
-          ? { meta_endDate: `,${new Date(endDateWithOneMoreDay).getTime()}` }
-          : {}),
-        ...(meta_startDate
-          ? {
-              meta_startDate: `${new Date(
-                meta_startDate as string,
-              ).getTime()},`,
-            }
-          : {}),
+        ...metaStartEndDateByMode,
       }),
     );
     if (meta.requestStatus === 'fulfilled') {
@@ -770,7 +801,7 @@ const ManageOrdersPage = ({ showOrderType }: { showOrderType?: boolean }) => {
         tableWrapperClassName={css.tableWrapper}
         tableClassName={css.table}
         tableBodyClassName={css.tableBody}
-        paginationProps={shouldHideOrder ? { showInfo: false } : {}}
+        paginationProps={isSubOrderMode ? { showInfo: false } : {}}
       />
     );
   } else {
@@ -781,54 +812,12 @@ const ManageOrdersPage = ({ showOrderType }: { showOrderType?: boolean }) => {
     );
   }
 
-  const stateAsString = meta_state as string;
-
-  const groupStateString = stateAsString
+  const groupStateString = stateOnQuery
     ?.split(',')
     .filter((item: string) => !!item);
 
   useEffect(() => {
     dispatch(resetStates());
-
-    const dateQueriesMaybe = shouldHideOrder
-      ? {
-          ...(meta_startDate
-            ? {
-                meta_startDate: `${DateTime.fromISO(meta_startDate as string)
-                  .minus({ days: 7 })
-                  .toMillis()},`,
-              }
-            : {}),
-          ...(meta_endDate
-            ? {
-                meta_endDate: `,${
-                  DateTime.fromISO(meta_startDate as string)
-                    .plus({ days: 14 })
-                    .toMillis() + 1
-                }`,
-              }
-            : {}),
-        }
-      : {
-          ...(meta_startDate
-            ? {
-                meta_startDate: `${
-                  meta_startDate
-                    ? new Date(meta_startDate as string).getTime()
-                    : ''
-                },`,
-              }
-            : {}),
-          ...(meta_endDate
-            ? {
-                meta_endDate: `,${
-                  meta_endDate
-                    ? new Date(meta_endDate as string).getTime() + 1
-                    : ''
-                }`,
-              }
-            : {}),
-        };
 
     if (isReady) {
       dispatch(
@@ -836,11 +825,18 @@ const ManageOrdersPage = ({ showOrderType }: { showOrderType?: boolean }) => {
           page,
           keywords,
           ...(meta_orderState ? { meta_orderState } : {}),
-          ...dateQueriesMaybe,
+          ...metaStartEndDateByMode,
         }),
       );
     }
-  }, [isReady]);
+  }, [
+    dispatch,
+    isReady,
+    keywords,
+    metaStartEndDateByMode,
+    meta_orderState,
+    page,
+  ]);
 
   const onClearFilter = () => {
     router.push({
@@ -850,24 +846,24 @@ const ManageOrdersPage = ({ showOrderType }: { showOrderType?: boolean }) => {
   };
 
   const onFilterSubmit = ({
-    keywords,
-    meta_startDate,
-    meta_endDate,
-    meta_orderState,
-    showMode,
+    keywords: _keywords,
+    meta_startDate: _meta_startDate,
+    meta_endDate: _meta_endDate,
+    meta_orderState: _meta_orderState,
+    showMode: _showMode,
   }: any) => {
     router.push({
       pathname: adminRoutes.ManageOrders.path,
       query: {
-        ...(keywords ? { keywords } : {}),
-        ...(meta_startDate
-          ? { meta_startDate: new Date(meta_startDate).toISOString() }
+        ...(_keywords ? { keywords: _keywords } : {}),
+        ...(_meta_startDate
+          ? { meta_startDate: new Date(_meta_startDate).toISOString() }
           : {}),
-        ...(meta_endDate
-          ? { meta_endDate: new Date(meta_endDate).toISOString() }
+        ...(_meta_endDate
+          ? { meta_endDate: new Date(_meta_endDate).toISOString() }
           : {}),
-        ...(meta_orderState ? { meta_orderState } : {}),
-        ...(showMode ? { showMode } : {}),
+        ...(_meta_orderState ? { meta_orderState: _meta_orderState } : {}),
+        ...(_showMode ? { showMode: _showMode } : {}),
       },
     });
   };
@@ -903,11 +899,11 @@ const ManageOrdersPage = ({ showOrderType }: { showOrderType?: boolean }) => {
                     keywords,
                     meta_orderState,
                     showMode: showMode as string,
-                    meta_startDate: meta_startDate
-                      ? new Date(meta_startDate as string).getTime()
+                    meta_startDate: startDateOnQuery
+                      ? new Date(startDateOnQuery as string).getTime()
                       : undefined,
-                    meta_endDate: meta_endDate
-                      ? new Date(meta_endDate as string).getTime()
+                    meta_endDate: endDateOnQuery
+                      ? new Date(endDateOnQuery as string).getTime()
                       : undefined,
                   }}
                 />
