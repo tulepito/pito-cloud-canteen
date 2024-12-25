@@ -3,6 +3,8 @@ import { useCallback, useMemo } from 'react';
 import * as XLSX from 'xlsx';
 
 import { isJoinedPlan } from '@helpers/order/orderPickingHelper';
+import { currentUserSelector } from '@redux/slices/user.slice';
+import type { UserListing } from '@src/types';
 import { Listing } from '@src/utils/data';
 import { formatTimestamp } from '@src/utils/dates';
 import type { TListing, TObject, TUser } from '@src/utils/types';
@@ -12,15 +14,33 @@ import { useAppSelector } from './reduxHooks';
 type ExportOrderDetailsExtendedField = 'company-name' | 'partner-name';
 type ExportOrderDetailsExtendedFields = ExportOrderDetailsExtendedField[];
 
+type Row = {
+  Ngày: string;
+  Tên: string;
+  'Món ăn': string;
+  'Đơn giá': number;
+  'Ghi chú': string;
+  'Tên công ty'?: string;
+  'Tên đối tác'?: string;
+};
+
+type PrivateField = {
+  Email: string;
+};
+
 const prepareData = ({
   orderDetail = {},
   participantData = {},
   extendedFields = [],
+  options,
 }: {
   orderDetail: TObject;
   participantData: TObject;
   extendedFields?: ExportOrderDetailsExtendedFields;
+  options?: { privateFieldsIncludingIfAdmin?: boolean };
 }) => {
+  const { privateFieldsIncludingIfAdmin = false } = options ?? {};
+
   return Object.entries<TObject>(orderDetail).reduce<TObject[]>(
     (result, currentOrderDetailEntry) => {
       const [date, rawOrderDetailOfDate] = currentOrderDetailEntry;
@@ -33,9 +53,14 @@ const prepareData = ({
           const [memberId, memberOrderData] = currentMemberOrderEntry;
           const { foodId, status, requirement } = memberOrderData;
 
-          const newItem: any = {
+          const newItem: Row & Partial<PrivateField> = {
             Ngày: formatTimestamp(Number(date)),
             Tên: participantData[memberId]?.name,
+            ...(privateFieldsIncludingIfAdmin
+              ? {
+                  Email: participantData[memberId]?.email,
+                }
+              : {}),
             'Món ăn': foodListOfDate[foodId]?.foodName,
             'Đơn giá': foodListOfDate[foodId]?.foodPrice,
             'Ghi chú': requirement,
@@ -85,6 +110,7 @@ const useExportOrderDetails = (options?: {
     participantData,
     anonymousParticipantData,
   } = useAppSelector((state) => state.OrderManagement);
+  const currentUser: UserListing = useAppSelector(currentUserSelector);
 
   const { participants = [], anonymous = [] } = Listing(
     orderData as TListing,
@@ -148,6 +174,10 @@ const useExportOrderDetails = (options?: {
       orderDetail: draftOrderDetail,
       participantData: participantDataMap,
       extendedFields,
+      options: {
+        privateFieldsIncludingIfAdmin:
+          currentUser.attributes?.profile?.metadata?.isAdmin,
+      },
     });
 
     const { title } = Listing(orderData as TListing).getAttributes();

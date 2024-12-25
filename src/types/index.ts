@@ -191,6 +191,7 @@ export type UserListing = DeepPartial<{
         hasSpecificPCCFee: boolean;
         id: string;
         isCompany: boolean;
+        isAdmin: boolean;
         isOnBoardingEmailSent: boolean;
         members: {
           [key: string]: {
