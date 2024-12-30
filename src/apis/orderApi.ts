@@ -2,6 +2,7 @@ import type {
   POSTUpdateStateBody,
   UpdateStateParams,
 } from '@pages/api/admin/listings/order/[orderId]/update-state.api';
+import type { POSTRemindMemberBody } from '@pages/api/orders/[orderId]/remind-member/index.api';
 import type { PUTUpdateOrderDetailFromDraftBody } from '@pages/api/orders/[orderId]/update-order-detail-from-draft.api';
 import type { TObject } from '@utils/types';
 
@@ -81,8 +82,10 @@ export const addUpdateMemberOrder = (
   body: AddUpdateMemberOrderApiBody,
 ) => putApi(`/orders/${orderId}/member-order`, body);
 
-export const sendRemindEmailToMemberApi = (orderId: string, body: TObject) =>
-  postApi(`/orders/${orderId}/remind-member`, body);
+export const sendRemindEmailToMemberApi = (
+  orderId: string,
+  body: POSTRemindMemberBody,
+) => postApi(`/orders/${orderId}/remind-member`, body);
 
 export const queryOrdersApi = (body: TBodyParams) => {
   return getApi(`/admin/listings/order`, body);

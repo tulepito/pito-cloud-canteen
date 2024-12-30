@@ -153,11 +153,9 @@ const deleteOrderParticipants = createAsyncThunk(
 const sendRemindEmailToMembers = createAsyncThunk(
   'app/OrderManagement/SEND_REMIND_EMAIL_TO_MEMBER',
   async (params: TObject) => {
-    const { orderId, orderLink, deadline, description, memberIdList } = params;
+    const { orderId, description, memberIdList } = params;
 
     await sendRemindEmailToMemberApi(orderId, {
-      orderLink,
-      deadline,
       description,
       uniqueMemberIdList: uniq(memberIdList),
     });

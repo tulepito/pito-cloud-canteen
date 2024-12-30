@@ -19,7 +19,6 @@ import {
 } from '@redux/slices/OrderManagement.slice';
 import { Listing } from '@src/utils/data';
 import { EOrderStates } from '@src/utils/enums';
-import { formatTimestamp } from '@utils/dates';
 import type { TDefaultProps, TListing } from '@utils/types';
 
 import type { TSendNotificationFormValues } from './SendNotificationForm';
@@ -64,10 +63,6 @@ const OrderLinkSection: React.FC<TOrderLinkSectionProps> = (props) => {
     companyId,
   });
 
-  const formattedOrderDeadline = formatTimestamp(
-    orderDeadline,
-    'HH:mm EEE,dd/MM/yyyy',
-  );
   const rootClasses = classNames(rootClassName || css.root, className);
 
   const defaultCopyText = intl.formatMessage({
@@ -97,13 +92,11 @@ const OrderLinkSection: React.FC<TOrderLinkSectionProps> = (props) => {
   const handleSubmitSendNotification = async (
     values: TSendNotificationFormValues,
   ) => {
-    const emailParams = {
-      ...values,
-      orderLink,
-      deadline: formattedOrderDeadline,
-    };
-
-    dispatch(orderManagementThunks.sendRemindEmailToMember(emailParams));
+    dispatch(
+      orderManagementThunks.sendRemindEmailToMember({
+        description: values.description,
+      }),
+    );
   };
 
   const shouldShowSendNotificationModal =

@@ -5,7 +5,6 @@ import groupBy from 'lodash/groupBy';
 import isEmpty from 'lodash/isEmpty';
 import omit from 'lodash/omit';
 import set from 'lodash/set';
-import uniq from 'lodash/uniq';
 
 import {
   createSubOrderChangesHistoryDocumentApi,
@@ -43,6 +42,7 @@ import {
   calculatePartnerQuotation,
 } from '@helpers/order/quotationHelper';
 import { AdminManageOrderActions } from '@pages/admin/order/AdminManageOrder.slice';
+import type { POSTRemindMemberBody } from '@pages/api/orders/[orderId]/remind-member/index.api';
 import { createAsyncThunk } from '@redux/redux.helper';
 import type { RootState } from '@redux/store';
 import type { NotificationInvitationParams } from '@services/notifications';
@@ -337,8 +337,8 @@ const updateOrderGeneralInfo = createAsyncThunk(
 
 const sendRemindEmailToMember = createAsyncThunk(
   'app/OrderManagement/SEND_REMIND_EMAIL_TO_MEMBER',
-  async (params: TObject, { getState }) => {
-    const { orderLink, deadline, description } = params;
+  async (params: Pick<POSTRemindMemberBody, 'description'>, { getState }) => {
+    const { description } = params;
 
     const {
       id: { uuid: orderId },
@@ -346,41 +346,13 @@ const sendRemindEmailToMember = createAsyncThunk(
 
     const {
       attributes: {
-        metadata: { orderDetail = {} },
+        id: { uuid: planId },
       },
-    } = getState().OrderManagement.planData!;
-
-    const memberIdList = Object.values(orderDetail).reduce(
-      (result, currentDateOrders) => {
-        const { memberOrders } = currentDateOrders as TObject;
-        const memberIds = Object.entries(memberOrders).reduce(
-          (ids: string[], [memberId, orders]) => {
-            const { foodId, status } = orders as TObject;
-
-            if (
-              (foodId === '' &&
-                status !== EParticipantOrderStatus.notAllowed) ||
-              status === EParticipantOrderStatus.empty ||
-              status === EParticipantOrderStatus.notJoined
-            ) {
-              return [...ids, memberId as string];
-            }
-
-            return ids;
-          },
-          [],
-        );
-
-        return [...(result as string[]), ...memberIds];
-      },
-      [],
-    ) as string[];
+    } = getState().OrderManagement.planData;
 
     await sendRemindEmailToMemberApi(orderId, {
-      orderLink,
-      deadline,
       description,
-      uniqueMemberIdList: uniq(memberIdList),
+      planId,
     });
   },
 );
