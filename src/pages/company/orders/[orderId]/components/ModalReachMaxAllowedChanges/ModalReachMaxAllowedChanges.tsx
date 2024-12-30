@@ -39,7 +39,13 @@ const ModalReachMaxAllowedChanges: React.FC<TModalReachMaxAllowedChanges> = (
               <FormattedMessage id="ModalReachMaxAllowedChanges.content" />
             </div>
             <div>
-              <FormattedMessage id="ModalReachMaxAllowedChanges.content2" />
+              <FormattedMessage
+                id="ModalReachMaxAllowedChanges.content2"
+                values={{
+                  percent:
+                    process.env.NEXT_PUBLIC_MAX_ORDER_DETAIL_MODIFIED_PERCENT,
+                }}
+              />
             </div>
           </>
         ) : (

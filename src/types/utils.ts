@@ -72,3 +72,7 @@ export type ListingBuilder<
     attributes: Attributes<Attr, Pub, Meta, Pri>;
   } & Ext
 >;
+
+export type Assert<T> = Exclude<T, undefined>;
+
+export type ArrayElement<T> = T extends (infer U)[] ? U : T;

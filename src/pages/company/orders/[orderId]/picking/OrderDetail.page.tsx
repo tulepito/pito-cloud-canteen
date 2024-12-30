@@ -52,6 +52,8 @@ import type { TListing } from '@utils/types';
 import ModalReachMaxAllowedChanges from '../components/ModalReachMaxAllowedChanges/ModalReachMaxAllowedChanges';
 import { useAutoPickFood } from '../hooks/useAutoPickFood';
 
+import OrderQuantityErrorSection from './OrderQuantityErrorSection';
+
 import css from './OrderDetail.module.scss';
 
 enum EPageViewMode {
@@ -70,9 +72,6 @@ const ViewByOrderStates = {
   [EOrderStates.picking]: EPageViewMode.edit,
   [EOrderStates.inProgress]: EPageViewMode.edit,
 };
-
-const ONE_DAY = 1;
-const NOW = new Date().getTime();
 
 const OrderDetailPage = () => {
   const [viewMode, setViewMode] = useState<EPageViewMode>(EPageViewMode.edit);
@@ -126,7 +125,7 @@ const OrderDetailPage = () => {
   const {
     orderState,
     bookerId,
-    orderType = EOrderType.normal,
+    orderType,
     orderVATPercentage,
     startDate,
     deliveryHour,
@@ -326,14 +325,17 @@ const OrderDetailPage = () => {
 
   const { lastTransition = ETransition.INITIATE_TRANSACTION, restaurant = {} } =
     draftOrderDetail?.[currentViewDate] || {};
-  const { minQuantity = 1 } = restaurant;
+  const { minQuantity = 1, maxQuantity = 100 } = restaurant;
 
   const ableToUpdateOrder =
     !isFetchingOrderDetails &&
     isRouterReady &&
-    ((lastTransition === ETransition.INITIATE_TRANSACTION &&
+    (((lastTransition === ETransition.INITIATE_TRANSACTION ||
+      lastTransition === ETransition.PARTNER_CONFIRM_SUB_ORDER) &&
       isDraftEditing &&
-      Number(diffDays(currentViewDate, NOW, 'day').days) > ONE_DAY) ||
+      Number(diffDays(currentViewDate, new Date().getTime(), 'hours').hours) >
+        +process.env
+          .NEXT_PUBLIC_MIN_OFFSET_TIME_TO_MODIFY_ORDER_DETAIL_IN_HOUR) ||
       isPickingOrder);
 
   const orderDetailsNotChanged = !checkOrderDetailHasChanged(
@@ -346,6 +348,18 @@ const OrderDetailPage = () => {
     orderReachMinRestaurantQuantity ||
     orderReachMaxRestaurantQuantityInProgressState ||
     orderReachMinRestaurantQuantityInProgressState;
+
+  const errorSection = (
+    <OrderQuantityErrorSection
+      planReachMaxCanModifyInProgressState={
+        planReachMaxCanModifyInProgressState
+      }
+      planReachMaxRestaurantQuantity={planReachMaxRestaurantQuantity}
+      planReachMinRestaurantQuantity={planReachMinRestaurantQuantity}
+      maxQuantity={maxQuantity}
+      minQuantity={minQuantity}
+    />
+  );
 
   const EditViewComponent = (
     <div className={editViewClasses}>
@@ -393,9 +407,7 @@ const OrderDetailPage = () => {
               handleOpenReachMaxAllowedChangesModal={
                 handleOpenReachMaxAllowedChangesModal
               }
-              planReachMaxCanModify={planReachMaxCanModifyInProgressState}
-              planReachMaxRestaurantQuantity={planReachMaxRestaurantQuantity}
-              planReachMinRestaurantQuantity={planReachMinRestaurantQuantity}
+              errorSection={errorSection}
             />
           </div>
           <ReviewOrdersResultModal
@@ -453,11 +465,9 @@ const OrderDetailPage = () => {
               <ManageLineItemsSection
                 isDraftEditing={isDraftEditing}
                 ableToUpdateOrder={ableToUpdateOrder}
-                shouldShowOverflowError={planReachMaxRestaurantQuantity}
-                shouldShowUnderError={planReachMinRestaurantQuantity}
                 setCurrentViewDate={handleSetCurrentViewDate}
                 currentViewDate={currentViewDate}
-                minQuantity={minQuantity}
+                errorSection={errorSection}
               />
 
               <RenderWhen condition={!isMobileLayout && isDraftEditing}>
@@ -514,11 +524,13 @@ const OrderDetailPage = () => {
 
   const ReviewViewComponent = (
     <>
-      <BookerStepperDesktopSection>
-        <div className={css.stepperContainerDesktop}>
-          <Stepper steps={_steps} currentStep={4} />
-        </div>
-      </BookerStepperDesktopSection>
+      {!!_steps.length && (
+        <BookerStepperDesktopSection>
+          <div className={css.stepperContainerDesktop}>
+            <Stepper steps={_steps} currentStep={4} />
+          </div>
+        </BookerStepperDesktopSection>
+      )}
       <ReviewView
         isViewCartDetailMode={isViewCartDetailMode}
         canGoBackEditMode
@@ -687,9 +699,11 @@ const OrderDetailPage = () => {
     case EPageViewMode.edit:
       content = (
         <>
-          <BookerStepperDesktopSection>
-            <Stepper className={css.stepper} {...stepperProps} />
-          </BookerStepperDesktopSection>
+          {!!stepperProps.steps.length && (
+            <BookerStepperDesktopSection>
+              <Stepper className={css.stepper} {...stepperProps} />
+            </BookerStepperDesktopSection>
+          )}
           {EditViewComponent}
         </>
       );

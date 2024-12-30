@@ -24,6 +24,7 @@ import { usePrepareOrderDetailPageData } from '@hooks/usePrepareOrderManagementD
 import { AdminManageOrderThunks } from '@pages/admin/order/AdminManageOrder.slice';
 import { ReviewContent } from '@pages/admin/order/StepScreen/ReviewOrder/ReviewOrder';
 import { useAutoPickFood } from '@pages/company/orders/[orderId]/hooks/useAutoPickFood';
+import OrderQuantityErrorSection from '@pages/company/orders/[orderId]/picking/OrderQuantityErrorSection';
 import {
   OrderManagementsAction,
   orderManagementThunks,
@@ -114,7 +115,6 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
       planReachMaxRestaurantQuantityInProgressState,
     planReachMinRestaurantQuantity:
       planReachMinRestaurantQuantityInProgressState,
-    planReachMaxCanModify: planReachMaxCanModifyInProgressState,
   } = planValidationsInProgressState?.[currentViewDate] || {};
 
   const {
@@ -305,6 +305,15 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
     }
   }, []);
 
+  const errorSection = (
+    <OrderQuantityErrorSection
+      planReachMaxRestaurantQuantity={planReachMaxRestaurantQuantity}
+      planReachMinRestaurantQuantity={planReachMinRestaurantQuantity}
+      maxQuantity={minQuantity}
+      minQuantity={minQuantity}
+    />
+  );
+
   return (
     <div className={css.container}>
       <RenderWhen condition={isEditMode}>
@@ -348,14 +357,8 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
                     currentViewDate={currentViewDate}
                     isDraftEditing={isDraftEditing}
                     ableToUpdateOrder={ableToUpdateOrder}
-                    planReachMaxCanModify={planReachMaxCanModifyInProgressState}
-                    planReachMaxRestaurantQuantity={
-                      planReachMaxRestaurantQuantity
-                    }
-                    planReachMinRestaurantQuantity={
-                      planReachMinRestaurantQuantity
-                    }
                     isAdminFlow
+                    errorSection={errorSection}
                   />
                 </div>
                 <div className={css.rightPart}>
@@ -415,12 +418,10 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
                   <ManageLineItemsSection
                     isDraftEditing={isDraftEditing}
                     ableToUpdateOrder={ableToUpdateOrder}
-                    shouldShowOverflowError={planReachMaxRestaurantQuantity}
-                    shouldShowUnderError={planReachMinRestaurantQuantity}
                     setCurrentViewDate={handleSetCurrentViewDate}
                     currentViewDate={currentViewDate}
-                    minQuantity={minQuantity}
                     isAdminFlow
+                    errorSection={errorSection}
                   />
                   <RenderWhen condition={isDraftEditing}>
                     <SubOrderChangesHistorySection

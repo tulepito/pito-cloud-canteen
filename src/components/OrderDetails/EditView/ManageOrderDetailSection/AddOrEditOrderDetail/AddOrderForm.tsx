@@ -7,7 +7,6 @@ import { useIntl } from 'react-intl';
 import isEmpty from 'lodash/isEmpty';
 
 import Button from '@components/Button/Button';
-import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import Form from '@components/Form/Form';
 import FieldCustomSelectComponent from '@components/FormFields/FieldCustomSelect/FieldCustomSelect';
 import FieldDropdownSelect from '@components/FormFields/FieldDropdownSelect/FieldDropdownSelect';
@@ -43,12 +42,8 @@ type TExtraProps = {
   }[];
   ableToUpdateOrder: boolean;
   isDraftEditing: boolean;
-  maxQuantity?: number;
-  minQuantity?: number;
   currentViewDate: number;
-  planReachMaxRestaurantQuantity?: boolean;
-  planReachMinRestaurantQuantity?: boolean;
-  planReachMaxCanModify?: boolean;
+  errorSection?: React.ReactNode;
 };
 type TAddOrderFormComponentProps = FormRenderProps<TAddOrderFormValues> &
   Partial<TExtraProps>;
@@ -60,7 +55,7 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
   const intl = useIntl();
   const dispatch = useAppDispatch();
   const { isMobileLayout } = useViewport();
-  const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
+  const isLoading = useAppSelector(orderDetailsAnyActionsInProgress);
   const addOrUpdateMemberOrderInProgress = useAppSelector(
     (state) => state.OrderManagement.addOrUpdateMemberOrderInProgress,
   );
@@ -78,15 +73,11 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
     invalid,
     ableToUpdateOrder,
     isDraftEditing,
-    planReachMaxRestaurantQuantity,
-    planReachMinRestaurantQuantity,
-    planReachMaxCanModify,
-    minQuantity,
-    maxQuantity,
+    errorSection,
     currentViewDate,
   } = props;
 
-  const fieldSelectMemberDisable = inProgress || !ableToUpdateOrder;
+  const fieldSelectMemberDisable = isLoading || !ableToUpdateOrder;
   const fieldSelectFoodDisable =
     fieldSelectMemberDisable || foodOptions?.length === 0;
   const submitDisabled =
@@ -252,26 +243,7 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
         </Button>
       </div>
 
-      <RenderWhen condition={!isMobileLayout}>
-        {planReachMaxCanModify && (
-          <ErrorMessage
-            className={css.error}
-            message={`Bạn đã thay đổi vượt mức quy định (tối đa 10% số lượng người tham gia)`}
-          />
-        )}
-        {planReachMaxRestaurantQuantity && (
-          <ErrorMessage
-            className={css.error}
-            message={`Bạn đã đặt vượt mức tối đa (${maxQuantity} phần)`}
-          />
-        )}
-        {planReachMinRestaurantQuantity && (
-          <ErrorMessage
-            className={css.error}
-            message={`Cần đặt tối thiểu ${minQuantity} phần`}
-          />
-        )}
-      </RenderWhen>
+      <RenderWhen condition={!isMobileLayout}>{errorSection}</RenderWhen>
 
       <div className={css.addRequirementContainer}>
         <Button

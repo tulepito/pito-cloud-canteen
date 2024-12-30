@@ -1,4 +1,5 @@
 import { convertDateToVNTimezone } from '@helpers/dateHelpers';
+import logger from '@helpers/logger';
 import { getPickFoodParticipants } from '@helpers/orderHelper';
 import { pushNativeNotificationOrderDetail } from '@pages/api/helpers/pushNotificationOrderDetailHelper';
 import { denormalisedResponseEntities } from '@services/data';
@@ -8,6 +9,12 @@ import { fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { createNativeNotification } from '@services/nativeNotification';
 import { createSlackNotification } from '@services/slackNotification';
+import type {
+  OrderDetail,
+  OrderListing,
+  PlanListing,
+  WithFlexSDKData,
+} from '@src/types';
 import { Listing, User } from '@utils/data';
 import {
   EBookerNativeNotificationType,
@@ -21,7 +28,7 @@ import { sendBookerNativeNotification } from './send-booker-native-notification.
 export const startOrder = async (orderId: string, planId: string) => {
   const integrationSdk = getIntegrationSdk();
 
-  const [orderListing] = denormalisedResponseEntities(
+  const [orderListing]: [OrderListing] = denormalisedResponseEntities(
     await integrationSdk.listings.show({
       id: orderId,
     }),
@@ -34,7 +41,7 @@ export const startOrder = async (orderId: string, planId: string) => {
     partnerIds = [],
     hasSpecificPCCFee: orderHasSpecificPCCFee,
     specificPCCFee: orderSpecificPCCFee,
-  } = Listing(orderListing).getMetadata();
+  } = Listing(orderListing as any).getMetadata();
 
   if (orderState !== EOrderStates.picking) {
     throw new Error(
@@ -56,7 +63,11 @@ export const startOrder = async (orderId: string, planId: string) => {
   const { hasSpecificPCCFee = false, specificPCCFee = 0 } =
     User(companyUser).getMetadata();
 
-  // TODO: update state, save vat and PCC fee in order listing
+  const oldPlan: WithFlexSDKData<PlanListing> =
+    await integrationSdk.listings.show({
+      id: planId,
+    });
+
   await integrationSdk.listings.update({
     id: orderId,
     metadata: {
@@ -72,12 +83,28 @@ export const startOrder = async (orderId: string, planId: string) => {
     },
   });
 
+  let orderDetailStartedSnapshot: OrderDetail | undefined;
+  const isOrderHasStartedSnapshot =
+    !!oldPlan.data.data.attributes?.metadata?.orderDetailStartedSnapshot;
+
+  if (!isOrderHasStartedSnapshot) {
+    logger.debug(
+      'Order has started snapshot',
+      oldPlan.data.data.attributes?.metadata?.orderDetail,
+    );
+
+    orderDetailStartedSnapshot =
+      oldPlan.data.data.attributes?.metadata?.orderDetail;
+  }
+
   const [plan] = denormalisedResponseEntities(
     await integrationSdk.listings.update(
       {
         id: planId,
         metadata: {
+          planStarted: true,
           partnerIds,
+          orderDetailStartedSnapshot,
         },
       },
       {
@@ -102,39 +129,41 @@ export const startOrder = async (orderId: string, planId: string) => {
         ENativeNotificationType.BookerTransitOrderStateToInProgress,
         {
           participantId,
-          order: orderListing,
+          order: orderListing as any,
         },
       );
     },
   );
 
-  createSlackNotification(
-    ESlackNotificationType.ORDER_STATUS_CHANGES_TO_IN_PROGRESS,
-    {
-      orderStatusChangesToInProgressData: {
-        orderCode: orderListing.attributes.title,
-        orderLink: `${process.env.NEXT_PUBLIC_CANONICAL_URL}/admin/order/${orderId}`,
-        orderName: orderListing.attributes.publicData.orderName,
-        companyName: orderListing.attributes.metadata.companyName,
-        startDate: convertDateToVNTimezone(
-          new Date(orderListing.attributes.metadata.startDate),
-        ).split('T')[0],
-        deliveryHour: orderListing.attributes.metadata.deliveryHour,
-        deliveryAddress:
-          orderListing.attributes.metadata.deliveryAddress.address,
+  if (!oldPlan.data.data.attributes?.metadata?.planStarted) {
+    createSlackNotification(
+      ESlackNotificationType.ORDER_STATUS_CHANGES_TO_IN_PROGRESS,
+      {
+        orderStatusChangesToInProgressData: {
+          orderCode: orderListing.attributes?.title!,
+          orderLink: `${process.env.NEXT_PUBLIC_CANONICAL_URL}/admin/order/${orderId}`,
+          orderName: orderListing.attributes?.publicData?.orderName!,
+          companyName: orderListing.attributes?.metadata?.companyName!,
+          startDate: convertDateToVNTimezone(
+            new Date(orderListing.attributes?.metadata?.startDate!),
+          ).split('T')[0],
+          deliveryHour: orderListing.attributes?.metadata?.deliveryHour!,
+          deliveryAddress:
+            orderListing.attributes?.metadata?.deliveryAddress?.address!,
+        },
       },
-    },
-  );
+    );
+  }
 
   await pushNativeNotificationOrderDetail(
     orderDetail,
-    orderListing,
+    orderListing as any,
     ENativeNotificationType.BookerTransitOrderStateToInProgress,
     integrationSdk,
   );
 
   sendBookerNativeNotification(
-    orderListing,
+    orderListing as any,
     EBookerNativeNotificationType.AdminStartOrder,
   );
 };

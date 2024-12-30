@@ -1,15 +1,65 @@
 import isEmpty from 'lodash/isEmpty';
 import uniq from 'lodash/uniq';
 
+import { convertDateToVNTimezone } from '@helpers/dateHelpers';
 import { isEnableUpdateBookingInfo } from '@helpers/orderHelper';
 import { fetchListing, fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
-import { EOrderType } from '@src/utils/enums';
+import { createSlackNotification } from '@services/slackNotification';
+import type { OrderDetail, OrderListing, PlanListing } from '@src/types';
+import { EOrderType, ESlackNotificationType } from '@src/utils/enums';
 import type { TPlan } from '@src/utils/orderTypes';
 import { denormalisedResponseEntities, Listing } from '@utils/data';
 import type { TObject } from '@utils/types';
 
 import { getInitMemberOrder } from './memberOrder.helper';
+
+const sendRestaurantChangedSlackNotification = async (
+  orderListing: OrderListing,
+  newOrderDetail: OrderDetail,
+) => {
+  const differentOrderDetail = Object.keys(newOrderDetail).reduce(
+    (acc, date) => {
+      const newRestaurantName =
+        newOrderDetail[date]?.restaurant?.restaurantName;
+      const oldRestaurantName =
+        newOrderDetail[date]?.oldValues?.[0]?.restaurant?.restaurantName;
+
+      if (
+        oldRestaurantName &&
+        newRestaurantName &&
+        newRestaurantName !== oldRestaurantName
+      ) {
+        return [
+          ...acc,
+          {
+            oldRestaurantName,
+            newRestaurantName,
+            date: convertDateToVNTimezone(new Date(+date)).split('T')[0],
+          },
+        ];
+      }
+
+      return acc;
+    },
+    [] as {
+      oldRestaurantName?: string;
+      newRestaurantName?: string;
+      date: string;
+    }[],
+  );
+
+  const changes = Object.values(differentOrderDetail);
+
+  createSlackNotification(ESlackNotificationType.RESTAURANT_CHANGED, {
+    restaurantChangedData: {
+      orderName: orderListing.attributes?.publicData?.orderName!,
+      orderLink: `${process.env.NEXT_PUBLIC_CANONICAL_URL}/admin/order/${orderListing.id?.uuid}`,
+      orderCode: orderListing.attributes?.title!,
+      changes,
+    },
+  });
+};
 
 export enum EApiUpdateMode {
   MERGE = 'merge',
@@ -73,14 +123,15 @@ const updatePlan = async ({
 }) => {
   const integrationSdk = getIntegrationSdk();
 
-  const orderListing = await fetchListing(orderId as string);
+  const orderListing: OrderListing = await fetchListing(orderId as string);
+
   const {
     companyId,
     selectedGroups = [],
     orderState,
     orderType = EOrderType.group,
     partnerIds = [],
-  } = Listing(orderListing).getMetadata();
+  } = Listing(orderListing as any).getMetadata();
   const enabledToUpdateRelatedBookingInfo =
     isEnableUpdateBookingInfo(orderState);
   const companyAccount = await fetchUser(companyId);
@@ -91,7 +142,7 @@ const updatePlan = async ({
     selectedGroups,
   });
 
-  let currPlan;
+  let currPlan: PlanListing;
 
   const normalizeDetail = getNormalizeDetail({
     orderDetail,
@@ -103,8 +154,9 @@ const updatePlan = async ({
 
   if (enabledToUpdateRelatedBookingInfo) {
     currPlan = await fetchListing(planId as string);
-    const { orderDetail: oldOrderDetail = {}, menuIds = [] } =
-      Listing(currPlan).getMetadata();
+    const { orderDetail: oldOrderDetail = {}, menuIds = [] } = Listing(
+      currPlan as any,
+    ).getMetadata();
 
     if (updateMode === EApiUpdateMode.MERGE) {
       updatedOrderDetail = getNormalizeDetail({
@@ -142,7 +194,10 @@ const updatePlan = async ({
       { expand: true },
     );
 
-    const planListing = denormalisedResponseEntities(planListingResponse)[0];
+    const planListing: PlanListing =
+      denormalisedResponseEntities(planListingResponse)[0];
+
+    sendRestaurantChangedSlackNotification(orderListing, normalizeDetail);
 
     return planListing;
   }

@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HttpMethod } from '@apis/configs';
+import logger from '@helpers/logger';
 import cookies from '@services/cookie';
 import { handleError } from '@services/sdk';
 
@@ -19,6 +20,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
         return res.json(planListing);
       } catch (error) {
+        logger.error('Error updating plan', String(error));
         handleError(res, error);
       }
       break;
@@ -36,6 +38,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
         return res.json(planListing);
       } catch (error) {
+        logger.error('Error updating plan', String(error));
         handleError(res, error);
       }
       break;

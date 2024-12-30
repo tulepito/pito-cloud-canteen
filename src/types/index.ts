@@ -1,4 +1,4 @@
-import type { DeepPartial, Image, ListingBuilder } from './utils';
+import type { Assert, DeepPartial, Image, ListingBuilder } from './utils';
 
 export type FoodListing = ListingBuilder<
   {},
@@ -71,45 +71,56 @@ export type OrderListing = ListingBuilder<
   {}
 >;
 
+export type OrderDetailValue = {
+  hasNoRestaurants: boolean;
+  lineItems: {
+    id: string;
+    name: string;
+    price: number;
+    quantity: number;
+    unitPrice: number;
+  }[];
+  transactionId: string;
+  lastTransition: string;
+  memberOrders: Record<
+    string,
+    {
+      foodId: string;
+      requirement: string;
+      status: 'empty' | 'joined' | 'notJoined' | 'notAllowed' | 'expired';
+    }
+  >;
+  restaurant: {
+    foodList: Record<
+      string,
+      {
+        foodName: string;
+        foodPrice: number;
+        foodUnit: string;
+      }
+    >;
+    id: string;
+    maxQuantity: number;
+    menuId: string;
+    minQuantity: number;
+    phoneNumber: string;
+    restaurantName: string;
+  };
+  editTagVersion?: number;
+  oldValues?: OrderDetailValue[];
+};
+
 export type PlanListing = ListingBuilder<
   {},
   {},
   {
     listingType: string;
     menuIds: string[];
-    orderDetail: Record<
-      string,
-      {
-        hasNoRestaurants: boolean;
-        lineItems: unknown[];
-        memberOrders: Record<
-          string,
-          {
-            foodId: string;
-            requirement: string;
-            status: 'empty';
-          }
-        >;
-        restaurant: {
-          foodList: Record<
-            string,
-            {
-              foodName: string;
-              foodPrice: number;
-              foodUnit: string;
-            }
-          >;
-          id: string;
-          maxQuantity: number;
-          menuId: string;
-          minQuantity: number;
-          phoneNumber: string;
-          restaurantName: string;
-        };
-      }
-    >;
+    orderDetail: { [timestamp: string]: OrderDetailValue };
+    orderDetailStartedSnapshot: { [timestamp: string]: OrderDetailValue };
     orderId: string;
     partnerIds: string[];
+    planStarted: boolean;
   },
   {},
   {}
@@ -217,3 +228,7 @@ export type WithFlexSDKData<T> = {
     data: T;
   };
 };
+
+export type OrderDetail = Assert<
+  Assert<Assert<PlanListing['attributes']>['metadata']>['orderDetail']
+>;

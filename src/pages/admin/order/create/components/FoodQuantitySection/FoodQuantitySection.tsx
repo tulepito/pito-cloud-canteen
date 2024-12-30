@@ -7,6 +7,7 @@ import { checkMinMaxQuantityInPickingState } from '@helpers/order/orderPickingHe
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 // eslint-disable-next-line import/no-cycle
 import NavigateButtons from '@pages/admin/order/components/NavigateButtons/NavigateButtons';
+import OrderQuantityErrorSection from '@pages/company/orders/[orderId]/picking/OrderQuantityErrorSection';
 import {
   setCanNotGoAfterFoodQuantity,
   setCanNotGoAfterOderDetail,
@@ -44,7 +45,8 @@ function FoodQuantitySection({
   const { orderType } = Listing(order).getMetadata();
   const isNormalOrder = orderType === EOrderType.normal;
 
-  const { minQuantity = 1 } = orderDetail?.[currentViewDate]?.restaurant || {};
+  const { minQuantity = 1, maxQuantity = 100 } =
+    orderDetail?.[currentViewDate]?.restaurant || {};
 
   const { planValidations } = checkMinMaxQuantityInPickingStateForAdmin(
     isNormalOrder,
@@ -83,12 +85,17 @@ function FoodQuantitySection({
     <div>
       <ManageLineItemsSection
         ableToUpdateOrder
-        shouldShowOverflowError={planReachMaxRestaurantQuantity}
-        shouldShowUnderError={planReachMinRestaurantQuantity}
         setCurrentViewDate={handleSetCurrentViewDate}
         currentViewDate={currentViewDate}
-        minQuantity={minQuantity}
         isAdminFlow
+        errorSection={
+          <OrderQuantityErrorSection
+            maxQuantity={maxQuantity}
+            minQuantity={minQuantity}
+            planReachMaxRestaurantQuantity={planReachMaxRestaurantQuantity}
+            planReachMinRestaurantQuantity={planReachMinRestaurantQuantity}
+          />
+        }
       />
       <div>
         <NavigateButtons goBack={goBack} onNextClick={onNextClick} />

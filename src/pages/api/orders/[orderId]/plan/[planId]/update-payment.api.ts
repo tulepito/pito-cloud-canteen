@@ -15,7 +15,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     switch (apiMethod) {
       case HttpMethod.PUT: {
         const { orderId, planId } = req.query;
-        console.info('[API-REQUEST]: update-payment.api.ts', req.query);
 
         if (isEmpty(orderId) || isEmpty(planId)) {
           return handleError(
@@ -36,7 +35,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         return handleError(res, new CustomError('Method not allowed', 405));
     }
   } catch (error) {
-    console.error('[API-ERROR]: update-payment.api.ts', error);
     handleError(res, error);
   }
 }

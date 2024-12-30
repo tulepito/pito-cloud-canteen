@@ -7,7 +7,6 @@ import difference from 'lodash/difference';
 import isEmpty from 'lodash/isEmpty';
 
 import Button from '@components/Button/Button';
-import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import { FieldDropdownSelectComponent } from '@components/FormFields/FieldDropdownSelect/FieldDropdownSelect';
 import { FieldTextAreaComponent } from '@components/FormFields/FieldTextArea/FieldTextArea';
 import IconAdd from '@components/Icons/IconAdd/IconAdd';
@@ -34,10 +33,8 @@ type TLineItemsTableProps = {
   currentViewDate: number;
   isDraftEditing?: boolean;
   ableToUpdateOrder?: boolean;
-  shouldShowOverflowError?: boolean;
-  shouldShowUnderError?: boolean;
-  minQuantity?: number;
   isAdminFlow?: boolean;
+  errorSection?: React.ReactNode;
 };
 
 const LineItemsTable: React.FC<TLineItemsTableProps> = (props) => {
@@ -45,10 +42,8 @@ const LineItemsTable: React.FC<TLineItemsTableProps> = (props) => {
     currentViewDate,
     isDraftEditing = false,
     ableToUpdateOrder = true,
-    shouldShowOverflowError = false,
-    shouldShowUnderError = false,
-    minQuantity = 1,
     isAdminFlow = false,
+    errorSection,
   } = props;
   const intl = useIntl();
   const dispatch = useAppDispatch();
@@ -297,11 +292,11 @@ const LineItemsTable: React.FC<TLineItemsTableProps> = (props) => {
     <div className={css.root}>
       <LineItemsTableComponent
         data={data}
+        inputDisabled={isDraftEditing}
         onModifyQuantity={handleModifyQuantity}
         ableToUpdateOrder={ableToUpdateOrder}
         isAdminFlow={isAdminFlow}
       />
-
       <form onSubmit={handleSubmit}>
         <div className={css.fieldContainer}>
           <label className={css.fieldLabel}>
@@ -309,18 +304,8 @@ const LineItemsTable: React.FC<TLineItemsTableProps> = (props) => {
           </label>
           {addFoodField}
         </div>
-        {shouldShowOverflowError && (
-          <ErrorMessage
-            className={css.error}
-            message={`Bạn đã vượt quá phần ăn tối đa của đối tác`}
-          />
-        )}
-        {shouldShowUnderError && (
-          <ErrorMessage
-            className={css.error}
-            message={`Cần đặt tối thiểu ${minQuantity} phần`}
-          />
-        )}
+
+        {errorSection}
 
         <div className={css.fieldContainer}>
           <label className={css.fieldLabel} htmlFor="LineItemsTable.note">

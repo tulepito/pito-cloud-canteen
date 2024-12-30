@@ -8,6 +8,7 @@ import ManageLineItemsSection from '@components/OrderDetails/EditView/ManageOrde
 import { checkMinMaxQuantityInPickingState } from '@helpers/order/orderPickingHelper';
 import { checkIsOrderHasInProgressState } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import OrderQuantityErrorSection from '@pages/company/orders/[orderId]/picking/OrderQuantityErrorSection';
 import { orderManagementThunks } from '@redux/slices/OrderManagement.slice';
 import { Listing } from '@src/utils/data';
 import { EOrderStates, EOrderType } from '@src/utils/enums';
@@ -115,7 +116,7 @@ const ManageFood: React.FC<TManageFoodProps> = (props) => {
       planReachMinRestaurantQuantityInPickingState,
   } = planValidations[currentViewDate as keyof typeof planValidations] || {};
 
-  const { minQuantity = 1 } =
+  const { minQuantity = 1, maxQuantity = 100 } =
     currentDraftOrderDetail?.[currentViewDate]?.restaurant || {};
 
   useEffect(() => {
@@ -129,6 +130,21 @@ const ManageFood: React.FC<TManageFoodProps> = (props) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [orderId]);
+
+  const errorSection = (
+    <OrderQuantityErrorSection
+      planReachMaxRestaurantQuantity={
+        planReachMaxRestaurantQuantityInProgressState ||
+        planReachMaxRestaurantQuantityInPickingState
+      }
+      planReachMinRestaurantQuantity={
+        planReachMinRestaurantQuantityInProgressState ||
+        planReachMinRestaurantQuantityInPickingState
+      }
+      maxQuantity={maxQuantity}
+      minQuantity={minQuantity}
+    />
+  );
 
   return (
     <div className={css.root}>
@@ -152,17 +168,9 @@ const ManageFood: React.FC<TManageFoodProps> = (props) => {
       <ManageLineItemsSection
         isDraftEditing
         ableToUpdateOrder={ableToUpdateOrder}
-        shouldShowOverflowError={
-          planReachMaxRestaurantQuantityInProgressState ||
-          planReachMaxRestaurantQuantityInPickingState
-        }
-        shouldShowUnderError={
-          planReachMinRestaurantQuantityInProgressState ||
-          planReachMinRestaurantQuantityInPickingState
-        }
+        errorSection={errorSection}
         setCurrentViewDate={setCurrentViewDate}
         currentViewDate={currentViewDate}
-        minQuantity={minQuantity}
         isAdminFlow
         unChangedRestaurantDayList={unChangedRestaurantDayList}
       />

@@ -2,12 +2,12 @@ import type {
   POSTUpdateStateBody,
   UpdateStateParams,
 } from '@pages/api/admin/listings/order/[orderId]/update-state.api';
+import type { PUTUpdateOrderDetailFromDraftBody } from '@pages/api/orders/[orderId]/update-order-detail-from-draft.api';
 import type { TObject } from '@utils/types';
 
 import type { TBodyParams } from './configs';
 import { deleteApi, getApi, postApi, putApi } from './configs';
 
-// Manage Order apis
 type TCreateBookerOrderApiBody = {
   companyId: string;
   bookerId: string;
@@ -210,8 +210,10 @@ export const recommendRestaurantApi = ({
     recommendParams,
   });
 };
-export const updateOrderDetailFromDraftApi = (orderId: string, body: TObject) =>
-  putApi(`/orders/${orderId}/update-order-detail-from-draft`, body);
+export const updateOrderDetailFromDraftApi = (
+  orderId: string,
+  body: PUTUpdateOrderDetailFromDraftBody,
+) => putApi(`/orders/${orderId}/update-order-detail-from-draft`, body);
 
 export const updatePaymentApi = (orderId: string, planId: string) =>
   putApi(`/orders/${orderId}/plan/${planId}/update-payment`);

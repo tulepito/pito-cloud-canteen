@@ -20,13 +20,11 @@ import css from './ManageLineItemsSection.module.scss';
 type TManageLineItemsSectionProps = {
   currentViewDate: number;
   isDraftEditing?: boolean;
-  shouldShowOverflowError?: boolean;
-  shouldShowUnderError?: boolean;
   setCurrentViewDate: (date: number) => void;
   ableToUpdateOrder?: boolean;
-  minQuantity?: number;
   isAdminFlow?: boolean;
   unChangedRestaurantDayList?: string[];
+  errorSection?: React.ReactNode;
 };
 
 const ManageLineItemsSection: React.FC<TManageLineItemsSectionProps> = (
@@ -37,11 +35,9 @@ const ManageLineItemsSection: React.FC<TManageLineItemsSectionProps> = (
     currentViewDate,
     setCurrentViewDate,
     ableToUpdateOrder = true,
-    shouldShowUnderError = false,
-    shouldShowOverflowError = false,
-    minQuantity = 0,
     isAdminFlow = false,
     unChangedRestaurantDayList = [],
+    errorSection,
   } = props;
 
   const intl = useIntl();
@@ -72,10 +68,8 @@ const ManageLineItemsSection: React.FC<TManageLineItemsSectionProps> = (
                 ableToUpdateOrder &&
                 !unChangedRestaurantDayList.includes(date.toString())
               }
-              shouldShowOverflowError={shouldShowOverflowError}
-              shouldShowUnderError={shouldShowUnderError}
-              minQuantity={minQuantity}
               isAdminFlow={isAdminFlow}
+              errorSection={errorSection}
             />
           </div>
         </div>

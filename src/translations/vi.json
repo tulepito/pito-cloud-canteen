@@ -1218,7 +1218,7 @@
   "MissingOrderModal.title": "Đã hết hạn chọn món!",
   "Modal.closeModal": "Đóng",
   "ModalReachMaxAllowedChanges.content": "Bạn đã thay đổi vượt mức quy định",
-  "ModalReachMaxAllowedChanges.content2": "(tối đa 10% số lượng người tham gia)",
+  "ModalReachMaxAllowedChanges.content2": "(tối đa {percent}% số lượng người tham gia)",
   "ModalReachMaxAllowedChanges.contentReachMin": "Cần đặt tối thiểu {minQuantity} phần",
   "MonthView.dayInWeekHeader.friday": "Thứ sáu",
   "MonthView.dayInWeekHeader.monday": "Thứ hai",

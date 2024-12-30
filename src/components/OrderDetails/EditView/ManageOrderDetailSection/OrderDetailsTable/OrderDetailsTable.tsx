@@ -14,18 +14,14 @@ import {
   OrderManagementsAction,
   orderManagementThunks,
 } from '@redux/slices/OrderManagement.slice';
-import type { TListing, TObject } from '@utils/types';
+import type { TObject } from '@utils/types';
 
 import AlertConfirmDeleteParticipant from '../../ManageParticipantsSection/AlertConfirmDeleteParticipant';
 import type { TEditOrderRowFormValues } from '../AddOrEditOrderDetail/EditOrderRowForm';
 import EditOrderRowModal from '../AddOrEditOrderDetail/EditOrderRowModal';
 import { usePrepareOrderDetailTableData } from '../hooks/usePrepareOrderDetailTableData';
 
-import {
-  checkShouldShowEditOrderWarningModal,
-  EOrderDetailsTableTab,
-  TABLE_TABS,
-} from './OrderDetailsTable.utils';
+import { EOrderDetailsTableTab, TABLE_TABS } from './OrderDetailsTable.utils';
 import { usePrepareTabItems } from './usePrepareTabItems';
 
 const tableTabList = Object.values(TABLE_TABS);
@@ -47,10 +43,6 @@ type TOrderDetailsTableProps = {
   ableToUpdateOrder: boolean;
   isDraftEditing: boolean;
   handleOpenReachMaxAllowedChangesModal?: (type: string) => void;
-  shouldShowOverflowError?: boolean;
-  minQuantity?: number;
-  maxQuantity?: number;
-  shouldShowUnderError?: boolean;
   isAdminFlow?: boolean;
 };
 
@@ -60,9 +52,6 @@ const OrderDetailsTable: React.FC<TOrderDetailsTableProps> = (props) => {
     foodOptions,
     ableToUpdateOrder,
     isDraftEditing,
-    handleOpenReachMaxAllowedChangesModal,
-    shouldShowOverflowError,
-    minQuantity,
     isAdminFlow = false,
   } = props;
   const {
@@ -85,15 +74,9 @@ const OrderDetailsTable: React.FC<TOrderDetailsTableProps> = (props) => {
     setTrue: turnOnDeleteParticipantModalOpen,
   } = useBoolean();
   const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
-  const planData = useAppSelector((state) => state.OrderManagement.planData);
 
-  const {
-    tableHeads,
-    packagePerMember,
-    allTabData,
-    deletedTabData,
-    currentOrderDetail,
-  } = usePrepareOrderDetailTableData(currentViewDate);
+  const { tableHeads, packagePerMember, allTabData, deletedTabData } =
+    usePrepareOrderDetailTableData(currentViewDate);
 
   const handleClickEditOrderItem =
     (tab: EOrderDetailsTableTab, memberId: string) => () => {
@@ -112,24 +95,6 @@ const OrderDetailsTable: React.FC<TOrderDetailsTableProps> = (props) => {
         allTabData[tab].find((item: TObject) => item.memberData.id === memberId)
           ?.memberData || {};
 
-      const { condition, type } = checkShouldShowEditOrderWarningModal(
-        planData as TListing,
-        currentViewDate,
-        memberId,
-        currentOrderDetail,
-        shouldShowOverflowError,
-        minQuantity,
-      );
-
-      if (
-        condition &&
-        type &&
-        tab !== EOrderDetailsTableTab.notChoose &&
-        handleOpenReachMaxAllowedChangesModal &&
-        isDraftEditing
-      ) {
-        return handleOpenReachMaxAllowedChangesModal(type);
-      }
       turnOnDeleteParticipantModalOpen();
 
       setWannaDeleteMember({ ...memberOrderData, tab });

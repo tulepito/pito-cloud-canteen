@@ -39,6 +39,7 @@ type TLineItemsTableComponentProps = {
   data: TObject;
   onModifyQuantity: (id: string, quantity: number) => () => void;
   ableToUpdateOrder: boolean;
+  inputDisabled?: boolean;
   isAdminFlow?: boolean;
 };
 
@@ -55,6 +56,7 @@ export const LineItemsTableComponent: React.FC<
   data = {},
   onModifyQuantity,
   ableToUpdateOrder,
+  inputDisabled,
   isAdminFlow = false,
 }) => {
   const intl = useIntl();
@@ -157,7 +159,7 @@ export const LineItemsTableComponent: React.FC<
                           name={foodId}
                           id={`${foodId}.quantity`}
                           type="number"
-                          disabled={actionDisabled}
+                          disabled={actionDisabled || inputDisabled}
                           className={css.quantityField}
                           inputClassName={css.quantityInput}
                           customOnBlur={handleBlurFoodQuantity}

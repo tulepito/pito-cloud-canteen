@@ -183,7 +183,7 @@ function BookerDraftOrderPage() {
   const {
     orderState,
     plans = [],
-    orderType = EOrderType.normal,
+    orderType,
     startDate: startDateTimestamp,
     endDate: endDateTimestamp,
     packagePerMember = 0,
@@ -523,13 +523,15 @@ function BookerDraftOrderPage() {
 
   return (
     <>
-      <BookerStepperDesktopSection>
-        <Stepper
-          className={css.stepperContainerDesktop}
-          steps={_steps}
-          currentStep={isSetupMode ? 1 : 2}
-        />
-      </BookerStepperDesktopSection>
+      {!!_steps.length && (
+        <BookerStepperDesktopSection>
+          <Stepper
+            className={css.stepperContainerDesktop}
+            steps={_steps}
+            currentStep={isSetupMode ? 1 : 2}
+          />
+        </BookerStepperDesktopSection>
+      )}
       <WalkThroughTourProvider
         onCloseTour={handleCloseWalkThrough}
         isMobileLayout={!isTabletLayoutOrLarger}>

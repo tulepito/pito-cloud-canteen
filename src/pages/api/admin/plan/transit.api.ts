@@ -21,6 +21,7 @@ import {
 import { createFirebaseDocNotification } from '@services/notifications';
 import adminChecker from '@services/permissionChecker/admin';
 import { getIntegrationSdk, handleError } from '@services/sdk';
+import { createSlackNotification } from '@services/slackNotification';
 import {
   denormalisedResponseEntities,
   Listing,
@@ -32,6 +33,7 @@ import {
   ENativeNotificationType,
   ENotificationType,
   EQuotationStatus,
+  ESlackNotificationType,
 } from '@src/utils/enums';
 import { isTransactionsTransitionInvalidTransition } from '@src/utils/errors';
 import { ETransition } from '@src/utils/transaction';
@@ -105,6 +107,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           bookerId,
         } = orderListing.getMetadata();
         const { title: orderTitle } = orderListing.getAttributes();
+        const { orderName } = orderListing.getPublicData();
         const generalNotificationData = {
           orderId,
           orderTitle,
@@ -252,7 +255,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           case ETransition.OPERATOR_CANCEL_AFTER_PARTNER_CONFIRMED:
           case ETransition.OPERATOR_CANCEL_AFTER_PARTNER_REJECTED: {
             logger.info('Operator cancel plan', String(participantIds));
-            // TODO:  send email notification to booker
+
             emailSendingFactory(
               EmailTemplateTypes.BOOKER.BOOKER_SUB_ORDER_CANCELED,
               {
@@ -260,7 +263,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
                 timestamp,
               },
             );
-            // TODO: send email notification to participants and create native notifications
+
             [...participantIds, ...anonymous].forEach(
               (participantId: string) => {
                 const { foodId } = memberOrders[participantId] || {};
@@ -286,7 +289,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
               },
             );
 
-            // push notification when order from inprogress to cancel
             await pushNativeNotificationSubOrderDate(
               restaurantId,
               String(startTimestamp),
@@ -313,7 +315,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
               },
             );
 
-            // TODO: create new quotation
             const quotation = await fetchListing(quotationId);
             const quotationListing = Listing(quotation);
             const { client, partner } = quotationListing.getMetadata();
@@ -343,7 +344,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
               client: newClient,
               partner: newPartner,
             });
-            console.log('run here');
+
             createFirebaseDocNotification(
               ENotificationType.BOOKER_SUB_ORDER_CANCELLED,
               {
@@ -352,7 +353,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
                 subOrderDate: startTimestamp,
               },
             );
-            // TODO: update all payments records
+
             await Promise.allSettled([
               modifyPaymentWhenCancelSubOrderService({
                 order,
@@ -370,6 +371,17 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
                 },
               ),
             ]);
+
+            createSlackNotification(ESlackNotificationType.SUB_ORDER_CANCELED, {
+              subOrderCanceledData: {
+                orderLink: `${process.env.NEXT_PUBLIC_CANONICAL_URL}/admin/order/${orderId}`,
+                orderCode: orderTitle,
+                orderName,
+                date: convertDateToVNTimezone(new Date(startTimestamp)).split(
+                  'T',
+                )[0],
+              },
+            });
             break;
           }
 

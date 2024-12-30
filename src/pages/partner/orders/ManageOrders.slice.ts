@@ -183,7 +183,7 @@ const PartnerManageOrdersSlice = createSlice({
         const { perPage } = pagination;
         const { orders: orderList, restaurantId } = payload;
 
-        const subOrderList = (orderList as TObject[]).reduce<TObject[]>(
+        const subOrderList = ((orderList || []) as TObject[]).reduce<TObject[]>(
           (result, curr) => {
             const { plan, quotation } = curr || {};
             const orderGetter = Listing(curr as TListing);

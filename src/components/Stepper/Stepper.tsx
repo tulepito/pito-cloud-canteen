@@ -76,6 +76,10 @@ const Stepper: React.FC<TStepperProps> = ({
     };
   }, [calculateStepWidth, steps]);
 
+  if (!steps || steps.length === 0) {
+    return null;
+  }
+
   return (
     <div className={classes} ref={rootRef}>
       <div className={css.stepContainer}>

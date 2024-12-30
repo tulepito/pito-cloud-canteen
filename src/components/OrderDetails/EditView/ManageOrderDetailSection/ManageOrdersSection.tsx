@@ -6,7 +6,6 @@ import isEmpty from 'lodash/isEmpty';
 import { useRouter } from 'next/router';
 
 import Button from '@components/Button/Button';
-import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import IconAdd from '@components/Icons/IconAdd/IconAdd';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import SlideModal from '@components/SlideModal/SlideModal';
@@ -37,10 +36,8 @@ type TManageOrdersSectionProps = {
   setCurrentViewDate: (date: number) => void;
   isDraftEditing: boolean;
   handleOpenReachMaxAllowedChangesModal?: (type: string) => void;
-  planReachMaxCanModify?: boolean;
-  planReachMaxRestaurantQuantity?: boolean;
-  planReachMinRestaurantQuantity?: boolean;
   isAdminFlow?: boolean;
+  errorSection?: React.ReactNode;
 };
 
 const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
@@ -50,10 +47,8 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
     setCurrentViewDate,
     isDraftEditing,
     handleOpenReachMaxAllowedChangesModal,
-    planReachMaxCanModify,
-    planReachMaxRestaurantQuantity,
-    planReachMinRestaurantQuantity,
     isAdminFlow = false,
+    errorSection,
   } = props;
 
   const dispatch = useAppDispatch();
@@ -117,12 +112,10 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
       memberOptions={memberOptions}
       ableToUpdateOrder={ableToUpdateOrder}
       isDraftEditing={isDraftEditing}
-      planReachMaxRestaurantQuantity={planReachMaxRestaurantQuantity}
-      planReachMinRestaurantQuantity={planReachMinRestaurantQuantity}
-      planReachMaxCanModify={planReachMaxCanModify}
       maxQuantity={maxQuantity}
       minQuantity={minQuantity}
       currentViewDate={currentViewDate}
+      errorSection={errorSection}
     />
   );
 
@@ -146,33 +139,11 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
             handleOpenReachMaxAllowedChangesModal={
               handleOpenReachMaxAllowedChangesModal
             }
-            shouldShowOverflowError={
-              planReachMaxRestaurantQuantity || planReachMaxCanModify
-            }
-            minQuantity={minQuantity}
-            maxQuantity={maxQuantity}
             isAdminFlow={isAdminFlow}
           />
           <div className={css.addOrder}>
             <div className={css.mobileSection}>
-              {planReachMaxCanModify && (
-                <ErrorMessage
-                  className={css.error}
-                  message={`Bạn đã thay đổi vượt mức quy định (tối đa 10% số lượng người tham gia)`}
-                />
-              )}
-              {planReachMaxRestaurantQuantity && (
-                <ErrorMessage
-                  className={css.error}
-                  message={`Bạn đã đặt vượt mức tối đa (${maxQuantity} phần)`}
-                />
-              )}
-              {planReachMinRestaurantQuantity && (
-                <ErrorMessage
-                  className={css.error}
-                  message={`Cần đặt tối thiểu ${minQuantity} phần`}
-                />
-              )}
+              {errorSection}
 
               <Button
                 variant="inline"

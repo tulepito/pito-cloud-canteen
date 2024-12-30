@@ -462,6 +462,12 @@ export enum ESlackNotificationType {
   CREATE_NEW_FOOD = 'createNewFood',
   UPDATE_FOOD = 'updateFood',
   ORDER_STATUS_CHANGES_TO_IN_PROGRESS = 'orderStatusChangesToInProgress',
+  PARTICIPANT_GROUP_ORDER_FOOD_CHANGED = 'participantGroupOrderFoodChanged',
+  PARTICIPANT_NORMAL_ORDER_FOOD_CHANGED = 'participantNormalOrderFoodChanged',
+  SUB_ORDER_CANCELED = 'subOrderCanceled',
+  RESTAURANT_CHANGED = 'restaurantChanged',
+  PARTNER_CONFIRMS_SUB_ORDER = 'partnerConfirmsSubOrder',
+  PARTNER_REJECTS_SUB_ORDER = 'partnerRejectsSubOrder',
 }
 
 export enum QuizStep {

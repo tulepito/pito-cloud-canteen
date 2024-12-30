@@ -13,7 +13,7 @@ type ParticipantOrderPickingParams = {
 export const participantOrderPickingSubject = (orderName: string) =>
   `Chọn món cho Tuần ăn ${orderName}`;
 
-const buildFullName = (
+export const buildFullName = (
   firstName?: string,
   lastName?: string,
   options?: {
