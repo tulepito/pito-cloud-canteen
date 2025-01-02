@@ -120,7 +120,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
         const booker = await fetchUser(bookerId);
 
-        const { orderDetail = {} } = planListing.getMetadata();
+        const { orderDetail = {}, slackThreadTs } = planListing.getMetadata();
         const { memberOrders = {}, restaurant = {} } =
           orderDetail[startTimestamp];
         const { foodList = {} } = restaurant;
@@ -374,6 +374,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
             createSlackNotification(ESlackNotificationType.SUB_ORDER_CANCELED, {
               subOrderCanceledData: {
+                threadTs: slackThreadTs,
                 orderLink: `${process.env.NEXT_PUBLIC_CANONICAL_URL}/admin/order/${orderId}`,
                 orderCode: orderTitle,
                 orderName,

@@ -2,16 +2,18 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HttpMethod } from '@apis/configs';
 import { convertDateToVNTimezone } from '@helpers/dateHelpers';
+import logger from '@helpers/logger';
 import { pushNotificationOrderDetailChanged } from '@pages/api/helpers/orderDetailHelper';
 import { denormalisedResponseEntities } from '@services/data';
 import { fetchUserListing } from '@services/integrationHelper';
-import { getIntegrationSdk, handleError } from '@services/sdk';
+import { getIntegrationSdk, getSdk, handleError } from '@services/sdk';
 import { createSlackNotification } from '@services/slackNotification';
 import type {
   FoodListing,
   OrderDetail,
   OrderListing,
   PlanListing,
+  UserListing,
   WithFlexSDKData,
 } from '@src/types';
 import { Listing } from '@src/utils/data';
@@ -52,8 +54,10 @@ export type DifferentOrderDetail = {
 
 const sendParticipantChangedGroupOrderFoodsSlackNotification = async (
   orderListing: OrderListing,
+  planListing: PlanListing,
   newOrderDetail: OrderDetail,
   oldOrderDetail: OrderDetail,
+  by: 'admin' | 'booker',
 ) => {
   const diffentOrderDetail = await Object.keys(newOrderDetail).reduce(
     async (accPromise, date) => {
@@ -191,6 +195,8 @@ const sendParticipantChangedGroupOrderFoodsSlackNotification = async (
     ESlackNotificationType.PARTICIPANT_GROUP_ORDER_FOOD_CHANGED,
     {
       participantGroupOrderFoodChangedData: {
+        by,
+        threadTs: planListing.attributes?.metadata?.slackThreadTs!,
         orderCode: orderListing.attributes?.title!,
         orderLink: `${process.env.NEXT_PUBLIC_CANONICAL_URL}/admin/order/${orderListing.id?.uuid}`,
         orderName: orderListing.attributes?.publicData?.orderName!,
@@ -229,8 +235,10 @@ const sendParticipantChangedGroupOrderFoodsSlackNotification = async (
 
 const sendParticipantChangedNormalOrderFoodsSlackNotification = async (
   orderListing: OrderListing,
+  planListing: PlanListing,
   newOrderDetail: OrderDetail,
   oldOrderDetail: OrderDetail,
+  by: 'admin' | 'booker',
 ) => {
   const diffentOrderDetail = Object.keys(newOrderDetail).reduce((acc, date) => {
     const newLineItems = newOrderDetail[date]?.lineItems;
@@ -289,6 +297,8 @@ const sendParticipantChangedNormalOrderFoodsSlackNotification = async (
     ESlackNotificationType.PARTICIPANT_NORMAL_ORDER_FOOD_CHANGED,
     {
       participantNormalOrderFoodChangedData: {
+        by,
+        threadTs: planListing.attributes?.metadata?.slackThreadTs!,
         orderCode: orderListing.attributes?.title!,
         orderLink: `${process.env.NEXT_PUBLIC_CANONICAL_URL}/admin/order/${orderListing.id?.uuid}`,
         orderName: orderListing.attributes?.publicData?.orderName!,
@@ -334,6 +344,11 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   switch (apiMethod) {
     case HttpMethod.PUT:
       try {
+        const sdk = getSdk(req, res);
+
+        const currentUser: WithFlexSDKData<UserListing> =
+          await sdk.currentUser.show();
+
         const { planId, orderDetail } =
           req.body as PUTUpdateOrderDetailFromDraftBody;
         const { orderId } = req.query;
@@ -355,7 +370,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             id: orderId,
           });
 
-        const planListing: WithFlexSDKData<PlanListing> =
+        const planListingResponse: WithFlexSDKData<PlanListing> =
           await integrationSdk.listings.update({
             id: planId,
             metadata: {
@@ -383,16 +398,24 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           if (orderType === EOrderType.group) {
             sendParticipantChangedGroupOrderFoodsSlackNotification(
               orderListingResponse.data.data,
+              oldPlanListing.data.data,
               orderDetail,
               oldOrderDetail,
+              currentUser.data.data.attributes?.profile?.metadata?.isAdmin
+                ? 'admin'
+                : 'booker',
             );
           }
 
           if (orderType === EOrderType.normal) {
             sendParticipantChangedNormalOrderFoodsSlackNotification(
               orderListingResponse.data.data,
+              oldPlanListing.data.data,
               orderDetail,
               oldOrderDetail,
+              currentUser.data.data.attributes?.profile?.metadata?.isAdmin
+                ? 'admin'
+                : 'booker',
             );
           }
         }
@@ -427,9 +450,13 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         res.json({
           statusCode: 200,
           message: `Successfully update plan from draft plan, planId: ${planId}`,
-          planListing: denormalisedResponseEntities(planListing)[0],
+          planListing: denormalisedResponseEntities(planListingResponse)[0],
         });
       } catch (error) {
+        logger.error(
+          'Error when update order detail from draft:',
+          String(error),
+        );
         handleError(res, error);
       }
       break;

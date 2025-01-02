@@ -64,6 +64,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             ESlackNotificationType.PARTNER_CONFIRMS_SUB_ORDER,
             {
               partnerConfirmsSubOrderData: {
+                threadTs: plan.attributes?.metadata?.slackThreadTs!,
                 orderLink: `${process.env.NEXT_PUBLIC_CANONICAL_URL}/admin/order/${orderId}`,
                 orderName: order.attributes?.publicData?.orderName!,
                 orderCode: order.attributes?.title!,
@@ -83,6 +84,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             ESlackNotificationType.PARTNER_REJECTS_SUB_ORDER,
             {
               partnerRejectsSubOrderData: {
+                threadTs: plan.attributes?.metadata?.slackThreadTs!,
                 orderLink: `${process.env.NEXT_PUBLIC_CANONICAL_URL}/admin/order/${orderId}`,
                 orderName: order.attributes?.publicData?.orderName!,
                 orderCode: order.attributes?.title!,

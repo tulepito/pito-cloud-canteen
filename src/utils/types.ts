@@ -697,6 +697,7 @@ export type TOrderChangeHistoryItem = {
 export type TSubOrderChangeHistoryItem = {
   id?: string | number;
   authorId?: string;
+  authorRole?: 'admin' | 'booker';
   createdAt?: any;
   memberId?: string;
   member?: {

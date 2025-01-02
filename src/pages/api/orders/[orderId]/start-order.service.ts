@@ -90,7 +90,7 @@ export const startOrder = async (orderId: string, planId: string) => {
   if (!isOrderHasStartedSnapshot) {
     logger.debug(
       'Order has started snapshot',
-      oldPlan.data.data.attributes?.metadata?.orderDetail,
+      JSON.stringify(oldPlan.data.data.attributes?.metadata?.orderDetail),
     );
 
     orderDetailStartedSnapshot =
@@ -150,6 +150,7 @@ export const startOrder = async (orderId: string, planId: string) => {
           deliveryHour: orderListing.attributes?.metadata?.deliveryHour!,
           deliveryAddress:
             orderListing.attributes?.metadata?.deliveryAddress?.address!,
+          planId,
         },
       },
     );

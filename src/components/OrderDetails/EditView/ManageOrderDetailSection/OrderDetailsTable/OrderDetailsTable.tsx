@@ -1,5 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @typescript-eslint/no-shadow */
 import { useEffect, useState } from 'react';
 import isEmpty from 'lodash/isEmpty';
 import { useRouter } from 'next/router';

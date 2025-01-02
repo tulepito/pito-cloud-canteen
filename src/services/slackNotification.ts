@@ -25,8 +25,11 @@ type SlackNotificationParams = {
     deliveryHour: string;
     deliveryAddress: string;
     orderCode: string;
+    planId: string;
   };
   participantGroupOrderFoodChangedData?: {
+    by: 'admin' | 'booker';
+    threadTs: string;
     orderLink: string;
     orderCode: string;
     orderName: string;
@@ -41,6 +44,8 @@ type SlackNotificationParams = {
     }[];
   };
   participantNormalOrderFoodChangedData?: {
+    by: 'admin' | 'booker';
+    threadTs: string;
     orderLink: string;
     orderCode: string;
     orderName: string;
@@ -53,12 +58,14 @@ type SlackNotificationParams = {
     }[];
   };
   subOrderCanceledData?: {
+    threadTs: string;
     orderLink: string;
     orderCode: string;
     orderName: string;
     date: string;
   };
   restaurantChangedData?: {
+    threadTs: string;
     orderLink: string;
     orderCode: string;
     orderName: string;
@@ -69,6 +76,7 @@ type SlackNotificationParams = {
     }[];
   };
   partnerConfirmsSubOrderData?: {
+    threadTs: string;
     orderLink: string;
     orderCode: string;
     orderName: string;
@@ -76,6 +84,7 @@ type SlackNotificationParams = {
     partnerName: string;
   };
   partnerRejectsSubOrderData?: {
+    threadTs: string;
     orderLink: string;
     orderCode: string;
     orderName: string;
@@ -93,7 +102,9 @@ export const createSlackNotification = async (
   try {
     logger.info(
       'createSlackNotification',
-      `notificationType: ${notificationType}`,
+      `notificationType: ${notificationType} ${JSON.stringify(
+        notificationParams,
+      )}`,
     );
     switch (notificationType) {
       case ESlackNotificationType.CREATE_NEW_FOOD:
@@ -131,7 +142,7 @@ export const createSlackNotification = async (
                 type: 'section',
                 text: {
                   type: 'mrkdwn',
-                  text: `:firecracker::firecracker::firecracker: Bạn có đơn hàng đang triển khai:\n*<${notificationParams.orderStatusChangesToInProgressData.orderLink}|#${notificationParams.orderStatusChangesToInProgressData.orderCode} - ${notificationParams.orderStatusChangesToInProgressData.orderName}>*`,
+                  text: `<!channel> :firecracker::firecracker::firecracker: Bạn có đơn hàng đang triển khai:\n*<${notificationParams.orderStatusChangesToInProgressData.orderLink}|#${notificationParams.orderStatusChangesToInProgressData.orderCode} - ${notificationParams.orderStatusChangesToInProgressData.orderName}>*`,
                 },
               },
               {
@@ -157,6 +168,14 @@ export const createSlackNotification = async (
                 ],
               },
             ],
+            metadata: {
+              event_type:
+                ESlackNotificationType.ORDER_STATUS_CHANGES_TO_IN_PROGRESS,
+              event_payload: {
+                plan_id:
+                  notificationParams.orderStatusChangesToInProgressData.planId,
+              },
+            },
           },
           {
             headers: {
@@ -175,12 +194,24 @@ export const createSlackNotification = async (
         await axios.post(
           process.env.SLACK_WEBHOOK_URL,
           {
+            thread_ts: participantGroupOrderFoodChangedData.threadTs,
             blocks: [
               {
                 type: 'section',
                 text: {
                   type: 'mrkdwn',
-                  text: `:gear::gear::gear: Đơn hàng có thay đổi khi đang diễn ra:\n*<${participantGroupOrderFoodChangedData.orderLink}|#${participantGroupOrderFoodChangedData.orderCode} - ${participantGroupOrderFoodChangedData.orderName}>*`,
+                  text: `<!here> :gear::gear::gear: Đơn hàng có thay đổi khi đang diễn ra:\n*<${participantGroupOrderFoodChangedData.orderLink}|#${participantGroupOrderFoodChangedData.orderCode} - ${participantGroupOrderFoodChangedData.orderName}>*`,
+                },
+              },
+              {
+                type: 'section',
+                text: {
+                  type: 'mrkdwn',
+                  text: `:person_in_tuxedo: Người thay đổi\n*${
+                    participantGroupOrderFoodChangedData.by === 'admin'
+                      ? 'Admin'
+                      : 'Booker'
+                  }*`,
                 },
               },
               ...participantGroupOrderFoodChangedData.changes.map((change) => {
@@ -189,25 +220,18 @@ export const createSlackNotification = async (
                   fields: [
                     {
                       type: 'mrkdwn',
-                      text: `:person_in_tuxedo: Participant\n*${change.participantName}*`,
+                      text: `[${change.date}] :person_in_tuxedo: Participant *${
+                        change.participantName
+                      }*\n${
+                        (change.type === 'remove' &&
+                          `:x: Xóa phần ăn *${change.removeFoodName}*`) ||
+                        (change.type === 'add' &&
+                          `:large_green_square: Thêm phần ăn *${change.addFoodName}*`) ||
+                        (change.type === 'update' &&
+                          `:pencil: Thay đổi từ *${change.fromFoodName}* thành *${change.toFoodName}*`) ||
+                        ''
+                      }`,
                     },
-                    {
-                      type: 'mrkdwn',
-                      text: `:clock1: Ngày\n*${change.date}*`,
-                    },
-                    (change.type === 'remove' && {
-                      type: 'mrkdwn',
-                      text: `:x: Xóa phần ăn *${change.removeFoodName}*`,
-                    }) ||
-                      (change.type === 'add' && {
-                        type: 'mrkdwn',
-                        text: `:large_green_square: Thêm phần ăn\n*${change.addFoodName}*`,
-                      }) ||
-                      (change.type === 'update' && {
-                        type: 'mrkdwn',
-                        text: `:pencil: Thay đổi từ *${change.fromFoodName}* thành *${change.toFoodName}*`,
-                      }) ||
-                      {},
                   ],
                 };
               }),
@@ -235,7 +259,18 @@ export const createSlackNotification = async (
                 type: 'section',
                 text: {
                   type: 'mrkdwn',
-                  text: `:gear::gear::gear: Đơn hàng có thay đổi khi đang diễn ra:\n*<${participantNormalOrderFoodChangedData.orderLink}|#${participantNormalOrderFoodChangedData.orderCode} - ${participantNormalOrderFoodChangedData.orderName}>*`,
+                  text: `<!here> :gear::gear::gear: Đơn hàng có thay đổi khi đang diễn ra:\n*<${participantNormalOrderFoodChangedData.orderLink}|#${participantNormalOrderFoodChangedData.orderCode} - ${participantNormalOrderFoodChangedData.orderName}>*`,
+                },
+              },
+              {
+                type: 'section',
+                text: {
+                  type: 'mrkdwn',
+                  text: `:person_in_tuxedo: Người thay đổi\n*${
+                    participantNormalOrderFoodChangedData?.by === 'admin'
+                      ? 'Admin'
+                      : 'Booker'
+                  }*`,
                 },
               },
               ...participantNormalOrderFoodChangedData.changes.map((change) => {
@@ -244,7 +279,7 @@ export const createSlackNotification = async (
                   fields: [
                     {
                       type: 'mrkdwn',
-                      text: `:clock1: Ngày\n*${change.date}*`,
+                      text: `[${change.date}]`,
                     },
                     (change.type === 'remove' && {
                       type: 'mrkdwn',
@@ -286,7 +321,7 @@ export const createSlackNotification = async (
                 type: 'section',
                 text: {
                   type: 'mrkdwn',
-                  text: `:truck::truck::truck: Đơn hàng đã thay đổi nhà hàng:\n*<${restaurantChangedData.orderLink}|#${restaurantChangedData.orderCode} - ${restaurantChangedData.orderName}>*`,
+                  text: `<!here> :truck::truck::truck: Đơn hàng đã thay đổi nhà hàng:\n*<${restaurantChangedData.orderLink}|#${restaurantChangedData.orderCode} - ${restaurantChangedData.orderName}>*`,
                 },
               },
               ...restaurantChangedData.changes.map((change) => {
@@ -331,7 +366,7 @@ export const createSlackNotification = async (
                 type: 'section',
                 text: {
                   type: 'mrkdwn',
-                  text: `:x::x::x: Sub đơn bị hủy:\n*<${subOrderCanceledData.orderLink}|#${subOrderCanceledData.orderCode} - ${subOrderCanceledData.orderName}>*`,
+                  text: `<!here> :x::x::x: Sub đơn bị hủy:\n*<${subOrderCanceledData.orderLink}|#${subOrderCanceledData.orderCode} - ${subOrderCanceledData.orderName}>*`,
                 },
               },
               {
@@ -366,7 +401,7 @@ export const createSlackNotification = async (
                 type: 'section',
                 text: {
                   type: 'mrkdwn',
-                  text: `:white_check_mark::white_check_mark::white_check_mark: Đối tác đã xác nhận sub đơn:\n*<${partnerConfirmsSubOrderData.orderLink}|#${partnerConfirmsSubOrderData.orderCode} - ${partnerConfirmsSubOrderData.orderName}>*`,
+                  text: `<!here> :white_check_mark::white_check_mark::white_check_mark: Đối tác đã xác nhận sub đơn:\n*<${partnerConfirmsSubOrderData.orderLink}|#${partnerConfirmsSubOrderData.orderCode} - ${partnerConfirmsSubOrderData.orderName}>*`,
                 },
               },
               {
@@ -405,7 +440,7 @@ export const createSlackNotification = async (
                 type: 'section',
                 text: {
                   type: 'mrkdwn',
-                  text: `:x::x::x: Đối tác đã từ chối sub đơn:\n*<${partnerRejectsSubOrderData.orderLink}|#${partnerRejectsSubOrderData.orderCode} - ${partnerRejectsSubOrderData.orderName}>*`,
+                  text: `<!here> :x::x::x: Đối tác đã từ chối sub đơn:\n*<${partnerRejectsSubOrderData.orderLink}|#${partnerRejectsSubOrderData.orderCode} - ${partnerRejectsSubOrderData.orderName}>*`,
                 },
               },
               {

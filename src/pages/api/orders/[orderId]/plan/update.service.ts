@@ -16,6 +16,7 @@ import { getInitMemberOrder } from './memberOrder.helper';
 
 const sendRestaurantChangedSlackNotification = async (
   orderListing: OrderListing,
+  planListing: PlanListing,
   newOrderDetail: OrderDetail,
 ) => {
   const differentOrderDetail = Object.keys(newOrderDetail).reduce(
@@ -53,6 +54,7 @@ const sendRestaurantChangedSlackNotification = async (
 
   createSlackNotification(ESlackNotificationType.RESTAURANT_CHANGED, {
     restaurantChangedData: {
+      threadTs: planListing.attributes?.metadata?.slackThreadTs!,
       orderName: orderListing.attributes?.publicData?.orderName!,
       orderLink: `${process.env.NEXT_PUBLIC_CANONICAL_URL}/admin/order/${orderListing.id?.uuid}`,
       orderCode: orderListing.attributes?.title!,
@@ -197,7 +199,11 @@ const updatePlan = async ({
     const planListing: PlanListing =
       denormalisedResponseEntities(planListingResponse)[0];
 
-    sendRestaurantChangedSlackNotification(orderListing, normalizeDetail);
+    sendRestaurantChangedSlackNotification(
+      orderListing,
+      planListing,
+      normalizeDetail,
+    );
 
     return planListing;
   }

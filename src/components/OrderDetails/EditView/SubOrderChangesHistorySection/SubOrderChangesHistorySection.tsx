@@ -25,7 +25,14 @@ type TSubOrderChangesHistorySectionProps = {
 const LIST_BOTTOM_ID = 'bottom-item';
 
 const SubOrderChangesHistoryItem = (props: TSubOrderChangeHistoryItem) => {
-  const { type, newValue = {}, oldValue = {}, member, createdAt } = props;
+  const {
+    type,
+    newValue = {},
+    oldValue = {},
+    member,
+    createdAt,
+    authorRole,
+  } = props;
   const intl = useIntl();
   const createdDate = formatTimestamp(
     createdAt?.seconds * 1000,
@@ -176,7 +183,14 @@ const SubOrderChangesHistoryItem = (props: TSubOrderChangeHistoryItem) => {
 
   return (
     <div className={css.item}>
-      <div className={css.itemTitle}>{itemContent().title}</div>
+      <div className={css.itemTitle}>
+        {authorRole === 'admin'
+          ? '[Admin] '
+          : authorRole === 'booker'
+          ? '[Booker] '
+          : ''}
+        {itemContent().title}
+      </div>
       <div className={css.itemContent}>{itemContent().content}</div>
       <div className={css.itemContent}>{createdDate}</div>
     </div>

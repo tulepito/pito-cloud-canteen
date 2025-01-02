@@ -5,6 +5,7 @@ import orderServices from '@pages/api/apiServices/order/index.service';
 import cookies from '@services/cookie';
 import { fetchUser } from '@services/integrationHelper';
 import { getCurrentUser, handleError } from '@services/sdk';
+import type { UserListing } from '@src/types';
 import { CurrentUser, User } from '@src/utils/data';
 
 const showUserMaybe = (id: string) => {
@@ -24,14 +25,21 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         try {
           const { planId } = req.query;
           const createData = req.body;
-          const { currentUser } = await getCurrentUser(req, res);
+          const {
+            currentUser,
+          }: {
+            currentUser: UserListing;
+          } = await getCurrentUser(req, res);
           const createdAt = createData?.createdAt
             ? new Date(createData.createdAt)
             : new Date();
           const response =
             await orderServices.createSubOrderHistoryRecordToFirestore({
               planId,
-              authorId: CurrentUser(currentUser).getId(),
+              authorId: CurrentUser(currentUser as any).getId(),
+              authorRole: currentUser.attributes?.profile?.metadata?.isAdmin
+                ? 'admin'
+                : 'booker',
               ...createData,
               createdAt,
             });

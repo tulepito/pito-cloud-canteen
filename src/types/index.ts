@@ -121,6 +121,7 @@ export type PlanListing = ListingBuilder<
     orderId: string;
     partnerIds: string[];
     planStarted: boolean;
+    slackThreadTs: string;
   },
   {},
   {}

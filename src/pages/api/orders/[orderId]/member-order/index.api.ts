@@ -4,9 +4,10 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HttpMethod } from '@apis/configs';
 import { convertDateToVNTimezone } from '@helpers/dateHelpers';
+import logger from '@helpers/logger';
 import { denormalisedResponseEntities } from '@services/data';
 import { fetchListing, fetchUserListing } from '@services/integrationHelper';
-import { getIntegrationSdk, handleError } from '@services/sdk';
+import { getIntegrationSdk, getSdk, handleError } from '@services/sdk';
 import { createSlackNotification } from '@services/slackNotification';
 import type {
   FoodListing,
@@ -92,8 +93,10 @@ const mappingOrderDetailsToOrderAndTransaction = async (
 
 const sendParticipantFoodChangeSlackNotification = async (
   orderListing: OrderListing,
+  planListing: PlanListing,
   newMembersOrderValues: NewMembersOrderValues,
   currentDate: number,
+  by: 'admin' | 'booker',
 ) => {
   const diffentOrderDetail = await Object.keys(
     newMembersOrderValues || {},
@@ -138,7 +141,9 @@ const sendParticipantFoodChangeSlackNotification = async (
   createSlackNotification(
     ESlackNotificationType.PARTICIPANT_GROUP_ORDER_FOOD_CHANGED,
     {
-      participantNormalOrderFoodChangedData: {
+      participantGroupOrderFoodChangedData: {
+        by,
+        threadTs: planListing.attributes?.metadata?.slackThreadTs!,
         orderCode: orderListing.attributes?.title!,
         orderLink: `${process.env.NEXT_PUBLIC_CANONICAL_URL}/admin/order/${orderListing.id?.uuid}`,
         orderName: orderListing.attributes?.publicData?.orderName!,
@@ -208,11 +213,14 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           anonymous = [],
         } = req.body as PUTMemberOrderBody;
 
+        const sdk = getSdk(req, res);
+        const currentUser = await sdk.currentUser.show();
+
         const currentPlan: PlanListing = await fetchListing(planId);
         const currentPlanListing = Listing(currentPlan as TListing);
         const { orderDetail = {} } = currentPlanListing.getMetadata();
 
-        const orderListing: WithFlexSDKData<OrderListing> =
+        const orderListingResponse: WithFlexSDKData<OrderListing> =
           await integrationSdk.listings.show({
             id: currentPlan.attributes?.metadata?.orderId,
           });
@@ -246,17 +254,20 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         const [planListing] = denormalisedResponseEntities(response);
 
         if (
-          orderListing.data.data.attributes?.metadata?.orderState ===
+          orderListingResponse.data.data.attributes?.metadata?.orderState ===
           EOrderStates.inProgress
         ) {
           sendParticipantFoodChangeSlackNotification(
-            orderListing.data.data,
+            orderListingResponse.data.data,
+            planListing,
             newMembersOrderValues,
             currentViewDate,
+            currentUser.data.data.attributes?.profile?.metadata?.isAdmin
+              ? 'admin'
+              : 'booker',
           );
         }
 
-        // Update order and transaction metadata without waiting for response
         mappingOrderDetailsToOrderAndTransaction(planListing, anonymous);
 
         res.json({
@@ -265,6 +276,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           planListing,
         });
       } catch (error) {
+        logger.error('Error when updating member order', String(error));
         handleError(res, error);
       }
       break;
