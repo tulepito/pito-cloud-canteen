@@ -1,5 +1,3 @@
-/* eslint-disable no-underscore-dangle */
-/* eslint-disable @typescript-eslint/naming-convention */
 import isEmpty from 'lodash/isEmpty';
 import { DateTime } from 'luxon';
 
