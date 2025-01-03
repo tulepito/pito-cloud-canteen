@@ -175,21 +175,33 @@ exports.handler = async (_event) => {
               allergies,
             );
 
-            newMemberOrderResult[memberId] = {
-              ...newMemberOrderResult[memberId],
-              foodId: suitableFood.id.uuid,
-              status: EParticipantOrderStatus.joined,
-            };
+            if (suitableFood) {
+              newMemberOrderResult[memberId] = {
+                ...newMemberOrderResult[memberId],
+                foodId: suitableFood?.id?.uuid,
+                status: EParticipantOrderStatus.joined,
+              };
 
-            console.log(
-              `LOG ~ Pick food for user`,
-              memberId,
-              suitableFood.id.uuid,
-              'at',
-              new Date(subOrderDate).toLocaleString('en-US', {
-                timeZone: 'Asia/Ho_Chi_Minh',
-              }),
-            );
+              console.log(
+                `LOG ~ Pick food for user`,
+                memberId,
+                suitableFood?.id?.uuid,
+                'at',
+                new Date(+subOrderDate).toLocaleString('en-US', {
+                  timeZone: 'Asia/Ho_Chi_Minh',
+                }),
+              );
+            } else {
+              newMemberOrderResult[memberId] = memberOrders[memberId];
+              console.log(
+                `LOG ~ Cannot pick food for user`,
+                memberId,
+                'at',
+                new Date(+subOrderDate).toLocaleString('en-US', {
+                  timeZone: 'Asia/Ho_Chi_Minh',
+                }),
+              );
+            }
 
             return newMemberOrderResult;
           },
@@ -231,6 +243,7 @@ exports.handler = async (_event) => {
       orderResponse,
       newOrderDetail,
     });
+
     const handlingSendNativeNotificationToParticipants =
       sendNativeNotificationToParticipants({
         allEmptyMembersIds,

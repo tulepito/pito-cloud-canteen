@@ -10,21 +10,27 @@ module.exports = async ({
 }) => {
   const handlingSendEmailToParticipants = allEmptyMembersIds.map(
     async (participantId) => {
-      const subOrderDateFoodList = Object.keys(groupFoodIdsBySubOrder).map(
-        (subOrderDate) => {
+      const subOrderDateFoodList = Object.keys(groupFoodIdsBySubOrder)
+        .map((subOrderDate) => {
           const { memberOrders = {}, restaurant = {} } =
             newOrderDetail[subOrderDate];
           const { foodList = {} } = restaurant;
 
           const { foodId } = memberOrders[participantId];
+
+          if (!foodId) {
+            return null;
+          }
+
           const { foodName } = foodList[foodId];
 
           return {
             subOrderDate,
             foodName,
           };
-        },
-      );
+        })
+        .filter(Boolean);
+
       const emailParams = {
         participant: participantResponses.find(
           (participant) => participant.id.uuid === participantId,

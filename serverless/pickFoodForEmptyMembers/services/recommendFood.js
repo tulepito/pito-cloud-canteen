@@ -10,9 +10,14 @@ const getLabelByKey = (options, key) => {
   return get(option, 'label', '');
 };
 
-exports.recommendFood = (foodList, subOrderFoodIds, allergies) => {
-  const subOrderFoodList = foodList.filter(
-    (food) => food.id?.uuid && subOrderFoodIds.includes(food.id.uuid),
+exports.recommendFood = (foodListings, subOrderFoodIds, allergies) => {
+  const subOrderFoodList = foodListings.filter(
+    (food) =>
+      food.id?.uuid &&
+      subOrderFoodIds.includes(food.id.uuid) &&
+      !food?.attributes?.publicData?.foodType
+        ?.toLowerCase()
+        .includes('vegetarian'),
   );
 
   const filteredFoodListByAllergies = subOrderFoodList.filter((food) => {
@@ -27,6 +32,11 @@ exports.recommendFood = (foodList, subOrderFoodIds, allergies) => {
 
     return !overlapAllergies.length;
   });
+
+  console.log(
+    'LOG ~ exports.recommendFood= ~ filteredFoodListByAllergies',
+    filteredFoodListByAllergies?.length,
+  );
 
   return filteredFoodListByAllergies[
     Math.floor(Math.random() * filteredFoodListByAllergies.length)
