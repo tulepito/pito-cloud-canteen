@@ -15,6 +15,7 @@ import {
   companyThunks,
 } from '@redux/slices/company.slice';
 import { companyMemberThunks } from '@redux/slices/companyMember.slice';
+import { buildFullName } from '@src/utils/emailTemplate/participantOrderPicking';
 import { ALLERGIES_OPTIONS, getLabelByKey } from '@src/utils/options';
 import { ensureUser, User } from '@utils/data';
 import type { TUser } from '@utils/types';
@@ -76,9 +77,17 @@ const MemberDetailPage: React.FC<MemberDetailPageProps> = () => {
   })}`;
 
   const memberUser = User(companyMember);
-  const { lastName = '', firstName = '' } = memberUser.getProfile();
+  const {
+    lastName = '',
+    firstName = '',
+    displayName,
+  } = memberUser.getProfile();
   const memberFullName =
-    lastName && firstName ? `${lastName} ${firstName}` : '';
+    lastName && firstName
+      ? buildFullName(firstName, lastName, {
+          compareToGetLongerWith: displayName,
+        })
+      : '';
 
   const memberName = checkMemberHasFlexAccount
     ? memberFullName || '---'

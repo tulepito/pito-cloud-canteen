@@ -28,6 +28,7 @@ import participantCompanyInvitation, {
   participantCompanyInvitationSubject,
 } from '@src/utils/emailTemplate/participantCompanyInvitation';
 import participantOrderPicking, {
+  buildFullName,
   participantOrderPickingSubject,
 } from '@src/utils/emailTemplate/participantOrderPicking';
 import participantPickingSubOrderChanged, {
@@ -395,14 +396,17 @@ export const emailSendingFactory = async (
         const { bookerUser, orderListing } = emailDataSource;
         const { startDate, endDate, deliveryHour } = orderListing.getMetadata();
         const { email: bookerEmail } = bookerUser?.getAttributes() || {};
-        const { lastName, firstName } = bookerUser?.getProfile() || {};
+        const { lastName, firstName, displayName } =
+          bookerUser?.getProfile() || {};
 
         const emailTemplate = bookerPickingOrderChanged({
           orderId,
           deliveryHour,
           formattedStartDate: formatTimestamp(startDate),
           formattedEndDate: formatTimestamp(endDate),
-          bookerName: `${lastName} ${firstName}`,
+          bookerName: buildFullName(firstName, lastName, {
+            compareToGetLongerWith: displayName,
+          }),
           changeHistory,
         });
 
@@ -512,7 +516,8 @@ export const emailSendingFactory = async (
         const { participantUser, orderListing } = emailDataSource;
         const { email: participantEmail } =
           participantUser?.getAttributes() || {};
-        const { lastName, firstName } = participantUser?.getProfile() || {};
+        const { lastName, firstName, displayName } =
+          participantUser?.getProfile() || {};
         const { daySession } = orderListing.getMetadata();
         const formattedSubOrderDate = formatTimestamp(timestamp);
 
@@ -520,7 +525,9 @@ export const emailSendingFactory = async (
           orderId,
           daySession: getLabelByKey(DAY_SESSION_OPTIONS, daySession),
           formattedSubOrderDate,
-          userName: `${lastName} ${firstName}`,
+          userName: buildFullName(firstName, lastName, {
+            compareToGetLongerWith: displayName,
+          }),
         });
 
         const emailDataParams = {

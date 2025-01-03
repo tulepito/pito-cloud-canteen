@@ -25,6 +25,7 @@ import { currentUserSelector } from '@redux/slices/user.slice';
 import config from '@src/configs';
 import { enGeneralPaths, personalPaths } from '@src/paths';
 import { CurrentUser } from '@src/utils/data';
+import { buildFullName } from '@src/utils/emailTemplate/participantOrderPicking';
 import type { TCurrentUser, TObject } from '@src/utils/types';
 
 import css from './CompanyHeaderMobile.module.scss';
@@ -67,8 +68,14 @@ const CompanyHeaderMobile: React.FC<CompanyHeaderMobileProps> = (props) => {
   const newNotificationIdsCount = newNotificationIds.length;
 
   const currentUserGetter = CurrentUser(currentUser);
-  const { lastName = '', firstName = '' } = currentUserGetter.getProfile();
-  const currentUserFullName = `${lastName} ${firstName}`;
+  const {
+    lastName = '',
+    firstName = '',
+    displayName,
+  } = currentUserGetter.getProfile();
+  const currentUserFullName = buildFullName(firstName, lastName, {
+    compareToGetLongerWith: displayName,
+  });
 
   useEffect(() => {
     if (isOpen) {

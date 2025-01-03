@@ -1,6 +1,7 @@
 import Tooltip from '@components/Tooltip/Tooltip';
 import { isCompletePickFood } from '@helpers/orderHelper';
 import { Listing } from '@src/utils/data';
+import { buildFullName } from '@src/utils/emailTemplate/participantOrderPicking';
 import type { TPlan } from '@src/utils/orderTypes';
 import type { TListing, TObject, TUser } from '@utils/types';
 
@@ -36,7 +37,7 @@ export const RawParticipants: React.FC<TRawParticipantsProps> = ({
           id: { uuid },
           attributes: {
             email,
-            profile: { firstName, lastName },
+            profile: { firstName, lastName, displayName },
           },
         } = item;
         const isSelectedFood = isCompletePickFood({
@@ -46,7 +47,9 @@ export const RawParticipants: React.FC<TRawParticipantsProps> = ({
 
         const cardComponent = (
           <ParticipantCard
-            name={`${lastName} ${firstName}`}
+            name={buildFullName(firstName, lastName, {
+              compareToGetLongerWith: displayName,
+            })}
             email={email}
             className={css.participantCard}
             onClickDeleteIcon={handleClickDeleteParticipant(uuid)}

@@ -9,6 +9,7 @@ import { useLogout } from '@hooks/useLogout';
 import { companyThunks } from '@redux/slices/company.slice';
 import { userActions } from '@redux/slices/user.slice';
 import { CurrentUser, User } from '@src/utils/data';
+import { buildFullName } from '@src/utils/emailTemplate/participantOrderPicking';
 import type { EUserRole } from '@src/utils/enums';
 
 import { mapUserPermissionByRole } from './helpers/mapUserPermissionByRole';
@@ -50,8 +51,10 @@ const RoleSelectModal: React.FC<TRoleSelectModalProps> = (props) => {
   const { companyName } = bookerCompanyUser.getPublicData();
 
   const currentUserGetter = CurrentUser(currentUser!);
-  const { firstName, lastName } = currentUserGetter.getProfile();
-  const fullName = `${lastName} ${firstName}`;
+  const { firstName, lastName, displayName } = currentUserGetter.getProfile();
+  const fullName = buildFullName(firstName, lastName, {
+    compareToGetLongerWith: displayName,
+  });
 
   const { companyList = [] } = currentUserGetter.getMetadata();
 

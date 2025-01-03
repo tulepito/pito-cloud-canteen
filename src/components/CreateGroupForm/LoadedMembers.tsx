@@ -2,6 +2,7 @@ import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput
 import IconEdit from '@components/Icons/IconEdit/IconEdit';
 import { Close } from '@components/Icons/Icons';
 import useBoolean from '@hooks/useBoolean';
+import { buildFullName } from '@src/utils/emailTemplate/participantOrderPicking';
 
 import css from './LoadedMembers.module.scss';
 
@@ -12,9 +13,15 @@ type LoadedMembersProps = {
 
 const getMemberFullName = (companyMembers: any[], memberId: string) => {
   const member = companyMembers.find((_member) => _member.id.uuid === memberId);
-  const { firstName = '', lastName = '' } = member.attributes.profile;
+  const {
+    firstName = '',
+    lastName = '',
+    displayName,
+  } = member.attributes.profile;
 
-  return `${lastName} ${firstName}`;
+  return buildFullName(firstName, lastName, {
+    compareToGetLongerWith: displayName,
+  });
 };
 
 const LoadedItem = ({ item, companyMembers, onDelete }: any) => {

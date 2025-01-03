@@ -21,6 +21,7 @@ import { currentUserSelector } from '@redux/slices/user.slice';
 import config from '@src/configs';
 import { companyPaths, enGeneralPaths } from '@src/paths';
 import { CurrentUser } from '@src/utils/data';
+import { buildFullName } from '@src/utils/emailTemplate/participantOrderPicking';
 import type { TObject } from '@src/utils/types';
 
 import css from './CompanyHeader.module.scss';
@@ -52,9 +53,11 @@ const CompanyHeader: React.FC<CompanyHeaderProps> = ({
   const { onOpenRoleSelectModal } = useRoleSelectModalController();
   const currentUser = useAppSelector(currentUserSelector);
   const currentUserGetter = CurrentUser(currentUser);
-  const { firstName, lastName } = currentUserGetter.getProfile();
+  const { firstName, lastName, displayName } = currentUserGetter.getProfile();
   const { email } = currentUserGetter.getAttributes();
-  const fullName = `${lastName} ${firstName}`;
+  const fullName = buildFullName(firstName, lastName, {
+    compareToGetLongerWith: displayName,
+  });
 
   const handleLogout = async () => {
     await handleLogoutFn();

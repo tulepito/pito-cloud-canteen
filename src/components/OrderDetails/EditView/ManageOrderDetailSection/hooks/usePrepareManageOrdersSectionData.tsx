@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { isEmpty } from 'lodash';
 
 import { useAppSelector } from '@hooks/reduxHooks';
+import { buildFullName } from '@src/utils/emailTemplate/participantOrderPicking';
 import {
   ETransition,
   TRANSITIONS_TO_STATE_CANCELED,
@@ -93,9 +94,12 @@ export const usePrepareManageOrdersSectionData = (
 
         const participantGetter = User(participant!);
         const { email } = participantGetter.getAttributes();
-        const { firstName, lastName } = participantGetter.getProfile();
+        const { firstName, lastName, displayName } =
+          participantGetter.getProfile();
 
-        const memberName = `${`${lastName} ${firstName}`} (${email})`;
+        const memberName = `${buildFullName(firstName, lastName, {
+          compareToGetLongerWith: displayName,
+        })} (${email})`;
 
         return accMemberOptions.concat({
           memberId,

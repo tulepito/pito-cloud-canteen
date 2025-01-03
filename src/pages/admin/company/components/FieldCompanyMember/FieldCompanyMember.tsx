@@ -5,6 +5,7 @@ import classNames from 'classnames';
 import Avatar from '@components/Avatar/Avatar';
 import { InlineTextButton } from '@components/Button/Button';
 import IconClose from '@components/Icons/IconClose/IconClose';
+import { buildFullName } from '@src/utils/emailTemplate/participantOrderPicking';
 import type { TCompanyMemberWithDetails } from '@utils/types';
 
 import css from './FieldCompanyMember.module.scss';
@@ -21,7 +22,7 @@ const FieldCompanyMemberCheckbox: React.FC<TFieldCompanyMemberCheckbox> = (
 ) => {
   const { user, onRemoveItem, onremoveNotFoundUserByEmail, className } = props;
   const { email, profile } = user?.attributes || {};
-  const { lastName = '', firstName = '' } = profile || {};
+  const { lastName = '', firstName = '', displayName } = profile || {};
 
   const handleRemoveItem = () =>
     !user?.id?.uuid
@@ -36,8 +37,11 @@ const FieldCompanyMemberCheckbox: React.FC<TFieldCompanyMemberCheckbox> = (
             <Avatar user={user} />
           </div>
           <div className={css.userDetails}>
-            <h3
-              className={css.userDisplayName}>{`${lastName} ${firstName}`}</h3>
+            <h3 className={css.userDisplayName}>
+              {buildFullName(firstName, lastName, {
+                compareToGetLongerWith: displayName,
+              })}
+            </h3>
             <p className={css.userEmail}>{email}</p>
           </div>
         </>

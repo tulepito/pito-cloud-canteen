@@ -2,6 +2,7 @@ import isEmpty from 'lodash/isEmpty';
 
 import { removeNonNumeric } from '@helpers/format';
 import { getIntegrationSdk } from '@services/integrationSdk';
+import { buildFullName } from '@src/utils/emailTemplate/participantOrderPicking';
 import type { TObject, TUpdateCompanyApiParams } from '@src/utils/types';
 
 const updateCompany = async (
@@ -41,7 +42,9 @@ const updateCompany = async (
     ...(firstName ? { firstName } : {}),
     ...(lastName ? { lastName } : {}),
     ...(firstName || lastName
-      ? { displayName: `${lastName} ${firstName}` }
+      ? {
+          displayName: buildFullName(firstName, lastName),
+        }
       : {}),
     publicData: {
       ...(phoneNumber ? { phoneNumber } : {}),

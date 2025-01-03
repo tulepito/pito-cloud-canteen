@@ -7,6 +7,7 @@ import { fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk, getSdk } from '@services/sdk';
 import { UserInviteStatus } from '@src/types/UserPermission';
 import { User } from '@src/utils/data';
+import { buildFullName } from '@src/utils/emailTemplate/participantOrderPicking';
 import { ECompanyPermission, ECompanyStates } from '@src/utils/enums';
 import type { TCreateCompanyApiParams, TObject } from '@src/utils/types';
 
@@ -41,7 +42,7 @@ const normalizeCreateCompanyParams = (dataParams: TCreateCompanyApiParams) => {
     email,
     firstName,
     lastName,
-    displayName: `${lastName} ${firstName}`,
+    displayName: buildFullName(firstName, lastName),
     publicData: {
       phoneNumber,
       companyEmail,

@@ -20,6 +20,7 @@ import {
   User,
 } from '@src/utils/data';
 import { VNTimezone } from '@src/utils/dates';
+import { buildFullName } from '@src/utils/emailTemplate/participantOrderPicking';
 import { EOrderType } from '@src/utils/enums';
 import { ETransition } from '@src/utils/transaction';
 import type { TTransaction } from '@src/utils/types';
@@ -241,9 +242,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       const { companyLocation } = companyUser.getPublicData();
       const { address: companyAddress } = companyLocation || {};
 
-      const { firstName, lastName } = bookerUser.getProfile();
+      const { firstName, lastName, displayName } = bookerUser.getProfile();
       const { phoneNumber: bookerPhoneNumber } = bookerUser.getPublicData();
-      const bookerName = `${lastName} ${firstName}`.trim();
+      const bookerName = buildFullName(firstName, lastName, {
+        compareToGetLongerWith: displayName,
+      }).trim();
 
       const isGroupOrder = orderType === EOrderType.group;
 

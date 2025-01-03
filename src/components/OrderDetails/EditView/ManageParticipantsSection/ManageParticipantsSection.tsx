@@ -12,6 +12,7 @@ import {
   orderDetailsAnyActionsInProgress,
   orderManagementThunks,
 } from '@redux/slices/OrderManagement.slice';
+import { buildFullName } from '@src/utils/emailTemplate/participantOrderPicking';
 import type { TDefaultProps, TObject, TUser } from '@utils/types';
 
 import type { TAddParticipantFormValues } from './AddParticipantForm';
@@ -32,13 +33,15 @@ export const renderParticipantCards = (
       id: { uuid },
       attributes: {
         email,
-        profile: { firstName, lastName },
+        profile: { firstName, lastName, displayName },
       },
     } = item;
 
     return (
       <ParticipantCard
-        name={`${lastName} ${firstName}`}
+        name={buildFullName(firstName, lastName, {
+          compareToGetLongerWith: displayName,
+        })}
         email={email}
         key={uuid}
         participant={item}

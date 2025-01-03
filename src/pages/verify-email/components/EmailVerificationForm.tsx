@@ -10,6 +10,7 @@ import PitoLogoV2 from '@components/PitoLogoV2/PitoLogoV2';
 import { getItem } from '@helpers/localStorageHelpers';
 import { participantPaths } from '@src/paths';
 import { LOCAL_STORAGE_KEYS, QUERY_REFS } from '@src/utils/constants';
+import { buildFullName } from '@src/utils/emailTemplate/participantOrderPicking';
 
 import css from './EmailVerificationForm.module.scss';
 
@@ -32,7 +33,7 @@ const EmailVerificationFormComponent: React.FC<
 > = (props) => {
   const { currentUser, inProgress, verificationError, handleSubmit } = props;
   const { email, emailVerified, pendingEmail } = currentUser.attributes;
-  const { firstName, lastName } = currentUser.attributes.profile;
+  const { firstName, lastName, displayName } = currentUser.attributes.profile;
   const emailToVerify = <strong>{pendingEmail || email}</strong>;
   const router = useRouter();
 
@@ -123,7 +124,11 @@ const EmailVerificationFormComponent: React.FC<
         <p className={css.modalMessage}>
           <FormattedMessage
             id="EmailVerificationForm.noPendingText"
-            values={{ name: `${lastName} ${firstName}` }}
+            values={{
+              name: buildFullName(firstName, lastName, {
+                compareToGetLongerWith: displayName,
+              }),
+            }}
           />
         </p>
         <div className={css.divider}></div>

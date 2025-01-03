@@ -1,5 +1,7 @@
 import { formatTimestamp } from '../dates';
 
+import { buildFullName } from './participantOrderPicking';
+
 const BASE_URL = process.env.NEXT_PUBLIC_CANONICAL_URL;
 
 type ParticipantCompanyInvitationParams = {
@@ -16,11 +18,13 @@ const participantSubOrderIsCanceled = ({
   orderListing,
   timestamp,
 }: ParticipantCompanyInvitationParams) => {
-  const { firstName, lastName } = participantUser.getProfile();
+  const { firstName, lastName, displayName } = participantUser.getProfile();
   const { orderName } = orderListing.getPublicData();
   const orderId = orderListing.getId();
   const viewOrderUrl = `${BASE_URL}/participant/order/${orderId}`;
-  const participantName = `${lastName} ${firstName}`;
+  const participantName = buildFullName(firstName, lastName, {
+    compareToGetLongerWith: displayName,
+  });
   const formattedSubOrderDate = formatTimestamp(timestamp);
 
   return `

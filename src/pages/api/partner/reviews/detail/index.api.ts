@@ -13,6 +13,7 @@ import {
   User,
 } from '@src/utils/data';
 import { formatTimestamp } from '@src/utils/dates';
+import { buildFullName } from '@src/utils/emailTemplate/participantOrderPicking';
 import { ECompanyPermission, EImageVariants } from '@src/utils/enums';
 import type { TListing } from '@src/utils/types';
 
@@ -132,8 +133,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           let name = '';
           const user = mapUserById.get(reviewerId);
           if (user) {
-            const { firstName, lastName } = User(user).getAttributes().profile;
-            name = `${lastName} ${firstName}`;
+            const { firstName, lastName, displayName } =
+              User(user).getAttributes().profile;
+            name = buildFullName(firstName, lastName, {
+              compareToGetLongerWith: displayName,
+            });
           }
 
           let description: string = '';

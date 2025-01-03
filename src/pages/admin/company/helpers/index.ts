@@ -1,4 +1,5 @@
 import type { TCompanyMembersByCompanyId } from '@redux/slices/companyMember.slice';
+import { buildFullName } from '@src/utils/emailTemplate/participantOrderPicking';
 import { User } from '@utils/data';
 import { ECompanyStates } from '@utils/enums';
 import { removeAccents } from '@utils/string';
@@ -68,7 +69,11 @@ export const parseEntitiesToTableData = (
 
     const companyId = companyUserGetter.getId();
     const { email } = companyUserGetter.getAttributes();
-    const { lastName = '', firstName = '' } = companyUserGetter.getProfile();
+    const {
+      lastName = '',
+      firstName = '',
+      displayName,
+    } = companyUserGetter.getProfile();
     const { userState } = companyUserGetter.getMetadata();
     const {
       companyLocation = {},
@@ -82,7 +87,9 @@ export const parseEntitiesToTableData = (
         userState,
         isDraft: userState === ECompanyStates.draft,
         id: companyId,
-        displayName: `${lastName} ${firstName}`,
+        displayName: buildFullName(firstName, lastName, {
+          compareToGetLongerWith: displayName,
+        }),
         phoneNumber,
         email,
         companyName,

@@ -9,6 +9,7 @@ import { HttpMethod } from '@apis/configs';
 import { queryAllPages } from '@helpers/apiHelpers';
 import cookies from '@services/cookie';
 import { getIntegrationSdk, handleError } from '@services/sdk';
+import { buildFullName } from '@src/utils/emailTemplate/participantOrderPicking';
 import { EListingType } from '@src/utils/enums';
 import { denormalisedResponseEntities, Listing, User } from '@utils/data';
 import type {
@@ -205,10 +206,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
                   restaurantsIds.includes(r.id.uuid),
                 );
 
-                const { firstName, lastName } = User(
+                const { firstName, lastName, displayName } = User(
                   bookerId === companyId ? company! : booker!,
                 ).getProfile();
-                const bookerName = `${lastName} ${firstName}`;
+                const bookerName = buildFullName(firstName, lastName, {
+                  compareToGetLongerWith: displayName,
+                });
 
                 return {
                   ...order,

@@ -6,6 +6,7 @@ import ParticipantCard from '@components/OrderDetails/EditView/ManageParticipant
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { Listing, User } from '@src/utils/data';
+import { buildFullName } from '@src/utils/emailTemplate/participantOrderPicking';
 import type { TObject, TUser } from '@src/utils/types';
 
 import { BookerDraftOrderPageThunks } from '../../BookerDraftOrderPage.slice';
@@ -60,13 +61,16 @@ const ParticipantList: React.FC<TParticipantListProps> = () => {
         {participantData.map((p: TObject) => {
           const participantGetter = User(p as TUser);
           const participantId = participantGetter.getId();
-          const { firstName, lastName } = participantGetter.getProfile();
+          const { firstName, lastName, displayName } =
+            participantGetter.getProfile();
           const { email } = participantGetter.getAttributes();
 
           return (
             <ParticipantCard
               key={participantId}
-              name={`${lastName} ${firstName}`}
+              name={buildFullName(firstName, lastName, {
+                compareToGetLongerWith: displayName,
+              })}
               email={email}
               participant={p as TUser}
               ableToRemove

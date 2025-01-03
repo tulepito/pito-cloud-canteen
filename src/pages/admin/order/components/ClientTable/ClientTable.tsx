@@ -14,6 +14,7 @@ import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
 import Pagination from '@components/Pagination/Pagination';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { addBooker } from '@redux/slices/Order.slice';
+import { buildFullName } from '@src/utils/emailTemplate/participantOrderPicking';
 import { User } from '@utils/data';
 import type { TObject, TUser } from '@utils/types';
 
@@ -128,14 +129,19 @@ const ClientTable: React.FC<ClientTableProps> = (props) => {
               {bookerList.map((booker) => {
                 const bookerUser = User(booker);
                 const bookerId = bookerUser.getId();
-                const { lastName = '', firstName = '' } =
-                  bookerUser.getProfile();
+                const {
+                  lastName = '',
+                  firstName = '',
+                  displayName,
+                } = bookerUser.getProfile();
                 const { email: bookerEmail } = bookerUser.getAttributes();
                 const { phoneNumber: bookerProtectedPhoneNumber } =
                   bookerUser.getProtectedData();
                 const { phoneNumber: bookerPublicPhoneNumber } =
                   bookerUser.getPublicData();
-                const bookerName = `${lastName} ${firstName}`;
+                const bookerName = buildFullName(firstName, lastName, {
+                  compareToGetLongerWith: displayName,
+                });
 
                 const handleBookerClick = () => {
                   if (shouldDisableAllFields) {

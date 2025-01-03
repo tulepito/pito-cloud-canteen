@@ -8,6 +8,7 @@ import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { Listing, User } from '@src/utils/data';
 import { formatTimestamp } from '@src/utils/dates';
+import { buildFullName } from '@src/utils/emailTemplate/participantOrderPicking';
 import type { TListing, TUser } from '@src/utils/types';
 
 import css from './TrackingDeliveryInfo.module.scss';
@@ -26,7 +27,7 @@ const TrackingDeliveryInfo: React.FC<TTrackingDeliveryInfoProps> = ({
   const { booker } = order || {};
   // Booker data
   const bookerGetter = User(booker as TUser);
-  const { firstName, lastName } = bookerGetter.getProfile();
+  const { firstName, lastName, displayName } = bookerGetter.getProfile();
   const { phoneNumber = '-' } = bookerGetter.getPublicData();
   // Order data
   const orderGetter = Listing(order as TListing);
@@ -44,7 +45,9 @@ const TrackingDeliveryInfo: React.FC<TTrackingDeliveryInfoProps> = ({
       },
       {
         label: intl.formatMessage({ id: 'Tracking.DeliveryInfo.staff' }),
-        value: `${lastName} ${firstName}`,
+        value: buildFullName(firstName, lastName, {
+          compareToGetLongerWith: displayName,
+        }),
       },
       {
         label: intl.formatMessage({

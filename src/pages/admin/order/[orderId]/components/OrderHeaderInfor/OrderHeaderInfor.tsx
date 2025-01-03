@@ -6,6 +6,7 @@ import Button from '@components/Button/Button';
 import { FieldTextInputComponent } from '@components/FormFields/FieldTextInput/FieldTextInput';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { Listing, User } from '@src/utils/data';
+import { buildFullName } from '@src/utils/emailTemplate/participantOrderPicking';
 import { EOrderStates } from '@src/utils/enums';
 import type { TListing, TUser } from '@src/utils/types';
 
@@ -46,8 +47,14 @@ const OrderHeaderInfor: React.FC<OrderHeaderInforProps> = (props) => {
   } = orderListing.getMetadata();
 
   const { companyName } = companyUser.getPublicData();
-  const { lastName = '', firstName = '' } = bookerUser.getProfile();
-  const bookerName = `${lastName} ${firstName}`;
+  const {
+    lastName = '',
+    firstName = '',
+    displayName,
+  } = bookerUser.getProfile();
+  const bookerName = buildFullName(firstName, lastName, {
+    compareToGetLongerWith: displayName,
+  });
   const { phoneNumber: protetedphoneNumber } = bookerUser.getProtectedData();
   const { phoneNumber: publicPhoneNumber } = bookerUser.getPublicData();
   const phoneNumber = protetedphoneNumber || publicPhoneNumber;

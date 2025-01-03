@@ -4,6 +4,7 @@ import classNames from 'classnames';
 
 import Avatar from '@components/Avatar/Avatar';
 import FieldCheckbox from '@components/FormFields/FieldCheckbox/FieldCheckbox';
+import { buildFullName } from '@src/utils/emailTemplate/participantOrderPicking';
 import type { TCompanyMemberWithDetails } from '@utils/types';
 
 import css from './FieldCompanyMemberCheckbox.module.scss';
@@ -21,7 +22,7 @@ const FieldCompanyMemberCheckbox: React.FC<TFieldCompanyMemberCheckbox> = (
 ) => {
   const { member, className, name } = props;
   const { email, profile } = member?.attributes || {};
-  const { lastName = '', firstName = '' } = profile || {};
+  const { lastName = '', firstName = '', displayName } = profile || {};
 
   const profileSection = (
     <div className={css.profileWrapper}>
@@ -30,7 +31,11 @@ const FieldCompanyMemberCheckbox: React.FC<TFieldCompanyMemberCheckbox> = (
           <Avatar user={member} />
         </div>
         <div className={css.userDetails}>
-          <h3 className={css.userDisplayName}>{`${lastName} ${firstName}`}</h3>
+          <h3 className={css.userDisplayName}>
+            {buildFullName(firstName, lastName, {
+              compareToGetLongerWith: displayName,
+            })}
+          </h3>
           <p className={css.userEmail}>{email}</p>
         </div>
       </>

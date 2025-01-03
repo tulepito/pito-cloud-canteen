@@ -1,6 +1,7 @@
 import isEmpty from 'lodash/isEmpty';
 
 import { Listing, User } from '@src/utils/data';
+import { buildFullName } from '@src/utils/emailTemplate/participantOrderPicking';
 import { TRANSITIONS_TO_STATE_CANCELED } from '@src/utils/transaction';
 import type { TListing, TObject, TUser } from '@src/utils/types';
 import { EParticipantOrderStatus, ESubOrderStatus } from '@utils/enums';
@@ -287,7 +288,7 @@ export const groupPickingOrderByFood = ({
           const anonymousUserMaybe = anonymous.find(
             (p) => p?.id?.uuid === memberId,
           );
-          const { firstName, lastName } = User(
+          const { firstName, lastName, displayName } = User(
             (participantMaybe || anonymousUserMaybe) as TUser,
           ).getProfile();
 
@@ -296,7 +297,9 @@ export const groupPickingOrderByFood = ({
             const { frequency, notes = [] } = data || {};
             const newNote = {
               note: requirement,
-              name: `${lastName} ${firstName}`,
+              name: buildFullName(firstName, lastName, {
+                compareToGetLongerWith: displayName,
+              }),
             };
 
             if (!isEmpty(requirement)) {

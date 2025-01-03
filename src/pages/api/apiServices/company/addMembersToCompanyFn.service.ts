@@ -19,6 +19,7 @@ import { UserInviteStatus } from '@src/types/UserPermission';
 import participantCompanyInvitation, {
   participantCompanyInvitationSubject,
 } from '@src/utils/emailTemplate/participantCompanyInvitation';
+import { buildFullName } from '@src/utils/emailTemplate/participantOrderPicking';
 import {
   EBookerOrderDraftStates,
   ECompanyPermission,
@@ -48,8 +49,10 @@ const addMembersToCompanyFn = async (params: TAddMembersToCompanyParams) => {
   const companyAccount = await fetchUser(companyId);
   const companyUser = User(companyAccount);
   const { companyName } = companyUser.getPublicData();
-  const { firstName, lastName } = companyUser.getProfile();
-  const companyBookerName = `${lastName} ${firstName}`;
+  const { firstName, lastName, displayName } = companyUser.getProfile();
+  const companyBookerName = buildFullName(firstName, lastName, {
+    compareToGetLongerWith: displayName,
+  });
   const { members = {} } = companyUser.getMetadata();
   const membersIdList = compact(
     Object.values(members).map((_member: any) => _member?.id),

@@ -1,5 +1,6 @@
 import isEmpty from 'lodash/isEmpty';
 
+import { buildFullName } from '@src/utils/emailTemplate/participantOrderPicking';
 import { EParticipantOrderStatus } from '@utils/enums';
 import type { TObject, TUser } from '@utils/types';
 
@@ -11,13 +12,19 @@ const memberInfoReduceFn = (result: TObject, currentParticipant: TUser) => {
     id: { uuid },
     attributes: {
       email,
-      profile: { firstName, lastName },
+      profile: { firstName, lastName, displayName },
     },
   } = currentParticipant;
 
   return {
     ...result,
-    [uuid]: { email, name: `${lastName} ${firstName}`, id: uuid },
+    [uuid]: {
+      email,
+      name: buildFullName(firstName, lastName, {
+        compareToGetLongerWith: displayName,
+      }),
+      id: uuid,
+    },
   };
 };
 

@@ -22,6 +22,8 @@ export const buildFullName = (
 ) => {
   if (!firstName || !lastName) return firstName || lastName || '';
 
+  if (firstName === lastName) return firstName;
+
   const fullName = `${lastName} ${firstName}`;
   if (!options) return fullName;
 

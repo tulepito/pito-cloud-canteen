@@ -26,6 +26,7 @@ import {
 import { currentUserSelector } from '@redux/slices/user.slice';
 import { enGeneralPaths, partnerPaths } from '@src/paths';
 import { CurrentUser } from '@src/utils/data';
+import { buildFullName } from '@src/utils/emailTemplate/participantOrderPicking';
 
 import PartnerNotificationModal from './PartnerNotificationModal';
 
@@ -47,8 +48,14 @@ const PartnerHeader: React.FC<TPartnerHeaderProps> = () => {
   const { isMobileLayout } = useViewport();
 
   const currentUserGetter = CurrentUser(currentUser);
-  const { lastName = '', firstName = '' } = currentUserGetter.getProfile();
-  const currentUserFullName = `${lastName} ${firstName}`;
+  const {
+    lastName = '',
+    firstName = '',
+    displayName,
+  } = currentUserGetter.getProfile();
+  const currentUserFullName = buildFullName(firstName, lastName, {
+    compareToGetLongerWith: displayName,
+  });
 
   const newNotificationIds = (notifications || []).reduce(
     (ids, noti) => (noti?.isNew === true ? ids.concat(noti?.id) : ids),

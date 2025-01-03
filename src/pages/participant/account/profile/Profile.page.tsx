@@ -8,6 +8,7 @@ import useBoolean from '@hooks/useBoolean';
 import { userThunks } from '@redux/slices/user.slice';
 import { participantPaths } from '@src/paths';
 import { User } from '@src/utils/data';
+import { buildFullName } from '@src/utils/emailTemplate/participantOrderPicking';
 import { splitNameFormFullName } from '@src/utils/string';
 
 import type { TProfileFormValues } from '../components/ProfileForm/ProfileForm';
@@ -28,12 +29,18 @@ const ProfilePage = () => {
   );
 
   const currentUserGetter = User(currentUser!);
-  const { firstName, lastName } = currentUserGetter.getProfile();
+  const { firstName, lastName, displayName } = currentUserGetter.getProfile();
   const { email } = currentUserGetter.getAttributes();
   const { phoneNumber } = currentUserGetter.getProtectedData();
   const initialValues = useMemo(
-    () => ({ name: `${lastName} ${firstName}`, email, phoneNumber }),
-    [email, firstName, lastName, phoneNumber],
+    () => ({
+      name: buildFullName(firstName, lastName, {
+        compareToGetLongerWith: displayName,
+      }),
+      email,
+      phoneNumber,
+    }),
+    [displayName, email, firstName, lastName, phoneNumber],
   );
 
   const handleGoBack = () => {

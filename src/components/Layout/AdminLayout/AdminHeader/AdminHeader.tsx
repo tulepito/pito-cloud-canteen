@@ -16,6 +16,7 @@ import { useLogout } from '@hooks/useLogout';
 import { currentUserSelector } from '@redux/slices/user.slice';
 import { enGeneralPaths } from '@src/paths';
 import { CurrentUser } from '@src/utils/data';
+import { buildFullName } from '@src/utils/emailTemplate/participantOrderPicking';
 
 import css from './AdminHeader.module.scss';
 
@@ -29,8 +30,14 @@ const AdminHeader: React.FC<TAdminHeaderProps> = () => {
   const handleLogoutFn = useLogout();
 
   const currentUserGetter = CurrentUser(currentUser);
-  const { lastName = '', firstName = '' } = currentUserGetter.getProfile();
-  const currentUserFullName = `${lastName} ${firstName}`;
+  const {
+    lastName = '',
+    firstName = '',
+    displayName,
+  } = currentUserGetter.getProfile();
+  const currentUserFullName = buildFullName(firstName, lastName, {
+    compareToGetLongerWith: displayName,
+  });
 
   const onLogout = async () => {
     await handleLogoutFn();

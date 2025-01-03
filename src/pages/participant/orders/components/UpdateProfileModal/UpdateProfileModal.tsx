@@ -7,6 +7,7 @@ import PopupModal from '@components/PopupModal/PopupModal';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { userThunks } from '@redux/slices/user.slice';
 import { User } from '@src/utils/data';
+import { buildFullName } from '@src/utils/emailTemplate/participantOrderPicking';
 import { splitNameFormFullName } from '@src/utils/string';
 import type { TCurrentUser, TUser } from '@src/utils/types';
 
@@ -40,13 +41,15 @@ const UpdateProfileModal: React.FC<UpdateProfileModalProps> = (props) => {
     (state) => state.ParticipantOrderList.updateProfileInProgress,
   );
   const currentUserGetter = User(currentUser as TUser);
-  const { firstName, lastName } = currentUserGetter.getProfile();
+  const { firstName, lastName, displayName } = currentUserGetter.getProfile();
   const { phoneNumber } = currentUserGetter.getProtectedData();
   const { allergies = [], nutritions = [] } = currentUserGetter.getPublicData();
 
   const initialValues = useMemo(
     () => ({
-      name: `${lastName} ${firstName}`,
+      name: buildFullName(firstName, lastName, {
+        compareToGetLongerWith: displayName,
+      }),
       phoneNumber,
       allergies,
       nutritions,

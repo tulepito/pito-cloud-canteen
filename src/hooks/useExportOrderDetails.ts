@@ -7,6 +7,7 @@ import { currentUserSelector } from '@redux/slices/user.slice';
 import type { UserListing } from '@src/types';
 import { Listing } from '@src/utils/data';
 import { formatTimestamp } from '@src/utils/dates';
+import { buildFullName } from '@src/utils/emailTemplate/participantOrderPicking';
 import type { TListing, TObject, TUser } from '@src/utils/types';
 
 import { useAppSelector } from './reduxHooks';
@@ -124,15 +125,19 @@ const useExportOrderDetails = (options?: {
         .map((pid: string) => {
           const participant = participantData.find(
             (p: TUser) => pid === p.id.uuid,
-          );
-          const { email } = participant?.attributes || {};
-          const { lastName = '', firstName = '' } =
-            participant?.attributes?.profile || {};
+          ) as UserListing | undefined;
 
           return {
             id: pid,
-            email,
-            name: `${lastName} ${firstName}`,
+            email: participant?.attributes?.email,
+            name: buildFullName(
+              participant?.attributes?.profile?.firstName,
+              participant?.attributes?.profile?.lastName,
+              {
+                compareToGetLongerWith:
+                  participant?.attributes?.profile?.displayName,
+              },
+            ),
             companyName,
           };
         })
@@ -142,13 +147,18 @@ const useExportOrderDetails = (options?: {
               (p: TUser) => pid === p.id.uuid,
             );
             const { email } = participant?.attributes || {};
-            const { lastName = '', firstName = '' } =
-              participant?.attributes?.profile || {};
+            const {
+              lastName = '',
+              firstName = '',
+              displayName,
+            } = participant?.attributes?.profile || {};
 
             return {
               id: pid,
               email,
-              name: `${lastName} ${firstName}`,
+              name: buildFullName(firstName, lastName, {
+                compareToGetLongerWith: displayName,
+              }),
               companyName,
             };
           }),

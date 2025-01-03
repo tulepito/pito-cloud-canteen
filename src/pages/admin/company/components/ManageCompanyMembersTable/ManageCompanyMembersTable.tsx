@@ -16,6 +16,7 @@ import Pagination from '@components/Pagination/Pagination';
 import type { TColumn } from '@components/Table/Table';
 import Table from '@components/Table/Table';
 import { UserInviteStatus } from '@src/types/UserPermission';
+import { buildFullName } from '@src/utils/emailTemplate/participantOrderPicking';
 import { ECompanyPermission } from '@src/utils/enums';
 import {
   isBookerInOrderProgress,
@@ -271,7 +272,14 @@ const parseEntitiesToTableData = ({
         inviteStatus: companyMember.inviteStatus,
         canRemoveOwner,
         permission: companyMember.permission,
-        name: companyMember.attributes.profile.displayName,
+        name: buildFullName(
+          companyMember?.attributes?.profile?.firstName,
+          companyMember?.attributes?.profile?.lastName,
+          {
+            compareToGetLongerWith:
+              companyMember?.attributes?.profile?.displayName,
+          },
+        ),
         email: companyMember.attributes.email,
         groups,
         handleToRemoveMember: handleToRemove,
@@ -578,11 +586,16 @@ const ManageCompanyMembersTable: React.FC<TManageCompanyMembersTable> = (
                 member.permission !== ECompanyPermission.owner && member.id,
             )
             .map((member) => {
-              const { lastName = '', firstName = '' } =
-                member.attributes.profile;
+              const {
+                lastName = '',
+                firstName = '',
+                displayName,
+              } = member.attributes.profile;
               const fullName =
                 lastName && firstName
-                  ? `${lastName} ${firstName}`
+                  ? buildFullName(firstName, lastName, {
+                      compareToGetLongerWith: displayName,
+                    })
                   : member.email;
 
               return (

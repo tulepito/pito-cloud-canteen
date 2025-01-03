@@ -12,6 +12,8 @@ import Tooltip from '@components/Tooltip/Tooltip';
 import { parseThousandNumber } from '@helpers/format';
 import { isJoinedPlan } from '@helpers/order/orderPickingHelper';
 import { useViewport } from '@hooks/useViewport';
+import type { UserListing } from '@src/types';
+import { buildFullName } from '@src/utils/emailTemplate/participantOrderPicking';
 import type { TObject, TUser } from '@utils/types';
 
 import css from './ReviewOrdersResultModal.module.scss';
@@ -99,30 +101,38 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
         .map((pid: string) => {
           const participant = participantDataFromProps.find(
             (p: TUser) => pid === p.id.uuid,
-          );
-          const { email } = participant?.attributes || {};
-          const { lastName = '', firstName = '' } =
-            participant?.attributes?.profile || {};
+          ) as UserListing | undefined;
 
           return {
             id: pid,
-            email,
-            name: `${lastName} ${firstName}`,
+            email: participant?.attributes?.email,
+            name: buildFullName(
+              participant?.attributes?.profile?.firstName,
+              participant?.attributes?.profile?.lastName,
+              {
+                compareToGetLongerWith:
+                  participant?.attributes?.profile?.displayName,
+              },
+            ),
           };
         })
         .concat(
           anonymous.map((pid: string) => {
             const participant = anonymousParticipantDataFromProps.find(
               (p: TUser) => pid === p.id.uuid,
-            );
-            const { email } = participant?.attributes || {};
-            const { lastName = '', firstName = '' } =
-              participant?.attributes?.profile || {};
+            ) as UserListing | undefined;
 
             return {
               id: pid,
-              email,
-              name: `${lastName} ${firstName}`,
+              email: participant?.attributes?.email,
+              name: buildFullName(
+                participant?.attributes?.profile?.firstName,
+                participant?.attributes?.profile?.lastName,
+                {
+                  compareToGetLongerWith:
+                    participant?.attributes?.profile?.displayName,
+                },
+              ),
             };
           }),
         ),

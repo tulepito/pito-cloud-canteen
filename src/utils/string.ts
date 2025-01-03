@@ -1,15 +1,33 @@
 import type { TProfile } from '@src/utils/types';
 
-export const splitNameFormFullName = (fullName: string) => {
-  const firstSpaceIndx = fullName.split('').findIndex((ch) => ch === ' ');
+export const splitNameFormFullName = (fullName?: string) => {
+  if (!fullName) {
+    return {
+      lastName: 'Người dùng',
+      firstName: 'chưa đặt tên',
+    };
+  }
 
-  if (firstSpaceIndx === -1) {
-    return { firstName: fullName, lastName: fullName };
+  const nonEmptyNames = fullName.split(' ').filter((name) => !!name); // Remove empty string
+
+  const firstName = nonEmptyNames.pop();
+
+  if (!firstName) {
+    return {
+      lastName: 'Người dùng',
+      firstName: 'chưa đặt tên',
+    };
+  }
+
+  let lastName = nonEmptyNames.join(' ');
+
+  if (!lastName) {
+    lastName = firstName; // lastName is required, if lastName === firstName, it means the user has only one name
   }
 
   return {
-    lastName: fullName.slice(0, firstSpaceIndx),
-    firstName: fullName.slice(firstSpaceIndx + 1),
+    lastName,
+    firstName,
   };
 };
 
