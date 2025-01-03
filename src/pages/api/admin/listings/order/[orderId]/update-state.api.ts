@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
+import logger from '@helpers/logger';
 import updateOrder from '@pages/api/orders/[orderId]/update.service';
 import cookies from '@services/cookie';
 import { emailSendingFactory, EmailTemplateTypes } from '@services/email';
@@ -77,6 +78,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       error: 'Invalid order state',
     });
   } catch (error) {
+    logger.error('Error updating order state', String(error));
     handleError(res, error);
   }
 }

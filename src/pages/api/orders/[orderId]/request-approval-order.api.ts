@@ -8,6 +8,7 @@ import { getIntegrationSdk } from '@services/integrationSdk';
 import { createFirebaseDocNotification } from '@services/notifications';
 import adminChecker from '@services/permissionChecker/admin';
 import { handleError } from '@services/sdk';
+import type { OrderListing, PlanListing, WithFlexSDKData } from '@src/types';
 import { Listing } from '@utils/data';
 import {
   EBookerNativeNotificationType,
@@ -26,7 +27,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       case HttpMethod.PUT:
         {
           const orderId = req.query.orderId as string;
-          const [orderListing] = denormalisedResponseEntities(
+          const [orderListing]: [OrderListing] = denormalisedResponseEntities(
             await integrationSdk.listings.show({
               id: orderId,
             }),
@@ -37,7 +38,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             bookerId,
             startDate,
             endDate,
-          } = Listing(orderListing).getMetadata();
+          } = Listing(orderListing as any).getMetadata();
 
           if (orderState !== EOrderDraftStates.draft) {
             throw new Error(
@@ -74,6 +75,34 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
               { expand: true },
             ),
           );
+
+          const planId = orderListing.attributes?.metadata?.plans?.[0];
+          const planListingResponse: WithFlexSDKData<PlanListing> =
+            await integrationSdk.listings.show({
+              id: planId,
+            });
+
+          const oldOrderDetail =
+            planListingResponse.data.data.attributes?.metadata?.orderDetail;
+          const orderDetailHasFoodList = Object.keys(
+            oldOrderDetail || {},
+          ).reduce((_orderDetailHasFoodList, date) => {
+            if (!oldOrderDetail?.[date]?.restaurant?.foodList) {
+              return _orderDetailHasFoodList;
+            }
+
+            return {
+              ..._orderDetailHasFoodList,
+              [date]: oldOrderDetail?.[date],
+            };
+          }, {});
+
+          integrationSdk.listings.update({
+            id: planId,
+            metadata: {
+              orderDetail: orderDetailHasFoodList,
+            },
+          });
 
           await Promise.allSettled([
             emailSendingFactory(
