@@ -23,6 +23,14 @@ function GleapCSSInjector() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser?.id?.uuid]);
 
+  useEffect(() => {
+    if (window.innerWidth < 768) {
+      document.body.classList.add('mobile-gleap');
+    } else {
+      document.body.classList.remove('mobile-gleap');
+    }
+  }, []);
+
   return null;
 }
 

@@ -1,9 +1,8 @@
-import { type PropsWithChildren, useEffect } from 'react';
+import { type PropsWithChildren } from 'react';
 import { useIntl } from 'react-intl';
 
 import type { TMetaProps } from '@components/Layout/Meta';
 import Meta from '@components/Layout/Meta';
-import Gleap from '@src/utils/gleap';
 
 type TMetaWrapperProps = PropsWithChildren<
   TMetaProps & {
@@ -24,12 +23,6 @@ const MetaWrapper: React.FC<TMetaWrapperProps> = ({
   descriptionId,
 }) => {
   const intl = useIntl();
-
-  useEffect(() => {
-    if (window.innerWidth < 768) {
-      Gleap.hideButton();
-    }
-  }, []);
 
   const metaProps = {
     title:
