@@ -36,10 +36,9 @@ const EmailVerification: React.FC<TEmailVerificationProps> = (props) => {
   };
 
   const navigateToHomePageMaybe = () => {
-    const companyId = getItem(LOCAL_STORAGE_KEYS.INVITATION_COMPANY_ID);
     const tempCompanyId = getItem(LOCAL_STORAGE_KEYS.TEMP_COMPANY_ID);
 
-    const targetCompanyId = companyId || tempCompanyId;
+    const targetCompanyId = tempCompanyId;
 
     if (targetCompanyId) {
       router.push(

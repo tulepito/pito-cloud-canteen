@@ -663,6 +663,7 @@ const OrderListSlice = createSlice({
         allPlans: newAllPlans,
       };
     },
+    logout: () => initialState,
   },
   extraReducers: (builder) => {
     builder

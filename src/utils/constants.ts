@@ -48,7 +48,6 @@ export const DAY_IN_WEEK = [
 ];
 
 export const LOCAL_STORAGE_KEYS = {
-  INVITATION_COMPANY_ID: 'invitation-company-id',
   TEMP_COMPANY_ID: 'temp-company-id',
 };
 

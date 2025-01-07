@@ -157,6 +157,12 @@
   margin-left: auto;
   background-color: $primaryPri2;
   padding: 4px 10px;
+  width: 28px;
+  height: 28px;
   border-radius: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transform: translateX(10px);
   z-index: 0;
 }

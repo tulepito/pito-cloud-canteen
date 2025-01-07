@@ -41,12 +41,6 @@ const useVerifyAuthentication = (homePageNavigateCondition: boolean) => {
       if (PATHS_REDIRECT_TO_SIGN_UP_IF_UNAUTHENTICATED.includes(pathname)) {
         if (!router.isReady) return;
 
-        const companyId = Array.isArray(router.query.companyId)
-          ? router?.query?.companyId?.[0]
-          : router?.query?.companyId;
-
-        setItem(LOCAL_STORAGE_KEYS.INVITATION_COMPANY_ID, companyId ?? '');
-
         router.replace({
           pathname: generalPaths.SignUp,
           query: { from: fullPath },
