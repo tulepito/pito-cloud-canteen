@@ -1,4 +1,4 @@
-import AWS from 'aws-sdk';
+import { SendEmailCommand, SESClient } from '@aws-sdk/client-ses';
 import type {
   Address,
   AddressList,
@@ -9,11 +9,12 @@ import type {
 
 import logger from '@helpers/logger';
 
-const SES = new AWS.SES({
-  accessKeyId: `${process.env.AWS_SES_ACCESS_KEY_ID}`,
-  secretAccessKey: `${process.env.AWS_SES_SECRET_ACCESS_KEY}`,
-  region: `${process.env.AWS_SES_REGION}`,
-  apiVersion: '2010-12-01',
+const sesClient = new SESClient({
+  region: process.env.AWS_SES_REGION,
+  credentials: {
+    accessKeyId: process.env.AWS_SES_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SES_SECRET_ACCESS_KEY,
+  },
 });
 
 export const createEmailParams = (
@@ -50,8 +51,8 @@ export const createEmailParams = (
 };
 
 export const sendEmail = (params: SendEmailRequest) => {
-  return SES.sendEmail(params)
-    .promise()
+  sesClient
+    .send(new SendEmailCommand(params))
     .then(() => {
       logger.success(
         `Send email to ${params.Destination.ToAddresses} success`,
