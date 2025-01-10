@@ -1,10 +1,10 @@
-FROM node:16.19.0
+FROM node:20.12.2
 WORKDIR /app
 
 COPY package.json yarn.lock ./
 COPY . .
 
-ENV NODE_ENV "production"
+ENV NODE_ENV="production"
 
 RUN yarn install --production --frozen-lockfile \
     && yarn build && yarn cache clean

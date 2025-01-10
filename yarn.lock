@@ -48,7 +48,7 @@
     "@smithy/util-utf8" "^2.0.0"
     tslib "^2.6.2"
 
-"@aws-sdk/client-ses@^3.723.0":
+"@aws-sdk/client-ses@3.723.0":
   version "3.723.0"
   resolved "https://registry.yarnpkg.com/@aws-sdk/client-ses/-/client-ses-3.723.0.tgz#732fa2138cc74a6712b0b2c89ffcc9e73fb388d7"
   integrity sha512-RzOvNyLWiJePyeYionzNxTmNm83yj+6cnQPbAjN78+UdzZxvMa/tG/m+KK3Vy5ZHWyWqKLMC8UZMWJ+LVVSJmg==

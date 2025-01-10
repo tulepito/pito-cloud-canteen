@@ -195,6 +195,7 @@ export const createSlackNotification = async (
           process.env.SLACK_WEBHOOK_URL,
           {
             thread_ts: participantGroupOrderFoodChangedData.threadTs,
+            reply_broadcast: true,
             blocks: [
               {
                 type: 'section',
@@ -254,6 +255,8 @@ export const createSlackNotification = async (
         await axios.post(
           process.env.SLACK_WEBHOOK_URL,
           {
+            thread_ts: participantNormalOrderFoodChangedData.threadTs,
+            reply_broadcast: true,
             blocks: [
               {
                 type: 'section',
@@ -316,6 +319,8 @@ export const createSlackNotification = async (
         await axios.post(
           process.env.SLACK_WEBHOOK_URL,
           {
+            thread_ts: restaurantChangedData.threadTs,
+            reply_broadcast: true,
             blocks: [
               {
                 type: 'section',
@@ -361,6 +366,8 @@ export const createSlackNotification = async (
         await axios.post(
           process.env.SLACK_WEBHOOK_URL,
           {
+            thread_ts: subOrderCanceledData.threadTs,
+            reply_broadcast: true,
             blocks: [
               {
                 type: 'section',
@@ -396,6 +403,8 @@ export const createSlackNotification = async (
         await axios.post(
           process.env.SLACK_WEBHOOK_URL,
           {
+            thread_ts: partnerConfirmsSubOrderData.threadTs,
+            reply_broadcast: true,
             blocks: [
               {
                 type: 'section',
