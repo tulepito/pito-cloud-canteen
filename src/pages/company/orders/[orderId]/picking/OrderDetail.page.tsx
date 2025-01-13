@@ -27,6 +27,7 @@ import ReviewView from '@components/OrderDetails/ReviewView/ReviewView';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import SidebarFeaturesHeader from '@components/SidebarFeaturesHeader/SidebarFeaturesHeader';
 import Stepper from '@components/Stepper/Stepper';
+import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
 import { checkMinMaxQuantityInPickingState } from '@helpers/order/orderPickingHelper';
 import { checkOrderDetailHasChanged } from '@helpers/order/subOrderChangeAfterStartHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
@@ -43,6 +44,7 @@ import {
 } from '@redux/slices/OrderManagement.slice';
 import { getStepsByOrderType } from '@src/constants/stepperSteps';
 import { companyPaths } from '@src/paths';
+import type { OrderListing } from '@src/types';
 import { diffDays } from '@src/utils/dates';
 import { ETransition } from '@src/utils/transaction';
 import { CurrentUser, Listing } from '@utils/data';
@@ -103,7 +105,10 @@ const OrderDetailPage = () => {
   const cancelPickingOrderInProgress = useAppSelector(
     (state) => state.OrderManagement.cancelPickingOrderInProgress,
   );
-  const orderData = useAppSelector((state) => state.OrderManagement.orderData);
+  const orderData: OrderListing = useAppSelector(
+    (state) => state.OrderManagement.orderData,
+  );
+
   const systemVATPercentage = useAppSelector(
     (state) => state.SystemAttributes.systemVATPercentage,
   );
@@ -325,7 +330,16 @@ const OrderDetailPage = () => {
 
   const { lastTransition = ETransition.INITIATE_TRANSACTION, restaurant = {} } =
     draftOrderDetail?.[currentViewDate] || {};
+
   const { minQuantity = 1, maxQuantity = 100 } = restaurant;
+
+  const _timeParts = convertHHmmStringToTimeParts(
+    orderData.attributes?.metadata?.deadlineHour,
+  );
+  const _deliveryHourOffsetInMilliseconds =
+    _timeParts.hours * 60 * 60 * 1000 + _timeParts.minutes * 60 * 1000;
+  const _currentDeliveryViewDateTime =
+    currentViewDate + _deliveryHourOffsetInMilliseconds;
 
   const ableToUpdateOrder =
     !isFetchingOrderDetails &&
@@ -333,7 +347,10 @@ const OrderDetailPage = () => {
     (((lastTransition === ETransition.INITIATE_TRANSACTION ||
       lastTransition === ETransition.PARTNER_CONFIRM_SUB_ORDER) &&
       isDraftEditing &&
-      Number(diffDays(currentViewDate, new Date().getTime(), 'hours').hours) >
+      Number(
+        diffDays(_currentDeliveryViewDateTime, new Date().getTime(), 'hours')
+          .hours,
+      ) >
         +process.env
           .NEXT_PUBLIC_MIN_OFFSET_TIME_TO_MODIFY_ORDER_DETAIL_IN_HOUR) ||
       isPickingOrder);
