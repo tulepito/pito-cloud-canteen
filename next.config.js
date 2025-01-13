@@ -26,6 +26,20 @@ const nextConfig = {
     domains: ['sharetribe.imgix.net', 'res.cloudinary.com'],
     unoptimized: true,
   },
+  redirects: async () => {
+    return [
+      {
+        source: '/meal-rating',
+        destination: 'https://meal-rating.pito.vn',
+        permanent: true,
+      },
+      {
+        source: '/meal-rating/',
+        destination: 'https://meal-rating.pito.vn',
+        permanent: true,
+      },
+    ];
+  },
 };
 
 module.exports = withSentryConfig(withEnvsAssurance(nextConfig), {
