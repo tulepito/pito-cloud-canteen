@@ -32,6 +32,7 @@ type DifferentOrderDetailMember = {
   newFoodId?: string;
   newFoodName?: string;
   memberName: string;
+  restaurantName: string;
 };
 
 type DifferentOrderDetailLineItem = {
@@ -64,6 +65,8 @@ const sendParticipantChangedGroupOrderFoodsSlackNotification = async (
       const acc = await accPromise;
       const newMemberOrders = newOrderDetail[date]?.memberOrders;
       const oldMemberOrders = oldOrderDetail[date]?.memberOrders;
+      const restaurantName =
+        newOrderDetail[date]?.restaurant?.restaurantName || '';
 
       const differentMemberOrders = await Object.keys(
         newMemberOrders || {},
@@ -82,6 +85,7 @@ const sendParticipantChangedGroupOrderFoodsSlackNotification = async (
               [memberId]: {
                 oldFoodId: oldMemberOrders?.[memberId]?.foodId,
                 newFoodId: newMemberOrders?.[memberId]?.foodId,
+                restaurantName,
                 memberName: buildFullName(
                   member?.attributes?.profile?.firstName,
                   member?.attributes?.profile?.lastName,
@@ -103,6 +107,7 @@ const sendParticipantChangedGroupOrderFoodsSlackNotification = async (
               [memberId]: {
                 oldFoodId: oldMemberOrders?.[memberId]?.foodId,
                 newFoodId: undefined,
+                restaurantName,
                 memberName: buildFullName(
                   member?.attributes?.profile?.firstName,
                   member?.attributes?.profile?.lastName,
@@ -170,6 +175,7 @@ const sendParticipantChangedGroupOrderFoodsSlackNotification = async (
                 newFoodId,
                 newFoodName: newFoodId ? foodNameMap[newFoodId] : undefined,
                 memberName,
+                restaurantName,
               },
             };
           },
@@ -209,7 +215,7 @@ const sendParticipantChangedGroupOrderFoodsSlackNotification = async (
             }
 
             return Object.keys(memberOrders).map((memberId) => {
-              const { oldFoodName, newFoodName, memberName } =
+              const { oldFoodName, newFoodName, memberName, restaurantName } =
                 memberOrders[memberId];
               const type =
                 (!oldFoodName && newFoodName && ('add' as const)) ||
@@ -224,6 +230,7 @@ const sendParticipantChangedGroupOrderFoodsSlackNotification = async (
                 toFoodName: newFoodName,
                 addFoodName: newFoodName,
                 removeFoodName: oldFoodName,
+                restaurantName,
               };
             });
           })

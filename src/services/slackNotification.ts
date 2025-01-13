@@ -41,6 +41,7 @@ type SlackNotificationParams = {
       removeFoodName?: string;
       addFoodName?: string;
       participantName: string;
+      restaurantName: string;
     }[];
   };
   participantNormalOrderFoodChangedData?: {
@@ -218,22 +219,20 @@ export const createSlackNotification = async (
               ...participantGroupOrderFoodChangedData.changes.map((change) => {
                 return {
                   type: 'section',
-                  fields: [
-                    {
-                      type: 'mrkdwn',
-                      text: `[${change.date}] :person_in_tuxedo: Participant *${
-                        change.participantName
-                      }*\n${
-                        (change.type === 'remove' &&
-                          `:x: Xóa phần ăn *${change.removeFoodName}*`) ||
-                        (change.type === 'add' &&
-                          `:large_green_square: Thêm phần ăn *${change.addFoodName}*`) ||
-                        (change.type === 'update' &&
-                          `:pencil: Thay đổi từ *${change.fromFoodName}* thành *${change.toFoodName}*`) ||
-                        ''
-                      }`,
-                    },
-                  ],
+                  text: {
+                    type: 'mrkdwn',
+                    text: `[${change.date}] :person_in_tuxedo: Đối tác *[${
+                      change.restaurantName
+                    }]* Participant *[${change.participantName}]* ${
+                      (change.type === 'remove' &&
+                        `:x: Xóa phần ăn *[${change.removeFoodName}]*`) ||
+                      (change.type === 'add' &&
+                        `:large_green_square: Thêm phần ăn *[${change.addFoodName}]*`) ||
+                      (change.type === 'update' &&
+                        `:pencil: Thay đổi từ *[${change.fromFoodName}]* thành *[${change.toFoodName}]*`) ||
+                      ''
+                    }`,
+                  },
                 };
               }),
             ],

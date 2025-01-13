@@ -98,6 +98,9 @@ const sendParticipantFoodChangeSlackNotification = async (
   currentDate: number,
   by: 'admin' | 'booker',
 ) => {
+  const restaurantName =
+    planListing.attributes?.metadata?.orderDetail?.[currentDate]?.restaurant
+      ?.restaurantName || '';
   const diffentOrderDetail = await Object.keys(
     newMembersOrderValues || {},
   ).reduce<Promise<DifferentOrderDetail>>(async (_acc, memberId) => {
@@ -121,6 +124,7 @@ const sendParticipantFoodChangeSlackNotification = async (
             [memberId]: {
               newFoodId: foodId,
               newFoodName: foodListing.data.data.attributes?.title,
+              restaurantName,
               memberName: buildFullName(
                 member?.attributes?.profile?.firstName,
                 member?.attributes?.profile?.lastName,
@@ -171,6 +175,7 @@ const sendParticipantFoodChangeSlackNotification = async (
                 toFoodName: newFoodName,
                 addFoodName: newFoodName,
                 removeFoodName: oldFoodName,
+                restaurantName,
               };
             });
           })
