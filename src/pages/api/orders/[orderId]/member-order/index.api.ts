@@ -198,7 +198,7 @@ export interface PUTMemberOrderBody {
   currentViewDate: number;
   participantId?: string;
   newMemberOrderValues?: unknown;
-  newMembersOrderValues: NewMembersOrderValues;
+  newMembersOrderValues?: NewMembersOrderValues;
   anonymous?: string[];
 }
 
@@ -260,7 +260,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
         if (
           orderListingResponse.data.data.attributes?.metadata?.orderState ===
-          EOrderStates.inProgress
+            EOrderStates.inProgress &&
+          newMembersOrderValues
         ) {
           sendParticipantFoodChangeSlackNotification(
             orderListingResponse.data.data,

@@ -2,6 +2,7 @@ import { useIntl } from 'react-intl';
 import classNames from 'classnames';
 
 import RenderWhen from '@components/RenderWhen/RenderWhen';
+import type { RestoreDraftDisAllowedMemberPayload } from '@redux/slices/OrderManagement.slice';
 
 import type { TAllTabData, TItemData } from './OrderDetailsTable.utils';
 import { EOrderDetailsTableTab, TABLE_TABS } from './OrderDetailsTable.utils';
@@ -22,7 +23,9 @@ type TUsePrepareTabItemsParams = {
     tab: EOrderDetailsTableTab,
     memberId: string,
   ) => () => void;
-  handleRestoreMembers: (memberIds: string[]) => void;
+  handleRestoreMembers: (
+    members: RestoreDraftDisAllowedMemberPayload['members'],
+  ) => void;
   handleDeletePermanentlyMembers: (memberIds: string[]) => void;
   ableToUpdateOrder: boolean;
 };

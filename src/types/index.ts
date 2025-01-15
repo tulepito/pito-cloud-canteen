@@ -71,6 +71,12 @@ export type OrderListing = ListingBuilder<
   {}
 >;
 
+export type MemberOrderValue = {
+  foodId: string;
+  requirement: string;
+  status: 'empty' | 'joined' | 'notJoined' | 'notAllowed' | 'expired';
+};
+
 export type OrderDetailValue = {
   hasNoRestaurants: boolean;
   lineItems: {
@@ -82,14 +88,7 @@ export type OrderDetailValue = {
   }[];
   transactionId: string;
   lastTransition: string;
-  memberOrders: Record<
-    string,
-    {
-      foodId: string;
-      requirement: string;
-      status: 'empty' | 'joined' | 'notJoined' | 'notAllowed' | 'expired';
-    }
-  >;
+  memberOrders: Record<string, MemberOrderValue>;
   restaurant: {
     foodList: Record<
       string,

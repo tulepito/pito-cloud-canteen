@@ -47,20 +47,20 @@ const IconNoteCheckList: React.FC<TIconProps> = ({ className }) => {
         stroke="#8C8C8C"
         strokeWidth="0.477635"
       />
-      <g clip-path="url(#clip0_1_8684)">
+      <g clipPath="url(#clip0_1_8684)">
         <path
           d="M26.201 15.9779V16.3891C26.2005 17.3528 25.8884 18.2906 25.3114 19.0624C24.7343 19.8343 23.9232 20.399 22.999 20.6723C22.0748 20.9455 21.0871 20.9127 20.1831 20.5787C19.279 20.2447 18.5072 19.6275 17.9827 18.819C17.4581 18.0105 17.209 17.0541 17.2724 16.0925C17.3358 15.1308 17.7084 14.2154 18.3345 13.4828C18.9607 12.7502 19.8069 12.2396 20.7469 12.0272C21.687 11.8149 22.6705 11.912 23.5508 12.3043"
           stroke="#262626"
           strokeWidth="0.893832"
-          stroke-linecap="round"
-          stroke-linejoin="round"
+          strokeLinecap="round"
+          strokeLinejoin="round"
         />
         <path
           d="M26.2015 12.8137L21.7323 17.2873L20.3916 15.9466"
           stroke="#262626"
           strokeWidth="0.893832"
-          stroke-linecap="round"
-          stroke-linejoin="round"
+          strokeLinecap="round"
+          strokeLinejoin="round"
         />
       </g>
       <defs>

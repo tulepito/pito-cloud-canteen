@@ -120,6 +120,28 @@ const sendParticipantChangedGroupOrderFoodsSlackNotification = async (
             };
           }
 
+          if (
+            oldMemberOrders?.[memberId]?.status === 'notAllowed' &&
+            newMemberOrders?.[memberId]?.status !== 'notAllowed'
+          ) {
+            return {
+              ...memberAcc,
+              [memberId]: {
+                oldFoodId: undefined,
+                newFoodId: newMemberOrders?.[memberId]?.foodId,
+                restaurantName,
+                memberName: buildFullName(
+                  member?.attributes?.profile?.firstName,
+                  member?.attributes?.profile?.lastName,
+                  {
+                    compareToGetLongerWith:
+                      member?.attributes?.profile?.displayName,
+                  },
+                ),
+              },
+            };
+          }
+
           return memberAcc;
         },
         Promise.resolve({}) as Promise<{

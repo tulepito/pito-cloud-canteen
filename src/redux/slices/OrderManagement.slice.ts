@@ -46,6 +46,8 @@ import type { POSTRemindMemberBody } from '@pages/api/orders/[orderId]/remind-me
 import { createAsyncThunk } from '@redux/redux.helper';
 import type { RootState } from '@redux/store';
 import type { NotificationInvitationParams } from '@services/notifications';
+import type { MemberOrderValue, OrderDetailValue } from '@src/types';
+import type { DeepPartial } from '@src/types/utils';
 import type { TPlan } from '@src/utils/orderTypes';
 import { denormalisedResponseEntities, Listing, User } from '@utils/data';
 import {
@@ -533,7 +535,13 @@ const disallowMember = createAsyncThunk(
 
 const restoredDisAllowedMember = createAsyncThunk(
   'app/OrderManagement/RESTORE_DISALLOWED_MEMBER',
-  async (params: TObject, { getState }) => {
+  async (
+    params: {
+      memberIds: string[];
+      currentViewDate: number;
+    },
+    { getState },
+  ) => {
     const { currentViewDate, memberIds = [] } = params;
     const {
       id: { uuid: orderId },
@@ -609,6 +617,93 @@ const deleteDisAllowedMember = createAsyncThunk(
     await updateOrderDetailFromDraftApi(orderId, updateParams);
 
     return updateParams;
+  },
+);
+
+export interface RestoreDraftDisAllowedMemberPayload {
+  members: DeepPartial<{
+    isAnonymous: boolean;
+    memberData: {
+      email: string;
+      name: string;
+      id: string;
+    };
+    status: MemberOrderValue['status'];
+    foodData: {
+      foodName: string;
+      foodPrice: number;
+      foodUnit: string;
+      foodId: string;
+      requirement: string;
+    };
+  }>[];
+
+  currentViewDate: number;
+}
+
+const restoreDraftDisAllowedMember = createAsyncThunk(
+  'app/OrderManagement/RESTORE_DRAFT_DISALLOWED_MEMBER',
+  async (payload: RestoreDraftDisAllowedMemberPayload, { getState }) => {
+    const { currentViewDate, members = [] } = payload;
+
+    const {
+      attributes: { metadata },
+    } = getState().OrderManagement.planData!;
+    const { currentUser } = getState().user;
+
+    const { memberOrders: oldMemberOrders = {} } =
+      metadata?.orderDetail[currentViewDate] || {};
+
+    const newMembersOrderValues: OrderDetailValue['memberOrders'] =
+      members.reduce((result, member) => {
+        if (!member.memberData?.id) return result;
+
+        const memberOrderDetailOnUpdateDate =
+          oldMemberOrders[member.memberData?.id];
+        const { foodId } = memberOrderDetailOnUpdateDate || {};
+
+        const newStatus =
+          foodId === ''
+            ? EParticipantOrderStatus.empty
+            : EParticipantOrderStatus.joined;
+
+        return {
+          ...result,
+          [member.memberData?.id]: {
+            ...memberOrderDetailOnUpdateDate,
+            status: newStatus,
+          },
+        };
+      }, oldMemberOrders);
+
+    const newDraftSubOrderChangesHistory = {
+      ...(getState().OrderManagement.draftSubOrderChangesHistory || {}),
+      [currentViewDate]: [
+        {
+          id: new Date().getTime(),
+          newValue: {
+            members,
+          },
+          createdAt: {
+            seconds: new Date().getTime() / 1000,
+          },
+          planOrderDate: currentViewDate,
+          type: EEditSubOrderHistoryType.MEMBERS_FOOD_RESTORED,
+          authorRole: currentUser?.attributes?.profile?.metadata?.isAdmin
+            ? 'admin'
+            : 'booker',
+        },
+        ...(getState().OrderManagement.draftSubOrderChangesHistory?.[
+          currentViewDate
+        ] || []),
+      ],
+    };
+
+    return {
+      currentViewDate,
+      newMembersOrderValues,
+      newDraftSubOrderChangesHistory,
+    };
   },
 );
 
@@ -848,7 +943,7 @@ const updateOrderFromDraftEdit = createAsyncThunk(
       planId,
       orderDetail: draftOrderDetail,
     });
-    await Promise.all(
+    Promise.all(
       Object.keys(draftSubOrderChangesHistory).map(async (date) => {
         const draftSubOrderChangesHistoryByDate = draftSubOrderChangesHistory[
           date as keyof typeof draftSubOrderChangesHistory
@@ -856,13 +951,13 @@ const updateOrderFromDraftEdit = createAsyncThunk(
         if (draftSubOrderChangesHistoryByDate.length > 0) {
           const { restaurant = {} } = draftOrderDetail[date] || {};
 
-          await sendOrderDetailUpdatedEmailApi({
+          sendOrderDetailUpdatedEmailApi({
             orderId,
             timestamp: date,
             restaurantId: restaurant.id!,
           });
 
-          await Promise.all(
+          Promise.all(
             draftSubOrderChangesHistoryByDate.map(
               async (item: TSubOrderChangeHistoryItem) => {
                 const {
@@ -883,7 +978,7 @@ const updateOrderFromDraftEdit = createAsyncThunk(
                   newValue,
                   createdAt: new Date(Number(createdAt?.seconds) * 1000),
                 };
-                await createSubOrderChangesHistoryDocumentApi(
+                createSubOrderChangesHistoryDocumentApi(
                   orderId,
                   subOrderChangesHistoryParams,
                 );
@@ -1005,6 +1100,7 @@ export const orderManagementThunks = {
   sendRemindEmailToMember,
   disallowMember,
   restoredDisAllowedMember,
+  restoreDraftDisAllowedMember,
   deleteDisAllowedMember,
   addParticipant,
   deleteParticipant,
@@ -1318,6 +1414,7 @@ const OrderManagementSlice = createSlice({
               foodPrice: oldFoodPrice,
               foodId: oldFoodId,
             },
+            authorRole: isAdminFlow ? 'admin' : 'booker',
           },
           ...(state.draftSubOrderChangesHistory[currentViewDate] || []),
         ],
@@ -1854,7 +1951,11 @@ const OrderManagementSlice = createSlice({
       })
 
       .addCase(restoredDisAllowedMember.fulfilled, (state, { payload }) => {
-        const { currentViewDate, newMembersOrderValues } = payload || {};
+        const { currentViewDate, newMembersOrderValues } =
+          (payload as {
+            currentViewDate: number;
+            newMembersOrderValues: TObject;
+          }) || {};
 
         set(
           state.planData.attributes.metadata.orderDetail,
@@ -1870,6 +1971,65 @@ const OrderManagementSlice = createSlice({
           ...state.draftOrderDetail[currentViewDate].memberOrders,
           ...newMembersOrderValues,
         });
+      })
+
+      .addCase(restoreDraftDisAllowedMember.fulfilled, (state, { payload }) => {
+        const {
+          currentViewDate,
+          newMembersOrderValues,
+          newDraftSubOrderChangesHistory,
+        } =
+          (payload as {
+            currentViewDate: number;
+            newMembersOrderValues: TObject;
+            newDraftSubOrderChangesHistory: Record<string, TObject[]>;
+          }) || {};
+
+        console.log([
+          ...(state.subOrderChangesHistory || []),
+          ...(newDraftSubOrderChangesHistory[currentViewDate] || []),
+        ]);
+
+        return {
+          ...state,
+          draftSubOrderChangesHistory: {
+            ...state.draftSubOrderChangesHistory,
+            ...newDraftSubOrderChangesHistory,
+          },
+          draftOrderDetail: {
+            ...state.draftOrderDetail,
+            [currentViewDate]: {
+              ...state.draftOrderDetail[currentViewDate],
+              memberOrders: {
+                ...state.draftOrderDetail[currentViewDate].memberOrders,
+                ...newMembersOrderValues,
+              },
+            },
+          },
+          planData: {
+            ...state.planData,
+            attributes: {
+              ...state.planData.attributes,
+              metadata: {
+                ...state.planData.attributes.metadata,
+                orderDetail: {
+                  ...state.planData.attributes.metadata.orderDetail,
+                  [currentViewDate]: {
+                    ...state.planData.attributes.metadata.orderDetail[
+                      currentViewDate
+                    ],
+                    memberOrders: {
+                      ...state.planData.attributes.metadata.orderDetail[
+                        currentViewDate
+                      ].memberOrders,
+                      ...newMembersOrderValues,
+                    },
+                  },
+                },
+              },
+            },
+          },
+        };
       })
 
       .addCase(deleteDisAllowedMember.fulfilled, (state, { payload }) => {

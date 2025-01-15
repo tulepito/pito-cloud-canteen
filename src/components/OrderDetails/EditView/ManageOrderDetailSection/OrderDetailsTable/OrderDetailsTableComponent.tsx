@@ -12,6 +12,7 @@ import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { parseThousandNumber } from '@helpers/format';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { useViewport } from '@hooks/useViewport';
+import type { RestoreDraftDisAllowedMemberPayload } from '@redux/slices/OrderManagement.slice';
 import { orderDetailsAnyActionsInProgress } from '@redux/slices/OrderManagement.slice';
 import { EParticipantOrderStatus } from '@utils/enums';
 import type { TObject } from '@utils/types';
@@ -40,7 +41,9 @@ type TOrderDetailsTableComponentProps = {
   hasTotalLine?: boolean;
   onClickEditOrderItem: (tab: EOrderDetailsTableTab, id: string) => () => void;
   onClickDeleteOrderItem: (memberId: string) => () => void;
-  onRestoreMembers: (memberIds: string[]) => void;
+  onRestoreMembers: (
+    memberIds: RestoreDraftDisAllowedMemberPayload['members'],
+  ) => void;
   onDeletePermanentlyMembers: (memberIds: string[]) => void;
   ableToUpdateOrder: boolean;
 };

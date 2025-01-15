@@ -5,6 +5,7 @@ import Modal from '@components/Modal/Modal';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import SlideModal from '@components/SlideModal/SlideModal';
 import { useViewport } from '@hooks/useViewport';
+import type { RestoreDraftDisAllowedMemberPayload } from '@redux/slices/OrderManagement.slice';
 import type { TObject } from '@utils/types';
 
 import type { TManageDeletedListFormValues } from './ManageDeletedListForm';
@@ -18,7 +19,9 @@ import css from './ManageDeletedListModal.module.scss';
 type TManageDeletedListModalProps = {
   isOpen: boolean;
   onClose: () => void;
-  onRestoreMembers: (memberIds: string[]) => void;
+  onRestoreMembers: (
+    members: RestoreDraftDisAllowedMemberPayload['members'],
+  ) => void;
   onDeletePermanentlyMembers: (memberIds: string[]) => void;
   deletedTabData: TObject[];
   disabled: boolean;
@@ -53,7 +56,18 @@ const ManageDeletedListModal: React.FC<TManageDeletedListModalProps> = (
 
   const handleSubmit = ({ memberIds }: TManageDeletedListFormValues) => {
     if (action === ManageDeletedListFormAction.RESTORE) {
-      onRestoreMembers(memberIds);
+      const members = memberIds.reduce((acc, memberId) => {
+        const member = deletedTabData.find(
+          (item) => item.memberData.id === memberId,
+        );
+
+        if (member) {
+          acc.push(member);
+        }
+
+        return acc;
+      }, [] as RestoreDraftDisAllowedMemberPayload['members']);
+      onRestoreMembers(members);
     } else if (action === ManageDeletedListFormAction.DELETE) {
       onDeletePermanentlyMembers(memberIds);
     }

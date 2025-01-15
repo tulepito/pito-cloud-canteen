@@ -7,6 +7,7 @@ import Tabs from '@components/Tabs/Tabs';
 import { historyPushState } from '@helpers/urlHelpers';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
+import type { RestoreDraftDisAllowedMemberPayload } from '@redux/slices/OrderManagement.slice';
 import {
   orderDetailsAnyActionsInProgress,
   OrderManagementsAction,
@@ -149,11 +150,22 @@ const OrderDetailsTable: React.FC<TOrderDetailsTableProps> = (props) => {
     setIsEditSelectionModalOpen(false);
   };
 
-  const handleRestoreMembers = async (memberIds: string[]) => {
+  const handleRestoreMembers = async (
+    members: RestoreDraftDisAllowedMemberPayload['members'],
+  ) => {
+    if (isDraftEditing) {
+      return dispatch(
+        orderManagementThunks.restoreDraftDisAllowedMember({
+          currentViewDate,
+          members,
+        }),
+      );
+    }
+
     await dispatch(
       orderManagementThunks.restoredDisAllowedMember({
         currentViewDate,
-        memberIds,
+        memberIds: members.map((member) => member.memberData?.id!),
       }),
     );
   };

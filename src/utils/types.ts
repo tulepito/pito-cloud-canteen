@@ -33,6 +33,9 @@ import type { ETransition } from './transaction';
 
 const { UUID, LatLng, Money } = sdkLoader;
 
+/**
+ * @deprecated
+ */
 export type TObject<
   K extends string | number | symbol = string,
   V = any,

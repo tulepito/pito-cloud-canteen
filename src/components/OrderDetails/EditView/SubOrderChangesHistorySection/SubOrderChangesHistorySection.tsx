@@ -6,6 +6,7 @@ import classNames from 'classnames';
 
 import { InlineTextButton } from '@components/Button/Button';
 import useBoolean from '@hooks/useBoolean';
+import type { RestoreDraftDisAllowedMemberPayload } from '@redux/slices/OrderManagement.slice';
 import { formatTimestamp } from '@src/utils/dates';
 import { EEditSubOrderHistoryType } from '@src/utils/enums';
 import type { TSubOrderChangeHistoryItem } from '@src/utils/types';
@@ -57,6 +58,24 @@ const SubOrderChangesHistoryItem = (props: TSubOrderChangeHistoryItem) => {
               foodName: <span className={css.boldText}>"{foodName}"</span>,
             },
           ),
+        };
+      }
+      case EEditSubOrderHistoryType.MEMBERS_FOOD_RESTORED: {
+        const {
+          members,
+        }: {
+          members: RestoreDraftDisAllowedMemberPayload['members'];
+        } = newValue || {};
+
+        return {
+          title: 'Khôi phục phần ăn',
+          content: `Đã khôi phục phần ăn cho ${
+            (members?.length || 0) <= 3
+              ? (members || [])
+                  .map((_member) => `"${_member?.memberData?.email}"`)
+                  .join(', ')
+              : `${members?.length} thành viên`
+          }`,
         };
       }
       case EEditSubOrderHistoryType.MEMBER_FOOD_CHANGED: {

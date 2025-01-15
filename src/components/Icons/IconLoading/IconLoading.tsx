@@ -16,7 +16,7 @@ const IconLoading: React.FC<TIconProps> = (props) => {
       stroke="#EE392A"
       aria-label="audio-loading"
       className={classes}>
-      <g fill="none" fillRule="evenodd" stroke-width="2">
+      <g fill="none" fillRule="evenodd" strokeWidth="2">
         <circle cx="22" cy="22" r="1">
           <animate
             attributeName="r"

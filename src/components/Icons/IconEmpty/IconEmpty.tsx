@@ -76,7 +76,7 @@ const IconEmpty: React.FC<TIconEmptyProps> = ({
       fill="none"
       className={className}
       xmlns="http://www.w3.org/2000/svg">
-      <g clip-path="url(#clip0_455_19635)">
+      <g clipPath="url(#clip0_455_19635)">
         <path
           d="M71.9081 79.1998C92.9409 79.1998 109.992 61.6833 109.992 39.9998C109.992 18.3163 92.8657 0.799805 71.9081 0.799805C50.8753 0.799805 33.8237 18.3163 33.8237 39.9998C33.8237 61.6833 50.8753 79.1998 71.9081 79.1998Z"
           fill="#F2F2F2"

@@ -2,6 +2,7 @@ import type {
   POSTUpdateStateBody,
   UpdateStateParams,
 } from '@pages/api/admin/listings/order/[orderId]/update-state.api';
+import type { PUTMemberOrderBody } from '@pages/api/orders/[orderId]/member-order/index.api';
 import type { POSTRemindMemberBody } from '@pages/api/orders/[orderId]/remind-member/index.api';
 import type { PUTUpdateOrderDetailFromDraftBody } from '@pages/api/orders/[orderId]/update-order-detail-from-draft.api';
 import type { TObject } from '@utils/types';
@@ -68,18 +69,9 @@ export const deleteParticipantFromOrderApi = (orderId: string, body: TObject) =>
   deleteApi(`/orders/${orderId}/participant`, body);
 // ------------------------- //
 
-type AddUpdateMemberOrderApiBody = {
-  planId: string;
-  currentViewDate: string;
-  participantId?: string;
-  newMemberOrderValues?: TObject;
-  newMembersOrderValues?: TObject;
-  anonymous?: string[];
-};
-
 export const addUpdateMemberOrder = (
   orderId: string,
-  body: AddUpdateMemberOrderApiBody,
+  body: PUTMemberOrderBody,
 ) => putApi(`/orders/${orderId}/member-order`, body);
 
 export const sendRemindEmailToMemberApi = (
