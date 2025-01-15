@@ -6,6 +6,7 @@ import { Views } from 'react-big-calendar';
 import Skeleton from 'react-loading-skeleton';
 import flatten from 'lodash/flatten';
 import { DateTime } from 'luxon';
+import Image from 'next/image';
 import { useRouter } from 'next/router';
 
 import Avatar from '@components/Avatar/Avatar';
@@ -20,7 +21,7 @@ import LoadingModal from '@components/LoadingModal/LoadingModal';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { getItem } from '@helpers/localStorageHelpers';
 import { markColorForOrder } from '@helpers/orderHelper';
-import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { useAppDispatch } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import useSubOrderPicking from '@pages/participant/hooks/useSubOrderPicking';
 import RatingSubOrderModal from '@pages/participant/orders/components/RatingSubOrderModal/RatingSubOrderModal';
@@ -29,7 +30,7 @@ import SubOrderDetailModal from '@pages/participant/orders/components/SubOrderDe
 import SuccessRatingModal from '@pages/participant/orders/components/SuccessRatingModal/SuccessRatingModal';
 import { OrderListThunks } from '@pages/participant/orders/OrderList.slice';
 import { CalendarActions } from '@redux/slices/Calendar.slice';
-import { isOver, isSameDate } from '@src/utils/dates';
+import { isOver } from '@src/utils/dates';
 import { EOrderStates, EParticipantOrderStatus } from '@src/utils/enums';
 import { convertStringToNumber } from '@src/utils/number';
 import { CurrentUser, Listing, User } from '@utils/data';
@@ -84,7 +85,6 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
   const { title: orderTitle } = orderObj.getAttributes();
   const orderColor = markColorForOrder(convertStringToNumber(orderTitle || ''));
   const currentUserId = CurrentUser(currentUser).getId();
-  const selectedDay = useAppSelector((state) => state.Calendar.selectedDay);
   const ratingSubOrderModalControl = useBoolean();
   const successRatingModalControl = useBoolean();
   const {
@@ -255,10 +255,17 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
       }),
     );
   };
+  const subOrdersFromSelectedDay = flattenEvents.filter((_event: any) => {
+    const _startDateWithoutTime = new Date(anchorDate).setHours(0, 0, 0, 0);
+    const _7daysAfterAnchorDate = new Date(_startDateWithoutTime).setDate(
+      new Date(_startDateWithoutTime).getDate() + 6,
+    );
 
-  const subOrdersFromSelectedDay = flattenEvents.filter((_event: any) =>
-    isSameDate(_event.start, selectedDay),
-  );
+    return (
+      _event.resource.timestamp >= _startDateWithoutTime &&
+      _event.resource.timestamp <= _7daysAfterAnchorDate
+    );
+  });
 
   const localStorageView = getItem('participant_calendarView');
   const isValidLocalStorageView = ['month', 'week'].includes(
@@ -361,14 +368,51 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
         />
       </div>
       <div className={css.subOrderContainer}>
-        {subOrdersFromSelectedDay.map((_event) => (
-          <SubOrderCard
-            key={_event.resource?.id}
-            event={_event}
-            setSelectedEvent={setSelectedEvent}
-            openSubOrderDetailModal={subOrderDetailModalControl.setTrue}
-          />
-        ))}
+        {subOrdersFromSelectedDay?.length ? (
+          subOrdersFromSelectedDay.map((_event) => (
+            <SubOrderCard
+              key={_event.resource?.id}
+              event={_event}
+              setSelectedEvent={setSelectedEvent}
+              openSubOrderDetailModal={subOrderDetailModalControl.setTrue}
+            />
+          ))
+        ) : (
+          <>
+            <div
+              style={{
+                position: 'relative',
+                width: '60%',
+                maxWidth: '400px',
+                height: '200px',
+                aspectRatio: '1/1',
+                margin: '0 auto',
+              }}>
+              <Image
+                src="/images/emptyResult.png"
+                style={{
+                  objectFit: 'contain',
+                }}
+                fill
+                alt="empty result"
+              />
+            </div>
+            <div>
+              <p style={{ margin: '4px 0', textAlign: 'center' }}>
+                Không tìm thấy đơn hàng nào trong tuần
+              </p>
+              <p
+                style={{
+                  margin: '4px 0',
+                  color: '#8c8c8c',
+                  fontSize: '14px',
+                  textAlign: 'center',
+                }}>
+                Hãy thử chọn ngày khác để xem thông tin đơn hàng
+              </p>
+            </div>
+          </>
+        )}
       </div>
       <RenderWhen condition={!!selectedEvent}>
         <SubOrderDetailModal

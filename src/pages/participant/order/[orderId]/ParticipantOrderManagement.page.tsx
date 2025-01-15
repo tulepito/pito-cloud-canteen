@@ -156,6 +156,7 @@ const ParticipantOrderManagement = () => {
           <span>{User(company as TUser).getPublicData().companyName}</span>
         </div>
       ),
+      children: '',
       childrenFn: (props: any) => <OrderCalendarView {...props} />,
       childrenProps: {
         company,
@@ -273,7 +274,7 @@ const ParticipantOrderManagement = () => {
                 />
               </>
             ) : (
-              <Tabs items={tabOptions as any} headerClassName={css.tabHeader} />
+              <Tabs items={tabOptions} headerClassName={css.tabHeader} />
             )}
             <LoadingModal isOpen={loadingInProgress} />
           </>
