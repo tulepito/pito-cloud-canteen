@@ -1,0 +1,42 @@
+@use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  row-gap: 16px;
+
+  .rowInfo {
+    display: flex;
+    flex-direction: column;
+    row-gap: 4px;
+
+    .label,
+    .value {
+      @include textTemplate(16px, 400, 24px);
+    }
+
+    .value {
+      font-weight: 600;
+    }
+
+    .rowDataLoading {
+      width: calc(100vw - 16px * 4);
+      height: 24px;
+    }
+
+    @include viewportMedium {
+      flex-direction: row;
+      column-gap: 40px;
+
+      .label {
+        flex-basis: 165px;
+      }
+
+      .rowDataLoading {
+        width: 420px;
+      }
+    }
+  }
+}
