@@ -1,12 +1,15 @@
 import { useMemo, useRef } from 'react';
 import type { Event } from 'react-big-calendar';
+import { shallowEqual } from 'react-redux';
 import { toast } from 'react-toastify';
 
 import Modal from '@components/Modal/Modal';
 import SlideModal from '@components/SlideModal/SlideModal';
-import { useAppDispatch } from '@hooks/reduxHooks';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { useViewport } from '@hooks/useViewport';
+import { SubOrdersThunks } from '@pages/participant/sub-orders/SubOrders.slice';
 import { resetImage } from '@redux/slices/uploadImage.slice';
+import { ESubOrderTxStatus } from '@src/utils/enums';
 
 import { OrderListThunks } from '../../OrderList.slice';
 import type { TRatingSubOrderFormValues } from '../RatingSubOrderForm/RatingSubOrderForm';
@@ -19,7 +22,7 @@ type TRatingSubOrderModalProps = {
   onClose: () => void;
   currentUserId: string;
   selectedEvent: Event | null;
-  openSuccessRatingModal?: () => void;
+  onRatingSuccess?: () => void;
   participantPostRatingInProgress?: boolean;
 };
 const RatingSubOrderModal: React.FC<TRatingSubOrderModalProps> = (props) => {
@@ -28,9 +31,13 @@ const RatingSubOrderModal: React.FC<TRatingSubOrderModalProps> = (props) => {
     onClose,
     currentUserId,
     selectedEvent,
-    openSuccessRatingModal,
+    onRatingSuccess,
     participantPostRatingInProgress,
   } = props;
+  const orders = useAppSelector(
+    (state) => state.ParticipantOrderList.orders,
+    shallowEqual,
+  );
   const dispatch = useAppDispatch();
   const { isMobileLayout } = useViewport();
   const { companyName, orderId, restaurant, timestamp, planId, foodName } =
@@ -58,7 +65,7 @@ const RatingSubOrderModal: React.FC<TRatingSubOrderModalProps> = (props) => {
   const handleSubmit = async (values: TRatingSubOrderFormValues) => {
     const { general, food, packaging, detailTextRating } = values;
     const rating = {
-      orderId: orderId as string,
+      orderId,
       restaurantId,
       timestamp,
       reviewerId: currentUserId,
@@ -84,8 +91,20 @@ const RatingSubOrderModal: React.FC<TRatingSubOrderModalProps> = (props) => {
 
     if (meta.requestStatus === 'fulfilled') {
       handleClose();
-      openSuccessRatingModal?.();
+      onRatingSuccess?.();
       toast.success('Cảm ơn bạn đã đánh giá');
+      dispatch(
+        SubOrdersThunks.fetchSubOrdersFromFirebase({
+          participantId: currentUserId,
+          txStatus: ESubOrderTxStatus.DELIVERED,
+          extraQueryParams: {
+            orderId: {
+              operator: 'in',
+              value: orders.map((order) => order?.id?.uuid),
+            },
+          },
+        }),
+      );
       dispatch(resetImage());
       formRef.current?.reset();
     }

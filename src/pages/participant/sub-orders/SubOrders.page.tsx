@@ -57,7 +57,7 @@ const SubOrders = () => {
     (state) => state.ParticipantOrderList.participantPostRatingInProgress,
   );
 
-  const openSuccessRatingModal = () => {
+  const onRatingSuccess = () => {
     ratingSubOrderModalControl.setFalse();
   };
 
@@ -170,7 +170,7 @@ const SubOrders = () => {
           onClose={ratingSubOrderModalControl.setFalse}
           selectedEvent={selectedEvent}
           currentUserId={currentUserId}
-          openSuccessRatingModal={openSuccessRatingModal}
+          onRatingSuccess={onRatingSuccess}
           participantPostRatingInProgress={participantPostRatingInProgress}
         />
       </RenderWhen>

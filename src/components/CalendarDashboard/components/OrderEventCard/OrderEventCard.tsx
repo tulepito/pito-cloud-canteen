@@ -72,6 +72,11 @@ const OrderEventCard: React.FC<TOrderEventCardProps> = ({
     shallowEqual,
   );
 
+  const fetchSubOrdersInProgress = useAppSelector(
+    (state) => state.ParticipantSubOrderList.fetchSubOrdersInProgress,
+    shallowEqual,
+  );
+
   const fetchSubOrderTxInProgress = useAppSelector(
     (state) => state.ParticipantOrderList.fetchSubOrderTxInProgress,
   );
@@ -163,6 +168,7 @@ const OrderEventCard: React.FC<TOrderEventCardProps> = ({
 
     const canRate =
       (scope === 'card' &&
+        !fetchSubOrdersInProgress &&
         lastTransition === ETransition.COMPLETE_DELIVERY &&
         status === EParticipantOrderStatus.joined &&
         (!deliveriedSubOrder || (!!deliveriedSubOrder && !reviewId))) ||

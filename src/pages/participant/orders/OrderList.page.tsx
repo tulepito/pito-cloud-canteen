@@ -121,6 +121,11 @@ const OrderListPage = () => {
     shallowEqual,
   );
 
+  const fetchSubOrdersInProgress = useAppSelector(
+    (state) => state.ParticipantSubOrderList.fetchSubOrdersInProgress,
+    shallowEqual,
+  );
+
   const fetchSubOrderDocumentInProgress = useAppSelector(
     (state) => state.ParticipantOrderList.fetchSubOrderDocumentInProgress,
   );
@@ -374,7 +379,7 @@ const OrderListPage = () => {
     }
   };
 
-  const openSuccessRatingModal = () => {
+  const onRatingSuccess = () => {
     ratingSubOrderModalControl.setFalse();
   };
 
@@ -619,6 +624,7 @@ const OrderListPage = () => {
         : {};
     const canRate =
       (scope === 'card' &&
+        !fetchSubOrdersInProgress &&
         lastTransition === ETransition.COMPLETE_DELIVERY &&
         status === EParticipantOrderStatus.joined &&
         (!deliveriedSubOrder || (!!deliveriedSubOrder && !reviewId))) ||
@@ -762,7 +768,7 @@ const OrderListPage = () => {
         onClose={ratingSubOrderModalControl.setFalse}
         selectedEvent={selectedEvent}
         currentUserId={currentUserId}
-        openSuccessRatingModal={openSuccessRatingModal}
+        onRatingSuccess={onRatingSuccess}
         participantPostRatingInProgress={participantPostRatingInProgress}
       />
 

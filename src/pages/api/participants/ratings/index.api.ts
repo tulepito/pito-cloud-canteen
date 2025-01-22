@@ -20,7 +20,11 @@ import type {
 } from '@src/types';
 import { Listing } from '@src/utils/data';
 import { buildFullName } from '@src/utils/emailTemplate/participantOrderPicking';
-import { ENativeNotificationType, ENotificationType } from '@src/utils/enums';
+import {
+  ENativeNotificationType,
+  ENotificationType,
+  ESubOrderTxStatus,
+} from '@src/utils/enums';
 
 import {
   buildParticipantSubOrderDocumentId,
@@ -115,6 +119,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         );
         await updateFirebaseDocument(subOrderId, {
           reviewId: review.id.uuid,
+          txStatus: ESubOrderTxStatus.DELIVERED, // mark the document as delivered, to perform the fetch action
         });
 
         createFirebaseDocNotification(ENotificationType.ORDER_RATING, {
