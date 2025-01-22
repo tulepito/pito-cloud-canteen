@@ -3,13 +3,12 @@
 
 .container {
   @include flexAlign(flex-start);
-  gap: 9px;
+  gap: 12px;
 }
 
 .avatar {
-  width: 24px;
-  height: 24px;
-  margin-top: 8px;
+  width: 32px;
+  height: 32px;
   flex-shrink: 0;
 }
 

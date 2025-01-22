@@ -469,6 +469,7 @@ export enum ESlackNotificationType {
   RESTAURANT_CHANGED = 'restaurantChanged',
   PARTNER_CONFIRMS_SUB_ORDER = 'partnerConfirmsSubOrder',
   PARTNER_REJECTS_SUB_ORDER = 'partnerRejectsSubOrder',
+  PARTICIPANT_RATING = 'participantRating',
 }
 
 export enum QuizStep {

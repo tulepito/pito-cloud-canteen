@@ -106,7 +106,7 @@ const TitleSection: React.FC<TTitleSectionProps> = ({
       </div>
       <RenderWhen condition={canReview}>
         <Button
-          variant="secondary"
+          variant="primary"
           className={css.reviewButton}
           onClick={goToReviewPage}>
           {reviewText}

@@ -55,7 +55,7 @@ const ServiceRating: React.FC<TServiceRatingProps> = (props) => {
     },
     {
       key: 'good-format',
-      label: 'HÌnh thức sạch đẹp',
+      label: 'Hình thức sạch đẹp',
     },
     {
       key: 'other',

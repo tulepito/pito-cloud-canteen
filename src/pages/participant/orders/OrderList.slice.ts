@@ -19,10 +19,12 @@ import {
 import { disableWalkthroughApi } from '@apis/userApi';
 import { getFoodQuery } from '@helpers/listingSearchQuery';
 import { markColorForOrder } from '@helpers/orderHelper';
+import type { POSTParticipantRating } from '@pages/api/participants/ratings/index.api';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { ParticipantOrderManagementActions } from '@redux/slices/ParticipantOrderManagementPage.slice';
 import { userThunks } from '@redux/slices/user.slice';
-import type { FoodListing } from '@src/types';
+import type { FoodListing, ParticipantSubOrderDocument } from '@src/types';
+import type { Image, VariantKey } from '@src/types/utils';
 import {
   CurrentUser,
   denormalisedResponseEntities,
@@ -69,7 +71,7 @@ type TOrderListState = {
   updateSubOrderInProgress: boolean;
   updateSubOrderError: any;
 
-  subOrderDocument: any;
+  subOrderDocument: ParticipantSubOrderDocument;
   fetchSubOrderDocumentInProgress: boolean;
   fetchSubOrderDocumentError: any;
 
@@ -324,17 +326,37 @@ const updateSubOrder = createAsyncThunk(
 
 const postParticipantRating = createAsyncThunk(
   POST_PARTICIPANT_RATING,
-  async (payload: any, { getState, dispatch }) => {
+  async (
+    payload: Omit<POSTParticipantRating, 'imageIdList' | 'imageUrlList'>,
+    { getState, dispatch },
+  ) => {
     const { images } = getState().uploadImage;
     const { currentUser } = getState().user;
     const { planId, rating } = payload;
     const { timestamp } = rating;
-    const bodyApi = {
-      ...payload,
-      imageIdList: Object.values(images).map((image: any) => image.imageId),
-    };
 
-    const { data: response } = await participantPostRatingApi(bodyApi);
+    const { data: response } = await participantPostRatingApi({
+      ...payload,
+      imageUrlList: Object.values(
+        images as (Image['attributes'] & {
+          imageId: string;
+          uploadedImage: Image;
+        })[],
+      ).reduce<string[]>((result, image) => {
+        if (image.uploadedImage.attributes.variants) {
+          const { variants } = image.uploadedImage.attributes;
+          const firstVariantKey = Object.keys(variants)[0];
+
+          result.push(variants[firstVariantKey as VariantKey].url);
+        }
+
+        return result;
+      }, []),
+      imageIdList: Object.values(images as { imageId: string }[]).map(
+        (image) => image.imageId,
+      ),
+    });
+
     dispatch(
       SubOrdersThunks.fetchSubOrderFromFirebase({
         subOrderDocumentId: `${currentUser?.id.uuid} - ${planId} - ${timestamp}`,

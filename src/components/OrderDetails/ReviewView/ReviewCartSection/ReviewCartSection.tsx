@@ -256,7 +256,7 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
         <RenderWhen condition={canReview}>
           {goToReviewPage && (
             <Button
-              variant="secondary"
+              variant="primary"
               className={css.reviewButton}
               onClick={goToReviewPage}>
               {reviewText}

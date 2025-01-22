@@ -5,6 +5,7 @@ import Link from 'next/link';
 
 import IconBannedUser from '@components/Icons/IconBannedUser/IconBannedUser';
 import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
+import type { UserListing } from '@src/types';
 import {
   ensureCurrentUser,
   ensureUser,
@@ -36,7 +37,7 @@ const AVATAR_IMAGE_VARIANTS = [
 
 type TAvatarProps = TDefaultProps & {
   initialsClassName?: string;
-  user: TCurrentUser | TUser;
+  user: TCurrentUser | TUser | UserListing;
   renderSizes?: string;
   disableProfileLink?: boolean;
 };

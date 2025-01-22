@@ -1,4 +1,4 @@
-import type { TRestaurantRating } from '@src/utils/types';
+import type { POSTParticipantRating } from '@pages/api/participants/ratings/index.api';
 
 import { getApi, postApi, putApi } from './configs';
 
@@ -12,14 +12,7 @@ export const participantReviewPlanTx = (body: TParticipantReviewPlanTxBody) => {
   return postApi('/participants/plans/review-restaurant', body);
 };
 
-type TParticipantPostRatingApiBody = {
-  companyName: string;
-  rating: TRestaurantRating;
-  imageIdList?: string[];
-  detailTextRating?: string;
-  planId?: string;
-};
-export const participantPostRatingApi = (body: TParticipantPostRatingApiBody) =>
+export const participantPostRatingApi = (body: POSTParticipantRating) =>
   postApi('/participants/ratings', body);
 
 export const updateFirstTimeViewOrderApi = (orderId: string) =>

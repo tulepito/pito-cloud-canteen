@@ -71,6 +71,14 @@ function WeekView({
     }
   }, [date, width]);
 
+  const currentRangeItems = currRange.reduce((total, item) => {
+    const eventsInDate = getEventsInDate(item, events);
+
+    return total + eventsInDate.length;
+  }, 0);
+
+  const isNoEvent = currentRangeItems === 0;
+
   return (
     <div className={css.root} id={`weekView`}>
       <div className={css.scrollContainer}>
@@ -87,7 +95,7 @@ function WeekView({
           />
         ))}
       </div>
-      <RenderWhen condition={events.length === 0 && !hideEmptySubOrderSection}>
+      <RenderWhen condition={isNoEvent && !hideEmptySubOrderSection}>
         <EmptySubOrder />
       </RenderWhen>
     </div>

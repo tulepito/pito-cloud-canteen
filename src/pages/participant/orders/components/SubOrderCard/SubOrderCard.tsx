@@ -13,10 +13,12 @@ type TSubOrderCardProps = {
   event: Event;
   setSelectedEvent: (event: Event) => void;
   openSubOrderDetailModal: () => void;
+  ratingSection: React.ReactNode;
 };
 
 const SubOrderCard: React.FC<TSubOrderCardProps> = (props) => {
-  const { event, setSelectedEvent, openSubOrderDetailModal } = props;
+  const { event, setSelectedEvent, ratingSection, openSubOrderDetailModal } =
+    props;
   const intl = useIntl();
   const { daySession, deliveryHour, status, orderColor, lastTransition } =
     event?.resource || {};
@@ -60,6 +62,7 @@ const SubOrderCard: React.FC<TSubOrderCardProps> = (props) => {
             isFirstHighlight={status === EParticipantOrderStatus.empty}
           />
         </div>
+        {ratingSection}
       </div>
     </div>
   );

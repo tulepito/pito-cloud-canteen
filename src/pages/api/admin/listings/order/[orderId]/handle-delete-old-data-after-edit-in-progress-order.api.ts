@@ -4,7 +4,10 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HttpMethod } from '@apis/configs';
 import { getEditedSubOrders } from '@helpers/orderHelper';
-import { deleteFirebaseDocumentById } from '@pages/api/participants/document/document.service';
+import {
+  buildParticipantSubOrderDocumentId,
+  deleteFirebaseDocumentById,
+} from '@pages/api/participants/document/document.service';
 import cookies from '@services/cookie';
 import { fetchListing } from '@services/integrationHelper';
 import {
@@ -80,7 +83,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
             const deleleSubOrderFromFirebaseAndSendNotification =
               participantsWithDeletedFood.map(async (participantId: string) => {
-                const subOrderId = `${participantId} - ${planId} - ${subOrderDate}`;
+                const subOrderId = buildParticipantSubOrderDocumentId(
+                  participantId,
+                  planId,
+                  +subOrderDate,
+                );
+
                 await deleteFirebaseDocumentById(subOrderId);
               });
 

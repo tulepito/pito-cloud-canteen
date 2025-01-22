@@ -11,6 +11,14 @@ import { EImageVariants, EParticipantOrderStatus } from '@src/utils/enums';
 
 const { FIREBASE_PARTICIPANT_SUB_ORDER_COLLECTION_NAME } = process.env;
 
+export const buildParticipantSubOrderDocumentId = (
+  participantId: string,
+  planId: string,
+  timestamp: number,
+) => {
+  return `${participantId} - ${planId} - ${timestamp}`;
+};
+
 export const addFirebaseDocument = async ({
   participantId,
   planId,
@@ -95,7 +103,7 @@ export const addFirebaseDocument = async ({
   }
 
   await setCollectionDocWithCustomId(
-    `${participantId} - ${planId} - ${timestamp}`,
+    buildParticipantSubOrderDocumentId(participantId, planId, timestamp),
     subOrderDocument,
     FIREBASE_PARTICIPANT_SUB_ORDER_COLLECTION_NAME!,
   );

@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
@@ -10,6 +10,7 @@ import { useViewport } from '@hooks/useViewport';
 import { Listing } from '@src/utils/data';
 import type { TListing } from '@src/utils/types';
 
+import type { RatingListingWithReviewer } from '../../BookerSelectRestaurant.slice';
 import useRestaurantReview from '../../hooks/restaurantReview';
 import ReviewItem from '../ReviewItem/ReviewItem';
 
@@ -21,55 +22,67 @@ type RestaurantReviewModalProps = {
 };
 
 const ReviewItemList = ({
-  isSeeAll,
   reviewList,
-  reviewerList,
-  inProgress,
+  isFetchingMore,
+  isFirstLoading,
   totalReview,
   onFetching,
-}: any) => {
+}: {
+  reviewList: RatingListingWithReviewer[];
+  isFetchingMore: boolean;
+  isFirstLoading: boolean;
+  totalReview: number;
+  onFetching: () => void;
+}) => {
   const intl = useIntl();
   const noReview = reviewList.length === 0;
   const isShowAllReviews = reviewList.length === totalReview;
 
-  const shouldShowLoadMore =
-    isSeeAll && !inProgress && !isShowAllReviews && !noReview;
+  const shouldShowLoadMore = !isFetchingMore && !isShowAllReviews && !noReview;
 
   return (
     <div className={css.reviewList}>
-      {noReview && !inProgress && (
+      {noReview && !isFetchingMore && (
         <div className={css.noReview}>
           {intl.formatMessage({
             id: 'OrderRatingForm.noReview',
           })}
         </div>
       )}
-      {reviewList.map((review: any) => {
-        const reviewListing = Listing(review);
-        const {
-          generalRating,
-          detailRating,
-          timestamp,
-          foodName,
-          detailTextRating,
-        } = reviewListing.getMetadata();
-        const { createdAt: reviewAt } = reviewListing.getAttributes();
 
-        return (
-          <div className={css.reviewItem} key={reviewListing.getId()}>
-            <ReviewItem
-              generalRating={generalRating}
-              detailRating={detailRating}
-              user={reviewerList?.[reviewListing.getId()]}
-              timestamp={timestamp}
-              foodName={foodName}
-              detailTextRating={detailTextRating}
-              reviewAt={reviewAt}
-            />
-          </div>
-        );
-      })}
-      {inProgress && <div className={css.loading}>Đang tải...</div>}
+      {isFirstLoading ? (
+        <div className={css.loading}>Đang tải...</div>
+      ) : (
+        reviewList.map((review) => {
+          const {
+            generalRating,
+            detailRating,
+            timestamp,
+            foodName,
+            detailTextRating,
+          } = review.attributes?.metadata || {};
+          const { createdAt: reviewAt } = review.attributes || {};
+
+          return (
+            <div className={css.reviewItem} key={review.id?.uuid}>
+              <ReviewItem
+                generalRating={generalRating || 0}
+                detailRating={detailRating}
+                user={review.reviewer}
+                timestamp={timestamp ? +timestamp : undefined}
+                foodName={foodName}
+                detailTextRating={detailTextRating}
+                reviewAt={reviewAt ? new Date(reviewAt) : undefined}
+              />
+            </div>
+          );
+        })
+      )}
+
+      {!isFirstLoading && isFetchingMore && (
+        <div className={css.loading}>Đang tải...</div>
+      )}
+
       {shouldShowLoadMore && (
         <div className={css.loadMore} onClick={onFetching}>
           {intl.formatMessage({
@@ -93,12 +106,20 @@ const RestaurantReviewModal: React.FC<RestaurantReviewModalProps> = (props) => {
     restaurantBookerReviews = [],
     restaurantParticipantReviews = [],
     selectedRestaurant,
-    restaurantBookerReviewers,
-    restaurantParticipantReviewers,
     fetchRestaurantReviewInProgress,
-    bookerReviewPagination,
-    participantReviewPagination,
-  } = useRestaurantReview(activeTab, true, reviewPage);
+    restaurantBookerReviewsMeta,
+    restaurantParticipantReviewsMeta,
+  } = useRestaurantReview(activeTab, reviewPage);
+
+  const isFirstLoading = reviewPage === 1 && fetchRestaurantReviewInProgress;
+
+  /**
+   * Reset review page when change tab
+   */
+  useEffect(() => {
+    setReviewPage(1);
+  }, [activeTab]);
+
   const selectedRestaurantListing = useMemo(
     () => Listing(selectedRestaurant as TListing),
     [selectedRestaurant],
@@ -107,12 +128,13 @@ const RestaurantReviewModal: React.FC<RestaurantReviewModalProps> = (props) => {
     selectedRestaurantListing.getMetadata();
 
   const { food, packaging } = detailRating || {};
-  const bookerReviewNumber = restaurantBookerReviews.length;
-  const participantReviewNumber = restaurantParticipantReviews.length;
   const totalComments = totalRatingNumber;
+
   const tabItems = [
     {
+      id: 'booker',
       key: 'booker',
+      children: '',
       label: (
         <div className={css.tabLabel}>
           <span>
@@ -121,21 +143,23 @@ const RestaurantReviewModal: React.FC<RestaurantReviewModalProps> = (props) => {
             })}
           </span>
           <div data-number className={css.commentNumber}>
-            {!fetchRestaurantReviewInProgress ? bookerReviewNumber : 0}
+            {fetchRestaurantReviewInProgress
+              ? '...'
+              : restaurantBookerReviewsMeta?.totalItems || 0}
           </div>
         </div>
       ),
       childrenFn: (childProps: any) => <ReviewItemList {...childProps} />,
       childrenProps: {
-        isSeeAll: true,
         reviewList: restaurantBookerReviews,
-        reviewerList: restaurantBookerReviewers,
-        inProgress: fetchRestaurantReviewInProgress,
-        totalReview: bookerReviewPagination?.totalItems,
+        isFetchingMore: fetchRestaurantReviewInProgress,
+        isFirstLoading,
+        totalReview: restaurantBookerReviewsMeta?.totalItems,
         onFetching: () => setReviewPage(reviewPage + 1),
       },
     },
     {
+      id: 'participant',
       key: 'participant',
       label: (
         <div className={css.tabLabel}>
@@ -145,17 +169,19 @@ const RestaurantReviewModal: React.FC<RestaurantReviewModalProps> = (props) => {
             })}
           </span>
           <div data-number className={css.commentNumber}>
-            {!fetchRestaurantReviewInProgress ? participantReviewNumber : 0}
+            {fetchRestaurantReviewInProgress
+              ? '...'
+              : totalComments - (restaurantBookerReviewsMeta?.totalItems || 0)}
           </div>
         </div>
       ),
+      children: '',
       childrenFn: (childProps: any) => <ReviewItemList {...childProps} />,
       childrenProps: {
-        isSeeAll: true,
         reviewList: restaurantParticipantReviews,
-        reviewerList: restaurantParticipantReviewers,
-        inProgress: fetchRestaurantReviewInProgress,
-        totalReview: participantReviewPagination?.totalItems,
+        isFetchingMore: fetchRestaurantReviewInProgress,
+        isFirstLoading,
+        totalReview: restaurantParticipantReviewsMeta?.totalItems,
         onFetching: () => setReviewPage(reviewPage + 1),
       },
     },
@@ -242,7 +268,7 @@ const RestaurantReviewModal: React.FC<RestaurantReviewModalProps> = (props) => {
         }>
         {generalView}
         <div className={css.content}>
-          <Tabs items={tabItems as any} onChange={onTabChange} />
+          <Tabs items={tabItems} onChange={onTabChange} />
         </div>
       </SlideModal>
       <RenderWhen.False>
@@ -257,7 +283,7 @@ const RestaurantReviewModal: React.FC<RestaurantReviewModalProps> = (props) => {
           })}>
           {detailView}
           <div className={css.content}>
-            <Tabs items={tabItems as any} onChange={onTabChange} />
+            <Tabs items={tabItems} onChange={onTabChange} />
           </div>
         </Modal>
       </RenderWhen.False>

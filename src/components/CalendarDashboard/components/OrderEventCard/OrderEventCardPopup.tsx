@@ -5,7 +5,6 @@ import { useIntl } from 'react-intl';
 import isEmpty from 'lodash/isEmpty';
 import { useRouter } from 'next/router';
 
-import Button from '@components/Button/Button';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { OrderListThunks } from '@pages/participant/orders/OrderList.slice';
@@ -13,7 +12,6 @@ import { participantOrderManagementThunks } from '@redux/slices/ParticipantOrder
 import { currentUserSelector } from '@redux/slices/user.slice';
 import { participantPaths } from '@src/paths';
 import { EOrderStates, EParticipantOrderStatus } from '@src/utils/enums';
-import { ETransition } from '@src/utils/transaction';
 import { CurrentUser } from '@utils/data';
 
 import type { TEventStatus } from '../../helpers/types';
@@ -28,28 +26,22 @@ type TOrderEventCardPopupProps = {
   event: Event;
   status: TEventStatus;
   isExpired: boolean;
-  subOrderDocument: any;
   lastTransition: string;
-  fetchSubOrderTxInProgress: boolean;
-  fetchSubOrderDocumentInProgress: boolean;
-  openRatingSubOrderModal: () => void;
   onCloseEventCardPopup: () => void;
   onPickForMe: () => void;
   pickFoodForSpecificSubOrderInProgress?: boolean;
+  ratingSection: React.ReactNode;
 };
 
 const OrderEventCardPopup: React.FC<TOrderEventCardPopupProps> = ({
   event,
   status,
   isExpired = false,
-  subOrderDocument,
   lastTransition,
-  fetchSubOrderTxInProgress,
-  fetchSubOrderDocumentInProgress,
-  openRatingSubOrderModal,
   onCloseEventCardPopup,
   onPickForMe,
   pickFoodForSpecificSubOrderInProgress,
+  ratingSection,
 }) => {
   const router = useRouter();
   const intl = useIntl();
@@ -80,8 +72,6 @@ const OrderEventCardPopup: React.FC<TOrderEventCardPopupProps> = ({
     router.pathname === participantPaths.OrderList
       ? 'orderList'
       : 'orderDetail';
-
-  const { reviewId } = subOrderDocument;
 
   const onNavigateToOrderDetail = () => {
     router.push({
@@ -163,23 +153,7 @@ const OrderEventCardPopup: React.FC<TOrderEventCardPopupProps> = ({
           </div>
         </div>
       </RenderWhen>
-      <RenderWhen
-        condition={
-          !reviewId &&
-          lastTransition === ETransition.COMPLETE_DELIVERY &&
-          status === EParticipantOrderStatus.joined
-        }>
-        <div className={css.ratingWrapper}>
-          <Button
-            disabled={
-              fetchSubOrderTxInProgress || fetchSubOrderDocumentInProgress
-            }
-            className={css.ratingBtn}
-            onClick={openRatingSubOrderModal}>
-            Đánh giá
-          </Button>
-        </div>
-      </RenderWhen>
+      {ratingSection}
     </div>
   );
 };

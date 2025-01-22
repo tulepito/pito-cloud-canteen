@@ -1,19 +1,20 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useMemo } from 'react';
 import { shallowEqual } from 'react-redux';
+import { format } from 'date-fns';
 
 import FieldDropdownSelect from '@components/FormFields/FieldDropdownSelect/FieldDropdownSelect';
 import FieldLabelCheckbox from '@components/FormFields/FieldLabelCheckbox/FieldLabelCheckbox';
 import FieldRating from '@components/FormFields/FieldRating/FieldRating';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 
+import type { RestaurantByDay } from '../../rating/OrderRating.slice';
 import { OrderRatingThunks } from '../../rating/OrderRating.slice';
 
 import css from './OrderRatingForm.module.scss';
 
 type TFoodRatingProps = {
   values: any;
-  restaurantsByDay: any;
+  restaurantsByDays: RestaurantByDay[];
   isShowTitle?: boolean;
 };
 
@@ -24,7 +25,7 @@ const OPTIONAL_FOOD_RESTAURANT_UNSATISFACTED =
 
 const FoodRating: React.FC<TFoodRatingProps> = (props) => {
   const dispatch = useAppDispatch();
-  const { values, restaurantsByDay, isShowTitle } = props;
+  const { values, restaurantsByDays, isShowTitle } = props;
 
   const fetchFoodListByRestaurant = useAppSelector(
     (state) => state.OrderRating.fetchFoodListByRestaurantInProgress,
@@ -95,13 +96,18 @@ const FoodRating: React.FC<TFoodRatingProps> = (props) => {
 
   const parsedRestaurantByDayOptions = useMemo(
     () =>
-      restaurantsByDay.map(
-        ({ restaurantId, restaurantName, timestamp }: any) => ({
+      restaurantsByDays.map(({ restaurantId, restaurantName, timestamp }) => {
+        return {
           key: `${restaurantId} - ${timestamp}`,
-          label: restaurantName,
-        }),
-      ),
-    [JSON.stringify(restaurantsByDay)],
+          label: `${restaurantName} - ${format(
+            new Date(timestamp),
+            'dd/MM/yyyy',
+          )}`,
+          restaurantId,
+        };
+      }),
+
+    [JSON.stringify(restaurantsByDays)],
   );
 
   const optionalFoodRating = isFoodSatifactedSelected ? (

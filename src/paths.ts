@@ -19,6 +19,13 @@ export const enGeneralPaths = {
   Tracking: '/tracking/[subOrderId]',
   SentryExamplePage: '/sentry-example-page',
   getInvitationPath: (orderId: string) => `/invitation/${orderId}`,
+  company: {
+    orders: {
+      '[orderId]': {
+        index: (orderId: string) => `/company/orders/${orderId}`,
+      },
+    },
+  },
 };
 
 export const personalPaths = {

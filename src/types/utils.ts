@@ -13,7 +13,8 @@ interface Landscape {
   name: string;
 }
 
-type VariantKey =
+export type VariantKey =
+  | 'square-small'
   | 'landscape-crop4x'
   | 'landscape-crop'
   | 'landscape-crop2x'
@@ -28,7 +29,7 @@ export interface Id {
 
 export interface Image {
   id: Id;
-  type: string;
+  type: 'image';
   attributes: {
     variants: Variants;
   };

@@ -2,9 +2,9 @@ import classNames from 'classnames';
 
 import Avatar from '@components/Avatar/Avatar';
 import IconRatingFace from '@components/Icons/IconRatingFace/IconRatingFace';
-import { User } from '@src/utils/data';
+import type { UserListing } from '@src/types';
 import { formatTimestamp } from '@src/utils/dates';
-import type { TUser } from '@src/utils/types';
+import { buildFullName } from '@src/utils/emailTemplate/participantOrderPicking';
 
 import { converRatingPointToLabel } from '../../helpers/review';
 
@@ -12,17 +12,17 @@ import css from './ReviewItem.module.scss';
 
 type ReviewItemProps = {
   generalRating: number;
-  detailRating: {
-    food: {
-      rating: number;
+  detailRating?: {
+    food?: {
+      rating?: number;
     };
-    packaging: {
-      rating: number;
+    packaging?: {
+      rating?: number;
       optionalOtherReview?: string;
     };
   };
-  timestamp: number;
-  user: TUser;
+  timestamp?: number;
+  user: UserListing;
   foodName?: string;
   detailTextRating?: string;
   reviewAt?: Date;
@@ -38,31 +38,39 @@ const ReviewItem: React.FC<ReviewItemProps> = (props) => {
     detailTextRating,
   } = props;
 
-  const { food, packaging } = detailRating;
-  const reviewerUser = User(user);
+  const { food, packaging } = detailRating || {};
 
   return (
     <div className={css.container}>
       <Avatar user={user} className={css.avatar} />
       <div className={css.reviewWrapper}>
         <div className={css.reviewerName}>
-          {reviewerUser.getProfile().displayName}
+          {buildFullName(
+            user.attributes?.profile?.firstName,
+            user.attributes?.profile?.lastName,
+            {
+              compareToGetLongerWith: user.attributes?.profile?.displayName,
+            },
+          )}
         </div>
         <div className={css.generalRating}>
           {converRatingPointToLabel(generalRating)}
         </div>
         <div className={css.detailRating}>
-          <IconRatingFace className={css.faceIcon} rating={food.rating} />
+          <IconRatingFace className={css.faceIcon} rating={food?.rating || 0} />
           <div className={css.label}>Món ăn: </div>
           <div className={css.value}>
-            {converRatingPointToLabel(food.rating)}
+            {converRatingPointToLabel(food?.rating || 0)}
           </div>
         </div>
         <div className={css.detailRating}>
-          <IconRatingFace className={css.faceIcon} rating={packaging.rating} />
+          <IconRatingFace
+            className={css.faceIcon}
+            rating={packaging?.rating || 0}
+          />
           <div className={css.label}>Dụng cụ: </div>
           <div className={css.value}>
-            {converRatingPointToLabel(packaging.rating)}
+            {converRatingPointToLabel(packaging?.rating || 0)}
           </div>
         </div>
         {packaging?.optionalOtherReview && (

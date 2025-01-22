@@ -1,14 +1,14 @@
-/* eslint-disable no-unneeded-ternary */
-/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from 'react';
 import type { Event, View } from 'react-big-calendar';
 import { Views } from 'react-big-calendar';
 import { shallowEqual } from 'react-redux';
+import { startOfWeek } from 'date-fns';
 import flatten from 'lodash/flatten';
 import { DateTime } from 'luxon';
 import { useRouter } from 'next/router';
 
 import BottomNavigationBar from '@components/BottomNavigationBar/BottomNavigationBar';
+import Button from '@components/Button/Button';
 import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
 import OrderEventCard from '@components/CalendarDashboard/components/OrderEventCard/OrderEventCard';
 import { EVENT_STATUS } from '@components/CalendarDashboard/helpers/constant';
@@ -18,11 +18,12 @@ import LoadingModal from '@components/LoadingModal/LoadingModal';
 import ParticipantLayout from '@components/ParticipantLayout/ParticipantLayout';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import Tabs from '@components/Tabs/Tabs';
-import { getItem, setItem } from '@helpers/localStorageHelpers';
+import { getItem } from '@helpers/localStorageHelpers';
 import { prepareDaySession } from '@helpers/order/prepareDataHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { useViewport } from '@hooks/useViewport';
+import { buildParticipantSubOrderDocumentId } from '@pages/api/participants/document/document.service';
 import { CalendarActions } from '@redux/slices/Calendar.slice';
 import { participantPaths } from '@src/paths';
 import { CurrentUser, Listing } from '@src/utils/data';
@@ -38,7 +39,11 @@ import {
   isOver,
   isSameDate,
 } from '@src/utils/dates';
-import { EOrderStates, EParticipantOrderStatus } from '@src/utils/enums';
+import {
+  EOrderStates,
+  EParticipantOrderStatus,
+  ESubOrderTxStatus,
+} from '@src/utils/enums';
 import {
   ETransition,
   TRANSITIONS_TO_STATE_CANCELED,
@@ -46,6 +51,7 @@ import {
 import type { TListing } from '@src/utils/types';
 
 import ParticipantToolbar from '../components/ParticipantToolbar/ParticipantToolbar';
+import { SubOrdersThunks } from '../sub-orders/SubOrders.slice';
 
 import NotificationModal from './components/NotificationModal/NotificationModal';
 import OnboardingOrderModal from './components/OnboardingOrderModal/OnboardingOrderModal';
@@ -54,7 +60,6 @@ import OrderListHeaderSection from './components/OrderListHeaderSection/OrderLis
 import RatingSubOrderModal from './components/RatingSubOrderModal/RatingSubOrderModal';
 import SubOrderCard from './components/SubOrderCard/SubOrderCard';
 import SubOrderDetailModal from './components/SubOrderDetailModal/SubOrderDetailModal';
-import SuccessRatingModal from './components/SuccessRatingModal/SuccessRatingModal';
 import UpdateProfileModal from './components/UpdateProfileModal/UpdateProfileModal';
 import WelcomeModal from './components/WelcomeModal/WelcomeModal';
 import { OrderListActions, OrderListThunks } from './OrderList.slice';
@@ -74,20 +79,17 @@ const OrderListPage = () => {
     localStorageView as View,
   );
 
-  const currentView = viewMode
-    ? viewMode
-    : isValidLocalStorageView
-    ? localStorageView
-    : Views.WEEK;
+  const currentView =
+    viewMode || (isValidLocalStorageView ? localStorageView : Views.WEEK);
 
-  const [defaultCalendarView, setDefaultCalendarView] =
-    useState<View>(currentView);
+  const [defaultCalendarView] = useState<View>(currentView);
 
   const updateProfileModalControl = useBoolean();
   const onBoardingModal = useBoolean();
   const tourControl = useBoolean();
   const ratingSubOrderModalControl = useBoolean();
   const { selectedDay, handleSelectDay } = useSelectDay();
+  const [anchorDate, setAnchorDate] = useState<Date>(selectedDay || new Date());
 
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [selectedDayOfMonth, setSelectedDayOfMonth] = useState<Date>(
@@ -103,7 +105,6 @@ const OrderListPage = () => {
 
   const subOrderDetailModalControl = useBoolean();
   const { isMobileLayout } = useViewport();
-  const successRatingModalControl = useBoolean();
   const notificationModalControl = useBoolean();
   const currentUser = useAppSelector((state) => state.user.currentUser);
   const orders = useAppSelector(
@@ -112,6 +113,20 @@ const OrderListPage = () => {
   );
   const ordersNotConfirmFirstTime = useAppSelector(
     (state) => state.ParticipantOrderList.ordersNotConfirmFirstTime,
+    shallowEqual,
+  );
+
+  const deliveredSubOrders = useAppSelector(
+    (state) => state.ParticipantSubOrderList.deliveredSubOrders,
+    shallowEqual,
+  );
+
+  const fetchSubOrderDocumentInProgress = useAppSelector(
+    (state) => state.ParticipantOrderList.fetchSubOrderDocumentInProgress,
+  );
+
+  const subOrderDocument = useAppSelector(
+    (state) => state.ParticipantOrderList.subOrderDocument,
     shallowEqual,
   );
 
@@ -307,9 +322,28 @@ const OrderListPage = () => {
 
   const flattenEvents = flatten<Event>(events);
 
-  const subOrdersFromSelectedDay = flattenEvents.filter((_event: any) =>
-    isSameDate(_event.start, selectedDay),
-  );
+  const subOrdersFromSelectedDay = flattenEvents.filter((_event: any) => {
+    if (currentView === Views.WEEK) {
+      const _startOfWeekAnchorDate = startOfWeek(anchorDate);
+      const _startDateWithoutTime = new Date(_startOfWeekAnchorDate).setHours(
+        0,
+        0,
+        0,
+        0,
+      );
+
+      const _7daysAfterAnchorDate = new Date(_startDateWithoutTime).setDate(
+        new Date(_startDateWithoutTime).getDate() + 6,
+      );
+
+      return (
+        _event.resource.timestamp >= _startDateWithoutTime &&
+        _event.resource.timestamp <= _7daysAfterAnchorDate
+      );
+    }
+
+    return isSameDate(_event.start, anchorDate);
+  });
 
   const openUpdateProfileModal = () => {
     updateProfileModalControl.setTrue();
@@ -329,18 +363,19 @@ const OrderListPage = () => {
     }, 0);
   };
 
-  const openRatingSubOrderModal = () => {
+  const openRatingSubOrderModal = (options?: { forceNoTooltip?: boolean }) => {
     subOrderDetailModalControl.setFalse();
     ratingSubOrderModalControl.setTrue();
+
+    if (options?.forceNoTooltip) {
+      setTimeout(() => {
+        subOrderDetailModalControl.setFalse();
+      });
+    }
   };
 
   const openSuccessRatingModal = () => {
     ratingSubOrderModalControl.setFalse();
-    successRatingModalControl.setTrue();
-  };
-
-  const closeAllModals = () => {
-    successRatingModalControl.setFalse();
   };
 
   const handleChangeTimePeriod = (action: string) => {
@@ -440,16 +475,6 @@ const OrderListPage = () => {
   };
 
   useEffect(() => {
-    if (isMobileLayout) {
-      setItem('participant_calendarView', Views.MONTH);
-      setDefaultCalendarView(Views.MONTH);
-    } else {
-      setItem('participant_calendarView', Views.WEEK);
-      setDefaultCalendarView(Views.WEEK);
-    }
-  }, [isMobileLayout]);
-
-  useEffect(() => {
     if (selectedEvent) {
       const { timestamp, planId } = selectedEvent.resource;
       const subOrderId = `${currentUserId} - ${planId} - ${timestamp}`;
@@ -508,6 +533,104 @@ const OrderListPage = () => {
     }
   }, [planIdFromQuery, timestampFromQuery, JSON.stringify(flattenEvents)]);
 
+  /**
+   * Load sub orders from firebase to view the sub order rating statuses
+   */
+  useEffect(() => {
+    const orderIds = orders.map((order) => Listing(order).getId());
+    if (orderIds.length) {
+      dispatch(
+        SubOrdersThunks.fetchSubOrdersFromFirebase({
+          participantId: currentUserId,
+          txStatus: ESubOrderTxStatus.DELIVERED,
+          extraQueryParams: {
+            orderId: {
+              operator: 'in',
+              value: orderIds,
+            },
+          },
+        }),
+      );
+    }
+  }, [JSON.stringify(orders)]);
+
+  const getRatingSectionByScope = (
+    scope: 'card' | 'pop-up',
+    _event?: Event,
+  ) => {
+    const buttonNode = (() => {
+      switch (scope) {
+        case 'card':
+          return (
+            <Button
+              disabled={
+                fetchSubOrderTxInProgress || fetchSubOrderDocumentInProgress
+              }
+              variant="primary"
+              fullWidth
+              size="small"
+              style={{
+                padding: '4px',
+                marginTop: '6px',
+                height: 'auto',
+              }}
+              onClick={() => openRatingSubOrderModal({ forceNoTooltip: true })}>
+              Đánh giá
+            </Button>
+          );
+        case 'pop-up':
+          return (
+            <div className={css.ratingWrapper}>
+              <Button
+                disabled={
+                  fetchSubOrderTxInProgress || fetchSubOrderDocumentInProgress
+                }
+                fullWidth
+                variant="primary"
+                className={css.ratingBtn}
+                onClick={() => openRatingSubOrderModal()}>
+                Đánh giá
+              </Button>
+            </div>
+          );
+        default:
+          return null;
+      }
+    })();
+
+    const deliveriedSubOrder = deliveredSubOrders.find((subOrder) => {
+      const subOrderId = buildParticipantSubOrderDocumentId(
+        subOrder?.participantId!,
+        subOrder.planId!,
+        _event?.resource?.timestamp,
+      );
+
+      return subOrderId === subOrder.id;
+    });
+
+    const { reviewId } =
+      scope === 'card' ? deliveriedSubOrder || {} : subOrderDocument || {};
+
+    const { lastTransition, status } =
+      scope === 'card'
+        ? _event?.resource || {}
+        : scope === 'pop-up'
+        ? selectedEvent?.resource || {}
+        : {};
+    const canRate =
+      (scope === 'card' &&
+        lastTransition === ETransition.COMPLETE_DELIVERY &&
+        status === EParticipantOrderStatus.joined &&
+        (!deliveriedSubOrder || (!!deliveriedSubOrder && !reviewId))) ||
+      (scope === 'pop-up' &&
+        lastTransition === ETransition.COMPLETE_DELIVERY &&
+        status === EParticipantOrderStatus.joined &&
+        !reviewId) ||
+      false;
+
+    return <RenderWhen condition={canRate}>{buttonNode}</RenderWhen>;
+  };
+
   useEffect(() => {
     dispatch(CalendarActions.setSelectedDay(selectedDay));
   }, []);
@@ -549,22 +672,28 @@ const OrderListPage = () => {
     <>
       <div className={css.calendarContainer}>
         <CalendarDashboard
-          anchorDate={selectedDay}
+          anchorDate={anchorDate}
           events={walkthroughEnable ? EVENTS_MOCKUP : flattenEvents}
           renderEvent={OrderEventCard}
           inProgress={fetchOrdersInProgress}
           defaultView={defaultCalendarView}
+          exposeAnchorDate={(date: any) => {
+            setAnchorDate(date);
+          }}
           components={{
-            toolbar: (toolBarProps: any) => (
-              <ParticipantToolbar
-                {...toolBarProps}
-                isAllowChangePeriod
-                onChangeDate={handleSelectDay}
-                onCustomPeriodClick={handleChangeTimePeriod}
-                onPickForMe={recommendFoodForSubOrder}
-                onPickForMeLoading={pickFoodForSubOrdersInProgress}
-              />
-            ),
+            toolbar: (toolBarProps: any) => {
+              return (
+                <ParticipantToolbar
+                  {...toolBarProps}
+                  isAllowChangePeriod
+                  anchorDate={anchorDate}
+                  onChangeDate={handleSelectDay}
+                  onCustomPeriodClick={handleChangeTimePeriod}
+                  onPickForMe={recommendFoodForSubOrder}
+                  onPickForMeLoading={pickFoodForSubOrdersInProgress}
+                />
+              );
+            },
           }}
           resources={{
             walkthroughEnable,
@@ -582,6 +711,7 @@ const OrderListPage = () => {
             event={_event}
             setSelectedEvent={setSelectedEvent}
             openSubOrderDetailModal={subOrderDetailModalControl.setTrue}
+            ratingSection={getRatingSectionByScope('card', _event)}
           />
         ))}
       </div>
@@ -615,7 +745,7 @@ const OrderListPage = () => {
               isOpen={subOrderDetailModalControl.value}
               onClose={subOrderDetailModalControl.setFalse}
               event={selectedEvent!}
-              openRatingSubOrderModal={openRatingSubOrderModal}
+              ratingSection={getRatingSectionByScope('pop-up')}
               from="orderList"
               recommendFoodForSpecificSubOrder={
                 recommendFoodForSpecificSubOrder
@@ -625,22 +755,17 @@ const OrderListPage = () => {
               }
             />
           </RenderWhen>
-          <RatingSubOrderModal
-            isOpen={ratingSubOrderModalControl.value}
-            onClose={ratingSubOrderModalControl.setFalse}
-            selectedEvent={selectedEvent}
-            currentUserId={currentUserId}
-            openSuccessRatingModal={openSuccessRatingModal}
-            participantPostRatingInProgress={participantPostRatingInProgress}
-          />
         </div>
       </RenderWhen>
-      <SuccessRatingModal
-        isOpen={successRatingModalControl.value}
-        onClose={successRatingModalControl.setFalse}
-        closeAllModals={closeAllModals}
-        fromOrderList
+      <RatingSubOrderModal
+        isOpen={ratingSubOrderModalControl.value}
+        onClose={ratingSubOrderModalControl.setFalse}
+        selectedEvent={selectedEvent}
+        currentUserId={currentUserId}
+        openSuccessRatingModal={openSuccessRatingModal}
+        participantPostRatingInProgress={participantPostRatingInProgress}
       />
+
       <RenderWhen condition={isMobileLayout}>
         <NotificationModal
           isOpen={notificationModalControl.value}
@@ -656,6 +781,7 @@ const OrderListPage = () => {
       label: ' ',
       childrenFn: () => orderListPageContent,
       childrenProps: {},
+      children: null,
     },
   ];
 
@@ -666,7 +792,7 @@ const OrderListPage = () => {
         numberOfUnseenNotifications={numberOfUnseenNotifications}
       />
       <Tabs
-        items={tabOptions as any}
+        items={tabOptions}
         className={css.tabHeaderPosition}
         headerWrapperClassName={css.headerWrapperClassName}
         headerClassName={css.tabHeader}

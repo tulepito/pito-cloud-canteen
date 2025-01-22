@@ -43,6 +43,7 @@ import {
 } from '@helpers/order/quotationHelper';
 import { AdminManageOrderActions } from '@pages/admin/order/AdminManageOrder.slice';
 import type { POSTRemindMemberBody } from '@pages/api/orders/[orderId]/remind-member/index.api';
+import { buildParticipantSubOrderDocumentId } from '@pages/api/participants/document/document.service';
 import { createAsyncThunk } from '@redux/redux.helper';
 import type { RootState } from '@redux/store';
 import type { NotificationInvitationParams } from '@services/notifications';
@@ -450,7 +451,11 @@ const addOrUpdateMemberOrder = createAsyncThunk(
         orderId,
         updateParams,
       );
-      const subOrderId = `${participantId} - ${planId} - ${currentViewDate}`;
+      const subOrderId = buildParticipantSubOrderDocumentId(
+        participantId,
+        planId,
+        currentViewDate,
+      );
 
       const addDocumentMemberSuborder = async () => {
         const { data: firebaseSubOrderDocument } =

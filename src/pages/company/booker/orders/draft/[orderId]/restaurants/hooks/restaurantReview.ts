@@ -7,7 +7,6 @@ import { BookerSelectRestaurantThunks } from '../BookerSelectRestaurant.slice';
 
 const useRestaurantReview = (
   activeTab: 'booker' | 'participant',
-  isViewAll: boolean = false,
   page: number = 1,
 ) => {
   const dispatch = useAppDispatch();
@@ -16,17 +15,9 @@ const useRestaurantReview = (
     (state) => state.BookerSelectRestaurant.restaurantBookerReviews,
     shallowEqual,
   );
+
   const restaurantParticipantReviews = useAppSelector(
     (state) => state.BookerSelectRestaurant.restaurantParticipantReviews,
-    shallowEqual,
-  );
-  const restaurantBookerReviewers = useAppSelector(
-    (state) => state.BookerSelectRestaurant.restaurantBookerReviewers,
-    shallowEqual,
-  );
-
-  const restaurantParticipantReviewers = useAppSelector(
-    (state) => state.BookerSelectRestaurant.restaurantParticipantReviewers,
     shallowEqual,
   );
 
@@ -39,12 +30,12 @@ const useRestaurantReview = (
     shallowEqual,
   );
 
-  const bookerReviewPagination = useAppSelector(
-    (state) => state.BookerSelectRestaurant.bookerReviewPagination,
+  const restaurantBookerReviewsMeta = useAppSelector(
+    (state) => state.BookerSelectRestaurant.restaurantBookerReviewsMeta,
   );
 
-  const participantReviewPagination = useAppSelector(
-    (state) => state.BookerSelectRestaurant.participantReviewPagination,
+  const restaurantParticipantReviewsMeta = useAppSelector(
+    (state) => state.BookerSelectRestaurant.restaurantParticipantReviewsMeta,
   );
 
   const fetchRestaurantReviewInProgress = useAppSelector(
@@ -60,21 +51,18 @@ const useRestaurantReview = (
     dispatch(
       BookerSelectRestaurantThunks.fetchRestaurantReviews({
         reviewRole: activeTab,
-        isViewAll,
         page,
       }),
     );
-  }, [activeTab, dispatch, isViewAll, page]);
+  }, [activeTab, dispatch, page]);
 
   return {
     restaurantBookerReviews,
     restaurantParticipantReviews,
     selectedRestaurant,
-    restaurantBookerReviewers,
-    restaurantParticipantReviewers,
     fetchRestaurantReviewInProgress,
-    bookerReviewPagination,
-    participantReviewPagination,
+    restaurantBookerReviewsMeta,
+    restaurantParticipantReviewsMeta,
   };
 };
 

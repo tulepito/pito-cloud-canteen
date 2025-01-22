@@ -1,5 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import { useMemo } from 'react';
+import { format } from 'date-fns';
 
 import FieldDropdownSelect from '@components/FormFields/FieldDropdownSelect/FieldDropdownSelect';
 import FieldLabelCheckbox from '@components/FormFields/FieldLabelCheckbox/FieldLabelCheckbox';
@@ -107,7 +107,10 @@ const PackagingRating: React.FC<TPackagingRatingProps> = (props) => {
       restaurantsByDay.map(
         ({ restaurantId, restaurantName, timestamp }: any) => ({
           key: `${restaurantId} - ${timestamp}`,
-          label: restaurantName,
+          label: `${restaurantName} - ${format(
+            new Date(timestamp),
+            'dd/MM/yyyy',
+          )}`,
         }),
       ),
     [JSON.stringify(restaurantsByDay)],

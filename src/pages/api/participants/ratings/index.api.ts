@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HttpMethod } from '@apis/configs';
+import logger from '@helpers/logger';
 import {
   postParticipantRatingFn,
   updateRatingForRestaurantFn,
@@ -10,11 +11,42 @@ import { fetchListing } from '@services/integrationHelper';
 import { createNativeNotificationToPartner } from '@services/nativeNotification';
 import { createFirebaseDocNotification } from '@services/notifications';
 import participantChecker from '@services/permissionChecker/participant';
-import { handleError } from '@services/sdk';
+import { getSdk, handleError } from '@services/sdk';
+import type {
+  OrderListing,
+  PlanListing,
+  UserListing,
+  WithFlexSDKData,
+} from '@src/types';
 import { Listing } from '@src/utils/data';
+import { buildFullName } from '@src/utils/emailTemplate/participantOrderPicking';
 import { ENativeNotificationType, ENotificationType } from '@src/utils/enums';
 
-import { updateFirebaseDocument } from '../document/document.service';
+import {
+  buildParticipantSubOrderDocumentId,
+  updateFirebaseDocument,
+} from '../document/document.service';
+
+export interface POSTParticipantRating {
+  companyName: string;
+  rating: {
+    reviewerId: string;
+    timestamp: string;
+    generalRating: number;
+    detailRating: {
+      food: {
+        rating: number;
+      };
+      packaging: {
+        rating: number;
+      };
+    };
+  };
+  detailTextRating: string;
+  imageIdList: string[];
+  imageUrlList: string[];
+  planId: string;
+}
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   const apiMethod = req.method;
@@ -22,21 +54,39 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     case HttpMethod.POST:
       try {
         const {
-          companyName = 'PCC',
+          companyName,
           rating,
           detailTextRating,
           imageIdList,
+          imageUrlList,
           planId,
-        } = req.body;
+        } = req.body as POSTParticipantRating;
+        const sdk = getSdk(req, res);
+
+        const currentUser: WithFlexSDKData<UserListing> =
+          await sdk.currentUser.show();
+
         const { reviewerId, timestamp, generalRating, detailRating } = rating;
-        const plan = await fetchListing(planId);
-        const planListing = Listing(plan);
+        const plan: PlanListing = await fetchListing(planId);
+        const planListing = Listing(plan as any);
         const { orderDetail = {} } = planListing.getMetadata();
         const { foodId } =
           orderDetail[timestamp]?.memberOrders?.[reviewerId] || {};
         const food = await fetchListing(foodId, ['author']);
         const foodListing = Listing(food);
         const { title: foodName } = foodListing.getAttributes();
+
+        if (!plan.attributes?.metadata?.orderId) {
+          throw new Error('Order id not found');
+        }
+
+        const orderListing: OrderListing = await fetchListing(
+          plan.attributes?.metadata?.orderId,
+        );
+
+        if (!orderListing.attributes?.title) {
+          throw new Error('Order title not found');
+        }
 
         const review = await postParticipantRatingFn({
           companyName,
@@ -45,10 +95,24 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           imageIdList,
           foodName,
           foodId,
+          imageUrlList,
+          orderCode: orderListing.attributes?.title,
+          ratingUserName: buildFullName(
+            currentUser.data.data.attributes?.profile?.firstName,
+            currentUser.data.data.attributes?.profile?.lastName,
+            {
+              compareToGetLongerWith:
+                currentUser.data.data.attributes?.profile?.displayName,
+            },
+          ),
         });
 
         await updateRatingForRestaurantFn([rating]);
-        const subOrderId = `${reviewerId} - ${planId} - ${timestamp}`;
+        const subOrderId = buildParticipantSubOrderDocumentId(
+          reviewerId,
+          planId,
+          +timestamp,
+        );
         await updateFirebaseDocument(subOrderId, {
           reviewId: review.id.uuid,
         });
@@ -56,7 +120,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         createFirebaseDocNotification(ENotificationType.ORDER_RATING, {
           userId: reviewerId,
           planId,
-          subOrderDate: timestamp,
+          subOrderDate: +timestamp,
           foodName,
         });
 
@@ -76,6 +140,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         }
         res.status(200).json({ success: true });
       } catch (error) {
+        logger.error('Error in POST /api/participants/ratings', String(error));
         handleError(res, error);
       }
 

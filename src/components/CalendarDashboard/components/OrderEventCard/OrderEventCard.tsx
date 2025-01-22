@@ -2,12 +2,16 @@ import type { Event } from 'react-big-calendar';
 import { shallowEqual } from 'react-redux';
 import classNames from 'classnames';
 
+import Button from '@components/Button/Button';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
 import Tooltip from '@components/Tooltip/Tooltip';
 import { useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { useViewport } from '@hooks/useViewport';
+import { buildParticipantSubOrderDocumentId } from '@pages/api/participants/document/document.service';
 import { isOver } from '@src/utils/dates';
 import { EParticipantOrderStatus } from '@src/utils/enums';
+import { ETransition } from '@src/utils/transaction';
 
 import OrderEventCardContentItems from './OrderEventCardContentItems';
 import OrderEventCardHeader from './OrderEventCardHeader';
@@ -62,6 +66,12 @@ const OrderEventCard: React.FC<TOrderEventCardProps> = ({
     (state) => state.ParticipantOrderList.subOrderDocument,
     shallowEqual,
   );
+
+  const deliveredSubOrders = useAppSelector(
+    (state) => state.ParticipantSubOrderList.deliveredSubOrders,
+    shallowEqual,
+  );
+
   const fetchSubOrderTxInProgress = useAppSelector(
     (state) => state.ParticipantOrderList.fetchSubOrderTxInProgress,
   );
@@ -69,10 +79,14 @@ const OrderEventCard: React.FC<TOrderEventCardProps> = ({
     (state) => state.ParticipantOrderList.fetchSubOrderDocumentInProgress,
   );
 
-  const handleOpenRatingModal = () => {
+  const handleOpenRatingModal = (options?: { forceNoTooltip?: boolean }) => {
     if (typeof openRatingSubOrderModal === 'function') {
       tooltipVisibleController.setFalse();
       openRatingSubOrderModal();
+    }
+
+    if (options?.forceNoTooltip) {
+      setTimeout(() => tooltipVisibleController.setFalse());
     }
   };
 
@@ -84,26 +98,102 @@ const OrderEventCard: React.FC<TOrderEventCardProps> = ({
     });
   };
 
+  const getRatingSectionByScope = (scope: 'card' | 'pop-up') => {
+    if (!event?.resource?.dishSelection?.dishSelection) return null;
+
+    const buttonNode = (() => {
+      switch (scope) {
+        case 'card':
+          return (
+            <Button
+              disabled={
+                fetchSubOrderTxInProgress || fetchSubOrderDocumentInProgress
+              }
+              variant="primary"
+              fullWidth
+              size="small"
+              style={{
+                padding: '4px',
+                marginTop: '6px',
+                height: 'auto',
+              }}
+              onClick={() =>
+                handleOpenRatingModal({
+                  forceNoTooltip: true,
+                })
+              }>
+              Đánh giá
+            </Button>
+          );
+        case 'pop-up':
+          return (
+            <div className={css.ratingWrapper}>
+              <Button
+                disabled={
+                  fetchSubOrderTxInProgress || fetchSubOrderDocumentInProgress
+                }
+                variant="primary"
+                fullWidth
+                className={css.ratingBtn}
+                onClick={() => {
+                  handleOpenRatingModal({
+                    forceNoTooltip: true,
+                  });
+                }}>
+                Đánh giá
+              </Button>
+            </div>
+          );
+        default:
+          return null;
+      }
+    })();
+
+    const deliveriedSubOrder = deliveredSubOrders.find((subOrder) => {
+      const subOrderId = buildParticipantSubOrderDocumentId(
+        subOrder?.participantId!,
+        subOrder.planId!,
+        timestamp,
+      );
+
+      return subOrderId === subOrder.id;
+    });
+    const { reviewId } =
+      scope === 'card' ? deliveriedSubOrder || {} : subOrderDocument || {};
+
+    const canRate =
+      (scope === 'card' &&
+        lastTransition === ETransition.COMPLETE_DELIVERY &&
+        status === EParticipantOrderStatus.joined &&
+        (!deliveriedSubOrder || (!!deliveriedSubOrder && !reviewId))) ||
+      (scope === 'pop-up' &&
+        lastTransition === ETransition.COMPLETE_DELIVERY &&
+        status === EParticipantOrderStatus.joined &&
+        !reviewId) ||
+      false;
+
+    return <RenderWhen condition={canRate}>{buttonNode}</RenderWhen>;
+  };
+
   return (
     <Tooltip
       overlayClassName={css.tooltipOverlay}
       visible={tooltipVisibleController.value}
       tooltipContent={
-        <OrderEventCardPopup
-          event={event}
-          status={status}
-          isExpired={isExpired}
-          subOrderDocument={subOrderDocument}
-          lastTransition={lastTransition}
-          fetchSubOrderTxInProgress={fetchSubOrderTxInProgress}
-          fetchSubOrderDocumentInProgress={fetchSubOrderDocumentInProgress}
-          openRatingSubOrderModal={handleOpenRatingModal}
-          onCloseEventCardPopup={tooltipVisibleController.setFalse}
-          onPickForMe={onPickForMe}
-          pickFoodForSpecificSubOrderInProgress={
-            pickFoodForSpecificSubOrderInProgress
-          }
-        />
+        tooltipVisibleController.value && (
+          <OrderEventCardPopup
+            event={event}
+            status={status}
+            isExpired={isExpired}
+            lastTransition={lastTransition}
+            ratingSection={getRatingSectionByScope('pop-up')}
+            onCloseEventCardPopup={tooltipVisibleController.setFalse}
+            onPickForMe={onPickForMe}
+            pickFoodForSpecificSubOrderInProgress={
+              pickFoodForSpecificSubOrderInProgress
+            }
+          />
+        )
       }
       onVisibleChange={(visible) => {
         if (visible) {
@@ -134,6 +224,8 @@ const OrderEventCard: React.FC<TOrderEventCardProps> = ({
                 isFirstHighlight={status === EParticipantOrderStatus.empty}
               />
             </div>
+
+            {getRatingSectionByScope('card')}
           </div>
         </div>
         <div className={css.dot} style={dotStyles}></div>

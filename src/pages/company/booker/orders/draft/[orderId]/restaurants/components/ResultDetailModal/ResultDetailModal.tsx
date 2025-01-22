@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 
 import Button from '@components/Button/Button';
@@ -22,7 +23,6 @@ import { getListingImageById } from '../../helpers';
 import { useGetPlanDetails } from '../../hooks/orderData';
 import { useGetRestaurant } from '../../hooks/restaurants';
 import FoodDetailModal from '../FoodDetailModal/FoodDetailModal';
-import RestaurantReviewModal from '../RestaurantReviewModal/RestaurantReviewModal';
 
 import FoodListSection from './FoodListSection';
 import ResultDetailFilters from './ResultDetailFilters';
@@ -30,6 +30,10 @@ import ResultDetailHeader from './ResultDetailHeader';
 import TopContent from './TopContent';
 
 import css from './ResultDetailModal.module.scss';
+
+const RestaurantReviewModal = dynamic(
+  () => import('../RestaurantReviewModal/RestaurantReviewModal'),
+);
 
 type TResultDetailModalProps = {
   isOpen?: boolean;
@@ -378,10 +382,12 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
         onSelect={handleSelectFood}
         isMobileLayout={!isTabletLayoutOrLarger}
       />
-      <RestaurantReviewModal
-        isOpen={restaurantReviewModalControl.value}
-        onClose={restaurantReviewModalControl.setFalse}
-      />
+      {restaurantReviewModalControl.value && (
+        <RestaurantReviewModal
+          isOpen={restaurantReviewModalControl.value}
+          onClose={restaurantReviewModalControl.setFalse}
+        />
+      )}
     </>
   );
 };

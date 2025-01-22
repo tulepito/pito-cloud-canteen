@@ -9,9 +9,21 @@ import {
 import cookies from '@services/cookie';
 import { fetchListing } from '@services/integrationHelper';
 import { createNativeNotificationToPartner } from '@services/nativeNotification';
-import { handleError } from '@services/sdk';
+import { getSdk, handleError } from '@services/sdk';
+import type { OrderListing, UserListing, WithFlexSDKData } from '@src/types';
+import { buildFullName } from '@src/utils/emailTemplate/participantOrderPicking';
 import { ENativeNotificationType } from '@src/utils/enums';
 import type { TRestaurantRating } from '@src/utils/types';
+
+export interface POSTCompanyRatingsBody {
+  companyName: string;
+  ratings: TRestaurantRating[];
+  detailTextRating: string;
+  imageIdList: string[];
+  staff: { rating: number; optionalRating: string[] };
+  service: { rating: number; optionalRating: string[] };
+  imageUrlList: string[];
+}
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   const apiMethod = req.method;
@@ -25,8 +37,39 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           imageIdList,
           staff,
           service,
-        } = req.body;
-        await postRatingFn({ companyName, ratings });
+          imageUrlList,
+        } = req.body as POSTCompanyRatingsBody;
+        const sdk = getSdk(req, res);
+        const currentUser: WithFlexSDKData<UserListing> =
+          await sdk.currentUser.show();
+
+        if (!ratings[0].orderId) {
+          throw new Error('Order ID is required');
+        }
+        const orderListing: OrderListing = await fetchListing(
+          ratings[0].orderId,
+        );
+
+        if (!orderListing.attributes?.title) {
+          throw new Error('Order title is required');
+        }
+
+        await postRatingFn({
+          companyName,
+          ratings,
+          ratingUserName: buildFullName(
+            currentUser.data.data.attributes?.profile?.firstName,
+            currentUser.data.data.attributes?.profile?.lastName,
+            {
+              compareToGetLongerWith:
+                currentUser.data.data.attributes?.profile?.displayName,
+            },
+          ),
+          orderCode: orderListing.attributes?.title,
+          detailTextRating,
+          generalRating: ratings[0].generalRating,
+          imageUrlList,
+        });
         await updateRatingForRestaurantFn(ratings);
         await updateRatingForOrderFn({
           ratings,

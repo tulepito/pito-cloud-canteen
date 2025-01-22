@@ -35,6 +35,7 @@ import {
   Transaction,
   User,
 } from '@src/utils/data';
+import { formatTimestamp } from '@src/utils/dates';
 import {
   ENotificationType,
   EPaymentType,
@@ -297,6 +298,7 @@ const transit = createAsyncThunk(
             userId: User(provider).getId(),
             orderId,
             planId,
+            subOrderName: `${companyName}_${formatTimestamp(timestamp)}`,
             subOrderDate: DateTime.fromISO(displayStart)
               .startOf('day')
               .toMillis(),

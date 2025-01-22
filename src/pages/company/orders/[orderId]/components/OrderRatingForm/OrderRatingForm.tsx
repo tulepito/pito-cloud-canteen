@@ -9,6 +9,7 @@ import FieldRating from '@components/FormFields/FieldRating/FieldRating';
 import FieldTextArea from '@components/FormFields/FieldTextArea/FieldTextArea';
 import MobileBottomContainer from '@components/MobileBottomContainer/MobileBottomContainer';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
+import { useAppSelector } from '@hooks/reduxHooks';
 import { useViewport } from '@hooks/useViewport';
 import { Listing } from '@src/utils/data';
 import type { TListing } from '@src/utils/types';
@@ -49,6 +50,9 @@ const OrderRatingFormComponent: React.FC<TOrderRatingFormComponentProps> = (
   const submitDisabled = inProgress || !values.general;
   const { isMobileLayout } = useViewport();
   const intl = useIntl();
+  const uploadImageInProgress = useAppSelector(
+    (state) => state.uploadImage.uploadImageInProgress,
+  );
 
   const pageTitle = isMobileLayout
     ? intl.formatMessage(
@@ -163,7 +167,7 @@ const OrderRatingFormComponent: React.FC<TOrderRatingFormComponentProps> = (
               <li className={css.detailRatingFieldWrapper}>
                 <FoodRating
                   values={values}
-                  restaurantsByDay={restaurantsByDay}
+                  restaurantsByDays={restaurantsByDay}
                   isShowTitle={!isMobileLayout}
                 />
               </li>
@@ -201,7 +205,10 @@ const OrderRatingFormComponent: React.FC<TOrderRatingFormComponentProps> = (
               id: 'OrderRatingForm.image',
             })}
           </div>
-          <RatingImagesUploadField images={images} />
+          <RatingImagesUploadField
+            images={images}
+            uploadImageInProgress={uploadImageInProgress}
+          />
         </div>
       </div>
       {isMobileLayout ? (

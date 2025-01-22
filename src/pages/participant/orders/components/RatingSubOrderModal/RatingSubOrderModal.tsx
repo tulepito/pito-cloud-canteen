@@ -1,5 +1,6 @@
 import { useMemo, useRef } from 'react';
 import type { Event } from 'react-big-calendar';
+import { toast } from 'react-toastify';
 
 import Modal from '@components/Modal/Modal';
 import SlideModal from '@components/SlideModal/SlideModal';
@@ -18,7 +19,7 @@ type TRatingSubOrderModalProps = {
   onClose: () => void;
   currentUserId: string;
   selectedEvent: Event | null;
-  openSuccessRatingModal: () => void;
+  openSuccessRatingModal?: () => void;
   participantPostRatingInProgress?: boolean;
 };
 const RatingSubOrderModal: React.FC<TRatingSubOrderModalProps> = (props) => {
@@ -32,14 +33,8 @@ const RatingSubOrderModal: React.FC<TRatingSubOrderModalProps> = (props) => {
   } = props;
   const dispatch = useAppDispatch();
   const { isMobileLayout } = useViewport();
-  const {
-    companyName = 'PCC',
-    orderId,
-    restaurant,
-    timestamp,
-    planId,
-    foodName,
-  } = selectedEvent?.resource || {};
+  const { companyName, orderId, restaurant, timestamp, planId, foodName } =
+    selectedEvent?.resource || {};
   const restaurantId = restaurant?.id;
   const formRef = useRef<any>(null);
 
@@ -89,7 +84,8 @@ const RatingSubOrderModal: React.FC<TRatingSubOrderModalProps> = (props) => {
 
     if (meta.requestStatus === 'fulfilled') {
       handleClose();
-      openSuccessRatingModal();
+      openSuccessRatingModal?.();
+      toast.success('Cảm ơn bạn đã đánh giá');
       dispatch(resetImage());
       formRef.current?.reset();
     }

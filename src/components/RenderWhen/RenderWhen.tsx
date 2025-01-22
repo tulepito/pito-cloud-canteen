@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 
 type TWhenProps = React.PropsWithChildren<{
   condition?: boolean;
@@ -10,11 +10,13 @@ const RenderWhen = ({ condition = true, children }: TWhenProps) => {
   React.Children.forEach(children, (child: any) => {
     const isTypeRenderWhenFalse = child?.props?.type === 'RenderWhenFalse';
 
-    if (
-      (condition && !isTypeRenderWhenFalse) ||
-      (!condition && isTypeRenderWhenFalse)
-    ) {
-      list.push(child);
+    if (child?.type !== undefined) {
+      if (
+        (condition && !isTypeRenderWhenFalse) ||
+        (!condition && isTypeRenderWhenFalse)
+      ) {
+        list.push(child);
+      }
     }
   });
 

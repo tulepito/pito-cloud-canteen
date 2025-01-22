@@ -8,6 +8,21 @@ import { newFoodTemplate } from '@src/utils/slackTemplates/newFood';
 
 import { fetchListing } from './integrationHelper';
 
+function getUserTypeDataByUserType(userType: 'participant' | 'booker') {
+  switch (userType) {
+    case 'participant':
+      return {
+        label: 'Participant',
+      };
+    case 'booker':
+      return {
+        label: 'Booker',
+      };
+    default:
+      return null;
+  }
+}
+
 type SlackNotificationParams = {
   foodId?: string;
   restaurantId?: string;
@@ -92,6 +107,15 @@ type SlackNotificationParams = {
     date: string;
     partnerName: string;
   };
+  participantRatingData?: {
+    ratingScore: number;
+    content: string;
+    images: string[];
+    ratingUserName: string;
+    partnerName: string;
+    orderCode: string;
+    ratingUserType: 'participant' | 'booker';
+  };
 };
 
 export const createSlackNotification = async (
@@ -108,6 +132,57 @@ export const createSlackNotification = async (
       )}`,
     );
     switch (notificationType) {
+      case ESlackNotificationType.PARTICIPANT_RATING: {
+        if (!notificationParams.participantRatingData) return;
+
+        const userTypeData = getUserTypeDataByUserType(
+          notificationParams.participantRatingData.ratingUserType,
+        );
+
+        if (!userTypeData) return;
+
+        await axios.post(
+          process.env.SLACK_RATING_WEBHOOK_URL,
+          {
+            blocks: [
+              {
+                type: 'section',
+                text: {
+                  type: 'mrkdwn',
+                  text: `[${userTypeData.label}] ${notificationParams.participantRatingData.ratingUserName} đã đánh giá ${notificationParams.participantRatingData.ratingScore} :star: cho nhà hàng *${notificationParams.participantRatingData.partnerName}* trong đơn hàng *#${notificationParams.participantRatingData.orderCode}*`,
+                },
+              },
+              ...(notificationParams.participantRatingData.content
+                ? [
+                    {
+                      type: 'section',
+                      text: {
+                        type: 'mrkdwn',
+                        text: `${notificationParams.participantRatingData.content}`,
+                      },
+                    },
+                  ]
+                : []),
+              ...(notificationParams.participantRatingData.images
+                ? notificationParams.participantRatingData.images.map(
+                    (image) => ({
+                      type: 'image',
+                      image_url: image,
+                      alt_text: 'Hình ảnh đánh giá',
+                    }),
+                  )
+                : []),
+            ],
+          },
+          {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          },
+        );
+        break;
+      }
+
       case ESlackNotificationType.CREATE_NEW_FOOD:
         {
           const { restaurantId, foodId } = notificationParams;

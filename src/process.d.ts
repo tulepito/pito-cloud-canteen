@@ -20,6 +20,7 @@ declare namespace NodeJS {
     NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: string;
 
     SLACK_WEBHOOK_URL: string;
+    SLACK_RATING_WEBHOOK_URL: string;
     SLACK_WEBHOOK_ENABLED: 'true' | 'false';
 
     NEXT_APP_FIREBASE_PROJECT_ID: string;

@@ -5,6 +5,7 @@ import { denormalisedResponseEntities } from '@services/data';
 import { fetchListing } from '@services/integrationHelper';
 import { createFirebaseDocNotification } from '@services/notifications';
 import { getIntegrationSdk } from '@services/sdk';
+import { createSlackNotification } from '@services/slackNotification';
 import { Listing, User } from '@src/utils/data';
 import {
   ECompanyPermission,
@@ -12,16 +13,31 @@ import {
   EListingType,
   ENotificationType,
   EOrderStates,
+  ESlackNotificationType,
 } from '@src/utils/enums';
+import type { TRestaurantRating } from '@src/utils/types';
 
 export const postRatingFn = async ({
   companyName,
   ratings,
+  generalRating,
+  detailTextRating,
+  imageUrlList,
+  ratingUserName,
+  orderCode,
 }: {
   companyName: string;
-  ratings: any;
+  ratings: TRestaurantRating[];
+  generalRating: number;
+  detailTextRating: string;
+  imageUrlList: string[];
+  ratingUserName: string;
+  orderCode: string;
 }) => {
   const integrationSdk = getIntegrationSdk();
+
+  const restaurantNames: string[] = [];
+
   await Promise.all(
     ratings.map(async (rating: any) => {
       const { restaurantId, ...rest } = rating;
@@ -40,6 +56,8 @@ export const postRatingFn = async ({
         },
       });
 
+      restaurantNames.push(restaurantListing.attributes.title);
+
       createFirebaseDocNotification(
         ENotificationType.SUB_ORDER_REVIEWED_BY_BOOKER,
         {
@@ -54,6 +72,18 @@ export const postRatingFn = async ({
       return denormalisedResponseEntities(response)[0];
     }),
   );
+
+  createSlackNotification(ESlackNotificationType.PARTICIPANT_RATING, {
+    participantRatingData: {
+      ratingScore: generalRating,
+      content: detailTextRating,
+      images: imageUrlList,
+      partnerName: uniq(restaurantNames).join(', '),
+      ratingUserName,
+      ratingUserType: 'booker',
+      orderCode,
+    },
+  });
 };
 
 export const postParticipantRatingFn = async ({
@@ -63,6 +93,9 @@ export const postParticipantRatingFn = async ({
   imageIdList,
   foodName,
   foodId,
+  imageUrlList,
+  orderCode,
+  ratingUserName,
 }: {
   companyName: string;
   rating: any;
@@ -70,11 +103,15 @@ export const postParticipantRatingFn = async ({
   imageIdList: string[];
   foodName: string;
   foodId: string;
+  imageUrlList: string[];
+  orderCode: string;
+  ratingUserName: string;
 }) => {
   const integrationSdk = getIntegrationSdk();
   const { restaurantId, ...rest } = rating;
-  const { orderId, timestamp, reviewerId } = rest;
+  const { orderId, timestamp, reviewerId, generalRating } = rest;
   const restaurantListing = await fetchListing(restaurantId, ['author']);
+
   const listingAuthorUser = User(restaurantListing.author);
   const authorId = listingAuthorUser.getId();
   const response = await integrationSdk.listings.create({
@@ -89,6 +126,18 @@ export const postParticipantRatingFn = async ({
       reviewRole: ECompanyPermission.participant,
       foodName,
       foodId,
+    },
+  });
+
+  createSlackNotification(ESlackNotificationType.PARTICIPANT_RATING, {
+    participantRatingData: {
+      ratingScore: generalRating,
+      content: detailTextRating,
+      images: imageUrlList,
+      partnerName: restaurantListing.attributes.title,
+      ratingUserName,
+      ratingUserType: 'participant',
+      orderCode,
     },
   });
 

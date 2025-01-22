@@ -15,14 +15,28 @@ import {
 
 const { FIREBASE_PARTICIPANT_SUB_ORDER_COLLECTION_NAME } = process.env;
 
+export interface GETParticipantsDocumentJSONParams {
+  txStatus: string | string[];
+  limitRecords: number;
+  lastRecord: number | null;
+  participantId: string;
+  extraQueryParams?: Record<string, any>;
+}
+
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   const apiMethod = req.method;
   switch (apiMethod) {
     case HttpMethod.GET:
       try {
         const { JSONParams } = req.query;
-        const { txStatus, limitRecords, lastRecord, participantId } =
-          JSON.parse(JSONParams as string);
+        const {
+          txStatus,
+          limitRecords,
+          lastRecord,
+          participantId,
+          extraQueryParams,
+        } = JSON.parse(String(JSONParams)) as GETParticipantsDocumentJSONParams;
+
         const response = await queryCollectionData({
           collectionName: FIREBASE_PARTICIPANT_SUB_ORDER_COLLECTION_NAME!,
           queryParams: {
@@ -38,6 +52,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
               operator: '==',
               value: EParticipantOrderStatus.joined,
             },
+            ...(extraQueryParams || {}),
           },
           limitRecords: Number(limitRecords),
           lastRecord: Number(lastRecord),

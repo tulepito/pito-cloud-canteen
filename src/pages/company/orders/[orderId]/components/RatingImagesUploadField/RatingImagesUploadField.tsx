@@ -176,7 +176,7 @@ const RatingImagesUploadField: React.FC<TRatingImagesUploadFieldProps> = ({
                 onClick={onDeleteImage(image.id)}>
                 <IconClose className={css.deleteIcon} />
               </div>
-              <RenderWhen condition={uploadImageInProgress && !image.imageId}>
+              <RenderWhen condition={!!uploadImageInProgress && !image.imageId}>
                 <div className={css.loadingUpload}>
                   <IconSpinner />
                 </div>

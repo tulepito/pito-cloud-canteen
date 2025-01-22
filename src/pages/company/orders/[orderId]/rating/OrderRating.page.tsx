@@ -2,21 +2,20 @@
 import { useEffect } from 'react';
 import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
+import { toast } from 'react-toastify';
 import isEmpty from 'lodash/isEmpty';
 import { useRouter } from 'next/router';
 
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import MobileTopContainer from '@components/MobileTopContainer/MobileTopContainer';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import useBoolean from '@hooks/useBoolean';
 import { useViewport } from '@hooks/useViewport';
 import { resetImage } from '@redux/slices/uploadImage.slice';
 import { enGeneralPaths } from '@src/paths';
-import { Listing } from '@src/utils/data';
+import type { OrderListing } from '@src/types';
 import { EOrderStates } from '@src/utils/enums';
 
 import OrderRatingForm from '../components/OrderRatingForm/OrderRatingForm';
-import RatingSuccessModal from '../components/RatingSuccessModal/RatingSuccessModal';
 
 import { OrderRatingThunks } from './OrderRating.slice';
 
@@ -26,7 +25,6 @@ const OrderRatingPage = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const intl = useIntl();
-  const ratingSuccessModalControl = useBoolean();
   const { isMobileLayout } = useViewport();
   const { orderId } = router.query;
   const currentUser = useAppSelector(
@@ -35,8 +33,12 @@ const OrderRatingPage = () => {
   );
   const currentUserId = currentUser?.id.uuid;
 
-  const order = useAppSelector(
+  const orderListing: OrderListing | undefined = useAppSelector(
     (state) => state.OrderRating.order,
+    shallowEqual,
+  );
+  const fetchOrderInProgress = useAppSelector(
+    (state) => state.OrderRating.fetchOrderInProgress,
     shallowEqual,
   );
   const restaurantsByDay = useAppSelector(
@@ -52,27 +54,35 @@ const OrderRatingPage = () => {
     (state) => state.OrderRating.postRatingInProgress,
   );
 
-  const orderListing = Listing(order);
-
   const {
-    orderStatus,
+    orderState,
     ratings: orderRatings,
-    companyName = 'PCC',
-  } = orderListing.getMetadata();
-  const isOrderRated = !!orderRatings || orderStatus === EOrderStates.reviewed;
+    companyName,
+  } = orderListing?.attributes?.metadata || {};
+
+  const isOrderRatedByBooker =
+    orderState === EOrderStates.reviewed ||
+    !!(orderRatings || []).find(
+      (rating) => rating?.reviewerId === currentUserId,
+    );
+
   const pageTitle = intl.formatMessage(
     {
       id: 'OrderRatingPage.pageTitle',
     },
     {
-      orderTitle: orderListing.getAttributes().title,
+      orderTitle: orderListing?.attributes?.title,
     },
   );
+
   useEffect(() => {
-    if (isOrderRated) {
-      router.push(`/company/orders/${orderId}`);
+    if (isOrderRatedByBooker && !fetchOrderInProgress) {
+      router.push(
+        enGeneralPaths.company.orders['[orderId]'].index(String(orderId)),
+      );
     }
-  }, [isOrderRated]);
+  }, [isOrderRatedByBooker, fetchOrderInProgress]);
+
   useEffect(() => {
     if (orderId) {
       dispatch(OrderRatingThunks.fetchOrder(orderId as string));
@@ -195,27 +205,27 @@ const OrderRatingPage = () => {
         optionalOtherReview: values?.['optionalService-other'],
       }),
     };
-    if (!isOrderRated) {
+    if (!isOrderRatedByBooker) {
       const { meta } = await dispatch(
         OrderRatingThunks.postRating({
           ratings,
           detailTextRating,
           staff: staffRating,
           service: serviceRating,
-          companyName,
+          companyName: companyName || '',
         }),
       );
       if (meta.requestStatus === 'fulfilled') {
-        ratingSuccessModalControl.setTrue();
+        toast.success('Cảm ơn bạn đã đánh giá');
+        router.replace(
+          enGeneralPaths.company.orders['[orderId]'].index(String(orderId)),
+        );
       }
     }
   };
 
   const handleGoBack = () => {
     router.back();
-  };
-  const handleGoToHome = () => {
-    router.push(enGeneralPaths.Auth);
   };
 
   return (
@@ -248,15 +258,9 @@ const OrderRatingPage = () => {
             inProgress={postRatingInProgress}
             restaurantsByDay={restaurantsByDay}
             images={images}
-            order={order}
+            order={orderListing as any}
           />
         </div>
-        <RatingSuccessModal
-          isPopup={!!isMobileLayout}
-          isOpen={ratingSuccessModalControl.value}
-          onClose={ratingSuccessModalControl.setFalse}
-          goToHome={handleGoToHome}
-        />
       </div>
     </>
   );

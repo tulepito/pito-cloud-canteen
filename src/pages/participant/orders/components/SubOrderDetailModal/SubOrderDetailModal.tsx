@@ -1,11 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import type { Event } from 'react-big-calendar';
 import { useIntl } from 'react-intl';
-import { shallowEqual } from 'react-redux';
 import last from 'lodash/last';
 import { useRouter } from 'next/router';
 
-import Button from '@components/Button/Button';
 import DishSelectionForm from '@components/CalendarDashboard/components/OrderEventCard/DishSelectionForm';
 import OrderEventCardContentItems from '@components/CalendarDashboard/components/OrderEventCard/OrderEventCardContentItems';
 import OrderEventCardStatus from '@components/CalendarDashboard/components/OrderEventCard/OrderEventCardStatus';
@@ -19,7 +17,6 @@ import { participantPaths } from '@src/paths';
 import { CurrentUser } from '@src/utils/data';
 import { isOver } from '@src/utils/dates';
 import { EOrderStates } from '@src/utils/enums';
-import { ETransition } from '@src/utils/transaction';
 
 import { OrderListThunks } from '../../OrderList.slice';
 
@@ -29,7 +26,7 @@ type TSubOrderDetailModalProps = {
   isOpen: boolean;
   onClose: () => void;
   event: Event;
-  openRatingSubOrderModal: () => void;
+  ratingSection: React.ReactNode;
   from: string;
   recommendFoodForSpecificSubOrder: (params: {
     planId: string;
@@ -44,7 +41,7 @@ const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
     isOpen,
     onClose,
     event,
-    openRatingSubOrderModal,
+    ratingSection,
     from,
     recommendFoodForSpecificSubOrder,
     pickFoodForSpecificSubOrderInProgress,
@@ -73,17 +70,11 @@ const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
     (state) => state.ParticipantOrderList.fetchSubOrderDocumentInProgress,
   );
 
-  const subOrderDocument = useAppSelector(
-    (state) => state.ParticipantOrderList.subOrderDocument,
-    shallowEqual,
-  );
   const timestamp = last<string>(orderDay.split(' - '));
 
   const isExpired = isOver(expiredTime);
   const shouldShowPickFoodSection =
     !isExpired && orderState === EOrderStates.picking;
-
-  const { reviewId } = subOrderDocument;
 
   const onNavigateToOrderDetail = () => {
     router.push({
@@ -184,19 +175,7 @@ const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
             </RenderWhen.False>
           </RenderWhen>
         </RenderWhen>
-        <RenderWhen
-          condition={
-            !reviewId && lastTransition === ETransition.COMPLETE_DELIVERY
-          }>
-          <Button
-            disabled={
-              fetchSubOrderTxInProgress || fetchSubOrderDocumentInProgress
-            }
-            className={css.ratingBtn}
-            onClick={openRatingSubOrderModal}>
-            Đánh giá
-          </Button>
-        </RenderWhen>
+        {ratingSection}
       </div>
     </SlideModal>
   );

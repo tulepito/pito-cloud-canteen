@@ -207,12 +207,18 @@ const DeadlineDateTimeFormComponent: React.FC<
       style={{ position: 'relative' }}
       onSubmit={handleSubmit}>
       <div
-        style={{
-          position: 'absolute',
-          top: '-80px',
-          width: 'fit-content',
-          right: 0,
-        }}>
+        style={
+          isMobileLayout
+            ? {
+                display: 'none',
+              }
+            : {
+                position: 'absolute',
+                top: '-80px',
+                width: 'fit-content',
+                right: 0,
+              }
+        }>
         {sendNotificationButton}
       </div>
       <div className={css.formContainer}>

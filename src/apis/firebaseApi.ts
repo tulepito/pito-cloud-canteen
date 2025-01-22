@@ -1,3 +1,4 @@
+import type { GETParticipantsDocumentJSONParams } from '@pages/api/participants/document/index.api';
 import type {
   TOrderChangeHistoryItem,
   TSubOrderChangeHistoryItem,
@@ -15,17 +16,8 @@ export const participantSubOrderAddDocumentApi = async (
 ) => postApi('/participants/document', body);
 
 export const participantSubOrderGetDocumentApi = async (
-  participantId: string,
-  txStatus: string,
-  limitRecords?: number,
-  lastRecord?: number | null,
-) =>
-  getApi(`/participants/document`, {
-    participantId,
-    txStatus,
-    limitRecords,
-    lastRecord,
-  });
+  payload: GETParticipantsDocumentJSONParams,
+) => getApi(`/participants/document`, payload);
 
 export type ParticipantSubOrderUpdateDocumentApiBody = {
   subOrderId: string; // participantId - planId - timestamp

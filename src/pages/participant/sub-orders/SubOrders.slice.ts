@@ -6,6 +6,7 @@ import {
   participantSubOrderGetDocumentApi,
 } from '@apis/firebaseApi';
 import { createAsyncThunk } from '@redux/redux.helper';
+import type { ParticipantSubOrderDocument } from '@src/types';
 import { denormalisedResponseEntities } from '@src/utils/data';
 import { EImageVariants, ESubOrderTxStatus } from '@src/utils/enums';
 
@@ -15,7 +16,7 @@ const FIREBASE_LIMIT_RECORDS = 20;
 type TSubOrdersState = {
   subOrders: any[];
   deliveringSubOrders: any[];
-  deliveredSubOrders: any[];
+  deliveredSubOrders: ParticipantSubOrderDocument[];
   fetchSubOrdersInProgress: boolean;
   fetchSubOrdersError: any;
 
@@ -54,17 +55,27 @@ const FETCH_SUB_ORDER_FROM_FIREBASE =
 
 const fetchSubOrdersFromFirebase = createAsyncThunk(
   FETCH_SUB_ORDERS_FROM_FIREBASE,
-  async (payload: any, { getState }) => {
+  async (
+    payload: {
+      participantId: string;
+      txStatus: string | string[];
+      extraQueryParams?: Record<string, any>;
+    },
+    { getState },
+  ) => {
     const { deliveringLastRecord, deliveredLastRecord } =
       getState().ParticipantSubOrderList;
     const { participantId, txStatus } = payload;
 
-    const { data: response } = await participantSubOrderGetDocumentApi(
+    const { data: response } = await participantSubOrderGetDocumentApi({
       participantId,
       txStatus,
-      FIREBASE_LIMIT_RECORDS,
-      Array.isArray(txStatus) ? deliveringLastRecord : deliveredLastRecord,
-    );
+      limitRecords: FIREBASE_LIMIT_RECORDS,
+      lastRecord: Array.isArray(txStatus)
+        ? deliveringLastRecord
+        : deliveredLastRecord,
+      extraQueryParams: payload.extraQueryParams,
+    });
 
     return Array.isArray(txStatus)
       ? {
@@ -123,7 +134,9 @@ export const SubOrdersThunks = {
 const SubOrdersSlice = createSlice({
   name: 'SubOrders',
   initialState,
-  reducers: {},
+  reducers: {
+    logout: () => initialState,
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchSubOrdersFromFirebase.pending, (state) => {
@@ -194,7 +207,7 @@ const SubOrdersSlice = createSlice({
           ...state,
           fetchSubOrderInProgress: false,
           ...(payload.deliveredSubOrder && {
-            deliveredSubOrders: state.deliveredSubOrders.map((subOrder: any) =>
+            deliveredSubOrders: state.deliveredSubOrders.map((subOrder) =>
               subOrder.id === payload.deliveredSubOrder.id
                 ? payload.deliveredSubOrder
                 : subOrder,

@@ -1,3 +1,5 @@
+import type { ECompanyPermission } from '@src/utils/enums';
+
 import type { Assert, DeepPartial, Image, ListingBuilder } from './utils';
 
 export type FoodListing = ListingBuilder<
@@ -66,6 +68,7 @@ export type OrderListing = ListingBuilder<
     selectedGroups: string[];
     serviceFees: Record<string, number>;
     startDate: number;
+    ratings: RatingListingMetadata[];
   },
   {},
   {}
@@ -186,7 +189,7 @@ export type UserListing = DeepPartial<{
       metadata: {
         company: {
           [key: string]: {
-            permission: 'booker' | 'participant' | 'owner';
+            permission: ECompanyPermission;
           };
         };
         isPartner: boolean;
@@ -218,17 +221,69 @@ export type UserListing = DeepPartial<{
         walkthroughEnable: boolean;
       };
     };
+    profileImage: Image;
   };
 }>;
+
+export type FlexDSKMeta = {
+  page: number;
+  perPage: number;
+  paginationUnsupported?: boolean;
+  totalItems: number;
+  totalPages: number;
+};
 
 export type WithFlexSDKData<T> = {
   status: number;
   statusText: string;
   data: {
     data: T;
+    meta?: FlexDSKMeta;
+    included?: Image[];
   };
 };
 
 export type OrderDetail = Assert<
   Assert<Assert<PlanListing['attributes']>['metadata']>['orderDetail']
 >;
+
+export interface RatingListingMetadata {
+  detailRating: {
+    food: {
+      rating: number;
+    };
+    packaging: {
+      rating: number;
+    };
+  };
+  detailTextRating: string;
+  foodId: string;
+  foodName: string;
+  generalRating: number;
+  orderId: string;
+  restaurantId: string;
+  reviewRole: 'participant' | 'booker';
+  reviewerId: string;
+  timestamp: string;
+}
+
+export type RatingListing = ListingBuilder<{}, {}, RatingListingMetadata, {}>;
+
+export type ParticipantSubOrderDocument = DeepPartial<{
+  deliveryHour: string;
+  txStatus: 'delivered';
+  createdAt: {
+    seconds: number;
+    nanoseconds: number;
+  };
+  restaurantName: string;
+  status: 'joined';
+  orderId: string;
+  restaurantAvatarImage: Image;
+  restaurantId: string;
+  planId: string;
+  reviewId: string;
+  foodId: string;
+  participantId: string;
+  id: string;
+}>;

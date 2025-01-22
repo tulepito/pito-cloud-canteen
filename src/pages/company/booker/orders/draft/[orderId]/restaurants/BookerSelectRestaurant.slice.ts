@@ -1,7 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { uniq } from 'lodash';
-import keyBy from 'lodash/keyBy';
-import mapValue from 'lodash/mapValues';
 import uniqBy from 'lodash/uniqBy';
 
 import {
@@ -19,13 +17,24 @@ import { sortRestaurants } from '@helpers/sort';
 import { createAsyncThunk } from '@redux/redux.helper';
 // eslint-disable-next-line import/no-cycle
 import { orderAsyncActions } from '@redux/slices/Order.slice';
+import type {
+  FlexDSKMeta,
+  RatingListing,
+  UserListing,
+  WithFlexSDKData,
+} from '@src/types';
 import type { TFoodInRestaurant } from '@src/types/bookerSelectRestaurant';
-import { CompanyPermissions } from '@src/types/UserPermission';
 import { denormalisedResponseEntities, Listing } from '@utils/data';
-import { ECompanyPermission, EImageVariants, EListingType } from '@utils/enums';
-import type { TListing, TObject, TPagination, TUser } from '@utils/types';
+import { EImageVariants, EListingType } from '@utils/enums';
+import type { TListing, TObject, TUser } from '@utils/types';
 
 export const MANAGE_ORDER_PAGE_SIZE = 10;
+
+type WithReviewer<T> = T & {
+  reviewer: UserListing;
+};
+
+export type RatingListingWithReviewer = WithReviewer<RatingListing>;
 
 // ================ Initial states ================ //
 type TOrderInitialState = {
@@ -67,13 +76,11 @@ type TOrderInitialState = {
   currentMenuId?: string;
   selectedRestaurantId: string;
 
-  restaurantBookerReviews: any;
-  restaurantBookerReviewers: any;
-  bookerReviewPagination: TPagination;
+  restaurantBookerReviews: RatingListingWithReviewer[];
+  restaurantBookerReviewsMeta?: FlexDSKMeta;
 
-  restaurantParticipantReviews: any;
-  restaurantParticipantReviewers: any;
-  participantReviewPagination: TPagination;
+  restaurantParticipantReviews: RatingListingWithReviewer[];
+  restaurantParticipantReviewsMeta?: FlexDSKMeta;
 
   fetchRestaurantReviewInProgress: boolean;
   fetchRestaurantReviewError: any;
@@ -118,12 +125,10 @@ const initialState: TOrderInitialState = {
   currentMenuId: undefined,
 
   restaurantBookerReviews: [],
-  restaurantBookerReviewers: [],
-  bookerReviewPagination: null!,
+  restaurantBookerReviewsMeta: null!,
 
   restaurantParticipantReviews: [],
-  restaurantParticipantReviewers: [],
-  participantReviewPagination: null!,
+  restaurantParticipantReviewsMeta: null!,
 
   fetchRestaurantReviewInProgress: false,
   fetchRestaurantReviewError: null,
@@ -408,76 +413,80 @@ const fetchFoodListFromRestaurant = createAsyncThunk(
 const fetchRestaurantReviews = createAsyncThunk(
   FETCH_RESTAURANT_REVIEWS,
   async (
-    { page = 1, reviewRole, isViewAll }: any,
+    {
+      page = 1,
+      reviewRole,
+    }: {
+      page: number;
+      reviewRole: 'booker' | 'participant';
+    },
     { extra: sdk, getState },
   ) => {
     const {
       selectedRestaurantId,
       restaurantBookerReviews,
-      restaurantBookerReviewers,
       restaurantParticipantReviews,
-      restaurantParticipantReviewers,
+      restaurantBookerReviewsMeta,
+      restaurantParticipantReviewsMeta,
     } = getState().BookerSelectRestaurant;
-    const rawResponse = await sdk.listings.query({
-      meta_listingType: EListingType.rating,
-      meta_restaurantId: selectedRestaurantId,
-      page,
-      perPage: isViewAll ? 10 : 5,
-      meta_reviewRole: reviewRole,
-    });
-    const { meta } = rawResponse.data;
 
-    const fetchedReviews = denormalisedResponseEntities(rawResponse);
+    const ratingListingsResponse: WithFlexSDKData<RatingListing[]> =
+      await sdk.listings.query({
+        meta_listingType: EListingType.rating,
+        meta_restaurantId: selectedRestaurantId,
+        page,
+        perPage: 5,
+        meta_reviewRole: reviewRole,
+      });
 
-    const reviewerWithReviewIdList = await Promise.all(
-      fetchedReviews.map(async (review: TListing) => {
-        const reviewGetter = Listing(review);
-        const reviewId = reviewGetter.getId();
-        const { reviewerId } = reviewGetter.getMetadata();
+    const ratingListings: RatingListing[] = ratingListingsResponse.data.data;
 
-        const [reviewer] = denormalisedResponseEntities(
-          await sdk.users.show({
-            id: reviewerId,
-            include: ['profileImage'],
-            'fields.image': [`variants.${EImageVariants.squareSmall2x}`],
-          }),
-        );
+    const ratingListWithUser = await Promise.all(
+      ratingListings.map(async (rating) => {
+        const reviewerId = rating.attributes?.metadata?.reviewerId;
+
+        const reviewer: WithFlexSDKData<UserListing> = await sdk.users.show({
+          id: reviewerId,
+          include: ['profileImage'],
+          'fields.image': [`variants.${EImageVariants.squareSmall}`],
+        });
 
         return {
-          id: reviewId,
-          value: reviewer,
+          ...rating,
+          reviewer: denormalisedResponseEntities(reviewer)?.[0],
         };
       }),
     );
 
+    if (reviewRole === 'booker') {
+      return {
+        restaurantBookerReviews:
+          page === 1
+            ? ratingListWithUser
+            : [...restaurantBookerReviews, ...ratingListWithUser],
+        restaurantParticipantReviews,
+        restaurantBookerReviewsMeta: ratingListingsResponse.data.meta,
+        restaurantParticipantReviewsMeta,
+      };
+    }
+
+    if (reviewRole === 'participant') {
+      return {
+        restaurantBookerReviews,
+        restaurantParticipantReviews:
+          page === 1
+            ? ratingListWithUser
+            : [...restaurantParticipantReviews, ...ratingListWithUser],
+        restaurantBookerReviewsMeta,
+        restaurantParticipantReviewsMeta: ratingListingsResponse.data.meta,
+      };
+    }
+
     return {
-      ...(CompanyPermissions.includes(reviewRole) && {
-        restaurantBookerReviews: isViewAll
-          ? uniqBy([...restaurantBookerReviews, ...fetchedReviews], 'id.uuid')
-          : fetchedReviews,
-        restaurantBookerReviewers: isViewAll
-          ? {
-              ...restaurantBookerReviewers,
-              ...mapValue(keyBy(reviewerWithReviewIdList, 'id'), 'value'),
-            }
-          : mapValue(keyBy(reviewerWithReviewIdList, 'id'), 'value'),
-        bookerReviewPagination: meta,
-      }),
-      ...(reviewRole === ECompanyPermission.participant && {
-        restaurantParticipantReviews: isViewAll
-          ? uniqBy(
-              [...restaurantParticipantReviews, ...fetchedReviews],
-              'id.uuid',
-            )
-          : fetchedReviews,
-        restaurantParticipantReviewers: isViewAll
-          ? {
-              ...restaurantParticipantReviewers,
-              ...mapValue(keyBy(reviewerWithReviewIdList, 'id'), 'value'),
-            }
-          : mapValue(keyBy(reviewerWithReviewIdList, 'id'), 'value'),
-        participantReviewPagination: meta,
-      }),
+      restaurantBookerReviews,
+      restaurantParticipantReviews,
+      restaurantBookerReviewsMeta,
+      restaurantParticipantReviewsMeta,
     };
   },
 );
@@ -675,16 +684,13 @@ const BookerSelectRestaurantSlice = createSlice({
         fetchRestaurantReviewInProgress: true,
         fetchRestaurantReviewError: null,
       }))
-      .addCase(fetchRestaurantReviews.fulfilled, (state, { payload }) => ({
-        ...state,
-        fetchRestaurantReviewInProgress: false,
-        restaurantBookerReviews: payload?.restaurantBookerReviews,
-        restaurantBookerReviewers: payload?.restaurantBookerReviewers,
-        restaurantParticipantReviews: payload?.restaurantParticipantReviews,
-        restaurantParticipantReviewers: payload?.restaurantParticipantReviewers,
-        bookerReviewPagination: payload?.bookerReviewPagination,
-        participantReviewPagination: payload?.participantReviewPagination,
-      }))
+      .addCase(fetchRestaurantReviews.fulfilled, (state, { payload }) => {
+        return {
+          ...state,
+          fetchRestaurantReviewInProgress: false,
+          ...payload,
+        };
+      })
       .addCase(fetchRestaurantReviews.rejected, (state, { error }) => ({
         ...state,
         fetchRestaurantReviewInProgress: false,

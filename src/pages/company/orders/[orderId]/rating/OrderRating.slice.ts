@@ -1,11 +1,18 @@
 import { createSlice } from '@reduxjs/toolkit';
 import uniq from 'lodash/uniq';
 
-import type { TBookerPostRatingApiBody } from '@apis/companyApi';
 import { bookerPostRatingApi } from '@apis/companyApi';
+import type { POSTCompanyRatingsBody } from '@pages/api/company/ratings/index.api';
 import { createAsyncThunk } from '@redux/redux.helper';
+import type { Image, VariantKey } from '@src/types/utils';
 import { denormalisedResponseEntities, Listing } from '@src/utils/data';
 import type { TListing } from '@src/utils/types';
+
+export interface RestaurantByDay {
+  restaurantId: string;
+  restaurantName: string;
+  timestamp: number;
+}
 
 // ================ Initial states ================ //
 type TOrderRatingState = {
@@ -15,11 +22,7 @@ type TOrderRatingState = {
   fetchOrderInProgress: boolean;
   fetchOrderError: any;
 
-  restaurantsByDay: {
-    restaurantId: string;
-    restaurantName: string;
-    timestamp: number;
-  }[];
+  restaurantsByDay: RestaurantByDay[];
 
   foodListByRestaurant: {
     [restaurantIdAndTimestamp: string]: {
@@ -141,13 +144,33 @@ const fetchFoodListByRestaurant = createAsyncThunk(
 
 const postRating = createAsyncThunk(
   POST_RATING,
-  async (data: TBookerPostRatingApiBody, { getState }) => {
+  async (
+    data: Omit<POSTCompanyRatingsBody, 'imageUrlList' | 'imageIdList'>,
+    { getState },
+  ) => {
     const { images } = getState().uploadImage;
-    const bodyApi = {
+
+    const { data: response } = await bookerPostRatingApi({
       ...data,
-      imageIdList: Object.values(images).map((image: any) => image.imageId),
-    };
-    const { data: response } = await bookerPostRatingApi(bodyApi);
+      imageUrlList: Object.values(
+        images as (Image['attributes'] & {
+          imageId: string;
+          uploadedImage: Image;
+        })[],
+      ).reduce<string[]>((result, image) => {
+        if (image.uploadedImage.attributes.variants) {
+          const { variants } = image.uploadedImage.attributes;
+          const firstVariantKey = Object.keys(variants)[0];
+
+          result.push(variants[firstVariantKey as VariantKey].url);
+        }
+
+        return result;
+      }, []),
+      imageIdList: Object.values(images as { imageId: string }[]).map(
+        (image) => image.imageId,
+      ),
+    });
 
     return response;
   },

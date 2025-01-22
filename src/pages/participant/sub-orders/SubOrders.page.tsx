@@ -15,7 +15,6 @@ import { CurrentUser } from '@src/utils/data';
 import { ESubOrderTxStatus } from '@src/utils/enums';
 
 import RatingSubOrderModal from '../orders/components/RatingSubOrderModal/RatingSubOrderModal';
-import SuccessRatingModal from '../orders/components/SuccessRatingModal/SuccessRatingModal';
 
 import SubOrderList from './components/SubOrderList/SubOrderList';
 import SubOrderReviewModal from './components/SubOrderReviewModal/SubOrderReviewModal';
@@ -39,7 +38,6 @@ const SubOrders = () => {
   const currentUserGetter = CurrentUser(currentUser);
   const currentUserId = currentUserGetter.getId();
   const ratingSubOrderModalControl = useBoolean();
-  const successRatingModalControl = useBoolean();
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
 
   const deliveredSubOrders = useAppSelector(
@@ -61,7 +59,6 @@ const SubOrders = () => {
 
   const openSuccessRatingModal = () => {
     ratingSubOrderModalControl.setFalse();
-    successRatingModalControl.setTrue();
   };
 
   useEffect(() => {
@@ -177,10 +174,6 @@ const SubOrders = () => {
           participantPostRatingInProgress={participantPostRatingInProgress}
         />
       </RenderWhen>
-      <SuccessRatingModal
-        isOpen={successRatingModalControl.value}
-        onClose={successRatingModalControl.setFalse}
-      />
       <BottomNavigationBar />
     </div>
   );

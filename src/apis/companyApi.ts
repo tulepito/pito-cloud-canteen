@@ -1,5 +1,6 @@
 import type { POSTAddMembersBody } from '@pages/api/company/members/add-members.api';
-import type { TObject, TRestaurantRating, TScenarioRating } from '@utils/types';
+import type { POSTCompanyRatingsBody } from '@pages/api/company/ratings/index.api';
+import type { TObject } from '@utils/types';
 
 import { deleteApi, getApi, postApi, putApi } from './configs';
 
@@ -213,15 +214,7 @@ export const adminTransferCompanyOwnerApi = ({
     permissionForOldOwner,
   });
 
-export type TBookerPostRatingApiBody = {
-  ratings: TRestaurantRating[];
-  imageIdList?: string[];
-  detailTextRating?: string;
-  staff: TScenarioRating;
-  service: TScenarioRating;
-  companyName: string;
-};
-export const bookerPostRatingApi = (body: TBookerPostRatingApiBody) =>
+export const bookerPostRatingApi = (body: POSTCompanyRatingsBody) =>
   postApi('/company/ratings', body);
 
 export const queryAllClientPaymentRecordsApi = (
