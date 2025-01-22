@@ -499,7 +499,7 @@ const recommendRestaurantForSpecificDay = createAsyncThunk(
 
     const { data: newOrderDetail } = await recommendRestaurantApi({
       orderId,
-      dateTime,
+      timestamp: dateTime,
       recommendParams,
     });
 

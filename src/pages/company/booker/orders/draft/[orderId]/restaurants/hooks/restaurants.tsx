@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { shallowEqual } from 'react-redux';
 import { DateTime } from 'luxon';
 import { useRouter } from 'next/router';
@@ -10,6 +10,7 @@ import { BookerSelectRestaurantThunks } from '../BookerSelectRestaurant.slice';
 import { convertQueryValueToArray } from '../helpers/urlQuery';
 
 export const useSearchRestaurants = () => {
+  const [searchInProgress, setSearchInProgress] = useState(false);
   const dispatch = useAppDispatch();
 
   const router = useRouter();
@@ -29,9 +30,6 @@ export const useSearchRestaurants = () => {
     (state) => state.BookerSelectRestaurant.searchResult,
     shallowEqual,
   );
-  const searchInProgress = useAppSelector(
-    (state) => state.BookerSelectRestaurant.searchInProgress,
-  );
 
   const totalResultItems = useAppSelector(
     (state) => state.BookerSelectRestaurant.totalItems,
@@ -48,25 +46,38 @@ export const useSearchRestaurants = () => {
   }, [dispatch, timestamp]);
 
   useEffect(() => {
-    dispatch(
-      BookerSelectRestaurantThunks.searchRestaurants({
-        timestamp: Number(timestamp),
-        orderId: orderId as string,
-        page: Number(page),
-        ...(menuTypes
-          ? { menuTypes: convertQueryValueToArray(menuTypes) }
-          : {}),
-        ...(categories
-          ? { categories: convertQueryValueToArray(categories) }
-          : {}),
-        ...(distance ? { distance: convertQueryValueToArray(distance) } : {}),
-        ...(rating ? { rating: convertQueryValueToArray(rating) } : {}),
-        ...(packaging
-          ? { packaging: convertQueryValueToArray(packaging) }
-          : {}),
-        ...(keywords ? { keywords: keywords as string } : {}),
-      }),
-    );
+    const timeout = setTimeout(async () => {
+      try {
+        setSearchInProgress(true);
+        await dispatch(
+          BookerSelectRestaurantThunks.searchRestaurants({
+            timestamp: Number(timestamp),
+            orderId: orderId as string,
+            page: Number(page),
+            ...(menuTypes
+              ? { menuTypes: convertQueryValueToArray(menuTypes) }
+              : {}),
+            ...(categories
+              ? { categories: convertQueryValueToArray(categories) }
+              : {}),
+            ...(distance
+              ? { distance: convertQueryValueToArray(distance) }
+              : {}),
+            ...(rating ? { rating: convertQueryValueToArray(rating) } : {}),
+            ...(packaging
+              ? { packaging: convertQueryValueToArray(packaging) }
+              : {}),
+            ...(keywords ? { keywords: keywords as string } : {}),
+          }),
+        );
+      } finally {
+        setSearchInProgress(false);
+      }
+    });
+
+    return () => {
+      clearTimeout(timeout);
+    };
   }, [
     categories,
     dispatch,

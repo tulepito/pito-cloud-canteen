@@ -57,6 +57,10 @@ const FilterSidebarFormComponent: React.FC<TFilterSidebarFormComponentProps> = (
       }
     });
 
+    if (JSON.stringify(newQuery) === JSON.stringify(router.query)) {
+      return;
+    }
+
     router.push({
       query: {
         ...newQuery,

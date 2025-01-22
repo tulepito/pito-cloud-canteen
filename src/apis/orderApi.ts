@@ -4,6 +4,7 @@ import type {
 } from '@pages/api/admin/listings/order/[orderId]/update-state.api';
 import type { PUTMemberOrderBody } from '@pages/api/orders/[orderId]/member-order/index.api';
 import type { POSTRemindMemberBody } from '@pages/api/orders/[orderId]/remind-member/index.api';
+import type { GETRestaurantsRecommendationJSONParams } from '@pages/api/orders/[orderId]/restaurants-recommendation/index.api';
 import type { PUTUpdateOrderDetailFromDraftBody } from '@pages/api/orders/[orderId]/update-order-detail-from-draft.api';
 import type { TObject } from '@utils/types';
 
@@ -193,15 +194,13 @@ export const updateOrderStateToDraftApi = (orderId: string) =>
 
 export const recommendRestaurantApi = ({
   orderId,
-  dateTime,
+  timestamp,
   recommendParams,
-}: {
+}: GETRestaurantsRecommendationJSONParams & {
   orderId: string;
-  dateTime?: number;
-  recommendParams?: TObject;
 }) => {
   return getApi(`/orders/${orderId}/restaurants-recommendation`, {
-    timestamp: dateTime,
+    timestamp,
     recommendParams,
   });
 };

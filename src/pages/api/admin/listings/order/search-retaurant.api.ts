@@ -24,7 +24,6 @@ import {
 import { convertWeekDay, VNTimezone } from '@src/utils/dates';
 import type { TListing } from '@src/utils/types';
 
-// TODO: Optimize search mechanism
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
     const apiMethod = req.method;
@@ -40,7 +39,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         const currentUserRes = await sdk.currentUser.show();
         const [companyAccount] = denormalisedResponseEntities(currentUserRes);
 
-        // eslint-disable-next-line unused-imports/no-unused-vars
         const { keywords, ...queryWithoutKeywords } = params;
         const query = getMenuQuery({ order, params: queryWithoutKeywords });
 

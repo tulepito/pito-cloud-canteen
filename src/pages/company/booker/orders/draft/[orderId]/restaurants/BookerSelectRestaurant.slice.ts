@@ -521,31 +521,29 @@ const BookerSelectRestaurantSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(searchRestaurants.pending, (state) => {
-        state.searchInProgress = true;
-      })
-      .addCase(searchRestaurants.fulfilled, (state, action) => {
-        state.searchInProgress = false;
-        state.restaurantIdList = action.payload.restaurantIdList ?? [];
-        state.searchResult = action.payload.searchResult ?? [];
-        state.totalItems = action.payload.totalItems ?? 0;
-        state.combinedRestaurantInFoods =
-          action.payload.combinedRestaurantInFoods ?? [];
-        state.combinedRestaurantMenuData =
-          action.payload.combinedRestaurantMenuData ?? [];
-
-        // add keywork to recentKeywords
-        const { keywords } = action.payload;
-        if (keywords) {
-          state.recentKeywords = uniq([
-            keywords,
-            ...(state.recentKeywords || []),
-          ]).slice(0, 4);
-        }
-      })
-      .addCase(searchRestaurants.rejected, (state) => {
-        state.searchInProgress = false;
-      })
+      .addCase(searchRestaurants.pending, (state) => ({
+        ...state,
+        searchInProgress: true,
+      }))
+      .addCase(searchRestaurants.fulfilled, (state, action) => ({
+        ...state,
+        searchInProgress: false,
+        restaurantIdList: action.payload.restaurantIdList ?? [],
+        searchResult: action.payload.searchResult ?? [],
+        totalItems: action.payload.totalItems ?? 0,
+        combinedRestaurantInFoods:
+          action.payload.combinedRestaurantInFoods ?? [],
+        combinedRestaurantMenuData:
+          action.payload.combinedRestaurantMenuData ?? [],
+        recentKeywords: uniq([
+          ...(action.payload.keywords ? [action.payload.keywords] : []),
+          ...(state.recentKeywords || []),
+        ]).slice(0, 4),
+      }))
+      .addCase(searchRestaurants.rejected, (state) => ({
+        ...state,
+        searchInProgress: false,
+      }))
 
       .addCase(fetchFoodsByRestaurantAndTimestamp.pending, () => {})
       .addCase(

@@ -57,9 +57,9 @@ export const recommendRestaurantForSpecificDay = async ({
     timestamp,
     favoriteRestaurantIdList,
   };
-  // * recommend from order data
+
   const {
-    packagePerMember = 0,
+    packagePerMember,
     nutritions,
     menuQuery,
     memberAmount,
@@ -77,19 +77,17 @@ export const recommendRestaurantForSpecificDay = async ({
         recommendParams,
         menuQueryParams,
       });
-  // * query all menus
+
   const allMenus = await queryAllListings({
     query: menuQuery,
   });
 
-  // filter all menus having publicData.foodsBydate[dayOfWeek]'s values.price === packagePerMember
   const filteredMenus = filterMenusHavePackagePerMember(
     allMenus,
     timestamp,
     packagePerMember,
   );
 
-  // * query all restaurant
   const restaurantIdList = chunk(
     uniq<string>(
       filteredMenus.map(
@@ -98,6 +96,7 @@ export const recommendRestaurantForSpecificDay = async ({
     ),
     100,
   );
+
   const restaurantsResponse = flatten(
     await Promise.all(
       restaurantIdList.map(async (ids) =>
@@ -121,7 +120,6 @@ export const recommendRestaurantForSpecificDay = async ({
     ),
   );
 
-  // * map restaurant with menu data
   const restaurants = combineMenusWithRestaurantData({
     menus: filteredMenus,
     restaurants: restaurantsResponse,

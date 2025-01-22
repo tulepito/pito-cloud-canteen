@@ -14,7 +14,7 @@ function handleRewrite(req: NextRequest) {
 async function handleLog(req: NextRequest) {
   const path = req.nextUrl.pathname;
   const body = await req.text();
-  const query = req.nextUrl.searchParams;
+  const { search } = req.nextUrl;
 
   let logData = {};
 
@@ -22,8 +22,11 @@ async function handleLog(req: NextRequest) {
     logData = { ...logData, body };
   }
 
-  if (query.size > 0) {
-    logData = { ...logData, query };
+  if (search !== '?JSONParams=%7B%7D') {
+    logData = {
+      ...logData,
+      searchParams: decodeURIComponent(search),
+    };
   }
 
   logger.info(

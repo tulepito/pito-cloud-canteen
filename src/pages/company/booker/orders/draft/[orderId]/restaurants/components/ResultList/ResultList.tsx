@@ -117,7 +117,7 @@ const ResultList: React.FC<TResultListProps> = ({
             ))}
           </div>
         )}
-        {!isLoading && restaurants.length === 0 && <EmptyList />}
+        {!isLoading && !restaurants.length && <EmptyList />}
         {!isLoading &&
           restaurants.map((restaurant) => {
             const foods = groupRestaurantInFoods?.get(restaurant?.id.uuid);

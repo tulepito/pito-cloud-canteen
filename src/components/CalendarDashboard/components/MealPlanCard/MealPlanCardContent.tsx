@@ -4,7 +4,6 @@ import { shallowEqual } from 'react-redux';
 import classNames from 'classnames';
 import { isEmpty } from 'lodash';
 import isNaN from 'lodash/isNaN';
-import Image from 'next/image';
 
 import IconRefreshing from '@components/Icons/IconRefreshing/IconRefreshing';
 import IconStar from '@components/Icons/IconStar/IconStar';
@@ -16,7 +15,6 @@ import { calculateDistance } from '@helpers/mapHelpers';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import FoodDetailModal from '@pages/company/booker/orders/draft/[orderId]/restaurants/components/FoodDetailModal/FoodDetailModal';
-import fallbackImage from '@pages/company/booker/orders/draft/[orderId]/restaurants/components/ResultDetailModal/cover.png';
 import { foodSliceThunks } from '@redux/slices/foods.slice';
 import type { RootState } from '@redux/store';
 import { Listing } from '@src/utils/data';
@@ -113,13 +111,6 @@ const MealPlanCardContent: React.FC<TMealPlanCardContentProps> = ({
               EImageVariants.landscapeCrop2x,
             ]}
           />
-          <RenderWhen.False>
-            <Image
-              className={css.fallbackImage}
-              src={fallbackImage}
-              alt="fallback"
-            />
-          </RenderWhen.False>
         </RenderWhen>
       </div>
       <div
