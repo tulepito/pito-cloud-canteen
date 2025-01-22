@@ -60,6 +60,7 @@ const fetchSubOrdersFromFirebase = createAsyncThunk(
       participantId: string;
       txStatus: string | string[];
       extraQueryParams?: Record<string, any>;
+      lastRecord?: number | null;
     },
     { getState },
   ) => {
@@ -71,9 +72,12 @@ const fetchSubOrdersFromFirebase = createAsyncThunk(
       participantId,
       txStatus,
       limitRecords: FIREBASE_LIMIT_RECORDS,
-      lastRecord: Array.isArray(txStatus)
-        ? deliveringLastRecord
-        : deliveredLastRecord,
+      lastRecord:
+        payload.lastRecord === null
+          ? payload.lastRecord
+          : Array.isArray(txStatus)
+          ? deliveringLastRecord
+          : deliveredLastRecord,
       extraQueryParams: payload.extraQueryParams,
     });
 

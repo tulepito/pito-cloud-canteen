@@ -97,6 +97,7 @@ const RatingSubOrderModal: React.FC<TRatingSubOrderModalProps> = (props) => {
         SubOrdersThunks.fetchSubOrdersFromFirebase({
           participantId: currentUserId,
           txStatus: ESubOrderTxStatus.DELIVERED,
+          lastRecord: null,
           extraQueryParams: {
             orderId: {
               operator: 'in',
