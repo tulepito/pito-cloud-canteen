@@ -1,3 +1,4 @@
+import { isUserAParticipant } from '@helpers/user';
 import type { TNativeNotificationPartnerParams } from '@src/types/nativeNotificationParams';
 import { Listing, User } from '@src/utils/data';
 import { formatTimestamp } from '@src/utils/dates';
@@ -34,15 +35,13 @@ export const createNativeNotification = async (
   const fullName = getFullName(profile);
 
   const { oneSignalUserIds = [] } = participantUser.getPrivateData();
-  const { company, isCompany } = participantUser.getMetadata();
+  const { isPartner } = participantUser.getMetadata();
 
-  const isBooker = Object.values(company || {}).some(({ permission }: any) => {
-    return permission === ECompanyPermission.booker;
-  });
+  const isParticipant = isUserAParticipant(participant);
 
-  const notSendParticipantNotification = isCompany || isBooker;
+  const allowedToSend = isParticipant || isPartner;
 
-  if (notSendParticipantNotification) return;
+  if (!allowedToSend) return;
 
   if (oneSignalUserIds.length === 0) return;
 
