@@ -7,13 +7,22 @@ function MenuEndDateBulkChangingSection() {
   const dispatch = useAppDispatch();
 
   return (
-    <Button
-      onClick={() => {
-        if (window.confirm('Bạn chắc chưa?') === false) return;
-        dispatch(PartnerManageMenusThunks.changeMenuEndDateInBulk());
-      }}>
-      Thay đổi toàn bộ ngày kết thúc của toàn bộ menu thành 31/12/2024
-    </Button>
+    <>
+      {/* <Button
+        onClick={() => {
+          if (window.confirm('Bạn chắc chưa?') === false) return;
+          dispatch(PartnerManageMenusThunks.changeMenuEndDateInBulk());
+        }}>
+        Thay đổi toàn bộ ngày kết thúc của toàn bộ menu thành 31/12/2024
+      </Button> */}
+      <Button
+        onClick={() => {
+          if (window.confirm('Bạn chắc chưa?') === false) return;
+          dispatch(PartnerManageMenusThunks.fetchAllBookersAndParticipants());
+        }}>
+        Xuất danh sách người dùng
+      </Button>
+    </>
   );
 }
 

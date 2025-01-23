@@ -2,6 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import { uniqBy } from 'lodash';
 import differenceBy from 'lodash/differenceBy';
 import isEqual from 'lodash/isEqual';
+import * as xlsx from 'xlsx';
 
 import { changeMenuEndDateInBulkApi } from '@apis/admin';
 import { closePartnerMenuApi, publishPartnerMenuApi } from '@apis/menuApi';
@@ -247,7 +248,40 @@ const changeMenuEndDateInBulk = createAsyncThunk(
   'app/PartnerManageMenus/CHANGE_MENU_END_DATE_IN_BULK',
   async (_: TObject | undefined) => {
     try {
-      await changeMenuEndDateInBulkApi();
+      await changeMenuEndDateInBulkApi({
+        type: 'change-end-date-in-bulk',
+      });
+    } catch (error) {
+      console.error(`CREATE_DRAFT_MENU error: `, error);
+    }
+  },
+);
+
+const fetchAllBookersAndParticipants = createAsyncThunk(
+  'app/PartnerManageMenus/FETCH_ALL_USERS',
+  async () => {
+    try {
+      const users = (await changeMenuEndDateInBulkApi({
+        type: 'fetch-all-bookers-participants',
+      })) as {
+        data: {
+          email: string;
+          fullName: string;
+          companyName?: string;
+          role: 'partner' | 'admin' | 'owner' | 'participant' | 'booker';
+        }[];
+      };
+
+      const usersWS = xlsx.utils.json_to_sheet(
+        users.data.filter(
+          (user) => user.role === 'participant' || user.role === 'booker',
+        ),
+      );
+      const wb = xlsx.utils.book_new();
+      xlsx.utils.book_append_sheet(wb, usersWS, 'Users');
+      xlsx.writeFile(wb, 'users.xlsx');
+
+      return users;
     } catch (error) {
       console.error(`CREATE_DRAFT_MENU error: `, error);
     }
@@ -371,6 +405,7 @@ export const PartnerManageMenusThunks = {
   deleteMenus,
   createDraftMenu,
   changeMenuEndDateInBulk,
+  fetchAllBookersAndParticipants,
   updateDraftMenu,
   loadMenuData,
   publishDraftMenu,

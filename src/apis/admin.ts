@@ -1,3 +1,4 @@
+import type { POSTChangeMenuEndDateInBulkBody } from '@pages/api/admin/listings/menus/change-end-date-in-bulk.api';
 import type { TObject } from '@src/utils/types';
 
 import { deleteApi, getApi, postApi, putApi } from './configs';
@@ -8,8 +9,10 @@ export const updateAttributesApi = (body: TObject) =>
   putApi('/admin/filters', body);
 export const deleteAttributesApi = (body: TObject) =>
   deleteApi('/admin/filters', body);
-export const changeMenuEndDateInBulkApi = () => {
-  return putApi(`/admin/listings/menus/change-end-date-in-bulk`);
+export const changeMenuEndDateInBulkApi = (
+  body: POSTChangeMenuEndDateInBulkBody,
+) => {
+  return postApi(`/admin/listings/menus/change-end-date-in-bulk`, body);
 };
 export const transitPlanApi = ({
   transactionId,
