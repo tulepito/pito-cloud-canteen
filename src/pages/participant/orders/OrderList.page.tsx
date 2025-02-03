@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import type { Event, View } from 'react-big-calendar';
 import { Views } from 'react-big-calendar';
 import { shallowEqual } from 'react-redux';
-import { startOfWeek } from 'date-fns';
+import { endOfMonth, endOfWeek, startOfMonth, startOfWeek } from 'date-fns';
 import flatten from 'lodash/flatten';
 import { DateTime } from 'luxon';
 import { useRouter } from 'next/router';
@@ -330,20 +330,23 @@ const OrderListPage = () => {
   const subOrdersFromSelectedDay = flattenEvents.filter((_event: any) => {
     if (currentView === Views.WEEK) {
       const _startOfWeekAnchorDate = startOfWeek(anchorDate);
-      const _startDateWithoutTime = new Date(_startOfWeekAnchorDate).setHours(
-        0,
-        0,
-        0,
-        0,
-      );
 
-      const _7daysAfterAnchorDate = new Date(_startDateWithoutTime).setDate(
-        new Date(_startDateWithoutTime).getDate() + 6,
-      );
+      const _endOfWeekAnchorDate = endOfWeek(anchorDate);
 
       return (
-        _event.resource.timestamp >= _startDateWithoutTime &&
-        _event.resource.timestamp <= _7daysAfterAnchorDate
+        _event.resource.timestamp >= _startOfWeekAnchorDate &&
+        _event.resource.timestamp <= _endOfWeekAnchorDate
+      );
+    }
+
+    if (currentView === Views.MONTH) {
+      const _startOfMonthAnchorDate = startOfMonth(anchorDate);
+
+      const _endOfMonthAnchorDate = endOfMonth(anchorDate);
+
+      return (
+        _event.resource.timestamp >= _startOfMonthAnchorDate &&
+        _event.resource.timestamp <= _endOfMonthAnchorDate
       );
     }
 

@@ -25,6 +25,16 @@ export const enGeneralPaths = {
         index: (orderId: string) => `/company/orders/${orderId}`,
       },
     },
+    booker: {
+      orders: {
+        new: {
+          '[companyId]': {
+            index: (companyId: string) =>
+              `/company/booker/orders/new/${companyId}`,
+          },
+        },
+      },
+    },
   },
 };
 
@@ -251,7 +261,6 @@ export const companyPaths = {
   Logo: '/company/[companyId]/logo',
   Members: '/company/[companyId]/members',
   MembersDetail: '/company/[companyId]/members/[memberEmail]',
-  CreateNewOrder: '/company/booker/orders/new',
   EditDraftOrder: '/company/booker/orders/draft/[orderId]',
   OrderSelectRestaurant: '/company/booker/orders/draft/[orderId]/restaurants',
   GroupDetail: '/company/[companyId]/group-setting',
@@ -294,6 +303,16 @@ export const participantPaths = {
   plans: {
     '[planId]': {
       index: (planId: string) => `/participant/plans/${planId}`,
+    },
+  },
+  company: {
+    '[companyId]': {
+      orders: {
+        new: {
+          index: (companyId: string) =>
+            `/participant/company/${companyId}/orders/new`,
+        },
+      },
     },
   },
 };

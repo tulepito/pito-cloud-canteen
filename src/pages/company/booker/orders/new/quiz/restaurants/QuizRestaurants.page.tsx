@@ -7,13 +7,13 @@ import { useRouter } from 'next/router';
 
 import RestaurantCard from '@components/RestaurantCard/RestaurantCard';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import EmptyList from '@pages/company/booker/orders/draft/[orderId]/restaurants/components/ResultList/EmptyList';
 import { FavoriteThunks } from '@redux/slices/Favorite.slice';
 import { QuizThunks } from '@redux/slices/Quiz.slice';
 import { quizPaths } from '@src/paths';
 import { User } from '@utils/data';
 import type { TUser } from '@utils/types';
 
-import EmptyList from '../../../draft/[orderId]/restaurants/components/ResultList/EmptyList';
 import QuizModal from '../components/QuizModal/QuizModal';
 
 import css from './QuizRestaurants.module.scss';

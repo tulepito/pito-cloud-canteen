@@ -90,6 +90,9 @@ const Toolbar: React.FC<TToolbarProps> = (props) => {
         className={classNames({
           [css.ctaBtn]: !finishDisabled,
         })}
+        style={{
+          whiteSpace: 'nowrap',
+        }}
         onClick={onFinishOrder}
         disabled={finishDisabled}
         loadingMode="extend"

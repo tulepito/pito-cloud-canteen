@@ -159,7 +159,7 @@ const QuizCreateOrderLoadingModal: React.FC<
           <div className={css.error}>
             <NamedLink
               title={'Thử lại lần nữa'}
-              params={{ pathanme: companyPaths.CreateNewOrder }}
+              params={{ pathanme: companyPaths.Home }}
             />
           </div>
         )}

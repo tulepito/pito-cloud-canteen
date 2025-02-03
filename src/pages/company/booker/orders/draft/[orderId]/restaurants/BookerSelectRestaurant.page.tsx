@@ -3,7 +3,7 @@ import isEmpty from 'lodash/isEmpty';
 import { useRouter } from 'next/router';
 
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
-import { companyPaths } from '@src/paths';
+import { companyPaths, enGeneralPaths } from '@src/paths';
 import { Listing, User } from '@src/utils/data';
 import { EBookerOrderDraftStates, EOrderDraftStates } from '@src/utils/enums';
 import type { TUser } from '@src/utils/types';
@@ -47,7 +47,11 @@ function BookerSelectRestaurant() {
   useEffect(() => {
     if (!isEmpty(orderState)) {
       if (orderState === EOrderDraftStates.draft) {
-        router.push({ pathname: companyPaths.CreateNewOrder });
+        router.push({
+          pathname: enGeneralPaths.company.booker.orders.new[
+            '[companyId]'
+          ].index(String(companyAccount?.id?.uuid)),
+        });
       } else if (!EnableToAccessPageOrderStates.includes(orderState)) {
         router.push({
           pathname: companyPaths.ManageOrderPicking,
@@ -55,7 +59,7 @@ function BookerSelectRestaurant() {
         });
       }
     }
-  }, [orderId, orderState, router]);
+  }, [companyAccount?.id?.uuid, orderId, orderState, router]);
 
   const {
     restaurants,

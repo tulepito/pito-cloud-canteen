@@ -19,7 +19,7 @@ import EmptySubOrder from '@pages/participant/orders/components/EmptySubOrder/Em
 import { createDeepEqualSelector } from '@redux/redux.helper';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
 import type { RootState } from '@redux/store';
-import { companyPaths } from '@src/paths';
+import { companyPaths, enGeneralPaths } from '@src/paths';
 import { User } from '@src/utils/data';
 import {
   EManageCompanyOrdersTab,
@@ -251,7 +251,11 @@ const CompanyOrdersTable: React.FC<TCompanyOrdersTableProps> = () => {
       });
     }
 
-    return router.push(companyPaths.CreateNewOrder);
+    return router.push(
+      enGeneralPaths.company.booker.orders.new['[companyId]'].index(
+        String(companyId),
+      ),
+    );
   };
 
   const orderStateWarningContent =

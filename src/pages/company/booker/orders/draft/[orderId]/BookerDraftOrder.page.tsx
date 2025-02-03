@@ -44,7 +44,7 @@ import { addWorkspaceCompanyId } from '@redux/slices/company.slice';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
 import { currentUserSelector } from '@redux/slices/user.slice';
 import { getStepsByOrderType } from '@src/constants/stepperSteps';
-import { companyPaths } from '@src/paths';
+import { companyPaths, enGeneralPaths } from '@src/paths';
 import { formatTimestamp } from '@src/utils/dates';
 import Gleap from '@src/utils/gleap';
 import { Listing, User } from '@utils/data';
@@ -449,7 +449,12 @@ function BookerDraftOrderPage() {
   useEffect(() => {
     if (!isEmpty(orderState)) {
       if (orderState === EOrderDraftStates.draft) {
-        router.push({ pathname: companyPaths.CreateNewOrder });
+        router.push({
+          pathname:
+            enGeneralPaths.company.booker.orders.new['[companyId]'].index(
+              companyId,
+            ),
+        });
       } else if (!ENABLE_TO_ACCESS_PAGE_ORDER_STATES.includes(orderState)) {
         router.push({
           pathname: companyPaths.ManageOrderPicking,

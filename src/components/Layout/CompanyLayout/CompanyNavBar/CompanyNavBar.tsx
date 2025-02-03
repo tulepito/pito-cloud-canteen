@@ -6,7 +6,7 @@ import IconFood from '@components/Icons/IconFood/IconFood';
 import IconHome from '@components/Icons/IconHome/IconHome';
 import IconUser2 from '@components/Icons/IconUser2/IconUser2';
 import NamedLink from '@components/NamedLink/NamedLink';
-import { companyPaths, personalPaths } from '@src/paths';
+import { companyPaths, enGeneralPaths, personalPaths } from '@src/paths';
 
 import css from './CompanyNavBar.module.scss';
 
@@ -32,10 +32,19 @@ const CompanyNavBar: React.FC<TCompanyNavBarProps> = () => {
         </div>
       </NamedLink>
 
-      <NamedLink path={companyPaths.CreateNewOrder} className={css.itemWrapper}>
+      <NamedLink
+        path={enGeneralPaths.company.booker.orders.new['[companyId]'].index(
+          '[companyId]',
+        )}
+        params={{ companyId: companyId as string }}
+        className={css.itemWrapper}>
         <div
           className={classNames(css.item, {
-            [css.active]: pathname === companyPaths.CreateNewOrder,
+            [css.active]:
+              pathname ===
+              enGeneralPaths.company.booker.orders.new['[companyId]'].index(
+                '[companyId]',
+              ),
           })}>
           <IconFood className={css.icon} />
           <div className={css.label}>Đặt hàng</div>
