@@ -1,13 +1,9 @@
 import type { NextRequest } from 'next/server';
-import { NextResponse, userAgent } from 'next/server';
+import { NextResponse } from 'next/server';
 
 import logger from '@helpers/logger';
 
-function handleRewrite(req: NextRequest) {
-  const { device } = userAgent(req);
-
-  if (device.type === 'mobile') return NextResponse.next();
-
+function handleRewrite() {
   return NextResponse.rewrite('https://in.pito.vn/cloud-canteen/');
 }
 
@@ -43,7 +39,7 @@ export async function middleware(req: NextRequest) {
   }
 
   if (path === '/') {
-    return handleRewrite(req);
+    return handleRewrite();
   }
 
   return NextResponse.next();
