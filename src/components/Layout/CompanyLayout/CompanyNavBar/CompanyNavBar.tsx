@@ -6,6 +6,7 @@ import IconFood from '@components/Icons/IconFood/IconFood';
 import IconHome from '@components/Icons/IconHome/IconHome';
 import IconUser2 from '@components/Icons/IconUser2/IconUser2';
 import NamedLink from '@components/NamedLink/NamedLink';
+import Tracker from '@helpers/tracker';
 import { companyPaths, enGeneralPaths, personalPaths } from '@src/paths';
 
 import css from './CompanyNavBar.module.scss';
@@ -52,6 +53,9 @@ const CompanyNavBar: React.FC<TCompanyNavBarProps> = () => {
       </NamedLink>
 
       <NamedLink
+        onClick={() => {
+          Tracker.track('booker:orders:view', {});
+        }}
         path={companyPaths.ManageOrders}
         params={{ companyId: companyId as string }}
         className={css.itemWrapper}>

@@ -6,6 +6,7 @@ import uniq from 'lodash/uniq';
 
 import Alert, { EAlertPosition, EAlertType } from '@components/Alert/Alert';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
+import Tracker from '@helpers/tracker';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { useViewport } from '@hooks/useViewport';
@@ -118,6 +119,10 @@ const ParticipantManagement: React.FC<TParticipantManagementProps> = () => {
     emails,
   }: TAddParticipantFormValues) => {
     const parseEmailList = uniq(emails.trim().replace(/\s+/g, ' ').split(' '));
+    Tracker.track('booker:order:add-emails', {
+      emails: parseEmailList,
+      orderId: order?.id?.uuid,
+    });
 
     await handleInviteMemberViaEmailList(parseEmailList);
   };

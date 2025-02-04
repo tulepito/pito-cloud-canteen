@@ -3,6 +3,7 @@ import { DateTime } from 'luxon';
 
 import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
 import { isOrderOverDeadline } from '@helpers/orderHelper';
+import Tracker from '@helpers/tracker';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { totalFoodPickedWithParticipant } from '@pages/participant/helpers';
 import { shoppingCartThunks } from '@redux/slices/shoppingCart.slice';
@@ -72,6 +73,9 @@ const SectionOrderPanel: React.FC<TSectionOrderPanelProps> = ({
   };
 
   const handleSubmit = async () => {
+    Tracker.track('participant:order:place', {
+      orderId,
+    });
     await dispatch(ParticipantPlanThunks.updateOrder({ orderId, planId }));
     setIsSubmitSuccess(true);
   };
@@ -91,6 +95,9 @@ const SectionOrderPanel: React.FC<TSectionOrderPanelProps> = ({
   };
 
   const handleAutoSelect = () => {
+    Tracker.track('participant:foods:randomly-suggest', {
+      orderId,
+    });
     dispatch(ParticipantPlanThunks.recommendFoodSubOrders());
   };
 

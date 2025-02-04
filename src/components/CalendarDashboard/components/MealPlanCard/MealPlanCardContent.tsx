@@ -4,6 +4,7 @@ import { shallowEqual } from 'react-redux';
 import classNames from 'classnames';
 import { isEmpty } from 'lodash';
 import isNaN from 'lodash/isNaN';
+import { useRouter } from 'next/router';
 
 import IconRefreshing from '@components/Icons/IconRefreshing/IconRefreshing';
 import IconStar from '@components/Icons/IconStar/IconStar';
@@ -12,6 +13,7 @@ import RenderWhen from '@components/RenderWhen/RenderWhen';
 import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
 import Tooltip from '@components/Tooltip/Tooltip';
 import { calculateDistance } from '@helpers/mapHelpers';
+import Tracker from '@helpers/tracker';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import FoodDetailModal from '@pages/company/booker/orders/draft/[orderId]/restaurants/components/FoodDetailModal/FoodDetailModal';
@@ -44,6 +46,7 @@ const MealPlanCardContent: React.FC<TMealPlanCardContentProps> = ({
     shallowEqual,
   );
 
+  const router = useRouter();
   const walkthroughStep = useAppSelector(
     (state) => state.BookerDraftOrderPage.walkthroughStep,
   );
@@ -72,6 +75,11 @@ const MealPlanCardContent: React.FC<TMealPlanCardContentProps> = ({
 
   const handleRefreshIconClick = () => {
     if (onRecommendMealInProgress) return;
+    Tracker.track('booker:order:randomly-suggest-menus', {
+      orderId: String(router.query.orderId),
+      planId: String(event.resource?.planId),
+      timestamp: Number(event?.resource?.id),
+    });
     onRecommendMeal?.(event?.start?.getTime()!);
   };
 

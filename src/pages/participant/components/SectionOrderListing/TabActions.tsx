@@ -4,6 +4,7 @@ import classNames from 'classnames';
 import Button from '@components/Button/Button';
 import IconBanned from '@components/Icons/IconBanned/IconBanned';
 import IconRefreshing from '@components/Icons/IconRefreshing/IconRefreshing';
+import Tracker from '@helpers/tracker';
 import { useAppDispatch } from '@hooks/reduxHooks';
 import { ParticipantPlanThunks } from '@pages/participant/plans/[planId]/ParticipantPlanPage.slice';
 import { shoppingCartThunks } from '@redux/slices/shoppingCart.slice';
@@ -13,6 +14,7 @@ import css from './SectionOrderListing.module.scss';
 type TTabActionsProps = {
   className?: string;
   planId: string;
+  orderId: string;
   orderDay: string;
   isOrderDeadlineOver: boolean;
   getNextSubOrderDay: (dayId: string) => string;
@@ -22,6 +24,7 @@ type TTabActionsProps = {
 const TabActions: React.FC<TTabActionsProps> = ({
   className,
   planId,
+  orderId,
   orderDay,
   isOrderDeadlineOver,
   getNextSubOrderDay,
@@ -30,12 +33,20 @@ const TabActions: React.FC<TTabActionsProps> = ({
   const dispatch = useAppDispatch();
 
   const handleAutoSelect = () => {
+    Tracker.track('participant:food:randomly-suggest', {
+      orderId,
+      timestamp: +orderDay,
+    });
     dispatch(ParticipantPlanThunks.recommendFoodSubOrder(orderDay));
     const nextDate = getNextSubOrderDay(orderDay);
     onSelectTab({ id: nextDate });
   };
 
   const handleNotJoinDay = () => {
+    Tracker.track('participant:food:ignore', {
+      orderId,
+      timestamp: +orderDay,
+    });
     dispatch(
       shoppingCartThunks.addToCart({
         planId,

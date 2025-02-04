@@ -157,6 +157,7 @@ const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({
           navigationEndClassName={css.rightNavigation}
           actionsComponent={
             <TabActions
+              orderId={order?.id?.uuid}
               orderDay={orderDay}
               planId={`${planId}`}
               isOrderDeadlineOver={isOrderDeadlineOver}

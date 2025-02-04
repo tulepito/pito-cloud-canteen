@@ -11,6 +11,7 @@ import ProfileMenu from '@components/ProfileMenu/ProfileMenu';
 import ProfileMenuContent from '@components/ProfileMenuContent/ProfileMenuContent';
 import ProfileMenuItem from '@components/ProfileMenuItem/ProfileMenuItem';
 import ProfileMenuLabel from '@components/ProfileMenuLabel/ProfileMenuLabel';
+import Tracker from '@helpers/tracker';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { useLogout } from '@hooks/useLogout';
 import { useRoleSelectModalController } from '@hooks/useRoleSelectModalController';
@@ -48,7 +49,11 @@ const GeneralLayoutTopBar = () => {
               })}
             </div>
           </NamedLink>
-          <NamedLink path={participantPaths.SubOrderList}>
+          <NamedLink
+            onClick={() => {
+              Tracker.track('participant:foods:view', {});
+            }}
+            path={participantPaths.SubOrderList}>
             <div className={css.menuItem}>
               {intl.formatMessage({
                 id: 'GeneralLayoutTopBar.menuItem.myOrders',

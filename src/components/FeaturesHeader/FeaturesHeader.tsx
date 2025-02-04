@@ -16,6 +16,7 @@ export type FeaturesHeaderProps = {
     query?: TObject;
     shouldActivePathname?: string[];
     extraFunc?: () => void;
+    onClick?: () => void;
   }[];
   cssCustom?: {
     readonly [key: string]: string;
@@ -39,28 +40,33 @@ const FeaturesHeader: React.FC<FeaturesHeaderProps> = (props) => {
   return (
     <nav className={css.container}>
       <ul className={css.navWrapper}>
-        {headerData.map(({ key, title, pathname, query, extraFunc }) => {
-          if (typeof extraFunc === 'function') {
+        {headerData.map(
+          ({ key, title, pathname, query, extraFunc, onClick }) => {
+            if (typeof extraFunc === 'function') {
+              return (
+                <div key={key} className={css.headerItem} onClick={extraFunc}>
+                  {title}
+                </div>
+              );
+            }
+
+            const activeHeaderItemClasses = classNames(css.headerItem, {
+              [css.active]: key === activeKey,
+            });
+            const hrefObject = !isEmpty(query) ? { pathname, query } : pathname;
+
             return (
-              <div key={key} className={css.headerItem} onClick={extraFunc}>
-                {title}
-              </div>
+              <li key={key}>
+                <Link
+                  className={activeHeaderItemClasses}
+                  href={hrefObject}
+                  onClick={onClick}>
+                  <div className={css.title}>{title}</div>
+                </Link>
+              </li>
             );
-          }
-
-          const activeHeaderItemClasses = classNames(css.headerItem, {
-            [css.active]: key === activeKey,
-          });
-          const hrefObject = !isEmpty(query) ? { pathname, query } : pathname;
-
-          return (
-            <li key={key}>
-              <Link className={activeHeaderItemClasses} href={hrefObject}>
-                <div className={css.title}>{title}</div>
-              </Link>
-            </li>
-          );
-        })}
+          },
+        )}
       </ul>
     </nav>
   );

@@ -4,6 +4,7 @@ import classNames from 'classnames';
 import isEmpty from 'lodash/isEmpty';
 import type { Duration } from 'luxon';
 import { DateTime } from 'luxon';
+import { useRouter } from 'next/router';
 
 import Badge from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
@@ -11,6 +12,7 @@ import IconEdit from '@components/Icons/IconEdit/IconEdit';
 import MobileBottomContainer from '@components/MobileBottomContainer/MobileBottomContainer';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
+import Tracker from '@helpers/tracker';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { useViewport } from '@hooks/useViewport';
@@ -75,6 +77,7 @@ const OrderTitle: React.FC<TOrderTitleProps> = (props) => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
   const editDeadlineModalControl = useBoolean();
+  const router = useRouter();
   const { isMobileLayout } = useViewport();
   const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
 
@@ -152,7 +155,12 @@ const OrderTitle: React.FC<TOrderTitleProps> = (props) => {
           variant="primary"
           className={css.makeOrderBtn}
           inProgress={confirmInProgress}
-          onClick={onConfirmOrder}>
+          onClick={() => {
+            Tracker.track('booker:order:place-order', {
+              orderId: router.query.orderId as string,
+            });
+            onConfirmOrder();
+          }}>
           {confirmButtonMessage}
         </Button>
       )}

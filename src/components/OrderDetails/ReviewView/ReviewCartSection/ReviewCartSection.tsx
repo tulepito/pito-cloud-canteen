@@ -14,6 +14,7 @@ import SlideModal from '@components/SlideModal/SlideModal';
 import Tooltip from '@components/Tooltip/Tooltip';
 import { parseThousandNumber } from '@helpers/format';
 import { isEnableToStartOrder } from '@helpers/orderHelper';
+import Tracker from '@helpers/tracker';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import type { usePrepareOrderDetailPageData } from '@hooks/usePrepareOrderManagementData';
@@ -230,6 +231,9 @@ const ReviewCartSection: React.FC<TReviewCartSectionProps> = (props) => {
             updateOrderFromDraftEditInProgress
           }
           onClick={async () => {
+            Tracker.track('booker:order:purchase-order', {
+              orderId: orderId as string,
+            });
             try {
               _setIsPickingOrderStarting(true);
               await handleStartPickingOrder();

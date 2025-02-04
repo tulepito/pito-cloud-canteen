@@ -18,6 +18,7 @@ type TNameLinkProps = TDefaultProps & {
   path?: string;
   replace?: boolean;
   target?: string;
+  onClick?: () => void;
 };
 
 const NamedLink: React.FC<TNameLinkProps> = ({
@@ -31,6 +32,7 @@ const NamedLink: React.FC<TNameLinkProps> = ({
   params,
   replace = false,
   target,
+  onClick,
 }) => {
   const classes = classNames(rootClassName || css.root, className);
   const queryString = to?.search ? `?${to.search}` : '';
@@ -47,6 +49,7 @@ const NamedLink: React.FC<TNameLinkProps> = ({
       href={href}
       replace={replace}
       passHref={passHref}
+      onClick={onClick}
       target={target}>
       {children}
     </Link>

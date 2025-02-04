@@ -4,11 +4,13 @@ import { useCallback, useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import classNames from 'classnames';
 import { DateTime } from 'luxon';
+import { useRouter } from 'next/router';
 
 import Button from '@components/Button/Button';
 import { ENavigate } from '@components/CalendarDashboard/helpers/constant';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import IconRefreshing from '@components/Icons/IconRefreshing/IconRefreshing';
+import Tracker from '@helpers/tracker';
 import type { TObject } from '@utils/types';
 
 import css from './Toolbar.module.scss';
@@ -47,6 +49,7 @@ const Toolbar: React.FC<TToolbarProps> = (props) => {
   } = props;
 
   const intl = useIntl();
+  const router = useRouter();
   const startDateDateTime = useMemo(
     () => DateTime.fromMillis(startDate),
     [startDate],
@@ -76,7 +79,12 @@ const Toolbar: React.FC<TToolbarProps> = (props) => {
       <Button
         variant="secondary"
         className={css.secondaryBtn}
-        onClick={onRecommendNewRestaurants}>
+        onClick={() => {
+          Tracker.track('booker:order:randomly-suggest-menus', {
+            orderId: String(router.query.orderId),
+          });
+          onRecommendNewRestaurants?.();
+        }}>
         <IconRefreshing
           className={css.refreshIcon}
           inProgress={onRecommendRestaurantInProgress}

@@ -5,6 +5,7 @@ import { InlineTextButton } from '@components/Button/Button';
 import NamedLink from '@components/NamedLink/NamedLink';
 import OrderDetailTooltip from '@components/OrderDetailTooltip/OrderDetailTooltip';
 import Tooltip from '@components/Tooltip/Tooltip';
+import Tracker from '@helpers/tracker';
 import { companyPaths } from '@src/paths';
 import { diffDays } from '@src/utils/dates';
 import {
@@ -17,7 +18,7 @@ import type { TIntegrationListing } from '@src/utils/types';
 import css from '../components/CompanyOrdersTable.module.scss';
 
 export interface CompanyOrderMobileRenderData {
-  onClick?: Function | null;
+  onClick?: () => void | null;
   namedLinkProps?: {
     path: string;
     params: {
@@ -87,7 +88,17 @@ export function getCompanyOrderRenderData(
 
     if (isMobileLayout) return { namedLinkProps };
 
-    return <NamedLink {...namedLinkProps}>{titleContent}</NamedLink>;
+    return (
+      <NamedLink
+        onClick={() => {
+          Tracker.track('booker:order:view', {
+            orderId: id,
+          });
+        }}
+        {...namedLinkProps}>
+        {titleContent}
+      </NamedLink>
+    );
   }
 
   if ([EOrderStates.picking].includes(state)) {
@@ -116,7 +127,17 @@ export function getCompanyOrderRenderData(
 
     if (isMobileLayout) return { namedLinkProps };
 
-    returnComponent = <NamedLink {...namedLinkProps}>{titleContent}</NamedLink>;
+    returnComponent = (
+      <NamedLink
+        onClick={() => {
+          Tracker.track('booker:order:view', {
+            orderId: id,
+          });
+        }}
+        {...namedLinkProps}>
+        {titleContent}
+      </NamedLink>
+    );
   } else {
     const namedLinkProps = {
       path: companyPaths.ManageOrderDetail,
@@ -125,7 +146,17 @@ export function getCompanyOrderRenderData(
 
     if (isMobileLayout) return { namedLinkProps };
 
-    returnComponent = <NamedLink {...namedLinkProps}>{titleContent}</NamedLink>;
+    returnComponent = (
+      <NamedLink
+        onClick={() => {
+          Tracker.track('booker:order:view', {
+            orderId: id,
+          });
+        }}
+        {...namedLinkProps}>
+        {titleContent}
+      </NamedLink>
+    );
   }
 
   const subOrders = [].concat(plan) as TIntegrationListing[];

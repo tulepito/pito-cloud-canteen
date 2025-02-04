@@ -8,6 +8,7 @@ import { useRouter } from 'next/router';
 
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import MobileTopContainer from '@components/MobileTopContainer/MobileTopContainer';
+import Tracker from '@helpers/tracker';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { useViewport } from '@hooks/useViewport';
 import { resetImage } from '@redux/slices/uploadImage.slice';
@@ -205,6 +206,12 @@ const OrderRatingPage = () => {
         optionalOtherReview: values?.['optionalService-other'],
       }),
     };
+
+    Tracker.track('booker:rating:create', {
+      orderId: orderId as string,
+      ratingScore: +general,
+      content: detailTextRating,
+    });
     if (!isOrderRatedByBooker) {
       const { meta } = await dispatch(
         OrderRatingThunks.postRating({

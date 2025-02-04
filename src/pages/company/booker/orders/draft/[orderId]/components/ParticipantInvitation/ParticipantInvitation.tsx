@@ -11,6 +11,7 @@ import AlertModal from '@components/Modal/AlertModal';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import Stepper from '@components/Stepper/Stepper';
 import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
+import Tracker from '@helpers/tracker';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { useViewport } from '@hooks/useViewport';
@@ -83,7 +84,6 @@ const ParticipantInvitation: React.FC<TParticipantInvitationProps> = ({
     }
   };
 
-  // * submit change deadline date & time
   const handleSubmitDeadlineDateTimeForm = async (
     values: TDeadlineDateTimeFormValues,
   ) => {
@@ -93,9 +93,11 @@ const ParticipantInvitation: React.FC<TParticipantInvitationProps> = ({
     confirmPublishOrderControl.setTrue();
   };
 
-  // * confirm publish draft order
   const handleConfirmPublishOrder = () => {
     confirmPublishOrderControl.setFalse();
+    Tracker.track('booker:order:send-invitation-emails', {
+      orderId: order?.id?.uuid,
+    });
 
     onPublishOrder();
   };

@@ -7,6 +7,7 @@ import Dropdown from '@components/CompanyLayout/Dropdown/Dropdown';
 import FeatureIcons from '@components/FeatureIcons/FeatureIcons';
 import IconArrowHead from '@components/Icons/IconArrowHead/IconArrowHead';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
+import Tracker from '@helpers/tracker';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { useViewport } from '@hooks/useViewport';
 import QuizFlow from '@pages/company/booker/orders/new/quiz/QuizFlow';
@@ -120,6 +121,9 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
       },
       pathname: companyPaths.ManageOrders,
       shouldActivePathname: [companyPaths.OrderRating],
+      onClick: () => {
+        Tracker.track('booker:orders:view', {});
+      },
     },
     {
       key: 'account',

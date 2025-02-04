@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-shadow */
-/* eslint-disable react-hooks/rules-of-hooks */
 import React, { type ReactNode } from 'react';
 import { useIntl } from 'react-intl';
 import Skeleton from 'react-loading-skeleton';
@@ -14,6 +13,7 @@ import RenderWhen from '@components/RenderWhen/RenderWhen';
 import type { TColumn } from '@components/Table/Table';
 import { parseThousandNumber } from '@helpers/format';
 import { getParticipantPickingLink } from '@helpers/order/prepareDataHelper';
+import Tracker from '@helpers/tracker';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { BookerNewOrderAction } from '@pages/company/booker/orders/new/BookerNewOrder.slice';
@@ -89,6 +89,9 @@ const CompanyOrdersActionColumn = ({
   };
 
   const navigateToOrderDetailPage = () => {
+    Tracker.track('booker:order:view', {
+      orderId,
+    });
     router.push({
       pathname: companyPaths.ManageOrderDetail,
       query: { orderId },

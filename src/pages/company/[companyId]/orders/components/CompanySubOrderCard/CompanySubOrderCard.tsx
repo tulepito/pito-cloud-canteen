@@ -9,6 +9,7 @@ import IconReceipt from '@components/Icons/IconReceipt/IconReceipt';
 import NamedLink from '@components/NamedLink/NamedLink';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { parseThousandNumber } from '@helpers/format';
+import Tracker from '@helpers/tracker';
 import { useAppSelector } from '@hooks/reduxHooks';
 import type { EOrderStates } from '@src/utils/enums';
 import { getLabelByKey, ORDER_STATE_OPTIONS } from '@src/utils/options';
@@ -54,7 +55,14 @@ const CompanySubOrderCard: React.FC<CompanySubOrderCardProps> = (props) => {
   const { Component, componentProps } = companyOrderRenderData.namedLinkProps
     ? {
         Component: NamedLink,
-        componentProps: companyOrderRenderData.namedLinkProps,
+        componentProps: {
+          ...companyOrderRenderData.namedLinkProps,
+          onClick: () => {
+            Tracker.track('booker:order:view', {
+              orderId: data.orderId,
+            });
+          },
+        },
       }
     : companyOrderRenderData.onClick
     ? {

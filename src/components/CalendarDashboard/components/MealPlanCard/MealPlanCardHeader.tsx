@@ -4,12 +4,14 @@ import { FormattedMessage } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import classNames from 'classnames';
 import { DateTime } from 'luxon';
+import { useRouter } from 'next/router';
 
 import IconClose from '@components/Icons/IconClose/IconClose';
 import IconMagnifier from '@components/Icons/IconMagnifier/IconMagnifier';
 import IconTickWithBackground from '@components/Icons/IconTickWithBackground/IconTickWithBackground';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import Tooltip from '@components/Tooltip/Tooltip';
+import Tracker from '@helpers/tracker';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { Listing } from '@src/utils/data';
 import { convertWeekDay, formatTimestamp, VNTimezone } from '@utils/dates';
@@ -40,6 +42,7 @@ const MealPlanCardHeader: React.FC<TMealPlanCardHeaderProps> = ({
     meal = {},
   } = event?.resource || {};
   const dishes = meal.dishes || [];
+  const router = useRouter();
   const handleDelete = () => {
     removeEventItem?.(resourceId);
   };
@@ -72,6 +75,11 @@ const MealPlanCardHeader: React.FC<TMealPlanCardHeaderProps> = ({
   };
 
   const handleSearchRestaurant = () => {
+    Tracker.track('booker:order:search-restaurants', {
+      orderId: String(router?.query?.orderId),
+      planId: String(event?.resource?.planId),
+      timestamp: Number(event?.resource?.id),
+    });
     onSearchRestaurant?.(event?.start!);
   };
 
