@@ -59,6 +59,7 @@ import {
 import { EHttpStatusCode, storableError } from '@utils/errors';
 import type {
   TCompany,
+  TCurrentUser,
   TListing,
   TObject,
   TSubOrderChangeHistoryItem,
@@ -590,6 +591,7 @@ const deleteDisAllowedMember = createAsyncThunk(
   'app/OrderManagement/DELETE_DISALLOWED_MEMBER',
   async (params: TObject, { getState }) => {
     const { currentViewDate, memberIds = [] } = params;
+    const { currentUser } = getState().user;
     const {
       id: { uuid: orderId },
     } = getState().OrderManagement.orderData!;
@@ -617,6 +619,7 @@ const deleteDisAllowedMember = createAsyncThunk(
     const updateParams = {
       planId,
       orderDetail: updateOrderDetail,
+      isAdminFlow: currentUser?.attributes?.profile?.metadata?.isAdmin,
     };
 
     await updateOrderDetailFromDraftApi(orderId, updateParams);
@@ -935,6 +938,7 @@ const updateOrderFromDraftEdit = createAsyncThunk(
       draftOrderDetail,
     } = getState().OrderManagement;
     const orderId = Listing(orderData as TListing).getId();
+    const currentUser = getState().user.currentUser as TCurrentUser;
     const { title: orderTitle } = Listing(
       orderData as TListing,
     ).getAttributes();
@@ -947,6 +951,7 @@ const updateOrderFromDraftEdit = createAsyncThunk(
     await updateOrderDetailFromDraftApi(orderId, {
       planId,
       orderDetail: draftOrderDetail,
+      isAdminFlow: currentUser?.attributes?.profile?.metadata?.isAdmin,
     });
     Promise.all(
       Object.keys(draftSubOrderChangesHistory).map(async (date) => {

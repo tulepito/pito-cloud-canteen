@@ -6,14 +6,13 @@ import logger from '@helpers/logger';
 import { pushNotificationOrderDetailChanged } from '@pages/api/helpers/orderDetailHelper';
 import { denormalisedResponseEntities } from '@services/data';
 import { fetchUserListing } from '@services/integrationHelper';
-import { getIntegrationSdk, getSdk, handleError } from '@services/sdk';
+import { getIntegrationSdk, handleError } from '@services/sdk';
 import { createSlackNotification } from '@services/slackNotification';
 import type {
   FoodListing,
   OrderDetail,
   OrderListing,
   PlanListing,
-  UserListing,
   WithFlexSDKData,
 } from '@src/types';
 import { Listing } from '@src/utils/data';
@@ -364,6 +363,7 @@ const sendParticipantChangedNormalOrderFoodsSlackNotification = async (
 export interface PUTUpdateOrderDetailFromDraftBody {
   planId: string;
   orderDetail: OrderDetail;
+  isAdminFlow: boolean;
 }
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
@@ -373,12 +373,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   switch (apiMethod) {
     case HttpMethod.PUT:
       try {
-        const sdk = getSdk(req, res);
-
-        const currentUser: WithFlexSDKData<UserListing> =
-          await sdk.currentUser.show();
-
-        const { planId, orderDetail } =
+        const { planId, orderDetail, isAdminFlow } =
           req.body as PUTUpdateOrderDetailFromDraftBody;
         const { orderId } = req.query;
 
@@ -430,9 +425,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
               oldPlanListing.data.data,
               orderDetail,
               oldOrderDetail,
-              currentUser.data.data.attributes?.profile?.metadata?.isAdmin
-                ? 'admin'
-                : 'booker',
+              isAdminFlow ? 'admin' : 'booker',
             );
           }
 
@@ -442,9 +435,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
               oldPlanListing.data.data,
               orderDetail,
               oldOrderDetail,
-              currentUser.data.data.attributes?.profile?.metadata?.isAdmin
-                ? 'admin'
-                : 'booker',
+              isAdminFlow ? 'admin' : 'booker',
             );
           }
         }
