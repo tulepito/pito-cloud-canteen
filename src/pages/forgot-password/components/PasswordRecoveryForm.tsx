@@ -27,6 +27,9 @@ type TExtraProps = TDefaultProps & {
   timeLeft: number;
   inProgress: boolean;
   submitButtonText: string;
+  view?: 'form' | 'success';
+  successComponent?: React.ReactNode;
+  changeEmailComponent?: React.ReactNode;
 };
 type TPasswordRecoveryFormComponentProps =
   FormRenderProps<TPasswordRecoveryFormValues> & Partial<TExtraProps>;
@@ -36,7 +39,14 @@ type TPasswordRecoveryFormProps = FormProps<TPasswordRecoveryFormValues> &
 const PasswordRecoveryFormComponent: React.FC<
   TPasswordRecoveryFormComponentProps
 > = (props) => {
-  const { inProgress, timeLeft, submitButtonText } = props;
+  const {
+    inProgress,
+    timeLeft,
+    submitButtonText,
+    view,
+    successComponent,
+    changeEmailComponent,
+  } = props;
 
   const intl = useIntl();
   const router = useRouter();
@@ -51,10 +61,6 @@ const PasswordRecoveryFormComponent: React.FC<
 
   const successMessageLineOne = intl.formatMessage({
     id: 'PasswordRecoveryForm.successMessageLineOne',
-  });
-
-  const successMessageLineTwo = intl.formatMessage({
-    id: 'PasswordRecoveryForm.successMessageLineTwo',
   });
 
   const formDescription = intl.formatMessage({
@@ -88,7 +94,6 @@ const PasswordRecoveryFormComponent: React.FC<
   };
 
   const { rootClassName, className, formId, handleSubmit, invalid } = props;
-  const submitDisable = invalid || inProgress;
 
   const classes = classNames(rootClassName || css.root, className);
 
@@ -99,81 +104,61 @@ const PasswordRecoveryFormComponent: React.FC<
         <span className={css.goBack}></span>
         {goBackText}
       </div>
-
       <Form className={classes} onSubmit={handleSubmit}>
         <div className={css.formContainer}>
-          <div className={css.formTitleContainer}>
-            <div className={css.formTitle}>{formTitle}</div>
+          {view === 'success' && successComponent}
 
-            {passwordRequested && timeLeft === 0 ? (
-              <div
-                className={css.formDescription}
-                style={{
-                  textAlign: 'center',
-                }}>
-                <span
-                  style={{
-                    display: 'inline-block',
-                  }}>
-                  {successMessageLineOne}
-                </span>
-                <span
-                  style={{
-                    display: 'inline-block',
-                  }}>
-                  {successMessageLineTwo}
-                </span>
+          {view === 'form' && (
+            <>
+              <div className="mt-2 mb-6">
+                <div className="text-lg font-semibold m-0 text-center">
+                  {formTitle}
+                </div>
+
+                {passwordRequested && timeLeft === 0 ? (
+                  <div className="text-stone-600 text-sm m-0 text-center px-4">
+                    {successMessageLineOne}
+                  </div>
+                ) : (
+                  <div className="text-stone-600 text-sm m-0 text-center px-4">
+                    {formDescription}
+                  </div>
+                )}
               </div>
-            ) : (
-              <div className={css.formDescription}>{formDescription}</div>
-            )}
-          </div>
 
-          <FieldTextInput
-            id={formId ? `${formId}.email` : 'email'}
-            name="email"
-            placeholder={emailPlaceholder}
-            validate={emailValidators}
-            label={emailLabel}
-            errorClass={css.errorClass}
-          />
+              <FieldTextInput
+                id={formId ? `${formId}.email` : 'email'}
+                name="email"
+                placeholder={emailPlaceholder}
+                validate={emailValidators}
+                label={emailLabel}
+                errorClass={css.errorClass}
+              />
+            </>
+          )}
 
           {recoveryError && <div className={css.error}>{recoveryError}</div>}
 
-          {/* <div className={css.desktopView}> */}
-          <Button
-            variant="primary"
-            className={css.submitButton}
-            type="submit"
-            disabled={submitDisable}>
-            {inProgress ? (
-              <>
-                {submitButtonLoadingText}
-                {timeLeft}
-              </>
-            ) : (
-              <> {submitButtonText}</>
-            )}
-          </Button>
-          {/* </div> */}
+          <div className="flex flex-col gap-4">
+            <Button
+              variant="primary"
+              className={css.submitButton}
+              type="submit"
+              loadingMode="extend"
+              inProgress={inProgress}
+              disabled={invalid || inProgress || !!timeLeft}>
+              {timeLeft ? (
+                <>
+                  {submitButtonLoadingText}
+                  {timeLeft}
+                </>
+              ) : (
+                <> {submitButtonText}</>
+              )}
+            </Button>
 
-          {/* <FixedBottomButtons
-            FirstButton={
-              <Button
-                className={css.submitButton}
-                type="submit"
-                disabled={submitDisable}>
-                {inProgress ? (
-                  <>
-                    {submitButtonLoadingText}
-                    {timeLeft}
-                  </>
-                ) : (
-                  <> {submitButtonText}</>
-                )}
-              </Button>
-            }
-          /> */}
+            {view === 'success' && changeEmailComponent}
+          </div>
         </div>
       </Form>
     </div>

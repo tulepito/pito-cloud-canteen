@@ -2,7 +2,7 @@ import { useRouter } from 'next/router';
 
 import Button from '@components/Button/Button';
 import PopupModal from '@components/PopupModal/PopupModal';
-import { companyPaths } from '@src/paths';
+import { enGeneralPaths } from '@src/paths';
 
 import css from './HomeReturnModal.module.scss';
 
@@ -14,10 +14,9 @@ type THomeReturnModalProps = {
 const HomeReturnModal: React.FC<THomeReturnModalProps> = (props) => {
   const { isOpen, onClose } = props;
   const router = useRouter();
-  const { companyId } = router.query;
 
   const handleGoHome = () => {
-    router.push({ pathname: companyPaths.Home, query: { companyId } });
+    router.push({ pathname: enGeneralPaths.Auth });
   };
 
   return (
