@@ -10,10 +10,12 @@ const createMonthViewWrapper = ({
   renderEvent,
   customComponents,
   inProgress,
+  preventSelectDay,
 }: {
   renderEvent: any;
   customComponents?: TCalendarItemCardComponents;
   inProgress?: boolean;
+  preventSelectDay?: boolean;
 }) => {
   const MonthViewWrapper = (props: any) => {
     if (inProgress) {
@@ -30,6 +32,7 @@ const createMonthViewWrapper = ({
         {...props}
         renderEvent={renderEvent}
         customComponents={customComponents}
+        preventSelectDay={preventSelectDay}
       />
     );
   };

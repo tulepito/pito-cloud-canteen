@@ -41,6 +41,7 @@ type TCalendarDashboardProps = TDefaultProps & {
   toolbarLabel?: ReactNode;
   hidePrevToolbarNavButton?: boolean;
   hideNextToolbarNavButton?: boolean;
+  preventSelectDay?: boolean;
 };
 
 const CalendarDashboard: React.FC<TCalendarDashboardProps> = ({
@@ -66,6 +67,7 @@ const CalendarDashboard: React.FC<TCalendarDashboardProps> = ({
   defaultView = Views.WEEK,
   hidePrevToolbarNavButton = false,
   hideNextToolbarNavButton = false,
+  preventSelectDay,
 }) => {
   const [calDate, setCalDate] = useState<Date | undefined>(anchorDate);
 
@@ -78,6 +80,7 @@ const CalendarDashboard: React.FC<TCalendarDashboardProps> = ({
         renderEvent,
         customComponents: components,
         inProgress,
+        preventSelectDay,
       })
     : false;
   const WeekViewWrapper = !hideWeekView
@@ -87,6 +90,7 @@ const CalendarDashboard: React.FC<TCalendarDashboardProps> = ({
         customComponents: components,
         customHeader: headerComponent,
         eventExtraProps,
+        preventSelectDay,
       })
     : false;
 

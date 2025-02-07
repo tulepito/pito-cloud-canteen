@@ -14,11 +14,17 @@ type TSubOrderCardProps = {
   setSelectedEvent: (event: Event) => void;
   openSubOrderDetailModal: () => void;
   ratingSection: React.ReactNode;
+  dateSection?: React.ReactNode;
 };
 
 const SubOrderCard: React.FC<TSubOrderCardProps> = (props) => {
-  const { event, setSelectedEvent, ratingSection, openSubOrderDetailModal } =
-    props;
+  const {
+    event,
+    setSelectedEvent,
+    ratingSection,
+    openSubOrderDetailModal,
+    dateSection,
+  } = props;
   const intl = useIntl();
   const { daySession, deliveryHour, status, orderColor, lastTransition } =
     event?.resource || {};
@@ -43,10 +49,11 @@ const SubOrderCard: React.FC<TSubOrderCardProps> = (props) => {
           <div className={css.daySession}>
             {intl.formatMessage({ id: `DayColumn.Session.${daySession}` })}
           </div>
-          <div className={css.orderHour}>{deliveryHour}</div>
+          <div className={css.orderHour}>
+            {deliveryHour} {dateSection ? ` - ${dateSection}` : ''}
+          </div>
         </div>
         <div>{`#${orderTitle}`}</div>
-        <div className={css.PCCText}>PITO Cloud Canteen</div>
       </div>
       <div className={css.body}>
         <div className={css.row}>

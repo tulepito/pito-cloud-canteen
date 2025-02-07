@@ -2,10 +2,10 @@ import type { ReactNode } from 'react';
 import React, { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
+import classNames from 'classnames';
 import isEmpty from 'lodash/isEmpty';
 import { useRouter } from 'next/router';
 
-import Avatar from '@components/Avatar/Avatar';
 import Button from '@components/Button/Button';
 import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
 import LoadingModal from '@components/LoadingModal/LoadingModal';
@@ -146,16 +146,7 @@ const ParticipantOrderManagement = () => {
   const tabOptions = [
     {
       id: 'company',
-      label: (
-        <div className={css.companyTab}>
-          <Avatar
-            className={css.companyAvatar}
-            user={company as TUser}
-            disableProfileLink
-          />
-          <span>{User(company as TUser).getPublicData().companyName}</span>
-        </div>
-      ),
+      label: null,
       children: '',
       childrenFn: (props: any) => <OrderCalendarView {...props} />,
       childrenProps: {
@@ -274,7 +265,10 @@ const ParticipantOrderManagement = () => {
                 />
               </>
             ) : (
-              <Tabs items={tabOptions} headerClassName={css.tabHeader} />
+              <Tabs
+                items={tabOptions}
+                headerClassName={classNames(css.tabHeader, '!hidden')}
+              />
             )}
             <LoadingModal isOpen={loadingInProgress} />
           </>

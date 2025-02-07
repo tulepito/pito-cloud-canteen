@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import type { Event, View } from 'react-big-calendar';
 import { Views } from 'react-big-calendar';
 import { shallowEqual } from 'react-redux';
-import { endOfMonth, endOfWeek, startOfMonth, startOfWeek } from 'date-fns';
 import flatten from 'lodash/flatten';
 import { DateTime } from 'luxon';
 import { useRouter } from 'next/router';
@@ -53,6 +52,7 @@ import type { TListing } from '@src/utils/types';
 import ParticipantToolbar from '../components/ParticipantToolbar/ParticipantToolbar';
 import { SubOrdersThunks } from '../sub-orders/SubOrders.slice';
 
+import EmptySubOrder from './components/EmptySubOrder/EmptySubOrder';
 import NotificationModal from './components/NotificationModal/NotificationModal';
 import OnboardingOrderModal from './components/OnboardingOrderModal/OnboardingOrderModal';
 import OnboardingTour from './components/OnboardingTour/OnboardingTour';
@@ -328,29 +328,9 @@ const OrderListPage = () => {
   const flattenEvents = flatten<Event>(events);
 
   const subOrdersFromSelectedDay = flattenEvents.filter((_event: any) => {
-    if (currentView === Views.WEEK) {
-      const _startOfWeekAnchorDate = startOfWeek(anchorDate);
+    const _anchorDate = selectedDay || anchorDate;
 
-      const _endOfWeekAnchorDate = endOfWeek(anchorDate);
-
-      return (
-        _event.resource.timestamp >= _startOfWeekAnchorDate &&
-        _event.resource.timestamp <= _endOfWeekAnchorDate
-      );
-    }
-
-    if (currentView === Views.MONTH) {
-      const _startOfMonthAnchorDate = startOfMonth(anchorDate);
-
-      const _endOfMonthAnchorDate = endOfMonth(anchorDate);
-
-      return (
-        _event.resource.timestamp >= _startOfMonthAnchorDate &&
-        _event.resource.timestamp <= _endOfMonthAnchorDate
-      );
-    }
-
-    return isSameDate(_event.start, anchorDate);
+    return isSameDate(_event.start, _anchorDate);
   });
 
   const openUpdateProfileModal = () => {
@@ -387,6 +367,12 @@ const OrderListPage = () => {
   };
 
   const handleChangeTimePeriod = (action: string) => {
+    if (action === 'TODAY') {
+      handleSelectDay(new Date());
+
+      return;
+    }
+
     if (action === 'NEXT') {
       if (currentView === Views.MONTH) {
         const nextDayOfMonth = getNextMonth(selectedDayOfMonth!);
@@ -700,6 +686,10 @@ const OrderListPage = () => {
                   onCustomPeriodClick={handleChangeTimePeriod}
                   onPickForMe={recommendFoodForSubOrder}
                   onPickForMeLoading={pickFoodForSubOrdersInProgress}
+                  onCustomViewChange={() => {
+                    setAnchorDate(new Date());
+                    handleSelectDay(new Date());
+                  }}
                 />
               );
             },
@@ -710,19 +700,26 @@ const OrderListPage = () => {
             setSelectedEvent,
             recommendFoodForSpecificSubOrder,
             pickFoodForSpecificSubOrderInProgress,
+            hideEmptySubOrderSection: !!isMobileLayout,
           }}
         />
       </div>
       <div className={css.subOrderContainer}>
-        {subOrdersFromSelectedDay.map((_event) => (
-          <SubOrderCard
-            key={_event.resource?.id}
-            event={_event}
-            setSelectedEvent={setSelectedEvent}
-            openSubOrderDetailModal={subOrderDetailModalControl.setTrue}
-            ratingSection={getRatingSectionByScope('card', _event)}
-          />
-        ))}
+        {subOrdersFromSelectedDay.length ? (
+          subOrdersFromSelectedDay.map((_event) => (
+            <SubOrderCard
+              key={_event.resource?.id}
+              event={_event}
+              setSelectedEvent={setSelectedEvent}
+              openSubOrderDetailModal={subOrderDetailModalControl.setTrue}
+              ratingSection={getRatingSectionByScope('card', _event)}
+            />
+          ))
+        ) : (
+          <RenderWhen condition={isMobileLayout}>
+            <EmptySubOrder />
+          </RenderWhen>
+        )}
       </div>
       <RenderWhen condition={walkthroughEnable}>
         <WelcomeModal

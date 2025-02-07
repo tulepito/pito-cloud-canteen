@@ -19,6 +19,7 @@ type TMDayItemProps = {
   resources?: any;
   selectedDay?: Date;
   onSelectDay?: (date: Date) => void;
+  preventSelectDay?: boolean;
 };
 
 const MDayItem: React.FC<TMDayItemProps> = ({
@@ -27,6 +28,7 @@ const MDayItem: React.FC<TMDayItemProps> = ({
   renderEvent,
   components,
   resources,
+  preventSelectDay,
 }) => {
   const currentDate = DateTime.fromJSDate(new Date()).startOf('day');
   const dateItem = DateTime.fromJSDate(date).startOf('day');
@@ -43,8 +45,10 @@ const MDayItem: React.FC<TMDayItemProps> = ({
       .get('day') === 0;
 
   const onDayClick = useCallback(() => {
+    if (preventSelectDay) return;
+
     handleSelectDay?.(date);
-  }, [date, handleSelectDay]);
+  }, [date, handleSelectDay, preventSelectDay]);
 
   return (
     <div className={css.monthDay} onClick={onDayClick}>

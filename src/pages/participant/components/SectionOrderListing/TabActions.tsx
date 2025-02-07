@@ -17,8 +17,13 @@ type TTabActionsProps = {
   orderId: string;
   orderDay: string;
   isOrderDeadlineOver: boolean;
-  getNextSubOrderDay: (dayId: string) => string;
-  onSelectTab: (item: any) => void;
+  onAddedToCart?: ({
+    foodName,
+    timestamp,
+  }: {
+    foodName?: string;
+    timestamp: string;
+  }) => void;
 };
 
 const TabActions: React.FC<TTabActionsProps> = ({
@@ -27,8 +32,7 @@ const TabActions: React.FC<TTabActionsProps> = ({
   orderId,
   orderDay,
   isOrderDeadlineOver,
-  getNextSubOrderDay,
-  onSelectTab,
+  onAddedToCart,
 }) => {
   const dispatch = useAppDispatch();
 
@@ -37,9 +41,12 @@ const TabActions: React.FC<TTabActionsProps> = ({
       orderId,
       timestamp: +orderDay,
     });
-    dispatch(ParticipantPlanThunks.recommendFoodSubOrder(orderDay));
-    const nextDate = getNextSubOrderDay(orderDay);
-    onSelectTab({ id: nextDate });
+
+    dispatch(ParticipantPlanThunks.recommendFoodSubOrder(orderDay))
+      .unwrap()
+      .then((data) => {
+        onAddedToCart?.({ foodName: data.foodName, timestamp: orderDay });
+      });
   };
 
   const handleNotJoinDay = () => {
@@ -54,8 +61,7 @@ const TabActions: React.FC<TTabActionsProps> = ({
         mealId: 'notJoined',
       }),
     );
-    const nextDate = getNextSubOrderDay(orderDay);
-    onSelectTab({ id: nextDate });
+    onAddedToCart?.({ timestamp: orderDay });
   };
 
   return (

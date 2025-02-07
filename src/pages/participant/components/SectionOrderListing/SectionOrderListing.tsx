@@ -1,4 +1,6 @@
+import { useRef } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
+import { toast } from 'react-toastify';
 import { DateTime } from 'luxon';
 import { useRouter } from 'next/router';
 
@@ -9,7 +11,9 @@ import Tabs from '@components/Tabs/Tabs';
 import Tooltip from '@components/Tooltip/Tooltip';
 import { isOrderOverDeadline as isOverDeadline } from '@helpers/orderHelper';
 import { useAppSelector } from '@hooks/reduxHooks';
+import { useViewport } from '@hooks/useViewport';
 import { Listing } from '@src/utils/data';
+import { formatTimestamp } from '@src/utils/dates';
 import { EOrderStates } from '@src/utils/enums';
 
 import { listingLoading } from './Loading';
@@ -59,10 +63,52 @@ const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({
     const subOrderDates = Object.keys(plan);
 
     const dayIndex = subOrderDates.findIndex((item) => item === dayId);
+    const firstDayIndexNotHaveDish = subOrderDates.findIndex(
+      (item) => !cartList?.[+item]?.foodId,
+    );
     const nextDayIndex =
-      Object.keys(plan).length - 1 === dayIndex ? dayIndex : dayIndex + 1;
+      subOrderDates.length - 1 === dayIndex
+        ? firstDayIndexNotHaveDish !== -1
+          ? firstDayIndexNotHaveDish
+          : dayIndex
+        : dayIndex + 1;
 
-    return subOrderDates[nextDayIndex];
+    return (
+      subOrderDates[nextDayIndex] || subOrderDates[firstDayIndexNotHaveDish]
+    );
+  };
+
+  const scrollTimeoutRef = useRef<any | null>(null);
+  const { isMobileLayout } = useViewport();
+
+  const onAddedToCart = ({
+    foodName,
+    timestamp,
+  }: {
+    foodName?: string;
+    timestamp: string;
+  }) => {
+    toast.success(
+      foodName
+        ? `Đã thêm món ${foodName} cho ngày ${formatTimestamp(+timestamp)}`
+        : `Không chọn món cho ngày ${formatTimestamp(+timestamp)}`,
+      {
+        position: isMobileLayout ? 'top-center' : 'bottom-center',
+        toastId: 'add-to-cart',
+        updateId: 'add-to-cart',
+        pauseOnHover: false,
+        autoClose: 3000,
+      },
+    );
+
+    scrollTimeoutRef.current = setTimeout(() => {
+      const nextDate = getNextSubOrderDay(timestamp);
+      onSelectTab({ id: nextDate });
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth',
+      });
+    }, 1000);
   };
 
   const convertDataToTabItem = () => {
@@ -75,7 +121,6 @@ const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({
         foodList,
         restaurant,
       }: { foodList: any[]; restaurant: any; memberOrder: any } = plan[item];
-      // eslint-disable-next-line no-unsafe-optional-chaining
       const { foodId: hasDishInCart } = cartList?.[item as any] || {};
       const planDate = DateTime.fromMillis(Number(item)).toJSDate();
       const itemLabel = (
@@ -116,8 +161,7 @@ const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({
           isSelected={hasDishInCart === dish?.id?.uuid}
           selectDisabled={selectDisabled}
           isOrderAlreadyStarted={isOrderAlreadyStarted}
-          getNextSubOrderDay={getNextSubOrderDay}
-          onSelectTab={onSelectTab}
+          onAddedToCart={onAddedToCart}
         />
       ));
 
@@ -161,8 +205,7 @@ const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({
               orderDay={orderDay}
               planId={`${planId}`}
               isOrderDeadlineOver={isOrderDeadlineOver}
-              getNextSubOrderDay={getNextSubOrderDay}
-              onSelectTab={onSelectTab}
+              onAddedToCart={onAddedToCart}
             />
           }
           enableTabScroll

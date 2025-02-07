@@ -8,6 +8,8 @@ import { useViewport } from '@hooks/useViewport';
 import css from './DayItem.module.scss';
 
 const DayColumnHeader: React.FC<TDayColumnHeaderProps> = ({
+  isCurrentDay,
+  isSelectedDay,
   date,
   className,
   shouldHideDate = false,
@@ -23,6 +25,8 @@ const DayColumnHeader: React.FC<TDayColumnHeaderProps> = ({
         css.dayHeader,
         {
           [css.disabledHeader]: isDisabled,
+          [css.activeHeader]: isSelectedDay,
+          [css.currentDay]: isCurrentDay,
         },
         className,
       )}>

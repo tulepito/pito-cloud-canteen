@@ -1,10 +1,12 @@
 import { useState } from 'react';
+import classNames from 'classnames';
 import { DateTime } from 'luxon';
 
 import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
 import { isOrderOverDeadline } from '@helpers/orderHelper';
 import Tracker from '@helpers/tracker';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { useViewport } from '@hooks/useViewport';
 import { totalFoodPickedWithParticipant } from '@pages/participant/helpers';
 import { shoppingCartThunks } from '@redux/slices/shoppingCart.slice';
 import type { RootState } from '@redux/store';
@@ -102,9 +104,10 @@ const SectionOrderPanel: React.FC<TSectionOrderPanelProps> = ({
   };
 
   const orderDetailIds = Object.keys(plan ?? {});
+  const { isMobileLayout } = useViewport();
 
   return (
-    <div className={css.root}>
+    <div className={classNames(css.root, isMobileLayout ? 'mb-[180px]' : '')}>
       <OrderPanelHeader
         selectedDays={totalFoodPickedWithParticipant(orderDetailIds, cartList)}
         sumDays={orderDays.length}

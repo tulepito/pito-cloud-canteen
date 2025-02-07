@@ -58,10 +58,12 @@ const recommendFoodForShoppingCart = ({
     allergies,
   });
 
+  const mostSuitableFoodListing = Listing(mostSuitableFood!);
+
   while (
     currentMealId &&
     suitablePriceFoodList.length > 1 &&
-    Listing(mostSuitableFood!).getId() === currentMealId
+    mostSuitableFoodListing.getId() === currentMealId
   ) {
     mostSuitableFood = recommendFood({
       foodList: suitablePriceFoodList,
@@ -76,9 +78,13 @@ const recommendFoodForShoppingCart = ({
     shoppingCartThunks.addToCart({
       planId: plans[0],
       dayId: subOrderDate,
-      mealId: Listing(mostSuitableFood!).getId(),
+      mealId: mostSuitableFoodListing.getId(),
     }),
   );
+
+  return {
+    foodName: mostSuitableFoodListing.getAttributes().title,
+  };
 };
 
 type TParticipantPlanState = {
@@ -262,7 +268,8 @@ export const recommendFoodSubOrder = createAsyncThunk(
     const { packagePerMember = 0, plans = [] } = orderListing.getMetadata();
     const currentMealId =
       orders[currentUserGetter.getId()]?.[plans[0]]?.[+subOrderDate]?.foodId;
-    recommendFoodForShoppingCart({
+
+    return recommendFoodForShoppingCart({
       plan,
       subOrderDate,
       packagePerMember,

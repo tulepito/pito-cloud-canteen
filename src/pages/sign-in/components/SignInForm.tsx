@@ -11,7 +11,6 @@ import Form from '@components/Form/Form';
 import FieldPasswordInput from '@components/FormFields/FieldPasswordInput/FieldPasswordInput';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import IconGoogle from '@components/Icons/IconGoogle/IconGoogle';
-import IconSecure from '@components/Icons/IconSecure/IconSecure';
 import PitoLogoV2 from '@components/PitoLogoV2/PitoLogoV2';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { generalPaths } from '@src/paths';
@@ -177,13 +176,6 @@ const SignInFormComponent: React.FC<TSignInFormComponentProps> = (props) => {
                 </Button>
               </RenderWhen>
             </RenderWhen>
-
-            <div className={css.secureWrapper}>
-              <IconSecure />
-              <p className={css.secureText}>
-                Đăng nhập an toàn - Thông tin của bạn được bảo mật HTTPS
-              </p>
-            </div>
 
             <div className={css.termsCenter}>
               <p className={css.termsWrapper}>

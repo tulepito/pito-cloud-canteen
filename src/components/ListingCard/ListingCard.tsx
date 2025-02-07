@@ -24,8 +24,13 @@ type TListCardProps = {
   isSelected?: boolean;
   selectDisabled?: boolean;
   isOrderAlreadyStarted: boolean;
-  getNextSubOrderDay: (dayId: string) => string;
-  onSelectTab: (item: any) => void;
+  onAddedToCart?: ({
+    foodName,
+    timestamp,
+  }: {
+    foodName?: string;
+    timestamp: string;
+  }) => void;
 };
 
 const ListingCard: React.FC<TListCardProps> = ({
@@ -36,8 +41,7 @@ const ListingCard: React.FC<TListCardProps> = ({
   isSelected,
   selectDisabled,
   isOrderAlreadyStarted,
-  getNextSubOrderDay,
-  onSelectTab,
+  onAddedToCart,
 }) => {
   const detailModalController = useBoolean();
   const requirementRef = useRef<string | undefined>();
@@ -61,11 +65,9 @@ const ListingCard: React.FC<TListCardProps> = ({
       dispatch(
         shoppingCartThunks.addToCart({ planId, dayId, mealId, requirement }),
       );
-      const nextDate = getNextSubOrderDay(dayId);
-      onSelectTab({ id: nextDate });
-      window.scrollTo({
-        top: 0,
-        behavior: 'smooth',
+      onAddedToCart?.({
+        foodName: title,
+        timestamp: dayId,
       });
     }
   };
@@ -122,7 +124,9 @@ const ListingCard: React.FC<TListCardProps> = ({
             {allergicIngredients.map((item: string) => `Có ${item}`).join(', ')}
           </p>
           {isSelected ? (
-            <span className={css.removeDish} onClick={handleRemoveFromCard}>
+            <span
+              className={classNames(css.removeDish, css.flip)}
+              onClick={handleRemoveFromCard}>
               <IconCheckmarkWithCircle />
             </span>
           ) : (

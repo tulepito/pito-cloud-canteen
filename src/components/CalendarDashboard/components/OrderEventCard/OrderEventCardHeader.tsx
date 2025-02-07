@@ -1,5 +1,5 @@
 import type { Event } from 'react-big-calendar';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { useIntl } from 'react-intl';
 
 import { MORNING_SESSION } from '@components/CalendarDashboard/helpers/constant';
 import { isOver } from '@src/utils/dates';
@@ -39,9 +39,6 @@ const OrderEventCardHeader: React.FC<TOrderEventCardHeaderProps> = ({
         <div className={css.eventTime}>{startTime}</div>
       </div>
       <div className={css.orderId}>#{event.title}</div>
-      <div className={css.mealType}>
-        <FormattedMessage id={`EventCard.PCC`} />
-      </div>
     </div>
   );
 };

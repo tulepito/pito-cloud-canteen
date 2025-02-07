@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { useCallback } from 'react';
 import type { Event } from 'react-big-calendar';
+import { isSameDay } from 'date-fns';
 
 import useSelectDay from '@components/CalendarDashboard/hooks/useSelectDay';
 import { useViewport } from '@hooks/useViewport';
@@ -25,6 +26,7 @@ type TWDayItemProps = {
   components?: TCalendarItemCardComponents;
   customHeader?: (params: TDayColumnHeaderProps) => ReactNode;
   eventExtraProps?: TObject;
+  preventSelectDay?: boolean;
 };
 
 const WDayItem: React.FC<TWDayItemProps> = ({
@@ -35,6 +37,7 @@ const WDayItem: React.FC<TWDayItemProps> = ({
   components,
   customHeader,
   eventExtraProps,
+  preventSelectDay,
 }) => {
   const { isMobileLayout } = useViewport();
   const {
@@ -43,7 +46,7 @@ const WDayItem: React.FC<TWDayItemProps> = ({
     endDate,
     availableOrderDetailCheckList,
   } = resources || ({} as any);
-  const { handleSelectDay } = useSelectDay();
+  const { selectedDay, handleSelectDay } = useSelectDay();
 
   const startDateTimestamp =
     startDate instanceof Date ? startDate?.getTime() : undefined;
@@ -64,8 +67,11 @@ const WDayItem: React.FC<TWDayItemProps> = ({
       ? undefined
       : availableOrderDetailCheckList?.[date.getTime()]?.isAvailable;
 
+  const isSelectedDay = isSameDay(date, selectedDay);
+  const isCurrentDay = isSameDay(date, new Date());
+
   const onClick = useCallback(() => {
-    if (isDisabled) {
+    if (isDisabled || preventSelectDay) {
       return;
     }
     handleSelectDay?.(date);
@@ -81,6 +87,7 @@ const WDayItem: React.FC<TWDayItemProps> = ({
       {customHeader ? (
         customHeader({
           date,
+          isCurrentDay,
         })
       ) : (
         <DayItemHeader
@@ -88,6 +95,8 @@ const WDayItem: React.FC<TWDayItemProps> = ({
           resources={resources}
           isDisabled={isDisabled}
           indicator={indicator}
+          isCurrentDay={isCurrentDay}
+          isSelectedDay={isSelectedDay}
         />
       )}
       {!isMobileLayout && (

@@ -37,12 +37,10 @@ const ParticipantPlan = () => {
   const infoSectionController = useBoolean();
   const dispatch = useAppDispatch();
   const [diffTime, setDiffTime] = useState<Duration | null>(null);
-  // Router
   const router = useRouter();
   const isRouterReady = router.isReady;
   const { planId, from = 'orderList' } = router.query;
 
-  // Load data
   const { loadDataInProgress, order, plan } = useLoadData();
   const { orderDayState, selectedRestaurant, handleSelectRestaurant } =
     useSelectRestaurant();
@@ -160,7 +158,10 @@ const ParticipantPlan = () => {
     });
   };
 
-  // Render
+  const isAllDaysHaveDishInCart =
+    !!Object.keys(plan).length &&
+    Object.keys(plan).every((timestamp) => cartList?.[+timestamp]?.foodId);
+
   return (
     <ParticipantLayout>
       <div className={css.root}>
@@ -201,7 +202,9 @@ const ParticipantPlan = () => {
             </div>
           </div>
           <Button
-            className={css.viewCartMobile}
+            className={classNames(css.viewCartMobile, {
+              [css.ctaBtn]: isAllDaysHaveDishInCart,
+            })}
             onClick={showMobileInfoSection}>
             <div>
               {intl.formatMessage({ id: 'ParticipantPlan.summary.cart' })}

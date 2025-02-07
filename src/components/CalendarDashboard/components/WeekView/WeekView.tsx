@@ -31,6 +31,7 @@ type TWeekViewProps = {
   customComponents?: TCalendarItemCardComponents;
   customHeader?: (params: TDayColumnHeaderProps) => ReactNode;
   eventExtraProps: TObject;
+  preventSelectDay?: boolean;
 } & TimeGridProps;
 
 type TWeekViewObject = {
@@ -49,6 +50,7 @@ function WeekView({
   customHeader,
   eventExtraProps,
   resources,
+  preventSelectDay,
 }: TWeekViewProps & TWeekViewObject) {
   const {
     viewport: { width },
@@ -92,6 +94,7 @@ function WeekView({
             eventExtraProps={eventExtraProps}
             components={customComponents}
             customHeader={customHeader}
+            preventSelectDay={preventSelectDay}
           />
         ))}
       </div>

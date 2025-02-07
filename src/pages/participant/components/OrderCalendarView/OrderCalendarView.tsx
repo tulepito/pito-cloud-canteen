@@ -24,6 +24,7 @@ import { getItem } from '@helpers/localStorageHelpers';
 import { markColorForOrder } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
+import { useViewport } from '@hooks/useViewport';
 import useSubOrderPicking from '@pages/participant/hooks/useSubOrderPicking';
 import EmptySubOrder from '@pages/participant/orders/components/EmptySubOrder/EmptySubOrder';
 import RatingSubOrderModal from '@pages/participant/orders/components/RatingSubOrderModal/RatingSubOrderModal';
@@ -31,7 +32,7 @@ import SubOrderCard from '@pages/participant/orders/components/SubOrderCard/SubO
 import SubOrderDetailModal from '@pages/participant/orders/components/SubOrderDetailModal/SubOrderDetailModal';
 import { OrderListThunks } from '@pages/participant/orders/OrderList.slice';
 import { CalendarActions } from '@redux/slices/Calendar.slice';
-import { isOver } from '@src/utils/dates';
+import { formatTimestamp, isOver } from '@src/utils/dates';
 import { EOrderStates, EParticipantOrderStatus } from '@src/utils/enums';
 import { convertStringToNumber } from '@src/utils/number';
 import { ETransition } from '@src/utils/transaction';
@@ -345,6 +346,8 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
     (state) => state.ParticipantOrderList.fetchSubOrderDocumentInProgress,
   );
 
+  const { isMobileLayout } = useViewport();
+
   const getRatingSectionByScope = (scope: 'pop-up') => {
     const buttonNode = (() => {
       switch (scope) {
@@ -382,7 +385,7 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
 
   return (
     <div className={css.container}>
-      <div>
+      <div className="mt-8">
         <CalendarDashboard
           anchorDate={anchorDate}
           events={flattenEvents}
@@ -391,6 +394,7 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
           inProgress={loadDataInProgress}
           exposeAnchorDate={handleAnchorDateChange}
           defaultView={defaultView}
+          preventSelectDay
           components={{
             toolbar: (toolBarProps: any) => (
               <ParticipantToolbar
@@ -400,6 +404,7 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
                 anchorDate={anchorDate}
                 onPickForMe={recommendFoodForSubOrder}
                 onPickForMeLoading={pickFoodForSubOrdersInProgress}
+                hideTodayButton
               />
             ),
           }}
@@ -407,22 +412,27 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
             setSelectedEvent,
             recommendFoodForSpecificSubOrder,
             pickFoodForSpecificSubOrderInProgress,
+            hideEmptySubOrderSection: !!isMobileLayout,
           }}
         />
       </div>
       <div className={css.subOrderContainer}>
         {subOrdersFromSelectedDay?.length ? (
           subOrdersFromSelectedDay.map((_event) => (
-            <SubOrderCard
-              key={_event.resource?.id}
-              event={_event}
-              setSelectedEvent={setSelectedEvent}
-              openSubOrderDetailModal={subOrderDetailModalControl.setTrue}
-              ratingSection={null}
-            />
+            <div key={_event.resource?.id} className="my-2">
+              <SubOrderCard
+                dateSection={formatTimestamp(_event.resource?.id)}
+                event={_event}
+                setSelectedEvent={setSelectedEvent}
+                openSubOrderDetailModal={subOrderDetailModalControl.setTrue}
+                ratingSection={null}
+              />
+            </div>
           ))
         ) : (
-          <EmptySubOrder />
+          <RenderWhen condition={isMobileLayout}>
+            <EmptySubOrder />
+          </RenderWhen>
         )}
       </div>
       <RenderWhen condition={!!selectedEvent}>

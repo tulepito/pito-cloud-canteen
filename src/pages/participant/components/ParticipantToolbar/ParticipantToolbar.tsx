@@ -23,6 +23,7 @@ export type TToolbarProps = {
   localizer: TObject;
   onNavigate: (action: string) => void;
   onView: (name: string) => void;
+  onCustomViewChange?: (name: string) => void;
   companyLogo?: ReactNode;
   recommendButton?: ReactNode;
   startDate: Date;
@@ -34,6 +35,7 @@ export type TToolbarProps = {
   onChangeDate?: (date: Date) => void;
   date?: Date;
   onCustomPeriodClick?: (action: string) => void;
+  hideTodayButton?: boolean;
 };
 
 const ParticipantToolbar: React.FC<TToolbarProps> = (props) => {
@@ -46,6 +48,7 @@ const ParticipantToolbar: React.FC<TToolbarProps> = (props) => {
     endDate,
     anchorDate,
     onView,
+    onCustomViewChange,
     views,
     view,
     isAllowChangePeriod = false,
@@ -53,6 +56,7 @@ const ParticipantToolbar: React.FC<TToolbarProps> = (props) => {
     onCustomPeriodClick,
     onPickForMe,
     onPickForMeLoading,
+    hideTodayButton,
   } = props;
   const intl = useIntl();
   const mountedRef = useRef(false);
@@ -86,6 +90,7 @@ const ParticipantToolbar: React.FC<TToolbarProps> = (props) => {
 
   const viewFunc = (viewName: string) => () => {
     onView(viewName);
+    onCustomViewChange?.(viewName);
     setItem('participant_calendarView', viewName);
   };
 
@@ -136,9 +141,13 @@ const ParticipantToolbar: React.FC<TToolbarProps> = (props) => {
             <div />
           )}
 
-          <div className={css.todayBtn} onClick={navigateFunc(ENavigate.TODAY)}>
-            <FormattedMessage id="Toolbar.action.today" />
-          </div>
+          {!hideTodayButton && (
+            <div
+              className={css.todayBtn}
+              onClick={navigateFunc(ENavigate.TODAY)}>
+              <FormattedMessage id="Toolbar.action.today" />
+            </div>
+          )}
         </div>
         <div className={css.toolbarNavigation}>
           <div

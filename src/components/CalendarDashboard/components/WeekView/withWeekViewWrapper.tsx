@@ -18,12 +18,14 @@ const withWeekViewWrapper = ({
   inProgress,
   customHeader,
   eventExtraProps,
+  preventSelectDay,
 }: {
   renderEvent: any;
   customComponents?: TCalendarItemCardComponents;
   inProgress?: boolean;
   customHeader?: (params: TDayColumnHeaderProps) => ReactNode;
   eventExtraProps?: TObject;
+  preventSelectDay?: boolean;
 }) => {
   const WeekViewWrapper = (props: any) => {
     if (inProgress) {
@@ -42,6 +44,7 @@ const withWeekViewWrapper = ({
         eventExtraProps={eventExtraProps}
         customComponents={customComponents}
         customHeader={customHeader}
+        preventSelectDay={preventSelectDay}
       />
     );
   };

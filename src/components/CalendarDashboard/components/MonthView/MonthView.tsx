@@ -22,6 +22,7 @@ type TMonthViewProps = {
   accessors: any;
   renderEvent?: React.FC<any>;
   customComponents?: TCalendarItemCardComponents;
+  preventSelectDay?: boolean;
 } & TimeGridProps;
 
 type TMonthViewObject = {
@@ -37,6 +38,7 @@ function MonthView({
   renderEvent,
   customComponents,
   resources,
+  preventSelectDay,
 }: TMonthViewProps & TMonthViewObject) {
   const currRange = useMemo(
     () => MonthView.range(date, { localizer }),
@@ -71,6 +73,7 @@ function MonthView({
             events={getEventsInDate(item, events)}
             renderEvent={renderEvent}
             components={customComponents}
+            preventSelectDay={preventSelectDay}
           />
         ))}
       </div>

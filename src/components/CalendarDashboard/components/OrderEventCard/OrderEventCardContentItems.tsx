@@ -78,14 +78,16 @@ const EventCardContent: React.FC<TEventCardContentProps> = ({
           <span>Còn {remainTime} để chọn</span>
         </OrderEventCardContentItem>
       </RenderWhen>
-      <OrderEventCardContentItem icon={<IconLocation />}>
-        <FormattedMessage
-          id="EventCard.deliveryAddress"
-          values={{
-            address: restaurantAddress,
-          }}
-        />
-      </OrderEventCardContentItem>
+      {restaurantAddress && (
+        <OrderEventCardContentItem icon={<IconLocation />}>
+          <FormattedMessage
+            id="EventCard.deliveryAddress"
+            values={{
+              address: restaurantAddress,
+            }}
+          />
+        </OrderEventCardContentItem>
+      )}
       <OrderEventCardContentItem icon={<IconShop />}>
         {restaurantObj.name}
       </OrderEventCardContentItem>

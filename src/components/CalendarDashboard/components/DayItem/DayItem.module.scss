@@ -19,6 +19,26 @@
   }
 }
 
+.activeHeader {
+  background-color: $neutralGray6 !important;
+  color: white !important;
+
+  .dateNumber,
+  .dayText {
+    color: white !important;
+  }
+}
+
+.currentDay {
+  color: $primaryPri2;
+  background-color: rgba($primaryPri2, 0.1);
+
+  .dateNumber,
+  .dayText {
+    color: $primaryPri2;
+  }
+}
+
 .monthDay {
   display: flex;
   flex-direction: column;
