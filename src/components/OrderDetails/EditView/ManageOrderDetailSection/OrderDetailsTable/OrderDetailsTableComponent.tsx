@@ -281,7 +281,8 @@ const OrderDetailsTableComponent: React.FC<
                           </td>
                           <td>
                             <RenderWhen condition={ableToUpdateOrder}>
-                              <div className={css.actionCell}>
+                              <div
+                                className={classNames(css.actionCell, 'flex')}>
                                 {actionIconComponents}
                               </div>
                             </RenderWhen>

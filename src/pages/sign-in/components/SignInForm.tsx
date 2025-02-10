@@ -177,7 +177,7 @@ const SignInFormComponent: React.FC<TSignInFormComponentProps> = (props) => {
               </RenderWhen>
             </RenderWhen>
 
-            <div className={css.termsCenter}>
+            <div className={classNames(css.termsCenter, '!mt-2')}>
               <p className={css.termsWrapper}>
                 Bằng cách tham gia, bạn đã đọc và đồng ý{' '}
                 <a

@@ -27,6 +27,7 @@ import {
 } from '@src/utils/enums';
 
 import {
+  addFirebaseDocument,
   buildParticipantSubOrderDocumentId,
   updateFirebaseDocument,
 } from '../document/document.service';
@@ -112,15 +113,32 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         });
 
         await updateRatingForRestaurantFn([rating]);
+
         const subOrderId = buildParticipantSubOrderDocumentId(
           reviewerId,
           planId,
           +timestamp,
         );
-        await updateFirebaseDocument(subOrderId, {
-          reviewId: review.id.uuid,
-          txStatus: ESubOrderTxStatus.DELIVERED, // mark the document as delivered, to perform the fetch action
-        });
+
+        try {
+          await updateFirebaseDocument(subOrderId, {
+            reviewId: review.id.uuid,
+            txStatus: ESubOrderTxStatus.DELIVERED, // mark the document as delivered, to perform the fetch action
+          });
+        } catch (error) {
+          const errorString = String(error);
+          if (errorString.includes('NOT_FOUND')) {
+            await addFirebaseDocument({
+              participantId: reviewerId,
+              planId,
+              timestamp: +timestamp,
+              extraParams: {
+                reviewId: review.id.uuid,
+                txStatus: ESubOrderTxStatus.DELIVERED,
+              },
+            });
+          }
+        }
 
         createFirebaseDocNotification(ENotificationType.ORDER_RATING, {
           userId: reviewerId,

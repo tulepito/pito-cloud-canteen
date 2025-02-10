@@ -7,8 +7,10 @@ import Button from '@components/Button/Button';
 import CountdownTimer from '@components/CountdownTimer/CountdownTimer';
 import IconEdit from '@components/Icons/IconEdit/IconEdit';
 import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
-import { useAppDispatch } from '@hooks/reduxHooks';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { orderManagementThunks } from '@redux/slices/OrderManagement.slice';
+import { currentUserSelector } from '@redux/slices/user.slice';
+import type { UserListing } from '@src/types';
 import { formatTimestamp } from '@src/utils/dates';
 import type { TDefaultProps } from '@utils/types';
 
@@ -32,6 +34,8 @@ const OrderDeadlineCountdownSection: React.FC<
 > = (props) => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
+  const currentUser: UserListing = useAppSelector(currentUserSelector);
+
   const [isEditOrderDeadlineModalOpen, setIsEditOrderDeadlineModalOpen] =
     useState(false);
 
@@ -44,7 +48,9 @@ const OrderDeadlineCountdownSection: React.FC<
   const currentTime = new Date().getTime();
   const rootClasses = classNames(rootClassName || css.root, className);
 
-  const disabledEditButton = currentTime >= orderDeadline || !ableToUpdateOrder;
+  const disabledEditButton = currentUser?.attributes?.profile?.metadata?.isAdmin
+    ? false // Admin can edit order deadline anytime
+    : currentTime >= orderDeadline || !ableToUpdateOrder;
   const formattedDeadline = `${deadlineHour}, ${formatTimestamp(
     orderDeadline,
     "dd 'tháng' MM, yyyy",

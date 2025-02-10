@@ -23,10 +23,12 @@ export const addFirebaseDocument = async ({
   participantId,
   planId,
   timestamp,
+  extraParams,
 }: {
   participantId: string;
   planId: string;
   timestamp: number;
+  extraParams?: Record<string, any>;
 }) => {
   const plan = await fetchListing(planId);
   const planListing = Listing(plan);
@@ -99,6 +101,7 @@ export const addFirebaseDocument = async ({
       ...subOrderDocument,
       foodName,
       ...(newFoodImage && { foodImage: newFoodImage }),
+      ...(extraParams || {}),
     };
   }
 

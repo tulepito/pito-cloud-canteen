@@ -223,14 +223,16 @@ const OrderDetailsTable: React.FC<TOrderDetailsTableProps> = (props) => {
         onCancel={handleCancelDeleteOrderItem}
         onConfirm={handleConfirmDeleteOrderItem}
       />
-      <EditOrderRowModal
-        isOpen={isEditSelectionModalOpen}
-        onClose={handleCloseEditSelectionModal}
-        onSubmit={handleSubmitEditSelectionModal}
-        foodOptions={foodOptions}
-        packagePerMember={packagePerMember}
-        currentMemberOrderData={currentMemberOrderData}
-      />
+      {isEditSelectionModalOpen && (
+        <EditOrderRowModal
+          isOpen={isEditSelectionModalOpen}
+          onClose={handleCloseEditSelectionModal}
+          onSubmit={handleSubmitEditSelectionModal}
+          foodOptions={foodOptions}
+          packagePerMember={packagePerMember}
+          currentMemberOrderData={currentMemberOrderData}
+        />
+      )}
     </>
   );
 };

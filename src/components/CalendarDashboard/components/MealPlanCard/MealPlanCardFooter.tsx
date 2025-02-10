@@ -87,9 +87,12 @@ const MealPlanCardFooter: React.FC<TMealPlanCardFooterProps> = ({
           )}
         </Button>
         <div
-          className={css.applyForOtherDays}
+          className={classNames(
+            css.applyForOtherDays,
+            'flex items-start gap-0',
+          )}
           onClick={handleOpenApplyOtherDaysModal}>
-          <IconCopy className={css.copyingIcon} />
+          <IconCopy className={classNames(css.copyingIcon, 'min-w-[16px]')} />
           <FormattedMessage id="MealPlanCard.footer.applyForOtherDays" />
         </div>
 

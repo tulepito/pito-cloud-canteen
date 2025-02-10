@@ -439,6 +439,9 @@ export const emailSendingFactory = async (
           ...emailDataSource,
           bookerNote,
         });
+
+        if (!emailTemplate) return;
+
         const emailDataParams = {
           receiver: [participantEmail],
           subject: participantOrderPickingSubject(orderName),

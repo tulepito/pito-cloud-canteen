@@ -131,9 +131,14 @@ const RestaurantCard: React.FC<TRestaurantCardProps> = ({
     .join(', ');
 
   return (
-    <div className={classes}>
+    <div
+      className={classNames(
+        classes,
+        'hover:shadow-md transition hover:cursor-pointer',
+      )}
+      onClick={handleClickCard}>
       <div>
-        <div className={css.coverImage} onClick={handleClickCard}>
+        <div className={css.coverImage}>
           <ResponsiveImage
             alt="card"
             image={restaurantCoverImage}
@@ -144,10 +149,7 @@ const RestaurantCard: React.FC<TRestaurantCardProps> = ({
           )}
         </div>
         <div className={css.header}>
-          <p
-            className={css.restaurantName}
-            onClick={handleClickCard}
-            title={restaurantName}>
+          <p className={css.restaurantName} title={restaurantName}>
             {Array.isArray(restaurantNameHighlight)
               ? restaurantNameHighlight.map((k) => (
                   <span
@@ -218,8 +220,10 @@ const RestaurantCard: React.FC<TRestaurantCardProps> = ({
             <tr>
               <td colSpan={3}>
                 <button
-                  className={css.inlineTextButtonRoot}
-                  onClick={handleClickCard}>
+                  className={classNames(
+                    css.inlineTextButtonRoot,
+                    'text-xs hover:underline hover:cursor-pointer',
+                  )}>
                   {intl.formatMessage({
                     id: 'RestaurantCard.viewDetailText',
                   })}

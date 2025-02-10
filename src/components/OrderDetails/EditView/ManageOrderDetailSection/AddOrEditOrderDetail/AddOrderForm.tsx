@@ -243,7 +243,9 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
         </Button>
       </div>
 
-      <RenderWhen condition={!isMobileLayout}>{errorSection}</RenderWhen>
+      <RenderWhen condition={!isMobileLayout}>
+        <div className="mt-2">{errorSection}</div>
+      </RenderWhen>
 
       <div className={css.addRequirementContainer}>
         <Button

@@ -1,4 +1,5 @@
 import { formatTimestamp } from '../dates';
+import { EOrderStates } from '../enums';
 
 const BASE_URL = process.env.NEXT_PUBLIC_CANONICAL_URL;
 
@@ -53,10 +54,18 @@ const participantOrderPicking = ({
   } = participantUser.getProfile();
   const orderId = orderListing.getId();
   const { orderName } = orderListing.getPublicData();
-  const { startDate, endDate, deliveryHour, deadlineHour, deadlineDate } =
-    orderListing.getMetadata();
+  const {
+    startDate,
+    endDate,
+    deliveryHour,
+    deadlineHour,
+    deadlineDate,
+    orderState,
+  } = orderListing.getMetadata();
   const { companyLocation } = companyUser.getPublicData();
   const { address: companyAddress } = companyLocation;
+
+  if (orderState === EOrderStates.inProgress) return null;
 
   const formattedStartDate = formatTimestamp(startDate);
   const formattedEndDate = formatTimestamp(endDate);

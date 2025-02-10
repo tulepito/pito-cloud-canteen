@@ -1,5 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
+import classNames from 'classnames';
 import type { FormApi } from 'final-form';
 import { useRouter } from 'next/router';
 
@@ -67,7 +68,7 @@ const ManagePartnerMenusPage: React.FC<TManagePartnerMenusPageProps> = (
 
   return (
     <div className={css.root}>
-      <div className={css.pageHeader}>
+      <div className={classNames(css.pageHeader, 'pb-4')}>
         <h1 className={css.title}>
           <FormattedMessage
             id={

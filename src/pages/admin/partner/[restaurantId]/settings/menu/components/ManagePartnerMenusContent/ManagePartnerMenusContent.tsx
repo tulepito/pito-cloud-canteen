@@ -138,7 +138,7 @@ const TABLE_COLUNMS: TColumn[] = [
       }
 
       return (
-        <div>
+        <div className="flex">
           <NamedLink
             path={`/admin/partner/${restaurantId}/settings/menu/${id}`}
             className={css.actionBtn}>
@@ -152,7 +152,7 @@ const TABLE_COLUNMS: TColumn[] = [
           <InlineTextButton
             type="button"
             onClick={onSetMenuToRemove}
-            className={css.actionBtn}>
+            className={classNames(css.actionBtn, 'min-h-[unset]')}>
             <IconDelete />
           </InlineTextButton>
         </div>
