@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HttpMethod } from '@apis/configs';
@@ -5,6 +6,7 @@ import { convertDateToVNTimezone } from '@helpers/dateHelpers';
 import logger from '@helpers/logger';
 import { pushNotificationOrderDetailChanged } from '@pages/api/helpers/orderDetailHelper';
 import { denormalisedResponseEntities } from '@services/data';
+import { emailSendingFactory, EmailTemplateTypes } from '@services/email';
 import { fetchUserListing } from '@services/integrationHelper';
 import { getIntegrationSdk, handleError } from '@services/sdk';
 import { createSlackNotification } from '@services/slackNotification';
@@ -16,6 +18,7 @@ import type {
   WithFlexSDKData,
 } from '@src/types';
 import { Listing } from '@src/utils/data';
+import { weekDayFormatFromDateTime } from '@src/utils/dates';
 import { buildFullName } from '@src/utils/emailTemplate/participantOrderPicking';
 import {
   EOrderStates,
@@ -52,7 +55,7 @@ export type DifferentOrderDetail = {
   [date: string]: DifferentOrderDetailValue;
 };
 
-const sendParticipantChangedGroupOrderFoodsSlackNotification = async (
+const notifyParticipantChangedGroupOrderFoods = async (
   orderListing: OrderListing,
   planListing: PlanListing,
   newOrderDetail: OrderDetail,
@@ -218,6 +221,84 @@ const sendParticipantChangedGroupOrderFoodsSlackNotification = async (
     Promise.resolve({}) as Promise<DifferentOrderDetail>,
   );
 
+  const emailParamsForBookerNotification: {
+    orderId: string;
+    changeHistory: {
+      oldData?: { title?: string; content?: string };
+      newData?: { title?: string; content?: string };
+    }[];
+  } = {
+    orderId: orderListing.id?.uuid!,
+    changeHistory: Object.keys(diffentOrderDetail)
+      .map((date) => {
+        const { memberOrders } = diffentOrderDetail[date];
+
+        if (!memberOrders) {
+          return [];
+        }
+
+        return Object.keys(memberOrders).map((memberId) => {
+          const { oldFoodName, newFoodName, memberName } =
+            memberOrders[memberId];
+          const type =
+            (!oldFoodName && newFoodName && ('add' as const)) ||
+            (!newFoodName && oldFoodName && ('remove' as const)) ||
+            ('update' as const);
+
+          const weekDay = `${weekDayFormatFromDateTime(
+            DateTime.fromMillis(Number(+date)),
+          )}:`;
+
+          if (type === 'add') {
+            return {
+              oldData: {
+                title: weekDay,
+                content: `${memberName}: Chưa chọn món`,
+              },
+              newData: {
+                title: weekDay,
+                content: `${memberName}: Thêm món "${newFoodName}"`,
+              },
+            };
+          }
+          if (type === 'remove') {
+            return {
+              oldData: {
+                title: weekDay,
+                content: `${memberName}: "${oldFoodName}"`,
+              },
+              newData: {
+                title: weekDay,
+                content: `${memberName}: Xoá ngày ăn`,
+              },
+            };
+          }
+          if (type === 'update') {
+            return {
+              oldData: {
+                title: weekDay,
+                content: `${memberName}: "${oldFoodName}"`,
+              },
+              newData: {
+                title: weekDay,
+                content: `${memberName}: đổi món "${newFoodName}"`,
+              },
+            };
+          }
+
+          return {
+            oldData: {},
+            newData: { title: '', content: '' },
+          };
+        });
+      })
+      .reduce((acc, memberOrders) => [...acc, ...memberOrders], []),
+  };
+
+  emailSendingFactory(
+    EmailTemplateTypes.BOOKER.BOOKER_PICKING_ORDER_CHANGED,
+    emailParamsForBookerNotification,
+  );
   createSlackNotification(
     ESlackNotificationType.PARTICIPANT_GROUP_ORDER_FOOD_CHANGED,
     {
@@ -420,7 +501,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             orderListingResponse.data.data.attributes?.metadata?.orderType;
 
           if (orderType === EOrderType.group) {
-            sendParticipantChangedGroupOrderFoodsSlackNotification(
+            notifyParticipantChangedGroupOrderFoods(
               orderListingResponse.data.data,
               oldPlanListing.data.data,
               orderDetail,

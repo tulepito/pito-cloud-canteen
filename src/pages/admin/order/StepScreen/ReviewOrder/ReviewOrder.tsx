@@ -1011,7 +1011,7 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
 
   return (
     <div className={css.root}>
-      <h1 className={css.title}>
+      <h1 className={classNames(css.title, 'font-semibold !text-lg')}>
         <FormattedMessage id="ReviewOrder.title" />
       </h1>
       <FinalForm

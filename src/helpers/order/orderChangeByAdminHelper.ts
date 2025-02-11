@@ -81,7 +81,6 @@ export const preparePickingOrderChangeNotificationData = ({
 
     if (restaurantId && oldRestaurantId) {
       if (restaurantId !== oldRestaurantId) {
-        // TODO: restaurant change for booker noti
         changeHistoryToNotifyBookerByMeal[timestamp] = [
           {
             oldData: {
@@ -94,8 +93,6 @@ export const preparePickingOrderChangeNotificationData = ({
             },
           },
         ];
-
-        // TODO: firebase change history for restaurant change
         firebaseChangeHistory.push({
           orderId,
           type: EEditOrderHistoryType.changeRestaurant,
@@ -106,7 +103,6 @@ export const preparePickingOrderChangeNotificationData = ({
         });
       } else {
         if (!isEmpty(removedFoodList)) {
-          // TODO: add food for booker noti
           removedFoodList.forEach((removedFoodId) => {
             const { foodName } = oldFoodList[removedFoodId] || {};
 
@@ -119,7 +115,6 @@ export const preparePickingOrderChangeNotificationData = ({
                 },
               });
 
-            // TODO: firebase change history for removing food
             firebaseChangeHistory.push({
               orderId,
               type: EEditOrderHistoryType.deleteFood,
@@ -135,7 +130,6 @@ export const preparePickingOrderChangeNotificationData = ({
           addedFoodList.forEach((addedFoodId) => {
             const { foodName } = foodList[addedFoodId] || {};
 
-            // TODO: add food for booker noti
             changeHistoryToNotifyBookerByMeal[timestamp] =
               changeHistoryToNotifyBookerByMeal[timestamp].concat({
                 oldData: {},
@@ -145,7 +139,6 @@ export const preparePickingOrderChangeNotificationData = ({
                 },
               });
 
-            // TODO: firebase change history for adding food
             firebaseChangeHistory.push({
               orderId,
               type: EEditOrderHistoryType.addFood,
@@ -159,7 +152,6 @@ export const preparePickingOrderChangeNotificationData = ({
       }
     }
 
-    // TODO: picking changed for participant noti
     const normalizedMemberOrders = { ...memberOrders };
     Object.entries(memberOrders).forEach(([memberId, pickingFoodData]) => {
       const { foodId = '', ...restPickingData } = pickingFoodData || {};
@@ -198,7 +190,7 @@ export const preparePickingOrderChangeNotificationData = ({
     detailAddress: updateDetailAddress,
     deliveryHour: updateDeliveryHour,
   } = updateOrderData || {};
-  // TODO: change history for other fields
+
   if (updateStaffName !== undefined && updateStaffName !== staffName) {
     changeHistoryToNotifyBooker.push({
       oldData: {
