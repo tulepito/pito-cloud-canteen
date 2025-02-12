@@ -4,6 +4,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HttpMethod } from '@apis/configs';
 import logger from '@helpers/logger';
+import { createFoodRatingNotificationSchedulerWhenOrderComplete } from '@pages/api/admin/plan/transit.api';
 import { transitionOrderStatus } from '@pages/api/admin/plan/transition-order-status.service';
 import createQuotation from '@pages/api/orders/[orderId]/quotation/create-quotation.service';
 import { emailSendingFactory, EmailTemplateTypes } from '@services/email';
@@ -278,6 +279,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
                       );
                     },
                   );
+
+                  createFoodRatingNotificationSchedulerWhenOrderComplete({
+                    orderId,
+                    participantIds,
+                    subOrderDate: Number(subOrderDate),
+                    planId,
+                  });
+
                   createFirebaseDocNotification(
                     ENotificationType.BOOKER_SUB_ORDER_COMPLETED,
                     {

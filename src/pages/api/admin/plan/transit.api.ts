@@ -45,6 +45,47 @@ import { transitionOrderStatus } from './transition-order-status.service';
 
 const { TIME_TO_SEND_FOOD_RATING_NOTIFICATION } = process.env;
 
+export function createFoodRatingNotificationSchedulerWhenOrderComplete({
+  orderId,
+  participantIds,
+  subOrderDate,
+  planId,
+}: {
+  orderId: string;
+  participantIds: string[];
+  subOrderDate: number;
+  planId: string;
+}) {
+  const startTimestamp = DateTime.fromMillis(subOrderDate)
+    .setZone(VNTimezone)
+    .startOf('day')
+    .toMillis();
+
+  const now = new Date();
+  const numberOfMinutesDeferToSentFoodRatingNotification = Number(
+    TIME_TO_SEND_FOOD_RATING_NOTIFICATION,
+  );
+
+  const _timeExpression = convertDateToVNTimezone(
+    new Date(
+      now.setMinutes(
+        now.getMinutes() + numberOfMinutesDeferToSentFoodRatingNotification,
+      ),
+    ),
+  );
+
+  createFoodRatingNotificationScheduler({
+    customName: `sendFRN_${orderId}_${startTimestamp}`,
+    timeExpression: _timeExpression,
+    params: {
+      orderId,
+      participantIds,
+      subOrderDate: startTimestamp,
+      planId,
+    },
+  });
+}
+
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
     const apiMethod = req.method;
@@ -206,29 +247,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
               },
             );
 
-            const now = new Date();
-            const numberOfMinutesDeferToSentFoodRatingNotification = Number(
-              TIME_TO_SEND_FOOD_RATING_NOTIFICATION,
-            );
-
-            const _timeExpression = convertDateToVNTimezone(
-              new Date(
-                now.setMinutes(
-                  now.getMinutes() +
-                    numberOfMinutesDeferToSentFoodRatingNotification,
-                ),
-              ),
-            );
-
-            createFoodRatingNotificationScheduler({
-              customName: `sendFRN_${orderId}_${startTimestamp}`,
-              timeExpression: _timeExpression,
-              params: {
-                orderId,
-                participantIds,
-                subOrderDate: startTimestamp,
-                planId,
-              },
+            createFoodRatingNotificationSchedulerWhenOrderComplete({
+              orderId,
+              participantIds,
+              subOrderDate: timestamp,
+              planId,
             });
 
             createFirebaseDocNotification(
