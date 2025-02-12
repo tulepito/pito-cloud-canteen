@@ -13,7 +13,10 @@ import {
   fetchListing,
   fetchUser,
 } from '@services/integrationHelper';
-import { createNativeNotificationToBooker } from '@services/nativeNotification';
+import {
+  createNativeNotification,
+  createNativeNotificationToBooker,
+} from '@services/nativeNotification';
 import { createFirebaseDocNotification } from '@services/notifications';
 import { getIntegrationSdk, handleError } from '@services/sdk';
 import { Listing, User } from '@src/utils/data';
@@ -21,6 +24,7 @@ import { VNTimezone } from '@src/utils/dates';
 import {
   EBookerNativeNotificationType,
   EListingType,
+  ENativeNotificationType,
   ENotificationType,
   EOnWheelOrderStatus,
   EQuotationStatus,
@@ -205,8 +209,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
                 if (!subOrderDate) return;
 
                 const subOrder = orderDetail[subOrderDate];
-                const { transactionId, lastTransition, restaurant } =
-                  subOrder || {};
+                const {
+                  transactionId,
+                  lastTransition,
+                  restaurant,
+                  memberOrders,
+                } = subOrder || {};
 
                 if (lastTransition === transition) return;
 
@@ -234,7 +242,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
                 const orderListing = Listing(order);
                 const orderId = orderListing.getId() as string;
                 const {
-                  participantIds = [],
+                  participants: participantIds = [],
                   anonymous = [],
                   quotationId,
                   companyId,
@@ -246,14 +254,29 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
                   planId,
                   subOrderDate: Number(subOrderDate),
                 };
+
                 if (transition === ETransition.START_DELIVERY) {
-                  [participantIds, anonymous].map(
+                  [...participantIds, ...anonymous].map(
                     async (participantId: string) => {
                       createFirebaseDocNotification(
                         ENotificationType.ORDER_DELIVERING,
                         {
                           ...generalNotificationData,
                           userId: participantId,
+                        },
+                      );
+
+                      const { foodList = {} } = restaurant;
+                      const { foodId } = memberOrders[participantId] || {};
+                      const { foodName = '' } = foodList[foodId] || {};
+
+                      createNativeNotification(
+                        ENativeNotificationType.AdminTransitSubOrderToDelivering,
+                        {
+                          participantId,
+                          planId,
+                          subOrderDate,
+                          foodName,
                         },
                       );
                     },
@@ -268,13 +291,27 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
                   );
                 }
                 if (transition === ETransition.COMPLETE_DELIVERY) {
-                  [participantIds, anonymous].map(
+                  [...participantIds, ...anonymous].map(
                     async (participantId: string) => {
                       createFirebaseDocNotification(
                         ENotificationType.ORDER_SUCCESS,
                         {
                           ...generalNotificationData,
                           userId: participantId,
+                        },
+                      );
+
+                      const { foodList = {} } = restaurant || {};
+                      const { foodId } = memberOrders[participantId] || {};
+                      const { foodName = '' } = foodList[foodId] || {};
+
+                      createNativeNotification(
+                        ENativeNotificationType.AdminTransitSubOrderToDelivered,
+                        {
+                          participantId,
+                          planId,
+                          subOrderDate,
+                          foodName,
                         },
                       );
                     },
@@ -322,6 +359,15 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
                         orderId,
                         timestamp: subOrderDate,
                         participantId,
+                      },
+                    );
+
+                    createNativeNotification(
+                      ENativeNotificationType.AdminTransitSubOrderToCanceled,
+                      {
+                        participantId,
+                        planId,
+                        subOrderDate,
                       },
                     );
                   });

@@ -29,6 +29,9 @@ export const createNativeNotification = async (
   const { participantId } = notificationParams;
 
   const participant = await fetchUser(participantId);
+
+  if (!participant) return;
+
   const participantUser = User(participant);
   const profile = participantUser.getProfile();
 
