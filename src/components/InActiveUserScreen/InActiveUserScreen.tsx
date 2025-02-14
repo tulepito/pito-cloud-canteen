@@ -20,7 +20,7 @@ const UnActiveUserScreen = () => {
   return (
     <div className={css.root}>
       <PitoLogo />
-      <p>Tài khoản của bạn chưa được kích hoạt</p>
+      <p className="my-2">Tài khoản của bạn chưa được kích hoạt</p>
       <Button type="button" onClick={handleLogout}>
         Đăng xuất
       </Button>

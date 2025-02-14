@@ -1,5 +1,9 @@
-import { useEffect, useMemo, useState } from 'react';
+/* eslint-disable no-await-in-loop */
+/* eslint-disable new-cap */
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 import isEmpty from 'lodash/isEmpty';
 import { DateTime } from 'luxon';
 
@@ -10,11 +14,16 @@ import RenderWhen from '@components/RenderWhen/RenderWhen';
 import SlideModal from '@components/SlideModal/SlideModal';
 import Tooltip from '@components/Tooltip/Tooltip';
 import { parseThousandNumber } from '@helpers/format';
+import logger from '@helpers/logger';
 import { isJoinedPlan } from '@helpers/order/orderPickingHelper';
+import { useAppSelector } from '@hooks/reduxHooks';
 import { useViewport } from '@hooks/useViewport';
 import type { UserListing } from '@src/types';
 import { buildFullName } from '@src/utils/emailTemplate/participantOrderPicking';
 import type { TObject, TUser } from '@utils/types';
+
+import UserLabelHiddenSection from './UserLabelHiddenSection';
+import UserLabelPreviewModal from './UserLabelPreviewModal';
 
 import css from './ReviewOrdersResultModal.module.scss';
 
@@ -43,6 +52,7 @@ const prepareData = ({
               foodId,
               ...foodListOfDate[foodId],
             },
+            restaurant,
           };
 
           return isJoinedPlan(foodId, status)
@@ -78,6 +88,21 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
   const intl = useIntl();
   const { isMobileLayout } = useViewport();
   const [expandingStatusMap, setExpandingStatusMap] = useState<any>({});
+  const [isViewUserLabelModalOpen, setIsViewUserLabelModalOpen] =
+    useState(false);
+  const [userLabelPreviewSrcs, setUserLabelPreviewSrcs] = useState<string[]>(
+    [],
+  );
+  const [targetedDate, setTargetDate] = useState<string | 'all'>('all');
+  const allowTriggerGenerateUserLabelFile = useRef(false);
+
+  const [isGeneratingUserLabelFile, setIsGeneratingUserLabelFile] =
+    useState(false);
+  const currentUser: UserListing | null = useAppSelector(
+    (state) => state.user.currentUser,
+  );
+
+  const isAdmin = currentUser?.attributes?.profile?.metadata?.isAdmin;
 
   const {
     orderDetail,
@@ -178,33 +203,123 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
       );
       setExpandingStatusMap(updateObject);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(preparedData)]);
+
+  const generateUserLabels = async (exportType: 'state' | 'pdf-file') => {
+    if (!allowTriggerGenerateUserLabelFile.current) return;
+
+    logger.info('Generating user labels...', 'START');
+
+    const pdf = new jsPDF('p', 'mm', 'a4');
+
+    const printableAreas = document.querySelectorAll('[id^=printable-area-]');
+    const pageHeight = pdf.internal.pageSize.height;
+    const pageWidth = pdf.internal.pageSize.width;
+    const _userLabelPreviewSrcs = [];
+
+    setIsGeneratingUserLabelFile(true);
+    for (let i = 0; i < printableAreas.length; i++) {
+      const printableArea = printableAreas[i];
+      const canvas = await html2canvas(printableArea as any, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+      });
+      /**
+       * TODO: improve performance by caching the image data
+       */
+      const imgData = canvas.toDataURL('image/png');
+
+      if (exportType === 'state') {
+        _userLabelPreviewSrcs.push(imgData);
+      }
+
+      if (exportType === 'pdf-file') {
+        const marginTopBottom = 10;
+        const marginLeftRight = 4;
+        pdf.addImage(
+          imgData,
+          'PNG',
+          marginLeftRight,
+          marginTopBottom,
+          pageWidth - marginLeftRight * 2,
+          pageHeight - marginTopBottom * 2,
+          undefined,
+          'FAST',
+        );
+
+        if (i < printableAreas.length - 1) {
+          pdf.addPage();
+        }
+      }
+    }
+
+    if (exportType === 'state') {
+      setUserLabelPreviewSrcs(_userLabelPreviewSrcs);
+    }
+
+    if (exportType === 'pdf-file') {
+      pdf.save('user-labels.pdf');
+    }
+
+    setIsGeneratingUserLabelFile(false);
+  };
+
+  /**
+   * When targetedDate is changed, trigger the generation of user labels
+   */
+  useEffect(() => {
+    generateUserLabels('state');
+  }, [targetedDate]);
+
+  const withSetCurrentDateTo =
+    (date: string | 'all', callback: () => void) => () => {
+      allowTriggerGenerateUserLabelFile.current = true;
+      setTargetDate(date);
+      setTimeout(callback);
+    };
 
   const content = (
     <>
       <div className={css.tableContainer}>
-        <div className={css.headRow}>
-          <div className={css.head}>
-            {intl.formatMessage({
-              id: 'ReviewOrdersResultModal.tableHead.name',
-            })}
+        <div className="relative">
+          <div className={css.headRow}>
+            <div className={css.head}>
+              {intl.formatMessage({
+                id: 'ReviewOrdersResultModal.tableHead.name',
+              })}
+            </div>
+            <div className={css.head}>
+              {intl.formatMessage({
+                id: 'ReviewOrdersResultModal.tableHead.foodName',
+              })}
+            </div>
+            <div className={css.head}>
+              {intl.formatMessage({
+                id: 'ReviewOrdersResultModal.tableHead.price',
+              })}
+            </div>
+            <div className={css.head}>
+              {intl.formatMessage({
+                id: 'ReviewOrdersResultModal.tableHead.requirement',
+              })}
+            </div>
           </div>
-          <div className={css.head}>
-            {intl.formatMessage({
-              id: 'ReviewOrdersResultModal.tableHead.foodName',
-            })}
-          </div>
-          <div className={css.head}>
-            {intl.formatMessage({
-              id: 'ReviewOrdersResultModal.tableHead.price',
-            })}
-          </div>
-          <div className={css.head}>
-            {intl.formatMessage({
-              id: 'ReviewOrdersResultModal.tableHead.requirement',
-            })}
-          </div>
+
+          {isAdmin && (
+            <div className="absolute top-1.5 right-2">
+              <Button
+                size="small"
+                loadingMode="extend"
+                inProgress={isGeneratingUserLabelFile && targetedDate === 'all'}
+                className="h-[28px]"
+                onClick={withSetCurrentDateTo('all', () => {
+                  generateUserLabels('pdf-file');
+                })}>
+                Tải toàn bộ label
+              </Button>
+            </div>
+          )}
         </div>
 
         {preparedData.map(({ date, orderData }) => {
@@ -225,10 +340,36 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
                   )}
                 </div>
                 <RenderWhen condition={!isEmptyOrderData}>
-                  <IconArrow
-                    direction={isExpanding ? 'up' : 'down'}
-                    onClick={toggleCollapseStatus(date)}
-                  />
+                  <div className="flex items-center">
+                    {isAdmin && (
+                      <RenderWhen condition={!isMobileLayout}>
+                        <Button
+                          variant="inline"
+                          size="small"
+                          onClick={withSetCurrentDateTo(date, () => {
+                            setIsViewUserLabelModalOpen(true);
+                          })}>
+                          Xem label
+                        </Button>
+                        <Button
+                          variant="inline"
+                          size="small"
+                          inProgress={
+                            isGeneratingUserLabelFile && targetedDate === date
+                          }
+                          loadingMode="extend"
+                          onClick={withSetCurrentDateTo(date, () => {
+                            generateUserLabels('pdf-file');
+                          })}>
+                          Tải label
+                        </Button>
+                      </RenderWhen>
+                    )}
+                    <IconArrow
+                      direction={isExpanding ? 'up' : 'down'}
+                      onClick={toggleCollapseStatus(date)}
+                    />
+                  </div>
                 </RenderWhen>
               </div>
               <RenderWhen condition={isExpanding}>
@@ -288,28 +429,46 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
   );
 
   return (
-    <RenderWhen condition={isMobileLayout}>
-      <SlideModal
-        id="ReviewOrdersResultModal"
-        modalTitle={modalTitle}
-        onClose={onClose}
-        isOpen={isOpen}
-        containerClassName={css.mobileModalContainer}
-        contentClassName={css.mobileModalContent}>
-        {content}
-      </SlideModal>
-
-      <RenderWhen.False>
-        <Modal
-          title={modalTitle}
+    <>
+      <RenderWhen condition={isMobileLayout}>
+        <SlideModal
+          id="ReviewOrdersResultModal"
+          modalTitle={modalTitle}
+          onClose={onClose}
           isOpen={isOpen}
-          handleClose={onClose}
-          className={css.modalRoot}
-          contentClassName={css.modalContentContainer}>
+          containerClassName={css.mobileModalContainer}
+          contentClassName={css.mobileModalContent}>
           {content}
-        </Modal>
-      </RenderWhen.False>
-    </RenderWhen>
+        </SlideModal>
+
+        <RenderWhen.False>
+          <Modal
+            title={modalTitle}
+            isOpen={isOpen}
+            handleClose={onClose}
+            className={css.modalRoot}
+            contentClassName={css.modalContentContainer}>
+            {content}
+          </Modal>
+        </RenderWhen.False>
+      </RenderWhen>
+
+      {isAdmin && isViewUserLabelModalOpen && !isMobileLayout && (
+        <UserLabelPreviewModal
+          previewSrcs={userLabelPreviewSrcs}
+          isOpen={isViewUserLabelModalOpen}
+          handleClose={() => setIsViewUserLabelModalOpen(false)}
+          isLoading={isGeneratingUserLabelFile}
+        />
+      )}
+
+      {isAdmin && (
+        <UserLabelHiddenSection
+          preparedData={preparedData}
+          targetedDate={targetedDate}
+        />
+      )}
+    </>
   );
 };
 

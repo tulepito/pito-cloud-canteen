@@ -20,6 +20,7 @@ export const useLogout = (options?: { from?: string }) => {
     dispatch(userActions.clearCurrentUser());
     dispatch(OrderListActions.logout());
     dispatch(SubOrdersActions.logout());
+    dispatch(userActions.logout());
     removeItem('userRole');
     router.push({
       pathname: generalPaths.SignIn,

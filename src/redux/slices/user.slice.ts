@@ -252,6 +252,7 @@ const userSlice = createSlice({
         isRoleSelectModalOpen: action.payload,
       };
     },
+    logout: () => initialState,
   },
   extraReducers: (builder) => {
     builder

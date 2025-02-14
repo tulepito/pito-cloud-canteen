@@ -12,7 +12,6 @@
   background-color: $neutralGray1;
   border-radius: 16px;
   flex-wrap: wrap;
-  row-gap: 16px;
 
   @include viewportLarge {
     align-items: center;
