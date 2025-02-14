@@ -1,4 +1,3 @@
-import { HttpStatusCode } from 'axios';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import cookies from '@services/cookie';
@@ -24,7 +23,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     if (!_uniqueMemberIdList?.length) {
       const integrationSdk = getIntegrationSdk();
       const planListingResponse: WithFlexSDKData<PlanListing> =
-        integrationSdk.listings.show({ id: planId });
+        await integrationSdk.listings.show({ id: planId });
 
       const orderDetail =
         planListingResponse.data?.data.attributes?.metadata?.orderDetail;
@@ -77,9 +76,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       }),
     );
 
-    res.status(HttpStatusCode.Ok).json({
+    res.status(200).json({
       statusCode: 200,
-      message: `Gửi email nhắc nhở thành công cho ${uniqueMemberIdList?.length} người`,
+      message: `Gửi email nhắc nhở thành công cho ${_uniqueMemberIdList?.length} người`,
     });
   } catch (error) {
     handleError(res, error);

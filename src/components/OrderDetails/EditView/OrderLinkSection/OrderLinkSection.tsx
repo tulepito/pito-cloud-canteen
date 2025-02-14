@@ -17,6 +17,7 @@ import {
   orderDetailsAnyActionsInProgress,
   orderManagementThunks,
 } from '@redux/slices/OrderManagement.slice';
+import type { OrderListing } from '@src/types';
 import { Listing } from '@src/utils/data';
 import { EOrderStates } from '@src/utils/enums';
 import type { TDefaultProps, TListing } from '@utils/types';
@@ -51,17 +52,21 @@ const OrderLinkSection: React.FC<TOrderLinkSectionProps> = (props) => {
   const dispatch = useAppDispatch();
   const { isMobileLayout } = useViewport();
   const sendNotificationModalControl = useBoolean();
-  const orderData = useAppSelector((state) => state.OrderManagement.orderData);
+  const orderData: OrderListing = useAppSelector(
+    (state) => state.OrderManagement.orderData,
+  );
   const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
 
   const isPicking =
     Listing(orderData as TListing).getMetadata().orderState ===
     EOrderStates.picking;
 
-  const orderLink = getParticipantPickingLink({
-    orderId: orderData?.id?.uuid,
-    companyId,
-  });
+  const orderLink = orderData?.id?.uuid
+    ? getParticipantPickingLink({
+        orderId: orderData?.id?.uuid,
+        companyId,
+      })
+    : '';
 
   const rootClasses = classNames(rootClassName || css.root, className);
 
@@ -92,9 +97,15 @@ const OrderLinkSection: React.FC<TOrderLinkSectionProps> = (props) => {
   const handleSubmitSendNotification = async (
     values: TSendNotificationFormValues,
   ) => {
+    if (!orderData?.id?.uuid || !orderData?.attributes?.metadata?.plans?.[0]) {
+      return;
+    }
+
     dispatch(
       orderManagementThunks.sendRemindEmailToMember({
         description: values.description,
+        orderId: orderData?.id?.uuid,
+        planId: orderData?.attributes?.metadata?.plans[0],
       }),
     );
   };

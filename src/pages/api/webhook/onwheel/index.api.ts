@@ -270,15 +270,17 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
                       const { foodId } = memberOrders[participantId] || {};
                       const { foodName = '' } = foodList[foodId] || {};
 
-                      createNativeNotification(
-                        ENativeNotificationType.AdminTransitSubOrderToDelivering,
-                        {
-                          participantId,
-                          planId,
-                          subOrderDate,
-                          foodName,
-                        },
-                      );
+                      if (foodName) {
+                        createNativeNotification(
+                          ENativeNotificationType.AdminTransitSubOrderToDelivering,
+                          {
+                            participantId,
+                            planId,
+                            subOrderDate,
+                            foodName,
+                          },
+                        );
+                      }
                     },
                   );
                   createNativeNotificationToBooker(
@@ -305,15 +307,17 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
                       const { foodId } = memberOrders[participantId] || {};
                       const { foodName = '' } = foodList[foodId] || {};
 
-                      createNativeNotification(
-                        ENativeNotificationType.AdminTransitSubOrderToDelivered,
-                        {
-                          participantId,
-                          planId,
-                          subOrderDate,
-                          foodName,
-                        },
-                      );
+                      if (foodName) {
+                        createNativeNotification(
+                          ENativeNotificationType.AdminTransitSubOrderToDelivered,
+                          {
+                            participantId,
+                            planId,
+                            subOrderDate,
+                            foodName,
+                          },
+                        );
+                      }
                     },
                   );
 
