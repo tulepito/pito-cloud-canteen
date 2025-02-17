@@ -64,6 +64,8 @@ const fetchSubOrdersFromFirebase = createAsyncThunk(
     },
     { getState },
   ) => {
+    if (!payload.participantId) return [] as any;
+
     const { deliveringLastRecord, deliveredLastRecord } =
       getState().ParticipantSubOrderList;
     const { participantId, txStatus } = payload;
