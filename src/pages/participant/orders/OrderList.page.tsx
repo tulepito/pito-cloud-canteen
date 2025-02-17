@@ -672,6 +672,7 @@ const OrderListPage = () => {
           renderEvent={OrderEventCard}
           inProgress={fetchOrdersInProgress}
           defaultView={defaultCalendarView}
+          preventSelectDay={!isMobileLayout}
           exposeAnchorDate={(date: any) => {
             setAnchorDate(date);
           }}

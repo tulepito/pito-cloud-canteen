@@ -126,7 +126,11 @@ const OrderEventCardPopup: React.FC<TOrderEventCardPopupProps> = ({
         </div>
       </div>
       <div className={css.cardStatus}>
-        <OrderEventCardStatus status={status} lastTransition={lastTransition} />
+        <OrderEventCardStatus
+          isFoodPicked={!!event.resource?.dishSelection?.dishSelection}
+          status={status}
+          lastTransition={lastTransition}
+        />
       </div>
       <div className={css.mealType}>
         <span className={css.regularText}>#{event.title}</span> |{' '}

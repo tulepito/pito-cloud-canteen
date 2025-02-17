@@ -219,6 +219,7 @@ const OrderEventCard: React.FC<TOrderEventCardProps> = ({
           <OrderEventCardHeader event={event} />
           <div className={css.eventCardContentWrapper}>
             <OrderEventCardStatus
+              isFoodPicked={isFoodPicked}
               className={css.cardStatus}
               status={status}
               lastTransition={lastTransition}

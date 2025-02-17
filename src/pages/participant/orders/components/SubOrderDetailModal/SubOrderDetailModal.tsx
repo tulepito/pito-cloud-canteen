@@ -136,6 +136,7 @@ const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
           </div>
           {status && (
             <OrderEventCardStatus
+              isFoodPicked={!!event.resource?.dishSelection?.dishSelection}
               status={status}
               lastTransition={lastTransition}
             />

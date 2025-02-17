@@ -13,6 +13,7 @@ type TOrderEventCardStatusProps = {
   status: TEventStatus;
   className?: string;
   lastTransition: string;
+  isFoodPicked: boolean;
 };
 
 const StatusToBadgeTypeMap = {
@@ -60,9 +61,33 @@ const txStateToLabelMapper = (lastTransition: string) => {
 };
 const OrderEventCardStatus: React.FC<TOrderEventCardStatusProps> = ({
   status,
+  isFoodPicked,
   lastTransition,
 }) => {
   const intl = useIntl();
+
+  let extendStatusData = null;
+
+  if (!!lastTransition && !isFoodPicked) {
+    extendStatusData = {
+      type: EBadgeType.default,
+      label: 'Không chọn món',
+    };
+  }
+
+  if (extendStatusData) {
+    return (
+      <>
+        <Badge
+          className={css.badge}
+          type={extendStatusData.type}
+          label={intl.formatMessage({
+            id: extendStatusData.label,
+          })}
+        />
+      </>
+    );
+  }
 
   return (
     <>
