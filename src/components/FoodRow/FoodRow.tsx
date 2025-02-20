@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import classNames from 'classnames';
 
 import IconMoneyReceive from '@components/Icons/IconMoneyReceive/IconMoneyReceive';
 import Tooltip from '@components/Tooltip/Tooltip';
@@ -44,7 +45,7 @@ const FoodRow: React.FC<TFoodRowProps> = ({
       <td>
         <div className={css.footerFood}>
           <Tooltip tooltipContent={foodName} placement="top">
-            <span className={css.foodName}>
+            <span className={classNames(css.foodName, '!line-clamp-1 ')}>
               {isFoodNameHasHighlightWords
                 ? foodNameHighlight.map((word) => (
                     <span

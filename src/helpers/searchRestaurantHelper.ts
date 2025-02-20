@@ -60,7 +60,12 @@ export function parseFoodsFromMenu(
   menu: TListing,
   dayOfWeek: string,
   mapfoods: Map<string, TListing>,
-  packagePerMember: number,
+  options?: {
+    findExactPackagePerMember?: {
+      active: boolean;
+      packagePerMember: number;
+    };
+  },
 ): TFoodInRestaurant[] {
   const result: TFoodInRestaurant[] = [];
   const menuListing = Listing(menu);
@@ -73,15 +78,26 @@ export function parseFoodsFromMenu(
       const foodListing = Listing(food);
       const { price, title, publicData } = foodListing.getAttributes();
 
-      if (price.amount <= packagePerMember)
-        result.push({
-          restaurantId,
-          foodId: key,
-          foodName: title,
-          minQuantity: foodListing.getPublicData().minQuantity ?? 0,
-          price: price.amount,
-          foodUnit: publicData?.unit ?? '',
-        });
+      if (
+        options?.findExactPackagePerMember &&
+        options?.findExactPackagePerMember?.active
+      ) {
+        const packagePerMember =
+          options?.findExactPackagePerMember.packagePerMember;
+
+        if (price.amount !== packagePerMember) {
+          return;
+        }
+      }
+
+      result.push({
+        restaurantId,
+        foodId: key,
+        foodName: title,
+        minQuantity: foodListing.getPublicData().minQuantity ?? 0,
+        price: price.amount,
+        foodUnit: publicData?.unit ?? '',
+      });
     }
   });
 
@@ -93,7 +109,6 @@ export function findFoodTitleInMenus(
   dayOfWeek: any | undefined | null,
   keywords: string | undefined,
   mapFoodId: Map<string, TListing>,
-  packagePerMember: number,
 ) {
   let menu: TListing | undefined;
   const foods: TFoodInRestaurant[] = [];
@@ -107,7 +122,6 @@ export function findFoodTitleInMenus(
         menus[i],
         dayOfWeek,
         mapFoodId,
-        packagePerMember,
       );
       if (
         combinedFoodsMenuData.findIndex((food) => {

@@ -38,6 +38,7 @@ type TRestaurantCardProps = {
   favoriteInProgress?: boolean;
   alreadyFavorite?: boolean;
   foods?: TFoodInRestaurant[];
+  packagePerMember?: number;
 };
 
 const RestaurantCard: React.FC<TRestaurantCardProps> = ({
@@ -50,6 +51,7 @@ const RestaurantCard: React.FC<TRestaurantCardProps> = ({
   favoriteInProgress,
   alreadyFavorite,
   foods = [],
+  packagePerMember,
 }) => {
   const intl = useIntl();
   const classes = classNames(css.root, className);
@@ -107,10 +109,25 @@ const RestaurantCard: React.FC<TRestaurantCardProps> = ({
     if (typeof favoriteFunc === 'function') favoriteFunc(restaurantId);
   };
 
-  const sortedFoods = sortFoodsInRestaurant(keywords, foods);
+  const numberOfMatchedPackagePerMemberFoods = foods.filter(
+    (food) => food.price === packagePerMember,
+  );
 
-  const hasMoreThan5Foods = sortedFoods.length > 5;
-  const first5Foods = sortedFoods.slice(0, 5);
+  const nonMatchedPackagePerMemberFoods = foods.filter(
+    (food) => food.price !== packagePerMember,
+  );
+
+  const sortedMatchedPackagePerMemberFoodsByKeyword = sortFoodsInRestaurant(
+    keywords,
+    numberOfMatchedPackagePerMemberFoods,
+  ).slice(0, 5);
+
+  const sortedNonMatchedPackagePerMemberFoodsByKeyword = sortFoodsInRestaurant(
+    keywords,
+    nonMatchedPackagePerMemberFoods,
+  ).slice(0, 5);
+
+  const hasMoreThan5Foods = foods.length > 5;
 
   const mealStyles = useMemo(
     () =>
@@ -134,7 +151,7 @@ const RestaurantCard: React.FC<TRestaurantCardProps> = ({
     <div
       className={classNames(
         classes,
-        'hover:shadow-md transition hover:cursor-pointer',
+        'hover:shadow-md transition hover:cursor-pointer !p-2',
       )}
       onClick={handleClickCard}>
       <div>
@@ -177,18 +194,22 @@ const RestaurantCard: React.FC<TRestaurantCardProps> = ({
             })}
           </span>
         </div>
-        <div className={css.footerItem}>
-          <IconStar className={css.littleStarIcon} />
-          <span>{`${totalRating} (${totalRatingNumber})`}</span>
-        </div>
+        {!!totalRatingNumber && (
+          <div className={css.footerItem}>
+            <IconStar className={css.littleStarIcon} />
+            <span>{`${totalRating} (${totalRatingNumber})`}</span>
+          </div>
+        )}
       </div>
 
-      <div className={css.footer}>
-        <div className={css.footerRowItem}>
-          <IconBox className={css.footerItemIcon} />
-          <span>{restaurantPackaging}</span>
+      {restaurantPackaging && (
+        <div className={css.footer}>
+          <div className={css.footerRowItem}>
+            <IconBox className={css.footerItemIcon} />
+            <span>{restaurantPackaging}</span>
+          </div>
         </div>
-      </div>
+      )}
 
       <div className={css.footer}>
         <div className={css.footerRowItem}>
@@ -204,35 +225,70 @@ const RestaurantCard: React.FC<TRestaurantCardProps> = ({
         </div>
       </div>
 
-      <table className={css.tableFood}>
-        <tbody>
-          {first5Foods.map((food, index) => (
-            <FoodRow
-              key={index}
-              foodName={food.foodName}
-              price={food.price}
-              minQuantity={food.minQuantity}
-              keywords={keywords}
-              highLightClass={css.highlightTitle}
-            />
-          ))}
-          {hasMoreThan5Foods && (
-            <tr>
-              <td colSpan={3}>
-                <button
-                  className={classNames(
-                    css.inlineTextButtonRoot,
-                    'text-xs hover:underline hover:cursor-pointer',
-                  )}>
-                  {intl.formatMessage({
-                    id: 'RestaurantCard.viewDetailText',
-                  })}
-                </button>
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+      <div className="bg-blue-50 mt-3 rounded-lg flex">
+        <table className={classNames(css.tableFood, 'my-1 mx-2 flex-1')}>
+          <tbody>
+            {!!sortedMatchedPackagePerMemberFoodsByKeyword.length && (
+              <tr>
+                <td colSpan={3}>
+                  <div className="text-sm font-semibold">Lựa chọn phù hợp</div>
+                </td>
+              </tr>
+            )}
+
+            {!!sortedMatchedPackagePerMemberFoodsByKeyword.length &&
+              sortedMatchedPackagePerMemberFoodsByKeyword.map((food, index) => (
+                <FoodRow
+                  key={index}
+                  foodName={food.foodName}
+                  price={food.price}
+                  minQuantity={food.minQuantity}
+                  keywords={keywords}
+                  highLightClass={css.highlightTitle}
+                />
+              ))}
+
+            {!sortedMatchedPackagePerMemberFoodsByKeyword.length &&
+              !!sortedNonMatchedPackagePerMemberFoodsByKeyword.length && (
+                <tr>
+                  <td colSpan={3}>
+                    <div className="text-sm font-semibold">Menu tham khảo</div>
+                  </td>
+                </tr>
+              )}
+            {!sortedMatchedPackagePerMemberFoodsByKeyword.length &&
+              !!sortedNonMatchedPackagePerMemberFoodsByKeyword.length &&
+              sortedNonMatchedPackagePerMemberFoodsByKeyword.map(
+                (food, index) => (
+                  <FoodRow
+                    key={index}
+                    foodName={food.foodName}
+                    price={food.price}
+                    minQuantity={food.minQuantity}
+                    keywords={keywords}
+                    highLightClass={css.highlightTitle}
+                  />
+                ),
+              )}
+
+            {hasMoreThan5Foods && (
+              <tr>
+                <td colSpan={3}>
+                  <button
+                    className={classNames(
+                      css.inlineTextButtonRoot,
+                      'text-xs hover:underline hover:cursor-pointer',
+                    )}>
+                    {intl.formatMessage({
+                      id: 'RestaurantCard.viewDetailText',
+                    })}
+                  </button>
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
       {favoriteFunc && (
         <Button
           className={css.favoriteBtn}

@@ -130,6 +130,7 @@ const ResultList: React.FC<TResultListProps> = ({
                 restaurant={restaurant}
                 companyGeoOrigin={companyGeoOrigin}
                 foods={foods ?? []}
+                packagePerMember={packagePerMember}
               />
             );
           })}

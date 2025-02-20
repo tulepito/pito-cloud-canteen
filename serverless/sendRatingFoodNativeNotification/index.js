@@ -4,6 +4,22 @@ const { sendNotification } = require('./utils/oneSignal');
 
 const BASE_URL = process.env.CANONICAL_URL;
 
+const buildFullName = (firstName, lastName, compareToGetLongerWith) => {
+  if (!firstName || !lastName) return firstName || lastName || '';
+
+  if (firstName === lastName) return firstName;
+
+  const fullName = `${lastName} ${firstName}`;
+
+  if (!compareToGetLongerWith) return fullName;
+
+  if (fullName.length < compareToGetLongerWith.length) {
+    return compareToGetLongerWith;
+  }
+
+  return fullName;
+};
+
 const createNativeNotification = async ({ notificationParams, sdk }) => {
   const { participantId, foodName, orderId, subOrderDate } = notificationParams;
   const participant = denormalisedResponseEntities(
@@ -12,7 +28,7 @@ const createNativeNotification = async ({ notificationParams, sdk }) => {
     }),
   )[0];
   const participantUser = User(participant);
-  const { displayName } = participantUser.getProfile();
+  const { displayName, firstName, lastName } = participantUser.getProfile();
   const { oneSignalUserIds = [] } = participantUser.getPrivateData();
   const { company = {}, isCompany } = participantUser.getMetadata();
 
@@ -28,11 +44,13 @@ const createNativeNotification = async ({ notificationParams, sdk }) => {
 
   const url = `${BASE_URL}/participant/order/${orderId}/?subOrderDate=${subOrderDate}&openRatingModal=true`;
 
+  const fullName = buildFullName(firstName, lastName, displayName);
+
   await Promise.all(
     oneSignalUserIds.map(async (oneSignalUserId) => {
       await sendNotification({
         title: 'Đánh giá ngày ăn',
-        content: `🌟 ${displayName} ơi, chấm ${foodName} hôm nay mấy điểm?`,
+        content: `🌟 ${fullName} ơi, chấm ${foodName} hôm nay mấy điểm?`,
         url,
         oneSignalUserId,
       });

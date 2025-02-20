@@ -69,6 +69,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           detailTextRating,
           generalRating: ratings[0].generalRating,
           imageUrlList,
+          orderId: orderListing.id?.uuid!,
         });
         await updateRatingForRestaurantFn(ratings);
         await updateRatingForOrderFn({

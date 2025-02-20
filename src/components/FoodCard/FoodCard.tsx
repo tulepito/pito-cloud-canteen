@@ -55,8 +55,13 @@ const FoodCard: React.FC<TFoodCardProps> = ({
   const isVegetarian = foodType === EFoodType.vegetarianDish;
 
   return (
-    <div className={classes}>
-      <div className={css.coverImage} onClick={handleClickFood}>
+    <div
+      className={classNames(
+        classes,
+        '!border-stone-200 hover:!border-stone-400 cursor-pointer',
+      )}
+      onClick={handleClickFood}>
+      <div className={css.coverImage}>
         <ResponsiveImage
           alt="food"
           image={Listing(food!).getImages()[0]}
@@ -66,7 +71,7 @@ const FoodCard: React.FC<TFoodCardProps> = ({
       </div>
       <div className={css.contentContainer}>
         <div className={css.topInfor}>
-          <div className={css.title} onClick={handleClickFood}>
+          <div className={classNames(css.title, '!text-sm font-semibold')}>
             {Listing(food!).getAttributes().title}
           </div>
         </div>
@@ -77,11 +82,17 @@ const FoodCard: React.FC<TFoodCardProps> = ({
             label={foodTypeLabel}
           />
         </div>
-        <div className={css.price}>{`${addCommas(
+        <div
+          className={classNames(
+            css.price,
+            '!text-sm font-semibold',
+          )}>{`${addCommas(
           Listing(food!).getAttributes().price?.amount,
         )} ₫ / Phần`}</div>
       </div>
-      {!hideSelection && selection}
+      {!hideSelection && (
+        <div onClick={(e) => e.stopPropagation()}>{selection}</div>
+      )}
     </div>
   );
 };

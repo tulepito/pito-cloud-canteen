@@ -119,7 +119,7 @@ export const prepareMenuFoodList = async ({
     (foodListing: TListing) => {
       if (packagePerMember <= 0) return true;
 
-      return foodListing.attributes.price.amount <= packagePerMember;
+      return foodListing.attributes.price.amount === packagePerMember;
     },
   );
 
@@ -285,7 +285,7 @@ export function filterMenusHavePackagePerMember(
     const foodIds = Object.keys(foodByIds);
 
     return foodIds.some(
-      (foodId) => foodByIds[foodId].price <= packagePerMember,
+      (foodId) => foodByIds[foodId].price === packagePerMember,
     );
   });
 }

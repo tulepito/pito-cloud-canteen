@@ -25,6 +25,7 @@ export const postRatingFn = async ({
   imageUrlList,
   ratingUserName,
   orderCode,
+  orderId,
 }: {
   companyName: string;
   ratings: TRestaurantRating[];
@@ -33,6 +34,7 @@ export const postRatingFn = async ({
   imageUrlList: string[];
   ratingUserName: string;
   orderCode: string;
+  orderId: string;
 }) => {
   const integrationSdk = getIntegrationSdk();
 
@@ -41,12 +43,12 @@ export const postRatingFn = async ({
   await Promise.all(
     ratings.map(async (rating: any) => {
       const { restaurantId, ...rest } = rating;
-      const { orderId, timestamp, reviewerId } = rest;
+      const { orderId: rOrderId, timestamp, reviewerId } = rest;
       const restaurantListing = await fetchListing(restaurantId, ['author']);
       const listingAuthorUser = User(restaurantListing.author);
       const authorId = listingAuthorUser.getId();
       const response = await integrationSdk.listings.create({
-        title: `Review for ${restaurantListing.attributes.title} - ${orderId} - ${timestamp}`,
+        title: `Review for ${restaurantListing.attributes.title} - ${rOrderId} - ${timestamp}`,
         authorId,
         state: EListingStates.published,
         metadata: {
@@ -62,7 +64,7 @@ export const postRatingFn = async ({
         ENotificationType.SUB_ORDER_REVIEWED_BY_BOOKER,
         {
           userId: authorId,
-          orderId,
+          orderId: rOrderId,
           subOrderDate: timestamp,
           companyName,
           reviewerId,
@@ -82,6 +84,7 @@ export const postRatingFn = async ({
       ratingUserName,
       ratingUserType: 'booker',
       orderCode,
+      orderLink: `${process.env.NEXT_PUBLIC_CANONICAL_URL}/admin/order/${orderId}`,
     },
   });
 };
@@ -138,6 +141,7 @@ export const postParticipantRatingFn = async ({
       ratingUserName,
       ratingUserType: 'participant',
       orderCode,
+      orderLink: `${process.env.NEXT_PUBLIC_CANONICAL_URL}/admin/order/${orderId}`,
     },
   });
 

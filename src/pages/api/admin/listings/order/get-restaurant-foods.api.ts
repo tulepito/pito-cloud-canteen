@@ -124,7 +124,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
               menu,
               dayOfWeek,
               mapFoodId,
-              packagePerMember,
+              {
+                findExactPackagePerMember: {
+                  active: true,
+                  packagePerMember,
+                },
+              },
             );
             if (combinedFoodsMenuData.length) {
               combinedRestaurantInFoods.push(...combinedFoodsMenuData);

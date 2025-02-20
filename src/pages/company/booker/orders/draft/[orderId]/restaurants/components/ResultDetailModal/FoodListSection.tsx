@@ -1,5 +1,6 @@
 import React from 'react';
 import { useIntl } from 'react-intl';
+import classNames from 'classnames';
 
 import FoodCard from '@components/FoodCard/FoodCard';
 import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
@@ -39,7 +40,7 @@ const FoodListSection: React.FC<TFoodsListSectionProps> = ({
       const { price } = foodListing.getAttributes();
       const { equalPriceFoodList, notEqualPriceFoodList } = result;
 
-      if (price.amount > packagePerMember) {
+      if (price.amount !== packagePerMember) {
         notEqualPriceFoodList.push(foodItem);
       } else {
         equalPriceFoodList.push(foodItem);
@@ -73,74 +74,94 @@ const FoodListSection: React.FC<TFoodsListSectionProps> = ({
   );
 
   return (
-    <section className={css.foodSection}>
+    <section className={classNames(css.foodSection)}>
       <div className={css.categories}>
         <div className={css.category}>
-          <h3 className={css.categoryTitle}>
-            {intl.formatMessage({
-              id: 'SelectRestaurantPage.ScopeFoodTitle',
-            })}
-          </h3>
           {fetchFoodInProgress ? (
             <div className={css.loading}>
               <IconSpinner />
             </div>
           ) : (
-            <div className={css.foodList}>
-              {sortesFoodList.map((item) => (
-                <FoodCard
-                  key={`${item?.id.uuid}`}
-                  food={item}
-                  isSelected={selectedFoodIds?.includes(`${item?.id.uuid}`)}
-                  onSelect={onSelectFood}
-                  onRemove={onRemoveFood}
-                  onClick={onClickFood}
-                  className={css.foodItem}
-                  hideSelection={hideSelection}
-                />
-              ))}
-              {foodList.length === 0 && (
+            <div className={classNames(css.foodList, '!gap-2')}>
+              <h3
+                className={classNames(
+                  css.categoryTitle,
+                  '!text-base font-semibold w-full !m-0',
+                )}>
+                Lựa chọn phù hợp
+              </h3>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full">
+                {sortesFoodList.map((item) => (
+                  <FoodCard
+                    food={item}
+                    key={item?.id.uuid}
+                    isSelected={selectedFoodIds?.includes(`${item?.id.uuid}`)}
+                    onSelect={onSelectFood}
+                    onRemove={onRemoveFood}
+                    onClick={onClickFood}
+                    className={classNames(
+                      css.foodItem,
+                      '!w-full !max-w-[unset]',
+                    )}
+                    hideSelection={hideSelection}
+                  />
+                ))}
+              </div>
+
+              {!foodList.length && (
                 <div className={css.emptyFoodList}>
                   {intl.formatMessage({
                     id: 'SelectRestaurantPage.EmptyFood',
                   })}
                 </div>
               )}
+
+              {sortesGreaterFoodList.length > 0 && (
+                <div className={classNames(css.categories, 'w-full')}>
+                  <div className={css.category}>
+                    <h3
+                      className={classNames(
+                        css.categoryTitle,
+                        '!text-base font-semibold w-full !my-2 !mt-4',
+                      )}>
+                      Trong cùng nhà hàng
+                    </h3>
+
+                    {fetchFoodInProgress ? (
+                      <div className={css.loading}>
+                        <IconSpinner />
+                      </div>
+                    ) : (
+                      <div className={classNames(css.foodList, 'w-full')}>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full">
+                          {sortesGreaterFoodList.map((item) => (
+                            <FoodCard
+                              key={`${item?.id.uuid}`}
+                              food={item}
+                              isSelected={selectedFoodIds?.includes(
+                                `${item?.id.uuid}`,
+                              )}
+                              onSelect={onSelectFood}
+                              onRemove={onRemoveFood}
+                              onClick={onClickFood}
+                              className={classNames(
+                                css.foodItem,
+                                '!w-full !max-w-[unset]',
+                              )}
+                              hideSelection={hideSelection}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
       </div>
-      {sortesGreaterFoodList.length > 0 && (
-        <div className={css.categories}>
-          <div className={css.category}>
-            <h3 className={css.categoryTitle}>
-              {intl.formatMessage({
-                id: 'SelectRestaurantPage.OutOfScopeFoodTitle',
-              })}
-            </h3>
-            {fetchFoodInProgress ? (
-              <div className={css.loading}>
-                <IconSpinner />
-              </div>
-            ) : (
-              <div className={css.foodList}>
-                {sortesGreaterFoodList.map((item) => (
-                  <FoodCard
-                    key={`${item?.id.uuid}`}
-                    food={item}
-                    isSelected={selectedFoodIds?.includes(`${item?.id.uuid}`)}
-                    onSelect={onSelectFood}
-                    onRemove={onRemoveFood}
-                    onClick={onClickFood}
-                    className={css.foodItem}
-                    hideSelection={hideSelection}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-      )}
     </section>
   );
 };

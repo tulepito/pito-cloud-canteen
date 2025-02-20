@@ -9,14 +9,15 @@
 
   @include viewportMedium {
     padding: 18px;
+    flex-basis: 712px;
   }
 
   @include viewportLarge {
-    flex-basis: 762px;
+    flex-basis: 864px;
   }
 
   @include viewportSLarge {
-    flex-basis: 1120px;
+    flex-basis: 1240px;
   }
 }
 

@@ -176,8 +176,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
                 menus[i],
                 dayOfWeek,
                 mapFoodId,
-                packagePerMember,
               );
+
               if (combinedFoodsMenuData && combinedFoodsMenuData.length) {
                 combinedRestaurantMenuData.push({
                   restaurantId,
@@ -198,7 +198,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             dayOfWeek,
             keywords,
             mapFoodId,
-            packagePerMember,
           );
           if (menuFound) {
             combinedRestaurantMenuData.push({
@@ -212,7 +211,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           }
         });
 
-        // save keywords
         if (keywords && companyAccount) {
           const currentUserId = CurrentUser(companyAccount).getId();
           const { previousKeywords = [] } =
@@ -229,7 +227,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
                 ? previousKeywords.filter((kw: string) => kw !== keywords)
                 : []),
             ];
-            await integrationSdk.users.updateProfile({
+            integrationSdk.users.updateProfile({
               id: currentUserId,
               metadata: {
                 previousKeywords: arrayKeywords,
@@ -238,11 +236,29 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           }
         }
 
+        const matchedPackagePerMemberRestaurants = searchResult.map(
+          (restaurant) => {
+            const restaurantId = restaurant.id.uuid;
+            const restHavingMatchedPackagePerMemberFoods =
+              combinedRestaurantInFoods.filter(
+                (food) =>
+                  food.restaurantId === restaurantId &&
+                  food.price === packagePerMember,
+              );
+
+            return {
+              ...restaurant,
+              numberOfMatchedPackagePerMemberFoods:
+                restHavingMatchedPackagePerMemberFoods.length,
+            };
+          },
+        );
+
         return res.status(200).json({
           ...(restaurantIdList.length > 0 && {
             restaurantIdList,
           }),
-          searchResult,
+          searchResult: matchedPackagePerMemberRestaurants,
           combinedRestaurantMenuData,
           totalItems: searchResult.length,
           combinedRestaurantInFoods,

@@ -113,6 +113,7 @@ type SlackNotificationParams = {
     images: string[];
     ratingUserName: string;
     partnerName: string;
+    orderLink: string;
     orderCode: string;
     ratingUserType: 'participant' | 'booker';
   };
@@ -149,7 +150,7 @@ export const createSlackNotification = async (
                 type: 'section',
                 text: {
                   type: 'mrkdwn',
-                  text: `[${userTypeData.label}] ${notificationParams.participantRatingData.ratingUserName} đã đánh giá ${notificationParams.participantRatingData.ratingScore} :star: cho nhà hàng *${notificationParams.participantRatingData.partnerName}* trong đơn hàng *#${notificationParams.participantRatingData.orderCode}*`,
+                  text: `[${userTypeData.label}] ${notificationParams.participantRatingData.ratingUserName} đã đánh giá ${notificationParams.participantRatingData.ratingScore} :star: cho nhà hàng *${notificationParams.participantRatingData.partnerName}* trong đơn hàng *<${notificationParams.participantRatingData.orderLink}|#${notificationParams.participantRatingData.orderCode}>*`,
                 },
               },
               ...(notificationParams.participantRatingData.content

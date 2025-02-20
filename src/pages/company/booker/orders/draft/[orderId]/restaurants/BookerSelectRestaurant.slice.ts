@@ -236,12 +236,30 @@ const searchRestaurants = createAsyncThunk(
       params,
     );
 
+    const matchedPackagePerMemberRestaurants =
+      restaurantData.searchResult.filter(
+        (restaurant: any) => !!restaurant.numberOfMatchedPackagePerMemberFoods,
+      );
+
+    const nonMatchedPackagePerMemberRestaurants =
+      restaurantData.searchResult.filter(
+        (restaurant: any) => !restaurant.numberOfMatchedPackagePerMemberFoods,
+      );
+
+    const sortedRestaurants = [
+      ...(matchedPackagePerMemberRestaurants.sort(
+        (first: TListing, second: TListing) =>
+          sortRestaurants(deliveryAddress.origin, first, second),
+      ) || []),
+      ...(nonMatchedPackagePerMemberRestaurants.sort(
+        (first: TListing, second: TListing) =>
+          sortRestaurants(deliveryAddress.origin, first, second),
+      ) || []),
+    ];
+
     return {
       restaurantIdList: restaurantData.restaurantIdList ?? [],
-      searchResult:
-        restaurantData.searchResult.sort((first: TListing, second: TListing) =>
-          sortRestaurants(deliveryAddress.origin, first, second),
-        ) ?? [],
+      searchResult: sortedRestaurants,
       combinedRestaurantMenuData:
         restaurantData.combinedRestaurantMenuData ?? [],
       totalItems: restaurantData.totalItems ?? 0,
