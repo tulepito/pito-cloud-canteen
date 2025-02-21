@@ -89,7 +89,7 @@ const FilterSidebarFormComponent: React.FC<TFilterSidebarFormComponentProps> = (
         </div>
         <div className={css.filterWrapper}>
           <CollapseFilter
-            title="Loại ấm thực"
+            title="Loại ẩm thực"
             name="categories"
             options={categoriesOptions}
           />

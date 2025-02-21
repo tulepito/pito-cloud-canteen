@@ -19,6 +19,9 @@ export const enGeneralPaths = {
   Tracking: '/tracking/[subOrderId]',
   SentryExamplePage: '/sentry-example-page',
   getInvitationPath: (orderId: string) => `/invitation/${orderId}`,
+  auth: {
+    index: '/auth',
+  },
   company: {
     orders: {
       '[orderId]': {
