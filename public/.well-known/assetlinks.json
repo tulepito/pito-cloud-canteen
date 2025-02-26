@@ -1,11 +1,15 @@
 [
   {
-    "relation": ["delegate_permission/common.handle_all_urls"],
+    "relation": [
+      "delegate_permission/common.handle_all_urls",
+      "delegate_permission/common.get_login_creds"
+    ],
     "target": {
       "namespace": "android_app",
       "package_name": "io.gonative.android.eoxmjq",
       "sha256_cert_fingerprints": [
-        "8C:D7:B8:A4:3E:35:44:8D:F1:AC:FF:85:24:47:6C:B2:79:26:68:72:87:02:E5:88:5B:EB:BC:66:EF:B7:BA:B5"
+        "8C:D7:B8:A4:3E:35:44:8D:F1:AC:FF:85:24:47:6C:B2:79:26:68:72:87:02:E5:88:5B:EB:BC:66:EF:B7:BA:B5",
+        "70:A5:5D:2C:BF:08:E9:99:35:C4:B4:89:36:23:33:0B:02:62:E2:8C:84:EF:F3:68:79:B7:4D:F0:4A:72:6C:DA"
       ]
     }
   }

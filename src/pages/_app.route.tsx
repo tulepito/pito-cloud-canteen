@@ -8,6 +8,7 @@ import nProgress from 'nprogress';
 import AuthGuard from '@components/Guards/AuthGuard';
 import GoNativeProvider from '@components/Guards/GoNativeProvider';
 import PermissionGuard from '@components/Guards/PermissionGuard';
+import { LoadingContainerImagePreloader } from '@components/LoadingContainer/LoadingContainer';
 import ToastifyProvider from '@components/ToastifyProvider/ToastifyProvider';
 import UIProvider from '@components/UIProvider/UIProvider';
 import store from '@redux/store';
@@ -59,6 +60,7 @@ const MyApp = ({
           </AuthGuard>
         </UIProvider>
       </Provider>
+      <LoadingContainerImagePreloader />
       <Script
         src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places&callback=Function.prototype`}
       />

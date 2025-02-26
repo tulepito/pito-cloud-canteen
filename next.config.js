@@ -21,6 +21,19 @@ const nextConfig = {
       { source: '/xac-nhan-email', destination: '/verify-email' },
     ];
   },
+  headers: async () => {
+    return [
+      {
+        source: '/static/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+    ];
+  },
   pageExtensions: ['route.tsx', 'route.jsx', 'api.ts', 'api.js'],
   images: {
     domains: ['sharetribe.imgix.net', 'res.cloudinary.com'],

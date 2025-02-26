@@ -14,6 +14,7 @@ interface UserLabelRecord {
   participantName: string;
   foodName: string;
   ratingUrl: string;
+  requirement?: string;
 }
 
 function UserLabelHiddenSection({
@@ -43,16 +44,18 @@ function UserLabelHiddenSection({
             };
             foodData: {
               foodName: string;
+              requirement: string;
             };
             restaurant: {
               restaurantName: string;
             };
           }) => {
             const { name: participantName } = memberData || {};
-            const { foodName } = foodData || {};
+            const { foodName, requirement } = foodData || {};
 
             return {
               partnerName: restaurant?.restaurantName,
+              requirement,
               companyName:
                 company?.attributes?.profile?.publicData?.companyName,
               mealDate: DateTime.fromMillis(Number(date)).toFormat(
@@ -99,7 +102,7 @@ function UserLabelHiddenSection({
   })();
 
   return (
-    <div className="h-0 overflow-hidden">
+    <div className="h-0 overflow-hidden absolute">
       <div>
         {chunksOf18UserLabelRecords.map((userLabelRecordsx18, index) => (
           <div
@@ -115,6 +118,7 @@ function UserLabelHiddenSection({
                   participantName={userLabelRecord.participantName}
                   foodName={userLabelRecord.foodName}
                   ratingUrl={userLabelRecord.ratingUrl}
+                  note={userLabelRecord.requirement}
                 />
               </div>
             ))}

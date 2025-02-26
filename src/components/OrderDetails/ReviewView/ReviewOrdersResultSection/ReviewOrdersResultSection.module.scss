@@ -1,6 +1,7 @@
 @use '/src/styles/vars.scss' as *;
 @use '/src/styles/customMediaQueries.scss' as *;
 @use '/src/styles/mixins.scss' as *;
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&family=Reddit+Sans:ital,wght@0,200..900;1,200..900&display=swap');
 
 .root {
   display: flex;
