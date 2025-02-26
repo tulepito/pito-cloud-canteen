@@ -3,12 +3,12 @@ import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
+import classNames from 'classnames';
 
 import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
 import FieldRating from '@components/FormFields/FieldRating/FieldRating';
 import FieldTextArea from '@components/FormFields/FieldTextArea/FieldTextArea';
-import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useAppSelector } from '@hooks/reduxHooks';
 import RatingImagesUploadField from '@pages/company/orders/[orderId]/components/RatingImagesUploadField/RatingImagesUploadField';
 
@@ -26,6 +26,7 @@ type TExtraProps = {
   images?: any;
   inProgress?: boolean;
   formRef?: any;
+  hideFormTitle?: boolean;
 };
 type TRatingSubOrderFormComponentProps =
   FormRenderProps<TRatingSubOrderFormValues> & Partial<TExtraProps>;
@@ -35,11 +36,10 @@ type TRatingSubOrderFormProps = FormProps<TRatingSubOrderFormValues> &
 const RatingSubOrderFormComponent: React.FC<
   TRatingSubOrderFormComponentProps
 > = (props) => {
-  const { handleSubmit, values, inProgress, form, formRef } = props;
+  const { handleSubmit, values, inProgress, form, formRef, hideFormTitle } =
+    props;
   const intl = useIntl();
   const hasGeneralRating = !!values?.general;
-  const hadFoodRating = !!values?.food;
-  const hadPackagingRating = !!values?.packaging;
   useImperativeHandle(formRef, () => form);
   const images = useAppSelector(
     (state) => state.uploadImage.images,
@@ -61,64 +61,115 @@ const RatingSubOrderFormComponent: React.FC<
     uploadImageInProgress;
 
   return (
-    <Form className={css.container} onSubmit={handleSubmit}>
+    <Form
+      className={classNames(css.container, 'w-full')}
+      onSubmit={handleSubmit}>
       <div className={css.generalRatingWrapper}>
-        <div className={css.generalRatingTitle}>Đánh giá tổng quan</div>
+        {!hideFormTitle && (
+          <div
+            className={classNames(
+              css.generalRatingTitle,
+              '!text-lg !font-semibold',
+            )}>
+            Đánh giá tổng quan
+          </div>
+        )}
         <FieldRating
           name="general"
           containerClassName={css.generalRatingField}
         />
       </div>
-      <RenderWhen condition={hasGeneralRating}>
-        <>
-          <div className={css.detailRatingWrapper}>
-            <div className={css.detailRatingTitle}>1. Món ăn</div>
-            <FieldRating
-              name="food"
-              containerClassName={css.detailRatingField}
-            />
-            <RenderWhen condition={hadFoodRating}>
-              <div className={css.ratingValue}>
-                {intl.formatMessage({
-                  id: `FieldRating.label.${values?.food}`,
-                })}
+
+      <div
+        className={classNames(
+          'transition-all duration-300 ease-in-out overflow-hidden max-h-[2000px]',
+          {
+            '!max-h-0': !hasGeneralRating,
+          },
+        )}>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-0 md:gap-4">
+          <div
+            className={classNames(
+              css.detailRatingWrapper,
+              'bg-stone-50 p-4 rounded-lg border border-solid border-stone-300',
+            )}>
+            <div
+              className={classNames(
+                css.detailRatingTitle,
+                '!text-sm !font-semibold md:!text-base text-center !m-0',
+              )}>
+              <div>Món ăn</div>
+              <div className="min-h-[24px]">
+                {values?.food ? (
+                  <span className="!font-normal">
+                    {`${intl.formatMessage({
+                      id: `FieldRating.label.${values?.food}`,
+                    })}`}
+                  </span>
+                ) : (
+                  ''
+                )}
               </div>
-            </RenderWhen>
+            </div>
+            <div className="mx-auto w-[200px]">
+              <FieldRating
+                name="food"
+                containerClassName={classNames(css.detailRatingField, '!gap-2')}
+              />
+            </div>
           </div>
-          <div className={css.detailRatingWrapper}>
-            <div className={css.detailRatingTitle}>2. Dụng cụ</div>
-            <FieldRating
-              name="packaging"
-              containerClassName={css.detailRatingField}
-            />
-            <RenderWhen condition={hadPackagingRating}>
-              <div className={css.ratingValue}>
-                {intl.formatMessage({
-                  id: `FieldRating.label.${values?.packaging}`,
-                })}
+          <div
+            className={classNames(
+              css.detailRatingWrapper,
+              'bg-stone-50 p-4 rounded-lg border border-solid border-stone-300',
+            )}>
+            <div
+              className={classNames(
+                css.detailRatingTitle,
+                '!text-sm !font-semibold md:!text-base text-center !mt-0 !mb-0',
+              )}>
+              <div>Dụng cụ</div>
+              <div className="min-h-[24px]">
+                {values?.packaging ? (
+                  <span className="!font-normal">
+                    {`${intl.formatMessage({
+                      id: `FieldRating.label.${values?.packaging}`,
+                    })}`}
+                  </span>
+                ) : (
+                  ''
+                )}
               </div>
-            </RenderWhen>
+            </div>
+
+            <div className="mx-auto w-[200px]">
+              <FieldRating
+                name="packaging"
+                containerClassName={css.detailRatingField}
+              />
+            </div>
           </div>
-          <div className={css.detailTextRatingWrapper}>
-            <FieldTextArea
-              id="detailTextRating"
-              name="detailTextRating"
-              label="Đánh giá chi tiết"
-              labelClassName={css.detailTextRatingLabel}
-              placeholder="Hãy giúp chúng tôi hiểu rõ hơn cảm nhận của bạn sau buổi ăn"
-              className={css.textareaField}
-            />
-          </div>
-          <div className={css.imagesRatingWrapper}>
-            <div className={css.imagesRatingTitle}>Hình ảnh</div>
-            <RatingImagesUploadField
-              images={images}
-              containerClassName={css.imagesFieldWrapper}
-              uploadImageInProgress={uploadImageInProgress}
-            />
-          </div>
-        </>
-      </RenderWhen>
+        </div>
+
+        <div className={css.detailTextRatingWrapper}>
+          <FieldTextArea
+            id="detailTextRating"
+            name="detailTextRating"
+            label="Đánh giá chi tiết"
+            labelClassName={css.detailTextRatingLabel}
+            placeholder="Hãy giúp chúng tôi hiểu rõ hơn cảm nhận của bạn sau buổi ăn"
+            className={css.textareaField}
+          />
+        </div>
+        <div className={css.imagesRatingWrapper}>
+          <div className={css.imagesRatingTitle}>Hình ảnh</div>
+          <RatingImagesUploadField
+            images={images}
+            containerClassName={css.imagesFieldWrapper}
+            uploadImageInProgress={uploadImageInProgress}
+          />
+        </div>
+      </div>
 
       <div className={css.submitBtnWrapper}>
         <Button

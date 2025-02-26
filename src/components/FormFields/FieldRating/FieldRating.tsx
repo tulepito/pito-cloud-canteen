@@ -29,7 +29,11 @@ const FieldRating: React.FC<TFieldRatingProps> = (props) => {
   const intl = useIntl();
 
   const containerClasses = classNames(css.container, containerClassName);
-  const labelClasses = classNames(css.label, labelClassName);
+  const labelClasses = classNames(
+    css.label,
+    labelClassName,
+    'text-xs w-full group',
+  );
 
   return (
     <div className={containerClasses}>
@@ -47,12 +51,21 @@ const FieldRating: React.FC<TFieldRatingProps> = (props) => {
               component="input"
             />
             <label className={labelClasses} htmlFor={`${name}-${rating}`}>
-              <IconRatingFace className={iconClassName} rating={rating} />
+              <IconRatingFace
+                className={classNames(
+                  iconClassName,
+                  'group-hover:transform group-hover:scale-110 will-change-transform transition-transform duration-200 ease-in-out',
+                )}
+                rating={rating}
+              />
 
               <span
-                className={classNames({
-                  [css.labelText]: !titleShowed,
-                })}>
+                className={classNames(
+                  {
+                    [css.labelText]: !titleShowed,
+                  },
+                  '!text-[10px] md:!text-sm',
+                )}>
                 {intl.formatMessage({ id: `FieldRating.label.${rating}` })}
               </span>
             </label>

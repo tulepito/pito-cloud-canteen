@@ -2,6 +2,7 @@ import { useMemo, useRef } from 'react';
 import type { Event } from 'react-big-calendar';
 import { shallowEqual } from 'react-redux';
 import { toast } from 'react-toastify';
+import classNames from 'classnames';
 
 import Modal from '@components/Modal/Modal';
 import SlideModal from '@components/SlideModal/SlideModal';
@@ -126,21 +127,26 @@ const RatingSubOrderModal: React.FC<TRatingSubOrderModalProps> = (props) => {
       </SlideModal>
     );
 
-  return (
-    <Modal
-      id="RatingSubOrderModal"
-      isOpen={isOpen}
-      handleClose={handleClose}
-      containerClassName={css.modalContainer}
-      title={`Đánh giá món ${foodName}`}>
-      <RatingSubOrderForm
-        onSubmit={handleSubmit}
-        initialValues={initialValues}
-        inProgress={participantPostRatingInProgress}
-        formRef={formRef}
-      />
-    </Modal>
-  );
+  if (isOpen) {
+    return (
+      <Modal
+        id="RatingSubOrderModal"
+        isOpen={isOpen}
+        handleClose={handleClose}
+        containerClassName={classNames(css.modalContainer, '!px-4')}
+        title={`Đánh giá món ${foodName}`}>
+        <RatingSubOrderForm
+          onSubmit={handleSubmit}
+          initialValues={initialValues}
+          inProgress={participantPostRatingInProgress}
+          formRef={formRef}
+          hideFormTitle
+        />
+      </Modal>
+    );
+  }
+
+  return null;
 };
 
 export default RatingSubOrderModal;

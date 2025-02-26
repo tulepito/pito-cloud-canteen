@@ -88,7 +88,7 @@ const FoodListSection: React.FC<TFoodsListSectionProps> = ({
                   css.categoryTitle,
                   '!text-base font-semibold w-full !m-0',
                 )}>
-                Lựa chọn phù hợp
+                Món ăn nằm trong mức giá đã chọn
               </h3>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full">
@@ -125,7 +125,7 @@ const FoodListSection: React.FC<TFoodsListSectionProps> = ({
                         css.categoryTitle,
                         '!text-base font-semibold w-full !my-2 !mt-4',
                       )}>
-                      Trong cùng nhà hàng
+                      Món ăn nằm ngoài mức giá đã chọn
                     </h3>
 
                     {fetchFoodInProgress ? (
