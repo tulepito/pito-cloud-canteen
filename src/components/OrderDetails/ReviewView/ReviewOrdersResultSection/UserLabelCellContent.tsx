@@ -22,6 +22,9 @@ function UserLabelCellContent({
 
   useEffect(() => {
     QRCode.toDataURL(ratingUrl, {
+      small: true,
+      margin: 2,
+      scale: 4,
       errorCorrectionLevel: 'L',
     }).then((url: string) => {
       setQrCodeDataUrl(url);
@@ -29,36 +32,35 @@ function UserLabelCellContent({
   }, [ratingUrl]);
 
   return (
-    <div className="relative w-full font-serif h-full gap-0 px-2 py-2 flex flex-col items-center">
+    <div className="relative w-full h-full gap-0 px-2 py-2 ">
       <div className="flex items-center justify-between w-full">
-        <div className="flex flex-col items-center gap-0 flex-1">
-          <div className="text-xs text-center flex flex-col justify-center items-center gap-0">
-            <div
-              className="text-[3.6mm] text-center h-[5mm]"
-              style={{
-                fontFamily: 'Quicksand',
-              }}>
-              {companyName.slice(0, 12) +
-                (companyName.length > 12 ? '...' : '')}
-            </div>
-            <div
-              className="text-[3.1mm] text-center h-[5mm] italic"
-              style={{
-                fontFamily: 'Quicksand',
-              }}>
-              {partnerName.slice(0, 14) +
-                (partnerName.length > 14 ? '...' : '')}
-            </div>
-          </div>
+        <div className="w-[calc(100%-30mm)] h-[14mm] overflow-hidden">
           <div
-            className="text-[3.1mm] text-center font-semibold"
+            className="text-[2.8mm] h-[4.75mm] overflow-hidden"
             style={{
               fontFamily: 'Quicksand',
+              lineHeight: 1.0,
+            }}>
+            {companyName}
+          </div>
+          <div
+            className="text-[2.8mm] italic h-[4.75mm] overflow-hidden"
+            style={{
+              fontFamily: 'Quicksand',
+              lineHeight: 1.0,
+            }}>
+            {partnerName}
+          </div>
+          <div
+            className="text-[2.8mm] font-semibold h-[4.5mm] overflow-hidden"
+            style={{
+              fontFamily: 'Quicksand',
+              lineHeight: 1.0,
             }}>
             {mealDate}
           </div>
         </div>
-        <div className="mx-auto flex gap-1">
+        <div className="mx-auto flex gap-1 w-[28mm] justify-end">
           <p
             className="m-0 text-right text-[2.6mm]"
             style={{
@@ -68,7 +70,7 @@ function UserLabelCellContent({
             <br /> <span className="text-nowrap">đánh giá</span>
           </p>
           <div className="relative ">
-            <div className="absolute bottom-[-4mm] left-[-7mm] w-[8mm] h-[8mm]">
+            <div className="absolute bottom-[0mm] left-[-7mm] w-[8mm] h-[8mm]">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 xmlnsXlink="http://www.w3.org/1999/xlink"
@@ -105,39 +107,42 @@ function UserLabelCellContent({
           </div>
           <img
             src={qrCodeDataUrl}
-            className="w-[12mm] h-[12mm] min-w-[12mm] min-h-[12mm]"
+            className="w-[16mm] h-[16mm] min-w-[16mm] min-h-[16mm]"
             alt="QR Code"
           />
         </div>
       </div>
 
-      <div
-        className="w-full px-2 text-[4.3mm] font-semibold text-center absolute bottom-[24mm] left-1/2 transform -translate-x-1/2"
-        style={{
-          wordBreak: 'break-word',
-          fontFamily: 'Reddit Sans',
-          lineHeight: 1.0,
-        }}>
-        {participantName.slice(0, 32) +
-          (participantName.length > 32 ? '...' : '')}
-      </div>
-      <div className="w-[12mm] h-[0.5mm] mt-4 bg-stone-600 absolute bottom-[18mm] left-1/2 transform -translate-x-1/2"></div>
-      <div
-        className="text-[3.3mm] w-full px-[2mm] text-center font-semibold absolute bottom-[14mm] left-1/2 transform -translate-x-1/2"
-        style={{
-          wordBreak: 'break-word',
-          fontFamily: 'Reddit Sans',
-        }}>
-        {foodName.slice(0, 22) + (foodName.length > 22 ? '...' : '')}
-      </div>
+      <div className="flex items-center flex-col justify-center">
+        <div
+          className="w-full px-2 text-[4mm] font-semibold text-center min-h-[7mm] pb-[2.5mm] max-h-[11.5mm] overflow-hidden"
+          style={{
+            wordBreak: 'break-word',
+            fontFamily: 'Reddit Sans',
+            lineHeight: 1.1,
+          }}>
+          {participantName}
+        </div>
+        <div className="w-[12mm] h-[0.5mm] mt-[2mm] bg-stone-600"></div>
+        <div
+          className="text-[3.2mm] w-full px-[2mm] text-center font-semibold h-[9mm] overflow-hidden"
+          style={{
+            wordBreak: 'break-word',
+            fontFamily: 'Reddit Sans',
+            lineHeight: 1.1,
+          }}>
+          {foodName}
+        </div>
 
-      <div
-        className="text-[3.3mm] w-full text-center font-light italic absolute bottom-[8mm] left-1/2 transform -translate-x-1/2"
-        style={{
-          wordBreak: 'break-word',
-          fontFamily: 'Reddit Sans',
-        }}>
-        {`${note?.slice(0, 22)}${(note?.length || 0) > 22 ? '...' : ''}`}
+        <div
+          className="text-[3.3mm] w-full text-center font-light italic h-[5.5mm] overflow-hidden mt-[-1.5mm]"
+          style={{
+            wordBreak: 'break-word',
+            fontFamily: 'Reddit Sans',
+            lineHeight: 1,
+          }}>
+          {note}
+        </div>
       </div>
 
       <i
@@ -150,5 +155,4 @@ function UserLabelCellContent({
     </div>
   );
 }
-
 export default UserLabelCellContent;

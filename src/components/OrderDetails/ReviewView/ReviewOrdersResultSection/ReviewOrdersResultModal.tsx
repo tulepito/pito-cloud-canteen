@@ -206,6 +206,7 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
   }, [JSON.stringify(preparedData)]);
 
   const generateUserLabels = async (exportType: 'state' | 'pdf-file') => {
+    if (!isAdmin) return;
     if (!allowTriggerGenerateUserLabelFile.current) return;
 
     logger.info('Generating user labels...', 'START');
@@ -221,13 +222,11 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
     for (let i = 0; i < printableAreas.length; i++) {
       const printableArea = printableAreas[i];
       const canvas = await html2canvas(printableArea as any, {
-        scale: 2,
+        scale: 3,
         useCORS: true,
         allowTaint: true,
       });
-      /**
-       * TODO: improve performance by caching the image data
-       */
+
       const imgData = canvas.toDataURL('image/png');
 
       if (exportType === 'state') {
@@ -269,8 +268,10 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
    * When targetedDate is changed, trigger the generation of user labels
    */
   useEffect(() => {
-    generateUserLabels('state');
-  }, [targetedDate]);
+    if (isOpen) {
+      generateUserLabels('state');
+    }
+  }, [targetedDate, isOpen]);
 
   const withSetCurrentDateTo =
     (date: string | 'all', callback: () => void) => () => {
