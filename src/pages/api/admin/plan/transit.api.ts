@@ -196,21 +196,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
                     userId: participantId,
                   },
                 );
-
-                const { foodId } = memberOrders[participantId] || {};
-
-                if (foodId) {
-                  const { foodName = '' } = foodList[foodId];
-                  createNativeNotification(
-                    ENativeNotificationType.AdminTransitSubOrderToDelivering,
-                    {
-                      participantId,
-                      planId,
-                      subOrderDate: startTimestamp.toString(),
-                      foodName,
-                    },
-                  );
-                }
               },
             );
             createNativeNotificationToBooker(

@@ -415,7 +415,6 @@ export const CONFIGS_BASE_ON_PAYMENT_STATUS = {
 export enum ENativeNotificationType {
   BookerTransitOrderStateToPicking = 'BookerTransitOrderStateToPicking',
   BookerTransitOrderStateToInProgress = 'BookerTransitOrderStateToInProgress',
-  AdminTransitSubOrderToDelivering = 'AdminTransitSubOrderToDelivering',
   AdminTransitSubOrderToDelivered = 'AdminTransitSubOrderToDelivered',
   AdminTransitSubOrderToCanceled = 'AdminTransitSubOrderToCanceled',
   TransitOrderStateToCanceled = 'TransitOrderStateToCanceled',

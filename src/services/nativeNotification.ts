@@ -96,21 +96,6 @@ export const createNativeNotification = async (
         });
       }
       break;
-    case ENativeNotificationType.AdminTransitSubOrderToDelivering:
-      {
-        const { foodName, planId, subOrderDate } = notificationParams;
-        const url = `${BASE_URL}/participant/orders/?planId=${planId}&timestamp=${subOrderDate}&viewMode=week`;
-
-        oneSignalUserIds.forEach((oneSignalUserId: string) => {
-          sendNotification({
-            title: '🛵 🛵 🛵 Cơm sắp đến',
-            content: `🌟 ${foodName} sắp đến rồi. Chuẩn bị ăn thôi`,
-            url,
-            oneSignalUserId,
-          });
-        });
-      }
-      break;
     case ENativeNotificationType.AdminTransitSubOrderToDelivered:
       {
         const { foodName, planId, subOrderDate } = notificationParams;
