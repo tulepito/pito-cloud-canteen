@@ -1,7 +1,6 @@
-import { useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { Event } from 'react-big-calendar';
 import { shallowEqual } from 'react-redux';
-import { toast } from 'react-toastify';
 import classNames from 'classnames';
 
 import Modal from '@components/Modal/Modal';
@@ -16,6 +15,8 @@ import { OrderListThunks } from '../../OrderList.slice';
 import type { TRatingSubOrderFormValues } from '../RatingSubOrderForm/RatingSubOrderForm';
 import RatingSubOrderForm from '../RatingSubOrderForm/RatingSubOrderForm';
 
+import { RatingSuccessIllustration } from './RatingSuccessIllustration';
+
 import css from './RatingSubOrderModal.module.scss';
 
 type TRatingSubOrderModalProps = {
@@ -23,7 +24,6 @@ type TRatingSubOrderModalProps = {
   onClose: () => void;
   currentUserId: string;
   selectedEvent: Event | null;
-  onRatingSuccess?: () => void;
   participantPostRatingInProgress?: boolean;
 };
 const RatingSubOrderModal: React.FC<TRatingSubOrderModalProps> = (props) => {
@@ -32,19 +32,30 @@ const RatingSubOrderModal: React.FC<TRatingSubOrderModalProps> = (props) => {
     onClose,
     currentUserId,
     selectedEvent,
-    onRatingSuccess,
     participantPostRatingInProgress,
   } = props;
   const orders = useAppSelector(
     (state) => state.ParticipantOrderList.orders,
     shallowEqual,
   );
+  const [ratingCompletedLevel, setRatingCompletedLevel] = useState<
+    'bad' | 'normal' | 'good'
+  >();
   const dispatch = useAppDispatch();
   const { isMobileLayout } = useViewport();
   const { companyName, orderId, restaurant, timestamp, planId, foodName } =
     selectedEvent?.resource || {};
   const restaurantId = restaurant?.id;
   const formRef = useRef<any>(null);
+
+  /**
+   * Reset ratingCompletedLevel when modal is closed
+   */
+  useEffect(() => {
+    if (!isOpen) {
+      setRatingCompletedLevel(undefined);
+    }
+  }, [isOpen]);
 
   const handleClose = () => {
     dispatch(resetImage());
@@ -91,9 +102,9 @@ const RatingSubOrderModal: React.FC<TRatingSubOrderModalProps> = (props) => {
     );
 
     if (meta.requestStatus === 'fulfilled') {
-      handleClose();
-      onRatingSuccess?.();
-      toast.success('Cảm ơn bạn đã đánh giá');
+      setRatingCompletedLevel(
+        +general < 3 ? 'bad' : +general < 4 ? 'normal' : 'good',
+      );
       dispatch(
         SubOrdersThunks.fetchSubOrdersFromFirebase({
           participantId: currentUserId,
@@ -112,18 +123,30 @@ const RatingSubOrderModal: React.FC<TRatingSubOrderModalProps> = (props) => {
     }
   };
 
+  const renderer = ratingCompletedLevel ? (
+    <RatingSuccessIllustration
+      level={ratingCompletedLevel}
+      action={() => {
+        handleClose();
+      }}
+    />
+  ) : (
+    <RatingSubOrderForm
+      onSubmit={handleSubmit}
+      initialValues={initialValues}
+      inProgress={participantPostRatingInProgress}
+      formRef={formRef}
+      hideFormTitle={!isMobileLayout}
+    />
+  );
+
   if (isMobileLayout)
     return (
       <SlideModal
         id="RatingSubOrderModal"
         isOpen={isOpen}
         onClose={handleClose}>
-        <RatingSubOrderForm
-          onSubmit={handleSubmit}
-          initialValues={initialValues}
-          inProgress={participantPostRatingInProgress}
-          formRef={formRef}
-        />
+        {renderer}
       </SlideModal>
     );
 
@@ -135,13 +158,7 @@ const RatingSubOrderModal: React.FC<TRatingSubOrderModalProps> = (props) => {
         handleClose={handleClose}
         containerClassName={classNames(css.modalContainer, '!px-4')}
         title={`Đánh giá món ${foodName}`}>
-        <RatingSubOrderForm
-          onSubmit={handleSubmit}
-          initialValues={initialValues}
-          inProgress={participantPostRatingInProgress}
-          formRef={formRef}
-          hideFormTitle
-        />
+        {renderer}
       </Modal>
     );
   }

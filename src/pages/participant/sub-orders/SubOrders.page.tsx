@@ -57,10 +57,6 @@ const SubOrders = () => {
     (state) => state.ParticipantOrderList.participantPostRatingInProgress,
   );
 
-  const onRatingSuccess = () => {
-    ratingSubOrderModalControl.setFalse();
-  };
-
   useEffect(() => {
     if (planIdFromQuery && timestampFromQuery) {
       const subOrderId = `${currentUserId} - ${planIdFromQuery} - ${timestampFromQuery}`;
@@ -170,7 +166,6 @@ const SubOrders = () => {
           onClose={ratingSubOrderModalControl.setFalse}
           selectedEvent={selectedEvent}
           currentUserId={currentUserId}
-          onRatingSuccess={onRatingSuccess}
           participantPostRatingInProgress={participantPostRatingInProgress}
         />
       </RenderWhen>

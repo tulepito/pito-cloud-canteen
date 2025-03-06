@@ -362,10 +362,6 @@ const OrderListPage = () => {
     }
   };
 
-  const onRatingSuccess = () => {
-    ratingSubOrderModalControl.setFalse();
-  };
-
   const handleChangeTimePeriod = (action: string) => {
     if (action === 'TODAY') {
       handleSelectDay(new Date());
@@ -769,7 +765,6 @@ const OrderListPage = () => {
         onClose={ratingSubOrderModalControl.setFalse}
         selectedEvent={selectedEvent}
         currentUserId={currentUserId}
-        onRatingSuccess={onRatingSuccess}
         participantPostRatingInProgress={participantPostRatingInProgress}
       />
 
