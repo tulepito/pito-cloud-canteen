@@ -94,8 +94,8 @@ function UserLabelHiddenSection({
         partnerName: firstCurrent.partnerName,
         companyName: firstCurrent.companyName,
         mealDate: firstCurrent.mealDate,
-        participantName: '...',
-        foodName: '.....',
+        participantName: '   ',
+        foodName: '   ',
         ratingUrl: firstCurrent.ratingUrl,
         requirement: '',
       });
