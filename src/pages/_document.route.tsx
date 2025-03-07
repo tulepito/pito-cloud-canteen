@@ -36,6 +36,10 @@ export default function Document() {
           href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap"
           rel="stylesheet"
         />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&family=Reddit+Sans:ital,wght@0,200..900;1,200..900&display=swap"
+          rel="stylesheet"
+        />
       </Head>
       <body>
         <Main />

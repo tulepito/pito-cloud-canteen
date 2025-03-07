@@ -20,6 +20,31 @@ const buildFullName = (firstName, lastName, compareToGetLongerWith) => {
   return fullName;
 };
 
+const ECompanyPermission = {
+  owner: 'owner',
+  booker: 'booker',
+  participant: 'participant',
+  accountant: 'accountant',
+};
+
+const checkUserPermission = (currentUser, permissions) => {
+  const { company } = currentUser.attributes?.profile?.metadata || {};
+
+  return Object.values(company || {}).some((value) => {
+    if (!value) {
+      return false;
+    }
+
+    const { permission } = value;
+
+    return permission && permissions.includes(permission);
+  });
+};
+
+const isUserAParticipant = (currentUser) => {
+  return checkUserPermission(currentUser, [ECompanyPermission.participant]);
+};
+
 const createNativeNotification = async ({ notificationParams, sdk }) => {
   const { participantId, foodName, orderId, subOrderDate } = notificationParams;
   const participant = denormalisedResponseEntities(
@@ -27,18 +52,19 @@ const createNativeNotification = async ({ notificationParams, sdk }) => {
       id: participantId,
     }),
   )[0];
+
+  if (!participant) return;
+
   const participantUser = User(participant);
   const { displayName, firstName, lastName } = participantUser.getProfile();
   const { oneSignalUserIds = [] } = participantUser.getPrivateData();
-  const { company = {}, isCompany } = participantUser.getMetadata();
+  const { isPartner } = participantUser.getMetadata();
 
-  const isBooker = Object.values(company).some(({ permission }) => {
-    return permission === 'booker';
-  });
+  const isParticipant = isUserAParticipant(participant);
 
-  const notSendParticipantNotification = isCompany || isBooker;
+  const allowedToSend = isParticipant || isPartner;
 
-  if (notSendParticipantNotification) return;
+  if (!allowedToSend) return;
 
   if (oneSignalUserIds.length === 0) return;
 

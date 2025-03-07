@@ -88,15 +88,27 @@ function UserLabelHiddenSection({
       return result;
     }, {} as Record<string, UserLabelRecord[]>);
 
-    const chunks = Object.values(sameDateMap).reduce((result, current) => {
-      const chunkSize = 18;
-      const chunk = [];
-      for (let i = 0; i < current.length; i += chunkSize) {
-        chunk.push(current.slice(i, i + chunkSize));
-      }
+    Object.keys(sameDateMap).forEach((date) => {
+      const firstCurrent = sameDateMap[date][0];
+      const emptyLabels = new Array(5).fill({
+        partnerName: firstCurrent.partnerName,
+        companyName: firstCurrent.companyName,
+        mealDate: firstCurrent.mealDate,
+        participantName: '...',
+        foodName: '.....',
+        ratingUrl: firstCurrent.ratingUrl,
+        requirement: '',
+      });
 
-      return result.concat(chunk);
-    }, [] as UserLabelRecord[][]);
+      sameDateMap[date].push(...emptyLabels);
+    });
+
+    const flatAllDates = Object.values(sameDateMap).flat();
+
+    const chunks = [];
+    for (let i = 0; i < flatAllDates.length; i += 18) {
+      chunks.push(flatAllDates.slice(i, i + 18));
+    }
 
     return chunks;
   })();
@@ -110,7 +122,7 @@ function UserLabelHiddenSection({
             className="grid grid-cols-3 w-[210mm] h-[297mm] content-start"
             id={`printable-area-${index}`}>
             {userLabelRecordsx18.map((userLabelRecord, idx) => (
-              <div key={idx} className="w-full h-[49.5mm]">
+              <div key={idx} className="w-full h-[48mm]">
                 <UserLabelCellContent
                   partnerName={userLabelRecord.partnerName}
                   companyName={userLabelRecord.companyName}

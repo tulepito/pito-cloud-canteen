@@ -32,7 +32,7 @@ function UserLabelCellContent({
   }, [ratingUrl]);
 
   return (
-    <div className="relative w-full h-full gap-0 px-2 py-2 ">
+    <div className="relative w-full h-full gap-0 p-[4mm] ">
       <div className="flex items-center justify-between w-full">
         <div className="w-[calc(100%-30mm)] h-[14mm] overflow-hidden">
           <div
@@ -135,7 +135,7 @@ function UserLabelCellContent({
         </div>
 
         <div
-          className="text-[3.3mm] w-full text-center font-light italic h-[5.5mm] overflow-hidden mt-[-1.5mm]"
+          className="text-[3.3mm] w-full text-center font-light italic h-[5.5mm] overflow-hidden mt-[-2mm]"
           style={{
             wordBreak: 'break-word',
             fontFamily: 'Reddit Sans',

@@ -234,7 +234,7 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
       }
 
       if (exportType === 'pdf-file') {
-        const marginTopBottom = 10;
+        const marginTopBottom = 4;
         const marginLeftRight = 4;
         pdf.addImage(
           imgData,
@@ -242,7 +242,7 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
           marginLeftRight,
           marginTopBottom,
           pageWidth - marginLeftRight * 2,
-          pageHeight - marginTopBottom * 2,
+          pageHeight - marginTopBottom,
           undefined,
           'FAST',
         );
