@@ -307,7 +307,7 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
             </div>
           </div>
 
-          {isAdmin && (
+          {isAdmin && !!participants?.length && (
             <div className="absolute top-1.5 right-2">
               <Button
                 size="small"

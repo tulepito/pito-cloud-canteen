@@ -1,6 +1,7 @@
 import { useRef } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { toast } from 'react-toastify';
+import classNames from 'classnames';
 import { DateTime } from 'luxon';
 import { useRouter } from 'next/router';
 
@@ -116,7 +117,8 @@ const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({
       return listingLoading();
     }
     const convertedData: any = [];
-    Object.keys(plan).forEach((item) => {
+    Object.keys(plan).forEach((item, oIndex) => {
+      const isLast = oIndex === Object.keys(plan).length - 1;
       const {
         foodList,
         restaurant,
@@ -124,7 +126,7 @@ const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({
       const { foodId: hasDishInCart } = cartList?.[item as any] || {};
       const planDate = DateTime.fromMillis(Number(item)).toJSDate();
       const itemLabel = (
-        <div className={css.tabTitle}>
+        <div className={classNames(css.tabTitle, {})}>
           <div>
             {intl.formatMessage({
               id: `Calendar.week.dayHeader.${planDate.getDay()}`,
@@ -141,7 +143,9 @@ const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({
                 <IconCheckmarkTabTitle className={css.tabTitleIcon} />
               </Tooltip>
             ))}
-          {}
+          {isLast && (
+            <div className="absolute right-0 w-[40px] mr-[-40px]"></div>
+          )}
         </div>
       );
 

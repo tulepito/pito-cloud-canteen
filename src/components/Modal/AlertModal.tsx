@@ -102,6 +102,7 @@ const AlertModal: React.FC<PropsWithChildren<TAlertModal>> = ({
             type="button"
             disabled={confirmDisabled}
             inProgress={confirmInProgress}
+            autoFocus
             className={classNames(css.confirm, confirmClassName)}
             size="medium"
             onClick={onConfirm}>

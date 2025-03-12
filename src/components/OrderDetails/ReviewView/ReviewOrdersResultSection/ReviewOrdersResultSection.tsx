@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
 import { useIntl } from 'react-intl';
 import classNames from 'classnames';
-import isEmpty from 'lodash/isEmpty';
 
 import Button from '@components/Button/Button';
-import { isCompletePickFood } from '@helpers/orderHelper';
 import type { TObject } from '@utils/types';
 
 import ReviewOrdersResultModal from './ReviewOrdersResultModal';
@@ -23,19 +21,9 @@ const ReviewOrdersResultSection: React.FC<TReviewOrdersResultSectionProps> = (
   const { className, onDownloadReviewOrderResults, data } = props;
   const intl = useIntl();
   const [isResultModalOpen, setIsResultModalOpen] = useState(false);
-  const { participants, orderDetail } = data;
+  const { participants } = data;
 
   const rootClasses = classNames(css.root, className);
-
-  const completedPickFoodParticipants =
-    !isEmpty(orderDetail) &&
-    !isEmpty(participants) &&
-    participants.filter((pid: string) =>
-      isCompletePickFood({
-        participantId: pid,
-        orderDetail,
-      }),
-    );
 
   const handleClickButtonViewResult = () => {
     setIsResultModalOpen(true);
@@ -45,17 +33,13 @@ const ReviewOrdersResultSection: React.FC<TReviewOrdersResultSectionProps> = (
     setIsResultModalOpen(false);
   };
 
+  if (!participants.length) return null;
+
   return (
     <div className={rootClasses}>
       <div className={css.titleContainer}>
         <div className={css.title}>
           {intl.formatMessage({ id: 'ReviewOrdersResultSection.title' })}
-        </div>
-        <div className={css.subtitle}>
-          {intl.formatMessage(
-            { id: 'ReviewOrdersResultSection.subtitle' },
-            { count: completedPickFoodParticipants.length || 1 },
-          )}
         </div>
       </div>
       <Button
@@ -63,7 +47,9 @@ const ReviewOrdersResultSection: React.FC<TReviewOrdersResultSectionProps> = (
         type="button"
         className={css.viewResultButton}
         onClick={handleClickButtonViewResult}>
-        {intl.formatMessage({ id: 'ReviewOrdersResultSection.viewResultText' })}
+        {intl.formatMessage({
+          id: 'ReviewOrdersResultSection.viewResultText',
+        })}
       </Button>
       <ReviewOrdersResultModal
         data={data}

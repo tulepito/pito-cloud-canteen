@@ -42,6 +42,7 @@ const getButtonSizeClassName = (size: string) => {
 
 const Button: React.FC<TButtonProps> = (props) => {
   const [mounted, setMounted] = useState(false);
+  const buttonRef = React.createRef<HTMLButtonElement>();
   const {
     rootClassName,
     className,
@@ -55,12 +56,22 @@ const Button: React.FC<TButtonProps> = (props) => {
     size = 'large',
     fullWidth = false,
     variant = 'primary',
+    autoFocus,
     ...rest
   } = props;
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  /**
+   * If the button is set to autoFocus, focus on it when it is mounted.
+   */
+  useEffect(() => {
+    if (autoFocus && buttonRef.current) {
+      buttonRef.current.focus();
+    }
+  }, [autoFocus, buttonRef]);
 
   let content;
   if (inProgress) {
@@ -112,6 +123,7 @@ const Button: React.FC<TButtonProps> = (props) => {
 
   return (
     <button
+      ref={buttonRef}
       className={classes}
       {...rest}
       disabled={buttonDisabled}

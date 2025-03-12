@@ -201,19 +201,22 @@ const EXCEL_FILE_COLUMN_NAME_AS_ENGLISH = [
 export const getImportDataFromCsv = (
   values: any,
   packagingOptions: any[] = [],
+  __altValuesInEnglish?: any,
 ) => {
-  const valuesInEnglish = Object.keys(values).reduce((acc, key, index) => {
-    const headerInEnglish = EXCEL_FILE_COLUMN_NAME_AS_ENGLISH.find((item) => {
-      return item.columnIndex === index;
-    });
+  const valuesInEnglish =
+    __altValuesInEnglish ||
+    Object.keys(values).reduce((acc, key, index) => {
+      const headerInEnglish = EXCEL_FILE_COLUMN_NAME_AS_ENGLISH.find((item) => {
+        return item.columnIndex === index;
+      });
 
-    const keyWordInEnglish = headerInEnglish?.key;
+      const keyWordInEnglish = headerInEnglish?.key;
 
-    return {
-      ...acc,
-      [keyWordInEnglish || key]: values[key],
-    };
-  }, {});
+      return {
+        ...acc,
+        [keyWordInEnglish || key]: values[key],
+      };
+    }, {});
 
   const {
     title,
