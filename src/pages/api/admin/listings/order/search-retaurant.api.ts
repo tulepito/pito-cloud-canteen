@@ -40,7 +40,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         const [companyAccount] = denormalisedResponseEntities(currentUserRes);
 
         const { keywords, ...queryWithoutKeywords } = params;
-        const query = getMenuQuery({ order, params: queryWithoutKeywords });
+        const query = getMenuQuery({
+          order,
+          params: queryWithoutKeywords,
+          options: {
+            ignoreSearchByPackagePermember: true,
+          },
+        });
 
         const orderListing = Listing(order);
         const {

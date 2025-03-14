@@ -36,9 +36,13 @@ export type TGeoOrigin = {
 export const getMenuQuery = ({
   order,
   params,
+  options,
 }: {
   order: TListing | null;
   params: TMenuQueryParams;
+  options?: {
+    ignoreSearchByPackagePermember?: boolean;
+  };
 }) => {
   const {
     timestamp,
@@ -88,7 +92,11 @@ export const getMenuQuery = ({
           )}`,
         }
       : {}),
-    [`pub_${dayOfWeek}MinFoodPrice`]: `-1,${packagePerMember + 1}`,
+    ...(options?.ignoreSearchByPackagePermember
+      ? {}
+      : {
+          [`pub_${dayOfWeek}MinFoodPrice`]: `,${packagePerMember + 1}`,
+        }),
     ...(mealFoodType.length > 0
       ? {
           [`meta_${dayOfWeek}FoodType`]: `has_any:${convertedMealFoodType.join(

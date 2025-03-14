@@ -109,7 +109,7 @@ const RestaurantCard: React.FC<TRestaurantCardProps> = ({
     if (typeof favoriteFunc === 'function') favoriteFunc(restaurantId);
   };
 
-  const numberOfMatchedPackagePerMemberFoods = foods.filter(
+  const matchedPackagePerMemberFoods = foods.filter(
     (food) => food.price === packagePerMember,
   );
 
@@ -119,7 +119,7 @@ const RestaurantCard: React.FC<TRestaurantCardProps> = ({
 
   const sortedMatchedPackagePerMemberFoodsByKeyword = sortFoodsInRestaurant(
     keywords,
-    numberOfMatchedPackagePerMemberFoods,
+    matchedPackagePerMemberFoods,
   ).slice(0, 5);
 
   const sortedNonMatchedPackagePerMemberFoodsByKeyword = sortFoodsInRestaurant(

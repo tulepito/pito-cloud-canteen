@@ -26,7 +26,7 @@ const TrackingOrderDetailInfo: React.FC<TTrackingOrderDetailInfoProps> = ({
     participants = [],
     anonymous = [],
   } = order || {};
-  // Order data
+
   const orderGetter = Listing(order as TListing);
   const { orderType = EOrderType.group } = orderGetter.getMetadata();
   const { lineItems = [] } = orderDetailOfDate;

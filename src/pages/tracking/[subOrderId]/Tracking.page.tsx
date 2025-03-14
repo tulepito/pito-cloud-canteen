@@ -72,10 +72,10 @@ const TrackingPage: React.FC<TTrackingPageProps> = () => {
         </RenderWhen>
       </div>
 
+      <TrackingNoteInfo />
       <TrackingOrderInfo />
       <TrackingDeliveryInfo subOrderDate={date} />
       <TrackingOrderDetailInfo subOrderDate={date} />
-      <TrackingNoteInfo />
       <TrackingContactInfo />
     </div>
   );

@@ -22,9 +22,9 @@ export const PreviewTable: React.FC<TemplatesTableProps> = ({
   data,
 }) => {
   return (
-    <div className="overflow-x-auto p-4">
-      <table className="min-w-full border border-gray-200 bg-white shadow-lg rounded-lg">
-        <thead>
+    <div className="overflow-x-auto p-0 my-2 max-h-[60vh]">
+      <table className="min-w-full shadow-lg rounded-lg overflow-auto">
+        <thead className="sticky top-0 z-10">
           <tr className="bg-gray-100 border-b">
             {columns.map((column, index) => (
               <th
