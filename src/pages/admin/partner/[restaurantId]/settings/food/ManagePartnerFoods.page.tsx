@@ -284,6 +284,10 @@ const ManagePartnerFoods = () => {
   const [foodToRemove, setFoodToRemove] = useState<any>(null);
   const [previewRecords, setPreviewRecords] = useState<Record[]>([]);
   const [isCreatingModeOn, setIsCreatingModeOn] = useState(false);
+  const [
+    isCreatingModeCompletedOneWayFlag,
+    setIsCreatingModeCompletedOneWayFlag,
+  ] = useState(false);
   const allowRunFetchRecordRef = React.useRef(true);
 
   const {
@@ -556,6 +560,7 @@ const ManagePartnerFoods = () => {
     }
 
     setIsCreatingModeOn(false);
+    setIsCreatingModeCompletedOneWayFlag(true);
   };
 
   const makeExcelFile = () => {
@@ -904,7 +909,9 @@ const ManagePartnerFoods = () => {
           handleClose={onCloseImportModal}
           containerClassName="!min-w-[80vw] !w-full"
           confirmLabel={
-            isCreatingModeOn
+            isCreatingModeCompletedOneWayFlag
+              ? `${numberOfCreatedRecords}/${totalRecords} đã được tạo, tắt dialog`
+              : isCreatingModeOn
               ? `Đang tạo ${numberOfCreatedRecords}/${totalRecords}...`
               : 'Tạo'
           }
@@ -916,7 +923,8 @@ const ManagePartnerFoods = () => {
           confirmDisabled={
             createPartnerFoodFromCsvInProgress ||
             !previewRecords.length ||
-            (isCreatingModeOn && numberOfCreatedRecords !== totalRecords)
+            (isCreatingModeOn && numberOfCreatedRecords !== totalRecords) ||
+            isCreatingModeCompletedOneWayFlag
           }>
           <p className={css.downloadFileHere}>
             <FormattedMessage
