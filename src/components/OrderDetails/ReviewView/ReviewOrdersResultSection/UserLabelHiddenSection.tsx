@@ -30,8 +30,8 @@ function UserLabelHiddenSection({
   );
   const router = useRouter();
 
-  const userLabelRecords = preparedData.reduce<UserLabelRecord[]>(
-    (result, { date, orderData }) => {
+  const userLabelRecords = preparedData
+    .reduce<UserLabelRecord[]>((result, { date, orderData }) => {
       if (date === targetedDate || targetedDate === 'all') {
         const userLabelData = orderData.map(
           ({
@@ -72,9 +72,18 @@ function UserLabelHiddenSection({
       }
 
       return result;
-    },
-    [] as UserLabelRecord[],
-  );
+    }, [] as UserLabelRecord[])
+    .sort((a, b) => {
+      if (a.foodName < b.foodName) {
+        return -1;
+      }
+
+      if (a.foodName > b.foodName) {
+        return 1;
+      }
+
+      return 0;
+    });
 
   const chunksOf18UserLabelRecords = (() => {
     const sameDateMap = userLabelRecords.reduce((result, current) => {

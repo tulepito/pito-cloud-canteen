@@ -47,3 +47,4 @@ export { default as PartnerManageMenus } from '@pages/partner/products/menu/Part
 export { default as ManageReviews } from '@pages/partner/reviews/ManageReviews.slice';
 export { default as PartnerSettingsPage } from '@pages/partner/settings/PartnerSettings.slice';
 export { default as TrackingPage } from '@pages/tracking/[subOrderId]/TrackingPage.slice';
+export { default as scanner } from '@redux/slices/scanner.slice';

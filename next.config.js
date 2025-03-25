@@ -19,6 +19,16 @@ const nextConfig = {
       { source: '/quen-mat-khau', destination: '/forgot-password' },
       { source: '/dat-lai-mat-khau', destination: '/reset-password' },
       { source: '/xac-nhan-email', destination: '/verify-email' },
+      {
+        source: '/com-trua-van-phong-pito-cloud-canteen/',
+        destination:
+          'https://in.pito.vn/com-trua-van-phong-pito-cloud-canteen/',
+      },
+      {
+        source: '/nang-tam-com-trua-van-phong-cho-doi-ngu/',
+        destination:
+          'https://in.pito.vn/nang-tam-com-trua-van-phong-cho-doi-ngu/',
+      },
     ];
   },
   headers: async () => {

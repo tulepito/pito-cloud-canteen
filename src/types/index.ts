@@ -78,6 +78,7 @@ export type MemberOrderValue = {
   foodId: string;
   requirement: string;
   status: 'empty' | 'joined' | 'notJoined' | 'notAllowed' | 'expired';
+  barcode?: string;
 };
 
 export type OrderDetailValue = {
@@ -120,10 +121,12 @@ export type PlanListing = ListingBuilder<
     menuIds: string[];
     orderDetail: { [timestamp: string]: OrderDetailValue };
     orderDetailStartedSnapshot: { [timestamp: string]: OrderDetailValue };
+    barcodeHashMap: Record<string, string>;
     orderId: string;
     partnerIds: string[];
     planStarted: boolean;
     slackThreadTs: string;
+    allowToScan?: boolean;
   },
   {},
   {}
@@ -221,8 +224,8 @@ export type UserListing = DeepPartial<{
         walkthroughEnable: boolean;
       };
     };
-    profileImage: Image;
   };
+  profileImage: Image;
 }>;
 
 export type FlexDSKMeta = {

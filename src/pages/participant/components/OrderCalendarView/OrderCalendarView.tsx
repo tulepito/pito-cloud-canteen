@@ -198,6 +198,7 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
           lastTransition,
           foodName: dishes.find((_dish) => _dish.key === foodSelection?.foodId)
             ?.value,
+          barcode: foodSelection?.barcode,
           isOrderStarted:
             orderStateHistory.findIndex(
               (history: TObject) => history.state === EOrderStates.inProgress,

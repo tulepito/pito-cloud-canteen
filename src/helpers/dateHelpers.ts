@@ -24,10 +24,19 @@ export const convertHHmmStringToTimeParts = (timeStr = '6:30') => {
   return { hours: parseInt(hours, 10), minutes: parseInt(minutes, 10) };
 };
 
-export const convertDateToVNTimezone = (date: Date) => {
+export const convertDateToVNTimezone = (
+  date: Date,
+  options?: {
+    format?: string;
+  },
+) => {
   const dateInVNTimezone = DateTime.fromJSDate(date, {
     zone: VNTimezone,
   });
+
+  if (options?.format) {
+    return dateInVNTimezone.toFormat(options.format);
+  }
 
   return dateInVNTimezone.toISO().split('.')[0];
 };

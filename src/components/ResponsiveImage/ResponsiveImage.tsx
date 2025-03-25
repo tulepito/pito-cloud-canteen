@@ -56,6 +56,8 @@ type TResponsiveImageProps = TDefaultProps & {
   variants?: TImageVariant[];
   sizes?: string;
   emptyType?: 'food';
+  src?: string;
+  style?: CSSProperties;
 };
 
 const ResponsiveImage: React.FC<TResponsiveImageProps> = (props) => {
@@ -66,6 +68,7 @@ const ResponsiveImage: React.FC<TResponsiveImageProps> = (props) => {
     image,
     variants = [],
     emptyType,
+    src,
     ...rest
   } = props;
 
@@ -99,9 +102,18 @@ const ResponsiveImage: React.FC<TResponsiveImageProps> = (props) => {
     if (emptyType === 'food') {
       return (
         <>
-          <Image src={defaultFoodThumbail} fill alt="Ảnh minh họa" />
-          <div className={css.overlay} />
-          <p className={css.overlayText}>Ảnh minh họa</p>
+          <Image
+            src={src || defaultFoodThumbail}
+            style={rest.style}
+            fill
+            alt="Ảnh minh họa"
+          />
+          {!src && (
+            <>
+              <div className={css.overlay} />
+              <p className={css.overlayText}>Ảnh minh họa</p>
+            </>
+          )}
         </>
       );
     }
@@ -132,6 +144,7 @@ const ResponsiveImage: React.FC<TResponsiveImageProps> = (props) => {
 
   const style = {
     objectFit: 'cover',
+    ...rest.style,
   } as CSSProperties;
 
   const imgProps = {

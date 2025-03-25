@@ -25,6 +25,7 @@ import { useViewport } from '@hooks/useViewport';
 import { buildParticipantSubOrderDocumentId } from '@pages/api/participants/document/document.service';
 import { CalendarActions } from '@redux/slices/Calendar.slice';
 import { participantPaths } from '@src/paths';
+import type { PlanListing } from '@src/types';
 import { CurrentUser, Listing } from '@src/utils/data';
 import {
   getEndDayOfWeek,
@@ -47,7 +48,6 @@ import {
   ETransition,
   TRANSITIONS_TO_STATE_CANCELED,
 } from '@src/utils/transaction';
-import type { TListing } from '@src/utils/types';
 
 import ParticipantToolbar from '../components/ParticipantToolbar/ParticipantToolbar';
 import { SubOrdersThunks } from '../sub-orders/SubOrders.slice';
@@ -217,7 +217,8 @@ const OrderListPage = () => {
 
     const currentPlan = plans?.find(
       (plan) => Listing(plan).getId() === planId,
-    ) as TListing;
+    ) as PlanListing;
+    const allowToScan = currentPlan.attributes?.metadata?.allowToScan;
     const orderId = mappingSubOrderToOrder[planId];
     const order = orders?.find((_order) => Listing(_order).getId() === orderId);
     const orderGetter = Listing(order);
@@ -234,7 +235,7 @@ const OrderListPage = () => {
       orderState === EOrderStates.canceled ||
       orderState === EOrderStates.canceledByBooker;
 
-    const { orderDetail = {} } = Listing(currentPlan).getMetadata();
+    const { orderDetail = {} } = Listing(currentPlan as any).getMetadata();
     const listEvent: Event[] = [];
 
     Object.keys(orderDetail).forEach((planItemKey: string) => {
@@ -289,6 +290,7 @@ const OrderListPage = () => {
           subOrderId: planId,
           orderId,
           planId,
+          allowToScan,
           daySession: prepareDaySession(daySession, deliveryHour),
           status: pickFoodStatus,
           type: 'dailyMeal',
@@ -311,6 +313,7 @@ const OrderListPage = () => {
           lastTransition,
           foodName: dishes.find((_dish) => _dish.key === foodSelection?.foodId)
             ?.value,
+          barcode: foodSelection?.barcode,
           disableSelectFood:
             isOrderAlreadyInProgress && isSubOrderNotAbleToEdit,
           pickedFoodDetail,

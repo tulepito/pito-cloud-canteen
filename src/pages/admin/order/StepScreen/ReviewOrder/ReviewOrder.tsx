@@ -42,6 +42,7 @@ import {
   saveDraftEditOrder,
 } from '@redux/slices/Order.slice';
 import { adminPaths } from '@src/paths';
+import type { PlanListing } from '@src/types';
 import { Listing } from '@utils/data';
 import { formatTimestamp } from '@utils/dates';
 import {
@@ -140,9 +141,14 @@ export const ReviewContent: React.FC<any> = (props) => {
   const orderInPickingState = useAppSelector(
     (state) => state.OrderManagement.orderData,
   );
+  const planListing: PlanListing = useAppSelector(
+    (state) => state.OrderManagement.planData,
+  );
   const orderDetailInPickingState = useAppSelector((state) => {
-    const planListing = state.OrderManagement.planData;
-    const { orderDetail = {} } = Listing(planListing as TListing).getMetadata();
+    const _planListing = state.OrderManagement.planData;
+    const { orderDetail = {} } = Listing(
+      _planListing as TListing,
+    ).getMetadata();
 
     return orderDetail;
   });
@@ -279,7 +285,7 @@ export const ReviewContent: React.FC<any> = (props) => {
   }, [deliveryManPhoneNumber]);
 
   return (
-    <div>
+    <div className="flex flex-col w-full gap-2">
       <RenderWhen condition={resultSectionShowed}>
         <ReviewOrdersResultSection
           className={css.reviewOrderResult}
@@ -290,6 +296,7 @@ export const ReviewContent: React.FC<any> = (props) => {
             anonymousParticipantData,
             orderDetail,
           }}
+          planListing={planListing}
           onDownloadReviewOrderResults={onDownloadReviewOrderResults}
         />
       </RenderWhen>

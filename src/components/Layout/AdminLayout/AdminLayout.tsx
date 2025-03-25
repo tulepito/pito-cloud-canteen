@@ -1,4 +1,5 @@
 import type { PropsWithChildren } from 'react';
+import { useRouter } from 'next/router';
 
 import useBoolean from '@hooks/useBoolean';
 
@@ -16,6 +17,11 @@ const AdminLayout: React.FC<PropsWithChildren> = (props) => {
     setFalse: onCloseMenu,
     toggle: toggleMenuOpen,
   } = useBoolean(false);
+  const { pathname } = useRouter();
+
+  if (pathname.includes('scanner')) {
+    return <div className="container w-full mx-auto">{children}</div>;
+  }
 
   return (
     <AdminLayoutWrapper>

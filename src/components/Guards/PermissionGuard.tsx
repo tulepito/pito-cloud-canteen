@@ -22,6 +22,9 @@ const PermissionGuard: React.FC<TPermissionGuardGuardProps> = (props) => {
   const { isAuthenticated, authInfoLoaded } = useAppSelector(
     (state) => state.auth,
   );
+  const { currentUserInProgress: currentUserIsLoading } = useAppSelector(
+    (state) => state.user,
+  );
   const { isInactiveCompany } = useActiveCompany();
   const { isRoleSelectModalOpen, onCloseRoleSelectModal } =
     useRoleSelectModalController();
@@ -37,7 +40,7 @@ const PermissionGuard: React.FC<TPermissionGuardGuardProps> = (props) => {
 
     const LayoutWrapper = getLayoutBaseOnPermission(userPermission);
 
-    return !authInfoLoaded ? (
+    return !authInfoLoaded || currentUserIsLoading ? (
       <FullScreenPageLoading />
     ) : isMatchedPermission && isAuthenticated ? (
       <LayoutWrapper>{children}</LayoutWrapper>

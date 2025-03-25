@@ -146,7 +146,9 @@ const authSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(authInfo.pending, (state) => state)
+      .addCase(authInfo.pending, (state) => {
+        state.authInfoLoaded = false;
+      })
       .addCase(authInfo.fulfilled, (state, { payload }) => {
         return {
           ...state,
@@ -154,6 +156,9 @@ const authSlice = createSlice({
           isAuthenticated: authenticated(payload),
           authScopes: payload.scopes || [],
         };
+      })
+      .addCase(authInfo.rejected, (state) => {
+        state.authInfoLoaded = true;
       })
 
       .addCase(signUp.pending, (state) => {

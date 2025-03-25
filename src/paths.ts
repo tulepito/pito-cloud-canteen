@@ -22,6 +22,21 @@ export const enGeneralPaths = {
   auth: {
     index: '/auth',
   },
+  admin: {
+    scanner: {
+      '[planId]': {
+        '[timestamp]': {
+          index: (planId: string, timestamp: string) =>
+            `/admin/scanner/${planId}/${timestamp}`,
+        },
+      },
+    },
+    order: {
+      '[orderId]': {
+        index: (orderId: string) => `/admin/order/${orderId}`,
+      },
+    },
+  },
   company: {
     orders: {
       '[orderId]': {

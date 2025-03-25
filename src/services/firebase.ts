@@ -22,16 +22,16 @@ import type { TObject } from '@src/utils/types';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_APP_FIREBASE_API_KEY,
-  authDomain: `${process.env.NEXT_APP_FIREBASE_PROJECT_ID}.firebaseapp.com`,
-  projectId: process.env.NEXT_APP_FIREBASE_PROJECT_ID,
-  storageBucket: `${process.env.NEXT_APP_FIREBASE_PROJECT_ID}.appspot.com`,
+  authDomain: `${process.env.NEXT_PUBLIC_NEXT_APP_FIREBASE_PROJECT_ID}.firebaseapp.com`,
+  projectId: process.env.NEXT_PUBLIC_NEXT_APP_FIREBASE_PROJECT_ID,
+  storageBucket: `${process.env.NEXT_PUBLIC_NEXT_APP_FIREBASE_PROJECT_ID}.appspot.com`,
   messagingSenderId: process.env.NEXT_APP_FIREBASE_MESSAGING_SENDER_ID,
   appId: process.env.NEXT_APP_FIREBASE_APP_ID,
   measurementId: process.env.NEXT_APP_FIREBASE_MEASURE_ID,
 };
 
 const firebaseApp = initializeApp(firebaseConfig);
-const firestore = getFirestore(firebaseApp);
+export const firestore = getFirestore(firebaseApp);
 
 const getCollectionData = async (collectionName: string) => {
   const ref = collection(firestore, collectionName);

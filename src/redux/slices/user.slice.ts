@@ -91,6 +91,7 @@ const getRoles = (currentUser: TCurrentUser) => {
 
 type TUserState = {
   currentUser: TCurrentUser | null;
+  currentUserInProgress: boolean;
   currentUserShowError: any;
   userPermission: EUserSystemPermission;
   sendVerificationEmailInProgress: boolean;
@@ -108,6 +109,7 @@ type TUserState = {
 
 const initialState: TUserState = {
   currentUser: null,
+  currentUserInProgress: true,
   currentUserShowError: null,
   userPermission: EUserSystemPermission.normal,
   sendVerificationEmailInProgress: false,
@@ -257,6 +259,7 @@ const userSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(fetchCurrentUser.pending, (state) => {
+        state.currentUserInProgress = true;
         state.currentUserShowError = null;
       })
       .addCase(fetchCurrentUser.fulfilled, (state, action) => {
@@ -267,6 +270,7 @@ const userSlice = createSlice({
           userPermission,
         } = action.payload;
 
+        state.currentUserInProgress = false;
         state.currentUser = mergeCurrentUser(state.currentUser, currentUser);
         state.userPermission =
           userPermission || detectUserPermission(currentUser);
@@ -275,6 +279,7 @@ const userSlice = createSlice({
         state.favoriteFood = favoriteFood;
       })
       .addCase(fetchCurrentUser.rejected, (state, action) => {
+        state.currentUserInProgress = false;
         state.currentUserShowError = action.payload;
       })
 

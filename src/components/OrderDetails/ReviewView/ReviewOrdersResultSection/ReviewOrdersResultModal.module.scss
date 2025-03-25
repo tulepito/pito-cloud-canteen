@@ -111,6 +111,10 @@
 
   .row {
     @include tableLayout;
+
+    & > div {
+      padding-right: 0px;
+    }
   }
 }
 

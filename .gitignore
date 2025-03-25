@@ -40,5 +40,3 @@ next-env.d.ts
 
 # zip files in serverless directory
 serverless/*.zip
-
-

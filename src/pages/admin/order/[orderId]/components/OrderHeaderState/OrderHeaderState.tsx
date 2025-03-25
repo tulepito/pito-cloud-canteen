@@ -9,9 +9,12 @@ import AlertModal from '@components/Modal/AlertModal';
 import OutsideClickHandler from '@components/OutsideClickHandler/OutsideClickHandler';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { isEnableToStartOrder } from '@helpers/orderHelper';
-import { useAppSelector } from '@hooks/reduxHooks';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
+import { ScannerModeToggle } from '@pages/admin/scanner/[planId]/ScannerModeToggle';
+import { orderManagementThunks } from '@redux/slices/OrderManagement.slice';
 import { adminPaths } from '@src/paths';
+import type { PlanListing } from '@src/types';
 import {
   ORDER_STATE_TRANSIT_FLOW,
   ORDER_STATES_TO_ENABLE_EDIT_ABILITY,
@@ -54,7 +57,9 @@ const OrderHeaderState: React.FC<OrderHeaderStateProps> = (props) => {
   const intl = useIntl();
   const router = useRouter();
   const orderStateActionDropdownControl = useBoolean();
-  const planData = useAppSelector((state) => state.OrderManagement.planData);
+  const { planData, fetchOrderInProgress } = useAppSelector(
+    (state) => state.OrderManagement,
+  );
   const confirmCancelOrderActions = useBoolean();
 
   const planDataGetter = Listing(planData as TListing);
@@ -149,6 +154,25 @@ const OrderHeaderState: React.FC<OrderHeaderStateProps> = (props) => {
   const handleClickTurnOnDraftEditMode = handleCloseDropdownAfterClickedAction(
     turnOnDraftEditMode!,
   );
+  const dispatch = useAppDispatch();
+
+  const planListing = planData as PlanListing;
+
+  const toggleScannerMode = () => {
+    dispatch(
+      orderManagementThunks.toggleScannerMode({
+        orderId: planListing.attributes?.metadata?.orderId!,
+        planId: planListing.id?.uuid!,
+        isAdminFlow: true,
+      }),
+    );
+    dispatch(
+      orderManagementThunks.loadData({
+        orderId: planListing.attributes?.metadata?.orderId!,
+        isAdminFlow: true,
+      }),
+    );
+  };
 
   return (
     <div className={css.header}>
@@ -194,6 +218,16 @@ const OrderHeaderState: React.FC<OrderHeaderStateProps> = (props) => {
             </OutsideClickHandler>
           </RenderWhen>
         </div>
+
+        {isGroupOrder && orderState === EOrderStates.inProgress && (
+          <ScannerModeToggle
+            isLoading={fetchOrderInProgress}
+            status={
+              planListing.attributes?.metadata?.allowToScan ? 'on' : 'off'
+            }
+            onChange={toggleScannerMode}
+          />
+        )}
       </div>
       <RenderWhen condition={shouldShowUpdateOrderStateBtn}>
         <Button

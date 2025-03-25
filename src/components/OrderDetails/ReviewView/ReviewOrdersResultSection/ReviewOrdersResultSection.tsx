@@ -3,6 +3,7 @@ import { useIntl } from 'react-intl';
 import classNames from 'classnames';
 
 import Button from '@components/Button/Button';
+import type { PlanListing } from '@src/types';
 import type { TObject } from '@utils/types';
 
 import ReviewOrdersResultModal from './ReviewOrdersResultModal';
@@ -13,12 +14,13 @@ type TReviewOrdersResultSectionProps = {
   className?: string;
   onDownloadReviewOrderResults: () => void;
   data: TObject;
+  planListing?: PlanListing;
 };
 
 const ReviewOrdersResultSection: React.FC<TReviewOrdersResultSectionProps> = (
   props,
 ) => {
-  const { className, onDownloadReviewOrderResults, data } = props;
+  const { className, onDownloadReviewOrderResults, data, planListing } = props;
   const intl = useIntl();
   const [isResultModalOpen, setIsResultModalOpen] = useState(false);
   const { participants } = data;
@@ -56,6 +58,7 @@ const ReviewOrdersResultSection: React.FC<TReviewOrdersResultSectionProps> = (
         onDownloadReviewOrderResults={onDownloadReviewOrderResults}
         isOpen={isResultModalOpen}
         onClose={handleCloseModal}
+        planListing={planListing}
       />
     </div>
   );

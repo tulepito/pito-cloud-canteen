@@ -33,6 +33,7 @@ import {
   updatePaymentApi,
   updatePlanDetailsApi,
 } from '@apis/orderApi';
+import { toggleScannerModeApi } from '@apis/scanner';
 import { fetchTxApi } from '@apis/txApi';
 import { checkUserExistedApi } from '@apis/userApi';
 import { EOrderDetailsTableTab } from '@components/OrderDetails/EditView/ManageOrderDetailSection/OrderDetailsTable/OrderDetailsTable.utils';
@@ -68,6 +69,7 @@ import type {
 } from '@utils/types';
 
 import { setOrderDetail } from './Order.slice';
+import { getErrorStringFromErrorObject } from './scanner.slice';
 import { SystemAttributesThunks } from './systemAttributes.slice';
 
 export const QUERY_SUB_ORDER_CHANGES_HISTORY_PER_PAGE = 3;
@@ -212,6 +214,9 @@ type TOrderManagementState = {
 
   toggleAutoPickFoodInProgress: boolean;
   toggleAutoPickFoodError: any;
+
+  toggleScannerModeInProgress: boolean;
+  toggleScannerModeError: string;
 };
 
 const initialState: TOrderManagementState = {
@@ -256,6 +261,9 @@ const initialState: TOrderManagementState = {
 
   toggleAutoPickFoodInProgress: false,
   toggleAutoPickFoodError: null,
+
+  toggleScannerModeInProgress: false,
+  toggleScannerModeError: '',
 };
 
 // ================ Thunk types ================ //
@@ -306,6 +314,26 @@ const loadData = createAsyncThunk(
     }
 
     return response.data;
+  },
+);
+
+const toggleScannerMode = createAsyncThunk(
+  'app/OrderManagement/TOGGLE_SCANNER_MODE',
+  async (
+    {
+      orderId,
+      planId,
+      isAdminFlow,
+    }: { orderId: string; planId: string; isAdminFlow: boolean },
+    { dispatch },
+  ) => {
+    await toggleScannerModeApi({ planId });
+    dispatch(
+      loadData({
+        orderId,
+        isAdminFlow,
+      }),
+    );
   },
 );
 
@@ -1099,6 +1127,7 @@ const handleAutoPickFoodToggle = createAsyncThunk(
 );
 
 export const orderManagementThunks = {
+  toggleScannerMode,
   loadData,
   updateOrderGeneralInfo,
   addOrUpdateMemberOrder,
@@ -2060,6 +2089,18 @@ const OrderManagementSlice = createSlice({
       .addCase(handleAutoPickFoodToggle.rejected, (state, { error }) => {
         state.toggleAutoPickFoodInProgress = false;
         state.toggleAutoPickFoodError = error;
+      })
+
+      .addCase(toggleScannerMode.pending, (state) => {
+        state.toggleScannerModeInProgress = true;
+        state.toggleScannerModeError = '';
+      })
+      .addCase(toggleScannerMode.fulfilled, (state) => {
+        state.toggleScannerModeInProgress = false;
+      })
+      .addCase(toggleScannerMode.rejected, (state, { error }) => {
+        state.toggleScannerModeInProgress = false;
+        state.toggleScannerModeError = getErrorStringFromErrorObject(error);
       });
   },
 });
