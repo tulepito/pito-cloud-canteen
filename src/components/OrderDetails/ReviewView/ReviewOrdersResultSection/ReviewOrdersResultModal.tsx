@@ -19,6 +19,7 @@ import logger from '@helpers/logger';
 import { isJoinedPlan } from '@helpers/order/orderPickingHelper';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { useViewport } from '@hooks/useViewport';
+import { generateScannerBarCode } from '@pages/api/admin/scanner/[planId]/toggle-mode.api';
 import { enGeneralPaths } from '@src/paths';
 import type { PlanListing, UserListing } from '@src/types';
 import { buildFullName } from '@src/utils/emailTemplate/participantOrderPicking';
@@ -32,9 +33,11 @@ import css from './ReviewOrdersResultModal.module.scss';
 const prepareData = ({
   orderDetail = {},
   participantData = {},
+  planId,
 }: {
   orderDetail: TObject;
   participantData: TObject;
+  planId: string;
 }) => {
   return Object.entries<TObject>(orderDetail).reduce<TObject[]>(
     (result, currentOrderDetailEntry) => {
@@ -46,7 +49,7 @@ const prepareData = ({
       const orderData = Object.entries<TObject>(memberOrders).reduce<TObject[]>(
         (memberOrderResult, currentMemberOrderEntry) => {
           const [memberId, memberOrderData] = currentMemberOrderEntry;
-          const { foodId, status, requirement, barcode } = memberOrderData;
+          const { foodId, status, requirement } = memberOrderData;
           const newItem = {
             memberData: participantData[memberId],
             foodData: {
@@ -55,7 +58,7 @@ const prepareData = ({
               ...foodListOfDate[foodId],
             },
             restaurant,
-            barcode,
+            barcode: generateScannerBarCode(planId, memberId, date),
           };
 
           return isJoinedPlan(foodId, status)
@@ -187,6 +190,7 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
   const preparedData = prepareData({
     orderDetail,
     participantData: participantDataMap,
+    planId: planListing?.id?.uuid || '',
   });
 
   const toggleCollapseStatus = (date: string) => () => {
