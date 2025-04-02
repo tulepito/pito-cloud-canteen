@@ -270,6 +270,7 @@ interface Record {
   allergicIngredients?: string;
   note?: string;
   imageBase64?: string;
+  imageBase64Loading?: boolean;
   status?: 'loading' | 'success' | string;
 }
 const ManagePartnerFoods = () => {
@@ -656,15 +657,29 @@ const ManagePartnerFoods = () => {
     if (previewRecords.length === 0) return;
     if (!allowRunFetchRecordRef.current) return;
     const fetchImageBase64 = async () => {
+      setPreviewRecords((prev) =>
+        prev.map((record) => ({
+          ...record,
+          imageBase64Loading: true,
+        })),
+      );
       const previewRecordsWithBase64 = await Promise.all(
         previewRecords.map(async (record) => {
           if (!record.image) {
             return record;
           }
 
-          const imageBase64 = await remoteImageUrlToBase64(record.image);
+          try {
+            if (record.image.startsWith('data:image')) {
+              return { ...record, imageBase64: record.image };
+            }
 
-          return { ...record, imageBase64 };
+            const imageBase64 = await remoteImageUrlToBase64(record.image);
+
+            return { ...record, imageBase64 };
+          } catch (error) {
+            return { ...record, imageBase64: undefined };
+          }
         }),
       );
 
@@ -714,19 +729,23 @@ const ManagePartnerFoods = () => {
     {
       label: 'Hình ảnh',
       accessor: 'imageBase64',
-      render: (value: string, _: any, index?: number) => {
+      render: (value: string, record: any, index?: number) => {
         if (index === undefined) {
           return <></>;
         }
 
+        if (record.imageBase64Loading) {
+          return <IconSpinner className="text-blue-500 stroke-blue-500" />;
+        }
+
         return (
           <div className="flex gap-2">
-            <div className="min-w-[64px] min-h-[64px] ">
+            <div className="min-w-[64px] min-h-[64px] max-w-[64px] max-h-[64px]">
               {value && (
                 <img
                   src={value}
                   alt="Template"
-                  className="min-w-[64px] min-h-[64px] object-cover rounded-md"
+                  className="min-w-[64px] min-h-[64px] object-cover rounded-md max-w-[64px] max-h-[64px]"
                 />
               )}
             </div>
@@ -921,6 +940,7 @@ const ManagePartnerFoods = () => {
           cancelLabel="Hủy"
           confirmInProgress={createPartnerFoodFromCsvInProgress}
           confirmDisabled={
+            previewRecords.some((record) => record.imageBase64Loading) ||
             createPartnerFoodFromCsvInProgress ||
             !previewRecords.length ||
             (isCreatingModeOn && numberOfCreatedRecords !== totalRecords) ||

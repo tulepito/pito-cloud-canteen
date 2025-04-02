@@ -7,7 +7,14 @@ export const remoteImageUrlToBase64 = async (url: string): Promise<string> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => {
-      resolve(reader.result as string);
+      if (
+        typeof reader.result === 'string' &&
+        reader.result.startsWith('data:image')
+      ) {
+        resolve(reader.result);
+      } else {
+        reject(new Error('Invalid image format'));
+      }
     };
     reader.onerror = reject;
     reader.readAsDataURL(blob);
