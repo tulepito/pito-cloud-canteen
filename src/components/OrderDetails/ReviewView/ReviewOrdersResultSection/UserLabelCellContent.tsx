@@ -1,13 +1,10 @@
-import { useEffect, useState } from 'react';
-import QRCode from 'qrcode';
-
 function UserLabelCellContent({
   companyName,
   partnerName,
   mealDate,
   participantName,
   foodName,
-  ratingUrl,
+  qrCodeImageSrc,
   note,
 }: {
   companyName: string;
@@ -15,22 +12,9 @@ function UserLabelCellContent({
   mealDate: string;
   participantName: string;
   foodName: string;
-  ratingUrl: string;
+  qrCodeImageSrc: string;
   note?: string;
 }) {
-  const [qrCodeDataUrl, setQrCodeDataUrl] = useState('');
-
-  useEffect(() => {
-    QRCode.toDataURL(ratingUrl, {
-      small: true,
-      margin: 2,
-      scale: 4,
-      errorCorrectionLevel: 'L',
-    }).then((url: string) => {
-      setQrCodeDataUrl(url);
-    });
-  }, [ratingUrl]);
-
   return (
     <div className="relative w-full h-full gap-0 p-[4mm] ">
       <div className="flex items-center justify-between w-full">
@@ -106,7 +90,7 @@ function UserLabelCellContent({
             </div>
           </div>
           <img
-            src={qrCodeDataUrl}
+            src={qrCodeImageSrc}
             className="w-[16mm] h-[16mm] min-w-[16mm] min-h-[16mm]"
             alt="QR Code"
           />

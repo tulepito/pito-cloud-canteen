@@ -1,90 +1,11 @@
-import { shallowEqual } from 'react-redux';
-import { DateTime } from 'luxon';
-import { useRouter } from 'next/router';
-
-import { useAppSelector } from '@hooks/reduxHooks';
-import type { UserListing } from '@src/types';
-
+import type { UserLabelRecord } from './ReviewOrdersResultModal';
 import UserLabelCellContent from './UserLabelCellContent';
 
-interface UserLabelRecord {
-  partnerName: string;
-  companyName: string;
-  mealDate: string;
-  participantName: string;
-  foodName: string;
-  ratingUrl: string;
-  requirement?: string;
-}
-
 function UserLabelHiddenSection({
-  preparedData,
-  targetedDate,
+  userLabelRecords,
 }: {
-  preparedData: any[];
-  targetedDate: string;
+  userLabelRecords: UserLabelRecord[];
 }) {
-  const company: UserListing | null = useAppSelector(
-    (state) => state.OrderManagement.companyData,
-    shallowEqual,
-  );
-  const router = useRouter();
-
-  const userLabelRecords = preparedData
-    .reduce<UserLabelRecord[]>((result, { date, orderData }) => {
-      if (date === targetedDate || targetedDate === 'all') {
-        const userLabelData = orderData.map(
-          ({
-            memberData,
-            foodData,
-            restaurant,
-          }: {
-            memberData: {
-              name: string;
-            };
-            foodData: {
-              foodName: string;
-              requirement: string;
-            };
-            restaurant: {
-              restaurantName: string;
-            };
-          }) => {
-            const { name: participantName } = memberData || {};
-            const { foodName, requirement } = foodData || {};
-
-            return {
-              partnerName: restaurant?.restaurantName,
-              requirement,
-              companyName:
-                company?.attributes?.profile?.publicData?.companyName,
-              mealDate: DateTime.fromMillis(Number(date)).toFormat(
-                'dd/MM/yyyy',
-              ),
-              participantName,
-              foodName,
-              ratingUrl: `${process.env.NEXT_PUBLIC_CANONICAL_URL}/participant/order/${router.query.orderId}/?subOrderDate=${date}&openRatingModal=true`,
-            };
-          },
-        );
-
-        return result.concat(userLabelData);
-      }
-
-      return result;
-    }, [] as UserLabelRecord[])
-    .sort((a, b) => {
-      if (a.foodName < b.foodName) {
-        return -1;
-      }
-
-      if (a.foodName > b.foodName) {
-        return 1;
-      }
-
-      return 0;
-    });
-
   const chunksOf18UserLabelRecords = (() => {
     const sameDateMap = userLabelRecords.reduce((result, current) => {
       const { mealDate } = current;
@@ -105,8 +26,9 @@ function UserLabelHiddenSection({
         mealDate: firstCurrent.mealDate,
         participantName: '   ',
         foodName: '   ',
-        ratingUrl: firstCurrent.ratingUrl,
+        timestamp: firstCurrent.timestamp,
         requirement: '',
+        qrCodeImageSrc: firstCurrent.qrCodeImageSrc,
       });
 
       sameDateMap[date].push(...emptyLabels);
@@ -138,7 +60,7 @@ function UserLabelHiddenSection({
                   mealDate={userLabelRecord.mealDate}
                   participantName={userLabelRecord.participantName}
                   foodName={userLabelRecord.foodName}
-                  ratingUrl={userLabelRecord.ratingUrl}
+                  qrCodeImageSrc={userLabelRecord.qrCodeImageSrc}
                   note={userLabelRecord.requirement}
                 />
               </div>

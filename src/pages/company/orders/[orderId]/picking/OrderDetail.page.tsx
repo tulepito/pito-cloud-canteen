@@ -5,6 +5,7 @@ import { useIntl } from 'react-intl';
 import Skeleton from 'react-loading-skeleton';
 import classNames from 'classnames';
 import isEmpty from 'lodash/isEmpty';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 
 import IconNavbar from '@components/Icons/IconNavbar/IconNavbar';
@@ -22,7 +23,6 @@ import OrderLinkSection from '@components/OrderDetails/EditView/OrderLinkSection
 import OrderTitle from '@components/OrderDetails/EditView/OrderTitle/OrderTitle';
 import SubOrderChangesHistorySection from '@components/OrderDetails/EditView/SubOrderChangesHistorySection/SubOrderChangesHistorySection';
 import type { TReviewInfoFormValues } from '@components/OrderDetails/ReviewView/ReviewInfoSection/ReviewInfoForm';
-import ReviewOrdersResultModal from '@components/OrderDetails/ReviewView/ReviewOrdersResultSection/ReviewOrdersResultModal';
 import ReviewView from '@components/OrderDetails/ReviewView/ReviewView';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import SidebarFeaturesHeader from '@components/SidebarFeaturesHeader/SidebarFeaturesHeader';
@@ -57,6 +57,16 @@ import { useAutoPickFood } from '../hooks/useAutoPickFood';
 import OrderQuantityErrorSection from './OrderQuantityErrorSection';
 
 import css from './OrderDetail.module.scss';
+
+const ReviewOrdersResultModal = dynamic(
+  () =>
+    import(
+      '@components/OrderDetails/ReviewView/ReviewOrdersResultSection/ReviewOrdersResultModal'
+    ),
+  {
+    ssr: false,
+  },
+);
 
 enum EPageViewMode {
   edit = 'edit',

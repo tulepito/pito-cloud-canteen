@@ -1,11 +1,16 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
+import { shallowEqual } from 'react-redux';
 import { toast } from 'react-toastify';
+import classNames from 'classnames';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import isEmpty from 'lodash/isEmpty';
 import { DateTime } from 'luxon';
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
+import QRCode from 'qrcode';
 
 import Button from '@components/Button/Button';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
@@ -25,10 +30,55 @@ import type { PlanListing, UserListing } from '@src/types';
 import { buildFullName } from '@src/utils/emailTemplate/participantOrderPicking';
 import type { TObject, TUser } from '@utils/types';
 
-import UserLabelHiddenSection from './UserLabelHiddenSection';
-import UserLabelPreviewModal from './UserLabelPreviewModal';
-
 import css from './ReviewOrdersResultModal.module.scss';
+
+const UserLabelCellContent = dynamic(() => import('./UserLabelCellContent'), {
+  ssr: false,
+});
+
+const UserLabelHiddenSection = dynamic(
+  () => import('./UserLabelHiddenSection'),
+  { ssr: false },
+);
+
+const UserLabelPreviewModal = dynamic(() => import('./UserLabelPreviewModal'), {
+  ssr: false,
+});
+
+function UserLabelThermalPrintSection({
+  userLabelRecords,
+}: {
+  userLabelRecords: UserLabelRecord[];
+}) {
+  return (
+    <>
+      {userLabelRecords.map((userLabelRecord, idx) => (
+        <div key={idx} className="w-[58mm] h-[44mm]">
+          <UserLabelCellContent
+            partnerName={userLabelRecord.partnerName}
+            companyName={userLabelRecord.companyName}
+            mealDate={userLabelRecord.mealDate}
+            participantName={userLabelRecord.participantName}
+            foodName={userLabelRecord.foodName}
+            qrCodeImageSrc={userLabelRecord.qrCodeImageSrc}
+            note={userLabelRecord.requirement}
+          />
+        </div>
+      ))}
+    </>
+  );
+}
+
+export interface UserLabelRecord {
+  partnerName: string;
+  companyName: string;
+  mealDate: string;
+  timestamp: string;
+  participantName: string;
+  foodName: string;
+  requirement?: string;
+  qrCodeImageSrc: string;
+}
 
 const prepareData = ({
   orderDetail = {},
@@ -104,6 +154,7 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
     [],
   );
   const [targetedDate, setTargetDate] = useState<string | 'all'>('all');
+  const currentPrintMode = useRef<'pdf' | 'thermal'>('pdf');
   const allowTriggerGenerateUserLabelFile = useRef(false);
 
   const [isGeneratingUserLabelFile, setIsGeneratingUserLabelFile] =
@@ -112,6 +163,12 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
     (state) => state.user.currentUser,
   );
 
+  const thermalPrintSectionRef = useRef<HTMLDivElement>(null);
+
+  const [qrCodeImageSrcMap, setQrCodeImageSrcMap] = useState<
+    Record<string, string>
+  >({});
+  const router = useRouter();
   const isAdmin = currentUser?.attributes?.profile?.metadata?.isAdmin;
 
   const {
@@ -187,11 +244,15 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
     [participantDataList],
   );
 
-  const preparedData = prepareData({
-    orderDetail,
-    participantData: participantDataMap,
-    planId: planListing?.id?.uuid || '',
-  });
+  const preparedData = useMemo(
+    () =>
+      prepareData({
+        orderDetail,
+        participantData: participantDataMap,
+        planId: planListing?.id?.uuid || '',
+      }),
+    [orderDetail, participantDataMap, planListing?.id?.uuid],
+  );
 
   const toggleCollapseStatus = (date: string) => () => {
     setExpandingStatusMap({
@@ -216,75 +277,111 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
     }
   }, [JSON.stringify(preparedData)]);
 
-  const generateUserLabels = async (exportType: 'state' | 'pdf-file') => {
-    if (!isAdmin) return;
-    if (!allowTriggerGenerateUserLabelFile.current) return;
+  const generatePDFModeLabels = useCallback(
+    async (exportType: 'preview' | 'pdf-file') => {
+      if (!isAdmin) return;
+      if (currentPrintMode.current !== 'pdf') return;
+      if (!allowTriggerGenerateUserLabelFile.current) return;
 
-    logger.info('Generating user labels...', 'START');
+      logger.info('Generating user labels...', 'START');
 
-    // eslint-disable-next-line new-cap
-    const pdf = new jsPDF('p', 'mm', 'a4');
+      // eslint-disable-next-line new-cap
+      const pdf = new jsPDF('p', 'mm', 'a4');
 
-    const printableAreas = document.querySelectorAll('[id^=printable-area-]');
-    const pageHeight = pdf.internal.pageSize.height;
-    const pageWidth = pdf.internal.pageSize.width;
-    const _userLabelPreviewSrcs = [];
+      const printableAreas = document.querySelectorAll('[id^=printable-area-]');
+      const pageHeight = pdf.internal.pageSize.height;
+      const pageWidth = pdf.internal.pageSize.width;
+      const _userLabelPreviewSrcs = [];
 
-    setIsGeneratingUserLabelFile(true);
-    for (let i = 0; i < printableAreas.length; i++) {
-      const printableArea = printableAreas[i];
-      // eslint-disable-next-line no-await-in-loop
-      const canvas = await html2canvas(printableArea as any, {
-        scale: 3,
-        useCORS: true,
-        allowTaint: true,
-      });
+      setIsGeneratingUserLabelFile(true);
+      for (let i = 0; i < printableAreas.length; i++) {
+        const printableArea = printableAreas[i];
+        // eslint-disable-next-line no-await-in-loop
+        const canvas = await html2canvas(printableArea as any, {
+          scale: 3,
+          useCORS: true,
+          allowTaint: true,
+        });
 
-      const imgData = canvas.toDataURL('image/png');
+        const imgData = canvas.toDataURL('image/png');
 
-      if (exportType === 'state') {
-        _userLabelPreviewSrcs.push(imgData);
+        if (exportType === 'preview') {
+          _userLabelPreviewSrcs.push(imgData);
+        }
+
+        if (exportType === 'pdf-file') {
+          const marginTopBottom = 4;
+          const marginLeftRight = 4;
+          pdf.addImage(
+            imgData,
+            'PNG',
+            marginLeftRight,
+            marginTopBottom,
+            pageWidth - marginLeftRight * 2,
+            pageHeight - marginTopBottom,
+            undefined,
+            'FAST',
+          );
+
+          if (i < printableAreas.length - 1) {
+            pdf.addPage();
+          }
+        }
+      }
+
+      if (exportType === 'preview') {
+        setUserLabelPreviewSrcs(_userLabelPreviewSrcs);
       }
 
       if (exportType === 'pdf-file') {
-        const marginTopBottom = 4;
-        const marginLeftRight = 4;
-        pdf.addImage(
-          imgData,
-          'PNG',
-          marginLeftRight,
-          marginTopBottom,
-          pageWidth - marginLeftRight * 2,
-          pageHeight - marginTopBottom,
-          undefined,
-          'FAST',
-        );
-
-        if (i < printableAreas.length - 1) {
-          pdf.addPage();
-        }
+        pdf.save('user-labels.pdf');
       }
-    }
 
-    if (exportType === 'state') {
-      setUserLabelPreviewSrcs(_userLabelPreviewSrcs);
-    }
+      setIsGeneratingUserLabelFile(false);
+    },
+    [isAdmin],
+  );
 
-    if (exportType === 'pdf-file') {
-      pdf.save('user-labels.pdf');
-    }
+  /**
+   * Generate QR code image src
+   */
+  useEffect(() => {
+    const datesNeededToGenerateQrCode = preparedData.reduce<Set<string>>(
+      (result, { date }) => {
+        if (date === targetedDate || targetedDate === 'all') {
+          result.add(date);
+        }
 
-    setIsGeneratingUserLabelFile(false);
-  };
+        return result;
+      },
+      new Set<string>(),
+    );
+
+    const generateQrCodeImageSrcsPromises = Array.from(
+      datesNeededToGenerateQrCode,
+    ).map(async (date) => {
+      const src = await QRCode.toDataURL(
+        `${process.env.NEXT_PUBLIC_CANONICAL_URL}/participant/order/${router.query.orderId}/?subOrderDate=${date}&openRatingModal=true`,
+      );
+
+      return { [date]: src };
+    });
+
+    Promise.all(generateQrCodeImageSrcsPromises).then((srcs) => {
+      setQrCodeImageSrcMap(
+        srcs.reduce((result, current) => ({ ...result, ...current }), {}),
+      );
+    });
+  }, [preparedData, router.query.orderId, targetedDate]);
 
   /**
    * When targetedDate is changed, trigger the generation of user labels
    */
   useEffect(() => {
-    if (isOpen) {
-      generateUserLabels('state');
+    if (isOpen && targetedDate) {
+      generatePDFModeLabels('preview');
     }
-  }, [targetedDate, isOpen]);
+  }, [targetedDate, isOpen, generatePDFModeLabels]);
 
   const withSetCurrentDateTo =
     (date: string | 'all', callback: () => void) => () => {
@@ -292,6 +389,103 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
       setTargetDate(date);
       setTimeout(callback);
     };
+
+  const printThermalSection = async () => {
+    if (!allowTriggerGenerateUserLabelFile.current) return;
+
+    const printContent = thermalPrintSectionRef.current?.innerHTML;
+    if (!printContent) return;
+    const convertToImage = await html2canvas(thermalPrintSectionRef.current, {
+      scale: 3,
+      useCORS: true,
+      allowTaint: true,
+    });
+    const imgData = convertToImage.toDataURL('image/png');
+
+    const printWindow = window.open('', '', 'height=600,width=800');
+    printWindow?.document.write(`
+      <style>
+        body {
+          margin: 0;
+        }
+
+        @media print {
+          body {
+            margin: 0;
+          }
+
+          @page {
+            size: 58mm 44mm;
+            margin: 0;
+          }
+        }
+      </style>
+      <img style="width: 55.785mm;" src="${imgData}" />
+    `);
+    printWindow?.document.close();
+    printWindow?.print();
+  };
+
+  const company: UserListing | null = useAppSelector(
+    (state) => state.OrderManagement.companyData,
+    shallowEqual,
+  );
+
+  const userLabelRecords = preparedData
+    .reduce<UserLabelRecord[]>((result, { date, orderData }) => {
+      if (date === targetedDate || targetedDate === 'all') {
+        const userLabelData = orderData.map(
+          ({
+            memberData,
+            foodData,
+            restaurant,
+          }: {
+            memberData: {
+              name: string;
+            };
+            foodData: {
+              foodName: string;
+              requirement: string;
+            };
+            restaurant: {
+              restaurantName: string;
+            };
+          }) => {
+            const { name: participantName } = memberData || {};
+            const { foodName, requirement } = foodData || {};
+
+            return {
+              partnerName: restaurant?.restaurantName,
+              requirement,
+              companyName:
+                company?.attributes?.profile?.publicData?.companyName || '',
+              mealDate: DateTime.fromMillis(Number(date)).toFormat(
+                'dd/MM/yyyy',
+              ),
+              participantName,
+              foodName,
+              timestamp: date,
+              qrCodeImageSrc: qrCodeImageSrcMap[date],
+            } satisfies UserLabelRecord;
+          },
+        );
+
+        return result.concat(userLabelData);
+      }
+
+      return result;
+    }, [] as UserLabelRecord[])
+    .sort((a, b) => {
+      if (a.foodName < b.foodName) {
+        return -1;
+      }
+
+      if (a.foodName > b.foodName) {
+        return 1;
+      }
+
+      return 0;
+    });
 
   const content = (
     <>
@@ -320,7 +514,9 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
                 inProgress={isGeneratingUserLabelFile && targetedDate === 'all'}
                 className="h-[36px] px-2 !border-blue-500 hover:!text-stone-600 hover:stroke-stone-600"
                 onClick={withSetCurrentDateTo('all', () => {
-                  generateUserLabels('pdf-file');
+                  setTimeout(() => {
+                    generatePDFModeLabels('pdf-file');
+                  });
                 })}>
                 <svg
                   viewBox="0 0 24 24"
@@ -396,7 +592,7 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
           return (
             <div className={css.dateContainer} key={date}>
               <div className={css.dateTitle}>
-                <div>
+                <div className="flex-1 flex items-center">
                   {intl.formatMessage(
                     { id: 'ReviewOrdersResultModal.dateTitle' },
                     {
@@ -407,7 +603,7 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
                   )}
                 </div>
                 <RenderWhen condition={!isEmptyOrderData}>
-                  <div className="flex items-center">
+                  <div className="flex flex-wrap justify-end gap-2 items-center">
                     {isAdmin && showBarcode && (
                       <Link
                         href={enGeneralPaths.admin.scanner['[planId]'][
@@ -442,27 +638,74 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
 
                     {isAdmin && (
                       <RenderWhen condition={!isMobileLayout}>
-                        <Button
-                          variant="inline"
-                          size="small"
-                          onClick={withSetCurrentDateTo(date, () => {
-                            setIsViewUserLabelModalOpen(true);
-                          })}>
-                          Xem label
-                        </Button>
-                        <Button
-                          variant="inline"
-                          size="small"
-                          inProgress={
-                            isGeneratingUserLabelFile && targetedDate === date
-                          }
-                          loadingMode="extend"
-                          onClick={withSetCurrentDateTo(date, () => {
-                            generateUserLabels('pdf-file');
-                          })}>
-                          Tải label
-                        </Button>
+                        <div className="flex gap-2 items-center bg-orange-50 py-1 px-2 rounded-lg border border-orange-200">
+                          <p className="text-xs ">Máy in nhiệt</p>
+                          <Button
+                            variant="inline"
+                            size="small"
+                            className={classNames({
+                              '!bg-gray-200':
+                                isGeneratingUserLabelFile &&
+                                targetedDate === date,
+                            })}
+                            inProgress={
+                              isGeneratingUserLabelFile && targetedDate === date
+                            }
+                            loadingMode="extend"
+                            onClick={withSetCurrentDateTo(date, () => {
+                              setTimeout(() => {
+                                printThermalSection();
+                              });
+                            })}>
+                            In label
+                          </Button>
+                        </div>
                       </RenderWhen>
+                    )}
+
+                    {isAdmin && (
+                      <div className="flex gap-2 items-center bg-blue-50 py-1 px-2 rounded-lg border border-blue-200">
+                        <p className="text-xs ">File label</p>
+                        <RenderWhen condition={!isMobileLayout}>
+                          <Button
+                            variant="inline"
+                            size="small"
+                            className={classNames({
+                              '!bg-gray-200':
+                                isGeneratingUserLabelFile &&
+                                targetedDate === date,
+                            })}
+                            inProgress={
+                              isGeneratingUserLabelFile && targetedDate === date
+                            }
+                            onClick={withSetCurrentDateTo(date, () => {
+                              setTimeout(() => {
+                                setIsViewUserLabelModalOpen(true);
+                              });
+                            })}>
+                            Xem label
+                          </Button>
+                          <Button
+                            variant="inline"
+                            size="small"
+                            inProgress={
+                              isGeneratingUserLabelFile && targetedDate === date
+                            }
+                            loadingMode="extend"
+                            className={classNames({
+                              '!bg-gray-200':
+                                isGeneratingUserLabelFile &&
+                                targetedDate === date,
+                            })}
+                            onClick={withSetCurrentDateTo(date, () => {
+                              setTimeout(() => {
+                                generatePDFModeLabels('pdf-file');
+                              });
+                            })}>
+                            Tải label
+                          </Button>
+                        </RenderWhen>
+                      </div>
                     )}
                     <IconArrow
                       direction={isExpanding ? 'up' : 'down'}
@@ -533,12 +776,6 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
                             <div className="flex-1">-</div>
                           )}
                         </div>
-                        <RenderWhen condition={!!requirement}>
-                          <div className={css.mobileRequirement}>
-                            <div />
-                            <div> {requirement}</div>
-                          </div>
-                        </RenderWhen>
                       </div>
                     );
                   })}
@@ -587,10 +824,17 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
       )}
 
       {isAdmin && (
-        <UserLabelHiddenSection
-          preparedData={preparedData}
-          targetedDate={targetedDate}
-        />
+        <UserLabelHiddenSection userLabelRecords={userLabelRecords} />
+      )}
+
+      {isAdmin && (
+        <div className="h-0 overflow-hidden absolute">
+          <div
+            className="flex flex-wrap gap-2 flex-col"
+            ref={thermalPrintSectionRef}>
+            <UserLabelThermalPrintSection userLabelRecords={userLabelRecords} />
+          </div>
+        </div>
       )}
     </>
   );

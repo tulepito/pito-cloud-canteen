@@ -1,14 +1,20 @@
 import React, { useState } from 'react';
 import { useIntl } from 'react-intl';
 import classNames from 'classnames';
+import dynamic from 'next/dynamic';
 
 import Button from '@components/Button/Button';
 import type { PlanListing } from '@src/types';
 import type { TObject } from '@utils/types';
 
-import ReviewOrdersResultModal from './ReviewOrdersResultModal';
-
 import css from './ReviewOrdersResultSection.module.scss';
+
+const ReviewOrdersResultModal = dynamic(
+  () => import('./ReviewOrdersResultModal'),
+  {
+    ssr: false,
+  },
+);
 
 type TReviewOrdersResultSectionProps = {
   className?: string;
