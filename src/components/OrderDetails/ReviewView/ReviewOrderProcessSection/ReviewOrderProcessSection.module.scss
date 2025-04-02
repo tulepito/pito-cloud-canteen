@@ -3,12 +3,14 @@
 @use '/src/styles/customMediaQueries.scss' as *;
 
 .root {
-  border: 1px solid $neutralGray5;
+  border: 1px solid $neutralGray3;
+  box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.05);
   border-radius: 16px;
   padding: 16px 24px;
-  display: none;
 
   @include viewportMedium {
+    border: 1px solid $neutralGray5;
+    box-shadow: none;
     display: block;
   }
 

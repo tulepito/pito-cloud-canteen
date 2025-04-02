@@ -5,6 +5,7 @@
 .root {
   padding: 0 16px 210px;
   display: flex;
+  gap: 8px;
   flex-direction: column;
 
   @include viewportMedium {
@@ -70,7 +71,6 @@
 
   .rightPart {
     order: 2;
-    height: 0;
     @include viewportMedium {
       height: fit-content;
     }

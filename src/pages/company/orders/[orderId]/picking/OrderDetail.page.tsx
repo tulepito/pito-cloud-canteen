@@ -653,12 +653,6 @@ const OrderDetailPage = () => {
     }
   }, [isMobileLayout, isViewCartDetailMode]);
 
-  useEffect(() => {
-    if (!isNormalOrder) {
-      automaticConfirmOrderMobileControl.setTrue();
-    }
-  }, [isNormalOrder]);
-
   const goHomeIcon = <GoHomeIcon control={confirmGoHomeControl} />;
   const moreOptionsIcon = (
     <MoreOptionsIcon
