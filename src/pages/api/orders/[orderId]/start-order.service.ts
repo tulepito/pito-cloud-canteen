@@ -102,7 +102,6 @@ export const startOrder = async (orderId: string, planId: string) => {
       {
         id: planId,
         metadata: {
-          planStarted: true,
           partnerIds,
           orderDetailStartedSnapshot,
         },
@@ -154,6 +153,13 @@ export const startOrder = async (orderId: string, planId: string) => {
         },
       },
     );
+
+    integrationSdk.listings.update({
+      id: planId,
+      metadata: {
+        planStarted: true,
+      },
+    });
   }
 
   await pushNativeNotificationOrderDetail(
