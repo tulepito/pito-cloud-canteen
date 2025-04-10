@@ -1,4 +1,4 @@
-import type { AxiosInstance, AxiosRequestConfig } from 'axios';
+import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import axios from 'axios';
 import type { NextApiHandler, NextApiRequest, NextApiResponse } from 'next';
 
@@ -16,15 +16,15 @@ const getRequestKey = (config: AxiosRequestConfig): string => {
 export const fetchWithDedup = <T = any>(
   axiosInstance: AxiosInstance,
   config: AxiosRequestConfig,
-): Promise<T> => {
+): Promise<AxiosResponse<T>> => {
   const key = getRequestKey(config);
 
   if (inFlightRequests.has(key)) {
-    return inFlightRequests.get(key) as Promise<T>;
+    return inFlightRequests.get(key) as Promise<AxiosResponse<T>>;
   }
 
   const requestPromise = axiosInstance(config)
-    .then((res) => res.data as T)
+    .then((res) => res as AxiosResponse<T>)
     .finally(() => {
       inFlightRequests.delete(key);
     });

@@ -98,22 +98,22 @@ export const deleteGroupApi = (data: DeleteGroupApiData) =>
   deleteApi('/company/group', data);
 
 export const queryOrdersApi = (companyId: string, params: TObject = {}) => {
-  return getApi(`/company/${companyId}/orders`, params);
+  return getDedupApi(`/company/${companyId}/orders/`, params);
 };
 
 const queryCompanyPlansByOrderIdsApi = (
   companyId: string,
   params: TObject = {},
 ) => {
-  return getApi(`/company/${companyId}/plans`, params);
+  return getDedupApi(`/company/${companyId}/plans/`, params);
 };
 
 export const getCompanyNotificationsApi = (companyId: string) => {
-  return getApi(`/company/${companyId}/orders/notifications`);
+  return getDedupApi(`/company/${companyId}/orders/notifications/`);
 };
 
 export const getCompanyOrderSummaryApi = (companyId: string) => {
-  return getApi(`/company/${companyId}/orders/summary`);
+  return getDedupApi(`/company/${companyId}/orders/summary/`);
 };
 
 export const companyApi = {
@@ -229,7 +229,7 @@ export const adminQueryAllClientPaymentsApi = (lastPaymentRecord: number) => {
 };
 
 export const fetchBookerNotificationsApi = () =>
-  getApi(`/company/notifications`);
+  getDedupApi(`/company/notifications/`);
 
 export const getCompanyRatingsApi = (
   companyId: string,

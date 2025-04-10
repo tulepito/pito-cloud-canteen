@@ -2,9 +2,9 @@ import type { NotificationInvitationParams } from '@services/notifications';
 import type { ENotificationType } from '@src/utils/enums';
 import type { TObject } from '@src/utils/types';
 
-import { getApi, postApi, putApi } from './configs';
+import { getDedupApi, postApi, putApi } from './configs';
 
-export const fetchNotificationsApi = async () => getApi('/notifications');
+export const fetchNotificationsApi = async () => getDedupApi('/notifications/');
 
 export const updateNotificationsApi = async ({
   notificationIds,

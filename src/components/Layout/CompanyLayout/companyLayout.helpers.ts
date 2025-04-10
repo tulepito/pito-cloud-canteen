@@ -40,6 +40,7 @@ export const shouldShowCompanyNavBar = [
   companyPaths.ManageOrders,
   enGeneralPaths.company.booker.orders.new['[companyId]'].index('[companyId]'),
   personalPaths.Account,
+  enGeneralPaths.company['[companyId]'].ratings.index('[companyId]'),
 ];
 
 export const shouldShowSidebar = (pathName: string) => {
@@ -55,7 +56,10 @@ export const shouldHideCompanyFooter = (pathName: string) => {
   return HIDING_COMPANY_FOOTER_PATHNAMES.includes(pathName);
 };
 
-const SHOW_COMPANY_MOBILE_HEADER_PATHNAMES = [companyPaths.Home];
+const SHOW_COMPANY_MOBILE_HEADER_PATHNAMES = [
+  companyPaths.Home,
+  enGeneralPaths.company['[companyId]'].ratings.index('[companyId]'),
+];
 
 export const shouldShowMobileCompanyHeader = (pathName: string) => {
   return SHOW_COMPANY_MOBILE_HEADER_PATHNAMES.includes(pathName);

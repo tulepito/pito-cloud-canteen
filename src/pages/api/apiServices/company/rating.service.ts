@@ -131,6 +131,7 @@ export const postParticipantRatingFn = async ({
       listingType: EListingType.rating,
       reviewRole: ECompanyPermission.participant,
       companyId,
+      orderCode,
       foodName,
       foodId,
     },

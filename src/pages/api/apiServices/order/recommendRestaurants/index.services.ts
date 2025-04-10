@@ -236,18 +236,17 @@ export const recommendRestaurants = async ({
             params: menuQueryParams,
             orderParams: recommendParams,
           });
+
       const allMenus = await queryAllListings({
         query: menuQuery,
       });
 
-      // filter all menus having publicData.foodsBydate[dayOfWeek]'s values.price === packagePerMember
       const filteredMenus = filterMenusHavePackagePerMember(
         allMenus,
         timestamp,
         packagePerMember,
       );
 
-      // * query all restaurant
       const restaurantIdList = chunk(
         uniq<string>(
           filteredMenus.map((menu: TListing) => {
@@ -258,32 +257,32 @@ export const recommendRestaurants = async ({
         ),
         100,
       );
+
       const restaurantsResponse = flatten(
         await Promise.all(
-          restaurantIdList.map(async (ids) =>
-            adminQueryListings(
-              getRestaurantQuery({
-                restaurantIds: ids,
-                companyAccount: null,
-                deliveryLatLng: {
-                  lat:
-                    order?.attributes?.metadata?.deliveryAddress?.origin?.lat ??
-                    0,
-                  lng:
-                    order?.attributes?.metadata?.deliveryAddress?.origin?.lng ??
-                    0,
-                },
-                isRestrictDistance: true,
-                params: {
-                  memberAmount,
-                },
-              }),
-            ),
-          ),
+          restaurantIdList.map(async (ids) => {
+            const restaurantQuery = getRestaurantQuery({
+              restaurantIds: ids,
+              companyAccount: null,
+              deliveryLatLng: {
+                lat:
+                  order?.attributes?.metadata?.deliveryAddress?.origin?.lat ??
+                  0,
+                lng:
+                  order?.attributes?.metadata?.deliveryAddress?.origin?.lng ??
+                  0,
+              },
+              isRestrictDistance: true,
+              params: {
+                memberAmount,
+              },
+            });
+
+            return adminQueryListings(restaurantQuery);
+          }),
         ),
       );
 
-      // * map restaurant with menu data
       const restaurants = combineMenusWithRestaurantData({
         menus: filteredMenus,
         restaurants: restaurantsResponse,

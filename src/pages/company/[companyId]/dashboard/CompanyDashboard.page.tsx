@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 
@@ -8,6 +7,7 @@ import { orderAsyncActions } from '@redux/slices/Order.slice';
 import { CurrentUser, User } from '@src/utils/data';
 import type { TCurrentUser, TUser } from '@src/utils/types';
 
+import BookerRatingSection from './components/BookerRatingSection/BookerRatingSection';
 import CompanyDashboardHeroSection from './components/CompanyDashboardHeroSection/CompanyDashboardHeroSection';
 import NotificationSection from './components/NotificationSection/NotificationSection';
 import OrdersAnalysisSection from './components/OrdersAnalysisSection/OrdersAnalysisSection';
@@ -56,11 +56,7 @@ const CompanyDashboardPage = () => {
         query: { companyId: getCompanyIdFromBookerUser(currentUser!) },
       });
     }
-  }, [
-    isReady,
-    JSON.stringify(companyId as string),
-    JSON.stringify(currentUser),
-  ]);
+  }, [companyId, currentUser, isReady, pathname, replace]);
 
   useEffect(() => {
     if (!companyId || !currentUserId) return;
@@ -86,13 +82,21 @@ const CompanyDashboardPage = () => {
         ...authorIdMaybe,
       }),
     );
+  }, [bookerCompanies, companyId, currentUserId, dispatch]);
+
+  useEffect(() => {
+    if (!companyId || !currentUserId) return;
+
+    const isPersonal = companyId === 'personal';
+    const companyIdToQuery = isPersonal ? currentUserId : companyId;
+
     dispatch(
       orderAsyncActions.getCompanyOrderNotification(companyIdToQuery as string),
     );
     dispatch(
       orderAsyncActions.getCompanyOrderSummary(companyIdToQuery as string),
     );
-  }, [dispatch, companyId, currentUserId, JSON.stringify(bookerCompanies)]);
+  }, [companyId, currentUserId, dispatch]);
 
   return (
     <div className={css.root}>
@@ -110,6 +114,7 @@ const CompanyDashboardPage = () => {
             />
           </div>
           <div className="flex flex-col gap-4">
+            <BookerRatingSection />
             <NotificationSection
               inProgress={getCompanyOrderNotificationInProgress}
               companyOrderNotificationMap={companyOrderNotificationMap}

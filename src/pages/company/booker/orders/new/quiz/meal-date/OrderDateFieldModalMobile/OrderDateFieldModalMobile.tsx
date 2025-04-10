@@ -15,12 +15,22 @@ type TOrderDateFieldModalMobileProps = {
   form: any;
   values: Partial<TMealDateFormValues>;
   selectedTimeRangeOption: string;
+  noMinMax?: boolean;
+  allowClear?: boolean;
+  dateRangeNoLimit?: boolean;
 };
 
 const OrderDateFieldModalMobile: React.FC<TOrderDateFieldModalMobileProps> = (
   props,
 ) => {
-  const { isOpen, onClose, form, values, selectedTimeRangeOption } = props;
+  const {
+    isOpen,
+    onClose,
+    form,
+    values,
+    selectedTimeRangeOption,
+    dateRangeNoLimit,
+  } = props;
   const {
     startDate,
     endDate,
@@ -28,11 +38,13 @@ const OrderDateFieldModalMobile: React.FC<TOrderDateFieldModalMobileProps> = (
     maxDate,
     handleUpdateDateRange,
     handleOrderDateRangeChange,
+    handleClearDateRange,
   } = useOrderDateSelect({
     form,
     values,
     modalCallback: onClose,
     selectedTimeRangeOption,
+    dateRangeNoLimit,
   });
 
   const daySession = useAppSelector((state) => state.Quiz.quiz?.daySession);
@@ -54,8 +66,8 @@ const OrderDateFieldModalMobile: React.FC<TOrderDateFieldModalMobileProps> = (
       <FieldDateRangePicker
         id="dateRangeFieldMobile"
         name="dateRangeFieldMobile"
-        minDate={newMinDate || new Date()}
-        maxDate={maxDate}
+        minDate={props.noMinMax ? undefined : newMinDate || new Date()}
+        maxDate={props.noMinMax ? undefined : maxDate}
         className={css.dateRangePicker}
         onChange={handleOrderDateRangeChange}
         selected={startDate}
@@ -63,12 +75,21 @@ const OrderDateFieldModalMobile: React.FC<TOrderDateFieldModalMobileProps> = (
         endDate={endDate}
       />
       <div className={css.bottomBtns}>
-        <Button className={css.btn} variant="secondary" onClick={onClose}>
+        <Button className={'flex-1'} variant="secondary" onClick={onClose}>
           Huỷ
         </Button>
+        {props.allowClear && (
+          <Button
+            variant="secondary"
+            type="button"
+            className={'flex-1'}
+            onClick={handleClearDateRange}>
+            Xoá
+          </Button>
+        )}
         <Button
           type="button"
-          className={css.btn}
+          className={'flex-1'}
           variant="primary"
           onClick={onSubmitOrderDate}>
           Áp dụng

@@ -265,6 +265,7 @@ export interface RatingListingMetadata {
   generalRating: number;
   companyId: string;
   orderId: string;
+  orderCode: string;
   restaurantId: string;
   reviewRole: 'participant' | 'booker';
   reviewerId: string;

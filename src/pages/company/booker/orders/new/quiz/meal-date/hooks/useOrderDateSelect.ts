@@ -10,6 +10,7 @@ type TUseOrderDateSelect = {
   values: Partial<TMealDateFormValues>;
   selectedTimeRangeOption: string;
   modalCallback?: () => void;
+  dateRangeNoLimit?: boolean;
 };
 
 export const useOrderDateSelect = ({
@@ -17,6 +18,7 @@ export const useOrderDateSelect = ({
   values,
   selectedTimeRangeOption,
   modalCallback,
+  dateRangeNoLimit,
 }: TUseOrderDateSelect) => {
   const { startDate: startDateInitialValue, endDate: endDateInitialValue } =
     values;
@@ -91,12 +93,23 @@ export const useOrderDateSelect = ({
     setStartDate(_values[0]);
     if (
       _values[1] &&
+      !dateRangeNoLimit &&
       diffDays(_values[1].getTime(), _values[0]?.getTime()).days > 6
     ) {
       setEndDate(DateTime.fromJSDate(_values[0]!).plus({ days: 6 }).toJSDate());
     } else {
       setEndDate(_values[1]);
     }
+  };
+
+  const handleClearDateRange = () => {
+    setStartDate(null);
+    setEndDate(null);
+    form.batch(() => {
+      form.change('startDate', null);
+      form.change('endDate', null);
+    });
+    modalCallback?.();
   };
 
   return {
@@ -109,5 +122,6 @@ export const useOrderDateSelect = ({
     handleUpdateDateRange,
     handleOrderDateRangeChange,
     handleTimeRangeSelect,
+    handleClearDateRange,
   };
 };

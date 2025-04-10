@@ -3,6 +3,7 @@ import { Form as FinalForm } from 'react-final-form';
 import format from 'date-fns/format';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
+import * as xlsx from 'xlsx';
 
 import { getCompanyRatingsApi } from '@apis/companyApi';
 import Avatar from '@components/Avatar/Avatar';
@@ -10,6 +11,7 @@ import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import MetaWrapper from '@components/MetaWrapper/MetaWrapper';
+import Tooltip from '@components/Tooltip/Tooltip';
 import { EmptyWrapper } from '@pages/admin/scanner/[planId]/EmptyWrapper';
 import { LoadingWrapper } from '@pages/admin/scanner/[planId]/LoadingWrapper';
 import OrderDateField from '@pages/company/booker/orders/new/quiz/meal-date/OrderDateField/OrderDateField';
@@ -26,6 +28,7 @@ export default function CompanyDetailRoute() {
   const [loadingMore, setLoadingMore] = useState<boolean>(false);
   const pageRef = useRef<number>(1);
   const [error, setError] = useState<string | null>(null);
+  const [exporting, setExporting] = useState<boolean>(false);
 
   const { query } = router;
   const {
@@ -54,34 +57,51 @@ export default function CompanyDetailRoute() {
   }, [endDateFromQuery]);
 
   const fetchRatings = useCallback(
-    async (filterBy?: {
-      orderCode?: string;
-      page?: number;
-      startDate?: string;
-      endDate?: string;
-    }) => {
+    async (
+      filterBy?: {
+        orderCode?: string;
+        page?: number;
+        perPage?: number;
+        startDate?: string;
+        endDate?: string;
+      },
+      mode: 'export' | 'ui' = 'ui',
+    ) => {
       try {
-        if (filterBy?.page && filterBy?.page > 1) {
-          setLoadingMore(true);
-        } else {
-          setInProgress(true);
+        if (mode === 'export') {
+          setExporting(true);
+        }
+
+        if (mode === 'ui') {
+          if (filterBy?.page && filterBy?.page > 1) {
+            setLoadingMore(true);
+          } else {
+            setInProgress(true);
+          }
         }
 
         setError(null);
         if (!companyId) return;
 
         const _page = filterBy?.page || 1;
+        const _perPage = filterBy?.perPage || 5;
         const response = await getCompanyRatingsApi(companyId as string, {
           page: _page,
-          perPage: 5,
+          perPage: _perPage,
           filterBy,
         });
 
-        setCanLoadMore(response.length >= 5);
-        if (filterBy?.page && filterBy?.page > 1) {
-          setRatings((prev) => [...prev, ...response]);
-        } else {
-          setRatings(response);
+        if (mode === 'ui') {
+          setCanLoadMore(response.data.length >= 5);
+          if (filterBy?.page && filterBy?.page > 1) {
+            setRatings((prev) => [...prev, ...response.data]);
+          } else {
+            setRatings(response.data);
+          }
+        }
+
+        if (mode === 'export') {
+          return response.data;
         }
       } catch (err) {
         setError('Error loading company ratings');
@@ -89,6 +109,7 @@ export default function CompanyDetailRoute() {
       } finally {
         setInProgress(false);
         setLoadingMore(false);
+        setExporting(false);
       }
     },
     [companyId],
@@ -98,16 +119,19 @@ export default function CompanyDetailRoute() {
    * Fetch ratings when the component mounts or when the companyId changes
    */
   useEffect(() => {
-    fetchRatings({
-      orderCode: orderCode as string,
-      startDate: startDate ? new Date(startDate).toDateString() : undefined,
-      endDate: endDate ? new Date(endDate).toDateString() : undefined,
-    });
+    fetchRatings(
+      {
+        orderCode: orderCode as string,
+        startDate: startDate ? new Date(startDate).toDateString() : undefined,
+        endDate: endDate ? new Date(endDate).toDateString() : undefined,
+      },
+      'ui',
+    );
   }, [companyId, endDate, fetchRatings, orderCode, startDate]);
 
   return (
     <MetaWrapper>
-      <div className="w-full container max-w-lg mx-auto">
+      <div className="w-full container p-4 pb-32 md:p-0 max-w-lg mx-auto">
         <div className="flex items-center gap-2 mb-2">
           <svg
             width="32px"
@@ -166,7 +190,7 @@ export default function CompanyDetailRoute() {
                 },
               },
               undefined,
-              { shallow: true },
+              { shallow: false },
             );
             pageRef.current = 1;
           }}
@@ -188,37 +212,124 @@ export default function CompanyDetailRoute() {
                       name="orderCode"
                       type="text"
                     />
-                    <OrderDateField hideLabel form={form} values={values} />
-                    <Button
-                      type="submit"
-                      disabled={invalid}
-                      size="small"
-                      className="h-[44px]"
-                      variant="primary">
-                      <div className="flex items-center gap-1">
-                        <span className="text-base">Lọc</span>
-                        <svg
-                          width="24px"
-                          height="24px"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg">
-                          <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                          <g
-                            id="SVGRepo_tracerCarrier"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"></g>
-                          <g id="SVGRepo_iconCarrier">
-                            {' '}
-                            <path
-                              fill-rule="evenodd"
-                              clip-rule="evenodd"
-                              d="M3 7C3 6.44772 3.44772 6 4 6H20C20.5523 6 21 6.44772 21 7C21 7.55228 20.5523 8 20 8H4C3.44772 8 3 7.55228 3 7ZM6 12C6 11.4477 6.44772 11 7 11H17C17.5523 11 18 11.4477 18 12C18 12.5523 17.5523 13 17 13H7C6.44772 13 6 12.5523 6 12ZM9 17C9 16.4477 9.44772 16 10 16H14C14.5523 16 15 16.4477 15 17C15 17.5523 14.5523 18 14 18H10C9.44772 18 9 17.5523 9 17Z"
-                              fill="currentColor"></path>{' '}
-                          </g>
-                        </svg>
-                      </div>
-                    </Button>
+                    <OrderDateField
+                      noMinMax
+                      hideQuickSelect
+                      allowClear
+                      dateRangeNoLimit
+                      hideLabel
+                      form={form}
+                      values={values}
+                    />
+                    <div className="flex items-center gap-2">
+                      <Button
+                        type="submit"
+                        disabled={invalid}
+                        size="small"
+                        className="h-[44px] flex-1"
+                        variant="primary">
+                        <div className="flex items-center gap-1">
+                          <span className="text-base">Lọc</span>
+                          <svg
+                            width="24px"
+                            height="24px"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                            <g
+                              id="SVGRepo_tracerCarrier"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"></g>
+                            <g id="SVGRepo_iconCarrier">
+                              {' '}
+                              <path
+                                fill-rule="evenodd"
+                                clip-rule="evenodd"
+                                d="M3 7C3 6.44772 3.44772 6 4 6H20C20.5523 6 21 6.44772 21 7C21 7.55228 20.5523 8 20 8H4C3.44772 8 3 7.55228 3 7ZM6 12C6 11.4477 6.44772 11 7 11H17C17.5523 11 18 11.4477 18 12C18 12.5523 17.5523 13 17 13H7C6.44772 13 6 12.5523 6 12ZM9 17C9 16.4477 9.44772 16 10 16H14C14.5523 16 15 16.4477 15 17C15 17.5523 14.5523 18 14 18H10C9.44772 18 9 17.5523 9 17Z"
+                                fill="currentColor"></path>{' '}
+                            </g>
+                          </svg>
+                        </div>
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        size="small"
+                        disabled={exporting}
+                        inProgress={exporting}
+                        className="h-[44px] w-[160px] hover:!text-[#000000] text-[#000000]"
+                        onClick={() => {
+                          fetchRatings(
+                            {
+                              ...values,
+                              page: 1,
+                              perPage: 1000,
+                            },
+                            'export',
+                          ).then((response) => {
+                            const ws = xlsx.utils.json_to_sheet(
+                              (response || []).map((rating) => ({
+                                'Mã đơn hàng': rating.order?.attributes?.title,
+                                'Người đánh giá':
+                                  rating.reviewer &&
+                                  buildFullNameFromProfile(
+                                    rating.reviewer.attributes?.profile,
+                                  ),
+                                'Đánh giá tổng quát':
+                                  rating.attributes?.metadata?.generalRating ||
+                                  0,
+                                'Đánh giá chi tiết':
+                                  rating.attributes?.metadata
+                                    ?.detailTextRating || '',
+                                'Thời gian đánh giá': rating.attributes
+                                  ?.metadata?.timestamp
+                                  ? format(
+                                      new Date(
+                                        +(
+                                          rating.attributes?.metadata
+                                            ?.timestamp || 0
+                                        ),
+                                      ),
+                                      'dd/MM/yyyy',
+                                    )
+                                  : '',
+                              })),
+                            );
+                            const wb = xlsx.utils.book_new();
+                            xlsx.utils.book_append_sheet(wb, ws, 'Ratings');
+                            xlsx.writeFile(wb, 'ratings.xlsx');
+                          });
+                        }}>
+                        <Tooltip
+                          tooltipContent={'Tối đa 1000 đánh giá gần nhất'}
+                          placement="top">
+                          <div className="flex items-center gap-1">
+                            <span>Xuất danh sách</span>
+                            <svg
+                              width="16px"
+                              height="16px"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg">
+                              <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                              <g
+                                id="SVGRepo_tracerCarrier"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"></g>
+                              <g id="SVGRepo_iconCarrier">
+                                {' '}
+                                <path
+                                  fill-rule="evenodd"
+                                  clip-rule="evenodd"
+                                  d="M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12ZM12 17.75C12.4142 17.75 12.75 17.4142 12.75 17V11C12.75 10.5858 12.4142 10.25 12 10.25C11.5858 10.25 11.25 10.5858 11.25 11V17C11.25 17.4142 11.5858 17.75 12 17.75ZM12 7C12.5523 7 13 7.44772 13 8C13 8.55228 12.5523 9 12 9C11.4477 9 11 8.55228 11 8C11 7.44772 11.4477 7 12 7Z"
+                                  fill="currentColor"></path>{' '}
+                              </g>
+                            </svg>
+                          </div>
+                        </Tooltip>
+                      </Button>
+                    </div>
                   </div>
                 </Form>
                 <LoadingWrapper isLoading={inProgress}>
@@ -243,6 +354,7 @@ export default function CompanyDetailRoute() {
                                       rating.reviewer.attributes?.profile,
                                     )}
                                   </div>
+
                                   <div className="flex items-center gap-0 ml-[-2px]">
                                     {new Array(
                                       rating.attributes?.metadata?.generalRating,
@@ -271,33 +383,49 @@ export default function CompanyDetailRoute() {
                                       ))}
                                   </div>
                                 </div>
-                                <div className="flex gap-2 flex-wrap">
-                                  {rating.images?.map((image, idx) => (
-                                    <Image
-                                      src={
-                                        image?.attributes?.variants?.[
-                                          'square-small2x'
-                                        ]?.url || ''
-                                      }
-                                      key={idx}
-                                      alt="Hình ảnh đánh giá"
-                                      width={100}
-                                      height={100}
-                                      style={{
-                                        borderRadius: '8px',
-                                      }}
-                                    />
-                                  ))}
-                                </div>
-                                {!!rating.attributes?.metadata
-                                  ?.detailTextRating && (
-                                  <p className="text-sm text-stone-700">
-                                    {
-                                      rating.attributes?.metadata
-                                        ?.detailTextRating
-                                    }
-                                  </p>
+
+                                {!!rating.images?.length && (
+                                  <div className="flex gap-2 flex-wrap">
+                                    {rating.images?.map((image, idx) => (
+                                      <Image
+                                        src={
+                                          image?.attributes?.variants?.[
+                                            'square-small2x'
+                                          ]?.url || ''
+                                        }
+                                        key={idx}
+                                        alt="Hình ảnh đánh giá"
+                                        width={100}
+                                        height={100}
+                                        style={{
+                                          borderRadius: '8px',
+                                        }}
+                                      />
+                                    ))}
+                                  </div>
                                 )}
+
+                                <p className="text-sm text-stone-700">
+                                  {rating.attributes?.metadata?.foodName && (
+                                    <span className="text-stone-900 font-semibold">
+                                      <span className="text-stone-900">
+                                        (Món ăn:&nbsp;
+                                      </span>
+                                      {rating.attributes?.metadata?.foodName})
+                                    </span>
+                                  )}
+                                  &nbsp;
+                                  {!!rating.attributes?.metadata
+                                    ?.detailTextRating && (
+                                    <span>
+                                      {
+                                        rating.attributes?.metadata
+                                          ?.detailTextRating
+                                      }
+                                    </span>
+                                  )}
+                                </p>
+
                                 <span className="text-xs text-stone-500">
                                   #{rating.order?.attributes?.title}&nbsp;&nbsp;
                                   {!!rating.attributes?.metadata?.timestamp &&
@@ -321,15 +449,18 @@ export default function CompanyDetailRoute() {
                         {canLoadMore && (
                           <div className="flex justify-center">
                             <Button
-                              variant="secondary"
+                              variant="inline"
                               size="small"
                               className="h-[44px]"
                               onClick={() => {
                                 pageRef.current += 1;
-                                fetchRatings({
-                                  ...values,
-                                  page: pageRef.current,
-                                });
+                                fetchRatings(
+                                  {
+                                    ...values,
+                                    page: pageRef.current,
+                                  },
+                                  'ui',
+                                );
                               }}>
                               Xem thêm
                             </Button>

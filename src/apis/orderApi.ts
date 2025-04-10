@@ -199,7 +199,7 @@ export const recommendRestaurantApi = ({
 }: GETRestaurantsRecommendationJSONParams & {
   orderId: string;
 }) => {
-  return getApi(`/orders/${orderId}/restaurants-recommendation`, {
+  return getApi(`/orders/${orderId}/restaurants-recommendation/`, {
     timestamp,
     recommendParams,
   });

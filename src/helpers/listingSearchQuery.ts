@@ -115,7 +115,14 @@ export const getMenuQuery = ({
 export const getMenuQueryWithDraftOrderData = ({
   params,
   orderParams,
-}: any) => {
+  options,
+}: {
+  params: TObject;
+  orderParams: TObject;
+  options?: {
+    ignoreSearchByPackagePermember?: boolean;
+  };
+}) => {
   const {
     timestamp,
     menuTypes = [],
@@ -164,7 +171,11 @@ export const getMenuQueryWithDraftOrderData = ({
           )}`,
         }
       : {}),
-    [`pub_${dayOfWeek}MinFoodPrice`]: `,${packagePerMember + 1}`,
+    ...(options?.ignoreSearchByPackagePermember
+      ? {}
+      : {
+          [`pub_${dayOfWeek}MinFoodPrice`]: `,${packagePerMember + 1}`,
+        }),
     ...(mealFoodType.length > 0
       ? {
           [`meta_${dayOfWeek}FoodType`]: `has_any:${convertedMealFoodType.join(
@@ -265,14 +276,19 @@ export const getRestaurantQuery = ({
 export const getMenuQueryInSpecificDay = ({
   order,
   timestamp,
+  options,
 }: {
   order: TListing | null;
   timestamp: number;
+  options?: {
+    ignoreSearchByPackagePermember?: boolean;
+  };
 }) => {
   const {
     nutritions = [],
     mealType: mealFoodType = [],
     daySession,
+    packagePerMember,
   } = Listing(order as TListing).getMetadata();
 
   const dateTime = DateTime.fromMillis(timestamp).setZone(VNTimezone);
@@ -294,6 +310,11 @@ export const getMenuQueryInSpecificDay = ({
           [`meta_${dayOfWeek}Nutritions`]: `has_any:${nutritions.join(',')}`,
         }
       : {}),
+    ...(options?.ignoreSearchByPackagePermember
+      ? {}
+      : {
+          [`pub_${dayOfWeek}MinFoodPrice`]: `,${packagePerMember + 1}`,
+        }),
     ...(mealFoodType.length > 0
       ? {
           [`meta_${dayOfWeek}FoodType`]: `has_any:${convertedMealFoodType.join(

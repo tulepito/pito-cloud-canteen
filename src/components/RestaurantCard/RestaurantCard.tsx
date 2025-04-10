@@ -17,6 +17,7 @@ import { calculateDistance } from '@helpers/mapHelpers';
 import { searchKeywords } from '@helpers/titleHelper';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { getListingImageById } from '@pages/company/booker/orders/draft/[orderId]/restaurants/helpers';
+import type { OrderListing } from '@src/types';
 import type { TFoodInRestaurant } from '@src/types/bookerSelectRestaurant';
 import { BadgeTypeBaseOnCategory } from '@src/utils/attributes';
 import type { TKeyValue } from '@src/utils/types';
@@ -29,10 +30,6 @@ type TRestaurantCardProps = {
   className?: string;
   restaurant?: any;
   onClick?: (restaurantId: string) => void;
-  companyGeoOrigin?: {
-    lat: number;
-    lng: number;
-  };
   hideFavoriteIcon?: boolean;
   favoriteFunc?: (restaurantId: string) => void;
   favoriteInProgress?: boolean;
@@ -45,7 +42,6 @@ const RestaurantCard: React.FC<TRestaurantCardProps> = ({
   className,
   onClick = () => null,
   restaurant,
-  companyGeoOrigin,
   hideFavoriteIcon,
   favoriteFunc,
   favoriteInProgress,
@@ -65,6 +61,10 @@ const RestaurantCard: React.FC<TRestaurantCardProps> = ({
   const packagingOptions = useAppSelector(
     (state) => state.SystemAttributes.packaging,
   );
+  const order = useAppSelector((state) => state.Order.order) as
+    | OrderListing
+    | undefined;
+
   const restaurantListing = Listing(restaurant);
   const restaurantId = restaurantListing.getId();
   const { geolocation: origin } = restaurantListing.getAttributes();
@@ -184,7 +184,10 @@ const RestaurantCard: React.FC<TRestaurantCardProps> = ({
       <div className={css.footer}>
         <div className={css.footerItem}>
           <IconTruck className={css.footerItemIcon} />
-          <span>{`${calculateDistance(companyGeoOrigin, origin)}km`}</span>
+          <span>{`${calculateDistance(
+            order?.attributes?.metadata?.deliveryAddress?.origin,
+            origin,
+          )}km`}</span>
         </div>
         <div className={css.footerItem}>
           <IconTerm className={css.footerIconTerm} />

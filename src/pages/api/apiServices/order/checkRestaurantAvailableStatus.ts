@@ -60,6 +60,9 @@ export const checkRestaurantAvailableStatus = async (
       const menuQuery = getMenuQueryInSpecificDay({
         order,
         timestamp: +timestamp,
+        options: {
+          ignoreSearchByPackagePermember: true,
+        },
       });
       const allMenus = await queryAllPages({
         sdkModel: integrationSdk.listings,

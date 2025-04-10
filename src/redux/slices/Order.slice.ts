@@ -981,6 +981,9 @@ const checkRestaurantStillAvailable = createAsyncThunk(
         const menuQuery = getMenuQueryInSpecificDay({
           order,
           timestamp: +timestamp,
+          options: {
+            ignoreSearchByPackagePermember: true,
+          },
         });
         const allMenus = await queryAllPages({
           sdkModel: sdk.listings,

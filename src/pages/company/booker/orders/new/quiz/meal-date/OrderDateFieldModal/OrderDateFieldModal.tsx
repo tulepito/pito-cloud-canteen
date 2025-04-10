@@ -16,6 +16,10 @@ type TOrderDateFieldModalProps = {
   selectedTimeRangeOption: string;
   onClose: () => void;
   setSelectedTimeRangeOption: (key: string) => void;
+  hideQuickSelect?: boolean;
+  noMinMax?: boolean;
+  allowClear?: boolean;
+  dateRangeNoLimit?: boolean;
 };
 
 const timeRangeOptions = [
@@ -40,6 +44,8 @@ const OrderDateFieldModal: React.FC<TOrderDateFieldModalProps> = (props) => {
     onClose,
     selectedTimeRangeOption,
     setSelectedTimeRangeOption,
+    allowClear,
+    dateRangeNoLimit,
   } = props;
 
   const {
@@ -50,11 +56,13 @@ const OrderDateFieldModal: React.FC<TOrderDateFieldModalProps> = (props) => {
     handleUpdateDateRange,
     handleOrderDateRangeChange,
     handleTimeRangeSelect,
+    handleClearDateRange,
   } = useOrderDateSelect({
     form,
     values,
     selectedTimeRangeOption,
     modalCallback: onClose,
+    dateRangeNoLimit,
   });
 
   const daySession = useAppSelector((state) => state.Quiz.quiz?.daySession);
@@ -65,25 +73,27 @@ const OrderDateFieldModal: React.FC<TOrderDateFieldModalProps> = (props) => {
 
   return (
     <div className={css.container}>
-      <div className={css.leftSide}>
-        {timeRangeOptions.map(({ key, label }) => {
-          const handleTimeRangeClick = () => {
-            setSelectedTimeRangeOption(key);
-            handleTimeRangeSelect(key);
-          };
+      {!props.hideQuickSelect && (
+        <div className={css.leftSide}>
+          {timeRangeOptions.map(({ key, label }) => {
+            const handleTimeRangeClick = () => {
+              setSelectedTimeRangeOption(key);
+              handleTimeRangeSelect(key);
+            };
 
-          return (
-            <div
-              key={key}
-              onClick={handleTimeRangeClick}
-              className={classNames(css.option, {
-                [css.selected]: selectedTimeRangeOption === key,
-              })}>
-              {label}
-            </div>
-          );
-        })}
-      </div>
+            return (
+              <div
+                key={key}
+                onClick={handleTimeRangeClick}
+                className={classNames(css.option, {
+                  [css.selected]: selectedTimeRangeOption === key,
+                })}>
+                {label}
+              </div>
+            );
+          })}
+        </div>
+      )}
       <div className={css.rightSide}>
         <FieldDateRangePicker
           id="dateRangeField"
@@ -93,13 +103,21 @@ const OrderDateFieldModal: React.FC<TOrderDateFieldModalProps> = (props) => {
           startDate={startDate}
           endDate={endDate}
           shouldHideInput
-          minDate={newMinDate || new Date()}
-          maxDate={maxDate}
+          minDate={props.noMinMax ? undefined : newMinDate || new Date()}
+          maxDate={props.noMinMax ? undefined : maxDate}
         />
         <div className={css.bottomBtns}>
           <Button variant="inline" type="button" onClick={onClose}>
             Huỷ
           </Button>
+          {allowClear && (
+            <Button
+              variant="inline"
+              type="button"
+              onClick={handleClearDateRange}>
+              Xoá
+            </Button>
+          )}
           <Button
             type="button"
             disabled={!startDate || !endDate}

@@ -121,9 +121,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     ? (JSON.parse(JSONParams) as GETCompanyRaitingsQuery)
     : ({} as GETCompanyRaitingsQuery);
 
-  const _orderCodeFilteredBy = filterBy?.orderCode || '';
-
-  if (_orderCodeFilteredBy === 'MIGRATE') {
+  if (filterBy?.orderCode === 'MIGRATE') {
     const allRatings = await retrieveAll<RatingListing[]>(
       integrationSdk.listings.query,
       {
@@ -138,6 +136,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
       if (
         rating.attributes?.metadata?.companyId &&
+        rating.attributes?.metadata?.orderCode &&
         typeof rating.attributes?.metadata?.timestamp === 'number'
       ) {
         // eslint-disable-next-line no-continue
@@ -146,12 +145,25 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
       // eslint-disable-next-line no-await-in-loop
       await sleep(50);
-      const orderListing: WithFlexSDKData<OrderListing> =
+      const orderListing: WithFlexSDKData<OrderListing> | undefined =
         // eslint-disable-next-line no-await-in-loop
-        await integrationSdk.listings.show({
-          id: orderId,
-          meta_listingType: EListingType.order,
-        });
+        await integrationSdk.listings
+          .show({
+            id: orderId,
+            meta_listingType: EListingType.order,
+          })
+          .catch((error: any) => {
+            console.error('Error fetching order listing:', {
+              orderId,
+              error: String(error),
+            });
+          });
+
+      if (!orderListing) {
+        console.error('Order listing not found:', orderId);
+        // eslint-disable-next-line no-continue
+        continue;
+      }
 
       // eslint-disable-next-line no-await-in-loop
       await sleep(50);
@@ -161,6 +173,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           id: rating.id?.uuid,
           metadata: {
             companyId: orderListing.data.data.attributes?.metadata?.companyId,
+            orderCode: orderListing.data.data.attributes?.title,
             timestamp: rating.attributes?.metadata?.timestamp
               ? +(rating.attributes?.metadata?.timestamp || 0)
               : 0,
@@ -193,27 +206,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(400).json({ message: 'Missing companyId' });
   }
 
-  let _orderId = '';
-  if (_orderCodeFilteredBy) {
-    const orderResponse: WithFlexSDKData<OrderListing[]> =
-      await integrationSdk.listings.query({
-        keywords: _orderCodeFilteredBy,
-        meta_listingType: EListingType.order,
-        page: 1,
-        perPage: 1,
-      });
-
-    if (orderResponse.data.data.length > 0) {
-      _orderId = orderResponse.data.data[0].id?.uuid!;
-    }
-  }
-
   try {
     const ratingListingsData: RatingListing[] = denormalisedResponseEntities(
       await integrationSdk.listings.query({
         meta_listingType: EListingType.rating,
         meta_companyId: companyId as string,
-        ...(_orderId ? { meta_orderId: _orderId } : {}),
+        ...(filterBy?.orderCode ? { meta_orderCode: filterBy?.orderCode } : {}),
         ...(filterBy?.startDate && filterBy?.endDate
           ? {
               meta_timestamp: `${

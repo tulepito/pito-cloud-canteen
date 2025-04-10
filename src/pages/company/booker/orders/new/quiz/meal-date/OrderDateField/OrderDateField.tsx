@@ -19,6 +19,10 @@ type OrderDateFieldProps = {
   onClick?: () => void;
   usePreviousData?: boolean;
   hideLabel?: boolean;
+  noMinMax?: boolean;
+  hideQuickSelect?: boolean;
+  allowClear?: boolean;
+  dateRangeNoLimit?: boolean;
 };
 const OrderDateField: React.FC<OrderDateFieldProps> = (props) => {
   const { usePreviousData = false, form, values, hideLabel, onClick } = props;
@@ -64,11 +68,14 @@ const OrderDateField: React.FC<OrderDateFieldProps> = (props) => {
         </RenderWhen>
       </div>
       <div className={css.orderDateFieldInputMobile}>
-        <div className={css.label}>Chọn ngày bắt đầu</div>
+        {!hideLabel && <div className={css.label}>Chọn ngày bắt đầu</div>}
         <div
           className={css.fieldInput}
           onClick={orderDateFieldModalMobileController.setTrue}>
           <IconCalendar />
+          {hideLabel && !startDate && (
+            <span className="text-stone-400">Chọn ngày bắt đầu</span>
+          )}
           <RenderWhen condition={!!startDate}>
             <span>
               {!!startDate &&
@@ -77,17 +84,22 @@ const OrderDateField: React.FC<OrderDateFieldProps> = (props) => {
                 })}
             </span>
             <RenderWhen.False>
-              <span className={css.placeholder}>Chọn ngày bắt đầu</span>
+              {!hideLabel && (
+                <span className={css.placeholder}>Chọn ngày bắt đầu</span>
+              )}
             </RenderWhen.False>
           </RenderWhen>
         </div>
       </div>
       <div className={css.orderDateFieldInputMobile}>
-        <div className={css.label}>Chọn ngày kết thúc</div>
+        {!hideLabel && <div className={css.label}>Chọn ngày kết thúc</div>}
         <div
           className={css.fieldInput}
           onClick={orderDateFieldModalMobileController.setTrue}>
           <IconCalendar />
+          {hideLabel && !endDate && (
+            <span className="text-stone-400">Chọn ngày kết thúc</span>
+          )}
           <RenderWhen condition={!!endDate}>
             <span>
               {!!endDate &&
@@ -96,7 +108,9 @@ const OrderDateField: React.FC<OrderDateFieldProps> = (props) => {
                 })}
             </span>
             <RenderWhen.False>
-              <span className={css.placeholder}>Chọn ngày kết thúc</span>
+              {!hideLabel && (
+                <span className={css.placeholder}>Chọn ngày kết thúc</span>
+              )}
             </RenderWhen.False>
           </RenderWhen>
         </div>
@@ -109,6 +123,10 @@ const OrderDateField: React.FC<OrderDateFieldProps> = (props) => {
             onClose={orderDateFieldModalController.setFalse}
             selectedTimeRangeOption={selectedTimeRangeOption}
             setSelectedTimeRangeOption={setSelectedTimeRangeOption}
+            hideQuickSelect={props.hideQuickSelect}
+            noMinMax={props.noMinMax}
+            allowClear={props.allowClear}
+            dateRangeNoLimit={props.dateRangeNoLimit}
           />
         </div>
       </RenderWhen>
@@ -119,6 +137,9 @@ const OrderDateField: React.FC<OrderDateFieldProps> = (props) => {
           form={form}
           values={values}
           selectedTimeRangeOption={selectedTimeRangeOption}
+          noMinMax={props.noMinMax}
+          allowClear={props.allowClear}
+          dateRangeNoLimit={props.dateRangeNoLimit}
         />
       </RenderWhen>
     </div>
