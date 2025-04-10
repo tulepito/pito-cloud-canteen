@@ -27,6 +27,7 @@ const HIDING_COMPANY_SIDE_BAR_PATHNAMES = [
   companyPaths.ManageOrderDetail,
   companyPaths.ManageOrderPicking,
   companyPaths.OrderRating,
+  enGeneralPaths.company['[companyId]'].ratings.index('[companyId]'),
   ...Object.values(quizPaths),
 ];
 

@@ -39,6 +39,18 @@ export const buildFullName = (
   return fullName;
 };
 
+export const buildFullNameFromProfile = (profile?: {
+  firstName?: string;
+  lastName?: string;
+  displayName?: string;
+}) => {
+  const { firstName, lastName, displayName } = profile || {};
+
+  return buildFullName(firstName, lastName, {
+    compareToGetLongerWith: displayName,
+  });
+};
+
 const participantOrderPicking = ({
   bookerUser,
   companyUser,

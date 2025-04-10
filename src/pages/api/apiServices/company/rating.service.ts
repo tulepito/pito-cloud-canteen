@@ -91,6 +91,7 @@ export const postRatingFn = async ({
 
 export const postParticipantRatingFn = async ({
   companyName,
+  companyId,
   rating,
   detailTextRating,
   imageIdList,
@@ -101,6 +102,7 @@ export const postParticipantRatingFn = async ({
   ratingUserName,
 }: {
   companyName: string;
+  companyId: string;
   rating: any;
   detailTextRating: string;
   imageIdList: string[];
@@ -124,9 +126,11 @@ export const postParticipantRatingFn = async ({
     images: imageIdList,
     metadata: {
       ...rating,
+      timestamp: +timestamp,
       detailTextRating,
       listingType: EListingType.rating,
       reviewRole: ECompanyPermission.participant,
+      companyId,
       foodName,
       foodId,
     },

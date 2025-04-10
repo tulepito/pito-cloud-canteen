@@ -272,7 +272,6 @@ export const getMenuQueryInSpecificDay = ({
   const {
     nutritions = [],
     mealType: mealFoodType = [],
-    packagePerMember,
     daySession,
   } = Listing(order as TListing).getMetadata();
 
@@ -295,7 +294,6 @@ export const getMenuQueryInSpecificDay = ({
           [`meta_${dayOfWeek}Nutritions`]: `has_any:${nutritions.join(',')}`,
         }
       : {}),
-    [`pub_${dayOfWeek}MinFoodPrice`]: `,${packagePerMember + 1}`,
     ...(mealFoodType.length > 0
       ? {
           [`meta_${dayOfWeek}FoodType`]: `has_any:${convertedMealFoodType.join(

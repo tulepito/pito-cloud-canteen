@@ -11,18 +11,20 @@ export function LoadingWrapper({
   size?: number;
 }) {
   return (
-    <div
-      className={classNames('flex justify-center items-center', {
-        'opacity-50': isLoading,
-      })}>
+    <>
       {isLoading ? (
         <div
-          className={`animate-spin rounded-full border-b-2 border-gray-900`}
-          style={{ width: size, height: size }}
-        />
+          className={classNames('flex justify-center items-center', {
+            'opacity-50': isLoading,
+          })}>
+          <div
+            className={`animate-spin rounded-full border-b-2 border-gray-900`}
+            style={{ width: size, height: size }}
+          />
+        </div>
       ) : (
         children
       )}
-    </div>
+    </>
   );
 }

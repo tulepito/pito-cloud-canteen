@@ -263,14 +263,23 @@ export interface RatingListingMetadata {
   foodId: string;
   foodName: string;
   generalRating: number;
+  companyId: string;
   orderId: string;
   restaurantId: string;
   reviewRole: 'participant' | 'booker';
   reviewerId: string;
-  timestamp: string;
+  timestamp: number;
 }
 
-export type RatingListing = ListingBuilder<{}, {}, RatingListingMetadata, {}>;
+export type RatingListing = ListingBuilder<
+  {},
+  {},
+  RatingListingMetadata,
+  {},
+  {
+    images?: Image[];
+  }
+>;
 
 export type ParticipantSubOrderDocument = DeepPartial<{
   deliveryHour: string;

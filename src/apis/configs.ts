@@ -1,8 +1,38 @@
+import type { AxiosInstance, AxiosRequestConfig } from 'axios';
 import axios from 'axios';
 import type { NextApiHandler, NextApiRequest, NextApiResponse } from 'next';
 
 import cookies from '@services/cookie';
 import type { TObject } from '@utils/types';
+
+const inFlightRequests = new Map<string, Promise<any>>();
+
+const getRequestKey = (config: AxiosRequestConfig): string => {
+  const { method, url, params, data } = config;
+
+  return JSON.stringify({ method, url, params, data });
+};
+
+export const fetchWithDedup = <T = any>(
+  axiosInstance: AxiosInstance,
+  config: AxiosRequestConfig,
+): Promise<T> => {
+  const key = getRequestKey(config);
+
+  if (inFlightRequests.has(key)) {
+    return inFlightRequests.get(key) as Promise<T>;
+  }
+
+  const requestPromise = axiosInstance(config)
+    .then((res) => res.data as T)
+    .finally(() => {
+      inFlightRequests.delete(key);
+    });
+
+  inFlightRequests.set(key, requestPromise);
+
+  return requestPromise;
+};
 
 export const apiBaseUrl = () => {
   const port = process.env.NEXT_PUBLIC_PORT || 3000;
@@ -26,6 +56,16 @@ export const getApi = (path: string, params: TObject = {}) => {
 
   return axios.get(`${apiBaseUrl()}${path}`, {
     ...(params ? { params: { JSONParams: JSON.stringify(params) } } : {}),
+  });
+};
+
+export const getDedupApi = <T = any>(path: string, params: TObject = {}) => {
+  return fetchWithDedup<T>(axios, {
+    method: 'GET',
+    url: `${apiBaseUrl()}${path}`,
+    params: {
+      ...(params ? { JSONParams: JSON.stringify(params) } : {}),
+    },
   });
 };
 

@@ -43,6 +43,11 @@ export const enGeneralPaths = {
         index: (orderId: string) => `/company/orders/${orderId}`,
       },
     },
+    '[companyId]': {
+      ratings: {
+        index: (companyId: string) => `/company/${companyId}/ratings`,
+      },
+    },
     booker: {
       orders: {
         new: {
@@ -313,6 +318,7 @@ export const participantPaths = {
       index: (orderId: string) => `/participant/order/${orderId}`,
     },
   },
+
   invitation: {
     '[companyId]': {
       index: (companyId: string) => `/participant/invitation/${companyId}`,

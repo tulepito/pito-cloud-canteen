@@ -9,7 +9,6 @@ import {
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HttpMethod } from '@apis/configs';
-import buildFullName from '@pages/admin/order/buildFullName';
 import type { FirebaseScannedRecord } from '@pages/admin/order/FirebaseScannedRecord';
 import type { POSTScannerPlanIdTimestampScanBody } from '@pages/admin/order/POSTScannerPlanIdTimestampScanBody';
 import { denormalisedResponseEntities } from '@services/data';
@@ -22,6 +21,7 @@ import type {
   UserListing,
   WithFlexSDKData,
 } from '@src/types';
+import { buildFullName } from '@src/utils/emailTemplate/participantOrderPicking';
 import { EImageVariants } from '@src/utils/enums';
 
 import {

@@ -18,7 +18,8 @@ export type VariantKey =
   | 'landscape-crop4x'
   | 'landscape-crop'
   | 'landscape-crop2x'
-  | 'landscape-crop6x';
+  | 'landscape-crop6x'
+  | 'square-small2x';
 
 export type Variants = Record<VariantKey, Landscape>;
 

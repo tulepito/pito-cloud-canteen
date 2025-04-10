@@ -99,20 +99,22 @@ const CompanyDashboardPage = () => {
       <CompanyDashboardHeroSection />
       <div className={css.container}>
         <div className={css.groupSections}>
-          <OrdersAnalysisSection
-            totalItemMap={totalItemMap}
-            inProgress={queryOrderInProgress}
-          />
-          <NotificationSection
-            inProgress={getCompanyOrderNotificationInProgress}
-            companyOrderNotificationMap={companyOrderNotificationMap}
-          />
-        </div>
-        <div className={css.groupSections}>
-          <ReportSection
-            inProgress={getCompanyOrderSummaryInProgress}
-            companyOrderSummary={companyOrderSummary}
-          />
+          <div className="flex flex-col gap-4">
+            <OrdersAnalysisSection
+              totalItemMap={totalItemMap}
+              inProgress={queryOrderInProgress}
+            />
+            <ReportSection
+              inProgress={getCompanyOrderSummaryInProgress}
+              companyOrderSummary={companyOrderSummary}
+            />
+          </div>
+          <div className="flex flex-col gap-4">
+            <NotificationSection
+              inProgress={getCompanyOrderNotificationInProgress}
+              companyOrderNotificationMap={companyOrderNotificationMap}
+            />
+          </div>
         </div>
       </div>
     </div>

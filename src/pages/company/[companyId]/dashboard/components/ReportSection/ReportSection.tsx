@@ -1,6 +1,7 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import Skeleton from 'react-loading-skeleton';
+import classNames from 'classnames';
 
 import IconDish from '@components/Icons/IconDish/IconDish';
 import IconDollar from '@components/Icons/IconDollar/IconDollar';
@@ -19,7 +20,7 @@ const ReportSection: React.FC<TReportSectionProps> = (props) => {
 
   return (
     <div className={css.root}>
-      <h3 className={css.title}>
+      <h3 className={classNames(css.title, 'font-semibold uppercase')}>
         <FormattedMessage id="ReportSection.title" />
       </h3>
       {inProgress ? (

@@ -100,7 +100,7 @@ const OrdersAnalysisSection: React.FC<TOrdersAnalysisSection> = (props) => {
 
   return (
     <div className={css.root}>
-      <h3 className={css.title}>
+      <h3 className={classNames(css.title, 'font-semibold uppercase')}>
         <FormattedMessage id="OrdersAnalysisSection.title" />
       </h3>
       {inProgress ? (

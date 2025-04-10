@@ -33,6 +33,9 @@ const AVATAR_IMAGE_VARIANTS = [
 
   // 480x480
   EImageVariants.squareSmall2x,
+
+  // default
+  EImageVariants.default,
 ];
 
 type TAvatarProps = TDefaultProps & {

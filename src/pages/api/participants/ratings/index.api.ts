@@ -93,8 +93,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           throw new Error('Order title not found');
         }
 
+        if (!orderListing.attributes?.metadata?.companyId) {
+          throw new Error('Company id not found');
+        }
+
         const review = await postParticipantRatingFn({
           companyName,
+          companyId: orderListing.attributes?.metadata?.companyId,
           rating,
           detailTextRating,
           imageIdList,
