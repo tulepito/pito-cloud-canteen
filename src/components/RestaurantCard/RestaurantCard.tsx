@@ -31,6 +31,10 @@ type TRestaurantCardProps = {
   restaurant?: any;
   onClick?: (restaurantId: string) => void;
   hideFavoriteIcon?: boolean;
+  companyGeoOrigin?: {
+    lat: number;
+    lng: number;
+  };
   favoriteFunc?: (restaurantId: string) => void;
   favoriteInProgress?: boolean;
   alreadyFavorite?: boolean;
@@ -43,6 +47,7 @@ const RestaurantCard: React.FC<TRestaurantCardProps> = ({
   onClick = () => null,
   restaurant,
   hideFavoriteIcon,
+  companyGeoOrigin,
   favoriteFunc,
   favoriteInProgress,
   alreadyFavorite,
@@ -185,7 +190,8 @@ const RestaurantCard: React.FC<TRestaurantCardProps> = ({
         <div className={css.footerItem}>
           <IconTruck className={css.footerItemIcon} />
           <span>{`${calculateDistance(
-            order?.attributes?.metadata?.deliveryAddress?.origin,
+            companyGeoOrigin ||
+              order?.attributes?.metadata?.deliveryAddress?.origin,
             origin,
           )}km`}</span>
         </div>

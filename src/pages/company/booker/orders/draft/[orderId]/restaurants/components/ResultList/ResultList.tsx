@@ -128,7 +128,6 @@ const ResultList: React.FC<TResultListProps> = ({
                 key={restaurant?.id.uuid}
                 className={css.card}
                 restaurant={restaurant}
-                companyGeoOrigin={companyGeoOrigin}
                 foods={foods ?? []}
                 packagePerMember={packagePerMember}
               />
