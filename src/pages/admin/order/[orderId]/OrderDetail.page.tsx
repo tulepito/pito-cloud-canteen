@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-shadow */
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useCallback, useEffect, useState } from 'react';
 import { shallowEqual } from 'react-redux';
 import compact from 'lodash/compact';

@@ -92,6 +92,7 @@ export type OrderDetailValue = {
   }[];
   transactionId: string;
   lastTransition: string;
+  trackingLink?: string;
   memberOrders: Record<string, MemberOrderValue>;
   restaurant: {
     foodList: Record<

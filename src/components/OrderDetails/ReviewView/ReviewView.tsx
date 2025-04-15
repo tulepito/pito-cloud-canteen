@@ -4,6 +4,7 @@ import classNames from 'classnames';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useAppDispatch } from '@hooks/reduxHooks';
 import { useViewport } from '@hooks/useViewport';
+import OrderDetailTrackingSection from '@pages/company/orders/[orderId]/components/OrderDetailTrackingSection';
 import type { usePrepareOrderDetailPageData } from '@pages/company/orders/[orderId]/picking/hooks/usePrepareData';
 import { orderManagementThunks } from '@redux/slices/OrderManagement.slice';
 import { Listing } from '@src/utils/data';
@@ -108,11 +109,16 @@ const ReviewView: React.FC<TReviewViewProps> = (props) => {
             />
           </RenderWhen>
 
+          <OrderDetailTrackingSection
+            orderDetail={reviewViewData.reviewResultData?.orderDetail}
+          />
+
           <ReviewInfoSection
             canEdit={canEditInfo}
             data={reviewViewData?.reviewInfoData || {}}
             setFormValues={setInfoFormValues}
           />
+
           <RenderWhen condition={isGroupOrder}>
             <ReviewOrdersResultSection
               className={css.resultRoot}

@@ -75,6 +75,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
         logger.info('OnWheel webhook recieved:', JSON.stringify(event));
         const { path } = event;
+        const sharedLink: string | undefined = event?.shared_link;
+
         switch (event.status) {
           case EOnWheelOrderStatus.idle:
           case EOnWheelOrderStatus.assigning: {
@@ -123,6 +125,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
                     [subOrderDate]: {
                       ...subOrder,
                       isOnWheelOrderCreated: true,
+                      ...(sharedLink ? { trackingLink: sharedLink } : {}),
                     },
                   };
 
@@ -229,6 +232,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
                   [subOrderDate]: {
                     ...subOrder,
                     lastTransition: transition,
+                    ...(sharedLink ? { trackingLink: sharedLink } : {}),
                   },
                 };
 

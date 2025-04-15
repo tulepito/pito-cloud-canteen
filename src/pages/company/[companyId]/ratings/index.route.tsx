@@ -344,7 +344,7 @@ export default function CompanyDetailRoute() {
                             <div className="flex gap-4">
                               <Avatar
                                 user={rating.reviewer}
-                                className="w-8 h-8"
+                                className="w-8 h-8 min-w-8 min-h-8"
                               />
 
                               <div className="flex flex-col gap-1">
@@ -405,26 +405,28 @@ export default function CompanyDetailRoute() {
                                   </div>
                                 )}
 
-                                <p className="text-sm text-stone-700">
-                                  {rating.attributes?.metadata?.foodName && (
-                                    <span className="text-stone-900 font-semibold">
-                                      <span className="text-stone-900">
-                                        (Món ăn:&nbsp;
+                                {!!rating.attributes?.metadata?.foodName && (
+                                  <p className="text-sm text-stone-700">
+                                    {rating.attributes?.metadata?.foodName && (
+                                      <span className="text-stone-900 font-semibold">
+                                        <span className="text-stone-900">
+                                          (Món ăn:&nbsp;
+                                        </span>
+                                        {rating.attributes?.metadata?.foodName})
                                       </span>
-                                      {rating.attributes?.metadata?.foodName})
-                                    </span>
-                                  )}
-                                  &nbsp;
-                                  {!!rating.attributes?.metadata
-                                    ?.detailTextRating && (
-                                    <span>
-                                      {
-                                        rating.attributes?.metadata
-                                          ?.detailTextRating
-                                      }
-                                    </span>
-                                  )}
-                                </p>
+                                    )}
+                                    &nbsp;
+                                    {!!rating.attributes?.metadata
+                                      ?.detailTextRating && (
+                                      <span>
+                                        {
+                                          rating.attributes?.metadata
+                                            ?.detailTextRating
+                                        }
+                                      </span>
+                                    )}
+                                  </p>
+                                )}
 
                                 <span className="text-xs text-stone-500">
                                   #{rating.order?.attributes?.title}&nbsp;&nbsp;

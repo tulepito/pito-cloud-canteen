@@ -23,6 +23,7 @@ import useExportOrderDetails from '@hooks/useExportOrderDetails';
 import { usePrepareOrderDetailPageData } from '@hooks/usePrepareOrderManagementData';
 import { AdminManageOrderThunks } from '@pages/admin/order/AdminManageOrder.slice';
 import { ReviewContent } from '@pages/admin/order/StepScreen/ReviewOrder/ReviewOrder';
+import OrderDetailTrackingSection from '@pages/company/orders/[orderId]/components/OrderDetailTrackingSection';
 import { useAutoPickFood } from '@pages/company/orders/[orderId]/hooks/useAutoPickFood';
 import OrderQuantityErrorSection from '@pages/company/orders/[orderId]/picking/OrderQuantityErrorSection';
 import {
@@ -315,7 +316,7 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
   );
 
   return (
-    <div className={css.container}>
+    <div className={classNames(css.container, 'flex gap-2 flex-col')}>
       <RenderWhen condition={isEditMode}>
         <OrderHeaderState
           order={order}
@@ -327,6 +328,7 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
           confirmUpdateDisabled={orderDetailsNotChanged}
           isAdminFlow
         />
+
         <RenderWhen condition={showStateSectionCondition}>
           <ReviewOrderStatesSection
             data={{
@@ -338,6 +340,9 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
             className={css.reviewOrderStates}
           />
         </RenderWhen>
+
+        <OrderDetailTrackingSection orderDetail={orderDetail} />
+
         <OrderHeaderInfor
           company={company}
           booker={booker}
