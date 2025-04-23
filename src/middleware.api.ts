@@ -34,7 +34,7 @@ async function handleLog(req: NextRequest) {
 export async function middleware(req: NextRequest) {
   const path = req.nextUrl.pathname;
 
-  if (path.startsWith('/api')) {
+  if (path.startsWith('/api') && !path.startsWith('/api/upload')) {
     handleLog(req);
   }
 

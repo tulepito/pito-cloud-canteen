@@ -29,7 +29,7 @@ import {
   generateBarcodeHashMap,
 } from '../toggle-mode.api';
 
-console.log('🚀 ~ buildFullName:', buildFullName);
+console.log('buildFullName:', buildFullName);
 
 export default async function handler(
   req: NextApiRequest,

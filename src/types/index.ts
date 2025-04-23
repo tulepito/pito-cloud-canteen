@@ -128,6 +128,19 @@ export type PlanListing = ListingBuilder<
     planStarted: boolean;
     slackThreadTs: string;
     allowToScan?: boolean;
+    deliveryInfoLastUpdatedAtTimestamp?: number;
+    deliveryInfo?: Record<
+      string,
+      Record<
+        string,
+        {
+          images: {
+            imageUrl: string;
+            imageId: string;
+          }[];
+        }
+      >
+    >;
   },
   {},
   {}

@@ -275,7 +275,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             })
             .toUnixInteger(),
           subOrderTitle,
-          trackingUrl: `${NEXT_PUBLIC_CANONICAL_URL}/tracking/${orderId}_${timestamp}`,
+          trackingUrl: `${NEXT_PUBLIC_CANONICAL_URL}/tracking/${orderId}_${timestamp}${
+            process.env.NEXT_PUBLIC_DELIVERY_INFO_ENABLED === 'true'
+              ? `?delivery=true`
+              : ''
+          }`,
           restaurantName,
           restaurantPhoneNumber,
           restaurantAddress,

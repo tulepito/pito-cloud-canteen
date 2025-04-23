@@ -328,7 +328,6 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
           confirmUpdateDisabled={orderDetailsNotChanged}
           isAdminFlow
         />
-
         <RenderWhen condition={showStateSectionCondition}>
           <ReviewOrderStatesSection
             data={{
@@ -340,9 +339,7 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
             className={css.reviewOrderStates}
           />
         </RenderWhen>
-
         <OrderDetailTrackingSection orderDetail={orderDetail} />
-
         <OrderHeaderInfor
           company={company}
           booker={booker}
@@ -351,7 +348,6 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
           updateOrderStaffNameInProgress={updateOrderStaffNameInProgress}
           containerClassName={css.orderInforWrapper}
         />
-
         <div className={css.orderDetailWrapper}>
           <RenderWhen condition={isPickingState || isDraftEditing}>
             <RenderWhen condition={isGroupOrder}>

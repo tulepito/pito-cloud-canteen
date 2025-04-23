@@ -1,6 +1,4 @@
-/* eslint-disable unused-imports/no-unused-vars */
-/* eslint-disable import/no-cycle */
-/* eslint-disable react-hooks/exhaustive-deps */
+import type { DetailedHTMLProps, ImgHTMLAttributes } from 'react';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Form as FinalForm } from 'react-final-form';
 import { useField, useForm } from 'react-final-form-hooks';
@@ -13,6 +11,7 @@ import { last, omit, pickBy, uniq } from 'lodash';
 import compact from 'lodash/compact';
 import isEmpty from 'lodash/isEmpty';
 import isEqual from 'lodash/isEqual';
+import Image from 'next/image';
 import { useRouter } from 'next/router';
 
 import Collapsible from '@components/Collapsible/Collapsible';
@@ -28,6 +27,7 @@ import type { TColumn } from '@components/Table/Table';
 import Table from '@components/Table/Table';
 import Tabs from '@components/Tabs/Tabs';
 import Tooltip from '@components/Tooltip/Tooltip';
+import { Dialog, DialogContent, DialogTrigger } from '@components/ui/dialog';
 import { addCommas, parseThousandNumber } from '@helpers/format';
 import { preparePickingOrderChangeNotificationData } from '@helpers/order/orderChangeByAdminHelper';
 import { getTrackingLink } from '@helpers/order/prepareDataHelper';
@@ -55,6 +55,7 @@ import type { TKeyValue, TListing, TObject } from '@utils/types';
 import { required } from '@utils/validators';
 
 import ConfirmNotifyUserModal from '../../components/ConfirmNotifyUserModal/ConfirmNotifyUserModal';
+// eslint-disable-next-line import/no-cycle
 import NavigateButtons, {
   EFlowType,
 } from '../../components/NavigateButtons/NavigateButtons';
@@ -63,6 +64,40 @@ import EditConfirmModal from './EditConfirmModal/EditConfirmModal';
 import type { TSelectRoleToSendNotificationFormValues } from './SelectRoleToSendNotificationForm/SelectRoleToSendNotificationForm';
 
 import css from './ReviewOrder.module.scss';
+
+function ZoomableImage({
+  src,
+  alt,
+  className,
+}: DetailedHTMLProps<ImgHTMLAttributes<HTMLImageElement>, HTMLImageElement>) {
+  if (!src) return null;
+
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <div className={`relative ${className}`}>
+          <Image
+            src={src}
+            alt={alt || ''}
+            objectFit="cover"
+            sizes="100vw"
+            fill
+          />
+        </div>
+      </DialogTrigger>
+      <DialogContent className="max-w-7xl border-0 bg-transparent p-0">
+        <div className="relative h-[calc(100vh-220px)] w-full overflow-clip rounded-md bg-transparent shadow-md">
+          <Image
+            src={src}
+            fill
+            alt={alt || ''}
+            className="h-full w-full object-contain"
+          />
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
 
 const MenuColumns: TColumn[] = [
   {
@@ -144,6 +179,7 @@ export const ReviewContent: React.FC<any> = (props) => {
   const planListing: PlanListing = useAppSelector(
     (state) => state.OrderManagement.planData,
   );
+
   const orderDetailInPickingState = useAppSelector((state) => {
     const _planListing = state.OrderManagement.planData;
     const { orderDetail = {} } = Listing(
@@ -284,8 +320,73 @@ export const ReviewContent: React.FC<any> = (props) => {
     setCurrDeliveryManPhoneNumber(deliveryManPhoneNumber);
   }, [deliveryManPhoneNumber]);
 
+  const currentDeliveryInfo =
+    planListing.attributes?.metadata?.deliveryInfo?.[timeStamp];
+  const deliveryImages = Object.values(currentDeliveryInfo || [])
+    .map((value) => {
+      return value?.images || [];
+    })
+    .flat();
+
   return (
     <div className="flex flex-col w-full gap-2">
+      {deliveryImages.length > 0 && (
+        <div className="flex flex-col gap-2 rounded-lg bg-gray-100 p-0 overflow-hidden">
+          <div className="font-bold text-base p-4 bg-gray-200 flex items-center gap-2">
+            <svg
+              width={20}
+              height={20}
+              viewBox="0 -2 20 20"
+              version="1.1"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="#000000">
+              <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+              <g
+                id="SVGRepo_tracerCarrier"
+                stroke-linecap="round"
+                stroke-linejoin="round"></g>
+              <g id="SVGRepo_iconCarrier">
+                {' '}
+                <title>image_picture [#972]</title>{' '}
+                <desc>Created with Sketch.</desc> <defs> </defs>{' '}
+                <g
+                  id="Page-1"
+                  stroke="none"
+                  stroke-width="1"
+                  fill="none"
+                  fill-rule="evenodd">
+                  {' '}
+                  <g
+                    id="Dribbble-Light-Preview"
+                    transform="translate(-380.000000, -3881.000000)"
+                    fill="#000000">
+                    {' '}
+                    <g id="icons" transform="translate(56.000000, 160.000000)">
+                      {' '}
+                      <path
+                        d="M336,3725.5 C336,3724.948 336.448,3724.5 337,3724.5 C337.552,3724.5 338,3724.948 338,3725.5 C338,3726.052 337.552,3726.5 337,3726.5 C336.448,3726.5 336,3726.052 336,3725.5 L336,3725.5 Z M340,3733 L328,3733 L332.518,3726.812 L335.354,3730.625 L336.75,3728.75 L340,3733 Z M326,3735 L342,3735 L342,3723 L326,3723 L326,3735 Z M324,3737 L344,3737 L344,3721 L324,3721 L324,3737 Z"
+                        id="image_picture-[#972]">
+                        {' '}
+                      </path>{' '}
+                    </g>{' '}
+                  </g>{' '}
+                </g>{' '}
+              </g>
+            </svg>
+            <span>HÌNH ẢNH VẬN ĐƠN</span>
+          </div>
+          <div className="flex flex-wrap gap-2 p-4 pt-2">
+            {deliveryImages.map((image, index: number) => (
+              <ZoomableImage
+                key={index}
+                src={image?.imageUrl}
+                alt={`Hình ảnh phiếu vận đơn ${index}`}
+                className="aspect-[16/9] h-[120px] object-cover cursor-pointer hover:opacity-80 rounded-md overflow-hidden"
+              />
+            ))}
+          </div>
+        </div>
+      )}
       <RenderWhen condition={resultSectionShowed}>
         <ReviewOrdersResultSection
           className={css.reviewOrderResult}
@@ -981,6 +1082,7 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
         );
       } else if (r === 'company') {
         // TODO: send notification to company
+        // eslint-disable-next-line unused-imports/no-unused-vars
         const { normalizedOrderDetail, ...restData } = notificationData;
 
         dispatch(

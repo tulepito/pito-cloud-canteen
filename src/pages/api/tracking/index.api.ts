@@ -105,7 +105,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           };
         }
 
-        // TODO: query plan info
         if (planId) {
           const [planListing] = denormalisedResponseEntities(
             (await integrationSdk.listings.show({ id: planId })) || [{}],
@@ -117,8 +116,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
               .json({ error: 'Order detail was not found' });
           }
 
-          const { orderDetail = {} } = Listing(planListing).getMetadata();
+          const { orderDetail = {}, deliveryInfo } =
+            Listing(planListing).getMetadata();
           const orderDetailOfDate = orderDetail[date] || {};
+          const deliveryInfoOfDate = deliveryInfo?.[date] || {};
           const { restaurant: restaurantObj = {} } = orderDetailOfDate;
           const { id: restaurantId } = restaurantObj;
 
@@ -129,6 +130,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           orderWithOtherDataMaybe = {
             ...orderWithOtherDataMaybe,
             orderDetailOfDate,
+            deliveryInfoOfDate,
             restaurant,
           };
         }

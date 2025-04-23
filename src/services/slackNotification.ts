@@ -42,6 +42,10 @@ type SlackNotificationParams = {
     orderCode: string;
     planId: string;
   };
+  deliveryAgentImagesUploadedData?: {
+    orderLink: string;
+    threadTs?: string;
+  };
   participantGroupOrderFoodChangedData?: {
     by: 'admin' | 'booker';
     threadTs: string;
@@ -253,6 +257,34 @@ export const createSlackNotification = async (
                   notificationParams.orderStatusChangesToInProgressData.planId,
               },
             },
+          },
+          {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          },
+        );
+        break;
+      }
+
+      case ESlackNotificationType.DELIVERY_AGENT_IMAGES_UPLOADED: {
+        if (!notificationParams.deliveryAgentImagesUploadedData) return;
+
+        await axios.post(
+          process.env.SLACK_WEBHOOK_URL,
+          {
+            thread_ts:
+              notificationParams.deliveryAgentImagesUploadedData.threadTs,
+            reply_broadcast: true,
+            blocks: [
+              {
+                type: 'section',
+                text: {
+                  type: 'mrkdwn',
+                  text: `<!here> :dart::dart::dart: Tài xế đã cập nhật hình ảnh cho đơn hàng của bạn <${notificationParams.deliveryAgentImagesUploadedData.orderLink}|Truy cập>`,
+                },
+              },
+            ],
           },
           {
             headers: {

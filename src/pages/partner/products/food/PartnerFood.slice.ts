@@ -461,7 +461,7 @@ const createPartnerFoodFromCsv = createAsyncThunk(
     }
 
     return new Promise((resolve, reject) => {
-      Papa.parse(googleSheetUrl, {
+      Papa.parse(googleSheetUrl!, {
         download: true,
         header: true,
         skipEmptyLines: true,

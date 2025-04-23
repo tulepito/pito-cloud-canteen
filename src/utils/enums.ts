@@ -462,6 +462,7 @@ export enum ESlackNotificationType {
   CREATE_NEW_FOOD = 'createNewFood',
   UPDATE_FOOD = 'updateFood',
   ORDER_STATUS_CHANGES_TO_IN_PROGRESS = 'orderStatusChangesToInProgress',
+  DELIVERY_AGENT_IMAGES_UPLOADED = 'deliveryAgentImagesUploaded',
   PARTICIPANT_GROUP_ORDER_FOOD_CHANGED = 'participantGroupOrderFoodChanged',
   PARTICIPANT_NORMAL_ORDER_FOOD_CHANGED = 'participantNormalOrderFoodChanged',
   SUB_ORDER_CANCELED = 'subOrderCanceled',
