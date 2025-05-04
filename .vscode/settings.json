@@ -11,5 +11,13 @@
     "source.fixAll": "explicit"
   },
   "i18n-ally.localesPaths": [],
-  "deno.enable": false
+  "deno.enable": false,
+  "github.copilot.chat.codeGeneration.instructions": [
+    {
+      "text": "Use useAppSelector alternative to useSelector",
+    },
+    {
+      "text": "Use useAppDispatch alternative to useDispatch",
+    },
+  ]
 }

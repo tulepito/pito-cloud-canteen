@@ -57,6 +57,7 @@ import DownloadColumnListForm from './ManageOrderFilterForms/DownloadColumnListF
 import type { TFilterColumnFormValues } from './ManageOrderFilterForms/FilterColumnForm/FilterColumnForm';
 import FilterColumnForm from './ManageOrderFilterForms/FilterColumnForm/FilterColumnForm';
 import FilterForm from './ManageOrderFilterForms/FilterForm/FilterForm';
+import DeliveryAgentsMealsSettingDialog from './DeliveryAgentsMealsSettingDialog';
 
 import css from './ManageOrders.module.scss';
 
@@ -926,6 +927,7 @@ const ManageOrdersPage = ({ showOrderType }: { showOrderType?: boolean }) => {
           }
           rightFilters={
             <>
+              <DeliveryAgentsMealsSettingDialog />
               <Tooltip
                 tooltipContent={
                   <FilterColumnForm

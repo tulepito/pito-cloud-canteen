@@ -121,6 +121,13 @@ export type PlanListing = ListingBuilder<
     listingType: string;
     menuIds: string[];
     orderDetail: { [timestamp: string]: OrderDetailValue };
+    deliveryAgentsMeals: {
+      [timestamp: string]: {
+        restaurantId: string;
+        restaurantName: string;
+        numberOfMeals: number;
+      };
+    };
     orderDetailStartedSnapshot: { [timestamp: string]: OrderDetailValue };
     barcodeHashMap: Record<string, string>;
     orderId: string;

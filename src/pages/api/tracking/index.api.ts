@@ -7,6 +7,7 @@ import { HttpMethod } from '@apis/configs';
 import { EHttpStatusCode } from '@apis/errors';
 import { denormalisedResponseEntities } from '@services/data';
 import { getIntegrationSdk, handleError } from '@services/sdk';
+import type { PlanListing } from '@src/types';
 import { Listing } from '@src/utils/data';
 import { EOrderType } from '@src/utils/enums';
 
@@ -108,7 +109,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         if (planId) {
           const [planListing] = denormalisedResponseEntities(
             (await integrationSdk.listings.show({ id: planId })) || [{}],
-          );
+          ) as [PlanListing];
 
           if (isEmpty(planListing)) {
             return res
@@ -116,10 +117,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
               .json({ error: 'Order detail was not found' });
           }
 
-          const { orderDetail = {}, deliveryInfo } =
-            Listing(planListing).getMetadata();
+          const { orderDetail = {}, deliveryInfo } = Listing(
+            planListing as any,
+          ).getMetadata();
           const orderDetailOfDate = orderDetail[date] || {};
           const deliveryInfoOfDate = deliveryInfo?.[date] || {};
+          const deliveryAgentsMealsOfDate =
+            planListing.attributes?.metadata?.deliveryAgentsMeals?.[date] || {};
+
           const { restaurant: restaurantObj = {} } = orderDetailOfDate;
           const { id: restaurantId } = restaurantObj;
 
@@ -131,6 +136,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             ...orderWithOtherDataMaybe,
             orderDetailOfDate,
             deliveryInfoOfDate,
+            deliveryAgentsMealsOfDate,
             restaurant,
           };
         }

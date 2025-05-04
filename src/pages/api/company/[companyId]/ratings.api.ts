@@ -42,8 +42,9 @@ export const retrieveAll = async <T extends Array<any>>(
   return allPages;
 };
 
-const retrieveAllByIdChunks = async <T extends Array<any>>(
+export const retrieveAllByIdChunks = async <T extends Array<any>>(
   queryFunction: (params: any) => Promise<WithFlexSDKData<T>>,
+  generateParamsFromId: (ids: string[]) => any,
   ids: string[],
   params: any,
   options?: { chunkSize?: number; denormalizeResponseEntities?: boolean },
@@ -76,14 +77,13 @@ const retrieveAllByIdChunks = async <T extends Array<any>>(
   const chunkPromises = allIds.map((chunk) => {
     const chunkParams = {
       ...(params || {}),
-      meta_id: chunk,
+      ...(generateParamsFromId(chunk) || {}),
     };
 
     return queryFunction(chunkParams);
   });
 
   const settledResponses = await Promise.allSettled(chunkPromises);
-
   settledResponses.forEach((settled) => {
     if (settled.status === 'fulfilled') {
       if (denormalizeResponseEntities) {
@@ -247,6 +247,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     }, []);
     const ordersData = await retrieveAllByIdChunks<OrderListing[]>(
       integrationSdk.listings.query,
+      (ids) => ({
+        meta_id: ids,
+      }),
       orderIds,
       {
         meta_listingType: EListingType.order,
@@ -255,6 +258,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
     const reviewersData = await retrieveAllByIdChunks<UserListing[]>(
       integrationSdk.users.query,
+      (ids) => ({
+        meta_id: ids,
+      }),
       reviewerIds,
       {
         include: ['profileImage'],
