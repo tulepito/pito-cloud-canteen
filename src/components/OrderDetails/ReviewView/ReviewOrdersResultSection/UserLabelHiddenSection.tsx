@@ -55,6 +55,7 @@ function UserLabelHiddenSection({
             {userLabelRecordsx18.map((userLabelRecord, idx) => (
               <div key={idx} className="w-full h-[48mm]">
                 <UserLabelCellContent
+                  type="a4"
                   partnerName={userLabelRecord.partnerName}
                   companyName={userLabelRecord.companyName}
                   mealDate={userLabelRecord.mealDate}

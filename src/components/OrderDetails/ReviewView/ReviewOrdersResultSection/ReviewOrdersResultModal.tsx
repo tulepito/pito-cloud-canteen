@@ -53,8 +53,9 @@ function UserLabelThermalPrintSection({
   return (
     <>
       {userLabelRecords.map((userLabelRecord, idx) => (
-        <div key={idx} className="w-[58mm] h-[44mm]">
+        <div key={idx} className="w-[62mm] h-[43mm]">
           <UserLabelCellContent
+            type="thermal"
             partnerName={userLabelRecord.partnerName}
             companyName={userLabelRecord.companyName}
             mealDate={userLabelRecord.mealDate}
@@ -154,7 +155,6 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
     [],
   );
   const [targetedDate, setTargetDate] = useState<string | 'all'>('all');
-  const currentPrintMode = useRef<'pdf' | 'thermal'>('pdf');
   const allowTriggerGenerateUserLabelFile = useRef(false);
 
   const [isGeneratingUserLabelFile, setIsGeneratingUserLabelFile] =
@@ -280,7 +280,6 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
   const generatePDFModeLabels = useCallback(
     async (exportType: 'preview' | 'pdf-file') => {
       if (!isAdmin) return;
-      if (currentPrintMode.current !== 'pdf') return;
       if (!allowTriggerGenerateUserLabelFile.current) return;
 
       logger.info('Generating user labels...', 'START');
@@ -415,12 +414,12 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
           }
 
           @page {
-            size: 58mm 44mm;
+            size: 62mm 43mm;
             margin: 0;
           }
         }
       </style>
-      <img style="width: 55.785mm;" src="${imgData}" />
+      <img style="width: 59.452mm;" src="${imgData}" />
     `);
     printWindow?.document.close();
     printWindow?.print();
