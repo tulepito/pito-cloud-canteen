@@ -8,7 +8,7 @@ import classNames from 'classnames';
 import { useRouter } from 'next/router';
 import { z } from 'zod';
 
-import { updateDeliveryInfo } from '@apis/orderApi';
+import { updateDeliveryInfo } from '@apis/planApi';
 import {
   Accordion,
   AccordionContent,
@@ -298,7 +298,7 @@ const TrackingOrderInfo = ({ subOrderDate }: TTrackingOrderInfoProps) => {
   const onSubmit = (_data: z.infer<typeof formSchema>) => {
     setIsFormSubmitted(true);
     updateDeliveryInfo({
-      orderId,
+      planId: order?.attributes?.metadata?.plans?.[0],
       deliveryPhoneNumber: phoneNumberForDetecting,
       subOrderTimestamp: String(subOrderDate),
       checkList: _data?.checklist || [],

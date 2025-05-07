@@ -238,14 +238,3 @@ export const sendOrderChangeFirebaseNotificationToPartnerApi = (
     `/orders/${orderId}/send-order-change-firebase-notification-to-partner`,
     params,
   );
-
-export const updateDeliveryInfo = (payload: {
-  orderId: string;
-  subOrderTimestamp: string;
-  deliveryPhoneNumber: string;
-  checkList: string[];
-}) => {
-  const { orderId, ..._payload } = payload;
-
-  return postApi(`/orders/${orderId}/update-delivery-info/`, _payload);
-};
