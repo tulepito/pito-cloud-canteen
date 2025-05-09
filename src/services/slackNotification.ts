@@ -44,6 +44,7 @@ type SlackNotificationParams = {
   };
   deliveryAgentImagesUploadedData?: {
     orderLink: string;
+    images: string[];
     threadTs?: string;
   };
   participantGroupOrderFoodChangedData?: {
@@ -270,7 +271,7 @@ export const createSlackNotification = async (
       case ESlackNotificationType.DELIVERY_AGENT_IMAGES_UPLOADED: {
         if (!notificationParams.deliveryAgentImagesUploadedData) return;
 
-        await axios.post(
+        axios.post(
           process.env.SLACK_WEBHOOK_URL,
           {
             thread_ts:
@@ -284,6 +285,31 @@ export const createSlackNotification = async (
                   text: `<!here> :dart::dart::dart: Tài xế đã cập nhật hình ảnh cho đơn hàng của bạn <${notificationParams.deliveryAgentImagesUploadedData.orderLink}|Truy cập>`,
                 },
               },
+            ],
+          },
+          {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          },
+        );
+
+        axios.post(
+          process.env.SLACK_WEBHOOK_URL,
+          {
+            thread_ts:
+              notificationParams.deliveryAgentImagesUploadedData.threadTs,
+            blocks: [
+              ...(notificationParams.deliveryAgentImagesUploadedData?.images
+                ? (
+                    notificationParams.deliveryAgentImagesUploadedData
+                      ?.images || []
+                  ).map((image) => ({
+                    type: 'image',
+                    image_url: image,
+                    alt_text: 'Hình ảnh tài xế đã tải lên',
+                  }))
+                : []),
             ],
           },
           {

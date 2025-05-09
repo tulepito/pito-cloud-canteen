@@ -5,7 +5,11 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { getIntegrationSdk } from '@services/sdk'; // Updated to use getIntegrationSdk
 import { createSlackNotification } from '@services/slackNotification';
-import type { PlanListing, WithFlexSDKData } from '@src/types';
+import type {
+  DeliveryInfoImage,
+  PlanListing,
+  WithFlexSDKData,
+} from '@src/types';
 import { ESlackNotificationType } from '@src/utils/enums';
 
 export const config = {
@@ -114,7 +118,7 @@ const handler = async (
           });
         });
       });
-      const results = await Promise.all(promises);
+      const results = (await Promise.all(promises)) as DeliveryInfoImage[];
 
       const currentDateValueGMTTime =
         new Date().valueOf() + new Date().getTimezoneOffset() * 60 * 1000;
@@ -127,8 +131,14 @@ const handler = async (
           ]?.lastTransition,
       }));
 
+      const metaImages = [
+        ...resultsWithMetaData,
+        ...(planListing.data.data.attributes?.metadata?.deliveryInfo?.[
+          subOrderDate
+        ]?.[phoneNumber]?.images || []),
+      ];
+
       const metadata = {
-        deliveryInfoLastUpdatedAtTimestamp: currentDateValueGMTTime,
         deliveryInfo: {
           ...(planListing.data.data.attributes?.metadata?.deliveryInfo || {}),
           [subOrderDate]: {
@@ -139,42 +149,23 @@ const handler = async (
               ...(planListing.data.data.attributes?.metadata?.deliveryInfo?.[
                 subOrderDate
               ]?.[phoneNumber] || {}),
-              images: [
-                ...resultsWithMetaData,
-                ...(planListing.data.data.attributes?.metadata?.deliveryInfo?.[
-                  subOrderDate
-                ]?.[phoneNumber]?.images || []),
-              ],
+              images: metaImages,
             },
           },
         },
       };
 
-      const lastUpdatedAtTimestamp =
-        planListing.data.data.attributes?.metadata
-          ?.deliveryInfoLastUpdatedAtTimestamp;
-      const lastUpdatedAtTimestampDate = lastUpdatedAtTimestamp
-        ? new Date(lastUpdatedAtTimestamp)
-        : null;
-
-      const currentTime = Date.now().valueOf();
-      const timeDifference = lastUpdatedAtTimestampDate
-        ? Math.abs(currentTime - lastUpdatedAtTimestampDate.valueOf())
-        : 0;
-
-      const fiveMinutes = 5 * 60 * 1000; // 5 minutes in milliseconds
-      if (!timeDifference || timeDifference > fiveMinutes) {
-        createSlackNotification(
-          ESlackNotificationType.DELIVERY_AGENT_IMAGES_UPLOADED,
-          {
-            deliveryAgentImagesUploadedData: {
-              orderLink: `${process.env.NEXT_PUBLIC_CANONICAL_URL}/admin/order/${planListing.data.data.attributes?.metadata?.orderId}`,
-              threadTs:
-                planListing.data.data.attributes?.metadata?.slackThreadTs,
-            },
+      createSlackNotification(
+        ESlackNotificationType.DELIVERY_AGENT_IMAGES_UPLOADED,
+        {
+          deliveryAgentImagesUploadedData: {
+            orderLink: `${process.env.NEXT_PUBLIC_CANONICAL_URL}/admin/order/${planListing.data.data.attributes?.metadata?.orderId}`,
+            images: resultsWithMetaData.map((image) => image?.imageUrl || ''),
+            threadTs: planListing.data.data.attributes?.metadata?.slackThreadTs,
           },
-        );
-      }
+        },
+      );
+
       await sdk.listings.update({
         id: planId,
         metadata,

@@ -80,40 +80,48 @@ function AppAlertDialog({
 
 const checkLists = [
   {
-    key: "Đầy đủ theo SỐ LƯỢNG trên PHIẾU VẬN ĐƠN tại mục 'LINK' trên Onwheel",
-    label:
-      "Đầy đủ theo SỐ LƯỢNG trên PHIẾU VẬN ĐƠN tại mục 'LINK' trên Onwheel",
+    key: 'Đầy đủ theo SỐ LƯỢNG trên PHIẾU VẬN ĐƠN này',
+    required: true,
+    label: 'Đầy đủ theo SỐ LƯỢNG trên PHIẾU VẬN ĐƠN này',
   },
   {
     key: 'Đủ CƠM THÊM (trừ khách Technify hiện không ăn cơm thêm)',
+    required: false,
     label: 'Đủ CƠM THÊM (trừ khách Technify hiện không ăn cơm thêm)',
   },
   {
     key: 'Đủ số lượng CANH THEO CƠM',
+    required: true,
     label: 'Đủ số lượng CANH THEO CƠM',
   },
   {
     key: 'Đủ số lượng CANH CHAY (nếu có cơm chay)',
+    required: true,
     label: 'Đủ số lượng CANH CHAY (nếu có cơm chay)',
   },
   {
     key: 'Đủ số lượng NƯỚC LÈO',
+    required: false,
     label: 'Đủ số lượng NƯỚC LÈO',
   },
   {
     key: 'Đủ TRÁNG MIỆNG',
+    required: false,
     label: 'Đủ TRÁNG MIỆNG',
   },
   {
     key: 'Đủ MUỖNG ĐŨA',
+    required: true,
     label: 'Đủ MUỖNG ĐŨA',
   },
   {
     key: 'Đủ RAU SỐNG NẾU BẾP CÓ CHO KÈM (như: Hủ tiếu, bò kho,...)',
+    required: false,
     label: 'Đủ RAU SỐNG NẾU BẾP CÓ CHO KÈM (như: Hủ tiếu, bò kho,...)',
   },
   {
     key: 'TEM PHỤ ĐÃ DÁN ĐỦ LÊN Tráng miệng, đũa muỗng, canh chay, cơm thêm...',
+    required: true,
     label:
       'TEM PHỤ ĐÃ DÁN ĐỦ LÊN Tráng miệng, đũa muỗng, canh chay, cơm thêm...',
   },
@@ -125,12 +133,16 @@ type TTrackingOrderInfoProps = {
 
 const formSchema = z.object({
   checklist: z
-    .array(
-      z.string().refine((val) => checkLists.some((item) => item.key === val)),
+    .array(z.string())
+    .refine(
+      (checklist) =>
+        checkLists
+          .filter((item) => item.required)
+          .every((item) => checklist.includes(item.key)),
+      {
+        message: 'Tất cả các mục bắt buộc phải được kiểm tra',
+      },
     )
-    .refine((val) => val.length === checkLists.length, {
-      message: 'Vui lòng chọn tất cả các mục trong checklist',
-    })
     .optional(),
 });
 
@@ -282,7 +294,7 @@ const TrackingOrderInfo = ({ subOrderDate }: TTrackingOrderInfoProps) => {
           }
 
           setImages([
-            ...(res.deliveryInfoOfDate[phoneNumberForDetecting]?.images.map(
+            ...(res.deliveryInfoOfDate[phoneNumberForDetecting]?.images?.map(
               (image: any) => ({
                 imageUrl: image.imageUrl,
                 state: 'uploaded' as const,
@@ -582,45 +594,54 @@ const TrackingOrderInfo = ({ subOrderDate }: TTrackingOrderInfoProps) => {
                             name="checklist"
                             render={({ field }) => (
                               <FormItem className="flex gap-1 items-center flex-wrap">
-                                {checkLists.map(({ key, label }) => {
-                                  const handleChange = () => {
-                                    if (!field.value?.includes(key)) {
-                                      field.onChange([
-                                        ...(field.value || []),
-                                        key,
-                                      ]);
-                                    } else {
-                                      field.onChange(
-                                        field.value?.filter(
-                                          (item) => item !== key,
-                                        ),
-                                      );
-                                    }
-                                  };
-
-                                  const emoji = field.value?.includes(key)
-                                    ? '✅'
-                                    : '❌';
-                                  const backgroundColor = field.value?.includes(
-                                    key,
+                                {checkLists
+                                  .sort(
+                                    (a, b) =>
+                                      Number(b.required) - Number(a.required),
                                   )
-                                    ? 'bg-green-100 hover:bg-green-100 border-green-500'
-                                    : 'bg-white hover:bg-blue-50 border-blue-500';
+                                  .map(({ key, label, required }) => {
+                                    const handleChange = () => {
+                                      if (!field.value?.includes(key)) {
+                                        field.onChange([
+                                          ...(field.value || []),
+                                          key,
+                                        ]);
+                                      } else {
+                                        field.onChange(
+                                          field.value?.filter(
+                                            (item) => item !== key,
+                                          ),
+                                        );
+                                      }
+                                    };
 
-                                  return (
-                                    <Badge
-                                      key={key}
-                                      variant="secondary"
-                                      className={classNames(
-                                        'cursor-pointer bg-white inline-block rounded-full p-2',
-                                        backgroundColor,
-                                      )}
-                                      onClick={handleChange}>
-                                      {emoji}&nbsp;&nbsp;
-                                      {label}
-                                    </Badge>
-                                  );
-                                })}
+                                    const emoji = field.value?.includes(key)
+                                      ? '✅'
+                                      : '❌';
+                                    const backgroundColor =
+                                      field.value?.includes(key)
+                                        ? 'bg-green-100 hover:bg-green-100 border-green-500'
+                                        : 'bg-white hover:bg-blue-50 border-blue-500';
+
+                                    return (
+                                      <Badge
+                                        key={key}
+                                        variant="secondary"
+                                        className={classNames(
+                                          'cursor-pointer bg-white inline-block rounded-full p-2',
+                                          backgroundColor,
+                                        )}
+                                        onClick={handleChange}>
+                                        {emoji}&nbsp;&nbsp;
+                                        {required ? (
+                                          <span className="text-red-500">
+                                            (Bắt buộc)&nbsp;
+                                          </span>
+                                        ) : null}
+                                        {label}
+                                      </Badge>
+                                    );
+                                  })}
                                 <FormMessage />
                               </FormItem>
                             )}

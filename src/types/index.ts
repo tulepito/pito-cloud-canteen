@@ -114,6 +114,13 @@ export type OrderDetailValue = {
   oldValues?: OrderDetailValue[];
 };
 
+export interface DeliveryInfoImage {
+  imageUrl: string;
+  imageId: string;
+  uploadedAt: number;
+  lastTransition: string;
+}
+
 export type PlanListing = ListingBuilder<
   {},
   {},
@@ -141,10 +148,7 @@ export type PlanListing = ListingBuilder<
       Record<
         string,
         {
-          images: {
-            imageUrl: string;
-            imageId: string;
-          }[];
+          images: DeliveryInfoImage[];
         }
       >
     >;
