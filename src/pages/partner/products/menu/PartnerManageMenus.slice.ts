@@ -14,6 +14,7 @@ import {
   updateMenuApi,
 } from '@apis/partnerApi';
 import { queryAllPages } from '@helpers/apiHelpers';
+import type { ToolType } from '@pages/api/admin/listings/menus/change-end-date-in-bulk.api';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { foodSliceThunks } from '@redux/slices/foods.slice';
 import {
@@ -259,7 +260,25 @@ const changeMenuEndDateInBulk = createAsyncThunk(
 
 const fetchAllBookersAndParticipants = createAsyncThunk(
   'app/PartnerManageMenus/FETCH_ALL_USERS',
-  async () => {
+  async ({ type }: { type: ToolType }) => {
+    if (type === 'fetch-all-partners') {
+      const partners = (await changeMenuEndDateInBulkApi({
+        type: 'fetch-all-partners',
+      })) as {
+        data: {
+          url: string;
+          partnerName: string;
+        }[];
+      };
+
+      const partnersWS = xlsx.utils.json_to_sheet(partners.data);
+      const wb = xlsx.utils.book_new();
+      xlsx.utils.book_append_sheet(wb, partnersWS, 'Partners');
+      xlsx.writeFile(wb, 'partners.xlsx');
+
+      return partners;
+    }
+
     try {
       const users = (await changeMenuEndDateInBulkApi({
         type: 'fetch-all-bookers-participants',

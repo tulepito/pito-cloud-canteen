@@ -30,6 +30,70 @@ export type FoodListing = ListingBuilder<
   { images: Image[] }
 >;
 
+export type RestaurantListing = ListingBuilder<
+  {},
+  {
+    location: {
+      address: string;
+    };
+    foodCertificate: {
+      status: 'no' | 'yes';
+    };
+    businessLicense: {
+      status: 'no' | 'yes';
+    };
+    contactorName: string;
+    minPrice: number;
+    packaging: string[];
+    vat: 'vat' | 'noExportVat' | 'direct';
+    phoneNumber: string;
+  },
+  {
+    status: 'unsatisfactory' | 'authorized' | 'new';
+  },
+  {
+    summary: {
+      totalOrders: number;
+      totalRevenue: number;
+      firstOrderBookedAt: number;
+      lastUpdatedAt: number;
+    };
+  },
+  {}
+>;
+
+type QuotationListingRecord = Record<
+  string,
+  {
+    name: string;
+    quotation: Record<
+      string,
+      {
+        foodId: string;
+        foodName: string;
+        foodPrice: number;
+        foodUnit: string;
+        frequency: number;
+      }[]
+    >;
+  }
+>;
+
+export type QuotationListing = ListingBuilder<
+  {},
+  {},
+  {
+    orderId: string;
+    companyId: string;
+    listingType: 'quotation';
+    client: QuotationListingRecord;
+    partner: QuotationListingRecord;
+    status: 'active';
+  },
+  {},
+  {}
+>;
+
 export type OrderListing = ListingBuilder<
   {},
   {
@@ -65,6 +129,7 @@ export type OrderListing = ListingBuilder<
     packagePerMember: number;
     participants: string[];
     plans: string[];
+    quotationId: string;
     selectedGroups: string[];
     serviceFees: Record<string, number>;
     startDate: number;
@@ -234,6 +299,7 @@ export type UserListing = DeepPartial<{
         id: string;
         isCompany: boolean;
         isAdmin: boolean;
+        restaurantListingId?: string;
         isOnBoardingEmailSent: boolean;
         members: {
           [key: string]: {
