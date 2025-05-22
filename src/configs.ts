@@ -169,7 +169,12 @@ const VATPercentage = 0;
 const marketplacePhoneNumber = '1900 252 530';
 
 // TODO: change this value to 5 when we have enough restaurants
-const maxKilometerFromRestaurantToDeliveryAddressForBooker = 10;
+/**
+ * @depreated use process.env.NEXT_PUBLIC_DISTANCE_RESTAURANT_TO_DELIVERY_ADDRESS
+ */
+const maxKilometerFromRestaurantToDeliveryAddressForBooker = +(
+  process.env.NEXT_PUBLIC_DISTANCE_RESTAURANT_TO_DELIVERY_ADDRESS || 9999
+);
 
 const config = {
   env,
@@ -196,6 +201,9 @@ const config = {
   maps,
   VATPercentage,
   marketplacePhoneNumber,
+  /**
+   * @deprecated use process.env.NEXT_PUBLIC_DISTANCE_RESTAURANT_TO_DELIVERY_ADDRESS
+   */
   maxKilometerFromRestaurantToDeliveryAddressForBooker,
   googleClientId,
 };
