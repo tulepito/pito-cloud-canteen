@@ -1,3 +1,4 @@
+import { useIntl } from 'react-intl';
 import classNames from 'classnames';
 import { useRouter } from 'next/router';
 
@@ -11,6 +12,7 @@ import css from './BottomNavigationBar.module.scss';
 
 const BottomNavigationBar = () => {
   const router = useRouter();
+  const intl = useIntl();
 
   return (
     <div className={css.container}>
@@ -20,7 +22,11 @@ const BottomNavigationBar = () => {
             [css.active]: router.pathname === participantPaths.OrderList,
           })}>
           <IconCalendar />
-          <div className={css.label}>Lịch của tôi</div>
+          <div className={css.label}>
+            {intl.formatMessage({
+              id: 'GeneralLayoutTopBar.menuItem.myCalender',
+            })}
+          </div>
         </div>
       </NamedLink>
       <NamedLink
@@ -31,7 +37,11 @@ const BottomNavigationBar = () => {
             [css.active]: router.pathname === participantPaths.SubOrderList,
           })}>
           <IconFood />
-          <div className={css.label}>Món đã đặt</div>
+          <div className={css.label}>
+            {intl.formatMessage({
+              id: 'GeneralLayoutTopBar.menuItem.myOrders',
+            })}
+          </div>
         </div>
       </NamedLink>
       <NamedLink path={participantPaths.Account} className={css.itemWrapper}>
@@ -40,7 +50,11 @@ const BottomNavigationBar = () => {
             [css.active]: router.pathname === participantPaths.Account,
           })}>
           <IconUser />
-          <div className={css.label}>Tài khoản</div>
+          <div className={css.label}>
+            {intl.formatMessage({
+              id: 'EditPartnerMenuWizard.informationTabLabel',
+            })}
+          </div>
         </div>
       </NamedLink>
     </div>

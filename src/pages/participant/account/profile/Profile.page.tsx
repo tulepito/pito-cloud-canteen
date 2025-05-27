@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { useIntl } from 'react-intl';
 import { useRouter } from 'next/router';
 
 import ConfirmationModal from '@components/ConfirmationModal/ConfirmationModal';
@@ -28,6 +29,7 @@ const ProfilePage = () => {
     (state) => state.user.updateProfileInProgress,
   );
 
+  const intl = useIntl();
   const currentUserGetter = User(currentUser!);
   const { firstName, lastName, displayName } = currentUserGetter.getProfile();
   const { email } = currentUserGetter.getAttributes();
@@ -69,7 +71,7 @@ const ProfilePage = () => {
 
   return (
     <div className={css.container}>
-      <ParticipantSidebar title="Tài khoản" />
+      <ParticipantSidebar title={intl.formatMessage({ id: 'tai-khoan' })} />
 
       <div className={css.desktopView}>
         <ProfileForm
@@ -94,8 +96,10 @@ const ProfilePage = () => {
         id="ProfileModalConfirmation"
         isOpen={updateProfileSuccessModalControl.value}
         onClose={updateProfileSuccessModalControl.setFalse}
-        title="Thông báo"
-        description="Thông tin của bạn đã được cập nhật thành công."
+        title={intl.formatMessage({ id: 'thong-bao-0' })}
+        description={intl.formatMessage({
+          id: 'thong-tin-cua-ban-da-duoc-cap-nhat-thanh-cong',
+        })}
         secondForAutoClose={3}
       />
     </div>

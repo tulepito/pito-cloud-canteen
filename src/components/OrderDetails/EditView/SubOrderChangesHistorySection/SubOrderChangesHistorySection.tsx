@@ -68,13 +68,13 @@ const SubOrderChangesHistoryItem = (props: TSubOrderChangeHistoryItem) => {
         } = newValue || {};
 
         return {
-          title: 'Khôi phục phần ăn',
-          content: `Đã khôi phục phần ăn cho ${
+          title: intl.formatMessage({ id: 'khoi-phuc-phan-an' }),
+          content: `${intl.formatMessage({ id: 'da-khoi-phuc-phan-an-cho' })} ${
             (members?.length || 0) <= 3
               ? (members || [])
                   .map((_member) => `"${_member?.memberData?.email}"`)
                   .join(', ')
-              : `${members?.length} thành viên`
+              : `${members?.length} ${intl.formatMessage({ id: 'thanh-vien' })}`
           }`,
         };
       }
@@ -277,7 +277,7 @@ const SubOrderChangesHistorySection: React.FC<
               ))
             ) : (
               <div className={css.noResults}>
-                Chưa có hoạt động chỉnh sửa nào
+                {intl.formatMessage({ id: 'chua-co-hoat-dong-chinh-sua-nao' })}
               </div>
             )}
             <div id={LIST_BOTTOM_ID}></div>
@@ -289,7 +289,7 @@ const SubOrderChangesHistorySection: React.FC<
                 onClick={handleQueryMore}
                 inProgress={loadMoreSubOrderChangesHistory}
                 type="button">
-                Xem thêm
+                {intl.formatMessage({ id: 'RestaurantCard.viewDetailText' })}
               </InlineTextButton>
             ) : mergedList.length > 3 ? (
               collapsible.value ? (
@@ -297,14 +297,14 @@ const SubOrderChangesHistorySection: React.FC<
                   className={css.moreButton}
                   onClick={handleCollapse}
                   type="button">
-                  Xem thêm
+                  {intl.formatMessage({ id: 'RestaurantCard.viewDetailText' })}
                 </InlineTextButton>
               ) : (
                 <InlineTextButton
                   className={css.moreButton}
                   onClick={handleCollapse}
                   type="button">
-                  Ẩn bớt
+                  {intl.formatMessage({ id: 'an-bot' })}
                 </InlineTextButton>
               )
             ) : null)}

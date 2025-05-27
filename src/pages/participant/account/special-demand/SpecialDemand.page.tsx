@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import { useRouter } from 'next/router';
 
@@ -41,6 +42,7 @@ const SpecialDemandPage: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [JSON.stringify(allergies), JSON.stringify(nutritions)],
   );
+  const intl = useIntl();
   const handleSubmit = async (values: TSpecialDemandFormValues) => {
     const { meta } = await dispatch(
       userThunks.updateProfile({ publicData: { ...values } }),
@@ -53,7 +55,7 @@ const SpecialDemandPage: React.FC = () => {
 
   return (
     <div className={css.container}>
-      <ParticipantSidebar title="Tài khoản" />
+      <ParticipantSidebar title={intl.formatMessage({ id: 'tai-khoan' })} />
 
       <div className={css.desktopView}>
         <SpecialDemandForm

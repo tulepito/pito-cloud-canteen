@@ -1,5 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect } from 'react';
+import { useIntl } from 'react-intl';
 import { useRouter } from 'next/router';
 
 import BottomNavigationBar from '@components/BottomNavigationBar/BottomNavigationBar';
@@ -9,6 +10,7 @@ import IconLock from '@components/Icons/IconLock/IconLock';
 import IconLogout from '@components/Icons/IconLogout/IconLogout';
 import IconSwap from '@components/Icons/IconSwap/IconSwap';
 import IconUser from '@components/Icons/IconUser2/IconUser2';
+import { LanguageSwitchButton } from '@components/Layout/CompanyLayout/CompanyHeader/LanguageSwitchButton';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { useLogout } from '@hooks/useLogout';
 import { useRoleSelectModalController } from '@hooks/useRoleSelectModalController';
@@ -23,6 +25,7 @@ import css from './Account.module.scss';
 const AccountPage = () => {
   const router = useRouter();
   const handleLogout = useLogout();
+  const intl = useIntl();
   const { isMobileLayout } = useViewport();
   const currentUser = useAppSelector(currentUserSelector);
   const { onOpenRoleSelectModal } = useRoleSelectModalController();
@@ -59,7 +62,11 @@ const AccountPage = () => {
         <div className={css.navigationItem} onClick={handleOpenProfileModal}>
           <div className={css.iconGroup}>
             <IconUser />
-            <span>Tài khoản cá nhân</span>
+            <span>
+              {intl.formatMessage({
+                id: 'ParticipantAccountSettingRoute.description',
+              })}
+            </span>
           </div>
           <IconArrow direction="right" />
         </div>
@@ -68,7 +75,11 @@ const AccountPage = () => {
           onClick={handleOpenChangePasswordModal}>
           <div className={css.iconGroup}>
             <IconLock />
-            <span>Đổi mật khẩu</span>
+            <span>
+              {intl.formatMessage({
+                id: 'ParticipantChangePasswordRoute.description',
+              })}
+            </span>
           </div>
           <IconArrow direction="right" />
         </div>
@@ -77,7 +88,11 @@ const AccountPage = () => {
           onClick={handleOpenSpecialDemandModal}>
           <div className={css.iconGroup}>
             <IconFood />
-            <span>Yêu cầu đặc biệt</span>
+            <span>
+              {intl.formatMessage({
+                id: 'ParticipantSpecialDemandRoute.description',
+              })}
+            </span>
           </div>
           <IconArrow direction="right" />
         </div>
@@ -85,15 +100,26 @@ const AccountPage = () => {
           <div className={css.navigationItem} onClick={onOpenRoleSelectModal}>
             <div className={css.iconGroup}>
               <IconSwap className={css.iconSwap} />
-              <span>Đổi vai trò</span>
+              <span>
+                {intl.formatMessage({ id: 'CompanyHeaderMobile.changeRole' })}
+              </span>
             </div>
             <IconArrow direction="right" />
           </div>
         )}
+        <div className={css.navigationItem}>
+          <div className={css.iconGroup}>
+            <IconLock />
+            <span>{intl.formatMessage({ id: 'ngon-ngu' })}</span>
+          </div>
+          <LanguageSwitchButton />
+        </div>
         <div className={css.navigationItem} onClick={handleLogout}>
           <div className={css.iconGroup}>
             <IconLogout />
-            <span>Đăng xuất</span>
+            <span>
+              {intl.formatMessage({ id: 'CompanyHeaderMobile.logout' })}
+            </span>
           </div>
           <IconArrow direction="right" />
         </div>

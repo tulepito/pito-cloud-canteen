@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useIntl } from 'react-intl';
 import { toast } from 'react-toastify';
 
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
@@ -13,6 +14,8 @@ export const useAutoPickFood = (value: boolean, orderId: string) => {
 
   const dispatch = useAppDispatch();
   const autoPickFoodController = useBoolean(value);
+
+  const intl = useIntl();
 
   const toggleFoodAutoPicking = async () => {
     if (toggleAutoPickFoodInProgress || isToggleingAutoPickFood) {
@@ -32,16 +35,22 @@ export const useAutoPickFood = (value: boolean, orderId: string) => {
 
       if (!autoPickFoodController.value) {
         toast.success(
-          'Đơn hàng này sẽ tự động chọn món cho những thành viên chưa xác nhận đặt đơn',
+          intl.formatMessage({
+            id: 'don-hang-nay-se-tu-dong-chon-mon-cho-nhung-thanh-vien-chua-xac-nhan-dat-don',
+          }),
         );
       } else {
         toast.success(
-          'Đơn hàng này sẽ không tự động chọn món cho những thành viên chưa xác nhận đặt đơn',
+          intl.formatMessage({
+            id: 'don-hang-nay-se-khong-tu-dong-chon-mon-cho-nhung-thanh-vien-chua-xac-nhan-dat-don',
+          }),
         );
       }
     } catch (error) {
       autoPickFoodController.toggle();
-      toast.error('Có lỗi xảy ra, vui lòng thử lại sau');
+      toast.error(
+        intl.formatMessage({ id: 'co-loi-xay-ra-vui-long-thu-lai-sau' }),
+      );
     } finally {
       setIsToggleingAutoPickFood(false);
     }

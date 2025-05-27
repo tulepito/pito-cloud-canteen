@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import type { IntlShape } from 'react-intl';
 import { useIntl } from 'react-intl';
 import last from 'lodash/last';
 
@@ -26,14 +27,14 @@ type SubOrderCardProps = {
   openRatingSubOrderModal?: () => void;
 };
 
-const getTxStatusLabel = (txStatus: string) => {
+const getTxStatusLabel = (txStatus: string, intl: IntlShape) => {
   switch (txStatus) {
     case 'delivering':
-      return 'Đang giao hàng';
+      return intl.formatMessage({ id: 'dang-giao-hang' });
     case 'delivered':
-      return 'Đã giao hàng';
+      return intl.formatMessage({ id: 'da-giao-hang' });
     default:
-      return 'Đã chọn món';
+      return intl.formatMessage({ id: 'da-chon-mon' });
   }
 };
 
@@ -79,7 +80,8 @@ const SubOrderCard: React.FC<SubOrderCardProps> = (props) => {
   const { generalRating } = reviewListing.getMetadata();
   const subOrderTime = `${deliveryHour} ${formatTimestamp(
     timestamp,
-    "EEEE, 'ngày' dd/MM/yyyy",
+    // eslint-disable-next-line no-useless-concat
+    'EEEE, ' + `'${intl.formatMessage({ id: 'ngay' })}'` + ' dd/MM/yyyy',
   )}`;
   const isSubOrderDelivered = txStatus === 'delivered';
   useEffect(() => {
@@ -140,12 +142,14 @@ const SubOrderCard: React.FC<SubOrderCardProps> = (props) => {
           <Badge
             className={css.badge}
             type={getTxStatusBadgeType(txStatus)}
-            label={getTxStatusLabel(txStatus)}
+            label={getTxStatusLabel(txStatus, intl)}
           />
           <RenderWhen condition={isSubOrderDelivered}>
             <RenderWhen condition={!reviewId}>
               <Button className={css.ratingBtn} onClick={openReviewRatingModal}>
-                Đánh giá
+                {intl.formatMessage({
+                  id: 'CompanyOrderDetailPage.titleSection.reviewButtonText',
+                })}
               </Button>
               <RenderWhen.False>
                 <div className={css.rating}>

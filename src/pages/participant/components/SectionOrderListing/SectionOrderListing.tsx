@@ -91,8 +91,14 @@ const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({
   }) => {
     toast.success(
       foodName
-        ? `Đã thêm món ${foodName} cho ngày ${formatTimestamp(+timestamp)}`
-        : `Không chọn món cho ngày ${formatTimestamp(+timestamp)}`,
+        ? `${intl.formatMessage({
+            id: 'da-them-mon',
+          })} ${foodName} ${intl.formatMessage({
+            id: 'cho-ngay',
+          })} ${formatTimestamp(+timestamp)}`
+        : `${intl.formatMessage({
+            id: 'khong-chon-mon-cho-ngay',
+          })} ${formatTimestamp(+timestamp)}`,
       {
         position: isMobileLayout ? 'top-center' : 'bottom-center',
         toastId: 'add-to-cart',

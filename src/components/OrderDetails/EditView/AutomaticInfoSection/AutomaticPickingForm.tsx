@@ -1,5 +1,6 @@
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Field, Form as FinalForm } from 'react-final-form';
+import { useIntl } from 'react-intl';
 
 import Form from '@components/Form/Form';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
@@ -27,13 +28,16 @@ type TAutomaticPickingFormProps = FormProps<TAutomaticPickingFormValues> &
 const AutomaticPickingFormComponent: React.FC<
   TAutomaticPickingFormComponentProps
 > = (props) => {
+  const intl = useIntl();
   const {
     handleFieldChange = console.info,
     shouldShowMainTitle = true,
     handleSubmit,
     disabled,
-    subTitle = 'Cho phép PITO Cloud Canteen tự chọn món cho những thành viên không xác nhận đặt đơn.',
-    mainTitle = 'Tự động chọn món cho thành viên',
+    subTitle = intl.formatMessage({
+      id: 'cho-phep-pito-cloud-canteen-tu-chon-mon-cho-nhung-thanh-vien-khong-xac-nhan-dat-don',
+    }),
+    mainTitle = intl.formatMessage({ id: 'tu-dong-chon-mon-cho-thanh-vien' }),
   } = props;
 
   const titleComponent = (
@@ -52,8 +56,9 @@ const AutomaticPickingFormComponent: React.FC<
         <Tooltip
           tooltipContent={
             <span>
-              Khi hết thời hạn, hệ thống tự động chọn món cho nhũng thành viên
-              chưa chọn.
+              {intl.formatMessage({
+                id: 'khi-het-thoi-han-he-thong-tu-dong-chon-mon-cho-nhung-thanh-vien-chua-chon',
+              })}
             </span>
           }
           placement="bottom">

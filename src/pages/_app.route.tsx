@@ -1,5 +1,7 @@
 import { Provider } from 'react-redux';
-import type { AppProps } from 'next/app';
+import { parse } from 'cookie';
+import type { AppContext, AppProps } from 'next/app';
+import App from 'next/app';
 import Head from 'next/head';
 import { Router } from 'next/router';
 import Script from 'next/script';
@@ -12,7 +14,9 @@ import { LoadingContainerImagePreloader } from '@components/LoadingContainer/Loa
 import ToastifyProvider from '@components/ToastifyProvider/ToastifyProvider';
 import UIProvider from '@components/UIProvider/UIProvider';
 import store from '@redux/store';
-import TranslationProvider from '@translations/TranslationProvider';
+import TranslationProvider, {
+  DEFAULT_LOCALE,
+} from '@translations/TranslationProvider';
 import type { NextApplicationPage } from '@utils/types';
 
 import '@src/styles/globals.scss';
@@ -37,27 +41,45 @@ const MyApp = ({
   router,
   ...restProps
 }: AppProps & AppCustomProps) => {
+  const { pathname } = router;
+
+  const isPagePublic = pathname.includes('/website');
+
   return (
-    <TranslationProvider>
+    <TranslationProvider lang={restProps.pageProps.lang}>
       <Provider store={store}>
         <UIProvider>
-          <AuthGuard>
-            <PermissionGuard>
-              <ToastifyProvider>
-                <GoNativeProvider>
-                  {/* common app head tag */}
-                  <Head>
-                    <meta
-                      name="viewport"
-                      content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi"
-                    />
-                  </Head>
-
-                  <Component {...restProps.pageProps} key={router.asPath} />
-                </GoNativeProvider>
-              </ToastifyProvider>
-            </PermissionGuard>
-          </AuthGuard>
+          {isPagePublic ? (
+            <ToastifyProvider>
+              <GoNativeProvider>
+                {/* common app head tag */}
+                <Head>
+                  <meta
+                    name="viewport"
+                    content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi"
+                  />
+                </Head>
+                <Component {...restProps.pageProps} key={router.asPath} />
+              </GoNativeProvider>
+            </ToastifyProvider>
+          ) : (
+            <AuthGuard>
+              <PermissionGuard>
+                <ToastifyProvider>
+                  <GoNativeProvider>
+                    {/* common app head tag */}
+                    <Head>
+                      <meta
+                        name="viewport"
+                        content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi"
+                      />
+                    </Head>
+                    <Component {...restProps.pageProps} key={router.asPath} />
+                  </GoNativeProvider>
+                </ToastifyProvider>
+              </PermissionGuard>
+            </AuthGuard>
+          )}
         </UIProvider>
       </Provider>
       <LoadingContainerImagePreloader />
@@ -69,6 +91,22 @@ const MyApp = ({
       </Script>
     </TranslationProvider>
   );
+};
+
+MyApp.getInitialProps = async (appContext: AppContext) => {
+  const appProps = await App.getInitialProps(appContext);
+
+  const req = appContext.ctx.req;
+  const cookies = req ? parse(req.headers.cookie || '') : {};
+  const lang = cookies.lang || DEFAULT_LOCALE;
+
+  return {
+    ...appProps,
+    pageProps: {
+      ...appProps.pageProps,
+      lang,
+    },
+  };
 };
 
 export default MyApp;

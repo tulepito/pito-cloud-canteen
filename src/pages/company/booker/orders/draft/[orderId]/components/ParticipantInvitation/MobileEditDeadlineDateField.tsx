@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { useIntl } from 'react-intl';
 
 import Button from '@components/Button/Button';
 import FieldDatePicker from '@components/FormFields/FieldDatePicker/FieldDatePicker';
@@ -27,12 +28,13 @@ const MobileEditDeadlineDateField: React.FC<
   selectedDate,
   setSelectedDate,
 }) => {
+  const intl = useIntl();
   const control = useBoolean();
 
   const formattedDeadlineDate =
     selectedDate !== null
       ? formatTimestamp(selectedDate?.getTime(), 'EEE, dd MMMM, yyyy')
-      : 'Chọn hạn chọn món';
+      : intl.formatMessage({ id: 'chon-han-chon-mon-0' });
 
   const handleSubmitDate = () => {
     setSelectedDate(selectedDate);
@@ -47,7 +49,9 @@ const MobileEditDeadlineDateField: React.FC<
   return (
     <>
       <div className={css.mobileInfoContainer} onClick={control.setTrue}>
-        <div className={css.label}>{'Ngày kết thúc'}</div>
+        <div className={css.label}>
+          {intl.formatMessage({ id: 'ngay-ket-thuc-0' })}
+        </div>
         <div className={css.mobileDeadlineDateInfo}>
           <IconCalendar />
           <div className={initialDeadlineDate !== null ? '' : css.placeholder}>
@@ -59,7 +63,7 @@ const MobileEditDeadlineDateField: React.FC<
       <RenderWhen condition={control.value}>
         <SlideModal
           id="MobileEditDeadlineDateField.slideModal"
-          modalTitle="Chọn ngày"
+          modalTitle={intl.formatMessage({ id: 'chon-ngay' })}
           isOpen={control.value}
           onClose={control.setFalse}
           containerClassName={css.mobileModalContainer}>
@@ -78,10 +82,14 @@ const MobileEditDeadlineDateField: React.FC<
 
             <div className={css.actions}>
               <Button variant={'secondary'} onClick={control.setFalse}>
-                Hủy
+                {intl.formatMessage({
+                  id: 'ManageCompanyMembersTable.memberRemoveCancel',
+                })}
               </Button>
               <Button type="button" onClick={handleSubmitDate}>
-                Áp dụng
+                {intl.formatMessage({
+                  id: 'MoveFoodToMenuForm.formStep.selectDays.submitText',
+                })}
               </Button>
             </div>
           </div>

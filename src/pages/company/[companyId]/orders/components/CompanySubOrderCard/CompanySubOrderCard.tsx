@@ -12,7 +12,10 @@ import { parseThousandNumber } from '@helpers/format';
 import Tracker from '@helpers/tracker';
 import { useAppSelector } from '@hooks/reduxHooks';
 import type { EOrderStates } from '@src/utils/enums';
-import { getLabelByKey, ORDER_STATE_OPTIONS } from '@src/utils/options';
+import {
+  getLabelByKey,
+  useOrderStateOptionsByLocale,
+} from '@src/utils/options';
 import type { TObject } from '@src/utils/types';
 
 import { BADGE_TYPE_BASE_ON_ORDER_STATE } from '../../helpers/constants';
@@ -47,6 +50,8 @@ const CompanySubOrderCard: React.FC<CompanySubOrderCardProps> = (props) => {
       id: 'CompanySubOrderCard.order',
     })
     .toUpperCase();
+
+  const ORDER_STATE_OPTIONS = useOrderStateOptionsByLocale();
 
   const companyOrderRenderData = getCompanyOrderRenderData(data, {
     isMobileLayout: true,

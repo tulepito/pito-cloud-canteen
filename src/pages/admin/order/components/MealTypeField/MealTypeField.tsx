@@ -2,7 +2,7 @@ import { useIntl } from 'react-intl';
 import classNames from 'classnames';
 
 import FieldCheckbox from '@components/FormFields/FieldCheckbox/FieldCheckbox';
-import { mealTypeOptions } from '@src/marketplaceConfig';
+import { useOptionLabelsByLocale } from '@src/marketplaceConfig';
 
 import css from './MealTypeField.module.scss';
 
@@ -16,6 +16,7 @@ type MealTypeFieldProps = {
 const MealTypeField: React.FC<MealTypeFieldProps> = (props) => {
   const { title, titleClassName, fieldClassName, options } = props;
   const intl = useIntl();
+  const { mealTypeOptions } = useOptionLabelsByLocale();
 
   return (
     <div className={css.container}>

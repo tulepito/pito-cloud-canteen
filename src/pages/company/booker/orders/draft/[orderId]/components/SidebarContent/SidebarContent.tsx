@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import { toast } from 'react-toastify';
 import classNames from 'classnames';
@@ -235,15 +235,17 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
     };
   }, [nutritions, mealType]);
 
+  const intl = useIntl();
+
   const finalizeGroupList = useMemo(() => {
     return [
       {
         id: 'allMembers',
-        name: 'Tất cả nhóm',
+        name: intl.formatMessage({ id: 'tat-ca-nhom' }),
       },
       ...(groupList || []),
     ];
-  }, [groupList]);
+  }, [groupList, intl]);
 
   const selectedGroupsInitValues = {
     selectedGroups,
@@ -437,7 +439,9 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
         {deliveryInitValues.deliveryHour}
       </>
     ),
-    numberEmployees: `${memberAmount || 0} người`,
+    numberEmployees: `${memberAmount || 0} ${intl.formatMessage({
+      id: 'nguoi',
+    })}`,
     nutrition: createNutritionText(
       nutritionsOptions,
       nutritionsInitValues.nutritions,
@@ -458,14 +462,16 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
         <div className={css.header}>
           <h2 className={css.title}>#{orderCode}</h2>
           <Badge
-            label="Đơn hàng tuần"
+            label={intl.formatMessage({ id: 'don-hang-tuan' })}
             type={EBadgeType.info}
             className={css.badge}
           />
         </div>
         <div className={css.mobileHeader}>
           <IconArrow direction="left" onClick={onCloseSideBar} />
-          <div className={css.title}>Cài đặt bữa ăn</div>
+          <div className={css.title}>
+            {intl.formatMessage({ id: 'SetupOrderDetail.orderSettings' })}
+          </div>
         </div>
         <nav className={css.navigation}>
           <NavigationItem
@@ -476,7 +482,11 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
           <NavigationItem
             onOpen={handleOpenDetails}
             messageId="deliveryTime"
-            errorMessage={isStartDateInValid ? 'Thời gian không hợp lệ' : ''}
+            errorMessage={
+              isStartDateInValid
+                ? intl.formatMessage({ id: 'thoi-gian-khong-hop-le' })
+                : ''
+            }
             subText={subTexts.deliveryTime}
           />
           <NavigationItem

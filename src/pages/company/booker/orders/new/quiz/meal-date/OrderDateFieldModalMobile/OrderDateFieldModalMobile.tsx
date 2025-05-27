@@ -1,3 +1,5 @@
+import { useIntl } from 'react-intl';
+
 import Button from '@components/Button/Button';
 import FieldDateRangePicker from '@components/FormFields/FieldDateRangePicker/FieldDateRangePicker';
 import SlideModal from '@components/SlideModal/SlideModal';
@@ -46,6 +48,7 @@ const OrderDateFieldModalMobile: React.FC<TOrderDateFieldModalMobileProps> = (
     selectedTimeRangeOption,
     dateRangeNoLimit,
   });
+  const intl = useIntl();
 
   const daySession = useAppSelector((state) => state.Quiz.quiz?.daySession);
   const newMinDate = adjustMinDateWithDaySession({
@@ -62,7 +65,7 @@ const OrderDateFieldModalMobile: React.FC<TOrderDateFieldModalMobileProps> = (
       id="OrderDateFieldModalMobile"
       isOpen={isOpen}
       onClose={onClose}
-      modalTitle="Chọn ngày">
+      modalTitle={intl.formatMessage({ id: 'chon-ngay' })}>
       <FieldDateRangePicker
         id="dateRangeFieldMobile"
         name="dateRangeFieldMobile"
@@ -76,7 +79,9 @@ const OrderDateFieldModalMobile: React.FC<TOrderDateFieldModalMobileProps> = (
       />
       <div className={css.bottomBtns}>
         <Button className={'flex-1'} variant="secondary" onClick={onClose}>
-          Huỷ
+          {intl.formatMessage({
+            id: 'ManageParticipantsSection.deleteParticipantPopup.cancel',
+          })}
         </Button>
         {props.allowClear && (
           <Button
@@ -84,7 +89,9 @@ const OrderDateFieldModalMobile: React.FC<TOrderDateFieldModalMobileProps> = (
             type="button"
             className={'flex-1'}
             onClick={handleClearDateRange}>
-            Xoá
+            {intl.formatMessage({
+              id: 'ManageCompanyOrdersPage.deleteDraftOrderModal.confirmBtn',
+            })}
           </Button>
         )}
         <Button
@@ -92,7 +99,9 @@ const OrderDateFieldModalMobile: React.FC<TOrderDateFieldModalMobileProps> = (
           className={'flex-1'}
           variant="primary"
           onClick={onSubmitOrderDate}>
-          Áp dụng
+          {intl.formatMessage({
+            id: 'MoveFoodToMenuForm.formStep.selectDays.submitText',
+          })}
         </Button>
       </div>
     </SlideModal>

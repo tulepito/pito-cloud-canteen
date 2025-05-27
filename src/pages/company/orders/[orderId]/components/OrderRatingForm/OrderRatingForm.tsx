@@ -63,7 +63,7 @@ const OrderRatingFormComponent: React.FC<TOrderRatingFormComponentProps> = (
           orderTitle: Listing(order!).getAttributes().title,
         },
       )
-    : 'Đánh giá tổng quan';
+    : intl.formatMessage({ id: 'danh-gia-tong-quan-0' });
   const btnSumitComponent = (
     <Button
       className={css.submitBtn}

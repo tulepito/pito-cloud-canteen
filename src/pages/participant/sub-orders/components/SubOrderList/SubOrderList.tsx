@@ -1,3 +1,5 @@
+import { useIntl } from 'react-intl';
+
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import EmptySubOrder from '@pages/participant/orders/components/EmptySubOrder/EmptySubOrder';
 
@@ -21,11 +23,16 @@ const SubOrderList: React.FC<SubOrderListProps> = (props) => {
     setSelectedEvent,
     openRatingSubOrderModal,
   } = props;
+  const intl = useIntl();
 
   return (
     <RenderWhen condition={subOrders.length === 0}>
       <div className={css.emptySubOrders}>
-        <EmptySubOrder title="Hiện chưa có món ăn đang triển khai" />
+        <EmptySubOrder
+          title={intl.formatMessage({
+            id: 'hien-chua-co-mon-an-dang-trien-khai',
+          })}
+        />
       </div>
       <RenderWhen.False>
         <div className={css.subOrdersWrapper}>

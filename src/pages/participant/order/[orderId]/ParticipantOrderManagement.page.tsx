@@ -100,7 +100,7 @@ const ParticipantOrderManagement = () => {
     Number(diffDays(startDate, today, 'day').days) < 0;
   const selectedGroupNames =
     selectedGroups.includes('allMembers') || !selectedGroups.length
-      ? ['Tất cả thành viên']
+      ? [intl.formatMessage({ id: 'tat-ca-thanh-vien' })]
       : selectedGroups.map((groupId: string) => {
           return groups.find((group: any) => group.id === groupId)?.name;
         });
@@ -108,19 +108,25 @@ const ParticipantOrderManagement = () => {
 
   const rowInformation = [
     {
-      label: 'Công ty:',
+      label: `${intl.formatMessage({
+        id: 'OrderSettingModal.field.company',
+      })}:`,
       value: companyName,
     },
     {
-      label: 'Nhóm:',
+      label: `${intl.formatMessage({ id: 'GroupMemberDetailPage.group' })}:`,
       value: selectedGroupNames.join(', '),
     },
     {
-      label: 'Hạn chọn món:',
+      label: `${intl.formatMessage({
+        id: 'SidebarContent.nav.settings.expiredTime',
+      })}:`,
       value: formatTimestamp(orderDeadline, 'dd/MM/yyyy, HH:mm'),
     },
     {
-      label: 'Người đại diện:',
+      label: `${intl.formatMessage({
+        id: 'Tracking.OrderInfo.contactorName',
+      })}:`,
       value: bookerName,
     },
   ];
@@ -225,7 +231,9 @@ const ParticipantOrderManagement = () => {
                 className={css.btn}
                 disabled={loadDataInProgress}
                 onClick={updateHideFirstTimeOrderModal}>
-                Bắt đầu
+                {intl.formatMessage({
+                  id: 'FieldAvailability.startTimePlaceholder',
+                })}
               </Button>
             }
           />
@@ -244,7 +252,9 @@ const ParticipantOrderManagement = () => {
                 className={css.btn}
                 onClick={goToHomePage}
                 disabled={loadDataInProgress}>
-                Về trang chủ
+                {intl.formatMessage({
+                  id: 'EmailVerification.toHomePageLinkText',
+                })}
               </Button>
             }
           />

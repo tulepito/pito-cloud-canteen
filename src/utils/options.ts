@@ -1,3 +1,5 @@
+import { useIntl } from 'react-intl';
+
 import { EBadgeType } from '@components/Badge/Badge';
 import {
   AFTERNOON_SESSION,
@@ -446,7 +448,9 @@ export const PARTNER_MENU_MEAL_TYPE_OPTIONS = [
 
 // #endregion
 
-// #region //* FOOD *//
+/**
+ * @deprecated
+ */
 export const FOOD_TYPE_OPTIONS = [
   {
     key: EFoodType.vegetarianDish,
@@ -457,6 +461,23 @@ export const FOOD_TYPE_OPTIONS = [
     label: 'Món mặn',
   },
 ];
+
+export const useFoodTypeOptionsByLocale = () => {
+  const intl = useIntl();
+
+  const _FOOD_TYPE_OPTIONS = [
+    {
+      key: EFoodType.vegetarianDish,
+      label: intl.formatMessage({ id: 'mon-chay' }),
+    },
+    {
+      key: EFoodType.savoryDish,
+      label: intl.formatMessage({ id: 'mon-man' }),
+    },
+  ];
+
+  return _FOOD_TYPE_OPTIONS;
+};
 
 export const FOOD_SPECIAL_DIET_OPTIONS = [
   {
@@ -518,6 +539,9 @@ export const FOOD_SPECIAL_DIET_OPTIONS = [
   },
 ];
 
+/**
+ * @deprecated
+ */
 export const FOOD_SIDE_DISH_OPTIONS = [
   {
     key: 'soup',
@@ -537,6 +561,34 @@ export const FOOD_SIDE_DISH_OPTIONS = [
   },
 ];
 
+export const useFoodSideDishOptionsByLocale = () => {
+  const intl = useIntl();
+
+  const _FOOD_SIDE_DISH_OPTIONS = [
+    {
+      key: 'soup',
+      label: intl.formatMessage({ id: 'mon-canh' }),
+    },
+    {
+      key: 'stir-fried-meal',
+      label: intl.formatMessage({ id: 'mon-xao' }),
+    },
+    {
+      key: 'dessert',
+      label: intl.formatMessage({ id: 'mon-trang-mieng' }),
+    },
+    {
+      key: 'drink',
+      label: intl.formatMessage({ id: 'nuoc-uong' }),
+    },
+  ];
+
+  return _FOOD_SIDE_DISH_OPTIONS;
+};
+
+/**
+ * @deprecated
+ */
 export const ALLERGIES_OPTIONS = [
   {
     key: 'egg',
@@ -559,6 +611,35 @@ export const ALLERGIES_OPTIONS = [
     label: 'Đậu nành',
   },
 ];
+
+export const useAllergiesOptionsByLocale = () => {
+  const intl = useIntl();
+
+  const _ALLERGIES_OPTIONS = [
+    {
+      key: 'egg',
+      label: intl.formatMessage({ id: 'trung' }),
+    },
+    {
+      key: 'shrimp',
+      label: intl.formatMessage({ id: 'tom' }),
+    },
+    {
+      key: 'seafood',
+      label: intl.formatMessage({ id: 'hai-san' }),
+    },
+    {
+      key: 'msg',
+      label: intl.formatMessage({ id: 'bot-ngot' }),
+    },
+    {
+      key: 'soy',
+      label: intl.formatMessage({ id: 'dau-nanh' }),
+    },
+  ];
+
+  return _ALLERGIES_OPTIONS;
+};
 
 export const FOOD_CATEGORY_OPTIONS = [
   {
@@ -679,6 +760,9 @@ export const FOOD_CATEGORY_OPTIONS = [
 ];
 // #endregion
 
+/**
+ * @deprecated
+ */
 export const ORDER_STATE_OPTIONS = [
   {
     key: EOrderStates.inProgress,
@@ -725,6 +809,58 @@ export const ORDER_STATE_OPTIONS = [
     label: 'Hết hiệu lực',
   },
 ];
+
+export const useOrderStateOptionsByLocale = () => {
+  const intl = useIntl();
+  const _ORDER_STATE_OPTIONS = [
+    {
+      key: EOrderStates.inProgress,
+      label: intl.formatMessage({ id: 'dang-trien-khai' }),
+    },
+    {
+      key: EOrderStates.picking,
+      label: intl.formatMessage({ id: 'dang-chon-mon' }),
+    },
+    {
+      key: EOrderStates.canceled,
+      label: intl.formatMessage({ id: 'huy-0' }),
+    },
+    {
+      key: EOrderStates.canceledByBooker,
+      label: intl.formatMessage({ id: 'huy-0' }),
+    },
+    {
+      key: EOrderDraftStates.pendingApproval,
+      label: intl.formatMessage({ id: 'moi-tao' }),
+    },
+    {
+      key: EOrderDraftStates.draft,
+      label: intl.formatMessage({ id: 'don-nhap' }),
+    },
+    {
+      key: EBookerOrderDraftStates.bookerDraft,
+      label: intl.formatMessage({ id: 'don-nhap' }),
+    },
+    {
+      key: EOrderStates.completed,
+      label: intl.formatMessage({ id: 'chua-danh-gia' }),
+    },
+    {
+      key: EOrderStates.pendingPayment,
+      label: intl.formatMessage({ id: 'chua-thanh-toan' }),
+    },
+    {
+      key: EOrderStates.reviewed,
+      label: intl.formatMessage({ id: 'da-danh-gia' }),
+    },
+    {
+      key: EOrderStates.expiredStart,
+      label: intl.formatMessage({ id: 'het-hieu-luc' }),
+    },
+  ];
+
+  return _ORDER_STATE_OPTIONS;
+};
 
 export const COMPANY_NUTRITION_TYPE_OPTIONS = [
   {

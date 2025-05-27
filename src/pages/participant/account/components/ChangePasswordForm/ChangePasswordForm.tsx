@@ -1,4 +1,5 @@
 import { useField, useForm } from 'react-final-form-hooks';
+import { useIntl } from 'react-intl';
 import { useRouter } from 'next/router';
 
 import Button from '@components/Button/Button';
@@ -71,6 +72,7 @@ const ChangePasswordForm: React.FC<TChangePasswordFormProps> = ({
       validate,
       initialValues,
     });
+  const intl = useIntl();
 
   const handleAnyFieldChange = () => {
     dispatch(passwordActions.clearChangePasswordError());
@@ -110,22 +112,26 @@ const ChangePasswordForm: React.FC<TChangePasswordFormProps> = ({
 
   return (
     <Form onSubmit={handleSubmit} className={css.root}>
-      <div className={css.header}>Đổi mật khẩu</div>
+      <div className={css.header}>
+        {intl.formatMessage({
+          id: 'ParticipantChangePasswordRoute.description',
+        })}
+      </div>
       <div className={css.formContainer}>
         <div className={css.fieldsContainer}>
           <div className={css.fieldWrapper}>
             <FieldPasswordInputComponent
               id={`password`}
               name="password"
-              label="Mật khẩu hiện tại"
+              label={intl.formatMessage({ id: 'mat-khau-hien-tai' })}
               input={passwordInput}
               meta={password.meta}
-              placeholder="Nhập mật khẩu hiện tại"
+              placeholder={intl.formatMessage({ id: 'nhap-mat-khau-hien-tai' })}
               className={css.fieldInput}
             />
             <div className={css.forgotPassword}>
               <span onClick={navigateToPasswordRecoverPage}>
-                Quên mật khẩu?
+                {intl.formatMessage({ id: 'SignInForm.forgotPassword' })}
               </span>
             </div>
           </div>
@@ -133,10 +139,10 @@ const ChangePasswordForm: React.FC<TChangePasswordFormProps> = ({
             <FieldPasswordInputComponent
               id={`newPassword`}
               name="newPassword"
-              label="Mật khẩu mới"
+              label={intl.formatMessage({ id: 'mat-khau-moi' })}
               input={newPasswordInput}
               meta={newPassword.meta}
-              placeholder="Nhập mật khẩu mới"
+              placeholder={intl.formatMessage({ id: 'nhap-mat-khau-moi' })}
               className={css.fieldInput}
             />
           </div>
@@ -144,16 +150,22 @@ const ChangePasswordForm: React.FC<TChangePasswordFormProps> = ({
             <FieldPasswordInputComponent
               id={`confirmPassword`}
               name="confirmPassword"
-              label="Xác nhận mật khẩu mới"
+              label={intl.formatMessage({ id: 'xac-nhan-mat-khau-moi' })}
               input={confirmPasswordInput}
               meta={confirmPassword.meta}
-              placeholder="Xác nhận mật khẩu mới"
+              placeholder={intl.formatMessage({
+                id: 'xac-nhan-mat-khau-moi-0',
+              })}
               className={css.fieldInput}
             />
           </div>
 
           <RenderWhen condition={changePasswordError !== null}>
-            <ErrorMessage message="Mật khẩu hiện tại chưa đúng" />
+            <ErrorMessage
+              message={intl.formatMessage({
+                id: 'mat-khau-hien-tai-chua-dung',
+              })}
+            />
           </RenderWhen>
         </div>
 
@@ -162,7 +174,7 @@ const ChangePasswordForm: React.FC<TChangePasswordFormProps> = ({
           disabled={disabledSubmit}
           inProgress={inProgress}
           className={css.submitBtn}>
-          Lưu thay đổi
+          {intl.formatMessage({ id: 'AddOrderForm.moibleSubmitButtonText' })}
         </Button>
       </div>
     </Form>

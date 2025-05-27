@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import type { Event, View } from 'react-big-calendar';
 import { Views } from 'react-big-calendar';
+import { useIntl } from 'react-intl';
 import Skeleton from 'react-loading-skeleton';
 import { shallowEqual } from 'react-redux';
 import flatten from 'lodash/flatten';
@@ -116,6 +117,7 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
     orderState === EOrderStates.canceledByBooker;
   const [anchorTime, setAnchorTime] = useState<number | undefined>();
 
+  const intl = useIntl();
   const anchorDate =
     anchorTime || startDate ? new Date(anchorTime || startDate) : new Date();
 
@@ -363,7 +365,9 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
                 fullWidth
                 className={css.ratingBtn}
                 onClick={ratingSubOrderModalControl.setTrue}>
-                Đánh giá
+                {intl.formatMessage({
+                  id: 'CompanyOrderDetailPage.titleSection.reviewButtonText',
+                })}
               </Button>
             </div>
           );

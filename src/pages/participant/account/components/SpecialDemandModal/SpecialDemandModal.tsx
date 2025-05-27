@@ -1,5 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 
+import { useIntl } from 'react-intl';
+
 import IconArrowHead from '@components/Icons/IconArrowHead/IconArrowHead';
 import Modal from '@components/Modal/Modal';
 import type { TCurrentUser, TUser } from '@src/utils/types';
@@ -27,6 +29,7 @@ const SpecialDemandModal: React.FC<TSpecialDemandModalProps> = (props) => {
     initialValues,
     inProgress,
   } = props;
+  const intl = useIntl();
 
   return (
     <Modal
@@ -41,9 +44,15 @@ const SpecialDemandModal: React.FC<TSpecialDemandModalProps> = (props) => {
         <div className={css.goBackContainer} onClick={onClose}>
           <IconArrowHead direction="left" />
           <span className={css.goBack}></span>
-          Quay lại
+          {intl.formatMessage({
+            id: 'booker.orders.draft.foodDetailModal.back',
+          })}
         </div>
-        <div className={css.modalTitle}>Yêu cầu đặc biệt</div>
+        <div className={css.modalTitle}>
+          {intl.formatMessage({
+            id: 'ParticipantSpecialDemandRoute.description',
+          })}
+        </div>
       </div>
       <div className={css.modalContent}>
         <SpecialDemandForm

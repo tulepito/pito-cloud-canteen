@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { Event, View } from 'react-big-calendar';
 import { Views } from 'react-big-calendar';
+import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import flatten from 'lodash/flatten';
 import { DateTime } from 'luxon';
@@ -150,6 +151,7 @@ const OrderListPage = () => {
     (state) => state.ParticipantOrderList.mappingSubOrderToOrder,
     shallowEqual,
   );
+  const intl = useIntl();
   const updateSubOrderInProgress = useAppSelector(
     (state) => state.ParticipantOrderList.updateSubOrderInProgress,
   );
@@ -568,7 +570,9 @@ const OrderListPage = () => {
                 height: 'auto',
               }}
               onClick={() => openRatingSubOrderModal({ forceNoTooltip: true })}>
-              Đánh giá
+              {intl.formatMessage({
+                id: 'CompanyOrderDetailPage.titleSection.reviewButtonText',
+              })}
             </Button>
           );
         case 'pop-up':
@@ -582,7 +586,9 @@ const OrderListPage = () => {
                 variant="primary"
                 className={css.ratingBtn}
                 onClick={() => openRatingSubOrderModal()}>
-                Đánh giá
+                {intl.formatMessage({
+                  id: 'CompanyOrderDetailPage.titleSection.reviewButtonText',
+                })}
               </Button>
             </div>
           );

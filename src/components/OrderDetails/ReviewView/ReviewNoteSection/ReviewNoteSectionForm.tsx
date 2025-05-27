@@ -1,5 +1,6 @@
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
+import { useIntl } from 'react-intl';
 
 import Form from '@components/Form/Form';
 import FieldTextArea from '@components/FormFields/FieldTextArea/FieldTextArea';
@@ -28,6 +29,8 @@ const ReviewNoteSectionFormComponent: React.FC<
     onSaveOrderNote(value as string);
   };
 
+  const intl = useIntl();
+
   return (
     <Form onSubmit={handleSubmit}>
       <>
@@ -35,7 +38,7 @@ const ReviewNoteSectionFormComponent: React.FC<
           id="orderNote"
           name="orderNote"
           disabled={disabled}
-          placeholder="Nhập ghi chú cho đơn hàng"
+          placeholder={intl.formatMessage({ id: 'nhap-ghi-chu-cho-don-hang' })}
           onBlur={handleSaveOrderNote}
         />
       </>

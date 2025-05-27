@@ -2,6 +2,8 @@
 @use '/src/styles/mixins.scss' as *;
 @use '/src/styles/rc-tooltip.scss' as *;
 @use '/src/styles/rc-pagination.scss' as *;
+// @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Quicksand:wght@300..700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -200,4 +202,80 @@ input[type='number'] {
   body {
     @apply bg-background text-foreground;
   }
+}
+
+@theme {
+  --font-display: 'Montserrat', sans-serif;
+  --font-alt: 'Quicksand', sans-serif;
+  --color-text: #454545;
+}
+
+@layer base {
+  .btn {
+    @apply cursor-pointer transition-all duration-300 ease-in-out flex items-center justify-center text-center  px-6 py-2 rounded-lg;
+  }
+}
+
+body {
+  font-family: var(--font-display);
+  overflow-x: hidden;
+}
+
+@property --_x {
+  syntax: '<length>';
+  inherits: true;
+  initial-value: 0px;
+}
+@property --_y {
+  syntax: '<length>';
+  inherits: true;
+  initial-value: 0px;
+}
+
+figure {
+  --r: 1rem;
+  --cutout-x: 0.9lh; /* Width of the cutout */
+  --cutout-y: 1.5lh; /* Height of the cutout */
+
+  display: grid;
+  place-items: start start;
+  font: 30px monospace;
+  transition: --_x 0.5s, --_y 0.5s;
+  cursor: pointer;
+  margin: 0;
+}
+
+figure > * {
+  grid-area: 1/1;
+}
+
+figure .clip {
+  border-radius: var(--r);
+
+  /* Components of the mask */
+  --_m: /calc(2 * var(--r)) calc(2 * var(--r)) radial-gradient(#000 69%, #0000
+        72%);
+  --_d-x: calc(var(--cutout-x) + var(--r));
+  --_d-y: calc(var(--cutout-y) + var(--r));
+  --_g: conic-gradient(
+    from 270deg at var(--r) var(--r),
+    /* top-left origin */ #0000 25%,
+    #000 0
+  );
+
+  /* Adjustable mask layers */
+  mask: calc(var(--_d-x) + var(--_x)) 0 var(--_m),
+    /* right circle */ 0% calc(var(--_d-y) + var(--_y)) var(--_m),
+    /* bottom circle */
+      radial-gradient(var(--cutout-y) at 0 0, #0000 99%, #000 calc(100% + 1px))
+      calc(var(--r) + var(--_x)) var(--r),
+    /* inner round corner */ var(--_g) calc(var(--_d-x) + var(--_x)) 0,
+    /* conic from right */ var(--_g) 0 calc(var(--_d-y) + var(--_y)); /* conic from top */
+  mask-repeat: no-repeat;
+}
+
+figure figcaption {
+  height: 1.96lh;
+  width: 1.35lh;
+  overflow: hidden;
 }

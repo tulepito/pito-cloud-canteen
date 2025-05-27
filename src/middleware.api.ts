@@ -4,7 +4,9 @@ import { NextResponse } from 'next/server';
 import logger from '@helpers/logger';
 
 function handleRewrite() {
-  return NextResponse.rewrite('https://in.pito.vn/cloud-canteen/');
+  return NextResponse.rewrite(
+    `${process.env.NEXT_PUBLIC_CANONICAL_URL}/website/`,
+  );
 }
 
 async function handleLog(req: NextRequest) {

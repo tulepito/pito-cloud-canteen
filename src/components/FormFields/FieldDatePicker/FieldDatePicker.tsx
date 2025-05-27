@@ -1,9 +1,8 @@
 import type { ReactDatePickerCustomHeaderProps } from 'react-datepicker';
-import DatePicker, { registerLocale } from 'react-datepicker';
+import DatePicker from 'react-datepicker';
 import type { FieldProps, FieldRenderProps } from 'react-final-form';
 import { Field } from 'react-final-form';
 import classNames from 'classnames';
-import viLocale from 'date-fns/locale/vi';
 
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import ValidationError from '@components/ValidationError/ValidationError';
@@ -12,7 +11,6 @@ import { formatDate } from '@src/utils/dates';
 import 'react-datepicker/dist/react-datepicker.css';
 import css from './FieldDatePicker.module.scss';
 
-registerLocale('vi', viLocale);
 type FieldDatePickerProps = FieldRenderProps<string, any> & {
   label?: string;
   name?: string;
@@ -120,7 +118,6 @@ export const FieldDatePickerComponent: React.FC<FieldDatePickerProps> = (
       )}
       <div className={css.fieldWrapper}>
         <DatePicker
-          locale="vi"
           id={id}
           name={name}
           onChange={onInputChange}

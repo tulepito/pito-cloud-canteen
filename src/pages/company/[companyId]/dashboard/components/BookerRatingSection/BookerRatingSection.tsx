@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useIntl } from 'react-intl';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 
@@ -18,6 +19,7 @@ export interface BookerViewerRatingData extends RatingListing {
 const BookerRatingSection = () => {
   const router = useRouter();
   const { companyId } = router.query;
+  const { formatMessage } = useIntl();
 
   const [ratingListing, setRatingListing] = useState<BookerViewerRatingData[]>(
     [],
@@ -56,14 +58,22 @@ const BookerRatingSection = () => {
         <EmptyWrapper blank isEmpty={ratingListing.length === 0}>
           <div className="flex items-center justify-between">
             <h3 className="font-bold text-base md:uppercase md:text-lg md:font-semibold mt-1">
-              Đánh giá
+              {formatMessage({
+                id: 'BookerRatingSection.title',
+                defaultMessage: 'Booker Ratings',
+              })}
             </h3>
             <Link
               href={enGeneralPaths.company['[companyId]'].ratings.index(
                 companyId as string,
               )}>
               <div className="flex text-blue-500">
-                <p className="text-sm ml-2">Xem tất cả</p>
+                <p className="text-sm ml-2">
+                  {formatMessage({
+                    id: 'BookerRatingSection.viewAll',
+                    defaultMessage: 'View All',
+                  })}
+                </p>
                 <svg
                   width="21"
                   height="20"
@@ -130,7 +140,12 @@ const BookerRatingSection = () => {
                 ) : null,
               )
             ) : (
-              <p>No ratings available.</p>
+              <p>
+                {formatMessage({
+                  id: 'BookerRatingSection.noRatings',
+                  defaultMessage: 'No ratings available.',
+                })}
+              </p>
             )}
           </div>
         </EmptyWrapper>

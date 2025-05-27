@@ -25,7 +25,9 @@ const DeliveryHourFieldMobile: React.FC<TDeliveryHourFieldMobileProps> = ({
 
   return (
     <div className={css.deliveryHourField}>
-      <div className={css.label}>Chọn giờ giao hàng</div>
+      <div className={css.label}>
+        {intl.formatMessage({ id: 'chon-gio-giao-hang' })}
+      </div>
 
       <div
         className={css.fieldInput}

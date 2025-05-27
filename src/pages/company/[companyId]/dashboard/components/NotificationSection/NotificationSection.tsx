@@ -1,5 +1,5 @@
 import React from 'react';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import Skeleton from 'react-loading-skeleton';
 import { useRouter } from 'next/router';
 
@@ -29,9 +29,7 @@ const NOTIFICATION_LIST: TCompanyOrderNotification[] = [
     label: (orderId: string) => (
       <FormattedMessage
         id="NotificationSection.label.draftOrder"
-        values={{
-          orderId,
-        }}
+        values={{ orderId }}
       />
     ),
   },
@@ -41,9 +39,7 @@ const NOTIFICATION_LIST: TCompanyOrderNotification[] = [
     label: (orderId: string) => (
       <FormattedMessage
         id="NotificationSection.label.completedOrder"
-        values={{
-          orderId,
-        }}
+        values={{ orderId }}
       />
     ),
   },
@@ -53,9 +49,7 @@ const NOTIFICATION_LIST: TCompanyOrderNotification[] = [
     label: (orderId: string) => (
       <FormattedMessage
         id="NotificationSection.label.deadlineDueOrder"
-        values={{
-          orderId,
-        }}
+        values={{ orderId }}
       />
     ),
   },
@@ -65,9 +59,7 @@ const NOTIFICATION_LIST: TCompanyOrderNotification[] = [
     label: (orderId: string) => (
       <FormattedMessage
         id="NotificationSection.label.pickingOrder"
-        values={{
-          orderId,
-        }}
+        values={{ orderId }}
       />
     ),
   },
@@ -107,9 +99,12 @@ const renderListNotifications = (
 
 const NotificationSection: React.FC<TNotificationSectionProps> = (props) => {
   const { companyOrderNotificationMap, inProgress } = props;
+  const intl = useIntl();
+
   const notifications = renderListNotifications(
     companyOrderNotificationMap,
   ) as unknown as TCompanyOrderNotification[];
+
   const router = useRouter();
   const { companyId } = router.query;
   const onNotificationClick = (item: TCompanyOrderNotification) => () => {
@@ -137,11 +132,13 @@ const NotificationSection: React.FC<TNotificationSectionProps> = (props) => {
     <div className={css.root}>
       <div className={css.titleWrapper}>
         <h3 className="font-bold text-base md:uppercase md:text-lg md:font-semibold mt-1">
-          <FormattedMessage id="NotificationSection.title" />
+          {intl.formatMessage({ id: 'NotificationSection.title' })}
         </h3>
         <NamedLink path={`/company/${companyId}/orders`}>
           <div className="flex text-blue-500">
-            <p className="text-sm ml-2">Xem tất cả</p>
+            <p className="text-sm ml-2">
+              {intl.formatMessage({ id: 'NotificationSection.viewAll' })}
+            </p>
             <svg
               width="21"
               height="20"
@@ -158,6 +155,7 @@ const NotificationSection: React.FC<TNotificationSectionProps> = (props) => {
           </div>
         </NamedLink>
       </div>
+
       {inProgress ? (
         <div className={css.loadingContainer}>
           <Skeleton className={css.loading} />
@@ -190,7 +188,7 @@ const NotificationSection: React.FC<TNotificationSectionProps> = (props) => {
             ))
           ) : (
             <div className={css.notificationItem}>
-              <FormattedMessage id="NotificationSection.noResults" />
+              {intl.formatMessage({ id: 'NotificationSection.noResults' })}
             </div>
           )}
         </div>

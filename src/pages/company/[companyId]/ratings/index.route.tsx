@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Form as FinalForm } from 'react-final-form';
+import { useIntl } from 'react-intl';
 import format from 'date-fns/format';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
@@ -29,6 +30,7 @@ export default function CompanyDetailRoute() {
   const pageRef = useRef<number>(1);
   const [error, setError] = useState<string | null>(null);
   const [exporting, setExporting] = useState<boolean>(false);
+  const intl = useIntl();
 
   const { query } = router;
   const {
@@ -169,7 +171,7 @@ export default function CompanyDetailRoute() {
             </g>
           </svg>
           <h3 className="text-md font-semibold">
-            Danh sách đánh giá của công ty
+            {intl.formatMessage({ id: 'danh-sach-danh-gia-cua-cong-ty' })}
           </h3>
         </div>
 
@@ -207,7 +209,9 @@ export default function CompanyDetailRoute() {
                 <Form onSubmit={handleSubmit} className="mb-2">
                   <div className="flex flex-col items-stretch gap-2 w-full">
                     <FieldTextInput
-                      placeholder="Nhập mã đơn hàng"
+                      placeholder={intl.formatMessage({
+                        id: 'nhap-ma-don-hang',
+                      })}
                       id="orderCode"
                       name="orderCode"
                       type="text"
@@ -229,7 +233,11 @@ export default function CompanyDetailRoute() {
                         className="h-[44px] flex-1"
                         variant="primary">
                         <div className="flex items-center gap-1">
-                          <span className="text-base">Lọc</span>
+                          <span className="text-base">
+                            {intl.formatMessage({
+                              id: 'FilterPartnerOrderForm.submitButtonText',
+                            })}
+                          </span>
                           <svg
                             width="24px"
                             height="24px"
@@ -302,10 +310,14 @@ export default function CompanyDetailRoute() {
                           });
                         }}>
                         <Tooltip
-                          tooltipContent={'Tối đa 1000 đánh giá gần nhất'}
+                          tooltipContent={intl.formatMessage({
+                            id: 'toi-da-1000-danh-gia-gan-nhat',
+                          })}
                           placement="top">
                           <div className="flex items-center gap-1">
-                            <span>Xuất danh sách</span>
+                            <span>
+                              {intl.formatMessage({ id: 'xuat-danh-sach' })}
+                            </span>
                             <svg
                               width="16px"
                               height="16px"
@@ -464,7 +476,9 @@ export default function CompanyDetailRoute() {
                                   'ui',
                                 );
                               }}>
-                              Xem thêm
+                              {intl.formatMessage({
+                                id: 'ManageParticipantsSection.viewDetailText',
+                              })}
                             </Button>
                           </div>
                         )}

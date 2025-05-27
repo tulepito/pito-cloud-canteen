@@ -1,19 +1,17 @@
 import type { ReactDatePickerCustomHeaderProps } from 'react-datepicker';
-import DatePicker, { registerLocale } from 'react-datepicker';
+import DatePicker from 'react-datepicker';
 import type { FieldProps, FieldRenderProps } from 'react-final-form';
 import { Field } from 'react-final-form';
 import classNames from 'classnames';
-import viLocale from 'date-fns/locale/vi';
 
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import ValidationError from '@components/ValidationError/ValidationError';
+import { useLocaleTimeProvider } from '@src/translations/TranslationProvider';
 import { formatDate } from '@src/utils/dates';
 
 import 'react-datepicker/dist/react-datepicker.css';
 import css from './FieldDateRangePicker.module.scss';
-
-registerLocale('vi', viLocale);
 
 type FieldDateRangePickerProps = FieldRenderProps<
   {
@@ -92,6 +90,8 @@ const FieldDateRangePickerComponent: React.FC<FieldDateRangePickerProps> = (
   const errorText = customErrorText || error;
   const hasError = !!customErrorText || !!(touched && invalid && error);
 
+  const localeTimeProvider = useLocaleTimeProvider();
+
   const fieldMeta = {
     shouldSkipTouched: true,
     touched: hasError,
@@ -142,7 +142,7 @@ const FieldDateRangePickerComponent: React.FC<FieldDateRangePickerProps> = (
         </>
       </RenderWhen>
       <DatePicker
-        locale="vi"
+        locale={localeTimeProvider}
         id={id}
         name={name}
         onChange={onInputChange}

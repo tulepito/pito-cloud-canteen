@@ -1,5 +1,5 @@
 import React from 'react';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import Button from '@components/Button/Button';
 import IconDanger from '@components/Icons/IconDanger/IconDanger';
@@ -19,6 +19,7 @@ const ModalReachMaxAllowedChanges: React.FC<TModalReachMaxAllowedChanges> = (
   props,
 ) => {
   const { id, isOpen, handleClose, type = 'reach_max', minQuantity } = props;
+  const intl = useIntl();
 
   return (
     <Modal
@@ -65,7 +66,7 @@ const ModalReachMaxAllowedChanges: React.FC<TModalReachMaxAllowedChanges> = (
         onClick={handleClose}
         className={css.button}
         variant="secondary">
-        Quay lại
+        {intl.formatMessage({ id: 'booker.orders.draft.foodDetailModal.back' })}
       </Button>
     </Modal>
   );

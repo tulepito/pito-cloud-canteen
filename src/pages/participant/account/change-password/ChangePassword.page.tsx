@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { useIntl } from 'react-intl';
 import { useRouter } from 'next/router';
 
 import ConfirmationModal from '@components/ConfirmationModal/ConfirmationModal';
@@ -18,6 +19,7 @@ const ChangePasswordPage: React.FC = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const changePasswordSuccessModalControl = useBoolean();
+  const intl = useIntl();
 
   const changePasswordInProgress = useAppSelector(
     (state) => state.password.changePasswordInProgress,
@@ -50,7 +52,7 @@ const ChangePasswordPage: React.FC = () => {
 
   return (
     <div className={css.container}>
-      <ParticipantSidebar title="Tài khoản" />
+      <ParticipantSidebar title={intl.formatMessage({ id: 'tai-khoan' })} />
 
       <div className={css.desktopView}>
         <ChangePasswordForm
@@ -73,8 +75,8 @@ const ChangePasswordPage: React.FC = () => {
         id="ChangePasswordSuccessModal"
         isOpen={changePasswordSuccessModalControl.value}
         onClose={changePasswordSuccessModalControl.setFalse}
-        title="Thông báo"
-        description="Đổi mật khẩu thành công!"
+        title={intl.formatMessage({ id: 'thong-bao' })}
+        description={intl.formatMessage({ id: 'doi-mat-khau-thanh-cong' })}
         secondForAutoClose={3}
       />
     </div>

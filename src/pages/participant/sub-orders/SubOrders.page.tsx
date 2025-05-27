@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { Event } from 'react-big-calendar';
+import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import { useRouter } from 'next/router';
 
@@ -28,6 +29,7 @@ const DELIVERED_TAB = ESubOrderTxStatus.DELIVERED;
 const SubOrders = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
+  const intl = useIntl();
   const { planId: planIdFromQuery, timestamp: timestampFromQuery } =
     router.query;
 
@@ -104,7 +106,11 @@ const SubOrders = () => {
       key: DELIVERING_TAB,
       label: (
         <div className={css.tabLabel}>
-          <span>Đang giao hàng</span>
+          <span>
+            {intl.formatMessage({
+              id: 'FilterPartnerOrderForm.subOrderStatus.delivering',
+            })}
+          </span>
           <div data-number className={css.totalItems}>
             {deliveringSubOrders.length}
           </div>
@@ -123,7 +129,11 @@ const SubOrders = () => {
       key: DELIVERED_TAB,
       label: (
         <div className={css.tabLabel}>
-          <span>Đã giao hàng</span>
+          <span>
+            {intl.formatMessage({
+              id: 'FilterPartnerOrderForm.subOrderStatus.delivered',
+            })}
+          </span>
           <div data-number className={css.totalItems}>
             {deliveredSubOrders.length}
           </div>
@@ -150,7 +160,9 @@ const SubOrders = () => {
 
   return (
     <div className={css.container}>
-      <div className={css.title}>Món đã đặt</div>
+      <div className={css.title}>
+        {intl.formatMessage({ id: 'GeneralLayoutTopBar.menuItem.myOrders' })}
+      </div>
       <Tabs items={tabItems as any} onChange={onTabChange} />
       <LoadingModal isOpen={fetchSubOrdersInProgress} />
       <RenderWhen condition={activeTab === DELIVERED_TAB && !!selectedSubOrder}>

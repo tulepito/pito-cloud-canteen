@@ -5,6 +5,7 @@ import type { PaginationProps as RCPaginationProps } from 'rc-pagination';
 import ExternalPagination from 'rc-pagination';
 import Select from 'rc-select';
 
+import { getCurrentLocaleFromLocalStorage } from '@src/translations/TranslationProvider';
 import type { TDefaultProps, TIconProps } from '@utils/types';
 
 import css from './Pagination.module.scss';
@@ -122,7 +123,12 @@ const Pagination: React.FC<TPaginationProps> = (props) => {
     nextIcon,
     prevIcon,
     selectComponentClass: Select,
-    locale: localeVi,
+    locale:
+      getCurrentLocaleFromLocalStorage() === 'vi'
+        ? localeVi
+        : {
+            items_per_page: '/ page',
+          },
   };
 
   return <ExternalPagination {...paginationProps} />;

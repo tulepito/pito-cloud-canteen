@@ -86,7 +86,8 @@ const RoleSelectModal: React.FC<TRoleSelectModalProps> = (props) => {
       handleClose={handleClose}>
       <div className={css.content}>
         <div className={css.title}>
-          Xin chào {fullName}, hãy chọn vai trò của bạn
+          {intl.formatMessage({ id: 'xin-chao' })} {fullName},{' '}
+          {intl.formatMessage({ id: 'hay-chon-vai-tro-cua-ban' })}
         </div>
         <div className={css.roles}>
           {roles.map((role) => (
@@ -101,7 +102,7 @@ const RoleSelectModal: React.FC<TRoleSelectModalProps> = (props) => {
           ))}
         </div>
         <InlineTextButton className={css.changeAccount} onClick={handleLogout}>
-          Đăng nhập tài khoản khác
+          {intl.formatMessage({ id: 'dang-nhap-tai-khoan-khac' })}
         </InlineTextButton>
       </div>
     </Modal>

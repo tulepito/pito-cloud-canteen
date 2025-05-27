@@ -1,3 +1,5 @@
+import { useIntl } from 'react-intl';
+
 import IconBell from '@components/Icons/IconBell/IconBell';
 import OutsideClickHandler from '@components/OutsideClickHandler/OutsideClickHandler';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
@@ -15,6 +17,7 @@ type OrderListHeaderSectionProps = {
 const OrderListHeaderSection: React.FC<OrderListHeaderSectionProps> = (
   props,
 ) => {
+  const intl = useIntl();
   const { openNotificationModal, numberOfUnseenNotifications } = props;
   const desktopNotificationTooltipController = useBoolean();
   const { isMobileLayout } = useViewport();
@@ -30,7 +33,9 @@ const OrderListHeaderSection: React.FC<OrderListHeaderSectionProps> = (
 
   return (
     <div className={css.sectionWrapper}>
-      <div className={css.sectionTitle}>Lịch của tôi</div>
+      <div className={css.sectionTitle}>
+        {intl.formatMessage({ id: 'GeneralLayoutTopBar.menuItem.myCalender' })}
+      </div>
       <RenderWhen condition={!isMobileLayout}>
         <div className={css.notificationWrapper}>
           <OutsideClickHandler

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useIntl } from 'react-intl';
 
 import Collapsible from '@components/Collapsible/Collapsible';
 
@@ -18,10 +19,12 @@ const ReviewNoteSection: React.FC<TReviewNoteSection> = (props) => {
     data: { orderNote, disabled },
   } = props;
 
+  const intl = useIntl();
+
   return disabled && !orderNote ? (
     <></>
   ) : (
-    <Collapsible label="Ghi chú">
+    <Collapsible label={intl.formatMessage({ id: 'ghi-chu' })}>
       <ReviewNoteSectionForm
         onSubmit={() => {}}
         initialValues={{

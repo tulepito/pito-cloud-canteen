@@ -161,7 +161,10 @@ const ManageFood: React.FC<TManageFoodProps> = (props) => {
               </span>
             )}
 
-            <Badge label={`Đơn hàng tuần`} type={EBadgeType.info} />
+            <Badge
+              label={intl.formatMessage({ id: 'don-hang-tuan' })}
+              type={EBadgeType.info}
+            />
           </div>
         </div>
       </div>

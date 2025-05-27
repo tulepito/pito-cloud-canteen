@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
+import { useIntl } from 'react-intl';
 import isEmpty from 'lodash/isEmpty';
 import { DateTime } from 'luxon';
 
@@ -146,6 +147,8 @@ const DeadlineDateTimeFormComponent: React.FC<
     }
   };
 
+  const intl = useIntl();
+
   const sendNotificationButton = (
     <Button
       variant="primary"
@@ -154,7 +157,7 @@ const DeadlineDateTimeFormComponent: React.FC<
       onClick={handleSubmitOutSideForm}
       inProgress={submitInProgress}
       className={css.sendNotificationButton}>
-      Gửi lời mời qua email
+      {intl.formatMessage({ id: 'gui-loi-moi-qua-email' })}
     </Button>
   );
   const saveInfoButton = (
@@ -163,7 +166,7 @@ const DeadlineDateTimeFormComponent: React.FC<
       disabled={saveInfoButtonDisabled}
       inProgress={submitInProgress}
       onClick={handleSubmitMobileChanges}>
-      Lưu thay đổi
+      {intl.formatMessage({ id: 'AddOrderForm.moibleSubmitButtonText' })}
     </Button>
   );
 
@@ -222,7 +225,9 @@ const DeadlineDateTimeFormComponent: React.FC<
         {sendNotificationButton}
       </div>
       <div className={css.formContainer}>
-        <div className={css.formTitle}>Thời hạn kết thúc chọn món</div>
+        <div className={css.formTitle}>
+          {intl.formatMessage({ id: 'thoi-han-ket-thuc-chon-mon' })}
+        </div>
         <RenderWhen condition={isMobileLayout}>
           <MobileEditDeadlineDateField
             minDate={minDeadlineDate}
@@ -237,9 +242,15 @@ const DeadlineDateTimeFormComponent: React.FC<
               id="DeadlineDateTimeForm.deadlineDate"
               name="deadlineDate"
               selected={selectedDeadlineDate}
-              label={isMobileLayout ? 'Ngày kết thúc' : 'Chọn ngày hết hạn'}
+              label={
+                isMobileLayout
+                  ? intl.formatMessage({ id: 'ngay-ket-thuc' })
+                  : intl.formatMessage({ id: 'chon-ngay-het-han' })
+              }
               placeholderText={
-                isMobileLayout ? 'Chọn hạn chọn món' : 'Ngày hết hạn'
+                isMobileLayout
+                  ? intl.formatMessage({ id: 'chon-han-chon-mon' })
+                  : intl.formatMessage({ id: 'ngay-het-han' })
               }
               minDate={minDeadlineDate}
               maxDate={maxDeadlineDate}
@@ -262,8 +273,16 @@ const DeadlineDateTimeFormComponent: React.FC<
             <FieldDropdownSelect
               id="DeadlineDateTimeForm.deadlineHour"
               name="deadlineHour"
-              label={isMobileLayout ? 'Giờ kết thúc' : 'Chọn giờ hết hạn'}
-              placeholder={isMobileLayout ? 'Chọn hạn chọn món' : 'Giờ hết hạn'}
+              label={
+                isMobileLayout
+                  ? intl.formatMessage({ id: 'gio-ket-thuc' })
+                  : intl.formatMessage({ id: 'chon-gio-het-han' })
+              }
+              placeholder={
+                isMobileLayout
+                  ? intl.formatMessage({ id: 'chon-han-chon-mon' })
+                  : intl.formatMessage({ id: 'gio-het-han' })
+              }
               leftIcon={<IconClock />}
               disabled={!selectedDeadlineDate}
               options={filteredTimeOptions}
@@ -277,7 +296,9 @@ const DeadlineDateTimeFormComponent: React.FC<
 
   return (
     <RenderWhen condition={isMobileLayout}>
-      <div>Thời hạn chọn món của thành viên</div>
+      <div>
+        {intl.formatMessage({ id: 'thoi-han-chon-mon-cua-thanh-vien' })}
+      </div>
       <div
         className={css.mobileDeadlineInfo}
         onClick={mobileDeadlineModalControl.setTrue}>
@@ -290,7 +311,7 @@ const DeadlineDateTimeFormComponent: React.FC<
 
       <SlideModal
         id="DeadlineDateTimeForm.mobileModal"
-        modalTitle={'Thời hạn chọn món'}
+        modalTitle={intl.formatMessage({ id: 'thoi-han-chon-mon' })}
         isOpen={mobileDeadlineModalControl.value}
         onClose={handleMobileModalClose}
         containerClassName={css.mobileModalContainer}>

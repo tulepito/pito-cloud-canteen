@@ -19,6 +19,9 @@ export const enGeneralPaths = {
   Tracking: '/tracking/[subOrderId]',
   SentryExamplePage: '/sentry-example-page',
   getInvitationPath: (orderId: string) => `/invitation/${orderId}`,
+  login: {
+    index: '/dang-nhap/',
+  },
   auth: {
     index: '/auth',
   },

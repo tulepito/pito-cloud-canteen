@@ -131,7 +131,7 @@ const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
       id="SubOrderDetailModal"
       isOpen={isOpen}
       onClose={onClose}
-      modalTitle="Chi tiết đơn hàng">
+      modalTitle={intl.formatMessage({ id: 'chi-tiet-don-hang' })}>
       <div className={css.root}>
         <div className={css.header}>
           <div className={css.title}>

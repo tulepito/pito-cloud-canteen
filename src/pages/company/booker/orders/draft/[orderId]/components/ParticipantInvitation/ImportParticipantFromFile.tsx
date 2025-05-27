@@ -1,4 +1,5 @@
 import { useRef } from 'react';
+import { useIntl } from 'react-intl';
 import { toast } from 'react-toastify';
 import * as XLSX from 'xlsx';
 
@@ -36,6 +37,7 @@ const ImportParticipantFromFile: React.FC<TImportParticipantFromFileProps> = ({
       fileRef.current.click();
     }
   };
+  const intl = useIntl();
 
   const handleChangeFile = async (e: any) => {
     e.stopPropagation();
@@ -83,17 +85,20 @@ const ImportParticipantFromFile: React.FC<TImportParticipantFromFileProps> = ({
       <div>
         <div className={css.importTipTitle}>
           <IconLightBulb className={css.mobileLightIcon} />
-          <div>MẸO NHỎ</div>
+          <div>{intl.formatMessage({ id: 'meo-nh' })}</div>
         </div>
         <div className={css.importTipContent}>
-          Bạn có thể thêm hàng loạt email bằng cách copy danh sách email và dán
-          vào ô nhập email hoặc tải lên file excel. Tải file mẫu{' '}
+          {intl.formatMessage({
+            id: 'ban-co-the-them-hang-loat-email-bang-cach-copy-danh-sach-email-va-dan-vao-o-nhap-email-hoac-tai-len-file-excel-tai-file-mau',
+          })}{' '}
           <strong className={css.downloadTemplateBtn}>
             <u>
               <NamedLink
                 target="_blank"
                 path={process.env.NEXT_PUBLIC_EMAIL_TEMPLATE_FILE_URL}>
-                tại đây
+                {intl.formatMessage({
+                  id: 'ManagePartnerMenu.preventDisableLink',
+                })}
               </NamedLink>
             </u>
           </strong>
@@ -105,7 +110,7 @@ const ImportParticipantFromFile: React.FC<TImportParticipantFromFileProps> = ({
         variant="secondary"
         onClick={handleClickUploadFile}>
         <IconUploadFile />
-        <span>Tải lên file</span>
+        <span>{intl.formatMessage({ id: 'tai-len-file' })}</span>
       </Button>
 
       <input

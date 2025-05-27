@@ -1,5 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useMemo, useState } from 'react';
+import type { IntlShape } from 'react-intl';
 import { useIntl } from 'react-intl';
 import Skeleton from 'react-loading-skeleton';
 import isEmpty from 'lodash/isEmpty';
@@ -46,7 +47,10 @@ const findCurrentActiveIndex = (orderStateHistory = []) => {
   }
 };
 
-const prepareItemData = (orderStateHistory: TOrderStateHistoryItem[] = []) => {
+const prepareItemData = (
+  orderStateHistory: TOrderStateHistoryItem[] = [],
+  intl: IntlShape = {} as IntlShape,
+) => {
   let parsedCreateOrderTime = '';
   let parsedStartPickingTime = '';
   let parsedStartOrderTime = '';
@@ -74,9 +78,18 @@ const prepareItemData = (orderStateHistory: TOrderStateHistoryItem[] = []) => {
   });
 
   return [
-    { label: 'Mới tạo', description: parsedCreateOrderTime },
-    { label: 'Chọn món', description: parsedStartPickingTime },
-    { label: 'Xác nhận đơn', description: parsedStartOrderTime },
+    {
+      label: intl.formatMessage({ id: 'moi-tao-0' }),
+      description: parsedCreateOrderTime,
+    },
+    {
+      label: intl.formatMessage({ id: 'chon-mon' }),
+      description: parsedStartPickingTime,
+    },
+    {
+      label: intl.formatMessage({ id: 'xac-nhan-don' }),
+      description: parsedStartOrderTime,
+    },
   ];
 };
 
@@ -112,12 +125,14 @@ const ReviewOrderProcessSection: React.FC<
 
   const items = useMemo(
     () =>
-      prepareItemData(orderStateHistory).concat([
+      prepareItemData(orderStateHistory, intl).concat([
         {
-          label: 'Đang triển khai',
-          description: `(${totalCompletedDates}/${totalDays} ngày hoàn thành)`,
+          label: intl.formatMessage({ id: 'dang-trien-khai-0' }),
+          description: `(${totalCompletedDates}/${totalDays} ${intl.formatMessage(
+            { id: 'ngay-hoan-thanh' },
+          )})`,
         },
-        { label: 'Đã hoàn thành', description: '' },
+        { label: intl.formatMessage({ id: 'da-hoan-thanh' }), description: '' },
       ]),
     [JSON.stringify(orderStateHistory), totalCompletedDates, totalDays],
   );
@@ -165,7 +180,7 @@ const ReviewOrderProcessSection: React.FC<
           <Link
             className={css.pickingLink}
             href={`/company/orders/${orderId}/picking`}>
-            Quản lý chọn món
+            {intl.formatMessage({ id: 'quan-ly-chon-mon' })}
           </Link>
         </RenderWhen>
       </div>
@@ -228,7 +243,7 @@ const ReviewOrderProcessSection: React.FC<
                       stroke-linecap="round"></path>{' '}
                   </g>
                 </svg>
-                <span>Thành viên đánh giá</span>
+                <span>{intl.formatMessage({ id: 'thanh-vien-danh-gia' })}</span>
               </div>
             </Button>
           </Link>

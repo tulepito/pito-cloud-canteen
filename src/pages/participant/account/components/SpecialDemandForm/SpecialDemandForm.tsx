@@ -1,11 +1,12 @@
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
+import { useIntl } from 'react-intl';
 import isEqual from 'lodash/isEqual';
 
 import Button from '@components/Button/Button';
 import Form from '@components/Form/Form';
 import FieldCheckbox from '@components/FormFields/FieldCheckbox/FieldCheckbox';
-import { ALLERGIES_OPTIONS } from '@src/utils/options';
+import { useAllergiesOptionsByLocale } from '@src/utils/options';
 
 import css from './SpecialDemandForm.module.scss';
 
@@ -37,17 +38,25 @@ const SpecialDemandFormComponent: React.FC<TSpecialDemandFormComponentProps> = (
     inProgress,
     view,
   } = props;
+  const intl = useIntl();
+  const ALLERGIES_OPTIONS = useAllergiesOptionsByLocale();
   const isFormNotChanged = isEqual(initialValues, values);
   const disabledSubmit =
     isFormNotChanged || submitting || invalid || inProgress;
 
   return (
     <Form onSubmit={handleSubmit} className={css.root}>
-      <div className={css.header}>Yêu cầu đặc biệt</div>
+      <div className={css.header}>
+        {intl.formatMessage({
+          id: 'ParticipantSpecialDemandRoute.description',
+        })}
+      </div>
       <div className={css.formContainer}>
         <div className={css.fieldsContainer}>
           <div className={css.fieldWrapper}>
-            <div className={css.title}>Dị ứng</div>
+            <div className={css.title}>
+              {intl.formatMessage({ id: 'GroupDetail.columnLabel.allergy' })}
+            </div>
             <div className={css.fieldGroup}>
               {ALLERGIES_OPTIONS.map(({ key, label }) => (
                 <FieldCheckbox
@@ -62,7 +71,11 @@ const SpecialDemandFormComponent: React.FC<TSpecialDemandFormComponentProps> = (
             </div>
           </div>
           <div className={css.fieldWrapper}>
-            <div className={css.title}>Chế độ dinh dưỡng</div>
+            <div className={css.title}>
+              {intl.formatMessage({
+                id: 'AdminAttributesSettingPage.attribute.nutritions',
+              })}
+            </div>
             <div className={css.fieldGroup}>
               {nutritionOptions.map(({ key, label }) => (
                 <FieldCheckbox
@@ -83,7 +96,7 @@ const SpecialDemandFormComponent: React.FC<TSpecialDemandFormComponentProps> = (
           disabled={disabledSubmit}
           inProgress={inProgress}
           className={css.submitBtn}>
-          Lưu thay đổi
+          {intl.formatMessage({ id: 'AddOrderForm.moibleSubmitButtonText' })}
         </Button>
       </div>
     </Form>

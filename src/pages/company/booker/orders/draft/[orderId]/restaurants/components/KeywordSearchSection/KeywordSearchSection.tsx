@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useIntl } from 'react-intl';
 import { useSelector } from 'react-redux';
 import { useRouter } from 'next/router';
 
@@ -30,6 +31,7 @@ function KeywordSearchSection() {
     dispatch(BookerSelectRestaurantThunks.fetchRecommendedKeywords());
   }, [dispatch]);
 
+  const intl = useIntl();
   const keywordsInitialValue = useMemo(() => {
     return {
       keywords: (keywords as string) || '',
@@ -94,7 +96,9 @@ function KeywordSearchSection() {
           onBlur={() => setIsInputFocused(false)}
           onSubmit={onSearchKeywordsSubmit}
           initialValues={keywordsInitialValue}
-          placeholder="Tìm kiếm tên nhà hàng hoặc tên món ăn"
+          placeholder={intl.formatMessage({
+            id: 'tim-kiem-ten-nha-hang-hoac-ten-mon-an',
+          })}
           inputClassName={css.keywordSearchForm}
           fullWidth
         />

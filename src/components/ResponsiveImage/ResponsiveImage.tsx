@@ -35,6 +35,7 @@
 
 import type { CSSProperties, MutableRefObject } from 'react';
 import React, { useEffect, useRef, useState } from 'react';
+import { useIntl } from 'react-intl';
 import classNames from 'classnames';
 import Image from 'next/image';
 
@@ -77,6 +78,7 @@ const ResponsiveImage: React.FC<TResponsiveImageProps> = (props) => {
   );
 
   const noImageContainerRef = useRef() as MutableRefObject<HTMLDivElement>;
+  const intl = useIntl();
 
   useEffect(() => {
     // This useEffect to make no image icon width to fit with its parent width
@@ -106,12 +108,14 @@ const ResponsiveImage: React.FC<TResponsiveImageProps> = (props) => {
             src={src || defaultFoodThumbail}
             style={rest.style}
             fill
-            alt="Ảnh minh họa"
+            alt={intl.formatMessage({ id: 'anh-minh-hoa' })}
           />
           {!src && (
             <>
               <div className={css.overlay} />
-              <p className={css.overlayText}>Ảnh minh họa</p>
+              <p className={css.overlayText}>
+                {intl.formatMessage({ id: 'anh-minh-hoa' })}
+              </p>
             </>
           )}
         </>

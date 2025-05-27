@@ -1,3 +1,4 @@
+import { useIntl } from 'react-intl';
 import isEmpty from 'lodash/isEmpty';
 import isEqual from 'lodash/isEqual';
 import { DateTime } from 'luxon';
@@ -16,7 +17,7 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { useViewport } from '@hooks/useViewport';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
-import { BOOKER_CREATE_GROUP_ORDER_STEPS } from '@src/constants/stepperSteps';
+import { useBookerCreateGroupOrderStepsLabel } from '@src/constants/stepperSteps';
 import { Listing } from '@src/utils/data';
 
 import type { TDeadlineDateTimeFormValues } from './DeadlineDateTimeForm';
@@ -44,6 +45,7 @@ const ParticipantInvitation: React.FC<TParticipantInvitationProps> = ({
 
   const { startDate, deadlineHour, deliveryHour } =
     Listing(order).getMetadata();
+  const intl = useIntl();
 
   // * calculate start delivery time
   const nextStartWeek = DateTime.fromJSDate(new Date())
@@ -113,10 +115,12 @@ const ParticipantInvitation: React.FC<TParticipantInvitationProps> = ({
     />
   );
 
+  const BOOKER_CREATE_GROUP_ORDER_STEPS = useBookerCreateGroupOrderStepsLabel();
+
   return (
     <>
       <MobileTopContainer
-        title="Mời tham gia nhóm"
+        title={intl.formatMessage({ id: 'moi-tham-gia-nhom' })}
         hasGoBackButton
         onGoBack={onGoBack}
       />
@@ -134,11 +138,21 @@ const ParticipantInvitation: React.FC<TParticipantInvitationProps> = ({
               className={css.goBackButtonContainer}
               onClick={onGoBack}>
               <IconArrow direction="left" />
-              <span className={css.goBackText}>Quay lại</span>
+              <span className={css.goBackText}>
+                {intl.formatMessage({
+                  id: 'booker.orders.draft.foodDetailModal.back',
+                })}
+              </span>
             </Button>
             <div className={css.title}>
-              <div>Mời thành viên tham gia nhóm</div>
-              <Badge label="Các thành viên được mời sẽ nhận thông báo chọn món ngay sau khi gửi lời mời" />
+              <div>
+                {intl.formatMessage({ id: 'moi-thanh-vien-tham-gia-nhom' })}
+              </div>
+              <Badge
+                label={intl.formatMessage({
+                  id: 'cac-thanh-vien-duoc-moi-se-nhan-thong-bao-chon-mon-ngay-sau-khi-gui-loi-moi',
+                })}
+              />
             </div>
           </div>
           <div className={css.participantInvitationContainer}>
@@ -153,14 +167,16 @@ const ParticipantInvitation: React.FC<TParticipantInvitationProps> = ({
               containerClassName={css.confirmModalContainer}
               isOpen={confirmPublishOrderControl.value}
               handleClose={confirmPublishOrderControl.setFalse}
-              title="Xác nhận đơn và gửi lời mời"
-              cancelLabel="Đóng"
-              confirmLabel={'Gửi lời mời'}
+              title={intl.formatMessage({ id: 'xac-nhan-don-va-gui-loi-moi' })}
+              cancelLabel={intl.formatMessage({ id: 'dong' })}
+              confirmLabel={intl.formatMessage({ id: 'gui-loi-moi' })}
               shouldFullScreenInMobile={false}
               confirmDisabled={shouldDisabledSubmitPublishOrder}
               onCancel={onGoBack}
               onConfirm={handleConfirmPublishOrder}>
-              Sau khi gửi, bạn sẽ không thể chỉnh sửa thực đơn của tuần ăn.
+              {intl.formatMessage({
+                id: 'sau-khi-gui-ban-se-khong-the-chinh-sua-thuc-don-cua-tuan-an',
+              })}
             </AlertModal>
             <ParticipantManagement />
           </div>

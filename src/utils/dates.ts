@@ -1,3 +1,4 @@
+import { formatDistanceToNow } from 'date-fns';
 import jstz from 'jstimezonedetect';
 import { capitalize } from 'lodash';
 import difference from 'lodash/difference';
@@ -12,6 +13,10 @@ import {
   MORNING_SESSION,
 } from '@components/CalendarDashboard/helpers/constant';
 import { EDaySession } from '@components/CalendarDashboard/helpers/types';
+import {
+  getCurrentLocaleFromLocalStorage,
+  getLocaleTimeProvider,
+} from '@src/translations/TranslationProvider';
 
 import { DAY_IN_WEEK } from './constants';
 import { getUniqueString } from './data';
@@ -77,76 +82,82 @@ export const getDefaultTimeZoneOnBrowser = () => {
 };
 
 export const weekDayFormatFromDateTime = (dateTime: DateTime) => {
-  const { weekday: weekDay } = dateTime;
-  let formattedWeekDay;
+  // const { weekday: weekDay } = dateTime;
+  const locale = getCurrentLocaleFromLocalStorage();
+  const weekDayFormat = dateTime.toFormat('cccc', {
+    locale,
+  });
 
-  switch (weekDay) {
-    case 1: {
-      formattedWeekDay = 'Thứ 2';
-      break;
-    }
-    case 2: {
-      formattedWeekDay = 'Thứ 3';
+  return weekDayFormat;
+  // let formattedWeekDay;
 
-      break;
-    }
-    case 3: {
-      formattedWeekDay = 'Thứ 4';
+  // switch (weekDay) {
+  //   case 1: {
+  //     formattedWeekDay = 'Thứ 2';
+  //     break;
+  //   }
+  //   case 2: {
+  //     formattedWeekDay = 'Thứ 3';
 
-      break;
-    }
-    case 4: {
-      formattedWeekDay = 'Thứ 5';
+  //     break;
+  //   }
+  //   case 3: {
+  //     formattedWeekDay = 'Thứ 4';
 
-      break;
-    }
-    case 5: {
-      formattedWeekDay = 'Thứ 6';
+  //     break;
+  //   }
+  //   case 4: {
+  //     formattedWeekDay = 'Thứ 5';
 
-      break;
-    }
-    case 6: {
-      formattedWeekDay = 'Thứ 7';
+  //     break;
+  //   }
+  //   case 5: {
+  //     formattedWeekDay = 'Thứ 6';
 
-      break;
-    }
-    case 7: {
-      formattedWeekDay = 'Chủ nhật';
+  //     break;
+  //   }
+  //   case 6: {
+  //     formattedWeekDay = 'Thứ 7';
 
-      break;
-    }
-    default: {
-      formattedWeekDay = 'Thứ 2';
-      break;
-    }
-  }
+  //     break;
+  //   }
+  //   case 7: {
+  //     formattedWeekDay = 'Chủ nhật';
 
-  return formattedWeekDay;
+  //     break;
+  //   }
+  //   default: {
+  //     formattedWeekDay = 'Thứ 2';
+  //     break;
+  //   }
+  // }
+
+  // return formattedWeekDay;
 };
 
 export const formatTimestamp = (
   date = new Date().getTime(),
   format?: string,
-  locale: LocaleOptions['locale'] = 'vi',
+  _locale: LocaleOptions['locale'] = 'vi',
   timeZone: string = VNTimezone,
 ) => {
   return DateTime.fromMillis(Number(date))
     .setZone(timeZone)
     .toFormat(format || 'dd/MM/yyyy', {
-      locale,
+      locale: getCurrentLocaleFromLocalStorage(),
     });
 };
 
 export const formatDate = (
   date = new Date(),
   format?: string,
-  locale: LocaleOptions['locale'] = 'vi',
+  _locale: LocaleOptions['locale'] = 'vi',
   timeZone: string = VNTimezone,
 ) => {
   return DateTime.fromJSDate(date)
     .setZone(timeZone)
     .toFormat(format || 'dd/MM/yyyy', {
-      locale,
+      locale: getCurrentLocaleFromLocalStorage(),
     });
 };
 
@@ -466,9 +477,12 @@ export const timeAgo = (date: Date) => {
   const diff = dateTime.diffNow().shiftTo(...units);
   const unit = units.find((u: any) => diff.get(u) !== 0) || 'second';
 
-  const relativeFormatter = new Intl.RelativeTimeFormat('vi', {
-    numeric: 'auto',
-  });
+  const relativeFormatter = new Intl.RelativeTimeFormat(
+    getCurrentLocaleFromLocalStorage(),
+    {
+      numeric: 'auto',
+    },
+  );
 
   return relativeFormatter.format(Math.trunc(diff.as(unit)), unit);
 };
@@ -495,28 +509,13 @@ export const isSameDate = (date1: Date, date2: Date) => {
 };
 
 export const calcPastTime = (timestamp: number) => {
-  const nowDt = DateTime.local();
   const pastDt = DateTime.fromMillis(timestamp);
-  const diff = nowDt
-    .diff(pastDt, ['days', 'hours', 'minutes', 'seconds'])
-    .toObject();
-  const diffInDays = diff.days || 0;
-  const diffInHours = diff.hours || 0;
-  const diffInMinutes = diff.minutes || 0;
+  const diff = formatDistanceToNow(pastDt.toJSDate(), {
+    addSuffix: true,
+    locale: getLocaleTimeProvider(),
+  });
 
-  if (diffInDays > 0) {
-    return `${Math.abs(diffInDays)} ngày trước`;
-  }
-
-  if (diffInHours > 0) {
-    return `${Math.abs(diffInHours)} giờ trước`;
-  }
-
-  if (diffInMinutes > 0) {
-    return `${Math.abs(diffInMinutes)} phút trước`;
-  }
-
-  return 'Vừa xong';
+  return diff;
 };
 export const getDayOfWeek = (timestamp: number) => {
   return DateTime.fromMillis(timestamp).setZone(VNTimezone).weekday;

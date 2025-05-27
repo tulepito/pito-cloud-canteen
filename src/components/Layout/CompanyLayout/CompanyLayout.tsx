@@ -1,5 +1,6 @@
 import type { PropsWithChildren } from 'react';
 import { useEffect, useState } from 'react';
+import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import { useRouter } from 'next/router';
 
@@ -40,6 +41,7 @@ export const companySettingPaths = [
 ];
 
 const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
+  const intl = useIntl();
   const { children } = props;
   const router = useRouter();
   const dispatch = useAppDispatch();
@@ -65,7 +67,7 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
       ...result,
       {
         value: User(cur).getId(),
-        label: 'Công ty',
+        label: intl.formatMessage({ id: 'CompanyLayout.company' }),
       },
     ];
   }, []);
@@ -75,7 +77,10 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
     label?: string;
   }>({});
   const accountOptions = [
-    { value: '', label: 'Cá nhân' },
+    {
+      value: '',
+      label: intl.formatMessage({ id: 'CompanyLayout.personalAccount' }),
+    },
     ...assignedCompanies,
   ];
 
@@ -101,7 +106,9 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
       title: (
         <div className={css.headerTitle}>
           <FeatureIcons.Cart />
-          <div className={css.title}>Đặt hàng</div>
+          <div className={css.title}>
+            {intl.formatMessage({ id: 'CompanyLayout.order' })}
+          </div>
         </div>
       ),
       pathname: companyPaths.Home,
@@ -111,7 +118,9 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
       title: (
         <div className={css.headerTitle}>
           <FeatureIcons.Box />
-          <div className={css.title}>Đơn hàng</div>
+          <div className={css.title}>
+            {intl.formatMessage({ id: 'CompanyLayout.orders' })}
+          </div>
         </div>
       ),
       query: {
@@ -134,7 +143,7 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
               <div className={css.headerTitle}>
                 <FeatureIcons.User />
                 <div className={css.title} title={title}>
-                  Tài khoản
+                  {intl.formatMessage({ id: 'CompanyLayout.account' })}
                 </div>
               </div>
               {isMobile && (
@@ -181,7 +190,7 @@ const CompanyLayout: React.FC<PropsWithChildren> = (props) => {
             (_company) => User(_company!).getId() === companyId,
           )!,
         ).getPublicData().companyName
-      : 'Tài khoản cá nhân';
+      : intl.formatMessage({ id: 'CompanyLayout.personalAccount' });
 
   return (
     <>

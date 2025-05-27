@@ -1,5 +1,6 @@
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
+import { useIntl } from 'react-intl';
 import isEmpty from 'lodash/isEmpty';
 
 import Button from '@components/Button/Button';
@@ -41,6 +42,7 @@ const AddParticipantFormComponent: React.FC<
   const addOrderParticipantsInProgress = useAppSelector(
     (state) => state.BookerDraftOrderPage.addOrderParticipantsInProgress,
   );
+  const intl = useIntl();
 
   const isInputEmpty = isEmpty(values.emails);
   const submitInProgress = addOrderParticipantsInProgress || submitting;
@@ -71,32 +73,39 @@ const AddParticipantFormComponent: React.FC<
             id="AddParticipantForm.emails"
             name="emails"
             placeholder={
-              isMobileLayout ? 'Nhập email' : 'Nhập email để thêm thành viên'
+              isMobileLayout
+                ? intl.formatMessage({ id: 'nhap-email' })
+                : intl.formatMessage({ id: 'nhap-email-de-them-thanh-vien' })
             }
             onKeyPress={handleFieldEmailsKeyPress}
             validate={composeValidators(
-              emailListFormatValid('Vui lòng nhập đúng định dạng mail'),
+              emailListFormatValid(
+                intl.formatMessage({ id: 'vui-long-nhap-dung-dinh-dang-mail' }),
+              ),
               emailListValid(
-                'Đã tồn tại trong danh sách thành viên',
+                intl.formatMessage({
+                  id: 'da-ton-tai-trong-danh-sach-thanh-vien',
+                }),
                 restrictEmailList,
               ),
             )}
           />
         </div>
         <Button inProgress={submitInProgress} disabled={submitDisable}>
-          Thêm
+          {intl.formatMessage({ id: 'them' })}
         </Button>
       </div>
       <div className={css.hintText}>
-        *Email được phân cách bằng khoảng trắng.
+        *{intl.formatMessage({ id: 'email-duoc-phan-cach-bang-khoang-trang' })}.
         {!isMobileLayout && ' Ví dụ: a1@gmail.com b2@gmail.com'}
       </div>
 
       <div className={css.hintContainer}>
         <IconLightBulb className={css.mobileLightIcon} />
         <div>
-          Bạn có thể thêm hàng loạt email bằng cách copy danh sách email và dán
-          vào ô nhập email.
+          {intl.formatMessage({
+            id: 'ban-co-the-them-hang-loat-email-bang-cach-copy-danh-sach-email-va-dan-vao-o-nhap-email',
+          })}
         </div>
       </div>
     </Form>

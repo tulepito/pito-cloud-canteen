@@ -212,7 +212,7 @@ const OrderHeaderState: React.FC<OrderHeaderStateProps> = (props) => {
                 <div
                   className={css.actionItem}
                   onClick={handleClickTurnOnDraftEditMode}>
-                  Quản lý chọn món
+                  {intl.formatMessage({ id: 'quan-ly-chon-mon' })}
                 </div>
               </RenderWhen>
             </OutsideClickHandler>

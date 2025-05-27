@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import { useRouter } from 'next/router';
 
@@ -32,12 +33,13 @@ const SidebarFeaturesHeader = ({
     shallowEqual,
   );
 
+  const intl = useIntl();
   const assignedCompanies = companyList.reduce((result: any[], cur: TUser) => {
     return [
       ...result,
       {
         value: User(cur).getId(),
-        label: 'Công ty',
+        label: intl.formatMessage({ id: 'cong-ty' }),
       },
     ];
   }, []);
@@ -47,7 +49,7 @@ const SidebarFeaturesHeader = ({
     label?: string;
   }>({});
   const accountOptions = [
-    { value: '', label: 'Cá nhân' },
+    { value: '', label: intl.formatMessage({ id: 'ca-nhan' }) },
     ...assignedCompanies,
   ];
 
@@ -73,7 +75,9 @@ const SidebarFeaturesHeader = ({
       title: (
         <div className={css.headerNavbarItem}>
           <FeatureIcons.Cart />
-          <div className={css.title}>Đặt hàng</div>
+          <div className={css.title}>
+            {intl.formatMessage({ id: 'CompanyLayout.order' })}
+          </div>
         </div>
       ),
       pathname: companyPaths.Home,
@@ -87,7 +91,9 @@ const SidebarFeaturesHeader = ({
       title: (
         <div className={css.headerNavbarItem}>
           <FeatureIcons.Box />
-          <div className={css.title}>Đơn hàng</div>
+          <div className={css.title}>
+            {intl.formatMessage({ id: 'SectionOrderHeader.title' })}
+          </div>
         </div>
       ),
       query: {
@@ -118,7 +124,11 @@ const SidebarFeaturesHeader = ({
           label={
             <div className={css.headerNavbarItem}>
               <FeatureIcons.User />
-              <div className={css.title}>Tài khoản</div>
+              <div className={css.title}>
+                {intl.formatMessage({
+                  id: 'EditPartnerMenuWizard.informationTabLabel',
+                })}
+              </div>
             </div>
           }>
           {accountOptions.map((option) => (
@@ -176,7 +186,9 @@ const SidebarFeaturesHeader = ({
         <div className={css.featuresHeaderMobile}>
           <div className={css.featuresHeaderMobileTitle}>
             <IconArrow direction="left" onClick={handleCloseNavbar} />
-            <div className={css.title}>Trở lại</div>
+            <div className={css.title}>
+              {intl.formatMessage({ id: 'tro-lai' })}
+            </div>
           </div>
           <FeaturesHeader headerData={featureHeaderData} cssCustom={css} />
         </div>

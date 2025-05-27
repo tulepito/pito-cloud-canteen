@@ -6,7 +6,7 @@ import Button from '@components/Button/Button';
 import { IconCheckbox } from '@components/FormFields/FieldCheckbox/FieldCheckbox';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useAppSelector } from '@hooks/reduxHooks';
-import { FOOD_TYPE_OPTIONS } from '@src/utils/options';
+import { useFoodTypeOptionsByLocale } from '@src/utils/options';
 
 import css from './NutritionForm.module.scss';
 
@@ -32,6 +32,7 @@ const NutritionForm: React.FC<TNutritionFormProps> = ({
     });
 
   const intl = useIntl();
+  const FOOD_TYPE_OPTIONS = useFoodTypeOptionsByLocale();
   const nutritionsOptions =
     useAppSelector((state) => state.SystemAttributes.nutritions) || [];
 

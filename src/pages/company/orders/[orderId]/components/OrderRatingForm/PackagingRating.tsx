@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { useIntl } from 'react-intl';
 import { format } from 'date-fns';
 
 import FieldDropdownSelect from '@components/FormFields/FieldDropdownSelect/FieldDropdownSelect';
@@ -102,6 +103,8 @@ const PackagingRating: React.FC<TPackagingRatingProps> = (props) => {
     }
   }, [isPackagingSatifactedSelected, values]);
 
+  const intl = useIntl();
+
   const parsedRestaurantByDayOptions = useMemo(
     () =>
       restaurantsByDay.map(
@@ -190,7 +193,9 @@ const PackagingRating: React.FC<TPackagingRatingProps> = (props) => {
   return (
     <>
       <div className={css.detailRatingMainField}>
-        <div className={css.detailRatingTitle}>Dụng cụ</div>
+        <div className={css.detailRatingTitle}>
+          {intl.formatMessage({ id: 'ManagePartnerReviewsPage.packageTitle' })}
+        </div>
         <FieldRating
           name="packaging"
           containerClassName={css.fieldContainer}

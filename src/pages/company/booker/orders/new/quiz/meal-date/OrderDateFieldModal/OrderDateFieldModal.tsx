@@ -1,3 +1,4 @@
+import { useIntl } from 'react-intl';
 import classNames from 'classnames';
 
 import Button from '@components/Button/Button';
@@ -22,21 +23,6 @@ type TOrderDateFieldModalProps = {
   dateRangeNoLimit?: boolean;
 };
 
-const timeRangeOptions = [
-  {
-    key: 'next7Days',
-    label: '7 ngày tiếp theo',
-  },
-  {
-    key: 'nextWeek',
-    label: 'Tuần tiếp theo',
-  },
-  {
-    key: 'custom',
-    label: 'Tùy chỉnh',
-  },
-];
-
 const OrderDateFieldModal: React.FC<TOrderDateFieldModalProps> = (props) => {
   const {
     form,
@@ -47,6 +33,22 @@ const OrderDateFieldModal: React.FC<TOrderDateFieldModalProps> = (props) => {
     allowClear,
     dateRangeNoLimit,
   } = props;
+  const intl = useIntl();
+
+  const timeRangeOptions = [
+    {
+      key: 'next7Days',
+      label: intl.formatMessage({ id: '7-ngay-tiep-theo' }),
+    },
+    {
+      key: 'nextWeek',
+      label: intl.formatMessage({ id: 'tuan-tiep-theo' }),
+    },
+    {
+      key: 'custom',
+      label: intl.formatMessage({ id: 'tuy-chi-nh' }),
+    },
+  ];
 
   const {
     startDate,
@@ -108,21 +110,21 @@ const OrderDateFieldModal: React.FC<TOrderDateFieldModalProps> = (props) => {
         />
         <div className={css.bottomBtns}>
           <Button variant="inline" type="button" onClick={onClose}>
-            Huỷ
+            {intl.formatMessage({ id: 'huy' })}
           </Button>
           {allowClear && (
             <Button
               variant="inline"
               type="button"
               onClick={handleClearDateRange}>
-              Xoá
+              {intl.formatMessage({ id: 'xoa' })}
             </Button>
           )}
           <Button
             type="button"
             disabled={!startDate || !endDate}
             onClick={handleUpdateDateRange}>
-            Áp dụng
+            {intl.formatMessage({ id: 'ap-dung' })}
           </Button>
         </div>
       </div>

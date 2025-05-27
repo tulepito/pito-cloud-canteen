@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { Event } from 'react-big-calendar';
+import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import { toast } from 'react-toastify';
 import classNames from 'classnames';
@@ -43,10 +44,11 @@ import { OrderListThunks } from '@pages/participant/orders/OrderList.slice';
 import { addWorkspaceCompanyId } from '@redux/slices/company.slice';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
 import { currentUserSelector } from '@redux/slices/user.slice';
-import { getStepsByOrderType } from '@src/constants/stepperSteps';
+import { useStepsByOrderType } from '@src/constants/stepperSteps';
 import { companyPaths, enGeneralPaths } from '@src/paths';
 import { formatTimestamp } from '@src/utils/dates';
 import Gleap from '@src/utils/gleap';
+import { successToastOptions } from '@src/utils/toastify';
 import { Listing, User } from '@utils/data';
 import {
   EBookerOrderDraftStates,
@@ -234,6 +236,7 @@ function BookerDraftOrderPage() {
     endDateTimestamp,
     JSON.stringify(orderDetail),
   ]);
+  const intl = useIntl();
 
   const handlePublishDraftOrder = async () => {
     const { meta } = await dispatch(
@@ -251,7 +254,14 @@ function BookerDraftOrderPage() {
             deadline: formatTimestamp(orderDeadline, 'HH:mm EEE,dd/MM/yyyy'),
             memberIdList: participantData.map((p) => p.id.uuid),
           }),
-        );
+        )
+          .unwrap()
+          .then(() => {
+            toast(
+              intl.formatMessage({ id: 'da-gui-loi-moi-den-thanh-vien' }),
+              successToastOptions,
+            );
+          });
       }
 
       router.push({
@@ -524,7 +534,7 @@ function BookerDraftOrderPage() {
     }
   }, [subOrderDateQuery]);
 
-  const _steps = getStepsByOrderType(orderType);
+  const _steps = useStepsByOrderType(orderType);
 
   return (
     <>
@@ -560,7 +570,9 @@ function BookerDraftOrderPage() {
             />
             <LayoutMain className={css.mainContainer}>
               <div className={css.header}>
-                <div className={css.title}>Thiết lập menu</div>
+                <div className={css.title}>
+                  {intl.formatMessage({ id: 'thiet-lap-menu' })}
+                </div>
                 <div className={css.headerActions}>
                   <IconHome
                     className={css.actionIcon}
@@ -589,9 +601,12 @@ function BookerDraftOrderPage() {
                 </div>
               </RenderWhen>
               <div className={css.orderTitleWrapper}>
-                <div className={css.title}>Đơn hàng #{orderTitle}</div>
+                <div className={css.title}>
+                  {intl.formatMessage({ id: 'SectionOrderHeader.title' })} #
+                  {orderTitle}
+                </div>
                 <Badge
-                  label="Đơn hàng tuần"
+                  label={intl.formatMessage({ id: 'don-hang-tuan-0' })}
                   type={EBadgeType.info}
                   className={css.badge}
                 />
@@ -615,18 +630,22 @@ function BookerDraftOrderPage() {
                     </div>
                     <div className={css.emptyTitle}>
                       <p style={{ margin: '4px 0' }}>
-                        Rất tiếc, không tìm thấy nhà hàng hay thực đơn phù hợp
-                        với yêu cầu của bạn
+                        {intl.formatMessage({
+                          id: 'rat-tiec-khong-tim-thay-nha-hang-hay-thuc-don-phu-hop-voi-yeu-cau-cua-ban',
+                        })}
                       </p>
                       <p className={css.emptyContent}>
-                        Bạn hãy thử thay đổi địa chỉ giao hàng, số người hoặc
-                        ngân sách nhé.
+                        {intl.formatMessage({
+                          id: 'ban-hay-thu-thay-doi-dia-chi-giao-hang-so-nguoi-hoac-ngan-sach-nhe',
+                        })}
                       </p>
                       <Button
                         className={css.contactUsBtn}
                         variant="primary"
                         onClick={handleChatIconClick}>
-                        Liên hệ với chúng tôi
+                        {intl.formatMessage({
+                          id: 'BookerSelectRestaurant.ResultList.emptyResult.contactUs',
+                        })}
                       </Button>
                     </div>
                   </div>
@@ -663,12 +682,20 @@ function BookerDraftOrderPage() {
                         <RenderWhen condition={!isAllDatesHaveNoRestaurants}>
                           <div className={css.addMealWrapper}>
                             <IconEmpty variant="food" />
-                            <div className={css.emptyText}>Chưa có bữa ăn</div>
+                            <div className={css.emptyText}>
+                              {intl.formatMessage({
+                                id: 'AddMorePlan.haveNoMeal',
+                              })}
+                            </div>
                             <div
                               className={css.addMeal}
                               onClick={handleAddMealClick}>
                               <IconPlus className={css.plusIcon} />
-                              <span>Thêm bữa ăn</span>
+                              <span>
+                                {intl.formatMessage({
+                                  id: 'AddMorePlan.addMore',
+                                })}
+                              </span>
                             </div>
                           </div>
                         </RenderWhen>

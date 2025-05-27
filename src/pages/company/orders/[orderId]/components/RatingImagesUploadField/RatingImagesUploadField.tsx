@@ -148,9 +148,23 @@ const RatingImagesUploadField: React.FC<TRatingImagesUploadFieldProps> = ({
                       <IconImage />
                       <div className={css.firstText}>
                         <RenderWhen condition={isMobileLayout}>
-                          <b>Chọn</b> ảnh/video của bạn
+                          <b>
+                            {intl.formatMessage({
+                              id: 'EditPartnerFoodForm.packagingPlaceholder',
+                            })}
+                          </b>{' '}
+                          {intl.formatMessage({ id: 'anh-video-cua-ban' })}
                           <RenderWhen.False>
-                            <b>Chọn</b> hoặc <b>Kéo</b> thả ảnh của bạn vào đây
+                            <b>
+                              {intl.formatMessage({
+                                id: 'EditPartnerFoodForm.packagingPlaceholder',
+                              })}
+                            </b>{' '}
+                            {intl.formatMessage({ id: 'SignInForm.orText' })}{' '}
+                            <b>{intl.formatMessage({ id: 'keo' })}</b>{' '}
+                            {intl.formatMessage({
+                              id: 'tha-anh-cua-ban-vao-day',
+                            })}
                           </RenderWhen.False>
                         </RenderWhen>
                       </div>

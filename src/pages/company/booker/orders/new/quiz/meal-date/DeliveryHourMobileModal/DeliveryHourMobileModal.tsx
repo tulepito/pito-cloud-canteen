@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useIntl } from 'react-intl';
 import classNames from 'classnames';
 
 import Button from '@components/Button/Button';
@@ -20,16 +21,7 @@ const DeliveryHourMobileModal: React.FC<TDeliveryHourMobileModalProps> = (
 ) => {
   const { isOpen, onClose, form, hourOptions } = props;
   const [deliveryHour, setDeliveryHour] = useState<string>('');
-  // const parsedDeliveryHourOptions = TIME_OPTIONS.map((option) => ({
-  //   label: option.label,
-  //   key: option.key,
-  // }));
-
-  // const parsedDeliveryHourOptions = useMemo(
-  //   () =>
-  //     filterValidDeliveryHours({ startDate: selectedStartDate, daySession }),
-  //   [selectedStartDate, daySession],
-  // );
+  const intl = useIntl();
 
   const handleDeliveryHourSelect = (key: string) => () => {
     setDeliveryHour(key);
@@ -44,7 +36,7 @@ const DeliveryHourMobileModal: React.FC<TDeliveryHourMobileModalProps> = (
       id="DeliveryHourMobileModal"
       isOpen={isOpen}
       onClose={onClose}
-      modalTitle="Chọn giờ giao hàng">
+      modalTitle={intl.formatMessage({ id: 'chon-gio-giao-hang' })}>
       <div className={css.timeOptionsWrapper}>
         {hourOptions.map(({ label, key }) => (
           <div
@@ -59,14 +51,18 @@ const DeliveryHourMobileModal: React.FC<TDeliveryHourMobileModalProps> = (
       </div>
       <div className={css.bottomBtns}>
         <Button className={css.btn} variant="secondary" onClick={onClose}>
-          Huỷ
+          {intl.formatMessage({
+            id: 'ManageParticipantsSection.deleteParticipantPopup.cancel',
+          })}
         </Button>
         <Button
           type="button"
           className={css.btn}
           variant="primary"
           onClick={handleSubmitDeliveryHour}>
-          Áp dụng
+          {intl.formatMessage({
+            id: 'MoveFoodToMenuForm.formStep.selectDays.submitText',
+          })}
         </Button>
       </div>
     </SlideModal>

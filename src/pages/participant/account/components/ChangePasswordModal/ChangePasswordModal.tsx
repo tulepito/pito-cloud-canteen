@@ -1,3 +1,5 @@
+import { useIntl } from 'react-intl';
+
 import IconArrowHead from '@components/Icons/IconArrowHead/IconArrowHead';
 import Modal from '@components/Modal/Modal';
 import { useAppSelector } from '@hooks/reduxHooks';
@@ -15,6 +17,7 @@ type TChangePasswordModalProps = {
 };
 const ChangePasswordModal: React.FC<TChangePasswordModalProps> = (props) => {
   const { isOpen, onClose, handleSubmit, initialValues } = props;
+  const intl = useIntl();
 
   const changePasswordInProgress = useAppSelector(
     (state) => state.password.changePasswordInProgress,
@@ -33,9 +36,15 @@ const ChangePasswordModal: React.FC<TChangePasswordModalProps> = (props) => {
         <div className={css.goBackContainer} onClick={onClose}>
           <IconArrowHead direction="left" />
           <span className={css.goBack}></span>
-          Quay lại
+          {intl.formatMessage({
+            id: 'booker.orders.draft.foodDetailModal.back',
+          })}
         </div>
-        <div className={css.modalTitle}>Đổi mật khẩu</div>
+        <div className={css.modalTitle}>
+          {intl.formatMessage({
+            id: 'ParticipantChangePasswordRoute.description',
+          })}
+        </div>
       </div>
       <div className={css.modalContent}>
         <ChangePasswordForm

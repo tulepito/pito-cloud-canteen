@@ -227,7 +227,9 @@ const ListingDetailModal: React.FC<TListingDetailModalProps> = (props) => {
             disabled={invalid}
             className={css.selectFoodBtn}
             onClick={onSelectFood}>
-            Chọn món này
+            {intl.formatMessage({
+              id: 'booker.orders.draft.foodDetailModal.addDish',
+            })}
           </Button>
         </div>
       </div>

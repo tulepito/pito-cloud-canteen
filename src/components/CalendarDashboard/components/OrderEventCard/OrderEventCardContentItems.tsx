@@ -1,5 +1,5 @@
 import type { Event } from 'react-big-calendar';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import { EVENT_STATUS } from '@components/CalendarDashboard/helpers/constant';
 import IconBanned from '@components/Icons/IconBanned/IconBanned';
@@ -35,6 +35,7 @@ const EventCardContent: React.FC<TEventCardContentProps> = ({
     status,
     pickedFoodDetail,
   } = event?.resource || {};
+  const intl = useIntl();
 
   const isExpired = isOver(expiredTime);
   const remainTime = calculateRemainTime(new Date(expiredTime).getTime());
@@ -68,14 +69,21 @@ const EventCardContent: React.FC<TEventCardContentProps> = ({
 
       <RenderWhen condition={shouldShowRejectButton}>
         <OrderEventCardContentItem icon={<IconBanned />}>
-          <span>Bỏ chọn ngày này</span>
+          <span>
+            {intl.formatMessage({
+              id: 'SectionOrderListing.unCheckThisDateButtonLabel',
+            })}
+          </span>
         </OrderEventCardContentItem>
       </RenderWhen>
       <RenderWhen condition={shouldShowCountdown}>
         <OrderEventCardContentItem
           icon={<IconClockWithExclamation />}
           isHighlight={isFirstHighlight}>
-          <span>Còn {remainTime} để chọn</span>
+          <span>
+            {intl.formatMessage({ id: 'con' })} {remainTime}{' '}
+            {intl.formatMessage({ id: 'de-chon' })}
+          </span>
         </OrderEventCardContentItem>
       </RenderWhen>
       {restaurantAddress && (

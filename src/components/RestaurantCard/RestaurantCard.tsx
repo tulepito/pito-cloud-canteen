@@ -240,7 +240,9 @@ const RestaurantCard: React.FC<TRestaurantCardProps> = ({
             {!!sortedMatchedPackagePerMemberFoodsByKeyword.length && (
               <tr>
                 <td colSpan={3}>
-                  <div className="text-sm font-semibold">Lựa chọn phù hợp</div>
+                  <div className="text-sm font-semibold">
+                    {intl.formatMessage({ id: 'lua-chon-phu-hop' })}
+                  </div>
                 </td>
               </tr>
             )}
@@ -261,7 +263,9 @@ const RestaurantCard: React.FC<TRestaurantCardProps> = ({
               !!sortedNonMatchedPackagePerMemberFoodsByKeyword.length && (
                 <tr>
                   <td colSpan={3}>
-                    <div className="text-sm font-semibold">Menu tham khảo</div>
+                    <div className="text-sm font-semibold">
+                      {intl.formatMessage({ id: 'menu-tham-khao' })}
+                    </div>
                   </td>
                 </tr>
               )}

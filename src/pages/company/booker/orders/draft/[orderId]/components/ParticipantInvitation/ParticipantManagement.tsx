@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useIntl } from 'react-intl';
 import { toast } from 'react-toastify';
 import difference from 'lodash/difference';
 import isEmpty from 'lodash/isEmpty';
@@ -52,6 +53,8 @@ const ParticipantManagement: React.FC<TParticipantManagementProps> = () => {
   const isParticipantListEmpty = isEmpty(participantData);
   const restrictEmailList = participantData.map((p) => p.attributes.email);
 
+  const intl = useIntl();
+
   const handleInviteMemberViaEmailList = async (emailList: string[]) => {
     const needInviteEmailList = difference(
       emailList,
@@ -94,13 +97,13 @@ const ParticipantManagement: React.FC<TParticipantManagementProps> = () => {
 
         const newMessage = (
           <span>
-            Đã thêm{' '}
+            {intl.formatMessage({ id: 'da-them' })}{' '}
             {needHandleItems.length > 1 ? (
               <b>{needHandleItems.length} email</b>
             ) : (
               'email'
             )}{' '}
-            vào danh sách
+            {intl.formatMessage({ id: 'vao-danh-sach' })}
           </span>
         );
 
@@ -132,8 +135,8 @@ const ParticipantManagement: React.FC<TParticipantManagementProps> = () => {
       <div className={css.titleContainer}>
         <div className={css.title}>
           {isMobileLayout
-            ? 'Danh sách thành viên'
-            : 'Danh sách thành viên hiện tại'}
+            ? intl.formatMessage({ id: 'danh-sach-thanh-vien' })
+            : intl.formatMessage({ id: 'danh-sach-thanh-vien-hien-tai' })}
         </div>
         <RenderWhen condition={!isParticipantListEmpty}>
           <div className={css.count}>{participantData.length}</div>

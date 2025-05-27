@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { Event } from 'react-big-calendar';
+import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import classNames from 'classnames';
 
@@ -47,6 +48,7 @@ const RatingSubOrderModal: React.FC<TRatingSubOrderModalProps> = (props) => {
     selectedEvent?.resource || {};
   const restaurantId = restaurant?.id;
   const formRef = useRef<any>(null);
+  const intl = useIntl();
 
   /**
    * Reset ratingCompletedLevel when modal is closed
@@ -157,7 +159,7 @@ const RatingSubOrderModal: React.FC<TRatingSubOrderModalProps> = (props) => {
         isOpen={isOpen}
         handleClose={handleClose}
         containerClassName={classNames(css.modalContainer, '!px-4')}
-        title={`Đánh giá món ${foodName}`}>
+        title={`${intl.formatMessage({ id: 'danh-gia-mon' })} ${foodName}`}>
         {renderer}
       </Modal>
     );

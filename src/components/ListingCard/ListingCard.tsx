@@ -9,7 +9,7 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { shoppingCartThunks } from '@redux/slices/shoppingCart.slice';
 import { EImageVariants } from '@src/utils/enums';
-import { FOOD_TYPE_OPTIONS, getLabelByKey } from '@src/utils/options';
+import { getLabelByKey, useFoodTypeOptionsByLocale } from '@src/utils/options';
 import { CurrentUser, Listing } from '@utils/data';
 
 import ListingDetailModal from './ListingDetailModal';
@@ -52,6 +52,7 @@ const ListingCard: React.FC<TListCardProps> = ({
   const storedRequirement =
     orders?.[userId]?.[planId]?.[parseInt(dayId, 10)]?.requirement;
 
+  const FOOD_TYPE_OPTIONS = useFoodTypeOptionsByLocale();
   const requirement = requirementRef.current;
   const mealId = listing?.id?.uuid;
   const { title, description } = Listing(listing).getAttributes();

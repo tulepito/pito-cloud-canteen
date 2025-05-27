@@ -1,4 +1,5 @@
 import type { Event } from 'react-big-calendar';
+import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import classNames from 'classnames';
 
@@ -71,6 +72,7 @@ const OrderEventCard: React.FC<TOrderEventCardProps> = ({
     (state) => state.ParticipantSubOrderList.deliveredSubOrders,
     shallowEqual,
   );
+  const intl = useIntl();
 
   const fetchSubOrdersInProgress = useAppSelector(
     (state) => state.ParticipantSubOrderList.fetchSubOrdersInProgress,
@@ -127,7 +129,9 @@ const OrderEventCard: React.FC<TOrderEventCardProps> = ({
                   forceNoTooltip: true,
                 })
               }>
-              Đánh giá
+              {intl.formatMessage({
+                id: 'CompanyOrderDetailPage.titleSection.reviewButtonText',
+              })}
             </Button>
           );
         case 'pop-up':
@@ -145,7 +149,9 @@ const OrderEventCard: React.FC<TOrderEventCardProps> = ({
                     forceNoTooltip: true,
                   });
                 }}>
-                Đánh giá
+                {intl.formatMessage({
+                  id: 'CompanyOrderDetailPage.titleSection.reviewButtonText',
+                })}
               </Button>
             </div>
           );

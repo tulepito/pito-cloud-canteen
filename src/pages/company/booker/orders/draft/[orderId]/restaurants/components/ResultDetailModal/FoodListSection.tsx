@@ -83,13 +83,17 @@ const FoodListSection: React.FC<TFoodsListSectionProps> = ({
             </div>
           ) : (
             <div className={classNames(css.foodList, '!gap-2')}>
-              <h3
-                className={classNames(
-                  css.categoryTitle,
-                  '!text-base font-semibold w-full !m-0',
-                )}>
-                Món ăn nằm trong mức giá đã chọn
-              </h3>
+              {!!sortesFoodList.length && (
+                <h3
+                  className={classNames(
+                    css.categoryTitle,
+                    '!text-base font-semibold w-full !m-0',
+                  )}>
+                  {intl.formatMessage({
+                    id: 'mon-an-nam-trong-muc-gia-da-chon',
+                  })}
+                </h3>
+              )}
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full">
                 {sortesFoodList.map((item) => (
@@ -120,13 +124,17 @@ const FoodListSection: React.FC<TFoodsListSectionProps> = ({
               {sortesGreaterFoodList.length > 0 && (
                 <div className={classNames(css.categories, 'w-full')}>
                   <div className={css.category}>
-                    <h3
-                      className={classNames(
-                        css.categoryTitle,
-                        '!text-base font-semibold w-full !my-2 !mt-4',
-                      )}>
-                      Món ăn nằm ngoài mức giá đã chọn
-                    </h3>
+                    {!!sortesGreaterFoodList.length && (
+                      <h3
+                        className={classNames(
+                          css.categoryTitle,
+                          '!text-base font-semibold w-full !my-2 !mt-4',
+                        )}>
+                        {intl.formatMessage({
+                          id: 'mon-an-nam-ngoai-muc-gia-da-chon',
+                        })}
+                      </h3>
+                    )}
 
                     {fetchFoodInProgress ? (
                       <div className={css.loading}>

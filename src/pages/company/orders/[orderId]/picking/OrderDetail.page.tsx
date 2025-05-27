@@ -42,7 +42,7 @@ import {
   OrderManagementsAction,
   orderManagementThunks,
 } from '@redux/slices/OrderManagement.slice';
-import { getStepsByOrderType } from '@src/constants/stepperSteps';
+import { useStepsByOrderType } from '@src/constants/stepperSteps';
 import { companyPaths } from '@src/paths';
 import type { OrderListing } from '@src/types';
 import { diffDays } from '@src/utils/dates';
@@ -219,7 +219,7 @@ const OrderDetailPage = () => {
 
   const confirmButtonMessage = isPickingOrder
     ? editViewData.countdownSectionData.orderDeadline > 0
-      ? 'Đặt đơn trước hạn'
+      ? intl.formatMessage({ id: 'dat-don-truoc-han' })
       : intl.formatMessage({
           id: 'EditView.OrderTitle.makeOrderButtonText',
         })
@@ -454,7 +454,7 @@ const OrderDetailPage = () => {
                   handleFieldChange={toggleFoodAutoPicking}
                   onSubmit={() => {}}
                   subTitle=""
-                  mainTitle="Tự động chọn món"
+                  mainTitle={intl.formatMessage({ id: 'tu-dong-chon-mon' })}
                 />
               </div>
             </OrderDeadlineCountdownSection>
@@ -547,7 +547,7 @@ const OrderDetailPage = () => {
     </div>
   );
 
-  const _steps = getStepsByOrderType(orderType);
+  const _steps = useStepsByOrderType(orderType);
 
   const ReviewViewComponent = (
     <>
@@ -669,15 +669,15 @@ const OrderDetailPage = () => {
       control={moreOptionsModalControl}
       options={[
         {
-          content: 'Danh sách thành viên',
+          content: intl.formatMessage({ id: 'danh-sach-thanh-vien-0' }),
           onClick: manageParticipantModalControl.setTrue,
         },
         {
-          content: 'Chia sẻ liên kết đặt hàng',
+          content: intl.formatMessage({ id: 'chia-se-lien-ket-dat-hang' }),
           onClick: sendNotificationModalControl.setTrue,
         },
         {
-          content: 'Kết quả chọn món',
+          content: intl.formatMessage({ id: 'ket-qua-chon-mon' }),
           onClick: managePickingResultModalControl.setTrue,
         },
       ]}
@@ -691,10 +691,10 @@ const OrderDetailPage = () => {
 
   const mobileTopContainerProps = {
     title: isEditViewMode
-      ? 'Quản lý chọn món'
+      ? intl.formatMessage({ id: 'quan-ly-chon-mon-0' })
       : isViewCartDetailMode
-      ? 'Giỏ hàng của bạn'
-      : 'Xem lại thông tin đơn hàng',
+      ? intl.formatMessage({ id: 'gio-hang-cua-ban' })
+      : intl.formatMessage({ id: 'xem-lai-thong-tin-don-hang' }),
     hasGoBackButton: !isEditViewMode || isViewCartDetailMode,
     onGoBack: isViewCartDetailMode
       ? handleGoBackFromViewCartDetailMode

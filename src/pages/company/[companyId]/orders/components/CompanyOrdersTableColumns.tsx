@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 import React, { type ReactNode } from 'react';
-import { useIntl } from 'react-intl';
+import type { IntlShape } from 'react-intl';
+import { defineMessages, useIntl } from 'react-intl';
 import Skeleton from 'react-loading-skeleton';
 import classNames from 'classnames';
 import { useRouter } from 'next/router';
@@ -10,7 +11,6 @@ import type { TButtonVariant } from '@components/Button/Button';
 import Button from '@components/Button/Button';
 import AlertModal from '@components/Modal/AlertModal';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
-import type { TColumn } from '@components/Table/Table';
 import { parseThousandNumber } from '@helpers/format';
 import { getParticipantPickingLink } from '@helpers/order/prepareDataHelper';
 import Tracker from '@helpers/tracker';
@@ -21,7 +21,7 @@ import { orderAsyncActions } from '@redux/slices/Order.slice';
 import { QuizActions } from '@redux/slices/Quiz.slice';
 import { companyPaths } from '@src/paths';
 import { diffDays } from '@src/utils/dates';
-import { getLabelByKey, ORDER_STATE_OPTIONS } from '@src/utils/options';
+import { getLabelByKey } from '@src/utils/options';
 import {
   EBookerOrderDraftStates,
   EOrderDraftStates,
@@ -321,10 +321,44 @@ const CompanyOrdersActionColumn = ({
   );
 };
 
-export const CompanyOrdersTableColumns: TColumn[] = [
+const messages = defineMessages({
+  title: {
+    id: 'CompanyOrdersTableColumns.title',
+    defaultMessage: 'Order',
+  },
+  deliveryTime: {
+    id: 'CompanyOrdersTableColumns.deliveryTime',
+    defaultMessage: 'Delivery Time',
+  },
+  orderType: {
+    id: 'CompanyOrdersTableColumns.orderType',
+    defaultMessage: 'Order Type',
+  },
+  restaurantName: {
+    id: 'CompanyOrdersTableColumns.restaurantName',
+    defaultMessage: 'Serving Unit',
+  },
+  address: {
+    id: 'CompanyOrdersTableColumns.address',
+    defaultMessage: 'Delivery Location',
+  },
+  totalWithVAT: {
+    id: 'CompanyOrdersTableColumns.totalWithVAT',
+    defaultMessage: 'Order Value',
+  },
+  state: {
+    id: 'CompanyOrdersTableColumns.state',
+    defaultMessage: 'Status',
+  },
+});
+
+export const getCompanyOrdersTableColumns = (
+  intl: IntlShape,
+  ORDER_STATE_OPTIONS: { key: string; label: string }[],
+) => [
   {
     key: 'title',
-    label: 'Đơn hàng',
+    label: intl.formatMessage(messages.title),
     render: (data: TObject) => {
       const companyOrderRenderData = getCompanyOrderRenderData(data);
 
@@ -336,7 +370,7 @@ export const CompanyOrdersTableColumns: TColumn[] = [
   },
   {
     key: 'deliveryTime',
-    label: 'Thời gian',
+    label: intl.formatMessage(messages.deliveryTime),
     render: ({ startDate, endDate, deliveryHour }: TObject) => {
       return (
         <div className={css.deliveryTime}>
@@ -352,7 +386,7 @@ export const CompanyOrdersTableColumns: TColumn[] = [
   },
   {
     key: 'orderType',
-    label: 'Loại đơn',
+    label: intl.formatMessage(messages.orderType),
     render: () => {
       return <div className={css.orderType}>PITO Cloud Canteen</div>;
     },
@@ -360,7 +394,7 @@ export const CompanyOrdersTableColumns: TColumn[] = [
 
   {
     key: 'restaurantName',
-    label: 'Đơn vị phục vụ',
+    label: intl.formatMessage(messages.restaurantName),
     render: ({
       restaurants = [],
       queryCompanyPlansByOrderIdsInProgress,
@@ -392,7 +426,7 @@ export const CompanyOrdersTableColumns: TColumn[] = [
   },
   {
     key: 'address',
-    label: 'Địa điểm giao hàng',
+    label: intl.formatMessage(messages.address),
     render: ({ location }: TObject) => {
       return (
         <div className={css.location} title={location}>
@@ -403,7 +437,7 @@ export const CompanyOrdersTableColumns: TColumn[] = [
   },
   {
     key: 'totalWithVAT',
-    label: 'Giá trị đơn hàng',
+    label: intl.formatMessage(messages.totalWithVAT),
     render: ({
       totalWithVAT,
       queryCompanyPlansByOrderIdsInProgress,
@@ -421,7 +455,7 @@ export const CompanyOrdersTableColumns: TColumn[] = [
   },
   {
     key: 'state',
-    label: 'Trạng thái',
+    label: intl.formatMessage(messages.state),
     render: ({
       state,
       paymentStatus,
@@ -459,6 +493,6 @@ export const CompanyOrdersTableColumns: TColumn[] = [
   {
     key: 'action',
     label: '',
-    render: (data) => <CompanyOrdersActionColumn {...data} />,
+    render: (data: any) => <CompanyOrdersActionColumn {...data} />,
   },
 ];

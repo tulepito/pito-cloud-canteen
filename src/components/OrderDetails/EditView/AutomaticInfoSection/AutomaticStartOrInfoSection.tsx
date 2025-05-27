@@ -1,3 +1,4 @@
+import { useIntl } from 'react-intl';
 import classNames from 'classnames';
 import { DateTime } from 'luxon';
 
@@ -38,6 +39,7 @@ const AutomaticStartOrInfoSection: React.FC<
 }) => {
   const classes = classNames(css.container, className);
   const { isMobileLayout } = useViewport();
+  const intl = useIntl();
 
   const deliveryDate = findDeliveryDate(startDate, deliveryHour);
 
@@ -74,11 +76,16 @@ const AutomaticStartOrInfoSection: React.FC<
         </svg>
 
         <div>
-          <div className={css.columnTitle}>Tự động đặt đơn</div>
+          <div className={css.columnTitle}>
+            {intl.formatMessage({ id: 'tu-dong-dat-don' })}
+          </div>
           <div className={css.columnDescription}>
-            Đơn sẽ được tự động đặt vào lúc{' '}
-            <b>{formattedAutomaticConfirmOrder}</b>. Trường hợp nếu đến hạn mà
-            không đủ số lượng đặt món thì đơn sẽ bị hủy.
+            {intl.formatMessage({ id: 'don-se-duoc-tu-dong-dat-vao-luc' })}{' '}
+            <b>{formattedAutomaticConfirmOrder}</b>.{' '}
+            {intl.formatMessage({
+              id: 'truong-hop-neu-den-han-ma-khong-du-so-luong-dat-mon-thi-don-se-bi-huy',
+            })}
+            .
           </div>
         </div>
       </div>
@@ -101,11 +108,12 @@ const AutomaticStartOrInfoSection: React.FC<
 
         <div>
           <div className={css.columnTitle}>
-            Tự động hủy tham gia cho thành viên
+            {intl.formatMessage({ id: 'tu-dong-huy-tham-gia-cho-thanh-vien' })}
           </div>
           <div className={css.columnDescription}>
-            Nếu quá thời hạn mà thành viên chưa chọn món thì sẽ được xem như là
-            không tham gia ngày ăn.
+            {intl.formatMessage({
+              id: 'neu-qua-thoi-han-ma-thanh-vien-chua-chon-mon-thi-se-duoc-xem-nhu-la-khong-tham-gia-ngay-an',
+            })}
           </div>
         </div>
       </div>
@@ -138,14 +146,16 @@ const AutomaticStartOrInfoSection: React.FC<
                 d="M12 7C12.5523 7 13 7.44772 13 8C13 8.55228 12.5523 9 12 9C11.4477 9 11 8.55228 11 8C11 7.44772 11.4477 7 12 7Z"
                 fill="currentColor"></path>{' '}
               <path
-                fill-rule="evenodd"
-                clip-rule="evenodd"
+                fillRule="evenodd"
+                clipRule="evenodd"
                 d="M1.25 12C1.25 6.06294 6.06294 1.25 12 1.25C17.9371 1.25 22.75 6.06294 22.75 12C22.75 17.9371 17.9371 22.75 12 22.75C6.06294 22.75 1.25 17.9371 1.25 12ZM12 2.75C6.89137 2.75 2.75 6.89137 2.75 12C2.75 17.1086 6.89137 21.25 12 21.25C17.1086 21.25 21.25 17.1086 21.25 12C21.25 6.89137 17.1086 2.75 12 2.75Z"
                 fill="currentColor"></path>{' '}
             </g>
           </svg>
           <div className="text-sm font-semibold text-blue-500">
-            Tự động đặt đơn và tự chọn món cho thành viên
+            {intl.formatMessage({
+              id: 'tu-dong-dat-don-va-tu-chon-mon-cho-thanh-vien',
+            })}
           </div>
         </div>
         <div className="rounded-full p-2 text-blue-500 hover:bg-stone-100">

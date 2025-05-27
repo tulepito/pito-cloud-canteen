@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { Event } from 'react-big-calendar';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import classNames from 'classnames';
 import { DateTime } from 'luxon';
@@ -54,6 +54,7 @@ const MealPlanCardHeader: React.FC<TMealPlanCardHeaderProps> = ({
   const walkthroughStep = useAppSelector(
     (state) => state.BookerDraftOrderPage.walkthroughStep,
   );
+  const intl = useIntl();
 
   const dateTime = DateTime.fromMillis(+resourceId).setZone(VNTimezone);
   const dayOfWeek = convertWeekDay(dateTime.weekday).key;
@@ -126,7 +127,7 @@ const MealPlanCardHeader: React.FC<TMealPlanCardHeaderProps> = ({
           {`${dishes.length}${
             foodIdList?.length ? `/${foodIdList?.length}` : ''
           }`}{' '}
-          món
+          {intl.formatMessage({ id: 'mon' })}
         </div>
         <div className={css.verticalDivider} />
         <Tooltip

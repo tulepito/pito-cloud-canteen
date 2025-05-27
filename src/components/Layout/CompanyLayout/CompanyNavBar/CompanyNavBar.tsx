@@ -1,3 +1,4 @@
+import { useIntl } from 'react-intl';
 import classNames from 'classnames';
 import { useRouter } from 'next/router';
 
@@ -17,6 +18,7 @@ const CompanyNavBar: React.FC<TCompanyNavBarProps> = () => {
   const router = useRouter();
   const { pathname } = router;
   const { companyId } = router.query;
+  const intl = useIntl();
 
   return (
     <div className={css.container}>
@@ -29,7 +31,9 @@ const CompanyNavBar: React.FC<TCompanyNavBarProps> = () => {
             [css.active]: pathname === companyPaths.Home,
           })}>
           <IconHome className={css.icon} />
-          <div className={css.label}>Trang chủ</div>
+          <div className={css.label}>
+            {intl.formatMessage({ id: 'AdminSidebar.dashboardLabel' })}
+          </div>
         </div>
       </NamedLink>
 
@@ -48,7 +52,9 @@ const CompanyNavBar: React.FC<TCompanyNavBarProps> = () => {
               ),
           })}>
           <IconFood className={css.icon} />
-          <div className={css.label}>Đặt hàng</div>
+          <div className={css.label}>
+            {intl.formatMessage({ id: 'CompanyLayout.order' })}
+          </div>
         </div>
       </NamedLink>
 
@@ -64,7 +70,9 @@ const CompanyNavBar: React.FC<TCompanyNavBarProps> = () => {
             [css.active]: pathname === companyPaths.ManageOrders,
           })}>
           <IconDocument className={css.icon} filled={false} />
-          <div className={css.label}>Đơn hàng</div>
+          <div className={css.label}>
+            {intl.formatMessage({ id: 'SectionOrderHeader.title' })}
+          </div>
         </div>
       </NamedLink>
       <NamedLink
@@ -76,7 +84,11 @@ const CompanyNavBar: React.FC<TCompanyNavBarProps> = () => {
             [css.active]: pathname === personalPaths.Account,
           })}>
           <IconUser2 className={css.icon} />
-          <div className={css.label}>Tài khoản</div>
+          <div className={css.label}>
+            {intl.formatMessage({
+              id: 'EditPartnerMenuWizard.informationTabLabel',
+            })}
+          </div>
         </div>
       </NamedLink>
     </div>

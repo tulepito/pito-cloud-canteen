@@ -71,7 +71,7 @@ const RatingSubOrderFormComponent: React.FC<
               css.generalRatingTitle,
               '!text-lg !font-semibold',
             )}>
-            Đánh giá tổng quan
+            {intl.formatMessage({ id: 'danh-gia-tong-quan' })}
           </div>
         )}
         <FieldRating
@@ -98,7 +98,11 @@ const RatingSubOrderFormComponent: React.FC<
                 css.detailRatingTitle,
                 '!text-sm !font-semibold md:!text-base text-center !m-0',
               )}>
-              <div>Món ăn</div>
+              <div>
+                {intl.formatMessage({
+                  id: 'AddOrderForm.foodIdField.placeholder',
+                })}
+              </div>
               <div className="min-h-[24px]">
                 {values?.food ? (
                   <span className="!font-normal">
@@ -128,7 +132,11 @@ const RatingSubOrderFormComponent: React.FC<
                 css.detailRatingTitle,
                 '!text-sm !font-semibold md:!text-base text-center !mt-0 !mb-0',
               )}>
-              <div>Dụng cụ</div>
+              <div>
+                {intl.formatMessage({
+                  id: 'ManagePartnerReviewsPage.packageTitle',
+                })}
+              </div>
               <div className="min-h-[24px]">
                 {values?.packaging ? (
                   <span className="!font-normal">
@@ -155,14 +163,18 @@ const RatingSubOrderFormComponent: React.FC<
           <FieldTextArea
             id="detailTextRating"
             name="detailTextRating"
-            label="Đánh giá chi tiết"
+            label={intl.formatMessage({ id: 'danh-gia-chi-tiet' })}
             labelClassName={css.detailTextRatingLabel}
-            placeholder="Hãy giúp chúng tôi hiểu rõ hơn cảm nhận của bạn sau buổi ăn"
+            placeholder={intl.formatMessage({
+              id: 'hay-giup-chung-toi-hieu-ro-hon-cam-nhan-cua-ban-sau-buoi-an',
+            })}
             className={css.textareaField}
           />
         </div>
         <div className={css.imagesRatingWrapper}>
-          <div className={css.imagesRatingTitle}>Hình ảnh</div>
+          <div className={css.imagesRatingTitle}>
+            {intl.formatMessage({ id: 'OrderRatingForm.image' })}
+          </div>
           <RatingImagesUploadField
             images={images}
             containerClassName={css.imagesFieldWrapper}
@@ -177,7 +189,7 @@ const RatingSubOrderFormComponent: React.FC<
           type="submit"
           inProgress={inProgress}
           disabled={submitDisabled}>
-          Gửi đánh giá
+          {intl.formatMessage({ id: 'OrderRatingForm.btnReviewMobile' })}
         </Button>
       </div>
     </Form>

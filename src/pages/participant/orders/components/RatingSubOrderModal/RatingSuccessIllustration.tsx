@@ -1,3 +1,5 @@
+import { useIntl } from 'react-intl';
+
 import Button from '@components/Button/Button';
 
 export const RatingSuccessIllustration = ({
@@ -7,27 +9,31 @@ export const RatingSuccessIllustration = ({
   level: 'bad' | 'normal' | 'good';
   action: () => void;
 }) => {
+  const intl = useIntl();
   const dataByLevel = {
     bad: {
       src: '/static/rating-asset-bad.png',
       alt: 'bad',
-      primaryText: 'THÔI RỒI!',
-      secondaryText:
-        'Rất tiếc vì món ăn chưa như mong đợi của bạn. Đánh giá của bạn sẽ giúp PITO cải thiện và khắc phục tốt hơn',
+      primaryText: intl.formatMessage({ id: 'thoi-roi' }),
+      secondaryText: intl.formatMessage({
+        id: 'rat-tiec-vi-mon-an-chua-nhu-mong-doi-cua-ban-danh-gia-cua-ban-se-giup-pito-cai-thien-va-khac-phuc-tot-hon',
+      }),
     },
     normal: {
       src: '/static/rating-asset-normal.png',
       alt: 'normal',
-      primaryText: 'CŨNG CŨNG!!!',
-      secondaryText:
-        'Cảm ơn bạn đã dành thời gian đánh giá. Mỗi đánh giá của bạn là động lực để PITO hoàn thiện hơn.',
+      primaryText: intl.formatMessage({ id: 'cung-cung' }),
+      secondaryText: intl.formatMessage({
+        id: 'cam-on-ban-da-danh-thoi-gian-danh-gia-moi-danh-gia-cua-ban-la-dong-luc-de-pito-hoan-thien-hon',
+      }),
     },
     good: {
       src: '/static/rating-asset-good.png',
       alt: 'good',
-      primaryText: 'NGON QUÁ!',
-      secondaryText:
-        'Thật tuyệt khi bạn thích bữa ăn. Cảm ơn bạn đã dành thời gian đánh giá!',
+      primaryText: intl.formatMessage({ id: 'ngon-qua' }),
+      secondaryText: intl.formatMessage({
+        id: 'that-tuyet-khi-ban-thich-bua-an-cam-on-ban-da-danh-thoi-gian-danh-gia',
+      }),
     },
   };
 
@@ -72,7 +78,9 @@ export const RatingSuccessIllustration = ({
             onClick={action}
             size="small"
             className="py-2 h-[42px] mt-2 px-8">
-            Đã hiểu
+            {intl.formatMessage({
+              id: 'ManagePartnersPage.deletePartnerAlert.confirmText',
+            })}
           </Button>
         </div>
       </div>

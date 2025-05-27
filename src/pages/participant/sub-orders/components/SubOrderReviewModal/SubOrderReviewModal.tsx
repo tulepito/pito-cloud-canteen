@@ -67,7 +67,11 @@ const SubOrderReviewModal: React.FC<SubOrderReviewModalProps> = (props) => {
       className={css.modal}
       closeClassName={css.closedModal}
       containerClassName={css.modalContainer}
-      title={isMobileLayout ? undefined : 'Đánh giá Chi tiết'}
+      title={
+        isMobileLayout
+          ? undefined
+          : intl.formatMessage({ id: 'danh-gia-chi-tiet-0' })
+      }
       shouldHideIconClose={isMobileLayout}>
       <RenderWhen condition={fetchReviewInProgress || isEmpty(subOrderReview)}>
         <div className={css.loading}>
@@ -77,7 +81,11 @@ const SubOrderReviewModal: React.FC<SubOrderReviewModalProps> = (props) => {
           <>
             <div className={css.goBack} onClick={onClose}>
               <IconArrow direction="left" />
-              <span>Quay lại</span>
+              <span>
+                {intl.formatMessage({
+                  id: 'booker.orders.draft.foodDetailModal.back',
+                })}
+              </span>
             </div>
             <div className={css.restaurantInfor}>
               <div className={css.leftSide}>

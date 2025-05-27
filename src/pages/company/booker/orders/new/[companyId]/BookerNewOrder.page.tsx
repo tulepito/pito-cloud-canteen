@@ -37,7 +37,7 @@ const BookerNewOrderPage: React.FC = () => {
   return (
     <div className={css.root}>
       <div className={css.header}>
-        <div>Đặt hàng</div>
+        <div>{intl.formatMessage({ id: 'CompanyLayout.order' })}</div>
       </div>
       <div className={css.content}>
         <div className={css.welcome}>

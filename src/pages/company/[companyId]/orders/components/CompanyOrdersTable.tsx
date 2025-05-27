@@ -21,6 +21,7 @@ import { orderAsyncActions } from '@redux/slices/Order.slice';
 import type { RootState } from '@redux/store';
 import { companyPaths, enGeneralPaths } from '@src/paths';
 import { User } from '@src/utils/data';
+import { useOrderStateOptionsByLocale } from '@src/utils/options';
 import {
   EManageCompanyOrdersTab,
   EOrderStates,
@@ -31,7 +32,7 @@ import type { TObject, TUser } from '@utils/types';
 import { parseEntitiesToTableData } from '../helpers/parseEntitiesToTableData';
 
 import OrderStateWarningModal from './OrderStateWarningModal/OrderStateWarningModal';
-import { CompanyOrdersTableColumns } from './CompanyOrdersTableColumns';
+import { getCompanyOrdersTableColumns } from './CompanyOrdersTableColumns';
 import { CompanySubOrderMobileSection } from './CompanySubOrderMobileSection';
 import type { TSearchOrderFormValues } from './SearchOrderForm';
 import SearchOrderForm from './SearchOrderForm';
@@ -93,6 +94,7 @@ const prepareTabItems = ({
   currentTab,
   tableData,
   isMobileLayout,
+  ORDER_STATE_OPTIONS,
 }: any) => {
   const {
     queryOrderError,
@@ -133,7 +135,7 @@ const prepareTabItems = ({
         <CompanySubOrderMobileSection tableData={tableData} />
       ) : (
         <TableForm
-          columns={CompanyOrdersTableColumns}
+          columns={getCompanyOrdersTableColumns(intl, ORDER_STATE_OPTIONS)}
           data={tableData}
           paginationLinksClassName={css.pagination}
           pagination={manageOrdersPagination}
@@ -206,6 +208,8 @@ const CompanyOrdersTable: React.FC<TCompanyOrdersTableProps> = () => {
   const [orderWarningState, setOrderWarningState] = useState<
     EOrderStates | 'expireStartOrder' | null
   >();
+
+  const ORDER_STATE_OPTIONS = useOrderStateOptionsByLocale();
 
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
 
@@ -290,6 +294,7 @@ const CompanyOrdersTable: React.FC<TCompanyOrdersTableProps> = () => {
     currentTab,
     tableData,
     isMobileLayout,
+    ORDER_STATE_OPTIONS,
   });
 
   const handleTabChange = ({ id: newTab }: TTabsItem) => {

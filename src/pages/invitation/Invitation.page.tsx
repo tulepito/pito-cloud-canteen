@@ -249,8 +249,12 @@ const InvitationPage = () => {
           }}>
           {currentUser?.attributes?.profile?.metadata?.isPartner ? (
             <EmptyView
-              title="Bạn đang đăng nhập với tài khoản đối tác"
-              description="Bạn đang truy cập đường dẫn chọn món dành cho `Người tham gia`. Vui lòng đăng nhập bằng tài khoản `Người tham gia` để tham gia đơn"
+              title={intl.formatMessage({
+                id: 'ban-dang-dang-nhap-voi-tai-khoan-doi-tac',
+              })}
+              description={intl.formatMessage({
+                id: 'ban-dang-truy-cap-duong-dan-chon-mon-danh-cho-nguoi-tham-gia-vui-long-dang-nhap-bang-tai-khoan-nguoi-tham-gia-de-tham-gia-don',
+              })}
               buttonComponent={
                 <div
                   style={{
@@ -260,14 +264,14 @@ const InvitationPage = () => {
                     alignItems: 'center',
                   }}>
                   <Button variant="secondary" onClick={handleLogout}>
-                    Đăng xuất
+                    {intl.formatMessage({ id: 'CompanyHeaderMobile.logout' })}
                   </Button>
                 </div>
               }
             />
           ) : error ? (
             <EmptyView
-              title="Không thể tham gia đơn"
+              title={intl.formatMessage({ id: 'khong-the-tham-gia-don' })}
               description={
                 <div
                   style={{
@@ -278,7 +282,9 @@ const InvitationPage = () => {
                   }}>
                   <p style={{ textAlign: 'center', margin: 0 }}>{error}</p>
                   <p style={{ textAlign: 'center', margin: 0 }}>
-                    Hãy thử tham gia đơn hàng này bằng tài khoản khác
+                    {intl.formatMessage({
+                      id: 'hay-thu-tham-gia-don-hang-nay-bang-tai-khoan-khac',
+                    })}
                   </p>
                 </div>
               }
@@ -291,15 +297,19 @@ const InvitationPage = () => {
                     alignItems: 'center',
                   }}>
                   <Button variant="secondary" onClick={handleLogout}>
-                    Đăng nhập bằng tài khoản khác
+                    {intl.formatMessage({
+                      id: 'dang-nhap-bang-tai-khoan-khac',
+                    })}
                   </Button>
                 </div>
               }
             />
           ) : _isUserABooker ? (
             <EmptyView
-              title="Vai trò không hợp lệ"
-              description="Bạn đang đăng nhập bằng tài khoản Booker hoặc Owner. Vui lòng đổi vai trò `Người tham gia` để tham gia đơn"
+              title={intl.formatMessage({ id: 'vai-tro-khong-hop-le' })}
+              description={intl.formatMessage({
+                id: 'ban-dang-dang-nhap-bang-tai-khoan-booker-hoac-owner-vui-long-doi-vai-tro-nguoi-tham-gia-de-tham-gia-don',
+              })}
               buttonComponent={
                 <div
                   style={{
@@ -309,11 +319,13 @@ const InvitationPage = () => {
                     alignItems: 'center',
                   }}>
                   <Button variant="secondary" onClick={handleLogout}>
-                    Đăng xuất
+                    {intl.formatMessage({ id: 'CompanyHeaderMobile.logout' })}
                   </Button>
 
                   <Button variant="primary" onClick={onOpenRoleSelectModal}>
-                    Đổi vai trò
+                    {intl.formatMessage({
+                      id: 'CompanyHeaderMobile.changeRole',
+                    })}
                   </Button>
                 </div>
               }
@@ -340,7 +352,9 @@ const InvitationPage = () => {
                   variant="primary"
                   disabled={isLoadingCompanyData}
                   onClick={acceptInvitaiton}>
-                  Bắt đầu
+                  {intl.formatMessage({
+                    id: 'FieldAvailability.startTimePlaceholder',
+                  })}
                 </Button>
               }
             />

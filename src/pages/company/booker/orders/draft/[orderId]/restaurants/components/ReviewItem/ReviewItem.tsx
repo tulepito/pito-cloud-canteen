@@ -1,3 +1,4 @@
+import { useIntl } from 'react-intl';
 import classNames from 'classnames';
 
 import Avatar from '@components/Avatar/Avatar';
@@ -37,6 +38,7 @@ const ReviewItem: React.FC<ReviewItemProps> = (props) => {
     foodName,
     detailTextRating,
   } = props;
+  const intl = useIntl();
 
   const { food, packaging } = detailRating || {};
 
@@ -58,7 +60,10 @@ const ReviewItem: React.FC<ReviewItemProps> = (props) => {
         </div>
         <div className={css.detailRating}>
           <IconRatingFace className={css.faceIcon} rating={food?.rating || 0} />
-          <div className={css.label}>Món ăn: </div>
+          <div className={css.label}>
+            {intl.formatMessage({ id: 'AddOrderForm.foodIdField.placeholder' })}
+            :{' '}
+          </div>
           <div className={css.value}>
             {converRatingPointToLabel(food?.rating || 0)}
           </div>
@@ -68,7 +73,12 @@ const ReviewItem: React.FC<ReviewItemProps> = (props) => {
             className={css.faceIcon}
             rating={packaging?.rating || 0}
           />
-          <div className={css.label}>Dụng cụ: </div>
+          <div className={css.label}>
+            {intl.formatMessage({
+              id: 'ManagePartnerReviewsPage.packageTitle',
+            })}
+            :{' '}
+          </div>
           <div className={css.value}>
             {converRatingPointToLabel(packaging?.rating || 0)}
           </div>

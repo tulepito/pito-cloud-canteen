@@ -179,15 +179,19 @@ const SignInFormComponent: React.FC<TSignInFormComponentProps> = (props) => {
 
             <div className={classNames(css.termsCenter, '!mt-2')}>
               <p className={css.termsWrapper}>
-                Bằng cách tham gia, bạn đã đọc và đồng ý{' '}
+                {intl.formatMessage({
+                  id: 'bang-cach-tham-gia-ban-da-doc-va-dong-y',
+                })}{' '}
                 <a
                   className={css.terms}
                   href="https://pito.vn/cam-nang/dieu-khoan-chinh-sach/"
                   target="_blank"
                   rel="noreferrer">
-                  Điều khoản dịch vụ và điều kiện sử dụng
+                  {intl.formatMessage({
+                    id: 'dieu-khoan-dich-vu-va-dieu-kien-su-dung',
+                  })}
                 </a>{' '}
-                của PITO.
+                {intl.formatMessage({ id: 'cua-pito' })}
               </p>
             </div>
 

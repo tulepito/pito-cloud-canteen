@@ -71,7 +71,11 @@ const ProfileForm: React.FC<TProfileFormProps> = ({
 
   return (
     <div className={css.root}>
-      <div className={css.header}>Tài khoản cá nhân</div>
+      <div className={css.header}>
+        {intl.formatMessage({
+          id: 'ParticipantAccountSettingRoute.description',
+        })}
+      </div>
       <div className={css.formContainer}>
         <div className={css.avatarSection}>
           <AvatarForm onSubmit={() => {}} currentUser={currentUser!} />
@@ -82,7 +86,7 @@ const ProfileForm: React.FC<TProfileFormProps> = ({
               <FieldTextInputComponent
                 id={`name`}
                 name="name"
-                label="Họ và tên"
+                label={intl.formatMessage({ id: 'ho-va-ten' })}
                 input={name.input}
                 meta={name.meta}
                 placeholder="Tên"
@@ -105,7 +109,7 @@ const ProfileForm: React.FC<TProfileFormProps> = ({
               <FieldTextInputComponent
                 id={`phoneNumber`}
                 name="phoneNumber"
-                label="Số điện thoại"
+                label={intl.formatMessage({ id: 'so-dien-thoai' })}
                 input={phoneNumber.input}
                 meta={phoneNumber.meta}
                 placeholder="0123456789"
@@ -119,7 +123,7 @@ const ProfileForm: React.FC<TProfileFormProps> = ({
             disabled={disabledSubmit}
             inProgress={inProgress}
             className={css.submitBtn}>
-            Lưu thay đổi
+            {intl.formatMessage({ id: 'AddOrderForm.moibleSubmitButtonText' })}
           </Button>
         </Form>
       </div>

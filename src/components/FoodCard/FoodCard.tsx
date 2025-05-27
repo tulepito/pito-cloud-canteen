@@ -1,4 +1,5 @@
 import React from 'react';
+import { useIntl } from 'react-intl';
 import classNames from 'classnames';
 
 import Badge, { EBadgeType } from '@components/Badge/Badge';
@@ -6,7 +7,7 @@ import IconCheckmarkWithCircle from '@components/Icons/IconCheckmark/IconCheckma
 import IconPlusCircle from '@components/Icons/IconPlusCircle/IconPlusCircle';
 import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
 import { addCommas } from '@helpers/format';
-import { FOOD_TYPE_OPTIONS, getLabelByKey } from '@src/utils/options';
+import { getLabelByKey, useFoodTypeOptionsByLocale } from '@src/utils/options';
 import { Listing } from '@utils/data';
 import { EFoodType, EImageVariants } from '@utils/enums';
 import type { TListing } from '@utils/types';
@@ -32,6 +33,7 @@ const FoodCard: React.FC<TFoodCardProps> = ({
   onClick = () => null,
   hideSelection = false,
 }) => {
+  const intl = useIntl();
   const classes = classNames(css.root, className);
   const { foodType } = Listing(food!).getPublicData();
 
@@ -43,6 +45,7 @@ const FoodCard: React.FC<TFoodCardProps> = ({
     onClick(`${Listing(food!).getId()}`);
   };
 
+  const FOOD_TYPE_OPTIONS = useFoodTypeOptionsByLocale();
   const handleRemove = () => {
     onRemove(Listing(food!).getId());
   };
@@ -88,7 +91,7 @@ const FoodCard: React.FC<TFoodCardProps> = ({
             '!text-sm font-semibold',
           )}>{`${addCommas(
           Listing(food!).getAttributes().price?.amount,
-        )} ₫ / Phần`}</div>
+        )} ₫ / ${intl.formatMessage({ id: 'phan' })}`}</div>
       </div>
       {!hideSelection && (
         <div onClick={(e) => e.stopPropagation()}>{selection}</div>

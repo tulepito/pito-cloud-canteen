@@ -73,7 +73,7 @@ const ParticipantPlan = () => {
       : (diffTime! as Duration)
   ).toFormat("d'd':h'h':mm'm':ss's'");
   const formattedDeadlineDate = DateTime.fromMillis(deadlineDate).toFormat(
-    "HH:mm, dd 'tháng' MM, yyyy",
+    `HH:mm, dd '${intl.formatMessage({ id: 'thang' })}' MM, yyyy`,
   );
 
   const timeLeftText = intl.formatMessage(
@@ -168,7 +168,11 @@ const ParticipantPlan = () => {
         <div className={css.leftSection}>
           <div className={css.goBack} onClick={handleGoBack}>
             <IconArrow direction="left" />
-            <span>Quay lại</span>
+            <span>
+              {intl.formatMessage({
+                id: 'booker.orders.draft.foodDetailModal.back',
+              })}
+            </span>
           </div>
           <SectionRestaurantHero
             listing={selectedRestaurant}

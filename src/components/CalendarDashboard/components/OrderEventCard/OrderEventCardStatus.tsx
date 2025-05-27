@@ -71,7 +71,7 @@ const OrderEventCardStatus: React.FC<TOrderEventCardStatusProps> = ({
   if (!!lastTransition && !isFoodPicked) {
     extendStatusData = {
       type: EBadgeType.default,
-      label: 'Không chọn món',
+      label: intl.formatMessage({ id: 'khong-chon-mon' }),
     };
   }
 

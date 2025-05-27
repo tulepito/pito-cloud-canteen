@@ -10,8 +10,25 @@
   "editor.codeActionsOnSave": {
     "source.fixAll": "explicit"
   },
-  "i18n-ally.localesPaths": [],
+  "i18n-ally.localesPaths": [
+    "src/translations"
+  ],
   "deno.enable": false,
+  "i18n-ally.keystyle": "flat",
+  "eslint.lintTask.enable": false,
+  "i18n-ally.refactor.templates": [
+    {
+      "default": true,
+      "template": "{intl.formatMessage({ id: '{key}' })}",
+    },
+    {
+      "default": false,
+      "template": "intl.formatMessage({ id: '{key}' })",
+    },
+  ],
+  "i18n-ally.sourceLanguage": "vi",
+  "i18n-ally.displayLanguage": "en",
+  "github.copilot.chat.codeGeneration.useInstructionFiles": true,
   "github.copilot.chat.codeGeneration.instructions": [
     {
       "text": "Use useAppSelector alternative to useSelector",
@@ -19,5 +36,8 @@
     {
       "text": "Use useAppDispatch alternative to useDispatch",
     },
+    {
+      "text": "Use const intl = useIntl() to get intl object",
+    }
   ]
 }

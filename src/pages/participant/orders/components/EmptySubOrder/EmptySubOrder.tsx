@@ -1,14 +1,21 @@
+import { useIntl } from 'react-intl';
 import classNames from 'classnames';
 
 import css from './EmptySubOrder.module.scss';
 
 const EmptySubOrder = ({
   className,
-  title = 'Hiện chưa có ngày ăn được tạo',
+  title = '',
 }: {
   className?: string;
   title?: string | React.ReactNode;
 }) => {
+  const intl = useIntl();
+
+  if (!title) {
+    title = intl.formatMessage({ id: 'hien-chua-co-ngay-an-duoc-tao' });
+  }
+
   return (
     <div className={classNames(css.container, className)}>
       <svg

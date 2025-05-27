@@ -331,7 +331,9 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
             <TopContent
               avatar={restaurantAvatar}
               restaurantName={restaurantName}
-              rating={`${totalRating} (${totalRatingNumber} đánh giá)`}
+              rating={`${totalRating} (${totalRatingNumber} ${intl.formatMessage(
+                { id: 'danh-gia-0' },
+              )})`}
               ratingNumber={totalRating}
               distance={`${distance}km`}
               onOpenReviewModal={onOpenReviewModal}

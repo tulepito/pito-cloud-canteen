@@ -1,4 +1,6 @@
 import { useEffect, useMemo } from 'react';
+import { useIntl } from 'react-intl';
+import classNames from 'classnames';
 import isEmpty from 'lodash/isEmpty';
 import { useRouter } from 'next/router';
 
@@ -92,20 +94,30 @@ function BookerSelectRestaurant() {
     });
   };
 
+  const intl = useIntl();
+
   return (
-    <Layout className={css.container}>
-      <LayoutTop className={css.topContainer}>
-        <div className={css.goBackBtn} onClick={handleGoBack}>
+    <Layout
+      className={classNames(
+        css.container,
+        '!pt-0 md:pt-[40px] !px-0 md:px-[24px]',
+      )}>
+      <LayoutTop className={classNames(css.topContainer, '!mt-0 md:mt-[40px]')}>
+        <div
+          className={classNames(css.goBackBtn, 'text-nowrap')}
+          onClick={handleGoBack}>
           <IconArrow direction="left" />
-          Quay lại
+          {intl.formatMessage({ id: 'quay-lai' })}
         </div>
-        <div className={css.pageTilte}>
+        <div className={classNames(css.pageTilte)}>
           <IconArrow
             className={css.icon}
             direction="left"
             onClick={handleGoBack}
           />
-          <div className={css.title}>danh sách nhà hàng</div>
+          <div className={css.title}>
+            {intl.formatMessage({ id: 'danh-sach-nha-hang' })}
+          </div>
         </div>
       </LayoutTop>
       <LayoutMain>

@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { useIntl } from 'react-intl';
 
 import IconClose from '@components/Icons/IconClose/IconClose';
 import Modal from '@components/Modal/Modal';
@@ -31,6 +32,8 @@ const BookerNotificationModal: React.FC<TBookerNotificationModalProps> = (
     dispatch(BookerCompaniesThunks.fetchBookerNotifications());
   }, [dispatch]);
 
+  const intl = useIntl();
+
   return (
     <Modal
       id="BookerNotificationModal"
@@ -39,7 +42,9 @@ const BookerNotificationModal: React.FC<TBookerNotificationModalProps> = (
       containerClassName={css.modalContainer}
       customHeader={
         <div className={css.header}>
-          <div className={css.title}>Thông báo</div>
+          <div className={css.title}>
+            {intl.formatMessage({ id: 'NotificationSection.title' })}
+          </div>
           <IconClose onClick={onClose} />
         </div>
       }>

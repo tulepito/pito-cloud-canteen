@@ -9,7 +9,7 @@ import RenderWhen from '@components/RenderWhen/RenderWhen';
 import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
 import SlideModal from '@components/SlideModal/SlideModal';
 import { addCommas } from '@helpers/format';
-import { FOOD_SIDE_DISH_OPTIONS } from '@src/utils/options';
+import { useFoodSideDishOptionsByLocale } from '@src/utils/options';
 import { Listing } from '@utils/data';
 import { EImageVariants } from '@utils/enums';
 import type { TListing } from '@utils/types';
@@ -38,6 +38,7 @@ const FoodDetailModal: React.FC<TFoodDetailModalProps> = ({
   const foodGetter = Listing(food!);
   const { sideDishes = [] } = foodGetter.getPublicData();
   const { title, price } = foodGetter.getAttributes();
+  const FOOD_SIDE_DISH_OPTIONS = useFoodSideDishOptionsByLocale();
 
   const renderedSideDishes = sideDishes?.map(
     (sideDish: string, index: number) => (
@@ -93,10 +94,11 @@ const FoodDetailModal: React.FC<TFoodDetailModalProps> = ({
             <div className={css.foodTitle}>{title}</div>
             <div className={css.price}>{`${addCommas(
               price?.amount,
-            )} ₫ / Phần`}</div>
+            )} ₫ / ${intl.formatMessage({ id: 'phan' })}`}</div>
           </div>
           <p className={css.description}>
-            {Listing(food!).getAttributes().description || 'Không có mô tả'}
+            {Listing(food!).getAttributes().description ||
+              intl.formatMessage({ id: 'khong-co-mo-ta' })}
           </p>
           <div className={css.sideDishesWrapper}>
             <div className={css.sideDishesTitle}>

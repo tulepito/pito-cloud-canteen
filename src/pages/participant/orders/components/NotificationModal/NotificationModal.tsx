@@ -1,3 +1,4 @@
+import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 
 import Modal from '@components/Modal/Modal';
@@ -36,6 +37,7 @@ const NotificationModal: React.FC<NotificationModalProps> = (props) => {
     (state) => state.Notification.notifications,
     shallowEqual,
   );
+  const intl = useIntl();
 
   return (
     <Modal
@@ -43,7 +45,7 @@ const NotificationModal: React.FC<NotificationModalProps> = (props) => {
       isOpen={isOpen}
       handleClose={onClose}
       className={css.modalContainer}
-      title="Thông báo">
+      title={intl.formatMessage({ id: 'thong-bao-0' })}>
       <div className={css.notifications}>
         {notifications.map((notificationItem: any) => (
           <NotificationItem

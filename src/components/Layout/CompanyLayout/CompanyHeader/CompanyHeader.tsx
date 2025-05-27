@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import React from 'react';
+import { useIntl } from 'react-intl';
 import classNames from 'classnames';
 import { useRouter } from 'next/router';
 
@@ -23,6 +24,8 @@ import { companyPaths, enGeneralPaths } from '@src/paths';
 import { CurrentUser } from '@src/utils/data';
 import { buildFullName } from '@src/utils/emailTemplate/participantOrderPicking';
 import type { TObject } from '@src/utils/types';
+
+import { LanguageSwitchButton } from './LanguageSwitchButton';
 
 import css from './CompanyHeader.module.scss';
 
@@ -68,6 +71,8 @@ const CompanyHeader: React.FC<CompanyHeaderProps> = ({
     router.push(companyPaths.Account);
   };
 
+  const intl = useIntl();
+
   const classes = classNames(css.root, showBottomLine && css.bottomLine);
 
   return (
@@ -96,6 +101,8 @@ const CompanyHeader: React.FC<CompanyHeaderProps> = ({
           <span className={css.hoverText}>{config.marketplacePhoneNumber}</span>
         </a>
         <div className={css.separator}></div>
+        <LanguageSwitchButton />
+        &nbsp;
         <ProfileMenu>
           <ProfileMenuLabel className={css.profileMenuWrapper}>
             <div className={css.avatar}>
@@ -112,14 +119,20 @@ const CompanyHeader: React.FC<CompanyHeaderProps> = ({
               className={css.menuItem}
               onClick={handleGoToAccountSettingPage}>
               <IconUser />
-              <div className={css.text}>Tài khoản</div>
+              <div className={css.text}>
+                {intl.formatMessage({
+                  id: 'EditPartnerMenuWizard.informationTabLabel',
+                })}
+              </div>
             </ProfileMenuItem>
             <ProfileMenuItem
               key="ChangeRole"
               className={css.menuItem}
               onClick={onOpenRoleSelectModal}>
               <IconSwap className={css.iconSwap} />
-              <div className={css.text}>Đổi vai trò</div>
+              <div className={css.text}>
+                {intl.formatMessage({ id: 'CompanyHeaderMobile.changeRole' })}
+              </div>
             </ProfileMenuItem>
 
             <ProfileMenuItem
@@ -127,7 +140,9 @@ const CompanyHeader: React.FC<CompanyHeaderProps> = ({
               className={css.menuItem}
               onClick={handleLogout}>
               <IconLogout className={css.logoutIcon} />
-              <div className={css.logout}>Đăng xuất</div>
+              <div className={css.logout}>
+                {intl.formatMessage({ id: 'CompanyHeaderMobile.logout' })}
+              </div>
             </ProfileMenuItem>
           </ProfileMenuContent>
         </ProfileMenu>

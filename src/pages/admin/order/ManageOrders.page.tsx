@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { FormattedMessage } from 'react-intl';
+import type { IntlShape } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import classNames from 'classnames';
 import { flatten } from 'lodash';
@@ -29,7 +30,10 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { orderAsyncActions, resetStates } from '@redux/slices/Order.slice';
 import { adminPaths, adminRoutes } from '@src/paths';
 import { Listing } from '@src/utils/data';
-import { getLabelByKey, ORDER_STATE_OPTIONS } from '@src/utils/options';
+import {
+  getLabelByKey,
+  useOrderStateOptionsByLocale,
+} from '@src/utils/options';
 import {
   ETransition,
   txIsCanceled,
@@ -98,7 +102,6 @@ const BADGE_CLASS_NAME_BASE_ON_ORDER_STATE = {
   [EOrderStates.picking]: css.badgeWarning,
   [EOrderStates.reviewed]: css.badgeWarning,
   [EOrderStates.expiredStart]: css.badgeDefault,
-
   [ETransition.START_DELIVERY]: css.badgeInProgress,
   [ETransition.COMPLETE_DELIVERY]: css.badgeSuccess,
 };
@@ -106,6 +109,8 @@ const BADGE_CLASS_NAME_BASE_ON_ORDER_STATE = {
 const renderBadgeForSubOrder = (
   tx: TTransaction,
   state: EOrderStates | EOrderDraftStates,
+  _ORDER_STATE_OPTIONS: any,
+  intl: IntlShape,
 ) => {
   if (!tx)
     return (
@@ -116,7 +121,7 @@ const renderBadgeForSubOrder = (
         )}
         labelClassName={css.badgeLabel}
         type={BADGE_TYPE_BASE_ON_ORDER_STATE[state] || EBadgeType.default}
-        label={getLabelByKey(ORDER_STATE_OPTIONS, state)}
+        label={getLabelByKey(_ORDER_STATE_OPTIONS, state)}
       />
     );
   if (txIsInitiated(tx)) {
@@ -124,22 +129,32 @@ const renderBadgeForSubOrder = (
       <Badge
         labelClassName={css.badgeLabel}
         type={EBadgeType.info}
-        label="Đang triển khai"
+        label={intl.formatMessage({ id: 'dang-trien-khai-1' })}
       />
     );
   }
   if (txIsPartnerConfirmed(tx)) {
-    return <Badge type={EBadgeType.strongWarning} label="Đối tác xác nhận" />;
+    return (
+      <Badge
+        type={EBadgeType.strongWarning}
+        label={intl.formatMessage({ id: 'doi-tac-xac-nhan' })}
+      />
+    );
   }
   if (txIsPartnerRejected(tx)) {
-    return <Badge type={EBadgeType.strongDefault} label="Đối tác từ chối" />;
+    return (
+      <Badge
+        type={EBadgeType.strongDefault}
+        label={intl.formatMessage({ id: 'doi-tac-tu-choi' })}
+      />
+    );
   }
   if (txIsDelivering(tx)) {
     return (
       <Badge
         labelClassName={css.badgeLabelLight}
         type={EBadgeType.darkBlue}
-        label="Đang giao hàng"
+        label={intl.formatMessage({ id: 'dang-giao-hang' })}
       />
     );
   }
@@ -148,7 +163,7 @@ const renderBadgeForSubOrder = (
       <Badge
         labelClassName={css.badgeLabelLight}
         type={EBadgeType.strongSuccess}
-        label="Đã giao hàng"
+        label={intl.formatMessage({ id: 'da-giao-hang' })}
       />
     );
   }
@@ -157,7 +172,7 @@ const renderBadgeForSubOrder = (
       <Badge
         labelClassName={css.badgeLabelLight}
         type={EBadgeType.strongDanger}
-        label="Huỷ đơn"
+        label={intl.formatMessage({ id: 'huy-don' })}
       />
     );
   }
@@ -166,7 +181,7 @@ const renderBadgeForSubOrder = (
     <Badge
       labelClassName={css.badgeLabelLight}
       type={EBadgeType.strongSuccess}
-      label="Đã giao hàng"
+      label={intl.formatMessage({ id: 'da-giao-hang' })}
     />
   );
 };
@@ -208,226 +223,6 @@ const OrderDetailTooltip = ({
 
   return <div className={css.tooltip}>{orderDetails}</div>;
 };
-
-const TABLE_COLUMN: TColumn[] = [
-  {
-    key: 'title',
-    label: 'ID',
-    render: ({
-      id: orderId,
-      title,
-      state,
-      subOrders,
-      parentKey,
-      timestamp,
-    }: any) => {
-      const isChildRow = !!parentKey;
-      const titleComponent = (
-        <div
-          className={classNames(
-            css.boldText,
-            isChildRow && css.firstChildCell,
-          )}>
-          #{title}
-        </div>
-      );
-
-      if (isChildRow) {
-        return (
-          <NamedLink
-            path={adminPaths.OrderDetail}
-            params={{ orderId: parentKey, timestamp }}>
-            {titleComponent}
-          </NamedLink>
-        );
-      }
-      if ([EOrderDraftStates.draft].includes(state)) {
-        return (
-          <NamedLink path={adminPaths.UpdateDraftOrder} params={{ orderId }}>
-            {titleComponent}
-          </NamedLink>
-        );
-      }
-
-      return (
-        <NamedLink path={adminPaths.OrderDetail} params={{ orderId }}>
-          {subOrders.length > 0 ? (
-            <Tooltip
-              overlayClassName={css.orderDetailTooltip}
-              overlayInnerStyle={{ backgroundColor: '#ffffff' }}
-              showArrow={false}
-              tooltipContent={<OrderDetailTooltip subOrders={subOrders} />}
-              placement="bottomLeft">
-              {titleComponent}
-            </Tooltip>
-          ) : (
-            titleComponent
-          )}
-        </NamedLink>
-      );
-    },
-    sortable: true,
-  },
-  {
-    key: 'orderName',
-    label: 'Tên đơn hàng',
-    render: ({ orderName }: any) => {
-      return <div className={css.orderName}>{orderName || <></>}</div>;
-    },
-  },
-  {
-    key: 'orderType',
-    label: 'Loại',
-    render: ({ orderType }: any) => {
-      return (
-        <div className={css.orderName}>
-          {orderType === EOrderType.normal && 'Thường'}
-          {orderType === EOrderType.group && 'Nhóm'}
-        </div>
-      );
-    },
-  },
-  {
-    key: 'address',
-    label: 'Địa điểm giao hàng',
-    render: (data: any) => {
-      return (
-        <div className={css.locationRow}>
-          <div className={css.companyName}>{data.companyName}</div>
-          {data.location || <></>}
-        </div>
-      );
-    },
-  },
-  {
-    key: 'bookerName',
-    label: 'Khách hàng',
-    render: (data: any) => {
-      return <div>{data.displayName}</div>;
-    },
-  },
-  {
-    key: 'startDate',
-    label: 'Thời gian',
-    render: (data: any) => {
-      const { startDate, endDate, parentKey } = data;
-
-      return startDate && endDate ? (
-        <div className={css.rowText}>
-          <div className={css.deliveryHour}>{data.deliveryHour}</div>
-          {parentKey ? startDate : `${startDate} - ${endDate}`}
-        </div>
-      ) : (
-        <></>
-      );
-    },
-    sortable: true,
-  },
-  {
-    key: 'restaurantName',
-    label: 'Đối tác',
-    render: ({ restaurants = [] }: any) => {
-      const { length } = restaurants;
-      const moreThanTwo = restaurants.length > 2;
-      const remainLength = length - 2;
-
-      return length > 0 ? (
-        <div className={css.rowText}>
-          {restaurants.slice(0, 2).map((restaurantName: string) => (
-            <div key={restaurantName} className={css.restaurantName}>
-              {restaurantName}
-            </div>
-          ))}
-          {moreThanTwo && (
-            <div className={css.remainText}>+ {remainLength} đối tác </div>
-          )}
-        </div>
-      ) : (
-        <></>
-      );
-    },
-  },
-  {
-    key: 'staffName',
-    label: 'Nhân viên phụ trách',
-    render: ({ staffName }: any) => {
-      return staffName ? <div>{staffName}</div> : <></>;
-    },
-    sortable: true,
-  },
-  {
-    key: 'state',
-    label: 'Trạng thái',
-    render: ({
-      state,
-      parentKey,
-      tx,
-    }: {
-      state: EOrderStates | EOrderDraftStates;
-      parentKey: string;
-      tx: TTransaction;
-    }) => {
-      return (
-        <RenderWhen condition={!!parentKey}>
-          {renderBadgeForSubOrder(tx, state)}
-          <RenderWhen.False>
-            <Badge
-              containerClassName={classNames(
-                css.badge,
-                BADGE_CLASS_NAME_BASE_ON_ORDER_STATE[state],
-              )}
-              labelClassName={css.badgeLabel}
-              type={BADGE_TYPE_BASE_ON_ORDER_STATE[state] || EBadgeType.default}
-              label={getLabelByKey(ORDER_STATE_OPTIONS, state)}
-            />
-          </RenderWhen.False>
-        </RenderWhen>
-      );
-    },
-    sortable: true,
-  },
-  {
-    key: 'isPaid',
-    label: 'Thanh toán',
-    render: ({ isPaid }) => (
-      <Badge
-        containerClassName={classNames(
-          css.badge,
-          isPaid ? css.badgeSuccess : css.badgeWarning,
-        )}
-        labelClassName={css.badgeLabel}
-        type={isPaid ? EBadgeType.success : EBadgeType.warning}
-        label={isPaid ? 'Đã thanh toán' : 'Chưa thanh toán'}
-      />
-    ),
-  },
-  {
-    key: 'isParent',
-    label: '',
-    render: ({ isParent }, _, collapseRowController) => {
-      return (
-        isParent && (
-          <IconArrow
-            direction="right"
-            onClick={collapseRowController?.toggle}
-            className={classNames(
-              css.iconArrow,
-              collapseRowController?.value && css.rotate,
-            )}
-          />
-        )
-      );
-    },
-  },
-];
-
-function getDisplayedColumn(
-  showOrderType: boolean | undefined,
-): string[] | (() => string[]) {
-  return TABLE_COLUMN.map((column) => column.key).filter(
-    (column) => showOrderType || (!showOrderType && column !== 'orderType'),
-  );
-}
 
 const filterOrder = (subOrders: any[], filterList: TObject) => {
   const { startDate, endDate } = filterList;
@@ -662,6 +457,7 @@ const sortOrders = ({ columnName, type }: TTableSortValue, data: any) => {
 
 const ManageOrdersPage = ({ showOrderType }: { showOrderType?: boolean }) => {
   const dispatch = useAppDispatch();
+  const intl = useIntl();
   const router = useRouter();
   // eslint-disable-next-line @typescript-eslint/naming-convention
   const {
@@ -677,6 +473,237 @@ const ManageOrdersPage = ({ showOrderType }: { showOrderType?: boolean }) => {
   const startDateOnQuery = meta_startDate as string | undefined;
   const endDateOnQuery = meta_endDate as string | undefined;
   const stateOnQuery = meta_state as string | undefined;
+
+  const ORDER_STATE_OPTIONS = useOrderStateOptionsByLocale();
+  const TABLE_COLUMN: TColumn[] = [
+    {
+      key: 'title',
+      label: 'ID',
+      render: ({
+        id: orderId,
+        title,
+        state,
+        subOrders,
+        parentKey,
+        timestamp,
+      }: any) => {
+        const isChildRow = !!parentKey;
+        const titleComponent = (
+          <div
+            className={classNames(
+              css.boldText,
+              isChildRow && css.firstChildCell,
+            )}>
+            #{title}
+          </div>
+        );
+
+        if (isChildRow) {
+          return (
+            <NamedLink
+              path={adminPaths.OrderDetail}
+              params={{ orderId: parentKey, timestamp }}>
+              {titleComponent}
+            </NamedLink>
+          );
+        }
+        if ([EOrderDraftStates.draft].includes(state)) {
+          return (
+            <NamedLink path={adminPaths.UpdateDraftOrder} params={{ orderId }}>
+              {titleComponent}
+            </NamedLink>
+          );
+        }
+
+        return (
+          <NamedLink path={adminPaths.OrderDetail} params={{ orderId }}>
+            {subOrders.length > 0 ? (
+              <Tooltip
+                overlayClassName={css.orderDetailTooltip}
+                overlayInnerStyle={{ backgroundColor: '#ffffff' }}
+                showArrow={false}
+                tooltipContent={<OrderDetailTooltip subOrders={subOrders} />}
+                placement="bottomLeft">
+                {titleComponent}
+              </Tooltip>
+            ) : (
+              titleComponent
+            )}
+          </NamedLink>
+        );
+      },
+      sortable: true,
+    },
+    {
+      key: 'orderName',
+      label: intl.formatMessage({ id: 'ten-don-hang' }),
+      render: ({ orderName }: any) => {
+        return <div className={css.orderName}>{orderName || <></>}</div>;
+      },
+    },
+    {
+      key: 'orderType',
+      label: intl.formatMessage({ id: 'loai' }),
+      render: ({ orderType }: any) => {
+        return (
+          <div className={css.orderName}>
+            {orderType === EOrderType.normal &&
+              intl.formatMessage({ id: 'thuong' })}
+            {orderType === EOrderType.group &&
+              intl.formatMessage({ id: 'nhom' })}
+          </div>
+        );
+      },
+    },
+    {
+      key: 'address',
+      label: intl.formatMessage({ id: 'dia-diem-giao-hang' }),
+      render: (data: any) => {
+        return (
+          <div className={css.locationRow}>
+            <div className={css.companyName}>{data.companyName}</div>
+            {data.location || <></>}
+          </div>
+        );
+      },
+    },
+    {
+      key: 'bookerName',
+      label: intl.formatMessage({ id: 'khach-hang' }),
+      render: (data: any) => {
+        return <div>{data.displayName}</div>;
+      },
+    },
+    {
+      key: 'startDate',
+      label: intl.formatMessage({ id: 'thoi-gian' }),
+      render: (data: any) => {
+        const { startDate, endDate, parentKey } = data;
+
+        return startDate && endDate ? (
+          <div className={css.rowText}>
+            <div className={css.deliveryHour}>{data.deliveryHour}</div>
+            {parentKey ? startDate : `${startDate} - ${endDate}`}
+          </div>
+        ) : (
+          <></>
+        );
+      },
+      sortable: true,
+    },
+    {
+      key: 'restaurantName',
+      label: intl.formatMessage({ id: 'doi-tac' }),
+      render: ({ restaurants = [] }: any) => {
+        const { length } = restaurants;
+        const moreThanTwo = restaurants.length > 2;
+        const remainLength = length - 2;
+
+        return length > 0 ? (
+          <div className={css.rowText}>
+            {restaurants.slice(0, 2).map((restaurantName: string) => (
+              <div key={restaurantName} className={css.restaurantName}>
+                {restaurantName}
+              </div>
+            ))}
+            {moreThanTwo && (
+              <div className={css.remainText}>
+                + {remainLength} {intl.formatMessage({ id: 'doi-tac-0' })}{' '}
+              </div>
+            )}
+          </div>
+        ) : (
+          <></>
+        );
+      },
+    },
+    {
+      key: 'staffName',
+      label: intl.formatMessage({ id: 'nhan-vien-phu-trach' }),
+      render: ({ staffName }: any) => {
+        return staffName ? <div>{staffName}</div> : <></>;
+      },
+      sortable: true,
+    },
+    {
+      key: 'state',
+      label: intl.formatMessage({ id: 'trang-thai' }),
+      render: ({
+        state,
+        parentKey,
+        tx,
+      }: {
+        state: EOrderStates | EOrderDraftStates;
+        parentKey: string;
+        tx: TTransaction;
+      }) => {
+        return (
+          <RenderWhen condition={!!parentKey}>
+            {renderBadgeForSubOrder(tx, state, ORDER_STATE_OPTIONS, intl)}
+            <RenderWhen.False>
+              <Badge
+                containerClassName={classNames(
+                  css.badge,
+                  BADGE_CLASS_NAME_BASE_ON_ORDER_STATE[state],
+                )}
+                labelClassName={css.badgeLabel}
+                type={
+                  BADGE_TYPE_BASE_ON_ORDER_STATE[state] || EBadgeType.default
+                }
+                label={getLabelByKey(ORDER_STATE_OPTIONS, state)}
+              />
+            </RenderWhen.False>
+          </RenderWhen>
+        );
+      },
+      sortable: true,
+    },
+    {
+      key: 'isPaid',
+      label: intl.formatMessage({ id: 'thanh-toan' }),
+      render: ({ isPaid }) => (
+        <Badge
+          containerClassName={classNames(
+            css.badge,
+            isPaid ? css.badgeSuccess : css.badgeWarning,
+          )}
+          labelClassName={css.badgeLabel}
+          type={isPaid ? EBadgeType.success : EBadgeType.warning}
+          label={
+            isPaid
+              ? intl.formatMessage({ id: 'da-thanh-toan' })
+              : intl.formatMessage({ id: 'chua-thanh-toan-0' })
+          }
+        />
+      ),
+    },
+    {
+      key: 'isParent',
+      label: '',
+      render: ({ isParent }, _, collapseRowController) => {
+        return (
+          isParent && (
+            <IconArrow
+              direction="right"
+              onClick={collapseRowController?.toggle}
+              className={classNames(
+                css.iconArrow,
+                collapseRowController?.value && css.rotate,
+              )}
+            />
+          )
+        );
+      },
+    },
+  ];
+
+  function getDisplayedColumn(
+    _showOrderType: boolean | undefined,
+  ): string[] | (() => string[]) {
+    return TABLE_COLUMN.map((column) => column.key).filter(
+      (column) => _showOrderType || (!_showOrderType && column !== 'orderType'),
+    );
+  }
 
   const { isReady } = router;
   const [sortValue, setSortValue] = useState<TTableSortValue>();
@@ -884,7 +911,7 @@ const ManageOrdersPage = ({ showOrderType }: { showOrderType?: boolean }) => {
           <FormattedMessage id="ManageOrders.title" />
         </h1>
         <NamedLink path={adminRoutes.CreateOrder.path}>
-          <Button>Tạo đơn</Button>
+          <Button>{intl.formatMessage({ id: 'tao-don' })}</Button>
         </NamedLink>
       </div>
       <div className={css.filterForm}>
@@ -943,7 +970,9 @@ const ManageOrdersPage = ({ showOrderType }: { showOrderType?: boolean }) => {
                 trigger="click"
                 overlayClassName={css.orderDetailTooltip}
                 overlayInnerStyle={{ backgroundColor: '#fff', padding: 0 }}>
-                <Button variant="secondary">Cột</Button>
+                <Button variant="secondary">
+                  {intl.formatMessage({ id: 'cot' })}
+                </Button>
               </Tooltip>
               <Tooltip
                 tooltipContent={
@@ -957,7 +986,11 @@ const ManageOrdersPage = ({ showOrderType }: { showOrderType?: boolean }) => {
                 trigger="click"
                 overlayClassName={css.orderDetailTooltip}
                 overlayInnerStyle={{ backgroundColor: '#fff', padding: 0 }}>
-                <Button variant="secondary">Tải danh sách</Button>
+                <Button variant="secondary">
+                  {intl.formatMessage({
+                    id: 'ManagePaymentsPage.actionButton.downloadPayment',
+                  })}
+                </Button>
               </Tooltip>
             </>
           }

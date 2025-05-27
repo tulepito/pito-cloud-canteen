@@ -5,6 +5,7 @@ import Avatar from '@components/Avatar/Avatar';
 import { InlineTextButton } from '@components/Button/Button';
 import IconLogout from '@components/Icons/IconLogout/IconLogout';
 import IconSwap from '@components/Icons/IconSwap/IconSwap';
+import { LanguageSwitchButton } from '@components/Layout/CompanyLayout/CompanyHeader/LanguageSwitchButton';
 import NamedLink from '@components/NamedLink/NamedLink';
 import PitoLogo from '@components/PitoLogo/PitoLogo';
 import ProfileMenu from '@components/ProfileMenu/ProfileMenu';
@@ -69,34 +70,43 @@ const GeneralLayoutTopBar = () => {
           </NamedLink>
         </div>
         <div className={css.divider} />
+        <div className="flex items-center">
+          <LanguageSwitchButton />
 
-        <ProfileMenu>
-          <ProfileMenuLabel className={css.profileMenuWrapper}>
-            <div className={css.avatar}>
-              <Avatar disableProfileLink user={currentUser} />
-            </div>
-          </ProfileMenuLabel>
-          <ProfileMenuContent className={css.profileMenuContent}>
-            {shouldShowChangeRoleOption && (
-              <ProfileMenuItem
-                key="ChangeRole"
-                className={css.menuItem}
-                onClick={onOpenRoleSelectModal}>
-                <IconSwap />
-                <div className={css.text}>Đổi vai trò</div>
+          <ProfileMenu>
+            <ProfileMenuLabel className={css.profileMenuWrapper}>
+              <div className={css.avatar}>
+                <Avatar disableProfileLink user={currentUser} />
+              </div>
+            </ProfileMenuLabel>
+            <ProfileMenuContent className={css.profileMenuContent}>
+              {shouldShowChangeRoleOption && (
+                <ProfileMenuItem
+                  key="ChangeRole"
+                  className={css.menuItem}
+                  onClick={onOpenRoleSelectModal}>
+                  <IconSwap />
+                  <div className={css.text}>
+                    {intl.formatMessage({
+                      id: 'CompanyHeaderMobile.changeRole',
+                    })}
+                  </div>
+                </ProfileMenuItem>
+              )}
+              <ProfileMenuItem key="Logout" className={css.menuItem}>
+                <IconLogout className={css.logoutIcon} />
+                <InlineTextButton
+                  type="button"
+                  onClick={handleLogout}
+                  className={css.logout}>
+                  <p>
+                    {intl.formatMessage({ id: 'CompanyHeaderMobile.logout' })}
+                  </p>
+                </InlineTextButton>
               </ProfileMenuItem>
-            )}
-            <ProfileMenuItem key="Logout" className={css.menuItem}>
-              <IconLogout className={css.logoutIcon} />
-              <InlineTextButton
-                type="button"
-                onClick={handleLogout}
-                className={css.logout}>
-                <p>Đăng xuất</p>
-              </InlineTextButton>
-            </ProfileMenuItem>
-          </ProfileMenuContent>
-        </ProfileMenu>
+            </ProfileMenuContent>
+          </ProfileMenu>
+        </div>
       </div>
     </div>
   );

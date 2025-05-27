@@ -1,11 +1,12 @@
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm, FormSpy } from 'react-final-form';
+import { useIntl } from 'react-intl';
 import classNames from 'classnames';
 import { useRouter } from 'next/router';
 
 import Form from '@components/Form/Form';
 import { useAppSelector } from '@hooks/reduxHooks';
-import { distanceOptions, ratingOptions } from '@src/marketplaceConfig';
+import { useOptionLabelsByLocale } from '@src/marketplaceConfig';
 
 import CollapseFilter from '../../../components/CollapseFilter/CollapseFilter';
 
@@ -69,48 +70,50 @@ const FilterSidebarFormComponent: React.FC<TFilterSidebarFormComponentProps> = (
   };
 
   const classes = classNames(css.root, className);
+  const intl = useIntl();
+  const optionLabels = useOptionLabelsByLocale();
 
   return (
     <Form onSubmit={handleSubmit} className={classes}>
       <FormSpy onChange={handleFormChange} subscription={{ values: true }} />
       <div className={css.header}>
-        <div className={css.title}>Bộ lọc</div>
+        <div className={css.title}>{intl.formatMessage({ id: 'bo-loc' })}</div>
         <div className={css.removeFilters} onClick={onResetAllFilters}>
-          Xoá tất cả bộ lọc
+          {intl.formatMessage({ id: 'xoa-tat-ca-bo-loc' })}
         </div>
       </div>
       <div className={css.filtersContainer}>
         <div className={css.filterWrapper}>
           <CollapseFilter
-            title="Loại menu"
+            title={intl.formatMessage({ id: 'loai-menu' })}
             name="menuTypes"
             options={menuTypesOptions}
           />
         </div>
         <div className={css.filterWrapper}>
           <CollapseFilter
-            title="Loại ẩm thực"
+            title={intl.formatMessage({ id: 'loai-am-thuc' })}
             name="categories"
             options={categoriesOptions}
           />
         </div>
         <div className={css.filterWrapper}>
           <CollapseFilter
-            title="Khoảng cách"
+            title={intl.formatMessage({ id: 'khoang-cach' })}
             name="distance"
-            options={distanceOptions}
+            options={optionLabels.distanceOptions}
           />
         </div>
         <div className={css.filterWrapper}>
           <CollapseFilter
-            title="Đánh giá"
+            title={intl.formatMessage({ id: 'danh-gia' })}
             name="rating"
-            options={ratingOptions}
+            options={optionLabels.ratingOptions}
           />
         </div>
         <div className={css.filterWrapper}>
           <CollapseFilter
-            title="Bao bì"
+            title={intl.formatMessage({ id: 'bao-bi' })}
             name="packaging"
             options={packagingOptions}
           />

@@ -26,10 +26,9 @@ import FileHelpers from '@helpers/fileHelpers';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { partnerPaths } from '@src/paths';
 import {
-  FOOD_SIDE_DISH_OPTIONS,
-  FOOD_TYPE_OPTIONS,
   MENU_TYPE_OPTIONS,
   OTHER_OPTION,
+  useFoodTypeOptionsByLocale,
 } from '@src/utils/options';
 import type { TKeyValue } from '@src/utils/types';
 import { EImageVariants } from '@utils/enums';
@@ -82,6 +81,8 @@ const EditPartnerFoodFormComponent: React.FC<
   } = props;
   const dispatch = useAppDispatch();
   const ready = isEqual(submittedValues, values);
+  const FOOD_TYPE_OPTIONS = useFoodTypeOptionsByLocale();
+  const FOOD_SIDE_DISH_OPTIONS = useFoodTypeOptionsByLocale();
   const {
     uploadedImages,
     uploadedImagesOrder,

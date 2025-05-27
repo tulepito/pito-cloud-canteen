@@ -1,11 +1,12 @@
 import { useState } from 'react';
+import { useIntl } from 'react-intl';
 import classNames from 'classnames';
 import format from 'date-fns/format';
-import viLocale from 'date-fns/locale/vi';
 
 import IconCalendar from '@components/Icons/IconCalender/IconCalender';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import useBoolean from '@hooks/useBoolean';
+import { useLocaleTimeProvider } from '@src/translations/TranslationProvider';
 
 import type { TMealDateFormValues } from '../MealDateForm/MealDateForm';
 import OrderDateFieldModal from '../OrderDateFieldModal/OrderDateFieldModal';
@@ -25,7 +26,9 @@ type OrderDateFieldProps = {
   dateRangeNoLimit?: boolean;
 };
 const OrderDateField: React.FC<OrderDateFieldProps> = (props) => {
+  const localeTimeProvider = useLocaleTimeProvider();
   const { usePreviousData = false, form, values, hideLabel, onClick } = props;
+  const intl = useIntl();
   const [selectedTimeRangeOption, setSelectedTimeRangeOption] =
     useState<string>('custom');
   const orderDateFieldModalController = useBoolean();
@@ -44,7 +47,9 @@ const OrderDateField: React.FC<OrderDateFieldProps> = (props) => {
   return (
     <div className={css.orderDateFieldWrapper}>
       {!hideLabel && (
-        <div className={css.orderDateFieldLabel}>Chọn khung thời gian đặt</div>
+        <div className={css.orderDateFieldLabel}>
+          {intl.formatMessage({ id: 'OrderDateField.label.selectTimeRange' })}
+        </div>
       )}
       <div
         className={css.orderDateFieldInput}
@@ -54,62 +59,90 @@ const OrderDateField: React.FC<OrderDateFieldProps> = (props) => {
           <span>
             {!!startDate &&
               format(startDate!, 'EEE, dd MMMM, yyyy', {
-                locale: viLocale,
+                locale: localeTimeProvider,
               })}{' '}
             -{' '}
             {!!endDate &&
               format(endDate!, 'EEE, dd MMMM, yyyy', {
-                locale: viLocale,
+                locale: localeTimeProvider,
               })}
           </span>
           <RenderWhen.False>
-            <span className={css.placeholder}>Chọn thời gian đặt</span>
+            <span className={css.placeholder}>
+              {intl.formatMessage({
+                id: 'OrderDateField.placeholder.selectTime',
+              })}
+            </span>
           </RenderWhen.False>
         </RenderWhen>
       </div>
       <div className={css.orderDateFieldInputMobile}>
-        {!hideLabel && <div className={css.label}>Chọn ngày bắt đầu</div>}
+        {!hideLabel && (
+          <div className={css.label}>
+            {intl.formatMessage({ id: 'OrderDateField.label.selectStartDate' })}
+          </div>
+        )}
         <div
           className={css.fieldInput}
           onClick={orderDateFieldModalMobileController.setTrue}>
           <IconCalendar />
           {hideLabel && !startDate && (
-            <span className="text-stone-400">Chọn ngày bắt đầu</span>
+            <span className="text-stone-400">
+              {intl.formatMessage({
+                id: 'OrderDateField.placeholder.selectStartDate',
+              })}
+            </span>
           )}
           <RenderWhen condition={!!startDate}>
             <span>
               {!!startDate &&
                 format(startDate!, 'EEE, dd MMMM, yyyy', {
-                  locale: viLocale,
+                  locale: localeTimeProvider,
                 })}
             </span>
             <RenderWhen.False>
               {!hideLabel && (
-                <span className={css.placeholder}>Chọn ngày bắt đầu</span>
+                <span className={css.placeholder}>
+                  {intl.formatMessage({
+                    id: 'OrderDateField.placeholder.selectStartDate',
+                  })}
+                </span>
               )}
             </RenderWhen.False>
           </RenderWhen>
         </div>
       </div>
       <div className={css.orderDateFieldInputMobile}>
-        {!hideLabel && <div className={css.label}>Chọn ngày kết thúc</div>}
+        {!hideLabel && (
+          <div className={css.label}>
+            {intl.formatMessage({ id: 'OrderDateField.label.selectEndDate' })}
+          </div>
+        )}
         <div
           className={css.fieldInput}
           onClick={orderDateFieldModalMobileController.setTrue}>
           <IconCalendar />
           {hideLabel && !endDate && (
-            <span className="text-stone-400">Chọn ngày kết thúc</span>
+            <span className="text-stone-400">
+              {intl.formatMessage({
+                id: 'OrderDateField.placeholder.selectEndDate',
+              })}
+            </span>
           )}
           <RenderWhen condition={!!endDate}>
             <span>
               {!!endDate &&
                 format(endDate!, 'EEE, dd MMMM, yyyy', {
-                  locale: viLocale,
+                  locale: localeTimeProvider,
                 })}
             </span>
             <RenderWhen.False>
               {!hideLabel && (
-                <span className={css.placeholder}>Chọn ngày kết thúc</span>
+                <span className={css.placeholder}>
+                  {intl.formatMessage({
+                    id: 'OrderDateField.placeholder.selectEndDate',
+                  })}
+                </span>
               )}
             </RenderWhen.False>
           </RenderWhen>

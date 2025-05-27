@@ -1,5 +1,6 @@
 import type { PropsWithChildren } from 'react';
 import React from 'react';
+import { useIntl } from 'react-intl';
 
 import Chip from '@components/Chip/Chip';
 import IconClose from '@components/Icons/IconClose/IconClose';
@@ -72,11 +73,13 @@ function KeywordSearchPopoverContent({
 }: KeywordSearchPopoverContentProps) {
   const hasRecentKeyWords = recentKeywords.length > 0;
   const hasPopularKeywords = popularKeywords.length > 0;
+  const intl = useIntl();
 
   return (
     <div className={css.root} {...divProps}>
       {hasRecentKeyWords && (
-        <KeywordSearchPopoverContentSection title="Tìm kiếm gần đây">
+        <KeywordSearchPopoverContentSection
+          title={intl.formatMessage({ id: 'tim-kiem-gan-day' })}>
           <RecentKeywordsList>
             {recentKeywords.map((keyword) => (
               <RecentKeywordsListItem
@@ -93,7 +96,8 @@ function KeywordSearchPopoverContent({
         <div className={css.divider}></div>
       )}
       {hasPopularKeywords && (
-        <KeywordSearchPopoverContentSection title="Tìm kiếm phổ biến">
+        <KeywordSearchPopoverContentSection
+          title={intl.formatMessage({ id: 'tim-kiem-pho-bien' })}>
           <ChipList>
             {popularKeywords.map((keyword) => (
               <Chip
