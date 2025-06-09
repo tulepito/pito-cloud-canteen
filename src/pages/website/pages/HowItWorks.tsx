@@ -1,5 +1,5 @@
 import CTAAlt from '../components/CTAAlt';
-import Decor2 from '../components/Decor2';
+// import Decor2 from '../components/Decor2';
 import FAQsAlt from '../components/FAQsAlt';
 import HighlightedFeaturesCard from '../components/HighlightedFeaturesCard';
 import Hero from '../components/HowItWorks/Hero';
@@ -15,15 +15,16 @@ const HowItWorks = () => {
     <div className="overflow-hidden">
       <Hero />
       <Hero2 />
+      <TrustedCompanies />
       <HowItWorksDynamicCard />
       <HighlightedFeaturesCard />
-      <Decor2 />
+      {/* <Decor2 /> */}
       <Testimonials />
-      <TrustedCompanies />
       <SingleTestimonial />
       <SimplifyOrdering />
       <FAQsAlt />
       <CTAAlt />
+      <div className="w-full bg-neutral-200 h-[1px]"></div>
     </div>
   );
 };

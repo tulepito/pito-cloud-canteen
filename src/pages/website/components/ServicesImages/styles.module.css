@@ -1,0 +1,94 @@
+.carousel__services_feature {
+  margin: 0 auto;
+  padding: 0;
+  overflow-x: auto !important;
+  scroll-behavior: smooth;
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  position: relative;
+  gap: 16px;
+  cursor: grab;
+
+  &:hover .services_feature {
+    animation-play-state: paused;
+  }
+
+  /* Ẩn scrollbar trên Firefox, IE/Edge */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.carousel__services_feature::-webkit-scrollbar {
+  display: none;
+  /* Chrome, Safari */
+}
+
+.carousel__services_feature.dragging {
+  cursor: grabbing;
+}
+
+.services_feature {
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+  padding: 16px 0;
+  animation-play-state: running;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  position: relative;
+  flex-wrap: nowrap;
+  animation: scrolling 240s linear infinite;
+}
+
+.carousel__services_feature:hover .services_feature,
+.services__item_feature:hover ~ .services_feature {
+  animation-play-state: paused;
+}
+
+.services__item_feature:hover {
+  transform: translateY(-4px);
+  z-index: 2;
+}
+
+.services__item_feature:hover ~ .services_feature {
+  animation-play-state: paused;
+}
+
+@keyframes scrolling {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+@media (min-width: 1024px) {
+  .services__item_feature {
+    flex: 0 0 280px;
+    width: 280px;
+    max-width: 280px;
+    min-width: 280px;
+    height: 400px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    z-index: 1;
+  }
+}
+
+@media (max-width: 1024px) {
+  .services__item_feature {
+    flex: 0 0 270px;
+    width: 270px;
+    max-width: 270px;
+    min-width: 270px;
+    height: 350px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    z-index: 1;
+  }
+}

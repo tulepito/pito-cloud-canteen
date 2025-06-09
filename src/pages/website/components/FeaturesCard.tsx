@@ -13,15 +13,15 @@ const FeaturesCard = () => {
   const intl = useIntl();
 
   return (
-    <div className="flex flex-col md:gap-20 md:pb-36 gap-10 relative max-w-[1024px] mx-auto">
+    <div className="flex flex-col md:gap-10 md:pb-16 gap-5 relative max-w-[1024px] mx-auto">
       {/* Heading */}
       <div className="flex flex-col gap-2 items-center">
-        <span className="text-text w-2/3 text-center">
+        <span className="text-text w-full md:w-2/3 text-center">
           {intl.formatMessage({
             id: 'reclaim-your-time-boost-team-satisfaction',
           })}
         </span>
-        <span className="font-alt text-2xl md:text-4xl font-bold md:w-1/2 text-center md:leading-[3rem]">
+        <span className="font-alt text-2xl md:text-[42px] font-bold text-center md:leading-[3rem] md:whitespace-pre-line">
           {intl.formatMessage({
             id: 'designed-for-hr-and-admin-professionals-in-tech',
           })}
@@ -70,12 +70,12 @@ const FeaturesCard = () => {
       {/* Decorations */}
       <Image
         src={lemon}
-        className="absolute md:top-24 top-60 md:left-auto -left-24 size-36 -rotate-45 -z-10"
+        className="absolute md:top-32 top-60 md:-left-10 -left-24 size-36 -rotate-45 -z-10"
         alt="lemon triangle decor"
       />
       <Image
         src={yellow}
-        className="absolute md:bottom-24 md:top-auto top-40 md:right-12 -right-12 size-20 -z-10"
+        className="absolute md:bottom-24 md:top-auto top-40 md:-right-12 -right-12 size-20 -z-10"
         alt="yellow circle decor"
       />
     </div>

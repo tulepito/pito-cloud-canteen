@@ -1,8 +1,9 @@
 import React from 'react';
+import { useRouter } from 'next/router';
 
-import Container from '../components/Container';
 import Footer from '../components/Footer';
 import Modal from '../components/Modal';
+import ModalAlt from '../components/ModalAlt';
 // eslint-disable-next-line import/no-cycle
 import Navbar from '../components/Navbar';
 
@@ -23,12 +24,25 @@ export const useModal = () => {
 };
 export const ModalProvider = ({ children }: { children: React.ReactNode }) => {
   const [isModalOpen, setIsModalOpen] = React.useState(false);
+  const router = useRouter();
+
+  let ModalComponent = Modal;
+
+  if (
+    router.pathname.includes('how-it-works') ||
+    router.pathname.includes('solutions')
+  ) {
+    ModalComponent = ModalAlt as any;
+  }
 
   return (
     <ModalContext.Provider value={{ isModalOpen, setIsModalOpen }}>
       {children}
 
-      <Modal isModalOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <ModalComponent
+        isModalOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </ModalContext.Provider>
   );
 };
@@ -48,9 +62,7 @@ const Layout = ({
       }}>
       <ModalProvider>
         <Navbar />
-        <Container>
-          <main className="pt-[80px]">{children}</main>
-        </Container>
+        <main className="pt-[80px]">{children}</main>
         {!noFooter && <Footer />}
       </ModalProvider>
     </div>

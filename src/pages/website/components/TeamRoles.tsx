@@ -4,19 +4,25 @@ import Image from 'next/image';
 import lemon from '../assets/decorations/lemon.svg';
 import pink from '../assets/decorations/pink.svg';
 import yellow from '../assets/decorations/yellow.svg';
-import employee from '../assets/employee.png';
-import hr from '../assets/hr.png';
+import employee from '../assets/employee.webp';
+import hr from '../assets/hr.webp';
+import { useModal } from '../pages/Layout';
 
 const TeamRoles = () => {
   const intl = useIntl();
+  const { setIsModalOpen } = useModal();
 
   return (
-    <div className="py-20 md:px-0 flex flex-col items-center gap-7 max-w-[1024px] mx-auto">
-      <span className="font-alt font-bold text-2xl w-2/3 text-center md:text-4xl md:leading-[3rem]">
+    <div className="pt-16 md:px-0 flex flex-col items-center gap-7 max-w-[1024px] mx-auto">
+      <span className="font-alt font-bold text-2xl w-full text-center md:text-[42px] md:leading-[3rem] md:whitespace-pre-line">
         {intl.formatMessage({ id: 'built-for-every-role-in-your-team' })}
       </span>
       <a
         href=""
+        onClick={(e) => {
+          e.preventDefault();
+          setIsModalOpen(true);
+        }}
         className="btn border border-solid border-gray-300 text-black hover:bg-black hover:text-white md:w-fit w-full">
         {intl.formatMessage({ id: 'book-free-consultation' })}
       </a>

@@ -1,7 +1,7 @@
 import { useIntl } from 'react-intl';
 import Image from 'next/image';
 
-import CTABg from '../assets/CTABg.png';
+import CTABg from '../assets/CTABg.webp';
 import { useModal } from '../pages/Layout';
 
 const CTAAlt = () => {
@@ -20,16 +20,18 @@ const CTAAlt = () => {
         <span className="text-text text-center md:text-left">
           {intl.formatMessage({ id: 'your-teams-meals' })}
         </span>
-        <span className="font-alt font-bold text-2xl md:text-6xl max-w-[600px] text-center md:text-left">
+        <span className="font-alt font-bold text-2xl md:text-6xl max-w-[700px] text-center leading-tight md:text-left md:whitespace-pre-line">
           {intl.formatMessage({ id: 'ready-to-simplify-team-lunches' })}
         </span>
-        <span className="text-text text-center md:text-left">
-          {intl.formatMessage({ id: 'lets-build-your-custom-plan' })}
-        </span>
+        {intl.locale === 'en' && (
+          <span className="text-text text-center md:text-left">
+            {intl.formatMessage({ id: 'lets-build-your-custom-plan' })}
+          </span>
+        )}
         <button
           onClick={() => setIsModalOpen(true)}
           className="btn hover:bg-black hover:text-white md:w-fit bg-white px-12 mt-3 md:mt-8 w-full ">
-          {intl.formatMessage({ id: 'get-started' })}
+          {intl.formatMessage({ id: 'get-advice' })}
         </button>
       </div>
     </div>

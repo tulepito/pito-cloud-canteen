@@ -4,9 +4,9 @@ import { useIntl } from 'react-intl';
 import type { StaticImageData } from 'next/image';
 import Image from 'next/image';
 
-import img0 from '../assets/why.png';
-import img1 from '../assets/why2.png';
-import img2 from '../assets/why3.png';
+import img0 from '../assets/why.webp';
+import img1 from '../assets/why2.webp';
+import img2 from '../assets/why3.webp';
 
 interface FAQ {
   question: string;
@@ -63,17 +63,18 @@ const WhyChooseUs = () => {
   };
 
   return (
-    <div className="pt-20 flex md:flex-row flex-col-reverse gap-10 md:px-0 md:pb-36 max-w-[1024px] mx-auto">
+    <div className="pt-16 flex md:flex-row flex-col-reverse gap-10 md:px-0 md:pb-16 max-w-[1024px] mx-auto">
       <div className="md:w-1/2">
         <Image
           src={faqs[activeIndex].image}
           className="rounded-2xl object-contain bg-sky-200 w-full h-auto"
           alt={`FAQ visual ${activeIndex}`}
+          priority
         />
       </div>
 
       <div className="flex flex-col gap-8 flex-1">
-        <span className="font-alt font-bold text-2xl md:text-4xl md:leading-[3rem]">
+        <span className="font-alt font-bold text-2xl md:text-[42px] md:leading-[3rem] md:whitespace-pre-line">
           {intl.formatMessage({ id: 'why-tech-leaders-choose-pito' })}
         </span>
 
@@ -85,7 +86,7 @@ const WhyChooseUs = () => {
               <div key={index} className="py-4">
                 <button
                   onClick={() => toggleFAQ(index)}
-                  className="w-full text-left flex justify-between items-center font-semibold text-lg text-black focus:outline-none cursor-pointer">
+                  className="w-full text-left text-xl flex justify-between items-center font-semibold text-black focus:outline-none cursor-pointer">
                   {faq.question}
                   <span className="text-[#A8A8A8] text-xl">
                     {isOpen ? <PiMinusBold /> : <PiPlusBold />}

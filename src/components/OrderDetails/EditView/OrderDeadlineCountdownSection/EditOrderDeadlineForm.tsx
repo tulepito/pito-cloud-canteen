@@ -11,7 +11,9 @@ import FieldDatePicker from '@components/FormFields/FieldDatePicker/FieldDatePic
 import FieldDropdownSelect from '@components/FormFields/FieldDropdownSelect/FieldDropdownSelect';
 import IconCalendar from '@components/Icons/IconCalender/IconCalender';
 import IconClock from '@components/Icons/IconClock/IconClock';
-import { TimeOptions } from '@utils/dates';
+import { useAppSelector } from '@hooks/reduxHooks';
+import { EUserSystemPermission } from '@src/utils/enums';
+import { formatDate, renderListTimeOptions } from '@utils/dates';
 
 import css from './EditOrderDeadlineForm.module.scss';
 
@@ -34,7 +36,11 @@ const EditOrderDeadlineFormComponent: React.FC<
   const { handleSubmit, startDate, values, form, pristine } = props;
   const intl = useIntl();
 
-  const today = new Date();
+  const userPermission = useAppSelector((state) => state.user.userPermission);
+
+  const isAdminFlow = EUserSystemPermission.admin === userPermission;
+
+  const today = useMemo(() => new Date(), []);
   const maxSelectedDate = DateTime.fromMillis(startDate!)
     .minus({ day: 2 })
     .toJSDate();
@@ -47,12 +53,18 @@ const EditOrderDeadlineFormComponent: React.FC<
 
   const parsedDeliveryHourOptions = useMemo(
     () =>
-      TimeOptions.map((option) => ({
+      renderListTimeOptions({
+        selectedDate: formatDate(new Date(values.deadlineDate)),
+      }).map((option) => ({
         label: option.label,
         key: option.key,
       })),
-    [],
+    [values.deadlineDate],
   );
+
+  const minDate = useMemo(() => {
+    return isAdminFlow ? today : addDays(today, 1);
+  }, [isAdminFlow, today]);
 
   return (
     <Form onSubmit={handleSubmit} className={css.root}>
@@ -67,7 +79,7 @@ const EditOrderDeadlineFormComponent: React.FC<
             id: 'EditOrderDeadlineForm.deadlineDate.label',
           })}
           autoComplete="off"
-          minDate={addDays(today, 1)}
+          minDate={minDate}
           maxDate={maxSelectedDate}
           dateFormat={'EEE, dd MMMM, yyyy'}
         />

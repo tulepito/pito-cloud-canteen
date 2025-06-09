@@ -8,8 +8,8 @@ const SingleTestimonial = () => {
   const intl = useIntl();
 
   return (
-    <div className="md:px-52 md:pb-36 px-5 md:pt-16 pt-24 flex flex-col gap-5 items-center max-w-[1224px] mx-auto">
-      <span className="font-alt text-2xl md:text-4xl font-bold md:leading-[3rem]">
+    <div className="md:px-0 md:pb-20 px-5 md:pt-20 pt-24 flex flex-col gap-5 items-center max-w-[1024px] mx-auto">
+      <span className="font-alt text-2xl md:text-3xl font-semibold md:leading-tight">
         “
         {intl.formatMessage({
           id: 'pito-cloud-canteen-has-significantly-improved-our-meal-quality-and-hygiene-sharing-meals-together-has-strengthened-team-bonds-and-deepened-employees-loyalty-to-the-company',

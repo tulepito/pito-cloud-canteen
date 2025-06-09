@@ -11,10 +11,10 @@ import avatar1 from '../assets/pfps/avatar1.png';
 import avatar2 from '../assets/pfps/avatar2.png';
 import avatar3 from '../assets/pfps/avatar3.png';
 import avatar4 from '../assets/pfps/avatar4.png';
-import avatar5 from '../assets/pfps/avatar5.png';
+// import avatar5 from '../assets/pfps/avatar5.png';
 import company2 from '../assets/testimonialCompanyLogos/company2.svg';
 import company3 from '../assets/testimonialCompanyLogos/company3.svg';
-import company5 from '../assets/testimonialCompanyLogos/company5.svg';
+// import company5 from '../assets/testimonialCompanyLogos/company5.svg';
 import company6 from '../assets/testimonialCompanyLogos/company6.svg';
 import company7 from '../assets/testimonialCompanyLogos/company7.svg';
 
@@ -72,22 +72,13 @@ const Testimonials: React.FC = () => {
       pfp: avatar4,
       companyLogo: company7,
     },
-    {
-      name: 'Lan Thy',
-      role: intl.formatMessage({ id: 'people-ops' }),
-      review: intl.formatMessage({
-        id: 'pito-transformed-our-lunch-management-from-a-daily-nightmare-to-a-strategic-employee-benefit',
-      }),
-      pfp: avatar5,
-      companyLogo: company5,
-    },
   ];
 
   return (
-    <div className="md:pt-20 md:pb-36">
-      <div className="flex flex-col gap-10 w-full">
+    <div className="pt-10 md:py-16">
+      <div className="flex flex-col gap-10 md:gap-12 w-full">
         <div className="flex items-center justify-center relative md:px-0 px-5">
-          <h2 className="relative font-bold font-alt text-2xl md:text-4xl md:text-start text-center">
+          <h2 className="relative font-bold font-alt text-2xl md:text-[42px] md:text-start text-center">
             {intl.formatMessage({ id: 'what-hr-professionals-are-saying' })}
 
             <div className="md:flex gap-2 absolute top-1 -right-32 hidden text-lg">
@@ -136,7 +127,9 @@ const Testimonials: React.FC = () => {
             const currentcOlor = colorHolders[index % colorHolders.length];
 
             return (
-              <SplideSlide key={index} className="group w-[600px]">
+              <SplideSlide
+                key={index}
+                className="group w-[400px] max-w-[400px]">
                 <div
                   className="rounded-2xl p-6 flex flex-col justify-between gap-4 h-full"
                   style={{ backgroundColor: currentcOlor }}>

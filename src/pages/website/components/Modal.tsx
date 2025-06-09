@@ -10,27 +10,12 @@ type ModalProps = {
   isModalOpen: boolean;
 };
 
-const Modal = ({ onClose, isModalOpen }: ModalProps) => {
+export const ModalForm = ({ onClose }: { onClose: () => void }) => {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [companyName, setCompanyName] = useState('');
   const [serviceRequirements, setServiceRequirements] = useState('');
-
   const intl = useIntl();
-  useEffect(() => {
-    if (isModalOpen) {
-      document.body.style.overflow = 'hidden';
-      document.body.setAttribute('data-lenis-prevent', 'true');
-    } else {
-      document.body.style.overflow = '';
-      document.body.removeAttribute('data-lenis-prevent');
-    }
-
-    return () => {
-      document.body.style.overflow = '';
-      document.body.removeAttribute('data-lenis-prevent');
-    };
-  }, [isModalOpen]);
 
   const submitForm = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -85,13 +70,109 @@ const Modal = ({ onClose, isModalOpen }: ModalProps) => {
   };
 
   return (
+    <form className="flex flex-col gap-2" onSubmit={submitForm}>
+      <div>
+        <label className="text-sm font-medium text-gray-700">
+          {intl.formatMessage({ id: 'company-name' })}
+        </label>
+        <input
+          type="text"
+          name="company_name"
+          required
+          value={companyName}
+          onChange={(e) => setCompanyName(e.target.value)}
+          autoFocus
+          placeholder={intl.formatMessage({ id: 'enter-company-name' })}
+          className="mt-1 w-full rounded-xl border border-solid border-gray-300 px-4 py-3 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black"
+        />
+      </div>
+
+      <div>
+        <label className="text-sm font-medium text-gray-700">
+          {intl.formatMessage({ id: 'phone-number' })}
+        </label>
+        <input
+          type="tel"
+          name="phone"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          pattern="^[0-9]+$"
+          required
+          autoComplete="tel"
+          className="mt-1 w-full rounded-xl border border-solid border-gray-300 px-4 py-3 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black"
+        />
+      </div>
+
+      <div>
+        <label className="text-sm font-medium text-gray-700">
+          {intl.formatMessage({ id: 'business-email' })}
+        </label>
+        <input
+          type="text"
+          name="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+          required
+          placeholder={intl.formatMessage({ id: 'enter-business-email' })}
+          className="mt-1 w-full rounded-xl border border-solid border-gray-300 px-4 py-3 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black"
+        />
+      </div>
+
+      <div>
+        <label className="text-sm font-medium text-gray-700">
+          {intl.formatMessage({ id: 'service-requirements' })} /{' '}
+          {intl.formatMessage({ id: 'notes' })}
+        </label>
+        <textarea
+          placeholder={intl.formatMessage({
+            id: 'let-us-know-any-preferences-or-questions',
+          })}
+          rows={4}
+          value={serviceRequirements}
+          onChange={(e) => setServiceRequirements(e.target.value)}
+          name="service_requirements"
+          required
+          autoComplete="off"
+          className="mt-1 w-full rounded-xl border border-solid border-gray-300 px-4 py-3 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black"
+        />
+      </div>
+
+      <button
+        type="submit"
+        className="bg-black text-white py-3 rounded-xl font-medium hover:bg-gray-800 transition">
+        {intl.formatMessage({ id: 'send' })}
+      </button>
+    </form>
+  );
+};
+
+const Modal = ({ onClose, isModalOpen }: ModalProps) => {
+  const intl = useIntl();
+
+  useEffect(() => {
+    if (isModalOpen) {
+      document.body.style.overflow = 'hidden';
+      document.body.setAttribute('data-lenis-prevent', 'true');
+    } else {
+      document.body.style.overflow = '';
+      document.body.removeAttribute('data-lenis-prevent');
+    }
+
+    return () => {
+      document.body.style.overflow = '';
+      document.body.removeAttribute('data-lenis-prevent');
+    };
+  }, [isModalOpen]);
+
+  return (
     <div
       className={`fixed inset-0 z-[9999] flex justify-center items-center transition-all duration-300 ease-in-out ${
-        isModalOpen ? 'opacity-100 visible bg-black/80' : 'opacity-0 invisible'
+        isModalOpen ? 'opacity-100 visible bg-black/20' : 'opacity-0 invisible'
       }`}>
-      <div className="relative">
+      <div className="relative ">
         <div
-          className={`bg-white w-full rounded-3xl p-6 md:p-10 md:max-w-md max-h-[95%] overflow-visible md:w-full relative transition-all duration-300 ease-in-out ${
+          className={`bg-white w-full rounded-2xl md:rounded-3xl p-6 md:p-10 md:max-w-md max-h-[95%] overflow-auto md:w-full relative transition-all duration-300 ease-in-out ${
             isModalOpen
               ? 'opacity-100 scale-100 visible'
               : 'opacity-0 scale-90 invisible'
@@ -118,80 +199,7 @@ const Modal = ({ onClose, isModalOpen }: ModalProps) => {
           </div>
 
           {/* Form */}
-          <form className="flex flex-col gap-2" onSubmit={submitForm}>
-            <div>
-              <label className="text-sm font-medium text-gray-700">
-                {intl.formatMessage({ id: 'company-name' })}
-              </label>
-              <input
-                type="text"
-                name="company_name"
-                required
-                value={companyName}
-                onChange={(e) => setCompanyName(e.target.value)}
-                autoFocus
-                placeholder={intl.formatMessage({ id: 'enter-company-name' })}
-                className="mt-1 w-full rounded-xl border border-solid border-gray-300 px-4 py-3 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black"
-              />
-            </div>
-
-            <div>
-              <label className="text-sm font-medium text-gray-700">
-                {intl.formatMessage({ id: 'phone-number' })}
-              </label>
-              <input
-                type="tel"
-                name="phone"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                pattern="^[0-9]+$"
-                required
-                autoComplete="tel"
-                className="mt-1 w-full rounded-xl border border-solid border-gray-300 px-4 py-3 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black"
-              />
-            </div>
-
-            <div>
-              <label className="text-sm font-medium text-gray-700">
-                {intl.formatMessage({ id: 'business-email' })}
-              </label>
-              <input
-                type="text"
-                name="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
-                required
-                placeholder={intl.formatMessage({ id: 'enter-business-email' })}
-                className="mt-1 w-full rounded-xl border border-solid border-gray-300 px-4 py-3 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black"
-              />
-            </div>
-
-            <div>
-              <label className="text-sm font-medium text-gray-700">
-                {intl.formatMessage({ id: 'service-requirements' })} /{' '}
-                {intl.formatMessage({ id: 'notes' })}
-              </label>
-              <textarea
-                placeholder={intl.formatMessage({
-                  id: 'let-us-know-any-preferences-or-questions',
-                })}
-                rows={4}
-                value={serviceRequirements}
-                onChange={(e) => setServiceRequirements(e.target.value)}
-                name="service_requirements"
-                required
-                autoComplete="off"
-                className="mt-1 w-full rounded-xl border border-solid border-gray-300 px-4 py-3 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black"
-              />
-            </div>
-
-            <button
-              type="submit"
-              className="bg-black text-white py-3 rounded-xl font-medium hover:bg-gray-800 transition">
-              {intl.formatMessage({ id: 'send' })}
-            </button>
-          </form>
+          <ModalForm onClose={onClose} />
         </div>
         {/* decorations */}
         <Image

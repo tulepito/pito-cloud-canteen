@@ -1,0 +1,102 @@
+import { useIntl } from 'react-intl';
+import clsx from 'clsx';
+import Image from 'next/image';
+
+import company1 from '../../assets/companies/company1.svg'; // booking
+import company2 from '../../assets/companies/company2.svg'; // shopee
+import company3 from '../../assets/companies/company3.svg'; // employment hero
+import company4 from '../../assets/companies/company4.svg'; // deloit
+import company5 from '../../assets/companies/company5.svg'; // mm
+import company6 from '../../assets/companies/company6.svg'; // salt
+import company7 from '../../assets/companies/company7.svg'; // amazon
+import company8 from '../../assets/companies/company8.svg'; // bck
+
+import styles from './styles.module.css';
+
+const companies = [
+  {
+    src: company1,
+    alt: 'Booking',
+    className: 'aspect-[2/1] w-[150px]',
+    classNameImage: 'object-contain',
+  },
+  {
+    src: company2,
+    alt: 'Shopee',
+    className: 'aspect-square w-[120px]',
+    classNameImage: 'object-fill',
+  },
+  {
+    src: company3,
+    alt: 'Employment Hero',
+    className: 'aspect-square w-[120px]',
+    classNameImage: 'object-fill',
+  },
+  {
+    src: company4,
+    alt: 'Deloitte',
+    className: 'aspect-[2/1] w-[150px]',
+    classNameImage: 'object-contain',
+  },
+  {
+    src: company5,
+    alt: 'MM',
+    className: 'aspect-square w-[120px]',
+    classNameImage: 'object-fill',
+  },
+  {
+    src: company6,
+    alt: 'Saltmine',
+    className: 'aspect-[2/1] w-[150px]',
+    classNameImage: 'object-contain',
+  },
+  {
+    src: company7,
+    alt: 'Amazon',
+    className: 'aspect-[2/1] w-[150px]',
+    classNameImage: 'object-contain',
+  },
+  {
+    src: company8,
+    alt: 'BCK',
+    className: 'aspect-[2/1] w-[150px]',
+    classNameImage: 'object-contain',
+  },
+];
+
+const TrustedCompanies = () => {
+  const intl = useIntl();
+
+  return (
+    <div className="mx-auto md:px-4 md:pb-20 px-5 pt-16 md:pt-0 flex flex-col md:gap-0 gap-5 items-center overflow-hidden">
+      <span className="w-full md:w-2/3 text-center text-lg whitespace-pre-line md:whitespace-normal">
+        {intl.formatMessage({
+          id: 'trusted-by-vietnams-leading-tech-companies',
+        })}
+      </span>
+      <div className={clsx('flex select-none overflow-hidden', styles.marquee)}>
+        {[...Array(2)].map((_, i) => (
+          <div
+            key={i}
+            className={clsx(
+              'flex shrink-0 items-center',
+              styles.marquee__group,
+            )}>
+            {companies.map((logo, index) => (
+              <div key={index} className={clsx('relative', logo.className)}>
+                <Image
+                  src={logo.src}
+                  alt={logo.alt}
+                  fill
+                  className={logo.classNameImage}
+                />
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export default TrustedCompanies;

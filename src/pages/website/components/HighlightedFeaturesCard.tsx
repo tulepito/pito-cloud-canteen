@@ -9,7 +9,7 @@ const HighlightedFeaturesCard = () => {
   const intl = useIntl();
 
   return (
-    <div className="flex flex-col md:gap-20 md:pb-36 md:p-20 md:px-32 px-2 pt-16 gap-10 relative max-w-[1224px] mx-auto">
+    <div className="flex flex-col md:gap-12 md:pb-20 md:p-20 md:px-0 px-2 pt-16 gap-10 relative max-w-[1024px] mx-auto">
       {/* Heading */}
       <div className="flex flex-col gap-2 items-center">
         <span className="text-text w-2/3 text-center">
@@ -17,13 +17,13 @@ const HighlightedFeaturesCard = () => {
             id: 'reclaim-your-time-boost-team-satisfaction',
           })}
         </span>
-        <span className="font-alt text-2xl md:text-4xl font-bold md:w-1/2 text-center md:leading-[3rem]">
+        <span className="font-alt text-2xl md:text-[42px] font-bold md:w-1/2 text-center md:leading-tight">
           {intl.formatMessage({ id: 'highlighted-features' })}
         </span>
       </div>
 
       {/* Feature Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:px-20">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:px-0">
         {/* Card 1 */}
         <div className="flex md:flex-col gap-8 justify-between border border-black/10 bg-white rounded-3xl p-5">
           <div className="shrink-0 bg-[#F6AFCE]/30 text-[#D680A3] size-10 rounded-full flex items-center justify-center text-xl">
@@ -33,7 +33,7 @@ const HighlightedFeaturesCard = () => {
             <span className="font-semibold">
               {intl.formatMessage({ id: 'auto-pilot-for-admins-0' })}
             </span>
-            <span className="text-sm">
+            <span className="text-sm md:min-h-[60.01px]">
               {intl.formatMessage({
                 id: 'schedule-once-for-the-week-monitor-everything-on-the-system-and-make-real-time-edits-with-ease',
               })}
@@ -47,10 +47,13 @@ const HighlightedFeaturesCard = () => {
             <PiUsersThreeLight />
           </div>
           <div className="flex flex-col gap-1">
-            <span className="font-semibold">Auto-Pilot for Participants</span>
+            <span className="font-semibold">
+              {intl.formatMessage({ id: 'auto-pilot-for-participants' })}
+            </span>
             <span className="text-sm">
-              Weekly meal reminders, dietary filtering, and curated menus. Set
-              it and enjoy it, hassle-free.
+              {intl.formatMessage({
+                id: 'weekly-meal-reminders-dietary-filtering-and-curated-menus-set-it-and-enjoy-it-hassle-free',
+              })}
             </span>
           </div>{' '}
         </div>

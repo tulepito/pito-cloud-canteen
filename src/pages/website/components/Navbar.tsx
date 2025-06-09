@@ -22,9 +22,9 @@ const Navbar = () => {
     <div className="w-full h-[60px] md:px-4 px-5 z-[1000] fixed bg-white/50 backdrop-blur-lg flex items-center">
       <div className="max-w-[1024px] w-full mx-auto">
         <div className="flex items-center justify-between">
-          <a href="/">
+          <Link href="/">
             <Image src={logo} alt="logo" className="md:w-16 w-14" />
-          </a>
+          </Link>
 
           {/* Desktop Buttons */}
           <div className="hidden md:flex items-center gap-2">
@@ -52,7 +52,7 @@ const Navbar = () => {
 
           {/* Mobile Menu */}
           <div
-            className={`fixed inset-0 bg-white backdrop-blur-lg h-screen text-black flex flex-col items-center p-5 justify-between gap-8 transition-transform duration-300 ${
+            className={`fixed inset-0 bg-white backdrop-blur-lg h-screen text-black flex flex-col items-center p-5 justify-start gap-8 transition-transform duration-300 ${
               isMenuOpen ? 'translate-x-0' : 'translate-x-full'
             }`}>
             <div className="w-full flex items-center justify-between">

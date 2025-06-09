@@ -3,7 +3,7 @@ import Image from 'next/image';
 
 import lemon from '../assets/decorations/lemon.svg';
 import yellow from '../assets/decorations/yellow.svg';
-import solutions from '../assets/solutions.png';
+import solutions from '../assets/solutions.webp';
 
 const Solutions = () => {
   const intl = useIntl();
@@ -52,10 +52,9 @@ const Solutions = () => {
   ];
 
   return (
-    <div className="md:py-20 md:px-4 md:pb-36 p-5 flex gap-10 relative max-w-[1024px] mx-auto">
+    <div className="md:py-16 md:px-4 p-5 flex gap-10 relative max-w-[1024px] mx-auto">
       <div className="md:w-1/2 flex flex-col md:items-start items-center">
-        <span>{intl.formatMessage({ id: 'solutions' })}</span>
-        <span className="font-alt font-bold text-2xl md:text-4xl md:w-auto w-2/3 md:text-start text-center">
+        <span className="font-alt font-bold text-2xl md:text-[42px] leading-tight md:w-auto w-2/3 md:text-start text-center md:whitespace-pre-line">
           {intl.formatMessage({ id: 'solutions-for-every-team-size' })}
         </span>
         <div className="flex flex-col gap-5 w-full mt-5 relative">
@@ -99,7 +98,7 @@ const Solutions = () => {
           />
         </div>
       </div>
-      <div className="flex-1 relative md:flex hidden scale-[175%] top-44 left-10">
+      <div className="flex-1 relative md:flex hidden scale-[175%] top-52 left-10">
         <Image
           src={solutions}
           alt="solutions hero"

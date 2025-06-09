@@ -38,8 +38,8 @@ const HowItWorksDynamicCard = () => {
   ];
 
   return (
-    <div className="flex flex-col items-center md:gap-12 md:px-56 px-5 md:pb-36 md:pt-20 gap-10 relative max-w-[1224px] mx-auto">
-      <span className="font-alt text-2xl md:text-4xl font-bold md:w-1/2 text-center md:leading-[3rem]">
+    <div className="flex flex-col items-center md:gap-12 md:px-0 px-5 md:pb-20 md:pt-16 gap-10 relative max-w-[1024px] mx-auto">
+      <span className="font-alt text-2xl md:text-[42px] font-bold md:w-1/2 text-center md:leading-tight md:whitespace-pre-line">
         {intl.formatMessage({ id: 'how-it-works' })}
       </span>
       <div className="flex md:flex-row flex-col md:items-stretch w-full gap-3">

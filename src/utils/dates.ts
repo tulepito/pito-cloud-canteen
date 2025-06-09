@@ -1,4 +1,12 @@
-import { formatDistanceToNow } from 'date-fns';
+import {
+  addMinutes,
+  format,
+  formatDistanceToNow,
+  isAfter,
+  isToday,
+  parse,
+  set,
+} from 'date-fns';
 import jstz from 'jstimezonedetect';
 import { capitalize } from 'lodash';
 import difference from 'lodash/difference';
@@ -137,26 +145,26 @@ export const weekDayFormatFromDateTime = (dateTime: DateTime) => {
 
 export const formatTimestamp = (
   date = new Date().getTime(),
-  format?: string,
+  formatString?: string,
   _locale: LocaleOptions['locale'] = 'vi',
   timeZone: string = VNTimezone,
 ) => {
   return DateTime.fromMillis(Number(date))
     .setZone(timeZone)
-    .toFormat(format || 'dd/MM/yyyy', {
+    .toFormat(formatString || 'dd/MM/yyyy', {
       locale: getCurrentLocaleFromLocalStorage(),
     });
 };
 
 export const formatDate = (
   date = new Date(),
-  format?: string,
+  formatString?: string,
   _locale: LocaleOptions['locale'] = 'vi',
   timeZone: string = VNTimezone,
 ) => {
   return DateTime.fromJSDate(date)
     .setZone(timeZone)
-    .toFormat(format || 'dd/MM/yyyy', {
+    .toFormat(formatString || 'dd/MM/yyyy', {
       locale: getCurrentLocaleFromLocalStorage(),
     });
 };
@@ -572,43 +580,66 @@ export const renderListTimeOptions = ({
   startTime = '06:30',
   endTime = '23:00',
   interval = 15,
-  isToday = false,
+  selectedDate,
 }: {
   startTime?: string;
   endTime?: string;
   interval?: number;
-  isToday?: boolean;
+  selectedDate?: string; // dd/MM/yyyy format
 }) => {
-  const [startHour, startMinute] = startTime?.split(':') || [];
-  const [endHour, endMinute] = endTime?.split(':') || [];
-  const startInterval = Number(startHour) * 60 + Number(startMinute);
-  const endInterval = Number(endHour) * 60 + Number(endMinute);
-  const result = [];
+  const [startHour, startMinute] = startTime.split(':').map(Number);
+  const [endHour, endMinute] = endTime.split(':').map(Number);
 
-  const today = new Date();
-  const currentHour = today.getHours();
-  const currentMinute = today.getMinutes();
-  const currentInterval = 60 * currentHour + currentMinute;
+  // Mặc định selectedDate là hôm nay nếu không có
+  const date = selectedDate
+    ? parse(selectedDate, 'dd/MM/yyyy', new Date())
+    : new Date();
 
-  for (let i = startInterval; i <= endInterval; i += interval) {
-    if (isToday && startInterval <= currentInterval) {
-      // eslint-disable-next-line no-continue
-      continue;
+  // Kiểm tra xem có phải hôm nay không
+  const isSelectedToday = isToday(date);
+
+  // Thiết lập mốc thời gian start và end
+  let startDate = set(date, {
+    hours: startHour,
+    minutes: startMinute,
+    seconds: 0,
+    milliseconds: 0,
+  });
+  const endDate = set(date, {
+    hours: endHour,
+    minutes: endMinute,
+    seconds: 0,
+    milliseconds: 0,
+  });
+
+  // Nếu là hôm nay và startDate đã qua, lùi startDate lên interval kế tiếp
+  if (isSelectedToday) {
+    const now = new Date();
+    if (isAfter(now, startDate)) {
+      const minutesSinceMidnight = now.getHours() * 60 + now.getMinutes();
+      const nextIntervalMinutes =
+        Math.ceil(minutesSinceMidnight / interval) * interval;
+      const nextHour = Math.floor(nextIntervalMinutes / 60);
+      const nextMinute = nextIntervalMinutes % 60;
+
+      startDate = set(date, {
+        hours: nextHour,
+        minutes: nextMinute,
+        seconds: 0,
+        milliseconds: 0,
+      });
     }
+  }
 
-    const hours = Math.floor(i / 60);
-    const minutes = i % 60;
+  const result = [];
+  let currentDate = startDate;
 
-    const timeIn24HourClock = `${hours}:${minutes}`.replace(/\b\d\b/g, '0$&');
+  while (currentDate <= endDate) {
+    const label = format(currentDate, 'hh:mm aa'); // 12h clock
+    const key = format(currentDate, 'HH:mm'); // 24h clock
+    result.push({ label, key });
 
-    const timeIn12HourClock = `${hours % 12 || 12}:${minutes} ${
-      'AP'[+(hours > 11)]
-    }M`.replace(/\b\d\b/g, '0$&');
-
-    result.push({
-      label: timeIn12HourClock,
-      key: timeIn24HourClock,
-    });
+    currentDate = addMinutes(currentDate, interval);
   }
 
   return result;

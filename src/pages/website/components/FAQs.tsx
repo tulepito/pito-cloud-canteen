@@ -63,12 +63,12 @@ const FAQs = () => {
   };
 
   return (
-    <div className="md:px-40 md:py-20 px-5 py-16 flex flex-col items-center gap-10 relative">
+    <div className="px-5 md:px-40 py-16 flex flex-col items-center gap-10 relative">
       <div className="flex flex-col items-center md:gap-4 gap-3 md:w-[55%] text-center">
-        <span className="font-alt font-bold text-2xl md:text-4xl">
+        <span className="font-alt font-bold text-2xl md:text-[42px] leading-tight">
           {intl.formatMessage({ id: 'got-questions' })}
         </span>
-        <span className="text-text">
+        <span className="text-text md:whitespace-pre-line">
           {intl.formatMessage({
             id: 'have-a-question-about-our-service-or-billing-check-out-the-answers-below-if-you-still-need-help-our-team-is-just-a-message-away',
           })}
@@ -83,7 +83,11 @@ const FAQs = () => {
             <div key={index}>
               <button
                 onClick={() => toggleFAQ(index)}
-                className="w-full hover:bg-[#FFCDE3] bg-[#FAFAFA] rounded-2xl p-4 flex justify-between items-center text-left font-medium text-base md:text-lg text-black focus:outline-none cursor-pointer transition-all duration-300 ease-in-out">
+                className="w-full hover:!bg-gray-300 bg-[#FAFAFA] rounded-2xl p-4 flex justify-between items-center text-left font-medium text-base md:text-lg text-black focus:outline-none cursor-pointer transition-all duration-300 ease-in-out"
+                style={{
+                  backgroundColor: !isOpen ? '#FAFAFA' : '#000',
+                  color: !isOpen ? '#000' : '#FAFAFA',
+                }}>
                 {faq.question}
                 <span className="text-[#A8A8A8] text-xl">
                   {isOpen ? <PiMinusBold /> : <PiPlusBold />}

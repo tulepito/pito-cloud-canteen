@@ -14,7 +14,6 @@
     "test-all": "yarn check-format && yarn check-lint && yarn check-types && yarn build",
     "fix-lint": "eslint . --fix --ext ts --ext tsx --ext js",
     "fix-all": "prettier --write . && eslint . --fix --ext ts --ext tsx --ext js",
-    "runt": "next lint --fix --file src/components/Layout/CompanyLayout/CompanyHeader/LanguageSwitchButton.tsx --file src/components/OrderDetails/EditView/AutomaticInfoSection/AutomaticStartOrInfoSection.tsx --file src/middleware.api.ts --file src/pages/_app.route.tsx --file src/pages/api/change-lang.route.tsx --file src/pages/company/components/AccountNavigationModal/AccountNavigationModal.tsx --file src/pages/website/components/CTA.tsx --file src/pages/website/components/CTAAlt.tsx --file src/pages/website/components/Container.tsx --file src/pages/website/components/FAQs.tsx --file src/pages/website/components/FAQsAlt.tsx --file src/pages/website/components/Features.tsx --file src/pages/website/components/FeaturesCard.tsx --file src/pages/website/components/Home/Hero.tsx --file src/pages/website/components/HowItWorks/Hero.tsx --file src/pages/website/components/Modal.tsx --file src/pages/website/components/Navbar.tsx --file src/pages/website/components/Solutions.tsx --file src/pages/website/components/TeamRoles.tsx --file src/pages/website/components/Testimonials.tsx --file src/pages/website/components/TrustedCompanies.tsx --file src/pages/website/components/WhyChooseUs.tsx --file src/pages/website/pages/Layout.tsx --file src/paths.ts --file src/translations/TranslationProvider.tsx",
     "sync-env:test": "rm -f .env.test && aws secretsmanager get-secret-value --secret-id arn:aws:secretsmanager:ap-southeast-1:050309102952:secret:pito/web/staging/cGl0b3Byb2plY3Q-oTy3te --region=ap-southeast-1 --query SecretString --output text --profile=sync-env > .env.json && node ./scripts/json2env.js .env.json .env.test && rm -f .env.json",
     "prepare": "husky install"
   },
@@ -83,6 +82,7 @@
     "react-day-picker": "8.10.1",
     "react-dom": "18.2.0",
     "react-dropzone": "^14.3.8",
+    "react-fast-marquee": "^1.6.5",
     "react-final-form": "6.5.9",
     "react-final-form-arrays": "3.1.4",
     "react-final-form-hooks": "2.0.2",

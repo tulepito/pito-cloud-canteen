@@ -4,7 +4,7 @@ import WhyChooseUs from './WhyChooseUs';
 
 const Features = () => {
   return (
-    <div className="md:p-20 px-2 pt-16 md:px-4">
+    <div className="px-5 py-16 md:px-4">
       <FeaturesCard />
       <WhyChooseUs />
       <TeamRoles />
