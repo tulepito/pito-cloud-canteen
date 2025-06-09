@@ -518,8 +518,8 @@ const TrackingOrderInfo = ({ subOrderDate }: TTrackingOrderInfoProps) => {
               </g>
             </svg>
             <span>
-              Đối tác sẽ cung cấp {numberOfDeliveryAgentsMeals} phần ăn cho nhân
-              viên giao hàng của PITO
+              Số lượng phần ăn đối tác cung cấp cho nhân viên giao hàng:{' '}
+              {numberOfDeliveryAgentsMeals}
             </span>
           </div>
         </AccordionContent>

@@ -7,13 +7,14 @@ import { denormalisedResponseEntities } from '@services/data';
 import adminChecker from '@services/permissionChecker/admin';
 import { getIntegrationSdk } from '@services/sdk';
 import type { OrderListing } from '@src/types';
-import { EListingType, EOrderStates } from '@src/utils/enums';
+import { EListingType } from '@src/utils/enums';
 
 export interface GETDeliveryAgentsMealsQuery {
   page?: number;
   perPage?: number;
   filterBy?: {
     orderCode?: string;
+    orderState?: string;
     startDate?: string;
     endDate?: string;
   };
@@ -41,7 +42,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const orderListingsData: OrderListing[] = denormalisedResponseEntities(
       await integrationSdk.listings.query({
         meta_listingType: EListingType.order,
-        meta_orderState: EOrderStates.inProgress,
+        ...(filterBy?.orderState
+          ? { meta_orderState: filterBy?.orderState }
+          : {}),
         ...(filterBy?.orderCode ? { keywords: filterBy?.orderCode } : {}),
         ...(filterBy?.startDate
           ? {

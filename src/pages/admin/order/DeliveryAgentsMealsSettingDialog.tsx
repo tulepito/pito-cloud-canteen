@@ -1,5 +1,6 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import type { DateRange } from 'react-day-picker';
+import Select from 'react-select';
 import { toast } from 'react-toastify';
 import {
   Popover,
@@ -36,6 +37,10 @@ import type { OrderListing, PlanListing } from '@src/types';
 
 import { EmptyWrapper } from '../scanner/[planId]/EmptyWrapper';
 import { LoadingWrapper } from '../scanner/[planId]/LoadingWrapper';
+
+import { ADMIN_FILTER_ORDER_STATE_OPTIONS } from './ManageOrderFilterForms/FilterForm/options';
+
+const BASE_URL = process.env.NEXT_PUBLIC_CANONICAL_URL;
 
 function DatePickerWithRange({
   className,
@@ -87,6 +92,7 @@ function DatePickerWithRange({
     </div>
   );
 }
+
 const DeliveryAgentsMealsSettingDialog = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -98,6 +104,7 @@ const DeliveryAgentsMealsSettingDialog = () => {
 
   const [date, setDate] = useState<DateRange | undefined>();
   const [orderCode, setOrderCode] = useState<string | undefined>(undefined);
+  const [orderState, setOrderState] = useState<string>('all');
   const [isLoading, setIsLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -157,6 +164,7 @@ const DeliveryAgentsMealsSettingDialog = () => {
       page,
       filterBy: {
         orderCode,
+        ...(orderState === 'all' ? {} : { orderState }),
         startDate: date?.from?.toISOString(),
         endDate: date?.to?.toISOString(),
       },
@@ -170,6 +178,10 @@ const DeliveryAgentsMealsSettingDialog = () => {
   useEffect(() => {
     if (!isDialogOpen) {
       resetState();
+      setIsLoading(false);
+      setDate(undefined);
+      setOrderCode(undefined);
+      setOrderState('all');
     } else {
       // refetch data when dialog is opened
       setFetchUsingFilterOptionsKey((prev) => prev + 1);
@@ -193,6 +205,7 @@ const DeliveryAgentsMealsSettingDialog = () => {
         perPage,
         filterBy: {
           orderCode,
+          ...(orderState === 'all' ? {} : { orderState }),
           startDate: date?.from?.toISOString(),
           endDate: date?.to?.toISOString(),
         },
@@ -218,31 +231,40 @@ const DeliveryAgentsMealsSettingDialog = () => {
       return;
     }
 
-    const sumTotalByRestaurantName: Record<string, number> = {};
+    const data = ordersWithPlanDataToExport
+      .flatMap((order) => {
+        const deliveryAgentsMeals =
+          order.plan?.attributes?.metadata?.deliveryAgentsMeals || {};
 
-    ordersWithPlanDataToExport.forEach((order) => {
-      const deliveryAgentsMeals =
-        order.plan?.attributes?.metadata?.deliveryAgentsMeals || {};
+        return Object.entries(deliveryAgentsMeals).map(
+          ([_timestamp, value]) => {
+            const restaurantName =
+              order.plan?.attributes?.metadata?.orderDetail?.[_timestamp]
+                ?.restaurant?.restaurantName || 'Unknown';
 
-      Object.entries(deliveryAgentsMeals).forEach(([_timestamp, value]) => {
-        const restaurantName =
-          order.plan?.attributes?.metadata?.orderDetail?.[_timestamp]
-            ?.restaurant?.restaurantName || 'Unknown';
+            return {
+              orderTitle: `#${order.attributes?.title}_${new Date(
+                Number(_timestamp),
+              ).getDay()}`,
+              url: `${BASE_URL}${enGeneralPaths.admin.order['[orderId]'].index(
+                order?.id?.uuid || '',
+              )}`,
+              deliveryDate: format(new Date(+_timestamp), 'dd/MM/yyyy'),
+              numberOfMeals: value?.numberOfMeals || 0,
+              restaurantName,
+            };
+          },
+        );
+      })
+      .filter((item) => item.numberOfMeals > 0);
 
-        if (sumTotalByRestaurantName[restaurantName]) {
-          sumTotalByRestaurantName[restaurantName] += value?.numberOfMeals || 0;
-        } else {
-          sumTotalByRestaurantName[restaurantName] = value?.numberOfMeals || 0;
-        }
-      });
-    });
-
-    const dataToExport = Object.entries(sumTotalByRestaurantName).map(
-      ([restaurantName, numberOfMeals]) => ({
-        'Tên nhà hàng': restaurantName,
-        'Số lượng phần ăn': numberOfMeals,
-      }),
-    );
+    const dataToExport = data.map((item) => ({
+      'Mã đơn': item.orderTitle,
+      'URL đơn hàng': item.url,
+      'Ngày giao hàng': item.deliveryDate,
+      'Số lượng phần ăn': item.numberOfMeals,
+      'Tên đối tác': item.restaurantName,
+    }));
 
     const worksheet = XLSX.utils.json_to_sheet(dataToExport);
     const workbook = XLSX.utils.book_new();
@@ -265,6 +287,62 @@ const DeliveryAgentsMealsSettingDialog = () => {
     window.URL.revokeObjectURL(url);
     setIsLoadingExport(false);
   };
+
+  const customStyles = useMemo(() => {
+    return {
+      control: (base: any) => ({
+        ...base,
+        width: '100%',
+        minWidth: '200px',
+        borderRadius: '8px',
+        border: '1px solid #e5e5e5',
+        background: '#fff',
+        outline: 'none',
+        '&:hover': {
+          backgroundColor: '#fafafa',
+        },
+        '&:focus, &:target': {
+          border: '2px solid #262626',
+          backgroundColor: '#fafafa',
+        },
+        boxShadow: 'none',
+        minHeight: 36,
+      }),
+      option: (styles: any, { data }: any) => {
+        return {
+          ...styles,
+          cursor: 'pointer',
+          fontSize: '12px',
+          fontWeight: '400',
+          lineHeight: '1.5',
+          width: '100%',
+          wordBreak: 'break-word',
+          color: '#262626',
+          backgroundColor: data?.key === orderState ? '#dbdbdb' : '#fff',
+          '&:hover': {
+            backgroundColor: '#fafafa',
+            color: '#262626',
+          },
+        };
+      },
+      input: (base: any) => ({
+        ...base,
+        margin: 0,
+        padding: 0,
+        fontSize: '16px',
+        fontWeight: '400',
+        lineHeight: '1.5',
+      }),
+      placeholder: (styles: any) => ({
+        ...styles,
+        fontSize: '14px !important',
+      }),
+      singleValue: (styles: any) => ({
+        ...styles,
+        fontSize: '14px !important',
+      }),
+    };
+  }, [orderState]);
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -291,6 +369,24 @@ const DeliveryAgentsMealsSettingDialog = () => {
                 onChange={(e) => {
                   setOrderCode(e.target.value);
                 }}></Input>
+              <Select
+                styles={customStyles}
+                options={[
+                  { key: 'all', label: 'Tất cả' },
+                  ...ADMIN_FILTER_ORDER_STATE_OPTIONS,
+                ]}
+                placeholder="Chọn trạng thái đơn"
+                onChange={(option: any) => {
+                  setOrderState(option?.key || undefined);
+                }}
+                value={ADMIN_FILTER_ORDER_STATE_OPTIONS.find(
+                  (option) => option.key === orderState,
+                )}
+                defaultValue={{
+                  key: 'all',
+                  label: 'Tất cả',
+                }}
+              />
               <Button
                 variant="outline"
                 className="w-[120px] border rounded-lg border-solid"
