@@ -78,7 +78,7 @@ const Testimonials: React.FC = () => {
     <div className="pt-10 md:py-16">
       <div className="flex flex-col gap-10 md:gap-12 w-full">
         <div className="flex items-center justify-center relative md:px-0 px-5">
-          <h2 className="relative font-bold font-alt text-2xl md:text-[42px] md:text-start text-center">
+          <h2 className="relative font-semibold font-[unbounded] font-alt text-2xl md:text-[40px] md:text-start text-center">
             {intl.formatMessage({ id: 'what-hr-professionals-are-saying' })}
 
             <div className="md:flex gap-2 absolute top-1 -right-32 hidden text-lg">
@@ -123,7 +123,7 @@ const Testimonials: React.FC = () => {
             },
           }}>
           {testimonials.map((testimonial, index) => {
-            const colorHolders = ['#F0F4F5', '#FFC811B2', '#F0F4F5', '#C5D475'];
+            const colorHolders = ['#CDEBFA', '#FCE9B6', '#E9EDCD', '#F7E1EB'];
             const currentcOlor = colorHolders[index % colorHolders.length];
 
             return (
@@ -133,7 +133,7 @@ const Testimonials: React.FC = () => {
                 <div
                   className="rounded-2xl p-6 flex flex-col justify-between gap-4 h-full"
                   style={{ backgroundColor: currentcOlor }}>
-                  <p className="flex-1">{testimonial.review}</p>
+                  <p className="flex-1 font-normal">{testimonial.review}</p>
                   <div className="w-full h-[1px] bg-[#D7D7D7] " />
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">

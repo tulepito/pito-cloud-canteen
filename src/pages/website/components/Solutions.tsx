@@ -1,9 +1,13 @@
+import { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 import Image from 'next/image';
 
 import lemon from '../assets/decorations/lemon.svg';
 import yellow from '../assets/decorations/yellow.svg';
-import solutions from '../assets/solutions.webp';
+import solutions1 from '../assets/giai-phap-com-trua-van-phong-1.webp';
+import solutions2 from '../assets/giai-phap-com-trua-van-phong-2.webp';
+import solutions3 from '../assets/giai-phap-com-trua-van-phong-3.webp';
+import solutions4 from '../assets/giai-phap-com-trua-van-phong-4.webp';
 
 const Solutions = () => {
   const intl = useIntl();
@@ -51,10 +55,22 @@ const Solutions = () => {
     },
   ];
 
+  const images = [solutions1, solutions2, solutions3, solutions4];
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
+    }, 5000);
+
+    return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <div className="md:py-16 md:px-4 p-5 flex gap-10 relative max-w-[1024px] mx-auto">
       <div className="md:w-1/2 flex flex-col md:items-start items-center">
-        <span className="font-alt font-bold text-2xl md:text-[42px] leading-tight md:w-auto w-2/3 md:text-start text-center md:whitespace-pre-line">
+        <span className="font-alt font-semibold font-[unbounded] text-2xl md:text-[40px] leading-tight md:w-auto w-full md:text-start text-center md:whitespace-pre-line">
           {intl.formatMessage({ id: 'solutions-for-every-team-size' })}
         </span>
         <div className="flex flex-col gap-5 w-full mt-5 relative">
@@ -78,7 +94,7 @@ const Solutions = () => {
                       <div
                         className="size-3.5 mt-1 shrink-0 rounded-sm"
                         style={{ backgroundColor: item.color }}></div>
-                      <span>{point}</span>
+                      <span className="font-medium">{point}</span>
                     </div>
                   ))}
                 </div>
@@ -100,9 +116,9 @@ const Solutions = () => {
       </div>
       <div className="flex-1 relative md:flex hidden scale-[175%] top-52 left-10">
         <Image
-          src={solutions}
+          src={images[currentImageIndex]}
           alt="solutions hero"
-          className="absolute -rotate-12 -right-20 w-[60rem]"
+          className="absolute -rotate-10 -right-20 w-[60rem] transition-opacity duration-1000"
         />
       </div>
     </div>

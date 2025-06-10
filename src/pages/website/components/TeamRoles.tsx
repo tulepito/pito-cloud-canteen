@@ -14,7 +14,7 @@ const TeamRoles = () => {
 
   return (
     <div className="pt-16 md:px-0 flex flex-col items-center gap-7 max-w-[1024px] mx-auto">
-      <span className="font-alt font-bold text-2xl w-full text-center md:text-[42px] md:leading-[3rem] md:whitespace-pre-line">
+      <span className="font-alt font-semibold font-[unbounded] text-2xl w-full text-center md:text-[40px] md:leading-[3rem] md:whitespace-pre-line">
         {intl.formatMessage({ id: 'built-for-every-role-in-your-team' })}
       </span>
       <a
@@ -23,7 +23,7 @@ const TeamRoles = () => {
           e.preventDefault();
           setIsModalOpen(true);
         }}
-        className="btn border border-solid border-gray-300 text-black hover:bg-black hover:text-white md:w-fit w-full">
+        className="btn border font-[unbounded] font-medium border-solid border-black text-black hover:bg-black hover:text-white md:w-fit w-full">
         {intl.formatMessage({ id: 'book-free-consultation' })}
       </a>
       <div className="grid md:grid-cols-2 gap-5 w-full">
@@ -61,7 +61,7 @@ const TeamRoles = () => {
             <div className="flex flex-col gap-2 text-sm">
               <div className="flex gap-2">
                 <div className="size-3.5 shrink-0 mt-1 rounded-sm bg-[#C5D475]"></div>
-                <span>
+                <span className="font-medium">
                   {intl.formatMessage({
                     id: 'free-yourself-from-daily-lunch-logistics',
                   })}
@@ -69,7 +69,7 @@ const TeamRoles = () => {
               </div>
               <div className="flex gap-2">
                 <div className="size-3.5 shrink-0 mt-1 rounded-sm bg-[#C5D475]"></div>
-                <span>
+                <span className="font-medium">
                   {intl.formatMessage({
                     id: 'set-price-caps-per-meal-and-track-real-time-spend',
                   })}
@@ -77,7 +77,7 @@ const TeamRoles = () => {
               </div>
               <div className="flex gap-2">
                 <div className="size-3.5 shrink-0 mt-1 rounded-sm bg-[#C5D475]"></div>
-                <span>
+                <span className="font-medium">
                   {intl.formatMessage({
                     id: 'one-invoice-full-visibility-no-surprises',
                   })}
@@ -85,7 +85,7 @@ const TeamRoles = () => {
               </div>
               <div className="flex gap-2">
                 <div className="size-3.5 shrink-0 mt-1 rounded-sm bg-[#C5D475]"></div>
-                <span>
+                <span className="font-medium">
                   {intl.formatMessage({
                     id: 'save-hours-every-week-with-smart-automation',
                   })}
@@ -122,7 +122,7 @@ const TeamRoles = () => {
             <div className="flex flex-col gap-2 text-sm">
               <div className="flex gap-2">
                 <div className="size-3.5 shrink-0 mt-1 rounded-sm bg-[#F6AFCE]"></div>
-                <span>
+                <span className="font-medium">
                   {intl.formatMessage({
                     id: 'choose-your-meals-from-rotating-curated-menus',
                   })}
@@ -130,13 +130,13 @@ const TeamRoles = () => {
               </div>
               <div className="flex gap-2">
                 <div className="size-3.5 shrink-0 mt-1 rounded-sm bg-[#F6AFCE]"></div>
-                <span>
+                <span className="font-medium">
                   {intl.formatMessage({ id: 'order-from-mobile-or-desktop' })}
                 </span>
               </div>
               <div className="flex gap-2">
                 <div className="size-3.5 shrink-0 mt-1 rounded-sm bg-[#F6AFCE]"></div>
-                <span>
+                <span className="font-medium">
                   {intl.formatMessage({
                     id: 'switch-vendors-weekly-to-avoid-food-fatigue',
                   })}
@@ -144,7 +144,7 @@ const TeamRoles = () => {
               </div>
               <div className="flex gap-2">
                 <div className="size-3.5 shrink-0 mt-1 rounded-sm bg-[#F6AFCE]"></div>
-                <span>
+                <span className="font-medium">
                   {intl.formatMessage({
                     id: 'grab-and-go-contactless-pickup-no-confusion',
                   })}

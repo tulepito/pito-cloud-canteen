@@ -35,18 +35,27 @@ const Navbar = () => {
 
   return (
     <div
-      className={`w-full h-[60px] md:px-4 px-5 z-[1000] fixed bg-white flex items-center transition-shadow duration-300 ${
+      className={`w-full h-[60px] md:h-[80px] md:px-4 px-5 z-[1000] fixed bg-white flex items-center transition-shadow duration-300 ${
         isScrolled ? 'shadow-md' : ''
       }`}>
       <div className="max-w-[1024px] w-full mx-auto">
         <div className="flex items-center justify-between">
           <Link href="/">
-            <Image src={logo} alt="logo" className="md:w-16 w-14" />
+            <Image
+              src={logo}
+              alt="logo"
+              className="md:w-20 w-14"
+              priority
+              loading="eager"
+              quality={100}
+            />
           </Link>
 
           {/* Desktop Buttons */}
           <div className="hidden md:flex items-center gap-2">
-            <Link className="btn" href={enGeneralPaths.login.index}>
+            <Link
+              className="btn hover:underline transition-all duration-300 ease-in-out"
+              href={enGeneralPaths.login.index}>
               {intl.formatMessage({ id: 'log-in' })}
             </Link>
             <a
@@ -84,7 +93,7 @@ const Navbar = () => {
 
             <div className="flex flex-col items-center gap-2 w-full">
               <Link
-                className="w-full border border-black btn text-lg py-3"
+                className="w-full border border-black btn text-lg py-3 hover:underline"
                 href={enGeneralPaths.login.index}>
                 {intl.formatMessage({ id: 'log-in' })}
               </Link>

@@ -16,12 +16,12 @@ const FeaturesCard = () => {
     <div className="flex flex-col md:gap-10 md:pb-16 gap-5 relative max-w-[1024px] mx-auto">
       {/* Heading */}
       <div className="flex flex-col gap-2 items-center">
-        <span className="text-text w-full md:w-2/3 text-center">
+        <span className="text-text w-full md:w-2/3 text-center font-medium">
           {intl.formatMessage({
             id: 'reclaim-your-time-boost-team-satisfaction',
           })}
         </span>
-        <span className="font-alt text-2xl md:text-[42px] font-bold text-center md:leading-[3rem] md:whitespace-pre-line">
+        <span className="font-alt text-2xl font-[unbounded] font-semibold md:text-[40px] text-center md:leading-[3rem] md:whitespace-pre-line">
           {intl.formatMessage({
             id: 'designed-for-hr-and-admin-professionals-in-tech',
           })}
@@ -32,10 +32,10 @@ const FeaturesCard = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         {/* Card 1 */}
         <div className="flex md:flex-col gap-8 justify-between border border-black/10 bg-white rounded-3xl p-5">
-          <div className="shrink-0 bg-[#F6AFCE]/30 text-[#D680A3] size-10 rounded-full flex items-center justify-center text-xl">
+          <div className="shrink-0 bg-[#F6AFCE]/30 text-[#D680A3] size-10 rounded-full flex items-center justify-center text-2xl">
             <PiHourglassMedium />
           </div>
-          <span>
+          <span className="font-medium md:text-lg">
             {intl.formatMessage({
               id: 'eliminate-endless-slack-messages-and-manual-spreadsheets',
             })}
@@ -44,10 +44,10 @@ const FeaturesCard = () => {
 
         {/* Card 2 */}
         <div className="flex md:flex-col gap-8 justify-between border border-black/10 bg-white rounded-3xl p-5">
-          <div className="shrink-0 bg-[#FFC811]/30 text-[#C79000] size-10 rounded-full flex items-center justify-center text-xl">
+          <div className="shrink-0 bg-[#FFC811]/30 text-[#C79000] size-10 rounded-full flex items-center justify-center text-2xl">
             <PiUsersThreeLight />
           </div>
-          <span>
+          <span className="font-medium md:text-lg">
             {intl.formatMessage({
               id: 'flexible-meal-solutions-for-dynamic-fast-changing-teams',
             })}
@@ -56,10 +56,10 @@ const FeaturesCard = () => {
 
         {/* Card 3 */}
         <div className="flex md:flex-col gap-8 justify-between border border-black/10 bg-white rounded-3xl p-5">
-          <div className="shrink-0 bg-[#6CCFF6]/30 text-[#3598BF] size-10 rounded-full flex items-center justify-center text-xl">
+          <div className="shrink-0 bg-[#6CCFF6]/30 text-[#3598BF] size-10 rounded-full flex items-center justify-center text-2xl">
             <PiRobotLight />
           </div>
-          <span>
+          <span className="font-medium md:text-lg">
             {intl.formatMessage({
               id: 'intelligent-ordering-that-adapts-to-your-people-and-operations',
             })}

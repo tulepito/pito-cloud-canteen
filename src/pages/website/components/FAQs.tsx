@@ -65,10 +65,10 @@ const FAQs = () => {
   return (
     <div className="px-5 md:px-40 py-16 flex flex-col items-center gap-10 relative">
       <div className="flex flex-col items-center md:gap-4 gap-3 md:w-[55%] text-center">
-        <span className="font-alt font-bold text-2xl md:text-[42px] leading-tight">
+        <span className="font-alt font-semibold font-[unbounded] text-2xl md:text-[40px] leading-tight">
           {intl.formatMessage({ id: 'got-questions' })}
         </span>
-        <span className="text-text md:whitespace-pre-line">
+        <span className="text-text md:whitespace-pre-line font-medium">
           {intl.formatMessage({
             id: 'have-a-question-about-our-service-or-billing-check-out-the-answers-below-if-you-still-need-help-our-team-is-just-a-message-away',
           })}
@@ -96,33 +96,33 @@ const FAQs = () => {
 
               <div
                 className={`overflow-hidden transition-all duration-300 ease-in-out ${
-                  isOpen ? 'max-h-32 my-5' : 'max-h-0'
+                  isOpen ? 'max-h-fit my-5' : 'max-h-0'
                 }`}>
-                {isOpen && <p>{faq.answer}</p>}
+                {isOpen && <p className="font-medium">{faq.answer}</p>}
               </div>
             </div>
           );
         })}
       </div>
       <div className="border border-[#A8A8A8] bg-white max-w-2xl p-5 rounded-2xl w-full flex md:flex-row flex-col md:items-end justify-between gap-6">
-        <div className="flex gap-4 md:w-1/2">
+        <div className="flex gap-4 md:w-2/3">
           <Image
             src={logo}
             className="rounded-full size-10 md:flex hidden"
             alt="logo"
           />
-          <div className="flex flex-col text-text md:gap-0 gap-3">
+          <div className="flex flex-col text-text md:gap-1 gap-3">
             <div className="flex items-center gap-4">
               <Image
                 src={logo}
                 className="rounded-full size-10 flex md:hidden"
                 alt="logo"
               />
-              <span className="font-semibold text-lg">
+              <span className="font-semibold text-lg font-[unbounded]">
                 {intl.formatMessage({ id: 'still-need-help' })}
               </span>
             </div>
-            <span className="text-sm">
+            <span className="text-base leading-normal font-semibold">
               {intl.formatMessage({
                 id: 'were-here-for-you-contact-our-team-and-well-assist-you-right-away',
               })}
@@ -131,7 +131,7 @@ const FAQs = () => {
         </div>
         <button
           onClick={() => setIsModalOpen(true)}
-          className="btn bg-black text-white">
+          className="btn bg-black text-white font-[unbounded] font-semibold">
           {intl.formatMessage({ id: 'get-in-touch' })}
         </button>
       </div>

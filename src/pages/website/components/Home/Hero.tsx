@@ -13,20 +13,20 @@ const Hero = () => {
   const { setIsModalOpen } = useModal();
 
   return (
-    <div className="w-full md:min-h-[70vh] md:px-0 px-5 relative max-w-[1280px] mx-auto">
+    <div className="w-full md:min-h-[70vh] md:px-0 px-5 relative container mx-auto">
       {/* main hero section */}
       <div className="flex md:flex-row md:px-0 flex-col items-center md:gap-12 gap-16 md:py-20 pt-10 md:h-[70vh]">
         {/* lhs */}
         <div className="flex flex-col md:items-start items-center md:text-left text-center md:gap-5 gap-2 md:w-1/2 pt-0">
-          <span className="text-text">
+          <span className="text-text font-medium">
             {intl.formatMessage({ id: 'the-lunch-management-platform' })}
           </span>
-          <span className="font-bold text-3xl md:text-[42px] md:leading-[3rem] md:whitespace-pre-line">
+          <span className="font-semibold text-3xl md:text-[42px] font-[unbounded] md:leading-[3rem] md:whitespace-pre-line">
             {intl.formatMessage({
               id: 'streamline-team-meals-simplify-your-workday',
             })}
           </span>
-          <span className="text-text md:whitespace-pre-line">
+          <span className="text-text md:text-lg md:whitespace-pre-line font-medium">
             {intl.formatMessage({
               id: 'stop-drowning-in-meal-coordination-pito-cloud-canteen-is-a-tech-powered-platform-that-transforms-workplace-dining-from-a-daily-headache-into-a-strategic-employee-benefit',
             })}
@@ -38,7 +38,7 @@ const Hero = () => {
                 e.preventDefault();
                 setIsModalOpen(true);
               }}
-              className="capitalize btn border border-gray-300 bg-black text-white py-3 px-6 font-semibold hover:opacity-90 transition-all duration-200 hover:scale-[1.01]">
+              className="capitalize btn border font-[unbounded] border-gray-300 bg-black text-white py-3 px-6 font-semibold hover:opacity-90 transition-all duration-200 hover:scale-[1.01]">
               {intl.formatMessage({ id: 'book-free-consultation-0' })}
             </a>
             {/* <a

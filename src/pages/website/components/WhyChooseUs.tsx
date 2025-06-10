@@ -5,8 +5,8 @@ import type { StaticImageData } from 'next/image';
 import Image from 'next/image';
 
 import img2 from '../assets/com-van-phong-cho-moi-quy.webp';
-import img0 from '../assets/dashboard-quan-ly-dat-com-van-phong.webp';
-import img1 from '../assets/tu-dong-hoa-dat-com-van-phong.webp';
+import img1 from '../assets/dashboard-quan-ly-dat-com-van-phong.webp';
+import img0 from '../assets/tu-dong-hoa-dat-com-van-phong.webp';
 
 interface FAQ {
   question: string;
@@ -64,7 +64,7 @@ const WhyChooseUs = () => {
 
   return (
     <div className="pt-16 flex md:flex-row flex-col-reverse gap-8 md:gap-16 md:px-0 md:pb-16 max-w-[1024px] mx-auto">
-      <div className="md:w-1/2">
+      <div className="md:w-2/5">
         <Image
           src={faqs[activeIndex].image}
           className="rounded-2xl object-contain bg-white w-full h-auto"
@@ -74,7 +74,7 @@ const WhyChooseUs = () => {
       </div>
 
       <div className="flex flex-col gap-8 flex-1">
-        <span className="font-alt font-bold text-2xl md:text-[42px] md:leading-[3rem] md:whitespace-pre-line">
+        <span className="font-alt font-[unbounded] font-semibold text-2xl md:text-[40px] md:leading-[3rem] md:whitespace-pre-line">
           {intl.formatMessage({ id: 'why-tech-leaders-choose-pito' })}
         </span>
 
@@ -101,7 +101,7 @@ const WhyChooseUs = () => {
                     {faq.answer.map((line, idx) => (
                       <div key={idx} className="flex gap-2">
                         <div className="size-3 shrink-0 mt-1 rounded-sm bg-[#C5D475]"></div>
-                        <span>{line}</span>
+                        <span className="font-medium ">{line}</span>
                       </div>
                     ))}
                   </div>
