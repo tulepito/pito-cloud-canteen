@@ -2,14 +2,15 @@ import { useIntl } from 'react-intl';
 import clsx from 'clsx';
 import Image from 'next/image';
 
-import company1 from '../../assets/companies/company1.svg'; // booking
-import company2 from '../../assets/companies/company2.svg'; // shopee
-import company3 from '../../assets/companies/company3.svg'; // employment hero
-import company4 from '../../assets/companies/company4.svg'; // deloit
-import company5 from '../../assets/companies/company5.svg'; // mm
-import company6 from '../../assets/companies/company6.svg'; // salt
-import company7 from '../../assets/companies/company7.svg'; // amazon
-import company8 from '../../assets/companies/company8.svg'; // bck
+import company1 from '../../assets/companies/1.webp'; // booking
+import company2 from '../../assets/companies/2.webp'; // shopee
+import company3 from '../../assets/companies/3.webp'; // employment hero
+import company4 from '../../assets/companies/4.webp'; // deloit
+import company5 from '../../assets/companies/5.webp'; // mm
+import company6 from '../../assets/companies/6.webp'; // salt
+import company7 from '../../assets/companies/7.webp'; // amazon
+import company8 from '../../assets/companies/8.webp'; // bck
+import company9 from '../../assets/companies/9.webp'; // lazada
 
 import styles from './styles.module.css';
 
@@ -59,6 +60,12 @@ const companies = [
   {
     src: company8,
     alt: 'BCK',
+    className: 'aspect-[2/1] w-[150px]',
+    classNameImage: 'object-contain',
+  },
+  {
+    src: company9,
+    alt: 'Lazada',
     className: 'aspect-[2/1] w-[150px]',
     classNameImage: 'object-contain',
   },

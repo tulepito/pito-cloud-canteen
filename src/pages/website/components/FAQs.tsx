@@ -83,9 +83,9 @@ const FAQs = () => {
             <div key={index}>
               <button
                 onClick={() => toggleFAQ(index)}
-                className="w-full hover:!bg-gray-300 bg-[#FAFAFA] rounded-2xl p-4 flex justify-between items-center text-left font-medium text-base md:text-lg text-black focus:outline-none cursor-pointer transition-all duration-300 ease-in-out"
+                className="w-full md:hover:!bg-gray-300 bg-[#FAFAFA] rounded-2xl p-4 flex justify-between items-center text-left font-medium text-base md:text-lg text-black focus:outline-none cursor-pointer transition-all duration-300 ease-in-out"
                 style={{
-                  backgroundColor: !isOpen ? '#FAFAFA' : '#000',
+                  backgroundColor: isOpen ? '#000' : '#FAFAFA',
                   color: !isOpen ? '#000' : '#FAFAFA',
                 }}>
                 {faq.question}

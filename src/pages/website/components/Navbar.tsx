@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FiMenu, FiX } from 'react-icons/fi';
 import { useIntl } from 'react-intl';
 import Image from 'next/image';
@@ -13,13 +13,31 @@ import { useModal } from '../pages/Layout';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false); // NEW STATE
   const intl = useIntl();
   const { setIsModalOpen } = useModal();
 
   const toggleMenu = () => setIsMenuOpen((prev) => !prev);
 
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 0) {
+        setIsScrolled(true);
+      } else {
+        setIsScrolled(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
-    <div className="w-full h-[60px] md:px-4 px-5 z-[1000] fixed bg-white/50 backdrop-blur-lg flex items-center">
+    <div
+      className={`w-full h-[60px] md:px-4 px-5 z-[1000] fixed bg-white flex items-center transition-shadow duration-300 ${
+        isScrolled ? 'shadow-md' : ''
+      }`}>
       <div className="max-w-[1024px] w-full mx-auto">
         <div className="flex items-center justify-between">
           <Link href="/">

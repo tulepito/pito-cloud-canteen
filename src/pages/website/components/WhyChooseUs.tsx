@@ -4,9 +4,9 @@ import { useIntl } from 'react-intl';
 import type { StaticImageData } from 'next/image';
 import Image from 'next/image';
 
-import img0 from '../assets/why.webp';
-import img1 from '../assets/why2.webp';
-import img2 from '../assets/why3.webp';
+import img2 from '../assets/com-van-phong-cho-moi-quy.webp';
+import img0 from '../assets/dashboard-quan-ly-dat-com-van-phong.webp';
+import img1 from '../assets/tu-dong-hoa-dat-com-van-phong.webp';
 
 interface FAQ {
   question: string;
@@ -63,11 +63,11 @@ const WhyChooseUs = () => {
   };
 
   return (
-    <div className="pt-16 flex md:flex-row flex-col-reverse gap-10 md:px-0 md:pb-16 max-w-[1024px] mx-auto">
+    <div className="pt-16 flex md:flex-row flex-col-reverse gap-8 md:gap-16 md:px-0 md:pb-16 max-w-[1024px] mx-auto">
       <div className="md:w-1/2">
         <Image
           src={faqs[activeIndex].image}
-          className="rounded-2xl object-contain bg-sky-200 w-full h-auto"
+          className="rounded-2xl object-contain bg-white w-full h-auto"
           alt={`FAQ visual ${activeIndex}`}
           priority
         />

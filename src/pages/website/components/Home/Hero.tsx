@@ -13,20 +13,20 @@ const Hero = () => {
   const { setIsModalOpen } = useModal();
 
   return (
-    <div className="w-full md:min-h-[34rem] md:px-0 px-5 relative max-w-[1024px] mx-auto">
+    <div className="w-full md:min-h-[70vh] md:px-0 px-5 relative max-w-[1280px] mx-auto">
       {/* main hero section */}
-      <div className="flex md:flex-row md:px-0 flex-col items-center md:gap-4 gap-16 md:py-20 pt-10">
+      <div className="flex md:flex-row md:px-0 flex-col items-center md:gap-12 gap-16 md:py-20 pt-10 md:h-[70vh]">
         {/* lhs */}
         <div className="flex flex-col md:items-start items-center md:text-left text-center md:gap-5 gap-2 md:w-1/2 pt-0">
           <span className="text-text">
             {intl.formatMessage({ id: 'the-lunch-management-platform' })}
           </span>
-          <span className="font-alt font-bold text-3xl md:text-[42px] md:leading-[3rem] md:whitespace-pre-line">
+          <span className="font-bold text-3xl md:text-[42px] md:leading-[3rem] md:whitespace-pre-line">
             {intl.formatMessage({
               id: 'streamline-team-meals-simplify-your-workday',
             })}
           </span>
-          <span className="text-text">
+          <span className="text-text md:whitespace-pre-line">
             {intl.formatMessage({
               id: 'stop-drowning-in-meal-coordination-pito-cloud-canteen-is-a-tech-powered-platform-that-transforms-workplace-dining-from-a-daily-headache-into-a-strategic-employee-benefit',
             })}
