@@ -87,6 +87,10 @@ const DOWNLOAD_COLUMN_LIST_OPTIONS = [
     key: 'partnerAddress',
     label: 'Địa chỉ đối tác',
   },
+  {
+    key: 'billingOfLading',
+    label: 'Phiếu vận đơn',
+  },
 ];
 
 const ORDER_TYPE_OPTIONS = [

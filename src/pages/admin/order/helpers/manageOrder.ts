@@ -4,6 +4,7 @@ import uniq from 'lodash/uniq';
 import * as XLSX from 'xlsx';
 
 import { parseThousandNumber } from '@helpers/format';
+import { getTrackingLink } from '@helpers/order/prepareDataHelper';
 import { formatTimestamp } from '@src/utils/dates';
 import { getLabelByKey, ORDER_STATE_OPTIONS } from '@src/utils/options';
 import type { TObject } from '@src/utils/types';
@@ -31,6 +32,7 @@ export const parseEntitiesToExportCsv = (
   const hasNumberPerFood = exportColumns.includes('numberPerFood');
   const hasPrice = exportColumns.includes('price');
   const hasBookerName = exportColumns.includes('bookerName');
+  const hasBillingOfLading = exportColumns.includes('billingOfLading');
 
   const orderToExport = orders.map((order) => {
     const {
@@ -53,7 +55,10 @@ export const parseEntitiesToExportCsv = (
       foodList,
       price,
       bookerName,
+      id,
     } = order.data || {};
+
+    console.log('order.data', order.data);
 
     const parentOrderData = {
       ...(hasTitleCol && { 'Mã đơn': title }),
@@ -113,6 +118,7 @@ export const parseEntitiesToExportCsv = (
             restaurants = [],
             restaurantId,
             subOrderDate,
+            timestamp,
           } = child?.data || {};
 
           return {
@@ -158,6 +164,9 @@ export const parseEntitiesToExportCsv = (
             }),
             ...(hasPartnersAddress && {
               'Địa chỉ đối tác': partnerLocation,
+            }),
+            ...(hasBillingOfLading && {
+              'Phiếu vận đơn': getTrackingLink(id, timestamp),
             }),
           };
         })
