@@ -37,7 +37,7 @@ export default function Document() {
           rel="stylesheet"
         />
         <link
-          href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&family=Reddit+Sans:ital,wght@0,200..900;1,200..900&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&family=Unbounded:wght@200..900&family=Reddit+Sans:ital,wght@0,200..900;1,200..900&display=swap"
           rel="stylesheet"
         />
       </Head>

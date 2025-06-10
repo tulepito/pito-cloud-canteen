@@ -16,7 +16,7 @@ const Footer = () => {
             <Image
               src={logo}
               alt="logo"
-              className="translate-x-3 md:translate-x-0"
+              className="translate-x-3 md:translate-x-0 md:w-20 w-14"
             />
           </Link>
           <div className="md:hidden flex items-center justify-end text-xl gap-3">
