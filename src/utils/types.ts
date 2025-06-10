@@ -73,6 +73,7 @@ export type TDefaultProps = {
 export type TIconProps = TDefaultProps & {
   width?: number;
   height?: number;
+  color?: string;
   onClick?: (e?: any) => void;
 };
 

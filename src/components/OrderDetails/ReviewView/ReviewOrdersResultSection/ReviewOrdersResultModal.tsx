@@ -45,7 +45,7 @@ const UserLabelPreviewModal = dynamic(() => import('./UserLabelPreviewModal'), {
   ssr: false,
 });
 
-function UserLabelThermalPrintSection({
+export function UserLabelThermalPrintSection({
   userLabelRecords,
 }: {
   userLabelRecords: UserLabelRecord[];

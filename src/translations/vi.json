@@ -1861,7 +1861,7 @@
   "SubOrderSummary.tableHead.type": "HẠNG MỤC",
   "SubOrderSummary.tableHead.unitPrice": "ĐƠN GIÁ",
   "SubOrderSummary.title": "CHI TIẾT ĐƠN HÀNG",
-  "SubOrderSummary.viewDetail": "Xem chi tiết chọn món",
+  "SubOrderSummary.viewDetail": "Xem chi tiết chọn món & In tem nhiệt",
   "SubOrderTitle.chatLink": "Chat",
   "SubOrderTitle.mainTitle": "Đơn hàng {orderTitle}",
   "SubOrderTitle.note": "Nếu có bất cứ thay đổi hoặc yêu cầu liên quan đến đơn hàng, vui lòng liên hệ hotline {phoneNumber}.",
@@ -2288,5 +2288,6 @@
   "yes-we-require-a-minimum-of-20-meals-per-day-with-a-commitment-of-at-least-3-meal-days-per-week": "Có. Chúng tôi yêu cầu tối thiểu 20 phần ăn mỗi ngày, và tối thiểu 3 ngày cho trên 1 tuần.",
   "how-can-i-track-and-manage-orders-on-pito-cloud-canteen": "Tôi có thể theo dõi và quản lý đơn hàng trên PITO Cloud Canteen như thế nào?",
   "you-can-easily-track-and-manage-their-orders-directly-through-the-system-dashboard-allowing-real-time-updates-on-order-status-adjustments-and-cost-control": "Bạn có thể dễ dàng theo dõi và quản lý đơn hàng qua bảng điều khiển trên hệ thống, với cập nhật thời gian thực về trạng thái đơn, điều chỉnh, và kiểm soát chi phí một cách dễ dàng và thống nhất.",
-  "get-advice": "Nhận tư vấn"
+  "get-advice": "Nhận tư vấn",
+  "SubOrderDetail.in-tem-nhiet": "In tem nhiệt"
 }
