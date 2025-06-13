@@ -4,9 +4,9 @@ import { useIntl } from 'react-intl';
 import type { StaticImageData } from 'next/image';
 import Image from 'next/image';
 
+import img0 from '../assets/com-trua-van-phong-cong-nghe.webp';
 import img2 from '../assets/com-van-phong-cho-moi-quy.webp';
 import img1 from '../assets/dashboard-quan-ly-dat-com-van-phong.webp';
-import img0 from '../assets/tu-dong-hoa-dat-com-van-phong.webp';
 
 interface FAQ {
   question: string;
@@ -63,14 +63,19 @@ const WhyChooseUs = () => {
   };
 
   return (
-    <div className="pt-16 flex md:flex-row flex-col-reverse gap-8 md:gap-16 md:px-0 md:pb-16 max-w-[1024px] mx-auto">
-      <div className="md:w-2/5">
-        <Image
-          src={faqs[activeIndex].image}
-          className="rounded-2xl object-contain bg-white w-full h-auto"
-          alt={`FAQ visual ${activeIndex}`}
-          priority
-        />
+    <div className="pt-16 flex md:flex-row items-center flex-col-reverse gap-4 md:gap-0 md:px-0 md:pb-16 container mx-auto">
+      <div className="md:w-1/2 w-full">
+        <div className="relative  aspect-[1/1] md:w-3/4 md:aspect-[4/5] mx-auto">
+          <Image
+            src={faqs[activeIndex].image}
+            className="rounded-2xl object-contain bg-white h-auto"
+            alt={`FAQ visual ${activeIndex}`}
+            priority
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            quality={100}
+          />
+        </div>
       </div>
 
       <div className="flex flex-col gap-8 flex-1">

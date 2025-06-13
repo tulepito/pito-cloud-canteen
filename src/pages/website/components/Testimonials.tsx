@@ -137,11 +137,17 @@ const Testimonials: React.FC = () => {
                   <div className="w-full h-[1px] bg-[#D7D7D7] " />
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                      <Image
-                        src={testimonial.pfp}
-                        alt={testimonial.name}
-                        className="w-12 h-12 rounded-full object-cover"
-                      />
+                      <div className="relative w-12 aspect-square">
+                        <Image
+                          src={testimonial.pfp}
+                          alt={testimonial.name}
+                          className="rounded-full object-cover"
+                          sizes="60px"
+                          fill
+                          quality={100}
+                        />
+                      </div>
+
                       <div>
                         <div className="font-semibold">{testimonial.name}</div>
                         <div className="text-sm  group-[.is-active]:">
@@ -149,11 +155,15 @@ const Testimonials: React.FC = () => {
                         </div>
                       </div>
                     </div>
-                    <Image
-                      src={testimonial.companyLogo}
-                      alt="company"
-                      className="w-[100px]"
-                    />
+                    <div className="relative aspect-square w-[100px]">
+                      <Image
+                        src={testimonial.companyLogo}
+                        alt="company"
+                        fill
+                        sizes="150px"
+                        quality={100}
+                      />
+                    </div>
                   </div>
                 </div>
               </SplideSlide>

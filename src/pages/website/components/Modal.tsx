@@ -99,6 +99,7 @@ export const ModalForm = ({ onClose }: { onClose: () => void }) => {
           pattern="^[0-9]+$"
           required
           autoComplete="tel"
+          placeholder={intl.formatMessage({ id: 'enter-phone' })}
           className="mt-1 w-full rounded-xl border border-solid border-gray-300 px-4 py-3 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black"
         />
       </div>

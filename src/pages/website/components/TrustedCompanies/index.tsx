@@ -98,6 +98,7 @@ const TrustedCompanies = () => {
                   className={logo.classNameImage}
                   priority
                   loading="eager"
+                  sizes="(max-width: 768px) 12vw, 5vw"
                 />
               </div>
             ))}

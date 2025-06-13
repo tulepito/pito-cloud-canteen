@@ -114,11 +114,12 @@ const Solutions = () => {
           />
         </div>
       </div>
-      <div className="flex-1 relative md:flex hidden scale-[175%] top-52 left-10">
+      <div className="flex-1 relative md:flex hidden h-full scale-[175%] aspect-[4/3] top-28 left-44">
         <Image
           src={images[currentImageIndex]}
           alt="solutions hero"
-          className="absolute -rotate-10 -right-20 w-[60rem] transition-opacity duration-1000"
+          fill
+          sizes="(max-width: 768px) 100vw, 40vw"
         />
       </div>
     </div>

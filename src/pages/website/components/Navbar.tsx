@@ -64,7 +64,7 @@ const Navbar = () => {
                 e.preventDefault();
                 setIsModalOpen(true);
               }}
-              className="btn border border-black bg-black text-white hover:opacity-90 hover:scale-[1.01] transition-all duration-300 ease-in-out">
+              className="btn border border-black bg-black text-white hover:opacity-90 hover:scale-[1.01] transition-all duration-300 ease-in-out font-[unbounded]">
               {intl.formatMessage({ id: 'request-demo' })}
             </a>
             <LanguageSwitchButton showLabel />
@@ -103,7 +103,7 @@ const Navbar = () => {
                   e.preventDefault();
                   setIsModalOpen(true);
                 }}
-                className="btn border border-black bg-black text-white w-full text-lg py-3">
+                className="btn border border-black bg-black text-white w-full text-lg py-3 font-[unbounded]">
                 {intl.formatMessage({ id: 'request-demo' })}
               </a>
               <LanguageSwitchButton showLabel />

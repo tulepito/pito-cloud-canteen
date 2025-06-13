@@ -51,7 +51,7 @@ const ServiceImages = () => {
                     alt={`Service Image ${index + 1}`}
                     fill
                     className="object-cover"
-                    quality={100}
+                    sizes="(max-width: 768px) 80vw, (max-width: 1200px) 33vw, 15vw"
                   />
                 </div>
               </div>

@@ -29,7 +29,7 @@ const CTA = () => {
             <button
               onClick={() => setIsModalOpen(true)}
               className="btn border border-solid border-gray-300 font-[unbounded] text-white bg-black hover:opacity-90 hover:scale-[1.01] transition-all duration-300 ease-in-out p-4 px-6 font-semibold">
-              {intl.formatMessage({ id: 'book-free-consultation' })}
+              {intl.formatMessage({ id: 'request-consultation' })}
             </button>
             {/* <button
             onClick={() => setIsModalOpen(true)}

@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useIntl } from 'react-intl';
 import Image from 'next/image';
 
@@ -6,11 +7,12 @@ import pink from '../assets/decorations/pink.svg';
 import yellow from '../assets/decorations/yellow.svg';
 import employee from '../assets/employee.webp';
 import hr from '../assets/hr.webp';
-import { useModal } from '../pages/Layout';
+
+import GoogleCalendarModal from './GoogleCalendarModal';
 
 const TeamRoles = () => {
   const intl = useIntl();
-  const { setIsModalOpen } = useModal();
+  const [isModalOpen, setIsModalOpen] = useState(false); // ✅ STATE MODAL
 
   return (
     <div className="pt-16 md:px-0 flex flex-col items-center gap-7 max-w-[1024px] mx-auto">
@@ -26,6 +28,14 @@ const TeamRoles = () => {
         className="btn border font-[unbounded] font-medium border-solid border-black text-black hover:bg-black hover:text-white md:w-fit w-full">
         {intl.formatMessage({ id: 'book-free-consultation' })}
       </a>
+      {isModalOpen && (
+        <div className="fixed inset-0 z-[9999] flex justify-center items-center bg-black/20">
+          <GoogleCalendarModal
+            isModalOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+          />
+        </div>
+      )}
       <div className="grid md:grid-cols-2 gap-5 w-full">
         {/* lhs */}
         <div className="relative flex flex-col pt-40 h-full">
@@ -36,7 +46,9 @@ const TeamRoles = () => {
                   style={{ objectFit: 'cover' }}
                   src={hr}
                   alt="hr"
-                  className="h-full rounded-2xl"
+                  className=" rounded-2xl"
+                  fill
+                  sizes="(max-width: 768px) 70vw, (max-width: 1200px) 33vw, 20vw"
                 />
               </div>
               {/* decorations */}
@@ -103,7 +115,9 @@ const TeamRoles = () => {
                   style={{ objectFit: 'cover' }}
                   src={employee}
                   alt="hr"
-                  className="h-full rounded-2xl"
+                  className="rounded-2xl"
+                  fill
+                  sizes="(max-width: 768px) 70vw, (max-width: 1200px) 33vw, 20vw"
                 />
               </div>
               {/* decorations */}
