@@ -111,8 +111,8 @@ const SubOrderDetail: React.FC<TSubOrderDetailProps> = ({
   }, [JSON.stringify(foodDataList)]);
 
   const printThermalSection = async () => {
-    const printContent = thermalPrintSectionRef.current?.innerHTML;
-    if (!printContent) return;
+    if (!thermalPrintSectionRef.current) return;
+
     const convertToImage = await html2canvas(thermalPrintSectionRef.current, {
       scale: 3,
       useCORS: true,
@@ -120,28 +120,36 @@ const SubOrderDetail: React.FC<TSubOrderDetailProps> = ({
     });
     const imgData = convertToImage.toDataURL('image/png');
 
-    const printWindow = window.open('', '', 'height=600,width=800');
-    printWindow?.document.write(`
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    document.body.appendChild(iframe);
+
+    iframe.contentDocument?.write(`
+      <html>
+        <head>
+          <title>Print</title>
           <style>
-            body {
-              margin: 0;
-            }
-    
+            body { margin: 0 }
             @media print {
-              body {
-                margin: 0;
-              }
-    
-              @page {
-                size: 62mm 43mm;
-                margin: 0;
-              }
+              @page { size: 62mm 43mm; margin: 0; }
+              body { margin: 0; }
             }
           </style>
+        </head>
+        <body>
           <img style="width: 59.452mm;" src="${imgData}" />
-        `);
-    printWindow?.document.close();
-    printWindow?.print();
+        </body>
+      </html>
+    `);
+    iframe.contentDocument?.close();
+
+    iframe.onload = () => {
+      iframe.contentWindow?.focus();
+      iframe.contentWindow?.print();
+      setTimeout(() => {
+        document.body.removeChild(iframe);
+      }, 1000);
+    };
   };
 
   useEffect(() => {
