@@ -31,6 +31,7 @@ const PartnerNotificationModal: React.FC<TPartnerNotificationModalProps> = ({
   const notifications = useAppSelector(
     (state) => state.Notification.notifications,
   );
+
   const { isMobileLayout, isTabletLayout } = useViewport();
 
   const notSeenNotificationIds = notifications.reduce(

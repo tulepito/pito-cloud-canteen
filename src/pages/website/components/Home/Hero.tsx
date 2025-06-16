@@ -9,6 +9,7 @@ import pink from '../../assets/decorations/pink.svg';
 import yellow from '../../assets/decorations/yellow.svg';
 import image from '../../assets/mo-hinh-dat-com-trua-van-phong.webp';
 import HeroVideoModal from '../HeroVideoModal';
+import VideoSection from '../VideoSection';
 
 const Hero = () => {
   const intl = useIntl();
@@ -20,7 +21,7 @@ const Hero = () => {
     <>
       <div className="w-full md:min-h-[70vh] md:px-0 px-5 relative container mx-auto">
         {/* main hero section */}
-        <div className="flex md:flex-row md:px-0 flex-col items-center md:gap-12 gap-16 md:py-20 pt-10 md:h-[70vh]">
+        <div className="flex md:flex-row md:px-0 flex-col items-center md:gap-12 gap-8 md:py-20 pt-10 md:h-[70vh]">
           {/* lhs */}
           <div className="flex flex-col md:items-start items-center md:text-left text-center md:gap-5 gap-2 md:w-1/2 pt-0">
             <span className="text-text font-medium">
@@ -46,22 +47,25 @@ const Hero = () => {
                 className="capitalize btn border font-[unbounded] border-gray-300 bg-black text-white py-3 px-6 font-semibold hover:opacity-90 transition-all duration-200 hover:scale-[1.01]">
                 {intl.formatMessage({ id: 'book-free-consultation-0' })}
               </a>
-              {/* <a
-              href=""
-              className="capitalize btn border border-solid border-gray-300 bg-white text-black hover:opacity-90 transition-all duration-200 hover:!scale-[1.01] py-3 px-6 font-semibold">
-              {intl.formatMessage({ id: 'book-free-consultation-0' })}
-            </a> */}
             </div>
           </div>
+          <VideoSection
+            embedUrl="https://fast.wistia.net/embed/iframe/s5r9t8jg3o?autoPlay=true&mute=true&playerColor=000000"
+            className="w-full block md:hidden"
+          />
           <div
-            className="flex-1 relative md:flex hidden h-full aspect-[4/3] scale-110 top-0 left-0 hover:scale-[1.12] transition-all duration-300 cursor-pointer"
+            className="flex-1 relative md:flex hidden h-full"
             onClick={() => setIsModalHeroOpen(true)}>
-            <Image
-              src={image}
-              alt="Image hero"
-              fill
-              sizes="(max-width: 768px) 100vw, 40vw"
-            />
+            <div className="relative aspect-[2997/2443] h-full scale-110 top-0 left-0 hover:scale-[1.12] transition-all duration-300 cursor-pointer">
+              <Image
+                src={image}
+                alt="Image hero"
+                fill
+                sizes="(max-width: 768px) 100vw, 40vw"
+                priority
+                loading="eager"
+              />
+            </div>
           </div>
         </div>
         {/* decorations */}
@@ -82,7 +86,7 @@ const Hero = () => {
         />
       </div>
       {isModalHeroOpen && (
-        <div className="fixed inset-0 z-[9999] flex justify-center items-center bg-black/20">
+        <div className="fixed inset-0 z-[9999] flex justify-center items-center bg-black/80">
           <HeroVideoModal
             isModalOpen={isModalHeroOpen}
             onClose={() => setIsModalHeroOpen(false)}
