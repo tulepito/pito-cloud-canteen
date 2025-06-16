@@ -13,31 +13,31 @@ const HeroVideoModal = ({ onClose, isModalOpen }: HeroVideoModalProps) => {
   const modalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Disable body scrolling when modal is open
+    const originalOverflow = document.body.style.overflow;
+
     if (isModalOpen) {
       document.body.style.overflow = 'hidden';
       document.body.setAttribute('data-lenis-prevent', 'true');
     } else {
-      document.body.style.overflow = '';
+      document.body.style.overflow = originalOverflow;
       document.body.removeAttribute('data-lenis-prevent');
     }
 
-    // Function to handle click outside modal
     const handleClickOutside = (event: MouseEvent) => {
       if (
         modalRef.current &&
         !modalRef.current.contains(event.target as Node)
       ) {
-        onClose(); // Close modal if the click is outside the modal
+        onClose();
       }
     };
 
-    // Attach event listener on mount
     document.addEventListener('mousedown', handleClickOutside);
 
-    // Clean up event listener on unmount
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
+      document.body.style.overflow = originalOverflow;
+      document.body.removeAttribute('data-lenis-prevent');
     };
   }, [isModalOpen, onClose]);
 
@@ -49,7 +49,6 @@ const HeroVideoModal = ({ onClose, isModalOpen }: HeroVideoModalProps) => {
           : 'opacity-0 scale-90 invisible'
       }`}
       ref={modalRef}>
-      {/* Close Button */}
       <button
         onClick={onClose}
         className="absolute top-1 right-2 z-10 text-black text-xxl font-semibold cursor-pointer hover:text-gray-500 transition-colors duration-300 ease-in-out">
