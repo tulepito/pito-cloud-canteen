@@ -68,7 +68,7 @@ const Solutions = () => {
   }, []);
 
   return (
-    <div className="md:py-16 md:px-4 p-5 flex gap-10 relative max-w-[1024px] mx-auto">
+    <div className="md:py-16 md:px-4 px-5 pt-10 md:mt-0 flex gap-10 relative max-w-[1024px] mx-auto">
       <div className="md:w-1/2 flex flex-col md:items-start items-center">
         <span className="font-alt font-semibold font-[unbounded] text-2xl md:text-[40px] leading-tight md:w-auto w-full md:text-start text-center md:whitespace-pre-line">
           {intl.formatMessage({ id: 'solutions-for-every-team-size' })}

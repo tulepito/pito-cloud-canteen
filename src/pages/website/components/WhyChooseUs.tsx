@@ -64,7 +64,7 @@ const WhyChooseUs = () => {
 
   return (
     <div className="pt-16 flex md:flex-row items-center flex-col-reverse gap-4 md:gap-12 md:px-28 md:pb-16 container mx-auto">
-      <div className="md:w-1/2 w-full">
+      <div className="md:w-[42%] w-full">
         <div className="relative  aspect-[1/1] md:w-full md:aspect-[4/5] mx-auto">
           <Image
             src={faqs[activeIndex].image}

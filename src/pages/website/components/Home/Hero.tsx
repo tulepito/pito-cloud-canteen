@@ -21,7 +21,7 @@ const Hero = () => {
     <>
       <div className="w-full md:min-h-[70vh] md:px-0 px-5 relative container mx-auto">
         {/* main hero section */}
-        <div className="flex md:flex-row md:px-0 flex-col items-center md:gap-12 gap-8 md:py-20 pt-10 md:h-[70vh]">
+        <div className="flex md:flex-row md:px-0 flex-col justify-center items-center md:gap-12 gap-8 md:py-20 pt-10 md:h-[70vh]">
           {/* lhs */}
           <div className="flex flex-col md:items-start items-center md:text-left text-center md:gap-5 gap-2 md:w-1/2 pt-0">
             <span className="text-text font-medium">
@@ -54,7 +54,7 @@ const Hero = () => {
             className="w-full block md:hidden"
           />
           <div
-            className="flex-1 relative md:flex hidden h-full"
+            className="relative md:flex hidden h-full"
             onClick={() => setIsModalHeroOpen(true)}>
             <div className="relative aspect-[2997/2443] h-full scale-110 top-0 left-0 hover:scale-[1.12] transition-all duration-300 cursor-pointer">
               <Image

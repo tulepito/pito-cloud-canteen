@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { PiMinusBold, PiPlusBold } from 'react-icons/pi';
 import { useIntl } from 'react-intl';
+import clsx from 'clsx';
 import Image from 'next/image';
 
 import lemon from '../assets/decorations/lemon.svg';
@@ -83,7 +84,10 @@ const FAQs = () => {
             <div key={index}>
               <button
                 onClick={() => toggleFAQ(index)}
-                className="w-full md:hover:!bg-gray-300 bg-[#FAFAFA] rounded-2xl p-4 flex justify-between items-center text-left font-medium text-base gap-4 md:text-lg text-black focus:outline-none cursor-pointer transition-all duration-300 ease-in-out"
+                className={clsx(
+                  'w-full md:hover:!bg-gray-300 bg-[#FAFAFA] rounded-2xl p-4 flex justify-between items-center text-left font-medium text-base gap-4 md:text-lg text-black focus:outline-none cursor-pointer transition-all duration-300 ease-in-out',
+                  isOpen && 'hover:!text-black',
+                )}
                 style={{
                   backgroundColor: isOpen ? '#000' : '#FAFAFA',
                   color: !isOpen ? '#000' : '#FAFAFA',

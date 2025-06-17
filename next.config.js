@@ -47,7 +47,7 @@ const nextConfig = {
   pageExtensions: ['route.tsx', 'route.jsx', 'api.ts', 'api.js'],
   images: {
     domains: ['sharetribe.imgix.net', 'res.cloudinary.com'],
-    unoptimized: false,
+    unoptimized: true,
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
   },
   redirects: async () => {
