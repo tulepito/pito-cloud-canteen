@@ -45,7 +45,7 @@ import {
   required,
   upperCaseFirstLetter,
   validateNonEnterInputField,
-  validFoodTitle,
+  // validFoodTitle,
 } from '@utils/validators';
 
 import type { TEditPartnerFoodFormValues } from '../../utils';
@@ -323,17 +323,17 @@ const EditPartnerFoodFormComponent: React.FC<
               required(
                 intl.formatMessage({ id: 'EditPartnerFoodForm.titleRequired' }),
               ),
-              maxLength(
-                intl.formatMessage({
-                  id: 'EditPartnerFoodForm.titleMaxLength',
-                }),
-                150,
-              ),
-              validFoodTitle(
-                intl.formatMessage({
-                  id: 'EditPartnerFoodForm.titleInValid',
-                }),
-              ),
+              // maxLength(
+              //   intl.formatMessage({
+              //     id: 'EditPartnerFoodForm.titleMaxLength',
+              //   }),
+              //   150,
+              // ),
+              // validFoodTitle(
+              //   intl.formatMessage({
+              //     id: 'EditPartnerFoodForm.titleInValid',
+              //   }),
+              // ),
             )}
           />
           <FieldTextInput
@@ -497,12 +497,12 @@ const EditPartnerFoodFormComponent: React.FC<
           label={intl.formatMessage({
             id: 'EditPartnerFoodForm.descriptionLabel',
           })}
-          validate={maxLength(
-            intl.formatMessage({
-              id: 'EditPartnerFoodForm.descriptionMaxLength',
-            }),
-            200,
-          )}
+          // validate={maxLength(
+          //   intl.formatMessage({
+          //     id: 'EditPartnerFoodForm.descriptionMaxLength',
+          //   }),
+          //   200,
+          // )}
         />
         <div className={css.field}>
           <FieldTextArea
