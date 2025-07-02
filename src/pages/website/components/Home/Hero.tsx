@@ -1,19 +1,37 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { PiPlayCircleThin } from 'react-icons/pi';
 import { useIntl } from 'react-intl';
 import Image from 'next/image';
 
+import { useViewport } from '@hooks/useViewport';
 import { useModal } from '@pages/website/pages/Layout';
 
+import image from '../../assets/com-trua-van-phong-pito-cloud-canteen.webp';
 import lemon from '../../assets/decorations/lemon.svg';
 import pink from '../../assets/decorations/pink.svg';
 import yellow from '../../assets/decorations/yellow.svg';
-import image from '../../assets/mo-hinh-dat-com-trua-van-phong.webp';
 import HeroVideoModal from '../HeroVideoModal';
 import VideoSection from '../VideoSection';
+
+import styles from './styles.module.css';
 
 const Hero = () => {
   const intl = useIntl();
   const { setIsModalOpen } = useModal();
+  const [linkVideo, setLinkVideo] = useState('');
+
+  useEffect(() => {
+    // Set the video link based on the current locale
+    if (intl.locale === 'vi') {
+      setLinkVideo('vhlrnaj7r4');
+    } else {
+      setLinkVideo('kpc1u5v2ac');
+    }
+  }, [intl.locale]);
+
+  const {
+    viewport: { width },
+  } = useViewport();
 
   const [isModalHeroOpen, setIsModalHeroOpen] = useState(false);
 
@@ -49,14 +67,15 @@ const Hero = () => {
               </a>
             </div>
           </div>
-          <VideoSection
-            embedUrl="https://fast.wistia.net/embed/iframe/s5r9t8jg3o?autoPlay=true&mute=true&playerColor=000000"
-            className="w-full block md:hidden"
-          />
-          <div
-            className="relative md:flex hidden h-full"
-            onClick={() => setIsModalHeroOpen(true)}>
-            <div className="relative aspect-[2997/2443] h-full scale-110 top-0 left-0 hover:scale-[1.12] transition-all duration-300 cursor-pointer">
+          {width <= 768 && (
+            <VideoSection
+              embedUrl={`https://fast.wistia.net/embed/iframe/${linkVideo}?autoPlay=true&mute=true&playerColor=000000`}
+              className="w-full"
+            />
+          )}
+
+          <div className="relative md:flex hidden h-full">
+            <div className="relative aspect-[2997/2443] h-full scale-110 top-0 left-0 transition-all duration-300">
               <Image
                 src={image}
                 alt="Image hero"
@@ -64,6 +83,10 @@ const Hero = () => {
                 sizes="(max-width: 768px) 100vw, 40vw"
                 priority
                 loading="eager"
+              />
+              <PiPlayCircleThin
+                className={styles.fadeoutLoop}
+                onClick={() => setIsModalHeroOpen(true)}
               />
             </div>
           </div>
@@ -90,6 +113,14 @@ const Hero = () => {
           <HeroVideoModal
             isModalOpen={isModalHeroOpen}
             onClose={() => setIsModalHeroOpen(false)}
+            videoComponent={
+              <VideoSection
+                embedUrl={`https://fast.wistia.net/embed/iframe/${linkVideo}?mute=true&playerColor=000000${
+                  isModalHeroOpen ? '&autoPlay=true' : '&play=false'
+                }`}
+                className="w-full"
+              />
+            }
           />
         </div>
       )}

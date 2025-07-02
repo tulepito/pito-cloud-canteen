@@ -2,14 +2,17 @@
 
 import { useEffect, useRef } from 'react';
 
-import VideoSection from './VideoSection';
-
 interface HeroVideoModalProps {
   onClose: () => void;
   isModalOpen: boolean;
+  videoComponent: React.ReactNode;
 }
 
-const HeroVideoModal = ({ onClose, isModalOpen }: HeroVideoModalProps) => {
+const HeroVideoModal = ({
+  onClose,
+  isModalOpen,
+  videoComponent,
+}: HeroVideoModalProps) => {
   const modalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -55,10 +58,7 @@ const HeroVideoModal = ({ onClose, isModalOpen }: HeroVideoModalProps) => {
         ✕
       </button>
 
-      <VideoSection
-        embedUrl="https://fast.wistia.net/embed/iframe/s5r9t8jg3o?autoPlay=true&mute=true&playerColor=000000"
-        className="w-full"
-      />
+      {videoComponent}
     </div>
   );
 };
