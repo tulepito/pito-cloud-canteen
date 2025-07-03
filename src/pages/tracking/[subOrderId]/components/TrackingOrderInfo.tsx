@@ -166,9 +166,10 @@ const TrackingOrderInfo = ({ subOrderDate }: TTrackingOrderInfoProps) => {
 
   const order = useAppSelector((state) => state.TrackingPage.order);
 
-  const { restaurant } = order || {};
+  const { restaurant, company } = order || {};
   const orderGetter = Listing(order as TListing);
   const restaurantGetter = Listing(restaurant as TListing);
+  const companyGetter = Listing(company as TListing);
   const { title: restaurantName } = restaurantGetter.getAttributes();
   const [phoneNumberForDetecting, setPhoneNumberForDetecting] = useState('');
   const { staffName } = orderGetter.getMetadata();
@@ -239,6 +240,7 @@ const TrackingOrderInfo = ({ subOrderDate }: TTrackingOrderInfoProps) => {
 
   const { orderNote: bookerOrderNote } = orderGetter.getMetadata();
   const { note: bookerSubOrderNote, lastTransition } = orderDetailOfDate || {};
+  const companyNote = companyGetter.getAttributes()?.profile?.publicData?.note;
 
   const isOrderDelivery = lastTransition === ETransition.START_DELIVERY;
 
@@ -385,7 +387,8 @@ const TrackingOrderInfo = ({ subOrderDate }: TTrackingOrderInfoProps) => {
 
   const isDeliverier = delivery === 'true';
 
-  const noteSectionShowed = bookerOrderNote || bookerSubOrderNote;
+  const noteSectionShowed =
+    bookerOrderNote || bookerSubOrderNote || companyNote;
   const numberOfDeliveryAgentsMeals =
     order?.deliveryAgentsMealsOfDate?.numberOfMeals || 0;
 
@@ -555,6 +558,16 @@ const TrackingOrderInfo = ({ subOrderDate }: TTrackingOrderInfoProps) => {
                       GHI CHÚ
                     </AccordionTrigger>
                     <AccordionContent className="flex flex-col py-2 gap-2">
+                      {companyNote && (
+                        <div className="flex flex-col gap-2 my-1 mx-2">
+                          <div className="shrink-0 text-blue-700 font-semibold">
+                            • Ghi chú của khách hàng
+                          </div>
+                          <div className="whitespace-pre-wrap">
+                            {companyNote}
+                          </div>
+                        </div>
+                      )}
                       {bookerOrderNote && (
                         <div className="flex flex-col gap-2 my-1 mx-2">
                           <div className="shrink-0 text-blue-700 font-semibold">
@@ -744,6 +757,14 @@ const TrackingOrderInfo = ({ subOrderDate }: TTrackingOrderInfoProps) => {
                     GHI CHÚ
                   </AccordionTrigger>
                   <AccordionContent className="flex flex-col py-2 gap-2">
+                    {companyNote && (
+                      <div className="flex flex-col gap-2 my-1 mx-2">
+                        <div className="shrink-0 text-blue-700 font-semibold">
+                          • Ghi chú của khách hàng
+                        </div>
+                        <div className="whitespace-pre-wrap">{companyNote}</div>
+                      </div>
+                    )}
                     {bookerOrderNote && (
                       <div className="flex flex-col gap-2 my-1 mx-2">
                         <div className="shrink-0 text-blue-700 font-semibold">
