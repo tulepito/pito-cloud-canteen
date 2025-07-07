@@ -5,6 +5,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { HttpMethod } from '@apis/configs';
 import cookies from '@services/cookie';
 import { fetchListing, fetchUser } from '@services/integrationHelper';
+import { addToProcessOrderQueue } from '@services/jobs/processOrder.job';
 import { getIntegrationSdk, getSdk, handleError } from '@services/sdk';
 import { EListingType } from '@src/utils/enums';
 import type { TListing } from '@src/utils/types';
@@ -119,49 +120,20 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         )[0];
         const currentUserId = CurrentUser(currentUser).getId();
 
-        const orderListing = await fetchListing(orderId as string);
-        const updatingPlan = await fetchListing(planId as string);
+        const job = await addToProcessOrderQueue({
+          orderId,
+          planId,
+          memberOrders,
+          orderDay,
+          orderDays,
+          planData,
+          currentUserId,
+        });
 
-        const { participants = [], anonymous = [] } =
-          Listing(orderListing).getMetadata();
-        const { orderDetail = {} } = Listing(updatingPlan).getMetadata();
-
-        if (orderDay && memberOrders) {
-          orderDetail[orderDay].memberOrders[currentUserId] =
-            memberOrders[currentUserId];
-        } else if (orderDays && planData) {
-          orderDays.forEach((day: any) => {
-            orderDetail[day].memberOrders[currentUserId] =
-              planData?.[day]?.[currentUserId];
-          });
-        }
-
-        const planResponse = await integrationSdk.listings.update(
-          {
-            id: planId,
-            metadata: {
-              orderDetail,
-            },
-          },
-          {
-            expand: true,
-          },
-        );
-        const plan = denormalisedResponseEntities(planResponse)[0];
-
-        if (
-          !participants.includes(currentUserId) &&
-          !anonymous.includes(currentUserId)
-        ) {
-          await integrationSdk.listings.update({
-            id: orderId,
-            metadata: {
-              anonymous: anonymous.concat(currentUserId),
-            },
-          });
-        }
-
-        return res.json({ plan });
+        return res.json({
+          message: 'Job queued',
+          jobId: job?.id,
+        });
       } catch (error) {
         handleError(res, error);
         console.error(error);
