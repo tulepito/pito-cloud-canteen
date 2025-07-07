@@ -31,6 +31,10 @@ const PartnerLayout: React.FC<PropsWithChildren> = (props) => {
   const showHeaderMaybe = !isMobileLayout || shouldShowPartnerHeader(pathname);
   const showNavBarMaybe = !isMobileLayout || shouldShowPartnerNavBar(pathname);
 
+  if (pathname.includes('scanner')) {
+    return <div className="container w-full mx-auto">{children}</div>;
+  }
+
   return (
     <div className={css.root}>
       <div className={css.main}>

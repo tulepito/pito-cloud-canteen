@@ -8,6 +8,7 @@ export interface FirebaseScannedRecord {
   memberAbbrName: string;
   foodName: string;
   foodThumbnailUrl?: string;
+  groupId?: string;
   scannedAt: number;
   state: 'live' | 'offline';
 }

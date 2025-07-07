@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+import { PiQrCode } from 'react-icons/pi';
 import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import { toast } from 'react-toastify';
@@ -131,6 +138,107 @@ const prepareData = ({
   );
 };
 
+const prepareDataGroups = ({
+  orderDetail = {},
+  participantData = {},
+  planId,
+  groups = [],
+}: {
+  orderDetail: TObject;
+  participantData: TObject;
+  planId: string;
+  groups: TObject[];
+}): TObject[] => {
+  return Object.entries<TObject>(orderDetail).reduce<TObject[]>(
+    (result, [date, rawOrderDetailOfDate]) => {
+      const { memberOrders = {}, restaurant = {} } = rawOrderDetailOfDate;
+      const { foodList: foodListOfDate = {} } = restaurant;
+
+      const participantMap = participantData as Record<string, TObject>;
+
+      // Prepare order data grouped by defined groups
+      const groupOrderData = groups
+        .map((group) => {
+          const { id: groupId, name: groupName, members = [] } = group;
+
+          const memberIds = members.map((m: TObject) => m.id);
+          const orderData = memberIds
+            .map((memberId: string) => {
+              const memberOrder = memberOrders[memberId];
+              if (!memberOrder) return null;
+
+              const { foodId, status, requirement } = memberOrder;
+              if (!isJoinedPlan(foodId, status)) return null;
+
+              return {
+                memberData: participantMap[memberId],
+                foodData: {
+                  requirement,
+                  foodId,
+                  ...foodListOfDate[foodId],
+                },
+                restaurant,
+                barcode: generateScannerBarCode(planId, memberId, date),
+              };
+            })
+            .filter(Boolean)
+            .sort((a: TObject, b: TObject) => {
+              const foodNameA = a.foodData?.foodName || '';
+              const foodNameB = b.foodData?.foodName || '';
+
+              return foodNameA.localeCompare(foodNameB);
+            });
+
+          return {
+            groupId,
+            groupName,
+            orderData,
+          };
+        })
+        .sort((a, b) => {
+          const groupNameA = a.groupName || '';
+          const groupNameB = b.groupName || '';
+
+          return groupNameA.localeCompare(groupNameB);
+        });
+
+      // Handle members not in any group
+      const allGroupMemberIds = new Set(
+        groups.flatMap((g) => g.members.map((m: TObject) => m.id)),
+      );
+
+      const orderDataForOthers = Object.entries<TObject>(memberOrders)
+        .filter(([memberId]) => !allGroupMemberIds.has(memberId))
+        .map(([memberId, memberOrderData]) => {
+          const { foodId, status, requirement } = memberOrderData;
+          if (!isJoinedPlan(foodId, status)) return null;
+
+          return {
+            memberData: participantMap[memberId],
+            foodData: {
+              requirement,
+              foodId,
+              ...foodListOfDate[foodId],
+            },
+            restaurant,
+            barcode: generateScannerBarCode(planId, memberId, date),
+          };
+        })
+        .filter(Boolean);
+
+      return [
+        ...result,
+        {
+          date,
+          groupOrderData,
+          orderDataForOthers,
+        },
+      ];
+    },
+    [],
+  );
+};
+
 type TReviewOrdersResultModalProps = {
   isOpen: boolean;
   data: TObject;
@@ -144,7 +252,7 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
 ) => {
   const { isOpen, onClose, onDownloadReviewOrderResults, data, planListing } =
     props;
-  const showBarcode = planListing?.attributes?.metadata?.allowToScan;
+  const showQRCode = planListing?.attributes?.metadata?.allowToQRCode;
   const planId = planListing?.id?.uuid;
   const intl = useIntl();
   const { isMobileLayout } = useViewport();
@@ -163,6 +271,11 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
     (state) => state.user.currentUser,
   );
 
+  const company: UserListing | null = useAppSelector(
+    (state) => state.OrderManagement.companyData,
+    shallowEqual,
+  );
+
   const thermalPrintSectionRef = useRef<HTMLDivElement>(null);
 
   const [qrCodeImageSrcMap, setQrCodeImageSrcMap] = useState<
@@ -170,6 +283,12 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
   >({});
   const router = useRouter();
   const isAdmin = currentUser?.attributes?.profile?.metadata?.isAdmin;
+  const groups = useMemo(
+    () => company?.attributes?.profile?.metadata?.groups || [],
+    [company],
+  );
+
+  const isHasGroups = groups.length > 0;
 
   const {
     orderDetail,
@@ -252,6 +371,17 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
         planId: planListing?.id?.uuid || '',
       }),
     [orderDetail, participantDataMap, planListing?.id?.uuid],
+  );
+
+  const preparedDataGroups = useMemo(
+    () =>
+      prepareDataGroups({
+        orderDetail,
+        participantData: participantDataMap,
+        planId: planListing?.id?.uuid || '',
+        groups: (groups || []).filter((g): g is TObject => Boolean(g)),
+      }),
+    [orderDetail, participantDataMap, planListing?.id?.uuid, groups],
   );
 
   const toggleCollapseStatus = (date: string) => () => {
@@ -425,66 +555,139 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
     printWindow?.print();
   };
 
-  const company: UserListing | null = useAppSelector(
-    (state) => state.OrderManagement.companyData,
-    shallowEqual,
-  );
+  const handleDownloadQRCode = async (groupId?: string) => {
+    try {
+      const dataToEncode = `${process.env.NEXT_PUBLIC_CANONICAL_URL}/qrcode${
+        groupId ? `?groupId=${groupId}` : ''
+      }`;
+      const canvas = document.createElement('canvas');
 
-  const userLabelRecords = preparedData
-    .reduce<UserLabelRecord[]>((result, { date, orderData }) => {
-      if (date === targetedDate || targetedDate === 'all') {
-        const userLabelData = orderData.map(
-          ({
-            memberData,
-            foodData,
-            restaurant,
-          }: {
-            memberData: {
-              name: string;
-            };
-            foodData: {
-              foodName: string;
-              requirement: string;
-            };
-            restaurant: {
-              restaurantName: string;
-            };
-          }) => {
-            const { name: participantName } = memberData || {};
-            const { foodName, requirement } = foodData || {};
+      // Tạo QR code trong canvas
+      await QRCode.toCanvas(canvas, dataToEncode, { width: 256 });
 
-            return {
-              partnerName: restaurant?.restaurantName,
-              requirement,
-              companyName:
-                company?.attributes?.profile?.publicData?.companyName || '',
-              mealDate: DateTime.fromMillis(Number(date)).toFormat(
-                'dd/MM/yyyy',
+      // Tạo link download
+      const imageUrl = canvas.toDataURL('image/png');
+      const downloadLink = document.createElement('a');
+      downloadLink.href = imageUrl;
+      downloadLink.download = 'qr-code.png';
+      downloadLink.click();
+    } catch (error) {
+      console.error('Lỗi tạo QR Code:', error);
+    }
+  };
+
+  const userLabelRecords = isHasGroups
+    ? preparedDataGroups.reduce<UserLabelRecord[]>(
+        (result, { date, groupOrderData, orderDataForOthers }) => {
+          if (date === targetedDate || targetedDate === 'all') {
+            const processData = (orderData: any[]) => {
+              return orderData.map(
+                ({
+                  memberData,
+                  foodData,
+                  restaurant,
+                }: {
+                  memberData: {
+                    name: string;
+                  };
+                  foodData: {
+                    foodName: string;
+                    requirement: string;
+                  };
+                  restaurant: {
+                    restaurantName: string;
+                  };
+                }) => {
+                  const { name: participantName } = memberData || {};
+                  const { foodName, requirement } = foodData || {};
+
+                  return {
+                    partnerName: restaurant?.restaurantName,
+                    requirement,
+                    companyName:
+                      company?.attributes?.profile?.publicData?.companyName ||
+                      '',
+                    mealDate: DateTime.fromMillis(Number(date)).toFormat(
+                      'dd/MM/yyyy',
+                    ),
+                    participantName,
+                    foodName,
+                    timestamp: date,
+                    qrCodeImageSrc: qrCodeImageSrcMap[date],
+                  } satisfies UserLabelRecord;
+                },
+              );
+            };
+
+            const userLabelData = [
+              ...processData(orderDataForOthers),
+              ...groupOrderData.flatMap((group: TObject) =>
+                processData(group.orderData),
               ),
-              participantName,
-              foodName,
-              timestamp: date,
-              qrCodeImageSrc: qrCodeImageSrcMap[date],
-            } satisfies UserLabelRecord;
-          },
-        );
+            ];
 
-        return result.concat(userLabelData);
-      }
+            return result.concat(userLabelData);
+          }
 
-      return result;
-    }, [] as UserLabelRecord[])
-    .sort((a, b) => {
-      if (a.foodName < b.foodName) {
-        return -1;
-      }
+          return result;
+        },
+        [] as UserLabelRecord[],
+      )
+    : preparedData
+        .reduce<UserLabelRecord[]>((result, { date, orderData }) => {
+          if (date === targetedDate || targetedDate === 'all') {
+            const userLabelData = orderData.map(
+              ({
+                memberData,
+                foodData,
+                restaurant,
+              }: {
+                memberData: {
+                  name: string;
+                };
+                foodData: {
+                  foodName: string;
+                  requirement: string;
+                };
+                restaurant: {
+                  restaurantName: string;
+                };
+              }) => {
+                const { name: participantName } = memberData || {};
+                const { foodName, requirement } = foodData || {};
 
-      if (a.foodName > b.foodName) {
-        return 1;
-      }
+                return {
+                  partnerName: restaurant?.restaurantName,
+                  requirement,
+                  companyName:
+                    company?.attributes?.profile?.publicData?.companyName || '',
+                  mealDate: DateTime.fromMillis(Number(date)).toFormat(
+                    'dd/MM/yyyy',
+                  ),
+                  participantName,
+                  foodName,
+                  timestamp: date,
+                  qrCodeImageSrc: qrCodeImageSrcMap[date],
+                } satisfies UserLabelRecord;
+              },
+            );
 
-      return 0;
-    });
+            return result.concat(userLabelData);
+          }
+
+          return result;
+        }, [] as UserLabelRecord[])
+        .sort((a, b) => {
+          if (a.foodName < b.foodName) {
+            return -1;
+          }
+
+          if (a.foodName > b.foodName) {
+            return 1;
+          }
+
+          return 0;
+        });
 
   const content = (
     <>
@@ -559,13 +762,13 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
               </Button>
             )}
           </div>
-          <div className="flex items-center bg-gray-100 p-2 rounded-t-md text-sm font-semibold uppercase">
+          <div className="flex items-center bg-gray-100 p-2 rounded-t-md text-sm font-semibold uppercase gap-2">
             <div className="flex-1 basis-[80px]">
               {intl.formatMessage({
                 id: 'ReviewOrdersResultModal.tableHead.name',
               })}
             </div>
-            {showBarcode && <div className="flex-1">Barcode</div>}
+            {showQRCode && <div className="flex-1">QRCode</div>}
             <div className="flex-1">
               {intl.formatMessage({
                 id: 'ReviewOrdersResultModal.tableHead.foodName',
@@ -584,205 +787,649 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
           </div>
         </div>
 
-        {preparedData.map(({ date, orderData }) => {
-          const isExpanding = expandingStatusMap[date];
-          const isEmptyOrderData = isEmpty(orderData);
+        {isHasGroups ? (
+          <>
+            {preparedDataGroups.map(
+              ({ date, groupOrderData, orderDataForOthers }) => {
+                const isExpanding = expandingStatusMap[date];
+                const isEmptyOrderData = isEmpty(groupOrderData);
 
-          return (
-            <div className={css.dateContainer} key={date}>
-              <div className={css.dateTitle}>
-                <div className="flex-1 flex items-center">
-                  {intl.formatMessage(
-                    { id: 'ReviewOrdersResultModal.dateTitle' },
-                    {
-                      date: DateTime.fromMillis(Number(date)).toFormat(
-                        'dd/MM/yyyy',
-                      ),
-                    },
-                  )}
-                </div>
-                <RenderWhen condition={!isEmptyOrderData}>
-                  <div className="flex flex-wrap justify-end gap-2 items-center">
-                    {isAdmin && showBarcode && (
-                      <Link
-                        href={enGeneralPaths.admin.scanner['[planId]'][
-                          '[timestamp]'
-                        ].index(String(planId), date)}
-                        legacyBehavior>
-                        <a target="_blank">
-                          <Button variant="inline" size="small">
-                            <div className="flex items-center gap-2 text-blue-500">
-                              <span>Mở trang scan</span>
-                              <svg
-                                fill="currentColor"
-                                viewBox="0 0 32 32"
-                                width="20px"
-                                height="20px"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                                <g
-                                  id="SVGRepo_tracerCarrier"
-                                  stroke-linecap="round"
-                                  stroke-linejoin="round"></g>
-                                <g id="SVGRepo_iconCarrier">
-                                  <path d="M23.5 23.5h-15v-15h4.791V6H6v20h20v-7.969h-2.5z"></path>
-                                  <path d="M17.979 6l3.016 3.018-6.829 6.829 1.988 1.987 6.83-6.828L26 14.02V6z"></path>
-                                </g>
-                              </svg>
+                return (
+                  <div className={css.dateContainer} key={date}>
+                    <div className={css.dateTitle}>
+                      <div className="flex-1 flex items-center">
+                        {intl.formatMessage(
+                          { id: 'ReviewOrdersResultModal.dateTitle' },
+                          {
+                            date: DateTime.fromMillis(Number(date)).toFormat(
+                              'dd/MM/yyyy',
+                            ),
+                          },
+                        )}
+                      </div>
+                      <RenderWhen condition={!isEmptyOrderData}>
+                        <div className="flex flex-wrap justify-end gap-2 items-center">
+                          {isAdmin && (
+                            <RenderWhen condition={!isMobileLayout}>
+                              <div className="flex gap-2 items-center bg-orange-50 py-1 px-2 rounded-lg border border-orange-200">
+                                <p className="text-xs ">Máy in nhiệt</p>
+                                <Button
+                                  variant="inline"
+                                  size="small"
+                                  className={classNames({
+                                    '!bg-gray-200':
+                                      isGeneratingUserLabelFile &&
+                                      targetedDate === date,
+                                  })}
+                                  inProgress={
+                                    isGeneratingUserLabelFile &&
+                                    targetedDate === date
+                                  }
+                                  loadingMode="extend"
+                                  onClick={withSetCurrentDateTo(date, () => {
+                                    setTimeout(() => {
+                                      printThermalSection();
+                                    });
+                                  })}>
+                                  In label
+                                </Button>
+                              </div>
+                            </RenderWhen>
+                          )}
+
+                          {isAdmin && (
+                            <div className="flex gap-2 items-center bg-blue-50 py-1 px-2 rounded-lg border border-blue-200">
+                              <p className="text-xs ">File label</p>
+                              <RenderWhen condition={!isMobileLayout}>
+                                <Button
+                                  variant="inline"
+                                  size="small"
+                                  className={classNames({
+                                    '!bg-gray-200':
+                                      isGeneratingUserLabelFile &&
+                                      targetedDate === date,
+                                  })}
+                                  inProgress={
+                                    isGeneratingUserLabelFile &&
+                                    targetedDate === date
+                                  }
+                                  onClick={withSetCurrentDateTo(date, () => {
+                                    setTimeout(() => {
+                                      setIsViewUserLabelModalOpen(true);
+                                    });
+                                  })}>
+                                  Xem label
+                                </Button>
+                                <Button
+                                  variant="inline"
+                                  size="small"
+                                  inProgress={
+                                    isGeneratingUserLabelFile &&
+                                    targetedDate === date
+                                  }
+                                  loadingMode="extend"
+                                  className={classNames({
+                                    '!bg-gray-200':
+                                      isGeneratingUserLabelFile &&
+                                      targetedDate === date,
+                                  })}
+                                  onClick={withSetCurrentDateTo(date, () => {
+                                    setTimeout(() => {
+                                      generatePDFModeLabels('pdf-file');
+                                    });
+                                  })}>
+                                  Tải label
+                                </Button>
+                              </RenderWhen>
                             </div>
-                          </Button>
-                        </a>
-                      </Link>
-                    )}
-
-                    {isAdmin && (
-                      <RenderWhen condition={!isMobileLayout}>
-                        <div className="flex gap-2 items-center bg-orange-50 py-1 px-2 rounded-lg border border-orange-200">
-                          <p className="text-xs ">Máy in nhiệt</p>
-                          <Button
-                            variant="inline"
-                            size="small"
-                            className={classNames({
-                              '!bg-gray-200':
-                                isGeneratingUserLabelFile &&
-                                targetedDate === date,
-                            })}
-                            inProgress={
-                              isGeneratingUserLabelFile && targetedDate === date
-                            }
-                            loadingMode="extend"
-                            onClick={withSetCurrentDateTo(date, () => {
-                              setTimeout(() => {
-                                printThermalSection();
-                              });
-                            })}>
-                            In label
-                          </Button>
+                          )}
+                          <IconArrow
+                            direction={isExpanding ? 'up' : 'down'}
+                            onClick={toggleCollapseStatus(date)}
+                          />
                         </div>
                       </RenderWhen>
-                    )}
+                    </div>
+                    {groupOrderData.map((group: TObject) => {
+                      return (
+                        <React.Fragment key={group.groupId}>
+                          <div className={css.dateTitle}>
+                            <div className="flex-1 flex items-center">
+                              {group?.groupName}
+                              {group?.orderData?.length > 0 &&
+                                `(Số lượng: ${group.orderData.length})`}
+                            </div>
+                            <RenderWhen condition={!isEmptyOrderData}>
+                              <div className="flex flex-wrap justify-end gap-2 items-center">
+                                {isAdmin && showQRCode && (
+                                  <div className="flex gap-2 items-center">
+                                    <Tooltip
+                                      tooltipContent="Tải mã QR"
+                                      placement="top">
+                                      <PiQrCode
+                                        className="size-[26px] text-blue-600 cursor-pointer transition-all"
+                                        onClick={() =>
+                                          handleDownloadQRCode(group.groupId)
+                                        }
+                                      />
+                                    </Tooltip>
+                                    <Link
+                                      href={enGeneralPaths.admin.scanner[
+                                        '[planId]'
+                                      ]['[timestamp]'].index(
+                                        String(planId),
+                                        `${date}_${group.groupId}`,
+                                      )}
+                                      legacyBehavior>
+                                      <a target="_blank">
+                                        <Button
+                                          variant="inline"
+                                          size="small"
+                                          className="!px-1">
+                                          <div className="flex items-center gap-1 text-blue-500">
+                                            <span>Mở trang scan</span>
+                                            <svg
+                                              fill="currentColor"
+                                              viewBox="0 0 32 32"
+                                              width="20px"
+                                              height="20px"
+                                              xmlns="http://www.w3.org/2000/svg">
+                                              <g
+                                                id="SVGRepo_bgCarrier"
+                                                stroke-width="0"></g>
+                                              <g
+                                                id="SVGRepo_tracerCarrier"
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"></g>
+                                              <g id="SVGRepo_iconCarrier">
+                                                <path d="M23.5 23.5h-15v-15h4.791V6H6v20h20v-7.969h-2.5z"></path>
+                                                <path d="M17.979 6l3.016 3.018-6.829 6.829 1.988 1.987 6.83-6.828L26 14.02V6z"></path>
+                                              </g>
+                                            </svg>
+                                          </div>
+                                        </Button>
+                                      </a>
+                                    </Link>
+                                  </div>
+                                )}
 
-                    {isAdmin && (
-                      <div className="flex gap-2 items-center bg-blue-50 py-1 px-2 rounded-lg border border-blue-200">
-                        <p className="text-xs ">File label</p>
-                        <RenderWhen condition={!isMobileLayout}>
-                          <Button
-                            variant="inline"
-                            size="small"
-                            className={classNames({
-                              '!bg-gray-200':
-                                isGeneratingUserLabelFile &&
-                                targetedDate === date,
-                            })}
-                            inProgress={
-                              isGeneratingUserLabelFile && targetedDate === date
-                            }
-                            onClick={withSetCurrentDateTo(date, () => {
-                              setTimeout(() => {
-                                setIsViewUserLabelModalOpen(true);
-                              });
-                            })}>
-                            Xem label
-                          </Button>
-                          <Button
-                            variant="inline"
-                            size="small"
-                            inProgress={
-                              isGeneratingUserLabelFile && targetedDate === date
-                            }
-                            loadingMode="extend"
-                            className={classNames({
-                              '!bg-gray-200':
-                                isGeneratingUserLabelFile &&
-                                targetedDate === date,
-                            })}
-                            onClick={withSetCurrentDateTo(date, () => {
-                              setTimeout(() => {
-                                generatePDFModeLabels('pdf-file');
-                              });
-                            })}>
-                            Tải label
-                          </Button>
-                        </RenderWhen>
-                      </div>
-                    )}
-                    <IconArrow
-                      direction={isExpanding ? 'up' : 'down'}
-                      onClick={toggleCollapseStatus(date)}
-                    />
-                  </div>
-                </RenderWhen>
-              </div>
-              <RenderWhen condition={isExpanding}>
-                <div className="w-full">
-                  {orderData.map((row: TObject) => {
-                    const {
-                      memberData,
-                      foodData: { foodName, foodPrice = 0, requirement },
-                      barcode,
-                    } = row;
-                    const { name: memberName, id: memberId } = memberData || {};
-
-                    return (
-                      <div key={memberId} className="flex items-center w-full">
-                        <div className="flex items-center flex-1 text-xs p-2">
-                          <div className="flex-1 basis-[80px] font-semibold">
-                            {memberName}
-                          </div>
-                          {showBarcode && (
-                            <Tooltip
-                              tooltipContent="Ấn để copy"
-                              placement="top">
-                              <div
-                                className="flex-1 text-xs !flex items-center gap-2 hover:scale-105 transition-transform cursor-pointer"
-                                onClick={() => {
-                                  navigator.clipboard.writeText(barcode);
-                                  toast.success(`Đã copy barcode: ${barcode}`);
-                                }}>
-                                <svg
-                                  width="16px"
-                                  height="16px"
-                                  viewBox="0 0 24 24"
-                                  fill="currentColor"
-                                  xmlns="http://www.w3.org/2000/svg">
-                                  <path
-                                    d="M11.1 22.75H6.9C2.99 22.75 1.25 21.01 1.25 17.1V12.9C1.25 8.99 2.99 7.25 6.9 7.25H11.1C15.01 7.25 16.75 8.99 16.75 12.9V17.1C16.75 21.01 15.01 22.75 11.1 22.75ZM6.9 8.75C3.8 8.75 2.75 9.8 2.75 12.9V17.1C2.75 20.2 3.8 21.25 6.9 21.25H11.1C14.2 21.25 15.25 20.2 15.25 17.1V12.9C15.25 9.8 14.2 8.75 11.1 8.75H6.9V8.75Z"
-                                    fill="currentColor"
-                                  />
-                                  <path
-                                    d="M17.1 16.75H16C15.59 16.75 15.25 16.41 15.25 16V12.9C15.25 9.8 14.2 8.75 11.1 8.75H8C7.59 8.75 7.25 8.41 7.25 8V6.9C7.25 2.99 8.99 1.25 12.9 1.25H17.1C21.01 1.25 22.75 2.99 22.75 6.9V11.1C22.75 15.01 21.01 16.75 17.1 16.75ZM16.75 15.25H17.1C20.2 15.25 21.25 14.2 21.25 11.1V6.9C21.25 3.8 20.2 2.75 17.1 2.75H12.9C9.8 2.75 8.75 3.8 8.75 6.9V7.25H11.1C15.01 7.25 16.75 8.99 16.75 12.9V15.25Z"
-                                    fill="currentColor"
-                                  />
-                                </svg>
-                                <span>{barcode}</span>
+                                <IconArrow
+                                  direction={isExpanding ? 'up' : 'down'}
+                                  onClick={toggleCollapseStatus(date)}
+                                />
                               </div>
-                            </Tooltip>
-                          )}
-                          <div className="text-xs flex-1 font-semibold">
-                            {foodName}
+                            </RenderWhen>
                           </div>
-                          <div className="text-xs flex-1">{`${parseThousandNumber(
-                            foodPrice,
-                          )}đ`}</div>
-                          {requirement ? (
-                            <Tooltip
-                              overlayClassName={css.requirementTooltip}
-                              tooltipContent={requirement}
-                              placement="bottomLeft">
-                              <div className="flex-1">{requirement}</div>
+                          <RenderWhen condition={isExpanding}>
+                            <div className="w-full">
+                              {group?.orderData?.map((row: TObject) => {
+                                const {
+                                  memberData,
+                                  foodData: {
+                                    foodName,
+                                    foodPrice = 0,
+                                    requirement,
+                                  },
+                                  barcode,
+                                } = row;
+                                const { name: memberName, id: memberId } =
+                                  memberData || {};
+
+                                return (
+                                  <div
+                                    key={memberId}
+                                    className="flex items-center w-full">
+                                    <div className="flex items-center flex-1 text-xs p-2 gap-2">
+                                      <div className="flex-1 basis-[80px] font-semibold">
+                                        {memberName}
+                                      </div>
+
+                                      {showQRCode && (
+                                        <Tooltip
+                                          tooltipContent="Ấn để copy"
+                                          placement="top">
+                                          <div
+                                            className="flex-1 text-xs !flex items-center gap-2 hover:scale-105 transition-transform cursor-pointer"
+                                            onClick={() => {
+                                              navigator.clipboard.writeText(
+                                                barcode,
+                                              );
+                                              toast.success(
+                                                `Đã copy barcode: ${barcode}`,
+                                              );
+                                            }}>
+                                            <svg
+                                              width="16px"
+                                              height="16px"
+                                              viewBox="0 0 24 24"
+                                              fill="currentColor"
+                                              xmlns="http://www.w3.org/2000/svg">
+                                              <path
+                                                d="M11.1 22.75H6.9C2.99 22.75 1.25 21.01 1.25 17.1V12.9C1.25 8.99 2.99 7.25 6.9 7.25H11.1C15.01 7.25 16.75 8.99 16.75 12.9V17.1C16.75 21.01 15.01 22.75 11.1 22.75ZM6.9 8.75C3.8 8.75 2.75 9.8 2.75 12.9V17.1C2.75 20.2 3.8 21.25 6.9 21.25H11.1C14.2 21.25 15.25 20.2 15.25 17.1V12.9C15.25 9.8 14.2 8.75 11.1 8.75H6.9V8.75Z"
+                                                fill="currentColor"
+                                              />
+                                              <path
+                                                d="M17.1 16.75H16C15.59 16.75 15.25 16.41 15.25 16V12.9C15.25 9.8 14.2 8.75 11.1 8.75H8C7.59 8.75 7.25 8.41 7.25 8V6.9C7.25 2.99 8.99 1.25 12.9 1.25H17.1C21.01 1.25 22.75 2.99 22.75 6.9V11.1C22.75 15.01 21.01 16.75 17.1 16.75ZM16.75 15.25H17.1C20.2 15.25 21.25 14.2 21.25 11.1V6.9C21.25 3.8 20.2 2.75 17.1 2.75H12.9C9.8 2.75 8.75 3.8 8.75 6.9V7.25H11.1C15.01 7.25 16.75 8.99 16.75 12.9V15.25Z"
+                                                fill="currentColor"
+                                              />
+                                            </svg>
+                                            <span>{barcode}</span>
+                                          </div>
+                                        </Tooltip>
+                                      )}
+                                      <div className="text-xs flex-1 font-semibold">
+                                        {foodName}
+                                      </div>
+                                      <div className="text-xs flex-1">{`${parseThousandNumber(
+                                        foodPrice,
+                                      )}đ`}</div>
+                                      {requirement ? (
+                                        <Tooltip
+                                          overlayClassName={
+                                            css.requirementTooltip
+                                          }
+                                          tooltipContent={requirement}
+                                          placement="bottomLeft">
+                                          <div className="flex-1">
+                                            {requirement}
+                                          </div>
+                                        </Tooltip>
+                                      ) : (
+                                        <div className="flex-1">-</div>
+                                      )}
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </RenderWhen>
+                        </React.Fragment>
+                      );
+                    })}
+                    {orderDataForOthers?.length > 0 && (
+                      <>
+                        <React.Fragment>
+                          <div className={css.dateTitle}>
+                            <div className="flex-1 flex items-center">
+                              Không có nhóm
+                            </div>
+                            <RenderWhen condition={!isEmptyOrderData}>
+                              <div className="flex flex-wrap justify-end gap-2 items-center">
+                                {isAdmin && showQRCode && (
+                                  <div className="flex gap-2 items-center">
+                                    <Tooltip
+                                      tooltipContent="Tải mã QR"
+                                      placement="top">
+                                      <PiQrCode
+                                        className="size-[26px] text-blue-600 cursor-pointer transition-all"
+                                        onClick={() =>
+                                          handleDownloadQRCode(undefined)
+                                        }
+                                      />
+                                    </Tooltip>
+                                    <Link
+                                      href={enGeneralPaths.admin.scanner[
+                                        '[planId]'
+                                      ]['[timestamp]'].index(
+                                        String(planId),
+                                        date,
+                                      )}
+                                      legacyBehavior>
+                                      <a target="_blank">
+                                        <Button
+                                          variant="inline"
+                                          size="small"
+                                          className="!px-1">
+                                          <div className="flex items-center gap-1 text-blue-500">
+                                            <span>Mở trang scan</span>
+                                            <svg
+                                              fill="currentColor"
+                                              viewBox="0 0 32 32"
+                                              width="20px"
+                                              height="20px"
+                                              xmlns="http://www.w3.org/2000/svg">
+                                              <g
+                                                id="SVGRepo_bgCarrier"
+                                                stroke-width="0"></g>
+                                              <g
+                                                id="SVGRepo_tracerCarrier"
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"></g>
+                                              <g id="SVGRepo_iconCarrier">
+                                                <path d="M23.5 23.5h-15v-15h4.791V6H6v20h20v-7.969h-2.5z"></path>
+                                                <path d="M17.979 6l3.016 3.018-6.829 6.829 1.988 1.987 6.83-6.828L26 14.02V6z"></path>
+                                              </g>
+                                            </svg>
+                                          </div>
+                                        </Button>
+                                      </a>
+                                    </Link>
+                                  </div>
+                                )}
+
+                                <IconArrow
+                                  direction={isExpanding ? 'up' : 'down'}
+                                  onClick={toggleCollapseStatus(date)}
+                                />
+                              </div>
+                            </RenderWhen>
+                          </div>
+                          <RenderWhen condition={isExpanding}>
+                            <div className="w-full">
+                              {orderDataForOthers?.map((row: TObject) => {
+                                const {
+                                  memberData,
+                                  foodData: {
+                                    foodName,
+                                    foodPrice = 0,
+                                    requirement,
+                                  },
+                                  barcode,
+                                } = row;
+                                const { name: memberName, id: memberId } =
+                                  memberData || {};
+
+                                return (
+                                  <div
+                                    key={memberId}
+                                    className="flex items-center w-full">
+                                    <div className="flex items-center flex-1 text-xs p-2">
+                                      <div className="flex-1 basis-[80px] font-semibold">
+                                        {memberName}
+                                      </div>
+
+                                      {showQRCode && (
+                                        <Tooltip
+                                          tooltipContent="Ấn để copy"
+                                          placement="top">
+                                          <div
+                                            className="flex-1 text-xs !flex items-center gap-2 hover:scale-105 transition-transform cursor-pointer"
+                                            onClick={() => {
+                                              navigator.clipboard.writeText(
+                                                barcode,
+                                              );
+                                              toast.success(
+                                                `Đã copy barcode: ${barcode}`,
+                                              );
+                                            }}>
+                                            <svg
+                                              width="16px"
+                                              height="16px"
+                                              viewBox="0 0 24 24"
+                                              fill="currentColor"
+                                              xmlns="http://www.w3.org/2000/svg">
+                                              <path
+                                                d="M11.1 22.75H6.9C2.99 22.75 1.25 21.01 1.25 17.1V12.9C1.25 8.99 2.99 7.25 6.9 7.25H11.1C15.01 7.25 16.75 8.99 16.75 12.9V17.1C16.75 21.01 15.01 22.75 11.1 22.75ZM6.9 8.75C3.8 8.75 2.75 9.8 2.75 12.9V17.1C2.75 20.2 3.8 21.25 6.9 21.25H11.1C14.2 21.25 15.25 20.2 15.25 17.1V12.9C15.25 9.8 14.2 8.75 11.1 8.75H6.9V8.75Z"
+                                                fill="currentColor"
+                                              />
+                                              <path
+                                                d="M17.1 16.75H16C15.59 16.75 15.25 16.41 15.25 16V12.9C15.25 9.8 14.2 8.75 11.1 8.75H8C7.59 8.75 7.25 8.41 7.25 8V6.9C7.25 2.99 8.99 1.25 12.9 1.25H17.1C21.01 1.25 22.75 2.99 22.75 6.9V11.1C22.75 15.01 21.01 16.75 17.1 16.75ZM16.75 15.25H17.1C20.2 15.25 21.25 14.2 21.25 11.1V6.9C21.25 3.8 20.2 2.75 17.1 2.75H12.9C9.8 2.75 8.75 3.8 8.75 6.9V7.25H11.1C15.01 7.25 16.75 8.99 16.75 12.9V15.25Z"
+                                                fill="currentColor"
+                                              />
+                                            </svg>
+                                            <span>{barcode}</span>
+                                          </div>
+                                        </Tooltip>
+                                      )}
+                                      <div className="text-xs flex-1 font-semibold">
+                                        {foodName}
+                                      </div>
+                                      <div className="text-xs flex-1">{`${parseThousandNumber(
+                                        foodPrice,
+                                      )}đ`}</div>
+                                      {requirement ? (
+                                        <Tooltip
+                                          overlayClassName={
+                                            css.requirementTooltip
+                                          }
+                                          tooltipContent={requirement}
+                                          placement="bottomLeft">
+                                          <div className="flex-1">
+                                            {requirement}
+                                          </div>
+                                        </Tooltip>
+                                      ) : (
+                                        <div className="flex-1">-</div>
+                                      )}
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </RenderWhen>
+                        </React.Fragment>
+                      </>
+                    )}
+                  </div>
+                );
+              },
+            )}
+          </>
+        ) : (
+          <>
+            {preparedData.map(({ date, orderData }) => {
+              const isExpanding = expandingStatusMap[date];
+              const isEmptyOrderData = isEmpty(orderData);
+
+              return (
+                <div className={css.dateContainer} key={date}>
+                  <div className={css.dateTitle}>
+                    <div className="flex-1 flex items-center">
+                      {intl.formatMessage(
+                        { id: 'ReviewOrdersResultModal.dateTitle' },
+                        {
+                          date: DateTime.fromMillis(Number(date)).toFormat(
+                            'dd/MM/yyyy',
+                          ),
+                        },
+                      )}
+                    </div>
+                    <RenderWhen condition={!isEmptyOrderData}>
+                      <div className="flex flex-wrap justify-end gap-2 items-center">
+                        {isAdmin && showQRCode && (
+                          <div className="flex gap-2 items-center">
+                            <Tooltip tooltipContent="Tải mã QR" placement="top">
+                              <PiQrCode
+                                className="size-[26px] text-blue-600 cursor-pointer transition-all"
+                                onClick={() => handleDownloadQRCode(undefined)}
+                              />
                             </Tooltip>
-                          ) : (
-                            <div className="flex-1">-</div>
-                          )}
-                        </div>
+                            <Link
+                              href={enGeneralPaths.admin.scanner['[planId]'][
+                                '[timestamp]'
+                              ].index(String(planId), date)}
+                              legacyBehavior>
+                              <a target="_blank">
+                                <Button
+                                  variant="inline"
+                                  size="small"
+                                  className="!px-1">
+                                  <div className="flex items-center gap-1 text-blue-500">
+                                    <span>Mở trang scan</span>
+                                    <svg
+                                      fill="currentColor"
+                                      viewBox="0 0 32 32"
+                                      width="20px"
+                                      height="20px"
+                                      xmlns="http://www.w3.org/2000/svg">
+                                      <g
+                                        id="SVGRepo_bgCarrier"
+                                        stroke-width="0"></g>
+                                      <g
+                                        id="SVGRepo_tracerCarrier"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"></g>
+                                      <g id="SVGRepo_iconCarrier">
+                                        <path d="M23.5 23.5h-15v-15h4.791V6H6v20h20v-7.969h-2.5z"></path>
+                                        <path d="M17.979 6l3.016 3.018-6.829 6.829 1.988 1.987 6.83-6.828L26 14.02V6z"></path>
+                                      </g>
+                                    </svg>
+                                  </div>
+                                </Button>
+                              </a>
+                            </Link>
+                          </div>
+                        )}
+
+                        {isAdmin && (
+                          <RenderWhen condition={!isMobileLayout}>
+                            <div className="flex gap-2 items-center bg-orange-50 py-1 px-2 rounded-lg border border-orange-200">
+                              <p className="text-xs ">Máy in nhiệt</p>
+                              <Button
+                                variant="inline"
+                                size="small"
+                                className={classNames({
+                                  '!bg-gray-200':
+                                    isGeneratingUserLabelFile &&
+                                    targetedDate === date,
+                                })}
+                                inProgress={
+                                  isGeneratingUserLabelFile &&
+                                  targetedDate === date
+                                }
+                                loadingMode="extend"
+                                onClick={withSetCurrentDateTo(date, () => {
+                                  setTimeout(() => {
+                                    printThermalSection();
+                                  });
+                                })}>
+                                In label
+                              </Button>
+                            </div>
+                          </RenderWhen>
+                        )}
+
+                        {isAdmin && (
+                          <div className="flex gap-2 items-center bg-blue-50 py-1 px-2 rounded-lg border border-blue-200">
+                            <p className="text-xs ">File label</p>
+                            <RenderWhen condition={!isMobileLayout}>
+                              <Button
+                                variant="inline"
+                                size="small"
+                                className={classNames({
+                                  '!bg-gray-200':
+                                    isGeneratingUserLabelFile &&
+                                    targetedDate === date,
+                                })}
+                                inProgress={
+                                  isGeneratingUserLabelFile &&
+                                  targetedDate === date
+                                }
+                                onClick={withSetCurrentDateTo(date, () => {
+                                  setTimeout(() => {
+                                    setIsViewUserLabelModalOpen(true);
+                                  });
+                                })}>
+                                Xem label
+                              </Button>
+                              <Button
+                                variant="inline"
+                                size="small"
+                                inProgress={
+                                  isGeneratingUserLabelFile &&
+                                  targetedDate === date
+                                }
+                                loadingMode="extend"
+                                className={classNames({
+                                  '!bg-gray-200':
+                                    isGeneratingUserLabelFile &&
+                                    targetedDate === date,
+                                })}
+                                onClick={withSetCurrentDateTo(date, () => {
+                                  setTimeout(() => {
+                                    generatePDFModeLabels('pdf-file');
+                                  });
+                                })}>
+                                Tải label
+                              </Button>
+                            </RenderWhen>
+                          </div>
+                        )}
+                        <IconArrow
+                          direction={isExpanding ? 'up' : 'down'}
+                          onClick={toggleCollapseStatus(date)}
+                        />
                       </div>
-                    );
-                  })}
+                    </RenderWhen>
+                  </div>
+                  <RenderWhen condition={isExpanding}>
+                    <div className="w-full">
+                      {orderData.map((row: TObject) => {
+                        const {
+                          memberData,
+                          foodData: { foodName, foodPrice = 0, requirement },
+                          barcode,
+                        } = row;
+                        const { name: memberName, id: memberId } =
+                          memberData || {};
+
+                        return (
+                          <div
+                            key={memberId}
+                            className="flex items-center w-full">
+                            <div className="flex items-center flex-1 text-xs p-2">
+                              <div className="flex-1 basis-[80px] font-semibold">
+                                {memberName}
+                              </div>
+
+                              {showQRCode && (
+                                <Tooltip
+                                  tooltipContent="Ấn để copy"
+                                  placement="top">
+                                  <div
+                                    className="flex-1 text-xs !flex items-center gap-2 hover:scale-105 transition-transform cursor-pointer"
+                                    onClick={() => {
+                                      navigator.clipboard.writeText(barcode);
+                                      toast.success(
+                                        `Đã copy barcode: ${barcode}`,
+                                      );
+                                    }}>
+                                    <svg
+                                      width="16px"
+                                      height="16px"
+                                      viewBox="0 0 24 24"
+                                      fill="currentColor"
+                                      xmlns="http://www.w3.org/2000/svg">
+                                      <path
+                                        d="M11.1 22.75H6.9C2.99 22.75 1.25 21.01 1.25 17.1V12.9C1.25 8.99 2.99 7.25 6.9 7.25H11.1C15.01 7.25 16.75 8.99 16.75 12.9V17.1C16.75 21.01 15.01 22.75 11.1 22.75ZM6.9 8.75C3.8 8.75 2.75 9.8 2.75 12.9V17.1C2.75 20.2 3.8 21.25 6.9 21.25H11.1C14.2 21.25 15.25 20.2 15.25 17.1V12.9C15.25 9.8 14.2 8.75 11.1 8.75H6.9V8.75Z"
+                                        fill="currentColor"
+                                      />
+                                      <path
+                                        d="M17.1 16.75H16C15.59 16.75 15.25 16.41 15.25 16V12.9C15.25 9.8 14.2 8.75 11.1 8.75H8C7.59 8.75 7.25 8.41 7.25 8V6.9C7.25 2.99 8.99 1.25 12.9 1.25H17.1C21.01 1.25 22.75 2.99 22.75 6.9V11.1C22.75 15.01 21.01 16.75 17.1 16.75ZM16.75 15.25H17.1C20.2 15.25 21.25 14.2 21.25 11.1V6.9C21.25 3.8 20.2 2.75 17.1 2.75H12.9C9.8 2.75 8.75 3.8 8.75 6.9V7.25H11.1C15.01 7.25 16.75 8.99 16.75 12.9V15.25Z"
+                                        fill="currentColor"
+                                      />
+                                    </svg>
+                                    <span>{barcode}</span>
+                                  </div>
+                                </Tooltip>
+                              )}
+                              <div className="text-xs flex-1 font-semibold">
+                                {foodName}
+                              </div>
+                              <div className="text-xs flex-1">{`${parseThousandNumber(
+                                foodPrice,
+                              )}đ`}</div>
+                              {requirement ? (
+                                <Tooltip
+                                  overlayClassName={css.requirementTooltip}
+                                  tooltipContent={requirement}
+                                  placement="bottomLeft">
+                                  <div className="flex-1">{requirement}</div>
+                                </Tooltip>
+                              ) : (
+                                <div className="flex-1">-</div>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </RenderWhen>
                 </div>
-              </RenderWhen>
-            </div>
-          );
-        })}
+              );
+            })}
+          </>
+        )}
       </div>
     </>
   );

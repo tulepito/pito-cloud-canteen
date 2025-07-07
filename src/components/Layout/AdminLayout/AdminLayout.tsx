@@ -20,7 +20,11 @@ const AdminLayout: React.FC<PropsWithChildren> = (props) => {
   const { pathname } = useRouter();
 
   if (pathname.includes('scanner')) {
-    return <div className="container w-full mx-auto">{children}</div>;
+    return (
+      <div className="w-full mx-auto bg-gradient-to-br from-orange-50 to-red-50 min-h-screen h-full">
+        {children}
+      </div>
+    );
   }
 
   return (

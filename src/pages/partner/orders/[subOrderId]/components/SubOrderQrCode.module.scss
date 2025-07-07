@@ -1,0 +1,279 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+@mixin tableColumnsLayout {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row;
+  column-gap: 2%;
+  flex-wrap: nowrap;
+  padding: 12px;
+
+  & > div {
+    word-break: break-word;
+  }
+
+  & > div:nth-of-type(1) {
+    flex-basis: 40px;
+    font-size: 14px;
+
+    @include viewportLarge {
+      flex-basis: 30px;
+      font-size: 16px;
+    }
+  }
+  & > div:nth-of-type(2) {
+    flex-basis: 40%;
+    font-size: 14px;
+
+    @include viewportLarge {
+      max-width: 200px;
+      flex-grow: 1;
+      font-size: 16px;
+    }
+
+    @include viewportLargeWithPaddings {
+      max-width: 250px;
+    }
+
+    @include viewportSLarge {
+      max-width: 280px;
+    }
+  }
+  & > div:nth-of-type(4) {
+    flex-basis: 20px;
+
+    @include viewportLarge {
+      text-align: left;
+    }
+  }
+}
+
+.tableContainer {
+  border-radius: 8px;
+  overflow: hidden;
+  padding: 0 16px;
+
+  @include viewportLarge {
+    padding: 0;
+  }
+
+  .tableHead {
+    color: $neutralGray1;
+    background-color: $neutralGray6;
+    @include textTemplate(14px, 700, 20px);
+    @include tableColumnsLayout;
+    display: none;
+
+    @include viewportLarge {
+      display: flex;
+    }
+  }
+
+  .tableHeadMobile {
+    color: $neutralGray1;
+    background-color: $neutralGray5;
+    @include textTemplate(14px, 700, 20px);
+    @include flexAlign(center);
+    gap: 8px;
+    padding: 10px 12px;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+
+    @include viewportLarge {
+      display: none;
+    }
+
+    & > div:nth-of-type(1) {
+      flex-basis: 40px;
+    }
+
+    & > div:nth-of-type(2) {
+      flex-basis: 30%;
+    }
+
+    & > div:nth-of-type(3) {
+      flex-basis: 40%;
+    }
+
+    & > div:nth-of-type(4) {
+      flex-basis: 0px;
+    }
+  }
+
+  .tableBody {
+    .tableRowGroup {
+      border: 1px solid $neutralGray3;
+
+      &:last-of-type {
+        border-radius: 0 0 8px 8px;
+      }
+
+      .groupTitle,
+      .row {
+        @include tableColumnsLayout;
+      }
+
+      .row {
+        & > div:nth-of-type(1) {
+          font-size: 12px;
+          flex-basis: 40px;
+
+          @include viewportLarge {
+            font-size: 14px;
+          }
+        }
+        & > div:nth-of-type(2) {
+          flex-basis: 30%;
+          font-size: 12px;
+
+          @include viewportLarge {
+            max-width: 200px;
+            flex-grow: 1;
+            font-size: 14px;
+          }
+
+          @include viewportLargeWithPaddings {
+            max-width: 250px;
+          }
+
+          @include viewportSLarge {
+            max-width: 280px;
+          }
+        }
+        & > div:nth-of-type(3) {
+          flex-basis: 40%;
+          @include lineClamp(2);
+          font-size: 12px;
+
+          @include viewportLarge {
+            flex-basis: 65%;
+            font-size: 14px;
+          }
+        }
+
+        & > div:nth-of-type(4) {
+          flex-basis: 20px;
+        }
+      }
+
+      .groupTitle {
+        background-color: $neutralGray3;
+        @include textTemplate(16px, 700, 24px);
+
+        &.collapsed + .rows .row {
+          height: 0;
+          padding: 0 12px;
+          opacity: 0;
+        }
+
+        .actionCell {
+          cursor: pointer;
+          display: flex;
+          justify-content: flex-end;
+
+          svg {
+            rotate: 0deg;
+            transition: rotate 0.2s linear;
+          }
+
+          .reversed {
+            rotate: x 180deg;
+          }
+        }
+      }
+
+      .rows {
+        & > .row {
+          @include textTemplate(16px, 400, 24px);
+          transition: 0.25s linear;
+
+          &:not(:last-of-type) {
+            border-bottom: 1px solid $neutralGray3;
+          }
+        }
+
+        &.collapsed > .row {
+          border: none;
+        }
+      }
+    }
+  }
+}
+
+.root {
+  margin-top: 28px;
+
+  .goBackBtnWrapper {
+    padding: 8px 16px;
+    border-bottom: 1px solid $neutralGray3;
+    .goBackBtn {
+      padding: 0;
+      display: flex;
+      flex-direction: row;
+      column-gap: 4px;
+      min-height: 32px;
+      align-items: center;
+      @include textTemplate(16px, 700, 24px);
+
+      .arrowIcon {
+        width: 20px;
+        height: 20px;
+      }
+
+      .goBackText {
+        font-size: 14px;
+
+        @include viewportLarge {
+          font-size: 16px;
+        }
+      }
+    }
+  }
+
+  .actionContainer {
+    margin: 24px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    align-items: flex-start;
+    justify-self: start;
+    padding: 0 16px;
+
+    @include viewportLarge {
+      padding: 0;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+    }
+
+    .title {
+      @include textTemplate(18px, 700, 24px);
+    }
+
+    .ctaButton {
+      padding: 4px 8px;
+      display: flex;
+      flex-direction: row;
+      column-gap: 8px;
+      align-items: center;
+      @include textTemplate(16px, 700, 24px);
+      font-size: 14px;
+
+      @include viewportLarge {
+        padding: 10px 20px;
+        display: flex;
+        flex-direction: row;
+        column-gap: 8px;
+        align-items: center;
+        @include textTemplate(16px, 700, 24px);
+      }
+    }
+  }
+
+  & > button {
+    min-height: unset;
+  }
+}

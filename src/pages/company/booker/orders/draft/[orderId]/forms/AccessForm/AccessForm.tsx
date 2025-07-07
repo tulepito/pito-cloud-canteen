@@ -4,7 +4,7 @@ import { useField, useForm } from 'react-final-form-hooks';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import Button from '@components/Button/Button';
-import { IconCheckbox } from '@components/FormFields/FieldCheckbox/FieldCheckbox';
+import { IconRadioButton } from '@components/FormFields/FieldRadioButton/FieldRadioButton';
 import NamedLink from '@components/NamedLink/NamedLink';
 import { companyPaths } from '@src/paths';
 
@@ -19,7 +19,7 @@ type TAccessFormProps = {
 };
 
 export type TAccessFormValues = {
-  selectedGroups: string;
+  selectedGroups: string[];
 };
 
 const validate = (values: TAccessFormValues) => {
@@ -61,24 +61,13 @@ const AccessForm: React.FC<TAccessFormProps> = ({
     ];
   }, [groupList]);
 
-  const handleChangeCheckboxGroup: (data: {
+  const handleChangeRadioButtonGroup: (data: {
     id: string;
     name: string;
-  }) => ChangeEventHandler<HTMLInputElement> = (data: any) => (e) => {
+  }) => ChangeEventHandler<HTMLInputElement> = (data) => (e) => {
     if (e.target.checked) {
-      form.change(
-        'selectedGroups',
-        (Array.isArray(selectedGroups.input.value)
-          ? Array.from(new Set([...selectedGroups.input.value, data.id]))
-          : [data.id]) as any,
-      );
-    } else {
-      form.change(
-        'selectedGroups',
-        (Array.isArray(selectedGroups.input.value)
-          ? selectedGroups.input.value.filter((item) => item !== data.id)
-          : []) as any,
-      );
+      // Gán mảng với đúng một item
+      form.change('selectedGroups', [data.id]);
     }
   };
 
@@ -104,19 +93,16 @@ const AccessForm: React.FC<TAccessFormProps> = ({
                 className={css.input}
                 id={`selectedGroups-${data.id}`}
                 {...selectedGroups.input}
-                onChange={handleChangeCheckboxGroup(data)}
+                onChange={handleChangeRadioButtonGroup(data)}
                 checked={(selectedGroups.input.value || []).includes(data.id)}
-                type="checkbox"
+                type="radio"
                 value={data.id}
               />
               <label
                 className={css.label}
                 htmlFor={`selectedGroups-${data.id}`}>
                 <span className={css.checkboxWrapper}>
-                  <IconCheckbox
-                    checkedClassName={css.checked}
-                    boxClassName={css.box}
-                  />
+                  <IconRadioButton checkedClassName={css.checked} />
                 </span>
                 <span className={css.labelText}>{data.name}</span>
               </label>

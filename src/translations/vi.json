@@ -2291,5 +2291,16 @@
   "you-can-easily-track-and-manage-their-orders-directly-through-the-system-dashboard-allowing-real-time-updates-on-order-status-adjustments-and-cost-control": "Bạn có thể dễ dàng theo dõi và quản lý đơn hàng qua bảng điều khiển trên hệ thống, với cập nhật thời gian thực về trạng thái đơn, điều chỉnh, và kiểm soát chi phí một cách dễ dàng và thống nhất.",
   "get-advice": "Nhận tư vấn",
   "SubOrderDetail.in-tem-nhiet": "In tem nhiệt",
-  "book-free-consultation": "Đặt lịch tư vấn miễn phí"
+  "book-free-consultation": "Đặt lịch tư vấn miễn phí",
+  "ma-code": "Mã Code",
+  "mo-trang-scan": "Mở trang scan",
+  "tai-ma-qr": "Tải mã QR",
+  "danh-sach-ma-code-cua-don-hang": "Danh sách mã code của đơn hàng",
+  "dang-chuyen-huong": "Đang chuyển hướng",
+  "ban-khong-truy-cap-duoc-tinh-nang-nay": "Bạn không truy cập được tính năng này.",
+  "quet-ma-thanh-cong": "Quét mã thành công, vui lòng đợi tới lượt bạn để lấy món.",
+  "ban-da-quet-ma-nay-roi": "Bạn đã quét mã này rồi!",
+  "he-thong-dang-xu-ly": "Hệ thống đang xử lý",
+  "quay-lai-trang-chu": "Quay lại trang chủ",
+  "vui-long-doi-trong-giay-lat": "Vui lòng đợi trong giây lát."
 }

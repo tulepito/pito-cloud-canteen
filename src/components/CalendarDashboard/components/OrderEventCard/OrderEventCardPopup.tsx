@@ -6,7 +6,6 @@ import { useRouter } from 'next/router';
 
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import ScannerBarcodeViewerRenderGuard from '@pages/participant/orders/components/SubOrderDetailModal/ScannerBarcodeViewerRenderGuard';
 import { OrderListThunks } from '@pages/participant/orders/OrderList.slice';
 import { participantOrderManagementThunks } from '@redux/slices/ParticipantOrderManagementPage.slice';
 import { currentUserSelector } from '@redux/slices/user.slice';
@@ -57,7 +56,6 @@ const OrderEventCardPopup: React.FC<TOrderEventCardPopupProps> = ({
     deliveryHour: startTime,
     isOrderStarted = false,
     orderState,
-    allowToScan,
   } = event.resource;
   const isOrderCancelled = orderState === EOrderStates.canceled;
   const isOrderPicking = orderState === EOrderStates.picking;
@@ -142,15 +140,6 @@ const OrderEventCardPopup: React.FC<TOrderEventCardPopupProps> = ({
       <OrderEventCardContentItems
         event={event}
         classNameCoverImage={css.coverImage}
-      />
-      <ScannerBarcodeViewerRenderGuard
-        foodPicked={!!event.resource?.dishSelection?.dishSelection}
-        barcodeData={{
-          planId,
-          memberId: CurrentUser(user).getId(),
-          date: timestamp,
-        }}
-        allowToScan={allowToScan}
       />
       <RenderWhen condition={status !== undefined && shouldShowPickFoodSection}>
         <div className={css.divider} />

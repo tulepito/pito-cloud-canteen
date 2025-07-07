@@ -1,4 +1,8 @@
 import type { POSTScannerPlanIdTimestampScanBody } from '@pages/admin/order/POSTScannerPlanIdTimestampScanBody';
+import type {
+  POSTScannerParticipantScanQRcodeBody,
+  POSTScannerPlanIdTimestampScanQRcodeBody,
+} from '@pages/qrcode/POSTScannerPlanIdTimestampScanORCodeBody';
 
 import { postApi, putApi } from './configs';
 
@@ -13,4 +17,29 @@ export const scanApi = (
 ) =>
   postApi(`/admin/scanner/${payload.planId}/${payload.timestamp}/scan`, {
     barcode: payload.barcode,
+    ...(payload.groupId && { groupId: payload.groupId }),
   });
+
+export const scanQRCodeApi = (
+  payload: {
+    planId: string;
+    timestamp: string;
+  } & POSTScannerPlanIdTimestampScanQRcodeBody,
+) =>
+  postApi(
+    `/participants/scanner/${payload.planId}/${payload.timestamp}/scan-qr-code`,
+    {
+      ...(payload.code && { code: payload.code }),
+    },
+  );
+
+export const scanQRCodeForParticipantApi = (
+  payload: POSTScannerParticipantScanQRcodeBody,
+) =>
+  postApi(`/participants/scanner/qrcode/${payload.currentUserId}/scan`, {
+    timestamp: payload.timestamp,
+    ...(payload.groupId && { groupId: payload.groupId }),
+  });
+
+export const toggleQRCodeModeApi = (payload: { planId: string }) =>
+  putApi(`/participants/scanner/${payload.planId}/toggle-mode`, {});

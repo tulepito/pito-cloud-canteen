@@ -43,7 +43,7 @@ const ParticipantManagement: React.FC<TParticipantManagementProps> = () => {
   );
   const {
     onAddMembersSubmitInQuizFlow: handleAddMemberToCompany,
-    checkEmailList,
+    checkEmailsList,
   } = useAddMemberEmail({ orderId: order?.id?.uuid });
 
   const orderGetter = Listing(order as TListing);
@@ -62,9 +62,10 @@ const ParticipantManagement: React.FC<TParticipantManagementProps> = () => {
     );
 
     if (!isEmpty(needInviteEmailList)) {
-      const newLoadedResult = (await checkEmailList(
+      const newLoadedResult = (await checkEmailsList(
         needInviteEmailList,
       )) as TObject[];
+
       const newNonAccountEmails = filterNoAccountUserEmail(newLoadedResult);
       const newUserIds = filterHasAccountUserIds(newLoadedResult);
       const newHasCompanyUserIds = filterHasAccountUserIds(

@@ -299,10 +299,12 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
     } = values;
     const finalStartDate = startDateValue || startDate;
     const finalEndDate = endDateValue || endDate;
+
     await dispatch(
       orderAsyncActions.updateOrder({
         generalInfo: {
           ...values,
+          selectedGroups: values?.selectedGroups,
           mealType: mealTypeValue?.map((type: any) =>
             mealTypeReverseAdapter(type),
           ),

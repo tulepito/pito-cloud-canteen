@@ -37,6 +37,7 @@ import SubOrderCart from './components/SubOrderCart';
 import SubOrderDetail from './components/SubOrderDetail';
 import SubOrderInfo from './components/SubOrderInfo';
 import SubOrderNote from './components/SubOrderNote';
+import SubOrderQrCode from './components/SubOrderQrCode';
 import SubOrderSummary from './components/SubOrderSummary';
 import SubOrderTitle from './components/SubOrderTitle';
 import { PartnerSubOrderDetailThunks } from './PartnerSubOrderDetail.slice';
@@ -47,6 +48,7 @@ type TPartnerSubOrderDetailPageProps = {};
 export enum EPartnerSubOrderDetailPageViewMode {
   summary = 'summary',
   detail = 'detail',
+  qrCode = 'qrCode',
 }
 
 const PartnerSubOrderDetailPage: React.FC<
@@ -122,6 +124,13 @@ const PartnerSubOrderDetailPage: React.FC<
 
   const isSummaryViewMode =
     viewMode === EPartnerSubOrderDetailPageViewMode.summary;
+
+  const isQRCodeViewMode =
+    viewMode === EPartnerSubOrderDetailPageViewMode.qrCode;
+
+  const isDetailViewMode =
+    viewMode === EPartnerSubOrderDetailPageViewMode.detail;
+
   const newUpdatedOrderNotificationIds = notifications.reduce(
     (
       ids,
@@ -255,7 +264,13 @@ const PartnerSubOrderDetailPage: React.FC<
 
   return (
     <div className={css.root}>
-      <RenderWhen condition={!isMobileLayout || isSummaryViewMode}>
+      <RenderWhen
+        condition={
+          !isMobileLayout ||
+          isSummaryViewMode ||
+          isQRCodeViewMode ||
+          isDetailViewMode
+        }>
         <>
           <div className={css.goBackContainer} onClick={handleGoBack}>
             <IconArrow direction="left" />
@@ -371,10 +386,13 @@ const PartnerSubOrderDetailPage: React.FC<
             </div>
           </PopupModal>
         </RenderWhen>
+      </RenderWhen>
+      <RenderWhen condition={isQRCodeViewMode}>
+        <SubOrderQrCode onChangeViewMode={handleChangeViewMode} />
+      </RenderWhen>
 
-        <RenderWhen.False>
-          <SubOrderDetail onChangeViewMode={handleChangeViewMode} />
-        </RenderWhen.False>
+      <RenderWhen condition={isDetailViewMode}>
+        <SubOrderDetail onChangeViewMode={handleChangeViewMode} />
       </RenderWhen>
     </div>
   );

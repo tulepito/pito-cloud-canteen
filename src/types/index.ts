@@ -207,6 +207,7 @@ export type PlanListing = ListingBuilder<
     planStarted: boolean;
     slackThreadTs: string;
     allowToScan?: boolean;
+    allowToQRCode?: boolean;
     deliveryInfoLastUpdatedAtTimestamp?: number;
     deliveryInfo?: Record<
       string,

@@ -17,6 +17,7 @@ export const enGeneralPaths = {
   EmailVerification: '/verify-email',
   Auth: '/auth',
   Tracking: '/tracking/[subOrderId]',
+  QRCode: '/qrcode',
   SentryExamplePage: '/sentry-example-page',
   getInvitationPath: (orderId: string) => `/invitation/${orderId}`,
   login: {
@@ -58,6 +59,16 @@ export const enGeneralPaths = {
             index: (companyId: string) =>
               `/company/booker/orders/new/${companyId}`,
           },
+        },
+      },
+    },
+  },
+  partner: {
+    scanner: {
+      '[planId]': {
+        '[timestamp]': {
+          index: (planId: string, timestamp: string) =>
+            `/partner/scanner/${planId}/${timestamp}`,
         },
       },
     },
@@ -107,6 +118,7 @@ export const IgnoredPermissionCheckRoutes = [
   generalPaths.EmailVerification,
   enGeneralPaths.EmailVerification,
   enGeneralPaths.Tracking,
+  enGeneralPaths.QRCode,
   enGeneralPaths.SentryExamplePage,
   enGeneralPaths.getInvitationPath('[orderId]'),
 ];
@@ -340,6 +352,11 @@ export const participantPaths = {
             `/participant/company/${companyId}/orders/new`,
         },
       },
+    },
+  },
+  qrcode: {
+    '[groupId]': {
+      index: (groupId: string) => `/participant/qrcode/${groupId}`,
     },
   },
 };

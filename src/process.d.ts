@@ -86,5 +86,7 @@ declare namespace NodeJS {
     NEXT_PUBLIC_MIN_OFFSET_TIME_TO_MODIFY_ORDER_DETAIL_IN_HOUR: string;
 
     NEXT_PUBLIC_DELIVERY_INFO_ENABLED: 'true' | 'false';
+
+    NEXT_PUBLIC_REDIS_URL: string;
   }
 }

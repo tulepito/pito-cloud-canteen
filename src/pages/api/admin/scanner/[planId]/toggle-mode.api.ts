@@ -10,7 +10,7 @@ export interface PUTScannerPlanIdBody {}
 const BASE62 = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
 const BASE62_LENGTH = 12;
 
-const bufferToBase62 = (buffer: Buffer) => {
+export const bufferToBase62 = (buffer: Buffer) => {
   let num = BigInt(`0x${buffer.toString('hex')}`);
   let str = '';
   const BASE = BigInt(62);

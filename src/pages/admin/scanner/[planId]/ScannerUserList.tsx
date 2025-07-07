@@ -13,84 +13,165 @@ import { convertDateToVNTimezone } from '@helpers/dateHelpers';
 import type { FirebaseScannedRecord } from '@pages/admin/order/FirebaseScannedRecord';
 import { firestore } from '@services/firebase';
 
+import { EmptyWrapper } from './EmptyWrapper';
+import { removeVietnameseTones } from './ScannerInputForm';
 import { ScannerUserListItem } from './ScannerUserListItem';
 
-export const ScannerUserList = () => {
+interface ScannerUserListProps {
+  searchValue?: string;
+  resetSearchInput: () => void;
+}
+
+export const ScannerUserList = ({
+  searchValue = '',
+  resetSearchInput,
+}: ScannerUserListProps) => {
   const router = useRouter();
   const [barcodes, setBarcodes] = useState<FirebaseScannedRecord[]>([]);
+  const [allBarcodes, setAllBarcodes] = useState<FirebaseScannedRecord[]>([]);
+  const [lastUpdate, setLastUpdate] = useState<string>('');
 
-  /**
-   * Subscribe to the scanned records collection
-   */
+  const { timestamp: timestampQuery } = router.query;
+
+  const getTimestampAndGroupId = (
+    queryParam: string | string[] | undefined,
+  ) => {
+    if (typeof queryParam !== 'string')
+      return { timestamp: undefined, groupId: undefined };
+
+    const parts = queryParam.split('_');
+
+    if (parts.length === 2) {
+      const [timestamp, groupId] = parts;
+
+      return { timestamp, groupId };
+    }
+
+    return { timestamp: queryParam, groupId: undefined };
+  };
+
+  const { timestamp, groupId } = getTimestampAndGroupId(timestampQuery);
+
   useEffect(() => {
+    if (!router.query.planId || !timestamp) return;
+
     const scannerRecordsRef = collection(
       firestore,
-      process.env.NEXT_PUBLIC_FIREBASE_SCANNED_RECORDS_COLLECTION_NAME,
-    );
-    const q = query(
-      scannerRecordsRef,
-      where('planId', '==', router.query.planId),
-      where(
-        'timestamp',
-        '==',
-        !!router.query.timestamp && +router.query.timestamp,
-      ),
+      process.env.NEXT_PUBLIC_FIREBASE_SCANNED_RECORDS_COLLECTION_NAME!,
     );
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      setBarcodes(
-        snapshot.docs.map((_doc) => ({
+    const conditions = [
+      where('planId', '==', router.query.planId),
+      where('timestamp', '==', +timestamp),
+      where('state', '==', 'live'),
+    ];
+
+    if (groupId) {
+      conditions.push(where('groupId', '==', groupId));
+    }
+
+    const q = query(scannerRecordsRef, ...conditions);
+
+    const unsubscribe = onSnapshot(q, {
+      next: (snapshot) => {
+        const now = new Date().toLocaleTimeString();
+        setLastUpdate(now);
+
+        const newBarcodes = snapshot.docs.map((_doc) => ({
           id: _doc.id,
           ...(_doc.data() as Omit<FirebaseScannedRecord, 'id'>),
-        })),
-      );
+        }));
+
+        const limitedBarcodes = newBarcodes.sort(
+          (a, b) => +a.scannedAt - +b.scannedAt,
+        );
+
+        setAllBarcodes(limitedBarcodes);
+      },
+      error: (error) => {
+        console.error('Firestore error:', error);
+      },
     });
 
     return () => unsubscribe();
-  }, [router.query.planId, router.query.timestamp]);
+  }, [router.query.planId, timestamp, groupId]);
+
+  useEffect(() => {
+    if (!searchValue) {
+      setBarcodes(allBarcodes);
+
+      return;
+    }
+
+    const keyword = removeVietnameseTones(searchValue.trim().toLowerCase());
+
+    const filtered = allBarcodes.filter((barcode) => {
+      const name = removeVietnameseTones(
+        barcode.memberName?.toLowerCase() || '',
+      );
+
+      return name.includes(keyword);
+    });
+
+    setBarcodes(filtered);
+  }, [searchValue, allBarcodes]);
 
   return (
-    <div className="grid grid-cols-1 gap-4 mx-8">
-      {!!barcodes.length &&
-        barcodes
-          .sort((a, b) => +b.scannedAt - +a.scannedAt)
-          .map((barcode) => (
-            <ScannerUserListItem
-              key={barcode.barcode}
-              userName={barcode.memberName}
-              userAbbrName={barcode.memberAbbrName}
-              userProfileImageUrl={barcode.memberProfileImageUrl}
-              foodName={barcode.foodName}
-              foodThumbnailUrl={barcode.foodThumbnailUrl}
-              scannedAt={convertDateToVNTimezone(new Date(barcode.scannedAt), {
-                format: 'HH:mm',
-              })}
-              state={barcode.state}
-              onClick={() => {
-                const scannedRecordRef = doc(
-                  firestore,
-                  process.env
-                    .NEXT_PUBLIC_FIREBASE_SCANNED_RECORDS_COLLECTION_NAME,
-                  barcode.id,
-                );
-                updateDoc(scannedRecordRef, {
-                  state: barcode.state === 'live' ? 'offline' : 'live',
-                });
-              }}
-            />
-          ))}
-      {!barcodes.length && (
-        <div className="col-span-3 text-center">
-          <img
-            className="w-1/3 mx-auto opacity-50 grayscale"
-            src="/static/scan-user-list-empty-illustration.png"
-            alt="Chờ quét mã..."
-          />
-          <p className="text-lg text-gray-500 mt-4">
-            Chờ quét mã từ người dùng...
-          </p>
-        </div>
-      )}
+    <div className="grid grid-cols-1 gap-12 container mx-auto py-12">
+      <div className="text-xs text-gray-400 mb-2 hidden">
+        Last update: {lastUpdate} | Items: {barcodes.length}
+      </div>
+
+      {
+        <EmptyWrapper isEmpty={!barcodes.length}>
+          <div className="flex flex-col gap-10 w-full">
+            {!!barcodes.length &&
+              barcodes.map((barcode) => (
+                <ScannerUserListItem
+                  key={barcode.id}
+                  userName={barcode.memberName}
+                  userAbbrName={barcode.memberAbbrName}
+                  userProfileImageUrl={barcode.memberProfileImageUrl}
+                  foodName={barcode.foodName}
+                  foodThumbnailUrl={barcode.foodThumbnailUrl}
+                  scannedAt={convertDateToVNTimezone(
+                    new Date(barcode.scannedAt),
+                    {
+                      format: 'HH:mm',
+                    },
+                  )}
+                  state={barcode.state}
+                  onClick={() => {
+                    const scannedRecordRef = doc(
+                      firestore,
+                      process.env
+                        .NEXT_PUBLIC_FIREBASE_SCANNED_RECORDS_COLLECTION_NAME,
+                      barcode.id,
+                    );
+
+                    updateDoc(scannedRecordRef, {
+                      state: barcode.state === 'live' ? 'offline' : 'live',
+                    });
+
+                    resetSearchInput();
+                  }}
+                />
+              ))}
+            {!barcodes.length && (
+              <div className="col-span-3 text-center">
+                <img
+                  className="w-1/3 mx-auto opacity-50 grayscale"
+                  src="/static/scan-user-list-empty-illustration.png"
+                  alt="Chờ quét mã..."
+                />
+                <p className="text-lg text-gray-500 mt-4">
+                  Chờ quét mã từ người dùng...
+                </p>
+              </div>
+            )}
+          </div>
+        </EmptyWrapper>
+      }
     </div>
   );
 };

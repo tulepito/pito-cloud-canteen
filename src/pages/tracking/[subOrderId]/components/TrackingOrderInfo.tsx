@@ -178,6 +178,7 @@ const TrackingOrderInfo = ({ subOrderDate }: TTrackingOrderInfoProps) => {
     phoneNumber = '',
     location = {},
   } = restaurantGetter.getPublicData();
+
   const [images, setImages] = useState<
     {
       imageUrl?: string;

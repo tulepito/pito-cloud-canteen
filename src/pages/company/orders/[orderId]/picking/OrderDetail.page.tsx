@@ -106,6 +106,8 @@ const OrderDetailPage = () => {
     Number(timestamp),
   );
 
+  console.log({ currentViewDate });
+
   const [showReachMaxAllowedChangesModal, setShowReachMaxAllowedChangesModal] =
     useState<'reach_max' | 'reach_min' | null>(null);
   const confirmGoHomeControl = useBoolean();

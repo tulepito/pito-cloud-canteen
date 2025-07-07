@@ -1,22 +1,33 @@
 import { createSlice } from '@reduxjs/toolkit';
 
+import { getParticipantsByOrderApi } from '@apis/orderApi';
 import { createAsyncThunk } from '@redux/redux.helper';
 import type { PlanListing, WithFlexSDKData } from '@src/types';
+import type { TCompany, TUser } from '@src/utils/types';
 
 // ================ Initial states ================ //
 type TScannerState = {
   planListing: PlanListing | null;
   planListingInProgress: boolean;
   planListingError: string;
+  participantData: Array<TUser>;
+  anonymousParticipantData: Array<TUser>;
+  fetchOrderInProgress: boolean;
+  companyData: TCompany | null;
 };
 const initialState: TScannerState = {
   planListing: null,
   planListingInProgress: false,
   planListingError: '',
+  participantData: [],
+  anonymousParticipantData: [],
+  fetchOrderInProgress: false,
+  companyData: null,
 };
 
 // ================ Thunk types ================ //
 const SCANNER_PLAN_LISTING = 'app/scanner/SCANNER_PLAN_LISTING';
+const LOAD_DATA = "app/scanner/LOAD_DATA'";
 
 // ================ Async thunks ================ //
 
@@ -36,6 +47,15 @@ export const ScannerThunks = {
       } catch (error) {
         return rejectWithValue(error);
       }
+    },
+  ),
+  loadData: createAsyncThunk(
+    LOAD_DATA,
+    async (payload: { orderId: string }) => {
+      const { orderId } = payload;
+      const response: any = await getParticipantsByOrderApi(orderId);
+
+      return response.data;
     },
   ),
 };
@@ -67,6 +87,21 @@ const ScannerSlice = createSlice({
       .addCase(ScannerThunks.fetchPlanListing.pending, (state) => {
         state.planListingInProgress = true;
         state.planListingError = '';
+      })
+      .addCase(ScannerThunks.loadData.pending, (state) => {
+        state.fetchOrderInProgress = true;
+      })
+      .addCase(ScannerThunks.loadData.fulfilled, (state, { payload }) => {
+        return {
+          ...state,
+          participantData: payload.participantData || [],
+          anonymousParticipantData: payload.anonymousParticipantData || [],
+          companyData: payload.company || null,
+          fetchOrderInProgress: false,
+        };
+      })
+      .addCase(ScannerThunks.loadData.rejected, (state) => {
+        state.fetchOrderInProgress = false;
       });
   },
 });

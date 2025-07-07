@@ -33,7 +33,7 @@ import {
   updatePaymentApi,
   updatePlanDetailsApi,
 } from '@apis/orderApi';
-import { toggleScannerModeApi } from '@apis/scanner';
+import { toggleQRCodeModeApi, toggleScannerModeApi } from '@apis/scanner';
 import { fetchTxApi } from '@apis/txApi';
 import { checkUserExistedApi } from '@apis/userApi';
 import { EOrderDetailsTableTab } from '@components/OrderDetails/EditView/ManageOrderDetailSection/OrderDetailsTable/OrderDetailsTable.utils';
@@ -314,6 +314,26 @@ const loadData = createAsyncThunk(
     }
 
     return response.data;
+  },
+);
+
+const toggleQRCodeMode = createAsyncThunk(
+  'app/OrderManagement/TOGGLE_QR_CODE_MODE',
+  async (
+    {
+      orderId,
+      planId,
+      isAdminFlow,
+    }: { orderId: string; planId: string; isAdminFlow: boolean },
+    { dispatch },
+  ) => {
+    await toggleQRCodeModeApi({ planId });
+    dispatch(
+      loadData({
+        orderId,
+        isAdminFlow,
+      }),
+    );
   },
 );
 
@@ -1128,6 +1148,7 @@ const handleAutoPickFoodToggle = createAsyncThunk(
 
 export const orderManagementThunks = {
   toggleScannerMode,
+  toggleQRCodeMode,
   loadData,
   updateOrderGeneralInfo,
   addOrUpdateMemberOrder,

@@ -13,7 +13,7 @@ import {
   getCompanyMembersDetailsApi,
   queryCompanyMembersApi,
 } from '@apis/index';
-import { checkUserExistedApi } from '@apis/userApi';
+import { checkUserExistedApi, checkUsersExistedApi } from '@apis/userApi';
 import type { POSTAddMembersBody } from '@pages/api/company/members/add-members.api';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { storableAxiosError } from '@utils/errors';
@@ -39,6 +39,7 @@ interface TCompanyMemberState {
 
   checkedEmailInputChunk: any[];
   checkEmailExistedInProgress: boolean;
+  checkEmailMultipleExistedInProgress: boolean;
 
   queryMembersInProgress: boolean;
   queryMembersError: any;
@@ -62,6 +63,7 @@ const initialState: TCompanyMemberState = {
 
   checkedEmailInputChunk: [],
   checkEmailExistedInProgress: false,
+  checkEmailMultipleExistedInProgress: false,
 
   queryMembersInProgress: false,
   queryMembersError: null,
@@ -75,6 +77,8 @@ const initialState: TCompanyMemberState = {
 };
 
 const CHECK_EMAILS_EXISTED = 'app/companyMember/CHECK_EMAILS_EXISTED';
+const CHECK_MULTIPLE_EMAILS_EXISTED =
+  'app/companyMember/CHECK_MULTIPLE_EMAILS_EXISTED';
 const ADD_MEMBERS = 'app/companyMember/ADD_MEMBERS';
 const DELETE_MEMBER = 'app/companyMember/DELETE_MEMBER';
 const QUERY_COMPANY_MEMBERS = 'app/companyMember/QUERY_COMPANY_MEMBERS';
@@ -111,6 +115,26 @@ const checkEmailExisted = createAsyncThunk(
     );
 
     return response;
+  },
+);
+
+const checkMultipleEmailExisted = createAsyncThunk(
+  CHECK_MULTIPLE_EMAILS_EXISTED,
+  async (emailList: string[]) => {
+    const response = await checkUsersExistedApi({
+      emails: emailList,
+    });
+
+    return response.data.map((item: TObject) => {
+      return {
+        email: item?.email,
+        response: {
+          status: item?.status,
+          ...(item?.status === 200 && { user: item?.user }),
+          ...(item?.status === 404 && { message: item?.message }),
+        },
+      };
+    });
   },
 );
 
@@ -227,6 +251,7 @@ export const companyMemberThunks = {
   addMembers,
   deleteMember,
   checkEmailExisted,
+  checkMultipleEmailExisted,
   queryCompanyMembers,
   adminAddMembers,
   adminDeleteMember,
@@ -260,6 +285,19 @@ export const companyMemberSlice = createSlice({
       .addCase(checkEmailExisted.rejected, (state) => ({
         ...state,
         checkEmailExistedInProgress: false,
+      }))
+
+      .addCase(checkMultipleEmailExisted.pending, (state) => ({
+        ...state,
+        checkEmailMultipleExistedInProgress: true,
+      }))
+      .addCase(checkMultipleEmailExisted.fulfilled, (state) => ({
+        ...state,
+        checkEmailMultipleExistedInProgress: false,
+      }))
+      .addCase(checkMultipleEmailExisted.rejected, (state) => ({
+        ...state,
+        checkEmailMultipleExistedInProgress: false,
       }))
 
       .addCase(addMembers.pending, (state) => ({

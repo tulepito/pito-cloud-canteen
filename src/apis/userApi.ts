@@ -8,6 +8,9 @@ export const checkUserExistedApi = ({
   id?: string;
 }) => getApi(`/users/check-user-existed/`, { email, id });
 
+export const checkUsersExistedApi = ({ emails }: { emails?: string[] }) =>
+  getApi(`/users/check-users-existed/`, { emails });
+
 export const queryMyCompaniesApi = () => getApi('/users/my-companies');
 
 export const disableWalkthroughApi = (userId: string) =>

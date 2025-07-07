@@ -47,6 +47,9 @@ const SubOrderSummary: React.FC<TSubOrderSummaryProps> = ({
   const { orderType = EOrderType.group } = orderGetter.getMetadata();
   const { orderDetail } = planGetter.getMetadata();
   const isGroupOrder = orderType === EOrderType.group;
+  const allowToQRCode = !!planGetter.getMetadata().allowToQRCode;
+
+  console.log({ allowToQRCode });
 
   const [data] = groupFoodOrderByDate({
     isGroupOrder,
@@ -144,6 +147,18 @@ const SubOrderSummary: React.FC<TSubOrderSummaryProps> = ({
               EPartnerSubOrderDetailPageViewMode.detail,
             )}>
             {intl.formatMessage({ id: 'SubOrderSummary.viewDetail' })}
+            <IconArrow direction="right" className={css.arrowIcon} />
+          </Button>
+        </RenderWhen>
+
+        <RenderWhen condition={isGroupOrder && allowToQRCode}>
+          <Button
+            variant="inline"
+            className={css.viewOrderDetail}
+            onClick={onChangeViewMode(
+              EPartnerSubOrderDetailPageViewMode.qrCode,
+            )}>
+            Tải QRCode & Mở trang scan
             <IconArrow direction="right" className={css.arrowIcon} />
           </Button>
         </RenderWhen>

@@ -1,5 +1,6 @@
 import isEmpty from 'lodash/isEmpty';
 
+import { generateScannerBarCode } from '@pages/api/admin/scanner/[planId]/toggle-mode.api';
 import { Listing, User } from '@src/utils/data';
 import { buildFullName } from '@src/utils/emailTemplate/participantOrderPicking';
 import { TRANSITIONS_TO_STATE_CANCELED } from '@src/utils/transaction';
@@ -245,11 +246,14 @@ export const groupPickingOrderByFood = ({
   date,
   participants = [],
   anonymous = [],
+  planId,
 }: {
   orderDetail: TObject;
   date?: number | string;
   participants: TObject[];
   anonymous: TObject[];
+  isGetBarcode?: boolean;
+  planId?: string;
 }) => {
   return Object.entries(orderDetail).reduce(
     (result, currentOrderDetailEntry, index) => {
@@ -300,6 +304,9 @@ export const groupPickingOrderByFood = ({
               name: buildFullName(firstName, lastName, {
                 compareToGetLongerWith: displayName,
               }),
+              ...(planId && {
+                barcode: generateScannerBarCode(planId, memberId, `${date}`),
+              }),
             };
 
             if (!isEmpty(requirement)) {
@@ -335,6 +342,199 @@ export const groupPickingOrderByFood = ({
           date: d,
           index,
           foodDataList,
+          restaurantId: id,
+        },
+      ];
+    },
+    [] as TObject[],
+  );
+};
+
+export const groupPickingOrderByFoodLevels = ({
+  orderDetail,
+  date,
+  participants = [],
+  anonymous = [],
+  groups = [],
+  planId,
+}: {
+  orderDetail: TObject;
+  date?: number | string;
+  participants: TObject[];
+  anonymous: TObject[];
+  groups: TObject[];
+  planId?: string;
+}) => {
+  return Object.entries(orderDetail).reduce(
+    (result, currentOrderDetailEntry, index) => {
+      const [d, rawOrderDetailOfDate] = currentOrderDetailEntry;
+
+      const {
+        memberOrders = {},
+        restaurant = {},
+        status: subOrderStatus,
+      } = rawOrderDetailOfDate as TObject;
+      const { id, foodList: foodListOfDate = {} } = restaurant;
+      if (
+        subOrderStatus === ESubOrderStatus.canceled ||
+        (date && d !== date.toString())
+      ) {
+        return result;
+      }
+
+      // Giảm thiểu memberOrders chỉ lấy các thành viên có trong các nhóm (group)
+      const dataOfGroups = groups.reduce((groupResult: TObject[], group) => {
+        const { id: groupId, name: groupName, members = [] } = group;
+
+        // Lọc các memberOrders chỉ thuộc các thành viên của group này
+        const validMemberOrders = Object.entries(memberOrders).filter(
+          ([memberId]) =>
+            members.some((member: { id: string }) => member.id === memberId),
+        );
+
+        // Chuyển đổi các memberOrders hợp lệ sang dạng foodDataList
+        const foodDataList = validMemberOrders.reduce(
+          (foodDataResult, [memberId, memberOrderData]) => {
+            const {
+              foodId,
+              status,
+              requirement = '',
+            } = memberOrderData as TObject;
+            const {
+              foodName,
+              foodPrice,
+              foodUnit = '',
+            } = foodListOfDate[foodId] || {};
+
+            const participantMaybe = participants.find(
+              (p) => p?.id?.uuid === memberId,
+            );
+            const anonymousUserMaybe = anonymous.find(
+              (p) => p?.id?.uuid === memberId,
+            );
+            const { firstName, lastName, displayName } = User(
+              (participantMaybe || anonymousUserMaybe) as TUser,
+            ).getProfile();
+
+            if (status === EParticipantOrderStatus.joined && foodId !== '') {
+              const data = foodDataResult[foodId] as TObject;
+              const { frequency = 0, notes = [] } = data || {};
+              const newNote = {
+                note: requirement,
+                name: buildFullName(firstName, lastName, {
+                  compareToGetLongerWith: displayName,
+                }),
+                ...(planId && {
+                  barcode: generateScannerBarCode(planId, memberId, `${date}`),
+                }),
+              };
+
+              if (!isEmpty(requirement)) {
+                notes.splice(0, 0, newNote);
+              } else {
+                notes.push(newNote);
+              }
+
+              foodDataResult[foodId] = data
+                ? { ...data, frequency: frequency + 1, notes }
+                : {
+                    foodId,
+                    foodName,
+                    foodUnit,
+                    foodPrice,
+                    notes,
+                    frequency: 1,
+                  };
+            }
+
+            return foodDataResult;
+          },
+          {} as TObject,
+        );
+
+        return [
+          ...groupResult,
+          {
+            id: groupId,
+            name: groupName,
+            foodDataList: Object.values(foodDataList), // Chuyển foodDataList thành array
+          },
+        ];
+      }, []);
+
+      // Xử lý các member không có trong nhóm
+      const foodDataListForOthers = Object.entries(memberOrders).reduce(
+        (foodDataResult, [memberId, memberOrderData]) => {
+          // Kiểm tra xem memberId có trong các group không
+          const isMemberInAnyGroup = groups.some((group) =>
+            group.members.some(
+              (member: { id: string }) => member.id === memberId,
+            ),
+          );
+
+          if (!isMemberInAnyGroup) {
+            const {
+              foodId,
+              status,
+              requirement = '',
+            } = memberOrderData as TObject;
+            const {
+              foodName,
+              foodPrice,
+              foodUnit = '',
+            } = foodListOfDate[foodId] || {};
+
+            const participantMaybe = participants.find(
+              (p) => p?.id?.uuid === memberId,
+            );
+            const anonymousUserMaybe = anonymous.find(
+              (p) => p?.id?.uuid === memberId,
+            );
+            const { firstName, lastName, displayName } = User(
+              (participantMaybe || anonymousUserMaybe) as TUser,
+            ).getProfile();
+
+            if (status === EParticipantOrderStatus.joined && foodId !== '') {
+              const data = foodDataResult[foodId] as TObject;
+              const { frequency = 0, notes = [] } = data || {};
+              const newNote = {
+                note: requirement,
+                name: buildFullName(firstName, lastName, {
+                  compareToGetLongerWith: displayName,
+                }),
+              };
+
+              if (!isEmpty(requirement)) {
+                notes.splice(0, 0, newNote);
+              } else {
+                notes.push(newNote);
+              }
+
+              foodDataResult[foodId] = data
+                ? { ...data, frequency: frequency + 1, notes }
+                : {
+                    foodId,
+                    foodName,
+                    foodUnit,
+                    foodPrice,
+                    notes,
+                    frequency: 1,
+                  };
+            }
+          }
+
+          return foodDataResult;
+        },
+        {} as TObject,
+      );
+
+      return [
+        ...result,
+        {
+          date: d,
+          index,
+          foodDataList: Object.values(foodDataListForOthers),
+          dataOfGroups,
           restaurantId: id,
         },
       ];

@@ -1,4 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
+import pLimit from 'p-limit';
+import pRetry from 'p-retry';
 
 import cookies from '@services/cookie';
 import { emailSendingFactory, EmailTemplateTypes } from '@services/email';
@@ -11,6 +13,21 @@ export interface POSTRemindMemberBody {
   uniqueMemberIdList?: string[];
   planId?: string;
 }
+
+// Utility
+const sleep = (ms: number) =>
+  new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+
+const chunkArray = <T>(arr: T[], size: number): T[][] => {
+  const result: T[][] = [];
+  for (let i = 0; i < arr.length; i += size) {
+    result.push(arr.slice(i, i + size));
+  }
+
+  return result;
+};
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
@@ -30,9 +47,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
       _uniqueMemberIdList = Object.values(orderDetail || {}).reduce(
         (acc, currentDateOrders) => {
-          if (!currentDateOrders) {
-            return acc;
-          }
+          if (!currentDateOrders) return acc;
 
           const { memberOrders } = currentDateOrders;
           const memberIds = Object.entries(memberOrders || {}).reduce(
@@ -63,23 +78,89 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
     _uniqueMemberIdList = Array.from(new Set(_uniqueMemberIdList));
 
-    await Promise.all(
-      (_uniqueMemberIdList || []).map(async (participantId: string) => {
-        await emailSendingFactory(
-          EmailTemplateTypes.PARTICIPANT.PARTICIPANT_ORDER_PICKING,
-          {
-            orderId,
-            participantId,
-            bookerNote: description,
-          },
-        );
-      }),
-    );
+    if (!_uniqueMemberIdList.length) {
+      return res.status(200).json({
+        statusCode: 200,
+        message: 'Không có người dùng nào cần gửi email nhắc nhở',
+        results: { successful: 0, failed: 0, total: 0 },
+      });
+    }
 
-    res.status(200).json({
-      statusCode: 200,
-      message: `Gửi email nhắc nhở thành công cho ${_uniqueMemberIdList?.length} người`,
-    });
+    // ==== CONFIG HERE ====
+    const CONCURRENCY = 10; // Gửi đồng thời 10 email
+    const BATCH_DELAY = 400; // Delay 400ms giữa mỗi batch
+    const limit = pLimit(CONCURRENCY);
+    // ======================
+
+    const results: { successful: number; failed: number; errors: string[] } = {
+      successful: 0,
+      failed: 0,
+      errors: [],
+    };
+
+    const batches = chunkArray(_uniqueMemberIdList, CONCURRENCY);
+
+    for (let i = 0; i < batches.length; i++) {
+      const batch = batches[i];
+
+      // eslint-disable-next-line no-await-in-loop
+      await Promise.all(
+        batch.map((participantId) =>
+          limit(() =>
+            pRetry(
+              () =>
+                emailSendingFactory(
+                  EmailTemplateTypes.PARTICIPANT.PARTICIPANT_ORDER_PICKING,
+                  { orderId, participantId, bookerNote: description },
+                ),
+              {
+                retries: 3,
+                minTimeout: 1000,
+                maxTimeout: 3000,
+                onFailedAttempt: (error: {
+                  attemptNumber: any;
+                  message: any;
+                }) => {
+                  console.log(
+                    `Retry ${error.attemptNumber} for ${participantId}: ${error.message}`,
+                  );
+                },
+              },
+            )
+              .then(() => {
+                results.successful++;
+                console.log(`✓ Gửi thành công cho ${participantId}`);
+              })
+              .catch((error: { message: any }) => {
+                results.failed++;
+                results.errors.push(`${participantId}: ${error.message}`);
+                console.error(
+                  `✗ Gửi thất bại cho ${participantId}:`,
+                  error.message,
+                );
+              }),
+          ),
+        ),
+      );
+
+      if (i < batches.length - 1) {
+        // eslint-disable-next-line no-await-in-loop
+        await sleep(BATCH_DELAY);
+      }
+    }
+
+    const response = {
+      statusCode: results.failed > 0 ? 207 : 200,
+      message: `Đã gửi thành công ${results.successful}/${_uniqueMemberIdList.length} email nhắc nhở`,
+      results: {
+        successful: results.successful,
+        failed: results.failed,
+        total: _uniqueMemberIdList.length,
+        errors: results.errors.length > 0 ? results.errors : undefined,
+      },
+    };
+
+    res.status(response.statusCode).json(response);
   } catch (error) {
     handleError(res, error);
   }

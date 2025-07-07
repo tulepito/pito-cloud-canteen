@@ -1,17 +1,13 @@
 import React from 'react';
+import { PiClock } from 'react-icons/pi';
 import classNames from 'classnames';
 import { motion } from 'framer-motion';
-
-import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
-
-import { ScannerIcon } from './ScannerIcon';
 
 export const ScannerUserListItem = ({
   userName,
   userProfileImageUrl,
   userAbbrName,
   foodName,
-  foodThumbnailUrl,
   scannedAt,
   state,
   onClick,
@@ -30,41 +26,21 @@ export const ScannerUserListItem = ({
       initial={{ scale: 0.5, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
       transition={{ duration: 0.5, ease: 'easeOut' }}
-      className={classNames('p-2 bg-white shadow-lg rounded-3xl', {
-        'shadow-xl': state === 'live',
-      })}>
+      className={classNames(
+        'rounded-3xl w-full border border-neutral-200 cursor-pointer',
+        state === 'live' ? 'bg-white' : 'bg-green-200',
+      )}>
       <div
-        style={{
-          backgroundColor:
-            state === 'live' ? '#FF5722' : 'rgba(255, 255, 255, 0.5)',
-        }}
-        className={classNames(
-          `flex min-h-[200px] gap-4 items-center rounded-3xl cursor-pointer hover:opacity-90 transition-opacity duration-300 overflow-hidden border border-gray-200 border-solid`,
-          {
-            '!bg-gray-400': state === 'offline',
-          },
-        )}
+        className="px-12 py-10 flex flex-col gap-20 z-10 w-full"
         onClick={onClick}>
-        <div className="h-full rounded-3xl overflow-hidden min-h-[200px] border-r-[8px] border-white border-solid aspect-[9/6] bg-white relative">
-          <ResponsiveImage
-            style={{
-              objectFit: 'cover',
-            }}
-            image={null}
-            className="w-full h-full"
-            src={foodThumbnailUrl}
-            alt={foodName}
-            emptyType="food"
-          />
-        </div>
-        <div className="p-4 flex flex-col gap-2 z-10">
-          {foodName && (
-            <div className="text-white text-3xl font-semibold line-clamp-1">
-              {foodName}
-            </div>
-          )}
+        {foodName && (
+          <div className="text-black text-6xl font-semibold line-clamp-3 h-fit leading-normal">
+            {foodName}
+          </div>
+        )}
+        <div className="flex flex-row justify-between items-center w-full">
           {userName && (
-            <div className="text-white text-base font-semibold flex items-center gap-2">
+            <div className="text-black text-base font-semibold flex items-center gap-3">
               <div className="min-w-[40px] min-h-[40px] w-[40px] h-[40px] rounded-full bg-gray-400 border-2 border-solid border-white overflow-hidden">
                 {userProfileImageUrl && (
                   <img
@@ -78,22 +54,22 @@ export const ScannerUserListItem = ({
                   <div
                     className="flex justify-center items-center h-full text-white text-base font-semibold"
                     style={{
-                      backgroundColor: '#FF5722',
+                      backgroundColor: '#fe693c',
                     }}>
                     {userAbbrName}
                   </div>
                 )}
               </div>
-              <div className="text-white line-clamp-1">{userName}</div>
+              <div className="text-neutral-500 line-clamp-1 text-3xl font-normal">
+                {userName}
+              </div>
             </div>
           )}
 
           {scannedAt && (
-            <div className="flex items-center gap-1 text-white">
-              <div className="min-w-[40px] flex justify-center items-center">
-                <ScannerIcon />
-              </div>
-              <div className="">{scannedAt}</div>
+            <div className="text-3xl text-neutral-500 font-normal flex flex-row items-center">
+              <PiClock className="inline-block mr-2" size={32} />
+              {scannedAt}
             </div>
           )}
         </div>

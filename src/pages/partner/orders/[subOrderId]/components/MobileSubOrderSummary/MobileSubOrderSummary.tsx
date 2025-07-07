@@ -20,6 +20,7 @@ import css from './MobileSubOrderSummary.module.scss';
 enum EPartnerSubOrderDetailPageViewMode {
   summary = 'summary',
   detail = 'detail',
+  qrCode = 'qrCode',
 }
 
 type TMobileSubOrderSummaryProps = {
@@ -48,6 +49,7 @@ const MobileSubOrderSummary: React.FC<TMobileSubOrderSummaryProps> = ({
   const { orderType = EOrderType.group } = orderGetter.getMetadata();
   const { orderDetail } = planGetter.getMetadata();
   const isGroupOrder = orderType === EOrderType.group;
+  const allowToQRCode = !!planGetter.getMetadata().allowToQRCode;
 
   const [data] = groupFoodOrderByDate({
     isGroupOrder,
@@ -90,8 +92,18 @@ const MobileSubOrderSummary: React.FC<TMobileSubOrderSummaryProps> = ({
     );
   };
 
-  const handleChangeView = () => {
+  const handleChangeViewDetail = () => {
     onChangeViewMode(EPartnerSubOrderDetailPageViewMode.detail)();
+    if (typeof window !== 'undefined') {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth',
+      });
+    }
+  };
+
+  const handleChangeViewQRCode = () => {
+    onChangeViewMode(EPartnerSubOrderDetailPageViewMode.qrCode)();
     if (typeof window !== 'undefined') {
       window.scrollTo({
         top: 0,
@@ -120,8 +132,17 @@ const MobileSubOrderSummary: React.FC<TMobileSubOrderSummaryProps> = ({
           <Button
             variant="inline"
             className={css.viewOrderDetail}
-            onClick={handleChangeView}>
+            onClick={handleChangeViewDetail}>
             {intl.formatMessage({ id: 'SubOrderSummary.viewDetail' })}
+            <IconArrow direction="right" className={css.arrowIcon} />
+          </Button>
+        </RenderWhen>
+        <RenderWhen condition={isGroupOrder && allowToQRCode}>
+          <Button
+            variant="inline"
+            className={css.viewOrderDetail}
+            onClick={handleChangeViewQRCode}>
+            Tải QRCode và Mở trang scan
             <IconArrow direction="right" className={css.arrowIcon} />
           </Button>
         </RenderWhen>

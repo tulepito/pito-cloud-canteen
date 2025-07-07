@@ -11,7 +11,7 @@ import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { isEnableToStartOrder } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
-import { ScannerModeToggle } from '@pages/admin/scanner/[planId]/ScannerModeToggle';
+import { QRCodeModeToggle } from '@pages/admin/scanner/[planId]/QRCodeModeToggle';
 import { orderManagementThunks } from '@redux/slices/OrderManagement.slice';
 import { adminPaths } from '@src/paths';
 import type { PlanListing } from '@src/types';
@@ -158,9 +158,9 @@ const OrderHeaderState: React.FC<OrderHeaderStateProps> = (props) => {
 
   const planListing = planData as PlanListing;
 
-  const toggleScannerMode = () => {
+  const toggleQRCodeMode = () => {
     dispatch(
-      orderManagementThunks.toggleScannerMode({
+      orderManagementThunks.toggleQRCodeMode({
         orderId: planListing.attributes?.metadata?.orderId!,
         planId: planListing.id?.uuid!,
         isAdminFlow: true,
@@ -220,12 +220,12 @@ const OrderHeaderState: React.FC<OrderHeaderStateProps> = (props) => {
         </div>
 
         {isGroupOrder && orderState === EOrderStates.inProgress && (
-          <ScannerModeToggle
+          <QRCodeModeToggle
             isLoading={fetchOrderInProgress}
             status={
-              planListing.attributes?.metadata?.allowToScan ? 'on' : 'off'
+              planListing.attributes?.metadata?.allowToQRCode ? 'on' : 'off'
             }
-            onChange={toggleScannerMode}
+            onChange={toggleQRCodeMode}
           />
         )}
       </div>

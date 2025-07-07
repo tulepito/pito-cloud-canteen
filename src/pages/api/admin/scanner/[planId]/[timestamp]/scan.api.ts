@@ -21,7 +21,6 @@ import type {
   UserListing,
   WithFlexSDKData,
 } from '@src/types';
-import { buildFullName } from '@src/utils/emailTemplate/participantOrderPicking';
 import { EImageVariants } from '@src/utils/enums';
 
 import {
@@ -29,7 +28,30 @@ import {
   generateBarcodeHashMap,
 } from '../toggle-mode.api';
 
-console.log('buildFullName:', buildFullName);
+export const buildFullName = (
+  firstName?: string,
+  lastName?: string,
+  options?: {
+    compareToGetLongerWith?: string;
+  },
+) => {
+  if (!firstName || !lastName) return firstName || lastName || '';
+
+  if (firstName === lastName) return firstName;
+
+  const fullName = `${lastName} ${firstName}`;
+  if (!options) return fullName;
+
+  const { compareToGetLongerWith } = options;
+
+  if (!compareToGetLongerWith) return fullName;
+
+  if (fullName.length < compareToGetLongerWith.length) {
+    return compareToGetLongerWith;
+  }
+
+  return fullName;
+};
 
 export default async function handler(
   req: NextApiRequest,
@@ -40,7 +62,7 @@ export default async function handler(
       planId: string;
       timestamp: string;
     };
-    const { barcode } = req.body as POSTScannerPlanIdTimestampScanBody;
+    const { barcode, groupId } = req.body as POSTScannerPlanIdTimestampScanBody;
     let matchedBarcodeMemberOrder: Partial<MemberOrderValue> | undefined;
 
     if (typeof planId !== 'string') {
@@ -173,7 +195,8 @@ export default async function handler(
             'square-small'
           ]?.url || '',
         state: 'live',
-        scannedAt: new Date().valueOf(),
+        scannedAt: Date.now(),
+        ...(groupId && { groupId }),
       } satisfies Omit<FirebaseScannedRecord, 'id'>;
 
       if (querySnapshot.empty) {

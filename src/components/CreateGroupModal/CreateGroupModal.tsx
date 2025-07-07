@@ -4,6 +4,7 @@ import Button from '@components/Button/Button';
 import CreateGroupForm from '@components/CreateGroupForm/CreateGroupForm';
 import Modal from '@components/Modal/Modal';
 import OutsideClickHandler from '@components/OutsideClickHandler/OutsideClickHandler';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
 
 import css from './CreateGroupModal.module.scss';
 
@@ -35,14 +36,16 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = (props) => {
               onModalClose={onClose}
             />
           </div>
-          <div className={css.modalFooter}>
-            <Button
-              variant="secondary"
-              className={css.cancelBtn}
-              onClick={onClose}>
-              {intl.formatMessage({ id: 'CreateGroupModal.cancel' })}
-            </Button>
-          </div>
+          <RenderWhen condition={!!companyMembers?.length}>
+            <div className={css.modalFooter}>
+              <Button
+                variant="secondary"
+                className={css.cancelBtn}
+                onClick={onClose}>
+                {intl.formatMessage({ id: 'CreateGroupModal.cancel' })}
+              </Button>
+            </div>
+          </RenderWhen>
         </div>
       </OutsideClickHandler>
     </Modal>

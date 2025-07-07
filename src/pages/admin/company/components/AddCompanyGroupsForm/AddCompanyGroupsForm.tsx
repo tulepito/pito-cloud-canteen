@@ -63,30 +63,41 @@ const AddCompanyGroupsFormComponent: React.FC<
           )}
         />
       </div>
-      <div className={css.members}>
-        {companyMembers.map((member) => (
-          <FieldCompanyMemberCheckbox
-            key={member.id.uuid}
-            className={css.checkbox}
-            member={member}
-          />
-        ))}
-      </div>
-      <div className={css.actionBtn}>
-        <Button
-          disabled={inProgress}
-          inProgress={inProgress}
-          className={css.submitButton}>
-          {intl.formatMessage({ id: 'AddCompanyGroupsForm.submitButton' })}
-        </Button>
-        <Button
-          disabled={inProgress}
-          onClick={handleCancel}
-          className={css.lightButton}
-          type="button">
-          {intl.formatMessage({ id: 'AddCompanyGroupsForm.cancelButton' })}
-        </Button>
-      </div>
+      <RenderWhen condition={!!companyMembers?.length}>
+        <>
+          <div className={css.members}>
+            {companyMembers.map((member) => (
+              <FieldCompanyMemberCheckbox
+                key={member.id.uuid}
+                className={css.checkbox}
+                member={member}
+              />
+            ))}
+          </div>
+          <div className={css.actionBtn}>
+            <Button
+              disabled={inProgress}
+              inProgress={inProgress}
+              className={css.submitButton}>
+              {intl.formatMessage({ id: 'AddCompanyGroupsForm.submitButton' })}
+            </Button>
+            <Button
+              disabled={inProgress}
+              onClick={handleCancel}
+              className={css.lightButton}
+              type="button">
+              {intl.formatMessage({ id: 'AddCompanyGroupsForm.cancelButton' })}
+            </Button>
+          </div>
+        </>
+      </RenderWhen>
+
+      <RenderWhen condition={!companyMembers?.length}>
+        <p className="text-center text-gray-500">
+          Không có thành viên nào không có nhóm hiện tại.
+        </p>
+      </RenderWhen>
+
       <RenderWhen condition={!isEmpty(formError)}>
         <ErrorMessage message={formError?.message} />
       </RenderWhen>

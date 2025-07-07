@@ -50,6 +50,9 @@ export const reorderApi = (orderId: string, body: TObject) =>
 export const getBookerOrderDataApi = (orderId: string) =>
   getApi(`/orders/${orderId}`);
 
+export const getParticipantsByOrderApi = (orderId: string) =>
+  getApi(`/orders/${orderId}/participants`);
+
 export const updateOrderApi = (orderId: string, body: TUpdateOrderApiBody) =>
   putApi(`/orders/${orderId}`, body);
 // ------------------------- //

@@ -137,6 +137,14 @@ export const useAddMemberEmail = (options?: { orderId?: string }) => {
     return payload;
   };
 
+  const checkEmailsList = async (value: string[]) => {
+    const { payload } = await dispatch(
+      companyMemberThunks.checkMultipleEmailExisted(value),
+    );
+
+    return payload;
+  };
+
   return {
     emailList,
     setEmailList,
@@ -145,6 +153,7 @@ export const useAddMemberEmail = (options?: { orderId?: string }) => {
     removeEmailValue,
     onAddMembersSubmit,
     checkEmailList,
+    checkEmailsList,
     addMembersInProgress,
     onAddMembersSubmitInQuizFlow,
   };

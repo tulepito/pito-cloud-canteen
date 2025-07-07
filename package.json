@@ -15,7 +15,8 @@
     "fix-lint": "eslint . --fix --ext ts --ext tsx --ext js",
     "fix-all": "prettier --write . && eslint . --fix --ext ts --ext tsx --ext js",
     "sync-env:test": "rm -f .env.test && aws secretsmanager get-secret-value --secret-id arn:aws:secretsmanager:ap-southeast-1:050309102952:secret:pito/web/staging/cGl0b3Byb2plY3Q-oTy3te --region=ap-southeast-1 --query SecretString --output text --profile=sync-env > .env.json && node ./scripts/json2env.js .env.json .env.test && rm -f .env.json",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "worker:updatePlan": "ts-node src/workers/updatePlanWorker.ts"
   },
   "dependencies": {
     "@aws-sdk/client-ses": "3.723.0",
@@ -38,6 +39,7 @@
     "autosize": "5.0.2",
     "aws-sdk": "2.1455.0",
     "axios": "1.2.1",
+    "bullmq": "^5.56.0",
     "class-variance-authority": "^0.7.1",
     "classnames": "2.3.2",
     "clsx": "^2.1.1",
@@ -53,6 +55,7 @@
     "formidable": "^3.5.2",
     "framer-motion": "^12.5.0",
     "html2canvas": "1.4.1",
+    "ioredis": "^5.6.1",
     "jsbarcode": "^3.11.6",
     "jshashes": "1.0.8",
     "jspdf": "2.5.1",
@@ -69,6 +72,8 @@
     "nookies": "^2.5.2",
     "nprogress": "0.2.0",
     "onesignal-node": "3.4.0",
+    "p-limit": "^6.2.0",
+    "p-retry": "^6.2.1",
     "papaparse": "5.3.2",
     "qrcode": "^1.5.4",
     "query-string": "8.0.3",

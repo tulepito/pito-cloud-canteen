@@ -14,9 +14,12 @@ export function LoadingWrapper({
     <>
       {isLoading ? (
         <div
-          className={classNames('flex justify-center items-center', {
-            'opacity-50': isLoading,
-          })}>
+          className={classNames(
+            'flex justify-center items-center min-h-[300px]',
+            {
+              'opacity-50': isLoading,
+            },
+          )}>
           <div
             className={`animate-spin rounded-full border-b-2 border-gray-900`}
             style={{ width: size, height: size }}

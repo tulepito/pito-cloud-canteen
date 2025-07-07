@@ -208,7 +208,10 @@ const EditCompanySettingsInformationFormComponent: React.FC<
   };
 
   const existedCompanyMembers = useMemo(
-    () => companyMembers?.filter((member) => !!member.id),
+    () =>
+      companyMembers?.filter(
+        (member) => !!member.id && member?.groups?.length === 0,
+      ),
     [JSON.stringify(companyMembers)],
   );
 

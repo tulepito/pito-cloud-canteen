@@ -20,8 +20,6 @@ import { EOrderStates } from '@src/utils/enums';
 
 import { OrderListThunks } from '../../OrderList.slice';
 
-import ScannerBarcodeViewerRenderGuard from './ScannerBarcodeViewerRenderGuard';
-
 import css from './SubOrderDetailModal.module.scss';
 
 type TSubOrderDetailModalProps = {
@@ -62,7 +60,6 @@ const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
     deliveryHour: startTime,
     orderState,
     lastTransition,
-    allowToScan,
   } = event.resource;
   const user = useAppSelector(currentUserSelector);
 
@@ -150,16 +147,6 @@ const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
           {intl.formatMessage({ id: 'EventCard.PCC' })}
         </div>
         <div className={css.eventTime}>{startTime}</div>
-        <div className={css.divider} />
-        <ScannerBarcodeViewerRenderGuard
-          foodPicked={!!event.resource?.dishSelection?.dishSelection}
-          allowToScan={allowToScan}
-          barcodeData={{
-            planId,
-            memberId: CurrentUser(user).getId(),
-            date: String(timestamp),
-          }}
-        />
         <OrderEventCardContentItems
           event={event}
           isFirstHighlight

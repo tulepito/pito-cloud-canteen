@@ -536,6 +536,10 @@ function BookerDraftOrderPage() {
 
   const _steps = useStepsByOrderType(orderType);
 
+  const isEmptyRecommendRestaurants = useMemo(() => {
+    return !calendarEvents.length;
+  }, [calendarEvents]);
+
   return (
     <>
       {!!_steps.length && (
@@ -623,7 +627,7 @@ function BookerDraftOrderPage() {
                   {...calendarProps}
                 />
 
-                <RenderWhen condition={isAllDatesHaveNoRestaurants}>
+                <RenderWhen condition={isEmptyRecommendRestaurants}>
                   <div className={css.emptyResult}>
                     <div className={css.emptyResultImg}>
                       <Image src={emptyResultImg} alt="empty result" />
