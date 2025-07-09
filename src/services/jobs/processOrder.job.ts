@@ -300,6 +300,8 @@ export const addToProcessOrderQueue = async (data: AddToQueueData) => {
   const deduplicationKey = `${data.orderId}-${data.planId}-${data.currentUserId}`;
 
   try {
+    await processOrderQueue.remove(deduplicationKey);
+
     const job = await processOrderQueue.add(queueName, data, {
       // Use deduplication based on plan and user
       jobId: deduplicationKey,
