@@ -7,13 +7,14 @@ import {
   updateDoc,
   where,
 } from 'firebase/firestore';
+import { AnimatePresence } from 'framer-motion';
+import { useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/router';
 
 import { convertDateToVNTimezone } from '@helpers/dateHelpers';
 import type { FirebaseScannedRecord } from '@pages/admin/order/FirebaseScannedRecord';
 import { firestore } from '@services/firebase';
 
-import { EmptyWrapper } from './EmptyWrapper';
 import { removeVietnameseTones } from './ScannerInputForm';
 import { ScannerUserListItem } from './ScannerUserListItem';
 
@@ -27,11 +28,14 @@ export const ScannerUserList = ({
   resetSearchInput,
 }: ScannerUserListProps) => {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [barcodes, setBarcodes] = useState<FirebaseScannedRecord[]>([]);
   const [allBarcodes, setAllBarcodes] = useState<FirebaseScannedRecord[]>([]);
+
   const [lastUpdate, setLastUpdate] = useState<string>('');
 
   const { timestamp: timestampQuery } = router.query;
+  const screen = searchParams.get('screen') || undefined;
 
   const getTimestampAndGroupId = (
     queryParam: string | string[] | undefined,
@@ -52,6 +56,7 @@ export const ScannerUserList = ({
 
   const { timestamp, groupId } = getTimestampAndGroupId(timestampQuery);
 
+  // useEffect để lấy chỉ các records live (cho hiển thị danh sách)
   useEffect(() => {
     if (!router.query.planId || !timestamp) return;
 
@@ -68,6 +73,10 @@ export const ScannerUserList = ({
 
     if (groupId) {
       conditions.push(where('groupId', '==', groupId));
+    }
+
+    if (screen) {
+      conditions.push(where('screen', '==', screen));
     }
 
     const q = query(scannerRecordsRef, ...conditions);
@@ -94,7 +103,7 @@ export const ScannerUserList = ({
     });
 
     return () => unsubscribe();
-  }, [router.query.planId, timestamp, groupId]);
+  }, [router.query.planId, timestamp, groupId, screen]);
 
   useEffect(() => {
     if (!searchValue) {
@@ -117,14 +126,14 @@ export const ScannerUserList = ({
   }, [searchValue, allBarcodes]);
 
   return (
-    <div className="grid grid-cols-1 gap-12 container mx-auto py-12">
+    <div className="grid grid-cols-1 gap-12 container mx-auto py-8">
       <div className="text-xs text-gray-400 mb-2 hidden">
         Last update: {lastUpdate} | Items: {barcodes.length}
       </div>
 
       {
-        <EmptyWrapper isEmpty={!barcodes.length}>
-          <div className="flex flex-col gap-10 w-full">
+        <div className="flex flex-col gap-10 w-full">
+          <AnimatePresence mode="popLayout">
             {!!barcodes.length &&
               barcodes.map((barcode) => (
                 <ScannerUserListItem
@@ -157,20 +166,20 @@ export const ScannerUserList = ({
                   }}
                 />
               ))}
-            {!barcodes.length && (
-              <div className="col-span-3 text-center">
-                <img
-                  className="w-1/3 mx-auto opacity-50 grayscale"
-                  src="/static/scan-user-list-empty-illustration.png"
-                  alt="Chờ quét mã..."
-                />
-                <p className="text-lg text-gray-500 mt-4">
-                  Chờ quét mã từ người dùng...
-                </p>
-              </div>
-            )}
-          </div>
-        </EmptyWrapper>
+          </AnimatePresence>
+          {!barcodes.length && (
+            <div className="col-span-3 text-center mt-[20%]">
+              <img
+                className="w-1/3 mx-auto opacity-50 grayscale"
+                src="/static/scan-user-list-empty-illustration.webp"
+                alt="Chờ quét mã..."
+              />
+              <p className="text-lg text-gray-500 mt-4">
+                Chờ quét mã từ người dùng...
+              </p>
+            </div>
+          )}
+        </div>
       }
     </div>
   );

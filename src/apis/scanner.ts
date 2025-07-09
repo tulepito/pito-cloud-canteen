@@ -18,6 +18,7 @@ export const scanApi = (
   postApi(`/admin/scanner/${payload.planId}/${payload.timestamp}/scan`, {
     barcode: payload.barcode,
     ...(payload.groupId && { groupId: payload.groupId }),
+    ...(payload.screen && { screen: payload.screen }),
   });
 
 export const scanQRCodeApi = (
@@ -30,6 +31,7 @@ export const scanQRCodeApi = (
     `/participants/scanner/${payload.planId}/${payload.timestamp}/scan-qr-code`,
     {
       ...(payload.code && { code: payload.code }),
+      ...(payload.screen && { groupId: payload.screen }),
     },
   );
 
@@ -39,6 +41,7 @@ export const scanQRCodeForParticipantApi = (
   postApi(`/participants/scanner/qrcode/${payload.currentUserId}/scan`, {
     timestamp: payload.timestamp,
     ...(payload.groupId && { groupId: payload.groupId }),
+    ...(payload.screen && { screen: payload.screen }),
   });
 
 export const toggleQRCodeModeApi = (payload: { planId: string }) =>

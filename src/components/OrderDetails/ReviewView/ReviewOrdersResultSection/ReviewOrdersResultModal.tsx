@@ -10,6 +10,7 @@ import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import { toast } from 'react-toastify';
 import classNames from 'classnames';
+import clsx from 'clsx';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import isEmpty from 'lodash/isEmpty';
@@ -555,11 +556,23 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
     printWindow?.print();
   };
 
-  const handleDownloadQRCode = async (groupId?: string) => {
+  const handleDownloadQRCode = async ({
+    groupId,
+    screen,
+  }: {
+    groupId?: string;
+    screen?: string;
+  }) => {
     try {
-      const dataToEncode = `${process.env.NEXT_PUBLIC_CANONICAL_URL}/qrcode${
-        groupId ? `?groupId=${groupId}` : ''
-      }`;
+      const baseUrl = `${process.env.NEXT_PUBLIC_CANONICAL_URL}/qrcode`;
+      const queryParams = new URLSearchParams();
+
+      if (groupId) queryParams.append('groupId', groupId);
+      if (screen) queryParams.append('screen', screen);
+
+      const dataToEncode = queryParams.toString()
+        ? `${baseUrl}?${queryParams.toString()}`
+        : baseUrl;
       const canvas = document.createElement('canvas');
 
       // Tạo QR code trong canvas
@@ -688,6 +701,82 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
 
           return 0;
         });
+
+  const renderComponentQRCode = ({
+    groupId,
+    date,
+  }: {
+    groupId?: string;
+    date: string;
+  }) => {
+    return (
+      <div className="flex gap-2 items-center divide-x divide-gray-300">
+        {[
+          {
+            title: 'Màn hình 1',
+            id: 'A',
+          },
+          {
+            title: 'Màn hình 2',
+            id: 'B',
+          },
+        ].map((item) => {
+          return (
+            <div
+              className={clsx(
+                'flex gap-2 items-center',
+                item.id === 'B' && 'pl-2',
+              )}
+              key={item.id}>
+              <Tooltip tooltipContent="Tải mã QR" placement="top">
+                <PiQrCode
+                  className="size-[20px] text-blue-600 cursor-pointer transition-all"
+                  onClick={() =>
+                    handleDownloadQRCode({
+                      groupId,
+                      screen: item.id,
+                    })
+                  }
+                />
+              </Tooltip>
+              <Link
+                href={`${enGeneralPaths.admin.scanner['[planId]'][
+                  '[timestamp]'
+                ].index(
+                  String(planId),
+                  groupId ? `${date}_${groupId}` : date,
+                )}?screen=${item.id}`}
+                legacyBehavior>
+                <a target="_blank">
+                  <Button variant="inline" size="small" className="!px-1">
+                    <div className="flex items-center gap-1 text-blue-500">
+                      <span>Mở trang scan {item.title}</span>
+                      <svg
+                        fill="currentColor"
+                        viewBox="0 0 32 32"
+                        width="20px"
+                        height="20px"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                        <g
+                          id="SVGRepo_tracerCarrier"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"></g>
+                        <g id="SVGRepo_iconCarrier">
+                          <path d="M23.5 23.5h-15v-15h4.791V6H6v20h20v-7.969h-2.5z"></path>
+                          <path d="M17.979 6l3.016 3.018-6.829 6.829 1.988 1.987 6.83-6.828L26 14.02V6z"></path>
+                        </g>
+                      </svg>
+                    </div>
+                  </Button>
+                </a>
+              </Link>
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
 
   const content = (
     <>
@@ -900,58 +989,13 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
                                 `(Số lượng: ${group.orderData.length})`}
                             </div>
                             <RenderWhen condition={!isEmptyOrderData}>
-                              <div className="flex flex-wrap justify-end gap-2 items-center">
-                                {isAdmin && showQRCode && (
-                                  <div className="flex gap-2 items-center">
-                                    <Tooltip
-                                      tooltipContent="Tải mã QR"
-                                      placement="top">
-                                      <PiQrCode
-                                        className="size-[26px] text-blue-600 cursor-pointer transition-all"
-                                        onClick={() =>
-                                          handleDownloadQRCode(group.groupId)
-                                        }
-                                      />
-                                    </Tooltip>
-                                    <Link
-                                      href={enGeneralPaths.admin.scanner[
-                                        '[planId]'
-                                      ]['[timestamp]'].index(
-                                        String(planId),
-                                        `${date}_${group.groupId}`,
-                                      )}
-                                      legacyBehavior>
-                                      <a target="_blank">
-                                        <Button
-                                          variant="inline"
-                                          size="small"
-                                          className="!px-1">
-                                          <div className="flex items-center gap-1 text-blue-500">
-                                            <span>Mở trang scan</span>
-                                            <svg
-                                              fill="currentColor"
-                                              viewBox="0 0 32 32"
-                                              width="20px"
-                                              height="20px"
-                                              xmlns="http://www.w3.org/2000/svg">
-                                              <g
-                                                id="SVGRepo_bgCarrier"
-                                                stroke-width="0"></g>
-                                              <g
-                                                id="SVGRepo_tracerCarrier"
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"></g>
-                                              <g id="SVGRepo_iconCarrier">
-                                                <path d="M23.5 23.5h-15v-15h4.791V6H6v20h20v-7.969h-2.5z"></path>
-                                                <path d="M17.979 6l3.016 3.018-6.829 6.829 1.988 1.987 6.83-6.828L26 14.02V6z"></path>
-                                              </g>
-                                            </svg>
-                                          </div>
-                                        </Button>
-                                      </a>
-                                    </Link>
-                                  </div>
-                                )}
+                              <div className="flex flex-wrap justify-end items-center">
+                                {isAdmin &&
+                                  showQRCode &&
+                                  renderComponentQRCode({
+                                    date,
+                                    groupId: group.groupId,
+                                  })}
 
                                 <IconArrow
                                   direction={isExpanding ? 'up' : 'down'}
@@ -1055,57 +1099,9 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
                             </div>
                             <RenderWhen condition={!isEmptyOrderData}>
                               <div className="flex flex-wrap justify-end gap-2 items-center">
-                                {isAdmin && showQRCode && (
-                                  <div className="flex gap-2 items-center">
-                                    <Tooltip
-                                      tooltipContent="Tải mã QR"
-                                      placement="top">
-                                      <PiQrCode
-                                        className="size-[26px] text-blue-600 cursor-pointer transition-all"
-                                        onClick={() =>
-                                          handleDownloadQRCode(undefined)
-                                        }
-                                      />
-                                    </Tooltip>
-                                    <Link
-                                      href={enGeneralPaths.admin.scanner[
-                                        '[planId]'
-                                      ]['[timestamp]'].index(
-                                        String(planId),
-                                        date,
-                                      )}
-                                      legacyBehavior>
-                                      <a target="_blank">
-                                        <Button
-                                          variant="inline"
-                                          size="small"
-                                          className="!px-1">
-                                          <div className="flex items-center gap-1 text-blue-500">
-                                            <span>Mở trang scan</span>
-                                            <svg
-                                              fill="currentColor"
-                                              viewBox="0 0 32 32"
-                                              width="20px"
-                                              height="20px"
-                                              xmlns="http://www.w3.org/2000/svg">
-                                              <g
-                                                id="SVGRepo_bgCarrier"
-                                                stroke-width="0"></g>
-                                              <g
-                                                id="SVGRepo_tracerCarrier"
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"></g>
-                                              <g id="SVGRepo_iconCarrier">
-                                                <path d="M23.5 23.5h-15v-15h4.791V6H6v20h20v-7.969h-2.5z"></path>
-                                                <path d="M17.979 6l3.016 3.018-6.829 6.829 1.988 1.987 6.83-6.828L26 14.02V6z"></path>
-                                              </g>
-                                            </svg>
-                                          </div>
-                                        </Button>
-                                      </a>
-                                    </Link>
-                                  </div>
-                                )}
+                                {isAdmin &&
+                                  showQRCode &&
+                                  renderComponentQRCode({ date })}
 
                                 <IconArrow
                                   direction={isExpanding ? 'up' : 'down'}
@@ -1226,50 +1222,9 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
                     </div>
                     <RenderWhen condition={!isEmptyOrderData}>
                       <div className="flex flex-wrap justify-end gap-2 items-center">
-                        {isAdmin && showQRCode && (
-                          <div className="flex gap-2 items-center">
-                            <Tooltip tooltipContent="Tải mã QR" placement="top">
-                              <PiQrCode
-                                className="size-[26px] text-blue-600 cursor-pointer transition-all"
-                                onClick={() => handleDownloadQRCode(undefined)}
-                              />
-                            </Tooltip>
-                            <Link
-                              href={enGeneralPaths.admin.scanner['[planId]'][
-                                '[timestamp]'
-                              ].index(String(planId), date)}
-                              legacyBehavior>
-                              <a target="_blank">
-                                <Button
-                                  variant="inline"
-                                  size="small"
-                                  className="!px-1">
-                                  <div className="flex items-center gap-1 text-blue-500">
-                                    <span>Mở trang scan</span>
-                                    <svg
-                                      fill="currentColor"
-                                      viewBox="0 0 32 32"
-                                      width="20px"
-                                      height="20px"
-                                      xmlns="http://www.w3.org/2000/svg">
-                                      <g
-                                        id="SVGRepo_bgCarrier"
-                                        stroke-width="0"></g>
-                                      <g
-                                        id="SVGRepo_tracerCarrier"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"></g>
-                                      <g id="SVGRepo_iconCarrier">
-                                        <path d="M23.5 23.5h-15v-15h4.791V6H6v20h20v-7.969h-2.5z"></path>
-                                        <path d="M17.979 6l3.016 3.018-6.829 6.829 1.988 1.987 6.83-6.828L26 14.02V6z"></path>
-                                      </g>
-                                    </svg>
-                                  </div>
-                                </Button>
-                              </a>
-                            </Link>
-                          </div>
-                        )}
+                        {isAdmin &&
+                          showQRCode &&
+                          renderComponentQRCode({ date })}
 
                         {isAdmin && (
                           <RenderWhen condition={!isMobileLayout}>

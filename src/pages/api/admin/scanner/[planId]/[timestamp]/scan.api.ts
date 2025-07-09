@@ -62,7 +62,8 @@ export default async function handler(
       planId: string;
       timestamp: string;
     };
-    const { barcode, groupId } = req.body as POSTScannerPlanIdTimestampScanBody;
+    const { barcode, groupId, screen } =
+      req.body as POSTScannerPlanIdTimestampScanBody;
     let matchedBarcodeMemberOrder: Partial<MemberOrderValue> | undefined;
 
     if (typeof planId !== 'string') {
@@ -197,6 +198,7 @@ export default async function handler(
         state: 'live',
         scannedAt: Date.now(),
         ...(groupId && { groupId }),
+        ...(screen && { screen }),
       } satisfies Omit<FirebaseScannedRecord, 'id'>;
 
       if (querySnapshot.empty) {

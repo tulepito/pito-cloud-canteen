@@ -3,26 +3,37 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   PiCallBell,
+  PiCaretDown,
+  PiCheckCircle,
+  PiClock,
   PiMagnifyingGlass,
   PiMagnifyingGlassLight,
+  PiPackage,
 } from 'react-icons/pi';
 import { toast } from 'react-toastify';
+import { collection, onSnapshot, query, where } from 'firebase/firestore';
+import Image from 'next/image';
+import { useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/router';
+import QRCode from 'qrcode';
 
 import { scanApi } from '@apis/scanner';
 import { isJoinedPlan } from '@helpers/order/orderPickingHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import type { FirebaseScannedRecord } from '@pages/admin/order/FirebaseScannedRecord';
 import { generateScannerBarCode } from '@pages/api/admin/scanner/[planId]/toggle-mode.api';
 import {
   getErrorStringFromErrorObject,
   ScannerThunks,
 } from '@redux/slices/scanner.slice';
+import { firestore } from '@services/firebase';
 import { formatTimestamp } from '@src/utils/dates';
 import { buildFullName } from '@src/utils/emailTemplate/participantOrderPicking';
 import type { TObject, TUser } from '@src/utils/types';
 
 import { LoadingWrapper } from './LoadingWrapper';
 
+// Utility functions
 const prepareDataGroups = ({
   orderDetailPerDate = {},
   participantDataMap = {},
@@ -67,6 +78,21 @@ export function removeVietnameseTones(str: string): string {
     .replace(/Đ/g, 'D');
 }
 
+const getTimestampAndGroupId = (queryParam: string | string[] | undefined) => {
+  if (typeof queryParam !== 'string')
+    return { timestamp: undefined, groupId: undefined };
+
+  const parts = queryParam.split('_');
+  if (parts.length === 2) {
+    const [timestamp, groupId] = parts;
+
+    return { timestamp, groupId };
+  }
+
+  return { timestamp: queryParam, groupId: undefined };
+};
+
+// Types
 interface IParticipant {
   name: string;
   barcode: string;
@@ -84,36 +110,28 @@ export function ScannerInputForm({
   handleSearchInputChange,
   resetSearchInput,
 }: ScannerInputFormProps) {
+  // States
   const [barcode, setBarcode] = useState('');
   const [searchInput, setSearchInput] = useState(searchValue);
+  const [qrUrl, setQrUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
   const [searchResults, setSearchResults] = useState<IParticipant[]>([]);
+  const [totalBarcodes, setTotalBarcodes] = useState<FirebaseScannedRecord[]>(
+    [],
+  );
+
+  // Refs
   const inputRef = useRef<HTMLInputElement>(null);
-  const popupRef = useRef<HTMLDivElement>(null);
-  const iconRef = useRef<HTMLDivElement>(null);
-  const router = useRouter();
-  const dispatch = useAppDispatch();
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const hasLoadedRef = useRef(false);
 
+  // Router and Redux
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const dispatch = useAppDispatch();
   const { timestamp: timestampQuery, planId } = router.query;
-
-  const getTimestampAndGroupId = (
-    queryParam: string | string[] | undefined,
-  ) => {
-    if (typeof queryParam !== 'string')
-      return { timestamp: undefined, groupId: undefined };
-
-    const parts = queryParam.split('_');
-    if (parts.length === 2) {
-      const [timestamp, groupId] = parts;
-
-      return { timestamp, groupId };
-    }
-
-    return { timestamp: queryParam, groupId: undefined };
-  };
-
+  const screen = searchParams.get('screen') || undefined;
   const { timestamp, groupId } = getTimestampAndGroupId(timestampQuery);
 
   const {
@@ -124,6 +142,11 @@ export function ScannerInputForm({
     fetchOrderInProgress,
   } = useAppSelector((state) => state.scanner);
 
+  console.log({
+    participantData,
+  });
+
+  // Memoized values
   const { orderId } = planListing?.attributes?.metadata || {};
   const orderDetail = useMemo(
     () => planListing?.attributes?.metadata?.orderDetail || {},
@@ -138,88 +161,6 @@ export function ScannerInputForm({
   const group = useMemo(() => {
     return groups.find((g: TObject) => g.id === groupId) || {};
   }, [groups, groupId]);
-
-  // Close popup when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        popupRef.current &&
-        !popupRef.current.contains(event.target as Node) &&
-        !inputRef.current?.contains(event.target as Node) &&
-        !iconRef.current?.contains(event.target as Node) // Thêm điều kiện cho icon
-      ) {
-        setShowPopup(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  // Tách logic submit thành hàm riêng để có thể gọi từ nhiều nơi
-  const performSubmit = async (barcodeValue: string) => {
-    if (!barcodeValue) return;
-
-    try {
-      setLoading(true);
-      await scanApi({
-        planId: planId as string,
-        timestamp: timestamp as string,
-        barcode: barcodeValue,
-        groupId: groupId as string,
-      });
-      setBarcode('');
-      setShowPopup(false);
-      toast.success('Xác nhận mã code thành công!', {
-        position: 'top-right',
-      });
-    } catch (error) {
-      toast.error(getErrorStringFromErrorObject(error), {
-        position: 'top-right',
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSubmit = async (e?: React.FormEvent<HTMLFormElement>) => {
-    if (e) e.preventDefault();
-    await performSubmit(barcode);
-  };
-
-  const handleInputFocus = () => {
-    setShowPopup(true);
-  };
-
-  // Thêm handler riêng cho icon click
-  const handleIconClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setShowPopup(!showPopup);
-
-    // Nếu đang mở popup, focus vào input
-    if (!showPopup) {
-      setTimeout(() => {
-        inputRef.current?.focus();
-      }, 100);
-    }
-  };
-
-  const handleParticipantSelect = async (participant: IParticipant) => {
-    setBarcode(participant.barcode);
-    setShowPopup(false);
-
-    // Gọi trực tiếp API với barcode của participant được chọn
-    await performSubmit(participant.barcode);
-  };
-
-  useEffect(() => {
-    if (orderId && !hasLoadedRef.current) {
-      hasLoadedRef.current = true;
-      dispatch(ScannerThunks.loadData({ orderId }));
-    }
-  }, [orderId, dispatch]);
 
   const participantDataList = useMemo(() => {
     const mapUserToParticipant = (p: TUser) => ({
@@ -267,6 +208,179 @@ export function ScannerInputForm({
     });
   }, [orderDetail, participantDataMap, planId, group, timestamp]);
 
+  // Event handlers
+  const performSubmit = async (barcodeValue: string) => {
+    if (!barcodeValue) return;
+
+    try {
+      setLoading(true);
+      await scanApi({
+        planId: planId as string,
+        timestamp: timestamp as string,
+        barcode: barcodeValue,
+        groupId: groupId as string,
+        screen,
+      });
+      setBarcode('');
+      setShowPopup(false);
+      toast.success('Lấy món thành công!', {
+        position: 'top-right',
+      });
+    } catch (error) {
+      toast.error(getErrorStringFromErrorObject(error), {
+        position: 'top-right',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmit = async (e?: React.FormEvent<HTMLFormElement>) => {
+    if (e) e.preventDefault();
+    await performSubmit(barcode);
+  };
+
+  const handleIconClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setShowPopup(!showPopup);
+
+    if (!showPopup) {
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 100);
+    }
+  };
+
+  const handleParticipantSelect = async (participant: IParticipant) => {
+    setBarcode(participant.barcode);
+    setShowPopup(false);
+    await performSubmit(participant.barcode);
+  };
+
+  const handleSubmitInput = async (e?: React.FormEvent<HTMLFormElement>) => {
+    if (e) e.preventDefault();
+
+    const trimmedInput = searchInput.trim();
+    if (!trimmedInput) {
+      resetSearchInput();
+
+      return;
+    }
+
+    handleSearchInputChange(trimmedInput);
+  };
+
+  // Handler for search input change with empty check
+  const handleSearchInputChangeInternal = (value: string) => {
+    setSearchInput(value);
+
+    // If input becomes empty, trigger the submit action immediately
+    if (value.trim() === '') {
+      resetSearchInput();
+    } else {
+      // Only update parent state if not empty to avoid unnecessary re-renders
+      handleSearchInputChange(value);
+    }
+  };
+
+  // Statistics calculations
+
+  const offlinePortions = useMemo(() => {
+    return totalBarcodes.filter(
+      (barcodeItem) => barcodeItem.state === 'offline',
+    ).length;
+  }, [totalBarcodes]);
+
+  const totalPortions = useMemo(() => {
+    return preparedGroupsData?.length ?? 0;
+  }, [preparedGroupsData]);
+
+  const livePortions = useMemo(() => {
+    return totalPortions - offlinePortions;
+  }, [offlinePortions, totalPortions]);
+
+  // Effects
+  useEffect(() => {
+    if (orderId && !hasLoadedRef.current) {
+      hasLoadedRef.current = true;
+      dispatch(ScannerThunks.loadData({ orderId }));
+    }
+  }, [orderId, dispatch]);
+
+  useEffect(() => {
+    if (searchValue) {
+      setSearchInput(searchValue);
+    } else {
+      setSearchInput('');
+    }
+  }, [searchValue]);
+
+  // Firebase listener for total barcodes
+  useEffect(() => {
+    if (!router.query.planId || !timestamp) return;
+
+    const scannerRecordsRef = collection(
+      firestore,
+      process.env.NEXT_PUBLIC_FIREBASE_SCANNED_RECORDS_COLLECTION_NAME!,
+    );
+
+    const conditions = [
+      where('planId', '==', router.query.planId),
+      where('timestamp', '==', +timestamp),
+    ];
+
+    if (groupId) {
+      conditions.push(where('groupId', '==', groupId));
+    }
+
+    const q = query(scannerRecordsRef, ...conditions);
+
+    const unsubscribe = onSnapshot(q, {
+      next: (snapshot) => {
+        const allRecords = snapshot.docs.map((_doc) => ({
+          id: _doc.id,
+          ...(_doc.data() as Omit<FirebaseScannedRecord, 'id'>),
+        }));
+
+        const sortedRecords = allRecords.sort(
+          (a, b) => +a.scannedAt - +b.scannedAt,
+        );
+
+        setTotalBarcodes(sortedRecords);
+      },
+      error: (error) => {
+        console.error('Firestore error for total records:', error);
+      },
+    });
+
+    return () => unsubscribe();
+  }, [router.query.planId, timestamp, groupId, screen]);
+
+  // QR Code generation
+  useEffect(() => {
+    const generateQR = async () => {
+      try {
+        const dataUrl = `${process.env.NEXT_PUBLIC_CANONICAL_URL}/qrcode`;
+        const queryParams = new URLSearchParams();
+
+        if (groupId) queryParams.append('groupId', groupId);
+        if (screen) queryParams.append('screen', screen);
+
+        const dataToEncode = queryParams.toString()
+          ? `${dataUrl}?${queryParams.toString()}`
+          : dataUrl;
+
+        const url = await QRCode.toDataURL(dataToEncode);
+        setQrUrl(url);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    generateQR();
+  }, [groupId, screen]);
+
   // Filter search results
   useEffect(() => {
     const searchTerm = removeVietnameseTones(barcode.trim().toLowerCase());
@@ -292,156 +406,186 @@ export function ScannerInputForm({
     }
   }, [barcode, preparedGroupsData]);
 
-  const handleSubmitInput = async (e?: React.FormEvent<HTMLFormElement>) => {
-    if (e) e.preventDefault();
-
-    const trimmedInput = searchInput.trim();
-
-    if (!trimmedInput) {
-      resetSearchInput();
-
-      return;
-    }
-
-    handleSearchInputChange(trimmedInput);
-  };
-
+  // Close popup when clicking outside
   useEffect(() => {
-    if (searchValue) {
-      setSearchInput(searchValue);
-    } else {
-      setSearchInput('');
-    }
-  }, [searchValue]);
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setShowPopup(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   return (
-    <div className=" bg-white w-full py-10 shadow-sm border-b sticky top-0 z-10">
-      <div className="grid grid-cols-7 gap-10 container mx-auto">
-        <div className="w-full col-span-4 mx-auto relative">
-          <div className="text-center flex flex-col gap-8 mb-6">
-            <h1 className="text-5xl font-medium text-gray-900">
-              Danh sách món ăn{' '}
-              <span className="text-blue-700 font-bold">{group?.name}</span>
-            </h1>
-            <form
-              className="flex items-center gap-4 rounded-lg"
-              onAbort={handleSubmitInput}>
-              <div className="relative flex-1">
-                {/* Icon Search */}
-                <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500">
-                  <PiMagnifyingGlass size={32} />
-                </div>
+    <div className="flex items-start justify-between gap-40 bg-white py-10 px-8 shadow-sm border-b sticky top-0 z-10">
+      <div className="flex-1 h-full flex flex-col justify-between">
+        <div className="flex flex-col gap-2 w-full">
+          <h1 className="text-4xl font-bold text-gray-900">
+            Danh sách món ăn{' '}
+            <span className="text-blue-600">{group?.name}</span>
+          </h1>
+          <p className="text-2xl text-gray-500">
+            {formatTimestamp(+timestamp!)}
+          </p>
+        </div>
 
-                {/* Input Field */}
-                <input
-                  type="text"
-                  value={searchInput}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault(); // Ngăn reload page
-                      handleSubmitInput(); // Gọi hàm xử lý tìm kiếm
-                    }
-                  }}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    setSearchInput(value);
-                  }}
-                  placeholder="Nhập tên người tham gia..."
-                  className="w-full p-6 pl-14 border-gray-600 rounded-lg text-2xl border-2 border-solid outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
-                />
-              </div>
-            </form>
+        <div className="flex items-center gap-6">
+          <div className="flex items-center gap-2">
+            <PiPackage className="w-6 h-6 text-blue-600" />
+            <span className="text-2xl text-gray-600">Tổng:</span>
+            <span className="font-semibold text-2xl text-blue-600">
+              {totalPortions}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <PiCheckCircle className="w-6 h-6 text-green-600" />
+            <span className="text-2xl text-gray-600">Đã phát:</span>
+            <span className="font-semibold text-2xl text-green-600">
+              {offlinePortions}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <PiClock className="w-6 h-6 text-orange-600" />
+            <span className="text-2xl text-gray-600">Còn lại:</span>
+            <span className="font-semibold text-2xl text-orange-600">
+              {livePortions}
+            </span>
           </div>
         </div>
-        <div className="w-full col-span-3 mx-auto relative">
-          <div className="text-center flex flex-col justify-center items-end gap-8">
-            <h1 className="text-[40px] font-medium text-gray-500">
-              {formatTimestamp(+timestamp!)}
-            </h1>
-            <div
-              className="flex flex-row items-center justify-center gap-4 cursor-pointer bg-black w-fit px-6 py-4 rounded-md"
-              onClick={handleIconClick}>
-              {loading ? (
-                <div
-                  className={`animate-spin rounded-full border-b-2 border-white`}
-                  style={{ width: 30, height: 30 }}
-                />
-              ) : (
-                <div ref={iconRef} className="cursor-pointer">
-                  <PiCallBell className="text-white" size={30} />
-                </div>
-              )}
-              <p className="text-2xl text-white uppercase">lấy món</p>
+
+        <form
+          className="flex items-center gap-4 rounded-lg"
+          onSubmit={handleSubmitInput}>
+          <div className="relative flex-1">
+            <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500">
+              <PiMagnifyingGlass size={32} />
+            </div>
+
+            <input
+              type="text"
+              value={searchInput}
+              onChange={(e) => handleSearchInputChangeInternal(e.target.value)}
+              placeholder="Nhập tên người tham gia..."
+              className="w-full p-4 pl-14 border-gray-300 rounded-xl text-2xl border-1 border-solid outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
+            />
+          </div>
+        </form>
+      </div>
+
+      <div className="flex flex-col items-center gap-3">
+        <div className="flex flex-col items-center">
+          <p className="text-xs text-gray-600 mb-1">Mã QRCode</p>
+          <div className="w-40 h-40 bg-white border border-gray-200 rounded flex items-center justify-center">
+            <div className="relative w-full aspect-square">
+              <Image
+                src={qrUrl}
+                alt="QRCode"
+                fill
+                className="aspect-square rounded-lg"
+              />
             </div>
           </div>
+        </div>
+
+        <div className="w-fit relative" ref={dropdownRef}>
+          <button
+            onClick={handleIconClick}
+            disabled={loading}
+            className="flex flex-row items-center justify-center gap-4 cursor-pointer bg-black hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed w-fit px-6 py-4 rounded-md transition-colors duration-200">
+            {loading ? (
+              <div className="animate-spin rounded-full border-b-2 border-white w-[30px] h-[30px]" />
+            ) : (
+              <PiCallBell className="text-white" size={30} />
+            )}
+            <p className="text-xl text-white uppercase">lấy món</p>
+            <PiCaretDown
+              className="text-white size-8"
+              style={{
+                transform: showPopup ? 'rotate(180deg)' : 'rotate(0deg)',
+                transition: 'transform 0.3s ease',
+              }}
+            />
+          </button>
 
           <div
-            className={`transition-all duration-300 ease-in-out overflow-hidden ${
+            className={`absolute top-full right-0 w-96 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-50 transition-all duration-300 ease-in-out ${
               showPopup
-                ? 'max-h-fit opacity-100 mt-4'
-                : 'max-h-0 opacity-0 mb-0'
+                ? 'opacity-100 translate-y-0 visible'
+                : 'opacity-0 -translate-y-2 invisible'
             }`}>
-            <form
-              onSubmit={handleSubmit}
-              className="flex items-center gap-4 rounded-lg">
-              <div className="relative flex-1">
-                <input
-                  ref={inputRef}
-                  type="text"
-                  value={barcode}
-                  onChange={(e) => setBarcode(e.target.value)}
-                  onFocus={handleInputFocus}
-                  placeholder="Nhập tên người tham gia..."
-                  className="w-full p-6 border-gray-600 rounded-lg text-2xl border-2 border-solid outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
-                />
-              </div>
-            </form>
+            <div className="p-4 border-b border-gray-200">
+              <form onSubmit={handleSubmit} className="flex items-center gap-4">
+                <div className="relative flex-1">
+                  <input
+                    ref={inputRef}
+                    type="text"
+                    value={barcode}
+                    onChange={(e) => setBarcode(e.target.value)}
+                    placeholder="Nhập tên người lấy món"
+                    className="w-full p-3 text-lg border-2 border-gray-300 rounded-lg outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
+                  />
+                </div>
+              </form>
+            </div>
 
-            {showPopup && (
-              <div
-                ref={popupRef}
-                className="absolute top-full w-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-80 overflow-y-auto">
-                <LoadingWrapper isLoading={fetchOrderInProgress}>
-                  {searchResults.length > 0 ? (
-                    <div className="py-2">
-                      <div className="px-4 py-2 text-sm text-gray-500 border-b border-gray-100">
-                        {searchResults.length} kết quả tìm kiếm
-                      </div>
-                      {searchResults.map((participant) => (
-                        <div
-                          key={participant.email}
-                          onClick={async () =>
-                            handleParticipantSelect(participant)
-                          }
-                          className="px-4 py-3 hover:bg-gray-50 cursor-pointer border-b border-gray-50 last:border-b-0 transition-colors duration-150">
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <div className="font-medium text-gray-900">
-                                {participant.name}
-                              </div>
-                              <div className="text-sm text-gray-500">
-                                Email: {participant.email}
-                              </div>
+            <div className="max-h-80 overflow-y-auto">
+              <LoadingWrapper isLoading={fetchOrderInProgress}>
+                {searchResults.length > 0 ? (
+                  <div className="py-2">
+                    <div className="px-4 py-2 text-sm text-gray-500 border-b border-gray-100">
+                      {searchResults.length} kết quả tìm kiếm
+                    </div>
+                    {searchResults.map((participant) => (
+                      <div
+                        key={participant.email}
+                        onClick={() => handleParticipantSelect(participant)}
+                        className="px-4 py-3 hover:bg-gray-50 cursor-pointer border-b border-gray-50 last:border-b-0 transition-colors duration-150">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <div className="font-medium text-gray-900">
+                              {participant.name}
+                            </div>
+                            <div className="text-sm text-gray-500">
+                              Email: {participant.email}
                             </div>
                           </div>
                         </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="px-4 py-8 text-center text-gray-500">
-                      <PiMagnifyingGlassLight
-                        size={32}
-                        className="mx-auto mb-2 text-gray-300"
-                      />
-                      <div className="text-sm">Không tìm thấy kết quả nào</div>
-                      <div className="text-xs text-gray-400 mt-1">
-                        Thử tìm kiếm với từ khóa khác
                       </div>
+                    ))}
+                  </div>
+                ) : barcode ? (
+                  <div className="px-4 py-8 text-center text-gray-500">
+                    <PiMagnifyingGlassLight
+                      size={32}
+                      className="mx-auto mb-2 text-gray-300"
+                    />
+                    <div className="text-sm">Không tìm thấy kết quả nào</div>
+                    <div className="text-xs text-gray-400 mt-1">
+                      Thử tìm kiếm với từ khóa khác
                     </div>
-                  )}
-                </LoadingWrapper>
-              </div>
-            )}
+                  </div>
+                ) : (
+                  <div className="px-4 py-8 text-center text-gray-500">
+                    <PiCallBell
+                      size={32}
+                      className="mx-auto mb-2 text-gray-300"
+                    />
+                    <div className="text-sm">Nhập tên để tìm kiếm</div>
+                    <div className="text-xs text-gray-400 mt-1">
+                      Bắt đầu nhập để xem danh sách
+                    </div>
+                  </div>
+                )}
+              </LoadingWrapper>
+            </div>
           </div>
         </div>
       </div>

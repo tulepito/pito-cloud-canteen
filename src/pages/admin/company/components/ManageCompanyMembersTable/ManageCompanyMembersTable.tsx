@@ -100,7 +100,13 @@ const TABLE_COLUMN: TColumn[] &
       if (!handleToUpdateMemberPermission) {
         return (
           <span>
-            {intl.formatMessage({ id: `UserPermission.${permission}` })}
+            {intl.formatMessage({
+              id: `UserPermission.${
+                permission in Object.values(ECompanyPermission)
+                  ? permission
+                  : ECompanyPermission.participant
+              }`,
+            })}
           </span>
         );
       }
@@ -109,16 +115,21 @@ const TABLE_COLUMN: TColumn[] &
         inviteStatus === UserInviteStatus.ACCEPTED
           ? Object.keys(ECompanyPermission)
           : Object.keys(ECompanyPermission).filter(
-              (permission) =>
-                ECompanyPermission[
-                  permission as keyof typeof ECompanyPermission
-                ] !== ECompanyPermission.owner,
+              (key) =>
+                ECompanyPermission[key as keyof typeof ECompanyPermission] !==
+                ECompanyPermission.owner,
             );
+
+      const selectedPermission = Object.values(ECompanyPermission).includes(
+        permission,
+      )
+        ? permission
+        : ECompanyPermission.participant;
 
       return (
         <select
           onChange={handleToUpdateMemberPermission}
-          value={permission}
+          value={selectedPermission}
           className={css.fieldSelect}>
           {permissionList.map((key) => (
             <option

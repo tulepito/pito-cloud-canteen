@@ -26,6 +26,7 @@ const QRCodePage = () => {
   const searchParams = useSearchParams();
 
   const groupId = searchParams.get('groupId') || undefined;
+  const screen = searchParams.get('screen') || undefined;
 
   const currentUser = useAppSelector((state) => state.user.currentUser);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -68,6 +69,7 @@ const QRCodePage = () => {
           groupId,
           currentUserId,
           timestamp,
+          screen,
         });
         setIsSuccess(true);
       } catch (error: any) {
@@ -85,7 +87,7 @@ const QRCodePage = () => {
     };
 
     fetchData();
-  }, [currentUserId, groupId, isAdmin, router, timestamp]);
+  }, [currentUserId, groupId, isAdmin, router, timestamp, screen]);
 
   useEffect(() => {
     if (isSuccess || isAlreadyScanned || errorMessage) {

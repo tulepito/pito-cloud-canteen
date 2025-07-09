@@ -1,5 +1,4 @@
 import React from 'react';
-import { PiClock } from 'react-icons/pi';
 import classNames from 'classnames';
 import { motion } from 'framer-motion';
 
@@ -8,7 +7,6 @@ export const ScannerUserListItem = ({
   userProfileImageUrl,
   userAbbrName,
   foodName,
-  scannedAt,
   state,
   onClick,
 }: {
@@ -23,8 +21,18 @@ export const ScannerUserListItem = ({
 }) => {
   return (
     <motion.div
-      initial={{ scale: 0.5, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
+      layout
+      initial={{ scale: 0.5, opacity: 0, y: 20 }}
+      animate={{ scale: 1, opacity: 1, y: 0 }}
+      exit={{
+        scale: 0.8,
+        opacity: 0,
+        x: -100,
+        transition: {
+          duration: 0.3,
+          ease: 'easeInOut',
+        },
+      }}
       transition={{ duration: 0.5, ease: 'easeOut' }}
       className={classNames(
         'rounded-3xl w-full border border-neutral-200 cursor-pointer',
@@ -63,13 +71,6 @@ export const ScannerUserListItem = ({
               <div className="text-neutral-500 line-clamp-1 text-3xl font-normal">
                 {userName}
               </div>
-            </div>
-          )}
-
-          {scannedAt && (
-            <div className="text-3xl text-neutral-500 font-normal flex flex-row items-center">
-              <PiClock className="inline-block mr-2" size={32} />
-              {scannedAt}
             </div>
           )}
         </div>

@@ -21,9 +21,7 @@ const AdminLayout: React.FC<PropsWithChildren> = (props) => {
 
   if (pathname.includes('scanner')) {
     return (
-      <div className="w-full mx-auto bg-gradient-to-br from-orange-50 to-red-50 min-h-screen h-full">
-        {children}
-      </div>
+      <div className="w-full mx-auto bg-[#F7E1EB] min-h-screen">{children}</div>
     );
   }
 

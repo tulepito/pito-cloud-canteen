@@ -123,14 +123,29 @@ const SubOrderQrCode: React.FC<TSubOrderQrCodeProps> = ({
     toast.success(`Đã copy barcode: ${barcode}`);
   };
 
-  const handleDownloadQRCode = async (groupId?: string) => {
+  const handleDownloadQRCode = async ({
+    groupId,
+    screen,
+  }: {
+    groupId?: string;
+    screen?: string;
+  }) => {
     try {
-      const url = `${process.env.NEXT_PUBLIC_CANONICAL_URL}/qrcode${
-        groupId ? `?groupId=${groupId}` : ''
-      }`;
-      const canvas = document.createElement('canvas');
-      await QRCode.toCanvas(canvas, url, { width: 256 });
+      const baseUrl = `${process.env.NEXT_PUBLIC_CANONICAL_URL}/qrcode`;
+      const queryParams = new URLSearchParams();
 
+      if (groupId) queryParams.append('groupId', groupId);
+      if (screen) queryParams.append('screen', screen);
+
+      const dataToEncode = queryParams.toString()
+        ? `${baseUrl}?${queryParams.toString()}`
+        : baseUrl;
+      const canvas = document.createElement('canvas');
+
+      // Tạo QR code trong canvas
+      await QRCode.toCanvas(canvas, dataToEncode, { width: 256 });
+
+      // Tạo link download
       const imageUrl = canvas.toDataURL('image/png');
       const downloadLink = document.createElement('a');
       downloadLink.href = imageUrl;
@@ -213,6 +228,82 @@ const SubOrderQrCode: React.FC<TSubOrderQrCodeProps> = ({
     );
   };
 
+  const renderComponentQRCode = ({
+    groupId,
+    dateQRcode,
+  }: {
+    groupId?: string;
+    dateQRcode: string;
+  }) => {
+    return (
+      <div className="flex gap-2 items-center divide-x divide-gray-300">
+        {[
+          {
+            title: 'Màn hình 1',
+            id: 'A',
+          },
+          {
+            title: 'Màn hình 2',
+            id: 'B',
+          },
+        ].map((item) => {
+          return (
+            <div
+              className={clsx(
+                'flex gap-2 items-center',
+                item.id === 'B' && 'pl-2',
+              )}
+              key={item.id}>
+              <Tooltip tooltipContent="Tải mã QR" placement="top">
+                <PiQrCode
+                  className="size-[20px] text-blue-600 cursor-pointer transition-all"
+                  onClick={() =>
+                    handleDownloadQRCode({
+                      groupId,
+                      screen: item.id,
+                    })
+                  }
+                />
+              </Tooltip>
+              <Link
+                href={`${enGeneralPaths.admin.scanner['[planId]'][
+                  '[timestamp]'
+                ].index(
+                  String(planId),
+                  groupId ? `${dateQRcode}_${groupId}` : dateQRcode,
+                )}?screen=${item.id}`}
+                legacyBehavior>
+                <a target="_blank">
+                  <Button variant="inline" size="small" className="!px-1">
+                    <div className="flex items-center gap-1 text-blue-500">
+                      <span>Mở trang scan {item.title}</span>
+                      <svg
+                        fill="currentColor"
+                        viewBox="0 0 32 32"
+                        width="20px"
+                        height="20px"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                        <g
+                          id="SVGRepo_tracerCarrier"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"></g>
+                        <g id="SVGRepo_iconCarrier">
+                          <path d="M23.5 23.5h-15v-15h4.791V6H6v20h20v-7.969h-2.5z"></path>
+                          <path d="M17.979 6l3.016 3.018-6.829 6.829 1.988 1.987 6.83-6.828L26 14.02V6z"></path>
+                        </g>
+                      </svg>
+                    </div>
+                  </Button>
+                </a>
+              </Link>
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
   return (
     <RenderWhen condition={!fetchOrderInProgress}>
       <div className={css.root}>
@@ -239,7 +330,11 @@ const SubOrderQrCode: React.FC<TSubOrderQrCodeProps> = ({
               <Button
                 variant="secondary"
                 className={css.ctaButton}
-                onClick={() => handleDownloadQRCode(undefined)}>
+                onClick={() =>
+                  handleDownloadQRCode({
+                    groupId: undefined,
+                  })
+                }>
                 <PiQrCode size={20} />
                 {intl.formatMessage({ id: 'tai-ma-qr' })}
               </Button>
@@ -330,52 +425,10 @@ const SubOrderQrCode: React.FC<TSubOrderQrCodeProps> = ({
                         </div>
                         {totalFoodInGroup ? (
                           <div className="flex-1">
-                            <div className="flex gap-2 items-center">
-                              <Tooltip
-                                tooltipContent="Tải mã QR"
-                                placement="top">
-                                <PiQrCode
-                                  className="size-[26px] text-blue-600 cursor-pointer transition-all"
-                                  onClick={() =>
-                                    handleDownloadQRCode(group.planId)
-                                  }
-                                />
-                              </Tooltip>
-                              <Link
-                                href={enGeneralPaths.admin.scanner['[planId]'][
-                                  '[timestamp]'
-                                ].index(String(planId), `${date}_${group.id}`)}
-                                legacyBehavior>
-                                <a target="_blank">
-                                  <Button
-                                    variant="inline"
-                                    size="small"
-                                    className="!px-1">
-                                    <div className="flex items-center gap-1 text-blue-500">
-                                      <span>Mở trang scan</span>
-                                      <svg
-                                        fill="currentColor"
-                                        viewBox="0 0 32 32"
-                                        width="20px"
-                                        height="20px"
-                                        xmlns="http://www.w3.org/2000/svg">
-                                        <g
-                                          id="SVGRepo_bgCarrier"
-                                          stroke-width="0"></g>
-                                        <g
-                                          id="SVGRepo_tracerCarrier"
-                                          stroke-linecap="round"
-                                          stroke-linejoin="round"></g>
-                                        <g id="SVGRepo_iconCarrier">
-                                          <path d="M23.5 23.5h-15v-15h4.791V6H6v20h20v-7.969h-2.5z"></path>
-                                          <path d="M17.979 6l3.016 3.018-6.829 6.829 1.988 1.987 6.83-6.828L26 14.02V6z"></path>
-                                        </g>
-                                      </svg>
-                                    </div>
-                                  </Button>
-                                </a>
-                              </Link>
-                            </div>
+                            {renderComponentQRCode({
+                              groupId: group.id,
+                              dateQRcode: date,
+                            })}
                           </div>
                         ) : (
                           <div className="flex-1"></div>
@@ -404,54 +457,10 @@ const SubOrderQrCode: React.FC<TSubOrderQrCodeProps> = ({
                         </div>
                         {totalFoodInGroup ? (
                           <div className="flex-1">
-                            <div className="flex gap-2 items-center">
-                              <Tooltip
-                                tooltipContent="Tải mã QR"
-                                placement="top">
-                                <PiQrCode
-                                  className="size-[26px] text-blue-600 cursor-pointer transition-all"
-                                  onClick={() =>
-                                    handleDownloadQRCode(group.planId)
-                                  }
-                                />
-                              </Tooltip>
-                              <Link
-                                href={enGeneralPaths.admin.scanner['[planId]'][
-                                  '[timestamp]'
-                                ].index(String(planId), `${date}_${group.id}`)}
-                                legacyBehavior>
-                                <a target="_blank">
-                                  <Button
-                                    variant="inline"
-                                    size="small"
-                                    className="!px-1">
-                                    <div className="flex items-center gap-1 text-blue-500">
-                                      <span className="whitespace-nowrap">
-                                        Mở trang scan
-                                      </span>
-                                      <svg
-                                        fill="currentColor"
-                                        viewBox="0 0 32 32"
-                                        width="20px"
-                                        height="20px"
-                                        xmlns="http://www.w3.org/2000/svg">
-                                        <g
-                                          id="SVGRepo_bgCarrier"
-                                          stroke-width="0"></g>
-                                        <g
-                                          id="SVGRepo_tracerCarrier"
-                                          stroke-linecap="round"
-                                          stroke-linejoin="round"></g>
-                                        <g id="SVGRepo_iconCarrier">
-                                          <path d="M23.5 23.5h-15v-15h4.791V6H6v20h20v-7.969h-2.5z"></path>
-                                          <path d="M17.979 6l3.016 3.018-6.829 6.829 1.988 1.987 6.83-6.828L26 14.02V6z"></path>
-                                        </g>
-                                      </svg>
-                                    </div>
-                                  </Button>
-                                </a>
-                              </Link>
-                            </div>
+                            {renderComponentQRCode({
+                              groupId: group.id,
+                              dateQRcode: date,
+                            })}
                           </div>
                         ) : (
                           <div className="flex-1"></div>
@@ -543,48 +552,9 @@ const SubOrderQrCode: React.FC<TSubOrderQrCodeProps> = ({
                           Số lượng: {foodDataListNullLevel?.length}
                         </div>
                         <div className="flex-1">
-                          <div className="flex gap-2 items-center">
-                            <Tooltip tooltipContent="Tải mã QR" placement="top">
-                              <PiQrCode
-                                className="size-[26px] text-blue-600 cursor-pointer transition-all"
-                                onClick={() => handleDownloadQRCode(undefined)}
-                              />
-                            </Tooltip>
-                            <Link
-                              href={enGeneralPaths.admin.scanner['[planId]'][
-                                '[timestamp]'
-                              ].index(String(planId), date)}
-                              legacyBehavior>
-                              <a target="_blank">
-                                <Button
-                                  variant="inline"
-                                  size="small"
-                                  className="!px-1">
-                                  <div className="flex items-center gap-1 text-blue-500">
-                                    <span>Mở trang scan</span>
-                                    <svg
-                                      fill="currentColor"
-                                      viewBox="0 0 32 32"
-                                      width="20px"
-                                      height="20px"
-                                      xmlns="http://www.w3.org/2000/svg">
-                                      <g
-                                        id="SVGRepo_bgCarrier"
-                                        stroke-width="0"></g>
-                                      <g
-                                        id="SVGRepo_tracerCarrier"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"></g>
-                                      <g id="SVGRepo_iconCarrier">
-                                        <path d="M23.5 23.5h-15v-15h4.791V6H6v20h20v-7.969h-2.5z"></path>
-                                        <path d="M17.979 6l3.016 3.018-6.829 6.829 1.988 1.987 6.83-6.828L26 14.02V6z"></path>
-                                      </g>
-                                    </svg>
-                                  </div>
-                                </Button>
-                              </a>
-                            </Link>
-                          </div>
+                          {renderComponentQRCode({
+                            dateQRcode: date,
+                          })}
                         </div>
                         <div
                           className={css.actionCell}

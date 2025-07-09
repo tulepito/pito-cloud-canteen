@@ -10,21 +10,35 @@ import type { TCurrentUser, TObject, TUser } from '@utils/types';
 
 export const ensureActiveUserIds = async (
   userIds: string[],
+  batchSize = 100,
 ): Promise<string[]> => {
   const integrationSdk = getIntegrationSdk();
-  const activeUserIds = denormalisedResponseEntities(
-    await integrationSdk.users.query({
-      meta_id: userIds,
+
+  const chunkArray = <T>(arr: T[], size: number): T[][] =>
+    Array.from({ length: Math.ceil(arr.length / size) }, (_, i) =>
+      arr.slice(i * size, i * size + size),
+    );
+
+  const chunks = chunkArray(userIds, batchSize);
+
+  const results: string[][] = await Promise.all(
+    chunks.map(async (chunk) => {
+      const response = await integrationSdk.users.query({
+        meta_id: chunk,
+      });
+
+      return denormalisedResponseEntities(response).map(
+        (participant: {
+          id: {
+            uuid: string;
+          };
+        }) => participant.id.uuid,
+      );
     }),
-  ).map(
-    (participant: {
-      id: {
-        uuid: string;
-      };
-    }) => participant.id.uuid,
   );
 
-  return activeUserIds;
+  // Flatten results
+  return results.flat();
 };
 
 export const getAllCompanyMembers = (companyAccount: TUser) => {
