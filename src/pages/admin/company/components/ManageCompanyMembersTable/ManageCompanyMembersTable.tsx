@@ -423,7 +423,7 @@ const ManageCompanyMembersTable: React.FC<TManageCompanyMembersTable> = (
   };
 
   const handleRemoveMember = async () => {
-    const email = memberToRemove?.email;
+    const email = memberToRemove?.email || memberToRemove?.attributes?.email;
     if (email) {
       const { error } = (await onRemoveMember(email)) as any;
       !error && handleCloseModal();
@@ -541,7 +541,9 @@ const ManageCompanyMembersTable: React.FC<TManageCompanyMembersTable> = (
             },
             {
               email: (
-                <span className={css.boldText}>{memberToRemove?.email}</span>
+                <span className={css.boldText}>
+                  {memberToRemove?.email || memberToRemove?.attributes?.email}
+                </span>
               ),
             },
           )}

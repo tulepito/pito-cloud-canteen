@@ -4,6 +4,14 @@ import cookies from '@services/cookie';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { denormalisedResponseEntities } from '@utils/data';
 
+const CHUNK_SIZE = 50; // Điều chỉnh tùy vào giới hạn API
+
+function chunkArray<T>(array: T[], size: number): T[][] {
+  return Array.from({ length: Math.ceil(array.length / size) }, (_, i) =>
+    array.slice(i * size, i * size + size),
+  );
+}
+
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   const { JSONParams = '', groupId /* page, */ /* perPage */ } = req.query;
 
@@ -11,15 +19,20 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
   try {
     const integrationSdk = getIntegrationSdk();
-    const allMembersResponse = await integrationSdk.users.query({
-      meta_id: memberIds,
-    });
-    const {
-      data: { meta },
-    } = allMembersResponse;
-    const allMembers = denormalisedResponseEntities(allMembersResponse);
+    const memberChunks = chunkArray(memberIds, CHUNK_SIZE);
 
-    return res.json({ allMembers, meta });
+    const responses = await Promise.all(
+      memberChunks.map((chunk) =>
+        integrationSdk.users.query({ meta_id: chunk }),
+      ),
+    );
+
+    const allMembersRaw = responses.flatMap((response) =>
+      denormalisedResponseEntities(response),
+    );
+    const meta = responses[0]?.data?.meta ?? {};
+
+    return res.json({ allMembers: allMembersRaw, meta });
   } catch (error) {
     console.error('Error query all group members, group ID: ', groupId);
   }

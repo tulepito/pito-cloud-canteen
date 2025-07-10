@@ -1,5 +1,4 @@
 import { convertDateToVNTimezone } from '@helpers/dateHelpers';
-import logger from '@helpers/logger';
 import { getPickFoodParticipants } from '@helpers/orderHelper';
 import { pushNativeNotificationOrderDetail } from '@pages/api/helpers/pushNotificationOrderDetailHelper';
 import { denormalisedResponseEntities } from '@services/data';
@@ -9,12 +8,7 @@ import { fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { createNativeNotification } from '@services/nativeNotification';
 import { createSlackNotification } from '@services/slackNotification';
-import type {
-  OrderDetail,
-  OrderListing,
-  PlanListing,
-  WithFlexSDKData,
-} from '@src/types';
+import type { OrderListing, PlanListing, WithFlexSDKData } from '@src/types';
 import { Listing, User } from '@utils/data';
 import {
   EBookerNativeNotificationType,
@@ -83,27 +77,12 @@ export const startOrder = async (orderId: string, planId: string) => {
     },
   });
 
-  let orderDetailStartedSnapshot: OrderDetail | undefined;
-  const isOrderHasStartedSnapshot =
-    !!oldPlan.data.data.attributes?.metadata?.orderDetailStartedSnapshot;
-
-  if (!isOrderHasStartedSnapshot) {
-    logger.debug(
-      'Order has started snapshot',
-      JSON.stringify(oldPlan.data.data.attributes?.metadata?.orderDetail),
-    );
-
-    orderDetailStartedSnapshot =
-      oldPlan.data.data.attributes?.metadata?.orderDetail;
-  }
-
   const [plan] = denormalisedResponseEntities(
     await integrationSdk.listings.update(
       {
         id: planId,
         metadata: {
           partnerIds,
-          orderDetailStartedSnapshot,
         },
       },
       {

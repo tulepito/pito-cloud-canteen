@@ -270,7 +270,7 @@
 
     & .scrollContainer {
       @include viewportMedium {
-        max-height: calc(36px * 6);
+        max-height: calc(100px * 6);
         overflow-x: auto;
       }
 

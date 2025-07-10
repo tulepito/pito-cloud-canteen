@@ -190,7 +190,7 @@ const GroupSettingPage = () => {
         isOpen={isCreateGroupModalOpen}
         onClose={handleCloseCreateGroupModal}
         companyMembers={companyMembers?.filter(
-          (member) => member?.groups?.length === 0,
+          (member) => !!member.id && member?.groups?.length === 0,
         )}
         originCompanyMembers={originCompanyMembers}
       />
