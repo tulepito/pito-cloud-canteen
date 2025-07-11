@@ -1016,8 +1016,11 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
                                   },
                                   barcode,
                                 } = row;
-                                const { name: memberName, id: memberId } =
-                                  memberData || {};
+                                const {
+                                  name: memberName,
+                                  id: memberId,
+                                  email,
+                                } = memberData || {};
 
                                 return (
                                   <div
@@ -1026,6 +1029,10 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
                                     <div className="flex items-center flex-1 text-xs p-2 gap-2">
                                       <div className="flex-1 basis-[80px] font-semibold">
                                         {memberName}
+                                        <br />
+                                        <span className="text-gray-500">
+                                          {email}
+                                        </span>
                                       </div>
 
                                       {showQRCode && (

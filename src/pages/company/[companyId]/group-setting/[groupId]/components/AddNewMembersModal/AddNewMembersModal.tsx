@@ -29,7 +29,12 @@ const AddNewMembersModal: React.FC<AddNewMembersModalProps> = (props) => {
         <div className={css.modalContainer}>
           <div className={css.modalContent}>
             <AddNewMembersForm
-              companyMembers={companyMembers}
+              companyMembers={companyMembers?.filter((member) => {
+                const groups = member?.attributes?.profile?.metadata?.groups;
+
+                // Only show members who are not in any group
+                return !(Array.isArray(groups) && groups.length > 0);
+              })}
               groupMembers={groupMembers}
               groupId={groupId}
               onModalClose={onClose}

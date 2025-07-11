@@ -180,68 +180,72 @@ const MembersPage = () => {
 
   const formattedCompanyMembers = useMemo<TRowData[]>(
     () =>
-      mergedCompanyMembers.reduce((result: any, member: any) => {
-        const id = member?.id?.uuid;
-        const email = member?.attributes?.email;
-        const memberGroupIds = groupList.reduce(
-          (groupIds: string[], curr: TObject) => {
-            const { members = [], id: groupId } = curr || {};
+      mergedCompanyMembers
+        .reduce((result: any, member: any) => {
+          const id = member?.id?.uuid;
+          const email = member?.attributes?.email;
+          const memberGroupIds = groupList.reduce(
+            (groupIds: string[], curr: TObject) => {
+              const { members = [], id: groupId } = curr || {};
 
-            if (
-              typeof members.find(
-                ({
-                  id: memberIdFromGroup,
-                  email: memberEmailFromGroup,
-                }: TObject) => {
-                  return (
-                    memberIdFromGroup === id || memberEmailFromGroup === email
-                  );
-                },
-              ) !== 'undefined'
-            ) {
-              return [...groupIds, groupId];
-            }
+              if (
+                typeof members.find(
+                  ({
+                    id: memberIdFromGroup,
+                    email: memberEmailFromGroup,
+                  }: TObject) => {
+                    return (
+                      memberIdFromGroup === id || memberEmailFromGroup === email
+                    );
+                  },
+                ) !== 'undefined'
+              ) {
+                return [...groupIds, groupId];
+              }
 
-            return groupIds;
-          },
-          [],
-        );
-
-        return [
-          ...result,
-          {
-            key: id || email,
-            data: {
-              id,
-              name: `${member.attributes.profile?.lastName || ''} ${
-                member.attributes.profile?.firstName || ''
-              }`,
-              email,
-              group: getGroupNames(memberGroupIds, groupList),
-              allergy:
-                User(member)
-                  .getPublicData()
-                  ?.allergies?.map((allergy: string) =>
-                    getLabelByKey(ALLERGIES_OPTIONS, allergy),
-                  )
-                  .join(', ') || [],
-              nutrition:
-                User(member)
-                  .getPublicData()
-                  ?.nutritions?.map((nutrition: string) =>
-                    getLabelByKey(nutritions, nutrition),
-                  )
-                  ?.join(', ') || [],
+              return groupIds;
             },
-          },
-        ];
-      }, []),
+            [],
+          );
+
+          return [
+            ...result,
+            {
+              key: id || email,
+              data: {
+                id,
+                name: `${member.attributes.profile?.lastName || ''} ${
+                  member.attributes.profile?.firstName || ''
+                }`,
+                email,
+                group: getGroupNames(memberGroupIds, groupList),
+                allergy:
+                  User(member)
+                    .getPublicData()
+                    ?.allergies?.map((allergy: string) =>
+                      getLabelByKey(ALLERGIES_OPTIONS, allergy),
+                    )
+                    .join(', ') || [],
+                nutrition:
+                  User(member)
+                    .getPublicData()
+                    ?.nutritions?.map((nutrition: string) =>
+                      getLabelByKey(nutritions, nutrition),
+                    )
+                    ?.join(', ') || [],
+              },
+            },
+          ];
+        }, [])
+        .filter((item: TObject) => !!item?.data?.id),
     [
       JSON.stringify(groupList),
       JSON.stringify(mergedCompanyMembers),
       JSON.stringify(nutritions),
     ],
   );
+
+  console.log({ formattedCompanyMembers });
 
   useEffect(() => {
     const fetchData = async () => {

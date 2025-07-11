@@ -76,6 +76,7 @@ const GroupDetailPage = () => {
     (state) => state.company.companyMembers,
     shallowEqual,
   );
+
   const nutritions = useAppSelector(
     (state) => state.SystemAttributes.nutritions,
     shallowEqual,
