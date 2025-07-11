@@ -17,7 +17,9 @@ type ExportOrderDetailsExtendedFields = ExportOrderDetailsExtendedField[];
 
 type Row = {
   Ngày: string;
+  Nhóm: string;
   Tên: string;
+  Email: string;
   'Món ăn': string;
   'Đơn giá': number;
   'Ghi chú': string;
@@ -56,12 +58,18 @@ const prepareData = ({
 
           const newItem: Row & Partial<PrivateField> = {
             Ngày: formatTimestamp(Number(date)),
+            ...(participantData[memberId]?.groupName && {
+              Nhóm: participantData[memberId]?.groupName,
+            }),
             Tên: participantData[memberId]?.name,
             ...(privateFieldsIncludingIfAdmin
               ? {
                   Email: participantData[memberId]?.email,
                 }
               : {}),
+            ...(participantData[memberId]?.email && {
+              Email: participantData[memberId]?.email,
+            }),
             'Món ăn': foodListOfDate[foodId]?.foodName,
             'Đơn giá': foodListOfDate[foodId]?.foodPrice,
             'Ghi chú': requirement,
@@ -85,20 +93,32 @@ const prepareData = ({
       );
 
       const sortedOrderData = orderData.sort((a, b) => {
-        if (a['Món ăn'] < b['Món ăn']) {
-          return -1;
-        }
-        if (a['Món ăn'] > b['Món ăn']) {
-          return 1;
-        }
+        const groupA = a['Nhóm'] ?? '';
+        const groupB = b['Nhóm'] ?? '';
+        const dishA = a['Món ăn'] ?? '';
+        const dishB = b['Món ăn'] ?? '';
 
-        return 0;
+        const groupCompare = groupA.localeCompare(groupB, 'vi');
+        if (groupCompare !== 0) return groupCompare;
+
+        return dishA.localeCompare(dishB, 'vi');
       });
 
       return [...result, ...sortedOrderData];
     },
     [],
   );
+};
+
+const getGroupNameByMemberId = (
+  data: any[],
+  memberId: string,
+): string | null => {
+  const group = data.find((item: TObject) =>
+    item.members?.some((member: any) => member.id === memberId),
+  );
+
+  return group?.name?.trim() ?? null;
 };
 
 const useExportOrderDetails = (options?: {
@@ -110,8 +130,10 @@ const useExportOrderDetails = (options?: {
     draftOrderDetail,
     participantData,
     anonymousParticipantData,
+    companyData,
   } = useAppSelector((state) => state.OrderManagement);
   const currentUser: UserListing = useAppSelector(currentUserSelector);
+  const groups = companyData?.attributes.profile.metadata?.groups || [];
 
   const { participants = [], anonymous = [] } = Listing(
     orderData as TListing,
@@ -139,6 +161,9 @@ const useExportOrderDetails = (options?: {
               },
             ),
             companyName,
+            ...(getGroupNameByMemberId(groups, pid) && {
+              groupName: getGroupNameByMemberId(groups, pid),
+            }),
           };
         })
         .concat(
@@ -160,6 +185,9 @@ const useExportOrderDetails = (options?: {
                 compareToGetLongerWith: displayName,
               }),
               companyName,
+              ...(getGroupNameByMemberId(groups, pid) && {
+                groupName: getGroupNameByMemberId(groups, pid),
+              }),
             };
           }),
         ),

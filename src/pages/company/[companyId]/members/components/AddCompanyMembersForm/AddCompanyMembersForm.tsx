@@ -57,6 +57,8 @@ const AddCompanyMembersForm: React.FC<AddCompanyMembersFormProps> = (props) => {
     User(currentUser).getAttributes().email,
   ];
 
+  const uniqueRestrictEmailList = Array.from(new Set(restrictEmailList));
+
   return (
     <FinalForm
       {...props}
@@ -74,14 +76,16 @@ const AddCompanyMembersForm: React.FC<AddCompanyMembersFormProps> = (props) => {
           if (!value) {
             return;
           }
+
           const rawEmailListValue = value
             .trim()
             .split(' ')
             .map((email: string) => email.trim());
           const emailListValue = difference(
             rawEmailListValue,
-            restrictEmailList,
+            uniqueRestrictEmailList,
           );
+
           let invalidEmail = false;
           emailListValue.forEach((email: string) => {
             if (emailFormatValid(emailInvalidMessage)(email)) {

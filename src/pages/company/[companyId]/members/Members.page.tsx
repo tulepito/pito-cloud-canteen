@@ -245,8 +245,6 @@ const MembersPage = () => {
     ],
   );
 
-  console.log({ formattedCompanyMembers });
-
   useEffect(() => {
     const fetchData = async () => {
       dispatch(companyMemberActions.resetError());
