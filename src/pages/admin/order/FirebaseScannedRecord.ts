@@ -11,4 +11,5 @@ export interface FirebaseScannedRecord {
   groupId?: string;
   scannedAt: number;
   state: 'live' | 'offline';
+  note?: string;
 }

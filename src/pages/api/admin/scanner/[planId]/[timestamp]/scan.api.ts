@@ -197,6 +197,9 @@ export default async function handler(
           ]?.url || '',
         state: 'live',
         scannedAt: Date.now(),
+        ...(matchedBarcodeMemberOrder?.requirement && {
+          note: matchedBarcodeMemberOrder?.requirement,
+        }),
         ...(groupId && { groupId }),
         ...(screen && { screen }),
       } satisfies Omit<FirebaseScannedRecord, 'id'>;

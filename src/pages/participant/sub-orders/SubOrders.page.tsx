@@ -78,7 +78,7 @@ const SubOrders = () => {
     dispatch(
       SubOrdersThunks.fetchSubOrdersFromFirebase({
         participantId: currentUserId,
-        txStatus: [ESubOrderTxStatus.PENDING, DELIVERING_TAB],
+        txStatus: DELIVERING_TAB,
       }),
     );
     dispatch(
@@ -93,10 +93,7 @@ const SubOrders = () => {
     dispatch(
       SubOrdersThunks.fetchSubOrdersFromFirebase({
         participantId: currentUserId,
-        txStatus:
-          activeTab === DELIVERING_TAB
-            ? [ESubOrderTxStatus.PENDING, DELIVERING_TAB]
-            : DELIVERED_TAB,
+        txStatus: activeTab === DELIVERING_TAB ? DELIVERING_TAB : DELIVERED_TAB,
       }),
     ),
   );

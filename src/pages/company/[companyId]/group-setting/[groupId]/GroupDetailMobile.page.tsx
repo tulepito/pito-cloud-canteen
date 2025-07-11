@@ -71,6 +71,19 @@ const GroupDetailMobilePage = () => {
     (state) => state.company.groupList,
     shallowEqual,
   );
+
+  const usersInGroup = useMemo(() => {
+    return groupList.flatMap((group: TObject) =>
+      group.members.map((member: TObject) => {
+        return {
+          id: {
+            uuid: member.id,
+          },
+        };
+      }),
+    );
+  }, [groupList]);
+
   const groupMembers = useAppSelector(
     (state) => state.company.groupMembers,
     shallowEqual,
@@ -247,7 +260,7 @@ const GroupDetailMobilePage = () => {
         isOpen={isAddNewMembersModalOpen}
         onClose={closeAddNewMembersModal}
         companyMembers={companyMembers}
-        groupMembers={groupMembers}
+        groupMembers={usersInGroup}
         groupId={groupId as string}
       />
       <ConfirmationModal

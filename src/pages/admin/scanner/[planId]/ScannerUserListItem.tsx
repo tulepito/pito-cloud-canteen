@@ -8,6 +8,7 @@ export const ScannerUserListItem = ({
   userAbbrName,
   foodName,
   state,
+  note,
   onClick,
 }: {
   userName: string;
@@ -17,6 +18,7 @@ export const ScannerUserListItem = ({
   foodThumbnailUrl?: string;
   scannedAt: string;
   state: 'live' | 'offline';
+  note?: string;
   onClick: () => void;
 }) => {
   return (
@@ -74,6 +76,12 @@ export const ScannerUserListItem = ({
             </div>
           )}
         </div>
+
+        {note && (
+          <path className="text-neutral-700 text-2xl font-normal">
+            * {note}
+          </path>
+        )}
       </div>
     </motion.div>
   );

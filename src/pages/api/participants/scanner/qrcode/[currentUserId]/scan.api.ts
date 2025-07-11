@@ -307,7 +307,6 @@ const validateGroupAccess = async (
   });
   const orderDetailData = denormalisedResponseEntities(orderDetailListing)[0];
 
-  console.log(orderDetailData.attributes?.metadata);
   const companyId = orderDetailData.attributes?.metadata?.companyId;
 
   if (!companyId) {
@@ -387,6 +386,9 @@ const createScannedRecord = async (
       '',
     state: 'live',
     scannedAt: Date.now(),
+    ...(processedData?.memberOrder?.requirement && {
+      note: processedData?.memberOrder?.requirement,
+    }),
     ...(context.groupId && { groupId: context.groupId }),
     ...(context.screen && { screen: context.screen }),
   } satisfies Omit<FirebaseScannedRecord, 'id'>;

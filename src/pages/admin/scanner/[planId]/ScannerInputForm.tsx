@@ -424,7 +424,7 @@ export function ScannerInputForm({
 
   return (
     <div className="flex items-start justify-between gap-40 bg-white py-10 px-8 shadow-sm border-b sticky top-0 z-10">
-      <div className="flex-1 h-full flex flex-col justify-between">
+      <div className="flex-1 h-full flex flex-col justify-between gap-16">
         <div className="flex flex-col gap-2 w-full">
           <h1 className="text-4xl font-bold text-gray-900">
             Danh sách món ăn{' '}
@@ -461,131 +461,134 @@ export function ScannerInputForm({
           </div>
         </div>
 
-        <form
-          className="flex items-center gap-4 rounded-lg"
-          onSubmit={handleSubmitInput}>
-          <div className="relative flex-1">
-            <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500">
-              <PiMagnifyingGlass size={32} />
-            </div>
+        <div className="flex flex-row gap-4 items-center w-full">
+          <form
+            className="flex items-center gap-4 rounded-lg w-[40%]"
+            onSubmit={handleSubmitInput}>
+            <div className="relative flex-1">
+              <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500">
+                <PiMagnifyingGlass size={32} />
+              </div>
 
-            <input
-              type="text"
-              value={searchInput}
-              onChange={(e) => handleSearchInputChangeInternal(e.target.value)}
-              placeholder="Nhập tên người tham gia..."
-              className="w-full p-4 pl-14 border-gray-300 rounded-xl text-2xl border-1 border-solid outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
-            />
-          </div>
-        </form>
-      </div>
-
-      <div className="flex flex-col items-center gap-3">
-        <div className="flex flex-col items-center">
-          <p className="text-xs text-gray-600 mb-1">Mã QRCode</p>
-          <div className="w-40 h-40 bg-white border border-gray-200 rounded flex items-center justify-center">
-            <div className="relative w-full aspect-square">
-              <Image
-                src={qrUrl}
-                alt="QRCode"
-                fill
-                className="aspect-square rounded-lg"
+              <input
+                type="text"
+                value={searchInput}
+                onChange={(e) =>
+                  handleSearchInputChangeInternal(e.target.value)
+                }
+                placeholder="Nhập tên người tham gia..."
+                className="w-full p-4 pl-14 border-gray-300 rounded-xl text-2xl border-1 border-solid outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
               />
             </div>
-          </div>
-        </div>
+          </form>
+          <div className="w-fit relative" ref={dropdownRef}>
+            <button
+              onClick={handleIconClick}
+              disabled={loading}
+              className="flex flex-row items-center justify-center gap-4 cursor-pointer bg-black hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed w-fit px-6 py-4 rounded-md transition-colors duration-200">
+              {loading ? (
+                <div className="animate-spin rounded-full border-b-2 border-white w-[30px] h-[30px]" />
+              ) : (
+                <PiCallBell className="text-white" size={30} />
+              )}
+              <p className="text-xl text-white uppercase">lấy món</p>
+              <PiCaretDown
+                className="text-white size-8"
+                style={{
+                  transform: showPopup ? 'rotate(180deg)' : 'rotate(0deg)',
+                  transition: 'transform 0.3s ease',
+                }}
+              />
+            </button>
 
-        <div className="w-fit relative" ref={dropdownRef}>
-          <button
-            onClick={handleIconClick}
-            disabled={loading}
-            className="flex flex-row items-center justify-center gap-4 cursor-pointer bg-black hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed w-fit px-6 py-4 rounded-md transition-colors duration-200">
-            {loading ? (
-              <div className="animate-spin rounded-full border-b-2 border-white w-[30px] h-[30px]" />
-            ) : (
-              <PiCallBell className="text-white" size={30} />
-            )}
-            <p className="text-xl text-white uppercase">lấy món</p>
-            <PiCaretDown
-              className="text-white size-8"
-              style={{
-                transform: showPopup ? 'rotate(180deg)' : 'rotate(0deg)',
-                transition: 'transform 0.3s ease',
-              }}
-            />
-          </button>
+            <div
+              className={`absolute top-full right-0 w-96 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-50 transition-all duration-300 ease-in-out ${
+                showPopup
+                  ? 'opacity-100 translate-y-0 visible'
+                  : 'opacity-0 -translate-y-2 invisible'
+              }`}>
+              <div className="p-4 border-b border-gray-200">
+                <form
+                  onSubmit={handleSubmit}
+                  className="flex items-center gap-4">
+                  <div className="relative flex-1">
+                    <input
+                      ref={inputRef}
+                      type="text"
+                      value={barcode}
+                      onChange={(e) => setBarcode(e.target.value)}
+                      placeholder="Nhập tên người lấy món"
+                      className="w-full p-3 text-lg border-2 border-gray-300 rounded-lg outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
+                    />
+                  </div>
+                </form>
+              </div>
 
-          <div
-            className={`absolute top-full right-0 w-96 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-50 transition-all duration-300 ease-in-out ${
-              showPopup
-                ? 'opacity-100 translate-y-0 visible'
-                : 'opacity-0 -translate-y-2 invisible'
-            }`}>
-            <div className="p-4 border-b border-gray-200">
-              <form onSubmit={handleSubmit} className="flex items-center gap-4">
-                <div className="relative flex-1">
-                  <input
-                    ref={inputRef}
-                    type="text"
-                    value={barcode}
-                    onChange={(e) => setBarcode(e.target.value)}
-                    placeholder="Nhập tên người lấy món"
-                    className="w-full p-3 text-lg border-2 border-gray-300 rounded-lg outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
-                  />
-                </div>
-              </form>
-            </div>
-
-            <div className="max-h-80 overflow-y-auto">
-              <LoadingWrapper isLoading={fetchOrderInProgress}>
-                {searchResults.length > 0 ? (
-                  <div className="py-2">
-                    <div className="px-4 py-2 text-sm text-gray-500 border-b border-gray-100">
-                      {searchResults.length} kết quả tìm kiếm
-                    </div>
-                    {searchResults.map((participant) => (
-                      <div
-                        key={participant.email}
-                        onClick={() => handleParticipantSelect(participant)}
-                        className="px-4 py-3 hover:bg-gray-50 cursor-pointer border-b border-gray-50 last:border-b-0 transition-colors duration-150">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <div className="font-medium text-gray-900">
-                              {participant.name}
-                            </div>
-                            <div className="text-sm text-gray-500">
-                              Email: {participant.email}
+              <div className="max-h-80 overflow-y-auto">
+                <LoadingWrapper isLoading={fetchOrderInProgress}>
+                  {searchResults.length > 0 ? (
+                    <div className="py-2">
+                      <div className="px-4 py-2 text-sm text-gray-500 border-b border-gray-100">
+                        {searchResults.length} kết quả tìm kiếm
+                      </div>
+                      {searchResults.map((participant) => (
+                        <div
+                          key={participant.email}
+                          onClick={() => handleParticipantSelect(participant)}
+                          className="px-4 py-3 hover:bg-gray-50 cursor-pointer border-b border-gray-50 last:border-b-0 transition-colors duration-150">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <div className="font-medium text-gray-900">
+                                {participant.name}
+                              </div>
+                              <div className="text-sm text-gray-500">
+                                Email: {participant.email}
+                              </div>
                             </div>
                           </div>
                         </div>
+                      ))}
+                    </div>
+                  ) : barcode ? (
+                    <div className="px-4 py-8 text-center text-gray-500">
+                      <PiMagnifyingGlassLight
+                        size={32}
+                        className="mx-auto mb-2 text-gray-300"
+                      />
+                      <div className="text-sm">Không tìm thấy kết quả nào</div>
+                      <div className="text-xs text-gray-400 mt-1">
+                        Thử tìm kiếm với từ khóa khác
                       </div>
-                    ))}
-                  </div>
-                ) : barcode ? (
-                  <div className="px-4 py-8 text-center text-gray-500">
-                    <PiMagnifyingGlassLight
-                      size={32}
-                      className="mx-auto mb-2 text-gray-300"
-                    />
-                    <div className="text-sm">Không tìm thấy kết quả nào</div>
-                    <div className="text-xs text-gray-400 mt-1">
-                      Thử tìm kiếm với từ khóa khác
                     </div>
-                  </div>
-                ) : (
-                  <div className="px-4 py-8 text-center text-gray-500">
-                    <PiCallBell
-                      size={32}
-                      className="mx-auto mb-2 text-gray-300"
-                    />
-                    <div className="text-sm">Nhập tên để tìm kiếm</div>
-                    <div className="text-xs text-gray-400 mt-1">
-                      Bắt đầu nhập để xem danh sách
+                  ) : (
+                    <div className="px-4 py-8 text-center text-gray-500">
+                      <PiCallBell
+                        size={32}
+                        className="mx-auto mb-2 text-gray-300"
+                      />
+                      <div className="text-sm">Nhập tên để tìm kiếm</div>
+                      <div className="text-xs text-gray-400 mt-1">
+                        Bắt đầu nhập để xem danh sách
+                      </div>
                     </div>
-                  </div>
-                )}
-              </LoadingWrapper>
+                  )}
+                </LoadingWrapper>
+              </div>
             </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex flex-col items-center h-full">
+        <p className="text-xs text-gray-600 mb-1">Mã QRCode</p>
+        <div className="aspect-square h-full bg-white border border-gray-200 rounded flex items-center justify-center">
+          <div className="relative w-full aspect-square">
+            <Image
+              src={qrUrl}
+              alt="QRCode"
+              fill
+              className="aspect-square rounded-lg"
+            />
           </div>
         </div>
       </div>

@@ -126,7 +126,7 @@ export const ScannerUserList = ({
   }, [searchValue, allBarcodes]);
 
   return (
-    <div className="grid grid-cols-1 gap-12 container mx-auto py-8">
+    <div className="grid grid-cols-1 gap-12 px-8 mx-auto py-8">
       <div className="text-xs text-gray-400 mb-2 hidden">
         Last update: {lastUpdate} | Items: {barcodes.length}
       </div>
@@ -150,6 +150,7 @@ export const ScannerUserList = ({
                     },
                   )}
                   state={barcode.state}
+                  note={barcode?.note}
                   onClick={() => {
                     const scannedRecordRef = doc(
                       firestore,
