@@ -287,17 +287,24 @@ export function ScannerInputForm({
   // Statistics calculations
 
   const offlinePortions = useMemo(() => {
-    return totalBarcodes.filter(
+    if (!Array.isArray(totalBarcodes)) return 0;
+    const count = totalBarcodes.filter(
       (barcodeItem) => barcodeItem.state === 'offline',
     ).length;
+
+    return Math.max(0, count);
   }, [totalBarcodes]);
 
   const totalPortions = useMemo(() => {
-    return preparedGroupsData?.length ?? 0;
+    const count = preparedGroupsData?.length ?? 0;
+
+    return Math.max(0, count);
   }, [preparedGroupsData]);
 
   const livePortions = useMemo(() => {
-    return totalPortions - offlinePortions;
+    const remaining = totalPortions - offlinePortions;
+
+    return Math.max(0, remaining);
   }, [offlinePortions, totalPortions]);
 
   // Effects
@@ -423,51 +430,51 @@ export function ScannerInputForm({
   }, []);
 
   return (
-    <div className="flex items-start justify-between gap-40 bg-white py-10 px-8 shadow-sm border-b sticky top-0 z-10">
-      <div className="flex-1 h-full flex flex-col justify-between gap-16">
+    <div className="flex items-start justify-between gap-40 bg-white py-5 md:py-10 px-4 md:px-8 shadow-sm border-b sticky top-0 z-10">
+      <div className="flex-1 w-full h-full flex flex-col justify-between gap-6 md:gap-16">
         <div className="flex flex-col gap-2 w-full">
-          <h1 className="text-4xl font-bold text-gray-900">
+          <h1 className="text-2xl md:text-4xl font-bold text-gray-900">
             Danh sách món ăn{' '}
             <span className="text-blue-600">{group?.name}</span>
           </h1>
-          <p className="text-2xl text-gray-500">
+          <p className="text-lg md:text-2xl text-gray-500">
             {formatTimestamp(+timestamp!)}
           </p>
         </div>
 
-        <div className="flex items-center gap-6">
+        <div className="flex flex-row items-center gap-4 md:gap-6">
           <div className="flex items-center gap-2">
-            <PiPackage className="w-6 h-6 text-blue-600" />
-            <span className="text-2xl text-gray-600">Tổng:</span>
-            <span className="font-semibold text-2xl text-blue-600">
+            <PiPackage className="size-5 md:w-6 md:h-6 text-blue-600" />
+            <span className="text-lg md:text-2xl text-gray-600">Tổng:</span>
+            <span className="font-semibold text-lg md:text-2xl text-blue-600">
               {totalPortions}
             </span>
           </div>
 
           <div className="flex items-center gap-2">
-            <PiCheckCircle className="w-6 h-6 text-green-600" />
-            <span className="text-2xl text-gray-600">Đã phát:</span>
-            <span className="font-semibold text-2xl text-green-600">
+            <PiCheckCircle className="size-5 md:w-6 md:h-6 text-green-600" />
+            <span className="text-lg md:text-2xl text-gray-600">Đã phát:</span>
+            <span className="font-semibold text-lg md:text-2xl text-green-600">
               {offlinePortions}
             </span>
           </div>
 
           <div className="flex items-center gap-2">
-            <PiClock className="w-6 h-6 text-orange-600" />
-            <span className="text-2xl text-gray-600">Còn lại:</span>
-            <span className="font-semibold text-2xl text-orange-600">
+            <PiClock className="size-5 md:w-6 md:h-6 text-orange-600" />
+            <span className="text-lg md:text-2xl text-gray-600">Còn lại:</span>
+            <span className="font-semibold text-lg md:text-2xl text-orange-600">
               {livePortions}
             </span>
           </div>
         </div>
 
-        <div className="flex flex-row gap-4 items-center w-full">
+        <div className="flex flex-col md:flex-row gap-4 items-center w-full">
           <form
-            className="flex items-center gap-4 rounded-lg w-[40%]"
+            className="flex items-center gap-4 rounded-lg w-full md:w-[40%]"
             onSubmit={handleSubmitInput}>
             <div className="relative flex-1">
               <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500">
-                <PiMagnifyingGlass size={32} />
+                <PiMagnifyingGlass className="size-6 md:size-8" />
               </div>
 
               <input
@@ -477,23 +484,23 @@ export function ScannerInputForm({
                   handleSearchInputChangeInternal(e.target.value)
                 }
                 placeholder="Nhập tên người tham gia..."
-                className="w-full p-4 pl-14 border-gray-300 rounded-xl text-2xl border-1 border-solid outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
+                className="w-full p-4 pl-12 md:pl-14 border-gray-300 rounded-xl text-base md:text-2xl border-1 border-solid outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
               />
             </div>
           </form>
-          <div className="w-fit relative" ref={dropdownRef}>
+          <div className="w-full md:w-fit relative" ref={dropdownRef}>
             <button
               onClick={handleIconClick}
               disabled={loading}
-              className="flex flex-row items-center justify-center gap-4 cursor-pointer bg-black hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed w-fit px-6 py-4 rounded-md transition-colors duration-200">
+              className="flex flex-row items-center justify-center gap-2 md:gap-4 cursor-pointer bg-black hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed w-fit px-4 md:px-6 py-3 md:py-4 rounded-md transition-colors duration-200">
               {loading ? (
                 <div className="animate-spin rounded-full border-b-2 border-white w-[30px] h-[30px]" />
               ) : (
-                <PiCallBell className="text-white" size={30} />
+                <PiCallBell className="size-6 md:size-[30px] text-white" />
               )}
-              <p className="text-xl text-white uppercase">lấy món</p>
+              <p className="text-lg md:text-xl text-white uppercase">lấy món</p>
               <PiCaretDown
-                className="text-white size-8"
+                className="text-white size-6 md:size-8"
                 style={{
                   transform: showPopup ? 'rotate(180deg)' : 'rotate(0deg)',
                   transition: 'transform 0.3s ease',
@@ -502,7 +509,8 @@ export function ScannerInputForm({
             </button>
 
             <div
-              className={`absolute top-full right-0 w-96 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-50 transition-all duration-300 ease-in-out ${
+              className={`absolute top-full mt-2 w-96 bg-white border border-gray-200 rounded-lg shadow-lg z-50 transition-all duration-300 ease-in-out left-1/2 -translate-x-1/2 md:left-auto md:translate-x-0 md:right-0
+              ${
                 showPopup
                   ? 'opacity-100 translate-y-0 visible'
                   : 'opacity-0 -translate-y-2 invisible'
@@ -518,7 +526,7 @@ export function ScannerInputForm({
                       value={barcode}
                       onChange={(e) => setBarcode(e.target.value)}
                       placeholder="Nhập tên người lấy món"
-                      className="w-full p-3 text-lg border-2 border-gray-300 rounded-lg outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
+                      className="w-full p-3 text-base md:text-lg border-2 border-gray-300 rounded-lg outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
                     />
                   </div>
                 </form>
@@ -579,7 +587,7 @@ export function ScannerInputForm({
         </div>
       </div>
 
-      <div className="flex flex-col items-center h-full">
+      <div className="hidden md:flex flex-col items-center h-full">
         <p className="text-xs text-gray-600 mb-1">Mã QRCode</p>
         <div className="aspect-square h-full bg-white border border-gray-200 rounded flex items-center justify-center">
           <div className="relative w-full aspect-square">

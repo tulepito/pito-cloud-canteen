@@ -41,17 +41,17 @@ export const ScannerUserListItem = ({
         state === 'live' ? 'bg-white' : 'bg-green-200',
       )}>
       <div
-        className="px-12 py-10 flex flex-col gap-20 z-10 w-full"
+        className="px-4 md:px-12 py-4 md:py-10 flex flex-col gap-6 md:gap-20 z-10 w-full"
         onClick={onClick}>
         {foodName && (
-          <div className="text-black text-6xl font-semibold line-clamp-3 h-fit leading-normal">
+          <div className="text-black text-2xl md:text-6xl font-semibold line-clamp-5 md:line-clamp-3 h-fit leading-normal">
             {foodName}
           </div>
         )}
         <div className="flex flex-row justify-between items-center w-full">
           {userName && (
             <div className="text-black text-base font-semibold flex items-center gap-3">
-              <div className="min-w-[40px] min-h-[40px] w-[40px] h-[40px] rounded-full bg-gray-400 border-2 border-solid border-white overflow-hidden">
+              <div className="min-w-8 min-h-8 md:min-w-[40px] md:min-h-[40px] w-8 h-8 md:w-[40px] md:h-[40px] rounded-full bg-gray-400 border-2 border-solid border-white overflow-hidden">
                 {userProfileImageUrl && (
                   <img
                     src={userProfileImageUrl}
@@ -62,7 +62,7 @@ export const ScannerUserListItem = ({
 
                 {!userProfileImageUrl && (
                   <div
-                    className="flex justify-center items-center h-full text-white text-base font-semibold"
+                    className="flex justify-center items-center h-full text-white text-xs md:text-base font-semibold"
                     style={{
                       backgroundColor: '#fe693c',
                     }}>
@@ -70,7 +70,7 @@ export const ScannerUserListItem = ({
                   </div>
                 )}
               </div>
-              <div className="text-neutral-500 line-clamp-1 text-3xl font-normal">
+              <div className="text-neutral-500 line-clamp-1 text-lg md:text-3xl font-normal">
                 {userName}
               </div>
             </div>
@@ -78,7 +78,7 @@ export const ScannerUserListItem = ({
         </div>
 
         {note && (
-          <path className="text-neutral-700 text-2xl font-normal">
+          <path className="text-neutral-700 text-lg md:text-2xl font-normal">
             * {note}
           </path>
         )}
