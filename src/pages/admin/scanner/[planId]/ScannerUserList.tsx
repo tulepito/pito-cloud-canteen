@@ -132,7 +132,7 @@ export const ScannerUserList = ({
       </div>
 
       {
-        <div className="flex flex-col gap-10 w-full">
+        <div className="flex flex-col gap-4 md:gap-10 w-full">
           <AnimatePresence mode="popLayout">
             {!!barcodes.length &&
               barcodes.map((barcode) => (

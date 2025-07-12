@@ -442,7 +442,7 @@ export function ScannerInputForm({
           </p>
         </div>
 
-        <div className="flex flex-row items-center gap-4 md:gap-6">
+        <div className="flex flex-row items-center justify-between md:justify-start gap-4 md:gap-6">
           <div className="flex items-center gap-2">
             <PiPackage className="size-5 md:w-6 md:h-6 text-blue-600" />
             <span className="text-lg md:text-2xl text-gray-600">Tổng:</span>
@@ -451,20 +451,26 @@ export function ScannerInputForm({
             </span>
           </div>
 
-          <div className="flex items-center gap-2">
-            <PiCheckCircle className="size-5 md:w-6 md:h-6 text-green-600" />
-            <span className="text-lg md:text-2xl text-gray-600">Đã phát:</span>
-            <span className="font-semibold text-lg md:text-2xl text-green-600">
-              {offlinePortions}
-            </span>
-          </div>
+          <div className="flex flex-col md:flex-row gap-2 md:gap-6 items-center justify-start md:justify-center">
+            <div className="flex items-center gap-2">
+              <PiCheckCircle className="size-5 md:w-6 md:h-6 text-green-600" />
+              <span className="text-lg md:text-2xl text-gray-600">
+                Đã phát:
+              </span>
+              <span className="font-semibold text-lg md:text-2xl text-green-600">
+                {offlinePortions}
+              </span>
+            </div>
 
-          <div className="flex items-center gap-2">
-            <PiClock className="size-5 md:w-6 md:h-6 text-orange-600" />
-            <span className="text-lg md:text-2xl text-gray-600">Còn lại:</span>
-            <span className="font-semibold text-lg md:text-2xl text-orange-600">
-              {livePortions}
-            </span>
+            <div className="flex items-center gap-2">
+              <PiClock className="size-5 md:w-6 md:h-6 text-orange-600" />
+              <span className="text-lg md:text-2xl text-gray-600">
+                Còn lại:
+              </span>
+              <span className="font-semibold text-lg md:text-2xl text-orange-600">
+                {livePortions}
+              </span>
+            </div>
           </div>
         </div>
 
