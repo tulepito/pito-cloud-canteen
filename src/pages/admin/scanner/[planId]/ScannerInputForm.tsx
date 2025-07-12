@@ -431,13 +431,20 @@ export function ScannerInputForm({
 
   return (
     <div className="flex items-start justify-between gap-40 bg-white py-5 md:py-10 px-4 md:px-8 shadow-sm border-b sticky top-0 z-10">
-      <div className="flex-1 w-full h-full flex flex-col justify-between gap-6 md:gap-16">
+      <div className="flex-1 w-full h-full flex flex-col justify-between gap-4 md:gap-16">
         <div className="flex flex-col gap-2 w-full">
-          <h1 className="text-2xl md:text-4xl font-bold text-gray-900">
+          <h1 className="hidden md:block text-2xl md:text-4xl font-bold text-gray-900">
             Danh sách món ăn{' '}
             <span className="text-blue-600">{group?.name}</span>
           </h1>
-          <p className="text-lg md:text-2xl text-gray-500">
+
+          <h1 className="block md:hidden text-2xl md:text-4xl font-bold text-gray-900">
+            <span className="text-blue-600">{group?.name}</span>
+            <span className="text-gray-600">
+              {formatTimestamp(+timestamp!)}
+            </span>
+          </h1>
+          <p className="hidden md:block text-lg md:text-2xl text-gray-500">
             {formatTimestamp(+timestamp!)}
           </p>
         </div>
