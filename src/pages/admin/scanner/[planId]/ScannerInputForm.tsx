@@ -21,7 +21,6 @@ import { scanApi } from '@apis/scanner';
 import { isJoinedPlan } from '@helpers/order/orderPickingHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import type { FirebaseScannedRecord } from '@pages/admin/order/FirebaseScannedRecord';
-import { generateScannerBarCode } from '@pages/api/admin/scanner/[planId]/toggle-mode.api';
 import {
   getErrorStringFromErrorObject,
   ScannerThunks,
@@ -37,16 +36,12 @@ import { LoadingWrapper } from './LoadingWrapper';
 const prepareDataGroups = ({
   orderDetailPerDate = {},
   participantDataMap = {},
-  planId,
   group,
-  timestamp,
 }: {
   orderDetailPerDate: TObject;
   participantDataMap: Record<string, { name: string; email: string }>;
-  planId: string;
   group: { id: string; members?: { id: string }[] };
-  timestamp: string;
-}): { name: string; email: string; barcode: string }[] => {
+}): { name: string; email: string; memberId: string }[] => {
   const { memberOrders = {} } = orderDetailPerDate;
   const memberIds = group?.members?.map((m) => m.id) ?? [];
 
@@ -62,12 +57,12 @@ const prepareDataGroups = ({
       results.push({
         name: participant.name,
         email: participant.email,
-        barcode: generateScannerBarCode(planId, memberId, timestamp),
+        memberId,
       });
     }
 
     return results;
-  }, [] as { name: string; email: string; barcode: string }[]);
+  }, [] as { name: string; email: string; memberId: string }[]);
 };
 
 export function removeVietnameseTones(str: string): string {
@@ -95,7 +90,7 @@ const getTimestampAndGroupId = (queryParam: string | string[] | undefined) => {
 // Types
 interface IParticipant {
   name: string;
-  barcode: string;
+  memberId: string;
   email: string;
 }
 
@@ -111,7 +106,7 @@ export function ScannerInputForm({
   resetSearchInput,
 }: ScannerInputFormProps) {
   // States
-  const [barcode, setBarcode] = useState('');
+  const [memberId, setMemberId] = useState('');
   const [searchInput, setSearchInput] = useState(searchValue);
   const [qrUrl, setQrUrl] = useState('');
   const [loading, setLoading] = useState(false);
@@ -202,26 +197,24 @@ export function ScannerInputForm({
     return prepareDataGroups({
       orderDetailPerDate: orderDetail[timestamp] || {},
       participantDataMap,
-      planId: planId as string,
       group,
-      timestamp,
     });
   }, [orderDetail, participantDataMap, planId, group, timestamp]);
 
   // Event handlers
-  const performSubmit = async (barcodeValue: string) => {
-    if (!barcodeValue) return;
+  const performSubmit = async (memberIdValue: string) => {
+    if (!memberIdValue) return;
 
     try {
       setLoading(true);
       await scanApi({
         planId: planId as string,
         timestamp: timestamp as string,
-        barcode: barcodeValue,
+        memberId: memberIdValue,
         groupId: groupId as string,
         screen,
       });
-      setBarcode('');
+      setMemberId('');
       setShowPopup(false);
       toast.success('Lấy món thành công!', {
         position: 'top-right',
@@ -237,7 +230,7 @@ export function ScannerInputForm({
 
   const handleSubmit = async (e?: React.FormEvent<HTMLFormElement>) => {
     if (e) e.preventDefault();
-    await performSubmit(barcode);
+    await performSubmit(memberId);
   };
 
   const handleIconClick = (e: React.MouseEvent) => {
@@ -253,9 +246,9 @@ export function ScannerInputForm({
   };
 
   const handleParticipantSelect = async (participant: IParticipant) => {
-    setBarcode(participant.barcode);
+    setMemberId(participant.memberId);
     setShowPopup(false);
-    await performSubmit(participant.barcode);
+    await performSubmit(participant.memberId);
   };
 
   const handleSubmitInput = async (e?: React.FormEvent<HTMLFormElement>) => {
@@ -390,13 +383,13 @@ export function ScannerInputForm({
 
   // Filter search results
   useEffect(() => {
-    const searchTerm = removeVietnameseTones(barcode.trim().toLowerCase());
+    const searchTerm = removeVietnameseTones(memberId.trim().toLowerCase());
 
     const transformedData: IParticipant[] = preparedGroupsData.map(
-      ({ name, email, barcode: barcodeValue }) => ({
+      ({ name, email, memberId: memberIdValue }) => ({
         name,
         email,
-        barcode: barcodeValue,
+        memberId: memberIdValue,
       }),
     );
 
@@ -411,7 +404,7 @@ export function ScannerInputForm({
     } else {
       setSearchResults(transformedData);
     }
-  }, [barcode, preparedGroupsData]);
+  }, [memberId, preparedGroupsData]);
 
   // Close popup when clicking outside
   useEffect(() => {
@@ -536,8 +529,8 @@ export function ScannerInputForm({
                     <input
                       ref={inputRef}
                       type="text"
-                      value={barcode}
-                      onChange={(e) => setBarcode(e.target.value)}
+                      value={memberId}
+                      onChange={(e) => setMemberId(e.target.value)}
                       placeholder="Nhập tên người lấy món"
                       className="w-full p-3 text-base md:text-lg border-2 border-gray-300 rounded-lg outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
                     />
@@ -570,7 +563,7 @@ export function ScannerInputForm({
                         </div>
                       ))}
                     </div>
-                  ) : barcode ? (
+                  ) : memberId ? (
                     <div className="px-4 py-8 text-center text-gray-500">
                       <PiMagnifyingGlassLight
                         size={32}

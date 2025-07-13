@@ -1,5 +1,5 @@
 export interface POSTScannerPlanIdTimestampScanBody {
-  barcode: string;
+  memberId: string;
   groupId?: string;
   screen?: string;
 }

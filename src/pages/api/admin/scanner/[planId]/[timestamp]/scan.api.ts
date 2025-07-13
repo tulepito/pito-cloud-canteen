@@ -23,11 +23,6 @@ import type {
 } from '@src/types';
 import { EImageVariants } from '@src/utils/enums';
 
-import {
-  detachScannerBarCodeUniqueKey,
-  generateBarcodeHashMap,
-} from '../toggle-mode.api';
-
 export const buildFullName = (
   firstName?: string,
   lastName?: string,
@@ -62,7 +57,7 @@ export default async function handler(
       planId: string;
       timestamp: string;
     };
-    const { barcode, groupId, screen } =
+    const { memberId, groupId, screen } =
       req.body as POSTScannerPlanIdTimestampScanBody;
     let matchedBarcodeMemberOrder: Partial<MemberOrderValue> | undefined;
 
@@ -92,53 +87,8 @@ export default async function handler(
           .json({ error: 'Không tìm thấy thông tin đơn hàng' });
       }
 
-      const barcodeHashMap = planListing.attributes?.metadata?.barcodeHashMap;
-      if (!barcodeHashMap) {
-        return res.status(404).json({ error: 'Không tìm thấy thông tin' });
-      }
-
-      let barcodeHashDigest = barcodeHashMap[barcode];
-      const barcodeHashMapLength = Object.keys(barcodeHashMap).length;
-      const totalMemberOrders = Object.values(orderDetail).reduce(
-        (acc, curr) => acc + Object.keys(curr?.memberOrders || {}).length,
-        0,
-      );
-
-      if (!barcodeHashDigest) {
-        if (barcodeHashMapLength === totalMemberOrders) {
-          return res.status(404).json({
-            error: 'Không tìm thấy thông tin mã vạch',
-          });
-        }
-
-        const refilledBarcodeHashMap = generateBarcodeHashMap(
-          planId,
-          orderDetail,
-        );
-
-        integrationSdk.listings.update({
-          id: planId,
-          metadata: {
-            barcodeHashMap: refilledBarcodeHashMap,
-          },
-        });
-
-        barcodeHashDigest = refilledBarcodeHashMap[barcode];
-        if (!barcodeHashDigest) {
-          return res
-            .status(404)
-            .json({ error: 'Không tìm thấy mã trong ngày ăn' });
-        }
-      }
-
-      const { memberId, date } =
-        detachScannerBarCodeUniqueKey(barcodeHashDigest);
-
-      if (date !== timestamp) {
-        return res.status(404).json({ error: 'Ngày ăn không hợp lệ' });
-      }
-
-      matchedBarcodeMemberOrder = orderDetail[date]?.memberOrders?.[memberId];
+      matchedBarcodeMemberOrder =
+        orderDetail[timestamp]?.memberOrders?.[memberId];
       if (!matchedBarcodeMemberOrder) {
         return res.status(404).json({ error: 'Không tìm thấy thông tin' });
       }
@@ -171,12 +121,18 @@ export default async function handler(
         firestore,
         process.env.NEXT_PUBLIC_FIREBASE_SCANNED_RECORDS_COLLECTION_NAME,
       );
-      const q = query(scannedRecordRef, where('barcode', '==', barcode));
+
+      const filters = [
+        where('memberId', '==', memberId),
+        where('planId', '==', planId),
+      ];
+
+      const q = query(scannedRecordRef, ...filters);
       const querySnapshot = await getDocs(q);
       const _record = {
         planId,
         timestamp: +timestamp,
-        barcode,
+        memberId,
         memberProfileImageUrl:
           memberListing.profileImage?.attributes?.variants?.['square-small']
             ?.url || '',

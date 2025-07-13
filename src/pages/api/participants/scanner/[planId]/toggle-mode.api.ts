@@ -1,7 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HttpMethod } from '@apis/configs';
-import { generateBarcodeHashMap } from '@pages/api/admin/scanner/[planId]/toggle-mode.api';
 import { getIntegrationSdk } from '@services/sdk';
 import type { PlanListing, WithFlexSDKData } from '@src/types';
 
@@ -36,14 +35,11 @@ export default async function handler(
         return res.status(404).json({ error: 'Order detail not found' });
       }
 
-      const barcodeHashMap = generateBarcodeHashMap(planId, orderDetail);
-
       const updatedPlanListingResponse: WithFlexSDKData<PlanListing> =
         await integrationSdk.listings.update({
           id: planId,
           metadata: {
             allowToQRCode: !currentAllowToQRCode,
-            barcodeHashMap,
           },
         });
 

@@ -6,8 +6,6 @@ import { usePathname } from 'next/navigation';
 function GleapCSSInjector() {
   const pathname = usePathname();
 
-  console.log({ pathname });
-
   useEffect(() => {
     if (!pathname) return;
     if (pathname.startsWith('/admin/scanner/')) {

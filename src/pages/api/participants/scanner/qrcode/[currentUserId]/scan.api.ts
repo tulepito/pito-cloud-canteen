@@ -3,11 +3,6 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HttpMethod } from '@apis/configs';
 import type { FirebaseScannedRecord } from '@pages/admin/order/FirebaseScannedRecord';
-import {
-  detachScannerBarCodeUniqueKey,
-  generateBarcodeHashMap,
-  generateScannerBarCode,
-} from '@pages/api/admin/scanner/[planId]/toggle-mode.api';
 import type { POSTScannerParticipantScanQRcodeBody } from '@pages/qrcode/POSTScannerPlanIdTimestampScanORCodeBody';
 import { denormalisedResponseEntities } from '@services/data';
 import { firestore } from '@services/firebase';
@@ -26,10 +21,6 @@ const ERROR_MESSAGES = {
     'Hiện bạn chưa có đơn hàng nào. Vui lòng đặt món trước khi quét mã.',
   ACTIVE_ORDER_NOT_FOUND:
     'Bạn chưa có đơn hàng nào đang hoạt động. Hãy kiểm tra lại lịch đặt món.',
-  BARCODE_MAP_NOT_FOUND:
-    'Mã QR không hợp lệ. Vui lòng quét lại hoặc hỏi nhân viên hỗ trợ.',
-  BARCODE_NOT_FOUND:
-    'Mã QR hôm nay không còn hiệu lực. Vui lòng kiểm tra lại thời gian và quét đúng mã.',
   INVALID_DATE: 'Ngày bạn chọn không hợp lệ. Vui lòng chọn lại ngày phù hợp.',
   MEMBER_NOT_FOUND:
     'Không tìm thấy thông tin tài khoản. Vui lòng kiểm tra hoặc liên hệ hỗ trợ.',
@@ -61,8 +52,6 @@ const ERROR_STATUS_MAP: Record<string, number> = {
   [ERROR_MESSAGES.PLAN_NOT_FOUND]: 404,
   [ERROR_MESSAGES.ORDER_NOT_FOUND]: 404,
   [ERROR_MESSAGES.ACTIVE_ORDER_NOT_FOUND]: 404,
-  [ERROR_MESSAGES.BARCODE_MAP_NOT_FOUND]: 404,
-  [ERROR_MESSAGES.BARCODE_NOT_FOUND]: 404,
   [ERROR_MESSAGES.MEMBER_NOT_FOUND]: 404,
   [ERROR_MESSAGES.MEMBER_DATA_NOT_LOADED]: 500,
   [ERROR_MESSAGES.COMPANY_NOT_FOUND]: 404,
@@ -91,7 +80,6 @@ interface ScanContext {
   timestamp: string;
   timestampNum: number;
   planId: string;
-  barcode: string;
   groupId?: string;
   screen?: string;
   orderId: string;
@@ -123,7 +111,6 @@ const logScanResult = (
   memberId: string,
   timestamp: string,
   planId: string,
-  barcode: string,
   foodTitle: string,
   isSuccess: boolean = true,
   screen?: string,
@@ -135,7 +122,7 @@ const logScanResult = (
   const screenInfo = screen ? ` on screen ${screen}` : '';
 
   console.log(
-    `[LOG QRCode] QR Code ${status} for user ${memberId} planId ${planId} timestamp: ${timestamp} barcode: ${barcode}${
+    `[LOG QRCode] QR Code ${status} for user ${memberId} planId ${planId} timestamp: ${timestamp} ${
       isSuccess ? ` food: ${foodTitle}` : ''
     }${screenInfo} at ${formattedTimestamp}`,
   );
@@ -162,14 +149,13 @@ const validateRequest = (req: NextApiRequest): ScanContext => {
     timestamp,
     timestampNum,
     planId: '', // Will be filled later
-    barcode: '', // Will be filled later
     groupId,
     screen,
     orderId: '', // Will be filled later
   };
 };
 
-const findActiveOrderAndGenerateBarcode = async (
+const findActiveOrder = async (
   context: ScanContext,
   integrationSdk: any,
 ): Promise<ScanContext> => {
@@ -193,21 +179,28 @@ const findActiveOrderAndGenerateBarcode = async (
 
   const planId = activeOrder.attributes.metadata.plans[0];
   const orderId = activeOrder.id.uuid;
-  const barcode = generateScannerBarCode(
-    planId,
-    context.currentUserId,
-    context.timestamp,
-  );
 
-  return { ...context, planId, barcode, orderId };
+  return { ...context, planId, orderId };
 };
 
-const checkDuplicateScan = async (barcode: string): Promise<void> => {
+const checkDuplicateScan = async ({
+  memberId,
+  planId,
+}: {
+  memberId: string;
+  planId: string;
+}): Promise<void> => {
   const scannedRecordRef = collection(
     firestore,
     process.env.NEXT_PUBLIC_FIREBASE_SCANNED_RECORDS_COLLECTION_NAME!,
   );
-  const q = query(scannedRecordRef, where('barcode', '==', barcode));
+
+  const filters = [
+    where('memberId', '==', memberId),
+    where('planId', '==', planId),
+  ];
+
+  const q = query(scannedRecordRef, ...filters);
   const querySnapshot = await getDocs(q);
 
   if (!querySnapshot.empty) {
@@ -237,63 +230,13 @@ const validateBarcodeAndGetMemberOrder = async (
     throw new APIError(ERROR_MESSAGES.ORDER_NOT_FOUND);
   }
 
-  const barcodeHashMap = planListing.attributes?.metadata?.barcodeHashMap;
-  if (!barcodeHashMap) {
-    throw new APIError(ERROR_MESSAGES.BARCODE_MAP_NOT_FOUND);
-  }
-
-  let barcodeHashDigest = barcodeHashMap[context.barcode];
-
-  // Regenerate barcode map if needed
-  if (!barcodeHashDigest) {
-    const barcodeHashMapLength = Object.keys(barcodeHashMap).length;
-    const totalMemberOrders = Object.values(orderDetail).reduce(
-      (acc: number, curr: any) =>
-        acc + Object.keys(curr?.memberOrders || {}).length,
-      0,
-    );
-
-    if (barcodeHashMapLength >= totalMemberOrders) {
-      throw new APIError(ERROR_MESSAGES.BARCODE_NOT_FOUND, 404, {
-        planId: context.planId,
-        currentUserId: context.currentUserId,
-        timestamp: context.timestamp,
-        barcode: context.barcode,
-      });
-    }
-
-    const refilledBarcodeHashMap = generateBarcodeHashMap(
-      context.planId,
-      orderDetail,
-    );
-    await integrationSdk.listings.update({
-      id: context.planId,
-      metadata: { barcodeHashMap: refilledBarcodeHashMap },
-    });
-
-    barcodeHashDigest = refilledBarcodeHashMap[context.barcode];
-    if (!barcodeHashDigest) {
-      throw new APIError(ERROR_MESSAGES.BARCODE_NOT_FOUND, 404, {
-        planId: context.planId,
-        currentUserId: context.currentUserId,
-        timestamp: context.timestamp,
-        barcode: context.barcode,
-        screen: context.screen,
-      });
-    }
-  }
-
-  const { memberId, date } = detachScannerBarCodeUniqueKey(barcodeHashDigest);
-  if (date !== context.timestamp) {
-    throw new APIError(ERROR_MESSAGES.INVALID_DATE);
-  }
-
-  const memberOrder = orderDetail[date]?.memberOrders?.[memberId];
+  const memberOrder =
+    orderDetail[context.timestamp]?.memberOrders?.[context.currentUserId];
   if (!memberOrder?.foodId) {
     throw new APIError(ERROR_MESSAGES.NO_FOOD_SELECTED);
   }
 
-  return { memberOrder, memberId };
+  return { memberOrder, memberId: context.currentUserId };
 };
 
 const validateGroupAccess = async (
@@ -370,7 +313,7 @@ const createScannedRecord = async (
   const record = {
     planId: context.planId,
     timestamp: context.timestampNum,
-    barcode: context.barcode,
+    memberId: context.currentUserId,
     memberProfileImageUrl:
       memberListing.profileImage?.attributes?.variants?.['square-small']?.url ||
       '',
@@ -419,11 +362,14 @@ const processOptimizedScan = async (
     // Step 1: Validate request
     let context = validateRequest(req);
 
-    // Step 2: Find active order and generate barcode
-    context = await findActiveOrderAndGenerateBarcode(context, integrationSdk);
+    // Step 2: Find active order
+    context = await findActiveOrder(context, integrationSdk);
 
     // Step 3: Check for duplicate scan (fail fast)
-    await checkDuplicateScan(context.barcode);
+    await checkDuplicateScan({
+      memberId: context.currentUserId,
+      planId: context.planId,
+    });
 
     // Step 4: Validate barcode and get member order
     const { memberOrder, memberId } = await validateBarcodeAndGetMemberOrder(
@@ -473,7 +419,6 @@ export default async function handler(
       context.currentUserId,
       context.timestamp,
       context.planId,
-      context.barcode,
       processedData.foodListing.attributes?.title!,
       true,
       context.screen,

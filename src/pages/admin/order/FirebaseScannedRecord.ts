@@ -2,7 +2,7 @@ export interface FirebaseScannedRecord {
   id: string;
   planId: string;
   timestamp: number;
-  barcode: string;
+  memberId: string;
   memberProfileImageUrl?: string;
   memberName: string;
   memberAbbrName: string;
