@@ -69,8 +69,14 @@ export const getDedupApi = <T = any>(path: string, params: TObject = {}) => {
   });
 };
 
-export const postApi = (path: string, body: TObject = {}) => {
-  return axios.post(`${apiBaseUrl()}${path}`, body);
+export const postApi = (
+  path: string,
+  body: TObject = {},
+  options: { signal?: AbortSignal } = {},
+) => {
+  return axios.post(`${apiBaseUrl()}${path}`, body, {
+    signal: options.signal, // ✅ hỗ trợ huỷ bằng AbortController
+  });
 };
 
 export const putApi = (path: string, body: TObject = {}) => {

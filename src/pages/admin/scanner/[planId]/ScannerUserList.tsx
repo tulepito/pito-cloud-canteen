@@ -126,7 +126,7 @@ export const ScannerUserList = ({
   }, [searchValue, allBarcodes]);
 
   return (
-    <div className="grid grid-cols-1 gap-12 p-4 md:px-8 mx-auto md:py-8">
+    <div className="grid grid-cols-1 gap-12 p-4 md:px-8 mx-auto md:py-8 w-full">
       <div className="text-xs text-gray-400 mb-2 hidden">
         Last update: {lastUpdate} | Items: {barcodes.length}
       </div>

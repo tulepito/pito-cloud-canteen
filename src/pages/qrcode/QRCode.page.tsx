@@ -43,8 +43,6 @@ const QRCodePage = () => {
     .getTime()
     .toString();
 
-  console.log(timestamp);
-
   useEffect(() => {
     // Chỉ gọi API 1 lần khi đã có currentUserId và không phải admin
     if (
