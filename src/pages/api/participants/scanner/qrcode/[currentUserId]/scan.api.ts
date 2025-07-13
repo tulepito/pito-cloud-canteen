@@ -1,4 +1,11 @@
-import { addDoc, collection, getDocs, query, where } from 'firebase/firestore';
+import {
+  collection,
+  doc,
+  getDocs,
+  query,
+  setDoc,
+  where,
+} from 'firebase/firestore';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HttpMethod } from '@apis/configs';
@@ -337,11 +344,23 @@ const createScannedRecord = async (
   } satisfies Omit<FirebaseScannedRecord, 'id'>;
 
   try {
-    const scannedRecordRef = collection(
+    // const scannedRecordRef = collection(
+    //   firestore,
+    //   process.env.NEXT_PUBLIC_FIREBASE_SCANNED_RECORDS_COLLECTION_NAME!,
+    // );
+    // await addDoc(scannedRecordRef, record);
+
+    // return record;
+
+    const recordId = `${context.planId}_${context.currentUserId}`;
+
+    const scannedRecordRef = doc(
       firestore,
       process.env.NEXT_PUBLIC_FIREBASE_SCANNED_RECORDS_COLLECTION_NAME!,
+      recordId,
     );
-    await addDoc(scannedRecordRef, record);
+
+    await setDoc(scannedRecordRef, record);
 
     return record;
   } catch (error) {
