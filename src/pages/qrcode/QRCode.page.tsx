@@ -147,7 +147,7 @@ const QRCodePage = () => {
       {getIcon()}
 
       <div className="text-center mt-4">
-        <h1 className="text-lg font-bold">{getMessage()}</h1>
+        <h1 className="text-lg font-bold px-10">{getMessage()}</h1>
 
         {showButton && (
           <Button
