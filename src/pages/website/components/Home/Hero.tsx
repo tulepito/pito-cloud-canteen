@@ -70,7 +70,7 @@ const Hero = () => {
           {width <= 768 && (
             <VideoSection
               embedUrl={`https://fast.wistia.net/embed/iframe/${linkVideo}?autoPlay=true&mute=true&playerColor=000000`}
-              className="w-full"
+              className="w-full hidden md:block"
             />
           )}
 
@@ -118,7 +118,7 @@ const Hero = () => {
                 embedUrl={`https://fast.wistia.net/embed/iframe/${linkVideo}?mute=true&playerColor=000000${
                   isModalHeroOpen ? '&autoPlay=true' : '&play=false'
                 }`}
-                className="w-full"
+                className="w-full block md:hidden"
               />
             }
           />

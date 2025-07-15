@@ -15,7 +15,7 @@ import { denormalisedResponseEntities } from '@services/data';
 import { firestore } from '@services/firebase';
 import { getIntegrationSdk } from '@services/sdk';
 import type { FoodListing, MemberOrderValue, UserListing } from '@src/types';
-import { EImageVariants, EOrderStates } from '@src/utils/enums';
+import { EImageVariants, EListingType, EOrderStates } from '@src/utils/enums';
 import type { TObject } from '@src/utils/types';
 
 // ==================== CONSTANTS ====================
@@ -166,26 +166,42 @@ const findActiveOrder = async (
   context: ScanContext,
   integrationSdk: any,
 ): Promise<ScanContext> => {
-  // Find active order
-  const orderParticipantsRes = await integrationSdk.listings.query({
+  const { currentUserId, timestampNum } = context;
+
+  const queryOrders = async (params: Record<string, any>) => {
+    const response = await integrationSdk.listings.query(params);
+
+    return denormalisedResponseEntities(response) || [];
+  };
+
+  const participantOrders = await queryOrders({
     meta_listingType: 'order',
-    meta_participants: `has_any:${context.currentUserId}`,
+    meta_participants: `has_any:${currentUserId}`,
     meta_orderState: EOrderStates.inProgress,
   });
 
-  const orderParticipants = denormalisedResponseEntities(orderParticipantsRes);
-  const activeOrder = orderParticipants.find((order: TObject) => {
-    const { startDate, endDate } = order?.attributes?.metadata || {};
+  let allOrders = participantOrders;
 
-    return startDate <= context.timestampNum && context.timestampNum <= endDate;
-  });
-
-  if (!activeOrder?.attributes?.metadata?.plans?.[0]) {
-    throw new APIError(ERROR_MESSAGES.ACTIVE_ORDER_NOT_FOUND);
+  if (participantOrders?.length === 0) {
+    allOrders = await queryOrders({
+      meta_listingType: EListingType.order,
+      meta_anonymous: `has_any:${currentUserId}`,
+      meta_orderState: EOrderStates.inProgress,
+    });
   }
 
-  const planId = activeOrder.attributes.metadata.plans[0];
-  const orderId = activeOrder.id.uuid;
+  const activeOrder = allOrders.find((order: TObject) => {
+    const { startDate, endDate } = order?.attributes?.metadata || {};
+
+    return startDate <= timestampNum && timestampNum <= endDate;
+  });
+
+  const planId = activeOrder?.attributes?.metadata?.plans?.[0];
+  const orderId = activeOrder?.id?.uuid;
+
+  if (!planId || !orderId) {
+    throw new APIError(ERROR_MESSAGES.ACTIVE_ORDER_NOT_FOUND);
+  }
 
   return { ...context, planId, orderId };
 };
@@ -193,9 +209,11 @@ const findActiveOrder = async (
 const checkDuplicateScan = async ({
   memberId,
   planId,
+  timestamp,
 }: {
   memberId: string;
   planId: string;
+  timestamp: number;
 }): Promise<void> => {
   const scannedRecordRef = collection(
     firestore,
@@ -205,6 +223,7 @@ const checkDuplicateScan = async ({
   const filters = [
     where('memberId', '==', memberId),
     where('planId', '==', planId),
+    where('timestamp', '==', timestamp),
   ];
 
   const q = query(scannedRecordRef, ...filters);
@@ -226,6 +245,7 @@ const validateBarcodeAndGetMemberOrder = async (
   const planListingResponse = await integrationSdk.listings.show({
     id: context.planId,
   });
+
   const planListing = planListingResponse.data.data;
 
   if (!planListing) {
@@ -239,6 +259,7 @@ const validateBarcodeAndGetMemberOrder = async (
 
   const memberOrder =
     orderDetail[context.timestamp]?.memberOrders?.[context.currentUserId];
+
   if (!memberOrder?.foodId) {
     throw new APIError(ERROR_MESSAGES.NO_FOOD_SELECTED);
   }
@@ -388,6 +409,7 @@ const processOptimizedScan = async (
     await checkDuplicateScan({
       memberId: context.currentUserId,
       planId: context.planId,
+      timestamp: context.timestampNum,
     });
 
     // Step 4: Validate barcode and get member order
