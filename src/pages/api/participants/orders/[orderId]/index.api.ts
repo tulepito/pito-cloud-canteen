@@ -71,7 +71,25 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
         // Get company data (user)
         const companyId = order?.attributes.metadata?.companyId || '';
-        const company = await fetchUser(companyId);
+        const companyRes = await fetchUser(companyId);
+
+        // Remove username and password from privateData
+        const privateData = { ...companyRes?.attributes?.profile?.privateData };
+        delete privateData?.username;
+        delete privateData?.password;
+
+        const companyProfile = {
+          ...companyRes?.attributes?.profile,
+          privateData,
+        };
+
+        const company = {
+          ...companyRes,
+          attributes: {
+            ...companyRes?.attributes,
+            profile: companyProfile,
+          },
+        };
 
         // Get list sub-order (plan)
         const planIds = order?.attributes.metadata?.plans || [];
