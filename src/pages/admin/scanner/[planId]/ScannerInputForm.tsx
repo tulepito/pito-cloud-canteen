@@ -1,21 +1,30 @@
 'use client';
 
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import {
   PiCallBell,
   PiCaretDown,
   PiCheckCircle,
+  PiCheckCircleFill,
   PiClock,
   PiMagnifyingGlass,
   PiMagnifyingGlassLight,
   PiPackage,
 } from 'react-icons/pi';
 import { toast } from 'react-toastify';
+import clsx from 'clsx';
 import { collection, onSnapshot, query, where } from 'firebase/firestore';
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/router';
 import QRCode from 'qrcode';
+import * as XLSX from 'xlsx';
 
 import { scanApi } from '@apis/scanner';
 import { isJoinedPlan } from '@helpers/order/orderPickingHelper';
@@ -32,7 +41,6 @@ import type { TObject, TUser } from '@src/utils/types';
 
 import { LoadingWrapper } from './LoadingWrapper';
 
-// Utility functions
 const prepareDataGroups = ({
   orderDetailPerDate = {},
   participantDataMap = {},
@@ -41,8 +49,8 @@ const prepareDataGroups = ({
   orderDetailPerDate: TObject;
   participantDataMap: Record<string, { name: string; email: string }>;
   group: { id: string; members?: { id: string }[] };
-}): { name: string; email: string; memberId: string }[] => {
-  const { memberOrders = {} } = orderDetailPerDate;
+}): { name: string; email: string; memberId: string; foodName: string }[] => {
+  const { memberOrders = {}, restaurant = {} } = orderDetailPerDate;
   const memberIds = group?.members?.map((m) => m.id) ?? [];
 
   return memberIds.reduce((results, memberId) => {
@@ -58,11 +66,12 @@ const prepareDataGroups = ({
         name: participant.name,
         email: participant.email,
         memberId,
+        foodName: restaurant?.foodList?.[memberOrder?.foodId]?.foodName || '',
       });
     }
 
     return results;
-  }, [] as { name: string; email: string; memberId: string }[]);
+  }, [] as { name: string; email: string; memberId: string; foodName: string }[]);
 };
 
 export function removeVietnameseTones(str: string): string {
@@ -87,11 +96,11 @@ const getTimestampAndGroupId = (queryParam: string | string[] | undefined) => {
   return { timestamp: queryParam, groupId: undefined };
 };
 
-// Types
 interface IParticipant {
   name: string;
   memberId: string;
   email: string;
+  hasScan?: boolean;
 }
 
 interface ScannerInputFormProps {
@@ -105,7 +114,6 @@ export function ScannerInputForm({
   handleSearchInputChange,
   resetSearchInput,
 }: ScannerInputFormProps) {
-  // States
   const [memberId, setMemberId] = useState('');
   const [searchInput, setSearchInput] = useState(searchValue);
   const [qrUrl, setQrUrl] = useState('');
@@ -115,13 +123,13 @@ export function ScannerInputForm({
   const [totalBarcodes, setTotalBarcodes] = useState<FirebaseScannedRecord[]>(
     [],
   );
+  const [isExporting, setIsExporting] = useState(false);
+  const [isExportingComplete, setIsExportingComplete] = useState(false);
 
-  // Refs
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const hasLoadedRef = useRef(false);
 
-  // Router and Redux
   const router = useRouter();
   const searchParams = useSearchParams();
   const dispatch = useAppDispatch();
@@ -137,26 +145,21 @@ export function ScannerInputForm({
     fetchOrderInProgress,
   } = useAppSelector((state) => state.scanner);
 
-  console.log({
-    participantData,
-  });
-
   // Memoized values
   const { orderId } = planListing?.attributes?.metadata || {};
   const orderDetail = useMemo(
     () => planListing?.attributes?.metadata?.orderDetail || {},
     [planListing],
   );
-
   const groups = useMemo(
     () => company?.attributes?.profile?.metadata?.groups || [],
     [company],
   );
-
   const group = useMemo(() => {
     return groups.find((g: TObject) => g.id === groupId) || {};
   }, [groups, groupId]);
 
+  // Memoized participant data list
   const participantDataList = useMemo(() => {
     const mapUserToParticipant = (p: TUser) => ({
       id: p.id.uuid,
@@ -175,6 +178,7 @@ export function ScannerInputForm({
     );
   }, [participantData, anonymousParticipantData]);
 
+  // Memoized participant data map
   const participantDataMap = useMemo(
     () =>
       participantDataList.reduce((res: TObject, curr: TObject) => {
@@ -183,6 +187,7 @@ export function ScannerInputForm({
     [participantDataList],
   );
 
+  // Memoized groups data preparation
   const preparedGroupsData = useMemo(() => {
     if (
       !orderDetail ||
@@ -228,11 +233,13 @@ export function ScannerInputForm({
     }
   };
 
+  // Handler for form submission
   const handleSubmit = async (e?: React.FormEvent<HTMLFormElement>) => {
     if (e) e.preventDefault();
     await performSubmit(memberId);
   };
 
+  // Handler for icon click to toggle popup
   const handleIconClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -245,12 +252,14 @@ export function ScannerInputForm({
     }
   };
 
+  // Handler for participant selection
   const handleParticipantSelect = async (participant: IParticipant) => {
     setMemberId(participant.memberId);
     setShowPopup(false);
     await performSubmit(participant.memberId);
   };
 
+  // Handler for form submission with empty check
   const handleSubmitInput = async (e?: React.FormEvent<HTMLFormElement>) => {
     if (e) e.preventDefault();
 
@@ -278,7 +287,6 @@ export function ScannerInputForm({
   };
 
   // Statistics calculations
-
   const offlinePortions = useMemo(() => {
     if (!Array.isArray(totalBarcodes)) return 0;
     const count = totalBarcodes.filter(
@@ -300,14 +308,105 @@ export function ScannerInputForm({
     return Math.max(0, remaining);
   }, [offlinePortions, totalPortions]);
 
-  // Effects
+  // Exports file xlsx
+  const handleExportRemainingMeals = useCallback(() => {
+    if (!planId || !timestamp) {
+      toast.error('Không thể xuất dữ liệu, vui lòng thử lại sau.', {
+        position: 'top-right',
+      });
+
+      return;
+    }
+
+    setIsExporting(true);
+
+    try {
+      const preDataExport = preparedGroupsData.filter((participant) => {
+        const hasLiveBarcode = totalBarcodes.find(
+          (barcodeItem) => barcodeItem.memberId === participant.memberId,
+        );
+
+        if (hasLiveBarcode) {
+          return hasLiveBarcode?.state === 'live';
+        }
+
+        return !hasLiveBarcode;
+      });
+
+      const dataToExport = preDataExport.map((participant) => ({
+        Tên: participant.name,
+        Email: participant.email,
+        'Món ăn': participant.foodName,
+      }));
+
+      const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Danh sách món ăn');
+
+      const fileName = `danh_sach_thanh_vien_chua_chon_mon_${formatTimestamp(
+        +timestamp!,
+      )}.xlsx`;
+
+      XLSX.writeFile(workbook, fileName);
+    } catch (error) {
+      toast.error('Xuất dữ liệu thất bại. Vui lòng thử lại.');
+    } finally {
+      setIsExporting(false);
+    }
+  }, [planId, timestamp, preparedGroupsData, totalBarcodes]);
+
+  // Exports file xlsx
+  const handleExportCompleteMeals = useCallback(() => {
+    if (!planId || !timestamp) {
+      toast.error('Không thể xuất dữ liệu, vui lòng thử lại sau.', {
+        position: 'top-right',
+      });
+
+      return;
+    }
+
+    setIsExportingComplete(true);
+
+    try {
+      const preDataExport = preparedGroupsData.filter((participant) =>
+        totalBarcodes.find(
+          (barcodeItem) =>
+            barcodeItem.memberId === participant.memberId &&
+            barcodeItem.state === 'offline',
+        ),
+      );
+
+      const dataToExport = preDataExport.map((participant) => ({
+        Tên: participant.name,
+        Email: participant.email,
+        'Món ăn': participant.foodName,
+      }));
+
+      const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Danh sách món ăn');
+
+      const fileName = `danh_sach_thanh_vien_da_lay_mon_an_${formatTimestamp(
+        +timestamp!,
+      )}.xlsx`;
+
+      XLSX.writeFile(workbook, fileName);
+    } catch (error) {
+      toast.error('Xuất dữ liệu thất bại. Vui lòng thử lại.');
+    } finally {
+      setIsExportingComplete(false);
+    }
+  }, [planId, timestamp, preparedGroupsData, totalBarcodes]);
+
+  // Firebase listener for barcodes
   useEffect(() => {
     if (orderId && !hasLoadedRef.current) {
       hasLoadedRef.current = true;
       dispatch(ScannerThunks.loadData({ orderId }));
     }
-  }, [orderId, dispatch]);
+  }, [orderId, dispatch, preparedGroupsData, totalBarcodes]);
 
+  // Sync search input with parent component
   useEffect(() => {
     if (searchValue) {
       setSearchInput(searchValue);
@@ -386,11 +485,18 @@ export function ScannerInputForm({
     const searchTerm = removeVietnameseTones(memberId.trim().toLowerCase());
 
     const transformedData: IParticipant[] = preparedGroupsData.map(
-      ({ name, email, memberId: memberIdValue }) => ({
-        name,
-        email,
-        memberId: memberIdValue,
-      }),
+      ({ name, email, memberId: memberIdValue }) => {
+        const hasScan = totalBarcodes.some(
+          (item) => item.memberId === memberIdValue,
+        );
+
+        return {
+          name,
+          email,
+          memberId: memberIdValue,
+          hasScan,
+        };
+      },
     );
 
     if (searchTerm) {
@@ -404,7 +510,7 @@ export function ScannerInputForm({
     } else {
       setSearchResults(transformedData);
     }
-  }, [memberId, preparedGroupsData]);
+  }, [memberId, preparedGroupsData, totalBarcodes]);
 
   // Close popup when clicking outside
   useEffect(() => {
@@ -452,7 +558,14 @@ export function ScannerInputForm({
           </div>
 
           <div className="flex flex-col md:flex-row gap-2 md:gap-6 items-center justify-start md:justify-center">
-            <div className="flex items-center gap-2">
+            <div
+              className={clsx(
+                'flex items-center gap-2 cursor-pointer transition-opacity duration-200',
+                isExportingComplete && 'opacity-50 pointer-events-none',
+              )}
+              onClick={
+                !isExportingComplete ? handleExportCompleteMeals : undefined
+              }>
               <PiCheckCircle className="size-5 md:w-6 md:h-6 text-green-600" />
               <span className="text-lg md:text-2xl text-gray-600">
                 Đã phát:
@@ -462,7 +575,12 @@ export function ScannerInputForm({
               </span>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div
+              className={clsx(
+                'flex items-center gap-2 cursor-pointer transition-opacity duration-200',
+                isExporting && 'opacity-50 pointer-events-none',
+              )}
+              onClick={!isExporting ? handleExportRemainingMeals : undefined}>
               <PiClock className="size-5 md:w-6 md:h-6 text-orange-600" />
               <span className="text-lg md:text-2xl text-gray-600">
                 Còn lại:
@@ -559,6 +677,12 @@ export function ScannerInputForm({
                                 Email: {participant.email}
                               </div>
                             </div>
+                            {participant.hasScan && (
+                              <PiCheckCircleFill
+                                className="text-green-500"
+                                size={24}
+                              />
+                            )}
                           </div>
                         </div>
                       ))}

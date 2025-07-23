@@ -38,13 +38,7 @@ const QRCodePage = () => {
   const isAdmin = !!currentUser?.attributes?.profile?.metadata?.isAdmin;
   const isParticipant = currentUser ? isUserAParticipant(currentUser) : false;
 
-  const now = new Date();
-  const timestamp = new Date(now.getFullYear(), now.getMonth(), now.getDate())
-    .getTime()
-    .toString();
-
   useEffect(() => {
-    // Chỉ gọi API 1 lần khi đã có currentUserId và không phải admin
     if (
       !currentUserId ||
       typeof isAdmin !== 'boolean' ||
@@ -62,6 +56,15 @@ const QRCodePage = () => {
     hasCalledRef.current = true;
 
     const fetchData = async () => {
+      const now = new Date();
+      const timestamp = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate(),
+      )
+        .getTime()
+        .toString();
+
       try {
         await scanQRCodeForParticipantApi({
           groupId,
@@ -85,7 +88,7 @@ const QRCodePage = () => {
     };
 
     fetchData();
-  }, [currentUserId, groupId, isAdmin, router, timestamp, screen]);
+  }, [currentUserId, groupId, isAdmin, router, screen]);
 
   useEffect(() => {
     if (isSuccess || isAlreadyScanned || errorMessage) {

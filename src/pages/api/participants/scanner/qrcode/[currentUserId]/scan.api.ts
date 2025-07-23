@@ -373,7 +373,7 @@ const createScannedRecord = async (
 
     // return record;
 
-    const recordId = `${context.planId}_${context.currentUserId}_${context.timestamp}`;
+    const recordId = `${context.planId}_${context.currentUserId}_${context.timestampNum}`;
 
     const scannedRecordRef = doc(
       firestore,

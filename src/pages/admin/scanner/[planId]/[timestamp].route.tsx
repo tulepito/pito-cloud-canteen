@@ -9,6 +9,8 @@ import { ScannerUserList } from './ScannerUserList';
 function ScannerPage() {
   const [searchInput, setSearchInput] = React.useState('');
 
+  const deferredSearchInput = React.useDeferredValue(searchInput);
+
   const resetSearchInput = () => {
     if (!searchInput) return;
     setSearchInput('');
@@ -27,7 +29,7 @@ function ScannerPage() {
           handleSearchInputChange={handleSearchInputChange}
         />
         <ScannerUserList
-          searchValue={searchInput}
+          searchValue={deferredSearchInput}
           resetSearchInput={resetSearchInput}
         />
       </div>

@@ -1,11 +1,4 @@
-import {
-  addDoc,
-  collection,
-  getDocs,
-  query,
-  updateDoc,
-  where,
-} from 'firebase/firestore';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HttpMethod } from '@apis/configs';
@@ -117,54 +110,70 @@ export default async function handler(
 
       const foodListing = foodListingResponse;
 
-      const scannedRecordRef = collection(
+      const recordId = `${planId}_${memberId}_${+timestamp}`;
+
+      const scannedRecordRef = doc(
         firestore,
-        process.env.NEXT_PUBLIC_FIREBASE_SCANNED_RECORDS_COLLECTION_NAME,
+        process.env.NEXT_PUBLIC_FIREBASE_SCANNED_RECORDS_COLLECTION_NAME!,
+        recordId,
       );
 
-      const filters = [
-        where('memberId', '==', memberId),
-        where('planId', '==', planId),
-      ];
+      const now = Date.now();
 
-      const q = query(scannedRecordRef, ...filters);
-      const querySnapshot = await getDocs(q);
-      const _record = {
-        planId,
-        timestamp: +timestamp,
-        memberId,
-        memberProfileImageUrl:
-          memberListing.profileImage?.attributes?.variants?.['square-small']
-            ?.url || '',
-        memberAbbrName:
-          memberListing.attributes?.profile?.abbreviatedName || '',
-        memberName: buildFullName(
-          memberListing.attributes?.profile?.firstName,
-          memberListing.attributes?.profile?.lastName,
+      const docSnapshot = await getDoc(scannedRecordRef);
+
+      let _record: Omit<FirebaseScannedRecord, 'id'>;
+
+      if (docSnapshot.exists()) {
+        const existing = docSnapshot.data() as FirebaseScannedRecord;
+
+        await setDoc(
+          scannedRecordRef,
           {
-            compareToGetLongerWith:
-              memberListing.attributes?.profile?.displayName,
+            state: 'live',
+            scannedAt: now,
           },
-        ),
-        foodName: foodListing.attributes?.title!,
-        foodThumbnailUrl:
-          foodListingResponse.images?.[0]?.attributes?.variants?.[
-            'square-small'
-          ]?.url || '',
-        state: 'live',
-        scannedAt: Date.now(),
-        ...(matchedBarcodeMemberOrder?.requirement && {
-          note: matchedBarcodeMemberOrder?.requirement,
-        }),
-        ...(groupId && { groupId }),
-        ...(screen && { screen }),
-      } satisfies Omit<FirebaseScannedRecord, 'id'>;
+          { merge: true },
+        );
 
-      if (querySnapshot.empty) {
-        await addDoc(scannedRecordRef, _record);
+        _record = {
+          ...existing,
+          state: 'live',
+          scannedAt: now,
+        };
       } else {
-        const docRef = querySnapshot.docs[0].ref;
-        await updateDoc(docRef, _record);
+        _record = {
+          planId,
+          timestamp: +timestamp,
+          memberId,
+          memberProfileImageUrl:
+            memberListing.profileImage?.attributes?.variants?.['square-small']
+              ?.url || '',
+          memberAbbrName:
+            memberListing.attributes?.profile?.abbreviatedName || '',
+          memberName: buildFullName(
+            memberListing.attributes?.profile?.firstName,
+            memberListing.attributes?.profile?.lastName,
+            {
+              compareToGetLongerWith:
+                memberListing.attributes?.profile?.displayName,
+            },
+          ),
+          foodName: foodListing.attributes?.title!,
+          foodThumbnailUrl:
+            foodListingResponse.images?.[0]?.attributes?.variants?.[
+              'square-small'
+            ]?.url || '',
+          state: 'live',
+          scannedAt: now,
+          ...(matchedBarcodeMemberOrder?.requirement && {
+            note: matchedBarcodeMemberOrder?.requirement,
+          }),
+          ...(groupId && { groupId }),
+          ...(screen && { screen }),
+        };
+
+        await setDoc(scannedRecordRef, _record);
       }
 
       return res.status(200).json(_record);
