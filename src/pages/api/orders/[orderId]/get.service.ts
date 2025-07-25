@@ -11,6 +11,28 @@ import { denormalisedResponseEntities, Listing } from '@utils/data';
 import type { TPlan } from '@utils/orderTypes';
 import type { TListing, TObject } from '@utils/types';
 
+const cleanPrivateData = (user: TObject) => {
+  if (!user || typeof user !== 'object') return user;
+
+  const attributes = user.attributes || {};
+  const profile = attributes.profile || {};
+  const originalPrivateData = profile.privateData || {};
+
+  // eslint-disable-next-line unused-imports/no-unused-vars
+  const { password, username, ...safePrivateData } = originalPrivateData;
+
+  return {
+    ...user,
+    attributes: {
+      ...attributes,
+      profile: {
+        ...profile,
+        privateData: safePrivateData,
+      },
+    },
+  };
+};
+
 const getOrder = async ({ orderId }: { orderId: string }) => {
   const integrationSdk = getIntegrationSdk();
 
@@ -44,7 +66,7 @@ const getOrder = async ({ orderId }: { orderId: string }) => {
         );
       }),
     ),
-  );
+  ).map((item) => cleanPrivateData(item));
 
   const anonymousParticipantData = flatten(
     await Promise.all(
@@ -58,7 +80,7 @@ const getOrder = async ({ orderId }: { orderId: string }) => {
         );
       }),
     ),
-  );
+  ).map((item) => cleanPrivateData(item));
 
   data = { ...data, participantData, anonymousParticipantData };
 

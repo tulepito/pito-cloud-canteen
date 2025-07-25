@@ -49,8 +49,6 @@ const SubOrderSummary: React.FC<TSubOrderSummaryProps> = ({
   const isGroupOrder = orderType === EOrderType.group;
   const allowToQRCode = !!planGetter.getMetadata().allowToQRCode;
 
-  console.log({ allowToQRCode });
-
   const [data] = groupFoodOrderByDate({
     isGroupOrder,
     orderDetail,

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import {
   collection,
   doc,
+  getDoc,
   onSnapshot,
   query,
   updateDoc,
@@ -151,17 +152,25 @@ export const ScannerUserList = ({
                   )}
                   state={barcode.state}
                   note={barcode?.note}
-                  onClick={() => {
+                  onClick={async () => {
                     const scannedRecordRef = doc(
                       firestore,
                       process.env
-                        .NEXT_PUBLIC_FIREBASE_SCANNED_RECORDS_COLLECTION_NAME,
+                        .NEXT_PUBLIC_FIREBASE_SCANNED_RECORDS_COLLECTION_NAME!,
                       barcode.id,
                     );
 
-                    updateDoc(scannedRecordRef, {
-                      state: barcode.state === 'live' ? 'offline' : 'live',
-                    });
+                    try {
+                      const docSnap = await getDoc(scannedRecordRef);
+
+                      if (docSnap.exists()) {
+                        await updateDoc(scannedRecordRef, {
+                          state: barcode.state === 'live' ? 'offline' : 'live',
+                        });
+                      }
+                    } catch (error) {
+                      console.error('Error updating document:', error);
+                    }
 
                     resetSearchInput();
                   }}

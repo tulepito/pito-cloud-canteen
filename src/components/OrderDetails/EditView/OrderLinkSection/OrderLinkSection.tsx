@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import classNames from 'classnames';
 
@@ -17,10 +17,10 @@ import {
   orderDetailsAnyActionsInProgress,
   orderManagementThunks,
 } from '@redux/slices/OrderManagement.slice';
-import type { OrderListing } from '@src/types';
+import type { OrderListing, PlanListing } from '@src/types';
 import { Listing } from '@src/utils/data';
 import { EOrderStates } from '@src/utils/enums';
-import type { TDefaultProps, TListing } from '@utils/types';
+import type { TDefaultProps, TListing, TObject } from '@utils/types';
 
 import type { TSendNotificationFormValues } from './SendNotificationForm';
 import SendNotificationModal from './SendNotificationModal';
@@ -55,6 +55,29 @@ const OrderLinkSection: React.FC<TOrderLinkSectionProps> = (props) => {
   const orderData: OrderListing = useAppSelector(
     (state) => state.OrderManagement.orderData,
   );
+
+  const planData: PlanListing = useAppSelector(
+    (state) => state.OrderManagement.planData,
+  );
+
+  const emptyItems = useMemo(() => {
+    const memberOrdersData = Object.values(
+      planData?.attributes?.metadata?.orderDetail || {},
+    )?.map((item) => item?.memberOrders);
+
+    const result: TObject = {};
+
+    memberOrdersData?.forEach((group) => {
+      Object.entries(group || {}).forEach(([key, value]) => {
+        if (value?.status === 'empty' || value?.status === 'expired') {
+          result[key] = value;
+        }
+      });
+    });
+
+    return result;
+  }, [planData?.attributes?.metadata?.orderDetail]);
+
   const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
 
   const isPicking =
@@ -106,6 +129,7 @@ const OrderLinkSection: React.FC<TOrderLinkSectionProps> = (props) => {
         description: values.description,
         orderId: orderData?.id?.uuid,
         planId: orderData?.attributes?.metadata?.plans[0],
+        uniqueMemberIdList: Object.keys(emptyItems),
       }),
     );
   };

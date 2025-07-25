@@ -390,16 +390,17 @@ const updateOrderGeneralInfo = createAsyncThunk(
 const sendRemindEmailToMember = createAsyncThunk(
   'app/OrderManagement/SEND_REMIND_EMAIL_TO_MEMBER',
   async (
-    params: Pick<POSTRemindMemberBody, 'description'> & {
+    params: Pick<POSTRemindMemberBody, 'description' | 'uniqueMemberIdList'> & {
       orderId: string;
       planId: string;
     },
   ) => {
-    const { description, orderId, planId } = params;
+    const { description, orderId, planId, uniqueMemberIdList } = params;
 
     await sendRemindEmailToMemberApi(orderId, {
       description,
       planId,
+      ...(uniqueMemberIdList && { uniqueMemberIdList }),
     });
   },
 );
