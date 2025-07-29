@@ -1208,10 +1208,9 @@ const OrderManagementSlice = createSlice({
         orderData,
       } = state;
 
-      const {
-        orderDetail: defaultOrderDetail = {},
-        orderDetailStartedSnapshot,
-      } = Listing(planData as TListing).getMetadata();
+      const { orderDetail: defaultOrderDetail = {} } = Listing(
+        planData as TListing,
+      ).getMetadata();
 
       const { foodId: defaultFoodId } =
         defaultOrderDetail[currentViewDate].memberOrders[memberId] || {};
@@ -1235,7 +1234,7 @@ const OrderManagementSlice = createSlice({
         checkMinMaxQuantityInProgressState(
           orderData,
           newOrderDetail,
-          orderDetailStartedSnapshot,
+          defaultOrderDetail,
           isAdminFlow,
         );
       const { planValidationsInProgressState } =
@@ -1357,10 +1356,9 @@ const OrderManagementSlice = createSlice({
         isAdminFlow = false,
       } = payload;
       const { draftOrderDetail, planData, orderData } = state;
-      const {
-        orderDetail: defaultOrderDetail = {},
-        orderDetailStartedSnapshot,
-      } = Listing(planData as TListing).getMetadata();
+      const { orderDetail: defaultOrderDetail = {} } = Listing(
+        planData as TListing,
+      ).getMetadata();
 
       const { status: defaultStatus } =
         defaultOrderDetail[currentViewDate].memberOrders[memberId] || {};
@@ -1398,7 +1396,7 @@ const OrderManagementSlice = createSlice({
         checkMinMaxQuantityInProgressState(
           orderData,
           newOrderDetail,
-          orderDetailStartedSnapshot,
+          defaultOrderDetail,
           isAdminFlow,
         );
       const { planValidationsInProgressState } =
@@ -1507,14 +1505,13 @@ const OrderManagementSlice = createSlice({
       const { planData, orderData } = state;
       const planDataGetter = Listing(planData as TListing);
 
-      const { orderDetail = {}, orderDetailStartedSnapshot } =
-        planDataGetter.getMetadata();
+      const { orderDetail = {} } = planDataGetter.getMetadata();
 
       const orderValidationsInProgressState =
         checkMinMaxQuantityInProgressState(
           orderData,
           newOrderDetail,
-          orderDetailStartedSnapshot,
+          orderDetail,
           isAdminFlow,
         );
       const { planValidationsInProgressState } =
@@ -1778,14 +1775,13 @@ const OrderManagementSlice = createSlice({
             ...restPayload
           } = payload;
 
-          const { orderDetail = {}, orderDetailStartedSnapshot } =
-            Listing(planData).getMetadata();
+          const { orderDetail = {} } = Listing(planData).getMetadata();
 
           const orderValidationsInProgressState =
             checkMinMaxQuantityInProgressState(
               orderData,
               orderDetail,
-              orderDetailStartedSnapshot,
+              {},
               isAdminFlow,
             );
 

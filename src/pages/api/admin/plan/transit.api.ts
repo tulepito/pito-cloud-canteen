@@ -22,6 +22,7 @@ import { createFirebaseDocNotification } from '@services/notifications';
 import adminChecker from '@services/permissionChecker/admin';
 import { getIntegrationSdk, handleError } from '@services/sdk';
 import { createSlackNotification } from '@services/slackNotification';
+import type { RatingListing } from '@src/types';
 import {
   denormalisedResponseEntities,
   Listing,
@@ -30,6 +31,7 @@ import {
 import { VNTimezone } from '@src/utils/dates';
 import {
   EBookerNativeNotificationType,
+  EListingType,
   ENativeNotificationType,
   ENotificationType,
   EQuotationStatus,
@@ -130,6 +132,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           orderId,
           anonymous = [],
         } = txGetter.getMetadata();
+
         const { booking, listing } = txGetter.getFullData();
         const listingGetter = Listing(listing);
         const restaurantId = listingGetter.getId();
@@ -158,6 +161,22 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         const plan = await fetchListing(plans[0]);
         const planListing = Listing(plan);
         const planId = planListing.getId();
+
+        const reviews: RatingListing[] = denormalisedResponseEntities(
+          await integrationSdk.listings.query({
+            meta_listingType: EListingType.rating,
+            meta_orderId: orderId,
+            meta_timestamp: timestamp,
+          }),
+        );
+
+        const reviewerIds = new Set(
+          reviews.map((review) => review.attributes?.metadata?.reviewerId),
+        );
+
+        const participantNotReviewIds = participantIds.filter(
+          (participant: string) => !reviewerIds.has(participant),
+        );
 
         const booker = await fetchUser(bookerId);
 
@@ -234,7 +253,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
             createFoodRatingNotificationSchedulerWhenOrderComplete({
               orderId,
-              participantIds,
+              participantIds: participantNotReviewIds,
               subOrderDate: timestamp,
               planId,
             });

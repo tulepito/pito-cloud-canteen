@@ -19,7 +19,8 @@ import {
 } from '@services/nativeNotification';
 import { createFirebaseDocNotification } from '@services/notifications';
 import { getIntegrationSdk, handleError } from '@services/sdk';
-import { Listing, User } from '@src/utils/data';
+import type { RatingListing } from '@src/types';
+import { denormalisedResponseEntities, Listing, User } from '@src/utils/data';
 import { VNTimezone } from '@src/utils/dates';
 import {
   EBookerNativeNotificationType,
@@ -281,6 +282,24 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
                   );
                 }
                 if (transition === ETransition.COMPLETE_DELIVERY) {
+                  const reviews: RatingListing[] = denormalisedResponseEntities(
+                    await integrationSdk.listings.query({
+                      meta_listingType: EListingType.rating,
+                      meta_orderId: orderId,
+                      meta_timestamp: subOrderDate,
+                    }),
+                  );
+
+                  const reviewerIds = new Set(
+                    reviews.map(
+                      (review) => review.attributes?.metadata?.reviewerId,
+                    ),
+                  );
+
+                  const participantNotReviewIds = participantIds.filter(
+                    (participant: string) => !reviewerIds.has(participant),
+                  );
+
                   [...participantIds, ...anonymous].map(
                     async (participantId: string) => {
                       createFirebaseDocNotification(
@@ -311,7 +330,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
                   createFoodRatingNotificationSchedulerWhenOrderComplete({
                     orderId,
-                    participantIds,
+                    participantIds: participantNotReviewIds,
                     subOrderDate: Number(subOrderDate),
                     planId,
                   });

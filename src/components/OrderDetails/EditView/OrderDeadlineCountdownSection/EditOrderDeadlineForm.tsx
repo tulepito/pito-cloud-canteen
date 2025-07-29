@@ -44,7 +44,7 @@ const EditOrderDeadlineFormComponent: React.FC<
   const maxSelectedDate = DateTime.fromMillis(startDate!)
     .minus({ day: 2 })
     .toJSDate();
-  const buttonDisabled = today.getTime() >= values.deadlineDate;
+  const buttonDisabled = !isAdminFlow && today.getTime() >= values.deadlineDate;
   const submitDisabled = pristine;
 
   const handleDeadlineDateChange = (date: number) => {

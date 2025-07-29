@@ -19,6 +19,11 @@ const Hero = () => {
   const intl = useIntl();
   const { setIsModalOpen } = useModal();
   const [linkVideo, setLinkVideo] = useState('');
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   useEffect(() => {
     // Set the video link based on the current locale
@@ -67,7 +72,7 @@ const Hero = () => {
               </a>
             </div>
           </div>
-          {width <= 768 && (
+          {isClient && width <= 768 && (
             <VideoSection
               embedUrl={`https://fast.wistia.net/embed/iframe/${linkVideo}?autoPlay=true&mute=true&playerColor=000000`}
               className="w-full hidden md:block"
