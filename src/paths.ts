@@ -8,6 +8,8 @@ export const generalPaths = {
   Home: '/',
 };
 
+export const publicPaths = ['/website', '/sitemap.xml', '/robots.txt'];
+
 export const enGeneralPaths = {
   SignIn: '/sign-in',
   SignUp: '/sign-up',

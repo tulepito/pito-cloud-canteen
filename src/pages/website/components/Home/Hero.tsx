@@ -47,9 +47,9 @@ const Hero = () => {
         <div className="flex md:flex-row md:px-0 flex-col justify-center items-center md:gap-12 gap-8 md:py-20 pt-10 md:h-[70vh]">
           {/* lhs */}
           <div className="flex flex-col md:items-start items-center md:text-left text-center md:gap-5 gap-2 md:w-1/2 pt-0">
-            <span className="text-text font-medium">
+            <h1 className="text-text font-medium">
               {intl.formatMessage({ id: 'the-lunch-management-platform' })}
-            </span>
+            </h1>
             <span className="font-semibold text-3xl md:text-[42px] font-[unbounded] md:leading-[3rem] md:whitespace-pre-line">
               {intl.formatMessage({
                 id: 'streamline-team-meals-simplify-your-workday',
@@ -88,6 +88,9 @@ const Hero = () => {
                 sizes="(max-width: 768px) 100vw, 40vw"
                 priority
                 loading="eager"
+                loader={(p) => {
+                  return p.src.replace('_next/static/media/', '');
+                }}
               />
               <PiPlayCircleThin
                 className={styles.fadeoutLoop}

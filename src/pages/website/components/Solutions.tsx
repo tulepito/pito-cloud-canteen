@@ -70,9 +70,9 @@ const Solutions = () => {
   return (
     <div className="md:py-16 md:px-4 px-5 pt-10 md:mt-0 flex gap-10 relative max-w-[1024px] mx-auto">
       <div className="md:w-1/2 flex flex-col md:items-start items-center">
-        <span className="font-alt font-semibold font-[unbounded] text-2xl md:text-[40px] leading-tight md:w-auto w-full md:text-start text-center md:whitespace-pre-line">
+        <h2 className="font-alt font-semibold font-[unbounded] text-2xl md:text-[40px] leading-tight md:w-auto w-full md:text-start text-center md:whitespace-pre-line">
           {intl.formatMessage({ id: 'solutions-for-every-team-size' })}
-        </span>
+        </h2>
         <div className="flex flex-col gap-5 w-full mt-5 relative">
           {solutionData.map((item, idx) => {
             const highlightText = item.title.replace(
@@ -84,7 +84,7 @@ const Solutions = () => {
               <div
                 key={idx}
                 className={`bg-white border ${item.borderColor} rounded-3xl flex flex-col gap-3 p-5`}>
-                <span
+                <h3
                   className="font-semibold text-lg"
                   dangerouslySetInnerHTML={{ __html: highlightText }}
                 />

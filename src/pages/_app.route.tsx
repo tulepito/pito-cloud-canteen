@@ -14,6 +14,7 @@ import { LoadingContainerImagePreloader } from '@components/LoadingContainer/Loa
 import ToastifyProvider from '@components/ToastifyProvider/ToastifyProvider';
 import UIProvider from '@components/UIProvider/UIProvider';
 import store from '@redux/store';
+import { publicPaths } from '@src/paths';
 import TranslationProvider, {
   DEFAULT_LOCALE,
 } from '@translations/TranslationProvider';
@@ -43,7 +44,7 @@ const MyApp = ({
 }: AppProps & AppCustomProps) => {
   const { pathname } = router;
 
-  const isPagePublic = pathname.includes('/website');
+  const isPagePublic = publicPaths.includes(pathname);
 
   return (
     <TranslationProvider lang={restProps.pageProps.lang}>
@@ -89,6 +90,23 @@ const MyApp = ({
       <Script id="gleap-script">
         {`!function(Gleap,t,i){if(!(Gleap=window.Gleap=window.Gleap||[]).invoked){for(window.GleapActions=[],Gleap.invoked=!0,Gleap.methods=["identify","setEnvironment","setTags","attachCustomData","setCustomData","removeCustomData","clearCustomData","registerCustomAction","trackEvent","log","preFillForm","showSurvey","sendSilentCrashReport","startFeedbackFlow","startBot","setAppBuildNumber","setAppVersionCode","setApiUrl","setFrameUrl","isOpened","open","close","on","setLanguage","setOfflineMode","initialize","disableConsoleLogOverwrite","logEvent","hide","enableShortcuts","showFeedbackButton","destroy","getIdentity","isUserIdentified","clearIdentity","openConversations","openConversation","openHelpCenterCollection","openHelpCenterArticle","openHelpCenter","searchHelpCenter","openNewsArticle","openNews","openFeatureRequests","isLiveMode"],Gleap.f=function(e){return function(){var t=Array.prototype.slice.call(arguments);window.GleapActions.push({e:e,a:t})}},t=0;t<Gleap.methods.length;t++)Gleap[i=Gleap.methods[t]]=Gleap.f(i);Gleap.load=function(){var t=document.getElementsByTagName("head")[0],i=document.createElement("script");i.type="text/javascript",i.async=!0,i.src="https://sdk.gleap.io/latest/index.js",t.appendChild(i)},Gleap.load(),Gleap.setLanguage("vi-VN"),Gleap.initialize("${process.env.NEXT_PUBLIC_GLEAP_SDK_KEY}"),Gleap.on("initialized",() =>{Gleap.hide()})}}();`}
       </Script>
+
+      {process.env.NEXT_PUBLIC_ENV === 'production' && (
+        <>
+          <Script
+            src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID}`}
+            strategy="afterInteractive"
+          />
+          <Script id="ga4-init" strategy="afterInteractive">
+            {`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', '${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID}');
+        `}
+          </Script>
+        </>
+      )}
     </TranslationProvider>
   );
 };

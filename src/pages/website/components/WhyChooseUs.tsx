@@ -79,9 +79,9 @@ const WhyChooseUs = () => {
       </div>
 
       <div className="flex flex-col gap-8 flex-1">
-        <span className="font-alt font-[unbounded] font-semibold text-2xl md:text-[40px] md:leading-[3rem] md:whitespace-pre-line">
+        <h2 className="font-alt font-[unbounded] font-semibold text-2xl md:text-[40px] md:leading-[3rem] md:whitespace-pre-line">
           {intl.formatMessage({ id: 'why-tech-leaders-choose-pito' })}
-        </span>
+        </h2>
 
         <div className="flex flex-col divide-y divide-gray-200">
           {faqs.map((faq, index) => {
@@ -92,7 +92,7 @@ const WhyChooseUs = () => {
                 <button
                   onClick={() => toggleFAQ(index)}
                   className="w-full text-left text-xl flex justify-between items-center font-semibold text-black focus:outline-none cursor-pointer">
-                  {faq.question}
+                  <h3>{faq.question}</h3>
                   <span className="text-[#A8A8A8] text-xl">
                     {isOpen ? <PiMinusBold /> : <PiPlusBold />}
                   </span>

@@ -25,6 +25,10 @@ export default function Document() {
           href="/static/icons/apple-touch-icon.png"
         />
         <meta name="apple-mobile-web-app-title" content="PITO Cloud Canteen" />
+        <meta
+          name="twitter:image"
+          content="https://in.pito.vn/wp-content/uploads/2024/11/thumbnail-pito-cloud-canteen.jpg"
+        />
         <link rel="manifest" href="/static/icons/site.webmanifest" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link

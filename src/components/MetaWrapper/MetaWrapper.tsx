@@ -21,6 +21,7 @@ const MetaWrapper: React.FC<TMetaWrapperProps> = ({
   titleId,
   description,
   descriptionId,
+  ...props
 }) => {
   const intl = useIntl();
 
@@ -45,6 +46,10 @@ const MetaWrapper: React.FC<TMetaWrapperProps> = ({
         intl.formatMessage({
           id: `${routeName}.description`,
         })),
+    'twitter:card': 'summary_large_image',
+    'twitter:title': title,
+    'twitter:description': description,
+    ...props,
   };
 
   return (

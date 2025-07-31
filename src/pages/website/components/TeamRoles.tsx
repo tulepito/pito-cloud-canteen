@@ -16,9 +16,9 @@ const TeamRoles = () => {
 
   return (
     <div className="pt-16 md:px-0 flex flex-col items-center gap-7 max-w-[1024px] mx-auto">
-      <span className="font-alt font-semibold font-[unbounded] text-2xl w-full text-center md:text-[40px] md:leading-[3rem] md:whitespace-pre-line">
+      <h2 className="font-alt font-semibold font-[unbounded] text-2xl w-full text-center md:text-[40px] md:leading-[3rem] md:whitespace-pre-line">
         {intl.formatMessage({ id: 'built-for-every-role-in-your-team' })}
-      </span>
+      </h2>
       <a
         href=""
         onClick={(e) => {
@@ -65,11 +65,11 @@ const TeamRoles = () => {
             </div>
           </div>
           <div className="border border-solid border-black/10 rounded-3xl bg-white p-5 pt-48 flex flex-col gap-3 -z-20 h-full">
-            <span className="font-semibold text-lg">
+            <h3 className="font-semibold text-lg">
               {intl.formatMessage({ id: 'for-hr' })} /{' '}
               {intl.formatMessage({ id: 'admins' })} /{' '}
               {intl.formatMessage({ id: 'office-managers' })}
-            </span>
+            </h3>
             <div className="flex flex-col gap-2 text-sm">
               <div className="flex gap-2">
                 <div className="size-3.5 shrink-0 mt-1 rounded-sm bg-[#C5D475]"></div>
@@ -129,10 +129,10 @@ const TeamRoles = () => {
             </div>
           </div>
           <div className="border border-black/10 rounded-3xl bg-white p-5 pt-48 flex flex-col gap-3 -z-20 h-full">
-            <span className="font-semibold text-lg">
+            <h3 className="font-semibold text-lg">
               {intl.formatMessage({ id: 'for-employees' })} /{' '}
               {intl.formatMessage({ id: 'participants' })}
-            </span>
+            </h3>
             <div className="flex flex-col gap-2 text-sm">
               <div className="flex gap-2">
                 <div className="size-3.5 shrink-0 mt-1 rounded-sm bg-[#F6AFCE]"></div>

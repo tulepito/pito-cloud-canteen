@@ -76,11 +76,11 @@ const TrustedCompanies = () => {
 
   return (
     <div className="mx-auto md:px-4 md:pb-20 px-5 pt-16 md:pt-0 flex flex-col md:gap-0 gap-5 items-center overflow-hidden">
-      <span className="w-full md:w-2/3 font-medium text-center text-lg whitespace-pre-line md:whitespace-normal">
+      <h3 className="w-full md:w-2/3 font-medium text-center text-lg whitespace-pre-line md:whitespace-normal">
         {intl.formatMessage({
           id: 'trusted-by-vietnams-leading-tech-companies',
         })}
-      </span>
+      </h3>
       <div className={clsx('flex select-none overflow-hidden', styles.marquee)}>
         {[...Array(2)].map((_, i) => (
           <div

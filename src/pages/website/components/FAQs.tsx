@@ -66,9 +66,9 @@ const FAQs = () => {
   return (
     <div className="px-5 md:px-40 py-16 flex flex-col items-center gap-10 relative">
       <div className="flex flex-col items-center md:gap-4 gap-3 md:w-[55%] text-center">
-        <span className="font-alt font-semibold font-[unbounded] text-2xl md:text-[40px] leading-tight">
+        <h2 className="font-alt font-semibold font-[unbounded] text-2xl md:text-[40px] leading-tight">
           {intl.formatMessage({ id: 'got-questions' })}
-        </span>
+        </h2>
         <span className="text-text md:whitespace-pre-line font-medium">
           {intl.formatMessage({
             id: 'have-a-question-about-our-service-or-billing-check-out-the-answers-below-if-you-still-need-help-our-team-is-just-a-message-away',
@@ -92,7 +92,7 @@ const FAQs = () => {
                   backgroundColor: isOpen ? '#000' : '#FAFAFA',
                   color: !isOpen ? '#000' : '#FAFAFA',
                 }}>
-                {faq.question}
+                <h3>{faq.question}</h3>
                 <span className="text-[#A8A8A8] text-xl">
                   {isOpen ? <PiMinusBold /> : <PiPlusBold />}
                 </span>

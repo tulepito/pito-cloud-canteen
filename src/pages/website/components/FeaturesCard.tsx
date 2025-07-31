@@ -21,11 +21,11 @@ const FeaturesCard = () => {
             id: 'reclaim-your-time-boost-team-satisfaction',
           })}
         </span>
-        <span className="font-alt text-2xl font-[unbounded] font-semibold md:text-[40px] text-center md:leading-[3rem] md:whitespace-pre-line">
+        <h2 className="font-alt text-2xl font-[unbounded] font-semibold md:text-[40px] text-center md:leading-[3rem] md:whitespace-pre-line">
           {intl.formatMessage({
             id: 'designed-for-hr-and-admin-professionals-in-tech',
           })}
-        </span>
+        </h2>
       </div>
 
       {/* Feature Cards */}
@@ -35,11 +35,11 @@ const FeaturesCard = () => {
           <div className="shrink-0 bg-[#F6AFCE]/30 text-[#D680A3] size-10 rounded-full flex items-center justify-center text-2xl">
             <PiHourglassMedium />
           </div>
-          <span className="font-medium md:text-lg">
+          <h3 className="font-medium md:text-lg">
             {intl.formatMessage({
               id: 'eliminate-endless-slack-messages-and-manual-spreadsheets',
             })}
-          </span>
+          </h3>
         </div>
 
         {/* Card 2 */}
@@ -47,11 +47,11 @@ const FeaturesCard = () => {
           <div className="shrink-0 bg-[#FFC811]/30 text-[#C79000] size-10 rounded-full flex items-center justify-center text-2xl">
             <PiUsersThreeLight />
           </div>
-          <span className="font-medium md:text-lg">
+          <h3 className="font-medium md:text-lg">
             {intl.formatMessage({
               id: 'flexible-meal-solutions-for-dynamic-fast-changing-teams',
             })}
-          </span>
+          </h3>
         </div>
 
         {/* Card 3 */}
@@ -59,11 +59,11 @@ const FeaturesCard = () => {
           <div className="shrink-0 bg-[#6CCFF6]/30 text-[#3598BF] size-10 rounded-full flex items-center justify-center text-2xl">
             <PiRobotLight />
           </div>
-          <span className="font-medium md:text-lg">
+          <h3 className="font-medium md:text-lg">
             {intl.formatMessage({
               id: 'intelligent-ordering-that-adapts-to-your-people-and-operations',
             })}
-          </span>
+          </h3>
         </div>
       </div>
 

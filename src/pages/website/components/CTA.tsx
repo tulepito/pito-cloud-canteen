@@ -16,15 +16,15 @@ const CTA = () => {
     <>
       <div className="flex flex-col gap-40 w-full items-center py-10 md:py-16">
         <div className="flex flex-col items-center gap-4 text-center md:w-1/2 px-5 md:px-0">
-          <span className="font-alt font-semibold font-[unbounded] text-2xl md:text-[40px] leading-tight">
+          <h2 className="font-alt font-semibold font-[unbounded] text-2xl md:text-[40px] leading-tight">
             {intl.formatMessage({ id: 'ready-to-revolutionize' })} <br />
             {intl.formatMessage({ id: 'your-teams-lunch-experience' })}
-          </span>
-          <span className="text-text md:whitespace-pre-line font-semibold">
+          </h2>
+          <h3 className="text-text md:whitespace-pre-line font-semibold">
             {intl.formatMessage({
               id: 'get-a-personalized-demo-of-the-platform-and-a-custom-solution-tailored-to-your-teams-size-and-budget-no-pressure-no-obligations-just-helpful-insights',
             })}
-          </span>
+          </h3>
           <div className="flex md:flex-row flex-col items-stretch md:items-center justify-center w-full px-5 gap-4 mt-5">
             <button
               onClick={() => setIsModalOpen(true)}
