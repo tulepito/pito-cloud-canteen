@@ -134,6 +134,8 @@ const SubOrderQrCode: React.FC<TSubOrderQrCodeProps> = ({
       const baseUrl = `${process.env.NEXT_PUBLIC_CANONICAL_URL}/qrcode`;
       const queryParams = new URLSearchParams();
 
+      if (order?.company?.id?.uuid)
+        queryParams.append('companyId', order?.company?.id?.uuid);
       if (groupId) queryParams.append('groupId', groupId);
       if (screen) queryParams.append('screen', screen);
 
@@ -242,10 +244,10 @@ const SubOrderQrCode: React.FC<TSubOrderQrCodeProps> = ({
             title: 'Màn hình 1',
             id: 'A',
           },
-          {
-            title: 'Màn hình 2',
-            id: 'B',
-          },
+          // {
+          //   title: 'Màn hình 2',
+          //   id: 'B',
+          // },
         ].map((item) => {
           return (
             <div

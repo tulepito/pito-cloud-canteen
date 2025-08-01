@@ -556,6 +556,7 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
       const baseUrl = `${process.env.NEXT_PUBLIC_CANONICAL_URL}/qrcode`;
       const queryParams = new URLSearchParams();
 
+      if (company?.id?.uuid) queryParams.append('companyId', company?.id?.uuid);
       if (groupId) queryParams.append('groupId', groupId);
       if (screen) queryParams.append('screen', screen);
 
@@ -705,10 +706,10 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
             title: 'Màn hình 1',
             id: 'A',
           },
-          {
-            title: 'Màn hình 2',
-            id: 'B',
-          },
+          // {
+          //   title: 'Màn hình 2',
+          //   id: 'B',
+          // },
         ].map((item) => {
           return (
             <div

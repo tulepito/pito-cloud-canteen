@@ -3,4 +3,5 @@ export interface POSTScannerParticipantScanQRcodeBody {
   timestamp: string;
   groupId?: string;
   screen?: string;
+  companyId: string;
 }

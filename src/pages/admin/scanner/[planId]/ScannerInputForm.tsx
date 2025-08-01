@@ -463,6 +463,8 @@ export function ScannerInputForm({
         const dataUrl = `${process.env.NEXT_PUBLIC_CANONICAL_URL}/qrcode`;
         const queryParams = new URLSearchParams();
 
+        if (company?.id?.uuid)
+          queryParams.append('companyId', company.id?.uuid);
         if (groupId) queryParams.append('groupId', groupId);
         if (screen) queryParams.append('screen', screen);
 
@@ -478,7 +480,7 @@ export function ScannerInputForm({
     };
 
     generateQR();
-  }, [groupId, screen]);
+  }, [groupId, screen, company?.id?.uuid]);
 
   // Filter search results
   useEffect(() => {

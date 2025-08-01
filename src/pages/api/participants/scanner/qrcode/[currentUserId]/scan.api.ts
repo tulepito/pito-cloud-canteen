@@ -15,8 +15,11 @@ import { denormalisedResponseEntities } from '@services/data';
 import { firestore } from '@services/firebase';
 import { getIntegrationSdk } from '@services/sdk';
 import type { FoodListing, MemberOrderValue, UserListing } from '@src/types';
-import { EImageVariants, EListingType, EOrderStates } from '@src/utils/enums';
+import { EImageVariants, EOrderStates, EOrderType } from '@src/utils/enums';
+import { getOrSetRedisCache } from '@src/utils/redisCache';
 import type { TObject } from '@src/utils/types';
+
+const CACHE_TTL_SECONDS = 60 * 60 * 2; // 2 hours
 
 // ==================== CONSTANTS ====================
 const ERROR_MESSAGES = {
@@ -26,6 +29,8 @@ const ERROR_MESSAGES = {
     'Bạn chưa có kế hoạch ăn uống. Vui lòng đăng ký trước khi sử dụng dịch vụ.',
   ORDER_NOT_FOUND:
     'Hiện bạn chưa có đơn hàng nào. Vui lòng đặt món trước khi quét mã.',
+  USER_NOT_IN_ORDER:
+    'Tài khoản của bạn không có trong đơn hàng này. Vui lòng kiểm tra lại thông tin.',
   ACTIVE_ORDER_NOT_FOUND:
     'Bạn chưa có đơn hàng nào đang hoạt động. Hãy kiểm tra lại lịch đặt món.',
   INVALID_DATE: 'Ngày bạn chọn không hợp lệ. Vui lòng chọn lại ngày phù hợp.',
@@ -58,6 +63,7 @@ const ERROR_STATUS_MAP: Record<string, number> = {
   [ERROR_MESSAGES.ALREADY_SCANNED]: 409,
   [ERROR_MESSAGES.PLAN_NOT_FOUND]: 404,
   [ERROR_MESSAGES.ORDER_NOT_FOUND]: 404,
+  [ERROR_MESSAGES.USER_NOT_IN_ORDER]: 404,
   [ERROR_MESSAGES.ACTIVE_ORDER_NOT_FOUND]: 404,
   [ERROR_MESSAGES.MEMBER_NOT_FOUND]: 404,
   [ERROR_MESSAGES.MEMBER_DATA_NOT_LOADED]: 500,
@@ -90,6 +96,7 @@ interface ScanContext {
   groupId?: string;
   screen?: string;
   orderId: string;
+  companyId: string;
 }
 
 interface ProcessedData {
@@ -142,7 +149,7 @@ const validateRequest = (req: NextApiRequest): ScanContext => {
   }
 
   const { currentUserId } = req.query as { currentUserId: string };
-  const { groupId, timestamp, screen } =
+  const { groupId, timestamp, screen, companyId } =
     req.body as POSTScannerParticipantScanQRcodeBody;
 
   if (!currentUserId || typeof currentUserId !== 'string') {
@@ -159,6 +166,7 @@ const validateRequest = (req: NextApiRequest): ScanContext => {
     groupId,
     screen,
     orderId: '', // Will be filled later
+    companyId,
   };
 };
 
@@ -166,42 +174,45 @@ const findActiveOrder = async (
   context: ScanContext,
   integrationSdk: any,
 ): Promise<ScanContext> => {
-  const { currentUserId, timestampNum } = context;
+  const { currentUserId, timestampNum, companyId } = context;
+  const cacheKey = `companyOrdersInProgess:${companyId}:${timestampNum}`;
 
-  const queryOrders = async (params: Record<string, any>) => {
-    const response = await integrationSdk.listings.query(params);
+  const companyOrders = await getOrSetRedisCache(
+    cacheKey,
+    CACHE_TTL_SECONDS,
+    async () => {
+      const response = await integrationSdk.listings.query({
+        meta_listingType: 'order',
+        meta_orderType: EOrderType.group,
+        meta_orderState: EOrderStates.pendingPayment,
+        meta_companyId: companyId,
+      });
 
-    return denormalisedResponseEntities(response) || [];
-  };
+      return denormalisedResponseEntities(response) || [];
+    },
+  );
 
-  const participantOrders = await queryOrders({
-    meta_listingType: 'order',
-    meta_participants: `has_any:${currentUserId}`,
-    meta_orderState: EOrderStates.inProgress,
-  });
-
-  let allOrders = participantOrders;
-
-  if (participantOrders?.length === 0) {
-    allOrders = await queryOrders({
-      meta_listingType: EListingType.order,
-      meta_anonymous: `has_any:${currentUserId}`,
-      meta_orderState: EOrderStates.inProgress,
-    });
-  }
-
-  const activeOrder = allOrders.find((order: TObject) => {
+  const activeOrder = companyOrders.find((order: TObject) => {
     const { startDate, endDate } = order?.attributes?.metadata || {};
 
     return startDate <= timestampNum && timestampNum <= endDate;
   });
 
-  const planId = activeOrder?.attributes?.metadata?.plans?.[0];
-  const orderId = activeOrder?.id?.uuid;
-
-  if (!planId || !orderId) {
+  if (!activeOrder) {
     throw new APIError(ERROR_MESSAGES.ACTIVE_ORDER_NOT_FOUND);
   }
+
+  const metadata = activeOrder?.attributes?.metadata;
+  const isValidUser =
+    metadata?.participants?.includes(currentUserId) ||
+    metadata?.anonymous?.includes(currentUserId);
+
+  if (!isValidUser) {
+    throw new APIError(ERROR_MESSAGES.USER_NOT_IN_ORDER);
+  }
+
+  const planId = metadata?.plans?.[0];
+  const orderId = activeOrder?.id?.uuid;
 
   return { ...context, planId, orderId };
 };
@@ -242,29 +253,41 @@ const validateBarcodeAndGetMemberOrder = async (
   context: ScanContext,
   integrationSdk: any,
 ): Promise<{ memberOrder: Partial<MemberOrderValue>; memberId: string }> => {
-  const planListingResponse = await integrationSdk.listings.show({
-    id: context.planId,
-  });
+  const { planId, timestampNum, currentUserId } = context;
+  const cacheKey = `planIdWithTimestamp:${planId}:${timestampNum}`;
 
-  const planListing = planListingResponse.data.data;
+  const orderDetailForTimestamp = await getOrSetRedisCache(
+    cacheKey,
+    CACHE_TTL_SECONDS,
+    async () => {
+      const planListingResponse = await integrationSdk.listings.show({
+        id: planId,
+      });
+      const planListing = planListingResponse?.data?.data;
 
-  if (!planListing) {
-    throw new APIError(ERROR_MESSAGES.PLAN_NOT_FOUND);
-  }
+      if (!planListing) {
+        throw new APIError(ERROR_MESSAGES.PLAN_NOT_FOUND);
+      }
 
-  const orderDetail = planListing.attributes?.metadata?.orderDetail;
-  if (!orderDetail) {
-    throw new APIError(ERROR_MESSAGES.ORDER_NOT_FOUND);
-  }
+      const orderDetail = planListing?.attributes?.metadata?.orderDetail;
+      if (!orderDetail || !orderDetail[timestampNum]) {
+        throw new APIError(ERROR_MESSAGES.ORDER_NOT_FOUND);
+      }
 
-  const memberOrder =
-    orderDetail[context.timestamp]?.memberOrders?.[context.currentUserId];
+      return orderDetail[timestampNum];
+    },
+  );
+
+  const memberOrder = orderDetailForTimestamp?.memberOrders?.[currentUserId];
 
   if (!memberOrder?.foodId) {
     throw new APIError(ERROR_MESSAGES.NO_FOOD_SELECTED);
   }
 
-  return { memberOrder, memberId: context.currentUserId };
+  return {
+    memberOrder,
+    memberId: currentUserId,
+  };
 };
 
 const validateGroupAccess = async (
@@ -273,33 +296,46 @@ const validateGroupAccess = async (
 ): Promise<void> => {
   if (!context.groupId) return;
 
-  const orderDetailListing = await integrationSdk.listings.show({
-    id: context.orderId,
-  });
-  const orderDetailData = denormalisedResponseEntities(orderDetailListing)[0];
+  // 1. Cache orderDetail listing theo orderId
+  const orderDetailData = await getOrSetRedisCache(
+    `orderDetailListing:${context.orderId}`,
+    CACHE_TTL_SECONDS,
+    async () => {
+      const response = await integrationSdk.listings.show({
+        id: context.orderId,
+      });
 
-  const companyId = orderDetailData.attributes?.metadata?.companyId;
+      return denormalisedResponseEntities(response)[0];
+    },
+  );
+
+  const companyId = orderDetailData?.attributes?.metadata?.companyId;
 
   if (!companyId) {
     throw new APIError(ERROR_MESSAGES.COMPANY_NOT_FOUND);
   }
 
-  const companyAccountResponse = await integrationSdk.users.show({
-    id: companyId,
-  });
-  const companyAccount = denormalisedResponseEntities(
-    companyAccountResponse,
-  )[0];
+  // 2. Cache user (company account) theo companyId
+  const companyAccount = await getOrSetRedisCache(
+    `companyAccount:${companyId}`,
+    CACHE_TTL_SECONDS,
+    async () => {
+      const response = await integrationSdk.users.show({ id: companyId });
+
+      return denormalisedResponseEntities(response)[0];
+    },
+  );
+
   const groups = companyAccount?.attributes?.profile?.metadata?.groups;
   const requestedGroup = groups?.find(
     (group: TObject) => group.id === context.groupId,
   );
 
-  if (
-    !requestedGroup?.members?.some(
-      (member: TObject) => member.id === context.currentUserId,
-    )
-  ) {
+  const isInGroup = requestedGroup?.members?.some(
+    (member: TObject) => member.id === context.currentUserId,
+  );
+
+  if (!isInGroup) {
     throw new APIError(ERROR_MESSAGES.USER_NOT_IN_REQUESTED_GROUP);
   }
 };

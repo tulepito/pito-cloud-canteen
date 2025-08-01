@@ -37,6 +37,7 @@ export const scanQRCodeForParticipantApi = async (
       `/participants/scanner/qrcode/${payload.currentUserId}/scan/`,
       {
         timestamp: payload.timestamp,
+        companyId: payload.companyId,
         ...(payload.groupId && { groupId: payload.groupId }),
         ...(payload.screen && { screen: payload.screen }),
       },

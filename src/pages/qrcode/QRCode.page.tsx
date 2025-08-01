@@ -26,6 +26,7 @@ const QRCodePage = () => {
   const searchParams = useSearchParams();
 
   const groupId = searchParams.get('groupId') || undefined;
+  const companyId = searchParams.get('companyId') || undefined;
   const screen = searchParams.get('screen') || undefined;
 
   const currentUser = useAppSelector((state) => state.user.currentUser);
@@ -43,6 +44,7 @@ const QRCodePage = () => {
       !currentUserId ||
       typeof isAdmin !== 'boolean' ||
       isAdmin ||
+      !companyId ||
       hasCalledRef.current
     ) {
       if (isAdmin) {
@@ -71,6 +73,7 @@ const QRCodePage = () => {
           currentUserId,
           timestamp,
           screen,
+          companyId,
         });
         setIsSuccess(true);
       } catch (error: any) {
@@ -88,7 +91,7 @@ const QRCodePage = () => {
     };
 
     fetchData();
-  }, [currentUserId, groupId, isAdmin, router, screen]);
+  }, [currentUserId, groupId, isAdmin, router, screen, companyId]);
 
   useEffect(() => {
     if (isSuccess || isAlreadyScanned || errorMessage) {
