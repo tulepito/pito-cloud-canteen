@@ -20,11 +20,11 @@ const CTA = () => {
             {intl.formatMessage({ id: 'ready-to-revolutionize' })} <br />
             {intl.formatMessage({ id: 'your-teams-lunch-experience' })}
           </h2>
-          <h3 className="text-text md:whitespace-pre-line font-semibold">
+          <span className="text-text md:whitespace-pre-line font-semibold">
             {intl.formatMessage({
               id: 'get-a-personalized-demo-of-the-platform-and-a-custom-solution-tailored-to-your-teams-size-and-budget-no-pressure-no-obligations-just-helpful-insights',
             })}
-          </h3>
+          </span>
           <div className="flex md:flex-row flex-col items-stretch md:items-center justify-center w-full px-5 gap-4 mt-5">
             <button
               onClick={() => setIsModalOpen(true)}

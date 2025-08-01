@@ -45,7 +45,7 @@ const TeamRoles = () => {
                 <Image
                   style={{ objectFit: 'cover' }}
                   src={hr}
-                  alt="hr"
+                  alt="HR"
                   className=" rounded-2xl"
                   fill
                   sizes="(max-width: 768px) 70vw, (max-width: 1200px) 33vw, 20vw"
@@ -114,7 +114,7 @@ const TeamRoles = () => {
                 <Image
                   style={{ objectFit: 'cover' }}
                   src={employee}
-                  alt="hr"
+                  alt="Employee"
                   className="rounded-2xl"
                   fill
                   sizes="(max-width: 768px) 70vw, (max-width: 1200px) 33vw, 20vw"

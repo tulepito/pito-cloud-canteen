@@ -35,11 +35,11 @@ const FeaturesCard = () => {
           <div className="shrink-0 bg-[#F6AFCE]/30 text-[#D680A3] size-10 rounded-full flex items-center justify-center text-2xl">
             <PiHourglassMedium />
           </div>
-          <h3 className="font-medium md:text-lg">
+          <span className="font-medium md:text-lg">
             {intl.formatMessage({
               id: 'eliminate-endless-slack-messages-and-manual-spreadsheets',
             })}
-          </h3>
+          </span>
         </div>
 
         {/* Card 2 */}
@@ -47,11 +47,11 @@ const FeaturesCard = () => {
           <div className="shrink-0 bg-[#FFC811]/30 text-[#C79000] size-10 rounded-full flex items-center justify-center text-2xl">
             <PiUsersThreeLight />
           </div>
-          <h3 className="font-medium md:text-lg">
+          <span className="font-medium md:text-lg">
             {intl.formatMessage({
               id: 'flexible-meal-solutions-for-dynamic-fast-changing-teams',
             })}
-          </h3>
+          </span>
         </div>
 
         {/* Card 3 */}
@@ -59,11 +59,11 @@ const FeaturesCard = () => {
           <div className="shrink-0 bg-[#6CCFF6]/30 text-[#3598BF] size-10 rounded-full flex items-center justify-center text-2xl">
             <PiRobotLight />
           </div>
-          <h3 className="font-medium md:text-lg">
+          <span className="font-medium md:text-lg">
             {intl.formatMessage({
               id: 'intelligent-ordering-that-adapts-to-your-people-and-operations',
             })}
-          </h3>
+          </span>
         </div>
       </div>
 

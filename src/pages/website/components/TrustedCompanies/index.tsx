@@ -17,49 +17,49 @@ import styles from './styles.module.css';
 const companies = [
   {
     src: company1,
-    alt: 'Booking',
+    alt: 'Employmenthero',
     className: 'aspect-[2/1] w-[150px]',
     classNameImage: 'object-contain',
   },
   {
     src: company2,
-    alt: 'Shopee',
+    alt: 'SEO WOO VINA',
     className: 'aspect-square w-[120px]',
     classNameImage: 'object-fill',
   },
   {
     src: company3,
-    alt: 'Employment Hero',
+    alt: 'Booking.com',
     className: 'aspect-square w-[120px]',
     classNameImage: 'object-fill',
   },
   {
     src: company4,
-    alt: 'Deloitte',
-    className: 'aspect-[2/1] w-[150px]',
-    classNameImage: 'object-contain',
-  },
-  {
-    src: company5,
-    alt: 'MM',
-    className: 'aspect-square w-[120px]',
-    classNameImage: 'object-fill',
-  },
-  {
-    src: company6,
-    alt: 'Saltmine',
-    className: 'aspect-[2/1] w-[150px]',
-    classNameImage: 'object-contain',
-  },
-  {
-    src: company7,
     alt: 'Amazon',
     className: 'aspect-[2/1] w-[150px]',
     classNameImage: 'object-contain',
   },
   {
+    src: company5,
+    alt: 'Saltmine',
+    className: 'aspect-square w-[120px]',
+    classNameImage: 'object-fill',
+  },
+  {
+    src: company6,
+    alt: 'JR286',
+    className: 'aspect-[2/1] w-[150px]',
+    classNameImage: 'object-contain',
+  },
+  {
+    src: company7,
+    alt: 'Technos',
+    className: 'aspect-[2/1] w-[150px]',
+    classNameImage: 'object-contain',
+  },
+  {
     src: company8,
-    alt: 'BCK',
+    alt: 'ARMOR',
     className: 'aspect-[2/1] w-[150px]',
     classNameImage: 'object-contain',
   },
@@ -76,11 +76,11 @@ const TrustedCompanies = () => {
 
   return (
     <div className="mx-auto md:px-4 md:pb-20 px-5 pt-16 md:pt-0 flex flex-col md:gap-0 gap-5 items-center overflow-hidden">
-      <h3 className="w-full md:w-2/3 font-medium text-center text-lg whitespace-pre-line md:whitespace-normal">
+      <span className="w-full md:w-2/3 font-medium text-center text-lg whitespace-pre-line md:whitespace-normal">
         {intl.formatMessage({
           id: 'trusted-by-vietnams-leading-tech-companies',
         })}
-      </h3>
+      </span>
       <div className={clsx('flex select-none overflow-hidden', styles.marquee)}>
         {[...Array(2)].map((_, i) => (
           <div

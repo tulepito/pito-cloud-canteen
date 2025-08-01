@@ -189,8 +189,7 @@ const Modal = ({ onClose, isModalOpen }: ModalProps) => {
           <div className="flex flex-col items-center text-center gap-4 mb-6">
             <h2 className="text-2xl md:text-4xl font-bold font-alt leading-snug">
               {intl.formatMessage({ id: 'lets-tailor-your' })}
-              <br />
-              {intl.formatMessage({ id: 'lunch-solution' })}
+              <br /> {intl.formatMessage({ id: 'lunch-solution' })}
             </h2>
             <p className="text-gray-600">
               {intl.formatMessage({

@@ -18,14 +18,19 @@
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  min-width: 80%;
-  max-width: 1024px;
   animation: scroll var(--duration) linear infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .marquee__group {
     animation-play-state: paused;
+  }
+}
+
+@media (min-width: 768px) {
+  .marquee__group {
+    min-width: 80%;
+    max-width: 1024px;
   }
 }
 

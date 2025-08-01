@@ -47,14 +47,14 @@ const Hero = () => {
         <div className="flex md:flex-row md:px-0 flex-col justify-center items-center md:gap-12 gap-8 md:py-20 pt-10 md:h-[70vh]">
           {/* lhs */}
           <div className="flex flex-col md:items-start items-center md:text-left text-center md:gap-5 gap-2 md:w-1/2 pt-0">
-            <h1 className="text-text font-medium">
+            <span className="text-text font-medium">
               {intl.formatMessage({ id: 'the-lunch-management-platform' })}
-            </h1>
-            <span className="font-semibold text-3xl md:text-[42px] font-[unbounded] md:leading-[3rem] md:whitespace-pre-line">
+            </span>
+            <h1 className="font-semibold text-3xl md:text-[42px] font-[unbounded] md:leading-[3rem] md:whitespace-pre-line">
               {intl.formatMessage({
                 id: 'streamline-team-meals-simplify-your-workday',
               })}
-            </span>
+            </h1>
             <span className="text-text md:text-lg md:whitespace-pre-line font-medium">
               {intl.formatMessage({
                 id: 'stop-drowning-in-meal-coordination-pito-cloud-canteen-is-a-tech-powered-platform-that-transforms-workplace-dining-from-a-daily-headache-into-a-strategic-employee-benefit',
@@ -83,7 +83,7 @@ const Hero = () => {
             <div className="relative aspect-[2997/2443] h-full scale-110 top-0 left-0 transition-all duration-300">
               <Image
                 src={image}
-                alt="Image hero"
+                alt="Cơm trưa văn phòng Pito Cloud Canteen"
                 fill
                 sizes="(max-width: 768px) 100vw, 40vw"
                 priority

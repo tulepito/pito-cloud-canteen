@@ -85,14 +85,14 @@ const FAQs = () => {
               <button
                 onClick={() => toggleFAQ(index)}
                 className={clsx(
-                  'w-full md:hover:!bg-gray-300 bg-[#FAFAFA] rounded-2xl p-4 flex justify-between items-center text-left font-medium text-base gap-4 md:text-lg text-black focus:outline-none cursor-pointer transition-all duration-300 ease-in-out',
-                  isOpen && 'hover:!text-black',
+                  'w-full md:hover:!bg-gray-300 bg-[#FAFAFA] rounded-2xl p-4 flex justify-between items-center text-left font-medium text-base gap-4 md:text-lg focus:outline-none cursor-pointer transition-all duration-300 ease-in-out',
+                  isOpen && 'md:hover:!text-black',
+                  isOpen ? 'text-white' : 'text-black',
                 )}
                 style={{
                   backgroundColor: isOpen ? '#000' : '#FAFAFA',
-                  color: !isOpen ? '#000' : '#FAFAFA',
                 }}>
-                <h3>{faq.question}</h3>
+                {faq.question}
                 <span className="text-[#A8A8A8] text-xl">
                   {isOpen ? <PiMinusBold /> : <PiPlusBold />}
                 </span>
