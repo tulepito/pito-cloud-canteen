@@ -184,7 +184,7 @@ const findActiveOrder = async (
       const response = await integrationSdk.listings.query({
         meta_listingType: 'order',
         meta_orderType: EOrderType.group,
-        meta_orderState: EOrderStates.pendingPayment,
+        meta_orderState: EOrderStates.inProgress,
         meta_companyId: companyId,
       });
 
