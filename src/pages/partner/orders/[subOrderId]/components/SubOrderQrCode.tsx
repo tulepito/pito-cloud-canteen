@@ -230,13 +230,7 @@ const SubOrderQrCode: React.FC<TSubOrderQrCodeProps> = ({
     );
   };
 
-  const renderComponentQRCode = ({
-    groupId,
-    dateQRcode,
-  }: {
-    groupId?: string;
-    dateQRcode: string;
-  }) => {
+  const renderComponentQRCode = (groupId?: string) => {
     return (
       <div className="flex gap-2 items-center divide-x divide-gray-300">
         {[
@@ -270,10 +264,7 @@ const SubOrderQrCode: React.FC<TSubOrderQrCodeProps> = ({
               <Link
                 href={`${enGeneralPaths.admin.scanner['[planId]'][
                   '[timestamp]'
-                ].index(
-                  String(planId),
-                  groupId ? `${dateQRcode}_${groupId}` : dateQRcode,
-                )}?screen=${item.id}`}
+                ].index(String(planId), groupId || '')}?screen=${item.id}`}
                 legacyBehavior>
                 <a target="_blank">
                   <Button variant="inline" size="small" className="!px-1">
@@ -427,10 +418,7 @@ const SubOrderQrCode: React.FC<TSubOrderQrCodeProps> = ({
                         </div>
                         {totalFoodInGroup ? (
                           <div className="flex-1">
-                            {renderComponentQRCode({
-                              groupId: group.id,
-                              dateQRcode: date,
-                            })}
+                            {renderComponentQRCode(group?.id)}
                           </div>
                         ) : (
                           <div className="flex-1"></div>
@@ -459,10 +447,7 @@ const SubOrderQrCode: React.FC<TSubOrderQrCodeProps> = ({
                         </div>
                         {totalFoodInGroup ? (
                           <div className="flex-1">
-                            {renderComponentQRCode({
-                              groupId: group.id,
-                              dateQRcode: date,
-                            })}
+                            {renderComponentQRCode(group?.id)}
                           </div>
                         ) : (
                           <div className="flex-1"></div>
@@ -553,11 +538,7 @@ const SubOrderQrCode: React.FC<TSubOrderQrCodeProps> = ({
                         <div className="flex-1 text-black">
                           Số lượng: {foodDataListNullLevel?.length}
                         </div>
-                        <div className="flex-1">
-                          {renderComponentQRCode({
-                            dateQRcode: date,
-                          })}
-                        </div>
+                        <div className="flex-1">{renderComponentQRCode()}</div>
                         <div
                           className={css.actionCell}
                           onClick={handleToggleCollapse(dataOfGroups?.length)}>

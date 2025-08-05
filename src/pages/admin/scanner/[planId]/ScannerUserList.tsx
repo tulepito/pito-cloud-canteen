@@ -35,27 +35,14 @@ export const ScannerUserList = ({
 
   const [lastUpdate, setLastUpdate] = useState<string>('');
 
-  const { timestamp: timestampQuery } = router.query;
+  const { groupId } = router.query;
   const screen = searchParams.get('screen') || undefined;
 
-  const getTimestampAndGroupId = (
-    queryParam: string | string[] | undefined,
-  ) => {
-    if (typeof queryParam !== 'string')
-      return { timestamp: undefined, groupId: undefined };
+  const now = React.useMemo(() => new Date(), []);
 
-    const parts = queryParam.split('_');
-
-    if (parts.length === 2) {
-      const [timestamp, groupId] = parts;
-
-      return { timestamp, groupId };
-    }
-
-    return { timestamp: queryParam, groupId: undefined };
-  };
-
-  const { timestamp, groupId } = getTimestampAndGroupId(timestampQuery);
+  const timestamp = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+    .getTime()
+    .toString();
 
   // useEffect để lấy chỉ các records live (cho hiển thị danh sách)
   useEffect(() => {
@@ -84,8 +71,7 @@ export const ScannerUserList = ({
 
     const unsubscribe = onSnapshot(q, {
       next: (snapshot) => {
-        const now = new Date().toLocaleTimeString();
-        setLastUpdate(now);
+        setLastUpdate(now.toLocaleTimeString());
 
         const newBarcodes = snapshot.docs.map((_doc) => ({
           id: _doc.id,
@@ -104,7 +90,7 @@ export const ScannerUserList = ({
     });
 
     return () => unsubscribe();
-  }, [router.query.planId, timestamp, groupId, screen]);
+  }, [router.query.planId, timestamp, groupId, screen, now]);
 
   useEffect(() => {
     if (!searchValue) {

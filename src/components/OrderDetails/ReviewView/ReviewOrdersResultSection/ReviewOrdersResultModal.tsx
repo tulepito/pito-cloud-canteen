@@ -692,13 +692,7 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
           return 0;
         });
 
-  const renderComponentQRCode = ({
-    groupId,
-    date,
-  }: {
-    groupId?: string;
-    date: string;
-  }) => {
+  const renderComponentQRCode = (groupId?: string) => {
     return (
       <div className="flex gap-2 items-center divide-x divide-gray-300">
         {[
@@ -732,10 +726,7 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
               <Link
                 href={`${enGeneralPaths.admin.scanner['[planId]'][
                   '[timestamp]'
-                ].index(
-                  String(planId),
-                  groupId ? `${date}_${groupId}` : date,
-                )}?screen=${item.id}`}
+                ].index(String(planId), groupId || '')}?screen=${item.id}`}
                 legacyBehavior>
                 <a target="_blank">
                   <Button variant="inline" size="small" className="!px-1">
@@ -981,10 +972,7 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
                               <div className="flex flex-wrap justify-end items-center">
                                 {isAdmin &&
                                   showQRCode &&
-                                  renderComponentQRCode({
-                                    date,
-                                    groupId: group.groupId,
-                                  })}
+                                  renderComponentQRCode(group?.groupId)}
 
                                 <IconArrow
                                   direction={isExpanding ? 'up' : 'down'}
@@ -1063,7 +1051,7 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
                               <div className="flex flex-wrap justify-end gap-2 items-center">
                                 {isAdmin &&
                                   showQRCode &&
-                                  renderComponentQRCode({ date })}
+                                  renderComponentQRCode()}
 
                                 <IconArrow
                                   direction={isExpanding ? 'up' : 'down'}
@@ -1150,9 +1138,7 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
                     </div>
                     <RenderWhen condition={!isEmptyOrderData}>
                       <div className="flex flex-wrap justify-end gap-2 items-center">
-                        {isAdmin &&
-                          showQRCode &&
-                          renderComponentQRCode({ date })}
+                        {isAdmin && showQRCode && renderComponentQRCode()}
 
                         {isAdmin && (
                           <RenderWhen condition={!isMobileLayout}>

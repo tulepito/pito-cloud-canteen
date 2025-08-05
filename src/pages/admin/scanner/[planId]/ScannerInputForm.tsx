@@ -82,20 +82,6 @@ export function removeVietnameseTones(str: string): string {
     .replace(/Đ/g, 'D');
 }
 
-const getTimestampAndGroupId = (queryParam: string | string[] | undefined) => {
-  if (typeof queryParam !== 'string')
-    return { timestamp: undefined, groupId: undefined };
-
-  const parts = queryParam.split('_');
-  if (parts.length === 2) {
-    const [timestamp, groupId] = parts;
-
-    return { timestamp, groupId };
-  }
-
-  return { timestamp: queryParam, groupId: undefined };
-};
-
 interface IParticipant {
   name: string;
   memberId: string;
@@ -133,9 +119,14 @@ export function ScannerInputForm({
   const router = useRouter();
   const searchParams = useSearchParams();
   const dispatch = useAppDispatch();
-  const { timestamp: timestampQuery, planId } = router.query;
+  const { groupId, planId } = router.query;
   const screen = searchParams.get('screen') || undefined;
-  const { timestamp, groupId } = getTimestampAndGroupId(timestampQuery);
+
+  const now = React.useMemo(() => new Date(), []);
+
+  const timestamp = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+    .getTime()
+    .toString();
 
   const {
     planListing,
@@ -465,7 +456,7 @@ export function ScannerInputForm({
 
         if (company?.id?.uuid)
           queryParams.append('companyId', company.id?.uuid);
-        if (groupId) queryParams.append('groupId', groupId);
+        if (groupId) queryParams.append('groupId', groupId as string);
         if (screen) queryParams.append('screen', screen);
 
         const dataToEncode = queryParams.toString()
