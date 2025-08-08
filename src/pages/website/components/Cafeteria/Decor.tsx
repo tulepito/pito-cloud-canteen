@@ -4,11 +4,11 @@ import blue from '../../assets/decorations/blue.svg';
 import lemon from '../../assets/decorations/lemon.svg';
 import pink from '../../assets/decorations/pink.svg';
 import yellow from '../../assets/decorations/yellow.svg';
-import pitoAsset1 from '../../assets/pitoAssets/6.png';
-import pitoAsset2 from '../../assets/pitoAssets/9.png';
-import pitoAsset3 from '../../assets/pitoAssets/10.png';
-import pitoAsset4 from '../../assets/pitoAssets/11.png';
-import pitoAsset5 from '../../assets/pitoAssets/12.png';
+import pitoAsset1 from '../../assets/pitoAssets/6.webp';
+import pitoAsset2 from '../../assets/pitoAssets/9.webp';
+import pitoAsset3 from '../../assets/pitoAssets/10.webp';
+import pitoAsset4 from '../../assets/pitoAssets/11.webp';
+import pitoAsset5 from '../../assets/pitoAssets/12.webp';
 
 const Decor = () => {
   return (

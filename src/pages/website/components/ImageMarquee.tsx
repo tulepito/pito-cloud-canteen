@@ -3,13 +3,13 @@ import Image from 'next/image';
 
 import image1 from '../assets/pitoAssets/1.webp';
 import image4 from '../assets/pitoAssets/7.webp';
-import image2 from '../assets/pitoAssets/14.png';
-import image3 from '../assets/pitoAssets/15.png';
-import image5 from '../assets/pitoAssets/16.png';
-import image6 from '../assets/pitoAssets/17.png';
-import image7 from '../assets/pitoAssets/18.png';
-import image8 from '../assets/pitoAssets/19.png';
-import image9 from '../assets/pitoAssets/20.png';
+import image2 from '../assets/pitoAssets/14.webp';
+import image3 from '../assets/pitoAssets/15.webp';
+import image5 from '../assets/pitoAssets/16.webp';
+import image6 from '../assets/pitoAssets/17.webp';
+import image7 from '../assets/pitoAssets/18.webp';
+import image8 from '../assets/pitoAssets/19.webp';
+import image9 from '../assets/pitoAssets/20.webp';
 
 const images = [
   { src: image1, alt: 'image1', type: 'type1' },

@@ -4,8 +4,8 @@ import Image from 'next/image';
 
 import image1 from '../assets/pitoAssets/1.webp';
 import image4 from '../assets/pitoAssets/3.webp';
-import image3 from '../assets/pitoAssets/11.png';
-import image5 from '../assets/pitoAssets/12.png';
+import image3 from '../assets/pitoAssets/11.webp';
+import image5 from '../assets/pitoAssets/12.webp';
 
 import { ModalForm } from './Modal';
 
