@@ -44,7 +44,7 @@ const MyApp = ({
 }: AppProps & AppCustomProps) => {
   const { pathname } = router;
 
-  const isPagePublic = publicPaths.some((path) => pathname.startsWith(path));
+  const isPagePublic = publicPaths.includes(pathname);
 
   return (
     <TranslationProvider lang={restProps.pageProps.lang}>
