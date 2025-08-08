@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { PiMinusBold, PiPlusBold } from 'react-icons/pi';
 import { useIntl } from 'react-intl';
+import clsx from 'clsx';
 import Image from 'next/image';
 
 import yellow from '../assets/decorations/yellow.svg';
@@ -24,72 +25,71 @@ const FAQsAlt = () => {
   const faqs: FAQ[] = useMemo(() => {
     return [
       {
-        question: intl.formatMessage({ id: 'do-you-support-vat-invoicing-0' }),
+        question: intl.formatMessage({ id: 'do-you-support-vat-invoicing-1' }),
         answer: intl.formatMessage({
-          id: 'yes-we-provide-full-vat-invoices-either-per-order-or-as-a-consolidated-invoice-by-billing-cycle-depending-on-your-preference-0',
+          id: 'yes-pito-provide-full-vat-invoices-either-per-order-or-consolidated-by-billing-cycle-depending-on-your-preference-0',
         }),
       },
       {
         question: intl.formatMessage({
-          id: 'how-does-pito-ensure-meal-quality',
+          id: 'how-much-notice-is-required-to-change-or-cancel-a-meal-on-the-same-day-0',
         }),
         answer: intl.formatMessage({
-          id: 'we-rigorously-vet-each-restaurant-partner-through-our-qa-qc-team-ensuring-strict-compliance-with-food-safety-standards-transparent-sourcing-of-ingredients-and-safe-preparation-processes-before-meals-are-served',
-        }),
-      },
-
-      {
-        question: intl.formatMessage({
-          id: 'how-much-notice-is-required-to-change-or-cancel-a-meal-on-the-same-day',
-        }),
-        answer: intl.formatMessage({
-          id: 'you-need-to-notify-us-at-least-10-hours-before-the-scheduled-delivery-time-provided-that-the-change-does-not-exceed-10-of-the-total-meal-quantity-for-that-day',
+          id: 'you-need-to-notify-us-at-least-10-hours-before-the-scheduled-delivery-time-provided-that-the-change-does-not-exceed-10-of-the-total-meal-quantity-for-that-day-0',
         }),
       },
       {
         question: intl.formatMessage({
-          id: 'does-pito-cloud-canteen-offer-vegetarian-or-special-diet-menus',
+          id: 'how-to-manage-participants-employees-on-the-pito-cloud-canteen-system-0',
         }),
         answer: intl.formatMessage({
-          id: 'yes-we-offer-flexible-vegetarian-and-special-diet-options-through-our-ordering-system-tailored-to-meet-the-specific-needs-of-each-company',
+          id: 'the-booker-the-representative-placing-the-order-manages-the-member-list-add-remove-members-only-members-who-are-invited-or-added-to-the-company-list-can-place-meal-orders-the-list-is-automatically-updated-whenever-there-are-any-changes-0',
         }),
       },
       {
         question: intl.formatMessage({
-          id: 'is-there-a-minimum-order-requirement-for-pito-cloud-canteen',
+          id: 'how-does-pito-ensure-meal-quality-0',
         }),
         answer: intl.formatMessage({
-          id: 'yes-we-require-a-minimum-of-20-meals-per-day-with-a-commitment-of-at-least-3-meal-days-per-week',
+          id: 'we-rigorously-vet-each-restaurant-partner-through-our-qa-qc-team-ensuring-strict-compliance-with-food-safety-standards-transparent-sourcing-of-ingredients-and-safe-preparation-processes-before-meals-are-served-0',
         }),
       },
       {
         question: intl.formatMessage({
-          id: 'how-can-i-track-and-manage-orders-on-pito-cloud-canteen',
+          id: 'does-pito-cloud-canteen-offer-vegetarian-or-special-diet-menus-0',
         }),
         answer: intl.formatMessage({
-          id: 'you-can-easily-track-and-manage-their-orders-directly-through-the-system-dashboard-allowing-real-time-updates-on-order-status-adjustments-and-cost-control',
+          id: 'yes-we-offer-flexible-vegetarian-and-special-diet-options-through-our-ordering-system-tailored-to-meet-the-specific-needs-of-each-company-0',
+        }),
+      },
+      {
+        question: intl.formatMessage({
+          id: 'how-can-i-track-and-manage-orders-on-pito-cloud-canteen-system',
+        }),
+        answer: intl.formatMessage({
+          id: 'you-can-easily-track-and-manage-their-orders-directly-through-the-system-dashboard-allowing-real-time-updates-on-order-status-adjustments-and-cost-control-0',
         }),
       },
     ];
   }, [intl]);
 
   return (
-    <div className="md:px-0 md:py-20 px-5 pt-16 pb-32 flex flex-col items-center gap-10 md:gap-12 relative max-w-[1024px] mx-auto">
+    <div className="md:px-0 md:py-16 px-5 pt-16 pb-10 flex flex-col items-center gap-10 md:gap-12 relative max-w-[1024px] mx-auto">
       <div
-        className="flex flex-col items-center md:gap-4 gap-3 md:w-[55%] text-center"
+        className="flex flex-col items-center md:gap-4 gap-3 md:w-[70%] text-center"
         style={{
           textAlign: 'center',
         }}>
-        <span className="font-alt font-bold text-2xl md:text-[42px] md:leading-tight">
+        <h2 className="font-[unbounded] font-bold text-3xl md:text-[40px] md:leading-tight">
           {intl.formatMessage({ id: 'frequently-asked-and' })} <br />
           {intl.locale === 'en' && (
             <span className="text-[#D680A3] md:leading-[4rem]">
               {intl.formatMessage({ id: 'secretly-worried-about' })}
             </span>
           )}
-        </span>
+        </h2>
         {intl.locale === 'en' && (
-          <span className="text-text">
+          <span className="md:whitespace-pre-line md:text-lg font-medium">
             {intl.formatMessage({
               id: 'have-a-question-about-our-service-or-billing-check-out-the-answers-below-if-you-still-need-help-our-team-is-just-a-message-away',
             })}
@@ -97,7 +97,7 @@ const FAQsAlt = () => {
         )}
       </div>
       {/* faqs */}
-      <div className="w-full grid md:grid-cols-2 gap-4 ">
+      <div className="w-full grid md:grid-cols-2 gap-4">
         {faqs.map((faq, index) => {
           const isOpen = activeIndex === index;
 
@@ -105,9 +105,12 @@ const FAQsAlt = () => {
             <div key={index}>
               <button
                 onClick={() => toggleFAQ(index)}
-                className="w-full bg-[#FAFAFA] hover:!bg-neutral-300 rounded-2xl p-4 flex justify-between items-center text-left font-medium text-base md:text-lg text-black focus:outline-none cursor-pointer transition-all duration-300 ease-in-out"
+                className={clsx(
+                  'w-full md:hover:!bg-gray-300 bg-[#FAFAFA] rounded-2xl p-4 flex justify-between items-center text-left font-medium text-base gap-4 md:text-lg text-black focus:outline-none cursor-pointer transition-all duration-300 ease-in-out',
+                  isOpen && 'hover:!text-black',
+                )}
                 style={{
-                  backgroundColor: !isOpen ? '#FAFAFA' : '#000',
+                  backgroundColor: isOpen ? '#000' : '#FAFAFA',
                   color: !isOpen ? '#000' : '#FAFAFA',
                 }}>
                 {faq.question}
@@ -133,18 +136,18 @@ const FAQsAlt = () => {
             className="rounded-full size-10 md:flex hidden"
             alt="logo"
           />
-          <div className="flex flex-col text-text md:gap-0 gap-3">
+          <div className="flex flex-col text-text md:gap-1 gap-3">
             <div className="flex items-center gap-4">
               <Image
                 src={logo}
                 className="rounded-full size-10 flex md:hidden"
                 alt="logo"
               />
-              <span className="font-semibold text-lg">
-                {intl.formatMessage({ id: 'still-need-help' })}
+              <span className="font-semibold text-lg font-[unbounded]">
+                {intl.formatMessage({ id: 'ban-van-con-thac-mac' })}
               </span>
             </div>
-            <span className="text-sm">
+            <span className="text-base leading-normal font-semibold">
               {intl.formatMessage({
                 id: 'were-here-for-you-contact-our-team-and-well-assist-you-right-away',
               })}
@@ -153,7 +156,7 @@ const FAQsAlt = () => {
         </div>
         <button
           onClick={() => setIsModalOpen(true)}
-          className="btn bg-black text-white">
+          className="btn bg-black text-white font-[unbounded] font-semibold">
           {intl.formatMessage({ id: 'get-in-touch' })}
         </button>
       </div>
@@ -234,9 +237,9 @@ export const FAQsAltCenter = () => {
   }, [intl]);
 
   return (
-    <div className="md:px-0 md:py-20 px-5 pt-16 pb-32 flex flex-col items-stretch gap-10 relative max-w-[1024px] mx-auto">
-      <div className="flex flex-col items-stretch md:gap-4 gap-3 md:w-[55%] text-left">
-        <span className="font-alt font-bold text-2xl md:text-5xl md:leading-[4rem] text-center md:text-left">
+    <div className="md:px-0 md:py-16 px-5 pt-20 pb-32 flex flex-col items-stretch gap-10 relative max-w-[1024px] mx-auto">
+      <div className="flex flex-col items-stretch md:gap-4 gap-3 md:w-[80%] text-left">
+        <span className="font-[unbounded] font-bold text-3xl md:text-[40px] md:leading-tight text-center md:text-left">
           {intl.formatMessage({ id: 'frequently-asked-and' })} <br />
           {intl.locale === 'en' && (
             <span className="text-[#D680A3] md:leading-[4rem]">
@@ -254,7 +257,14 @@ export const FAQsAltCenter = () => {
             <div key={index}>
               <button
                 onClick={() => toggleFAQ(index)}
-                className="w-full bg-[#FAFAFA] hover:bg-[#FFCDE3] rounded-2xl p-4 flex justify-between items-center text-left font-medium text-base md:text-lg text-black focus:outline-none cursor-pointer transition-all duration-300 ease-in-out">
+                className={clsx(
+                  'w-full md:hover:!bg-gray-300 bg-[#FAFAFA] rounded-2xl p-4 flex justify-between items-center text-left font-medium text-base gap-4 md:text-lg text-black focus:outline-none cursor-pointer transition-all duration-300 ease-in-out',
+                  isOpen && 'hover:!text-black',
+                )}
+                style={{
+                  backgroundColor: isOpen ? '#000' : '#FAFAFA',
+                  color: !isOpen ? '#000' : '#FAFAFA',
+                }}>
                 {faq.question}
                 <span className="text-[#A8A8A8] text-xl">
                   {isOpen ? <PiMinusBold /> : <PiPlusBold />}
@@ -278,18 +288,18 @@ export const FAQsAltCenter = () => {
             className="rounded-full size-10 md:flex hidden"
             alt="logo"
           />
-          <div className="flex flex-col text-text md:gap-0 gap-3">
+          <div className="flex flex-col text-text md:gap-1 gap-3">
             <div className="flex items-center gap-4">
               <Image
                 src={logo}
                 className="rounded-full size-10 flex md:hidden"
                 alt="logo"
               />
-              <span className="font-semibold text-lg">
+              <span className="font-semibold text-lg font-[unbounded]">
                 {intl.formatMessage({ id: 'still-need-help' })}
               </span>
             </div>
-            <span className="text-sm">
+            <span className="text-base leading-normal font-semibold">
               {intl.formatMessage({
                 id: 'were-here-for-you-contact-our-team-and-well-assist-you-right-away',
               })}
@@ -298,7 +308,7 @@ export const FAQsAltCenter = () => {
         </div>
         <button
           onClick={() => setIsModalOpen(true)}
-          className="btn bg-black text-white">
+          className="btn bg-black text-white font-[unbounded] font-semibold">
           {intl.formatMessage({ id: 'get-in-touch' })}
         </button>
       </div>

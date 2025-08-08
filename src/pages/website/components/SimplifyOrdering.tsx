@@ -1,8 +1,5 @@
 import { useState } from 'react';
 import { useIntl } from 'react-intl';
-import Image from 'next/image';
-
-import stepBg from '../assets/stepBg.svg';
 
 import VideoSection from './VideoSection';
 
@@ -32,27 +29,24 @@ const SimplifyOrdering = () => {
   ];
 
   return (
-    <div className="pt-20 px-5 flex md:flex-row-reverse flex-col gap-4 md:px-0 md:pb-20 max-w-[1024px] mx-auto">
-      <div className="md:w-1/2 relative flex items-center justify-center rounded-2xl overflow-hidden">
-        <Image
-          src={stepBg}
-          alt="stepBg"
-          className="size-full object-cover absolute -z-10"
-        />
-        <VideoSection
-          embedUrl={`https://fast.wistia.net/embed/iframe/${steps[activeIndex].image}?autoPlay=true&mute=true&playerColor=000000`}
-          className="w-[95%]"
-        />
+    <div className="pt-16 px-5 flex md:flex-row-reverse flex-col gap-4 md:px-0 md:pb-16 max-w-[1024px] mx-auto">
+      <div className="md:w-1/2 relative flex items-end justify-center">
+        <div className="w-full rounded-2xl overflow-hidden shadow-lg">
+          <VideoSection
+            embedUrl={`https://fast.wistia.net/embed/iframe/${steps[activeIndex].image}?autoPlay=true&mute=true&playerColor=000000`}
+            className="w-full"
+          />
+        </div>
       </div>
 
       <div className="flex flex-col gap-8 flex-1">
-        <span className="font-alt font-bold text-2xl md:text-start text-center md:text-[42px] md:leading-tight md:whitespace-pre-line">
+        <h2 className="font-[unbounded] font-bold text-3xl md:text-start text-center md:text-[40px] md:leading-tight md:whitespace-pre-line">
           {intl.formatMessage({ id: 'simplify-the-process-of-ordering-lunch' })}
-        </span>
+        </h2>
 
-        <div className="flex flex-col">
+        <div className="flex flex-col gap-[10px]">
           {steps.map((step, index) => (
-            <div key={index} className="py-2.5">
+            <div key={index}>
               <button
                 onClick={() =>
                   setActiveIndex(index === activeIndex ? 0 : index)

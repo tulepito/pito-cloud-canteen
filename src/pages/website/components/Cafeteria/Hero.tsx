@@ -1,3 +1,4 @@
+import { useIntl } from 'react-intl';
 import Image from 'next/image';
 
 import { useModal } from '@pages/website/pages/Layout';
@@ -10,29 +11,39 @@ import lemon2 from '../../assets/decorations/lemon2.svg';
 import yellow2 from '../../assets/decorations/yellow2.svg';
 
 const Hero = () => {
+  const intl = useIntl();
+
   const { setIsModalOpen } = useModal();
 
   return (
     <div className="w-full md:min-h-[40rem] relative">
       {/* main hero section */}
-      <div className="flex flex-col items-center gap-20 md:py-20 px-5">
+      <div className="flex flex-col items-center gap-20 md:py-20 px-5 md:min-h-[40rem] md:justify-center">
         {/* lhs */}
         <div className="flex flex-col items-center text-center md:gap-5 gap-2 md:w-[53%] md:pt-0">
           <div className="md:hidden h-[80px]"></div>
-          <span className="text-text">Your Team’s Meals</span>
-          <span className="font-alt font-bold text-3xl md:text-6xl md:w-auto">
-            Lunch Made Easy, <br /> Whether You Have{' '}
-            <span className="text-[#D680A3]">100</span> <br /> or{' '}
-            <span className="text-[#D680A3]">2,000+</span> Employees
+          <span className="text-center font-medium">
+            {intl.formatMessage({ id: 'your-teams-meals' })}
           </span>
-          <span className="text-text w-3/4">
-            Delivering the &quot;office canteen&quot; experience – from planning
-            and setup to service – without the need for an in-house kitchen.
+          <h1 className="font-[unbounded] font-bold text-3xl md:text-[40px] md:w-auto leading-[1.4]">
+            {intl.formatMessage({ id: 'lunch-made-easy' })},{' '}
+            <br className="hidden md:block" />{' '}
+            {intl.formatMessage({ id: 'whether-you-have' })}{' '}
+            <span className="text-[#D680A3]">100</span>{' '}
+            {intl.locale === 'en' && <br className="hidden md:block" />}{' '}
+            {intl.formatMessage({ id: 'or' })}{' '}
+            <span className="text-[#D680A3]">500+</span>{' '}
+            {intl.formatMessage({ id: 'employees' })}
+          </h1>
+          <span className="text-text w-full md:w-3/4 md:text-lg font-medium">
+            {intl.formatMessage({
+              id: 'delivering-the-office-canteen-experience-from-planning-and-setup-to-service-without-the-need-for-an-in-house-kitchen',
+            })}
           </span>
           <button
             onClick={() => setIsModalOpen(true)}
-            className="capitalize btn border border-black bg-black text-white hover:bg-white hover:text-black mt-5 md:w-auto w-full">
-            Free Consultation
+            className="capitalize btn border font-[unbounded] border-gray-300 bg-black text-white py-3 px-6 font-semibold hover:opacity-90 transition-all duration-200 hover:scale-[1.01] mt-5">
+            {intl.formatMessage({ id: 'free-consultation' })}
           </button>
         </div>
       </div>

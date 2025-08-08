@@ -2,11 +2,13 @@ import { useState } from 'react';
 import { useIntl } from 'react-intl';
 import Image from 'next/image';
 
-import Step1Image from '../assets/howItWorks1.png';
-import Step2Image from '../assets/howItWorks2.png';
-import Step3Image from '../assets/howItWorks3.png';
+import Step3Image from '../assets/giao-va-setup-tan-noi.webp';
+import Step1Image from '../assets/len-ke-hoach-mot-lan-khong-can-dat-moi-ngay.webp';
+import Step2Image from '../assets/nhan-vien-tu-chon-mon.webp';
+import { useModal } from '../pages/Layout';
 
 const HowItWorksDynamicCard = () => {
+  const { setIsModalOpen } = useModal();
   const [activeCard, setActiveCard] = useState<number>(0);
   const intl = useIntl();
 
@@ -39,9 +41,9 @@ const HowItWorksDynamicCard = () => {
 
   return (
     <div className="flex flex-col items-center md:gap-12 md:px-0 px-5 md:pb-20 md:pt-16 gap-10 relative max-w-[1024px] mx-auto">
-      <span className="font-alt text-2xl md:text-[42px] font-bold md:w-1/2 text-center md:leading-tight md:whitespace-pre-line">
+      <h2 className="font-[unbounded] text-3xl md:text-[40px] font-bold md:w-2/3 text-center md:leading-tight md:whitespace-pre-line">
         {intl.formatMessage({ id: 'how-it-works' })}
-      </span>
+      </h2>
       <div className="flex md:flex-row flex-col md:items-stretch w-full gap-3">
         {cards.map((card, index) => {
           const isActive = activeCard === index;
@@ -81,7 +83,7 @@ const HowItWorksDynamicCard = () => {
                 </div>
               </figure>
               <div className="flex flex-col gap-1">
-                <span className="font-semibold">{card.title}</span>
+                <h3 className="font-semibold">{card.title}</h3>
                 <span
                   className={`text-sm transition-all duration-300 ease-in-out ${
                     isActive
@@ -95,6 +97,15 @@ const HowItWorksDynamicCard = () => {
           );
         })}
       </div>
+      <a
+        href=""
+        onClick={(e) => {
+          e.preventDefault();
+          setIsModalOpen(true);
+        }}
+        className="btn border font-[unbounded] font-medium border-solid border-black text-black hover:bg-black hover:text-white md:w-fit w-full">
+        {intl.formatMessage({ id: 'dat-lich-demo-mien-phi' })}
+      </a>
     </div>
   );
 };

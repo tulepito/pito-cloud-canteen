@@ -1,42 +1,50 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
+import { useIntl } from 'react-intl';
 import Image from 'next/image';
 
-import Step1Image from '../../assets/howItWorks1.png';
-import Step2Image from '../../assets/howItWorks2.png';
-import Step3Image from '../../assets/howItWorks3.png';
+import Step3Image from '../../assets/giao-va-setup-tan-noi.webp';
+import Step1Image from '../../assets/len-ke-hoach-mot-lan-khong-can-dat-moi-ngay.webp';
+import Step2Image from '../../assets/nhan-vien-tu-chon-mon.webp';
 
 const HowItWorksDynamicCard = () => {
+  const intl = useIntl();
   const [activeCard, setActiveCard] = useState<number>(0);
 
-  const cards = [
-    {
-      number: '01',
-      title: 'Plan Weeklky',
-      description:
-        'Select restaurants and rotate the menu each day of the week. The system handles the rest automatically.',
-      image: Step1Image,
-    },
-    {
-      number: '02',
-      title: 'Employees Select Their Meals',
-      description:
-        'Each person logs in and selects their meal based on preferences. The meal is customized for each employee.',
-      image: Step2Image,
-    },
-    {
-      number: '03',
-      title: 'On-Site Setup & Service',
-      description:
-        'Employees scan a code to pick up their meal from the setup lunch area managed by PITO staff.',
-      image: Step3Image,
-    },
-  ];
+  const cards = useMemo(
+    () => [
+      {
+        number: '01',
+        title: intl.formatMessage({ id: 'plan-weekly' }),
+        description: intl.formatMessage({
+          id: 'select-restaurants-and-rotate-the-menu-each-day-of-the-week-the-system-handles-the-rest-automatically',
+        }),
+        image: Step1Image,
+      },
+      {
+        number: '02',
+        title: intl.formatMessage({ id: 'employees-select-their-meals' }),
+        description: intl.formatMessage({
+          id: 'each-person-logs-in-and-selects-their-meal-based-on-preferences-the-meal-is-customized-for-each-employee',
+        }),
+        image: Step2Image,
+      },
+      {
+        number: '03',
+        title: intl.formatMessage({ id: 'on-site-setup-and-service' }),
+        description: intl.formatMessage({
+          id: 'employees-scan-a-code-to-pick-up-their-meal-from-the-setup-lunch-area-managed-by-pito-staff',
+        }),
+        image: Step3Image,
+      },
+    ],
+    [intl],
+  );
 
   return (
-    <div className="flex flex-col items-center md:gap-12 md:px-0 px-5 md:pb-36 md:pt-20 pt-20 gap-10 relative max-w-[1024px] mx-auto">
-      <span className="font-alt text-2xl md:text-4xl font-bold md:w-1/2 text-center md:leading-[3rem]">
-        How It Works
-      </span>
+    <div className="flex flex-col items-center md:gap-12 md:px-0 px-5 md:pb-16 md:pt-16 pt-20 gap-10 relative max-w-[1024px] mx-auto">
+      <h2 className="font-[unbounded] text-3xl md:text-[40px] font-bold md:w-full text-center md:leading-tight whitespace-pre-line">
+        {intl.formatMessage({ id: 'how-it-works' })}
+      </h2>
       <div className="flex md:flex-row flex-col md:items-stretch w-full gap-3">
         {cards.map((card, index) => {
           const isActive = activeCard === index;

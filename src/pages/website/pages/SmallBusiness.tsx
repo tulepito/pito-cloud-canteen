@@ -17,7 +17,7 @@ const SmallBusiness = () => {
       <TrustedCompanies />
       <CommonProblems />
       <HowItWorks />
-      <div className="py-24">
+      <div className="py-16">
         <ImageMarquee />
       </div>
       <WhyChoosePito />

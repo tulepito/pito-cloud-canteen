@@ -17,17 +17,18 @@ const Hero = () => {
       <div className="flex md:flex-row flex-col-reverse items-center md:justify-start justify-center md:py-20 mb-5 md:mb-0">
         {/* lhs */}
         <div className="flex flex-col md:items-start items-center md:text-left text-center md:gap-5 gap-2 md:w-[55%] w-full pt-0 md:pb-0 pb-50">
-          <span className="text-text">Enterprise-Ready</span>
-          <span className="font-alt font-bold text-3xl md:text-6xl md:leading-[4rem]">
-            Lunch Operations, Without an In-House Canteen
+          <span className="font-medium">Mid-Sized Business Ready</span>
+          <span className="font-[unbounded] font-bold text-3xl md:text-[40px] md:leading-tight">
+            <span className="text-[#D680A3]">Lunch Operations</span> Without an
+            In-House Canteen
           </span>
-          <span className="text-text ">
+          <span className="font-medium md:text-lg">
             Bring a professional lunch experience to your office without the
             need for an in-house kitchen or manual management.
           </span>
           <button
             onClick={() => setIsModalOpen(true)}
-            className="btn z-20 border border-black hover:bg-white hover:text-black bg-black text-white mt-4 md:w-auto w-full">
+            className="capitalize btn border font-[unbounded] border-gray-300 bg-black text-white py-3 px-6 font-semibold hover:opacity-90 transition-all duration-200 hover:scale-[1.01] mt-4">
             Book a Free Consultation{' '}
           </button>
         </div>

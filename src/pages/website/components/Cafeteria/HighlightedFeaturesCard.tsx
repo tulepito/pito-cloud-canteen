@@ -1,20 +1,25 @@
 import { PiFileTextLight, PiForkKnife, PiUser } from 'react-icons/pi';
+import { useIntl } from 'react-intl';
 import Image from 'next/image';
 
 import pink from '../../assets/decorations/pink.svg';
 import yellow from '../../assets/decorations/yellow.svg';
 
 const HighlightedFeaturesCard = () => {
+  const intl = useIntl();
+
   return (
-    <div className="flex flex-col md:gap-20 md:pb-36 md:p-20 md:px-0 px-2 pt-16 gap-10 relative max-w-[1024px] mx-auto">
+    <div className="flex flex-col md:gap-20 md:pb-16 md:pt-16 md:px-0 px-2 py-10 gap-10 relative max-w-[1024px] mx-auto">
       {/* Heading */}
       <div className="flex flex-col gap-2 items-center">
-        <span className="text-text w-2/3 text-center">
-          Reclaim Your Time. Boost Team Satisfaction
+        <span className="w-full md:w-2/3 text-center font-medium">
+          {intl.formatMessage({
+            id: 'reclaim-your-time-boost-team-satisfaction',
+          })}
         </span>
-        <span className="font-alt text-2xl md:text-4xl font-bold md:w-1/2 text-center md:leading-[3rem]">
-          Highlighted Features
-        </span>
+        <h2 className="font-[unbounded] text-3xl md:text-[40px] font-bold w-full md:w-[60%] text-center md:leading-tight">
+          {intl.formatMessage({ id: 'highlighted-features' })}
+        </h2>
       </div>
 
       {/* Feature Cards */}
@@ -25,9 +30,13 @@ const HighlightedFeaturesCard = () => {
             <PiUser />
           </div>
           <div className="flex flex-col gap-1">
-            <span className="font-semibold">Flexible Grouping</span>
+            <span className="font-semibold">
+              {intl.formatMessage({ id: 'flexible-grouping' })}
+            </span>
             <span className="text-sm">
-              Eliminate endless Slack messages and manual spreadsheets
+              {intl.formatMessage({
+                id: 'eliminate-endless-slack-messages-and-manual-spreadsheets-0',
+              })}
             </span>
           </div>
         </div>
@@ -38,9 +47,13 @@ const HighlightedFeaturesCard = () => {
             <PiFileTextLight />
           </div>
           <div className="flex flex-col gap-1">
-            <span className="font-semibold">Department-Based Reporting</span>
+            <span className="font-semibold">
+              {intl.formatMessage({ id: 'department-based-reporting' })}
+            </span>
             <span className="text-sm">
-              Easily track costs by department or for the entire company.
+              {intl.formatMessage({
+                id: 'easily-track-costs-by-department-or-for-the-entire-company',
+              })}
             </span>
           </div>{' '}
         </div>
@@ -52,10 +65,13 @@ const HighlightedFeaturesCard = () => {
           </div>
 
           <div className="flex flex-col gap-1">
-            <span className="font-semibold">On-Site Setup & Service</span>
+            <span className="font-semibold">
+              {intl.formatMessage({ id: 'on-site-setup-and-service-0' })}
+            </span>
             <span className="text-sm">
-              For orders of 150+ meals per day, a dedicated team is available to
-              set up and serve on-site.
+              {intl.formatMessage({
+                id: 'for-orders-of-100-meals-per-day-a-dedicated-team-is-available-to-set-up-and-serve-on-site',
+              })}
             </span>
           </div>
         </div>

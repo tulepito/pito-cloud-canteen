@@ -1,11 +1,11 @@
+import { useIntl } from 'react-intl';
 import { Splide, SplideSlide } from '@splidejs/react-splide';
 import Image from 'next/image';
 
-import image1 from '../assets/pitoAssets/1.png';
-import image4 from '../assets/pitoAssets/3.png';
+import image1 from '../assets/pitoAssets/1.webp';
+import image4 from '../assets/pitoAssets/3.webp';
 import image3 from '../assets/pitoAssets/11.png';
 import image5 from '../assets/pitoAssets/12.png';
-import image2 from '../assets/pitoAssets/13.png';
 
 import { ModalForm } from './Modal';
 
@@ -16,9 +16,11 @@ type ModalProps = {
   isModalOpen: boolean;
 };
 
-const images = [image1, image2, image3, image4, image5];
+const images = [image1, image3, image4, image5];
 
 const ModalAlt = ({ onClose, isModalOpen }: ModalProps) => {
+  const intl = useIntl();
+
   if (!isModalOpen) {
     return null; // Don't render the modal if it's not open
   }
@@ -76,13 +78,14 @@ const ModalAlt = ({ onClose, isModalOpen }: ModalProps) => {
           {/* Heading */}
           <div className="flex flex-col items-center text-center gap-4 mb-6">
             <h2 className="text-2xl md:text-4xl font-bold font-alt leading-snug">
-              Let’s Tailor Your
+              {intl.formatMessage({ id: 'lets-tailor-your-0' })}
               <br />
-              Lunch Solution
+              {intl.formatMessage({ id: 'lunch-solution-0' })}
             </h2>
             <p className="text-gray-600">
-              Say goodbye to lunch hassles — we’ll make every meal easy and
-              enjoyable for your team!
+              {intl.formatMessage({
+                id: 'say-goodbye-to-lunch-hassles-well-make-every-meal-easy-and-enjoyable-for-your-team-0',
+              })}
             </p>
           </div>
           {/* Form */}

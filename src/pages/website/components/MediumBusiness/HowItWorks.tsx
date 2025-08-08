@@ -119,13 +119,13 @@ export const HowItWorksSteps = ({
 
 const HowItWorks = () => {
   return (
-    <div className="flex flex-col items-center md:gap-12 md:px-0 px-5 md:pt-0 pt-20 md:pb-0 pb-20 gap-1 relative max-w-[1024px] mx-auto">
+    <div className="flex flex-col items-center md:gap-12 md:px-0 px-5 md:pt-16 pt-20 pb-16 gap-1 relative max-w-[1024px] mx-auto">
       <div className="flex flex-col gap-2 items-center">
-        <span className="font-alt text-2xl md:text-5xl font-bold text-center md:leading-[4rem]">
+        <span className="font-[unbounded] text-3xl md:text-[40px] font-bold text-center md:leading-tight">
           How it works <br />{' '}
           <span className="text-[#D680A3]">3 easy steps</span>{' '}
         </span>
-        <span className="text-text text-center md:w-auto w-2/3">
+        <span className="text-center md:w-auto w-2/3 md:text-lg font-medium">
           Transform Your Lunch Experience in Just 3 Steps
         </span>
       </div>

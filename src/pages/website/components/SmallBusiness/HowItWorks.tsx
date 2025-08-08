@@ -13,12 +13,13 @@ import { HowItWorksSteps } from '../MediumBusiness/HowItWorks';
 
 const HowItWorks = () => {
   return (
-    <div className="flex flex-col items-center md:gap-12 md:px-56 px-5 md:pb-36 md:pt-20 gap-0 relative">
+    <div className="flex flex-col items-center md:gap-12 md:px-0 px-5 md:pb-16 md:pt-16 gap-0 relative max-w-[1024px] mx-auto">
       <div className="flex flex-col gap-2 items-center">
-        <span className="font-alt text-2xl md:text-5xl font-bold text-center md:leading-[3rem]">
-          How It Works
-        </span>
-        <span className="text-text md:w-3/4 text-center">
+        <p className="font-[unbounded] text-3xl md:text-[40px] font-bold text-center md:leading-tight">
+          How It Works <br />
+          <span className="text-[#D680A3]">3 easy steps</span>{' '}
+        </p>
+        <span className="md:w-3/4 text-center font-medium md:text-lg">
           🎯 Ideal for teams of 10–99 employees, especially in offices without a
           built-in kitchen.
         </span>

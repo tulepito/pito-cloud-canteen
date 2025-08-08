@@ -31,15 +31,15 @@ const CTA = ({
         className="object-cover md:hidden block right-0 w-full"
       />
 
-      <div className="absolute top-12 flex flex-col md:items-start items-center md:text-start text-center gap-4 px-5 md:px-0 max-w-[1024px] mx-auto w-full py-16 md:pb-36 right-0 left-0">
-        <span className="text-text">{textTop}</span>
-        <span className="font-alt font-bold text-2xl md:text-6xl leading-[4rem]">
+      <div className="absolute -top-10 md:top-12 flex flex-col md:items-start items-center md:text-start text-center gap-4 px-5 md:px-0 max-w-[1024px] mx-auto w-full py-16 md:pb-36 right-0 left-0">
+        <span className="font-medium">{textTop}</span>
+        <span className="font-[unbounded] font-bold text-3xl md:text-[42px] leading-tight">
           {textMiddleNode}
         </span>
-        <span className="text-text md:w-3/4">{textBottom}</span>
+        <span className="font-medium md:text-lg md:w-3/4">{textBottom}</span>
         <button
           onClick={() => setIsModalOpen(true)}
-          className="btn z-20 hover:bg-black hover:text-white w-fit bg-white px-12 mt-3 md:mt-8">
+          className="btn hover:bg-black hover:text-white md:w-fit bg-white py-3 px-6 mt-3 md:mt-8 w-full font-[unbounded] font-semibold">
           Book a Free Consultation
         </button>
       </div>

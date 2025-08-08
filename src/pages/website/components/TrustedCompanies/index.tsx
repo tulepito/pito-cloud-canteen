@@ -2,15 +2,15 @@ import { useIntl } from 'react-intl';
 import clsx from 'clsx';
 import Image from 'next/image';
 
-import company1 from '../../assets/companies/1.webp'; // booking
-import company2 from '../../assets/companies/2.webp'; // shopee
-import company3 from '../../assets/companies/3.webp'; // employment hero
-import company4 from '../../assets/companies/4.webp'; // deloit
-import company5 from '../../assets/companies/5.webp'; // mm
-import company6 from '../../assets/companies/6.webp'; // salt
-import company7 from '../../assets/companies/7.webp'; // amazon
-import company8 from '../../assets/companies/8.webp'; // bck
-import company9 from '../../assets/companies/9.webp'; // lazada
+import company3 from '../../assets/companies/amazon.webp'; // employment hero
+import company4 from '../../assets/companies/armor.webp'; // deloit
+import company5 from '../../assets/companies/booking.webp'; // mm
+import company1 from '../../assets/companies/employment-hero.webp'; // booking
+import company6 from '../../assets/companies/jr286.webp'; // salt
+import company7 from '../../assets/companies/lazada.webp'; // amazon
+import company8 from '../../assets/companies/saltmine.webp'; // bck
+import company2 from '../../assets/companies/seo-vina.webp'; // shopee
+import company9 from '../../assets/companies/technos.webp'; // lazada
 
 import styles from './styles.module.css';
 
@@ -75,7 +75,7 @@ const TrustedCompanies = () => {
   const intl = useIntl();
 
   return (
-    <div className="mx-auto md:px-4 md:pb-20 px-5 pt-16 md:pt-0 flex flex-col md:gap-0 gap-5 items-center overflow-hidden">
+    <div className="mx-auto md:px-4 md:pb-16 px-5 pt-16 md:pt-0 flex flex-col md:gap-0 gap-5 items-center overflow-hidden">
       <span className="w-full md:w-2/3 font-medium text-center text-lg whitespace-pre-line md:whitespace-normal">
         {intl.formatMessage({
           id: 'trusted-by-vietnams-leading-tech-companies',

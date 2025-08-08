@@ -8,7 +8,25 @@ export const generalPaths = {
   Home: '/',
 };
 
-export const publicPaths = ['/website', '/sitemap.xml', '/robots.txt'];
+export const websitePaths = {
+  MealBoxDelivery: '/meal-box-delivery/',
+  PopupCanteen: '/popup-canteen/',
+  SmallBusiness: '/solutions/small-business/',
+  MiddleBusiness: '/solutions/middle-business/',
+  Admin: '/admin/',
+  Employee: '/employees/',
+  Startup: '/start-up/',
+  TechService: '/tech-service',
+  OffShore: '/off-shore',
+};
+
+export const publicPaths = [
+  generalPaths.Home,
+  websitePaths.MealBoxDelivery,
+  websitePaths.PopupCanteen,
+  '/sitemap.xml',
+  '/robots.txt',
+];
 
 export const enGeneralPaths = {
   SignIn: '/sign-in',

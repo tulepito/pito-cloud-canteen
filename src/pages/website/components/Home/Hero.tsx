@@ -96,6 +96,10 @@ const Hero = () => {
                 className={styles.fadeoutLoop}
                 onClick={() => setIsModalHeroOpen(true)}
               />
+              <PiPlayCircleThin
+                className={styles.fadeoutLoop}
+                onClick={() => setIsModalHeroOpen(true)}
+              />
             </div>
           </div>
         </div>

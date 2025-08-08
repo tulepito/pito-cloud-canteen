@@ -8,7 +8,7 @@ const SingleTestimonial = () => {
   const intl = useIntl();
 
   return (
-    <div className="md:px-0 md:pb-20 px-5 md:pt-20 pt-24 flex flex-col gap-5 items-center max-w-[1024px] mx-auto">
+    <div className="md:px-0 md:pb-16 px-5 md:pt-16 pt-24 flex flex-col gap-5 items-center max-w-[1024px] mx-auto">
       <span className="font-alt text-2xl md:text-3xl font-semibold md:leading-tight">
         “
         {intl.formatMessage({

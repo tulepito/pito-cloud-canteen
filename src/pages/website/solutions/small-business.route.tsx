@@ -5,7 +5,7 @@ import SmallBusiness from '../pages/SmallBusiness';
 
 function Page() {
   return (
-    <Layout noFooter>
+    <Layout>
       <SmallBusiness />
     </Layout>
   );

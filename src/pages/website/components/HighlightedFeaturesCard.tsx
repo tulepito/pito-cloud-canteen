@@ -9,17 +9,17 @@ const HighlightedFeaturesCard = () => {
   const intl = useIntl();
 
   return (
-    <div className="flex flex-col md:gap-12 md:pb-20 md:p-20 md:px-0 px-2 pt-16 gap-10 relative max-w-[1024px] mx-auto">
+    <div className="flex flex-col md:gap-12 md:pb-16 md:px-0 px-2 pb-10 pt-10 md:pt-16 gap-10 relative max-w-[1024px] mx-auto">
       {/* Heading */}
       <div className="flex flex-col gap-2 items-center">
-        <span className="text-text w-2/3 text-center">
+        <span className="w-2/3 text-center font-medium">
           {intl.formatMessage({
             id: 'reclaim-your-time-boost-team-satisfaction',
           })}
         </span>
-        <span className="font-alt text-2xl md:text-[42px] font-bold md:w-1/2 text-center md:leading-tight">
+        <h2 className="font-[unbounded] text-3xl md:text-[40px] font-bold md:w-1/2 text-center md:leading-tight">
           {intl.formatMessage({ id: 'highlighted-features' })}
-        </span>
+        </h2>
       </div>
 
       {/* Feature Cards */}
@@ -30,9 +30,9 @@ const HighlightedFeaturesCard = () => {
             <PiUser />
           </div>
           <div className="flex flex-col gap-1">
-            <span className="font-semibold">
+            <h3 className="font-semibold">
               {intl.formatMessage({ id: 'auto-pilot-for-admins-0' })}
-            </span>
+            </h3>
             <span className="text-sm md:min-h-[60.01px]">
               {intl.formatMessage({
                 id: 'schedule-once-for-the-week-monitor-everything-on-the-system-and-make-real-time-edits-with-ease',
@@ -47,9 +47,9 @@ const HighlightedFeaturesCard = () => {
             <PiUsersThreeLight />
           </div>
           <div className="flex flex-col gap-1">
-            <span className="font-semibold">
+            <h3 className="font-semibold">
               {intl.formatMessage({ id: 'auto-pilot-for-participants' })}
-            </span>
+            </h3>
             <span className="text-sm">
               {intl.formatMessage({
                 id: 'weekly-meal-reminders-dietary-filtering-and-curated-menus-set-it-and-enjoy-it-hassle-free',
@@ -65,9 +65,9 @@ const HighlightedFeaturesCard = () => {
           </div>
 
           <div className="flex flex-col gap-1">
-            <span className="font-semibold">
+            <h3 className="font-semibold">
               {intl.formatMessage({ id: 'personalized-packaging-0' })}
-            </span>
+            </h3>
             <span className="text-sm">
               {intl.formatMessage({
                 id: 'each-box-is-labeled-with-the-employees-name-meal-details-and-dietary-information-no-more-lunchtime-mix-ups-0',

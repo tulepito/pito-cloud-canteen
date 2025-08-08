@@ -24,8 +24,8 @@ const solutionList = [
 
 const CommonProblems = () => {
   return (
-    <div className="md:pt-1 pt-20 md:pb-20 md:px-0 flex flex-col items-center gap-7 px-5 max-w-[1024px] mx-auto">
-      <span className="font-alt font-bold text-2xl md:w-2/3 text-center md:text-5xl md:leading-[4rem]">
+    <div className="pt-16 md:pb-16 md:px-0 flex flex-col items-center gap-7 px-5 max-w-[1024px] mx-auto">
+      <span className="font-[unbounded] font-bold text-3xl md:w-[75%] text-center md:text-[40px] md:leading-tight">
         From admin overload <br /> to{' '}
         <span className="text-[#96A546]">seamless lunch operations</span>
       </span>

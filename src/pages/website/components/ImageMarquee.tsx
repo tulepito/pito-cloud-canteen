@@ -1,8 +1,8 @@
 import Marquee from 'react-fast-marquee';
 import Image from 'next/image';
 
-import image1 from '../assets/pitoAssets/1.png';
-import image4 from '../assets/pitoAssets/7.png';
+import image1 from '../assets/pitoAssets/1.webp';
+import image4 from '../assets/pitoAssets/7.webp';
 import image2 from '../assets/pitoAssets/14.png';
 import image3 from '../assets/pitoAssets/15.png';
 import image5 from '../assets/pitoAssets/16.png';

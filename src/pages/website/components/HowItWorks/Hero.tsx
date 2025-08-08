@@ -60,27 +60,31 @@ const HeroContent = () => {
   const intl = useIntl();
 
   return (
-    <div className="flex flex-col items-center justify-center gap-2 w-full text-center md:w-2/3 md:gap-4">
-      <span className="text-center">
-        {intl.formatMessage({ id: 'your-teams-meals' })}
-      </span>
-
-      <div className="flex flex-col items-center text-center gap-2 md:gap-5">
-        <h1 className="font-alt font-bold text-3xl leading-tight md:text-6xl xl:whitespace-pre">
-          {intl.formatMessage({
-            id: 'done-right-without-the-daily-coordination',
-          })}
-        </h1>
-
-        <p className="text-center md:w-[60%] md:whitespace-pre-line">
-          {intl.formatMessage({
-            id: 'automated-lunch-ordering-system-designed-for-teams-of-20-to-99-employees-helps-you-save-time-on-coordination-so-you-can-focus-on-your-work',
-          })}
-        </p>
-
-        <button className="btn capitalize border border-solid border-black bg-black text-white hover:bg-white hover:text-black mt-5 w-full md:w-auto">
-          {intl.formatMessage({ id: 'get-started' })}
-        </button>
+    <div className="w-full md:min-h-[40rem] relative">
+      {/* main hero section */}
+      <div className="flex flex-col items-center gap-20 md:py-20 pt-32 md:pt-20 px-5 md:pb-auto pb-12 md:min-h-[40rem] justify-center">
+        {/* lhs */}
+        <div className="flex flex-col gap-2 md:gap-4 w-full text-center justify-center md:w-2/3">
+          <span className="text-center font-medium">
+            {intl.formatMessage({ id: 'your-teams-meals' })}
+          </span>
+          <div className="flex flex-col items-center text-center md:gap-5 gap-2 md:pt-0">
+            <h1 className="font-[unbounded] font-bold text-3xl md:text-[40px] md:w-auto leading-[1.4]">
+              {intl.formatMessage({ id: 'giai-phap-dat-bua-trua-tu-dong' })},
+              <br /> {intl.formatMessage({ id: 'toi-uu-cho-nhom' })}{' '}
+              <span className="text-[#D680A3]">20–99</span>{' '}
+              {intl.locale === 'vi' && 'người'}
+            </h1>
+            <span className="text-center md:w-[70%] md:whitespace-pre-line md:text-lg font-medium">
+              {intl.formatMessage({
+                id: 'helps-you-save-time-on-coordination-so-you-can-focus-on-your-work',
+              })}
+            </span>
+            <button className="capitalize btn border font-[unbounded] border-gray-300 bg-black text-white py-3 px-6 font-semibold hover:opacity-90 transition-all duration-200 hover:scale-[1.01]">
+              {intl.formatMessage({ id: 'get-started' })}
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );

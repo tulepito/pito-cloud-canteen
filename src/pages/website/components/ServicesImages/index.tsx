@@ -1,28 +1,13 @@
 import React from 'react';
 import clsx from 'clsx';
+import type { StaticImageData } from 'next/image';
 import Image from 'next/image';
-
-import pitoAsset1 from '../../assets/pitoAssets/1.png';
-import pitoAsset2 from '../../assets/pitoAssets/2.png';
-import pitoAsset3 from '../../assets/pitoAssets/3.png';
-import pitoAsset4 from '../../assets/pitoAssets/4.png';
-import pitoAsset5 from '../../assets/pitoAssets/5.png';
-import pitoAsset6 from '../../assets/pitoAssets/6.png';
 
 import css from './styles.module.css';
 
-const images = [
-  pitoAsset1,
-  pitoAsset2,
-  pitoAsset3,
-  pitoAsset4,
-  pitoAsset5,
-  pitoAsset6,
-];
-
-const ServiceImages = () => {
+const ServiceImages = ({ images }: { images: StaticImageData[] }) => {
   return (
-    <div className="mx-auto pb-10">
+    <div className="mx-auto">
       <div className={clsx(css.carousel__services_feature)}>
         <div className={clsx('py-4', css.services_feature)}>
           {images.concat(images).map((image, index) => (

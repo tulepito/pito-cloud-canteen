@@ -9,12 +9,12 @@ import {
 
 const WhyChoosePito = () => {
   return (
-    <div className="flex flex-col items-center md:gap-12 md:px-56 px-5 md:pb-20 md:pt-20 gap-10 relative pb-10">
+    <div className="flex flex-col items-center md:gap-12 md:px-0 px-5 md:pb-16 md:pt-16 gap-10 relative pb-10 max-w-[1024px] mx-auto">
       <div className="flex flex-col gap-2 items-center">
-        <span className="font-alt text-2xl md:text-4xl font-bold text-center md:leading-[3rem]">
+        <span className="font-[unbounded] text-3xl md:text-[40px] font-bold text-center md:leading-tight">
           Why Choose PITO Cloud Canteen?
         </span>
-        <span className="text-text md:w-3/4 text-center">
+        <span className="md:w-3/4 text-center font-medium md:text-lg">
           No more manual lunch ordering. PITO helps you schedule lunch for the
           whole week in just a few minutes. No Excel files, no complicated Zalo
           messages.
