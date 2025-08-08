@@ -7,6 +7,7 @@ import { convertDateToVNTimezone } from '@helpers/dateHelpers';
 import logger from '@helpers/logger';
 import { denormalisedResponseEntities } from '@services/data';
 import { fetchListing, fetchUserListing } from '@services/integrationHelper';
+import { addToProcessOrderQueue } from '@services/jobs/processOrder.job';
 import { getIntegrationSdk, getSdk, handleError } from '@services/sdk';
 import { createSlackNotification } from '@services/slackNotification';
 import type {
@@ -218,6 +219,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           anonymous = [],
         } = req.body as PUTMemberOrderBody;
 
+        const { orderId } = req.query as { orderId: string };
+
         const sdk = getSdk(req, res);
         const currentUser = await sdk.currentUser.show();
 
@@ -230,31 +233,23 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             id: currentPlan.attributes?.metadata?.orderId,
           });
 
-        const newOrderDetail = {
-          ...orderDetail,
-          [currentViewDate]: {
-            ...orderDetail[currentViewDate],
-            memberOrders: {
-              ...orderDetail[currentViewDate].memberOrders,
-              ...(newMembersOrderValues && {
-                ...newMembersOrderValues,
-              }),
-              ...(participantId && {
-                [participantId]: newMemberOrderValues,
-              }),
-            },
-          },
+        const memberOrders = {
+          ...orderDetail[currentViewDate].memberOrders,
+          ...(newMembersOrderValues && {
+            ...newMembersOrderValues,
+          }),
+          ...(participantId && {
+            [participantId]: newMemberOrderValues,
+          }),
         };
 
-        const response = await integrationSdk.listings.update(
-          {
-            id: planId,
-            metadata: {
-              orderDetail: newOrderDetail,
-            },
-          },
-          { expand: true },
-        );
+        const response = await addToProcessOrderQueue({
+          orderId,
+          currentUserId: participantId!,
+          planId,
+          memberOrders,
+          orderDay: `${currentViewDate}`,
+        });
 
         const [planListing] = denormalisedResponseEntities(response);
 

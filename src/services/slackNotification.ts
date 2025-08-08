@@ -2,6 +2,7 @@ import axios from 'axios';
 
 import logger from '@helpers/logger';
 import { Listing, User } from '@src/utils/data';
+import { formatTimestamp } from '@src/utils/dates';
 import { ESlackNotificationType } from '@src/utils/enums';
 import { editFoodTemplate } from '@src/utils/slackTemplates/editFood';
 import { newFoodTemplate } from '@src/utils/slackTemplates/newFood';
@@ -121,6 +122,7 @@ type SlackNotificationParams = {
     orderLink: string;
     orderCode: string;
     ratingUserType: 'participant' | 'booker';
+    subDate?: number;
   };
 };
 
@@ -155,7 +157,20 @@ export const createSlackNotification = async (
                 type: 'section',
                 text: {
                   type: 'mrkdwn',
-                  text: `[${userTypeData.label}] ${notificationParams.participantRatingData.ratingUserName} đã đánh giá ${notificationParams.participantRatingData.ratingScore} :star: cho nhà hàng *${notificationParams.participantRatingData.partnerName}* trong đơn hàng *<${notificationParams.participantRatingData.orderLink}|#${notificationParams.participantRatingData.orderCode}>*`,
+                  text: `[${userTypeData.label}] ${
+                    notificationParams.participantRatingData.ratingUserName
+                  } đã đánh giá ${
+                    notificationParams.participantRatingData.ratingScore
+                  } :star: cho nhà hàng *${
+                    notificationParams.participantRatingData.partnerName
+                  }* trong đơn hàng *<${
+                    notificationParams.participantRatingData.orderLink
+                  }|#${notificationParams.participantRatingData.orderCode}>* ${
+                    notificationParams.participantRatingData.subDate &&
+                    `cho sub đơn *${formatTimestamp(
+                      notificationParams.participantRatingData.subDate,
+                    )}*`
+                  }`,
                 },
               },
               ...(notificationParams.participantRatingData.content
