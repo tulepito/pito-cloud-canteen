@@ -21,9 +21,9 @@ export const websitePaths = {
 };
 
 export const publicPaths = [
-  generalPaths.Home,
   websitePaths.MealBoxDelivery,
   websitePaths.PopupCanteen,
+  '/website',
   '/sitemap.xml',
   '/robots.txt',
 ];

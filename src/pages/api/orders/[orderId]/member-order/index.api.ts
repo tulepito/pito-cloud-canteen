@@ -7,7 +7,7 @@ import { convertDateToVNTimezone } from '@helpers/dateHelpers';
 import logger from '@helpers/logger';
 import { denormalisedResponseEntities } from '@services/data';
 import { fetchListing, fetchUserListing } from '@services/integrationHelper';
-import { addToProcessOrderQueue } from '@services/jobs/processOrder.job';
+import { addToProcessMemberOrderQueue } from '@services/jobs/processMemberOrder.job';
 import { getIntegrationSdk, getSdk, handleError } from '@services/sdk';
 import { createSlackNotification } from '@services/slackNotification';
 import type {
@@ -243,15 +243,13 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           }),
         };
 
-        const response = await addToProcessOrderQueue({
+        const planListing = await addToProcessMemberOrderQueue({
           orderId,
           currentUserId: participantId!,
           planId,
           memberOrders,
           orderDay: `${currentViewDate}`,
         });
-
-        const [planListing] = denormalisedResponseEntities(response);
 
         if (
           orderListingResponse.data.data.attributes?.metadata?.orderState ===
