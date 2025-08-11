@@ -3,7 +3,7 @@ import Image from 'next/image';
 import { useModal } from '@pages/website/pages/Layout';
 
 import blue from '../../assets/decorations/blue2.svg';
-import imageDecor1Alt2 from '../../assets/decorations/imageDecor1Alt2.svg';
+import imageDecor1Alt2 from '../../assets/decorations/imageDecor1Alt2.webp';
 import lemon from '../../assets/decorations/lemon.svg';
 import pink from '../../assets/decorations/pink.svg';
 import yellow from '../../assets/decorations/yellow.svg';

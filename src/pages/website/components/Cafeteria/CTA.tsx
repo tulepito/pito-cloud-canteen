@@ -4,8 +4,8 @@ import Image from 'next/image';
 import { useModal } from '@pages/website/pages/Layout';
 
 import blue from '../../assets/decorations/blue2.svg';
-import imageDecor2Alt from '../../assets/decorations/imageDecor2Alt.svg';
-import imageDecor3Alt from '../../assets/decorations/imageDecor3Alt.svg';
+import imageDecor2Alt from '../../assets/decorations/imageDecor2Alt.webp';
+import imageDecor3Alt from '../../assets/decorations/imageDecor3Alt.webp';
 import lemon from '../../assets/decorations/lemon.svg';
 import yellow from '../../assets/decorations/yellow.svg';
 
@@ -71,7 +71,7 @@ const CTA = () => {
       <Image
         src={imageDecor3Alt}
         alt="blue decor"
-        className="md:top-8 -right-20 -top-20 md:size-[540px] size-[280px] absolute -z-10"
+        className="md:top-20 -right-20 -top-20 md:w-[540px] aspect-[4/3] w-[280px] absolute -z-10"
       />
     </div>
   );

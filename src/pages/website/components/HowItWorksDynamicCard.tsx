@@ -5,10 +5,11 @@ import Image from 'next/image';
 import Step3Image from '../assets/giao-va-setup-tan-noi.webp';
 import Step1Image from '../assets/len-ke-hoach-mot-lan-khong-can-dat-moi-ngay.webp';
 import Step2Image from '../assets/nhan-vien-tu-chon-mon.webp';
-import { useModal } from '../pages/Layout';
+
+import GoogleCalendarModal from './GoogleCalendarModal';
 
 const HowItWorksDynamicCard = () => {
-  const { setIsModalOpen } = useModal();
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeCard, setActiveCard] = useState<number>(0);
   const intl = useIntl();
 
@@ -42,7 +43,7 @@ const HowItWorksDynamicCard = () => {
   return (
     <div className="flex flex-col items-center md:gap-12 md:px-0 px-5 md:pb-20 md:pt-16 gap-10 relative max-w-[1024px] mx-auto">
       <h2 className="font-[unbounded] text-3xl md:text-[40px] font-bold md:w-2/3 text-center md:leading-tight md:whitespace-pre-line">
-        {intl.formatMessage({ id: 'how-it-works' })}
+        {intl.formatMessage({ id: 'mo-hinh-hoat-dong' })}
       </h2>
       <div className="flex md:flex-row flex-col md:items-stretch w-full gap-3">
         {cards.map((card, index) => {
@@ -106,6 +107,14 @@ const HowItWorksDynamicCard = () => {
         className="btn border font-[unbounded] font-medium border-solid border-black text-black hover:bg-black hover:text-white md:w-fit w-full">
         {intl.formatMessage({ id: 'dat-lich-demo-mien-phi' })}
       </a>
+      {isModalOpen && (
+        <div className="fixed inset-0 z-[9999] flex justify-center items-center bg-black/20">
+          <GoogleCalendarModal
+            isModalOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+          />
+        </div>
+      )}
     </div>
   );
 };

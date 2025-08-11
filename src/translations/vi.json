@@ -2349,8 +2349,8 @@
   "become-a-partner": "Trở thành đối tác",
   "giai-phap-dat-bua-trua-tu-dong-cho-nhom-20-99-nguoi": "Giải pháp đặt bữa trưa tự động cho nhóm 20–99 người",
   "tu-dong-len-ke-hoach-bua-trua-cung-pito-nhan-vien-chu-dong-chon-mon-quan-ly-ca-tuan-de-dang-giao-dung-gio-khong-can-xu-ly-thu-cong": "Tự động lên kế hoạch bữa trưa cùng PITO. Nhân viên chủ động chọn món, quản lý cả tuần dễ dàng, giao đúng giờ – không cần xử lý thủ công",
-  "giai-phap-dat-bua-trua-tu-dong": "Giải pháp đặt bữa trưa tự động",
-  "toi-uu-cho-nhom": "Tối ưu cho nhóm",
+  "giai-phap-dat-bua-trua-tu-dong": "Tự động hóa bữa trưa",
+  "toi-uu-cho-nhom": "Phù hợp nhóm",
   "ma-code": "Mã Code",
   "mo-trang-scan": "Mở trang scan",
   "tai-ma-qr": "Tải mã QR",
@@ -2363,5 +2363,6 @@
   "quay-lai-trang-chu": "Quay lại trang chủ",
   "vui-long-doi-trong-giay-lat": "Vui lòng đợi trong giây lát.",
   "bua-trua-tu-dong-cho-doanh-nghiep-lon-or-pito-cloud-canteen": "Bữa trưa tự động cho doanh nghiệp lớn | PITO Cloud Canteen",
-  "don-gian-hoa-viec-dat-bua-trua-cho-100-2000-nhan-su-nhan-vien-tu-chon-mon-pito-setup-canteen-tai-cho-khong-can-bep-an-noi-bo": "Đơn giản hóa việc đặt bữa trưa cho 100–2000 nhân sự. Nhân viên tự chọn món, PITO setup canteen tại chỗ, không cần bếp ăn nội bộ."
+  "don-gian-hoa-viec-dat-bua-trua-cho-100-2000-nhan-su-nhan-vien-tu-chon-mon-pito-setup-canteen-tai-cho-khong-can-bep-an-noi-bo": "Đơn giản hóa việc đặt bữa trưa cho 100–2000 nhân sự. Nhân viên tự chọn món, PITO setup canteen tại chỗ, không cần bếp ăn nội bộ.",
+  "mo-hinh-hoat-dong": "Mô hình hoạt động?"
 }

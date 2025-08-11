@@ -40,8 +40,6 @@ const Hero = () => {
 
   const [isModalHeroOpen, setIsModalHeroOpen] = useState(false);
 
-  console.log({ isModalHeroOpen });
-
   return (
     <>
       <div className="w-full md:min-h-[70vh] md:px-0 px-5 relative container mx-auto">

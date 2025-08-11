@@ -4,8 +4,8 @@ import Image from 'next/image';
 import { useModal } from '@pages/website/pages/Layout';
 
 import blue2 from '../../assets/decorations/blue2.svg';
-import imageDecor1Alt from '../../assets/decorations/imageDecor1Alt.svg';
-import imageDecor3 from '../../assets/decorations/imageDecor3.svg';
+import imageDecor1Alt from '../../assets/decorations/imageDecor1Alt.webp';
+import imageDecor3 from '../../assets/decorations/imageDecor3.webp';
 import lemon from '../../assets/decorations/lemon.svg';
 import lemon2 from '../../assets/decorations/lemon2.svg';
 import yellow2 from '../../assets/decorations/yellow2.svg';
@@ -56,7 +56,7 @@ const Hero = () => {
       <Image
         src={imageDecor3}
         alt="blue decor"
-        className="md:top-8 md:-right-44 -right-24 -top-16 md:size-[33rem] size-48 absolute -z-20"
+        className="md:top-8 md:-right-44 -right-24 -top-16 md:w-[33rem] w-48 aspect-[5/4] absolute -z-20"
       />
       <Image
         src={lemon}
@@ -71,7 +71,7 @@ const Hero = () => {
       <Image
         src={imageDecor1Alt}
         alt="image decor"
-        className="md:top-20 -top-10 -left-14 md:-left-64 md:size-[37rem] size-32 absolute -z-20"
+        className="md:top-20 -top-10 -left-14 md:-left-64 md:w-[37rem] w-32 aspect-[4/3] absolute -z-20"
       />
       <Image
         src={blue2}

@@ -2293,7 +2293,7 @@
   "SubOrderDetail.in-tem-nhiet": "Print thermal label",
   "book-free-consultation": "Book free consultation",
   "meal-box-delivery": "Meal Box Delivery",
-  "cafeteria-service": "Cafeteria Service",
+  "cafeteria-service": "Popup Canteen",
   "by-size": "By Size",
   "small-business": "Small Business",
   "middle-business": "Middle Business",
@@ -2342,7 +2342,7 @@
   "you-can-easily-track-and-manage-their-orders-directly-through-the-system-dashboard-allowing-real-time-updates-on-order-status-adjustments-and-cost-control-0": "You can easily track and manage their orders directly through the system dashboard, allowing real-time updates on order status, adjustments, and cost control.",
   "ban-van-con-thac-mac": "Still need help?",
   "your-teams-meals-0": "Your Team’s Meals",
-  "upgrade-your-teams-lunch-experience": "Upgrade Your Team’s Lunch Experience",
+  "upgrade-your-teams-lunch-experience": "Upgrade Your Team’s \n Lunch Experience",
   "whether-its-100-or-500-employees-lunch-coordination-is-no-longer-a-hassle": "Whether it’s 100 or 500 employees — lunch coordination is no longer a hassle.",
   "request-a-free-consultation": "Request a Free Consultation",
   "help-center": "Help Center",
@@ -2363,5 +2363,6 @@
   "quay-lai-trang-chu": "Go back to homepage",
   "vui-long-doi-trong-giay-lat": "Please wait a moment.",
   "bua-trua-tu-dong-cho-doanh-nghiep-lon-or-pito-cloud-canteen": "Lunch Solutions for 100–2000 Employees | PITO Cloud Canteen",
-  "don-gian-hoa-viec-dat-bua-trua-cho-100-2000-nhan-su-nhan-vien-tu-chon-mon-pito-setup-canteen-tai-cho-khong-can-bep-an-noi-bo": "End lunch coordination hassles. PITO delivers personalized, ready-to-eat meals at your office – with on-site setup for teams of 100+ employees."
+  "don-gian-hoa-viec-dat-bua-trua-cho-100-2000-nhan-su-nhan-vien-tu-chon-mon-pito-setup-canteen-tai-cho-khong-can-bep-an-noi-bo": "End lunch coordination hassles. PITO delivers personalized, ready-to-eat meals at your office – with on-site setup for teams of 100+ employees.",
+  "mo-hinh-hoat-dong": "How It Works?"
 }
