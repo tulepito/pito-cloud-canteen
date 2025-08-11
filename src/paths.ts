@@ -9,13 +9,13 @@ export const generalPaths = {
 };
 
 export const websitePaths = {
-  MealBoxDelivery: '/meal-box-delivery/',
-  PopupCanteen: '/popup-canteen/',
-  SmallBusiness: '/solutions/small-business/',
-  MiddleBusiness: '/solutions/middle-business/',
-  Admin: '/admin/',
-  Employee: '/employees/',
-  Startup: '/start-up/',
+  MealBoxDelivery: '/meal-box-delivery',
+  PopupCanteen: '/popup-canteen',
+  SmallBusiness: '/solutions/small-business',
+  MiddleBusiness: '/solutions/middle-business',
+  Admin: '/admin',
+  Employee: '/employees',
+  Startup: '/start-up',
   TechService: '/tech-service',
   OffShore: '/off-shore',
 };

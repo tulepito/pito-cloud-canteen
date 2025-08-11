@@ -40,6 +40,8 @@ const Hero = () => {
 
   const [isModalHeroOpen, setIsModalHeroOpen] = useState(false);
 
+  console.log({ isModalHeroOpen });
+
   return (
     <>
       <div className="w-full md:min-h-[70vh] md:px-0 px-5 relative container mx-auto">
@@ -75,7 +77,7 @@ const Hero = () => {
           {isClient && width <= 768 && (
             <VideoSection
               embedUrl={`https://fast.wistia.net/embed/iframe/${linkVideo}?autoPlay=true&mute=true&playerColor=000000`}
-              className="w-full hidden md:block"
+              className="w-full block md:hidden"
             />
           )}
 
@@ -130,7 +132,7 @@ const Hero = () => {
                 embedUrl={`https://fast.wistia.net/embed/iframe/${linkVideo}?mute=true&playerColor=000000${
                   isModalHeroOpen ? '&autoPlay=true' : '&play=false'
                 }`}
-                className="w-full block md:hidden"
+                className="w-full hidden md:block"
               />
             }
           />
