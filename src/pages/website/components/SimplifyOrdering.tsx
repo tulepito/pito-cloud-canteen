@@ -30,7 +30,7 @@ const SimplifyOrdering = () => {
 
   return (
     <div className="pt-16 px-5 flex md:flex-row-reverse flex-col gap-4 md:px-0 md:pb-16 max-w-[1024px] mx-auto">
-      <div className="md:w-1/2 relative flex items-end justify-center">
+      <div className="md:w-1/2 relative md:flex items-end justify-center hidden">
         <div className="w-full rounded-2xl overflow-hidden shadow-lg">
           <VideoSection
             embedUrl={`https://fast.wistia.net/embed/iframe/${steps[activeIndex].image}?autoPlay=true&mute=true&playerColor=000000`}
@@ -38,7 +38,6 @@ const SimplifyOrdering = () => {
           />
         </div>
       </div>
-
       <div className="flex flex-col gap-8 flex-1">
         <h2 className="font-[unbounded] font-bold text-3xl md:text-start text-center md:text-[40px] md:leading-tight md:whitespace-pre-line">
           {intl.formatMessage({ id: 'simplify-the-process-of-ordering-lunch' })}
@@ -60,6 +59,16 @@ const SimplifyOrdering = () => {
                   `}></div>
                 {step.step}
               </button>
+              {activeIndex === index && (
+                <div className="md:w-1/2 relative flex md:hidden items-end justify-center mt-2 md:mt-0">
+                  <div className="w-full rounded-2xl overflow-hidden shadow-lg">
+                    <VideoSection
+                      embedUrl={`https://fast.wistia.net/embed/iframe/${step.image}?autoPlay=true&mute=true&playerColor=000000`}
+                      className="w-full"
+                    />
+                  </div>
+                </div>
+              )}
             </div>
           ))}
         </div>

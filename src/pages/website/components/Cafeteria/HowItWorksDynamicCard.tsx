@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
+import clsx from 'clsx';
 import Image from 'next/image';
 
 import Step3Image from '../../assets/giao-va-setup-tan-noi.webp';
@@ -41,8 +42,8 @@ const HowItWorksDynamicCard = () => {
   );
 
   return (
-    <div className="flex flex-col items-center md:gap-12 md:px-0 px-5 md:pb-16 md:pt-16 pt-20 gap-10 relative max-w-[1024px] mx-auto">
-      <h2 className="font-[unbounded] text-3xl md:text-[40px] font-bold md:w-full text-center md:leading-tight whitespace-pre-line">
+    <div className="flex flex-col items-center md:gap-12 md:px-0 px-5 md:pb-16 md:pt-16 pt-16 gap-10 relative max-w-[1024px] mx-auto">
+      <h2 className="font-[unbounded] text-2xl md:text-[40px] font-bold md:w-full text-center md:leading-tight whitespace-pre-line">
         {intl.formatMessage({ id: 'how-it-works' })}
       </h2>
       <div className="flex md:flex-row flex-col md:items-stretch w-full gap-3">
@@ -77,7 +78,10 @@ const HowItWorksDynamicCard = () => {
                     isActive ? 'scale-100 h-56' : 'scale-0 h-0'
                   }`}>
                   <Image
-                    className="w-full -mr-16 h-full object-cover object-top-left"
+                    className={clsx(
+                      'w-full h-full object-cover object-top-left',
+                      card.number === '03' ? '-mr-4' : '-mr-16',
+                    )}
                     src={card.image}
                     alt={card.title}
                   />

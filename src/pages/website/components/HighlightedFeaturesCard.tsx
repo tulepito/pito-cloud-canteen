@@ -9,7 +9,7 @@ const HighlightedFeaturesCard = () => {
   const intl = useIntl();
 
   return (
-    <div className="flex flex-col md:gap-12 md:pb-16 md:px-0 px-2 pb-10 pt-10 md:pt-16 gap-10 relative max-w-[1024px] mx-auto">
+    <div className="flex flex-col md:gap-12 md:pb-16 md:px-0 px-5 pb-0 pt-16 gap-10 relative max-w-[1024px] mx-auto">
       {/* Heading */}
       <div className="flex flex-col gap-2 items-center">
         <span className="w-2/3 text-center font-medium">
@@ -17,7 +17,7 @@ const HighlightedFeaturesCard = () => {
             id: 'reclaim-your-time-boost-team-satisfaction',
           })}
         </span>
-        <h2 className="font-[unbounded] text-3xl md:text-[40px] font-bold md:w-1/2 text-center md:leading-tight">
+        <h2 className="font-[unbounded] text-2xl md:text-[40px] font-bold md:w-1/2 text-center md:leading-tight">
           {intl.formatMessage({ id: 'highlighted-features' })}
         </h2>
       </div>

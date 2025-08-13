@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { useIntl } from 'react-intl';
 import Image from 'next/image';
 
-import Step3Image from '../assets/giao-va-setup-tan-noi.webp';
 import Step1Image from '../assets/len-ke-hoach-mot-lan-khong-can-dat-moi-ngay.webp';
+import Step3Image from '../assets/meal-box-delivery.webp';
 import Step2Image from '../assets/nhan-vien-tu-chon-mon.webp';
 
 import GoogleCalendarModal from './GoogleCalendarModal';
@@ -41,8 +41,8 @@ const HowItWorksDynamicCard = () => {
   ];
 
   return (
-    <div className="flex flex-col items-center md:gap-12 md:px-0 px-5 md:pb-20 md:pt-16 gap-10 relative max-w-[1024px] mx-auto">
-      <h2 className="font-[unbounded] text-3xl md:text-[40px] font-bold md:w-2/3 text-center md:leading-tight md:whitespace-pre-line">
+    <div className="flex flex-col items-center md:gap-12 md:px-0 px-5 md:pb-20 pt-16 md:pt-16 gap-10 relative max-w-[1024px] mx-auto">
+      <h2 className="font-[unbounded] text-2xl md:text-[40px] font-bold md:w-2/3 text-center md:leading-tight md:whitespace-pre-line">
         {intl.formatMessage({ id: 'mo-hinh-hoat-dong' })}
       </h2>
       <div className="flex md:flex-row flex-col md:items-stretch w-full gap-3">

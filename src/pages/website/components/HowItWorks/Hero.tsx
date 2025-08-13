@@ -65,16 +65,17 @@ const HeroContent = () => {
   return (
     <div className="w-full md:min-h-[30rem] relative">
       {/* main hero section */}
-      <div className="flex flex-col items-center gap-20 pt-32 md:pt-20 px-5 md:pb-auto pb-12 md:min-h-[30rem] justify-center">
+      <div className="flex flex-col items-center gap-20 md:pb-10 py-0 md:pt-20 px-0 md:px-5 md:pb-auto md:min-h-[30rem] justify-center">
         {/* lhs */}
         <div className="flex flex-col gap-2 md:gap-4 w-full text-center justify-center md:w-2/3">
           <span className="text-center font-medium">
             {intl.formatMessage({ id: 'your-teams-meals' })}
           </span>
           <div className="flex flex-col items-center text-center md:gap-5 gap-2 md:pt-0">
-            <h1 className="font-[unbounded] font-bold text-3xl md:text-[40px] md:w-auto leading-[1.4]">
+            <h1 className="font-[unbounded] font-bold text-3xl md:text-[42px] md:w-auto leading-[1.4]">
               {intl.formatMessage({ id: 'giai-phap-dat-bua-trua-tu-dong' })},
-              <br /> {intl.formatMessage({ id: 'toi-uu-cho-nhom' })}{' '}
+              <br className="hidden md:block" />{' '}
+              {intl.formatMessage({ id: 'toi-uu-cho-nhom' })}{' '}
               <span className="text-[#D680A3]">20–99</span>{' '}
               {intl.locale === 'vi' && 'người'}
             </h1>
@@ -115,7 +116,7 @@ const Decorations = () => (
 const Hero = () => {
   return (
     <section className="w-full relative md:min-h-[30rem]">
-      <div className="flex flex-col items-center gap-20 px-5 pt-32 pb-12 md:py-20 md:pt-20">
+      <div className="flex flex-col items-center gap-20 px-5 pt-32 pb-10 md:pb-12 md:py-20 md:pt-20">
         <HeroContent />
       </div>
       <Decorations />

@@ -75,7 +75,7 @@ const Testimonials: React.FC = () => {
   ];
 
   return (
-    <div className="pt-10 md:py-16">
+    <div className="pt-16 pb-0 md:py-16">
       <div className="flex flex-col gap-10 md:gap-12 w-full">
         <div className="flex items-center justify-center relative md:px-0 px-5">
           <h2 className="relative font-semibold font-[unbounded] font-alt text-2xl md:text-[40px] md:text-start text-center">

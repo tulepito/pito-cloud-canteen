@@ -76,7 +76,7 @@ const TrustedCompanies = () => {
 
   return (
     <div className="mx-auto md:px-4 md:pb-16 px-5 pt-16 md:pt-0 flex flex-col md:gap-0 gap-5 items-center overflow-hidden">
-      <span className="w-full md:w-2/3 font-medium text-center text-lg whitespace-pre-line md:whitespace-normal">
+      <span className="w-full md:w-2/3 font-medium text-center md:text-lg whitespace-pre-line md:whitespace-normal">
         {intl.formatMessage({
           id: 'trusted-by-vietnams-leading-tech-companies',
         })}

@@ -423,7 +423,7 @@ const Navbar = () => {
 
       {/* Mobile Menu */}
       <div
-        className={`fixed top-0 right-0 h-full w-full max-w-sm bg-white z-[1000] transform transition-transform duration-300 ease-in-out md:hidden ${
+        className={`fixed top-0 right-0 h-full w-full bg-white z-[1000] transform transition-transform duration-300 ease-in-out md:hidden ${
           isMenuOpen ? 'translate-x-0' : 'translate-x-full'
         }`}>
         <div className="flex flex-col h-full">

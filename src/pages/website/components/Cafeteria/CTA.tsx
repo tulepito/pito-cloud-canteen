@@ -23,7 +23,7 @@ const CTA = () => {
           <span className="text-text md:w-3/4 font-medium">
             {intl.formatMessage({ id: 'your-teams-meals-0' })}
           </span>
-          <h2 className="font-[unbounded] font-bold text-3xl md:text-[40px] leading-tight whitespace-pre-line">
+          <h2 className="font-[unbounded] font-bold text-2xl md:text-[40px] leading-tight md:whitespace-pre-line">
             {intl.formatMessage({ id: 'upgrade-your-teams-lunch-experience' })}
           </h2>
           <span className="text-text md:w-[55%] md:text-lg font-medium leading-tight">

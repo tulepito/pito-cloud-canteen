@@ -8,7 +8,7 @@ const SingleTestimonial = () => {
   const intl = useIntl();
 
   return (
-    <div className="md:px-0 md:pb-16 px-5 md:pt-16 pt-24 flex flex-col gap-5 items-center max-w-[1024px] mx-auto">
+    <div className="md:px-0 md:pb-16 px-5 pt-16 flex flex-col gap-5 items-center max-w-[1024px] mx-auto">
       <span className="font-alt text-2xl md:text-3xl font-semibold md:leading-tight">
         “
         {intl.formatMessage({
@@ -19,14 +19,20 @@ const SingleTestimonial = () => {
       <div className="flex items-center justify-between w-full">
         {/* lhs */}
         <div className="flex items-center gap-2">
-          <Image src={Lan} alt="Lan" className="size-16 rounded-full" />
+          <Image
+            src={Lan}
+            alt="Lan"
+            className="size-12 md:size-16 rounded-full"
+          />
           <div className="flex flex-col">
-            <span className="font-semibold text-lg">Lan Thy</span>
-            <span>{intl.formatMessage({ id: 'admin-executive' })}</span>
+            <span className="font-semibold text-sm md:text-lg">Lan Thy</span>
+            <span className="text-xs md:text-base">
+              {intl.formatMessage({ id: 'admin-executive' })}
+            </span>
           </div>
         </div>
         {/* rhs */}
-        <Image src={SaltMine} alt="saltmine" />
+        <Image src={SaltMine} alt="saltmine" className="w-24 md:w-44" />
       </div>
     </div>
   );

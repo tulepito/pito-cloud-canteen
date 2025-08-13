@@ -107,7 +107,7 @@ const FAQsAlt = () => {
                 onClick={() => toggleFAQ(index)}
                 className={clsx(
                   'w-full md:hover:!bg-gray-300 bg-[#FAFAFA] rounded-2xl p-4 flex justify-between items-center text-left font-medium text-base gap-4 md:text-lg text-black focus:outline-none cursor-pointer transition-all duration-300 ease-in-out',
-                  isOpen && 'hover:!text-black',
+                  isOpen && 'md:hover:!text-black',
                 )}
                 style={{
                   backgroundColor: isOpen ? '#000' : '#FAFAFA',
@@ -121,7 +121,7 @@ const FAQsAlt = () => {
 
               <div
                 className={`overflow-hidden transition-all duration-300 ease-in-out ${
-                  isOpen ? 'max-h-32 my-5' : 'max-h-0'
+                  isOpen ? 'max-h-fit my-5' : 'max-h-0'
                 }`}>
                 {isOpen && <p>{faq.answer}</p>}
               </div>
@@ -237,9 +237,9 @@ export const FAQsAltCenter = () => {
   }, [intl]);
 
   return (
-    <div className="md:px-0 md:py-16 px-5 pt-20 pb-32 flex flex-col items-stretch gap-10 relative max-w-[1024px] mx-auto">
+    <div className="md:px-0 md:py-16 px-5 pt-16 pb-32 flex flex-col items-stretch gap-10 relative max-w-[1024px] mx-auto">
       <div className="flex flex-col items-stretch md:gap-4 gap-3 md:w-[80%] text-left">
-        <span className="font-[unbounded] font-bold text-3xl md:text-[40px] md:leading-tight text-center md:text-left">
+        <span className="font-[unbounded] font-bold text-2xl md:text-[40px] md:leading-tight text-center md:text-left">
           {intl.formatMessage({ id: 'frequently-asked-and' })} <br />
           {intl.locale === 'en' && (
             <span className="text-[#D680A3] md:leading-[4rem]">
@@ -259,7 +259,7 @@ export const FAQsAltCenter = () => {
                 onClick={() => toggleFAQ(index)}
                 className={clsx(
                   'w-full md:hover:!bg-gray-300 bg-[#FAFAFA] rounded-2xl p-4 flex justify-between items-center text-left font-medium text-base gap-4 md:text-lg text-black focus:outline-none cursor-pointer transition-all duration-300 ease-in-out',
-                  isOpen && 'hover:!text-black',
+                  isOpen && 'md:hover:!text-black',
                 )}
                 style={{
                   backgroundColor: isOpen ? '#000' : '#FAFAFA',
