@@ -36,7 +36,7 @@ const FoodDetailModal: React.FC<TFoodDetailModalProps> = ({
   const intl = useIntl();
 
   const foodGetter = Listing(food!);
-  const { sideDishes = [] } = foodGetter.getPublicData();
+  const { sideDishes = [], notes } = foodGetter.getPublicData();
   const { title, price } = foodGetter.getAttributes();
   const FOOD_SIDE_DISH_OPTIONS = useFoodSideDishOptionsByLocale();
 
@@ -100,6 +100,7 @@ const FoodDetailModal: React.FC<TFoodDetailModalProps> = ({
             {Listing(food!).getAttributes().description ||
               intl.formatMessage({ id: 'khong-co-mo-ta' })}
           </p>
+
           <div className={css.sideDishesWrapper}>
             <div className={css.sideDishesTitle}>
               {intl.formatMessage({
@@ -108,6 +109,14 @@ const FoodDetailModal: React.FC<TFoodDetailModalProps> = ({
             </div>
             {renderedSideDishes}
           </div>
+          {notes && (
+            <div className="mt-4">
+              <p className="font-bold">
+                {intl.formatMessage({ id: 'ghi-chu' })}:
+              </p>
+              <p className="font-normal mt-4 text-[14px]"> {notes}</p>
+            </div>
+          )}
         </div>
 
         <RenderWhen.False>

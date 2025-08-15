@@ -7,7 +7,6 @@ import { convertDateToVNTimezone } from '@helpers/dateHelpers';
 import logger from '@helpers/logger';
 import { denormalisedResponseEntities } from '@services/data';
 import { fetchListing, fetchUserListing } from '@services/integrationHelper';
-import { addToProcessMemberOrderQueue } from '@services/jobs/processMemberOrder.job';
 import { getIntegrationSdk, getSdk, handleError } from '@services/sdk';
 import { createSlackNotification } from '@services/slackNotification';
 import type {
@@ -219,8 +218,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           anonymous = [],
         } = req.body as PUTMemberOrderBody;
 
-        const { orderId } = req.query as { orderId: string };
-
         const sdk = getSdk(req, res);
         const currentUser = await sdk.currentUser.show();
 
@@ -233,23 +230,33 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             id: currentPlan.attributes?.metadata?.orderId,
           });
 
-        const memberOrders = {
-          ...orderDetail[currentViewDate].memberOrders,
-          ...(newMembersOrderValues && {
-            ...newMembersOrderValues,
-          }),
-          ...(participantId && {
-            [participantId]: newMemberOrderValues,
-          }),
+        const newOrderDetail = {
+          ...orderDetail,
+          [currentViewDate]: {
+            ...orderDetail[currentViewDate],
+            memberOrders: {
+              ...orderDetail[currentViewDate].memberOrders,
+              ...(newMembersOrderValues && {
+                ...newMembersOrderValues,
+              }),
+              ...(participantId && {
+                [participantId]: newMemberOrderValues,
+              }),
+            },
+          },
         };
 
-        const planListing = await addToProcessMemberOrderQueue({
-          orderId,
-          currentUserId: participantId!,
-          planId,
-          memberOrders,
-          orderDay: `${currentViewDate}`,
-        });
+        const response = await integrationSdk.listings.update(
+          {
+            id: planId,
+            metadata: {
+              orderDetail: newOrderDetail,
+            },
+          },
+          { expand: true },
+        );
+
+        const [planListing] = denormalisedResponseEntities(response);
 
         if (
           orderListingResponse.data.data.attributes?.metadata?.orderState ===
