@@ -8,6 +8,7 @@ import React, {
 import { PiQrCode } from 'react-icons/pi';
 import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
+import { toast } from 'react-toastify';
 import classNames from 'classnames';
 import clsx from 'clsx';
 import html2canvas from 'html2canvas';
@@ -22,6 +23,7 @@ import QRCode from 'qrcode';
 import Button from '@components/Button/Button';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import IconDownload from '@components/Icons/IconDownload/IconDownload';
+import IconUpdate from '@components/Icons/IconUpdate/IconUpdate';
 import Modal from '@components/Modal/Modal';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import SlideModal from '@components/SlideModal/SlideModal';
@@ -29,12 +31,20 @@ import Tooltip from '@components/Tooltip/Tooltip';
 import { parseThousandNumber } from '@helpers/format';
 import logger from '@helpers/logger';
 import { isJoinedPlan } from '@helpers/order/orderPickingHelper';
-import { useAppSelector } from '@hooks/reduxHooks';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { useViewport } from '@hooks/useViewport';
+import { orderManagementThunks } from '@redux/slices/OrderManagement.slice';
 import { enGeneralPaths } from '@src/paths';
-import type { PlanListing, UserListing } from '@src/types';
+import type {
+  MealItemsFailed,
+  OrderListing,
+  PlanListing,
+  UserListing,
+} from '@src/types';
 import { buildFullName } from '@src/utils/emailTemplate/participantOrderPicking';
 import type { TObject, TUser } from '@utils/types';
+
+import ReasonFieldMealItemFailed from './ReasonFieldMealItemFailed';
 
 import css from './ReviewOrdersResultModal.module.scss';
 
@@ -255,10 +265,13 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
     [],
   );
   const [targetedDate, setTargetDate] = useState<string | 'all'>('all');
+  const [mealItemsFailed, setMealItemsFailed] = useState<MealItemsFailed>({});
   const allowTriggerGenerateUserLabelFile = useRef(false);
 
   const [isGeneratingUserLabelFile, setIsGeneratingUserLabelFile] =
     useState(false);
+
+  const dispatch = useAppDispatch();
   const currentUser: UserListing | null = useAppSelector(
     (state) => state.user.currentUser,
   );
@@ -266,6 +279,20 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
   const company: UserListing | null = useAppSelector(
     (state) => state.OrderManagement.companyData,
     shallowEqual,
+  );
+
+  const planData: PlanListing | null = useAppSelector(
+    (state) => state.OrderManagement.planData,
+    shallowEqual,
+  );
+
+  const orderDataListing: OrderListing | null = useAppSelector(
+    (state) => state.OrderManagement.orderData,
+    shallowEqual,
+  );
+
+  const isUpdatingMealItemsFailed: boolean = useAppSelector(
+    (state) => state.OrderManagement.isUpdatingMealItemsFailed,
   );
 
   const thermalPrintSectionRef = useRef<HTMLDivElement>(null);
@@ -380,6 +407,15 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
       [date]: !expandingStatusMap[date],
     });
   };
+
+  useEffect(() => {
+    if (planData?.attributes?.metadata?.mealItemsFailed) {
+      setMealItemsFailed(
+        (planData?.attributes?.metadata?.mealItemsFailed ??
+          {}) as MealItemsFailed,
+      );
+    }
+  }, [planData.attributes?.metadata?.mealItemsFailed]);
 
   useEffect(() => {
     if (!isEmpty(preparedData)) {
@@ -579,6 +615,80 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
     }
   };
 
+  const onCheckMealItemFailed = ({
+    timestamp,
+    memberId,
+    foodId,
+    reason,
+  }: {
+    timestamp: string;
+    memberId: string;
+    foodId: string;
+    reason: string;
+  }) => {
+    setMealItemsFailed((prev: MealItemsFailed) => {
+      const list = prev[timestamp] ?? [];
+      const idx = list.findIndex(
+        (it) => it.memberId === memberId && it.foodId === foodId,
+      );
+
+      if (idx !== -1) {
+        if (list.length === 1) {
+          const next = { ...prev };
+          delete next[timestamp];
+
+          return next;
+        }
+        const nextList = [...list.slice(0, idx), ...list.slice(idx + 1)];
+
+        return { ...prev, [timestamp]: nextList };
+      }
+
+      return {
+        ...prev,
+        [timestamp]: [...list, { memberId, foodId, reason }],
+      };
+    });
+  };
+
+  const onChangeReasonInput = ({
+    timestamp,
+    memberId,
+    foodId,
+    reason,
+  }: {
+    timestamp: string;
+    memberId: string;
+    foodId: string;
+    reason: string;
+  }) => {
+    setMealItemsFailed((prev: MealItemsFailed) => ({
+      ...prev,
+      [timestamp]: (prev[timestamp] || []).map((item) =>
+        item.memberId === memberId && item.foodId === foodId
+          ? { ...item, reason }
+          : item,
+      ),
+    }));
+  };
+
+  const onUpdateMealItemsFailed = () => {
+    dispatch(
+      orderManagementThunks.updateMealItemsFailed({
+        planId: planListing?.id?.uuid!,
+        mealItemsFailed,
+        quotationId: orderDataListing?.attributes?.metadata?.quotationId,
+      }),
+    )
+      .then(() => {
+        toast.success('Cập nhật phần ăn lỗi thành công');
+        onClose();
+      })
+      .catch(() => {
+        toast.error('Cập nhật phần ăn lỗi thất bại');
+      });
+  };
+
   const userLabelRecords = isHasGroups
     ? preparedDataGroups.reduce<UserLabelRecord[]>(
         (result, { date, groupOrderData, orderDataForOthers }) => {
@@ -761,77 +871,88 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
 
   const content = (
     <>
+      <div className="flex gap-2 justify-end mb-4">
+        {isAdmin && (
+          <Button
+            size="small"
+            variant="primary"
+            className="h-[36px] px-2"
+            inProgress={isUpdatingMealItemsFailed}
+            onClick={onUpdateMealItemsFailed}>
+            <IconUpdate className="min-w-[16px] min-h-[16px]" color="#ffffff" />
+            Cập nhập phần ăn bị lỗi
+          </Button>
+        )}
+        <Button
+          size="small"
+          variant="secondary"
+          className="h-[36px] px-2 !border-blue-500 hover:!text-stone-600"
+          onClick={onDownloadReviewOrderResults}>
+          <IconDownload className="min-w-[24px] min-h-[24px]" />
+          {isMobileLayout
+            ? intl.formatMessage({
+                id: 'ReviewOrdersResultModal.mobileDownloadFileText',
+              })
+            : intl.formatMessage({
+                id: 'ReviewOrdersResultModal.downloadFileText',
+              })}
+        </Button>
+        {isAdmin && !!participants?.length && (
+          <Button
+            size="small"
+            loadingMode="extend"
+            variant="secondary"
+            inProgress={isGeneratingUserLabelFile && targetedDate === 'all'}
+            className="h-[36px] px-2 !border-blue-500 hover:!text-stone-600 hover:stroke-stone-600"
+            onClick={withSetCurrentDateTo('all', () => {
+              setTimeout(() => {
+                generatePDFModeLabels('pdf-file');
+              });
+            })}>
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              width="24px"
+              height="24px"
+              xmlns="http://www.w3.org/2000/svg">
+              <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+              <g
+                id="SVGRepo_tracerCarrier"
+                stroke-linecap="round"
+                stroke-linejoin="round"></g>
+              <g id="SVGRepo_iconCarrier">
+                {' '}
+                <path
+                  d="M8.5 7L8.5 14M8.5 14L11 11M8.5 14L6 11"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"></path>{' '}
+                <path
+                  d="M15.5 7L15.5 14M15.5 14L18 11M15.5 14L13 11"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"></path>{' '}
+                <path
+                  d="M18 17H12H6"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"></path>{' '}
+                <path
+                  d="M22 12C22 16.714 22 19.0711 20.5355 20.5355C19.0711 22 16.714 22 12 22C7.28595 22 4.92893 22 3.46447 20.5355C2 19.0711 2 16.714 2 12C2 7.28595 2 4.92893 3.46447 3.46447C4.92893 2 7.28595 2 12 2C16.714 2 19.0711 2 20.5355 3.46447C21.5093 4.43821 21.8356 5.80655 21.9449 8"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"></path>{' '}
+              </g>
+            </svg>
+            &nbsp;
+            <span>Tải toàn bộ label</span>
+          </Button>
+        )}
+      </div>
       <div className={css.tableContainer}>
-        <div className="relative">
-          <div className="flex gap-2 justify-end mb-4">
-            <Button
-              size="small"
-              variant="secondary"
-              className="h-[36px] px-2 !border-blue-500 hover:!text-stone-600"
-              onClick={onDownloadReviewOrderResults}>
-              <IconDownload className="min-w-[24px] min-h-[24px]" />
-              {isMobileLayout
-                ? intl.formatMessage({
-                    id: 'ReviewOrdersResultModal.mobileDownloadFileText',
-                  })
-                : intl.formatMessage({
-                    id: 'ReviewOrdersResultModal.downloadFileText',
-                  })}
-            </Button>
-            {isAdmin && !!participants?.length && (
-              <Button
-                size="small"
-                loadingMode="extend"
-                variant="secondary"
-                inProgress={isGeneratingUserLabelFile && targetedDate === 'all'}
-                className="h-[36px] px-2 !border-blue-500 hover:!text-stone-600 hover:stroke-stone-600"
-                onClick={withSetCurrentDateTo('all', () => {
-                  setTimeout(() => {
-                    generatePDFModeLabels('pdf-file');
-                  });
-                })}>
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  width="24px"
-                  height="24px"
-                  xmlns="http://www.w3.org/2000/svg">
-                  <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                  <g
-                    id="SVGRepo_tracerCarrier"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"></g>
-                  <g id="SVGRepo_iconCarrier">
-                    {' '}
-                    <path
-                      d="M8.5 7L8.5 14M8.5 14L11 11M8.5 14L6 11"
-                      stroke="currentColor"
-                      stroke-width="1.5"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"></path>{' '}
-                    <path
-                      d="M15.5 7L15.5 14M15.5 14L18 11M15.5 14L13 11"
-                      stroke="currentColor"
-                      stroke-width="1.5"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"></path>{' '}
-                    <path
-                      d="M18 17H12H6"
-                      stroke="currentColor"
-                      stroke-width="1.5"
-                      stroke-linecap="round"></path>{' '}
-                    <path
-                      d="M22 12C22 16.714 22 19.0711 20.5355 20.5355C19.0711 22 16.714 22 12 22C7.28595 22 4.92893 22 3.46447 20.5355C2 19.0711 2 16.714 2 12C2 7.28595 2 4.92893 3.46447 3.46447C4.92893 2 7.28595 2 12 2C16.714 2 19.0711 2 20.5355 3.46447C21.5093 4.43821 21.8356 5.80655 21.9449 8"
-                      stroke="currentColor"
-                      stroke-width="1.5"
-                      stroke-linecap="round"></path>{' '}
-                  </g>
-                </svg>
-                &nbsp;
-                <span>Tải toàn bộ label</span>
-              </Button>
-            )}
-          </div>
+        <div className="min-w-[700px] overflow-x-scroll md:overflow-auto md:min-w-[unset]">
           <div className="flex items-center bg-gray-100 p-2 rounded-t-md text-sm font-semibold uppercase gap-2">
             <div className="flex-1 basis-[80px]">
               {intl.formatMessage({
@@ -853,15 +974,342 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
                 id: 'ReviewOrdersResultModal.tableHead.requirement',
               })}
             </div>
+            <div className="flex-1">PHẦN ĂN BỊ LỖI</div>
           </div>
-        </div>
+          {isHasGroups ? (
+            <>
+              {preparedDataGroups.map(
+                ({ date, groupOrderData, orderDataForOthers }) => {
+                  const isExpanding = expandingStatusMap[date];
+                  const isEmptyOrderData = isEmpty(groupOrderData);
 
-        {isHasGroups ? (
-          <>
-            {preparedDataGroups.map(
-              ({ date, groupOrderData, orderDataForOthers }) => {
+                  return (
+                    <div className={css.dateContainer} key={date}>
+                      <div className={css.dateTitle}>
+                        <div className="flex-1 flex items-center">
+                          {intl.formatMessage(
+                            { id: 'ReviewOrdersResultModal.dateTitle' },
+                            {
+                              date: DateTime.fromMillis(Number(date)).toFormat(
+                                'dd/MM/yyyy',
+                              ),
+                            },
+                          )}
+                        </div>
+                        <RenderWhen condition={!isEmptyOrderData}>
+                          <div className="flex flex-wrap justify-end gap-2 items-center">
+                            {isAdmin && (
+                              <RenderWhen condition={!isMobileLayout}>
+                                <div className="flex gap-2 items-center bg-orange-50 py-1 px-2 rounded-lg border border-orange-200">
+                                  <p className="text-xs ">Máy in nhiệt</p>
+                                  <Button
+                                    variant="inline"
+                                    size="small"
+                                    className={classNames({
+                                      '!bg-gray-200':
+                                        isGeneratingUserLabelFile &&
+                                        targetedDate === date,
+                                    })}
+                                    inProgress={
+                                      isGeneratingUserLabelFile &&
+                                      targetedDate === date
+                                    }
+                                    loadingMode="extend"
+                                    onClick={withSetCurrentDateTo(date, () => {
+                                      setTimeout(() => {
+                                        printThermalSection();
+                                      });
+                                    })}>
+                                    In label
+                                  </Button>
+                                </div>
+                              </RenderWhen>
+                            )}
+
+                            {isAdmin && (
+                              <div className="flex gap-2 items-center bg-blue-50 py-1 px-2 rounded-lg border border-blue-200">
+                                <p className="text-xs ">File label</p>
+                                <RenderWhen condition={!isMobileLayout}>
+                                  <Button
+                                    variant="inline"
+                                    size="small"
+                                    className={classNames({
+                                      '!bg-gray-200':
+                                        isGeneratingUserLabelFile &&
+                                        targetedDate === date,
+                                    })}
+                                    inProgress={
+                                      isGeneratingUserLabelFile &&
+                                      targetedDate === date
+                                    }
+                                    onClick={withSetCurrentDateTo(date, () => {
+                                      setTimeout(() => {
+                                        setIsViewUserLabelModalOpen(true);
+                                      });
+                                    })}>
+                                    Xem label
+                                  </Button>
+                                  <Button
+                                    variant="inline"
+                                    size="small"
+                                    inProgress={
+                                      isGeneratingUserLabelFile &&
+                                      targetedDate === date
+                                    }
+                                    loadingMode="extend"
+                                    className={classNames({
+                                      '!bg-gray-200':
+                                        isGeneratingUserLabelFile &&
+                                        targetedDate === date,
+                                    })}
+                                    onClick={withSetCurrentDateTo(date, () => {
+                                      setTimeout(() => {
+                                        generatePDFModeLabels('pdf-file');
+                                      });
+                                    })}>
+                                    Tải label
+                                  </Button>
+                                </RenderWhen>
+                              </div>
+                            )}
+                            <IconArrow
+                              direction={isExpanding ? 'up' : 'down'}
+                              onClick={toggleCollapseStatus(date)}
+                            />
+                          </div>
+                        </RenderWhen>
+                      </div>
+                      {groupOrderData.map((group: TObject) => {
+                        return (
+                          <React.Fragment key={group.groupId}>
+                            <div className={css.dateTitle}>
+                              <div className="flex-1 flex items-center">
+                                {group?.groupName}
+                                {group?.orderData?.length > 0 &&
+                                  `(Số lượng: ${group.orderData.length})`}
+                              </div>
+                              <RenderWhen condition={!isEmptyOrderData}>
+                                <div className="flex flex-wrap justify-end items-center">
+                                  {isAdmin &&
+                                    showQRCode &&
+                                    renderComponentQRCode(group?.groupId)}
+
+                                  <IconArrow
+                                    direction={isExpanding ? 'up' : 'down'}
+                                    onClick={toggleCollapseStatus(date)}
+                                  />
+                                </div>
+                              </RenderWhen>
+                            </div>
+                            <RenderWhen condition={isExpanding}>
+                              <div className="w-full">
+                                {group?.orderData?.map((row: TObject) => {
+                                  const {
+                                    memberData,
+                                    foodData: {
+                                      foodId,
+                                      foodName,
+                                      foodPrice = 0,
+                                      requirement,
+                                    },
+                                  } = row;
+                                  const {
+                                    name: memberName,
+                                    id: memberId,
+                                    email,
+                                  } = memberData || {};
+
+                                  const isMealItemFailed = (
+                                    mealItemsFailed[date] || []
+                                  ).some((item) => item.memberId === memberId);
+
+                                  return (
+                                    <div
+                                      key={memberId}
+                                      className="flex items-center w-full">
+                                      <div className="flex items-center flex-1 text-xs p-2 gap-2">
+                                        <div className="flex-1 basis-[80px] font-semibold">
+                                          {memberName}
+                                          <br />
+                                          <span className="text-gray-500">
+                                            {email}
+                                          </span>
+                                        </div>
+
+                                        <div className="text-xs flex-1 font-semibold">
+                                          {foodName}
+                                        </div>
+                                        <div className="text-xs flex-1">{`${parseThousandNumber(
+                                          foodPrice,
+                                        )}đ`}</div>
+                                        {requirement ? (
+                                          <Tooltip
+                                            overlayClassName={
+                                              css.requirementTooltip
+                                            }
+                                            tooltipContent={requirement}
+                                            placement="bottomLeft">
+                                            <div className="flex-1">
+                                              {requirement}
+                                            </div>
+                                          </Tooltip>
+                                        ) : (
+                                          <div className="flex-1">-</div>
+                                        )}
+                                        <div className="text-xs flex-1">
+                                          <ReasonFieldMealItemFailed
+                                            readOnly={!isAdmin}
+                                            checked={isMealItemFailed}
+                                            initialReason={
+                                              (
+                                                mealItemsFailed[date] || []
+                                              ).find(
+                                                (i) => i.memberId === memberId,
+                                              )?.reason ?? ''
+                                            }
+                                            onChange={(checked, reason) =>
+                                              onCheckMealItemFailed({
+                                                timestamp: date,
+                                                foodId,
+                                                memberId,
+                                                reason: checked ? reason : '',
+                                              })
+                                            }
+                                            onChangeReasonInput={(reason) =>
+                                              onChangeReasonInput({
+                                                timestamp: date,
+                                                foodId,
+                                                memberId,
+                                                reason,
+                                              })
+                                            }
+                                          />
+                                        </div>
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </RenderWhen>
+                          </React.Fragment>
+                        );
+                      })}
+                      {orderDataForOthers?.length > 0 && (
+                        <>
+                          <React.Fragment>
+                            <div className={css.dateTitle}>
+                              <div className="flex-1 flex items-center">
+                                Không có nhóm
+                              </div>
+                              <RenderWhen condition={!isEmptyOrderData}>
+                                <div className="flex flex-wrap justify-end gap-2 items-center">
+                                  {isAdmin &&
+                                    showQRCode &&
+                                    renderComponentQRCode()}
+
+                                  <IconArrow
+                                    direction={isExpanding ? 'up' : 'down'}
+                                    onClick={toggleCollapseStatus(date)}
+                                  />
+                                </div>
+                              </RenderWhen>
+                            </div>
+                            <RenderWhen condition={isExpanding}>
+                              <div className="w-full">
+                                {orderDataForOthers?.map((row: TObject) => {
+                                  const {
+                                    memberData,
+                                    foodData: {
+                                      foodId,
+                                      foodName,
+                                      foodPrice = 0,
+                                      requirement,
+                                    },
+                                  } = row;
+                                  const { name: memberName, id: memberId } =
+                                    memberData || {};
+
+                                  const isMealItemFailed = (
+                                    mealItemsFailed[date] || []
+                                  ).some((item) => item.memberId === memberId);
+
+                                  return (
+                                    <div
+                                      key={memberId}
+                                      className="flex items-center w-full">
+                                      <div className="flex items-center flex-1 text-xs p-2 gap-2">
+                                        <div className="flex-1 basis-[80px] font-semibold">
+                                          {memberName}
+                                        </div>
+
+                                        <div className="text-xs flex-1 font-semibold">
+                                          {foodName}
+                                        </div>
+                                        <div className="text-xs flex-1">{`${parseThousandNumber(
+                                          foodPrice,
+                                        )}đ`}</div>
+                                        {requirement ? (
+                                          <Tooltip
+                                            overlayClassName={
+                                              css.requirementTooltip
+                                            }
+                                            tooltipContent={requirement}
+                                            placement="bottomLeft">
+                                            <div className="flex-1">
+                                              {requirement}
+                                            </div>
+                                          </Tooltip>
+                                        ) : (
+                                          <div className="flex-1">-</div>
+                                        )}
+                                        <div className="text-xs flex-1">
+                                          <ReasonFieldMealItemFailed
+                                            readOnly={!isAdmin}
+                                            checked={isMealItemFailed}
+                                            initialReason={
+                                              (
+                                                mealItemsFailed[date] || []
+                                              ).find(
+                                                (i) => i.memberId === memberId,
+                                              )?.reason ?? ''
+                                            }
+                                            onChange={(checked, reason) =>
+                                              onCheckMealItemFailed({
+                                                timestamp: date,
+                                                foodId,
+                                                memberId,
+                                                reason: checked ? reason : '',
+                                              })
+                                            }
+                                            onChangeReasonInput={(reason) =>
+                                              onChangeReasonInput({
+                                                timestamp: date,
+                                                foodId,
+                                                memberId,
+                                                reason,
+                                              })
+                                            }
+                                          />
+                                        </div>
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </RenderWhen>
+                          </React.Fragment>
+                        </>
+                      )}
+                    </div>
+                  );
+                },
+              )}
+            </>
+          ) : (
+            <>
+              {preparedData.map(({ date, orderData }) => {
                 const isExpanding = expandingStatusMap[date];
-                const isEmptyOrderData = isEmpty(groupOrderData);
+                const isEmptyOrderData = isEmpty(orderData);
 
                 return (
                   <div className={css.dateContainer} key={date}>
@@ -878,6 +1326,8 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
                       </div>
                       <RenderWhen condition={!isEmptyOrderData}>
                         <div className="flex flex-wrap justify-end gap-2 items-center">
+                          {isAdmin && showQRCode && renderComponentQRCode()}
+
                           {isAdmin && (
                             <RenderWhen condition={!isMobileLayout}>
                               <div className="flex gap-2 items-center bg-orange-50 py-1 px-2 rounded-lg border border-orange-200">
@@ -959,313 +1409,89 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
                         </div>
                       </RenderWhen>
                     </div>
-                    {groupOrderData.map((group: TObject) => {
-                      return (
-                        <React.Fragment key={group.groupId}>
-                          <div className={css.dateTitle}>
-                            <div className="flex-1 flex items-center">
-                              {group?.groupName}
-                              {group?.orderData?.length > 0 &&
-                                `(Số lượng: ${group.orderData.length})`}
-                            </div>
-                            <RenderWhen condition={!isEmptyOrderData}>
-                              <div className="flex flex-wrap justify-end items-center">
-                                {isAdmin &&
-                                  showQRCode &&
-                                  renderComponentQRCode(group?.groupId)}
+                    <RenderWhen condition={isExpanding}>
+                      <div className="w-full">
+                        {orderData.map((row: TObject) => {
+                          const {
+                            memberData,
+                            foodData: {
+                              foodName,
+                              foodPrice = 0,
+                              requirement,
+                              foodId,
+                            },
+                          } = row;
+                          const { name: memberName, id: memberId } =
+                            memberData || {};
 
-                                <IconArrow
-                                  direction={isExpanding ? 'up' : 'down'}
-                                  onClick={toggleCollapseStatus(date)}
-                                />
+                          const isMealItemFailed = (
+                            mealItemsFailed[date] || []
+                          ).some((item) => item === memberId);
+
+                          const initialReason =
+                            (mealItemsFailed[date] || []).find(
+                              (i) => i.memberId === memberId,
+                            )?.reason ?? '';
+
+                          return (
+                            <div
+                              key={memberId}
+                              className="flex items-center w-full">
+                              <div className="flex items-center flex-1 text-xs p-2 gap-2">
+                                <div className="flex-1 basis-[80px] font-semibold">
+                                  {memberName}
+                                </div>
+                                <div className="text-xs flex-1 font-semibold">
+                                  {foodName}
+                                </div>
+                                <div className="text-xs flex-1">{`${parseThousandNumber(
+                                  foodPrice,
+                                )}đ`}</div>
+                                {requirement ? (
+                                  <Tooltip
+                                    overlayClassName={css.requirementTooltip}
+                                    tooltipContent={requirement}
+                                    placement="bottomLeft">
+                                    <div className="flex-1">{requirement}</div>
+                                  </Tooltip>
+                                ) : (
+                                  <div className="flex-1">-</div>
+                                )}
+                                <div className="text-xs flex-1">
+                                  <ReasonFieldMealItemFailed
+                                    readOnly={!isAdmin}
+                                    checked={isMealItemFailed}
+                                    initialReason={initialReason}
+                                    onChange={(checked, reason) =>
+                                      onCheckMealItemFailed({
+                                        timestamp: date,
+                                        foodId,
+                                        memberId,
+                                        reason: checked ? reason : '',
+                                      })
+                                    }
+                                    onChangeReasonInput={(reason) =>
+                                      onChangeReasonInput({
+                                        timestamp: date,
+                                        foodId,
+                                        memberId,
+                                        reason,
+                                      })
+                                    }
+                                  />
+                                </div>
                               </div>
-                            </RenderWhen>
-                          </div>
-                          <RenderWhen condition={isExpanding}>
-                            <div className="w-full">
-                              {group?.orderData?.map((row: TObject) => {
-                                const {
-                                  memberData,
-                                  foodData: {
-                                    foodName,
-                                    foodPrice = 0,
-                                    requirement,
-                                  },
-                                } = row;
-                                const {
-                                  name: memberName,
-                                  id: memberId,
-                                  email,
-                                } = memberData || {};
-
-                                return (
-                                  <div
-                                    key={memberId}
-                                    className="flex items-center w-full">
-                                    <div className="flex items-center flex-1 text-xs p-2 gap-2">
-                                      <div className="flex-1 basis-[80px] font-semibold">
-                                        {memberName}
-                                        <br />
-                                        <span className="text-gray-500">
-                                          {email}
-                                        </span>
-                                      </div>
-
-                                      <div className="text-xs flex-1 font-semibold">
-                                        {foodName}
-                                      </div>
-                                      <div className="text-xs flex-1">{`${parseThousandNumber(
-                                        foodPrice,
-                                      )}đ`}</div>
-                                      {requirement ? (
-                                        <Tooltip
-                                          overlayClassName={
-                                            css.requirementTooltip
-                                          }
-                                          tooltipContent={requirement}
-                                          placement="bottomLeft">
-                                          <div className="flex-1">
-                                            {requirement}
-                                          </div>
-                                        </Tooltip>
-                                      ) : (
-                                        <div className="flex-1">-</div>
-                                      )}
-                                    </div>
-                                  </div>
-                                );
-                              })}
                             </div>
-                          </RenderWhen>
-                        </React.Fragment>
-                      );
-                    })}
-                    {orderDataForOthers?.length > 0 && (
-                      <>
-                        <React.Fragment>
-                          <div className={css.dateTitle}>
-                            <div className="flex-1 flex items-center">
-                              Không có nhóm
-                            </div>
-                            <RenderWhen condition={!isEmptyOrderData}>
-                              <div className="flex flex-wrap justify-end gap-2 items-center">
-                                {isAdmin &&
-                                  showQRCode &&
-                                  renderComponentQRCode()}
-
-                                <IconArrow
-                                  direction={isExpanding ? 'up' : 'down'}
-                                  onClick={toggleCollapseStatus(date)}
-                                />
-                              </div>
-                            </RenderWhen>
-                          </div>
-                          <RenderWhen condition={isExpanding}>
-                            <div className="w-full">
-                              {orderDataForOthers?.map((row: TObject) => {
-                                const {
-                                  memberData,
-                                  foodData: {
-                                    foodName,
-                                    foodPrice = 0,
-                                    requirement,
-                                  },
-                                } = row;
-                                const { name: memberName, id: memberId } =
-                                  memberData || {};
-
-                                return (
-                                  <div
-                                    key={memberId}
-                                    className="flex items-center w-full">
-                                    <div className="flex items-center flex-1 text-xs p-2">
-                                      <div className="flex-1 basis-[80px] font-semibold">
-                                        {memberName}
-                                      </div>
-
-                                      <div className="text-xs flex-1 font-semibold">
-                                        {foodName}
-                                      </div>
-                                      <div className="text-xs flex-1">{`${parseThousandNumber(
-                                        foodPrice,
-                                      )}đ`}</div>
-                                      {requirement ? (
-                                        <Tooltip
-                                          overlayClassName={
-                                            css.requirementTooltip
-                                          }
-                                          tooltipContent={requirement}
-                                          placement="bottomLeft">
-                                          <div className="flex-1">
-                                            {requirement}
-                                          </div>
-                                        </Tooltip>
-                                      ) : (
-                                        <div className="flex-1">-</div>
-                                      )}
-                                    </div>
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          </RenderWhen>
-                        </React.Fragment>
-                      </>
-                    )}
-                  </div>
-                );
-              },
-            )}
-          </>
-        ) : (
-          <>
-            {preparedData.map(({ date, orderData }) => {
-              const isExpanding = expandingStatusMap[date];
-              const isEmptyOrderData = isEmpty(orderData);
-
-              return (
-                <div className={css.dateContainer} key={date}>
-                  <div className={css.dateTitle}>
-                    <div className="flex-1 flex items-center">
-                      {intl.formatMessage(
-                        { id: 'ReviewOrdersResultModal.dateTitle' },
-                        {
-                          date: DateTime.fromMillis(Number(date)).toFormat(
-                            'dd/MM/yyyy',
-                          ),
-                        },
-                      )}
-                    </div>
-                    <RenderWhen condition={!isEmptyOrderData}>
-                      <div className="flex flex-wrap justify-end gap-2 items-center">
-                        {isAdmin && showQRCode && renderComponentQRCode()}
-
-                        {isAdmin && (
-                          <RenderWhen condition={!isMobileLayout}>
-                            <div className="flex gap-2 items-center bg-orange-50 py-1 px-2 rounded-lg border border-orange-200">
-                              <p className="text-xs ">Máy in nhiệt</p>
-                              <Button
-                                variant="inline"
-                                size="small"
-                                className={classNames({
-                                  '!bg-gray-200':
-                                    isGeneratingUserLabelFile &&
-                                    targetedDate === date,
-                                })}
-                                inProgress={
-                                  isGeneratingUserLabelFile &&
-                                  targetedDate === date
-                                }
-                                loadingMode="extend"
-                                onClick={withSetCurrentDateTo(date, () => {
-                                  setTimeout(() => {
-                                    printThermalSection();
-                                  });
-                                })}>
-                                In label
-                              </Button>
-                            </div>
-                          </RenderWhen>
-                        )}
-
-                        {isAdmin && (
-                          <div className="flex gap-2 items-center bg-blue-50 py-1 px-2 rounded-lg border border-blue-200">
-                            <p className="text-xs ">File label</p>
-                            <RenderWhen condition={!isMobileLayout}>
-                              <Button
-                                variant="inline"
-                                size="small"
-                                className={classNames({
-                                  '!bg-gray-200':
-                                    isGeneratingUserLabelFile &&
-                                    targetedDate === date,
-                                })}
-                                inProgress={
-                                  isGeneratingUserLabelFile &&
-                                  targetedDate === date
-                                }
-                                onClick={withSetCurrentDateTo(date, () => {
-                                  setTimeout(() => {
-                                    setIsViewUserLabelModalOpen(true);
-                                  });
-                                })}>
-                                Xem label
-                              </Button>
-                              <Button
-                                variant="inline"
-                                size="small"
-                                inProgress={
-                                  isGeneratingUserLabelFile &&
-                                  targetedDate === date
-                                }
-                                loadingMode="extend"
-                                className={classNames({
-                                  '!bg-gray-200':
-                                    isGeneratingUserLabelFile &&
-                                    targetedDate === date,
-                                })}
-                                onClick={withSetCurrentDateTo(date, () => {
-                                  setTimeout(() => {
-                                    generatePDFModeLabels('pdf-file');
-                                  });
-                                })}>
-                                Tải label
-                              </Button>
-                            </RenderWhen>
-                          </div>
-                        )}
-                        <IconArrow
-                          direction={isExpanding ? 'up' : 'down'}
-                          onClick={toggleCollapseStatus(date)}
-                        />
+                          );
+                        })}
                       </div>
                     </RenderWhen>
                   </div>
-                  <RenderWhen condition={isExpanding}>
-                    <div className="w-full">
-                      {orderData.map((row: TObject) => {
-                        const {
-                          memberData,
-                          foodData: { foodName, foodPrice = 0, requirement },
-                        } = row;
-                        const { name: memberName, id: memberId } =
-                          memberData || {};
-
-                        return (
-                          <div
-                            key={memberId}
-                            className="flex items-center w-full">
-                            <div className="flex items-center flex-1 text-xs p-2">
-                              <div className="flex-1 basis-[80px] font-semibold">
-                                {memberName}
-                              </div>
-                              <div className="text-xs flex-1 font-semibold">
-                                {foodName}
-                              </div>
-                              <div className="text-xs flex-1">{`${parseThousandNumber(
-                                foodPrice,
-                              )}đ`}</div>
-                              {requirement ? (
-                                <Tooltip
-                                  overlayClassName={css.requirementTooltip}
-                                  tooltipContent={requirement}
-                                  placement="bottomLeft">
-                                  <div className="flex-1">{requirement}</div>
-                                </Tooltip>
-                              ) : (
-                                <div className="flex-1">-</div>
-                              )}
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </RenderWhen>
-                </div>
-              );
-            })}
-          </>
-        )}
+                );
+              })}
+            </>
+          )}
+        </div>
       </div>
     </>
   );
@@ -1288,7 +1514,7 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
             title={modalTitle}
             isOpen={isOpen}
             handleClose={onClose}
-            containerClassName="!p-4"
+            containerClassName="!p-4 md:!basis-[70vw]"
             headerClassName="p-0"
             className={css.modalRoot}>
             {content}

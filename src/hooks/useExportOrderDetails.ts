@@ -1,10 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import * as XLSX from 'xlsx';
 
 import { isJoinedPlan } from '@helpers/order/orderPickingHelper';
 import { currentUserSelector } from '@redux/slices/user.slice';
-import type { UserListing } from '@src/types';
+import type { MealItemsFailed, UserListing } from '@src/types';
 import { Listing } from '@src/utils/data';
 import { formatTimestamp } from '@src/utils/dates';
 import { buildFullName } from '@src/utils/emailTemplate/participantOrderPicking';
@@ -36,9 +36,11 @@ const prepareData = ({
   participantData = {},
   extendedFields = [],
   options,
+  mealItemsFailed,
 }: {
   orderDetail: TObject;
   participantData: TObject;
+  mealItemsFailed: MealItemsFailed;
   extendedFields?: ExportOrderDetailsExtendedFields;
   options?: { privateFieldsIncludingIfAdmin?: boolean };
 }) => {
@@ -73,6 +75,15 @@ const prepareData = ({
             'Món ăn': foodListOfDate[foodId]?.foodName,
             'Đơn giá': foodListOfDate[foodId]?.foodPrice,
             'Ghi chú': requirement,
+            'Phần ăn lỗi': (mealItemsFailed[date] || []).some(
+              (item) => item.memberId === memberId && item.foodId === foodId,
+            )
+              ? 'Có'
+              : 'Không',
+            'Nguyên nhân bị lỗi':
+              (mealItemsFailed[date] || []).find(
+                (item) => item.memberId === memberId && item.foodId === foodId,
+              )?.reason || '',
           };
 
           extendedFields.forEach((field) => {
@@ -131,9 +142,16 @@ const useExportOrderDetails = (options?: {
     participantData,
     anonymousParticipantData,
     companyData,
+    planData,
   } = useAppSelector((state) => state.OrderManagement);
   const currentUser: UserListing = useAppSelector(currentUserSelector);
   const groups = companyData?.attributes.profile.metadata?.groups || [];
+  const mealItemsFailed = planData?.attributes?.metadata?.mealItemsFailed;
+
+  const mealItemsFailedRef = useRef(mealItemsFailed);
+  useEffect(() => {
+    mealItemsFailedRef.current = mealItemsFailed;
+  }, [mealItemsFailed]);
 
   const { participants = [], anonymous = [] } = Listing(
     orderData as TListing,
@@ -216,6 +234,7 @@ const useExportOrderDetails = (options?: {
         privateFieldsIncludingIfAdmin:
           currentUser.attributes?.profile?.metadata?.isAdmin,
       },
+      mealItemsFailed: mealItemsFailedRef.current,
     });
 
     const { title } = Listing(orderData as TListing).getAttributes();
@@ -229,6 +248,7 @@ const useExportOrderDetails = (options?: {
     JSON.stringify(participantDataMap),
     JSON.stringify(orderData),
     JSON.stringify(extendedFields),
+    JSON.stringify(mealItemsFailedRef.current),
   ]);
 
   return { handler };

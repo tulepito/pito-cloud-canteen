@@ -33,6 +33,7 @@ import {
   updatePaymentApi,
   updatePlanDetailsApi,
 } from '@apis/orderApi';
+import { updateMealItemsFailedApi } from '@apis/planApi';
 import { toggleQRCodeModeApi, toggleScannerModeApi } from '@apis/scanner';
 import { fetchTxApi } from '@apis/txApi';
 import { checkUserExistedApi } from '@apis/userApi';
@@ -48,7 +49,11 @@ import { buildParticipantSubOrderDocumentId } from '@pages/api/participants/docu
 import { createAsyncThunk } from '@redux/redux.helper';
 import type { RootState } from '@redux/store';
 import type { NotificationInvitationParams } from '@services/notifications';
-import type { MemberOrderValue, OrderDetailValue } from '@src/types';
+import type {
+  MealItemsFailed,
+  MemberOrderValue,
+  OrderDetailValue,
+} from '@src/types';
 import type { DeepPartial } from '@src/types/utils';
 import type { TPlan } from '@src/utils/orderTypes';
 import { denormalisedResponseEntities, Listing, User } from '@utils/data';
@@ -154,6 +159,7 @@ type TOrderManagementState = {
   isDeletingParticipant: boolean;
   // Update state
   isUpdatingOrderDetails: boolean;
+  isUpdatingMealItemsFailed: boolean;
   // Send email state
   isSendingRemindEmail: boolean;
   // Cancel order state
@@ -223,6 +229,7 @@ const initialState: TOrderManagementState = {
   fetchOrderInProgress: false,
   isDeletingParticipant: false,
   isUpdatingOrderDetails: false,
+  isUpdatingMealItemsFailed: false,
   isSendingRemindEmail: false,
   cancelPickingOrderInProgress: false,
   cancelPickingOrderError: null,
@@ -334,6 +341,29 @@ const toggleQRCodeMode = createAsyncThunk(
         isAdminFlow,
       }),
     );
+  },
+);
+
+const updateMealItemsFailed = createAsyncThunk(
+  'app/OrderManagement/UPDATE_MEAL_ITEMS_FAILED',
+  async ({
+    planId,
+    mealItemsFailed,
+    quotationId,
+  }: {
+    planId: string;
+    mealItemsFailed: MealItemsFailed;
+    quotationId?: string;
+  }) => {
+    await updateMealItemsFailedApi({
+      planId,
+      mealItemsFailed,
+      quotationId,
+    });
+
+    return {
+      mealItemsFailed,
+    };
   },
 );
 
@@ -1167,6 +1197,7 @@ export const orderManagementThunks = {
   fetchQuotation,
   updateOrderFromDraftEdit,
   handleAutoPickFoodToggle,
+  updateMealItemsFailed,
 };
 
 // ================ Slice ================ //
@@ -1955,6 +1986,22 @@ const OrderManagementSlice = createSlice({
         state.updateOrderFromDraftEditError = error;
       })
 
+      .addCase(updateMealItemsFailed.pending, (state) => {
+        state.isUpdatingMealItemsFailed = true;
+      })
+      .addCase(updateMealItemsFailed.fulfilled, (state, { payload }) => {
+        state.isUpdatingMealItemsFailed = false;
+
+        set(
+          state.planData,
+          'attributes.metadata.mealItemsFailed',
+          payload.mealItemsFailed,
+        );
+      })
+      .addCase(updateMealItemsFailed.rejected, (state) => {
+        state.isUpdatingMealItemsFailed = false;
+      })
+
       /* =============== updatePlanOrderDetail =============== */
       .addCase(updatePlanOrderDetail.pending, (state) => {
         state.isUpdatingOrderDetails = true;
@@ -2036,11 +2083,6 @@ const OrderManagementSlice = createSlice({
             newMembersOrderValues: TObject;
             newDraftSubOrderChangesHistory: Record<string, TObject[]>;
           }) || {};
-
-        console.log([
-          ...(state.subOrderChangesHistory || []),
-          ...(newDraftSubOrderChangesHistory[currentViewDate] || []),
-        ]);
 
         return {
           ...state,

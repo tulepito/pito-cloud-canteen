@@ -7,13 +7,16 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import classNames from 'classnames';
 import arrayMutators from 'final-form-arrays';
+import html2canvas from 'html2canvas';
 import { last, omit, pickBy, uniq } from 'lodash';
 import compact from 'lodash/compact';
 import isEmpty from 'lodash/isEmpty';
 import isEqual from 'lodash/isEqual';
+import { DateTime } from 'luxon';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 
+import Button from '@components/Button/Button';
 import Collapsible from '@components/Collapsible/Collapsible';
 import ConfirmationModal from '@components/ConfirmationModal/ConfirmationModal';
 import Form from '@components/Form/Form';
@@ -21,7 +24,9 @@ import { FieldDropdownSelectComponent } from '@components/FormFields/FieldDropdo
 import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import IconCopy from '@components/Icons/IconCopy/IconCopy';
+import type { UserLabelRecord } from '@components/OrderDetails/ReviewView/ReviewOrdersResultSection/ReviewOrdersResultModal';
 import ReviewOrdersResultSection from '@components/OrderDetails/ReviewView/ReviewOrdersResultSection/ReviewOrdersResultSection';
+import UserLabelCellNormalContent from '@components/OrderDetails/ReviewView/ReviewOrdersResultSection/UserLabelCellNormalContent';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import type { TColumn } from '@components/Table/Table';
 import Table from '@components/Table/Table';
@@ -35,6 +40,7 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { AdminManageOrderThunks } from '@pages/admin/order/AdminManageOrder.slice';
 import { EApiUpdateMode } from '@pages/api/orders/[orderId]/plan/update.service';
+import { company } from '@redux/slices';
 import {
   changeStep4SubmitStatus,
   clearDraftEditOrder,
@@ -42,8 +48,8 @@ import {
   saveDraftEditOrder,
 } from '@redux/slices/Order.slice';
 import { adminPaths } from '@src/paths';
-import type { PlanListing } from '@src/types';
-import { Listing } from '@utils/data';
+import type { PlanListing, UserListing } from '@src/types';
+import { Listing, User } from '@utils/data';
 import { formatTimestamp } from '@utils/dates';
 import {
   EOrderDraftStates,
@@ -96,6 +102,34 @@ function ZoomableImage({
         </div>
       </DialogContent>
     </Dialog>
+  );
+}
+
+export type UserLabelRecordThermal = Omit<
+  UserLabelRecord,
+  'participantName' | 'qrCodeImageSrc' | 'timestamp'
+>;
+
+function UserLabelThermalPrintSection({
+  userLabelRecords,
+}: {
+  userLabelRecords: UserLabelRecordThermal[];
+}) {
+  return (
+    <>
+      {userLabelRecords.map((userLabelRecord, idx) => (
+        <div key={idx} className="w-[62mm] h-[43mm]">
+          <UserLabelCellNormalContent
+            type="thermal"
+            partnerName={userLabelRecord.partnerName}
+            companyName={userLabelRecord.companyName}
+            mealDate={userLabelRecord.mealDate}
+            foodName={userLabelRecord.foodName}
+            note={userLabelRecord.requirement}
+          />
+        </div>
+      ))}
+    </>
   );
 }
 
@@ -159,6 +193,7 @@ export const ReviewContent: React.FC<any> = (props) => {
     updatePlanDetail,
     foodOrder = {},
     onDownloadReviewOrderResults,
+    company: companyValue,
   } = props;
   const router = useRouter();
   const intl = useIntl();
@@ -180,6 +215,10 @@ export const ReviewContent: React.FC<any> = (props) => {
     (state) => state.OrderManagement.planData,
   );
 
+  const currentUser: UserListing | null = useAppSelector(
+    (state) => state.user.currentUser,
+  );
+
   const orderDetailInPickingState = useAppSelector((state) => {
     const _planListing = state.OrderManagement.planData;
     const { orderDetail = {} } = Listing(
@@ -199,6 +238,8 @@ export const ReviewContent: React.FC<any> = (props) => {
     (state) => state.SystemAttributes.deliveryPeople,
   );
 
+  const { companyName } = User(companyValue).getPublicData();
+
   const isOrderDetailPage = router.pathname === adminPaths.OrderDetail;
 
   const defaultCopyText = intl.formatMessage({
@@ -208,8 +249,12 @@ export const ReviewContent: React.FC<any> = (props) => {
     id: 'ReviewContent.copyToClipboardTooltip.copied',
   });
 
+  const isAdmin = currentUser?.attributes?.profile?.metadata?.isAdmin;
+
   const [copyToClipboardTooltip, setCopyToClipboardTooltip] =
     useState(defaultCopyText);
+  const allowTriggerGenerateUserLabelFile = useRef(false);
+  const thermalPrintSectionRef = useRef<HTMLDivElement>(null);
 
   const order = !isEmpty(orderInDraftState)
     ? orderInDraftState
@@ -247,9 +292,11 @@ export const ReviewContent: React.FC<any> = (props) => {
     orderState,
     orderNote,
     orderStateHistory = [],
+    orderType,
   } = Listing(order as TListing).getMetadata();
 
   const orderId = Listing(order as TListing).getId();
+  const isNormalOrder = orderType === EOrderType.normal;
   const { restaurantName, phoneNumber, foodList = {} } = restaurant || {};
   const resultSectionShowed = [
     EOrderStates.inProgress,
@@ -307,6 +354,42 @@ export const ReviewContent: React.FC<any> = (props) => {
     setCurrDeliveryManPhoneNumber(currDeliveryInfoOption?.phoneNumber);
   };
 
+  const printThermalSection = async () => {
+    if (!allowTriggerGenerateUserLabelFile.current) return;
+
+    const printContent = thermalPrintSectionRef.current?.innerHTML;
+    if (!printContent) return;
+    const convertToImage = await html2canvas(thermalPrintSectionRef.current, {
+      scale: 3,
+      useCORS: true,
+      allowTaint: true,
+    });
+    const imgData = convertToImage.toDataURL('image/png');
+
+    const printWindow = window.open('', '', 'height=600,width=800');
+    printWindow?.document.write(`
+        <style>
+          body {
+            margin: 0;
+          }
+  
+          @media print {
+            body {
+              margin: 0;
+            }
+  
+            @page {
+              size: 62mm 43mm;
+              margin: 0;
+            }
+          }
+        </style>
+        <img style="width: 59.452mm;" src="${imgData}" />
+      `);
+    printWindow?.document.close();
+    printWindow?.print();
+  };
+
   const parsedDeliveryManOptions = useMemo(
     () =>
       deliveryManOptions.map((d: TObject) => ({
@@ -328,254 +411,301 @@ export const ReviewContent: React.FC<any> = (props) => {
     })
     .flat();
 
+  const userLabelRecords = useMemo<UserLabelRecordThermal[]>(() => {
+    return foodDataList.flatMap((food: TObject) =>
+      Array.from({ length: food.frequency || 1 }, () => ({
+        partnerName: restaurantName,
+        companyName,
+        mealDate: DateTime.fromMillis(Number(timeStamp)).toFormat('dd/MM/yyyy'),
+        foodName: food?.foodName || '',
+        requirement: orderNote || note || '',
+      })),
+    );
+  }, [foodDataList, restaurantName, companyName, timeStamp, orderNote, note]);
+
   return (
-    <div className="flex flex-col w-full gap-2">
-      {deliveryImages.length > 0 && (
-        <div className="flex flex-col gap-2 rounded-lg bg-gray-100 p-0 overflow-hidden">
-          <div className="font-bold text-base p-4 bg-gray-200 flex items-center gap-2">
-            <svg
-              width={20}
-              height={20}
-              viewBox="0 -2 20 20"
-              version="1.1"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="#000000">
-              <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-              <g
-                id="SVGRepo_tracerCarrier"
-                stroke-linecap="round"
-                stroke-linejoin="round"></g>
-              <g id="SVGRepo_iconCarrier">
-                {' '}
-                <title>image_picture [#972]</title>{' '}
-                <desc>Created with Sketch.</desc> <defs> </defs>{' '}
+    <>
+      <div className="flex flex-col w-full gap-2">
+        {deliveryImages.length > 0 && (
+          <div className="flex flex-col gap-2 rounded-lg bg-gray-100 p-0 overflow-hidden">
+            <div className="font-bold text-base p-4 bg-gray-200 flex items-center gap-2">
+              <svg
+                width={20}
+                height={20}
+                viewBox="0 -2 20 20"
+                version="1.1"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="#000000">
+                <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
                 <g
-                  id="Page-1"
-                  stroke="none"
-                  stroke-width="1"
-                  fill="none"
-                  fill-rule="evenodd">
+                  id="SVGRepo_tracerCarrier"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"></g>
+                <g id="SVGRepo_iconCarrier">
                   {' '}
+                  <title>image_picture [#972]</title>{' '}
+                  <desc>Created with Sketch.</desc> <defs> </defs>{' '}
                   <g
-                    id="Dribbble-Light-Preview"
-                    transform="translate(-380.000000, -3881.000000)"
-                    fill="#000000">
+                    id="Page-1"
+                    stroke="none"
+                    stroke-width="1"
+                    fill="none"
+                    fill-rule="evenodd">
                     {' '}
-                    <g id="icons" transform="translate(56.000000, 160.000000)">
+                    <g
+                      id="Dribbble-Light-Preview"
+                      transform="translate(-380.000000, -3881.000000)"
+                      fill="#000000">
                       {' '}
-                      <path
-                        d="M336,3725.5 C336,3724.948 336.448,3724.5 337,3724.5 C337.552,3724.5 338,3724.948 338,3725.5 C338,3726.052 337.552,3726.5 337,3726.5 C336.448,3726.5 336,3726.052 336,3725.5 L336,3725.5 Z M340,3733 L328,3733 L332.518,3726.812 L335.354,3730.625 L336.75,3728.75 L340,3733 Z M326,3735 L342,3735 L342,3723 L326,3723 L326,3735 Z M324,3737 L344,3737 L344,3721 L324,3721 L324,3737 Z"
-                        id="image_picture-[#972]">
+                      <g
+                        id="icons"
+                        transform="translate(56.000000, 160.000000)">
                         {' '}
-                      </path>{' '}
+                        <path
+                          d="M336,3725.5 C336,3724.948 336.448,3724.5 337,3724.5 C337.552,3724.5 338,3724.948 338,3725.5 C338,3726.052 337.552,3726.5 337,3726.5 C336.448,3726.5 336,3726.052 336,3725.5 L336,3725.5 Z M340,3733 L328,3733 L332.518,3726.812 L335.354,3730.625 L336.75,3728.75 L340,3733 Z M326,3735 L342,3735 L342,3723 L326,3723 L326,3735 Z M324,3737 L344,3737 L344,3721 L324,3721 L324,3737 Z"
+                          id="image_picture-[#972]">
+                          {' '}
+                        </path>{' '}
+                      </g>{' '}
                     </g>{' '}
                   </g>{' '}
-                </g>{' '}
-              </g>
-            </svg>
-            <span>HÌNH ẢNH VẬN ĐƠN</span>
+                </g>
+              </svg>
+              <span>HÌNH ẢNH VẬN ĐƠN</span>
+            </div>
+            <div className="flex flex-wrap gap-2 p-4 pt-2">
+              {deliveryImages.map((image, index: number) => (
+                <ZoomableImage
+                  key={index}
+                  src={image?.imageUrl}
+                  alt={`Hình ảnh phiếu vận đơn ${index}`}
+                  className="aspect-[16/9] h-[120px] object-cover cursor-pointer hover:opacity-80 rounded-md overflow-hidden"
+                />
+              ))}
+            </div>
           </div>
-          <div className="flex flex-wrap gap-2 p-4 pt-2">
-            {deliveryImages.map((image, index: number) => (
-              <ZoomableImage
-                key={index}
-                src={image?.imageUrl}
-                alt={`Hình ảnh phiếu vận đơn ${index}`}
-                className="aspect-[16/9] h-[120px] object-cover cursor-pointer hover:opacity-80 rounded-md overflow-hidden"
-              />
-            ))}
-          </div>
-        </div>
-      )}
-      <RenderWhen condition={resultSectionShowed}>
-        <ReviewOrdersResultSection
-          className={css.reviewOrderResult}
-          data={{
-            participants,
-            participantData,
-            anonymous,
-            anonymousParticipantData,
-            orderDetail,
-          }}
-          planListing={planListing}
-          onDownloadReviewOrderResults={onDownloadReviewOrderResults}
-        />
-      </RenderWhen>
-      <div className={css.infoSection}>
-        <RenderWhen condition={isOrderDetailPage}>
+        )}
+        <RenderWhen condition={resultSectionShowed}>
+          <ReviewOrdersResultSection
+            className={css.reviewOrderResult}
+            data={{
+              participants,
+              participantData,
+              anonymous,
+              anonymousParticipantData,
+              orderDetail,
+            }}
+            planListing={planListing}
+            onDownloadReviewOrderResults={onDownloadReviewOrderResults}
+          />
+        </RenderWhen>
+        <div className={css.infoSection}>
+          <RenderWhen condition={isOrderDetailPage}>
+            <Collapsible
+              label={intl.formatMessage({
+                id: 'ReviewOrder.deliveryManInfoLabel',
+              })}>
+              <div className={classNames(css.contentBox, css.spaceStart)}>
+                <div className={css.flexChild}>
+                  <span className={css.boxTitle}>
+                    {intl.formatMessage({ id: 'ReviewOrder.deliveryManName' })}
+                  </span>
+                  <FieldDropdownSelectComponent
+                    id={`${timeStamp}_deliveryMan`}
+                    name="deliveryMan"
+                    className={css.selectBoxContent}
+                    meta={deliveryMan.meta}
+                    options={parsedDeliveryManOptions}
+                    placeholder="Chọn nhân viên"
+                    input={deliveryMan.input}
+                    customOnChange={handleFieldDeliveryManChange}
+                  />
+                </div>
+                <div className={css.flexChild}>
+                  <span className={css.boxTitle}>
+                    {intl.formatMessage({ id: 'ReviewOrder.phoneNumberLabel' })}
+                  </span>
+                  <RenderWhen condition={!isEmpty(currDeliveryPhoneNumber)}>
+                    <span className={css.boxContent}>
+                      {currDeliveryPhoneNumber}
+                    </span>
+                  </RenderWhen>
+
+                  <RenderWhen condition={shouldShowTrackingLink}>
+                    <div className={css.billOfLading} onClick={handleCopyLink}>
+                      {intl.formatMessage({ id: 'ReviewOrder.billOfLading' })}
+                      <Tooltip
+                        overlayClassName={css.toolTipOverlay}
+                        trigger="hover"
+                        tooltipContent={copyToClipboardTooltip}
+                        placement="bottom">
+                        <div>
+                          <IconCopy className={css.copyIcon} />
+                        </div>
+                      </Tooltip>
+                    </div>
+                  </RenderWhen>
+                </div>
+              </div>
+            </Collapsible>
+          </RenderWhen>
           <Collapsible
             label={intl.formatMessage({
-              id: 'ReviewOrder.deliveryManInfoLabel',
+              id: 'ReviewOrder.providerLabel',
             })}>
             <div className={classNames(css.contentBox, css.spaceStart)}>
               <div className={css.flexChild}>
                 <span className={css.boxTitle}>
-                  {intl.formatMessage({ id: 'ReviewOrder.deliveryManName' })}
+                  {intl.formatMessage({ id: 'ReviewOrder.providerName' })}
                 </span>
-                <FieldDropdownSelectComponent
-                  id={`${timeStamp}_deliveryMan`}
-                  name="deliveryMan"
-                  className={css.selectBoxContent}
-                  meta={deliveryMan.meta}
-                  options={parsedDeliveryManOptions}
-                  placeholder="Chọn nhân viên"
-                  input={deliveryMan.input}
-                  customOnChange={handleFieldDeliveryManChange}
-                />
+                <span className={css.boxContent}>{restaurantName}</span>
               </div>
               <div className={css.flexChild}>
                 <span className={css.boxTitle}>
                   {intl.formatMessage({ id: 'ReviewOrder.phoneNumberLabel' })}
                 </span>
-                <RenderWhen condition={!isEmpty(currDeliveryPhoneNumber)}>
-                  <span className={css.boxContent}>
-                    {currDeliveryPhoneNumber}
-                  </span>
-                </RenderWhen>
-
-                <RenderWhen condition={shouldShowTrackingLink}>
-                  <div className={css.billOfLading} onClick={handleCopyLink}>
-                    {intl.formatMessage({ id: 'ReviewOrder.billOfLading' })}
-                    <Tooltip
-                      overlayClassName={css.toolTipOverlay}
-                      trigger="hover"
-                      tooltipContent={copyToClipboardTooltip}
-                      placement="bottom">
-                      <div>
-                        <IconCopy className={css.copyIcon} />
-                      </div>
-                    </Tooltip>
-                  </div>
-                </RenderWhen>
+                <span className={css.boxContent}>{phoneNumber}</span>
               </div>
             </div>
           </Collapsible>
-        </RenderWhen>
-        <Collapsible
-          label={intl.formatMessage({
-            id: 'ReviewOrder.providerLabel',
-          })}>
-          <div className={classNames(css.contentBox, css.spaceStart)}>
-            <div className={css.flexChild}>
-              <span className={css.boxTitle}>
-                {intl.formatMessage({ id: 'ReviewOrder.providerName' })}
-              </span>
-              <span className={css.boxContent}>{restaurantName}</span>
-            </div>
-            <div className={css.flexChild}>
-              <span className={css.boxTitle}>
-                {intl.formatMessage({ id: 'ReviewOrder.phoneNumberLabel' })}
-              </span>
-              <span className={css.boxContent}>{phoneNumber}</span>
+        </div>
+
+        {isNormalOrder && (
+          <div className="w-full flex justify-end mb-5">
+            <div className="flex gap-2 items-center bg-orange-50 py-1 px-2 rounded-lg border border-orange-200 w-fit">
+              <p className="text-xs ">Máy in nhiệt</p>
+              <Button
+                variant="inline"
+                size="medium"
+                className="h-[36px]"
+                loadingMode="extend"
+                onClick={() => {
+                  allowTriggerGenerateUserLabelFile.current = true;
+                  setTimeout(() => {
+                    printThermalSection();
+                  });
+                }}>
+                In label
+              </Button>
             </div>
           </div>
-        </Collapsible>
-      </div>
-      <Collapsible
-        label={intl.formatMessage({
-          id: 'ReviewOrder.menuLabel',
-        })}>
-        <RenderWhen condition={shouldShowFoodList}>
-          <Table
-            columns={MenuColumns}
-            data={parsedFoodList}
-            tableClassName={css.tableRoot}
-            tableHeadClassName={css.tableHead}
-            tableHeadRowClassName={css.tableHeadRow}
-            tableBodyClassName={css.tableBody}
-            tableBodyRowClassName={css.tableBodyRow}
-            tableBodyCellClassName={css.tableBodyCell}
-          />
+        )}
 
-          <RenderWhen.False>
-            <div className={css.tableContainer}>
-              <div className={css.tableHead}>
-                <div>
-                  {intl.formatMessage({
-                    id: 'ReviewOrder.tableHead.no',
-                  })}
-                </div>
-                <div>
-                  {intl.formatMessage({
-                    id: 'ReviewOrder.tableHead.type',
-                  })}
-                </div>
-                <div>
-                  {intl.formatMessage({
-                    id: 'ReviewOrder.tableHead.unit',
-                  })}
-                </div>
-                <div>
-                  {intl.formatMessage({
-                    id: 'ReviewOrder.tableHead.quantity',
-                  })}
-                </div>
+        <Collapsible
+          label={intl.formatMessage({
+            id: 'ReviewOrder.menuLabel',
+          })}>
+          <RenderWhen condition={shouldShowFoodList}>
+            <Table
+              columns={MenuColumns}
+              data={parsedFoodList}
+              tableClassName={css.tableRoot}
+              tableHeadClassName={css.tableHead}
+              tableHeadRowClassName={css.tableHeadRow}
+              tableBodyClassName={css.tableBody}
+              tableBodyRowClassName={css.tableBodyRow}
+              tableBodyCellClassName={css.tableBodyCell}
+            />
 
-                <div>
-                  {intl.formatMessage({
-                    id: 'ReviewOrder.tableHead.price',
-                  })}
-                </div>
-                <div></div>
-              </div>
-
-              <div className={css.tableBody}>
-                <div className={css.tableRowGroup}>
-                  <div className={groupTitleClasses}>
-                    <div>{1}</div>
-                    <div>
-                      {intl.formatMessage({
-                        id: 'ReviewOrder.table.menuTitle',
-                      })}
-                    </div>
-                    <div>{''}</div>
-                    <div>{totalDishes}</div>
-                    <div>{parseThousandNumber(totalPrice || 0)}đ</div>
-                    <div
-                      className={css.actionCell}
-                      onClick={handleToggleMenuCollapse}>
-                      <IconArrow className={iconClasses} />
-                    </div>
-                  </div>
-                  <div className={rowsClasses}>
-                    {foodDataList.map((foodData: TObject, index: number) => {
-                      const {
-                        foodId = index,
-                        foodPrice = 0,
-                        foodUnit = '',
-                        foodName = '',
-                        frequency = 1,
-                      } = foodData;
-
-                      return (
-                        <div className={css.row} key={foodId}>
-                          <div></div>
-                          <div>{foodName}</div>
-                          <div>{foodUnit}</div>
-                          <div>{frequency}</div>
-                          <div>{parseThousandNumber(foodPrice || 0)}đ</div>
-                          <div>{''}</div>
-                        </div>
-                      );
+            <RenderWhen.False>
+              <div className={css.tableContainer}>
+                <div className={css.tableHead}>
+                  <div>
+                    {intl.formatMessage({
+                      id: 'ReviewOrder.tableHead.no',
                     })}
                   </div>
+                  <div>
+                    {intl.formatMessage({
+                      id: 'ReviewOrder.tableHead.type',
+                    })}
+                  </div>
+                  <div>
+                    {intl.formatMessage({
+                      id: 'ReviewOrder.tableHead.unit',
+                    })}
+                  </div>
+                  <div>
+                    {intl.formatMessage({
+                      id: 'ReviewOrder.tableHead.quantity',
+                    })}
+                  </div>
+
+                  <div>
+                    {intl.formatMessage({
+                      id: 'ReviewOrder.tableHead.price',
+                    })}
+                  </div>
+                  <div></div>
+                </div>
+
+                <div className={css.tableBody}>
+                  <div className={css.tableRowGroup}>
+                    <div className={groupTitleClasses}>
+                      <div>{1}</div>
+                      <div>
+                        {intl.formatMessage({
+                          id: 'ReviewOrder.table.menuTitle',
+                        })}
+                      </div>
+                      <div>{''}</div>
+                      <div>{totalDishes}</div>
+                      <div>{parseThousandNumber(totalPrice || 0)}đ</div>
+                      <div
+                        className={css.actionCell}
+                        onClick={handleToggleMenuCollapse}>
+                        <IconArrow className={iconClasses} />
+                      </div>
+                    </div>
+                    <div className={rowsClasses}>
+                      {foodDataList.map((foodData: TObject, index: number) => {
+                        const {
+                          foodId = index,
+                          foodPrice = 0,
+                          foodUnit = '',
+                          foodName = '',
+                          frequency = 1,
+                        } = foodData;
+
+                        return (
+                          <div className={css.row} key={foodId}>
+                            <div></div>
+                            <div>{foodName}</div>
+                            <div>{foodUnit}</div>
+                            <div>{frequency}</div>
+                            <div>{parseThousandNumber(foodPrice || 0)}đ</div>
+                            <div>{''}</div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          </RenderWhen.False>
-        </RenderWhen>
-      </Collapsible>
-      {(orderNote || note) && (
-        <Collapsible
-          label={intl.formatMessage({
-            id: 'ReviewOrder.note',
-          })}>
-          <div className={classNames(css.contentBox, css.spaceStart)}>
-            {orderNote || note}
-          </div>
+            </RenderWhen.False>
+          </RenderWhen>
         </Collapsible>
+        {(orderNote || note) && (
+          <Collapsible
+            label={intl.formatMessage({
+              id: 'ReviewOrder.note',
+            })}>
+            <div className={classNames(css.contentBox, css.spaceStart)}>
+              {orderNote || note}
+            </div>
+          </Collapsible>
+        )}
+      </div>
+      {isAdmin && (
+        <div className="h-0 overflow-hidden absolute">
+          <div
+            className="flex flex-wrap gap-2 flex-col"
+            ref={thermalPrintSectionRef}>
+            <UserLabelThermalPrintSection userLabelRecords={userLabelRecords} />
+          </div>
+        </div>
       )}
-    </div>
+    </>
   );
 };
 
@@ -595,7 +725,11 @@ const parseDataToReviewTab = (values: any) => {
           key,
           label: formatTimestamp(Number(key)),
           childrenFn: (childProps: any) => <ReviewContent {...childProps} />,
-          childrenProps: { ...orderDetail[key], ...rest, order: values },
+          childrenProps: {
+            ...orderDetail[key],
+            ...rest,
+            order: values,
+          },
         };
       }),
   );
@@ -745,12 +879,14 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
                 draftEditOrderData?.deliveryAddress || deliveryAddress,
 
               notes: draftEditOrderData?.notes || notes,
+              company,
             })
           : parseDataToReviewTab({
               orderDetail,
               deliveryHour,
               deliveryAddress,
               notes,
+              company,
             }),
       };
     }, [
@@ -760,6 +896,7 @@ const ReviewOrder: React.FC<TReviewOrder> = (props) => {
       JSON.stringify(draftEditOrderData),
       JSON.stringify(orderDetail),
       JSON.stringify(draftEditOrderDetail),
+      company,
     ]) || {};
   const isEditInProgressOrder = orderState === EOrderStates.inProgress;
 

@@ -244,6 +244,7 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
             timeStamp: key,
             foodOrder,
             onDownloadReviewOrderResults,
+            company,
           },
         };
       });

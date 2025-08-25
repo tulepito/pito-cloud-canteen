@@ -89,6 +89,7 @@ export type QuotationListing = ListingBuilder<
     client: QuotationListingRecord;
     partner: QuotationListingRecord;
     status: 'active';
+    mealItemsFailed?: MealItemsFailedQuotation;
   },
   {},
   {}
@@ -145,6 +146,24 @@ export type MemberOrderValue = {
   status: 'empty' | 'joined' | 'notJoined' | 'notAllowed' | 'expired';
   barcode?: string;
 };
+
+export type MealItemsFailedItem = {
+  memberId: string;
+  foodId: string;
+  reason: string;
+};
+
+export type MealItemsFailedQuotationItem = {
+  foodId: string;
+  count: number;
+};
+
+export type MealItemsFailed = Record<string, MealItemsFailedItem[]>;
+
+export type MealItemsFailedQuotation = Record<
+  string,
+  MealItemsFailedQuotationItem[]
+>;
 
 export type OrderDetailValue = {
   hasNoRestaurants: boolean;
@@ -218,6 +237,7 @@ export type PlanListing = ListingBuilder<
         }
       >
     >;
+    mealItemsFailed?: MealItemsFailed;
   },
   {},
   {}
