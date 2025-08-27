@@ -1,9 +1,7 @@
-import CTABg from '../assets/CTABg2.png';
-import CTABgMobile from '../assets/CTABg2-2.png';
 import FAQsAlt from '../components/FAQsAlt';
 import ImageMarquee from '../components/ImageMarquee';
-import CTA from '../components/MediumBusiness/CTA';
 import CommonProblems from '../components/SmallBusiness/CommonProblems';
+import CTASection from '../components/SmallBusiness/CTASection';
 import Hero from '../components/SmallBusiness/Hero';
 import HowItWorks from '../components/SmallBusiness/HowItWorks';
 import WhyChoosePito from '../components/SmallBusiness/WhyChoosePito';
@@ -17,23 +15,11 @@ const SmallBusiness = () => {
       <TrustedCompanies />
       <CommonProblems />
       <HowItWorks />
-      <div className="py-16">
-        <ImageMarquee />
-      </div>
+      <ImageMarquee className="!mb-0 py-[64px] md:py-16" />
       <WhyChoosePito />
       <Testimonials />
       <FAQsAlt />
-      <CTA
-        src={CTABg}
-        srcMobile={CTABgMobile}
-        textTop="Your Team’s Meals"
-        textMiddleNode={
-          <>
-            Ready to Upgrade Your <br /> Office Lunch Experience?
-          </>
-        }
-        textBottom="Let PITO help you manage lunch for 100–300 employees without the need for an in-house kitchen or manual coordination."
-      />
+      <CTASection />
     </div>
   );
 };

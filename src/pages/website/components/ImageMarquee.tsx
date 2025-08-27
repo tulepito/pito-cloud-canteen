@@ -24,9 +24,9 @@ const images = [
   { src: image4, alt: 'image4-duplicate', type: 'type2' },
 ];
 
-const ImageMarquee = () => {
+const ImageMarquee = ({ className = '' }: { className?: string }) => {
   return (
-    <div className="mb-[60px] md:mb-[160px]">
+    <div className={`mb-[60px] md:mb-[160px] ${className}`}>
       <Marquee className="h-full">
         {images.map(({ src, alt, type }, index) => {
           return (

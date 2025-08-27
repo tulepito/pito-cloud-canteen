@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { CgClose } from 'react-icons/cg';
+import { useIntl } from 'react-intl';
 import Image from 'next/image';
 
 import image1 from '../../assets/employee/tired1.webp';
@@ -7,36 +8,48 @@ import image2 from '../../assets/employee/tired2.webp';
 import image3 from '../../assets/employee/tired3.webp';
 import image4 from '../../assets/employee/tired4.webp';
 
-const data = [
-  {
-    src: image1,
-    alt: 'Image 1',
-    title: 'Wasting time picking meals every morning',
-  },
-  {
-    src: image2,
-    alt: 'Image 1',
-    title: 'Confusion at lunch: which box is mine?',
-  },
-  {
-    src: image3,
-    alt: 'Image 1',
-    title: 'Repetitive meals that don&apos;t match your taste',
-  },
-  {
-    src: image4,
-    alt: 'Image 1',
-    title: 'Food arrives late - cutting into break time',
-  },
-];
-
 const Tired = () => {
+  const intl = useIntl();
+
+  const data = useMemo(() => {
+    return [
+      {
+        src: image1,
+        alt: 'Image 1',
+        title: intl.formatMessage({
+          id: 'wasting-time-picking-meals-every-morning',
+        }),
+      },
+      {
+        src: image2,
+        alt: 'Image 1',
+        title: intl.formatMessage({
+          id: 'confusion-at-lunch-which-box-is-mine',
+        }),
+      },
+      {
+        src: image3,
+        alt: 'Image 1',
+        title: intl.formatMessage({
+          id: 'repetitive-meals-that-don-and-apos-t-match-your-taste',
+        }),
+      },
+      {
+        src: image4,
+        alt: 'Image 1',
+        title: intl.formatMessage({
+          id: 'food-arrives-late-cutting-into-break-time',
+        }),
+      },
+    ];
+  }, [intl]);
+
   return (
     <div className="flex flex-col w-full gap-8 md:gap-20 relative md:mb-36 mb-20 max-w-[1024px] mx-auto px-5 md:px-0">
       {/* main hero section */}
-      <span className="font-alt font-semibold font-[unbounded] text-2xl md:text-[40px] leading-tight text-center">
-        Tired of this every lunch?
-      </span>
+      <h2 className="font-alt font-semibold font-[unbounded] text-2xl md:text-[40px] leading-tight text-center">
+        {intl.formatMessage({ id: 'tired-of-this-every-lunch' })}
+      </h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-6">
         {data.map((item, index) => (

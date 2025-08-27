@@ -20,7 +20,7 @@ const CTAAlt = () => {
         <span className="text-center md:text-left  font-medium">
           {intl.formatMessage({ id: 'your-teams-meals' })}
         </span>
-        <h2 className="font-bold text-3xl md:text-[42px] font-[unbounded] max-w-[700px] text-center leading-tight md:text-left md:whitespace-pre-line">
+        <h2 className="font-bold text-2xl md:text-[40px] font-[unbounded] max-w-[700px] text-center leading-tight md:text-left md:whitespace-pre-line">
           {intl.formatMessage({ id: 'ready-to-simplify-team-lunches' })}
         </h2>
         {intl.locale === 'en' && (

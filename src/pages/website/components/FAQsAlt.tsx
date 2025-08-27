@@ -81,7 +81,8 @@ const FAQsAlt = () => {
           textAlign: 'center',
         }}>
         <h2 className="font-[unbounded] font-bold text-3xl md:text-[40px] md:leading-tight">
-          {intl.formatMessage({ id: 'frequently-asked-and' })} <br />
+          {intl.formatMessage({ id: 'frequently-asked-and' })}{' '}
+          <br className="hidden md:block" />
           {intl.locale === 'en' && (
             <span className="text-[#D680A3] md:leading-[4rem]">
               {intl.formatMessage({ id: 'secretly-worried-about' })}

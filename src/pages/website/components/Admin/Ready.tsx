@@ -9,7 +9,7 @@ import blue from '../../assets/decorations/blue3.svg';
 import lemon from '../../assets/decorations/lemon.svg';
 import pink from '../../assets/decorations/pink.svg';
 import yellow from '../../assets/decorations/yellow.svg';
-import imageVideo from '../../assets/videoPlaceholder.png';
+import imageVideo from '../../assets/videoPlaceholder.webp';
 
 const Ready = () => {
   const intl = useIntl();
@@ -18,17 +18,20 @@ const Ready = () => {
   return (
     <>
       <div className="w-full md:min-h-[70vh] relative overflow-hidden">
-        {/* main hero section */}
-
         <div className="flex md:flex-row flex-col-reverse items-center md:justify-start justify-center md:py-20 mb-5 md:mb-0 max-w-[1024px] mx-auto md:px-0 px-5">
           <div className="flex flex-col md:items-start items-center md:text-left text-center md:gap-5 gap-2 md:w-2/3 pt-0">
-            <span className=" font-medium">Your Team&apos;s Meals</span>
-            <p className="font-semibold text-3xl md:text-[42px] font-[unbounded] md:leading-tight md:whitespace-pre-line">
-              Ready to transform lunch at the office? Why wait?
+            <span className=" font-medium">
+              {intl.formatMessage({ id: 'your-teams-meals-3' })}
+            </span>
+            <p className="font-semibold text-2xl md:text-[40px] font-[unbounded] md:leading-tight md:whitespace-pre-line">
+              {intl.formatMessage({
+                id: 'ready-to-transform-lunch-at-the-office-why-wait',
+              })}
             </p>
             <span className="md:text-lg md:whitespace-pre-line  font-medium">
-              Deliver a new standard of employee{' '}
-              <br className="hidden md:block" /> wellness - one meal at a time.
+              {intl.formatMessage({
+                id: 'deliver-a-new-standard-of-employee-wellness-one-meal-at-a-time',
+              })}
             </span>
             <div className="flex md:flex-row flex-col md:items-center items-stretch w-full gap-2 mt-3 md:mt-8">
               <a
@@ -43,8 +46,6 @@ const Ready = () => {
             </div>
           </div>
         </div>
-        {/* decorations */}
-
         <div className="relative aspect-[120/107] w-full md:hidden block">
           <Image
             src={CTABgMobile}

@@ -12,7 +12,7 @@ import GoogleCalendarModal from './GoogleCalendarModal';
 
 const TeamRoles = () => {
   const intl = useIntl();
-  const [isModalOpen, setIsModalOpen] = useState(false); // ✅ STATE MODAL
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
     <div className="pt-16 md:px-0 flex flex-col items-center gap-7 max-w-[1024px] mx-auto">

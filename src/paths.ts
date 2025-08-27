@@ -13,9 +13,9 @@ export const websitePaths = {
   PopupCanteen: '/popup-canteen',
   SmallBusiness: '/solutions/small-business',
   MiddleBusiness: '/solutions/middle-business',
-  Admin: '/admin',
-  Employee: '/employees',
-  Startup: '/start-up',
+  Admin: '/solutions/admin',
+  Employee: '/solutions/employees',
+  Startup: '/solutions/start-up',
   TechService: '/tech-service',
   OffShore: '/off-shore',
 };
@@ -23,6 +23,11 @@ export const websitePaths = {
 export const publicPaths = [
   websitePaths.MealBoxDelivery,
   websitePaths.PopupCanteen,
+  websitePaths.SmallBusiness,
+  websitePaths.MiddleBusiness,
+  websitePaths.Admin,
+  websitePaths.Employee,
+  websitePaths.Startup,
   '/website',
   '/sitemap.xml',
   '/robots.txt',
@@ -457,3 +462,6 @@ export const partnerRoutes = {
     label: 'Đánh giá',
   },
 };
+
+export const thankYouPaths =
+  'https://pito.vn/cam-nang/cloud-canteen/cam-on-ban-da-dang-ky-tu-van/';

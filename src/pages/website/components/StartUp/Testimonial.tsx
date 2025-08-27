@@ -76,8 +76,8 @@ const Testimonials: React.FC = () => {
     <div className="md:mb-36 mb-20">
       <div className="flex flex-col gap-10 md:gap-12 w-full">
         <div className="flex items-center justify-between relative w-full max-w-[1024px] mx-auto">
-          <p className="font-semibold text-3xl md:text-[42px] font-[unbounded] md:leading-tight md:whitespace-pre-line px-5 md:px-0">
-            What Our Customers Say
+          <p className="font-semibold text-2xl md:text-[40px] font-[unbounded] md:leading-tight md:whitespace-pre-line px-5 md:px-0">
+            {intl.formatMessage({ id: 'what-our-customers-say' })}
           </p>
           <div className="md:flex gap-2 absolute top-1 -right-32 hidden text-lg">
             <button

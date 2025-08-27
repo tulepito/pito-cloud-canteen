@@ -15,7 +15,7 @@ const HowItWorks = () => {
 
       <div className="flex flex-col md:items-start items-center md:text-left text-center md:gap-5 gap-2 md:w-2/3 pt-0">
         <span className="font-semibold font-[unbounded] text-2xl md:text-[40px] leading-tight text-center">
-          How It Works <br />{' '}
+          How It Works <br className="hidden md:block" />{' '}
           <span className="text-[#D680A3]">3 easy steps</span>
         </span>
         <span className="text-text md:text-lg md:whitespace-pre-line font-medium">

@@ -78,9 +78,9 @@ const Testimonials: React.FC = () => {
     <div className="md:mb-32 mb-20">
       <div className="flex flex-col gap-8 md:gap-[60px] max-w-[1024px] mx-auto w-full">
         <div className="flex items-center justify-center relative md:px-0 px-5">
-          <p className="font-semibold text-center md:text-left text-3xl md:text-[42px] font-[unbounded] md:leading-tight md:whitespace-pre-line">
-            Real Employee Feedback
-          </p>
+          <h2 className="font-semibold text-center md:text-left text-2xl md:text-[40px] font-[unbounded] md:leading-tight md:whitespace-pre-line">
+            {intl.formatMessage({ id: 'real-employee-feedback' })}
+          </h2>
         </div>
         <Splide
           ref={splideRef}

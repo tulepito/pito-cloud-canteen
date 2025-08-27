@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { CgClose } from 'react-icons/cg';
+import { useIntl } from 'react-intl';
 import Image from 'next/image';
 
 import image1 from '../../assets/startup/what1.webp';
@@ -7,46 +8,65 @@ import image2 from '../../assets/startup/what2.webp';
 import image3 from '../../assets/startup/what3.webp';
 import image4 from '../../assets/startup/what4.webp';
 
-const data = [
-  {
-    src: image1,
-    alt: 'Image 1',
-    title:
-      'Admin/HR spends several hours daily collecting orders, changing dishes, and handling errors.',
-  },
-  {
-    src: image2,
-    alt: 'Image 1',
-    title:
-      "Late deliveries, wrong orders ruin employees' lunchtime experience.",
-  },
-  {
-    src: image3,
-    alt: 'Image 1',
-    title:
-      'No management tools - operations are handled manually via Zalo and Excel.',
-  },
-  {
-    src: image4,
-    alt: 'Image 1',
-    title:
-      'Hard to control budgets, lack of transparency in cost reconciliation.',
-  },
-];
-
 const What = () => {
+  const intl = useIntl();
+
+  const data = useMemo(() => {
+    return [
+      {
+        src: image1,
+        alt: 'Image 1',
+        title: intl.formatMessage({
+          id: 'admin-hr-spends-several-hours-daily-collecting-orders-changing-dishes-and-handling-errors',
+        }),
+      },
+      {
+        src: image2,
+        alt: 'Image 1',
+        title: intl.formatMessage({
+          id: 'late-deliveries-wrong-orders-ruin-employees-lunchtime-experience',
+        }),
+      },
+      {
+        src: image3,
+        alt: 'Image 1',
+        title: intl.formatMessage({
+          id: 'no-management-tools-operations-are-handled-manually-via-zalo-and-excel',
+        }),
+      },
+      {
+        src: image4,
+        alt: 'Image 1',
+        title: intl.formatMessage({
+          id: 'hard-to-control-budgets-lack-of-transparency-in-cost-reconciliation',
+        }),
+      },
+    ];
+  }, [intl]);
+
   return (
     <div className="flex flex-col w-full gap-8 md:gap-20 relative md:mb-36 mb-20 max-w-[1024px] mx-auto px-5 md:px-0">
-      {/* main hero section */}
       <div className="flex flex-col items-center text-center md:gap-5 gap-2 w-full pt-0">
         <span className=" font-medium">
-          Unorganized meals are draining your team&apos;s speed.
+          {intl.formatMessage({
+            id: 'lunch-chaos-lower-efficiency',
+          })}
         </span>
-        <p className="font-semibold font-[unbounded] text-2xl md:text-[40px] leading-tight text-center">
-          What are <span className="text-[#96A546]">Startups</span> losing over{' '}
-          <br className="hidden md:block" />{' '}
-          <span className="text-[#96A546]">small matters</span>?
-        </p>
+        <h2 className="font-semibold font-[unbounded] text-2xl md:text-[40px] leading-tight text-center">
+          {intl.formatMessage(
+            {
+              id: 'hr-admin-burnout-caused-by-ordering-lunch',
+            },
+            {
+              highlightVi: (
+                <span className="text-[#96A546]">HR/Admin kiệt sức</span>
+              ),
+              highlightEn: (
+                <span className="text-[#96A546]">HR/Admin Burnout</span>
+              ),
+            },
+          )}
+        </h2>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-6">

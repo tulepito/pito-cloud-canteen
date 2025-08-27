@@ -1,14 +1,13 @@
+import { useIntl } from 'react-intl';
 import Image from 'next/image';
 
+import step3 from '../../assets/com-van-phong-cho-moi-quy.webp';
 import blueTriangle from '../../assets/decorations/blueTriangle.svg';
 import lemon from '../../assets/decorations/lemon.svg';
 import pink from '../../assets/decorations/pink.svg';
 import pinkAlt from '../../assets/decorations/pinkAlt.svg';
 import yellow from '../../assets/decorations/yellow.svg';
 import yellowTriangle from '../../assets/decorations/yellowTriangle.svg';
-import step1 from '../../assets/pitoAssets/gifs/step1.gif';
-import step2 from '../../assets/pitoAssets/gifs/step2.gif';
-import step3 from '../../assets/pitoAssets/gifs/step3.gif';
 
 export const HowItWorksSteps = ({
   step1Title = '',
@@ -29,9 +28,9 @@ export const HowItWorksSteps = ({
       md:size-16 size-12 flex items-center justify-center rounded-full bg-[#6CCFF6]/80 md:text-xl text-base text-white font-semibold">
             01
           </div>
-          <span className="font-bold md:text-4xl text-xl font-alt">
+          <h3 className="font-bold md:text-4xl text-xl font-alt">
             {step1Title}
-          </span>
+          </h3>
           <span className="text-lg">{step1Description}</span>
         </div>
         {/* rhs */}
@@ -46,8 +45,14 @@ export const HowItWorksSteps = ({
             alt="pink"
             className="absolute -z-10 md:size-64 size-45 -rotate-90 bottom-0 md:-bottom-20 md:-right-20 right-auto md:left-auto -left-20 md:transform-none scale-50 translate-x-[0] translate-y-[160px]"
           />
-          <div className="rounded-2xl mt-20 md:mt-0 relative overflow-hidden aspect-[2.1] w-full flex items-center justify-center scale-110">
-            <Image src={step1} alt="step 1 gif" fill className="object-cover" />
+          <div className="mt-0 relative w-full aspect-video rounded-md overflow-hidden border border-neutral-200">
+            <iframe
+              src="https://fast.wistia.net/embed/iframe/7za7iibhgy?autoPlay=true&mute=true&playerColor=000000"
+              title="Media Frame"
+              allow="autoplay; encrypted-media; picture-in-picture"
+              allowFullScreen={false}
+              className="absolute top-0 left-0 w-full h-full"
+            />
           </div>
         </div>
       </div>
@@ -65,8 +70,14 @@ export const HowItWorksSteps = ({
             alt="yellow"
             className="absolute -z-10 size-12 -top-6 md:left-8 left-auto md:right-auto right-0"
           />
-          <div className="rounded-2xl relative overflow-hidden aspect-[2.2] w-full flex items-center justify-center scale-110">
-            <Image src={step2} alt="step 2 gif" className="object-cover" />
+          <div className="mt-0 relative w-full aspect-video rounded-md overflow-hidden border border-neutral-200">
+            <iframe
+              src="https://fast.wistia.net/embed/iframe/8u3jxgesk7?autoPlay=true&mute=true&playerColor=000000"
+              title="Media Frame"
+              allow="autoplay; encrypted-media; picture-in-picture"
+              allowFullScreen={false}
+              className="absolute top-0 left-0 w-full h-full"
+            />
           </div>
         </div>
         {/* rhs */}
@@ -76,9 +87,9 @@ export const HowItWorksSteps = ({
       md:size-16 size-12 flex items-center justify-center rounded-full bg-[#C5D475] md:text-xl text-base text-white font-semibold">
             02
           </div>
-          <span className="font-bold md:text-4xl text-xl font-alt">
+          <h3 className="font-bold md:text-4xl text-xl font-alt">
             {step2Title}
-          </span>
+          </h3>
           <span className="text-lg">{step2Description}</span>
         </div>
       </div>
@@ -91,9 +102,9 @@ export const HowItWorksSteps = ({
       md:size-16 size-12 flex items-center justify-center rounded-full bg-[#F6AFCE] md:text-xl text-base text-white font-semibold">
             03
           </div>
-          <span className="font-bold md:text-4xl text-xl font-alt">
+          <h3 className="font-bold md:text-4xl text-xl font-alt">
             {step3Title}
-          </span>
+          </h3>
           <span className="text-lg">{step3Description}</span>
         </div>
         {/* rhs */}
@@ -108,8 +119,12 @@ export const HowItWorksSteps = ({
             alt="pink decor"
             className="absolute -z-10 size-50 -top-20 -right-20 md:flex hidden"
           />
-          <div className="rounded-2xl relative overflow-hidden aspect-[2.0] w-full flex items-center justify-center scale-110">
-            <Image src={step3} alt="step 3 gif" className="object-cover" />
+          <div className="rounded-2xl relative aspect-square w-full flex items-center justify-center overflow-hidden">
+            <Image
+              src={step3}
+              alt="PITO services on-site"
+              className="object-cover"
+            />
           </div>
         </div>
       </div>
@@ -118,24 +133,42 @@ export const HowItWorksSteps = ({
 };
 
 const HowItWorks = () => {
+  const intl = useIntl();
+
   return (
     <div className="flex flex-col items-center md:gap-12 md:px-0 px-5 md:pt-16 pt-20 pb-16 gap-1 relative max-w-[1024px] mx-auto">
       <div className="flex flex-col gap-2 items-center">
         <span className="font-[unbounded] text-3xl md:text-[40px] font-bold text-center md:leading-tight">
-          How it works <br />{' '}
-          <span className="text-[#D680A3]">3 easy steps</span>{' '}
+          {intl.formatMessage({ id: 'how-it-works-1' })} <br />{' '}
+          <span className="text-[#D680A3]">
+            {intl.formatMessage({ id: '3-easy-steps' })}
+          </span>{' '}
         </span>
         <span className="text-center md:w-auto w-2/3 md:text-lg font-medium">
-          Transform Your Lunch Experience in Just 3 Steps
+          {intl.formatMessage({
+            id: 'transform-your-lunch-experience-in-just-3-steps',
+          })}
         </span>
       </div>
       <HowItWorksSteps
-        step1Title="Automatically Plan Weekly Menus"
-        step2Title="Employees Pre-Select Their Meals"
-        step3Title="PITO Sets Up & Serves On-Site"
-        step1Description="Admins select menus from over 100 carefully vetted restaurants. No time wasted making daily decisions."
-        step2Description="Employees choose their meals via the app/web. Dietary preferences and allergies are automatically suggested."
-        step3Description="No kitchen required. PITO delivers and serves meals at your office with a professional pop-up canteen setup."
+        step1Title={intl.formatMessage({
+          id: 'automatically-plan-weekly-menus',
+        })}
+        step2Title={intl.formatMessage({
+          id: 'employees-pre-select-their-meals',
+        })}
+        step3Title={intl.formatMessage({
+          id: 'pito-sets-up-and-serves-on-site',
+        })}
+        step1Description={intl.formatMessage({
+          id: 'admins-select-menus-from-over-100-carefully-vetted-restaurants-no-time-wasted-making-daily-decisions',
+        })}
+        step2Description={intl.formatMessage({
+          id: 'employees-choose-their-meals-via-the-app-web-dietary-preferences-and-allergies-are-automatically-suggested',
+        })}
+        step3Description={intl.formatMessage({
+          id: 'no-kitchen-required-pito-delivers-and-serves-meals-at-your-office-with-a-professional-pop-up-canteen-setup',
+        })}
       />
     </div>
   );

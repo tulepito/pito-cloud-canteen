@@ -78,9 +78,9 @@ const Testimonials: React.FC = () => {
     <div className="md:mb-32 mb-20">
       <div className="flex flex-col gap-6 md:gap-12 max-w-[1024px] mx-auto w-full">
         <div className="flex items-center md:justify-between relative md:px-0 px-5">
-          <p className="relative font-semibold font-[unbounded] font-alt text-[28px]">
-            Testimonial & Brand Trust
-          </p>
+          <h2 className="relative font-semibold font-[unbounded] font-alt text-[28px]">
+            {intl.formatMessage({ id: 'testimonial-and-brand-trust' })}
+          </h2>
           <div className="md:flex gap-2 hidden text-lg">
             <button
               onClick={goPrev}

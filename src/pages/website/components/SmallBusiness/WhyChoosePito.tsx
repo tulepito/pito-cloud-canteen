@@ -6,18 +6,21 @@ import {
   PiStar,
   PiUser,
 } from 'react-icons/pi';
+import { useIntl } from 'react-intl';
 
 const WhyChoosePito = () => {
+  const intl = useIntl();
+
   return (
     <div className="flex flex-col items-center md:gap-12 md:px-0 px-5 md:pb-16 md:pt-16 gap-10 relative pb-10 max-w-[1024px] mx-auto">
       <div className="flex flex-col gap-2 items-center">
-        <span className="font-[unbounded] text-3xl md:text-[40px] font-bold text-center md:leading-tight">
-          Why Choose PITO Cloud Canteen?
-        </span>
+        <h2 className="font-[unbounded] text-3xl md:text-[40px] font-bold text-center md:leading-tight">
+          {intl.formatMessage({ id: 'why-choose-pito-cloud-canteen' })}
+        </h2>
         <span className="md:w-3/4 text-center font-medium md:text-lg">
-          No more manual lunch ordering. PITO helps you schedule lunch for the
-          whole week in just a few minutes. No Excel files, no complicated Zalo
-          messages.
+          {intl.formatMessage({
+            id: 'no-more-manual-lunch-ordering-pito-helps-you-schedule-lunch-for-the-whole-week-in-just-a-few-minutes-no-excel-files-no-complicated-zalo-messages',
+          })}
         </span>
       </div>
       <div className="grid md:grid-cols-2 gap-5 w-full md:px-18">
@@ -26,7 +29,9 @@ const WhyChoosePito = () => {
             <PiForkKnife />
           </div>
           <span className="font-semibold">
-            Perfect for offices without in-house kitchens
+            {intl.formatMessage({
+              id: 'perfect-for-offices-without-in-house-kitchens',
+            })}
           </span>
         </div>
         <div className="rounded-2xl p-3 border border-[#D7D7D7] flex items-center gap-3">
@@ -34,7 +39,9 @@ const WhyChoosePito = () => {
             <PiLaptop />
           </div>
           <span className="font-semibold">
-            Manage everything from one simple platform{' '}
+            {intl.formatMessage({
+              id: 'manage-everything-from-one-simple-platform',
+            })}{' '}
           </span>
         </div>
         <div className="rounded-2xl p-3 border border-[#D7D7D7] flex items-center gap-3">
@@ -42,7 +49,7 @@ const WhyChoosePito = () => {
             <PiHandshake />
           </div>
           <span className="font-semibold">
-            Works with verified, rotating vendors{' '}
+            {intl.formatMessage({ id: 'works-with-verified-rotating-vendors' })}{' '}
           </span>
         </div>
         <div className="rounded-2xl p-3 border border-[#D7D7D7] flex items-center gap-3">
@@ -50,7 +57,7 @@ const WhyChoosePito = () => {
             <PiFileText />
           </div>
           <span className="font-semibold">
-            Transparent pricing, no hidden fees{' '}
+            {intl.formatMessage({ id: 'transparent-pricing-no-hidden-fees' })}{' '}
           </span>
         </div>
         <div className="rounded-2xl p-3 border border-[#D7D7D7] flex items-center gap-3">
@@ -58,8 +65,9 @@ const WhyChoosePito = () => {
             <PiUser />
           </div>
           <span className="font-semibold">
-            Personalized meals for each employee – the right person, the right
-            dish{' '}
+            {intl.formatMessage({
+              id: 'personalized-meals-for-each-employee-the-right-person-the-right-dish',
+            })}{' '}
           </span>
         </div>
         <div className="rounded-2xl p-3 border border-[#D7D7D7] flex items-center gap-3">
@@ -67,7 +75,9 @@ const WhyChoosePito = () => {
             <PiStar />
           </div>
           <span className="font-semibold">
-            Diverse, high-quality menus with real user ratings{' '}
+            {intl.formatMessage({
+              id: 'diverse-high-quality-menus-with-real-user-ratings',
+            })}{' '}
           </span>
         </div>
       </div>

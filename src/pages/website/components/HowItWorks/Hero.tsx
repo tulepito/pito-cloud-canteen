@@ -72,7 +72,7 @@ const HeroContent = () => {
             {intl.formatMessage({ id: 'your-teams-meals' })}
           </span>
           <div className="flex flex-col items-center text-center md:gap-5 gap-2 md:pt-0">
-            <h1 className="font-[unbounded] font-bold text-3xl md:text-[42px] md:w-auto leading-[1.4]">
+            <h1 className="font-[unbounded] font-bold text-2xl md:text-[40px] md:w-auto leading-[1.4]">
               {intl.formatMessage({ id: 'giai-phap-dat-bua-trua-tu-dong' })},
               <br className="hidden md:block" />{' '}
               {intl.formatMessage({ id: 'toi-uu-cho-nhom' })}{' '}

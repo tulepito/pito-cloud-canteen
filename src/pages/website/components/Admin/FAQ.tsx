@@ -77,10 +77,14 @@ const FAQ = () => {
   return (
     <div className="md:px-0 px-5 flex flex-col items-center gap-10 md:gap-12 relative max-w-[1024px] mx-auto md:mb-36 mb-20">
       <div className="flex flex-col items-start w-full">
-        <p className="font-bold font-[unbounded] text-2xl md:text-[42px] md:leading-tight">
-          Frequently Asked <br /> and{' '}
-          <span className="text-[#D680A3]">Secretly Worried About</span>
-        </p>
+        <h2 className="font-bold font-[unbounded] text-2xl md:text-[42px] md:leading-tight">
+          {intl.formatMessage({ id: 'frequently-asked-and' })} <br />
+          {intl.locale === 'en' && (
+            <span className="text-[#D680A3] md:leading-[4rem]">
+              {intl.formatMessage({ id: 'secretly-worried-about' })}
+            </span>
+          )}
+        </h2>
       </div>
       {/* faqs */}
       <div className="w-full grid md:grid-cols-2 gap-4 ">

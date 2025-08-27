@@ -1,3 +1,4 @@
+import { useIntl } from 'react-intl';
 import Image from 'next/image';
 
 import { useModal } from '@pages/website/pages/Layout';
@@ -10,6 +11,7 @@ import imageMobile from '../../assets/startup/image.webp';
 import image from '../../assets/startup/ready.webp';
 
 const Hero = () => {
+  const intl = useIntl();
   const { setIsModalOpen } = useModal();
 
   return (
@@ -29,12 +31,17 @@ const Hero = () => {
         <div className="flex md:flex-row-reverse flex-col-reverse items-center md:justify-start h-full justify-center md:mb-0 max-w-[1024px] mx-auto md:min-h-[60vh] md:px-0 px-5">
           <div className="flex flex-col md:items-start items-center md:text-left text-center md:gap-5 gap-2 md:w-[60%] pt-0">
             <span className=" font-medium">
-              Delicious - On time - Your choice.
+              {intl.formatMessage({ id: 'delicious-on-time-your-choice-0' })}
             </span>
-            <p className="font-semibold text-3xl md:text-[42px] font-[unbounded] md:leading-tight md:whitespace-pre-line">
+            {/* <p className="font-semibold text-2xl md:text-[40px] font-[unbounded] md:leading-tight md:whitespace-pre-line">
               Ready to upgrade your team&apos;s lunch –{' '}
               <span className="text-[#D680A3]">saving time</span> and effort?
-            </p>
+            </p> */}
+            <h2 className="font-semibold text-2xl md:text-[40px] font-[unbounded] md:leading-tight md:whitespace-pre-line">
+              {intl.formatMessage({
+                id: 'ready-to-upgrade-your-teams-lunch-saving-time-and-effort',
+              })}
+            </h2>
             <div className="flex md:flex-row flex-col md:items-center items-stretch w-full gap-2 mt-8">
               <a
                 href=""
@@ -43,7 +50,7 @@ const Hero = () => {
                   setIsModalOpen(true);
                 }}
                 className="capitalize btn border font-[unbounded] border-gray-300 bg-black text-white py-3 px-6 font-semibold hover:opacity-90 transition-all duration-200 hover:scale-[1.01]">
-                Request a Demo
+                {intl.formatMessage({ id: 'request-a-demo' })}
               </a>
             </div>
           </div>

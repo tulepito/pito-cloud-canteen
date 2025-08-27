@@ -30,7 +30,8 @@ export const ModalProvider = ({ children }: { children: React.ReactNode }) => {
 
   if (
     router.pathname.includes('how-it-works') ||
-    router.pathname.includes('solutions')
+    router.pathname.includes('solutions') ||
+    router.pathname.includes('/website/employees')
   ) {
     ModalComponent = ModalAlt as any;
   }
@@ -62,7 +63,7 @@ const Layout = ({
       }}>
       <ModalProvider>
         <Navbar />
-        <main className="pt-[80px]">{children}</main>
+        <main className="pt-[100px]">{children}</main>
         {!noFooter && <Footer />}
       </ModalProvider>
     </div>

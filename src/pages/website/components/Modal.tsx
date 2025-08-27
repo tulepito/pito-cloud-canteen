@@ -1,7 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { toast } from 'react-toastify';
+import classNames from 'classnames';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+
+import { thankYouPaths } from '@src/paths';
 
 import pink from '../assets/decorations/pink.svg';
 
@@ -11,6 +15,7 @@ type ModalProps = {
 };
 
 export const ModalForm = ({ onClose }: { onClose: () => void }) => {
+  const router = useRouter();
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [companyName, setCompanyName] = useState('');
@@ -42,7 +47,12 @@ export const ModalForm = ({ onClose }: { onClose: () => void }) => {
           'Content-Type': 'application/json',
         },
       });
+
       onClose();
+
+      // Redirect to thank you page
+      router.push(thankYouPaths);
+
       toast.success(intl.formatMessage({ id: 'gui-thanh-cong' }), {
         position: 'top-right',
         autoClose: 5000,
@@ -52,6 +62,7 @@ export const ModalForm = ({ onClose }: { onClose: () => void }) => {
         draggable: true,
         progress: undefined,
       });
+
       setEmail('');
       setPhone('');
       setCompanyName('');
@@ -118,6 +129,172 @@ export const ModalForm = ({ onClose }: { onClose: () => void }) => {
           placeholder={intl.formatMessage({ id: 'enter-business-email' })}
           className="mt-1 w-full rounded-xl border border-solid border-gray-300 px-4 py-3 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black"
         />
+      </div>
+
+      <div>
+        <label className="text-sm font-medium text-gray-700">
+          {intl.formatMessage({ id: 'service-requirements' })} /{' '}
+          {intl.formatMessage({ id: 'notes' })}
+        </label>
+        <textarea
+          placeholder={intl.formatMessage({
+            id: 'let-us-know-any-preferences-or-questions',
+          })}
+          rows={4}
+          value={serviceRequirements}
+          onChange={(e) => setServiceRequirements(e.target.value)}
+          name="service_requirements"
+          required
+          autoComplete="off"
+          className="mt-1 w-full rounded-xl border border-solid border-gray-300 px-4 py-3 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black"
+        />
+      </div>
+
+      <button
+        type="submit"
+        className="bg-black text-white py-3 rounded-xl font-medium hover:bg-gray-800 transition">
+        {intl.formatMessage({ id: 'send' })}
+      </button>
+    </form>
+  );
+};
+
+export const ModalFormWithEmployees = ({
+  onClose,
+}: {
+  onClose: () => void;
+}) => {
+  const router = useRouter();
+  const [employeeCount, setEmployeeCount] = useState('');
+  const [phone, setPhone] = useState('');
+  const [companyName, setCompanyName] = useState('');
+  const [serviceRequirements, setServiceRequirements] = useState('');
+  const intl = useIntl();
+
+  const submitForm = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const data = {
+      company_name: companyName,
+      employee_count: employeeCount,
+      phone,
+      service_requirements: serviceRequirements,
+    };
+    const url = `https://activecampaign.pito.vn/proc.php?u=471&f=471&s=&c=0&m=0&act=sub&v=2&or=bd51ff8fcedda08477434aea129306d8&field[2]=${encodeURIComponent(
+      data.company_name || '',
+    )}&employee_count=${encodeURIComponent(
+      data.employee_count || '',
+    )}&phone=${encodeURIComponent(
+      data.phone || '',
+    )}&field[106]=${encodeURIComponent(
+      data.service_requirements || '',
+    )}&jsonp=true`;
+
+    try {
+      await fetch(url, {
+        method: 'GET',
+        mode: 'no-cors',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      onClose();
+
+      // Redirect to thank you page
+      router.push(thankYouPaths);
+
+      toast.success(intl.formatMessage({ id: 'gui-thanh-cong' }), {
+        position: 'top-right',
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+
+      setEmployeeCount('');
+      setPhone('');
+      setCompanyName('');
+      setServiceRequirements('');
+    } catch (error) {
+      toast.error('Có lỗi xảy ra, vui lòng kiểm tra lại thông tin', {
+        position: 'top-right',
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+    }
+  };
+
+  return (
+    <form className="flex flex-col gap-2" onSubmit={submitForm}>
+      <div>
+        <label className="text-sm font-medium text-gray-700">
+          {intl.formatMessage({ id: 'company-name' })}
+        </label>
+        <input
+          type="text"
+          name="company_name"
+          required
+          value={companyName}
+          onChange={(e) => setCompanyName(e.target.value)}
+          autoFocus
+          placeholder={intl.formatMessage({ id: 'enter-company-name' })}
+          className="mt-1 w-full rounded-xl border border-solid border-gray-300 px-4 py-3 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black"
+        />
+      </div>
+
+      <div>
+        <label className="text-sm font-medium text-gray-700">
+          {intl.formatMessage({ id: 'phone-number' })}
+        </label>
+        <input
+          type="tel"
+          name="phone"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          pattern="^[0-9]+$"
+          required
+          autoComplete="tel"
+          placeholder={intl.formatMessage({ id: 'enter-phone' })}
+          className="mt-1 w-full rounded-xl border border-solid border-gray-300 px-4 py-3 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black"
+        />
+      </div>
+
+      <div>
+        <label className="text-sm font-medium text-gray-700">
+          {intl.formatMessage({ id: 'so-luong-nhan-vien' })}
+        </label>
+        <select
+          value={employeeCount}
+          onChange={(e) => setEmployeeCount(e.target.value)}
+          required
+          className={classNames(
+            'mt-1 w-full rounded-xl border border-solid border-gray-300 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-black',
+            employeeCount === '' && 'text-gray-400',
+          )}>
+          <option value="" disabled>
+            {intl.formatMessage({ id: 'chon-so-luong-nhan-vien' })}
+          </option>
+          <option value="30-50">
+            30 - 50 {intl.formatMessage({ id: 'nhan-su' })}
+          </option>
+          <option value="50-70">
+            50 - 70 {intl.formatMessage({ id: 'nhan-su' })}
+          </option>
+          <option value="70-100">
+            70 - 100 {intl.formatMessage({ id: 'nhan-su' })}
+          </option>
+          <option value="100+">
+            {intl.formatMessage({ id: 'hon' })} 100+{' '}
+            {intl.formatMessage({ id: 'nhan-su' })}
+          </option>
+        </select>
       </div>
 
       <div>

@@ -1,11 +1,5 @@
-// import { useState } from 'react';
 import { useIntl } from 'react-intl';
 
-// import Image from 'next/image';
-// import blue from '../assets/decorations/blue.svg';
-// import lemon from '../assets/decorations/lemon.svg';
-// import pink from '../assets/decorations/pink.svg';
-// import yellow from '../assets/decorations/yellow.svg';
 import { useModal } from '../pages/Layout';
 
 const CTA = () => {
@@ -31,10 +25,6 @@ const CTA = () => {
               className="btn border border-solid border-gray-300 font-[unbounded] text-white bg-black hover:opacity-90 hover:scale-[1.01] transition-all duration-300 ease-in-out p-4 px-6 font-semibold">
               {intl.formatMessage({ id: 'request-consultation' })}
             </button>
-            {/* <button
-            onClick={() => setIsModalOpen(true)}
-            className="btn border border-solid border-gray-300 hover:bg-black hover:text-white">
-          </button> */}
           </div>
         </div>
       </div>

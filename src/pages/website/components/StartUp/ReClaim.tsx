@@ -11,18 +11,27 @@ const ReClaim = () => {
 
   return (
     <div className="flex flex-col md:gap-10 md:mb-36 mb-20 gap-5 relative max-w-[1024px] mx-auto px-5 md:px-0">
-      {/* Heading */}
       <div className="flex flex-col gap-2 items-center">
         <span className="text-text w-full md:w-2/3 text-center font-semibold">
           {intl.formatMessage({
-            id: 'reclaim-your-time-boost-team-satisfaction',
+            id: 'effortless-lunch-better-experience',
           })}
         </span>
-        <span className="font-alt text-2xl font-[unbounded] font-semibold md:text-[40px] text-center md:leading-tight md:whitespace-pre-line">
-          What <span className="text-[#96A546]">Startups Get</span> from{' '}
-          <br className="hidden md:block" />{' '}
-          <span className="text-[#96A546]">PITO Cloud Canteen</span>?
-        </span>
+        <h2 className="font-alt text-2xl font-[unbounded] font-semibold md:text-[40px] text-center md:leading-tight md:whitespace-pre-line">
+          {intl.formatMessage(
+            {
+              id: 'focus-on-growth-not-on-lunch',
+            },
+            {
+              highlightVi: (
+                <span className="text-[#D680A3]">Tập trung tăn trưởng</span>
+              ),
+              highlightEn: (
+                <span className="text-[#D680A3]">Focus on Growth</span>
+              ),
+            },
+          )}
+        </h2>
       </div>
 
       {/* Feature Cards */}
@@ -32,8 +41,8 @@ const ReClaim = () => {
           <div className="shrink-0 bg-[#F6AFCE]/30 text-[#D680A3] size-8 md:size-10 rounded-full flex items-center justify-center text-2xl">
             <PiClock className="text-xl md:text-2xl" />
           </div>
-          <span className="text-base md:text-2xl font-medium md:font-bold md:h-[84px]">
-            Save 90% of time coordinating meals
+          <span className="text-base md:text-2xl font-medium md:font-semibold md:h-[84px]">
+            {intl.formatMessage({ id: 'save-90-of-time-coordinating-meals' })}
           </span>
         </div>
 
@@ -42,8 +51,10 @@ const ReClaim = () => {
           <div className="shrink-0 bg-[#6CCFF6]/30 text-[#3598BF] size-8 md:size-10 rounded-full flex items-center justify-center text-2xl">
             <PiForkKnife className="text-xl md:text-2xl" />
           </div>
-          <span className="text-base md:text-2xl font-medium md:font-bold md:h-[84px]">
-            Diverse menu, different dishes every day, never boring
+          <span className="text-base md:text-2xl font-medium md:font-semibold md:h-[84px]">
+            {intl.formatMessage({
+              id: 'diverse-menu-different-dishes-every-day-never-boring',
+            })}
           </span>
         </div>
 
@@ -52,8 +63,10 @@ const ReClaim = () => {
           <div className="shrink-0 bg-[#C5D475]/30 text-[#96A546] size-8 md:size-10 rounded-full flex items-center justify-center text-2xl">
             <PiFileText className="text-xl md:text-2xl" />
           </div>
-          <span className="text-base md:text-2xl font-medium md:font-bold md:h-[84px]">
-            Detailed weekly and monthly reports on the system
+          <span className="text-base md:text-2xl font-medium md:font-semibold md:h-[84px]">
+            {intl.formatMessage({
+              id: 'detailed-weekly-and-monthly-reports-on-the-system',
+            })}
           </span>
         </div>
 
@@ -63,16 +76,18 @@ const ReClaim = () => {
             <div className="shrink-0 bg-[#C5D475]/30 text-[#96A546] size-8 md:size-10 rounded-full flex items-center justify-center text-2xl">
               <PiFileText className="text-xl md:text-2xl" />
             </div>
-            <span className="text-base md:text-2xl font-medium md:font-bold md:h-[84px]">
-              Meals delivered to the designated point, ensuring food safety
+            <span className="text-base md:text-2xl font-medium md:font-semibold md:h-[84px]">
+              {intl.formatMessage({
+                id: 'meals-delivered-to-the-designated-point-ensuring-food-safety',
+              })}
             </span>
           </div>
           <div className="flex md:flex-col gap-3 md:gap-8 justify-start md:justify-between border border-black/10 bg-white rounded-2xl md:rounded-3xl px-3 py-4 md:p-5 w-full md:w-1/2">
             <div className="shrink-0 bg-[#F6AFCE]/30 text-[#D680A3] size-8 md:size-10 rounded-full flex items-center justify-center text-2xl">
               <PiFileText className="text-xl md:text-2xl" />
             </div>
-            <span className="text-base md:text-2xl font-medium md:font-bold md:h-[84px]">
-              Flexible daily adjustments
+            <span className="text-base md:text-2xl font-medium md:font-semibold md:h-[84px]">
+              {intl.formatMessage({ id: 'flexible-daily-adjustments' })}
             </span>
           </div>
         </div>

@@ -1,14 +1,16 @@
+import { useIntl } from 'react-intl';
 import Image from 'next/image';
 
 import { useModal } from '@pages/website/pages/Layout';
 
 import blue from '../../assets/decorations/blue2.svg';
-import imageDecor1Alt2 from '../../assets/decorations/imageDecor1Alt2.webp';
 import lemon from '../../assets/decorations/lemon.svg';
 import pink from '../../assets/decorations/pink.svg';
+import imageDecor1Alt2 from '../../assets/decorations/PITO-cloud-canteen-dat-com-trua-van-phong.webp';
 import yellow from '../../assets/decorations/yellow.svg';
 
 const Hero = () => {
+  const intl = useIntl();
   const { setIsModalOpen } = useModal();
 
   return (
@@ -17,19 +19,24 @@ const Hero = () => {
       <div className="flex md:flex-row flex-col-reverse items-center md:justify-start justify-center md:py-20 mb-5 md:mb-0">
         {/* lhs */}
         <div className="flex flex-col md:items-start items-center md:text-left text-center md:gap-5 gap-2 md:w-[55%] w-full pt-0 md:pb-0 pb-50">
-          <span className="font-medium">Mid-Sized Business Ready</span>
-          <span className="font-[unbounded] font-bold text-3xl md:text-[40px] md:leading-tight">
-            <span className="text-[#D680A3]">Lunch Operations</span> Without an
-            In-House Canteen
+          <span className="font-medium">
+            {intl.formatMessage({ id: 'mid-sized-business-ready' })}
           </span>
+          <h1 className="font-[unbounded] font-bold text-3xl md:text-[40px] md:leading-tight">
+            <span className="text-[#D680A3]">
+              {intl.formatMessage({ id: 'lunch-operations' })}
+            </span>{' '}
+            {intl.formatMessage({ id: 'without-an-in-house-canteen' })}
+          </h1>
           <span className="font-medium md:text-lg">
-            Bring a professional lunch experience to your office without the
-            need for an in-house kitchen or manual management.
+            {intl.formatMessage({
+              id: 'bring-a-professional-lunch-experience-to-your-office-without-the-need-for-an-in-house-kitchen-or-manual-management',
+            })}
           </span>
           <button
             onClick={() => setIsModalOpen(true)}
             className="capitalize btn border font-[unbounded] border-gray-300 bg-black text-white py-3 px-6 font-semibold hover:opacity-90 transition-all duration-200 hover:scale-[1.01] mt-4">
-            Book a Free Consultation{' '}
+            {intl.formatMessage({ id: 'book-a-free-consultation' })}{' '}
           </button>
         </div>
       </div>
@@ -64,11 +71,14 @@ const Hero = () => {
         alt="pink decor"
         className="md:size-56 size-30 md:bottom-20 -bottom-15 md:rotate-150 -right-20 md:right-52 absolute -z-20 md:rotate-180 md:transform-none scale-50 -translate-y-[460px] translate-x-[140px] -rotate-[132deg]"
       />
-      <Image
-        src={imageDecor1Alt2}
-        alt="image decor"
-        className="md:top-10 md:-right-20 z-1 md:z-0 md:bottom-auto -bottom-8 right-23  md:size-[480px] size-72 absolute -z-20 md:transform-none translate-x-4"
-      />
+      <div className="md:top-20 md:-right-20 md:bottom-auto -bottom-16 right-8  md:h-[340px] md:w-fit aspect-[3/2] w-80 absolute -z-20">
+        <Image
+          src={imageDecor1Alt2}
+          alt="image decor"
+          fill
+          className="object-contain"
+        />
+      </div>
       <div className="h-[240px] md:hidden"></div>
     </div>
   );

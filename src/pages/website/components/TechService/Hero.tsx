@@ -22,7 +22,7 @@ const Hero = () => {
           <span className=" font-medium">
             Delicious - On time - Your choice.
           </span>
-          <p className="font-semibold text-3xl md:text-[42px] font-[unbounded] md:leading-tight md:whitespace-pre-line">
+          <p className="font-semibold text-2xl md:text-[40px] font-[unbounded] md:leading-tight md:whitespace-pre-line">
             Still <span className="text-[#D680A3]">losing hours each week</span>
             ... just to{' '}
             <span className="text-[#D680A3]">manage lunch orders</span>?

@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { CgClose } from 'react-icons/cg';
+import { useIntl } from 'react-intl';
 import Image from 'next/image';
 
 import image1 from '../../assets/admin/image1.webp';
@@ -7,41 +8,53 @@ import image2 from '../../assets/admin/image2.webp';
 import image3 from '../../assets/admin/image3.webp';
 import image4 from '../../assets/admin/image4.webp';
 
-const data = [
-  {
-    src: image1,
-    alt: 'Image 1',
-    title: 'Daily manual ordering & follow-ups',
-  },
-  {
-    src: image2,
-    alt: 'Image 1',
-    title: 'Scattered budgets and unclear invoicing',
-  },
-  {
-    src: image3,
-    alt: 'Image 1',
-    title: 'Employee complaints: repeated meals, late delivery',
-  },
-  {
-    src: image4,
-    alt: 'Image 1',
-    title: 'Operational overload as team size scales up',
-  },
-];
-
 const Daily = () => {
+  const intl = useIntl();
+
+  const data = useMemo(() => {
+    return [
+      {
+        src: image1,
+        alt: 'Image 1',
+        title: intl.formatMessage({
+          id: 'daily-manual-ordering-and-follow-ups',
+        }),
+      },
+      {
+        src: image2,
+        alt: 'Image 1',
+        title: intl.formatMessage({
+          id: 'scattered-budgets-and-unclear-invoicing',
+        }),
+      },
+      {
+        src: image3,
+        alt: 'Image 1',
+        title: intl.formatMessage({
+          id: 'employee-complaints-repeated-meals-late-delivery',
+        }),
+      },
+      {
+        src: image4,
+        alt: 'Image 1',
+        title: intl.formatMessage({
+          id: 'operational-overload-as-team-size-scales-up',
+        }),
+      },
+    ];
+  }, [intl]);
+
   return (
     <div className="flex flex-col w-full gap-8 md:gap-20 relative md:mb-36 mb-20 max-w-[1024px] mx-auto px-5 md:px-0">
       {/* main hero section */}
       <div className="flex flex-col items-center md:gap-4 gap-3 text-center w-full">
-        <span className="font-alt font-semibold font-[unbounded] text-2xl md:text-[40px] leading-tight">
-          Admin&apos;s Daily Struggles
-        </span>
+        <h2 className="font-alt font-semibold font-[unbounded] text-2xl md:text-[40px] leading-tight">
+          {intl.formatMessage({ id: 'admins-daily-struggles' })}
+        </h2>
         <span className="text-text md:text-lg md:whitespace-pre-line font-medium">
-          These are the daily struggles most office{' '}
-          <br className="hidden md:block" /> admins face when managing lunch
-          manually.
+          {intl.formatMessage({
+            id: 'these-are-the-daily-struggles-most-office-admins-face-when-managing-lunch-manually',
+          })}
         </span>
       </div>
 

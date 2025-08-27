@@ -58,84 +58,76 @@ const PlatformContent = ({ isMobile = false }) => {
   );
 };
 
-// const ResourceContent = ({ isMobile = false }) => {
-//   const intl = useIntl();
+const SolutionContent = ({ isMobile = false }) => {
+  const intl = useIntl();
 
-//   const gridClass = isMobile
-//     ? 'flex flex-col gap-4'
-//     : 'grid grid-cols-3 gap-4 p-0 lg:p-4';
+  const gridClass = isMobile
+    ? 'flex flex-col gap-4'
+    : 'grid grid-cols-3 gap-4 p-0 lg:p-4';
 
-//   return (
-//     <div className={gridClass}>
-//       {[
-//         {
-//           label: intl.formatMessage({ id: 'by-size' }),
-//           children: [
-//             {
-//               label: intl.formatMessage({ id: 'small-business' }),
-//               href: websitePaths.SmallBusiness,
-//             },
-//             {
-//               label: intl.formatMessage({ id: 'middle-business' }),
-//               href: websitePaths.MiddleBusiness,
-//             },
-//           ],
-//         },
-//         {
-//           label: intl.formatMessage({ id: 'by-industry' }),
-//           children: [
-//             {
-//               label: intl.formatMessage({ id: 'startup' }),
-//               href: websitePaths.Startup,
-//             },
-//             {
-//               label: intl.formatMessage({ id: 'tech-services' }),
-//               href: websitePaths.TechService,
-//             },
-//             {
-//               label: intl.formatMessage({ id: 'offshore-teams' }),
-//               href: websitePaths.OffShore,
-//             },
-//           ],
-//         },
-//         {
-//           label: intl.formatMessage({ id: 'by-role' }),
-//           children: [
-//             {
-//               label: intl.formatMessage({ id: 'admins' }),
-//               href: websitePaths.Admin,
-//             },
-//             {
-//               label: intl.formatMessage({ id: 'employee' }),
-//               href: websitePaths.Employee,
-//             },
-//           ],
-//         },
-//       ].map((item) => (
-//         <div key={item.label} className={isMobile ? 'space-y-2' : 'space-y-4'}>
-//           <p
-//             className={`font-medium text-neutral-500 ${
-//               isMobile ? 'text-sm' : 'text-base'
-//             }`}>
-//             {item.label}
-//           </p>
-//           <div className="grid grid-cols-1 gap-2">
-//             {item.children.map((child) => (
-//               <Link
-//                 key={child.label}
-//                 href={child.href}
-//                 className={`block whitespace-nowrap font-medium text-neutral-900 hover:underline ${
-//                   isMobile ? 'text-sm pl-2' : 'text-[14px] pl-4'
-//                 }`}>
-//                 {child.label}
-//               </Link>
-//             ))}
-//           </div>
-//         </div>
-//       ))}
-//     </div>
-//   );
-// };
+  return (
+    <div className={gridClass}>
+      {[
+        {
+          label: intl.formatMessage({ id: 'by-size' }),
+          children: [
+            {
+              label: intl.formatMessage({ id: 'small-business' }),
+              href: websitePaths.SmallBusiness,
+            },
+            {
+              label: intl.formatMessage({ id: 'middle-business' }),
+              href: websitePaths.MiddleBusiness,
+            },
+          ],
+        },
+        {
+          label: intl.formatMessage({ id: 'by-industry' }),
+          children: [
+            {
+              label: intl.formatMessage({ id: 'startup' }),
+              href: websitePaths.Startup,
+            },
+          ],
+        },
+        {
+          label: intl.formatMessage({ id: 'by-role' }),
+          children: [
+            {
+              label: intl.formatMessage({ id: 'admins' }),
+              href: websitePaths.Admin,
+            },
+            {
+              label: intl.formatMessage({ id: 'employee' }),
+              href: websitePaths.Employee,
+            },
+          ],
+        },
+      ].map((item) => (
+        <div key={item.label} className={isMobile ? 'space-y-2' : 'space-y-4'}>
+          <p
+            className={`font-medium text-neutral-500 ${
+              isMobile ? 'text-sm' : 'text-base'
+            }`}>
+            {item.label}
+          </p>
+          <div className="grid grid-cols-1 gap-2">
+            {item.children.map((child) => (
+              <Link
+                key={child.label}
+                href={child.href}
+                className={`block whitespace-nowrap font-medium text-neutral-900 hover:underline ${
+                  isMobile ? 'text-sm pl-2' : 'text-[14px] pl-4'
+                }`}>
+                {child.label}
+              </Link>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
 
 const ResourceContent = ({ isMobile = false }) => {
   const intl = useIntl();
@@ -273,11 +265,11 @@ const Navbar = () => {
         content: <PlatformContent />,
         mobileContent: <PlatformContent isMobile={true} />,
       },
-      // {
-      //   label: intl.formatMessage({ id: 'solutions-0' }),
-      //   content: <ResourceContent />,
-      //   mobileContent: <ResourceContent isMobile={true} />,
-      // },
+      {
+        label: intl.formatMessage({ id: 'solutions-0' }),
+        content: <SolutionContent />,
+        mobileContent: <SolutionContent isMobile={true} />,
+      },
       {
         label: intl.formatMessage({ id: 'resources' }),
         content: <ResourceContent />,
@@ -374,7 +366,7 @@ const Navbar = () => {
                 onMouseEnter={() => setActiveMenu(activeMenu)}
                 onMouseLeave={handleMouseLeave}
                 style={{
-                  minWidth: '150%',
+                  minWidth: '120%',
                 }}>
                 <div
                   className="size-full rounded-lg bg-white"

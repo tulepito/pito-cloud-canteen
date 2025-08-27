@@ -36,7 +36,7 @@ const Why = () => {
     <div className="flex flex-col w-full gap-8 md:gap-20 relative md:mb-36 mb-20 max-w-[1024px] mx-auto px-5 md:px-0">
       {/* main hero section */}
       <div className="flex flex-col items-center text-center md:gap-5 gap-2 w-full pt-0">
-        <p className="font-semibold text-3xl md:text-[42px] font-[unbounded] md:leading-tight md:whitespace-pre-line">
+        <p className="font-semibold text-2xl md:text-[40px] font-[unbounded] md:leading-tight md:whitespace-pre-line">
           Why <span className="text-[#96A546]">Tech Service Companies</span>{' '}
           <br /> Choose PITO
         </p>

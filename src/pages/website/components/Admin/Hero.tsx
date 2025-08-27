@@ -3,12 +3,12 @@ import Image from 'next/image';
 
 import { useModal } from '@pages/website/pages/Layout';
 
-import image from '../../assets/admin/hero.webp';
 import imageMobile from '../../assets/admin/heroMobile.webp';
+import image from '../../assets/cloud-canteen-com-van-phong.webp';
 import blue from '../../assets/decorations/blue3.svg';
 import lemon from '../../assets/decorations/lemon.svg';
 import yellow from '../../assets/decorations/yellow.svg';
-import imageVideo from '../../assets/videoPlaceholder.png';
+import imageVideo from '../../assets/videoPlaceholder.webp';
 
 const Hero = () => {
   const intl = useIntl();
@@ -17,19 +17,23 @@ const Hero = () => {
   return (
     <>
       <div className="w-full md:min-h-[70vh] relative">
-        {/* main hero section */}
-
         <div className="flex md:flex-row flex-col-reverse items-center md:justify-start justify-center md:py-20 mb-6 md:mb-0 max-w-[1024px] mx-auto md:px-0 px-5">
           <div className="flex flex-col md:items-start items-center md:text-left text-center md:gap-5 gap-2 md:w-2/3 pt-0">
-            <p className="font-semibold text-[26px] md:text-[42px] font-[unbounded] md:leading-tight md:whitespace-pre-line">
-              Cut <span className="text-[#D680A3]">80%</span> of admin time,
-              Increase <span className="text-[#D680A3]">100%</span> employee
-              satisfaction
-            </p>
+            <h1 className="font-semibold text-[26px] md:text-[42px] font-[unbounded] md:leading-tight md:whitespace-pre-line">
+              {intl.formatMessage(
+                {
+                  id: 'cut-80-of-admin-time-increase-100-employee-satisfaction',
+                },
+                {
+                  percentFirst: <span className="text-[#D680A3]">80%</span>,
+                  percentSecond: <span className="text-[#D680A3]">100%</span>,
+                },
+              )}
+            </h1>
             <span className="text-text md:text-lg md:whitespace-pre-line font-medium">
-              Automate your lunch process across teams. Manage menus,{' '}
-              <br className="md:block hidden" /> budgets, and feedback — all in
-              one place.
+              {intl.formatMessage({
+                id: 'automate-your-lunch-process-across-teams-manage-menus-budgets-and-feedback-all-in-one-place',
+              })}
             </span>
             <div className="flex md:flex-row flex-col md:items-center items-stretch w-full gap-2 mt-8">
               <a
@@ -68,8 +72,8 @@ const Hero = () => {
           <Image src={lemon} alt="lemon triangle decor" fill />
         </div>
 
-        <div className="h-[85%] w-fit md:top-0 md:-right-[5%] z-0 right-0 absolute -rotate-6 hidden md:block">
-          <div className="relative aspect-[19/14] h-full">
+        <div className="h-[85%] w-fit md:top-0 md:-right-[5%] z-0 right-0 absolute rotate-6 hidden md:block">
+          <div className="relative aspect-[301/239] h-full">
             <Image
               src={yellow}
               alt="yellow circle decor"

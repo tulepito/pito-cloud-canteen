@@ -33,7 +33,7 @@ const CTA = ({
 
       <div className="absolute top-1/3 md:top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center text-center gap-4 px-5 md:px-0 max-w-[1024px] mx-auto w-full">
         <span className=" font-medium">{textTop}</span>
-        <span className="font-semibold text-3xl md:text-[42px] font-[unbounded] md:leading-tight md:whitespace-pre-line">
+        <span className="font-semibold text-2xl md:text-[40px] font-[unbounded] md:leading-tight md:whitespace-pre-line">
           {textMiddleNode}
         </span>
         {textBottom && <span className="text-text md:w-3/4">{textBottom}</span>}

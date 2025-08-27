@@ -1,4 +1,3 @@
-// pages/sitemap.xml.tsx
 import type { GetServerSideProps } from 'next';
 
 const generateSiteMap = () => {
@@ -24,7 +23,7 @@ ${urls.join('\n')}
 };
 
 function Sitemap() {
-  return null; // Next.js will not render anything on the page
+  return null;
 }
 
 export const getServerSideProps: GetServerSideProps = async ({ res }) => {
