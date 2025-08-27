@@ -1,7 +1,8 @@
 import type { ReactNode } from 'react';
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import type { Event } from 'react-big-calendar';
 import { isSameDay } from 'date-fns';
+import { useRouter } from 'next/router';
 
 import useSelectDay from '@components/CalendarDashboard/hooks/useSelectDay';
 import { useViewport } from '@hooks/useViewport';
@@ -47,6 +48,15 @@ const WDayItem: React.FC<TWDayItemProps> = ({
     availableOrderDetailCheckList,
   } = resources || ({} as any);
   const { selectedDay, handleSelectDay } = useSelectDay();
+  const router = useRouter();
+
+  const { subOrderDate } = router.query;
+
+  useEffect(() => {
+    if (subOrderDate) handleSelectDay?.(new Date(+subOrderDate));
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [subOrderDate]);
 
   const startDateTimestamp =
     startDate instanceof Date ? startDate?.getTime() : undefined;
