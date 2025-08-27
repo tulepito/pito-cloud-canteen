@@ -151,7 +151,7 @@ const OrderDetailsTableComponent: React.FC<
                         name: memberName,
                         email: memberEmail,
                       } = memberData || {};
-                      const hasFoodPrice = Number(foodPrice) > 0;
+                      // const hasFoodPrice = Number(foodPrice) > 0;
                       const formattedFoodPrice = `${parseThousandNumber(
                         foodPrice,
                       )}đ`;
@@ -233,10 +233,9 @@ const OrderDetailsTableComponent: React.FC<
                                 {memberNameComponent}
 
                                 <RenderWhen condition={isExpanding}>
-                                  <div className={css.grayLabel}>Email</div>
-                                  <RenderWhen condition={hasFoodPrice}>
-                                    <div className={css.grayLabel}>Đơn giá</div>
-                                  </RenderWhen>
+                                  <span className={css.grayLabel}>
+                                    {memberEmail}
+                                  </span>
                                 </RenderWhen>
                               </div>
 
@@ -249,20 +248,20 @@ const OrderDetailsTableComponent: React.FC<
                           <td title={foodName}>
                             <RenderWhen condition={isMobileLayout}>
                               <div className={css.mobileNameContainer}>
-                                <div className={css.foodNameWithAction}>
+                                <div
+                                  className={classNames(
+                                    css.foodNameWithAction,
+                                    'gap-2',
+                                  )}>
                                   {foodNameComponent}
-                                  <IconArrow
-                                    onClick={toggleCollapseStatus(memberId)}
-                                    direction={isExpanding ? 'up' : 'down'}
-                                  />
+                                  <div className="min-size-5">
+                                    <IconArrow
+                                      onClick={toggleCollapseStatus(memberId)}
+                                      direction={isExpanding ? 'up' : 'down'}
+                                    />
+                                  </div>
                                 </div>
                                 <RenderWhen condition={isExpanding}>
-                                  <div className={css.memberEmail}>
-                                    {memberEmail}
-                                  </div>
-                                  <RenderWhen condition={hasFoodPrice}>
-                                    <div>{formattedFoodPrice}</div>
-                                  </RenderWhen>
                                   <RenderWhen condition={ableToUpdateOrder}>
                                     {actionIconComponents}
                                   </RenderWhen>

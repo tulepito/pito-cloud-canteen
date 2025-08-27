@@ -1,5 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { PiMagnifyingGlass } from 'react-icons/pi';
 import { useIntl } from 'react-intl';
 import Skeleton from 'react-loading-skeleton';
 import isEmpty from 'lodash/isEmpty';
@@ -57,6 +58,13 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
     query: { timestamp },
   } = useRouter();
   const intl = useIntl();
+
+  const [searchInput, setSearchInput] = useState('');
+
+  const handleSearchInputChangeInternal = (value: string) => {
+    setSearchInput(value);
+  };
+
   const addOrderRowModalControl = useBoolean();
   const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
   const {
@@ -126,10 +134,28 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
       label: <div>{formattedDate}</div>,
       children: (
         <div className={css.manageOrdersContainer}>
-          <div className={css.title}>
-            {intl.formatMessage({
-              id: 'ManageOrdersSection.manageOrdersContainer.title',
-            })}
+          <div className="flex flex-col gap-2 md:flex-row items-start md:items-center justify-start md:justify-between">
+            <span className={css.title}>
+              {intl.formatMessage({
+                id: 'ManageOrdersSection.manageOrdersContainer.title',
+              })}
+            </span>
+
+            <div className="relative w-full md:flex-1 md:w-fit md:max-w-[300px]">
+              <div className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-500">
+                <PiMagnifyingGlass className="size-4 md:size-6" />
+              </div>
+
+              <input
+                type="text"
+                value={searchInput}
+                onChange={(e) =>
+                  handleSearchInputChangeInternal(e.target.value)
+                }
+                placeholder="Nhập tên/email người tham gia..."
+                className="w-full p-2 pl-6 md:pl-10 border-gray-300 border-[0.5px] rounded-sm md:rounded-lg text-xs md:text-sm border-1 border-solid outline-none focus:border-neutral-900 transition-all duration-200"
+              />
+            </div>
           </div>
           <OrderDetailsTable
             currentViewDate={currentViewDate}
@@ -140,6 +166,7 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
               handleOpenReachMaxAllowedChangesModal
             }
             isAdminFlow={isAdminFlow}
+            searchInput={searchInput}
           />
           <div className={css.addOrder}>
             <div className={css.mobileSection}>

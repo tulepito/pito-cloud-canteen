@@ -43,6 +43,7 @@ type TOrderDetailsTableProps = {
   isDraftEditing: boolean;
   handleOpenReachMaxAllowedChangesModal?: (type: string) => void;
   isAdminFlow?: boolean;
+  searchInput?: string;
 };
 
 const OrderDetailsTable: React.FC<TOrderDetailsTableProps> = (props) => {
@@ -52,6 +53,7 @@ const OrderDetailsTable: React.FC<TOrderDetailsTableProps> = (props) => {
     ableToUpdateOrder,
     isDraftEditing,
     isAdminFlow = false,
+    searchInput,
   } = props;
   const {
     query: { tab: tabId },
@@ -188,6 +190,7 @@ const OrderDetailsTable: React.FC<TOrderDetailsTableProps> = (props) => {
     handleRestoreMembers,
     handleDeletePermanentlyMembers,
     ableToUpdateOrder,
+    searchInput,
   });
 
   const handleTabChange = ({ id }: TTabsItem) => {

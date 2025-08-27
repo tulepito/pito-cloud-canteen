@@ -2,6 +2,7 @@ import { useIntl } from 'react-intl';
 import classNames from 'classnames';
 
 import RenderWhen from '@components/RenderWhen/RenderWhen';
+import { removeVietnameseTones } from '@pages/admin/scanner/[planId]/ScannerInputForm';
 import type { RestoreDraftDisAllowedMemberPayload } from '@redux/slices/OrderManagement.slice';
 
 import type { TAllTabData, TItemData } from './OrderDetailsTable.utils';
@@ -28,6 +29,7 @@ type TUsePrepareTabItemsParams = {
   ) => void;
   handleDeletePermanentlyMembers: (memberIds: string[]) => void;
   ableToUpdateOrder: boolean;
+  searchInput?: string;
 };
 
 export const usePrepareTabItems = ({
@@ -40,12 +42,25 @@ export const usePrepareTabItems = ({
   handleRestoreMembers,
   handleDeletePermanentlyMembers,
   ableToUpdateOrder,
+  searchInput,
 }: TUsePrepareTabItemsParams) => {
   const intl = useIntl();
 
   return Object.values(TABLE_TABS).map((itemValue) => {
     const { id: tabId, value: tabValue } = itemValue;
     const tabData = allTabData[tabValue];
+
+    const search = removeVietnameseTones(
+      searchInput?.trim().toLowerCase() || '',
+    );
+
+    const tabDataFiltered = search
+      ? tabData.filter(({ memberData: { name, email } }) =>
+          [name, email].some((field) =>
+            removeVietnameseTones(field.toLowerCase()).includes(search),
+          ),
+        )
+      : tabData;
 
     const numberClasses = classNames(css.number, {
       [css.numberActive]: tabValue === currentTab,
@@ -68,7 +83,7 @@ export const usePrepareTabItems = ({
       onClickDeleteOrderItem: (memberId: string) =>
         handleClickDeleteOrderItem(tabValue, memberId),
       onClickEditOrderItem: handleClickEditOrderItem,
-      data: tabData,
+      data: tabDataFiltered,
       deletedTabData,
       onRestoreMembers: handleRestoreMembers,
       onDeletePermanentlyMembers: handleDeletePermanentlyMembers,

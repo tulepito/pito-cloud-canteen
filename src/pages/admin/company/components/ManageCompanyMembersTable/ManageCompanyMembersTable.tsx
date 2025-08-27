@@ -315,7 +315,7 @@ const sliceMembers = (
   return [...members].slice((pageAsNum - 1) * perPage, pageAsNum * perPage);
 };
 
-const MEMBER_PAGE_SIZE = 5;
+const MEMBER_PAGE_SIZE = 10;
 
 const ManageCompanyMembersTable: React.FC<TManageCompanyMembersTable> = (
   props,
