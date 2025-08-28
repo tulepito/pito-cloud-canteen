@@ -31,7 +31,6 @@ const SingleTestimonial = () => {
             </span>
           </div>
         </div>
-        {/* rhs */}
         <Image src={SaltMine} alt="saltmine" className="w-24 md:w-44" />
       </div>
     </div>

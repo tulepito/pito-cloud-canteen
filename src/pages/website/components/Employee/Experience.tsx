@@ -50,7 +50,7 @@ const Experience = () => {
         textColor: '#D680A3',
         icon: <PiUser />,
         imgSrc:
-          'https://fast.wistia.net/embed/iframe/7za7iibhgy?autoPlay=true&mute=true&playerColor=000000',
+          'https://fast.wistia.net/embed/iframe/tpn0y59zt5?autoPlay=true&mute=true&playerColor=000000',
         type: 'gif',
       },
     ];

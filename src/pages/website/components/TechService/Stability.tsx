@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { CgClose } from 'react-icons/cg';
 import {
   PiBellRinging,
@@ -7,6 +7,7 @@ import {
   PiHandshake,
   PiUser,
 } from 'react-icons/pi';
+import { useIntl } from 'react-intl';
 import Image from 'next/image';
 
 import blue from '../../assets/decorations/blue.svg';
@@ -16,60 +17,88 @@ import yellow from '../../assets/decorations/yellow.svg';
 import differenceImage from '../../assets/tech/stability.webp';
 import differenceImage1 from '../../assets/tech/stability1.webp';
 
-const data1 = [
-  'Admin/Ops spending hours each week just coordinating lunch.',
-  'Delayed deliveries disrupt sprints, meetings, and support shifts.',
-  'Manual management across apps, chat groups, and spreadsheets.',
-  'Frustrated employees impacting team morale and performance.',
-];
-
-const data2 = [
-  {
-    icon: <PiForkKnife />,
-    title: 'Pre-plan weekly meals for teams with rotating shifts.',
-  },
-  {
-    icon: <PiUser />,
-    title: 'Allow individual meal selection with dietary preferences.',
-  },
-  {
-    icon: <PiClock />,
-    title: 'Guaranteed on-time, contactless delivery.',
-  },
-  {
-    icon: <PiHandshake />,
-    title: 'Real-time cost tracking by project, team, or department.',
-  },
-  {
-    icon: <PiBellRinging />,
-    title: 'Automated notifications for employees to manage their meals.',
-  },
-];
-
 const Stability = () => {
+  const intl = useIntl();
+
+  const data1 = useMemo(() => {
+    return [
+      intl.formatMessage({
+        id: 'hr-admin-spending-hours-each-week-on-lunch-orders',
+      }),
+      intl.formatMessage({ id: 'late-deliveries-disrupt-meals-and-work' }),
+      intl.formatMessage({
+        id: 'manual-management-via-chat-apps-excel-and-spreadsheets',
+      }),
+      intl.formatMessage({ id: 'frustrated-employees-lower-productivity' }),
+    ];
+  }, [intl]);
+
+  const data2 = useMemo(() => {
+    return [
+      {
+        icon: <PiForkKnife />,
+        title: intl.formatMessage({
+          id: 'pre-plan-weekly-meals-automatically-on-the-system',
+        }),
+      },
+      {
+        icon: <PiUser />,
+        title: intl.formatMessage({
+          id: 'allow-employees-to-choose-meals-based-on-taste-and-dietary-needs',
+        }),
+      },
+      {
+        icon: <PiClock />,
+        title: intl.formatMessage({
+          id: 'ensure-on-time-fully-contactless-delivery',
+        }),
+      },
+      {
+        icon: <PiHandshake />,
+        title: intl.formatMessage({
+          id: 'track-costs-by-project-team-or-department-in-real-time',
+        }),
+      },
+      {
+        icon: <PiBellRinging />,
+        title: intl.formatMessage({
+          id: 'send-automated-reminders-for-employees-to-manage-their-meals',
+        }),
+      },
+    ];
+  }, [intl]);
+
   return (
     <div className="flex flex-col w-full gap-8 md:gap-20 relative md:mb-36 mb-20 max-w-[1024px] mx-auto px-5 md:px-0">
-      {/* main hero section */}
-      <div className="flex flex-col items-center md:gap-4 gap-3 text-center w-full">
-        <p className="font-alt font-semibold font-[unbounded] text-2xl md:text-[40px] leading-tight">
-          <span className="text-[#96A546]">PITO Cloud Canteen</span> <br />{' '}
-          Stability for High-Performance Teams
-        </p>
-        <span className="text-text md:text-lg md:whitespace-pre-line font-medium">
-          Keep your team focused on deadlines <br /> not distracted by food
-          logistics
-        </span>
-      </div>
+      <h2 className="font-alt text-center font-semibold font-[unbounded] text-2xl md:text-[40px] leading-tight md:whitespace-pre-line">
+        {intl.formatMessage(
+          {
+            id: 'pito-cloud-canteen-stable-lunch-higher-productivity',
+          },
+          {
+            highlightEn: <span className="text-[#D680A3]">Stable Lunch</span>,
+            highlightVi: (
+              <span className="text-[#D680A3]">Ổn định bữa trưa</span>
+            ),
+            highlightEn1: (
+              <span className="text-[#D680A3]">Higher Productivity</span>
+            ),
+            highlightVi1: (
+              <span className="text-[#D680A3]">Tăng hiệu suất</span>
+            ),
+          },
+        )}
+      </h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-[60px]">
         <div className="flex flex-col gap-3 md:gap-6 w-full">
           <p className="text-[20px] md:text-4xl font-semibold text-center md:text-left">
-            When logistics fall apart, delivery suffers
+            {intl.formatMessage({ id: 'when-logistics-fail-lunch-suffers' })}
           </p>
           <div className="flex flex-col items-end gap-2 w-full">
             {data1.map((item, index) => (
               <div
                 key={index}
-                className="flex items-start gap-3 border border-[#D7D7D7] rounded-2xl py-4 px-3 md:p-5">
+                className="w-full flex items-center gap-3 border border-[#D7D7D7] rounded-2xl py-4 px-3 md:p-5">
                 <div className="size-8 md:size-11 text-lg md:text-xl shrink-0 rounded-full flex items-center justify-center bg-[#F0F4F5] text-[#A8A8A8]">
                   <CgClose />
                 </div>
@@ -86,7 +115,7 @@ const Stability = () => {
               src={differenceImage}
               alt="Traditional Lunch Provider"
               fill
-              className="object-cover md:object-fill"
+              className="object-cover"
             />
             <Image
               src={yellow}
@@ -104,7 +133,7 @@ const Stability = () => {
               src={differenceImage1}
               alt="Traditional Lunch Provider"
               fill
-              className="object-cover md:object-fill"
+              className="object-cover"
             />
             <div className="aspect-[247/285] w-[35%] top-[18%] -left-[50%] absolute -z-10 -rotate-[22deg]">
               <Image src={blue2} alt="pink triangle decor" fill />
@@ -121,7 +150,7 @@ const Stability = () => {
         </div>
         <div className="flex flex-col order-1 md:order-2 col-span-1 gap-3 md:gap-6 w-full mt-4 md:mt-0">
           <p className="text-[20px] md:text-4xl font-semibold text-center md:text-left">
-            PITO Cloud Canteen helps you
+            {intl.formatMessage({ id: 'pito-cloud-canteen-helps-you' })}
           </p>
           <div className="flex flex-col gap-2 w-full">
             {data2.map((item, index) => (

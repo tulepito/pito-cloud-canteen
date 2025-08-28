@@ -1,73 +1,304 @@
-import { PiCalendarCheck, PiForkKnife, PiPackage } from 'react-icons/pi';
+import { useIntl } from 'react-intl';
 import Image from 'next/image';
 
-import image1 from '../../assets/admin/how-it-works-1.webp';
-import image2 from '../../assets/admin/how-it-works-2.webp';
-import image3 from '../../assets/admin/how-it-works-3.webp';
+import blueTriangle from '../../assets/decorations/blueTriangle.svg';
+import lemon from '../../assets/decorations/lemon.svg';
+import pink from '../../assets/decorations/pink.svg';
+import pinkAlt from '../../assets/decorations/pinkAlt.svg';
+import yellow from '../../assets/decorations/yellow.svg';
+import yellowTriangle from '../../assets/decorations/yellowTriangle.svg';
+
+export const HowItWorksSteps = ({
+  step1Title = '',
+  step2Title = '',
+  step3Title = '',
+  step1Description = '',
+  step2Description = '',
+  step3Description = '',
+}: {
+  step1Title?: string;
+  step2Title?: string;
+  step3Title?: string;
+  step1Description?: string;
+  step2Description?: string;
+  step3Description?: string;
+}) => {
+  return (
+    <div className="flex flex-col items-center md:gap-40 gap-20 w-full md:mt-20 mt-10">
+      {/* step 1 */}
+      <div className="flex md:flex-row flex-col md:gap-32 gap-10 justify-between">
+        {/* lhs */}
+        <div className="flex pt-12 flex-col md:items-start md:text-start items-center text-center md:gap-5 gap-2 md:w-1/2">
+          <div
+            className="
+      md:size-16 size-12 flex items-center justify-center rounded-full bg-[#6CCFF6]/80 md:text-xl text-base text-white font-semibold">
+            01
+          </div>
+          <h3 className="font-bold md:text-4xl text-xl font-alt">
+            {step1Title}
+          </h3>
+          <span className="text-lg">{step1Description}</span>
+        </div>
+        {/* rhs */}
+        <div className="md:w-1/2 relative flex md:justify-end md:items-end justify-center items-center">
+          <Image
+            src={yellowTriangle}
+            alt="yellow"
+            className="absolute -z-10 md:size-40 size-25 md:-top-10 -top-20 md:left-10 left-auto md:right-auto -right-8 md:transform-none scale-50 translate-x-[60px] translate-y-[20px]"
+          />
+          <Image
+            src={pink}
+            alt="pink"
+            className="absolute -z-10 md:size-64 size-45 -rotate-90 bottom-0 md:-bottom-20 md:-right-20 right-auto md:left-auto -left-20 md:transform-none scale-50 translate-x-[0] translate-y-[160px]"
+          />
+          <div className="mt-0 relative w-full aspect-video rounded-md overflow-hidden border border-neutral-200">
+            <iframe
+              src="https://fast.wistia.net/embed/iframe/7za7iibhgy?autoPlay=true&mute=true&playerColor=000000"
+              title="Media Frame"
+              allow="autoplay; encrypted-media; picture-in-picture"
+              allowFullScreen={false}
+              className="absolute top-0 left-0 w-full h-full"
+            />
+          </div>
+        </div>
+      </div>
+      {/* step 2 */}
+      <div className="flex  md:flex-row flex-col-reverse md:gap-32 gap-10 justify-between md:translate-x-10">
+        {/* lhs */}
+        <div className="md:w-1/2 relative flex md:justify-end md:items-end justify-center items-center">
+          <Image
+            src={blueTriangle}
+            alt="blue"
+            className="absolute -z-10 size-40 top-20 -left-20"
+          />
+          <Image
+            src={yellow}
+            alt="yellow"
+            className="absolute -z-10 size-12 -top-6 md:left-8 left-auto md:right-auto right-0"
+          />
+          <div className="mt-0 relative w-full aspect-video rounded-md overflow-hidden border border-neutral-200">
+            <iframe
+              src="https://fast.wistia.net/embed/iframe/8u3jxgesk7?autoPlay=true&mute=true&playerColor=000000"
+              title="Media Frame"
+              allow="autoplay; encrypted-media; picture-in-picture"
+              allowFullScreen={false}
+              className="absolute top-0 left-0 w-full h-full"
+            />
+          </div>
+        </div>
+        {/* rhs */}
+        <div className="flex pt-12 flex-col md:items-start md:text-start items-center text-center md:gap-5 gap-2 md:w-1/2">
+          <div
+            className="
+      md:size-16 size-12 flex items-center justify-center rounded-full bg-[#C5D475] md:text-xl text-base text-white font-semibold">
+            02
+          </div>
+          <h3 className="font-bold md:text-4xl text-xl font-alt">
+            {step2Title}
+          </h3>
+          <span className="text-lg">{step2Description}</span>
+        </div>
+      </div>
+      {/* step 3 */}
+      <div className="flex md:flex-row flex-col md:gap-32 gap-10 justify-between">
+        {/* lhs */}
+        <div className="flex pt-12 flex-col md:items-start md:text-start items-center text-center md:gap-5 gap-2 md:w-1/2">
+          <div
+            className="
+      md:size-16 size-12 flex items-center justify-center rounded-full bg-[#F6AFCE] md:text-xl text-base text-white font-semibold">
+            03
+          </div>
+          <h3 className="font-bold md:text-4xl text-xl font-alt">
+            {step3Title}
+          </h3>
+          <span className="text-lg">{step3Description}</span>
+        </div>
+        {/* rhs */}
+        <div className="md:w-1/2 relative flex md:justify-end md:items-end justify-center items-center">
+          <Image
+            src={lemon}
+            alt="lemon decor"
+            className="absolute -z-10 size-40 md:-bottom-15 bottom-auto md:top-auto -top-20 -left-32 rotate-60"
+          />
+          <Image
+            src={pinkAlt}
+            alt="pink decor"
+            className="absolute -z-10 size-50 -top-20 -right-20 md:flex hidden"
+          />
+          <div className="mt-0 relative w-full aspect-video rounded-md overflow-hidden border border-neutral-200">
+            <iframe
+              src="https://fast.wistia.net/embed/iframe/tpn0y59zt5?autoPlay=true&mute=true&playerColor=000000"
+              title="Media Frame"
+              allow="autoplay; encrypted-media; picture-in-picture"
+              allowFullScreen={false}
+              className="absolute top-0 left-0 w-full h-full"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const HowItWorks = () => {
+  const intl = useIntl();
+
   return (
-    <div className="flex flex-col w-full gap-8 md:gap-20 relative md:mb-36 mb-20 max-w-[1024px] mx-auto px-5 md:px-0">
-      {/* main hero section */}
-      <span className="font-alt font-semibold font-[unbounded] text-2xl md:text-[40px] leading-tight">
-        How It Works
-      </span>
-      <div className="flex flex-col items-center w-full gap-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-[60px] w-full">
-          <div className="order-2 md:order-1 col-span-1 flex flex-row md:flex-col gap-3 md:gap-5 justify-center">
-            <div className="size-8 md:size-20 text-lg md:text-4xl flex items-center justify-center shrink-0 rounded-full text-[#96A546] bg-[#C5D475]/50">
-              <PiCalendarCheck />
+    <div className="flex flex-col items-center md:gap-12 md:px-0 px-5 pb-20 md:pb-36 md:pt-16 gap-0 relative max-w-[1024px] mx-auto">
+      <div className="flex flex-col gap-2 items-center">
+        <h2 className="font-[unbounded] text-3xl md:text-[40px] font-bold text-center md:leading-tight">
+          {intl.formatMessage({ id: 'how-it-works-1' })} <br />
+          <span className="text-[#D680A3]">
+            {intl.formatMessage({ id: '3-easy-steps' })}
+          </span>{' '}
+        </h2>
+        <span className="md:w-3/4 text-center font-medium md:text-lg">
+          🎯{' '}
+          {intl.formatMessage({
+            id: 'ideal-for-teams-of-10-99-employees-especially-in-offices-without-a-built-in-kitchen',
+          })}
+        </span>
+      </div>
+      <HowItWorksSteps
+        step1Title={intl.formatMessage({ id: 'plan-once-set-and-forget-0' })}
+        step2Title={intl.formatMessage({ id: 'let-your-team-choose-0' })}
+        step3Title={intl.formatMessage({
+          id: 'meals-delivered-where-you-want-0',
+        })}
+        step1Description={intl.formatMessage({
+          id: 'the-booker-your-teams-meal-coordinator-selects-the-vendors-and-weekly-menu-no-more-daily-decisions-or-zalo-messages-0',
+        })}
+        step2Description={intl.formatMessage({
+          id: 'employees-receive-app-notifications-to-pre-select-their-meals-just-one-tap-and-the-whole-weeks-menu-is-set-0',
+        })}
+        step3Description={intl.formatMessage({
+          id: 'no-calls-no-confusion-our-delivery-agents-team-sets-up-meals-at-the-designated-drop-off-point-all-fully-contactless-0',
+        })}
+      />
+      <div className="flex-col items-center md:gap-40 gap-20 w-full md:mt-40 mt-10 hidden">
+        {/* step 1 */}
+        <div className="flex md:flex-row flex-col md:gap-30 gap-20 justify-between">
+          {/* lhs */}
+          <div className="flex flex-col md:items-start md:text-start items-center text-center md:gap-5 gap-2 md:w-1/3">
+            <div
+              className="
+            md:size-16 size-12 flex items-center justify-center rounded-full bg-[#6CCFF6]/80 md:text-xl text-base text-white font-semibold">
+              01
             </div>
-            <p className="text-base md:text-[22px]  font-medium">
-              Plan meals for your entire team in advance (weekly, shift-based).
-            </p>
+            <span className="font-bold md:text-3xl text-xl font-alt">
+              {intl.formatMessage({ id: 'plan-once-set-and-forget-0' })}
+            </span>
+            <span>
+              {intl.formatMessage({
+                id: 'the-booker-your-teams-meal-coordinator-selects-the-vendors-and-weekly-menu-no-more-daily-decisions-or-zalo-messages-0',
+              })}
+            </span>
           </div>
-          <div className="order-1 md:order-2 col-span-1 relative w-full aspect-[164/175] md:aspect-[12/7]">
+          {/* rhs */}
+          <div className="md:w-1/2 relative flex md:justify-end md:items-end justify-center items-center">
             <Image
-              src={image1}
-              alt="How It Works Step 1"
-              fill
-              className="rounded-[20px] object-cover"
+              src={yellowTriangle}
+              alt="yellow"
+              className="absolute -z-10 md:size-40 size-25 md:-top-10 -top-20 md:left-10 left-auto md:right-auto -right-8"
             />
+            <Image
+              src={pink}
+              alt="pink"
+              className="absolute -z-10 md:size-70 size-45 -rotate-120 -bottom-20 md:-right-15 right-auto md:left-auto -left-20"
+            />
+            <div className="relative w-full aspect-video rounded-md overflow-hidden border border-neutral-200">
+              <iframe
+                src="https://fast.wistia.net/embed/iframe/7za7iibhgy?autoPlay=true&mute=true&playerColor=000000"
+                title="Media Frame"
+                allow="autoplay; encrypted-media; picture-in-picture"
+                allowFullScreen={false}
+                className="absolute top-0 left-0 w-full h-full"
+              />
+            </div>
           </div>
         </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-[60px] w-full">
-          <div className="col-span-1 relative w-full aspect-[164/175] md:aspect-[12/7]">
+        {/* step 2 */}
+        <div className="flex md:flex-row flex-col-reverse md:gap-30 gap-20 justify-between">
+          {/* lhs */}
+          <div className="md:w-1/2 relative flex md:justify-end md:items-end justify-center items-center">
             <Image
-              src={image2}
-              alt="How It Works Step 2"
-              fill
-              className="rounded-[20px] object-cover"
+              src={blueTriangle}
+              alt="blue"
+              className="absolute -z-10 size-40 top-20 -left-20"
             />
-          </div>
-          <div className="col-span-1 flex flex-row md:flex-col gap-3 md:gap-5 justify-center">
-            <div className="size-8 md:size-20 text-lg md:text-4xl flex items-center justify-center shrink-0 rounded-full text-[#D680A3] bg-[#FBD7E7]/50">
-              <PiForkKnife />
+            <Image
+              src={yellow}
+              alt="yellow"
+              className="absolute -z-10 size-12 -top-6 md:left-8 left-auto md:right-auto right-0"
+            />
+            <div className="relative w-full aspect-video rounded-md overflow-hidden border border-neutral-200">
+              <iframe
+                src="https://fast.wistia.net/embed/iframe/8u3jxgesk7?autoPlay=true&mute=true&playerColor=000000"
+                title="Media Frame"
+                allow="autoplay; encrypted-media; picture-in-picture"
+                allowFullScreen={false}
+                className="absolute top-0 left-0 w-full h-full"
+              />
             </div>
-            <p className="text-base md:text-[22px]  font-medium">
-              Employees pick their meals via app/web.
-            </p>
+          </div>
+          {/* rhs */}
+          <div className="flex flex-col md:items-start md:text-start items-center text-center md:gap-5 gap-2 md:w-1/3">
+            <div
+              className="
+            md:size-16 size-12 flex items-center justify-center rounded-full bg-[#C5D475] md:text-xl text-base text-white font-semibold">
+              02
+            </div>
+            <span className="font-bold md:text-3xl text-xl font-alt">
+              {intl.formatMessage({ id: 'let-your-team-choose-0' })}
+            </span>
+            <span>
+              {intl.formatMessage({
+                id: 'employees-receive-app-notifications-to-pre-select-their-meals-just-one-tap-and-the-whole-weeks-menu-is-set-0',
+              })}
+            </span>
           </div>
         </div>
-
-        <div className="grid col-span-1 md:grid-cols-2 gap-2 md:gap-[60px] w-full">
-          <div className="order-2 md:order-1 col-span-1 flex flex-row md:flex-col gap-3 md:gap-5 justify-center">
-            <div className="size-8 md:size-20 text-lg md:text-4xl flex items-center justify-center shrink-0 rounded-full text-[#3598BF] bg-[#C4ECFB]/50">
-              <PiPackage />
+        {/* step 3 */}
+        <div className="flex md:flex-row flex-col md:gap-30 gap-20 justify-between">
+          {/* lhs */}
+          <div className="flex flex-col md:items-start md:text-start items-center text-center md:gap-5 gap-2 md:w-1/3">
+            <div
+              className="
+            md:size-16 size-12 flex items-center justify-center rounded-full bg-[#F6AFCE] md:text-xl text-base text-white font-semibold">
+              03
             </div>
-            <p className="text-base md:text-[22px]  font-medium">
-              Meals are delivered to your designated drop-off points – on time,
-              every time.
-            </p>
+            <span className="font-bold md:text-3xl text-xl font-alt">
+              {intl.formatMessage({
+                id: 'meals-delivered-where-you-want-0',
+              })}
+            </span>
+            <span>
+              {intl.formatMessage({
+                id: 'no-calls-no-confusion-our-delivery-agents-team-sets-up-meals-at-the-designated-drop-off-point-all-fully-contactless-0',
+              })}
+            </span>
           </div>
-          <div className="order-1 md:order-2 col-span-1 relative w-full aspect-[164/175] md:aspect-[12/7]">
+          {/* rhs */}
+          <div className="md:w-1/2 relative flex md:justify-end md:items-end justify-center items-center">
             <Image
-              src={image3}
-              alt="How It Works Step 3"
-              fill
-              className="rounded-[20px] object-cover"
+              src={lemon}
+              alt="lemon decor"
+              className="absolute -z-10 size-40 md:-bottom-15 bottom-auto md:top-auto -top-20 -left-20 rotate-60"
             />
+            <Image
+              src={pinkAlt}
+              alt="pink decor"
+              className="absolute -z-10 size-50 -top-20 -right-20 md:flex hidden"
+            />
+            <div className="relative w-full aspect-video rounded-md overflow-hidden border border-neutral-200">
+              <iframe
+                src="https://fast.wistia.net/embed/iframe/tpn0y59zt5?autoPlay=true&mute=true&playerColor=000000"
+                title="Media Frame"
+                allow="autoplay; encrypted-media; picture-in-picture"
+                allowFullScreen={false}
+                className="absolute top-0 left-0 w-full h-full"
+              />
+            </div>
           </div>
         </div>
       </div>

@@ -1,45 +1,63 @@
+import { useMemo } from 'react';
 import { PiBrain, PiFileText, PiHeart, PiUsersThree } from 'react-icons/pi';
+import { useIntl } from 'react-intl';
 import clsx from 'clsx';
 import Image from 'next/image';
 
-import featureImage from '../../assets/employee/employee-hero.webp';
+import featureImage from '../../assets/com-trua-van-phong-cong-nghe.webp';
 
 const Why = () => {
-  const data = [
-    {
-      title: 'Minimize operational overhead — focus fully on client delivery.',
-      color: '#C5D475',
-      textColor: '#96A546',
-      icon: <PiBrain />,
-    },
-    {
-      title: 'Optimize cost management across multiple teams.',
-      color: '#C4ECFB',
-      textColor: '#3598BF',
-      icon: <PiUsersThree />,
-    },
-    {
-      title: 'Boost employee morale through seamless, hassle-free meals.',
-      color: '#FBD7E7',
-      textColor: '#D680A3',
-      icon: <PiHeart />,
-    },
-    {
-      title: 'Transparent invoicing — no surprises, no hidden charges.',
-      color: '#C5D475',
-      textColor: '#96A546',
-      icon: <PiFileText />,
-    },
-  ];
+  const intl = useIntl();
+
+  const data = useMemo(() => {
+    return [
+      {
+        title: intl.formatMessage({
+          id: 'reduce-operational-burden-focus-on-getting-work-done',
+        }),
+        color: '#C5D475',
+        textColor: '#96A546',
+        icon: <PiBrain />,
+      },
+      {
+        title: intl.formatMessage({
+          id: 'optimize-cost-management-across-multiple-teams-departments',
+        }),
+        color: '#C4ECFB',
+        textColor: '#3598BF',
+        icon: <PiUsersThree />,
+      },
+      {
+        title: intl.formatMessage({
+          id: 'boost-employee-satisfaction-with-convenient-hassle-free-lunches',
+        }),
+        color: '#FBD7E7',
+        textColor: '#D680A3',
+        icon: <PiHeart />,
+      },
+      {
+        title: intl.formatMessage({
+          id: 'transparent-and-detailed-invoicing-no-hidden-costs',
+        }),
+        color: '#C5D475',
+        textColor: '#96A546',
+        icon: <PiFileText />,
+      },
+    ];
+  }, [intl]);
 
   return (
     <div className="flex flex-col w-full gap-8 md:gap-20 relative md:mb-36 mb-20 max-w-[1024px] mx-auto px-5 md:px-0">
-      {/* main hero section */}
       <div className="flex flex-col items-center text-center md:gap-5 gap-2 w-full pt-0">
-        <p className="font-semibold text-2xl md:text-[40px] font-[unbounded] md:leading-tight md:whitespace-pre-line">
-          Why <span className="text-[#96A546]">Tech Service Companies</span>{' '}
-          <br /> Choose PITO
-        </p>
+        <h2 className="font-semibold text-2xl md:text-[40px] font-[unbounded] md:leading-tight md:whitespace-pre-line">
+          {intl.formatMessage(
+            { id: 'why-tech-companies-choose-pito' },
+            {
+              highlightEn: <span className="text-[#96A546]">Choose PITO</span>,
+              highlightVi: <span className="text-[#96A546]">chọn PITO</span>,
+            },
+          )}
+        </h2>
       </div>
 
       <div className="flex md:flex-row flex-col gap-2 md:gap-6 w-full">
@@ -48,7 +66,7 @@ const Why = () => {
             src={featureImage}
             alt="stepBg"
             fill
-            className="object-cover"
+            className="object-contain"
           />
         </div>
 

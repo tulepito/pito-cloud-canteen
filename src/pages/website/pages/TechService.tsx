@@ -1,5 +1,3 @@
-import CTABg from '../assets/tech/CTABg.webp';
-import CTABgMobile from '../assets/tech/CTABgMobile.webp';
 import FAQ from '../components/Admin/FAQ';
 import TestimonialsEmployee from '../components/Employee/Testimonial';
 import SingleTestimonial from '../components/SingleTestimonial';
@@ -33,18 +31,7 @@ const TechService = () => {
       <Why />
       <Testimonials />
       <FAQ />
-      <CTA
-        src={CTABg}
-        srcMobile={CTABgMobile}
-        textTop="Keep your team focused on what matters"
-        textMiddleNode={
-          <>
-            Stop losing time over lunch. <br className="hidden md:block" />{' '}
-            Start delivering better with <br className="hidden md:block" /> PITO
-            Cloud Canteen.
-          </>
-        }
-      />
+      <CTA />
     </div>
   );
 };

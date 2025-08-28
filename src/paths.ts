@@ -16,7 +16,7 @@ export const websitePaths = {
   Admin: '/solutions/admin',
   Employee: '/solutions/employees',
   Startup: '/solutions/start-up',
-  TechService: '/tech-service',
+  TechService: '/solutions/tech-service',
   OffShore: '/off-shore',
 };
 
@@ -28,6 +28,7 @@ export const publicPaths = [
   websitePaths.Admin,
   websitePaths.Employee,
   websitePaths.Startup,
+  websitePaths.TechService,
   '/website',
   '/sitemap.xml',
   '/robots.txt',

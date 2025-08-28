@@ -24,7 +24,7 @@ const ReClaim = () => {
             },
             {
               highlightVi: (
-                <span className="text-[#D680A3]">Tập trung tăn trưởng</span>
+                <span className="text-[#D680A3]">Tập trung tăng trưởng</span>
               ),
               highlightEn: (
                 <span className="text-[#D680A3]">Focus on Growth</span>

@@ -13,6 +13,8 @@ import logo from '../assets/Logo.svg';
 // eslint-disable-next-line import/no-cycle
 import { useModal } from '../pages/Layout';
 
+import { LogoSwitchButton } from './LogoSwitchButton';
+
 const PlatformContent = ({ isMobile = false }) => {
   const intl = useIntl();
   const router = useRouter();
@@ -87,6 +89,10 @@ const SolutionContent = ({ isMobile = false }) => {
             {
               label: intl.formatMessage({ id: 'startup' }),
               href: websitePaths.Startup,
+            },
+            {
+              label: intl.formatMessage({ id: 'tech-services' }),
+              href: websitePaths.TechService,
             },
           ],
         },
@@ -301,16 +307,7 @@ const Navbar = () => {
       }`}>
       <div className="max-w-[1024px] w-full mx-auto">
         <div className="flex items-center justify-between">
-          <Link href="/">
-            <Image
-              src={logo}
-              alt="logo"
-              className="md:w-20 w-14"
-              priority
-              loading="eager"
-              quality={100}
-            />
-          </Link>
+          <LogoSwitchButton />
 
           {/* Desktop Navigation */}
           <div className="relative">

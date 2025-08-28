@@ -32,7 +32,7 @@ const CommonProblems = () => {
       {
         icon: <PiLaptop className="text-[#96A546]" />,
         text: intl.formatMessage({
-          id: 'a-centralized-dashboard-to-track-feedback-costs-and-orders-in-one-place',
+          id: 'centralized-dashboard-to-track-feedback-costs-and-orders-in-one-place',
         }),
       },
       {
