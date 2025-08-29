@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { Event, View } from 'react-big-calendar';
 import { Views } from 'react-big-calendar';
 import { useIntl } from 'react-intl';
@@ -388,12 +388,20 @@ const OrderListPage = () => {
       } else {
         const nextDayOfMonth = getNextWeek(selectedDayOfMonth!);
         setSelectedDayOfMonth(nextDayOfMonth);
-        const endDayOfWeek = getEndDayOfWeek(nextDayOfMonth);
-        const startDayOfWeek = getStartDayOfWeek(nextDayOfMonth);
 
-        if (endDayOfWeek.getMonth() !== startDayOfWeek.getMonth()) {
-          setMaxSelectedMonth(getEndOfMonth(endDayOfWeek));
+        const startDayOfWeek = getStartDayOfWeek(nextDayOfMonth);
+        const endDayOfWeek = getEndDayOfWeek(nextDayOfMonth);
+
+        const normalize = (d: Date) =>
+          new Date(d.getFullYear(), d.getMonth(), d.getDate());
+
+        if (
+          normalize(startDayOfWeek) < normalize(minSelectedMonth) ||
+          normalize(endDayOfWeek) > normalize(maxSelectedMonth)
+        ) {
           setMinSelectedMonth(getStartOfMonth(startDayOfWeek));
+          setMaxSelectedMonth(getEndOfMonth(endDayOfWeek));
+
           isFirstTimeReachMinOrMaxMonthControl.setTrue();
 
           return;
@@ -412,12 +420,20 @@ const OrderListPage = () => {
     } else {
       const prevDayOfMonth = getPrevWeek(selectedDayOfMonth!);
       setSelectedDayOfMonth(prevDayOfMonth);
-      const endDayOfWeek = getEndDayOfWeek(prevDayOfMonth);
-      const startDayOfWeek = getStartDayOfWeek(prevDayOfMonth);
 
-      if (endDayOfWeek.getMonth() !== startDayOfWeek.getMonth()) {
-        setMaxSelectedMonth(getEndOfMonth(endDayOfWeek));
+      const startDayOfWeek = getStartDayOfWeek(prevDayOfMonth);
+      const endDayOfWeek = getEndDayOfWeek(prevDayOfMonth);
+
+      const normalize = (d: Date) =>
+        new Date(d.getFullYear(), d.getMonth(), d.getDate());
+
+      if (
+        normalize(startDayOfWeek) < normalize(minSelectedMonth) ||
+        normalize(endDayOfWeek) > normalize(maxSelectedMonth)
+      ) {
         setMinSelectedMonth(getStartOfMonth(startDayOfWeek));
+        setMaxSelectedMonth(getEndOfMonth(endDayOfWeek));
+
         isFirstTimeReachMinOrMaxMonthControl.setTrue();
 
         return;
@@ -478,21 +494,56 @@ const OrderListPage = () => {
   }, [selectedEvent]);
 
   const [isReadyLatestOrders, setReadyLatestOrders] = useState(false);
+  const hasFetchedOrders = useRef(false);
+  const prevDeps = useRef([
+    currentUserId,
+    minSelectedMonth,
+    maxSelectedMonth,
+    isFirstTimeReachMinOrMaxMonthControl.value,
+  ]);
 
   useEffect(() => {
     (async () => {
-      if (isFirstTimeReachMinOrMaxMonthControl.value) {
-        await dispatch(
-          OrderListThunks.fetchOrders({
-            userId: currentUserId,
-            startDate: minSelectedMonth,
-            endDate: maxSelectedMonth,
-          }),
-        );
-        setReadyLatestOrders(true);
-        dispatch(OrderListActions.markColorToOrder());
+      if (
+        isFirstTimeReachMinOrMaxMonthControl.value &&
+        currentUserId &&
+        !hasFetchedOrders.current
+      ) {
+        hasFetchedOrders.current = true;
+        try {
+          await dispatch(
+            OrderListThunks.fetchOrders({
+              userId: currentUserId,
+              startDate: minSelectedMonth,
+              endDate: maxSelectedMonth,
+            }),
+          );
+          setReadyLatestOrders(true);
+          dispatch(OrderListActions.markColorToOrder());
+        } catch (error) {
+          hasFetchedOrders.current = false;
+        }
       }
     })();
+
+    return () => {
+      if (
+        JSON.stringify([
+          currentUserId,
+          minSelectedMonth,
+          maxSelectedMonth,
+          isFirstTimeReachMinOrMaxMonthControl.value,
+        ]) !== JSON.stringify(prevDeps.current)
+      ) {
+        hasFetchedOrders.current = false;
+      }
+      prevDeps.current = [
+        currentUserId,
+        minSelectedMonth,
+        maxSelectedMonth,
+        isFirstTimeReachMinOrMaxMonthControl.value,
+      ];
+    };
   }, [
     currentUserId,
     minSelectedMonth,
