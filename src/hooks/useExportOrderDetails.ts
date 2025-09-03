@@ -40,7 +40,7 @@ const prepareData = ({
 }: {
   orderDetail: TObject;
   participantData: TObject;
-  mealItemsFailed: MealItemsFailed;
+  mealItemsFailed?: MealItemsFailed;
   extendedFields?: ExportOrderDetailsExtendedFields;
   options?: { privateFieldsIncludingIfAdmin?: boolean };
 }) => {
@@ -75,13 +75,13 @@ const prepareData = ({
             'Món ăn': foodListOfDate[foodId]?.foodName,
             'Đơn giá': foodListOfDate[foodId]?.foodPrice,
             'Ghi chú': requirement,
-            'Phần ăn lỗi': (mealItemsFailed[date] || []).some(
+            'Phần ăn lỗi': (mealItemsFailed?.[date] || []).some(
               (item) => item.memberId === memberId && item.foodId === foodId,
             )
               ? 'Có'
               : 'Không',
             'Nguyên nhân bị lỗi':
-              (mealItemsFailed[date] || []).find(
+              (mealItemsFailed?.[date] || []).find(
                 (item) => item.memberId === memberId && item.foodId === foodId,
               )?.reason || '',
           };
