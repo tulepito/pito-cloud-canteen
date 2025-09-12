@@ -70,12 +70,6 @@ const login = createAsyncThunk(
   async (params: { email: string; password: string }, { extra: sdk }) => {
     const { email: username, password } = params;
     await sdk.login({ username, password });
-    await sdk.currentUser.updateProfile({
-      privateData: {
-        username,
-        password,
-      },
-    });
   },
   {
     serializeError: storableError,
