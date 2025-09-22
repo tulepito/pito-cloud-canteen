@@ -29,6 +29,11 @@ const nextConfig = {
         destination:
           'https://in.pito.vn/nang-tam-com-trua-van-phong-cho-doi-ngu/',
       },
+      {
+        source: '/giai-phap-com-trua-van-phong/',
+        destination:
+          'https://pito.vn/cam-nang/com-trua-van-phong-pito-cloud-canteen/',
+      },
     ];
   },
   headers: async () => {
