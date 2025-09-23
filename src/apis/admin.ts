@@ -1,7 +1,9 @@
+import type { AdminViewerRatingData } from '@pages/admin/company/components/AdminRatingSection/AdminRatingSection';
+import type { GETCompanyRaitingsQuery } from '@pages/api/admin/company/[companyId]/ratings/index.api';
 import type { POSTChangeMenuEndDateInBulkBody } from '@pages/api/admin/listings/menus/change-end-date-in-bulk.api';
 import type { TObject } from '@src/utils/types';
 
-import { deleteApi, getApi, postApi, putApi } from './configs';
+import { deleteApi, getApi, getDedupApi, postApi, putApi } from './configs';
 
 export const addAttributesApi = (body: TObject) =>
   postApi('/admin/filters', body);
@@ -133,3 +135,12 @@ export const handleDeleteOldDataAfterEditInProgressOrderApi = (
 export const verifyEmailApi = (userId: string) => {
   putApi('/verify-email', { userId });
 };
+
+export const getAdminCompanyRatingsApi = (
+  companyId: string,
+  payload: GETCompanyRaitingsQuery,
+) =>
+  getDedupApi<AdminViewerRatingData>(
+    `/admin/company/${companyId}/ratings/`,
+    payload,
+  );

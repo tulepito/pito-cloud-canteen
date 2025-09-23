@@ -1,0 +1,20 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+
+.root {
+}
+
+.tableWrapper {
+  @include viewportMedium {
+    max-width: calc(100vw - 350px);
+    overflow-x: scroll;
+    position: relative;
+  }
+}
+
+.table {
+  @include viewportMedium {
+    min-width: 1100px;
+  }
+}

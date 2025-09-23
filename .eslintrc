@@ -15,10 +15,21 @@
     "plugin:prettier/recommended"
   ],
   "rules": {
+    "prettier/prettier": [
+      "error",
+      {
+        "endOfLine": "auto"
+      }
+    ],
     "consistent-return": "off",
     "no-param-reassign": [
       "off",
-      { "props": true, "ignorePropertyModificationsFor": ["state"] }
+      {
+        "props": true,
+        "ignorePropertyModificationsFor": [
+          "state"
+        ]
+      }
     ],
     "no-nested-ternary": "off",
     "no-console": "off",
@@ -29,8 +40,15 @@
   "overrides": [
     // Configuration for TypeScript files
     {
-      "files": ["**/*.ts", "**/*.tsx"],
-      "plugins": ["@typescript-eslint", "unused-imports", "simple-import-sort"],
+      "files": [
+        "**/*.ts",
+        "**/*.tsx"
+      ],
+      "plugins": [
+        "@typescript-eslint",
+        "unused-imports",
+        "simple-import-sort"
+      ],
       "extends": [
         "airbnb-typescript",
         "next/core-web-vitals",
@@ -53,20 +71,34 @@
           {
             "groups": [
               // Packages `react` related packages come first.
-              ["^react", "^@?\\w"],
+              [
+                "^react",
+                "^@?\\w"
+              ],
               // [],
               // Internal.
               [
                 "(@(apis|components|configs|forms|helpers|hooks|pages|redux|services|sharetribe|src|styles|translations|utils))(/.*|$)"
               ],
               // Side effect imports.
-              ["^\\u0000"],
+              [
+                "^\\u0000"
+              ],
               // Parent imports. Put `..` last.
-              ["^\\.\\.(?!/?$)", "^\\.\\./?$"],
+              [
+                "^\\.\\.(?!/?$)",
+                "^\\.\\./?$"
+              ],
               // Other relative imports. Put same-folder imports and `.` last.
-              ["^\\./(?=.*/)(?!/?$)", "^\\.(?!/?$)", "^\\./?$"],
+              [
+                "^\\./(?=.*/)(?!/?$)",
+                "^\\.(?!/?$)",
+                "^\\./?$"
+              ],
               // Style imports.
-              ["^.+\\.?(scss|css)$"]
+              [
+                "^.+\\.?(scss|css)$"
+              ]
             ]
           }
         ],
