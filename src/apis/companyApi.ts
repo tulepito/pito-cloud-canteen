@@ -1,7 +1,7 @@
-import type { GETCompanyRaitingsQuery } from '@pages/api/company/[companyId]/ratings.api';
+import type { GETCompanyRaitingsQuery } from '@pages/api/company/[companyId]/ratings/index.api';
 import type { POSTAddMembersBody } from '@pages/api/company/members/add-members.api';
 import type { POSTCompanyRatingsBody } from '@pages/api/company/ratings/index.api';
-import type { BookerViewerRatingData } from '@pages/company/[companyId]/dashboard/components/BookerRatingSection/BookerRatingSection';
+import type { BookerViewerRatingData } from '@pages/company/[companyId]/ratings/index.route';
 import type { TObject } from '@utils/types';
 
 import { deleteApi, getApi, getDedupApi, postApi, putApi } from './configs';
@@ -235,7 +235,7 @@ export const getCompanyRatingsApi = (
   companyId: string,
   payload: GETCompanyRaitingsQuery,
 ) =>
-  getDedupApi<BookerViewerRatingData[]>(
+  getDedupApi<BookerViewerRatingData>(
     `/company/${companyId}/ratings/`,
     payload,
   );

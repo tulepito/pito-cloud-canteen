@@ -81,9 +81,8 @@ const TABLE_COLUMN: TColumn[] = [
 const AdminRatingSection = () => {
   const router = useRouter();
   const { companyId } = router.query;
-  const [pageSize] = useState<number>(10);
   const { query } = router;
-  const { page, orderCode, startDate, endDate } = query;
+  const { page, perPage, orderCode, startDate, endDate } = query;
 
   const [ratingListing, setRatingListing] = useState<AdminViewerRatingData>({
     data: [],
@@ -91,13 +90,13 @@ const AdminRatingSection = () => {
       totalItems: 0,
       totalPages: 0,
       page: Number(page) || 1,
-      perPage: pageSize,
+      perPage: Number(perPage) || 10,
     },
   });
 
   const pagination = {
     page: Number(page),
-    perPage: pageSize,
+    perPage: Number(perPage) || 10,
     totalPages: ratingListing.pagination.totalPages,
     totalItems: ratingListing.pagination.totalItems,
   };
@@ -135,7 +134,7 @@ const AdminRatingSection = () => {
       setInProgress(true);
       getAdminCompanyRatingsApi(companyId as string, {
         page: Number(page) || 1,
-        perPage: pageSize,
+        perPage: Number(perPage) || 10,
         ...(orderCode ? { orderCode: orderCode as string } : {}),
         ...(startDate && endDate
           ? {
@@ -153,8 +152,6 @@ const AdminRatingSection = () => {
         });
     }
   }, [companyId as string, page, orderCode, startDate, endDate]);
-
-  console.log('ratingListing', ratingListing);
 
   if (!companyId) {
     return null;

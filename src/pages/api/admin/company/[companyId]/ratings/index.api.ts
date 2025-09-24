@@ -243,9 +243,11 @@ const handler = async (
       ...(orderCode ? { meta_orderCode: orderCode } : {}),
       ...(startDate && endDate
         ? {
+            // Fix: Set end date to end of day (23:59:59.999) to include same-day ranges
+            // startDate: 2025-01-01 -> range: 2024-12-31T23:59:59.999Z to 2025-01-01T23:59:59.999Z
             meta_timestamp: `${new Date(startDate).valueOf() - 1},${new Date(
               endDate,
-            ).valueOf()}`,
+            ).setHours(23, 59, 59, 999)}`,
           }
         : {}),
       page: _page,
