@@ -2,10 +2,11 @@ import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
 import logger from '@helpers/logger';
+import type { TLocale } from '@src/types/utils';
 
-function handleRewrite() {
+function handleRewrite(locale: TLocale) {
   return NextResponse.rewrite(
-    `${process.env.NEXT_PUBLIC_CANONICAL_URL}/website/`,
+    `${process.env.NEXT_PUBLIC_CANONICAL_URL}/${locale}/website/`,
   );
 }
 
@@ -41,7 +42,7 @@ export async function middleware(req: NextRequest) {
   }
 
   if (path === '/') {
-    return handleRewrite();
+    return handleRewrite(req.nextUrl.locale as TLocale);
   }
 
   return NextResponse.next();

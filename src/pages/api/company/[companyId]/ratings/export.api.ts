@@ -4,7 +4,6 @@ import * as XLSX from 'xlsx';
 import { HttpMethod } from '@apis/configs';
 import cookies from '@services/cookie';
 import { denormalisedResponseEntities } from '@services/data';
-import adminChecker from '@services/permissionChecker/admin';
 import { getIntegrationSdk } from '@services/sdk';
 import type {
   OrderListing,
@@ -437,4 +436,4 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 };
 
-export default cookies(adminChecker(handler));
+export default cookies(handler);

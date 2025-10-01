@@ -103,9 +103,7 @@ const TranslationProvider = ({
       locale={lang || DEFAULT_LOCALE}
       defaultLocale={DEFAULT_LOCALE}
       messages={message}>
-      <LangContext.Provider value={{ lang: lang || DEFAULT_LOCALE }}>
-        {children}
-      </LangContext.Provider>
+      {children}
     </IntlProvider>
   );
 };

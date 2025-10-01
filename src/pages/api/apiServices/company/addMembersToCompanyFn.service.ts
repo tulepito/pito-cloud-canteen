@@ -164,13 +164,14 @@ const addMembersToCompanyFn = async (params: TAddMembersToCompanyParams) => {
   const newParticipantMembers = await Promise.all(
     newParticipantIds.map(async (userId: string) => {
       const userAccount = await fetchUser(userId);
-      const { companyList: userCompanyList = [] } =
+      const { companyList: userCompanyList = [], company: existCompany = {} } =
         User(userAccount).getMetadata();
       await integrationSdk.users.updateProfile({
         id: userId,
         metadata: {
           companyList: uniq(userCompanyList.concat(companyId)),
           company: {
+            ...existCompany,
             [companyId]: {
               permission: ECompanyPermission.participant,
             },

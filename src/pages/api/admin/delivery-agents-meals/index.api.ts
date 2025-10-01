@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { HttpMethod } from '@apis/configs';
-import { retrieveAllByIdChunks } from '@pages/api/company/[companyId]/ratings.api';
+import { retrieveAllByIdChunks } from '@pages/api/company/[companyId]/ratings/index.api';
 import cookies from '@services/cookie';
 import { denormalisedResponseEntities } from '@services/data';
 import adminChecker from '@services/permissionChecker/admin';

@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
 
-import { useLang } from '@src/translations/TranslationProvider';
-
-type Locale = 'en' | 'vi';
+import { EAppLocale } from '@src/utils/enums';
 
 export function LanguageSwitchButton({
   showLabel = false,
@@ -11,31 +11,10 @@ export function LanguageSwitchButton({
   showLabel?: boolean;
 }) {
   const intl = useIntl();
-  const { lang } = useLang();
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const btnRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
-
-  const switchLang = (to: Locale) => {
-    if (to === lang) {
-      setOpen(false);
-
-      return;
-    }
-    fetch('/api/change-lang', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ lang: to }),
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error('Failed to change language');
-        window.location.reload();
-      })
-      .catch((err) => {
-        console.error('Error changing language:', err);
-      })
-      .finally(() => setOpen(false));
-  };
 
   // Close on click outside
   useEffect(() => {
@@ -107,7 +86,9 @@ export function LanguageSwitchButton({
   );
 
   const current =
-    lang === 'vi' ? { code: 'VI', flag: FlagVI } : { code: 'EN', flag: FlagUS };
+    router.locale === EAppLocale.VI
+      ? { code: 'VI', flag: FlagVI }
+      : { code: 'EN', flag: FlagUS };
 
   return (
     <div className="relative inline-block text-left">
@@ -129,20 +110,24 @@ export function LanguageSwitchButton({
           role="menu"
           aria-orientation="vertical"
           className="absolute right-0 z-20 mt-2 w-40 origin-top-right rounded-lg border border-gray-200 bg-white p-1 shadow-lg">
-          <button
+          <Link
             role="menuitem"
             className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-gray-100 focus:bg-gray-100"
-            onClick={() => switchLang('vi')}>
+            href={{ pathname: router.pathname, query: router.query }}
+            as={router.asPath}
+            locale={EAppLocale.VI}>
             {FlagVI}
             <span>{intl.formatMessage({ id: 'tieng-viet' })}</span>
-          </button>
-          <button
+          </Link>
+          <Link
             role="menuitem"
             className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-gray-100 focus:bg-gray-100"
-            onClick={() => switchLang('en')}>
+            href={{ pathname: router.pathname, query: router.query }}
+            as={router.asPath}
+            locale={EAppLocale.EN}>
             {FlagUS}
             <span>{intl.formatMessage({ id: 'english' })}</span>
-          </button>
+          </Link>
         </div>
       )}
     </div>

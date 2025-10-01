@@ -34,7 +34,7 @@ const BookerRatingSection = () => {
         page: 1,
         perPage: 3,
       })
-        .then((response) => setRatingListing(response.data))
+        .then((response) => setRatingListing(response.data.data))
         .catch((error) => {
           console.error('Error fetching ratings:', error);
         })

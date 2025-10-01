@@ -102,14 +102,35 @@ export const retrieveAllByIdChunks = async <T extends Array<any>>(
 export interface GETCompanyRaitingsQuery {
   page?: number;
   perPage?: number;
-  filterBy?: {
-    orderCode?: string;
-    startDate?: string;
-    endDate?: string;
+
+  orderCode?: string;
+  startDate?: string;
+  endDate?: string;
+}
+
+/**
+ * Response structure for GET /company/[companyId]/ratings
+ * Includes paginated ratings data with reviewer and order information
+ */
+export interface GETCompanyRatingsResponse {
+  data: Array<
+    RatingListing & {
+      reviewer?: UserListing;
+      order?: OrderListing;
+    }
+  >;
+  pagination: {
+    totalItems: number;
+    totalPages: number;
+    page: number;
+    perPage: number;
   };
 }
 
-const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+const handler = async (
+  req: NextApiRequest,
+  res: NextApiResponse<GETCompanyRatingsResponse | { message: string }>,
+) => {
   const integrationSdk = getIntegrationSdk();
   const { method } = req;
   const { companyId, JSONParams } = req.query as unknown as {
@@ -117,11 +138,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     JSONParams: string;
   };
 
-  const { page, perPage, filterBy } = JSONParams
+  // format Json PArams like GETCompanyRaitingsQuery
+  const { page, perPage, endDate, orderCode, startDate } = JSONParams
     ? (JSON.parse(JSONParams) as GETCompanyRaitingsQuery)
     : ({} as GETCompanyRaitingsQuery);
 
-  if (filterBy?.orderCode === 'MIGRATE') {
+  if (orderCode === 'MIGRATE') {
     const allRatings = await retrieveAll<RatingListing[]>(
       integrationSdk.listings.query,
       {
@@ -192,7 +214,15 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         });
     }
 
-    return res.status(200).json([allRatings]);
+    return res.status(200).json({
+      data: allRatings,
+      pagination: {
+        totalItems: allRatings.length,
+        totalPages: 1,
+        page: 1,
+        perPage: allRatings.length,
+      },
+    });
   }
 
   const _page = Math.max(1, Number(page) || 1);
@@ -207,24 +237,31 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   try {
+    const ratingListingsResponse = await integrationSdk.listings.query({
+      meta_listingType: EListingType.rating,
+      meta_companyId: companyId as string,
+      ...(orderCode ? { meta_orderCode: orderCode } : {}),
+      ...(startDate && endDate
+        ? {
+            // Fix: Set end date to end of day (23:59:59.999) to include same-day ranges
+            // startDate: 2025-01-01 -> range: 2024-12-31T23:59:59.999Z to 2025-01-01T23:59:59.999Z
+            meta_timestamp: `${new Date(startDate).valueOf() - 1},${new Date(
+              endDate,
+            ).setHours(23, 59, 59, 999)}`,
+          }
+        : {}),
+      page: _page,
+      perPage: _perPage,
+      include: ['images'],
+      'fields.image': [`variants.${EImageVariants.squareSmall2x}`],
+    });
+
     const ratingListingsData: RatingListing[] = denormalisedResponseEntities(
-      await integrationSdk.listings.query({
-        meta_listingType: EListingType.rating,
-        meta_companyId: companyId as string,
-        ...(filterBy?.orderCode ? { meta_orderCode: filterBy?.orderCode } : {}),
-        ...(filterBy?.startDate && filterBy?.endDate
-          ? {
-              meta_timestamp: `${
-                new Date(filterBy.startDate).valueOf() - 1
-              },${new Date(filterBy.endDate).valueOf()}`,
-            }
-          : {}),
-        page: _page,
-        perPage: _perPage,
-        include: ['images'],
-        'fields.image': [`variants.${EImageVariants.squareSmall2x}`],
-      }),
+      ratingListingsResponse,
     );
+
+    // Extract pagination metadata
+    const paginationMeta = ratingListingsResponse.data.meta;
 
     const reviewerIds = ratingListingsData.reduce((acc: string[], rating) => {
       const metadata = rating.attributes?.metadata;
@@ -286,7 +323,16 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       };
     });
 
-    res.status(200).json(ratingsWithReviewersAndOrder);
+    // Return data with pagination metadata
+    res.status(200).json({
+      data: ratingsWithReviewersAndOrder,
+      pagination: {
+        totalItems: paginationMeta?.totalItems || 0,
+        totalPages: paginationMeta?.totalPages || 0,
+        page: paginationMeta?.page || _page,
+        perPage: paginationMeta?.perPage || _perPage,
+      },
+    });
   } catch (error) {
     console.error('Error fetching rating listing:', error);
     res.status(500).json({ message: 'Error fetching rating listing' });

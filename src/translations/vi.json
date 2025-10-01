@@ -2348,7 +2348,7 @@
   "help-center": "Hỗ trợ",
   "become-a-partner": "Trở thành đối tác",
   "giai-phap-dat-bua-trua-tu-dong-cho-nhom-20-99-nguoi": "Giải pháp đặt bữa trưa tự động cho nhóm 20–99 người",
-  "tu-dong-len-ke-hoach-bua-trua-cung-pito-nhan-vien-chu-dong-chon-mon-quan-ly-ca-tuan-de-dang-giao-dung-gio-khong-can-xu-ly-thu-cong": "Tự động lên kế hoạch bữa trưa cùng PITO. Nhân viên chủ động chọn món, quản lý cả tuần dễ dàng, giao đúng giờ – không cần xử lý thủ công",
+  "tu-dong-len-ke-hoach-bua-trua-cung-pito-nhan-vien-chu-dong-chon-mon-quan-ly-ca-tuan-de-dang-giao-dung-gio-khong-can-xu-ly-thu-cong": "Tự động lên kế hoạch bữa trưa cùng PITO. Nhân viên chủ động chọn món, quản lý cả tuần dễ dàng, giao đúng giờ - không cần xử lý thủ công",
   "giai-phap-dat-bua-trua-tu-dong": "Tự động hóa bữa trưa",
   "toi-uu-cho-nhom": "Phù hợp nhóm",
   "ma-code": "Mã Code",
@@ -2564,7 +2564,7 @@
   "save-90-of-lunch-coordination-time-employees-choose-their-own-meals-delivered-on-time-pito-cloud-canteen-helps-startups-optimize-operations-and-boost-team-satisfaction": "Tiết kiệm 90% thời gian đặt cơm, nhân viên tự chọn món, giao tận nơi đúng giờ. PITO Cloud Canteen giúp Startup tối ưu vận hành và nâng cao sự hài lòng đội ngũ.",
   "reclaim-your-time-boost-team-satisfaction": "Tối ưu thời gian. Tăng sự hài lòng cho đội ngũ",
   "tieng-viet": "Tiếng Việt",
-  "english": "Tiếng Anh",
+  "english": "English",
   "losing-hours-each-day-to-lunch-management": "{highlightVi}: nỗi lo của mọi Admin?",
   "pito-cloud-canteen-stable-lunch-higher-productivity": "PITO Cloud Canteen\n {highlightVi} – {highlightVi1}",
   "hr-admin-spending-hours-each-week-on-lunch-orders": "HR/Admin mất hàng giờ mỗi tuần cho việc đặt cơm",
@@ -2592,6 +2592,8 @@
   "why-tech-companies-choose-pito": "Tại sao các công ty công nghệ {highlightVi}?",
   "optimize-today-with-pito-cloud-canteen": "Tối ưu hóa hôm nay với PITO Cloud Canteen",
   "smart-lunch-with-pito-accurate-friendly": "Bữa trưa thông minh với PITO – chính xác, thân thiện",
-  "automated-lunch-solution-or-pito-cloud-canteen": "Automated Lunch Solution | PITO Cloud Canteen",
-  "plan-weekly-meals-let-employees-choose-dishes-ensure-on-time-delivery-and-track-transparent-costs-all-on-one-platform": "Plan weekly meals, let employees choose dishes, ensure on-time delivery, and track transparent costs — all on one platform."
+  "automated-lunch-solution-or-pito-cloud-canteen": "Giải pháp tự động hóa bữa trưa | PITO Cloud Canteen",
+  "plan-weekly-meals-let-employees-choose-dishes-ensure-on-time-delivery-and-track-transparent-costs-all-on-one-platform": "Lên kế hoạch tuần ăn, nhân viên tự chọn món, giao đúng giờ, chi phí minh bạch – tất cả trong một nền tảng.",
+  "automated-corporate-lunch-ordering-solution": "Giải pháp tự động hóa đặt cơm trưa cho doanh nghiệp",
+  "pcc-helps-companies-plan-lunch-choose-vendors-manage-and-deliver-on-time-without-setup-costs-and-save-time": "PITO Cloud Canteen giúp doanh nghiệp lập kế hoạch bữa ăn, chọn nhà cung cấp, quản lý và giao tận nơi – không phí setup, tiết kiệm thời gian."
 }

@@ -106,7 +106,7 @@ const Table = (props: TTableProps) => {
   const tableClasses = classNames(css.table, tableClassName);
   const router = useRouter();
 
-  const onPageChange = (page: number) => {
+  const onPageChange = (page: number, pageSize?: number) => {
     if (typeof onCustomPageChange === 'function') {
       onCustomPageChange(page);
     } else {
@@ -115,6 +115,7 @@ const Table = (props: TTableProps) => {
         query: {
           ...router.query,
           page,
+          ...(pageSize ? { perPage: pageSize } : {}),
         },
       };
 
