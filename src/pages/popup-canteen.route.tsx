@@ -19,7 +19,9 @@ function PopupCanteenPage() {
       description={intl.formatMessage({
         id: 'don-gian-hoa-viec-dat-bua-trua-cho-100-2000-nhan-su-nhan-vien-tu-chon-mon-pito-setup-canteen-tai-cho-khong-can-bep-an-noi-bo',
       })}
-      canonical={websitePaths.PopupCanteen}
+      canonical={
+        process.env.NEXT_PUBLIC_CANONICAL_URL + websitePaths.PopupCanteen
+      }
       imageUrl="https://in.pito.vn/wp-content/uploads/2024/11/thumbnail-pito-cloud-canteen.jpg">
       <Layout>
         <PopupCanteen />

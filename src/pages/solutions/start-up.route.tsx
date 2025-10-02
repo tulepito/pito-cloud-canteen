@@ -19,7 +19,7 @@ const StartUpPage = () => {
       description={intl.formatMessage({
         id: 'save-90-of-lunch-coordination-time-employees-choose-their-own-meals-delivered-on-time-pito-cloud-canteen-helps-startups-optimize-operations-and-boost-team-satisfaction',
       })}
-      canonical={websitePaths.Startup}
+      canonical={process.env.NEXT_PUBLIC_CANONICAL_URL + websitePaths.Startup}
       imageUrl="https://in.pito.vn/wp-content/uploads/2024/11/thumbnail-pito-cloud-canteen.jpg">
       <Layout>
         <StartUp />

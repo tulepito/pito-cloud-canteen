@@ -18,7 +18,9 @@ function Page() {
       description={intl.formatMessage({
         id: 'plan-weekly-meals-let-employees-choose-dishes-ensure-on-time-delivery-and-track-transparent-costs-all-on-one-platform',
       })}
-      canonical={websitePaths.TechService}
+      canonical={
+        process.env.NEXT_PUBLIC_CANONICAL_URL + websitePaths.TechService
+      }
       imageUrl="https://in.pito.vn/wp-content/uploads/2024/11/thumbnail-pito-cloud-canteen.jpg">
       <Layout>
         <TechService />

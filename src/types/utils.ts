@@ -78,3 +78,5 @@ export type ListingBuilder<
 export type Assert<T> = Exclude<T, undefined>;
 
 export type ArrayElement<T> = T extends (infer U)[] ? U : T;
+
+export type TLocale = 'vi' | 'en';

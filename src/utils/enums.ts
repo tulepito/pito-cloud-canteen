@@ -512,3 +512,8 @@ export enum ETimePeriodOption {
   LAST_30_DAYS = 'last30Days',
   CUSTOM = 'custom',
 }
+
+export enum EAppLocale {
+  VI = 'vi',
+  EN = 'en',
+}

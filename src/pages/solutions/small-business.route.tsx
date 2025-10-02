@@ -18,7 +18,9 @@ function Page() {
       description={intl.formatMessage({
         id: 'no-more-zalo-excel-or-manual-coordination-pito-helps-businesses-plan-weekly-menus-lets-employees-pre-select-meals-ensures-on-time-delivery-and-provides-clear-cost-tracking',
       })}
-      canonical={websitePaths.SmallBusiness}
+      canonical={
+        process.env.NEXT_PUBLIC_CANONICAL_URL + websitePaths.SmallBusiness
+      }
       imageUrl="https://in.pito.vn/wp-content/uploads/2024/11/thumbnail-pito-cloud-canteen.jpg">
       <Layout>
         <SmallBusiness />

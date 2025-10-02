@@ -18,7 +18,9 @@ function Page() {
       description={intl.formatMessage({
         id: 'pito-helps-businesses-optimize-team-lunches-employees-choose-meals-online-receive-unified-delivery-and-access-transparent-cost-reporting-weekly-menu-planning-is-fully-automated-no-more-zalo-or-excel',
       })}
-      canonical={websitePaths.MiddleBusiness}
+      canonical={
+        process.env.NEXT_PUBLIC_CANONICAL_URL + websitePaths.MiddleBusiness
+      }
       imageUrl="https://in.pito.vn/wp-content/uploads/2024/11/thumbnail-pito-cloud-canteen.jpg">
       <Layout>
         <MediumBusiness />

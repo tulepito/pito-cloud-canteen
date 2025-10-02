@@ -1,7 +1,5 @@
 import { Provider } from 'react-redux';
-import { parse } from 'cookie';
-import type { AppContext, AppProps } from 'next/app';
-import App from 'next/app';
+import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import { Router } from 'next/router';
 import Script from 'next/script';
@@ -15,6 +13,7 @@ import ToastifyProvider from '@components/ToastifyProvider/ToastifyProvider';
 import UIProvider from '@components/UIProvider/UIProvider';
 import store from '@redux/store';
 import { publicPaths } from '@src/paths';
+import type { TLocale } from '@src/types/utils';
 import TranslationProvider, {
   DEFAULT_LOCALE,
 } from '@translations/TranslationProvider';
@@ -42,12 +41,14 @@ const MyApp = ({
   router,
   ...restProps
 }: AppProps & AppCustomProps) => {
-  const { pathname } = router;
+  const { pathname, locale, defaultLocale } = router;
 
   const isPagePublic = publicPaths.includes(pathname);
 
+  const currentLocale = locale || defaultLocale || DEFAULT_LOCALE;
+
   return (
-    <TranslationProvider lang={restProps.pageProps.lang}>
+    <TranslationProvider lang={currentLocale as TLocale}>
       <Provider store={store}>
         <UIProvider>
           {isPagePublic ? (
@@ -109,22 +110,6 @@ const MyApp = ({
       )}
     </TranslationProvider>
   );
-};
-
-MyApp.getInitialProps = async (appContext: AppContext) => {
-  const appProps = await App.getInitialProps(appContext);
-
-  const req = appContext.ctx.req;
-  const cookies = req ? parse(req.headers.cookie || '') : {};
-  const lang = cookies.lang || DEFAULT_LOCALE;
-
-  return {
-    ...appProps,
-    pageProps: {
-      ...appProps.pageProps,
-      lang,
-    },
-  };
 };
 
 export default MyApp;

@@ -18,7 +18,9 @@ function MealBoxDeliveryPage() {
       description={intl.formatMessage({
         id: 'tu-dong-len-ke-hoach-bua-trua-cung-pito-nhan-vien-chu-dong-chon-mon-quan-ly-ca-tuan-de-dang-giao-dung-gio-khong-can-xu-ly-thu-cong',
       })}
-      canonical={websitePaths.MealBoxDelivery}
+      canonical={
+        process.env.NEXT_PUBLIC_CANONICAL_URL + websitePaths.MealBoxDelivery
+      }
       imageUrl="https://in.pito.vn/wp-content/uploads/2024/11/thumbnail-pito-cloud-canteen.jpg">
       <Layout>
         <MealBox />

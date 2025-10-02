@@ -18,7 +18,7 @@ function Page() {
       description={intl.formatMessage({
         id: 'smart-lunch-solution-choose-once-get-what-you-like-delivered-on-time-suggest-pito-cloud-canteen-to-improve-your-companys-lunch-experience',
       })}
-      canonical={websitePaths.Employee}
+      canonical={process.env.NEXT_PUBLIC_CANONICAL_URL + websitePaths.Employee}
       imageUrl="https://in.pito.vn/wp-content/uploads/2024/11/thumbnail-pito-cloud-canteen.jpg">
       <Layout>
         <Employee />

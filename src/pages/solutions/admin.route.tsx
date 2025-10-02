@@ -18,7 +18,7 @@ function Page() {
       description={intl.formatMessage({
         id: 'admin-tiet-kiem-80-thoi-gian-quan-ly-ngan-sach-and-phan-hoi-chi-trong-mot-nen-tang-khong-con-excel-zalo-thu-cong',
       })}
-      canonical={websitePaths.Admin}
+      canonical={process.env.NEXT_PUBLIC_CANONICAL_URL + websitePaths.Admin}
       imageUrl="https://in.pito.vn/wp-content/uploads/2024/11/thumbnail-pito-cloud-canteen.jpg">
       <Layout>
         <Admin />
