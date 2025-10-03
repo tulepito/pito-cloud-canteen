@@ -83,6 +83,13 @@ class DistributedLock {
   }
 
   private async tryAcquireLock(attempts = 0): Promise<boolean> {
+    const startTime = Date.now();
+    console.log(
+      `[RACE_DEBUG] Lock acquisition attempt ${attempts + 1}/${
+        this.maxRetries
+      } for ${this.lockKey}, token: ${this.token}`,
+    );
+
     const result = (await this.redis.eval(
       ACQUIRE_LOCK_SCRIPT,
       1,
@@ -91,10 +98,39 @@ class DistributedLock {
       this.ttl,
     )) as number;
 
-    if (result === 1) return true;
-    if (attempts >= this.maxRetries) return false;
+    const duration = Date.now() - startTime;
+
+    if (result === 1) {
+      console.log(
+        `[RACE_DEBUG] Lock acquired successfully for ${this.lockKey} after ${
+          attempts + 1
+        } attempts, duration: ${duration}ms, token: ${this.token}`,
+      );
+
+      return true;
+    }
+
+    if (attempts >= this.maxRetries) {
+      console.error(
+        `[RACE_DEBUG] Lock acquisition failed after ${
+          attempts + 1
+        } attempts for ${this.lockKey}, total duration: ${duration}ms, token: ${
+          this.token
+        }`,
+      );
+
+      return false;
+    }
 
     const delay = this.retryDelay * 1.5 ** Math.min(attempts, 10);
+    console.warn(
+      `[RACE_DEBUG] Lock busy for ${
+        this.lockKey
+      }, retrying in ${delay}ms (attempt ${attempts + 1}/${
+        this.maxRetries
+      }), token: ${this.token}`,
+    );
+
     await new Promise((res) => {
       setTimeout(res, delay);
     });
@@ -150,6 +186,7 @@ const processOrderQueue = new Queue<AddToQueueData>(queueName, {
 const worker = new Worker<ProcessOrderJobData>(
   queueName,
   async (job: Job<ProcessOrderJobData>) => {
+    const jobStartTime = Date.now();
     const {
       orderId,
       planId,
@@ -160,6 +197,12 @@ const worker = new Worker<ProcessOrderJobData>(
       currentUserId,
     } = job.data;
 
+    console.log(
+      `[RACE_DEBUG] Job started - planId: ${planId}, userId: ${currentUserId}, orderId: ${orderId}, jobId: ${
+        job.id
+      }, timestamp: ${new Date().toISOString()}`,
+    );
+
     const sdk = getIntegrationSdk();
     const lock = new DistributedLock(
       redisConnection as Redis,
@@ -167,24 +210,37 @@ const worker = new Worker<ProcessOrderJobData>(
       {
         ttl: 30000,
         retryDelay: 100,
-        maxRetries: 100,
+        maxRetries: 100, // Maybe bug here
       },
     );
 
     try {
+      console.log(
+        `[RACE_DEBUG] Attempting to acquire lock for planId: ${planId}, userId: ${currentUserId}`,
+      );
+
       const lockAcquired = await lock.acquire();
       if (!lockAcquired) {
-        console.error(`Failed to acquire lock for planId: ${planId}`);
+        console.error(
+          `[RACE_DEBUG] CRITICAL: Failed to acquire lock for planId: ${planId}, userId: ${currentUserId} after all retries`,
+        );
         throw new Error(`Failed to acquire lock for planId: ${planId}`);
       }
 
+      const lockAcquiredTime = Date.now();
       console.log(
-        `Lock acquired for planId: ${planId}, user: ${currentUserId}`,
+        `[RACE_DEBUG] Lock acquired for planId: ${planId}, user: ${currentUserId}, lock acquisition took: ${
+          lockAcquiredTime - jobStartTime
+        }ms`,
       );
       await job.updateProgress(25);
 
       const orderListing = await fetchListing(orderId as string);
       await job.updateProgress(50);
+
+      console.log(
+        `[RACE_DEBUG] Fetching fresh plan data for planId: ${planId}, userId: ${currentUserId}`,
+      );
 
       // Re-fetch fresh plan before mutation
       const updatingPlan = await fetchListing(planId as string);
@@ -193,14 +249,30 @@ const worker = new Worker<ProcessOrderJobData>(
       const currentMetadata = Listing(updatingPlan).getMetadata() ?? {};
       const orderDetail = currentMetadata.orderDetail ?? {};
 
+      // Log the current state before modification
+      console.log(
+        `[RACE_DEBUG] Current orderDetail state for planId: ${planId}, userId: ${currentUserId}:`,
+        JSON.stringify(orderDetail, null, 2),
+      );
+
+      const originalOrderDetail = JSON.parse(JSON.stringify(orderDetail));
+
       // Merge logic
       if (orderDay && memberOrders) {
+        console.log(
+          `[RACE_DEBUG] Processing single day order - planId: ${planId}, userId: ${currentUserId}, orderDay: ${orderDay}`,
+        );
         orderDetail[orderDay] = orderDetail[orderDay] || { memberOrders: {} };
         orderDetail[orderDay].memberOrders =
           orderDetail[orderDay].memberOrders || {};
         orderDetail[orderDay].memberOrders[currentUserId] =
           memberOrders[currentUserId];
       } else if (orderDays && planData) {
+        console.log(
+          `[RACE_DEBUG] Processing multiple days order - planId: ${planId}, userId: ${currentUserId}, orderDays: ${orderDays?.join(
+            ', ',
+          )}`,
+        );
         orderDays.forEach((day) => {
           orderDetail[day] = orderDetail[day] || { memberOrders: {} };
           orderDetail[day].memberOrders = orderDetail[day].memberOrders || {};
@@ -211,8 +283,22 @@ const worker = new Worker<ProcessOrderJobData>(
         });
       }
 
+      // Log what changed
+      console.log(
+        `[RACE_DEBUG] OrderDetail changes for planId: ${planId}, userId: ${currentUserId}:`,
+        {
+          before: originalOrderDetail,
+          after: orderDetail,
+          timestamp: new Date().toISOString(),
+        },
+      );
+
       await job.updateProgress(75);
       await lock.extend();
+
+      console.log(
+        `[RACE_DEBUG] Updating plan listing for planId: ${planId}, userId: ${currentUserId}`,
+      );
 
       const planResponse = await sdk.listings.update(
         {
@@ -226,6 +312,9 @@ const worker = new Worker<ProcessOrderJobData>(
         !participants.includes(currentUserId) &&
         !anonymous.includes(currentUserId)
       ) {
+        console.log(
+          `[RACE_DEBUG] Adding user ${currentUserId} to anonymous participants for orderId: ${orderId}`,
+        );
         await sdk.listings.update({
           id: orderId,
           metadata: {
@@ -235,28 +324,53 @@ const worker = new Worker<ProcessOrderJobData>(
       }
 
       await job.updateProgress(100);
+      const totalDuration = Date.now() - jobStartTime;
       console.log(
-        `Job done for planId: ${planId}, user: ${currentUserId}, memberOrders: ${memberOrders}, orderDay: ${orderDay}, orderDays: ${orderDays}, planData: ${planData}`,
+        `[RACE_DEBUG] Job completed successfully - planId: ${planId}, userId: ${currentUserId}, total duration: ${totalDuration}ms, memberOrders: ${JSON.stringify(
+          memberOrders,
+        )}, orderDay: ${orderDay}, orderDays: ${orderDays?.join(
+          ', ',
+        )}, planData keys: ${
+          planData ? Object.keys(planData).join(', ') : 'none'
+        }`,
       );
 
       return denormalisedResponseEntities(planResponse)[0];
     } catch (error) {
-      console.error('Process order error:', {
-        planId,
-        currentUserId,
-        error: error instanceof Error ? error.message : error,
-      });
+      const totalDuration = Date.now() - jobStartTime;
+      console.error(
+        `[RACE_DEBUG] Process order error after ${totalDuration}ms:`,
+        {
+          planId,
+          currentUserId,
+          orderId,
+          jobId: job.id,
+          error: error instanceof Error ? error.message : error,
+          stack: error instanceof Error ? error.stack : undefined,
+          timestamp: new Date().toISOString(),
+        },
+      );
       throw error;
     } finally {
       try {
+        console.log(
+          `[RACE_DEBUG] Attempting to release lock for planId: ${planId}, userId: ${currentUserId}`,
+        );
         const released = await lock.release();
         if (!released) {
-          console.warn(`Failed to release lock for planId: ${planId}`);
+          console.warn(
+            `[RACE_DEBUG] WARNING: Failed to release lock for planId: ${planId}, userId: ${currentUserId} - lock may have been stolen or expired`,
+          );
         } else {
-          console.log(`Lock released for planId: ${planId}`);
+          console.log(
+            `[RACE_DEBUG] Lock released successfully for planId: ${planId}, userId: ${currentUserId}`,
+          );
         }
       } catch (releaseError) {
-        console.error('Error releasing lock:', releaseError);
+        console.error(
+          `[RACE_DEBUG] Error releasing lock for planId: ${planId}, userId: ${currentUserId}:`,
+          releaseError,
+        );
       }
     }
   },
@@ -270,26 +384,55 @@ const worker = new Worker<ProcessOrderJobData>(
 
 // Job events
 worker.on('error', (error) => {
-  console.error('Worker error:', error);
+  console.error('[RACE_DEBUG] Worker error:', error);
 });
 
 worker.on('stalled', (jobId) => {
-  console.warn('Job stalled:', jobId);
+  console.warn(
+    `[RACE_DEBUG] Job stalled - this may indicate a race condition or deadlock: ${jobId}`,
+  );
 });
 
 worker.on('failed', (job, error) => {
-  console.error('Job failed:', {
+  console.error('[RACE_DEBUG] Job failed:', {
     jobId: job?.id,
+    planId: job?.data?.planId,
+    userId: job?.data?.currentUserId,
+    orderId: job?.data?.orderId,
     data: job?.data,
     error: error.message,
+    stack: error.stack,
+    attemptsMade: job?.attemptsMade,
+    timestamp: new Date().toISOString(),
   });
 });
 
 // Add to queue
 export const addToProcessOrderQueue = async (data: AddToQueueData) => {
   const deduplicationKey = `${data.orderId}-${data.planId}-${data.currentUserId}`;
+  const startTime = Date.now();
+
   try {
+    console.log(
+      `[RACE_DEBUG] Attempting to add job to queue - userId: ${
+        data.currentUserId
+      }, planId: ${data.planId}, orderId: ${
+        data.orderId
+      }, deduplicationKey: ${deduplicationKey}, timestamp: ${new Date().toISOString()}`,
+    );
+
+    // Check if job already exists
+    const existingJob = await processOrderQueue.getJob(deduplicationKey);
+    if (existingJob) {
+      console.log(
+        `[RACE_DEBUG] Existing job found for deduplicationKey: ${deduplicationKey}, jobId: ${
+          existingJob.id
+        }, state: ${await existingJob.getState()}, removing it first`,
+      );
+    }
+
     await processOrderQueue.remove(deduplicationKey);
+
     const job = await processOrderQueue.add(queueName, data, {
       jobId: deduplicationKey,
       removeOnComplete: 10,
@@ -302,13 +445,30 @@ export const addToProcessOrderQueue = async (data: AddToQueueData) => {
       priority: data.orderDays?.length || 1,
     });
 
+    const duration = Date.now() - startTime;
+    console.log(
+      `[RACE_DEBUG] Job added successfully to queue - userId: ${
+        data.currentUserId
+      }, planId: ${data.planId}, jobId: ${job.id}, priority: ${
+        data.orderDays?.length || 1
+      }, duration: ${duration}ms`,
+    );
+
     return job;
   } catch (error) {
+    const duration = Date.now() - startTime;
     if (error instanceof Error && error.message.includes('duplicate')) {
-      console.log(`Duplicate job ignored for ${deduplicationKey}`);
+      console.log(
+        `[RACE_DEBUG] Duplicate job ignored for ${deduplicationKey}, userId: ${data.currentUserId}, duration: ${duration}ms - this indicates potential race condition`,
+      );
 
       return null;
     }
+
+    console.error(
+      `[RACE_DEBUG] Error adding job to queue for userId: ${data.currentUserId}, planId: ${data.planId}, duration: ${duration}ms:`,
+      error,
+    );
     throw error;
   }
 };
