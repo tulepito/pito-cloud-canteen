@@ -136,6 +136,7 @@ export enum EListingType {
   order = 'order',
   rating = 'rating',
   quotation = 'quotation',
+  log = 'log',
 }
 
 export enum EOrderType {
