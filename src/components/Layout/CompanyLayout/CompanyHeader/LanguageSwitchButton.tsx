@@ -3,7 +3,9 @@ import { useIntl } from 'react-intl';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 
+import type { TLocale } from '@src/types/utils';
 import { EAppLocale } from '@src/utils/enums';
+import { getLocalizedPathFromCurrentPath } from '@src/utils/i18nRoutes';
 
 export function LanguageSwitchButton({
   showLabel = false,
@@ -90,6 +92,16 @@ export function LanguageSwitchButton({
       ? { code: 'VI', flag: FlagVI }
       : { code: 'EN', flag: FlagUS };
 
+  // Get localized paths for language switching
+  const localizedPathForVI = getLocalizedPathFromCurrentPath(
+    router.pathname,
+    EAppLocale.VI as TLocale,
+  );
+  const localizedPathForEN = getLocalizedPathFromCurrentPath(
+    router.pathname,
+    EAppLocale.EN as TLocale,
+  );
+
   return (
     <div className="relative inline-block text-left">
       <button
@@ -113,8 +125,7 @@ export function LanguageSwitchButton({
           <Link
             role="menuitem"
             className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-gray-100 focus:bg-gray-100"
-            href={{ pathname: router.pathname, query: router.query }}
-            as={router.asPath}
+            href={{ pathname: localizedPathForVI, query: router.query }}
             locale={EAppLocale.VI}>
             {FlagVI}
             <span>{intl.formatMessage({ id: 'tieng-viet' })}</span>
@@ -122,8 +133,7 @@ export function LanguageSwitchButton({
           <Link
             role="menuitem"
             className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-gray-100 focus:bg-gray-100"
-            href={{ pathname: router.pathname, query: router.query }}
-            as={router.asPath}
+            href={{ pathname: localizedPathForEN, query: router.query }}
             locale={EAppLocale.EN}>
             {FlagUS}
             <span>{intl.formatMessage({ id: 'english' })}</span>

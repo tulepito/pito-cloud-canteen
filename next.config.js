@@ -34,6 +34,34 @@ const nextConfig = {
         destination:
           'https://pito.vn/cam-nang/com-trua-van-phong-pito-cloud-canteen/',
       },
+      {
+        source: '/giao-nhan-com-trua-van-phong',
+        destination: '/meal-box-delivery',
+      },
+      {
+        source: '/giai-phap/doanh-nghiep-nho',
+        destination: '/solutions/small-business',
+      },
+      {
+        source: '/giai-phap/doanh-nghiep-vua',
+        destination: '/solutions/middle-business',
+      },
+      {
+        source: '/giai-phap/start-up',
+        destination: '/solutions/start-up',
+      },
+      {
+        source: '/giai-phap/cong-ty-cong-nghe',
+        destination: '/solutions/tech-service',
+      },
+      {
+        source: '/giai-phap/admin',
+        destination: '/solutions/admin',
+      },
+      {
+        source: '/giai-phap/employees',
+        destination: '/solutions/employees',
+      },
     ];
   },
   headers: async () => {

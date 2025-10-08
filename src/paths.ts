@@ -20,6 +20,18 @@ export const websitePaths = {
   OffShore: '/off-shore',
 };
 
+export const viWebsitePaths = {
+  MealBoxDelivery: '/giao-nhan-com-trua-van-phong',
+  PopupCanteen: '/popup-canteen',
+  SmallBusiness: '/giai-phap/doanh-nghiep-nho',
+  MiddleBusiness: '/giai-phap/doanh-nghiep-vua',
+  Admin: '/giai-phap/admin',
+  Employee: '/giai-phap/employees',
+  Startup: '/giai-phap/start-up',
+  TechService: '/giai-phap/cong-ty-cong-nghe',
+  OffShore: '/off-shore',
+};
+
 export const publicPaths = [
   websitePaths.MealBoxDelivery,
   websitePaths.PopupCanteen,

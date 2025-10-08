@@ -7,7 +7,9 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 
 import { LanguageSwitchButton } from '@components/Layout/CompanyLayout/CompanyHeader/LanguageSwitchButton';
-import { enGeneralPaths, websitePaths } from '@src/paths';
+import { enGeneralPaths } from '@src/paths';
+import type { TLocale } from '@src/types/utils';
+import { getLocalizedPath } from '@src/utils/i18nRoutes';
 
 import logo from '../assets/Logo.svg';
 // eslint-disable-next-line import/no-cycle
@@ -19,6 +21,8 @@ const PlatformContent = ({ isMobile = false }) => {
   const intl = useIntl();
   const router = useRouter();
 
+  const locale = router.locale;
+
   const gridClass = isMobile
     ? 'flex flex-col gap-2'
     : 'grid grid-cols-2 gap-4 p-0 lg:p-4';
@@ -28,11 +32,11 @@ const PlatformContent = ({ isMobile = false }) => {
       {[
         {
           label: intl.formatMessage({ id: 'meal-box-delivery' }),
-          href: websitePaths.MealBoxDelivery,
+          href: getLocalizedPath('mealBoxDelivery', locale as TLocale),
         },
         {
           label: intl.formatMessage({ id: 'cafeteria-service' }),
-          href: websitePaths.PopupCanteen,
+          href: getLocalizedPath('popupCanteen', locale as TLocale),
         },
       ].map((item) => (
         <div
@@ -63,6 +67,10 @@ const PlatformContent = ({ isMobile = false }) => {
 const SolutionContent = ({ isMobile = false }) => {
   const intl = useIntl();
 
+  const router = useRouter();
+
+  const locale = router.locale;
+
   const gridClass = isMobile
     ? 'flex flex-col gap-4'
     : 'grid grid-cols-3 gap-4 p-0 lg:p-4';
@@ -75,11 +83,17 @@ const SolutionContent = ({ isMobile = false }) => {
           children: [
             {
               label: intl.formatMessage({ id: 'small-business' }),
-              href: websitePaths.SmallBusiness,
+              href: getLocalizedPath(
+                'solutionsSmallBusiness',
+                locale as TLocale,
+              ),
             },
             {
               label: intl.formatMessage({ id: 'middle-business' }),
-              href: websitePaths.MiddleBusiness,
+              href: getLocalizedPath(
+                'solutionsMiddleBusiness',
+                locale as TLocale,
+              ),
             },
           ],
         },
@@ -88,11 +102,11 @@ const SolutionContent = ({ isMobile = false }) => {
           children: [
             {
               label: intl.formatMessage({ id: 'startup' }),
-              href: websitePaths.Startup,
+              href: getLocalizedPath('solutionsStartup', locale as TLocale),
             },
             {
               label: intl.formatMessage({ id: 'tech-services' }),
-              href: websitePaths.TechService,
+              href: getLocalizedPath('solutionsTechService', locale as TLocale),
             },
           ],
         },
@@ -101,11 +115,11 @@ const SolutionContent = ({ isMobile = false }) => {
           children: [
             {
               label: intl.formatMessage({ id: 'admins' }),
-              href: websitePaths.Admin,
+              href: getLocalizedPath('solutionsAdmin', locale as TLocale),
             },
             {
               label: intl.formatMessage({ id: 'employee' }),
-              href: websitePaths.Employee,
+              href: getLocalizedPath('solutionsEmployees', locale as TLocale),
             },
           ],
         },
