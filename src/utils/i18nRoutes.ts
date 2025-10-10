@@ -47,6 +47,9 @@ export function getLocalizedPathFromCurrentPath(
   currentPath: string,
   targetLocale: TLocale,
 ): string {
+  if (currentPath === '/website' || currentPath === '/website/') {
+    return targetLocale === 'en' ? '/en' : '/';
+  }
   const foundRoute = Object.values(i18nRoutes).find(
     (paths) => paths.en === currentPath || paths.vi === currentPath,
   );
