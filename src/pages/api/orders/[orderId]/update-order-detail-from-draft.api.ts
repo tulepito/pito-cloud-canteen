@@ -18,7 +18,7 @@ import type {
   WithFlexSDKData,
 } from '@src/types';
 import { Listing } from '@src/utils/data';
-import { weekDayFormatFromDateTime } from '@src/utils/dates';
+import { VNTimezone, weekDayFormatFromDateTime } from '@src/utils/dates';
 import { buildFullName } from '@src/utils/emailTemplate/participantOrderPicking';
 import {
   EOrderStates,
@@ -246,7 +246,7 @@ const notifyParticipantChangedGroupOrderFoods = async (
             ('update' as const);
 
           const weekDay = `${weekDayFormatFromDateTime(
-            DateTime.fromMillis(Number(+date)),
+            DateTime.fromMillis(Number(+date)).setZone(VNTimezone),
           )}:`;
 
           if (type === 'add') {
