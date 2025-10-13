@@ -6,11 +6,12 @@ import cookies from '@services/cookie';
 import { denormalisedResponseEntities } from '@services/data';
 import adminChecker from '@services/permissionChecker/admin';
 import { getIntegrationSdk } from '@services/sdk';
-import type {
-  OrderListing,
-  RatingListing,
-  UserListing,
-  WithFlexSDKData,
+import type { RestaurantListing } from '@src/types';
+import {
+  type OrderListing,
+  type RatingListing,
+  type UserListing,
+  type WithFlexSDKData,
 } from '@src/types';
 import { EImageVariants, EListingType } from '@src/utils/enums';
 
@@ -306,6 +307,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       },
     );
 
+    console.log('Total ratings fetched for export:', ratingListingsData);
+
     const reviewerIds = ratingListingsData.reduce((acc: string[], rating) => {
       const metadata = rating.attributes?.metadata;
       const reviewerId = metadata?.reviewerId;
@@ -350,8 +353,24 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       },
     );
 
+    const restaurants = await retrieveAll<RestaurantListing[]>(
+      integrationSdk.listings.query,
+      {
+        meta_listingType: EListingType.restaurant,
+      },
+      { denormalizeResponseEntities: true },
+    );
+
+    const findRestaurantById = (id: string) =>
+      restaurants.find((restaurant) => restaurant.id?.uuid === id);
+
     const ratingsWithReviewersAndOrder = ratingListingsData.map((rating) => {
-      const metadata = rating.attributes?.metadata;
+      const metadata = {
+        ...rating.attributes?.metadata,
+        restaurantId: findRestaurantById(
+          rating.attributes?.metadata?.restaurantId ?? '',
+        )?.attributes?.title,
+      };
       const reviewerId = metadata?.reviewerId;
       const reviewerData = reviewersData.find(
         (user) => user.id?.uuid === reviewerId,
@@ -363,14 +382,15 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         ...rating,
         reviewer: reviewerData,
         order: orderData,
+        attributes: {
+          ...rating.attributes,
+          metadata: {
+            ...rating.attributes?.metadata,
+            restaurantId: metadata.restaurantId, // updated restaurantId
+          },
+        },
       };
     });
-
-    // Generate XLSX file
-    console.log(
-      'ratingsWithReviewersAndOrder count:',
-      ratingsWithReviewersAndOrder.length,
-    );
 
     // Temporary: return JSON to debug data structure
     if (req.query.debug === 'true') {

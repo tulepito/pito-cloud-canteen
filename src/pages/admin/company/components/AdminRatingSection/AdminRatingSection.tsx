@@ -208,8 +208,8 @@ const AdminRatingSection = () => {
 
                 return (
                   <Form onSubmit={handleSubmit} className="mb-2 w-full">
-                    <div className="flex flex-row items-center justify-between w-full">
-                      <div className="flex flex-row items-stretch gap-2">
+                    <div className="flex md:flex-row flex-col items-center justify-between w-full">
+                      <div className="flex md:flex-row flex-col items-stretch gap-2">
                         <FieldTextInput
                           placeholder={'Mã đơn hàng'}
                           id="orderCode"
