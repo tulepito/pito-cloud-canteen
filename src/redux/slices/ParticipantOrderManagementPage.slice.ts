@@ -18,6 +18,7 @@ const UPDATE_FIRST_TIME_VIEW_ORDER =
 
 type TParticipantOrderManagementState = {
   company: TUser | {};
+  booker: TUser | {};
   order: TListing | {};
   plans: TListing[];
   pickedFoods: TListing[];
@@ -36,6 +37,7 @@ type TParticipantOrderManagementState = {
 
 const initialState: TParticipantOrderManagementState = {
   company: {},
+  booker: {},
   order: {},
   plans: [],
   subOrders: [],
@@ -66,7 +68,7 @@ const loadData = createAsyncThunk(
       }),
     )[0];
     const orderListing = Listing(order);
-    const { plans = [], companyId } = orderListing.getMetadata();
+    const { plans = [], companyId, bookerId } = orderListing.getMetadata();
     const plan = denormalisedResponseEntities(
       await sdk.listings.show({
         id: plans[0],
@@ -140,6 +142,16 @@ const loadData = createAsyncThunk(
       ) || [{}])[0];
 
       returnValues = { ...returnValues, company };
+    }
+    if (bookerId) {
+      const booker = (denormalisedResponseEntities(
+        await sdk.users.show({
+          id: bookerId,
+          include: ['profileImage'],
+          'fields.image': [`variants.${EImageVariants.squareSmall}`],
+        }),
+      ) || [{}])[0];
+      returnValues = { ...returnValues, booker };
     }
 
     return returnValues;

@@ -49,6 +49,10 @@ const ParticipantOrderManagement = () => {
     (state) => state.ParticipantOrderManagementPage.company,
     shallowEqual,
   );
+  const booker = useAppSelector(
+    (state) => state.ParticipantOrderManagementPage.booker,
+    shallowEqual,
+  );
   const order = useAppSelector(
     (state) => state.ParticipantOrderManagementPage.order,
     shallowEqual,
@@ -79,6 +83,7 @@ const ParticipantOrderManagement = () => {
   );
 
   const companyUser = User(company as TUser);
+  const bookerUser = User(booker as TUser);
   const orderListing = Listing(order as TListing);
   const { orderName } = orderListing.getPublicData();
   const {
@@ -88,7 +93,8 @@ const ParticipantOrderManagement = () => {
     orderState,
     startDate,
   } = orderListing.getMetadata();
-  const { displayName: bookerName } = companyUser.getProfile();
+  const { displayName: bookerName = '' } = bookerUser.getProfile();
+
   const { companyName } = companyUser.getPublicData();
   const { groups = [] } = companyUser.getMetadata();
   const isOrderCanceled = orderState === EOrderStates.canceled;
