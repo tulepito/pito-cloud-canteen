@@ -6,7 +6,15 @@ import { fetchListing } from '@services/integrationHelper';
 import { defaultQueueConfig } from '@services/queues/config';
 import { redisConnection } from '@services/redis';
 import { getIntegrationSdk } from '@services/sdk';
+import { createSlackNotification } from '@services/slackNotification';
 import { denormalisedResponseEntities, Listing } from '@src/utils/data';
+import { ESlackNotificationType } from '@src/utils/enums';
+import {
+  buildActualUserPlan,
+  buildExpectedUserPlan,
+  buildUserActions,
+  verifyOrderPersistence,
+} from '@src/utils/order';
 
 const queueName = 'processOrder';
 
@@ -204,6 +212,7 @@ const worker = new Worker<ProcessOrderJobData>(
     );
 
     const sdk = getIntegrationSdk();
+    let originalOrderDetailBefore: Record<string, any> = {};
     const lock = new DistributedLock(
       redisConnection as Redis,
       `plan:${planId}`,
@@ -256,6 +265,7 @@ const worker = new Worker<ProcessOrderJobData>(
       );
 
       const originalOrderDetail = JSON.parse(JSON.stringify(orderDetail));
+      originalOrderDetailBefore = originalOrderDetail;
 
       // Merge logic
       if (orderDay && memberOrders) {
@@ -350,6 +360,31 @@ const worker = new Worker<ProcessOrderJobData>(
           timestamp: new Date().toISOString(),
         },
       );
+      try {
+        const orderLink = `${
+          process.env.NEXT_PUBLIC_APP_URL || ''
+        }/participant/orders/${orderId}`;
+        await createSlackNotification(
+          ESlackNotificationType.PARTICIPANT_ORDER_PERSISTENCE_FAILED,
+          {
+            orderLink,
+            orderCode: '',
+            orderName: '',
+            planId,
+            userId: currentUserId,
+            actions: [],
+            expected: {},
+            actual: {},
+            failedAt: 'job-exception',
+            service: 'processOrder.job',
+            jobId: job.id,
+            error: error instanceof Error ? error.message : String(error),
+            totalJobDurationMs: Date.now() - jobStartTime,
+          } as any,
+        );
+      } catch (notifyErr) {
+        console.error('[RACE_DEBUG] Slack notify failed:', notifyErr);
+      }
       throw error;
     } finally {
       try {
@@ -365,6 +400,74 @@ const worker = new Worker<ProcessOrderJobData>(
           console.log(
             `[RACE_DEBUG] Lock released successfully for planId: ${planId}, userId: ${currentUserId}`,
           );
+          // Verify persistence AFTER releasing lock
+          try {
+            const freshPlan = await fetchListing(planId as string);
+            const daysToCheck: string[] = orderDay
+              ? [String(orderDay)]
+              : (orderDays as string[]) || [];
+
+            // Build expected user plan
+            const expectedUserPlan = buildExpectedUserPlan(
+              daysToCheck,
+              planData || {},
+              currentUserId,
+            );
+
+            // Build user actions
+            const userActions = buildUserActions(
+              daysToCheck,
+              planData || {},
+              currentUserId,
+              originalOrderDetailBefore,
+            );
+
+            // Build actual user plan
+            const actualUserPlan = buildActualUserPlan(
+              freshPlan,
+              currentUserId,
+              daysToCheck,
+            );
+
+            // Verify persistence using utils
+            await verifyOrderPersistence({
+              orderId,
+              planId,
+              currentUserId,
+              jobId: job.id as string,
+              jobStartTime,
+              orderDay,
+              orderDays: daysToCheck,
+              expectedUserPlan,
+              actualUserPlan,
+              userActions,
+            });
+          } catch (verifyAfterReleaseError) {
+            console.error(
+              '[RACE_DEBUG] Verification after release failed:',
+              verifyAfterReleaseError,
+            );
+            try {
+              await createSlackNotification(
+                ESlackNotificationType.PARTICIPANT_ORDER_PERSISTENCE_FAILED,
+                {
+                  service: 'processOrder.job',
+                  failedAt: 'verify-after-release-failed',
+                  orderId,
+                  planId,
+                  userId: currentUserId,
+                  error:
+                    verifyAfterReleaseError instanceof Error
+                      ? verifyAfterReleaseError.message
+                      : String(verifyAfterReleaseError),
+                  jobId: job.id,
+                  totalJobDurationMs: Date.now() - jobStartTime,
+                } as any,
+              );
+            } catch (_notifyErr) {
+              // ignore
+            }
+          }
         }
       } catch (releaseError) {
         console.error(
@@ -453,6 +556,20 @@ export const addToProcessOrderQueue = async (data: AddToQueueData) => {
         data.orderDays?.length || 1
       }, duration: ${duration}ms`,
     );
+
+    if (await job.isFailed()) {
+      await createSlackNotification(
+        ESlackNotificationType.PARTICIPANT_ORDER_PERSISTENCE_FAILED,
+        {
+          service: 'processOrder.queue',
+          failedAt: 'queue-overloaded',
+          orderId: data.orderId,
+          planId: data.planId,
+          userId: data.currentUserId,
+          error: `Queue job failed with reason: ${job.failedReason}`,
+        } as any,
+      );
+    }
 
     return job;
   } catch (error) {

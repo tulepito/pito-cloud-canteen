@@ -22,6 +22,7 @@ declare namespace NodeJS {
     SLACK_WEBHOOK_URL: string;
     SLACK_RATING_WEBHOOK_URL: string;
     SLACK_WEBHOOK_ENABLED: 'true' | 'false';
+    SLACK_WEBHOOK_FOR_MISSING_ORDERS_URL: string;
 
     NEXT_PUBLIC_NEXT_APP_FIREBASE_PROJECT_ID: string;
     NEXT_APP_FIREBASE_API_KEY: string;

@@ -4,6 +4,7 @@ import logger from '@helpers/logger';
 import { Listing, User } from '@src/utils/data';
 import { formatTimestamp } from '@src/utils/dates';
 import { ESlackNotificationType } from '@src/utils/enums';
+import type { MissingOrderSlackNotificationBody } from '@src/utils/order';
 import { editFoodTemplate } from '@src/utils/slackTemplates/editFood';
 import { newFoodTemplate } from '@src/utils/slackTemplates/newFood';
 
@@ -660,6 +661,195 @@ export const createSlackNotification = async (
           });
         }
         break;
+      case ESlackNotificationType.PARTICIPANT_ORDER_PERSISTENCE_FAILED: {
+        const payload: MissingOrderSlackNotificationBody =
+          notificationParams as MissingOrderSlackNotificationBody;
+        const {
+          orderCode,
+          orderName,
+          planId,
+          userId,
+          userName,
+          actions = [],
+          expected,
+          actual,
+          failedAt,
+          service,
+          error,
+          threadTs,
+          metrics,
+          diffTable = [],
+        } = payload || {};
+
+        const truncate = (s: string, n = 1400) =>
+          s && s.length > n ? `${s.slice(0, n)}...` : s;
+
+        const actionsList = Array.isArray(actions)
+          ? actions
+              .map((a: any, i: number) => {
+                const actionName =
+                  a.type === 'changeFood'
+                    ? `:pencil: Đổi món`
+                    : a.type === 'addFood'
+                    ? `:heavy_plus_sign: Thêm món`
+                    : a.type === 'removeFood'
+                    ? `:x: Xóa món`
+                    : a.type === 'changeRequirement'
+                    ? `:memo: Yêu cầu`
+                    : `:gear: ${a.type}`;
+                const foodLabel =
+                  a.fromFoodName || a.fromFoodId
+                    ? `(${a.fromFoodName || a.fromFoodId} → ${
+                        a.toFoodName || a.foodName || a.foodId || ''
+                      })`
+                    : a.foodName || a.foodId || '';
+                const req = a.requirement ? ` (req: ${a.requirement})` : '';
+
+                return `${i + 1}. [${a.time}] ${actionName} - ${
+                  formatTimestamp(a.date) || ''
+                } ${foodLabel}${req}`;
+              })
+              .join('\n')
+          : 'N/A';
+
+        const expectedStr = expected
+          ? truncate(JSON.stringify(expected, null, 2))
+          : '';
+        const actualStr = actual
+          ? truncate(JSON.stringify(actual, null, 2))
+          : '';
+
+        await axios.post(
+          process.env.SLACK_WEBHOOK_FOR_MISSING_ORDERS_URL,
+          {
+            ...(threadTs ? { thread_ts: threadTs, reply_broadcast: true } : {}),
+            blocks: [
+              {
+                type: 'header',
+                text: {
+                  type: 'plain_text',
+                  text: '[WARNING :warning: :warning: :warning:] Cảnh báo mất món ở Participant',
+                },
+              },
+              { type: 'divider' },
+              {
+                type: 'section',
+                text: {
+                  type: 'mrkdwn',
+                  text: `*Đơn hàng*: <#${orderCode} - ${orderName}>`,
+                },
+                fields: [
+                  { type: 'mrkdwn', text: `*Plan ID*\n${planId || 'N/A'}` },
+                  { type: 'mrkdwn', text: `*User*\n${userName} - #${userId}` },
+                  { type: 'mrkdwn', text: `*Bước lỗi*\n${failedAt || 'N/A'}` },
+                  { type: 'mrkdwn', text: `*Service*\n${service || 'N/A'}` },
+                  ...(metrics
+                    ? [
+                        {
+                          type: 'mrkdwn',
+                          text: `*Queue*\nwaiting=${metrics.waiting} active=${metrics.active}`,
+                        },
+                      ]
+                    : []),
+                ],
+              },
+              { type: 'divider' },
+              ...(actions && actions.length
+                ? [
+                    {
+                      type: 'section',
+                      text: {
+                        type: 'mrkdwn',
+                        text: `*Hành vi người dùng*\n${actionsList}`,
+                      },
+                    },
+                    { type: 'divider' },
+                  ]
+                : []),
+              ...(diffTable && diffTable.length
+                ? [
+                    { type: 'divider' },
+                    {
+                      type: 'section',
+                      text: {
+                        type: 'mrkdwn',
+                        text: '*Đối chiếu Expected vs Actual (theo ngày)*',
+                      },
+                    },
+                    ...diffTable.slice(0, 10).map((row: any) => ({
+                      type: 'section',
+                      fields: [
+                        { type: 'mrkdwn', text: `*Ngày*\n${row.date}` },
+                        {
+                          type: 'mrkdwn',
+                          text: `*Expected*\n${
+                            row.expected.foodName || row.expected.foodId || '-'
+                          } | ${row.expected.status || '-'}$${
+                            row.expected.requirement
+                              ? `\n(req: ${row.expected.requirement})`
+                              : ''
+                          }`,
+                        },
+                        {
+                          type: 'mrkdwn',
+                          text: `*Actual*\n${
+                            row.actual.foodName || row.actual.foodId || '-'
+                          } | ${row.actual.status || '-'}$${
+                            row.actual.requirement
+                              ? `\n(req: ${row.actual.requirement})`
+                              : ''
+                          }`,
+                        },
+                      ],
+                    })),
+                  ]
+                : expectedStr || actualStr
+                ? [
+                    { type: 'divider' },
+                    ...(expectedStr
+                      ? [
+                          {
+                            type: 'section',
+                            text: {
+                              type: 'mrkdwn',
+                              text: `*Expected (client gửi)*\n\n\`${expectedStr}\``,
+                            },
+                          },
+                        ]
+                      : []),
+                    ...(actualStr
+                      ? [
+                          {
+                            type: 'section',
+                            text: {
+                              type: 'mrkdwn',
+                              text: `*Actual (DB ghi nhận)*\n\n\`${actualStr}\``,
+                            },
+                          },
+                        ]
+                      : []),
+                  ]
+                : []),
+              ...(error
+                ? [
+                    { type: 'divider' },
+                    {
+                      type: 'section',
+                      text: {
+                        type: 'mrkdwn',
+                        text: `*Error*\n\`${String(error)}\``,
+                      },
+                    },
+                  ]
+                : []),
+            ],
+          },
+          {
+            headers: { 'Content-Type': 'application/json' },
+          },
+        );
+        break;
+      }
       default:
         break;
     }

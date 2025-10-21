@@ -6,7 +6,6 @@ import { HttpMethod } from '@apis/configs';
 import cookies from '@services/cookie';
 import { fetchListing, fetchUser } from '@services/integrationHelper';
 import { addToProcessOrderQueue } from '@services/jobs/processOrder.job';
-import { pushOrderLog } from '@services/jobs/pushLogOrder.job';
 import { getIntegrationSdk, getSdk, handleError } from '@services/sdk';
 import { EListingType } from '@src/utils/enums';
 import type { TListing } from '@src/utils/types';
@@ -134,20 +133,31 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       const { planId, memberOrders, orderDay, orderDays, planData } = req.body;
 
       try {
+        console.info('[TRACK] step=api_receive start', {
+          orderId,
+          planId,
+          hasMemberOrders: Boolean(memberOrders),
+          hasOrderDays: Boolean(orderDays?.length),
+        });
         const currentUser = denormalisedResponseEntities(
           await sdk.currentUser.show(),
         )[0];
         const currentUserId = CurrentUser(currentUser).getId();
 
-        await pushOrderLog({
-          orderId: orderId as string,
-          planId,
-          authorId: currentUserId,
-          orderDays,
-          title: `Order logs ${orderId} user ${currentUserId}`,
-          entry: planData,
-        });
+        // await pushOrderLog({
+        //   orderId: orderId as string,
+        //   planId,
+        //   authorId: currentUserId,
+        //   orderDays,
+        //   title: `Order logs ${orderId} user ${currentUserId}`,
+        //   entry: planData,
+        // });
 
+        console.info('[TRACK] step=enqueue_job start', {
+          orderId,
+          planId,
+          currentUserId,
+        });
         const job = await addToProcessOrderQueue({
           orderId,
           planId,
@@ -157,6 +167,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           planData,
           currentUserId,
         });
+        console.info('[TRACK] step=enqueue_job success', { jobId: job?.id });
+        console.info('[TRACK] step=api_receive success');
 
         return res.json({
           message: 'Job queued',

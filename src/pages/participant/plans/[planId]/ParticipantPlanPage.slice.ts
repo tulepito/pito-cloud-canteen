@@ -188,7 +188,10 @@ const reloadData = createAsyncThunk(
 
 const updateOrder = createAsyncThunk(
   UPDATE_ORDER,
-  async (data: { orderId: string; planId: string }, { getState, dispatch }) => {
+  async (
+    data: { orderId: string; planId: string },
+    { getState, dispatch },
+  ): Promise<boolean> => {
     const { orderId, planId } = data;
     const { currentUser } = getState().user;
     const currentUserId = currentUser?.id?.uuid;
@@ -230,7 +233,7 @@ const updateOrder = createAsyncThunk(
     };
 
     const {
-      data: { plan: newPlan },
+      data: { plan: newPlan, jobId },
     } = await updateParticipantOrderApi(orderId, updateValues);
     dispatch(OrderListActions.updatePlanDetail(newPlan));
     orderDays.forEach((timestamp: string) => {
@@ -249,7 +252,7 @@ const updateOrder = createAsyncThunk(
       });
     });
 
-    return true;
+    return !!jobId;
   },
   {
     serializeError: storableError,

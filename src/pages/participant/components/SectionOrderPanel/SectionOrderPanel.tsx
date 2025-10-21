@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { toast } from 'react-toastify';
 import classNames from 'classnames';
 import { DateTime } from 'luxon';
 
@@ -78,10 +79,14 @@ const SectionOrderPanel: React.FC<TSectionOrderPanelProps> = ({
     Tracker.track('participant:order:place', {
       orderId,
     });
-    await dispatch(ParticipantPlanThunks.updateOrder({ orderId, planId }));
-    setIsSubmitSuccess(true);
+    const res = await dispatch(
+      ParticipantPlanThunks.updateOrder({ orderId, planId }),
+    );
+    if (res) setIsSubmitSuccess(true);
+    else {
+      toast.error('Đã có lỗi xảy ra trong chọn món. Vui lòng thử lại sau');
+    }
   };
-
   const handleConfirmDeleteAll = () => {
     dispatch(shoppingCartThunks.removeAllFromPlanCart({ planId }));
     setIsOpenConfirmDeleteAll(false);
