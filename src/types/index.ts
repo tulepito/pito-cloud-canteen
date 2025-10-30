@@ -1,4 +1,4 @@
-import type { ECompanyPermission } from '@src/utils/enums';
+import type { ECompanyPermission, EUserRole } from '@src/utils/enums';
 
 import type { Assert, DeepPartial, Image, ListingBuilder } from './utils';
 
@@ -382,6 +382,7 @@ export interface RatingListingMetadata {
   reviewRole: 'participant' | 'booker';
   reviewerId: string;
   timestamp: number;
+  replies?: TReviewReply[];
 }
 
 export type RatingListing = ListingBuilder<
@@ -391,6 +392,7 @@ export type RatingListing = ListingBuilder<
   {},
   {
     images?: Image[];
+    author?: UserListing;
   }
 >;
 
@@ -412,3 +414,17 @@ export type ParticipantSubOrderDocument = DeepPartial<{
   participantId: string;
   id: string;
 }>;
+
+export type TReviewStatus = 'pending' | 'approved' | 'rejected';
+
+export type TReviewReply = {
+  id?: string;
+  authorId: string;
+  authorName: string;
+  replyRole: EUserRole;
+  replyContent: string;
+  repliedAt: number;
+  status?: TReviewStatus;
+  approvedAt?: number;
+  approvedBy?: string;
+};

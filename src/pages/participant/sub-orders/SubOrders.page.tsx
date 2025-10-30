@@ -6,11 +6,13 @@ import { useRouter } from 'next/router';
 
 import BottomNavigationBar from '@components/BottomNavigationBar/BottomNavigationBar';
 import LoadingModal from '@components/LoadingModal/LoadingModal';
+import RatingReview from '@components/RatingReview/RatingReview';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import Tabs from '@components/Tabs/Tabs';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { useBottomScroll } from '@hooks/useBottomScroll';
+import { fetchParticipantReviews } from '@redux/slices/Reviews.participant.slice';
 import { currentUserSelector } from '@redux/slices/user.slice';
 import { CurrentUser } from '@src/utils/data';
 import { ESubOrderTxStatus } from '@src/utils/enums';
@@ -25,6 +27,7 @@ import css from './SubOrders.module.scss';
 
 const DELIVERING_TAB = ESubOrderTxStatus.DELIVERING;
 const DELIVERED_TAB = ESubOrderTxStatus.DELIVERED;
+const RATING_HISTORY_TAB = 'RATING_HISTORY';
 
 const SubOrders = () => {
   const dispatch = useAppDispatch();
@@ -32,6 +35,11 @@ const SubOrders = () => {
   const intl = useIntl();
   const { planId: planIdFromQuery, timestamp: timestampFromQuery } =
     router.query;
+
+  const FIRST_PAGE = 1;
+  const [page, setPage] = useState(FIRST_PAGE);
+  const { reviews, pagination, fetchReviewsInProgress, fetchReviewsError } =
+    useAppSelector((state) => state.participantReviews);
 
   const [activeTab, setActiveTab] = useState(DELIVERING_TAB);
   const [selectedSubOrder, setSelectedSubOrder] = useState<any>(null);
@@ -58,6 +66,15 @@ const SubOrders = () => {
   const participantPostRatingInProgress = useAppSelector(
     (state) => state.ParticipantOrderList.participantPostRatingInProgress,
   );
+
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+    dispatch(fetchParticipantReviews({ page: newPage }));
+  };
+
+  useEffect(() => {
+    dispatch(fetchParticipantReviews({}));
+  }, [dispatch]);
 
   useEffect(() => {
     if (planIdFromQuery && timestampFromQuery) {
@@ -148,6 +165,34 @@ const SubOrders = () => {
         setSelectedEvent,
         openRatingSubOrderModal: ratingSubOrderModalControl.setTrue,
       },
+    },
+    {
+      key: RATING_HISTORY_TAB,
+      label: (
+        <div className={css.tabLabel}>
+          <span>
+            {intl.formatMessage({
+              id: 'FilterPartnerOrderForm.subOrderStatus.ratingHistory',
+            })}
+          </span>
+          <div data-number className={css.totalItems}>
+            {deliveredSubOrders.length}
+          </div>
+        </div>
+      ),
+      childrenFn: () => (
+        <div>
+          <RatingReview
+            reviews={reviews}
+            fetchReviewsInProgress={fetchReviewsInProgress}
+            fetchReviewsError={fetchReviewsError}
+            pagination={pagination}
+            handlePageChange={handlePageChange}
+            page={page}
+            isDisabledReply={true}
+          />
+        </div>
+      ),
     },
   ];
 

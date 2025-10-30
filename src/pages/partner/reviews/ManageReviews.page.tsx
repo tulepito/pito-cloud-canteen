@@ -1,16 +1,18 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 import classNames from 'classnames';
-import { uniq } from 'lodash';
-import { useRouter } from 'next/router';
 
+import RatingReview from '@components/RatingReview/RatingReview';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { useViewport } from '@hooks/useViewport';
-import { partnerPaths } from '@src/paths';
+import {
+  fetchPartnerReviews,
+  submitReply,
+} from '@redux/slices/Reviews.partner.slice';
+import { currentUserSelector } from '@redux/slices/user.slice';
+import { CurrentUser } from '@src/utils/data';
+import type { EUserRole } from '@src/utils/enums';
 
-import PartnerReviewDetailTable from './components/PartnerReviewDetailTable/PartnerReviewDetailTable';
-import type { TPartnerReviewsFilterFormValues } from './components/PartnerReviewsFilterForm/PartnerReviewsFilterForm';
-import PartnerReviewsFilterForm from './components/PartnerReviewsFilterForm/PartnerReviewsFilterForm';
 import SummarizeReview from './components/SummarizeReview/SummarizeReview';
 import { ManageReviewsThunks } from './ManageReviews.slice';
 
@@ -19,11 +21,25 @@ import css from './ManageReviews.module.scss';
 const ManageReviewsPage = () => {
   const dispatch = useAppDispatch();
   const intl = useIntl();
-  const router = useRouter();
   const { isMobileLayout } = useViewport();
-  const {
-    query: { rating: queryRating },
-  } = router;
+
+  const FIRST_PAGE = 1;
+  const [page, setPage] = useState(FIRST_PAGE);
+  const { reviews, pagination, fetchReviewsInProgress, fetchReviewsError } =
+    useAppSelector((state) => state.partnerReviews);
+  const currentUser = useAppSelector(currentUserSelector);
+
+  const currentUserGetter = CurrentUser(currentUser);
+  const { displayName } = currentUserGetter.getProfile();
+
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+    dispatch(fetchPartnerReviews({ page: newPage }));
+  };
+
+  useEffect(() => {
+    dispatch(fetchPartnerReviews({}));
+  }, [dispatch]);
 
   const averageFoodRating = useAppSelector(
     (state) => state.ManageReviews.averageFoodRating,
@@ -44,63 +60,48 @@ const ManageReviewsPage = () => {
     (state) => state.ManageReviews.ratingDetail,
   );
 
-  const convertRatingToNumber = (rating: string) => {
-    const result: number[] = [];
-    rating.split(',').forEach((rate) => {
-      result.push(Number(rate));
-    });
-
-    return result;
-  };
-
-  const ratings = useMemo(() => {
-    const result = [];
-
-    if (queryRating) {
-      if (Array.isArray(queryRating)) {
-        queryRating.forEach((rating) => {
-          result.push(...convertRatingToNumber(rating));
-        });
-      } else {
-        result.push(...convertRatingToNumber(queryRating));
-      }
-    }
-
-    return uniq(result);
-  }, [queryRating]);
-
   useEffect(() => {
     if (isFirstLoad) dispatch(ManageReviewsThunks.loadReviewSummarizeData());
   }, [isFirstLoad, dispatch]);
 
-  const handleFilterChange = ({
-    ratings: ratingFormValue,
-  }: TPartnerReviewsFilterFormValues) => {
-    router.replace({
-      pathname: partnerPaths.ManageReviews,
-      query: {
-        ...(ratingFormValue.length
-          ? { rating: ratingFormValue.join(',') }
-          : {}),
-      },
-    });
-  };
+  // const handleFilterChange = ({
+  //   ratings: ratingFormValue,
+  // }: TPartnerReviewsFilterFormValues) => {
+  //   router.replace({
+  //     pathname: partnerPaths.ManageReviews,
+  //     query: {
+  //       ...(ratingFormValue.length
+  //         ? { rating: ratingFormValue.join(',') }
+  //         : {}),
+  //     },
+  //   });
+  // };
 
-  const handleClearFilter = () => {
-    router.replace({
-      pathname: partnerPaths.ManageReviews,
-      query: {},
-    });
+  // const handleClearFilter = () => {
+  //   router.replace({
+  //     pathname: partnerPaths.ManageReviews,
+  //     query: {},
+  //   });
+  // };
+  const handleReply = async ({
+    reviewId,
+    replyRole,
+    replyContent,
+  }: {
+    reviewId: string;
+    replyRole: EUserRole;
+    replyContent: string;
+  }) => {
+    await dispatch(
+      submitReply({
+        reviewId,
+        replyRole,
+        replyContent,
+        authorId: currentUser?.id?.uuid || '',
+        authorName: displayName || '',
+      }),
+    );
   };
-
-  const filterForm = (
-    <PartnerReviewsFilterForm
-      onSubmit={handleFilterChange}
-      onClearFilter={handleClearFilter}
-      ratingDetail={ratingDetail}
-      initialValues={{ ratings: uniq(ratings) }}
-    />
-  );
 
   return (
     <div className={css.root}>
@@ -122,7 +123,18 @@ const ManageReviewsPage = () => {
           totalNumberOfReivews={totalNumberOfReivews}
         />
       </div>
-      <PartnerReviewDetailTable ratings={ratings} filterForm={filterForm} />
+      {/* <PartnerReviewDetailTable ratings={ratings} filterForm={filterForm} />
+       */}
+      <RatingReview
+        reviews={reviews}
+        fetchReviewsInProgress={fetchReviewsInProgress}
+        fetchReviewsError={fetchReviewsError}
+        pagination={pagination}
+        handleReply={handleReply}
+        handlePageChange={handlePageChange}
+        page={page}
+        ratingDetail={ratingDetail}
+      />
     </div>
   );
 };

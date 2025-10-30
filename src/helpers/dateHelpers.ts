@@ -40,3 +40,61 @@ export const convertDateToVNTimezone = (
 
   return dateInVNTimezone.toISO().split('.')[0];
 };
+
+/**
+ * Format time ago
+ * @param timestamp - The timestamp to format
+ * @param locale - The locale to format the time ago
+ * @returns
+ */
+export const formatTimeAgo = (timestamp: number, locale: string = 'vi') => {
+  const now = Date.now();
+  const then = new Date(timestamp).getTime();
+  const diffMs = Math.max(0, now - then);
+
+  const minuteMs = 60 * 1000;
+  const hourMs = 60 * minuteMs;
+  const dayMs = 24 * hourMs;
+  const monthMs = 30 * dayMs;
+
+  const normalized = (locale || 'vi').toLowerCase();
+  const isVi = normalized.startsWith('vi');
+
+  if (diffMs < minuteMs) {
+    return isVi ? 'Vừa xong' : 'Just now';
+  }
+
+  if (diffMs < hourMs) {
+    const minutes = Math.floor(diffMs / minuteMs);
+    if (isVi) {
+      return `${minutes} phút trước`;
+    }
+
+    return `${minutes} minutes ago`;
+  }
+
+  if (diffMs < dayMs) {
+    const hours = Math.floor(diffMs / hourMs);
+    if (isVi) {
+      return `${hours} giờ trước`;
+    }
+
+    return `${hours} hours ago`;
+  }
+
+  if (diffMs < monthMs) {
+    const days = Math.floor(diffMs / dayMs);
+    if (isVi) {
+      return `${days} ngày trước`;
+    }
+
+    return `${days} days ago`;
+  }
+
+  const months = Math.floor(diffMs / monthMs);
+  if (isVi) {
+    return `${months} tháng trước`;
+  }
+
+  return `${months} months ago`;
+};
