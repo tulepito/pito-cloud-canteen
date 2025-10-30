@@ -846,6 +846,8 @@ const fetchOrder = createAsyncThunk(
 
     dispatch(SystemAttributesThunks.fetchVATPercentageByOrderId(orderId));
 
+    console.log('fetchOrder@fetchOrder: ', response);
+
     return {
       order: response,
       selectedBooker,

@@ -62,6 +62,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             detailTextRating,
             foodName,
             reviewRole,
+            replies,
           } = reviewListing.getMetadata();
 
           userIds.push(reviewerId);
@@ -81,6 +82,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             detailTextRating,
             foodName,
             reviewRole,
+            replies,
           };
         });
 
@@ -127,6 +129,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             reviewerId,
             detailTextRating,
             foodName,
+            replies,
             reviewRole,
           } = rawData;
 
@@ -167,6 +170,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             name,
             foodName: foodNameValue,
             user,
+            replies,
           };
         });
 

@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 
 import IconHome from '@components/Icons/IconHome/IconHome';
 import IconOrderManagement from '@components/Icons/IconOrderManagement/IconOrderManagement';
+import IconOutlineStar from '@components/Icons/IconOutlineStar/IconOutlineStar';
 import IconSetting from '@components/Icons/IconSetting/IconSetting';
 import IconTool from '@components/Icons/IconTool/IconTool';
 import IconUserManagement from '@components/Icons/IconUserManagement/IconUserManagement';
@@ -50,6 +51,13 @@ const LIST_SIDEBAR_MENU: TSidebarMenu[] = [
         highlightRefLinks: [adminRoutes.OrderDetails.path],
       },
     ],
+  },
+  {
+    id: 'reviews',
+    Icon: IconOutlineStar,
+    nameLink: adminRoutes.ManageReviews.path,
+    label: 'AdminSidebar.reviewsLabel',
+    isFirstLevel: true,
   },
   {
     id: 'user',

@@ -175,6 +175,7 @@ export const adminPaths = {
   UpdateDraftOrder: '/admin/order/create/[orderId]',
   EditOrder: '/admin/order/edit/[orderId]',
   OrderDetail: '/admin/order/[orderId]',
+  ManageReviews: '/admin/reviews',
 };
 
 // Should be an object => path should has its label
@@ -322,6 +323,10 @@ export const adminRoutes = {
   ClientPayment: {
     path: '/admin/payment-client',
     label: 'Thanh toán khách hàng',
+  },
+  ManageReviews: {
+    path: '/admin/reviews',
+    label: 'Quản lý đánh giá',
   },
 } as const;
 
