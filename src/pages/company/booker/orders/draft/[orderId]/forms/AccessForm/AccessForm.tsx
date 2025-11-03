@@ -4,7 +4,7 @@ import { useField, useForm } from 'react-final-form-hooks';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import Button from '@components/Button/Button';
-import { IconRadioButton } from '@components/FormFields/FieldRadioButton/FieldRadioButton';
+import { IconCheckbox } from '@components/FormFields/FieldCheckbox/FieldCheckbox';
 import NamedLink from '@components/NamedLink/NamedLink';
 import { companyPaths } from '@src/paths';
 
@@ -51,6 +51,10 @@ const AccessForm: React.FC<TAccessFormProps> = ({
   const submitInprogress = loading || submitting;
   const disabledSubmit = pristine || submitting || hasValidationErrors;
 
+  const isAllMembersSelected = (selectedGroups.input.value || []).includes(
+    'allMembers',
+  );
+
   const finalizeGroupList = useMemo(() => {
     return [
       {
@@ -61,13 +65,27 @@ const AccessForm: React.FC<TAccessFormProps> = ({
     ];
   }, [groupList]);
 
-  const handleChangeRadioButtonGroup: (data: {
+  const handleChangeCheckboxButtonGroup: (data: {
     id: string;
     name: string;
   }) => ChangeEventHandler<HTMLInputElement> = (data) => (e) => {
-    if (e.target.checked) {
-      // Gán mảng với đúng một item
-      form.change('selectedGroups', [data.id]);
+    const current = selectedGroups.input.value || [];
+    const isChecking = e.target.checked;
+
+    if (data.id === 'allMembers') {
+      form.change('selectedGroups', isChecking ? ['allMembers'] : []);
+
+      return;
+    }
+
+    if (isChecking) {
+      const withoutAll = current.filter((id: string) => id !== 'allMembers');
+      form.change('selectedGroups', [...withoutAll, data.id]);
+    } else {
+      form.change(
+        'selectedGroups',
+        current.filter((id: string) => id !== data.id),
+      );
     }
   };
 
@@ -93,16 +111,17 @@ const AccessForm: React.FC<TAccessFormProps> = ({
                 className={css.input}
                 id={`selectedGroups-${data.id}`}
                 {...selectedGroups.input}
-                onChange={handleChangeRadioButtonGroup(data)}
+                onChange={handleChangeCheckboxButtonGroup(data)}
                 checked={(selectedGroups.input.value || []).includes(data.id)}
-                type="radio"
+                type="checkbox"
                 value={data.id}
+                disabled={data.id !== 'allMembers' && isAllMembersSelected}
               />
               <label
                 className={css.label}
                 htmlFor={`selectedGroups-${data.id}`}>
                 <span className={css.checkboxWrapper}>
-                  <IconRadioButton checkedClassName={css.checked} />
+                  <IconCheckbox checkedClassName={css.checked} />
                 </span>
                 <span className={css.labelText}>{data.name}</span>
               </label>
