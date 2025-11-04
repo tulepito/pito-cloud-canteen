@@ -19,11 +19,14 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     switch (apiMethod) {
       case HttpMethod.GET: {
         try {
-          const { page = 1, perPage = 10 } = JSON.parse(
-            req.query.JSONParams as string,
-          ) as {
+          const {
+            page = 1,
+            perPage = 10,
+            ratings = [1, 2, 3, 4, 5],
+          } = JSON.parse(req.query.JSONParams as string) as {
             page: number;
             perPage: number;
+            ratings: number[] | undefined;
           };
 
           const currentUserRes = await sdk.currentUser.show();
@@ -33,12 +36,13 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           if (!restaurantId) {
             return res.status(401).json({ message: 'Unauthorized' });
           }
-          console.log('restaurantId', restaurantId);
+          const ratingString = ratings?.join(',');
           const response = await sdk.listings.query({
             meta_listingType: EListingType.rating,
             meta_restaurantId: restaurantId,
             page: Number(page),
             perPage: Number(perPage),
+            meta_generalRatingValue: `has_any:${ratingString}`,
             include: ['images', 'author'],
           });
 

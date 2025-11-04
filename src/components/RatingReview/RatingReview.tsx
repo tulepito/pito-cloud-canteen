@@ -1,17 +1,15 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
-import { uniq } from 'lodash';
-import { MessageCircle } from 'lucide-react';
-import { useRouter } from 'next/router';
+import { MessageCircle, Search } from 'lucide-react';
 
 import Button from '@components/Button/Button';
 import IconFilter from '@components/Icons/IconFilter/IconFilter';
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import Pagination from '@components/Pagination/Pagination';
+import RatingFilter from '@components/RatingReview/RatingFilter';
 import ReviewCard from '@components/RatingReview/ReviewCard';
-import ReviewFilters from '@components/RatingReview/ReviewFilters';
 import Tooltip from '@components/Tooltip/Tooltip';
-import PartnerReviewsFilterForm from '@pages/partner/reviews/components/PartnerReviewsFilterForm/PartnerReviewsFilterForm';
+import useDebounce from '@hooks/useDebounce';
 import type { RatingListing } from '@src/types';
 import type { EUserRole } from '@src/utils/enums';
 import type { TPagination } from '@src/utils/types';
@@ -32,12 +30,12 @@ interface RatingReviewProps {
   }) => void;
   pagination: TPagination;
   page: number;
-  handleSearch?: (search: string) => void;
-  handleUserSearch?: (userSearch: string) => void;
+  handleSearch?: (orderCode: string) => void;
   handlePageChange?: (page: number) => void;
   isShowFilters?: boolean;
   isDisabledReply?: boolean;
-  ratingDetail?: any;
+  handleFilterRating?: (ratings: number[]) => void;
+  selectedRatings?: number[];
 }
 
 const RatingReview = ({
@@ -46,70 +44,89 @@ const RatingReview = ({
   fetchReviewsError,
   pagination,
   page,
-  ratingDetail,
   handleSearch,
-  handleUserSearch,
+  handleFilterRating,
   handlePageChange,
   handleReply,
   submitReplyInProgress = false,
   isShowFilters = false,
   isDisabledReply = false,
+  selectedRatings = [],
 }: RatingReviewProps) => {
-  const {
-    query: { rating: queryRating },
-  } = useRouter();
+  const [orderCode, setOrderCode] = useState('');
+  const debouncedOrderCode = useDebounce(orderCode, 400);
+  const isFirstMount = useRef(true);
 
-  const convertRatingToNumber = useCallback((rating: string) => {
-    const result: number[] = [];
-    rating.split(',').forEach((rate) => {
-      result.push(Number(rate));
-    });
+  useEffect(() => {
+    // Skip first mount to avoid duplicate fetch (parent component already fetches on mount)
+    if (isFirstMount.current) {
+      isFirstMount.current = false;
 
-    return result;
-  }, []);
-  const ratings = useMemo(() => {
-    const result = [];
-
-    if (queryRating) {
-      if (Array.isArray(queryRating)) {
-        queryRating.forEach((rating) => {
-          result.push(...convertRatingToNumber(rating));
-        });
-      } else {
-        result.push(...convertRatingToNumber(queryRating));
-      }
+      return;
     }
+    const trimmed = debouncedOrderCode.trim();
+    handleSearch?.(trimmed || '');
+  }, [debouncedOrderCode, handleSearch]);
 
-    return uniq(result);
-  }, [queryRating]);
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setOrderCode(e.target.value);
+  };
+
+  const ratingDetail = [
+    {
+      rating: 1,
+    },
+    {
+      rating: 2,
+    },
+    {
+      rating: 3,
+    },
+    {
+      rating: 4,
+    },
+    {
+      rating: 5,
+    },
+  ];
 
   return (
     <>
       {/* Filters */}
       {isShowFilters && (
-        <>
-          <ReviewFilters
-            onSearch={handleSearch}
-            onUserSearch={handleUserSearch}
-          />
+        <div className="flex gap-4 justify-between items-center w-full">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <input
+              type="text"
+              value={orderCode}
+              onChange={handleSearchChange}
+              placeholder="Nhập mã đơn hàng..."
+              className="w-full pl-10 pr-4 py-2 flex-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-black"
+            />
+          </div>
           <Tooltip
             tooltipContent={
-              <PartnerReviewsFilterForm
-                onSubmit={() => { }}
-                onClearFilter={() => { }}
-                pristine={false}
+              <RatingFilter
                 ratingDetail={ratingDetail}
-                initialValues={{ ratings: uniq(ratings) }}
+                selected={selectedRatings}
+                onSubmit={handleFilterRating}
               />
             }
+            overlayInnerStyle={{
+              padding: 0,
+              backgroundColor: 'white',
+              marginRight: '20px',
+            }}
+            showArrow={false}
             trigger="click"
             placement="bottom">
             <Button type="button" variant="secondary">
-              <IconFilter />
+              <IconFilter className="mx-1" />
               <FormattedMessage id="IntegrationFilterModal.filterMessage" />
             </Button>
           </Tooltip>
-        </>
+        </div>
       )}
 
       {/* Loading State */}
@@ -130,7 +147,7 @@ const RatingReview = ({
 
       {/* Reviews List */}
       {!fetchReviewsInProgress && (
-        <div className="space-y-6 w-full">
+        <div className="space-y-6 w-full mt-2">
           {reviews.length === 0 ? (
             <div className="text-center py-12">
               <MessageCircle className="w-12 h-12 text-gray-400 mx-auto mb-4" />

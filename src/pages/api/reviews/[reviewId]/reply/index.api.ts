@@ -43,6 +43,22 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
           const authorUser = await sdk.currentUser.show();
           const [author] = denormalisedResponseEntities(authorUser);
+
+          // Check if author is partner -> if yes, then check if partner had responded to this review before
+          if (replyRole === EUserRole.partner) {
+            const metadata = review.attributes?.metadata;
+            const replies = metadata?.replies || [];
+            const partnerReply = replies.find(
+              (reply) =>
+                reply?.replyRole === EUserRole.partner &&
+                reply?.authorId === author.id?.uuid,
+            );
+            if (partnerReply) {
+              return res.status(400).json({
+                error: 'Partner already have replied to this review',
+              });
+            }
+          }
           let replyObject: TReviewReply;
           if (replyRole === EUserRole.partner) {
             replyObject = {

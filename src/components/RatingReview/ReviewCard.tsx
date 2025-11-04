@@ -77,6 +77,12 @@ const ReviewCard = ({
   const replies =
     reviewInformation.replies?.filter((reply) => reply !== undefined) || [];
 
+  const isPartnerAlreadyReplied = replies.some(
+    (reply) =>
+      reply.replyRole === EUserRole.partner &&
+      reply.authorId === currentUser?.id?.uuid,
+  );
+
   const handleProcessReply = async (
     replyId: string,
     action: 'approved' | 'rejected',
@@ -101,6 +107,7 @@ const ReviewCard = ({
 
   const isAdminView = role === EUserRole.admin;
   const isPartnerView = role === EUserRole.partner;
+  const isPartnerCanReply = !isPartnerAlreadyReplied && isPartnerView;
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
@@ -207,7 +214,7 @@ const ReviewCard = ({
           )}
 
           {/* Action Buttons */}
-          {!isDisabledReply && (
+          {(!isDisabledReply || isPartnerCanReply) && (
             <div className="flex items-center gap-4">
               <button
                 onClick={() => setShowReplyInput(!showReplyInput)}
@@ -303,6 +310,11 @@ const ReviewCard = ({
               {isPartnerView && reply.status === 'pending' && (
                 <p className="text-gray-500 italic text-xs leading-relaxed ml-8">
                   Phản hồi của bạn đang được xem xét bởi quản trị viên.
+                </p>
+              )}
+              {isAdminView && reply.status === 'pending' && (
+                <p className="text-gray-500 italic text-xs leading-relaxed ml-8">
+                  Phản hồi của partner đang đợi duyệt.
                 </p>
               )}
             </div>

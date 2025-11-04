@@ -383,6 +383,7 @@ export interface RatingListingMetadata {
   reviewerId: string;
   timestamp: number;
   replies?: TReviewReply[];
+  generalRatingValue: number[];
 }
 
 export type RatingListing = ListingBuilder<

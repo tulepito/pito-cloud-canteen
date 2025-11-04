@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
+import { toast } from 'react-toastify';
+import { isAxiosError } from 'axios';
 import classNames from 'classnames';
 
 import RatingReview from '@components/RatingReview/RatingReview';
@@ -7,6 +9,7 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { useViewport } from '@hooks/useViewport';
 import {
   fetchPartnerReviews,
+  setFilters,
   submitReply,
 } from '@redux/slices/Reviews.partner.slice';
 import { currentUserSelector } from '@redux/slices/user.slice';
@@ -25,8 +28,13 @@ const ManageReviewsPage = () => {
 
   const FIRST_PAGE = 1;
   const [page, setPage] = useState(FIRST_PAGE);
-  const { reviews, pagination, fetchReviewsInProgress, fetchReviewsError } =
-    useAppSelector((state) => state.partnerReviews);
+  const {
+    reviews,
+    pagination,
+    fetchReviewsInProgress,
+    fetchReviewsError,
+    filters,
+  } = useAppSelector((state) => state.partnerReviews);
   const currentUser = useAppSelector(currentUserSelector);
 
   const currentUserGetter = CurrentUser(currentUser);
@@ -34,7 +42,17 @@ const ManageReviewsPage = () => {
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
-    dispatch(fetchPartnerReviews({ page: newPage }));
+    dispatch(fetchPartnerReviews({ ...filters, page: newPage }));
+  };
+
+  const handleSearch = (orderCode: string) => {
+    dispatch(setFilters({ orderCode }));
+    dispatch(fetchPartnerReviews({ ...filters, orderCode, page: 1 }));
+  };
+
+  const handleFilterRating = (ratings: number[]) => {
+    dispatch(setFilters({ ratings }));
+    dispatch(fetchPartnerReviews({ ...filters, ratings, page: 1 }));
   };
 
   useEffect(() => {
@@ -56,33 +74,11 @@ const ManageReviewsPage = () => {
   const totalNumberOfReivews = useAppSelector(
     (state) => state.ManageReviews.totalNumberOfReivews,
   );
-  const ratingDetail = useAppSelector(
-    (state) => state.ManageReviews.ratingDetail,
-  );
 
   useEffect(() => {
     if (isFirstLoad) dispatch(ManageReviewsThunks.loadReviewSummarizeData());
   }, [isFirstLoad, dispatch]);
 
-  // const handleFilterChange = ({
-  //   ratings: ratingFormValue,
-  // }: TPartnerReviewsFilterFormValues) => {
-  //   router.replace({
-  //     pathname: partnerPaths.ManageReviews,
-  //     query: {
-  //       ...(ratingFormValue.length
-  //         ? { rating: ratingFormValue.join(',') }
-  //         : {}),
-  //     },
-  //   });
-  // };
-
-  // const handleClearFilter = () => {
-  //   router.replace({
-  //     pathname: partnerPaths.ManageReviews,
-  //     query: {},
-  //   });
-  // };
   const handleReply = async ({
     reviewId,
     replyRole,
@@ -92,15 +88,27 @@ const ManageReviewsPage = () => {
     replyRole: EUserRole;
     replyContent: string;
   }) => {
-    await dispatch(
-      submitReply({
-        reviewId,
-        replyRole,
-        replyContent,
-        authorId: currentUser?.id?.uuid || '',
-        authorName: displayName || '',
-      }),
-    );
+    try {
+      await dispatch(
+        submitReply({
+          reviewId,
+          replyRole,
+          replyContent,
+          authorId: currentUser?.id?.uuid || '',
+          authorName: displayName || '',
+        }),
+      ).unwrap();
+    } catch (error) {
+      console.error('Error submitting reply:', error);
+      let message = 'Có lỗi xảy ra. Vui lòng thử lại.';
+      if (isAxiosError(error)) {
+        const data = error.response?.data as { error?: string } | undefined;
+        message = data?.error ?? error.message;
+      } else if (error instanceof Error) {
+        message = error.message;
+      }
+      toast.error(message);
+    }
   };
 
   return (
@@ -132,8 +140,11 @@ const ManageReviewsPage = () => {
         pagination={pagination}
         handleReply={handleReply}
         handlePageChange={handlePageChange}
+        handleSearch={handleSearch}
+        handleFilterRating={handleFilterRating}
         page={page}
-        ratingDetail={ratingDetail}
+        isShowFilters={true}
+        selectedRatings={filters.ratings}
       />
     </div>
   );
