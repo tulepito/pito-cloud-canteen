@@ -33,7 +33,7 @@ const PartnerReviewsFilterFormComponent: React.FC<
     return ratingDetail.map((detail) => {
       const label = `${intl.formatMessage({
         id: `FieldRating.label.${detail.rating}`,
-      })} (${detail.total})`;
+      })}`;
 
       return {
         key: detail.rating,

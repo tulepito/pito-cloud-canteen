@@ -17,9 +17,8 @@ export const fetchPartnerReviews = createAsyncThunk(
     params: {
       page?: number;
       limit?: number;
-      search?: string;
-      userSearch?: string;
-      rating?: number;
+      orderCode?: string;
+      ratings?: number[];
     } = {},
   ) => {
     const { page = 1, limit = 10 } = params;
@@ -29,19 +28,15 @@ export const fetchPartnerReviews = createAsyncThunk(
       pageSize: limit.toString(),
     });
 
-    if (params.search) {
-      queryParams.append('search', params.search);
+    if (params.orderCode) {
+      queryParams.append('orderCode', params.orderCode);
     }
-    if (params.userSearch) {
-      queryParams.append('userSearch', params.userSearch);
-    }
-    if (params.rating) {
-      queryParams.append('rating', params.rating.toString());
+    if (params.ratings) {
+      queryParams.append('rating', params.ratings.join(','));
     }
     const response = await getPartnerReviewsApi(page, limit, {
-      search: params.search,
-      userSearch: params.userSearch,
-      rating: params.rating,
+      orderCode: params.orderCode,
+      ratings: params.ratings,
     });
 
     const data = response.data.data;
@@ -65,9 +60,8 @@ export const fetchReviewsSilent = createAsyncThunk(
   'app/Reviews/FETCH_REVIEWS_SILENT',
   async ({ page, limit }: { page: number; limit: number }, { getState }) => {
     const res = await getPartnerReviewsApi(page, limit, {
-      search: getState().partnerReviews.filters.search,
-      userSearch: getState().partnerReviews.filters.userSearch,
-      rating: getState().partnerReviews.filters.rating,
+      orderCode: getState().partnerReviews.filters.orderCode,
+      ratings: getState().partnerReviews.filters.ratings,
     });
 
     return {
@@ -174,9 +168,8 @@ type TReviewsState = {
 
   // UI states
   filters: {
-    search: string;
-    userSearch: string;
-    rating: number | undefined;
+    orderCode: string | undefined;
+    ratings: number[] | undefined;
   };
 };
 
@@ -193,9 +186,8 @@ const initialState: TReviewsState = {
   fetchReviewsError: null,
   submitReplyError: null,
   filters: {
-    search: '',
-    userSearch: '',
-    rating: undefined,
+    orderCode: '',
+    ratings: undefined,
   },
 };
 
@@ -208,7 +200,7 @@ const reviewsSlice = createSlice({
       state.filters = { ...state.filters, ...action.payload };
     },
     clearFilters: (state) => {
-      state.filters = { search: '', userSearch: '', rating: undefined };
+      state.filters = { orderCode: undefined, ratings: undefined };
     },
     clearErrors: (state) => {
       state.fetchReviewsError = null;

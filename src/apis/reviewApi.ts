@@ -10,9 +10,8 @@ export const getAdminReviewsApi = (
   page: number,
   perPage: number,
   params: {
-    search?: string;
-    userSearch?: string;
-    rating?: number;
+    orderCode?: string;
+    ratings?: number[];
   },
 ) => {
   return getApi<ApiResponse<(RatingListing & { authorName: string })[]>>(
@@ -39,9 +38,8 @@ export const getPartnerReviewsApi = (
   page: number,
   perPage: number,
   params: {
-    search?: string;
-    userSearch?: string;
-    rating?: number;
+    orderCode?: string;
+    ratings?: number[];
   },
 ) => {
   return getApi<ApiResponse<(RatingListing & { authorName: string })[]>>(

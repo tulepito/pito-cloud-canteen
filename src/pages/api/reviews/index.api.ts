@@ -6,7 +6,7 @@ import { denormalisedResponseEntities } from '@services/data';
 import participantChecker from '@services/permissionChecker/participant';
 import { getSdk, handleError } from '@services/sdk';
 import type { RatingListing } from '@src/types';
-import { EListingType } from '@src/utils/enums';
+import { EListingType, EUserRole } from '@src/utils/enums';
 import { SuccessResponse } from '@src/utils/response';
 import type { TPagination } from '@src/utils/types';
 
@@ -47,12 +47,14 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           const reviewsWithReplies = reviews.map((review) => {
             const replies = review.attributes?.metadata?.replies || [];
             const validReplies = replies.filter(
-              (reply) => reply?.status !== 'pending',
+              (reply) =>
+                reply?.replyRole !== EUserRole.partner ||
+                reply?.status === 'approved',
             );
+            review.attributes!.metadata!.replies = validReplies;
 
             return {
               ...review,
-              replies: validReplies,
               authorName: user.attributes.profile.displayName,
             };
           });

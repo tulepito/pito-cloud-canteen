@@ -4,6 +4,7 @@ import { HttpMethod } from '@apis/configs';
 import cookies from '@services/cookie';
 import { denormalisedResponseEntities } from '@services/data';
 import { getIntegrationSdk } from '@services/integrationSdk';
+import adminChecker from '@services/permissionChecker/admin';
 import { getSdk, handleError } from '@services/sdk';
 import type { RatingListing } from '@src/types';
 import { EUserRole } from '@src/utils/enums';
@@ -90,4 +91,4 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 };
 
-export default cookies(handler);
+export default cookies(adminChecker(handler));

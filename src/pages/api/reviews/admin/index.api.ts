@@ -3,7 +3,6 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { HttpMethod } from '@apis/configs';
 import cookies from '@services/cookie';
 import { denormalisedResponseEntities } from '@services/data';
-import adminChecker from '@services/permissionChecker/admin';
 import { getSdk, handleError } from '@services/sdk';
 import type { RatingListing } from '@src/types';
 import { EListingType } from '@src/utils/enums';
@@ -21,24 +20,21 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           const {
             page = 1,
             perPage = 10,
-            search = '',
-            userSearch = '',
-            rating = undefined,
+            orderCode = undefined,
+            ratings = [1, 2, 3, 4, 5],
           } = JSON.parse(req.query.JSONParams as string) as {
             page: number;
             perPage: number;
-            search: string;
-            userSearch: string;
-            rating: number | undefined;
+            orderCode: string | undefined;
+            ratings: number[] | undefined;
           };
-
+          const ratingString = ratings?.join(',');
           const response = await sdk.listings.query({
             meta_listingType: EListingType.rating,
             page: Number(page),
             perPage: Number(perPage),
-            ...(search && { search }),
-            ...(userSearch && { userSearch }),
-            ...(rating && { rating }),
+            meta_orderCode: orderCode,
+            meta_generalRatingValue: `has_any:${ratingString}`,
             include: ['images', 'author'],
           });
 
@@ -91,4 +87,4 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 };
 
-export default cookies(adminChecker(handler));
+export default cookies(handler);
