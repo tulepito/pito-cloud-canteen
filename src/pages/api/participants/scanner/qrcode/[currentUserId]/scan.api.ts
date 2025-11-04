@@ -175,8 +175,7 @@ const findActiveOrder = async (
   integrationSdk: any,
 ): Promise<ScanContext> => {
   const { currentUserId, timestampNum, companyId } = context;
-  const cacheKey = `companyOrdersInProgess:${companyId}:${timestampNum}`;
-
+  const cacheKey = `companyOrdersInProgess:${companyId}:${timestampNum}:${context.groupId}`;
   const companyOrders = await getOrSetRedisCache(
     cacheKey,
     CACHE_TTL_SECONDS,
@@ -185,6 +184,7 @@ const findActiveOrder = async (
         meta_listingType: 'order',
         meta_orderType: EOrderType.group,
         meta_orderState: EOrderStates.inProgress,
+        meta_selectedGroups: `has_any:${context.groupId},allMembers`,
         meta_companyId: companyId,
       });
 
