@@ -91,7 +91,7 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
     orderValidationsInProgressState,
     fetchOrderInProgress,
   } = useAppSelector((state) => state.OrderManagement);
-  console.log('transactionMap', transactionMap);
+
   const dispatch = useAppDispatch();
   const router = useRouter();
   const {
@@ -114,9 +114,9 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
 
   const {
     planReachMaxRestaurantQuantity:
-    planReachMaxRestaurantQuantityInProgressState,
+      planReachMaxRestaurantQuantityInProgressState,
     planReachMinRestaurantQuantity:
-    planReachMinRestaurantQuantityInProgressState,
+      planReachMinRestaurantQuantityInProgressState,
   } = planValidationsInProgressState?.[currentViewDate] || {};
 
   const {
@@ -174,9 +174,9 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
 
   const {
     planReachMaxRestaurantQuantity:
-    planReachMaxRestaurantQuantityInPickingState,
+      planReachMaxRestaurantQuantityInPickingState,
     planReachMinRestaurantQuantity:
-    planReachMinRestaurantQuantityInPickingState,
+      planReachMinRestaurantQuantityInPickingState,
   } = planValidations[currentViewDate as keyof typeof planValidations] || {};
 
   const planReachMaxRestaurantQuantity =
@@ -286,7 +286,7 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
     subOrderChangesHistory,
     draftSubOrderChangesHistory:
       draftSubOrderChangesHistory[
-      currentViewDate as unknown as keyof typeof draftSubOrderChangesHistory
+        currentViewDate as unknown as keyof typeof draftSubOrderChangesHistory
       ],
     onQueryMoreSubOrderChangesHistory,
     subOrderChangesHistoryTotalItems,
@@ -376,7 +376,7 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
                       disabled={isToggleingAutoPickFood}
                       initialValues={{ autoPicking: autoPickingAllowed }}
                       handleFieldChange={toggleFoodAutoPicking}
-                      onSubmit={() => { }}
+                      onSubmit={() => {}}
                     />
                     <i
                       style={{
@@ -442,8 +442,9 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
             <RenderWhen.False>
               <Tabs
                 items={tabItems as any}
-                defaultActiveKey={`${(defaultActiveKey < 0 ? 0 : defaultActiveKey) + 1
-                  }`}
+                defaultActiveKey={`${
+                  (defaultActiveKey < 0 ? 0 : defaultActiveKey) + 1
+                }`}
               />
             </RenderWhen.False>
           </RenderWhen>
