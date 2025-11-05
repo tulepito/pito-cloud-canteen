@@ -4,7 +4,7 @@ import { useField, useForm } from 'react-final-form-hooks';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import Button from '@components/Button/Button';
-import { IconCheckbox } from '@components/FormFields/FieldCheckbox/FieldCheckbox';
+import { IconRadioButton } from '@components/FormFields/FieldRadioButton/FieldRadioButton';
 import NamedLink from '@components/NamedLink/NamedLink';
 import { companyPaths } from '@src/paths';
 
@@ -51,10 +51,6 @@ const AccessForm: React.FC<TAccessFormProps> = ({
   const submitInprogress = loading || submitting;
   const disabledSubmit = pristine || submitting || hasValidationErrors;
 
-  const isAllMembersSelected = (selectedGroups.input.value || []).includes(
-    'allMembers',
-  );
-
   const finalizeGroupList = useMemo(() => {
     return [
       {
@@ -65,11 +61,11 @@ const AccessForm: React.FC<TAccessFormProps> = ({
     ];
   }, [groupList]);
 
-  const handleChangeCheckboxButtonGroup: (data: {
+  const handleChangeRadioButtonGroup: (data: {
     id: string;
     name: string;
   }) => ChangeEventHandler<HTMLInputElement> = (data) => (e) => {
-    const current = selectedGroups.input.value || [];
+    const current: string[] = selectedGroups.input.value || [];
     const isChecking = e.target.checked;
 
     if (data.id === 'allMembers') {
@@ -78,14 +74,25 @@ const AccessForm: React.FC<TAccessFormProps> = ({
       return;
     }
 
+    const specificIds = groupList.map((g) => g.id);
+
     if (isChecking) {
       const withoutAll = current.filter((id: string) => id !== 'allMembers');
-      form.change('selectedGroups', [...withoutAll, data.id]);
-    } else {
+      const next = Array.from(new Set([...withoutAll, data.id]));
+
+      const allSpecificSelected =
+        specificIds.length > 0 &&
+        specificIds.every((id: string) => next.includes(id));
+
       form.change(
         'selectedGroups',
-        current.filter((id: string) => id !== data.id),
+        allSpecificSelected ? ['allMembers'] : next,
       );
+    } else {
+      const next = current.filter(
+        (id: string) => id !== data.id && id !== 'allMembers',
+      );
+      form.change('selectedGroups', next);
     }
   };
 
@@ -111,17 +118,16 @@ const AccessForm: React.FC<TAccessFormProps> = ({
                 className={css.input}
                 id={`selectedGroups-${data.id}`}
                 {...selectedGroups.input}
-                onChange={handleChangeCheckboxButtonGroup(data)}
+                onChange={handleChangeRadioButtonGroup(data)}
                 checked={(selectedGroups.input.value || []).includes(data.id)}
                 type="checkbox"
                 value={data.id}
-                disabled={data.id !== 'allMembers' && isAllMembersSelected}
               />
               <label
                 className={css.label}
                 htmlFor={`selectedGroups-${data.id}`}>
                 <span className={css.checkboxWrapper}>
-                  <IconCheckbox checkedClassName={css.checked} />
+                  <IconRadioButton checkedClassName={css.checked} />
                 </span>
                 <span className={css.labelText}>{data.name}</span>
               </label>
