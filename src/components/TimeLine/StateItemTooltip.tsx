@@ -62,8 +62,8 @@ const StateItemTooltip: React.FC<TStateItemTooltipProps> = ({
     lastTransition === ETransition.PARTNER_REJECT_SUB_ORDER
       ? ETransition.OPERATOR_CANCEL_AFTER_PARTNER_REJECTED
       : lastTransition === ETransition.PARTNER_CONFIRM_SUB_ORDER
-        ? ETransition.OPERATOR_CANCEL_AFTER_PARTNER_CONFIRMED
-        : ETransition.OPERATOR_CANCEL_PLAN;
+      ? ETransition.OPERATOR_CANCEL_AFTER_PARTNER_CONFIRMED
+      : ETransition.OPERATOR_CANCEL_PLAN;
 
   const transitTx = (transition: ETransition) => async () => {
     await dispatch(
