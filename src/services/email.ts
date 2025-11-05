@@ -34,6 +34,9 @@ import participantOrderPicking, {
 import participantPickingSubOrderChanged, {
   participantPickingSubOrderChangedSubject,
 } from '@src/utils/emailTemplate/participantPickingSubOrderChanged';
+import participantReviewReply, {
+  participantReviewReplySubject,
+} from '@src/utils/emailTemplate/participantReviewReply';
 import participantSubOrderIsCanceled, {
   participantSubOrderIsCanceledSubject,
 } from '@src/utils/emailTemplate/participantSubOrderIsCanceled';
@@ -71,6 +74,7 @@ export enum EmailTemplateForParticipantTypes {
   PARTICIPANT_ORDER_PICKING = 'PARTICIPANT_ORDER_PICKING',
   PARTICIPANT_SUB_ORDER_CANCELED = 'PARTICIPANT_SUB_ORDER_CANCELED',
   PARTICIPANT_PICKING_ORDER_CHANGED = 'PARTICIPANT_PICKING_ORDER_CHANGED',
+  PARTICIPANT_REVIEW_REPLY = 'PARTICIPANT_REVIEW_REPLY',
 }
 
 export enum EmailTemplateForPartnerTypes {
@@ -618,6 +622,46 @@ export const emailSendingFactory = async (
         const emailDataParams = {
           receiver: [partnerEmail],
           subject: partnerOrderDetailsUpdatedSubject(formattedSubOrderDate),
+          content: emailTemplate as string,
+          sender: systemSenderEmail as string,
+        };
+        sendIndividualEmail(emailDataParams);
+        break;
+      }
+      case EmailTemplateTypes.PARTICIPANT.PARTICIPANT_REVIEW_REPLY: {
+        const {
+          reviewId,
+          replyContent,
+          replyAuthorName,
+          isPartnerReply = false,
+          partnerName,
+        } = emailParams;
+        const review = await fetchListing(reviewId);
+        const reviewListing = Listing(review);
+        const { reviewerId, foodName } = reviewListing.getMetadata();
+        const participant = await fetchUser(reviewerId);
+        if (!participant) {
+          console.error(`Participant not found for review ${reviewId}`);
+          break;
+        }
+        const participantUser = User(participant);
+        const { email: participantEmail } =
+          participantUser?.getAttributes() || {};
+        if (!participantEmail) {
+          console.error(`Participant email not found for review ${reviewId}`);
+          break;
+        }
+        const emailTemplate = participantReviewReply({
+          participantUser,
+          replyContent,
+          replyAuthorName,
+          foodName,
+          isPartnerReply,
+          partnerName,
+        });
+        const emailDataParams = {
+          receiver: [participantEmail],
+          subject: participantReviewReplySubject(foodName),
           content: emailTemplate as string,
           sender: systemSenderEmail as string,
         };

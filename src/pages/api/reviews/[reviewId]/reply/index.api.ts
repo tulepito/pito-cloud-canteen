@@ -4,10 +4,14 @@ import { v4 as uuidv4 } from 'uuid';
 import { HttpMethod } from '@apis/configs';
 import cookies from '@services/cookie';
 import { denormalisedResponseEntities } from '@services/data';
+import { emailSendingFactory, EmailTemplateTypes } from '@services/email';
+import { fetchListing, fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { getSdk, handleError } from '@services/sdk';
+import { createSlackNotification } from '@services/slackNotification';
 import type { RatingListing, TReviewReply } from '@src/types';
-import { EUserRole } from '@src/utils/enums';
+import { Listing, User } from '@src/utils/data';
+import { ESlackNotificationType, EUserRole } from '@src/utils/enums';
 import { SuccessResponse } from '@src/utils/response';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
@@ -99,6 +103,79 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           });
           const [updatedReview] =
             denormalisedResponseEntities(newReviewResponse);
+
+          // Send email to participant if admin replied
+          if (replyRole === EUserRole.admin) {
+            const reviewListing = Listing(updatedReview);
+            const { foodName } = reviewListing.getMetadata();
+            try {
+              await emailSendingFactory(
+                EmailTemplateTypes.PARTICIPANT.PARTICIPANT_REVIEW_REPLY,
+                {
+                  reviewId: reviewId as string,
+                  replyContent,
+                  replyAuthorName: author.attributes.profile.displayName,
+                  foodName,
+                  isPartnerReply: false,
+                },
+              );
+            } catch (error) {
+              console.error('Error sending email for admin reply:', error);
+              // Don't fail the request if email sending fails
+            }
+          }
+
+          // Send Slack notification to admin if partner replied
+          if (replyRole === EUserRole.partner) {
+            const reviewListing = Listing(updatedReview);
+            const {
+              foodName,
+              generalRating,
+              reviewerId,
+              restaurantId,
+              orderCode,
+            } = reviewListing.getMetadata();
+            try {
+              const BASE_URL = process.env.NEXT_PUBLIC_CANONICAL_URL;
+              const reviewLink = `${BASE_URL}/admin/reviews`;
+
+              // Fetch reviewer and restaurant info
+              const [reviewer, restaurant] = await Promise.all([
+                fetchUser(reviewerId),
+                restaurantId ? fetchListing(restaurantId) : null,
+              ]);
+
+              const reviewerUser = reviewer ? User(reviewer) : null;
+              const reviewerName =
+                reviewerUser?.getProfile()?.displayName || 'Người dùng';
+              const restaurantListing = restaurant ? Listing(restaurant) : null;
+              const partnerName =
+                restaurantListing?.getPublicData()?.title ||
+                author.attributes.profile.displayName;
+
+              await createSlackNotification(
+                ESlackNotificationType.PARTNER_REPLY_REVIEW,
+                {
+                  partnerReplyReviewData: {
+                    reviewId: reviewId as string,
+                    reviewLink,
+                    partnerName,
+                    replyContent,
+                    foodName,
+                    reviewerName,
+                    ratingScore: generalRating || 0,
+                    orderCode: orderCode || '',
+                  },
+                },
+              );
+            } catch (error) {
+              console.error(
+                'Error sending Slack notification for partner reply:',
+                error,
+              );
+              // Don't fail the request if Slack notification fails
+            }
+          }
 
           return new SuccessResponse(updatedReview, {
             message: 'Reply created successfully',

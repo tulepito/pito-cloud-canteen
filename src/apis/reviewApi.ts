@@ -67,7 +67,7 @@ export const postProcessReplyReviewApi = (
   reviewId: string,
   replyId: string,
   status: TReviewStatus,
-): Promise<AxiosResponse<RatingListing>> => {
+): Promise<AxiosResponse<ApiResponse<RatingListing>>> => {
   return postApi(`/reviews/${reviewId}/reply/${replyId}` as string, {
     status,
   });

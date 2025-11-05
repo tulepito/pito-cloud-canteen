@@ -472,6 +472,7 @@ export enum ESlackNotificationType {
   PARTNER_REJECTS_SUB_ORDER = 'partnerRejectsSubOrder',
   PARTICIPANT_RATING = 'participantRating',
   PARTICIPANT_ORDER_PERSISTENCE_FAILED = 'participantOrderPersistenceFailed',
+  PARTNER_REPLY_REVIEW = 'partnerReplyReview',
 }
 
 export enum QuizStep {

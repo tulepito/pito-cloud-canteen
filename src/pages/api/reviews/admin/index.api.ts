@@ -5,7 +5,7 @@ import cookies from '@services/cookie';
 import { denormalisedResponseEntities } from '@services/data';
 import { getSdk, handleError } from '@services/sdk';
 import type { RatingListing } from '@src/types';
-import { EListingType } from '@src/utils/enums';
+import { EListingType, EUserRole } from '@src/utils/enums';
 import { SuccessResponse } from '@src/utils/response';
 import type { TPagination } from '@src/utils/types';
 
@@ -49,6 +49,13 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
                 id: authorId as string,
               });
               const [authorData] = denormalisedResponseEntities(author);
+              const replies = review.attributes?.metadata?.replies || [];
+              const validReplies = replies.filter(
+                (reply) =>
+                  reply?.replyRole !== EUserRole.partner ||
+                  reply?.status !== 'rejected',
+              );
+              review.attributes!.metadata!.replies = validReplies;
 
               return {
                 ...review,

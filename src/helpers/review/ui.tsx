@@ -15,24 +15,28 @@ export const renderStars = (rating: number) => {
 export const renderReplyRole = (replyRole: EUserRole) => {
   switch (replyRole) {
     case EUserRole.admin:
-      return <span className="font-bold text-gray-900 text-[10px]">Admin</span>;
+      return (
+        <span className="text-gray-500 font-medium text-[10px]">Admin</span>
+      );
     case EUserRole.participant:
       return (
-        <span className="font-bold text-gray-900 text-[10px]">Participant</span>
+        <span className="text-gray-500 font-medium text-[10px]">
+          Participant
+        </span>
       );
     case EUserRole.booker:
       return (
-        <span className="font-bold text-gray-900 text-[10px]">Booker</span>
+        <span className="text-gray-500 font-medium text-[10px]">Booker</span>
       );
     case EUserRole.company:
       return (
-        <span className="font-bold text-gray-900 text-[10px]">Company</span>
+        <span className="text-gray-500 font-medium text-[10px]">Company</span>
       );
     case EUserRole.partner:
       return (
-        <span className="font-bold text-gray-900 text-[10px]">Partner</span>
+        <span className="text-gray-500 font-medium text-[10px]">Partner</span>
       );
     default:
-      return <span className="font-bold text-gray-900 text-[10px]">NA</span>;
+      return <span className="text-gray-500 font-medium text-[10px]">NA</span>;
   }
 };
