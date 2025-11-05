@@ -53,13 +53,6 @@ const LIST_SIDEBAR_MENU: TSidebarMenu[] = [
     ],
   },
   {
-    id: 'reviews',
-    Icon: IconOutlineStar,
-    nameLink: adminRoutes.ManageReviews.path,
-    label: 'AdminSidebar.reviewsLabel',
-    isFirstLevel: true,
-  },
-  {
     id: 'user',
     label: 'AdminSidebar.userLabel',
     Icon: IconUserManagement,
@@ -150,6 +143,13 @@ const LIST_SIDEBAR_MENU: TSidebarMenu[] = [
         highlightRefLinks: [adminRoutes.PartnerPayment.path],
       },
     ],
+  },
+  {
+    id: 'reviews',
+    Icon: IconOutlineStar,
+    nameLink: adminRoutes.ManageReviews.path,
+    label: 'AdminSidebar.reviewsLabel',
+    isFirstLevel: true,
   },
   {
     id: 'setting',

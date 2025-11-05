@@ -1,6 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-import { getAdminReviewsApi, postReplyReviewApi } from '@apis/reviewApi';
+import {
+  getAdminReviewsApi,
+  postProcessReplyReviewApi,
+  postReplyReviewApi,
+} from '@apis/reviewApi';
 import { createAsyncThunk } from '@redux/redux.helper';
 import type { RatingListing } from '@src/types';
 import type { EUserRole } from '@src/utils/enums';
@@ -10,6 +14,7 @@ import { storableError } from '@utils/errors';
 // ================ Async thunks ================ //
 const FETCH_ADMIN_REVIEWS = 'app/Reviews/FETCH_ADMIN_REVIEWS';
 const SUBMIT_REPLY = 'app/Reviews/SUBMIT_REPLY';
+const PROCESS_REPLY = 'app/Reviews/PROCESS_REPLY';
 
 export const fetchReviews = createAsyncThunk(
   FETCH_ADMIN_REVIEWS,
@@ -143,6 +148,49 @@ export const submitReply = createAsyncThunk<
       });
       console.error('Error submitting reply:', err);
 
+      return rejectWithValue(err);
+    }
+  },
+  { serializeError: storableError },
+);
+
+export const processReply = createAsyncThunk<
+  {
+    reviewId: string;
+    replyId: string;
+    status: 'approved' | 'rejected';
+    updatedReview: RatingListing;
+  },
+  { reviewId: string; replyId: string; status: 'approved' | 'rejected' }
+>(
+  PROCESS_REPLY,
+  async (
+    {
+      reviewId,
+      replyId,
+      status,
+    }: { reviewId: string; replyId: string; status: 'approved' | 'rejected' },
+    { rejectWithValue },
+  ) => {
+    try {
+      const response = await postProcessReplyReviewApi(
+        reviewId,
+        replyId,
+        status,
+      );
+
+      const updatedReview = response.data.data;
+      if (!updatedReview) {
+        return rejectWithValue(new Error('No review data returned'));
+      }
+
+      return {
+        reviewId,
+        replyId,
+        status,
+        updatedReview,
+      };
+    } catch (err) {
       return rejectWithValue(err);
     }
   },
@@ -304,6 +352,28 @@ const reviewsSlice = createSlice({
       .addCase(submitReply.rejected, (state, action) => {
         state.submitReplyInProgress = false;
         state.submitReplyError = action.payload;
+      });
+
+    builder
+      .addCase(processReply.fulfilled, (state, action) => {
+        const { reviewId, updatedReview } = action.payload;
+
+        const reviewIndex = state.reviews.findIndex(
+          (r) => r.id?.uuid === reviewId,
+        );
+        console.log('reviewIndex', reviewIndex);
+        console.log('updatedReview', updatedReview);
+
+        if (reviewIndex !== -1) {
+          const existingReview = state.reviews[reviewIndex];
+          state.reviews[reviewIndex] = {
+            authorName: existingReview.authorName,
+            ...updatedReview,
+          };
+        }
+      })
+      .addCase(processReply.rejected, (_state) => {
+        // Error handling is done in the component
       });
   },
 });

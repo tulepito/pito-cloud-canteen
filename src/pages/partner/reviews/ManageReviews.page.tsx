@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { toast } from 'react-toastify';
 import { isAxiosError } from 'axios';
@@ -40,24 +40,44 @@ const ManageReviewsPage = () => {
   const currentUserGetter = CurrentUser(currentUser);
   const { displayName } = currentUserGetter.getProfile();
 
-  const handlePageChange = (newPage: number) => {
-    setPage(newPage);
-    dispatch(fetchPartnerReviews({ ...filters, page: newPage }));
-  };
+  const filtersRef = useRef(filters);
 
-  const handleSearch = (orderCode: string) => {
-    dispatch(setFilters({ orderCode }));
-    dispatch(fetchPartnerReviews({ ...filters, orderCode, page: 1 }));
-  };
-
-  const handleFilterRating = (ratings: number[]) => {
-    dispatch(setFilters({ ratings }));
-    dispatch(fetchPartnerReviews({ ...filters, ratings, page: 1 }));
-  };
+  // Keep filtersRef in sync with filters
+  useEffect(() => {
+    filtersRef.current = filters;
+  }, [filters]);
 
   useEffect(() => {
     dispatch(fetchPartnerReviews({}));
   }, [dispatch]);
+
+  const handlePageChange = useCallback(
+    (newPage: number) => {
+      setPage(newPage);
+      dispatch(fetchPartnerReviews({ ...filtersRef.current, page: newPage }));
+    },
+    [dispatch],
+  );
+
+  const handleSearch = useCallback(
+    (orderCode: string) => {
+      const trimmedOrderCode = orderCode.trim();
+      const newOrderCode = trimmedOrderCode || undefined;
+      const newFilters = { ...filtersRef.current, orderCode: newOrderCode };
+      dispatch(setFilters({ orderCode: newOrderCode }));
+      dispatch(fetchPartnerReviews({ ...newFilters, page: 1 }));
+    },
+    [dispatch],
+  );
+
+  const handleFilterRating = useCallback(
+    (ratings: number[]) => {
+      const newFilters = { ...filtersRef.current, ratings };
+      dispatch(setFilters({ ratings }));
+      dispatch(fetchPartnerReviews({ ...newFilters, page: 1 }));
+    },
+    [dispatch],
+  );
 
   const averageFoodRating = useAppSelector(
     (state) => state.ManageReviews.averageFoodRating,
@@ -79,37 +99,40 @@ const ManageReviewsPage = () => {
     if (isFirstLoad) dispatch(ManageReviewsThunks.loadReviewSummarizeData());
   }, [isFirstLoad, dispatch]);
 
-  const handleReply = async ({
-    reviewId,
-    replyRole,
-    replyContent,
-  }: {
-    reviewId: string;
-    replyRole: EUserRole;
-    replyContent: string;
-  }) => {
-    try {
-      await dispatch(
-        submitReply({
-          reviewId,
-          replyRole,
-          replyContent,
-          authorId: currentUser?.id?.uuid || '',
-          authorName: displayName || '',
-        }),
-      ).unwrap();
-    } catch (error) {
-      console.error('Error submitting reply:', error);
-      let message = 'Có lỗi xảy ra. Vui lòng thử lại.';
-      if (isAxiosError(error)) {
-        const data = error.response?.data as { error?: string } | undefined;
-        message = data?.error ?? error.message;
-      } else if (error instanceof Error) {
-        message = error.message;
+  const handleReply = useCallback(
+    async ({
+      reviewId,
+      replyRole,
+      replyContent,
+    }: {
+      reviewId: string;
+      replyRole: EUserRole;
+      replyContent: string;
+    }) => {
+      try {
+        await dispatch(
+          submitReply({
+            reviewId,
+            replyRole,
+            replyContent,
+            authorId: currentUser?.id?.uuid || '',
+            authorName: displayName || '',
+          }),
+        ).unwrap();
+      } catch (error) {
+        console.error('Error submitting reply:', error);
+        let message = 'Có lỗi xảy ra. Vui lòng thử lại.';
+        if (isAxiosError(error)) {
+          const data = error.response?.data as { error?: string } | undefined;
+          message = data?.error ?? error.message;
+        } else if (error instanceof Error) {
+          message = error.message;
+        }
+        toast.error(message);
       }
-      toast.error(message);
-    }
-  };
+    },
+    [dispatch, currentUser?.id?.uuid, displayName],
+  );
 
   return (
     <div className={css.root}>
@@ -131,8 +154,6 @@ const ManageReviewsPage = () => {
           totalNumberOfReivews={totalNumberOfReivews}
         />
       </div>
-      {/* <PartnerReviewDetailTable ratings={ratings} filterForm={filterForm} />
-       */}
       <RatingReview
         reviews={reviews}
         fetchReviewsInProgress={fetchReviewsInProgress}

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { MessageCircle, Search } from 'lucide-react';
 
 import Button from '@components/Button/Button';
@@ -53,12 +53,12 @@ const RatingReview = ({
   isDisabledReply = false,
   selectedRatings = [],
 }: RatingReviewProps) => {
+  const intl = useIntl();
   const [orderCode, setOrderCode] = useState('');
   const debouncedOrderCode = useDebounce(orderCode, 400);
   const isFirstMount = useRef(true);
 
   useEffect(() => {
-    // Skip first mount to avoid duplicate fetch (parent component already fetches on mount)
     if (isFirstMount.current) {
       isFirstMount.current = false;
 
@@ -101,7 +101,9 @@ const RatingReview = ({
               type="text"
               value={orderCode}
               onChange={handleSearchChange}
-              placeholder="Nhập mã đơn hàng..."
+              placeholder={intl.formatMessage({
+                id: 'RatingReview.searchOrderCodePlaceholder',
+              })}
               className="w-full pl-10 pr-4 py-2 flex-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-black"
             />
           </div>
@@ -140,7 +142,10 @@ const RatingReview = ({
       {fetchReviewsError && (
         <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
           <p className="text-red-800">
-            Có lỗi xảy ra khi tải đánh giá: {fetchReviewsError}
+            <FormattedMessage
+              id="RatingReview.errorLoadingReviews"
+              values={{ error: fetchReviewsError }}
+            />
           </p>
         </div>
       )}
@@ -152,10 +157,10 @@ const RatingReview = ({
             <div className="text-center py-12">
               <MessageCircle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
               <h3 className="text-lg font-medium text-gray-900 mb-2">
-                Không có đánh giá nào
+                <FormattedMessage id="RatingReview.noReviewsTitle" />
               </h3>
               <p className="text-gray-600">
-                Không tìm thấy đánh giá nào phù hợp với bộ lọc hiện tại.
+                <FormattedMessage id="RatingReview.noReviewsDescription" />
               </p>
             </div>
           ) : (

@@ -27,21 +27,50 @@ import css from './SubOrders.module.scss';
 
 const DELIVERING_TAB = ESubOrderTxStatus.DELIVERING;
 const DELIVERED_TAB = ESubOrderTxStatus.DELIVERED;
-const RATING_HISTORY_TAB = 'RATING_HISTORY';
+const RATING_HISTORY_TAB = 'rating-history';
 
 const SubOrders = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const intl = useIntl();
-  const { planId: planIdFromQuery, timestamp: timestampFromQuery } =
-    router.query;
+  const {
+    planId: planIdFromQuery,
+    timestamp: timestampFromQuery,
+    tab: tabFromQuery = DELIVERED_TAB,
+  } = router.query;
 
   const FIRST_PAGE = 1;
   const [page, setPage] = useState(FIRST_PAGE);
   const { reviews, pagination, fetchReviewsInProgress, fetchReviewsError } =
     useAppSelector((state) => state.participantReviews);
 
-  const [activeTab, setActiveTab] = useState(DELIVERING_TAB);
+  const getTabIndex = (tabKey: string | string[] | undefined): string => {
+    const key = Array.isArray(tabKey) ? tabKey[0] : tabKey;
+
+    if (key === DELIVERING_TAB) {
+      return '1';
+    }
+    if (key === DELIVERED_TAB) {
+      return '2';
+    }
+    if (key === RATING_HISTORY_TAB) {
+      return '3';
+    }
+
+    return '2';
+  };
+
+  const [activeTab, setActiveTab] = useState<ESubOrderTxStatus | string>(
+    (tabFromQuery as string) || DELIVERED_TAB,
+  );
+
+  useEffect(() => {
+    const tabFromUrl = (tabFromQuery as string) || DELIVERED_TAB;
+    if (tabFromUrl !== activeTab) {
+      setActiveTab(tabFromUrl);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tabFromQuery]);
   const [selectedSubOrder, setSelectedSubOrder] = useState<any>(null);
   const subOrderReviewModalControl = useBoolean();
   const currentUser = useAppSelector(currentUserSelector);
@@ -83,7 +112,16 @@ const SubOrders = () => {
         (_subOrder) => _subOrder.id === subOrderId,
       );
       if (subOrder) {
-        setActiveTab(DELIVERED_TAB);
+        if (tabFromQuery !== DELIVERED_TAB) {
+          router.replace(
+            {
+              pathname: router.pathname,
+              query: { ...router.query, tab: DELIVERED_TAB },
+            },
+            undefined,
+            { shallow: true },
+          );
+        }
         setSelectedSubOrder(subOrder);
         subOrderReviewModalControl.setTrue();
       }
@@ -106,14 +144,17 @@ const SubOrders = () => {
     );
   }, [currentUserId, dispatch]);
 
-  useBottomScroll(() =>
-    dispatch(
-      SubOrdersThunks.fetchSubOrdersFromFirebase({
-        participantId: currentUserId,
-        txStatus: activeTab === DELIVERING_TAB ? DELIVERING_TAB : DELIVERED_TAB,
-      }),
-    ),
-  );
+  useBottomScroll(() => {
+    if (activeTab === DELIVERING_TAB || activeTab === DELIVERED_TAB) {
+      dispatch(
+        SubOrdersThunks.fetchSubOrdersFromFirebase({
+          participantId: currentUserId,
+          txStatus:
+            activeTab === DELIVERING_TAB ? DELIVERING_TAB : DELIVERED_TAB,
+        }),
+      );
+    }
+  });
 
   const tabItems = [
     {
@@ -172,7 +213,7 @@ const SubOrders = () => {
         <div className={css.tabLabel}>
           <span>
             {intl.formatMessage({
-              id: 'FilterPartnerOrderForm.subOrderStatus.ratingHistory',
+              id: 'ManageParticipantsRatingHistoryPage.title',
             })}
           </span>
           <div data-number className={css.totalItems}>
@@ -197,7 +238,20 @@ const SubOrders = () => {
   ];
 
   const onTabChange = (tab: any) => {
-    setActiveTab(tab?.key);
+    const newTabKey = tab?.key;
+
+    if (newTabKey && newTabKey !== activeTab) {
+      setActiveTab(newTabKey);
+
+      router.replace(
+        {
+          pathname: router.pathname,
+          query: { ...router.query, tab: newTabKey },
+        },
+        undefined,
+        { shallow: true },
+      );
+    }
   };
 
   return (
@@ -205,7 +259,11 @@ const SubOrders = () => {
       <div className={css.title}>
         {intl.formatMessage({ id: 'GeneralLayoutTopBar.menuItem.myOrders' })}
       </div>
-      <Tabs items={tabItems as any} onChange={onTabChange} />
+      <Tabs
+        items={tabItems as any}
+        onChange={onTabChange}
+        defaultActiveKey={getTabIndex(activeTab)}
+      />
       <LoadingModal isOpen={fetchSubOrdersInProgress} />
       <RenderWhen condition={activeTab === DELIVERED_TAB && !!selectedSubOrder}>
         <SubOrderReviewModal
