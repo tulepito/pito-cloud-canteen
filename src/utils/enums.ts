@@ -426,6 +426,8 @@ export enum ENativeNotificationType {
   PartnerTransitOrderToCanceled = 'PartnerTransitOrderToCanceled',
   PartnerEditSubOrder = 'PartnerEditSubOrder',
   PartnerSubOrderNegativeRating = 'PartnerSubOrderNegativeRating',
+  AdminReplyReview = 'AdminReplyReview',
+  AdminApprovePartnerReplyReview = 'AdminApprovePartnerReplyReview',
 }
 
 export enum EBookerNativeNotificationType {

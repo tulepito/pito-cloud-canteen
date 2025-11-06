@@ -150,28 +150,33 @@ const ReviewCard = ({
                 renderStars(reviewInformation.generalRating)}
             </div>
             <span className="text-gray-500 text-sm">
-              {reviewInformation.orderCode || 'ORD-001'} •{' '}
-              {reviewInformation.foodName || 'N/A'}
+              {reviewInformation.orderCode} • {reviewInformation.foodName}
             </span>
           </div>
           <div className="flex gap-2 items-center mb-1">
-            <span className="bg-white px-2 py-1 text-sm flex items-center gap-1">
-              <FormattedMessage id="ReviewCard.foodRatingLabel" />{' '}
-              {reviewInformation.detailRating?.food?.rating && (
-                <IconRatingFace
-                  className="w-5 h-5"
-                  rating={reviewInformation.detailRating?.food?.rating}
-                />
-              )}
+            <span className="bg-white pe-2 py-1 text-sm flex items-center gap-1">
+              {reviewInformation.detailRating?.food?.rating &&
+              reviewInformation.detailRating?.food?.rating > 0 ? (
+                <>
+                  <FormattedMessage id="ReviewCard.foodRatingLabel" />{' '}
+                  <IconRatingFace
+                    className="w-5 h-5"
+                    rating={reviewInformation.detailRating?.food?.rating}
+                  />
+                </>
+              ) : null}
             </span>
-            <span className="bg-white px-2 flex py-1 text-sm items-center gap-1">
-              <FormattedMessage id="ReviewCard.packagingRatingLabel" />{' '}
-              {reviewInformation.detailRating?.packaging?.rating && (
-                <IconRatingFace
-                  className="w-5 h-5"
-                  rating={reviewInformation.detailRating?.packaging?.rating}
-                />
-              )}
+            <span className="bg-white pe-2 flex py-1 text-sm items-center gap-1">
+              {reviewInformation.detailRating?.packaging?.rating &&
+              reviewInformation.detailRating?.packaging?.rating > 0 ? (
+                <>
+                  <FormattedMessage id="ReviewCard.packagingRatingLabel" />{' '}
+                  <IconRatingFace
+                    className="w-5 h-5"
+                    rating={reviewInformation.detailRating?.packaging?.rating}
+                  />
+                </>
+              ) : null}
             </span>
           </div>
           {/* Comment */}

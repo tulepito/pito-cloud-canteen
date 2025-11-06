@@ -19,6 +19,9 @@ type NativeNotificationParams = {
   foodName?: string;
   planId?: string;
   subOrderDate?: string;
+  reviewId?: string;
+  replyContent?: string;
+  partnerName?: string;
 };
 const BASE_URL = process.env.NEXT_PUBLIC_CANONICAL_URL;
 
@@ -143,6 +146,44 @@ export const createNativeNotification = async (
               +startDate!,
               'dd/MM',
             )}-${formatTimestamp(+endDate!, 'dd/MM')} đã bị hủy`,
+            url,
+            oneSignalUserId,
+          });
+        });
+      }
+      break;
+
+    case ENativeNotificationType.AdminReplyReview:
+      {
+        const { foodName } = notificationParams;
+        const url = `${BASE_URL}/participant/sub-orders?tab=rating-history`;
+
+        oneSignalUserIds.forEach((oneSignalUserId: string) => {
+          sendNotification({
+            title: '💬 Có phản hồi mới về đánh giá của bạn',
+            content: `Admin đã phản hồi về đánh giá của bạn cho món ${
+              foodName || 'món ăn'
+            }. Nhấn để xem chi tiết!`,
+            url,
+            oneSignalUserId,
+          });
+        });
+      }
+      break;
+
+    case ENativeNotificationType.AdminApprovePartnerReplyReview:
+      {
+        const { foodName, partnerName } = notificationParams;
+        const url = `${BASE_URL}/participant/sub-orders?tab=rating-history`;
+
+        oneSignalUserIds.forEach((oneSignalUserId: string) => {
+          sendNotification({
+            title: '💬 Nhà hàng đã phản hồi đánh giá của bạn',
+            content: `${
+              partnerName || 'Nhà hàng'
+            } đã phản hồi về đánh giá của bạn cho món ${
+              foodName || 'món ăn'
+            }. Nhấn để xem chi tiết!`,
             url,
             oneSignalUserId,
           });
