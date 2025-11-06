@@ -2,16 +2,23 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { v4 as uuidv4 } from 'uuid';
 
 import { HttpMethod } from '@apis/configs';
+import { EHttpStatusCode } from '@apis/errors';
 import cookies from '@services/cookie';
 import { denormalisedResponseEntities } from '@services/data';
 import { emailSendingFactory, EmailTemplateTypes } from '@services/email';
 import { fetchListing, fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
+import { createNativeNotification } from '@services/nativeNotification';
+import participantChecker from '@services/permissionChecker/participant';
 import { getSdk, handleError } from '@services/sdk';
 import { createSlackNotification } from '@services/slackNotification';
 import type { RatingListing, TReviewReply } from '@src/types';
-import { Listing, User } from '@src/utils/data';
-import { ESlackNotificationType, EUserRole } from '@src/utils/enums';
+import { CurrentUser, Listing, User } from '@src/utils/data';
+import {
+  ENativeNotificationType,
+  ESlackNotificationType,
+  EUserRole,
+} from '@src/utils/enums';
 import { SuccessResponse } from '@src/utils/response';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
@@ -47,6 +54,14 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
           const authorUser = await sdk.currentUser.show();
           const [author] = denormalisedResponseEntities(authorUser);
+          const { isAdmin = false, isPartner = false } =
+            CurrentUser(author).getMetadata();
+
+          if (!isAdmin && !isPartner) {
+            return res.status(EHttpStatusCode.Forbidden).json({
+              message: "You don't have permission to access this api!",
+            });
+          }
 
           // Check if author is partner -> if yes, then check if partner had responded to this review before
           if (replyRole === EUserRole.partner) {
@@ -104,10 +119,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           const [updatedReview] =
             denormalisedResponseEntities(newReviewResponse);
 
-          // Send email to participant if admin replied
+          // Send email and native notification to participant if admin replied
           if (replyRole === EUserRole.admin) {
             const reviewListing = Listing(updatedReview);
-            const { foodName } = reviewListing.getMetadata();
+            const { foodName, reviewerId } = reviewListing.getMetadata();
             try {
               await emailSendingFactory(
                 EmailTemplateTypes.PARTICIPANT.PARTICIPANT_REVIEW_REPLY,
@@ -122,6 +137,25 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             } catch (error) {
               console.error('Error sending email for admin reply:', error);
               // Don't fail the request if email sending fails
+            }
+
+            // Send native notification
+            try {
+              await createNativeNotification(
+                ENativeNotificationType.AdminReplyReview,
+                {
+                  participantId: reviewerId,
+                  reviewId: reviewId as string,
+                  replyContent,
+                  foodName,
+                },
+              );
+            } catch (error) {
+              console.error(
+                'Error sending native notification for admin reply:',
+                error,
+              );
+              // Don't fail the request if notification fails
             }
           }
 
@@ -199,4 +233,4 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 };
 
-export default cookies(handler);
+export default cookies(participantChecker(handler));

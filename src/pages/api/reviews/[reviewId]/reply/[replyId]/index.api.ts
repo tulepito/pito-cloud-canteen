@@ -6,11 +6,12 @@ import { denormalisedResponseEntities } from '@services/data';
 import { emailSendingFactory, EmailTemplateTypes } from '@services/email';
 import { fetchListing } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
+import { createNativeNotification } from '@services/nativeNotification';
 import adminChecker from '@services/permissionChecker/admin';
 import { getSdk, handleError } from '@services/sdk';
 import type { RatingListing, TReviewReply } from '@src/types';
 import { Listing } from '@src/utils/data';
-import { EUserRole } from '@src/utils/enums';
+import { ENativeNotificationType, EUserRole } from '@src/utils/enums';
 import { SuccessResponse } from '@src/utils/response';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
@@ -84,28 +85,26 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           const [updatedReview] =
             denormalisedResponseEntities(newReviewResponse);
 
-          // Send email to participant if partner reply is approved
+          // Send email and native notification to participant if partner reply is approved
           if (status === 'approved') {
             const reviewListing = Listing(updatedReview);
-            const { foodName, restaurantId } = reviewListing.getMetadata();
-            try {
-              // Fetch restaurant to get partner name
-              let partnerName = partnerReply.authorName;
-              if (restaurantId) {
-                try {
-                  const restaurant = await fetchListing(restaurantId);
-                  const restaurantListing = Listing(restaurant);
-                  const restaurantTitle =
-                    restaurantListing.getPublicData()?.title;
-                  if (restaurantTitle) {
-                    partnerName = restaurantTitle;
-                  }
-                } catch (error) {
-                  console.error('Error fetching restaurant:', error);
-                  // Use author name as fallback
+            const { foodName, restaurantId, reviewerId } =
+              reviewListing.getMetadata();
+            let partnerName = partnerReply.authorName;
+            if (restaurantId) {
+              try {
+                const restaurant = await fetchListing(restaurantId);
+                const restaurantListing = Listing(restaurant);
+                const restaurantTitle =
+                  restaurantListing.getPublicData()?.title;
+                if (restaurantTitle) {
+                  partnerName = restaurantTitle;
                 }
+              } catch (error) {
+                console.error('Error fetching restaurant:', error);
               }
-
+            }
+            try {
               await emailSendingFactory(
                 EmailTemplateTypes.PARTICIPANT.PARTICIPANT_REVIEW_REPLY,
                 {
@@ -123,6 +122,26 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
                 error,
               );
               // Don't fail the request if email sending fails
+            }
+
+            // Send native notification
+            try {
+              await createNativeNotification(
+                ENativeNotificationType.AdminApprovePartnerReplyReview,
+                {
+                  participantId: reviewerId,
+                  reviewId: reviewId as string,
+                  replyContent: partnerReply.replyContent,
+                  foodName,
+                  partnerName,
+                },
+              );
+            } catch (error) {
+              console.error(
+                'Error sending native notification for approved partner reply:',
+                error,
+              );
+              // Don't fail the request if notification fails
             }
           }
 
