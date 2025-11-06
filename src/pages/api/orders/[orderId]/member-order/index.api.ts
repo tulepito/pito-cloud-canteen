@@ -5,6 +5,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { HttpMethod } from '@apis/configs';
 import { convertDateToVNTimezone } from '@helpers/dateHelpers';
 import logger from '@helpers/logger';
+import cookies from '@services/cookie';
 import { denormalisedResponseEntities } from '@services/data';
 import { fetchListing, fetchUserListing } from '@services/integrationHelper';
 import { getIntegrationSdk, getSdk, handleError } from '@services/sdk';
@@ -292,4 +293,4 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 };
 
-export default handler;
+export default cookies(handler);

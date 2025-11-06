@@ -65,9 +65,34 @@ const AccessForm: React.FC<TAccessFormProps> = ({
     id: string;
     name: string;
   }) => ChangeEventHandler<HTMLInputElement> = (data) => (e) => {
-    if (e.target.checked) {
-      // Gán mảng với đúng một item
-      form.change('selectedGroups', [data.id]);
+    const current: string[] = selectedGroups.input.value || [];
+    const isChecking = e.target.checked;
+
+    if (data.id === 'allMembers') {
+      form.change('selectedGroups', isChecking ? ['allMembers'] : []);
+
+      return;
+    }
+
+    const specificIds = groupList.map((g) => g.id);
+
+    if (isChecking) {
+      const withoutAll = current.filter((id: string) => id !== 'allMembers');
+      const next = Array.from(new Set([...withoutAll, data.id]));
+
+      const allSpecificSelected =
+        specificIds.length > 0 &&
+        specificIds.every((id: string) => next.includes(id));
+
+      form.change(
+        'selectedGroups',
+        allSpecificSelected ? ['allMembers'] : next,
+      );
+    } else {
+      const next = current.filter(
+        (id: string) => id !== data.id && id !== 'allMembers',
+      );
+      form.change('selectedGroups', next);
     }
   };
 
@@ -95,7 +120,7 @@ const AccessForm: React.FC<TAccessFormProps> = ({
                 {...selectedGroups.input}
                 onChange={handleChangeRadioButtonGroup(data)}
                 checked={(selectedGroups.input.value || []).includes(data.id)}
-                type="radio"
+                type="checkbox"
                 value={data.id}
               />
               <label
