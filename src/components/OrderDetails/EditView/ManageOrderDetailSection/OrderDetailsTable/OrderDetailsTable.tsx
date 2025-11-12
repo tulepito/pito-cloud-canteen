@@ -129,7 +129,8 @@ const OrderDetailsTable: React.FC<TOrderDetailsTableProps> = (props) => {
   const handleSubmitEditSelectionModal = async (
     values: TEditOrderRowFormValues,
   ) => {
-    const { foodId, requirement } = values;
+    const { foodId, requirement, secondaryFoodId, secondaryRequirement } =
+      values;
     const { memberData } = currentMemberOrderData;
     const updateValues = {
       memberId: memberData?.id,
@@ -138,6 +139,8 @@ const OrderDetailsTable: React.FC<TOrderDetailsTableProps> = (props) => {
       currentViewDate,
       memberEmail: memberData?.email,
       isAdminFlow,
+      ...(secondaryFoodId && { secondaryFoodId }),
+      ...(secondaryRequirement && { secondaryRequirement }),
     };
 
     if (isDraftEditing) {

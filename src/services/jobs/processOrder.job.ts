@@ -205,6 +205,10 @@ const worker = new Worker<ProcessOrderJobData>(
       currentUserId,
     } = job.data;
 
+    console.log('worker@@planData:', {
+      planData: JSON.stringify(planData),
+    });
+
     console.log(
       `[RACE_DEBUG] Job started - planId: ${planId}, userId: ${currentUserId}, orderId: ${orderId}, jobId: ${
         job.id
@@ -287,6 +291,7 @@ const worker = new Worker<ProcessOrderJobData>(
           orderDetail[day] = orderDetail[day] || { memberOrders: {} };
           orderDetail[day].memberOrders = orderDetail[day].memberOrders || {};
           const userData = planData?.[day]?.[currentUserId];
+          console.log('worker@@userData:', { userData });
           if (userData !== undefined) {
             orderDetail[day].memberOrders[currentUserId] = userData;
           }

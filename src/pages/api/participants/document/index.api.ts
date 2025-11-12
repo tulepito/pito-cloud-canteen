@@ -80,9 +80,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     case HttpMethod.PUT:
       try {
         const { subOrderId, params } = req.body;
-        const { foodId } = params;
+        const { foodId, secondaryFoodId } = params;
         let foodName = '';
         let foodImage = null;
+        let secondaryFoodName = '';
+        let secondaryFoodImage = null;
         if (foodId) {
           const foodResponse = await fetchListing(
             foodId,
@@ -103,10 +105,31 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
                 }
               : null;
         }
+        if (secondaryFoodId) {
+          const secondaryFoodResponse = await fetchListing(
+            secondaryFoodId,
+            ['images'],
+            [`variants.${EImageVariants.squareSmall2x}`],
+          );
+          const secondaryFoodListing = Listing(secondaryFoodResponse);
+          const newSecondaryFoodImages = secondaryFoodListing.getImages();
+          secondaryFoodName = secondaryFoodListing.getAttributes().title;
+          secondaryFoodImage =
+            newSecondaryFoodImages.length > 0
+              ? {
+                  ...newSecondaryFoodImages[0],
+                  id: {
+                    uuid: newSecondaryFoodImages[0].id.uuid,
+                  },
+                }
+              : null;
+        }
         await updateFirebaseDocument(subOrderId!, {
           ...params,
           ...(foodImage && { foodImage }),
           ...(foodName && { foodName }),
+          ...(secondaryFoodImage && { secondaryFoodImage }),
+          ...(secondaryFoodName && { secondaryFoodName }),
         });
         res.json({ message: 'Update document successfully' });
       } catch (error) {

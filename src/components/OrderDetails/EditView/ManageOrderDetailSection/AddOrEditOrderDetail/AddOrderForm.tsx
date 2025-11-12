@@ -29,6 +29,8 @@ export type TAddOrderFormValues = {
   participantId: { key: string; label: string };
   foodId: string;
   requirement: string;
+  secondaryFoodId?: string;
+  secondaryRequirement?: string;
 };
 
 type TExtraProps = {
@@ -76,6 +78,10 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
     errorSection,
     currentViewDate,
   } = props;
+
+  const isAllowAddSecondFood = useAppSelector(
+    (state) => state.OrderManagement.isAllowAddSecondFood,
+  );
 
   const fieldSelectMemberDisable = isLoading || !ableToUpdateOrder;
   const fieldSelectFoodDisable =
@@ -219,20 +225,39 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
             </div>
           )}
         </div>
-        <div className={css.fieldContainer}>
-          <FieldDropdownSelect
-            className={css.fieldSelect}
-            dropdownWrapperClassName={css.fieldSelectDropdownWrapper}
-            options={parsedFoodOptions}
-            disabled={fieldSelectFoodDisable}
-            id={'addOrder.foodId'}
-            name="foodId"
-            placeholder={intl.formatMessage({
-              id: 'AddOrderForm.foodIdField.placeholder',
-            })}
-            fieldWrapperClassName={css.fieldSelectWrapper}
-          />
+        <div className="flex flex-col gap-4">
+          <div className={css.fieldContainer}>
+            <FieldDropdownSelect
+              className={css.fieldSelect}
+              dropdownWrapperClassName={css.fieldSelectDropdownWrapper}
+              options={parsedFoodOptions}
+              disabled={fieldSelectFoodDisable}
+              id={'addOrder.foodId'}
+              name="foodId"
+              placeholder={intl.formatMessage({
+                id: 'AddOrderForm.foodIdField.placeholder',
+              })}
+              fieldWrapperClassName={css.fieldSelectWrapper}
+            />
+          </div>
+          <RenderWhen condition={isAllowAddSecondFood}>
+            <div className={css.fieldContainer}>
+              <FieldDropdownSelect
+                className={css.fieldSelect}
+                dropdownWrapperClassName={css.fieldSelectDropdownWrapper}
+                options={parsedFoodOptions}
+                disabled={fieldSelectFoodDisable}
+                id={'addOrder.secondaryFoodId'}
+                name="secondaryFoodId"
+                placeholder={intl.formatMessage({
+                  id: 'AddOrderForm.secondaryFoodIdField.placeholder',
+                })}
+                fieldWrapperClassName={css.fieldSelectWrapper}
+              />
+            </div>
+          </RenderWhen>
         </div>
+
         <Button
           disabled={submitDisabled}
           inProgress={addOrUpdateMemberOrderInProgress}

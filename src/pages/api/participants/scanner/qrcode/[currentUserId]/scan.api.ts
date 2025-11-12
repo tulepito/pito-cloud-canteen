@@ -102,6 +102,7 @@ interface ScanContext {
 interface ProcessedData {
   memberOrder: Partial<MemberOrderValue>;
   foodListing: FoodListing;
+  secondFoodListing?: FoodListing;
   memberListing: UserListing;
   memberId: string;
 }
@@ -344,8 +345,16 @@ const fetchFoodAndMemberData = async (
   memberOrder: Partial<MemberOrderValue>,
   memberId: string,
   integrationSdk: any,
-): Promise<{ foodListing: FoodListing; memberListing: UserListing }> => {
-  const [foodListingResponse, memberListingResponse] = await Promise.all([
+): Promise<{
+  foodListing: FoodListing;
+  memberListing: UserListing;
+  secondFoodListing?: FoodListing;
+}> => {
+  const [
+    foodListingResponse,
+    memberListingResponse,
+    secondFoodListingResponse,
+  ] = await Promise.all([
     integrationSdk.listings.show({
       id: memberOrder.foodId,
       include: ['images'],
@@ -356,23 +365,48 @@ const fetchFoodAndMemberData = async (
       include: ['profileImage'],
       'fields.image': [`variants.${EImageVariants.squareSmall}`],
     }),
+    memberOrder.secondaryFoodId
+      ? integrationSdk.listings.show({
+          id: memberOrder.secondaryFoodId,
+          include: ['images'],
+          'fields.image': [`variants.${EImageVariants.squareSmall}`],
+        })
+      : Promise.resolve(undefined),
   ]);
 
   const foodListing = denormalisedResponseEntities(foodListingResponse)[0];
+  const secondFoodListing = secondFoodListingResponse
+    ? denormalisedResponseEntities(secondFoodListingResponse)[0]
+    : undefined;
   const memberListing = denormalisedResponseEntities(memberListingResponse)[0];
 
   if (!foodListing || !memberListing?.attributes?.profile) {
     throw new APIError(ERROR_MESSAGES.MEMBER_DATA_NOT_LOADED);
   }
 
-  return { foodListing, memberListing };
+  return { foodListing, memberListing, secondFoodListing };
+};
+
+const getFoodName = (
+  foodListing: FoodListing,
+  secondFoodListing?: FoodListing,
+) => {
+  if (secondFoodListing) {
+    if (foodListing.id?.uuid === secondFoodListing.id?.uuid) {
+      return `${foodListing.attributes?.title} x2 định lượng`;
+    }
+
+    return `${foodListing.attributes?.title} + ${secondFoodListing.attributes?.title}`;
+  }
+
+  return foodListing.attributes?.title!;
 };
 
 const createScannedRecord = async (
   context: ScanContext,
   processedData: ProcessedData,
 ): Promise<Omit<FirebaseScannedRecord, 'id'>> => {
-  const { foodListing, memberListing } = processedData;
+  const { foodListing, memberListing, secondFoodListing } = processedData;
 
   const record = {
     planId: context.planId,
@@ -387,7 +421,7 @@ const createScannedRecord = async (
       memberListing?.attributes?.profile?.lastName,
       memberListing?.attributes?.profile?.displayName,
     ),
-    foodName: foodListing.attributes?.title!,
+    foodName: getFoodName(foodListing, secondFoodListing),
     foodThumbnailUrl:
       foodListing.images?.[0]?.attributes?.variants?.['square-small']?.url ||
       '',
@@ -454,21 +488,26 @@ const processOptimizedScan = async (
       integrationSdk,
     );
 
+    console.log('processOptimizedScan@memberOrder: ', { memberOrder });
+
     // Step 5: Parallel execution - group validation and data fetching
-    const [, { foodListing, memberListing }] = await Promise.all([
-      validateGroupAccess(context, integrationSdk),
-      fetchFoodAndMemberData(memberOrder, memberId, integrationSdk),
-    ]);
+    const [, { foodListing, memberListing, secondFoodListing }] =
+      await Promise.all([
+        validateGroupAccess(context, integrationSdk),
+        fetchFoodAndMemberData(memberOrder, memberId, integrationSdk),
+      ]);
 
     const processedData: ProcessedData = {
       memberOrder,
       foodListing,
       memberListing,
       memberId,
+      secondFoodListing,
     };
 
     return { context, processedData };
   } catch (error) {
+    console.error(`[LOG QRCode] Error in processOptimizedScan: ${error}`);
     if (error instanceof APIError) throw error;
     throw new APIError(ERROR_MESSAGES.SDK_ERROR);
   }

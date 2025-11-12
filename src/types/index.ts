@@ -149,6 +149,8 @@ export type OrderListing = ListingBuilder<
 
 export type MemberOrderValue = {
   foodId: string;
+  secondaryFoodId?: string;
+  secondaryRequirement?: string;
   requirement: string;
   status: 'empty' | 'joined' | 'notJoined' | 'notAllowed' | 'expired';
   barcode?: string;

@@ -1,3 +1,4 @@
+import type { TUpdateParticipantOrderApiBody } from '@src/types/order';
 import type {
   TCreateCompanyApiParams,
   TObject,
@@ -79,8 +80,10 @@ export const loadOrderDataApi = (orderId: string) =>
 export const loadPlanDataApi = (planId: string) =>
   getApi(`/participants/plans/${planId}`);
 
-export const updateParticipantOrderApi = (orderId: string, body: TObject) =>
-  postApi(`/participants/orders/${orderId}`, body);
+export const updateParticipantOrderApi = (
+  orderId: string,
+  body: TUpdateParticipantOrderApiBody,
+) => postApi(`/participants/orders/${orderId}`, body);
 
 export const fetchUserApi = (userId: string) =>
   getApi(`/users/fetch-user/${userId}`);
