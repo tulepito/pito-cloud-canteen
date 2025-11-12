@@ -191,6 +191,8 @@ type NewMembersOrderValues = {
     foodId: string;
     requirement: string;
     status: 'joined';
+    secondaryFoodId?: string;
+    secondaryRequirement?: string;
   };
 };
 

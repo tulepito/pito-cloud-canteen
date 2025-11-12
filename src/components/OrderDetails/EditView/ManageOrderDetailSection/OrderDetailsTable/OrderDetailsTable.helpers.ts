@@ -39,7 +39,7 @@ export const prepareDataForTabs = ({
   memberOrders: TObject;
   foodList: TObject;
 }) => {
-  const memberOrderList = Object.entries<TObject>(memberOrders);
+  const memberOrderList = Object.entries(memberOrders);
 
   const memberInfoMap = participantData.reduce<TObject>(memberInfoReduceFn, {});
   const anonymousMemberInfoMap = anonymousParticipantData.reduce<TObject>(
@@ -56,7 +56,13 @@ export const prepareDataForTabs = ({
       } = result;
 
       const [memberId, orderItemData] = currentOrderItem;
-      const { status, foodId, requirement = '' } = orderItemData || {};
+      const {
+        status,
+        foodId,
+        requirement = '',
+        secondaryFoodId,
+        secondaryRequirement = '',
+      } = orderItemData || {};
       const memberDataMaybe = memberInfoMap[memberId];
       const anonymousDataMaybe = anonymousMemberInfoMap[memberId];
       const memberData = memberDataMaybe || anonymousDataMaybe || {};
@@ -65,13 +71,26 @@ export const prepareDataForTabs = ({
         return result;
       }
 
+      const secondFoodData =
+        secondaryFoodId &&
+        secondaryFoodId.length > 0 &&
+        foodList[secondaryFoodId]
+          ? {
+              secondaryFoodId,
+              secondFoodName: foodList[secondaryFoodId].foodName,
+              secondFoodPrice: foodList[secondaryFoodId].foodPrice,
+              secondaryRequirement,
+              secondFoodUnit: foodList[secondaryFoodId].foodUnit,
+            }
+          : {};
+
       const itemData: TItemData = {
         isAnonymous: isEmpty(memberDataMaybe),
         memberData,
-        status,
+        status: status!,
         foodData:
           foodId?.length > 0 && foodList[foodId]
-            ? { ...foodList[foodId], foodId, requirement }
+            ? { ...foodList[foodId], foodId, requirement, ...secondFoodData }
             : {},
       };
 

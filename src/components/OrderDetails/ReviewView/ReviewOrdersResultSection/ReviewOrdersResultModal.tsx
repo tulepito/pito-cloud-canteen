@@ -114,20 +114,50 @@ const prepareData = ({
       const orderData = Object.entries<TObject>(memberOrders).reduce<TObject[]>(
         (memberOrderResult, currentMemberOrderEntry) => {
           const [memberId, memberOrderData] = currentMemberOrderEntry;
-          const { foodId, status, requirement } = memberOrderData;
-          const newItem = {
-            memberData: participantData[memberId],
-            foodData: {
-              requirement,
-              foodId,
-              ...foodListOfDate[foodId],
-            },
-            restaurant,
+          const {
+            foodId,
+            secondaryFoodId,
+            status,
+            requirement = '',
+            secondaryRequirement = '',
+          } = memberOrderData;
+
+          const appendFoodToResult = (
+            items: TObject[],
+            id?: string,
+            requirementValue: string = '',
+          ) => {
+            if (!id || !isJoinedPlan(id, status)) {
+              return items;
+            }
+            const foodDataOfDate = foodListOfDate[id];
+            if (!foodDataOfDate) {
+              return items;
+            }
+
+            return items.concat({
+              memberData: participantData[memberId],
+              foodData: {
+                requirement: requirementValue,
+                foodId: id,
+                ...foodDataOfDate,
+              },
+              restaurant,
+            });
           };
 
-          return isJoinedPlan(foodId, status)
-            ? memberOrderResult.concat([newItem])
-            : memberOrderResult;
+          let nextResult = appendFoodToResult(
+            memberOrderResult,
+            foodId,
+            requirement,
+          );
+          nextResult = appendFoodToResult(
+            nextResult,
+            secondaryFoodId,
+            secondaryRequirement,
+          );
+
+          return nextResult;
         },
         [],
       );
@@ -167,24 +197,44 @@ const prepareDataGroups = ({
 
           const memberIds = members.map((m: TObject) => m.id);
           const orderData = memberIds
-            .map((memberId: string) => {
+            .flatMap((memberId: string) => {
               const memberOrder = memberOrders[memberId];
-              if (!memberOrder) return null;
+              if (!memberOrder) return [];
 
-              const { foodId, status, requirement } = memberOrder;
-              if (!isJoinedPlan(foodId, status)) return null;
+              const {
+                foodId,
+                secondaryFoodId,
+                status,
+                requirement = '',
+                secondaryRequirement = '',
+              } = memberOrder;
 
-              return {
-                memberData: participantMap[memberId],
-                foodData: {
-                  requirement,
-                  foodId,
-                  ...foodListOfDate[foodId],
-                },
-                restaurant,
+              const buildFoodData = (
+                id?: string,
+                requirementValue: string = '',
+              ) => {
+                if (!id || !isJoinedPlan(id, status)) return [];
+                const foodDataOfDate = foodListOfDate[id];
+                if (!foodDataOfDate) return [];
+
+                return [
+                  {
+                    memberData: participantMap[memberId],
+                    foodData: {
+                      requirement: requirementValue,
+                      foodId: id,
+                      ...foodDataOfDate,
+                    },
+                    restaurant,
+                  },
+                ];
               };
+
+              return [
+                ...buildFoodData(foodId, requirement),
+                ...buildFoodData(secondaryFoodId, secondaryRequirement),
+              ];
             })
-            .filter(Boolean)
             .sort((a: TObject, b: TObject) => {
               const foodNameA = a.foodData?.foodName || '';
               const foodNameB = b.foodData?.foodName || '';
@@ -212,21 +262,41 @@ const prepareDataGroups = ({
 
       const orderDataForOthers = Object.entries<TObject>(memberOrders)
         .filter(([memberId]) => !allGroupMemberIds.has(memberId))
-        .map(([memberId, memberOrderData]) => {
-          const { foodId, status, requirement } = memberOrderData;
-          if (!isJoinedPlan(foodId, status)) return null;
+        .flatMap(([memberId, memberOrderData]) => {
+          const {
+            foodId,
+            secondaryFoodId,
+            status,
+            requirement = '',
+            secondaryRequirement = '',
+          } = memberOrderData;
 
-          return {
-            memberData: participantMap[memberId],
-            foodData: {
-              requirement,
-              foodId,
-              ...foodListOfDate[foodId],
-            },
-            restaurant,
+          const buildFoodData = (
+            id?: string,
+            requirementValue: string = '',
+          ) => {
+            if (!id || !isJoinedPlan(id, status)) return [];
+            const foodDataOfDate = foodListOfDate[id];
+            if (!foodDataOfDate) return [];
+
+            return [
+              {
+                memberData: participantMap[memberId],
+                foodData: {
+                  requirement: requirementValue,
+                  foodId: id,
+                  ...foodDataOfDate,
+                },
+                restaurant,
+              },
+            ];
           };
-        })
-        .filter(Boolean);
+
+          return [
+            ...buildFoodData(foodId, requirement),
+            ...buildFoodData(secondaryFoodId, secondaryRequirement),
+          ];
+        });
 
       return [
         ...result,
@@ -1121,11 +1191,15 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
 
                                   const isMealItemFailed = (
                                     mealItemsFailed[date] || []
-                                  ).some((item) => item.memberId === memberId);
+                                  ).some(
+                                    (item) =>
+                                      item.memberId === memberId &&
+                                      item.foodId === foodId,
+                                  );
 
                                   return (
                                     <div
-                                      key={memberId}
+                                      key={`${memberId}-${foodId}`}
                                       className="flex items-center w-full">
                                       <div className="flex items-center flex-1 text-xs p-2 gap-2">
                                         <div className="flex-1 basis-[80px] font-semibold">
@@ -1231,11 +1305,15 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
 
                                   const isMealItemFailed = (
                                     mealItemsFailed[date] || []
-                                  ).some((item) => item.memberId === memberId);
+                                  ).some(
+                                    (item) =>
+                                      item.memberId === memberId &&
+                                      item.foodId === foodId,
+                                  );
 
                                   return (
                                     <div
-                                      key={memberId}
+                                      key={`${memberId}-${foodId}`}
                                       className="flex items-center w-full">
                                       <div className="flex items-center flex-1 text-xs p-2 gap-2">
                                         <div className="flex-1 basis-[80px] font-semibold">

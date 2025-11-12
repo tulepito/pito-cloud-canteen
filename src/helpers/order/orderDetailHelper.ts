@@ -1,5 +1,6 @@
 import isEmpty from 'lodash/isEmpty';
 
+import { getFoodDataMap } from '@helpers/orderHelper';
 import { generateScannerBarCode } from '@pages/api/admin/scanner/[planId]/toggle-mode.api';
 import { Listing, User } from '@src/utils/data';
 import { buildFullName } from '@src/utils/emailTemplate/participantOrderPicking';
@@ -30,47 +31,7 @@ const groupFoodForGroupOrder = (
         return result;
       }
 
-      const foodDataMap = Object.entries(memberOrders).reduce(
-        (foodFrequencyResult, currentMemberOrderEntry) => {
-          const [, memberOrderData] = currentMemberOrderEntry;
-          const {
-            foodId,
-            status,
-            requirement = '',
-          } = memberOrderData as TObject;
-          const {
-            foodName,
-            foodPrice,
-            foodUnit = '',
-          } = foodListOfDate[foodId] || {};
-
-          if (status === EParticipantOrderStatus.joined && foodId !== '') {
-            const data = foodFrequencyResult[foodId] as TObject;
-            const { frequency, notes = [] } = data || {};
-
-            if (!isEmpty(requirement)) {
-              notes.push(requirement);
-            }
-
-            return {
-              ...foodFrequencyResult,
-              [foodId]: data
-                ? { ...data, frequency: frequency + 1, notes }
-                : {
-                    foodId,
-                    foodName,
-                    foodUnit,
-                    foodPrice,
-                    notes,
-                    frequency: 1,
-                  },
-            };
-          }
-
-          return foodFrequencyResult;
-        },
-        {} as TObject,
-      );
+      const foodDataMap = getFoodDataMap({ foodListOfDate, memberOrders });
       const foodDataList = Object.values(foodDataMap);
       const summary = foodDataList.reduce(
         (previousResult: TObject, current: TObject) => {
@@ -279,12 +240,19 @@ export const groupPickingOrderByFood = ({
             foodId,
             status,
             requirement = '',
+            // secondaryFoodId,
+            // secondaryRequirement = '',
           } = memberOrderData as TObject;
           const {
             foodName,
             foodPrice,
             foodUnit = '',
           } = foodListOfDate[foodId] || {};
+          // const {
+          //   foodName: secondFoodName,
+          //   foodPrice: secondFoodPrice,
+          //   foodUnit: secondFoodUnit = '',
+          // } = secondaryFoodId ? foodListOfDate[secondaryFoodId] || {} : {};
 
           const participantMaybe = participants.find(
             (p) => p?.id?.uuid === memberId,

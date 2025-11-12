@@ -51,6 +51,7 @@
     @include textTemplate(14px, 600, 18px, '');
     color: $neutralGray7;
     margin: 0 0 4px 0;
+    justify-self: start;
   }
 
   .categories {

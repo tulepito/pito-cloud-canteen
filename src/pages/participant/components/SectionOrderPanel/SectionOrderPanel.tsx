@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { toast } from 'react-toastify';
 import classNames from 'classnames';
 import { DateTime } from 'luxon';
@@ -67,8 +67,14 @@ const SectionOrderPanel: React.FC<TSectionOrderPanelProps> = ({
   const dispatch = useAppDispatch();
 
   // Functions
-  const handleRemoveItem = (dayId: string) => {
-    dispatch(shoppingCartThunks.removeFromCart({ planId, dayId }));
+  const handleRemoveItem = (dayId: string, removeSecondFood?: boolean) => {
+    dispatch(
+      shoppingCartThunks.removeFromCart({
+        planId,
+        dayId,
+        removeSecondFood,
+      }),
+    );
   };
 
   const handleRemoveAllItem = () => {
@@ -164,4 +170,4 @@ const SectionOrderPanel: React.FC<TSectionOrderPanelProps> = ({
   );
 };
 
-export default SectionOrderPanel;
+export default React.memo(SectionOrderPanel);

@@ -5,20 +5,25 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { HttpMethod } from '@apis/configs';
 import cookies from '@services/cookie';
 import { getIntegrationSdk, getSdk, handleError } from '@services/sdk';
+import type { TOrderDetail, TOrderDetailRestaurant } from '@src/types/order';
 import {
   CurrentUser,
   denormalisedResponseEntities,
   Listing,
 } from '@utils/data';
 
-const fetchSubOrder = async (orderDetail: any, currentUserId: string) => {
+const fetchSubOrder = async (
+  orderDetail: TOrderDetail,
+  currentUserId: string,
+) => {
   let orderDetailResult = {};
   const integrationSdk = getIntegrationSdk();
   const planKeys = Object.keys(orderDetail);
 
   for (const planKey of planKeys) {
     const { restaurant = {}, memberOrders = {} } = orderDetail[planKey] || {};
-    const { foodList = {}, id: restaurantId } = restaurant;
+    const { foodList = {}, id: restaurantId } =
+      restaurant as TOrderDetailRestaurant;
 
     // Fetch restaurant data
     const restaurantData = denormalisedResponseEntities(
@@ -90,7 +95,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
               id: planId,
             }),
           )[0];
-          const { orderId, orderDetail } = Listing(plan).getMetadata();
+          const { orderId, orderDetail } = Listing(plan).getMetadata() as {
+            orderId: string;
+            orderDetail: TOrderDetail;
+          };
           const order = denormalisedResponseEntities(
             await integrationSdk.listings.show({
               id: orderId,

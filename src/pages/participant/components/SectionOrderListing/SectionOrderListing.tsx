@@ -92,13 +92,13 @@ const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({
     toast.success(
       foodName
         ? `${intl.formatMessage({
-            id: 'da-them-mon',
-          })} ${foodName} ${intl.formatMessage({
-            id: 'cho-ngay',
-          })} ${formatTimestamp(+timestamp)}`
+          id: 'da-them-mon',
+        })} ${foodName} ${intl.formatMessage({
+          id: 'cho-ngay',
+        })} ${formatTimestamp(+timestamp)}`
         : `${intl.formatMessage({
-            id: 'khong-chon-mon-cho-ngay',
-          })} ${formatTimestamp(+timestamp)}`,
+          id: 'khong-chon-mon-cho-ngay',
+        })} ${formatTimestamp(+timestamp)}`,
       {
         position: isMobileLayout ? 'top-center' : 'bottom-center',
         toastId: 'add-to-cart',
@@ -129,7 +129,9 @@ const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({
         foodList,
         restaurant,
       }: { foodList: any[]; restaurant: any; memberOrder: any } = plan[item];
-      const { foodId: hasDishInCart } = cartList?.[item as any] || {};
+      const cartItem = cartList?.[item as any] || {};
+      const hasDishInCart = cartItem.foodId;
+      const hasSecondDish = !!cartItem.secondaryFoodId;
       const planDate = DateTime.fromMillis(Number(item)).toJSDate();
       const itemLabel = (
         <div className={classNames(css.tabTitle, {})}>
@@ -138,6 +140,9 @@ const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({
               id: `Calendar.week.dayHeader.${planDate.getDay()}`,
             })}
             , {planDate.getDate()}/{planDate.getMonth() + 1}
+            {hasSecondDish && (
+              <span className={css.secondFoodIndicator}> +1</span>
+            )}
           </div>
           {hasDishInCart &&
             (hasDishInCart === 'notJoined' ? (
@@ -161,19 +166,25 @@ const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({
         submitDataInprogress ||
         isOrderAlreadyStarted;
 
-      const childrenList = foodList.map((dish, index) => (
-        <ListingCard
-          key={dish?.id?.uuid || index}
-          className={css.listingCard}
-          listing={dish}
-          dayId={item}
-          planId={`${planId}`}
-          isSelected={hasDishInCart === dish?.id?.uuid}
-          selectDisabled={selectDisabled}
-          isOrderAlreadyStarted={isOrderAlreadyStarted}
-          onAddedToCart={onAddedToCart}
-        />
-      ));
+      const childrenList = foodList.map((dish, index) => {
+        const dishId = dish?.id?.uuid;
+        const isFirstSelected = hasDishInCart === dishId;
+        const isSecondSelected = cartItem.secondaryFoodId === dishId;
+
+        return (
+          <ListingCard
+            key={dishId || index}
+            className={css.listingCard}
+            listing={dish}
+            dayId={item}
+            planId={`${planId}`}
+            isSelected={isFirstSelected || isSecondSelected}
+            selectDisabled={selectDisabled}
+            isOrderAlreadyStarted={isOrderAlreadyStarted}
+            onAddedToCart={onAddedToCart}
+          />
+        );
+      });
 
       convertedData.push({
         label: itemLabel,
@@ -199,9 +210,8 @@ const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({
       <div className={css.sectionMainOrder}>
         <Tabs
           items={tabItems}
-          defaultActiveKey={`${
-            (defaultActiveKey < 0 ? 0 : defaultActiveKey) + 1
-          }`}
+          defaultActiveKey={`${(defaultActiveKey < 0 ? 0 : defaultActiveKey) + 1
+            }`}
           contentClassName={css.sectionMainOrderListings}
           headerClassName={css.sectionMainOrderHeader}
           onChange={onSelectTab}

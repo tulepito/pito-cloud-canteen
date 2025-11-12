@@ -79,6 +79,7 @@
   "AddOrderForm.addRequirement.hide": "Hide special request",
   "AddOrderForm.addRequirement.show": "Add special request",
   "AddOrderForm.foodIdField.placeholder": "Dish",
+  "AddOrderForm.secondaryFoodIdField.placeholder": "Secondary dish",
   "AddOrderForm.moibleSubmitButtonText": "Save changes",
   "AddOrderForm.participantIdField.activePlaceholder": "Enter name or email",
   "AddOrderForm.participantIdField.createOption": "Add \"{value}\"",
@@ -1862,8 +1863,11 @@
   "SubOrderChangesHistoryItem.foodRemovedContent": "Removed {quantity} {foodName}",
   "SubOrderChangesHistoryItem.memberFoodAdded": "Added member",
   "SubOrderChangesHistoryItem.memberFoodAddedContent": "Added {email} with {foodName}",
+  "SubOrderChangesHistoryItem.memberFoodAddedWithSecondaryFoodContent": "Added {email} with {foodName} and {secondaryFoodName}",
   "SubOrderChangesHistoryItem.memberFoodChanged": "Edited dish",
   "SubOrderChangesHistoryItem.memberFoodChangedContent": "Changed dish {oldFoodName} to {newFoodName} of {email}",
+  "SubOrderChangesHistoryItem.memberSecondaryFoodChangedContent": "Changed dish {oldSecondaryFoodName} to {newSecondaryFoodName} of {email}",
+  "SubOrderChangesHistoryItem.memberFoodChangedWithSecondaryFoodContent": "Changed dish {oldFoodName} to {newFoodName} and {oldSecondaryFoodName} to {newSecondaryFoodName} of {email}",
   "SubOrderChangesHistoryItem.memberFoodRemoved": "Removed member",
   "SubOrderChangesHistoryItem.memberFoodRemovedContent": "Removed {email} from {from}",
   "SubOrderChangesHistorySection.title": "Edit activities",
@@ -2626,5 +2630,6 @@
   "automated-lunch-solution-or-pito-cloud-canteen": "Automated Lunch Solution | PITO Cloud Canteen",
   "plan-weekly-meals-let-employees-choose-dishes-ensure-on-time-delivery-and-track-transparent-costs-all-on-one-platform": "Plan weekly meals, let employees choose dishes, ensure on-time delivery, and track transparent costs — all on one platform.",
   "automated-corporate-lunch-ordering-solution": "Automated Corporate Lunch Ordering Solution",
-  "pcc-helps-companies-plan-lunch-choose-vendors-manage-and-deliver-on-time-without-setup-costs-and-save-time": "PITO Cloud Canteen helps companies plan meals, select vendors, manage orders, and deliver directly - no setup fees, saving time and effort."
+  "pcc-helps-companies-plan-lunch-choose-vendors-manage-and-deliver-on-time-without-setup-costs-and-save-time": "PITO Cloud Canteen helps companies plan meals, select vendors, manage orders, and deliver directly - no setup fees, saving time and effort.",
+  "nhap-ghi-chu-cho-don-hang": "Enter order note"
 }
