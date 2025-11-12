@@ -3,15 +3,17 @@ import difference from 'lodash/difference';
 
 import { participantSubOrderAddDocumentApi } from '@apis/firebaseApi';
 import { loadPlanDataApi, updateParticipantOrderApi } from '@apis/index';
-import {
-  OrderListActions,
-  recommendFood,
-} from '@pages/participant/orders/OrderList.slice';
+import { recommendFood } from '@pages/participant/orders/OrderList.slice';
 import { createAsyncThunk } from '@redux/redux.helper';
 import {
   shoppingCartActions,
   shoppingCartThunks,
 } from '@redux/slices/shoppingCart.slice';
+import type {
+  TCartItem,
+  TPlanOrder,
+  TUpdateParticipantOrderApiBody,
+} from '@src/types/order';
 import { CurrentUser, Listing } from '@src/utils/data';
 import type { TListing } from '@src/utils/types';
 import { EParticipantOrderStatus } from '@utils/enums';
@@ -127,6 +129,8 @@ const loadData = createAsyncThunk(
         status,
         foodId,
         requirement = '',
+        secondaryFoodId,
+        secondaryRequirement,
       } = plan?.[day]?.memberOrder?.[currentUserId] || {};
 
       if (status !== EParticipantOrderStatus.empty) {
@@ -140,6 +144,21 @@ const loadData = createAsyncThunk(
             requirement,
           }),
         );
+        if (secondaryFoodId) {
+          dispatch(
+            shoppingCartActions.addToCart({
+              currentUserId,
+              planId,
+              dayId: day,
+              mealId:
+                status === EParticipantOrderStatus.notJoined
+                  ? status
+                  : secondaryFoodId,
+              requirement: secondaryRequirement,
+              isSecondFood: true,
+            }),
+          );
+        }
       }
     });
 
@@ -196,61 +215,84 @@ const updateOrder = createAsyncThunk(
     const { currentUser } = getState().user;
     const currentUserId = currentUser?.id?.uuid;
     const { orders } = getState().shoppingCart;
+    console.log('orders', { orders });
     const planData = orders?.[currentUserId]?.[planId] || {};
+    console.log('planData', { planData });
     const orderDays = Object.keys(planData);
+    console.log('orderDays', { orderDays });
 
-    const updatedPlan = orderDays.reduce((acc: any, curr: any) => {
-      const { foodId = '', requirement = '' } = planData[curr] || {};
+    const buildCartItem = (
+      foodId: string,
+      requirement: string,
+      secondaryFoodId?: string,
+      secondaryRequirement?: string,
+    ) => {
+      const isNotJoined = foodId === EParticipantOrderStatus.notJoined;
+      const status = isNotJoined
+        ? EParticipantOrderStatus.notJoined
+        : foodId?.length > 0
+        ? EParticipantOrderStatus.joined
+        : EParticipantOrderStatus.empty;
+
+      const baseItem: TCartItem = {
+        status,
+        foodId: isNotJoined ? '' : foodId,
+        requirement,
+        ...(secondaryFoodId && {
+          secondaryFoodId,
+          secondaryRequirement,
+        }),
+      };
+
+      return baseItem;
+    };
+
+    const updatedPlan = orderDays.reduce<TPlanOrder>((acc, curr) => {
+      const {
+        foodId = '',
+        requirement = '',
+        secondaryFoodId,
+        secondaryRequirement,
+      } = planData[+curr] || {};
 
       return {
         ...acc,
         [curr]: {
-          [currentUserId]:
-            // eslint-disable-next-line no-nested-ternary
-            foodId === EParticipantOrderStatus.notJoined
-              ? {
-                  status: EParticipantOrderStatus.notJoined,
-                  foodId: '',
-                  requirement,
-                }
-              : {
-                  status:
-                    foodId?.length > 0
-                      ? EParticipantOrderStatus.joined
-                      : EParticipantOrderStatus.empty,
-                  foodId,
-                  requirement,
-                },
+          [currentUserId]: buildCartItem(
+            foodId,
+            requirement,
+            secondaryFoodId,
+            secondaryRequirement,
+          ),
         },
       };
     }, {});
 
-    const updateValues = {
+    const updateValues: TUpdateParticipantOrderApiBody = {
       orderId,
       orderDays,
       planId,
       planData: updatedPlan,
     };
 
+    console.log('updateOrder@@updateValues:', {
+      updateValues: JSON.stringify(updateValues),
+    });
+
     const {
-      data: { plan: newPlan, jobId },
+      data: { jobId },
     } = await updateParticipantOrderApi(orderId, updateValues);
-    dispatch(OrderListActions.updatePlanDetail(newPlan));
-    orderDays.forEach((timestamp: string) => {
-      participantSubOrderAddDocumentApi({
-        participantId: currentUserId,
-        planId,
-        timestamp: parseInt(`${timestamp}`, 10),
-      });
-    });
+
     await dispatch(reloadData(planId));
-    orderDays.map(async (subOrderDate: string) => {
-      await participantSubOrderAddDocumentApi({
-        participantId: currentUserId,
-        planId,
-        timestamp: parseInt(`${subOrderDate}`, 10),
-      });
-    });
+    await Promise.all(
+      orderDays.map((timestamp: string) =>
+        participantSubOrderAddDocumentApi({
+          participantId: currentUserId,
+          planId,
+          timestamp: parseInt(timestamp, 10),
+        }),
+      ),
+    );
 
     return !!jobId;
   },

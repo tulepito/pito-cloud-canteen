@@ -12,6 +12,7 @@ import FieldTextInput from '@components/FormFields/FieldTextInput/FieldTextInput
 import IconMinus from '@components/Icons/IconMinus/IconMinus';
 import IconPlusWithoutBorder from '@components/Icons/IconPlusWithoutBorder/IconPlusWithoutBorder';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
+import { useAppSelector } from '@hooks/reduxHooks';
 
 import css from './EditOrderRowForm.module.scss';
 
@@ -19,6 +20,8 @@ export type TEditOrderRowFormValues = {
   memberName: string;
   foodId: string;
   requirement: string;
+  secondaryFoodId?: string;
+  secondaryRequirement?: string;
 };
 
 type TExtraProps = {
@@ -40,6 +43,11 @@ const EditOrderRowFormComponent: React.FC<TEditOrderRowFormComponentProps> = (
   } = props;
   const intl = useIntl();
   const { requirement } = initialValues;
+
+  // Flag to check if the user is allowed to add a second food
+  const isAllowAddSecondFood = useAppSelector(
+    (state) => state.OrderManagement.isAllowAddSecondFood,
+  );
 
   const submitDisabled = pristine || submitting;
   const submitInprogress = submitting;
@@ -96,15 +104,28 @@ const EditOrderRowFormComponent: React.FC<TEditOrderRowFormComponentProps> = (
     <Form onSubmit={handleSubmit} className={css.root}>
       <div className={css.fieldOnRow}>
         <FieldTextInput name="memberName" disabled className={css.input} />
-        <FieldDropdownSelect
-          id="foodId"
-          name="foodId"
-          className={css.input}
-          placeholder={intl.formatMessage({
-            id: 'EditOrderRowForm.foodSelectField.placeholder',
-          })}
-          options={parsedFoodOptions}
-        />
+        <div className="flex flex-col gap-2">
+          <FieldDropdownSelect
+            id="foodId"
+            name="foodId"
+            className={css.input}
+            placeholder={intl.formatMessage({
+              id: 'EditOrderRowForm.foodSelectField.placeholder',
+            })}
+            options={parsedFoodOptions}
+          />
+          <RenderWhen condition={isAllowAddSecondFood}>
+            <FieldDropdownSelect
+              id="secondaryFoodId"
+              name="secondaryFoodId"
+              className={css.input}
+              placeholder={intl.formatMessage({
+                id: 'EditOrderRowForm.foodSelectField.placeholder',
+              })}
+              options={parsedFoodOptions}
+            />
+          </RenderWhen>
+        </div>
       </div>
 
       <Button

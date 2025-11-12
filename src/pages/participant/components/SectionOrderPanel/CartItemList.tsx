@@ -14,7 +14,7 @@ type TCartItemList = {
   cartList: TObject;
   cartListKeys: string[];
   plan: any;
-  handleRemoveItem: (dayId: string) => void;
+  handleRemoveItem: (dayId: string, removeSecondFood?: boolean) => void;
 };
 
 const CartItemList: React.FC<TCartItemList> = ({
@@ -36,17 +36,18 @@ const CartItemList: React.FC<TCartItemList> = ({
     const planDate = DateTime.fromMillis(Number(key)).toJSDate();
     const itemLabel = `${intl.formatMessage({
       id: `Calendar.week.dayHeader.${planDate.getDay()}`,
-    })}, ${planDate.getDate()}/${
-      planDate.getMonth() + 1
-    }/${planDate.getFullYear()}`;
+    })}, ${planDate.getDate()}/${planDate.getMonth() + 1
+      }/${planDate.getFullYear()}`;
 
-    const { foodId = '' } = item;
+    const { foodId = '', secondaryFoodId = '' } = item;
 
     if (foodId === '') {
       return null;
     }
 
     const foodList = plan?.[key]?.foodList || [];
+
+    // Món đầu tiên
     const selectedDish =
       foodId === 'notJoined'
         ? null
@@ -58,15 +59,39 @@ const CartItemList: React.FC<TCartItemList> = ({
         ? intl.formatMessage({ id: 'SectionOrderPanel.notJoined' })
         : dishAttributes?.title;
 
+    // Món thứ 2 (nếu có)
+    const secondDish =
+      secondaryFoodId && secondaryFoodId !== 'notJoined'
+        ? foodList.find((food: any) => food?.id?.uuid === secondaryFoodId)
+        : null;
+    const secondDishAttributes = secondDish
+      ? Listing(secondDish).getAttributes()
+      : null;
+    const secondDishTitle = secondDishAttributes?.title;
+
     return (
-      <CartItem
-        key={key}
-        label={itemLabel}
-        value={dishTitle}
-        subOrderDate={key}
-        removeDisabled={isOrderDeadlineOver}
-        onRemove={onRemoveItem(key)}
-      />
+      <div key={key}>
+        <CartItem
+          label={itemLabel}
+          value={dishTitle}
+          subOrderDate={key}
+          removeDisabled={isOrderDeadlineOver}
+          onRemove={onRemoveItem(key)}
+          foodPosition="first"
+        />
+        {secondDishTitle && (
+          <CartItem
+            label=""
+            value={secondDishTitle}
+            subOrderDate={key}
+            removeDisabled={isOrderDeadlineOver}
+            onRemove={() => {
+              handleRemoveItem(key, true);
+            }}
+            foodPosition="second"
+          />
+        )}
+      </div>
     );
   };
 

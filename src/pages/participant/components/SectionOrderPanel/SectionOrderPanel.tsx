@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { toast } from 'react-toastify';
 import classNames from 'classnames';
 import { DateTime } from 'luxon';
@@ -67,8 +67,14 @@ const SectionOrderPanel: React.FC<TSectionOrderPanelProps> = ({
   const dispatch = useAppDispatch();
 
   // Functions
-  const handleRemoveItem = (dayId: string) => {
-    dispatch(shoppingCartThunks.removeFromCart({ planId, dayId }));
+  const handleRemoveItem = (dayId: string, removeSecondFood?: boolean) => {
+    dispatch(
+      shoppingCartThunks.removeFromCart({
+        planId,
+        dayId,
+        removeSecondFood,
+      }),
+    );
   };
 
   const handleRemoveAllItem = () => {
@@ -79,11 +85,18 @@ const SectionOrderPanel: React.FC<TSectionOrderPanelProps> = ({
     Tracker.track('participant:order:place', {
       orderId,
     });
-    const res = await dispatch(
-      ParticipantPlanThunks.updateOrder({ orderId, planId }),
-    );
-    if (res) setIsSubmitSuccess(true);
-    else {
+    try {
+      const res = await dispatch(
+        ParticipantPlanThunks.updateOrder({ orderId, planId }),
+      );
+      // payload will be true if jobId exists
+      if (res?.payload) {
+        setIsSubmitSuccess(true);
+      } else {
+        toast.error('Đã có lỗi xảy ra trong chọn món. Vui lòng thử lại sau');
+      }
+    } catch (error) {
+      console.error('Error submitting order:', error);
       toast.error('Đã có lỗi xảy ra trong chọn món. Vui lòng thử lại sau');
     }
   };
@@ -151,4 +164,4 @@ const SectionOrderPanel: React.FC<TSectionOrderPanelProps> = ({
   );
 };
 
-export default SectionOrderPanel;
+export default React.memo(SectionOrderPanel);

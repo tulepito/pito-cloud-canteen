@@ -1,12 +1,12 @@
 /* eslint-disable react/no-unescaped-entities */
 /* eslint-disable no-unsafe-optional-chaining */
+import type { ReactNode } from 'react';
 import { useIntl } from 'react-intl';
 import Skeleton from 'react-loading-skeleton';
 import classNames from 'classnames';
 
 import { InlineTextButton } from '@components/Button/Button';
 import useBoolean from '@hooks/useBoolean';
-import type { RestoreDraftDisAllowedMemberPayload } from '@redux/slices/OrderManagement.slice';
 import { formatTimestamp } from '@src/utils/dates';
 import { EEditSubOrderHistoryType } from '@src/utils/enums';
 import type { TSubOrderChangeHistoryItem } from '@src/utils/types';
@@ -43,7 +43,7 @@ const SubOrderChangesHistoryItem = (props: TSubOrderChangeHistoryItem) => {
   const itemContent = () => {
     switch (type) {
       case EEditSubOrderHistoryType.MEMBER_FOOD_ADDED: {
-        const { foodName } = newValue;
+        const { foodName, secondaryFoodName } = newValue || {};
 
         return {
           title: intl.formatMessage({
@@ -51,21 +51,22 @@ const SubOrderChangesHistoryItem = (props: TSubOrderChangeHistoryItem) => {
           }),
           content: intl.formatMessage(
             {
-              id: 'SubOrderChangesHistoryItem.memberFoodAddedContent',
+              id: secondaryFoodName
+                ? 'SubOrderChangesHistoryItem.memberFoodAddedWithSecondaryFoodContent'
+                : 'SubOrderChangesHistoryItem.memberFoodAddedContent',
             },
             {
               email: <span className={css.boldText}>"{member?.email}"</span>,
               foodName: <span className={css.boldText}>"{foodName}"</span>,
+              secondaryFoodName: (
+                <span className={css.boldText}>"{secondaryFoodName}"</span>
+              ),
             },
           ),
         };
       }
       case EEditSubOrderHistoryType.MEMBERS_FOOD_RESTORED: {
-        const {
-          members,
-        }: {
-          members: RestoreDraftDisAllowedMemberPayload['members'];
-        } = newValue || {};
+        const { members } = newValue || {};
 
         return {
           title: intl.formatMessage({ id: 'khoi-phuc-phan-an' }),
@@ -79,8 +80,57 @@ const SubOrderChangesHistoryItem = (props: TSubOrderChangeHistoryItem) => {
         };
       }
       case EEditSubOrderHistoryType.MEMBER_FOOD_CHANGED: {
-        const { foodName: oldFoodName } = oldValue;
-        const { foodName: newFoodName } = newValue;
+        const {
+          foodId: oldFoodId,
+          foodName: oldFoodName,
+          secondaryFoodId: oldSecondaryFoodId,
+          secondaryFoodName: oldSecondaryFoodName,
+        } = oldValue;
+        const {
+          foodId: newFoodId,
+          foodName: newFoodName,
+          secondaryFoodId: newSecondaryFoodId,
+          secondaryFoodName: newSecondaryFoodName,
+        } = newValue || {};
+
+        const primaryChanged = oldFoodId !== newFoodId;
+        const secondaryChanged =
+          (oldSecondaryFoodId || undefined) !==
+          (newSecondaryFoodId || undefined);
+
+        let messageId = 'SubOrderChangesHistoryItem.memberFoodChangedContent';
+
+        if (primaryChanged && secondaryChanged) {
+          messageId =
+            'SubOrderChangesHistoryItem.memberFoodChangedWithSecondaryFoodContent';
+        } else if (!primaryChanged && secondaryChanged) {
+          messageId =
+            'SubOrderChangesHistoryItem.memberSecondaryFoodChangedContent';
+        } else if (!primaryChanged && !secondaryChanged) {
+          messageId = 'SubOrderChangesHistoryItem.memberFoodChangedContent';
+        }
+
+        const messageValues: Record<string, ReactNode> = {
+          email: <span className={css.boldText}>"{member?.email}"</span>,
+        };
+
+        if (primaryChanged) {
+          messageValues.newFoodName = (
+            <span className={css.boldText}>"{newFoodName}"</span>
+          );
+          messageValues.oldFoodName = (
+            <span className={css.boldText}>"{oldFoodName}"</span>
+          );
+        }
+
+        if (secondaryChanged) {
+          messageValues.newSecondaryFoodName = (
+            <span className={css.boldText}>"{newSecondaryFoodName}"</span>
+          );
+          messageValues.oldSecondaryFoodName = (
+            <span className={css.boldText}>"{oldSecondaryFoodName}"</span>
+          );
+        }
 
         return {
           title: intl.formatMessage({
@@ -88,16 +138,14 @@ const SubOrderChangesHistoryItem = (props: TSubOrderChangeHistoryItem) => {
           }),
           content: intl.formatMessage(
             {
-              id: 'SubOrderChangesHistoryItem.memberFoodChangedContent',
+              id: messageId,
             },
             {
-              newFoodName: (
-                <span className={css.boldText}>"{newFoodName}"</span>
-              ),
-              oldFoodName: (
-                <span className={css.boldText}>"{oldFoodName}"</span>
-              ),
-              email: <span className={css.boldText}>"{member?.email}"</span>,
+              oldFoodName: messageValues.oldFoodName,
+              newFoodName: messageValues.newFoodName,
+              email: messageValues.email,
+              oldSecondaryFoodName: messageValues.oldSecondaryFoodName,
+              newSecondaryFoodName: messageValues.newSecondaryFoodName,
             },
           ),
         };
@@ -118,7 +166,7 @@ const SubOrderChangesHistoryItem = (props: TSubOrderChangeHistoryItem) => {
           ),
         };
       case EEditSubOrderHistoryType.FOOD_ADDED: {
-        const { foodName } = newValue;
+        const { foodName } = newValue || {};
 
         return {
           title: intl.formatMessage({
@@ -155,7 +203,7 @@ const SubOrderChangesHistoryItem = (props: TSubOrderChangeHistoryItem) => {
       }
       case EEditSubOrderHistoryType.FOOD_DECREASED: {
         const { quantity: oldQuantity, foodName } = oldValue;
-        const { quantity } = newValue;
+        const { quantity } = newValue || {};
 
         return {
           title: intl.formatMessage({
@@ -168,7 +216,7 @@ const SubOrderChangesHistoryItem = (props: TSubOrderChangeHistoryItem) => {
             {
               foodName: <span className={css.boldText}>"{foodName}"</span>,
               quantity: (
-                <span className={css.boldText}>{oldQuantity - quantity}</span>
+                <span className={css.boldText}>{oldQuantity! - quantity!}</span>
               ),
             },
           ),
@@ -176,7 +224,7 @@ const SubOrderChangesHistoryItem = (props: TSubOrderChangeHistoryItem) => {
       }
       case EEditSubOrderHistoryType.FOOD_INCREASED: {
         const { quantity: oldQuantity, foodName } = oldValue;
-        const { quantity } = newValue;
+        const { quantity } = newValue || {};
 
         return {
           title: intl.formatMessage({
@@ -189,7 +237,7 @@ const SubOrderChangesHistoryItem = (props: TSubOrderChangeHistoryItem) => {
             {
               foodName: <span className={css.boldText}>"{foodName}"</span>,
               quantity: (
-                <span className={css.boldText}>{quantity - oldQuantity}</span>
+                <span className={css.boldText}>{quantity! - oldQuantity!}</span>
               ),
             },
           ),
